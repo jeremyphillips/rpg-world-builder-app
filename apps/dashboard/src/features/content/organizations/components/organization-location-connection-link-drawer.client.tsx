@@ -9,9 +9,16 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
-import { Button, Heading, SegmentedControl, Text } from '@rpg/ui'
+import {
+  Button,
+  Heading,
+  SegmentedControl,
+  SelectionSummaryCard,
+  SelectionSummaryChangeAction,
+  Text,
+} from '@rpg/ui'
 
-import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
+import { LocationConnectionKindField } from '../../components/location-connection-kind-field.client'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -51,6 +58,8 @@ import {
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
   ORGANIZATION_DRAWER_KIND_FIELD_LABELS,
   ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS,
+  RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
+  RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW,
   type OrganizationConnectionDrawerIntent,
   filterLocationsForOrganizationKind,
   locationEligibleForOrganizationKind,
@@ -60,6 +69,7 @@ import {
 import {
   buildOrganizationFamilyKindOptions,
   buildOrganizationLocationChangeKindOptions,
+  canReopenConnectionKindDecision,
   resolveActiveConnectionKind,
   type LocationConnectionKindOption,
 } from '../../lib/location-connection-kind-options'
@@ -86,8 +96,6 @@ export const ORGANIZATION_LOCATION_LINK_NO_RESULTS = 'No matches for this search
 export const ORGANIZATION_LOCATION_LINK_NO_ITEMS = 'No locations are available.'
 export const ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE =
   'Choose a relationship type to see eligible locations.'
-
-const ORGANIZATION_DRAWER_KIND_CHANGE_LABEL = 'Change'
 
 type ExistingConnection = {
   id: string
@@ -198,6 +206,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
   )
   const [locationBrowseScope, setLocationBrowseScope] =
     React.useState<OrganizationLocationTargetBrowseScope>('all')
+  const [editingKind, setEditingKind] = React.useState(false)
 
   const excludeConnectionId =
     mode === 'changeKind' || mode === 'changeTarget' ? initialConnection?.id : undefined
@@ -358,8 +367,18 @@ function OrganizationLocationConnectionLinkDrawerContent({
     organizationId,
   ])
 
+  const canEditKind = canReopenConnectionKindDecision(kindOptions)
+  const kindDecisionComplete = showKindStep && Boolean(activeKind)
+  const showKindField =
+    showKindStep && (!kindDecisionComplete || editingKind || (kindDecisionComplete && !canEditKind))
+  const showKindSummary = showKindStep && canEditKind && kindDecisionComplete && !editingKind
+  const selectedKindOption = kindOptions.find((option) => option.value === activeKind)
+  const kindFieldLabel = ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]
+  const kindChangeAriaLabel = RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL
+
   const showLocationPicker =
-    ((mode === 'add' && Boolean(activeKind)) || mode === 'changeTarget') &&
+    ((mode === 'add' && Boolean(activeKind) && (!showKindStep || !editingKind)) ||
+      mode === 'changeTarget') &&
     !currentEndpoint?.unavailable
   const hasTargetChange =
     mode === 'changeTarget'
@@ -371,7 +390,15 @@ function OrganizationLocationConnectionLinkDrawerContent({
 
   const handleKindChange = (value: string) => {
     const nextKind = value as OrganizationLocationConnectionKind
+
+    if (showKindStep && activeKind === nextKind) {
+      setEditingKind(false)
+      return
+    }
+
     setSelectedKind(nextKind)
+    setEditingKind(false)
+
     if (!selectedLocationId) return
 
     const locationForSelection = locations.find((location) => location.id === selectedLocationId)
@@ -388,6 +415,11 @@ function OrganizationLocationConnectionLinkDrawerContent({
     ) {
       setSelectedLocationId(null)
     }
+  }
+
+  const startEditingKind = () => {
+    if (!canEditKind) return
+    setEditingKind(true)
   }
 
   const handleSubmit = async () => {
@@ -551,14 +583,33 @@ function OrganizationLocationConnectionLinkDrawerContent({
               {familyAddDrawerHelper}
             </Text>
           ) : null}
-          {showKindStep ? (
-            <LocationConnectionKindStep
+          {showKindField ? (
+            <LocationConnectionKindField
               id="organization-location-connection-kind"
-              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+              label={kindFieldLabel}
               options={kindOptions}
               value={activeKind}
               onValueChange={handleKindChange}
-              changeLabel={ORGANIZATION_DRAWER_KIND_CHANGE_LABEL}
+            />
+          ) : null}
+          {showKindSummary && selectedKindOption ? (
+            <SelectionSummaryCard
+              eyebrow={RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW}
+              rows={[
+                {
+                  label: kindFieldLabel,
+                  value: selectedKindOption.label,
+                  onValueClick: startEditingKind,
+                  valueActionAriaLabel: kindChangeAriaLabel,
+                  action: (
+                    <SelectionSummaryChangeAction
+                      changeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
+                      ariaLabel={kindChangeAriaLabel}
+                      onChange={startEditingKind}
+                    />
+                  ),
+                },
+              ]}
             />
           ) : null}
           {mode === 'changeTarget' &&
@@ -581,16 +632,14 @@ function OrganizationLocationConnectionLinkDrawerContent({
             </EntityReplacementSection>
           ) : null}
           {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
-            <LocationConnectionKindStep
+            <LocationConnectionKindField
               id="organization-location-connection-edit-kind"
-              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+              label={kindFieldLabel}
               options={changeKindPickerOptions}
               value={activeKind}
               onValueChange={(value) =>
                 setSelectedKind(value as OrganizationLocationConnectionKind)
               }
-              changeLabel={ORGANIZATION_DRAWER_KIND_CHANGE_LABEL}
-              defaultExpanded
             />
           ) : null}
           {showLocationPicker && !showMutationEmptyState && mode !== 'changeTarget' ? (
@@ -634,7 +683,10 @@ function OrganizationLocationConnectionLinkDrawerContent({
         ) : undefined
       }
       footer={
-        !showMutationEmptyState && (showLocationPicker || mode === 'changeKind') && activeKind ? (
+        !showMutationEmptyState &&
+        (showLocationPicker || mode === 'changeKind') &&
+        activeKind &&
+        !(showKindStep && editingKind) ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
             {submitLabel}
           </Button>

@@ -3,9 +3,15 @@
 import * as React from 'react'
 
 import type { CampaignNpcDetail, CharacterBuildContext } from '@rpg/contracts'
-import { Button, DialogPanelActionRow, usePendingAwareOpenChange } from '@rpg/ui'
+import { usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
+import {
+  CreateSetupFooter,
+  notifyCreateSetupValueChangeCompletion,
+  useCreateSetupSequence,
+  type SetupSummaryEditTarget,
+} from '@/lib/create-setup'
 import { CreateModalShell } from '@/lib/create-flow'
 
 import {
@@ -15,9 +21,11 @@ import {
 } from '../lib/quick-npc-form-fields'
 import { applyQuickNpcSetupValueChange } from '../lib/quick-npc-setup-value-change.lib'
 import {
+  buildQuickNpcCreateSetupSets,
+  QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
   QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
   QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
-  resolveQuickNpcSetupModel,
+  resolveQuickNpcBuildExternalDecision,
 } from '../lib/quick-npc-create-modal-setup.lib'
 import {
   QuickNpcAuthoringForm,
@@ -66,30 +74,59 @@ function QuickNpcCreateModalSession({
 }: QuickNpcCreateModalProps) {
   const [state, setState] = React.useState(() => createInitialState(buildContext))
   const [authoringPending, setAuthoringPending] = React.useState(false)
+  const pendingSetupSummaryEditRef = React.useRef<SetupSummaryEditTarget | null>(null)
+  const setupValuesRef = React.useRef(state.setupValues)
+  setupValuesRef.current = state.setupValues
   const { trustedClose } = usePendingAwareOpenChange({
     pending: authoringPending,
     onOpenChange,
   })
 
-  const setupModel = React.useMemo(
+  const organizationMembers = organization.members
+  const titles = organizationMembers?.titles ?? []
+  const classAffinityIds = organizationMembers?.classAffinityIds
+  const speciesAffinityIds = organizationMembers?.speciesAffinityIds
+
+  const setupSets = React.useMemo(
     () =>
-      resolveQuickNpcSetupModel({
+      buildQuickNpcCreateSetupSets({
         context: buildContext,
         values: state.setupValues,
-        titles: organization.members?.titles ?? [],
+        titles,
         members: {
-          classAffinityIds: organization.members?.classAffinityIds,
-          speciesAffinityIds: organization.members?.speciesAffinityIds,
+          classAffinityIds,
+          speciesAffinityIds,
         },
       }),
-    [
-      buildContext,
-      organization.members?.classAffinityIds,
-      organization.members?.speciesAffinityIds,
-      organization.members?.titles,
-      state.setupValues,
-    ],
+    [buildContext, classAffinityIds, speciesAffinityIds, state.setupValues, titles],
   )
+
+  const handleContinueFromSetup = React.useCallback((values: QuickNpcSetupValues) => {
+    setState((current) => ({
+      ...current,
+      phase: 'authoring',
+      setupValues: values,
+      authoringValues: {
+        requiredWeaponIds: [],
+        requiredSpellIds: [],
+      },
+    }))
+  }, [])
+
+  const externalDecisions = React.useMemo(
+    () => [
+      resolveQuickNpcBuildExternalDecision({
+        values: state.setupValues,
+        context: buildContext,
+      }),
+    ],
+    [buildContext, state.setupValues],
+  )
+
+  const sequenceModel = useCreateSetupSequence(setupSets, {
+    externalDecisions,
+    onSetupComplete: () => handleContinueFromSetup(setupValuesRef.current),
+  })
 
   const requestCancel = React.useCallback(() => {
     if (authoringPending) return
@@ -107,36 +144,67 @@ function QuickNpcCreateModalSession({
     [onOpenChange, requestCancel],
   )
 
-  const handleApplySetupChange = React.useCallback(
-    (setId: string, nextValue: string | number) => {
+  const handleSetupValueChange = React.useCallback(
+    (event: Parameters<typeof applyQuickNpcSetupValueChange>[0]['event']) => {
+      const previousSets = buildQuickNpcCreateSetupSets({
+        context: buildContext,
+        values: setupValuesRef.current,
+        titles,
+        members: {
+          classAffinityIds,
+          speciesAffinityIds,
+        },
+      })
+
+      const nextValues = applyQuickNpcSetupValueChange({
+        values: setupValuesRef.current,
+        event,
+        context: buildContext,
+        titles,
+        organizationClassAffinityIds: classAffinityIds,
+      })
+
+      const nextSets = buildQuickNpcCreateSetupSets({
+        context: buildContext,
+        values: nextValues,
+        titles,
+        members: {
+          classAffinityIds,
+          speciesAffinityIds,
+        },
+      })
+
+      const nextExternalDecisions = [
+        resolveQuickNpcBuildExternalDecision({
+          values: nextValues,
+          context: buildContext,
+        }),
+      ]
+
+      notifyCreateSetupValueChangeCompletion({
+        previousSets,
+        nextSets,
+        externalDecisions: nextExternalDecisions,
+        onSetupComplete: () => handleContinueFromSetup(nextValues),
+      })
+
       setState((current) => ({
         ...current,
-        setupValues: applyQuickNpcSetupValueChange({
-          values: current.setupValues,
-          setId,
-          nextValue,
-          context: buildContext,
-          titles: organization.members?.titles ?? [],
-          organizationClassAffinityIds: organization.members?.classAffinityIds,
-        }),
+        setupValues: nextValues,
       }))
     },
-    [buildContext, organization.members?.classAffinityIds, organization.members?.titles],
+    [buildContext, classAffinityIds, handleContinueFromSetup, speciesAffinityIds, titles],
   )
 
-  const handleContinueFromSetup = React.useCallback((values: QuickNpcSetupValues) => {
+  const returnToAuthoring = React.useCallback(() => {
     setState((current) => ({
       ...current,
       phase: 'authoring',
-      setupValues: values,
-      authoringValues: {
-        requiredWeaponIds: [],
-        requiredSpellIds: [],
-      },
     }))
   }, [])
 
-  const handleChangeSetup = React.useCallback(() => {
+  const handleSetupSummaryEdit = React.useCallback((target: SetupSummaryEditTarget) => {
+    pendingSetupSummaryEditRef.current = target
     setState((current) => ({
       ...current,
       phase: 'setup',
@@ -147,6 +215,22 @@ function QuickNpcCreateModalSession({
       },
     }))
   }, [])
+
+  React.useLayoutEffect(() => {
+    if (state.phase !== 'setup') return
+
+    const pending = pendingSetupSummaryEditRef.current
+    if (!pending) return
+
+    pendingSetupSummaryEditRef.current = null
+    if (pending.type === 'set') {
+      sequenceModel.reopen(pending.id, { onDismiss: returnToAuthoring })
+    }
+  }, [returnToAuthoring, sequenceModel, state.phase])
+
+  const handleChangeSetup = React.useCallback(() => {
+    handleSetupSummaryEdit({ type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID })
+  }, [handleSetupSummaryEdit])
 
   const handleAuthoringCreated = React.useCallback(
     async (npc: CampaignNpcDetail) => {
@@ -172,21 +256,11 @@ function QuickNpcCreateModalSession({
         contentMode={state.phase === 'setup' ? 'scroll' : 'managed'}
         footer={
           state.phase === 'setup' ? (
-            <DialogPanelActionRow>
-              <Button type="button" variant="outline" onClick={requestCancel}>
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                disabled={!setupModel.canContinue}
-                onClick={() => {
-                  if (!setupModel.canContinue) return
-                  handleContinueFromSetup(state.setupValues)
-                }}
-              >
-                Continue
-              </Button>
-            </DialogPanelActionRow>
+            <CreateSetupFooter
+              model={sequenceModel}
+              onCancel={requestCancel}
+              onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
+            />
           ) : (
             <FormShellFooterSlot />
           )
@@ -197,7 +271,9 @@ function QuickNpcCreateModalSession({
             buildContext={buildContext}
             organization={organization}
             setupValues={state.setupValues}
-            onApplySetupChange={handleApplySetupChange}
+            setupSets={setupSets}
+            sequenceModel={sequenceModel}
+            onSetupValueChange={handleSetupValueChange}
           />
         ) : (
           <QuickNpcAuthoringForm
@@ -209,6 +285,7 @@ function QuickNpcCreateModalSession({
             initialValues={state.authoringValues}
             onCancel={requestCancel}
             onChangeSetup={handleChangeSetup}
+            onSetupSummaryEdit={handleSetupSummaryEdit}
             onCreated={handleAuthoringCreated}
             onPendingChange={setAuthoringPending}
           />

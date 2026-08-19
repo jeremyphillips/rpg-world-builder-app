@@ -52,15 +52,16 @@ describe('LocationSettlementCreateSetup', () => {
     expect(screen.queryByText(/before authoring/i)).not.toBeInTheDocument()
   })
 
-  it('keeps the terminal choice set expanded after selection and completes on Continue', async () => {
+  it('summarizes the completed choice and completes on Continue after selection', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
+    const onOpenChange = vi.fn()
 
     render(
       <LocationSettlementCreateSetup
         open
         intent={{ authoringType: 'settlement' }}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onComplete={onComplete}
       />,
     )
@@ -68,8 +69,9 @@ describe('LocationSettlementCreateSetup', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('City') }))
 
     expect(
-      screen.getByRole('radiogroup', { name: SETTLEMENT_CREATE_SETUP_PROMPT }),
-    ).toBeInTheDocument()
+      screen.queryByRole('radiogroup', { name: SETTLEMENT_CREATE_SETUP_PROMPT }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('City')).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
     ).not.toBeInTheDocument()
@@ -79,6 +81,7 @@ describe('LocationSettlementCreateSetup', () => {
 
     await waitFor(() => {
       expect(onComplete).toHaveBeenCalledWith({ kind: 'settlement', settlementType: 'city' })
+      expect(onOpenChange).toHaveBeenCalledWith(false)
     })
   })
 })

@@ -13,8 +13,8 @@ import {
   type OrganizationDomain,
   type OrganizationForm,
 } from '@rpg/contracts'
-import { Button } from '@rpg/ui'
-import { SetupSummaryCard, SetupSummaryCardChangeAction } from '@/lib/create-setup'
+import { Button, SelectionSummaryCard } from '@rpg/ui'
+import { mapSetupSummaryRowModelsToProps, type SetupSummaryEditTarget } from '@/lib/create-setup'
 import {
   FormShellSubmitButton,
   TabbedForm,
@@ -44,10 +44,9 @@ import {
   type QuickNpcSetupValues,
 } from '../lib/quick-npc-form-fields'
 import {
-  QUICK_NPC_AUTHORING_SETUP_CHANGE_ARIA_LABEL,
   QUICK_NPC_SETUP_CHANGE_LABEL,
   QUICK_NPC_SETUP_SUMMARY_EYEBROW,
-  resolveQuickNpcAuthoringSetupSummaryRows,
+  resolveQuickNpcSetupSummaryRows,
 } from '../lib/quick-npc-create-modal-setup.lib'
 import {
   QUICK_NPC_GENERATE_NAME_LABEL,
@@ -81,6 +80,7 @@ export type QuickNpcAuthoringFormProps = {
   initialValues?: Partial<QuickNpcAuthoringTabValues> | undefined
   onCancel: () => void
   onChangeSetup: () => void
+  onSetupSummaryEdit: (target: SetupSummaryEditTarget) => void
   onCreated: (npc: CampaignNpcDetail) => void | Promise<void>
   onPendingChange?: (pending: boolean) => void
 }
@@ -214,6 +214,7 @@ export function QuickNpcAuthoringForm({
   initialValues,
   onCancel,
   onChangeSetup,
+  onSetupSummaryEdit,
   onCreated,
   onPendingChange,
 }: QuickNpcAuthoringFormProps) {
@@ -250,7 +251,7 @@ export function QuickNpcAuthoringForm({
 
   const setupSummaryRows = React.useMemo(
     () =>
-      resolveQuickNpcAuthoringSetupSummaryRows({
+      resolveQuickNpcSetupSummaryRows({
         values: setup,
         context: buildContext,
         titles: organization.members?.titles ?? [],
@@ -318,16 +319,13 @@ export function QuickNpcAuthoringForm({
             fallback={defaultValues}
             onConfiguredCountChange={setConfiguredCount}
           />
-          <SetupSummaryCard
+          <SelectionSummaryCard
             eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
-            rows={setupSummaryRows}
-            cardAction={
-              <SetupSummaryCardChangeAction
-                changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
-                ariaLabel={QUICK_NPC_AUTHORING_SETUP_CHANGE_ARIA_LABEL}
-                onChange={onChangeSetup}
-              />
-            }
+            rows={mapSetupSummaryRowModelsToProps({
+              rows: setupSummaryRows,
+              changeLabel: QUICK_NPC_SETUP_CHANGE_LABEL,
+              onEdit: onSetupSummaryEdit,
+            })}
           />
         </>
       )}

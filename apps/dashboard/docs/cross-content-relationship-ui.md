@@ -292,24 +292,62 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 | `DrawerContext`                                              | Lightweight fixed-endpoint composition (`EntityItem` identity, no border/background) — no border/background |
 | `RelationshipDrawerSubjectField`                             | Structured read-only **form** fields only — not entity endpoint chrome                                      |
 | `EntityReplacementCurrentField` / `EntityReplacementSection` | Sunken Current chrome hosting the same entity context composition for searchable replacement flows          |
-| `LocationConnectionKindStep`                                 | Kind selection when intent is not yet kind-specific (change-kind; family-level adds)                        |
+| `LocationConnectionKindField`                                | Dumb active kind radios (options, value, onValueChange) — drawer owns summary vs field visibility           |
+| `SelectionSummaryCard`                                       | Completed decision row within sequenced Add drawers and create-modal setup                                  |
 | Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                               |
 
 When a per-kind add action resolves intent before open, **do not** show a kind picker in the drawer.
 
-When a **family-level** add action must choose among semantically meaningful kinds, use **`LocationConnectionKindStep`** (collapsing radio cards). After selection, collapse to the chosen kind so the remaining workflow receives visual priority. Do not fork collapse behavior inside relationship drawers.
+When a **family-level** add action must choose among semantically meaningful kinds, sequenced Add drawers use **`LocationConnectionKindField`** for the active kind decision and **`SelectionSummaryCard`** for the completed kind row. While the user reopens kind (Change), hide downstream controls (subject type, entity picker, search) **and** the persistence footer — do not disable them. Kind change clears only downstream selections that are ineligible under the new kind; preserve still-valid subject type and entity selections.
 
-Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search.
+### Sequenced Add kind option count
+
+Hosts derive reopen capability once from total option count (enabled **and** disabled):
+
+```ts
+const canEditKind = canReopenConnectionKindDecision(kindOptions)
+```
+
+Use `canEditKind` for every kind-reopen surface — Change affordance, `startEditingKind`, and summary-row action. Do not parallel-check `options.length > 1` in drawer JSX.
+
+| Option count | Kind control                                   | After kind chosen               | Change / overlay                                            |
+| ------------ | ---------------------------------------------- | ------------------------------- | ----------------------------------------------------------- |
+| **0**        | No kind control                                | Downstream only                 | N/A                                                         |
+| **1**        | Locked readout (`LocationConnectionKindField`) | Picker / footer immediately     | **No Change** — `canEditKind` is false                      |
+| **2+**       | Active radios initially                        | `SelectionSummaryCard` + Change | Change hides downstream; same-value reselect dismisses edit |
+
+Two total options with one disabled still counts as **2+** — Change must reopen radios and show the disabled reason, not collapse to the single-option lock.
+
+**Change-kind** drawers use always-expanded **`LocationConnectionKindField`** only — no summary card, no Change affordance, footer stays visible.
+
+Create-modal draft relationship tabs (Building → Organizations) use the same completed-decision grammar as `CreateSetupPanel` (`SelectionSummaryCard` rows + `RadioCardField` for active kind) inside a feature-owned stage machine — not drawer-local collapse chrome.
+
+Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search. Hide subject type, picker, and persist footer while kind is being edited upstream.
+
+### Inverted organization add without `addKind` (legacy)
+
+`LocationInverseOrganizationConnectionLinkDrawer` in **add** mode without a resolved `addKind` is an **inverted leftover**, not sequenced grammar: the user picks the organization first, then sees kind radios only after a subject is selected (`showKindStep` requires `selectedOrganizationId`). Do **not** extend this branch with sequenced overlay behavior (`SelectionSummaryCard`, Change, or upstream edit hiding). Per-kind inverse adds that resolve intent before open pass `addKind` and skip the kind step entirely. New surfaces should prefer intent-resolved adds or the sequenced People drawer pattern.
+
+## Presentation roles (relationship drawers)
+
+| Role                         | Primitive                         | When                                                                |
+| ---------------------------- | --------------------------------- | ------------------------------------------------------------------- |
+| Active choice                | `RadioCardField` (via kind field) | Unresolved kind or upstream edit overlay                            |
+| Completed in-sequence choice | `SelectionSummaryCard`            | Kind selected in sequenced Add; compact label/value, no description |
+| Terminal entity identity     | Picker Selected row               | Entity chosen before footer persist                                 |
+| Persisted endpoint replace   | `EntityReplacementSection`        | changeTarget / replaceOrganization                                  |
+
+Do not stretch one selected-card primitive across those surfaces.
 
 ## Add vs edit choice contract
 
 Add workflows begin **unresolved**. Change-kind workflows begin **resolved** with eligible options expanded immediately.
 
-| Mode                | Collapsible choice initial state | Current values                                                       |
-| ------------------- | -------------------------------- | -------------------------------------------------------------------- |
-| **Add**             | Expanded option list             | None — user must choose                                              |
-| **Change kind**     | Expanded with current selected   | Hydrated from persisted relationship; kind is the only mutable field |
-| **Replace subject** | Kind shown as read-only field    | `EntityReplacementSection` + `New {subject}` picker                  |
+| Mode                | Kind control initial state                                   | Current values                                                       |
+| ------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------- |
+| **Add (sequenced)** | Active radios until kind chosen                              | None — user must choose; completed kind → `SelectionSummaryCard` row |
+| **Change kind**     | Expanded `LocationConnectionKindField` with current selected | Hydrated from persisted relationship; kind is the only mutable field |
+| **Replace subject** | Kind shown as read-only field                                | `EntityReplacementSection` + `New {subject}` picker                  |
 
 ## Current-value representation
 
@@ -329,7 +367,7 @@ Rules:
 - Do **not** compensate with prose such as `Current: Organization · Headquarters`. Render fixed endpoints with **`DrawerContext`**; render replacement values in sunken **`EntityReplacementCurrentField`**.
 - **Change kind** opens with eligible options visible — do not require a second "Change" interaction.
 - Change-kind drawers change **kind only** — disable entity pickers (`pickerEnabled={false}` on `CatalogPickerSheet`) so search, empty states, and picker hooks do not mount.
-- Reuse `CollapsibleRadioCardField` via `LocationConnectionKindStep` with `defaultExpanded` for change-kind flows.
+- Sequenced Add drawers use **`LocationConnectionKindField`** + **`SelectionSummaryCard`**; change-kind uses **`LocationConnectionKindField`** only (always expanded).
 
 ## Presentation policy
 
@@ -479,7 +517,7 @@ Before building a new cross-content relationship surface, evaluate:
 2. `RelationshipList.Row` (composes `CrossContentRelationshipRow`) + overflow menu items for populated rows
 3. `DetailSectionPanel` + `DetailSectionGroup` + `DetailSectionRowList` + `DetailEntityRow` for hierarchy sections (no typed-edge semantics)
 4. Explicit Root/Group `itemCount` for empty vs footer vs slot-empty — no manual list chrome
-5. `DrawerContext` + embedded entity picker + kind step (when needed)
+5. `DrawerContext` + embedded entity picker + `LocationConnectionKindField` / `SelectionSummaryCard` (sequenced Add) or kind field only (change-kind)
 6. Direction-aware copy resolvers
 7. Feature-owned entity summary VMs mapped to neutral row / Current fields (`LocationEntitySummaryVm` for org→location targets — generic relationship code never imports location display)
 

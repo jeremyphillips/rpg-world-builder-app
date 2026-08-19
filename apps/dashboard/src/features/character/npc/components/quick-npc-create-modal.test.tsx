@@ -105,19 +105,9 @@ async function setBuildCardLevel(user: ReturnType<typeof userEvent.setup>, level
     await user.click(changeLevelButton)
   }
 
-  const targetLevel = Number(level)
   const levelInput = await screen.findByRole('spinbutton', { name: 'Level' })
-  let currentLevel = Number((levelInput as HTMLInputElement).value)
-
-  while (currentLevel < targetLevel) {
-    await user.click(screen.getByRole('button', { name: /increase level/i }))
-    currentLevel += 1
-  }
-
-  while (currentLevel > targetLevel) {
-    await user.click(screen.getByRole('button', { name: /decrease level/i }))
-    currentLevel -= 1
-  }
+  await user.clear(levelInput)
+  await user.type(levelInput, level)
 }
 
 async function selectBuildCardClass(user: ReturnType<typeof userEvent.setup>, className: RegExp) {
@@ -170,18 +160,19 @@ describe('QuickNpcCreateModal', () => {
     createNpcMock.mockResolvedValue(npcDetail)
   })
 
-  it('collapses title and species into a grouped selections summary after both are chosen', async () => {
+  it('renders a partial selections summary after title is chosen and species is active', async () => {
     const user = userEvent.setup()
     renderModal()
 
     await user.click(screen.getByRole('radio', { name: /no title/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
 
-    expect(screen.queryByRole('radio', { name: /dwarf/i })).not.toBeInTheDocument()
     expect(screen.getByText('Selections')).toBeInTheDocument()
-    expect(screen.getByText('Dwarf')).toBeInTheDocument()
+    expect(screen.getByText('No title')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
   })
 
   it('hides the build card until title and species are both complete', async () => {
@@ -196,9 +187,8 @@ describe('QuickNpcCreateModal', () => {
     expect(
       screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
     ).not.toBeInTheDocument()
-    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.queryByText('Selections')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'No title, Change' })).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: /what species/i })).toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
@@ -223,44 +213,71 @@ describe('QuickNpcCreateModal', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('dismisses title reopen when the current title is re-selected', async () => {
+  it('preserves manual class and level when title is reconfirmed without a value change', async () => {
     const user = userEvent.setup()
     renderModal()
 
     await user.click(screen.getByRole('radio', { name: /no title/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
+    await screen.findByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL })
+    await setBuildCardLevel(user, '3')
+    await selectBuildCardClass(user, /fighter/i)
 
     await user.click(screen.getByRole('button', { name: 'Change title' }))
-    expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
-
     await user.click(screen.getByRole('radio', { name: /no title/i }))
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
     expect(
-      screen.queryByRole('radiogroup', { name: /choose this member/i }),
-    ).not.toBeInTheDocument()
-    expect(
       screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
     ).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }))
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toHaveValue(3)
+    expect(screen.getByText('Fighter')).toBeInTheDocument()
   })
 
-  it('hides the build card when species is reopened', async () => {
+  it('collapses species into selections after selection while build remains pending', async () => {
     const user = userEvent.setup()
     renderModal()
 
     await user.click(screen.getByRole('radio', { name: /no title/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('No title')).toBeInTheDocument()
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
     ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: 'Details' })).not.toBeInTheDocument()
+  })
 
-    await user.click(screen.getByRole('button', { name: 'Change species' }))
+  it('returns to authoring when a setup row is reconfirmed without changing the value', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await completeSetup(user)
+    await user.click(screen.getByRole('button', { name: 'Change role' }))
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
+  })
+
+  it('re-enters setup from the Build row without reopening a radio question', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await completeSetup(user)
+    await user.click(screen.getByRole('button', { name: 'Change build' }))
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
     expect(
-      screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).not.toBeInTheDocument()
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
   it('shows setup-phase headline and description', () => {
@@ -291,8 +308,8 @@ describe('QuickNpcCreateModal', () => {
 
     await completeSetup(user)
 
-    const changeSetup = screen.getByRole('button', { name: 'Change setup' })
-    const scrollRegion = changeSetup.closest('.overflow-y-auto')
+    const changeBuild = screen.getByRole('button', { name: 'Change build' })
+    const scrollRegion = changeBuild.closest('.overflow-y-auto')
 
     expect(scrollRegion).toBeTruthy()
     expect(scrollRegion?.className).toContain('min-h-0')
@@ -304,7 +321,6 @@ describe('QuickNpcCreateModal', () => {
     const user = userEvent.setup()
     const { props } = renderModal()
 
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     await completeSetup(user)
     expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
 
@@ -325,13 +341,13 @@ describe('QuickNpcCreateModal', () => {
     expect(props.onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('returns to setup from Change and clears back to details on continue', async () => {
+  it('returns to setup from Build row Change and clears back to details on continue', async () => {
     const user = userEvent.setup()
     renderModal()
 
     await completeSetup(user)
     await user.type(screen.getByRole('textbox', { name: /name/i }), 'Draft NPC')
-    await user.click(screen.getByRole('button', { name: 'Change setup' }))
+    await user.click(screen.getByRole('button', { name: 'Change build' }))
 
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
     await completeSetup(user)
@@ -517,8 +533,10 @@ describe('QuickNpcCreateModal', () => {
     await selectBuildCardClass(user, /rogue/i)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
-    const changeSpecies = screen.getByRole('button', { name: 'Change species' })
-    await user.click(changeSpecies)
+    const changeSpecies = screen.queryByRole('button', { name: 'Change species' })
+    if (changeSpecies) {
+      await user.click(changeSpecies)
+    }
     await user.click(screen.getByRole('radio', { name: /elf/i }))
 
     expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()

@@ -67,13 +67,25 @@ Immediate children only. Expandable region rows split counts:
 ### Create setup
 
 Settlement, Region, and Site use the shared setup gate
-(`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. Detail Add
-location runs setup inside `LocationCreateModal`; overview/page create uses
-`LocationCreateSetupHost` → `LocationCreateSetupSession`. Both consume
+(`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. Building uses the same
+setup model inside `LocationCreateModal` (sequential Form → Facility with explicit skip on optional
+Form). Detail Add location runs setup inside `LocationCreateModal` with **auto-advance** on the final
+selection (no setup Continue on first pass). Overview/page create uses
+`LocationCreateSetupHost` → `LocationCreateSetupSession` with the same choice sets but an **explicit
+Continue** navigation boundary (radio selection alone does not navigate). Both consume
 `resolveLocationCreateModalSetupModel` / `applyLocationCreateModalSetupValueChange` for
-choice-set ids, `dependsOn`, continue, and complete. URL resume params
+choice-set ids, `dependsOn`, `visibleWhenComplete`, `summaryGroup`, and complete. URL resume params
 (`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
 same shortcut contract.
+
+Building → Organizations relationship drafting stays on the Add/Pending composer (not
+`CreateSetupPanel`) but uses the same create-modal grammar: active controls for in-progress
+decisions, `SelectionSummaryCard` rows for completed ones. The `branch` stage is the active
+create-org control — not a placeholder completed organization row. Copy these primitives for
+a second create-modal draft relationship tab; do not extract a generic composer until a second
+identical consumer exists.
+
+Orchestration lives in `@/lib/create-setup`; see `apps/dashboard/src/lib/create-setup/README.md`.
 
 Both subgroup actions derive from one `childAuthoringTypesForParentKind` result, projected
 by `resolveStructureChildAuthoringOptions`.

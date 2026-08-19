@@ -73,15 +73,18 @@ organization detail **Members** section — no full builder route.
 **Dismiss paths:** Cancel / X / Escape during authoring → `createNpc` → `add` (drawer stays
 open with preserved search). Success → `null` (all overlays close). Pending submit blocks dismiss.
 
-**Setup phase** (`CreateSetupPanel` for Title and Species; `QuickNpcBuildCard` for Class and Level):
+**Setup phase** (`useCreateSetupSequence` + `CreateSetupPanel` for Title and Species;
+`QuickNpcBuildCard` for Class and Level — reads `isEditingUpstream` from the shared model):
 
 - **Title-first progressive reveal** — only the membership title choice is visible until the user
   selects a title or explicit **No title** (`membershipTitle: undefined` is setup-only unset and
   incomplete; deliberate no-title uses the UI sentinel `ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`
   / `__no_title__`, which is not persisted on the created NPC).
-- **Build card** — after Title and Species are complete and neither identity set is reopened,
-  one sibling card owns Class and Level. Changing Title or Species hides the build card until the
-  choice is settled again.
+- **Build card** — after Title and Species are complete and `isEditingUpstream` is false,
+  one sibling card owns Class and Level. Build is registered as an **explicit external decision**
+  (`quickNpcBuild`) — footer **Continue** confirms Build at its current revision before transitioning
+  to authoring. Reopening Title or Species or changing Level/Class changes the revision, invalidating
+  any prior confirmation until the user confirms again. Same-value reselect dismisses without clearing Build.
   When the selected title carries a snapshotted `npcRecommendation`, the card shows **Recommended
   build** identity (template label + description) plus in-row Class and Level editors. Without a
   title recommendation (including **No title**), the card shows **Build** with Class and Level only
@@ -94,7 +97,11 @@ open with preserved search). Success → `null` (all overlays close). Pending su
   `applyQuickNpcSetupValueChange`, not in the card.
 
 Setup mutations flow through `applyQuickNpcSetupValueChange` inside functional `setState` (location
-create convention). Title change preserves Species but reseeds Build, Level, and Class.
+create convention). Title change preserves Species but reseeds Build, Level, and Class. Setup events
+use the shared `onSetupValueChange({ setId, previousValue, nextValue, invalidatedSetIds })`
+contract from `@/lib/create-setup`. Setup footer states derive from `CreateSetupFooter` — Cancel-only
+while choices auto-complete, disabled/enabled Continue while Build resolves, re-entry Continue when
+returning from authoring without material changes.
 
 **Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
 `requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `connections.organizations`, then

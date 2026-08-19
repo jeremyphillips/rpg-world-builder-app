@@ -1,4 +1,8 @@
-import type { CreateSetupChoiceSet } from './create-setup.types'
+import {
+  CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW,
+  CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL,
+} from './create-setup.constants'
+import type { CreateSetupChoiceSet, CreateSetupSet } from './create-setup.types'
 
 export type CreateSetupGroupedChoiceRow = {
   setId: string
@@ -7,61 +11,70 @@ export type CreateSetupGroupedChoiceRow = {
 }
 
 export function resolveCreateSetupChoiceValueLabel(set: CreateSetupChoiceSet): string {
+  if (set.skipped) {
+    return set.skippedValueLabel ?? CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL
+  }
+
   const selectedOption = set.options.find((option) => option.value === set.value)
   return selectedOption?.label ?? set.value
 }
 
-export function isCreateSetupSetCollapsedComplete(args: {
-  setId: string
-  visibleSetIds: readonly string[]
-  isCollapsedComplete: (setId: string) => boolean
-}): boolean {
-  return args.visibleSetIds.includes(args.setId) && args.isCollapsedComplete(args.setId)
+export function resolveCreateSetupSummaryRowLabel(set: CreateSetupChoiceSet): string {
+  return set.summaryLabel ?? set.fieldLabel
 }
 
-export function resolveCreateSetupCollapsedCompleteGroupedSetIds(args: {
-  groupedChoiceSetIds: readonly string[]
-  visibleSetIds: readonly string[]
-  isCollapsedComplete: (setId: string) => boolean
-}): string[] {
-  return args.groupedChoiceSetIds.filter((setId) =>
-    isCreateSetupSetCollapsedComplete({
-      setId,
-      visibleSetIds: args.visibleSetIds,
-      isCollapsedComplete: args.isCollapsedComplete,
-    }),
+export function resolveCreateSetupSummaryGroupMemberIds(
+  sets: readonly CreateSetupSet[],
+  summaryGroup: string,
+): string[] {
+  return sets.flatMap((set) => (set.summaryGroup === summaryGroup ? [set.id] : []))
+}
+
+export function resolveCreateSetupSummaryGroups(
+  sets: readonly CreateSetupSet[],
+): Map<string, string[]> {
+  const groups = new Map<string, string[]>()
+
+  for (const set of sets) {
+    if (!set.summaryGroup) continue
+    const members = groups.get(set.summaryGroup) ?? []
+    members.push(set.id)
+    groups.set(set.summaryGroup, members)
+  }
+
+  return groups
+}
+
+export function resolveCreateSetupSummaryGroupEyebrow(
+  sets: readonly CreateSetupSet[],
+  summaryGroup: string,
+): string | undefined {
+  return sets.find((set) => set.summaryGroup === summaryGroup)?.summaryGroupEyebrow
+}
+
+export function resolveCreateSetupSummaryGroupDisplayEyebrow(
+  sets: readonly CreateSetupSet[],
+  summaryGroup: string,
+): string {
+  return (
+    resolveCreateSetupSummaryGroupEyebrow(sets, summaryGroup) ??
+    CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW
   )
 }
 
-/** True when every declared id is visible, complete, and collapsed. */
-export function isCreateSetupGroupedChoiceSummaryReady(args: {
-  groupedChoiceSetIds: readonly string[]
-  visibleSetIds: readonly string[]
-  isCollapsedComplete: (setId: string) => boolean
-  allowPartial?: boolean
+export function isCreateSetupSummaryEligibleSet(args: {
+  set: CreateSetupSet
+  activeSetId: string | null
 }): boolean {
-  const collapsedCompleteIds = resolveCreateSetupCollapsedCompleteGroupedSetIds(args)
-
-  if (args.allowPartial) {
-    return collapsedCompleteIds.length > 0
-  }
-
-  if (args.groupedChoiceSetIds.length < 2) {
-    return false
-  }
-
-  return collapsedCompleteIds.length === args.groupedChoiceSetIds.length
+  if (!args.set.isComplete) return false
+  return args.set.id !== args.activeSetId
 }
 
-export function resolveCreateSetupGroupedChoiceRows(args: {
-  groupedChoiceSetIds: readonly string[]
+export function resolveCreateSetupPartialSummaryRows(args: {
+  setIds: readonly string[]
   setById: ReadonlyMap<string, CreateSetupChoiceSet | undefined>
-  /** When set, only these ids are included (preserving declared order). */
-  collapsedCompleteSetIds?: readonly string[]
 }): CreateSetupGroupedChoiceRow[] {
-  const setIds = args.collapsedCompleteSetIds ?? args.groupedChoiceSetIds
-
-  return setIds.flatMap((setId) => {
+  return args.setIds.flatMap((setId) => {
     const set = args.setById.get(setId)
     if (!set || set.kind !== 'choice') {
       return []
@@ -70,9 +83,55 @@ export function resolveCreateSetupGroupedChoiceRows(args: {
     return [
       {
         setId,
-        label: set.fieldLabel,
+        label: resolveCreateSetupSummaryRowLabel(set),
         valueLabel: resolveCreateSetupChoiceValueLabel(set),
       },
     ]
   })
+}
+
+export type CreateSetupPartialSummarySegment =
+  | { kind: 'group'; summaryGroup: string; setIds: string[] }
+  | { kind: 'standalone'; setId: string }
+
+export function resolveCreateSetupPartialSummarySegments(args: {
+  sets: readonly CreateSetupSet[]
+  visibleSetIds: readonly string[]
+  activeSetId: string | null
+}): CreateSetupPartialSummarySegment[] {
+  const setById = new Map(args.sets.map((set) => [set.id, set]))
+  const renderedGroups = new Set<string>()
+  const renderedStandalone = new Set<string>()
+  const segments: CreateSetupPartialSummarySegment[] = []
+
+  for (const setId of args.visibleSetIds) {
+    const set = setById.get(setId)
+    if (!set) continue
+    if (!isCreateSetupSummaryEligibleSet({ set, activeSetId: args.activeSetId })) continue
+
+    const summaryGroup = set.summaryGroup
+    if (summaryGroup) {
+      if (renderedGroups.has(summaryGroup)) continue
+      renderedGroups.add(summaryGroup)
+
+      const memberSetIds = resolveCreateSetupSummaryGroupMemberIds(args.sets, summaryGroup)
+      const eligibleMemberSetIds = memberSetIds.filter((memberSetId) => {
+        const member = setById.get(memberSetId)
+        return (
+          member && isCreateSetupSummaryEligibleSet({ set: member, activeSetId: args.activeSetId })
+        )
+      })
+
+      if (eligibleMemberSetIds.length > 0) {
+        segments.push({ kind: 'group', summaryGroup, setIds: eligibleMemberSetIds })
+      }
+      continue
+    }
+
+    if (renderedStandalone.has(set.id)) continue
+    renderedStandalone.add(set.id)
+    segments.push({ kind: 'standalone', setId: set.id })
+  }
+
+  return segments
 }

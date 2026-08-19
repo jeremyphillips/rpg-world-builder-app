@@ -18,6 +18,7 @@ import {
   buildOrganizationFamilyKindOptions,
   buildOrganizationInverseLocationConnectionKindOptions,
   buildOrganizationLocationChangeKindOptions,
+  canReopenConnectionKindDecision,
   ORGANIZATION_LOCATION_CONNECTION_STALE_CURRENT_KIND_REASON,
 } from './location-connection-kind-options'
 import { resolveRelationshipAlternatives } from './relationship/relationship-alternatives'
@@ -203,6 +204,26 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
     expect(pickerOptions.some((option) => option.value !== currentKind && !option.disabled)).toBe(
       true,
     )
+  })
+})
+
+describe('canReopenConnectionKindDecision', () => {
+  it('returns false when fewer than two options exist', () => {
+    expect(canReopenConnectionKindDecision([])).toBe(false)
+    expect(
+      canReopenConnectionKindDecision([
+        { value: 'owns', label: 'Owner', description: 'Owns this location.' },
+      ]),
+    ).toBe(false)
+  })
+
+  it('returns true when two or more options exist, including when one is disabled', () => {
+    expect(
+      canReopenConnectionKindDecision([
+        { value: 'headquarters', label: 'Headquarters', description: 'HQ', disabled: true },
+        { value: 'owns', label: 'Owner', description: 'Owns this location.' },
+      ]),
+    ).toBe(true)
   })
 })
 

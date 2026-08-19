@@ -112,6 +112,7 @@ function renderAuthoringForm(
     setup,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
+    onSetupSummaryEdit: vi.fn(),
     onCreated: vi.fn(),
     ...overrides,
   }
@@ -163,14 +164,16 @@ describe('QuickNpcAuthoringForm', () => {
     })
   })
 
-  it('shows structured setup summary rows with a single Change setup action', () => {
+  it('shows structured setup summary rows with row-level Change actions', () => {
     renderAuthoringForm()
 
     expect(screen.getByText('Setup')).toBeInTheDocument()
     expect(screen.getByText('No title')).toBeInTheDocument()
-    expect(screen.getByText('Dwarf · Level 1 Fighter')).toBeInTheDocument()
-    expect(screen.queryByText('Covert operator')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change setup' })).toBeInTheDocument()
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
+    expect(screen.getByText('Level 1 Fighter')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change role' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change build' })).toBeInTheDocument()
   })
 
   it('returns to setup when setup values are no longer valid at submit time', async () => {

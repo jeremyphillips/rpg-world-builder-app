@@ -10,7 +10,7 @@ import type {
 import { resolveLocationConnectionEligibility } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
-import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
+import { LocationConnectionKindField } from '../../components/location-connection-kind-field.client'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -251,13 +251,12 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
             </Text>
           ) : null}
           {showKindStep ? (
-            <LocationConnectionKindStep
+            <LocationConnectionKindField
               id="location-inverse-character-connection-kind"
               label={LOCATION_CONNECTION_KIND_FIELD_LABEL}
               options={kindOptions}
               value={activeKind}
               onValueChange={(value) => setSelectedKind(value as CharacterLocationConnectionKind)}
-              defaultExpanded={mode === 'changeKind'}
             />
           ) : null}
         </div>

@@ -14,7 +14,7 @@ import {
 } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
-import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
+import { LocationConnectionKindField } from '../../components/location-connection-kind-field.client'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -394,7 +394,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
             </Text>
           ) : null}
           {showKindStep ? (
-            <LocationConnectionKindStep
+            <LocationConnectionKindField
               id="location-inverse-organization-connection-kind"
               label={kindFieldLabel}
               options={kindOptions}
@@ -402,7 +402,6 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               onValueChange={(value) =>
                 setSelectedKind(value as OrganizationLocationConnectionKind)
               }
-              defaultExpanded={mode === 'changeKind'}
             />
           ) : null}
         </div>

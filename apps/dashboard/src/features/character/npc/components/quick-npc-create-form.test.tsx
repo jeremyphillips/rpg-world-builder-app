@@ -116,6 +116,7 @@ function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcAutho
     setup,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
+    onSetupSummaryEdit: vi.fn(),
     onCreated: vi.fn(),
     ...overrides,
   }
@@ -150,7 +151,7 @@ describe('QuickNpcAuthoringForm', () => {
     expect(screen.getByRole('combobox', { name: /alignment/i })).toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: 'No title' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create NPC' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change setup' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change build' })).toBeInTheDocument()
   })
 
   it('creates the NPC atomically with the titled membership connection', async () => {
@@ -176,12 +177,15 @@ describe('QuickNpcAuthoringForm', () => {
     ])
   })
 
-  it('calls onChangeSetup from the setup summary Change action', async () => {
+  it('calls onSetupSummaryEdit from the Build row Change action', async () => {
     const user = userEvent.setup()
     const { props } = renderForm()
 
-    await user.click(screen.getByRole('button', { name: 'Change setup' }))
-    expect(props.onChangeSetup).toHaveBeenCalledTimes(1)
+    await user.click(screen.getByRole('button', { name: 'Change build' }))
+    expect(props.onSetupSummaryEdit).toHaveBeenCalledWith({
+      type: 'external',
+      id: 'quickNpcBuild',
+    })
     expect(createNpcMock).not.toHaveBeenCalled()
   })
 
@@ -202,7 +206,7 @@ describe('QuickNpcAuthoringForm', () => {
     })
 
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
-    expect(screen.getByText('Covert operator')).toBeInTheDocument()
+    expect(screen.getByText('Covert operator · Level 5 Fighter')).toBeInTheDocument()
   })
 
   it('surfaces builder issues inline and keeps the form open when resolution fails', async () => {

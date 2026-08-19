@@ -10,7 +10,7 @@ import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connect
 import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 
 import { resolveQuickNpcDefaultLevel, type QuickNpcSetupValues } from './quick-npc-form-fields'
-import { isCreateSetupChoiceComplete } from '@/lib/create-setup'
+import { isCreateSetupChoiceComplete, type CreateSetupValueChangeEvent } from '@/lib/create-setup'
 import { applyQuickNpcRecommendedClassSeeding } from './quick-npc-class-recommendation.lib'
 
 function clampLevel(level: number, minLevel: number, maxLevel: number): number {
@@ -66,8 +66,7 @@ export function resolveQuickNpcLevelForMembershipTitle(args: {
 
 type QuickNpcSetupValueChangeArgs = {
   values: QuickNpcSetupValues
-  setId: string
-  nextValue: string | number
+  event: CreateSetupValueChangeEvent
   context: CharacterBuildContext
   titles: readonly OrganizationMembershipTitleDefinition[]
   organizationClassAffinityIds?: readonly string[]
@@ -95,18 +94,20 @@ function applyRecommendedClassSeedingWhenSpeciesComplete(
 export function applyQuickNpcSetupValueChange(
   args: QuickNpcSetupValueChangeArgs,
 ): QuickNpcSetupValues {
-  if (args.setId === 'speciesId') {
+  const { setId, nextValue } = args.event
+
+  if (setId === 'speciesId') {
     const nextValues = applyLevelClassSideEffects({
       ...args.values,
-      speciesId: String(args.nextValue),
+      speciesId: String(nextValue),
       classId: '',
     })
 
     return applyRecommendedClassSeedingWhenSpeciesComplete({ ...args, values: nextValues })
   }
 
-  if (args.setId === 'membershipTitle') {
-    const membershipTitle = String(args.nextValue)
+  if (setId === 'membershipTitle') {
+    const membershipTitle = String(nextValue)
     const nextValues = {
       ...args.values,
       membershipTitle,
@@ -121,9 +122,9 @@ export function applyQuickNpcSetupValueChange(
     return applyRecommendedClassSeedingWhenSpeciesComplete({ ...args, values: nextValues })
   }
 
-  if (args.setId === 'level') {
+  if (setId === 'level') {
     const previousLevel = args.values.level
-    const nextLevel = Number(args.nextValue)
+    const nextLevel = Number(nextValue)
 
     if (!isClassProgressionApplicable(nextLevel)) {
       return applyLevelClassSideEffects({ ...args.values, level: nextLevel })
@@ -139,10 +140,10 @@ export function applyQuickNpcSetupValueChange(
     return { ...args.values, level: nextLevel }
   }
 
-  if (args.setId === 'classId') {
+  if (setId === 'classId') {
     return {
       ...args.values,
-      classId: String(args.nextValue),
+      classId: String(nextValue),
     }
   }
 

@@ -15,6 +15,9 @@ describe('quick-npc setup structural drift', () => {
     const setupPhaseSource = readFileSync(quickNpcCreateSetupPhasePath, 'utf8')
 
     expect(modalSource).toContain('QuickNpcCreateSetupPhase')
+    expect(modalSource).toContain('buildQuickNpcCreateSetupSets')
+    expect(modalSource).toContain('useCreateSetupSequence')
+    expect(modalSource).toContain('CreateSetupFooter')
     expect(modalSource).not.toMatch(/buildQuickNpcFormFields/)
     expect(modalSource).not.toMatch(/<TabbedForm/)
     expect(modalSource).not.toMatch(/<Form[\s/>]/)
@@ -22,6 +25,5 @@ describe('quick-npc setup structural drift', () => {
 
     expect(setupPhaseSource).toContain('CreateSetupPanel')
     expect(setupPhaseSource).toContain('QuickNpcBuildCard')
-    expect(setupPhaseSource).toContain('buildQuickNpcCreateSetupSets')
   })
 })

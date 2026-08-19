@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { LocationRegionCreateSetup } from './location-region-create-setup.client'
 
 describe('LocationRegionCreateSetup', () => {
@@ -25,13 +24,13 @@ describe('LocationRegionCreateSetup', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(screen.getByRole('button', { name: 'Change classification' }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     expect(
-      screen.queryByRole('radio', { name: (name) => name.startsWith('Kingdom') }),
+      screen.queryByRole('radio', { name: (name) => name.startsWith('Kingdom'), checked: true }),
     ).not.toBeInTheDocument()
   })
 
@@ -55,15 +54,38 @@ describe('LocationRegionCreateSetup', () => {
     ).toBeInTheDocument()
   })
 
-  it('completes with classification after both steps', async () => {
+  it('dismisses reopen without clearing downstream when the same classification is re-selected', async () => {
     const user = userEvent.setup()
-    const onComplete = vi.fn()
 
     render(
       <LocationRegionCreateSetup
         open
         intent={{ authoringType: 'region' }}
         onOpenChange={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
+    await user.click(screen.getByRole('button', { name: 'Change classification' }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.getByText('Kingdom')).toBeInTheDocument()
+  })
+
+  it('completes with classification after both steps', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const onOpenChange = vi.fn()
+
+    render(
+      <LocationRegionCreateSetup
+        open
+        intent={{ authoringType: 'region' }}
+        onOpenChange={onOpenChange}
         onComplete={onComplete}
       />,
     )
@@ -77,6 +99,7 @@ describe('LocationRegionCreateSetup', () => {
         kind: 'region',
         classification: { kind: 'political', type: 'kingdom' },
       })
+      expect(onOpenChange).toHaveBeenCalledWith(false)
     })
   })
 })

@@ -1,13 +1,26 @@
 'use client'
 
 import { type OrganizationLocationConnectionKind } from '@rpg/contracts'
-import { Alert, Button, ChooserSummaryCard, SearchBar, Text } from '@rpg/ui'
+import {
+  Alert,
+  Button,
+  Heading,
+  RadioCardField,
+  SearchBar,
+  SelectionSummaryCard,
+  SelectionSummaryChangeAction,
+  Text,
+  type RadioCardOption,
+} from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 
-import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
+import {
+  BUILDING_ORGANIZATION_COMPOSER_CHANGE_LABEL,
+  canConfirmBuildingOrganizationRelationship,
+  type BuildingOrganizationComposerSummaryRow,
+} from '../lib/building-organizations-create-tab-controller.lib'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { buildOrganizationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
-import { LOCATION_CONNECTION_KIND_CHANGE_LABEL } from '../../lib/location-connection-drawer-intent'
 import {
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
@@ -16,7 +29,6 @@ import {
 } from '../../lib/forms/organization-form-projection'
 import { resolveDiscoverableOrganizationMemberClasses } from '../../organizations/lib/organization-member-class-discoverable.lib'
 import { BUILDING_ORGANIZATION_NO_INTENT_KIND_REASON } from '../lib/building-organization-create-drafts'
-import { canConfirmBuildingOrganizationRelationship } from '../lib/building-organizations-create-tab-controller.lib'
 import {
   BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
   BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL,
@@ -25,18 +37,16 @@ import {
   BUILDING_ORGANIZATIONS_INTENT_PROMPT,
   BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE,
   BUILDING_ORGANIZATIONS_LOADING_LABEL,
-  BUILDING_ORGANIZATIONS_ORGANIZATION_CHANGE_LABEL,
-  BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
-  BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW,
   BUILDING_ORGANIZATIONS_SEARCH_LABEL,
   BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
-  resolveBuildingOrganizationTargetDomainLabel,
-  resolveBuildingOrganizationTargetName,
 } from '../lib/building-organizations-create-tab.lib'
 import type { UseBuildingOrganizationsCreateTabResult } from '../hooks/use-building-organizations-create-tab.client'
-import type { BuildingOrganizationRelationshipDraft } from '../lib/building-organization-create-drafts'
+import type {
+  BuildingOrganizationRelationshipDraft,
+  BuildingOrganizationRelationshipKindOption,
+} from '../lib/building-organization-create-drafts'
 import {
   buildingOrganizationsComposerClasses,
   buildingOrganizationsComposerReviewClasses,
@@ -53,6 +63,17 @@ import {
   OrganizationAuthoringPresetBridge,
 } from '../../organizations/components/organization-authoring-form-shell.client'
 import { useOrganizationAuthoringContext } from '../../organizations/lib/organization-authoring-context.client'
+
+function toRelationshipRadioOptions(
+  options: readonly BuildingOrganizationRelationshipKindOption[],
+): RadioCardOption[] {
+  return options.map((option) => ({
+    value: option.value,
+    label: option.label,
+    description: option.disabled ? option.disabledReason : option.description,
+    disabled: option.disabled,
+  }))
+}
 
 function BuildingOrganizationConfirmButton({
   confirmLabel,
@@ -80,6 +101,97 @@ function BuildingOrganizationConfirmButton({
         {confirmLabel}
       </Button>
     </div>
+  )
+}
+
+function BuildingOrganizationSummaryCard({
+  controller,
+}: {
+  controller: UseBuildingOrganizationsCreateTabResult
+}) {
+  const { composerView, startEditingOrganization, startEditingRelationship } = controller
+  const { summaryEyebrow, summaryRows } = composerView
+
+  if (!summaryEyebrow || summaryRows.length === 0) return null
+
+  return (
+    <SelectionSummaryCard
+      eyebrow={summaryEyebrow}
+      rows={summaryRows.map((row) =>
+        mapSummaryRow(row, composerView, startEditingRelationship, startEditingOrganization),
+      )}
+    />
+  )
+}
+
+function mapSummaryRow(
+  row: BuildingOrganizationComposerSummaryRow,
+  view: UseBuildingOrganizationsCreateTabResult['composerView'],
+  startEditingRelationship: UseBuildingOrganizationsCreateTabResult['startEditingRelationship'],
+  startEditingOrganization: UseBuildingOrganizationsCreateTabResult['startEditingOrganization'],
+) {
+  const showChange =
+    row.decision === 'relationship' ? view.showRelationshipChange : view.showOrganizationChange
+  const onChange =
+    row.decision === 'relationship' ? startEditingRelationship : startEditingOrganization
+  const valueActionAriaLabel = `Change ${row.label.toLowerCase()}`
+
+  return {
+    label: row.label,
+    value: row.value,
+    onValueClick: showChange ? onChange : undefined,
+    valueActionAriaLabel: showChange ? valueActionAriaLabel : undefined,
+    action: showChange ? (
+      <SelectionSummaryChangeAction
+        changeLabel={BUILDING_ORGANIZATION_COMPOSER_CHANGE_LABEL}
+        ariaLabel={valueActionAriaLabel}
+        onChange={onChange}
+      />
+    ) : undefined,
+  }
+}
+
+function BuildingOrganizationRelationshipKindField({
+  controller,
+  relationship,
+}: {
+  controller: UseBuildingOrganizationsCreateTabResult
+  relationship?: BuildingOrganizationRelationshipDraft
+}) {
+  const { rawKind, handleKindChange, intentKindOptions, kindOptionsFor } = controller
+  const relationshipKindOptions = relationship
+    ? kindOptionsFor(relationship.organization, relationship.draftId)
+    : intentKindOptions
+
+  if (relationshipKindOptions.length === 1) {
+    const resolved = relationshipKindOptions[0]
+    if (!resolved) return null
+
+    return (
+      <div className="space-y-1">
+        <Heading variant="label" as="p">
+          {BUILDING_ORGANIZATIONS_INTENT_PROMPT}
+        </Heading>
+        <Text>{resolved.label}</Text>
+      </div>
+    )
+  }
+
+  if (relationshipKindOptions.length === 0) return null
+
+  return (
+    <RadioCardField
+      id={
+        relationship
+          ? `building-organization-pending-kind-${relationship.draftId}`
+          : 'building-organization-relationship-kind'
+      }
+      label={BUILDING_ORGANIZATIONS_INTENT_PROMPT}
+      density="compact"
+      value={rawKind ?? ''}
+      options={toRelationshipRadioOptions(relationshipKindOptions)}
+      onValueChange={(value) => handleKindChange(value as OrganizationLocationConnectionKind)}
+    />
   )
 }
 
@@ -128,7 +240,7 @@ function BuildingOrganizationDiscoveryRow({
   )
 }
 
-export function BuildingOrganizationDiscovery({
+function BuildingOrganizationDiscovery({
   controller,
 }: {
   controller: UseBuildingOrganizationsCreateTabResult
@@ -236,7 +348,7 @@ function BuildingOrganizationNewOrganizationForm({
   )
 }
 
-export function BuildingOrganizationNewBranch({
+function BuildingOrganizationNewBranch({
   controller,
   confirmLabel,
 }: {
@@ -279,100 +391,25 @@ export function BuildingOrganizationNewBranch({
   )
 }
 
-function BuildingOrganizationReviewStage({
+function BuildingOrganizationReviewCommit({
   controller,
   confirmLabel,
   onConfirm,
-  canConfirm,
 }: {
   controller: UseBuildingOrganizationsCreateTabResult
   confirmLabel: string
   onConfirm: () => void
-  canConfirm: boolean
 }) {
   const {
     kind,
     selectedOrganization,
-    returnToDiscovery,
-    plan,
-    organizations,
+    composerStage,
+    kindOptionsFor,
+    editingDraftId,
     validationAttempted,
   } = controller
-  if (!kind || !selectedOrganization) return null
-
-  return (
-    <div className={buildingOrganizationsComposerReviewClasses}>
-      <ChooserSummaryCard
-        density="compact"
-        eyebrow={BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW}
-        changeLabel={BUILDING_ORGANIZATIONS_ORGANIZATION_CHANGE_LABEL}
-        title={resolveBuildingOrganizationTargetName({
-          organization: selectedOrganization,
-          plan,
-          existingOrganizations: organizations,
-        })}
-        description={
-          resolveBuildingOrganizationTargetDomainLabel({
-            organization: selectedOrganization,
-            plan,
-            existingOrganizations: organizations,
-          }) || undefined
-        }
-        onChange={returnToDiscovery}
-      />
-      <BuildingOrganizationConfirmButton
-        confirmLabel={confirmLabel}
-        disabled={!canConfirm || (validationAttempted && !kind)}
-        onConfirm={onConfirm}
-      />
-    </div>
-  )
-}
-
-function BuildingOrganizationRelationshipKindStep({
-  controller,
-  relationship,
-}: {
-  controller: UseBuildingOrganizationsCreateTabResult
-  relationship?: BuildingOrganizationRelationshipDraft
-}) {
-  const { kind, handleKindChange, intentKindOptions, kindOptionsFor } = controller
-  const relationshipKindOptions = relationship
-    ? kindOptionsFor(relationship.organization, relationship.draftId)
-    : intentKindOptions
-
-  return (
-    <LocationConnectionKindStep
-      id={
-        relationship
-          ? `building-organization-pending-kind-${relationship.draftId}`
-          : 'building-organization-relationship-kind'
-      }
-      label={BUILDING_ORGANIZATIONS_INTENT_PROMPT}
-      summaryEyebrow={BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW}
-      options={relationshipKindOptions}
-      value={kind}
-      onValueChange={(value) => handleKindChange(value as OrganizationLocationConnectionKind)}
-      changeLabel={LOCATION_CONNECTION_KIND_CHANGE_LABEL}
-      defaultExpanded={!kind}
-    />
-  )
-}
-
-function BuildingOrganizationRelationshipStage({
-  controller,
-  relationship,
-  confirmLabel,
-  onConfirm,
-}: {
-  controller: UseBuildingOrganizationsCreateTabResult
-  relationship?: BuildingOrganizationRelationshipDraft
-  confirmLabel: string
-  onConfirm: () => void
-}) {
-  const { kind, composerStage, selectedOrganization, kindOptionsFor, editingDraftId } = controller
   const organizationOptions = selectedOrganization
-    ? kindOptionsFor(selectedOrganization, editingDraftId ?? relationship?.draftId)
+    ? kindOptionsFor(selectedOrganization, editingDraftId ?? undefined)
     : []
   const canConfirm = canConfirmBuildingOrganizationRelationship({
     kind,
@@ -381,33 +418,15 @@ function BuildingOrganizationRelationshipStage({
     organizationOptions,
   })
 
-  if (composerStage === 'discovery' && kind) {
-    return (
-      <div className={buildingOrganizationsComposerStageOffsetClasses}>
-        <BuildingOrganizationDiscovery controller={controller} />
-      </div>
-    )
-  }
-  if (composerStage === 'review') {
-    return (
-      <div className={buildingOrganizationsComposerStageOffsetClasses}>
-        <BuildingOrganizationReviewStage
-          controller={controller}
-          confirmLabel={confirmLabel}
-          onConfirm={onConfirm}
-          canConfirm={canConfirm}
-        />
-      </div>
-    )
-  }
-  if (composerStage === 'branch' && kind && selectedOrganization) {
-    return (
-      <div className={buildingOrganizationsComposerStageOffsetClasses}>
-        <BuildingOrganizationNewBranch controller={controller} confirmLabel={confirmLabel} />
-      </div>
-    )
-  }
-  return null
+  return (
+    <div className={buildingOrganizationsComposerReviewClasses}>
+      <BuildingOrganizationConfirmButton
+        confirmLabel={confirmLabel}
+        disabled={!canConfirm || (validationAttempted && !kind)}
+        onConfirm={onConfirm}
+      />
+    </div>
+  )
 }
 
 export function BuildingOrganizationRelationshipReview({
@@ -421,18 +440,38 @@ export function BuildingOrganizationRelationshipReview({
   confirmLabel: string
   onConfirm: () => void
 }) {
+  const { composerView } = controller
+
   return (
-    <div className={buildingOrganizationsComposerClasses}>
-      <BuildingOrganizationRelationshipKindStep
-        controller={controller}
-        relationship={relationship}
-      />
-      <BuildingOrganizationRelationshipStage
-        controller={controller}
-        relationship={relationship}
-        confirmLabel={confirmLabel}
-        onConfirm={onConfirm}
-      />
+    <div className={buildingOrganizationsComposerClasses} data-building-organization-composer>
+      {composerView.activeDecision === 'relationship' ? (
+        <BuildingOrganizationRelationshipKindField
+          controller={controller}
+          relationship={relationship}
+        />
+      ) : null}
+      {composerView.summaryRows.length > 0 ? (
+        <BuildingOrganizationSummaryCard controller={controller} />
+      ) : null}
+      {composerView.showDiscovery ? (
+        <div className={buildingOrganizationsComposerStageOffsetClasses}>
+          <BuildingOrganizationDiscovery controller={controller} />
+        </div>
+      ) : null}
+      {composerView.showBranch ? (
+        <div className={buildingOrganizationsComposerStageOffsetClasses}>
+          <BuildingOrganizationNewBranch controller={controller} confirmLabel={confirmLabel} />
+        </div>
+      ) : null}
+      {composerView.showCommit ? (
+        <div className={buildingOrganizationsComposerStageOffsetClasses}>
+          <BuildingOrganizationReviewCommit
+            controller={controller}
+            confirmLabel={confirmLabel}
+            onConfirm={onConfirm}
+          />
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -468,7 +507,7 @@ export function BuildingOrganizationPendingEdit({
   controller: UseBuildingOrganizationsCreateTabResult
   relationship: BuildingOrganizationRelationshipDraft
 }) {
-  const { commitPendingEdit, cancelPendingEdit, composerStage } = controller
+  const { commitPendingEdit, cancelPendingEdit, composerView } = controller
 
   return (
     <div className={buildingOrganizationsComposerClasses}>
@@ -478,7 +517,7 @@ export function BuildingOrganizationPendingEdit({
         confirmLabel={BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL}
         onConfirm={() => commitPendingEdit(relationship)}
       />
-      {composerStage === 'discovery' ? (
+      {composerView.showDiscovery ? (
         <div className={buildingOrganizationsConfirmActionsClasses}>
           <Button type="button" variant="ghost" size="sm" onClick={cancelPendingEdit}>
             Cancel edit

@@ -10,7 +10,7 @@ import { makeOrganization } from '@/test/fixtures/factories/organization'
 
 import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab.client'
 import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab.client'
-import { LOCATION_CONNECTION_KIND_CHANGE_LABEL } from '../../lib/location-connection-drawer-intent'
+import { CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW } from '@/lib/create-setup'
 import {
   BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL,
   BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
@@ -18,6 +18,7 @@ import {
   BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL,
   BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE,
   BUILDING_ORGANIZATIONS_INTENT_PROMPT,
+  BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME,
   BUILDING_ORGANIZATIONS_OVERFLOW_LABEL,
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
   BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
@@ -104,6 +105,23 @@ async function addExistingOwner(user: ReturnType<typeof userEvent.setup>) {
   )
 }
 
+function expectRelationshipSummary(value: string) {
+  expect(screen.getByText(CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: `${value}, Change relationship` })).toBeInTheDocument()
+}
+
+function expectNoRelationshipSummary() {
+  expect(screen.queryByRole('button', { name: /Change relationship/i })).not.toBeInTheDocument()
+}
+
+function expectOrganizationSummary(value: string) {
+  expect(screen.getByRole('button', { name: `${value}, Change organization` })).toBeInTheDocument()
+}
+
+function expectNoOrganizationSummary() {
+  expect(screen.queryByRole('button', { name: /Change organization/i })).not.toBeInTheDocument()
+}
+
 describe('BuildingOrganizationsCreateTab', () => {
   it('starts as an untouched optional Add-mode panel', async () => {
     const onStatusChange = vi.fn()
@@ -171,7 +189,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     )
     expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: LOCATION_CONNECTION_KIND_CHANGE_LABEL }))
+    await user.click(screen.getByRole('button', { name: 'Change relationship' }))
     await user.click(screen.getByRole('radio', { name: /Operator/i }))
     await user.click(
       screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL }),
@@ -262,7 +280,42 @@ describe('BuildingOrganizationsCreateTab', () => {
     )
   })
 
-  it('collapses the chosen intent kind before organization discovery', async () => {
+  it('hides organization discovery while the intent kind is being edited', async () => {
+    const user = userEvent.setup()
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+
+    await chooseOwnerIntent(user)
+    expect(
+      screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Change relationship' }))
+    expect(
+      screen.queryByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('radiogroup')).toBeInTheDocument()
+    expectNoRelationshipSummary()
+  })
+
+  it('restores discovery after same-value kind reselect without resetting search state', async () => {
+    const user = userEvent.setup()
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+
+    await chooseOwnerIntent(user)
+    const searchbox = screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL })
+    await user.type(searchbox, 'Copper')
+    expect(searchbox).toHaveValue('Copper')
+
+    await user.click(screen.getByRole('button', { name: 'Change relationship' }))
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+
+    expectRelationshipSummary('Owner')
+    expect(
+      screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
+    ).toHaveValue('Copper')
+  })
+
+  it('shows relationship summary before organization discovery', async () => {
     const user = userEvent.setup()
     const onPlanChange = vi.fn()
     render(
@@ -275,16 +328,14 @@ describe('BuildingOrganizationsCreateTab', () => {
     )
 
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
-    expect(
-      screen.getByRole('button', {
-        name: `Headquarters, ${LOCATION_CONNECTION_KIND_CHANGE_LABEL}`,
-      }),
-    ).toBeInTheDocument()
+    expectRelationshipSummary('Headquarters')
     expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+    expectNoOrganizationSummary()
     expect(onPlanChange).not.toHaveBeenCalled()
     await user.click(
       screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
     )
+    expectOrganizationSummary('Copper Kettle Guild')
     await user.click(
       screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
     )
@@ -292,6 +343,62 @@ describe('BuildingOrganizationsCreateTab', () => {
     expect(onPlanChange.mock.calls[0]![0].relationships.at(-1)).toMatchObject({
       kind: 'headquarters',
     })
+  })
+
+  it('uses setup summary grammar for active and completed decisions', async () => {
+    const user = userEvent.setup()
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+
+    expectNoRelationshipSummary()
+    expect(
+      screen.getByRole('radiogroup', { name: BUILDING_ORGANIZATIONS_INTENT_PROMPT }),
+    ).toBeInTheDocument()
+
+    await chooseOwnerIntent(user)
+    expectRelationshipSummary('Owner')
+    expectNoOrganizationSummary()
+    expect(
+      screen.queryByRole('radiogroup', { name: BUILDING_ORGANIZATIONS_INTENT_PROMPT }),
+    ).not.toBeInTheDocument()
+
+    await user.click(
+      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
+    )
+    expectRelationshipSummary('Owner')
+    expectOrganizationSummary('Copper Kettle Guild')
+  })
+
+  it('shows branch with relationship summary only and no placeholder organization row', async () => {
+    const user = userEvent.setup()
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+
+    await chooseOwnerIntent(user)
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
+
+    expectRelationshipSummary('Owner')
+    expectNoOrganizationSummary()
+    expect(screen.queryByText(BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME)).not.toBeInTheDocument()
+  })
+
+  it('reopens unpinned discovery when changing organization from review', async () => {
+    const user = userEvent.setup()
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+
+    await chooseOwnerIntent(user)
+    await user.click(
+      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
+    )
+    expectOrganizationSummary('Copper Kettle Guild')
+
+    await user.click(screen.getByRole('button', { name: 'Change organization' }))
+    expectRelationshipSummary('Owner')
+    expectNoOrganizationSummary()
+    expect(
+      screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL }).length,
+    ).toBeGreaterThan(0)
   })
 
   it('normalizes in-progress composer and attributed server issues through its panel controller', async () => {

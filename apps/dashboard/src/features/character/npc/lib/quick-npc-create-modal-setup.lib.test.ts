@@ -8,8 +8,11 @@ import {
 } from '../../lib/character-builder-fixtures'
 import {
   buildQuickNpcCreateSetupSets,
-  resolveQuickNpcAuthoringSetupSummaryRows,
-  resolveQuickNpcSetupModel,
+  resolveQuickNpcSetupSummaryRows,
+  isQuickNpcBuildResolved,
+  quickNpcBuildRevision,
+  resolveQuickNpcBuildExternalDecision,
+  QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
 } from './quick-npc-create-modal-setup.lib'
 import {
   QUICK_NPC_BUILD_FIELD_LABEL,
@@ -39,12 +42,11 @@ describe('buildQuickNpcCreateSetupSets', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context,
       values,
-      onApplySetupChange: () => {},
       titles: [],
     })
 
     expect(sets.map((set) => set.id)).toEqual(['membershipTitle', 'speciesId'])
-    expect(sets.find((set) => set.id === 'speciesId')?.collapseWhenActiveAndComplete).toBe(true)
+    expect(sets.find((set) => set.id === 'membershipTitle')?.summaryGroup).toBe('selections')
     expect(isQuickNpcMembershipTitleSetupComplete(values.membershipTitle)).toBe(false)
 
     const sequenceItems = sets.map((set) => ({
@@ -68,7 +70,6 @@ describe('buildQuickNpcCreateSetupSets', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context,
       values,
-      onApplySetupChange: () => {},
       titles: [],
     })
 
@@ -195,11 +196,11 @@ describe('resolveQuickNpcBuildCardModel', () => {
   })
 })
 
-describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
+describe('resolveQuickNpcSetupSummaryRows', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
-  it('returns Role, Character, and Build rows when a title recommendation exists', () => {
-    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+  it('returns Role, Species, and Build rows with explicit edit targets when a title recommendation exists', () => {
+    const rows = resolveQuickNpcSetupSummaryRows({
       values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
@@ -211,14 +212,29 @@ describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
     })
 
     expect(rows).toEqual([
-      { label: 'Role', value: 'Guildmaster' },
-      { label: 'Character', value: expect.stringContaining('Dwarf') },
-      { label: 'Build', value: 'Covert operator' },
+      {
+        id: 'membershipTitle',
+        label: 'Role',
+        value: 'Guildmaster',
+        editTarget: { type: 'set', id: 'membershipTitle' },
+      },
+      {
+        id: 'speciesId',
+        label: 'Species',
+        value: 'Dwarf',
+        editTarget: { type: 'set', id: 'speciesId' },
+      },
+      {
+        id: 'quickNpcBuild',
+        label: 'Build',
+        value: 'Covert operator · Level 5 Fighter',
+        editTarget: { type: 'external', id: 'quickNpcBuild' },
+      },
     ])
   })
 
-  it('omits Build and uses No title for Role when no title recommendation exists', () => {
-    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+  it('includes Build with level-only copy when no title recommendation exists', () => {
+    const rows = resolveQuickNpcSetupSummaryRows({
       values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -230,12 +246,28 @@ describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
     })
 
     expect(rows).toEqual([
-      { label: 'Role', value: 'No title' },
-      { label: 'Character', value: expect.stringContaining('Dwarf') },
+      {
+        id: 'membershipTitle',
+        label: 'Role',
+        value: 'No title',
+        editTarget: { type: 'set', id: 'membershipTitle' },
+      },
+      {
+        id: 'speciesId',
+        label: 'Species',
+        value: 'Dwarf',
+        editTarget: { type: 'set', id: 'speciesId' },
+      },
+      {
+        id: 'quickNpcBuild',
+        label: 'Build',
+        value: 'Level 1 Fighter',
+        editTarget: { type: 'external', id: 'quickNpcBuild' },
+      },
     ])
   })
 
-  it('formats Character as species plus Level 0 without a phantom class', () => {
+  it('formats Build as level-only when class progression does not apply', () => {
     const elf = makeSpecies({ slug: 'elf', name: 'Elf' })
     const elfContext = createCampaignNpcBuilderContextFixture({
       catalog: {
@@ -243,7 +275,7 @@ describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
         species: [elf, ...populatedBuilderCatalog.species],
       },
     })
-    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+    const rows = resolveQuickNpcSetupSummaryRows({
       values: {
         speciesId: elf.id,
         membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -254,11 +286,16 @@ describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
       titles: [],
     })
 
-    expect(rows[1]).toEqual({ label: 'Character', value: 'Elf · Level 0' })
+    expect(rows[2]).toEqual({
+      id: 'quickNpcBuild',
+      label: 'Build',
+      value: 'Level 0',
+      editTarget: { type: 'external', id: 'quickNpcBuild' },
+    })
   })
 })
 
-describe('resolveQuickNpcSetupModel', () => {
+describe('isQuickNpcBuildResolved', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
   const rogueClass = {
     ...populatedBuilderCatalog.classes[0]!,
@@ -275,7 +312,7 @@ describe('resolveQuickNpcSetupModel', () => {
 
   it('requires class when level progression applies', () => {
     expect(
-      resolveQuickNpcSetupModel({
+      isQuickNpcBuildResolved({
         context,
         values: {
           speciesId: 'srd-cc-5.2.1:dwarf',
@@ -283,13 +320,13 @@ describe('resolveQuickNpcSetupModel', () => {
           classId: '',
           level: 1,
         },
-      }).canContinue,
+      }),
     ).toBe(false)
   })
 
-  it('enables Continue when a single recommendation has been auto-seeded', () => {
+  it('is resolved when a single recommendation has been auto-seeded', () => {
     expect(
-      resolveQuickNpcSetupModel({
+      isQuickNpcBuildResolved({
         context: multiClassContext,
         values: {
           speciesId: 'srd-cc-5.2.1:dwarf',
@@ -297,9 +334,57 @@ describe('resolveQuickNpcSetupModel', () => {
           classId: rogueClass.id,
           level: 5,
         },
-        titles: [guildmasterTitle],
-        members: { classAffinityIds: [rogueClass.id] },
-      }).canContinue,
+      }),
     ).toBe(true)
+  })
+})
+
+describe('quickNpcBuildRevision', () => {
+  const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+  const baseValues = {
+    speciesId: 'srd-cc-5.2.1:dwarf',
+    membershipTitle: 'Guildmaster',
+    classId: populatedBuilderCatalog.classes[0]!.id,
+    level: 5,
+  }
+
+  it('derives revision from membershipTitle, speciesId, level, and classId only', () => {
+    expect(quickNpcBuildRevision(baseValues)).toBe(
+      `Guildmaster:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
+    )
+    expect(quickNpcBuildRevision({ ...baseValues, membershipTitle: 'Other' })).not.toBe(
+      quickNpcBuildRevision(baseValues),
+    )
+    expect(quickNpcBuildRevision({ ...baseValues, speciesId: 'srd-cc-5.2.1:elf' })).not.toBe(
+      quickNpcBuildRevision(baseValues),
+    )
+    expect(quickNpcBuildRevision({ ...baseValues, level: 3 })).not.toBe(
+      quickNpcBuildRevision(baseValues),
+    )
+    expect(quickNpcBuildRevision({ ...baseValues, classId: 'srd-cc-5.2.1:rogue' })).not.toBe(
+      quickNpcBuildRevision(baseValues),
+    )
+  })
+
+  it('registers Build as an explicit external decision with Continue label', () => {
+    const decision = resolveQuickNpcBuildExternalDecision({ values: baseValues, context })
+
+    expect(decision).toEqual({
+      id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
+      isResolved: true,
+      completion: 'explicit',
+      revision: quickNpcBuildRevision(baseValues),
+      completeLabel: 'Continue',
+    })
+  })
+
+  it('changes revision when build-affecting inputs change', () => {
+    const first = resolveQuickNpcBuildExternalDecision({ values: baseValues, context })
+    const second = resolveQuickNpcBuildExternalDecision({
+      values: { ...baseValues, level: 2 },
+      context,
+    })
+
+    expect(first.revision).not.toBe(second.revision)
   })
 })

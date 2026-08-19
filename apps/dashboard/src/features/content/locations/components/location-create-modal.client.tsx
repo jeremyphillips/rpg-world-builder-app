@@ -1,11 +1,15 @@
 'use client'
 
 import * as React from 'react'
-import { Button, DialogPanelActionRow, usePendingAwareOpenChange } from '@rpg/ui'
+import { Button, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
+import {
+  CreateSetupFooter,
+  notifyCreateSetupValueChangeCompletion,
+  type SetupSummaryEditTarget,
+} from '@/lib/create-setup'
 import { CreateModalShell, type CreateWorkflowPanelStatus } from '@/lib/create-flow'
-import { CreateSetupPanel } from '@/lib/create-setup'
 
 import type {
   ContentFormHostChrome,
@@ -25,6 +29,7 @@ import {
   applyLocationCreateModalSetupValueChange,
   EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
   resolveLocationCreateModalSetupModel,
+  isLocationCreateModalSetupComplete,
   type LocationCreateModalSetupModel,
   type LocationCreateModalSetupValues,
 } from '../lib/location-create-modal-setup.lib'
@@ -33,10 +38,15 @@ import {
   type BuildingCreateSetupProjection,
 } from '../lib/location-building-create-setup.lib'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
+import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
 import {
-  buildLocationCreateSetupSets,
-  type LocationCreateSetupChoiceSet,
-} from '../lib/location-create-setup.lib'
+  resolveLocationSetupSummaryRows,
+  type LocationSetupSummaryEntry,
+} from '../lib/location-setup-summary-rows.lib'
+import {
+  LocationCreateModalSetupPanel,
+  useLocationCreateModalSetupSequence,
+} from './location-create-modal-setup-panel.client'
 import { LocationCreateForm } from './location-create-form.client'
 import {
   BuildingOrganizationsCreateTab,
@@ -60,7 +70,6 @@ type LocationCreateModalState = {
   fixedCreate: LocationFixedCreateContext | null
   detailsMounted: boolean
   setupValues: LocationCreateModalSetupValues
-  reopenChoiceSetId: string | null
   formKey: string
   buildingSetupApplication: {
     revision: number
@@ -80,7 +89,6 @@ function createInitialState(intent: LocationCreateIntent): LocationCreateModalSt
       fixedCreate: null,
       detailsMounted: false,
       setupValues: emptySetup,
-      reopenChoiceSetId: null,
       formKey,
       buildingSetupApplication: null,
     }
@@ -92,7 +100,6 @@ function createInitialState(intent: LocationCreateIntent): LocationCreateModalSt
     fixedCreate: session.fixedCreate,
     detailsMounted: true,
     setupValues: emptySetup,
-    reopenChoiceSetId: null,
     formKey,
     buildingSetupApplication: null,
   }
@@ -112,23 +119,18 @@ function resolveModalHeadline({
   return 'Create location'
 }
 
-function LocationCreateModalSetupPanel({
-  choiceSets,
-  reopenChoiceSetId,
-  onReopenChoiceSetIdChange,
-}: {
-  choiceSets: LocationCreateSetupChoiceSet[]
-  reopenChoiceSetId: string | null
-  onReopenChoiceSetIdChange: (choiceSetId: string | null) => void
-}) {
-  return (
-    <CreateSetupPanel
-      sets={buildLocationCreateSetupSets(choiceSets)}
-      changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
-      reopenSetId={reopenChoiceSetId}
-      onReopenSetIdChange={onReopenChoiceSetIdChange}
-    />
-  )
+const MULTI_SETUP_EYEBROW = 'Setup' as const
+
+function resolveAuthoringSetupSummary(
+  entries: readonly LocationSetupSummaryEntry[],
+): { eyebrow: string; rows: ReturnType<typeof resolveLocationSetupSummaryRows> } | null {
+  const rows = resolveLocationSetupSummaryRows(entries)
+  if (rows.length === 0) return null
+
+  return {
+    eyebrow: rows.length === 1 ? rows[0]!.label : MULTI_SETUP_EYEBROW,
+    rows,
+  }
 }
 
 function buildDetailsChrome({
@@ -160,24 +162,6 @@ function buildDetailsChrome({
         <FormShellSubmitButton disabled={pending}>{submitLabel}</FormShellSubmitButton>
       </>
     ),
-  }
-}
-
-const MULTI_SETUP_EYEBROW = 'Setup' as const
-
-function resolveSetupSummary(
-  entries: readonly { fieldLabel: string; valueLabel: string }[],
-): { eyebrow: string; summary: string } | null {
-  const firstEntry = entries[0]
-  if (!firstEntry) return null
-
-  if (entries.length === 1) {
-    return { eyebrow: firstEntry.fieldLabel, summary: firstEntry.valueLabel }
-  }
-
-  return {
-    eyebrow: MULTI_SETUP_EYEBROW,
-    summary: entries.map((entry) => entry.valueLabel).join(' · '),
   }
 }
 
@@ -305,69 +289,94 @@ function useLocationCreateModalController({
     [onOpenChange, requestClose],
   )
 
-  const handleContinueFromSetup = React.useCallback(() => {
-    if (!setupModel?.canContinue) return
-    const result = setupModel.complete()
-    if (!result) return
-    const fixedCreate = completeLocationCreateSetup(intent, result)
-    setState((current) => ({
-      ...current,
-      phase: 'details',
-      fixedCreate,
-      detailsMounted: true,
-      reopenChoiceSetId: null,
-      buildingSetupApplication:
-        result.kind === 'building'
-          ? {
-              revision: (current.buildingSetupApplication?.revision ?? 0) + 1,
-              projection: {
-                ...(result.form ? { form: result.form } : {}),
-                ...(result.facilityAuthoringGroup
-                  ? { facilityAuthoringGroup: result.facilityAuthoringGroup }
-                  : {}),
-              },
-            }
-          : current.buildingSetupApplication,
-    }))
-  }, [intent, setupModel])
+  const handleContinueFromSetup = React.useCallback(
+    (values: LocationCreateModalSetupValues = state.setupValues) => {
+      const model = resolveLocationCreateModalSetupModel({ intent, values })
+      if (!model || !isLocationCreateModalSetupComplete(model)) return
+      const result = model.complete()
+      if (!result) return
+      const fixedCreate = completeLocationCreateSetup(intent, result)
+      setState((current) => ({
+        ...current,
+        phase: 'details',
+        setupValues: values,
+        fixedCreate,
+        detailsMounted: true,
+        buildingSetupApplication:
+          result.kind === 'building'
+            ? {
+                revision: (current.buildingSetupApplication?.revision ?? 0) + 1,
+                projection: {
+                  ...(result.form ? { form: result.form } : {}),
+                  ...(result.facilityAuthoringGroup
+                    ? { facilityAuthoringGroup: result.facilityAuthoringGroup }
+                    : {}),
+                },
+              }
+            : current.buildingSetupApplication,
+      }))
+    },
+    [intent, state.setupValues],
+  )
 
   const handleBackToSetup = React.useCallback(() => {
     setState((current) => ({
       ...current,
       phase: 'setup',
-      reopenChoiceSetId: null,
     }))
   }, [])
 
-  const setReopenChoiceSetId = React.useCallback((choiceSetId: string | null) => {
-    setState((current) => ({ ...current, reopenChoiceSetId: choiceSetId }))
+  const returnToDetailsPhase = React.useCallback(() => {
+    setState((current) => ({
+      ...current,
+      phase: 'details',
+    }))
   }, [])
 
-  const choiceSets: LocationCreateSetupChoiceSet[] =
-    setupModel?.choiceSets.map((choiceSet) => ({
-      ...choiceSet,
-      onValueChange: (nextValue: string) => {
-        setState((current) => ({
-          ...current,
-          setupValues: applyLocationCreateModalSetupValueChange({
-            values: current.setupValues,
-            choiceSetId: choiceSet.id,
-            nextValue,
-          }),
-        }))
-      },
-    })) ?? []
+  const handleSetupValueChange = React.useCallback(
+    (event: Parameters<typeof applyLocationCreateModalSetupValueChange>[0]['event']) => {
+      const previousModel = resolveLocationCreateModalSetupModel({
+        intent,
+        values: state.setupValues,
+      })
+      const previousSets = previousModel
+        ? buildLocationCreateSetupSets(previousModel.choiceSets)
+        : []
+
+      const nextValues = applyLocationCreateModalSetupValueChange({
+        values: state.setupValues,
+        event,
+      })
+      const nextModel = resolveLocationCreateModalSetupModel({ intent, values: nextValues })
+      const nextSets = nextModel ? buildLocationCreateSetupSets(nextModel.choiceSets) : []
+
+      notifyCreateSetupValueChangeCompletion({
+        previousSets,
+        nextSets,
+        onSetupComplete: () => handleContinueFromSetup(nextValues),
+      })
+
+      setState((current) => ({
+        ...current,
+        setupValues: nextValues,
+      }))
+    },
+    [handleContinueFromSetup, intent, state.setupValues],
+  )
+
+  const setupSets = setupModel ? buildLocationCreateSetupSets(setupModel.choiceSets) : []
 
   return {
     state,
     setupModel,
     leaveBridgeRef,
-    choiceSets,
+    setupSets,
+    handleSetupValueChange,
     requestClose,
     handleOpenChange,
     handleContinueFromSetup,
     handleBackToSetup,
-    setReopenChoiceSetId,
+    returnToDetailsPhase,
     setDetailsPending,
     trustedClose,
   }
@@ -396,12 +405,13 @@ function LocationCreateModalSession({
     state,
     setupModel,
     leaveBridgeRef,
-    choiceSets,
+    setupSets,
+    handleSetupValueChange,
     requestClose,
     handleOpenChange,
     handleContinueFromSetup,
     handleBackToSetup,
-    setReopenChoiceSetId,
+    returnToDetailsPhase,
     setDetailsPending,
     trustedClose,
   } = useLocationCreateModalController({ intent, onOpenChange })
@@ -417,6 +427,7 @@ function LocationCreateModalSession({
   const organizationsControllerRef = React.useRef<BuildingOrganizationsCreateTabController | null>(
     null,
   )
+  const pendingSetupSummaryEditRef = React.useRef<SetupSummaryEditTarget | null>(null)
 
   const showDetails = state.phase === 'details' && state.fixedCreate != null
   const buildingTabsConfigured =
@@ -424,6 +435,35 @@ function LocationCreateModalSession({
     state.fixedCreate?.authoringType === 'building' &&
     state.buildingSetupApplication != null
   const showSetup = state.phase === 'setup' && setupModel != null
+  const setupSequenceModel = useLocationCreateModalSetupSequence({
+    sets: setupSets,
+    onSetupComplete: () => handleContinueFromSetup(state.setupValues),
+  })
+
+  const returnToDetails = React.useCallback(() => {
+    returnToDetailsPhase()
+  }, [returnToDetailsPhase])
+
+  const handleSetupSummaryEdit = React.useCallback(
+    (target: SetupSummaryEditTarget) => {
+      pendingSetupSummaryEditRef.current = target
+      handleBackToSetup()
+    },
+    [handleBackToSetup],
+  )
+
+  React.useLayoutEffect(() => {
+    if (state.phase !== 'setup') return
+
+    const pending = pendingSetupSummaryEditRef.current
+    if (!pending) return
+
+    pendingSetupSummaryEditRef.current = null
+    if (pending.type === 'set') {
+      setupSequenceModel.reopen(pending.id, { onDismiss: returnToDetails })
+    }
+  }, [returnToDetails, setupSequenceModel, state.phase])
+
   const submitLabel = buildingTabsConfigured
     ? BUILDING_CREATE_SETUP_HEADLINE
     : formatContentCreateActionLabel('locations')
@@ -456,13 +496,16 @@ function LocationCreateModalSession({
       submitBlocked={buildingSubmitBlocked || undefined}
     />
   )
-  const resolvedSetupSummary = setupModel ? resolveSetupSummary(setupModel.summaryEntries) : null
+  const resolvedSetupSummary = setupModel
+    ? resolveAuthoringSetupSummary(setupModel.summaryEntries)
+    : null
   const setupSummary =
     showDetails && state.hadSetup && resolvedSetupSummary
       ? {
-          ...resolvedSetupSummary,
+          eyebrow: resolvedSetupSummary.eyebrow,
+          rows: resolvedSetupSummary.rows,
           changeLabel: LOCATION_CREATE_SETUP_CHANGE_LABEL,
-          onChange: handleBackToSetup,
+          onRowEdit: handleSetupSummaryEdit,
         }
       : undefined
 
@@ -517,18 +560,11 @@ function LocationCreateModalSession({
         }
         footer={
           showSetup ? (
-            <DialogPanelActionRow>
-              <Button type="button" variant="outline" onClick={requestClose}>
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                disabled={!setupModel?.canContinue}
-                onClick={handleContinueFromSetup}
-              >
-                Continue
-              </Button>
-            </DialogPanelActionRow>
+            <CreateSetupFooter
+              model={setupSequenceModel}
+              onCancel={requestClose}
+              onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
+            />
           ) : (
             <FormShellFooterSlot />
           )
@@ -536,9 +572,9 @@ function LocationCreateModalSession({
       >
         {showSetup ? (
           <LocationCreateModalSetupPanel
-            choiceSets={choiceSets}
-            reopenChoiceSetId={state.reopenChoiceSetId}
-            onReopenChoiceSetIdChange={setReopenChoiceSetId}
+            sets={setupSets}
+            model={setupSequenceModel}
+            onSetupValueChange={handleSetupValueChange}
           />
         ) : null}
 

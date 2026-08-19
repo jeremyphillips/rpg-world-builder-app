@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { SetupSummaryCard, SetupSummaryCardChangeAction } from './setup-summary-card.client'
+import { SelectionSummaryCard, SelectionSummaryChangeAction } from './selection-summary-card'
 
 const meta = {
-  title: 'Create Setup/SetupSummaryCard',
-  component: SetupSummaryCard,
+  title: 'Forms/SelectionSummaryCard',
+  component: SelectionSummaryCard,
   args: {
     eyebrow: 'Selections',
     rows: [
@@ -12,7 +12,7 @@ const meta = {
         label: 'Title',
         value: 'Guildmaster',
         action: (
-          <SetupSummaryCardChangeAction
+          <SelectionSummaryChangeAction
             changeLabel="Change"
             ariaLabel="Change title"
             onChange={() => undefined}
@@ -23,7 +23,7 @@ const meta = {
         label: 'Species',
         value: 'Gnome',
         action: (
-          <SetupSummaryCardChangeAction
+          <SelectionSummaryChangeAction
             changeLabel="Change"
             ariaLabel="Change species"
             onChange={() => undefined}
@@ -32,7 +32,7 @@ const meta = {
       },
     ],
   },
-} satisfies Meta<typeof SetupSummaryCard>
+} satisfies Meta<typeof SelectionSummaryCard>
 
 export default meta
 type Story = StoryObj<typeof meta>
@@ -43,7 +43,7 @@ export const AuthoringSetup: Story = {
   args: {
     eyebrow: 'Setup',
     cardAction: (
-      <SetupSummaryCardChangeAction
+      <SelectionSummaryChangeAction
         changeLabel="Change"
         ariaLabel="Change setup"
         onChange={() => undefined}
@@ -57,23 +57,6 @@ export const AuthoringSetup: Story = {
   },
 }
 
-export const AuthoringLevel0: Story = {
-  args: {
-    eyebrow: 'Setup',
-    cardAction: (
-      <SetupSummaryCardChangeAction
-        changeLabel="Change"
-        ariaLabel="Change setup"
-        onChange={() => undefined}
-      />
-    ),
-    rows: [
-      { label: 'Role', value: 'No title' },
-      { label: 'Character', value: 'Elf · Level 0' },
-    ],
-  },
-}
-
 export const LongValues: Story = {
   args: {
     rows: [
@@ -81,7 +64,7 @@ export const LongValues: Story = {
         label: 'Title',
         value: 'Grandmaster of the Ancient Order of the Silver Lantern',
         action: (
-          <SetupSummaryCardChangeAction
+          <SelectionSummaryChangeAction
             changeLabel="Change"
             ariaLabel="Change title"
             onChange={() => undefined}
@@ -92,7 +75,7 @@ export const LongValues: Story = {
         label: 'Species',
         value: 'Rock Gnome with an unusually long catalog display name',
         action: (
-          <SetupSummaryCardChangeAction
+          <SelectionSummaryChangeAction
             changeLabel="Change"
             ariaLabel="Change species"
             onChange={() => undefined}

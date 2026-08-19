@@ -6,47 +6,66 @@ export {
 } from './create-setup-panel.client'
 
 export {
+  CreateSetupFooter,
+  deriveCreateSetupFooterState,
+  type CreateSetupFooterProps,
+  type CreateSetupFooterState,
+} from './create-setup-footer.client'
+
+export {
   CREATE_SETUP_DEFAULT_CHANGE_LABEL,
   CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW,
+  CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL,
 } from './create-setup.constants'
 
 export {
-  isCreateSetupGroupedChoiceSummaryReady,
+  isCreateSetupSummaryEligibleSet,
   resolveCreateSetupChoiceValueLabel,
-  resolveCreateSetupGroupedChoiceRows,
+  resolveCreateSetupPartialSummaryRows,
+  resolveCreateSetupPartialSummarySegments,
+  resolveCreateSetupSummaryGroupDisplayEyebrow,
+  resolveCreateSetupSummaryGroupEyebrow,
+  resolveCreateSetupSummaryGroupMemberIds,
+  resolveCreateSetupSummaryGroups,
+  resolveCreateSetupSummaryRowLabel,
   type CreateSetupGroupedChoiceRow,
+  type CreateSetupPartialSummarySegment,
 } from './create-setup-completed-choice-groups.lib'
-
-export { CreateSetupSummary, type CreateSetupSummaryProps } from './create-setup-summary.client'
-
-export {
-  SetupSummaryCard,
-  SetupSummaryCardChangeAction,
-  SetupSummaryRow,
-  type SetupSummaryCardChangeActionProps,
-  type SetupSummaryCardProps,
-  type SetupSummaryRowProps,
-} from './setup-summary-card.client'
 
 export {
   isCreateSetupChoiceComplete,
-  isCreateSetupNumberComplete,
+  notifyCreateSetupCompletionTransition,
   resolveCreateSetupActiveSetId,
-  resolveCreateSetupCanContinue,
+  resolveCreateSetupIsComplete,
+  resolveCreateSetupPendingExplicitDecisions,
   resolveCreateSetupSetExpanded,
   resolveCreateSetupSetIdsToInvalidate,
+  resolveCreateSetupSetsComplete,
   resolveCreateSetupVisibleSetIds,
   type ResolveCreateSetupActiveSetIdInput,
 } from './create-setup-sequence.lib'
 
-export { assertCreateSetupSetsOnReset } from './create-setup-validation.lib'
+export {
+  evaluateCreateSetupCompletionTransition,
+  notifyCreateSetupValueChangeCompletion,
+  useCreateSetupSequence,
+  type UseCreateSetupSequenceOptions,
+} from './use-create-setup-sequence.client'
 
 export { createSetupModalBodyClasses } from './create-setup.variants'
 
+export { mapSetupSummaryRowModelsToProps } from './setup-summary-row-models.client'
+
 export type {
   CreateSetupChoiceSet,
-  CreateSetupNumberSet,
+  CreateSetupExternalDecision,
+  CreateSetupPendingExplicitDecision,
+  CreateSetupReopenOptions,
   CreateSetupSequenceItem,
+  CreateSetupSequenceModel,
   CreateSetupSet,
   CreateSetupSetBase,
+  CreateSetupValueChangeEvent,
+  SetupSummaryEditTarget,
+  SetupSummaryRowModel,
 } from './create-setup.types'

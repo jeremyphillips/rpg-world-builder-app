@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
@@ -39,6 +39,13 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
     [searchParams],
   )
   const softParentLocationId = parseLocationCreateSoftParent(searchParams)
+  const setupCompletedRef = useRef(false)
+
+  useEffect(() => {
+    if (session.kind === 'needsSetup') {
+      setupCompletedRef.current = false
+    }
+  }, [session])
 
   const navigateToFixedCreate = useCallback(
     (fixedCreate: NonNullable<LocationFormCtx['fixedCreate']>) => {
@@ -71,11 +78,12 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
       <LocationCreateSetupHost
         intent={session.intent}
         onOpenChange={(open) => {
-          if (!open) {
+          if (!open && !setupCompletedRef.current) {
             navigate(ROUTES.content.locations.create(campaignId))
           }
         }}
         onComplete={(result) => {
+          setupCompletedRef.current = true
           navigateToFixedCreate(completeLocationCreateSetup(session.intent, result))
         }}
       />

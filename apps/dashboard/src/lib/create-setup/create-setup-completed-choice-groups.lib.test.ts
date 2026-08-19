@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  isCreateSetupGroupedChoiceSummaryReady,
   resolveCreateSetupChoiceValueLabel,
-  resolveCreateSetupCollapsedCompleteGroupedSetIds,
-  resolveCreateSetupGroupedChoiceRows,
+  resolveCreateSetupPartialSummaryRows,
+  resolveCreateSetupPartialSummarySegments,
+  resolveCreateSetupSummaryGroupMemberIds,
 } from './create-setup-completed-choice-groups.lib'
 import type { CreateSetupChoiceSet } from './create-setup.types'
 
@@ -17,8 +17,6 @@ function buildChoiceSet(
     options: [{ value: 'a', label: 'Alpha' }],
     value: 'a',
     isComplete: true,
-    onValueChange: () => {},
-    onReset: () => {},
     ...overrides,
   }
 }
@@ -37,40 +35,21 @@ describe('create-setup-completed-choice-groups', () => {
     ).toBe('Guildmaster')
   })
 
-  it('requires every declared id to be collapsed-complete before grouping', () => {
-    const isCollapsedComplete = (setId: string) => setId === 'membershipTitle'
-
+  it('uses the skipped label when a set is marked skipped', () => {
     expect(
-      isCreateSetupGroupedChoiceSummaryReady({
-        groupedChoiceSetIds: ['membershipTitle', 'speciesId'],
-        visibleSetIds: ['membershipTitle', 'speciesId'],
-        isCollapsedComplete,
-      }),
-    ).toBe(false)
+      resolveCreateSetupChoiceValueLabel(
+        buildChoiceSet({
+          id: 'form',
+          fieldLabel: 'Building form',
+          value: '',
+          skipped: true,
+          skippedValueLabel: 'Not specified',
+        }),
+      ),
+    ).toBe('Not specified')
   })
 
-  it('allows a partial grouped summary when opted in', () => {
-    const isCollapsedComplete = (setId: string) => setId === 'membershipTitle'
-
-    expect(
-      isCreateSetupGroupedChoiceSummaryReady({
-        groupedChoiceSetIds: ['membershipTitle', 'speciesId'],
-        visibleSetIds: ['membershipTitle', 'speciesId'],
-        isCollapsedComplete,
-        allowPartial: true,
-      }),
-    ).toBe(true)
-
-    expect(
-      resolveCreateSetupCollapsedCompleteGroupedSetIds({
-        groupedChoiceSetIds: ['membershipTitle', 'speciesId'],
-        visibleSetIds: ['membershipTitle', 'speciesId'],
-        isCollapsedComplete,
-      }),
-    ).toEqual(['membershipTitle'])
-  })
-
-  it('builds grouped rows only for collapsed-complete ids when filtered', () => {
+  it('builds partial summary rows for completed non-active sets', () => {
     const setById = new Map<string, CreateSetupChoiceSet>([
       [
         'membershipTitle',
@@ -81,57 +60,60 @@ describe('create-setup-completed-choice-groups', () => {
           value: 'guildmaster',
         }),
       ],
-      [
-        'speciesId',
-        buildChoiceSet({
-          id: 'speciesId',
-          fieldLabel: 'Species',
-          options: [{ value: 'gnome', label: 'Gnome' }],
-          value: '',
-          isComplete: false,
-        }),
-      ],
     ])
 
     expect(
-      resolveCreateSetupGroupedChoiceRows({
-        groupedChoiceSetIds: ['membershipTitle', 'speciesId'],
+      resolveCreateSetupPartialSummaryRows({
+        setIds: ['membershipTitle'],
         setById,
-        collapsedCompleteSetIds: ['membershipTitle'],
       }),
     ).toEqual([{ setId: 'membershipTitle', label: 'Title', valueLabel: 'Guildmaster' }])
   })
 
-  it('builds grouped rows in declared id order', () => {
-    const setById = new Map<string, CreateSetupChoiceSet>([
-      [
-        'speciesId',
-        buildChoiceSet({
-          id: 'speciesId',
-          fieldLabel: 'Species',
-          options: [{ value: 'gnome', label: 'Gnome' }],
-          value: 'gnome',
-        }),
-      ],
-      [
-        'membershipTitle',
-        buildChoiceSet({
-          id: 'membershipTitle',
-          fieldLabel: 'Title',
-          options: [{ value: 'guildmaster', label: 'Guildmaster' }],
-          value: 'guildmaster',
-        }),
-      ],
-    ])
+  it('resolves partial summary segments for grouped and standalone sets', () => {
+    const sets = [
+      buildChoiceSet({
+        id: 'membershipTitle',
+        fieldLabel: 'Title',
+        summaryGroup: 'selections',
+        options: [{ value: 'guildmaster', label: 'Guildmaster' }],
+        value: 'guildmaster',
+      }),
+      buildChoiceSet({
+        id: 'speciesId',
+        fieldLabel: 'Species',
+        summaryGroup: 'selections',
+        options: [{ value: 'gnome', label: 'Gnome' }],
+        value: '',
+        isComplete: false,
+      }),
+      buildChoiceSet({
+        id: 'siteType',
+        fieldLabel: 'Site type',
+        options: [{ value: 'landmark', label: 'Landmark' }],
+        value: 'landmark',
+      }),
+    ]
 
     expect(
-      resolveCreateSetupGroupedChoiceRows({
-        groupedChoiceSetIds: ['membershipTitle', 'speciesId'],
-        setById,
+      resolveCreateSetupPartialSummarySegments({
+        sets,
+        visibleSetIds: ['membershipTitle', 'speciesId', 'siteType'],
+        activeSetId: 'speciesId',
       }),
     ).toEqual([
-      { setId: 'membershipTitle', label: 'Title', valueLabel: 'Guildmaster' },
-      { setId: 'speciesId', label: 'Species', valueLabel: 'Gnome' },
+      { kind: 'group', summaryGroup: 'selections', setIds: ['membershipTitle'] },
+      { kind: 'standalone', setId: 'siteType' },
     ])
+  })
+
+  it('preserves summary group membership by set declaration, not adjacency', () => {
+    const sets = [
+      buildChoiceSet({ id: 'a', summaryGroup: 'identity' }),
+      buildChoiceSet({ id: 'inserted', fieldLabel: 'Inserted' }),
+      buildChoiceSet({ id: 'b', summaryGroup: 'identity' }),
+    ]
+
+    expect(resolveCreateSetupSummaryGroupMemberIds(sets, 'identity')).toEqual(['a', 'b'])
   })
 })

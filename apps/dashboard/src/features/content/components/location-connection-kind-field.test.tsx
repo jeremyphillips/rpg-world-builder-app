@@ -1,11 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { LOCATION_CONNECTION_KIND_CHANGE_LABEL } from '../lib/location-connection-drawer-intent'
-import { LocationConnectionKindStep } from './location-connection-kind-step.client'
+import { LocationConnectionKindField } from './location-connection-kind-field.client'
 
 const multiKindOptions = [
   {
@@ -18,17 +16,12 @@ const multiKindOptions = [
     label: 'Controls',
     description: 'Exercises military or coercive control over this region.',
   },
-  {
-    value: 'claims',
-    label: 'Claims',
-    description: 'Publicly asserts authority without fully exercising it.',
-  },
 ]
 
-describe('LocationConnectionKindStep', () => {
+describe('LocationConnectionKindField', () => {
   it('renders a read-only resolved kind for single-kind families', () => {
     render(
-      <LocationConnectionKindStep
+      <LocationConnectionKindField
         id="connection-kind"
         label="Connection type"
         options={[
@@ -48,36 +41,41 @@ describe('LocationConnectionKindStep', () => {
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
   })
 
-  it('collapses to a summary after selecting a kind', async () => {
+  it('renders nothing when no options are available', () => {
+    const { container } = render(
+      <LocationConnectionKindField
+        id="connection-kind"
+        label="Connection type"
+        options={[]}
+        value={null}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('renders radio cards for multi-option families', async () => {
     const user = userEvent.setup()
+    const onValueChange = vi.fn()
 
-    function ControlledStep() {
-      const [value, setValue] = useState<string | null>(null)
-
-      return (
-        <LocationConnectionKindStep
-          id="connection-kind"
-          label="Authority type"
-          options={multiKindOptions}
-          value={value}
-          onValueChange={setValue}
-        />
-      )
-    }
-
-    render(<ControlledStep />)
+    render(
+      <LocationConnectionKindField
+        id="connection-kind"
+        label="Authority type"
+        options={multiKindOptions}
+        value={null}
+        onValueChange={onValueChange}
+      />,
+    )
 
     await user.click(screen.getByRole('radio', { name: /Governs/i }))
-
-    expect(
-      screen.getByRole('button', { name: 'Governs, Change connection type' }),
-    ).toBeInTheDocument()
-    expect(screen.queryByRole('radiogroup', { name: 'Authority type' })).not.toBeInTheDocument()
+    expect(onValueChange).toHaveBeenCalledWith('governs')
   })
 
   it('shows disabled options with unavailable reasons instead of normal descriptions', () => {
     render(
-      <LocationConnectionKindStep
+      <LocationConnectionKindField
         id="connection-kind"
         label="Relationship type"
         options={[
@@ -96,7 +94,6 @@ describe('LocationConnectionKindStep', () => {
         ]}
         value={null}
         onValueChange={vi.fn()}
-        defaultExpanded
       />,
     )
 
@@ -107,49 +104,27 @@ describe('LocationConnectionKindStep', () => {
         'A designated primary base or headquarters location for the organization.',
       ),
     ).not.toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /Owner/i })).toBeEnabled()
   })
 
-  it('passes a custom summary eyebrow to the collapsed chooser', () => {
+  it('disables the entire field when disabled is true', () => {
     render(
-      <LocationConnectionKindStep
-        id="connection-kind"
-        label="What relationship should this organization have with this building?"
-        summaryEyebrow="Relationship"
-        options={multiKindOptions}
-        value="governs"
-        onValueChange={vi.fn()}
-      />,
-    )
-
-    expect(screen.getByText('Relationship')).toBeInTheDocument()
-    expect(
-      screen.queryByText('What relationship should this organization have with this building?'),
-    ).not.toBeInTheDocument()
-  })
-
-  it('re-expands the chooser when Change is clicked', async () => {
-    const user = userEvent.setup()
-
-    render(
-      <LocationConnectionKindStep
+      <LocationConnectionKindField
         id="connection-kind"
         label="Authority type"
         options={multiKindOptions}
-        value="controls"
+        value="governs"
         onValueChange={vi.fn()}
+        disabled
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: LOCATION_CONNECTION_KIND_CHANGE_LABEL }))
-
-    expect(screen.getByRole('radiogroup', { name: 'Authority type' })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /Controls/i })).toBeChecked()
+    expect(screen.getByRole('radio', { name: /Governs/i })).toBeDisabled()
+    expect(screen.getByRole('radio', { name: /Controls/i })).toBeDisabled()
   })
 
-  itAxe('has no axe accessibility violations in summary mode', async () => {
+  itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
-      <LocationConnectionKindStep
+      <LocationConnectionKindField
         id="connection-kind"
         label="Authority type"
         options={multiKindOptions}

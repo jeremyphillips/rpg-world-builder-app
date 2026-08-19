@@ -21,7 +21,33 @@ import {
   resolveQuickNpcBuildCardModel,
 } from '../lib/quick-npc-build-card.lib'
 import { applyQuickNpcSetupValueChange } from '../lib/quick-npc-setup-value-change.lib'
+import type { QuickNpcSetupValues } from '../lib/quick-npc-form-fields'
 import { QuickNpcBuildCard } from './quick-npc-build-card.client'
+
+function applySetupChange(args: {
+  values: QuickNpcSetupValues
+  setId: string
+  nextValue: string | number
+  context: ReturnType<typeof createCampaignNpcBuilderContextFixture>
+  titles: (typeof guildmasterTitle)[]
+  organizationClassAffinityIds?: readonly string[]
+}) {
+  const { values, setId, nextValue, ...rest } = args
+  const previousValue =
+    setId === 'speciesId'
+      ? values.speciesId
+      : setId === 'membershipTitle'
+        ? (values.membershipTitle ?? '')
+        : setId === 'classId'
+          ? values.classId
+          : values.level
+
+  return applyQuickNpcSetupValueChange({
+    values,
+    event: { setId, previousValue, nextValue, invalidatedSetIds: [] },
+    ...rest,
+  })
+}
 
 const guildmasterTitle = {
   id: 'omt_guildmaster',
@@ -215,7 +241,7 @@ describe('QuickNpcBuildCard', () => {
     })
 
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: {
           speciesId: 'srd-cc-5.2.1:dwarf',
           membershipTitle: 'Guildmaster',
@@ -279,7 +305,7 @@ describe('QuickNpcBuildCard', () => {
     }
 
     function BuildCardAtLevel({ level }: { level: number }) {
-      const values = applyQuickNpcSetupValueChange({
+      const values = applySetupChange({
         values: { ...baseValues, level: 0 },
         setId: 'level',
         nextValue: level,
@@ -331,7 +357,7 @@ describe('QuickNpcBuildCard', () => {
     }
 
     function BuildCardAtLevel({ level }: { level: number }) {
-      const values = applyQuickNpcSetupValueChange({
+      const values = applySetupChange({
         values: { ...baseValues, level: 0 },
         setId: 'level',
         nextValue: level,

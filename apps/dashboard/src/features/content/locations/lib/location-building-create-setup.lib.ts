@@ -12,6 +12,7 @@ import {
 import type { RadioCardOption } from '@rpg/ui'
 
 import type { LocationFormValues } from './location-form-fields'
+import type { LocationSetupSummaryEntry } from './location-setup-summary-rows.lib'
 
 export const BUILDING_CREATE_SETUP_HEADLINE = 'Create building' as const
 export const BUILDING_CREATE_SETUP_FORM_FIELD_LABEL = 'Building form' as const
@@ -21,6 +22,9 @@ export const BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL = 'Facility' as const
 export const BUILDING_CREATE_SETUP_FACILITY_PROMPT =
   'What kind of facility are you creating?' as const
 export const BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE = 'browse_all' as const
+export const BUILDING_CREATE_SETUP_FORM_SKIP_LABEL = 'Skip / Not specified' as const
+export const BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_GROUP = 'setupIdentity' as const
+export const BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_EYEBROW = 'Setup' as const
 
 export type BuildingCreateSetupProjection = {
   form?: BuildingForm
@@ -147,17 +151,19 @@ export function buildBuildingClassificationFromCreateSetup(
 export function buildBuildingCreateSetupSummaryEntries(
   projection: BuildingCreateSetupProjection,
   facilityScopeValue: BuildingCreateSetupSelection['facilityAuthoringGroup'],
-): { fieldLabel: string; valueLabel: string }[] {
+): LocationSetupSummaryEntry[] {
   return [
     ...(projection.form
       ? [
           {
+            setId: 'buildingForm',
             fieldLabel: BUILDING_CREATE_SETUP_FORM_FIELD_LABEL,
             valueLabel: getBuildingFormLabel(projection.form),
           },
         ]
       : []),
     {
+      setId: 'buildingFacilityAuthoringGroup',
       fieldLabel: BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
       valueLabel: projection.facilityAuthoringGroup
         ? BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES[projection.facilityAuthoringGroup].label

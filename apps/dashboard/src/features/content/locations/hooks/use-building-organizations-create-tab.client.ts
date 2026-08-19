@@ -1,7 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import { getOrganizationDomainLabel, type Organization } from '@rpg/contracts'
+import {
+  getOrganizationDomainLabel,
+  getOrganizationLocationConnectionLabel,
+  type Organization,
+} from '@rpg/contracts'
 
 import type {
   AddPendingWorkflowMode,
@@ -34,14 +38,22 @@ import {
   organizationTargetEligibleForKind,
   resolveBuildingOrganizationCommitKind,
   resolveBuildingOrganizationComposerStage,
+  resolveBuildingOrganizationComposerView,
   resolveBuildingOrganizationEffectiveKind,
+  resolveBuildingOrganizationHasResolvedOrganizationTarget,
   resolveBuildingOrganizationInProgress,
   resolveBuildingOrganizationVisibleIssues,
   type BuildingOrganizationComposerStage,
   type BuildingOrganizationComposerTarget,
+  type BuildingOrganizationEditingDecision,
 } from '../lib/building-organizations-create-tab-controller.lib'
+import { resolveBuildingOrganizationTargetName } from '../lib/building-organizations-create-tab.lib'
 
-export type { BuildingOrganizationComposerStage, BuildingOrganizationComposerTarget }
+export type {
+  BuildingOrganizationComposerStage,
+  BuildingOrganizationComposerTarget,
+  BuildingOrganizationEditingDecision,
+}
 
 export type UseBuildingOrganizationsCreateTabInput = {
   campaignId: string
@@ -89,6 +101,8 @@ export function useBuildingOrganizationsCreateTab({
   const [serverIssues, setServerIssues] = React.useState<readonly BuildingOrganizationDraftIssue[]>(
     [],
   )
+  const [editingDecision, setEditingDecision] =
+    React.useState<BuildingOrganizationEditingDecision | null>(null)
 
   const resetEditor = React.useCallback(() => {
     setComposerStage('intent')
@@ -97,6 +111,7 @@ export function useBuildingOrganizationsCreateTab({
     setNewOrganizationDraftId(null)
     setKind(null)
     setSearchQuery('')
+    setEditingDecision(null)
   }, [])
 
   const updatePlan = React.useCallback(
@@ -247,7 +262,12 @@ export function useBuildingOrganizationsCreateTab({
 
   const handleKindChange = React.useCallback(
     (value: BuildingOrganizationRelationshipDraft['kind']) => {
+      if (value === kind) {
+        setEditingDecision(null)
+        return
+      }
       setValidationAttempted(false)
+      setEditingDecision(null)
       setKind(value)
       if (!selectedOrganization) {
         setComposerStage('discovery')
@@ -262,14 +282,35 @@ export function useBuildingOrganizationsCreateTab({
       setComposerStage(stillEligible ? 'review' : 'discovery')
       if (!stillEligible) setSelectedOrganization(null)
     },
-    [editingDraftId, kindOptionsFor, selectedOrganization],
+    [editingDraftId, kind, kindOptionsFor, selectedOrganization],
   )
 
-  const selectExistingOrganization = React.useCallback((organizationId: string) => {
-    setValidationAttempted(false)
-    setSelectedOrganization({ kind: 'existing', organizationId })
-    setComposerStage('review')
+  const startEditingRelationship = React.useCallback(() => {
+    setEditingDecision('relationship')
   }, [])
+
+  const startEditingOrganization = React.useCallback(() => {
+    setEditingDecision('organization')
+  }, [])
+
+  const selectExistingOrganization = React.useCallback(
+    (organizationId: string) => {
+      if (
+        editingDecision === 'organization' &&
+        selectedOrganization?.kind === 'existing' &&
+        selectedOrganization.organizationId === organizationId
+      ) {
+        setEditingDecision(null)
+        return
+      }
+
+      setValidationAttempted(false)
+      setEditingDecision(null)
+      setSelectedOrganization({ kind: 'existing', organizationId })
+      setComposerStage('review')
+    },
+    [editingDecision, selectedOrganization],
+  )
 
   const commitExisting = React.useCallback(() => {
     const resolvedKind = resolveBuildingOrganizationCommitKind({
@@ -346,6 +387,7 @@ export function useBuildingOrganizationsCreateTab({
       setSelectedOrganization(null)
       setKind(null)
       setComposerStage('intent')
+      setEditingDecision(null)
     },
     [kind, plan, selectedOrganization, updatePlan],
   )
@@ -358,6 +400,7 @@ export function useBuildingOrganizationsCreateTab({
       setKind(relationship.kind)
       setComposerStage('review')
       setNewOrganizationDraftId(null)
+      setEditingDecision(null)
     },
     [],
   )
@@ -367,6 +410,7 @@ export function useBuildingOrganizationsCreateTab({
     setSelectedOrganization(null)
     setKind(null)
     setComposerStage('intent')
+    setEditingDecision(null)
   }, [])
 
   const removeRelationship = React.useCallback(
@@ -385,6 +429,7 @@ export function useBuildingOrganizationsCreateTab({
   const enterNewOrganizationBranch = React.useCallback(() => {
     const draftOrganizationId = createBuildingOrganizationDraftId()
     setValidationAttempted(false)
+    setEditingDecision(null)
     setNewOrganizationDraftId(draftOrganizationId)
     setSelectedOrganization({ kind: 'new', draftOrganizationId })
     setComposerStage('branch')
@@ -392,10 +437,54 @@ export function useBuildingOrganizationsCreateTab({
 
   const returnToDiscovery = React.useCallback(() => {
     setValidationAttempted(false)
+    setEditingDecision(null)
     setSelectedOrganization(null)
     setNewOrganizationDraftId(null)
     setComposerStage('discovery')
   }, [])
+
+  const composerKindOptions = React.useMemo(() => {
+    if (editingDraftId && selectedOrganization) {
+      return kindOptionsFor(selectedOrganization, editingDraftId)
+    }
+    return intentKindOptions
+  }, [editingDraftId, intentKindOptions, kindOptionsFor, selectedOrganization])
+
+  const organizationName = React.useMemo(
+    () =>
+      selectedOrganization
+        ? resolveBuildingOrganizationTargetName({
+            organization: selectedOrganization,
+            plan,
+            existingOrganizations: organizations,
+          })
+        : null,
+    [organizations, plan, selectedOrganization],
+  )
+
+  const composerView = React.useMemo(
+    () =>
+      resolveBuildingOrganizationComposerView({
+        composerStage: resolvedComposerStage,
+        editingDecision,
+        kindLabel: effectiveKind ? getOrganizationLocationConnectionLabel(effectiveKind) : null,
+        organizationName,
+        hasKind: effectiveKind != null,
+        hasResolvedOrganization: resolveBuildingOrganizationHasResolvedOrganizationTarget({
+          selectedOrganization,
+          organizationName,
+        }),
+        relationshipKindCount: composerKindOptions.filter((option) => !option.disabled).length,
+      }),
+    [
+      composerKindOptions,
+      editingDecision,
+      effectiveKind,
+      organizationName,
+      resolvedComposerStage,
+      selectedOrganization,
+    ],
+  )
 
   const context: ContentFormCtx = formCtx ?? {
     campaignId,
@@ -413,10 +502,15 @@ export function useBuildingOrganizationsCreateTab({
     composerStage: resolvedComposerStage,
     setComposerStage,
     editingDraftId,
+    editingDecision,
     selectedOrganization,
     visibleIssues,
     kind: effectiveKind,
+    rawKind: kind,
     handleKindChange,
+    startEditingRelationship,
+    startEditingOrganization,
+    composerView,
     searchQuery,
     setSearchQuery,
     isPending,

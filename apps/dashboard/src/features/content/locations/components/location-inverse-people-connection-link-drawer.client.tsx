@@ -10,14 +10,21 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationDomainLabel } from '@rpg/contracts'
-import { Button, Eyebrow, SegmentedControl, Text } from '@rpg/ui'
+import {
+  Button,
+  Eyebrow,
+  SegmentedControl,
+  SelectionSummaryCard,
+  SelectionSummaryChangeAction,
+  Text,
+} from '@rpg/ui'
 
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { LocationConnectionKindStep } from '../../components/location-connection-kind-step.client'
+import { LocationConnectionKindField } from '../../components/location-connection-kind-field.client'
 import {
   CatalogEntityPickerSheet,
   createCatalogEntityRowRenderer,
@@ -27,10 +34,13 @@ import {
   buildOrganizationPickerEntitySummary,
 } from '../../lib/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../lib/relationship/drawer-context.client'
+import { applyPeopleKindSlotDownstreamState } from '../../lib/relationship/apply-people-kind-slot-downstream-state.lib'
 import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
+  RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
+  RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW,
   characterInverseSubjectHasAvailableKind,
   organizationDrawerIntentFromKind,
   organizationInverseSubjectHasAvailableKind,
@@ -38,6 +48,7 @@ import {
 import { buildSubjectLocationConnectionKeySet } from '../../lib/location-connection-duplicate-keys'
 import {
   buildPeopleSectionKindOptions,
+  canReopenConnectionKindDecision,
   resolveActiveConnectionKind,
   resolvePeopleKindSlotFromOptionValue,
 } from '../../lib/location-connection-kind-options'
@@ -92,8 +103,6 @@ const SUBJECT_TYPE_SEGMENT_OPTIONS = [
   { value: 'character' as const, label: 'Character' },
   { value: 'organization' as const, label: 'Organization' },
 ]
-
-const PEOPLE_DRAWER_KIND_CHANGE_LABEL = 'Change'
 
 function resolveActiveBinding(
   slot: PeopleKindSlot,
@@ -166,6 +175,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     React.useState<PeopleConnectionSubjectType | null>(null)
   const [selectedOrganizationId, setSelectedOrganizationId] = React.useState<string | null>(null)
   const [selectedCharacterId, setSelectedCharacterId] = React.useState<string | null>(null)
+  const [editingKind, setEditingKind] = React.useState(false)
 
   const activeSlotKey = resolveActiveConnectionKind(selectedSlotKey, kindOptions)
   const activeSlot = activeSlotKey
@@ -185,18 +195,22 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   )
 
   const effectiveSubjectType = subjectTypeOverride ?? selectableSubjectTypes[0] ?? null
-  const showSubjectTypeSegment = Boolean(activeSlot && selectableSubjectTypes.length > 1)
-  const showEntityPicker = Boolean(activeSlot)
+  const canEditKind = canReopenConnectionKindDecision(kindOptions)
+  const kindDecisionComplete = Boolean(activeSlotKey)
+  const showKindField =
+    kindOptions.length > 0 &&
+    (!kindDecisionComplete || editingKind || (kindDecisionComplete && !canEditKind))
+  const showKindSummary = canEditKind && kindDecisionComplete && !editingKind
+  const selectedKindOption = kindOptions.find((option) => option.value === activeSlotKey)
+  const kindFieldLabel = LOCATION_PEOPLE_SECTION_SURFACE_COPY.kindFieldLabel
+  const kindChangeAriaLabel = RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL
+  const showSubjectTypeSegment = Boolean(
+    activeSlot && selectableSubjectTypes.length > 1 && !editingKind,
+  )
+  const showEntityPicker = Boolean(activeSlot && !editingKind)
   const effectiveBinding = activeSlot
     ? resolveActiveBinding(activeSlot, effectiveSubjectType)
     : undefined
-
-  const handleSlotKeyChange = (value: string) => {
-    setSelectedSlotKey(value)
-    setSubjectTypeOverride(null)
-    setSelectedOrganizationId(null)
-    setSelectedCharacterId(null)
-  }
 
   const orgRows = React.useMemo(
     () => connectedPartyRows.filter((row) => row.subjectType === 'organization'),
@@ -207,6 +221,45 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     () => connectedPartyRows.filter((row) => row.subjectType === 'character'),
     [connectedPartyRows],
   )
+
+  const handleSlotKeyChange = (value: string) => {
+    if (activeSlotKey === value) {
+      setEditingKind(false)
+      return
+    }
+
+    const nextSlot = resolvePeopleKindSlotFromOptionValue(kindSlots, value)
+    setSelectedSlotKey(value)
+    setEditingKind(false)
+
+    if (!nextSlot) {
+      setSubjectTypeOverride(null)
+      setSelectedOrganizationId(null)
+      setSelectedCharacterId(null)
+      return
+    }
+
+    const downstream = applyPeopleKindSlotDownstreamState({
+      nextSlot,
+      locationId: location.id,
+      canAddOrganization,
+      canAddCharacter,
+      subjectTypeOverride,
+      selectedOrganizationId,
+      selectedCharacterId,
+      orgRows,
+      characterRows,
+    })
+
+    setSubjectTypeOverride(downstream.subjectTypeOverride)
+    setSelectedOrganizationId(downstream.selectedOrganizationId)
+    setSelectedCharacterId(downstream.selectedCharacterId)
+  }
+
+  const startEditingKind = () => {
+    if (!canEditKind) return
+    setEditingKind(true)
+  }
 
   const characterExistingKeys = React.useMemo(
     () => buildSubjectLocationConnectionKeySet(characterRows),
@@ -297,14 +350,33 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   const headerBelowDescription = (
     <div className="space-y-4">
       <DrawerContext entities={drawerContextEntities} />
-      {kindOptions.length > 0 ? (
-        <LocationConnectionKindStep
+      {showKindField ? (
+        <LocationConnectionKindField
           id="location-people-connection-kind"
-          label={LOCATION_PEOPLE_SECTION_SURFACE_COPY.kindFieldLabel}
+          label={kindFieldLabel}
           options={kindOptions}
           value={activeSlotKey}
           onValueChange={handleSlotKeyChange}
-          changeLabel={PEOPLE_DRAWER_KIND_CHANGE_LABEL}
+        />
+      ) : null}
+      {showKindSummary && selectedKindOption ? (
+        <SelectionSummaryCard
+          eyebrow={RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW}
+          rows={[
+            {
+              label: kindFieldLabel,
+              value: selectedKindOption.label,
+              onValueClick: startEditingKind,
+              valueActionAriaLabel: kindChangeAriaLabel,
+              action: (
+                <SelectionSummaryChangeAction
+                  changeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
+                  ariaLabel={kindChangeAriaLabel}
+                  onChange={startEditingKind}
+                />
+              ),
+            },
+          ]}
         />
       ) : null}
       {showSubjectTypeSegment && activeSlot ? (
@@ -323,12 +395,12 @@ function LocationInversePeopleConnectionLinkDrawerContent({
           />
         </div>
       ) : null}
-      {instructionCopy ? (
+      {instructionCopy && !editingKind ? (
         <Text variant="muted" className="text-sm">
           {instructionCopy}
         </Text>
       ) : null}
-      {!showEntityPicker ? (
+      {!activeSlotKey ? (
         <Text variant="muted" className="text-sm" role="status">
           {LOCATION_PEOPLE_SECTION_SURFACE_COPY.chooseKindMessage}
         </Text>
@@ -355,7 +427,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         }
         noItemsMessage="No organizations are available."
         footer={
-          showEntityPicker && selectedOrganizationId && organizationDomain ? (
+          showEntityPicker && !editingKind && selectedOrganizationId && organizationDomain ? (
             <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
               {submitLabel}
             </Button>
@@ -420,7 +492,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       }
       noItemsMessage="No characters are available."
       footer={
-        showEntityPicker && selectedCharacterId && characterKind ? (
+        showEntityPicker && !editingKind && selectedCharacterId && characterKind ? (
           <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
             {submitLabel}
           </Button>
