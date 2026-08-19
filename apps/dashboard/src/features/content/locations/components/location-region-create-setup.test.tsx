@@ -55,15 +55,40 @@ describe('LocationRegionCreateSetup', () => {
     ).toBeInTheDocument()
   })
 
-  it('completes with classification after both steps', async () => {
+  it('dismisses reopen without clearing downstream when the same classification is re-selected', async () => {
     const user = userEvent.setup()
-    const onComplete = vi.fn()
 
     render(
       <LocationRegionCreateSetup
         open
         intent={{ authoringType: 'region' }}
         onOpenChange={vi.fn()}
+        onComplete={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
+    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
+
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }),
+    ).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('completes with classification after both steps', async () => {
+    const user = userEvent.setup()
+    const onComplete = vi.fn()
+    const onOpenChange = vi.fn()
+
+    render(
+      <LocationRegionCreateSetup
+        open
+        intent={{ authoringType: 'region' }}
+        onOpenChange={onOpenChange}
         onComplete={onComplete}
       />,
     )
@@ -77,6 +102,7 @@ describe('LocationRegionCreateSetup', () => {
         kind: 'region',
         classification: { kind: 'political', type: 'kingdom' },
       })
+      expect(onOpenChange).toHaveBeenCalledWith(false)
     })
   })
 })

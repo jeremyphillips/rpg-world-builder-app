@@ -55,12 +55,13 @@ describe('LocationSettlementCreateSetup', () => {
   it('keeps the terminal choice set expanded after selection and completes on Continue', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
+    const onOpenChange = vi.fn()
 
     render(
       <LocationSettlementCreateSetup
         open
         intent={{ authoringType: 'settlement' }}
-        onOpenChange={vi.fn()}
+        onOpenChange={onOpenChange}
         onComplete={onComplete}
       />,
     )
@@ -79,6 +80,7 @@ describe('LocationSettlementCreateSetup', () => {
 
     await waitFor(() => {
       expect(onComplete).toHaveBeenCalledWith({ kind: 'settlement', settlementType: 'city' })
+      expect(onOpenChange).toHaveBeenCalledWith(false)
     })
   })
 })
