@@ -13,8 +13,7 @@ import { formatBuilderDraftCharacterSummary } from '../../lib/builder-preview/pr
 import { buildOrganizationMembershipTitleRadioOptions } from '../../components/connections/organization-membership-title-field.lib'
 import {
   isCreateSetupChoiceComplete,
-  isCreateSetupNumberComplete,
-  resolveCreateSetupCanContinue,
+  type CreateSetupExternalDecision,
   type CreateSetupSet,
 } from '@/lib/create-setup'
 
@@ -50,7 +49,54 @@ export const QUICK_NPC_SPECIES_AFFINITY_PROMPT =
 export type QuickNpcSetupModel = {
   speciesOptions: ReturnType<typeof buildQuickNpcContentOptions>['speciesOptions']
   classOptions: ReturnType<typeof buildQuickNpcContentOptions>['classOptions']
-  canContinue: boolean
+}
+
+export const QUICK_NPC_BUILD_EXTERNAL_DECISION_ID = 'quickNpcBuild' as const
+
+export function quickNpcBuildRevision(values: QuickNpcSetupValues): string {
+  return [
+    values.membershipTitle ?? '',
+    values.speciesId,
+    String(values.level),
+    values.classId,
+  ].join(':')
+}
+
+function isQuickNpcLevelResolved(
+  level: number,
+  constraints: ReturnType<typeof resolveCharacterLevelConstraints>,
+): boolean {
+  return Number.isInteger(level) && level >= constraints.minLevel && level <= constraints.maxLevel
+}
+
+export function isQuickNpcBuildResolved(args: {
+  values: QuickNpcSetupValues
+  context: CharacterBuildContext
+}): boolean {
+  const levelConstraints = resolveCharacterLevelConstraints({
+    characterKind: args.context.characterKind,
+    rulesScope: args.context.rulesScope,
+    characterCreationRules: args.context.characterCreationRules,
+  })
+  const classRequired = isClassProgressionApplicable(args.values.level)
+
+  return (
+    isQuickNpcLevelResolved(args.values.level, levelConstraints) &&
+    (!classRequired || Boolean(args.values.classId))
+  )
+}
+
+export function resolveQuickNpcBuildExternalDecision(args: {
+  values: QuickNpcSetupValues
+  context: CharacterBuildContext
+}): CreateSetupExternalDecision {
+  return {
+    id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
+    isResolved: isQuickNpcBuildResolved(args),
+    completion: 'explicit',
+    revision: quickNpcBuildRevision(args.values),
+    completeLabel: 'Continue',
+  }
 }
 
 export {
@@ -152,8 +198,6 @@ function buildQuickNpcSpeciesSetupSet(
     summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
     summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
     isComplete: isCreateSetupChoiceComplete(args.values.speciesId),
-    collapseWhenComplete: true,
-    collapseWhenActiveAndComplete: true,
   }
 }
 
@@ -171,7 +215,6 @@ function buildQuickNpcMembershipTitleSetupSet(
     summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
     summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
     isComplete: isQuickNpcMembershipTitleSetupComplete(args.values.membershipTitle),
-    collapseWhenComplete: true,
   }
 }
 
@@ -210,31 +253,10 @@ export function resolveQuickNpcSetupModel(args: {
   members?: { classAffinityIds?: readonly string[]; speciesAffinityIds?: readonly string[] }
 }): QuickNpcSetupModel {
   const { speciesOptions, classOptions } = buildQuickNpcContentOptions(args.context)
-  const levelConstraints = resolveCharacterLevelConstraints({
-    characterKind: args.context.characterKind,
-    rulesScope: args.context.rulesScope,
-    characterCreationRules: args.context.characterCreationRules,
-  })
-  const { speciesId, classId, level } = args.values
-  const classRequired = isClassProgressionApplicable(level)
-
-  const sets = buildQuickNpcCreateSetupSets({
-    context: args.context,
-    values: args.values,
-    titles: args.titles ?? [],
-    members: args.members,
-  })
-  const canContinue =
-    resolveCreateSetupCanContinue({ sets }) &&
-    isQuickNpcMembershipTitleSetupComplete(args.values.membershipTitle) &&
-    isCreateSetupNumberComplete(level, levelConstraints.minLevel, levelConstraints.maxLevel) &&
-    Boolean(speciesId) &&
-    (!classRequired || Boolean(classId))
 
   return {
     speciesOptions,
     classOptions,
-    canContinue,
   }
 }
 

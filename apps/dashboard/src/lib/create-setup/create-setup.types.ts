@@ -1,4 +1,4 @@
-import type { NumberStepperDigits, RadioCardOption, RadioCardOptionGroup } from '@rpg/ui'
+import type { RadioCardOption, RadioCardOptionGroup } from '@rpg/ui'
 
 export type CreateSetupValueChangeEvent = {
   setId: string
@@ -9,15 +9,34 @@ export type CreateSetupValueChangeEvent = {
   skipped?: boolean
 }
 
+export type CreateSetupExternalDecision = {
+  id: string
+  /** Values are valid/settled — sequence-level isComplete additionally requires confirmation for explicit decisions. */
+  isResolved: boolean
+  completion: 'auto' | 'explicit'
+  /** Confirmation identity: material changes invalidate any prior confirmation. */
+  revision: string
+  completeLabel?: string
+}
+
+export type CreateSetupPendingExplicitDecision = {
+  id: string
+  isResolved: boolean
+  completeLabel: string
+}
+
 export type CreateSetupSequenceModel = {
   activeSetId: string | null
   visibleSetIds: string[]
-  collapsedCompleteSetIds: string[]
   reopenSetId: string | null
   reopen: (setId: string | null) => void
   /** True while a reopened upstream set is being edited — siblings/downstream hide on this. */
   isEditingUpstream: boolean
-  canContinue: boolean
+  /** All decisions resolved and explicit decisions confirmed at their current revision. */
+  isComplete: boolean
+  /** Explicit decisions currently unconfirmed — drives the derived footer action. */
+  pendingExplicitDecisions: CreateSetupPendingExplicitDecision[]
+  completeExplicitDecision: (id: string) => void
 }
 
 export type CreateSetupSequenceItem = {
@@ -28,30 +47,20 @@ export type CreateSetupSequenceItem = {
   dependsOn?: readonly string[]
   /** Upstream set ids that must be complete before this set is visible — no reset. */
   visibleWhenComplete?: readonly string[]
-  /**
-   * Presentation: when false, completed visible sets stay expanded.
-   * Does not affect `isComplete`. @default true
-   */
-  collapseWhenComplete?: boolean
-  /**
-   * Presentation: when true, a completed set collapses even while it remains
-   * the active terminal set. Opt-in for flows that should summarize after seeding.
-   */
-  collapseWhenActiveAndComplete?: boolean
-  /** Semantic group id — collapsed-complete members render one grouped SetupSummaryCard. */
+  /** Semantic group id — completed non-active members render partial SetupSummaryCard rows. */
   summaryGroup?: string
 }
 
 export type CreateSetupSetBase = {
   id: string
   fieldLabel: string
+  /** Row label in setup-phase summary; falls back to fieldLabel. */
+  summaryLabel?: string
   /** Optional — radio cards may explain; compact number controls may omit. */
   prompt?: string
   required?: boolean
   dependsOn?: readonly string[]
   visibleWhenComplete?: readonly string[]
-  collapseWhenComplete?: boolean
-  collapseWhenActiveAndComplete?: boolean
   summaryGroup?: string
   /** Eyebrow for grouped setup-phase summary when `summaryGroup` is set. */
   summaryGroupEyebrow?: string
@@ -70,12 +79,4 @@ export type CreateSetupChoiceSet = CreateSetupSetBase & {
   skippedValueLabel?: string
 }
 
-export type CreateSetupNumberSet = CreateSetupSetBase & {
-  kind: 'number'
-  value: number
-  min: number
-  max: number
-  digits?: NumberStepperDigits
-}
-
-export type CreateSetupSet = CreateSetupChoiceSet | CreateSetupNumberSet
+export type CreateSetupSet = CreateSetupChoiceSet

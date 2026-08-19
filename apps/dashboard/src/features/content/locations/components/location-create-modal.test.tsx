@@ -25,10 +25,7 @@ import {
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
-import {
-  LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL,
-  LOCATION_CREATE_SETUP_CHANGE_LABEL,
-} from '../lib/location-create-setup-chrome.lib'
+import { LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL } from '../lib/building-organizations-create-tab.lib'
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
@@ -190,7 +187,6 @@ function renderModal(intent: LocationCreateIntent, onOpenChange = vi.fn(), open 
 
 async function continueSettlementSetup(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('City') }))
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
   expect(await screen.findByRole('heading', { name: 'Create city' })).toBeInTheDocument()
 }
 
@@ -239,7 +235,6 @@ async function continueBuildingSetup(
     await user.click(skipButton)
   }
   await chooseBuildingFacilityGroup(user, facilityGroup)
-  await user.click(screen.getByRole('button', { name: 'Continue' }))
   expect(await screen.findByRole('heading', { name: 'Create building' })).toBeInTheDocument()
   expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
 }
@@ -288,7 +283,7 @@ describe('LocationCreateModal', () => {
     expect(
       screen.queryByRole('radiogroup', { name: 'What kind of facility are you creating?' }),
     ).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
 
     await skipBuildingForm(user)
     await continueBuildingSetup(user)
@@ -1019,11 +1014,11 @@ describe('LocationCreateModal', () => {
     const firstRegionType = within(regionTypeGroup).getAllByRole('radio')[0]
     expect(firstRegionType).toBeTruthy()
     await user.click(firstRegionType!)
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
     await user.click(
-      screen.getByRole('button', { name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}` }),
+      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
     )
+    await user.click(screen.getByRole('button', { name: 'Change classification' }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
     const clearedRegionTypeGroup = screen.getByRole('radiogroup', { name: 'Region type' })
@@ -1035,7 +1030,7 @@ describe('LocationCreateModal', () => {
         name: (name) => name.startsWith('Continent'),
       }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
   })
 
   it('shows multi-line region summary Change, returns to terminal setup, and preserves Name', async () => {
@@ -1052,7 +1047,6 @@ describe('LocationCreateModal', () => {
     ).textContent
     expect(firstRegionTypeName).toBeTruthy()
     await user.click(firstRegionType!)
-    await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByText('Setup')).toBeInTheDocument()
     expect(screen.getByText('Political')).toBeInTheDocument()
@@ -1065,9 +1059,7 @@ describe('LocationCreateModal', () => {
     )
 
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}` }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
     expect(
       screen.queryByRole('radiogroup', {
         name: (name) => name.startsWith('What kind of'),

@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { LocationRegionCreateSetup } from './location-region-create-setup.client'
 
 describe('LocationRegionCreateSetup', () => {
@@ -25,13 +24,13 @@ describe('LocationRegionCreateSetup', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(screen.getByRole('button', { name: 'Change classification' }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     expect(
-      screen.queryByRole('radio', { name: (name) => name.startsWith('Kingdom') }),
+      screen.queryByRole('radio', { name: (name) => name.startsWith('Kingdom'), checked: true }),
     ).not.toBeInTheDocument()
   })
 
@@ -69,7 +68,7 @@ describe('LocationRegionCreateSetup', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(screen.getByRole('button', { name: 'Change classification' }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
 
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()

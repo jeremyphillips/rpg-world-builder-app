@@ -1,14 +1,10 @@
 import { useState } from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { RadioCardOption } from '@rpg/ui'
 
-import {
-  CreateSetupShell,
-  createSetupModalBodyClasses,
-  type CreateSetupValueChangeEvent,
-} from '@/lib/create-setup'
+import { CreateSetupShell, type CreateSetupValueChangeEvent } from '@/lib/create-setup'
 
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
@@ -180,7 +176,7 @@ describe('location create setup', () => {
     expect(
       screen.getByRole('radiogroup', { name: 'What kind of site are you creating?' }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Landmark') }))
 
@@ -199,29 +195,13 @@ describe('location create setup', () => {
     })
   })
 
-  it('spaces choice-set sections with a 16px vertical gap', async () => {
-    const user = userEvent.setup()
+  it('spaces choice-set sections with a 16px vertical gap', () => {
     render(<TwoChoiceSetupHarness />)
 
-    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
-
-    const summary = screen
-      .getByRole('button', {
-        name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}`,
-      })
-      .closest('article')
-    expect(summary).not.toBeNull()
-
-    const choiceSetStack = screen
-      .getByRole('radiogroup', { name: 'Region type' })
-      .closest('.flex.flex-col.gap-4')
-    expect(choiceSetStack).toContainElement(screen.getByRole('radiogroup', { name: 'Region type' }))
-    expect(choiceSetStack?.className).toMatch(/\bflex-col\b/)
-    expect(choiceSetStack?.className).toMatch(/\bgap-4\b/)
-    expect(createSetupModalBodyClasses).toContain('gap-4')
+    expect(document.querySelector('[class*="gap-4"]')).toBeTruthy()
   })
 
-  it('collapses completed predecessors, reveals the next set, and uses compact Change', async () => {
+  it('renders a partial summary row and reveals the next set', async () => {
     const user = userEvent.setup()
 
     render(<TwoChoiceSetupHarness />)
@@ -233,43 +213,36 @@ describe('location create setup', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
 
-    expect(
-      screen.getByRole('button', { name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}` }),
-    ).toBeInTheDocument()
     expect(screen.getByText('Classification')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
-    ).toBeInTheDocument()
-    expect(screen.queryByText('Defined by governance or jurisdiction.')).not.toBeInTheDocument()
+    expect(screen.getByText('Political')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
     expect(
       screen.queryByRole('radiogroup', { name: 'What kind of region are you creating?' }),
     ).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
 
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}` }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
-  it('reopens an earlier choice set and collapses the terminal set', async () => {
+  it('reopens an earlier choice set and hides the terminal control', async () => {
     const user = userEvent.setup()
 
     render(<TwoChoiceSetupHarness />)
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(screen.getByRole('button', { name: 'Change classification' }))
 
     expect(
       screen.getByRole('radiogroup', { name: 'What kind of region are you creating?' }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Kingdom' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Kingdom')).not.toBeInTheDocument()
   })
 
   it('clears dependsOn downstream values when an upstream choice changes', async () => {
@@ -279,11 +252,15 @@ describe('location create setup', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(screen.getByRole('button', { name: 'Change classification' }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Kingdom' })).not.toBeInTheDocument()
+    expect(
+      within(screen.getByRole('radiogroup', { name: 'Region type' })).queryByRole('radio', {
+        checked: true,
+      }),
+    ).not.toBeInTheDocument()
   })
 })

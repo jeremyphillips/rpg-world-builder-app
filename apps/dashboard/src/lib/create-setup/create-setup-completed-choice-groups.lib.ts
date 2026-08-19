@@ -1,4 +1,7 @@
-import { CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL } from './create-setup.constants'
+import {
+  CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW,
+  CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL,
+} from './create-setup.constants'
 import type { CreateSetupChoiceSet, CreateSetupSet } from './create-setup.types'
 
 export type CreateSetupGroupedChoiceRow = {
@@ -14,6 +17,10 @@ export function resolveCreateSetupChoiceValueLabel(set: CreateSetupChoiceSet): s
 
   const selectedOption = set.options.find((option) => option.value === set.value)
   return selectedOption?.label ?? set.value
+}
+
+export function resolveCreateSetupSummaryRowLabel(set: CreateSetupChoiceSet): string {
+  return set.summaryLabel ?? set.fieldLabel
 }
 
 export function resolveCreateSetupSummaryGroupMemberIds(
@@ -45,51 +52,29 @@ export function resolveCreateSetupSummaryGroupEyebrow(
   return sets.find((set) => set.summaryGroup === summaryGroup)?.summaryGroupEyebrow
 }
 
-export function isCreateSetupSetCollapsedComplete(args: {
-  setId: string
-  visibleSetIds: readonly string[]
-  isCollapsedComplete: (setId: string) => boolean
-}): boolean {
-  return args.visibleSetIds.includes(args.setId) && args.isCollapsedComplete(args.setId)
-}
-
-export function resolveCreateSetupCollapsedCompleteGroupedSetIds(args: {
-  groupMemberSetIds: readonly string[]
-  visibleSetIds: readonly string[]
-  isCollapsedComplete: (setId: string) => boolean
-}): string[] {
-  return args.groupMemberSetIds.filter((setId) =>
-    isCreateSetupSetCollapsedComplete({
-      setId,
-      visibleSetIds: args.visibleSetIds,
-      isCollapsedComplete: args.isCollapsedComplete,
-    }),
+export function resolveCreateSetupSummaryGroupDisplayEyebrow(
+  sets: readonly CreateSetupSet[],
+  summaryGroup: string,
+): string {
+  return (
+    resolveCreateSetupSummaryGroupEyebrow(sets, summaryGroup) ??
+    CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW
   )
 }
 
-/** True when every declared group member is visible, complete, and collapsed. */
-export function isCreateSetupGroupedChoiceSummaryReady(args: {
-  groupMemberSetIds: readonly string[]
-  visibleSetIds: readonly string[]
-  isCollapsedComplete: (setId: string) => boolean
+export function isCreateSetupSummaryEligibleSet(args: {
+  set: CreateSetupSet
+  activeSetId: string | null
 }): boolean {
-  if (args.groupMemberSetIds.length < 2) {
-    return false
-  }
-
-  const collapsedCompleteIds = resolveCreateSetupCollapsedCompleteGroupedSetIds(args)
-  return collapsedCompleteIds.length === args.groupMemberSetIds.length
+  if (!args.set.isComplete) return false
+  return args.set.id !== args.activeSetId
 }
 
-export function resolveCreateSetupGroupedChoiceRows(args: {
-  groupMemberSetIds: readonly string[]
+export function resolveCreateSetupPartialSummaryRows(args: {
+  setIds: readonly string[]
   setById: ReadonlyMap<string, CreateSetupChoiceSet | undefined>
-  /** When set, only these ids are included (preserving declared order). */
-  collapsedCompleteSetIds?: readonly string[]
 }): CreateSetupGroupedChoiceRow[] {
-  const setIds = args.collapsedCompleteSetIds ?? args.groupMemberSetIds
-
-  return setIds.flatMap((setId) => {
+  return args.setIds.flatMap((setId) => {
     const set = args.setById.get(setId)
     if (!set || set.kind !== 'choice') {
       return []
@@ -98,9 +83,55 @@ export function resolveCreateSetupGroupedChoiceRows(args: {
     return [
       {
         setId,
-        label: set.fieldLabel,
+        label: resolveCreateSetupSummaryRowLabel(set),
         valueLabel: resolveCreateSetupChoiceValueLabel(set),
       },
     ]
   })
+}
+
+export type CreateSetupPartialSummarySegment =
+  | { kind: 'group'; summaryGroup: string; setIds: string[] }
+  | { kind: 'standalone'; setId: string }
+
+export function resolveCreateSetupPartialSummarySegments(args: {
+  sets: readonly CreateSetupSet[]
+  visibleSetIds: readonly string[]
+  activeSetId: string | null
+}): CreateSetupPartialSummarySegment[] {
+  const setById = new Map(args.sets.map((set) => [set.id, set]))
+  const renderedGroups = new Set<string>()
+  const renderedStandalone = new Set<string>()
+  const segments: CreateSetupPartialSummarySegment[] = []
+
+  for (const setId of args.visibleSetIds) {
+    const set = setById.get(setId)
+    if (!set) continue
+    if (!isCreateSetupSummaryEligibleSet({ set, activeSetId: args.activeSetId })) continue
+
+    const summaryGroup = set.summaryGroup
+    if (summaryGroup) {
+      if (renderedGroups.has(summaryGroup)) continue
+      renderedGroups.add(summaryGroup)
+
+      const memberSetIds = resolveCreateSetupSummaryGroupMemberIds(args.sets, summaryGroup)
+      const eligibleMemberSetIds = memberSetIds.filter((memberSetId) => {
+        const member = setById.get(memberSetId)
+        return (
+          member && isCreateSetupSummaryEligibleSet({ set: member, activeSetId: args.activeSetId })
+        )
+      })
+
+      if (eligibleMemberSetIds.length > 0) {
+        segments.push({ kind: 'group', summaryGroup, setIds: eligibleMemberSetIds })
+      }
+      continue
+    }
+
+    if (renderedStandalone.has(set.id)) continue
+    renderedStandalone.add(set.id)
+    segments.push({ kind: 'standalone', setId: set.id })
+  }
+
+  return segments
 }

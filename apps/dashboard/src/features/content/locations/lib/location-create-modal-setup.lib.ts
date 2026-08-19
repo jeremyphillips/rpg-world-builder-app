@@ -141,7 +141,7 @@ function resolveBuildingSetupModel(
         visibleWhenComplete: ['buildingForm'],
         summaryGroup: BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_GROUP,
         summaryGroupEyebrow: BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_EYEBROW,
-        isComplete: Boolean(values.buildingFacilityAuthoringGroup),
+        isComplete: Boolean(values.buildingFacilityAuthoringGroup) && projection != null,
       },
     ],
     canContinue: isBuildingFormSetupComplete(values) && projection != null,

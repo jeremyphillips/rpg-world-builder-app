@@ -2,12 +2,14 @@
 
 import { useId } from 'react'
 
-import { Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
+import { Modal } from '@rpg/ui'
 
 import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from './create-setup.constants'
+import { CreateSetupFooter } from './create-setup-footer.client'
 import { buildCreateSetupPanelItems } from './create-setup-panel-items.client'
 import { useCreateSetupSequence } from './use-create-setup-sequence.client'
 import type {
+  CreateSetupExternalDecision,
   CreateSetupSequenceModel,
   CreateSetupSet,
   CreateSetupValueChangeEvent,
@@ -56,11 +58,10 @@ export type CreateSetupShellProps = {
   changeLabel?: string
   onSetupValueChange: (event: CreateSetupValueChangeEvent) => void
   onContinue: () => void
-  /** Escape hatch for extra validation beyond required set completion. */
-  additionalContinueConstraint?: boolean
+  externalDecisions?: readonly CreateSetupExternalDecision[]
 }
 
-/** Shared create-setup modal: compact selected summaries + ID-sequenced expansion. */
+/** Shared create-setup modal: partial summary rows + ID-sequenced expansion. */
 export function CreateSetupShell({
   open,
   onOpenChange,
@@ -70,10 +71,17 @@ export function CreateSetupShell({
   changeLabel,
   onSetupValueChange,
   onContinue,
-  additionalContinueConstraint = true,
+  externalDecisions,
 }: CreateSetupShellProps) {
-  const model = useCreateSetupSequence(sets, { additionalContinueConstraint })
-  const canContinue = model.canContinue
+  const handleSetupComplete = () => {
+    onContinue()
+    onOpenChange(false)
+  }
+
+  const model = useCreateSetupSequence(sets, {
+    externalDecisions,
+    onSetupComplete: handleSetupComplete,
+  })
 
   const description = typeof subhead === 'string' ? subhead : undefined
 
@@ -90,22 +98,11 @@ export function CreateSetupShell({
           />
         </Modal.Body>
         <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              disabled={!canContinue}
-              onClick={() => {
-                if (!canContinue) return
-                onContinue()
-                onOpenChange(false)
-              }}
-            >
-              Continue
-            </Button>
-          </div>
+          <CreateSetupFooter
+            model={model}
+            onCancel={() => onOpenChange(false)}
+            onSetupComplete={handleSetupComplete}
+          />
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

@@ -1,4 +1,4 @@
-import type { CreateSetupSequenceItem, CreateSetupSet } from './create-setup.types'
+import type { CreateSetupExternalDecision, CreateSetupSequenceItem } from './create-setup.types'
 
 export type ResolveCreateSetupActiveSetIdInput = {
   sets: readonly CreateSetupSequenceItem[]
@@ -62,35 +62,18 @@ export function resolveCreateSetupActiveSetId({
   return visibleSets[visibleSets.length - 1]?.id ?? sets[sets.length - 1]?.id ?? null
 }
 
+/** True when the set is the active decision control (expanded RadioCardField). */
 export function resolveCreateSetupSetExpanded({
   setId,
   activeSetId,
   reopenSetId = null,
-  visible,
-  isComplete,
-  required = true,
-  collapseWhenComplete = true,
-  collapseWhenActiveAndComplete = false,
 }: {
   setId: string
   activeSetId: string | null
   reopenSetId?: string | null
-  visible: boolean
-  isComplete: boolean
-  required?: boolean
-  collapseWhenComplete?: boolean
-  collapseWhenActiveAndComplete?: boolean
 }): boolean {
   if (reopenSetId === setId) return true
-  if (setId === activeSetId) {
-    if (!isComplete) return true
-    if (collapseWhenComplete === false) return true
-    if (collapseWhenActiveAndComplete) return false
-    return true
-  }
-  if (visible && required === false && !isComplete) return true
-  if (visible && collapseWhenComplete === false) return true
-  return false
+  return setId === activeSetId
 }
 
 /**
@@ -125,24 +108,68 @@ export function resolveCreateSetupVisibleSetIds({
   return visibleIds
 }
 
-export function resolveCreateSetupCanContinue({
+export function resolveCreateSetupSetsComplete({
   sets,
 }: {
   sets: readonly CreateSetupSequenceItem[]
 }): boolean {
   if (sets.length === 0) return false
-  return sets.every((set) => {
-    const required = set.required !== false
-    return !required || set.isComplete
+  return sets.every((set) => set.isComplete)
+}
+
+export function resolveCreateSetupIsComplete({
+  sets,
+  externalDecisions = [],
+  confirmedRevisionById = new Map<string, string>(),
+}: {
+  sets: readonly CreateSetupSequenceItem[]
+  externalDecisions?: readonly CreateSetupExternalDecision[]
+  confirmedRevisionById?: ReadonlyMap<string, string>
+}): boolean {
+  if (!resolveCreateSetupSetsComplete({ sets })) {
+    return false
+  }
+
+  for (const decision of externalDecisions) {
+    if (!decision.isResolved) {
+      return false
+    }
+    if (decision.completion === 'explicit') {
+      if (confirmedRevisionById.get(decision.id) !== decision.revision) {
+        return false
+      }
+    }
+  }
+
+  return true
+}
+
+export function resolveCreateSetupPendingExplicitDecisions({
+  externalDecisions = [],
+  confirmedRevisionById = new Map<string, string>(),
+}: {
+  externalDecisions?: readonly CreateSetupExternalDecision[]
+  confirmedRevisionById?: ReadonlyMap<string, string>
+}): Array<{ id: string; isResolved: boolean; completeLabel: string }> {
+  return externalDecisions.flatMap((decision) => {
+    if (decision.completion !== 'explicit') {
+      return []
+    }
+    if (confirmedRevisionById.get(decision.id) === decision.revision) {
+      return []
+    }
+    return [
+      {
+        id: decision.id,
+        isResolved: decision.isResolved,
+        completeLabel: decision.completeLabel ?? 'Continue',
+      },
+    ]
   })
 }
 
 export function isCreateSetupChoiceComplete(value: string | null | undefined): boolean {
   return Boolean(value)
-}
-
-export function isCreateSetupNumberComplete(value: number, min: number, max: number): boolean {
-  return Number.isInteger(value) && value >= min && value <= max
 }
 
 type SetDependencyItem = {
@@ -153,36 +180,6 @@ type SetDependencyItem = {
 /**
  * Set ids that must be reset when `changedSetId` changes, including transitive dependents.
  */
-export function resolveCreateSetupCollapsedCompleteSetIds({
-  sets,
-  visibleSetIds,
-  activeSetId,
-  reopenSetId = null,
-}: {
-  sets: readonly CreateSetupSet[]
-  visibleSetIds: readonly string[]
-  activeSetId: string | null
-  reopenSetId?: string | null
-}): string[] {
-  const setsById = new Map(sets.map((set) => [set.id, set]))
-
-  return visibleSetIds.filter((setId) => {
-    const set = setsById.get(setId)
-    if (!set?.isComplete) return false
-
-    return !resolveCreateSetupSetExpanded({
-      setId,
-      activeSetId,
-      reopenSetId,
-      visible: true,
-      isComplete: true,
-      required: set.required,
-      collapseWhenComplete: set.collapseWhenComplete ?? true,
-      collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete ?? false,
-    })
-  })
-}
-
 export function resolveCreateSetupSetIdsToInvalidate({
   sets,
   changedSetId,
@@ -212,4 +209,18 @@ export function resolveCreateSetupSetIdsToInvalidate({
   }
 
   return [...invalidated]
+}
+
+export function notifyCreateSetupCompletionTransition({
+  wasComplete,
+  nextComplete,
+  onSetupComplete,
+}: {
+  wasComplete: boolean
+  nextComplete: boolean
+  onSetupComplete?: () => void
+}): void {
+  if (!wasComplete && nextComplete && onSetupComplete) {
+    onSetupComplete()
+  }
 }

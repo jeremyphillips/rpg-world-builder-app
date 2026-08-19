@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
-import type { CreateSetupValueChangeEvent } from '@/lib/create-setup'
-import { CreateSetupShell } from '@/lib/create-setup'
+import type { CreateSetupExternalDecision, CreateSetupValueChangeEvent } from '@/lib/create-setup'
+import { CreateSetupShell, notifyCreateSetupValueChangeCompletion } from '@/lib/create-setup'
 
 import type {
   LocationCreateIntent,
@@ -17,6 +17,21 @@ import {
 } from '../lib/location-create-modal-setup.lib'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
+
+const LOCATION_SETUP_NAVIGATION_DECISION_ID = 'locationSetupNavigation' as const
+
+function resolveLocationSetupNavigationExternalDecision(args: {
+  values: LocationCreateModalSetupValues
+  isReady: boolean
+}): CreateSetupExternalDecision {
+  return {
+    id: LOCATION_SETUP_NAVIGATION_DECISION_ID,
+    isResolved: args.isReady,
+    completion: 'explicit',
+    revision: JSON.stringify(args.values),
+    completeLabel: 'Continue',
+  }
+}
 
 export type LocationCreateSetupSessionProps = {
   open: boolean
@@ -40,19 +55,64 @@ export function LocationCreateSetupSession({
   }))
 
   const model = resolveLocationCreateModalSetupModel({ intent, values })
+  const sets = useMemo(() => (model ? buildLocationCreateSetupSets(model.choiceSets) : []), [model])
+  const externalDecisions = useMemo(
+    () =>
+      model
+        ? [
+            resolveLocationSetupNavigationExternalDecision({
+              values,
+              isReady: model.canContinue,
+            }),
+          ]
+        : [],
+    [model, values],
+  )
+
   if (!model) {
     throw new Error(
       `Unsupported location create setup authoring type: ${String(intent.authoringType)}`,
     )
   }
 
+  const handleContinue = () => {
+    const currentModel = resolveLocationCreateModalSetupModel({ intent, values })
+    const result = currentModel?.complete()
+    if (!result) return
+    onComplete(result)
+  }
+
   const handleSetupValueChange = (event: CreateSetupValueChangeEvent) => {
-    setValues((current) =>
-      applyLocationCreateModalSetupValueChange({
-        values: current,
-        event,
-      }),
-    )
+    const previousModel = resolveLocationCreateModalSetupModel({ intent, values })
+    const previousSets = previousModel ? buildLocationCreateSetupSets(previousModel.choiceSets) : []
+
+    const nextValues = applyLocationCreateModalSetupValueChange({
+      values,
+      event,
+    })
+    const nextModel = resolveLocationCreateModalSetupModel({ intent, values: nextValues })
+    const nextSets = nextModel ? buildLocationCreateSetupSets(nextModel.choiceSets) : []
+    const nextExternalDecisions = nextModel
+      ? [
+          resolveLocationSetupNavigationExternalDecision({
+            values: nextValues,
+            isReady: nextModel.canContinue,
+          }),
+        ]
+      : []
+
+    notifyCreateSetupValueChangeCompletion({
+      previousSets,
+      nextSets,
+      externalDecisions: nextExternalDecisions,
+      onSetupComplete: () => {
+        const result = nextModel?.complete()
+        if (!result) return
+        onComplete(result)
+      },
+    })
+
+    setValues(nextValues)
   }
 
   return (
@@ -61,15 +121,11 @@ export function LocationCreateSetupSession({
       onOpenChange={onOpenChange}
       headline={model.headline}
       subhead={model.subhead}
-      sets={buildLocationCreateSetupSets(model.choiceSets)}
+      sets={sets}
       changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
-      additionalContinueConstraint={model.canContinue}
+      externalDecisions={externalDecisions}
       onSetupValueChange={handleSetupValueChange}
-      onContinue={() => {
-        const result = model.complete()
-        if (!result) return
-        onComplete(result)
-      }}
+      onContinue={handleContinue}
     />
   )
 }

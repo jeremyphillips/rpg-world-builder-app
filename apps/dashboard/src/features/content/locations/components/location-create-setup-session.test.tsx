@@ -6,7 +6,7 @@ import { SETTLEMENT_CREATE_SETUP_PROMPT } from '../lib/location-settlement-creat
 import { LocationCreateSetupSession } from './location-create-setup-session.client'
 
 describe('LocationCreateSetupSession', () => {
-  it('passes additionalContinueConstraint from the shared setup model', async () => {
+  it('requires explicit Continue confirmation after selection', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
     const onOpenChange = vi.fn()

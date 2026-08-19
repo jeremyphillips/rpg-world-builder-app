@@ -7,7 +7,7 @@ import type { CharacterBuildContext } from '@rpg/contracts'
 import {
   CreateSetupPanel,
   createSetupModalBodyClasses,
-  useCreateSetupSequence,
+  type CreateSetupSequenceModel,
   type CreateSetupValueChangeEvent,
 } from '@/lib/create-setup'
 import { cn } from '@rpg/ui'
@@ -17,21 +17,21 @@ import {
   isQuickNpcBuildCardVisible,
   resolveQuickNpcBuildCardModel,
 } from '../lib/quick-npc-build-card.lib'
-import {
-  buildQuickNpcCreateSetupSets,
-  QUICK_NPC_SETUP_CHANGE_LABEL,
-} from '../lib/quick-npc-create-modal-setup.lib'
+import { QUICK_NPC_SETUP_CHANGE_LABEL } from '../lib/quick-npc-create-modal-setup.lib'
 import type { QuickNpcCreateFormOrganization } from './quick-npc-authoring-form.client'
 import { QuickNpcBuildCard } from './quick-npc-build-card.client'
 import {
   quickNpcBuildCardSectionClasses,
   quickNpcBuildCardSetupOffsetClasses,
 } from './quick-npc-build-card.variants'
+import type { CreateSetupSet } from '@/lib/create-setup'
 
 export type QuickNpcCreateSetupPhaseProps = {
   buildContext: CharacterBuildContext
   organization: QuickNpcCreateFormOrganization
   setupValues: QuickNpcSetupValues
+  setupSets: CreateSetupSet[]
+  sequenceModel: CreateSetupSequenceModel
   onSetupValueChange: (event: CreateSetupValueChangeEvent) => void
 }
 
@@ -39,30 +39,10 @@ export function QuickNpcCreateSetupPhase({
   buildContext,
   organization,
   setupValues,
+  setupSets,
+  sequenceModel,
   onSetupValueChange,
 }: QuickNpcCreateSetupPhaseProps) {
-  const setupSets = React.useMemo(
-    () =>
-      buildQuickNpcCreateSetupSets({
-        context: buildContext,
-        values: setupValues,
-        titles: organization.members?.titles ?? [],
-        members: {
-          classAffinityIds: organization.members?.classAffinityIds,
-          speciesAffinityIds: organization.members?.speciesAffinityIds,
-        },
-      }),
-    [
-      buildContext,
-      organization.members?.classAffinityIds,
-      organization.members?.speciesAffinityIds,
-      organization.members?.titles,
-      setupValues,
-    ],
-  )
-
-  const sequenceModel = useCreateSetupSequence(setupSets)
-
   const buildCardModel = React.useMemo(
     () =>
       resolveQuickNpcBuildCardModel({

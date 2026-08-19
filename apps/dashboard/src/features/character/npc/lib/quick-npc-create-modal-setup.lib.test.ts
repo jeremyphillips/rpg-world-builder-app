@@ -9,7 +9,7 @@ import {
 import {
   buildQuickNpcCreateSetupSets,
   resolveQuickNpcSetupSummaryRows,
-  resolveQuickNpcSetupModel,
+  isQuickNpcBuildResolved,
 } from './quick-npc-create-modal-setup.lib'
 import {
   QUICK_NPC_BUILD_FIELD_LABEL,
@@ -256,7 +256,7 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
   })
 })
 
-describe('resolveQuickNpcSetupModel', () => {
+describe('isQuickNpcBuildResolved', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
   const rogueClass = {
     ...populatedBuilderCatalog.classes[0]!,
@@ -273,7 +273,7 @@ describe('resolveQuickNpcSetupModel', () => {
 
   it('requires class when level progression applies', () => {
     expect(
-      resolveQuickNpcSetupModel({
+      isQuickNpcBuildResolved({
         context,
         values: {
           speciesId: 'srd-cc-5.2.1:dwarf',
@@ -281,13 +281,13 @@ describe('resolveQuickNpcSetupModel', () => {
           classId: '',
           level: 1,
         },
-      }).canContinue,
+      }),
     ).toBe(false)
   })
 
-  it('enables Continue when a single recommendation has been auto-seeded', () => {
+  it('is resolved when a single recommendation has been auto-seeded', () => {
     expect(
-      resolveQuickNpcSetupModel({
+      isQuickNpcBuildResolved({
         context: multiClassContext,
         values: {
           speciesId: 'srd-cc-5.2.1:dwarf',
@@ -295,9 +295,7 @@ describe('resolveQuickNpcSetupModel', () => {
           classId: rogueClass.id,
           level: 5,
         },
-        titles: [guildmasterTitle],
-        members: { classAffinityIds: [rogueClass.id] },
-      }).canContinue,
+      }),
     ).toBe(true)
   })
 })

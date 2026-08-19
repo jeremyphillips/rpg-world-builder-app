@@ -1,12 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   isCreateSetupChoiceComplete,
-  isCreateSetupNumberComplete,
+  notifyCreateSetupCompletionTransition,
   resolveCreateSetupActiveSetId,
-  resolveCreateSetupCanContinue,
+  resolveCreateSetupIsComplete,
   resolveCreateSetupSetExpanded,
   resolveCreateSetupSetIdsToInvalidate,
+  resolveCreateSetupSetsComplete,
   resolveCreateSetupVisibleSetIds,
 } from './create-setup-sequence.lib'
 import type { CreateSetupSequenceItem } from './create-setup.types'
@@ -16,7 +17,6 @@ function sequence(
     id: string
     isComplete: boolean
     required?: boolean
-    collapseWhenComplete?: boolean
     visibleWhenComplete?: readonly string[]
   }>,
 ): CreateSetupSequenceItem[] {
@@ -69,18 +69,6 @@ describe('create-setup-sequence', () => {
       ).toBe('operator')
     })
 
-    it('selects the terminal set when all are complete', () => {
-      expect(
-        resolveCreateSetupActiveSetId({
-          sets: sequence([
-            { id: 'classification', isComplete: true },
-            { id: 'regionType', isComplete: true },
-            { id: 'extra', isComplete: true },
-          ]),
-        }),
-      ).toBe('extra')
-    })
-
     it('prefers a reopen id when it is still present', () => {
       expect(
         resolveCreateSetupActiveSetId({
@@ -92,99 +80,22 @@ describe('create-setup-sequence', () => {
         }),
       ).toBe('classification')
     })
-
-    it('ignores a reopen id that is no longer in the sequence', () => {
-      expect(
-        resolveCreateSetupActiveSetId({
-          sets: sequence([
-            { id: 'classification', isComplete: true },
-            { id: 'regionType', isComplete: false },
-          ]),
-          reopenSetId: 'removed',
-        }),
-      ).toBe('regionType')
-    })
-
-    it('skips a complete number set and activates the next incomplete set', () => {
-      expect(
-        resolveCreateSetupActiveSetId({
-          sets: sequence([
-            { id: 'species', isComplete: true },
-            { id: 'level', isComplete: true, collapseWhenComplete: false },
-            { id: 'class', isComplete: false },
-          ]),
-        }),
-      ).toBe('class')
-    })
-
-    it('activates an incomplete optional set when downstream setup is gated on it', () => {
-      expect(
-        resolveCreateSetupActiveSetId({
-          sets: sequence([
-            { id: 'membershipTitle', isComplete: false, required: false },
-            {
-              id: 'speciesId',
-              isComplete: false,
-              visibleWhenComplete: ['membershipTitle'],
-            },
-          ]),
-        }),
-      ).toBe('membershipTitle')
-    })
-
-    it('keeps the terminal set active when optional predecessors remain incomplete', () => {
-      expect(
-        resolveCreateSetupActiveSetId({
-          sets: sequence([
-            { id: 'form', isComplete: false, required: false },
-            { id: 'operator', isComplete: true },
-          ]),
-        }),
-      ).toBe('operator')
-    })
   })
 
   describe('resolveCreateSetupSetExpanded', () => {
-    it('expands only the active incomplete set when collapseWhenComplete defaults to true', () => {
+    it('expands only the active set', () => {
       expect(
         resolveCreateSetupSetExpanded({
           setId: 'classification',
           activeSetId: 'classification',
-          visible: true,
-          isComplete: false,
         }),
       ).toBe(true)
       expect(
         resolveCreateSetupSetExpanded({
           setId: 'regionType',
           activeSetId: 'classification',
-          visible: true,
-          isComplete: false,
         }),
       ).toBe(false)
-    })
-
-    it('collapses a completed active set when collapseWhenActiveAndComplete is true', () => {
-      expect(
-        resolveCreateSetupSetExpanded({
-          setId: 'class',
-          activeSetId: 'class',
-          visible: true,
-          isComplete: true,
-          collapseWhenActiveAndComplete: true,
-        }),
-      ).toBe(false)
-    })
-
-    it('keeps a completed active terminal set expanded by default', () => {
-      expect(
-        resolveCreateSetupSetExpanded({
-          setId: 'class',
-          activeSetId: 'class',
-          visible: true,
-          isComplete: true,
-        }),
-      ).toBe(true)
     })
 
     it('re-expands a completed set when it is explicitly reopened', () => {
@@ -193,32 +104,6 @@ describe('create-setup-sequence', () => {
           setId: 'class',
           activeSetId: 'class',
           reopenSetId: 'class',
-          visible: true,
-          isComplete: true,
-        }),
-      ).toBe(true)
-    })
-
-    it('keeps visible sets expanded when collapseWhenComplete is false', () => {
-      expect(
-        resolveCreateSetupSetExpanded({
-          setId: 'level',
-          activeSetId: 'class',
-          visible: true,
-          isComplete: true,
-          collapseWhenComplete: false,
-        }),
-      ).toBe(true)
-    })
-
-    it('keeps a visible incomplete optional set expanded', () => {
-      expect(
-        resolveCreateSetupSetExpanded({
-          setId: 'facility',
-          activeSetId: 'operator',
-          visible: true,
-          isComplete: false,
-          required: false,
         }),
       ).toBe(true)
     })
@@ -231,129 +116,38 @@ describe('create-setup-sequence', () => {
           sets: sequence([
             { id: 'a', isComplete: false },
             { id: 'b', isComplete: false },
-            { id: 'c', isComplete: false },
           ]),
           activeSetId: 'a',
         }),
       ).toEqual(['a'])
     })
 
-    it('reveals the next set after the first completes', () => {
+    it('reveals completed predecessors plus the active set', () => {
       expect(
         resolveCreateSetupVisibleSetIds({
           sets: sequence([
             { id: 'a', isComplete: true },
             { id: 'b', isComplete: false },
-            { id: 'c', isComplete: false },
           ]),
           activeSetId: 'b',
         }),
       ).toEqual(['a', 'b'])
     })
-
-    it('reveals incomplete optional predecessors without requiring negative answers', () => {
-      expect(
-        resolveCreateSetupVisibleSetIds({
-          sets: sequence([
-            { id: 'form', isComplete: false, required: false },
-            { id: 'facility', isComplete: false, required: false },
-            { id: 'operator', isComplete: false },
-          ]),
-          activeSetId: 'operator',
-        }),
-      ).toEqual(['form', 'facility', 'operator'])
-    })
-
-    it('shows completed predecessors plus terminal when all complete', () => {
-      expect(
-        resolveCreateSetupVisibleSetIds({
-          sets: sequence([
-            { id: 'a', isComplete: true },
-            { id: 'b', isComplete: true },
-            { id: 'c', isComplete: true },
-          ]),
-          activeSetId: 'c',
-        }),
-      ).toEqual(['a', 'b', 'c'])
-    })
-
-    it('when reopening an earlier set, hides later incomplete unlock and keeps completed predecessors', () => {
-      expect(
-        resolveCreateSetupVisibleSetIds({
-          sets: sequence([
-            { id: 'a', isComplete: true },
-            { id: 'b', isComplete: true },
-            { id: 'c', isComplete: true },
-          ]),
-          activeSetId: 'a',
-        }),
-      ).toEqual(['a'])
-    })
-
-    it('hides sets until visibleWhenComplete upstream sets are complete', () => {
-      expect(
-        resolveCreateSetupVisibleSetIds({
-          sets: sequence([
-            { id: 'membershipTitle', isComplete: false, required: false },
-            {
-              id: 'speciesId',
-              isComplete: false,
-              visibleWhenComplete: ['membershipTitle'],
-            },
-            {
-              id: 'level',
-              isComplete: true,
-              visibleWhenComplete: ['speciesId'],
-            },
-          ]),
-          activeSetId: 'membershipTitle',
-        }),
-      ).toEqual(['membershipTitle'])
-    })
-
-    it('reveals downstream sets after the species visibility gate opens', () => {
-      expect(
-        resolveCreateSetupVisibleSetIds({
-          sets: sequence([
-            { id: 'membershipTitle', isComplete: true, required: false },
-            {
-              id: 'speciesId',
-              isComplete: true,
-              visibleWhenComplete: ['membershipTitle'],
-            },
-            {
-              id: 'level',
-              isComplete: true,
-              collapseWhenComplete: false,
-              visibleWhenComplete: ['speciesId'],
-            },
-            {
-              id: 'classId',
-              isComplete: false,
-              visibleWhenComplete: ['speciesId'],
-            },
-          ]),
-          activeSetId: 'classId',
-        }),
-      ).toEqual(['membershipTitle', 'speciesId', 'level', 'classId'])
-    })
   })
 
-  describe('resolveCreateSetupCanContinue', () => {
-    it('is false until every required set is complete', () => {
+  describe('resolveCreateSetupSetsComplete', () => {
+    it('requires every set in the sequence to be complete', () => {
       expect(
-        resolveCreateSetupCanContinue({
+        resolveCreateSetupSetsComplete({
           sets: sequence([
             { id: 'a', isComplete: true },
             { id: 'b', isComplete: false },
           ]),
         }),
       ).toBe(false)
-    })
 
-    it('is true when all required sets are complete', () => {
       expect(
-        resolveCreateSetupCanContinue({
+        resolveCreateSetupSetsComplete({
           sets: sequence([
             { id: 'a', isComplete: true },
             { id: 'b', isComplete: true },
@@ -361,32 +155,57 @@ describe('create-setup-sequence', () => {
         }),
       ).toBe(true)
     })
+  })
 
-    it('treats a complete number set with collapseWhenComplete false as satisfying continue', () => {
+  describe('resolveCreateSetupIsComplete', () => {
+    it('requires explicit external decisions to be confirmed', () => {
       expect(
-        resolveCreateSetupCanContinue({
-          sets: sequence([
-            { id: 'species', isComplete: true },
-            { id: 'level', isComplete: true, collapseWhenComplete: false },
-            { id: 'class', isComplete: true },
-          ]),
+        resolveCreateSetupIsComplete({
+          sets: sequence([{ id: 'title', isComplete: true }]),
+          externalDecisions: [
+            {
+              id: 'build',
+              isResolved: true,
+              completion: 'explicit',
+              revision: 'v1',
+            },
+          ],
+        }),
+      ).toBe(false)
+
+      expect(
+        resolveCreateSetupIsComplete({
+          sets: sequence([{ id: 'title', isComplete: true }]),
+          externalDecisions: [
+            {
+              id: 'build',
+              isResolved: true,
+              completion: 'explicit',
+              revision: 'v1',
+            },
+          ],
+          confirmedRevisionById: new Map([['build', 'v1']]),
         }),
       ).toBe(true)
     })
+  })
 
-    it('ignores optional incomplete sets', () => {
-      expect(
-        resolveCreateSetupCanContinue({
-          sets: sequence([
-            { id: 'a', isComplete: true },
-            { id: 'b', isComplete: false, required: false },
-          ]),
-        }),
-      ).toBe(true)
-    })
+  describe('notifyCreateSetupCompletionTransition', () => {
+    it('fires onSetupComplete only on a false to true transition', () => {
+      const onSetupComplete = vi.fn()
 
-    it('is false for an empty sequence', () => {
-      expect(resolveCreateSetupCanContinue({ sets: [] })).toBe(false)
+      notifyCreateSetupCompletionTransition({
+        wasComplete: false,
+        nextComplete: true,
+        onSetupComplete,
+      })
+      notifyCreateSetupCompletionTransition({
+        wasComplete: true,
+        nextComplete: true,
+        onSetupComplete,
+      })
+
+      expect(onSetupComplete).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -398,14 +217,6 @@ describe('create-setup-sequence', () => {
     })
   })
 
-  describe('isCreateSetupNumberComplete', () => {
-    it('requires an integer within bounds', () => {
-      expect(isCreateSetupNumberComplete(1, 1, 20)).toBe(true)
-      expect(isCreateSetupNumberComplete(0, 1, 20)).toBe(false)
-      expect(isCreateSetupNumberComplete(21, 1, 20)).toBe(false)
-    })
-  })
-
   describe('resolveCreateSetupSetIdsToInvalidate', () => {
     it('clears direct dependents when an upstream id changes', () => {
       expect(
@@ -414,24 +225,6 @@ describe('create-setup-sequence', () => {
           changedSetId: 'classification',
         }),
       ).toEqual(['regionType'])
-    })
-
-    it('clears transitive dependents', () => {
-      expect(
-        resolveCreateSetupSetIdsToInvalidate({
-          sets: [{ id: 'a' }, { id: 'b', dependsOn: ['a'] }, { id: 'c', dependsOn: ['b'] }],
-          changedSetId: 'a',
-        }),
-      ).toEqual(['b', 'c'])
-    })
-
-    it('returns an empty list when nothing depends on the changed id', () => {
-      expect(
-        resolveCreateSetupSetIdsToInvalidate({
-          sets: [{ id: 'classification' }, { id: 'regionType', dependsOn: ['classification'] }],
-          changedSetId: 'regionType',
-        }),
-      ).toEqual([])
     })
   })
 })

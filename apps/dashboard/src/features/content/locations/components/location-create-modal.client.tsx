@@ -1,9 +1,10 @@
 'use client'
 
 import * as React from 'react'
-import { Button, DialogPanelActionRow, usePendingAwareOpenChange } from '@rpg/ui'
+import { Button, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
+import { CreateSetupFooter, notifyCreateSetupValueChangeCompletion } from '@/lib/create-setup'
 import { CreateModalShell, type CreateWorkflowPanelStatus } from '@/lib/create-flow'
 
 import type {
@@ -37,7 +38,10 @@ import {
 } from '../lib/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
 import { resolveLocationSetupSummaryRows } from '../lib/location-setup-summary-rows.lib'
-import { LocationCreateModalSetupPanel } from './location-create-modal-setup-panel.client'
+import {
+  LocationCreateModalSetupPanel,
+  useLocationCreateModalSetupSequence,
+} from './location-create-modal-setup-panel.client'
 import { LocationCreateForm } from './location-create-form.client'
 import {
   BuildingOrganizationsCreateTab,
@@ -280,30 +284,35 @@ function useLocationCreateModalController({
     [onOpenChange, requestClose],
   )
 
-  const handleContinueFromSetup = React.useCallback(() => {
-    if (!setupModel?.canContinue) return
-    const result = setupModel.complete()
-    if (!result) return
-    const fixedCreate = completeLocationCreateSetup(intent, result)
-    setState((current) => ({
-      ...current,
-      phase: 'details',
-      fixedCreate,
-      detailsMounted: true,
-      buildingSetupApplication:
-        result.kind === 'building'
-          ? {
-              revision: (current.buildingSetupApplication?.revision ?? 0) + 1,
-              projection: {
-                ...(result.form ? { form: result.form } : {}),
-                ...(result.facilityAuthoringGroup
-                  ? { facilityAuthoringGroup: result.facilityAuthoringGroup }
-                  : {}),
-              },
-            }
-          : current.buildingSetupApplication,
-    }))
-  }, [intent, setupModel])
+  const handleContinueFromSetup = React.useCallback(
+    (values: LocationCreateModalSetupValues = state.setupValues) => {
+      const model = resolveLocationCreateModalSetupModel({ intent, values })
+      if (!model?.canContinue) return
+      const result = model.complete()
+      if (!result) return
+      const fixedCreate = completeLocationCreateSetup(intent, result)
+      setState((current) => ({
+        ...current,
+        phase: 'details',
+        setupValues: values,
+        fixedCreate,
+        detailsMounted: true,
+        buildingSetupApplication:
+          result.kind === 'building'
+            ? {
+                revision: (current.buildingSetupApplication?.revision ?? 0) + 1,
+                projection: {
+                  ...(result.form ? { form: result.form } : {}),
+                  ...(result.facilityAuthoringGroup
+                    ? { facilityAuthoringGroup: result.facilityAuthoringGroup }
+                    : {}),
+                },
+              }
+            : current.buildingSetupApplication,
+      }))
+    },
+    [intent, state.setupValues],
+  )
 
   const handleBackToSetup = React.useCallback(() => {
     setState((current) => ({
@@ -314,15 +323,33 @@ function useLocationCreateModalController({
 
   const handleSetupValueChange = React.useCallback(
     (event: Parameters<typeof applyLocationCreateModalSetupValueChange>[0]['event']) => {
+      const previousModel = resolveLocationCreateModalSetupModel({
+        intent,
+        values: state.setupValues,
+      })
+      const previousSets = previousModel
+        ? buildLocationCreateSetupSets(previousModel.choiceSets)
+        : []
+
+      const nextValues = applyLocationCreateModalSetupValueChange({
+        values: state.setupValues,
+        event,
+      })
+      const nextModel = resolveLocationCreateModalSetupModel({ intent, values: nextValues })
+      const nextSets = nextModel ? buildLocationCreateSetupSets(nextModel.choiceSets) : []
+
+      notifyCreateSetupValueChangeCompletion({
+        previousSets,
+        nextSets,
+        onSetupComplete: () => handleContinueFromSetup(nextValues),
+      })
+
       setState((current) => ({
         ...current,
-        setupValues: applyLocationCreateModalSetupValueChange({
-          values: current.setupValues,
-          event,
-        }),
+        setupValues: nextValues,
       }))
     },
-    [],
+    [handleContinueFromSetup, intent, state.setupValues],
   )
 
   const setupSets = setupModel ? buildLocationCreateSetupSets(setupModel.choiceSets) : []
@@ -393,6 +420,10 @@ function LocationCreateModalSession({
     state.fixedCreate?.authoringType === 'building' &&
     state.buildingSetupApplication != null
   const showSetup = state.phase === 'setup' && setupModel != null
+  const setupSequenceModel = useLocationCreateModalSetupSequence({
+    sets: setupSets,
+    onSetupComplete: () => handleContinueFromSetup(state.setupValues),
+  })
   const submitLabel = buildingTabsConfigured
     ? BUILDING_CREATE_SETUP_HEADLINE
     : formatContentCreateActionLabel('locations')
@@ -490,18 +521,11 @@ function LocationCreateModalSession({
         }
         footer={
           showSetup ? (
-            <DialogPanelActionRow>
-              <Button type="button" variant="outline" onClick={requestClose}>
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                disabled={!setupModel?.canContinue}
-                onClick={handleContinueFromSetup}
-              >
-                Continue
-              </Button>
-            </DialogPanelActionRow>
+            <CreateSetupFooter
+              model={setupSequenceModel}
+              onCancel={requestClose}
+              onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
+            />
           ) : (
             <FormShellFooterSlot />
           )
@@ -510,7 +534,7 @@ function LocationCreateModalSession({
         {showSetup ? (
           <LocationCreateModalSetupPanel
             sets={setupSets}
-            canContinue={setupModel?.canContinue ?? false}
+            model={setupSequenceModel}
             onSetupValueChange={handleSetupValueChange}
           />
         ) : null}
