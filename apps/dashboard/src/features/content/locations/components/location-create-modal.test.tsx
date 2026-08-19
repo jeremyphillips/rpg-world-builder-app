@@ -17,8 +17,10 @@ import { toast } from '@rpg/ui'
 import type * as RpgUi from '@rpg/ui'
 
 import { notifyContentCreated } from '@/lib/notify'
+import type { OnContentCreated } from '@/lib/create-flow'
 import {
   makeBuildingLocationCreateIntent,
+  makeLocationCreateIntent,
   makeRegionLocationCreateIntent,
   makeSettlementLocationCreateIntent,
 } from '@/test/fixtures/factories/additional/location-create-intent'
@@ -68,7 +70,10 @@ vi.mock('../lib/location-building-create-composition.lib', async (importOriginal
   const actual = await importOriginal<Record<string, unknown>>()
   return {
     ...actual,
-    completeBuildingCreateComposition: vi.fn(async () => ({ kind: 'success' as const })),
+    completeBuildingCreateComposition: vi.fn(async () => ({
+      buildingId: 'building-1',
+      toast: { kind: 'success' as const },
+    })),
     invalidateBuildingCreateCompositionQueries: vi.fn(),
     applyDeferredBuildingCampaignAccess: vi.fn(async () => false),
   }
@@ -167,7 +172,12 @@ const regionIntent = makeRegionLocationCreateIntent({
 const mockedCompleteBuildingCreateComposition = vi.mocked(completeBuildingCreateComposition)
 const mockedApplyDeferredBuildingCampaignAccess = vi.mocked(applyDeferredBuildingCampaignAccess)
 
-function renderModal(intent: LocationCreateIntent, onOpenChange = vi.fn(), open = true) {
+function renderModal(
+  intent: LocationCreateIntent,
+  onOpenChange = vi.fn(),
+  open = true,
+  options?: { onCreated?: OnContentCreated },
+) {
   const queryClient = makeTestQueryClient()
   return {
     onOpenChange,
@@ -179,6 +189,7 @@ function renderModal(intent: LocationCreateIntent, onOpenChange = vi.fn(), open 
           onOpenChange={onOpenChange}
           intent={intent}
           campaignId={STORY_CAMPAIGN_ID}
+          onCreated={options?.onCreated}
         />
       </QueryClientProvider>,
     ),
@@ -269,7 +280,10 @@ describe('LocationCreateModal', () => {
       districts: { created: [], failed: [] },
     })
     mockedApplyDeferredBuildingCampaignAccess.mockResolvedValue(false)
-    mockedCompleteBuildingCreateComposition.mockResolvedValue({ kind: 'success' })
+    mockedCompleteBuildingCreateComposition.mockResolvedValue({
+      buildingId: 'building-1',
+      toast: { kind: 'success' },
+    })
   })
 
   it('requires Facility discovery intent while Form remains optional', async () => {
@@ -873,8 +887,11 @@ describe('LocationCreateModal', () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     mockedCompleteBuildingCreateComposition.mockResolvedValueOnce({
-      kind: 'warning',
-      message: 'Building created, but campaign access could not be updated.',
+      buildingId: 'building-1',
+      toast: {
+        kind: 'warning',
+        message: 'Building created, but campaign access could not be updated.',
+      },
     })
     renderModal(buildingIntent, onOpenChange)
     await continueBuildingSetup(user)
@@ -1076,5 +1093,52 @@ describe('LocationCreateModal', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Westmark')
     expect(screen.getByText('Political')).toBeInTheDocument()
     expect(screen.getByText(firstRegionTypeName!)).toBeInTheDocument()
+  })
+
+  it('calls onCreated after settlement create succeeds and closes the modal', async () => {
+    const user = userEvent.setup()
+    const onCreated = vi.fn()
+    const onOpenChange = vi.fn()
+
+    renderModal(settlementIntent, onOpenChange, true, { onCreated })
+
+    await continueSettlementSetup(user)
+    await submitCreateForm(user)
+
+    await waitFor(() => {
+      expect(onCreated).toHaveBeenCalledWith({ contentType: 'locations', id: 'settlement-new' })
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
+  })
+
+  it('does not call onCreated when Cancel closes the modal', async () => {
+    const user = userEvent.setup()
+    const onCreated = vi.fn()
+    const onOpenChange = vi.fn()
+
+    renderModal(makeLocationCreateIntent({ authoringType: 'fortification' }), onOpenChange, true, {
+      onCreated,
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
+    expect(onCreated).not.toHaveBeenCalled()
+  })
+
+  it('leaves contained create behavior unchanged when onCreated is omitted', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+
+    renderModal(settlementIntent, onOpenChange)
+
+    await continueSettlementSetup(user)
+    await submitCreateForm(user)
+
+    await waitFor(() => {
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
   })
 })

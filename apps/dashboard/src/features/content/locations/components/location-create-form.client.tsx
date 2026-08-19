@@ -9,6 +9,7 @@ import { Button, cn, toast } from '@rpg/ui'
 import { FormShellSubmitButton, useSchemaFormSubmit, type FormValueSync } from '@rpg/ui/form'
 
 import type { CreateWorkflowPanelStatus } from '@/lib/create-flow'
+import type { OnContentCreated } from '@/lib/create-flow'
 import { notifyContentCreated } from '@/lib/notify'
 import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import { useSubmitHandler, type FormSubmitHandler } from '@/lib/use-submit-handler'
@@ -98,6 +99,7 @@ export type LocationCreateFormProps = {
   onNavigateToTab?: (tabId: string) => void
   onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
   submitBlocked?: boolean
+  onCreated?: OnContentCreated
 }
 
 type LocationCreateFormBodyProps = LocationCreateFormProps
@@ -385,6 +387,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     onNavigateToTab,
     onDetailsStatusChange,
     submitBlocked,
+    onCreated,
   } = props
   const queryClient = useQueryClient()
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
@@ -445,17 +448,18 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
 
       setCompositionPending(true)
       try {
-        const toastResult = await completeBuildingCreateComposition({
+        const completion = await completeBuildingCreateComposition({
           campaignId,
           request,
           queryClient,
           pendingAccess: campaignAccessDraftRef.current,
           organizationsController,
         })
-        if (toastResult.kind === 'success') {
+        if (completion.toast.kind === 'success') {
+          onCreated?.({ contentType: 'locations', id: completion.buildingId })
           notifyContentCreated('locations')
         } else {
-          toast.warning(toastResult.message)
+          toast.warning(completion.toast.message)
         }
       } catch (error) {
         handleBuildingCreateCompositionFailure({
@@ -501,7 +505,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
 }
 
 function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
-  const { campaignId, fixedCreate, optionsCtx, chrome } = props
+  const { campaignId, fixedCreate, optionsCtx, chrome, onCreated } = props
   if (!chrome) {
     throw new Error('LocationGenericCreateForm requires chrome.')
   }
@@ -528,7 +532,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
       fixedCreate,
     )
 
-    const { deferredAccessFailed } = await createWithDeferredCampaignAccess({
+    const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
       campaignId,
       routeKey: locationFormDef.routeKey,
       createInput: {
@@ -550,6 +554,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
     if (deferredAccessFailed) {
       toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
     } else {
+      onCreated?.({ contentType: 'locations', id: created.id })
       notifyContentCreated('locations')
     }
   }, 'Could not create locations.')
@@ -570,7 +575,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
 function LocationSettlementCreateForm(
   props: LocationCreateFormBodyProps & { fixedCreate: FixedSettlementCreateContext },
 ) {
-  const { campaignId, fixedCreate, optionsCtx, chrome } = props
+  const { campaignId, fixedCreate, optionsCtx, chrome, onCreated } = props
   if (!chrome) {
     throw new Error('LocationSettlementCreateForm requires chrome.')
   }
@@ -639,6 +644,7 @@ function LocationSettlementCreateForm(
       })
 
       if (toastResult.kind === 'success') {
+        onCreated?.({ contentType: 'locations', id: result.settlement.id })
         notifyContentCreated('locations')
       } else {
         toast.warning(toastResult.message)

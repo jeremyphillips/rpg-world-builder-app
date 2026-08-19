@@ -9,7 +9,11 @@ import {
   notifyCreateSetupValueChangeCompletion,
   type SetupSummaryEditTarget,
 } from '@/lib/create-setup'
-import { CreateModalShell, type CreateWorkflowPanelStatus } from '@/lib/create-flow'
+import {
+  CreateModalShell,
+  type CreateWorkflowPanelStatus,
+  type OnContentCreated,
+} from '@/lib/create-flow'
 
 import type {
   ContentFormHostChrome,
@@ -60,6 +64,8 @@ export type LocationCreateModalProps = {
   campaignId: string
   /** Optional preloaded context for embedded/test surfaces; normal app usage resolves it here. */
   formOptionsCtx?: ContentFormCtx
+  /** Called after persistence succeeds; modal closes without waiting for picker handoff. */
+  onCreated?: OnContentCreated
 }
 
 type LocationCreateModalPhase = 'setup' | 'details'
@@ -190,6 +196,7 @@ function LocationCreateModalDetailsForm({
   onDetailsStatusChange,
   useCompositeBuildingChrome,
   submitBlocked,
+  onCreated,
 }: {
   fixedCreate: LocationFixedCreateContext
   campaignId: string
@@ -211,6 +218,7 @@ function LocationCreateModalDetailsForm({
   onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
   useCompositeBuildingChrome?: boolean
   submitBlocked?: boolean
+  onCreated?: OnContentCreated
 }) {
   return (
     <LocationCreateForm
@@ -233,6 +241,7 @@ function LocationCreateModalDetailsForm({
       onNavigateToTab={onNavigateToTab}
       onDetailsStatusChange={onDetailsStatusChange}
       submitBlocked={submitBlocked}
+      onCreated={onCreated}
       chrome={
         useCompositeBuildingChrome
           ? undefined
@@ -400,6 +409,7 @@ function LocationCreateModalSession({
   intent,
   campaignId,
   formOptionsCtx,
+  onCreated,
 }: LocationCreateModalProps) {
   const {
     state,
@@ -494,6 +504,7 @@ function LocationCreateModalSession({
       onDetailsStatusChange={buildingTabsConfigured ? setDetailsStatus : undefined}
       useCompositeBuildingChrome={buildingTabsConfigured}
       submitBlocked={buildingSubmitBlocked || undefined}
+      onCreated={onCreated}
     />
   )
   const resolvedSetupSummary = setupModel

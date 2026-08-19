@@ -1,3 +1,4 @@
+export { type CreatedContentResult, type OnContentCreated } from './created-content-result.types'
 export {
   CreateModalShell,
   type CreateModalShellContentMode,
