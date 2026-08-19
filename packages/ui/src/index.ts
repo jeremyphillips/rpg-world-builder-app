@@ -317,6 +317,14 @@ export {
   type ChooserSummaryCardProps,
 } from './components/ui/chooser-summary-card'
 export {
+  SelectionSummaryCard,
+  SelectionSummaryChangeAction,
+  SelectionSummaryRow,
+  type SelectionSummaryCardProps,
+  type SelectionSummaryChangeActionProps,
+  type SelectionSummaryRowProps,
+} from './components/ui/selection-summary-card'
+export {
   CollapsibleRadioCardField,
   type CollapsibleRadioCardFieldProps,
 } from './components/ui/collapsible-radio-card-field'

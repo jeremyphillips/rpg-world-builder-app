@@ -5,8 +5,8 @@ Ordered, dependent authoring for create flows (locations, Quick NPC, future cons
 ## Rule
 
 Setup is a **sequence of decisions**. Each decision completes on selection (auto) or explicit
-confirmation (compound / recommended). Completed decisions render as partial `SetupSummaryCard`
-rows; the active decision renders as an expanded `RadioCardField` only.
+confirmation (compound / recommended). Completed decisions render as partial `SelectionSummaryCard`
+rows from `@rpg/ui`; the active decision renders as an expanded `RadioCardField` only.
 
 ```text
 sequencer  → order, visibility, visibleWhenComplete, dependsOn, active/complete, invalidation
@@ -84,10 +84,10 @@ setup re-entered, already complete         → [Cancel] [Continue]  (re-entry; n
 
 ## Summary model
 
-- **Setup phase** — partial `SetupSummaryCard` rows from completed decisions; row-level Change reopens.
+- **Setup phase** — partial `SelectionSummaryCard` rows from completed decisions; row-level Change reopens.
   Active/reopened sets are omitted from summary rows.
-- **Authoring phase** — `SetupSummaryCard` with card-level Change; rows from feature `resolveXSetupSummaryRows()`.
-- **Shared renderer** — `SetupSummaryCard` / `SetupSummaryRow` for both phases.
+- **Authoring phase** — `SelectionSummaryCard` with card-level Change; rows from feature `resolveXSetupSummaryRows()`.
+- **Shared renderer** — `SelectionSummaryCard` / `SelectionSummaryRow` from `@rpg/ui` for both phases.
 
 Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for the panel.
 
@@ -102,7 +102,7 @@ Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for th
 - **Quick NPC modal setup** — Title and Species via `CreateSetupPanel`; Build as explicit external decision;
   Class and Level in sibling `QuickNpcBuildCard`.
 
-**Building → Organizations composer** — feature-owned stage machine (`intent → discovery → review | branch`) with `SetupSummaryCard` partial rows and `RadioCardField` for active relationship kind. Entity discovery, nested org create, draft plan, and composite commit stay local. The `branch` stage is the active create-org control — not a completed placeholder organization row. A second create-modal draft relationship tab should copy these primitives rather than extracting a generic composer until a second identical consumer exists.
+**Building → Organizations composer** — feature-owned stage machine (`intent → discovery → review | branch`) with `SelectionSummaryCard` partial rows and `RadioCardField` for active relationship kind. Entity discovery, nested org create, draft plan, and composite commit stay local. The `branch` stage is the active create-org control — not a completed placeholder organization row. A second create-modal draft relationship tab should copy these primitives rather than extracting a generic composer until a second identical consumer exists.
 
 Sequenced create-modal setup must use create-setup orchestration unless listed as a documented
 exception. `create-setup-parallel-path-drift.test.ts` guards `CollapsibleRadioCardField` and
@@ -110,7 +110,7 @@ exception. `create-setup-parallel-path-drift.test.ts` guards `CollapsibleRadioCa
 decisions. Relationship drawers keep `LocationConnectionKindStep` (collapsing kind chrome).
 
 Create-modal radio cards represent **active decisions only**; completed setup decisions render through
-`SetupSummaryCard` partial rows.
+`SelectionSummaryCard` partial rows from `@rpg/ui`.
 
 ## UX invariants
 

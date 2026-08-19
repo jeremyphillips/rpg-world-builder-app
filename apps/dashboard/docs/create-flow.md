@@ -54,7 +54,7 @@ Recorded before the relationship-first refinement. Findings:
    `ContentEntityCard` (static).
 3. **Radio selection is domain-specific.** Add Member radios are membership
    titles from `OrganizationMembershipTitleField`. Relationship-first building
-   composition uses `RadioCardField` for active kind and `SetupSummaryCard` rows
+   composition uses `RadioCardField` for active kind and `SelectionSummaryCard` rows
    for completed decisions inside the Organizations composer. Sequenced location and Quick
    NPC setup use `CreateSetupPanel` with the same grammar. Relationship drawers keep
    `LocationConnectionKindStep` (`CollapsibleRadioCardField` / `ChooserSummaryCard`).
@@ -69,7 +69,7 @@ Recorded before the relationship-first refinement. Findings:
    trailing action only. CEC never receives expand, composer, or relationship
    props.
 7. **Pending edit stays in Pending mode.** The edited row swaps to the same composer
-   (`SetupSummaryCard` rows + active controls) in place. Sibling pending cards remain visible.
+   (`SelectionSummaryCard` rows + active controls) in place. Sibling pending cards remain visible.
    This is not a return to Add/discovery at the root. While the relationship kind
    is being edited, downstream discovery/review/branch stages hide (same reveal invariant as create-setup).
 8. **Parallel patterns left in place.** `CatalogEntityRow` in picker sheets,

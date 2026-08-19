@@ -299,7 +299,7 @@ When a per-kind add action resolves intent before open, **do not** show a kind p
 
 When a **family-level** add action must choose among semantically meaningful kinds, use **`LocationConnectionKindStep`** (collapsing radio cards). After selection, collapse to the chosen kind so the remaining workflow receives visual priority. Do not fork collapse behavior inside relationship drawers.
 
-Create-modal draft relationship tabs (Building → Organizations) use the same completed-decision grammar as `CreateSetupPanel` (`SetupSummaryCard` rows + `RadioCardField` for active kind) inside a feature-owned stage machine — not `LocationConnectionKindStep`.
+Create-modal draft relationship tabs (Building → Organizations) use the same completed-decision grammar as `CreateSetupPanel` (`SelectionSummaryCard` rows + `RadioCardField` for active kind) inside a feature-owned stage machine — not `LocationConnectionKindStep`.
 
 Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search.
 

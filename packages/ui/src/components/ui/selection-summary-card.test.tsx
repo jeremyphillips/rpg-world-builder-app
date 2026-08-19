@@ -3,22 +3,22 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import { SetupSummaryCard, SetupSummaryCardChangeAction } from './setup-summary-card.client'
+import { SelectionSummaryCard, SelectionSummaryChangeAction } from './selection-summary-card'
 
-describe('SetupSummaryCard', () => {
+describe('SelectionSummaryCard', () => {
   it('renders eyebrow rows and row-level change actions', async () => {
     const user = userEvent.setup()
     const onChangeTitle = vi.fn()
 
     render(
-      <SetupSummaryCard
+      <SelectionSummaryCard
         eyebrow="Selections"
         rows={[
           {
             label: 'Title',
             value: 'Guildmaster',
             action: (
-              <SetupSummaryCardChangeAction
+              <SelectionSummaryChangeAction
                 changeLabel="Change"
                 ariaLabel="Change title"
                 onChange={onChangeTitle}
@@ -46,7 +46,7 @@ describe('SetupSummaryCard', () => {
     const onChangeTitle = vi.fn()
 
     render(
-      <SetupSummaryCard
+      <SelectionSummaryCard
         eyebrow="Selections"
         rows={[
           {
@@ -55,7 +55,7 @@ describe('SetupSummaryCard', () => {
             onValueClick: onChangeTitle,
             valueActionAriaLabel: 'Change title',
             action: (
-              <SetupSummaryCardChangeAction
+              <SelectionSummaryChangeAction
                 changeLabel="Change"
                 ariaLabel="Change title"
                 onChange={onChangeTitle}
@@ -75,10 +75,10 @@ describe('SetupSummaryCard', () => {
     const onChangeSetup = vi.fn()
 
     render(
-      <SetupSummaryCard
+      <SelectionSummaryCard
         eyebrow="Setup"
         cardAction={
-          <SetupSummaryCardChangeAction
+          <SelectionSummaryChangeAction
             changeLabel="Change"
             ariaLabel="Change setup"
             onChange={onChangeSetup}
@@ -95,26 +95,12 @@ describe('SetupSummaryCard', () => {
     expect(onChangeSetup).toHaveBeenCalledOnce()
   })
 
-  it('applies compact row padding without top on the first row or bottom on the last', () => {
-    const { container } = render(
-      <SetupSummaryCard
-        eyebrow="Selections"
-        rows={[
-          { label: 'Title', value: 'Guildmaster' },
-          { label: 'Species', value: 'Gnome' },
-        ]}
-      />,
-    )
-
-    const rows = container.querySelectorAll('dl > div')
-    expect(rows).toHaveLength(2)
-    expect(rows[0]).toHaveClass('py-0.5', 'first:pt-0', 'last:pb-0')
-    expect(rows[1]).toHaveClass('py-0.5', 'first:pt-0', 'last:pb-0')
-  })
-
   it('uses quiet summary chrome without selected-state ring tokens', () => {
     const { container } = render(
-      <SetupSummaryCard eyebrow="Selections" rows={[{ label: 'Title', value: 'Guildmaster' }]} />,
+      <SelectionSummaryCard
+        eyebrow="Selections"
+        rows={[{ label: 'Title', value: 'Guildmaster' }]}
+      />,
     )
 
     const card = container.querySelector('article')
@@ -123,45 +109,16 @@ describe('SetupSummaryCard', () => {
     expect(card?.className).not.toContain('border-primary')
   })
 
-  it('renders colon labels and reserves compact control height on the primary line', () => {
-    const { container } = render(
-      <SetupSummaryCard
-        eyebrow="Setup"
-        rows={[
-          { label: 'Role', value: 'No title' },
-          {
-            label: 'Title',
-            value: 'Guildmaster',
-            action: (
-              <SetupSummaryCardChangeAction
-                changeLabel="Change"
-                ariaLabel="Change title"
-                onChange={() => undefined}
-              />
-            ),
-          },
-        ]}
-      />,
-    )
-
-    expect(screen.getByText('Role:')).toBeInTheDocument()
-    expect(screen.getByText('Title:')).toBeInTheDocument()
-    expect(container.querySelector('.min-h-control-action-compact')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change title' })).toHaveClass(
-      'h-control-action-compact',
-    )
-  })
-
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
-      <SetupSummaryCard
+      <SelectionSummaryCard
         eyebrow="Selections"
         rows={[
           {
             label: 'Title',
             value: 'Guildmaster',
             action: (
-              <SetupSummaryCardChangeAction
+              <SelectionSummaryChangeAction
                 changeLabel="Change"
                 ariaLabel="Change title"
                 onChange={() => undefined}

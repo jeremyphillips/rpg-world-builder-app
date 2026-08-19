@@ -1,10 +1,13 @@
 'use client'
 
-import type { RadioCardOption } from '@rpg/ui'
-import { CollapsibleRadioCardField, Heading, Text } from '@rpg/ui'
+import { CollapsibleRadioCardField } from '@rpg/ui'
 
 import { LOCATION_CONNECTION_KIND_CHANGE_LABEL } from '../lib/location-connection-drawer-intent'
 import type { LocationConnectionKindOption } from '../lib/location-connection-kind-options'
+import {
+  LocationConnectionKindField,
+  toLocationConnectionKindRadioOptions,
+} from './location-connection-kind-field.client'
 
 export type LocationConnectionKindStepProps = {
   id: string
@@ -19,15 +22,6 @@ export type LocationConnectionKindStepProps = {
   onExpandedChange?: (expanded: boolean) => void
 }
 
-function toRadioCardOptions(options: readonly LocationConnectionKindOption[]): RadioCardOption[] {
-  return options.map((option) => ({
-    value: option.value,
-    label: option.label,
-    description: option.disabled ? option.disabledReason : option.description,
-    disabled: option.disabled,
-  }))
-}
-
 export function LocationConnectionKindStep({
   id,
   label,
@@ -39,22 +33,16 @@ export function LocationConnectionKindStep({
   defaultExpanded,
   onExpandedChange,
 }: LocationConnectionKindStepProps) {
-  if (options.length === 1) {
-    const resolved = options[0]
-    if (!resolved) return null
-
+  if (options.length <= 1) {
     return (
-      <div className="space-y-1">
-        <Heading variant="label" as="p">
-          {label}
-        </Heading>
-        <Text>{resolved.label}</Text>
-      </div>
+      <LocationConnectionKindField
+        id={id}
+        label={label}
+        options={options}
+        value={value}
+        onValueChange={onValueChange}
+      />
     )
-  }
-
-  if (options.length === 0) {
-    return null
   }
 
   return (
@@ -65,7 +53,7 @@ export function LocationConnectionKindStep({
       changeLabel={changeLabel}
       density="compact"
       value={value ?? ''}
-      options={toRadioCardOptions(options)}
+      options={toLocationConnectionKindRadioOptions(options)}
       onValueChange={onValueChange}
       defaultExpanded={defaultExpanded}
       onExpandedChange={onExpandedChange}

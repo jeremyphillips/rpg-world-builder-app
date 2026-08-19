@@ -5,6 +5,7 @@ import * as React from 'react'
 import {
   Badge,
   Modal,
+  SelectionSummaryCard,
   Tabs,
   TabsContent,
   TabsList,
@@ -13,7 +14,6 @@ import {
 } from '@rpg/ui'
 
 import {
-  SetupSummaryCard,
   mapSetupSummaryRowModelsToProps,
   type SetupSummaryEditTarget,
   type SetupSummaryRowModel,
@@ -202,7 +202,7 @@ export function CreateModalShell({
         <Modal.Header headline={headline} description={description} />
         <Modal.Body stableBody data-create-modal-body className={createModalShellBodyVariants()}>
           {setupSummary ? (
-            <SetupSummaryCard
+            <SelectionSummaryCard
               eyebrow={setupSummary.eyebrow}
               rows={mapSetupSummaryRowModelsToProps({
                 rows: setupSummary.rows,

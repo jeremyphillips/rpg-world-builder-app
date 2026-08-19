@@ -80,7 +80,7 @@ same shortcut contract.
 
 Building → Organizations relationship drafting stays on the Add/Pending composer (not
 `CreateSetupPanel`) but uses the same create-modal grammar: active controls for in-progress
-decisions, `SetupSummaryCard` rows for completed ones. The `branch` stage is the active
+decisions, `SelectionSummaryCard` rows for completed ones. The `branch` stage is the active
 create-org control — not a placeholder completed organization row. Copy these primitives for
 a second create-modal draft relationship tab; do not extract a generic composer until a second
 identical consumer exists.

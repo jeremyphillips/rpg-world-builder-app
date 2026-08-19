@@ -33,15 +33,6 @@ export {
 } from './create-setup-completed-choice-groups.lib'
 
 export {
-  SetupSummaryCard,
-  SetupSummaryCardChangeAction,
-  SetupSummaryRow,
-  type SetupSummaryCardChangeActionProps,
-  type SetupSummaryCardProps,
-  type SetupSummaryRowProps,
-} from './setup-summary-card.client'
-
-export {
   isCreateSetupChoiceComplete,
   notifyCreateSetupCompletionTransition,
   resolveCreateSetupActiveSetId,

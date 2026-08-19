@@ -66,7 +66,7 @@ export type CreateSetupSequenceItem = {
   dependsOn?: readonly string[]
   /** Upstream set ids that must be complete before this set is visible — no reset. */
   visibleWhenComplete?: readonly string[]
-  /** Semantic group id — completed non-active members render partial SetupSummaryCard rows. */
+  /** Semantic group id — completed non-active members render partial SelectionSummaryCard rows. */
   summaryGroup?: string
 }
 

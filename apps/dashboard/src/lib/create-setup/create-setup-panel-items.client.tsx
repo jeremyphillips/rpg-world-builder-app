@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Button, RadioCardField } from '@rpg/ui'
+import { Button, RadioCardField, SelectionSummaryCard, SelectionSummaryChangeAction } from '@rpg/ui'
 
 import {
   resolveCreateSetupPartialSummaryRows,
@@ -13,7 +13,6 @@ import {
   resolveCreateSetupSetIdsToInvalidate,
 } from './create-setup-sequence.lib'
 import { CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW } from './create-setup.constants'
-import { SetupSummaryCard, SetupSummaryCardChangeAction } from './setup-summary-card.client'
 import type {
   CreateSetupChoiceSet,
   CreateSetupSequenceModel,
@@ -115,7 +114,7 @@ function renderPartialSummaryCard(
   }
 
   return (
-    <SetupSummaryCard
+    <SelectionSummaryCard
       key={`summary-${setIds.join('-')}`}
       eyebrow={eyebrow}
       rows={rows.map((row) => {
@@ -127,7 +126,7 @@ function renderPartialSummaryCard(
           onValueClick: () => input.model.reopen(row.setId),
           valueActionAriaLabel,
           action: (
-            <SetupSummaryCardChangeAction
+            <SelectionSummaryChangeAction
               changeLabel={input.changeLabel}
               ariaLabel={valueActionAriaLabel}
               onChange={() => input.model.reopen(row.setId)}

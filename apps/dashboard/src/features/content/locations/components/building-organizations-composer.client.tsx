@@ -7,6 +7,8 @@ import {
   Heading,
   RadioCardField,
   SearchBar,
+  SelectionSummaryCard,
+  SelectionSummaryChangeAction,
   Text,
   type RadioCardOption,
 } from '@rpg/ui'
@@ -19,7 +21,6 @@ import {
 } from '../lib/building-organizations-create-tab-controller.lib'
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { buildOrganizationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
-import { SetupSummaryCard, SetupSummaryCardChangeAction } from '@/lib/create-setup'
 import {
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
@@ -114,7 +115,7 @@ function BuildingOrganizationSummaryCard({
   if (!summaryEyebrow || summaryRows.length === 0) return null
 
   return (
-    <SetupSummaryCard
+    <SelectionSummaryCard
       eyebrow={summaryEyebrow}
       rows={summaryRows.map((row) =>
         mapSummaryRow(row, composerView, startEditingRelationship, startEditingOrganization),
@@ -141,7 +142,7 @@ function mapSummaryRow(
     onValueClick: showChange ? onChange : undefined,
     valueActionAriaLabel: showChange ? valueActionAriaLabel : undefined,
     action: showChange ? (
-      <SetupSummaryCardChangeAction
+      <SelectionSummaryChangeAction
         changeLabel={BUILDING_ORGANIZATION_COMPOSER_CHANGE_LABEL}
         ariaLabel={valueActionAriaLabel}
         onChange={onChange}

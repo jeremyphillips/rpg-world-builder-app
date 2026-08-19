@@ -13,12 +13,8 @@ import {
   type OrganizationDomain,
   type OrganizationForm,
 } from '@rpg/contracts'
-import { Button } from '@rpg/ui'
-import {
-  mapSetupSummaryRowModelsToProps,
-  SetupSummaryCard,
-  type SetupSummaryEditTarget,
-} from '@/lib/create-setup'
+import { Button, SelectionSummaryCard } from '@rpg/ui'
+import { mapSetupSummaryRowModelsToProps, type SetupSummaryEditTarget } from '@/lib/create-setup'
 import {
   FormShellSubmitButton,
   TabbedForm,
@@ -323,7 +319,7 @@ export function QuickNpcAuthoringForm({
             fallback={defaultValues}
             onConfiguredCountChange={setConfiguredCount}
           />
-          <SetupSummaryCard
+          <SelectionSummaryCard
             eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
             rows={mapSetupSummaryRowModelsToProps({
               rows: setupSummaryRows,

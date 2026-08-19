@@ -164,7 +164,7 @@ function formatQuickNpcAuthoringBuildSummaryValue(args: {
   return parts.join(' · ')
 }
 
-/** Structured Role / Species / Build rows for authoring-phase SetupSummaryCard. */
+/** Structured Role / Species / Build rows for authoring-phase SelectionSummaryCard. */
 export function resolveQuickNpcSetupSummaryRows(args: {
   values: QuickNpcSetupValues
   context: CharacterBuildContext

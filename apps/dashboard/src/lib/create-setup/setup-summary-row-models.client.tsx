@@ -1,16 +1,14 @@
 'use client'
 
-import {
-  SetupSummaryCardChangeAction,
-  type SetupSummaryRowProps,
-} from './setup-summary-card.client'
+import { SelectionSummaryChangeAction, type SelectionSummaryRowProps } from '@rpg/ui'
+
 import type { SetupSummaryEditTarget, SetupSummaryRowModel } from './create-setup.types'
 
 export function mapSetupSummaryRowModelsToProps(args: {
   rows: readonly SetupSummaryRowModel[]
   changeLabel: string
   onEdit?: (target: SetupSummaryEditTarget) => void
-}): SetupSummaryRowProps[] {
+}): SelectionSummaryRowProps[] {
   return args.rows.map((row) => {
     const editTarget = row.editTarget
     if (editTarget == null || args.onEdit == null) {
@@ -30,7 +28,7 @@ export function mapSetupSummaryRowModelsToProps(args: {
       onValueClick: () => args.onEdit?.(editTarget),
       valueActionAriaLabel,
       action: (
-        <SetupSummaryCardChangeAction
+        <SelectionSummaryChangeAction
           changeLabel={args.changeLabel}
           ariaLabel={valueActionAriaLabel}
           onChange={() => args.onEdit?.(editTarget)}
