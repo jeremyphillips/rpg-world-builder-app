@@ -102,13 +102,12 @@ Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for th
 - **Quick NPC modal setup** — Title and Species via `CreateSetupPanel`; Build as explicit external decision;
   Class and Level in sibling `QuickNpcBuildCard`.
 
-**Documented exception:** Building → Organizations composer uses its own stage machine but adopts the
-reveal invariant (hide downstream while editing upstream kind via `LocationConnectionKindStep`;
-`ChooserSummaryCard` remains sanctioned for entity selection and kind step).
+**Building → Organizations composer** — feature-owned stage machine (`intent → discovery → review | branch`) with `SetupSummaryCard` partial rows and `RadioCardField` for active relationship kind. Entity discovery, nested org create, draft plan, and composite commit stay local. The `branch` stage is the active create-org control — not a completed placeholder organization row. A second create-modal draft relationship tab should copy these primitives rather than extracting a generic composer until a second identical consumer exists.
 
 Sequenced create-modal setup must use create-setup orchestration unless listed as a documented
-exception. `create-setup-parallel-path-drift.test.ts` guards direct `CollapsibleRadioCardField`,
-`RadioCardField`, and `ChooserSummaryCard` imports in `*create*` production components.
+exception. `create-setup-parallel-path-drift.test.ts` guards `CollapsibleRadioCardField` and
+`ChooserSummaryCard` in create-modal decision sequences; `RadioCardField` is allowed for active
+decisions. Relationship drawers keep `LocationConnectionKindStep` (collapsing kind chrome).
 
 Create-modal radio cards represent **active decisions only**; completed setup decisions render through
 `SetupSummaryCard` partial rows.

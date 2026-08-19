@@ -54,10 +54,10 @@ Recorded before the relationship-first refinement. Findings:
    `ContentEntityCard` (static).
 3. **Radio selection is domain-specific.** Add Member radios are membership
    titles from `OrganizationMembershipTitleField`. Relationship-first building
-   composition uses `LocationConnectionKindStep` (the allowlisted wrapper around
-   `CollapsibleRadioCardField` / `ChooserSummaryCard`). Sequenced location and Quick
-   NPC setup use `CreateSetupPanel` + partial `SetupSummaryCard` rows instead — active
-   decisions only in `RadioCardField`; completed decisions never use `ChooserSummaryCard`.
+   composition uses `RadioCardField` for active kind and `SetupSummaryCard` rows
+   for completed decisions inside the Organizations composer. Sequenced location and Quick
+   NPC setup use `CreateSetupPanel` with the same grammar. Relationship drawers keep
+   `LocationConnectionKindStep` (`CollapsibleRadioCardField` / `ChooserSummaryCard`).
    Do not lift title vocabulary into shared UI.
 4. **Lifted pieces.** Add/Pending mode root (`AddPendingWorkflow`) with one
    composing slot and one pending collection slot. Do not lift the picker Sheet,
@@ -68,11 +68,10 @@ Recorded before the relationship-first refinement. Findings:
 6. **`ContentEntityCard` stays pure.** Discovery and pending rows use CEC with a
    trailing action only. CEC never receives expand, composer, or relationship
    props.
-7. **Pending edit stays in Pending mode.** The edited row swaps to hydrated
-   `ChooserSummaryCard` review in place. Sibling pending cards remain visible.
+7. **Pending edit stays in Pending mode.** The edited row swaps to the same composer
+   (`SetupSummaryCard` rows + active controls) in place. Sibling pending cards remain visible.
    This is not a return to Add/discovery at the root. While the relationship kind
-   is expanded for edit, downstream discovery/review/branch stages hide until the
-   kind collapses again (same reveal invariant as create-setup).
+   is being edited, downstream discovery/review/branch stages hide (same reveal invariant as create-setup).
 8. **Parallel patterns left in place.** `CatalogEntityRow` in picker sheets,
    equipment picker disclosure (commerce), and mutation-oriented relationship
    drawers. Do not migrate them in this phase.

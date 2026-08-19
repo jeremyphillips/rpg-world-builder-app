@@ -79,8 +79,11 @@ choice-set ids, `dependsOn`, `visibleWhenComplete`, `summaryGroup`, and complete
 same shortcut contract.
 
 Building → Organizations relationship drafting stays on the Add/Pending composer (not
-`CreateSetupPanel`) but adopts the same reveal invariant: editing relationship kind hides downstream
-discovery/review stages until the kind collapses.
+`CreateSetupPanel`) but uses the same create-modal grammar: active controls for in-progress
+decisions, `SetupSummaryCard` rows for completed ones. The `branch` stage is the active
+create-org control — not a placeholder completed organization row. Copy these primitives for
+a second create-modal draft relationship tab; do not extract a generic composer until a second
+identical consumer exists.
 
 Orchestration lives in `@/lib/create-setup`; see `apps/dashboard/src/lib/create-setup/README.md`.
 

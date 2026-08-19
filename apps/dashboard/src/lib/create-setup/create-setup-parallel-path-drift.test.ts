@@ -10,19 +10,17 @@ const CREATE_SETUP_INTERNAL_SUFFIXES = new Set([
   'create-setup-panel.client.tsx',
 ])
 
-/**
- * Documented exceptions — relationship/kind flows that wrap CollapsibleRadioCardField or
- * ChooserSummaryCard instead of create-setup orchestration.
- */
+/** Drawer relationship kind step — not create-modal decision sequences. */
 const COLLAPSIBLE_RADIO_ALLOWLIST_SUFFIXES = new Set(['location-connection-kind-step.client.tsx'])
 
-const CHOOSER_SUMMARY_ALLOWLIST_SUFFIXES = new Set([
+const CREATE_MODAL_DECISION_SEQUENCE_SUFFIXES = new Set([
   'building-organizations-composer.client.tsx',
-  'location-connection-kind-step.client.tsx',
+  'quick-npc-create-setup-phase.client.tsx',
+  'location-create-modal-setup-panel.client.tsx',
 ])
 
-const FORBIDDEN_RADIO_IMPORT_PATTERN =
-  /\b(CollapsibleRadioCardField|RadioCardField)\b[\s\S]*?\bfrom ['"]@rpg\/ui['"]/
+const FORBIDDEN_COLLAPSIBLE_RADIO_IMPORT_PATTERN =
+  /\bCollapsibleRadioCardField\b[\s\S]*?\bfrom ['"]@rpg\/ui['"]/
 
 const FORBIDDEN_CHOOSER_SUMMARY_IMPORT_PATTERN =
   /\bChooserSummaryCard\b[\s\S]*?\bfrom ['"]@rpg\/ui['"]/
@@ -58,21 +56,19 @@ function isAllowedCollapsibleRadioConsumer(relativePath: string): boolean {
   return false
 }
 
-function isAllowedChooserSummaryConsumer(relativePath: string): boolean {
+function isCreateModalDecisionSequence(relativePath: string): boolean {
   const suffix = relativePath.split('/').at(-1)
-  if (!suffix) return false
-  if (CHOOSER_SUMMARY_ALLOWLIST_SUFFIXES.has(suffix)) return true
-  return false
+  return suffix != null && CREATE_MODAL_DECISION_SEQUENCE_SUFFIXES.has(suffix)
 }
 
 describe('create-setup parallel path drift', () => {
-  it('keeps sequenced create setup on create-setup orchestration unless allowlisted', () => {
+  it('forbids CollapsibleRadioCardField outside create-setup internals and drawer kind steps', () => {
     const offenders: string[] = []
 
     for (const filePath of collectProductionSourceFiles(dashboardSrcRoot)) {
       const relativePath = relative(dashboardSrcRoot, filePath)
       const source = readFileSync(filePath, 'utf8')
-      if (!FORBIDDEN_RADIO_IMPORT_PATTERN.test(source)) continue
+      if (!FORBIDDEN_COLLAPSIBLE_RADIO_IMPORT_PATTERN.test(source)) continue
       if (isAllowedCollapsibleRadioConsumer(relativePath)) continue
       offenders.push(relativePath)
     }
@@ -80,14 +76,14 @@ describe('create-setup parallel path drift', () => {
     expect(offenders).toEqual([])
   })
 
-  it('forbids ChooserSummaryCard in create paths except documented relationship composers', () => {
+  it('forbids ChooserSummaryCard in create-modal decision sequences', () => {
     const offenders: string[] = []
 
     for (const filePath of collectProductionSourceFiles(dashboardSrcRoot)) {
       const relativePath = relative(dashboardSrcRoot, filePath)
+      if (!isCreateModalDecisionSequence(relativePath)) continue
       const source = readFileSync(filePath, 'utf8')
       if (!FORBIDDEN_CHOOSER_SUMMARY_IMPORT_PATTERN.test(source)) continue
-      if (isAllowedChooserSummaryConsumer(relativePath)) continue
       offenders.push(relativePath)
     }
 

@@ -12,7 +12,37 @@ import {
   type BuildingOrganizationDraftPlan,
   type BuildingOrganizationRelationshipDraft,
 } from './building-organization-create-drafts'
+import {
+  CREATE_SETUP_DEFAULT_CHANGE_LABEL,
+  CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW,
+} from '@/lib/create-setup'
+
 import { BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE } from './building-organizations-create-tab.lib'
+import {
+  BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME,
+  BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
+  BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW,
+} from './building-organizations-create-tab.lib'
+
+export type BuildingOrganizationEditingDecision = 'relationship' | 'organization'
+
+export type BuildingOrganizationComposerSummaryRow = {
+  id: 'relationship' | 'organization'
+  decision: BuildingOrganizationEditingDecision | 'organizationResolved'
+  label: string
+  value: string
+}
+
+export type BuildingOrganizationComposerView = {
+  activeDecision: BuildingOrganizationEditingDecision | null
+  showDiscovery: boolean
+  showBranch: boolean
+  showCommit: boolean
+  showRelationshipChange: boolean
+  showOrganizationChange: boolean
+  summaryEyebrow: string | null
+  summaryRows: readonly BuildingOrganizationComposerSummaryRow[]
+}
 
 export type BuildingOrganizationComposerStage = 'intent' | 'discovery' | 'review' | 'branch'
 
@@ -179,6 +209,179 @@ export function filterVisibleOrganizations(
     `${organization.name} ${getDomainLabel(organization)}`.toLocaleLowerCase().includes(normalized),
   )
 }
+
+function buildRelationshipSummaryRow(kindLabel: string): BuildingOrganizationComposerSummaryRow {
+  return {
+    id: 'relationship',
+    decision: 'relationship',
+    label: BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW,
+    value: kindLabel,
+  }
+}
+
+function buildOrganizationSummaryRow(
+  organizationName: string,
+): BuildingOrganizationComposerSummaryRow {
+  return {
+    id: 'organization',
+    decision: 'organizationResolved',
+    label: BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
+    value: organizationName,
+  }
+}
+
+export function resolveBuildingOrganizationHasResolvedOrganizationTarget(input: {
+  selectedOrganization: BuildingOrganizationComposerTarget | null
+  organizationName: string | null
+}): boolean {
+  if (!input.selectedOrganization || !input.organizationName) return false
+  if (input.selectedOrganization.kind === 'existing') return true
+  return input.organizationName !== BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME
+}
+
+function emptyBuildingOrganizationComposerView(): BuildingOrganizationComposerView {
+  return {
+    activeDecision: null,
+    showDiscovery: false,
+    showBranch: false,
+    showCommit: false,
+    showRelationshipChange: false,
+    showOrganizationChange: false,
+    summaryEyebrow: null,
+    summaryRows: [],
+  }
+}
+
+function resolveRelationshipKindChangeVisible(relationshipKindCount: number): boolean {
+  return relationshipKindCount > 1
+}
+
+function buildRelationshipOnlySummaryView(input: {
+  relationshipRow: BuildingOrganizationComposerSummaryRow | null
+  relationshipKindCount: number
+  activeDecision: BuildingOrganizationComposerView['activeDecision']
+  showDiscovery?: boolean
+  showBranch?: boolean
+}): BuildingOrganizationComposerView {
+  return {
+    activeDecision: input.activeDecision,
+    showDiscovery: input.showDiscovery ?? false,
+    showBranch: input.showBranch ?? false,
+    showCommit: false,
+    showRelationshipChange: resolveRelationshipKindChangeVisible(input.relationshipKindCount),
+    showOrganizationChange: false,
+    summaryEyebrow: input.relationshipRow ? CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW : null,
+    summaryRows: input.relationshipRow ? [input.relationshipRow] : [],
+  }
+}
+
+function resolveReviewStageView(input: {
+  relationshipRow: BuildingOrganizationComposerSummaryRow | null
+  organizationName: string | null
+  hasResolvedOrganization: boolean
+  relationshipKindCount: number
+}): BuildingOrganizationComposerView {
+  const organizationRow =
+    input.hasResolvedOrganization && input.organizationName
+      ? buildOrganizationSummaryRow(input.organizationName)
+      : null
+  const summaryRows = [
+    ...(input.relationshipRow ? [input.relationshipRow] : []),
+    ...(organizationRow ? [organizationRow] : []),
+  ]
+
+  return {
+    activeDecision: null,
+    showDiscovery: false,
+    showBranch: false,
+    showCommit: summaryRows.length >= 2,
+    showRelationshipChange: resolveRelationshipKindChangeVisible(input.relationshipKindCount),
+    showOrganizationChange: Boolean(organizationRow),
+    summaryEyebrow: summaryRows.length > 0 ? CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW : null,
+    summaryRows,
+  }
+}
+
+function resolveStageComposerView(input: {
+  composerStage: BuildingOrganizationComposerStage
+  relationshipRow: BuildingOrganizationComposerSummaryRow | null
+  organizationName: string | null
+  hasKind: boolean
+  hasResolvedOrganization: boolean
+  relationshipKindCount: number
+}): BuildingOrganizationComposerView {
+  switch (input.composerStage) {
+    case 'intent':
+      return {
+        ...emptyBuildingOrganizationComposerView(),
+        activeDecision: input.hasKind ? null : 'relationship',
+        showRelationshipChange: resolveRelationshipKindChangeVisible(input.relationshipKindCount),
+      }
+    case 'discovery':
+      return buildRelationshipOnlySummaryView({
+        relationshipRow: input.relationshipRow,
+        relationshipKindCount: input.relationshipKindCount,
+        activeDecision: 'organization',
+        showDiscovery: true,
+      })
+    case 'branch':
+      return buildRelationshipOnlySummaryView({
+        relationshipRow: input.relationshipRow,
+        relationshipKindCount: input.relationshipKindCount,
+        activeDecision: 'organization',
+        showBranch: true,
+      })
+    case 'review':
+      return resolveReviewStageView(input)
+    default:
+      return emptyBuildingOrganizationComposerView()
+  }
+}
+
+export function resolveBuildingOrganizationComposerView(input: {
+  composerStage: BuildingOrganizationComposerStage
+  editingDecision: BuildingOrganizationEditingDecision | null
+  kindLabel: string | null
+  organizationName: string | null
+  hasKind: boolean
+  hasResolvedOrganization: boolean
+  relationshipKindCount: number
+}): BuildingOrganizationComposerView {
+  const relationshipKindChangeVisible = resolveRelationshipKindChangeVisible(
+    input.relationshipKindCount,
+  )
+
+  if (input.editingDecision === 'relationship') {
+    return {
+      ...emptyBuildingOrganizationComposerView(),
+      activeDecision: 'relationship',
+      showRelationshipChange: relationshipKindChangeVisible,
+    }
+  }
+
+  const relationshipRow =
+    input.hasKind && input.kindLabel ? buildRelationshipSummaryRow(input.kindLabel) : null
+
+  if (input.editingDecision === 'organization') {
+    return buildRelationshipOnlySummaryView({
+      relationshipRow,
+      relationshipKindCount: input.relationshipKindCount,
+      activeDecision: 'organization',
+      showDiscovery: true,
+    })
+  }
+
+  return resolveStageComposerView({
+    composerStage: input.composerStage,
+    relationshipRow,
+    organizationName: input.organizationName,
+    hasKind: input.hasKind,
+    hasResolvedOrganization: input.hasResolvedOrganization,
+    relationshipKindCount: input.relationshipKindCount,
+  })
+}
+
+export const BUILDING_ORGANIZATION_COMPOSER_CHANGE_LABEL = CREATE_SETUP_DEFAULT_CHANGE_LABEL
 
 export function canConfirmBuildingOrganizationRelationship(input: {
   kind: OrganizationLocationConnectionKind | null
