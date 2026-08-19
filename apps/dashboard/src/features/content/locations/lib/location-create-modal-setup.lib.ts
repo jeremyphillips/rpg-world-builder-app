@@ -13,6 +13,7 @@ import {
 } from '@/lib/create-setup'
 
 import type { LocationCreateIntent, LocationCreateSetupResult } from './location-create-session'
+import type { LocationSetupSummaryEntry } from './location-setup-summary-rows.lib'
 import {
   BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
   BUILDING_CREATE_SETUP_FACILITY_PROMPT,
@@ -98,7 +99,7 @@ export type LocationCreateModalSetupModel = {
   subhead?: string | false
   choiceSets: LocationCreateModalSetupChoiceSetConfig[]
   complete: () => LocationCreateSetupResult | null
-  summaryEntries: { fieldLabel: string; valueLabel: string }[]
+  summaryEntries: LocationSetupSummaryEntry[]
 }
 
 /** True when every choice set is complete (including projection-safe facility readiness). */
@@ -193,6 +194,7 @@ export function resolveLocationCreateModalSetupModel({
       summaryEntries: values.siteType
         ? [
             {
+              setId: 'siteType',
               fieldLabel: SITE_CREATE_SETUP_FIELD_LABEL,
               valueLabel: optionLabel(options, values.siteType),
             },
@@ -222,6 +224,7 @@ export function resolveLocationCreateModalSetupModel({
       summaryEntries: values.settlementType
         ? [
             {
+              setId: 'settlementType',
               fieldLabel: SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
               valueLabel: optionLabel(options, values.settlementType),
             },
@@ -266,10 +269,12 @@ export function resolveLocationCreateModalSetupModel({
         values.classificationKind && values.regionType
           ? [
               {
+                setId: 'classification',
                 fieldLabel: REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
                 valueLabel: optionLabel(kindOptions, values.classificationKind),
               },
               {
+                setId: 'regionType',
                 fieldLabel: REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
                 valueLabel: optionLabel(typeOptions, values.regionType),
               },

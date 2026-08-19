@@ -1,4 +1,21 @@
+import type { ReactNode } from 'react'
+
 import type { RadioCardOption, RadioCardOptionGroup } from '@rpg/ui'
+
+export type SetupSummaryEditTarget = { type: 'set'; id: string } | { type: 'external'; id: string }
+
+export type SetupSummaryRowModel = {
+  id: string
+  label: string
+  value: ReactNode
+  helper?: ReactNode
+  editTarget?: SetupSummaryEditTarget
+}
+
+export type CreateSetupReopenOptions = {
+  /** Invoked on same-value reselect dismissal for this edit session only. */
+  onDismiss?: () => void
+}
 
 export type CreateSetupValueChangeEvent = {
   setId: string
@@ -29,7 +46,9 @@ export type CreateSetupSequenceModel = {
   activeSetId: string | null
   visibleSetIds: string[]
   reopenSetId: string | null
-  reopen: (setId: string | null) => void
+  reopen: (setId: string | null, options?: CreateSetupReopenOptions) => void
+  /** Clears the edit session and returns any Authoring-origin dismissal callback. */
+  takeEditSessionDismiss: () => (() => void) | undefined
   /** True while a reopened upstream set is being edited — siblings/downstream hide on this. */
   isEditingUpstream: boolean
   /** All decisions resolved and explicit decisions confirmed at their current revision. */

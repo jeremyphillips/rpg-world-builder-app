@@ -11,6 +11,7 @@ import {
   resolveCreateSetupSetsComplete,
   resolveCreateSetupVisibleSetIds,
 } from './create-setup-sequence.lib'
+import { notifyCreateSetupValueChangeCompletion } from './use-create-setup-sequence.client'
 import type { CreateSetupSequenceItem } from './create-setup.types'
 
 function sequence(
@@ -268,6 +269,28 @@ describe('create-setup-sequence', () => {
       notifyCreateSetupCompletionTransition({
         wasComplete: true,
         nextComplete: true,
+        onSetupComplete,
+      })
+
+      expect(onSetupComplete).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('notifyCreateSetupValueChangeCompletion', () => {
+    it('fires onSetupComplete whenever the next setup state is complete', () => {
+      const onSetupComplete = vi.fn()
+      const completeSet = {
+        id: 'siteType',
+        kind: 'choice' as const,
+        fieldLabel: 'Site type',
+        options: [{ value: 'city', label: 'City' }],
+        value: 'city',
+        isComplete: true,
+      }
+
+      notifyCreateSetupValueChangeCompletion({
+        previousSets: [completeSet],
+        nextSets: [completeSet],
         onSetupComplete,
       })
 

@@ -4,7 +4,11 @@ import * as React from 'react'
 import { Button, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
-import { CreateSetupFooter, notifyCreateSetupValueChangeCompletion } from '@/lib/create-setup'
+import {
+  CreateSetupFooter,
+  notifyCreateSetupValueChangeCompletion,
+  type SetupSummaryEditTarget,
+} from '@/lib/create-setup'
 import { CreateModalShell, type CreateWorkflowPanelStatus } from '@/lib/create-flow'
 
 import type {
@@ -33,12 +37,12 @@ import {
   BUILDING_CREATE_SETUP_HEADLINE,
   type BuildingCreateSetupProjection,
 } from '../lib/location-building-create-setup.lib'
-import {
-  LOCATION_CREATE_SETUP_CHANGE_LABEL,
-  LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL,
-} from '../lib/location-create-setup-chrome.lib'
+import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
-import { resolveLocationSetupSummaryRows } from '../lib/location-setup-summary-rows.lib'
+import {
+  resolveLocationSetupSummaryRows,
+  type LocationSetupSummaryEntry,
+} from '../lib/location-setup-summary-rows.lib'
 import {
   LocationCreateModalSetupPanel,
   useLocationCreateModalSetupSequence,
@@ -118,8 +122,8 @@ function resolveModalHeadline({
 const MULTI_SETUP_EYEBROW = 'Setup' as const
 
 function resolveAuthoringSetupSummary(
-  entries: readonly { fieldLabel: string; valueLabel: string }[],
-): { eyebrow: string; rows: { label: string; value: string }[] } | null {
+  entries: readonly LocationSetupSummaryEntry[],
+): { eyebrow: string; rows: ReturnType<typeof resolveLocationSetupSummaryRows> } | null {
   const rows = resolveLocationSetupSummaryRows(entries)
   if (rows.length === 0) return null
 
@@ -322,6 +326,13 @@ function useLocationCreateModalController({
     }))
   }, [])
 
+  const returnToDetailsPhase = React.useCallback(() => {
+    setState((current) => ({
+      ...current,
+      phase: 'details',
+    }))
+  }, [])
+
   const handleSetupValueChange = React.useCallback(
     (event: Parameters<typeof applyLocationCreateModalSetupValueChange>[0]['event']) => {
       const previousModel = resolveLocationCreateModalSetupModel({
@@ -365,6 +376,7 @@ function useLocationCreateModalController({
     handleOpenChange,
     handleContinueFromSetup,
     handleBackToSetup,
+    returnToDetailsPhase,
     setDetailsPending,
     trustedClose,
   }
@@ -399,6 +411,7 @@ function LocationCreateModalSession({
     handleOpenChange,
     handleContinueFromSetup,
     handleBackToSetup,
+    returnToDetailsPhase,
     setDetailsPending,
     trustedClose,
   } = useLocationCreateModalController({ intent, onOpenChange })
@@ -414,6 +427,7 @@ function LocationCreateModalSession({
   const organizationsControllerRef = React.useRef<BuildingOrganizationsCreateTabController | null>(
     null,
   )
+  const pendingSetupSummaryEditRef = React.useRef<SetupSummaryEditTarget | null>(null)
 
   const showDetails = state.phase === 'details' && state.fixedCreate != null
   const buildingTabsConfigured =
@@ -425,6 +439,31 @@ function LocationCreateModalSession({
     sets: setupSets,
     onSetupComplete: () => handleContinueFromSetup(state.setupValues),
   })
+
+  const returnToDetails = React.useCallback(() => {
+    returnToDetailsPhase()
+  }, [returnToDetailsPhase])
+
+  const handleSetupSummaryEdit = React.useCallback(
+    (target: SetupSummaryEditTarget) => {
+      pendingSetupSummaryEditRef.current = target
+      handleBackToSetup()
+    },
+    [handleBackToSetup],
+  )
+
+  React.useLayoutEffect(() => {
+    if (state.phase !== 'setup') return
+
+    const pending = pendingSetupSummaryEditRef.current
+    if (!pending) return
+
+    pendingSetupSummaryEditRef.current = null
+    if (pending.type === 'set') {
+      setupSequenceModel.reopen(pending.id, { onDismiss: returnToDetails })
+    }
+  }, [returnToDetails, setupSequenceModel, state.phase])
+
   const submitLabel = buildingTabsConfigured
     ? BUILDING_CREATE_SETUP_HEADLINE
     : formatContentCreateActionLabel('locations')
@@ -466,8 +505,7 @@ function LocationCreateModalSession({
           eyebrow: resolvedSetupSummary.eyebrow,
           rows: resolvedSetupSummary.rows,
           changeLabel: LOCATION_CREATE_SETUP_CHANGE_LABEL,
-          changeAriaLabel: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL,
-          onChange: handleBackToSetup,
+          onRowEdit: handleSetupSummaryEdit,
         }
       : undefined
 

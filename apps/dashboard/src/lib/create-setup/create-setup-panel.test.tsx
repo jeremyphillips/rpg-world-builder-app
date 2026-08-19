@@ -208,9 +208,10 @@ describe('CreateSetupPanel', () => {
     expect(screen.queryByRole('radiogroup', { name: 'Choose a species' })).not.toBeInTheDocument()
   })
 
-  it('dismisses reopen without emitting a value change when the same option is re-selected', async () => {
+  it('invokes the edit-session dismissal callback on same-value reselect', async () => {
     const user = userEvent.setup()
     const onSetupValueChange = vi.fn()
+    const onDismiss = vi.fn()
 
     function SameValueHarness() {
       const sets: CreateSetupSet[] = [
@@ -236,15 +237,23 @@ describe('CreateSetupPanel', () => {
       ]
       const model = useCreateSetupSequence(sets)
 
-      return <CreateSetupPanel sets={sets} model={model} onSetupValueChange={onSetupValueChange} />
+      return (
+        <>
+          <button type="button" onClick={() => model.reopen('membershipTitle', { onDismiss })}>
+            Reopen title with dismiss
+          </button>
+          <CreateSetupPanel sets={sets} model={model} onSetupValueChange={onSetupValueChange} />
+        </>
+      )
     }
 
     render(<SameValueHarness />)
 
-    await user.click(screen.getByRole('button', { name: 'Change title' }))
+    await user.click(screen.getByRole('button', { name: 'Reopen title with dismiss' }))
     await user.click(screen.getByRole('radio', { name: /no title/i }))
 
     expect(onSetupValueChange).not.toHaveBeenCalled()
+    expect(onDismiss).toHaveBeenCalledTimes(1)
     expect(screen.queryByRole('radiogroup', { name: 'Choose a title' })).not.toBeInTheDocument()
   })
 })

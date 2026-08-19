@@ -56,6 +56,7 @@ const meta = {
     setup,
     onCancel: () => undefined,
     onChangeSetup: () => undefined,
+    onSetupSummaryEdit: () => undefined,
     onCreated: () => undefined,
   },
 } satisfies Meta<typeof QuickNpcAuthoringForm>

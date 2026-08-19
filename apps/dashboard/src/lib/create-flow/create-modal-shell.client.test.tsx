@@ -97,10 +97,10 @@ describe('CreateModalShell', () => {
     expect(issueBadge.className).not.toMatch(/createModalShellIssueBadge/)
   })
 
-  it('supports controlled navigation and domain-owned setup summary actions', async () => {
+  it('supports controlled navigation and row-level setup summary actions', async () => {
     const user = userEvent.setup()
     const onActiveTabChange = vi.fn()
-    const onChangeSetup = vi.fn()
+    const onRowEdit = vi.fn()
 
     render(
       <CreateModalShell
@@ -112,11 +112,20 @@ describe('CreateModalShell', () => {
         setupSummary={{
           eyebrow: 'Setup',
           rows: [
-            { label: 'Building form', value: 'House' },
-            { label: 'Facility', value: 'Commercial' },
+            {
+              id: 'buildingForm',
+              label: 'Building form',
+              value: 'House',
+              editTarget: { type: 'set', id: 'buildingForm' },
+            },
+            {
+              id: 'buildingFacilityAuthoringGroup',
+              label: 'Facility',
+              value: 'Commercial',
+              editTarget: { type: 'set', id: 'buildingFacilityAuthoringGroup' },
+            },
           ],
-          changeAriaLabel: 'Change setup',
-          onChange: onChangeSetup,
+          onRowEdit,
         }}
         tabs={[
           {
@@ -137,10 +146,10 @@ describe('CreateModalShell', () => {
     )
 
     await user.click(screen.getByRole('tab', { name: 'Organizations' }))
-    await user.click(screen.getByRole('button', { name: 'Change setup' }))
+    await user.click(screen.getByRole('button', { name: 'Change building form' }))
 
     expect(onActiveTabChange).toHaveBeenCalledWith('organizations')
-    expect(onChangeSetup).toHaveBeenCalledOnce()
+    expect(onRowEdit).toHaveBeenCalledWith({ type: 'set', id: 'buildingForm' })
   })
 
   it('keeps tab panels mounted while Setup temporarily owns the visible body', () => {

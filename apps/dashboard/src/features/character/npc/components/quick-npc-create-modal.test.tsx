@@ -235,6 +235,51 @@ describe('QuickNpcCreateModal', () => {
     expect(screen.getByText('Fighter')).toBeInTheDocument()
   })
 
+  it('collapses species into selections after selection while build remains pending', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('No title')).toBeInTheDocument()
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: 'Details' })).not.toBeInTheDocument()
+  })
+
+  it('returns to authoring when a setup row is reconfirmed without changing the value', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await completeSetup(user)
+    await user.click(screen.getByRole('button', { name: 'Change role' }))
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
+  })
+
+  it('re-enters setup from the Build row without reopening a radio question', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await completeSetup(user)
+    await user.click(screen.getByRole('button', { name: 'Change build' }))
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+  })
+
   it('shows setup-phase headline and description', () => {
     renderModal()
 
@@ -263,8 +308,8 @@ describe('QuickNpcCreateModal', () => {
 
     await completeSetup(user)
 
-    const changeSetup = screen.getByRole('button', { name: 'Change setup' })
-    const scrollRegion = changeSetup.closest('.overflow-y-auto')
+    const changeBuild = screen.getByRole('button', { name: 'Change build' })
+    const scrollRegion = changeBuild.closest('.overflow-y-auto')
 
     expect(scrollRegion).toBeTruthy()
     expect(scrollRegion?.className).toContain('min-h-0')
@@ -296,13 +341,13 @@ describe('QuickNpcCreateModal', () => {
     expect(props.onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('returns to setup from Change and clears back to details on continue', async () => {
+  it('returns to setup from Build row Change and clears back to details on continue', async () => {
     const user = userEvent.setup()
     renderModal()
 
     await completeSetup(user)
     await user.type(screen.getByRole('textbox', { name: /name/i }), 'Draft NPC')
-    await user.click(screen.getByRole('button', { name: 'Change setup' }))
+    await user.click(screen.getByRole('button', { name: 'Change build' }))
 
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
     await completeSetup(user)

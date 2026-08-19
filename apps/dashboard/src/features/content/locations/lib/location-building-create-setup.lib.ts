@@ -12,6 +12,7 @@ import {
 import type { RadioCardOption } from '@rpg/ui'
 
 import type { LocationFormValues } from './location-form-fields'
+import type { LocationSetupSummaryEntry } from './location-setup-summary-rows.lib'
 
 export const BUILDING_CREATE_SETUP_HEADLINE = 'Create building' as const
 export const BUILDING_CREATE_SETUP_FORM_FIELD_LABEL = 'Building form' as const
@@ -150,17 +151,19 @@ export function buildBuildingClassificationFromCreateSetup(
 export function buildBuildingCreateSetupSummaryEntries(
   projection: BuildingCreateSetupProjection,
   facilityScopeValue: BuildingCreateSetupSelection['facilityAuthoringGroup'],
-): { fieldLabel: string; valueLabel: string }[] {
+): LocationSetupSummaryEntry[] {
   return [
     ...(projection.form
       ? [
           {
+            setId: 'buildingForm',
             fieldLabel: BUILDING_CREATE_SETUP_FORM_FIELD_LABEL,
             valueLabel: getBuildingFormLabel(projection.form),
           },
         ]
       : []),
     {
+      setId: 'buildingFacilityAuthoringGroup',
       fieldLabel: BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
       valueLabel: projection.facilityAuthoringGroup
         ? BUILDING_FACILITY_AUTHORING_GROUP_ENTRIES[projection.facilityAuthoringGroup].label

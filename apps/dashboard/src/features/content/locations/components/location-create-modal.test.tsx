@@ -25,8 +25,8 @@ import {
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
-import { LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL } from '../lib/building-organizations-create-tab.lib'
+import { BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL } from '../lib/location-building-create-setup.lib'
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
 import {
@@ -206,10 +206,6 @@ async function chooseBuildingFacilityGroup(
   await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
 }
 
-async function reopenBuildingFacility(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole('button', { name: 'Change facility' }))
-}
-
 async function chooseBuildingFacilityType(
   user: ReturnType<typeof userEvent.setup>,
   label:
@@ -320,9 +316,7 @@ describe('LocationCreateModal', () => {
     ).not.toBeInTheDocument()
     expect(screen.getByText(SETTLEMENT_CREATE_SETUP_FIELD_LABEL)).toBeInTheDocument()
     expect(screen.getByText('City')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change settlement type' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
 
@@ -334,9 +328,7 @@ describe('LocationCreateModal', () => {
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     expect(screen.getByText('Browse all')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Organizations (optional)' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change facility' })).toBeInTheDocument()
   })
 
   it('preserves Organization editor state through Change-to-Setup and includes it in dismissal guards', async () => {
@@ -349,7 +341,9 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
     await user.click(
-      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
+      screen.getByRole('button', {
+        name: `Change ${BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL.toLowerCase()}`,
+      }),
     )
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
@@ -756,11 +750,11 @@ describe('LocationCreateModal', () => {
     fireEvent.input(description)
 
     await user.click(
-      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
+      screen.getByRole('button', {
+        name: `Change ${BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL.toLowerCase()}`,
+      }),
     )
-    await reopenBuildingFacility(user)
     await chooseBuildingFacilityGroup(user, 'Religious')
-    await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Copper Kettle')
     expect(screen.getByRole('textbox', { name: 'Description' })).toHaveTextContent(
@@ -789,11 +783,11 @@ describe('LocationCreateModal', () => {
     await chooseBuildingFacilityType(user, 'Brewery')
 
     await user.click(
-      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
+      screen.getByRole('button', {
+        name: `Change ${BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL.toLowerCase()}`,
+      }),
     )
-    await reopenBuildingFacility(user)
     await chooseBuildingFacilityGroup(user, 'Commercial')
-    await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByText('Commercial')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Brewery')
@@ -1034,9 +1028,6 @@ describe('LocationCreateModal', () => {
     expect(firstRegionType).toBeTruthy()
     await user.click(firstRegionType!)
 
-    await user.click(
-      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
-    )
     await user.click(screen.getByRole('button', { name: 'Change classification' }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
@@ -1052,7 +1043,7 @@ describe('LocationCreateModal', () => {
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
   })
 
-  it('shows multi-line region summary Change, returns to summarized setup, and preserves Name', async () => {
+  it('shows multi-line region summary row actions, returns to details on same-value dismiss, and preserves Name', async () => {
     const user = userEvent.setup()
     renderModal(regionIntent)
 
@@ -1073,24 +1064,16 @@ describe('LocationCreateModal', () => {
     expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Westmark')
-    await user.click(
-      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Change region type' }))
+
+    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.getByText('Political')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { checked: true }))
 
     expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
-    expect(screen.getByText('Political')).toBeInTheDocument()
-    expect(screen.getByText(firstRegionTypeName!)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
-    expect(
-      screen.queryByRole('radiogroup', {
-        name: (name) => name.startsWith('What kind of'),
-      }),
-    ).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
-
-    await user.click(screen.getByRole('button', { name: 'Continue' }))
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Westmark')
-    expect(screen.getByText('Setup')).toBeInTheDocument()
     expect(screen.getByText('Political')).toBeInTheDocument()
     expect(screen.getByText(firstRegionTypeName!)).toBeInTheDocument()
   })

@@ -199,7 +199,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
 describe('resolveQuickNpcSetupSummaryRows', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
-  it('returns Role, Character, and Build rows when a title recommendation exists', () => {
+  it('returns Role, Species, and Build rows with explicit edit targets when a title recommendation exists', () => {
     const rows = resolveQuickNpcSetupSummaryRows({
       values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
@@ -212,13 +212,28 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
     })
 
     expect(rows).toEqual([
-      { label: 'Role', value: 'Guildmaster' },
-      { label: 'Character', value: expect.stringContaining('Dwarf') },
-      { label: 'Build', value: 'Covert operator' },
+      {
+        id: 'membershipTitle',
+        label: 'Role',
+        value: 'Guildmaster',
+        editTarget: { type: 'set', id: 'membershipTitle' },
+      },
+      {
+        id: 'speciesId',
+        label: 'Species',
+        value: 'Dwarf',
+        editTarget: { type: 'set', id: 'speciesId' },
+      },
+      {
+        id: 'quickNpcBuild',
+        label: 'Build',
+        value: 'Covert operator · Level 5 Fighter',
+        editTarget: { type: 'external', id: 'quickNpcBuild' },
+      },
     ])
   })
 
-  it('omits Build and uses No title for Role when no title recommendation exists', () => {
+  it('includes Build with level-only copy when no title recommendation exists', () => {
     const rows = resolveQuickNpcSetupSummaryRows({
       values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
@@ -231,12 +246,28 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
     })
 
     expect(rows).toEqual([
-      { label: 'Role', value: 'No title' },
-      { label: 'Character', value: expect.stringContaining('Dwarf') },
+      {
+        id: 'membershipTitle',
+        label: 'Role',
+        value: 'No title',
+        editTarget: { type: 'set', id: 'membershipTitle' },
+      },
+      {
+        id: 'speciesId',
+        label: 'Species',
+        value: 'Dwarf',
+        editTarget: { type: 'set', id: 'speciesId' },
+      },
+      {
+        id: 'quickNpcBuild',
+        label: 'Build',
+        value: 'Level 1 Fighter',
+        editTarget: { type: 'external', id: 'quickNpcBuild' },
+      },
     ])
   })
 
-  it('formats Character as species plus Level 0 without a phantom class', () => {
+  it('formats Build as level-only when class progression does not apply', () => {
     const elf = makeSpecies({ slug: 'elf', name: 'Elf' })
     const elfContext = createCampaignNpcBuilderContextFixture({
       catalog: {
@@ -255,7 +286,12 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       titles: [],
     })
 
-    expect(rows[1]).toEqual({ label: 'Character', value: 'Elf · Level 0' })
+    expect(rows[2]).toEqual({
+      id: 'quickNpcBuild',
+      label: 'Build',
+      value: 'Level 0',
+      editTarget: { type: 'external', id: 'quickNpcBuild' },
+    })
   })
 })
 

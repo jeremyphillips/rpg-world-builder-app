@@ -14,6 +14,7 @@ function buildModel(overrides: Partial<CreateSetupSequenceModel> = {}): CreateSe
     visibleSetIds: [],
     reopenSetId: null,
     reopen: () => undefined,
+    takeEditSessionDismiss: () => undefined,
     isEditingUpstream: false,
     isComplete: false,
     pendingExplicitDecisions: [],

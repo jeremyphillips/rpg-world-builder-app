@@ -63,13 +63,18 @@ export {
 
 export { createSetupModalBodyClasses } from './create-setup.variants'
 
+export { mapSetupSummaryRowModelsToProps } from './setup-summary-row-models.client'
+
 export type {
   CreateSetupChoiceSet,
   CreateSetupExternalDecision,
   CreateSetupPendingExplicitDecision,
+  CreateSetupReopenOptions,
   CreateSetupSequenceItem,
   CreateSetupSequenceModel,
   CreateSetupSet,
   CreateSetupSetBase,
   CreateSetupValueChangeEvent,
+  SetupSummaryEditTarget,
+  SetupSummaryRowModel,
 } from './create-setup.types'

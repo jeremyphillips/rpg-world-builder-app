@@ -12,7 +12,12 @@ import {
   type ModalContentProps,
 } from '@rpg/ui'
 
-import { SetupSummaryCard, SetupSummaryCardChangeAction } from '@/lib/create-setup'
+import {
+  SetupSummaryCard,
+  mapSetupSummaryRowModelsToProps,
+  type SetupSummaryEditTarget,
+  type SetupSummaryRowModel,
+} from '@/lib/create-setup'
 
 import {
   createModalShellBodyVariants,
@@ -63,10 +68,9 @@ export type CreateModalShellTab = {
 
 export type CreateModalShellSetupSummary = {
   eyebrow: string
-  rows: readonly { label: string; value: string }[]
+  rows: readonly SetupSummaryRowModel[]
   changeLabel?: string
-  changeAriaLabel?: string
-  onChange: () => void
+  onRowEdit: (target: SetupSummaryEditTarget) => void
 }
 
 export type CreateModalShellProps = {
@@ -200,14 +204,11 @@ export function CreateModalShell({
           {setupSummary ? (
             <SetupSummaryCard
               eyebrow={setupSummary.eyebrow}
-              rows={setupSummary.rows}
-              cardAction={
-                <SetupSummaryCardChangeAction
-                  changeLabel={setupSummary.changeLabel ?? 'Change'}
-                  ariaLabel={setupSummary.changeAriaLabel ?? 'Change setup'}
-                  onChange={setupSummary.onChange}
-                />
-              }
+              rows={mapSetupSummaryRowModelsToProps({
+                rows: setupSummary.rows,
+                changeLabel: setupSummary.changeLabel ?? 'Change',
+                onEdit: setupSummary.onRowEdit,
+              })}
             />
           ) : null}
           {tabs ? (

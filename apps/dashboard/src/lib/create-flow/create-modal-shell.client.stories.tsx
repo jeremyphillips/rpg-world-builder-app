@@ -46,10 +46,20 @@ export const OptionalRelationshipTabs: Story = {
     setupSummary: {
       eyebrow: 'Setup',
       rows: [
-        { label: 'Form', value: 'House' },
-        { label: 'Facility', value: 'Commercial' },
+        {
+          id: 'buildingForm',
+          label: 'Form',
+          value: 'House',
+          editTarget: { type: 'set', id: 'buildingForm' },
+        },
+        {
+          id: 'buildingFacilityAuthoringGroup',
+          label: 'Facility',
+          value: 'Commercial',
+          editTarget: { type: 'set', id: 'buildingFacilityAuthoringGroup' },
+        },
       ],
-      onChange: () => undefined,
+      onRowEdit: () => undefined,
     },
     tabs: [
       {

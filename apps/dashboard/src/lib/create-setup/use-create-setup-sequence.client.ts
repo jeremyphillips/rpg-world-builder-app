@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 
 import {
   resolveCreateSetupActiveSetId,
@@ -11,6 +11,7 @@ import {
 } from './create-setup-sequence.lib'
 import type {
   CreateSetupExternalDecision,
+  CreateSetupReopenOptions,
   CreateSetupSequenceModel,
   CreateSetupSet,
 } from './create-setup.types'
@@ -37,6 +38,7 @@ export function useCreateSetupSequence(
   options: UseCreateSetupSequenceOptions = {},
 ): CreateSetupSequenceModel {
   const [reopenSetId, setReopenSetId] = useState<string | null>(null)
+  const editSessionDismissRef = useRef<(() => void) | undefined>(undefined)
   const [confirmedRevisionById, setConfirmedRevisionById] = useState<Map<string, string>>(
     () => new Map(),
   )
@@ -97,11 +99,23 @@ export function useCreateSetupSequence(
     [confirmedRevisionById, externalDecisions, options.onSetupComplete, sequenceItems],
   )
 
+  const reopen = useCallback((setId: string | null, options?: CreateSetupReopenOptions) => {
+    setReopenSetId(setId)
+    editSessionDismissRef.current = setId != null ? options?.onDismiss : undefined
+  }, [])
+
+  const takeEditSessionDismiss = useCallback(() => {
+    const onDismiss = editSessionDismissRef.current
+    editSessionDismissRef.current = undefined
+    return onDismiss
+  }, [])
+
   return {
     activeSetId,
     visibleSetIds,
     reopenSetId,
-    reopen: setReopenSetId,
+    reopen,
+    takeEditSessionDismiss,
     isEditingUpstream: reopenSetId != null,
     isComplete,
     pendingExplicitDecisions,
@@ -139,10 +153,8 @@ export function notifyCreateSetupValueChangeCompletion(args: {
   confirmedRevisionById?: ReadonlyMap<string, string>
   onSetupComplete?: () => void
 }): void {
-  const { wasComplete, nextComplete } = evaluateCreateSetupCompletionTransition(args)
-  notifyCreateSetupCompletionTransition({
-    wasComplete,
-    nextComplete,
-    onSetupComplete: args.onSetupComplete,
-  })
+  const { nextComplete } = evaluateCreateSetupCompletionTransition(args)
+  if (nextComplete && args.onSetupComplete) {
+    args.onSetupComplete()
+  }
 }

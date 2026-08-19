@@ -38,7 +38,9 @@ function emitSetupValueChange(
   const previousValue = set.value
   if (!skipped && nextValue === previousValue) {
     if (input.model.reopenSetId === set.id) {
+      const onDismiss = input.model.takeEditSessionDismiss()
       input.model.reopen(null)
+      onDismiss?.()
     }
     return
   }
