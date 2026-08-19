@@ -196,6 +196,9 @@ describe('QuickNpcCreateModal', () => {
     expect(
       screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
     ).not.toBeInTheDocument()
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'No title, Change' })).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: /what species/i })).toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))

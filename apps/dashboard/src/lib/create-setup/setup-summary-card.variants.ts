@@ -7,7 +7,7 @@ export const setupSummaryCardShellClasses =
 
 export const setupSummaryCardListClasses = 'flex flex-col'
 
-export const setupSummaryCardRowClasses = 'flex justify-between gap-3'
+export const setupSummaryCardRowClasses = 'flex justify-between gap-3 py-0.5 first:pt-0 last:pb-0'
 
 export const setupSummaryCardRowDividerClasses = 'border-t border-border-subtle'
 

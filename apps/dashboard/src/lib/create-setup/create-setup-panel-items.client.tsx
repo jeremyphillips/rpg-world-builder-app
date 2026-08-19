@@ -5,6 +5,7 @@ import { CollapsibleRadioCardField, FieldLabelContent, NumberStepper, Text } fro
 
 import {
   isCreateSetupGroupedChoiceSummaryReady,
+  resolveCreateSetupCollapsedCompleteGroupedSetIds,
   resolveCreateSetupGroupedChoiceRows,
 } from './create-setup-completed-choice-groups.lib'
 import {
@@ -29,6 +30,7 @@ export type BuildCreateSetupPanelItemsInput = {
   changeLabel: string
   groupedChoiceSetIds: readonly string[]
   groupedSummaryEyebrow: string
+  allowPartialGroupedSummary?: boolean
   setReopenSetId: (setId: string | null) => void
 }
 
@@ -130,10 +132,18 @@ function renderNumberSet(
   )
 }
 
-function renderGroupedSummary(input: BuildCreateSetupPanelItemsInput): ReactNode {
+function resolveFirstVisibleGroupedSetId(input: BuildCreateSetupPanelItemsInput): string | null {
+  return input.visibleSetIds.find((setId) => input.groupedChoiceSetIds.includes(setId)) ?? null
+}
+
+function renderGroupedSummary(
+  input: BuildCreateSetupPanelItemsInput,
+  collapsedCompleteSetIds: readonly string[],
+): ReactNode {
   const groupedRows = resolveCreateSetupGroupedChoiceRows({
     groupedChoiceSetIds: input.groupedChoiceSetIds,
     setById: input.choiceSetById,
+    collapsedCompleteSetIds,
   })
 
   return (
@@ -168,11 +178,20 @@ export function buildCreateSetupPanelItems(input: BuildCreateSetupPanelItemsInpu
     return set.isComplete && !resolvePanelSetExpanded(set, input)
   }
 
-  const groupedSummaryReady = isCreateSetupGroupedChoiceSummaryReady({
+  const collapsedCompleteGroupedSetIds = resolveCreateSetupCollapsedCompleteGroupedSetIds({
     groupedChoiceSetIds: input.groupedChoiceSetIds,
     visibleSetIds: input.visibleSetIds,
     isCollapsedComplete,
   })
+
+  const groupedSummaryReady = isCreateSetupGroupedChoiceSummaryReady({
+    groupedChoiceSetIds: input.groupedChoiceSetIds,
+    visibleSetIds: input.visibleSetIds,
+    isCollapsedComplete,
+    allowPartial: input.allowPartialGroupedSummary,
+  })
+
+  const firstVisibleGroupedSetId = resolveFirstVisibleGroupedSetId(input)
 
   const renderedSetIds = new Set<string>()
   const panelItems: ReactNode[] = []
@@ -185,10 +204,10 @@ export function buildCreateSetupPanelItems(input: BuildCreateSetupPanelItemsInpu
     if (
       groupedSummaryReady &&
       input.groupedChoiceSetIds.length > 0 &&
-      setId === input.groupedChoiceSetIds[0]
+      setId === firstVisibleGroupedSetId
     ) {
-      panelItems.push(renderGroupedSummary(input))
-      for (const groupedSetId of input.groupedChoiceSetIds) {
+      panelItems.push(renderGroupedSummary(input, collapsedCompleteGroupedSetIds))
+      for (const groupedSetId of collapsedCompleteGroupedSetIds) {
         renderedSetIds.add(groupedSetId)
       }
       continue

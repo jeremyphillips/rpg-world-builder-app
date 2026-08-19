@@ -90,6 +90,7 @@ export function QuickNpcCreateSetupPhase({
         changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
         groupedChoiceSetIds={QUICK_NPC_SETUP_GROUPED_CHOICE_SET_IDS}
         groupedSummaryEyebrow={QUICK_NPC_SETUP_SELECTIONS_EYEBROW}
+        allowPartialGroupedSummary
         reopenSetId={reopenSetId}
         onReopenSetIdChange={setReopenSetId}
       />

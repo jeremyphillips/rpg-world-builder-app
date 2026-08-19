@@ -95,6 +95,23 @@ describe('SetupSummaryCard', () => {
     expect(onChangeSetup).toHaveBeenCalledOnce()
   })
 
+  it('applies compact row padding without top on the first row or bottom on the last', () => {
+    const { container } = render(
+      <SetupSummaryCard
+        eyebrow="Selections"
+        rows={[
+          { label: 'Title', value: 'Guildmaster' },
+          { label: 'Species', value: 'Gnome' },
+        ]}
+      />,
+    )
+
+    const rows = container.querySelectorAll('dl > div')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toHaveClass('py-0.5', 'first:pt-0', 'last:pb-0')
+    expect(rows[1]).toHaveClass('py-0.5', 'first:pt-0', 'last:pb-0')
+  })
+
   it('uses quiet summary chrome without selected-state ring tokens', () => {
     const { container } = render(
       <SetupSummaryCard eyebrow="Selections" rows={[{ label: 'Title', value: 'Guildmaster' }]} />,

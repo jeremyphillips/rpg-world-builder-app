@@ -33,6 +33,11 @@ export type CreateSetupPanelProps = {
    */
   groupedChoiceSetIds?: readonly string[]
   groupedSummaryEyebrow?: string
+  /**
+   * When true, render a quiet grouped summary as soon as any declared choice is
+   * collapsed-complete; incomplete grouped choices keep their active controls.
+   */
+  allowPartialGroupedSummary?: boolean
   className?: string
 }
 
@@ -44,6 +49,7 @@ export function CreateSetupPanel({
   onReopenSetIdChange,
   groupedChoiceSetIds = [],
   groupedSummaryEyebrow = CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW,
+  allowPartialGroupedSummary = false,
   className = createSetupModalBodyClasses,
 }: CreateSetupPanelProps) {
   assertCreateSetupSetsOnReset(sets)
@@ -92,6 +98,7 @@ export function CreateSetupPanel({
     changeLabel,
     groupedChoiceSetIds,
     groupedSummaryEyebrow,
+    allowPartialGroupedSummary,
     setReopenSetId,
   })
 

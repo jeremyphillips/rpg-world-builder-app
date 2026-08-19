@@ -268,6 +268,53 @@ describe('CreateSetupPanel', () => {
     expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
   })
 
+  it('renders a partial grouped summary while later grouped choices are still active', () => {
+    const sets: CreateSetupSet[] = [
+      {
+        id: 'membershipTitle',
+        kind: 'choice',
+        fieldLabel: 'Title',
+        prompt: 'Choose a title',
+        options: [{ value: 'guildmaster', label: 'Guildmaster' }],
+        value: 'guildmaster',
+        isComplete: true,
+        collapseWhenComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+      {
+        id: 'speciesId',
+        kind: 'choice',
+        fieldLabel: 'Species',
+        prompt: 'Choose a species',
+        options: SPECIES_OPTIONS,
+        value: '',
+        visibleWhenComplete: ['membershipTitle'],
+        isComplete: false,
+        collapseWhenComplete: true,
+        collapseWhenActiveAndComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+    ]
+
+    render(
+      <CreateSetupPanel
+        sets={sets}
+        groupedChoiceSetIds={['membershipTitle', 'speciesId']}
+        groupedSummaryEyebrow="Selections"
+        allowPartialGroupedSummary
+      />,
+    )
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Change species' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Guildmaster, Change' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Choose a species' })).toBeInTheDocument()
+  })
+
   it('does not group a third collapsed choice that is not in groupedChoiceSetIds', () => {
     const sets: CreateSetupSet[] = [
       {
