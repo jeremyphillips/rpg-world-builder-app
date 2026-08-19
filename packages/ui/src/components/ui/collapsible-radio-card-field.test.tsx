@@ -119,7 +119,7 @@ describe('CollapsibleRadioCardField', () => {
     expect(screen.getByRole('radio', { name: /Governs/i })).toBeChecked()
   })
 
-  it('calls onValueChange when the selected option is clicked again while expanded', async () => {
+  it('collapses without emitting when the selected option is clicked again while expanded', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()
 
@@ -139,7 +139,7 @@ describe('CollapsibleRadioCardField', () => {
 
     await user.click(screen.getByRole('radio', { name: /Governs/i }))
 
-    expect(onValueChange).toHaveBeenCalledWith('governs')
+    expect(onValueChange).not.toHaveBeenCalled()
   })
 
   it('collapses when the selected option is clicked again while expanded', async () => {

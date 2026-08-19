@@ -8,7 +8,7 @@ import {
 } from '../../lib/character-builder-fixtures'
 import {
   buildQuickNpcCreateSetupSets,
-  resolveQuickNpcAuthoringSetupSummaryRows,
+  resolveQuickNpcSetupSummaryRows,
   resolveQuickNpcSetupModel,
 } from './quick-npc-create-modal-setup.lib'
 import {
@@ -193,11 +193,11 @@ describe('resolveQuickNpcBuildCardModel', () => {
   })
 })
 
-describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
+describe('resolveQuickNpcSetupSummaryRows', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
   it('returns Role, Character, and Build rows when a title recommendation exists', () => {
-    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+    const rows = resolveQuickNpcSetupSummaryRows({
       values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
@@ -216,7 +216,7 @@ describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
   })
 
   it('omits Build and uses No title for Role when no title recommendation exists', () => {
-    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+    const rows = resolveQuickNpcSetupSummaryRows({
       values: {
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -241,7 +241,7 @@ describe('resolveQuickNpcAuthoringSetupSummaryRows', () => {
         species: [elf, ...populatedBuilderCatalog.species],
       },
     })
-    const rows = resolveQuickNpcAuthoringSetupSummaryRows({
+    const rows = resolveQuickNpcSetupSummaryRows({
       values: {
         speciesId: elf.id,
         membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,

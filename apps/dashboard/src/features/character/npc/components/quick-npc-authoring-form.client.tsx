@@ -47,7 +47,7 @@ import {
   QUICK_NPC_AUTHORING_SETUP_CHANGE_ARIA_LABEL,
   QUICK_NPC_SETUP_CHANGE_LABEL,
   QUICK_NPC_SETUP_SUMMARY_EYEBROW,
-  resolveQuickNpcAuthoringSetupSummaryRows,
+  resolveQuickNpcSetupSummaryRows,
 } from '../lib/quick-npc-create-modal-setup.lib'
 import {
   QUICK_NPC_GENERATE_NAME_LABEL,
@@ -250,7 +250,7 @@ export function QuickNpcAuthoringForm({
 
   const setupSummaryRows = React.useMemo(
     () =>
-      resolveQuickNpcAuthoringSetupSummaryRows({
+      resolveQuickNpcSetupSummaryRows({
         values: setup,
         context: buildContext,
         titles: organization.members?.titles ?? [],

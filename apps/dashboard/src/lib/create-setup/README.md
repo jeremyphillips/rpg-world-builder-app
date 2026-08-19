@@ -50,7 +50,25 @@ Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for th
 - Quick NPC modal setup — Title and Species via `CreateSetupPanel`; Class and Level in sibling `QuickNpcBuildCard`
 
 **Documented exception:** Building → Organizations composer uses its own stage machine but adopts the
-reveal invariant (hide downstream while editing upstream kind).
+reveal invariant (hide downstream while editing upstream kind via `LocationConnectionKindStep`
+`onExpandedChange`; same-value reselect collapses without downstream reset).
+
+Sequenced create-modal setup must use create-setup orchestration unless listed as a documented
+exception. `create-setup-parallel-path-drift.test.ts` guards direct `CollapsibleRadioCardField` /
+`RadioCardField` imports in `*create*` production components.
+
+## UX invariants
+
+- **Progressive reveal** — downstream setup UI stays hidden until upstream choices are complete, and
+  hides again while an upstream choice is being edited.
+- **Same-value reselect** — re-confirming the current choice dismisses edit mode without emitting a
+  value change or clearing downstream state.
+- **Single mutation channel** — feature applicators own all setup transitions; the panel emits
+  `onSetupValueChange` only for genuine changes.
+- **Grouped summaries** — `summaryGroup` members collapse into one `SetupSummaryCard` only when every
+  member is complete; a lone completed member stays on `ChooserSummaryCard`.
+- **Optional sets** — explicit skip completes the set for reveal; optional sets never auto-pass-through
+  to the next question.
 
 Do not route setup through `FormItem` / `Form` — that layer is for tabbed authoring, not progressive create setup.
 
@@ -67,4 +85,4 @@ onSetupValueChange({
 ```
 
 Feature applicators are the only mutation point. Sequenced create-modal setup must use create-setup
-orchestration unless listed as a documented exception.
+orchestration unless listed as a documented exception (see **Consumers** above).

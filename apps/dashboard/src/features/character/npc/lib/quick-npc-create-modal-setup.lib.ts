@@ -126,9 +126,6 @@ export function resolveQuickNpcSetupSummaryRows(args: {
   return rows
 }
 
-/** @deprecated Use `resolveQuickNpcSetupSummaryRows`. */
-export const resolveQuickNpcAuthoringSetupSummaryRows = resolveQuickNpcSetupSummaryRows
-
 type QuickNpcSetupSetBuilderArgs = {
   values: QuickNpcSetupValues
   titles: readonly OrganizationMembershipTitleDefinition[]

@@ -262,6 +262,42 @@ describe('BuildingOrganizationsCreateTab', () => {
     )
   })
 
+  it('hides organization discovery while the intent kind is being edited', async () => {
+    const user = userEvent.setup()
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+
+    await chooseOwnerIntent(user)
+    expect(
+      screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: LOCATION_CONNECTION_KIND_CHANGE_LABEL }))
+    expect(
+      screen.queryByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('radiogroup')).toBeInTheDocument()
+  })
+
+  it('restores discovery after same-value kind reselect without resetting search state', async () => {
+    const user = userEvent.setup()
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+
+    await chooseOwnerIntent(user)
+    const searchbox = screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL })
+    await user.type(searchbox, 'Copper')
+    expect(searchbox).toHaveValue('Copper')
+
+    await user.click(screen.getByRole('button', { name: LOCATION_CONNECTION_KIND_CHANGE_LABEL }))
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+
+    expect(
+      screen.getByRole('button', { name: `Owner, ${LOCATION_CONNECTION_KIND_CHANGE_LABEL}` }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
+    ).toHaveValue('Copper')
+  })
+
   it('collapses the chosen intent kind before organization discovery', async () => {
     const user = userEvent.setup()
     const onPlanChange = vi.fn()

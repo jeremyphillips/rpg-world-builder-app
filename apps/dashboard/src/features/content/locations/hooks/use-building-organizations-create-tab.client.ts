@@ -247,6 +247,7 @@ export function useBuildingOrganizationsCreateTab({
 
   const handleKindChange = React.useCallback(
     (value: BuildingOrganizationRelationshipDraft['kind']) => {
+      if (value === kind) return
       setValidationAttempted(false)
       setKind(value)
       if (!selectedOrganization) {
@@ -262,7 +263,7 @@ export function useBuildingOrganizationsCreateTab({
       setComposerStage(stillEligible ? 'review' : 'discovery')
       if (!stillEligible) setSelectedOrganization(null)
     },
-    [editingDraftId, kindOptionsFor, selectedOrganization],
+    [editingDraftId, kind, kindOptionsFor, selectedOrganization],
   )
 
   const selectExistingOrganization = React.useCallback((organizationId: string) => {

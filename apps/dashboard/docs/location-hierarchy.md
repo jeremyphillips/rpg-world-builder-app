@@ -67,13 +67,20 @@ Immediate children only. Expandable region rows split counts:
 ### Create setup
 
 Settlement, Region, and Site use the shared setup gate
-(`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. Detail Add
-location runs setup inside `LocationCreateModal`; overview/page create uses
+(`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. Building uses the same
+setup model inside `LocationCreateModal` (sequential Form → Facility with explicit skip on optional
+Form). Detail Add location runs setup inside `LocationCreateModal`; overview/page create uses
 `LocationCreateSetupHost` → `LocationCreateSetupSession`. Both consume
 `resolveLocationCreateModalSetupModel` / `applyLocationCreateModalSetupValueChange` for
-choice-set ids, `dependsOn`, continue, and complete. URL resume params
+choice-set ids, `dependsOn`, `visibleWhenComplete`, continue, and complete. URL resume params
 (`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
 same shortcut contract.
+
+Building → Organizations relationship drafting stays on the Add/Pending composer (not
+`CreateSetupPanel`) but adopts the same reveal invariant: editing relationship kind hides downstream
+discovery/review stages until the kind collapses.
+
+Orchestration lives in `@/lib/create-setup`; see `apps/dashboard/src/lib/create-setup/README.md`.
 
 Both subgroup actions derive from one `childAuthoringTypesForParentKind` result, projected
 by `resolveStructureChildAuthoringOptions`.

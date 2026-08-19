@@ -54,8 +54,9 @@ Recorded before the relationship-first refinement. Findings:
    `ContentEntityCard` (static).
 3. **Radio selection is domain-specific.** Add Member radios are membership
    titles from `OrganizationMembershipTitleField`. Relationship-first building
-   composition uses `LocationConnectionKindStep` (`CollapsibleRadioCardField` /
-   `ChooserSummaryCard`). Do not lift title vocabulary into shared UI.
+   composition uses `LocationConnectionKindStep` (the allowlisted wrapper around
+   `CollapsibleRadioCardField` / `ChooserSummaryCard`). Sequenced location and Quick
+   NPC setup use `CreateSetupPanel` instead. Do not lift title vocabulary into shared UI.
 4. **Lifted pieces.** Add/Pending mode root (`AddPendingWorkflow`) with one
    composing slot and one pending collection slot. Do not lift the picker Sheet,
    membership title field, or immediate-persist controller.
@@ -67,7 +68,9 @@ Recorded before the relationship-first refinement. Findings:
    props.
 7. **Pending edit stays in Pending mode.** The edited row swaps to hydrated
    `ChooserSummaryCard` review in place. Sibling pending cards remain visible.
-   This is not a return to Add/discovery at the root.
+   This is not a return to Add/discovery at the root. While the relationship kind
+   is expanded for edit, downstream discovery/review/branch stages hide until the
+   kind collapses again (same reveal invariant as create-setup).
 8. **Parallel patterns left in place.** `CatalogEntityRow` in picker sheets,
    equipment picker disclosure (commerce), and mutation-oriented relationship
    drawers. Do not migrate them in this phase.

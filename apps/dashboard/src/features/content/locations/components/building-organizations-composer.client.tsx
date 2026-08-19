@@ -1,5 +1,7 @@
 'use client'
 
+import * as React from 'react'
+
 import { type OrganizationLocationConnectionKind } from '@rpg/contracts'
 import { Alert, Button, ChooserSummaryCard, SearchBar, Text } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
@@ -332,9 +334,11 @@ function BuildingOrganizationReviewStage({
 function BuildingOrganizationRelationshipKindStep({
   controller,
   relationship,
+  onEditingChange,
 }: {
   controller: UseBuildingOrganizationsCreateTabResult
   relationship?: BuildingOrganizationRelationshipDraft
+  onEditingChange?: (editing: boolean) => void
 }) {
   const { kind, handleKindChange, intentKindOptions, kindOptionsFor } = controller
   const relationshipKindOptions = relationship
@@ -355,6 +359,7 @@ function BuildingOrganizationRelationshipKindStep({
       onValueChange={(value) => handleKindChange(value as OrganizationLocationConnectionKind)}
       changeLabel={LOCATION_CONNECTION_KIND_CHANGE_LABEL}
       defaultExpanded={!kind}
+      onExpandedChange={onEditingChange}
     />
   )
 }
@@ -421,18 +426,30 @@ export function BuildingOrganizationRelationshipReview({
   confirmLabel: string
   onConfirm: () => void
 }) {
+  const { kind } = controller
+  const [kindEditing, setKindEditing] = React.useState(() => !kind)
+
+  React.useEffect(() => {
+    if (!kind) {
+      setKindEditing(true)
+    }
+  }, [kind])
+
   return (
-    <div className={buildingOrganizationsComposerClasses}>
+    <div className={buildingOrganizationsComposerClasses} data-building-organization-composer>
       <BuildingOrganizationRelationshipKindStep
         controller={controller}
         relationship={relationship}
+        onEditingChange={setKindEditing}
       />
-      <BuildingOrganizationRelationshipStage
-        controller={controller}
-        relationship={relationship}
-        confirmLabel={confirmLabel}
-        onConfirm={onConfirm}
-      />
+      {!kindEditing ? (
+        <BuildingOrganizationRelationshipStage
+          controller={controller}
+          relationship={relationship}
+          confirmLabel={confirmLabel}
+          onConfirm={onConfirm}
+        />
+      ) : null}
     </div>
   )
 }

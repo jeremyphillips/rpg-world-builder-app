@@ -69,6 +69,12 @@ export function CollapsibleRadioCardField({
         : selectedOption?.description
 
   const handleValueChange = (nextValue: string) => {
+    if (nextValue === value) {
+      if (expanded) {
+        setExpanded(false)
+      }
+      return
+    }
     onValueChange?.(nextValue)
     if (collapseAfterSelect) {
       setExpanded(false)
