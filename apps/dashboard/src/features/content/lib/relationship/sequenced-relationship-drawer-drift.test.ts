@@ -17,6 +17,21 @@ const SEQUENCED_ADD_DRAWER_FILES = [
   ),
 ] as const
 
+const NESTED_CREATE_DRAWER_FILES = [
+  ...SEQUENCED_ADD_DRAWER_FILES,
+  fileURLToPath(
+    new URL(
+      '../../locations/components/location-inverse-organization-connection-link-drawer.client.tsx',
+      import.meta.url,
+    ),
+  ),
+] as const
+
+const NESTED_CREATE_RESOLVER_IMPORT =
+  "from '../../lib/relationship/relationship-picker-create-intents.lib'"
+const NESTED_CREATE_ORG_RESOLVER_IMPORT =
+  "from '../../lib/relationship/relationship-picker-nested-create.lib'"
+
 describe('sequenced relationship drawer drift', () => {
   for (const filePath of SEQUENCED_ADD_DRAWER_FILES) {
     const label = filePath.split('/').at(-1)
@@ -34,6 +49,39 @@ describe('sequenced relationship drawer drift', () => {
       expect(source).not.toContain('ChooserSummaryCard')
       expect(source).not.toContain('CollapsibleRadioCardField')
       expect(source).not.toContain('LocationConnectionKindStep')
+    })
+  }
+
+  const nestedCreateDrawerExpectations: Record<
+    string,
+    { resolverImport: string; usesNestedCreateHook: boolean }
+  > = {
+    'organization-location-connection-link-drawer.client.tsx': {
+      resolverImport: NESTED_CREATE_RESOLVER_IMPORT,
+      usesNestedCreateHook: true,
+    },
+    'location-inverse-organization-connection-link-drawer.client.tsx': {
+      resolverImport: NESTED_CREATE_ORG_RESOLVER_IMPORT,
+      usesNestedCreateHook: true,
+    },
+    'location-inverse-people-connection-link-drawer.client.tsx': {
+      resolverImport: NESTED_CREATE_ORG_RESOLVER_IMPORT,
+      usesNestedCreateHook: true,
+    },
+  }
+
+  for (const filePath of NESTED_CREATE_DRAWER_FILES) {
+    const label = filePath.split('/').at(-1)
+    const expectation = nestedCreateDrawerExpectations[label ?? '']
+
+    it(`${label} wires nested create through shared resolver and hook`, () => {
+      expect(expectation).toBeDefined()
+      const source = readFileSync(filePath, 'utf8')
+
+      expect(source).toContain(expectation!.resolverImport)
+      if (expectation!.usesNestedCreateHook) {
+        expect(source).toContain('useRelationshipPickerNestedCreate')
+      }
     })
   }
 })

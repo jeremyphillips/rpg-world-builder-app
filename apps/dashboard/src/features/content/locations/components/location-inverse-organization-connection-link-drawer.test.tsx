@@ -1,6 +1,8 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+
+import { renderWithProviders } from '@/test/render'
 
 import {
   guildhallBuilding,
@@ -56,7 +58,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regressi
   it('does not show a broad family kind selector for Add headquarters', () => {
     const location = testSettlementLocation()
 
-    render(
+    renderWithProviders(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -82,7 +84,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer direct-intent regressi
   it('does not show a broad family kind selector for Add owner on a building', () => {
     const location = guildhallBuilding()
 
-    render(
+    renderWithProviders(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -109,7 +111,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer change-kind', () => {
     const user = userEvent.setup()
     const location = guildhallBuilding()
 
-    render(
+    renderWithProviders(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -162,7 +164,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   it('uses site-family replace copy without territorial drawer strings', () => {
     const location = guildhallBuilding()
 
-    render(
+    renderWithProviders(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -196,7 +198,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   it('uses territorial replace copy for territorial authority intent', () => {
     const location = testSettlementLocation()
 
-    render(
+    renderWithProviders(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -237,7 +239,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const location = guildhallBuilding()
 
-    render(
+    renderWithProviders(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -275,7 +277,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   it('shows read-only relationship type and organization picker without kind controls', () => {
     const location = guildhallBuilding()
 
-    render(
+    renderWithProviders(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -302,7 +304,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   it('evaluates replace-organization availability for the persisted kind, not site-family union', () => {
     const location = infrastructureLocation()
 
-    render(
+    renderWithProviders(
       <LocationInverseOrganizationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}

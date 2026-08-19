@@ -75,6 +75,11 @@ import {
   resolvePeopleKindSlotSubjectTypeFieldLabel,
 } from '../lib/location-connected-parties-people-kind-slots'
 import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
+import {
+  revalidateCreatedOrganizationForInverseDrawer,
+  resolveRelationshipPickerOrganizationCreateIntents,
+} from '../../lib/relationship/relationship-picker-nested-create.lib'
+import { useRelationshipPickerNestedCreate } from '../../lib/relationship/use-relationship-picker-nested-create.client'
 
 export type LocationInversePeopleConnectionLinkDrawerProps = {
   open: boolean
@@ -275,8 +280,14 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     ? organizationDrawerIntentFromKind(organizationDomain)
     : undefined
 
-  const organizationAvailabilityKinds = organizationDomain ? [organizationDomain] : []
-  const characterAvailabilityKinds = characterKind ? [characterKind] : []
+  const organizationAvailabilityKinds = React.useMemo(
+    () => (organizationDomain ? [organizationDomain] : []),
+    [organizationDomain],
+  )
+  const characterAvailabilityKinds = React.useMemo(
+    () => (characterKind ? [characterKind] : []),
+    [characterKind],
+  )
 
   const instructionCopy = (() => {
     if (organizationDomain) {
@@ -301,8 +312,67 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     return LOCATION_PEOPLE_SECTION_SURFACE_COPY.add
   })()
 
+  const nestedCreateIntents = React.useMemo(() => {
+    if (
+      effectiveSubjectType !== 'organization' ||
+      !showEntityPicker ||
+      editingKind ||
+      !organizationDomain ||
+      !canAddOrganization
+    ) {
+      return []
+    }
+
+    return resolveRelationshipPickerOrganizationCreateIntents({
+      locationId: location.id,
+      kinds: organizationAvailabilityKinds,
+      orgRows,
+    })
+  }, [
+    canAddOrganization,
+    editingKind,
+    effectiveSubjectType,
+    location.id,
+    organizationAvailabilityKinds,
+    orgRows,
+    organizationDomain,
+    showEntityPicker,
+  ])
+
+  const nestedCreate = useRelationshipPickerNestedCreate({
+    campaignId,
+    enabled:
+      effectiveSubjectType === 'organization' &&
+      showEntityPicker &&
+      !editingKind &&
+      Boolean(organizationDomain) &&
+      canAddOrganization,
+    createIntents: nestedCreateIntents,
+    locationId: location.id,
+    onSelectCreatedOrganization: setSelectedOrganizationId,
+    revalidateCreatedOrganization: (organization, freshOrgRows) => {
+      if (!organizationDomain) {
+        return false
+      }
+
+      return revalidateCreatedOrganizationForInverseDrawer({
+        organization,
+        locationId: location.id,
+        kinds: organizationAvailabilityKinds,
+        orgRows: freshOrgRows,
+      })
+    },
+  })
+
+  const {
+    auxiliaryAction: nestedCreateAuxiliaryAction,
+    modals: nestedCreateModals,
+    nestedCreateBusy,
+  } = nestedCreate
+
   const canSubmit = Boolean(
     !isSubmitting &&
+    !nestedCreateBusy &&
     ((effectiveSubjectType === 'organization' &&
       selectedOrganizationId &&
       organizationDomain &&
@@ -420,67 +490,75 @@ function LocationInversePeopleConnectionLinkDrawerContent({
 
   if (effectiveSubjectType === 'organization') {
     return (
-      <CatalogEntityPickerSheet
-        {...sharedSheetProps}
-        searchPlaceholder={
-          resolveLocationInverseOrganizationTargetPresentation(organizationDomain).searchPlaceholder
-        }
-        noItemsMessage="No organizations are available."
-        footer={
-          showEntityPicker && !editingKind && selectedOrganizationId && organizationDomain ? (
-            <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-              {submitLabel}
-            </Button>
-          ) : undefined
-        }
-        items={showEntityPicker ? organizations : []}
-        getItemKey={(organization) => organization.id}
-        getItemToolbarLabel={(organization) => organization.name}
-        getSearchText={(organization) =>
-          [organization.name, getOrganizationDomainLabel(organization.organizationDomain)].join(' ')
-        }
-        renderEntityRow={createCatalogEntityRowRenderer({
-          buildEntity: (organization) =>
-            buildOrganizationPickerEntitySummary(organization, {
-              imageKey: organization.imageKey,
-              description:
+      <>
+        {nestedCreateModals}
+        <CatalogEntityPickerSheet
+          {...sharedSheetProps}
+          loading={nestedCreateBusy}
+          auxiliaryAction={nestedCreateAuxiliaryAction}
+          searchPlaceholder={
+            resolveLocationInverseOrganizationTargetPresentation(organizationDomain)
+              .searchPlaceholder
+          }
+          noItemsMessage="No organizations are available."
+          footer={
+            showEntityPicker && !editingKind && selectedOrganizationId && organizationDomain ? (
+              <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
+                {submitLabel}
+              </Button>
+            ) : undefined
+          }
+          items={showEntityPicker ? organizations : []}
+          getItemKey={(organization) => organization.id}
+          getItemToolbarLabel={(organization) => organization.name}
+          getSearchText={(organization) =>
+            [organization.name, getOrganizationDomainLabel(organization.organizationDomain)].join(
+              ' ',
+            )
+          }
+          renderEntityRow={createCatalogEntityRowRenderer({
+            buildEntity: (organization) =>
+              buildOrganizationPickerEntitySummary(organization, {
+                imageKey: organization.imageKey,
+                description:
+                  organizationDomain != null &&
+                  !organizationInverseSubjectHasAvailableKind(
+                    organization.id,
+                    location.id,
+                    organizationAvailabilityKinds,
+                    orgRows,
+                  )
+                    ? organizationFullyLinkedReason
+                    : undefined,
+              }),
+            buildTrailing: (organization) => {
+              const isSelected = selectedOrganizationId === organization.id
+              const hasAvailableKind =
                 organizationDomain != null &&
-                !organizationInverseSubjectHasAvailableKind(
+                organizationInverseSubjectHasAvailableKind(
                   organization.id,
                   location.id,
                   organizationAvailabilityKinds,
                   orgRows,
                 )
-                  ? organizationFullyLinkedReason
-                  : undefined,
-            }),
-          buildTrailing: (organization) => {
-            const isSelected = selectedOrganizationId === organization.id
-            const hasAvailableKind =
-              organizationDomain != null &&
-              organizationInverseSubjectHasAvailableKind(
-                organization.id,
-                location.id,
-                organizationAvailabilityKinds,
-                orgRows,
-              )
-            const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
+              const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
-            return {
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  phase={phase}
-                  canSelect={hasAvailableKind}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => setSelectedOrganizationId(organization.id)}
-                  onRemove={() => setSelectedOrganizationId(null)}
-                />
-              ),
-            }
-          },
-        })}
-      />
+              return {
+                kind: 'action',
+                content: (
+                  <CatalogPickerSelectionActions
+                    phase={phase}
+                    canSelect={hasAvailableKind}
+                    addLabel={isSelected ? 'Selected' : 'Select'}
+                    onAdd={() => setSelectedOrganizationId(organization.id)}
+                    onRemove={() => setSelectedOrganizationId(null)}
+                  />
+                ),
+              }
+            },
+          })}
+        />
+      </>
     )
   }
 

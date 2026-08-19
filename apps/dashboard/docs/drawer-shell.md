@@ -78,10 +78,10 @@ Footer composition:
 
 ### CatalogPickerSheet slot policy
 
-| Slot              | Role                                                                | Examples                             |
-| ----------------- | ------------------------------------------------------------------- | ------------------------------------ |
-| `auxiliaryAction` | Quiet **alternate acquisition** when the desired item may not exist | Create new NPC, Create location      |
-| `footer`          | **Concluding drawer action** for the current workflow               | Submit link, Done, Confirm selection |
+| Slot              | Role                                                                | Examples                                             |
+| ----------------- | ------------------------------------------------------------------- | ---------------------------------------------------- |
+| `auxiliaryAction` | Quiet **alternate acquisition** when the desired item may not exist | Create new NPC, Create location, Create organization |
+| `footer`          | **Concluding drawer action** for the current workflow               | Submit link, Done, Confirm selection                 |
 
 Rules:
 
@@ -107,6 +107,7 @@ Cancel buttons in form drawers use `DrawerShell.Close`, not `Sheet.Close`.
 | Surface                                   | Scaffold                                                                 |
 | ----------------------------------------- | ------------------------------------------------------------------------ |
 | Location create (detail Add location)     | `LocationCreateModal` → `ContentFormHost`                                |
+| Organization create (relationship picker) | `OrganizationCreateModal` → `ContentFormHost`                            |
 | Quick NPC (org Add member)                | `OrganizationMemberPickerDrawer` + character-owned `QuickNpcCreateModal` |
 | Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                                      |
 | Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)                                    |
@@ -127,6 +128,13 @@ The parent hook owns exclusive overlay modes and passes context between shells:
 ```text
 add (picker drawer)  →  createNpc (modal)  →  cancel returns to add  →  success closes all
 ```
+
+**Relationship picker nested create** (organization/location Add drawers): launch
+`OrganizationCreateModal` or `LocationCreateModal` as a sibling while the picker stays
+mounted. Cancel returns to the picker unchanged. Success calls `onCreated({ contentType, id })`,
+closes the modal immediately, and returns to the picker — the drawer refetches catalogs,
+revalidates eligibility (type, occupancy, duplicate edges), then selects the created entity.
+Footer submit still persists the relationship. Do not copy org-member “success closes all.”
 
 Quick NPC: the organizations hook toggles `add` | `createNpc`; the character feature owns
 `QuickNpcCreateModal` (Setup, TabbedForm authoring, create). See

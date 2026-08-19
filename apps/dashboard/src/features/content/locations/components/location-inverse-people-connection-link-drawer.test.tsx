@@ -1,7 +1,9 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
+
+import { renderWithProviders } from '@/test/render'
 
 import { YAWNING_PORTAL, LOCATIONS_LIST } from '../fixtures'
 import { buildLocationsById } from '../lib/location-display'
@@ -51,7 +53,7 @@ const sampleCharacters = [
 
 describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('starts with a relationship kind step before entity selection', () => {
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -82,7 +84,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('shows subject type segments only after selecting an ambiguous kind', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -109,7 +111,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('auto-resolves a single subject type after kind selection', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -149,7 +151,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
       sectionGroup: 'people_and_organizations' as const,
     }
 
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -177,7 +179,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   })
 
   it('shows locked kind and picker without Change when only one kind slot exists', () => {
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -205,7 +207,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('switches picker copy when the subject type segment changes', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -230,7 +232,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('hides subject type, picker, and footer while editing kind upstream', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -268,7 +270,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('retains organization selection through kind edit overlay and same-value dismiss', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -300,7 +302,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('preserves organization selection when changing to another compatible kind', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -330,7 +332,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('clears organization selection when changing to an incompatible kind', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
@@ -358,7 +360,7 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
   })
 
   itAxe('has no axe accessibility violations', async () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <LocationInversePeopleConnectionLinkDrawer
         open
         onOpenChange={() => undefined}
