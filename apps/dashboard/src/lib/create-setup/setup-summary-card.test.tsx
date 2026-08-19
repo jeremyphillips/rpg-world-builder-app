@@ -41,6 +41,35 @@ describe('SetupSummaryCard', () => {
     expect(onChangeTitle).toHaveBeenCalledOnce()
   })
 
+  it('calls onValueClick when the row value is clicked', async () => {
+    const user = userEvent.setup()
+    const onChangeTitle = vi.fn()
+
+    render(
+      <SetupSummaryCard
+        eyebrow="Selections"
+        rows={[
+          {
+            label: 'Title',
+            value: 'Guildmaster',
+            onValueClick: onChangeTitle,
+            valueActionAriaLabel: 'Change title',
+            action: (
+              <SetupSummaryCardChangeAction
+                changeLabel="Change"
+                ariaLabel="Change title"
+                onChange={onChangeTitle}
+              />
+            ),
+          },
+        ]}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Guildmaster, Change title' }))
+    expect(onChangeTitle).toHaveBeenCalledOnce()
+  })
+
   it('renders a card-level change action when provided', async () => {
     const user = userEvent.setup()
     const onChangeSetup = vi.fn()
@@ -75,6 +104,35 @@ describe('SetupSummaryCard', () => {
     expect(card).toHaveClass('bg-surface-muted')
     expect(card?.className).not.toContain('ring-primary')
     expect(card?.className).not.toContain('border-primary')
+  })
+
+  it('renders colon labels and reserves compact control height on the primary line', () => {
+    const { container } = render(
+      <SetupSummaryCard
+        eyebrow="Setup"
+        rows={[
+          { label: 'Role', value: 'No title' },
+          {
+            label: 'Title',
+            value: 'Guildmaster',
+            action: (
+              <SetupSummaryCardChangeAction
+                changeLabel="Change"
+                ariaLabel="Change title"
+                onChange={() => undefined}
+              />
+            ),
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('Role:')).toBeInTheDocument()
+    expect(screen.getByText('Title:')).toBeInTheDocument()
+    expect(container.querySelector('.min-h-control-action-compact')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change title' })).toHaveClass(
+      'h-control-action-compact',
+    )
   })
 
   itAxe('has no axe accessibility violations', async () => {

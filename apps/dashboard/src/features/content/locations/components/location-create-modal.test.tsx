@@ -1032,7 +1032,9 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
 
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Political' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}` }),
+    ).toBeInTheDocument()
     expect(
       screen.queryByRole('radiogroup', {
         name: (name) => name.startsWith('What kind of'),

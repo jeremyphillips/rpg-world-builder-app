@@ -15,7 +15,7 @@ export const quickNpcBuildCardIdentityTitleClasses = 'heading-style-card text-fo
 export const quickNpcBuildCardAttributesShellClasses =
   'flex flex-col rounded-md border border-border bg-sunken shadow-surface-sunken'
 
-export const quickNpcBuildCardAttributeRowClasses = 'flex flex-col px-4 py-3'
+export const quickNpcBuildCardAttributeRowClasses = 'flex flex-col px-3 py-2'
 
 export const quickNpcBuildCardAttributeRowDividerClasses = 'border-t border-border'
 

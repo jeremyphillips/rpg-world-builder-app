@@ -31,6 +31,24 @@ describe('RadioCard', () => {
     expect(onValueChange).toHaveBeenCalledWith('3e')
   })
 
+  it('calls onValueChange when the selected option is clicked again', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    render(
+      <RadioCard
+        aria-label="Edition preset"
+        options={options}
+        value="5e"
+        onValueChange={onValueChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Modern 5e/i }))
+
+    expect(onValueChange).toHaveBeenCalledWith('5e')
+    expect(onValueChange).toHaveBeenCalledTimes(1)
+  })
+
   it('marks the selected option as checked', () => {
     render(<RadioCard aria-label="Edition preset" options={options} value="5e" />)
     expect(screen.getByRole('radio', { name: /Modern 5e/i })).toBeChecked()

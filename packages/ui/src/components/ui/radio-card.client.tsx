@@ -35,6 +35,24 @@ export const RADIO_CARD_DEFAULT_DETAILS_LABEL = 'Details'
 
 export const RADIO_CARD_SUMMARY_SEPARATOR = ' · '
 
+/** Radix RadioGroup skips onValueChange when the current option is clicked again. */
+export function createRadioCardReselectClickHandler(
+  optionValue: string,
+  selectedValue: string | undefined,
+  onValueChange?: (value: string) => void,
+  disabled?: boolean,
+): React.MouseEventHandler<HTMLButtonElement> | undefined {
+  if (!onValueChange || disabled) {
+    return undefined
+  }
+
+  return () => {
+    if (selectedValue === optionValue) {
+      onValueChange(optionValue)
+    }
+  }
+}
+
 export type RadioCardDensity = 'default' | 'compact'
 
 export type RadioCardVariant = 'card' | 'row'
@@ -286,6 +304,8 @@ const RadioCardItem = React.forwardRef<
       titleClassName,
       controlPosition = 'left',
       disabled,
+      onClick,
+      value,
       ...props
     },
     ref,
@@ -293,7 +313,9 @@ const RadioCardItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       disabled={disabled}
+      value={value}
       className={cn(radioCardVariants({ density, variant }), className)}
+      onClick={onClick}
       {...props}
     >
       <RadioCardItemContent
@@ -319,6 +341,8 @@ type RadioCardOptionWithDetailsProps = {
   density: RadioCardDensity
   idPrefix: string
   selected: boolean
+  selectedValue?: string
+  onValueChange?: (value: string) => void
 }
 
 function RadioCardOptionWithDetails({
@@ -326,6 +350,8 @@ function RadioCardOptionWithDetails({
   density,
   idPrefix,
   selected,
+  selectedValue,
+  onValueChange,
 }: RadioCardOptionWithDetailsProps) {
   const summaryText =
     option.summaryItems && option.summaryItems.length > 0
@@ -341,6 +367,12 @@ function RadioCardOptionWithDetails({
           value={option.value}
           disabled={option.disabled}
           className={cn(radioCardItemWithDetailsVariants(), 'group')}
+          onClick={createRadioCardReselectClickHandler(
+            option.value,
+            selectedValue,
+            onValueChange,
+            option.disabled,
+          )}
         >
           <RadioCardControl variant="card" density={density} className="col-start-1 row-start-1" />
           <div
@@ -402,12 +434,16 @@ function RadioCard({
   density = 'default',
   controlPosition = 'left',
   value,
+  onValueChange,
   ...props
 }: RadioCardProps) {
+  const selectedValue = value ?? undefined
+
   return (
     <RadioGroup
       className={cn(radioCardGroupGapVariants({ variant, density }), className)}
       value={value}
+      onValueChange={onValueChange}
       {...props}
     >
       {options.map((option) => {
@@ -418,7 +454,9 @@ function RadioCard({
               option={option}
               density={density}
               idPrefix={idPrefix}
-              selected={value === option.value}
+              selected={selectedValue === option.value}
+              selectedValue={selectedValue}
+              onValueChange={onValueChange}
             />
           )
         }
@@ -439,6 +477,12 @@ function RadioCard({
             density={density}
             variant={variant}
             controlPosition={controlPosition}
+            onClick={createRadioCardReselectClickHandler(
+              option.value,
+              selectedValue,
+              onValueChange,
+              option.disabled,
+            )}
           />
         )
       })}

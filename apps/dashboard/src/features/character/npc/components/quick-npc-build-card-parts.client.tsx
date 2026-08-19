@@ -107,7 +107,7 @@ export function BuildCardTemplateIdentity({
         <Text as="h3" className={quickNpcBuildCardIdentityTitleClasses}>
           {templateLabel}
         </Text>
-        <Badge appearance="soft" tone="success" size="sm" leadingIcon={<CheckIcon />}>
+        <Badge appearance="soft" tone="neutral" size="sm" leadingIcon={<CheckIcon />}>
           {QUICK_NPC_BUILD_RECOMMENDED_BADGE_LABEL}
         </Badge>
       </div>

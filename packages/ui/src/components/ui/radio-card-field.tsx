@@ -3,6 +3,7 @@ import { Eyebrow } from './eyebrow'
 import {
   RadioCard,
   RadioCardItem,
+  createRadioCardReselectClickHandler,
   type RadioCardDensity,
   type RadioCardOption,
 } from './radio-card.client'
@@ -83,6 +84,12 @@ function GroupedRadioCardOptions({
                 summaryItems={option.summaryItems}
                 summaryLines={option.summaryLines}
                 density={density}
+                onClick={createRadioCardReselectClickHandler(
+                  option.value,
+                  value,
+                  onValueChange,
+                  option.disabled,
+                )}
               />
             ))}
           </div>

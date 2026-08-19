@@ -65,7 +65,9 @@ describe('CollapsibleRadioCardField', () => {
 
     await user.click(screen.getByRole('radio', { name: /Governs/i }))
 
-    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Governs, Change connection type' }),
+    ).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Authority type' })).not.toBeInTheDocument()
   })
 
@@ -85,12 +87,90 @@ describe('CollapsibleRadioCardField', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Governs, Change connection type' }),
+    ).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Change connection type' }))
 
     expect(screen.getByRole('radiogroup', { name: 'Authority type' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Governs/i })).toBeChecked()
+  })
+
+  it('re-expands the chooser when the selected title is clicked', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <CollapsibleRadioCardField
+        id="connection-kind"
+        label="Authority type"
+        summaryEyebrow="Authority type"
+        changeLabel="Change connection type"
+        options={options}
+        value="governs"
+        defaultExpanded={false}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Governs, Change connection type' }))
+
+    expect(screen.getByRole('radiogroup', { name: 'Authority type' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Governs/i })).toBeChecked()
+  })
+
+  it('calls onValueChange when the selected option is clicked again while expanded', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+
+    render(
+      <CollapsibleRadioCardField
+        id="connection-kind"
+        label="Authority type"
+        summaryEyebrow="Authority type"
+        changeLabel="Change connection type"
+        options={options}
+        value="governs"
+        expanded
+        collapseAfterSelect={false}
+        onValueChange={onValueChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Governs/i }))
+
+    expect(onValueChange).toHaveBeenCalledWith('governs')
+  })
+
+  it('collapses when the selected option is clicked again while expanded', async () => {
+    const user = userEvent.setup()
+
+    function ControlledField() {
+      const [expanded, setExpanded] = useState(true)
+
+      return (
+        <CollapsibleRadioCardField
+          id="connection-kind"
+          label="Authority type"
+          summaryEyebrow="Authority type"
+          changeLabel="Change connection type"
+          options={options}
+          value="governs"
+          expanded={expanded}
+          onExpandedChange={setExpanded}
+          onValueChange={vi.fn()}
+        />
+      )
+    }
+
+    render(<ControlledField />)
+
+    await user.click(screen.getByRole('radio', { name: /Governs/i }))
+
+    expect(
+      screen.getByRole('button', { name: 'Governs, Change connection type' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Authority type' })).not.toBeInTheDocument()
   })
 
   it('opens collapsed when a value is pre-selected', () => {
@@ -106,7 +186,9 @@ describe('CollapsibleRadioCardField', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Controls' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Controls, Change connection type' }),
+    ).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Authority type' })).not.toBeInTheDocument()
   })
 
@@ -142,7 +224,9 @@ describe('CollapsibleRadioCardField', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Governs, Change connection type' }),
+    ).toBeInTheDocument()
     expect(
       screen.queryByText('Exercises political authority over this region.'),
     ).not.toBeInTheDocument()

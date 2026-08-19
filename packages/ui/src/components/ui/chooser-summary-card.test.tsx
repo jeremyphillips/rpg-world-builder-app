@@ -18,7 +18,9 @@ describe('ChooserSummaryCard', () => {
     )
 
     expect(screen.getByText('Connection type')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Governs, Change connection type' }),
+    ).toBeInTheDocument()
     expect(screen.getByText('Exercises political authority over this region.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change connection type' })).toBeInTheDocument()
   })
@@ -37,6 +39,24 @@ describe('ChooserSummaryCard', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Change connection type' }))
+
+    expect(onChange).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onChange when the selected title is clicked', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+
+    render(
+      <ChooserSummaryCard
+        eyebrow="Connection type"
+        changeLabel="Change connection type"
+        title="Governs"
+        onChange={onChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Governs, Change connection type' }))
 
     expect(onChange).toHaveBeenCalledTimes(1)
   })
@@ -72,7 +92,7 @@ describe('ChooserSummaryCard', () => {
     const primaryCopy = container.querySelector('article > div > div:last-child')
     expect(primaryCopy).toHaveClass('gap-0')
 
-    const title = screen.getByRole('heading', { name: 'City' })
+    const title = screen.getByRole('button', { name: 'City, Change settlement type' })
     expect(title).toHaveClass('text-base')
 
     const eyebrow = screen.getByText('Settlement type')

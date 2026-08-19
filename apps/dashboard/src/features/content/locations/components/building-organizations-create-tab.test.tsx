@@ -275,7 +275,11 @@ describe('BuildingOrganizationsCreateTab', () => {
     )
 
     await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
-    expect(screen.getByRole('heading', { name: 'Headquarters' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: `Headquarters, ${LOCATION_CONNECTION_KIND_CHANGE_LABEL}`,
+      }),
+    ).toBeInTheDocument()
     expect(screen.queryByRole('radio')).not.toBeInTheDocument()
     expect(onPlanChange).not.toHaveBeenCalled()
     await user.click(

@@ -3,6 +3,7 @@
 import { Button } from './button.client'
 import { Eyebrow } from './eyebrow'
 import { Text } from './text'
+import { cn } from '../../lib/utils'
 import type { RadioCardDensity } from './radio-card.client'
 import {
   chooserSummaryCardBodyVariants,
@@ -11,6 +12,7 @@ import {
   chooserSummaryCardEyebrowRowClasses,
   chooserSummaryCardPrimaryCopyVariants,
   chooserSummaryCardShellClasses,
+  chooserSummaryCardTitleButtonClasses,
   chooserSummaryCardTitleVariants,
 } from './chooser-summary-card.variants'
 
@@ -23,6 +25,10 @@ export type ChooserSummaryCardProps = {
   density?: RadioCardDensity
 }
 
+function buildChooserSummaryTitleAriaLabel(title: string, changeLabel: string): string {
+  return `${title}, ${changeLabel}`
+}
+
 export function ChooserSummaryCard({
   eyebrow,
   changeLabel,
@@ -31,6 +37,8 @@ export function ChooserSummaryCard({
   onChange,
   density = 'default',
 }: ChooserSummaryCardProps) {
+  const titleAriaLabel = buildChooserSummaryTitleAriaLabel(title, changeLabel)
+
   return (
     <article className={chooserSummaryCardShellClasses}>
       <div className={chooserSummaryCardBodyVariants({ density })}>
@@ -47,9 +55,17 @@ export function ChooserSummaryCard({
           </Button>
         </div>
         <div className={chooserSummaryCardPrimaryCopyVariants({ density })}>
-          <Text as="h3" className={chooserSummaryCardTitleVariants({ density })}>
+          <button
+            type="button"
+            className={cn(
+              chooserSummaryCardTitleVariants({ density }),
+              chooserSummaryCardTitleButtonClasses,
+            )}
+            aria-label={titleAriaLabel}
+            onClick={onChange}
+          >
             {title}
-          </Text>
+          </button>
           {description ? (
             <Text as="p" className={chooserSummaryCardDescriptionVariants({ density })}>
               {description}

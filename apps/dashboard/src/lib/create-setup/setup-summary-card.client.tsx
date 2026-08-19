@@ -2,16 +2,19 @@
 
 import type { ReactNode } from 'react'
 
-import { Button, Eyebrow } from '@rpg/ui'
+import { Button, Eyebrow, cn } from '@rpg/ui'
 
 import {
-  setupSummaryCardActionLinkClasses,
+  setupSummaryCardChangeActionClasses,
   setupSummaryCardListClasses,
+  setupSummaryCardRowActionColumnClasses,
+  setupSummaryCardRowCopyColumnClasses,
   setupSummaryCardRowClasses,
-  setupSummaryCardRowCopyClasses,
   setupSummaryCardRowDividerClasses,
   setupSummaryCardRowHelperVariants,
   setupSummaryCardRowLabelVariants,
+  setupSummaryCardRowPrimaryLineClasses,
+  setupSummaryCardRowValueButtonClasses,
   setupSummaryCardRowValueVariants,
   setupSummaryCardSectionClasses,
   setupSummaryCardShellClasses,
@@ -22,7 +25,14 @@ export type SetupSummaryRowProps = {
   value: ReactNode
   helper?: ReactNode
   action?: ReactNode
+  onValueClick?: () => void
+  valueActionAriaLabel?: string
   showDivider?: boolean
+}
+
+function buildSetupSummaryValueAriaLabel(value: ReactNode, actionAriaLabel: string): string {
+  const valueText = typeof value === 'string' || typeof value === 'number' ? String(value) : ''
+  return valueText ? `${valueText}, ${actionAriaLabel}` : actionAriaLabel
 }
 
 export function SetupSummaryRow({
@@ -30,8 +40,24 @@ export function SetupSummaryRow({
   value,
   helper,
   action,
+  onValueClick,
+  valueActionAriaLabel,
   showDivider,
 }: SetupSummaryRowProps) {
+  const valueContent =
+    onValueClick != null && valueActionAriaLabel != null ? (
+      <button
+        type="button"
+        className={cn(setupSummaryCardRowValueVariants(), setupSummaryCardRowValueButtonClasses)}
+        aria-label={buildSetupSummaryValueAriaLabel(value, valueActionAriaLabel)}
+        onClick={onValueClick}
+      >
+        {value}
+      </button>
+    ) : (
+      <span className={setupSummaryCardRowValueVariants()}>{value}</span>
+    )
+
   return (
     <div
       className={
@@ -40,12 +66,14 @@ export function SetupSummaryRow({
           : setupSummaryCardRowClasses
       }
     >
-      <div className={setupSummaryCardRowCopyClasses}>
-        <dt className={setupSummaryCardRowLabelVariants()}>{label}</dt>
-        <dd className={setupSummaryCardRowValueVariants()}>{value}</dd>
+      <div className={setupSummaryCardRowCopyColumnClasses}>
+        <div className={setupSummaryCardRowPrimaryLineClasses}>
+          <dt className={setupSummaryCardRowLabelVariants()}>{label}:</dt>
+          <dd className="min-w-0">{valueContent}</dd>
+        </div>
         {helper ? <p className={setupSummaryCardRowHelperVariants()}>{helper}</p> : null}
       </div>
-      {action}
+      {action ? <div className={setupSummaryCardRowActionColumnClasses}>{action}</div> : null}
     </div>
   )
 }
@@ -94,7 +122,8 @@ export function SetupSummaryCardChangeAction({
       type="button"
       variant="link"
       size="sm"
-      className={setupSummaryCardActionLinkClasses}
+      density="compact"
+      className={setupSummaryCardChangeActionClasses}
       aria-label={ariaLabel}
       onClick={onChange}
     >

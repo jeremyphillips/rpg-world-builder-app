@@ -220,6 +220,30 @@ describe('QuickNpcCreateModal', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('dismisses title reopen when the current title is re-selected', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Change title' }))
+    expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('radiogroup', { name: /choose this member/i }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+  })
+
   it('hides the build card when species is reopened', async () => {
     const user = userEvent.setup()
     renderModal()

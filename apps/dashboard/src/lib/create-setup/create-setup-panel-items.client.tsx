@@ -140,17 +140,23 @@ function renderGroupedSummary(input: BuildCreateSetupPanelItemsInput): ReactNode
     <SetupSummaryCard
       key={`grouped-${input.groupedChoiceSetIds.join('-')}`}
       eyebrow={input.groupedSummaryEyebrow}
-      rows={groupedRows.map((row) => ({
-        label: row.label,
-        value: row.valueLabel,
-        action: (
-          <SetupSummaryCardChangeAction
-            changeLabel={input.changeLabel}
-            ariaLabel={`Change ${row.label.toLowerCase()}`}
-            onChange={() => input.setReopenSetId(row.setId)}
-          />
-        ),
-      }))}
+      rows={groupedRows.map((row) => {
+        const valueActionAriaLabel = `Change ${row.label.toLowerCase()}`
+
+        return {
+          label: row.label,
+          value: row.valueLabel,
+          onValueClick: () => input.setReopenSetId(row.setId),
+          valueActionAriaLabel,
+          action: (
+            <SetupSummaryCardChangeAction
+              changeLabel={input.changeLabel}
+              ariaLabel={valueActionAriaLabel}
+              onChange={() => input.setReopenSetId(row.setId)}
+            />
+          ),
+        }
+      })}
     />
   )
 }

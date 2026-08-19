@@ -216,8 +216,8 @@ describe('CreateSetupPanel', () => {
 
     render(<CreateSetupPanel sets={sets} />)
 
-    expect(screen.getByRole('heading', { name: 'Guildmaster' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Dwarf' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Guildmaster, Change' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Dwarf, Change' })).toBeInTheDocument()
     expect(screen.queryByText('Selections')).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Change' })).toHaveLength(2)
   })
@@ -315,6 +315,6 @@ describe('CreateSetupPanel', () => {
     render(<CreateSetupPanel sets={sets} groupedChoiceSetIds={['membershipTitle', 'speciesId']} />)
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Fighter' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Fighter, Change' })).toBeInTheDocument()
   })
 })

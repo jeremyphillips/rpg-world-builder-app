@@ -65,7 +65,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
 
-    expect(screen.getByRole('heading', { name: 'Owner' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Owner, Change' })).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Relationship type' })).not.toBeInTheDocument()
     expect(screen.getByText('Royal Mint')).toBeInTheDocument()
   })
@@ -575,7 +575,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     )
 
     expect(screen.getByText(ORGANIZATION_LOCATION_LINK_NO_RESULTS)).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Owner' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Owner, Change' })).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations in kind summary mode', async () => {

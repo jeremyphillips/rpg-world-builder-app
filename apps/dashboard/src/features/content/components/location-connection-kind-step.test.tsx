@@ -69,7 +69,9 @@ describe('LocationConnectionKindStep', () => {
 
     await user.click(screen.getByRole('radio', { name: /Governs/i }))
 
-    expect(screen.getByRole('heading', { name: 'Governs' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Governs, Change connection type' }),
+    ).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Authority type' })).not.toBeInTheDocument()
   })
 
