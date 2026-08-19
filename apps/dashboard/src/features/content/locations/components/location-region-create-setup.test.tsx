@@ -72,10 +72,8 @@ describe('LocationRegionCreateSetup', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
 
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
-    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }),
-    ).toHaveAttribute('aria-checked', 'true')
+    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.getByText('Kingdom')).toBeInTheDocument()
   })
 
   it('completes with classification after both steps', async () => {

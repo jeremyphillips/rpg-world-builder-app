@@ -206,6 +206,10 @@ async function chooseBuildingFacilityGroup(
   await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
 }
 
+async function reopenBuildingFacility(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: 'Change facility' }))
+}
+
 async function chooseBuildingFacilityType(
   user: ReturnType<typeof userEvent.setup>,
   label:
@@ -754,6 +758,7 @@ describe('LocationCreateModal', () => {
     await user.click(
       screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
     )
+    await reopenBuildingFacility(user)
     await chooseBuildingFacilityGroup(user, 'Religious')
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
@@ -786,6 +791,7 @@ describe('LocationCreateModal', () => {
     await user.click(
       screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
     )
+    await reopenBuildingFacility(user)
     await chooseBuildingFacilityGroup(user, 'Commercial')
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
@@ -1046,7 +1052,7 @@ describe('LocationCreateModal', () => {
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
   })
 
-  it('shows multi-line region summary Change, returns to terminal setup, and preserves Name', async () => {
+  it('shows multi-line region summary Change, returns to summarized setup, and preserves Name', async () => {
     const user = userEvent.setup()
     renderModal(regionIntent)
 
@@ -1071,13 +1077,16 @@ describe('LocationCreateModal', () => {
       screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
     )
 
-    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.getByText('Political')).toBeInTheDocument()
+    expect(screen.getByText(firstRegionTypeName!)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
     expect(
       screen.queryByRole('radiogroup', {
         name: (name) => name.startsWith('What kind of'),
       }),
     ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
     await user.click(screen.getByRole('button', { name: 'Continue' }))
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Westmark')

@@ -167,7 +167,7 @@ describe('location create setup', () => {
     expect(screen.getByText('Choose the options that best describe this site.')).toBeInTheDocument()
   })
 
-  it('keeps a single choice set expanded after selection and omits summary chrome', async () => {
+  it('summarizes a completed single choice and enables Continue after selection', async () => {
     const user = userEvent.setup()
     const onContinue = vi.fn()
 
@@ -181,12 +181,12 @@ describe('location create setup', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Landmark') }))
 
     expect(
-      screen.getByRole('radiogroup', { name: 'What kind of site are you creating?' }),
-    ).toBeInTheDocument()
+      screen.queryByRole('radiogroup', { name: 'What kind of site are you creating?' }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Landmark')).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
     ).not.toBeInTheDocument()
-    expect(screen.queryByText('A notable place or feature in the world.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
     await user.click(screen.getByRole('button', { name: 'Continue' }))
@@ -224,7 +224,8 @@ describe('location create setup', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
 
-    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.getByText('Kingdom')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })

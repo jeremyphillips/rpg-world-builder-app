@@ -5,6 +5,7 @@ import {
   notifyCreateSetupCompletionTransition,
   resolveCreateSetupActiveSetId,
   resolveCreateSetupIsComplete,
+  resolveCreateSetupPendingExplicitDecisions,
   resolveCreateSetupSetExpanded,
   resolveCreateSetupSetIdsToInvalidate,
   resolveCreateSetupSetsComplete,
@@ -37,12 +38,12 @@ describe('create-setup-sequence', () => {
       ).toBe('siteType')
     })
 
-    it('keeps a single complete set active as terminal', () => {
+    it('returns null when a single set is already complete', () => {
       expect(
         resolveCreateSetupActiveSetId({
           sets: sequence([{ id: 'siteType', isComplete: true }]),
         }),
-      ).toBe('siteType')
+      ).toBeNull()
     })
 
     it('selects the first incomplete set in a multi-step flow', () => {
@@ -57,7 +58,7 @@ describe('create-setup-sequence', () => {
       ).toBe('regionType')
     })
 
-    it('skips incomplete optional sets and activates the first incomplete required set', () => {
+    it('activates the first incomplete eligible-now set, including optionals', () => {
       expect(
         resolveCreateSetupActiveSetId({
           sets: sequence([
@@ -66,7 +67,33 @@ describe('create-setup-sequence', () => {
             { id: 'operator', isComplete: false },
           ]),
         }),
-      ).toBe('operator')
+      ).toBe('form')
+    })
+
+    it('does not activate sets whose reveal prerequisites are unsatisfied', () => {
+      expect(
+        resolveCreateSetupActiveSetId({
+          sets: sequence([
+            { id: 'form', isComplete: false, required: false },
+            {
+              id: 'facility',
+              isComplete: false,
+              visibleWhenComplete: ['form'],
+            },
+          ]),
+        }),
+      ).toBe('form')
+    })
+
+    it('returns null when all eligible sets are complete even if an external decision remains pending', () => {
+      expect(
+        resolveCreateSetupActiveSetId({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: true },
+            { id: 'speciesId', isComplete: true, visibleWhenComplete: ['membershipTitle'] },
+          ]),
+        }),
+      ).toBeNull()
     })
 
     it('prefers a reopen id when it is still present', () => {
@@ -133,6 +160,18 @@ describe('create-setup-sequence', () => {
         }),
       ).toEqual(['a', 'b'])
     })
+
+    it('returns eligible complete sets when no question is active', () => {
+      expect(
+        resolveCreateSetupVisibleSetIds({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: true },
+            { id: 'speciesId', isComplete: true, visibleWhenComplete: ['membershipTitle'] },
+          ]),
+          activeSetId: null,
+        }),
+      ).toEqual(['membershipTitle', 'speciesId'])
+    })
   })
 
   describe('resolveCreateSetupSetsComplete', () => {
@@ -187,6 +226,33 @@ describe('create-setup-sequence', () => {
           confirmedRevisionById: new Map([['build', 'v1']]),
         }),
       ).toBe(true)
+    })
+
+    it('keeps setup incomplete while an explicit external decision is pending', () => {
+      const sets = sequence([
+        { id: 'membershipTitle', isComplete: true },
+        { id: 'speciesId', isComplete: true, visibleWhenComplete: ['membershipTitle'] },
+      ])
+      const externalDecisions = [
+        {
+          id: 'quickNpcBuild',
+          isResolved: false,
+          completion: 'explicit' as const,
+          revision: 'v1',
+        },
+      ]
+
+      expect(resolveCreateSetupActiveSetId({ sets })).toBeNull()
+      expect(resolveCreateSetupVisibleSetIds({ sets, activeSetId: null })).toEqual([
+        'membershipTitle',
+        'speciesId',
+      ])
+      expect(resolveCreateSetupIsComplete({ sets, externalDecisions })).toBe(false)
+      expect(
+        resolveCreateSetupPendingExplicitDecisions({ externalDecisions }).map(
+          (decision) => decision.id,
+        ),
+      ).toEqual(['quickNpcBuild'])
     })
   })
 

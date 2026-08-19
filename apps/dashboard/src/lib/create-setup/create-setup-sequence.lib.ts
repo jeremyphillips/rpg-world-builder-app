@@ -24,14 +24,14 @@ function isCreateSetupVisibilityGateOpen(
   return true
 }
 
-function filterCreateSetupSetsByVisibilityGate(
-  sets: readonly CreateSetupSequenceItem[],
-): CreateSetupSequenceItem[] {
-  const setsById = buildCreateSetupSetsById(sets)
-  return sets.filter((set) => isCreateSetupVisibilityGateOpen(set, setsById))
+function isCreateSetupSetEligibleNow(
+  set: CreateSetupSequenceItem,
+  setsById: Map<string, CreateSetupSequenceItem>,
+): boolean {
+  return isCreateSetupVisibilityGateOpen(set, setsById)
 }
 
-/** Active = reopened (if still present) ?? first incomplete required set ?? terminal. */
+/** Active = reopened (if eligible) ?? first incomplete eligible-now set ?? null on exhaustion. */
 export function resolveCreateSetupActiveSetId({
   sets,
   reopenSetId,
@@ -39,27 +39,20 @@ export function resolveCreateSetupActiveSetId({
   if (sets.length === 0) return null
 
   const setsById = buildCreateSetupSetsById(sets)
-  const visibleSets = filterCreateSetupSetsByVisibilityGate(sets)
 
   if (reopenSetId != null) {
     const reopenSet = setsById.get(reopenSetId)
-    if (reopenSet && isCreateSetupVisibilityGateOpen(reopenSet, setsById)) {
+    if (reopenSet && isCreateSetupSetEligibleNow(reopenSet, setsById)) {
       return reopenSetId
     }
   }
 
-  const firstIncompleteRequired = visibleSets.find(
-    (set) => set.required !== false && !set.isComplete,
+  const firstIncompleteEligible = sets.find(
+    (set) => isCreateSetupSetEligibleNow(set, setsById) && !set.isComplete,
   )
-  if (firstIncompleteRequired) return firstIncompleteRequired.id
+  if (firstIncompleteEligible) return firstIncompleteEligible.id
 
-  const firstIncompleteVisibilityGate = visibleSets.find((set) => {
-    if (set.isComplete) return false
-    return sets.some((candidate) => candidate.visibleWhenComplete?.includes(set.id))
-  })
-  if (firstIncompleteVisibilityGate) return firstIncompleteVisibilityGate.id
-
-  return visibleSets[visibleSets.length - 1]?.id ?? sets[sets.length - 1]?.id ?? null
+  return null
 }
 
 /** True when the set is the active decision control (expanded RadioCardField). */
@@ -77,8 +70,8 @@ export function resolveCreateSetupSetExpanded({
 }
 
 /**
- * Reveal completed or optional predecessors plus the active set. Required sets
- * still unlock in order; untouched optional sets are pass-through authoring.
+ * Reveal completed or optional predecessors plus the active set. When no question is
+ * active (exhaustion), returns all eligible-now complete sets for summary rendering.
  */
 export function resolveCreateSetupVisibleSetIds({
   sets,
@@ -87,16 +80,23 @@ export function resolveCreateSetupVisibleSetIds({
   sets: readonly CreateSetupSequenceItem[]
   activeSetId: string | null
 }): string[] {
-  if (sets.length === 0 || activeSetId == null) return []
+  if (sets.length === 0) return []
 
   const setsById = buildCreateSetupSetsById(sets)
+
+  if (activeSetId == null) {
+    return sets.flatMap((set) =>
+      isCreateSetupSetEligibleNow(set, setsById) && set.isComplete ? [set.id] : [],
+    )
+  }
+
   const activeIndex = sets.findIndex((set) => set.id === activeSetId)
   if (activeIndex < 0) return []
 
   const visibleIds: string[] = []
   for (let index = 0; index < sets.length; index += 1) {
     const set = sets[index]
-    if (!set || !isCreateSetupVisibilityGateOpen(set, setsById)) continue
+    if (!set || !isCreateSetupSetEligibleNow(set, setsById)) continue
     if (index < activeIndex && (set.isComplete || set.required === false)) {
       visibleIds.push(set.id)
       continue

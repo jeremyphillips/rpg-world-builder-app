@@ -172,6 +172,42 @@ describe('CreateSetupPanel', () => {
     expect(screen.getByRole('radiogroup', { name: 'Choose a class' })).toBeInTheDocument()
   })
 
+  it('renders completed summaries without an active control when setup sets are exhausted', () => {
+    const sets: CreateSetupSet[] = [
+      {
+        id: 'membershipTitle',
+        kind: 'choice',
+        fieldLabel: 'Title',
+        prompt: 'Choose a title',
+        options: [{ value: 'guildmaster', label: 'Guildmaster' }],
+        value: 'guildmaster',
+        summaryGroup: 'selections',
+        summaryGroupEyebrow: 'Selections',
+        isComplete: true,
+      },
+      {
+        id: 'speciesId',
+        kind: 'choice',
+        fieldLabel: 'Species',
+        prompt: 'Choose a species',
+        options: SPECIES_OPTIONS,
+        value: 'dwarf',
+        visibleWhenComplete: ['membershipTitle'],
+        summaryGroup: 'selections',
+        summaryGroupEyebrow: 'Selections',
+        isComplete: true,
+      },
+    ]
+
+    render(<GroupedSetupHarness sets={sets} />)
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Choose a title' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Choose a species' })).not.toBeInTheDocument()
+  })
+
   it('dismisses reopen without emitting a value change when the same option is re-selected', async () => {
     const user = userEvent.setup()
     const onSetupValueChange = vi.fn()

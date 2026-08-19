@@ -31,7 +31,7 @@ describe('LocationCreateSetupSession', () => {
     })
   })
 
-  it('keeps single-choice setup expanded without summary chrome after selection', async () => {
+  it('summarizes the completed choice without an active control after selection', async () => {
     const user = userEvent.setup()
 
     render(
@@ -46,8 +46,10 @@ describe('LocationCreateSetupSession', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('City') }))
 
     expect(
-      screen.getByRole('radiogroup', { name: SETTLEMENT_CREATE_SETUP_PROMPT }),
-    ).toBeInTheDocument()
+      screen.queryByRole('radiogroup', { name: SETTLEMENT_CREATE_SETUP_PROMPT }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('City')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Change' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 })

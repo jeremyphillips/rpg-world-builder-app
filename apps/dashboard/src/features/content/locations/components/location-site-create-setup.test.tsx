@@ -28,7 +28,7 @@ describe('LocationSiteCreateSetup', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 
-  it('keeps the terminal choice set expanded after selection and completes on Continue', async () => {
+  it('summarizes the completed choice and completes on Continue after selection', async () => {
     const user = userEvent.setup()
     const onComplete = vi.fn()
     const onOpenChange = vi.fn()
@@ -44,7 +44,10 @@ describe('LocationSiteCreateSetup', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Landmark') }))
 
-    expect(screen.getByRole('radiogroup', { name: SITE_CREATE_SETUP_PROMPT })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('radiogroup', { name: SITE_CREATE_SETUP_PROMPT }),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Landmark')).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
     ).not.toBeInTheDocument()
