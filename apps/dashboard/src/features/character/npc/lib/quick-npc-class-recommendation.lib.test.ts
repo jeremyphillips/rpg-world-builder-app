@@ -4,13 +4,16 @@ import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 
 import {
   applyQuickNpcRecommendedClassSeeding,
   resolveQuickNpcClassIdFromRecommendationCardinality,
   resolveQuickNpcClassRecommendationIds,
 } from './quick-npc-class-recommendation.lib'
+import {
+  quickNpcMemberSetupValues,
+  quickNpcMemberSetupWithNoTitle,
+} from './quick-npc-test-fixtures'
 
 describe('resolveQuickNpcClassIdFromRecommendationCardinality', () => {
   it('seeds exactly one recommendation', () => {
@@ -63,12 +66,12 @@ describe('resolveQuickNpcClassRecommendationIds', () => {
   it('merges template and organization affinities for the current title', () => {
     expect(
       resolveQuickNpcClassRecommendationIds({
-        values: {
+        values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
           membershipTitle: 'Guildmaster',
           classId: '',
           level: 9,
-        },
+        }),
         context,
         titles: [guildmasterTitle],
         organizationClassAffinityIds: [fighterClass.id],
@@ -79,12 +82,11 @@ describe('resolveQuickNpcClassRecommendationIds', () => {
   it('falls back to organization affinities when the title has no template recommendation', () => {
     expect(
       resolveQuickNpcClassRecommendationIds({
-        values: {
+        values: quickNpcMemberSetupWithNoTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
-          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           classId: '',
           level: 1,
-        },
+        }),
         context,
         titles: [guildmasterTitle],
         organizationClassAffinityIds: [rogueClass.id],
@@ -123,12 +125,11 @@ describe('applyQuickNpcRecommendedClassSeeding', () => {
   it('auto-seeds a single eligible recommendation', () => {
     expect(
       applyQuickNpcRecommendedClassSeeding({
-        values: {
+        values: quickNpcMemberSetupWithNoTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
-          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           classId: '',
           level: 1,
-        },
+        }),
         context,
         titles: [],
         organizationClassAffinityIds: [rogueClass.id],
@@ -139,12 +140,12 @@ describe('applyQuickNpcRecommendedClassSeeding', () => {
   it('clears Class at level 0 regardless of recommendations', () => {
     expect(
       applyQuickNpcRecommendedClassSeeding({
-        values: {
+        values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
           membershipTitle: 'Guildmaster',
           classId: rogueClass.id,
           level: 0,
-        },
+        }),
         context,
         titles: [guildmasterTitle],
         organizationClassAffinityIds: [rogueClass.id],
@@ -155,12 +156,12 @@ describe('applyQuickNpcRecommendedClassSeeding', () => {
   it('does not auto-select when multiple recommendations exist', () => {
     expect(
       applyQuickNpcRecommendedClassSeeding({
-        values: {
+        values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
           membershipTitle: 'Guildmaster',
           classId: '',
           level: 9,
-        },
+        }),
         context,
         titles: [guildmasterTitle],
         organizationClassAffinityIds: [fighterClass.id],

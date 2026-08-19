@@ -17,9 +17,12 @@ import {
   type SetupSummaryRowModel,
 } from '@/lib/create-setup'
 
+import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import {
   buildQuickNpcContentOptions,
   isQuickNpcMembershipTitleSetupComplete,
+  isQuickNpcOrganizationMemberSetup,
+  type QuickNpcOrganizationMemberSetupValues,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
 import { buildQuickNpcSpeciesRadioCardPresentation } from './quick-npc-species-option-groups.lib'
@@ -28,6 +31,9 @@ import { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-re
 export const QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE = 'Set up member' as const
 export const QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION =
   "Choose the member's role and starting character options. Recommendations come from this organization and can be changed before creation." as const
+export const QUICK_NPC_STANDALONE_SETUP_HEADLINE = 'Set up NPC' as const
+export const QUICK_NPC_STANDALONE_SETUP_DESCRIPTION =
+  'Choose species and starting character options.' as const
 export const QUICK_NPC_SETUP_HEADLINE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
 export const QUICK_NPC_SETUP_SELECTIONS_EYEBROW = 'Selections' as const
@@ -54,6 +60,10 @@ export type QuickNpcSetupModel = {
 export const QUICK_NPC_BUILD_EXTERNAL_DECISION_ID = 'quickNpcBuild' as const
 
 export function quickNpcBuildRevision(values: QuickNpcSetupValues): string {
+  if (values.contextKind === 'standalone') {
+    return [values.speciesId, String(values.level), values.classId].join(':')
+  }
+
   return [
     values.membershipTitle ?? '',
     values.speciesId,
@@ -146,12 +156,14 @@ function formatQuickNpcAuthoringBuildSummaryValue(args: {
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>
 }): string {
   const parts: string[] = []
-  const recommendation = resolveQuickNpcSelectedTitleRecommendation({
-    membershipTitle: args.values.membershipTitle,
-    titles: args.titles,
-  })
-  if (recommendation !== undefined) {
-    parts.push(getNpcAuthoringTemplateLabel(recommendation.templateId))
+  if (isQuickNpcOrganizationMemberSetup(args.values)) {
+    const recommendation = resolveQuickNpcSelectedTitleRecommendation({
+      membershipTitle: args.values.membershipTitle,
+      titles: args.titles,
+    })
+    if (recommendation !== undefined) {
+      parts.push(getNpcAuthoringTemplateLabel(recommendation.templateId))
+    }
   }
 
   const className = resolveQuickNpcClassDisplayLabel(args.values.classId, args.catalogIndex)
@@ -166,20 +178,28 @@ function formatQuickNpcAuthoringBuildSummaryValue(args: {
 
 /** Structured Role / Species / Build rows for authoring-phase SelectionSummaryCard. */
 export function resolveQuickNpcSetupSummaryRows(args: {
+  createContext: QuickNpcCreateContext
   values: QuickNpcSetupValues
   context: CharacterBuildContext
   titles?: readonly OrganizationMembershipTitleDefinition[]
 }): QuickNpcAuthoringSetupSummaryRow[] {
   const titles = args.titles ?? []
   const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
+  const rows: QuickNpcAuthoringSetupSummaryRow[] = []
 
-  return [
-    {
+  if (args.createContext.kind === 'organization-member') {
+    rows.push({
       id: 'membershipTitle',
       label: QUICK_NPC_AUTHORING_SETUP_ROLE_LABEL,
-      value: resolveQuickNpcMembershipTitleDisplayLabel(args.values.membershipTitle, titles),
+      value: resolveQuickNpcMembershipTitleDisplayLabel(
+        isQuickNpcOrganizationMemberSetup(args.values) ? args.values.membershipTitle : undefined,
+        titles,
+      ),
       editTarget: { type: 'set', id: 'membershipTitle' },
-    },
+    })
+  }
+
+  rows.push(
     {
       id: 'speciesId',
       label: QUICK_NPC_AUTHORING_SETUP_SPECIES_LABEL,
@@ -196,7 +216,9 @@ export function resolveQuickNpcSetupSummaryRows(args: {
       }),
       editTarget: { type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID },
     },
-  ]
+  )
+
+  return rows
 }
 
 type QuickNpcSetupSetBuilderArgs = {
@@ -207,7 +229,9 @@ type QuickNpcSetupSetBuilderArgs = {
 }
 
 function buildQuickNpcSpeciesSetupSet(
-  args: Pick<QuickNpcSetupSetBuilderArgs, 'values' | 'speciesTermLabel' | 'speciesPresentation'>,
+  args: Pick<QuickNpcSetupSetBuilderArgs, 'values' | 'speciesTermLabel' | 'speciesPresentation'> & {
+    gateOnMembershipTitle: boolean
+  },
 ): CreateSetupSet {
   return {
     id: 'speciesId',
@@ -221,16 +245,17 @@ function buildQuickNpcSpeciesSetupSet(
       ? { optionGroups: args.speciesPresentation.optionGroups }
       : {}),
     value: args.values.speciesId,
-    visibleWhenComplete: ['membershipTitle'],
+    ...(args.gateOnMembershipTitle ? { visibleWhenComplete: ['membershipTitle'] as const } : {}),
     summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
     summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
     isComplete: isCreateSetupChoiceComplete(args.values.speciesId),
   }
 }
 
-function buildQuickNpcMembershipTitleSetupSet(
-  args: Pick<QuickNpcSetupSetBuilderArgs, 'values' | 'titles'>,
-): CreateSetupSet {
+function buildQuickNpcMembershipTitleSetupSet(args: {
+  values: QuickNpcOrganizationMemberSetupValues
+  titles: readonly OrganizationMembershipTitleDefinition[]
+}): CreateSetupSet {
   return {
     id: 'membershipTitle',
     kind: 'choice',
@@ -246,6 +271,7 @@ function buildQuickNpcMembershipTitleSetupSet(
 }
 
 export function buildQuickNpcCreateSetupSets(args: {
+  createContext: QuickNpcCreateContext
   context: CharacterBuildContext
   values: QuickNpcSetupValues
   titles: readonly OrganizationMembershipTitleDefinition[]
@@ -267,13 +293,29 @@ export function buildQuickNpcCreateSetupSets(args: {
     speciesPresentation,
   }
 
+  if (args.createContext.kind === 'standalone') {
+    return [
+      buildQuickNpcSpeciesSetupSet({
+        ...setBuilderArgs,
+        gateOnMembershipTitle: false,
+      }),
+    ]
+  }
+
   return [
-    buildQuickNpcMembershipTitleSetupSet(setBuilderArgs),
-    buildQuickNpcSpeciesSetupSet(setBuilderArgs),
+    buildQuickNpcMembershipTitleSetupSet({
+      values: values as QuickNpcOrganizationMemberSetupValues,
+      titles,
+    }),
+    buildQuickNpcSpeciesSetupSet({
+      ...setBuilderArgs,
+      gateOnMembershipTitle: true,
+    }),
   ]
 }
 
 export function resolveQuickNpcSetupModel(args: {
+  createContext: QuickNpcCreateContext
   context: CharacterBuildContext
   values: QuickNpcSetupValues
   titles?: readonly OrganizationMembershipTitleDefinition[]

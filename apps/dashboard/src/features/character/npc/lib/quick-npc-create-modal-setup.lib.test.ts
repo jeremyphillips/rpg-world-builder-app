@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import { makeSpecies } from '@/test/fixtures/factories/species'
 import {
   createCampaignNpcBuilderContextFixture,
@@ -25,6 +24,16 @@ import {
 } from './quick-npc-form-fields'
 import { resolveQuickNpcClassOptionGroups } from './quick-npc-class-option-groups.lib'
 import { resolveCreateSetupActiveSetId, resolveCreateSetupVisibleSetIds } from '@/lib/create-setup'
+import {
+  quickNpcMemberSetupValues,
+  quickNpcMemberSetupWithNoTitle,
+  quickNpcOrganizationMemberCreateContext,
+  quickNpcStandaloneCreateContext,
+  quickNpcStandaloneSetupValues,
+} from './quick-npc-test-fixtures'
+
+const memberCreateContext = quickNpcOrganizationMemberCreateContext()
+const standaloneCreateContext = quickNpcStandaloneCreateContext()
 
 const guildmasterTitle = {
   id: 'omt_guildmaster',
@@ -37,9 +46,10 @@ const guildmasterTitle = {
 describe('buildQuickNpcCreateSetupSets', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
-  it('returns only title and species setup sets', () => {
-    const values = createQuickNpcSetupDefaultValues(context)
+  it('returns only title and species setup sets for organization-member context', () => {
+    const values = createQuickNpcSetupDefaultValues(context, memberCreateContext)
     const sets = buildQuickNpcCreateSetupSets({
+      createContext: memberCreateContext,
       context,
       values,
       titles: [],
@@ -47,7 +57,11 @@ describe('buildQuickNpcCreateSetupSets', () => {
 
     expect(sets.map((set) => set.id)).toEqual(['membershipTitle', 'speciesId'])
     expect(sets.find((set) => set.id === 'membershipTitle')?.summaryGroup).toBe('selections')
-    expect(isQuickNpcMembershipTitleSetupComplete(values.membershipTitle)).toBe(false)
+    expect(
+      isQuickNpcMembershipTitleSetupComplete(
+        values.contextKind === 'organization-member' ? values.membershipTitle : undefined,
+      ),
+    ).toBe(false)
 
     const sequenceItems = sets.map((set) => ({
       id: set.id,
@@ -62,12 +76,23 @@ describe('buildQuickNpcCreateSetupSets', () => {
     ])
   })
 
-  it('reveals species after explicit No title without downstream setup sets', () => {
-    const values = {
-      ...createQuickNpcSetupDefaultValues(context),
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-    }
+  it('returns only species setup set for standalone context', () => {
+    const values = createQuickNpcSetupDefaultValues(context, standaloneCreateContext)
     const sets = buildQuickNpcCreateSetupSets({
+      createContext: standaloneCreateContext,
+      context,
+      values,
+      titles: [],
+    })
+
+    expect(sets.map((set) => set.id)).toEqual(['speciesId'])
+    expect(sets.find((set) => set.id === 'speciesId')?.visibleWhenComplete).toBeUndefined()
+  })
+
+  it('reveals species after explicit No title without downstream setup sets', () => {
+    const values = quickNpcMemberSetupWithNoTitle()
+    const sets = buildQuickNpcCreateSetupSets({
+      createContext: memberCreateContext,
       context,
       values,
       titles: [],
@@ -102,25 +127,46 @@ describe('resolveQuickNpcBuildCardModel', () => {
     },
   })
 
-  it('returns null until title and species are complete', () => {
+  it('returns null until title and species are complete for organization-member context', () => {
     expect(
       resolveQuickNpcBuildCardModel({
+        createContext: memberCreateContext,
         context,
-        values: createQuickNpcSetupDefaultValues(context),
+        values: createQuickNpcSetupDefaultValues(context, memberCreateContext),
         titles: [],
       }),
     ).toBeNull()
   })
 
+  it('returns build card after species is complete for standalone context', () => {
+    const model = resolveQuickNpcBuildCardModel({
+      createContext: standaloneCreateContext,
+      context,
+      values: quickNpcStandaloneSetupValues({
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        level: 0,
+      }),
+      titles: [],
+    })
+
+    expect(model).toMatchObject({
+      mode: 'build',
+      sectionEyebrow: QUICK_NPC_BUILD_FIELD_LABEL,
+      level: 0,
+      classProgressionApplicable: false,
+    })
+  })
+
   it('returns recommended build mode with class grouping and level prompt', () => {
     const model = resolveQuickNpcBuildCardModel({
+      createContext: memberCreateContext,
       context: multiClassContext,
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: '',
         level: 5,
-      },
+      }),
       titles: [guildmasterTitle],
       members: { classAffinityIds: [rogueClass.id] },
     })
@@ -140,13 +186,13 @@ describe('resolveQuickNpcBuildCardModel', () => {
 
   it('returns build mode without template identity or recommended level helper', () => {
     const model = resolveQuickNpcBuildCardModel({
+      createContext: memberCreateContext,
       context,
-      values: {
+      values: quickNpcMemberSetupWithNoTitle({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
         classId: '',
         level: 0,
-      },
+      }),
       titles: [],
     })
 
@@ -175,13 +221,14 @@ describe('resolveQuickNpcBuildCardModel', () => {
     })
 
     const model = resolveQuickNpcBuildCardModel({
+      createContext: memberCreateContext,
       context: multiClassContext,
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: '',
         level: 5,
-      },
+      }),
       titles: [guildmasterTitle],
       members: { classAffinityIds: [fighterClass.id] },
     })
@@ -201,12 +248,13 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
 
   it('returns Role, Species, and Build rows with explicit edit targets when a title recommendation exists', () => {
     const rows = resolveQuickNpcSetupSummaryRows({
-      values: {
+      createContext: memberCreateContext,
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 5,
-      },
+      }),
       context,
       titles: [guildmasterTitle],
     })
@@ -233,14 +281,29 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
     ])
   })
 
-  it('includes Build with level-only copy when no title recommendation exists', () => {
+  it('omits Role row for standalone context', () => {
     const rows = resolveQuickNpcSetupSummaryRows({
-      values: {
+      createContext: standaloneCreateContext,
+      values: quickNpcStandaloneSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 1,
-      },
+      }),
+      context,
+      titles: [],
+    })
+
+    expect(rows.map((row) => row.id)).toEqual(['speciesId', 'quickNpcBuild'])
+  })
+
+  it('includes Build with level-only copy when no title recommendation exists', () => {
+    const rows = resolveQuickNpcSetupSummaryRows({
+      createContext: memberCreateContext,
+      values: quickNpcMemberSetupWithNoTitle({
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        classId: populatedBuilderCatalog.classes[0]!.id,
+        level: 1,
+      }),
       context,
       titles: [guildmasterTitle],
     })
@@ -276,12 +339,12 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       },
     })
     const rows = resolveQuickNpcSetupSummaryRows({
-      values: {
+      createContext: memberCreateContext,
+      values: quickNpcMemberSetupWithNoTitle({
         speciesId: elf.id,
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 0,
-      },
+      }),
       context: elfContext,
       titles: [],
     })
@@ -314,26 +377,38 @@ describe('isQuickNpcBuildResolved', () => {
     expect(
       isQuickNpcBuildResolved({
         context,
-        values: {
+        values: quickNpcMemberSetupWithNoTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
-          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           classId: '',
           level: 1,
-        },
+        }),
       }),
     ).toBe(false)
+  })
+
+  it('is resolved at Level 0 without class for standalone context', () => {
+    expect(
+      isQuickNpcBuildResolved({
+        context,
+        values: quickNpcStandaloneSetupValues({
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          classId: '',
+          level: 0,
+        }),
+      }),
+    ).toBe(true)
   })
 
   it('is resolved when a single recommendation has been auto-seeded', () => {
     expect(
       isQuickNpcBuildResolved({
         context: multiClassContext,
-        values: {
+        values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
           membershipTitle: 'Guildmaster',
           classId: rogueClass.id,
           level: 5,
-        },
+        }),
       }),
     ).toBe(true)
   })
@@ -341,47 +416,56 @@ describe('isQuickNpcBuildResolved', () => {
 
 describe('quickNpcBuildRevision', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
-  const baseValues = {
+  const memberBaseValues = quickNpcMemberSetupValues({
     speciesId: 'srd-cc-5.2.1:dwarf',
     membershipTitle: 'Guildmaster',
     classId: populatedBuilderCatalog.classes[0]!.id,
     level: 5,
-  }
+  })
+  const standaloneBaseValues = quickNpcStandaloneSetupValues({
+    speciesId: 'srd-cc-5.2.1:dwarf',
+    classId: populatedBuilderCatalog.classes[0]!.id,
+    level: 5,
+  })
 
-  it('derives revision from membershipTitle, speciesId, level, and classId only', () => {
-    expect(quickNpcBuildRevision(baseValues)).toBe(
+  it('derives member revision from membershipTitle, speciesId, level, and classId', () => {
+    expect(quickNpcBuildRevision(memberBaseValues)).toBe(
       `Guildmaster:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
     )
-    expect(quickNpcBuildRevision({ ...baseValues, membershipTitle: 'Other' })).not.toBe(
-      quickNpcBuildRevision(baseValues),
+    expect(quickNpcBuildRevision({ ...memberBaseValues, membershipTitle: 'Other' })).not.toBe(
+      quickNpcBuildRevision(memberBaseValues),
     )
-    expect(quickNpcBuildRevision({ ...baseValues, speciesId: 'srd-cc-5.2.1:elf' })).not.toBe(
-      quickNpcBuildRevision(baseValues),
+  })
+
+  it('derives standalone revision from speciesId, level, and classId only', () => {
+    expect(quickNpcBuildRevision(standaloneBaseValues)).toBe(
+      `srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
     )
-    expect(quickNpcBuildRevision({ ...baseValues, level: 3 })).not.toBe(
-      quickNpcBuildRevision(baseValues),
-    )
-    expect(quickNpcBuildRevision({ ...baseValues, classId: 'srd-cc-5.2.1:rogue' })).not.toBe(
-      quickNpcBuildRevision(baseValues),
+    expect(quickNpcBuildRevision(standaloneBaseValues)).not.toContain('Guildmaster')
+    expect(quickNpcBuildRevision({ ...standaloneBaseValues, level: 3 })).not.toBe(
+      quickNpcBuildRevision(standaloneBaseValues),
     )
   })
 
   it('registers Build as an explicit external decision with Continue label', () => {
-    const decision = resolveQuickNpcBuildExternalDecision({ values: baseValues, context })
+    const decision = resolveQuickNpcBuildExternalDecision({
+      values: memberBaseValues,
+      context,
+    })
 
     expect(decision).toEqual({
       id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
       isResolved: true,
       completion: 'explicit',
-      revision: quickNpcBuildRevision(baseValues),
+      revision: quickNpcBuildRevision(memberBaseValues),
       completeLabel: 'Continue',
     })
   })
 
   it('changes revision when build-affecting inputs change', () => {
-    const first = resolveQuickNpcBuildExternalDecision({ values: baseValues, context })
+    const first = resolveQuickNpcBuildExternalDecision({ values: memberBaseValues, context })
     const second = resolveQuickNpcBuildExternalDecision({
-      values: { ...baseValues, level: 2 },
+      values: { ...memberBaseValues, level: 2 },
       context,
     })
 

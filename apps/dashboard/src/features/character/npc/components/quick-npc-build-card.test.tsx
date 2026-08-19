@@ -2,7 +2,6 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -21,8 +20,20 @@ import {
   resolveQuickNpcBuildCardModel,
 } from '../lib/quick-npc-build-card.lib'
 import { applyQuickNpcSetupValueChange } from '../lib/quick-npc-setup-value-change.lib'
-import type { QuickNpcSetupValues } from '../lib/quick-npc-form-fields'
+import {
+  isQuickNpcOrganizationMemberSetup,
+  type QuickNpcOrganizationMemberSetupValues,
+  type QuickNpcSetupValues,
+} from '../lib/quick-npc-form-fields'
+import {
+  quickNpcMemberSetupValues,
+  quickNpcMemberSetupWithNoTitle,
+  quickNpcOrganizationMemberCreateContext,
+  quickNpcTestOrganization,
+} from '../lib/quick-npc-test-fixtures'
 import { QuickNpcBuildCard } from './quick-npc-build-card.client'
+
+const createContext = quickNpcOrganizationMemberCreateContext(quickNpcTestOrganization)
 
 function applySetupChange(args: {
   values: QuickNpcSetupValues
@@ -37,7 +48,9 @@ function applySetupChange(args: {
     setId === 'speciesId'
       ? values.speciesId
       : setId === 'membershipTitle'
-        ? (values.membershipTitle ?? '')
+        ? isQuickNpcOrganizationMemberSetup(values)
+          ? (values.membershipTitle ?? '')
+          : ''
         : setId === 'classId'
           ? values.classId
           : values.level
@@ -73,12 +86,7 @@ const fighterClass = {
 
 function renderBuildCard(
   overrides: {
-    values?: {
-      speciesId: string
-      membershipTitle: string | undefined
-      classId: string
-      level: number
-    }
+    values?: QuickNpcOrganizationMemberSetupValues
     members?: { classAffinityIds?: readonly string[] }
   } = {},
 ) {
@@ -88,13 +96,16 @@ function renderBuildCard(
       classes: [fighterClass, rogueClass],
     },
   })
-  const values = overrides.values ?? {
-    speciesId: 'srd-cc-5.2.1:dwarf',
-    membershipTitle: 'Guildmaster',
-    classId: rogueClass.id,
-    level: 9,
-  }
+  const values =
+    overrides.values ??
+    quickNpcMemberSetupValues({
+      speciesId: 'srd-cc-5.2.1:dwarf',
+      membershipTitle: 'Guildmaster',
+      classId: rogueClass.id,
+      level: 9,
+    })
   const model = resolveQuickNpcBuildCardModel({
+    createContext,
     context,
     values,
     titles: [guildmasterTitle],
@@ -130,13 +141,13 @@ describe('QuickNpcBuildCard', () => {
   it('renders build mode without template identity or recommended level helper', () => {
     const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
     const model = resolveQuickNpcBuildCardModel({
+      createContext,
       context,
-      values: {
+      values: quickNpcMemberSetupWithNoTitle({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
         classId: '',
         level: 0,
-      },
+      }),
       titles: [],
     })
 
@@ -153,12 +164,12 @@ describe('QuickNpcBuildCard', () => {
   it('expands class inside the class row and collapses after selection', async () => {
     const user = userEvent.setup()
     const { onClassChange } = renderBuildCard({
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: rogueClass.id,
         level: 9,
-      },
+      }),
     })
 
     await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_CLASS_LABEL }))
@@ -188,12 +199,12 @@ describe('QuickNpcBuildCard', () => {
   it('opens only one editor at a time', async () => {
     const user = userEvent.setup()
     renderBuildCard({
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: rogueClass.id,
         level: 9,
-      },
+      }),
     })
 
     await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_CLASS_LABEL }))
@@ -206,12 +217,12 @@ describe('QuickNpcBuildCard', () => {
 
   it('shows class recommendation helper when current class diverges', () => {
     renderBuildCard({
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: fighterClass.id,
         level: 9,
-      },
+      }),
     })
 
     expect(screen.getByText('Recommended: Rogue')).toBeInTheDocument()
@@ -219,12 +230,12 @@ describe('QuickNpcBuildCard', () => {
 
   it('starts with class editor expanded when class is unresolved', () => {
     renderBuildCard({
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: '',
         level: 9,
-      },
+      }),
       members: { classAffinityIds: [rogueClass.id, fighterClass.id] },
     })
 
@@ -242,12 +253,12 @@ describe('QuickNpcBuildCard', () => {
 
     expect(
       applySetupChange({
-        values: {
+        values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
           membershipTitle: 'Guildmaster',
           classId: rogueClass.id,
           level: 9,
-        },
+        }),
         setId: 'level',
         nextValue: 0,
         context,
@@ -263,12 +274,12 @@ describe('QuickNpcBuildCard', () => {
   it('keeps the class row visible and non-interactive at level 0', async () => {
     const user = userEvent.setup()
     const { onClassChange } = renderBuildCard({
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: '',
         level: 0,
-      },
+      }),
     })
 
     expect(screen.getByText('CLASS')).toBeInTheDocument()
@@ -297,12 +308,12 @@ describe('QuickNpcBuildCard', () => {
       },
     })
     const members = { classAffinityIds: [rogueClass.id] }
-    const baseValues = {
+    const baseValues = quickNpcMemberSetupValues({
       speciesId: 'srd-cc-5.2.1:dwarf',
-      membershipTitle: 'Guildmaster' as string | undefined,
+      membershipTitle: 'Guildmaster',
       classId: '',
       level: 0,
-    }
+    })
 
     function BuildCardAtLevel({ level }: { level: number }) {
       const values = applySetupChange({
@@ -314,6 +325,7 @@ describe('QuickNpcBuildCard', () => {
         organizationClassAffinityIds: members.classAffinityIds,
       })
       const model = resolveQuickNpcBuildCardModel({
+        createContext,
         context,
         values,
         titles: [guildmasterTitle],
@@ -349,12 +361,12 @@ describe('QuickNpcBuildCard', () => {
       },
     })
     const members = { classAffinityIds: [rogueClass.id, fighterClass.id] }
-    const baseValues = {
+    const baseValues = quickNpcMemberSetupValues({
       speciesId: 'srd-cc-5.2.1:dwarf',
-      membershipTitle: 'Guildmaster' as string | undefined,
+      membershipTitle: 'Guildmaster',
       classId: '',
       level: 0,
-    }
+    })
 
     function BuildCardAtLevel({ level }: { level: number }) {
       const values = applySetupChange({
@@ -366,6 +378,7 @@ describe('QuickNpcBuildCard', () => {
         organizationClassAffinityIds: members.classAffinityIds,
       })
       const model = resolveQuickNpcBuildCardModel({
+        createContext,
         context,
         values,
         titles: [guildmasterTitle],

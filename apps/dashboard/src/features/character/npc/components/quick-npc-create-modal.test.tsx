@@ -15,6 +15,10 @@ import { QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL } from '../lib/quick-npc-build-card.
 import { renderWithProviders } from '@/test/render'
 
 import { QuickNpcCreateModal } from './quick-npc-create-modal.client'
+import {
+  quickNpcOrganizationMemberCreateContext,
+  quickNpcTestOrganization,
+} from '../lib/quick-npc-test-fixtures'
 
 const createNpcMock = vi.hoisted(() => vi.fn())
 
@@ -34,11 +38,8 @@ beforeAll(() => {
   }
 })
 
-const organization = {
-  id: 'organization-lantern-guild',
-  name: 'Lantern Guild',
-  organizationDomain: 'occupational' as const,
-}
+const organization = quickNpcTestOrganization
+const memberCreateContext = quickNpcOrganizationMemberCreateContext(organization)
 
 const quickFighter = {
   ...populatedBuilderCatalog.classes[0]!,
@@ -145,7 +146,7 @@ function renderModal(overrides: Partial<React.ComponentProps<typeof QuickNpcCrea
     onOpenChange: vi.fn(),
     campaignId: 'campaign-test-1',
     buildContext,
-    organization,
+    context: memberCreateContext,
     onCancel: vi.fn(),
     onCreated: vi.fn(),
     ...overrides,
@@ -337,7 +338,12 @@ describe('QuickNpcCreateModal', () => {
     await selectOption(user, /alignment/i, /lawful neutral/i)
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
-    await waitFor(() => expect(props.onCreated).toHaveBeenCalledWith(npcDetail))
+    await waitFor(() =>
+      expect(props.onCreated).toHaveBeenCalledWith({
+        contentType: 'npcs',
+        id: npcDetail.character.id,
+      }),
+    )
     expect(props.onOpenChange).toHaveBeenCalledWith(false)
   })
 
@@ -375,7 +381,12 @@ describe('QuickNpcCreateModal', () => {
     expect(props.onCancel).not.toHaveBeenCalled()
 
     resolveCreate?.(npcDetail)
-    await waitFor(() => expect(props.onCreated).toHaveBeenCalledWith(npcDetail))
+    await waitFor(() =>
+      expect(props.onCreated).toHaveBeenCalledWith({
+        contentType: 'npcs',
+        id: npcDetail.character.id,
+      }),
+    )
   })
 
   it('auto-seeds and collapses Class when exactly one recommendation exists', async () => {
@@ -405,9 +416,12 @@ describe('QuickNpcCreateModal', () => {
           ],
         },
       }),
-      organization: {
-        ...organization,
-        members: { classAffinityIds: [rogueClass.id], speciesAffinityIds: [], titles: [] },
+      context: {
+        kind: 'organization-member',
+        organization: {
+          ...organization,
+          members: { classAffinityIds: [rogueClass.id], speciesAffinityIds: [], titles: [] },
+        },
       },
     })
 
@@ -457,12 +471,15 @@ describe('QuickNpcCreateModal', () => {
           ],
         },
       }),
-      organization: {
-        ...organization,
-        members: {
-          classAffinityIds: [rogueClass.id, quickFighter.id],
-          speciesAffinityIds: [],
-          titles: [],
+      context: {
+        kind: 'organization-member',
+        organization: {
+          ...organization,
+          members: {
+            classAffinityIds: [rogueClass.id, quickFighter.id],
+            speciesAffinityIds: [],
+            titles: [],
+          },
         },
       },
     })
@@ -517,12 +534,15 @@ describe('QuickNpcCreateModal', () => {
           ],
         },
       }),
-      organization: {
-        ...organization,
-        members: {
-          classAffinityIds: [rogueClass.id, quickFighter.id],
-          speciesAffinityIds: [],
-          titles: [],
+      context: {
+        kind: 'organization-member',
+        organization: {
+          ...organization,
+          members: {
+            classAffinityIds: [rogueClass.id, quickFighter.id],
+            speciesAffinityIds: [],
+            titles: [],
+          },
         },
       },
     })

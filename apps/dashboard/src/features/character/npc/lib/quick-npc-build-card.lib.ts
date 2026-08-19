@@ -14,8 +14,10 @@ import { isCreateSetupChoiceComplete } from '@/lib/create-setup'
 import {
   buildQuickNpcContentOptions,
   isQuickNpcMembershipTitleSetupComplete,
+  isQuickNpcOrganizationMemberSetup,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
+import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import {
   resolveQuickNpcClassOptionGroups,
   type QuickNpcClassOptionGroup,
@@ -108,7 +110,30 @@ export function isQuickNpcBuildCardVisible(args: {
   return args.buildCardModel != null && !args.isEditingUpstream
 }
 
+function isQuickNpcBuildCardBlocked(args: {
+  createContext: QuickNpcCreateContext
+  values: QuickNpcSetupValues
+}): boolean {
+  if (!isCreateSetupChoiceComplete(args.values.speciesId)) {
+    return true
+  }
+
+  if (args.createContext.kind === 'organization-member') {
+    return (
+      !isQuickNpcOrganizationMemberSetup(args.values) ||
+      !isQuickNpcMembershipTitleSetupComplete(args.values.membershipTitle)
+    )
+  }
+
+  return false
+}
+
+function resolveQuickNpcBuildCardMembershipTitle(values: QuickNpcSetupValues): string | undefined {
+  return isQuickNpcOrganizationMemberSetup(values) ? values.membershipTitle : undefined
+}
+
 export function resolveQuickNpcBuildCardModel(args: {
+  createContext: QuickNpcCreateContext
   context: CharacterBuildContext
   values: QuickNpcSetupValues
   titles: readonly OrganizationMembershipTitleDefinition[]
@@ -116,16 +141,14 @@ export function resolveQuickNpcBuildCardModel(args: {
 }): QuickNpcBuildCardModel | null {
   const { values, context, titles } = args
 
-  if (!isQuickNpcMembershipTitleSetupComplete(values.membershipTitle)) {
+  if (isQuickNpcBuildCardBlocked(args)) {
     return null
   }
 
-  if (!isCreateSetupChoiceComplete(values.speciesId)) {
-    return null
-  }
+  const membershipTitle = resolveQuickNpcBuildCardMembershipTitle(values)
 
   const titleRecommendation = resolveQuickNpcSelectedTitleRecommendation({
-    membershipTitle: values.membershipTitle,
+    membershipTitle,
     titles,
   })
   const templateEntry: NpcAuthoringTemplateEntry | undefined =
@@ -178,7 +201,7 @@ export function resolveQuickNpcBuildCardModel(args: {
     level: values.level,
     levelConstraints,
     levelPrompt: formatQuickNpcLevelRecommendationPrompt({
-      membershipTitle: values.membershipTitle,
+      membershipTitle,
       titles,
     }),
   }

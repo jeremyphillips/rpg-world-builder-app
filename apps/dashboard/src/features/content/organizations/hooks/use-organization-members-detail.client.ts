@@ -7,6 +7,7 @@ import { getErrorMessage, resolveOrganizationMembershipMetadata } from '@rpg/con
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useCampaignCharacters, useCanManageCampaign } from '@/features/campaign'
+import type { CreatedContentResult } from '@/lib/create-flow'
 import {
   createCharacterOrganizationMembership,
   deleteCharacterOrganizationMembership,
@@ -272,6 +273,14 @@ export function useOrganizationMembersDetail(
   const openAddDrawer = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
   const openCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'createNpc' }), [])
   const cancelCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
+  const handleQuickNpcContentCreated = React.useCallback(
+    async (result: CreatedContentResult) => {
+      if (result.contentType !== 'npcs') return
+      await invalidate({ characterId: result.id, subjectKind: 'npc' })
+      setDrawerState(null)
+    },
+    [invalidate],
+  )
   const handleQuickNpcSuccess = React.useCallback(
     async (npc: CampaignNpcDetail) => {
       await handleQuickNpcCreated(npc)
@@ -306,6 +315,7 @@ export function useOrganizationMembersDetail(
     openAddDrawer,
     openCreateNpcModal,
     cancelCreateNpcModal,
+    handleQuickNpcContentCreated,
     handleQuickNpcSuccess,
     openEditDrawer,
     openRemoveConfirm,

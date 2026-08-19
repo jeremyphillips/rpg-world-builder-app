@@ -27,6 +27,7 @@ import {
   countQuickNpcConfiguredRequirementsFromArrays,
   type QuickNpcRequirementOptionSets,
 } from './quick-npc-requirement-options.lib'
+import type { QuickNpcCreateContext } from './quick-npc-create-context'
 
 // ---------------------------------------------------------------------------
 // Quick NPC form — setup (species/title/level/class) plus authoring tabs for
@@ -39,12 +40,36 @@ export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
 export const QUICK_NPC_DETAILS_TAB_ID = 'details' as const
 export const QUICK_NPC_REQUIREMENTS_TAB_ID = 'requirements' as const
 
-export type QuickNpcSetupValues = {
+export type QuickNpcSetupCoreValues = {
   speciesId: string
-  /** Setup-only unset (`undefined`) until the user chooses a title or No title. */
-  membershipTitle: string | undefined
   classId: string
   level: number
+}
+
+export type QuickNpcStandaloneSetupValues = QuickNpcSetupCoreValues & {
+  contextKind: 'standalone'
+}
+
+export type QuickNpcOrganizationMemberSetupValues = QuickNpcSetupCoreValues & {
+  contextKind: 'organization-member'
+  /** Setup-only unset (`undefined`) until the user chooses a title or No title. */
+  membershipTitle: string | undefined
+}
+
+export type QuickNpcSetupValues =
+  | QuickNpcStandaloneSetupValues
+  | QuickNpcOrganizationMemberSetupValues
+
+export function isQuickNpcOrganizationMemberSetup(
+  values: QuickNpcSetupValues,
+): values is QuickNpcOrganizationMemberSetupValues {
+  return values.contextKind === 'organization-member'
+}
+
+export function isQuickNpcStandaloneSetup(
+  values: QuickNpcSetupValues,
+): values is QuickNpcStandaloneSetupValues {
+  return values.contextKind === 'standalone'
 }
 
 export function isQuickNpcMembershipTitleSetupComplete(
@@ -64,33 +89,12 @@ export function resolveQuickNpcDefaultLevel(context: CharacterBuildContext): num
   }).minLevel
 }
 
-export function createQuickNpcSetupDefaultValues(
-  context: CharacterBuildContext,
-): QuickNpcSetupValues {
-  return {
-    speciesId: '',
-    membershipTitle: undefined,
-    classId: '',
-    level: resolveQuickNpcDefaultLevel(context),
-  }
-}
-
-export const EMPTY_QUICK_NPC_SETUP_VALUES: QuickNpcSetupValues = {
-  speciesId: '',
-  membershipTitle: undefined,
-  classId: '',
-  level: 1,
-}
-
-export function quickNpcSetupSchema(maxLevel: number, minLevel: number) {
+function quickNpcSetupCoreFields(maxLevel: number, minLevel: number) {
   return z
     .object({
       speciesId: z
         .string()
         .min(1, formatFieldMessage(characterBuilderValidationMessages.speciesRequired())),
-      membershipTitle: z.string().refine((value) => isQuickNpcMembershipTitleSetupComplete(value), {
-        message: 'Choose a membership title or No title.',
-      }),
       classId: z.string(),
       level: z
         .number({
@@ -121,8 +125,60 @@ export function quickNpcSetupSchema(maxLevel: number, minLevel: number) {
     })
 }
 
+export function quickNpcStandaloneSetupSchema(maxLevel: number, minLevel: number) {
+  return quickNpcSetupCoreFields(maxLevel, minLevel).extend({
+    contextKind: z.literal('standalone'),
+  })
+}
+
+export function quickNpcOrganizationMemberSetupSchema(maxLevel: number, minLevel: number) {
+  return quickNpcSetupCoreFields(maxLevel, minLevel).extend({
+    contextKind: z.literal('organization-member'),
+    membershipTitle: z.string().refine((value) => isQuickNpcMembershipTitleSetupComplete(value), {
+      message: 'Choose a membership title or No title.',
+    }),
+  })
+}
+
+export function quickNpcSetupSchema(maxLevel: number, minLevel: number) {
+  return z.discriminatedUnion('contextKind', [
+    quickNpcStandaloneSetupSchema(maxLevel, minLevel),
+    quickNpcOrganizationMemberSetupSchema(maxLevel, minLevel),
+  ])
+}
+
+export function createQuickNpcSetupDefaultValues(
+  buildContext: CharacterBuildContext,
+  createContext: QuickNpcCreateContext,
+): QuickNpcSetupValues {
+  const core = {
+    speciesId: '',
+    classId: '',
+    level: resolveQuickNpcDefaultLevel(buildContext),
+  }
+
+  if (createContext.kind === 'standalone') {
+    return { contextKind: 'standalone', ...core }
+  }
+
+  return {
+    contextKind: 'organization-member',
+    membershipTitle: undefined,
+    ...core,
+  }
+}
+
+export const EMPTY_QUICK_NPC_ORGANIZATION_MEMBER_SETUP_VALUES: QuickNpcOrganizationMemberSetupValues =
+  {
+    contextKind: 'organization-member',
+    speciesId: '',
+    membershipTitle: undefined,
+    classId: '',
+    level: 1,
+  }
+
 export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
-  return quickNpcSetupSchema(maxLevel, minLevel).extend({
+  const authoringFields = z.object({
     name: z
       .string()
       .trim()
@@ -134,6 +190,8 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
     requiredWeaponIds: z.array(z.string()),
     requiredSpellIds: z.array(z.string()),
   })
+
+  return z.intersection(quickNpcSetupSchema(maxLevel, minLevel), authoringFields)
 }
 
 /** TabbedForm schema — authoring tabs only; setup fields are validated separately. */

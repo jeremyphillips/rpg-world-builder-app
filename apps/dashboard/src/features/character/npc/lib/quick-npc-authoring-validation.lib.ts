@@ -8,6 +8,7 @@ import {
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 import {
   isQuickNpcMembershipTitleSetupComplete,
+  isQuickNpcOrganizationMemberSetup,
   quickNpcSetupSchema,
 } from './quick-npc-form-fields'
 
@@ -19,7 +20,10 @@ export function isQuickNpcSetupStillValid(
   setup: QuickNpcSetupValues,
   context: CharacterBuildContext,
 ): boolean {
-  if (!isQuickNpcMembershipTitleSetupComplete(setup.membershipTitle)) {
+  if (
+    isQuickNpcOrganizationMemberSetup(setup) &&
+    !isQuickNpcMembershipTitleSetupComplete(setup.membershipTitle)
+  ) {
     return false
   }
 

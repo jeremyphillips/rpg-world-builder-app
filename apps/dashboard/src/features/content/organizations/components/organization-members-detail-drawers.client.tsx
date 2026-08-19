@@ -80,9 +80,9 @@ export function OrganizationMembersDetailDrawers({
           }}
           campaignId={detail.quickNpc.campaignId}
           buildContext={buildContext}
-          organization={editableOrganization}
+          context={{ kind: 'organization-member', organization: editableOrganization }}
           onCancel={detail.cancelCreateNpcModal}
-          onCreated={detail.handleQuickNpcSuccess}
+          onCreated={detail.handleQuickNpcContentCreated}
         />
       ) : null}
 

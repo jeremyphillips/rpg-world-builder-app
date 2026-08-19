@@ -2,5 +2,6 @@
 export type CreatedContentResult =
   | { contentType: 'organizations'; id: string }
   | { contentType: 'locations'; id: string }
+  | { contentType: 'npcs'; id: string }
 
 export type OnContentCreated = (result: CreatedContentResult) => void

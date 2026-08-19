@@ -98,6 +98,7 @@ export {
   QuickNpcCreateModal,
   QUICK_NPC_CREATE_TITLE,
   type QuickNpcCreateFormOrganization,
+  type QuickNpcCreateContext,
 } from './npc/components/quick-npc-create-modal.client'
 export {
   QuickNpcAuthoringForm,

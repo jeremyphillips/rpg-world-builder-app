@@ -15,6 +15,7 @@ import {
   QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
   QUICK_NPC_TITLE_FIELD_PROMPT,
 } from '../lib/quick-npc-create-modal-setup.lib'
+import { quickNpcOrganizationMemberCreateContext } from '../lib/quick-npc-test-fixtures'
 import { QuickNpcCreateModal } from './quick-npc-create-modal.client'
 
 const organization = {
@@ -92,14 +93,14 @@ const meta = {
     onOpenChange: () => undefined,
     campaignId: 'campaign-test-1',
     buildContext: buildOrganizationCatalog({}),
-    organization: {
+    context: quickNpcOrganizationMemberCreateContext({
       ...organization,
       members: {
         classAffinityIds: [rogueClass.id],
         speciesAffinityIds: [],
         titles: [guildmasterTitle],
       },
-    },
+    }),
     onCancel: () => undefined,
     onCreated: () => undefined,
   },
@@ -142,14 +143,14 @@ export const MultipleClassRecommendations: Story = {
     buildContext: buildOrganizationCatalog({
       classAffinityIds: [rogueClass.id, quickFighter.id],
     }),
-    organization: {
+    context: quickNpcOrganizationMemberCreateContext({
       ...organization,
       members: {
         classAffinityIds: [rogueClass.id, quickFighter.id],
         speciesAffinityIds: [],
         titles: [],
       },
-    },
+    }),
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.ownerDocument.body)
@@ -172,10 +173,10 @@ export const MultipleClassRecommendations: Story = {
 export const Authoring: Story = {
   args: {
     buildContext: buildOrganizationCatalog({ titles: [] }),
-    organization: {
+    context: quickNpcOrganizationMemberCreateContext({
       ...organization,
       members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
-    },
+    }),
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.ownerDocument.body)

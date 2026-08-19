@@ -12,13 +12,14 @@ import {
 } from '@/lib/create-setup'
 import { cn } from '@rpg/ui'
 
+import type { QuickNpcCreateContext } from '../lib/quick-npc-create-context'
+import { resolveQuickNpcCreateOrganization } from '../lib/quick-npc-create-context'
 import type { QuickNpcSetupValues } from '../lib/quick-npc-form-fields'
 import {
   isQuickNpcBuildCardVisible,
   resolveQuickNpcBuildCardModel,
 } from '../lib/quick-npc-build-card.lib'
 import { QUICK_NPC_SETUP_CHANGE_LABEL } from '../lib/quick-npc-create-modal-setup.lib'
-import type { QuickNpcCreateFormOrganization } from './quick-npc-authoring-form.client'
 import { QuickNpcBuildCard } from './quick-npc-build-card.client'
 import {
   quickNpcBuildCardSectionClasses,
@@ -28,7 +29,7 @@ import type { CreateSetupSet } from '@/lib/create-setup'
 
 export type QuickNpcCreateSetupPhaseProps = {
   buildContext: CharacterBuildContext
-  organization: QuickNpcCreateFormOrganization
+  createContext: QuickNpcCreateContext
   setupValues: QuickNpcSetupValues
   setupSets: CreateSetupSet[]
   sequenceModel: CreateSetupSequenceModel
@@ -37,26 +38,30 @@ export type QuickNpcCreateSetupPhaseProps = {
 
 export function QuickNpcCreateSetupPhase({
   buildContext,
-  organization,
+  createContext,
   setupValues,
   setupSets,
   sequenceModel,
   onSetupValueChange,
 }: QuickNpcCreateSetupPhaseProps) {
+  const organization = resolveQuickNpcCreateOrganization(createContext)
+
   const buildCardModel = React.useMemo(
     () =>
       resolveQuickNpcBuildCardModel({
+        createContext,
         context: buildContext,
         values: setupValues,
-        titles: organization.members?.titles ?? [],
+        titles: organization?.members?.titles ?? [],
         members: {
-          classAffinityIds: organization.members?.classAffinityIds,
+          classAffinityIds: organization?.members?.classAffinityIds,
         },
       }),
     [
       buildContext,
-      organization.members?.classAffinityIds,
-      organization.members?.titles,
+      createContext,
+      organization?.members?.classAffinityIds,
+      organization?.members?.titles,
       setupValues,
     ],
   )

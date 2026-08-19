@@ -19,8 +19,13 @@ import {
   quickNpcAuthoringTabDefaultValues,
   QUICK_NPC_DETAILS_TAB_ID,
 } from './quick-npc-form-fields'
+import {
+  quickNpcMemberSetupWithNoTitle,
+  quickNpcOrganizationMemberCreateContext,
+} from './quick-npc-test-fixtures'
 
 const validValues = {
+  contextKind: 'organization-member' as const,
   name: 'Guard Captain',
   speciesId: 'srd-cc-5.2.1:dwarf',
   classId: 'srd-cc-5.2.1:fighter',
@@ -49,8 +54,10 @@ describe('isQuickNpcMembershipTitleSetupComplete', () => {
 describe('createQuickNpcSetupDefaultValues', () => {
   it('starts with setup-only unset membership title until the user chooses', () => {
     const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+    const createContext = quickNpcOrganizationMemberCreateContext()
 
-    expect(createQuickNpcSetupDefaultValues(context)).toMatchObject({
+    expect(createQuickNpcSetupDefaultValues(context, createContext)).toMatchObject({
+      contextKind: 'organization-member',
       speciesId: '',
       membershipTitle: undefined,
       classId: '',
@@ -216,12 +223,11 @@ describe('buildQuickNpcTabs validation wiring', () => {
   it('merges setup and tab values for create/finalize', () => {
     expect(
       mergeQuickNpcAuthoringValues(
-        {
+        quickNpcMemberSetupWithNoTitle({
           speciesId: 'species-1',
-          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           classId: 'class-1',
           level: 2,
-        },
+        }),
         {
           name: 'Guard Captain',
           alignment: 'ln',

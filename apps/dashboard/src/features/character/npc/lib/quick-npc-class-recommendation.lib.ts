@@ -11,6 +11,7 @@ import {
 import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
+import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'
 
 export function resolveQuickNpcSelectedTitleRecommendation(args: {
   membershipTitle: string | undefined
@@ -34,7 +35,9 @@ export function resolveQuickNpcClassRecommendationIds(args: {
   organizationClassAffinityIds?: readonly string[]
 }): string[] {
   const titleRecommendation = resolveQuickNpcSelectedTitleRecommendation({
-    membershipTitle: args.values.membershipTitle,
+    membershipTitle: isQuickNpcOrganizationMemberSetup(args.values)
+      ? args.values.membershipTitle
+      : undefined,
     titles: args.titles,
   })
   const playableClasses = resolvePlayableBuilderContent(args.context).classes

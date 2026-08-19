@@ -14,10 +14,15 @@ vi.mock('@/features/character', async (importOriginal) => {
     ...actual,
     QuickNpcCreateModal: ({
       onCancel,
-      organization,
+      context,
     }: {
       onCancel: () => void
-      organization: { members?: { classAffinityIds?: readonly string[] } }
+      context:
+        | { kind: 'standalone' }
+        | {
+            kind: 'organization-member'
+            organization: { members?: { classAffinityIds?: readonly string[] } }
+          }
     }) => (
       <div>
         <h2>Create NPC</h2>
@@ -25,7 +30,9 @@ vi.mock('@/features/character', async (importOriginal) => {
           Cancel
         </button>
         <span data-testid="quick-npc-class-affinities">
-          {(organization.members?.classAffinityIds ?? []).join(',')}
+          {context.kind === 'organization-member'
+            ? (context.organization.members?.classAffinityIds ?? []).join(',')
+            : ''}
         </span>
       </div>
     ),
@@ -79,6 +86,7 @@ function createDetail(
     openAddDrawer: vi.fn(),
     openCreateNpcModal: vi.fn(),
     cancelCreateNpcModal: vi.fn(),
+    handleQuickNpcContentCreated: vi.fn(),
     handleQuickNpcSuccess: vi.fn(),
     openEditDrawer: vi.fn(),
     openRemoveConfirm: vi.fn(),
