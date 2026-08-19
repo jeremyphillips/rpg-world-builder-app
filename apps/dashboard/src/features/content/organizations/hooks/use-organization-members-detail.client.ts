@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { CampaignNpcDetail, Organization } from '@rpg/contracts'
+import type { Organization } from '@rpg/contracts'
 import { getErrorMessage, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -144,31 +144,14 @@ export function useOrganizationMembersDetail(
     [campaignId, invalidate, organizationId],
   )
 
-  /** Quick NPC creation already wrote the membership atomically — refresh reads only. */
-  const handleQuickNpcCreated = React.useCallback(
-    async (npc: CampaignNpcDetail) => {
-      await invalidate({ characterId: npc.character.id, subjectKind: 'npc' })
+  /** Quick NPC nested create succeeded — refresh roster reads and close all overlays. */
+  const handleQuickNpcContentCreated = React.useCallback(
+    async (result: CreatedContentResult) => {
+      if (result.contentType !== 'npcs') return
+      await invalidate({ characterId: result.id, subjectKind: 'npc' })
+      setDrawerState(null)
     },
     [invalidate],
-  )
-
-  /** Quick NPC creation context for the Add member drawer — buildContext is null until it resolves. */
-  const quickNpc = React.useMemo(
-    () => ({
-      campaignId,
-      buildContext: npcBuildContext,
-      buildContextFailed:
-        npcBuildContextIsError ||
-        (npcBuildContextUnavailable !== null && npcBuildContextUnavailable.kind !== 'loading'),
-      onCreated: handleQuickNpcCreated,
-    }),
-    [
-      campaignId,
-      handleQuickNpcCreated,
-      npcBuildContext,
-      npcBuildContextIsError,
-      npcBuildContextUnavailable,
-    ],
   )
 
   const editingRow = drawerState?.mode === 'edit' ? drawerState.row : null
@@ -273,21 +256,6 @@ export function useOrganizationMembersDetail(
   const openAddDrawer = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
   const openCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'createNpc' }), [])
   const cancelCreateNpcModal = React.useCallback(() => setDrawerState({ mode: 'add' }), [])
-  const handleQuickNpcContentCreated = React.useCallback(
-    async (result: CreatedContentResult) => {
-      if (result.contentType !== 'npcs') return
-      await invalidate({ characterId: result.id, subjectKind: 'npc' })
-      setDrawerState(null)
-    },
-    [invalidate],
-  )
-  const handleQuickNpcSuccess = React.useCallback(
-    async (npc: CampaignNpcDetail) => {
-      await handleQuickNpcCreated(npc)
-      setDrawerState(null)
-    },
-    [handleQuickNpcCreated],
-  )
   const openEditDrawer = React.useCallback(
     (row: OrganizationMemberRowVm) => setDrawerState({ mode: 'edit', row }),
     [],
@@ -297,6 +265,18 @@ export function useOrganizationMembersDetail(
     [],
   )
   const closeDrawer = React.useCallback(() => setDrawerState(null), [])
+
+  /** Quick NPC availability for the Add member drawer — buildContext is null until it resolves. */
+  const quickNpc = React.useMemo(
+    () => ({
+      campaignId,
+      buildContext: npcBuildContext,
+      buildContextFailed:
+        npcBuildContextIsError ||
+        (npcBuildContextUnavailable !== null && npcBuildContextUnavailable.kind !== 'loading'),
+    }),
+    [campaignId, npcBuildContext, npcBuildContextIsError, npcBuildContextUnavailable],
+  )
 
   return {
     canManage,
@@ -316,7 +296,6 @@ export function useOrganizationMembersDetail(
     openCreateNpcModal,
     cancelCreateNpcModal,
     handleQuickNpcContentCreated,
-    handleQuickNpcSuccess,
     openEditDrawer,
     openRemoveConfirm,
     closeDrawer,
