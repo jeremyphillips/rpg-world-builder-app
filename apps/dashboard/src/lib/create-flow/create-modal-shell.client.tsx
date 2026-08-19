@@ -12,7 +12,7 @@ import {
   type ModalContentProps,
 } from '@rpg/ui'
 
-import { CreateSetupSummary, type CreateSetupSummaryProps } from '@/lib/create-setup'
+import { SetupSummaryCard, SetupSummaryCardChangeAction } from '@/lib/create-setup'
 
 import {
   createModalShellBodyVariants,
@@ -61,12 +61,20 @@ export type CreateModalShellTab = {
   contentMode?: CreateModalShellContentMode
 }
 
+export type CreateModalShellSetupSummary = {
+  eyebrow: string
+  rows: readonly { label: string; value: string }[]
+  changeLabel?: string
+  changeAriaLabel?: string
+  onChange: () => void
+}
+
 export type CreateModalShellProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   headline: React.ReactNode
   description?: React.ReactNode
-  setupSummary?: CreateSetupSummaryProps
+  setupSummary?: CreateModalShellSetupSummary
   tabs?: readonly [CreateModalShellTab, ...CreateModalShellTab[]]
   /** Hides tab chrome/panels without unmounting them while a workflow returns to Setup. */
   tabsVisible?: boolean
@@ -189,7 +197,19 @@ export function CreateModalShell({
       >
         <Modal.Header headline={headline} description={description} />
         <Modal.Body stableBody data-create-modal-body className={createModalShellBodyVariants()}>
-          {setupSummary ? <CreateSetupSummary {...setupSummary} /> : null}
+          {setupSummary ? (
+            <SetupSummaryCard
+              eyebrow={setupSummary.eyebrow}
+              rows={setupSummary.rows}
+              cardAction={
+                <SetupSummaryCardChangeAction
+                  changeLabel={setupSummary.changeLabel ?? 'Change'}
+                  ariaLabel={setupSummary.changeAriaLabel ?? 'Change setup'}
+                  onChange={setupSummary.onChange}
+                />
+              }
+            />
+          ) : null}
           {tabs ? (
             <>
               <div

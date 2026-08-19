@@ -71,18 +71,20 @@ describe('formatQuickNpcClassRecommendationHelper', () => {
 })
 
 describe('isQuickNpcBuildCardVisible', () => {
-  it('requires a resolved model and no reopened identity set', () => {
-    expect(isQuickNpcBuildCardVisible({ buildCardModel: null, reopenSetId: null })).toBe(false)
+  it('requires a resolved model and no upstream edit in progress', () => {
+    expect(isQuickNpcBuildCardVisible({ buildCardModel: null, isEditingUpstream: false })).toBe(
+      false,
+    )
     expect(
       isQuickNpcBuildCardVisible({
         buildCardModel: { sectionEyebrow: 'Build' } as never,
-        reopenSetId: 'membershipTitle',
+        isEditingUpstream: true,
       }),
     ).toBe(false)
     expect(
       isQuickNpcBuildCardVisible({
         buildCardModel: { sectionEyebrow: 'Build' } as never,
-        reopenSetId: null,
+        isEditingUpstream: false,
       }),
     ).toBe(true)
   })

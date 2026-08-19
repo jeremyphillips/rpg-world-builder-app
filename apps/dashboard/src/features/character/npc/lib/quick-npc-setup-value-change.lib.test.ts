@@ -9,7 +9,7 @@ import {
   applyQuickNpcSetupValueChange,
   resolveQuickNpcLevelForMembershipTitle,
 } from './quick-npc-setup-value-change.lib'
-import { createQuickNpcSetupDefaultValues } from './quick-npc-form-fields'
+import { createQuickNpcSetupDefaultValues, type QuickNpcSetupValues } from './quick-npc-form-fields'
 
 const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
@@ -61,6 +61,30 @@ const changeArgs = {
   organizationClassAffinityIds: [rogueClass.id],
 }
 
+function applySetupChange(
+  args: {
+    values: QuickNpcSetupValues
+    setId: string
+    nextValue: string | number
+  } & typeof changeArgs,
+) {
+  const { values, setId, nextValue, ...rest } = args
+  const previousValue =
+    setId === 'speciesId'
+      ? values.speciesId
+      : setId === 'membershipTitle'
+        ? (values.membershipTitle ?? '')
+        : setId === 'classId'
+          ? values.classId
+          : values.level
+
+  return applyQuickNpcSetupValueChange({
+    values,
+    event: { setId, previousValue, nextValue, invalidatedSetIds: [] },
+    ...rest,
+  })
+}
+
 describe('resolveQuickNpcLevelForMembershipTitle', () => {
   it('returns the campaign default for no title', () => {
     expect(
@@ -104,7 +128,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('recomputes and auto-seeds Class when Species changes without touching level', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: baseValues,
         setId: 'speciesId',
         nextValue: 'srd-cc-5.2.1:elf',
@@ -120,7 +144,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('defers Class seeding when Title is selected before Species', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: {
           ...createQuickNpcSetupDefaultValues(multiClassContext),
           speciesId: '',
@@ -141,7 +165,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('auto-seeds Class when Species completes after Title', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: {
           ...createQuickNpcSetupDefaultValues(multiClassContext),
           speciesId: '',
@@ -163,7 +187,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('preserves species when title changes and reseeds level and class', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: {
           ...baseValues,
           speciesId: 'srd-cc-5.2.1:elf',
@@ -184,7 +208,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('auto-seeds Class when Title resolves to exactly one recommendation', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: baseValues,
         setId: 'membershipTitle',
         nextValue: 'Guildmaster',
@@ -200,7 +224,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('clears Class when Title resolves to multiple recommendations', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: {
           ...baseValues,
           membershipTitle: 'Guildmaster',
@@ -220,7 +244,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('seeds organization-only recommendations when the title has no template recommendation', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: baseValues,
         setId: 'membershipTitle',
         nextValue: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -236,7 +260,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('clears class when level drops to 0', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: baseValues,
         setId: 'level',
         nextValue: 0,
@@ -251,7 +275,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('preserves class when level stays above 0', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: baseValues,
         setId: 'level',
         nextValue: 5,
@@ -265,7 +289,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('recomputes and auto-seeds Class when level rises from 0 to a class-applicable level', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: {
           ...baseValues,
           membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -286,7 +310,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('defers Class seeding when level rises from 0 before Species is complete', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: {
           ...createQuickNpcSetupDefaultValues(multiClassContext),
           speciesId: '',
@@ -308,7 +332,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('does not restore a stale class when level rises from 0 without a single recommendation', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: {
           ...baseValues,
           membershipTitle: 'Commander',
@@ -329,7 +353,7 @@ describe('applyQuickNpcSetupValueChange', () => {
 
   it('preserves a manually selected class', () => {
     expect(
-      applyQuickNpcSetupValueChange({
+      applySetupChange({
         values: baseValues,
         setId: 'classId',
         nextValue: fighterClass.id,

@@ -1,4 +1,4 @@
-import type { CreateSetupSequenceItem } from './create-setup.types'
+import type { CreateSetupSequenceItem, CreateSetupSet } from './create-setup.types'
 
 export type ResolveCreateSetupActiveSetIdInput = {
   sets: readonly CreateSetupSequenceItem[]
@@ -153,6 +153,36 @@ type SetDependencyItem = {
 /**
  * Set ids that must be reset when `changedSetId` changes, including transitive dependents.
  */
+export function resolveCreateSetupCollapsedCompleteSetIds({
+  sets,
+  visibleSetIds,
+  activeSetId,
+  reopenSetId = null,
+}: {
+  sets: readonly CreateSetupSet[]
+  visibleSetIds: readonly string[]
+  activeSetId: string | null
+  reopenSetId?: string | null
+}): string[] {
+  const setsById = new Map(sets.map((set) => [set.id, set]))
+
+  return visibleSetIds.filter((setId) => {
+    const set = setsById.get(setId)
+    if (!set?.isComplete) return false
+
+    return !resolveCreateSetupSetExpanded({
+      setId,
+      activeSetId,
+      reopenSetId,
+      visible: true,
+      isComplete: true,
+      required: set.required,
+      collapseWhenComplete: set.collapseWhenComplete ?? true,
+      collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete ?? false,
+    })
+  })
+}
+
 export function resolveCreateSetupSetIdsToInvalidate({
   sets,
   changedSetId,

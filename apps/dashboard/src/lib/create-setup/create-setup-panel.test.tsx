@@ -9,7 +9,9 @@ import {
   isCreateSetupChoiceComplete,
   isCreateSetupNumberComplete,
   resolveCreateSetupActiveSetId,
+  useCreateSetupSequence,
   type CreateSetupSet,
+  type CreateSetupValueChangeEvent,
 } from '@/lib/create-setup'
 
 const SPECIES_OPTIONS: RadioCardOption[] = [
@@ -22,10 +24,39 @@ const CLASS_OPTIONS: RadioCardOption[] = [
   { value: 'wizard', label: 'Wizard' },
 ]
 
-function buildNpcSetupSets(
+function applyNpcSetupValueChange(
   values: { speciesId: string; level: number; classId: string },
-  onValuesChange: (patch: Partial<{ speciesId: string; level: number; classId: string }>) => void,
-): CreateSetupSet[] {
+  event: CreateSetupValueChangeEvent,
+) {
+  let next = { ...values }
+
+  for (const invalidatedId of event.invalidatedSetIds) {
+    if (invalidatedId === 'classId') {
+      next.classId = ''
+    }
+    if (invalidatedId === 'level') {
+      next.level = 1
+    }
+  }
+
+  if (event.setId === 'speciesId') {
+    next = { ...next, speciesId: String(event.nextValue), classId: '' }
+  }
+  if (event.setId === 'level') {
+    next = { ...next, level: Number(event.nextValue) }
+  }
+  if (event.setId === 'classId') {
+    next = { ...next, classId: String(event.nextValue) }
+  }
+
+  return next
+}
+
+function buildNpcSetupSets(values: {
+  speciesId: string
+  level: number
+  classId: string
+}): CreateSetupSet[] {
   const min = 1
   const max = 20
 
@@ -39,8 +70,6 @@ function buildNpcSetupSets(
       value: values.speciesId,
       isComplete: isCreateSetupChoiceComplete(values.speciesId),
       collapseWhenComplete: true,
-      onValueChange: (speciesId) => onValuesChange({ speciesId }),
-      onReset: () => {},
     },
     {
       id: 'level',
@@ -52,8 +81,6 @@ function buildNpcSetupSets(
       digits: 2,
       isComplete: isCreateSetupNumberComplete(values.level, min, max),
       collapseWhenComplete: false,
-      onValueChange: (level) => onValuesChange({ level }),
-      onReset: () => onValuesChange({ level: 1 }),
     },
     {
       id: 'classId',
@@ -65,22 +92,24 @@ function buildNpcSetupSets(
       dependsOn: ['speciesId'],
       isComplete: isCreateSetupChoiceComplete(values.classId),
       collapseWhenComplete: true,
-      onValueChange: (classId) => onValuesChange({ classId }),
-      onReset: () => onValuesChange({ classId: '' }),
     },
   ]
 }
 
 function MixedSetupHarness() {
   const [values, setValues] = useState({ speciesId: '', level: 1, classId: '' })
-  const sets = buildNpcSetupSets(values, (nextValues) => {
-    setValues((current) => ({
-      ...current,
-      ...nextValues,
-    }))
-  })
+  const sets = buildNpcSetupSets(values)
+  const model = useCreateSetupSequence(sets)
 
-  return <CreateSetupPanel sets={sets} />
+  return (
+    <CreateSetupPanel
+      sets={sets}
+      model={model}
+      onSetupValueChange={(event) => {
+        setValues((current) => applyNpcSetupValueChange(current, event))
+      }}
+    />
+  )
 }
 
 function OptionalSetupHarness() {
@@ -95,8 +124,6 @@ function OptionalSetupHarness() {
       value: values.form,
       required: false,
       isComplete: isCreateSetupChoiceComplete(values.form),
-      onValueChange: (form) => setValues((current) => ({ ...current, form })),
-      onReset: () => setValues((current) => ({ ...current, form: '' })),
     },
     {
       id: 'facility',
@@ -107,8 +134,6 @@ function OptionalSetupHarness() {
       value: values.facility,
       required: false,
       isComplete: isCreateSetupChoiceComplete(values.facility),
-      onValueChange: (facility) => setValues((current) => ({ ...current, facility })),
-      onReset: () => setValues((current) => ({ ...current, facility: '' })),
     },
     {
       id: 'operator',
@@ -121,12 +146,31 @@ function OptionalSetupHarness() {
       ],
       value: values.operator,
       isComplete: isCreateSetupChoiceComplete(values.operator),
-      onValueChange: (operator) => setValues((current) => ({ ...current, operator })),
-      onReset: () => setValues((current) => ({ ...current, operator: '' })),
     },
   ]
+  const model = useCreateSetupSequence(sets)
 
-  return <CreateSetupPanel sets={sets} />
+  return (
+    <CreateSetupPanel
+      sets={sets}
+      model={model}
+      onSetupValueChange={(event) => {
+        setValues((current) => {
+          const next = { ...current }
+          if (event.setId === 'form') next.form = String(event.nextValue)
+          if (event.setId === 'facility') next.facility = String(event.nextValue)
+          if (event.setId === 'operator') next.operator = String(event.nextValue)
+          return next
+        })
+      }}
+    />
+  )
+}
+
+function GroupedSetupHarness({ sets }: { sets: CreateSetupSet[] }) {
+  const model = useCreateSetupSequence(sets)
+
+  return <CreateSetupPanel sets={sets} model={model} onSetupValueChange={vi.fn()} />
 }
 
 describe('CreateSetupPanel', () => {
@@ -166,19 +210,13 @@ describe('CreateSetupPanel', () => {
     await user.click(screen.getByRole('button', { name: 'Increase Level' }))
     await user.click(screen.getByRole('radio', { name: 'Fighter' }))
 
-    const setsAfterClass = buildNpcSetupSets(
-      { speciesId: 'dwarf', level: 2, classId: 'fighter' },
-      vi.fn(),
-    )
+    const setsAfterClass = buildNpcSetupSets({ speciesId: 'dwarf', level: 2, classId: 'fighter' })
     expect(resolveCreateSetupActiveSetId({ sets: setsAfterClass })).toBe('classId')
 
     await user.click(screen.getAllByRole('button', { name: 'Change' })[0]!)
     await user.click(screen.getByRole('radio', { name: 'Elf' }))
 
-    const setsAfterSpeciesChange = buildNpcSetupSets(
-      { speciesId: 'elf', level: 1, classId: '' },
-      vi.fn(),
-    )
+    const setsAfterSpeciesChange = buildNpcSetupSets({ speciesId: 'elf', level: 1, classId: '' })
     expect(resolveCreateSetupActiveSetId({ sets: setsAfterSpeciesChange })).toBe('classId')
     expect(setsAfterSpeciesChange.find((set) => set.id === 'level')?.isComplete).toBe(true)
     expect(screen.queryByRole('heading', { name: 'Fighter' })).not.toBeInTheDocument()
@@ -195,8 +233,6 @@ describe('CreateSetupPanel', () => {
         value: 'guildmaster',
         isComplete: true,
         collapseWhenComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
       {
         id: 'speciesId',
@@ -209,12 +245,10 @@ describe('CreateSetupPanel', () => {
         isComplete: true,
         collapseWhenComplete: true,
         collapseWhenActiveAndComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
     ]
 
-    render(<CreateSetupPanel sets={sets} />)
+    render(<GroupedSetupHarness sets={sets} />)
 
     expect(screen.getByRole('button', { name: 'Guildmaster, Change' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Dwarf, Change' })).toBeInTheDocument()
@@ -231,10 +265,10 @@ describe('CreateSetupPanel', () => {
         prompt: 'Choose a title',
         options: [{ value: 'guildmaster', label: 'Guildmaster' }],
         value: 'guildmaster',
+        summaryGroup: 'selections',
+        summaryGroupEyebrow: 'Selections',
         isComplete: true,
         collapseWhenComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
       {
         id: 'speciesId',
@@ -244,21 +278,15 @@ describe('CreateSetupPanel', () => {
         options: SPECIES_OPTIONS,
         value: 'dwarf',
         visibleWhenComplete: ['membershipTitle'],
+        summaryGroup: 'selections',
+        summaryGroupEyebrow: 'Selections',
         isComplete: true,
         collapseWhenComplete: true,
         collapseWhenActiveAndComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
     ]
 
-    render(
-      <CreateSetupPanel
-        sets={sets}
-        groupedChoiceSetIds={['membershipTitle', 'speciesId']}
-        groupedSummaryEyebrow="Selections"
-      />,
-    )
+    render(<GroupedSetupHarness sets={sets} />)
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
@@ -268,7 +296,7 @@ describe('CreateSetupPanel', () => {
     expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
   })
 
-  it('renders a partial grouped summary while later grouped choices are still active', () => {
+  it('keeps a single completed grouped member on ChooserSummaryCard until the group is complete', () => {
     const sets: CreateSetupSet[] = [
       {
         id: 'membershipTitle',
@@ -277,10 +305,10 @@ describe('CreateSetupPanel', () => {
         prompt: 'Choose a title',
         options: [{ value: 'guildmaster', label: 'Guildmaster' }],
         value: 'guildmaster',
+        summaryGroup: 'selections',
+        summaryGroupEyebrow: 'Selections',
         isComplete: true,
         collapseWhenComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
       {
         id: 'speciesId',
@@ -290,32 +318,22 @@ describe('CreateSetupPanel', () => {
         options: SPECIES_OPTIONS,
         value: '',
         visibleWhenComplete: ['membershipTitle'],
+        summaryGroup: 'selections',
+        summaryGroupEyebrow: 'Selections',
         isComplete: false,
         collapseWhenComplete: true,
         collapseWhenActiveAndComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
     ]
 
-    render(
-      <CreateSetupPanel
-        sets={sets}
-        groupedChoiceSetIds={['membershipTitle', 'speciesId']}
-        groupedSummaryEyebrow="Selections"
-        allowPartialGroupedSummary
-      />,
-    )
+    render(<GroupedSetupHarness sets={sets} />)
 
-    expect(screen.getByText('Selections')).toBeInTheDocument()
-    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Change species' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Guildmaster, Change' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
+    expect(screen.queryByText('Selections')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Guildmaster, Change' })).toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Choose a species' })).toBeInTheDocument()
   })
 
-  it('does not group a third collapsed choice that is not in groupedChoiceSetIds', () => {
+  it('does not group a third collapsed choice that is outside the summary group', () => {
     const sets: CreateSetupSet[] = [
       {
         id: 'membershipTitle',
@@ -324,10 +342,10 @@ describe('CreateSetupPanel', () => {
         prompt: 'Choose a title',
         options: [{ value: 'guildmaster', label: 'Guildmaster' }],
         value: 'guildmaster',
+        summaryGroup: 'selections',
+        summaryGroupEyebrow: 'Selections',
         isComplete: true,
         collapseWhenComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
       {
         id: 'speciesId',
@@ -337,11 +355,11 @@ describe('CreateSetupPanel', () => {
         options: SPECIES_OPTIONS,
         value: 'dwarf',
         visibleWhenComplete: ['membershipTitle'],
+        summaryGroup: 'selections',
+        summaryGroupEyebrow: 'Selections',
         isComplete: true,
         collapseWhenComplete: true,
         collapseWhenActiveAndComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
       {
         id: 'classId',
@@ -354,14 +372,44 @@ describe('CreateSetupPanel', () => {
         isComplete: true,
         collapseWhenComplete: true,
         collapseWhenActiveAndComplete: true,
-        onValueChange: vi.fn(),
-        onReset: () => {},
       },
     ]
 
-    render(<CreateSetupPanel sets={sets} groupedChoiceSetIds={['membershipTitle', 'speciesId']} />)
+    render(<GroupedSetupHarness sets={sets} />)
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Fighter, Change' })).toBeInTheDocument()
+  })
+
+  it('dismisses reopen without emitting a value change when the same option is re-selected', async () => {
+    const user = userEvent.setup()
+    const onSetupValueChange = vi.fn()
+
+    function SameValueHarness() {
+      const sets: CreateSetupSet[] = [
+        {
+          id: 'membershipTitle',
+          kind: 'choice',
+          fieldLabel: 'Title',
+          prompt: 'Choose a title',
+          options: [{ value: 'none', label: 'No title' }],
+          value: 'none',
+          isComplete: true,
+          collapseWhenComplete: true,
+          collapseWhenActiveAndComplete: true,
+        },
+      ]
+      const model = useCreateSetupSequence(sets)
+
+      return <CreateSetupPanel sets={sets} model={model} onSetupValueChange={onSetupValueChange} />
+    }
+
+    render(<SameValueHarness />)
+
+    await user.click(screen.getByRole('button', { name: 'No title, Change' }))
+    await user.click(screen.getByRole('radio', { name: /no title/i }))
+
+    expect(onSetupValueChange).not.toHaveBeenCalled()
+    expect(screen.queryByRole('radiogroup', { name: 'Choose a title' })).not.toBeInTheDocument()
   })
 })

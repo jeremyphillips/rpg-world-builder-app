@@ -1,10 +1,30 @@
 import type { NumberStepperDigits, RadioCardOption, RadioCardOptionGroup } from '@rpg/ui'
 
+export type CreateSetupValueChangeEvent = {
+  setId: string
+  previousValue: string | number
+  nextValue: string | number
+  invalidatedSetIds: readonly string[]
+  /** When true, the set is resolved without a value (optional skip affordance). */
+  skipped?: boolean
+}
+
+export type CreateSetupSequenceModel = {
+  activeSetId: string | null
+  visibleSetIds: string[]
+  collapsedCompleteSetIds: string[]
+  reopenSetId: string | null
+  reopen: (setId: string | null) => void
+  /** True while a reopened upstream set is being edited — siblings/downstream hide on this. */
+  isEditingUpstream: boolean
+  canContinue: boolean
+}
+
 export type CreateSetupSequenceItem = {
   id: string
   isComplete: boolean
   required?: boolean
-  /** Upstream set ids — when any change, dependents are reset via `onReset`. */
+  /** Upstream set ids — when any changes, dependents are reset via the value-change event. */
   dependsOn?: readonly string[]
   /** Upstream set ids that must be complete before this set is visible — no reset. */
   visibleWhenComplete?: readonly string[]
@@ -18,6 +38,8 @@ export type CreateSetupSequenceItem = {
    * the active terminal set. Opt-in for flows that should summarize after seeding.
    */
   collapseWhenActiveAndComplete?: boolean
+  /** Semantic group id — collapsed-complete members render one grouped SetupSummaryCard. */
+  summaryGroup?: string
 }
 
 export type CreateSetupSetBase = {
@@ -30,8 +52,10 @@ export type CreateSetupSetBase = {
   visibleWhenComplete?: readonly string[]
   collapseWhenComplete?: boolean
   collapseWhenActiveAndComplete?: boolean
+  summaryGroup?: string
+  /** Eyebrow for grouped setup-phase summary when `summaryGroup` is set. */
+  summaryGroupEyebrow?: string
   isComplete: boolean
-  onReset: () => void
 }
 
 export type CreateSetupChoiceSet = CreateSetupSetBase & {
@@ -39,13 +63,16 @@ export type CreateSetupChoiceSet = CreateSetupSetBase & {
   options: RadioCardOption[]
   optionGroups?: RadioCardOptionGroup[]
   value: string
-  onValueChange: (value: string) => void
+  /** Optional sets: explicit skip affordance label (e.g. "Skip / Not specified"). */
+  skipLabel?: string
+  /** When true, summary shows `skippedValueLabel` instead of the selected option. */
+  skipped?: boolean
+  skippedValueLabel?: string
 }
 
 export type CreateSetupNumberSet = CreateSetupSetBase & {
   kind: 'number'
   value: number
-  onValueChange: (value: number) => void
   min: number
   max: number
   digits?: NumberStepperDigits

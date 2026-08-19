@@ -107,14 +107,13 @@ function QuickNpcCreateModalSession({
     [onOpenChange, requestCancel],
   )
 
-  const handleApplySetupChange = React.useCallback(
-    (setId: string, nextValue: string | number) => {
+  const handleSetupValueChange = React.useCallback(
+    (event: Parameters<typeof applyQuickNpcSetupValueChange>[0]['event']) => {
       setState((current) => ({
         ...current,
         setupValues: applyQuickNpcSetupValueChange({
           values: current.setupValues,
-          setId,
-          nextValue,
+          event,
           context: buildContext,
           titles: organization.members?.titles ?? [],
           organizationClassAffinityIds: organization.members?.classAffinityIds,
@@ -197,7 +196,7 @@ function QuickNpcCreateModalSession({
             buildContext={buildContext}
             organization={organization}
             setupValues={state.setupValues}
-            onApplySetupChange={handleApplySetupChange}
+            onSetupValueChange={handleSetupValueChange}
           />
         ) : (
           <QuickNpcAuthoringForm

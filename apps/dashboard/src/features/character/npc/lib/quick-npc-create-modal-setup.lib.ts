@@ -32,12 +32,12 @@ export const QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION =
 export const QUICK_NPC_SETUP_HEADLINE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
 export const QUICK_NPC_SETUP_SELECTIONS_EYEBROW = 'Selections' as const
+export const QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP = 'selections' as const
 export const QUICK_NPC_SETUP_SUMMARY_EYEBROW = 'Setup' as const
 export const QUICK_NPC_AUTHORING_SETUP_ROLE_LABEL = 'Role' as const
 export const QUICK_NPC_AUTHORING_SETUP_CHARACTER_LABEL = 'Character' as const
 export const QUICK_NPC_AUTHORING_SETUP_BUILD_LABEL = 'Build' as const
 export const QUICK_NPC_AUTHORING_SETUP_CHANGE_ARIA_LABEL = 'Change setup' as const
-export const QUICK_NPC_SETUP_GROUPED_CHOICE_SET_IDS = ['membershipTitle', 'speciesId'] as const
 export const QUICK_NPC_TITLE_FIELD_PROMPT =
   "Choose this member's role in the organization." as const
 export {
@@ -83,7 +83,7 @@ export function resolveQuickNpcMembershipTitleDisplayLabel(
 }
 
 /** Structured Role / Character / Build rows for authoring-phase SetupSummaryCard. */
-export function resolveQuickNpcAuthoringSetupSummaryRows(args: {
+export function resolveQuickNpcSetupSummaryRows(args: {
   values: QuickNpcSetupValues
   context: CharacterBuildContext
   titles?: readonly OrganizationMembershipTitleDefinition[]
@@ -126,19 +126,18 @@ export function resolveQuickNpcAuthoringSetupSummaryRows(args: {
   return rows
 }
 
+/** @deprecated Use `resolveQuickNpcSetupSummaryRows`. */
+export const resolveQuickNpcAuthoringSetupSummaryRows = resolveQuickNpcSetupSummaryRows
+
 type QuickNpcSetupSetBuilderArgs = {
   values: QuickNpcSetupValues
-  onApplySetupChange: (setId: string, nextValue: string | number) => void
   titles: readonly OrganizationMembershipTitleDefinition[]
   speciesTermLabel: string
   speciesPresentation: ReturnType<typeof buildQuickNpcSpeciesRadioCardPresentation>
 }
 
 function buildQuickNpcSpeciesSetupSet(
-  args: Pick<
-    QuickNpcSetupSetBuilderArgs,
-    'values' | 'onApplySetupChange' | 'speciesTermLabel' | 'speciesPresentation'
-  >,
+  args: Pick<QuickNpcSetupSetBuilderArgs, 'values' | 'speciesTermLabel' | 'speciesPresentation'>,
 ): CreateSetupSet {
   return {
     id: 'speciesId',
@@ -153,16 +152,16 @@ function buildQuickNpcSpeciesSetupSet(
       : {}),
     value: args.values.speciesId,
     visibleWhenComplete: ['membershipTitle'],
+    summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
+    summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
     isComplete: isCreateSetupChoiceComplete(args.values.speciesId),
     collapseWhenComplete: true,
     collapseWhenActiveAndComplete: true,
-    onValueChange: (speciesId) => args.onApplySetupChange('speciesId', speciesId),
-    onReset: () => {},
   }
 }
 
 function buildQuickNpcMembershipTitleSetupSet(
-  args: Pick<QuickNpcSetupSetBuilderArgs, 'values' | 'onApplySetupChange' | 'titles'>,
+  args: Pick<QuickNpcSetupSetBuilderArgs, 'values' | 'titles'>,
 ): CreateSetupSet {
   return {
     id: 'membershipTitle',
@@ -172,23 +171,22 @@ function buildQuickNpcMembershipTitleSetupSet(
     prompt: QUICK_NPC_TITLE_FIELD_PROMPT,
     options: buildOrganizationMembershipTitleRadioOptions({ titles: args.titles }),
     value: args.values.membershipTitle ?? '',
+    summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
+    summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
     isComplete: isQuickNpcMembershipTitleSetupComplete(args.values.membershipTitle),
     collapseWhenComplete: true,
-    onValueChange: (membershipTitle) => args.onApplySetupChange('membershipTitle', membershipTitle),
-    onReset: () => {},
   }
 }
 
 export function buildQuickNpcCreateSetupSets(args: {
   context: CharacterBuildContext
   values: QuickNpcSetupValues
-  onApplySetupChange: (setId: string, nextValue: string | number) => void
   titles: readonly OrganizationMembershipTitleDefinition[]
   members?: { classAffinityIds?: readonly string[]; speciesAffinityIds?: readonly string[] }
 }): CreateSetupSet[] {
   const { speciesOptions } = buildQuickNpcContentOptions(args.context)
   const playableContent = resolvePlayableBuilderContent(args.context)
-  const { values, onApplySetupChange, titles } = args
+  const { values, titles } = args
   const speciesPresentation = buildQuickNpcSpeciesRadioCardPresentation({
     speciesOptions,
     speciesAffinityIds: args.members?.speciesAffinityIds,
@@ -197,7 +195,6 @@ export function buildQuickNpcCreateSetupSets(args: {
   const speciesTerm = getContentTypeTerm('species')
   const setBuilderArgs: QuickNpcSetupSetBuilderArgs = {
     values,
-    onApplySetupChange,
     titles,
     speciesTermLabel: speciesTerm.label,
     speciesPresentation,
@@ -227,7 +224,6 @@ export function resolveQuickNpcSetupModel(args: {
   const sets = buildQuickNpcCreateSetupSets({
     context: args.context,
     values: args.values,
-    onApplySetupChange: () => {},
     titles: args.titles ?? [],
     members: args.members,
   })

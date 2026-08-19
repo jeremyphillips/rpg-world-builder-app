@@ -1,4 +1,5 @@
-import type { CreateSetupChoiceSet } from './create-setup.types'
+import { CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL } from './create-setup.constants'
+import type { CreateSetupChoiceSet, CreateSetupSet } from './create-setup.types'
 
 export type CreateSetupGroupedChoiceRow = {
   setId: string
@@ -7,8 +8,41 @@ export type CreateSetupGroupedChoiceRow = {
 }
 
 export function resolveCreateSetupChoiceValueLabel(set: CreateSetupChoiceSet): string {
+  if (set.skipped) {
+    return set.skippedValueLabel ?? CREATE_SETUP_DEFAULT_SKIPPED_VALUE_LABEL
+  }
+
   const selectedOption = set.options.find((option) => option.value === set.value)
   return selectedOption?.label ?? set.value
+}
+
+export function resolveCreateSetupSummaryGroupMemberIds(
+  sets: readonly CreateSetupSet[],
+  summaryGroup: string,
+): string[] {
+  return sets.flatMap((set) => (set.summaryGroup === summaryGroup ? [set.id] : []))
+}
+
+export function resolveCreateSetupSummaryGroups(
+  sets: readonly CreateSetupSet[],
+): Map<string, string[]> {
+  const groups = new Map<string, string[]>()
+
+  for (const set of sets) {
+    if (!set.summaryGroup) continue
+    const members = groups.get(set.summaryGroup) ?? []
+    members.push(set.id)
+    groups.set(set.summaryGroup, members)
+  }
+
+  return groups
+}
+
+export function resolveCreateSetupSummaryGroupEyebrow(
+  sets: readonly CreateSetupSet[],
+  summaryGroup: string,
+): string | undefined {
+  return sets.find((set) => set.summaryGroup === summaryGroup)?.summaryGroupEyebrow
 }
 
 export function isCreateSetupSetCollapsedComplete(args: {
@@ -20,11 +54,11 @@ export function isCreateSetupSetCollapsedComplete(args: {
 }
 
 export function resolveCreateSetupCollapsedCompleteGroupedSetIds(args: {
-  groupedChoiceSetIds: readonly string[]
+  groupMemberSetIds: readonly string[]
   visibleSetIds: readonly string[]
   isCollapsedComplete: (setId: string) => boolean
 }): string[] {
-  return args.groupedChoiceSetIds.filter((setId) =>
+  return args.groupMemberSetIds.filter((setId) =>
     isCreateSetupSetCollapsedComplete({
       setId,
       visibleSetIds: args.visibleSetIds,
@@ -33,33 +67,27 @@ export function resolveCreateSetupCollapsedCompleteGroupedSetIds(args: {
   )
 }
 
-/** True when every declared id is visible, complete, and collapsed. */
+/** True when every declared group member is visible, complete, and collapsed. */
 export function isCreateSetupGroupedChoiceSummaryReady(args: {
-  groupedChoiceSetIds: readonly string[]
+  groupMemberSetIds: readonly string[]
   visibleSetIds: readonly string[]
   isCollapsedComplete: (setId: string) => boolean
-  allowPartial?: boolean
 }): boolean {
-  const collapsedCompleteIds = resolveCreateSetupCollapsedCompleteGroupedSetIds(args)
-
-  if (args.allowPartial) {
-    return collapsedCompleteIds.length > 0
-  }
-
-  if (args.groupedChoiceSetIds.length < 2) {
+  if (args.groupMemberSetIds.length < 2) {
     return false
   }
 
-  return collapsedCompleteIds.length === args.groupedChoiceSetIds.length
+  const collapsedCompleteIds = resolveCreateSetupCollapsedCompleteGroupedSetIds(args)
+  return collapsedCompleteIds.length === args.groupMemberSetIds.length
 }
 
 export function resolveCreateSetupGroupedChoiceRows(args: {
-  groupedChoiceSetIds: readonly string[]
+  groupMemberSetIds: readonly string[]
   setById: ReadonlyMap<string, CreateSetupChoiceSet | undefined>
   /** When set, only these ids are included (preserving declared order). */
   collapsedCompleteSetIds?: readonly string[]
 }): CreateSetupGroupedChoiceRow[] {
-  const setIds = args.collapsedCompleteSetIds ?? args.groupedChoiceSetIds
+  const setIds = args.collapsedCompleteSetIds ?? args.groupMemberSetIds
 
   return setIds.flatMap((setId) => {
     const set = args.setById.get(setId)

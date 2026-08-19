@@ -25,7 +25,10 @@ import {
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
-import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
+import {
+  LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL,
+  LOCATION_CREATE_SETUP_CHANGE_LABEL,
+} from '../lib/location-create-setup-chrome.lib'
 import { BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL } from '../lib/building-organizations-create-tab.lib'
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
@@ -196,6 +199,10 @@ async function chooseBuildingForm(user: ReturnType<typeof userEvent.setup>, form
   await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
 }
 
+async function skipBuildingForm(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: /skip \/ not specified/i }))
+}
+
 async function chooseBuildingFacilityGroup(
   user: ReturnType<typeof userEvent.setup>,
   label: 'Browse all' | 'Commercial' | 'Production' | 'Religious' | 'Residence' | 'Civic',
@@ -227,6 +234,10 @@ async function continueBuildingSetup(
   user: ReturnType<typeof userEvent.setup>,
   facilityGroup: Parameters<typeof chooseBuildingFacilityGroup>[1] = 'Browse all',
 ) {
+  const skipButton = screen.queryByRole('button', { name: /skip \/ not specified/i })
+  if (skipButton) {
+    await user.click(skipButton)
+  }
   await chooseBuildingFacilityGroup(user, facilityGroup)
   await user.click(screen.getByRole('button', { name: 'Continue' }))
   expect(await screen.findByRole('heading', { name: 'Create building' })).toBeInTheDocument()
@@ -275,10 +286,11 @@ describe('LocationCreateModal', () => {
       screen.getByRole('radiogroup', { name: 'What physical form does this building have?' }),
     ).toBeVisible()
     expect(
-      screen.getByRole('radiogroup', { name: 'What kind of facility are you creating?' }),
-    ).toBeVisible()
+      screen.queryByRole('radiogroup', { name: 'What kind of facility are you creating?' }),
+    ).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
 
+    await skipBuildingForm(user)
     await continueBuildingSetup(user)
   })
 
@@ -310,7 +322,7 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText(SETTLEMENT_CREATE_SETUP_FIELD_LABEL)).toBeInTheDocument()
     expect(screen.getByText('City')).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
+      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
     ).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
@@ -324,7 +336,7 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText('Browse all')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Organizations (optional)' })).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
+      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
     ).toBeInTheDocument()
   })
 
@@ -337,7 +349,9 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('tab', { name: 'Organizations (optional)' }))
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(
+      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
+    )
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(
@@ -390,7 +404,9 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('House') }))
     await continueBuildingSetup(user)
 
-    expect(screen.getByText('House · Browse all')).toBeInTheDocument()
+    expect(screen.getByText('Setup')).toBeInTheDocument()
+    expect(screen.getByText('House')).toBeInTheDocument()
+    expect(screen.getByText('Browse all')).toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Form' })).not.toBeInTheDocument()
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -419,7 +435,9 @@ describe('LocationCreateModal', () => {
     await chooseBuildingForm(user, 'tower')
     await continueBuildingSetup(user)
 
-    expect(screen.getByText('Tower · Browse all')).toBeInTheDocument()
+    expect(screen.getByText('Setup')).toBeInTheDocument()
+    expect(screen.getByText('Tower')).toBeInTheDocument()
+    expect(screen.getByText('Browse all')).toBeInTheDocument()
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'North Spire')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -441,7 +459,9 @@ describe('LocationCreateModal', () => {
     await chooseBuildingForm(user, 'hall')
     await continueBuildingSetup(user)
 
-    expect(screen.getByText('Hall · Browse all')).toBeInTheDocument()
+    expect(screen.getByText('Setup')).toBeInTheDocument()
+    expect(screen.getByText('Hall')).toBeInTheDocument()
+    expect(screen.getByText('Browse all')).toBeInTheDocument()
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Great Hall')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -463,7 +483,9 @@ describe('LocationCreateModal', () => {
     await chooseBuildingForm(user, 'keep')
     await continueBuildingSetup(user)
 
-    expect(screen.getByText('Keep · Browse all')).toBeInTheDocument()
+    expect(screen.getByText('Setup')).toBeInTheDocument()
+    expect(screen.getByText('Keep')).toBeInTheDocument()
+    expect(screen.getByText('Browse all')).toBeInTheDocument()
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Stone Keep')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -734,7 +756,9 @@ describe('LocationCreateModal', () => {
     description.innerHTML = '<p>A landmark by the quay.</p>'
     fireEvent.input(description)
 
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(
+      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
+    )
     await chooseBuildingFacilityGroup(user, 'Religious')
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
@@ -742,7 +766,9 @@ describe('LocationCreateModal', () => {
     expect(screen.getByRole('textbox', { name: 'Description' })).toHaveTextContent(
       'A landmark by the quay.',
     )
-    expect(screen.getByText('House · Religious')).toBeInTheDocument()
+    expect(screen.getByText('Setup')).toBeInTheDocument()
+    expect(screen.getByText('House')).toBeInTheDocument()
+    expect(screen.getByText('Religious')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Facility type' })).not.toHaveTextContent('Brewery')
 
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -762,7 +788,9 @@ describe('LocationCreateModal', () => {
     await continueBuildingSetup(user, 'Production')
     await chooseBuildingFacilityType(user, 'Brewery')
 
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(
+      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
+    )
     await chooseBuildingFacilityGroup(user, 'Commercial')
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
@@ -993,7 +1021,9 @@ describe('LocationCreateModal', () => {
     await user.click(firstRegionType!)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
 
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(
+      screen.getByRole('button', { name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}` }),
+    )
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
     const clearedRegionTypeGroup = screen.getByRole('radiogroup', { name: 'Region type' })
@@ -1025,11 +1055,14 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(screen.getByText('Setup')).toBeInTheDocument()
-    expect(screen.getByText(`Political · ${firstRegionTypeName}`)).toBeInTheDocument()
+    expect(screen.getByText('Political')).toBeInTheDocument()
+    expect(screen.getByText(firstRegionTypeName!)).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Westmark')
-    await user.click(screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }))
+    await user.click(
+      screen.getByRole('button', { name: LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL }),
+    )
 
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
     expect(
@@ -1043,6 +1076,8 @@ describe('LocationCreateModal', () => {
 
     await user.click(screen.getByRole('button', { name: 'Continue' }))
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Westmark')
-    expect(screen.getByText(`Political · ${firstRegionTypeName}`)).toBeInTheDocument()
+    expect(screen.getByText('Setup')).toBeInTheDocument()
+    expect(screen.getByText('Political')).toBeInTheDocument()
+    expect(screen.getByText(firstRegionTypeName!)).toBeInTheDocument()
   })
 })

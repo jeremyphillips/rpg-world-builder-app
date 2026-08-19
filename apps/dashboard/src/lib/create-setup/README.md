@@ -12,31 +12,59 @@ sequencer  → order, visibility, visibleWhenComplete, dependsOn, active/complet
 panel      → kind → control (choice | number)
 ```
 
+- **Array order defines presentation order** — inserting a set shifts reveal position; `summaryGroup`
+  membership is declared per set, never inferred from adjacency.
 - **Sequencer** (`create-setup-sequence.lib.ts`) is control-agnostic — it never imports UI.
+- **Sequence model** (`useCreateSetupSequence`) is owned by the feature setup phase and passed to
+  `CreateSetupPanel` and sibling UI (e.g. Quick NPC Build card). One instance — no forked reopen state.
 - **Panel** (`create-setup-panel.client.tsx`) maps `kind` to `CollapsibleRadioCardField` or `NumberStepper`.
-- **`groupedChoiceSetIds`** — optional declared membership list for one quiet `SetupSummaryCard` when every listed choice set is visible, complete, and collapsed. Default remains per-set `ChooserSummaryCard`.
-- **`allowPartialGroupedSummary`** — when true with `groupedChoiceSetIds`, render the grouped `SetupSummaryCard` as soon as any declared choice is collapsed-complete; incomplete grouped choices keep their active controls below. Quick NPC opts in so Title collapses into the quiet summary while Species is still open.
+- **`summaryGroup`** — set-level semantic grouping. When every member is collapsed-complete, one quiet
+  `SetupSummaryCard` renders; a single completed member stays on `ChooserSummaryCard` until the group completes.
+- **`skipLabel`** — optional sets expose an explicit skip affordance; skipping emits
+  `onSetupValueChange({ skipped: true, ... })` and the feature records resolved-without-value.
 - **`isComplete`** is caller-owned on each set; the sequencer reads it but does not derive it from values.
-- **`visibleWhenComplete`** hides a set until listed upstream sets are complete — presentation-only; does not call `onReset`.
-- **`dependsOn`** triggers upstream invalidation via `onReset()` — use only for real reset boundaries.
-  Quick NPC setup is an exception: species→class invalidation lives in
-  `applyQuickNpcSetupValueChange` (functional `setState`), so its Class set omits `dependsOn`.
-- **`required: false`** makes a set pass-through: it remains visible/editable but does not block the
-  next required set or Continue. Authors do not need a negative sentinel choice merely to advance.
-- **`onReset`** is required when `dependsOn` is non-empty — invalidation calls `onReset()`, not value clears.
+- **`visibleWhenComplete`** hides a set until listed upstream sets are complete — presentation-only.
+- **`dependsOn`** declares domain invalidation — the panel emits `invalidatedSetIds`; feature applicators
+  clear dependents atomically. No per-set `onReset`.
+- **Same-value reselect** — when `nextValue === set.value`, the panel dismisses reopen state and emits nothing.
+- **`required: false`** — optional sets can be skipped or left incomplete when they do not gate downstream
+  visibility; explicit skip completes the set for reveal purposes.
 - **`collapseWhenComplete: false`** keeps a completed visible set expanded (e.g. Level between choice sets).
 
 The active set is the first incomplete required set among visibility-gated sets, then the first
 incomplete optional set that gates downstream visibility via `visibleWhenComplete`, then the
 terminal set. Completed and optional predecessors are visible; an incomplete visible optional set
-stays expanded. A controlled reopen still temporarily focuses the requested set and preserves the
-existing Change/dependency behavior.
+stays expanded. Reopen temporarily focuses the requested set.
 
-Feature domain models (location intent, NPC build context) stay in feature `lib/` and build `CreateSetupSet[]` for the panel.
+## Summary model
+
+- **Setup phase** — grouped `SetupSummaryCard` rows from set `fieldLabel` + selected label; row-level Change reopens.
+- **Authoring phase** — `SetupSummaryCard` with card-level Change; rows from feature `resolveXSetupSummaryRows()`.
+- **Shared renderer** — `SetupSummaryCard` / `SetupSummaryRow` for both phases.
+
+Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for the panel.
 
 ## Consumers
 
 - Location create setup — choice sets via `CreateSetupShell` and `buildLocationCreateSetupSets`
-- Quick NPC modal setup — Title and Species via `CreateSetupPanel`; Class and Level in sibling `QuickNpcBuildCard` after both are complete
+- Quick NPC modal setup — Title and Species via `CreateSetupPanel`; Class and Level in sibling `QuickNpcBuildCard`
+
+**Documented exception:** Building → Organizations composer uses its own stage machine but adopts the
+reveal invariant (hide downstream while editing upstream kind).
 
 Do not route setup through `FormItem` / `Form` — that layer is for tabbed authoring, not progressive create setup.
+
+## Event contract
+
+```ts
+onSetupValueChange({
+  setId,
+  previousValue,
+  nextValue,
+  invalidatedSetIds,
+  skipped?: boolean,
+})
+```
+
+Feature applicators are the only mutation point. Sequenced create-modal setup must use create-setup
+orchestration unless listed as a documented exception.

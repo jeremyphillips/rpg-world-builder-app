@@ -1,12 +1,15 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { CollapsibleRadioCardField, FieldLabelContent, NumberStepper, Text } from '@rpg/ui'
+import { Button, CollapsibleRadioCardField, FieldLabelContent, NumberStepper, Text } from '@rpg/ui'
 
 import {
   isCreateSetupGroupedChoiceSummaryReady,
   resolveCreateSetupCollapsedCompleteGroupedSetIds,
   resolveCreateSetupGroupedChoiceRows,
+  resolveCreateSetupSummaryGroupEyebrow,
+  resolveCreateSetupSummaryGroupMemberIds,
+  resolveCreateSetupSummaryGroups,
 } from './create-setup-completed-choice-groups.lib'
 import {
   resolveCreateSetupSetExpanded,
@@ -15,33 +18,27 @@ import {
 import { SetupSummaryCard, SetupSummaryCardChangeAction } from './setup-summary-card.client'
 import type {
   CreateSetupChoiceSet,
-  CreateSetupSequenceItem,
+  CreateSetupSequenceModel,
   CreateSetupSet,
+  CreateSetupValueChangeEvent,
 } from './create-setup.types'
 
 export type BuildCreateSetupPanelItemsInput = {
   baseId: string
-  visibleSetIds: readonly string[]
-  sequenceItems: readonly CreateSetupSequenceItem[]
-  setById: ReadonlyMap<string, CreateSetupSet>
-  choiceSetById: ReadonlyMap<string, CreateSetupChoiceSet>
-  activeSetId: string | null
-  reopenSetId: string | null
+  sets: readonly CreateSetupSet[]
+  model: CreateSetupSequenceModel
   changeLabel: string
-  groupedChoiceSetIds: readonly string[]
-  groupedSummaryEyebrow: string
-  allowPartialGroupedSummary?: boolean
-  setReopenSetId: (setId: string | null) => void
+  onSetupValueChange: (event: CreateSetupValueChangeEvent) => void
 }
 
 function resolvePanelSetExpanded(
   set: CreateSetupSet,
-  input: Pick<BuildCreateSetupPanelItemsInput, 'activeSetId' | 'reopenSetId'>,
+  input: Pick<BuildCreateSetupPanelItemsInput, 'model'>,
 ) {
   return resolveCreateSetupSetExpanded({
     setId: set.id,
-    activeSetId: input.activeSetId,
-    reopenSetId: input.reopenSetId,
+    activeSetId: input.model.activeSetId,
+    reopenSetId: input.model.reopenSetId,
     visible: true,
     isComplete: set.isComplete,
     required: set.required,
@@ -50,18 +47,39 @@ function resolvePanelSetExpanded(
   })
 }
 
-function invalidateDependentSets(
-  input: Pick<BuildCreateSetupPanelItemsInput, 'sequenceItems' | 'setById'>,
-  changedSetId: string,
+function emitSetupValueChange(
+  input: BuildCreateSetupPanelItemsInput,
+  set: CreateSetupSet,
+  nextValue: string | number,
+  skipped = false,
 ) {
-  const invalidatedIds = resolveCreateSetupSetIdsToInvalidate({
-    sets: input.sequenceItems,
-    changedSetId,
-  })
-
-  for (const invalidatedId of invalidatedIds) {
-    input.setById.get(invalidatedId)?.onReset()
+  const previousValue = set.kind === 'choice' ? set.value : set.value
+  if (!skipped && nextValue === previousValue) {
+    if (input.model.reopenSetId === set.id) {
+      input.model.reopen(null)
+    }
+    return
   }
+
+  if (input.model.reopenSetId === set.id) {
+    input.model.reopen(null)
+  }
+
+  const sequenceItems = input.sets.map((item) => ({
+    id: item.id,
+    dependsOn: item.dependsOn,
+  }))
+
+  input.onSetupValueChange({
+    setId: set.id,
+    previousValue,
+    nextValue,
+    invalidatedSetIds: resolveCreateSetupSetIdsToInvalidate({
+      sets: sequenceItems,
+      changedSetId: set.id,
+    }),
+    ...(skipped ? { skipped: true } : {}),
+  })
 }
 
 function renderChoiceSet(
@@ -69,37 +87,49 @@ function renderChoiceSet(
   expanded: boolean,
   input: BuildCreateSetupPanelItemsInput,
 ) {
+  const showSkip = set.skipLabel != null && expanded && !set.isComplete
+
   return (
-    <CollapsibleRadioCardField
-      key={set.id}
-      id={`${input.baseId}-${set.id}`}
-      label={set.prompt ?? set.fieldLabel}
-      summaryEyebrow={set.fieldLabel}
-      changeLabel={input.changeLabel}
-      summaryDescription={false}
-      collapseAfterSelect={false}
-      density="compact"
-      value={set.value}
-      options={set.options}
-      optionGroups={set.optionGroups}
-      expanded={expanded}
-      onExpandedChange={(nextExpanded) => {
-        if (nextExpanded) {
-          input.setReopenSetId(set.id)
-          return
-        }
-        if (input.reopenSetId === set.id) {
-          input.setReopenSetId(null)
-        }
-      }}
-      onValueChange={(nextValue) => {
-        if (input.reopenSetId === set.id) {
-          input.setReopenSetId(null)
-        }
-        invalidateDependentSets(input, set.id)
-        set.onValueChange(nextValue)
-      }}
-    />
+    <div key={set.id} className="flex flex-col gap-y-3">
+      <CollapsibleRadioCardField
+        id={`${input.baseId}-${set.id}`}
+        label={set.prompt ?? set.fieldLabel}
+        summaryEyebrow={set.fieldLabel}
+        changeLabel={input.changeLabel}
+        summaryDescription={false}
+        collapseAfterSelect={false}
+        density="compact"
+        value={set.value}
+        options={set.options}
+        optionGroups={set.optionGroups}
+        expanded={expanded}
+        onExpandedChange={(nextExpanded) => {
+          if (nextExpanded) {
+            input.model.reopen(set.id)
+            return
+          }
+          if (input.model.reopenSetId === set.id) {
+            input.model.reopen(null)
+          }
+        }}
+        onValueChange={(nextValue) => {
+          emitSetupValueChange(input, set, nextValue)
+        }}
+      />
+      {showSkip ? (
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="self-start"
+          onClick={() => {
+            emitSetupValueChange(input, set, set.value, true)
+          }}
+        >
+          {set.skipLabel}
+        </Button>
+      ) : null}
+    </div>
   )
 }
 
@@ -124,45 +154,48 @@ function renderNumberSet(
         max={set.max}
         value={set.value}
         onChange={(nextValue) => {
-          invalidateDependentSets(input, set.id)
-          set.onValueChange(nextValue)
+          emitSetupValueChange(input, set, nextValue)
         }}
       />
     </div>
   )
 }
 
-function resolveFirstVisibleGroupedSetId(input: BuildCreateSetupPanelItemsInput): string | null {
-  return input.visibleSetIds.find((setId) => input.groupedChoiceSetIds.includes(setId)) ?? null
-}
-
 function renderGroupedSummary(
   input: BuildCreateSetupPanelItemsInput,
+  summaryGroup: string,
   collapsedCompleteSetIds: readonly string[],
 ): ReactNode {
+  const groupMemberSetIds = resolveCreateSetupSummaryGroupMemberIds(input.sets, summaryGroup)
   const groupedRows = resolveCreateSetupGroupedChoiceRows({
-    groupedChoiceSetIds: input.groupedChoiceSetIds,
-    setById: input.choiceSetById,
+    groupMemberSetIds,
+    setById: buildCreateSetupChoiceSetMap(input.sets),
     collapsedCompleteSetIds,
   })
+  const eyebrow =
+    resolveCreateSetupSummaryGroupEyebrow(input.sets, summaryGroup) ??
+    groupMemberSetIds
+      .map((setId) => input.sets.find((set) => set.id === setId)?.summaryGroupEyebrow)
+      .find(Boolean) ??
+    summaryGroup
 
   return (
     <SetupSummaryCard
-      key={`grouped-${input.groupedChoiceSetIds.join('-')}`}
-      eyebrow={input.groupedSummaryEyebrow}
+      key={`grouped-${summaryGroup}`}
+      eyebrow={eyebrow}
       rows={groupedRows.map((row) => {
         const valueActionAriaLabel = `Change ${row.label.toLowerCase()}`
 
         return {
           label: row.label,
           value: row.valueLabel,
-          onValueClick: () => input.setReopenSetId(row.setId),
+          onValueClick: () => input.model.reopen(row.setId),
           valueActionAriaLabel,
           action: (
             <SetupSummaryCardChangeAction
               changeLabel={input.changeLabel}
               ariaLabel={valueActionAriaLabel}
-              onChange={() => input.setReopenSetId(row.setId)}
+              onChange={() => input.model.reopen(row.setId)}
             />
           ),
         }
@@ -172,50 +205,50 @@ function renderGroupedSummary(
 }
 
 export function buildCreateSetupPanelItems(input: BuildCreateSetupPanelItemsInput): ReactNode[] {
+  const visibleSetIds = input.model.visibleSetIds
+  const setById = buildCreateSetupSetMap(input.sets)
+  const summaryGroups = resolveCreateSetupSummaryGroups(input.sets)
+
   const isCollapsedComplete = (setId: string) => {
-    const set = input.setById.get(setId)
+    const set = setById.get(setId)
     if (!set) return false
     return set.isComplete && !resolvePanelSetExpanded(set, input)
   }
 
-  const collapsedCompleteGroupedSetIds = resolveCreateSetupCollapsedCompleteGroupedSetIds({
-    groupedChoiceSetIds: input.groupedChoiceSetIds,
-    visibleSetIds: input.visibleSetIds,
-    isCollapsedComplete,
-  })
-
-  const groupedSummaryReady = isCreateSetupGroupedChoiceSummaryReady({
-    groupedChoiceSetIds: input.groupedChoiceSetIds,
-    visibleSetIds: input.visibleSetIds,
-    isCollapsedComplete,
-    allowPartial: input.allowPartialGroupedSummary,
-  })
-
-  const firstVisibleGroupedSetId = resolveFirstVisibleGroupedSetId(input)
-
   const renderedSetIds = new Set<string>()
   const panelItems: ReactNode[] = []
 
-  for (const setId of input.visibleSetIds) {
+  for (const setId of visibleSetIds) {
     if (renderedSetIds.has(setId)) {
       continue
     }
 
-    if (
-      groupedSummaryReady &&
-      input.groupedChoiceSetIds.length > 0 &&
-      setId === firstVisibleGroupedSetId
-    ) {
-      panelItems.push(renderGroupedSummary(input, collapsedCompleteGroupedSetIds))
-      for (const groupedSetId of collapsedCompleteGroupedSetIds) {
-        renderedSetIds.add(groupedSetId)
-      }
+    const set = setById.get(setId)
+    if (!set) {
       continue
     }
 
-    const set = input.setById.get(setId)
-    if (!set) {
-      continue
+    const summaryGroup = set.summaryGroup
+    if (summaryGroup) {
+      const groupMemberSetIds = summaryGroups.get(summaryGroup) ?? []
+      const groupedSummaryReady = isCreateSetupGroupedChoiceSummaryReady({
+        groupMemberSetIds,
+        visibleSetIds,
+        isCollapsedComplete,
+      })
+
+      if (groupedSummaryReady && groupMemberSetIds[0] === setId) {
+        const collapsedCompleteGroupedSetIds = resolveCreateSetupCollapsedCompleteGroupedSetIds({
+          groupMemberSetIds,
+          visibleSetIds,
+          isCollapsedComplete,
+        })
+        panelItems.push(renderGroupedSummary(input, summaryGroup, collapsedCompleteGroupedSetIds))
+        for (const groupedSetId of collapsedCompleteGroupedSetIds) {
+          renderedSetIds.add(groupedSetId)
+        }
+        continue
+      }
     }
 
     renderedSetIds.add(setId)

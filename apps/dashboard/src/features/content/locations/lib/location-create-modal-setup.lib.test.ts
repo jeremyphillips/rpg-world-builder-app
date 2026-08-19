@@ -14,35 +14,63 @@ describe('applyLocationCreateModalSetupValueChange', () => {
         classificationKind: 'political',
         regionType: 'kingdom',
       },
-      choiceSetId: 'classification',
-      nextValue: 'geographic',
+      event: {
+        setId: 'classification',
+        previousValue: 'political',
+        nextValue: 'geographic',
+        invalidatedSetIds: ['regionType'],
+      },
     })
 
     expect(next.classificationKind).toBe('geographic')
     expect(next.regionType).toBe('')
   })
 
+  it('marks building form as skipped without a value', () => {
+    const next = applyLocationCreateModalSetupValueChange({
+      values: EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+      event: {
+        setId: 'buildingForm',
+        previousValue: '',
+        nextValue: '',
+        invalidatedSetIds: [],
+        skipped: true,
+      },
+    })
+
+    expect(next.buildingForm).toBe('')
+    expect(next.buildingFormSkipped).toBe(true)
+  })
+
   it('accepts empty clears for site and settlement types', () => {
     expect(
       applyLocationCreateModalSetupValueChange({
         values: { ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES, siteType: 'landmark' },
-        choiceSetId: 'siteType',
-        nextValue: '',
+        event: {
+          setId: 'siteType',
+          previousValue: 'landmark',
+          nextValue: '',
+          invalidatedSetIds: [],
+        },
       }).siteType,
     ).toBe('')
 
     expect(
       applyLocationCreateModalSetupValueChange({
         values: { ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES, settlementType: 'city' },
-        choiceSetId: 'settlementType',
-        nextValue: '',
+        event: {
+          setId: 'settlementType',
+          previousValue: 'city',
+          nextValue: '',
+          invalidatedSetIds: [],
+        },
       }).settlementType,
     ).toBe('')
   })
 })
 
 describe('resolveLocationCreateModalSetupModel', () => {
-  it('builds optional Form before required Facility discovery', () => {
+  it('sequences optional Form before Facility discovery', () => {
     const model = resolveLocationCreateModalSetupModel({
       intent: { authoringType: 'building' },
       values: {
@@ -51,10 +79,33 @@ describe('resolveLocationCreateModalSetupModel', () => {
       },
     })
 
-    expect(model?.choiceSets.map(({ id, required }) => ({ id, required }))).toEqual([
-      { id: 'buildingForm', required: false },
-      { id: 'buildingFacilityAuthoringGroup', required: undefined },
+    expect(
+      model?.choiceSets.map(({ id, required, visibleWhenComplete }) => ({
+        id,
+        required,
+        visibleWhenComplete,
+      })),
+    ).toEqual([
+      { id: 'buildingForm', required: false, visibleWhenComplete: undefined },
+      {
+        id: 'buildingFacilityAuthoringGroup',
+        required: undefined,
+        visibleWhenComplete: ['buildingForm'],
+      },
     ])
+    expect(model?.canContinue).toBe(false)
+  })
+
+  it('allows continue after form is skipped and facility is selected', () => {
+    const model = resolveLocationCreateModalSetupModel({
+      intent: { authoringType: 'building' },
+      values: {
+        ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        buildingFormSkipped: true,
+        buildingFacilityAuthoringGroup: 'browse_all',
+      },
+    })
+
     expect(model?.canContinue).toBe(true)
     expect(model?.complete()).toEqual({ kind: 'building' })
   })
@@ -64,6 +115,7 @@ describe('resolveLocationCreateModalSetupModel', () => {
       intent: { authoringType: 'building' },
       values: {
         ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        buildingFormSkipped: true,
         buildingFacilityAuthoringGroup: 'production',
       },
     })

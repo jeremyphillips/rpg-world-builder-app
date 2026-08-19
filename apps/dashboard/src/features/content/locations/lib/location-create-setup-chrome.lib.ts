@@ -1,6 +1,7 @@
 import { midSentenceLabel } from '@rpg/contracts'
 
 export const LOCATION_CREATE_SETUP_CHANGE_LABEL = 'Change' as const
+export const LOCATION_AUTHORING_SETUP_CHANGE_ARIA_LABEL = 'Change setup' as const
 
 /**
  * Opt-in generic setup modal subhead. Pass as `subhead` when a setup needs

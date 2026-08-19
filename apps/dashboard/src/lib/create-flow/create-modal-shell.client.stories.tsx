@@ -45,7 +45,10 @@ export const OptionalRelationshipTabs: Story = {
   args: {
     setupSummary: {
       eyebrow: 'Setup',
-      summary: 'House · Commercial',
+      rows: [
+        { label: 'Form', value: 'House' },
+        { label: 'Facility', value: 'Commercial' },
+      ],
       onChange: () => undefined,
     },
     tabs: [

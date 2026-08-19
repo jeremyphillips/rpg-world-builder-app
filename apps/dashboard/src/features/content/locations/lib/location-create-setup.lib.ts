@@ -1,13 +1,9 @@
-import { isCreateSetupChoiceComplete, type CreateSetupSet } from '@/lib/create-setup'
+import type { CreateSetupSet } from '@/lib/create-setup'
 
 import type { LocationCreateModalSetupChoiceSetConfig } from './location-create-modal-setup.lib'
 
-export type LocationCreateSetupChoiceSet = LocationCreateModalSetupChoiceSetConfig & {
-  onValueChange: (value: string) => void
-}
-
 export function buildLocationCreateSetupSets(
-  choiceSets: readonly LocationCreateSetupChoiceSet[],
+  choiceSets: readonly LocationCreateModalSetupChoiceSetConfig[],
 ): CreateSetupSet[] {
   return choiceSets.map((choiceSet) => ({
     kind: 'choice',
@@ -18,8 +14,14 @@ export function buildLocationCreateSetupSets(
     value: choiceSet.value,
     required: choiceSet.required,
     dependsOn: choiceSet.dependsOn,
-    isComplete: isCreateSetupChoiceComplete(choiceSet.value),
-    onValueChange: choiceSet.onValueChange,
-    onReset: () => choiceSet.onValueChange(''),
+    visibleWhenComplete: choiceSet.visibleWhenComplete,
+    summaryGroup: choiceSet.summaryGroup,
+    summaryGroupEyebrow: choiceSet.summaryGroupEyebrow,
+    skipLabel: choiceSet.skipLabel,
+    skipped: choiceSet.skipped,
+    skippedValueLabel: choiceSet.skippedValueLabel,
+    isComplete: choiceSet.isComplete,
   }))
 }
+
+export type LocationCreateSetupChoiceSet = LocationCreateModalSetupChoiceSetConfig

@@ -7,13 +7,18 @@ import type {
 } from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
+import type { CreateSetupValueChangeEvent } from '@/lib/create-setup'
+
 import type { LocationCreateIntent, LocationCreateSetupResult } from './location-create-session'
 import {
   BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
   BUILDING_CREATE_SETUP_FACILITY_PROMPT,
   BUILDING_CREATE_SETUP_FORM_FIELD_LABEL,
   BUILDING_CREATE_SETUP_FORM_PROMPT,
+  BUILDING_CREATE_SETUP_FORM_SKIP_LABEL,
   BUILDING_CREATE_SETUP_HEADLINE,
+  BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_EYEBROW,
+  BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_GROUP,
   buildBuildingCreateSetupSummaryEntries,
   buildBuildingFacilityAuthoringGroupRadioOptions,
   buildBuildingFormRadioOptions,
@@ -47,6 +52,7 @@ import {
 
 export type LocationCreateModalSetupValues = {
   buildingForm: BuildingForm | ''
+  buildingFormSkipped: boolean
   buildingFacilityAuthoringGroup: BuildingFacilityAuthoringGroup | 'browse_all' | ''
   siteType: SiteType | ''
   settlementType: SettlementType | ''
@@ -56,6 +62,7 @@ export type LocationCreateModalSetupValues = {
 
 export const EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES = {
   buildingForm: '',
+  buildingFormSkipped: false,
   buildingFacilityAuthoringGroup: '',
   siteType: '',
   settlementType: '',
@@ -71,6 +78,13 @@ export type LocationCreateModalSetupChoiceSetConfig = {
   value: string
   required?: boolean
   dependsOn?: readonly string[]
+  visibleWhenComplete?: readonly string[]
+  summaryGroup?: string
+  summaryGroupEyebrow?: string
+  skipLabel?: string
+  skipped?: boolean
+  skippedValueLabel?: string
+  isComplete: boolean
 }
 
 export type LocationCreateModalSetupModel = {
@@ -87,6 +101,10 @@ function optionLabel(options: readonly RadioCardOption[], value: string): string
   return options.find((option) => option.value === value)?.label ?? value
 }
 
+function isBuildingFormSetupComplete(values: LocationCreateModalSetupValues): boolean {
+  return Boolean(values.buildingForm) || values.buildingFormSkipped
+}
+
 function resolveBuildingSetupModel(
   values: LocationCreateModalSetupValues,
 ): LocationCreateModalSetupModel {
@@ -96,6 +114,8 @@ function resolveBuildingSetupModel(
     form: values.buildingForm,
     facilityAuthoringGroup: values.buildingFacilityAuthoringGroup,
   })
+  const formComplete = isBuildingFormSetupComplete(values)
+
   return {
     headline: BUILDING_CREATE_SETUP_HEADLINE,
     choiceSets: [
@@ -106,6 +126,11 @@ function resolveBuildingSetupModel(
         options: formOptions,
         value: values.buildingForm,
         required: false,
+        skipLabel: BUILDING_CREATE_SETUP_FORM_SKIP_LABEL,
+        skipped: values.buildingFormSkipped && !values.buildingForm,
+        summaryGroup: BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_GROUP,
+        summaryGroupEyebrow: BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_EYEBROW,
+        isComplete: formComplete,
       },
       {
         id: 'buildingFacilityAuthoringGroup',
@@ -113,9 +138,13 @@ function resolveBuildingSetupModel(
         prompt: BUILDING_CREATE_SETUP_FACILITY_PROMPT,
         options: facilityOptions,
         value: values.buildingFacilityAuthoringGroup,
+        visibleWhenComplete: ['buildingForm'],
+        summaryGroup: BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_GROUP,
+        summaryGroupEyebrow: BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_EYEBROW,
+        isComplete: Boolean(values.buildingFacilityAuthoringGroup),
       },
     ],
-    canContinue: projection != null,
+    canContinue: isBuildingFormSetupComplete(values) && projection != null,
     complete: () => (projection ? { kind: 'building', ...projection } : null),
     summaryEntries: projection
       ? buildBuildingCreateSetupSummaryEntries(projection, values.buildingFacilityAuthoringGroup)
@@ -146,6 +175,7 @@ export function resolveLocationCreateModalSetupModel({
           prompt: SITE_CREATE_SETUP_PROMPT,
           options,
           value: values.siteType,
+          isComplete: Boolean(values.siteType),
         },
       ],
       canContinue,
@@ -176,6 +206,7 @@ export function resolveLocationCreateModalSetupModel({
           prompt: SETTLEMENT_CREATE_SETUP_PROMPT,
           options,
           value: values.settlementType,
+          isComplete: Boolean(values.settlementType),
         },
       ],
       canContinue,
@@ -210,6 +241,7 @@ export function resolveLocationCreateModalSetupModel({
           prompt: resolveRegionCreateSetupPrompt(intent),
           options: kindOptions,
           value: values.classificationKind,
+          isComplete: Boolean(values.classificationKind),
         },
         {
           id: 'regionType',
@@ -218,6 +250,7 @@ export function resolveLocationCreateModalSetupModel({
           options: typeOptions,
           value: values.regionType,
           dependsOn: ['classification'],
+          isComplete: Boolean(values.regionType),
         },
       ],
       canContinue,
@@ -241,46 +274,82 @@ export function resolveLocationCreateModalSetupModel({
   return null
 }
 
+function clearInvalidatedLocationSetupValues(
+  values: LocationCreateModalSetupValues,
+  invalidatedSetIds: readonly string[],
+): LocationCreateModalSetupValues {
+  let next = values
+
+  for (const setId of invalidatedSetIds) {
+    if (setId === 'regionType') {
+      next = { ...next, regionType: '' }
+    }
+    if (setId === 'buildingFacilityAuthoringGroup') {
+      next = { ...next, buildingFacilityAuthoringGroup: '' }
+    }
+  }
+
+  return next
+}
+
 export function applyLocationCreateModalSetupValueChange({
   values,
-  choiceSetId,
-  nextValue,
+  event,
 }: {
   values: LocationCreateModalSetupValues
-  choiceSetId: string
-  nextValue: string
+  event: CreateSetupValueChangeEvent
 }): LocationCreateModalSetupValues {
+  const nextValues = clearInvalidatedLocationSetupValues(values, event.invalidatedSetIds)
+
   const buildingSelection = applyBuildingCreateSetupSelectionChange({
     selection: {
-      form: values.buildingForm,
-      facilityAuthoringGroup: values.buildingFacilityAuthoringGroup,
+      form: nextValues.buildingForm,
+      facilityAuthoringGroup: nextValues.buildingFacilityAuthoringGroup,
     },
-    choiceSetId,
-    nextValue,
+    choiceSetId: event.setId,
+    nextValue: String(event.nextValue),
   })
   if (buildingSelection) {
+    if (event.setId === 'buildingForm' && event.skipped) {
+      return {
+        ...nextValues,
+        buildingForm: '',
+        buildingFormSkipped: true,
+        buildingFacilityAuthoringGroup: buildingSelection.facilityAuthoringGroup,
+      }
+    }
+
     return {
-      ...values,
+      ...nextValues,
       buildingForm: buildingSelection.form,
+      buildingFormSkipped: event.setId === 'buildingForm' ? false : nextValues.buildingFormSkipped,
       buildingFacilityAuthoringGroup: buildingSelection.facilityAuthoringGroup,
     }
   }
-  if (choiceSetId === 'siteType') {
-    return { ...values, siteType: isSiteType(nextValue) ? nextValue : '' }
-  }
-  if (choiceSetId === 'settlementType') {
-    return { ...values, settlementType: isSettlementType(nextValue) ? nextValue : '' }
-  }
-  if (choiceSetId === 'classification') {
-    // Clear dependsOn dependents atomically with the upstream change.
+
+  if (event.setId === 'siteType') {
     return {
-      ...values,
-      classificationKind: nextValue as RegionClassificationKind | '',
+      ...nextValues,
+      siteType: isSiteType(String(event.nextValue)) ? (event.nextValue as SiteType) : '',
+    }
+  }
+  if (event.setId === 'settlementType') {
+    return {
+      ...nextValues,
+      settlementType: isSettlementType(String(event.nextValue))
+        ? (event.nextValue as SettlementType)
+        : '',
+    }
+  }
+  if (event.setId === 'classification') {
+    return {
+      ...nextValues,
+      classificationKind: event.nextValue as RegionClassificationKind | '',
       regionType: '',
     }
   }
-  if (choiceSetId === 'regionType') {
-    return { ...values, regionType: nextValue }
+  if (event.setId === 'regionType') {
+    return { ...nextValues, regionType: String(event.nextValue) }
   }
-  return values
+  return nextValues
 }

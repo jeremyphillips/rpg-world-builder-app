@@ -39,12 +39,11 @@ describe('buildQuickNpcCreateSetupSets', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context,
       values,
-      onApplySetupChange: () => {},
       titles: [],
     })
 
     expect(sets.map((set) => set.id)).toEqual(['membershipTitle', 'speciesId'])
-    expect(sets.find((set) => set.id === 'speciesId')?.collapseWhenActiveAndComplete).toBe(true)
+    expect(sets.find((set) => set.id === 'membershipTitle')?.summaryGroup).toBe('selections')
     expect(isQuickNpcMembershipTitleSetupComplete(values.membershipTitle)).toBe(false)
 
     const sequenceItems = sets.map((set) => ({
@@ -68,7 +67,6 @@ describe('buildQuickNpcCreateSetupSets', () => {
     const sets = buildQuickNpcCreateSetupSets({
       context,
       values,
-      onApplySetupChange: () => {},
       titles: [],
     })
 

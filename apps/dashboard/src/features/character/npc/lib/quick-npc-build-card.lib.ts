@@ -103,9 +103,9 @@ export function formatQuickNpcClassRecommendationHelper(args: {
 /** Setup-phase presentation gate — hides Build while identity choices are reopened. */
 export function isQuickNpcBuildCardVisible(args: {
   buildCardModel: QuickNpcBuildCardModel | null
-  reopenSetId: string | null
+  isEditingUpstream: boolean
 }): boolean {
-  return args.buildCardModel != null && args.reopenSetId == null
+  return args.buildCardModel != null && !args.isEditingUpstream
 }
 
 export function resolveQuickNpcBuildCardModel(args: {

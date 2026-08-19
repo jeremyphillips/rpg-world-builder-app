@@ -21,6 +21,9 @@ export const BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL = 'Facility' as const
 export const BUILDING_CREATE_SETUP_FACILITY_PROMPT =
   'What kind of facility are you creating?' as const
 export const BUILDING_FACILITY_BROWSE_ALL_SETUP_VALUE = 'browse_all' as const
+export const BUILDING_CREATE_SETUP_FORM_SKIP_LABEL = 'Skip / Not specified' as const
+export const BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_GROUP = 'setupIdentity' as const
+export const BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_EYEBROW = 'Setup' as const
 
 export type BuildingCreateSetupProjection = {
   form?: BuildingForm

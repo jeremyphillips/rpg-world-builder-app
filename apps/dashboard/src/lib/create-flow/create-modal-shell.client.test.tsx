@@ -111,7 +111,11 @@ describe('CreateModalShell', () => {
         onActiveTabChange={onActiveTabChange}
         setupSummary={{
           eyebrow: 'Setup',
-          summary: 'House · Commercial',
+          rows: [
+            { label: 'Building form', value: 'House' },
+            { label: 'Facility', value: 'Commercial' },
+          ],
+          changeAriaLabel: 'Change setup',
           onChange: onChangeSetup,
         }}
         tabs={[
@@ -133,7 +137,7 @@ describe('CreateModalShell', () => {
     )
 
     await user.click(screen.getByRole('tab', { name: 'Organizations' }))
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('button', { name: 'Change setup' }))
 
     expect(onActiveTabChange).toHaveBeenCalledWith('organizations')
     expect(onChangeSetup).toHaveBeenCalledOnce()

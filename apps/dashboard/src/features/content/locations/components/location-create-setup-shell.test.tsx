@@ -4,7 +4,11 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { RadioCardOption } from '@rpg/ui'
 
-import { CreateSetupShell, createSetupModalBodyClasses } from '@/lib/create-setup'
+import {
+  CreateSetupShell,
+  createSetupModalBodyClasses,
+  type CreateSetupValueChangeEvent,
+} from '@/lib/create-setup'
 
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
@@ -59,7 +63,7 @@ function SingleChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () =>
       prompt: 'What kind of site are you creating?',
       options: SITE_OPTIONS,
       value: siteType,
-      onValueChange: setSiteType,
+      isComplete: Boolean(siteType),
     },
   ]
 
@@ -70,6 +74,9 @@ function SingleChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () =>
       headline="Create site"
       sets={buildLocationCreateSetupSets(choiceSets)}
       changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
+      onSetupValueChange={(event) => {
+        if (event.setId === 'siteType') setSiteType(String(event.nextValue))
+      }}
       onContinue={onContinue}
     />
   )
@@ -79,6 +86,19 @@ function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => vo
   const [classification, setClassification] = useState('')
   const [regionType, setRegionType] = useState('')
 
+  const handleSetupValueChange = (event: CreateSetupValueChangeEvent) => {
+    if (event.setId === 'classification') {
+      setClassification(String(event.nextValue))
+      if (event.invalidatedSetIds.includes('regionType')) {
+        setRegionType('')
+      }
+      return
+    }
+    if (event.setId === 'regionType') {
+      setRegionType(String(event.nextValue))
+    }
+  }
+
   const choiceSets: LocationCreateSetupChoiceSet[] = [
     {
       id: 'classification',
@@ -86,7 +106,7 @@ function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => vo
       prompt: 'What kind of region are you creating?',
       options: CLASSIFICATION_OPTIONS,
       value: classification,
-      onValueChange: setClassification,
+      isComplete: Boolean(classification),
     },
     {
       id: 'regionType',
@@ -94,8 +114,8 @@ function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => vo
       prompt: 'Region type',
       options: REGION_TYPE_OPTIONS,
       value: regionType,
-      onValueChange: setRegionType,
       dependsOn: ['classification'],
+      isComplete: Boolean(regionType),
     },
   ]
 
@@ -106,6 +126,7 @@ function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => vo
       headline="Create region"
       sets={buildLocationCreateSetupSets(choiceSets)}
       changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
+      onSetupValueChange={handleSetupValueChange}
       onContinue={onContinue}
     />
   )
@@ -138,10 +159,11 @@ describe('location create setup', () => {
             prompt: 'What kind of site are you creating?',
             options: SITE_OPTIONS,
             value: '',
-            onValueChange: vi.fn(),
+            isComplete: false,
           },
         ])}
         changeLabel={LOCATION_CREATE_SETUP_CHANGE_LABEL}
+        onSetupValueChange={vi.fn()}
         onContinue={vi.fn()}
       />,
     )
@@ -190,7 +212,9 @@ describe('location create setup', () => {
       .closest('article')
     expect(summary).not.toBeNull()
 
-    const choiceSetStack = summary?.parentElement
+    const choiceSetStack = screen
+      .getByRole('radiogroup', { name: 'Region type' })
+      .closest('.flex.flex-col.gap-4')
     expect(choiceSetStack).toContainElement(screen.getByRole('radiogroup', { name: 'Region type' }))
     expect(choiceSetStack?.className).toMatch(/\bflex-col\b/)
     expect(choiceSetStack?.className).toMatch(/\bgap-4\b/)

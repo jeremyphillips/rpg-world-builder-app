@@ -1,105 +1,43 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
+import { useId } from 'react'
+
 import { Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
 
-import { assertCreateSetupSetsOnReset } from './create-setup-validation.lib'
-import {
-  CREATE_SETUP_DEFAULT_CHANGE_LABEL,
-  CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW,
-} from './create-setup.constants'
-import {
-  buildCreateSetupChoiceSetMap,
-  buildCreateSetupPanelItems,
-  buildCreateSetupSetMap,
-} from './create-setup-panel-items.client'
-import {
-  resolveCreateSetupActiveSetId,
-  resolveCreateSetupCanContinue,
-  resolveCreateSetupVisibleSetIds,
-} from './create-setup-sequence.lib'
-import type { CreateSetupSet } from './create-setup.types'
+import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from './create-setup.constants'
+import { buildCreateSetupPanelItems } from './create-setup-panel-items.client'
+import { useCreateSetupSequence } from './use-create-setup-sequence.client'
+import type {
+  CreateSetupSequenceModel,
+  CreateSetupSet,
+  CreateSetupValueChangeEvent,
+} from './create-setup.types'
 import { createSetupModalBodyClasses } from './create-setup.variants'
 
 export type CreateSetupPanelProps = {
   sets: CreateSetupSet[]
+  model: CreateSetupSequenceModel
+  onSetupValueChange: (event: CreateSetupValueChangeEvent) => void
   changeLabel?: string
-  /** Controlled reopen override; omit for uncontrolled (panel owns local state). */
-  reopenSetId?: string | null
-  onReopenSetIdChange?: (setId: string | null) => void
-  /**
-   * Declared choice-set ids that collapse into one quiet summary when every
-   * listed set is visible, complete, and collapsed. Omitted = ChooserSummaryCard per set.
-   */
-  groupedChoiceSetIds?: readonly string[]
-  groupedSummaryEyebrow?: string
-  /**
-   * When true, render a quiet grouped summary as soon as any declared choice is
-   * collapsed-complete; incomplete grouped choices keep their active controls.
-   */
-  allowPartialGroupedSummary?: boolean
   className?: string
 }
 
 /** Ordered setup stack — sequencer + kind-specific controls. */
 export function CreateSetupPanel({
   sets,
+  model,
+  onSetupValueChange,
   changeLabel = CREATE_SETUP_DEFAULT_CHANGE_LABEL,
-  reopenSetId: reopenSetIdProp,
-  onReopenSetIdChange,
-  groupedChoiceSetIds = [],
-  groupedSummaryEyebrow = CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW,
-  allowPartialGroupedSummary = false,
   className = createSetupModalBodyClasses,
 }: CreateSetupPanelProps) {
-  assertCreateSetupSetsOnReset(sets)
-
   const baseId = useId()
-  const [uncontrolledReopenSetId, setUncontrolledReopenSetId] = useState<string | null>(null)
-  const isReopenControlled = onReopenSetIdChange != null
-  const reopenSetId = isReopenControlled ? (reopenSetIdProp ?? null) : uncontrolledReopenSetId
-  const setReopenSetId = isReopenControlled ? onReopenSetIdChange : setUncontrolledReopenSetId
-
-  const sequenceItems = useMemo(
-    () =>
-      sets.map((set) => ({
-        id: set.id,
-        isComplete: set.isComplete,
-        required: set.required,
-        dependsOn: set.dependsOn,
-        visibleWhenComplete: set.visibleWhenComplete,
-        collapseWhenComplete: set.collapseWhenComplete,
-        collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete,
-      })),
-    [sets],
-  )
-
-  const activeSetId = resolveCreateSetupActiveSetId({
-    sets: sequenceItems,
-    reopenSetId,
-  })
-
-  const visibleSetIds = resolveCreateSetupVisibleSetIds({
-    sets: sequenceItems,
-    activeSetId,
-  })
-
-  const setById = useMemo(() => buildCreateSetupSetMap(sets), [sets])
-  const choiceSetById = useMemo(() => buildCreateSetupChoiceSetMap(sets), [sets])
 
   const panelItems = buildCreateSetupPanelItems({
     baseId,
-    visibleSetIds,
-    sequenceItems,
-    setById,
-    choiceSetById,
-    activeSetId,
-    reopenSetId,
+    sets,
+    model,
     changeLabel,
-    groupedChoiceSetIds,
-    groupedSummaryEyebrow,
-    allowPartialGroupedSummary,
-    setReopenSetId,
+    onSetupValueChange,
   })
 
   return <div className={className}>{panelItems}</div>
@@ -116,6 +54,7 @@ export type CreateSetupShellProps = {
   subhead?: string | false
   sets: CreateSetupSet[]
   changeLabel?: string
+  onSetupValueChange: (event: CreateSetupValueChangeEvent) => void
   onContinue: () => void
   /** Escape hatch for extra validation beyond required set completion. */
   additionalContinueConstraint?: boolean
@@ -129,25 +68,12 @@ export function CreateSetupShell({
   subhead = false,
   sets,
   changeLabel,
+  onSetupValueChange,
   onContinue,
   additionalContinueConstraint = true,
 }: CreateSetupShellProps) {
-  const sequenceItems = useMemo(
-    () =>
-      sets.map((set) => ({
-        id: set.id,
-        isComplete: set.isComplete,
-        required: set.required,
-        dependsOn: set.dependsOn,
-        visibleWhenComplete: set.visibleWhenComplete,
-        collapseWhenComplete: set.collapseWhenComplete,
-        collapseWhenActiveAndComplete: set.collapseWhenActiveAndComplete,
-      })),
-    [sets],
-  )
-
-  const canContinue =
-    resolveCreateSetupCanContinue({ sets: sequenceItems }) && additionalContinueConstraint
+  const model = useCreateSetupSequence(sets, { additionalContinueConstraint })
+  const canContinue = model.canContinue
 
   const description = typeof subhead === 'string' ? subhead : undefined
 
@@ -156,7 +82,12 @@ export function CreateSetupShell({
       <Modal.Content size="sm" {...(!description ? { 'aria-describedby': undefined } : {})}>
         <Modal.Header headline={headline} description={description} />
         <Modal.Body>
-          <CreateSetupPanel sets={sets} changeLabel={changeLabel} />
+          <CreateSetupPanel
+            sets={sets}
+            model={model}
+            onSetupValueChange={onSetupValueChange}
+            changeLabel={changeLabel}
+          />
         </Modal.Body>
         <Modal.Footer>
           <div className={dialogPanelActionRowClasses}>
