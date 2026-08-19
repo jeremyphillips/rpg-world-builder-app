@@ -41,7 +41,12 @@ beforeAll(() => {
 const CAMPAIGN_ID = 'campaign-test-1'
 
 const membershipTitles = [
-  { id: 'omt_guildmaster', label: 'Guildmaster', priority: 50 as const },
+  {
+    id: 'omt_guildmaster',
+    label: 'Guildmaster',
+    priority: 50 as const,
+    npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
+  },
 ] as const
 
 const organization = {
@@ -98,8 +103,6 @@ function buildContextFixture(
   })
 }
 
-const setupSummaryLine = 'Dwarf · Level 1 Fighter'
-
 const npcDetail = makeCampaignNpcDetail({
   character: { id: 'npc-99', name: 'Guard Captain' },
   participation: { id: 'participation-99' },
@@ -111,7 +114,6 @@ function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcAutho
     buildContext: buildContextFixture(),
     organization,
     setup,
-    setupSummaryLine,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
     onCreated: vi.fn(),
@@ -148,7 +150,7 @@ describe('QuickNpcAuthoringForm', () => {
     expect(screen.getByRole('combobox', { name: /alignment/i })).toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: 'No title' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Create NPC' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change setup' })).toBeInTheDocument()
   })
 
   it('creates the NPC atomically with the titled membership connection', async () => {
@@ -178,9 +180,29 @@ describe('QuickNpcAuthoringForm', () => {
     const user = userEvent.setup()
     const { props } = renderForm()
 
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('button', { name: 'Change setup' }))
     expect(props.onChangeSetup).toHaveBeenCalledTimes(1)
     expect(createNpcMock).not.toHaveBeenCalled()
+  })
+
+  it('shows membership title and recommended build in the setup summary', () => {
+    const guildmasterSetup = {
+      ...setup,
+      membershipTitle: 'Guildmaster',
+      level: 5,
+    }
+    renderForm({
+      setup: guildmasterSetup,
+      organization: {
+        ...organization,
+        members: {
+          titles: membershipTitles,
+        },
+      },
+    })
+
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    expect(screen.getByText('Covert operator')).toBeInTheDocument()
   })
 
   it('surfaces builder issues inline and keeps the form open when resolution fails', async () => {

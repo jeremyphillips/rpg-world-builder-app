@@ -102,8 +102,6 @@ const setup = {
   level: 1,
 }
 
-const setupSummaryLine = 'Dwarf · Level 1 Fighter'
-
 function renderAuthoringForm(
   overrides: Partial<React.ComponentProps<typeof QuickNpcAuthoringForm>> = {},
 ) {
@@ -112,7 +110,6 @@ function renderAuthoringForm(
     buildContext,
     organization,
     setup,
-    setupSummaryLine,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
     onCreated: vi.fn(),
@@ -164,6 +161,16 @@ describe('QuickNpcAuthoringForm', () => {
         screen.getByRole('tab', { name: /Details.*1 field needs attention/i }),
       ).toBeInTheDocument()
     })
+  })
+
+  it('shows structured setup summary rows with a single Change setup action', () => {
+    renderAuthoringForm()
+
+    expect(screen.getByText('Setup')).toBeInTheDocument()
+    expect(screen.getByText('No title')).toBeInTheDocument()
+    expect(screen.getByText('Dwarf · Level 1 Fighter')).toBeInTheDocument()
+    expect(screen.queryByText('Covert operator')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change setup' })).toBeInTheDocument()
   })
 
   it('returns to setup when setup values are no longer valid at submit time', async () => {

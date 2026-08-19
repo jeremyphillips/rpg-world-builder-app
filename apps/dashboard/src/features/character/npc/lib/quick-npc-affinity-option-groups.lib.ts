@@ -5,17 +5,40 @@ import { mapFieldOptionsToRadioCardOptions } from '../../lib/choice-sets/choice-
 
 export const QUICK_NPC_AFFINITY_RECOMMENDED_EYEBROW = 'Recommended for this organization' as const
 
-export function buildQuickNpcAffinityRadioCardPresentation(input: {
+export type QuickNpcAffinityOption = {
+  value: string
+  label: string
+  disabled?: boolean
+}
+
+export type QuickNpcAffinityOptionGroup = {
+  id: string
+  eyebrow: string
+  options: readonly QuickNpcAffinityOption[]
+}
+
+function mapFieldOptionsToAffinityOptions(
+  options: readonly FieldOption[],
+): QuickNpcAffinityOption[] {
+  return options.map((option) => ({
+    value: option.value,
+    label: option.label,
+    ...(option.disabled ? { disabled: option.disabled } : {}),
+  }))
+}
+
+/** Chrome-neutral recommended vs all-other grouping for affinity pickers. */
+export function resolveQuickNpcAffinityOptionGroups(input: {
   options: readonly FieldOption[]
   recommendedIds: readonly string[]
   recommendedGroupEyebrow: string
   allOtherGroupEyebrow: string
   allOtherGroupId: string
 }): {
-  options: RadioCardOption[]
-  optionGroups?: RadioCardOptionGroup[]
+  options: QuickNpcAffinityOption[]
+  optionGroups?: QuickNpcAffinityOptionGroup[]
 } {
-  const options = mapFieldOptionsToRadioCardOptions(input.options)
+  const options = mapFieldOptionsToAffinityOptions(input.options)
 
   if (input.recommendedIds.length === 0) {
     return { options }
@@ -34,7 +57,7 @@ export function buildQuickNpcAffinityRadioCardPresentation(input: {
   const recommendedValueSet = new Set(recommendedOptions.map((option) => option.value))
   const otherOptions = options.filter((option) => !recommendedValueSet.has(option.value))
 
-  const optionGroups: RadioCardOptionGroup[] = [
+  const optionGroups: QuickNpcAffinityOptionGroup[] = [
     {
       id: 'recommended',
       eyebrow: input.recommendedGroupEyebrow,
@@ -51,4 +74,36 @@ export function buildQuickNpcAffinityRadioCardPresentation(input: {
   }
 
   return { options, optionGroups }
+}
+
+export function buildQuickNpcAffinityRadioCardPresentation(input: {
+  options: readonly FieldOption[]
+  recommendedIds: readonly string[]
+  recommendedGroupEyebrow: string
+  allOtherGroupEyebrow: string
+  allOtherGroupId: string
+}): {
+  options: RadioCardOption[]
+  optionGroups?: RadioCardOptionGroup[]
+} {
+  const grouped = resolveQuickNpcAffinityOptionGroups(input)
+  const options = mapFieldOptionsToRadioCardOptions(input.options)
+
+  if (!grouped.optionGroups) {
+    return { options }
+  }
+
+  const radioOptionsByValue = new Map(options.map((option) => [option.value, option]))
+
+  return {
+    options,
+    optionGroups: grouped.optionGroups.map((group) => ({
+      id: group.id,
+      eyebrow: group.eyebrow,
+      options: group.options.flatMap((option) => {
+        const radioOption = radioOptionsByValue.get(option.value)
+        return radioOption ? [radioOption] : []
+      }),
+    })),
+  }
 }

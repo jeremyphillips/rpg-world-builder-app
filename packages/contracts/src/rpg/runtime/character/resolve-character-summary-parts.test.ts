@@ -110,5 +110,17 @@ describe('resolveBuilderCharacterSummaryParts', () => {
         ),
       ),
     ).toBe('Level 4 Fighter')
+
+    expect(
+      formatCharacterSummary(
+        resolveBuilderCharacterSummaryParts(
+          {
+            species: { speciesId: 'srd-cc-5.2.1:elf' },
+            class: { level: 0 },
+          },
+          lookup,
+        ),
+      ),
+    ).toBe('Elf · Level 0')
   })
 })

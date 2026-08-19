@@ -42,4 +42,8 @@ export const chooserSummaryCardPrimaryCopyVariants = radioCardPrimaryCopyStackVa
 
 export const chooserSummaryCardTitleVariants = radioCardSummaryTitleVariants
 
+/** Clickable selected value — same action as the Change link. */
+export const chooserSummaryCardTitleButtonClasses =
+  'cursor-pointer border-0 bg-transparent p-0 text-left transition-colors hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm'
+
 export const chooserSummaryCardDescriptionVariants = radioCardDescriptionVariants

@@ -184,26 +184,184 @@ describe('CreateSetupPanel', () => {
     expect(screen.queryByRole('heading', { name: 'Fighter' })).not.toBeInTheDocument()
   })
 
-  it('renders read-only note sets between choice and number controls', () => {
+  it('keeps the default chooser summary when grouped ids are not declared', () => {
     const sets: CreateSetupSet[] = [
       {
-        id: 'recommendedBuild',
-        kind: 'note',
-        fieldLabel: 'Recommended build',
-        body: 'Civic leader',
-        description: 'Civilian leader whose authority is primarily social.',
+        id: 'title',
+        kind: 'choice',
+        fieldLabel: 'Title',
+        prompt: 'Choose a title',
+        options: [{ value: 'guildmaster', label: 'Guildmaster' }],
+        value: 'guildmaster',
         isComplete: true,
-        required: false,
+        collapseWhenComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+      {
+        id: 'speciesId',
+        kind: 'choice',
+        fieldLabel: 'Species',
+        prompt: 'Choose a species',
+        options: SPECIES_OPTIONS,
+        value: 'dwarf',
+        visibleWhenComplete: ['title'],
+        isComplete: true,
+        collapseWhenComplete: true,
+        collapseWhenActiveAndComplete: true,
+        onValueChange: vi.fn(),
         onReset: () => {},
       },
     ]
 
     render(<CreateSetupPanel sets={sets} />)
 
-    expect(screen.getByText('Recommended build')).toBeInTheDocument()
-    expect(screen.getByText('Civic leader')).toBeInTheDocument()
-    expect(
-      screen.getByText('Civilian leader whose authority is primarily social.'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Guildmaster, Change' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Dwarf, Change' })).toBeInTheDocument()
+    expect(screen.queryByText('Selections')).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Change' })).toHaveLength(2)
+  })
+
+  it('renders a declared grouped summary when every listed choice is collapsed-complete', () => {
+    const sets: CreateSetupSet[] = [
+      {
+        id: 'membershipTitle',
+        kind: 'choice',
+        fieldLabel: 'Title',
+        prompt: 'Choose a title',
+        options: [{ value: 'guildmaster', label: 'Guildmaster' }],
+        value: 'guildmaster',
+        isComplete: true,
+        collapseWhenComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+      {
+        id: 'speciesId',
+        kind: 'choice',
+        fieldLabel: 'Species',
+        prompt: 'Choose a species',
+        options: SPECIES_OPTIONS,
+        value: 'dwarf',
+        visibleWhenComplete: ['membershipTitle'],
+        isComplete: true,
+        collapseWhenComplete: true,
+        collapseWhenActiveAndComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+    ]
+
+    render(
+      <CreateSetupPanel
+        sets={sets}
+        groupedChoiceSetIds={['membershipTitle', 'speciesId']}
+        groupedSummaryEyebrow="Selections"
+      />,
+    )
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Guildmaster' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
+  })
+
+  it('renders a partial grouped summary while later grouped choices are still active', () => {
+    const sets: CreateSetupSet[] = [
+      {
+        id: 'membershipTitle',
+        kind: 'choice',
+        fieldLabel: 'Title',
+        prompt: 'Choose a title',
+        options: [{ value: 'guildmaster', label: 'Guildmaster' }],
+        value: 'guildmaster',
+        isComplete: true,
+        collapseWhenComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+      {
+        id: 'speciesId',
+        kind: 'choice',
+        fieldLabel: 'Species',
+        prompt: 'Choose a species',
+        options: SPECIES_OPTIONS,
+        value: '',
+        visibleWhenComplete: ['membershipTitle'],
+        isComplete: false,
+        collapseWhenComplete: true,
+        collapseWhenActiveAndComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+    ]
+
+    render(
+      <CreateSetupPanel
+        sets={sets}
+        groupedChoiceSetIds={['membershipTitle', 'speciesId']}
+        groupedSummaryEyebrow="Selections"
+        allowPartialGroupedSummary
+      />,
+    )
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Change species' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Guildmaster, Change' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Choose a species' })).toBeInTheDocument()
+  })
+
+  it('does not group a third collapsed choice that is not in groupedChoiceSetIds', () => {
+    const sets: CreateSetupSet[] = [
+      {
+        id: 'membershipTitle',
+        kind: 'choice',
+        fieldLabel: 'Title',
+        prompt: 'Choose a title',
+        options: [{ value: 'guildmaster', label: 'Guildmaster' }],
+        value: 'guildmaster',
+        isComplete: true,
+        collapseWhenComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+      {
+        id: 'speciesId',
+        kind: 'choice',
+        fieldLabel: 'Species',
+        prompt: 'Choose a species',
+        options: SPECIES_OPTIONS,
+        value: 'dwarf',
+        visibleWhenComplete: ['membershipTitle'],
+        isComplete: true,
+        collapseWhenComplete: true,
+        collapseWhenActiveAndComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+      {
+        id: 'classId',
+        kind: 'choice',
+        fieldLabel: 'Class',
+        prompt: 'Choose a class',
+        options: CLASS_OPTIONS,
+        value: 'fighter',
+        visibleWhenComplete: ['speciesId'],
+        isComplete: true,
+        collapseWhenComplete: true,
+        collapseWhenActiveAndComplete: true,
+        onValueChange: vi.fn(),
+        onReset: () => {},
+      },
+    ]
+
+    render(<CreateSetupPanel sets={sets} groupedChoiceSetIds={['membershipTitle', 'speciesId']} />)
+
+    expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Fighter, Change' })).toBeInTheDocument()
   })
 })

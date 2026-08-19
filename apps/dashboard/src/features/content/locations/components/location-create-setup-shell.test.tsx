@@ -183,7 +183,11 @@ describe('location create setup', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
 
-    const summary = screen.getByRole('heading', { name: 'Political' }).closest('article')
+    const summary = screen
+      .getByRole('button', {
+        name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}`,
+      })
+      .closest('article')
     expect(summary).not.toBeNull()
 
     const choiceSetStack = summary?.parentElement
@@ -205,7 +209,9 @@ describe('location create setup', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
 
-    expect(screen.getByRole('heading', { name: 'Political' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}` }),
+    ).toBeInTheDocument()
     expect(screen.getByText('Classification')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: LOCATION_CREATE_SETUP_CHANGE_LABEL }),
@@ -220,7 +226,9 @@ describe('location create setup', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
 
     expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Political' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: `Political, ${LOCATION_CREATE_SETUP_CHANGE_LABEL}` }),
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 

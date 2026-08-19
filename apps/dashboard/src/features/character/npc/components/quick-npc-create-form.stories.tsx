@@ -45,8 +45,6 @@ const setup = {
   level: 1,
 }
 
-const setupSummaryLine = 'Dwarf · Level 1 Fighter'
-
 const meta = {
   title: 'Dashboard/Character/QuickNpcAuthoringForm',
   component: QuickNpcAuthoringForm,
@@ -56,7 +54,6 @@ const meta = {
     buildContext,
     organization,
     setup,
-    setupSummaryLine,
     onCancel: () => undefined,
     onChangeSetup: () => undefined,
     onCreated: () => undefined,

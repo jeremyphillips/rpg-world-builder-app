@@ -9,11 +9,13 @@ while `collapseWhenComplete` is **presentation policy**, not completion policy.
 
 ```text
 sequencer  → order, visibility, visibleWhenComplete, dependsOn, active/complete, invalidation, collapse policy
-panel      → kind → control (choice | number | note)
+panel      → kind → control (choice | number)
 ```
 
 - **Sequencer** (`create-setup-sequence.lib.ts`) is control-agnostic — it never imports UI.
-- **Panel** (`create-setup-panel.client.tsx`) maps `kind` to `CollapsibleRadioCardField`, `NumberStepper`, or read-only note copy.
+- **Panel** (`create-setup-panel.client.tsx`) maps `kind` to `CollapsibleRadioCardField` or `NumberStepper`.
+- **`groupedChoiceSetIds`** — optional declared membership list for one quiet `SetupSummaryCard` when every listed choice set is visible, complete, and collapsed. Default remains per-set `ChooserSummaryCard`.
+- **`allowPartialGroupedSummary`** — when true with `groupedChoiceSetIds`, render the grouped `SetupSummaryCard` as soon as any declared choice is collapsed-complete; incomplete grouped choices keep their active controls below. Quick NPC opts in so Title collapses into the quiet summary while Species is still open.
 - **`isComplete`** is caller-owned on each set; the sequencer reads it but does not derive it from values.
 - **`visibleWhenComplete`** hides a set until listed upstream sets are complete — presentation-only; does not call `onReset`.
 - **`dependsOn`** triggers upstream invalidation via `onReset()` — use only for real reset boundaries.
@@ -35,6 +37,6 @@ Feature domain models (location intent, NPC build context) stay in feature `lib/
 ## Consumers
 
 - Location create setup — choice sets via `CreateSetupShell` and `buildLocationCreateSetupSets`
-- Quick NPC modal setup — Title → Species → Recommended build (when present) → Level → Class
+- Quick NPC modal setup — Title and Species via `CreateSetupPanel`; Class and Level in sibling `QuickNpcBuildCard` after both are complete
 
 Do not route setup through `FormItem` / `Form` — that layer is for tabbed authoring, not progressive create setup.
