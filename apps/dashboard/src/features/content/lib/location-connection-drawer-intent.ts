@@ -53,6 +53,10 @@ export const LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON = 'Already linked'
 
 export const LOCATION_CONNECTION_KIND_CHANGE_LABEL = 'Change connection type'
 
+export const RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW = 'Selections' as const
+
+export const RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL = 'Change' as const
+
 export const ORGANIZATION_DRAWER_CHANGE_KIND_TITLE = 'Change connection type'
 
 export const ORGANIZATION_DRAWER_CHANGE_TARGET_TITLE = 'Change location'

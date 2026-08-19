@@ -105,8 +105,10 @@ Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for th
 **Building → Organizations composer** — feature-owned stage machine (`intent → discovery → review | branch`) with `SelectionSummaryCard` partial rows and `RadioCardField` for active relationship kind. Entity discovery, nested org create, draft plan, and composite commit stay local. The `branch` stage is the active create-org control — not a completed placeholder organization row. A second create-modal draft relationship tab should copy these primitives rather than extracting a generic composer until a second identical consumer exists.
 
 Sequenced create-modal setup must use create-setup orchestration unless listed as a documented
-exception. `create-setup-parallel-path-drift.test.ts` guards `CollapsibleRadioCardField` and
-`ChooserSummaryCard` in create-modal decision sequences; `RadioCardField` is allowed for active
+exception. Relationship sequenced Add drawers import `SelectionSummaryCard` from `@rpg/ui` directly —
+they are **not** create-setup consumers. `create-setup-parallel-path-drift.test.ts` and
+`sequenced-relationship-drawer-drift.test.ts` guard against collapse chrome and deleted kind-step
+wrappers. `RadioCardField` is allowed for active
 decisions. Relationship drawers keep `LocationConnectionKindStep` (collapsing kind chrome).
 
 Create-modal radio cards represent **active decisions only**; completed setup decisions render through

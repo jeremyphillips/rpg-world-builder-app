@@ -155,6 +155,38 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
     expect(screen.getByPlaceholderText('Search organizations…')).toBeInTheDocument()
   })
 
+  it('hides subject type, picker, and footer while editing kind upstream', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={kindSlots}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={sampleOrganizations}
+        characters={sampleCharacters}
+        connectedPartyRows={[]}
+        canAddOrganization
+        canAddCharacter
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: 'Organization' }))
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+
+    expect(screen.getByRole('radiogroup', { name: /Relationship type/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Organization' })).not.toBeInTheDocument()
+    expect(screen.queryByPlaceholderText('Search organizations…')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Add owner/i })).not.toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <LocationInversePeopleConnectionLinkDrawer

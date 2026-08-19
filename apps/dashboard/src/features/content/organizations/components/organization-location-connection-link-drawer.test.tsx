@@ -36,7 +36,35 @@ function withOrganizationLocationDrawerIndex(locations: Parameters<typeof buildL
 }
 
 describe('OrganizationLocationConnectionLinkDrawer', () => {
-  it('opens with collapsible kind cards and canonical descriptions for site family add', async () => {
+  it('hides location picker and footer while editing kind upstream', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="site"
+        organizationId="org-1"
+        {...withOrganizationLocationDrawerIndex([testBuildingLocation()])}
+        existingConnections={[]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+
+    await user.click(screen.getByRole('button', { name: 'Change' }))
+
+    expect(screen.getByRole('radiogroup', { name: 'Relationship type' })).toBeInTheDocument()
+    expect(screen.queryByText('Royal Mint')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add site relationship' })).not.toBeInTheDocument()
+  })
+
+  it('opens with kind radios and canonical descriptions for site family add', async () => {
     const user = userEvent.setup()
 
     render(
