@@ -31,9 +31,10 @@ describe('ContentFormDef create submit drift guard', () => {
     expect(source).not.toContain('BuildingCreateSubmitButton')
   })
 
-  it('flags page create shell until Phase 7 migrates manual publish parse', () => {
+  it('requires page create shell to use useContentFormSubmit', () => {
     const source = readFileSync(contentCreateShellPath, 'utf8')
 
-    expect(source).toMatch(manualPublishParsePattern)
+    expect(source).toContain('useContentFormSubmit')
+    expect(source).not.toMatch(manualPublishParsePattern)
   })
 })

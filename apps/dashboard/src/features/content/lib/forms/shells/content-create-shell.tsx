@@ -30,6 +30,8 @@ import { resolveContentFormSchema } from './content-edit-load'
 import { intentToStatus } from './content-create-intent'
 import { createWithDeferredCampaignAccess } from '../../campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../campaign-access/campaign-access-labels'
+import { useContentFormSubmit } from './content-form-submit'
+import { resolveContentFormNavigationFields } from './content-form-host-projection'
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -80,6 +82,11 @@ function ContentCreateFormBody({
   )
   const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
   const leaveGuardRef = useRef<Pick<UnsavedChangesConfirmController, 'runTrusted'> | null>(null)
+  const formKey = `content-create-${def.routeKey}-${campaignId}`
+
+  const prepareCommitValues = prepareSubmitValues as
+    | ((values: Record<string, unknown>) => Record<string, unknown>)
+    | undefined
 
   const createEntity = async (
     values: Record<string, unknown>,
@@ -117,11 +124,25 @@ function ContentCreateFormBody({
     }
   }
 
-  const { onSubmit: onPublish, formError: publishFormError } = useSubmitHandler(async (values) => {
-    const preparedValues = prepareSubmitValues?.(values) ?? values
-    resolveContentFormSchema(def, ctx, 'publish').parse(preparedValues)
-    await createEntity(values, intentToStatus('publish'), 'publish')
-  }, `Could not create ${def.routeKey}.`)
+  const invalidPresentation = {
+    resolverFields: resolveContentFormNavigationFields(def, ctx),
+    formId: formKey,
+  }
+
+  const {
+    onSubmit: onPublish,
+    formError: publishFormError,
+    UiBridge,
+  } = useContentFormSubmit<Record<string, unknown>>({
+    def,
+    ctx,
+    fallbackMessage: `Could not create ${def.routeKey}.`,
+    prepareCommitValues,
+    invalidPresentation,
+    persist: async (values) => {
+      await createEntity(values, intentToStatus('publish'), 'publish')
+    },
+  })
 
   const { onSubmit: onSaveDraft, formError: saveDraftFormError } = useSubmitHandler(
     async (values) => {
@@ -147,6 +168,7 @@ function ContentCreateFormBody({
         ctx={ctx}
         schema={resolveContentFormSchema(def, ctx, 'draft')}
         defaultValues={{ ...def.createDefaultValues, ...initialValues }}
+        formKey={formKey}
         formMode="create"
         contentTypeKey={contentTypeKey}
         campaignId={campaignId}
@@ -163,7 +185,12 @@ function ContentCreateFormBody({
         onLeaveGuardReady={(guard) => {
           leaveGuardRef.current = guard
         }}
-        formHeaderPrefix={formHeaderPrefix}
+        formHeaderPrefix={
+          <>
+            <UiBridge />
+            {formHeaderPrefix}
+          </>
+        }
       />
     </>
   )

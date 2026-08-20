@@ -47,6 +47,8 @@ export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
   fallbackMessage: string
   mapError?: (error: unknown) => string | undefined
   invalidPresentation?: ContentFormInvalidPresentation
+  /** Applied immediately before commit schema validation. Persist still receives raw form values. */
+  prepareCommitValues?: (values: TValues) => TValues
   /** Feature-owned persistence — called only after commit validation passes. */
   persist: FormSubmitHandler<TValues>
 }
@@ -113,6 +115,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     fallbackMessage,
     mapError,
     invalidPresentation,
+    prepareCommitValues,
     persist,
   } = options
 
@@ -130,7 +133,8 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       return mapError?.(error)
     },
     submit: async (values, form) => {
-      const commitResult = publishSchema.safeParse(values)
+      const commitValues = prepareCommitValues?.(values) ?? values
+      const commitResult = publishSchema.safeParse(commitValues)
       if (!commitResult.success) {
         form.clearErrors()
         const issues = zodIssuesToValidationIssues(commitResult.error.issues)
