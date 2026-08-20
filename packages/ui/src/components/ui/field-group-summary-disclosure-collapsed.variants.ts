@@ -2,7 +2,13 @@ import { cva } from 'class-variance-authority'
 
 import { iconGlyphRootClasses } from './icon-glyph.variants'
 
-/** Status line row — indicator, label, and detail separator. */
+export {
+  fieldGroupSummaryDisclosureLegendVariants,
+  fieldGroupSummaryPrimaryVariants,
+  fieldGroupSummaryStatusLineVariants,
+} from './field-group-summary-disclosure.variants'
+
+/** @deprecated Prefer {@link fieldGroupSummaryStatusLineVariants}. */
 export const fieldGroupSummaryStatusLineClasses = 'flex min-w-0 items-center gap-1.5 text-sm'
 
 /** Middle-dot separator before detail text. */

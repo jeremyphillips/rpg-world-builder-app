@@ -14,7 +14,7 @@ import {
   type FieldSize,
 } from './field.client'
 import {
-  fieldAnatomyStackClasses,
+  fieldAnatomyStackVariants,
   fieldChipWrapGapClasses,
   fieldLabelVariants,
   fieldSetResetClasses,
@@ -194,7 +194,7 @@ export function ChipsField({
         aria-describedby={resolvedDescribedBy}
         aria-invalid={hasError || undefined}
         disabled={disabled}
-        className={cn(fieldSetResetClasses, fieldAnatomyStackClasses)}
+        className={cn(fieldSetResetClasses, fieldAnatomyStackVariants({ size }))}
         onBlur={onBlur}
       >
         <legend

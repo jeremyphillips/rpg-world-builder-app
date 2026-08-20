@@ -3,7 +3,6 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../components/equipment/equipment-picker-drawer.types'
 import {
   createEquipmentStepContextFixture,
@@ -19,14 +18,14 @@ import {
   resolveQuickNpcRequirementValidIds,
   resolveQuickNpcWeaponRequirementOptions,
 } from './quick-npc-requirement-options.lib'
+import { quickNpcMemberSetupWithNoTitle } from './quick-npc-test-fixtures'
 import { getEquipmentPickerCallout } from '../../components/equipment/equipment-picker-callout.lib'
 
-const setup = {
+const setup = quickNpcMemberSetupWithNoTitle({
   speciesId: 'species-1',
-  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: equipmentStepBardClassFixture.id,
   level: 1,
-}
+})
 
 describe('quick-npc-requirement-options.lib', () => {
   it('offers campaign-available weapons rather than package-reachable only', () => {

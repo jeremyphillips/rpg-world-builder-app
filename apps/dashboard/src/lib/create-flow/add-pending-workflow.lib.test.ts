@@ -7,6 +7,16 @@ describe('resolveAddPendingMode', () => {
     expect(resolveAddPendingMode({ requestedMode: 'pending', hasPendingItems: false })).toBe('add')
   })
 
+  it('keeps pending resting when empty resting is allowed', () => {
+    expect(
+      resolveAddPendingMode({
+        requestedMode: 'pending',
+        hasPendingItems: false,
+        allowEmptyResting: true,
+      }),
+    ).toBe('pending')
+  })
+
   it('honors the requested mode when pending items exist', () => {
     expect(resolveAddPendingMode({ requestedMode: 'add', hasPendingItems: true })).toBe('add')
     expect(resolveAddPendingMode({ requestedMode: 'pending', hasPendingItems: true })).toBe(

@@ -2,12 +2,10 @@ import { cva } from 'class-variance-authority'
 
 import { cn, iconGhostControlVariants } from '@rpg/ui'
 
-import {
-  ENTITY_BODY_INLINE_START_VAR,
-  ENTITY_CONTENT_OFFSET_VAR,
-} from '../../entity/entity-leading-rail.lib'
+import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
 import {
   ENTITY_SURFACE_INLINE_END_VAR,
+  ENTITY_SURFACE_INLINE_START_VAR,
   entitySurfaceHorizontalInsetClasses,
 } from '../../entity/entity-surface-inset.variants'
 
@@ -43,20 +41,25 @@ export const detailEntityRowDisclosureButtonVariants = cva(
   iconGhostControlVariants({ hover: 'text', layout: 'flex' }),
 )
 
-export const detailEntityRowDisclosureContentVariants = cva('', {
+export const detailEntityRowDisclosureContentVariants = cva('mb-2', {
   variants: {
     inset: {
       self: cn(
-        `pl-[var(${ENTITY_BODY_INLINE_START_VAR})]`,
+        `pl-[var(${ENTITY_SURFACE_INLINE_START_VAR})]`,
         `pr-[var(${ENTITY_SURFACE_INLINE_END_VAR})]`,
       ),
-      parent: `pl-[var(${ENTITY_CONTENT_OFFSET_VAR})]`,
+      parent: '',
     },
   },
   defaultVariants: {
     inset: 'self',
   },
 })
+
+/** Indents preview rail by disclosure utility + content gap — rail-to-copy gap stays on the group. */
+export const detailEntityRowDisclosurePreviewOffsetVariants = cva(
+  `pl-[var(${ENTITY_CONTENT_OFFSET_VAR})]`,
+)
 
 /** Left rail wrapping disclosure preview child rows. */
 export const detailEntityRowDisclosurePreviewGroupVariants = cva(

@@ -19,10 +19,7 @@ import {
 } from '../field-config'
 import { assertOptionalDisclosureFieldConfigs } from '../config/optional-disclosure-config.lib'
 import type { FormValidationPresentation } from '../context/form-ui.context'
-import {
-  FormShellFooterPublisher,
-  type FormShellFooterModel,
-} from '../chrome/form-shell-footer.context'
+import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -97,11 +94,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
   validationPresentation?: FormValidationPresentation
 }
 
-function buildExternalFooterModel(
+function buildExternalFooterContent(
   formId: string,
   formError: string | null | undefined,
   footer: React.ReactNode,
-): FormShellFooterModel | null {
+): FormShellExternalFooterContent | null {
   if (!footer && !formError) {
     return null
   }
@@ -168,9 +165,10 @@ export function Form<TFieldValues extends FieldValues>({
 
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const resolvedHeader = resolveSchemaFormFooter(header, form)
-  const externalFooterModel = externalFooter
-    ? buildExternalFooterModel(formId, formError, resolvedFooter)
-    : null
+  const externalFooterContent = React.useMemo(
+    () => (externalFooter ? buildExternalFooterContent(formId, formError, resolvedFooter) : null),
+    [externalFooter, formError, formId, resolvedFooter],
+  )
 
   return (
     <SchemaFormShell
@@ -184,9 +182,7 @@ export function Form<TFieldValues extends FieldValues>({
       validateSilently={validateSilently}
       onSubmit={onSubmit}
       externalFooter={externalFooter}
-      externalFooterPublisher={
-        externalFooter ? <FormShellFooterPublisher model={externalFooterModel} /> : undefined
-      }
+      externalFooterContent={externalFooterContent}
       className={cn(externalFooter && 'flex min-h-0 flex-1 flex-col', className)}
     >
       <FormShellFieldStack

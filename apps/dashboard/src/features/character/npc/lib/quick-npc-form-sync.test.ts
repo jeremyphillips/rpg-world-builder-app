@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -10,6 +9,7 @@ import {
   QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
+import { quickNpcMemberSetupWithNoTitle } from './quick-npc-test-fixtures'
 import { createQuickNpcFormValueSyncs } from './quick-npc-form-sync'
 
 const quickFighter = {
@@ -33,12 +33,11 @@ const buildContext = createCampaignNpcBuilderContextFixture({
 describe('createQuickNpcFormValueSyncs', () => {
   it('intersects weapon requirements when setup changes make ids invalid', () => {
     const sync = createQuickNpcFormValueSyncs(buildContext)[0]!
-    const setup: QuickNpcSetupValues = {
+    const setup: QuickNpcSetupValues = quickNpcMemberSetupWithNoTitle({
       speciesId: populatedBuilderCatalog.species[0]!.id,
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       classId: quickFighter.id,
       level: 1,
-    }
+    })
 
     const patch = sync.apply(
       {
@@ -63,10 +62,11 @@ describe('createQuickNpcFormValueSyncs', () => {
 
     const patch = sync.apply(
       {
-        speciesId: populatedBuilderCatalog.species[0]!.id,
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-        classId: quickFighter.id,
-        level: 1,
+        ...quickNpcMemberSetupWithNoTitle({
+          speciesId: populatedBuilderCatalog.species[0]!.id,
+          classId: quickFighter.id,
+          level: 1,
+        }),
         [QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME]: [],
         [QUICK_NPC_REQUIRED_SPELL_FIELD_NAME]: [],
       },

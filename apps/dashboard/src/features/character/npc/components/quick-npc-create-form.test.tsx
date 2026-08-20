@@ -7,13 +7,17 @@ import type { CharacterBuildContext } from '@rpg/contracts'
 
 import { makeCampaignNpcDetail } from '@/test/fixtures/factories/additional/character'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import { renderWithProviders } from '@/test/render'
 
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
+import {
+  quickNpcMemberSetupValues,
+  quickNpcMemberSetupWithNoTitle,
+  quickNpcOrganizationMemberCreateContext,
+} from '../lib/quick-npc-test-fixtures'
 import { createNpc } from '../api/npc-client'
 import type * as NpcClient from '../api/npc-client'
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
@@ -56,6 +60,8 @@ const organization = {
   members: { titles: [...membershipTitles] },
 }
 
+const createContext = quickNpcOrganizationMemberCreateContext(organization)
+
 const organizationCatalogRow = {
   id: organization.id,
   slug: 'lantern-guild',
@@ -84,12 +90,11 @@ const quickFighter = {
   },
 }
 
-const setup = {
+const setup = quickNpcMemberSetupWithNoTitle({
   speciesId: populatedBuilderCatalog.species[0]!.id,
-  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: quickFighter.id,
   level: 1,
-}
+})
 
 function buildContextFixture(
   overrides: { classes?: (typeof quickFighter)[] } = {},
@@ -112,7 +117,7 @@ function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcAutho
   const props = {
     campaignId: CAMPAIGN_ID,
     buildContext: buildContextFixture(),
-    organization,
+    createContext,
     setup,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
@@ -157,12 +162,22 @@ describe('QuickNpcAuthoringForm', () => {
   it('creates the NPC atomically with the titled membership connection', async () => {
     const user = userEvent.setup()
     const { props } = renderForm({
-      setup: { ...setup, membershipTitle: 'Guildmaster' },
+      setup: quickNpcMemberSetupValues({
+        speciesId: populatedBuilderCatalog.species[0]!.id,
+        membershipTitle: 'Guildmaster',
+        classId: quickFighter.id,
+        level: 1,
+      }),
     })
     await fillAuthoringFields(user)
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
-    await waitFor(() => expect(props.onCreated).toHaveBeenCalledWith(npcDetail))
+    await waitFor(() =>
+      expect(props.onCreated).toHaveBeenCalledWith({
+        contentType: 'npcs',
+        id: npcDetail.character.id,
+      }),
+    )
 
     expect(createNpcMock).toHaveBeenCalledTimes(1)
     const [campaignId, input] = createNpcMock.mock.calls[0]!
@@ -190,19 +205,20 @@ describe('QuickNpcAuthoringForm', () => {
   })
 
   it('shows membership title and recommended build in the setup summary', () => {
-    const guildmasterSetup = {
-      ...setup,
+    const guildmasterSetup = quickNpcMemberSetupValues({
+      speciesId: populatedBuilderCatalog.species[0]!.id,
       membershipTitle: 'Guildmaster',
+      classId: quickFighter.id,
       level: 5,
-    }
+    })
     renderForm({
       setup: guildmasterSetup,
-      organization: {
+      createContext: quickNpcOrganizationMemberCreateContext({
         ...organization,
         members: {
           titles: membershipTitles,
         },
-      },
+      }),
     })
 
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
@@ -223,11 +239,11 @@ describe('QuickNpcAuthoringForm', () => {
     }
     const { props } = renderForm({
       buildContext: buildContextFixture({ classes: [unsatisfiableFighter] }),
-      setup: {
-        ...setup,
+      setup: quickNpcMemberSetupWithNoTitle({
+        speciesId: populatedBuilderCatalog.species[0]!.id,
         classId: unsatisfiableFighter.id,
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-      },
+        level: 1,
+      }),
     })
 
     await fillAuthoringFields(user)

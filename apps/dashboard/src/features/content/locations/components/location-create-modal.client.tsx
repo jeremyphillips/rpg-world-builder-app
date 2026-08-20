@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Button, usePendingAwareOpenChange } from '@rpg/ui'
+import { Button, Modal, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
 import {
@@ -9,7 +9,16 @@ import {
   notifyCreateSetupValueChangeCompletion,
   type SetupSummaryEditTarget,
 } from '@/lib/create-setup'
-import { CreateModalShell, type CreateWorkflowPanelStatus } from '@/lib/create-flow'
+import {
+  CreateModalShell,
+  STANDALONE_CONTENT_CREATE_CONTEXT,
+  type ContentCreateContext,
+  type CreateCompositionChildWorkflowView,
+  type CreateModalShellTab,
+  type CreateWorkflowPanelStatus,
+  type OnContentCreated,
+  resolveActiveCreateTabId,
+} from '@/lib/create-flow'
 
 import type {
   ContentFormHostChrome,
@@ -33,10 +42,12 @@ import {
   type LocationCreateModalSetupModel,
   type LocationCreateModalSetupValues,
 } from '../lib/location-create-modal-setup.lib'
+import { type BuildingCreateSetupProjection } from '../lib/location-building-create-setup.lib'
 import {
-  BUILDING_CREATE_SETUP_HEADLINE,
-  type BuildingCreateSetupProjection,
-} from '../lib/location-building-create-setup.lib'
+  EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN,
+  resolveBuildingCreateTransactionSummary,
+  type BuildingOrganizationDraftPlan,
+} from '../lib/building-organization-create-drafts'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
 import {
@@ -47,6 +58,10 @@ import {
   LocationCreateModalSetupPanel,
   useLocationCreateModalSetupSequence,
 } from './location-create-modal-setup-panel.client'
+import {
+  resolveLocationCreateAuthoringCapabilities,
+  type LocationCreateAuthoringTabId,
+} from '../lib/location-create-authoring-capabilities.lib'
 import { LocationCreateForm } from './location-create-form.client'
 import {
   BuildingOrganizationsCreateTab,
@@ -58,8 +73,12 @@ export type LocationCreateModalProps = {
   onOpenChange: (open: boolean) => void
   intent: LocationCreateIntent
   campaignId: string
+  /** Semantic reason for create — drives authoring capability suppression. */
+  createContext?: ContentCreateContext
   /** Optional preloaded context for embedded/test surfaces; normal app usage resolves it here. */
   formOptionsCtx?: ContentFormCtx
+  /** Called after persistence and caller handoff succeed. */
+  onCreated?: OnContentCreated
 }
 
 type LocationCreateModalPhase = 'setup' | 'details'
@@ -169,6 +188,92 @@ function resolveCreateWorkflowPanelBlocksSubmit(status: CreateWorkflowPanelStatu
   return status.blocksSubmit ?? status.invalid
 }
 
+function CreateCompositionChildFooter({
+  childWorkflow,
+  organizationsControllerRef,
+  pending,
+}: {
+  childWorkflow: NonNullable<CreateCompositionChildWorkflowView>
+  organizationsControllerRef: React.MutableRefObject<BuildingOrganizationsCreateTabController | null>
+  pending: boolean
+}) {
+  return (
+    <Modal.FooterActions>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={pending}
+        onClick={() => organizationsControllerRef.current?.cancelComposer()}
+      >
+        Cancel
+      </Button>
+      {childWorkflow.commitTarget.kind === 'form' ? (
+        <Button
+          type="submit"
+          form={childWorkflow.commitTarget.formId}
+          disabled={pending || !childWorkflow.canCommit}
+        >
+          {childWorkflow.commitLabel}
+        </Button>
+      ) : (
+        <Button
+          type="button"
+          disabled={pending || !childWorkflow.canCommit}
+          onClick={() => organizationsControllerRef.current?.commitComposer()}
+        >
+          {childWorkflow.commitLabel}
+        </Button>
+      )}
+    </Modal.FooterActions>
+  )
+}
+
+function buildBuildingShellTabs({
+  capabilities,
+  campaignId,
+  formOptionsCtx,
+  renderDetailsForm,
+  organizationsTabContent,
+  organizationsStatus,
+  detailsStatus,
+  childWorkflowActive,
+}: {
+  capabilities: ReturnType<typeof resolveLocationCreateAuthoringCapabilities>
+  campaignId: string
+  formOptionsCtx?: ContentFormCtx
+  renderDetailsForm: (optionsCtx: ContentFormCtx) => React.ReactNode
+  organizationsTabContent: React.ReactNode
+  organizationsStatus: CreateWorkflowPanelStatus
+  detailsStatus: CreateWorkflowPanelStatus
+  childWorkflowActive: boolean
+}): [CreateModalShellTab, ...CreateModalShellTab[]] {
+  const tabDefinitions: Record<LocationCreateAuthoringTabId, () => CreateModalShellTab> = {
+    details: () => ({
+      id: 'details',
+      label: 'Details',
+      disabled: childWorkflowActive,
+      content: formOptionsCtx ? (
+        renderDetailsForm(formOptionsCtx)
+      ) : (
+        <ContentFormOptionsGate campaignId={campaignId}>{renderDetailsForm}</ContentFormOptionsGate>
+      ),
+      status: detailsStatus,
+      contentMode: 'managed',
+    }),
+    organizations: () => ({
+      id: 'organizations',
+      label: 'Organizations',
+      content: organizationsTabContent,
+      status: organizationsStatus,
+    }),
+  }
+
+  return capabilities.tabs.map((tabId) => tabDefinitions[tabId]()) as [
+    CreateModalShellTab,
+    ...CreateModalShellTab[],
+  ]
+}
+
 function LocationCreateModalDetailsForm({
   fixedCreate,
   campaignId,
@@ -190,6 +295,7 @@ function LocationCreateModalDetailsForm({
   onDetailsStatusChange,
   useCompositeBuildingChrome,
   submitBlocked,
+  onCreated,
 }: {
   fixedCreate: LocationFixedCreateContext
   campaignId: string
@@ -211,6 +317,7 @@ function LocationCreateModalDetailsForm({
   onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
   useCompositeBuildingChrome?: boolean
   submitBlocked?: boolean
+  onCreated?: OnContentCreated
 }) {
   return (
     <LocationCreateForm
@@ -233,6 +340,8 @@ function LocationCreateModalDetailsForm({
       onNavigateToTab={onNavigateToTab}
       onDetailsStatusChange={onDetailsStatusChange}
       submitBlocked={submitBlocked}
+      submitLabel={submitLabel}
+      onCreated={onCreated}
       chrome={
         useCompositeBuildingChrome
           ? undefined
@@ -377,6 +486,7 @@ function useLocationCreateModalController({
     handleContinueFromSetup,
     handleBackToSetup,
     returnToDetailsPhase,
+    detailsPending,
     setDetailsPending,
     trustedClose,
   }
@@ -399,7 +509,9 @@ function LocationCreateModalSession({
   onOpenChange,
   intent,
   campaignId,
+  createContext = STANDALONE_CONTENT_CREATE_CONTEXT,
   formOptionsCtx,
+  onCreated,
 }: LocationCreateModalProps) {
   const {
     state,
@@ -412,10 +524,11 @@ function LocationCreateModalSession({
     handleContinueFromSetup,
     handleBackToSetup,
     returnToDetailsPhase,
+    detailsPending,
     setDetailsPending,
     trustedClose,
   } = useLocationCreateModalController({ intent, onOpenChange })
-  const [activeTabId, setActiveTabId] = React.useState('details')
+  const [requestedTabId, setRequestedTabId] = React.useState('details')
   const [detailsStatus, setDetailsStatus] = React.useState<CreateWorkflowPanelStatus>({
     invalid: false,
     dirty: false,
@@ -427,13 +540,39 @@ function LocationCreateModalSession({
   const organizationsControllerRef = React.useRef<BuildingOrganizationsCreateTabController | null>(
     null,
   )
+  const [organizationDraftPlan, setOrganizationDraftPlan] = React.useState(
+    EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN,
+  )
+  const [childWorkflow, setChildWorkflow] = React.useState<CreateCompositionChildWorkflowView>(null)
   const pendingSetupSummaryEditRef = React.useRef<SetupSummaryEditTarget | null>(null)
 
+  const handleOrganizationPlanChange = React.useCallback((plan: BuildingOrganizationDraftPlan) => {
+    setOrganizationDraftPlan(plan)
+  }, [])
+
+  const handleChildWorkflowChange = React.useCallback(
+    (view: CreateCompositionChildWorkflowView) => {
+      setChildWorkflow(view)
+    },
+    [],
+  )
+
   const showDetails = state.phase === 'details' && state.fixedCreate != null
-  const buildingTabsConfigured =
+  const buildingDetailsReady =
     state.detailsMounted &&
     state.fixedCreate?.authoringType === 'building' &&
     state.buildingSetupApplication != null
+  const capabilities =
+    state.fixedCreate != null
+      ? resolveLocationCreateAuthoringCapabilities({
+          authoringType: state.fixedCreate.authoringType,
+          createContext,
+        })
+      : null
+  const useBuildingShellTabs = buildingDetailsReady && capabilities != null
+  const organizationComposition = capabilities?.organizationComposition ?? false
+  const activeTabId = resolveActiveCreateTabId(capabilities?.tabs ?? [], requestedTabId, 'details')
+
   const showSetup = state.phase === 'setup' && setupModel != null
   const setupSequenceModel = useLocationCreateModalSetupSequence({
     sets: setupSets,
@@ -464,12 +603,14 @@ function LocationCreateModalSession({
     }
   }, [returnToDetails, setupSequenceModel, state.phase])
 
-  const submitLabel = buildingTabsConfigured
-    ? BUILDING_CREATE_SETUP_HEADLINE
-    : formatContentCreateActionLabel('locations')
+  const submitLabel =
+    state.fixedCreate?.authoringType === 'building'
+      ? resolveBuildingCreateTransactionSummary(organizationDraftPlan).submitLabel
+      : formatContentCreateActionLabel('locations')
+  const childWorkflowActive = childWorkflow?.active === true
   const setupHeader = resolveSetupPhaseHeader({ phase: state.phase, setupModel })
   const buildingSubmitBlocked =
-    buildingTabsConfigured &&
+    organizationComposition &&
     (resolveCreateWorkflowPanelBlocksSubmit(detailsStatus) ||
       resolveCreateWorkflowPanelBlocksSubmit(organizationsStatus))
   const renderDetailsForm = (optionsCtx: ContentFormCtx) => (
@@ -480,7 +621,7 @@ function LocationCreateModalSession({
       open={open}
       leaveBridgeRef={leaveBridgeRef}
       formKey={state.formKey}
-      showDetails={showDetails && (!buildingTabsConfigured || activeTabId === 'details')}
+      showDetails={showDetails && (!useBuildingShellTabs || activeTabId === 'details')}
       hadSetup={state.hadSetup}
       submitLabel={submitLabel}
       onBack={handleBackToSetup}
@@ -488,12 +629,13 @@ function LocationCreateModalSession({
       onTrustedClose={trustedClose}
       onPendingChange={setDetailsPending}
       buildingSetupApplication={state.buildingSetupApplication}
-      extraUnsavedEdits={organizationsStatus.dirty}
-      organizationsControllerRef={buildingTabsConfigured ? organizationsControllerRef : undefined}
-      onNavigateToTab={buildingTabsConfigured ? setActiveTabId : undefined}
-      onDetailsStatusChange={buildingTabsConfigured ? setDetailsStatus : undefined}
-      useCompositeBuildingChrome={buildingTabsConfigured}
+      extraUnsavedEdits={organizationComposition ? organizationsStatus.dirty : undefined}
+      organizationsControllerRef={organizationComposition ? organizationsControllerRef : undefined}
+      onNavigateToTab={organizationComposition ? setRequestedTabId : undefined}
+      onDetailsStatusChange={useBuildingShellTabs ? setDetailsStatus : undefined}
+      useCompositeBuildingChrome={organizationComposition}
       submitBlocked={buildingSubmitBlocked || undefined}
+      onCreated={onCreated}
     />
   )
   const resolvedSetupSummary = setupModel
@@ -508,6 +650,16 @@ function LocationCreateModalSession({
           onRowEdit: handleSetupSummaryEdit,
         }
       : undefined
+  const organizationsTabContent = (
+    <BuildingOrganizationsCreateTab
+      campaignId={campaignId}
+      formCtx={formOptionsCtx}
+      controllerRef={organizationsControllerRef}
+      onStatusChange={setOrganizationsStatus}
+      onPlanChange={handleOrganizationPlanChange}
+      onChildWorkflowChange={handleChildWorkflowChange}
+    />
+  )
 
   return (
     <FormShellFooterScope>
@@ -522,40 +674,21 @@ function LocationCreateModalSession({
         description={setupHeader.description}
         setupSummary={setupSummary}
         contentMode={showSetup ? 'scroll' : 'managed'}
-        activeTabId={buildingTabsConfigured ? activeTabId : undefined}
-        onActiveTabChange={buildingTabsConfigured ? setActiveTabId : undefined}
+        activeTabId={useBuildingShellTabs ? activeTabId : undefined}
+        onActiveTabChange={useBuildingShellTabs ? setRequestedTabId : undefined}
         tabsVisible={showDetails}
         tabs={
-          buildingTabsConfigured
-            ? [
-                {
-                  id: 'details',
-                  label: 'Details',
-                  content: formOptionsCtx ? (
-                    renderDetailsForm(formOptionsCtx)
-                  ) : (
-                    <ContentFormOptionsGate campaignId={campaignId}>
-                      {renderDetailsForm}
-                    </ContentFormOptionsGate>
-                  ),
-                  status: detailsStatus,
-                  contentMode: 'managed',
-                },
-                {
-                  id: 'organizations',
-                  label: 'Organizations',
-                  optional: true,
-                  content: (
-                    <BuildingOrganizationsCreateTab
-                      campaignId={campaignId}
-                      formCtx={formOptionsCtx}
-                      controllerRef={organizationsControllerRef}
-                      onStatusChange={setOrganizationsStatus}
-                    />
-                  ),
-                  status: organizationsStatus,
-                },
-              ]
+          useBuildingShellTabs && capabilities
+            ? buildBuildingShellTabs({
+                capabilities,
+                campaignId,
+                formOptionsCtx,
+                renderDetailsForm,
+                organizationsTabContent,
+                organizationsStatus,
+                detailsStatus,
+                childWorkflowActive,
+              })
             : undefined
         }
         footer={
@@ -564,6 +697,12 @@ function LocationCreateModalSession({
               model={setupSequenceModel}
               onCancel={requestClose}
               onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
+            />
+          ) : childWorkflowActive && childWorkflow ? (
+            <CreateCompositionChildFooter
+              childWorkflow={childWorkflow}
+              organizationsControllerRef={organizationsControllerRef}
+              pending={detailsPending}
             />
           ) : (
             <FormShellFooterSlot />
@@ -578,7 +717,7 @@ function LocationCreateModalSession({
           />
         ) : null}
 
-        {!buildingTabsConfigured && state.detailsMounted && state.fixedCreate ? (
+        {!useBuildingShellTabs && state.detailsMounted && state.fixedCreate ? (
           formOptionsCtx ? (
             renderDetailsForm(formOptionsCtx)
           ) : (
@@ -598,5 +737,10 @@ function LocationCreateModalSession({
  */
 export function LocationCreateModal(props: LocationCreateModalProps) {
   if (!props.open) return null
-  return <LocationCreateModalSession key={JSON.stringify(props.intent)} {...props} />
+  return (
+    <LocationCreateModalSession
+      key={JSON.stringify({ intent: props.intent, createContext: props.createContext })}
+      {...props}
+    />
+  )
 }

@@ -2,11 +2,15 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
+import {
+  quickNpcMemberSetupWithNoTitle,
+  quickNpcOrganizationMemberCreateContext,
+  quickNpcTestOrganization,
+} from '../lib/quick-npc-test-fixtures'
 import { renderWithProviders } from '@/test/render'
 
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
@@ -71,11 +75,7 @@ beforeAll(() => {
   }
 })
 
-const organization = {
-  id: 'organization-lantern-guild',
-  name: 'Lantern Guild',
-  organizationDomain: 'occupational' as const,
-}
+const createContext = quickNpcOrganizationMemberCreateContext(quickNpcTestOrganization)
 
 const quickFighter = {
   ...populatedBuilderCatalog.classes[0]!,
@@ -95,12 +95,11 @@ const buildContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
-const setup = {
+const setup = quickNpcMemberSetupWithNoTitle({
   speciesId: 'srd-cc-5.2.1:dwarf',
-  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: quickFighter.id,
   level: 1,
-}
+})
 
 function renderAuthoringForm(
   overrides: Partial<React.ComponentProps<typeof QuickNpcAuthoringForm>> = {},
@@ -108,7 +107,7 @@ function renderAuthoringForm(
   const props = {
     campaignId: 'campaign-test-1',
     buildContext,
-    organization,
+    createContext,
     setup,
     onCancel: vi.fn(),
     onChangeSetup: vi.fn(),
@@ -181,11 +180,11 @@ describe('QuickNpcAuthoringForm', () => {
     const onChangeSetup = vi.fn()
     renderAuthoringForm({
       onChangeSetup,
-      setup: {
-        ...setup,
+      setup: quickNpcMemberSetupWithNoTitle({
         speciesId: 'srd-cc-5.2.1:not-a-species',
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-      },
+        classId: quickFighter.id,
+        level: 1,
+      }),
     })
 
     await user.type(screen.getByRole('textbox', { name: /name/i }), 'Guard Captain')

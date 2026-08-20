@@ -107,6 +107,7 @@ function LocationConnectedPeopleDrawer({ location, detail }: LocationConnectedPa
       isSubmitting={detail.isMutationPending}
       onOrganizationSubmit={detail.handlePeopleDrawerOrganizationSubmit}
       onCharacterSubmit={detail.handlePeopleDrawerCharacterSubmit}
+      quickNpc={detail.quickNpc}
     />
   )
 }

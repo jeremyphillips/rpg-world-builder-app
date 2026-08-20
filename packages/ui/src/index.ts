@@ -586,6 +586,7 @@ export { FileField, type FileFieldProps } from './components/ui/file-field.clien
 export {
   Modal,
   type ModalContentProps,
+  type ModalFooterActionsProps,
   type ModalHeaderProps,
   type ModalStableSize,
 } from './components/ui/modal.client'

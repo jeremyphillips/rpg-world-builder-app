@@ -3,18 +3,10 @@
 import * as React from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 
-import {
-  resolveOrganizationMembershipMetadata,
-  type CampaignNpcDetail,
-  type CharacterBuildContext,
-  type OrganizationFunction,
-  type OrganizationMembershipTitleDefinition,
-  type OrganizationPractice,
-  type OrganizationDomain,
-  type OrganizationForm,
-} from '@rpg/contracts'
+import type { CharacterBuildContext } from '@rpg/contracts'
 import { Button, SelectionSummaryCard } from '@rpg/ui'
 import { mapSetupSummaryRowModelsToProps, type SetupSummaryEditTarget } from '@/lib/create-setup'
+import { useCreateFlowFormDensity, CREATE_FLOW_FORM_DENSITY } from '@/lib/create-flow'
 import {
   FormShellSubmitButton,
   TabbedForm,
@@ -24,20 +16,17 @@ import {
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
-import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 import { useCreateNpc } from '../hooks/use-create-npc'
 import { useQuickNpcNameTrailingAction } from '../hooks/use-quick-npc-name-trailing-action.client'
 import { isQuickNpcSetupStillValid } from '../lib/quick-npc-authoring-validation.lib'
-import { buildQuickNpcCreateInput, formatQuickNpcCreationError } from '../lib/quick-npc-create'
+import { buildQuickNpcAuthoringCreateInput } from '../lib/quick-npc-authoring-submit.lib'
+import { formatQuickNpcCreationError } from '../lib/quick-npc-create'
 import { createQuickNpcFormValueSyncs } from '../lib/quick-npc-form-sync'
 import {
-  buildQuickNpcConstraints,
   buildQuickNpcDetailsFields,
   buildQuickNpcRequirementsFields,
-  buildQuickNpcSeed,
   buildQuickNpcTabs,
   countQuickNpcConfiguredRequirements,
-  mergeQuickNpcAuthoringValues,
   quickNpcAuthoringTabDefaultValues,
   quickNpcAuthoringTabSchema,
   type QuickNpcAuthoringTabValues,
@@ -54,41 +43,32 @@ import {
 } from '../lib/quick-npc-name-generation'
 import { buildQuickNpcRequirementOptionSets } from '../lib/quick-npc-requirement-options.lib'
 import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.client'
+import {
+  QUICK_NPC_CREATE_SUBMIT_LABEL,
+  type QuickNpcCreateContext,
+} from '../lib/quick-npc-create-context'
 
-export const QUICK_NPC_CREATE_SUBMIT_LABEL = 'Create NPC' as const
+export { QUICK_NPC_CREATE_SUBMIT_LABEL } from '../lib/quick-npc-create-context'
+export type { QuickNpcCreateFormOrganization } from '../lib/quick-npc-create-context'
+
 export const QUICK_NPC_CREATE_FALLBACK_ERROR = 'Could not create this NPC.' as const
-
-export type QuickNpcCreateFormOrganization = {
-  id: string
-  name: string
-  organizationDomain: OrganizationDomain
-  organizationForm?: OrganizationForm
-  functions?: readonly OrganizationFunction[]
-  practices?: readonly OrganizationPractice[]
-  members?: {
-    classAffinityIds?: readonly string[]
-    speciesAffinityIds?: readonly string[]
-    titles?: readonly OrganizationMembershipTitleDefinition[]
-  }
-}
 
 export type QuickNpcAuthoringFormProps = {
   campaignId: string
   buildContext: CharacterBuildContext
-  organization: QuickNpcCreateFormOrganization
+  createContext: QuickNpcCreateContext
   setup: QuickNpcSetupValues
   initialValues?: Partial<QuickNpcAuthoringTabValues> | undefined
   onCancel: () => void
   onChangeSetup: () => void
   onSetupSummaryEdit: (target: SetupSummaryEditTarget) => void
-  onCreated: (npc: CampaignNpcDetail) => void | Promise<void>
+  onCreated: (result: { contentType: 'npcs'; id: string }) => void | Promise<void>
   onPendingChange?: (pending: boolean) => void
 }
 
 function buildQuickNpcAuthoringTabs(args: {
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
-  organization: QuickNpcCreateFormOrganization
   configuredCount: number
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
@@ -134,14 +114,12 @@ function QuickNpcAuthoringTabsSync({
   form,
   setup,
   buildContext,
-  organization,
   configuredCount,
   onTabsChange,
 }: {
   form: UseFormReturn<QuickNpcAuthoringTabValues>
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
-  organization: QuickNpcCreateFormOrganization
   configuredCount: number
   onTabsChange: (tabs: TabbedFormTab[]) => void
 }) {
@@ -156,12 +134,11 @@ function QuickNpcAuthoringTabsSync({
       buildQuickNpcAuthoringTabs({
         setup,
         buildContext,
-        organization,
         configuredCount,
         nameTrailingAction: trailingAction,
         nameHint,
       }),
-    [buildContext, configuredCount, nameHint, organization, setup, trailingAction],
+    [buildContext, configuredCount, nameHint, setup, trailingAction],
   )
 
   React.useLayoutEffect(() => {
@@ -209,7 +186,7 @@ function RequirementCountWatcher({
 export function QuickNpcAuthoringForm({
   campaignId,
   buildContext,
-  organization,
+  createContext,
   setup,
   initialValues,
   onCancel,
@@ -218,13 +195,15 @@ export function QuickNpcAuthoringForm({
   onCreated,
   onPendingChange,
 }: QuickNpcAuthoringFormProps) {
+  const createFlowDensity = useCreateFlowFormDensity()
   const { mutateAsync, isPending, isSuccess } = useCreateNpc()
   const [configuredCount, setConfiguredCount] = React.useState(0)
+  const organization =
+    createContext.kind === 'organization-member' ? createContext.organization : undefined
   const [tabs, setTabs] = React.useState<TabbedFormTab[]>(() =>
     buildQuickNpcAuthoringTabs({
       setup,
       buildContext,
-      organization,
       configuredCount: 0,
     }),
   )
@@ -252,11 +231,12 @@ export function QuickNpcAuthoringForm({
   const setupSummaryRows = React.useMemo(
     () =>
       resolveQuickNpcSetupSummaryRows({
+        createContext,
         values: setup,
         context: buildContext,
-        titles: organization.members?.titles ?? [],
+        titles: organization?.members?.titles ?? [],
       }),
-    [buildContext, organization.members?.titles, setup],
+    [buildContext, createContext, organization?.members?.titles, setup],
   )
 
   const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabValues>({
@@ -266,28 +246,15 @@ export function QuickNpcAuthoringForm({
         return
       }
 
-      const values = mergeQuickNpcAuthoringValues(setup, tabValues)
-      const membershipMetadata = resolveOrganizationMembershipMetadata({
-        titles: organization.members?.titles ?? [],
-        selectedTitle: titleFromMembershipRadioValue(setup.membershipTitle ?? ''),
-      })
-
-      const constraints = buildQuickNpcConstraints(values)
-      const input = buildQuickNpcCreateInput({
-        seed: buildQuickNpcSeed(values),
-        context: buildContext,
-        ...(constraints ? { constraints } : {}),
-        membership: {
-          organizationId: organization.id,
-          ...(membershipMetadata.title !== undefined ? { title: membershipMetadata.title } : {}),
-          ...(membershipMetadata.priority !== undefined
-            ? { priority: membershipMetadata.priority }
-            : {}),
-        },
+      const input = buildQuickNpcAuthoringCreateInput({
+        createContext,
+        setup,
+        tabValues,
+        buildContext,
       })
 
       const npc = await mutateAsync({ campaignId, input })
-      await onCreated(npc)
+      await onCreated({ contentType: 'npcs', id: npc.character.id })
     },
     fallbackMessage: QUICK_NPC_CREATE_FALLBACK_ERROR,
     mapError: formatQuickNpcCreationError,
@@ -296,6 +263,7 @@ export function QuickNpcAuthoringForm({
   return (
     <TabbedForm<QuickNpcAuthoringTabValues>
       key={`${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
+      density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
       schema={schema}
       tabs={tabs}
       defaultValues={defaultValues}
@@ -310,7 +278,6 @@ export function QuickNpcAuthoringForm({
             form={form}
             setup={setup}
             buildContext={buildContext}
-            organization={organization}
             configuredCount={configuredCount}
             onTabsChange={setTabs}
           />

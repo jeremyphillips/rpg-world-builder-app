@@ -1,6 +1,6 @@
 import { fieldAnatomyStackClasses } from './field.variants'
 
-/** Vertical stack for the expanded disclosure body (header + control). */
+/** @deprecated Prefer {@link fieldAnatomyStackVariants} with the field `size` in the component. */
 export const optionalFieldDisclosureStackClasses = fieldAnatomyStackClasses
 
 /** Label + remove action row when the optional field is expanded. */

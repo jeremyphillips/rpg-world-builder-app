@@ -1,8 +1,10 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
+
+import { renderWithProviders } from '@/test/render'
 
 import {
   northernMarchRegion,
@@ -39,7 +41,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('hides location picker and footer while editing kind upstream', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -67,7 +69,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('opens with kind radios and canonical descriptions for site family add', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -101,7 +103,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('shows a disabled headquarters option with the existing location reason in add site relationship', () => {
     const guildhouse = testBuildingLocation({ id: 'building-hq', name: 'Thieves Guildhouse' })
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -130,7 +132,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   })
 
   it('skips kind UI for geographic presence and shows the location picker immediately', () => {
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -163,7 +165,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('filters geographic presence locations by settlement and region segments', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -202,7 +204,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('preserves search query when switching geographic presence browse scopes', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -235,7 +237,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   })
 
   it('disables settlement browse scope when no eligible settlement candidates exist', () => {
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -258,7 +260,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('disables territorial singleton locations occupied by another organization', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -311,7 +313,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       )
     }
 
-    render(<ControlledDrawer />)
+    renderWithProviders(<ControlledDrawer />)
 
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: 'Select' }))
@@ -327,7 +329,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -376,7 +378,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       structureType: 'infrastructure',
     })
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -420,7 +422,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     const headquartersPresentation = resolveOrganizationForwardTargetPresentation('headquarters')
     const onSubmit = vi.fn().mockResolvedValue(undefined)
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -483,7 +485,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       slug: 'silver-eel',
     })
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -518,7 +520,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   })
 
   it('blocks changeTarget when the current endpoint is unavailable', () => {
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -553,7 +555,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       slug: 'silver-eel',
     })
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -579,7 +581,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('shows search-empty messaging without disabling the selected kind', async () => {
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -609,7 +611,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   itAxe('has no axe accessibility violations in kind summary mode', async () => {
     const user = userEvent.setup()
 
-    const { container } = render(
+    const { container } = renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -635,7 +637,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -695,7 +697,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     })
     const onSubmit = vi.fn().mockResolvedValue(undefined)
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -731,7 +733,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
   it('does not show authoritative-empty for changeTarget when candidate set is partial', () => {
     const current = northernMarchRegion()
 
-    render(
+    renderWithProviders(
       <OrganizationLocationConnectionLinkDrawer
         open
         onOpenChange={vi.fn()}
@@ -751,5 +753,40 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(
       screen.queryByText(RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES.changeTarget),
     ).not.toBeInTheDocument()
+  })
+
+  it('preserves the location picker and blocks relationship actions while nested create is active', async () => {
+    const user = userEvent.setup()
+
+    renderWithProviders(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="territorial_authority"
+        organizationId="org-1"
+        {...withOrganizationLocationDrawerIndex([northernMarchRegion()])}
+        existingConnections={[]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Controls/i }))
+
+    const search = screen.getByPlaceholderText('Search locations…')
+    await user.type(search, 'North')
+    expect(screen.getByText('Northern March')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Create region' }))
+
+    expect(screen.getByText('Northern March')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Search locations…', hidden: true })).toHaveValue(
+      'North',
+    )
+    expect(
+      screen.getByRole('button', { name: 'Add territorial authority', hidden: true }),
+    ).toBeDisabled()
   })
 })

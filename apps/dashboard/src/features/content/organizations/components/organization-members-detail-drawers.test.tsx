@@ -14,18 +14,33 @@ vi.mock('@/features/character', async (importOriginal) => {
     ...actual,
     QuickNpcCreateModal: ({
       onCancel,
-      organization,
+      onCreated,
+      context,
     }: {
       onCancel: () => void
-      organization: { members?: { classAffinityIds?: readonly string[] } }
+      onCreated?: (result: { contentType: 'npcs'; id: string }) => void
+      context:
+        | { kind: 'standalone' }
+        | {
+            kind: 'organization-member'
+            organization: { members?: { classAffinityIds?: readonly string[] } }
+          }
     }) => (
       <div>
         <h2>Create NPC</h2>
         <button type="button" onClick={onCancel}>
           Cancel
         </button>
+        <button
+          type="button"
+          onClick={() => onCreated?.({ contentType: 'npcs', id: 'npc-created-1' })}
+        >
+          Complete create
+        </button>
         <span data-testid="quick-npc-class-affinities">
-          {(organization.members?.classAffinityIds ?? []).join(',')}
+          {context.kind === 'organization-member'
+            ? (context.organization.members?.classAffinityIds ?? []).join(',')
+            : ''}
         </span>
       </div>
     ),
@@ -74,12 +89,11 @@ function createDetail(
       campaignId: 'campaign-test-1',
       buildContext,
       buildContextFailed: false,
-      onCreated: vi.fn(),
     },
     openAddDrawer: vi.fn(),
     openCreateNpcModal: vi.fn(),
     cancelCreateNpcModal: vi.fn(),
-    handleQuickNpcSuccess: vi.fn(),
+    handleQuickNpcContentCreated: vi.fn(),
     openEditDrawer: vi.fn(),
     openRemoveConfirm: vi.fn(),
     closeDrawer: vi.fn(),
@@ -140,6 +154,25 @@ describe('OrganizationMembersDetailDrawers', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel', hidden: true }))
     expect(cancelCreateNpcModal).toHaveBeenCalledTimes(1)
+  })
+
+  it('wires Quick NPC success to the org hook CreatedContentResult handoff', () => {
+    const handleQuickNpcContentCreated = vi.fn()
+    renderWithProviders(
+      <OrganizationMembersDetailDrawers
+        organization={organization}
+        detail={createDetail({
+          drawerState: { mode: 'createNpc' },
+          handleQuickNpcContentCreated,
+        })}
+      />,
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Complete create', hidden: true }))
+    expect(handleQuickNpcContentCreated).toHaveBeenCalledWith({
+      contentType: 'npcs',
+      id: 'npc-created-1',
+    })
   })
 
   it('does not render overlays when the viewer cannot manage members', () => {

@@ -11,6 +11,7 @@ import {
 import { accordionContentVariants } from './accordion.variants'
 import { resolveChromeClasses } from './chrome.variants'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
+import type { FieldSize } from './field.client'
 import type { FieldGroupSummary, FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosureCollapsed } from './field-group-summary-disclosure-collapsed.client'
 import { FieldGroupSummaryDisclosureExpandedHeader } from './field-group-summary-disclosure-expanded-header.client'
@@ -64,6 +65,7 @@ export type FieldGroupSummaryDisclosureProps<TFieldValues extends FieldValues = 
   legend: string
   panelId: string
   legendId: string
+  size?: FieldSize
   disclosure: FieldGroupSummaryDisclosure
   uiStateKey?: string
   collapseKey: string
@@ -76,6 +78,7 @@ function FieldGroupSummaryDisclosureHeader({
   legend,
   legendId,
   panelId,
+  size,
   closeLabel,
   openLabel,
   unsavedSuffix,
@@ -89,6 +92,7 @@ function FieldGroupSummaryDisclosureHeader({
   legend: string
   legendId: string
   panelId: string
+  size: FieldSize
   closeLabel: string
   openLabel: string
   unsavedSuffix: string
@@ -104,6 +108,7 @@ function FieldGroupSummaryDisclosureHeader({
         legend={legend}
         legendId={legendId}
         panelId={panelId}
+        size={size}
         closeLabel={closeLabel}
         disabled={disabled}
         onClose={() => onOpenChange(false)}
@@ -116,6 +121,7 @@ function FieldGroupSummaryDisclosureHeader({
       legend={legend}
       legendId={legendId}
       panelId={panelId}
+      size={size}
       summary={summary}
       openLabel={openLabel}
       unsavedSuffix={unsavedSuffix}
@@ -139,6 +145,7 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
   legend,
   panelId,
   legendId,
+  size = 'md',
   disclosure,
   uiStateKey,
   collapseKey,
@@ -175,6 +182,7 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
         legend={legend}
         legendId={legendId}
         panelId={panelId}
+        size={size}
         closeLabel={closeLabel}
         openLabel={openLabel}
         unsavedSuffix={unsavedSuffix}

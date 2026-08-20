@@ -56,6 +56,16 @@ const seed = {
 } as const
 
 describe('buildQuickNpcCreateInput', () => {
+  it('produces a canonical NPC create input without organization connections when membership is omitted', () => {
+    const input = buildQuickNpcCreateInput({
+      seed,
+      context: quickNpcTestContext(),
+    })
+
+    expect(input.connections.organizations).toEqual([])
+    expect(input.connections.locations).toEqual([])
+  })
+
   it('produces a canonical NPC create input with the membership connection included', () => {
     const input = buildQuickNpcCreateInput({
       seed,

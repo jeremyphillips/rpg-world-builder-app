@@ -4,8 +4,9 @@ import * as React from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import { useFormState } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
+import { Form, type FormDensity, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
+import { useCreateFlowFormDensity } from '@/lib/create-flow'
 import { FormUnsavedChangesGuard, useUnsavedChangesConfirm } from '@/lib/form-unsaved-changes-guard'
 import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context.client'
@@ -45,6 +46,8 @@ export type ContentFormHostProps<TFormValues extends FieldValues> = {
   /** Optional class hooks matching drawer defaults when omitted. */
   formClassName?: string
   contentClassName?: string
+  /** Overrides create-flow density when inside {@link CreateModalShell}. */
+  density?: FormDensity
   onSubmit: (values: TFormValues, form: UseFormReturn<TFormValues>) => void | Promise<void>
   /** Called after a successful submit via the leave bridge (trusted close). */
   onTrustedClose: () => void
@@ -115,9 +118,13 @@ export function ContentFormHost<TFormValues extends FieldValues>({
   chrome,
   formClassName = 'flex min-h-0 flex-1 flex-col',
   contentClassName,
+  density,
   onSubmit,
   onTrustedClose,
 }: ContentFormHostProps<TFormValues>) {
+  const createFlowDensity = useCreateFlowFormDensity()
+  const resolvedDensity = density ?? createFlowDensity
+
   const handleSubmit = React.useCallback(
     async (values: TFormValues, formInstance: UseFormReturn<TFormValues>) => {
       try {
@@ -145,6 +152,7 @@ export function ContentFormHost<TFormValues extends FieldValues>({
       valueSyncs={form.valueSyncs}
       className={formClassName}
       contentClassName={contentClassName}
+      density={resolvedDensity}
       formError={formError}
       header={form.header}
       onSubmit={handleSubmit}

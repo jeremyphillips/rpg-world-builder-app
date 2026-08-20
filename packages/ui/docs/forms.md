@@ -146,10 +146,10 @@ via `resolveFormDensity` — do not set rhythm and size independently on shells.
 | `kind: 'array'`                                                             | yes                    | `compact`            |
 | `kind: 'dependent'`, `kind: 'slot'`, `kind: 'row'`                          | no                     | inherit parent       |
 
-| `density`     | Sibling gap | Control scale (`sm` / `md`) |
-| ------------- | ----------- | --------------------------- |
-| `comfortable` | `gap-6`     | `md`                        |
-| `compact`     | `gap-2`     | `sm`                        |
+| `density`     | Sibling gap | Label → control | Control scale (`sm` / `md`) |
+| ------------- | ----------- | --------------- | --------------------------- |
+| `comfortable` | `gap-6`     | `space-y-2`     | `md`                        |
+| `compact`     | `gap-3`     | `space-y-1`     | `sm`                        |
 
 **Leaf escape hatch:** `controlSizeOverride` on a field config changes control height only —
 not sibling rhythm. Rare; prefer section `density`. Production usage is intentionally
@@ -317,7 +317,10 @@ Array item conditionals use **relative** `dependsOn` names — see
 
 `useSubmitHandler` lives in `@rpg/ui/form` and is the shared wrapper for async submit
 callbacks. It clears stale root errors, awaits the callback (preserving RHF `isSubmitting`),
-and maps thrown errors to the `formError` string passed to `<Form>`.
+maps thrown errors to the `formError` string passed to `<Form>`, and **rethrows by default**
+so callers can gate success chrome on a rejected submit Promise. Opt into absorbed failures
+with `absorbErrors: true` only when a consumer intentionally treats failure as a resolved
+submit.
 
 ```tsx
 const { mutateAsync, isPending, isSuccess } = useCreateDomainThing()
@@ -356,6 +359,16 @@ const { onSubmit, formError } = useSubmitHandler({
 
 Canonical pending expression: `mutation.isPending || form.formState.isSubmitting`. Do not
 add a helper unless additional pending sources appear (uploads, transition locks, etc.).
+
+### External footer `requestSubmit` parity
+
+When footer actions render outside the form element (`FormShellFooterSlot`, modal shell footers),
+`FormShellSubmitButton` prefers `FormShellFooterModel.requestSubmit` — the **same function
+reference** registered by `SchemaFormElement`, not a reconstructed wrapper. Inline footers use
+`useSchemaFormSubmit().requestSubmit`; external footers use the published model reference. Both
+paths invoke identical draft invalid-submit behavior (focus, expand, tab navigation).
+
+Fallback: native `form={formId}` submit when no model reference is available (legacy shells).
 
 ### Client submit vs API idempotency
 

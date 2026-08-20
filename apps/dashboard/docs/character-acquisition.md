@@ -44,17 +44,18 @@ packages/contracts/src/character-import/                   # adapt + finalize im
 
 ## Dashboard entry surfaces
 
-| Entry                  | URL                                              | channel | kind | rulesScope | ownership |
-| ---------------------- | ------------------------------------------------ | ------- | ---- | ---------- | --------- |
-| Sidebar PC build       | `/characters/new`                                | build   | pc   | ruleset    | user      |
-| Sidebar PC import      | `/characters/import`                             | import  | pc   | ruleset    | user      |
-| NPC build              | `/campaigns/:id/npcs/new`                        | build   | npc  | campaign   | campaign  |
-| NPC import             | `/campaigns/:id/npcs/import`                     | import  | npc  | campaign   | campaign  |
-| Campaign PC onboarding | `/campaigns/:id/onboarding`                      | build   | pc   | campaign   | user      |
-| Quick NPC (org member) | organization detail → Add member drawer → modal  | build   | npc  | campaign   | campaign  |
-| PC detail              | `/characters/:characterId`                       | —       | pc   | —          | user      |
-| Campaign PC detail     | `/campaigns/:campaignId/characters/:characterId` | —       | pc   | —          | user      |
-| NPC detail             | `/campaigns/:id/npcs/:npcId`                     | —       | npc  | —          | campaign  |
+| Entry                  | URL                                                | channel | kind | rulesScope | ownership |
+| ---------------------- | -------------------------------------------------- | ------- | ---- | ---------- | --------- |
+| Sidebar PC build       | `/characters/new`                                  | build   | pc   | ruleset    | user      |
+| Sidebar PC import      | `/characters/import`                               | import  | pc   | ruleset    | user      |
+| NPC build              | `/campaigns/:id/npcs/new`                          | build   | npc  | campaign   | campaign  |
+| NPC import             | `/campaigns/:id/npcs/import`                       | import  | npc  | campaign   | campaign  |
+| Campaign PC onboarding | `/campaigns/:id/onboarding`                        | build   | pc   | campaign   | user      |
+| Quick NPC (org member) | organization detail → Add member drawer → modal    | build   | npc  | campaign   | campaign  |
+| Quick NPC (standalone) | location People drawer → Character segment → modal | build   | npc  | campaign   | campaign  |
+| PC detail              | `/characters/:characterId`                         | —       | pc   | —          | user      |
+| Campaign PC detail     | `/campaigns/:campaignId/characters/:characterId`   | —       | pc   | —          | user      |
+| NPC detail             | `/campaigns/:id/npcs/:npcId`                       | —       | npc  | —          | campaign  |
 
 NPC authoring routes require campaign `owner` or `co-owner` (see campaign feature
 README). Default `/characters/*` never carries campaign id in the URL.
@@ -115,6 +116,25 @@ satisfiability. Setup changes atomically intersect stale requirement ids with th
 Name generation is independent of mechanical build determinism.
 Overlay policy: [drawer-shell.md](./drawer-shell.md#overlay-modality-policy). Resolver detail:
 [automatic-build-resolution.md](../../../packages/contracts/docs/character-builder/automatic-build-resolution.md).
+
+### Quick NPC (standalone)
+
+Campaign managers create an NPC without organization membership from the location detail **People &
+organizations** drawer when the Character subject segment is active.
+
+| Layer                                       | Responsibility                                                                                                                                          |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useLocationConnectedPartiesDetail`         | Loads NPC build context readiness (`useCampaignNpcBuildContext`); passes `quickNpc` to the People drawer                                                |
+| `LocationInversePeopleConnectionLinkDrawer` | Character segment resolves `resolveRelationshipPickerCharacterCreateIntents`; build-context readiness gates the auxiliary action at the drawer boundary |
+| `useRelationshipPickerNestedCreate`         | Launches standalone `QuickNpcCreateModal`; `onCreated({ contentType: 'npcs', id })` selects the NPC locally — drawer stays open                         |
+| `QuickNpcCreateModal`                       | `context: { kind: 'standalone' }`; setup is Species → Build only; no membership stamp on create                                                         |
+
+**Persist split:** nested Create NPC posts only `POST /npcs` with empty org/location connections.
+Footer **Add** persists the location edge via `onCharacterSubmit` — the same boundary as organization
+nested create.
+
+**Level 0:** when campaign minimum is 0, standalone Build opens as Level 0 / Class not applicable and
+is confirmable — expected product behavior, not a seeder bug.
 
 ### Campaign-scoped PC detail
 

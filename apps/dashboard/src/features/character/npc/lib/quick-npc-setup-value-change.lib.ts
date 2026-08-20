@@ -10,6 +10,7 @@ import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connect
 import { titleFromMembershipRadioValue } from '../../components/connections/organization-membership-title-field.lib'
 
 import { resolveQuickNpcDefaultLevel, type QuickNpcSetupValues } from './quick-npc-form-fields'
+import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'
 import { isCreateSetupChoiceComplete, type CreateSetupValueChangeEvent } from '@/lib/create-setup'
 import { applyQuickNpcRecommendedClassSeeding } from './quick-npc-class-recommendation.lib'
 
@@ -107,8 +108,12 @@ export function applyQuickNpcSetupValueChange(
   }
 
   if (setId === 'membershipTitle') {
+    if (!isQuickNpcOrganizationMemberSetup(args.values)) {
+      return args.values
+    }
+
     const membershipTitle = String(nextValue)
-    const nextValues = {
+    const nextValues: QuickNpcSetupValues = {
       ...args.values,
       membershipTitle,
       level: resolveQuickNpcLevelForMembershipTitle({

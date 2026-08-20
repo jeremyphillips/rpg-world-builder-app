@@ -19,6 +19,8 @@ import {
   type SetupSummaryRowModel,
 } from '@/lib/create-setup'
 
+import { CreateFlowFormDensityRoot } from './create-flow-form-density.client'
+import { resolveActiveCreateTabId } from './resolve-active-create-tab'
 import {
   createModalShellBodyVariants,
   createModalShellContentVariants,
@@ -62,6 +64,7 @@ export type CreateModalShellTab = {
   label: string
   content: React.ReactNode
   optional?: boolean
+  disabled?: boolean
   status: CreateWorkflowPanelStatus
   contentMode?: CreateModalShellContentMode
 }
@@ -113,6 +116,23 @@ function CreateModalShellIssueBadge({ count }: { count: number | undefined }) {
   )
 }
 
+function CreateModalShellTabPanel({
+  tab,
+  'data-create-tab-panel': dataCreateTabPanel,
+}: {
+  tab: CreateModalShellTab
+  'data-create-tab-panel'?: string
+}) {
+  return (
+    <div
+      data-create-tab-panel={dataCreateTabPanel ?? tab.id}
+      className={createModalShellTabContentVariants({ mode: tab.contentMode })}
+    >
+      {tab.content}
+    </div>
+  )
+}
+
 function CreateModalShellTabs({
   tabs,
   activeTabId,
@@ -124,11 +144,21 @@ function CreateModalShellTabs({
 >) {
   if (!tabs) return null
 
-  const fallbackTabId = tabs[0].id
+  const availableTabIds = tabs.map((tab) => tab.id)
+  const fallbackTabId = tabs[0]!.id
+  const resolvedActiveTabId = resolveActiveCreateTabId(
+    availableTabIds,
+    activeTabId,
+    defaultActiveTabId ?? fallbackTabId,
+  )
+
+  if (tabs.length === 1) {
+    return <CreateModalShellTabPanel tab={tabs[0]!} />
+  }
 
   return (
     <Tabs
-      value={activeTabId}
+      value={activeTabId != null ? resolvedActiveTabId : undefined}
       defaultValue={defaultActiveTabId ?? fallbackTabId}
       onValueChange={onActiveTabChange}
       variant="line"
@@ -138,7 +168,12 @@ function CreateModalShellTabs({
         <TabsList aria-label="Create sections">
           {tabs.map((tab) => {
             return (
-              <TabsTrigger key={tab.id} value={tab.id} data-create-tab-trigger={tab.id}>
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                data-create-tab-trigger={tab.id}
+                disabled={tab.disabled}
+              >
                 {tab.label}
                 {tab.optional ? ' (optional)' : null}
                 {tab.status.invalid ? (
@@ -201,46 +236,48 @@ export function CreateModalShell({
       >
         <Modal.Header headline={headline} description={description} />
         <Modal.Body stableBody data-create-modal-body className={createModalShellBodyVariants()}>
-          {setupSummary ? (
-            <SelectionSummaryCard
-              eyebrow={setupSummary.eyebrow}
-              rows={mapSetupSummaryRowModelsToProps({
-                rows: setupSummary.rows,
-                changeLabel: setupSummary.changeLabel ?? 'Change',
-                onEdit: setupSummary.onRowEdit,
-              })}
-            />
-          ) : null}
-          {tabs ? (
-            <>
-              <div
-                className={createModalShellTabsVisibilityVariants({ visible: tabsVisible })}
-                aria-hidden={!tabsVisible || undefined}
-              >
-                <CreateModalShellTabs
-                  tabs={tabs}
-                  activeTabId={activeTabId}
-                  defaultActiveTabId={defaultActiveTabId}
-                  onActiveTabChange={onActiveTabChange}
-                />
-              </div>
-              {!tabsVisible ? (
+          <CreateFlowFormDensityRoot>
+            {setupSummary ? (
+              <SelectionSummaryCard
+                eyebrow={setupSummary.eyebrow}
+                rows={mapSetupSummaryRowModelsToProps({
+                  rows: setupSummary.rows,
+                  changeLabel: setupSummary.changeLabel ?? 'Change',
+                  onEdit: setupSummary.onRowEdit,
+                })}
+              />
+            ) : null}
+            {tabs ? (
+              <>
                 <div
-                  data-create-modal-content
-                  className={createModalShellContentVariants({ mode: contentMode })}
+                  className={createModalShellTabsVisibilityVariants({ visible: tabsVisible })}
+                  aria-hidden={!tabsVisible || undefined}
                 >
-                  {children}
+                  <CreateModalShellTabs
+                    tabs={tabs}
+                    activeTabId={activeTabId}
+                    defaultActiveTabId={defaultActiveTabId}
+                    onActiveTabChange={onActiveTabChange}
+                  />
                 </div>
-              ) : null}
-            </>
-          ) : (
-            <div
-              data-create-modal-content
-              className={createModalShellContentVariants({ mode: contentMode })}
-            >
-              {children}
-            </div>
-          )}
+                {!tabsVisible ? (
+                  <div
+                    data-create-modal-content
+                    className={createModalShellContentVariants({ mode: contentMode })}
+                  >
+                    {children}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <div
+                data-create-modal-content
+                className={createModalShellContentVariants({ mode: contentMode })}
+              >
+                {children}
+              </div>
+            )}
+          </CreateFlowFormDensityRoot>
         </Modal.Body>
         <Modal.Footer data-create-modal-footer>{footer}</Modal.Footer>
       </Modal.Content>

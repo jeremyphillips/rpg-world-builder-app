@@ -5,7 +5,6 @@ import {
   QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   intersectQuickNpcRequirementIds,
   resolveQuickNpcRequirementValidIds,
@@ -58,10 +57,10 @@ export function createQuickNpcFormValueSyncs(
           return undefined
         }
 
-        // Title does not affect requirement reachability; use the no-title sentinel so setup shape stays valid.
+        // Title does not affect requirement reachability; standalone setup omits membership title.
         const setup: QuickNpcSetupValues = {
+          contextKind: 'standalone',
           speciesId: typeof values.speciesId === 'string' ? values.speciesId : '',
-          membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
           classId: typeof values.classId === 'string' ? values.classId : '',
           level: typeof values.level === 'number' ? values.level : 1,
         }

@@ -5,8 +5,13 @@ import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import { resolveQuickNpcBuildCardModel } from '../lib/quick-npc-build-card.lib'
+import {
+  quickNpcMemberSetupValues,
+  quickNpcMemberSetupWithNoTitle,
+  quickNpcOrganizationMemberCreateContext,
+  quickNpcTestOrganization,
+} from '../lib/quick-npc-test-fixtures'
 import { QuickNpcBuildCard } from './quick-npc-build-card.client'
 
 const guildmasterTitle = {
@@ -38,6 +43,8 @@ const context = createCampaignNpcBuilderContextFixture({
   },
 })
 
+const createContext = quickNpcOrganizationMemberCreateContext(quickNpcTestOrganization)
+
 const meta = {
   title: 'Dashboard/Character/QuickNpcBuildCard',
   component: QuickNpcBuildCard,
@@ -54,13 +61,14 @@ type Story = StoryObj<typeof meta>
 export const RecommendedBuild: Story = {
   args: {
     model: resolveQuickNpcBuildCardModel({
+      createContext,
       context,
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: rogueClass.id,
         level: 9,
-      },
+      }),
       titles: [guildmasterTitle],
       members: { classAffinityIds: [rogueClass.id] },
     })!,
@@ -70,13 +78,13 @@ export const RecommendedBuild: Story = {
 export const BuildMode: Story = {
   args: {
     model: resolveQuickNpcBuildCardModel({
+      createContext,
       context,
-      values: {
+      values: quickNpcMemberSetupWithNoTitle({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
         classId: '',
         level: 0,
-      },
+      }),
       titles: [],
     })!,
   },
@@ -85,13 +93,14 @@ export const BuildMode: Story = {
 export const UnresolvedClass: Story = {
   args: {
     model: resolveQuickNpcBuildCardModel({
+      createContext,
       context,
-      values: {
+      values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'Guildmaster',
         classId: '',
         level: 9,
-      },
+      }),
       titles: [guildmasterTitle],
       members: { classAffinityIds: [rogueClass.id, fighterClass.id] },
     })!,

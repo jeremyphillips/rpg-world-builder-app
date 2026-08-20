@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { Button, DialogPanelActionRow } from '@rpg/ui'
+import { Button, Modal } from '@rpg/ui'
 
 import { CreateModalShell } from './create-modal-shell.client'
 
 const footer = (
-  <DialogPanelActionRow>
+  <Modal.FooterActions>
     <Button type="button" variant="outline">
       Cancel
     </Button>
     <Button type="button">Create building</Button>
-  </DialogPanelActionRow>
+  </Modal.FooterActions>
 )
 
 const meta = {

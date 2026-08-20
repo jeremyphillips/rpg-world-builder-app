@@ -421,20 +421,23 @@ live in [create-flow.md](./create-flow.md#add--pending-workflow).
 
 ```text
 AddPendingWorkflow
-├── Add mode    → domain composing tree (intent → discovery → review → branch)
-└── Pending mode → ContentEntityCard rows + overflow; edit swaps row to review
+├── resting / pending → ContentEntityCard rows + overflow; optional empty state
+└── composing slot    → CreateComposition* + domain-owned discovery / forms / child footer
 ```
 
 **`ContentEntityCard` must not expand.** Do not add collapse, composer, or
 relationship-kind props to CEC. Discovery uses CEC + trailing **Select**
-(outline, `size="sm"`, `density="compact"`). Pending edit replaces one row with
-hydrated `SelectionSummaryCard` review in place — sibling pending cards stay on CEC.
+(outline, `size="sm"`, `density="compact"`). Pending **Edit** leaves the row on
+CEC and opens the focused composition composer in the `AddPendingWorkflow`
+composing slot — sibling pending cards remain visible only while resting.
 
 Zero-eligible discovery rows stay on CEC with a disabled trailing **Select** and
 the authoritative reason in the entity status lane.
 
-Pending-row edit stays in Pending mode. That is not Add/discovery mode at the
-root.
+Pending-row edit switches to **composing** mode (focused composer + child footer).
+That is not Add/discovery mode at the resting root. See
+[create-flow.md](./create-flow.md#nested-composition-presentation) for nested
+**composition** vs relationship-drawer **acquisition**.
 
 ---
 

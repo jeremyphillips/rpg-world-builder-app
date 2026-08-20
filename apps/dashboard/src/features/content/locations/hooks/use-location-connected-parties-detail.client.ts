@@ -17,7 +17,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useCanManageCampaign, useCampaignCharacters } from '@/features/campaign'
-import { useCampaignBuildContext, useNpcs } from '@/features/character'
+import { useCampaignBuildContext, useCampaignNpcBuildContext, useNpcs } from '@/features/character'
 
 import { filterReferenceableCatalogRows } from '../../lib/form-options/content-reference-catalog.lib'
 import { buildLocationsById } from '../lib/location-display'
@@ -186,6 +186,12 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
   const campaignCharactersQuery = useCampaignCharacters(campaignId)
   const npcsQuery = useNpcs(campaignId)
   const { catalogIndex } = useCampaignBuildContext(campaignId)
+  const {
+    context: npcBuildContext,
+    catalogIndex: npcCatalogIndex,
+    isError: npcBuildContextIsError,
+    unavailable: npcBuildContextUnavailable,
+  } = useCampaignNpcBuildContext(canManage ? campaignId : undefined)
 
   const [mutationError, setMutationError] = React.useState<string | null>(null)
   const [pendingRelationshipId, setPendingRelationshipId] = React.useState<string>()
@@ -533,6 +539,18 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     })
   }, [allOrganizations, organizationDrawerState, rows])
 
+  const quickNpc = React.useMemo(
+    () => ({
+      buildContext: npcBuildContext,
+      catalogIndex: npcCatalogIndex,
+      buildContextFailed:
+        npcBuildContextIsError ||
+        (npcBuildContextUnavailable !== null && npcBuildContextUnavailable.kind !== 'loading'),
+      buildContextReady: npcBuildContext != null,
+    }),
+    [npcBuildContext, npcBuildContextIsError, npcBuildContextUnavailable, npcCatalogIndex],
+  )
+
   return {
     connectedPartiesQuery,
     organizations: referenceableOrganizations,
@@ -601,5 +619,6 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
       eligibility.characterKinds.length > 0,
     canAddOrganizationInverse:
       canWriteInverse && canInverseWriteLocationConnectionForOwner('organizations'),
+    quickNpc,
   }
 }

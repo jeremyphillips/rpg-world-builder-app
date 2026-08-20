@@ -13,6 +13,8 @@ Campaign availability is a **separate form surface** from content body fields. I
 
 Collapsed summary comes from `resolveCampaignAccessSummary`. The group uses `disclosure: { variant: 'summary' }` on `buildCampaignAccessFields`. While dirty, the summary appends ` · Unsaved` and the panel stays open until **Done**.
 
+`CampaignAccessSection` accepts optional `density` — typically inherited from the parent form via `ContentFormHeader` (`useFormSectionContext`) or from `useCreateFlowFormDensity()` inside create modals. Summary chrome and field labels follow the same `compact` / `comfortable` scale as sibling form fields.
+
 The collapsed disclosure renders as a **status row**:
 
 - **Available** — success dot, `Available` label, and configured player-access `detail` (e.g. `DM only`) on one line; no tinted wrapper.

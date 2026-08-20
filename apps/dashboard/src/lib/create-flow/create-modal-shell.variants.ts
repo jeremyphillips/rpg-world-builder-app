@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority'
 
+import { createTabPanelContentOffsetClasses } from './create-tab-content.variants'
+
 export const createModalShellBodyVariants = cva('gap-4')
 
 export const createModalShellContentVariants = cva('min-h-0 flex-1', {
@@ -24,7 +26,7 @@ export const createModalShellTabsVisibilityVariants = cva('', {
 export const createModalShellTabsListRegionVariants = cva('shrink-0 overflow-x-auto')
 
 export const createModalShellTabContentVariants = cva(
-  'mt-4 min-h-0 flex-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=inactive]:hidden',
+  `${createTabPanelContentOffsetClasses} min-h-0 flex-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 data-[state=inactive]:hidden`,
   {
     variants: {
       mode: {

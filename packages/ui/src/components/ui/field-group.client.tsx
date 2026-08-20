@@ -91,6 +91,7 @@ export function FieldGroup({
       <FieldGroupSummaryRoute
         id={id}
         legend={legend}
+        size={size}
         rhythm={rhythm}
         className={className}
         uiStateKey={uiStateKey}

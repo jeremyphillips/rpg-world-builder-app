@@ -38,9 +38,9 @@ wrapper resolves section context and RHF name prefixes, then renders the entry r
 Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint? }` for new config;
 `legend` + `description` remain supported and resolve through `resolveGroupHeading`.
 Nested named groups derive subsection typography from nesting depth — no `legendSize`
-override. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-2`) owns sibling
+override. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
-`mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-2`) owns sibling spacing.
+`mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-3`) owns sibling spacing.
 Standalone `FormItems` outside `<Form>` need rhythm from either `<Form>` (which wraps
 `FormRhythmStack` automatically) or **`FormFieldStack`** — a detached shell that composes
 `FormUiProvider`, `FormSectionProvider`, `FormRhythmStack`, and `FormItems`. Use

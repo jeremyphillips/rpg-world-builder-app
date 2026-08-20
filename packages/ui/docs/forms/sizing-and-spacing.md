@@ -23,17 +23,18 @@ Do not sprinkle ad-hoc `space-y-*` on field wrappers in apps — adjust shared t
 
 | Token                                 | Class                            | Use                                                                                                           |
 | ------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `fieldAnatomyStackClasses`            | `space-y-2`                      | Label, control, hint/error inside one field                                                                   |
+| `fieldAnatomyStackVariants`           | `space-y-1` / `space-y-2`        | Label, control, hint/error inside one field — follows control `size` (`sm` → 4px, `md`/`lg` → 8px)            |
+| `fieldAnatomyStackClasses`            | `space-y-2`                      | Comfortable default alias for `fieldAnatomyStackVariants({ size: 'md' })`                                     |
 | `fieldLabelHintStackClasses`          | `gap-1`                          | Label + hint when `hintPosition="below-label"`                                                                |
 | `fieldGroupStackClasses`              | `flex flex-col gap-6`            | Alias for `comfortable` — prefer `fieldStackRhythmVariants` in new code                                       |
-| `fieldStackRhythmVariants`            | `gap-2` / `gap-6`                | Form columns, groups, stacks, array item **bodies** — `compact` or `comfortable`                              |
+| `fieldStackRhythmVariants`            | `gap-3` / `gap-6`                | Form columns, groups, stacks, array item **bodies** — `compact` or `comfortable`                              |
 | `formDependentInsetSpacing`           | `pl-8` / `pl-9`                  | Total dependent content inset (8px rail gutter + 24px/28px content offset)                                    |
 | `formDependentContentOffsetSpacing`   | `pl-6` / `pl-7` (semantic)       | Content offset portion inside the inset gutter (excluding 8px rail leading space)                             |
 | `fieldRailOffsetClasses`              | `left-2` (8px)                   | Decorative rail position — leading space before the rail within the inset gutter                              |
 | `resolveFieldRailClasses`             | pseudo-element rail              | Decorative boundary only — does not shift content                                                             |
 | `resolveDependentInsetClasses`        | `pl-8` / `pl-9`                  | Applies total content inset when `inset: true`                                                                |
 | `fieldGroupInsetPaddingVariants`      | alias of dependent inset         | Deprecated — use `fieldDependentInsetVariants`                                                                |
-| `fieldArrayItemListClasses`           | `gap-2` / `gap-3` / `gap-6`      | Gap between sibling **array items** — combines rhythm + section `size`                                        |
+| `fieldArrayItemListClasses`           | `gap-3` / `gap-3` / `gap-6`      | Gap between sibling **array items** — combines rhythm + section `size`                                        |
 | `fieldGroupBottomMarginClasses`       | `mb-8`                           | Space below standalone `FieldGroup` fieldsets; omitted inside rhythm stacks (form root, nested groups/arrays) |
 | `fieldGroupFlexStackClasses`          | `flex flex-col gap-8`            | Stacking fieldsets or collapse-prone siblings                                                                 |
 | `formSectionStackClasses`             | `flex flex-col gap-7`            | Top-level accordion sections on `<Form>`                                                                      |

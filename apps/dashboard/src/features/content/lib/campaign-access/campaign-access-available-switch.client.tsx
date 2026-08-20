@@ -4,6 +4,7 @@ import { useId } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { SwitchField } from '@rpg/ui'
+import { useFieldControlSize } from '@rpg/ui/form'
 
 import { useCampaignAccessAvailabilityContext } from './campaign-access-form-context.client'
 
@@ -20,6 +21,7 @@ export function CampaignAccessAvailableSwitch({
   info,
 }: CampaignAccessAvailableSwitchProps) {
   const id = useId()
+  const controlSize = useFieldControlSize()
   const { pending, onAvailableChange } = useCampaignAccessAvailabilityContext()
   const { control } = useFormContext<ContentCampaignAccessPatch>()
   const available = useWatch({ control, name: 'available' })
@@ -35,7 +37,7 @@ export function CampaignAccessAvailableSwitch({
       checked={available ?? false}
       disabled={pending}
       onCheckedChange={(checked) => void onAvailableChange(checked)}
-      size="sm"
+      size={controlSize}
     />
   )
 }

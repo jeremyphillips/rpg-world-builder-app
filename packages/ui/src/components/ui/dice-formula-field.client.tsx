@@ -31,7 +31,7 @@ import {
 } from './dice-formula-field.lib'
 import { FieldLayout } from './field-layout'
 import {
-  fieldAnatomyStackClasses,
+  fieldAnatomyStackVariants,
   fieldInlineControlRowClasses,
   fieldLabelHintStackClasses,
   fieldLabelVariants,
@@ -140,7 +140,7 @@ export function DiceFormulaField({
         id={id}
         aria-describedby={describedBy}
         aria-invalid={hasError || undefined}
-        className={cn(fieldAnatomyStackClasses, fieldWidthVariants({ width }))}
+        className={cn(fieldAnatomyStackVariants({ size }), fieldWidthVariants({ width }))}
         onBlur={onBlur}
       >
         <div className={fieldInlineControlRowClasses}>

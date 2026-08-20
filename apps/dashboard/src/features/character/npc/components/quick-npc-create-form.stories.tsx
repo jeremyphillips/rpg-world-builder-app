@@ -1,25 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../lib/character-builder-fixtures'
+import {
+  quickNpcMemberSetupWithNoTitle,
+  quickNpcOrganizationMemberCreateContext,
+  quickNpcTestOrganization,
+} from '../lib/quick-npc-test-fixtures'
 import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
 
-const organization = {
-  id: 'organization-lantern-guild',
-  name: 'Lantern Guild',
-  organizationDomain: 'occupational' as const,
-}
+const createContext = quickNpcOrganizationMemberCreateContext(quickNpcTestOrganization)
 
 const buildContext = createCampaignNpcBuilderContextFixture({
   catalog: {
     ...populatedBuilderCatalog,
     organizations: [
       {
-        id: organization.id,
+        id: createContext.organization.id,
         slug: 'lantern-guild',
         rulesetId: 'srd-cc-5.2.1',
         source: 'homebrew',
@@ -27,8 +27,8 @@ const buildContext = createCampaignNpcBuilderContextFixture({
         campaignId: 'campaign-test-1',
         createdAt: '2026-01-01T00:00:00.000Z',
         updatedAt: '2026-01-01T00:00:00.000Z',
-        name: organization.name,
-        organizationDomain: organization.organizationDomain,
+        name: createContext.organization.name,
+        organizationDomain: createContext.organization.organizationDomain,
         functions: [],
         practices: [],
         members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
@@ -38,12 +38,11 @@ const buildContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
-const setup = {
+const setup = quickNpcMemberSetupWithNoTitle({
   speciesId: populatedBuilderCatalog.species[0]!.id,
-  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: populatedBuilderCatalog.classes[0]!.id,
   level: 1,
-}
+})
 
 const meta = {
   title: 'Dashboard/Character/QuickNpcAuthoringForm',
@@ -52,7 +51,7 @@ const meta = {
   args: {
     campaignId: 'campaign-test-1',
     buildContext,
-    organization,
+    createContext,
     setup,
     onCancel: () => undefined,
     onChangeSetup: () => undefined,
@@ -86,12 +85,11 @@ export const ResolutionError: Story = {
         organizations: buildContext.catalog.organizations,
       },
     }),
-    setup: {
+    setup: quickNpcMemberSetupWithNoTitle({
       speciesId: populatedBuilderCatalog.species[0]!.id,
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
       classId: unsatisfiableClass.id,
       level: 1,
-    },
+    }),
     initialValues: {
       name: 'Stalled Recruit',
       alignment: 'ln',

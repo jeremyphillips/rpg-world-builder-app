@@ -320,9 +320,67 @@ Two total options with one disabled still counts as **2+** — Change must reope
 
 **Change-kind** drawers use always-expanded **`LocationConnectionKindField`** only — no summary card, no Change affordance, footer stays visible.
 
-Create-modal draft relationship tabs (Building → Organizations) use the same completed-decision grammar as `CreateSetupPanel` (`SelectionSummaryCard` rows + `RadioCardField` for active kind) inside a feature-owned stage machine — not drawer-local collapse chrome.
+Create-modal draft relationship tabs (Building → Organizations) use
+`CreateCompositionSummary` + `RadioCardField` inside a feature-owned stage machine
+with resting/composing workspace semantics — not drawer-local collapse chrome and
+not inline pending-row edit. See
+[create-flow.md](./create-flow.md#nested-composition-presentation) for nested
+**composition** vs relationship-picker **acquisition**
+([§Relationship picker nested create](#relationship-picker-nested-create)).
 
-Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search. Hide subject type, picker, and persist footer while kind is being edited upstream.
+Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search. Hide subject type, picker, and persist footer while kind is being edited upstream. **Create organization** is wired on the organization subject segment; **Create NPC** is wired on the character segment via `resolveRelationshipPickerCharacterCreateIntents`. Build-context readiness (`useCampaignNpcBuildContext`) gates the character auxiliary action at the drawer — not inside the intent resolver.
+
+### Relationship picker nested create
+
+Domain-owned **`resolveRelationshipPickerCreateIntents`** (location and character targets) and
+**`resolveRelationshipPickerOrganizationCreateIntents`** (organization targets with singleton-slot
+gating) decide what may be created from an Add drawer. Dashboard maps 0 / 1 / many intents onto
+`CatalogPickerSheet` **`auxiliaryAction`** via **`mapRelationshipPickerCreateIntentsToAuxiliaryAction`**
+(menu variant for 2+ location authoring types; direct action for a single intent).
+
+Handoff is drawer-owned through **`useRelationshipPickerNestedCreate`**: sibling
+`OrganizationCreateModal` / `LocationCreateModal` / standalone `QuickNpcCreateModal`, optional
+**`onCreated({ contentType, id })`** after persistence, then `resolvingCreatedTarget` refresh +
+full eligibility revalidation before select. Nested modals stay open until handoff resolves
+successfully; handoff failure rejects `onCreated`, surfaces status-specific feedback, and leaves
+the create modal open — the entity already exists, so callers must not retry persistence.
+Footer submit is the only relationship persist boundary — nested create must not POST the relationship.
+
+Nested create supplies one relationship endpoint. The originating workflow owns that
+relationship. Reverse org-location composition authoring is suppressed in nested
+creators via **`ContentCreateContext`** (`relationship-target` +
+`relationshipVocabulary: 'organization_location_connection'`) and
+**`resolveLocationCreateAuthoringCapabilities`** — not ad-hoc tab props on drawers.
+Org Add member + Quick NPC keeps its
+membership-specific success-closes-all handoff; do not route that picker through the shared intent
+resolver.
+
+**Intent vs readiness:** `resolveRelationshipPickerCreateIntents` (and character/org wrappers)
+decide whether Create NPC is conceptually supported. Campaign NPC build-context load/failure is
+wired only at the drawer/hook auxiliary-action layer (`buildContextReady` / `buildContextFailed`).
+
+Wired Add drawers: organization forward location pickers, location inverse organization pickers, and
+People drawer organization and character segments. Out of scope: changeKind, changeTarget,
+replaceOrganization, org member picker.
+
+**Inverse drawer scope:** inverse drawers launch organization and character nested create only —
+never location create — so they intentionally omit `nestedCreateContext`. Forward organization →
+location pickers pass `nestedCreateContext` for org-composition suppression via
+`resolveLocationCreateAuthoringCapabilities`.
+
+**Loading vs blocking:** `nestedCreateBusy` means interaction is blocked, not that the catalog is
+loading. `CatalogPickerSheet.loading` must reflect only genuine catalog/query pending — never
+`nestedCreateBusy` or `phase`. If a drawer later wires query-pending into `loading`, that remains
+valid; nested-create phases must not replace the picker list.
+
+| Phase                    | Picker presentation                           | Auxiliary create action | Relationship footer |
+| ------------------------ | --------------------------------------------- | ----------------------- | ------------------- |
+| `idle`                   | Normal (catalog loading if query pending)     | Enabled                 | Normal              |
+| `creating`               | Preserved — list, search, selection unchanged | Disabled                | Blocked             |
+| `resolvingCreatedTarget` | Preserved — list, search unchanged            | Disabled                | Blocked             |
+
+Org Add member + Quick NPC is a **visual reference** for picker preservation behind a nested modal;
+do not copy its overlay-state architecture or success-closes-all semantics into relationship pickers.
 
 ### Inverted organization add without `addKind` (legacy)
 

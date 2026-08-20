@@ -10,6 +10,7 @@ import {
   dialogDismissHandlers,
 } from './dialog-parts.client'
 import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
+import { DialogPanelActionRow } from './dialog-panel-action-row.client'
 import {
   dialogContentFocusShellClasses,
   dialogPanelBodyVariants,
@@ -177,12 +178,23 @@ const ModalFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
+      data-modal-footer=""
       className={cn(dialogPanelFooterClasses, modalFooterDockClasses, className)}
       {...props}
     />
   ),
 )
 ModalFooter.displayName = 'Modal.Footer'
+
+export type ModalFooterActionsProps = React.HTMLAttributes<HTMLDivElement>
+
+/** Horizontal action row for {@link ModalFooter} — right-aligned button groups only. */
+const ModalFooterActions = React.forwardRef<HTMLDivElement, ModalFooterActionsProps>(
+  ({ className, ...props }, ref) => (
+    <DialogPanelActionRow ref={ref} data-modal-footer-actions="" className={className} {...props} />
+  ),
+)
+ModalFooterActions.displayName = 'Modal.FooterActions'
 
 /**
  * Compound, accessible modal built on Radix Dialog (focus trap, scroll lock,
@@ -195,7 +207,9 @@ ModalFooter.displayName = 'Modal.Footer'
  *   <Modal.Content size="sm">
  *     <Modal.Header headline="Delete?" description="This cannot be undone." />
  *     <Modal.Body>…</Modal.Body>
- *     <Modal.Footer>…</Modal.Footer>
+ *     <Modal.Footer>
+ *       <Modal.FooterActions>…</Modal.FooterActions>
+ *     </Modal.Footer>
  *   </Modal.Content>
  * </Modal.Root>
  * ```
@@ -211,5 +225,6 @@ export const Modal = {
   Header: ModalHeader,
   Body: ModalBody,
   Footer: ModalFooter,
+  FooterActions: ModalFooterActions,
   Close: ModalClose,
 }

@@ -4,6 +4,7 @@
 import * as React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type * as RpgUi from '@rpg/ui'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -12,7 +13,7 @@ import { CreateModalShell } from './create-modal-shell.client'
 const modalContentSpy = vi.fn()
 
 vi.mock('@rpg/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@rpg/ui')>()
+  const actual = await importOriginal<typeof RpgUi>()
   const ActualModalContent = actual.Modal.Content
 
   return {
@@ -97,6 +98,36 @@ describe('CreateModalShell', () => {
     expect(issueBadge.className).not.toMatch(/createModalShellIssueBadge/)
   })
 
+  it('disables tab triggers when requested', () => {
+    render(
+      <CreateModalShell
+        open
+        onOpenChange={vi.fn()}
+        headline="Create building"
+        activeTabId="organizations"
+        tabs={[
+          {
+            id: 'details',
+            label: 'Details',
+            disabled: true,
+            content: <p>Details panel</p>,
+            status: { invalid: false, dirty: false },
+          },
+          {
+            id: 'organizations',
+            label: 'Organizations',
+            content: <p>Organizations panel</p>,
+            status: { invalid: false, dirty: false },
+          },
+        ]}
+        footer={<button type="button">Add relationship</button>}
+      />,
+    )
+
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeDisabled()
+    expect(screen.getByRole('tab', { name: 'Organizations' })).toBeEnabled()
+  })
+
   it('supports controlled navigation and row-level setup summary actions', async () => {
     const user = userEvent.setup()
     const onActiveTabChange = vi.fn()
@@ -150,6 +181,85 @@ describe('CreateModalShell', () => {
 
     expect(onActiveTabChange).toHaveBeenCalledWith('organizations')
     expect(onRowEdit).toHaveBeenCalledWith({ type: 'set', id: 'buildingForm' })
+  })
+
+  it('renders a single tab directly without tab chrome', () => {
+    render(
+      <CreateModalShell
+        open
+        onOpenChange={vi.fn()}
+        headline="Create building"
+        tabs={[
+          {
+            id: 'details',
+            label: 'Details',
+            content: <p>Details only</p>,
+            status: { invalid: false, dirty: false },
+            contentMode: 'managed',
+          },
+        ]}
+        footer={<button type="button">Create building</button>}
+      />,
+    )
+
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument()
+    expect(screen.getByText('Details only')).toBeVisible()
+  })
+
+  it('applies the same managed panel wrapper for single-tab and multi-tab content', () => {
+    const { rerender } = render(
+      <CreateModalShell
+        open
+        onOpenChange={vi.fn()}
+        headline="Create building"
+        tabs={[
+          {
+            id: 'details',
+            label: 'Details',
+            content: <p>Single tab panel</p>,
+            status: { invalid: false, dirty: false },
+            contentMode: 'managed',
+          },
+        ]}
+        footer={<button type="button">Create building</button>}
+      />,
+    )
+
+    const singleTabPanel = screen.getByText('Single tab panel').parentElement
+    expect(singleTabPanel).toHaveAttribute('data-create-tab-panel', 'details')
+    expect(singleTabPanel).toHaveClass('mt-3', 'min-h-0', 'flex-1', 'flex', 'flex-col')
+
+    rerender(
+      <CreateModalShell
+        open
+        onOpenChange={vi.fn()}
+        headline="Create building"
+        activeTabId="details"
+        tabs={[
+          {
+            id: 'details',
+            label: 'Details',
+            content: <p>Multi tab panel</p>,
+            status: { invalid: false, dirty: false },
+            contentMode: 'managed',
+          },
+          {
+            id: 'organizations',
+            label: 'Organizations',
+            content: <p>Organizations panel</p>,
+            status: { invalid: false, dirty: false },
+            contentMode: 'managed',
+          },
+        ]}
+        footer={<button type="button">Create building</button>}
+      />,
+    )
+
+    const multiTabPanel = screen
+      .getByText('Multi tab panel')
+      .closest('[data-create-tab-panel="details"]')
+    expect(multiTabPanel).toHaveClass('mt-3', 'min-h-0', 'flex-1', 'flex', 'flex-col')
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
   })
 
   it('keeps tab panels mounted while Setup temporarily owns the visible body', () => {

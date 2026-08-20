@@ -1,5 +1,5 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
-import { Button, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
+import { Button, Modal } from '@rpg/ui'
 
 import {
   formatContentDemotionBlockedDescription,
@@ -31,11 +31,11 @@ export function ContentDemotionBlockedDialog({
         <ContentUsageBlockedList blockers={blockers} />
 
         <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
+          <Modal.FooterActions>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Close
             </Button>
-          </div>
+          </Modal.FooterActions>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

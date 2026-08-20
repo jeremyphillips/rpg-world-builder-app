@@ -112,7 +112,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByText('Traits')).not.toHaveClass('text-field-array-legend')
     expect(screen.getByText('Traits')).not.toHaveClass('text-field-group-legend')
     expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(
-      'gap-2',
+      'gap-3',
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
@@ -1094,10 +1094,10 @@ describe('ArrayFieldRenderer', () => {
     const compactRow = document.querySelector('[data-compact-inline-row]')
     expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
 
-    expect(screen.getByRole('textbox', { name: 'Description' }).closest('.space-y-2')).toHaveClass(
+    expect(screen.getByRole('textbox', { name: 'Description' }).closest('.space-y-1')).toHaveClass(
       'flex-1',
     )
-    expect(screen.getByRole('spinbutton', { name: 'DC' }).closest('.space-y-2')).toHaveClass(
+    expect(screen.getByRole('spinbutton', { name: 'DC' }).closest('.space-y-1')).toHaveClass(
       'flex-none',
     )
   })

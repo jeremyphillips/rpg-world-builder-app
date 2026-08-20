@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import type { ContentAccessTargetType, ContentCampaignAccessPatch } from '@rpg/contracts'
-import type { FormItem, GroupConfig } from '@rpg/ui/form'
+import type { FormDensity, FormItem, GroupConfig } from '@rpg/ui/form'
 
 import { buildCampaignAvailabilityFields } from '@/lib/campaign-availability/campaign-availability-form-fields'
 
@@ -31,6 +31,7 @@ export type CampaignAccessFormCtx = {
   /** Stable group id — include entity id so disclosure state resets per record. */
   groupId: string
   participantOptions?: ReadonlyArray<{ value: string; label: string }>
+  groupDensity?: FormDensity
 }
 
 function buildParticipantField(ctx: CampaignAccessFormCtx): FormItem[] {
@@ -67,6 +68,7 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
   const availabilityGroup = buildCampaignAvailabilityFields({
     groupId: ctx.groupId,
     pending: ctx.pending,
+    groupDensity: ctx.groupDensity,
     summaryDependsOn: ['available', 'visibilityMode', 'participantIds'],
     resolveSummary: (values) =>
       resolveCampaignAccessSummary(

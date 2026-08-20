@@ -50,12 +50,24 @@ type CatalogPickerSheetRowRenderProps<TItem> =
  * Rendered between search and results. Do not use for row submit or workflow completion —
  * use row actions or `footer` instead.
  */
+export type CatalogPickerAuxiliaryActionMenuItem = {
+  label: string
+  onAction: () => void
+  disabled?: boolean
+}
+
 export type CatalogPickerAuxiliaryAction =
   | {
       state: 'action'
       label: string
       onAction: () => void
       /** Action exists but is temporarily unavailable. */
+      disabled?: boolean
+    }
+  | {
+      state: 'menu'
+      label: string
+      items: readonly CatalogPickerAuxiliaryActionMenuItem[]
       disabled?: boolean
     }
   | {

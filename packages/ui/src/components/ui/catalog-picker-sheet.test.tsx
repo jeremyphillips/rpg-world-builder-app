@@ -587,6 +587,36 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByText('No items match your search.')).toBeInTheDocument()
   })
 
+  it('renders menu auxiliaryAction and invokes item handlers', async () => {
+    const user = userEvent.setup()
+    const onFortification = vi.fn()
+
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        auxiliaryAction={{
+          state: 'menu',
+          label: 'Create new',
+          items: [
+            { label: 'Building', onAction: vi.fn() },
+            { label: 'Fortification', onAction: onFortification },
+          ],
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Create new' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Fortification' }))
+
+    expect(onFortification).toHaveBeenCalledOnce()
+  })
+
   it('renders unavailable auxiliaryAction as hint text instead of a button', () => {
     render(
       <CatalogPickerSheet

@@ -368,7 +368,6 @@ function ContentEditFormBody({
       form.reset(baseline)
     },
     fallbackMessage: `Could not update ${def.routeKey}.`,
-    propagateErrors: true,
   })
 
   return (

@@ -4,7 +4,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { Button } from '../../components/ui/button.client'
 import { Modal } from '../../components/ui/modal.client'
-import { dialogPanelActionRowClasses } from '../../components/ui/dialog-panel.variants'
 import type { FormItem } from '../field-config'
 import { FormFieldStack } from './form-field-stack.client'
 
@@ -49,12 +48,12 @@ function DetachedFormModalDemo() {
           </FormProvider>
         </Modal.Body>
         <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
+          <Modal.FooterActions>
             <Button type="button" variant="outline">
               Cancel
             </Button>
             <Button type="button">Apply</Button>
-          </div>
+          </Modal.FooterActions>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

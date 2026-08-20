@@ -11,7 +11,7 @@ import {
   type CharacterRosterState,
   type CharacterVitalState,
 } from '@rpg/contracts'
-import { Button, Modal, Text, dialogPanelActionRowClasses } from '@rpg/ui'
+import { Button, Modal, Text } from '@rpg/ui'
 import { FormFieldStack } from '@rpg/ui/form'
 import type { FormItem } from '@rpg/ui/form'
 
@@ -127,14 +127,14 @@ export function NpcStatusEditor({
           </FormProvider>
         </Modal.Body>
         <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
+          <Modal.FooterActions>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit" form={formId} disabled={updateStatus.isPending}>
               Save
             </Button>
-          </div>
+          </Modal.FooterActions>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

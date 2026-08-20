@@ -10,15 +10,7 @@ import {
   type CharacterBuildContext,
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
-import {
-  Badge,
-  Button,
-  InfoTooltip,
-  Modal,
-  SelectField,
-  Text,
-  dialogPanelActionRowClasses,
-} from '@rpg/ui'
+import { Badge, Button, InfoTooltip, Modal, SelectField, Text } from '@rpg/ui'
 
 import {
   buildBuilderLevelSelectOptions,
@@ -61,14 +53,14 @@ export function CharacterBuilderLevelChangeConfirmationModal({
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
+          <Modal.FooterActions>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               {formatFieldMessage(characterBuilderLevelMessages.changeCancelLabel())}
             </Button>
             <Button type="button" onClick={onConfirm}>
               {formatFieldMessage(characterBuilderLevelMessages.changeConfirmLabel())}
             </Button>
-          </div>
+          </Modal.FooterActions>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

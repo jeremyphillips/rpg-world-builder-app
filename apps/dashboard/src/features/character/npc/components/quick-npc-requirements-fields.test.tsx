@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connections/organization-membership-title-field.types'
 import { EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL } from '../../components/equipment/equipment-picker-drawer.types'
 import {
   createEquipmentStepContextFixture,
@@ -14,15 +13,15 @@ import {
   quickNpcAuthoringTabDefaultValues,
   type QuickNpcAuthoringTabValues,
 } from '../lib/quick-npc-form-fields'
+import { quickNpcMemberSetupWithNoTitle } from '../lib/quick-npc-test-fixtures'
 import { buildQuickNpcRequirementOptionSets } from '../lib/quick-npc-requirement-options.lib'
 import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.client'
 
-const setup = {
+const setup = quickNpcMemberSetupWithNoTitle({
   speciesId: 'species-1',
-  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   classId: equipmentStepBardClassFixture.id,
   level: 1,
-}
+})
 
 function RequirementsFieldsHarness() {
   const form = useForm<QuickNpcAuthoringTabValues>({

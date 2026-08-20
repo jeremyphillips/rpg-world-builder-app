@@ -17,9 +17,11 @@ export type AddPendingWorkflowProps = {
   defaultMode?: AddPendingWorkflowMode
   onModeChange?: (mode: AddPendingWorkflowMode) => void
   addAnotherLabel: string
+  addFirstLabel?: string
   onAddAnother: () => void
   pendingHeading?: string
   pendingItems: React.ReactNode
+  emptyState?: React.ReactNode
   composing?: React.ReactNode
 }
 
@@ -29,16 +31,23 @@ export function AddPendingWorkflow({
   defaultMode,
   onModeChange,
   addAnotherLabel,
+  addFirstLabel,
   onAddAnother,
   pendingHeading,
   pendingItems,
+  emptyState,
   composing,
 }: AddPendingWorkflowProps) {
+  const allowEmptyResting = emptyState != null
   const [uncontrolledMode, setUncontrolledMode] = React.useState<AddPendingWorkflowMode>(
-    defaultMode ?? (hasPendingItems ? 'pending' : 'add'),
+    defaultMode ?? (hasPendingItems || allowEmptyResting ? 'pending' : 'add'),
   )
   const requestedMode = mode ?? uncontrolledMode
-  const resolvedMode = resolveAddPendingMode({ requestedMode, hasPendingItems })
+  const resolvedMode = resolveAddPendingMode({
+    requestedMode,
+    hasPendingItems,
+    allowEmptyResting,
+  })
 
   const setRequestedMode = React.useCallback(
     (nextMode: AddPendingWorkflowMode) => {
@@ -53,24 +62,37 @@ export function AddPendingWorkflow({
     onAddAnother()
   }, [onAddAnother, setRequestedMode])
 
+  const addLabel = hasPendingItems ? addAnotherLabel : (addFirstLabel ?? addAnotherLabel)
+
   return (
     <div className={addPendingWorkflowStackClasses} data-add-pending-mode={resolvedMode}>
       {resolvedMode === 'pending' ? (
-        <>
-          <div className={addPendingWorkflowPendingListClasses}>
-            {pendingHeading ? (
-              <Heading as="h3" variant="subsection">
-                {pendingHeading}
-              </Heading>
-            ) : null}
-            {pendingItems}
-          </div>
-          <div>
-            <Button type="button" variant="ghost" onClick={handleAddAnother}>
-              {addAnotherLabel}
-            </Button>
-          </div>
-        </>
+        hasPendingItems ? (
+          <>
+            <div className={addPendingWorkflowPendingListClasses}>
+              {pendingHeading ? (
+                <Heading as="h3" variant="subsection">
+                  {pendingHeading}
+                </Heading>
+              ) : null}
+              {pendingItems}
+            </div>
+            <div>
+              <Button type="button" variant="ghost" onClick={handleAddAnother}>
+                {addAnotherLabel}
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            {emptyState}
+            <div>
+              <Button type="button" variant="ghost" onClick={handleAddAnother}>
+                {addLabel}
+              </Button>
+            </div>
+          </>
+        )
       ) : (
         composing
       )}

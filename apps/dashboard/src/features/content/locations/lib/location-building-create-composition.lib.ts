@@ -221,6 +221,11 @@ export type BuildingCreateCompletionToast = Readonly<
   { kind: 'success' } | { kind: 'warning'; message: string }
 >
 
+export type BuildingCreateCompositionCompletion = Readonly<{
+  toast: BuildingCreateCompletionToast
+  buildingId: string
+}>
+
 export function resolveBuildingCreateCompletionToast(input: {
   deferredAccessFailed: boolean
 }): BuildingCreateCompletionToast {
@@ -337,7 +342,7 @@ export async function completeBuildingCreateComposition(input: {
   queryClient: QueryClient
   pendingAccess: ContentCampaignAccessPatch | null
   organizationsController?: BuildingOrganizationsPanelController | null
-}): Promise<BuildingCreateCompletionToast> {
+}): Promise<BuildingCreateCompositionCompletion> {
   const result = await createBuildingComposition(input.campaignId, input.request)
   const deferredAccessFailed = await applyDeferredBuildingCampaignAccess({
     campaignId: input.campaignId,
@@ -346,7 +351,10 @@ export async function completeBuildingCreateComposition(input: {
   })
   await invalidateBuildingCreateCompositionQueries(input.queryClient, input.campaignId, result)
   input.organizationsController?.reset()
-  return resolveBuildingCreateCompletionToast({ deferredAccessFailed })
+  return {
+    buildingId: result.building.id,
+    toast: resolveBuildingCreateCompletionToast({ deferredAccessFailed }),
+  }
 }
 
 function classifyRequestValidationIssue(

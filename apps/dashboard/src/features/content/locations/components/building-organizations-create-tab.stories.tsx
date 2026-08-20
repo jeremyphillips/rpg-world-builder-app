@@ -88,25 +88,25 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const EmptyAddMode: Story = {}
+export const EmptyResting: Story = {}
 
 export const IntentFirstDiscovery: Story = {
   args: {
-    organizationItems,
+    initialComposerMode: 'composing',
   },
 }
 
 export const ZeroEligibleIntent: Story = {
   args: {
     initialPlan: fullyBlockedPlan,
-    initialMode: 'add',
+    initialComposerMode: 'composing',
   },
 }
 
 export const SingleEligibleIntentSummary: Story = {
   args: {
     initialPlan: singleEligiblePlan,
-    initialMode: 'add',
+    initialComposerMode: 'composing',
   },
 }
 
@@ -116,7 +116,7 @@ export const MixedPendingRelationships: Story = {
   },
 }
 
-export const PendingEditInPlace: Story = {
+export const PendingEditFocused: Story = {
   args: {
     initialPlan: mixedPlan,
   },

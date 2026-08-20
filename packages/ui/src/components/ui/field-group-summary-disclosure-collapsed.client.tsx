@@ -1,12 +1,18 @@
 import { CircleSlash } from 'lucide-react'
 
+import { cn } from '../../lib/utils'
 import { Button } from './button.client'
+import type { FieldSize } from './field.client'
 import type { FieldGroupSummary } from './field-group-disclosure.types'
+import {
+  fieldGroupSummaryDisclosureLegendVariants,
+  fieldGroupSummaryPrimaryVariants,
+  fieldGroupSummaryStatusLineVariants,
+} from './field-group-summary-disclosure.variants'
 import {
   fieldGroupSummaryStatusDetailSeparatorClasses,
   fieldGroupSummaryStatusIndicatorVariants,
   fieldGroupSummaryStatusLabelVariants,
-  fieldGroupSummaryStatusLineClasses,
   fieldGroupSummaryStatusSecondaryClasses,
 } from './field-group-summary-disclosure-collapsed.variants'
 import { fieldGroupSummaryDisclosureActionButtonClasses } from './field-group-summary-disclosure.variants'
@@ -16,6 +22,7 @@ export type FieldGroupSummaryDisclosureCollapsedProps = {
   legend: string
   legendId: string
   panelId: string
+  size: FieldSize
   summary: FieldGroupSummary
   openLabel: string
   unsavedSuffix: string
@@ -47,14 +54,20 @@ function buildSummaryAccessibleName(
   return parts.join('. ')
 }
 
-function FieldGroupSummaryStatusRow({ summary }: { summary: FieldGroupSummary }) {
+function FieldGroupSummaryStatusRow({
+  summary,
+  size,
+}: {
+  summary: FieldGroupSummary
+  size: FieldSize
+}) {
   const status = summary.status
   if (!status) return null
 
   const tone = status.tone ?? 'neutral'
 
   return (
-    <span className={fieldGroupSummaryStatusLineClasses}>
+    <span className={fieldGroupSummaryStatusLineVariants({ size })}>
       {status.indicator === 'dot' ? (
         <span
           aria-hidden
@@ -67,13 +80,24 @@ function FieldGroupSummaryStatusRow({ summary }: { summary: FieldGroupSummary })
           className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'inactive', tone })}
         />
       ) : null}
-      <span className={fieldGroupSummaryStatusLabelVariants({ tone })}>{status.label}</span>
+      <span
+        className={cn(
+          fieldGroupSummaryStatusLabelVariants({ tone }),
+          fieldGroupSummaryDisclosureLegendVariants({ size }),
+        )}
+      >
+        {status.label}
+      </span>
       {summary.detail ? (
         <>
           <span aria-hidden className={fieldGroupSummaryStatusDetailSeparatorClasses}>
             ·
           </span>
-          <Text as="span" variant="muted">
+          <Text
+            as="span"
+            variant="muted"
+            className={fieldGroupSummaryDisclosureLegendVariants({ size })}
+          >
             {summary.detail}
           </Text>
         </>
@@ -86,6 +110,7 @@ export function FieldGroupSummaryDisclosureCollapsed({
   legend,
   legendId,
   panelId,
+  size,
   summary,
   openLabel,
   unsavedSuffix,
@@ -95,10 +120,11 @@ export function FieldGroupSummaryDisclosureCollapsed({
 }: FieldGroupSummaryDisclosureCollapsedProps) {
   const accessibleName = buildSummaryAccessibleName(summary, unsavedSuffix, showDirtySuffix)
   const usesStatusRow = Boolean(summary.status)
+  const legendTypography = fieldGroupSummaryDisclosureLegendVariants({ size })
 
   return (
     <>
-      <Text id={legendId} variant="muted" className="text-sm">
+      <Text id={legendId} variant="muted" className={legendTypography}>
         {legend}
       </Text>
       <div className="flex items-start justify-between gap-3">
@@ -112,14 +138,14 @@ export function FieldGroupSummaryDisclosureCollapsed({
           onClick={onOpen}
         >
           {usesStatusRow ? (
-            <FieldGroupSummaryStatusRow summary={summary} />
+            <FieldGroupSummaryStatusRow summary={summary} size={size} />
           ) : (
-            <Text as="span" className="text-sm">
+            <Text as="span" className={fieldGroupSummaryPrimaryVariants({ size })}>
               {summary.primary}
             </Text>
           )}
           {showDirtySuffix ? (
-            <Text as="span" variant="muted" className="text-sm">
+            <Text as="span" variant="muted" className={legendTypography}>
               {unsavedSuffix}
             </Text>
           ) : null}
@@ -127,7 +153,11 @@ export function FieldGroupSummaryDisclosureCollapsed({
             <Text
               as="span"
               variant={usesStatusRow ? undefined : 'muted'}
-              className={usesStatusRow ? fieldGroupSummaryStatusSecondaryClasses : 'mt-1 text-sm'}
+              className={
+                usesStatusRow
+                  ? fieldGroupSummaryStatusSecondaryClasses
+                  : cn('mt-1', legendTypography)
+              }
             >
               {summary.secondary}
             </Text>

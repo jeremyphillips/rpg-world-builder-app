@@ -6,12 +6,11 @@ import type { ReactNode } from 'react'
 import { Button } from './button.client'
 import type { FieldSize } from './field.client'
 import { FieldLabelContent } from './field-label-content'
-import { fieldLabelVariants } from './field.variants'
+import { fieldAnatomyStackVariants, fieldLabelVariants } from './field.variants'
 import { cn } from '../../lib/utils'
 import {
   optionalFieldDisclosureActionButtonClasses,
   optionalFieldDisclosureHeaderClasses,
-  optionalFieldDisclosureStackClasses,
 } from './optional-field-disclosure.variants'
 
 export type OptionalFieldDisclosureProps = {
@@ -56,7 +55,7 @@ export function OptionalFieldDisclosure({
   }
 
   return (
-    <div className={optionalFieldDisclosureStackClasses}>
+    <div className={fieldAnatomyStackVariants({ size })}>
       <div className={optionalFieldDisclosureHeaderClasses}>
         <label htmlFor={controlId} className={cn(fieldLabelVariants({ size }))}>
           <FieldLabelContent label={fieldLabel} />

@@ -19,6 +19,7 @@ import {
 } from '@rpg/ui'
 
 import { LocationConnectionKindField } from '../../components/location-connection-kind-field.client'
+import type { ContentCreateContext } from '@/lib/create-flow'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -66,6 +67,9 @@ import {
   resolveKindsForOrganizationDrawerIntent,
   resolveEdgesAtLocation,
 } from '../../lib/location-connection-drawer-intent'
+import { resolveRelationshipPickerCreateIntents } from '../../lib/relationship/relationship-picker-create-intents.lib'
+import { revalidateCreatedLocationForOrganizationForwardDrawer } from '../../lib/relationship/relationship-picker-nested-create.lib'
+import { useRelationshipPickerNestedCreate } from '../../lib/relationship/use-relationship-picker-nested-create.client'
 import {
   buildOrganizationFamilyKindOptions,
   buildOrganizationLocationChangeKindOptions,
@@ -386,7 +390,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
       : true
   const hasChange =
     (mode !== 'changeKind' || activeKind !== initialConnection?.kind) && hasTargetChange
-  const canSubmit = Boolean(selectedLocationId && activeKind) && hasChange && !isSubmitting
 
   const handleKindChange = (value: string) => {
     const nextKind = value as OrganizationLocationConnectionKind
@@ -556,206 +559,275 @@ function OrganizationLocationConnectionLinkDrawerContent({
     return summaries
   }, [campaignId, locationsById, pickerLocations])
 
+  const nestedCreateIntents = React.useMemo(() => {
+    if (mode !== 'add' || !activeKind || !showLocationPicker || showMutationEmptyState) {
+      return []
+    }
+
+    return resolveRelationshipPickerCreateIntents({
+      target: 'location',
+      selectedKind: activeKind,
+      activeBrowseScope: showTargetBrowseScopeControl ? effectiveLocationBrowseScope : undefined,
+    })
+  }, [
+    activeKind,
+    effectiveLocationBrowseScope,
+    mode,
+    showLocationPicker,
+    showMutationEmptyState,
+    showTargetBrowseScopeControl,
+  ])
+
+  const nestedCreateContext = React.useMemo((): ContentCreateContext => {
+    if (!activeKind) {
+      return { kind: 'standalone' }
+    }
+
+    return {
+      kind: 'relationship-target',
+      source: { contentType: 'organizations', id: organizationId },
+      relationshipVocabulary: 'organization_location_connection',
+    }
+  }, [activeKind, organizationId])
+
+  const nestedCreate = useRelationshipPickerNestedCreate({
+    campaignId,
+    enabled: mode === 'add' && showLocationPicker && !showMutationEmptyState,
+    createIntents: nestedCreateIntents,
+    nestedCreateContext,
+    subjectOrganizationId: organizationId,
+    onSelectCreatedLocation: setSelectedLocationId,
+    revalidateCreatedLocation: (location, context) => {
+      if (!activeKind) {
+        return false
+      }
+
+      return revalidateCreatedLocationForOrganizationForwardDrawer({
+        location,
+        kind: activeKind,
+        subjectOrganizationId: organizationId,
+        existingConnections: context.existingConnections,
+        edgesByLocationId: context.edgesByLocationId,
+        excludeConnectionId,
+      })
+    },
+  })
+
+  const {
+    auxiliaryAction: nestedCreateAuxiliaryAction,
+    modals: nestedCreateModals,
+    nestedCreateBusy,
+  } = nestedCreate
+
+  const canSubmit =
+    Boolean(selectedLocationId && activeKind) && hasChange && !isSubmitting && !nestedCreateBusy
+
   return (
-    <CatalogEntityPickerSheet
-      open={open}
-      onOpenChange={onOpenChange}
-      title={title}
-      pickerEnabled={showLocationPicker && !showMutationEmptyState}
-      searchPlaceholder={targetPresentation.searchPlaceholder}
-      noResultsMessage={ORGANIZATION_LOCATION_LINK_NO_RESULTS}
-      noItemsMessage={ORGANIZATION_LOCATION_LINK_NO_ITEMS}
-      headerBelowDescription={
-        <div className="space-y-4">
-          <DrawerContext entities={drawerContextEntities} />
-          {mode === 'changeTarget' && lockedKindLabel ? (
-            <RelationshipDrawerSubjectField
-              label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
-              value={lockedKindLabel}
-            />
-          ) : null}
-          {instructionCopy ? (
-            <Text variant="muted" className="text-sm">
-              {instructionCopy}
-            </Text>
-          ) : familyAddDrawerHelper ? (
-            <Text variant="muted" className="text-sm">
-              {familyAddDrawerHelper}
-            </Text>
-          ) : null}
-          {showKindField ? (
-            <LocationConnectionKindField
-              id="organization-location-connection-kind"
-              label={kindFieldLabel}
-              options={kindOptions}
-              value={activeKind}
-              onValueChange={handleKindChange}
-            />
-          ) : null}
-          {showKindSummary && selectedKindOption ? (
-            <SelectionSummaryCard
-              eyebrow={RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW}
-              rows={[
-                {
-                  label: kindFieldLabel,
-                  value: selectedKindOption.label,
-                  onValueClick: startEditingKind,
-                  valueActionAriaLabel: kindChangeAriaLabel,
-                  action: (
-                    <SelectionSummaryChangeAction
-                      changeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
-                      ariaLabel={kindChangeAriaLabel}
-                      onChange={startEditingKind}
-                    />
-                  ),
-                },
-              ]}
-            />
-          ) : null}
-          {mode === 'changeTarget' &&
-          (currentEndpoint || (showLocationPicker && !showMutationEmptyState)) ? (
-            <EntityReplacementSection
-              entityLabel={changeTargetEntityLabel}
-              current={currentEndpoint}
-              showNewSection={showLocationPicker && !showMutationEmptyState}
-              newHelper={targetPresentation.targetHelp}
-            >
-              {showTargetBrowseScopeControl ? (
-                <SegmentedControl
-                  aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
-                  value={locationBrowseScope}
-                  options={browseScopeOptions}
-                  onValueChange={setLocationBrowseScope}
-                  fullWidth
-                />
-              ) : null}
-            </EntityReplacementSection>
-          ) : null}
-          {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
-            <LocationConnectionKindField
-              id="organization-location-connection-edit-kind"
-              label={kindFieldLabel}
-              options={changeKindPickerOptions}
-              value={activeKind}
-              onValueChange={(value) =>
-                setSelectedKind(value as OrganizationLocationConnectionKind)
-              }
-            />
-          ) : null}
-          {showLocationPicker && !showMutationEmptyState && mode !== 'changeTarget' ? (
-            <div className="space-y-2">
-              <Heading variant="label" as="p">
-                {targetFieldLabel}
-              </Heading>
-              {targetPresentation.targetHelp ? (
-                <Text variant="muted" className="text-sm">
-                  {targetPresentation.targetHelp}
-                </Text>
-              ) : null}
-              {showTargetBrowseScopeControl ? (
-                <SegmentedControl
-                  aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
-                  value={locationBrowseScope}
-                  options={browseScopeOptions}
-                  onValueChange={setLocationBrowseScope}
-                  fullWidth
-                />
-              ) : null}
-            </div>
-          ) : null}
-          {!showLocationPicker && mode === 'add' && !activeKind ? (
+    <>
+      {nestedCreateModals}
+      <CatalogEntityPickerSheet
+        open={open}
+        onOpenChange={onOpenChange}
+        title={title}
+        auxiliaryAction={nestedCreateAuxiliaryAction}
+        pickerEnabled={showLocationPicker && !showMutationEmptyState}
+        searchPlaceholder={targetPresentation.searchPlaceholder}
+        noResultsMessage={ORGANIZATION_LOCATION_LINK_NO_RESULTS}
+        noItemsMessage={ORGANIZATION_LOCATION_LINK_NO_ITEMS}
+        headerBelowDescription={
+          <div className="space-y-4">
+            <DrawerContext entities={drawerContextEntities} />
+            {mode === 'changeTarget' && lockedKindLabel ? (
+              <RelationshipDrawerSubjectField
+                label={ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]}
+                value={lockedKindLabel}
+              />
+            ) : null}
+            {instructionCopy ? (
+              <Text variant="muted" className="text-sm">
+                {instructionCopy}
+              </Text>
+            ) : familyAddDrawerHelper ? (
+              <Text variant="muted" className="text-sm">
+                {familyAddDrawerHelper}
+              </Text>
+            ) : null}
+            {showKindField ? (
+              <LocationConnectionKindField
+                id="organization-location-connection-kind"
+                label={kindFieldLabel}
+                options={kindOptions}
+                value={activeKind}
+                onValueChange={handleKindChange}
+              />
+            ) : null}
+            {showKindSummary && selectedKindOption ? (
+              <SelectionSummaryCard
+                eyebrow={RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW}
+                rows={[
+                  {
+                    label: kindFieldLabel,
+                    value: selectedKindOption.label,
+                    onValueClick: startEditingKind,
+                    valueActionAriaLabel: kindChangeAriaLabel,
+                    action: (
+                      <SelectionSummaryChangeAction
+                        changeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
+                        ariaLabel={kindChangeAriaLabel}
+                        onChange={startEditingKind}
+                      />
+                    ),
+                  },
+                ]}
+              />
+            ) : null}
+            {mode === 'changeTarget' &&
+            (currentEndpoint || (showLocationPicker && !showMutationEmptyState)) ? (
+              <EntityReplacementSection
+                entityLabel={changeTargetEntityLabel}
+                current={currentEndpoint}
+                showNewSection={showLocationPicker && !showMutationEmptyState}
+                newHelper={targetPresentation.targetHelp}
+              >
+                {showTargetBrowseScopeControl ? (
+                  <SegmentedControl
+                    aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
+                    value={locationBrowseScope}
+                    options={browseScopeOptions}
+                    onValueChange={setLocationBrowseScope}
+                    fullWidth
+                  />
+                ) : null}
+              </EntityReplacementSection>
+            ) : null}
+            {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
+              <LocationConnectionKindField
+                id="organization-location-connection-edit-kind"
+                label={kindFieldLabel}
+                options={changeKindPickerOptions}
+                value={activeKind}
+                onValueChange={(value) =>
+                  setSelectedKind(value as OrganizationLocationConnectionKind)
+                }
+              />
+            ) : null}
+            {showLocationPicker && !showMutationEmptyState && mode !== 'changeTarget' ? (
+              <div className="space-y-2">
+                <Heading variant="label" as="p">
+                  {targetFieldLabel}
+                </Heading>
+                {targetPresentation.targetHelp ? (
+                  <Text variant="muted" className="text-sm">
+                    {targetPresentation.targetHelp}
+                  </Text>
+                ) : null}
+                {showTargetBrowseScopeControl ? (
+                  <SegmentedControl
+                    aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
+                    value={locationBrowseScope}
+                    options={browseScopeOptions}
+                    onValueChange={setLocationBrowseScope}
+                    fullWidth
+                  />
+                ) : null}
+              </div>
+            ) : null}
+            {!showLocationPicker && mode === 'add' && !activeKind ? (
+              <Text variant="muted" className="text-sm" role="status">
+                {ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE}
+              </Text>
+            ) : null}
+            {showMutationEmptyState && mutationEmptyMessage ? (
+              <Text variant="muted" className="text-sm" role="status">
+                {mutationEmptyMessage}
+              </Text>
+            ) : null}
+          </div>
+        }
+        emptyState={
+          showLocationPicker && mode === 'add' && !activeKind ? (
             <Text variant="muted" className="text-sm" role="status">
               {ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE}
             </Text>
-          ) : null}
-          {showMutationEmptyState && mutationEmptyMessage ? (
-            <Text variant="muted" className="text-sm" role="status">
-              {mutationEmptyMessage}
-            </Text>
-          ) : null}
-        </div>
-      }
-      emptyState={
-        showLocationPicker && mode === 'add' && !activeKind ? (
-          <Text variant="muted" className="text-sm" role="status">
-            {ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE}
-          </Text>
-        ) : undefined
-      }
-      footer={
-        !showMutationEmptyState &&
-        (showLocationPicker || mode === 'changeKind') &&
-        activeKind &&
-        !(showKindStep && editingKind) ? (
-          <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-            {submitLabel}
-          </Button>
-        ) : undefined
-      }
-      hasStructuredFilters={showTargetBrowseScopeControl && effectiveLocationBrowseScope !== 'all'}
-      items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
-      getItemKey={(location) => location.id}
-      getItemToolbarLabel={(location) => location.name}
-      getSearchText={(location) => {
-        const summary = pickerLocationSummaries.get(location.id)
-        return summary ? buildLocationEntitySummarySearchText(summary) : location.name
-      }}
-      renderEntityRow={createCatalogEntityRowRenderer({
-        buildEntity: (location) => {
+          ) : undefined
+        }
+        footer={
+          !showMutationEmptyState &&
+          (showLocationPicker || mode === 'changeKind') &&
+          activeKind &&
+          !(showKindStep && editingKind) ? (
+            <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
+              {submitLabel}
+            </Button>
+          ) : undefined
+        }
+        hasStructuredFilters={
+          showTargetBrowseScopeControl && effectiveLocationBrowseScope !== 'all'
+        }
+        items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
+        getItemKey={(location) => location.id}
+        getItemToolbarLabel={(location) => location.name}
+        getSearchText={(location) => {
           const summary = pickerLocationSummaries.get(location.id)
-          const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
-          const kindAvailable =
-            activeKind != null &&
-            organizationLocationConnectionHasAvailableKind({
-              locationId: location.id,
-              kinds: [activeKind],
-              subjectOrganizationId: organizationId,
-              connections: existingConnections,
-              edgesAtLocation,
-              excludeConnectionId,
-            })
-
-          return summary
-            ? buildLocationPickerEntitySummary(summary, {
-                imageKey: location.imageKey,
-                description: !kindAvailable ? fullyLinkedReason : undefined,
+          return summary ? buildLocationEntitySummarySearchText(summary) : location.name
+        }}
+        renderEntityRow={createCatalogEntityRowRenderer({
+          buildEntity: (location) => {
+            const summary = pickerLocationSummaries.get(location.id)
+            const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
+            const kindAvailable =
+              activeKind != null &&
+              organizationLocationConnectionHasAvailableKind({
+                locationId: location.id,
+                kinds: [activeKind],
+                subjectOrganizationId: organizationId,
+                connections: existingConnections,
+                edgesAtLocation,
+                excludeConnectionId,
               })
-            : {
-                heading: location.name,
-                description: !kindAvailable ? fullyLinkedReason : undefined,
-                media: location.imageKey
-                  ? buildEntityMediaFromImageKey(location.imageKey, location.name, 'compact')
-                  : undefined,
-              }
-        },
-        buildTrailing: (location) => {
-          const isSelected = selectedLocationId === location.id
-          const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
-          const kindAvailable =
-            activeKind != null &&
-            organizationLocationConnectionHasAvailableKind({
-              locationId: location.id,
-              kinds: [activeKind],
-              subjectOrganizationId: organizationId,
-              connections: existingConnections,
-              edgesAtLocation,
-              excludeConnectionId,
-            })
 
-          return {
-            kind: 'action',
-            content: (
-              <CatalogPickerSelectionActions
-                phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
-                canSelect={kindAvailable}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => setSelectedLocationId(location.id)}
-                onRemove={() => setSelectedLocationId(null)}
-              />
-            ),
-          }
-        },
-      })}
-    />
+            return summary
+              ? buildLocationPickerEntitySummary(summary, {
+                  imageKey: location.imageKey,
+                  description: !kindAvailable ? fullyLinkedReason : undefined,
+                })
+              : {
+                  heading: location.name,
+                  description: !kindAvailable ? fullyLinkedReason : undefined,
+                  media: location.imageKey
+                    ? buildEntityMediaFromImageKey(location.imageKey, location.name, 'compact')
+                    : undefined,
+                }
+          },
+          buildTrailing: (location) => {
+            const isSelected = selectedLocationId === location.id
+            const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
+            const kindAvailable =
+              activeKind != null &&
+              organizationLocationConnectionHasAvailableKind({
+                locationId: location.id,
+                kinds: [activeKind],
+                subjectOrganizationId: organizationId,
+                connections: existingConnections,
+                edgesAtLocation,
+                excludeConnectionId,
+              })
+
+            return {
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
+                  canSelect={kindAvailable}
+                  addLabel={isSelected ? 'Selected' : 'Select'}
+                  onAdd={() => setSelectedLocationId(location.id)}
+                  onRemove={() => setSelectedLocationId(null)}
+                />
+              ),
+            }
+          },
+        })}
+      />
+    </>
   )
 }
