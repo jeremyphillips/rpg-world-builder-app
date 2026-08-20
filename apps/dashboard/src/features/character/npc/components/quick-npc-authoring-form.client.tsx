@@ -43,13 +43,15 @@ import {
 } from '../lib/quick-npc-name-generation'
 import { buildQuickNpcRequirementOptionSets } from '../lib/quick-npc-requirement-options.lib'
 import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.client'
+import {
+  QUICK_NPC_CREATE_SUBMIT_LABEL,
+  type QuickNpcCreateContext,
+} from '../lib/quick-npc-create-context'
 
-export const QUICK_NPC_CREATE_SUBMIT_LABEL = 'Create NPC' as const
-export const QUICK_NPC_CREATE_FALLBACK_ERROR = 'Could not create this NPC.' as const
-
-import type { QuickNpcCreateContext } from '../lib/quick-npc-create-context'
-
+export { QUICK_NPC_CREATE_SUBMIT_LABEL } from '../lib/quick-npc-create-context'
 export type { QuickNpcCreateFormOrganization } from '../lib/quick-npc-create-context'
+
+export const QUICK_NPC_CREATE_FALLBACK_ERROR = 'Could not create this NPC.' as const
 
 export type QuickNpcAuthoringFormProps = {
   campaignId: string

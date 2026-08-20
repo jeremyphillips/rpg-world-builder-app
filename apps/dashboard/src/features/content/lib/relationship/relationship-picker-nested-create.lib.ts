@@ -38,6 +38,7 @@ import {
   resolveRelationshipPickerCreateIntents,
   type RelationshipPickerCreateIntent,
 } from './relationship-picker-create-intents.lib'
+import type { NestedCreateHandoffResult } from './relationship-picker-nested-create.types'
 
 export function resolveRelationshipPickerCharacterCreateIntents(input: {
   createableCharacterTypes: readonly ['npc']
@@ -308,7 +309,7 @@ export type RelationshipPickerNestedCreateHandoffInput = {
 export async function resolveRelationshipPickerNestedCreateHandoff(
   queryClient: QueryClient,
   input: RelationshipPickerNestedCreateHandoffInput,
-): Promise<{ organizationId?: string; locationId?: string; characterId?: string }> {
+): Promise<NestedCreateHandoffResult> {
   await invalidateRelationshipPickerNestedCreateQueries(queryClient, {
     campaignId: input.campaignId,
     result: input.result,
@@ -324,17 +325,21 @@ export async function resolveRelationshipPickerNestedCreateHandoff(
     return resolveNpcNestedCreateHandoff(queryClient, input)
   }
 
-  return resolveLocationNestedCreateHandoff(queryClient, input)
+  if (input.result.contentType === 'locations') {
+    return resolveLocationNestedCreateHandoff(queryClient, input)
+  }
+
+  return { status: 'unsupported' }
 }
 
 async function resolveOrganizationNestedCreateHandoff(
   queryClient: QueryClient,
   input: RelationshipPickerNestedCreateHandoffInput,
-): Promise<{ organizationId?: string }> {
+): Promise<NestedCreateHandoffResult> {
   const organizations = await fetchReferenceableOrganizations(queryClient, input.campaignId)
   const organization = organizations.find((entry) => entry.id === input.result.id)
   if (!organization) {
-    return {}
+    return { status: 'not-found' }
   }
 
   const orgRows =
@@ -349,20 +354,20 @@ async function resolveOrganizationNestedCreateHandoff(
     input.revalidateCreatedOrganization &&
     !input.revalidateCreatedOrganization(organization, orgRows)
   ) {
-    return {}
+    return { status: 'ineligible' }
   }
 
-  return { organizationId: organization.id }
+  return { status: 'selected', organizationId: organization.id }
 }
 
 async function resolveLocationNestedCreateHandoff(
   queryClient: QueryClient,
   input: RelationshipPickerNestedCreateHandoffInput,
-): Promise<{ locationId?: string }> {
+): Promise<NestedCreateHandoffResult> {
   const locations = await fetchReferenceableLocations(queryClient, input.campaignId)
   const location = locations.find((entry) => entry.id === input.result.id)
   if (!location) {
-    return {}
+    return { status: 'not-found' }
   }
 
   const forwardContext =
@@ -380,28 +385,28 @@ async function resolveLocationNestedCreateHandoff(
     input.revalidateCreatedLocation &&
     !input.revalidateCreatedLocation(location, forwardContext)
   ) {
-    return {}
+    return { status: 'ineligible' }
   }
 
-  return { locationId: location.id }
+  return { status: 'selected', locationId: location.id }
 }
 
 async function resolveNpcNestedCreateHandoff(
   queryClient: QueryClient,
   input: RelationshipPickerNestedCreateHandoffInput,
-): Promise<{ characterId?: string }> {
+): Promise<NestedCreateHandoffResult> {
   const characters = await fetchReferenceableNpcCharacterOptions(queryClient, {
     campaignId: input.campaignId,
     catalogIndex: input.catalogIndex,
   })
   const character = characters.find((entry) => entry.id === input.result.id)
   if (!character) {
-    return {}
+    return { status: 'not-found' }
   }
 
   if (input.revalidateCreatedNpc && !input.revalidateCreatedNpc(character)) {
-    return {}
+    return { status: 'ineligible' }
   }
 
-  return { characterId: character.id }
+  return { status: 'selected', characterId: character.id }
 }

@@ -6,6 +6,10 @@ import type {
   OrganizationPractice,
 } from '@rpg/contracts'
 
+import type { ContentCreateContext } from '@/lib/create-flow/content-create-context'
+
+export const QUICK_NPC_CREATE_SUBMIT_LABEL = 'Create NPC' as const
+
 export type QuickNpcCreateFormOrganization = {
   id: string
   name: string
@@ -44,4 +48,15 @@ export function resolveQuickNpcCreateOrganization(
   context: QuickNpcCreateContext,
 ): QuickNpcCreateFormOrganization | undefined {
   return context.kind === 'organization-member' ? context.organization : undefined
+}
+
+/** Lossy map — relationship-target semantics do not flow into Quick NPC context today. */
+export function mapContentCreateContextToQuickNpcCreateContext(
+  context: ContentCreateContext,
+): QuickNpcCreateContext {
+  if (context.kind === 'standalone') {
+    return { kind: 'standalone' }
+  }
+
+  return { kind: 'standalone' }
 }

@@ -5,7 +5,12 @@ import { Button, toast, usePendingAwareOpenChange } from '@rpg/ui'
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
-import { CreateModalShell, type OnContentCreated } from '@/lib/create-flow'
+import {
+  CreateModalShell,
+  formatNestedCreateHandoffFailure,
+  invokeOnContentCreated,
+  type OnContentCreated,
+} from '@/lib/create-flow'
 import { notifyContentCreated } from '@/lib/notify'
 import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
@@ -110,7 +115,16 @@ function OrganizationCreateModalForm({
         return
       }
 
-      onCreated?.({ contentType: 'organizations', id: created.id })
+      try {
+        await invokeOnContentCreated(onCreated, {
+          contentType: 'organizations',
+          id: created.id,
+        })
+      } catch (error) {
+        toast.warning(formatNestedCreateHandoffFailure(error))
+        return
+      }
+
       notifyContentCreated('organizations')
     },
   })

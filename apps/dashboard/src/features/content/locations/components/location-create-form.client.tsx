@@ -9,7 +9,11 @@ import { Button, cn, toast } from '@rpg/ui'
 import { FormShellSubmitButton, type FormValueSync } from '@rpg/ui/form'
 
 import type { CreateWorkflowPanelStatus } from '@/lib/create-flow'
-import type { OnContentCreated } from '@/lib/create-flow'
+import {
+  formatNestedCreateHandoffFailure,
+  invokeOnContentCreated,
+  type OnContentCreated,
+} from '@/lib/create-flow'
 import { notifyContentCreated } from '@/lib/notify'
 import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import type { FormSubmitHandler } from '@/lib/use-submit-handler'
@@ -109,6 +113,20 @@ type LocationCreateFormBodyProps = LocationCreateFormProps
 
 type FixedSettlementCreateContext = LocationFixedCreateContext & {
   settlementType: NonNullable<LocationFixedCreateContext['settlementType']>
+}
+
+async function completeLocationCreateHandoff(
+  onCreated: OnContentCreated | undefined,
+  id: string,
+): Promise<boolean> {
+  try {
+    await invokeOnContentCreated(onCreated, { contentType: 'locations', id })
+    notifyContentCreated('locations')
+    return true
+  } catch (error) {
+    toast.warning(formatNestedCreateHandoffFailure(error))
+    return false
+  }
 }
 
 function LocationBuildingSetupProjectionBridge({
@@ -434,8 +452,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
           organizationsController,
         })
         if (completion.toast.kind === 'success') {
-          onCreated?.({ contentType: 'locations', id: completion.buildingId })
-          notifyContentCreated('locations')
+          await completeLocationCreateHandoff(onCreated, completion.buildingId)
         } else {
           toast.warning(completion.toast.message)
         }
@@ -539,8 +556,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
       if (deferredAccessFailed) {
         toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
       } else {
-        onCreated?.({ contentType: 'locations', id: created.id })
-        notifyContentCreated('locations')
+        await completeLocationCreateHandoff(onCreated, created.id)
       }
     },
   })
@@ -637,8 +653,7 @@ function LocationSettlementCreateForm(
         })
 
         if (toastResult.kind === 'success') {
-          onCreated?.({ contentType: 'locations', id: result.settlement.id })
-          notifyContentCreated('locations')
+          await completeLocationCreateHandoff(onCreated, result.settlement.id)
         } else {
           toast.warning(toastResult.message)
         }

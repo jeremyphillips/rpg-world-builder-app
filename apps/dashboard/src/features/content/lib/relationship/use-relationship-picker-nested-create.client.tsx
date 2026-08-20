@@ -12,7 +12,7 @@ import type {
 } from '@rpg/contracts'
 
 import type { ContentCreateContext, CreatedContentResult } from '@/lib/create-flow'
-import { STANDALONE_CONTENT_CREATE_CONTEXT } from '@/lib/create-flow'
+import { NestedCreateHandoffError, STANDALONE_CONTENT_CREATE_CONTEXT } from '@/lib/create-flow'
 
 import type { LocationAuthoringType } from '../../locations/lib/location-authoring-type'
 import type { LocationConnectedPartyCharacterOption } from '../../locations/lib/location-connected-party-character-options.lib'
@@ -24,13 +24,10 @@ import {
   resolveRelationshipPickerNestedCreateHandoff,
   type OrganizationForwardNestedCreateRevalidationContext,
 } from './relationship-picker-nested-create.lib'
+import type { ActiveNestedCreateIntent } from './relationship-picker-nested-create.types'
 
+export type { ActiveNestedCreateIntent } from './relationship-picker-nested-create.types'
 export type RelationshipPickerNestedCreatePhase = 'idle' | 'creating' | 'resolvingCreatedTarget'
-
-type ActiveNestedCreateIntent =
-  | { target: 'organization' }
-  | { target: 'location'; authoringType: LocationAuthoringType }
-  | { target: 'character' }
 
 export type UseRelationshipPickerNestedCreateInput = {
   campaignId: string
@@ -54,6 +51,16 @@ export type UseRelationshipPickerNestedCreateInput = {
     context: OrganizationForwardNestedCreateRevalidationContext,
   ) => boolean
   revalidateCreatedNpc?: (character: LocationConnectedPartyCharacterOption) => boolean
+}
+
+function isNestedCreateModalOpen(
+  activeIntent: ActiveNestedCreateIntent | null,
+  target: ActiveNestedCreateIntent['target'],
+  phase: RelationshipPickerNestedCreatePhase,
+): boolean {
+  return (
+    activeIntent?.target === target && (phase === 'creating' || phase === 'resolvingCreatedTarget')
+  )
 }
 
 export function useRelationshipPickerNestedCreate({
@@ -127,7 +134,6 @@ export function useRelationshipPickerNestedCreate({
 
   const handleCreated = React.useCallback(
     async (result: CreatedContentResult) => {
-      setActiveIntent(null)
       setPhase('resolvingCreatedTarget')
 
       try {
@@ -142,13 +148,22 @@ export function useRelationshipPickerNestedCreate({
           revalidateCreatedNpc,
         })
 
+        if (handoff.status !== 'selected') {
+          throw new NestedCreateHandoffError(handoff.status)
+        }
+
         applyRelationshipPickerNestedCreateHandoff(handoff, {
           onSelectCreatedOrganization,
           onSelectCreatedLocation,
           onSelectCreatedNpc,
         })
-      } finally {
+
+        setActiveIntent(null)
+        setActiveCreateContext(STANDALONE_CONTENT_CREATE_CONTEXT)
         setPhase('idle')
+      } catch (error) {
+        setPhase('creating')
+        throw error
       }
     },
     [
@@ -191,9 +206,9 @@ export function useRelationshipPickerNestedCreate({
       campaignId={campaignId}
       activeIntent={activeIntent}
       createContext={activeCreateContext}
-      organizationCreateOpen={phase === 'creating' && activeIntent?.target === 'organization'}
-      locationCreateOpen={phase === 'creating' && activeIntent?.target === 'location'}
-      npcCreateOpen={phase === 'creating' && activeIntent?.target === 'character'}
+      organizationCreateOpen={isNestedCreateModalOpen(activeIntent, 'organization', phase)}
+      locationCreateOpen={isNestedCreateModalOpen(activeIntent, 'location', phase)}
+      npcCreateOpen={isNestedCreateModalOpen(activeIntent, 'character', phase)}
       npcBuildContext={npcBuildContext}
       onCreateModalOpenChange={handleCreateModalOpenChange}
       onCreated={handleCreated}

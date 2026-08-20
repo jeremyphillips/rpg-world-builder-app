@@ -1,11 +1,17 @@
+import type { NestedCreateHandoffResult } from './relationship-picker-nested-create.types'
+
 export function applyRelationshipPickerNestedCreateHandoff(
-  handoff: { organizationId?: string; locationId?: string; characterId?: string },
+  handoff: NestedCreateHandoffResult,
   callbacks: {
     onSelectCreatedOrganization?: (organizationId: string) => void
     onSelectCreatedLocation?: (locationId: string) => void
     onSelectCreatedNpc?: (characterId: string) => void
   },
 ): void {
+  if (handoff.status !== 'selected') {
+    return
+  }
+
   if (handoff.organizationId) {
     callbacks.onSelectCreatedOrganization?.(handoff.organizationId)
   }

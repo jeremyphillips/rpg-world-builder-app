@@ -341,8 +341,10 @@ gating) decide what may be created from an Add drawer. Dashboard maps 0 / 1 / ma
 Handoff is drawer-owned through **`useRelationshipPickerNestedCreate`**: sibling
 `OrganizationCreateModal` / `LocationCreateModal` / standalone `QuickNpcCreateModal`, optional
 **`onCreated({ contentType, id })`** after persistence, then `resolvingCreatedTarget` refresh +
-full eligibility revalidation before select. Footer submit is the only relationship persist boundary
-— nested create must not POST the relationship.
+full eligibility revalidation before select. Nested modals stay open until handoff resolves
+successfully; handoff failure rejects `onCreated`, surfaces status-specific feedback, and leaves
+the create modal open — the entity already exists, so callers must not retry persistence.
+Footer submit is the only relationship persist boundary — nested create must not POST the relationship.
 
 Nested create supplies one relationship endpoint. The originating workflow owns that
 relationship. Reverse org-location composition authoring is suppressed in nested
@@ -360,6 +362,11 @@ wired only at the drawer/hook auxiliary-action layer (`buildContextReady` / `bui
 Wired Add drawers: organization forward location pickers, location inverse organization pickers, and
 People drawer organization and character segments. Out of scope: changeKind, changeTarget,
 replaceOrganization, org member picker.
+
+**Inverse drawer scope:** inverse drawers launch organization and character nested create only —
+never location create — so they intentionally omit `nestedCreateContext`. Forward organization →
+location pickers pass `nestedCreateContext` for org-composition suppression via
+`resolveLocationCreateAuthoringCapabilities`.
 
 **Loading vs blocking:** `nestedCreateBusy` means interaction is blocked, not that the catalog is
 loading. `CatalogPickerSheet.loading` must reflect only genuine catalog/query pending — never

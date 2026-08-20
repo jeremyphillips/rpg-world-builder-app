@@ -95,10 +95,14 @@ export {
 export { useCreateNpc } from './npc/hooks/use-create-npc'
 export { useNpcs, npcsQueryKey } from './npc/hooks/use-npcs'
 export {
-  QuickNpcCreateModal,
-  QUICK_NPC_CREATE_TITLE,
+  mapContentCreateContextToQuickNpcCreateContext,
+  QUICK_NPC_CREATE_SUBMIT_LABEL,
   type QuickNpcCreateFormOrganization,
   type QuickNpcCreateContext,
+} from './npc/lib/quick-npc-create-context'
+export {
+  QuickNpcCreateModal,
+  QUICK_NPC_CREATE_TITLE,
 } from './npc/components/quick-npc-create-modal.client'
 export {
   QuickNpcAuthoringForm,

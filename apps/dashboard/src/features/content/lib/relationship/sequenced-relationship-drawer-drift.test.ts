@@ -108,4 +108,20 @@ describe('sequenced relationship drawer drift', () => {
     expect(source).toContain('nestedCreateContext')
     expect(source).not.toMatch(/hideOrganizations|suppressOrganizations|hideConnectionsTab/)
   })
+
+  // Policy: inverse drawers never launch location nested create — nestedCreateContext omitted by design.
+  // See apps/dashboard/docs/cross-content-relationship-ui.md §Relationship picker nested create.
+  it('inverse organization drawer omits nestedCreateContext because location create is out of scope', () => {
+    const source = readFileSync(
+      fileURLToPath(
+        new URL(
+          '../../locations/components/location-inverse-organization-connection-link-drawer.client.tsx',
+          import.meta.url,
+        ),
+      ),
+      'utf8',
+    )
+
+    expect(source).not.toContain('nestedCreateContext')
+  })
 })

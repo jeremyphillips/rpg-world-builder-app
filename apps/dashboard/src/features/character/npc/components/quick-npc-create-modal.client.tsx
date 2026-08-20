@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import type { CharacterBuildContext } from '@rpg/contracts'
-import { usePendingAwareOpenChange } from '@rpg/ui'
+import { toast, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
 import {
@@ -13,6 +13,7 @@ import {
   type SetupSummaryEditTarget,
 } from '@/lib/create-setup'
 import { CreateModalShell, type OnContentCreated } from '@/lib/create-flow'
+import { formatNestedCreateHandoffFailure, invokeOnContentCreated } from '@/lib/create-flow'
 
 import {
   createQuickNpcSetupDefaultValues,
@@ -266,8 +267,14 @@ function QuickNpcCreateModalSession({
   }, [handleSetupSummaryEdit])
 
   const handleAuthoringCreated = React.useCallback(
-    (result: { contentType: 'npcs'; id: string }) => {
-      onCreated?.(result)
+    async (result: { contentType: 'npcs'; id: string }) => {
+      try {
+        await invokeOnContentCreated(onCreated, result)
+      } catch (error) {
+        toast.warning(formatNestedCreateHandoffFailure(error))
+        return
+      }
+
       trustedClose()
     },
     [onCreated, trustedClose],

@@ -6,6 +6,7 @@ import {
 } from '@rpg/contracts'
 
 import { formatContentCreateActionLabel } from '../content-type-labels'
+import { QUICK_NPC_CREATE_SUBMIT_LABEL } from '@/features/character'
 import {
   canonicalFieldsForAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
@@ -16,8 +17,6 @@ import {
   locationMatchesTargetBrowseScope,
   type OrganizationLocationTargetBrowseScope,
 } from '../../organizations/lib/organization-location-target-browse-scope'
-
-export const RELATIONSHIP_PICKER_CREATE_NPC_LABEL = 'Create NPC' as const
 
 export type RelationshipPickerCreateableCharacterType = 'npc'
 
@@ -137,7 +136,7 @@ function resolveCharacterCreateIntents(
     {
       target: 'character',
       id: 'npc',
-      label: RELATIONSHIP_PICKER_CREATE_NPC_LABEL,
+      label: QUICK_NPC_CREATE_SUBMIT_LABEL,
     },
   ]
 }

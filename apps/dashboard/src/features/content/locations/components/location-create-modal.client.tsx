@@ -77,7 +77,7 @@ export type LocationCreateModalProps = {
   createContext?: ContentCreateContext
   /** Optional preloaded context for embedded/test surfaces; normal app usage resolves it here. */
   formOptionsCtx?: ContentFormCtx
-  /** Called after persistence succeeds; modal closes without waiting for picker handoff. */
+  /** Called after persistence and caller handoff succeed. */
   onCreated?: OnContentCreated
 }
 

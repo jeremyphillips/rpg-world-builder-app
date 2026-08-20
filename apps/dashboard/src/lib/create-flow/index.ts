@@ -4,7 +4,16 @@ export {
   type ContentCreateContext,
   type ContentCreateRelationshipVocabulary,
 } from './content-create-context'
-export { type CreatedContentResult, type OnContentCreated } from './created-content-result.types'
+export {
+  type CreatedContentResult,
+  type OnContentCreated,
+  invokeOnContentCreated,
+} from './created-content-result.types'
+export {
+  NestedCreateHandoffError,
+  formatNestedCreateHandoffFailure,
+  NESTED_CREATE_HANDOFF_UNEXPECTED_ERROR_MESSAGE,
+} from './nested-create-handoff.errors'
 export { resolveActiveCreateTabId } from './resolve-active-create-tab'
 export {
   CreateModalShell,

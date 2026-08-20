@@ -22,7 +22,13 @@ vi.mock('@/features/content/organizations/components/organization-create-modal.c
     open ? (
       <button
         type="button"
-        onClick={() => onCreated?.({ contentType: 'organizations', id: 'org-new' })}
+        onClick={async () => {
+          try {
+            await onCreated?.({ contentType: 'organizations', id: 'org-new' })
+          } catch {
+            // Handoff failures reject onCreated — callers catch at the persist boundary.
+          }
+        }}
       >
         Submit mock organization
       </button>
@@ -59,7 +65,7 @@ describe('useRelationshipPickerNestedCreate', () => {
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     })
     resolveHandoffMock.mockReset()
-    resolveHandoffMock.mockResolvedValue({ organizationId: 'org-new' })
+    resolveHandoffMock.mockResolvedValue({ status: 'selected', organizationId: 'org-new' })
   })
 
   function wrapper({ children }: { children: ReactNode }) {
@@ -183,6 +189,56 @@ describe('useRelationshipPickerNestedCreate', () => {
     expect(screen.getByTestId('busy')).toHaveTextContent('false')
     expect(onSelectCreatedOrganization).toHaveBeenCalledWith('org-new')
     expect(resolveHandoffMock).toHaveBeenCalled()
+    expect(
+      screen.queryByRole('button', { name: 'Submit mock organization' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('keeps nested create open and rejects when handoff is ineligible', async () => {
+    resolveHandoffMock.mockResolvedValue({ status: 'ineligible' })
+    const user = userEvent.setup()
+    const onSelectCreatedOrganization = vi.fn()
+
+    function Harness() {
+      const nestedCreate = useRelationshipPickerNestedCreate({
+        campaignId: STORY_CAMPAIGN_ID,
+        createIntents: resolveRelationshipPickerCreateIntents({ target: 'organization' }),
+        onSelectCreatedOrganization,
+      })
+      const auxiliaryAction = nestedCreate.auxiliaryAction
+
+      return (
+        <>
+          {nestedCreate.modals}
+          <button
+            type="button"
+            onClick={() => {
+              if (auxiliaryAction?.state === 'action') {
+                auxiliaryAction.onAction()
+              }
+            }}
+          >
+            Launch create organization
+          </button>
+          <div data-testid="phase">{nestedCreate.phase}</div>
+        </>
+      )
+    }
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Harness />
+      </QueryClientProvider>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Launch create organization' }))
+    await user.click(screen.getByRole('button', { name: 'Submit mock organization' }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('phase')).toHaveTextContent('creating')
+    })
+    expect(onSelectCreatedOrganization).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: 'Submit mock organization' })).toBeInTheDocument()
   })
 
   it('snapshots nested create context when launching location create', async () => {

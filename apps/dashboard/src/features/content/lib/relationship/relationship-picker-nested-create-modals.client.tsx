@@ -2,18 +2,15 @@
 
 import type { CharacterBuildContext } from '@rpg/contracts'
 
-import { QuickNpcCreateModal } from '@/features/character'
+import {
+  mapContentCreateContextToQuickNpcCreateContext,
+  QuickNpcCreateModal,
+} from '@/features/character'
 
-import type { LocationAuthoringType } from '../../locations/lib/location-authoring-type'
 import { LocationCreateModal } from '../../locations/components/location-create-modal.client'
 import { OrganizationCreateModal } from '../../organizations/components/organization-create-modal.client'
-import type { OnContentCreated } from '@/lib/create-flow'
-import type { ContentCreateContext } from '@/lib/create-flow'
-
-type ActiveNestedCreateIntent =
-  | { target: 'organization' }
-  | { target: 'location'; authoringType: LocationAuthoringType }
-  | { target: 'character' }
+import type { OnContentCreated, ContentCreateContext } from '@/lib/create-flow'
+import type { ActiveNestedCreateIntent } from './relationship-picker-nested-create.types'
 
 export type RelationshipPickerNestedCreateModalsProps = {
   campaignId: string
@@ -64,7 +61,7 @@ export function RelationshipPickerNestedCreateModals({
           onOpenChange={onCreateModalOpenChange}
           campaignId={campaignId}
           buildContext={npcBuildContext}
-          context={{ kind: 'standalone' }}
+          context={mapContentCreateContextToQuickNpcCreateContext(createContext)}
           onCancel={onNpcCancel}
           onCreated={onCreated}
         />
