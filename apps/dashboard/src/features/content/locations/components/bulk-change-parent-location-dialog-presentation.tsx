@@ -8,8 +8,8 @@ import {
   formatBulkChangeParentResolutionLegend,
   formatBulkChangeParentResolveApplyLabel,
   formatBulkChangeParentResolveTally,
-} from './bulk-change-parent-labels'
-import type { BulkChangeParentPreview } from './resolve-bulk-change-parent-preview'
+} from '../lib/bulk/bulk-change-parent-labels'
+import type { BulkChangeParentPreview } from '../lib/bulk/resolve-bulk-change-parent-preview'
 
 type UnchangedContext = Pick<
   BulkChangeParentPreview,
