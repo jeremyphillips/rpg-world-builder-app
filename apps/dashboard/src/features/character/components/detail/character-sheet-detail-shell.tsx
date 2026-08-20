@@ -4,7 +4,7 @@ import { Heading } from '@rpg/ui'
 import { PageLoadState, type PageLoadStateProps } from '@/components/layout/page-load-state'
 import { WidePage } from '@/components/layout/wide-page'
 
-import { CHARACTER_SHEET_ERROR_LABELS } from '../../lib/character-sheet-error-labels'
+import { CHARACTER_SHEET_ERROR_LABELS } from '../../lib/detail/character-sheet-error-labels'
 
 export type CharacterSheetDetailShellProps = Pick<
   PageLoadStateProps,

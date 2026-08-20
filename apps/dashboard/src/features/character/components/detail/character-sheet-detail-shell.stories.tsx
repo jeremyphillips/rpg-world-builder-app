@@ -3,7 +3,7 @@ import { expect, within } from 'storybook/test'
 
 import { ROUTES } from '@/app/routes'
 
-import { CHARACTER_SHEET_ERROR_LABELS } from '../../lib/character-sheet-error-labels'
+import { CHARACTER_SHEET_ERROR_LABELS } from '../../lib/detail/character-sheet-error-labels'
 import { CharacterSheetDetailShell } from './character-sheet-detail-shell'
 
 const meta = {
