@@ -3,7 +3,7 @@
 import type {
   LocationCreateIntent,
   LocationCreateSetupResult,
-} from '../lib/location-create-session'
+} from '../lib/create/session/location-create-session'
 import { LocationCreateSetupSession } from './location-create-setup-session.client'
 
 export type LocationRegionCreateSetupProps = {

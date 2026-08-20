@@ -7,8 +7,11 @@ import type {
   SiteType,
 } from '@rpg/contracts'
 
-import { requiresLocationCreateSetup, type LocationAuthoringType } from './location-authoring-type'
-import type { LocationFixedCreateContext } from './location-form-ctx'
+import {
+  requiresLocationCreateSetup,
+  type LocationAuthoringType,
+} from '../../location-authoring-type'
+import type { LocationFixedCreateContext } from '../../location-form-ctx'
 
 export type LocationCreateIntent = {
   authoringType: LocationAuthoringType

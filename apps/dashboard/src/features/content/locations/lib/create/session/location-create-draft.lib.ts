@@ -1,7 +1,7 @@
-import type { LocationFixedCreateContext } from './location-form-ctx'
-import type { LocationFormValues } from './location-form-fields'
-import { locationFormDef } from './location-form-def'
-import { fixedCreateToInitialValues } from './location-create-shortcuts'
+import type { LocationFixedCreateContext } from '../../location-form-ctx'
+import type { LocationFormValues } from '../../location-form-fields'
+import { locationFormDef } from '../../location-form-def'
+import { fixedCreateToInitialValues } from '../location-create-shortcuts'
 
 /** Stable signature for fixed-create form composition (fields + settlement districts). */
 export function resolveLocationFixedCreateCompositionKey(

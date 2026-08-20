@@ -19,7 +19,7 @@ import type { DrawerContextEntityPresentation } from '../../lib/relationship/dra
 
 import type { LocationAuthoringType } from './location-authoring-type'
 import { resolveRegionRelationshipLabelPlural } from './location-contextual-terminology.lib'
-import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
+import { childAuthoringTypesForParentKind } from './create/location-create-shortcuts'
 import {
   resolveLocationParentReplacementAction,
   type LocationParentReplacementAction,

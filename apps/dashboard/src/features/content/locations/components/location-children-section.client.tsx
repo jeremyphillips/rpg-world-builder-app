@@ -41,11 +41,11 @@ import {
   LOCATION_PARENT_MOVE_ACTION_LABELS,
   LOCATION_PARENT_REPLACEMENT_DRAWER,
 } from '../lib/hierarchy/location-parent-replacement-surface-copy'
-import type { LocationCreateIntent } from '../lib/location-create-session'
+import type { LocationCreateIntent } from '../lib/create/session/location-create-session'
 import {
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
-} from '../lib/location-create-shortcuts'
+} from '../lib/create/location-create-shortcuts'
 import { resolveStructureChildAuthoringOptions } from '../lib/location-structure.lib'
 import { LocationAddChildMenu } from './location-add-child-menu.client'
 import { LocationCreateModal } from './location-create-modal.client'

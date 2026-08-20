@@ -12,7 +12,10 @@ import {
   type CreateSetupValueChangeEvent,
 } from '@/lib/create-setup'
 
-import type { LocationCreateIntent, LocationCreateSetupResult } from './location-create-session'
+import type {
+  LocationCreateIntent,
+  LocationCreateSetupResult,
+} from '../session/location-create-session'
 import type { LocationSetupSummaryEntry } from './location-setup-summary-rows.lib'
 import {
   BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,

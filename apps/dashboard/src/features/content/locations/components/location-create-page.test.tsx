@@ -9,8 +9,8 @@ import { makeTestQueryClient } from '@/test/render'
 import {
   LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM,
   LOCATION_CREATE_TYPE_SEARCH_PARAM,
-} from '../lib/location-create-shortcuts'
-import { SITE_CREATE_SETUP_PROMPT } from '../lib/location-site-create-setup.lib'
+} from '../lib/create/location-create-shortcuts'
+import { SITE_CREATE_SETUP_PROMPT } from '../lib/create/setup/location-site-create-setup.lib'
 import { LocationCreatePage } from './location-create-page.client'
 
 vi.mock('@/features/campaign', () => ({

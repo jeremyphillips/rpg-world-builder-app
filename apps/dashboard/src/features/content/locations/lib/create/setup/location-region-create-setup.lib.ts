@@ -10,8 +10,8 @@ import {
 } from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
-import { resolveRegionRelationshipLabel } from './location-contextual-terminology.lib'
-import type { LocationCreateIntent } from './location-create-session'
+import { resolveRegionRelationshipLabel } from '../../location-contextual-terminology.lib'
+import type { LocationCreateIntent } from '../session/location-create-session'
 
 export const REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL = 'Classification' as const
 

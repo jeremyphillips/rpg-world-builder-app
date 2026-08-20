@@ -9,7 +9,7 @@ import {
   SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
 } from './location-form-fields'
 import type { LocationFormCtx } from './location-form-ctx'
-import { resolveSettlementStructureAuthoringGuidance } from './location-settlement-create-composition.lib'
+import { resolveSettlementStructureAuthoringGuidance } from './create/composition/location-settlement-create-composition.lib'
 
 function collectFieldNames(items: FormItem[]): string[] {
   const names: string[] = []

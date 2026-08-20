@@ -33,7 +33,7 @@ import {
   parentLocationFieldVisibility,
 } from './hierarchy/location-parent-picker'
 import { LocationSettlementStartingDistrictsSlot } from '../components/location-settlement-starting-districts-slot.client'
-import type { SettlementStructureAuthoringGuidance } from './location-settlement-create-composition.lib'
+import type { SettlementStructureAuthoringGuidance } from './create/composition/location-settlement-create-composition.lib'
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 

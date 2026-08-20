@@ -5,11 +5,11 @@ import {
   type SettlementType,
 } from '@rpg/contracts'
 
-import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
-import { createContent } from '../../lib/list/content-client'
+import { createWithDeferredCampaignAccess } from '../../../../lib/campaign-access/create-with-deferred-campaign-access'
+import { createContent } from '../../../../lib/list/content-client'
 
-import { buildLocationCreateInput } from './location-form-values'
-import type { LocationFormValues } from './location-form-fields'
+import { buildLocationCreateInput } from '../../location-form-values'
+import type { LocationFormValues } from '../../location-form-fields'
 
 export type SettlementDistrictDraft = {
   id: string

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { SETTLEMENT_CREATE_SETUP_HEADLINE } from '../lib/location-settlement-create-setup.lib'
+import { SETTLEMENT_CREATE_SETUP_HEADLINE } from '../lib/create/setup/location-settlement-create-setup.lib'
 import { LocationCreateSetupHost } from './location-create-setup-host.client'
 
 describe('LocationCreateSetupHost', () => {

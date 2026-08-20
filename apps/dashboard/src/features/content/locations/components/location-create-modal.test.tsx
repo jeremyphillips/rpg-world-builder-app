@@ -39,17 +39,17 @@ import {
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
 } from '../lib/building-organizations/building-organizations-create-tab.lib'
-import { BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL } from '../lib/location-building-create-setup.lib'
-import type { LocationCreateIntent } from '../lib/location-create-session'
-import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
+import { BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL } from '../lib/create/setup/location-building-create-setup.lib'
+import type { LocationCreateIntent } from '../lib/create/session/location-create-session'
+import { createSettlementWithStartingDistricts } from '../lib/create/composition/location-settlement-create-composition.lib'
 import {
   completeBuildingCreateComposition,
   applyDeferredBuildingCampaignAccess,
-} from '../lib/location-building-create-composition.lib'
+} from '../lib/create/composition/location-building-create-composition.lib'
 import {
   SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
   SETTLEMENT_CREATE_SETUP_PROMPT,
-} from '../lib/location-settlement-create-setup.lib'
+} from '../lib/create/setup/location-settlement-create-setup.lib'
 import { LocationCreateModal } from './location-create-modal.client'
 
 const organizationCatalog = vi.hoisted(() => [
@@ -105,26 +105,32 @@ vi.mock('../../lib/list/use-content-mutations', async (importOriginal) => {
   }
 })
 
-vi.mock('../lib/location-settlement-create-composition.lib', async (importOriginal) => {
-  const actual = await importOriginal<Record<string, unknown>>()
-  return {
-    ...actual,
-    createSettlementWithStartingDistricts: vi.fn(),
-  }
-})
+vi.mock(
+  '../lib/create/composition/location-settlement-create-composition.lib',
+  async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>()
+    return {
+      ...actual,
+      createSettlementWithStartingDistricts: vi.fn(),
+    }
+  },
+)
 
-vi.mock('../lib/location-building-create-composition.lib', async (importOriginal) => {
-  const actual = await importOriginal<Record<string, unknown>>()
-  return {
-    ...actual,
-    completeBuildingCreateComposition: vi.fn(async () => ({
-      buildingId: 'building-1',
-      toast: { kind: 'success' as const },
-    })),
-    invalidateBuildingCreateCompositionQueries: vi.fn(),
-    applyDeferredBuildingCampaignAccess: vi.fn(async () => false),
-  }
-})
+vi.mock(
+  '../lib/create/composition/location-building-create-composition.lib',
+  async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>()
+    return {
+      ...actual,
+      completeBuildingCreateComposition: vi.fn(async () => ({
+        buildingId: 'building-1',
+        toast: { kind: 'success' as const },
+      })),
+      invalidateBuildingCreateCompositionQueries: vi.fn(),
+      applyDeferredBuildingCampaignAccess: vi.fn(async () => false),
+    }
+  },
+)
 
 vi.mock('../../organizations', () => ({
   useOrganizations: () => ({ data: organizationCatalog, isPending: false, isError: false }),
@@ -181,7 +187,7 @@ vi.mock('../../lib/campaign-access/campaign-access-section.client', () => ({
   ),
 }))
 
-vi.mock('../lib/location-create-shortcuts', async (importOriginal) => {
+vi.mock('../lib/create/location-create-shortcuts', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   const buildLocationCreateInitialValues = actual.buildLocationCreateInitialValues as (
     ...args: unknown[]

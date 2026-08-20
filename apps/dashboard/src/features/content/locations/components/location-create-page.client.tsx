@@ -14,9 +14,9 @@ import {
   buildLocationFixedCreateHref,
   parseLocationCreateSessionFromSearchParams,
   parseLocationCreateSoftParent,
-} from '../lib/location-create-shortcuts'
-import { completeLocationCreateSetup } from '../lib/location-create-session'
-import { resolveLocationCreatePageModel } from '../lib/location-create-page.lib'
+} from '../lib/create/location-create-shortcuts'
+import { completeLocationCreateSetup } from '../lib/create/session/location-create-session'
+import { resolveLocationCreatePageModel } from '../lib/create/session/location-create-page.lib'
 import type { LocationFormCtx } from '../lib/location-form-ctx'
 import type { LocationFormValues } from '../lib/location-form-fields'
 import { applyLocationFixedCreateContext } from '../lib/location-form-values'

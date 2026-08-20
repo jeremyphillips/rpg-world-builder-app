@@ -6,9 +6,9 @@ import type { RadioCardOption } from '@rpg/ui'
 
 import { CreateSetupShell, type CreateSetupValueChangeEvent } from '@/lib/create-setup'
 
-import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
-import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
-import type { LocationCreateSetupChoiceSet } from '../lib/location-create-setup.lib'
+import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/create/setup/location-create-setup-chrome.lib'
+import { buildLocationCreateSetupSets } from '../lib/create/setup/location-create-setup.lib'
+import type { LocationCreateSetupChoiceSet } from '../lib/create/setup/location-create-setup.lib'
 
 const SITE_OPTIONS: RadioCardOption[] = [
   {

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 
-import { buildLocationFixedCreateHref } from '../lib/location-create-shortcuts'
+import { buildLocationFixedCreateHref } from '../lib/create/location-create-shortcuts'
 import type { LocationAuthoringType } from '../lib/location-authoring-type'
 
 export function LocationCreateAuthoringTypeWatcher({

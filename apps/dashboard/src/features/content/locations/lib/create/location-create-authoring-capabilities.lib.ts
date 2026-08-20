@@ -1,6 +1,6 @@
 import type { ContentCreateContext } from '@/lib/create-flow/content-create-context'
 
-import type { LocationAuthoringType } from './location-authoring-type'
+import type { LocationAuthoringType } from '../location-authoring-type'
 
 export const LOCATION_CREATE_AUTHORING_TAB_IDS = ['details', 'organizations'] as const
 

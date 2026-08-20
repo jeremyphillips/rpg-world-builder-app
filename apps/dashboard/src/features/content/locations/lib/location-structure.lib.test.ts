@@ -8,7 +8,7 @@ import {
   resolveLocationStructureProfile,
   resolveStructureChildAuthoringOptions,
 } from './location-structure.lib'
-import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
+import { childAuthoringTypesForParentKind } from './create/location-create-shortcuts'
 import { buildLocationDetailViewModel } from './location-display'
 
 describe('resolveLocationStructureProfile', () => {

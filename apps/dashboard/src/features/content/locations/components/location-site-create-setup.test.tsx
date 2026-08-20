@@ -2,11 +2,11 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
+import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/create/setup/location-create-setup-chrome.lib'
 import {
   SITE_CREATE_SETUP_HEADLINE,
   SITE_CREATE_SETUP_PROMPT,
-} from '../lib/location-site-create-setup.lib'
+} from '../lib/create/setup/location-site-create-setup.lib'
 import { LocationSiteCreateSetup } from './location-site-create-setup.client'
 
 describe('LocationSiteCreateSetup', () => {

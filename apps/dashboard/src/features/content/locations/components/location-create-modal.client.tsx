@@ -31,9 +31,9 @@ import {
   completeLocationCreateSetup,
   resolveLocationCreateSession,
   type LocationCreateIntent,
-} from '../lib/location-create-session'
+} from '../lib/create/session/location-create-session'
 import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
-import { formatLocationFixedCreateHeading } from '../lib/location-create-shortcuts'
+import { formatLocationFixedCreateHeading } from '../lib/create/location-create-shortcuts'
 import {
   applyLocationCreateModalSetupValueChange,
   EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
@@ -41,19 +41,19 @@ import {
   isLocationCreateModalSetupComplete,
   type LocationCreateModalSetupModel,
   type LocationCreateModalSetupValues,
-} from '../lib/location-create-modal-setup.lib'
-import { type BuildingCreateSetupProjection } from '../lib/location-building-create-setup.lib'
+} from '../lib/create/setup/location-create-modal-setup.lib'
+import { type BuildingCreateSetupProjection } from '../lib/create/setup/location-building-create-setup.lib'
 import {
   EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN,
   resolveBuildingCreateTransactionSummary,
   type BuildingOrganizationDraftPlan,
 } from '../lib/building-organizations/building-organization-create-drafts'
-import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
-import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
+import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/create/setup/location-create-setup-chrome.lib'
+import { buildLocationCreateSetupSets } from '../lib/create/setup/location-create-setup.lib'
 import {
   resolveLocationSetupSummaryRows,
   type LocationSetupSummaryEntry,
-} from '../lib/location-setup-summary-rows.lib'
+} from '../lib/create/setup/location-setup-summary-rows.lib'
 import {
   LocationCreateModalSetupPanel,
   useLocationCreateModalSetupSequence,
@@ -61,7 +61,7 @@ import {
 import {
   resolveLocationCreateAuthoringCapabilities,
   type LocationCreateAuthoringTabId,
-} from '../lib/location-create-authoring-capabilities.lib'
+} from '../lib/create/location-create-authoring-capabilities.lib'
 import { LocationCreateForm } from './location-create-form.client'
 import {
   BuildingOrganizationsCreateTab,

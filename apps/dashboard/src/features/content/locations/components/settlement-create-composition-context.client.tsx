@@ -9,7 +9,7 @@ import {
   removeSettlementDistrictDraft,
   updateSettlementDistrictDraft,
   type SettlementCreateComposition,
-} from '../lib/location-settlement-create-composition.lib'
+} from '../lib/create/composition/location-settlement-create-composition.lib'
 
 type SettlementCreateCompositionContextValue = {
   composition: SettlementCreateComposition

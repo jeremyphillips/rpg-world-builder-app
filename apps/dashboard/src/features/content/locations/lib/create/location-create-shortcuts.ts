@@ -27,15 +27,15 @@ import {
   UNCLASSIFIED_STRUCTURE_LABEL,
   requiresLocationCreateSetup,
   type LocationAuthoringType,
-} from './location-authoring-type'
-import { resolveRegionRelationshipLabel } from './location-contextual-terminology.lib'
+} from '../location-authoring-type'
+import { resolveRegionRelationshipLabel } from '../location-contextual-terminology.lib'
 import {
   completeLocationCreateSetup,
   fixedCreateFromIntent,
   type LocationCreateIntent,
   type LocationCreateSetupResult,
-} from './location-create-session'
-import type { LocationFixedCreateContext } from './location-form-ctx'
+} from './session/location-create-session'
+import type { LocationFixedCreateContext } from '../location-form-ctx'
 
 export const LOCATION_CREATE_TYPE_SEARCH_PARAM = 'type'
 export const LOCATION_CREATE_PARENT_SEARCH_PARAM = 'parent'

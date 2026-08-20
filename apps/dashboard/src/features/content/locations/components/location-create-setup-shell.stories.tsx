@@ -5,11 +5,11 @@ import type { RadioCardOption } from '@rpg/ui'
 
 import { CreateSetupShell } from '@/lib/create-setup'
 
-import { resolveLocationCreateSetupDefaultSubhead } from '../lib/location-create-setup-chrome.lib'
+import { resolveLocationCreateSetupDefaultSubhead } from '../lib/create/setup/location-create-setup-chrome.lib'
 import {
   buildLocationCreateSetupSets,
   type LocationCreateSetupChoiceSet,
-} from '../lib/location-create-setup.lib'
+} from '../lib/create/setup/location-create-setup.lib'
 
 const SITE_OPTIONS: RadioCardOption[] = [
   {

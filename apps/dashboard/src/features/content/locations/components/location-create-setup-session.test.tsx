@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { SETTLEMENT_CREATE_SETUP_PROMPT } from '../lib/location-settlement-create-setup.lib'
+import { SETTLEMENT_CREATE_SETUP_PROMPT } from '../lib/create/setup/location-settlement-create-setup.lib'
 import { LocationCreateSetupSession } from './location-create-setup-session.client'
 
 describe('LocationCreateSetupSession', () => {

@@ -6,7 +6,7 @@ import {
   completeLocationCreateSetup,
   resolveLocationCreateSession,
   type LocationCreateIntent,
-} from '../lib/location-create-session'
+} from '../lib/create/session/location-create-session'
 import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
 import { LocationCreateSetupHost } from './location-create-setup-host.client'
 

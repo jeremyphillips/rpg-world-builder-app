@@ -6,7 +6,7 @@ import { useFormContext } from 'react-hook-form'
 import {
   mergeLocationCreateDraftForFixedCreate,
   resolveLocationFixedCreateCompositionKey,
-} from '../lib/location-create-draft.lib'
+} from '../lib/create/session/location-create-draft.lib'
 import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
 import type { LocationFormValues } from '../lib/location-form-fields'
 

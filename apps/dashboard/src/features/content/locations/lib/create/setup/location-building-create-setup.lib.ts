@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
-import type { LocationFormValues } from './location-form-fields'
+import type { LocationFormValues } from '../../location-form-fields'
 import type { LocationSetupSummaryEntry } from './location-setup-summary-rows.lib'
 
 export const BUILDING_CREATE_SETUP_HEADLINE = 'Create building' as const

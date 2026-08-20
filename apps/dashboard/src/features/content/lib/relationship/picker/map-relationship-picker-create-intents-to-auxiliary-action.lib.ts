@@ -1,7 +1,7 @@
 import type { CatalogPickerAuxiliaryAction } from '@rpg/ui'
 
 import type { LocationAuthoringType } from '../../../locations/lib/location-authoring-type'
-import { getLocationAuthoringTypeLabel } from '../../../locations/lib/location-create-shortcuts'
+import { getLocationAuthoringTypeLabel } from '../../../locations/lib/create/location-create-shortcuts'
 import {
   RELATIONSHIP_PICKER_CREATE_MENU_LABEL,
   type RelationshipPickerCreateIntent,

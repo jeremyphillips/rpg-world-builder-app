@@ -14,7 +14,7 @@ import { Plus } from 'lucide-react'
 import {
   childAuthoringTypesForParentKind,
   getLocationAuthoringTypeLabel,
-} from '../lib/location-create-shortcuts'
+} from '../lib/create/location-create-shortcuts'
 import type { LocationAuthoringType } from '../lib/location-authoring-type'
 
 type LocationAddChildMenuTriggerProps =

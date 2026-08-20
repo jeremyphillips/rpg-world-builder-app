@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { HARBORFORD, DOCK_WARD, ALDERMERE } from '../fixtures'
+import { HARBORFORD, DOCK_WARD, ALDERMERE } from '../../../fixtures'
 import {
   completeLocationCreateSetup,
   fixedCreateFromIntent,

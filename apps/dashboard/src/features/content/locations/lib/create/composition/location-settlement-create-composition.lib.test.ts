@@ -13,16 +13,16 @@ import {
   validateSettlementCreateComposition,
 } from './location-settlement-create-composition.lib'
 
-vi.mock('../../lib/list/content-client', () => ({
+vi.mock('../../../../lib/list/content-client', () => ({
   createContent: vi.fn(),
 }))
 
-vi.mock('../../lib/campaign-access/create-with-deferred-campaign-access', () => ({
+vi.mock('../../../../lib/campaign-access/create-with-deferred-campaign-access', () => ({
   createWithDeferredCampaignAccess: vi.fn(),
 }))
 
-import { createContent } from '../../lib/list/content-client'
-import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
+import { createContent } from '../../../../lib/list/content-client'
+import { createWithDeferredCampaignAccess } from '../../../../lib/campaign-access/create-with-deferred-campaign-access'
 
 describe('settlement create composition state', () => {
   it('tracks dirty state against the empty baseline', () => {

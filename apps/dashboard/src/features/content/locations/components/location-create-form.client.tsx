@@ -34,8 +34,8 @@ import {
 import { ContentFormHeader } from '../../lib/forms/shells/content-form-shell-layout.lib'
 import { useContentFormSubmit } from '../../lib/forms/shells/content-form-submit'
 import { resolveContentFormNavigationFields } from '../../lib/forms/shells/content-form-host-projection'
-import { resolveBuildingCreateViewForPath } from '../lib/location-building-create-invalid-submit.lib'
-import { fixedCreateToInitialValues } from '../lib/location-create-shortcuts'
+import { resolveBuildingCreateViewForPath } from '../lib/create/setup/location-building-create-invalid-submit.lib'
+import { fixedCreateToInitialValues } from '../lib/create/location-create-shortcuts'
 import '../lib/location-form-def'
 import { locationFormDef } from '../lib/location-form-def'
 import type { LocationFormCtx } from '../lib/location-form-ctx'
@@ -53,7 +53,7 @@ import {
   buildBuildingClassificationFromCreateSetup,
   BUILDING_CREATE_SETUP_HEADLINE,
   type BuildingCreateSetupProjection,
-} from '../lib/location-building-create-setup.lib'
+} from '../lib/create/setup/location-building-create-setup.lib'
 import {
   assertClientBuildingCreatePlan,
   buildBuildingCreateCompositionRequest,
@@ -61,7 +61,7 @@ import {
   handleBuildingCreateCompositionFailure,
   mapBuildingCreateSubmitError,
   validateBuildingCreateOrganizationsPanel,
-} from '../lib/location-building-create-composition.lib'
+} from '../lib/create/composition/location-building-create-composition.lib'
 import { EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN } from '../lib/building-organizations/building-organization-create-drafts'
 import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab.client'
 import {
@@ -69,7 +69,7 @@ import {
   resolveSettlementCreateCompletionToast,
   resolveSettlementStructureAuthoringGuidance,
   validateSettlementCreateComposition,
-} from '../lib/location-settlement-create-composition.lib'
+} from '../lib/create/composition/location-settlement-create-composition.lib'
 import { LocationCreateDraftPrune } from './location-create-draft-prune.client'
 import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-fields.client'
 import {

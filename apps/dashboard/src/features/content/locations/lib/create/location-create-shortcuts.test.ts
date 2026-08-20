@@ -13,7 +13,7 @@ import {
   parseLocationCreateSessionFromSearchParams,
   parseLocationCreateSoftParent,
 } from './location-create-shortcuts'
-import { completeLocationCreateSetup } from './location-create-session'
+import { completeLocationCreateSetup } from './session/location-create-session'
 
 describe('parseLocationCreateSessionFromSearchParams', () => {
   it('returns unrestricted when type param is absent', () => {

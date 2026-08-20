@@ -22,7 +22,7 @@ import {
   buildLocationFixedCreateHref,
   getLocationAuthoringTypeLabel,
   LOCATION_CREATE_PROMOTED_AUTHORING_TYPES,
-} from '../lib/location-create-shortcuts'
+} from '../lib/create/location-create-shortcuts'
 
 export type LocationCreateActionsProps = {
   campaignId: string

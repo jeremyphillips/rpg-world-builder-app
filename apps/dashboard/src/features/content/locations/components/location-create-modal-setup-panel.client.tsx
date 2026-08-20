@@ -10,7 +10,7 @@ import {
   type CreateSetupValueChangeEvent,
 } from '@/lib/create-setup'
 
-import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
+import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/create/setup/location-create-setup-chrome.lib'
 
 export function useLocationCreateModalSetupSequence(args: {
   sets: CreateSetupSet[]

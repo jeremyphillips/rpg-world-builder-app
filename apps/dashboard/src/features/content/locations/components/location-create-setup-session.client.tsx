@@ -8,16 +8,16 @@ import { CreateSetupShell, notifyCreateSetupValueChangeCompletion } from '@/lib/
 import type {
   LocationCreateIntent,
   LocationCreateSetupResult,
-} from '../lib/location-create-session'
+} from '../lib/create/session/location-create-session'
 import {
   applyLocationCreateModalSetupValueChange,
   EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
   resolveLocationCreateModalSetupModel,
   isLocationCreateModalSetupComplete,
   type LocationCreateModalSetupValues,
-} from '../lib/location-create-modal-setup.lib'
-import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
-import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
+} from '../lib/create/setup/location-create-modal-setup.lib'
+import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/create/setup/location-create-setup-chrome.lib'
+import { buildLocationCreateSetupSets } from '../lib/create/setup/location-create-setup.lib'
 
 const LOCATION_SETUP_NAVIGATION_DECISION_ID = 'locationSetupNavigation' as const
 
