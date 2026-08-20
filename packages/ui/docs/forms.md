@@ -317,7 +317,10 @@ Array item conditionals use **relative** `dependsOn` names — see
 
 `useSubmitHandler` lives in `@rpg/ui/form` and is the shared wrapper for async submit
 callbacks. It clears stale root errors, awaits the callback (preserving RHF `isSubmitting`),
-and maps thrown errors to the `formError` string passed to `<Form>`.
+maps thrown errors to the `formError` string passed to `<Form>`, and **rethrows by default**
+so callers can gate success chrome on a rejected submit Promise. Opt into absorbed failures
+with `absorbErrors: true` only when a consumer intentionally treats failure as a resolved
+submit.
 
 ```tsx
 const { mutateAsync, isPending, isSuccess } = useCreateDomainThing()

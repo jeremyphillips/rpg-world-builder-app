@@ -23,7 +23,14 @@ export interface UseSubmitHandlerOptions<TValues extends FieldValues> {
   submit: FormSubmitHandler<TValues>
   fallbackMessage: string
   mapError?: (error: unknown) => string | undefined
-  /** Rethrow after mapping to `formError` so callers can detect failure. */
+  /**
+   * When true, swallowed submit failures resolve without rethrowing. Prefer leaving
+   * this unset so callers can gate success chrome on a rejected submit Promise.
+   */
+  absorbErrors?: boolean
+  /**
+   * @deprecated Use default rejection behavior or `absorbErrors: true` when needed.
+   */
   propagateErrors?: boolean
 }
 
@@ -36,7 +43,8 @@ export interface UseSubmitHandlerResult<TValues extends FieldValues> {
 
 /**
  * Generic form-error adapter: clears stale root errors, awaits the submit
- * callback (preserving RHF `isSubmitting`), and maps thrown errors to `formError`.
+ * callback (preserving RHF `isSubmitting`), maps thrown errors to `formError`,
+ * and rethrows by default so submit failure is not mistaken for success.
  */
 export function useSubmitHandler<TValues extends FieldValues>(
   options: UseSubmitHandlerOptions<TValues>,
@@ -62,7 +70,8 @@ export function useSubmitHandler<TValues extends FieldValues>(
       await options.submit(values, form)
     } catch (err) {
       setError(err)
-      if (options.propagateErrors) {
+      const shouldAbsorb = options.absorbErrors === true
+      if (!shouldAbsorb) {
         throw err
       }
     }

@@ -5,12 +5,23 @@ import { useLayoutEffect, useSyncExternalStore } from 'react'
 
 import { DialogPanelActionRow } from '../../components/ui/dialog-panel-action-row.client'
 import { Text } from '../../components/ui/text'
+import type { SchemaFormRequestSubmit } from '../schema-form-request-submit.types'
+
+/** Footer chrome input before the canonical `requestSubmit` reference is attached. */
+export type FormShellExternalFooterContent = {
+  formId: string
+  footer: React.ReactNode
+  formError: string | null
+  validationSummary?: React.ReactNode
+}
 
 export type FormShellFooterModel = {
   formId: string
   footer: React.ReactNode
   formError: string | null
   validationSummary?: React.ReactNode
+  /** Same function reference as `useSchemaFormSubmit().requestSubmit`. */
+  requestSubmit?: SchemaFormRequestSubmit
 }
 
 type FormShellFooterStore = {
@@ -121,6 +132,18 @@ export function useFormShellFooterFormId(): string | null {
   if (!scope) return null
 
   return model?.formId ?? null
+}
+
+/** Read the published canonical submit entry point for external overlay footers. */
+export function useFormShellFooterRequestSubmit(): SchemaFormRequestSubmit | null {
+  const scope = React.useContext(FormShellFooterScopeContext)
+  const model = useSyncExternalStore(
+    scope?.subscribe ?? noopSubscribe,
+    scope?.getSnapshot ?? noopSnapshot,
+    scope?.getSnapshot ?? noopSnapshot,
+  )
+
+  return model?.requestSubmit ?? null
 }
 
 export type FormShellFooterContentProps = {

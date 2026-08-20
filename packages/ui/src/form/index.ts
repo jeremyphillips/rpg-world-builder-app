@@ -5,6 +5,7 @@ export { Form, type FormProps } from './shells/form.client'
 export {
   useSchemaFormSubmit,
   type SchemaFormSubmitHandler,
+  type SchemaFormRequestSubmit,
 } from './shells/schema-form-shell.client'
 export {
   FormItems,
@@ -74,6 +75,8 @@ export {
   FormShellFooterPublisher,
   useFormShellFooterModel,
   useFormShellFooterFormId,
+  useFormShellFooterRequestSubmit,
+  type FormShellExternalFooterContent,
   type FormShellFooterModel,
   type FormShellFooterContentProps,
   type FormShellFooterPublisherProps,

@@ -20,14 +20,20 @@ import {
 } from '../context/form-ui.context'
 import type { FileFieldPropsMap, FormItem } from '../field-config'
 import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
+import {
+  FormShellFooterPublisher,
+  type FormShellExternalFooterContent,
+  type FormShellFooterModel,
+} from '../chrome/form-shell-footer.context'
+import type { SchemaFormRequestSubmit } from '../schema-form-request-submit.types'
 
-export type SchemaFormSubmitHandler<TFieldValues extends FieldValues> = (
-  values: TFieldValues,
-  form: UseFormReturn<TFieldValues>,
-) => void | Promise<void>
+export type {
+  SchemaFormRequestSubmit,
+  SchemaFormSubmitHandler,
+} from '../schema-form-request-submit.types'
 
 type SchemaFormSubmitContextValue<TFieldValues extends FieldValues> = {
-  requestSubmit: (handler: SchemaFormSubmitHandler<TFieldValues>, onInvalid?: () => void) => void
+  requestSubmit: SchemaFormRequestSubmit<TFieldValues>
 }
 
 const SchemaFormSubmitContext =
@@ -68,9 +74,30 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   className?: string | undefined
   /** When true, the `<form>` wraps body content only; footer publishers render outside it. */
   externalFooter?: boolean
+  /** Footer chrome published to {@link FormShellFooterSlot} when {@link externalFooter} is true. */
+  externalFooterContent?: FormShellExternalFooterContent | null
   children: React.ReactNode
-  /** Rendered outside the `<form>` when {@link externalFooter} is true. */
-  externalFooterPublisher?: React.ReactNode
+}
+
+function SchemaFormExternalFooterPublisher<TFieldValues extends FieldValues>({
+  content,
+  requestSubmit,
+}: {
+  content: FormShellExternalFooterContent
+  requestSubmit: SchemaFormRequestSubmit<TFieldValues>
+}) {
+  const model = React.useMemo(
+    (): FormShellFooterModel => ({
+      formId: content.formId,
+      footer: content.footer,
+      formError: content.formError,
+      validationSummary: content.validationSummary,
+      requestSubmit: requestSubmit as FormShellFooterModel['requestSubmit'],
+    }),
+    [content, requestSubmit],
+  )
+
+  return <FormShellFooterPublisher model={model} />
 }
 
 function SchemaFormElement<TFieldValues extends FieldValues>({
@@ -81,8 +108,8 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
   onInvalidSubmit,
   className,
   externalFooter,
+  externalFooterContent,
   children,
-  externalFooterPublisher,
 }: Pick<
   SchemaFormShellProps<TFieldValues>,
   | 'form'
@@ -92,15 +119,30 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
   | 'onInvalidSubmit'
   | 'className'
   | 'externalFooter'
+  | 'externalFooterContent'
   | 'children'
-  | 'externalFooterPublisher'
 >) {
   const ui = React.useContext(FormUiContext)
 
-  const requestSubmit = React.useCallback(
-    (handler: SchemaFormSubmitHandler<TFieldValues>, onInvalid?: () => void) => {
+  const runSubmitHandler = React.useCallback(
+    async (
+      values: TFieldValues,
+      handler: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void | Promise<void>,
+    ) => {
+      try {
+        await handler(values, form)
+      } catch {
+        // Submit adapters surface root/field errors before rejecting.
+      }
+    },
+    [form],
+  )
+
+  const requestSubmit = React.useCallback<SchemaFormRequestSubmit<TFieldValues>>(
+    (handler, onInvalid) => {
+      const resolvedHandler = handler ?? onSubmit
       void form.handleSubmit(
-        (values) => handler(values, form),
+        (values) => runSubmitHandler(values, resolvedHandler),
         (errors) => {
           onInvalid?.()
           if (onInvalidSubmit) {
@@ -111,7 +153,7 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
         },
       )()
     },
-    [fields, form, formId, onInvalidSubmit, ui],
+    [fields, form, formId, onInvalidSubmit, onSubmit, runSubmitHandler, ui],
   )
 
   const submitContext = React.useMemo(() => ({ requestSubmit }), [requestSubmit])
@@ -121,7 +163,7 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
       id={formId}
       noValidate
       onSubmit={form.handleSubmit(
-        (values) => onSubmit(values, form),
+        (values) => runSubmitHandler(values, onSubmit),
         (errors) => {
           if (onInvalidSubmit) {
             onInvalidSubmit(form, fields, formId, ui, errors)
@@ -143,7 +185,12 @@ function SchemaFormElement<TFieldValues extends FieldValues>({
       {externalFooter ? (
         <>
           {formElement}
-          {externalFooterPublisher}
+          {externalFooterContent ? (
+            <SchemaFormExternalFooterPublisher
+              content={externalFooterContent}
+              requestSubmit={requestSubmit}
+            />
+          ) : null}
         </>
       ) : (
         formElement
@@ -168,8 +215,8 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   onInvalidSubmit,
   className,
   externalFooter,
+  externalFooterContent,
   children,
-  externalFooterPublisher,
 }: SchemaFormShellProps<TFieldValues>) {
   const sectionContext = React.useMemo(
     () => ({ depth: 0, namedGroupDepth: 0, headingTier: 'section' as const, density }),
@@ -195,7 +242,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
             onInvalidSubmit={onInvalidSubmit}
             className={className}
             externalFooter={externalFooter}
-            externalFooterPublisher={externalFooterPublisher}
+            externalFooterContent={externalFooterContent}
           >
             <FormSectionContext.Provider value={sectionContext}>
               {children}

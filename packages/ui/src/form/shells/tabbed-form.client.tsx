@@ -19,10 +19,7 @@ import {
   formTabbedChromeRhythmStackClasses,
 } from '../chrome/form-chrome.variants'
 import { cn } from '../../lib/utils'
-import {
-  FormShellFooterPublisher,
-  type FormShellFooterModel,
-} from '../chrome/form-shell-footer.context'
+import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
 import {
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
@@ -100,11 +97,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   validationPresentation?: FormValidationPresentation
 }
 
-function buildExternalFooterModel(
+function buildExternalFooterContent(
   formId: string,
   formError: string | null | undefined,
   footer: React.ReactNode,
-): FormShellFooterModel | null {
+): FormShellExternalFooterContent | null {
   if (!footer && !formError) {
     return null
   }
@@ -188,9 +185,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     />
   )
 
-  const externalFooterModel = externalFooter
-    ? buildExternalFooterModel(formId, formError, resolvedFooter)
-    : null
+  const externalFooterContent = React.useMemo(
+    () => (externalFooter ? buildExternalFooterContent(formId, formError, resolvedFooter) : null),
+    [externalFooter, formError, formId, resolvedFooter],
+  )
 
   const panels = (
     <TabbedFormPanels
@@ -237,9 +235,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         onInvalidSubmit={handleInvalidSubmit}
         onSubmit={onSubmit}
         externalFooter={externalFooter}
-        externalFooterPublisher={
-          externalFooter ? <FormShellFooterPublisher model={externalFooterModel} /> : undefined
-        }
+        externalFooterContent={externalFooterContent}
         className={cn(
           externalFooter && 'flex min-h-0 flex-1 flex-col',
           resolveTabbedFormShellClassName(className, stickyChrome, externalFooter),
