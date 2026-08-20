@@ -47,7 +47,7 @@ import {
   EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN,
   resolveBuildingCreateTransactionSummary,
   type BuildingOrganizationDraftPlan,
-} from '../lib/building-organization-create-drafts'
+} from '../lib/building-organizations/building-organization-create-drafts'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../lib/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../lib/location-create-setup.lib'
 import {

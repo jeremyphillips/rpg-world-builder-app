@@ -220,7 +220,7 @@ const dashboardContentPickerPolicyGuards = {
     'src/features/**/*picker*.{ts,tsx}',
     'src/features/**/*drawer*.{ts,tsx}',
     'src/features/content/locations/lib/location-*-field-options*.ts',
-    'src/features/content/locations/lib/building-organizations-create-tab-controller.lib.ts',
+    'src/features/content/locations/lib/building-organizations/building-organizations-create-tab-controller.lib.ts',
     'src/features/content/locations/lib/hierarchy/location-parent-replacement.ts',
     'src/features/content/locations/lib/hierarchy/bulk/build-bulk-change-parent-fields.ts',
     'src/features/content/lib/relationship/location-connection/location-connection-drawer-intent.ts',

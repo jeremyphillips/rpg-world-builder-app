@@ -3,13 +3,13 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const composerPath = fileURLToPath(
-  new URL('../components/building-organizations-composer.client.tsx', import.meta.url),
+  new URL('../../components/building-organizations-composer.client.tsx', import.meta.url),
 )
 const variantsPath = fileURLToPath(
-  new URL('../components/building-organizations-create-tab.variants.ts', import.meta.url),
+  new URL('../../components/building-organizations-create-tab.variants.ts', import.meta.url),
 )
 const modalPath = fileURLToPath(
-  new URL('../components/location-create-modal.client.tsx', import.meta.url),
+  new URL('../../components/location-create-modal.client.tsx', import.meta.url),
 )
 
 describe('building organizations composer structural drift', () => {

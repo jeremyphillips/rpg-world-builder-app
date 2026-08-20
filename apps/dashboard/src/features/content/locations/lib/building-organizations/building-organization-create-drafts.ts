@@ -8,11 +8,11 @@ import {
   type OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import { buildOrganizationLocationConnectionKindOptions } from '../../lib/relationship/location-connection/location-connection-kind-options'
+import { buildOrganizationLocationConnectionKindOptions } from '../../../lib/relationship/location-connection/location-connection-kind-options'
 import {
   organizationFormSchema,
   type OrganizationFormValues,
-} from '../../lib/forms/organization-form-projection'
+} from '../../../lib/forms/organization-form-projection'
 
 export const PENDING_BUILDING_LOCATION_ID = 'pending-building' as const
 export const NEW_ORGANIZATION_SUBJECT_PREFIX = 'draft-organization:' as const

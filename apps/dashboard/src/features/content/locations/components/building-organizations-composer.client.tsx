@@ -30,8 +30,8 @@ import {
   organizationFormSchema,
 } from '../../lib/forms/organization-form-projection'
 import { resolveDiscoverableOrganizationMemberClasses } from '../../organizations/lib/organization-member-class-discoverable.lib'
-import { BUILDING_ORGANIZATION_NO_INTENT_KIND_REASON } from '../lib/building-organization-create-drafts'
-import { mapBuildingOrganizationCompositionSummaryRows } from '../lib/building-organization-composition-presentation.lib'
+import { BUILDING_ORGANIZATION_NO_INTENT_KIND_REASON } from '../lib/building-organizations/building-organization-create-drafts'
+import { mapBuildingOrganizationCompositionSummaryRows } from '../lib/building-organizations/building-organization-composition-presentation.lib'
 import {
   BUILDING_NEW_ORGANIZATION_FORM_ID,
   BUILDING_ORGANIZATIONS_BRANCH_HEADING,
@@ -48,12 +48,12 @@ import {
   BUILDING_ORGANIZATIONS_SEARCH_LABEL,
   BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER,
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
-} from '../lib/building-organizations-create-tab.lib'
+} from '../lib/building-organizations/building-organizations-create-tab.lib'
 import type { UseBuildingOrganizationsCreateTabResult } from '../hooks/use-building-organizations-create-tab.client'
 import type {
   BuildingOrganizationRelationshipDraft,
   BuildingOrganizationRelationshipKindOption,
-} from '../lib/building-organization-create-drafts'
+} from '../lib/building-organizations/building-organization-create-drafts'
 import {
   buildingOrganizationsDiscoveryBodyClasses,
   buildingOrganizationsDiscoveryControlsClasses,

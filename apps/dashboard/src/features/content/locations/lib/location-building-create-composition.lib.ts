@@ -27,7 +27,7 @@ import { locationFormDef } from './location-form-def'
 import type {
   BuildingOrganizationDraftIssue,
   BuildingOrganizationDraftPlan,
-} from './building-organization-create-drafts'
+} from './building-organizations/building-organization-create-drafts'
 
 export class BuildingCreateSubmitBlockedError extends Error {
   constructor() {

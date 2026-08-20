@@ -11,7 +11,7 @@ import {
   resolveBuildingCreateCompletionToast,
   validateBuildingCreateCompositionRequest,
 } from './location-building-create-composition.lib'
-import type { BuildingOrganizationDraftPlan } from './building-organization-create-drafts'
+import type { BuildingOrganizationDraftPlan } from './building-organizations/building-organization-create-drafts'
 
 const buildingInput = {
   slug: 'clock-tower',

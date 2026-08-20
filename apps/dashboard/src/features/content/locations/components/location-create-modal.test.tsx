@@ -38,7 +38,7 @@ import {
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
-} from '../lib/building-organizations-create-tab.lib'
+} from '../lib/building-organizations/building-organizations-create-tab.lib'
 import { BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL } from '../lib/location-building-create-setup.lib'
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'

@@ -27,8 +27,8 @@ import {
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_TAB_DESCRIPTION,
   BUILDING_ORGANIZATIONS_TAB_HEADING,
-} from '../lib/building-organizations-create-tab.lib'
-import type { BuildingOrganizationDraftPlan } from '../lib/building-organization-create-drafts'
+} from '../lib/building-organizations/building-organizations-create-tab.lib'
+import type { BuildingOrganizationDraftPlan } from '../lib/building-organizations/building-organization-create-drafts'
 
 const organizations = [
   makeOrganization({

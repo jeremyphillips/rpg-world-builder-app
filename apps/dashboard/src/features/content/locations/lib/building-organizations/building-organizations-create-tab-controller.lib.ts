@@ -6,7 +6,7 @@ import type {
   CreateWorkflowDraftPanelController,
 } from '@/lib/create-flow'
 
-import type { OrganizationFormValues } from '../../lib/forms/organization-form-projection'
+import type { OrganizationFormValues } from '../../../lib/forms/organization-form-projection'
 import {
   createBuildingOrganizationDraftId,
   upsertBuildingOrganizationRelationshipDraft,

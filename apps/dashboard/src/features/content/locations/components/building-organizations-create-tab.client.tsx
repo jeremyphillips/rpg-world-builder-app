@@ -16,8 +16,8 @@ import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import type {
   BuildingOrganizationDraftIssue,
   BuildingOrganizationDraftPlan,
-} from '../lib/building-organization-create-drafts'
-import type { BuildingOrganizationComposerMode } from '../lib/building-organizations-create-tab-controller.lib'
+} from '../lib/building-organizations/building-organization-create-drafts'
+import type { BuildingOrganizationComposerMode } from '../lib/building-organizations/building-organizations-create-tab-controller.lib'
 import {
   BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL,
   BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL,
@@ -29,7 +29,7 @@ import {
   BUILDING_ORGANIZATIONS_TAB_DESCRIPTION,
   BUILDING_ORGANIZATIONS_TAB_HEADING,
   buildBuildingOrganizationPendingEntity,
-} from '../lib/building-organizations-create-tab.lib'
+} from '../lib/building-organizations/building-organizations-create-tab.lib'
 import { useBuildingOrganizationsCreateTab } from '../hooks/use-building-organizations-create-tab.client'
 import type { BuildingOrganizationsCreateTabController } from '../hooks/use-building-organizations-create-tab.client'
 import { BuildingOrganizationComposer } from './building-organizations-composer.client'
@@ -39,7 +39,7 @@ import {
   buildingOrganizationsTabIntroClasses,
 } from './building-organizations-create-tab.variants'
 
-export type { BuildingOrganizationComposerStage } from '../lib/building-organizations-create-tab-controller.lib'
+export type { BuildingOrganizationComposerStage } from '../lib/building-organizations/building-organizations-create-tab-controller.lib'
 
 export type { BuildingOrganizationsCreateTabController } from '../hooks/use-building-organizations-create-tab.client'
 

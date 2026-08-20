@@ -62,7 +62,7 @@ import {
   mapBuildingCreateSubmitError,
   validateBuildingCreateOrganizationsPanel,
 } from '../lib/location-building-create-composition.lib'
-import { EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN } from '../lib/building-organization-create-drafts'
+import { EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN } from '../lib/building-organizations/building-organization-create-drafts'
 import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab.client'
 import {
   createSettlementWithStartingDistricts,
