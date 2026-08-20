@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 const SEQUENCED_ADD_DRAWER_FILES = [
   fileURLToPath(
     new URL(
-      '../../../organizations/components/organization-location-connection-link-drawer.client.tsx',
+      '../../../organizations/components/location-connections/organization-location-connection-link-drawer.client.tsx',
       import.meta.url,
     ),
   ),
@@ -28,7 +28,7 @@ const NESTED_CREATE_DRAWER_FILES = [
 ] as const
 
 const NESTED_CREATE_RESOLVER_IMPORT =
-  "from '../../lib/relationship/picker/relationship-picker-create-intents.lib'"
+  "from '../../../lib/relationship/picker/relationship-picker-create-intents.lib'"
 const NESTED_CREATE_ORG_RESOLVER_IMPORT =
   "from '../../lib/relationship/picker/relationship-picker-nested-create.lib'"
 const NESTED_CREATE_CHARACTER_RESOLVER_IMPORT = 'resolveRelationshipPickerCharacterCreateIntents'

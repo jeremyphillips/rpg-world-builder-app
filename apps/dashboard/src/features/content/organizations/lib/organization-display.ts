@@ -16,8 +16,8 @@ import {
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer/drawer-context.types'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
-import { resolveOrganizationMemberClassAffinityDisplayLabel } from './organization-member-class-chip-options.lib'
-import { resolveOrganizationMemberSpeciesAffinityDisplayLabel } from './organization-member-species-chip-options.lib'
+import { resolveOrganizationMemberClassAffinityDisplayLabel } from './members/organization-member-class-chip-options.lib'
+import { resolveOrganizationMemberSpeciesAffinityDisplayLabel } from './members/organization-member-species-chip-options.lib'
 
 export const ORGANIZATION_SECTION_LABELS = {
   members: 'Members',

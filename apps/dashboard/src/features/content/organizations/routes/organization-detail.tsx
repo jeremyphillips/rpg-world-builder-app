@@ -16,8 +16,8 @@ import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSpecies } from '../../species/hooks/use-species'
-import { OrganizationLocationConnectionsDetailSection } from '../components/organization-location-connections-detail-section.client'
-import { OrganizationMembersDetailSection } from '../components/organization-members-detail-section.client'
+import { OrganizationLocationConnectionsDetailSection } from '../components/location-connections/organization-location-connections-detail-section.client'
+import { OrganizationMembersDetailSection } from '../components/members/organization-members-detail-section.client'
 import { useOrganizations } from '../hooks/use-organizations'
 import {
   buildOrganizationDetailViewModel,

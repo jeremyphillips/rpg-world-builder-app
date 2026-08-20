@@ -41,7 +41,7 @@ as `ORGANIZATION_ACTIVITY_PARTITION_IDS`. They are **partition keys** for regres
 claim that every id was historically persisted as `activities[]`.
 
 Representative boundary cases live in
-[`organization-activity-pressure.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/__tests__/fixtures/organization-activity-pressure.fixture.ts).
+[`organization-activity-pressure.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/presets/fixtures/organization-activity-pressure.fixture.ts).
 
 ## Preset / discovery gates
 
@@ -52,7 +52,7 @@ Representative boundary cases live in
 - **Discovery ownership** — a live preset label must not appear verbatim in another preset's
   `discoveryTerms` (contracts guard + dashboard mirror test).
 - **150-corpus disposition** — frozen outcomes in
-  [`organization-preset-coverage.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/__tests__/fixtures/organization-preset-coverage.fixture.ts).
+  [`organization-preset-coverage.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/presets/fixtures/organization-preset-coverage.fixture.ts).
   `undiscoverable` must stay zero; `weak` / `no_start` rows are diagnostic, not debt to zero out.
 
 ## Deferred / rejected (from discovery)

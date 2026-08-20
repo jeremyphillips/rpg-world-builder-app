@@ -3,7 +3,7 @@ import { createOrganizationInputSchema, type CreateOrganizationInput } from '@rp
 
 import { CITY_COUNCIL } from '../fixtures'
 import { organizationFormDef } from './organization-form-def'
-import type { OrganizationFormValues } from './organization-form-fields'
+import type { OrganizationFormValues } from '../../lib/forms/organization-form-projection'
 
 it('type: toInput return type matches CreateOrganizationInput', () => {
   expectTypeOf(organizationFormDef.toInput).returns.toEqualTypeOf<CreateOrganizationInput>()

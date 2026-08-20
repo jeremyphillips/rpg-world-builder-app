@@ -29,7 +29,7 @@ import {
   organizationCreateDefaultValues,
   organizationFormSchema,
 } from '../../lib/forms/organization-form-projection'
-import { resolveDiscoverableOrganizationMemberClasses } from '../../organizations/lib/organization-member-class-discoverable.lib'
+import { resolveDiscoverableOrganizationMemberClasses } from '../../organizations/lib/members/organization-member-class-discoverable.lib'
 import { BUILDING_ORGANIZATION_NO_INTENT_KIND_REASON } from '../lib/building-organizations/building-organization-create-drafts'
 import { mapBuildingOrganizationCompositionSummaryRows } from '../lib/building-organizations/building-organization-composition-presentation.lib'
 import {
@@ -63,8 +63,8 @@ import {
 import {
   OrganizationAuthoringFormShell,
   OrganizationAuthoringPresetBridge,
-} from '../../organizations/components/organization-authoring-form-shell.client'
-import { useOrganizationAuthoringContext } from '../../organizations/lib/organization-authoring-context.client'
+} from '../../organizations/components/authoring/organization-authoring-form-shell.client'
+import { useOrganizationAuthoringContext } from '../../organizations/components/authoring/organization-authoring-context.client'
 
 function toRelationshipRadioOptions(
   options: readonly BuildingOrganizationRelationshipKindOption[],

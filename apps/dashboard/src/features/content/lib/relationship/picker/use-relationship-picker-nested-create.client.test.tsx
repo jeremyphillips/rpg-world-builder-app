@@ -11,7 +11,7 @@ import { useRelationshipPickerNestedCreate } from './use-relationship-picker-nes
 
 const resolveHandoffMock = vi.fn()
 
-vi.mock('../../../organizations/components/organization-create-modal.client', () => ({
+vi.mock('../../../organizations/components/authoring/organization-create-modal.client', () => ({
   OrganizationCreateModal: ({
     open,
     onCreated,

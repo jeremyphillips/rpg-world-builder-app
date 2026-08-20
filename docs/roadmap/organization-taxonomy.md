@@ -73,12 +73,12 @@ Verified against registry tests and preset coverage fixtures. If documentation a
 
 ## Test artifacts (not product KPIs)
 
-| Fixture / test                                                                                                                                                          | Role                                                  |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| [`organization-preset-coverage.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/__tests__/fixtures/organization-preset-coverage.fixture.ts)     | 150-corpus disposition ledger for preset discovery    |
-| [`organization-activity-pressure.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/__tests__/fixtures/organization-activity-pressure.fixture.ts) | Function/Practice boundary regression after the split |
-| [`organization-semantic-flows.test.ts`](../../apps/dashboard/src/features/content/organizations/lib/organization-semantic-flows.test.ts)                                | Durable search and projection cases                   |
-| [`organization-authoring-vocab-smoke.test.ts`](../../apps/dashboard/src/features/content/organizations/lib/organization-authoring-vocab-smoke.test.ts)                  | Shipped vocab appears on authoring surfaces           |
+| Fixture / test                                                                                                                                                        | Role                                                  |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| [`organization-preset-coverage.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/presets/fixtures/organization-preset-coverage.fixture.ts)     | 150-corpus disposition ledger for preset discovery    |
+| [`organization-activity-pressure.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/presets/fixtures/organization-activity-pressure.fixture.ts) | Function/Practice boundary regression after the split |
+| [`organization-semantic-flows.test.ts`](../../apps/dashboard/src/features/content/organizations/lib/presets/organization-semantic-flows.test.ts)                      | Durable search and projection cases                   |
+| [`organization-authoring-vocab-smoke.test.ts`](../../apps/dashboard/src/features/content/organizations/lib/presets/organization-authoring-vocab-smoke.test.ts)        | Shipped vocab appears on authoring surfaces           |
 
 ## Stopping rule / reopen triggers
 

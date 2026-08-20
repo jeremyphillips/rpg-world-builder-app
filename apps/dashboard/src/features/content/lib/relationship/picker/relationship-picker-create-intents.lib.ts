@@ -16,7 +16,7 @@ import { getLocationAuthoringTypeLabel } from '../../../locations/lib/create/loc
 import {
   locationMatchesTargetBrowseScope,
   type OrganizationLocationTargetBrowseScope,
-} from '../../../organizations/lib/organization-location-target-browse-scope'
+} from '../../../organizations/lib/location-connections/organization-location-target-browse-scope'
 
 export type RelationshipPickerCreateableCharacterType = 'npc'
 

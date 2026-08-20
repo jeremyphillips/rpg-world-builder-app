@@ -6,8 +6,8 @@ import { ContentCreateShell } from '../../lib/forms/shells/content-create-shell'
 import {
   OrganizationAuthoringFormShell,
   OrganizationAuthoringPresetBridge,
-} from '../components/organization-authoring-form-shell.client'
-import { useOrganizationAuthoringContext } from '../lib/organization-authoring-context.client'
+} from '../components/authoring/organization-authoring-form-shell.client'
+import { useOrganizationAuthoringContext } from '../components/authoring/organization-authoring-context.client'
 import '../lib/organization-form-def'
 
 function OrganizationCreateForm({ campaignId }: { campaignId: string }) {

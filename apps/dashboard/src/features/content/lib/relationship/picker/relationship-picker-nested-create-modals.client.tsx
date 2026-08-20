@@ -8,7 +8,7 @@ import {
 } from '@/features/character'
 
 import { LocationCreateModal } from '../../../locations/components/location-create-modal.client'
-import { OrganizationCreateModal } from '../../../organizations/components/organization-create-modal.client'
+import { OrganizationCreateModal } from '../../../organizations/components/authoring/organization-create-modal.client'
 import type { OnContentCreated, ContentCreateContext } from '@/lib/create-flow'
 import type { ActiveNestedCreateIntent } from './relationship-picker-nested-create.types'
 

@@ -46,7 +46,7 @@ Dashboard drawers delegate to these helpers through `location-connection-duplica
 
 Each organization may have at most **one** headquarters connection across all locations (`maxSubjectsPerOrganization` on the kind vocab entry). Family add drawers keep headquarters visible when that slot is occupied and show `Already set at {locationName}.` as the unavailable reason.
 
-Picker copy for headquarters (field helper, search placeholder, change-location drawer title) lives in dashboard target presentation config — see [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) and [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
+Picker copy for headquarters (field helper, search placeholder, change-location drawer title) lives in dashboard target presentation config — see [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/location-connections/organization-location-connection-surface-copy.ts) and [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
 
 Mutation candidate filtering (add, change location, replace organization) always evaluates the **persisted or selected relationship kind**, never the union of kinds represented by a drawer intent family.
 

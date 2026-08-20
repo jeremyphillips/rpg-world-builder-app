@@ -29,11 +29,11 @@ import { useOrganizationLocationReferences } from './use-organization-location-r
 import {
   buildOrganizationLocationConnectionCards,
   resolveOrganizationForwardCurrentLocationEndpoint,
-} from '../lib/build-organization-location-connection-cards'
+} from '../lib/location-connections/build-organization-location-connection-cards'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
-import type { OrganizationLocationConnectionEditTarget } from '../components/organization-location-connections-section.client'
-import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../components/organization-location-connections-section.client'
-import type { OrganizationLocationConnectionMutationContext } from '../components/organization-location-connection-relationship-row.client'
+import type { OrganizationLocationConnectionEditTarget } from '../components/location-connections/organization-location-connections-section.client'
+import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../components/location-connections/organization-location-connections-section.client'
+import type { OrganizationLocationConnectionMutationContext } from '../components/location-connections/organization-location-connection-relationship-row.client'
 
 type EditDrawerState = {
   mode: Extract<OrganizationForwardDrawerMode, 'changeKind' | 'changeTarget'>

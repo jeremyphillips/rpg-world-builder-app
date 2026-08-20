@@ -19,18 +19,18 @@ import {
 } from '@/features/character'
 
 import { buildLocationConnectedPartyCharactersById } from '../../locations/lib/connected-parties/location-connected-party-character-options.lib'
-import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'
-import type { OrganizationMemberPickerCommit } from '../components/organization-member-picker-drawer.client'
+import type { OrganizationMemberPickerCandidate } from '../components/members/organization-member-picker-drawer.client'
+import type { OrganizationMemberPickerCommit } from '../components/members/organization-member-picker-drawer.client'
 import {
   buildOrganizationMemberRows,
   type OrganizationMemberRowVm,
-} from '../lib/build-organization-member-rows'
+} from '../lib/members/build-organization-member-rows'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
-import { buildOrganizationMemberSelectionPolicy } from '../lib/organization-member-selection-policy.lib'
+import { buildOrganizationMemberSelectionPolicy } from '../lib/members/organization-member-selection-policy.lib'
 import {
   ORGANIZATION_MEMBER_ADD_FAILED,
   ORGANIZATION_MEMBERS_MUTATION_ERROR,
-} from '../lib/organization-members.constants'
+} from '../lib/members/organization-members.constants'
 import { useOrganizationMembers } from './use-organization-members'
 
 const UPDATE_MEMBERSHIP_FAILED = 'Could not update this membership.'

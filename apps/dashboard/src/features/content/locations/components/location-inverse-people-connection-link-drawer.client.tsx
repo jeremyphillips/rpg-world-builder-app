@@ -77,7 +77,7 @@ import {
   resolvePeopleKindSlotSubjectTypeFieldLabel,
 } from '../lib/connected-parties/location-connected-parties-people-kind-slots'
 import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
-import { ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE } from '../../organizations/components/organization-member-picker-drawer.client'
+import { ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE } from '../../organizations/components/members/organization-member-picker-drawer.client'
 import {
   revalidateCreatedNpcForInverseDrawer,
   revalidateCreatedOrganizationForInverseDrawer,

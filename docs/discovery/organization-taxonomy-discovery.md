@@ -277,13 +277,13 @@ distinction.
 
 ## Where to go next
 
-| Need                                                            | Read                                                                                                                                                                |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Shipped model and authoring                                     | [`organizations-classification.md`](../../apps/dashboard/docs/organizations-classification.md)                                                                      |
-| Current counts, deferred presets, implementation follow-through | [`organization-taxonomy.md`](../roadmap/organization-taxonomy.md)                                                                                                   |
-| Admission gates for new Functions/Practices                     | [`organization-taxonomy-evidence.md`](../analysis/organization-taxonomy-evidence.md)                                                                                |
-| Full 150-concept table + 150-row matrix + Phases 1–8 verbatim   | [`archive/organization-taxonomy-discovery-v0.1.md`](./archive/organization-taxonomy-discovery-v0.1.md)                                                              |
-| Preset discovery disposition ledger                             | [`organization-preset-coverage.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/__tests__/fixtures/organization-preset-coverage.fixture.ts) |
+| Need                                                            | Read                                                                                                                                                              |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shipped model and authoring                                     | [`organizations-classification.md`](../../apps/dashboard/docs/organizations-classification.md)                                                                    |
+| Current counts, deferred presets, implementation follow-through | [`organization-taxonomy.md`](../roadmap/organization-taxonomy.md)                                                                                                 |
+| Admission gates for new Functions/Practices                     | [`organization-taxonomy-evidence.md`](../analysis/organization-taxonomy-evidence.md)                                                                              |
+| Full 150-concept table + 150-row matrix + Phases 1–8 verbatim   | [`archive/organization-taxonomy-discovery-v0.1.md`](./archive/organization-taxonomy-discovery-v0.1.md)                                                            |
+| Preset discovery disposition ledger                             | [`organization-preset-coverage.fixture.ts`](../../apps/dashboard/src/features/content/organizations/lib/presets/fixtures/organization-preset-coverage.fixture.ts) |
 
 **Do not summarize away the archive.** When this digest and the archive disagree on historical
 counts or audit-time vocabulary, the archive wins for research provenance; contracts tests win for

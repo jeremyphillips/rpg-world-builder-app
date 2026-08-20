@@ -15,12 +15,15 @@ vi.mock('@/components/layout/use-breadcrumb-label', () => ({
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
-vi.mock('../components/organization-location-connections-detail-section.client', () => ({
-  OrganizationLocationConnectionsDetailSection: () => (
-    <div data-testid="organization-detail-section">Location connections</div>
-  ),
-}))
-vi.mock('../components/organization-members-detail-section.client', () => ({
+vi.mock(
+  '../components/location-connections/organization-location-connections-detail-section.client',
+  () => ({
+    OrganizationLocationConnectionsDetailSection: () => (
+      <div data-testid="organization-detail-section">Location connections</div>
+    ),
+  }),
+)
+vi.mock('../components/members/organization-members-detail-section.client', () => ({
   OrganizationMembersDetailSection: () => (
     <div data-testid="organization-detail-section">Members</div>
   ),

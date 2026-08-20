@@ -224,8 +224,8 @@ const dashboardContentPickerPolicyGuards = {
     'src/features/content/locations/lib/hierarchy/location-parent-replacement.ts',
     'src/features/content/locations/lib/hierarchy/bulk/build-bulk-change-parent-fields.ts',
     'src/features/content/lib/relationship/location-connection/location-connection-drawer-intent.ts',
-    'src/features/content/organizations/lib/organization-member-class-discoverable.lib.ts',
-    'src/features/content/organizations/lib/organization-member-species-discoverable.lib.ts',
+    'src/features/content/organizations/lib/members/organization-member-class-discoverable.lib.ts',
+    'src/features/content/organizations/lib/members/organization-member-species-discoverable.lib.ts',
   ],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',

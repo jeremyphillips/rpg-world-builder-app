@@ -2,7 +2,7 @@ import type { OrganizationMembersResponse } from '@rpg/contracts'
 
 import { request } from '@/lib/api-client'
 
-import { ORGANIZATION_MEMBERS_LOAD_ERROR } from '../lib/organization-members.constants'
+import { ORGANIZATION_MEMBERS_LOAD_ERROR } from '../lib/members/organization-members.constants'
 
 export async function getOrganizationMembers(
   campaignId: string,

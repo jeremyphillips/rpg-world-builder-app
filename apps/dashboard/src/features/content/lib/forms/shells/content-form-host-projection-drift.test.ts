@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 const organizationCreateModalPath = fileURLToPath(
   new URL(
-    '../../../organizations/components/organization-create-modal.client.tsx',
+    '../../../organizations/components/authoring/organization-create-modal.client.tsx',
     import.meta.url,
   ),
 )
