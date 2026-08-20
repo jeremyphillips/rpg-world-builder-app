@@ -1,7 +1,7 @@
 'use client'
 
 import type { ActionTargetFailure } from '@rpg/contracts'
-import { Alert, Modal, dialogPanelActionRowClasses } from '@rpg/ui'
+import { Alert, Modal } from '@rpg/ui'
 
 import { ActionDialogShellFooter } from './action-dialog-shell-footer.client'
 import {
@@ -115,7 +115,7 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
         </Modal.Body>
 
         <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
+          <Modal.FooterActions>
             <ActionDialogShellFooter
               phase={phase}
               pending={pending}
@@ -131,7 +131,7 @@ export function ActionDialogShell<TBlocker, TFailure extends ActionTargetFailure
               onResolveConfirm={onResolveConfirm}
               onRetryFailed={onRetryFailed}
             />
-          </div>
+          </Modal.FooterActions>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

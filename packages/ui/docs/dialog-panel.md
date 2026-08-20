@@ -20,15 +20,15 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 
 ## Shared tokens (`dialog-panel.variants.ts`)
 
-| Token                              | Role                                                                                      |
-| ---------------------------------- | ----------------------------------------------------------------------------------------- |
-| `dialogPanelSectionPaddingClasses` | Canonical `p-6` section inset                                                             |
-| `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content                                        |
-| `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)                         |
-| `dialogPanelStableBodyVariants`    | Stable shell (`px-6`, `pb-0`) — child owns scroll                                         |
-| `dialogPanelScrollRegionClasses`   | Inner scroll region above docked footer (`overflow-y-auto` + `pb-6`)                      |
-| `dialogPanelFooterClasses`         | Overlay footer section chrome (`border-t border-border-faint` + `px-6` + `py-4`; no fill) |
-| `dialogPanelActionRowClasses`      | Action row flex helper — prefer `DialogPanelActionRow` component                          |
+| Token                              | Role                                                                                                                      |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `dialogPanelSectionPaddingClasses` | Canonical `p-6` section inset                                                                                             |
+| `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content                                                                        |
+| `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)                                                         |
+| `dialogPanelStableBodyVariants`    | Stable shell (`px-6`, `pb-0`) — child owns scroll                                                                         |
+| `dialogPanelScrollRegionClasses`   | Inner scroll region above docked footer (`overflow-y-auto` + `pb-6`)                                                      |
+| `dialogPanelFooterClasses`         | Overlay footer section chrome (`border-t border-border-faint` + `px-6` + `py-4`; no fill)                                 |
+| `dialogPanelActionRowClasses`      | Action row flex helper — prefer `Modal.FooterActions` under Modal.Footer; `DialogPanelActionRow` for Sheet / form publish |
 
 **Do not** extract header padding into dialog-panel — `DialogPanelHeader` already owns it.
 **Do not** add Form-specific horizontal padding SSOTs; managed Form inset derives from
@@ -38,12 +38,19 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 
 ```text
 dialogPanelFooterClasses     border-t border-border-faint + px-6 + py-4 column root; inherits panel surface
-dialogPanelActionRowClasses  child helper for button groups
-sheetFooterDockClasses       Sheet-only shrink-0 z-20 placement
+dialogPanelActionRowClasses  child helper for button groups (implementation detail)
+Modal.FooterActions          preferred action row under Modal.Footer
+DialogPanelActionRow         shared action row for Sheet.Footer and form publish paths
 
-Modal.Footer  = dialogPanelFooterClasses
+Modal.Footer  = dialogPanelFooterClasses (+ modalFooterDockClasses)
 Sheet.Footer  = dialogPanelFooterClasses + sheetFooterDockClasses
 ```
+
+**Invariant:** overlay footer chrome is owned by `Modal.Footer` (vertical dock, validation
+summary, spacing). Footer **action geometry** is owned by `Modal.FooterActions` (or
+`DialogPanelActionRow` for Sheet / `FormShellFooterContent` publish paths). Do not place
+action `Button`s directly in the footer action area — they will stack full width in the
+column layout.
 
 Overlay footer chrome does **not** set `bg-*`. The panel Content already established
 surface fill and `--surface-current`. Backdrop blur stays on page sticky
@@ -60,7 +67,8 @@ Footer: separator + px-6 + py-4 (independently complete; no pt-0)
 Form drawer flows use `<Form externalFooter>` with overlay-owned `DrawerShell.Footer` /
 `Sheet.Footer` wrapping `<FormShellFooterSlot />`. Semantic footer content (errors,
 validation summary, actions) is owned by `FormShellFooterContent`; shell primitives own
-section chrome only. Manual action rows use `DialogPanelActionRow`.
+section chrome only. Manual action rows under `Modal.Footer` use `Modal.FooterActions`; Sheet and form
+publish paths use `DialogPanelActionRow` / `FormShellFooterContent`.
 
 ## Initial focus
 

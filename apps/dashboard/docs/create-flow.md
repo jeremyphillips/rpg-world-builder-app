@@ -27,6 +27,11 @@ wrapper contract (`createModalShellTabContentVariants`) as multi-tab
 `TabsContent` so scroll ownership and stable-height geometry stay aligned.
 Tab controls appear only when two or more views are supplied.
 
+Footer actions published into `CreateModalShell` must use `Modal.FooterActions`
+(or `FormShellFooterSlot`, which wraps `DialogPanelActionRow`). Do not place
+action buttons directly in the shell footer slot — `Modal.Footer` is a vertical
+dock and unwrapped buttons stack full width.
+
 ## Add / Pending workflow
 
 Optional create-tab relationship composition uses a shared **Add / Pending**

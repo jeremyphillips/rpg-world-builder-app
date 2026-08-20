@@ -5,7 +5,6 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Modal } from './modal.client'
 import { Button } from './button.client'
-import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 import { modalStableBlockSizeClasses, modalStableTallBlockSizeClasses } from './modal.variants'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { InfoTooltip } from './tooltip.client'
@@ -21,11 +20,11 @@ function renderModal(contentProps: Record<string, unknown> = {}) {
         <Modal.Header headline="Invite a player" description="They will receive an email." />
         <Modal.Body>Body content</Modal.Body>
         <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
+          <Modal.FooterActions>
             <Modal.Close asChild>
               <Button>Cancel</Button>
             </Modal.Close>
-          </div>
+          </Modal.FooterActions>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>,
@@ -149,6 +148,32 @@ describe('Modal', () => {
     expect(body).toHaveClass('pb-0')
     expect(body).toHaveClass('px-6')
     expect(body).not.toHaveClass('overflow-y-auto')
+  })
+
+  it('applies action-row layout through Modal.FooterActions', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Header headline="Footer actions" />
+          <Modal.Body>Body</Modal.Body>
+          <Modal.Footer>
+            <Modal.FooterActions data-testid="footer-actions">
+              <Button variant="outline">Cancel</Button>
+              <Button>Save</Button>
+            </Modal.FooterActions>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const actions = await screen.findByTestId('footer-actions')
+    expect(actions).toHaveClass('flex', 'items-center', 'justify-end', 'gap-2')
+    expect(actions).toHaveAttribute('data-modal-footer-actions')
   })
 
   it('keeps default body shrinkable and panel chrome pinned', async () => {

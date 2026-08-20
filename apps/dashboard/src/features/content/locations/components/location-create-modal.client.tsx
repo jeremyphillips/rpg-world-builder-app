@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Button, usePendingAwareOpenChange } from '@rpg/ui'
+import { Button, Modal, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
 import {
@@ -198,7 +198,7 @@ function CreateCompositionChildFooter({
   pending: boolean
 }) {
   return (
-    <>
+    <Modal.FooterActions>
       <Button
         type="button"
         variant="outline"
@@ -224,7 +224,7 @@ function CreateCompositionChildFooter({
           {childWorkflow.commitLabel}
         </Button>
       )}
-    </>
+    </Modal.FooterActions>
   )
 }
 

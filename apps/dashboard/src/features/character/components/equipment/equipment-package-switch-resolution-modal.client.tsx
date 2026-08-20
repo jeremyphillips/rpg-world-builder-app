@@ -7,7 +7,7 @@ import type {
   EquipmentPackageSwitchBlockingReason,
   EquipmentPackageSwitchEvaluation,
 } from '@rpg/contracts'
-import { Modal, dialogPanelActionRowClasses } from '@rpg/ui'
+import { Modal } from '@rpg/ui'
 
 import {
   type EquipmentInventoryQuantityTarget,
@@ -112,7 +112,7 @@ export function EquipmentPackageSwitchResolutionModal({
           />
         </Modal.Body>
         <Modal.Footer>
-          <div className={dialogPanelActionRowClasses}>
+          <Modal.FooterActions>
             <EquipmentPackageSwitchResolutionModalFooter
               isBlocked={modalState.isBlocked}
               confirmDisabled={modalState.confirmDisabled}
@@ -121,7 +121,7 @@ export function EquipmentPackageSwitchResolutionModal({
               onCancel={() => onOpenChange(false)}
               onConfirm={onConfirm}
             />
-          </div>
+          </Modal.FooterActions>
         </Modal.Footer>
       </Modal.Content>
     </Modal.Root>

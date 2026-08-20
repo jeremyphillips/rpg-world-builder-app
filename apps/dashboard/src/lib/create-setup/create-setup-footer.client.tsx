@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, dialogPanelActionRowClasses } from '@rpg/ui'
+import { Button, Modal } from '@rpg/ui'
 
 import type { CreateSetupSequenceModel } from './create-setup.types'
 
@@ -49,7 +49,7 @@ export function CreateSetupFooter({ model, onCancel, onSetupComplete }: CreateSe
   }
 
   return (
-    <div className={dialogPanelActionRowClasses}>
+    <Modal.FooterActions>
       <Button type="button" variant="outline" onClick={onCancel}>
         Cancel
       </Button>
@@ -62,6 +62,6 @@ export function CreateSetupFooter({ model, onCancel, onSetupComplete }: CreateSe
           {continueLabel}
         </Button>
       )}
-    </div>
+    </Modal.FooterActions>
   )
 }
