@@ -17,7 +17,7 @@ import {
   CHARACTERS_OVERVIEW_COPY,
 } from '../lib/character-list-routing'
 import { resolveCharacterDetailHref } from '@/lib/routing/resolve-character-detail-href'
-import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
+import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 
 type CharacterListSectionProps = {
   heading: string

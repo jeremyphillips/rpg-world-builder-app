@@ -10,7 +10,7 @@ import { StandaloneCharacterRedirectGuard } from '../components/standalone-chara
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
 import { buildCharacterDetailViewModel } from '../lib/display/character-display'
-import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
+import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 
 function CharacterDetailBody() {
   const { characterId } = useParams<{ characterId: string }>()

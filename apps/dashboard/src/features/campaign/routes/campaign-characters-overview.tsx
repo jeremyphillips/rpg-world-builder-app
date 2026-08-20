@@ -8,7 +8,7 @@ import { CharacterListCard } from '@/features/character'
 import { normalizeListController, resolveCharacterControllerDisplay } from '@/features/character'
 
 import { useCampaignBuildContext } from '@/features/character'
-import { resolveQueryErrorLabel } from '@/features/character'
+import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaignCharacters } from '../hooks/use-campaign-characters'
 import { useCampaigns } from '../hooks/use-campaigns'

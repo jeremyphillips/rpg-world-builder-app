@@ -7,7 +7,7 @@ import { useCanManageCampaign } from '@/features/campaign'
 
 import { NpcsOverviewTable } from '../components/npcs-overview-table.client'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
-import { resolveQueryErrorLabel } from '../../lib/resolve-query-error-label.lib'
+import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useNpcs } from '../hooks/use-npcs'
 
 export function NpcsOverview() {

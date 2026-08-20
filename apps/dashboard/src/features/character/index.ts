@@ -135,11 +135,6 @@ export {
 } from './lib/display/character-display'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
 export { formatContentReferenceLabel } from './lib/display/format-content-reference-label'
-export {
-  resolveQueryErrorLabel,
-  combineQueryPending,
-  combineQueryError,
-} from './lib/resolve-query-error-label.lib'
 export { SAMPLE_PC, makeCampaignNpcListItem, makeCampaignNpcDetail } from './lib/character-fixtures'
 export {
   populatedBuilderCatalog,

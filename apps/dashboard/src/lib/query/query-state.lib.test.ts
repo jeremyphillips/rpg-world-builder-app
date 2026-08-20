@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { combineQueryError, resolveQueryErrorLabel } from './resolve-query-error-label.lib'
+import { combineQueryError, resolveQueryErrorLabel } from './query-state.lib'
 
 describe('resolveQueryErrorLabel', () => {
   it('returns the first query error message', () => {
