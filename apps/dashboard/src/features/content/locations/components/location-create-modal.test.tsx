@@ -17,7 +17,7 @@ import { toast } from '@rpg/ui'
 import type * as RpgUi from '@rpg/ui'
 
 import { notifyContentCreated } from '@/lib/notify'
-import type { OnContentCreated } from '@/lib/create-flow'
+import type { ContentCreateContext, OnContentCreated } from '@/lib/create-flow'
 import {
   makeBuildingLocationCreateIntent,
   makeLocationCreateIntent,
@@ -181,7 +181,7 @@ function renderModal(
   open = true,
   options?: {
     onCreated?: OnContentCreated
-    createContext?: import('@/lib/create-flow').ContentCreateContext
+    createContext?: ContentCreateContext
   },
 ) {
   const queryClient = makeTestQueryClient()
@@ -348,7 +348,7 @@ describe('LocationCreateModal', () => {
 
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     expect(screen.getByText('Browse all')).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'Organizations (optional)' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Organizations' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change facility' })).toBeInTheDocument()
   })
 
@@ -395,7 +395,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
     await continueBuildingSetup(user)
 
-    expect(screen.getByRole('tab', { name: 'Organizations (optional)' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Organizations' })).toBeInTheDocument()
   })
 
   it('preserves Organization editor state through Change-to-Setup and includes it in dismissal guards', async () => {
@@ -404,7 +404,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent, onOpenChange)
     await continueBuildingSetup(user)
 
-    await user.click(screen.getByRole('tab', { name: 'Organizations (optional)' }))
+    await user.click(screen.getByRole('tab', { name: 'Organizations' }))
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL }))
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
@@ -423,17 +423,19 @@ describe('LocationCreateModal', () => {
     expect(onOpenChange).not.toHaveBeenCalled()
   })
 
-  it('disables Create building while the Organizations composer is in progress', async () => {
+  it('shows child footer while the Organizations composer is in progress', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
     await continueBuildingSetup(user)
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
-    await user.click(screen.getByRole('tab', { name: 'Organizations (optional)' }))
+    await user.click(screen.getByRole('tab', { name: 'Organizations' }))
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL }))
 
-    const createButton = screen.getByRole('button', { name: 'Create building' })
-    expect(createButton).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Create building' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add relationship' })).toBeDisabled()
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeDisabled()
     expect(mockedCompleteBuildingCreateComposition).not.toHaveBeenCalled()
   })
 

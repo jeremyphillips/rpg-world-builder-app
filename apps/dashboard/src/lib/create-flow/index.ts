@@ -22,3 +22,8 @@ export {
   type AddPendingWorkflowProps,
 } from './add-pending-workflow.client'
 export { resolveAddPendingMode } from './add-pending-workflow.lib'
+export {
+  areCreateCompositionChildWorkflowViewsEqual,
+  type CreateCompositionChildWorkflowCommitTarget,
+  type CreateCompositionChildWorkflowView,
+} from './create-composition-child-workflow.types'

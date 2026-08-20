@@ -63,6 +63,7 @@ export type CreateModalShellTab = {
   label: string
   content: React.ReactNode
   optional?: boolean
+  disabled?: boolean
   status: CreateWorkflowPanelStatus
   contentMode?: CreateModalShellContentMode
 }
@@ -166,7 +167,12 @@ function CreateModalShellTabs({
         <TabsList aria-label="Create sections">
           {tabs.map((tab) => {
             return (
-              <TabsTrigger key={tab.id} value={tab.id} data-create-tab-trigger={tab.id}>
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                data-create-tab-trigger={tab.id}
+                disabled={tab.disabled}
+              >
                 {tab.label}
                 {tab.optional ? ' (optional)' : null}
                 {tab.status.invalid ? (

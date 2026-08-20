@@ -7,6 +7,7 @@ import { Alert, Heading, Text } from '@rpg/ui'
 import {
   AddPendingWorkflow,
   type AddPendingWorkflowMode,
+  type CreateCompositionChildWorkflowView,
   type CreateWorkflowPanelStatus,
 } from '@/lib/create-flow'
 
@@ -54,6 +55,7 @@ export type BuildingOrganizationsCreateTabProps = {
   controllerRef?: React.MutableRefObject<BuildingOrganizationsCreateTabController | null>
   onStatusChange?: (status: CreateWorkflowPanelStatus) => void
   onPlanChange?: (plan: BuildingOrganizationDraftPlan) => void
+  onChildWorkflowChange?: (view: CreateCompositionChildWorkflowView) => void
 }
 
 function BuildingOrganizationDraftIssues({

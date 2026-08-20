@@ -4,6 +4,7 @@
 import * as React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type * as RpgUi from '@rpg/ui'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -12,7 +13,7 @@ import { CreateModalShell } from './create-modal-shell.client'
 const modalContentSpy = vi.fn()
 
 vi.mock('@rpg/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@rpg/ui')>()
+  const actual = await importOriginal<typeof RpgUi>()
   const ActualModalContent = actual.Modal.Content
 
   return {
@@ -95,6 +96,36 @@ describe('CreateModalShell', () => {
       'leading-none',
     )
     expect(issueBadge.className).not.toMatch(/createModalShellIssueBadge/)
+  })
+
+  it('disables tab triggers when requested', () => {
+    render(
+      <CreateModalShell
+        open
+        onOpenChange={vi.fn()}
+        headline="Create building"
+        activeTabId="organizations"
+        tabs={[
+          {
+            id: 'details',
+            label: 'Details',
+            disabled: true,
+            content: <p>Details panel</p>,
+            status: { invalid: false, dirty: false },
+          },
+          {
+            id: 'organizations',
+            label: 'Organizations',
+            content: <p>Organizations panel</p>,
+            status: { invalid: false, dirty: false },
+          },
+        ]}
+        footer={<button type="button">Add relationship</button>}
+      />,
+    )
+
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeDisabled()
+    expect(screen.getByRole('tab', { name: 'Organizations' })).toBeEnabled()
   })
 
   it('supports controlled navigation and row-level setup summary actions', async () => {

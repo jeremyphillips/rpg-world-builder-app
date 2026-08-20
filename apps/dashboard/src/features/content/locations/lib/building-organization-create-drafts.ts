@@ -412,3 +412,24 @@ export function removeBuildingOrganizationRelationshipDraft(
         ),
   }
 }
+
+export type BuildingCreateTransactionSummary = Readonly<{
+  newOrganizationCount: number
+  submitLabel: string
+}>
+
+export function resolveBuildingCreateTransactionSummary(
+  plan: BuildingOrganizationDraftPlan,
+): BuildingCreateTransactionSummary {
+  const newOrganizationCount = plan.organizations.length
+  if (newOrganizationCount === 0) {
+    return { newOrganizationCount, submitLabel: 'Create building' }
+  }
+  if (newOrganizationCount === 1) {
+    return { newOrganizationCount, submitLabel: 'Create building and organization' }
+  }
+  return {
+    newOrganizationCount,
+    submitLabel: `Create building and ${newOrganizationCount} organizations`,
+  }
+}

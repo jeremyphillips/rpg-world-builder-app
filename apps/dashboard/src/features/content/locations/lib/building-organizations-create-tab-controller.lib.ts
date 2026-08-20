@@ -1,6 +1,10 @@
 import type { Organization, OrganizationLocationConnectionKind } from '@rpg/contracts'
 
-import type { CreateWorkflowDraftPanelController } from '@/lib/create-flow'
+import type {
+  CreateCompositionChildWorkflowCommitTarget,
+  CreateCompositionChildWorkflowView,
+  CreateWorkflowDraftPanelController,
+} from '@/lib/create-flow'
 
 import type { OrganizationFormValues } from '../../lib/forms/organization-form-projection'
 import {
@@ -13,11 +17,14 @@ import {
 } from './building-organization-create-drafts'
 import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from '@/lib/create-setup'
 
-import { BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE } from './building-organizations-create-tab.lib'
 import {
+  BUILDING_NEW_ORGANIZATION_FORM_ID,
+  BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
+  BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE,
   BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME,
   BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
   BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW,
+  BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
 } from './building-organizations-create-tab.lib'
 
 export type BuildingOrganizationComposerMode = 'resting' | 'composing'
@@ -392,4 +399,41 @@ export function canConfirmBuildingOrganizationRelationship(input: {
   if (!input.kind || !input.selectedOrganization) return false
   if (input.composerStage !== 'review' && input.composerStage !== 'branch') return false
   return !input.organizationOptions.find((option) => option.value === input.kind)?.disabled
+}
+
+export function resolveBuildingOrganizationChildWorkflowView(input: {
+  composerMode: BuildingOrganizationComposerMode
+  composerStage: BuildingOrganizationComposerStage
+  editingDraftId: string | null
+  kind: OrganizationLocationConnectionKind | null
+  selectedOrganization: BuildingOrganizationComposerTarget | null
+  organizationOptions: readonly BuildingOrganizationRelationshipKindOption[]
+}): CreateCompositionChildWorkflowView {
+  if (input.composerMode !== 'composing') return null
+
+  const commitLabel = input.editingDraftId
+    ? BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL
+    : BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL
+
+  const commitTarget: CreateCompositionChildWorkflowCommitTarget =
+    input.composerStage === 'branch' && input.selectedOrganization?.kind === 'new'
+      ? { kind: 'form', formId: BUILDING_NEW_ORGANIZATION_FORM_ID }
+      : { kind: 'action' }
+
+  const canCommit =
+    commitTarget.kind === 'form'
+      ? true
+      : canConfirmBuildingOrganizationRelationship({
+          kind: input.kind,
+          selectedOrganization: input.selectedOrganization,
+          composerStage: input.composerStage,
+          organizationOptions: input.organizationOptions,
+        })
+
+  return {
+    active: true,
+    canCommit,
+    commitLabel,
+    commitTarget,
+  }
 }

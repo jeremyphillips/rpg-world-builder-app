@@ -7,7 +7,12 @@ import {
   type Organization,
 } from '@rpg/contracts'
 
-import type { AddPendingWorkflowMode, CreateWorkflowPanelStatus } from '@/lib/create-flow'
+import type {
+  AddPendingWorkflowMode,
+  CreateCompositionChildWorkflowView,
+  CreateWorkflowPanelStatus,
+} from '@/lib/create-flow'
+import { areCreateCompositionChildWorkflowViewsEqual } from '@/lib/create-flow'
 
 import { useOrganizations } from '../../organizations'
 import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
@@ -34,6 +39,7 @@ import {
   organizationTargetEligibleForKind,
   resolveBuildingOrganizationCommitKind,
   resolveBuildingOrganizationComposerStage,
+  resolveBuildingOrganizationChildWorkflowView,
   resolveBuildingOrganizationComposerView,
   resolveBuildingOrganizationEffectiveKind,
   resolveBuildingOrganizationHasResolvedOrganizationTarget,
@@ -70,8 +76,8 @@ export type BuildingOrganizationsCreateTabController = CreateWorkflowDraftPanelC
   BuildingOrganizationDraftPlan,
   BuildingOrganizationDraftIssue
 > & {
-  cancelComposer?: () => void
-  commitComposer?: () => void
+  cancelComposer: () => void
+  commitComposer: () => void
 }
 
 export type UseBuildingOrganizationsCreateTabInput = {
@@ -85,6 +91,7 @@ export type UseBuildingOrganizationsCreateTabInput = {
   controllerRef?: React.MutableRefObject<BuildingOrganizationsCreateTabController | null>
   onStatusChange?: (status: CreateWorkflowPanelStatus) => void
   onPlanChange?: (plan: BuildingOrganizationDraftPlan) => void
+  onChildWorkflowChange?: (view: CreateCompositionChildWorkflowView) => void
 }
 
 export function useBuildingOrganizationsCreateTab({
@@ -97,6 +104,7 @@ export function useBuildingOrganizationsCreateTab({
   controllerRef,
   onStatusChange,
   onPlanChange,
+  onChildWorkflowChange,
 }: UseBuildingOrganizationsCreateTabInput) {
   const rootRef = React.useRef<HTMLDivElement | null>(null)
   const { data: queriedOrganizations = [], isPending, isError } = useOrganizations(campaignId)
@@ -480,6 +488,44 @@ export function useBuildingOrganizationsCreateTab({
     }
     return intentKindOptions
   }, [editingDraftId, intentKindOptions, kindOptionsFor, selectedOrganization])
+
+  const childWorkflowView = React.useMemo(
+    () =>
+      resolveBuildingOrganizationChildWorkflowView({
+        composerMode,
+        composerStage: resolvedComposerStage,
+        editingDraftId,
+        kind: effectiveKind,
+        selectedOrganization,
+        organizationOptions: composerKindOptions,
+      }),
+    [
+      composerKindOptions,
+      composerMode,
+      editingDraftId,
+      effectiveKind,
+      resolvedComposerStage,
+      selectedOrganization,
+    ],
+  )
+
+  const previousChildWorkflowViewRef = React.useRef<CreateCompositionChildWorkflowView | undefined>(
+    undefined,
+  )
+  React.useEffect(() => {
+    if (!onChildWorkflowChange) return
+    if (
+      previousChildWorkflowViewRef.current !== undefined &&
+      areCreateCompositionChildWorkflowViewsEqual(
+        previousChildWorkflowViewRef.current,
+        childWorkflowView,
+      )
+    ) {
+      return
+    }
+    previousChildWorkflowViewRef.current = childWorkflowView
+    onChildWorkflowChange(childWorkflowView)
+  }, [childWorkflowView, onChildWorkflowChange])
 
   const organizationName = React.useMemo(
     () =>

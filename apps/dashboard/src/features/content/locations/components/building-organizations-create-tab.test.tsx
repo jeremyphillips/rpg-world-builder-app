@@ -455,6 +455,37 @@ describe('BuildingOrganizationsCreateTab', () => {
     expect(screen.getByText('Server-attributed issue.')).toHaveFocus()
   })
 
+  it('publishes child-workflow projection only on semantic changes', async () => {
+    const user = userEvent.setup()
+    const onChildWorkflowChange = vi.fn()
+    render(
+      <BuildingOrganizationsCreateTab
+        campaignId="campaign-1"
+        onChildWorkflowChange={onChildWorkflowChange}
+      />,
+    )
+
+    expect(onChildWorkflowChange).toHaveBeenCalledTimes(1)
+    expect(onChildWorkflowChange).toHaveBeenLastCalledWith(null)
+
+    await startComposing(user)
+    await waitFor(() => expect(onChildWorkflowChange).toHaveBeenCalledTimes(2))
+    expect(onChildWorkflowChange.mock.calls[1]![0]).toMatchObject({
+      active: true,
+      commitTarget: { kind: 'action' },
+    })
+
+    await chooseOwnerIntent(user)
+    expect(onChildWorkflowChange).toHaveBeenCalledTimes(2)
+
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
+    await waitFor(() => expect(onChildWorkflowChange).toHaveBeenCalledTimes(3))
+    expect(onChildWorkflowChange.mock.calls[2]![0]).toMatchObject({
+      active: true,
+      commitTarget: { kind: 'form', formId: 'building-new-organization-draft' },
+    })
+  })
+
   itAxe('has no accessibility violations in resting empty state', async () => {
     const { container } = render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
     await expectNoAxeViolations(container)

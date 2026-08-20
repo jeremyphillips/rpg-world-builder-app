@@ -5,6 +5,9 @@ import { describe, expect, it } from 'vitest'
 const composerPath = fileURLToPath(
   new URL('../components/building-organizations-composer.client.tsx', import.meta.url),
 )
+const modalPath = fileURLToPath(
+  new URL('../components/location-create-modal.client.tsx', import.meta.url),
+)
 
 describe('building organizations composer structural drift', () => {
   it('uses create-modal setup summary grammar instead of legacy selected-card chrome', () => {
@@ -16,5 +19,18 @@ describe('building organizations composer structural drift', () => {
     expect(source).not.toContain('ChooserSummaryCard')
     expect(source).not.toContain('CollapsibleRadioCardField')
     expect(source).not.toContain('LocationConnectionKindStep')
+  })
+})
+
+describe('location create modal composition ownership drift', () => {
+  it('consumes only semantic child-workflow projection without org composer internals', () => {
+    const source = readFileSync(modalPath, 'utf8')
+
+    expect(source).toContain('CreateCompositionChildWorkflowView')
+    expect(source).toContain('childWorkflow')
+    expect(source).not.toMatch(/\bBuildingOrganizationComposerStage\b/)
+    expect(source).not.toMatch(/\bselectedOrganization\b/)
+    expect(source).not.toMatch(/\bnewOrganizationDraftId\b/)
+    expect(source).not.toMatch(/\bBUILDING_ORGANIZATION_/i)
   })
 })

@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  resolveBuildingOrganizationChildWorkflowView,
   resolveBuildingOrganizationComposerView,
   resolveBuildingOrganizationHasResolvedOrganizationTarget,
 } from './building-organizations-create-tab-controller.lib'
+import {
+  BUILDING_NEW_ORGANIZATION_FORM_ID,
+  BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
+  BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
+} from './building-organizations-create-tab.lib'
 
 describe('resolveBuildingOrganizationComposerView', () => {
   it('shows active relationship radios without a summary row on intent', () => {
@@ -141,5 +147,73 @@ describe('resolveBuildingOrganizationHasResolvedOrganizationTarget', () => {
         organizationName: 'New organization',
       }),
     ).toBe(false)
+  })
+})
+
+describe('resolveBuildingOrganizationChildWorkflowView', () => {
+  const enabledKindOptions = [{ value: 'owns' as const, label: 'Owner', description: '' }]
+
+  it('returns null while resting', () => {
+    expect(
+      resolveBuildingOrganizationChildWorkflowView({
+        composerMode: 'resting',
+        composerStage: 'review',
+        editingDraftId: null,
+        kind: 'owns',
+        selectedOrganization: { kind: 'existing', organizationId: 'organization-1' },
+        organizationOptions: enabledKindOptions,
+      }),
+    ).toBeNull()
+  })
+
+  it('projects an action commit on review with a resolved existing organization', () => {
+    expect(
+      resolveBuildingOrganizationChildWorkflowView({
+        composerMode: 'composing',
+        composerStage: 'review',
+        editingDraftId: null,
+        kind: 'owns',
+        selectedOrganization: { kind: 'existing', organizationId: 'organization-1' },
+        organizationOptions: enabledKindOptions,
+      }),
+    ).toEqual({
+      active: true,
+      canCommit: true,
+      commitLabel: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
+      commitTarget: { kind: 'action' },
+    })
+  })
+
+  it('projects a form commit on branch for new organizations', () => {
+    expect(
+      resolveBuildingOrganizationChildWorkflowView({
+        composerMode: 'composing',
+        composerStage: 'branch',
+        editingDraftId: null,
+        kind: 'owns',
+        selectedOrganization: { kind: 'new', draftOrganizationId: 'draft-1' },
+        organizationOptions: enabledKindOptions,
+      }),
+    ).toEqual({
+      active: true,
+      canCommit: true,
+      commitLabel: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
+      commitTarget: { kind: 'form', formId: BUILDING_NEW_ORGANIZATION_FORM_ID },
+    })
+  })
+
+  it('uses the update label while editing a pending relationship', () => {
+    expect(
+      resolveBuildingOrganizationChildWorkflowView({
+        composerMode: 'composing',
+        composerStage: 'review',
+        editingDraftId: 'relationship-1',
+        kind: 'owns',
+        selectedOrganization: { kind: 'existing', organizationId: 'organization-1' },
+        organizationOptions: enabledKindOptions,
+      }),
+    ).toMatchObject({
+      commitLabel: BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
+    })
   })
 })

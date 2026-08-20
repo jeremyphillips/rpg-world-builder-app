@@ -99,6 +99,7 @@ export type LocationCreateFormProps = {
   onNavigateToTab?: (tabId: string) => void
   onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
   submitBlocked?: boolean
+  submitLabel?: string
   onCreated?: OnContentCreated
 }
 
@@ -387,6 +388,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     onNavigateToTab,
     onDetailsStatusChange,
     submitBlocked,
+    submitLabel: submitLabelProp,
     onCreated,
   } = props
   const queryClient = useQueryClient()
@@ -474,7 +476,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     },
   })
 
-  const submitLabel = BUILDING_CREATE_SETUP_HEADLINE
+  const submitLabel = submitLabelProp ?? BUILDING_CREATE_SETUP_HEADLINE
 
   return (
     <LocationCreateFormShell
