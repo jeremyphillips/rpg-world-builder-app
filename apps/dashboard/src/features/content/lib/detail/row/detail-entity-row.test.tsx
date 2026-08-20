@@ -196,9 +196,11 @@ describe('DetailEntityRow', () => {
     await user.click(screen.getByRole('button', { name: 'Show locations in Dock Ward' }))
 
     const expandedRegion = container.querySelector('[id]')
-    expect(expandedRegion).toHaveClass('pl-[var(--entity-body-inline-start)]')
+    expect(expandedRegion).toHaveClass('mb-2')
+    expect(expandedRegion).toHaveClass('pl-[var(--entity-surface-inline-start)]')
     expect(expandedRegion).toHaveClass('pr-[var(--entity-surface-inline-end)]')
-    expect(expandedRegion?.firstElementChild).toHaveClass(
+    expect(expandedRegion?.firstElementChild).toHaveClass('pl-[var(--entity-content-offset)]')
+    expect(expandedRegion?.firstElementChild?.firstElementChild).toHaveClass(
       'border-l',
       'border-border-subtle',
       'pl-3',
