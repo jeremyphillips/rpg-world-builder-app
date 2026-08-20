@@ -16,7 +16,7 @@ import { npcOverviewFilterSchema } from '../lib/npc-overview-filter-schema'
 import { NPC_OVERVIEW_TABLE_KEY } from '../lib/npc-overview-labels'
 import { toNpcOverviewTableRow, type NpcOverviewTableRow } from '../lib/npc-overview-row'
 import { npcsOverviewColumns } from '../lib/npcs-overview-columns'
-import { useNpcOverviewQueryState } from '../lib/use-npc-overview-query-state.client'
+import { useNpcOverviewQueryState } from '../hooks/use-npc-overview-query-state.client'
 
 const NPCS_EMPTY_MESSAGE = 'No NPCs yet. Create one to populate your campaign roster.'
 

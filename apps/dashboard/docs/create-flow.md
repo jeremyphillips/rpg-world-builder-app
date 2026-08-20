@@ -230,7 +230,7 @@ creators use `STANDALONE_CONTENT_CREATE_CONTEXT`.
 
 Quick NPC nested create maps at the modal boundary via
 `mapContentCreateContextToQuickNpcCreateContext` in
-[`quick-npc-create-context.ts`](../src/features/character/npc/lib/quick-npc-create-context.ts).
+[`quick-npc-create-context.ts`](../src/features/character/npc/lib/quick-npc/quick-npc-create-context.ts).
 `relationship-target` is intentionally mapped to `{ kind: 'standalone' }` — Quick NPC context does
 not carry relationship vocabulary unless product approves extending it.
 

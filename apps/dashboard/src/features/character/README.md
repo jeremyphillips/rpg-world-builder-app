@@ -29,6 +29,41 @@ Folder layout and the feature-boundary rule are documented in
 | Step hooks         | `hooks/use-equipment-step.client.ts`, `hooks/use-proficiencies-step.client.ts` |
 | Restore affordance | `components/character-builder-draft-restore.client.tsx`                        |
 
+## `npc/` sub-feature
+
+Campaign-scoped NPC roster, Quick NPC nested create, bulk roster status, and thin
+routes that delegate full builder/detail to parent `character/` surfaces.
+
+| Area                  | Path                                                          |
+| --------------------- | ------------------------------------------------------------- |
+| Overview route        | `npc/routes/npcs-overview.tsx`                                |
+| Detail route          | `npc/routes/npc-detail.tsx` (reuses `CharacterDetailContent`) |
+| Create route          | `npc/routes/npc-create.tsx` (reuses `CharacterBuilderShell`)  |
+| Quick NPC modal       | `npc/components/quick-npc/`                                   |
+| Quick NPC lib         | `npc/lib/quick-npc/`                                          |
+| Bulk roster status    | `npc/lib/bulk/`                                               |
+| Overview table config | `npc/lib/npc-overview-*`, `npcs-overview-columns.tsx`         |
+| Imperative NPC fetch  | `npc/lib/fetch-campaign-npcs.lib.ts`                          |
+
+### Cross-feature barrel exports
+
+Other features import NPC capabilities through `@/features/character` only — not
+`npc/` internals.
+
+| Export                         | Use                                                              |
+| ------------------------------ | ---------------------------------------------------------------- |
+| `fetchCampaignNpcs`            | Imperative campaign NPC list with canonical query/cache behavior |
+| `invalidateCampaignNpcQueries` | Invalidate NPC list cache after nested create                    |
+| `useNpcs`, `npcsQueryKey`      | React query hook for campaign NPC list                           |
+| Quick NPC modal exports        | Nested create from relationship pickers                          |
+
+`npc/api/` (`listNpcs`, `getNpc`, …) and single-NPC query keys remain internal
+until an external consumer requires them.
+
+**Follow-up:** audit cross-feature imperative catalog fetching for locations and
+organizations (`listLocations`, `listOrganizations` deep imports in relationship
+picker) and establish matching capability exports where production consumers exist.
+
 ## Routes
 
 | Path                       | Screen                                                     |

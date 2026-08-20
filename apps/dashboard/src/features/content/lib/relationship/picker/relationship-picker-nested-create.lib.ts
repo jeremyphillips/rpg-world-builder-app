@@ -10,9 +10,11 @@ import type {
 import type { QueryClient } from '@tanstack/react-query'
 
 import type { CreatedContentResult } from '@/lib/create-flow'
-import { buildCharacterCardViewModel } from '@/features/character'
-import { listNpcs } from '@/features/character/npc/api/npc-client'
-import { npcsQueryKey } from '@/features/character/npc/hooks/use-npcs'
+import {
+  buildCharacterCardViewModel,
+  fetchCampaignNpcs,
+  invalidateCampaignNpcQueries,
+} from '@/features/character'
 
 import { filterReferenceableCatalogRows } from '../../form-options/content-reference-catalog.lib'
 import { invalidateLocationConnectionQueries } from '../location-connection/invalidate-location-connection-queries'
@@ -179,7 +181,7 @@ export async function invalidateRelationshipPickerNestedCreateQueries(
   }
 
   if (input.result.contentType === 'npcs') {
-    invalidations.push(queryClient.invalidateQueries({ queryKey: npcsQueryKey(input.campaignId) }))
+    invalidations.push(invalidateCampaignNpcQueries(queryClient, input.campaignId))
   }
 
   invalidations.push(
@@ -216,7 +218,7 @@ export async function fetchReferenceableLocations(
 }
 
 function mapNpcListItemToCharacterOption(
-  npc: Awaited<ReturnType<typeof listNpcs>>[number],
+  npc: Awaited<ReturnType<typeof fetchCampaignNpcs>>[number],
   catalogIndex: CharacterBuildCatalogIndex | null | undefined,
 ): LocationConnectedPartyCharacterOption {
   return {
@@ -233,10 +235,7 @@ export async function fetchReferenceableNpcCharacterOptions(
   queryClient: QueryClient,
   input: { campaignId: string; catalogIndex?: CharacterBuildCatalogIndex | null },
 ): Promise<LocationConnectedPartyCharacterOption[]> {
-  const npcs = await queryClient.fetchQuery({
-    queryKey: npcsQueryKey(input.campaignId),
-    queryFn: () => listNpcs(input.campaignId),
-  })
+  const npcs = await fetchCampaignNpcs(queryClient, input.campaignId)
 
   return npcs.map((npc) => mapNpcListItemToCharacterOption(npc, input.catalogIndex))
 }

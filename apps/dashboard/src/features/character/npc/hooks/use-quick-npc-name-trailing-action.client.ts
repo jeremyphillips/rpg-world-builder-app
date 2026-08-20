@@ -11,8 +11,8 @@ import {
   QUICK_NPC_GENERATE_NAME_LABEL,
   QUICK_NPC_NAME_GENERATION_FAILED,
   resolveQuickNpcNameGenerationSupport,
-} from '../lib/quick-npc-name-generation'
-import type { QuickNpcAuthoringTabValues } from '../lib/quick-npc-form-fields'
+} from '../lib/quick-npc/quick-npc-name-generation'
+import type { QuickNpcAuthoringTabValues } from '../lib/quick-npc/quick-npc-form-fields'
 
 export function useQuickNpcNameTrailingAction({
   speciesId,

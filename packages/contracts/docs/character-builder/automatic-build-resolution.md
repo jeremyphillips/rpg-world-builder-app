@@ -121,7 +121,7 @@ second assembly path.
 
 ## Consumers
 
-- **Quick NPC** (dashboard): `apps/dashboard/src/features/character/npc/lib/quick-npc-create.ts`
+- **Quick NPC** (dashboard): `apps/dashboard/src/features/character/npc/lib/quick-npc/quick-npc-create.ts`
   wraps the resolver, injects the organization membership connection, and
   finalizes — one atomic `POST /api/campaigns/:id/npcs` carries the
   membership in `connections.organizations`. Entry surface: organization detail

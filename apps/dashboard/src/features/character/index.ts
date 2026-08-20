@@ -94,27 +94,28 @@ export {
 } from './hooks/use-character-location-references'
 export { useCreateNpc } from './npc/hooks/use-create-npc'
 export { useNpcs, npcsQueryKey } from './npc/hooks/use-npcs'
+export { fetchCampaignNpcs, invalidateCampaignNpcQueries } from './npc/lib/fetch-campaign-npcs.lib'
 export {
   mapContentCreateContextToQuickNpcCreateContext,
   QUICK_NPC_CREATE_SUBMIT_LABEL,
   type QuickNpcCreateFormOrganization,
   type QuickNpcCreateContext,
-} from './npc/lib/quick-npc-create-context'
+} from './npc/lib/quick-npc/quick-npc-create-context'
 export {
   QuickNpcCreateModal,
   QUICK_NPC_CREATE_TITLE,
-} from './npc/components/quick-npc-create-modal.client'
+} from './npc/components/quick-npc/quick-npc-create-modal.client'
 export {
   QuickNpcAuthoringForm,
   type QuickNpcAuthoringFormProps,
-} from './npc/components/quick-npc-authoring-form.client'
+} from './npc/components/quick-npc/quick-npc-authoring-form.client'
 export {
   type QuickNpcAuthoringValues,
   type QuickNpcSetupValues,
-} from './npc/lib/quick-npc-form-fields'
-export { buildQuickNpcClassRadioCardPresentation } from './npc/lib/quick-npc-class-option-groups.lib'
-export { resolveQuickNpcClassOptionGroups } from './npc/lib/quick-npc-class-option-groups.lib'
-export { buildQuickNpcSpeciesRadioCardPresentation } from './npc/lib/quick-npc-species-option-groups.lib'
+} from './npc/lib/quick-npc/quick-npc-form-fields'
+export { buildQuickNpcClassRadioCardPresentation } from './npc/lib/quick-npc/quick-npc-class-option-groups.lib'
+export { resolveQuickNpcClassOptionGroups } from './npc/lib/quick-npc/quick-npc-class-option-groups.lib'
+export { buildQuickNpcSpeciesRadioCardPresentation } from './npc/lib/quick-npc/quick-npc-species-option-groups.lib'
 export {
   buildCharacterDetailViewModel,
   buildCharacterCardViewModel,
