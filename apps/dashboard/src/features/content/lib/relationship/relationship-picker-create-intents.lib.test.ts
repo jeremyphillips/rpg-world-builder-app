@@ -163,4 +163,28 @@ describe('resolveRelationshipPickerCreateIntents', () => {
       ),
     ).toEqual(['region'])
   })
+
+  it('returns Create NPC for character target when npc is createable', () => {
+    expect(
+      resolveRelationshipPickerCreateIntents({
+        target: 'character',
+        createableCharacterTypes: ['npc'],
+      }),
+    ).toEqual([
+      {
+        target: 'character',
+        id: 'npc',
+        label: 'Create NPC',
+      },
+    ])
+  })
+
+  it('returns no character intents when npc is not createable', () => {
+    expect(
+      resolveRelationshipPickerCreateIntents({
+        target: 'character',
+        createableCharacterTypes: [],
+      }),
+    ).toEqual([])
+  })
 })

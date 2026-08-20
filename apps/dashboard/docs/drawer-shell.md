@@ -109,6 +109,7 @@ Cancel buttons in form drawers use `DrawerShell.Close`, not `Sheet.Close`.
 | Location create (detail Add location)     | `LocationCreateModal` → `ContentFormHost`                                |
 | Organization create (relationship picker) | `OrganizationCreateModal` → `ContentFormHost`                            |
 | Quick NPC (org Add member)                | `OrganizationMemberPickerDrawer` + character-owned `QuickNpcCreateModal` |
+| Quick NPC (standalone)                    | Location People drawer Character segment + `QuickNpcCreateModal`         |
 | Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                                      |
 | Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)                                    |
 | Character builder catalog pickers         | `CatalogPickerSheet` + `catalogPickerShellProps()`                       |
@@ -137,7 +138,9 @@ revalidates eligibility (type, occupancy, duplicate edges), then selects the cre
 Footer submit still persists the relationship. Do not copy org-member “success closes all.”
 
 Quick NPC: the organizations hook toggles `add` | `createNpc`; the character feature owns
-`QuickNpcCreateModal` (Setup, TabbedForm authoring, create). See
+`QuickNpcCreateModal` (Setup, TabbedForm authoring, create). Location People nested create uses
+the same modal in standalone context — success returns to the picker with the NPC selected; footer
+Add persists the location connection. See
 [character-acquisition.md](./character-acquisition.md#quick-npc-organization-member).
 
 ### Pending dismiss (`usePendingAwareOpenChange`)

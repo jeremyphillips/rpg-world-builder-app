@@ -9,13 +9,19 @@ import {
 } from '../../lib/character-builder-fixtures'
 import { QUICK_NPC_CLASS_ALL_GROUP_EYEBROW } from '../lib/quick-npc-class-option-groups.lib'
 import { QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL } from '../lib/quick-npc-build-card.lib'
+import { QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL } from '../lib/quick-npc-build-card.lib'
 import {
   QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
   QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
   QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
+  QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
+  QUICK_NPC_STANDALONE_SETUP_HEADLINE,
   QUICK_NPC_TITLE_FIELD_PROMPT,
 } from '../lib/quick-npc-create-modal-setup.lib'
-import { quickNpcOrganizationMemberCreateContext } from '../lib/quick-npc-test-fixtures'
+import {
+  quickNpcOrganizationMemberCreateContext,
+  quickNpcStandaloneCreateContext,
+} from '../lib/quick-npc-test-fixtures'
 import { QuickNpcCreateModal } from './quick-npc-create-modal.client'
 
 const organization = {
@@ -192,5 +198,66 @@ export const Authoring: Story = {
     }
     await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
     await expect(canvas.getByText("Create a new NPC as a member of Thieves' Guild.")).toBeVisible()
+  },
+}
+
+const standaloneBuildContext = createCampaignNpcBuilderContextFixture({
+  catalog: populatedBuilderCatalog,
+})
+
+const standaloneBuildContextMinLevelOne = createCampaignNpcBuilderContextFixture({
+  catalog: populatedBuilderCatalog,
+  characterCreationRules: {
+    ...createCampaignNpcBuilderContextFixture().characterCreationRules,
+    levelZeroNpcs: {
+      ...createCampaignNpcBuilderContextFixture().characterCreationRules.levelZeroNpcs,
+      enabled: false,
+    },
+  },
+})
+
+export const StandaloneSpeciesFirst: Story = {
+  args: {
+    buildContext: standaloneBuildContext,
+    context: quickNpcStandaloneCreateContext(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement.ownerDocument.body)
+
+    await expect(canvas.getByText(QUICK_NPC_STANDALONE_SETUP_HEADLINE)).toBeVisible()
+    await expect(canvas.getByText(QUICK_NPC_STANDALONE_SETUP_DESCRIPTION)).toBeVisible()
+    expect(canvas.queryByText(QUICK_NPC_TITLE_FIELD_PROMPT)).not.toBeInTheDocument()
+    expect(canvas.queryByText(QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION)).not.toBeInTheDocument()
+    expect(canvas.queryByText(QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL)).not.toBeInTheDocument()
+    await expect(canvas.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  },
+}
+
+export const StandaloneLevelZeroPath: Story = {
+  args: {
+    buildContext: standaloneBuildContext,
+    context: quickNpcStandaloneCreateContext(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement.ownerDocument.body)
+
+    await userEvent.click(canvas.getByRole('radio', { name: /dwarf/i }))
+    await expect(canvas.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Continue' })).toBeEnabled()
+  },
+}
+
+export const StandaloneClassGatePath: Story = {
+  args: {
+    buildContext: standaloneBuildContextMinLevelOne,
+    context: quickNpcStandaloneCreateContext(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement.ownerDocument.body)
+
+    await userEvent.click(canvas.getByRole('radio', { name: /dwarf/i }))
+    await expect(canvas.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    await userEvent.click(canvas.getByRole('radio', { name: /fighter/i }))
+    await expect(canvas.getByRole('button', { name: 'Continue' })).toBeEnabled()
   },
 }

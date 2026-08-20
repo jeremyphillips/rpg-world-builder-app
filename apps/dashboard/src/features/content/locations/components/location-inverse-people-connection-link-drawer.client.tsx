@@ -3,6 +3,8 @@
 import * as React from 'react'
 
 import type {
+  CharacterBuildCatalogIndex,
+  CharacterBuildContext,
   CharacterLocationConnectionKind,
   Location,
   LocationConnectedPartyRow,
@@ -75,8 +77,11 @@ import {
   resolvePeopleKindSlotSubjectTypeFieldLabel,
 } from '../lib/location-connected-parties-people-kind-slots'
 import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
+import { ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE } from '../../organizations/components/organization-member-picker-drawer.client'
 import {
+  revalidateCreatedNpcForInverseDrawer,
   revalidateCreatedOrganizationForInverseDrawer,
+  resolveRelationshipPickerCharacterCreateIntents,
   resolveRelationshipPickerOrganizationCreateIntents,
 } from '../../lib/relationship/relationship-picker-nested-create.lib'
 import { useRelationshipPickerNestedCreate } from '../../lib/relationship/use-relationship-picker-nested-create.client'
@@ -102,6 +107,12 @@ export type LocationInversePeopleConnectionLinkDrawerProps = {
     characterId: string
     kind: CharacterLocationConnectionKind
   }) => Promise<void>
+  quickNpc?: {
+    buildContext: CharacterBuildContext | null
+    buildContextFailed: boolean
+    buildContextReady: boolean
+    catalogIndex?: CharacterBuildCatalogIndex | null
+  }
 }
 
 const SUBJECT_TYPE_SEGMENT_OPTIONS = [
@@ -142,6 +153,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   isSubmitting = false,
   onOrganizationSubmit,
   onCharacterSubmit,
+  quickNpc,
 }: LocationInversePeopleConnectionLinkDrawerProps) {
   const organizationIds = React.useMemo(
     () => organizations.map((organization) => organization.id),
@@ -364,15 +376,80 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     },
   })
 
+  const characterNestedCreateIntents = React.useMemo(() => {
+    if (
+      effectiveSubjectType !== 'character' ||
+      !showEntityPicker ||
+      editingKind ||
+      !characterKind ||
+      !canAddCharacter
+    ) {
+      return []
+    }
+
+    return resolveRelationshipPickerCharacterCreateIntents({
+      createableCharacterTypes: ['npc'],
+    })
+  }, [canAddCharacter, characterKind, editingKind, effectiveSubjectType, showEntityPicker])
+
+  const characterNestedCreate = useRelationshipPickerNestedCreate({
+    campaignId,
+    enabled:
+      effectiveSubjectType === 'character' &&
+      showEntityPicker &&
+      !editingKind &&
+      Boolean(characterKind) &&
+      canAddCharacter &&
+      Boolean(quickNpc?.buildContextReady) &&
+      !quickNpc?.buildContextFailed,
+    createIntents: characterNestedCreateIntents,
+    locationId: location.id,
+    npcBuildContext: quickNpc?.buildContext ?? null,
+    npcCatalogIndex: quickNpc?.catalogIndex,
+    onSelectCreatedNpc: setSelectedCharacterId,
+    revalidateCreatedNpc: (character) => {
+      if (!characterKind) {
+        return false
+      }
+
+      return revalidateCreatedNpcForInverseDrawer({
+        character,
+        kinds: characterAvailabilityKinds,
+        existingKeys: characterExistingKeys,
+      })
+    },
+  })
+
   const {
     auxiliaryAction: nestedCreateAuxiliaryAction,
     modals: nestedCreateModals,
     nestedCreateBusy,
   } = nestedCreate
 
+  const {
+    auxiliaryAction: characterNestedCreateAuxiliaryAction,
+    modals: characterNestedCreateModals,
+    nestedCreateBusy: characterNestedCreateBusy,
+  } = characterNestedCreate
+
+  const characterAuxiliaryAction = (() => {
+    if (!characterNestedCreateIntents.length) {
+      return undefined
+    }
+    if (quickNpc?.buildContextFailed) {
+      return {
+        state: 'unavailable' as const,
+        message: ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE,
+      }
+    }
+    return characterNestedCreateAuxiliaryAction
+  })()
+
+  const effectiveNestedCreateBusy = nestedCreateBusy || characterNestedCreateBusy
+
   const canSubmit = Boolean(
     !isSubmitting &&
-    !nestedCreateBusy &&
+    !effectiveNestedCreateBusy &&
     ((effectiveSubjectType === 'organization' &&
       selectedOrganizationId &&
       organizationDomain &&
@@ -563,61 +640,66 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   }
 
   return (
-    <CatalogEntityPickerSheet
-      {...sharedSheetProps}
-      searchPlaceholder={
-        resolveLocationInverseCharacterTargetPresentation(characterKind).searchPlaceholder
-      }
-      noItemsMessage="No characters are available."
-      footer={
-        showEntityPicker && !editingKind && selectedCharacterId && characterKind ? (
-          <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
-            {submitLabel}
-          </Button>
-        ) : undefined
-      }
-      items={showEntityPicker ? characters : []}
-      getItemKey={(character) => character.id}
-      getItemToolbarLabel={(character) => character.name}
-      getSearchText={buildConnectedPartyCharacterPickerSearchText}
-      renderEntityRow={createCatalogEntityRowRenderer({
-        buildEntity: (character) =>
-          buildCharacterPickerEntitySummary(character, {
-            description:
+    <>
+      {characterNestedCreateModals}
+      <CatalogEntityPickerSheet
+        {...sharedSheetProps}
+        loading={characterNestedCreateBusy}
+        auxiliaryAction={characterAuxiliaryAction}
+        searchPlaceholder={
+          resolveLocationInverseCharacterTargetPresentation(characterKind).searchPlaceholder
+        }
+        noItemsMessage="No characters are available."
+        footer={
+          showEntityPicker && !editingKind && selectedCharacterId && characterKind ? (
+            <Button type="button" disabled={!canSubmit} onClick={() => void handleSubmit()}>
+              {submitLabel}
+            </Button>
+          ) : undefined
+        }
+        items={showEntityPicker ? characters : []}
+        getItemKey={(character) => character.id}
+        getItemToolbarLabel={(character) => character.name}
+        getSearchText={buildConnectedPartyCharacterPickerSearchText}
+        renderEntityRow={createCatalogEntityRowRenderer({
+          buildEntity: (character) =>
+            buildCharacterPickerEntitySummary(character, {
+              description:
+                characterKind != null &&
+                !characterInverseSubjectHasAvailableKind(
+                  character.id,
+                  characterAvailabilityKinds,
+                  characterExistingKeys,
+                )
+                  ? CHARACTER_DRAWER_FULLY_LINKED_REASON
+                  : undefined,
+            }),
+          buildTrailing: (character) => {
+            const isSelected = selectedCharacterId === character.id
+            const hasAvailableKind =
               characterKind != null &&
-              !characterInverseSubjectHasAvailableKind(
+              characterInverseSubjectHasAvailableKind(
                 character.id,
                 characterAvailabilityKinds,
                 characterExistingKeys,
               )
-                ? CHARACTER_DRAWER_FULLY_LINKED_REASON
-                : undefined,
-          }),
-        buildTrailing: (character) => {
-          const isSelected = selectedCharacterId === character.id
-          const hasAvailableKind =
-            characterKind != null &&
-            characterInverseSubjectHasAvailableKind(
-              character.id,
-              characterAvailabilityKinds,
-              characterExistingKeys,
-            )
-          const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
+            const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
-          return {
-            kind: 'action',
-            content: (
-              <CatalogPickerSelectionActions
-                phase={phase}
-                canSelect={hasAvailableKind}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => setSelectedCharacterId(character.id)}
-                onRemove={() => setSelectedCharacterId(null)}
-              />
-            ),
-          }
-        },
-      })}
-    />
+            return {
+              kind: 'action',
+              content: (
+                <CatalogPickerSelectionActions
+                  phase={phase}
+                  canSelect={hasAvailableKind}
+                  addLabel={isSelected ? 'Selected' : 'Select'}
+                  onAdd={() => setSelectedCharacterId(character.id)}
+                  onRemove={() => setSelectedCharacterId(null)}
+                />
+              ),
+            }
+          },
+        })}
+      />
+    </>
   )
 }

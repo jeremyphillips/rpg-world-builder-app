@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -12,6 +12,44 @@ import { CITY_COUNCIL } from '../../organizations/fixtures'
 import { PEOPLE_SECTION_KIND_FULLY_LINKED_REASON } from '../../lib/location-connection-kind-options'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer.client'
+import {
+  createCampaignNpcBuilderContextFixture,
+  populatedBuilderCatalog,
+} from '@/features/character'
+
+const createCharacterLocationConnectionMock = vi.hoisted(() => vi.fn())
+const listNpcsMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../api/character-location-connection-client', () => ({
+  createCharacterLocationConnection: createCharacterLocationConnectionMock,
+}))
+
+vi.mock('@/features/character/npc/api/npc-client', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  listNpcs: listNpcsMock,
+}))
+
+vi.mock('@/features/character', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    QuickNpcCreateModal: ({
+      open,
+      onCreated,
+    }: {
+      open: boolean
+      onCreated?: (result: { contentType: 'npcs'; id: string }) => void
+    }) =>
+      open ? (
+        <button
+          type="button"
+          onClick={() => onCreated?.({ contentType: 'npcs', id: 'npc-created-1' })}
+        >
+          Complete create NPC
+        </button>
+      ) : null,
+  }
+})
 
 const ownerSlot = {
   heading: 'Owner',
@@ -50,6 +88,17 @@ const sampleCharacters = [
     classIds: [],
   },
 ]
+
+const quickNpcBuildContext = createCampaignNpcBuilderContextFixture({
+  catalog: populatedBuilderCatalog,
+})
+
+const quickNpcProps = {
+  buildContext: quickNpcBuildContext,
+  buildContextFailed: false,
+  buildContextReady: true,
+  catalogIndex: null,
+}
 
 describe('LocationInversePeopleConnectionLinkDrawer', () => {
   it('starts with a relationship kind step before entity selection', () => {
@@ -378,5 +427,86 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  it('offers Create NPC on the character segment when build context is ready', async () => {
+    const user = userEvent.setup()
+
+    renderWithProviders(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={kindSlots}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={sampleOrganizations}
+        characters={sampleCharacters}
+        connectedPartyRows={[]}
+        canAddOrganization
+        canAddCharacter
+        quickNpc={quickNpcProps}
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    expect(screen.getByRole('button', { name: 'Create NPC' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create organization' })).not.toBeInTheDocument()
+  })
+
+  it('persists location connection only after footer Add, not during nested NPC create', async () => {
+    const user = userEvent.setup()
+    const onCharacterSubmit = vi.fn().mockResolvedValue(undefined)
+    createCharacterLocationConnectionMock.mockReset()
+    listNpcsMock.mockResolvedValue([
+      {
+        character: {
+          id: 'npc-created-1',
+          name: 'Created NPC',
+          vital: { hp: { current: 1, max: 1 } },
+          classes: [],
+          species: { id: 'srd-cc-5.2.1:dwarf', name: 'Dwarf' },
+        },
+        participation: { id: 'part-1', roster: 'active', joinedAt: '2026-01-01T00:00:00.000Z' },
+      },
+    ])
+
+    renderWithProviders(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={[ownerSlot]}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={sampleOrganizations}
+        characters={sampleCharacters}
+        connectedPartyRows={[]}
+        canAddOrganization
+        canAddCharacter
+        quickNpc={quickNpcProps}
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={onCharacterSubmit}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Create NPC' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Complete create NPC', hidden: true }))
+
+    expect(createCharacterLocationConnectionMock).not.toHaveBeenCalled()
+    expect(onCharacterSubmit).not.toHaveBeenCalled()
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Add owner/i })).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', { name: /Add owner/i }))
+    await waitFor(() =>
+      expect(onCharacterSubmit).toHaveBeenCalledWith({
+        characterId: 'npc-created-1',
+        kind: 'owns',
+      }),
+    )
+    expect(createCharacterLocationConnectionMock).not.toHaveBeenCalled()
   })
 })

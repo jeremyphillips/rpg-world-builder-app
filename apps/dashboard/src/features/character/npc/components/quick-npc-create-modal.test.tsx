@@ -17,8 +17,14 @@ import { renderWithProviders } from '@/test/render'
 import { QuickNpcCreateModal } from './quick-npc-create-modal.client'
 import {
   quickNpcOrganizationMemberCreateContext,
+  quickNpcStandaloneCreateContext,
   quickNpcTestOrganization,
 } from '../lib/quick-npc-test-fixtures'
+import {
+  QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
+  QUICK_NPC_STANDALONE_SETUP_HEADLINE,
+} from '../lib/quick-npc-create-modal-setup.lib'
+import { QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL } from '../lib/quick-npc-build-card.lib'
 
 const createNpcMock = vi.hoisted(() => vi.fn())
 
@@ -562,5 +568,122 @@ describe('QuickNpcCreateModal', () => {
     expect(screen.getByRole('radio', { name: /rogue/i })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /fighter/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  })
+})
+
+describe('QuickNpcCreateModal standalone context', () => {
+  const standaloneContext = quickNpcStandaloneCreateContext()
+
+  const standaloneBuildContext = createCampaignNpcBuilderContextFixture({
+    catalog: {
+      ...populatedBuilderCatalog,
+      classes: [quickFighter],
+    },
+  })
+
+  const standaloneBuildContextMinLevelOne = createCampaignNpcBuilderContextFixture({
+    catalog: {
+      ...populatedBuilderCatalog,
+      classes: [quickFighter],
+    },
+    characterCreationRules: {
+      ...createCampaignNpcBuilderContextFixture().characterCreationRules,
+      levelZeroNpcs: {
+        ...createCampaignNpcBuilderContextFixture().characterCreationRules.levelZeroNpcs,
+        enabled: false,
+      },
+    },
+  })
+
+  function renderStandaloneModal(
+    overrides: Partial<React.ComponentProps<typeof QuickNpcCreateModal>> = {},
+  ) {
+    return renderModal({
+      context: standaloneContext,
+      buildContext: standaloneBuildContext,
+      ...overrides,
+    })
+  }
+
+  async function completeStandaloneSetup(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    const changeLevelButton = screen.queryByRole('button', {
+      name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
+    })
+    if (changeLevelButton) {
+      await setBuildCardLevel(user, '1')
+      await selectBuildCardClass(user, /fighter/i)
+    }
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+  }
+
+  it('shows species first without title or member copy', () => {
+    renderStandaloneModal()
+
+    expect(screen.getByText(QUICK_NPC_STANDALONE_SETUP_HEADLINE)).toBeInTheDocument()
+    expect(screen.getByText(QUICK_NPC_STANDALONE_SETUP_DESCRIPTION)).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /no title/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: /what species/i })).toBeInTheDocument()
+  })
+
+  it('shows build after species without title gating', async () => {
+    const user = userEvent.setup()
+    renderStandaloneModal()
+
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    expect(
+      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
+    ).toBeInTheDocument()
+  })
+
+  it('confirms Level 0 build without class', async () => {
+    const user = userEvent.setup()
+    renderStandaloneModal()
+
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    expect(screen.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
+  })
+
+  it('blocks build until class is selected when campaign min is above 0', async () => {
+    const user = userEvent.setup()
+    renderStandaloneModal({ buildContext: standaloneBuildContextMinLevelOne })
+
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    await selectBuildCardClass(user, /fighter/i)
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+  })
+
+  it('creates without membership and calls onCreated', async () => {
+    const user = userEvent.setup()
+    const { props } = renderStandaloneModal({ buildContext: standaloneBuildContextMinLevelOne })
+
+    await completeStandaloneSetup(user)
+    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Town Guard')
+    await selectOption(user, /alignment/i, /lawful neutral/i)
+    await user.click(screen.getByRole('button', { name: 'Create NPC' }))
+
+    await waitFor(() => expect(createNpcMock).toHaveBeenCalled())
+    const createInput = createNpcMock.mock.calls[0]?.[1]
+    expect(createInput?.connections?.organizations ?? []).toEqual([])
+    expect(createInput?.connections?.locations ?? []).toEqual([])
+    await waitFor(() =>
+      expect(props.onCreated).toHaveBeenCalledWith({
+        contentType: 'npcs',
+        id: npcDetail.character.id,
+      }),
+    )
+  })
+
+  it('does not call onCreated when cancelled from authoring', async () => {
+    const user = userEvent.setup()
+    const { props } = renderStandaloneModal({ buildContext: standaloneBuildContextMinLevelOne })
+
+    await completeStandaloneSetup(user)
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(props.onCreated).not.toHaveBeenCalled()
+    expect(props.onCancel).toHaveBeenCalledTimes(1)
   })
 })

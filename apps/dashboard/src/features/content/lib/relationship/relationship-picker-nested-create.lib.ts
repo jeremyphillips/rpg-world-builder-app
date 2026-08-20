@@ -1,4 +1,6 @@
 import type {
+  CharacterBuildCatalogIndex,
+  CharacterLocationConnectionKind,
   Location,
   LocationConnectedPartyRow,
   Organization,
@@ -8,15 +10,20 @@ import type {
 import type { QueryClient } from '@tanstack/react-query'
 
 import type { CreatedContentResult } from '@/lib/create-flow'
+import { buildCharacterCardViewModel } from '@/features/character'
+import { listNpcs } from '@/features/character/npc/api/npc-client'
+import { npcsQueryKey } from '@/features/character/npc/hooks/use-npcs'
 
 import { filterReferenceableCatalogRows } from '../form-options/content-reference-catalog.lib'
 import { invalidateLocationConnectionQueries } from '../invalidate-location-connection-queries'
 import {
+  characterInverseSubjectHasAvailableKind,
   locationEligibleForOrganizationKind,
   organizationInverseSubjectHasAvailableKind,
   resolveEdgesAtLocation,
 } from '../location-connection-drawer-intent'
 import { organizationLocationConnectionHasAvailableKind } from '../location-connection-duplicate-keys'
+import type { LocationConnectedPartyCharacterOption } from '../../locations/lib/location-connected-party-character-options.lib'
 import { listLocations } from '../../locations/api/locations-api'
 import { getLocationConnectedParties } from '../../locations/api/location-connected-parties-client'
 import { locationConnectedPartiesQueryKey } from '../../locations/hooks/use-location-connected-parties'
@@ -31,6 +38,15 @@ import {
   resolveRelationshipPickerCreateIntents,
   type RelationshipPickerCreateIntent,
 } from './relationship-picker-create-intents.lib'
+
+export function resolveRelationshipPickerCharacterCreateIntents(input: {
+  createableCharacterTypes: readonly ['npc']
+}): RelationshipPickerCreateIntent[] {
+  return resolveRelationshipPickerCreateIntents({
+    target: 'character',
+    createableCharacterTypes: input.createableCharacterTypes,
+  })
+}
 
 /** Sentinel subject id — only occupancy / duplicate checks that ignore subject history apply. */
 export const RELATIONSHIP_PICKER_NESTED_CREATE_ORGANIZATION_SENTINEL_ID =
@@ -128,6 +144,22 @@ export function revalidateCreatedOrganizationForInverseDrawer(input: {
   )
 }
 
+export function revalidateCreatedNpcForInverseDrawer(input: {
+  character: LocationConnectedPartyCharacterOption | undefined
+  kinds: readonly CharacterLocationConnectionKind[]
+  existingKeys: ReadonlySet<string>
+}): boolean {
+  if (!input.character) {
+    return false
+  }
+
+  return characterInverseSubjectHasAvailableKind(
+    input.character.id,
+    input.kinds,
+    input.existingKeys,
+  )
+}
+
 export async function invalidateRelationshipPickerNestedCreateQueries(
   queryClient: QueryClient,
   input: {
@@ -143,6 +175,10 @@ export async function invalidateRelationshipPickerNestedCreateQueries(
     invalidations.push(
       queryClient.invalidateQueries({ queryKey: organizationsQueryKey(input.campaignId) }),
     )
+  }
+
+  if (input.result.contentType === 'npcs') {
+    invalidations.push(queryClient.invalidateQueries({ queryKey: npcsQueryKey(input.campaignId) }))
   }
 
   invalidations.push(
@@ -176,6 +212,32 @@ export async function fetchReferenceableLocations(
     queryFn: () => listLocations(campaignId),
   })
   return filterReferenceableCatalogRows(result.items)
+}
+
+function mapNpcListItemToCharacterOption(
+  npc: Awaited<ReturnType<typeof listNpcs>>[number],
+  catalogIndex: CharacterBuildCatalogIndex | null | undefined,
+): LocationConnectedPartyCharacterOption {
+  return {
+    id: npc.character.id,
+    name: npc.character.name,
+    summary: catalogIndex ? buildCharacterCardViewModel(npc.character, catalogIndex).summary : '',
+    characterType: 'npc',
+    classIds: npc.character.classes.map((entry) => entry.classId),
+    speciesId: npc.character.species.id,
+  }
+}
+
+export async function fetchReferenceableNpcCharacterOptions(
+  queryClient: QueryClient,
+  input: { campaignId: string; catalogIndex?: CharacterBuildCatalogIndex | null },
+): Promise<LocationConnectedPartyCharacterOption[]> {
+  const npcs = await queryClient.fetchQuery({
+    queryKey: npcsQueryKey(input.campaignId),
+    queryFn: () => listNpcs(input.campaignId),
+  })
+
+  return npcs.map((npc) => mapNpcListItemToCharacterOption(npc, input.catalogIndex))
 }
 
 export type OrganizationForwardNestedCreateRevalidationContext = {
@@ -231,6 +293,7 @@ export type RelationshipPickerNestedCreateHandoffInput = {
   result: CreatedContentResult
   subjectOrganizationId?: string
   locationId?: string
+  catalogIndex?: CharacterBuildCatalogIndex | null
   revalidateCreatedOrganization?: (
     organization: Organization,
     orgRows: readonly LocationConnectedPartyRow[],
@@ -239,12 +302,13 @@ export type RelationshipPickerNestedCreateHandoffInput = {
     location: Location,
     context: OrganizationForwardNestedCreateRevalidationContext,
   ) => boolean
+  revalidateCreatedNpc?: (character: LocationConnectedPartyCharacterOption) => boolean
 }
 
 export async function resolveRelationshipPickerNestedCreateHandoff(
   queryClient: QueryClient,
   input: RelationshipPickerNestedCreateHandoffInput,
-): Promise<{ organizationId?: string; locationId?: string }> {
+): Promise<{ organizationId?: string; locationId?: string; characterId?: string }> {
   await invalidateRelationshipPickerNestedCreateQueries(queryClient, {
     campaignId: input.campaignId,
     result: input.result,
@@ -254,6 +318,10 @@ export async function resolveRelationshipPickerNestedCreateHandoff(
 
   if (input.result.contentType === 'organizations') {
     return resolveOrganizationNestedCreateHandoff(queryClient, input)
+  }
+
+  if (input.result.contentType === 'npcs') {
+    return resolveNpcNestedCreateHandoff(queryClient, input)
   }
 
   return resolveLocationNestedCreateHandoff(queryClient, input)
@@ -316,4 +384,24 @@ async function resolveLocationNestedCreateHandoff(
   }
 
   return { locationId: location.id }
+}
+
+async function resolveNpcNestedCreateHandoff(
+  queryClient: QueryClient,
+  input: RelationshipPickerNestedCreateHandoffInput,
+): Promise<{ characterId?: string }> {
+  const characters = await fetchReferenceableNpcCharacterOptions(queryClient, {
+    campaignId: input.campaignId,
+    catalogIndex: input.catalogIndex,
+  })
+  const character = characters.find((entry) => entry.id === input.result.id)
+  if (!character) {
+    return {}
+  }
+
+  if (input.revalidateCreatedNpc && !input.revalidateCreatedNpc(character)) {
+    return {}
+  }
+
+  return { characterId: character.id }
 }

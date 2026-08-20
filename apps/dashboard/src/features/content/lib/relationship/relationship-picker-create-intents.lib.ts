@@ -17,6 +17,10 @@ import {
   type OrganizationLocationTargetBrowseScope,
 } from '../../organizations/lib/organization-location-target-browse-scope'
 
+export const RELATIONSHIP_PICKER_CREATE_NPC_LABEL = 'Create NPC' as const
+
+export type RelationshipPickerCreateableCharacterType = 'npc'
+
 export type RelationshipPickerCreateIntentInput =
   | { target: 'organization' }
   | {
@@ -24,6 +28,10 @@ export type RelationshipPickerCreateIntentInput =
       selectedKind: OrganizationLocationConnectionKind
       activeBrowseScope?: OrganizationLocationTargetBrowseScope
       parentLocationId?: string
+    }
+  | {
+      target: 'character'
+      createableCharacterTypes: readonly RelationshipPickerCreateableCharacterType[]
     }
 
 export type RelationshipPickerCreateIntent =
@@ -34,6 +42,7 @@ export type RelationshipPickerCreateIntent =
       label: string
       authoringType: LocationAuthoringType
     }
+  | { target: 'character'; id: 'npc'; label: string }
 
 const PARENT_REQUIRED_AUTHORING_TYPES = new Set<LocationAuthoringType>(['district', 'interior'])
 
@@ -117,6 +126,22 @@ function resolveLocationCreateIntents(
   }))
 }
 
+function resolveCharacterCreateIntents(
+  input: Extract<RelationshipPickerCreateIntentInput, { target: 'character' }>,
+): RelationshipPickerCreateIntent[] {
+  if (!input.createableCharacterTypes.includes('npc')) {
+    return []
+  }
+
+  return [
+    {
+      target: 'character',
+      id: 'npc',
+      label: RELATIONSHIP_PICKER_CREATE_NPC_LABEL,
+    },
+  ]
+}
+
 /** Resolves nested-create intents for relationship entity pickers. */
 export function resolveRelationshipPickerCreateIntents(
   input: RelationshipPickerCreateIntentInput,
@@ -129,6 +154,10 @@ export function resolveRelationshipPickerCreateIntents(
         label: formatContentCreateActionLabel('organizations'),
       },
     ]
+  }
+
+  if (input.target === 'character') {
+    return resolveCharacterCreateIntents(input)
   }
 
   return resolveLocationCreateIntents(input)

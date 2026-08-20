@@ -31,6 +31,7 @@ const NESTED_CREATE_RESOLVER_IMPORT =
   "from '../../lib/relationship/relationship-picker-create-intents.lib'"
 const NESTED_CREATE_ORG_RESOLVER_IMPORT =
   "from '../../lib/relationship/relationship-picker-nested-create.lib'"
+const NESTED_CREATE_CHARACTER_RESOLVER_IMPORT = 'resolveRelationshipPickerCharacterCreateIntents'
 
 describe('sequenced relationship drawer drift', () => {
   for (const filePath of SEQUENCED_ADD_DRAWER_FILES) {
@@ -54,7 +55,11 @@ describe('sequenced relationship drawer drift', () => {
 
   const nestedCreateDrawerExpectations: Record<
     string,
-    { resolverImport: string; usesNestedCreateHook: boolean }
+    {
+      resolverImport: string
+      usesNestedCreateHook: boolean
+      characterResolverImport?: string
+    }
   > = {
     'organization-location-connection-link-drawer.client.tsx': {
       resolverImport: NESTED_CREATE_RESOLVER_IMPORT,
@@ -67,6 +72,7 @@ describe('sequenced relationship drawer drift', () => {
     'location-inverse-people-connection-link-drawer.client.tsx': {
       resolverImport: NESTED_CREATE_ORG_RESOLVER_IMPORT,
       usesNestedCreateHook: true,
+      characterResolverImport: NESTED_CREATE_CHARACTER_RESOLVER_IMPORT,
     },
   }
 
@@ -79,6 +85,9 @@ describe('sequenced relationship drawer drift', () => {
       const source = readFileSync(filePath, 'utf8')
 
       expect(source).toContain(expectation!.resolverImport)
+      if ('characterResolverImport' in expectation! && expectation.characterResolverImport) {
+        expect(source).toContain(expectation.characterResolverImport)
+      }
       if (expectation!.usesNestedCreateHook) {
         expect(source).toContain('useRelationshipPickerNestedCreate')
       }

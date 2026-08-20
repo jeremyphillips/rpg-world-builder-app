@@ -322,26 +322,31 @@ Two total options with one disabled still counts as **2+** — Change must reope
 
 Create-modal draft relationship tabs (Building → Organizations) use the same completed-decision grammar as `CreateSetupPanel` (`SelectionSummaryCard` rows + `RadioCardField` for active kind) inside a feature-owned stage machine — not drawer-local collapse chrome.
 
-Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search. Hide subject type, picker, and persist footer while kind is being edited upstream. **Create organization** is wired on the organization subject segment only; character segment has no nested NPC create yet.
+Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search. Hide subject type, picker, and persist footer while kind is being edited upstream. **Create organization** is wired on the organization subject segment; **Create NPC** is wired on the character segment via `resolveRelationshipPickerCharacterCreateIntents`. Build-context readiness (`useCampaignNpcBuildContext`) gates the character auxiliary action at the drawer — not inside the intent resolver.
 
 ### Relationship picker nested create
 
-Domain-owned **`resolveRelationshipPickerCreateIntents`** (location targets) and
+Domain-owned **`resolveRelationshipPickerCreateIntents`** (location and character targets) and
 **`resolveRelationshipPickerOrganizationCreateIntents`** (organization targets with singleton-slot
 gating) decide what may be created from an Add drawer. Dashboard maps 0 / 1 / many intents onto
 `CatalogPickerSheet` **`auxiliaryAction`** via **`mapRelationshipPickerCreateIntentsToAuxiliaryAction`**
 (menu variant for 2+ location authoring types; direct action for a single intent).
 
 Handoff is drawer-owned through **`useRelationshipPickerNestedCreate`**: sibling
-`OrganizationCreateModal` / `LocationCreateModal`, optional **`onCreated({ contentType, id })`**
-after persistence, then `resolvingCreatedTarget` refresh + full eligibility revalidation before
-select. Footer submit is the only relationship persist boundary — nested create must not POST the
-relationship. Org Add member + Quick NPC keeps its membership-specific success-closes-all handoff;
-do not route that picker through the shared intent resolver.
+`OrganizationCreateModal` / `LocationCreateModal` / standalone `QuickNpcCreateModal`, optional
+**`onCreated({ contentType, id })`** after persistence, then `resolvingCreatedTarget` refresh +
+full eligibility revalidation before select. Footer submit is the only relationship persist boundary
+— nested create must not POST the relationship. Org Add member + Quick NPC keeps its
+membership-specific success-closes-all handoff; do not route that picker through the shared intent
+resolver.
+
+**Intent vs readiness:** `resolveRelationshipPickerCreateIntents` (and character/org wrappers)
+decide whether Create NPC is conceptually supported. Campaign NPC build-context load/failure is
+wired only at the drawer/hook auxiliary-action layer (`buildContextReady` / `buildContextFailed`).
 
 Wired Add drawers: organization forward location pickers, location inverse organization pickers, and
-People drawer organization segment. Out of scope: changeKind, changeTarget, replaceOrganization,
-character segment Create NPC, org member picker.
+People drawer organization and character segments. Out of scope: changeKind, changeTarget,
+replaceOrganization, org member picker.
 
 ### Inverted organization add without `addKind` (legacy)
 

@@ -10,6 +10,7 @@ import {
 export type RelationshipPickerCreateIntentHandlers = {
   onOrganization: () => void
   onLocation: (authoringType: LocationAuthoringType) => void
+  onCharacter: () => void
   disabled?: boolean
 }
 
@@ -35,6 +36,10 @@ export function mapRelationshipPickerCreateIntentsToAuxiliaryAction(
           handlers.onOrganization()
           return
         }
+        if (intent.target === 'character') {
+          handlers.onCharacter()
+          return
+        }
         handlers.onLocation(intent.authoringType)
       },
     }
@@ -46,12 +51,16 @@ export function mapRelationshipPickerCreateIntentsToAuxiliaryAction(
     disabled,
     items: intents.map((intent) => ({
       label:
-        intent.target === 'organization'
-          ? intent.label
-          : getLocationAuthoringTypeLabel(intent.authoringType),
+        intent.target === 'location'
+          ? getLocationAuthoringTypeLabel(intent.authoringType)
+          : intent.label,
       onAction: () => {
         if (intent.target === 'organization') {
           handlers.onOrganization()
+          return
+        }
+        if (intent.target === 'character') {
+          handlers.onCharacter()
           return
         }
         handlers.onLocation(intent.authoringType)

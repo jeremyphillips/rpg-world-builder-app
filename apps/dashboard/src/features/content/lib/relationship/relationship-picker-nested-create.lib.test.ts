@@ -7,7 +7,9 @@ import { CITY_COUNCIL } from '../../organizations/fixtures'
 import {
   relationshipPickerOrganizationCreateAvailable,
   revalidateCreatedLocationForOrganizationForwardDrawer,
+  revalidateCreatedNpcForInverseDrawer,
   revalidateCreatedOrganizationForInverseDrawer,
+  resolveRelationshipPickerCharacterCreateIntents,
   resolveRelationshipPickerOrganizationCreateIntents,
   RELATIONSHIP_PICKER_NESTED_CREATE_ORGANIZATION_SENTINEL_ID,
 } from './relationship-picker-nested-create.lib'
@@ -94,6 +96,54 @@ describe('resolveRelationshipPickerOrganizationCreateIntents', () => {
         label: 'Create organization',
       }),
     ])
+  })
+})
+
+describe('resolveRelationshipPickerCharacterCreateIntents', () => {
+  it('returns Create NPC when npc is createable', () => {
+    expect(
+      resolveRelationshipPickerCharacterCreateIntents({ createableCharacterTypes: ['npc'] }),
+    ).toEqual([
+      expect.objectContaining({
+        target: 'character',
+        id: 'npc',
+        label: 'Create NPC',
+      }),
+    ])
+  })
+})
+
+describe('revalidateCreatedNpcForInverseDrawer', () => {
+  it('rejects when the character slot is already linked', () => {
+    expect(
+      revalidateCreatedNpcForInverseDrawer({
+        character: {
+          id: 'char-1',
+          name: 'Braggi',
+          summary: 'Merchant',
+          characterType: 'npc',
+          classIds: [],
+        },
+        kinds: ['owns'],
+        existingKeys: new Set(['char-1:owns']),
+      }),
+    ).toBe(false)
+  })
+
+  it('accepts a created character when the slot is open', () => {
+    expect(
+      revalidateCreatedNpcForInverseDrawer({
+        character: {
+          id: 'char-1',
+          name: 'Braggi',
+          summary: 'Merchant',
+          characterType: 'npc',
+          classIds: [],
+        },
+        kinds: ['owns'],
+        existingKeys: new Set(),
+      }),
+    ).toBe(true)
   })
 })
 

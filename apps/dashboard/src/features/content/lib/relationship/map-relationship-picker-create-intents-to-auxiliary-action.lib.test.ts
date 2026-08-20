@@ -9,6 +9,7 @@ describe('mapRelationshipPickerCreateIntentsToAuxiliaryAction', () => {
       mapRelationshipPickerCreateIntentsToAuxiliaryAction([], {
         onOrganization: vi.fn(),
         onLocation: vi.fn(),
+        onCharacter: vi.fn(),
       }),
     ).toBeUndefined()
   })
@@ -17,7 +18,7 @@ describe('mapRelationshipPickerCreateIntentsToAuxiliaryAction', () => {
     const onOrganization = vi.fn()
     const action = mapRelationshipPickerCreateIntentsToAuxiliaryAction(
       resolveRelationshipPickerCreateIntents({ target: 'organization' }),
-      { onOrganization, onLocation: vi.fn() },
+      { onOrganization, onLocation: vi.fn(), onCharacter: vi.fn() },
     )
 
     expect(action).toEqual(
@@ -33,6 +34,29 @@ describe('mapRelationshipPickerCreateIntentsToAuxiliaryAction', () => {
     expect(onOrganization).toHaveBeenCalledOnce()
   })
 
+  it('maps one character intent to a direct action', () => {
+    const onCharacter = vi.fn()
+    const action = mapRelationshipPickerCreateIntentsToAuxiliaryAction(
+      resolveRelationshipPickerCreateIntents({
+        target: 'character',
+        createableCharacterTypes: ['npc'],
+      }),
+      { onOrganization: vi.fn(), onLocation: vi.fn(), onCharacter },
+    )
+
+    expect(action).toEqual(
+      expect.objectContaining({
+        state: 'action',
+        label: 'Create NPC',
+      }),
+    )
+
+    if (action?.state === 'action') {
+      action.onAction()
+    }
+    expect(onCharacter).toHaveBeenCalledOnce()
+  })
+
   it('maps many location intents to a menu in registry order labels', () => {
     const onLocation = vi.fn()
     const action = mapRelationshipPickerCreateIntentsToAuxiliaryAction(
@@ -40,7 +64,7 @@ describe('mapRelationshipPickerCreateIntentsToAuxiliaryAction', () => {
         target: 'location',
         selectedKind: 'headquarters',
       }),
-      { onOrganization: vi.fn(), onLocation },
+      { onOrganization: vi.fn(), onLocation, onCharacter: vi.fn() },
     )
 
     expect(action).toEqual(
@@ -64,7 +88,7 @@ describe('mapRelationshipPickerCreateIntentsToAuxiliaryAction', () => {
   it('forwards disabled to action and menu variants', () => {
     const action = mapRelationshipPickerCreateIntentsToAuxiliaryAction(
       resolveRelationshipPickerCreateIntents({ target: 'organization' }),
-      { onOrganization: vi.fn(), onLocation: vi.fn(), disabled: true },
+      { onOrganization: vi.fn(), onLocation: vi.fn(), onCharacter: vi.fn(), disabled: true },
     )
 
     expect(action).toEqual(expect.objectContaining({ disabled: true }))
