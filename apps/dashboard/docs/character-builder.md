@@ -22,9 +22,9 @@ layer from contracts instead of ad-hoc empty/blocked branches in each step view.
 | Layer         | Module                                                     | Role                                                                  |
 | ------------- | ---------------------------------------------------------- | --------------------------------------------------------------------- |
 | Contracts     | `resolveBuilderStepReadiness`                              | Single source of truth for blocked / N/A / empty / choices / complete |
-| Dashboard lib | `lib/builder-step-readiness.lib.ts`                        | Message-only vs interactive UI; proficiencies section filtering       |
+| Dashboard lib | `lib/builder/builder-step-readiness.lib.ts`                | Message-only vs interactive UI; proficiencies section filtering       |
 | UI            | `components/steps/builder-step-readiness-panel.client.tsx` | Renders readiness `message` + `helperText`                            |
-| Rail          | `lib/builder-step-visual-status.ts`                        | Maps readiness → `StepStatus` (`locked` = not applicable)             |
+| Rail          | `lib/builder/builder-step-visual-status.ts`                | Maps readiness → `StepStatus` (`locked` = not applicable)             |
 
 ### Proficiencies partial block
 

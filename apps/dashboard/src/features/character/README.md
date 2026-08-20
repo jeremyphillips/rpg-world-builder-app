@@ -45,25 +45,44 @@ the in-memory draft snapshot; React wiring lives in `hooks/use-character-builder
 
 ## `lib/` layout
 
-Root `lib/` keeps feature-wide fixtures only (`character-builder-fixtures.ts`,
-`character-fixtures.ts`, `campaign-roster-presentation.ts`). Step form modules stay
-in `lib/steps/`; sheet filters stay in `lib/detail/`.
+Root policy: `lib/` may contain a small number of cross-cutting Character seams
+that do not yet form a material subdomain. Stable multi-file concerns belong in
+subdirectories.
 
-| Subfolder           | Ownership                                     |
-| ------------------- | --------------------------------------------- |
-| `builder/`          | Shell chrome, navigation, rail, validation UX |
-| `builder-preview/`  | Builder/review projection (not sheet display) |
-| `campaign-context/` | Campaign build-context availability           |
-| `choice-sets/`      | Choice-set field wiring and selection helpers |
-| `draft/`            | Draft merge, touch, and non-empty detection   |
-| `display/`          | List/detail character display view models     |
-| `equipment/`        | Equipment step view models                    |
-| `proficiencies/`    | Proficiencies step view models                |
-| `spells/`           | Spells step view models                       |
+| Root file                                                 | Role                                                      |
+| --------------------------------------------------------- | --------------------------------------------------------- |
+| `characters-overview-copy.ts`                             | Standalone list section labels and empty-state copy       |
+| `campaign-roster-presentation.ts`                         | Roster status badge presentation (list card, NPC columns) |
+| `invalidate-character-organization-membership-queries.ts` | Org membership query invalidation                         |
+
+| Subfolder           | Ownership                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------ |
+| `builder/`          | Shell chrome, step navigation, rail, validation UX — see `character-builder-navigation.ts` |
+| `builder-preview/`  | Builder/review projection (not sheet display)                                              |
+| `campaign-context/` | Campaign build-context availability                                                        |
+| `choice-sets/`      | Choice-set field wiring and selection helpers                                              |
+| `detail/`           | Sheet catalog, tab filters, route error copy                                               |
+| `display/`          | List/detail character display view models                                                  |
+| `draft/`            | Draft merge, touch, and non-empty detection                                                |
+| `equipment/`        | Equipment step view models                                                                 |
+| `fixtures/`         | Story/test fixtures and builder context seeds                                              |
+| `navigation/`       | Standalone sheet redirect helpers (not builder step rail)                                  |
+| `proficiencies/`    | Proficiencies step view models                                                             |
+| `spells/`           | Spells step view models                                                                    |
+| `steps/`            | Identity and abilities builder form modules                                                |
+
+Future folder triggers (not implemented until 3+ cohesive modules exist):
+
+- Roster/list copy modules → `overview/` or `roster/`
+- Multiple org-membership cache helpers → `memberships/` or `connections/`
 
 Co-located `components/**/*.lib.ts` modules stay beside their UI when they are
 drawer/inventory view models or picker chrome — see
 [feature-structure.md § Character builder co-location](../../docs/feature-structure.md#character-builder-co-located-lib-modules).
+
+Shared TanStack Query slice helpers for route shells live in
+[`@/lib/query/query-state.lib`](../../lib/query/query-state.lib.ts), not under
+this feature.
 
 ## Related docs
 

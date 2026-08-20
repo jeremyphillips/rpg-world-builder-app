@@ -160,9 +160,10 @@ header `identitySupplement` slot via
 
 ## Error copy (route shells)
 
-User-visible messages come from API responses via `resolveQueryErrorLabel`.
+User-visible messages come from API responses via `resolveQueryErrorLabel`
+([`@/lib/query/query-state.lib`](../src/lib/query/query-state.lib.ts)).
 Reference constants live in
-`apps/dashboard/src/features/character/lib/character-sheet-error-labels.ts`.
+`apps/dashboard/src/features/character/lib/detail/character-sheet-error-labels.ts`.
 Visual states are documented in Storybook:
 `Character/CharacterSheetDetailShell`.
 
