@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { type OrganizationLocationConnectionKind } from '@rpg/contracts'
 import {
   Alert,
@@ -53,15 +54,15 @@ import type {
   BuildingOrganizationRelationshipKindOption,
 } from '../lib/building-organization-create-drafts'
 import {
-  buildingOrganizationsChooseExistingClasses,
   buildingOrganizationsComposerClasses,
   buildingOrganizationsComposerHeadingClasses,
   buildingOrganizationsComposerSummaryRowsClasses,
   buildingOrganizationsDiscoveryBodyClasses,
   buildingOrganizationsDiscoveryControlsClasses,
   buildingOrganizationsDiscoveryCreateActionClasses,
-  buildingOrganizationsDiscoveryClasses,
   buildingOrganizationsDiscoveryListClasses,
+  buildingOrganizationsStageHeadingRowClasses,
+  buildingOrganizationsStageStackClasses,
   buildingOrganizationsStageSubheadingClasses,
 } from './building-organizations-create-tab.variants'
 import {
@@ -175,6 +176,33 @@ function BuildingOrganizationRelationshipKindField({
   )
 }
 
+function BuildingOrganizationStageSubheading({
+  heading,
+  helper,
+  action,
+  children,
+}: {
+  heading: string
+  helper: string
+  action?: ReactNode
+  children?: ReactNode
+}) {
+  return (
+    <div className={buildingOrganizationsStageStackClasses}>
+      <div className={buildingOrganizationsStageSubheadingClasses}>
+        <div className={buildingOrganizationsStageHeadingRowClasses}>
+          <Heading as="h4" variant="group">
+            {heading}
+          </Heading>
+          {action}
+        </div>
+        <Text variant="muted">{helper}</Text>
+      </div>
+      {children}
+    </div>
+  )
+}
+
 function BuildingOrganizationDiscoveryRow({
   organization,
   kind,
@@ -239,13 +267,10 @@ function BuildingOrganizationDiscovery({
   } = controller
 
   return (
-    <div className={buildingOrganizationsDiscoveryClasses}>
-      <div className={buildingOrganizationsStageSubheadingClasses}>
-        <Heading as="h4" variant="group">
-          {BUILDING_ORGANIZATIONS_DISCOVERY_HEADING}
-        </Heading>
-        <Text variant="muted">{BUILDING_ORGANIZATIONS_DISCOVERY_HELPER}</Text>
-      </div>
+    <BuildingOrganizationStageSubheading
+      heading={BUILDING_ORGANIZATIONS_DISCOVERY_HEADING}
+      helper={BUILDING_ORGANIZATIONS_DISCOVERY_HELPER}
+    >
       <div className={buildingOrganizationsDiscoveryBodyClasses}>
         <div className={buildingOrganizationsDiscoveryControlsClasses}>
           <SearchBar
@@ -287,7 +312,7 @@ function BuildingOrganizationDiscovery({
           ))}
         </div>
       </div>
-    </div>
+    </BuildingOrganizationStageSubheading>
   )
 }
 
@@ -332,8 +357,10 @@ function BuildingOrganizationNewBranch({
   const { context, returnToDiscovery, commitNew, newOrganizationDraftId } = controller
 
   return (
-    <>
-      <div className={buildingOrganizationsChooseExistingClasses}>
+    <BuildingOrganizationStageSubheading
+      heading={BUILDING_ORGANIZATIONS_BRANCH_HEADING}
+      helper={BUILDING_ORGANIZATIONS_BRANCH_HELPER}
+      action={
         <Button
           type="button"
           variant="ghost"
@@ -343,13 +370,8 @@ function BuildingOrganizationNewBranch({
         >
           {BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL}
         </Button>
-      </div>
-      <div className={buildingOrganizationsStageSubheadingClasses}>
-        <Heading as="h4" variant="subsection">
-          {BUILDING_ORGANIZATIONS_BRANCH_HEADING}
-        </Heading>
-        <Text variant="muted">{BUILDING_ORGANIZATIONS_BRANCH_HELPER}</Text>
-      </div>
+      }
+    >
       <OrganizationAuthoringFormShell>
         <BuildingOrganizationNewOrganizationForm
           context={context}
@@ -357,7 +379,7 @@ function BuildingOrganizationNewBranch({
           commitNew={commitNew}
         />
       </OrganizationAuthoringFormShell>
-    </>
+    </BuildingOrganizationStageSubheading>
   )
 }
 

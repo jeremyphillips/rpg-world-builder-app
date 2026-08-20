@@ -5,6 +5,9 @@ import { describe, expect, it } from 'vitest'
 const composerPath = fileURLToPath(
   new URL('../components/building-organizations-composer.client.tsx', import.meta.url),
 )
+const variantsPath = fileURLToPath(
+  new URL('../components/building-organizations-create-tab.variants.ts', import.meta.url),
+)
 const modalPath = fileURLToPath(
   new URL('../components/location-create-modal.client.tsx', import.meta.url),
 )
@@ -19,6 +22,21 @@ describe('building organizations composer structural drift', () => {
     expect(source).not.toContain('ChooserSummaryCard')
     expect(source).not.toContain('CollapsibleRadioCardField')
     expect(source).not.toContain('LocationConnectionKindStep')
+  })
+
+  it('routes discovery and branch stages through the shared stage subheading pattern', () => {
+    const source = readFileSync(composerPath, 'utf8')
+    const variants = readFileSync(variantsPath, 'utf8')
+
+    expect(source).toMatch(/function BuildingOrganizationStageSubheading[\s\S]*variant="group"/)
+    expect(source).toMatch(
+      /BuildingOrganizationStageSubheading[\s\S]*BUILDING_ORGANIZATIONS_DISCOVERY_HEADING/,
+    )
+    expect(source).toMatch(
+      /BuildingOrganizationStageSubheading[\s\S]*BUILDING_ORGANIZATIONS_BRANCH_HEADING/,
+    )
+    expect(variants).toContain('gap-0.5')
+    expect(variants).toContain('gap-2.5')
   })
 })
 

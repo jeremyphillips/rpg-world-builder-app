@@ -29,6 +29,7 @@ import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
 import {
   BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL,
+  BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL,
   BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL,
 } from '../lib/building-organizations-create-tab.lib'
 import { BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL } from '../lib/location-building-create-setup.lib'
@@ -416,7 +417,7 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('button', { name: 'Continue' }))
 
     expect(
-      screen.getByRole('button', { name: '← Choose existing organization' }),
+      screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL }),
     ).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Close' }))
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
