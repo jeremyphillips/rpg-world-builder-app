@@ -52,10 +52,6 @@ import {
 } from '../lib/location-settlement-create-setup.lib'
 import { LocationCreateModal } from './location-create-modal.client'
 
-const mutateAsync = vi.fn()
-const updateRouteContentCampaignAccess = vi.fn()
-const invalidateContentFormDefQueries = vi.fn()
-
 const organizationCatalog = vi.hoisted(() => [
   {
     id: 'organization-1',
@@ -79,6 +75,22 @@ const organizationCatalog = vi.hoisted(() => [
     connections: { locations: [] },
   },
 ])
+
+const rogueClass = vi.hoisted(() => ({
+  id: 'class-rogue',
+  slug: 'rogue',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'homebrew' as const,
+  status: 'published' as const,
+  campaignId: 'camp_1',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Rogue',
+}))
+
+const mutateAsync = vi.fn()
+const updateRouteContentCampaignAccess = vi.fn()
+const invalidateContentFormDefQueries = vi.fn()
 
 vi.mock('../../lib/list/use-content-mutations', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
@@ -118,6 +130,15 @@ vi.mock('../../organizations', () => ({
   useOrganizations: () => ({ data: organizationCatalog, isPending: false, isError: false }),
 }))
 
+vi.mock('../../organizations/lib/organization-authoring-context.client', () => ({
+  OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
+  useOrganizationAuthoringContext: () => ({
+    practiceRecommendations: [],
+    setPracticeRecommendations: vi.fn(),
+    clearPracticeRecommendations: vi.fn(),
+  }),
+}))
+
 vi.mock('../../lib/campaign-access/campaign-access-api', () => ({
   updateRouteContentCampaignAccess: (...args: unknown[]) =>
     updateRouteContentCampaignAccess(...args),
@@ -128,7 +149,10 @@ vi.mock('../../lib/forms/shells/content-form-shell-layout', () => ({
     children({
       campaignId: STORY_CAMPAIGN_ID,
       campaignRules: {},
-      options: { locations: buildContentPurposeSelectors([]) },
+      options: {
+        locations: buildContentPurposeSelectors([]),
+        classes: buildContentPurposeSelectors([rogueClass]),
+      },
     }),
 }))
 
@@ -1339,6 +1363,16 @@ describe('LocationCreateModal', () => {
 
     await waitFor(() => {
       expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
+  })
+
+  describe('transaction-aware submit labels', () => {
+    it('shows Create building when there are no new organization drafts', async () => {
+      const user = userEvent.setup()
+      renderModal(buildingIntent)
+      await continueBuildingSetup(user)
+
+      expect(screen.getByRole('button', { name: 'Create building' })).toBeInTheDocument()
     })
   })
 })
