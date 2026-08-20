@@ -346,6 +346,19 @@ successfully; handoff failure rejects `onCreated`, surfaces status-specific feed
 the create modal open — the entity already exists, so callers must not retry persistence.
 Footer submit is the only relationship persist boundary — nested create must not POST the relationship.
 
+**Typed handoff results** (`NestedCreateHandoffResult` in
+[`relationship-picker-nested-create.types.ts`](../src/features/content/lib/relationship/relationship-picker-nested-create.types.ts)):
+
+| Status        | User-visible outcome                                                            |
+| ------------- | ------------------------------------------------------------------------------- |
+| `selected`    | Drawer selects the new entity; nested modal closes                              |
+| `not-found`   | Warning — created, but not visible yet; refresh or select manually              |
+| `ineligible`  | Warning — created, but cannot link in this slot; select manually or change kind |
+| `unsupported` | Error — created, but automatic selection unsupported for this content type      |
+
+Copy lives in [`nested-create-handoff.errors.ts`](../src/lib/create-flow/nested-create-handoff.errors.ts)
+(`formatNestedCreateHandoffFailure`). Reject = handoff failed after persist; never re-mutate.
+
 Nested create supplies one relationship endpoint. The originating workflow owns that
 relationship. Reverse org-location composition authoring is suppressed in nested
 creators via **`ContentCreateContext`** (`relationship-target` +

@@ -39,6 +39,8 @@ describe('building organizations composer structural drift', () => {
     expect(variants).not.toContain('buildingOrganizationsStageSubheadingClasses')
     expect(variants).not.toContain('buildingOrganizationsComposerClasses')
     expect(variants).not.toContain('gap-2.5')
+    expect(source).not.toMatch(/\bspace-y-\d/)
+    expect(source).toContain('createCompositionStageSubheadingClasses')
     // Policy: apps/dashboard/docs/create-flow.md §Nested composition presentation
   })
 })

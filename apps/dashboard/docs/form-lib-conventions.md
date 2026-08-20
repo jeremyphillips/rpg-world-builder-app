@@ -396,6 +396,13 @@ touches a field. Invalid Create/Save clicks run RHF validation, show progressive
 navigate/focus the first invalid field or tab. Optional `validateSilently` / `useSilentFormValidity`
 may drive secondary UI (e.g. "Ready to create") — not the primary submit gate.
 
+**Quick NPC exception:** Quick NPC create stays on `useSubmitHandler` plus domain libs
+(`TabbedForm`, build-context projection, tabbed submit labels) — do not premature-standardize onto
+`useContentFormSubmit`. Nested picker handoff lifecycle is owned by
+`useRelationshipPickerNestedCreate` and `invokeOnContentCreated` reject semantics (see
+[create-flow.md](./create-flow.md#oncontentcreated-handoff) and
+[cross-content-relationship-ui.md](./cross-content-relationship-ui.md#relationship-picker-nested-create)).
+
 Feat- and species-specific helpers (not cross-type shared infra):
 
 | Module             | Path                                                                                                                                                |

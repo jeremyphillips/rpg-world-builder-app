@@ -143,6 +143,12 @@ Usage sketch:
 Not every workflow needs all three primitives. Use each where its anatomy
 applies; do not hand-build equivalent layout when a primitive exists.
 
+**Read-only single-option kind display:** when only one relationship kind is eligible, show a
+label + resolved value instead of a one-option radio group. This is not a `CreateCompositionStage`
+(the stage primitive uses `Heading variant="group"` / `h4` for active decisions with optional body).
+Reuse `createCompositionStageSubheadingClasses` for label → value spacing and keep
+`Heading variant="label"` for the prompt. Building Organizations is the reference implementation.
+
 ### Adjacent infrastructure
 
 ```text
@@ -187,6 +193,46 @@ every primitive in every workflow.
 
 Scoped structural tests (Building composer) and
 `create-composition-presentation-ownership.test.ts` supplement this policy.
+
+## OnContentCreated handoff
+
+Create modals and nested picker flows share a post-persist callback contract in
+[`created-content-result.types.ts`](../src/lib/create-flow/created-content-result.types.ts).
+
+| Step                     | Behavior                                                                                                                  |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| Persist                  | Entity is created (mutation succeeds)                                                                                     |
+| `invokeOnContentCreated` | Awaits caller handoff (query refresh, revalidation, selection callback)                                                   |
+| Resolve                  | Handoff succeeded → modal closes, drawer selection applied                                                                |
+| Reject                   | Handoff failed → **entity already exists**; modal stays open; surface status-specific error; **do not retry persistence** |
+
+Call sites wrap persist success as:
+
+```ts
+try {
+  await invokeOnContentCreated(onCreated, result)
+  notifyContentCreated(...)
+  trustedClose()
+} catch (err) {
+  toast.warning/error(formatNestedCreateHandoffFailure(err))
+  return
+}
+```
+
+Nested picker hooks reject with `NestedCreateHandoffError` carrying a typed status; org-member
+Quick NPC roster refresh uses the same reject-don't-retry-persist rule.
+
+### Content create context
+
+[`ContentCreateContext`](../src/lib/create-flow/content-create-context.ts) describes why a create
+modal opened. Nested relationship pickers pass `relationship-target` plus vocabulary; standalone
+creators use `STANDALONE_CONTENT_CREATE_CONTEXT`.
+
+Quick NPC nested create maps at the modal boundary via
+`mapContentCreateContextToQuickNpcCreateContext` in
+[`quick-npc-create-context.ts`](../src/features/character/npc/lib/quick-npc-create-context.ts).
+`relationship-target` is intentionally mapped to `{ kind: 'standalone' }` — Quick NPC context does
+not carry relationship vocabulary unless product approves extending it.
 
 ## Add / Pending workflow
 

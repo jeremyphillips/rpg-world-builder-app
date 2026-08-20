@@ -16,6 +16,7 @@ import {
   CreateCompositionComposer,
   CreateCompositionStage,
   CreateCompositionSummary,
+  createCompositionStageSubheadingClasses,
   useCreateFlowFormDensity,
   CREATE_FLOW_FORM_DENSITY,
 } from '@/lib/create-flow'
@@ -93,7 +94,7 @@ function BuildingOrganizationRelationshipKindField({
     if (!resolved) return null
 
     return (
-      <div className="space-y-1">
+      <div className={createCompositionStageSubheadingClasses}>
         <Heading variant="label" as="p">
           {BUILDING_ORGANIZATIONS_INTENT_PROMPT}
         </Heading>
