@@ -10,7 +10,7 @@ import { pickClass, pickSkillProficiency } from '@/features/content'
 import {
   createStandaloneBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { ClassStep } from './class-step.client'
 
 const fighter = pickClass('fighter')

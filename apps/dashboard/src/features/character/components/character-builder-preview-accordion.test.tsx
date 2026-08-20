@@ -12,7 +12,7 @@ import {
   type CharacterBuildContext,
 } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../lib/fixtures/character-builder-fixtures'
 import {
   createSpellsStepContextFixture,
   spellsStepWizardCantrips,

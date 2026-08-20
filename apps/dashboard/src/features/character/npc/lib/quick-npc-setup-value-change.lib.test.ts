@@ -4,7 +4,7 @@ import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../components/connect
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import {
   applyQuickNpcSetupValueChange,
   resolveQuickNpcLevelForMembershipTitle,

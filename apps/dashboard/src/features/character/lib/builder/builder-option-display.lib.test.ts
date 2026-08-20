@@ -13,7 +13,7 @@ import {
   formatClassCardOption,
   formatSpeciesCardOption,
 } from './builder-option-display.lib'
-import { populatedBuilderCatalog } from '../character-builder-fixtures'
+import { populatedBuilderCatalog } from '../fixtures/character-builder-fixtures'
 
 const dwarfWithTraits = makeSpecies({
   ...populatedBuilderCatalog.species[0]!,

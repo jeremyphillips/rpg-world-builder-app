@@ -135,7 +135,11 @@ export {
 } from './lib/display/character-display'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
 export { formatContentReferenceLabel } from './lib/display/format-content-reference-label'
-export { SAMPLE_PC, makeCampaignNpcListItem, makeCampaignNpcDetail } from './lib/character-fixtures'
+export {
+  SAMPLE_PC,
+  makeCampaignNpcListItem,
+  makeCampaignNpcDetail,
+} from './lib/fixtures/character-fixtures'
 export {
   populatedBuilderCatalog,
   createStandaloneBuilderContextFixture,
@@ -143,7 +147,7 @@ export {
   createStandaloneBuilderCatalogIndexFixture,
   createCampaignNpcBuilderContextFixture,
   createCampaignPcBuilderContextFixture,
-} from './lib/character-builder-fixtures'
+} from './lib/fixtures/character-builder-fixtures'
 export { isNonEmptyCharacterBuilderDraft } from './lib/draft/is-non-empty-character-builder-draft'
 export {
   createCharacterBuilderStore,

@@ -5,7 +5,7 @@ import { isCharacterBuildFinalizationError, type CharacterBuildContext } from '@
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { buildQuickNpcCreateInput, formatQuickNpcCreationError } from './quick-npc-create'
 
 /** Fighter variant whose skill choice is satisfiable by the fixture catalog. */

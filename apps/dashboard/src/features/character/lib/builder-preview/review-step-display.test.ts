@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../fixtures/character-builder-fixtures'
 import { formatAbilityMethodLabel, resolveReviewReadyMessage } from './review-step-display'
 
 describe('review-step-display', () => {

@@ -13,7 +13,7 @@ import type {
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../lib/fixtures/character-builder-fixtures'
 import { createSpellsStepContextFixture } from '../lib/spells/spells-step.fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 

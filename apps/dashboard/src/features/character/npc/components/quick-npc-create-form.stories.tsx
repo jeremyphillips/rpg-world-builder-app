@@ -4,7 +4,7 @@ import { expect, userEvent, within } from 'storybook/test'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import {
   quickNpcMemberSetupWithNoTitle,
   quickNpcOrganizationMemberCreateContext,

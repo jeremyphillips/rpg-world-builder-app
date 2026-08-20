@@ -7,7 +7,7 @@ import {
   indexCharacterBuildCatalog,
 } from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import { createStandaloneBuilderContextFixture } from '../lib/fixtures/character-builder-fixtures'
 import { useCharacterPreview } from './use-character-preview'
 
 describe('useCharacterPreview', () => {

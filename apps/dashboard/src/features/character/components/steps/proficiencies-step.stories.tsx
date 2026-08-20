@@ -9,7 +9,7 @@ import {
   createProficienciesStepRogueWithSkillSelectionsFixture,
   createProficienciesStepRogueWithStaleSkillFixture,
 } from '../../lib/proficiencies/proficiencies-step.fixtures'
-import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import { createStandaloneBuilderContextFixture } from '../../lib/fixtures/character-builder-fixtures'
 import { ProficienciesStep } from './proficiencies-step.client'
 
 const emptyContext = createStandaloneBuilderContextFixture()

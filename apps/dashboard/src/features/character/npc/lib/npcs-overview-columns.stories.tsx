@@ -5,8 +5,8 @@ import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.cl
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../../lib/character-builder-fixtures'
-import { makeCampaignNpcListItem } from '../../lib/character-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
+import { makeCampaignNpcListItem } from '../../lib/fixtures/character-fixtures'
 import { npcOverviewFilterSchema } from './npc-overview-filter-schema'
 import { toNpcOverviewTableRow } from './npc-overview-row'
 

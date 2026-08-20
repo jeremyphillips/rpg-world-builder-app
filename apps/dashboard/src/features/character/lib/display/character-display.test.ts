@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../character-builder-fixtures'
+} from '../fixtures/character-builder-fixtures'
 import {
   buildCharacterCardViewModel,
   buildCharacterDetailViewModel,
   formatCharacterSummaryFromCatalog,
 } from './character-display'
-import { SAMPLE_PC, makeCampaignNpcListItem } from '../character-fixtures'
+import { SAMPLE_PC, makeCampaignNpcListItem } from '../fixtures/character-fixtures'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)

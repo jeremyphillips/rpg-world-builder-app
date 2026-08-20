@@ -5,7 +5,7 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import {
   createCampaignPcBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../lib/character-builder-fixtures'
+} from '../lib/fixtures/character-builder-fixtures'
 import { CharacterBuilderLevelControl } from './character-builder-level-control.client'
 
 const meta = {

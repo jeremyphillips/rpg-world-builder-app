@@ -5,8 +5,8 @@ import { pickEquipment } from '@/features/content'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../../lib/character-builder-fixtures'
-import { SAMPLE_PC } from '../../lib/character-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
+import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetEquipmentCards } from '../../lib/detail/character-sheet-catalog'
 import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.client'
 

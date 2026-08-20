@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import {
   QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
   QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME,

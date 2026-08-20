@@ -5,7 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../../lib/fixtures/character-builder-fixtures'
 import { getBuilderChromeCopy } from '../../lib/builder/builder-chrome-copy'
 import { ReviewStep } from './review-step.client'
 import { lanternGuild } from '../connections/organization-picker-drawer.fixtures'

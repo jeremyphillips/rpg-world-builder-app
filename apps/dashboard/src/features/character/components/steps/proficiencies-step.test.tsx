@@ -9,7 +9,7 @@ import {
   formatFieldMessage,
 } from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import { createStandaloneBuilderContextFixture } from '../../lib/fixtures/character-builder-fixtures'
 import {
   createEmptyProficienciesStepPreviewFixture,
   createProficienciesStepOriginLanguagesFixture,

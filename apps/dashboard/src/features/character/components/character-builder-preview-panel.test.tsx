@@ -13,7 +13,7 @@ import {
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../lib/character-builder-fixtures'
+} from '../lib/fixtures/character-builder-fixtures'
 import {
   PREVIEW_CHOOSE_ALIGNMENT,
   PREVIEW_CHOOSE_SPECIES,

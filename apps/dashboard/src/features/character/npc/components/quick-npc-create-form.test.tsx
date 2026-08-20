@@ -12,7 +12,7 @@ import { renderWithProviders } from '@/test/render'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import {
   quickNpcMemberSetupValues,
   quickNpcMemberSetupWithNoTitle,

@@ -4,7 +4,7 @@ import { CLASS_SECTION_LABELS, CLASS_STAT_LABELS } from '@/features/content'
 import { pickClass, pickSkillProficiency } from '@/features/content'
 
 import { buildClassDetailsSheetContent } from './builder-class-option-display.lib'
-import { populatedBuilderCatalog } from '../character-builder-fixtures'
+import { populatedBuilderCatalog } from '../fixtures/character-builder-fixtures'
 
 describe('builder-class-option-display.lib', () => {
   const fighter = pickClass('fighter')

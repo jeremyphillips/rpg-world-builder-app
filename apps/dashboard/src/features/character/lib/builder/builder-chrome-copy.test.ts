@@ -7,7 +7,7 @@ import {
   createCampaignNpcBuilderContextFixture,
   createCampaignPcBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../character-builder-fixtures'
+} from '../fixtures/character-builder-fixtures'
 import { getBuilderChromeCopy, getBuilderChromeCopyForContext } from './builder-chrome-copy'
 
 describe('getBuilderChromeCopy', () => {

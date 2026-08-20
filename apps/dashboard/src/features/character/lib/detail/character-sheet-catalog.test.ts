@@ -5,8 +5,8 @@ import { pickSpell } from '@/features/content'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../character-builder-fixtures'
-import { SAMPLE_PC } from '../character-fixtures'
+} from '../fixtures/character-builder-fixtures'
+import { SAMPLE_PC } from '../fixtures/character-fixtures'
 import {
   buildCharacterSheetEquipmentCards,
   buildCharacterSheetSpellCards,

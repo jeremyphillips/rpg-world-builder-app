@@ -4,7 +4,7 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import { createStandaloneBuilderContextFixture } from '../../lib/fixtures/character-builder-fixtures'
 import { cityCouncil, lanternGuild } from '../connections/organization-picker-drawer.fixtures'
 import { ConnectionsStep } from './connections-step.client'
 

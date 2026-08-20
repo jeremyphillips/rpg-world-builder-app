@@ -9,7 +9,7 @@ import {
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../lib/character-builder-fixtures'
+} from '../lib/fixtures/character-builder-fixtures'
 import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
 
 const meta = {

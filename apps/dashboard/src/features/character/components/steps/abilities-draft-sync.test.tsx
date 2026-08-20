@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import { createStandaloneBuilderContextFixture } from '../../lib/fixtures/character-builder-fixtures'
 import { abilitiesFormCopy } from '../../lib/steps/abilities-form-labels'
 import { AbilitiesStep } from './abilities-step.client'
 

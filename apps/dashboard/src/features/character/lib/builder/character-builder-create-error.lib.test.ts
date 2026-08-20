@@ -5,7 +5,7 @@ import { ApiError, CharacterBuildFinalizationError } from '@rpg/contracts'
 import {
   createCampaignPcBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../character-builder-fixtures'
+} from '../fixtures/character-builder-fixtures'
 import {
   applyBuilderCreateFailure,
   resolveBuilderCreateFailure,

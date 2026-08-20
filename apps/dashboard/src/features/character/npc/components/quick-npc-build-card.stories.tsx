@@ -4,7 +4,7 @@ import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { resolveQuickNpcBuildCardModel } from '../lib/quick-npc-build-card.lib'
 import {
   quickNpcMemberSetupValues,

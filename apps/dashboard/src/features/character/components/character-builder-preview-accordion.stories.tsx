@@ -7,7 +7,7 @@ import {
   resolveAvailableChoices,
 } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../lib/fixtures/character-builder-fixtures'
 import { narrativeFieldCount } from '../lib/builder-preview/narrative-preview'
 import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion.client'
 

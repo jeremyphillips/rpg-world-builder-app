@@ -8,7 +8,7 @@ import {
   resolveAvailableChoices,
 } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../fixtures/character-builder-fixtures'
 import {
   countProficiencyChoicesRemaining,
   formatPreviewLanguagesSubsection,

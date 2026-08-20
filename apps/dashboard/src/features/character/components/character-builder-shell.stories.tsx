@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
   createStandaloneBuilderCatalogIndexFixture,
   createPopulatedStandaloneBuilderContextFixture,
-} from '../lib/character-builder-fixtures'
+} from '../lib/fixtures/character-builder-fixtures'
 import { CharacterBuilderShell } from './character-builder-shell.client'
 
 const meta = {

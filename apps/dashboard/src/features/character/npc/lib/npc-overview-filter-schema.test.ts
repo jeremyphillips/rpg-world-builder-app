@@ -5,8 +5,8 @@ import { createDefaultCharacterVitalState } from '@rpg/contracts'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../../lib/character-builder-fixtures'
-import { makeCampaignNpcListItem } from '../../lib/character-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
+import { makeCampaignNpcListItem } from '../../lib/fixtures/character-fixtures'
 import { toNpcOverviewTableRow } from './npc-overview-row'
 import { npcOverviewFilterSchema } from './npc-overview-filter-schema'
 

@@ -6,7 +6,7 @@ import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { QUICK_NPC_CLASS_ALL_GROUP_EYEBROW } from '../lib/quick-npc-class-option-groups.lib'
 import { QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL } from '../lib/quick-npc-build-card.lib'
 import { QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL } from '../lib/quick-npc-build-card.lib'

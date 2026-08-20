@@ -21,7 +21,7 @@ import { makeSpecies } from '@/test/fixtures/factories/species'
 import {
   createStandaloneBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { CHANGE_HERITAGE_LABEL } from '../../lib/builder/builder-parent-choice-status.lib'
 import { SpeciesStep } from './species-step.client'
 

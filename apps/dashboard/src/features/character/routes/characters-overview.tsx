@@ -15,7 +15,7 @@ import { buildCharacterCardViewModel } from '../lib/display/character-display'
 import {
   CHARACTERS_INDEX_SECTION_LABELS,
   CHARACTERS_OVERVIEW_COPY,
-} from '../lib/character-list-routing'
+} from '../lib/characters-overview-copy'
 import { resolveCharacterDetailHref } from '@/lib/routing/resolve-character-detail-href'
 import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 

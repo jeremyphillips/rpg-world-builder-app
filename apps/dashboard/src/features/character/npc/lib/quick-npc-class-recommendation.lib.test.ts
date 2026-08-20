@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 
 import {
   applyQuickNpcRecommendedClassSeeding,

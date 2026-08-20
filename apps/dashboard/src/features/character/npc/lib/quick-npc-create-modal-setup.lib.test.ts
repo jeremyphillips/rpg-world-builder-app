@@ -4,7 +4,7 @@ import { makeSpecies } from '@/test/fixtures/factories/species'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import {
   buildQuickNpcCreateSetupSets,
   resolveQuickNpcSetupSummaryRows,

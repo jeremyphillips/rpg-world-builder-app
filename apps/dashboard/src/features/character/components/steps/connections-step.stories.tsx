@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../../lib/character-builder-fixtures'
+import { createStandaloneBuilderContextFixture } from '../../lib/fixtures/character-builder-fixtures'
 import { cityCouncil, lanternGuild } from '../connections/organization-picker-drawer.fixtures'
 import { ConnectionsStep } from './connections-step.client'
 

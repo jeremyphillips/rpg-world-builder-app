@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../character-builder-fixtures'
-import { SAMPLE_PC } from '../character-fixtures'
+} from '../fixtures/character-builder-fixtures'
+import { SAMPLE_PC } from '../fixtures/character-fixtures'
 import {
   buildCharacterEntitySummaryVmFromCatalog,
   buildCharacterEntitySummaryVmFromTransport,

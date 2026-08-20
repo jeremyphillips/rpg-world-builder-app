@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { renderWithProviders } from '@/test/render'
 
 import {

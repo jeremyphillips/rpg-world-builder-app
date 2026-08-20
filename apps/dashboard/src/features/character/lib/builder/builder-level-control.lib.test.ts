@@ -9,7 +9,7 @@ import {
 import {
   createCampaignNpcBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../character-builder-fixtures'
+} from '../fixtures/character-builder-fixtures'
 import {
   buildBuilderLevelSelectOptions,
   evaluateBuilderLevelChange,

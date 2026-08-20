@@ -6,7 +6,7 @@ import type {
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../lib/character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../lib/fixtures/character-builder-fixtures'
 import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()

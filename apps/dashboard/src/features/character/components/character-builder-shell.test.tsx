@@ -23,7 +23,7 @@ import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
 import {
   createStandaloneBuilderCatalogIndexFixture,
   createStandaloneBuilderContextFixture,
-} from '../lib/character-builder-fixtures'
+} from '../lib/fixtures/character-builder-fixtures'
 import { abilitiesFormCopy } from '../lib/steps/abilities-form-labels'
 import { resetCharacterBuilderStoreCache } from '../store/character-builder-store'
 import { CharacterBuilderShell } from './character-builder-shell.client'

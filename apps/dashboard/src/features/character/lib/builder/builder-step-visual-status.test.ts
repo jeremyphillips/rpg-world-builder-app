@@ -6,7 +6,7 @@ import {
   resolveAvailableChoices,
 } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../fixtures/character-builder-fixtures'
 import { createSpellsStepContextFixture } from '../spells/spells-step.fixtures'
 import {
   resolveStepVisualStatus,

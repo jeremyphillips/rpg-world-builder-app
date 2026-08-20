@@ -12,7 +12,7 @@ import {
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { AbilitiesStep } from './abilities-step.client'
 
 const context = createStandaloneBuilderContextFixture()

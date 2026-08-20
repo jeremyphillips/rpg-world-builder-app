@@ -12,7 +12,7 @@ import {
   homebrewSpeciesFixture,
   populatedBuilderCatalog,
   unsupportedNamingDwarfSpecies,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import {
   generateQuickNpcName,
   resolveQuickNpcNameGenerationSupport,

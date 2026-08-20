@@ -7,9 +7,9 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
-import { SAMPLE_PC } from '../../lib/character-fixtures'
+import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
 import { CharacterDetailContent } from './character-detail-content.client'
 
 vi.mock('@/components/layout/use-breadcrumb-label', () => ({

@@ -5,7 +5,7 @@ import { createEmptyCharacterBuilderDraft, DEFAULT_STANDARD_ARRAY } from '@rpg/c
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../../lib/character-builder-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
 import { AbilitiesStep } from './abilities-step.client'
 
 const context = createStandaloneBuilderContextFixture()
