@@ -10,6 +10,18 @@ import type {
   BuildingOrganizationRelationshipDraft,
 } from './building-organization-create-drafts'
 
+export const BUILDING_ORGANIZATIONS_TAB_HEADING = 'Organizations'
+export const BUILDING_ORGANIZATIONS_TAB_DESCRIPTION =
+  'Add owners, tenants, or operators associated with this building. You can link an existing organization or create a new one.'
+export const BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL = 'No organization relationships added.'
+export const BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL = '+ Add organization relationship'
+export const BUILDING_ORGANIZATIONS_COMPOSER_HEADING = 'Add organization relationship'
+export const BUILDING_ORGANIZATIONS_DISCOVERY_HEADING = 'Choose organization'
+export const BUILDING_ORGANIZATIONS_DISCOVERY_HELPER =
+  'Select an existing organization or create a new one.'
+export const BUILDING_ORGANIZATIONS_BRANCH_HEADING = 'New organization'
+export const BUILDING_ORGANIZATIONS_BRANCH_HELPER =
+  'This organization will be created when you create the building.'
 export const BUILDING_ORGANIZATIONS_INTENT_PROMPT =
   'What relationship should this organization have with this building?'
 export const BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW = 'Relationship'
@@ -17,7 +29,7 @@ export const BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW = 'Organization'
 export const BUILDING_ORGANIZATIONS_ORGANIZATION_CHANGE_LABEL = 'Change'
 export const BUILDING_ORGANIZATIONS_SEARCH_LABEL = 'Search organizations'
 export const BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER = 'Search organizations…'
-export const BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL = '+ Create organization'
+export const BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL = '+ Create new organization'
 export const BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL = '← Choose existing organization'
 export const BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL = '+ Add another relationship'
 export const BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL = 'Add relationship'
@@ -26,9 +38,10 @@ export const BUILDING_ORGANIZATIONS_SELECT_LABEL = 'Select'
 export const BUILDING_ORGANIZATIONS_PENDING_HEADING = 'Pending relationships'
 export const BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE =
   'Finish or cancel the relationship you are adding.'
-export const BUILDING_ORGANIZATIONS_NEW_BADGE_LABEL = 'New Organization'
+export const BUILDING_ORGANIZATIONS_NEW_BADGE_LABEL = 'New organization'
 export const BUILDING_ORGANIZATIONS_UNAVAILABLE_NAME = 'Unavailable Organization'
-export const BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME = 'New Organization'
+export const BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME = 'New organization'
+export const BUILDING_NEW_ORGANIZATION_FORM_ID = 'building-new-organization-draft'
 export const BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL = 'Edit relationship'
 export const BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL = 'Remove relationship'
 export const BUILDING_ORGANIZATIONS_OVERFLOW_LABEL = 'Relationship actions'

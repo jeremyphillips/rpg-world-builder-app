@@ -4,18 +4,14 @@ import type { CreateWorkflowDraftPanelController } from '@/lib/create-flow'
 
 import type { OrganizationFormValues } from '../../lib/forms/organization-form-projection'
 import {
-  buildBuildingOrganizationRelationshipKindOptions,
   createBuildingOrganizationDraftId,
-  resolveBuildingOrganizationDiscoveryAddState,
   upsertBuildingOrganizationRelationshipDraft,
   type BuildingOrganizationDraftIssue,
   type BuildingOrganizationDraftPlan,
   type BuildingOrganizationRelationshipDraft,
+  type BuildingOrganizationRelationshipKindOption,
 } from './building-organization-create-drafts'
-import {
-  CREATE_SETUP_DEFAULT_CHANGE_LABEL,
-  CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW,
-} from '@/lib/create-setup'
+import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from '@/lib/create-setup'
 
 import { BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE } from './building-organizations-create-tab.lib'
 import {
@@ -23,6 +19,8 @@ import {
   BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
   BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW,
 } from './building-organizations-create-tab.lib'
+
+export type BuildingOrganizationComposerMode = 'resting' | 'composing'
 
 export type BuildingOrganizationEditingDecision = 'relationship' | 'organization'
 
@@ -40,8 +38,14 @@ export type BuildingOrganizationComposerView = {
   showCommit: boolean
   showRelationshipChange: boolean
   showOrganizationChange: boolean
-  summaryEyebrow: string | null
   summaryRows: readonly BuildingOrganizationComposerSummaryRow[]
+}
+
+export type BuildingOrganizationDiscoveryAddState = {
+  eligibleCount: number
+  addDisabled: boolean
+  addDisabledReason?: string
+  singleEligibleValue?: OrganizationLocationConnectionKind
 }
 
 export type BuildingOrganizationComposerStage = 'intent' | 'discovery' | 'review' | 'branch'
@@ -55,7 +59,7 @@ export function organizationTargetEligibleForKind(input: {
   kindOptionsFor: (
     organization?: BuildingOrganizationRelationshipDraft['organization'],
     relationshipDraftId?: string,
-  ) => ReturnType<typeof buildBuildingOrganizationRelationshipKindOptions>
+  ) => readonly BuildingOrganizationRelationshipKindOption[]
   relationshipDraftId?: string
 }): boolean {
   const options = input.kindOptionsFor(input.organization, input.relationshipDraftId)
@@ -65,14 +69,14 @@ export function organizationTargetEligibleForKind(input: {
 
 export function resolveBuildingOrganizationEffectiveKind(input: {
   kind: OrganizationLocationConnectionKind | null
-  requestedMode: 'add' | 'pending'
+  composerMode: BuildingOrganizationComposerMode
   composerStage: BuildingOrganizationComposerStage
   editingDraftId: string | null
-  intentState: ReturnType<typeof resolveBuildingOrganizationDiscoveryAddState>
+  intentState: BuildingOrganizationDiscoveryAddState
 }): OrganizationLocationConnectionKind | null {
   return (
     input.kind ??
-    (input.requestedMode === 'add' &&
+    (input.composerMode === 'composing' &&
     input.composerStage === 'intent' &&
     input.editingDraftId == null
       ? (input.intentState.singleEligibleValue ?? null)
@@ -84,7 +88,7 @@ export function resolveBuildingOrganizationComposerStage(input: {
   composerStage: BuildingOrganizationComposerStage
   effectiveKind: OrganizationLocationConnectionKind | null
   kind: OrganizationLocationConnectionKind | null
-  intentState: ReturnType<typeof resolveBuildingOrganizationDiscoveryAddState>
+  intentState: BuildingOrganizationDiscoveryAddState
 }): BuildingOrganizationComposerStage {
   if (
     input.composerStage === 'intent' &&
@@ -98,18 +102,9 @@ export function resolveBuildingOrganizationComposerStage(input: {
 }
 
 export function resolveBuildingOrganizationInProgress(input: {
-  editingDraftId: string | null
-  requestedMode: 'add' | 'pending'
-  composerStage: BuildingOrganizationComposerStage
-  effectiveKind: OrganizationLocationConnectionKind | null
+  composerMode: BuildingOrganizationComposerMode
 }): boolean {
-  return (
-    input.editingDraftId != null ||
-    (input.requestedMode === 'add' &&
-      (input.composerStage === 'branch' ||
-        input.effectiveKind != null ||
-        input.composerStage === 'review'))
-  )
+  return input.composerMode === 'composing'
 }
 
 export function resolveBuildingOrganizationVisibleIssues(input: {
@@ -221,12 +216,16 @@ function buildRelationshipSummaryRow(kindLabel: string): BuildingOrganizationCom
 
 function buildOrganizationSummaryRow(
   organizationName: string,
+  organizationDomainLabel?: string | null,
 ): BuildingOrganizationComposerSummaryRow {
+  const value = organizationDomainLabel
+    ? `${organizationName} · ${organizationDomainLabel}`
+    : organizationName
   return {
     id: 'organization',
     decision: 'organizationResolved',
     label: BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
-    value: organizationName,
+    value,
   }
 }
 
@@ -247,7 +246,6 @@ function emptyBuildingOrganizationComposerView(): BuildingOrganizationComposerVi
     showCommit: false,
     showRelationshipChange: false,
     showOrganizationChange: false,
-    summaryEyebrow: null,
     summaryRows: [],
   }
 }
@@ -270,7 +268,6 @@ function buildRelationshipOnlySummaryView(input: {
     showCommit: false,
     showRelationshipChange: resolveRelationshipKindChangeVisible(input.relationshipKindCount),
     showOrganizationChange: false,
-    summaryEyebrow: input.relationshipRow ? CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW : null,
     summaryRows: input.relationshipRow ? [input.relationshipRow] : [],
   }
 }
@@ -278,12 +275,13 @@ function buildRelationshipOnlySummaryView(input: {
 function resolveReviewStageView(input: {
   relationshipRow: BuildingOrganizationComposerSummaryRow | null
   organizationName: string | null
+  organizationDomainLabel: string | null
   hasResolvedOrganization: boolean
   relationshipKindCount: number
 }): BuildingOrganizationComposerView {
   const organizationRow =
     input.hasResolvedOrganization && input.organizationName
-      ? buildOrganizationSummaryRow(input.organizationName)
+      ? buildOrganizationSummaryRow(input.organizationName, input.organizationDomainLabel)
       : null
   const summaryRows = [
     ...(input.relationshipRow ? [input.relationshipRow] : []),
@@ -297,7 +295,6 @@ function resolveReviewStageView(input: {
     showCommit: summaryRows.length >= 2,
     showRelationshipChange: resolveRelationshipKindChangeVisible(input.relationshipKindCount),
     showOrganizationChange: Boolean(organizationRow),
-    summaryEyebrow: summaryRows.length > 0 ? CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW : null,
     summaryRows,
   }
 }
@@ -306,6 +303,7 @@ function resolveStageComposerView(input: {
   composerStage: BuildingOrganizationComposerStage
   relationshipRow: BuildingOrganizationComposerSummaryRow | null
   organizationName: string | null
+  organizationDomainLabel: string | null
   hasKind: boolean
   hasResolvedOrganization: boolean
   relationshipKindCount: number
@@ -343,6 +341,7 @@ export function resolveBuildingOrganizationComposerView(input: {
   editingDecision: BuildingOrganizationEditingDecision | null
   kindLabel: string | null
   organizationName: string | null
+  organizationDomainLabel: string | null
   hasKind: boolean
   hasResolvedOrganization: boolean
   relationshipKindCount: number
@@ -375,6 +374,7 @@ export function resolveBuildingOrganizationComposerView(input: {
     composerStage: input.composerStage,
     relationshipRow,
     organizationName: input.organizationName,
+    organizationDomainLabel: input.organizationDomainLabel,
     hasKind: input.hasKind,
     hasResolvedOrganization: input.hasResolvedOrganization,
     relationshipKindCount: input.relationshipKindCount,
@@ -387,7 +387,7 @@ export function canConfirmBuildingOrganizationRelationship(input: {
   kind: OrganizationLocationConnectionKind | null
   selectedOrganization: BuildingOrganizationComposerTarget | null
   composerStage: BuildingOrganizationComposerStage
-  organizationOptions: ReturnType<typeof buildBuildingOrganizationRelationshipKindOptions>
+  organizationOptions: readonly BuildingOrganizationRelationshipKindOption[]
 }): boolean {
   if (!input.kind || !input.selectedOrganization) return false
   if (input.composerStage !== 'review' && input.composerStage !== 'branch') return false

@@ -10,7 +10,8 @@ describe('building organizations composer structural drift', () => {
   it('uses create-modal setup summary grammar instead of legacy selected-card chrome', () => {
     const source = readFileSync(composerPath, 'utf8')
 
-    expect(source).toContain('SelectionSummaryCard')
+    expect(source).toContain('SelectionSummaryRow')
+    expect(source).not.toContain('SelectionSummaryCard')
     expect(source).toContain('RadioCardField')
     expect(source).not.toContain('ChooserSummaryCard')
     expect(source).not.toContain('CollapsibleRadioCardField')

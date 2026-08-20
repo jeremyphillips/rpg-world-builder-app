@@ -27,7 +27,10 @@ import {
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
-import { BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL } from '../lib/building-organizations-create-tab.lib'
+import {
+  BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL,
+  BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL,
+} from '../lib/building-organizations-create-tab.lib'
 import { BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL } from '../lib/location-building-create-setup.lib'
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import { createSettlementWithStartingDistricts } from '../lib/location-settlement-create-composition.lib'
@@ -402,6 +405,7 @@ describe('LocationCreateModal', () => {
     await continueBuildingSetup(user)
 
     await user.click(screen.getByRole('tab', { name: 'Organizations (optional)' }))
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL }))
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
     await user.click(
@@ -426,7 +430,7 @@ describe('LocationCreateModal', () => {
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
     await user.click(screen.getByRole('tab', { name: 'Organizations (optional)' }))
-    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL }))
 
     const createButton = screen.getByRole('button', { name: 'Create building' })
     expect(createButton).toBeDisabled()

@@ -10,21 +10,23 @@ import { makeOrganization } from '@/test/fixtures/factories/organization'
 
 import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab.client'
 import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab.client'
-import { CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW } from '@/lib/create-setup'
 import {
   BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL,
-  BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
+  BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL,
+  BUILDING_ORGANIZATIONS_COMPOSER_HEADING,
   BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL,
+  BUILDING_ORGANIZATIONS_DISCOVERY_HEADING,
   BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL,
+  BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL,
   BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE,
   BUILDING_ORGANIZATIONS_INTENT_PROMPT,
-  BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME,
   BUILDING_ORGANIZATIONS_OVERFLOW_LABEL,
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
   BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
   BUILDING_ORGANIZATIONS_SEARCH_LABEL,
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
-  BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
+  BUILDING_ORGANIZATIONS_TAB_DESCRIPTION,
+  BUILDING_ORGANIZATIONS_TAB_HEADING,
 } from '../lib/building-organizations-create-tab.lib'
 import type { BuildingOrganizationDraftPlan } from '../lib/building-organization-create-drafts'
 
@@ -93,20 +95,27 @@ const threeKindsPlan: BuildingOrganizationDraftPlan = {
   relationships: allKindsPlan.relationships.slice(0, 3),
 }
 
+async function startComposing(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL }))
+}
+
 async function chooseOwnerIntent(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('radio', { name: /Owner/i }))
 }
 
-async function addExistingOwner(user: ReturnType<typeof userEvent.setup>) {
+async function addExistingOwner(
+  user: ReturnType<typeof userEvent.setup>,
+  controllerRef?: { current: BuildingOrganizationsCreateTabController | null },
+) {
+  await startComposing(user)
   await chooseOwnerIntent(user)
   await user.click(screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!)
-  await user.click(
-    screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
-  )
+  if (controllerRef) {
+    act(() => controllerRef.current?.commitComposer?.())
+  }
 }
 
 function expectRelationshipSummary(value: string) {
-  expect(screen.getByText(CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: `${value}, Change relationship` })).toBeInTheDocument()
 }
 
@@ -123,7 +132,7 @@ function expectNoOrganizationSummary() {
 }
 
 describe('BuildingOrganizationsCreateTab', () => {
-  it('starts as an untouched optional Add-mode panel', async () => {
+  it('starts in resting empty state with tab intro and no auto-open composer', async () => {
     const onStatusChange = vi.fn()
     render(
       <BuildingOrganizationsCreateTab campaignId="campaign-1" onStatusChange={onStatusChange} />,
@@ -136,12 +145,15 @@ describe('BuildingOrganizationsCreateTab', () => {
         dirty: false,
       }),
     )
-    expect(screen.getByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_TAB_HEADING)).toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_TAB_DESCRIPTION)).toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL)).toBeInTheDocument()
+    expect(screen.queryByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).not.toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).not.toBeInTheDocument()
-    expect(screen.queryByRole('combobox', { name: 'Connection type' })).not.toBeInTheDocument()
+    expect(screen.queryByText(BUILDING_ORGANIZATIONS_COMPOSER_HEADING)).not.toBeInTheDocument()
   })
 
-  it('does not create a draft until Add relationship is confirmed', async () => {
+  it('does not create a draft until the relationship is committed', async () => {
     const user = userEvent.setup()
     const onPlanChange = vi.fn()
     const controllerRef = { current: null as BuildingOrganizationsCreateTabController | null }
@@ -153,6 +165,7 @@ describe('BuildingOrganizationsCreateTab', () => {
       />,
     )
 
+    await startComposing(user)
     await chooseOwnerIntent(user)
     expect(onPlanChange).not.toHaveBeenCalled()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).not.toBeInTheDocument()
@@ -161,18 +174,20 @@ describe('BuildingOrganizationsCreateTab', () => {
     expect(await screen.findByText(BUILDING_ORGANIZATIONS_IN_PROGRESS_MESSAGE)).toBeInTheDocument()
   })
 
-  it('adds, edits in Pending mode, and removes the last draft without persistence', async () => {
+  it('adds, edits in focused composer, and removes the last draft without persistence', async () => {
     const user = userEvent.setup()
     const onPlanChange = vi.fn()
+    const controllerRef = { current: null as BuildingOrganizationsCreateTabController | null }
     render(
       <BuildingOrganizationsCreateTab
         campaignId="campaign-1"
         organizationItems={organizations}
+        controllerRef={controllerRef}
         onPlanChange={onPlanChange}
       />,
     )
 
-    await addExistingOwner(user)
+    await addExistingOwner(user, controllerRef)
 
     expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).not.toBeInTheDocument()
@@ -187,13 +202,11 @@ describe('BuildingOrganizationsCreateTab', () => {
     await user.click(
       screen.getByRole('menuitem', { name: BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL }),
     )
-    expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
-    expect(screen.queryByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).not.toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_COMPOSER_HEADING)).toBeInTheDocument()
+    expect(screen.queryByText(BUILDING_ORGANIZATIONS_TAB_HEADING)).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Change relationship' }))
     await user.click(screen.getByRole('radio', { name: /Operator/i }))
-    await user.click(
-      screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL }),
-    )
+    act(() => controllerRef.current?.commitComposer?.())
     expect(onPlanChange.mock.calls[1]![0].relationships[0]).toMatchObject({
       draftId: firstPlan.relationships[0].draftId,
       kind: 'operator',
@@ -203,25 +216,25 @@ describe('BuildingOrganizationsCreateTab', () => {
     await user.click(
       screen.getByRole('menuitem', { name: BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL }),
     )
-    expect(screen.getByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL)).toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).not.toBeInTheDocument()
   })
 
-  it('returns to Pending after add-another confirmation', async () => {
+  it('returns to resting after add-another confirmation', async () => {
     const user = userEvent.setup()
-    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
+    const controllerRef = { current: null as BuildingOrganizationsCreateTabController | null }
+    render(<BuildingOrganizationsCreateTab campaignId="campaign-1" controllerRef={controllerRef} />)
 
-    await addExistingOwner(user)
+    await addExistingOwner(user, controllerRef)
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL }))
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_COMPOSER_HEADING)).toBeInTheDocument()
     expect(screen.getByText(BUILDING_ORGANIZATIONS_INTENT_PROMPT)).toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: /Tenant/i }))
     await user.click(
       screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[1]!,
     )
-    await user.click(
-      screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
-    )
+    act(() => controllerRef.current?.commitComposer?.())
     expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
     expect(screen.getByText('Copper Kettle Guild')).toBeInTheDocument()
     expect(screen.getByText('Harbor Merchants Guild')).toBeInTheDocument()
@@ -233,7 +246,7 @@ describe('BuildingOrganizationsCreateTab', () => {
       <BuildingOrganizationsCreateTab
         campaignId="campaign-1"
         initialPlan={allKindsPlan}
-        initialMode="add"
+        initialComposerMode="composing"
       />,
     )
 
@@ -247,12 +260,14 @@ describe('BuildingOrganizationsCreateTab', () => {
     const user = userEvent.setup()
     render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
 
+    await startComposing(user)
     await chooseOwnerIntent(user)
 
     const searchbox = screen.getByRole('searchbox', {
       name: BUILDING_ORGANIZATIONS_SEARCH_LABEL,
     })
     expect(searchbox).toBeInTheDocument()
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_DISCOVERY_HEADING)).toBeInTheDocument()
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_SEARCH_LABEL)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument()
 
@@ -270,7 +285,7 @@ describe('BuildingOrganizationsCreateTab', () => {
       <BuildingOrganizationsCreateTab campaignId="campaign-1" onStatusChange={onStatusChange} />,
     )
 
-    await chooseOwnerIntent(user)
+    await startComposing(user)
     await waitFor(() =>
       expect(onStatusChange).toHaveBeenLastCalledWith({
         invalid: false,
@@ -284,6 +299,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     const user = userEvent.setup()
     render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
 
+    await startComposing(user)
     await chooseOwnerIntent(user)
     expect(
       screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL }),
@@ -301,6 +317,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     const user = userEvent.setup()
     render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
 
+    await startComposing(user)
     await chooseOwnerIntent(user)
     const searchbox = screen.getByRole('searchbox', { name: BUILDING_ORGANIZATIONS_SEARCH_LABEL })
     await user.type(searchbox, 'Copper')
@@ -318,11 +335,13 @@ describe('BuildingOrganizationsCreateTab', () => {
   it('shows relationship summary before organization discovery', async () => {
     const user = userEvent.setup()
     const onPlanChange = vi.fn()
+    const controllerRef = { current: null as BuildingOrganizationsCreateTabController | null }
     render(
       <BuildingOrganizationsCreateTab
         campaignId="campaign-1"
         initialPlan={threeKindsPlan}
-        initialMode="add"
+        initialComposerMode="composing"
+        controllerRef={controllerRef}
         onPlanChange={onPlanChange}
       />,
     )
@@ -335,20 +354,19 @@ describe('BuildingOrganizationsCreateTab', () => {
     await user.click(
       screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
     )
-    expectOrganizationSummary('Copper Kettle Guild')
-    await user.click(
-      screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
-    )
+    expectOrganizationSummary('Copper Kettle Guild · Commercial')
+    act(() => controllerRef.current?.commitComposer?.())
     expect(onPlanChange).toHaveBeenCalledOnce()
     expect(onPlanChange.mock.calls[0]![0].relationships.at(-1)).toMatchObject({
       kind: 'headquarters',
     })
   })
 
-  it('uses setup summary grammar for active and completed decisions', async () => {
+  it('uses compact summary rows for active and completed decisions', async () => {
     const user = userEvent.setup()
     render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
 
+    await startComposing(user)
     expectNoRelationshipSummary()
     expect(
       screen.getByRole('radiogroup', { name: BUILDING_ORGANIZATIONS_INTENT_PROMPT }),
@@ -365,30 +383,31 @@ describe('BuildingOrganizationsCreateTab', () => {
       screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
     )
     expectRelationshipSummary('Owner')
-    expectOrganizationSummary('Copper Kettle Guild')
+    expectOrganizationSummary('Copper Kettle Guild · Commercial')
   })
 
   it('shows branch with relationship summary only and no placeholder organization row', async () => {
     const user = userEvent.setup()
     render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
 
+    await startComposing(user)
     await chooseOwnerIntent(user)
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
 
     expectRelationshipSummary('Owner')
     expectNoOrganizationSummary()
-    expect(screen.queryByText(BUILDING_ORGANIZATIONS_NEW_FALLBACK_NAME)).not.toBeInTheDocument()
   })
 
   it('reopens unpinned discovery when changing organization from review', async () => {
     const user = userEvent.setup()
     render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
 
+    await startComposing(user)
     await chooseOwnerIntent(user)
     await user.click(
       screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!,
     )
-    expectOrganizationSummary('Copper Kettle Guild')
+    expectOrganizationSummary('Copper Kettle Guild · Commercial')
 
     await user.click(screen.getByRole('button', { name: 'Change organization' }))
     expectRelationshipSummary('Owner')
@@ -413,6 +432,7 @@ describe('BuildingOrganizationsCreateTab', () => {
       />,
     )
 
+    await startComposing(user)
     await chooseOwnerIntent(user)
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
     await waitFor(() =>
@@ -435,7 +455,7 @@ describe('BuildingOrganizationsCreateTab', () => {
     expect(screen.getByText('Server-attributed issue.')).toHaveFocus()
   })
 
-  itAxe('has no accessibility violations in Add mode', async () => {
+  itAxe('has no accessibility violations in resting empty state', async () => {
     const { container } = render(<BuildingOrganizationsCreateTab campaignId="campaign-1" />)
     await expectNoAxeViolations(container)
   })

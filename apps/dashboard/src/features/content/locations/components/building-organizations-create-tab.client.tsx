@@ -2,12 +2,11 @@
 
 import * as React from 'react'
 import { type Organization } from '@rpg/contracts'
-import { Alert } from '@rpg/ui'
+import { Alert, Heading, Text } from '@rpg/ui'
 
 import {
   AddPendingWorkflow,
   type AddPendingWorkflowMode,
-  type CreateWorkflowDraftPanelController,
   type CreateWorkflowPanelStatus,
 } from '@/lib/create-flow'
 
@@ -18,35 +17,38 @@ import type {
   BuildingOrganizationDraftIssue,
   BuildingOrganizationDraftPlan,
 } from '../lib/building-organization-create-drafts'
+import type { BuildingOrganizationComposerMode } from '../lib/building-organizations-create-tab-controller.lib'
 import {
   BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL,
+  BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL,
   BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL,
+  BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL,
   BUILDING_ORGANIZATIONS_OVERFLOW_LABEL,
   BUILDING_ORGANIZATIONS_PENDING_HEADING,
   BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
+  BUILDING_ORGANIZATIONS_TAB_DESCRIPTION,
+  BUILDING_ORGANIZATIONS_TAB_HEADING,
   buildBuildingOrganizationPendingEntity,
 } from '../lib/building-organizations-create-tab.lib'
 import { useBuildingOrganizationsCreateTab } from '../hooks/use-building-organizations-create-tab.client'
-import {
-  BuildingOrganizationComposer,
-  BuildingOrganizationPendingEdit,
-} from './building-organizations-composer.client'
+import type { BuildingOrganizationsCreateTabController } from '../hooks/use-building-organizations-create-tab.client'
+import { BuildingOrganizationComposer } from './building-organizations-composer.client'
 import {
   buildingOrganizationsCreateTabClasses,
   buildingOrganizationsIssueListClasses,
+  buildingOrganizationsTabIntroClasses,
 } from './building-organizations-create-tab.variants'
 
 export type { BuildingOrganizationComposerStage } from '../lib/building-organizations-create-tab-controller.lib'
 
-export type BuildingOrganizationsCreateTabController = CreateWorkflowDraftPanelController<
-  BuildingOrganizationDraftPlan,
-  BuildingOrganizationDraftIssue
->
+export type { BuildingOrganizationsCreateTabController } from '../hooks/use-building-organizations-create-tab.client'
 
 export type BuildingOrganizationsCreateTabProps = {
   campaignId: string
   formCtx?: ContentFormCtx
   initialPlan?: BuildingOrganizationDraftPlan
+  initialComposerMode?: BuildingOrganizationComposerMode
+  /** @deprecated Use initialComposerMode */
   initialMode?: AddPendingWorkflowMode
   organizationItems?: readonly Organization[]
   controllerRef?: React.MutableRefObject<BuildingOrganizationsCreateTabController | null>
@@ -77,17 +79,28 @@ function BuildingOrganizationDraftIssues({
   )
 }
 
+function BuildingOrganizationsTabIntro() {
+  return (
+    <div className={buildingOrganizationsTabIntroClasses}>
+      <Heading as="h2" variant="subsection">
+        {BUILDING_ORGANIZATIONS_TAB_HEADING}
+      </Heading>
+      <Text variant="muted">{BUILDING_ORGANIZATIONS_TAB_DESCRIPTION}</Text>
+    </div>
+  )
+}
+
 export function BuildingOrganizationsCreateTab(props: BuildingOrganizationsCreateTabProps) {
   const controller = useBuildingOrganizationsCreateTab(props)
   const {
     rootRef,
     plan,
     organizations,
-    requestedMode,
-    setRequestedMode,
-    editingDraftId,
+    composerMode,
+    addPendingWorkflowMode,
+    handleAddPendingWorkflowModeChange,
+    startComposing,
     visibleIssues,
-    resetEditor,
     editRelationship,
     removeRelationship,
   } = controller
@@ -95,53 +108,48 @@ export function BuildingOrganizationsCreateTab(props: BuildingOrganizationsCreat
   return (
     <div ref={rootRef} className={buildingOrganizationsCreateTabClasses}>
       <BuildingOrganizationDraftIssues issues={visibleIssues} />
+      {composerMode === 'resting' ? <BuildingOrganizationsTabIntro /> : null}
       <AddPendingWorkflow
         hasPendingItems={plan.relationships.length > 0}
-        mode={requestedMode}
-        onModeChange={setRequestedMode}
+        mode={addPendingWorkflowMode}
+        onModeChange={handleAddPendingWorkflowModeChange}
+        addFirstLabel={BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL}
         addAnotherLabel={BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL}
-        onAddAnother={resetEditor}
+        onAddAnother={startComposing}
         pendingHeading={BUILDING_ORGANIZATIONS_PENDING_HEADING}
-        pendingItems={plan.relationships.map((relationship) =>
-          editingDraftId === relationship.draftId ? (
-            <BuildingOrganizationPendingEdit
-              key={relationship.draftId}
-              controller={controller}
-              relationship={relationship}
-            />
-          ) : (
-            <ContentEntityCard
-              key={relationship.draftId}
-              entity={buildBuildingOrganizationPendingEntity({
-                relationship,
-                plan,
-                existingOrganizations: organizations,
-              })}
-              density="compact"
-              trailing={{
-                kind: 'action',
-                content: (
-                  <DetailOverflowMenu
-                    triggerLabel={BUILDING_ORGANIZATIONS_OVERFLOW_LABEL}
-                    actions={[
-                      {
-                        id: 'edit',
-                        label: BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL,
-                        onSelect: () => editRelationship(relationship),
-                      },
-                      {
-                        id: 'remove',
-                        label: BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
-                        destructive: true,
-                        onSelect: () => removeRelationship(relationship.draftId),
-                      },
-                    ]}
-                  />
-                ),
-              }}
-            />
-          ),
-        )}
+        emptyState={<Text variant="muted">{BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL}</Text>}
+        pendingItems={plan.relationships.map((relationship) => (
+          <ContentEntityCard
+            key={relationship.draftId}
+            entity={buildBuildingOrganizationPendingEntity({
+              relationship,
+              plan,
+              existingOrganizations: organizations,
+            })}
+            density="compact"
+            trailing={{
+              kind: 'action',
+              content: (
+                <DetailOverflowMenu
+                  triggerLabel={BUILDING_ORGANIZATIONS_OVERFLOW_LABEL}
+                  actions={[
+                    {
+                      id: 'edit',
+                      label: BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL,
+                      onSelect: () => editRelationship(relationship),
+                    },
+                    {
+                      id: 'remove',
+                      label: BUILDING_ORGANIZATIONS_REMOVE_ACTION_LABEL,
+                      destructive: true,
+                      onSelect: () => removeRelationship(relationship.draftId),
+                    },
+                  ]}
+                />
+              ),
+            }}
+          />
+        ))}
         composing={
           <div data-building-organization-composer>
             <BuildingOrganizationComposer controller={controller} />

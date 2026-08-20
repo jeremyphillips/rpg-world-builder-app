@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW } from '@/lib/create-setup'
-
 import {
   resolveBuildingOrganizationComposerView,
   resolveBuildingOrganizationHasResolvedOrganizationTarget,
@@ -14,6 +12,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
       editingDecision: null,
       kindLabel: null,
       organizationName: null,
+      organizationDomainLabel: null,
       hasKind: false,
       hasResolvedOrganization: false,
       relationshipKindCount: 4,
@@ -32,6 +31,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
       editingDecision: null,
       kindLabel: 'Owner',
       organizationName: null,
+      organizationDomainLabel: null,
       hasKind: true,
       hasResolvedOrganization: false,
       relationshipKindCount: 4,
@@ -39,7 +39,6 @@ describe('resolveBuildingOrganizationComposerView', () => {
 
     expect(view.activeDecision).toBe('organization')
     expect(view.showDiscovery).toBe(true)
-    expect(view.summaryEyebrow).toBe(CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW)
     expect(view.summaryRows).toEqual([
       { id: 'relationship', decision: 'relationship', label: 'Relationship', value: 'Owner' },
     ])
@@ -52,6 +51,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
       editingDecision: null,
       kindLabel: 'Owner',
       organizationName: 'City Bank',
+      organizationDomainLabel: 'Commercial',
       hasKind: true,
       hasResolvedOrganization: true,
       relationshipKindCount: 4,
@@ -59,7 +59,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
 
     expect(view.activeDecision).toBeNull()
     expect(view.showCommit).toBe(true)
-    expect(view.summaryRows.map((row) => row.value)).toEqual(['Owner', 'City Bank'])
+    expect(view.summaryRows.map((row) => row.value)).toEqual(['Owner', 'City Bank · Commercial'])
   })
 
   it('shows branch form with relationship row only and no placeholder organization row', () => {
@@ -67,7 +67,8 @@ describe('resolveBuildingOrganizationComposerView', () => {
       composerStage: 'branch',
       editingDecision: null,
       kindLabel: 'Owner',
-      organizationName: 'New Organization',
+      organizationName: 'New organization',
+      organizationDomainLabel: null,
       hasKind: true,
       hasResolvedOrganization: false,
       relationshipKindCount: 4,
@@ -87,6 +88,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
       editingDecision: 'relationship',
       kindLabel: 'Owner',
       organizationName: 'City Bank',
+      organizationDomainLabel: 'Commercial',
       hasKind: true,
       hasResolvedOrganization: true,
       relationshipKindCount: 4,
@@ -107,6 +109,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
       editingDecision: 'organization',
       kindLabel: 'Owner',
       organizationName: 'City Bank',
+      organizationDomainLabel: 'Commercial',
       hasKind: true,
       hasResolvedOrganization: true,
       relationshipKindCount: 4,
@@ -135,7 +138,7 @@ describe('resolveBuildingOrganizationHasResolvedOrganizationTarget', () => {
     expect(
       resolveBuildingOrganizationHasResolvedOrganizationTarget({
         selectedOrganization: { kind: 'new', draftOrganizationId: 'draft-1' },
-        organizationName: 'New Organization',
+        organizationName: 'New organization',
       }),
     ).toBe(false)
   })

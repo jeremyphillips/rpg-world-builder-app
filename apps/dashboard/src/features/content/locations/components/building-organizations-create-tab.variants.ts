@@ -1,6 +1,10 @@
 import { cn } from '@rpg/ui'
 
 export const buildingOrganizationsCreateTabClasses = cn('flex flex-col gap-6')
+export const buildingOrganizationsTabIntroClasses = cn('flex flex-col gap-1')
+export const buildingOrganizationsComposerHeadingClasses = cn('flex flex-col gap-4')
+export const buildingOrganizationsComposerSummaryRowsClasses = cn('flex flex-col')
+export const buildingOrganizationsStageSubheadingClasses = cn('flex flex-col gap-1')
 export const buildingOrganizationsIssueListClasses = cn(
   'list-disc space-y-1 pl-5 text-sm text-destructive',
 )
