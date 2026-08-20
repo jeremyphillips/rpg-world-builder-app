@@ -38,6 +38,19 @@ vi.mock('./relationship-picker-nested-create.lib', async (importOriginal) => {
   }
 })
 
+vi.mock('../../locations/components/location-create-modal.client', () => ({
+  LocationCreateModal: ({
+    open,
+    createContext,
+  }: {
+    open: boolean
+    createContext?: { kind: string }
+  }) =>
+    open ? (
+      <div data-testid="location-create-context">{createContext?.kind ?? 'missing'}</div>
+    ) : null,
+}))
+
 describe('useRelationshipPickerNestedCreate', () => {
   let queryClient: QueryClient
 
@@ -170,5 +183,50 @@ describe('useRelationshipPickerNestedCreate', () => {
     expect(screen.getByTestId('busy')).toHaveTextContent('false')
     expect(onSelectCreatedOrganization).toHaveBeenCalledWith('org-new')
     expect(resolveHandoffMock).toHaveBeenCalled()
+  })
+
+  it('snapshots nested create context when launching location create', async () => {
+    const user = userEvent.setup()
+
+    function Harness() {
+      const nestedCreate = useRelationshipPickerNestedCreate({
+        campaignId: STORY_CAMPAIGN_ID,
+        createIntents: resolveRelationshipPickerCreateIntents({
+          target: 'location',
+          selectedKind: 'headquarters',
+        }),
+        nestedCreateContext: {
+          kind: 'relationship-target',
+          source: { contentType: 'organizations', id: 'org-1' },
+          relationshipVocabulary: 'organization_location_connection',
+        },
+      })
+
+      return (
+        <>
+          {nestedCreate.modals}
+          <button
+            type="button"
+            onClick={() => {
+              const action = nestedCreate.auxiliaryAction
+              if (action?.state === 'menu') {
+                action.items.find((item) => item.label === 'Building')?.onAction()
+              }
+            }}
+          >
+            Launch location create
+          </button>
+        </>
+      )
+    }
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Harness />
+      </QueryClientProvider>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Launch location create' }))
+    expect(screen.getByTestId('location-create-context')).toHaveTextContent('relationship-target')
   })
 })

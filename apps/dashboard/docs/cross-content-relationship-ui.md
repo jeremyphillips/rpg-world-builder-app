@@ -336,7 +336,14 @@ Handoff is drawer-owned through **`useRelationshipPickerNestedCreate`**: sibling
 `OrganizationCreateModal` / `LocationCreateModal` / standalone `QuickNpcCreateModal`, optional
 **`onCreated({ contentType, id })`** after persistence, then `resolvingCreatedTarget` refresh +
 full eligibility revalidation before select. Footer submit is the only relationship persist boundary
-— nested create must not POST the relationship. Org Add member + Quick NPC keeps its
+— nested create must not POST the relationship.
+
+Nested create supplies one relationship endpoint. The originating workflow owns that
+relationship. Reverse org-location composition authoring is suppressed in nested
+creators via **`ContentCreateContext`** (`relationship-target` +
+`relationshipVocabulary: 'organization_location_connection'`) and
+**`resolveLocationCreateAuthoringCapabilities`** — not ad-hoc tab props on drawers.
+Org Add member + Quick NPC keeps its
 membership-specific success-closes-all handoff; do not route that picker through the shared intent
 resolver.
 

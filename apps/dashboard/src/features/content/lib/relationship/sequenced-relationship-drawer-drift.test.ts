@@ -101,4 +101,11 @@ describe('sequenced relationship drawer drift', () => {
       expect(source).not.toMatch(/loading=\{[^}]*phase[^}]*\}/)
     })
   }
+
+  it('organization forward drawer passes nestedCreateContext instead of ad-hoc suppression props', () => {
+    const source = readFileSync(NESTED_CREATE_DRAWER_FILES[0], 'utf8')
+
+    expect(source).toContain('nestedCreateContext')
+    expect(source).not.toMatch(/hideOrganizations|suppressOrganizations|hideConnectionsTab/)
+  })
 })

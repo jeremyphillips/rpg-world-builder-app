@@ -19,6 +19,7 @@ import {
   type SetupSummaryRowModel,
 } from '@/lib/create-setup'
 
+import { resolveActiveCreateTabId } from './resolve-active-create-tab'
 import {
   createModalShellBodyVariants,
   createModalShellContentVariants,
@@ -113,6 +114,23 @@ function CreateModalShellIssueBadge({ count }: { count: number | undefined }) {
   )
 }
 
+function CreateModalShellTabPanel({
+  tab,
+  'data-create-tab-panel': dataCreateTabPanel,
+}: {
+  tab: CreateModalShellTab
+  'data-create-tab-panel'?: string
+}) {
+  return (
+    <div
+      data-create-tab-panel={dataCreateTabPanel ?? tab.id}
+      className={createModalShellTabContentVariants({ mode: tab.contentMode })}
+    >
+      {tab.content}
+    </div>
+  )
+}
+
 function CreateModalShellTabs({
   tabs,
   activeTabId,
@@ -124,11 +142,21 @@ function CreateModalShellTabs({
 >) {
   if (!tabs) return null
 
-  const fallbackTabId = tabs[0].id
+  const availableTabIds = tabs.map((tab) => tab.id)
+  const fallbackTabId = tabs[0]!.id
+  const resolvedActiveTabId = resolveActiveCreateTabId(
+    availableTabIds,
+    activeTabId,
+    defaultActiveTabId ?? fallbackTabId,
+  )
+
+  if (tabs.length === 1) {
+    return <CreateModalShellTabPanel tab={tabs[0]!} />
+  }
 
   return (
     <Tabs
-      value={activeTabId}
+      value={activeTabId != null ? resolvedActiveTabId : undefined}
       defaultValue={defaultActiveTabId ?? fallbackTabId}
       onValueChange={onActiveTabChange}
       variant="line"

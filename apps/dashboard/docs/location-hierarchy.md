@@ -85,6 +85,11 @@ create-org control — not a placeholder completed organization row. Copy these 
 a second create-modal draft relationship tab; do not extract a generic composer until a second
 identical consumer exists.
 
+Relationship-target nested create (organization forward → Building) suppresses the
+Organizations composition surface via `ContentCreateContext` and
+`resolveLocationCreateAuthoringCapabilities` — see
+[`cross-content-relationship-ui.md`](./cross-content-relationship-ui.md).
+
 Orchestration lives in `@/lib/create-setup`; see `apps/dashboard/src/lib/create-setup/README.md`.
 
 Both subgroup actions derive from one `childAuthoringTypesForParentKind` result, projected

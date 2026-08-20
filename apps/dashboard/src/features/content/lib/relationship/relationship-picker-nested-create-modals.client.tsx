@@ -8,6 +8,7 @@ import type { LocationAuthoringType } from '../../locations/lib/location-authori
 import { LocationCreateModal } from '../../locations/components/location-create-modal.client'
 import { OrganizationCreateModal } from '../../organizations/components/organization-create-modal.client'
 import type { OnContentCreated } from '@/lib/create-flow'
+import type { ContentCreateContext } from '@/lib/create-flow'
 
 type ActiveNestedCreateIntent =
   | { target: 'organization' }
@@ -17,6 +18,7 @@ type ActiveNestedCreateIntent =
 export type RelationshipPickerNestedCreateModalsProps = {
   campaignId: string
   activeIntent: ActiveNestedCreateIntent | null
+  createContext: ContentCreateContext
   organizationCreateOpen: boolean
   locationCreateOpen: boolean
   npcCreateOpen: boolean
@@ -29,6 +31,7 @@ export type RelationshipPickerNestedCreateModalsProps = {
 export function RelationshipPickerNestedCreateModals({
   campaignId,
   activeIntent,
+  createContext,
   organizationCreateOpen,
   locationCreateOpen,
   npcCreateOpen,
@@ -51,6 +54,7 @@ export function RelationshipPickerNestedCreateModals({
           onOpenChange={onCreateModalOpenChange}
           campaignId={campaignId}
           intent={{ authoringType: activeIntent.authoringType }}
+          createContext={createContext}
           onCreated={onCreated}
         />
       ) : null}

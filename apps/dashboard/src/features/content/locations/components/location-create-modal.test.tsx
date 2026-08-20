@@ -176,7 +176,10 @@ function renderModal(
   intent: LocationCreateIntent,
   onOpenChange = vi.fn(),
   open = true,
-  options?: { onCreated?: OnContentCreated },
+  options?: {
+    onCreated?: OnContentCreated
+    createContext?: import('@/lib/create-flow').ContentCreateContext
+  },
 ) {
   const queryClient = makeTestQueryClient()
   return {
@@ -189,6 +192,7 @@ function renderModal(
           onOpenChange={onOpenChange}
           intent={intent}
           campaignId={STORY_CAMPAIGN_ID}
+          createContext={options?.createContext}
           onCreated={options?.onCreated}
         />
       </QueryClientProvider>,
@@ -343,6 +347,52 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText('Browse all')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Organizations (optional)' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change facility' })).toBeInTheDocument()
+  })
+
+  it('suppresses Organizations composition for relationship-target Building create', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent, vi.fn(), true, {
+      createContext: {
+        kind: 'relationship-target',
+        source: { contentType: 'organizations', id: 'org-1' },
+        relationshipVocabulary: 'organization_location_connection',
+      },
+    })
+    await continueBuildingSetup(user)
+
+    expect(screen.queryByRole('tab', { name: /Organizations/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
+  })
+
+  it('submits relationship-target Building create without organization drafts', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent, vi.fn(), true, {
+      createContext: {
+        kind: 'relationship-target',
+        source: { contentType: 'organizations', id: 'org-1' },
+        relationshipVocabulary: 'organization_location_connection',
+      },
+    })
+    await continueBuildingSetup(user)
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Guild Hall')
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
+
+    await waitFor(() => {
+      expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce()
+    })
+    expect(mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request).toMatchObject({
+      organizations: [],
+      relationships: [],
+    })
+  })
+
+  it('keeps Organizations composition available for contained Building create', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetup(user)
+
+    expect(screen.getByRole('tab', { name: 'Organizations (optional)' })).toBeInTheDocument()
   })
 
   it('preserves Organization editor state through Change-to-Setup and includes it in dismissal guards', async () => {

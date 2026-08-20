@@ -11,8 +11,12 @@ import {
 } from '@/lib/create-setup'
 import {
   CreateModalShell,
+  STANDALONE_CONTENT_CREATE_CONTEXT,
+  type ContentCreateContext,
+  type CreateModalShellTab,
   type CreateWorkflowPanelStatus,
   type OnContentCreated,
+  resolveActiveCreateTabId,
 } from '@/lib/create-flow'
 
 import type {
@@ -51,6 +55,10 @@ import {
   LocationCreateModalSetupPanel,
   useLocationCreateModalSetupSequence,
 } from './location-create-modal-setup-panel.client'
+import {
+  resolveLocationCreateAuthoringCapabilities,
+  type LocationCreateAuthoringTabId,
+} from '../lib/location-create-authoring-capabilities.lib'
 import { LocationCreateForm } from './location-create-form.client'
 import {
   BuildingOrganizationsCreateTab,
@@ -62,6 +70,8 @@ export type LocationCreateModalProps = {
   onOpenChange: (open: boolean) => void
   intent: LocationCreateIntent
   campaignId: string
+  /** Semantic reason for create — drives authoring capability suppression. */
+  createContext?: ContentCreateContext
   /** Optional preloaded context for embedded/test surfaces; normal app usage resolves it here. */
   formOptionsCtx?: ContentFormCtx
   /** Called after persistence succeeds; modal closes without waiting for picker handoff. */
@@ -173,6 +183,59 @@ function buildDetailsChrome({
 
 function resolveCreateWorkflowPanelBlocksSubmit(status: CreateWorkflowPanelStatus): boolean {
   return status.blocksSubmit ?? status.invalid
+}
+
+function buildBuildingShellTabs({
+  capabilities,
+  campaignId,
+  formOptionsCtx,
+  renderDetailsForm,
+  organizationsControllerRef,
+  setOrganizationsStatus,
+  organizationsStatus,
+  detailsStatus,
+}: {
+  capabilities: ReturnType<typeof resolveLocationCreateAuthoringCapabilities>
+  campaignId: string
+  formOptionsCtx?: ContentFormCtx
+  renderDetailsForm: (optionsCtx: ContentFormCtx) => React.ReactNode
+  organizationsControllerRef: React.MutableRefObject<BuildingOrganizationsCreateTabController | null>
+  setOrganizationsStatus: React.Dispatch<React.SetStateAction<CreateWorkflowPanelStatus>>
+  organizationsStatus: CreateWorkflowPanelStatus
+  detailsStatus: CreateWorkflowPanelStatus
+}): [CreateModalShellTab, ...CreateModalShellTab[]] {
+  const tabDefinitions: Record<LocationCreateAuthoringTabId, () => CreateModalShellTab> = {
+    details: () => ({
+      id: 'details',
+      label: 'Details',
+      content: formOptionsCtx ? (
+        renderDetailsForm(formOptionsCtx)
+      ) : (
+        <ContentFormOptionsGate campaignId={campaignId}>{renderDetailsForm}</ContentFormOptionsGate>
+      ),
+      status: detailsStatus,
+      contentMode: 'managed',
+    }),
+    organizations: () => ({
+      id: 'organizations',
+      label: 'Organizations',
+      optional: true,
+      content: (
+        <BuildingOrganizationsCreateTab
+          campaignId={campaignId}
+          formCtx={formOptionsCtx}
+          controllerRef={organizationsControllerRef}
+          onStatusChange={setOrganizationsStatus}
+        />
+      ),
+      status: organizationsStatus,
+    }),
+  }
+
+  return capabilities.tabs.map((tabId) => tabDefinitions[tabId]()) as [
+    CreateModalShellTab,
+    ...CreateModalShellTab[],
+  ]
 }
 
 function LocationCreateModalDetailsForm({
@@ -408,6 +471,7 @@ function LocationCreateModalSession({
   onOpenChange,
   intent,
   campaignId,
+  createContext = STANDALONE_CONTENT_CREATE_CONTEXT,
   formOptionsCtx,
   onCreated,
 }: LocationCreateModalProps) {
@@ -440,10 +504,31 @@ function LocationCreateModalSession({
   const pendingSetupSummaryEditRef = React.useRef<SetupSummaryEditTarget | null>(null)
 
   const showDetails = state.phase === 'details' && state.fixedCreate != null
-  const buildingTabsConfigured =
+  const buildingDetailsReady =
     state.detailsMounted &&
     state.fixedCreate?.authoringType === 'building' &&
     state.buildingSetupApplication != null
+  const capabilities =
+    state.fixedCreate != null
+      ? resolveLocationCreateAuthoringCapabilities({
+          authoringType: state.fixedCreate.authoringType,
+          createContext,
+        })
+      : null
+  const useBuildingShellTabs = buildingDetailsReady && capabilities != null
+  const organizationComposition = capabilities?.organizationComposition ?? false
+  const resolvedActiveTabId = resolveActiveCreateTabId(
+    capabilities?.tabs ?? [],
+    activeTabId,
+    'details',
+  )
+
+  React.useEffect(() => {
+    if (resolvedActiveTabId !== activeTabId) {
+      setActiveTabId(resolvedActiveTabId)
+    }
+  }, [activeTabId, resolvedActiveTabId])
+
   const showSetup = state.phase === 'setup' && setupModel != null
   const setupSequenceModel = useLocationCreateModalSetupSequence({
     sets: setupSets,
@@ -474,12 +559,13 @@ function LocationCreateModalSession({
     }
   }, [returnToDetails, setupSequenceModel, state.phase])
 
-  const submitLabel = buildingTabsConfigured
-    ? BUILDING_CREATE_SETUP_HEADLINE
-    : formatContentCreateActionLabel('locations')
+  const submitLabel =
+    state.fixedCreate?.authoringType === 'building'
+      ? BUILDING_CREATE_SETUP_HEADLINE
+      : formatContentCreateActionLabel('locations')
   const setupHeader = resolveSetupPhaseHeader({ phase: state.phase, setupModel })
   const buildingSubmitBlocked =
-    buildingTabsConfigured &&
+    organizationComposition &&
     (resolveCreateWorkflowPanelBlocksSubmit(detailsStatus) ||
       resolveCreateWorkflowPanelBlocksSubmit(organizationsStatus))
   const renderDetailsForm = (optionsCtx: ContentFormCtx) => (
@@ -490,7 +576,7 @@ function LocationCreateModalSession({
       open={open}
       leaveBridgeRef={leaveBridgeRef}
       formKey={state.formKey}
-      showDetails={showDetails && (!buildingTabsConfigured || activeTabId === 'details')}
+      showDetails={showDetails && (!useBuildingShellTabs || resolvedActiveTabId === 'details')}
       hadSetup={state.hadSetup}
       submitLabel={submitLabel}
       onBack={handleBackToSetup}
@@ -498,11 +584,11 @@ function LocationCreateModalSession({
       onTrustedClose={trustedClose}
       onPendingChange={setDetailsPending}
       buildingSetupApplication={state.buildingSetupApplication}
-      extraUnsavedEdits={organizationsStatus.dirty}
-      organizationsControllerRef={buildingTabsConfigured ? organizationsControllerRef : undefined}
-      onNavigateToTab={buildingTabsConfigured ? setActiveTabId : undefined}
-      onDetailsStatusChange={buildingTabsConfigured ? setDetailsStatus : undefined}
-      useCompositeBuildingChrome={buildingTabsConfigured}
+      extraUnsavedEdits={organizationComposition ? organizationsStatus.dirty : undefined}
+      organizationsControllerRef={organizationComposition ? organizationsControllerRef : undefined}
+      onNavigateToTab={organizationComposition ? setActiveTabId : undefined}
+      onDetailsStatusChange={useBuildingShellTabs ? setDetailsStatus : undefined}
+      useCompositeBuildingChrome={organizationComposition}
       submitBlocked={buildingSubmitBlocked || undefined}
       onCreated={onCreated}
     />
@@ -533,40 +619,21 @@ function LocationCreateModalSession({
         description={setupHeader.description}
         setupSummary={setupSummary}
         contentMode={showSetup ? 'scroll' : 'managed'}
-        activeTabId={buildingTabsConfigured ? activeTabId : undefined}
-        onActiveTabChange={buildingTabsConfigured ? setActiveTabId : undefined}
+        activeTabId={useBuildingShellTabs ? resolvedActiveTabId : undefined}
+        onActiveTabChange={useBuildingShellTabs ? setActiveTabId : undefined}
         tabsVisible={showDetails}
         tabs={
-          buildingTabsConfigured
-            ? [
-                {
-                  id: 'details',
-                  label: 'Details',
-                  content: formOptionsCtx ? (
-                    renderDetailsForm(formOptionsCtx)
-                  ) : (
-                    <ContentFormOptionsGate campaignId={campaignId}>
-                      {renderDetailsForm}
-                    </ContentFormOptionsGate>
-                  ),
-                  status: detailsStatus,
-                  contentMode: 'managed',
-                },
-                {
-                  id: 'organizations',
-                  label: 'Organizations',
-                  optional: true,
-                  content: (
-                    <BuildingOrganizationsCreateTab
-                      campaignId={campaignId}
-                      formCtx={formOptionsCtx}
-                      controllerRef={organizationsControllerRef}
-                      onStatusChange={setOrganizationsStatus}
-                    />
-                  ),
-                  status: organizationsStatus,
-                },
-              ]
+          useBuildingShellTabs && capabilities
+            ? buildBuildingShellTabs({
+                capabilities,
+                campaignId,
+                formOptionsCtx,
+                renderDetailsForm,
+                organizationsControllerRef,
+                setOrganizationsStatus,
+                organizationsStatus,
+                detailsStatus,
+              })
             : undefined
         }
         footer={
@@ -589,7 +656,7 @@ function LocationCreateModalSession({
           />
         ) : null}
 
-        {!buildingTabsConfigured && state.detailsMounted && state.fixedCreate ? (
+        {!useBuildingShellTabs && state.detailsMounted && state.fixedCreate ? (
           formOptionsCtx ? (
             renderDetailsForm(formOptionsCtx)
           ) : (
@@ -609,5 +676,10 @@ function LocationCreateModalSession({
  */
 export function LocationCreateModal(props: LocationCreateModalProps) {
   if (!props.open) return null
-  return <LocationCreateModalSession key={JSON.stringify(props.intent)} {...props} />
+  return (
+    <LocationCreateModalSession
+      key={JSON.stringify({ intent: props.intent, createContext: props.createContext })}
+      {...props}
+    />
+  )
 }

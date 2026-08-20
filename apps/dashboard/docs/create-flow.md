@@ -21,6 +21,12 @@ The shell consumes normalized panel status (`invalid`, optional `issueCount`,
 Controlled `activeTabId` lets a domain coordinator activate the first invalid
 panel after submit.
 
+When exactly one authoring view is available, `CreateModalShell` renders that
+view directly and omits tab chrome. The single-tab branch uses the same panel
+wrapper contract (`createModalShellTabContentVariants`) as multi-tab
+`TabsContent` so scroll ownership and stable-height geometry stay aligned.
+Tab controls appear only when two or more views are supplied.
+
 ## Add / Pending workflow
 
 Optional create-tab relationship composition uses a shared **Add / Pending**

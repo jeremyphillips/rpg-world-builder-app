@@ -11,7 +11,8 @@ import type {
   Organization,
 } from '@rpg/contracts'
 
-import type { CreatedContentResult } from '@/lib/create-flow'
+import type { ContentCreateContext, CreatedContentResult } from '@/lib/create-flow'
+import { STANDALONE_CONTENT_CREATE_CONTEXT } from '@/lib/create-flow'
 
 import type { LocationAuthoringType } from '../../locations/lib/location-authoring-type'
 import type { LocationConnectedPartyCharacterOption } from '../../locations/lib/location-connected-party-character-options.lib'
@@ -35,6 +36,8 @@ export type UseRelationshipPickerNestedCreateInput = {
   campaignId: string
   enabled?: boolean
   createIntents: readonly RelationshipPickerCreateIntent[]
+  /** Semantic create context snapshotted when nested create launches. */
+  nestedCreateContext?: ContentCreateContext
   subjectOrganizationId?: string
   locationId?: string
   npcBuildContext?: CharacterBuildContext | null
@@ -57,6 +60,7 @@ export function useRelationshipPickerNestedCreate({
   campaignId,
   enabled = true,
   createIntents,
+  nestedCreateContext,
   subjectOrganizationId,
   locationId,
   npcBuildContext,
@@ -71,34 +75,45 @@ export function useRelationshipPickerNestedCreate({
   const queryClient = useQueryClient()
   const [phase, setPhase] = React.useState<RelationshipPickerNestedCreatePhase>('idle')
   const [activeIntent, setActiveIntent] = React.useState<ActiveNestedCreateIntent | null>(null)
+  const [activeCreateContext, setActiveCreateContext] = React.useState<ContentCreateContext>(
+    STANDALONE_CONTENT_CREATE_CONTEXT,
+  )
 
   const nestedCreateBusy = phase === 'creating' || phase === 'resolvingCreatedTarget'
+
+  const snapshotCreateContext = React.useCallback(() => {
+    return nestedCreateContext ?? STANDALONE_CONTENT_CREATE_CONTEXT
+  }, [nestedCreateContext])
 
   const resetNestedCreate = React.useCallback(() => {
     setPhase('idle')
     setActiveIntent(null)
+    setActiveCreateContext(STANDALONE_CONTENT_CREATE_CONTEXT)
   }, [])
 
   const launchOrganizationCreate = React.useCallback(() => {
     if (nestedCreateBusy) return
+    setActiveCreateContext(snapshotCreateContext())
     setActiveIntent({ target: 'organization' })
     setPhase('creating')
-  }, [nestedCreateBusy])
+  }, [nestedCreateBusy, snapshotCreateContext])
 
   const launchLocationCreate = React.useCallback(
     (authoringType: LocationAuthoringType) => {
       if (nestedCreateBusy) return
+      setActiveCreateContext(snapshotCreateContext())
       setActiveIntent({ target: 'location', authoringType })
       setPhase('creating')
     },
-    [nestedCreateBusy],
+    [nestedCreateBusy, snapshotCreateContext],
   )
 
   const launchNpcCreate = React.useCallback(() => {
     if (nestedCreateBusy) return
+    setActiveCreateContext(snapshotCreateContext())
     setActiveIntent({ target: 'character' })
     setPhase('creating')
-  }, [nestedCreateBusy])
+  }, [nestedCreateBusy, snapshotCreateContext])
 
   const handleCreateModalOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -175,6 +190,7 @@ export function useRelationshipPickerNestedCreate({
     <RelationshipPickerNestedCreateModals
       campaignId={campaignId}
       activeIntent={activeIntent}
+      createContext={activeCreateContext}
       organizationCreateOpen={phase === 'creating' && activeIntent?.target === 'organization'}
       locationCreateOpen={phase === 'creating' && activeIntent?.target === 'location'}
       npcCreateOpen={phase === 'creating' && activeIntent?.target === 'character'}

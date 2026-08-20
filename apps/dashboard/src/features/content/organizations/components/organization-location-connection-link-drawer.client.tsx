@@ -19,6 +19,7 @@ import {
 } from '@rpg/ui'
 
 import { LocationConnectionKindField } from '../../components/location-connection-kind-field.client'
+import type { ContentCreateContext } from '@/lib/create-flow'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -577,10 +578,23 @@ function OrganizationLocationConnectionLinkDrawerContent({
     showTargetBrowseScopeControl,
   ])
 
+  const nestedCreateContext = React.useMemo((): ContentCreateContext => {
+    if (!activeKind) {
+      return { kind: 'standalone' }
+    }
+
+    return {
+      kind: 'relationship-target',
+      source: { contentType: 'organizations', id: organizationId },
+      relationshipVocabulary: 'organization_location_connection',
+    }
+  }, [activeKind, organizationId])
+
   const nestedCreate = useRelationshipPickerNestedCreate({
     campaignId,
     enabled: mode === 'add' && showLocationPicker && !showMutationEmptyState,
     createIntents: nestedCreateIntents,
+    nestedCreateContext,
     subjectOrganizationId: organizationId,
     onSelectCreatedLocation: setSelectedLocationId,
     revalidateCreatedLocation: (location, context) => {
