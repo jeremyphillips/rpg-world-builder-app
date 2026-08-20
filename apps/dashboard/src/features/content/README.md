@@ -11,6 +11,7 @@ feature (one ESLint boundary element) made of several content-type sub-areas:
 | [`skill-proficiencies`](./skill-proficiencies) | Skills and proficiencies                            |
 | [`equipment`](./equipment)                     | Unified equipment catalog (weapons, armor, gear, …) |
 | [`locations`](./locations)                     | Places in the world (regions, sites, maps)          |
+| [`organizations`](./organizations)             | Factions, guilds, governments, and similar groups   |
 | [`monsters`](./monsters)                       | Monsters / statblock entries                        |
 
 Sub-areas are folders inside this feature, not separate boundary elements, so
