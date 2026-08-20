@@ -33,6 +33,29 @@ add a dedicated projection module (e.g. `location-authoring-type.ts`) that:
 Reference: locations Location type projection —
 [locations-building-classification.md](./locations-building-classification.md#authoring-flow).
 
+### ContentFormDef → ContentFormHost projection
+
+When a `ContentFormDef` registry entry is wired directly to
+[`ContentFormHost`](../src/features/content/lib/forms/shells/content-form-host.client.tsx)
+(modals, drawers, nested create flows), use
+[`resolveContentFormHostConfig`](../src/features/content/lib/forms/shells/content-form-host-projection.ts)
+for def-owned props — do not hand-pick subsets of `schema`, `fields`, `valueSyncs`, or
+`defaultValues`.
+
+Page/edit shells (`ContentCreateShell`, `ContentEditShell`) route through
+[`ContentFormLayout`](../src/features/content/lib/forms/shells/content-form-shell-layout.tsx),
+which resolves `valueSyncs` via
+[`resolveContentFormValueSyncs`](../src/features/content/lib/forms/shells/content-form-host-projection.ts)
+only. Do not call `resolveContentFormHostConfig` there — the Host-specific helper is for
+`ContentFormHost` adapters.
+
+**Caller-owned (stay outside the projection):** `header`, preset/authoring bridges, submit
+handlers, campaign-access chrome, leave guard, and other workflow/layout props passed
+alongside the spread.
+
+**Shallow `defaultValues` merge:** `{ ...def.createDefaultValues, ...options.defaultValues }`.
+Caller overrides replace top-level keys entirely — no deep merge.
+
 Organization familiar starting points (`organization-form-projection.ts`):
 
 - Runtime model: [`organizations-classification.md`](./organizations-classification.md)

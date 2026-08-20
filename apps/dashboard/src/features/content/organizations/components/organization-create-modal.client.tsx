@@ -15,11 +15,12 @@ import {
   formatContentCreateActionLabel,
   formatContentCreateHeading,
 } from '../../lib/content-type-labels'
-import { contentFormFields, type ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
 import {
   ContentFormHost,
   type ContentFormHostLeaveBridge,
 } from '../../lib/forms/shells/content-form-host.client'
+import { resolveContentFormHostConfig } from '../../lib/forms/shells/content-form-host-projection'
 import { ContentFormHeader } from '../../lib/forms/shells/content-form-shell-layout.lib'
 import { resolveContentFormSchema } from '../../lib/forms/shells/content-edit-load'
 import { useContentWriteMutation } from '../../lib/list/use-content-mutations'
@@ -116,10 +117,10 @@ function OrganizationCreateModalForm({
       leaveBridgeRef={leaveBridgeRef}
       wrapForm={(form) => <CampaignAccessFormProvider>{form}</CampaignAccessFormProvider>}
       form={{
-        schema: resolveContentFormSchema(organizationFormDef, ctx, 'draft'),
-        defaultValues: organizationFormDef.createDefaultValues,
-        fields: contentFormFields(organizationFormDef, ctx),
-        formKey: `organization-create-modal-${campaignId}`,
+        ...resolveContentFormHostConfig<OrganizationFormValues>(organizationFormDef, ctx, {
+          validationIntent: 'draft',
+          formKey: `organization-create-modal-${campaignId}`,
+        }),
         header: () => (
           <>
             <OrganizationAuthoringPresetBridge />
