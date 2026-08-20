@@ -34,10 +34,10 @@ import {
 import {
   buildCharacterPickerEntitySummary,
   buildOrganizationPickerEntitySummary,
-} from '../../lib/content-entity-picker-presentation.lib'
-import { DrawerContext } from '../../lib/relationship/drawer-context.client'
-import { applyPeopleKindSlotDownstreamState } from '../../lib/relationship/apply-people-kind-slot-downstream-state.lib'
-import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
+} from '../../lib/entity/content-entity-picker-presentation.lib'
+import { DrawerContext } from '../../lib/relationship/drawer/drawer-context.client'
+import { applyPeopleKindSlotDownstreamState } from '../../lib/relationship/location-connection/apply-people-kind-slot-downstream-state.lib'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer/drawer-context.types'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
@@ -46,14 +46,14 @@ import {
   characterInverseSubjectHasAvailableKind,
   organizationDrawerIntentFromKind,
   organizationInverseSubjectHasAvailableKind,
-} from '../../lib/location-connection-drawer-intent'
-import { buildSubjectLocationConnectionKeySet } from '../../lib/location-connection-duplicate-keys'
+} from '../../lib/relationship/location-connection/location-connection-drawer-intent'
+import { buildSubjectLocationConnectionKeySet } from '../../lib/relationship/location-connection/location-connection-duplicate-keys'
 import {
   buildPeopleSectionKindOptions,
   canReopenConnectionKindDecision,
   resolveActiveConnectionKind,
   resolvePeopleKindSlotFromOptionValue,
-} from '../../lib/location-connection-kind-options'
+} from '../../lib/relationship/location-connection/location-connection-kind-options'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 import {
   resolveLocationInverseCharacterAddDrawerInstruction,
@@ -83,8 +83,8 @@ import {
   revalidateCreatedOrganizationForInverseDrawer,
   resolveRelationshipPickerCharacterCreateIntents,
   resolveRelationshipPickerOrganizationCreateIntents,
-} from '../../lib/relationship/relationship-picker-nested-create.lib'
-import { useRelationshipPickerNestedCreate } from '../../lib/relationship/use-relationship-picker-nested-create.client'
+} from '../../lib/relationship/picker/relationship-picker-nested-create.lib'
+import { useRelationshipPickerNestedCreate } from '../../lib/relationship/picker/use-relationship-picker-nested-create.client'
 
 export type LocationInversePeopleConnectionLinkDrawerProps = {
   open: boolean

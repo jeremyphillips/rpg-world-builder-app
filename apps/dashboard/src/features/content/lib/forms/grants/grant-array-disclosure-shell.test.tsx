@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { Form, type FormItem } from '@rpg/ui/form'
 
 import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
-import { disclosureEntityCardBodyInlineStartClasses } from '../../entity/disclosure-entity-card.variants'
+import { disclosureEntityCardBodyInlineStartClasses } from '../../entity/disclosure/disclosure-entity-card.variants'
 import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
 
 const grantRowSchema = z.object({

@@ -14,7 +14,7 @@ import {
   CatalogEntityPickerSheet,
   createCatalogEntityRowRenderer,
 } from '../../lib/content-entity-card.client'
-import { buildLocationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
+import { buildLocationPickerEntitySummary } from '../../lib/entity/content-entity-picker-presentation.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
 import { buildLocationEntitySummarySearchText } from '../lib/location-display'

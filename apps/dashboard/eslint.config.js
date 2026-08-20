@@ -140,7 +140,7 @@ const dashboardEntityCatalogPickerImportGuard = {
   files: ['src/features/**/*picker*.{ts,tsx}', 'src/features/**/*drawer*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
-    'src/features/content/lib/entity/catalog-entity-picker-sheet.client.tsx',
+    'src/features/content/lib/entity/catalog/catalog-entity-picker-sheet.client.tsx',
   ],
   rules: {
     'no-restricted-imports': [
@@ -223,7 +223,7 @@ const dashboardContentPickerPolicyGuards = {
     'src/features/content/locations/lib/building-organizations-create-tab-controller.lib.ts',
     'src/features/content/locations/lib/location-parent-replacement.ts',
     'src/features/content/locations/lib/bulk/build-bulk-change-parent-fields.ts',
-    'src/features/content/lib/location-connection-drawer-intent.ts',
+    'src/features/content/lib/relationship/location-connection/location-connection-drawer-intent.ts',
     'src/features/content/organizations/lib/organization-member-class-discoverable.lib.ts',
     'src/features/content/organizations/lib/organization-member-species-discoverable.lib.ts',
   ],

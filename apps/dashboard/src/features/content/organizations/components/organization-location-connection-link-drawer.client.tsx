@@ -29,20 +29,20 @@ import {
   CatalogEntityPickerSheet,
   createCatalogEntityRowRenderer,
 } from '../../lib/content-entity-card.client'
-import { buildLocationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
+import { buildLocationPickerEntitySummary } from '../../lib/entity/content-entity-picker-presentation.lib'
 import { buildEntityMediaFromImageKey } from '../../lib/entity/entity-media.lib'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
-import { DrawerContext } from '../../lib/relationship/drawer-context.client'
-import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
+import { DrawerContext } from '../../lib/relationship/drawer/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer/drawer-context.types'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
   resolveRelationshipAlternatives,
   type RelationshipCandidateSet,
-} from '../../lib/relationship/relationship-alternatives'
-import { resolveRelationshipCandidateSet } from '../../lib/relationship/relationship-candidate-set'
-import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
+} from '../../lib/relationship/list/relationship-alternatives'
+import { resolveRelationshipCandidateSet } from '../../lib/relationship/list/relationship-candidate-set'
+import { RelationshipDrawerSubjectField } from '../../lib/relationship/drawer/relationship-drawer-subject-field.client'
 import {
   buildLocationEntitySummarySearchText,
   buildLocationEntitySummaryVm,
@@ -66,19 +66,19 @@ import {
   locationEligibleForOrganizationKind,
   resolveKindsForOrganizationDrawerIntent,
   resolveEdgesAtLocation,
-} from '../../lib/location-connection-drawer-intent'
-import { resolveRelationshipPickerCreateIntents } from '../../lib/relationship/relationship-picker-create-intents.lib'
-import { revalidateCreatedLocationForOrganizationForwardDrawer } from '../../lib/relationship/relationship-picker-nested-create.lib'
-import { useRelationshipPickerNestedCreate } from '../../lib/relationship/use-relationship-picker-nested-create.client'
+} from '../../lib/relationship/location-connection/location-connection-drawer-intent'
+import { resolveRelationshipPickerCreateIntents } from '../../lib/relationship/picker/relationship-picker-create-intents.lib'
+import { revalidateCreatedLocationForOrganizationForwardDrawer } from '../../lib/relationship/picker/relationship-picker-nested-create.lib'
+import { useRelationshipPickerNestedCreate } from '../../lib/relationship/picker/use-relationship-picker-nested-create.client'
 import {
   buildOrganizationFamilyKindOptions,
   buildOrganizationLocationChangeKindOptions,
   canReopenConnectionKindDecision,
   resolveActiveConnectionKind,
   type LocationConnectionKindOption,
-} from '../../lib/location-connection-kind-options'
-import { organizationLocationConnectionHasAvailableKind } from '../../lib/location-connection-duplicate-keys'
-import type { OrganizationForwardDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
+} from '../../lib/relationship/location-connection/location-connection-kind-options'
+import { organizationLocationConnectionHasAvailableKind } from '../../lib/relationship/location-connection/location-connection-duplicate-keys'
+import type { OrganizationForwardDrawerMode } from '../../lib/relationship/list/relationship-mutation-mode'
 import {
   DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION,
   resolveOrganizationForwardAddDrawerInstruction,

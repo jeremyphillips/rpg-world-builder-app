@@ -31,15 +31,26 @@ builders (`*-stat-rows.ts`).
 
 ```text
 lib/
-  fixtures/       # STORY_* IDs, pick*() catalog helpers
+  fixtures/         # STORY_* IDs, pick*() catalog helpers
   forms/            # registry + key helpers; shells/, fields/, grants/ subfolders
   form-options/     # Level, rich-text link options
-  overview/         # List shell, table config, source badge
+  overview/         # List shell, table config, source badge; hooks/ subfolder
   detail/           # page/, metadata/, section/, row/ — see feature-structure.md
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client
-  utils/            # title-case and other small helpers
+  entity/           # Entity anatomy; catalog/, disclosure/ surface splits
+  relationship/     # Cross-content relationship UI; drawer/, list/, picker/, location-connection/
+  campaign-access/  # Campaign availability; overview/ row chrome; bulk/ actions
+  entity-replacement/  # Shared Current→New drawer chrome
+  delete/           # Deletion blocked dialog + usage-blocked list
+  demotion/         # Demotion blocked dialog
+  duplication/      # Duplicate-content dialog
+  usage/            # Entry usage references section
+  utils/            # title-case, sortable-array-move, other small helpers
 ```
+
+Root-level files are limited to cross-type vocabulary (`content-type-labels.ts`,
+`labels.ts`) and the public entity facade (`content-entity-card.client.tsx`).
 
 Catalog list
 fetching for top-level content types (classes, species, weapons, etc.) is wired

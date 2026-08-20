@@ -177,7 +177,7 @@ export {
   type GrantSummaryItem,
   type GrantSummaryKind,
   type GrantSummaryModel,
-} from './lib/grant-display'
+} from './lib/forms/grants/grant-display'
 export {
   contentFormRegistry,
   type ContentFormDef,
@@ -199,4 +199,4 @@ export {
   useContentWriteMutation,
 } from './lib/list/use-content-mutations'
 export { ContentDeletionBlockedDialog } from './lib/delete/content-deletion-blocked-dialog.client'
-export { ContentCampaignAvailabilityAction } from './lib/overview/content-campaign-availability-action.client'
+export { ContentCampaignAvailabilityAction } from './lib/campaign-access/overview/content-campaign-availability-action.client'

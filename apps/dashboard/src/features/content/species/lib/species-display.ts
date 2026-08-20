@@ -17,7 +17,7 @@ import {
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
   type GrantDisplayVocabulary,
-} from '../../lib/grant-display'
+} from '../../lib/forms/grants/grant-display'
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
 export const SPECIES_STAT_LABELS = {

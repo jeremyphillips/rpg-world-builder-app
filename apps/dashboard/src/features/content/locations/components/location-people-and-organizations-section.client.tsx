@@ -9,15 +9,15 @@ import {
 } from '@/features/character'
 
 import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
-import { RelationshipList } from '../../lib/relationship/relationship-list.client'
+import { RelationshipList } from '../../lib/relationship/list/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
-} from '../../lib/relationship/relationship-alternatives'
+} from '../../lib/relationship/list/relationship-alternatives'
 import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
-} from '../../lib/relationship/resolve-relationship-overflow-actions'
+} from '../../lib/relationship/list/resolve-relationship-overflow-actions'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
 import { LOCATION_INVERSE_PEOPLE_OVERFLOW } from '../lib/location-connection-surface-copy'
 import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'

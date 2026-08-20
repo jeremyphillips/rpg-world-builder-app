@@ -23,7 +23,7 @@ import {
 } from '../../../lib/forms/fields/content-economy-form-fields'
 import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import { referenceEquipmentFieldOptions } from '../../../lib/form-options/content-field-option.lib'
-import { EntityDisclosureArrayItemShell } from '../../../lib/entity/entity-disclosure-array-item-shell.client'
+import { EntityDisclosureArrayItemShell } from '../../../lib/entity/disclosure/entity-disclosure-array-item-shell.client'
 import {
   equipmentGrantChoiceItemFormSchema,
   equipmentGrantItemFields,

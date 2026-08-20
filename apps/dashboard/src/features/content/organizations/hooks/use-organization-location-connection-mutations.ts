@@ -6,7 +6,7 @@ import type {
   UpdateOrganizationLocationConnectionInput,
 } from '@rpg/contracts'
 
-import { invalidateLocationConnectionQueries } from '../../lib/invalidate-location-connection-queries'
+import { invalidateLocationConnectionQueries } from '../../lib/relationship/location-connection/invalidate-location-connection-queries'
 import {
   createOrganizationLocationConnection,
   deleteOrganizationLocationConnection,

@@ -1,7 +1,7 @@
 import { describe, expectTypeOf, it } from 'vitest'
 
 import type { ContentEntityCardProps } from '../content-entity-card.client'
-import type { DisclosureEntityCardProps } from './disclosure-entity-card.client'
+import type { DisclosureEntityCardProps } from './disclosure/disclosure-entity-card.client'
 import type { EntityItemProps } from './entity-item.client'
 
 type ConsumerPresentationKeys =

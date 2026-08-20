@@ -29,7 +29,7 @@ import {
 import { dragHandleVariants } from '@rpg/ui'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { resolveSortableArrayMove } from '../../lib/sortable/sortable-array-move.lib'
+import { resolveSortableArrayMove } from '../../lib/utils/sortable-array-move.lib'
 
 export type SortableAbilityScoreOrderProps = {
   value: AbilityScoreOrder

@@ -3,7 +3,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import type { OrganizationConnectionDrawerIntent } from '../../lib/location-connection-drawer-intent'
+import type { OrganizationConnectionDrawerIntent } from '../../lib/relationship/location-connection/location-connection-drawer-intent'
 import type { OrganizationLocationTargetBrowseScope } from './organization-location-target-browse-scope'
 
 export type OrganizationForwardTargetPresentationConfig = {

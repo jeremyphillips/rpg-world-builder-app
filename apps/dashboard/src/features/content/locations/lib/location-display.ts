@@ -15,7 +15,7 @@ import { formatDescriptorCount } from '@/lib/actions/action-count-grammar'
 
 import { ROUTES } from '@/app/routes'
 
-import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
+import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer/drawer-context.types'
 
 import type { LocationAuthoringType } from './location-authoring-type'
 import { resolveRegionRelationshipLabelPlural } from './location-contextual-terminology.lib'

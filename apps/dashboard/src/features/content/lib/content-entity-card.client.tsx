@@ -17,13 +17,13 @@ export type {
 } from './entity/entity-item-trailing.types'
 export { EntitySummary } from './entity/entity-summary.client'
 export { EntityItem } from './entity/entity-item.client'
-export { DisclosureEntityCard } from './entity/disclosure-entity-card.client'
-export type { DisclosureEntityCardProps } from './entity/disclosure-entity-card.client'
-export { CatalogEntityRow } from './entity/catalog-entity-row.client'
-export type { CatalogEntityRowProps } from './entity/catalog-entity-row.client'
-export { CatalogEntityPickerSheet } from './entity/catalog-entity-picker-sheet.client'
-export type { CatalogEntityPickerSheetProps } from './entity/catalog-entity-picker-sheet.client'
-export { createCatalogEntityRowRenderer } from './entity/catalog-entity-row-renderer.client'
+export { DisclosureEntityCard } from './entity/disclosure/disclosure-entity-card.client'
+export type { DisclosureEntityCardProps } from './entity/disclosure/disclosure-entity-card.client'
+export { CatalogEntityRow } from './entity/catalog/catalog-entity-row.client'
+export type { CatalogEntityRowProps } from './entity/catalog/catalog-entity-row.client'
+export { CatalogEntityPickerSheet } from './entity/catalog/catalog-entity-picker-sheet.client'
+export type { CatalogEntityPickerSheetProps } from './entity/catalog/catalog-entity-picker-sheet.client'
+export { createCatalogEntityRowRenderer } from './entity/catalog/catalog-entity-row-renderer.client'
 
 export type ContentEntityCardProps = {
   entity: EntitySummaryModel

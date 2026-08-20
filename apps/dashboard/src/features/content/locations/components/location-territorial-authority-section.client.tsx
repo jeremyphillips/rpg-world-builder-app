@@ -11,16 +11,16 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 
 import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
-import { RelationshipList } from '../../lib/relationship/relationship-list.client'
+import { RelationshipList } from '../../lib/relationship/list/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
   type RelationshipCandidateSet,
-} from '../../lib/relationship/relationship-alternatives'
+} from '../../lib/relationship/list/relationship-alternatives'
 import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
-} from '../../lib/relationship/resolve-relationship-overflow-actions'
+} from '../../lib/relationship/list/resolve-relationship-overflow-actions'
 import {
   TERRITORIAL_AUTHORITY_OVERFLOW,
   TERRITORIAL_AUTHORITY_SECTION_HEADING,

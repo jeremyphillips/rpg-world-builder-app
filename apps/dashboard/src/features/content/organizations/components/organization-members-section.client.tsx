@@ -4,7 +4,7 @@ import { SemanticText, Text } from '@rpg/ui'
 
 import { DetailSectionPanel } from '../../lib/detail/section/detail-section-panel.client'
 import type { DetailOverflowAction } from '../../lib/detail/row/detail-overflow-menu.client'
-import { RelationshipList } from '../../lib/relationship/relationship-list.client'
+import { RelationshipList } from '../../lib/relationship/list/relationship-list.client'
 import type { OrganizationMemberRowVm } from '../lib/build-organization-member-rows'
 import { ORGANIZATION_SECTION_LABELS } from '../lib/organization-display'
 import {

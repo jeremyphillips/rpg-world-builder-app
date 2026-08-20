@@ -8,7 +8,7 @@ import {
   type OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import { buildOrganizationLocationConnectionKindOptions } from '../../lib/location-connection-kind-options'
+import { buildOrganizationLocationConnectionKindOptions } from '../../lib/relationship/location-connection/location-connection-kind-options'
 import {
   organizationFormSchema,
   type OrganizationFormValues,

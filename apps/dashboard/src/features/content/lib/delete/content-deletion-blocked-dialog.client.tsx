@@ -5,7 +5,7 @@ import {
   formatContentDeletionBlockedDescription,
   formatContentDeletionBlockedHeadline,
 } from '../content-type-labels'
-import { ContentUsageBlockedList } from '../content-usage-blocked-list.client'
+import { ContentUsageBlockedList } from './content-usage-blocked-list.client'
 
 export interface ContentDeletionBlockedDialogProps {
   open: boolean

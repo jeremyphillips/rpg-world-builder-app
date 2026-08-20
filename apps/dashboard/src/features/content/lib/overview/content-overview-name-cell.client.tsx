@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom'
 import type { DuplicateContentSource } from '../duplication/duplicate-content-dialog.client'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
 import { ContentStatusNameBadge } from './content-status-name-badge.client'
-import { ContentAccessMetadata } from './content-access-metadata.client'
+import { ContentAccessMetadata } from '../campaign-access/overview/content-access-metadata.client'
 import { ContentOverviewUtilityActions } from './content-overview-utility-actions.client'
 
 export type ContentOverviewNameCellProps = {

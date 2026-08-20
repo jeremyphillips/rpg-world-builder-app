@@ -24,14 +24,14 @@ import {
   CatalogEntityPickerSheet,
   createCatalogEntityRowRenderer,
 } from '../../lib/content-entity-card.client'
-import { buildOrganizationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
+import { buildOrganizationPickerEntitySummary } from '../../lib/entity/content-entity-picker-presentation.lib'
 import { EntityReplacementSection } from '../../lib/entity-replacement/entity-replacement-section.client'
-import { DrawerContext } from '../../lib/relationship/drawer-context.client'
-import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
+import { DrawerContext } from '../../lib/relationship/drawer/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer/drawer-context.types'
 import type { EntityReplacementCurrentSnapshot } from '../../lib/entity-replacement/entity-replacement-current-entity'
 import { ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
-import { RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL } from '../../lib/relationship/relationship-drawer-field-labels'
-import { RelationshipDrawerSubjectField } from '../../lib/relationship/relationship-drawer-subject-field.client'
+import { RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL } from '../../lib/relationship/drawer/relationship-drawer-field-labels'
+import { RelationshipDrawerSubjectField } from '../../lib/relationship/drawer/relationship-drawer-subject-field.client'
 
 import {
   ORGANIZATION_DRAWER_CHANGE_KIND_SUBMIT_LABEL,
@@ -42,21 +42,21 @@ import {
   type OrganizationConnectionDrawerIntent,
   organizationInverseSubjectHasAvailableKind,
   resolveOrganizationKindsForDrawerIntent,
-} from '../../lib/location-connection-drawer-intent'
+} from '../../lib/relationship/location-connection/location-connection-drawer-intent'
 import {
   revalidateCreatedOrganizationForInverseDrawer,
   resolveRelationshipPickerOrganizationCreateIntents,
-} from '../../lib/relationship/relationship-picker-nested-create.lib'
-import { useRelationshipPickerNestedCreate } from '../../lib/relationship/use-relationship-picker-nested-create.client'
+} from '../../lib/relationship/picker/relationship-picker-nested-create.lib'
+import { useRelationshipPickerNestedCreate } from '../../lib/relationship/picker/use-relationship-picker-nested-create.client'
 import {
   buildOrganizationInverseLocationConnections,
   buildOrganizationLocationConnectionEdgesAtLocation,
-} from '../../lib/location-connection-duplicate-keys'
+} from '../../lib/relationship/location-connection/location-connection-duplicate-keys'
 import {
   buildOrganizationLocationChangeKindOptions,
   buildOrganizationInverseLocationConnectionKindOptions,
   resolveActiveConnectionKind,
-} from '../../lib/location-connection-kind-options'
+} from '../../lib/relationship/location-connection/location-connection-kind-options'
 import {
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddDrawerTitle,
@@ -72,7 +72,7 @@ import { buildOrganizationDrawerContextEntity } from '../../organizations/lib/or
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose an organization to see available connection types.'
 
-import type { OrganizationInverseDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
+import type { OrganizationInverseDrawerMode } from '../../lib/relationship/list/relationship-mutation-mode'
 export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void

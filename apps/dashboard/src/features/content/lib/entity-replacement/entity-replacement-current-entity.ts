@@ -1,4 +1,4 @@
-import type { DrawerContextEntityPresentation } from '../relationship/drawer-context.types'
+import type { DrawerContextEntityPresentation } from '../relationship/drawer/drawer-context.types'
 
 export type EntityReplacementCurrentSnapshot = {
   entity: DrawerContextEntityPresentation

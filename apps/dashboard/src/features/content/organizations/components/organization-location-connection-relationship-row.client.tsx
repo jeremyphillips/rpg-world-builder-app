@@ -9,16 +9,16 @@ import type {
 } from '@rpg/contracts'
 
 import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
-import { RelationshipList } from '../../lib/relationship/relationship-list.client'
+import { RelationshipList } from '../../lib/relationship/list/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
   type RelationshipCandidateSet,
-} from '../../lib/relationship/relationship-alternatives'
+} from '../../lib/relationship/list/relationship-alternatives'
 import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
-} from '../../lib/relationship/resolve-relationship-overflow-actions'
+} from '../../lib/relationship/list/resolve-relationship-overflow-actions'
 import { buildLocationEntityContextPresentation } from '../../locations/lib/location-display'
 import type { OrganizationLocationConnectionPreviewItem } from '../lib/organization-display'
 import { resolveOrganizationForwardOverflowLabels } from '../lib/organization-location-connection-surface-copy'

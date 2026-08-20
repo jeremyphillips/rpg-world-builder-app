@@ -21,24 +21,24 @@ import {
   LOCATION_INVERSE_CHARACTER_CHANGE_KIND_SUBMIT_LABEL,
   LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE,
   characterInverseSubjectHasAvailableKind,
-} from '../../lib/location-connection-drawer-intent'
+} from '../../lib/relationship/location-connection/location-connection-drawer-intent'
 import {
   CatalogEntityPickerSheet,
   createCatalogEntityRowRenderer,
 } from '../../lib/content-entity-card.client'
-import { buildCharacterPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
-import { DrawerContext } from '../../lib/relationship/drawer-context.client'
-import { toDrawerContextEntity } from '../../lib/relationship/drawer-context.types'
-import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
+import { buildCharacterPickerEntitySummary } from '../../lib/entity/content-entity-picker-presentation.lib'
+import { DrawerContext } from '../../lib/relationship/drawer/drawer-context.client'
+import { toDrawerContextEntity } from '../../lib/relationship/drawer/drawer-context.types'
+import { toLocationConnectionEligibilityInput } from '../../lib/relationship/location-connection/location-connection-eligibility-input'
 import {
   buildSubjectLocationConnectionKeySet,
   subjectLocationConnectionKey,
-} from '../../lib/location-connection-duplicate-keys'
+} from '../../lib/relationship/location-connection/location-connection-duplicate-keys'
 import {
   buildCharacterInverseLocationConnectionKindOptions,
   LOCATION_CONNECTION_KIND_FIELD_LABEL,
   resolveActiveConnectionKind,
-} from '../../lib/location-connection-kind-options'
+} from '../../lib/relationship/location-connection/location-connection-kind-options'
 import {
   resolveLocationInverseCharacterAddDrawerInstruction,
   resolveLocationInverseCharacterAddDrawerTitle,
@@ -56,7 +56,7 @@ import { buildLocationContextPresentationFromLocation } from '../lib/location-di
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
 
-import type { RelationshipMutationMode } from '../../lib/relationship/relationship-mutation-mode'
+import type { RelationshipMutationMode } from '../../lib/relationship/list/relationship-mutation-mode'
 
 export type LocationInverseCharacterConnectionLinkDrawerProps = {
   open: boolean

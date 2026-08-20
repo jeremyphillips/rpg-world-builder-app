@@ -20,9 +20,9 @@ import {
   organizationDrawerIntentFromKind,
   resolveVisibleOrganizationConnectionFamilies,
   type OrganizationConnectionDrawerIntent,
-} from '../../lib/location-connection-drawer-intent'
-import { resolveRelationshipAlternatives } from '../../lib/relationship/relationship-alternatives'
-import type { OrganizationForwardDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
+} from '../../lib/relationship/location-connection/location-connection-drawer-intent'
+import { resolveRelationshipAlternatives } from '../../lib/relationship/list/relationship-alternatives'
+import type { OrganizationForwardDrawerMode } from '../../lib/relationship/list/relationship-mutation-mode'
 import { useCampaignOrganizationLocationConnectionEdges } from './use-campaign-organization-location-connection-edges'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
 import { useOrganizationLocationReferences } from './use-organization-location-references'

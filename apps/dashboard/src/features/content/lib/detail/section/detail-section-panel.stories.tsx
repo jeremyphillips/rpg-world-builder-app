@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { DetailSectionPanel } from './detail-section-panel.client'
-import { RelationshipList } from '../../relationship/relationship-list.client'
+import { RelationshipList } from '../../relationship/list/relationship-list.client'
 
 const meta = {
   title: 'Content/Detail/DetailSectionPanel',

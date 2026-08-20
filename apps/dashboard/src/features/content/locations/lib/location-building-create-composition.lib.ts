@@ -21,7 +21,7 @@ import { updateRouteContentCampaignAccess } from '../../lib/campaign-access/camp
 import { isDefaultCampaignAccessPatch } from '../../lib/campaign-access/campaign-access-state'
 import { buildOrganizationCreateInput } from '../../lib/forms/organization-form-projection'
 import { invalidateContentFormDefQueries } from '../../lib/list/use-content-mutations'
-import { invalidateLocationConnectionQueries } from '../../lib/invalidate-location-connection-queries'
+import { invalidateLocationConnectionQueries } from '../../lib/relationship/location-connection/invalidate-location-connection-queries'
 import { organizationsQueryKey } from '../../organizations/hooks/use-organizations'
 import { locationFormDef } from './location-form-def'
 import type {

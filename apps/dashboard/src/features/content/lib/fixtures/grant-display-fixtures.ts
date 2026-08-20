@@ -1,7 +1,7 @@
 import { loadSeedSpells } from '@rpg/catalog/spells'
 import type { GrantGroup, SpeciesTrait } from '@rpg/contracts'
 
-import { GRANT_SUMMARY_JOIN, type GrantDisplayVocabulary } from '../grant-display'
+import { GRANT_SUMMARY_JOIN, type GrantDisplayVocabulary } from '../forms/grants/grant-display'
 
 import { pickClass, pickEquipment, pickSpecies, pickSpell } from './pick'
 import { STORY_RULESET_ID } from './constants'

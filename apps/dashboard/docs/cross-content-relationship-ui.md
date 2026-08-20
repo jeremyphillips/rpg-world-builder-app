@@ -263,9 +263,9 @@ Both actions remain in the subgroup header for empty and populated states. Direc
 | Populated edge summary + overflow | `CrossContentRelationshipRow` (composes `DetailEntityRow` + `DetailOverflowMenu`)                                          |
 | Overflow actions                  | `DetailOverflowMenu` from `content/lib/detail/row/` (feature supplies `{ id, label, destructive? }`; compact icon trigger) |
 
-Relationship rows build overflow action arrays via **`buildRelationshipOverflowActions`** in [`resolve-relationship-overflow-actions.ts`](../src/features/content/lib/relationship/resolve-relationship-overflow-actions.ts), which returns `DetailOverflowAction[]`. Alternatives derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/relationship-alternatives.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
+Relationship rows build overflow action arrays via **`buildRelationshipOverflowActions`** in [`resolve-relationship-overflow-actions.ts`](../src/features/content/lib/relationship/list/resolve-relationship-overflow-actions.ts), which returns `DetailOverflowAction[]`. Alternatives derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/list/relationship-alternatives.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
 
-Client-side mutation availability may conclude that no alternative exists only when the candidate set is an authoritative domain set (`isAuthoritativeDomainSet: true` on [`RelationshipCandidateSet`](../src/features/content/lib/relationship/relationship-candidate-set.ts)). Partial or paginated data produces `unknown`, never an authoritative `unavailable`.
+Client-side mutation availability may conclude that no alternative exists only when the candidate set is an authoritative domain set (`isAuthoritativeDomainSet: true` on [`RelationshipCandidateSet`](../src/features/content/lib/relationship/list/relationship-candidate-set.ts)). Partial or paginated data produces `unknown`, never an authoritative `unavailable`.
 
 Mutation capability must not depend on the current search/page/render subset.
 
@@ -276,7 +276,7 @@ Mutation capability must not depend on the current search/page/render subset.
 
 Structural impossibility (e.g. single-kind families with no registry alternates) resolves to `unavailable` directly and bypasses candidate-set completeness logic.
 
-[`hasResolvedRelationshipMutationAlternative`](../src/features/content/lib/relationship/relationship-alternatives.ts) means materialized alternatives exist — not "user may invoke." [`isRelationshipMutationActionVisible`](../src/features/content/lib/relationship/relationship-alternatives.ts) governs invocation. Drawers consume the same resolver output and reuse the same candidate set — do not recompute eligibility independently.
+[`hasResolvedRelationshipMutationAlternative`](../src/features/content/lib/relationship/list/relationship-alternatives.ts) means materialized alternatives exist — not "user may invoke." [`isRelationshipMutationActionVisible`](../src/features/content/lib/relationship/list/relationship-alternatives.ts) governs invocation. Drawers consume the same resolver output and reuse the same candidate set — do not recompute eligibility independently.
 
 | Kind-group shell (header + kind rows) | `DetailSectionPanel` + `RelationshipList.Root` + `RelationshipList.Group` |
 | Multi-subject kind add (org + character) | Family-level add → `LocationInversePeopleConnectionLinkDrawer` with kind step, then subject-type segment when ambiguous |
@@ -347,7 +347,7 @@ the create modal open — the entity already exists, so callers must not retry p
 Footer submit is the only relationship persist boundary — nested create must not POST the relationship.
 
 **Typed handoff results** (`NestedCreateHandoffResult` in
-[`relationship-picker-nested-create.types.ts`](../src/features/content/lib/relationship/relationship-picker-nested-create.types.ts)):
+[`relationship-picker-nested-create.types.ts`](../src/features/content/lib/relationship/picker/relationship-picker-nested-create.types.ts)):
 
 | Status        | User-visible outcome                                                            |
 | ------------- | ------------------------------------------------------------------------------- |
@@ -431,7 +431,7 @@ Replacement UI must explicitly represent the persisted value independently of th
 
 Do not make users infer the persisted value from an absent candidate, drawer title, or surrounding page context.
 
-Current-value display is resolved from persisted/hydrated relationship data at drawer open time ([`resolve-relationship-drawer-current-endpoint.ts`](../src/features/content/lib/relationship/resolve-relationship-drawer-current-endpoint.ts)). Candidate collections used for replacement pickers are not authoritative for current display. When the persisted endpoint cannot be resolved, surface an explicit unavailable state and block the replacement mutation — do not silently omit the Current field.
+Current-value display is resolved from persisted/hydrated relationship data at drawer open time ([`resolve-relationship-drawer-current-endpoint.ts`](../src/features/content/lib/relationship/drawer/resolve-relationship-drawer-current-endpoint.ts)). Candidate collections used for replacement pickers are not authoritative for current display. When the persisted endpoint cannot be resolved, surface an explicit unavailable state and block the replacement mutation — do not silently omit the Current field.
 
 Rules:
 
@@ -442,7 +442,7 @@ Rules:
 
 ## Presentation policy
 
-Relationship direction does **not** determine whether empty kinds are displayed. Use dashboard presentation policy in [`relationship-group-presentation.ts`](../src/features/content/lib/relationship/relationship-group-presentation.ts):
+Relationship direction does **not** determine whether empty kinds are displayed. Use dashboard presentation policy in [`relationship-group-presentation.ts`](../src/features/content/lib/relationship/list/relationship-group-presentation.ts):
 
 | Presentation           | When to use                                                                                        |
 | ---------------------- | -------------------------------------------------------------------------------------------------- |
@@ -548,7 +548,7 @@ Organization forward target pickers use optional `targetPresentation` config and
 
 Use **direction-aware resolvers** in feature copy modules (for example [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) for location inverse and [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) for organization forward). Do not reuse one empty/add label for Location inverse and Organization forward.
 
-Location inverse drawers resolve **subject** target presentation in [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) (`resolveLocationInverseOrganizationTargetPresentation`, `resolveLocationInverseCharacterTargetPresentation`, `resolveLocationInverseOrganizationReplaceHelper`). Drawers consume **`searchPlaceholder`** and replace helpers where applicable; field labels use shared [`relationship-drawer-field-labels.ts`](../src/features/content/lib/relationship/relationship-drawer-field-labels.ts) constants when they already match resolver defaults.
+Location inverse drawers resolve **subject** target presentation in [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/location-connection-surface-copy.ts) (`resolveLocationInverseOrganizationTargetPresentation`, `resolveLocationInverseCharacterTargetPresentation`, `resolveLocationInverseOrganizationReplaceHelper`). Drawers consume **`searchPlaceholder`** and replace helpers where applicable; field labels use shared [`relationship-drawer-field-labels.ts`](../src/features/content/lib/relationship/drawer/relationship-drawer-field-labels.ts) constants when they already match resolver defaults.
 
 Browse scopes remain **forward-only** — inverse pickers select a subject with a fixed location; HQ structure scoping on inverse flows stays in `@rpg/contracts` eligibility on that location. Do not merge forward and inverse presentation modules.
 

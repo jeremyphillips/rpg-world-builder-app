@@ -14,7 +14,7 @@ import {
 } from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
-import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
+import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer/drawer-context.types'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
 import { resolveOrganizationMemberClassAffinityDisplayLabel } from './organization-member-class-chip-options.lib'
 import { resolveOrganizationMemberSpeciesAffinityDisplayLabel } from './organization-member-species-chip-options.lib'

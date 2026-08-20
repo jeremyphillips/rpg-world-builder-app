@@ -22,7 +22,7 @@ import {
 } from '@/lib/create-flow'
 
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
-import { buildOrganizationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
+import { buildOrganizationPickerEntitySummary } from '../../lib/entity/content-entity-picker-presentation.lib'
 import {
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,

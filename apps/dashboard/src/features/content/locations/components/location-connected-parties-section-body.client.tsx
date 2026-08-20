@@ -7,7 +7,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import type { RelationshipCandidateSet } from '../../lib/relationship/relationship-alternatives'
+import type { RelationshipCandidateSet } from '../../lib/relationship/list/relationship-alternatives'
 import {
   LocationPeopleAndOrganizationsSectionBody,
   type LocationPeopleMutationContext,

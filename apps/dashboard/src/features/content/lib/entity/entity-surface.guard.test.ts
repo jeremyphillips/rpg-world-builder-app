@@ -108,9 +108,9 @@ describe('entity surface architecture guard', () => {
   it('does not import entity anatomy internals outside allowlist', () => {
     const allowlist = new Set([
       'content/lib/content-entity-card.client.tsx',
-      'content/lib/entity/disclosure-entity-card.client.tsx',
+      'content/lib/entity/disclosure/disclosure-entity-card.client.tsx',
       'content/lib/detail/row/detail-entity-row.client.tsx',
-      'content/lib/relationship/drawer-context-entity-block.client.tsx',
+      'content/lib/relationship/drawer/drawer-context-entity-block.client.tsx',
     ])
 
     for (const path of featureImplementationFiles()) {

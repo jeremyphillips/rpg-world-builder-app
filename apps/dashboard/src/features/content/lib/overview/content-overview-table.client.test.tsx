@@ -38,7 +38,7 @@ vi.mock('@/features/campaign', () => ({
 
 const manageViewer = { kind: 'manage' as const }
 
-vi.mock('./use-content-viewer', () => ({
+vi.mock('./hooks/use-content-viewer', () => ({
   useContentViewer: vi.fn(() => manageViewer),
 }))
 
@@ -50,7 +50,7 @@ vi.mock('./content-overview-preferences', async (importOriginal) => {
   }
 })
 
-vi.mock('./use-content-campaign-availability-toggle.client', () => ({
+vi.mock('./hooks/use-content-campaign-availability-toggle.client', () => ({
   useContentCampaignAvailabilityToggle: vi.fn(() => ({
     pending: false,
     blockedOpen: false,

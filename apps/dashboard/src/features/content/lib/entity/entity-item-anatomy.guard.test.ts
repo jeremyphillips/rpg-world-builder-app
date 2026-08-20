@@ -31,7 +31,10 @@ describe('entity item anatomy guard', () => {
   })
 
   it('publishes leading offset from DEC and CEC surface roots only', () => {
-    const decSource = readFileSync(join(ENTITY_ROOT, 'disclosure-entity-card.client.tsx'), 'utf8')
+    const decSource = readFileSync(
+      join(ENTITY_ROOT, 'disclosure/disclosure-entity-card.client.tsx'),
+      'utf8',
+    )
     const frameSource = readFileSync(join(ENTITY_ROOT, 'entity-card-frame.client.tsx'), 'utf8')
 
     expect(decSource).toMatch(/buildEntityContentOffsetStyle/)
@@ -51,7 +54,10 @@ describe('entity item anatomy guard', () => {
   })
 
   it('keeps DEC on entity-card CLI row layout without consumer padding props', () => {
-    const decSource = readFileSync(join(ENTITY_ROOT, 'disclosure-entity-card.client.tsx'), 'utf8')
+    const decSource = readFileSync(
+      join(ENTITY_ROOT, 'disclosure/disclosure-entity-card.client.tsx'),
+      'utf8',
+    )
 
     expect(decSource).toMatch(/rowLayout="entity-card"/)
     expect(decSource).toMatch(/toolbarLeadingChrome="none"/)
@@ -69,7 +75,7 @@ describe('entity item anatomy guard', () => {
 
   it('keeps catalog entity row on entity-card CLI mode with shared anatomy', () => {
     const catalogRowSource = readFileSync(
-      join(ENTITY_ROOT, 'catalog-entity-row.client.tsx'),
+      join(ENTITY_ROOT, 'catalog/catalog-entity-row.client.tsx'),
       'utf8',
     )
 
@@ -81,7 +87,7 @@ describe('entity item anatomy guard', () => {
   it('keeps entity-backed catalog pickers on CatalogEntityPickerSheet', () => {
     const featureRoot = join(ENTITY_ROOT, '../..')
     const allowlist = new Set([
-      join(ENTITY_ROOT, 'catalog-entity-picker-sheet.client.tsx'),
+      join(ENTITY_ROOT, 'catalog/catalog-entity-picker-sheet.client.tsx'),
       join(ENTITY_ROOT, '../content-entity-card.test.tsx'),
     ])
     const entityPickerPattern =

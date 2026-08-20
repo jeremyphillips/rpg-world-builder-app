@@ -30,7 +30,7 @@ export type LocationParentReplacementAction =
 
 export type LocationParentReplacementMode = 'change' | 'set'
 
-import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
+import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer/drawer-context.types'
 
 export type LocationParentReplacementCurrentSnapshot = {
   parentLocationId: string
