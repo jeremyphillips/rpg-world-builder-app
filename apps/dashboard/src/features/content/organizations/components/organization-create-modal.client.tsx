@@ -7,7 +7,6 @@ import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from
 
 import { CreateModalShell, type OnContentCreated } from '@/lib/create-flow'
 import { notifyContentCreated } from '@/lib/notify'
-import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
 import { CampaignAccessFormProvider } from '../../lib/campaign-access/campaign-access-form-context.client'
@@ -20,9 +19,12 @@ import {
   ContentFormHost,
   type ContentFormHostLeaveBridge,
 } from '../../lib/forms/shells/content-form-host.client'
-import { resolveContentFormHostConfig } from '../../lib/forms/shells/content-form-host-projection'
 import { ContentFormHeader } from '../../lib/forms/shells/content-form-shell-layout.lib'
-import { resolveContentFormSchema } from '../../lib/forms/shells/content-edit-load'
+import { useContentFormSubmit } from '../../lib/forms/shells/content-form-submit'
+import {
+  resolveContentFormHostConfig,
+  resolveContentFormNavigationFields,
+} from '../../lib/forms/shells/content-form-host-projection'
 import { useContentWriteMutation } from '../../lib/list/use-content-mutations'
 import { ContentFormOptionsGate } from '../../lib/forms/shells/content-form-shell-layout'
 import {
@@ -73,36 +75,45 @@ function OrganizationCreateModalForm({
     organizationPracticeRecommendationIds: practiceRecommendations,
   }
 
-  const { onSubmit, formError } = useSubmitHandler<OrganizationFormValues>(async (values) => {
-    resolveContentFormSchema(organizationFormDef, ctx, 'publish').parse(values)
+  const formKey = `organization-create-modal-${campaignId}`
 
-    const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
-      campaignId,
-      routeKey: organizationFormDef.routeKey,
-      createInput: {
-        ...organizationFormDef.toInput(
-          values,
-          {
-            weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-            campaignRules: ctx.campaignRules,
-            equipmentKind: ctx.equipmentKind,
-          },
-          'publish',
-        ),
-        status: 'published' as const,
-      },
-      mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
-      pendingAccess: campaignAccessDraftRef.current,
-    })
+  const { onSubmit, formError, UiBridge } = useContentFormSubmit<OrganizationFormValues>({
+    def: organizationFormDef,
+    ctx,
+    fallbackMessage: 'Could not create organizations.',
+    invalidPresentation: {
+      resolverFields: resolveContentFormNavigationFields(organizationFormDef, ctx),
+      formId: formKey,
+    },
+    persist: async (values) => {
+      const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
+        campaignId,
+        routeKey: organizationFormDef.routeKey,
+        createInput: {
+          ...organizationFormDef.toInput(
+            values,
+            {
+              weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+              campaignRules: ctx.campaignRules,
+              equipmentKind: ctx.equipmentKind,
+            },
+            'publish',
+          ),
+          status: 'published' as const,
+        },
+        mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
+        pendingAccess: campaignAccessDraftRef.current,
+      })
 
-    if (deferredAccessFailed) {
-      toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
-      return
-    }
+      if (deferredAccessFailed) {
+        toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
+        return
+      }
 
-    onCreated?.({ contentType: 'organizations', id: created.id })
-    notifyContentCreated('organizations')
-  }, 'Could not create organizations.')
+      onCreated?.({ contentType: 'organizations', id: created.id })
+      notifyContentCreated('organizations')
+    },
+  })
 
   React.useEffect(() => {
     onPendingChange?.(mutation.isPending)
@@ -119,15 +130,16 @@ function OrganizationCreateModalForm({
       form={{
         ...resolveContentFormHostConfig<OrganizationFormValues>(organizationFormDef, ctx, {
           validationIntent: 'draft',
-          formKey: `organization-create-modal-${campaignId}`,
+          formKey,
         }),
         header: () => (
           <>
+            <UiBridge />
             <OrganizationAuthoringPresetBridge />
             <ContentFormHeader
               def={organizationFormDef}
               ctx={ctx}
-              formKey={`organization-create-modal-${campaignId}`}
+              formKey={formKey}
               campaignId={campaignId}
               onCampaignAccessDraftChange={(patch) => {
                 campaignAccessDraftRef.current = patch

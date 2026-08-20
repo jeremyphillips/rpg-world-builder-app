@@ -6,13 +6,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useFormContext, useFormState } from 'react-hook-form'
 import { type ContentCampaignAccessPatch } from '@rpg/contracts'
 import { Button, cn, toast } from '@rpg/ui'
-import { FormShellSubmitButton, useSchemaFormSubmit, type FormValueSync } from '@rpg/ui/form'
+import { FormShellSubmitButton, type FormValueSync } from '@rpg/ui/form'
 
 import type { CreateWorkflowPanelStatus } from '@/lib/create-flow'
 import type { OnContentCreated } from '@/lib/create-flow'
 import { notifyContentCreated } from '@/lib/notify'
 import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
-import { useSubmitHandler, type FormSubmitHandler } from '@/lib/use-submit-handler'
+import type { FormSubmitHandler } from '@/lib/use-submit-handler'
 import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context.client'
 import { createWithDeferredCampaignAccess } from '../../lib/campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING } from '../../lib/campaign-access/campaign-access-labels'
@@ -28,7 +28,9 @@ import {
   type ContentFormHostLeaveBridge,
 } from '../../lib/forms/shells/content-form-host.client'
 import { ContentFormHeader } from '../../lib/forms/shells/content-form-shell-layout.lib'
-import { resolveContentFormSchema } from '../../lib/forms/shells/content-edit-load'
+import { useContentFormSubmit } from '../../lib/forms/shells/content-form-submit'
+import { resolveContentFormNavigationFields } from '../../lib/forms/shells/content-form-host-projection'
+import { resolveBuildingCreateViewForPath } from '../lib/location-building-create-invalid-submit.lib'
 import { fixedCreateToInitialValues } from '../lib/location-create-shortcuts'
 import '../lib/location-form-def'
 import { locationFormDef } from '../lib/location-form-def'
@@ -190,46 +192,11 @@ function LocationCreateDetailsPanelStatusBridge({
   return null
 }
 
-function BuildingCreateSubmitButton({
-  pending,
-  submitBlocked,
-  submitLabel,
-  onSubmit,
-  onInvalidDetails,
-}: {
-  pending: boolean
-  submitBlocked?: boolean
-  submitLabel: string
-  onSubmit: FormSubmitHandler<LocationDraftFormValues>
-  onInvalidDetails: () => void
-}) {
-  const schemaFormSubmit = useSchemaFormSubmit<LocationDraftFormValues>()
-  if (!schemaFormSubmit) {
-    return (
-      <FormShellSubmitButton disabled={pending || submitBlocked}>
-        {submitLabel}
-      </FormShellSubmitButton>
-    )
-  }
-
-  return (
-    <Button
-      type="button"
-      disabled={pending || submitBlocked}
-      onClick={() => schemaFormSubmit.requestSubmit(onSubmit, onInvalidDetails)}
-    >
-      {submitLabel}
-    </Button>
-  )
-}
-
 function buildBuildingCreateFooterChrome(input: {
   hadSetup: boolean
   pending: boolean
   submitBlocked?: boolean
   submitLabel: string
-  onSubmit: FormSubmitHandler<LocationDraftFormValues>
-  onInvalidDetails: () => void
   onBack: () => void
   onCancel: () => void
 }): ContentFormHostChrome {
@@ -246,13 +213,9 @@ function buildBuildingCreateFooterChrome(input: {
             Cancel
           </Button>
         )}
-        <BuildingCreateSubmitButton
-          pending={input.pending}
-          submitBlocked={input.submitBlocked}
-          submitLabel={input.submitLabel}
-          onSubmit={input.onSubmit}
-          onInvalidDetails={input.onInvalidDetails}
-        />
+        <FormShellSubmitButton disabled={input.pending || input.submitBlocked}>
+          {input.submitLabel}
+        </FormShellSubmitButton>
       </>
     ),
   }
@@ -268,6 +231,7 @@ type LocationCreateFormShellProps = LocationCreateFormBodyProps & {
   campaignAccessDraftRef: MutableRefObject<ContentCampaignAccessPatch | null>
   fields: ReturnType<typeof contentFormFields>
   pending: boolean
+  chrome: ContentFormHostChrome | ((ctx: { pending: boolean }) => ContentFormHostChrome)
   extraUnsavedEdits?: boolean
   onSubmit: FormSubmitHandler<LocationDraftFormValues>
   formError?: string | null
@@ -275,7 +239,7 @@ type LocationCreateFormShellProps = LocationCreateFormBodyProps & {
   formDefaultValues?: Record<string, unknown>
   formValueSyncs?: FormValueSync[]
   onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
-  chrome: ContentFormHostChrome | ((ctx: { pending: boolean }) => ContentFormHostChrome)
+  submitUiBridge?: () => null
 }
 
 function LocationCreateFormShell({
@@ -301,6 +265,7 @@ function LocationCreateFormShell({
   formDefaultValues,
   formValueSyncs = locationFormValueSyncs,
   onDetailsStatusChange,
+  submitUiBridge,
 }: LocationCreateFormShellProps) {
   useEffect(() => {
     onPendingChange?.(pending)
@@ -336,31 +301,35 @@ function LocationCreateFormShell({
           },
           valueSyncs: formValueSyncs,
           formKey,
-          header: () => (
-            <>
-              {buildingSetupApplication ? (
-                <LocationBuildingSetupProjectionBridge application={buildingSetupApplication} />
-              ) : null}
-              {onDetailsStatusChange ? (
-                <LocationCreateDetailsPanelStatusBridge
-                  formError={formError}
-                  extraUnsavedEdits={extraUnsavedEdits}
-                  onStatusChange={onDetailsStatusChange}
+          header: () => {
+            const SubmitUiBridge = submitUiBridge
+            return (
+              <>
+                {SubmitUiBridge ? <SubmitUiBridge /> : null}
+                {buildingSetupApplication ? (
+                  <LocationBuildingSetupProjectionBridge application={buildingSetupApplication} />
+                ) : null}
+                {onDetailsStatusChange ? (
+                  <LocationCreateDetailsPanelStatusBridge
+                    formError={formError}
+                    extraUnsavedEdits={extraUnsavedEdits}
+                    onStatusChange={onDetailsStatusChange}
+                  />
+                ) : null}
+                <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} />
+                <LocationCreateDraftPrune fixedCreate={fixedCreate} />
+                <ContentFormHeader
+                  def={locationFormDef}
+                  ctx={locationCtx}
+                  formKey={formKey}
+                  campaignId={campaignId}
+                  onCampaignAccessDraftChange={(patch) => {
+                    campaignAccessDraftRef.current = patch
+                  }}
                 />
-              ) : null}
-              <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} />
-              <LocationCreateDraftPrune fixedCreate={fixedCreate} />
-              <ContentFormHeader
-                def={locationFormDef}
-                ctx={locationCtx}
-                formKey={formKey}
-                campaignId={campaignId}
-                onCampaignAccessDraftChange={(patch) => {
-                  campaignAccessDraftRef.current = patch
-                }}
-              />
-            </>
-          ),
+              </>
+            )
+          },
           fields,
         }}
         leaveBridgeRef={leaveBridgeRef}
@@ -411,11 +380,18 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     omitBuildingForm: true,
   })
 
-  const { onSubmit, formError } = useSubmitHandler<LocationDraftFormValues>({
+  const { onSubmit, formError, UiBridge } = useContentFormSubmit<LocationDraftFormValues>({
+    def: locationFormDef,
+    ctx: locationCtx,
     fallbackMessage: 'Could not create building.',
     mapError: mapBuildingCreateSubmitError,
-    submit: async (values, form) => {
-      resolveContentFormSchema(locationFormDef, locationCtx, 'publish').parse(values)
+    invalidPresentation: {
+      resolverFields: resolveContentFormNavigationFields(locationFormDef, locationCtx, fields),
+      formId: props.formKey,
+      resolveViewForPath: resolveBuildingCreateViewForPath,
+      activateView: onNavigateToTab,
+    },
+    persist: async (values, form) => {
       const overlaidValues = applyLocationFixedCreateContext(
         values as LocationFormValues,
         fixedCreate,
@@ -486,6 +462,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
       pending={compositionPending}
       onSubmit={onSubmit}
       formError={formError}
+      submitUiBridge={UiBridge}
       onDetailsStatusChange={onDetailsStatusChange}
       formDefaultValues={{
         ...(setupClassification ? { classification: setupClassification } : {}),
@@ -496,8 +473,6 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
           pending,
           submitBlocked,
           submitLabel,
-          onSubmit,
-          onInvalidDetails: () => onNavigateToTab?.('details'),
           onBack,
           onCancel,
         })
@@ -522,54 +497,64 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
     fixedCreate,
   }
 
-  const { onSubmit, formError } = useSubmitHandler<LocationDraftFormValues>(async (values) => {
-    if (fixedCreate.authoringType === 'building') {
-      throw new Error('Building create must use the composition coordinator.')
-    }
+  const fields = contentFormFields(locationFormDef, locationCtx)
 
-    resolveContentFormSchema(locationFormDef, locationCtx, 'publish').parse(values)
+  const { onSubmit, formError, UiBridge } = useContentFormSubmit<LocationDraftFormValues>({
+    def: locationFormDef,
+    ctx: locationCtx,
+    fallbackMessage: 'Could not create locations.',
+    invalidPresentation: {
+      resolverFields: resolveContentFormNavigationFields(locationFormDef, locationCtx, fields),
+      formId: props.formKey,
+    },
+    persist: async (values) => {
+      if (fixedCreate.authoringType === 'building') {
+        throw new Error('Building create must use the composition coordinator.')
+      }
 
-    const overlaidValues = applyLocationFixedCreateContext(
-      values as LocationFormValues,
-      fixedCreate,
-    )
+      const overlaidValues = applyLocationFixedCreateContext(
+        values as LocationFormValues,
+        fixedCreate,
+      )
 
-    const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
-      campaignId,
-      routeKey: locationFormDef.routeKey,
-      createInput: {
-        ...locationFormDef.toInput(
-          overlaidValues,
-          {
-            weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
-            campaignRules: locationCtx.campaignRules,
-            equipmentKind: locationCtx.equipmentKind,
-          },
-          'publish',
-        ),
-        status: 'published' as const,
-      },
-      mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
-      pendingAccess: campaignAccessDraftRef.current,
-    })
+      const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
+        campaignId,
+        routeKey: locationFormDef.routeKey,
+        createInput: {
+          ...locationFormDef.toInput(
+            overlaidValues,
+            {
+              weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
+              campaignRules: locationCtx.campaignRules,
+              equipmentKind: locationCtx.equipmentKind,
+            },
+            'publish',
+          ),
+          status: 'published' as const,
+        },
+        mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
+        pendingAccess: campaignAccessDraftRef.current,
+      })
 
-    if (deferredAccessFailed) {
-      toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
-    } else {
-      onCreated?.({ contentType: 'locations', id: created.id })
-      notifyContentCreated('locations')
-    }
-  }, 'Could not create locations.')
+      if (deferredAccessFailed) {
+        toast.warning(CAMPAIGN_ACCESS_CREATE_DEFERRED_WARNING)
+      } else {
+        onCreated?.({ contentType: 'locations', id: created.id })
+        notifyContentCreated('locations')
+      }
+    },
+  })
 
   return (
     <LocationCreateFormShell
       {...props}
       chrome={chrome}
       campaignAccessDraftRef={campaignAccessDraftRef}
-      fields={contentFormFields(locationFormDef, locationCtx)}
+      fields={fields}
       pending={mutation.isPending}
       onSubmit={onSubmit}
       formError={formError}
+      submitUiBridge={UiBridge}
     />
   )
 }
@@ -599,62 +584,69 @@ function LocationSettlementCreateForm(
     afterDescription: buildSettlementStartingDistrictsFormItems(guidance),
   })
 
-  const { onSubmit, formError } = useSubmitHandler<LocationDraftFormValues>(async (values) => {
-    resolveContentFormSchema(locationFormDef, locationCtx, 'publish').parse(values)
+  const { onSubmit, formError, UiBridge } = useContentFormSubmit<LocationDraftFormValues>({
+    def: locationFormDef,
+    ctx: locationCtx,
+    fallbackMessage: 'Could not create locations.',
+    invalidPresentation: {
+      resolverFields: resolveContentFormNavigationFields(locationFormDef, locationCtx, fields),
+      formId: props.formKey,
+    },
+    persist: async (values) => {
+      const overlaidValues = applyLocationFixedCreateContext(
+        values as LocationFormValues,
+        fixedCreate,
+      )
 
-    const overlaidValues = applyLocationFixedCreateContext(
-      values as LocationFormValues,
-      fixedCreate,
-    )
-
-    const compositionValidation = validateSettlementCreateComposition(
-      settlementComposition.composition,
-    )
-    if (!compositionValidation.ok) {
-      throw new Error(compositionValidation.message)
-    }
-
-    setCompositionPending(true)
-    try {
-      const settlementCreateInput = {
-        ...locationFormDef.toInput(
-          overlaidValues,
-          {
-            weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
-            campaignRules: locationCtx.campaignRules,
-            equipmentKind: locationCtx.equipmentKind,
-          },
-          'publish',
-        ),
-        status: 'published' as const,
+      const compositionValidation = validateSettlementCreateComposition(
+        settlementComposition.composition,
+      )
+      if (!compositionValidation.ok) {
+        throw new Error(compositionValidation.message)
       }
 
-      const result = await createSettlementWithStartingDistricts({
-        campaignId,
-        routeKey: locationFormDef.routeKey,
-        settlementCreateInput,
-        pendingAccess: campaignAccessDraftRef.current,
-        composition: settlementComposition.composition,
-      })
+      setCompositionPending(true)
+      try {
+        const settlementCreateInput = {
+          ...locationFormDef.toInput(
+            overlaidValues,
+            {
+              weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
+              campaignRules: locationCtx.campaignRules,
+              equipmentKind: locationCtx.equipmentKind,
+            },
+            'publish',
+          ),
+          status: 'published' as const,
+        }
 
-      invalidateContentFormDefQueries(queryClient, campaignId, locationFormDef)
+        const result = await createSettlementWithStartingDistricts({
+          campaignId,
+          routeKey: locationFormDef.routeKey,
+          settlementCreateInput,
+          pendingAccess: campaignAccessDraftRef.current,
+          composition: settlementComposition.composition,
+        })
 
-      const toastResult = resolveSettlementCreateCompletionToast({
-        settlementType: fixedCreate.settlementType,
-        deferredAccessFailed: result.deferredAccessFailed,
-        districtsFailedCount: result.districts.failed.length,
-      })
+        invalidateContentFormDefQueries(queryClient, campaignId, locationFormDef)
 
-      if (toastResult.kind === 'success') {
-        onCreated?.({ contentType: 'locations', id: result.settlement.id })
-        notifyContentCreated('locations')
-      } else {
-        toast.warning(toastResult.message)
+        const toastResult = resolveSettlementCreateCompletionToast({
+          settlementType: fixedCreate.settlementType,
+          deferredAccessFailed: result.deferredAccessFailed,
+          districtsFailedCount: result.districts.failed.length,
+        })
+
+        if (toastResult.kind === 'success') {
+          onCreated?.({ contentType: 'locations', id: result.settlement.id })
+          notifyContentCreated('locations')
+        } else {
+          toast.warning(toastResult.message)
+        }
+      } finally {
+        setCompositionPending(false)
       }
-    } finally {
-      setCompositionPending(false)
-    }
-  }, 'Could not create locations.')
+    },
+  })
 
   return (
     <LocationCreateFormShell
@@ -666,6 +658,7 @@ function LocationSettlementCreateForm(
       extraUnsavedEdits={settlementComposition.isDirty || undefined}
       onSubmit={onSubmit}
       formError={formError}
+      submitUiBridge={UiBridge}
     />
   )
 }

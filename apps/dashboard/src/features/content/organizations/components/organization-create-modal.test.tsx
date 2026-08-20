@@ -113,6 +113,24 @@ describe('OrganizationCreateModal', () => {
     })
   })
 
+  it('does not call mutateAsync when publish validation fails', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+
+    render(
+      <QueryClientProvider client={makeTestQueryClient()}>
+        <OrganizationCreateModal open onOpenChange={onOpenChange} campaignId={STORY_CAMPAIGN_ID} />
+      </QueryClientProvider>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Create organization' }))
+
+    await waitFor(() => {
+      expect(mutateAsync).not.toHaveBeenCalled()
+      expect(onOpenChange).not.toHaveBeenCalledWith(false)
+    })
+  })
+
   it('does not call onCreated when Cancel closes the modal', async () => {
     const user = userEvent.setup()
     const onCreated = vi.fn()

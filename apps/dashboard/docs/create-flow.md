@@ -32,6 +32,13 @@ Footer actions published into `CreateModalShell` must use `Modal.FooterActions`
 action buttons directly in the shell footer slot — `Modal.Footer` is a vertical
 dock and unwrapped buttons stack full width.
 
+When the form body and footer render in separate DOM trees (modal shell footer slot),
+`FormShellSubmitButton` uses the canonical `requestSubmit` reference published on
+`FormShellFooterModel` — the same function as inline `useSchemaFormSubmit().requestSubmit`.
+One submission entry point regardless of button location. Commit-invalid submit activates the
+first invalid panel via feature-supplied `resolveViewForPath` / `activateView` callbacks
+(see `useContentFormSubmit` in [form-lib-conventions.md](./form-lib-conventions.md)).
+
 ## Add / Pending workflow
 
 Optional create-tab relationship composition uses a shared **Add / Pending**

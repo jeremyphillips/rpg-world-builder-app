@@ -360,6 +360,16 @@ const { onSubmit, formError } = useSubmitHandler({
 Canonical pending expression: `mutation.isPending || form.formState.isSubmitting`. Do not
 add a helper unless additional pending sources appear (uploads, transition locks, etc.).
 
+### External footer `requestSubmit` parity
+
+When footer actions render outside the form element (`FormShellFooterSlot`, modal shell footers),
+`FormShellSubmitButton` prefers `FormShellFooterModel.requestSubmit` — the **same function
+reference** registered by `SchemaFormElement`, not a reconstructed wrapper. Inline footers use
+`useSchemaFormSubmit().requestSubmit`; external footers use the published model reference. Both
+paths invoke identical draft invalid-submit behavior (focus, expand, tab navigation).
+
+Fallback: native `form={formId}` submit when no model reference is available (legacy shells).
+
 ### Client submit vs API idempotency
 
 `FormSaveFooter` + `isSubmitting` + `mutation.isPending` prevent double-submit through the

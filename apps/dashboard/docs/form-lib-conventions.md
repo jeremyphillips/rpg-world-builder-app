@@ -364,8 +364,25 @@ Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) w
 | **Edit**   | `[Discard changes]` `[Save changes]` | `hasDirtyFields(dirtyFields)` — disabled when clean, `pending`, or read-only | Stay on edit route; reset baseline from `def.toFormValues(saved)`; one toast from coordinated save session (`onSaved`) — access-only uses availability copy, body or combined uses `notifySaveSuccess` |
 
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
-Submit/error wiring: `useSubmitHandler` in create/edit shells. Nested subclass editor remains
+Submit/error wiring: `useContentFormSubmit` for ContentFormDef create modals and hosts;
+`useSubmitHandler` alone for edit shells and non–ContentFormDef surfaces. Nested subclass editor remains
 separate until aligned in a follow-up.
+
+#### `useContentFormSubmit` (ContentFormDef create)
+
+Create surfaces that use `ContentFormDef` (`ContentFormHost`, create modals, future drawers) must
+route publish/create submit through `useContentFormSubmit` in
+[`content-form-submit.ts`](../src/features/content/lib/forms/shells/content-form-submit.ts).
+Do **not** call `resolveContentFormSchema(..., 'publish').parse()` in feature submit handlers.
+
+The hook runs: draft validation (RHF, already done) → commit validation via
+`validateContentPublishValues` → invalid-submit presentation (field errors, optional tab/view reveal)
+→ feature-owned `persist`. Commit-invalid failures reject without `formError`; persist failures set
+`formError` and reject. Success chrome (trusted close, navigate) runs only after a resolved submit.
+
+Render the returned `UiBridge` inside the form header so invalid-submit focus can expand sections.
+Feature-owned tab mapping uses `invalidPresentation.resolveViewForPath` / `activateView` — shared code
+never hard-codes tab ids.
 
 **Why not `formState.isDirty`?** RHF `isDirty` compares current values to `defaultValues` and
 can read `true` after hydration when value-sync, rich-text init, or conditional `shouldUnregister`

@@ -439,6 +439,23 @@ describe('LocationCreateModal', () => {
     expect(mockedCompleteBuildingCreateComposition).not.toHaveBeenCalled()
   })
 
+  it('blocks building create with empty Name from Organizations tab', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    renderModal(buildingIntent, onOpenChange)
+    await continueBuildingSetup(user)
+
+    await user.click(screen.getByRole('tab', { name: 'Organizations' }))
+    await user.click(screen.getByRole('button', { name: 'Create building' }))
+
+    await waitFor(() => {
+      expect(mockedCompleteBuildingCreateComposition).not.toHaveBeenCalled()
+      expect(screen.getByRole('tab', { name: /^Details/ })).toHaveAttribute('aria-selected', 'true')
+      expect(screen.getByRole('textbox', { name: 'Name' })).toBeInvalid()
+    })
+    expect(onOpenChange).not.toHaveBeenCalledWith(false)
+  })
+
   it('preserves the bounded modal scroll chain when Building details expand', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)

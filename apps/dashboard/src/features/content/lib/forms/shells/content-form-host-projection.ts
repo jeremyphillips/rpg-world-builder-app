@@ -10,6 +10,15 @@ import { contentFormFields } from '../content-form-registry'
 import { resolveContentFormSchema } from './content-edit-load'
 import type { ContentFormHostFormProps } from './content-form-host.client'
 
+/** Resolver fields for invalid-submit focus — hoisted name first. */
+export function resolveContentFormNavigationFields(
+  def: Pick<AnyContentFormDef, 'nameField' | 'buildFields' | 'buildTabs'>,
+  ctx: ContentFormCtx,
+  fields?: FormItem[],
+): FormItem[] {
+  return [def.nameField(ctx), ...(fields ?? contentFormFields(def, ctx))]
+}
+
 export function resolveContentFormValueSyncs(
   def: Pick<AnyContentFormDef, 'routeKey' | 'valueSyncs'>,
   ctx: ContentFormCtx,
