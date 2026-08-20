@@ -55,6 +55,8 @@ const AUTHORING_TYPE_ALLOWED_SUFFIXES = new Set([
   'location-create-form.client.tsx',
   'location-create-modal-setup.lib.ts',
   'location-create-modal-setup.lib.test.ts',
+  'location-create-authoring-capabilities.lib.ts',
+  'location-create-authoring-capabilities.lib.test.ts',
   'location-building-create-setup.lib.ts',
   'location-building-create-setup.lib.test.ts',
   'location-create-draft.lib.ts',
