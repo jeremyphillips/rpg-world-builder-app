@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import type { Control, FieldValues } from 'react-hook-form'
 
 import { cn } from '../../lib/utils'
+import type { FieldSize } from './field.client'
 import type { FieldGroupChromeClassNames } from './field-group-chrome.variants'
 import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosure as FieldGroupSummaryDisclosureView } from './field-group-summary-disclosure.client'
@@ -17,6 +18,7 @@ import {
 export type SummaryDisclosureFieldGroupShellProps = {
   id?: string
   legend: string
+  size: FieldSize
   rhythm: FieldRhythm
   className?: string
   uiStateKey?: string
@@ -31,6 +33,7 @@ export type SummaryDisclosureFieldGroupShellProps = {
 export function SummaryDisclosureFieldGroupShell({
   id,
   legend,
+  size,
   rhythm,
   className,
   uiStateKey,
@@ -59,6 +62,7 @@ export function SummaryDisclosureFieldGroupShell({
         legend={legend}
         legendId={legendId}
         panelId={panelId}
+        size={size}
         disclosure={disclosure}
         uiStateKey={uiStateKey}
         collapseKey={collapseKey}

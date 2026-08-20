@@ -108,6 +108,31 @@ function SummaryDisclosureNoPanelDividerHarness() {
   )
 }
 
+function CompactSummaryDisclosureHarness() {
+  const form = useForm<Values>({ defaultValues: { available: true, visibilityMode: 'dm_only' } })
+
+  return (
+    <FormProvider {...form}>
+      <FieldGroup
+        id="access-compact"
+        legend="Campaign availability"
+        size="sm"
+        formControl={form.control as unknown as Control<FieldValues>}
+        disclosure={{
+          variant: 'summary',
+          defaultOpen: false,
+          resolveSummary: () => ({
+            status: { label: 'Available', tone: 'success', indicator: 'dot' },
+            detail: 'DM only',
+          }),
+        }}
+      >
+        <div>Expanded fields</div>
+      </FieldGroup>
+    </FormProvider>
+  )
+}
+
 describe('FieldGroup summary disclosure', () => {
   it('renders collapsed summary and opens from Change', async () => {
     const user = userEvent.setup()
@@ -215,5 +240,12 @@ describe('FieldGroup summary disclosure', () => {
   it('has no accessibility violations for structured status row', async () => {
     const { container } = render(<StructuredStatusDisclosureHarness />)
     await expectNoAxeViolations(container)
+  })
+
+  it('uses compact field label scale for summary chrome when size is sm', () => {
+    render(<CompactSummaryDisclosureHarness />)
+
+    expect(screen.getByText('Campaign availability')).toHaveClass('text-xs')
+    expect(screen.getByText('Available')).toHaveClass('text-xs')
   })
 })

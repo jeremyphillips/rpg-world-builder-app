@@ -227,7 +227,7 @@ describe('CreateModalShell', () => {
 
     const singleTabPanel = screen.getByText('Single tab panel').parentElement
     expect(singleTabPanel).toHaveAttribute('data-create-tab-panel', 'details')
-    expect(singleTabPanel).toHaveClass('mt-4', 'min-h-0', 'flex-1', 'flex', 'flex-col')
+    expect(singleTabPanel).toHaveClass('mt-3', 'min-h-0', 'flex-1', 'flex', 'flex-col')
 
     rerender(
       <CreateModalShell
@@ -258,7 +258,7 @@ describe('CreateModalShell', () => {
     const multiTabPanel = screen
       .getByText('Multi tab panel')
       .closest('[data-create-tab-panel="details"]')
-    expect(multiTabPanel).toHaveClass('mt-4', 'min-h-0', 'flex-1', 'flex', 'flex-col')
+    expect(multiTabPanel).toHaveClass('mt-3', 'min-h-0', 'flex-1', 'flex', 'flex-col')
     expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
   })
 

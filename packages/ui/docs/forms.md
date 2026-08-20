@@ -146,10 +146,10 @@ via `resolveFormDensity` — do not set rhythm and size independently on shells.
 | `kind: 'array'`                                                             | yes                    | `compact`            |
 | `kind: 'dependent'`, `kind: 'slot'`, `kind: 'row'`                          | no                     | inherit parent       |
 
-| `density`     | Sibling gap | Control scale (`sm` / `md`) |
-| ------------- | ----------- | --------------------------- |
-| `comfortable` | `gap-6`     | `md`                        |
-| `compact`     | `gap-2`     | `sm`                        |
+| `density`     | Sibling gap | Label → control | Control scale (`sm` / `md`) |
+| ------------- | ----------- | --------------- | --------------------------- |
+| `comfortable` | `gap-6`     | `space-y-2`     | `md`                        |
+| `compact`     | `gap-3`     | `space-y-1`     | `sm`                        |
 
 **Leaf escape hatch:** `controlSizeOverride` on a field config changes control height only —
 not sibling rhythm. Rare; prefer section `density`. Production usage is intentionally

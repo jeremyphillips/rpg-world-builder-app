@@ -13,7 +13,16 @@ import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
-import { FormItems, FormSectionProvider, FormUiProvider, makeResolver } from '@rpg/ui/form'
+import {
+  DEFAULT_FORM_DENSITY,
+  FormItems,
+  FormSectionProvider,
+  FormUiProvider,
+  makeResolver,
+  type FormDensity,
+} from '@rpg/ui/form'
+
+import { useCreateFlowFormDensity } from '@/lib/create-flow'
 
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
@@ -50,6 +59,8 @@ export interface CampaignAccessSectionProps {
   entityName?: string
   /** Called after a successful persisted PATCH on edit. */
   onPersistedChange?: (access: ResolvedContentCampaignAccess) => void
+  /** Inherits parent form density when omitted. */
+  density?: FormDensity
 }
 
 export function CampaignAccessSection({
@@ -61,7 +72,10 @@ export function CampaignAccessSection({
   onDraftChange,
   entityName,
   onPersistedChange,
+  density,
 }: CampaignAccessSectionProps) {
+  const createFlowDensity = useCreateFlowFormDensity()
+  const resolvedDensity = density ?? createFlowDensity ?? DEFAULT_FORM_DENSITY
   const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
   const sectionId = useId()
   const groupId = `campaign-access-${entityId ?? 'create'}`
@@ -100,8 +114,9 @@ export function CampaignAccessSection({
         pending: false,
         groupId,
         participantOptions,
+        groupDensity: resolvedDensity,
       }),
-    [groupId, participantOptions, targetType],
+    [groupId, participantOptions, resolvedDensity, targetType],
   )
 
   const resolver = useMemo(
@@ -128,8 +143,17 @@ export function CampaignAccessSection({
         pending,
         groupId,
         participantOptions,
+        groupDensity: resolvedDensity,
       }),
-    [available, groupId, initialPatch.available, participantOptions, pending, targetType],
+    [
+      available,
+      groupId,
+      initialPatch.available,
+      participantOptions,
+      pending,
+      resolvedDensity,
+      targetType,
+    ],
   )
 
   useEffect(() => {
@@ -292,7 +316,7 @@ export function CampaignAccessSection({
     >
       <FormProvider {...form}>
         <FormUiProvider fields={renderedFields}>
-          <FormSectionProvider density="compact" inRhythmStack>
+          <FormSectionProvider density={resolvedDensity} inRhythmStack>
             {persistError ? (
               <Text variant="destructive" role="alert" className="mb-4">
                 {persistError}

@@ -55,6 +55,25 @@ describe('CampaignAccessSection', () => {
     expect(screen.getByText('All players')).toBeInTheDocument()
   })
 
+  it('uses compact label scale when density is compact', async () => {
+    const user = userEvent.setup()
+    renderSection(
+      <CampaignAccessSection
+        campaignId="campaign-1"
+        targetType="feats"
+        entityId="feat-1"
+        density="compact"
+      />,
+    )
+
+    expect(screen.getByText('Campaign availability')).toHaveClass('text-xs')
+
+    await expandCampaignAccess(user)
+
+    expect(screen.getByText('Available in this campaign')).toHaveClass('text-xs')
+    expect(screen.getByRole('combobox', { name: 'Player access' })).toHaveClass('text-xs')
+  })
+
   it('shows the participant picker when specific players is selected', async () => {
     vi.mocked(participantRoster.useCampaignAccessParticipantRoster).mockReturnValue({
       data: [{ id: 'pc-1', name: 'Aldric', playerDisplayName: 'Player One' }],

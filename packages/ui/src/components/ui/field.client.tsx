@@ -11,7 +11,7 @@ import {
 import { FieldDerivedMeta } from './field-derived-meta.client'
 import { useFieldDerivedMetaContext } from './field-derived-meta-context.client'
 import {
-  fieldAnatomyStackClasses,
+  fieldAnatomyStackVariants,
   fieldErrorTextVariants,
   fieldLabelVariants,
   type FieldLabelPlacement,
@@ -135,7 +135,11 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         <div
           ref={ref}
           data-field={name}
-          className={cn(fieldAnatomyStackClasses, fieldWidthVariants({ width }), className)}
+          className={cn(
+            fieldAnatomyStackVariants({ size }),
+            fieldWidthVariants({ width }),
+            className,
+          )}
           {...props}
         >
           {children}

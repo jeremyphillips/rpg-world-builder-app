@@ -23,6 +23,25 @@ export {
 } from './add-pending-workflow.client'
 export { resolveAddPendingMode } from './add-pending-workflow.lib'
 export {
+  CREATE_FLOW_FORM_DENSITY,
+  CreateFlowFormDensityRoot,
+  useCreateFlowFormDensity,
+} from './create-flow-form-density.client'
+export {
+  createTabComposerReviewClasses,
+  createTabComposerStackClasses,
+  createTabDiscoveryBodyClasses,
+  createTabDiscoveryControlsClasses,
+  createTabDiscoveryCreateActionClasses,
+  createTabDiscoveryListClasses,
+  createTabDiscoveryStackClasses,
+  createTabIntroClasses,
+  createTabPanelContentOffsetClasses,
+  createTabPanelStackClasses,
+  createTabPendingListClasses,
+  createTabStageSubheadingClasses,
+} from './create-tab-content.variants'
+export {
   areCreateCompositionChildWorkflowViewsEqual,
   type CreateCompositionChildWorkflowCommitTarget,
   type CreateCompositionChildWorkflowView,

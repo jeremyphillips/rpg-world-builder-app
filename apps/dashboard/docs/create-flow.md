@@ -39,6 +39,64 @@ One submission entry point regardless of button location. Commit-invalid submit 
 first invalid panel via feature-supplied `resolveViewForPath` / `activateView` callbacks
 (see `useContentFormSubmit` in [form-lib-conventions.md](./form-lib-conventions.md)).
 
+### Tab panel content spacing
+
+Nested create-tab panels share a vertical rhythm in
+`create-tab-content.variants.ts`. Import the tokens from `@/lib/create-flow` —
+do not reintroduce ad-hoc `gap-*` / `mt-*` stacks in feature tab content.
+
+| Token                                | Tailwind  | Use                                                        |
+| ------------------------------------ | --------- | ---------------------------------------------------------- |
+| `createTabPanelContentOffsetClasses` | `mt-3`    | Tab list → first panel content (12px)                      |
+| `createTabPanelStackClasses`         | `gap-3`   | Major panel sections — alerts, intro, workflow root (12px) |
+| `createTabIntroClasses`              | `gap-1`   | Tab intro heading → helper copy (4px)                      |
+| `createTabComposerStackClasses`      | `gap-2`   | Composer section title → review body (8px)                 |
+| `createTabComposerReviewClasses`     | `gap-2`   | Review stages — intent, summary rows, discovery (8px)      |
+| `createTabStageSubheadingClasses`    | `gap-0`   | Stage heading ↔ helper line (flush)                        |
+| `createTabDiscoveryStackClasses`     | `gap-1`   | Stage subheading block → discovery controls (4px)          |
+| `createTabDiscoveryBodyClasses`      | `gap-0.5` | Discovery create action → picker list (2px)                |
+| `createTabDiscoveryControlsClasses`  | `gap-2`   | Search → inline create action (8px)                        |
+| `createTabDiscoveryListClasses`      | `gap-2`   | Sibling picker / entity cards (8px)                        |
+| `createTabPendingListClasses`        | `gap-2`   | Sibling pending draft cards (8px)                          |
+
+Typical composing stack (Building Organizations and future Add/Pending consumers):
+
+```text
+Tab list
+  (12px — createTabPanelContentOffsetClasses on tab panel)
+Panel stack
+  (12px — createTabPanelStackClasses between alert / intro / workflow)
+Composer title
+  (8px — createTabComposerStackClasses)
+Review stages (intent → summary → discovery)
+  (8px — createTabComposerReviewClasses)
+Stage subheading + helper (flush — createTabStageSubheadingClasses)
+  (4px — createTabDiscoveryStackClasses)
+Search
+  (8px — createTabDiscoveryControlsClasses)
++ Create new
+  (2px — createTabDiscoveryBodyClasses)
+Picker cards (8px between — createTabDiscoveryListClasses)
+```
+
+Feature modules may re-export aliases (e.g. `buildingOrganizationsComposerClasses`)
+but should not fork spacing values.
+
+### Form density
+
+`CreateModalShell` wraps modal body content in `CreateFlowFormDensityRoot`
+(`CREATE_FLOW_FORM_DENSITY` = `compact`). That supplies `FormSectionProvider`
+context for hand-built field stacks and a `useCreateFlowFormDensity()` hook for
+schema-driven `<Form>` / `<TabbedForm>` shells inside create workflows.
+
+`ContentFormHost` inherits create-flow density automatically when rendered inside
+`CreateModalShell`. Drawers and page create keep the form-system default
+(`comfortable`) unless they pass an explicit `density`.
+
+`ContentFormHeader` passes parent form `density` into `CampaignAccessSection` so
+campaign availability labels, disclosure chrome, and sibling header spacing follow
+the same rhythm as body fields.
+
 ## Add / Pending workflow
 
 Optional create-tab relationship composition uses a shared **Add / Pending**

@@ -15,7 +15,7 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `field-row-presentation.lib.ts` — `resolveFieldPresentation`, `resolveFieldRowClasses`
  *
  * Spacing tokens below:
- * - `fieldAnatomyStackClasses` — label / control / hint inside one field
+ * - `fieldAnatomyStackVariants` — label / control / hint inside one field (by control scale)
  * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
  * - `fieldGroupBottomMarginClasses` — space below standalone group/array fieldsets (omitted when a parent rhythm stack owns sibling gap)
@@ -46,7 +46,22 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldToggleDependentStackClasses` — compact stack rhythm alias (backward compatible)
  * - `fieldSeparatorVariants` — trailing divider after a leaf field or row
  */
-export const fieldAnatomyStackClasses = 'space-y-2'
+export const fieldAnatomyStackVariants = cva('', {
+  variants: {
+    size: {
+      /** Dense forms (`FormDensity: 'compact'`) — 4px label-to-control gap. */
+      sm: 'space-y-1',
+      md: 'space-y-2',
+      lg: 'space-y-2',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Comfortable default — prefer {@link fieldAnatomyStackVariants} when `size` is known. */
+export const fieldAnatomyStackClasses = fieldAnatomyStackVariants({ size: 'md' })
 /** Tighter gap between a field label and its hint when `hintPosition="below-label"`. */
 export const fieldLabelHintStackClasses = 'flex flex-col gap-1'
 export const fieldGroupStackClasses = 'flex flex-col gap-6'
@@ -137,7 +152,7 @@ export type FieldRhythm = 'compact' | 'comfortable'
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {
     rhythm: {
-      compact: 'gap-2',
+      compact: 'gap-3',
       comfortable: 'gap-6',
     },
   },
@@ -247,7 +262,7 @@ export function fieldArrayItemListClasses(options: {
     return cn('flex flex-col', options.size === 'md' ? 'gap-6' : 'gap-3')
   }
 
-  return cn('flex flex-col', options.size === 'md' ? 'gap-3' : 'gap-2')
+  return cn('flex flex-col', 'gap-3')
 }
 
 /** Compact toggle-dependent stack rhythm — prefer `fieldStackRhythmVariants` for configurable stacks. */

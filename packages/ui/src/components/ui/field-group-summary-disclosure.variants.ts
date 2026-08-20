@@ -1,5 +1,44 @@
+import { cva } from 'class-variance-authority'
+
 import { cn } from '../../lib/utils'
+import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 import { optionalFieldDisclosureActionButtonClasses } from './optional-field-disclosure.variants'
+
+/** Summary disclosure legend + status copy — follows resolved section control scale. */
+export const fieldGroupSummaryDisclosureLegendVariants = cva('', {
+  variants: {
+    size: fieldSizeTypographyClasses,
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Status row container — indicator, label, and detail at field label scale. */
+export const fieldGroupSummaryStatusLineVariants = cva('flex min-w-0 items-center gap-1.5', {
+  variants: {
+    size: fieldSizeTypographyClasses,
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Primary summary line when no structured status row is present. */
+export const fieldGroupSummaryPrimaryVariants = cva('', {
+  variants: {
+    size: fieldSizeTypographyClasses,
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+export function resolveFieldGroupSummaryDisclosureExpandedLegendClassName(
+  size: FieldSizeToken = 'md',
+): string {
+  return cn(fieldGroupSummaryDisclosureLegendVariants({ size }), 'font-medium')
+}
 
 /** Compact text action buttons (Change / Done) — matches optional field disclosure. */
 export const fieldGroupSummaryDisclosureActionButtonClasses =

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  fieldAnatomyStackVariants,
   fieldArrayItemListClasses,
   fieldGroupLegendHeaderMarginVariants,
   fieldGroupLegendVariants,
@@ -10,13 +11,24 @@ import {
   resolveFieldGroupLegendClassName,
 } from './field.variants'
 
+describe('fieldAnatomyStackVariants', () => {
+  it('maps sm to 4px label-to-control gap', () => {
+    expect(fieldAnatomyStackVariants({ size: 'sm' })).toContain('space-y-1')
+  })
+
+  it('maps md and lg to 8px label-to-control gap', () => {
+    expect(fieldAnatomyStackVariants({ size: 'md' })).toContain('space-y-2')
+    expect(fieldAnatomyStackVariants({ size: 'lg' })).toContain('space-y-2')
+  })
+})
+
 describe('fieldStackRhythmVariants', () => {
   it('maps comfortable to gap-6', () => {
     expect(fieldStackRhythmVariants({ rhythm: 'comfortable' })).toContain('gap-6')
   })
 
-  it('maps compact to gap-2', () => {
-    expect(fieldStackRhythmVariants({ rhythm: 'compact' })).toContain('gap-2')
+  it('maps compact to gap-3', () => {
+    expect(fieldStackRhythmVariants({ rhythm: 'compact' })).toContain('gap-3')
   })
 })
 
@@ -30,8 +42,8 @@ describe('fieldArrayItemListClasses', () => {
     expect(fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'md' })).toContain('gap-6')
   })
 
-  it('uses gap-2 for compact sm sections', () => {
-    expect(fieldArrayItemListClasses({ rhythm: 'compact', size: 'sm' })).toContain('gap-2')
+  it('uses gap-3 for compact sm sections', () => {
+    expect(fieldArrayItemListClasses({ rhythm: 'compact', size: 'sm' })).toContain('gap-3')
   })
 
   it('uses gap-3 for compact md sections', () => {

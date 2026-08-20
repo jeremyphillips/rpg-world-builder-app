@@ -60,7 +60,8 @@ describe('shell density parity', () => {
     }
 
     render(<Harness />)
-    expect(screen.getByLabelText('Name').closest('.gap-2')).toBeInTheDocument()
+    expect(screen.getByLabelText('Name').closest('.gap-3')).toBeInTheDocument()
+    expect(screen.getByLabelText('Name').closest('.space-y-1')).toBeInTheDocument()
   })
 
   it('Form defaults to comfortable density', () => {

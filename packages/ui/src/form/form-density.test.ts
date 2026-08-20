@@ -12,7 +12,7 @@ describe('resolveFormDensity', () => {
     expect(resolveFormDensity('comfortable')).toEqual({ rhythm: 'comfortable', size: 'md' })
   })
 
-  it('maps compact to gap-2 rhythm and sm controls', () => {
+  it('maps compact to gap-3 rhythm and sm controls', () => {
     expect(resolveFormDensity('compact')).toEqual({ rhythm: 'compact', size: 'sm' })
   })
 

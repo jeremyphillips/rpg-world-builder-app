@@ -14,6 +14,8 @@ import {
 } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 
+import { useCreateFlowFormDensity, CREATE_FLOW_FORM_DENSITY } from '@/lib/create-flow'
+
 import {
   BUILDING_ORGANIZATION_COMPOSER_CHANGE_LABEL,
   type BuildingOrganizationComposerSummaryRow,
@@ -54,8 +56,8 @@ import {
   buildingOrganizationsChooseExistingClasses,
   buildingOrganizationsComposerClasses,
   buildingOrganizationsComposerHeadingClasses,
-  buildingOrganizationsComposerStageOffsetClasses,
   buildingOrganizationsComposerSummaryRowsClasses,
+  buildingOrganizationsDiscoveryBodyClasses,
   buildingOrganizationsDiscoveryControlsClasses,
   buildingOrganizationsDiscoveryCreateActionClasses,
   buildingOrganizationsDiscoveryClasses,
@@ -239,49 +241,51 @@ function BuildingOrganizationDiscovery({
   return (
     <div className={buildingOrganizationsDiscoveryClasses}>
       <div className={buildingOrganizationsStageSubheadingClasses}>
-        <Heading as="h4" variant="subsection">
+        <Heading as="h4" variant="group">
           {BUILDING_ORGANIZATIONS_DISCOVERY_HEADING}
         </Heading>
         <Text variant="muted">{BUILDING_ORGANIZATIONS_DISCOVERY_HELPER}</Text>
       </div>
-      <div className={buildingOrganizationsDiscoveryControlsClasses}>
-        <SearchBar
-          id="building-organization-search"
-          placeholder={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
-          ariaLabel={BUILDING_ORGANIZATIONS_SEARCH_LABEL}
-          value={searchQuery}
-          onValueChange={setSearchQuery}
-        />
-        <div className={buildingOrganizationsDiscoveryCreateActionClasses}>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            density="compact"
-            onClick={enterNewOrganizationBranch}
-          >
-            {BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL}
-          </Button>
-        </div>
-      </div>
-      <div className={buildingOrganizationsDiscoveryListClasses}>
-        {isError ? (
-          <Alert variant="destructive" title={BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE} />
-        ) : null}
-        {isPending ? <Text variant="muted">{BUILDING_ORGANIZATIONS_LOADING_LABEL}</Text> : null}
-        {!isPending && !isError && visibleOrganizations.length === 0 ? (
-          <Text variant="muted">{BUILDING_ORGANIZATIONS_EMPTY_SEARCH_LABEL}</Text>
-        ) : null}
-        {visibleOrganizations.map((organization) => (
-          <BuildingOrganizationDiscoveryRow
-            key={organization.id}
-            organization={organization}
-            kind={kind}
-            kindOptionsFor={kindOptionsFor}
-            selectExistingOrganization={selectExistingOrganization}
-            resolveBuildingOrganizationSelectState={resolveBuildingOrganizationSelectState}
+      <div className={buildingOrganizationsDiscoveryBodyClasses}>
+        <div className={buildingOrganizationsDiscoveryControlsClasses}>
+          <SearchBar
+            id="building-organization-search"
+            placeholder={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
+            ariaLabel={BUILDING_ORGANIZATIONS_SEARCH_LABEL}
+            value={searchQuery}
+            onValueChange={setSearchQuery}
           />
-        ))}
+          <div className={buildingOrganizationsDiscoveryCreateActionClasses}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              density="compact"
+              onClick={enterNewOrganizationBranch}
+            >
+              {BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL}
+            </Button>
+          </div>
+        </div>
+        <div className={buildingOrganizationsDiscoveryListClasses}>
+          {isError ? (
+            <Alert variant="destructive" title={BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE} />
+          ) : null}
+          {isPending ? <Text variant="muted">{BUILDING_ORGANIZATIONS_LOADING_LABEL}</Text> : null}
+          {!isPending && !isError && visibleOrganizations.length === 0 ? (
+            <Text variant="muted">{BUILDING_ORGANIZATIONS_EMPTY_SEARCH_LABEL}</Text>
+          ) : null}
+          {visibleOrganizations.map((organization) => (
+            <BuildingOrganizationDiscoveryRow
+              key={organization.id}
+              organization={organization}
+              kind={kind}
+              kindOptionsFor={kindOptionsFor}
+              selectExistingOrganization={selectExistingOrganization}
+              resolveBuildingOrganizationSelectState={resolveBuildingOrganizationSelectState}
+            />
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -297,11 +301,13 @@ function BuildingOrganizationNewOrganizationForm({
   commitNew: UseBuildingOrganizationsCreateTabResult['commitNew']
 }) {
   const { practiceRecommendations } = useOrganizationAuthoringContext()
+  const createFlowDensity = useCreateFlowFormDensity()
 
   return (
     <Form
       key={newOrganizationDraftId ?? 'new-organization'}
       id={BUILDING_NEW_ORGANIZATION_FORM_ID}
+      density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
       schema={organizationFormSchema}
       fields={buildOrganizationFields(context, {
         includeName: true,
@@ -376,15 +382,9 @@ export function BuildingOrganizationRelationshipReview({
         <BuildingOrganizationComposerSummaryRows controller={controller} />
       ) : null}
       {composerView.showDiscovery ? (
-        <div className={buildingOrganizationsComposerStageOffsetClasses}>
-          <BuildingOrganizationDiscovery controller={controller} />
-        </div>
+        <BuildingOrganizationDiscovery controller={controller} />
       ) : null}
-      {composerView.showBranch ? (
-        <div className={buildingOrganizationsComposerStageOffsetClasses}>
-          <BuildingOrganizationNewBranch controller={controller} />
-        </div>
-      ) : null}
+      {composerView.showBranch ? <BuildingOrganizationNewBranch controller={controller} /> : null}
     </div>
   )
 }

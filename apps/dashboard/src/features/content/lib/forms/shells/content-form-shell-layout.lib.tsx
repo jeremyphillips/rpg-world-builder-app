@@ -1,10 +1,13 @@
+'use client'
+
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type {
   ContentCampaignAccessPatch,
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
-import { FormItems } from '@rpg/ui/form'
+import { cn, fieldStackRhythmVariants } from '@rpg/ui'
+import { FormItems, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 
@@ -35,16 +38,19 @@ export function ContentFormHeader({
   onCampaignAccessDraftChange,
   onCampaignAccessPersisted,
 }: ContentFormCampaignAccessProps) {
+  const { density } = useFormSectionContext()
+  const { rhythm } = resolveFormDensity(density)
   const idPrefix = formKey ?? 'content-form'
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className={cn(fieldStackRhythmVariants({ rhythm }))}>
       <FormItems items={[def.nameField(ctx)]} idPrefix={idPrefix} />
       {campaignId ? (
         <CampaignAccessSection
           campaignId={campaignId}
           targetType={def.routeKey as ContentTypeKey}
           entityId={entityId}
+          density={density}
           initialAccess={campaignAccess}
           onDraftChange={onCampaignAccessDraftChange}
           onPersistedChange={onCampaignAccessPersisted}

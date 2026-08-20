@@ -6,6 +6,7 @@ import { useWatch, type UseFormReturn } from 'react-hook-form'
 import type { CharacterBuildContext } from '@rpg/contracts'
 import { Button, SelectionSummaryCard } from '@rpg/ui'
 import { mapSetupSummaryRowModelsToProps, type SetupSummaryEditTarget } from '@/lib/create-setup'
+import { useCreateFlowFormDensity, CREATE_FLOW_FORM_DENSITY } from '@/lib/create-flow'
 import {
   FormShellSubmitButton,
   TabbedForm,
@@ -192,6 +193,7 @@ export function QuickNpcAuthoringForm({
   onCreated,
   onPendingChange,
 }: QuickNpcAuthoringFormProps) {
+  const createFlowDensity = useCreateFlowFormDensity()
   const { mutateAsync, isPending, isSuccess } = useCreateNpc()
   const [configuredCount, setConfiguredCount] = React.useState(0)
   const organization =
@@ -259,6 +261,7 @@ export function QuickNpcAuthoringForm({
   return (
     <TabbedForm<QuickNpcAuthoringTabValues>
       key={`${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
+      density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
       schema={schema}
       tabs={tabs}
       defaultValues={defaultValues}
