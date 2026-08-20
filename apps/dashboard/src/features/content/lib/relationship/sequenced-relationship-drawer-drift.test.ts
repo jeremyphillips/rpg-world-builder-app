@@ -92,5 +92,13 @@ describe('sequenced relationship drawer drift', () => {
         expect(source).toContain('useRelationshipPickerNestedCreate')
       }
     })
+
+    it(`${label} does not wire nested-create busy state into picker loading`, () => {
+      const source = readFileSync(filePath, 'utf8')
+
+      expect(source).not.toMatch(/loading=\{[^}]*nestedCreateBusy[^}]*\}/)
+      expect(source).not.toMatch(/loading=\{[^}]*characterNestedCreateBusy[^}]*\}/)
+      expect(source).not.toMatch(/loading=\{[^}]*phase[^}]*\}/)
+    })
   }
 })

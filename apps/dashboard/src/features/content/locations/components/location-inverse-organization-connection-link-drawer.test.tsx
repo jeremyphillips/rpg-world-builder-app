@@ -327,3 +327,40 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
     expect(screen.getByRole('button', { name: 'Select' })).toBeDisabled()
   })
 })
+
+describe('LocationInverseOrganizationConnectionLinkDrawer nested create', () => {
+  it('preserves the organization picker and blocks relationship actions while nested create is active', async () => {
+    const user = userEvent.setup()
+    const location = guildhallBuilding()
+
+    renderWithProviders(
+      <LocationInverseOrganizationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="site"
+        addKind="headquarters"
+        location={location}
+        {...drawerContextFor(location)}
+        organizations={[CITY_COUNCIL, SILVER_CIRCLE]}
+        connectedPartyRows={[]}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const search = screen.getByRole('textbox', { name: 'Search organizations…' })
+    await user.type(search, 'City')
+    expect(screen.getByText('City Council')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Create organization' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Create organization' }))
+
+    expect(screen.getByText('City Council')).toBeInTheDocument()
+    expect(
+      screen.getByRole('textbox', { name: 'Search organizations…', hidden: true }),
+    ).toHaveValue('City')
+    expect(
+      screen.getByRole('button', { name: 'Add headquarters organization', hidden: true }),
+    ).toBeDisabled()
+  })
+})

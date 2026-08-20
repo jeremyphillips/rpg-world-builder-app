@@ -571,7 +571,6 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         {nestedCreateModals}
         <CatalogEntityPickerSheet
           {...sharedSheetProps}
-          loading={nestedCreateBusy}
           auxiliaryAction={nestedCreateAuxiliaryAction}
           searchPlaceholder={
             resolveLocationInverseOrganizationTargetPresentation(organizationDomain)
@@ -644,7 +643,6 @@ function LocationInversePeopleConnectionLinkDrawerContent({
       {characterNestedCreateModals}
       <CatalogEntityPickerSheet
         {...sharedSheetProps}
-        loading={characterNestedCreateBusy}
         auxiliaryAction={characterAuxiliaryAction}
         searchPlaceholder={
           resolveLocationInverseCharacterTargetPresentation(characterKind).searchPlaceholder

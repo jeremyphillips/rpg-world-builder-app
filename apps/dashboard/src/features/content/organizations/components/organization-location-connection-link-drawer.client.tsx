@@ -615,7 +615,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
         open={open}
         onOpenChange={onOpenChange}
         title={title}
-        loading={nestedCreateBusy}
         auxiliaryAction={nestedCreateAuxiliaryAction}
         pickerEnabled={showLocationPicker && !showMutationEmptyState}
         searchPlaceholder={targetPresentation.searchPlaceholder}

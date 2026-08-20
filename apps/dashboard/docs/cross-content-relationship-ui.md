@@ -348,6 +348,20 @@ Wired Add drawers: organization forward location pickers, location inverse organ
 People drawer organization and character segments. Out of scope: changeKind, changeTarget,
 replaceOrganization, org member picker.
 
+**Loading vs blocking:** `nestedCreateBusy` means interaction is blocked, not that the catalog is
+loading. `CatalogPickerSheet.loading` must reflect only genuine catalog/query pending — never
+`nestedCreateBusy` or `phase`. If a drawer later wires query-pending into `loading`, that remains
+valid; nested-create phases must not replace the picker list.
+
+| Phase                    | Picker presentation                           | Auxiliary create action | Relationship footer |
+| ------------------------ | --------------------------------------------- | ----------------------- | ------------------- |
+| `idle`                   | Normal (catalog loading if query pending)     | Enabled                 | Normal              |
+| `creating`               | Preserved — list, search, selection unchanged | Disabled                | Blocked             |
+| `resolvingCreatedTarget` | Preserved — list, search unchanged            | Disabled                | Blocked             |
+
+Org Add member + Quick NPC is a **visual reference** for picker preservation behind a nested modal;
+do not copy its overlay-state architecture or success-closes-all semantics into relationship pickers.
+
 ### Inverted organization add without `addKind` (legacy)
 
 `LocationInverseOrganizationConnectionLinkDrawer` in **add** mode without a resolved `addKind` is an **inverted leftover**, not sequenced grammar: the user picks the organization first, then sees kind radios only after a subject is selected (`showKindStep` requires `selectedOrganizationId`). Do **not** extend this branch with sequenced overlay behavior (`SelectionSummaryCard`, Change, or upstream edit hiding). Per-kind inverse adds that resolve intent before open pass `addKind` and skip the kind step entirely. New surfaces should prefer intent-resolved adds or the sequenced People drawer pattern.

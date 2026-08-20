@@ -754,4 +754,39 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       screen.queryByText(RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES.changeTarget),
     ).not.toBeInTheDocument()
   })
+
+  it('preserves the location picker and blocks relationship actions while nested create is active', async () => {
+    const user = userEvent.setup()
+
+    renderWithProviders(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="territorial_authority"
+        organizationId="org-1"
+        {...withOrganizationLocationDrawerIndex([northernMarchRegion()])}
+        existingConnections={[]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Controls/i }))
+
+    const search = screen.getByPlaceholderText('Search locations…')
+    await user.type(search, 'North')
+    expect(screen.getByText('Northern March')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Create region' }))
+
+    expect(screen.getByText('Northern March')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Search locations…', hidden: true })).toHaveValue(
+      'North',
+    )
+    expect(
+      screen.getByRole('button', { name: 'Add territorial authority', hidden: true }),
+    ).toBeDisabled()
+  })
 })

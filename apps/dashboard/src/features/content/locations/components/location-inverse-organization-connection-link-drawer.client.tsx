@@ -413,7 +413,6 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         open={open}
         onOpenChange={onOpenChange}
         title={title}
-        loading={nestedCreateBusy}
         auxiliaryAction={nestedCreateAuxiliaryAction}
         pickerEnabled={showOrganizationPicker}
         searchPlaceholder={organizationTargetPresentation.searchPlaceholder}
