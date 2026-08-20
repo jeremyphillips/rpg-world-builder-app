@@ -7,7 +7,7 @@ import {
 } from '@rpg/contracts'
 import type { QueryClient } from '@tanstack/react-query'
 
-import { updateContent } from '../../lib/list/content-client'
+import { updateContent } from '../../../lib/list/content-client'
 import { invalidateLocationHierarchyQueries } from './invalidate-location-hierarchy-queries'
 
 import { buildLocationHierarchyGraph } from './build-location-hierarchy-graph'
@@ -16,8 +16,8 @@ import {
   buildLocationEntityContextPresentation,
   buildLocationsById,
   type LocationEntitySummaryVm,
-} from './location-display'
-import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
+} from '../location-display'
+import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity-replacement/entity-replacement-current-entity'
 
 export const LOCATION_PARENT_REPLACEMENT_ACTION_LABELS = {
   changeParent: 'Change parent',
@@ -30,7 +30,7 @@ export type LocationParentReplacementAction =
 
 export type LocationParentReplacementMode = 'change' | 'set'
 
-import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer/drawer-context.types'
+import type { DrawerContextEntityPresentation } from '../../../lib/relationship/drawer/drawer-context.types'
 
 export type LocationParentReplacementCurrentSnapshot = {
   parentLocationId: string

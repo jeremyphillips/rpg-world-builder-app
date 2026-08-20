@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
+import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../../fixtures'
 import {
   buildParentLocationOptionAvailability,
   parentLocationFieldVisibility,

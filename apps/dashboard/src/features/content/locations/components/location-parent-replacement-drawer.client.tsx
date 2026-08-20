@@ -24,21 +24,21 @@ import {
   hasLocationParentReplacementContextMismatch,
   type LocationParentReplacementCurrentSnapshot,
   type LocationParentReplacementMode,
-} from '../lib/location-parent-replacement'
+} from '../lib/hierarchy/location-parent-replacement'
 import {
   filterLocationsByParentBrowseScope,
   LOCATION_PARENT_BROWSE_SCOPE_LABEL,
   resolveParentBrowseScopeOptions,
   shouldShowParentBrowseScopes,
   type LocationParentBrowseScope,
-} from '../lib/location-parent-browse-scope'
+} from '../lib/hierarchy/location-parent-browse-scope'
 import {
   LOCATION_PARENT_REPLACEMENT_DRAWER,
   resolveLocationParentReplacementDrawerNewHelper,
   resolveLocationParentReplacementDrawerSubmitLabel,
   resolveLocationParentReplacementDrawerTitle,
   type LocationParentReplacementDrawerSurface,
-} from '../lib/location-parent-replacement-surface-copy'
+} from '../lib/hierarchy/location-parent-replacement-surface-copy'
 
 export type LocationParentReplacementDrawerProps = {
   open: boolean

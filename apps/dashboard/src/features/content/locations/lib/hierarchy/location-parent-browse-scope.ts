@@ -5,7 +5,7 @@ import {
   locationKindMatchesBrowseFamily,
   resolveLocationKindBrowseFamily,
   type LocationKindBrowseFamily,
-} from './location-kind-browse-families'
+} from '../location-kind-browse-families'
 
 export type LocationParentBrowseScope = 'all' | LocationKindBrowseFamily
 

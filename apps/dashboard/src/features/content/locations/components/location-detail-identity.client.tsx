@@ -9,7 +9,7 @@ import {
   contentStatRowValueVariants,
   contentStatRowVariants,
 } from '../../lib/detail/metadata/content-stat-row.variants'
-import { LOCATION_PARENT_REPLACEMENT_ACTION_LABELS } from '../lib/location-parent-replacement'
+import { LOCATION_PARENT_REPLACEMENT_ACTION_LABELS } from '../lib/hierarchy/location-parent-replacement'
 import type { LocationDetailIdentityViewModel } from '../lib/location-display'
 
 export type LocationDetailIdentityProps = {

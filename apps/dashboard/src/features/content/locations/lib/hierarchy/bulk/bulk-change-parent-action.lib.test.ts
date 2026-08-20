@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { ApiError, LOCATION_PARENT_ASSIGNMENT_BLOCKER_CODES } from '@rpg/contracts'
 
-import { ALDERMERE, DOCK_WARD, GREYSHORE, HARBORFORD, LOCATIONS_LIST } from '../../fixtures'
+import { ALDERMERE, DOCK_WARD, GREYSHORE, HARBORFORD, LOCATIONS_LIST } from '../../../fixtures'
 import {
   applyBulkChangeParentToTargets,
   isBulkChangeParentNoOp,
@@ -10,7 +10,7 @@ import {
 
 const updateContent = vi.fn()
 
-vi.mock('../../../lib/list/content-client', () => ({
+vi.mock('../../../../lib/list/content-client', () => ({
   updateContent: (...args: unknown[]) => updateContent(...args),
 }))
 

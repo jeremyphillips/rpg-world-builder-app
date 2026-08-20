@@ -23,8 +23,8 @@ import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
 import {
   resolveLocationParentReplacementAction,
   type LocationParentReplacementAction,
-} from './location-parent-replacement'
-import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
+} from './hierarchy/location-parent-replacement'
+import { LOCATION_UNCONTAINED_LABEL } from './hierarchy/location-parent-replacement-surface-copy'
 import {
   formatLocationStructureSplitCount,
   partitionLocationsByStructureGroup,

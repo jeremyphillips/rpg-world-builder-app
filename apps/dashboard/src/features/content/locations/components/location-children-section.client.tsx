@@ -36,11 +36,11 @@ import {
   applyLocationParentReplacement,
   hasLocationParentReplacementContextMismatch,
   invalidateLocationParentReplacementQueries,
-} from '../lib/location-parent-replacement'
+} from '../lib/hierarchy/location-parent-replacement'
 import {
   LOCATION_PARENT_MOVE_ACTION_LABELS,
   LOCATION_PARENT_REPLACEMENT_DRAWER,
-} from '../lib/location-parent-replacement-surface-copy'
+} from '../lib/hierarchy/location-parent-replacement-surface-copy'
 import type { LocationCreateIntent } from '../lib/location-create-session'
 import {
   childAuthoringTypesForParentKind,

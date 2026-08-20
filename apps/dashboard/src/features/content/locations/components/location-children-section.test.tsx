@@ -14,7 +14,7 @@ import { makeLocation } from '@/test/fixtures/factories/location'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { DOCK_WARD, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
 import { buildLocationDetailViewModel } from '../lib/location-display'
-import { LOCATION_PARENT_REPLACEMENT_DRAWER } from '../lib/location-parent-replacement-surface-copy'
+import { LOCATION_PARENT_REPLACEMENT_DRAWER } from '../lib/hierarchy/location-parent-replacement-surface-copy'
 import { LocationChildrenSection } from './location-children-section.client'
 
 const { mockUpdateContent } = vi.hoisted(() => ({

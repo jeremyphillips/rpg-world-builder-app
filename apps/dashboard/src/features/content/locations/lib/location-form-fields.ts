@@ -27,11 +27,11 @@ import {
   canonicalFieldsForAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
 } from './location-authoring-type'
-import { buildParentLocationFieldOptions } from './location-parent-field-options.lib'
+import { buildParentLocationFieldOptions } from './hierarchy/location-parent-field-options.lib'
 import {
   buildParentLocationOptionAvailability,
   parentLocationFieldVisibility,
-} from './location-parent-picker'
+} from './hierarchy/location-parent-picker'
 import { LocationSettlementStartingDistrictsSlot } from '../components/location-settlement-starting-districts-slot.client'
 import type { SettlementStructureAuthoringGuidance } from './location-settlement-create-composition.lib'
 

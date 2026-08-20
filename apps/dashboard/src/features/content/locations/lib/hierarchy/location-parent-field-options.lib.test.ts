@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { buildContentPurposeSelectors } from '@rpg/contracts'
 import { makeLocation } from '@/test/fixtures/factories/location'
 
-import { DOCK_WARD, GREYSHORE, HARBORFORD } from '../fixtures'
+import { DOCK_WARD, GREYSHORE, HARBORFORD } from '../../fixtures'
 import { buildParentLocationFieldOptions } from './location-parent-field-options.lib'
 
 describe('buildParentLocationFieldOptions', () => {

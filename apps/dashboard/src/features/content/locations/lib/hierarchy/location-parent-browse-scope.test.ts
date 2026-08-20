@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { makeLocation } from '@/test/fixtures/factories/location'
 
-import { ALDERMERE, GREYSHORE, HARBORFORD, DOCK_WARD, YAWNING_PORTAL } from '../fixtures'
+import { ALDERMERE, GREYSHORE, HARBORFORD, DOCK_WARD, YAWNING_PORTAL } from '../../fixtures'
 import {
   filterLocationsByParentBrowseScope,
   locationMatchesParentBrowseScope,

@@ -20,7 +20,7 @@ import {
   type LocationParentAssignmentBlocker,
 } from '@rpg/contracts'
 
-import { updateContent } from '../../../lib/list/content-client'
+import { updateContent } from '../../../../lib/list/content-client'
 import { buildLocationHierarchyGraph } from '../build-location-hierarchy-graph'
 import type { BulkChangeParentConfig } from './build-bulk-change-parent-fields'
 

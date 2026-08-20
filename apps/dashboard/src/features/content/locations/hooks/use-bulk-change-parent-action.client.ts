@@ -13,14 +13,14 @@ import { notifyActionOutcomes } from '@/lib/actions/action-outcome-notify.lib'
 import type { ActionLifecycleCloseEvent } from '@/lib/actions/action-lifecycle.types'
 import { patchContentOverviewListLocationParent } from '@/features/content/lib/overview/content-overview-list-cache.lib'
 
-import { invalidateLocationHierarchyQueries } from '../lib/invalidate-location-hierarchy-queries'
-import { formatBulkChangeParentSuccessToast } from '../lib/bulk/bulk-change-parent-labels'
+import { invalidateLocationHierarchyQueries } from '../lib/hierarchy/invalidate-location-hierarchy-queries'
+import { formatBulkChangeParentSuccessToast } from '../lib/hierarchy/bulk/bulk-change-parent-labels'
 import {
   applyBulkChangeParentToTargets,
   validateBulkChangeParent,
   type BulkChangeParentRow,
-} from '../lib/bulk/bulk-change-parent-action.lib'
-import type { BulkChangeParentConfig } from '../lib/bulk/build-bulk-change-parent-fields'
+} from '../lib/hierarchy/bulk/bulk-change-parent-action.lib'
+import type { BulkChangeParentConfig } from '../lib/hierarchy/bulk/build-bulk-change-parent-fields'
 
 export type UseBulkChangeParentActionOptions = {
   campaignId: string

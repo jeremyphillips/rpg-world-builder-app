@@ -1,7 +1,7 @@
 import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
 
-import { BULK_CHANGE_PARENT_DESCRIPTOR } from '@/features/content/locations/lib/bulk/bulk-change-parent-labels'
+import { BULK_CHANGE_PARENT_DESCRIPTOR } from '@/features/content/locations/lib/hierarchy/bulk/bulk-change-parent-labels'
 
 import { groupUsageBlockersBySourceKey } from './group-usage-blockers-by-source'
 import {

@@ -12,8 +12,8 @@ import type { LocationDetailIdentityViewModel } from '../lib/location-display'
 import {
   applyLocationParentReplacement,
   invalidateLocationParentReplacementQueries,
-} from '../lib/location-parent-replacement'
-import { LOCATION_PARENT_REPLACEMENT_DRAWER } from '../lib/location-parent-replacement-surface-copy'
+} from '../lib/hierarchy/location-parent-replacement'
+import { LOCATION_PARENT_REPLACEMENT_DRAWER } from '../lib/hierarchy/location-parent-replacement-surface-copy'
 
 export type LocationDetailMetadataProps = {
   location: Location

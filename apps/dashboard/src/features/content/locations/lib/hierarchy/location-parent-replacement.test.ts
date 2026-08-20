@@ -11,7 +11,7 @@ import {
   HARBORFORD,
   LOCATIONS_LIST,
   YAWNING_PORTAL,
-} from '../fixtures'
+} from '../../fixtures'
 import {
   applyLocationParentReplacement,
   buildEligibleLocationParentReplacementCandidates,
@@ -23,18 +23,18 @@ import {
   resolveLocationParentReplacementCurrentSnapshot,
   resolveLocationParentReplacementMode,
 } from './location-parent-replacement'
-import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity-replacement/entity-replacement-current-entity'
 import {
   buildLocationChildren,
   buildLocationLocatedInSegments,
   buildLocationsById,
-} from './location-display'
+} from '../location-display'
 
-vi.mock('../../lib/list/content-client', () => ({
+vi.mock('../../../lib/list/content-client', () => ({
   updateContent: vi.fn(),
 }))
 
-import { updateContent } from '../../lib/list/content-client'
+import { updateContent } from '../../../lib/list/content-client'
 
 const mockUpdateContent = vi.mocked(updateContent)
 

@@ -12,7 +12,7 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table.
 import { LocationCreateActions } from '../components/location-create-actions.client'
 import { BulkChangeParentLocationDialog } from '../components/bulk-change-parent-location-dialog.client'
 import { useLocations } from '../hooks/use-locations'
-import { BULK_CHANGE_PARENT_MENU_LABEL } from '../lib/bulk/bulk-change-parent-labels'
+import { BULK_CHANGE_PARENT_MENU_LABEL } from '../lib/hierarchy/bulk/bulk-change-parent-labels'
 import { locationsColumns, locationsFilterSchema } from '../lib/locations-overview-columns'
 
 export function LocationsOverview() {

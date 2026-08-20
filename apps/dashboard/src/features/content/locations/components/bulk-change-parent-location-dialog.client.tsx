@@ -24,9 +24,9 @@ import {
   buildBulkChangeParentFields,
   toBulkChangeParentConfig,
   type BulkChangeParentFormFieldValues,
-} from '../lib/bulk/build-bulk-change-parent-fields'
+} from '../lib/hierarchy/bulk/build-bulk-change-parent-fields'
 import { resolveBulkChangeParentDialogPresentation } from './bulk-change-parent-location-dialog-presentation'
-import { resolveBulkChangeParentPreview } from '../lib/bulk/resolve-bulk-change-parent-preview'
+import { resolveBulkChangeParentPreview } from '../lib/hierarchy/bulk/resolve-bulk-change-parent-preview'
 import { useBulkChangeParentAction } from '../hooks/use-bulk-change-parent-action.client'
 import type { ContentBase } from '../../lib/overview/content-table-config'
 
