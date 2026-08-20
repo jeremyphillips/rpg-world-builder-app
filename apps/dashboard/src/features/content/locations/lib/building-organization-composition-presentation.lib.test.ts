@@ -9,7 +9,6 @@ describe('mapBuildingOrganizationCompositionSummaryRows', () => {
       activeDecision: null,
       showDiscovery: false,
       showBranch: false,
-      showCommit: false,
       showRelationshipChange: false,
       showOrganizationChange: false,
       summaryRows: [
@@ -32,7 +31,6 @@ describe('mapBuildingOrganizationCompositionSummaryRows', () => {
       activeDecision: null,
       showDiscovery: false,
       showBranch: false,
-      showCommit: false,
       showRelationshipChange: false,
       showOrganizationChange: true,
       summaryRows: [

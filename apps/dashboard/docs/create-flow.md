@@ -41,35 +41,33 @@ first invalid panel via feature-supplied `resolveViewForPath` / `activateView` c
 
 ### Tab panel content spacing
 
-Nested create-tab panels share a vertical rhythm in
-`create-tab-content.variants.ts`. Import the tokens from `@/lib/create-flow` —
+Nested create-tab panels share tab-level rhythm in
+`create-tab-content.variants.ts`. Composition layout spacing lives in
+`create-composition.variants.ts`. Import tokens from `@/lib/create-flow` —
 do not reintroduce ad-hoc `gap-*` / `mt-*` stacks in feature tab content.
 
-| Token                                | Tailwind  | Use                                                                                            |
-| ------------------------------------ | --------- | ---------------------------------------------------------------------------------------------- |
-| `createTabPanelContentOffsetClasses` | `mt-3`    | Tab list → first panel content (12px)                                                          |
-| `createTabPanelStackClasses`         | `gap-3`   | Major panel sections — alerts, intro, workflow root (12px)                                     |
-| `createTabIntroClasses`              | `gap-1`   | Tab intro heading → helper copy (4px)                                                          |
-| `createTabComposerStackClasses`      | `gap-2`   | Composer section title → review body (8px); aliased as `createCompositionComposerStackClasses` |
-| `createTabComposerReviewClasses`     | `gap-2`   | Review stages — intent, summary, discovery (8px); aliased as `createCompositionReviewClasses`  |
-| `createTabDiscoveryBodyClasses`      | `gap-0.5` | Feature-owned discovery body: create action → picker list (2px)                                |
-| `createTabDiscoveryControlsClasses`  | `gap-2`   | Feature-owned discovery: search → inline create action (8px)                                   |
-| `createTabDiscoveryListClasses`      | `gap-2`   | Feature-owned discovery: sibling picker / entity cards (8px)                                   |
-| `createTabPendingListClasses`        | `gap-2`   | Sibling pending draft cards (8px)                                                              |
+| Token                                | Tailwind  | Use                                                             |
+| ------------------------------------ | --------- | --------------------------------------------------------------- |
+| `createTabPanelContentOffsetClasses` | `mt-3`    | Tab list → first panel content (12px)                           |
+| `createTabPanelStackClasses`         | `gap-3`   | Major panel sections — alerts, intro, workflow root (12px)      |
+| `createTabIntroClasses`              | `gap-1`   | Tab intro heading → helper copy (4px)                           |
+| `createTabDiscoveryBodyClasses`      | `gap-0.5` | Feature-owned discovery body: create action → picker list (2px) |
+| `createTabDiscoveryControlsClasses`  | `gap-2`   | Feature-owned discovery: search → inline create action (8px)    |
+| `createTabDiscoveryListClasses`      | `gap-2`   | Feature-owned discovery: sibling picker / entity cards (8px)    |
+| `createTabPendingListClasses`        | `gap-2`   | Sibling pending draft cards (8px)                               |
 
 Composition stage spacing lives in `create-composition.variants.ts` — use
-`CreateCompositionStage` rather than forking these values:
+`CreateCompositionStage` and `CreateCompositionComposer` rather than forking
+these values:
 
-| Token                                     | Tailwind  | Use                                           |
-| ----------------------------------------- | --------- | --------------------------------------------- |
-| `createCompositionStageSubheadingClasses` | `gap-0.5` | Stage heading row → helper when present (2px) |
-| `createCompositionStageStackClasses`      | `gap-2.5` | Stage subheading block → stage body (10px)    |
-| `createCompositionStageHeadingRowClasses` | —         | Heading row with optional trailing action     |
-| `createCompositionSummaryRowsClasses`     | —         | Completed-decision summary `<dl>` wrapper     |
-
-Deprecated tab tokens (`createTabStageSubheadingClasses`,
-`createTabDiscoveryStackClasses`) remain exported for compatibility but are
-superseded by the composition stage tokens above.
+| Token                                     | Tailwind  | Use                                                      |
+| ----------------------------------------- | --------- | -------------------------------------------------------- |
+| `createCompositionComposerStackClasses`   | `gap-2`   | Composer subsection title → review body (8px)            |
+| `createCompositionReviewClasses`          | `gap-2`   | Review stages — intent, summary, discovery, branch (8px) |
+| `createCompositionStageSubheadingClasses` | `gap-0.5` | Stage heading row → helper when present (2px)            |
+| `createCompositionStageStackClasses`      | `gap-2.5` | Stage subheading block → stage body (10px)               |
+| `createCompositionStageHeadingRowClasses` | —         | Heading row with optional trailing action                |
+| `createCompositionSummaryRowsClasses`     | —         | Completed-decision summary `<dl>` wrapper                |
 
 Typical composing stack (Building Organizations reference implementation):
 
@@ -223,12 +221,12 @@ Recorded before the relationship-first refinement. Findings:
    `ContentEntityCard` (static).
 3. **Radio selection is domain-specific.** Add Member radios are membership
    titles from `OrganizationMembershipTitleField`. Relationship-first building
-   composition uses `RadioCardField` for active kind and `SelectionSummaryCard` rows
-   for completed decisions inside the Organizations composer. Sequenced location and Quick
-   NPC setup use `CreateSetupPanel` with the same grammar. Relationship drawers use
-   `LocationConnectionKindField` for active kind and `SelectionSummaryCard` for completed kind rows;
-   change-kind drawers keep the kind field expanded only.
-   Do not lift title vocabulary into shared UI.
+   composition uses `RadioCardField` for active kind and `CreateCompositionSummary`
+   rows for completed decisions inside the Organizations composer. Sequenced location
+   and Quick NPC setup use `CreateSetupPanel` with setup-style summary rows.
+   Relationship drawers use `LocationConnectionKindField` for active kind and
+   `SelectionSummaryCard` for completed kind rows; change-kind drawers keep the
+   kind field expanded only. Do not lift title vocabulary into shared UI.
 4. **Lifted pieces.** Add/Pending mode root (`AddPendingWorkflow`) with one
    composing slot and one pending collection slot. Do not lift the picker Sheet,
    membership title field, or immediate-persist controller.
@@ -238,10 +236,12 @@ Recorded before the relationship-first refinement. Findings:
 6. **`ContentEntityCard` stays pure.** Discovery and pending rows use CEC with a
    trailing action only. CEC never receives expand, composer, or relationship
    props.
-7. **Pending edit stays in Pending mode.** The edited row swaps to the same composer
-   (`SelectionSummaryCard` rows + active controls) in place. Sibling pending cards remain visible.
-   This is not a return to Add/discovery at the root. While the relationship kind
-   is being edited, downstream discovery/review/branch stages hide (same reveal invariant as create-setup).
+7. **Pending edit switches to composing mode.** Overflow **Edit** on a pending row
+   opens the full Organizations composer in **composing** mode (intro hidden, child
+   footer active). Pending `ContentEntityCard` rows stay visible only in **resting**
+   pending mode — not inline `SelectionSummaryCard` review. While the relationship
+   kind is being edited, downstream discovery/review/branch stages hide (same reveal
+   invariant as create-setup).
 8. **Parallel patterns left in place.** `CatalogEntityRow` in picker sheets,
    equipment picker disclosure (commerce), and mutation-oriented relationship
    drawers. Do not migrate them in this phase.
@@ -263,7 +263,8 @@ The root API uses `addAnotherLabel` / slot props — never domain nouns such as
 
 See [content-entity-card.md](./content-entity-card.md#add--pending-composition).
 Discovery rows use CEC + trailing **Select** (outline, compact). Pending rows
-use CEC + overflow actions until edit swaps the row to hydrated review.
+use CEC + overflow actions; **Edit** opens the focused composition composer in
+the `AddPendingWorkflow` composing slot — not an inline summary card on the row.
 
 ## Building composite create (atomic submit)
 

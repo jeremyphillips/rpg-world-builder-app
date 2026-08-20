@@ -78,12 +78,13 @@ choice-set ids, `dependsOn`, `visibleWhenComplete`, `summaryGroup`, and complete
 (`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
 same shortcut contract.
 
-Building → Organizations relationship drafting stays on the Add/Pending composer (not
-`CreateSetupPanel`) but uses the same create-modal grammar: active controls for in-progress
-decisions, `SelectionSummaryCard` rows for completed ones. The `branch` stage is the active
-create-org control — not a placeholder completed organization row. Copy these primitives for
-a second create-modal draft relationship tab; do not extract a generic composer until a second
-identical consumer exists.
+Building → Organizations relationship drafting stays on the Add/Pending composer
+(not `CreateSetupPanel`) with a **resting vs composing** workspace: completed
+decisions via `CreateCompositionSummary`, active controls for in-progress choices,
+and a modal child footer while composing. The `branch` stage is the active
+create-org control — not a placeholder completed organization row. Copy the
+create-flow composition primitives for a second create-modal draft relationship
+tab; see [create-flow.md](./create-flow.md#nested-composition-presentation).
 
 Relationship-target nested create (organization forward → Building) suppresses the
 Organizations composition surface via `ContentCreateContext` and

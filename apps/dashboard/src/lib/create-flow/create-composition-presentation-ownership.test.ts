@@ -12,5 +12,8 @@ describe('create-flow composition presentation ownership', () => {
     expect(source).toContain('CreateCompositionSummary')
     expect(source).toContain('CreateCompositionStage')
     expect(source).toContain('createCompositionStageStackClasses')
+    expect(source).not.toContain('createTabStageSubheadingClasses')
+    expect(source).not.toContain('createTabDiscoveryStackClasses')
+    expect(source).not.toContain('createTabComposerStackClasses')
   })
 })

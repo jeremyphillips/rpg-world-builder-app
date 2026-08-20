@@ -6,7 +6,6 @@ import { Alert, Heading, Text } from '@rpg/ui'
 
 import {
   AddPendingWorkflow,
-  type AddPendingWorkflowMode,
   type CreateCompositionChildWorkflowView,
   type CreateWorkflowPanelStatus,
 } from '@/lib/create-flow'
@@ -49,8 +48,6 @@ export type BuildingOrganizationsCreateTabProps = {
   formCtx?: ContentFormCtx
   initialPlan?: BuildingOrganizationDraftPlan
   initialComposerMode?: BuildingOrganizationComposerMode
-  /** @deprecated Use initialComposerMode */
-  initialMode?: AddPendingWorkflowMode
   organizationItems?: readonly Organization[]
   controllerRef?: React.MutableRefObject<BuildingOrganizationsCreateTabController | null>
   onStatusChange?: (status: CreateWorkflowPanelStatus) => void

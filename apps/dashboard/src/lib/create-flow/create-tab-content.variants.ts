@@ -9,18 +9,6 @@ export const createTabPanelStackClasses = cn('flex flex-col gap-3')
 /** 4px — tab panel intro heading to helper copy. */
 export const createTabIntroClasses = cn('flex flex-col gap-1')
 
-/** 8px — composing section title to review body. */
-export const createTabComposerStackClasses = cn('flex flex-col gap-2')
-
-/** 8px — review stages (intent, summary rows, discovery). */
-export const createTabComposerReviewClasses = cn('flex flex-col gap-2')
-
-/** @deprecated Prefer `createCompositionStageSubheadingClasses` from `create-composition.variants.ts`. */
-export const createTabStageSubheadingClasses = cn('flex flex-col gap-0')
-
-/** @deprecated Prefer `createCompositionStageStackClasses` from `create-composition.variants.ts`. */
-export const createTabDiscoveryStackClasses = cn('flex flex-col gap-1')
-
 /** 2px — discovery create action to picker card list. */
 export const createTabDiscoveryBodyClasses = cn('flex flex-col gap-0.5')
 

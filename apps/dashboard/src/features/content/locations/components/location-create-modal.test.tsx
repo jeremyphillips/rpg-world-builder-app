@@ -11,7 +11,7 @@ import {
   type BuildingForm,
   type ContentCampaignAccessPatch,
 } from '@rpg/contracts'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { toast } from '@rpg/ui'
 
 import type * as RpgUi from '@rpg/ui'
@@ -29,8 +29,15 @@ import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { HARBORFORD } from '../fixtures'
 import {
   BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL,
+  BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
   BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL,
   BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL,
+  BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL,
+  BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL,
+  BUILDING_ORGANIZATIONS_OVERFLOW_LABEL,
+  BUILDING_ORGANIZATIONS_PENDING_HEADING,
+  BUILDING_ORGANIZATIONS_SELECT_LABEL,
+  BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
 } from '../lib/building-organizations-create-tab.lib'
 import { BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL } from '../lib/location-building-create-setup.lib'
 import type { LocationCreateIntent } from '../lib/location-create-session'
@@ -48,6 +55,30 @@ import { LocationCreateModal } from './location-create-modal.client'
 const mutateAsync = vi.fn()
 const updateRouteContentCampaignAccess = vi.fn()
 const invalidateContentFormDefQueries = vi.fn()
+
+const organizationCatalog = vi.hoisted(() => [
+  {
+    id: 'organization-1',
+    slug: 'organization-1',
+    rulesetId: 'srd-cc-5.2.1',
+    source: 'homebrew' as const,
+    status: 'published' as const,
+    campaignId: 'camp_1',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    name: 'Copper Kettle Guild',
+    description: '<p>A guild of copper workers.</p>',
+    organizationDomain: 'commercial' as const,
+    functions: [],
+    practices: [],
+    members: {
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+      titles: [],
+    },
+    connections: { locations: [] },
+  },
+])
 
 vi.mock('../../lib/list/use-content-mutations', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
@@ -84,7 +115,7 @@ vi.mock('../lib/location-building-create-composition.lib', async (importOriginal
 })
 
 vi.mock('../../organizations', () => ({
-  useOrganizations: () => ({ data: [], isPending: false, isError: false }),
+  useOrganizations: () => ({ data: organizationCatalog, isPending: false, isError: false }),
 }))
 
 vi.mock('../../lib/campaign-access/campaign-access-api', () => ({
@@ -270,6 +301,27 @@ async function submitBuildingCreateForm(user: ReturnType<typeof userEvent.setup>
   await submitCreateForm(user, 'Create building')
 }
 
+async function openOrganizationsComposing(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('tab', { name: 'Organizations' }))
+  await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL }))
+}
+
+async function chooseOwnerAndSelectFirstOrganization(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('radio', { name: /Owner/i }))
+  await user.click(screen.getAllByRole('button', { name: BUILDING_ORGANIZATIONS_SELECT_LABEL })[0]!)
+}
+
+beforeAll(() => {
+  if (!HTMLElement.prototype.hasPointerCapture) {
+    HTMLElement.prototype.hasPointerCapture = () => false
+    HTMLElement.prototype.setPointerCapture = () => {}
+    HTMLElement.prototype.releasePointerCapture = () => {}
+  }
+  if (!HTMLElement.prototype.scrollIntoView) {
+    HTMLElement.prototype.scrollIntoView = () => {}
+  }
+})
+
 describe('LocationCreateModal', () => {
   beforeEach(() => {
     mutateAsync.mockReset()
@@ -438,6 +490,80 @@ describe('LocationCreateModal', () => {
     expect(screen.getByRole('button', { name: 'Add relationship' })).toBeDisabled()
     expect(screen.getByRole('tab', { name: 'Details' })).toBeDisabled()
     expect(mockedCompleteBuildingCreateComposition).not.toHaveBeenCalled()
+  })
+
+  it('returns to resting parent footer when the child composer Cancel is clicked', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    renderModal(buildingIntent, onOpenChange)
+    await continueBuildingSetup(user)
+
+    await openOrganizationsComposing(user)
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Create building' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_EMPTY_STATE_LABEL)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Create building' })).toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('commits an organization relationship from the child footer and restores the parent footer', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetup(user)
+
+    await openOrganizationsComposing(user)
+    await chooseOwnerAndSelectFirstOrganization(user)
+
+    const addRelationship = await screen.findByRole('button', {
+      name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL,
+    })
+    await waitFor(() => expect(addRelationship).toBeEnabled())
+    await user.click(addRelationship)
+
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
+    expect(screen.getByText('Copper Kettle Guild')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Create building' })).toBeInTheDocument()
+    expect(mockedCompleteBuildingCreateComposition).not.toHaveBeenCalled()
+  })
+
+  it('shows Update relationship in the child footer while editing a pending relationship', async () => {
+    const user = userEvent.setup()
+    renderModal(buildingIntent)
+    await continueBuildingSetup(user)
+
+    await openOrganizationsComposing(user)
+    await chooseOwnerAndSelectFirstOrganization(user)
+    await user.click(
+      await screen.findByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
+    )
+
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_OVERFLOW_LABEL }))
+    await user.click(
+      screen.getByRole('menuitem', { name: BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL }),
+    )
+
+    expect(
+      screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL }),
+    ).toBeInTheDocument()
+  })
+
+  it('shows Add relationship on the child footer for nested new organization authoring', async () => {
+    const user = userEvent.setup({ pointerEventsCheck: 0 })
+    renderModal(buildingIntent)
+    await continueBuildingSetup(user)
+
+    await openOrganizationsComposing(user)
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
+
+    expect(screen.queryByRole('button', { name: 'Create building' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_RELATIONSHIP_LABEL }),
+    ).toBeInTheDocument()
   })
 
   it('blocks building create with empty Name from Organizations tab', async () => {

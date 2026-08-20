@@ -42,7 +42,6 @@ export type BuildingOrganizationComposerView = {
   activeDecision: BuildingOrganizationEditingDecision | null
   showDiscovery: boolean
   showBranch: boolean
-  showCommit: boolean
   showRelationshipChange: boolean
   showOrganizationChange: boolean
   summaryRows: readonly BuildingOrganizationComposerSummaryRow[]
@@ -250,7 +249,6 @@ function emptyBuildingOrganizationComposerView(): BuildingOrganizationComposerVi
     activeDecision: null,
     showDiscovery: false,
     showBranch: false,
-    showCommit: false,
     showRelationshipChange: false,
     showOrganizationChange: false,
     summaryRows: [],
@@ -272,7 +270,6 @@ function buildRelationshipOnlySummaryView(input: {
     activeDecision: input.activeDecision,
     showDiscovery: input.showDiscovery ?? false,
     showBranch: input.showBranch ?? false,
-    showCommit: false,
     showRelationshipChange: resolveRelationshipKindChangeVisible(input.relationshipKindCount),
     showOrganizationChange: false,
     summaryRows: input.relationshipRow ? [input.relationshipRow] : [],
@@ -299,7 +296,6 @@ function resolveReviewStageView(input: {
     activeDecision: null,
     showDiscovery: false,
     showBranch: false,
-    showCommit: summaryRows.length >= 2,
     showRelationshipChange: resolveRelationshipKindChangeVisible(input.relationshipKindCount),
     showOrganizationChange: Boolean(organizationRow),
     summaryRows,

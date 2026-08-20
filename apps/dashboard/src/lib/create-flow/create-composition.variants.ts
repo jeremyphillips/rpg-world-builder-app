@@ -1,15 +1,10 @@
 import { cn } from '@rpg/ui'
 
-import {
-  createTabComposerReviewClasses,
-  createTabComposerStackClasses,
-} from './create-tab-content.variants'
-
 /** 8px — composer subsection title to review body. */
-export const createCompositionComposerStackClasses = createTabComposerStackClasses
+export const createCompositionComposerStackClasses = cn('flex flex-col gap-2')
 
 /** 8px — sibling review stages (active decision, summary, discovery, branch). */
-export const createCompositionReviewClasses = createTabComposerReviewClasses
+export const createCompositionReviewClasses = cn('flex flex-col gap-2')
 
 /** 2px — stage heading row to helper copy when helper is present. */
 export const createCompositionStageSubheadingClasses = cn('flex flex-col gap-0.5')

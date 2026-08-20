@@ -320,7 +320,13 @@ Two total options with one disabled still counts as **2+** — Change must reope
 
 **Change-kind** drawers use always-expanded **`LocationConnectionKindField`** only — no summary card, no Change affordance, footer stays visible.
 
-Create-modal draft relationship tabs (Building → Organizations) use the same completed-decision grammar as `CreateSetupPanel` (`SelectionSummaryCard` rows + `RadioCardField` for active kind) inside a feature-owned stage machine — not drawer-local collapse chrome.
+Create-modal draft relationship tabs (Building → Organizations) use
+`CreateCompositionSummary` + `RadioCardField` inside a feature-owned stage machine
+with resting/composing workspace semantics — not drawer-local collapse chrome and
+not inline pending-row edit. See
+[create-flow.md](./create-flow.md#nested-composition-presentation) for nested
+**composition** vs relationship-picker **acquisition**
+([§Relationship picker nested create](#relationship-picker-nested-create)).
 
 Location **People & organizations** family-level adds follow the same sequence: relationship kind → subject type (only when ambiguous) → entity picker. When a selected kind supports both organization and character bindings (`buildPeopleKindSlots` merges shared headings such as Owner, Tenant, Operator), resolve subject type inside `LocationInversePeopleConnectionLinkDrawer` via a segmented control (`Character` / `Organization`) above the entity search. Hide subject type, picker, and persist footer while kind is being edited upstream. **Create organization** is wired on the organization subject segment; **Create NPC** is wired on the character segment via `resolveRelationshipPickerCharacterCreateIntents`. Build-context readiness (`useCampaignNpcBuildContext`) gates the character auxiliary action at the drawer — not inside the intent resolver.
 

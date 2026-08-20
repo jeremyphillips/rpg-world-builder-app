@@ -28,18 +28,14 @@ export {
   useCreateFlowFormDensity,
 } from './create-flow-form-density.client'
 export {
-  createTabComposerReviewClasses,
-  createTabComposerStackClasses,
   createTabDiscoveryBodyClasses,
   createTabDiscoveryControlsClasses,
   createTabDiscoveryCreateActionClasses,
   createTabDiscoveryListClasses,
-  createTabDiscoveryStackClasses,
   createTabIntroClasses,
   createTabPanelContentOffsetClasses,
   createTabPanelStackClasses,
   createTabPendingListClasses,
-  createTabStageSubheadingClasses,
 } from './create-tab-content.variants'
 export {
   areCreateCompositionChildWorkflowViewsEqual,

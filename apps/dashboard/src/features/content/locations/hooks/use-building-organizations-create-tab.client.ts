@@ -65,11 +65,8 @@ export type {
 
 function resolveInitialComposerMode(input: {
   initialComposerMode?: BuildingOrganizationComposerMode
-  initialMode?: AddPendingWorkflowMode
 }): BuildingOrganizationComposerMode {
-  if (input.initialComposerMode) return input.initialComposerMode
-  if (input.initialMode === 'add') return 'composing'
-  return 'resting'
+  return input.initialComposerMode ?? 'resting'
 }
 
 export type BuildingOrganizationsCreateTabController = CreateWorkflowDraftPanelController<
@@ -85,8 +82,6 @@ export type UseBuildingOrganizationsCreateTabInput = {
   formCtx?: ContentFormCtx
   initialPlan?: BuildingOrganizationDraftPlan
   initialComposerMode?: BuildingOrganizationComposerMode
-  /** @deprecated Use initialComposerMode */
-  initialMode?: AddPendingWorkflowMode
   organizationItems?: readonly Organization[]
   controllerRef?: React.MutableRefObject<BuildingOrganizationsCreateTabController | null>
   onStatusChange?: (status: CreateWorkflowPanelStatus) => void
@@ -99,7 +94,6 @@ export function useBuildingOrganizationsCreateTab({
   formCtx,
   initialPlan = EMPTY_BUILDING_ORGANIZATION_DRAFT_PLAN,
   initialComposerMode,
-  initialMode,
   organizationItems,
   controllerRef,
   onStatusChange,
@@ -114,7 +108,7 @@ export function useBuildingOrganizationsCreateTab({
   }, [organizationItems, queriedOrganizations])
   const [plan, setPlan] = React.useState<BuildingOrganizationDraftPlan>(initialPlan)
   const [composerMode, setComposerMode] = React.useState<BuildingOrganizationComposerMode>(() =>
-    resolveInitialComposerMode({ initialComposerMode, initialMode }),
+    resolveInitialComposerMode({ initialComposerMode }),
   )
   const [composerStage, setComposerStage] =
     React.useState<BuildingOrganizationComposerStage>('intent')

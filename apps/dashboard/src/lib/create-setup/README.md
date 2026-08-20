@@ -102,7 +102,14 @@ Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for th
 - **Quick NPC modal setup** — Title and Species via `CreateSetupPanel`; Build as explicit external decision;
   Class and Level in sibling `QuickNpcBuildCard`.
 
-**Building → Organizations composer** — feature-owned stage machine (`intent → discovery → review | branch`) with `SelectionSummaryCard` partial rows and `RadioCardField` for active relationship kind. Entity discovery, nested org create, draft plan, and composite commit stay local. The `branch` stage is the active create-org control — not a completed placeholder organization row. A second create-modal draft relationship tab should copy these primitives rather than extracting a generic composer until a second identical consumer exists.
+**Building → Organizations composer** — feature-owned stage machine
+(`intent → discovery → review | branch`) with `CreateCompositionSummary` completed
+decisions and `RadioCardField` for active relationship kind. Entity discovery,
+nested org create, draft plan, composite commit, and child footer semantics stay
+local. The `branch` stage is the active create-org control — not a completed
+placeholder organization row. Shared structural presentation lives in
+`@/lib/create-flow` (`CreateComposition*`); see
+[create-flow.md](../../docs/create-flow.md#nested-composition-presentation).
 
 Sequenced create-modal setup must use create-setup orchestration unless listed as a documented
 exception. Relationship sequenced Add drawers import `SelectionSummaryCard` from `@rpg/ui` directly —

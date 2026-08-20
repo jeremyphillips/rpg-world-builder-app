@@ -28,7 +28,6 @@ describe('resolveBuildingOrganizationComposerView', () => {
     expect(view.summaryRows).toEqual([])
     expect(view.showDiscovery).toBe(false)
     expect(view.showBranch).toBe(false)
-    expect(view.showCommit).toBe(false)
   })
 
   it('shows relationship summary and discovery after kind is chosen', () => {
@@ -64,7 +63,6 @@ describe('resolveBuildingOrganizationComposerView', () => {
     })
 
     expect(view.activeDecision).toBeNull()
-    expect(view.showCommit).toBe(true)
     expect(view.summaryRows.map((row) => row.value)).toEqual(['Owner', 'City Bank · Commercial'])
   })
 
@@ -85,7 +83,6 @@ describe('resolveBuildingOrganizationComposerView', () => {
     expect(view.summaryRows).toEqual([
       { id: 'relationship', decision: 'relationship', label: 'Relationship', value: 'Owner' },
     ])
-    expect(view.showCommit).toBe(false)
   })
 
   it('hides downstream UI while editing relationship', () => {
@@ -104,7 +101,6 @@ describe('resolveBuildingOrganizationComposerView', () => {
     expect(view.summaryRows).toEqual([])
     expect(view.showDiscovery).toBe(false)
     expect(view.showBranch).toBe(false)
-    expect(view.showCommit).toBe(false)
     expect(view.showBranch && view.activeDecision === 'relationship').toBe(false)
     expect(view.showDiscovery && view.activeDecision === 'relationship').toBe(false)
   })
@@ -123,7 +119,6 @@ describe('resolveBuildingOrganizationComposerView', () => {
 
     expect(view.activeDecision).toBe('organization')
     expect(view.showDiscovery).toBe(true)
-    expect(view.showCommit).toBe(false)
     expect(view.summaryRows).toEqual([
       { id: 'relationship', decision: 'relationship', label: 'Relationship', value: 'Owner' },
     ])

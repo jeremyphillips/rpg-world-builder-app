@@ -220,6 +220,66 @@ describe('BuildingOrganizationsCreateTab', () => {
     expect(screen.queryByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).not.toBeInTheDocument()
   })
 
+  it('restores the original pending relationship when a focused edit is cancelled', async () => {
+    const user = userEvent.setup()
+    const onPlanChange = vi.fn()
+    const controllerRef = { current: null as BuildingOrganizationsCreateTabController | null }
+    render(
+      <BuildingOrganizationsCreateTab
+        campaignId="campaign-1"
+        organizationItems={organizations}
+        controllerRef={controllerRef}
+        onPlanChange={onPlanChange}
+      />,
+    )
+
+    await addExistingOwner(user, controllerRef)
+    const originalPlan = onPlanChange.mock.calls[0]![0]
+
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_OVERFLOW_LABEL }))
+    await user.click(
+      screen.getByRole('menuitem', { name: BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Change relationship' }))
+    await user.click(screen.getByRole('radio', { name: /Operator/i }))
+    act(() => controllerRef.current?.cancelComposer())
+
+    expect(onPlanChange).toHaveBeenCalledTimes(1)
+    expect(onPlanChange.mock.calls[0]![0]).toEqual(originalPlan)
+    expect(screen.getByText(BUILDING_ORGANIZATIONS_PENDING_HEADING)).toBeInTheDocument()
+  })
+
+  it('updates a pending relationship in place without adding a duplicate row', async () => {
+    const user = userEvent.setup()
+    const onPlanChange = vi.fn()
+    const controllerRef = { current: null as BuildingOrganizationsCreateTabController | null }
+    render(
+      <BuildingOrganizationsCreateTab
+        campaignId="campaign-1"
+        organizationItems={organizations}
+        controllerRef={controllerRef}
+        onPlanChange={onPlanChange}
+      />,
+    )
+
+    await addExistingOwner(user, controllerRef)
+    const firstPlan = onPlanChange.mock.calls[0]![0]
+
+    await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_OVERFLOW_LABEL }))
+    await user.click(
+      screen.getByRole('menuitem', { name: BUILDING_ORGANIZATIONS_EDIT_ACTION_LABEL }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Change relationship' }))
+    await user.click(screen.getByRole('radio', { name: /Operator/i }))
+    act(() => controllerRef.current?.commitComposer())
+
+    expect(onPlanChange.mock.calls[1]![0].relationships).toHaveLength(1)
+    expect(onPlanChange.mock.calls[1]![0].relationships[0]?.draftId).toBe(
+      firstPlan.relationships[0]?.draftId,
+    )
+    expect(onPlanChange.mock.calls[1]![0].relationships[0]?.kind).toBe('operator')
+  })
+
   it('returns to resting after add-another confirmation', async () => {
     const user = userEvent.setup()
     const controllerRef = { current: null as BuildingOrganizationsCreateTabController | null }

@@ -137,8 +137,8 @@ export const OrganizationsTab: Story = {
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {})
     const canvas = within(canvasElement.ownerDocument.body)
-    await userEvent.click(canvas.getByRole('tab', { name: 'Organizations (optional)' }))
-    await expect(canvas.getByText('No Organization relationships will be created.')).toBeVisible()
+    await userEvent.click(canvas.getByRole('tab', { name: 'Organizations' }))
+    await expect(canvas.getByText('No organization relationships added.')).toBeVisible()
   },
 }
 
