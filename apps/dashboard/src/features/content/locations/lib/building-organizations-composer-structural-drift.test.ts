@@ -16,7 +16,7 @@ describe('building organizations composer structural drift', () => {
   it('uses create-modal setup summary grammar instead of legacy selected-card chrome', () => {
     const source = readFileSync(composerPath, 'utf8')
 
-    expect(source).toContain('SelectionSummaryRow')
+    expect(source).toContain('CreateCompositionSummary')
     expect(source).not.toContain('SelectionSummaryCard')
     expect(source).toContain('RadioCardField')
     expect(source).not.toContain('ChooserSummaryCard')
@@ -24,19 +24,21 @@ describe('building organizations composer structural drift', () => {
     expect(source).not.toContain('LocationConnectionKindStep')
   })
 
-  it('routes discovery and branch stages through the shared stage subheading pattern', () => {
+  it('uses shared create-flow composition presentation instead of local layout anatomy', () => {
     const source = readFileSync(composerPath, 'utf8')
     const variants = readFileSync(variantsPath, 'utf8')
 
-    expect(source).toMatch(/function BuildingOrganizationStageSubheading[\s\S]*variant="group"/)
-    expect(source).toMatch(
-      /BuildingOrganizationStageSubheading[\s\S]*BUILDING_ORGANIZATIONS_DISCOVERY_HEADING/,
-    )
-    expect(source).toMatch(
-      /BuildingOrganizationStageSubheading[\s\S]*BUILDING_ORGANIZATIONS_BRANCH_HEADING/,
-    )
-    expect(variants).toContain('gap-0.5')
-    expect(variants).toContain('gap-2.5')
+    expect(source).toContain('CreateCompositionComposer')
+    expect(source).toContain('CreateCompositionSummary')
+    expect(source).toContain('CreateCompositionStage')
+    expect(source).not.toContain('BuildingOrganizationStageSubheading')
+    expect(source).not.toContain('BuildingOrganizationComposerSummaryRows')
+    expect(source).not.toContain('SelectionSummaryRow')
+    expect(source).not.toContain('SelectionSummaryChangeAction')
+    expect(source).toContain('mapBuildingOrganizationCompositionSummaryRows')
+    expect(variants).not.toContain('buildingOrganizationsStageSubheadingClasses')
+    expect(variants).not.toContain('buildingOrganizationsComposerClasses')
+    expect(variants).not.toContain('gap-2.5')
   })
 })
 

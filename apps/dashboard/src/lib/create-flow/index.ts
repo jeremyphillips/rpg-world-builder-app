@@ -46,3 +46,24 @@ export {
   type CreateCompositionChildWorkflowCommitTarget,
   type CreateCompositionChildWorkflowView,
 } from './create-composition-child-workflow.types'
+export {
+  CreateCompositionComposer,
+  type CreateCompositionComposerProps,
+} from './create-composition-composer.client'
+export {
+  CreateCompositionStage,
+  type CreateCompositionStageProps,
+} from './create-composition-stage.client'
+export {
+  CreateCompositionSummary,
+  type CreateCompositionSummaryProps,
+  type CreateCompositionSummaryRow,
+} from './create-composition-summary.client'
+export {
+  createCompositionComposerStackClasses,
+  createCompositionReviewClasses,
+  createCompositionStageHeadingRowClasses,
+  createCompositionStageStackClasses,
+  createCompositionStageSubheadingClasses,
+  createCompositionSummaryRowsClasses,
+} from './create-composition.variants'

@@ -1,6 +1,5 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { type OrganizationLocationConnectionKind } from '@rpg/contracts'
 import {
   Alert,
@@ -8,19 +7,19 @@ import {
   Heading,
   RadioCardField,
   SearchBar,
-  SelectionSummaryChangeAction,
-  SelectionSummaryRow,
   Text,
   type RadioCardOption,
 } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 
-import { useCreateFlowFormDensity, CREATE_FLOW_FORM_DENSITY } from '@/lib/create-flow'
-
 import {
-  BUILDING_ORGANIZATION_COMPOSER_CHANGE_LABEL,
-  type BuildingOrganizationComposerSummaryRow,
-} from '../lib/building-organizations-create-tab-controller.lib'
+  CreateCompositionComposer,
+  CreateCompositionStage,
+  CreateCompositionSummary,
+  useCreateFlowFormDensity,
+  CREATE_FLOW_FORM_DENSITY,
+} from '@/lib/create-flow'
+
 import { ContentEntityCard } from '../../lib/content-entity-card.client'
 import { buildOrganizationPickerEntitySummary } from '../../lib/content-entity-picker-presentation.lib'
 import {
@@ -31,6 +30,7 @@ import {
 } from '../../lib/forms/organization-form-projection'
 import { resolveDiscoverableOrganizationMemberClasses } from '../../organizations/lib/organization-member-class-discoverable.lib'
 import { BUILDING_ORGANIZATION_NO_INTENT_KIND_REASON } from '../lib/building-organization-create-drafts'
+import { mapBuildingOrganizationCompositionSummaryRows } from '../lib/building-organization-composition-presentation.lib'
 import {
   BUILDING_NEW_ORGANIZATION_FORM_ID,
   BUILDING_ORGANIZATIONS_BRANCH_HEADING,
@@ -54,16 +54,10 @@ import type {
   BuildingOrganizationRelationshipKindOption,
 } from '../lib/building-organization-create-drafts'
 import {
-  buildingOrganizationsComposerClasses,
-  buildingOrganizationsComposerHeadingClasses,
-  buildingOrganizationsComposerSummaryRowsClasses,
   buildingOrganizationsDiscoveryBodyClasses,
   buildingOrganizationsDiscoveryControlsClasses,
   buildingOrganizationsDiscoveryCreateActionClasses,
   buildingOrganizationsDiscoveryListClasses,
-  buildingOrganizationsStageHeadingRowClasses,
-  buildingOrganizationsStageStackClasses,
-  buildingOrganizationsStageSubheadingClasses,
 } from './building-organizations-create-tab.variants'
 import {
   OrganizationAuthoringFormShell,
@@ -80,56 +74,6 @@ function toRelationshipRadioOptions(
     description: option.disabled ? option.disabledReason : option.description,
     disabled: option.disabled,
   }))
-}
-
-function mapSummaryRow(
-  row: BuildingOrganizationComposerSummaryRow,
-  view: UseBuildingOrganizationsCreateTabResult['composerView'],
-  startEditingRelationship: UseBuildingOrganizationsCreateTabResult['startEditingRelationship'],
-  startEditingOrganization: UseBuildingOrganizationsCreateTabResult['startEditingOrganization'],
-) {
-  const showChange =
-    row.decision === 'relationship' ? view.showRelationshipChange : view.showOrganizationChange
-  const onChange =
-    row.decision === 'relationship' ? startEditingRelationship : startEditingOrganization
-  const valueActionAriaLabel = `Change ${row.label.toLowerCase()}`
-
-  return {
-    label: row.label,
-    value: row.value,
-    onValueClick: showChange ? onChange : undefined,
-    valueActionAriaLabel: showChange ? valueActionAriaLabel : undefined,
-    action: showChange ? (
-      <SelectionSummaryChangeAction
-        changeLabel={BUILDING_ORGANIZATION_COMPOSER_CHANGE_LABEL}
-        ariaLabel={valueActionAriaLabel}
-        onChange={onChange}
-      />
-    ) : undefined,
-  }
-}
-
-function BuildingOrganizationComposerSummaryRows({
-  controller,
-}: {
-  controller: UseBuildingOrganizationsCreateTabResult
-}) {
-  const { composerView, startEditingOrganization, startEditingRelationship } = controller
-  const { summaryRows } = composerView
-
-  if (summaryRows.length === 0) return null
-
-  return (
-    <dl className={buildingOrganizationsComposerSummaryRowsClasses}>
-      {summaryRows.map((row, index) => (
-        <SelectionSummaryRow
-          key={row.id}
-          {...mapSummaryRow(row, composerView, startEditingRelationship, startEditingOrganization)}
-          showDivider={index > 0}
-        />
-      ))}
-    </dl>
-  )
 }
 
 function BuildingOrganizationRelationshipKindField({
@@ -173,33 +117,6 @@ function BuildingOrganizationRelationshipKindField({
       options={toRelationshipRadioOptions(relationshipKindOptions)}
       onValueChange={(value) => handleKindChange(value as OrganizationLocationConnectionKind)}
     />
-  )
-}
-
-function BuildingOrganizationStageSubheading({
-  heading,
-  helper,
-  action,
-  children,
-}: {
-  heading: string
-  helper: string
-  action?: ReactNode
-  children?: ReactNode
-}) {
-  return (
-    <div className={buildingOrganizationsStageStackClasses}>
-      <div className={buildingOrganizationsStageSubheadingClasses}>
-        <div className={buildingOrganizationsStageHeadingRowClasses}>
-          <Heading as="h4" variant="group">
-            {heading}
-          </Heading>
-          {action}
-        </div>
-        <Text variant="muted">{helper}</Text>
-      </div>
-      {children}
-    </div>
   )
 }
 
@@ -248,7 +165,7 @@ function BuildingOrganizationDiscoveryRow({
   )
 }
 
-function BuildingOrganizationDiscovery({
+function BuildingOrganizationDiscoveryBody({
   controller,
 }: {
   controller: UseBuildingOrganizationsCreateTabResult
@@ -267,52 +184,47 @@ function BuildingOrganizationDiscovery({
   } = controller
 
   return (
-    <BuildingOrganizationStageSubheading
-      heading={BUILDING_ORGANIZATIONS_DISCOVERY_HEADING}
-      helper={BUILDING_ORGANIZATIONS_DISCOVERY_HELPER}
-    >
-      <div className={buildingOrganizationsDiscoveryBodyClasses}>
-        <div className={buildingOrganizationsDiscoveryControlsClasses}>
-          <SearchBar
-            id="building-organization-search"
-            placeholder={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
-            ariaLabel={BUILDING_ORGANIZATIONS_SEARCH_LABEL}
-            value={searchQuery}
-            onValueChange={setSearchQuery}
-          />
-          <div className={buildingOrganizationsDiscoveryCreateActionClasses}>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              density="compact"
-              onClick={enterNewOrganizationBranch}
-            >
-              {BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL}
-            </Button>
-          </div>
-        </div>
-        <div className={buildingOrganizationsDiscoveryListClasses}>
-          {isError ? (
-            <Alert variant="destructive" title={BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE} />
-          ) : null}
-          {isPending ? <Text variant="muted">{BUILDING_ORGANIZATIONS_LOADING_LABEL}</Text> : null}
-          {!isPending && !isError && visibleOrganizations.length === 0 ? (
-            <Text variant="muted">{BUILDING_ORGANIZATIONS_EMPTY_SEARCH_LABEL}</Text>
-          ) : null}
-          {visibleOrganizations.map((organization) => (
-            <BuildingOrganizationDiscoveryRow
-              key={organization.id}
-              organization={organization}
-              kind={kind}
-              kindOptionsFor={kindOptionsFor}
-              selectExistingOrganization={selectExistingOrganization}
-              resolveBuildingOrganizationSelectState={resolveBuildingOrganizationSelectState}
-            />
-          ))}
+    <div className={buildingOrganizationsDiscoveryBodyClasses}>
+      <div className={buildingOrganizationsDiscoveryControlsClasses}>
+        <SearchBar
+          id="building-organization-search"
+          placeholder={BUILDING_ORGANIZATIONS_SEARCH_PLACEHOLDER}
+          ariaLabel={BUILDING_ORGANIZATIONS_SEARCH_LABEL}
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
+        <div className={buildingOrganizationsDiscoveryCreateActionClasses}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            density="compact"
+            onClick={enterNewOrganizationBranch}
+          >
+            {BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL}
+          </Button>
         </div>
       </div>
-    </BuildingOrganizationStageSubheading>
+      <div className={buildingOrganizationsDiscoveryListClasses}>
+        {isError ? (
+          <Alert variant="destructive" title={BUILDING_ORGANIZATIONS_LOAD_ERROR_TITLE} />
+        ) : null}
+        {isPending ? <Text variant="muted">{BUILDING_ORGANIZATIONS_LOADING_LABEL}</Text> : null}
+        {!isPending && !isError && visibleOrganizations.length === 0 ? (
+          <Text variant="muted">{BUILDING_ORGANIZATIONS_EMPTY_SEARCH_LABEL}</Text>
+        ) : null}
+        {visibleOrganizations.map((organization) => (
+          <BuildingOrganizationDiscoveryRow
+            key={organization.id}
+            organization={organization}
+            kind={kind}
+            kindOptionsFor={kindOptionsFor}
+            selectExistingOrganization={selectExistingOrganization}
+            resolveBuildingOrganizationSelectState={resolveBuildingOrganizationSelectState}
+          />
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -349,40 +261,6 @@ function BuildingOrganizationNewOrganizationForm({
   )
 }
 
-function BuildingOrganizationNewBranch({
-  controller,
-}: {
-  controller: UseBuildingOrganizationsCreateTabResult
-}) {
-  const { context, returnToDiscovery, commitNew, newOrganizationDraftId } = controller
-
-  return (
-    <BuildingOrganizationStageSubheading
-      heading={BUILDING_ORGANIZATIONS_BRANCH_HEADING}
-      helper={BUILDING_ORGANIZATIONS_BRANCH_HELPER}
-      action={
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          density="compact"
-          onClick={returnToDiscovery}
-        >
-          {BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL}
-        </Button>
-      }
-    >
-      <OrganizationAuthoringFormShell>
-        <BuildingOrganizationNewOrganizationForm
-          context={context}
-          newOrganizationDraftId={newOrganizationDraftId}
-          commitNew={commitNew}
-        />
-      </OrganizationAuthoringFormShell>
-    </BuildingOrganizationStageSubheading>
-  )
-}
-
 export function BuildingOrganizationRelationshipReview({
   controller,
   relationship,
@@ -390,23 +268,59 @@ export function BuildingOrganizationRelationshipReview({
   controller: UseBuildingOrganizationsCreateTabResult
   relationship?: BuildingOrganizationRelationshipDraft
 }) {
-  const { composerView } = controller
+  const { composerView, startEditingOrganization, startEditingRelationship, returnToDiscovery } =
+    controller
+  const summaryRows = mapBuildingOrganizationCompositionSummaryRows({
+    composerView,
+    startEditingRelationship,
+    startEditingOrganization,
+  })
 
   return (
-    <div className={buildingOrganizationsComposerClasses} data-building-organization-composer>
+    <div data-building-organization-composer>
       {composerView.activeDecision === 'relationship' ? (
         <BuildingOrganizationRelationshipKindField
           controller={controller}
           relationship={relationship}
         />
       ) : null}
-      {composerView.summaryRows.length > 0 ? (
-        <BuildingOrganizationComposerSummaryRows controller={controller} />
-      ) : null}
+
+      <CreateCompositionSummary rows={summaryRows} />
+
       {composerView.showDiscovery ? (
-        <BuildingOrganizationDiscovery controller={controller} />
+        <CreateCompositionStage
+          heading={BUILDING_ORGANIZATIONS_DISCOVERY_HEADING}
+          helper={BUILDING_ORGANIZATIONS_DISCOVERY_HELPER}
+        >
+          <BuildingOrganizationDiscoveryBody controller={controller} />
+        </CreateCompositionStage>
       ) : null}
-      {composerView.showBranch ? <BuildingOrganizationNewBranch controller={controller} /> : null}
+
+      {composerView.showBranch ? (
+        <CreateCompositionStage
+          heading={BUILDING_ORGANIZATIONS_BRANCH_HEADING}
+          helper={BUILDING_ORGANIZATIONS_BRANCH_HELPER}
+          action={
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              density="compact"
+              onClick={returnToDiscovery}
+            >
+              {BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL}
+            </Button>
+          }
+        >
+          <OrganizationAuthoringFormShell>
+            <BuildingOrganizationNewOrganizationForm
+              context={controller.context}
+              newOrganizationDraftId={controller.newOrganizationDraftId}
+              commitNew={controller.commitNew}
+            />
+          </OrganizationAuthoringFormShell>
+        </CreateCompositionStage>
+      ) : null}
     </div>
   )
 }
@@ -427,11 +341,8 @@ export function BuildingOrganizationComposer({
   }
 
   return (
-    <div className={buildingOrganizationsComposerHeadingClasses}>
-      <Heading as="h3" variant="subsection">
-        {BUILDING_ORGANIZATIONS_COMPOSER_HEADING}
-      </Heading>
+    <CreateCompositionComposer heading={BUILDING_ORGANIZATIONS_COMPOSER_HEADING}>
       <BuildingOrganizationRelationshipReview controller={controller} />
-    </div>
+    </CreateCompositionComposer>
   )
 }
