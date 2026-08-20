@@ -15,10 +15,10 @@ export const createTabComposerStackClasses = cn('flex flex-col gap-2')
 /** 8px — review stages (intent, summary rows, discovery). */
 export const createTabComposerReviewClasses = cn('flex flex-col gap-2')
 
-/** No gap — stage heading to helper line. */
+/** @deprecated Prefer `createCompositionStageSubheadingClasses` from `create-composition.variants.ts`. */
 export const createTabStageSubheadingClasses = cn('flex flex-col gap-0')
 
-/** 4px — stage subheading block to the discovery control column. */
+/** @deprecated Prefer `createCompositionStageStackClasses` from `create-composition.variants.ts`. */
 export const createTabDiscoveryStackClasses = cn('flex flex-col gap-1')
 
 /** 2px — discovery create action to picker card list. */
