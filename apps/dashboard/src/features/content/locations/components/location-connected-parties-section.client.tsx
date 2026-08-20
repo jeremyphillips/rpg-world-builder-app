@@ -14,21 +14,21 @@ import type { RelationshipCandidateSet } from '../../lib/relationship/list/relat
 
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
 import { LocationConnectedPartiesSectionBody } from './location-connected-parties-section-body.client'
-import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
-import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
+import type { PeopleKindSlot } from '../lib/connected-parties/location-connected-parties-people-kind-slots'
+import type { LocationConnectedPartyCharacterOption } from '../lib/connected-parties/location-connected-party-character-options.lib'
 import {
   resolveLocationConnectedPartiesSectionHeadingId,
   usesFieldGroupHeader,
-} from '../lib/location-connected-parties-section-layout'
+} from '../lib/connected-parties/location-connected-parties-section-layout'
 
-export { buildPeopleKindSlots } from '../lib/location-connected-parties-people-kind-slots'
-export type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
+export { buildPeopleKindSlots } from '../lib/connected-parties/location-connected-parties-people-kind-slots'
+export type { PeopleKindSlot } from '../lib/connected-parties/location-connected-parties-people-kind-slots'
 
 export {
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
   LOCATION_CONNECTED_PARTIES_SECTION_HELPERS,
   LOCATION_CONNECTED_PARTIES_SECTION_LABELS,
-} from '../lib/location-connected-parties-section-copy'
+} from '../lib/connected-parties/location-connected-parties-section-copy'
 
 export type LocationConnectedPartyEditTarget =
   | {

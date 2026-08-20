@@ -26,10 +26,10 @@ import {
   TERRITORIAL_AUTHORITY_SECTION_HEADING,
   TERRITORIAL_AUTHORITY_SECTION_HELPER,
   TERRITORIAL_AUTHORITY_SLOT_COPY,
-} from '../lib/location-connection-surface-copy'
+} from '../lib/connected-parties/location-connection-surface-copy'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
 
-export { TERRITORIAL_AUTHORITY_SECTION_EMPTY } from '../lib/location-connection-surface-copy'
+export { TERRITORIAL_AUTHORITY_SECTION_EMPTY } from '../lib/connected-parties/location-connection-surface-copy'
 
 const SINGLETON_KINDS = [
   'governs',

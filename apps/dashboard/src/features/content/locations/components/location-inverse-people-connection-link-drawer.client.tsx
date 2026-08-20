@@ -54,7 +54,7 @@ import {
   resolveActiveConnectionKind,
   resolvePeopleKindSlotFromOptionValue,
 } from '../../lib/relationship/location-connection/location-connection-kind-options'
-import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
+import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/connected-parties/location-connected-parties-section-copy'
 import {
   resolveLocationInverseCharacterAddDrawerInstruction,
   resolveLocationInverseCharacterAddSubmitLabel,
@@ -62,20 +62,20 @@ import {
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddSubmitLabel,
   resolveLocationInverseOrganizationTargetPresentation,
-} from '../lib/location-connection-surface-copy'
-import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
-import { buildConnectedPartyCharacterPickerSearchText } from '../lib/location-connected-party-character-options.lib'
+} from '../lib/connected-parties/location-connection-surface-copy'
+import type { LocationConnectedPartyCharacterOption } from '../lib/connected-parties/location-connected-party-character-options.lib'
+import { buildConnectedPartyCharacterPickerSearchText } from '../lib/connected-parties/location-connected-party-character-options.lib'
 import type {
   PeopleConnectionSubjectType,
   PeopleKindBinding,
   PeopleKindSlot,
-} from '../lib/location-connected-parties-people-kind-slots'
+} from '../lib/connected-parties/location-connected-parties-people-kind-slots'
 import {
   resolvePeopleKindSlotAddLabel,
   resolvePeopleKindSlotBinding,
   resolvePeopleKindSlotSelectableSubjectTypes,
   resolvePeopleKindSlotSubjectTypeFieldLabel,
-} from '../lib/location-connected-parties-people-kind-slots'
+} from '../lib/connected-parties/location-connected-parties-people-kind-slots'
 import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
 import { ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE } from '../../organizations/components/organization-member-picker-drawer.client'
 import {

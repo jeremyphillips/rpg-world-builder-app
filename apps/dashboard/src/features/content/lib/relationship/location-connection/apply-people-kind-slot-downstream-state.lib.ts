@@ -9,11 +9,11 @@ import type {
   PeopleConnectionSubjectType,
   PeopleKindBinding,
   PeopleKindSlot,
-} from '../../../locations/lib/location-connected-parties-people-kind-slots'
+} from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
 import {
   resolvePeopleKindSlotBinding,
   resolvePeopleKindSlotSelectableSubjectTypes,
-} from '../../../locations/lib/location-connected-parties-people-kind-slots'
+} from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
 
 export type PeopleKindSlotDownstreamState = {
   subjectTypeOverride: PeopleConnectionSubjectType | null

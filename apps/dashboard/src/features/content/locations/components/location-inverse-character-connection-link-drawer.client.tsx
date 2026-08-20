@@ -44,12 +44,12 @@ import {
   resolveLocationInverseCharacterAddDrawerTitle,
   resolveLocationInverseCharacterAddSubmitLabel,
   resolveLocationInverseCharacterTargetPresentation,
-} from '../lib/location-connection-surface-copy'
-import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
+} from '../lib/connected-parties/location-connection-surface-copy'
+import type { LocationConnectedPartyCharacterOption } from '../lib/connected-parties/location-connected-party-character-options.lib'
 import {
   buildConnectedPartyCharacterEntitySummary,
   buildConnectedPartyCharacterPickerSearchText,
-} from '../lib/location-connected-party-character-options.lib'
+} from '../lib/connected-parties/location-connected-party-character-options.lib'
 import { buildCharacterEntityContextPresentation } from '@/features/character'
 import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
 

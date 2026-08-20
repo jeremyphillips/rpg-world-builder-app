@@ -4,7 +4,7 @@ import {
   resolveLocationConnectionEligibility,
 } from '@rpg/contracts'
 
-import { toLocationConnectionEligibilityInput } from '../../lib/relationship/location-connection/location-connection-eligibility-input'
+import { toLocationConnectionEligibilityInput } from '../../../lib/relationship/location-connection/location-connection-eligibility-input'
 
 export type LocationConnectedPartiesSectionEligibility = {
   territorialAuthority: boolean

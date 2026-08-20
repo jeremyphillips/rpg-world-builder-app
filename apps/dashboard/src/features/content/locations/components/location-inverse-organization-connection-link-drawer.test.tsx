@@ -16,7 +16,7 @@ import { CITY_COUNCIL, SILVER_CIRCLE } from '../../organizations/fixtures'
 import {
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
   TERRITORIAL_AUTHORITY_DRAWER,
-} from '../lib/location-connection-surface-copy'
+} from '../lib/connected-parties/location-connection-surface-copy'
 import { LocationInverseOrganizationConnectionLinkDrawer } from './location-inverse-organization-connection-link-drawer.client'
 
 function infrastructureLocation() {

@@ -21,7 +21,7 @@ import {
   buildConnectedPartyCharacterEntitySummary,
   buildConnectedPartyCharacterPickerSearchText,
   type LocationConnectedPartyCharacterOption,
-} from '../../locations/lib/location-connected-party-character-options.lib'
+} from '../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 import {
   filterAndSortOrganizationMemberPickerCandidates,
   formatOrganizationMemberPickerStatusBadgeLabel,

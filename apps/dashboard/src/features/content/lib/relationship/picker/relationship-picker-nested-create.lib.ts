@@ -23,7 +23,7 @@ import {
   resolveEdgesAtLocation,
 } from '../location-connection/location-connection-drawer-intent'
 import { organizationLocationConnectionHasAvailableKind } from '../location-connection/location-connection-duplicate-keys'
-import type { LocationConnectedPartyCharacterOption } from '../../../locations/lib/location-connected-party-character-options.lib'
+import type { LocationConnectedPartyCharacterOption } from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 import { listLocations } from '../../../locations/api/locations-api'
 import { getLocationConnectedParties } from '../../../locations/api/location-connected-parties-client'
 import { locationConnectedPartiesQueryKey } from '../../../locations/hooks/use-location-connected-parties'

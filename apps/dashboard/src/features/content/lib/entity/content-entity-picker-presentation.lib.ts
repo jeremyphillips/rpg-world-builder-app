@@ -12,7 +12,7 @@ import {
 import {
   buildConnectedPartyCharacterEntitySummary,
   type LocationConnectedPartyCharacterOption,
-} from '../../locations/lib/location-connected-party-character-options.lib'
+} from '../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 
 import { buildEntityMediaFromImageKey } from './entity-media.lib'
 import type { EntitySummaryModel } from './entity-summary.types'

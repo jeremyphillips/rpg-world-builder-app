@@ -37,7 +37,7 @@ import { invalidateLocationConnectionQueries } from '../../lib/relationship/loca
 import {
   resolveLocationConnectedPartiesSectionEligibility,
   shouldShowLocationConnectedPartiesSection,
-} from '../lib/location-connected-parties-section-visibility'
+} from '../lib/connected-parties/location-connected-parties-section-visibility'
 import {
   organizationDrawerIntentFromKind,
   type OrganizationConnectionDrawerIntent,
@@ -48,7 +48,7 @@ import { toLocationConnectionEligibilityInput } from '../../lib/relationship/loc
 import { peopleSectionHasAvailableTarget } from '../../lib/relationship/location-connection/location-connection-kind-options'
 import type { LocationConnectedPartyEditTarget } from '../components/location-connected-parties-section.client'
 import { buildPeopleKindSlots } from '../components/location-connected-parties-section.client'
-import { buildLocationConnectedPartyCharactersById } from '../lib/location-connected-party-character-options.lib'
+import { buildLocationConnectedPartyCharactersById } from '../lib/connected-parties/location-connected-party-character-options.lib'
 import { resolveLocationInverseCurrentOrganizationEndpoint } from '../../lib/relationship/drawer/resolve-relationship-drawer-current-endpoint'
 import { useLocationConnectedParties } from './use-location-connected-parties'
 

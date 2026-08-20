@@ -8,7 +8,7 @@ import { normalizeSearchQuery } from '@rpg/search'
 import { chainComparators, compareNumberDescending } from '@rpg/search/ranking'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
-import { buildConnectedPartyCharacterPickerSearchText } from '../../locations/lib/location-connected-party-character-options.lib'
+import { buildConnectedPartyCharacterPickerSearchText } from '../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 import { compareName, scoreAndFilterPickerItems } from '@/features/character'
 
 import type { OrganizationMemberPickerCandidate } from '../components/organization-member-picker-drawer.client'

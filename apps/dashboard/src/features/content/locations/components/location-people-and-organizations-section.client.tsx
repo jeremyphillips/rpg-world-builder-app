@@ -18,15 +18,15 @@ import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
 } from '../../lib/relationship/list/resolve-relationship-overflow-actions'
-import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
-import { LOCATION_INVERSE_PEOPLE_OVERFLOW } from '../lib/location-connection-surface-copy'
-import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
+import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/connected-parties/location-connected-parties-section-copy'
+import { LOCATION_INVERSE_PEOPLE_OVERFLOW } from '../lib/connected-parties/location-connection-surface-copy'
+import type { PeopleKindSlot } from '../lib/connected-parties/location-connected-parties-people-kind-slots'
 import {
   peopleKindBindingKey,
   peopleKindSlotKey,
-} from '../lib/location-connected-parties-people-kind-slots'
-import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
-import { resolveLocationConnectedPartySubjectHref } from '../lib/resolve-location-connected-party-subject-href'
+} from '../lib/connected-parties/location-connected-parties-people-kind-slots'
+import type { LocationConnectedPartyCharacterOption } from '../lib/connected-parties/location-connected-party-character-options.lib'
+import { resolveLocationConnectedPartySubjectHref } from '../lib/connected-parties/resolve-location-connected-party-subject-href'
 import {
   toLocationConnectedPartyEditTarget,
   type LocationConnectedPartyEditTarget,

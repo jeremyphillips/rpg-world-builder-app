@@ -11,7 +11,7 @@ import {
   LocationConnectedPartiesSection,
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
 } from './location-connected-parties-section.client'
-import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/location-connected-parties-section-copy'
+import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../lib/connected-parties/location-connected-parties-section-copy'
 
 import type { LocationConnectedPartyRow } from '@rpg/contracts'
 

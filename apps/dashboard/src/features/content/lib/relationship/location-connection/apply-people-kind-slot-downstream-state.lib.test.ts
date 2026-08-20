@@ -2,7 +2,7 @@ import type { LocationConnectedPartyRow } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { applyPeopleKindSlotDownstreamState } from './apply-people-kind-slot-downstream-state.lib'
-import type { PeopleKindSlot } from '../../../locations/lib/location-connected-parties-people-kind-slots'
+import type { PeopleKindSlot } from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
 
 const ownerSlot: PeopleKindSlot = {
   heading: 'Owner',

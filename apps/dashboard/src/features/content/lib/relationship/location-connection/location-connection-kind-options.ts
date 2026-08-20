@@ -36,13 +36,13 @@ import {
 import {
   resolveTerritorialKindOccupiedReason,
   TERRITORIAL_AUTHORITY_DRAWER,
-} from '../../../locations/lib/location-connection-surface-copy'
+} from '../../../locations/lib/connected-parties/location-connection-surface-copy'
 import {
   resolveInverseCharacterKindDescription,
   resolveInverseOrganizationKindDescription,
-} from '../../../locations/lib/location-inverse-relationship-description'
-import type { PeopleKindSlot } from '../../../locations/lib/location-connected-parties-people-kind-slots'
-import { peopleKindSlotKey } from '../../../locations/lib/location-connected-parties-people-kind-slots'
+} from '../../../locations/lib/connected-parties/location-inverse-relationship-description'
+import type { PeopleKindSlot } from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
+import { peopleKindSlotKey } from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
 
 export type LocationConnectionKindOption = {
   value: string

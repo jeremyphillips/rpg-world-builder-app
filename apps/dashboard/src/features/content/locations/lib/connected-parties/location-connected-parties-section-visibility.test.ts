@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { HARBORFORD } from '../fixtures'
+import { HARBORFORD } from '../../fixtures'
 import {
   resolveLocationConnectedPartiesSectionEligibility,
   shouldShowLocationConnectedPartiesSection,

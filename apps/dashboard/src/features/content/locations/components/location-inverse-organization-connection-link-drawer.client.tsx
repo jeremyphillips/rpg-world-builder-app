@@ -65,7 +65,7 @@ import {
   resolveLocationInverseOrganizationTargetPresentation,
   TERRITORIAL_AUTHORITY_DRAWER,
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
-} from '../lib/location-connection-surface-copy'
+} from '../lib/connected-parties/location-connection-surface-copy'
 import { buildLocationContextPresentationFromLocation } from '../lib/location-display'
 import { buildOrganizationDrawerContextEntity } from '../../organizations/lib/organization-display'
 

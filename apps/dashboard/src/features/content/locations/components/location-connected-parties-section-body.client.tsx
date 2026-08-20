@@ -16,13 +16,13 @@ import {
   LocationTerritorialAuthoritySectionBody,
   type LocationTerritorialMutationContext,
 } from './location-territorial-authority-section.client'
-import type { PeopleKindSlot } from '../lib/location-connected-parties-people-kind-slots'
+import type { PeopleKindSlot } from '../lib/connected-parties/location-connected-parties-people-kind-slots'
 import {
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
   LOCATION_CONNECTED_PARTIES_SECTION_HELPERS,
   LOCATION_CONNECTED_PARTIES_SECTION_LABELS,
-} from '../lib/location-connected-parties-section-copy'
-import type { LocationConnectedPartyCharacterOption } from '../lib/location-connected-party-character-options.lib'
+} from '../lib/connected-parties/location-connected-parties-section-copy'
+import type { LocationConnectedPartyCharacterOption } from '../lib/connected-parties/location-connected-party-character-options.lib'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
 
 type LocationConnectedPartiesSectionBodyProps = {

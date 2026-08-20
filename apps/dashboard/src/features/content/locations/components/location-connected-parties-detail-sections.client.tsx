@@ -12,7 +12,7 @@ import { ConfirmDialog, SemanticText, Text } from '@rpg/ui'
 import { LocationConnectedPartiesDrawers } from './location-connected-parties-drawers.client'
 import { LocationConnectedPartiesSection } from './location-connected-parties-section.client'
 import { useLocationConnectedPartiesDetail } from '../hooks/use-location-connected-parties-detail.client'
-import { resolveTerritorialRemoveConfirmation } from '../lib/location-connection-surface-copy'
+import { resolveTerritorialRemoveConfirmation } from '../lib/connected-parties/location-connection-surface-copy'
 
 export { LOCATION_CONNECTED_PARTIES_MUTATION_ERROR } from '../hooks/use-location-connected-parties-detail.client'
 

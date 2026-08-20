@@ -7,7 +7,7 @@ import {
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
   LOCATION_CONNECTED_PARTIES_SECTION_HELPERS,
   LOCATION_CONNECTED_PARTIES_SECTION_LABELS,
-} from '../lib/location-connected-parties-section-copy'
+} from '../lib/connected-parties/location-connected-parties-section-copy'
 
 type LocationConnectedPartiesSectionHeaderProps = {
   sectionGroup: LocationConnectedPartySectionGroup

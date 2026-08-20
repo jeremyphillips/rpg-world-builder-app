@@ -15,7 +15,7 @@ import type { ContentCreateContext, CreatedContentResult } from '@/lib/create-fl
 import { NestedCreateHandoffError, STANDALONE_CONTENT_CREATE_CONTEXT } from '@/lib/create-flow'
 
 import type { LocationAuthoringType } from '../../../locations/lib/location-authoring-type'
-import type { LocationConnectedPartyCharacterOption } from '../../../locations/lib/location-connected-party-character-options.lib'
+import type { LocationConnectedPartyCharacterOption } from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 import { applyRelationshipPickerNestedCreateHandoff } from './apply-relationship-picker-nested-create-handoff.lib'
 import { mapRelationshipPickerCreateIntentsToAuxiliaryAction } from './map-relationship-picker-create-intents-to-auxiliary-action.lib'
 import type { RelationshipPickerCreateIntent } from './relationship-picker-create-intents.lib'
