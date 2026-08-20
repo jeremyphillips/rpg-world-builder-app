@@ -7,8 +7,8 @@ import {
   mergeLocationCreateDraftForFixedCreate,
   resolveLocationFixedCreateCompositionKey,
 } from '../lib/create/session/location-create-draft.lib'
-import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
-import type { LocationFormValues } from '../lib/location-form-fields'
+import type { LocationFixedCreateContext } from '../lib/forms/location-form-ctx'
+import type { LocationFormValues } from '../lib/forms/location-form-fields'
 
 /** Preserves compatible draft fields when setup changes fixed-create composition. */
 export function LocationCreateDraftPrune({

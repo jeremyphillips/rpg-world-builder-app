@@ -9,7 +9,7 @@ import { buildingClassificationSchema } from '@rpg/contracts'
 import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 import { makeLocation } from '@/test/fixtures/factories/location'
 
-import { HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../fixtures'
+import { HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../../fixtures'
 import { locationsColumns } from './locations-overview-columns'
 
 function renderContainsCell(location: Location) {

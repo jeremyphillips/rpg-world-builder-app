@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { FormItem } from '@rpg/ui/form'
 
-import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
+import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { filterLocationFieldsForAuthoringType } from './location-classification-form-fields'
 import { buildLocationFields } from './location-form-fields'
 import type { LocationFormCtx } from './location-form-ctx'

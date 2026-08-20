@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { FormItem } from '@rpg/ui/form'
 
-import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
+import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import {
   buildLocationFields,
   buildSettlementStartingDistrictsFormItems,
@@ -9,7 +9,7 @@ import {
   SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
 } from './location-form-fields'
 import type { LocationFormCtx } from './location-form-ctx'
-import { resolveSettlementStructureAuthoringGuidance } from './create/composition/location-settlement-create-composition.lib'
+import { resolveSettlementStructureAuthoringGuidance } from '../create/composition/location-settlement-create-composition.lib'
 
 function collectFieldNames(items: FormItem[]): string[] {
   const names: string[] = []

@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { createLocationInputSchema } from '@rpg/contracts'
 
-import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
-import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../fixtures'
+import { defaultCampaignRules } from '../../../lib/form-options/content-campaign-rules'
+import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../../fixtures'
 import {
   canonicalFieldsForAuthoringType,
   resolveLocationAuthoringType,
-} from './location-authoring-type'
+} from '../location-authoring-type'
 import {
   buildLocationCreateInput,
   applyLocationFixedCreateContext,
   locationToFormValues,
 } from './location-form-values'
 import type { LocationFormValues } from './location-form-fields'
-import { resolveContentFormSchema } from '../../lib/forms/shells/content-edit-load'
+import { resolveContentFormSchema } from '../../../lib/forms/shells/content-edit-load'
 import { locationFormDef } from './location-form-def'
 import type { LocationFormCtx } from './location-form-ctx'
 

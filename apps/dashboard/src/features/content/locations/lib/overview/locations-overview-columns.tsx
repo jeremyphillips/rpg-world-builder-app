@@ -8,9 +8,9 @@ import { Link } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
-import { buildContentColumns } from '../../lib/overview/content-table-config'
+import { buildContentColumns } from '../../../lib/overview/content-table-config'
 
-import { buildChildSummariesByParentId, type LocationChildSummaryItem } from './location-display'
+import { buildChildSummariesByParentId, type LocationChildSummaryItem } from '../location-display'
 
 export type { LocationsOverviewFilterState } from './locations-overview-filter-schema'
 export { locationsFilterSchema } from './locations-overview-filter-schema'

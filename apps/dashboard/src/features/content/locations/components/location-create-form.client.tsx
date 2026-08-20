@@ -36,18 +36,18 @@ import { useContentFormSubmit } from '../../lib/forms/shells/content-form-submit
 import { resolveContentFormNavigationFields } from '../../lib/forms/shells/content-form-host-projection'
 import { resolveBuildingCreateViewForPath } from '../lib/create/setup/location-building-create-invalid-submit.lib'
 import { fixedCreateToInitialValues } from '../lib/create/location-create-shortcuts'
-import '../lib/location-form-def'
-import { locationFormDef } from '../lib/location-form-def'
-import type { LocationFormCtx } from '../lib/location-form-ctx'
-import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
+import '../lib/forms/location-form-def'
+import { locationFormDef } from '../lib/forms/location-form-def'
+import type { LocationFormCtx } from '../lib/forms/location-form-ctx'
+import type { LocationFixedCreateContext } from '../lib/forms/location-form-ctx'
 import {
   composeLocationCreateBodyFields,
   buildSettlementStartingDistrictsFormItems,
   locationDraftFormSchema,
   type LocationFormValues,
-} from '../lib/location-form-fields'
-import { locationFormValueSyncs } from '../lib/location-form-sync'
-import { applyLocationFixedCreateContext } from '../lib/location-form-values'
+} from '../lib/forms/location-form-fields'
+import { locationFormValueSyncs } from '../lib/forms/location-form-sync'
+import { applyLocationFixedCreateContext } from '../lib/forms/location-form-values'
 import {
   applyBuildingCreateSetupProjection,
   buildBuildingClassificationFromCreateSetup,

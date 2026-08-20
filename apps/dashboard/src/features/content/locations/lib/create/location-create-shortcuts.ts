@@ -35,7 +35,7 @@ import {
   type LocationCreateIntent,
   type LocationCreateSetupResult,
 } from './session/location-create-session'
-import type { LocationFixedCreateContext } from '../location-form-ctx'
+import type { LocationFixedCreateContext } from '../forms/location-form-ctx'
 
 export const LOCATION_CREATE_TYPE_SEARCH_PARAM = 'type'
 export const LOCATION_CREATE_PARENT_SEARCH_PARAM = 'parent'

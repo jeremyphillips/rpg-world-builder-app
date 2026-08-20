@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
+import type { LocationFixedCreateContext } from '../lib/forms/location-form-ctx'
 
 /** Registers fixed create context on the form so conditional fields can watch locked values. */
 export function LocationFixedCreateHiddenFields({

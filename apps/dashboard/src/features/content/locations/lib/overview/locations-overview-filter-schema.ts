@@ -24,8 +24,8 @@ import {
   createContentSourceFilter,
   createContentStatusFilter,
   type ContentOverviewBaseFilterState,
-} from '../../lib/overview/content-overview-filter-schema'
-import { shouldPresentContentSource } from '../../lib/content-type-presentation'
+} from '../../../lib/overview/content-overview-filter-schema'
+import { shouldPresentContentSource } from '../../../lib/content-type-presentation'
 import {
   getLocationOverviewSearchText,
   readLocationBuildingClassification,

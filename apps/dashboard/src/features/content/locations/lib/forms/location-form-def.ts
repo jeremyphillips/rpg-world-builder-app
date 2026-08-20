@@ -1,7 +1,7 @@
 import type { CreateLocationInput, Location } from '@rpg/contracts'
 
-import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
-import { locationsQueryKey, useLocations } from '../hooks/use-locations'
+import { contentFormRegistry, type ContentFormDef } from '../../../lib/forms/content-form-registry'
+import { locationsQueryKey, useLocations } from '../../hooks/use-locations'
 import {
   buildLocationFields,
   locationDraftFormSchema,

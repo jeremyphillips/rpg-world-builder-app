@@ -8,8 +8,8 @@ import {
 import { createWithDeferredCampaignAccess } from '../../../../lib/campaign-access/create-with-deferred-campaign-access'
 import { createContent } from '../../../../lib/list/content-client'
 
-import { buildLocationCreateInput } from '../../location-form-values'
-import type { LocationFormValues } from '../../location-form-fields'
+import { buildLocationCreateInput } from '../../forms/location-form-values'
+import type { LocationFormValues } from '../../forms/location-form-fields'
 
 export type SettlementDistrictDraft = {
   id: string

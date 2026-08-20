@@ -17,11 +17,11 @@ import {
 } from '../lib/create/location-create-shortcuts'
 import { completeLocationCreateSetup } from '../lib/create/session/location-create-session'
 import { resolveLocationCreatePageModel } from '../lib/create/session/location-create-page.lib'
-import type { LocationFormCtx } from '../lib/location-form-ctx'
-import type { LocationFormValues } from '../lib/location-form-fields'
-import { applyLocationFixedCreateContext } from '../lib/location-form-values'
+import type { LocationFormCtx } from '../lib/forms/location-form-ctx'
+import type { LocationFormValues } from '../lib/forms/location-form-fields'
+import { applyLocationFixedCreateContext } from '../lib/forms/location-form-values'
 import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-fields.client'
-import '../lib/location-form-def'
+import '../lib/forms/location-form-def'
 
 export type LocationCreatePageProps = {
   campaignId: string

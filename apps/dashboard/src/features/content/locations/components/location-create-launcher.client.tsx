@@ -7,7 +7,7 @@ import {
   resolveLocationCreateSession,
   type LocationCreateIntent,
 } from '../lib/create/session/location-create-session'
-import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
+import type { LocationFixedCreateContext } from '../lib/forms/location-form-ctx'
 import { LocationCreateSetupHost } from './location-create-setup-host.client'
 
 export function useLocationCreateSessionLaunch(

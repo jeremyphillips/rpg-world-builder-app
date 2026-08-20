@@ -10,7 +10,7 @@ import type { FormValueSync } from '@rpg/ui/form'
 import {
   clearInvalidFieldsForAuthoringType,
   resolveAuthoringTypeFromFormValues,
-} from './location-authoring-type'
+} from '../location-authoring-type'
 
 type ClassificationFormSlice = {
   kind?: string

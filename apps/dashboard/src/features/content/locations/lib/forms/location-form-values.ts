@@ -7,12 +7,15 @@ import {
   type LocationKind,
 } from '@rpg/contracts'
 
-import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+import {
+  finalizeContentInput,
+  slugForInputParse,
+} from '../../../lib/forms/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../../lib/forms/content-form-registry'
 import {
   canonicalFieldsForAuthoringType,
   resolveLocationAuthoringType,
-} from './location-authoring-type'
+} from '../location-authoring-type'
 import type { LocationFormValues } from './location-form-fields'
 import type { LocationFixedCreateContext } from './location-form-ctx'
 

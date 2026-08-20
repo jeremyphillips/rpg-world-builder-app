@@ -65,8 +65,9 @@ the same way: each sub-area's `hooks/use-*.ts` exports aliased
 `useCreate*` / `useUpdate*` hooks at module level. Generic create/edit shells
 call [`useContentWriteMutation`](./lib/list/use-content-mutations.ts) with the
 registered `ContentFormDef` (including optional `invalidateQueryKeys` — classes
-also refresh skill proficiencies). Future sub-areas (`locations/`, `monsters/`)
-should follow the same list + mutation factory pattern in their `hooks/use-*.ts`.
+also refresh skill proficiencies). [`locations/`](./locations) and future sub-areas
+(`monsters/`) follow the same list + mutation factory pattern in their
+`hooks/use-*.ts`.
 
 Class [`FeatureItem`](./classes/lib/feature-item.tsx) rows render level + name headings inline
 via local `featureHeading()` (no separate formatter module); stored feature

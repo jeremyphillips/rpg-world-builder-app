@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DataTable } from '@rpg/ui'
 
-import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { LOCATIONS_LIST } from '../fixtures'
+import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
+import { LOCATIONS_LIST } from '../../fixtures'
 import { locationsColumns } from './locations-overview-columns'
 
 const meta = {

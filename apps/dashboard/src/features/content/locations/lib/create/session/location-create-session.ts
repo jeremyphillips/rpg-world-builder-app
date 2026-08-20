@@ -11,7 +11,7 @@ import {
   requiresLocationCreateSetup,
   type LocationAuthoringType,
 } from '../../location-authoring-type'
-import type { LocationFixedCreateContext } from '../../location-form-ctx'
+import type { LocationFixedCreateContext } from '../../forms/location-form-ctx'
 
 export type LocationCreateIntent = {
   authoringType: LocationAuthoringType

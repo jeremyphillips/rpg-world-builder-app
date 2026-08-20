@@ -13,10 +13,10 @@ import {
 } from '@rpg/contracts'
 import type { FormItem, RowFieldItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
 import type { LocationFormCtx } from './location-form-ctx'
-import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
+import { descriptionField, nameField } from '../../../lib/forms/fields/content-identity-form-fields'
+import { draftOptionalSelect } from '../../../lib/forms/draft-form-schema-helpers'
 import {
   buildLocationClassificationFields,
   buildLocationPrimaryClassificationFields,
@@ -26,14 +26,14 @@ import {
   buildLocationAuthoringTypeOptions,
   canonicalFieldsForAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
-} from './location-authoring-type'
-import { buildParentLocationFieldOptions } from './hierarchy/location-parent-field-options.lib'
+} from '../location-authoring-type'
+import { buildParentLocationFieldOptions } from '../hierarchy/location-parent-field-options.lib'
 import {
   buildParentLocationOptionAvailability,
   parentLocationFieldVisibility,
-} from './hierarchy/location-parent-picker'
-import { LocationSettlementStartingDistrictsSlot } from '../components/location-settlement-starting-districts-slot.client'
-import type { SettlementStructureAuthoringGuidance } from './create/composition/location-settlement-create-composition.lib'
+} from '../hierarchy/location-parent-picker'
+import { LocationSettlementStartingDistrictsSlot } from '../../components/location-settlement-starting-districts-slot.client'
+import type { SettlementStructureAuthoringGuidance } from '../create/composition/location-settlement-create-composition.lib'
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 

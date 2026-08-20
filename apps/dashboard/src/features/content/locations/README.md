@@ -12,14 +12,22 @@ bulk parent editing.
 
 ```text
 lib/
-  create/                  # create orchestration (setup/, composition/, session/)
+  create/
+    setup/                 # per-kind setup, modal setup, setup chrome
+    composition/           # nested building/settlement composition
+    session/               # session, draft, page orchestration
+    location-create-*.ts   # shortcuts, authoring capabilities (create root)
   building-organizations/  # nested building org composition tab
   connected-parties/       # detail connected-parties helpers and copy
-  hierarchy/               # parent tree editing
+  hierarchy/
     bulk/                  # bulk change-parent action
+    location-parent-*      # parent picker, replacement, graph
   forms/                   # ContentFormDef and form field modules
   overview/                # list route columns, filters, search
-  <cross-cutting seams>    # see root policy below
+  location-display.ts      # display registry SSOT (lib root)
+  location-authoring-type.ts
+  location-structure.lib.ts
+  …                        # other cross-cutting seams (see below)
 ```
 
 ### Root policy
@@ -36,6 +44,13 @@ that do not belong to one stable subconcern:
 | `location-contextual-terminology.lib.ts` | Vocabulary helpers spanning surfaces              |
 | `location-kind-browse-families.ts`       | Browse/discovery axis                             |
 
+Form modules live under `lib/forms/` (not lib root) to keep the root small while
+matching the form suffix split in
+[form-lib-conventions.md](../../../../docs/form-lib-conventions.md).
+
+Overview list config lives under `lib/overview/`; `location-display.ts` stays at
+root because it is consumed across detail, overview, organizations, and pickers.
+
 ## Component prefix families
 
 | Prefix                                                               | Concern                         |
@@ -44,6 +59,16 @@ that do not belong to one stable subconcern:
 | `location-connected-parties-*` / `location-inverse-*`                | Connected parties detail        |
 | `building-organizations-*`                                           | Building org composition tab    |
 | `location-children-*` / `location-parent-*` / `bulk-change-parent-*` | Hierarchy editing               |
+
+## Key files
+
+| Area                    | Path                                                                                   |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| Form def                | `lib/forms/location-form-def.ts`                                                       |
+| Display registry        | `lib/location-display.ts`                                                              |
+| List route              | `routes/locations-overview.tsx`                                                        |
+| Overview columns        | `lib/overview/locations-overview-columns.tsx`                                          |
+| Building orgs reference | `lib/building-organizations/`, `components/building-organizations-composer.client.tsx` |
 
 ## Watch — cross-feature import boundaries
 

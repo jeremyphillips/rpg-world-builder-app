@@ -13,7 +13,7 @@ import { LocationCreateActions } from '../components/location-create-actions.cli
 import { BulkChangeParentLocationDialog } from '../components/bulk-change-parent-location-dialog.client'
 import { useLocations } from '../hooks/use-locations'
 import { BULK_CHANGE_PARENT_MENU_LABEL } from '../lib/hierarchy/bulk/bulk-change-parent-labels'
-import { locationsColumns, locationsFilterSchema } from '../lib/locations-overview-columns'
+import { locationsColumns, locationsFilterSchema } from '../lib/overview/locations-overview-columns'
 
 export function LocationsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()

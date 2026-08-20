@@ -2,7 +2,7 @@ import {
   fixedCreateToInitialValues,
   type LocationCreateSessionParseResult,
 } from '../location-create-shortcuts'
-import type { LocationFixedCreateContext } from '../../location-form-ctx'
+import type { LocationFixedCreateContext } from '../../forms/location-form-ctx'
 
 export function resolveLocationCreatePageModel(
   session: LocationCreateSessionParseResult,

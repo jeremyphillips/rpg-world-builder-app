@@ -32,7 +32,7 @@ import {
   resolveLocationCreateSession,
   type LocationCreateIntent,
 } from '../lib/create/session/location-create-session'
-import type { LocationFixedCreateContext } from '../lib/location-form-ctx'
+import type { LocationFixedCreateContext } from '../lib/forms/location-form-ctx'
 import { formatLocationFixedCreateHeading } from '../lib/create/location-create-shortcuts'
 import {
   applyLocationCreateModalSetupValueChange,

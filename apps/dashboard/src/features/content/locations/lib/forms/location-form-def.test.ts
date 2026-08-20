@@ -1,8 +1,8 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
 import { createLocationInputSchema, type CreateLocationInput } from '@rpg/contracts'
 
-import { HARBORFORD, YAWNING_PORTAL } from '../fixtures'
-import { resolveLocationAuthoringType } from './location-authoring-type'
+import { HARBORFORD, YAWNING_PORTAL } from '../../fixtures'
+import { resolveLocationAuthoringType } from '../location-authoring-type'
 import { locationFormDef } from './location-form-def'
 import type { LocationFormValues } from './location-form-fields'
 

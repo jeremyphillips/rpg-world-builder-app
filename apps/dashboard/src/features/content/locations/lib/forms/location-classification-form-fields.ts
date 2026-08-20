@@ -33,12 +33,12 @@ import {
   type RowFieldItem,
 } from '@rpg/ui/form'
 
-import type { LocationAuthoringType } from './location-authoring-type'
+import type { LocationAuthoringType } from '../location-authoring-type'
 
 import {
   buildLocationAuthoringTypeOptions,
   visibleForAuthoringType,
-} from './location-authoring-type'
+} from '../location-authoring-type'
 
 const SELECT_PLACEHOLDER = 'Select…'
 

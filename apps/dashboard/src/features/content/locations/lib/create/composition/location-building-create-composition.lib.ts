@@ -23,7 +23,7 @@ import { buildOrganizationCreateInput } from '../../../../lib/forms/organization
 import { invalidateContentFormDefQueries } from '../../../../lib/list/use-content-mutations'
 import { invalidateLocationConnectionQueries } from '../../../../lib/relationship/location-connection/invalidate-location-connection-queries'
 import { organizationsQueryKey } from '../../../../organizations/hooks/use-organizations'
-import { locationFormDef } from '../../location-form-def'
+import { locationFormDef } from '../../forms/location-form-def'
 import type {
   BuildingOrganizationDraftIssue,
   BuildingOrganizationDraftPlan,
