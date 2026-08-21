@@ -10,7 +10,7 @@ import type {
 import { resolveLocationConnectionEligibility } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
-import { LocationConnectionKindField } from '../../../components/location-connection-kind-field.client'
+import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -53,7 +53,7 @@ import { buildLocationContextPresentationFromLocation } from '../../lib/location
 export const LOCATION_INVERSE_CHARACTER_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose a character to see available connection types.'
 
-import type { RelationshipMutationMode } from '../../../lib/relationship/list/relationship-mutation-mode'
+import type { RelationshipMutationMode } from '../../../lib/relationship/core/relationship-mutation-mode'
 
 export type LocationInverseCharacterConnectionLinkDrawerProps = {
   open: boolean

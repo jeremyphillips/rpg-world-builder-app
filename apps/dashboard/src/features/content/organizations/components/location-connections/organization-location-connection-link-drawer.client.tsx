@@ -18,7 +18,7 @@ import {
   Text,
 } from '@rpg/ui'
 
-import { LocationConnectionKindField } from '../../../components/location-connection-kind-field.client'
+import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import type { ContentCreateContext } from '@/lib/create-flow'
 import {
   CatalogPickerSelectionActions,
@@ -37,8 +37,8 @@ import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
   resolveRelationshipAlternatives,
   type RelationshipCandidateSet,
-} from '../../../lib/relationship/list/relationship-alternatives'
-import { resolveRelationshipCandidateSet } from '../../../lib/relationship/list/relationship-candidate-set'
+} from '../../../lib/relationship/location-connection/location-connection-alternatives'
+import { resolveRelationshipCandidateSet } from '../../../lib/relationship/core/relationship-candidate-set'
 import { RelationshipDrawerSubjectField } from '../../../lib/relationship/drawer/relationship-drawer-subject-field.client'
 import {
   buildLocationEntitySummarySearchText,
@@ -64,9 +64,9 @@ import {
   resolveKindsForOrganizationDrawerIntent,
   resolveEdgesAtLocation,
 } from '../../../lib/relationship/location-connection/location-connection-drawer-intent'
-import { resolveRelationshipPickerCreateIntents } from '../../../lib/relationship/picker/relationship-picker-create-intents.lib'
-import { revalidateCreatedLocationForOrganizationForwardDrawer } from '../../../lib/relationship/picker/relationship-picker-nested-create.lib'
-import { useRelationshipPickerNestedCreate } from '../../../lib/relationship/picker/use-relationship-picker-nested-create.client'
+import { resolveRelationshipPickerCreateIntents } from '../../../lib/relationship/nested-create/relationship-picker-create-intents.lib'
+import { revalidateCreatedLocationForOrganizationForwardDrawer } from '../../../lib/relationship/nested-create/relationship-picker-nested-create.lib'
+import { useRelationshipPickerNestedCreate } from '../../../lib/relationship/nested-create/use-relationship-picker-nested-create.client'
 import {
   buildOrganizationFamilyKindOptions,
   buildOrganizationLocationChangeKindOptions,
@@ -75,7 +75,7 @@ import {
   type LocationConnectionKindOption,
 } from '../../../lib/relationship/location-connection/location-connection-kind-options'
 import { organizationLocationConnectionHasAvailableKind } from '../../../lib/relationship/location-connection/location-connection-duplicate-keys'
-import type { OrganizationForwardDrawerMode } from '../../../lib/relationship/list/relationship-mutation-mode'
+import type { OrganizationForwardDrawerMode } from '../../../lib/relationship/location-connection/location-connection-mutation-mode'
 import {
   DEFAULT_ORGANIZATION_FORWARD_TARGET_PRESENTATION,
   resolveOrganizationForwardAddDrawerInstruction,

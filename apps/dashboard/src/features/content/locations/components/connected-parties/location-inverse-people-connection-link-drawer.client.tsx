@@ -26,14 +26,14 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import { LocationConnectionKindField } from '../../../components/location-connection-kind-field.client'
+import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import {
   buildCharacterPickerEntitySummary,
   buildOrganizationPickerEntitySummary,
 } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'
-import { applyPeopleKindSlotDownstreamState } from '../../../lib/relationship/location-connection/apply-people-kind-slot-downstream-state.lib'
+import { applyPeopleKindSlotDownstreamState } from '../../../locations/lib/connected-parties/apply-people-kind-slot-downstream-state.lib'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
@@ -80,8 +80,8 @@ import {
   revalidateCreatedOrganizationForInverseDrawer,
   resolveRelationshipPickerCharacterCreateIntents,
   resolveRelationshipPickerOrganizationCreateIntents,
-} from '../../../lib/relationship/picker/relationship-picker-nested-create.lib'
-import { useRelationshipPickerNestedCreate } from '../../../lib/relationship/picker/use-relationship-picker-nested-create.client'
+} from '../../../lib/relationship/nested-create/relationship-picker-nested-create.lib'
+import { useRelationshipPickerNestedCreate } from '../../../lib/relationship/nested-create/use-relationship-picker-nested-create.client'
 
 export type LocationInversePeopleConnectionLinkDrawerProps = {
   open: boolean

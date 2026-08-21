@@ -12,12 +12,17 @@ const RELATIONSHIP_SECTION_FILES = [
   'apps/dashboard/src/features/content/locations/components/connected-parties/location-territorial-authority-section.client.tsx',
 ] as const
 
+const RELATIONSHIP_SECTION_IMPORT_FORBIDDEN = [
+  /CrossContentRelationshipRow/,
+  /cross-content-relationship-row/,
+  /relationship\/list\/row\//,
+] as const
+
 const LEGACY_PATTERNS = [
   /RelationshipContentRow/,
   /RelationshipFieldGroupRow/,
   /relationship-content-row/,
   /relationship-field-group-row/,
-  /CrossContentRelationshipRow/,
   /DetailSectionGroup/,
   /space-y-1/,
 ] as const
@@ -41,6 +46,9 @@ describe('relationship list migration guard', () => {
     for (const relativePath of RELATIONSHIP_SECTION_FILES) {
       const source = readFileSync(join(REPO_ROOT, relativePath), 'utf8')
       for (const pattern of LEGACY_PATTERNS) {
+        expect(source, `${relativePath} must not match ${pattern}`).not.toMatch(pattern)
+      }
+      for (const pattern of RELATIONSHIP_SECTION_IMPORT_FORBIDDEN) {
         expect(source, `${relativePath} must not match ${pattern}`).not.toMatch(pattern)
       }
       expect(source, `${relativePath} must use RelationshipList`).toMatch(/RelationshipList/)

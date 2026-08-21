@@ -3,17 +3,17 @@ import type { LocationConnectedPartyRow } from '@rpg/contracts'
 import {
   characterInverseSubjectHasAvailableKind,
   organizationInverseSubjectHasAvailableKind,
-} from './location-connection-drawer-intent'
-import { buildSubjectLocationConnectionKeySet } from './location-connection-duplicate-keys'
+} from '../../../lib/relationship/location-connection/location-connection-drawer-intent'
+import { buildSubjectLocationConnectionKeySet } from '../../../lib/relationship/location-connection/location-connection-duplicate-keys'
 import type {
   PeopleConnectionSubjectType,
   PeopleKindBinding,
   PeopleKindSlot,
-} from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
+} from './location-connected-parties-people-kind-slots'
 import {
   resolvePeopleKindSlotBinding,
   resolvePeopleKindSlotSelectableSubjectTypes,
-} from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
+} from './location-connected-parties-people-kind-slots'
 
 export type PeopleKindSlotDownstreamState = {
   subjectTypeOverride: PeopleConnectionSubjectType | null

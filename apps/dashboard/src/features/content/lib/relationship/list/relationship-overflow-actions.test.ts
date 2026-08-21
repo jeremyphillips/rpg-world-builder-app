@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { buildRelationshipOverflowActions } from './resolve-relationship-overflow-actions'
+import { buildRelationshipOverflowActions } from './relationship-overflow-actions'
 
 describe('buildRelationshipOverflowActions', () => {
   it('shows view and remove when supported regardless of availability semantics', () => {

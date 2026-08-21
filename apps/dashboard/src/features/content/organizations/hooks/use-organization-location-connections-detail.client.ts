@@ -21,8 +21,8 @@ import {
   resolveVisibleOrganizationConnectionFamilies,
   type OrganizationConnectionDrawerIntent,
 } from '../../lib/relationship/location-connection/location-connection-drawer-intent'
-import { resolveRelationshipAlternatives } from '../../lib/relationship/list/relationship-alternatives'
-import type { OrganizationForwardDrawerMode } from '../../lib/relationship/list/relationship-mutation-mode'
+import { resolveRelationshipAlternatives } from '../../lib/relationship/location-connection/location-connection-alternatives'
+import type { OrganizationForwardDrawerMode } from '../../lib/relationship/location-connection/location-connection-mutation-mode'
 import { useCampaignOrganizationLocationConnectionEdges } from './use-campaign-organization-location-connection-edges'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
 import { useOrganizationLocationReferences } from './use-organization-location-references'

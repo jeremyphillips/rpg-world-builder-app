@@ -16,8 +16,8 @@ import {
   buildSubjectLocationConnectionKeySet,
   isOrganizationLocationConnectionKindBlockedForLocation,
   subjectLocationConnectionKey,
-} from '../location-connection/location-connection-duplicate-keys'
-import { toLocationConnectionEligibilityInput } from '../location-connection/location-connection-eligibility-input'
+} from './location-connection-duplicate-keys'
+import { toLocationConnectionEligibilityInput } from './location-connection-eligibility-input'
 import {
   filterLocationsForOrganizationKind,
   organizationDrawerIntentFromKind,
@@ -25,39 +25,27 @@ import {
   resolveEdgesAtLocation,
   resolveKindsForOrganizationDrawerIntent,
   resolveOrganizationKindsForDrawerIntent,
-} from '../location-connection/location-connection-drawer-intent'
+} from './location-connection-drawer-intent'
 import {
   buildCharacterInverseLocationConnectionKindOptions,
   buildOrganizationInverseLocationConnectionKindOptions,
   type LocationConnectionKindOption,
-} from '../location-connection/location-connection-kind-options'
+} from './location-connection-kind-options'
 import {
   availabilityFromStructuralCount,
   resolveCatalogMutationAvailability,
   resolveRelationshipCandidateSet,
   type RelationshipCandidateSet,
-} from './relationship-candidate-set'
-
-export type { RelationshipCandidateSet } from './relationship-candidate-set'
-
-export type AvailabilityState = 'available' | 'unavailable' | 'unknown'
-
-export type RelationshipOperationState = {
-  /** Mutation category applies on this surface (authz + endpoint mutability). */
-  supported: boolean
-  /** Whether >= 1 valid alternative exists. `unknown` while prerequisite data is loading. */
-  availability: AvailabilityState
-  /** Transient authoritative data still loading. Only meaningful when availability === 'unknown'. */
-  isResolving?: boolean
-}
-
-export type RelationshipMutationCapabilities = {
-  view?: RelationshipOperationState
-  changeKind?: RelationshipOperationState
-  changeTarget?: RelationshipOperationState
-  replaceSubject?: RelationshipOperationState
-  remove?: RelationshipOperationState
-}
+} from '../core/relationship-candidate-set'
+import type {
+  RelationshipMutationCapabilities,
+  RelationshipOperationState,
+} from '../core/relationship-mutation-capabilities'
+export type { RelationshipCandidateSet } from '../core/relationship-candidate-set'
+export type {
+  RelationshipMutationCapabilities,
+  RelationshipOperationState,
+} from '../core/relationship-mutation-capabilities'
 
 export type RelationshipAvailabilitySnapshot = {
   alternateKinds?: readonly OrganizationLocationConnectionKind[]

@@ -59,7 +59,7 @@ boundary). Classification — path updates only in reorgs; extractions deferred.
 | `locations/` connected parties                      | org API, `useOrganizations`                   | Legitimate public API                          |
 | `locations/` inverse drawers                        | display VM, member picker constant            | Presentation API / implementation leak (watch) |
 | `content/lib/forms/organization-form-projection.ts` | practice ranking, member chip-options         | Inverted dependency (watch)                    |
-| `content/lib/relationship/picker/`                  | create modal, browse scope, API/query keys    | Shared cross-content (watch)                   |
+| `content/lib/relationship/nested-create/`           | create modal, browse scope, API/query keys    | Shared cross-content (watch)                   |
 
 ## Related docs
 

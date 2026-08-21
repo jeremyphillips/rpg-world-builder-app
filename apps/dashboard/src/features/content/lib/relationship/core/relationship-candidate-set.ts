@@ -1,4 +1,4 @@
-import type { RelationshipOperationState } from './relationship-alternatives'
+import type { RelationshipOperationState } from '../core/relationship-mutation-capabilities'
 
 export type RelationshipCandidateSet<T> = {
   readonly items: readonly T[]

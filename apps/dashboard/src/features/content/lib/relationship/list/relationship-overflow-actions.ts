@@ -2,7 +2,7 @@ import type { DetailOverflowAction } from '../../detail/row/detail-overflow-menu
 import type {
   RelationshipMutationCapabilities,
   RelationshipOperationState,
-} from './relationship-alternatives'
+} from '../core/relationship-mutation-capabilities'
 
 export type RelationshipOverflowActionId =
   | 'view'
@@ -38,11 +38,11 @@ function pushAlternativeMutationAction(
   input: {
     id: RelationshipOverflowActionId
     operation?: RelationshipOperationState
-    label: string
+    label?: string
     onSelect?: () => void
   },
 ): void {
-  if (!isAlternativeMutationVisible(input.operation) || !input.onSelect) {
+  if (!input.label || !isAlternativeMutationVisible(input.operation) || !input.onSelect) {
     return
   }
 
@@ -76,14 +76,14 @@ export function buildRelationshipOverflowActions(input: {
   pushAlternativeMutationAction(actions, {
     id: 'changeKind',
     operation: input.capabilities.changeKind,
-    label: input.labels.changeKind ?? 'Change connection type',
+    label: input.labels.changeKind,
     onSelect: input.handlers.changeKind,
   })
 
   pushAlternativeMutationAction(actions, {
     id: 'changeTarget',
     operation: input.capabilities.changeTarget,
-    label: input.labels.changeTarget ?? 'Change location',
+    label: input.labels.changeTarget,
     onSelect: input.handlers.changeTarget,
   })
 

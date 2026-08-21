@@ -10,7 +10,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import type { RelationshipCandidateSet } from '../../../lib/relationship/list/relationship-alternatives'
+import type { RelationshipCandidateSet } from '../../../lib/relationship/location-connection/location-connection-alternatives'
 
 import { LocationConnectedPartiesSectionHeader } from './location-connected-parties-section-header.client'
 import { LocationConnectedPartiesSectionBody } from './location-connected-parties-section-body.client'

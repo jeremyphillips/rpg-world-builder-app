@@ -24,7 +24,7 @@ import {
   ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE,
   ORGANIZATION_LOCATION_LINK_NO_RESULTS,
 } from './organization-location-connection-link-drawer.client'
-import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../../lib/relationship/list/relationship-alternatives'
+import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../../lib/relationship/location-connection/location-connection-alternatives'
 import { ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.lib'
 import { buildLocationsById } from '../../../locations/lib/location-display'
 

@@ -28,9 +28,9 @@ const NESTED_CREATE_DRAWER_FILES = [
 ] as const
 
 const NESTED_CREATE_RESOLVER_IMPORT =
-  "from '../../../lib/relationship/picker/relationship-picker-create-intents.lib'"
+  "from '../../../lib/relationship/nested-create/relationship-picker-create-intents.lib'"
 const NESTED_CREATE_ORG_RESOLVER_IMPORT =
-  "from '../../../lib/relationship/picker/relationship-picker-nested-create.lib'"
+  "from '../../../lib/relationship/nested-create/relationship-picker-nested-create.lib'"
 const NESTED_CREATE_CHARACTER_RESOLVER_IMPORT = 'resolveRelationshipPickerCharacterCreateIntents'
 
 describe('sequenced relationship drawer drift', () => {

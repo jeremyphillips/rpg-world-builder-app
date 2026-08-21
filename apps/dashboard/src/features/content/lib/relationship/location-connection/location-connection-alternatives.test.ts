@@ -14,12 +14,12 @@ import {
   hasResolvedRelationshipMutationAlternative,
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
-} from './relationship-alternatives'
+} from './location-connection-alternatives'
 import {
   buildRelationshipOverflowActions,
   isRelationshipMutationOverflowActionId,
   type RelationshipOverflowActionId,
-} from './resolve-relationship-overflow-actions'
+} from '../list/relationship-overflow-actions'
 
 function authoritativeLocations(items: readonly Location[]) {
   return { items, isAuthoritativeDomainSet: true as const }

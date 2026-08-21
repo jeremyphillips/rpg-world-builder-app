@@ -21,7 +21,7 @@ import {
   canReopenConnectionKindDecision,
   ORGANIZATION_LOCATION_CONNECTION_STALE_CURRENT_KIND_REASON,
 } from './location-connection-kind-options'
-import { resolveRelationshipAlternatives } from '../list/relationship-alternatives'
+import { resolveRelationshipAlternatives } from './location-connection-alternatives'
 
 function headquartersRow(organizationId = 'org-1'): LocationConnectedPartyRow {
   return {

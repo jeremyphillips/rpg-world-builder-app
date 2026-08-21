@@ -3,7 +3,7 @@
 import type { RadioCardOption } from '@rpg/ui'
 import { Heading, RadioCardField, Text } from '@rpg/ui'
 
-import type { LocationConnectionKindOption } from '../lib/relationship/location-connection/location-connection-kind-options'
+import type { LocationConnectionKindOption } from './location-connection-kind-options'
 
 export type LocationConnectionKindFieldProps = {
   id: string

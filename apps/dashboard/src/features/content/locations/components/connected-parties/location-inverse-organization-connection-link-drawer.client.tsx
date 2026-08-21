@@ -14,7 +14,7 @@ import {
 } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
-import { LocationConnectionKindField } from '../../../components/location-connection-kind-field.client'
+import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -43,8 +43,8 @@ import {
 import {
   revalidateCreatedOrganizationForInverseDrawer,
   resolveRelationshipPickerOrganizationCreateIntents,
-} from '../../../lib/relationship/picker/relationship-picker-nested-create.lib'
-import { useRelationshipPickerNestedCreate } from '../../../lib/relationship/picker/use-relationship-picker-nested-create.client'
+} from '../../../lib/relationship/nested-create/relationship-picker-nested-create.lib'
+import { useRelationshipPickerNestedCreate } from '../../../lib/relationship/nested-create/use-relationship-picker-nested-create.client'
 import {
   buildOrganizationInverseLocationConnections,
   buildOrganizationLocationConnectionEdgesAtLocation,
@@ -69,7 +69,7 @@ import { buildOrganizationDrawerEntityPresentation } from '../../../organization
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose an organization to see available connection types.'
 
-import type { OrganizationInverseDrawerMode } from '../../../lib/relationship/list/relationship-mutation-mode'
+import type { OrganizationInverseDrawerMode } from '../../../lib/relationship/location-connection/location-connection-mutation-mode'
 export type LocationInverseOrganizationConnectionLinkDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void

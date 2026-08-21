@@ -49,7 +49,7 @@ import { peopleSectionHasAvailableTarget } from '../../lib/relationship/location
 import type { LocationConnectedPartyEditTarget } from '../components/connected-parties/location-connected-parties-section.client'
 import { buildPeopleKindSlots } from '../components/connected-parties/location-connected-parties-section.client'
 import { buildLocationConnectedPartyCharactersById } from '../lib/connected-parties/location-connected-party-character-options.lib'
-import { resolveLocationInverseCurrentOrganizationEndpoint } from '../../lib/relationship/drawer/resolve-relationship-drawer-current-endpoint'
+import { resolveLocationInverseCurrentOrganizationEndpoint } from '../../lib/relationship/location-connection/location-inverse-current-organization-endpoint'
 import { useLocationConnectedParties } from './use-location-connected-parties'
 
 export const LOCATION_CONNECTED_PARTIES_MUTATION_ERROR =

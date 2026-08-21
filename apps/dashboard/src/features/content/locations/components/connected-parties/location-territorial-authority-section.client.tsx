@@ -16,11 +16,11 @@ import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
   type RelationshipCandidateSet,
-} from '../../../lib/relationship/list/relationship-alternatives'
+} from '../../../lib/relationship/location-connection/location-connection-alternatives'
 import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
-} from '../../../lib/relationship/list/resolve-relationship-overflow-actions'
+} from '../../../lib/relationship/list/relationship-overflow-actions'
 import {
   TERRITORIAL_AUTHORITY_OVERFLOW,
   TERRITORIAL_AUTHORITY_SECTION_HEADING,

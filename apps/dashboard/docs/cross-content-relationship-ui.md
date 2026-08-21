@@ -263,9 +263,9 @@ Both actions remain in the subgroup header for empty and populated states. Direc
 | Populated edge summary + overflow | `CrossContentRelationshipRow` (composes `DetailEntityRow` + `DetailOverflowMenu`)                                          |
 | Overflow actions                  | `DetailOverflowMenu` from `content/lib/detail/row/` (feature supplies `{ id, label, destructive? }`; compact icon trigger) |
 
-Relationship rows build overflow action arrays via **`buildRelationshipOverflowActions`** in [`resolve-relationship-overflow-actions.ts`](../src/features/content/lib/relationship/list/resolve-relationship-overflow-actions.ts), which returns `DetailOverflowAction[]`. Alternatives derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/list/relationship-alternatives.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
+Relationship rows build overflow action arrays via **`buildRelationshipOverflowActions`** in [`resolve-relationship-overflow-actions.ts`](../src/features/content/lib/relationship/list/relationship-overflow-actions.ts), which returns `DetailOverflowAction[]`. Alternatives derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/location-connection/location-connection-alternatives.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
 
-Client-side mutation availability may conclude that no alternative exists only when the candidate set is an authoritative domain set (`isAuthoritativeDomainSet: true` on [`RelationshipCandidateSet`](../src/features/content/lib/relationship/list/relationship-candidate-set.ts)). Partial or paginated data produces `unknown`, never an authoritative `unavailable`.
+Client-side mutation availability may conclude that no alternative exists only when the candidate set is an authoritative domain set (`isAuthoritativeDomainSet: true` on [`RelationshipCandidateSet`](../src/features/content/lib/relationship/core/relationship-candidate-set.ts)). Partial or paginated data produces `unknown`, never an authoritative `unavailable`.
 
 Mutation capability must not depend on the current search/page/render subset.
 
@@ -276,7 +276,7 @@ Mutation capability must not depend on the current search/page/render subset.
 
 Structural impossibility (e.g. single-kind families with no registry alternates) resolves to `unavailable` directly and bypasses candidate-set completeness logic.
 
-[`hasResolvedRelationshipMutationAlternative`](../src/features/content/lib/relationship/list/relationship-alternatives.ts) means materialized alternatives exist — not "user may invoke." [`isRelationshipMutationActionVisible`](../src/features/content/lib/relationship/list/relationship-alternatives.ts) governs invocation. Drawers consume the same resolver output and reuse the same candidate set — do not recompute eligibility independently.
+[`hasResolvedRelationshipMutationAlternative`](../src/features/content/lib/relationship/location-connection/location-connection-alternatives.ts) means materialized alternatives exist — not "user may invoke." [`isRelationshipMutationActionVisible`](../src/features/content/lib/relationship/location-connection/location-connection-alternatives.ts) governs invocation. Drawers consume the same resolver output and reuse the same candidate set — do not recompute eligibility independently.
 
 | Kind-group shell (header + kind rows) | `DetailSectionPanel` + `RelationshipList.Root` + `RelationshipList.Group` |
 | Multi-subject kind add (org + character) | Family-level add → `LocationInversePeopleConnectionLinkDrawer` with kind step, then subject-type segment when ambiguous |
@@ -347,7 +347,7 @@ the create modal open — the entity already exists, so callers must not retry p
 Footer submit is the only relationship persist boundary — nested create must not POST the relationship.
 
 **Typed handoff results** (`NestedCreateHandoffResult` in
-[`relationship-picker-nested-create.types.ts`](../src/features/content/lib/relationship/picker/relationship-picker-nested-create.types.ts)):
+[`relationship-picker-nested-create.types.ts`](../src/features/content/lib/relationship/nested-create/relationship-picker-nested-create.types.ts)):
 
 | Status        | User-visible outcome                                                            |
 | ------------- | ------------------------------------------------------------------------------- |
@@ -431,7 +431,7 @@ Replacement UI must explicitly represent the persisted value independently of th
 
 Do not make users infer the persisted value from an absent candidate, drawer title, or surrounding page context.
 
-Current-value display is resolved from persisted/hydrated relationship data at drawer open time ([`resolve-relationship-drawer-current-endpoint.ts`](../src/features/content/lib/relationship/drawer/resolve-relationship-drawer-current-endpoint.ts)). Candidate collections used for replacement pickers are not authoritative for current display. When the persisted endpoint cannot be resolved, surface an explicit unavailable state and block the replacement mutation — do not silently omit the Current field.
+Current-value display is resolved from persisted/hydrated relationship data at drawer open time ([`resolve-relationship-drawer-current-endpoint.ts`](../src/features/content/lib/relationship/location-connection/location-inverse-current-organization-endpoint.ts)). Candidate collections used for replacement pickers are not authoritative for current display. When the persisted endpoint cannot be resolved, surface an explicit unavailable state and block the replacement mutation — do not silently omit the Current field.
 
 Rules:
 

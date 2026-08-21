@@ -13,11 +13,11 @@ import { RelationshipList } from '../../../lib/relationship/list/relationship-li
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
-} from '../../../lib/relationship/list/relationship-alternatives'
+} from '../../../lib/relationship/location-connection/location-connection-alternatives'
 import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
-} from '../../../lib/relationship/list/resolve-relationship-overflow-actions'
+} from '../../../lib/relationship/list/relationship-overflow-actions'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
 import { LOCATION_INVERSE_PEOPLE_OVERFLOW } from '../../lib/connected-parties/location-connection-surface-copy'
 import type { PeopleKindSlot } from '../../lib/connected-parties/location-connected-parties-people-kind-slots'

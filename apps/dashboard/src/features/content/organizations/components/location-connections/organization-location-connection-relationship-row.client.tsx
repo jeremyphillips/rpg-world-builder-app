@@ -14,11 +14,11 @@ import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
   type RelationshipCandidateSet,
-} from '../../../lib/relationship/list/relationship-alternatives'
+} from '../../../lib/relationship/location-connection/location-connection-alternatives'
 import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
-} from '../../../lib/relationship/list/resolve-relationship-overflow-actions'
+} from '../../../lib/relationship/list/relationship-overflow-actions'
 import { buildLocationEntityContextPresentation } from '../../../locations/lib/location-display'
 import type { OrganizationLocationConnectionPreviewItem } from '../../lib/organization-display'
 import { resolveOrganizationForwardOverflowLabels } from '../../lib/location-connections/organization-location-connection-surface-copy'

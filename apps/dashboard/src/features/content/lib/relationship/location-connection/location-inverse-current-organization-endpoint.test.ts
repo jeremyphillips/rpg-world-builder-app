@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveLocationInverseCurrentOrganizationEndpoint } from './resolve-relationship-drawer-current-endpoint'
+import { resolveLocationInverseCurrentOrganizationEndpoint } from './location-inverse-current-organization-endpoint'
 import { ENTITY_UNAVAILABLE_ORGANIZATION_HEADING } from '../../entity/summary/entity-unavailable-headings.lib'
 
 describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {

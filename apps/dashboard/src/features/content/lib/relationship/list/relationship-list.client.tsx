@@ -8,7 +8,7 @@ import { Button, Eyebrow, Text, cn } from '@rpg/ui'
 import { detailSectionGroupHeaderVariants } from '../../detail/section/detail-section-group.variants'
 import { detailRowListSeparatorVariants } from '../../detail/section/detail-row-list.variants'
 import type { DetailOverflowAction } from '../../detail/row/detail-overflow-menu.client'
-import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
+import { CrossContentRelationshipRow } from './row/cross-content-relationship-row.client'
 import type { EntitySummaryStatusItem } from '../../entity/summary/entity-summary-status.types'
 import {
   relationshipListEmptyVariants,

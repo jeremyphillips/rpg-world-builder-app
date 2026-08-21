@@ -14,6 +14,6 @@ Shared dashboard create-flow infrastructure.
 
 Domain forms, relationship vocabulary, and picker eligibility remain feature-owned.
 Setup sequencing lives in `@/lib/create-setup`.
-Nested acquisition orchestration lives in `features/content/lib/relationship/picker/`.
+Nested acquisition orchestration lives in `features/content/lib/relationship/nested-create/`.
 
 Detail: [create-flow.md](../../../docs/create-flow.md)
