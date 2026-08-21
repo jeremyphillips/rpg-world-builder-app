@@ -12,8 +12,11 @@ import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
 import { EntityAnatomyHost } from '@/features/content'
 
-import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
-import { searchResultRowVariants, type SearchResultRowDensity } from './search-result-row.variants'
+import type { GlobalSearchSurfaceContext } from '../../lib/global-search-surface.variants'
+import {
+  searchResultRowVariants,
+  type SearchResultRowDensity,
+} from './global-search-result-row.variants'
 
 export type { SearchResultRowDensity }
 

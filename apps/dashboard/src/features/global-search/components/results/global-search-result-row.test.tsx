@@ -6,8 +6,8 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { renderWithProviders } from '@/test/render'
 
-import { globalSearchGroupContentInsetClasses } from '../lib/global-search-group.variants'
-import { SearchResultRow } from './search-result-row.client'
+import { globalSearchGroupContentInsetClasses } from '../../lib/global-search-group.variants'
+import { SearchResultRow } from './global-search-result-row.client'
 
 function rowShell(link: HTMLElement): HTMLElement {
   return link.parentElement!

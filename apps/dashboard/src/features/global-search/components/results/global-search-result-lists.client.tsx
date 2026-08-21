@@ -2,14 +2,14 @@
 
 import type { GlobalSearchDocument } from '@rpg/contracts'
 
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
-import type { GlobalSearchSurfaceContext } from '../lib/global-search-group.variants'
-import { globalSearchResultListClasses } from '../lib/global-search-group.variants'
-import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
-import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
+import type { GlobalSearchSurfaceContext } from '../../lib/global-search-group.variants'
+import { globalSearchResultListClasses } from '../../lib/global-search-group.variants'
+import { isGlobalSearchCampaignUnavailable } from '../../lib/global-search-result-presentation'
+import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
 import { GlobalSearchGroupSection } from './global-search-group-section.client'
-import { SearchResultRow } from './search-result-row.client'
+import { SearchResultRow } from './global-search-result-row.client'
 
 export type GlobalSearchGroupedResultsProps = {
   sections: readonly GlobalSearchGroupSectionModel[]

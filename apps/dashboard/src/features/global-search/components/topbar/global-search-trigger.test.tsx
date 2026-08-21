@@ -6,7 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { renderWithProviders } from '@/test/render'
 
 import { GlobalSearchTrigger } from './global-search-trigger.client'
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 
 describe('GlobalSearchTrigger', () => {
   it('opens search when clicked', async () => {

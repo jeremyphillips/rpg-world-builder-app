@@ -4,13 +4,13 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
-import { globalSearchGroupContentInsetClasses } from '../lib/global-search-group.variants'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
+import { globalSearchGroupContentInsetClasses } from '../../lib/global-search-group.variants'
 import {
   resolveGlobalSearchHeadingSurfaceClasses,
   resolveGlobalSearchRowHoverSurfaceClasses,
-} from '../lib/global-search-surface.variants'
-import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
+} from '../../lib/global-search-surface.variants'
+import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
 import { GlobalSearchGroupSection } from './global-search-group-section.client'
 
 function rowShell(link: HTMLElement): HTMLElement {

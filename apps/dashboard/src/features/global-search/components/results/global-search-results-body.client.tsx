@@ -9,11 +9,14 @@ import {
   type SegmentedControlOption,
 } from '@rpg/ui'
 
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
-import { globalSearchPageResultsShellClasses } from '../lib/global-search-surface.variants'
-import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
+import { globalSearchPageResultsShellClasses } from '../../lib/global-search-surface.variants'
+import type { GlobalSearchGroupSection } from '../../lib/rank-global-search'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
-import { GlobalSearchFlatResults, GlobalSearchGroupedResults } from './global-search-results.client'
+import {
+  GlobalSearchFlatResults,
+  GlobalSearchGroupedResults,
+} from './global-search-result-lists.client'
 
 function deriveActiveResultCount(
   group: GlobalSearchUrlGroup,

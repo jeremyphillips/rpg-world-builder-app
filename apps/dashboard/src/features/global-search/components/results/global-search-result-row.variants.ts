@@ -2,9 +2,9 @@ import { cva } from 'class-variance-authority'
 
 import { cn, interactiveRowVariants } from '@rpg/ui'
 
-import { globalSearchGroupContentInsetClasses } from '../lib/global-search-group.variants'
-import { resolveGlobalSearchRowHoverSurfaceClasses } from '../lib/global-search-surface.variants'
-import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
+import { globalSearchGroupContentInsetClasses } from '../../lib/global-search-group.variants'
+import { resolveGlobalSearchRowHoverSurfaceClasses } from '../../lib/global-search-surface.variants'
+import type { GlobalSearchSurfaceContext } from '../../lib/global-search-surface.variants'
 
 export type SearchResultRowDensity = 'compact' | 'default'
 

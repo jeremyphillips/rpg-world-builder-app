@@ -7,13 +7,13 @@ import type { GlobalSearchDocument, GlobalSearchFilterGroup } from '@rpg/contrac
 
 import { ROUTES } from '@/app/routes'
 
-import { useGlobalSearchTopbar } from '../hooks/use-global-search-topbar'
-import { useDismissOnOutsideInteraction } from '../hooks/use-dismiss-on-outside-interaction'
-import { resolveGlobalSearchHref } from '../lib/resolve-global-search-href'
-import { GlobalSearchField } from './global-search-field.client'
+import { useGlobalSearchTopbar } from '../../hooks/use-global-search-topbar'
+import { useDismissOnOutsideInteraction } from '../../hooks/use-dismiss-on-outside-interaction'
+import { resolveGlobalSearchHref } from '../../lib/resolve-global-search-href'
+import { GlobalSearchField } from '../global-search-field.client'
 import { GlobalSearchPreviewPanel } from './global-search-preview-panel.client'
 import { GlobalSearchTrigger } from './global-search-trigger.client'
-import { useGlobalSearchContext } from './global-search-provider.client'
+import { useGlobalSearchContext } from '../global-search-provider.client'
 import {
   globalSearchTopbarInputWrapClasses,
   globalSearchTopbarPreviewClasses,

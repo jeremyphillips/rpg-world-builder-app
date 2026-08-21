@@ -5,16 +5,16 @@ import { Link } from 'react-router-dom'
 import type { GlobalSearchDocument } from '@rpg/contracts'
 import { cn } from '@rpg/ui'
 
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 import {
   globalSearchPreviewBodyClasses,
   globalSearchPreviewFooterClasses,
   globalSearchPreviewFooterLinkVariants,
   globalSearchPreviewInsetClasses,
-} from '../lib/global-search-preview.variants'
-import type { GlobalSearchGroupSection } from '../lib/rank-global-search'
-import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt.client'
-import { GlobalSearchGroupedResults } from './global-search-results.client'
+} from '../../lib/global-search-preview.variants'
+import type { GlobalSearchGroupSection } from '../../lib/rank-global-search'
+import { GlobalSearchEmptyPrompt } from '../results/global-search-empty-prompt.client'
+import { GlobalSearchGroupedResults } from '../results/global-search-result-lists.client'
 
 type GlobalSearchPreviewStatusProps = {
   isPending: boolean

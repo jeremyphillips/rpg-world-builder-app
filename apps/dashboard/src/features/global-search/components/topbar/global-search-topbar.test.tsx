@@ -5,9 +5,9 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
-import { GlobalSearchProvider } from './global-search-provider.client'
+import { GlobalSearchProvider } from '../global-search-provider.client'
 import { GlobalSearchTopbar } from './global-search-topbar.client'
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 
 import type * as ReactRouterDom from 'react-router-dom'
 import type * as CampaignFeature from '@/features/campaign'

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { SearchResultRow } from './search-result-row.client'
+import { SearchResultRow } from './global-search-result-row.client'
 
 const meta = {
   title: 'GlobalSearch/SearchResultRow',

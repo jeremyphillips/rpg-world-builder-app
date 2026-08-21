@@ -5,11 +5,11 @@ import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
 import { Eyebrow, cn } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 import {
   deriveGlobalSearchPreviewGroupFollows,
   deriveGlobalSearchPreviewGroupState,
-} from '../lib/global-search-preview-group'
+} from '../../lib/global-search-preview-group'
 import {
   globalSearchGroupContentInsetClasses,
   globalSearchGroupHeadingCountClasses,
@@ -18,10 +18,10 @@ import {
   globalSearchGroupShowAllLinkVariants,
   globalSearchResultListClasses,
   type GlobalSearchSurfaceContext,
-} from '../lib/global-search-group.variants'
-import { isGlobalSearchCampaignUnavailable } from '../lib/global-search-result-presentation'
-import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../lib/rank-global-search'
-import { SearchResultRow, type SearchResultRowDensity } from './search-result-row.client'
+} from '../../lib/global-search-group.variants'
+import { isGlobalSearchCampaignUnavailable } from '../../lib/global-search-result-presentation'
+import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
+import { SearchResultRow, type SearchResultRowDensity } from './global-search-result-row.client'
 
 export type GlobalSearchGroupSectionProps = {
   section: GlobalSearchGroupSectionModel

@@ -5,7 +5,7 @@ import { Search } from 'lucide-react'
 
 import { Button, cn } from '@rpg/ui'
 
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 
 export type GlobalSearchTriggerProps = {
   disabled?: boolean

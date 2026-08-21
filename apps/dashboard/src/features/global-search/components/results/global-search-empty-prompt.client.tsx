@@ -2,7 +2,7 @@
 
 import { Heading, Text, cn } from '@rpg/ui'
 
-import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
+import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 
 export type GlobalSearchEmptyPromptProps = {
   title?: string
