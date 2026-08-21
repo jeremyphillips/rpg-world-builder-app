@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { SpeciesCultureNamingAlert } from './species-culture-naming-alert.client'
+import { SpeciesCultureNamingAlert } from './species-culture-naming-alert'
 
 describe('SpeciesCultureNamingAlert', () => {
   it('renders the homebrew naming warning', () => {

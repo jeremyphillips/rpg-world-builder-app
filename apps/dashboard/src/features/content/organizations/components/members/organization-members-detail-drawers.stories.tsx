@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import type { useOrganizationMembersDetail } from '../../hooks/use-organization-members-detail.client'
+import type { useOrganizationMembersDetail } from '../../hooks/use-organization-members-detail'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../../lib/organization-display'
 import { ORGANIZATION_MEMBER_PICKER_CANDIDATES } from './organization-member-picker-drawer.fixtures'
-import { OrganizationMembersDetailDrawers } from './organization-members-detail-drawers.client'
+import { OrganizationMembersDetailDrawers } from './organization-members-detail-drawers'
 
 const organization = {
   id: 'organization-lantern-guild',

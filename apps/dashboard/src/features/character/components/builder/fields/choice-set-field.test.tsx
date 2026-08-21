@@ -6,7 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { ORIGIN_LANGUAGES_CHOICE_ID, type ChoiceSet } from '@rpg/contracts'
 
 import { CHOICE_SET_COMBOBOX_OPTION_THRESHOLD } from '../../../lib/choice-sets/choice-set-field.lib'
-import { ChoiceSetField } from './choice-set-field.client'
+import { ChoiceSetField } from './choice-set-field'
 
 const originLanguagesChoiceSet = {
   id: `ruleset:srd-cc-5.2.1:${ORIGIN_LANGUAGES_CHOICE_ID}`,

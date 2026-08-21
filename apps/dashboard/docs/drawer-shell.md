@@ -58,7 +58,7 @@ case and a shared token or DrawerShell variant — not local Tailwind overrides.
 - **`composed`** — children render directly under `Sheet.Content` (no auto Body).
   Use with `<Form contentWrapper externalFooter>` and overlay-owned
   `<DrawerShell.Footer><FormShellFooterSlot /></DrawerShell.Footer>` (see
-  [`ContentFormDrawer`](../src/features/content/lib/forms/shells/host/content-form-drawer.client.tsx)).
+  [`ContentFormDrawer`](../src/features/content/lib/forms/shells/host/content-form-drawer.tsx)).
   Form re-applies horizontal inset from `dialogPanelSectionInsetXClasses`.
 
 ## Surface, width, and footer SSOT

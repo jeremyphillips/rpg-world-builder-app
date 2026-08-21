@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { buildLocationDetailViewModel } from '../../lib/location-display'
 import { ALDERMERE, HARBORFORD, LOCATIONS_LIST } from '../../fixtures'
-import { LocationDetailIdentity } from './location-detail-identity.client'
+import { LocationDetailIdentity } from './location-detail-identity'
 
 const CAMPAIGN_ID = 'camp_story'
 

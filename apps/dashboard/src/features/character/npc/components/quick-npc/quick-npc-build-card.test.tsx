@@ -31,7 +31,7 @@ import {
   quickNpcOrganizationMemberCreateContext,
   quickNpcTestOrganization,
 } from '../../lib/quick-npc/quick-npc-test-fixtures'
-import { QuickNpcBuildCard } from './quick-npc-build-card.client'
+import { QuickNpcBuildCard } from './quick-npc-build-card'
 
 const createContext = quickNpcOrganizationMemberCreateContext(quickNpcTestOrganization)
 

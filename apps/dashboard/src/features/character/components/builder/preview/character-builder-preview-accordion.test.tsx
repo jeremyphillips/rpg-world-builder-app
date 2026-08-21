@@ -18,7 +18,7 @@ import {
   spellsStepWizardCantrips,
   spellsStepWizardClass,
 } from '../../../lib/spells/spells-step.fixtures'
-import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion.client'
+import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 

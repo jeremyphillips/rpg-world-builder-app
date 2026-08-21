@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import type { ArrayItemShellRenderProps } from '@rpg/ui/form'
 
-import { EntityDisclosureArrayItemShell } from '../../entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell.client'
+import { EntityDisclosureArrayItemShell } from '../../entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 
 /** DEC shell for entity-backed grant array rows — form-owned ≠ form-styled. */

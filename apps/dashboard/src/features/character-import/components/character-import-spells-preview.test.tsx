@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-import { CharacterImportSpellsPreviewSection } from './character-import-spells-preview.client'
+import { CharacterImportSpellsPreviewSection } from './character-import-spells-preview'
 
 describe('CharacterImportSpellsPreviewSection', () => {
   it('groups supported spells above unsupported entries', () => {

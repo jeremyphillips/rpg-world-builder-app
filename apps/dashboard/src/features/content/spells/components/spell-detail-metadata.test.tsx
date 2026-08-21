@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { pickSpell } from '../../lib/fixtures/pick'
 import { buildSpellDetailViewModel } from '../lib/spell-display'
-import { SpellDetailMetadata } from './spell-detail-metadata.client'
+import { SpellDetailMetadata } from './spell-detail-metadata'
 
 const cureWounds = buildSpellDetailViewModel(pickSpell('cure-wounds'))
 

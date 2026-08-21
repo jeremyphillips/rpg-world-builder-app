@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-import { NpcAuthoringGate } from './npc-authoring-gate.client'
+import { NpcAuthoringGate } from './npc-authoring-gate'
 
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(),

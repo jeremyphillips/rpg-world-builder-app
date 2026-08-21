@@ -1,5 +1,3 @@
-'use client'
-
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type {
   ContentCampaignAccessPatch,
@@ -11,9 +9,12 @@ import { FormItems, resolveFormDensity, useFormSectionContext } from '@rpg/ui/fo
 
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 
-import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context.client'
-import { CampaignAccessSection } from '../../../campaign-access/campaign-access-section.client'
-import { useContentSaveSession, type CoordinatedSaveSavedEvent } from '../session/use-content-save-session'
+import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context'
+import { CampaignAccessSection } from '../../../campaign-access/campaign-access-section'
+import {
+  useContentSaveSession,
+  type CoordinatedSaveSavedEvent,
+} from '../session/use-content-save-session'
 import { ContentFormFooter } from './content-form-footer'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 

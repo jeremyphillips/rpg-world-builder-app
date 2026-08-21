@@ -10,7 +10,7 @@ import { ORGANIZATION_MEMBER_ROWS } from './organization-members-section.fixture
 import {
   OrganizationMembersSection,
   type OrganizationMembersSectionProps,
-} from './organization-members-section.client'
+} from './organization-members-section'
 
 function renderSection(props: Partial<OrganizationMembersSectionProps> = {}) {
   return render(

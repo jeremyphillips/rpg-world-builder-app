@@ -1,4 +1,4 @@
-import type { CampaignAccessSaveResult } from '../../../campaign-access/campaign-access-form-context.client'
+import type { CampaignAccessSaveResult } from '../../../campaign-access/campaign-access-form-context'
 
 export type SaveResult =
   | { status: 'saved' }

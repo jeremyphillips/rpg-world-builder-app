@@ -6,7 +6,7 @@ import {
   CAMPAIGN_OVERVIEW_SECTION_LABELS,
   formatInvitationStatusLine,
 } from '../../lib/overview/campaign-overview-labels'
-import { CampaignInviteRowActions } from './campaign-invite-row-actions.client'
+import { CampaignInviteRowActions } from './campaign-invite-row-actions'
 
 export type CampaignOverviewInvitationsSectionProps = {
   campaignId: string

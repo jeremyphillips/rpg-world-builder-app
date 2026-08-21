@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterImportNarrativePreviewSection } from './character-import-narrative-preview.client'
+import { CharacterImportNarrativePreviewSection } from './character-import-narrative-preview'
 
 const meta = {
   title: 'Dashboard/Character Import/Narrative Preview',

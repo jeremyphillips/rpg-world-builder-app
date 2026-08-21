@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { LOCATIONS_LIST, YAWNING_PORTAL } from '../../fixtures'
 import { buildLocationsById } from '../../lib/location-display'
-import { LocationInverseCharacterConnectionLinkDrawer } from './location-inverse-character-connection-link-drawer.client'
+import { LocationInverseCharacterConnectionLinkDrawer } from './location-inverse-character-connection-link-drawer'
 
 const locationsById = buildLocationsById(LOCATIONS_LIST)
 

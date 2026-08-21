@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import { RESOLUTION_FIELD_LABELS } from '../../lib/form/resolution-form-labels'
 import { createDefaultResolutionFormValues } from '../../lib/form/resolution-form-values'
-import { SpellResolutionSelectionModeSelect } from './spell-resolution-selection-mode-select.client'
+import { SpellResolutionSelectionModeSelect } from './spell-resolution-selection-mode-select'
 
 function SelectionModeHarness() {
   const form = useForm({

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { toPendingInvitePromotion } from '@/features/campaign'
 
-import { CampaignInvitationCard } from './campaign-invitation-card.client'
+import { CampaignInvitationCard } from './campaign-invitation-card'
 
 const invite = {
   inviteId: 'a'.repeat(24),

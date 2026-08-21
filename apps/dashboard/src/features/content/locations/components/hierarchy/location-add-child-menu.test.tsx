@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { LocationAddChildMenu } from './location-add-child-menu.client'
+import { LocationAddChildMenu } from './location-add-child-menu'
 
 describe('LocationAddChildMenu', () => {
   it('calls onSelectAuthoringType instead of navigating', async () => {

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { CITY_COUNCIL } from '@/features/content'
 
-import { CharacterOrganizationsSummary } from './character-organizations-summary.client'
+import { CharacterOrganizationsSummary } from './character-organizations-summary'
 
 const meta = {
   title: 'Character/CharacterOrganizationsSummary',

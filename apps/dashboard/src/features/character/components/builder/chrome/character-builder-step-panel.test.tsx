@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { CharacterBuilderStepPanel } from './character-builder-step-panel.client'
+import { CharacterBuilderStepPanel } from './character-builder-step-panel'
 
 describe('CharacterBuilderStepPanel', () => {
   it('describes deferred proficiency choices', () => {

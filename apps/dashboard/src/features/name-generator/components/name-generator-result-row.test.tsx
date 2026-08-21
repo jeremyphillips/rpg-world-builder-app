@@ -4,7 +4,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
 import type { GeneratedName } from '@rpg/contracts/name-generator'
 
-import { NameGeneratorResultRow } from './name-generator-result-row.client'
+import { NameGeneratorResultRow } from './name-generator-result-row'
 
 const FIXTURE_RESULT: GeneratedName = {
   value: 'Aelar Galanodel',

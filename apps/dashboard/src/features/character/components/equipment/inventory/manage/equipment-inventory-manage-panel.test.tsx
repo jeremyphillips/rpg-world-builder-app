@@ -21,7 +21,7 @@ import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-
 import {
   EquipmentInventoryManageDisclosureCard,
   createStorybookApplyMagicItemAcquisition,
-} from '../manage/equipment-inventory-manage-panel.client'
+} from '../manage/equipment-inventory-manage-panel'
 
 const rows: EquipmentInventoryRow[] = [
   {

@@ -1,5 +1,3 @@
-'use client'
-
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Form } from '@rpg/ui/form'
 
@@ -13,9 +11,9 @@ import {
   organizationCreateDefaultValues,
   organizationFormSchema,
 } from '../../../lib/forms/organization-form-projection'
-import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge.client'
-import { useOrganizationAuthoringContext } from './organization-authoring-context.client'
-import { OrganizationAuthoringFormShell } from './organization-authoring-form-shell.client'
+import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge'
+import { useOrganizationAuthoringContext } from './organization-authoring-context'
+import { OrganizationAuthoringFormShell } from './organization-authoring-form-shell'
 
 function OrganizationAuthoringFormBody({ ctx }: { ctx: ContentFormCtx }) {
   const { practiceRecommendations } = useOrganizationAuthoringContext()

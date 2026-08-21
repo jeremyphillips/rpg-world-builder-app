@@ -9,7 +9,7 @@ import {
   cityCouncil,
   lanternGuild,
 } from '../../../connections/picker/organization-picker-drawer.fixtures'
-import { ConnectionsStep } from './connections-step.client'
+import { ConnectionsStep } from './connections-step'
 
 const context = createStandaloneBuilderContextFixture({
   catalog: {

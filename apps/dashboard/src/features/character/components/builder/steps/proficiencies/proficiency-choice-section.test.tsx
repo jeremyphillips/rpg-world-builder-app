@@ -7,7 +7,7 @@ import {
   createProficienciesStepRogueFixture,
   proficienciesStepStealthSkill,
 } from '../../../../lib/proficiencies/proficiencies-step.fixtures'
-import { ProficiencyChoiceSection } from './proficiency-choice-section.client'
+import { ProficiencyChoiceSection } from './proficiency-choice-section'
 
 describe('ProficiencyChoiceSection', () => {
   it('renders the selection counter and add trigger', () => {

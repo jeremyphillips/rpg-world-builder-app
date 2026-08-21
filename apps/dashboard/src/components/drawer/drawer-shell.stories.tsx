@@ -10,7 +10,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
-import { DrawerShell } from './drawer-shell.client'
+import { DrawerShell } from './drawer-shell'
 import { drawerShellBodyVariants } from './drawer-shell.variants'
 
 const meta = {

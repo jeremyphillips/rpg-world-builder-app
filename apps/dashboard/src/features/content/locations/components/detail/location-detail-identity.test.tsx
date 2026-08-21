@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { ALDERMERE, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../../fixtures'
 import { buildLocationDetailViewModel } from '../../lib/location-display'
 import { LOCATION_UNCONTAINED_LABEL } from '../../lib/hierarchy/location-parent-replacement-surface-copy'
-import { LocationDetailIdentity } from './location-detail-identity.client'
+import { LocationDetailIdentity } from './location-detail-identity'
 
 const CAMPAIGN_ID = 'camp_1'
 

@@ -83,14 +83,14 @@ via intentional `kind: 'slot'` in `lib/forms/location-form-fields.ts` per
 
 ## Key files
 
-| Area                    | Path                                                                                                          |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| Form def                | `lib/forms/location-form-def.ts`                                                                              |
-| Display registry        | `lib/location-display.ts`                                                                                     |
-| List route              | `routes/locations-overview.tsx`                                                                               |
-| Overview columns        | `lib/overview/locations-overview-columns.tsx`                                                                 |
-| Building orgs reference | `lib/building-organizations/`, `components/building-organizations/building-organizations-composer.client.tsx` |
-| Create modal            | `components/create/location-create-modal.client.tsx`                                                          |
+| Area                    | Path                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| Form def                | `lib/forms/location-form-def.ts`                                                                       |
+| Display registry        | `lib/location-display.ts`                                                                              |
+| List route              | `routes/locations-overview.tsx`                                                                        |
+| Overview columns        | `lib/overview/locations-overview-columns.tsx`                                                          |
+| Building orgs reference | `lib/building-organizations/`, `components/building-organizations/building-organizations-composer.tsx` |
+| Create modal            | `components/create/location-create-modal.tsx`                                                          |
 
 ## Watch — cross-feature import boundaries
 

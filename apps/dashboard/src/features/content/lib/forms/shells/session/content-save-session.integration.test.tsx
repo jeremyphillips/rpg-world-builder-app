@@ -9,7 +9,7 @@ import {
   CampaignAccessFormProvider,
   useCampaignAccessParticipantUpdater,
   type CampaignAccessSaveResult,
-} from '../../../campaign-access/campaign-access-form-context.client'
+} from '../../../campaign-access/campaign-access-form-context'
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
 import { useContentSaveSession } from './use-content-save-session'
 

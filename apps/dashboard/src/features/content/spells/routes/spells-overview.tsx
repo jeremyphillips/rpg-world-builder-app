@@ -12,7 +12,7 @@ import {
 import { useSpells, useSpellsUsageMeta } from '../hooks/use-spells'
 import { spellsColumns, spellsFilterSchema } from '../lib/spells-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
 export function SpellsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()

@@ -6,7 +6,7 @@ import { buildContentPurposeSelectors } from '@rpg/contracts'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 
 import { pickClass } from '../../lib/fixtures/pick'
-import { ClassCharacterCreationTab } from './class-character-creation-tab.client'
+import { ClassCharacterCreationTab } from './class-character-creation-tab'
 import { characterCreationProficienciesToFormValues } from '../lib/character-creation/class-character-creation-proficiencies-form-values'
 import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
 import { startingEquipmentItemTitle } from '../lib/character-creation/class-starting-equipment-form-fields'

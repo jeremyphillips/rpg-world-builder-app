@@ -4,11 +4,11 @@ import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 import { FormSectionProvider, FormUiProvider } from '@rpg/ui/form'
 
-import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch.client'
+import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch'
 import {
   CampaignAccessAvailabilityProvider,
   CampaignAccessFormProvider,
-} from './campaign-access-form-context.client'
+} from './campaign-access-form-context'
 import {
   CAMPAIGN_ACCESS_AVAILABLE_HINT,
   CAMPAIGN_ACCESS_AVAILABLE_LABEL,

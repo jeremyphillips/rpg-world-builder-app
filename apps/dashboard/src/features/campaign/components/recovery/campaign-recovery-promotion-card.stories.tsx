@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
 import { toRecoveryPromotion } from '../../lib/recovery/campaign-recovery-promotions.lib'
-import { CampaignRecoveryPromotionCard } from './campaign-recovery-promotion-card.client'
+import { CampaignRecoveryPromotionCard } from './campaign-recovery-promotion-card'
 
 const meta = {
   title: 'Campaign/CampaignRecoveryPromotionCard',

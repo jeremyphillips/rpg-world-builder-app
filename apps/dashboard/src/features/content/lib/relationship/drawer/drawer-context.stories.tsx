@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { DrawerContext } from './drawer-context.client'
+import { DrawerContext } from './drawer-context'
 
 const meta = {
   title: 'Content/Relationship/DrawerContext',

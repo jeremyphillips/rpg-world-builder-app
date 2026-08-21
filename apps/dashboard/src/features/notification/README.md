@@ -9,23 +9,23 @@ API publish/list contracts (including list filters) live in
 
 ## Layout
 
-| Path                                              | Responsibility                                                |
-| ------------------------------------------------- | ------------------------------------------------------------- |
-| `api/notifications.ts`                            | Same-origin notification API client                           |
-| `hooks/use-notifications.ts`                      | Bell list query (`unreadCount` included)                      |
-| `hooks/use-notification-inbox.ts`                 | Infinite inbox query (filter-keyed cache)                     |
-| `hooks/use-notification-inbox-page.ts`            | Inbox page state: filters, mark-all, load more                |
-| `hooks/use-notification-actions.ts`               | Mark read / all read / seen mutations                         |
-| `hooks/use-notification-bell-menu.ts`             | Bell open/seen + mark-all wiring                              |
-| `components/notification-bell-menu.tsx`           | Wires `@rpg/ui` primitives + navigation                       |
-| `components/notification-inbox-header.client.tsx` | Description + `PrimaryFilterPanel` (Unread / Campaign / Type) |
-| `components/notification-inbox-body.client.tsx`   | Preview list + load more                                      |
-| `routes/notifications-list.tsx`                   | Paginated notification history                                |
-| `lib/notification-inbox-filter-schema.ts`         | Inbox `FilterSchema` (URL-synced server filters)              |
-| `lib/notification-query-keys.ts`                  | Bell + inbox query keys                                       |
-| `lib/notification-cache.ts`                       | Bell cache helpers + version guards                           |
-| `lib/resolve-notification-action.ts`              | Maps persisted action kinds to app paths                      |
-| `lib/notification-copy.ts`                        | User-facing copy                                              |
+| Path                                       | Responsibility                                                |
+| ------------------------------------------ | ------------------------------------------------------------- |
+| `api/notifications.ts`                     | Same-origin notification API client                           |
+| `hooks/use-notifications.ts`               | Bell list query (`unreadCount` included)                      |
+| `hooks/use-notification-inbox.ts`          | Infinite inbox query (filter-keyed cache)                     |
+| `hooks/use-notification-inbox-page.ts`     | Inbox page state: filters, mark-all, load more                |
+| `hooks/use-notification-actions.ts`        | Mark read / all read / seen mutations                         |
+| `hooks/use-notification-bell-menu.ts`      | Bell open/seen + mark-all wiring                              |
+| `components/notification-bell-menu.tsx`    | Wires `@rpg/ui` primitives + navigation                       |
+| `components/notification-inbox-header.tsx` | Description + `PrimaryFilterPanel` (Unread / Campaign / Type) |
+| `components/notification-inbox-body.tsx`   | Preview list + load more                                      |
+| `routes/notifications-list.tsx`            | Paginated notification history                                |
+| `lib/notification-inbox-filter-schema.ts`  | Inbox `FilterSchema` (URL-synced server filters)              |
+| `lib/notification-query-keys.ts`           | Bell + inbox query keys                                       |
+| `lib/notification-cache.ts`                | Bell cache helpers + version guards                           |
+| `lib/resolve-notification-action.ts`       | Maps persisted action kinds to app paths                      |
+| `lib/notification-copy.ts`                 | User-facing copy                                              |
 
 Presentation primitives (`NotificationBell`, popover, preview list/item, empty/loading)
 live in `@rpg/ui` and stay domain-agnostic. Rows are whole-row click targets — no

@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 
-import { CampaignInviteReviewPage } from './campaign-invite-review-page.client'
+import { CampaignInviteReviewPage } from './campaign-invite-review-page'
 
 const inviteId = 'b'.repeat(24)
 

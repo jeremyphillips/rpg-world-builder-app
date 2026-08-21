@@ -1,5 +1,3 @@
-'use client'
-
 import { NotificationBell, NotificationPopover, NotificationPopoverHeader } from '@rpg/ui'
 import { useParams } from 'react-router-dom'
 

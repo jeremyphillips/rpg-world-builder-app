@@ -12,7 +12,7 @@ import {
 import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetEquipmentCards } from '../../../lib/detail/character-sheet-catalog'
 import { EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL } from '../../equipment/picker/drawer/equipment-picker-drawer.types'
-import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.client'
+import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-import { PendingCampaignInvitation } from './pending-campaign-invitation.client'
+import { PendingCampaignInvitation } from './pending-campaign-invitation'
 
 const invite = {
   inviteId: 'a'.repeat(24),

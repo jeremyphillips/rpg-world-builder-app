@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import { ContentDeletionConfirmDialog } from './content-deletion-confirm-dialog.client'
+import { ContentDeletionConfirmDialog } from './content-deletion-confirm-dialog'
 
 describe('ContentDeletionConfirmDialog', () => {
   it('renders destructive confirm copy', async () => {

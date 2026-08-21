@@ -2,7 +2,7 @@ import { describe, expectTypeOf, it } from 'vitest'
 
 import type { ContentEntityCardProps, DisclosureEntityCardProps } from '@/features/content'
 
-import type { EntityAnatomyHostProps } from './entity-anatomy.client'
+import type { EntityAnatomyHostProps } from './entity-anatomy'
 
 type ConsumerPresentationKeys =
   | 'className'

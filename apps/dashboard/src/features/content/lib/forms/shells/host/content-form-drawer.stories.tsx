@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { z } from 'zod'
 
-import { ContentFormDrawer } from './content-form-drawer.client'
+import { ContentFormDrawer } from './content-form-drawer'
 
 const schema = z.object({
   name: z.string().min(1),

@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { makeQueryWrapper } from '@/test/make-wrapper'
 import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
-import { ClassSubclassesTab } from './class-subclasses-tab.client'
+import { ClassSubclassesTab } from './class-subclasses-tab'
 
 vi.mock('../hooks/use-subclass-mutations', () => ({
   useCreateSubclass: () => ({
@@ -24,7 +24,7 @@ vi.mock('../hooks/use-subclass-mutations', () => ({
   }),
 }))
 
-vi.mock('./subclasses/subclass-editor-panel.client', () => ({
+vi.mock('./subclasses/subclass-editor-panel', () => ({
   SubclassEditorPanel: ({ onDeleteRequest }: { onDeleteRequest: () => void }) => (
     <div>
       <button type="button" onClick={onDeleteRequest}>

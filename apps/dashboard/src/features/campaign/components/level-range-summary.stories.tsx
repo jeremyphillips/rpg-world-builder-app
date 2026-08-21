@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { ExtendedProgressionEffects } from './extended-progression-effects.client'
-import { ExtendedLevelRangeSummary, StandardLevelRangeSummary } from './level-range-summary.client'
+import { ExtendedProgressionEffects } from './extended-progression-effects'
+import { ExtendedLevelRangeSummary, StandardLevelRangeSummary } from './level-range-summary'
 
 function SummaryStory({
   defaultValues,

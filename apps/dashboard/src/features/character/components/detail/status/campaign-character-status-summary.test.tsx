@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { createDefaultCampaignRosterState, createDefaultCharacterVitalState } from '@rpg/contracts'
 
-import { CampaignCharacterStatusSummary } from './campaign-character-status-summary.client'
+import { CampaignCharacterStatusSummary } from './campaign-character-status-summary'
 
 describe('CampaignCharacterStatusSummary', () => {
   it('renders roster and vital labels', () => {

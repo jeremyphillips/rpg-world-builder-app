@@ -8,7 +8,7 @@ remains a slow fallback while connected.
 
 | Path                                                   | Responsibility                                              |
 | ------------------------------------------------------ | ----------------------------------------------------------- |
-| `components/realtime-provider.client.tsx`              | Connects after auth, dispatches socket events to features   |
+| `components/realtime-provider.tsx`                     | Connects after auth, dispatches socket events to features   |
 | `context/realtime-context.tsx`                         | Exposes `isConnected` + active thread id for scoped refetch |
 | `@rpg/contracts` (`REALTIME_EVENTS`, `SOCKET_IO_PATH`) | Transport event catalog shared with the API                 |
 

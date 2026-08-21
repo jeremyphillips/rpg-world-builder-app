@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ContentEntityCard } from '@/features/content'
 import { Text } from '@rpg/ui'
 
-import { BuilderInventoryRemoveAction } from './builder-inventory-remove-action.client'
+import { BuilderInventoryRemoveAction } from './builder-inventory-remove-action'
 
 const meta = {
   title: 'Character Builder/BuilderSelectedEntityCard',

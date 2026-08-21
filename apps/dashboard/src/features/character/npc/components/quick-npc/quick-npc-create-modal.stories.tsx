@@ -22,7 +22,7 @@ import {
   quickNpcOrganizationMemberCreateContext,
   quickNpcStandaloneCreateContext,
 } from '../../lib/quick-npc/quick-npc-test-fixtures'
-import { QuickNpcCreateModal } from './quick-npc-create-modal.client'
+import { QuickNpcCreateModal } from './quick-npc-create-modal'
 
 const organization = {
   id: 'organization-thieves-guild',

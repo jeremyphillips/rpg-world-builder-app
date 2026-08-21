@@ -4,15 +4,12 @@ import { describe, expect, it } from 'vitest'
 
 const organizationCreateModalPath = fileURLToPath(
   new URL(
-    '../../../../organizations/components/create/organization-create-modal.client.tsx',
+    '../../../../organizations/components/create/organization-create-modal.tsx',
     import.meta.url,
   ),
 )
 const locationCreateFormPath = fileURLToPath(
-  new URL(
-    '../../../../locations/components/create/location-create-form.client.tsx',
-    import.meta.url,
-  ),
+  new URL('../../../../locations/components/create/location-create-form.tsx', import.meta.url),
 )
 
 describe('ContentFormHost def adapter drift guard', () => {

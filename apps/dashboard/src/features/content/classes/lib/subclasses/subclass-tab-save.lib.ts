@@ -3,7 +3,7 @@ import { getErrorMessage } from '@rpg/contracts'
 
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
 import { updateContentCampaignAccess } from '../../../lib/campaign-access/campaign-access-api'
-import type { CampaignAccessSaveResult } from '../../../lib/campaign-access/campaign-access-form-context.client'
+import type { CampaignAccessSaveResult } from '../../../lib/campaign-access/campaign-access-form-context'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../../lib/campaign-access/campaign-access-labels'
 import { isDefaultCampaignAccessPatch } from '../../../lib/campaign-access/campaign-access-state'
 import {

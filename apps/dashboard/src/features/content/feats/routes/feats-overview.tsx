@@ -11,7 +11,7 @@ import {
 import { useFeats, useFeatsUsageMeta } from '../hooks/use-feats'
 import { featsColumns, featsFilterSchema } from '../lib/feats-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
 export function FeatsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()

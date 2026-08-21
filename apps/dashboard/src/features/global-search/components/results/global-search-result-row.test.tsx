@@ -7,7 +7,7 @@ import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { renderWithProviders } from '@/test/render'
 
 import { globalSearchGroupContentInsetClasses } from '../../lib/global-search-group.variants'
-import { SearchResultRow } from './global-search-result-row.client'
+import { SearchResultRow } from './global-search-result-row'
 
 function rowShell(link: HTMLElement): HTMLElement {
   return link.parentElement!

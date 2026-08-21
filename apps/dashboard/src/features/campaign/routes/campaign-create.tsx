@@ -29,7 +29,7 @@ import { InviteMembersStep } from '../components/create/invite-members-step'
 import {
   BLANK_CAMPAIGN_TEMPLATE_VALUE,
   CampaignTemplateChooser,
-} from '../components/create/campaign-template-chooser.client'
+} from '../components/create/campaign-template-chooser'
 import { useCampaignTemplates } from '../hooks/use-campaign-templates'
 import { mapCampaignTemplateToCreateValues } from '../lib/settings/campaign-template-form-values'
 

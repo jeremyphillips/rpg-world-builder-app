@@ -6,7 +6,7 @@ import { ROUTES } from '@/app/routes'
 import { useEquipmentFamilyOverview } from '../hooks/use-equipment-family-overview'
 import type { FamilyTableConfig } from '../lib/shared/equipment-family-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 import type { EquipmentFamilyPath } from '../lib/shared/equipment-family-paths'
 
 type EquipmentFamilyOverviewContentProps = {

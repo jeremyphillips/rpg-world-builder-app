@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { IdentityStep } from './identity-step.client'
+import { IdentityStep } from './identity-step'
 
 const meta = {
   title: 'Character Builder/IdentityStep',

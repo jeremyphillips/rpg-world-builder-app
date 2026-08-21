@@ -1,8 +1,6 @@
-'use client'
-
 import { Outlet, useLocation, useMatch, useParams } from 'react-router-dom'
 
-import { CampaignLayoutRecoveryChrome } from '../components/recovery/campaign-layout-recovery-chrome.client'
+import { CampaignLayoutRecoveryChrome } from '../components/recovery/campaign-layout-recovery-chrome'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
 

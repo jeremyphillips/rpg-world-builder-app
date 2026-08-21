@@ -7,7 +7,7 @@ import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../../lib/organization-display'
 import {
   ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
   OrganizationLocationConnectionsSection,
-} from './organization-location-connections-section.client'
+} from './organization-location-connections-section'
 
 const meta = {
   title: 'Content/Organizations/OrganizationLocationConnectionsSection',

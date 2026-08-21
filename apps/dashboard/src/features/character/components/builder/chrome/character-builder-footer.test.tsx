@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { getBuilderChromeCopy } from '../../../lib/builder/builder-chrome-copy'
-import { CharacterBuilderFooter } from './character-builder-footer.client'
+import { CharacterBuilderFooter } from './character-builder-footer'
 
 const pcChrome = getBuilderChromeCopy('standalone_pc')
 

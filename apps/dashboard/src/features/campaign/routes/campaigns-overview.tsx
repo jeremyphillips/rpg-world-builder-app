@@ -3,7 +3,7 @@ import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { useCampaigns } from '@/features/campaign'
 import { usePendingCampaignInvites } from '@/features/campaign-invite'
 
-import { NewCampaignLink } from '../components/new-campaign-link.client'
+import { NewCampaignLink } from '../components/new-campaign-link'
 import { hasCampaignRows } from '../lib/overview/campaign-list-view.lib'
 import {
   resolveCampaignsOverviewDescription,

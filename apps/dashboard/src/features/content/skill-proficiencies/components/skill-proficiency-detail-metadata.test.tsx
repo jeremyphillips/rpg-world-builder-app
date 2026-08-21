@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { pickSkillProficiency } from '../../lib/fixtures/pick'
 import { buildSkillProficiencyDetailViewModel } from '../lib/skill-proficiency-display'
-import { SkillProficiencyDetailMetadata } from './skill-proficiency-detail-metadata.client'
+import { SkillProficiencyDetailMetadata } from './skill-proficiency-detail-metadata'
 
 const stealth = buildSkillProficiencyDetailViewModel(pickSkillProficiency('stealth'))
 

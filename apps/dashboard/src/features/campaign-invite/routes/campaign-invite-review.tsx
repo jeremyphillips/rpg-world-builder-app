@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/page/narrow-page'
 
-import { CampaignInviteReviewPage } from '../components/campaign-invite-review-page.client'
+import { CampaignInviteReviewPage } from '../components/campaign-invite-review-page'
 
 export function CampaignInviteReviewRoute() {
   const { inviteId } = useParams<{ inviteId: string }>()

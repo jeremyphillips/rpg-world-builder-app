@@ -3,7 +3,7 @@ import { createMemoryRouter, RouterProvider, useSearchParams } from 'react-route
 import { describe, expect, it, vi } from 'vitest'
 import { createEqualsFilter, createFilterSchema, createTextFilter } from '@rpg/ui/filters'
 
-import { useContentOverviewQueryState } from './use-content-overview-query-state.client'
+import { useContentOverviewQueryState } from './use-content-overview-query-state'
 
 type Row = {
   name: string

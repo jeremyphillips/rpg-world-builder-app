@@ -7,7 +7,7 @@ import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/page/narrow-page'
 
 import { CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY } from '../lib/onboarding/campaign-onboarding-copy'
-import { CampaignOnboardingClient } from '../components/onboarding/campaign-onboarding.client'
+import { CampaignOnboardingClient } from '../components/onboarding/campaign-onboarding'
 
 export function CampaignOnboardingBody({
   context,

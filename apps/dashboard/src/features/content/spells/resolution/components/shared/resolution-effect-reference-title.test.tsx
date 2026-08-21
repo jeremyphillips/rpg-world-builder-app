@@ -6,7 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { resolveEffectReferenceById } from '../../lib/form/resolution-effect-reference.lib'
-import { ResolutionEffectReferenceTitle } from './resolution-effect-reference-title.client'
+import { ResolutionEffectReferenceTitle } from './resolution-effect-reference-title'
 
 describe('ResolutionEffectReferenceTitle', () => {
   it('exposes full plain-text title via native title and aria-label', () => {

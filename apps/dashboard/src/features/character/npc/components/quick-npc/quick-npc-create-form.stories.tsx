@@ -10,7 +10,7 @@ import {
   quickNpcOrganizationMemberCreateContext,
   quickNpcTestOrganization,
 } from '../../lib/quick-npc/quick-npc-test-fixtures'
-import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
+import { QuickNpcAuthoringForm } from './quick-npc-authoring-form'
 
 const createContext = quickNpcOrganizationMemberCreateContext(quickNpcTestOrganization)
 

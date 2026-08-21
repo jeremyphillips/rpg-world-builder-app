@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { WidePage } from '@/components/layout/page/wide-page'
 
-import { CharacterBuilderShell } from '../../components/builder/character-builder-shell.client'
+import { CharacterBuilderShell } from '../../components/builder/character-builder-shell'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
-import { NpcAuthoringGate } from '../components/npc-authoring-gate.client'
+import { NpcAuthoringGate } from '../components/npc-authoring-gate'
 
 export function NpcCreate() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()

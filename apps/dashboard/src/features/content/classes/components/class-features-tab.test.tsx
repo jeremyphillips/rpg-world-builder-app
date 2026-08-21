@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { TestFormShell } from '@/test/form-shell'
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { ClassFeaturesTab } from './class-features-tab.client'
+import { ClassFeaturesTab } from './class-features-tab'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
   const { stubUiFormItems } = await import('@/test/mocks/ui-form')

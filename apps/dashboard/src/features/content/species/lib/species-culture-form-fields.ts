@@ -8,8 +8,8 @@ import { buildActiveLanguageFieldOptions } from '@/features/vocabulary'
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { SpeciesCultureNamingAlert } from '../components/species-culture-naming-alert.client'
-import { SpeciesPersonalNameComponentsField } from '../components/species-personal-name-components-field.client'
+import { SpeciesCultureNamingAlert } from '../components/species-culture-naming-alert'
+import { SpeciesPersonalNameComponentsField } from '../components/species-personal-name-components-field'
 
 export const CULTURE_FIELD_PREFIX = 'culture'
 export const CULTURE_USE_OVERRIDE_FIELD = 'culture.useOverride'

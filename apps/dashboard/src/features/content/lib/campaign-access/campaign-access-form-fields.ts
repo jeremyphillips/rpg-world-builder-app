@@ -4,7 +4,7 @@ import type { FormDensity, FormItem, GroupConfig } from '@rpg/ui/form'
 
 import { buildCampaignAvailabilityFields } from '@/lib/campaign-availability/campaign-availability-form-fields'
 
-import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch.client'
+import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch'
 import {
   campaignAccessVisibilityOptionAvailability,
   resolveCampaignAccessPlayerAccessHint,

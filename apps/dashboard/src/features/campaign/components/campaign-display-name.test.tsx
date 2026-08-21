@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CampaignDisplayName } from './campaign-display-name'
-import { CampaignDisplayNameList } from './campaign-display-name-list.client'
+import { CampaignDisplayNameList } from './campaign-display-name-list'
 
 describe('CampaignDisplayName', () => {
   it('renders a linked topbar identity', () => {

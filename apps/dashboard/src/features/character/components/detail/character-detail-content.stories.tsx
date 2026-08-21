@@ -6,7 +6,7 @@ import {
 } from '../../lib/fixtures/character-builder-fixtures'
 import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
 import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
-import { CharacterDetailContent } from './character-detail-content.client'
+import { CharacterDetailContent } from './character-detail-content'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)

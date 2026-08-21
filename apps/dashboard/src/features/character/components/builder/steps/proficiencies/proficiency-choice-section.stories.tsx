@@ -5,7 +5,7 @@ import {
   proficienciesStepAcrobaticsSkill,
   proficienciesStepStealthSkill,
 } from '../../../../lib/proficiencies/proficiencies-step.fixtures'
-import { ProficiencyChoiceSection } from './proficiency-choice-section.client'
+import { ProficiencyChoiceSection } from './proficiency-choice-section'
 
 const { model } = createProficienciesStepRogueFixture()
 const emptyChoice = model.sections.find((section) => section.kind === 'skills')!.choices[0]!

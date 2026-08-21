@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { CharacterCampaignBlockingIssue, CharacterCampaignWarning } from '@rpg/contracts'
 
-import { CampaignCharacterEligibilityAlert } from './campaign-character-eligibility-alert.client'
+import { CampaignCharacterEligibilityAlert } from './campaign-character-eligibility-alert'
 
 const blockingIssues: CharacterCampaignBlockingIssue[] = [
   { code: 'level_mismatch', actualLevel: 3, requiredLevel: 1 },

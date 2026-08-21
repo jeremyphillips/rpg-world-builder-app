@@ -9,7 +9,7 @@ import {
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 
-import type { MasterDetailListBadge } from '../../components/master-detail/master-detail-list-panel.client'
+import type { MasterDetailListBadge } from '../../components/master-detail/master-detail-list-panel'
 
 export type EmbeddedRowSource = 'system' | 'homebrew'
 

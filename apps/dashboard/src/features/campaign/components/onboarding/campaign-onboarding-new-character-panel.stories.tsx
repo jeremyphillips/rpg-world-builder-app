@@ -3,7 +3,7 @@ import type { CampaignOnboardingIncompleteContext } from '@rpg/contracts'
 
 import { withDashboardProviders } from '../../../../../.storybook/decorators'
 
-import { CampaignOnboardingNewCharacterPanel } from './campaign-onboarding-new-character-panel.client'
+import { CampaignOnboardingNewCharacterPanel } from './campaign-onboarding-new-character-panel'
 
 const incompleteContext: CampaignOnboardingIncompleteContext = {
   status: 'onboarding_incomplete',

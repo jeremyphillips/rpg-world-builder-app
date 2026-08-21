@@ -3,7 +3,7 @@ import { useId, useState, type ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { EntityAnatomy } from '../../../entity/anatomy/entity-anatomy.client'
+import { EntityAnatomy } from '../../../entity/anatomy/entity-anatomy'
 import type { EntityAnatomyTrailing } from '../../../entity/anatomy/entity-anatomy-trailing.types'
 import { buildEntityContentOffsetStyle } from '../../../entity/anatomy/entity-leading-rail.lib'
 import { projectEntitySummaryModel } from '../../../entity/summary/entity-summary-projection.lib'

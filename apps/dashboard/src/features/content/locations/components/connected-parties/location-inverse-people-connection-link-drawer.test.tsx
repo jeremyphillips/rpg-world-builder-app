@@ -11,7 +11,7 @@ import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { CITY_COUNCIL } from '../../../organizations/fixtures'
 import { PEOPLE_SECTION_KIND_FULLY_LINKED_REASON } from '../../lib/connected-parties/location-people-section-kind-options.lib'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
-import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer.client'
+import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,

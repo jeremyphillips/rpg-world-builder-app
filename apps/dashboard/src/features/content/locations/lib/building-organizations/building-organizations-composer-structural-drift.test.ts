@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 const composerPath = fileURLToPath(
   new URL(
-    '../../components/building-organizations/building-organizations-composer.client.tsx',
+    '../../components/building-organizations/building-organizations-composer.tsx',
     import.meta.url,
   ),
 )
@@ -15,7 +15,7 @@ const variantsPath = fileURLToPath(
   ),
 )
 const modalPath = fileURLToPath(
-  new URL('../../components/create/location-create-modal.client.tsx', import.meta.url),
+  new URL('../../components/create/location-create-modal.tsx', import.meta.url),
 )
 
 describe('building organizations composer structural drift', () => {

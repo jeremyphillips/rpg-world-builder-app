@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { abilitiesFormCopy } from '../../../../../lib/steps/abilities-form-labels'
 import { FIXED_SCORES_DND_KINDS } from '../../../../../lib/steps/fixed-scores-dnd.lib'
-import { ScoreToken } from './score-token.client'
+import { ScoreToken } from './score-token'
 
 const meta = {
   title: 'Character Builder/ScoreToken',

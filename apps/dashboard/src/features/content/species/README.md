@@ -23,8 +23,8 @@ Delete-locking is **derived** because species traits and heritage have no per-ro
 | Creature type field options         | `lib/creature-type-field-options.ts`                                                                                  |
 | Display registry (detail + builder) | `lib/species-display.ts` — labels and view models for detail route, builder sheet, and overview filter                |
 | Shared master-detail lock helper    | [`content/lib/master-detail/is-embedded-row-system-locked.ts`](../lib/master-detail/is-embedded-row-system-locked.ts) |
-| Traits tab (master-detail)          | `components/species-traits-tab.client.tsx`                                                                            |
-| Heritage tab (master-detail)        | `components/species-heritage-tab.client.tsx`                                                                          |
+| Traits tab (master-detail)          | `components/species-traits-tab.tsx`                                                                                   |
+| Heritage tab (master-detail)        | `components/species-heritage-tab.tsx`                                                                                 |
 
 ## Related docs
 

@@ -1,10 +1,8 @@
-'use client'
-
 import { PageHeader } from '@/components/layout/page/page-header'
 import { WidePage } from '@/components/layout/page/wide-page'
 import { Text } from '@rpg/ui'
 
-import { AdminUsersOverviewTable } from '../components/admin-users-overview-table.client'
+import { AdminUsersOverviewTable } from '../components/admin-users-overview-table'
 
 export function AdminUsers() {
   return (

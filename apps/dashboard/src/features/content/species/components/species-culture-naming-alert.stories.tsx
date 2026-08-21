@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { SpeciesCultureNamingAlert } from './species-culture-naming-alert.client'
+import { SpeciesCultureNamingAlert } from './species-culture-naming-alert'
 
 const meta = {
   title: 'Dashboard/Species/SpeciesCultureNamingAlert',

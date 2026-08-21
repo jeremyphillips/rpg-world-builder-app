@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { GlobalSearchProvider } from '../global-search-provider.client'
-import { GlobalSearchTopbar } from './global-search-topbar.client'
+import { GlobalSearchProvider } from '../global-search-provider'
+import { GlobalSearchTopbar } from './global-search-topbar'
 
 const meta = {
   title: 'GlobalSearch/GlobalSearchTopbar',

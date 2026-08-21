@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { lanternGuild } from './picker/organization-picker-drawer.fixtures'
-import { EditOrganizationMembershipDrawer } from './edit-organization-membership-drawer.client'
+import { EditOrganizationMembershipDrawer } from './edit-organization-membership-drawer'
 
 describe('EditOrganizationMembershipDrawer', () => {
   it('saves selected title and closes on success', async () => {

@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { SUBCLASSES_FOR_FIGHTER } from '../../fixtures'
-import { SubclassListPanel } from './subclass-list-panel.client'
+import { SubclassListPanel } from './subclass-list-panel'
 
 describe('SubclassListPanel', () => {
   const items = SUBCLASSES_FOR_FIGHTER.map((subclass) => ({

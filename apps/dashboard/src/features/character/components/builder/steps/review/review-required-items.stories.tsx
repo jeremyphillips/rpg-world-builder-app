@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import { ReviewRequiredItems } from './review-required-items.client'
+import { ReviewRequiredItems } from './review-required-items'
 
 const meta = {
   title: 'Character Builder/ReviewRequiredItems',

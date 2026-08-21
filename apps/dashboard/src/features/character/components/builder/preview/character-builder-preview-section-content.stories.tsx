@@ -4,7 +4,7 @@ import {
   CharacterBuilderPreviewSectionContent,
   CharacterBuilderPreviewSubsection,
   CharacterBuilderPreviewSubsectionHint,
-} from './character-builder-preview-section-content.client'
+} from './character-builder-preview-section-content'
 
 const meta = {
   title: 'Character Builder/CharacterBuilderPreviewSectionContent',

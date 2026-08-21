@@ -7,7 +7,7 @@ import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { useBuildContext } from '@/features/character'
 
-import { CharacterImportForm } from '../components/character-import-form.client'
+import { CharacterImportForm } from '../components/character-import-form'
 import {
   CHARACTER_IMPORT_DEFAULT_ALIGNMENT,
   type CharacterImportSaveTarget,

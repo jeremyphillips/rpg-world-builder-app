@@ -8,7 +8,7 @@ import {
   type PrerequisiteEditorValue,
 } from '../lib/requirement-editor-form-schema'
 import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
-import { RequirementEditor } from './requirement-editor.client'
+import { RequirementEditor } from './requirement-editor'
 
 const meta = {
   title: 'Content/RequirementEditor',

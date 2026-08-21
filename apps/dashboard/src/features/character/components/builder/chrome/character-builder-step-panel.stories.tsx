@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterBuilderStepPanel } from './character-builder-step-panel.client'
+import { CharacterBuilderStepPanel } from './character-builder-step-panel'
 
 const meta = {
   title: 'Character Builder/CharacterBuilderStepPanel',

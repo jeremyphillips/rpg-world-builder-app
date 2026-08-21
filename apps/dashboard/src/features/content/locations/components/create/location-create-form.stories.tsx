@@ -3,12 +3,12 @@ import { useRef } from 'react'
 import { Button, dialogPanelSectionInsetXClasses } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
-import type { ContentFormHostLeaveBridge } from '../../../lib/forms/shells/host/content-form-host.client'
+import type { ContentFormHostLeaveBridge } from '../../../lib/forms/shells/host/content-form-host'
 import { ContentFormOptionsGate } from '../../../lib/forms/shells/layout/content-form-shell-layout'
 import { formatContentCreateActionLabel } from '../../../lib/content-type-labels'
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { HARBORFORD } from '../../fixtures'
-import { LocationCreateForm } from './location-create-form.client'
+import { LocationCreateForm } from './location-create-form'
 
 function LocationCreateFormStory({
   authoringType = 'building',

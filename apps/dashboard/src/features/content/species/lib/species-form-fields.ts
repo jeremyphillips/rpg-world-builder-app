@@ -25,9 +25,9 @@ import {
   embeddedMasterDetailTabValidation,
   prefixFormItems,
 } from '../../lib/forms/validation/tabbed-form-resolver-fields'
-import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
-import { SpeciesRulesTab } from '../components/species-rules-tab.client'
-import { SpeciesTraitsTab } from '../components/species-traits-tab.client'
+import { SpeciesHeritageTab } from '../components/species-heritage-tab'
+import { SpeciesRulesTab } from '../components/species-rules-tab'
+import { SpeciesTraitsTab } from '../components/species-traits-tab'
 import { heritageScalarFields } from './species-heritage-form-fields'
 import {
   cultureFields,

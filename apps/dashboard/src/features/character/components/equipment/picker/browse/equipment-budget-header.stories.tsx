@@ -4,7 +4,7 @@ import {
   equipmentPickerBudgetFixture,
   equipmentPickerLowRemainingBudgetFixture,
 } from '../drawer/equipment-picker-drawer.fixtures'
-import { EquipmentBudgetHeader } from './equipment-budget-header.client'
+import { EquipmentBudgetHeader } from './equipment-budget-header'
 
 const meta = {
   title: 'Character Builder/EquipmentBudgetHeader',

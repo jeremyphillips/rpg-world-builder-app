@@ -8,7 +8,7 @@ import { renderWithProviders } from '@/test/render'
 import {
   ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE,
   OrganizationMemberPickerDrawer,
-} from './organization-member-picker-drawer.client'
+} from './organization-member-picker-drawer'
 import {
   ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
   ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,

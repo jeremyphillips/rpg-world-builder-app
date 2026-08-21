@@ -4,7 +4,7 @@ import {
   createStandaloneBuilderCatalogIndexFixture,
   createPopulatedStandaloneBuilderContextFixture,
 } from '../../lib/fixtures/character-builder-fixtures'
-import { CharacterBuilderShell } from './character-builder-shell.client'
+import { CharacterBuilderShell } from './character-builder-shell'
 
 const meta = {
   title: 'Character Builder/CharacterBuilderShell',

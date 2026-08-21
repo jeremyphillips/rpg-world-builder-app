@@ -16,14 +16,14 @@ vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
 vi.mock(
-  '../components/location-connections/organization-location-connections-detail-section.client',
+  '../components/location-connections/organization-location-connections-detail-section',
   () => ({
     OrganizationLocationConnectionsDetailSection: () => (
       <div data-testid="organization-detail-section">Location connections</div>
     ),
   }),
 )
-vi.mock('../components/members/organization-members-detail-section.client', () => ({
+vi.mock('../components/members/organization-members-detail-section', () => ({
   OrganizationMembersDetailSection: () => (
     <div data-testid="organization-detail-section">Members</div>
   ),

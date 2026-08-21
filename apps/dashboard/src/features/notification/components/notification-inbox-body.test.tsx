@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
-import { NotificationInboxBody } from './notification-inbox-body.client'
+import { NotificationInboxBody } from './notification-inbox-body'
 
 const previewItems = [
   {

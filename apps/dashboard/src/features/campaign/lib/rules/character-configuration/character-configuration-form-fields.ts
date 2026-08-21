@@ -43,11 +43,11 @@ import {
 
 import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/vocabulary'
 
-import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects.client'
+import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects'
 import {
   ExtendedLevelRangeSummary,
   StandardLevelRangeSummary,
-} from '../../../components/level-range-summary.client'
+} from '../../../components/level-range-summary'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { IMPORTED_CHARACTERS_POLICY_LABELS } from './character-configuration-form-labels'

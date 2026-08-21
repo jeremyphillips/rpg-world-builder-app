@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
 import { makeCampaignNpcListItem } from '../../lib/fixtures/character-fixtures'
-import { BulkRosterStatusDialog } from './bulk-roster-status-dialog.client'
+import { BulkRosterStatusDialog } from './bulk-roster-status-dialog'
 
 const meta = {
   title: 'Dashboard/Character/BulkRosterStatusDialog',

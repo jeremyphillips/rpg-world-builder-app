@@ -5,8 +5,8 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
-import { GlobalSearchProvider } from '../global-search-provider.client'
-import { GlobalSearchTopbar } from './global-search-topbar.client'
+import { GlobalSearchProvider } from '../global-search-provider'
+import { GlobalSearchTopbar } from './global-search-topbar'
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 
 import type * as ReactRouterDom from 'react-router-dom'

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { characterBuilderStepReadinessMessages, formatFieldMessage } from '@rpg/contracts'
 
-import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
+import { BuilderStepReadinessPanel } from './builder-step-readiness-panel'
 
 const meta = {
   title: 'Character Builder/BuilderStepReadinessPanel',

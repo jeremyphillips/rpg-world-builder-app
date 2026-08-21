@@ -7,7 +7,7 @@ import {
   SETTLEMENT_CREATE_SETUP_HEADLINE,
   SETTLEMENT_CREATE_SETUP_PROMPT,
 } from '../../../lib/create/setup/location-settlement-create-setup.lib'
-import { LocationSettlementCreateSetup } from './location-settlement-create-setup.client'
+import { LocationSettlementCreateSetup } from './location-settlement-create-setup'
 
 describe('LocationSettlementCreateSetup', () => {
   it('renders canonical settlement options with kind-oriented prompt', () => {

@@ -34,5 +34,5 @@ picker transport: [`@/features/character`](../../../../character) (`CharacterPic
 
 ## Workflow hook
 
-[`useLocationConnectedPartiesDetail`](../../hooks/use-location-connected-parties-detail.client.ts)
+[`useLocationConnectedPartiesDetail`](../../hooks/use-location-connected-parties-detail.ts)
 owns exclusive overlay state and hands context to `LocationConnectedPartiesDrawers`.

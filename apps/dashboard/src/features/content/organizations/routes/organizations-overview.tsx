@@ -9,7 +9,7 @@ import {
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 import { useOrganizations, useOrganizationsUsageMeta } from '../hooks/use-organizations'
 import {
   organizationsColumns,

@@ -12,7 +12,7 @@ import { STORY_CAMPAIGN_ID } from '@/features/content/lib/fixtures/constants'
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
 
-import { BulkChangeParentLocationDialog } from './bulk-change-parent-location-dialog.client'
+import { BulkChangeParentLocationDialog } from './bulk-change-parent-location-dialog'
 import { DOCK_WARD, GREYSHORE, HARBORFORD, LOCATIONS_LIST } from '../../fixtures'
 
 type StoryLocation = WithCampaignAccess<Location>

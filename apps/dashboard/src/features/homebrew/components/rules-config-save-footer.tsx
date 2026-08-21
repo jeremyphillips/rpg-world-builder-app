@@ -1,5 +1,3 @@
-'use client'
-
 import { FormSaveFooter } from '@rpg/ui/form'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 

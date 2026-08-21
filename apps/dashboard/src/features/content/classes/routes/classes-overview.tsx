@@ -11,7 +11,7 @@ import {
 import { useClasses, useClassesUsageMeta } from '../hooks/use-classes'
 import { classColumns, classFilterSchema } from '../lib/classes-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
 export function ClassesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()

@@ -5,19 +5,19 @@ import { describe, expect, it } from 'vitest'
 const NESTED_CREATE_DRAWER_FILES = [
   fileURLToPath(
     new URL(
-      '../../../organizations/components/location-connections/organization-location-connection-link-drawer.client.tsx',
+      '../../../organizations/components/location-connections/organization-location-connection-link-drawer.tsx',
       import.meta.url,
     ),
   ),
   fileURLToPath(
     new URL(
-      '../../../locations/components/connected-parties/location-inverse-organization-connection-link-drawer.client.tsx',
+      '../../../locations/components/connected-parties/location-inverse-organization-connection-link-drawer.tsx',
       import.meta.url,
     ),
   ),
   fileURLToPath(
     new URL(
-      '../../../locations/components/connected-parties/location-inverse-people-connection-link-drawer.client.tsx',
+      '../../../locations/components/connected-parties/location-inverse-people-connection-link-drawer.tsx',
       import.meta.url,
     ),
   ),
@@ -42,15 +42,15 @@ describe('sequenced relationship drawer drift', () => {
       characterResolverImport?: string
     }
   > = {
-    'organization-location-connection-link-drawer.client.tsx': {
+    'organization-location-connection-link-drawer.tsx': {
       resolverImport: NESTED_CREATE_RESOLVER_IMPORT,
       usesNestedCreateHook: true,
     },
-    'location-inverse-organization-connection-link-drawer.client.tsx': {
+    'location-inverse-organization-connection-link-drawer.tsx': {
       resolverImport: NESTED_CREATE_ORG_RESOLVER_IMPORT,
       usesNestedCreateHook: true,
     },
-    'location-inverse-people-connection-link-drawer.client.tsx': {
+    'location-inverse-people-connection-link-drawer.tsx': {
       resolverImport: NESTED_CREATE_ORG_RESOLVER_IMPORT,
       usesNestedCreateHook: true,
       characterResolverImport: NESTED_CREATE_CHARACTER_RESOLVER_IMPORT,
@@ -96,7 +96,7 @@ describe('sequenced relationship drawer drift', () => {
     const source = readFileSync(
       fileURLToPath(
         new URL(
-          '../../../locations/components/connected-parties/location-inverse-organization-connection-link-drawer.client.tsx',
+          '../../../locations/components/connected-parties/location-inverse-organization-connection-link-drawer.tsx',
           import.meta.url,
         ),
       ),

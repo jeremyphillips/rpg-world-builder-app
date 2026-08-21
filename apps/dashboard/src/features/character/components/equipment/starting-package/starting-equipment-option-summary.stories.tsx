@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import type { StartingEquipmentOptionSummary } from '@rpg/contracts'
 
-import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary.client'
+import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary'
 
 const goldSummary = {
   optionId: 'starting-gold',

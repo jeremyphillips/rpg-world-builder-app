@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { InviteMemberDialog } from './invite-member-dialog.client'
+import { InviteMemberDialog } from './invite-member-dialog'
 
 const mutateAsync = vi.fn()
 

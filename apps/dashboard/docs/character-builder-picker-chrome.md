@@ -36,12 +36,12 @@ There is no import-string guard; the contract is documented here.
 
 ## Drawer entry points
 
-| Domain        | Drawer                                                                  | Controller / lib                                           |
-| ------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Equipment     | `components/equipment/picker/drawer/equipment-picker-drawer.client.tsx` | `useEquipmentPickerController` + drawer lib                |
-| Spells        | `components/spells/picker/spell-picker-drawer.client.tsx`               | `useSpellPickerController` + drawer lib + browse-mode lib  |
-| Proficiencies | `components/proficiencies/picker/proficiency-picker-drawer.client.tsx`  | drawer lib only (no controller)                            |
-| Organizations | `components/connections/picker/organization-picker-drawer.client.tsx`   | drawer lib only — builder **and** sheet reuse control case |
+| Domain        | Drawer                                                           | Controller / lib                                           |
+| ------------- | ---------------------------------------------------------------- | ---------------------------------------------------------- |
+| Equipment     | `components/equipment/picker/drawer/equipment-picker-drawer.tsx` | `useEquipmentPickerController` + drawer lib                |
+| Spells        | `components/spells/picker/spell-picker-drawer.tsx`               | `useSpellPickerController` + drawer lib + browse-mode lib  |
+| Proficiencies | `components/proficiencies/picker/proficiency-picker-drawer.tsx`  | drawer lib only (no controller)                            |
+| Organizations | `components/connections/picker/organization-picker-drawer.tsx`   | drawer lib only — builder **and** sheet reuse control case |
 
 All four are domain composition shells over `@rpg/content` **`CatalogEntityPickerSheet`**
 (`surface="background"`, `size="lg"`). Equipment and spell browse state live in domain
@@ -143,21 +143,21 @@ bucket for anything two files import. A module belongs here only when **all** of
 Subfolders: `sort/`, `selection/`, `row/`, `results/`. Filter toolbar seams stay at
 picker root.
 
-| Module                                            | Role                                                       |
-| ------------------------------------------------- | ---------------------------------------------------------- |
-| `results/catalog-picker-results-state.client.tsx` | Dashed empty-state `InsetPanel` (spells + proficiencies)   |
-| `results/catalog-picker-empty-state.lib.ts`       | `no-options` / `selection-full` kind + message mapping     |
-| `row/catalog-picker-row-state.lib.ts`             | Dimmed row + first disabled-reason note                    |
-| `catalog-picker-filter-state.lib.ts` (root)       | Clearable / reset-view criteria (equipment delegates here) |
-| `catalog-toolbar-reset-action.client.tsx` (root)  | Reset button + layout-stable slot                          |
-| `sort/catalog-sort-control.client.tsx`            | Sort `<Select>`                                            |
+| Module                                      | Role                                                       |
+| ------------------------------------------- | ---------------------------------------------------------- |
+| `results/catalog-picker-results-state.tsx`  | Dashed empty-state `InsetPanel` (spells + proficiencies)   |
+| `results/catalog-picker-empty-state.lib.ts` | `no-options` / `selection-full` kind + message mapping     |
+| `row/catalog-picker-row-state.lib.ts`       | Dimmed row + first disabled-reason note                    |
+| `catalog-picker-filter-state.lib.ts` (root) | Clearable / reset-view criteria (equipment delegates here) |
+| `catalog-toolbar-reset-action.tsx` (root)   | Reset button + layout-stable slot                          |
+| `sort/catalog-sort-control.tsx`             | Sort `<Select>`                                            |
 
 **Promoted to `@rpg/ui`** (import from `@rpg/ui`, not `character/components/picker/`):
 
-| Module                                        | Role                                                  |
-| --------------------------------------------- | ----------------------------------------------------- |
-| `catalog-picker-selection-actions.client.tsx` | Add / Remove row action phases                        |
-| `catalog-picker-row-action.lib.ts`            | Phase resolver (`resolveCatalogPickerRowActionPhase`) |
+| Module                                 | Role                                                  |
+| -------------------------------------- | ----------------------------------------------------- |
+| `catalog-picker-selection-actions.tsx` | Add / Remove row action phases                        |
+| `catalog-picker-row-action.lib.ts`     | Phase resolver (`resolveCatalogPickerRowActionPhase`) |
 
 **Not in `picker/` (domain-owned):**
 
@@ -165,7 +165,7 @@ picker root.
 | -------------------------------------------------------- | ------------------------------ |
 | `spell-picker-browse-mode.lib.ts`                        | `spells/picker/`               |
 | `useSpellPickerController`                               | `spells/picker/`               |
-| `spell-picker-selection-summary.client.tsx`              | `spells/picker/` (spells only) |
+| `spell-picker-selection-summary.tsx`                     | `spells/picker/` (spells only) |
 | `useEquipmentAcquisitionCommitConfirmation`              | `equipment/acquisition/`       |
 | `map-*-compact-summary-to-metadata-lines.ts`             | respective domain `*/picker/`  |
 | `CatalogMetadataRenderer` / `formatCatalogMetadataLines` | `@/features/content`           |

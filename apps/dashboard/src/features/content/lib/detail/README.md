@@ -34,7 +34,7 @@ DetailCollectionGroup
         └── DetailEntityRow
 ```
 
-Canonical production: [`LocationChildrenSection`](../../locations/components/hierarchy/location-children-section.client.tsx)
+Canonical production: [`LocationChildrenSection`](../../locations/components/hierarchy/location-children-section.tsx)
 (story: `locations/components/hierarchy/location-children-section.stories.tsx`).
 
 ## Relationship collection body
@@ -51,9 +51,9 @@ RelationshipList.Root
 
 Canonical production:
 
-- [`OrganizationMembersSection`](../../organizations/components/members/organization-members-section.client.tsx)
-- [`LocationPeopleAndOrganizationsSection`](../../locations/components/connected-parties/location-people-and-organizations-section.client.tsx)
-- [`OrganizationLocationConnectionsSection`](../../organizations/components/location-connections/organization-location-connections-section.client.tsx)
+- [`OrganizationMembersSection`](../../organizations/components/members/organization-members-section.tsx)
+- [`LocationPeopleAndOrganizationsSection`](../../locations/components/connected-parties/location-people-and-organizations-section.tsx)
+- [`OrganizationLocationConnectionsSection`](../../organizations/components/location-connections/organization-location-connections-section.tsx)
 
 Organizations stay **Relationship-first** — do not re-scaffold them onto
 `DetailCollectionGroup` / `DetailCollectionRowList` for parity with Locations.

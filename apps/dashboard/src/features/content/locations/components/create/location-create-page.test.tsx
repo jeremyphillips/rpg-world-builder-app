@@ -11,7 +11,7 @@ import {
   LOCATION_CREATE_TYPE_SEARCH_PARAM,
 } from '../../lib/create/location-create-shortcuts'
 import { SITE_CREATE_SETUP_PROMPT } from '../../lib/create/setup/location-site-create-setup.lib'
-import { LocationCreatePage } from './location-create-page.client'
+import { LocationCreatePage } from './location-create-page'
 
 vi.mock('@/features/campaign', () => ({
   useCampaigns: () => ({ data: [] }),
@@ -23,7 +23,7 @@ vi.mock('../../../lib/forms/shells/create/content-create-shell', () => ({
   ),
 }))
 
-vi.mock('./location-create-modal.client', () => ({
+vi.mock('./location-create-modal', () => ({
   LocationCreateModal: () => <div data-testid="location-create-modal" />,
 }))
 

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 
-import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
+import { EquipmentPickerItemDetails } from './equipment-picker-item-details'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,

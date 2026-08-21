@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { buildLocationDetailViewModel } from '../../lib/location-display'
 import { HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../../fixtures'
-import { LocationChildrenSection } from './location-children-section.client'
+import { LocationChildrenSection } from './location-children-section'
 
 function createQueryClient() {
   return new QueryClient({

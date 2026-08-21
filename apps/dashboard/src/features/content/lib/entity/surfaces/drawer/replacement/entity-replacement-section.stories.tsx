@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { EntityReplacementSection } from './entity-replacement-section.client'
+import { EntityReplacementSection } from './entity-replacement-section'
 
 const meta = {
   title: 'Content/Entity/Surfaces/Drawer/Replacement/EntityReplacementSection',

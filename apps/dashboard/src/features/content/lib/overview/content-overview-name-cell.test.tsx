@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
-import { ContentOverviewNameCell } from './content-overview-name-cell.client'
+import { ContentOverviewNameCell } from './content-overview-name-cell'
 import { contentOverviewListQueryKey } from './content-overview-query-keys'
 
 function renderNameCell(props: Partial<ComponentProps<typeof ContentOverviewNameCell>> = {}) {

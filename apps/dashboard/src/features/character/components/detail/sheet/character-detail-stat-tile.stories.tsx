@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterDetailStatTile } from './character-detail-stat-tile.client'
+import { CharacterDetailStatTile } from './character-detail-stat-tile'
 
 const meta = {
   title: 'Character/CharacterDetailStatTile',

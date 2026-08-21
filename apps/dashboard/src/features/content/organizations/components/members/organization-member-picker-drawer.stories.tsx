@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { OrganizationMemberPickerDrawer } from './organization-member-picker-drawer.client'
+import { OrganizationMemberPickerDrawer } from './organization-member-picker-drawer'
 import {
   ORGANIZATION_MEMBER_PICKER_CANDIDATES,
   ORGANIZATION_MEMBER_PICKER_ORGANIZATION,

@@ -2,7 +2,7 @@ import type { SpellResolutionOutcomeResult } from '@rpg/contracts'
 import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
-import { SpellResolutionOutcomeApplicationSection } from '../../components/outcomes/spell-resolution-outcome-application-section.client'
+import { SpellResolutionOutcomeApplicationSection } from '../../components/outcomes/spell-resolution-outcome-application-section'
 
 import { embeddedArrayResolverField } from '../../../../lib/forms/validation/tabbed-form-resolver-fields'
 import { readOutcomeApplications } from './resolution-outcome-applications.lib'

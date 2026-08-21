@@ -22,7 +22,7 @@ import { createNpc } from '../../api/npc-client'
 import type * as NpcClient from '../../api/npc-client'
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
-import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
+import { QuickNpcAuthoringForm } from './quick-npc-authoring-form'
 
 vi.mock('../../api/npc-client', async (importOriginal) => ({
   ...(await importOriginal<typeof NpcClient>()),

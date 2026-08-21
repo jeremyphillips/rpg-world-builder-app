@@ -1,9 +1,7 @@
-'use client'
-
 import type { CampaignListItem } from '@rpg/contracts'
 
 import { CAMPAIGN_DESTINATION_COPY } from '../lib/recovery/campaign-destination-copy'
-import { CampaignDestinationSection } from './recovery/campaign-destination-section.client'
+import { CampaignDestinationSection } from './recovery/campaign-destination-section'
 
 interface CampaignPickerProps {
   campaigns: CampaignListItem[]

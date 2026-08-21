@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { EntityReplacementCurrentField } from './entity-replacement-current-field.client'
+import { EntityReplacementCurrentField } from './entity-replacement-current-field'
 
 describe('EntityReplacementCurrentField', () => {
   it('renders label and entity context in a sunken inset panel', () => {

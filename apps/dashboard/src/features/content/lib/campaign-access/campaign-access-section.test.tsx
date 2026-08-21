@@ -4,8 +4,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { CampaignAccessSection } from './campaign-access-section.client'
-import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
+import { CampaignAccessSection } from './campaign-access-section'
+import { CampaignAccessFormProvider } from './campaign-access-form-context'
 import * as campaignAccessApi from './campaign-access-api'
 import * as participantRoster from './use-campaign-access-participant-roster'
 

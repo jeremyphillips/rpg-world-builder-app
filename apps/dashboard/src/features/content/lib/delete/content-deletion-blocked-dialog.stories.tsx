@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ContentDeletionBlockedDialog } from './content-deletion-blocked-dialog.client'
+import { ContentDeletionBlockedDialog } from './content-deletion-blocked-dialog'
 
 const meta = {
   title: 'Content/ContentDeletionBlockedDialog',

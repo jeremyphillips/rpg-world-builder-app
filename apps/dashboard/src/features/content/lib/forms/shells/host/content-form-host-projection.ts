@@ -8,7 +8,7 @@ import { resolutionFormValueSyncs } from '../../../../spells/resolution/lib/form
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 import { contentFormFields } from '../../registry/content-form-registry'
 import { resolveContentFormSchema } from '../edit/content-edit-load'
-import type { ContentFormHostFormProps } from './content-form-host.client'
+import type { ContentFormHostFormProps } from './content-form-host'
 
 /** Resolver fields for invalid-submit focus — hoisted name first. */
 export function resolveContentFormNavigationFields(

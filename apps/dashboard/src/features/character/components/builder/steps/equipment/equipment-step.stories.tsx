@@ -14,7 +14,7 @@ import {
   equipmentStepLuteFixture,
   equipmentStepMonkClassFixture,
 } from '../../../../lib/equipment/equipment-step.fixtures'
-import { EquipmentStep } from './equipment-step.client'
+import { EquipmentStep } from './equipment-step'
 
 const context = createStandaloneBuilderContextFixture({
   catalog: equipmentStepCatalogFixture,

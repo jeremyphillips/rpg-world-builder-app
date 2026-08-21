@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildEquipmentDetailViewModel, EQUIPMENT_STAT_LABELS } from '../lib/equipment-display'
 import { pickEquipment } from '../../lib/fixtures/pick'
-import { EquipmentDetailMetadata } from './equipment-detail-metadata.client'
+import { EquipmentDetailMetadata } from './equipment-detail-metadata'
 
 const longswordDetail = buildEquipmentDetailViewModel(pickEquipment('longsword'))
 

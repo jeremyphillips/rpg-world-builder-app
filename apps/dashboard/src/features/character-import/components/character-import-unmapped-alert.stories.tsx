@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterImportUnmappedAlert } from './character-import-unmapped-alert.client'
+import { CharacterImportUnmappedAlert } from './character-import-unmapped-alert'
 
 const meta = {
   title: 'Dashboard/Character Import/Unmapped Alert',

@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
-import { CampaignAccessSection } from './campaign-access-section.client'
-import { CampaignAccessFormProvider } from './campaign-access-form-context.client'
-import { ContentEditHeadingBadges } from './content-edit-heading-badges.client'
+import { CampaignAccessSection } from './campaign-access-section'
+import { CampaignAccessFormProvider } from './campaign-access-form-context'
+import { ContentEditHeadingBadges } from './content-edit-heading-badges'
 
 const meta = {
   title: 'Content/Campaign Access',

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-import { CharacterImportEquipmentPreviewSection } from './character-import-equipment-preview.client'
+import { CharacterImportEquipmentPreviewSection } from './character-import-equipment-preview'
 
 describe('CharacterImportEquipmentPreviewSection', () => {
   it('groups supported equipment above unsupported items', () => {

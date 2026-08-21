@@ -7,7 +7,7 @@ import {
   EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE,
   type EquipmentInventoryRow,
 } from '../../../../lib/equipment/equipment-step.lib'
-import { EquipmentPurchasedInventorySection } from '../purchased/equipment-purchased-inventory-section.client'
+import { EquipmentPurchasedInventorySection } from '../purchased/equipment-purchased-inventory-section'
 import type { PurchasedCategoryGroup } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 
 const stackableRow: EquipmentInventoryRow = {

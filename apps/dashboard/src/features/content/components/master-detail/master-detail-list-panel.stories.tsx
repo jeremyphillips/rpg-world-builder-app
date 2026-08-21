@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { MasterDetailListPanel } from './master-detail-list-panel.client'
+import { MasterDetailListPanel } from './master-detail-list-panel'
 
 const meta = {
   title: 'Content/MasterDetailListPanel',

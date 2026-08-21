@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
-import { DrawerEntityBlock } from './drawer-entity-block.client'
+import { DrawerEntityBlock } from './drawer-entity-block'
 
 describe('DrawerEntityBlock', () => {
   it('projects heading, classification, and description through EntityAnatomy', () => {

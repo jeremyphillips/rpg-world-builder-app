@@ -6,7 +6,7 @@ import {
   CampaignAccessFormProvider,
   useCampaignAccessForm,
   useCampaignAccessParticipantUpdater,
-} from './campaign-access-form-context.client'
+} from './campaign-access-form-context'
 
 function ParticipantHarness({ isDirty, isPending }: { isDirty: boolean; isPending: boolean }) {
   const save = vi.fn(async () => ({ status: 'skipped' as const }))

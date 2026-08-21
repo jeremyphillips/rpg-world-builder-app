@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import { SpellPickerDrawer } from './spell-picker-drawer.client'
+import { SpellPickerDrawer } from './spell-picker-drawer'
 import {
   spellPickerCantripChoiceSetFixture,
   spellPickerDetectMagicFixture,

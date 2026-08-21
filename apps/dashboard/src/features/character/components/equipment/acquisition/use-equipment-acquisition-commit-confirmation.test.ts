@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS,
   useEquipmentAcquisitionCommitConfirmation,
-} from './use-equipment-acquisition-commit-confirmation.client'
+} from './use-equipment-acquisition-commit-confirmation'
 
 describe('useEquipmentAcquisitionCommitConfirmation', () => {
   it('resets quantity and shows success after commit', () => {

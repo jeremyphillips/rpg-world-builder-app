@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
+import { CrossContentRelationshipRow } from './cross-content-relationship-row'
 
 describe('CrossContentRelationshipRow', () => {
   it('renders optional secondaryText when supplied', () => {

@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts/character-import'
 
 import { createCharacterImportAdaptOptions } from '../model/character-import-adapt-options'
-import { CharacterImportPreview } from './character-import-preview.client'
+import { CharacterImportPreview } from './character-import-preview'
 
 const fixtureResult = adaptDndBeyondCharacter(
   dndBeyondCharacter133058471Payload,

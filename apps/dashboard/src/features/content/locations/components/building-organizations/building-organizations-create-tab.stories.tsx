@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { makeOrganization } from '@/test/fixtures/factories/organization'
 
-import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab.client'
+import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab'
 import type { BuildingOrganizationDraftPlan } from '../../lib/building-organizations/building-organization-create-drafts'
 
 const organizationItems = [

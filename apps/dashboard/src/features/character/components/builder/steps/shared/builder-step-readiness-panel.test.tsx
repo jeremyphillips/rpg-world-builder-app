@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { characterBuilderStepReadinessMessages, formatFieldMessage } from '@rpg/contracts'
 
-import { BuilderStepReadinessPanel } from './builder-step-readiness-panel.client'
+import { BuilderStepReadinessPanel } from './builder-step-readiness-panel'
 
 describe('BuilderStepReadinessPanel', () => {
   it('renders a partial-block info alert with helper text', () => {

@@ -6,7 +6,7 @@ import {
   createCampaignPcBuilderContextFixture,
   createStandaloneBuilderContextFixture,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import { CharacterBuilderLevelControl } from './character-builder-level-control.client'
+import { CharacterBuilderLevelControl } from './character-builder-level-control'
 
 const meta = {
   title: 'Character Builder/CharacterBuilderLevelControl',

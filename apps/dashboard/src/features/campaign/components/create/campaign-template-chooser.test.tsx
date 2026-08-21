@@ -4,10 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import type { CampaignTemplate } from '@rpg/contracts'
 
-import {
-  BLANK_CAMPAIGN_TEMPLATE_VALUE,
-  CampaignTemplateChooser,
-} from './campaign-template-chooser.client'
+import { BLANK_CAMPAIGN_TEMPLATE_VALUE, CampaignTemplateChooser } from './campaign-template-chooser'
 
 const template: CampaignTemplate = {
   metadata: {

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { SETTLEMENT_CREATE_SETUP_HEADLINE } from '../../../lib/create/setup/location-settlement-create-setup.lib'
-import { LocationCreateSetupHost } from './location-create-setup-host.client'
+import { LocationCreateSetupHost } from './location-create-setup-host'
 
 describe('LocationCreateSetupHost', () => {
   it('renders the shared setup session for setup-gated authoring types', () => {

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { SpeciesPersonalNameComponentsField } from './species-personal-name-components-field.client'
+import { SpeciesPersonalNameComponentsField } from './species-personal-name-components-field'
 
 function StoryWrapper({
   defaultValues = { culture: { naming: { supported: true, personalNameComponents: [] } } },

@@ -8,7 +8,7 @@ import {
   formatCampaignRoleLabel,
   formatMemberInviteAcceptedLine,
 } from '../../lib/overview/campaign-overview-labels'
-import { CampaignOverviewMemberRowActions } from './campaign-overview-member-row-actions.client'
+import { CampaignOverviewMemberRowActions } from './campaign-overview-member-row-actions'
 
 export type CampaignOverviewMembersSectionProps = {
   members: CampaignOverviewMemberListItem[]

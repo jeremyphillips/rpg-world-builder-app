@@ -48,7 +48,7 @@ Inside the feature → direct owner-relative imports. Topbar may import `results
 **Root components rule:** keep a component at `components/` root when consumed by multiple
 sibling surface families and neither family is the natural sole owner.
 
-**Result modules:** `global-search-result-lists.client.tsx` holds reusable grouped/flat collection
+**Result modules:** `global-search-result-lists.tsx` holds reusable grouped/flat collection
 compositors; `GlobalSearchResultsBody` is the full-page results surface (filters, loading, shell).
 
 ## Key files
@@ -57,11 +57,11 @@ compositors; `GlobalSearchResultsBody` is the full-page results surface (filters
 - `lib/resolve-global-search-href.ts` — wire `target` → dashboard href
 - `lib/rank-global-search.ts` — forgiving `@rpg/ui` ranking + grouping helpers
 - `routes/global-search-page.tsx` — full results page
-- `components/global-search-provider.client.tsx` — public shell entry; topbar open state + ⌘K
-- `components/global-search-field.client.tsx` — shared search input
-- `components/topbar/global-search-topbar.client.tsx` — public topbar composition root
-- `components/results/global-search-results-body.client.tsx` — page results surface
-- `components/results/global-search-result-lists.client.tsx` — grouped/flat result compositors
+- `components/global-search-provider.tsx` — public shell entry; topbar open state + ⌘K
+- `components/global-search-field.tsx` — shared search input
+- `components/topbar/global-search-topbar.tsx` — public topbar composition root
+- `components/results/global-search-results-body.tsx` — page results surface
+- `components/results/global-search-result-lists.tsx` — grouped/flat result compositors
 
 Public barrel exports `GlobalSearchProvider`, `GlobalSearchTopbar`, and `GlobalSearchTrigger`
 (dead export follow-up: `GlobalSearchTrigger`, `useGlobalSearchContext`). Route screens

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
-import { LocationSiteCreateSetup } from './location-site-create-setup.client'
+import { LocationSiteCreateSetup } from './location-site-create-setup'
 
 const meta = {
   title: 'Content/Locations/LocationSiteCreateSetup',

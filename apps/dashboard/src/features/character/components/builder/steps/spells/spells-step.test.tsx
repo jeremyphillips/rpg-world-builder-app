@@ -17,7 +17,7 @@ import {
   spellsStepWizardCantrips,
   spellsStepWizardClass,
 } from '../../../../lib/spells/spells-step.fixtures'
-import { SpellsStep } from './spells-step.client'
+import { SpellsStep } from './spells-step'
 
 const context = createSpellsStepContextFixture()
 

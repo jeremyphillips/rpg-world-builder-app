@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { MasterDetailValidationBanner } from './master-detail-validation-banner.client'
+import { MasterDetailValidationBanner } from './master-detail-validation-banner'
 
 const meta = {
   title: 'Content/MasterDetailValidationBanner',

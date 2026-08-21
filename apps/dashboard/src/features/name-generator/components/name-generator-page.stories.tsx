@@ -11,7 +11,7 @@ import { createNameGeneratorFilterSchema } from '../model/name-generator-filter-
 import { formatMatchCountLabel } from '../model/format-results-summary'
 import { resetNameGeneratorFilters } from '../model/sanitize-filters-on-change'
 import type { NameGeneratorFilters } from '../model/name-generator-filters'
-import { NameGeneratorPage, NameGeneratorPageView } from './name-generator-page.client'
+import { NameGeneratorPage, NameGeneratorPageView } from './name-generator-page'
 
 const STORY_ELF_SPECIES: SpeciesCultureInput = {
   id: 'srd-cc-5.2.1:elf',

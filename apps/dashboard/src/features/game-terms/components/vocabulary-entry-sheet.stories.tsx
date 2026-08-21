@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { VocabularyEntrySheet } from './vocabulary-entry-sheet.client'
+import { VocabularyEntrySheet } from './vocabulary-entry-sheet'
 
 const editEntry = {
   id: 'fey-kin',

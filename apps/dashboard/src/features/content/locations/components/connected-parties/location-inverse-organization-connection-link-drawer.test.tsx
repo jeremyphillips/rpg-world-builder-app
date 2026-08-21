@@ -17,7 +17,7 @@ import {
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
   TERRITORIAL_AUTHORITY_DRAWER,
 } from '../../lib/connected-parties/location-connection-surface-copy'
-import { LocationInverseOrganizationConnectionLinkDrawer } from './location-inverse-organization-connection-link-drawer.client'
+import { LocationInverseOrganizationConnectionLinkDrawer } from './location-inverse-organization-connection-link-drawer'
 
 function infrastructureLocation() {
   return makeLocation({

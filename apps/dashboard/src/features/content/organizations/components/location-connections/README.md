@@ -36,4 +36,4 @@ location-connection adapter — not in this components folder.
 ## Related
 
 Member roster drawers (separate G6 workflow): [`members/`](../members/) →
-[`OrganizationMembersDetailDrawers`](../members/organization-members-detail-drawers.client.tsx).
+[`OrganizationMembersDetailDrawers`](../members/organization-members-detail-drawers.tsx).

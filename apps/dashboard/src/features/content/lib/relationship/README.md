@@ -38,7 +38,7 @@ nested-create/        nested entity-acquisition lifecycle (*Picker* symbols kept
 location-connection/  org/character ↔ location family adapter (flat)
 ```
 
-Feature `*-link-drawer.client.tsx` files are **composition roots** in
+Feature `*-link-drawer.tsx` files are **composition roots** in
 `locations/components/connected-parties/` and
 `organizations/components/location-connections/`. They are not moved here.
 
@@ -47,12 +47,12 @@ Feature `*-link-drawer.client.tsx` files are **composition roots** in
 | Folder                 | Supported imports                                                                                                                                                                            |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `core/`                | `relationship-candidate-set`, `relationship-mutation-capabilities`, `relationship-mutation-mode`                                                                                             |
-| `list/`                | `relationship-list.client` (`RelationshipList`), `relationship-overflow-actions`, `relationship-group-presentation` (typed-edge group action placement)                                      |
-| `drawer/`              | `drawer-context.client`, `relationship-drawer-subject-field.client`, `relationship-drawer-field-labels` (`RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL`)                                     |
-| `nested-create/`       | `use-relationship-picker-nested-create.client`, intent resolvers, `revalidateCreated*` helpers                                                                                               |
+| `list/`                | `relationship-list` (`RelationshipList`), `relationship-overflow-actions`, `relationship-group-presentation` (typed-edge group action placement)                                             |
+| `drawer/`              | `drawer-context`, `relationship-drawer-subject-field`, `relationship-drawer-field-labels` (`RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL`)                                                   |
+| `nested-create/`       | `use-relationship-picker-nested-create`, intent resolvers, `revalidateCreated*` helpers                                                                                                      |
 | `location-connection/` | eligibility, duplicate-keys, drawer-intent, kind-options, kind-options-copy (type), kind-decision-presentation, KindField, alternatives, invalidate, current-endpoint, mutation-mode aliases |
 
-**Private:** `list/row/cross-content-relationship-row.client` (use `RelationshipList.Row`
+**Private:** `list/row/cross-content-relationship-row` (use `RelationshipList.Row`
 only), list Empty/Footer internals, nested-create modals/handoff helpers (reached via the hook).
 
 ## Drawer composition grammars

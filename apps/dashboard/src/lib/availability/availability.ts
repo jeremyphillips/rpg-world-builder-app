@@ -1,4 +1,4 @@
-import type { MasterDetailListBadge } from '@/features/content/components/master-detail/master-detail-list-panel.client'
+import type { MasterDetailListBadge } from '@/features/content/components/master-detail/master-detail-list-panel'
 
 import {
   AVAILABILITY_REASON_CODES,

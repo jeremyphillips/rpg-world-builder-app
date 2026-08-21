@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import { ContentDeletionBlockedDialog } from './content-deletion-blocked-dialog.client'
+import { ContentDeletionBlockedDialog } from './content-deletion-blocked-dialog'
 
 describe('ContentDeletionBlockedDialog', () => {
   it('renders usage blockers as character links', async () => {

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
-import { EntityAnatomyHost } from './entity-anatomy.client'
+import { EntityAnatomyHost } from './entity-anatomy'
 import { GREY_COAST_ENTITY, HARBOR_DISTRICT_ENTITY } from '../entity.fixture'
 
 describe('EntityAnatomyHost', () => {

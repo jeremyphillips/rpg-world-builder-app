@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { MasterDetailDeleteDialog } from './master-detail-delete-dialog.client'
+import { MasterDetailDeleteDialog } from './master-detail-delete-dialog'
 
 describe('MasterDetailDeleteDialog', () => {
   it('renders the noun and name and confirms', async () => {

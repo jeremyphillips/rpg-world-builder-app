@@ -20,7 +20,7 @@ Outcome **application rows** were migrated from an ad-hoc card to the array fiel
   `lib/form/resolution-outcome-form-fields.ts`
 - `SpellResolutionOutcomeApplicationAddControl` (external add dropdown, mirrors effects)
 - `FormItems` with `namePrefix={`resolution.outcomes.${outcomeIndex}`}` in
-  `spell-resolution-outcome-group-body.client.tsx`
+  `spell-resolution-outcome-group-body.tsx`
 - `resolutionOutcomeApplicationsResolverFields()` wired on the spell Resolution tab
   (`spell-form-fields.ts`)
 
@@ -101,7 +101,7 @@ with resolver-only leaf fields for `resolution.outcomes.{0,1,2}.note` so tier-1
 validation copy uses "Additional behavior" if note validation is added later. Low
 priority today (`note` is optional).
 
-### 2. `spell-resolution-outcome-group-body.client.tsx`
+### 2. `spell-resolution-outcome-group-body.tsx`
 
 Replace separate `FormItems` + add control + `TextareaField` with one call:
 
@@ -119,7 +119,7 @@ Remove props: `noteId`, `noteValue`, `noteError`, `onNoteChange`, `onNoteBlur`.
 
 Keep: `headingId`, `result`, `outcomeIndex`, outer `<section>` + `<Heading>`.
 
-### 3. `use-spell-resolution-outcome-group.client.ts`
+### 3. `use-spell-resolution-outcome-group.ts`
 
 Remove:
 
@@ -129,7 +129,7 @@ Remove:
 
 Keep: `headingId`, `outcomeIndex`, `result`, collapse/expand miss logic.
 
-### 4. `spell-resolution-outcome-group.client.tsx` / types
+### 4. `spell-resolution-outcome-group.tsx` / types
 
 Update `SpellResolutionOutcomeGroupBodyProps` and spread from hook — drop note props.
 
@@ -155,7 +155,7 @@ Pre-commit affected gates per `AGENTS.md` before commit.
 ## Reference patterns
 
 - **Effects add slot:** `resolution-form-slots.ts` → `hideAddAction: true` + `SpellResolutionEffectAddControl`
-- **Embedded FormItems + namePrefix:** species heritage tab (`species-heritage-tab.client.tsx`)
+- **Embedded FormItems + namePrefix:** species heritage tab (`species-heritage-tab.tsx`)
 - **Resolver fields:** `embeddedArrayResolverField` in `tabbed-form-resolver-fields.ts`; spell tab already has `errorPaths: ['resolution.outcomes']`
 - **Form rhythm tokens:** `fieldStackRhythmVariants` / `kind: 'group'` — `packages/ui/docs/forms/sizing-and-spacing.md`
 

@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useState } from 'react'
 import {
   deriveVocabularyEntryId,
@@ -17,11 +15,11 @@ import { useCanManageCampaign } from '@/features/campaign'
 import { notifyVocabularyEntryCreated, notifyVocabularyEntrySaved } from '@/lib/notify'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
 
-import { BulkVocabularyAvailabilityDialog } from '../components/bulk-vocabulary-availability-dialog.client'
+import { BulkVocabularyAvailabilityDialog } from '../components/bulk-vocabulary-availability-dialog'
 import {
   VocabularyEntrySheet,
   type VocabularyEntryFormValues,
-} from '../components/vocabulary-entry-sheet.client'
+} from '../components/vocabulary-entry-sheet'
 import {
   UNKNOWN_VOCABULARY_SET_MESSAGE,
   useVocabularyMutations,
@@ -29,7 +27,7 @@ import {
   vocabularyFieldLabel,
 } from '@/features/vocabulary'
 
-import { useVocabularyOverviewPage } from '../hooks/use-vocabulary-overview-page.client'
+import { useVocabularyOverviewPage } from '../hooks/use-vocabulary-overview-page'
 import { GameTermsFallback } from '../lib/detail/game-terms-fallback'
 import { findGameTermsCategory } from '../lib/hub/vocabulary-set-registry'
 import { VOCABULARY_OVERVIEW_FILTER_SCHEMA } from '../lib/vocabulary/vocabulary-overview-filter-schema'

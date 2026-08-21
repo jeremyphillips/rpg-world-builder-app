@@ -3,34 +3,26 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const actionsSource = readFileSync(
-  fileURLToPath(
-    new URL('../../components/create/location-create-actions.client.tsx', import.meta.url),
-  ),
+  fileURLToPath(new URL('../../components/create/location-create-actions.tsx', import.meta.url)),
   'utf8',
 )
 const childrenSource = readFileSync(
   fileURLToPath(
-    new URL('../../components/hierarchy/location-children-section.client.tsx', import.meta.url),
+    new URL('../../components/hierarchy/location-children-section.tsx', import.meta.url),
   ),
   'utf8',
 )
 const modalSource = readFileSync(
-  fileURLToPath(
-    new URL('../../components/create/location-create-modal.client.tsx', import.meta.url),
-  ),
+  fileURLToPath(new URL('../../components/create/location-create-modal.tsx', import.meta.url)),
   'utf8',
 )
 
 const pageSource = readFileSync(
-  fileURLToPath(
-    new URL('../../components/create/location-create-page.client.tsx', import.meta.url),
-  ),
+  fileURLToPath(new URL('../../components/create/location-create-page.tsx', import.meta.url)),
   'utf8',
 )
 const formSource = readFileSync(
-  fileURLToPath(
-    new URL('../../components/create/location-create-form.client.tsx', import.meta.url),
-  ),
+  fileURLToPath(new URL('../../components/create/location-create-form.tsx', import.meta.url)),
   'utf8',
 )
 

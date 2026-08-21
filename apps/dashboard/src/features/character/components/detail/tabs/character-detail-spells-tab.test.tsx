@@ -11,7 +11,7 @@ import {
 } from '../../../lib/fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetSpellCards } from '../../../lib/detail/character-sheet-catalog'
-import { CharacterDetailSpellsTab } from './character-detail-spells-tab.client'
+import { CharacterDetailSpellsTab } from './character-detail-spells-tab'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {

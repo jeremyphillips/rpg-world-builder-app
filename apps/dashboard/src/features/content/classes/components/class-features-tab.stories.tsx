@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { ClassFeaturesTab } from './class-features-tab.client'
+import { ClassFeaturesTab } from './class-features-tab'
 
 const meta = {
   title: 'Content/Classes/ClassFeaturesTab',

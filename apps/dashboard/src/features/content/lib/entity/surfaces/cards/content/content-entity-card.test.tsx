@@ -5,9 +5,9 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { buildEntityMediaFromImageKey } from '../../../summary/entity-media.lib'
 import { HARBOR_DISTRICT_ENTITY } from '../../../entity.fixture'
-import { CatalogEntityPickerSheet } from '../../catalog/catalog-entity-picker-sheet.client'
-import { createCatalogEntityRowRenderer } from '../../catalog/catalog-entity-row-renderer.client'
-import { ContentEntityCard, ContentEntityCardViewLink } from './content-entity-card.client'
+import { CatalogEntityPickerSheet } from '../../catalog/catalog-entity-picker-sheet'
+import { createCatalogEntityRowRenderer } from '../../catalog/catalog-entity-row-renderer'
+import { ContentEntityCard, ContentEntityCardViewLink } from './content-entity-card'
 
 describe('ContentEntityCard', () => {
   it('wraps the heading in a link when headingHref is provided', () => {

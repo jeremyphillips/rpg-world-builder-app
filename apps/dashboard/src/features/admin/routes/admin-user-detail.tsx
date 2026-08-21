@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Badge, buttonVariants, Heading, RowActionsMenu, Text } from '@rpg/ui'
@@ -10,8 +8,8 @@ import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { useIsSuperadmin } from '@/features/auth'
 
-import { DeleteUserDialog } from '../components/delete-user-dialog.client'
-import { AdminUserContextLine } from '../components/admin-user-tab-nav.client'
+import { DeleteUserDialog } from '../components/delete-user-dialog'
+import { AdminUserContextLine } from '../components/admin-user-tab-nav'
 import { useAdminUserRouteContext } from '../lib/admin-user-route-context'
 import { toAdminUserDeleteSubject } from '../lib/admin-user-delete-subject'
 import {

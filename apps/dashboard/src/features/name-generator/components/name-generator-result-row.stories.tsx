@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import type { GeneratedName } from '@rpg/contracts/name-generator'
 
-import { NameGeneratorResultRow } from './name-generator-result-row.client'
+import { NameGeneratorResultRow } from './name-generator-result-row'
 
 const FIXTURE_RESULT: GeneratedName = {
   value: 'Aelar Galanodel',

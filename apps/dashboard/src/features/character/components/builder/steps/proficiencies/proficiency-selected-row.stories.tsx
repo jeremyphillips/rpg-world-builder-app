@@ -4,7 +4,7 @@ import {
   createProficienciesStepRogueFixture,
   proficienciesStepStealthSkill,
 } from '../../../../lib/proficiencies/proficiencies-step.fixtures'
-import { ProficiencySelectedRow } from './proficiency-selected-row.client'
+import { ProficiencySelectedRow } from './proficiency-selected-row'
 
 const base = createProficienciesStepRogueFixture()
 const skillChoiceSetId = base.resolvedChoiceSets.find(

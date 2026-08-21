@@ -19,7 +19,7 @@ import {
 } from '../lib/requirement-editor-form-schema'
 import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
 import { FormSectionProvider } from '@rpg/ui/form'
-import { RequirementEditor } from './requirement-editor.client'
+import { RequirementEditor } from './requirement-editor'
 
 function EditorShell({
   prerequisiteEditor = requirementEditorDefaultValue(),

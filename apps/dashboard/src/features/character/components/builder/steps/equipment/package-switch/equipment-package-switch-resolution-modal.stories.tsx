@@ -13,7 +13,7 @@ import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
-import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal.client'
+import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
 
 const rope = pickEquipment('rope')
 const silverNeedle = pickEquipment('silver-needle')

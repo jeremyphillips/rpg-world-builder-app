@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { DrawerContext } from './drawer-context.client'
+import { DrawerContext } from './drawer-context'
 
 describe('DrawerContext', () => {
   it('renders one entity with suffix and supporting text', () => {

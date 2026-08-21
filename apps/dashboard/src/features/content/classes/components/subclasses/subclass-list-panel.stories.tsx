@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { SUBCLASSES_FOR_FIGHTER } from '../../fixtures'
-import { SubclassListPanel } from './subclass-list-panel.client'
+import { SubclassListPanel } from './subclass-list-panel'
 
 const meta = {
   title: 'Content/Classes/SubclassListPanel',

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { FormEmbeddedMasterDetailEditor } from './form-embedded-master-detail-editor.client'
+import { FormEmbeddedMasterDetailEditor } from './form-embedded-master-detail-editor'
 
 const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name', required: true }]
 

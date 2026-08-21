@@ -6,7 +6,7 @@ import { pickClass } from '../../lib/fixtures/pick'
 
 import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { SpeciesRulesTab } from './species-rules-tab.client'
+import { SpeciesRulesTab } from './species-rules-tab'
 
 const meta = {
   title: 'Content/Species/SpeciesRulesTab',

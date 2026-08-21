@@ -15,7 +15,7 @@ import {
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
-vi.mock('../../lib/usage/content-usage-references-section.client', () => ({
+vi.mock('../../lib/usage/content-usage-references-section', () => ({
   ContentUsageReferencesSection: () => null,
 }))
 vi.mock('@/features/campaign', () => ({

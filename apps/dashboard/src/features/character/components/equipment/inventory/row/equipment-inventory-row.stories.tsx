@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row.client'
+import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 
 const editableStartingGoldRow: EquipmentInventoryRow = {
