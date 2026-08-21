@@ -5,7 +5,7 @@ import { Button, Text } from '@rpg/ui'
 import {
   PACKAGE_SWITCH_CANCEL_LABEL,
   PACKAGE_SWITCH_CONFIRM_LABEL,
-} from './equipment-package-switch-resolution.lib'
+} from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import {
   equipmentPackageSwitchResolutionFooterActionsClasses,
   equipmentPackageSwitchResolutionFooterClasses,

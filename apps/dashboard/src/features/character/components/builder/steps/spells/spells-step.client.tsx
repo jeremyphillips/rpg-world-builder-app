@@ -20,8 +20,8 @@ import { choiceSetsForSpellsStep } from '../../../../lib/spells/spells-step.lib'
 import { withChoiceSetSelections } from '../../../../lib/choice-sets/choice-set-selections'
 import { BuilderStepFrame } from '../shared/builder-step-frame.client'
 import { BuilderStepReadinessPanel } from '../shared/builder-step-readiness-panel.client'
-import { SpellChoiceSection } from '../../../spells/spell-choice-section.client'
-import { SpellcastingSummaryCard } from '../../../spells/spellcasting-summary-card.client'
+import { SpellChoiceSection } from './spell-choice-section.client'
+import { SpellcastingSummaryCard } from './spellcasting-summary-card.client'
 import {
   SPELL_PICKER_MODE_CANTRIPS,
   type SpellPickerMode,

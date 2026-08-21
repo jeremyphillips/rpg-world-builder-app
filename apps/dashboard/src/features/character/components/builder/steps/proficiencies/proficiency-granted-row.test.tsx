@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { createProficienciesStepRogueFixture } from '../../lib/proficiencies/proficiencies-step.fixtures'
+import { createProficienciesStepRogueFixture } from '../../../../lib/proficiencies/proficiencies-step.fixtures'
 import { ProficiencyGrantedRow } from './proficiency-granted-row.client'
 
 describe('ProficiencyGrantedRow', () => {

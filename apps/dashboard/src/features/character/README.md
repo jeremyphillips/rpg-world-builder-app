@@ -49,9 +49,10 @@ lifecycles — detail tabs and membership composition stay here.
 
 ## `components/equipment/` layout
 
-Builder equipment acquisition UI — catalog drawer, step inventory, acquisition
-panel, starting package, and package-switch modal. Shared catalog chrome lives in
-`components/picker/` (not here).
+Reusable equipment domain capabilities — catalog drawer, step inventory,
+acquisition panel, and starting package. Builder-only package-switch modal lives
+under `components/builder/steps/equipment/package-switch/`. Shared catalog chrome
+lives in `components/picker/` (not here).
 
 | Subfolder           | Responsibility                                                                    |
 | ------------------- | --------------------------------------------------------------------------------- |
@@ -63,10 +64,17 @@ panel, starting package, and package-switch modal. Shared catalog chrome lives i
 | `inventory/`        | Step inventory — `summary/`, `row/`, `column/`, `purchased/`, `added/`, `manage/` |
 | `acquisition/`      | Step acquisition panel, guidance, commit labels                                   |
 | `starting-package/` | Starting-equipment option cards, package card, toolbar                            |
-| `package-switch/`   | Package-switch resolution modal and conversion editor                             |
+| `package-switch/`   | **Temporary stub** — conversion editor only (starting-package follow-up)          |
 
-Inventory layout VM: `lib/equipment/equipment-inventory-summary.lib.ts`. Shared
-inventory CVA: `inventory/equipment-inventory.variants.ts`.
+Inventory layout VM: `lib/equipment/equipment-inventory-summary.lib.ts`. Package-switch
+resolution state: `lib/equipment/equipment-package-switch-resolution.lib.ts` (pure logic,
+no presentation). Shared inventory CVA: `inventory/equipment-inventory.variants.ts`.
+
+## `components/proficiencies/` and `components/spells/` layout
+
+Thin domain folders — `picker/` only. Builder step composition (sections, rows,
+spell choice/summary cards) lives under `components/builder/steps/proficiencies/` and
+`components/builder/steps/spells/`.
 
 ## `components/connections/` layout
 
@@ -104,9 +112,12 @@ sibling folders (`equipment/`, `spells/`, `proficiencies/`, `connections/`,
 | `steps/`     | One folder per canonical step; shared chrome in `steps/shared/`                   |
 
 Each builder step owns a folder (`identity/`, `species/`, `class/`, `abilities/`,
-`proficiencies/`, `equipment/`, `spells/`, `connections/`, `review/`). Shared step wrappers
-(`builder-step-frame`, `builder-step-readiness-panel`) live in `steps/shared/`. Subdivide within a
-step only for stable sub-responsibilities (e.g. `abilities/assignment/`, `abilities/recommendation/`).
+`proficiencies/`, `equipment/`, `spells/`, `connections/`, `review/`). Step-specific
+composition (proficiency sections/rows, spell choice/summary cards, equipment
+package-switch modal) lives in the step folder — not under domain `components/`.
+Shared step wrappers (`builder-step-frame`, `builder-step-readiness-panel`) live in
+`steps/shared/`. Subdivide within a step only for stable sub-responsibilities (e.g.
+`abilities/assignment/`, `abilities/recommendation/`, `equipment/package-switch/`).
 
 Step orchestration hooks stay in `hooks/` (`use-*-step.client.ts`); view models
 stay in `lib/builder/`, `lib/steps/`, and per-concern `lib/<step>/`.
@@ -181,7 +192,7 @@ subdirectories.
 | `detail/`                  | Sheet catalog, tab filters, route error copy                                               |
 | `display/`                 | List/detail character display view models                                                  |
 | `draft/`                   | Draft merge, touch, and non-empty detection                                                |
-| `equipment/`               | Equipment step view models                                                                 |
+| `equipment/`               | Equipment step view models and package-switch resolution                                   |
 | `fixtures/`                | Story/test fixtures and builder context seeds                                              |
 | `navigation/`              | Standalone sheet redirect helpers (not builder step rail)                                  |
 | `proficiencies/`           | Proficiencies step view models                                                             |

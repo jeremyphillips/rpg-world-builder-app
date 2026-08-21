@@ -6,14 +6,14 @@ import { Text } from '@rpg/ui'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../../lib/equipment/equipment-step.lib'
+} from '../../../../../lib/equipment/equipment-step.lib'
 
-import { EquipmentInventoryColumn } from '../inventory/column/equipment-inventory-column.client'
-import { EquipmentPurchasedInventorySection } from '../inventory/purchased/equipment-purchased-inventory-section.client'
+import { EquipmentInventoryColumn } from '../../../../equipment/inventory/column/equipment-inventory-column.client'
+import { EquipmentPurchasedInventorySection } from '../../../../equipment/inventory/purchased/equipment-purchased-inventory-section.client'
 import {
   type buildPackageSwitchDraftPurchasedGroups,
   PACKAGE_SWITCH_SAFETY_NOTE,
-} from './equipment-package-switch-resolution.lib'
+} from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import {
   equipmentPackageSwitchResolutionAlertClasses,
   equipmentPackageSwitchResolutionBlockedBodyClasses,

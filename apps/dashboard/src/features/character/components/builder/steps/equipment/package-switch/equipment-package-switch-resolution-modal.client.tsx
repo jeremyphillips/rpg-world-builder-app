@@ -12,12 +12,12 @@ import { Modal } from '@rpg/ui'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
-} from '../../../lib/equipment/equipment-step.lib'
+} from '../../../../../lib/equipment/equipment-step.lib'
 
 import {
   buildPackageSwitchDraftPurchasedGroups,
   resolvePackageSwitchModalState,
-} from './equipment-package-switch-resolution.lib'
+} from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import { EquipmentPackageSwitchResolutionModalBody } from './equipment-package-switch-resolution-modal-body.client'
 import { EquipmentPackageSwitchResolutionModalFooter } from './equipment-package-switch-resolution-modal-footer.client'
 import {

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
   createProficienciesStepRogueFixture,
   proficienciesStepStealthSkill,
-} from '../../lib/proficiencies/proficiencies-step.fixtures'
+} from '../../../../lib/proficiencies/proficiencies-step.fixtures'
 import { ProficiencySelectedRow } from './proficiency-selected-row.client'
 
 const base = createProficienciesStepRogueFixture()

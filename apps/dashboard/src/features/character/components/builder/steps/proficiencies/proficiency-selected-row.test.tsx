@@ -10,7 +10,7 @@ import {
   createProficienciesStepRogueWithStaleSkillFixture,
   proficienciesStepStealthSkill,
   PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID,
-} from '../../lib/proficiencies/proficiencies-step.fixtures'
+} from '../../../../lib/proficiencies/proficiencies-step.fixtures'
 import {
   PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL,
   ProficiencySelectedRow,

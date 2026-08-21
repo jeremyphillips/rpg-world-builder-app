@@ -166,6 +166,20 @@ Example key-files table:
 | List route | `routes/classes-overview.tsx` |
 ```
 
+## Character builder ownership model
+
+```text
+builder/steps/<step>/     → step-specific composition and workflows
+components/<domain>/      → reusable domain capabilities (picker | inventory | acquisition)
+lib/<domain>/             → pure cross-surface logic
+```
+
+Builder step folders own step-specific UI (proficiency sections/rows, spell
+choice/summary cards, equipment package-switch modal). Domain folders under
+`components/equipment/`, `components/proficiencies/picker/`, and
+`components/spells/picker/` stay reusable. Domain UI must not import from
+`components/builder/steps/**`.
+
 ## Character builder co-located `*.lib.ts` modules
 
 Under `character/components/`, keep view-model helpers beside the component tree
@@ -174,13 +188,18 @@ formatting, UI state reducers). Move to `character/lib/<concern>/` only when the
 module is reused across components, imported outside the subtree, or is an
 independently testable view-model seam.
 
-| Location                            | Keep co-located when…                                         |
-| ----------------------------------- | ------------------------------------------------------------- |
-| `components/picker/*.lib.ts`        | Shared picker chrome (search/sort/filter shell)               |
-| `components/equipment/*/*.lib.ts`   | Drawer/inventory/modal view models (per surface subfolder)    |
-| `components/spells/*.lib.ts`        | Spell drawer-only helpers                                     |
-| `components/proficiencies/*.lib.ts` | Proficiency drawer-only helpers                               |
-| `components/connections/*.lib.ts`   | Picker/edit drawer view models (filter/sort stays co-located) |
+| Location                                   | Keep co-located when…                                         |
+| ------------------------------------------ | ------------------------------------------------------------- |
+| `components/picker/*.lib.ts`               | Shared picker chrome (search/sort/filter shell)               |
+| `components/equipment/picker/**/*.lib.ts`  | Equipment picker/drawer view models                           |
+| `components/spells/picker/*.lib.ts`        | Spell drawer-only helpers                                     |
+| `components/proficiencies/picker/*.lib.ts` | Proficiency drawer-only helpers                               |
+| `components/connections/*.lib.ts`          | Picker/edit drawer view models (filter/sort stays co-located) |
+
+Package-switch resolution state lives in
+`character/lib/equipment/equipment-package-switch-resolution.lib.ts` (pure logic,
+no presentation). Modal UI lives in
+`character/components/builder/steps/equipment/package-switch/`.
 
 Title membership semantics (`ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`, radio mappers) live in
 `character/lib/organization-membership/organization-membership-title.lib.ts` when reused outside

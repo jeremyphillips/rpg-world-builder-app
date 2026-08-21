@@ -7,7 +7,7 @@ import {
   formatPackageSwitchWealth,
   packageSwitchDraftHasEdits,
   resolvePackageSwitchBudgetStatusLabel,
-} from './equipment-package-switch-resolution.lib'
+} from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import {
   equipmentPackageSwitchResolutionBudgetLabelClasses,
   equipmentPackageSwitchResolutionBudgetRowClasses,

@@ -4,7 +4,7 @@ import type { ProficiencyChoiceSelectedRow } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
 import { ContentEntityCard } from '@/features/content'
-import { BuilderInventoryRemoveAction } from '../builder/inventory/builder-inventory-remove-action.client'
+import { BuilderInventoryRemoveAction } from '../../inventory/builder-inventory-remove-action.client'
 
 export const PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL = 'Stale' as const
 

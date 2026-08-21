@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { createProficienciesStepRogueFixture } from '../../lib/proficiencies/proficiencies-step.fixtures'
+import { createProficienciesStepRogueFixture } from '../../../../lib/proficiencies/proficiencies-step.fixtures'
 import { ProficiencySection } from './proficiency-section.client'
 
 const { model } = createProficienciesStepRogueFixture()

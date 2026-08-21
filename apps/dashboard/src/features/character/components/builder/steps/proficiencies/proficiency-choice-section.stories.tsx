@@ -4,7 +4,7 @@ import {
   createProficienciesStepRogueFixture,
   proficienciesStepAcrobaticsSkill,
   proficienciesStepStealthSkill,
-} from '../../lib/proficiencies/proficiencies-step.fixtures'
+} from '../../../../lib/proficiencies/proficiencies-step.fixtures'
 import { ProficiencyChoiceSection } from './proficiency-choice-section.client'
 
 const { model } = createProficienciesStepRogueFixture()

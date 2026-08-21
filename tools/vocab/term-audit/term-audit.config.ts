@@ -84,13 +84,13 @@ export const VOCAB_TERM_AUDIT_CONFIG = {
     },
     {
       target: 'content-type:spells',
-      path: 'apps/dashboard/src/features/character/components/spells/spell-picker-drawer.client.tsx',
+      path: 'apps/dashboard/src/features/character/components/spells/picker/spell-picker-drawer.client.tsx',
       reason: 'Spell picker workflow chrome, not catalog collection label',
       owner: 'dashboard',
     },
     {
       target: 'content-type:spells',
-      path: 'apps/dashboard/src/features/character/components/spells/spellcasting-summary-card.client.tsx',
+      path: 'apps/dashboard/src/features/character/components/builder/steps/spells/spellcasting-summary-card.client.tsx',
       reason: 'Spellcasting mechanic labels (save DC, attack, slots), not catalog chrome',
       owner: 'dashboard',
     },

@@ -159,19 +159,20 @@ conflict resolution, not a new customization signal).
 
 ## Key modules
 
-| Area                     | Path                                                                                        |
-| ------------------------ | ------------------------------------------------------------------------------------------- |
-| Layout VM                | `lib/equipment/equipment-inventory-summary.lib.ts`                                          |
-| Inventory chrome CVA     | `components/equipment/inventory/equipment-inventory.variants.ts`                            |
-| Package card + editor    | `components/equipment/starting-package/equipment-starting-package-*.client.tsx`             |
-| Purchased rows           | `components/equipment/inventory/purchased/equipment-purchased-inventory-section.client.tsx` |
-| Purchase drawer rows     | `components/equipment/picker/purchase/equipment-picker-purchase-rows.client.tsx`            |
-| Purchase VM              | `components/equipment/picker/purchase/equipment-picker-purchase.lib.ts`                     |
-| NumberStepper            | `packages/ui/src/components/ui/number-stepper.client.tsx`                                   |
-| Step wiring              | `hooks/use-equipment-step.client.ts`                                                        |
-| Package-switch modal     | `components/equipment/package-switch/equipment-package-switch-resolution-modal.*`           |
-| Conversion contracts     | `packages/contracts/.../starting-package-conversion.ts`                                     |
-| Package-switch contracts | `packages/contracts/.../equipment-package-switch.ts`                                        |
+| Area                          | Path                                                                                            |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| Layout VM                     | `lib/equipment/equipment-inventory-summary.lib.ts`                                              |
+| Inventory chrome CVA          | `components/equipment/inventory/equipment-inventory.variants.ts`                                |
+| Package card + editor         | `components/equipment/starting-package/equipment-starting-package-*.client.tsx`                 |
+| Purchased rows                | `components/equipment/inventory/purchased/equipment-purchased-inventory-section.client.tsx`     |
+| Purchase drawer rows          | `components/equipment/picker/purchase/equipment-picker-purchase-rows.client.tsx`                |
+| Purchase VM                   | `components/equipment/picker/purchase/equipment-picker-purchase.lib.ts`                         |
+| NumberStepper                 | `packages/ui/src/components/ui/number-stepper.client.tsx`                                       |
+| Step wiring                   | `hooks/use-equipment-step.client.ts`                                                            |
+| Package-switch modal          | `components/builder/steps/equipment/package-switch/equipment-package-switch-resolution-modal.*` |
+| Package-switch resolution lib | `lib/equipment/equipment-package-switch-resolution.lib.ts`                                      |
+| Conversion contracts          | `packages/contracts/.../starting-package-conversion.ts`                                         |
+| Package-switch contracts      | `packages/contracts/.../equipment-package-switch.ts`                                            |
 
 ## Related docs
 

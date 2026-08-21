@@ -9,9 +9,9 @@ import {
   formatSpellSelectionCounter,
   isSpellChoiceSetOverSelected,
   resolveSelectedSpellLabels,
-} from '../../lib/spells/spells-step.lib'
-import { shouldShowSelectionFullNotice } from '../../lib/choice-sets/selection-counter.lib'
-import { BuilderInventoryRemoveAction } from '../builder/inventory/builder-inventory-remove-action.client'
+} from '../../../../lib/spells/spells-step.lib'
+import { shouldShowSelectionFullNotice } from '../../../../lib/choice-sets/selection-counter.lib'
+import { BuilderInventoryRemoveAction } from '../../inventory/builder-inventory-remove-action.client'
 import {
   spellChoiceSectionClasses,
   spellChoiceSectionCounterRowClasses,
