@@ -1,5 +1,3 @@
-'use client'
-
 import { useFormState } from 'react-hook-form'
 
 import { hasDirtyFields } from '@/lib/form-dirty-state'

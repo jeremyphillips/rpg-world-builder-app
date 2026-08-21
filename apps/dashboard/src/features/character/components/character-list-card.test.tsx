@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
-import { CharacterListCard } from './character-list-card.client'
+import { CharacterListCard } from './character-list-card'
 
 const sampleCard = {
   id: 'char-1',

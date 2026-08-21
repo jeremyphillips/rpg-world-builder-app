@@ -9,7 +9,7 @@ import {
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../../../lib/fixtures/character-builder-fixtures'
 import { narrativeFieldCount } from '../../../lib/builder-preview/narrative-preview'
-import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion.client'
+import { CharacterBuilderPreviewAccordion } from './character-builder-preview-accordion'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)

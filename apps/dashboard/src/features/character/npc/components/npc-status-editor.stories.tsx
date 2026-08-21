@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { createDefaultCampaignRosterState, createDefaultCharacterVitalState } from '@rpg/contracts'
 
-import { NpcStatusEditor } from './npc-status-editor.client'
+import { NpcStatusEditor } from './npc-status-editor'
 
 const meta = {
   title: 'Dashboard/Character/NpcStatusEditor',

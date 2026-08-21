@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom'
 import { buildSourceColumn } from '@/lib/data-table/column-builders'
 import { buildUsedByOverviewColumn } from '@/lib/usage-references/build-used-by-overview-column'
 
-import { VocabularyAvailabilityMetadata } from '../../components/vocabulary-availability-metadata.client'
+import { VocabularyAvailabilityMetadata } from '../../components/vocabulary-availability-metadata'
 import { VOCABULARY_SOURCE_BADGE } from '@/features/vocabulary'
 
 import {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterImportDispositionReport } from './character-import-disposition-report.client'
+import { CharacterImportDispositionReport } from './character-import-disposition-report'
 
 const meta = {
   title: 'Dashboard/Character Import/Disposition Report',

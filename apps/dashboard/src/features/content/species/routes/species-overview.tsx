@@ -11,7 +11,7 @@ import {
 import { useSpecies, useSpeciesUsageMeta } from '../hooks/use-species'
 import { speciesColumns, speciesFilterSchema } from '../lib/species-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
 export function SpeciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()

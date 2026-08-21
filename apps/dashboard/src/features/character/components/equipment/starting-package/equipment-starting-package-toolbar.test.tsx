@@ -7,7 +7,7 @@ import {
   EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL,
   EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL,
 } from '../../../lib/equipment/equipment-step.lib'
-import { EquipmentStartingPackageToolbar } from './equipment-starting-package-toolbar.client'
+import { EquipmentStartingPackageToolbar } from './equipment-starting-package-toolbar'
 
 describe('EquipmentStartingPackageToolbar', () => {
   it('renders customize and change option as link buttons', async () => {

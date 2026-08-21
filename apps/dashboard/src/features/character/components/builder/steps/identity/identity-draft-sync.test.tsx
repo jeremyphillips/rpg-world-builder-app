@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { IdentityStep } from './identity-step.client'
+import { IdentityStep } from './identity-step'
 
 describe('IdentityDraftSync', () => {
   it('seeds the form from an externally restored draft without clobbering the store', async () => {

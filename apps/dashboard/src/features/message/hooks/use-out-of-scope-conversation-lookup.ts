@@ -1,5 +1,3 @@
-'use client'
-
 import type { Conversation } from '@rpg/contracts'
 
 import { useConversation } from './use-conversation'

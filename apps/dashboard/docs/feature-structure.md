@@ -30,14 +30,14 @@ enforcement and shared `src/` imports →
 
 ## Folder responsibilities
 
-| Folder        | Responsibility                                                                               |
-| ------------- | -------------------------------------------------------------------------------------------- |
-| `routes/`     | Route-level screens mounted in the app router                                                |
-| `components/` | Feature UI — `*.client.tsx` for client components; co-located `*.stories.tsx` / `*.test.tsx` |
-| `hooks/`      | React hooks; TanStack Query pairs with `api/`                                                |
-| `api/`        | Same-origin API wrappers (`fetch('/api/...')`); no UI                                        |
-| `domain/`     | Optional pure logic, framework-agnostic                                                      |
-| `lib/`        | Non-route helpers — see [lib concern index](#lib-concern-index)                              |
+| Folder        | Responsibility                                                  |
+| ------------- | --------------------------------------------------------------- |
+| `routes/`     | Route-level screens mounted in the app router                   |
+| `components/` | Feature UI — co-located `*.stories.tsx` / `*.test.tsx`          |
+| `hooks/`      | React hooks; TanStack Query pairs with `api/`                   |
+| `api/`        | Same-origin API wrappers (`fetch('/api/...')`); no UI           |
+| `domain/`     | Optional pure logic, framework-agnostic                         |
+| `lib/`        | Non-route helpers — see [lib concern index](#lib-concern-index) |
 
 ### `routes/`
 
@@ -49,9 +49,27 @@ Full splitting map → [code-splitting.md](./code-splitting.md).
 
 ### `components/`
 
-Client components: `<name>.client.tsx` with `'use client'`. Server components:
-`<name>.tsx` (no directive). Every component gets co-located `*.stories.tsx`
-(CSF3); logic-bearing or interactive components also get `*.test.tsx`.
+**Naming SSOT** for dashboard modules — also summarized in
+[feature-conventions.md § Component naming](./feature-conventions.md#component-naming).
+
+Components and hooks use `<name>.tsx` / `<name>.ts` — no `.client` suffix and no
+`'use client'` directive. The dashboard is a client-rendered Vite SPA; unlike
+Next.js apps in this monorepo, filename suffixes do not mark a server/client
+boundary here.
+
+| Artifact            | Pattern              |
+| ------------------- | -------------------- |
+| Component / surface | `<name>.tsx`         |
+| Hook                | `use-<name>.ts`      |
+| Variants            | `<name>.variants.ts` |
+| Story               | `<name>.stories.tsx` |
+| Test                | `<name>.test.tsx`    |
+
+Every component gets co-located `*.stories.tsx` (CSF3); logic-bearing or
+interactive components also get `*.test.tsx`.
+
+> **`@rpg/ui` and `apps/public`** retain `<name>.client.tsx` + `'use client'` for
+> interactive modules. Do not add `.client` or `'use client'` to new dashboard modules.
 
 ### `hooks/` and `api/`
 
@@ -204,7 +222,7 @@ Title membership semantics (`ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`, radio mapp
 `character/lib/organization-membership/organization-membership-title.lib.ts` when reused outside
 the connections subtree.
 
-Step orchestration hooks belong in `character/hooks/` (`use-*-step.client.ts`), not
+Step orchestration hooks belong in `character/hooks/` (`use-*-step.ts`), not
 under `components/builder/steps/`.
 
 ## Organizations component layout

@@ -3,7 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 
 import { withDashboardProviders } from '../../../../../.storybook/decorators'
 import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
-import { ClassSubclassesTab } from './class-subclasses-tab.client'
+import { ClassSubclassesTab } from './class-subclasses-tab'
 
 const meta = {
   title: 'Content/Classes/ClassSubclassesTab',

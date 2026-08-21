@@ -6,7 +6,7 @@ import type {
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
-import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section.client'
+import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section'
 
 import {
   buildVocabularyEntrySheetFields,

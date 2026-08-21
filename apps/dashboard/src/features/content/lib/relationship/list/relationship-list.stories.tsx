@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { RelationshipList } from './relationship-list.client'
+import { RelationshipList } from './relationship-list'
 
 const meta = {
   title: 'Content/Relationship/RelationshipList',

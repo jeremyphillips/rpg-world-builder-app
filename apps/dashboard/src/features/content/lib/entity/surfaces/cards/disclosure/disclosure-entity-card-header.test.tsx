@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { CollapsibleListItem } from '@rpg/ui'
 
 import { HARBOR_DISTRICT_ENTITY } from '../../../entity.fixture'
-import { DisclosureEntityCardHeader } from './disclosure-entity-card-header.client'
+import { DisclosureEntityCardHeader } from './disclosure-entity-card-header'
 
 function renderInCollapsibleContext(ui: React.ReactNode) {
   return render(

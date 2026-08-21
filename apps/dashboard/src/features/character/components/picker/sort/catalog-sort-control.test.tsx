@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { CatalogSortControl } from './catalog-sort-control.client'
+import { CatalogSortControl } from './catalog-sort-control'
 import { pickerSortOption } from './catalog-picker-sort-labels.lib'
 
 describe('CatalogSortControl', () => {

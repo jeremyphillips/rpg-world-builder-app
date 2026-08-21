@@ -15,7 +15,7 @@ import { renderWithProviders } from '@/test/render'
 
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
-import { QuickNpcAuthoringForm } from './quick-npc-authoring-form.client'
+import { QuickNpcAuthoringForm } from './quick-npc-authoring-form'
 
 vi.mock('../../lib/quick-npc/quick-npc-requirement-options.lib', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()

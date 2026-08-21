@@ -7,7 +7,7 @@ import {
   SITE_CREATE_SETUP_HEADLINE,
   SITE_CREATE_SETUP_PROMPT,
 } from '../../../lib/create/setup/location-site-create-setup.lib'
-import { LocationSiteCreateSetup } from './location-site-create-setup.client'
+import { LocationSiteCreateSetup } from './location-site-create-setup'
 
 describe('LocationSiteCreateSetup', () => {
   it('renders canonical site options with kind-oriented prompt', () => {

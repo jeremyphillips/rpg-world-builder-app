@@ -5,7 +5,7 @@ import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.type
 import {
   EquipmentPickerFilterRowControls,
   EquipmentPickerPrimaryFilterControls,
-} from './equipment-picker-filter-controls.client'
+} from './equipment-picker-filter-controls'
 
 const items = [] as unknown as readonly EquipmentPickerItem[]
 

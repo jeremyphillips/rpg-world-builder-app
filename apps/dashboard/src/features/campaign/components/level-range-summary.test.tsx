@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { ExtendedLevelRangeSummary, StandardLevelRangeSummary } from './level-range-summary.client'
+import { ExtendedLevelRangeSummary, StandardLevelRangeSummary } from './level-range-summary'
 
 function SummaryHarness({
   defaultValues,

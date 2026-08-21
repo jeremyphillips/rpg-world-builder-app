@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ContentUsageReferencesSection } from './content-usage-references-section.client'
+import { ContentUsageReferencesSection } from './content-usage-references-section'
 
 const meta = {
   title: 'Dashboard/Content/ContentUsageReferencesSection',

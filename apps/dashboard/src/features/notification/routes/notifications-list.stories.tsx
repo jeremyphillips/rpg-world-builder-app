@@ -5,8 +5,8 @@ import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { PageHeader } from '@/components/layout/page/page-header'
 import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
 
-import { NotificationInboxBody } from '../components/notification-inbox-body.client'
-import { NotificationInboxHeader } from '../components/notification-inbox-header.client'
+import { NotificationInboxBody } from '../components/notification-inbox-body'
+import { NotificationInboxHeader } from '../components/notification-inbox-header'
 import { createNotificationInboxFilterSchema } from '../lib/notification-inbox-filter-schema'
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 

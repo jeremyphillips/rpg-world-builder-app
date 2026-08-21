@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterRelationshipIndicator } from './character-relationship-indicator.client'
+import { CharacterRelationshipIndicator } from './character-relationship-indicator'
 
 const meta = {
   title: 'Shared/CharacterRelationshipIndicator',

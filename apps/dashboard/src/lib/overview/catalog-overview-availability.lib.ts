@@ -13,7 +13,7 @@ import {
   deriveCampaignAvailabilityScope,
   type CampaignAvailabilityScope,
 } from './campaign-availability-scope.lib'
-import { CAMPAIGN_AVAILABILITY_FILTER_FIELD_ID } from './overview-availability-supplement.client'
+import { CAMPAIGN_AVAILABILITY_FILTER_FIELD_ID } from './overview-availability-supplement'
 
 type SetFilterValue<TFilters> = (
   id: FilterFieldId<TFilters>,

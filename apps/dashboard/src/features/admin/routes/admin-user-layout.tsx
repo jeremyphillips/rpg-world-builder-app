@@ -1,5 +1,3 @@
-'use client'
-
 import { Outlet, useParams } from 'react-router-dom'
 
 import { PageLoadState } from '@/components/layout/page/page-load-state'
@@ -7,7 +5,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadc
 
 import { useAdminUser } from '../hooks/use-admin-user'
 import { AdminUserRouteProvider } from '../lib/admin-user-route-context'
-import { AdminUserTabNav } from '../components/admin-user-tab-nav.client'
+import { AdminUserTabNav } from '../components/admin-user-tab-nav'
 
 export function AdminUserLayout() {
   const { userId } = useParams<{ userId: string }>()

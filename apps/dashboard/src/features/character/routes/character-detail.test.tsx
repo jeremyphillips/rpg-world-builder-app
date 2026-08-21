@@ -14,7 +14,7 @@ import { CharacterDetail } from './character-detail'
 
 vi.mock('../hooks/use-character')
 vi.mock('../hooks/use-build-context')
-vi.mock('../components/standalone-character-redirect-guard.client', () => ({
+vi.mock('../components/standalone-character-redirect-guard', () => ({
   StandaloneCharacterRedirectGuard: ({ children }: { children: React.ReactNode }) => children,
 }))
 vi.mock('@rpg/catalog/xp-progressions', () => ({

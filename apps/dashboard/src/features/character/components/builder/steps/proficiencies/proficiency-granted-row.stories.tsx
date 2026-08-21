@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { createProficienciesStepRogueFixture } from '../../../../lib/proficiencies/proficiencies-step.fixtures'
-import { ProficiencyGrantedRow } from './proficiency-granted-row.client'
+import { ProficiencyGrantedRow } from './proficiency-granted-row'
 
 const { model } = createProficienciesStepRogueFixture()
 const savingThrowRow = model.sections.find((section) => section.kind === 'savingThrows')!

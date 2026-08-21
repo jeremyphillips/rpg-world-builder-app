@@ -6,7 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CITY_COUNCIL } from '@/features/content'
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../../lib/display/character-display'
-import { CharacterOrganizationsSummary } from './character-organizations-summary.client'
+import { CharacterOrganizationsSummary } from './character-organizations-summary'
 
 describe('CharacterOrganizationsSummary', () => {
   it('renders stacked memberships with titles and empty None', () => {

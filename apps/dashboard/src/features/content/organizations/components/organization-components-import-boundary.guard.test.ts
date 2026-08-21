@@ -7,7 +7,7 @@ const REPO_ROOT = join(__dirname, '../../../../../../..')
 const DASHBOARD_SRC = join(REPO_ROOT, 'apps/dashboard/src')
 
 const ORGANIZATION_CREATE_MODAL_IMPORT =
-  /organizations\/components\/create\/organization-create-modal\.client/
+  /organizations\/components\/create\/organization-create-modal/
 
 function isForbiddenOrganizationComponentsImport(importPath: string): boolean {
   if (!importPath.includes('organizations/components/')) {

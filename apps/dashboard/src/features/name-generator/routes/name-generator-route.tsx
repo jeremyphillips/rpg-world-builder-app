@@ -2,7 +2,7 @@ import { Alert, Heading, Text } from '@rpg/ui'
 
 import { NarrowPage } from '@/components/layout/page/narrow-page'
 
-import { NameGeneratorPage } from '../components/name-generator-page.client'
+import { NameGeneratorPage } from '../components/name-generator-page'
 
 export function NameGeneratorRoute() {
   return (

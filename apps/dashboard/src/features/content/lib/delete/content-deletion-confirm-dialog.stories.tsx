@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ContentDeletionConfirmDialog } from './content-deletion-confirm-dialog.client'
+import { ContentDeletionConfirmDialog } from './content-deletion-confirm-dialog'
 
 const meta = {
   title: 'Content/ContentDeletionConfirmDialog',

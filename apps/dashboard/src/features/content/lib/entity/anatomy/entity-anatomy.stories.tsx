@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ContentEntityCard } from '@/features/content'
-import { EntityAnatomyHost } from './entity-anatomy.client'
+import { EntityAnatomyHost } from './entity-anatomy'
 import { GREY_COAST_ENTITY, HARBOR_DISTRICT_ENTITY, SILVER_CIRCLE_ENTITY } from '../entity.fixture'
 
 const meta = {

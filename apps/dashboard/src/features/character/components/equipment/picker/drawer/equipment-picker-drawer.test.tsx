@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { EquipmentPickerDrawer } from './equipment-picker-drawer.client'
+import { EquipmentPickerDrawer } from './equipment-picker-drawer'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,

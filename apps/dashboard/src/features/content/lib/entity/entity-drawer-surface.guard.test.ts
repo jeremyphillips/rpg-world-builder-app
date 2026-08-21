@@ -9,10 +9,10 @@ const DRAWER_SURFACE_ROOT = join(FEATURE_ROOT, 'content/lib/entity/surfaces/draw
 const RELATIONSHIP_DRAWER_ROOT = join(FEATURE_ROOT, 'content/lib/relationship/drawer')
 
 const RELATIONSHIP_DRAWER_GENERIC_CONTEXT_FILES = new Set([
-  'drawer-context.client.tsx',
+  'drawer-context.tsx',
   'drawer-context.types.ts',
   'drawer-context.variants.ts',
-  'relationship-drawer-subject-field.client.tsx',
+  'relationship-drawer-subject-field.tsx',
   'relationship-drawer-field-labels.ts',
 ])
 

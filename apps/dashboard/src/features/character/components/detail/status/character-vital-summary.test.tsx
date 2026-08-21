@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { createDefaultCharacterVitalState } from '@rpg/contracts'
 
-import { CharacterVitalSummary } from './character-vital-summary.client'
+import { CharacterVitalSummary } from './character-vital-summary'
 
 describe('CharacterVitalSummary', () => {
   it('renders vital label', () => {

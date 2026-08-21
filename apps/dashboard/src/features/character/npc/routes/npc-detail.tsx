@@ -1,11 +1,11 @@
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { WidePage } from '@/components/layout/page/wide-page'
 
-import { CampaignCharacterStatusSummary } from '../../components/detail/status/campaign-character-status-summary.client'
-import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'
-import { CharacterOrganizationMembershipsContainer } from '../../components/detail/memberships/character-organization-memberships-container.client'
-import { NpcStatusEditAction } from '../components/npc-status-edit-action.client'
-import { useNpcDetailPage } from '../hooks/use-npc-detail-page.client'
+import { CampaignCharacterStatusSummary } from '../../components/detail/status/campaign-character-status-summary'
+import { CharacterDetailContent } from '../../components/detail/character-detail-content'
+import { CharacterOrganizationMembershipsContainer } from '../../components/detail/memberships/character-organization-memberships-container'
+import { NpcStatusEditAction } from '../components/npc-status-edit-action'
+import { useNpcDetailPage } from '../hooks/use-npc-detail-page'
 
 /** Campaign NPC detail — reuses {@link CharacterDetailContent}; see its growth comment for the PC/NPC boundary. */
 export function NpcDetail() {

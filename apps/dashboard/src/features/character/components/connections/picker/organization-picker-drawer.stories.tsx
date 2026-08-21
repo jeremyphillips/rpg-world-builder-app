@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { OrganizationPickerDrawer } from './organization-picker-drawer.client'
+import { OrganizationPickerDrawer } from './organization-picker-drawer'
 import { organizationPickerItems } from './organization-picker-drawer.fixtures'
 
 const meta = {

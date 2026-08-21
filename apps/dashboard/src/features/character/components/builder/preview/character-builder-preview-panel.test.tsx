@@ -19,7 +19,7 @@ import {
   PREVIEW_CHOOSE_SPECIES,
   PREVIEW_UNNAMED_CHARACTER,
 } from '../../../lib/builder-preview/preview-identity-summary'
-import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
+import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel'
 
 describe('CharacterBuilderPreviewPanel', () => {
   it('renders the fixed identity summary and accordion sections', () => {

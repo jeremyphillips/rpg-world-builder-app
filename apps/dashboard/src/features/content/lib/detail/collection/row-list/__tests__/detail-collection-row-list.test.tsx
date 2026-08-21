@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { DetailEntityRow } from '../../../row/entity/detail-entity-row.client'
-import { DetailCollectionRowList } from '../detail-collection-row-list.client'
+import { DetailEntityRow } from '../../../row/entity/detail-entity-row'
+import { DetailCollectionRowList } from '../detail-collection-row-list'
 
 describe('DetailCollectionRowList', () => {
   it('renders structural dividers between children without list padding', () => {

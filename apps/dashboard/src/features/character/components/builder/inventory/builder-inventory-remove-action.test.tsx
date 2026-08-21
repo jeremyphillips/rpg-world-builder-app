@@ -6,7 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import {
   BuilderInventoryRemoveAction,
   formatBuilderInventoryRemoveLabel,
-} from './builder-inventory-remove-action.client'
+} from './builder-inventory-remove-action'
 
 describe('BuilderInventoryRemoveAction', () => {
   it('renders an icon remove action with a default aria label', async () => {

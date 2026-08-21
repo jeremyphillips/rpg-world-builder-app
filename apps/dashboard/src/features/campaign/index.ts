@@ -1,27 +1,27 @@
 export { CampaignSwitcher } from './components/campaign-switcher'
 export { CampaignPicker } from './components/campaign-picker'
 export { CampaignDisplayName } from './components/campaign-display-name'
-export { CampaignDisplayNameList } from './components/campaign-display-name-list.client'
+export { CampaignDisplayNameList } from './components/campaign-display-name-list'
 export {
   CampaignTopbarTitle,
   CampaignTopbarTitleError,
   CampaignTopbarTitleMissing,
   CampaignTopbarTitleSkeleton,
 } from './components/campaign-topbar-title'
-export { ContinueCampaignCard } from './components/recovery/continue-campaign-card.client'
+export { ContinueCampaignCard } from './components/recovery/continue-campaign-card'
 export {
   CampaignRecoveryPromotionCard,
   FinishJoiningCampaignCard,
-} from './components/recovery/campaign-recovery-promotion-card.client'
-export { PendingCampaignInvitation } from './components/recovery/pending-campaign-invitation.client'
-export { PendingCampaignInvitationsSection } from './components/recovery/pending-campaign-invitations-section.client'
-export { CampaignCharacterEligibilityAlert } from './components/onboarding/campaign-character-eligibility-alert.client'
-export { ExtendedProgressionEffects } from './components/extended-progression-effects.client'
+} from './components/recovery/campaign-recovery-promotion-card'
+export { PendingCampaignInvitation } from './components/recovery/pending-campaign-invitation'
+export { PendingCampaignInvitationsSection } from './components/recovery/pending-campaign-invitations-section'
+export { CampaignCharacterEligibilityAlert } from './components/onboarding/campaign-character-eligibility-alert'
+export { ExtendedProgressionEffects } from './components/extended-progression-effects'
 export {
   ExtendedLevelRangeSummary,
   StandardLevelRangeSummary,
-} from './components/level-range-summary.client'
-export { NewCampaignLink } from './components/new-campaign-link.client'
+} from './components/level-range-summary'
+export { NewCampaignLink } from './components/new-campaign-link'
 export {
   buildRulesConfigFields,
   CHARACTER_CONFIGURATION_SECTIONS,

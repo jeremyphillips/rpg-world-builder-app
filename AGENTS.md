@@ -83,8 +83,13 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
 
 - Every component gets a co-located `*.stories.tsx` (CSF3); logic-bearing or
   interactive components also get a co-located `*.test.tsx`.
-- Client component: `<name>.client.tsx` with `'use client'`. Server component:
-  `<name>.tsx` (no directive).
+- **Dashboard** (`apps/dashboard`): `<name>.tsx` / `<name>.ts` — no `.client`
+  suffix, no `'use client'` directive. The dashboard is a Vite SPA; modules are
+  client-rendered by default. See
+  [feature-structure.md](apps/dashboard/docs/feature-structure.md#components).
+- **`@rpg/ui` and Next.js apps** (`apps/public`): interactive modules use
+  `<name>.client.tsx` with `'use client'`; server-safe modules use `<name>.tsx`
+  with no directive.
 - Shared primitives live in `packages/ui` so both `dashboard` and `public` can
   consume them. Authoring detail → [packages/ui/README.md](packages/ui/README.md).
 - Forms: prefer the schema-driven `<Form>` (`@rpg/ui/form`) — the only

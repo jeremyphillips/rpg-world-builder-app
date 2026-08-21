@@ -6,7 +6,7 @@ import { pickClass } from '../../lib/fixtures/pick'
 import { characterCreationProficienciesToFormValues } from '../lib/character-creation/class-character-creation-proficiencies-form-values'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
 import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
-import { ClassCharacterCreationTab } from './class-character-creation-tab.client'
+import { ClassCharacterCreationTab } from './class-character-creation-tab'
 
 const monkStartingEquipment = startingEquipmentToFormValues(
   pickClass('monk').characterCreation!.startingEquipment!,

@@ -10,7 +10,7 @@ import {
   equipmentPickerRopeFixture,
 } from './equipment-picker-drawer.fixtures'
 import { EQUIPMENT_PICKER_VIEW_DEFAULTS } from './equipment-picker-drawer.lib'
-import { useEquipmentPickerController } from './use-equipment-picker-controller.client'
+import { useEquipmentPickerController } from './use-equipment-picker-controller'
 
 describe('useEquipmentPickerController', () => {
   it('preserves browse state across close/reopen but clears add quantities on close', () => {

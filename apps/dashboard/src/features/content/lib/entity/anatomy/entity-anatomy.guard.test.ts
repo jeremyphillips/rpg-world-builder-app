@@ -19,9 +19,9 @@ describe('entity anatomy guard', () => {
 
   it('does not publish leading offset vars from anatomy or leading rail', () => {
     for (const file of [
-      'anatomy/entity-anatomy.client.tsx',
-      'anatomy/entity-leading-rail.client.tsx',
-      'anatomy/entity-anatomy-trailing.client.tsx',
+      'anatomy/entity-anatomy.tsx',
+      'anatomy/entity-leading-rail.tsx',
+      'anatomy/entity-anatomy-trailing.tsx',
     ]) {
       const source = readFileSync(join(ENTITY_ROOT, file), 'utf8')
       expect(source, `${file} must not publish --entity-leading-offset`).not.toMatch(
@@ -32,11 +32,11 @@ describe('entity anatomy guard', () => {
 
   it('publishes leading offset from DEC and CEC surface roots only', () => {
     const decSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/cards/disclosure/disclosure-entity-card.client.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/disclosure/disclosure-entity-card.tsx'),
       'utf8',
     )
     const frameSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/cards/content/entity-card-frame.client.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/content/entity-card-frame.tsx'),
       'utf8',
     )
 
@@ -61,7 +61,7 @@ describe('entity anatomy guard', () => {
 
   it('keeps DEC on entity-card CLI row layout without consumer padding props', () => {
     const decSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/cards/disclosure/disclosure-entity-card.client.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/disclosure/disclosure-entity-card.tsx'),
       'utf8',
     )
 
@@ -81,7 +81,7 @@ describe('entity anatomy guard', () => {
 
   it('keeps catalog entity row on entity-card CLI mode with shared anatomy', () => {
     const catalogRowSource = readFileSync(
-      join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-row.client.tsx'),
+      join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-row.tsx'),
       'utf8',
     )
 
@@ -93,7 +93,7 @@ describe('entity anatomy guard', () => {
   it('keeps entity-backed catalog pickers on CatalogEntityPickerSheet', () => {
     const featureRoot = join(ENTITY_ROOT, '../..')
     const allowlist = new Set([
-      join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-picker-sheet.client.tsx'),
+      join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-picker-sheet.tsx'),
       join(ENTITY_ROOT, 'surfaces/cards/content/content-entity-card.test.tsx'),
     ])
     const entityPickerPattern =

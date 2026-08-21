@@ -1,5 +1,5 @@
-export { CharacterImportForm } from './components/character-import-form.client'
-export type { CharacterImportFormProps } from './components/character-import-form.client'
+export { CharacterImportForm } from './components/character-import-form'
+export type { CharacterImportFormProps } from './components/character-import-form'
 export {
   useCharacterImportPreview,
   characterImportPreviewMutationKey,

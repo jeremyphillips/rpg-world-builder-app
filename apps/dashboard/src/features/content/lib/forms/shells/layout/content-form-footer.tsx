@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { UseFormReturn, FieldValues } from 'react-hook-form'
@@ -13,7 +11,7 @@ import {
   type UnsavedChangesConfirmController,
 } from '@/lib/form-unsaved-changes-guard'
 import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
-import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
+import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
 
 import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
 import { useContentFormActionState } from './use-content-form-action-state'

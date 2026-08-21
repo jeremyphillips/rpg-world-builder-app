@@ -8,9 +8,9 @@ import {
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
-import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
-import { LocationCreateActions } from '../components/create/location-create-actions.client'
-import { BulkChangeParentLocationDialog } from '../components/hierarchy/bulk-change-parent-location-dialog.client'
+import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
+import { LocationCreateActions } from '../components/create/location-create-actions'
+import { BulkChangeParentLocationDialog } from '../components/hierarchy/bulk-change-parent-location-dialog'
 import { useLocations } from '../hooks/use-locations'
 import { BULK_CHANGE_PARENT_MENU_LABEL } from '../lib/hierarchy/bulk/bulk-change-parent-labels'
 import { locationsColumns, locationsFilterSchema } from '../lib/overview/locations-overview-columns'

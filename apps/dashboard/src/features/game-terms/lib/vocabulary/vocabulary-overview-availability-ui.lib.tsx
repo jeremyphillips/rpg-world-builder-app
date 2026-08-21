@@ -8,7 +8,7 @@ import {
 } from '@/features/content'
 import { resolveAvailabilityFilteredEmptyCopy } from '@/lib/overview/availability-empty-state-copy.lib'
 import type { CampaignAvailabilityScope } from '@/lib/overview/campaign-availability-scope.lib'
-import { CAMPAIGN_AVAILABILITY_FILTER_FIELD_ID } from '@/lib/overview/overview-availability-supplement.client'
+import { CAMPAIGN_AVAILABILITY_FILTER_FIELD_ID } from '@/lib/overview/overview-availability-supplement'
 
 type FilterNoticeActions<TFilters> = {
   setFilterValue: (

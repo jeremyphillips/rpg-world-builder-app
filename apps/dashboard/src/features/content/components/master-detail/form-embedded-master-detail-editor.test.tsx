@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { TestFormShell } from '@/test/form-shell'
 import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
-import { FormEmbeddedMasterDetailEditor } from './form-embedded-master-detail-editor.client'
+import { FormEmbeddedMasterDetailEditor } from './form-embedded-master-detail-editor'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
   const { stubUiFormItems } = await import('@/test/mocks/ui-form')

@@ -9,8 +9,8 @@ import {
   type TabbedFormTab,
 } from '@rpg/ui/form'
 
-import { CampaignAccessFormProvider } from '../../../campaign-access/campaign-access-form-context.client'
-import { ContentEditPublishBridge } from '../edit/content-edit-publish-bridge.client'
+import { CampaignAccessFormProvider } from '../../../campaign-access/campaign-access-form-context'
+import { ContentEditPublishBridge } from '../edit/content-edit-publish-bridge'
 import type { ContentFormCampaignAccessProps } from './content-form-shell-layout.lib'
 import {
   ContentFormHeader,

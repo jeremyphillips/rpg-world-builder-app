@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { ALDERMERE, LOCATIONS_LIST, YAWNING_PORTAL } from '../../fixtures'
-import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
+import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer'
 
 const PLANE = makeLocation({
   kind: 'plane',

@@ -3,10 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const sessionSourcePath = fileURLToPath(
-  new URL(
-    '../../../components/create/setup/location-create-setup-session.client.tsx',
-    import.meta.url,
-  ),
+  new URL('../../../components/create/setup/location-create-setup-session.tsx', import.meta.url),
 )
 
 describe('location create setup session structural drift', () => {

@@ -192,7 +192,7 @@ Shared assembly lives in `assembleImportCreateCharacterInput()`. Adaptation stay
 ## Detail sheet (shared PC/NPC UI)
 
 PC and NPC detail routes both build a `CharacterDetailViewModel` and render
-[`CharacterDetailContent`](../src/features/character/components/detail/character-detail-content.client.tsx).
+[`CharacterDetailContent`](../src/features/character/components/detail/character-detail-content.tsx).
 Keep sheet layout kind-neutral there; route wrappers own kind-specific loading and
 mutations. See the growth comment on `CharacterDetailContent` for the PC/NPC
 boundary (hide user-ownership affordances on NPC surfaces).

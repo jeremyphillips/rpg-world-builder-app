@@ -6,10 +6,10 @@ import { describe, expect, it } from 'vitest'
 const REPO_ROOT = join(__dirname, '../../../../../../..')
 
 const RELATIONSHIP_COLLECTION_SECTION_FILES = [
-  'apps/dashboard/src/features/content/organizations/components/members/organization-members-section.client.tsx',
-  'apps/dashboard/src/features/content/organizations/components/location-connections/organization-location-connections-section.client.tsx',
-  'apps/dashboard/src/features/content/locations/components/connected-parties/location-people-and-organizations-section.client.tsx',
-  'apps/dashboard/src/features/content/locations/components/connected-parties/location-territorial-authority-section.client.tsx',
+  'apps/dashboard/src/features/content/organizations/components/members/organization-members-section.tsx',
+  'apps/dashboard/src/features/content/organizations/components/location-connections/organization-location-connections-section.tsx',
+  'apps/dashboard/src/features/content/locations/components/connected-parties/location-people-and-organizations-section.tsx',
+  'apps/dashboard/src/features/content/locations/components/connected-parties/location-territorial-authority-section.tsx',
 ] as const
 
 const GROUPED_COLLECTION_BODY_FORBIDDEN = [
@@ -50,7 +50,7 @@ describe('detail collection grammar guard', () => {
     const source = readFileSync(
       join(
         REPO_ROOT,
-        'apps/dashboard/src/features/content/lib/relationship/list/relationship-list.client.tsx',
+        'apps/dashboard/src/features/content/lib/relationship/list/relationship-list.tsx',
       ),
       'utf8',
     )

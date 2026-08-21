@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterImportPreviewRow } from './character-import-preview-row.client'
+import { CharacterImportPreviewRow } from './character-import-preview-row'
 
 const meta = {
   title: 'Dashboard/Character Import/Preview Row',

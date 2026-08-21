@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { ALDERMERE, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../../fixtures'
-import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer.client'
+import { LocationParentReplacementDrawer } from './location-parent-replacement-drawer'
 
 function createMultiFamilyCampaignLocations() {
   const site = makeLocation({

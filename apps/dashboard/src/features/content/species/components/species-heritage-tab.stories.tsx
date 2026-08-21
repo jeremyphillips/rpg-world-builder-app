@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { SpeciesHeritageTab } from './species-heritage-tab.client'
+import { SpeciesHeritageTab } from './species-heritage-tab'
 
 const meta = {
   title: 'Content/Species/SpeciesHeritageTab',

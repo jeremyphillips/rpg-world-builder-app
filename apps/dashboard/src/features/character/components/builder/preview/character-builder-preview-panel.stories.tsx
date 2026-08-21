@@ -10,7 +10,7 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderContextFixture,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel.client'
+import { CharacterBuilderPreviewPanel } from './character-builder-preview-panel'
 
 const meta = {
   title: 'Character Builder/CharacterBuilderPreviewPanel',

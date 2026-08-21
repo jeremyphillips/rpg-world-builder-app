@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
+import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
 
 import {
   createPopulatedStandaloneBuilderContextFixture,

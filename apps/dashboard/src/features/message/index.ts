@@ -19,5 +19,5 @@ export {
   MessagesEntryLinks,
   MessagesGlobalEntryLink,
   MessagesOverviewEntryActions,
-} from './components/messages-entry-links.client'
+} from './components/messages-entry-links'
 export { MESSAGES_ACTION_COPY } from './lib/messages-copy'

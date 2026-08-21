@@ -37,24 +37,24 @@ export {
   ContentEntityCard,
   ContentEntityCardViewLink,
   type ContentEntityCardProps,
-} from './lib/entity/surfaces/cards/content/content-entity-card.client'
+} from './lib/entity/surfaces/cards/content/content-entity-card'
 export {
   DisclosureEntityCard,
   type DisclosureEntityCardProps,
-} from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card.client'
+} from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card'
 export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
 export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
-export { EntitySummary } from './lib/entity/summary/entity-summary.client'
+export { EntitySummary } from './lib/entity/summary/entity-summary'
 export type {
   EntityAnatomyTrailing,
   EntityAnatomyTrailingSecondary,
 } from './lib/entity/anatomy/entity-anatomy-trailing.types'
-export { EntityAnatomyHost } from './lib/entity/anatomy/entity-anatomy.client'
-export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row.client'
-export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row.client'
-export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client'
-export type { CatalogEntityPickerSheetProps } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client'
-export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/catalog-entity-row-renderer.client'
+export { EntityAnatomyHost } from './lib/entity/anatomy/entity-anatomy'
+export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row'
+export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row'
+export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
+export type { CatalogEntityPickerSheetProps } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
+export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/catalog-entity-row-renderer'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
   CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
@@ -102,7 +102,7 @@ export {
   buildSkillProficiencyDetailViewModel,
   type SkillProficiencyDetailViewModel,
 } from './skill-proficiencies/lib/skill-proficiency-display'
-export { SkillProficiencyDetailMetadata } from './skill-proficiencies/components/skill-proficiency-detail-metadata.client'
+export { SkillProficiencyDetailMetadata } from './skill-proficiencies/components/skill-proficiency-detail-metadata'
 export { SkillProficiencyCreate } from './skill-proficiencies/routes/skill-proficiency-create'
 export { SkillProficiencyEdit } from './skill-proficiencies/routes/skill-proficiency-edit'
 export { SpeciesOverview, SpeciesDetail, useSpecies, speciesQueryKey } from './species'
@@ -153,23 +153,23 @@ export {
   type SpellDetailViewModel,
   type SpellDisplayVocabulary,
 } from './spells/lib/spell-display'
-export { SpellDetailMetadata } from './spells/components/spell-detail-metadata.client'
+export { SpellDetailMetadata } from './spells/components/spell-detail-metadata'
 export {
   ContentCreateShell,
   ContentFormShellResolver,
 } from './lib/forms/shells/create/content-create-shell'
-export { ContentFormDrawer } from './lib/forms/shells/host/content-form-drawer.client'
+export { ContentFormDrawer } from './lib/forms/shells/host/content-form-drawer'
 export type {
   ContentFormDrawerFormProps,
   ContentFormDrawerProps,
-} from './lib/forms/shells/host/content-form-drawer.client'
-export { ContentFormHost } from './lib/forms/shells/host/content-form-host.client'
+} from './lib/forms/shells/host/content-form-drawer'
+export { ContentFormHost } from './lib/forms/shells/host/content-form-host'
 export type {
   ContentFormHostChrome,
   ContentFormHostFormProps,
   ContentFormHostLeaveBridge,
   ContentFormHostProps,
-} from './lib/forms/shells/host/content-form-host.client'
+} from './lib/forms/shells/host/content-form-host'
 export { ContentEditShell } from './lib/forms/shells/edit/content-edit-shell'
 export {
   buildGrantSummaryModel,
@@ -204,5 +204,5 @@ export {
   createContentMutationHooks,
   useContentWriteMutation,
 } from './lib/list/use-content-mutations'
-export { ContentDeletionBlockedDialog } from './lib/delete/content-deletion-blocked-dialog.client'
-export { ContentCampaignAvailabilityAction } from './lib/campaign-access/overview/content-campaign-availability-action.client'
+export { ContentDeletionBlockedDialog } from './lib/delete/content-deletion-blocked-dialog'
+export { ContentCampaignAvailabilityAction } from './lib/campaign-access/overview/content-campaign-availability-action'

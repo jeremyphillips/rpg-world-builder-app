@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-import { CharacterImportPreviewRow } from './character-import-preview-row.client'
+import { CharacterImportPreviewRow } from './character-import-preview-row'
 
 describe('CharacterImportPreviewRow', () => {
   it('renders missing-source values as muted not-set copy without an issue line', () => {

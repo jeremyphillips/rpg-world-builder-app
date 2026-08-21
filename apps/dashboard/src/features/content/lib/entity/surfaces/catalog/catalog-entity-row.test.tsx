@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { CatalogEntityRow } from './catalog-entity-row.client'
+import { CatalogEntityRow } from './catalog-entity-row'
 import {
   catalogEntityRowBodyWashVariants,
   catalogEntityRowInsetRootVariants,

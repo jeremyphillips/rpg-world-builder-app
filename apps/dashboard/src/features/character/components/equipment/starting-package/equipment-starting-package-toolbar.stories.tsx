@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { EquipmentStartingPackageToolbar } from './equipment-starting-package-toolbar.client'
+import { EquipmentStartingPackageToolbar } from './equipment-starting-package-toolbar'
 
 const meta = {
   title: 'Character Builder/EquipmentStartingPackageToolbar',

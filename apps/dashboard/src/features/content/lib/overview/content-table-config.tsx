@@ -23,7 +23,7 @@ import { buildSourceColumn, stampDataColumns } from '@/lib/data-table/column-bui
 import { getContentImageUrl } from '../detail/page/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
-import { ContentOverviewNameCell } from './content-overview-name-cell.client'
+import { ContentOverviewNameCell } from './content-overview-name-cell'
 import { shouldPresentContentSource } from '../content-type-presentation'
 import { buildContentUsedByColumn } from './content-used-by-column'
 

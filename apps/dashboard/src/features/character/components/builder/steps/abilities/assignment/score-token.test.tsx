@@ -6,7 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { abilitiesFormCopy } from '../../../../../lib/steps/abilities-form-labels'
 import { FIXED_SCORES_DND_KINDS } from '../../../../../lib/steps/fixed-scores-dnd.lib'
-import { ScoreToken } from './score-token.client'
+import { ScoreToken } from './score-token'
 
 function renderScoreToken(ui: ReactElement) {
   return render(<DndContext>{ui}</DndContext>)

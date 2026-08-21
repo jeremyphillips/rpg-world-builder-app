@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
-import { SpeciesPersonalNameComponentsField } from './species-personal-name-components-field.client'
+import { SpeciesPersonalNameComponentsField } from './species-personal-name-components-field'
 
 function TestHarness({
   defaultValues = { culture: { naming: { supported: true, personalNameComponents: [] } } },

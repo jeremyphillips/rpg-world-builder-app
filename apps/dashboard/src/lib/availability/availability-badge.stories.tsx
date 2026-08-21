@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { AvailabilityBadge } from './availability-badge.client'
+import { AvailabilityBadge } from './availability-badge'
 import { resolveAvailability } from './availability'
 
 const meta = {

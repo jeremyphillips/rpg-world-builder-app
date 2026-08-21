@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from '@rpg/ui'
@@ -14,7 +12,7 @@ import {
 } from '@/lib/filters'
 
 import { activateNotification } from '../lib/activate-notification'
-import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
+import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
 import {
   createNotificationInboxFilterSchema,
   toNotificationListQueryFilters,

@@ -14,7 +14,7 @@ import {
 import {
   PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL,
   ProficiencySelectedRow,
-} from './proficiency-selected-row.client'
+} from './proficiency-selected-row'
 
 describe('ProficiencySelectedRow', () => {
   it('renders source and remove action for a selected row', async () => {

@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useId } from 'react'
 
 import { CONTENT_OVERVIEW_BULK_SELECTION_LIMIT } from '../content-overview-selection.constants'

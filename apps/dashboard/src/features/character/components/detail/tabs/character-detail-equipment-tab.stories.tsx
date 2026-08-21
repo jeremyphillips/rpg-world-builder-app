@@ -8,7 +8,7 @@ import {
 } from '../../../lib/fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetEquipmentCards } from '../../../lib/detail/character-sheet-catalog'
-import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.client'
+import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
 import { renderWithDataRouter } from '@/lib/test-router'
-import { ContentFormDrawer } from './content-form-drawer.client'
+import { ContentFormDrawer } from './content-form-drawer'
 
 const schema = z.object({ name: z.string().min(1) })
 

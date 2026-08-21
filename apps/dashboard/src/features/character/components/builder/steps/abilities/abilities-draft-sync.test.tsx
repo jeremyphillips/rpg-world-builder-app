@@ -6,7 +6,7 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { createStandaloneBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
 import { abilitiesFormCopy } from '../../../../lib/steps/abilities-form-labels'
-import { AbilitiesStep } from './abilities-step.client'
+import { AbilitiesStep } from './abilities-step'
 
 const context = createStandaloneBuilderContextFixture()
 

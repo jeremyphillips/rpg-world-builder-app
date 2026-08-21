@@ -9,7 +9,7 @@ import {
   clearBuilderFormContinueHandlersForTests,
   runBuilderFormContinueHandler,
 } from '../../../../lib/builder/builder-form-continue-registry'
-import { IdentityStep } from './identity-step.client'
+import { IdentityStep } from './identity-step'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {

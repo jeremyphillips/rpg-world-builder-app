@@ -15,7 +15,7 @@ import type {
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../../../lib/fixtures/character-builder-fixtures'
 import { createSpellsStepContextFixture } from '../../../lib/spells/spells-step.fixtures'
-import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
+import { CharacterBuilderStepRail } from './character-builder-step-rail'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)

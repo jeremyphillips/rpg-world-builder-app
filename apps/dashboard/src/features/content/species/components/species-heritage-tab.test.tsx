@@ -7,7 +7,7 @@ import { TestFormShell } from '@/test/form-shell'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { HeritageForm } from '../../species/lib/species-heritage-form-fields'
-import { SpeciesHeritageTab } from './species-heritage-tab.client'
+import { SpeciesHeritageTab } from './species-heritage-tab'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
   const { stubUiFormItems } = await import('@/test/mocks/ui-form')

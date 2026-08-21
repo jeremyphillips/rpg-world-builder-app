@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
 import { optionalResolutionFormSchema } from '../../lib/form/resolution-form-schema'
-import { SpellResolutionPreview } from './spell-resolution-preview.client'
+import { SpellResolutionPreview } from './spell-resolution-preview'
 
 const previewSchema = z.object({
   resolution: optionalResolutionFormSchema,

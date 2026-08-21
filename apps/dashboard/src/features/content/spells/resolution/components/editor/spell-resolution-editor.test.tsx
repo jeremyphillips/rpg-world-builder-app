@@ -7,9 +7,9 @@ import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import { makeContentFormCtx } from '../../../../lib/fixtures/content-form-ctx'
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
-import * as resolutionChangeConfirm from '../../hooks/use-resolution-change-confirm.client'
+import * as resolutionChangeConfirm from '../../hooks/use-resolution-change-confirm'
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
-import { SpellResolutionEditor } from './spell-resolution-editor.client'
+import { SpellResolutionEditor } from './spell-resolution-editor'
 
 const formCtx = makeContentFormCtx({
   damageTypeVocabulary: buildSeedDamageTypeVocabulary(),

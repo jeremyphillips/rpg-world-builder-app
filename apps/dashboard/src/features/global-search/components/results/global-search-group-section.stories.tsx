@@ -3,7 +3,7 @@ import { establishSurfaceCurrent } from '@rpg/ui'
 
 import { globalSearchPageResultsShellClasses } from '../../lib/global-search-surface.variants'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
-import { GlobalSearchGroupSection } from './global-search-group-section.client'
+import { GlobalSearchGroupSection } from './global-search-group-section'
 
 const truncatedSection: GlobalSearchGroupSectionModel = {
   filterGroup: 'content',

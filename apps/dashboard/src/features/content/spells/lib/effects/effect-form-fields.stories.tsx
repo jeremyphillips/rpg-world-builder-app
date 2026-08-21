@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
-import { SpellEffectsEditor } from '../../components/spell-effects-editor.client'
+import { SpellEffectsEditor } from '../../components/spell-effects-editor'
 import { SPELL_EFFECT_FIXTURES } from './effect-fixtures'
 
 const formCtx = makeContentFormCtx({

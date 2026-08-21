@@ -12,7 +12,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { makeTestQueryClient } from '@/test/render'
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
-import { OrganizationCreateModal } from './organization-create-modal.client'
+import { OrganizationCreateModal } from './organization-create-modal'
 
 const mutateAsync = vi.fn()
 
@@ -40,7 +40,7 @@ vi.mock('../../../lib/forms/shells/layout/content-form-shell-layout', () => ({
     }),
 }))
 
-vi.mock('../../../lib/campaign-access/campaign-access-section.client', () => ({
+vi.mock('../../../lib/campaign-access/campaign-access-section', () => ({
   CampaignAccessSection: ({
     onDraftChange,
   }: {
@@ -52,7 +52,7 @@ vi.mock('../../../lib/campaign-access/campaign-access-section.client', () => ({
   ),
 }))
 
-vi.mock('./organization-authoring-context.client', () => ({
+vi.mock('./organization-authoring-context', () => ({
   OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
   useOrganizationAuthoringContext: () => ({
     practiceRecommendations: [],

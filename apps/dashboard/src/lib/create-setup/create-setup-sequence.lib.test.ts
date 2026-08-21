@@ -11,7 +11,7 @@ import {
   resolveCreateSetupSetsComplete,
   resolveCreateSetupVisibleSetIds,
 } from './create-setup-sequence.lib'
-import { notifyCreateSetupValueChangeCompletion } from './use-create-setup-sequence.client'
+import { notifyCreateSetupValueChangeCompletion } from './use-create-setup-sequence'
 import type { CreateSetupSequenceItem } from './create-setup.types'
 
 function sequence(

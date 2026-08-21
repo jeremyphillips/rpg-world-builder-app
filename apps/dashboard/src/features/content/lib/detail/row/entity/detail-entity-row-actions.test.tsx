@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { DetailEntityRowActions } from './detail-entity-row-actions.client'
+import { DetailEntityRowActions } from './detail-entity-row-actions'
 import { detailEntityRowActionsVariants } from './detail-entity-row-actions.variants'
 
 describe('DetailEntityRowActions', () => {

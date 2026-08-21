@@ -6,7 +6,7 @@ import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import { SPELL_EFFECT_FIXTURES } from '../lib/effects/effect-fixtures'
-import { EFFECTS_NOT_SAVED_BANNER, SpellEffectsEditor } from './spell-effects-editor.client'
+import { EFFECTS_NOT_SAVED_BANNER, SpellEffectsEditor } from './spell-effects-editor'
 
 const formCtx = makeContentFormCtx({
   damageTypeVocabulary: buildSeedDamageTypeVocabulary(),

@@ -53,7 +53,7 @@ Detail collection grammar: [`content/lib/detail/README.md`](../lib/detail/README
 
 | Consumer                     | May import                                                             |
 | ---------------------------- | ---------------------------------------------------------------------- |
-| `relationship/nested-create` | `components/create/organization-create-modal.client.tsx` only          |
+| `relationship/nested-create` | `components/create/organization-create-modal.tsx` only                 |
 | Locations building composer  | `components/create/` (FormShell, context, PresetBridge)                |
 | Org detail route             | `*-detail-section` composition roots in members / location-connections |
 

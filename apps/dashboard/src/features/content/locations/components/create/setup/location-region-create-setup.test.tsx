@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { LocationRegionCreateSetup } from './location-region-create-setup.client'
+import { LocationRegionCreateSetup } from './location-region-create-setup'
 
 describe('LocationRegionCreateSetup', () => {
   it('uses Create region heading and clears type when classification changes', async () => {

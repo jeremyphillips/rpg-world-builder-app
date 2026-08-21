@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createDefaultCampaignRosterState, createDefaultCharacterVitalState } from '@rpg/contracts'
 
-import { CampaignCharacterStatusSummary } from './campaign-character-status-summary.client'
+import { CampaignCharacterStatusSummary } from './campaign-character-status-summary'
 
 const meta = {
   title: 'Dashboard/Character/CampaignCharacterStatusSummary',

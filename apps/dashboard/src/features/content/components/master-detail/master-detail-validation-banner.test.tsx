@@ -3,7 +3,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE } from '../../lib/master-detail/master-detail-constants'
-import { MasterDetailValidationBanner } from './master-detail-validation-banner.client'
+import { MasterDetailValidationBanner } from './master-detail-validation-banner'
 
 describe('MasterDetailValidationBanner', () => {
   it('renders nothing when not visible', () => {

@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { RelationshipList } from './relationship-list.client'
+import { RelationshipList } from './relationship-list'
 import {
   relationshipListFooterVariants,
   relationshipListRootVariants,

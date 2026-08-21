@@ -144,11 +144,11 @@ Per-code presentation: title, description, severity, badge label, optional
 ## Master-detail integration
 
 Embedded editors combine toggle state + optional `resolveRowReasons` on
-[`FormEmbeddedMasterDetailEditor`](../src/features/content/components/master-detail/form-embedded-master-detail-editor.client.tsx):
+[`FormEmbeddedMasterDetailEditor`](../src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx):
 
 1. `resolveRowReasons({ row, rowKey, index })` → `AvailabilityReason[]`
 2. [`resolveEmbeddedRowMeta`](../src/features/content/lib/master-detail/resolve-embedded-row-meta.ts) calls `combineAvailabilityReasons`
-3. Inactive badge on the rail; [`MasterDetailEditorPanel`](../src/features/content/components/master-detail/master-detail-editor-panel.client.tsx) renders `AvailabilityAlert` above the row form
+3. Inactive badge on the rail; [`MasterDetailEditorPanel`](../src/features/content/components/master-detail/master-detail-editor-panel.tsx) renders `AvailabilityAlert` above the row form
 
 ## Adding a reason code
 

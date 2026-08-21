@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterImportProficienciesPreviewSection } from './character-import-proficiencies-preview.client'
+import { CharacterImportProficienciesPreviewSection } from './character-import-proficiencies-preview'
 
 const meta = {
   title: 'Dashboard/Character Import/Proficiencies Preview',

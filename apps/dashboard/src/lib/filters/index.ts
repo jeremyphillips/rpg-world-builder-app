@@ -13,6 +13,6 @@ export {
   stripCampaignIdFromSearch,
 } from './filter-url-state.lib'
 
-export { useFilterUrlState, type UseFilterUrlStateOptions } from './use-filter-url-state.client'
+export { useFilterUrlState, type UseFilterUrlStateOptions } from './use-filter-url-state'
 
-export { useInvalidCampaignScopeNotice } from './use-invalid-campaign-scope-notice.client'
+export { useInvalidCampaignScopeNotice } from './use-invalid-campaign-scope-notice'

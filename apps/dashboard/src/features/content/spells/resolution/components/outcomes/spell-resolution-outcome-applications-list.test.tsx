@@ -18,8 +18,8 @@ import {
   outcomeApplicationsFieldPath,
 } from '../../lib/form/resolution-outcome-applications-form-fields'
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
-import { SpellResolutionOutcomeApplicationsList } from './spell-resolution-outcome-applications-list.client'
-import { outcomeApplicationsIdPrefix } from './spell-resolution-outcome-applications-list.client'
+import { SpellResolutionOutcomeApplicationsList } from './spell-resolution-outcome-applications-list'
+import { outcomeApplicationsIdPrefix } from './spell-resolution-outcome-applications-list'
 
 function InvalidSubmitHarness({ defaultResolution }: { defaultResolution: ResolutionFormValues }) {
   const form = useForm({

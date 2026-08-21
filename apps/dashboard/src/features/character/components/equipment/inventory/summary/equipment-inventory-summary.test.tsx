@@ -23,8 +23,8 @@ import {
   EQUIPMENT_STEP_BROWSE_LABEL,
   formatEquipmentGoldOptionStartingDescription,
 } from '../../../../lib/equipment/equipment-step.lib'
-import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
-import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row.client'
+import { EquipmentInventorySummary } from './equipment-inventory-summary'
+import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 
 const inventoryManagementProps = {

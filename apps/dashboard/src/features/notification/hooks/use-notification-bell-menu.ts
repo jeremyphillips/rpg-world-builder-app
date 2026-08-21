@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -7,7 +5,7 @@ import { toast } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 
 import { activateNotification } from '../lib/activate-notification'
-import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
+import { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
 import { listUnseenNotificationIds } from '../lib/unseen-notification-ids'
 import { useNotificationActions } from './use-notification-actions'
 import { useNotifications } from './use-notifications'

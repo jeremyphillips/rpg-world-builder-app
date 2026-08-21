@@ -3,9 +3,9 @@ import { Plus } from 'lucide-react'
 
 import { Button } from '@rpg/ui'
 
-import { DetailEntityRow } from './detail-entity-row.client'
-import { DetailEntityRowActions } from './detail-entity-row-actions.client'
-import { DetailOverflowMenu } from '../../detail-overflow-menu.client'
+import { DetailEntityRow } from './detail-entity-row'
+import { DetailEntityRowActions } from './detail-entity-row-actions'
+import { DetailOverflowMenu } from '../../detail-overflow-menu'
 
 const meta = {
   title: 'Content/Detail/DetailEntityRowActions',

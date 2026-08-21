@@ -31,7 +31,7 @@ vi.mock('socket.io-client', () => ({
   io: ioMock,
 }))
 
-import { RealtimeProvider } from './realtime-provider.client'
+import { RealtimeProvider } from './realtime-provider'
 import { useRealtimeStatus } from '../context/realtime-context'
 import {
   applyConversationEnvelopeToList,

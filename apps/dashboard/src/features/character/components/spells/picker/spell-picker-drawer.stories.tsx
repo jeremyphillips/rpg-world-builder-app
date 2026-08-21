@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import { Button } from '@rpg/ui'
 
-import { SpellPickerDrawer } from './spell-picker-drawer.client'
+import { SpellPickerDrawer } from './spell-picker-drawer'
 import {
   spellPickerCantripChoiceSetFixture,
   spellPickerDetectMagicFixture,

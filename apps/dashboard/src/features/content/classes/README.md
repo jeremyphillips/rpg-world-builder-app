@@ -23,12 +23,12 @@ The **Subclasses** tab uses a list + editor layout: subclasses load from the nes
 | Class form tab field modules         | `lib/class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`, `class-resources-form-fields.ts`                   |
 | Subclass form fields / values        | `lib/subclasses/subclass-form-fields.ts`, `subclass-form-values.ts`                                                                                              |
 | Shared feature row fields            | `lib/class-feature-form-fields.ts`, `lib/class-subclass-choice-features.ts`                                                                                      |
-| Features tab (master-detail)         | `components/class-features-tab.client.tsx`                                                                                                                       |
-| Character creation tab               | `components/class-character-creation-tab.client.tsx`                                                                                                             |
+| Features tab (master-detail)         | `components/class-features-tab.tsx`                                                                                                                              |
+| Character creation tab               | `components/class-character-creation-tab.tsx`                                                                                                                    |
 | Starting equipment form              | `lib/character-creation/class-starting-equipment-form-*.ts`                                                                                                      |
-| Subclasses tab                       | `components/class-subclasses-tab.client.tsx`                                                                                                                     |
+| Subclasses tab                       | `components/class-subclasses-tab.tsx`                                                                                                                            |
 | Subclass tab state / save            | `lib/subclasses/subclass-tab-state.lib.ts`, `subclass-tab-save.lib.ts`                                                                                           |
-| Subclass tab hook                    | `hooks/use-class-subclasses-tab.client.ts`                                                                                                                       |
+| Subclass tab hook                    | `hooks/use-class-subclasses-tab.ts`                                                                                                                              |
 | Spell progression grid helpers       | `lib/progression-table-helpers.ts`                                                                                                                               |
 | Cantrip template presets (seed-only) | `lib/cantrips-profiles.ts`                                                                                                                                       |
 | Read-only progression table          | `components/detail/class-progression-table.tsx`                                                                                                                  |
@@ -39,7 +39,7 @@ The **Subclasses** tab uses a list + editor layout: subclasses load from the nes
 
 | Area                      | Path                                                                         |
 | ------------------------- | ---------------------------------------------------------------------------- |
-| Form tab shells           | `components/class-*-tab.client.tsx` (root)                                   |
+| Form tab shells           | `components/class-*-tab.tsx` (root)                                          |
 | Detail presentation       | `components/detail/` — progression table, proficiencies section, feature row |
 | Character creation UI     | `components/character-creation/` — link cues, ability-score ordering         |
 | Subclass master-detail UI | `components/subclasses/` — list/editor panels, gates, delete dialog          |

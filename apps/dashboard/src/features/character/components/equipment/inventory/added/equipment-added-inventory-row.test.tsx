@@ -11,7 +11,7 @@ import {
   equipmentStepPotionOfHealingFixture,
 } from '../../../../lib/equipment/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
-import { EquipmentAddedInventoryRowItem } from '../added/equipment-added-inventory-row.client'
+import { EquipmentAddedInventoryRowItem } from '../added/equipment-added-inventory-row'
 import type { AddedEquipmentEntryViewModel } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 
 const grantRow: EquipmentInventoryRow = {

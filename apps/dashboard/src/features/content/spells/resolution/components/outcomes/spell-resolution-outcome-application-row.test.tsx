@@ -9,8 +9,8 @@ import { FormSectionProvider, FormUiProvider } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
-import { SpellResolutionOutcomeApplicationsList } from './spell-resolution-outcome-applications-list.client'
-import { outcomeApplicationsIdPrefix } from './spell-resolution-outcome-applications-list.client'
+import { SpellResolutionOutcomeApplicationsList } from './spell-resolution-outcome-applications-list'
+import { outcomeApplicationsIdPrefix } from './spell-resolution-outcome-applications-list'
 import { outcomeApplicationsFieldPath } from '../../lib/form/resolution-outcome-applications-form-fields'
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 

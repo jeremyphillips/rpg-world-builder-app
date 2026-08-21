@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { GlobalSearchTrigger } from './global-search-trigger.client'
+import { GlobalSearchTrigger } from './global-search-trigger'
 
 const meta = {
   title: 'GlobalSearch/GlobalSearchTrigger',

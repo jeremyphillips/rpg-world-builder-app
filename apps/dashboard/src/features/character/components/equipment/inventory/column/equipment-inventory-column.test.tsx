@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { EquipmentInventoryColumn } from '../column/equipment-inventory-column.client'
+import { EquipmentInventoryColumn } from '../column/equipment-inventory-column'
 
 describe('EquipmentInventoryColumn', () => {
   it('renders a subsection title and body content', () => {

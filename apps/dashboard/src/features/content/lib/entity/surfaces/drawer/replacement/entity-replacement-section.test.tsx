@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { EntityReplacementSection } from './entity-replacement-section.client'
+import { EntityReplacementSection } from './entity-replacement-section'
 
 describe('EntityReplacementSection', () => {
   it('renders current summary, unavailable message, and new helper copy', () => {

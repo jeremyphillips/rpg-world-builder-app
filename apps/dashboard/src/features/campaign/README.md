@@ -42,13 +42,13 @@ acquisition model (axes, ownership, build/import finalization).
 
 ## Invite ownership
 
-| Concern                                | Location                                                                                                  |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Manager send-invite dialog             | `components/overview/invite-member-dialog.client.tsx`                                                     |
-| Overview invite list / row actions     | `components/overview/campaign-overview-invitations-section.tsx`, `campaign-invite-row-actions.client.tsx` |
-| Pending invite promotions (home/index) | `components/recovery/pending-campaign-invitation*.tsx`                                                    |
-| Invite review card                     | `features/campaign-invite/`                                                                               |
-| Form schemas (dialog + create wizard)  | `lib/forms/invite-member-form-fields.ts`, `invite-members-form-fields.ts`                                 |
+| Concern                                | Location                                                                                           |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Manager send-invite dialog             | `components/overview/invite-member-dialog.tsx`                                                     |
+| Overview invite list / row actions     | `components/overview/campaign-overview-invitations-section.tsx`, `campaign-invite-row-actions.tsx` |
+| Pending invite promotions (home/index) | `components/recovery/pending-campaign-invitation*.tsx`                                             |
+| Invite review card                     | `features/campaign-invite/`                                                                        |
+| Form schemas (dialog + create wizard)  | `lib/forms/invite-member-form-fields.ts`, `invite-members-form-fields.ts`                          |
 
 ## Player onboarding
 
@@ -70,20 +70,20 @@ acquisition model (axes, ownership, build/import finalization).
 
 ## Component map (onboarding recovery)
 
-| Component                            | Location                                                                  | Surface                                                     |
-| ------------------------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `PromotionCard`                      | `components/layout/promotion-card.tsx`                                    | Shared home promotion chrome                                |
-| `CampaignRecoveryState`              | `lib/recovery/campaign-recovery-state.ts`                                 | Dashboard wrapper over `viewerState`                        |
-| `resolveCampaignEntryDestination`    | `lib/recovery/campaign-destination.lib.ts`                                | Index/switcher/continue → campaign shell                    |
-| `resolveCampaignRecoveryDestination` | `lib/recovery/campaign-destination.lib.ts`                                | Home/alert/nav CTA → onboarding or reconnect                |
-| `resolveCampaignRecoveryPromotions`  | `lib/recovery/campaign-recovery-promotions.lib.ts`                        | Home promotion ranking (preference ranks, never suppresses) |
-| `CampaignRecoveryPromotionCard`      | `components/recovery/campaign-recovery-promotion-card.client.tsx`         | Home recovery promotion                                     |
-| `CampaignInvitationCard`             | `features/campaign-invite/components/campaign-invitation-card.client.tsx` | Home pending invite promotion                               |
-| `CampaignLayoutRecoveryChrome`       | `components/recovery/campaign-layout-recovery-chrome.client.tsx`          | Layout loading/error/recovery shell                         |
-| `CampaignOnboardingIncompleteAlert`  | `components/recovery/campaign-onboarding-incomplete-alert.client.tsx`     | Campaign layout warning                                     |
-| `CampaignDestinationRow`             | `components/recovery/campaign-destination-row.client.tsx`                 | Campaigns index rows                                        |
-| `persistCampaignSelectionBestEffort` | `@rpg/api-client`                                                         | Public accept/continue handoff (local + server)             |
-| `usePersistCampaignSelection`        | `features/campaign`                                                       | Dashboard accept/continue handoff                           |
+| Component                            | Location                                                           | Surface                                                     |
+| ------------------------------------ | ------------------------------------------------------------------ | ----------------------------------------------------------- |
+| `PromotionCard`                      | `components/layout/promotion-card.tsx`                             | Shared home promotion chrome                                |
+| `CampaignRecoveryState`              | `lib/recovery/campaign-recovery-state.ts`                          | Dashboard wrapper over `viewerState`                        |
+| `resolveCampaignEntryDestination`    | `lib/recovery/campaign-destination.lib.ts`                         | Index/switcher/continue → campaign shell                    |
+| `resolveCampaignRecoveryDestination` | `lib/recovery/campaign-destination.lib.ts`                         | Home/alert/nav CTA → onboarding or reconnect                |
+| `resolveCampaignRecoveryPromotions`  | `lib/recovery/campaign-recovery-promotions.lib.ts`                 | Home promotion ranking (preference ranks, never suppresses) |
+| `CampaignRecoveryPromotionCard`      | `components/recovery/campaign-recovery-promotion-card.tsx`         | Home recovery promotion                                     |
+| `CampaignInvitationCard`             | `features/campaign-invite/components/campaign-invitation-card.tsx` | Home pending invite promotion                               |
+| `CampaignLayoutRecoveryChrome`       | `components/recovery/campaign-layout-recovery-chrome.tsx`          | Layout loading/error/recovery shell                         |
+| `CampaignOnboardingIncompleteAlert`  | `components/recovery/campaign-onboarding-incomplete-alert.tsx`     | Campaign layout warning                                     |
+| `CampaignDestinationRow`             | `components/recovery/campaign-destination-row.tsx`                 | Campaigns index rows                                        |
+| `persistCampaignSelectionBestEffort` | `@rpg/api-client`                                                  | Public accept/continue handoff (local + server)             |
+| `usePersistCampaignSelection`        | `features/campaign`                                                | Dashboard accept/continue handoff                           |
 
 ## Campaign template pipeline
 

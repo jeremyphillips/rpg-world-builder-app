@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-import { CharacterImportNarrativePreviewSection } from './character-import-narrative-preview.client'
+import { CharacterImportNarrativePreviewSection } from './character-import-narrative-preview'
 
 describe('CharacterImportNarrativePreviewSection', () => {
   it('renders each narrative child as not set when the source is missing', () => {

@@ -3,10 +3,10 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const quickNpcCreateModalPath = fileURLToPath(
-  new URL('../../components/quick-npc/quick-npc-create-modal.client.tsx', import.meta.url),
+  new URL('../../components/quick-npc/quick-npc-create-modal.tsx', import.meta.url),
 )
 const quickNpcCreateSetupPhasePath = fileURLToPath(
-  new URL('../../components/quick-npc/quick-npc-create-setup-phase.client.tsx', import.meta.url),
+  new URL('../../components/quick-npc/quick-npc-create-setup-phase.tsx', import.meta.url),
 )
 
 describe('quick-npc setup structural drift', () => {

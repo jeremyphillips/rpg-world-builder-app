@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { useCharacterBuilderStore } from '../../../hooks/use-character-builder-store'
-import { CharacterBuilderDraftRestore } from './character-builder-draft-restore.client'
+import { CharacterBuilderDraftRestore } from './character-builder-draft-restore'
 
 vi.mock('../../../hooks/use-character-builder-store', () => ({
   useCharacterBuilderStore: vi.fn(),

@@ -5,7 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { buildLocationDetailViewModel } from '../../lib/location-display'
 import { HARBORFORD, LOCATIONS_LIST } from '../../fixtures'
-import { LocationDetailIdentity } from './location-detail-identity.client'
+import { LocationDetailIdentity } from './location-detail-identity'
 import { ContentEntityCard } from '@/features/content'
 
 describe('LocationDetailIdentity', () => {

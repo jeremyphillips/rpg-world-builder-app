@@ -9,7 +9,7 @@ import {
   EQUIPMENT_CHANGE_PACKAGE_LABEL,
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
 } from '../../../lib/equipment/equipment-step.lib'
-import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary.client'
+import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary'
 
 const summary = {
   optionId: 'starting-gold',

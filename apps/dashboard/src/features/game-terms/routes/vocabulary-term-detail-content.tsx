@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useState } from 'react'
 import {
   getVocabularyOptionSetTerm,
@@ -15,13 +13,13 @@ import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { WidePage } from '@/components/layout/page/wide-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useCanManageCampaign } from '@/features/campaign'
-import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section.client'
+import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section'
 import { notifyVocabularyEntrySaved } from '@/lib/notify'
 
 import {
   VocabularyEntrySheet,
   type VocabularyEntryFormValues,
-} from '../components/vocabulary-entry-sheet.client'
+} from '../components/vocabulary-entry-sheet'
 import {
   getVocabularySourceLabel,
   UNKNOWN_VOCABULARY_SET_MESSAGE,

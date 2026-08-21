@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { MasterDetailDeleteDialog } from './master-detail-delete-dialog.client'
+import { MasterDetailDeleteDialog } from './master-detail-delete-dialog'
 
 const meta = {
   title: 'Content/MasterDetailDeleteDialog',

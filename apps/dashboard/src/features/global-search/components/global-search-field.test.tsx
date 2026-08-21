@@ -5,7 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
-import { GlobalSearchField } from './global-search-field.client'
+import { GlobalSearchField } from './global-search-field'
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
 
 describe('GlobalSearchField', () => {

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
 
-import { GlobalSearchField } from './global-search-field.client'
+import { GlobalSearchField } from './global-search-field'
 
 function ControlledGlobalSearchField(
   props: Omit<React.ComponentProps<typeof GlobalSearchField>, 'value' | 'onValueChange'> & {

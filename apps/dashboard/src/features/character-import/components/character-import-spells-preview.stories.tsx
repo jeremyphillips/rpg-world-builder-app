@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterImportSpellsPreviewSection } from './character-import-spells-preview.client'
+import { CharacterImportSpellsPreviewSection } from './character-import-spells-preview'
 
 const meta = {
   title: 'Dashboard/Character Import/Spells Preview',

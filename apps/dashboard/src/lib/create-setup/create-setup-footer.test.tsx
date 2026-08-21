@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { deriveCreateSetupFooterState } from './create-setup-footer.client'
+import { deriveCreateSetupFooterState } from './create-setup-footer'
 import {
   resolveCreateSetupIsComplete,
   resolveCreateSetupPendingExplicitDecisions,

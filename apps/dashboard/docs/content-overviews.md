@@ -40,7 +40,7 @@ table card — row 1 for result context, row 2 for selection and column controls
 - Supplement copy: `5 hidden · Show` when availability is **Available**; `5 unavailable shown · Hide`
   when **All**; omitted when **Unavailable** is selected.
 
-Shared modules: `overview-result-summary.client.tsx`, `overview-selection-cluster.client.tsx`.
+Shared modules: `overview-result-summary.tsx`, `overview-selection-cluster.tsx`.
 
 ## Selection mode (managers)
 
@@ -61,7 +61,7 @@ Managers opt into selection mode via **Select** in the utility bar row 2.
   open/close and apply callbacks stay per extension.
 
 Modules: `use-content-overview-selection.ts`, `use-content-overview-bulk-selection.ts`,
-`content-bulk-actions-menu.client.tsx`, `content-overview-table.client.tsx` (`bulkExtensions`).
+`content-bulk-actions-menu.tsx`, `content-overview-table.tsx` (`bulkExtensions`).
 
 ### Bulk actions
 
@@ -79,22 +79,22 @@ only **updated** targets leave selection; blocked targets remain selected for re
 
 ## Components
 
-| Module                                        | Role                                                 |
-| --------------------------------------------- | ---------------------------------------------------- |
-| `overview-result-summary.client.tsx`          | Shared result count + supplemental disclosure        |
-| `overview-selection-cluster.client.tsx`       | Browse Select trigger and selection-mode actions     |
-| `content-bulk-actions-menu.client.tsx`        | Bulk actions dropdown (availability + extensions)    |
-| `use-content-overview-selection.ts`           | Selection mode state, cap, filter pruning            |
-| `use-content-overview-bulk-selection.ts`      | Shared selection for multiple bulk dialogs           |
-| `content-overview-table.client.tsx`           | `bulkExtensions[]` wiring and apply-complete handler |
-| `content-overview-availability-ui.lib.tsx`    | Hidden-unavailable supplement and empty-state CTA    |
-| `content-overview-name-cell.client.tsx`       | Composes both lines                                  |
-| `content-overview-utility-actions.client.tsx` | Manager `Edit · Duplicate` actions                   |
-| `content-access-metadata.client.tsx`          | Manager and player campaign-access metadata          |
-| `filter-catalog-rows-for-viewer.ts`           | Discovery filter helper (defense-in-depth)           |
-| `use-content-viewer.ts`                       | Membership → `ContentViewer` hook                    |
-| `content-table-config.tsx`                    | Shared `buildContentColumns` name column             |
-| `content-overview-columns.client.ts`          | Injects `canManage` + `getEditHref` into name column |
+| Module                                     | Role                                                 |
+| ------------------------------------------ | ---------------------------------------------------- |
+| `overview-result-summary.tsx`              | Shared result count + supplemental disclosure        |
+| `overview-selection-cluster.tsx`           | Browse Select trigger and selection-mode actions     |
+| `content-bulk-actions-menu.tsx`            | Bulk actions dropdown (availability + extensions)    |
+| `use-content-overview-selection.ts`        | Selection mode state, cap, filter pruning            |
+| `use-content-overview-bulk-selection.ts`   | Shared selection for multiple bulk dialogs           |
+| `content-overview-table.tsx`               | `bulkExtensions[]` wiring and apply-complete handler |
+| `content-overview-availability-ui.lib.tsx` | Hidden-unavailable supplement and empty-state CTA    |
+| `content-overview-name-cell.tsx`           | Composes both lines                                  |
+| `content-overview-utility-actions.tsx`     | Manager `Edit · Duplicate` actions                   |
+| `content-access-metadata.tsx`              | Manager and player campaign-access metadata          |
+| `filter-catalog-rows-for-viewer.ts`        | Discovery filter helper (defense-in-depth)           |
+| `use-content-viewer.ts`                    | Membership → `ContentViewer` hook                    |
+| `content-table-config.tsx`                 | Shared `buildContentColumns` name column             |
+| `content-overview-columns.ts`              | Injects `canManage` + `getEditHref` into name column |
 
 ## Row actions
 

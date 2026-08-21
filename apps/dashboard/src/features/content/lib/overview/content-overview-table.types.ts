@@ -9,7 +9,7 @@ import type {
 import type { ColumnDef } from '@rpg/ui'
 import type { FilterSchema } from '@rpg/ui/filters'
 
-import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu.client'
+import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu'
 
 import type { ContentBase } from './content-table-config'
 import type { ContentOverviewBaseFilterState } from './content-overview-filter-schema'

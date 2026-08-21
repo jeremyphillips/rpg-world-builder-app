@@ -13,75 +13,75 @@ const DRAWER_ARCHITECTURE_DOC = join(DOCS_ROOT, 'drawer-architecture.md')
 const PRODUCTION_DRAWER_SURFACES: readonly { label: string; path: string }[] = [
   {
     label: 'EquipmentPickerDrawer',
-    path: 'apps/dashboard/src/features/character/components/equipment/picker/drawer/equipment-picker-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/character/components/equipment/picker/drawer/equipment-picker-drawer.tsx',
   },
   {
     label: 'SpellPickerDrawer',
-    path: 'apps/dashboard/src/features/character/components/spells/picker/spell-picker-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/character/components/spells/picker/spell-picker-drawer.tsx',
   },
   {
     label: 'ProficiencyPickerDrawer',
-    path: 'apps/dashboard/src/features/character/components/proficiencies/picker/proficiency-picker-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/character/components/proficiencies/picker/proficiency-picker-drawer.tsx',
   },
   {
     label: 'OrganizationPickerDrawer',
-    path: 'apps/dashboard/src/features/character/components/connections/picker/organization-picker-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/character/components/connections/picker/organization-picker-drawer.tsx',
   },
   {
     label: 'OrganizationMemberPickerDrawer',
-    path: 'apps/dashboard/src/features/content/organizations/components/members/organization-member-picker-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/content/organizations/components/members/organization-member-picker-drawer.tsx',
   },
   {
     label: 'OrgLocationConnectionLinkDrawer',
-    path: 'apps/dashboard/src/features/content/organizations/components/location-connections/organization-location-connection-link-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/content/organizations/components/location-connections/organization-location-connection-link-drawer.tsx',
   },
   {
     label: 'LocationInversePeopleConnLinkDrawer',
-    path: 'apps/dashboard/src/features/content/locations/components/connected-parties/location-inverse-people-connection-link-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/content/locations/components/connected-parties/location-inverse-people-connection-link-drawer.tsx',
   },
   {
     label: 'LocationInverseOrgConnLinkDrawer',
-    path: 'apps/dashboard/src/features/content/locations/components/connected-parties/location-inverse-organization-connection-link-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/content/locations/components/connected-parties/location-inverse-organization-connection-link-drawer.tsx',
   },
   {
     label: 'LocationInverseCharacterConnLinkDrawer',
-    path: 'apps/dashboard/src/features/content/locations/components/connected-parties/location-inverse-character-connection-link-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/content/locations/components/connected-parties/location-inverse-character-connection-link-drawer.tsx',
   },
   {
     label: 'LocationParentReplacementDrawer',
-    path: 'apps/dashboard/src/features/content/locations/components/hierarchy/location-parent-replacement-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/content/locations/components/hierarchy/location-parent-replacement-drawer.tsx',
   },
   {
     label: 'VocabularyEntrySheet',
-    path: 'apps/dashboard/src/features/game-terms/components/vocabulary-entry-sheet.client.tsx',
+    path: 'apps/dashboard/src/features/game-terms/components/vocabulary-entry-sheet.tsx',
   },
   {
     label: 'EditOrganizationMembershipDrawer',
-    path: 'apps/dashboard/src/features/character/components/connections/edit-organization-membership-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/character/components/connections/edit-organization-membership-drawer.tsx',
   },
   {
     label: 'OrganizationMembersDetailDrawers',
-    path: 'apps/dashboard/src/features/content/organizations/components/members/organization-members-detail-drawers.client.tsx',
+    path: 'apps/dashboard/src/features/content/organizations/components/members/organization-members-detail-drawers.tsx',
   },
   {
     label: 'LocationConnectedPartiesDrawers',
-    path: 'apps/dashboard/src/features/content/locations/components/connected-parties/location-connected-parties-drawers.client.tsx',
+    path: 'apps/dashboard/src/features/content/locations/components/connected-parties/location-connected-parties-drawers.tsx',
   },
   {
     label: 'CharacterOrganizationMembershipDrawers',
-    path: 'apps/dashboard/src/features/character/components/detail/memberships/character-organization-membership-drawers.client.tsx',
+    path: 'apps/dashboard/src/features/character/components/detail/memberships/character-organization-membership-drawers.tsx',
   },
   {
     label: 'DrawerShell',
-    path: 'apps/dashboard/src/components/drawer/drawer-shell.client.tsx',
+    path: 'apps/dashboard/src/components/drawer/drawer-shell.tsx',
   },
   {
     label: 'CatalogEntityPickerSheet',
-    path: 'apps/dashboard/src/features/content/lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client.tsx',
+    path: 'apps/dashboard/src/features/content/lib/entity/surfaces/catalog/catalog-entity-picker-sheet.tsx',
   },
   {
     label: 'ContentFormDrawer',
-    path: 'apps/dashboard/src/features/content/lib/forms/shells/host/content-form-drawer.client.tsx',
+    path: 'apps/dashboard/src/features/content/lib/forms/shells/host/content-form-drawer.tsx',
   },
   {
     label: 'BuilderOptionDetailsSheet',
@@ -155,7 +155,7 @@ describe('drawer architecture guard', () => {
   it('does not introduce a second wrapper over CatalogEntityPickerSheet', () => {
     const catalogEntityPickerSheetPath = join(
       REPO_ROOT,
-      'apps/dashboard/src/features/content/lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client.tsx',
+      'apps/dashboard/src/features/content/lib/entity/surfaces/catalog/catalog-entity-picker-sheet.tsx',
     )
     const source = readFileSync(catalogEntityPickerSheetPath, 'utf8')
 

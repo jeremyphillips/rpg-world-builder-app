@@ -1,5 +1,3 @@
-'use client'
-
 import { useMemo } from 'react'
 import { Text } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
@@ -28,10 +26,10 @@ import {
   useEditionPresetVocabulary,
 } from '@/features/vocabulary'
 
-import { RulesConfigFieldNav } from '../components/rules-config-field-nav.client'
+import { RulesConfigFieldNav } from '../components/rules-config-field-nav'
 import { createRulesConfigSaveFooter } from '../components/rules-config-save-footer'
-import { useCharacterConfigurationRulesForm } from '../hooks/use-character-configuration-rules-form.client'
-import { useRulesConfigNavScrollSpy } from '../hooks/use-rules-config-nav-scroll-spy.client'
+import { useCharacterConfigurationRulesForm } from '../hooks/use-character-configuration-rules-form'
+import { useRulesConfigNavScrollSpy } from '../hooks/use-rules-config-nav-scroll-spy'
 import { disableFormItems } from '@/lib/disable-form-items'
 import { HomebrewDetailFallback } from '../lib/detail/homebrew-detail-fallback'
 import { HomebrewDetailMain } from '../lib/detail/homebrew-detail-main'

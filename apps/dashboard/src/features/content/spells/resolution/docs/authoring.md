@@ -8,16 +8,16 @@ contracts — do not redefine them here.
 
 ## Form modules
 
-| Module                                     | Responsibility                     |
-| ------------------------------------------ | ---------------------------------- |
-| `resolution-form-schema.ts`                | Zod shape + selection validation   |
-| `resolution-form-values.ts`                | Entity ↔ form round-trip, defaults |
-| `resolution-form-visibility.ts`            | Mode-driven field visibility       |
-| `resolution-form-slots.ts`                 | Slot registry wiring               |
-| `resolution-target-form-fields.ts`         | Selection panel field definitions  |
-| `resolution-progression-*.ts`              | Progression schema slice + presets |
-| `spell-resolution-progression.client.tsx`  | Progression section UI             |
-| `use-resolution-change-confirm.client.tsx` | Confirm-first change planning      |
+| Module                              | Responsibility                     |
+| ----------------------------------- | ---------------------------------- |
+| `resolution-form-schema.ts`         | Zod shape + selection validation   |
+| `resolution-form-values.ts`         | Entity ↔ form round-trip, defaults |
+| `resolution-form-visibility.ts`     | Mode-driven field visibility       |
+| `resolution-form-slots.ts`          | Slot registry wiring               |
+| `resolution-target-form-fields.ts`  | Selection panel field definitions  |
+| `resolution-progression-*.ts`       | Progression schema slice + presets |
+| `spell-resolution-progression.tsx`  | Progression section UI             |
+| `use-resolution-change-confirm.tsx` | Confirm-first change planning      |
 
 ## Progression section
 
@@ -55,7 +55,7 @@ Tests: `resolution-form-visibility.test.ts`.
 
 Cleanup is planned in contracts (`selection-change-plan.ts` /
 `selection-mode-cleanup.ts`) and applied on confirm in
-`use-resolution-change-confirm.client.tsx`.
+`use-resolution-change-confirm.tsx`.
 
 | Transition                  | Cleanup                                                 |
 | --------------------------- | ------------------------------------------------------- |

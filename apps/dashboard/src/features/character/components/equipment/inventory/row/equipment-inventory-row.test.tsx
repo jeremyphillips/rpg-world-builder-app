@@ -5,7 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { equipmentStepBardClassFixture } from '../../../../lib/equipment/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
-import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row.client'
+import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
 
 const editableStackableRow: EquipmentInventoryRow = {
   group: 'gear',

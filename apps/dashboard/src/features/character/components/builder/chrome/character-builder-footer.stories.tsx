@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 
 import { getBuilderChromeCopy } from '../../../lib/builder/builder-chrome-copy'
-import { CharacterBuilderFooter } from './character-builder-footer.client'
+import { CharacterBuilderFooter } from './character-builder-footer'
 
 const pcChrome = getBuilderChromeCopy('standalone_pc')
 

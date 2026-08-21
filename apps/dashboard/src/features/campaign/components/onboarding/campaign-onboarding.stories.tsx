@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import type { CampaignOnboardingIncompleteContext } from '@rpg/contracts'
 
-import { CampaignOnboardingClient } from './campaign-onboarding.client'
+import { CampaignOnboardingClient } from './campaign-onboarding'
 
 const incompleteContext: CampaignOnboardingIncompleteContext = {
   status: 'onboarding_incomplete',

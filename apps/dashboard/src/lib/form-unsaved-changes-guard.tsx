@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useRef } from 'react'
 import { useFormState } from 'react-hook-form'
 import { UNSAFE_DataRouterContext, useBlocker } from 'react-router-dom'
 
-import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context.client'
+import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
 
 import { composeFormLeaveDirty } from './form-leave-dirty'
 import {

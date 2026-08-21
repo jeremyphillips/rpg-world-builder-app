@@ -5,7 +5,7 @@ import type { CampaignEligibleCharacter } from '@rpg/contracts'
 import { withDashboardProviders } from '../../../../../.storybook/decorators'
 
 import { campaignOnboardingEligibleCharactersQueryKey } from '../../hooks/use-campaign-onboarding-eligible-characters'
-import { CampaignOnboardingExistingCharacterPanel } from './campaign-onboarding-existing-character-panel.client'
+import { CampaignOnboardingExistingCharacterPanel } from './campaign-onboarding-existing-character-panel'
 
 const CAMPAIGN_ID = 'camp_1'
 

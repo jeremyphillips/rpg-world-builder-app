@@ -7,7 +7,7 @@ import {
   createStandaloneBuilderCatalogIndexFixture,
 } from '../lib/fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../lib/fixtures/character-fixtures'
-import { CharacterListCard } from './character-list-card.client'
+import { CharacterListCard } from './character-list-card'
 
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(
   createPopulatedStandaloneBuilderContextFixture(),

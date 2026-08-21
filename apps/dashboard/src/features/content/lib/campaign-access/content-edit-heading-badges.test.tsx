@@ -5,7 +5,7 @@ import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { ContentEditHeadingBadges } from './content-edit-heading-badges.client'
+import { ContentEditHeadingBadges } from './content-edit-heading-badges'
 
 function renderBadges(options: {
   source: ContentSource

@@ -6,7 +6,7 @@ import {
   CharacterBuilderPreviewSectionContent,
   CharacterBuilderPreviewSubsection,
   CharacterBuilderPreviewSubsectionHint,
-} from './character-builder-preview-section-content.client'
+} from './character-builder-preview-section-content'
 
 describe('CharacterBuilderPreviewSectionContent', () => {
   it('renders section hint and bordered subsections', () => {

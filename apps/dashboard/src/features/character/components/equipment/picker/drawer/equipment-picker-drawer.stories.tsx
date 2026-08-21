@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 
-import { EquipmentPickerDrawer } from './equipment-picker-drawer.client'
+import { EquipmentPickerDrawer } from './equipment-picker-drawer'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,

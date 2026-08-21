@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { VocabularyUsageReference } from '@rpg/contracts'
 
-import { UsageReferenceRow } from './usage-reference-row.client'
+import { UsageReferenceRow } from './usage-reference-row'
 
 const meta = {
   title: 'Shared/UsageReferences/UsageReferenceRow',

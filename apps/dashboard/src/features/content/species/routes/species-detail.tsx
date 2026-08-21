@@ -23,11 +23,11 @@ import {
 } from '../lib/species-display'
 import { useSpecies } from '../hooks/use-species'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
-import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
+import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
-import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section.client'
+import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 
 // ---------------------------------------------------------------------------
 // Sub-components (markup only — labels and formatting live in species-display)

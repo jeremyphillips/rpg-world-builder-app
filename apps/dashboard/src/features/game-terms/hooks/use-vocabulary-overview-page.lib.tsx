@@ -2,14 +2,14 @@ import type { VocabularyOptionSetId, VocabularyOptionWithUsage } from '@rpg/cont
 import type { RefObject } from 'react'
 
 import type { OverviewRowSelectionState } from '@/lib/data-table/use-overview-selection'
-import { OverviewBulkActionsMenu } from '@/lib/overview/overview-bulk-actions-menu.client'
+import { OverviewBulkActionsMenu } from '@/lib/overview/overview-bulk-actions-menu'
 
 import {
   VOCABULARY_BULK_ACTIONS_MENU_LABEL,
   VOCABULARY_BULK_ACTION_EDIT_AVAILABILITY_LABEL,
 } from '../lib/labels'
 
-import { VocabularyRowActions } from '../components/vocabulary-row-actions.client'
+import { VocabularyRowActions } from '../components/vocabulary-row-actions'
 
 const VOCABULARY_BULK_SELECTION_LIMIT = 50
 

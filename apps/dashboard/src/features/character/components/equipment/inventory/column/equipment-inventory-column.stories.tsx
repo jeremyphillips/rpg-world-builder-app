@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '@rpg/ui'
 
-import { EquipmentStartingPackageToolbar } from '../../starting-package/equipment-starting-package-toolbar.client'
-import { EquipmentInventoryColumn } from '../column/equipment-inventory-column.client'
-import { EquipmentPurchasedInventorySection } from '../purchased/equipment-purchased-inventory-section.client'
+import { EquipmentStartingPackageToolbar } from '../../starting-package/equipment-starting-package-toolbar'
+import { EquipmentInventoryColumn } from '../column/equipment-inventory-column'
+import { EquipmentPurchasedInventorySection } from '../purchased/equipment-purchased-inventory-section'
 
 const meta = {
   title: 'Character Builder/EquipmentInventoryColumn',

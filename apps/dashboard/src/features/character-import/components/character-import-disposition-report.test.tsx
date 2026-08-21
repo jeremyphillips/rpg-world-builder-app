@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { CharacterImportDispositionReport } from './character-import-disposition-report.client'
+import { CharacterImportDispositionReport } from './character-import-disposition-report'
 
 describe('CharacterImportDispositionReport', () => {
   it('lists ignored source fields without unsupported entries', () => {

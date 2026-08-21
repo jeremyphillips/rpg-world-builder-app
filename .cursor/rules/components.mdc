@@ -8,7 +8,8 @@ alwaysApply: false
 
 - Co-locate a `*.stories.tsx` (CSF3) for every component; add `*.test.tsx` for
   logic-bearing or interactive ones.
-- Client: `<name>.client.tsx` + `'use client'`. Server: `<name>.tsx` (no directive).
+- Dashboard: `<name>.tsx` (no `.client`, no `'use client'`). `@rpg/ui` / Next.js:
+  `<name>.client.tsx` + `'use client'` when interactive; `<name>.tsx` when server-safe.
 - Use design-token classes — never hardcode colors or font sizes.
 - Accessibility is required: use `itAxe` for axe-only Vitest blocks (CI-only;
   local `FORCE_AXE=1` to opt in), Storybook axe-playwright on PRs, and no

@@ -7,7 +7,7 @@ import {
   createProficienciesStepRogueFixture,
   proficienciesStepStealthSkill,
 } from '../../../../lib/proficiencies/proficiencies-step.fixtures'
-import { ProficiencySection } from './proficiency-section.client'
+import { ProficiencySection } from './proficiency-section'
 
 describe('ProficiencySection', () => {
   it('renders granted rows and nested choice sections', () => {

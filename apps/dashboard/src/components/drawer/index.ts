@@ -1,1 +1,1 @@
-export { DrawerShell, type DrawerShellProps } from './drawer-shell.client'
+export { DrawerShell, type DrawerShellProps } from './drawer-shell'

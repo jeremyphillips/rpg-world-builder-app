@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
 
-import { EquipmentPickerItemDetails } from './equipment-picker-item-details.client'
+import { EquipmentPickerItemDetails } from './equipment-picker-item-details'
 import {
   equipmentPickerArrowsFixture,
   equipmentPickerBudgetFixture,

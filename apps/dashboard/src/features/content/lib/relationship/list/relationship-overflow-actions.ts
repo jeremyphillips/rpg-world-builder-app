@@ -1,4 +1,4 @@
-import type { DetailOverflowAction } from '../../detail/detail-overflow-menu.client'
+import type { DetailOverflowAction } from '../../detail/detail-overflow-menu'
 import type {
   RelationshipMutationCapabilities,
   RelationshipOperationState,

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { DetailEntityRow } from '../../../row/entity/detail-entity-row.client'
-import { DetailCollectionGroup } from '../detail-collection-group.client'
-import { DetailCollectionPanel } from '../../panel/detail-collection-panel.client'
-import { DetailCollectionRowList } from '../../row-list/detail-collection-row-list.client'
+import { DetailEntityRow } from '../../../row/entity/detail-entity-row'
+import { DetailCollectionGroup } from '../detail-collection-group'
+import { DetailCollectionPanel } from '../../panel/detail-collection-panel'
+import { DetailCollectionRowList } from '../../row-list/detail-collection-row-list'
 
 const meta = {
   title: 'Content/Detail/DetailCollectionGroup',

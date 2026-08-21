@@ -15,7 +15,7 @@ import {
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import { quickNpcMemberSetupWithNoTitle } from '../../lib/quick-npc/quick-npc-test-fixtures'
 import { buildQuickNpcRequirementOptionSets } from '../../lib/quick-npc/quick-npc-requirement-options.lib'
-import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields.client'
+import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields'
 
 const setup = quickNpcMemberSetupWithNoTitle({
   speciesId: 'species-1',

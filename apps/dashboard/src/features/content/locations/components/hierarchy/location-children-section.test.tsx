@@ -15,7 +15,7 @@ import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { DOCK_WARD, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../../fixtures'
 import { buildLocationDetailViewModel } from '../../lib/location-display'
 import { LOCATION_PARENT_REPLACEMENT_DRAWER } from '../../lib/hierarchy/location-parent-replacement-surface-copy'
-import { LocationChildrenSection } from './location-children-section.client'
+import { LocationChildrenSection } from './location-children-section'
 
 const { mockUpdateContent } = vi.hoisted(() => ({
   mockUpdateContent: vi.fn(),
@@ -25,7 +25,7 @@ vi.mock('../../../lib/list/content-client', () => ({
   updateContent: mockUpdateContent,
 }))
 
-vi.mock('../create/location-create-modal.client', () => ({
+vi.mock('../create/location-create-modal', () => ({
   LocationCreateModal: ({
     intent,
     open,

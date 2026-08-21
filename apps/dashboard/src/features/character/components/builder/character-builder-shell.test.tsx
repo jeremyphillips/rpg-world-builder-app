@@ -26,7 +26,7 @@ import {
 } from '../../lib/fixtures/character-builder-fixtures'
 import { abilitiesFormCopy } from '../../lib/steps/abilities-form-labels'
 import { resetCharacterBuilderStoreCache } from '../../store/character-builder-store'
-import { CharacterBuilderShell } from './character-builder-shell.client'
+import { CharacterBuilderShell } from './character-builder-shell'
 
 async function assignStrengthScore(score: number) {
   await userEvent.click(

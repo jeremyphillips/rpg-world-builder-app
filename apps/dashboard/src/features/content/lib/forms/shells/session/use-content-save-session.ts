@@ -1,12 +1,10 @@
-'use client'
-
 import { useCallback, useEffect, useRef } from 'react'
 import { useFormState, type FieldValues, type UseFormReturn } from 'react-hook-form'
 import { useSchemaFormSubmit } from '@rpg/ui/form'
 
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
-import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context.client'
+import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context'
 import {
   runCoordinatedContentSave,
   type CoordinatedSaveSavedEvent,

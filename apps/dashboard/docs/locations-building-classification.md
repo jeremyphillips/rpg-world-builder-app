@@ -129,7 +129,7 @@ first, then sequentially POSTs each district as a child `kind: 'district'` Locat
 | ---------------------------------------- | ------------------------------------------------------------- |
 | `location-create-session.ts`             | `resolveLocationCreateSession`, `completeLocationCreateSetup` |
 | `location-create-shortcuts.ts`           | Fixed-session URL parse/serialize                             |
-| `location-create-modal.client.tsx`       | Contained create: setup ↔ details in one modal                |
+| `location-create-modal.tsx`              | Contained create: setup ↔ details in one modal                |
 | `location-classification-form-fields.ts` | Form select + Facility searchable combobox                    |
 | `location-building-create-setup.lib.ts`  | Building Setup — Form cards + Facility discovery groups       |
 

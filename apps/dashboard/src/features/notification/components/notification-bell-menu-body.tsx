@@ -1,5 +1,3 @@
-'use client'
-
 import { MessageSquare } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
@@ -14,7 +12,7 @@ import {
 
 import { MESSAGES_ACTION_COPY } from '@/features/message'
 
-import type { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items.client'
+import type { mapNotificationsToPreviewItems } from '../lib/map-notifications-to-preview-items'
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 
 type NotificationBellMenuFooterProps = {

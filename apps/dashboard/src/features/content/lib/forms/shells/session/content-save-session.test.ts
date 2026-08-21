@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import type { CampaignAccessSaveResult } from '../../../campaign-access/campaign-access-form-context.client'
+import type { CampaignAccessSaveResult } from '../../../campaign-access/campaign-access-form-context'
 import {
   runCoordinatedContentSave,
   runContentSaveSession,

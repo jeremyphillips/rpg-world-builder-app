@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
-import { EntityAnatomy } from './entity-anatomy.client'
+import { EntityAnatomy } from './entity-anatomy'
 import { GREY_COAST_ENTITY } from '../entity.fixture'
 
 function querySlot(container: HTMLElement, slot: 'leading' | 'content' | 'trailing') {

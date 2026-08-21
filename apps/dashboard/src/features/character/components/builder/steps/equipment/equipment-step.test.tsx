@@ -36,7 +36,7 @@ import {
 } from '../../../../lib/equipment/equipment-step.lib'
 import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../../../equipment/picker/purchase/equipment-picker-purchase.lib'
-import { EquipmentStep } from './equipment-step.client'
+import { EquipmentStep } from './equipment-step'
 
 const context = createStandaloneBuilderContextFixture({
   catalog: equipmentStepCatalogFixture,

@@ -18,8 +18,8 @@ import {
   proficienciesStepAcrobaticsSkill,
   proficienciesStepStealthSkill,
 } from '../../../../lib/proficiencies/proficiencies-step.fixtures'
-import { PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL } from './proficiency-selected-row.client'
-import { ProficienciesStep } from './proficiencies-step.client'
+import { PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL } from './proficiency-selected-row'
+import { ProficienciesStep } from './proficiencies-step'
 
 const emptyContext = createStandaloneBuilderContextFixture()
 

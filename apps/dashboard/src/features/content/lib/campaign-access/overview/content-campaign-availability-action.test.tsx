@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { ContentCampaignAvailabilityAction } from './content-campaign-availability-action.client'
+import { ContentCampaignAvailabilityAction } from './content-campaign-availability-action'
 import {
   CAMPAIGN_ACCESS_AVAILABLE_LABEL,
   CAMPAIGN_ACCESS_PLAYER_ACCESS_PRESERVED_HINT,

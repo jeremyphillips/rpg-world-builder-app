@@ -20,7 +20,7 @@ import {
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
 } from '../../../../lib/equipment/equipment-step.fixtures'
-import { EquipmentInventorySummary } from './equipment-inventory-summary.client'
+import { EquipmentInventorySummary } from './equipment-inventory-summary'
 
 const monkToolChoiceSetId = buildChoiceSetId(
   'class',

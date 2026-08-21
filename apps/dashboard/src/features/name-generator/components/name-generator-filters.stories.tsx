@@ -9,7 +9,7 @@ import { deriveFilterOptions } from '../model/derive-filter-options'
 import { createNameGeneratorFilterSchema } from '../model/name-generator-filter-schema'
 import { resetNameGeneratorFilters } from '../model/sanitize-filters-on-change'
 import type { NameGeneratorFilters } from '../model/name-generator-filters'
-import { NameGeneratorFilters as NameGeneratorFiltersPanel } from './name-generator-filters.client'
+import { NameGeneratorFilters as NameGeneratorFiltersPanel } from './name-generator-filters'
 
 const STORY_ELF_SPECIES: SpeciesCultureInput = {
   id: 'srd-cc-5.2.1:elf',

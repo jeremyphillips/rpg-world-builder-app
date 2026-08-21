@@ -8,8 +8,8 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { makeOrganization } from '@/test/fixtures/factories/organization'
 
-import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab.client'
-import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab.client'
+import { BuildingOrganizationsCreateTab } from './building-organizations-create-tab'
+import type { BuildingOrganizationsCreateTabController } from './building-organizations-create-tab'
 import {
   BUILDING_ORGANIZATIONS_ADD_ANOTHER_LABEL,
   BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL,

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
-import { CatalogCollapsibleList } from './catalog-collapsible-list.client'
+import { CatalogCollapsibleList } from './catalog-collapsible-list'
 
 describe('CatalogCollapsibleList', () => {
   it('renders semantic list items', () => {

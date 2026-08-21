@@ -204,7 +204,7 @@ feature components          → discovery body, entity cards, create-new forms, 
 ```
 
 Reference: Building Organizations —
-[`building-organizations-composer.client.tsx`](../src/features/content/locations/components/building-organizations/building-organizations-composer.client.tsx),
+[`building-organizations-composer.tsx`](../src/features/content/locations/components/building-organizations/building-organizations-composer.tsx),
 [`building-organization-composition-presentation.lib.ts`](../src/features/content/locations/lib/building-organizations/building-organization-composition-presentation.lib.ts).
 
 ### Policy

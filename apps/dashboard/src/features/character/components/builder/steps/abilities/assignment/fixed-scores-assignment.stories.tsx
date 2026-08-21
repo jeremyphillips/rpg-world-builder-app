@@ -4,7 +4,7 @@ import { DEFAULT_STANDARD_ARRAY } from '@rpg/contracts'
 import { Form } from '@rpg/ui/form'
 
 import { abilitiesFormSchema } from '../../../../../lib/steps/abilities-form-fields'
-import { FixedScoresAssignment } from './fixed-scores-assignment.client'
+import { FixedScoresAssignment } from './fixed-scores-assignment'
 
 const meta = {
   title: 'Character Builder/FixedScoresAssignment',

@@ -169,7 +169,7 @@ prose; below it, **condition sets** (internally `groups`) hold horizontal
 Shared serialization lives in
 `apps/dashboard/src/features/content/feats/lib/requirement-editor-form.ts`; the UI is
 `RequirementEditor` in
-`apps/dashboard/src/features/content/feats/components/requirement-editor.client.tsx`,
+`apps/dashboard/src/features/content/feats/components/requirement-editor.tsx`,
 wired into `feat-form-def.ts` via a `kind: 'slot'` form field.
 
 **User-facing terminology:**

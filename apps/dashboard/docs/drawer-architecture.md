@@ -66,7 +66,7 @@ workflow routing (which overlay opens next).
 
 Async inside a drawer is fine — the boundary is **implementation ownership**, not asynchrony.
 
-Canonical control case: [`OrganizationPickerDrawer`](../src/features/character/components/connections/picker/organization-picker-drawer.client.tsx)
+Canonical control case: [`OrganizationPickerDrawer`](../src/features/character/components/connections/picker/organization-picker-drawer.tsx)
 (`onAdd` → await → close on success).
 
 ---
@@ -100,15 +100,15 @@ provably satisfy the grammar.
 
 ## Where do I start?
 
-| I need…                                          | Grammar | Start here                                                                                                                                                                                                                        |
-| ------------------------------------------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Browse picker (multi-apply, filters, sort)       | G1      | [`SpellPickerDrawer`](../src/features/character/components/spells/picker/spell-picker-drawer.client.tsx) + [`useSpellPickerController`](../src/features/character/components/spells/picker/use-spell-picker-controller.client.ts) |
-| Simple commit picker (one add per open)          | G2      | [`OrganizationPickerDrawer`](../src/features/character/components/connections/picker/organization-picker-drawer.client.tsx)                                                                                                       |
-| Sequenced commit picker (kind → entity → footer) | G2      | [`OrganizationLocationConnectionLinkDrawer`](../src/features/content/organizations/components/location-connections/organization-location-connection-link-drawer.client.tsx)                                                       |
-| Change kind only                                 | G3      | [`LocationInverseCharacterConnLinkDrawer`](../src/features/content/locations/components/connected-parties/location-inverse-character-connection-link-drawer.client.tsx)                                                           |
-| Replace subject/target                           | G4      | [`LocationParentReplacementDrawer`](../src/features/content/locations/components/hierarchy/location-parent-replacement-drawer.client.tsx)                                                                                         |
-| Edit form in a drawer                            | G5      | [`VocabularyEntrySheet`](../src/features/game-terms/components/vocabulary-entry-sheet.client.tsx)                                                                                                                                 |
-| Multi-overlay workflow                           | G6      | [`OrganizationMembersDetailDrawers`](../src/features/content/organizations/components/members/organization-members-detail-drawers.client.tsx)                                                                                     |
+| I need…                                          | Grammar | Start here                                                                                                                                                                                                          |
+| ------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Browse picker (multi-apply, filters, sort)       | G1      | [`SpellPickerDrawer`](../src/features/character/components/spells/picker/spell-picker-drawer.tsx) + [`useSpellPickerController`](../src/features/character/components/spells/picker/use-spell-picker-controller.ts) |
+| Simple commit picker (one add per open)          | G2      | [`OrganizationPickerDrawer`](../src/features/character/components/connections/picker/organization-picker-drawer.tsx)                                                                                                |
+| Sequenced commit picker (kind → entity → footer) | G2      | [`OrganizationLocationConnectionLinkDrawer`](../src/features/content/organizations/components/location-connections/organization-location-connection-link-drawer.tsx)                                                |
+| Change kind only                                 | G3      | [`LocationInverseCharacterConnLinkDrawer`](../src/features/content/locations/components/connected-parties/location-inverse-character-connection-link-drawer.tsx)                                                    |
+| Replace subject/target                           | G4      | [`LocationParentReplacementDrawer`](../src/features/content/locations/components/hierarchy/location-parent-replacement-drawer.tsx)                                                                                  |
+| Edit form in a drawer                            | G5      | [`VocabularyEntrySheet`](../src/features/game-terms/components/vocabulary-entry-sheet.tsx)                                                                                                                          |
+| Multi-overlay workflow                           | G6      | [`OrganizationMembersDetailDrawers`](../src/features/content/organizations/components/members/organization-members-detail-drawers.tsx)                                                                              |
 
 Folder composition trees: [connected-parties/README.md](../src/features/content/locations/components/connected-parties/README.md), [location-connections/README.md](../src/features/content/organizations/components/location-connections/README.md).
 

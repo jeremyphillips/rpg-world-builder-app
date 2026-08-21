@@ -1,5 +1,3 @@
-'use client'
-
 import { useContext, useRef } from 'react'
 import type { ContentValidationIntent } from '@rpg/contracts'
 import { getApiValidationIssues } from '@rpg/contracts'

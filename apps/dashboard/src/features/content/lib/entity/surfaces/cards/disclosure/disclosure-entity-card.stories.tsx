@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
 import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
-import { DisclosureEntityCard } from './disclosure-entity-card.client'
+import { DisclosureEntityCard } from './disclosure-entity-card'
 import { HARBOR_DISTRICT_ENTITY } from '../../../entity.fixture'
 
 const mockDragHandleProps = {

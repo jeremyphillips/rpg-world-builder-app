@@ -13,8 +13,8 @@ export {
   fetchCharacterCreationRules,
   type BuilderCatalogLists,
 } from './api/ruleset-content-client'
-export { CharacterBuilderDraftRestore } from './components/builder/chrome/character-builder-draft-restore.client'
-export { CharacterListCard } from './components/character-list-card.client'
+export { CharacterBuilderDraftRestore } from './components/builder/chrome/character-builder-draft-restore'
+export { CharacterListCard } from './components/character-list-card'
 export type { CharacterListCardData } from './components/character-list-card.lib'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
 export {
@@ -40,31 +40,31 @@ export {
 export { charactersQueryKey, useCharacters } from './hooks/use-characters'
 export { useCreateCharacter } from './hooks/use-create-character'
 export { useDeleteCharacter } from './hooks/use-delete-character'
-export { CharacterBuilderShell } from './components/builder/character-builder-shell.client'
-export { CampaignCharacterStatusSummary } from './components/detail/status/campaign-character-status-summary.client'
-export { CharacterDetailContent } from './components/detail/character-detail-content.client'
-export { CharacterOrganizationsSummary } from './components/detail/memberships/character-organizations-summary.client'
-export { CharacterOrganizationMembershipsContainer } from './components/detail/memberships/character-organization-memberships-container.client'
+export { CharacterBuilderShell } from './components/builder/character-builder-shell'
+export { CampaignCharacterStatusSummary } from './components/detail/status/campaign-character-status-summary'
+export { CharacterDetailContent } from './components/detail/character-detail-content'
+export { CharacterOrganizationsSummary } from './components/detail/memberships/character-organizations-summary'
+export { CharacterOrganizationMembershipsContainer } from './components/detail/memberships/character-organization-memberships-container'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
-export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action.client'
-export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'
+export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action'
+export { NpcAuthoringGate } from './npc/components/npc-authoring-gate'
 export {
   compareName,
   scoreAndFilterPickerItems,
 } from './components/picker/sort/catalog-picker-sort.lib'
-export { EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS } from './components/equipment/acquisition/use-equipment-acquisition-commit-confirmation.client'
+export { EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS } from './components/equipment/acquisition/use-equipment-acquisition-commit-confirmation'
 export {
   characterOrganizationReferencesQueryKey,
   useCharacterOrganizationReferences,
 } from './hooks/use-character-organization-references'
-export { EditOrganizationMembershipDrawer } from './components/connections/edit-organization-membership-drawer.client'
+export { EditOrganizationMembershipDrawer } from './components/connections/edit-organization-membership-drawer'
 export {
   CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
   formatRemoveMembershipHeadline,
   type EditOrganizationMembershipDrawerCopy,
   type EditOrganizationMembershipOrganization,
 } from './components/connections/edit-organization-membership-drawer.types'
-export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field.client'
+export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field'
 export {
   membershipRadioValueFromTitle,
   ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -95,11 +95,11 @@ export {
 export {
   QuickNpcCreateModal,
   QUICK_NPC_CREATE_TITLE,
-} from './npc/components/quick-npc/quick-npc-create-modal.client'
+} from './npc/components/quick-npc/quick-npc-create-modal'
 export {
   QuickNpcAuthoringForm,
   type QuickNpcAuthoringFormProps,
-} from './npc/components/quick-npc/quick-npc-authoring-form.client'
+} from './npc/components/quick-npc/quick-npc-authoring-form'
 export {
   type QuickNpcAuthoringValues,
   type QuickNpcSetupValues,

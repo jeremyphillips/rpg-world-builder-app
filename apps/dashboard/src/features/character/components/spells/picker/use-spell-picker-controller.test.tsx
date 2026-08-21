@@ -9,7 +9,7 @@ import {
   spellPickerOpenItemsFixture,
 } from './spell-picker-drawer.fixtures'
 import { SPELL_PICKER_SORT_NAME_DESC } from './spell-picker-drawer.types'
-import { useSpellPickerController } from './use-spell-picker-controller.client'
+import { useSpellPickerController } from './use-spell-picker-controller'
 
 describe('useSpellPickerController', () => {
   it('preserves per-mode browse state across close/reopen', () => {

@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import { Button } from '@rpg/ui'
 
-import { ProficiencyPickerDrawer } from './proficiency-picker-drawer.client'
+import { ProficiencyPickerDrawer } from './proficiency-picker-drawer'
 import {
   proficiencyPickerAcrobaticsOptionId,
   proficiencyPickerCatalogIndexFixture,

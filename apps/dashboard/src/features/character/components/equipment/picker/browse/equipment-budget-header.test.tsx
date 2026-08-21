@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { equipmentPickerBudgetFixture } from '../drawer/equipment-picker-drawer.fixtures'
-import { EquipmentBudgetHeader } from './equipment-budget-header.client'
+import { EquipmentBudgetHeader } from './equipment-budget-header'
 
 describe('EquipmentBudgetHeader', () => {
   it('renders remaining on its own line with muted starting and spent meta', () => {

@@ -5,7 +5,7 @@ export {
 } from './routes/equipment-family-overview'
 export { EquipmentFamilyCreate } from './routes/equipment-family-create'
 export { EquipmentDetail, EquipmentDetailContent } from './routes/equipment-detail'
-export { EquipmentDetailMetadata } from './components/equipment-detail-metadata.client'
+export { EquipmentDetailMetadata } from './components/equipment-detail-metadata'
 export {
   buildEquipmentDetailViewModel,
   buildEquipmentPickerRowViewModel,

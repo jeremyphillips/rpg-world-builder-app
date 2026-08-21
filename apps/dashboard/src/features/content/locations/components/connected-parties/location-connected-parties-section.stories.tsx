@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { testRegionLocation } from '@/features/content/lib/fixtures/location-test-helpers'
 import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
-import { LocationConnectedPartiesSection } from './location-connected-parties-section.client'
+import { LocationConnectedPartiesSection } from './location-connected-parties-section'
 
 import type { LocationConnectedPartyRow } from '@rpg/contracts'
 

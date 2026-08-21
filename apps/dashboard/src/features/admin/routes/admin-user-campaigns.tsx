@@ -1,1 +1,1 @@
-export { AdminUserCampaignsPage } from '../components/admin-user-campaigns-table.client'
+export { AdminUserCampaignsPage } from '../components/admin-user-campaigns-table'

@@ -1,5 +1,3 @@
-'use client'
-
 import {
   useOverviewSelection,
   type OverviewRowSelectionState,

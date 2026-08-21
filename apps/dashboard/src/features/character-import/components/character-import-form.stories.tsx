@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-import { CharacterImportForm } from './character-import-form.client'
+import { CharacterImportForm } from './character-import-form'
 
 const meta = {
   title: 'Dashboard/Character Import/Form',

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
-import { DisclosureEntityCard } from './disclosure-entity-card.client'
+import { DisclosureEntityCard } from './disclosure-entity-card'
 import {
   disclosureEntityCardBodyInlineEndClasses,
   disclosureEntityCardBodyInlineStartClasses,

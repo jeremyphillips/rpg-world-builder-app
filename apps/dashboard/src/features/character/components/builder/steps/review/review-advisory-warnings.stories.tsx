@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ReviewAdvisoryWarnings } from './review-advisory-warnings.client'
+import { ReviewAdvisoryWarnings } from './review-advisory-warnings'
 
 const meta = {
   title: 'Character Builder/ReviewAdvisoryWarnings',

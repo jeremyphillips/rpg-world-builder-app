@@ -14,7 +14,7 @@ import { QUICK_NPC_CLASS_ALL_GROUP_EYEBROW } from '../../lib/quick-npc/quick-npc
 import { QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL } from '../../lib/quick-npc/quick-npc-build-card.lib'
 import { renderWithProviders } from '@/test/render'
 
-import { QuickNpcCreateModal } from './quick-npc-create-modal.client'
+import { QuickNpcCreateModal } from './quick-npc-create-modal'
 import {
   quickNpcOrganizationMemberCreateContext,
   quickNpcStandaloneCreateContext,

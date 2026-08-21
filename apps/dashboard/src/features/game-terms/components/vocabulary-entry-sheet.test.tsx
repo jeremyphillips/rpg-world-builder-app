@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '@/test/render'
 
-import { VocabularyEntrySheet } from './vocabulary-entry-sheet.client'
+import { VocabularyEntrySheet } from './vocabulary-entry-sheet'
 
 describe('VocabularyEntrySheet', () => {
   it('renders a fresh create form with the campaign helper line', () => {

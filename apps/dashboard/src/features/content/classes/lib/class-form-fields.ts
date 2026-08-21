@@ -18,9 +18,9 @@ import {
   embeddedArrayResolverField,
   embeddedMasterDetailTabValidation,
 } from '../../lib/forms/validation/tabbed-form-resolver-fields'
-import { ClassFeaturesTab } from '../components/class-features-tab.client'
-import { ClassCharacterCreationTab } from '../components/class-character-creation-tab.client'
-import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'
+import { ClassFeaturesTab } from '../components/class-features-tab'
+import { ClassCharacterCreationTab } from '../components/class-character-creation-tab'
+import { ClassSubclassesTab } from '../components/class-subclasses-tab'
 import { coreAttributesFields } from './class-basics-form-fields'
 import {
   classFeatureItemFields,

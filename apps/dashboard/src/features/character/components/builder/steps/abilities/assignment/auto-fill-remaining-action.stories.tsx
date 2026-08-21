@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { characterBuilderAbilityRecommendationMessages, formatFieldMessage } from '@rpg/contracts'
 
-import { AutoFillRemainingAction } from './auto-fill-remaining-action.client'
+import { AutoFillRemainingAction } from './auto-fill-remaining-action'
 
 const meta = {
   title: 'Character Builder/AutoFillRemainingAction',

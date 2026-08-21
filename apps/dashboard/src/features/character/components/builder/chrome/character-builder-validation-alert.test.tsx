@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { characterBuilderValidationMessages, formatFieldMessage } from '@rpg/contracts'
 
-import { CharacterBuilderValidationAlert } from './character-builder-validation-alert.client'
+import { CharacterBuilderValidationAlert } from './character-builder-validation-alert'
 
 describe('CharacterBuilderValidationAlert', () => {
   it('renders nothing when there are no issues', () => {

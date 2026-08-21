@@ -7,7 +7,7 @@ import type {
 } from '@rpg/contracts/rpg/character-builder'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../../../lib/fixtures/character-builder-fixtures'
-import { CharacterBuilderStepRail } from './character-builder-step-rail.client'
+import { CharacterBuilderStepRail } from './character-builder-step-rail'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)

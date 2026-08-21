@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { LocationConnectionKindField } from './location-connection-kind-field.client'
+import { LocationConnectionKindField } from './location-connection-kind-field'
 
 const multiKindOptions = [
   {

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { Button } from '@rpg/ui'
 
-import { DrawerShell } from './drawer-shell.client'
+import { DrawerShell } from './drawer-shell'
 
 describe('DrawerShell', () => {
   it('renders title and body when open', () => {

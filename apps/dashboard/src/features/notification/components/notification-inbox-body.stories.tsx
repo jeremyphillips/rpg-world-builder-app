@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { NotificationInboxBody } from './notification-inbox-body.client'
+import { NotificationInboxBody } from './notification-inbox-body'
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 
 const previewItems = [

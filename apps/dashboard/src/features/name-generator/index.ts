@@ -1,5 +1,5 @@
 export { useNameGeneratorPage } from './hooks/use-name-generator-page'
-export { NameGeneratorPage } from './components/name-generator-page.client'
+export { NameGeneratorPage } from './components/name-generator-page'
 export type {
   NameGeneratorFilters,
   NameGeneratorPageError,

@@ -1,5 +1,3 @@
-'use client'
-
 import type {
   CampaignAvailabilityFilter,
   ContentTypeKey,
@@ -7,9 +5,9 @@ import type {
 } from '@rpg/contracts'
 import { RowActionsMenu } from '@rpg/ui'
 
-import { CampaignAccessBlockedDialog } from '../campaign-access/campaign-access-blocked-dialog.client'
-import { ContentCampaignAvailabilityAction } from '../campaign-access/overview/content-campaign-availability-action.client'
-import { useContentCampaignAvailabilityToggle } from './hooks/use-content-campaign-availability-toggle.client'
+import { CampaignAccessBlockedDialog } from '../campaign-access/campaign-access-blocked-dialog'
+import { ContentCampaignAvailabilityAction } from '../campaign-access/overview/content-campaign-availability-action'
+import { useContentCampaignAvailabilityToggle } from './hooks/use-content-campaign-availability-toggle'
 
 export interface ContentOverviewRowActionsProps {
   campaignId: string

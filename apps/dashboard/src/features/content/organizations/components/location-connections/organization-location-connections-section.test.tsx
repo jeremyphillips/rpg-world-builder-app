@@ -14,7 +14,7 @@ import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 import {
   OrganizationLocationConnectionsSection,
   ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
-} from './organization-location-connections-section.client'
+} from './organization-location-connections-section'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../../lib/organization-display'
 import { buildOrganizationLocationConnectionCards } from '../../lib/location-connections/build-organization-location-connection-cards'
 import { buildLocationsById } from '../../../locations/lib/location-display'

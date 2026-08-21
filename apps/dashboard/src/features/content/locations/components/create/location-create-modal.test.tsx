@@ -50,7 +50,7 @@ import {
   SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
   SETTLEMENT_CREATE_SETUP_PROMPT,
 } from '../../lib/create/setup/location-settlement-create-setup.lib'
-import { LocationCreateModal } from './location-create-modal.client'
+import { LocationCreateModal } from './location-create-modal'
 
 const organizationCatalog = vi.hoisted(() => [
   {
@@ -136,7 +136,7 @@ vi.mock('../../../organizations', () => ({
   useOrganizations: () => ({ data: organizationCatalog, isPending: false, isError: false }),
 }))
 
-vi.mock('../../../organizations/components/create/organization-authoring-context.client', () => ({
+vi.mock('../../../organizations/components/create/organization-authoring-context', () => ({
   OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
   useOrganizationAuthoringContext: () => ({
     practiceRecommendations: [],
@@ -162,7 +162,7 @@ vi.mock('../../../lib/forms/shells/layout/content-form-shell-layout', () => ({
     }),
 }))
 
-vi.mock('../../../lib/campaign-access/campaign-access-section.client', () => ({
+vi.mock('../../../lib/campaign-access/campaign-access-section', () => ({
   CampaignAccessSection: ({
     onDraftChange,
   }: {

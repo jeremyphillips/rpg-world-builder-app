@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CharacterBuilderValidationAlert } from './character-builder-validation-alert.client'
+import { CharacterBuilderValidationAlert } from './character-builder-validation-alert'
 
 const meta = {
   title: 'Character Builder/CharacterBuilderValidationAlert',

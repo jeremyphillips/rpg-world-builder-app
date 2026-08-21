@@ -10,7 +10,7 @@ import {
 import {
   EquipmentInventoryManageDisclosureCard,
   createStorybookApplyMagicItemAcquisition,
-} from '../manage/equipment-inventory-manage-panel.client'
+} from '../manage/equipment-inventory-manage-panel'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 
 const rows: EquipmentInventoryRow[] = [

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CatalogPickerResultsState } from './catalog-picker-results-state.client'
+import { CatalogPickerResultsState } from './catalog-picker-results-state'
 
 const meta = {
   title: 'Character Builder/Picker/CatalogPickerResultsState',

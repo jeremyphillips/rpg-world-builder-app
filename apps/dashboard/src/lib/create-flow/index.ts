@@ -24,18 +24,18 @@ export {
   type CreateWorkflowPanelValidationResult,
   type CreateWorkflowPanelController,
   type CreateWorkflowDraftPanelController,
-} from './create-modal-shell.client'
+} from './create-modal-shell'
 export {
   AddPendingWorkflow,
   type AddPendingWorkflowMode,
   type AddPendingWorkflowProps,
-} from './add-pending-workflow.client'
+} from './add-pending-workflow'
 export { resolveAddPendingMode } from './add-pending-workflow.lib'
 export {
   CREATE_FLOW_FORM_DENSITY,
   CreateFlowFormDensityRoot,
   useCreateFlowFormDensity,
-} from './create-flow-form-density.client'
+} from './create-flow-form-density'
 export {
   createTabDiscoveryBodyClasses,
   createTabDiscoveryControlsClasses,
@@ -54,16 +54,16 @@ export {
 export {
   CreateCompositionComposer,
   type CreateCompositionComposerProps,
-} from './create-composition-composer.client'
+} from './create-composition-composer'
 export {
   CreateCompositionStage,
   type CreateCompositionStageProps,
-} from './create-composition-stage.client'
+} from './create-composition-stage'
 export {
   CreateCompositionSummary,
   type CreateCompositionSummaryProps,
   type CreateCompositionSummaryRow,
-} from './create-composition-summary.client'
+} from './create-composition-summary'
 export {
   createCompositionComposerStackClasses,
   createCompositionReviewClasses,

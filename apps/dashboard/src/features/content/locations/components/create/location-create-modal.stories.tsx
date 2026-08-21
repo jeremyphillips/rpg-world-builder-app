@@ -13,7 +13,7 @@ import {
 import { withDashboardProviders } from '../../../../../../.storybook/decorators'
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { HARBORFORD } from '../../fixtures'
-import { LocationCreateModal, type LocationCreateModalProps } from './location-create-modal.client'
+import { LocationCreateModal, type LocationCreateModalProps } from './location-create-modal'
 
 const buildingArgs = {
   open: true,

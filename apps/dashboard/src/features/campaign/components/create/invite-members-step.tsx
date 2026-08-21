@@ -1,5 +1,3 @@
-'use client'
-
 import { Heading, Text, WizardFooter, useWizard } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 

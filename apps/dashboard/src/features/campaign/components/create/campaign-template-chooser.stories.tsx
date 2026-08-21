@@ -2,10 +2,7 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { CampaignTemplate } from '@rpg/contracts'
 
-import {
-  BLANK_CAMPAIGN_TEMPLATE_VALUE,
-  CampaignTemplateChooser,
-} from './campaign-template-chooser.client'
+import { BLANK_CAMPAIGN_TEMPLATE_VALUE, CampaignTemplateChooser } from './campaign-template-chooser'
 
 const templates: CampaignTemplate[] = [
   {

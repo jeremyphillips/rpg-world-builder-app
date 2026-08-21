@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { ReviewAdvisoryWarnings } from './review-advisory-warnings.client'
+import { ReviewAdvisoryWarnings } from './review-advisory-warnings'
 
 describe('ReviewAdvisoryWarnings', () => {
   it('renders nothing when there are no warnings', () => {

@@ -3,14 +3,14 @@ export {
   CreateSetupShell,
   type CreateSetupPanelProps,
   type CreateSetupShellProps,
-} from './create-setup-panel.client'
+} from './create-setup-panel'
 
 export {
   CreateSetupFooter,
   deriveCreateSetupFooterState,
   type CreateSetupFooterProps,
   type CreateSetupFooterState,
-} from './create-setup-footer.client'
+} from './create-setup-footer'
 
 export {
   CREATE_SETUP_DEFAULT_CHANGE_LABEL,
@@ -50,11 +50,11 @@ export {
   notifyCreateSetupValueChangeCompletion,
   useCreateSetupSequence,
   type UseCreateSetupSequenceOptions,
-} from './use-create-setup-sequence.client'
+} from './use-create-setup-sequence'
 
 export { createSetupModalBodyClasses } from './create-setup.variants'
 
-export { mapSetupSummaryRowModelsToProps } from './setup-summary-row-models.client'
+export { mapSetupSummaryRowModelsToProps } from './setup-summary-row-models'
 
 export type {
   CreateSetupChoiceSet,

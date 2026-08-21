@@ -176,14 +176,14 @@ Pane files document their parent in a header comment. `MessagesDirectListPane` a
 
 ### Folder map
 
-| Path                                            | Role                                                                   |
-| ----------------------------------------------- | ---------------------------------------------------------------------- |
-| `components/workspace/`                         | Responsive shell, right-pane orchestration, pane composition units     |
-| `components/thread/`                            | Thread body, header, composer, preview chrome, shared-campaign display |
-| `components/direct-list/`                       | Conversation list pane (rows, status, empty, start link)               |
-| `components/messages-campaign-scope.client.tsx` | Root shared — filter chrome + out-of-scope pin (workspace + list)      |
-| `components/messages-metadata.client.tsx`       | Root shared — quiet metadata / `<time>` (thread + list)                |
-| `components/messages-entry-links.client.tsx`    | Root shared — barrel-exported nav/overview entry links                 |
+| Path                                     | Role                                                                   |
+| ---------------------------------------- | ---------------------------------------------------------------------- |
+| `components/workspace/`                  | Responsive shell, right-pane orchestration, pane composition units     |
+| `components/thread/`                     | Thread body, header, composer, preview chrome, shared-campaign display |
+| `components/direct-list/`                | Conversation list pane (rows, status, empty, start link)               |
+| `components/messages-campaign-scope.tsx` | Root shared — filter chrome + out-of-scope pin (workspace + list)      |
+| `components/messages-metadata.tsx`       | Root shared — quiet metadata / `<time>` (thread + list)                |
+| `components/messages-entry-links.tsx`    | Root shared — barrel-exported nav/overview entry links                 |
 
 ### Dependency direction
 

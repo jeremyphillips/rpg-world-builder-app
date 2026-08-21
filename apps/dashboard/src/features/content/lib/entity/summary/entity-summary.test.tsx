@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { EntitySummary } from './entity-summary.client'
+import { EntitySummary } from './entity-summary'
 
 describe('EntitySummary mixed heading', () => {
   it('keeps classification immediately adjacent for short titles', () => {

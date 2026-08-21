@@ -35,7 +35,7 @@ function findModalHeightViolations(files: readonly string[]): string[] {
     if (!MODAL_HEIGHT_TOKEN_PATTERN.test(source)) return false
 
     // CreateModalShell is the sole owner — stableSize selection is allowed there.
-    if (path.endsWith('create-modal-shell.client.tsx')) return false
+    if (path.endsWith('create-modal-shell.tsx')) return false
 
     return true
   })

@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { UsageReferencesQuerySection } from './usage-references-query-section.client'
+import { UsageReferencesQuerySection } from './usage-references-query-section'
 
-vi.mock('./usage-references-section.client', () => ({
+vi.mock('./usage-references-section', () => ({
   UsageReferencesSection: () => <div>Ready usage section</div>,
 }))
 

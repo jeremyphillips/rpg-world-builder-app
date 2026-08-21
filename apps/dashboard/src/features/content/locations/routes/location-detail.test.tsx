@@ -30,14 +30,9 @@ vi.mock('@/features/character', async (importOriginal) => {
     useNpcs: vi.fn(() => ({ data: [] })),
   }
 })
-vi.mock(
-  '../components/connected-parties/location-connected-parties-detail-sections.client',
-  () => ({
-    LocationConnectedPartiesDetailSections: () => (
-      <section aria-label="Connected parties sections" />
-    ),
-  }),
-)
+vi.mock('../components/connected-parties/location-connected-parties-detail-sections', () => ({
+  LocationConnectedPartiesDetailSections: () => <section aria-label="Connected parties sections" />,
+}))
 vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
   useOrganizations: vi.fn(() => ({ data: [] })),
 }))

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CollapsibleListItem } from '@rpg/ui'
 
-import { CatalogCollapsibleList } from './catalog-collapsible-list.client'
+import { CatalogCollapsibleList } from './catalog-collapsible-list'
 
 const meta = {
   title: 'Content/Catalog/CatalogCollapsibleList',
