@@ -112,7 +112,7 @@ Cancel buttons in form drawers use `DrawerShell.Close`, not `Sheet.Close`.
 | Quick NPC (standalone)                    | Location People drawer Character segment + `QuickNpcCreateModal`         |
 | Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                                      |
 | Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)                                    |
-| Character builder catalog pickers         | `CatalogPickerSheet` + `catalogPickerShellProps()`                       |
+| Character builder catalog pickers         | `CatalogEntityPickerSheet` (`surface="background"`, `size="lg"`)         |
 | Species/class option dossier              | `BuilderOptionDetailsSheet` (allowlisted)                                |
 
 Cross-content relationship UI: [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).

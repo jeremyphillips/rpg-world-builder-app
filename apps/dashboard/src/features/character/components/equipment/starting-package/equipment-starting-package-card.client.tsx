@@ -9,8 +9,8 @@ import {
   type EquipmentInventoryRow,
   type StartingPackageInventoryGroup,
 } from '../../../lib/equipment/equipment-step.lib'
-import { EquipmentInventoryRowItem } from '../inventory/equipment-inventory-row.client'
-import { equipmentInventoryRowListClasses } from '../inventory/equipment-inventory-summary.variants'
+import { EquipmentInventoryRowItem } from '../inventory/row/equipment-inventory-row.client'
+import { equipmentInventoryRowListClasses } from '../inventory/equipment-inventory.variants'
 import {
   equipmentStartingPackageCardBodyClasses,
   equipmentStartingPackageCardVariants,

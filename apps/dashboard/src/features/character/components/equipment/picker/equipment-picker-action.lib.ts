@@ -9,9 +9,9 @@ import {
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
-} from './equipment-picker-drawer.types'
-import { formatEquipmentUnaffordableReason } from './equipment-picker-drawer.lib'
-import type { EquipmentPickerItem } from './equipment-picker-drawer.types'
+} from './drawer/equipment-picker-drawer.types'
+import { formatEquipmentUnaffordableReason } from './drawer/equipment-picker-drawer.lib'
+import type { EquipmentPickerItem } from './drawer/equipment-picker-drawer.types'
 
 export type EquipmentPickerRowActionViewModel =
   | {

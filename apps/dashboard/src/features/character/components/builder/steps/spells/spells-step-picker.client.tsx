@@ -10,12 +10,12 @@ import {
 } from '@rpg/contracts'
 
 import { withChoiceSetSelections } from '../../../../lib/choice-sets/choice-set-selections'
-import { SpellPickerDrawer } from '../../../spells/spell-picker-drawer.client'
+import { SpellPickerDrawer } from '../../../spells/picker/spell-picker-drawer.client'
 import {
   SPELL_PICKER_MODE_CANTRIPS,
   SPELL_PICKER_MODE_PREPARED_SPELLS,
   type SpellPickerMode,
-} from '../../../spells/spell-picker-drawer.types'
+} from '../../../spells/picker/spell-picker-drawer.types'
 
 function spellPickerModeForChoiceSet(choiceSet: ChoiceSet): SpellPickerMode {
   return choiceSet.choiceType === 'cantrip'

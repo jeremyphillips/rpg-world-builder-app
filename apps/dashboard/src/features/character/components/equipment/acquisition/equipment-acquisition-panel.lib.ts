@@ -32,7 +32,7 @@ import {
   formatUsesGrantPreviewLine,
   resolveAllowanceRarity,
 } from './equipment-acquisition-format.lib'
-import { resolveEquipmentInventoryManageSources } from '../inventory/equipment-inventory-manage.lib'
+import { resolveEquipmentInventoryManageSources } from '../inventory/manage/equipment-inventory-manage.lib'
 
 export {
   formatGrantPreviewLine,

@@ -6,7 +6,7 @@ import {
   equipmentPickerBudgetFixture,
   equipmentPickerLongswordFixture,
   equipmentPickerRopeFixture,
-} from '../../components/equipment/picker/equipment-picker-drawer.fixtures'
+} from '../../components/equipment/picker/drawer/equipment-picker-drawer.fixtures'
 import {
   clampEquipmentStepQuantity,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,

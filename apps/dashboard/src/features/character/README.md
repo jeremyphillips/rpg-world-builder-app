@@ -53,16 +53,20 @@ Builder equipment acquisition UI — catalog drawer, step inventory, acquisition
 panel, starting package, and package-switch modal. Shared catalog chrome lives in
 `components/picker/` (not here).
 
-| Subfolder           | Responsibility                                              |
-| ------------------- | ----------------------------------------------------------- |
-| `picker/`           | Equipment picker drawer, budget header, purchase/grant rows |
-| `inventory/`        | Step inventory columns, rows, manage panel, summary VM      |
-| `acquisition/`      | Acquisition panel, guidance, commit labels                  |
-| `starting-package/` | Starting-equipment option cards, package card, toolbar      |
-| `package-switch/`   | Package-switch resolution modal and conversion editor       |
+| Subfolder           | Responsibility                                                                    |
+| ------------------- | --------------------------------------------------------------------------------- |
+| `picker/drawer/`    | Equipment picker shell, types, fixtures                                           |
+| `picker/browse/`    | Filters, budget header, catalog result rows                                       |
+| `picker/details/`   | Item detail panel + character preview                                             |
+| `picker/purchase/`  | Picker purchase/grant UI (not step-level acquisition)                             |
+| `picker/callouts/`  | Picker callout logic + presentation                                               |
+| `inventory/`        | Step inventory — `summary/`, `row/`, `column/`, `purchased/`, `added/`, `manage/` |
+| `acquisition/`      | Step acquisition panel, guidance, commit labels                                   |
+| `starting-package/` | Starting-equipment option cards, package card, toolbar                            |
+| `package-switch/`   | Package-switch resolution modal and conversion editor                             |
 
-Co-located `*.lib.ts` view models stay beside their surface per
-[feature-structure.md § Character builder co-location](../../docs/feature-structure.md#character-builder-co-located-lib-modules).
+Inventory layout VM: `lib/equipment/equipment-inventory-summary.lib.ts`. Shared
+inventory CVA: `inventory/equipment-inventory.variants.ts`.
 
 ## `components/connections/` layout
 
@@ -70,9 +74,9 @@ Reusable organization membership UI — picker drawer, edit drawer, and shared t
 field. Builder step composition lives in `components/builder/steps/connections/`;
 sheet summary and drawer wiring live in `components/detail/memberships/`.
 
-| File family                                      | Responsibility                          |
+| Subfolder / file                                 | Responsibility                          |
 | ------------------------------------------------ | --------------------------------------- |
-| `organization-picker-drawer.*`                   | Add-membership catalog picker sheet     |
+| `picker/organization-picker-drawer.*`            | Add-membership catalog picker sheet     |
 | `edit-organization-membership-drawer.*`          | Edit/remove membership drawer + copy    |
 | `organization-membership-title-field.client.tsx` | Shared title radio field (presentation) |
 

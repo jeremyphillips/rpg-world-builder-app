@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import { lanternGuild } from './organization-picker-drawer.fixtures'
+import { lanternGuild } from './picker/organization-picker-drawer.fixtures'
 import { EditOrganizationMembershipDrawer } from './edit-organization-membership-drawer.client'
 
 describe('EditOrganizationMembershipDrawer', () => {

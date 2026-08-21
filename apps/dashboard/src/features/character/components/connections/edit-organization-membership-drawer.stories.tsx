@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
 
-import { lanternGuild } from './organization-picker-drawer.fixtures'
+import { lanternGuild } from './picker/organization-picker-drawer.fixtures'
 import { EditOrganizationMembershipDrawer } from './edit-organization-membership-drawer.client'
 
 const meta = {

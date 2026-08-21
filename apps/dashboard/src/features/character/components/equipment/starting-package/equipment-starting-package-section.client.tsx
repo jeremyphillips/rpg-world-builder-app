@@ -14,7 +14,7 @@ import {
   EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   type StartingPackageInventoryGroup,
 } from '../../../lib/equipment/equipment-step.lib'
-import { EquipmentInventoryColumn } from '../inventory/equipment-inventory-column.client'
+import { EquipmentInventoryColumn } from '../inventory/column/equipment-inventory-column.client'
 import { EquipmentPackageConversionEditor } from '../package-switch/equipment-package-conversion-editor.client'
 import {
   EquipmentStartingPackageCard,

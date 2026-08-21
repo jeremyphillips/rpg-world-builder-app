@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL } from '../../../components/equipment/picker/equipment-picker-drawer.types'
+import { EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL } from '../../../components/equipment/picker/drawer/equipment-picker-drawer.types'
 import {
   createEquipmentStepContextFixture,
   equipmentStepBardClassFixture,

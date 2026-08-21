@@ -14,8 +14,8 @@ import { Button, InsetPanel, Text } from '@rpg/ui'
 
 import { ContentEntityCard } from '@/features/content'
 import { BuilderInventoryRemoveAction } from '../../inventory/builder-inventory-remove-action.client'
-import { OrganizationPickerDrawer } from '../../../connections/organization-picker-drawer.client'
-import type { OrganizationMembershipSelection } from '../../../connections/organization-picker-drawer.types'
+import { OrganizationPickerDrawer } from '../../../connections/picker/organization-picker-drawer.client'
+import type { OrganizationMembershipSelection } from '../../../connections/picker/organization-picker-drawer.types'
 import {
   connectionsStepEmptyClasses,
   connectionsStepHeaderClasses,

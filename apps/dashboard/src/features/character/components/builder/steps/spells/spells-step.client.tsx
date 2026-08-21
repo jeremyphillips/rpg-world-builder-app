@@ -25,7 +25,7 @@ import { SpellcastingSummaryCard } from '../../../spells/spellcasting-summary-ca
 import {
   SPELL_PICKER_MODE_CANTRIPS,
   type SpellPickerMode,
-} from '../../../spells/spell-picker-drawer.types'
+} from '../../../spells/picker/spell-picker-drawer.types'
 import { spellPickerModeForChoiceSet, SpellsStepPicker } from './spells-step-picker.client'
 
 export type SpellsStepProps = {

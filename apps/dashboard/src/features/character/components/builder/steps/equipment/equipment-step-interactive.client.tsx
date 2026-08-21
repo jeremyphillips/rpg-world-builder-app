@@ -11,7 +11,7 @@ import {
 import { showsBuilderStepReviewMessage } from '../../../../lib/builder/builder-step-readiness.lib'
 import { EquipmentAcquisitionGuidance } from '../../../equipment/acquisition/equipment-acquisition-guidance.client'
 import { EquipmentPackageSwitchResolutionModal } from '../../../equipment/package-switch/equipment-package-switch-resolution-modal.client'
-import { EquipmentPickerDrawer } from '../../../equipment/picker/equipment-picker-drawer.client'
+import { EquipmentPickerDrawer } from '../../../equipment/picker/drawer/equipment-picker-drawer.client'
 import { StartingEquipmentOptionSection } from '../../../equipment/starting-package/starting-equipment-option-section.client'
 import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-interactive.variants'
 import {

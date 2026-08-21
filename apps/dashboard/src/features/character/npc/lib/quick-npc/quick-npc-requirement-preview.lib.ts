@@ -1,10 +1,10 @@
-import type { EquipmentPickerCallout } from '../../../components/equipment/picker/equipment-picker-drawer.types'
-import { getEquipmentPickerCallout } from '../../../components/equipment/picker/equipment-picker-callout.lib'
+import type { EquipmentPickerCallout } from '../../../components/equipment/picker/drawer/equipment-picker-drawer.types'
+import { getEquipmentPickerCallout } from '../../../components/equipment/picker/callouts/equipment-picker-callout.lib'
 import {
   formatCatalogPickerMetadataLines,
   mapEquipmentCompactSummaryToMetadataLines,
   mapSpellPickerCompactSummaryToMetadataLines,
-} from '../../../components/picker/catalog-picker-metadata'
+} from '../../../components/picker/metadata'
 
 import type {
   QuickNpcSpellRequirementOption,

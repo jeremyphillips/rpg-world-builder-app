@@ -8,8 +8,8 @@ import {
   type EquipmentInventoryRemoveTarget,
 } from '../../../lib/equipment/equipment-step.lib'
 
-import { EquipmentInventoryColumn } from '../inventory/equipment-inventory-column.client'
-import { EquipmentPurchasedInventorySection } from '../inventory/equipment-purchased-inventory-section.client'
+import { EquipmentInventoryColumn } from '../inventory/column/equipment-inventory-column.client'
+import { EquipmentPurchasedInventorySection } from '../inventory/purchased/equipment-purchased-inventory-section.client'
 import {
   type buildPackageSwitchDraftPurchasedGroups,
   PACKAGE_SWITCH_SAFETY_NOTE,

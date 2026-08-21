@@ -7,9 +7,9 @@ import {
   CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
   type EditOrganizationMembershipOrganization,
 } from '../../connections/edit-organization-membership-drawer.types'
-import { OrganizationPickerDrawer } from '../../connections/organization-picker-drawer.client'
-import type { OrganizationMembershipSelection } from '../../connections/organization-picker-drawer.types'
-import type { OrganizationPickerItem } from '../../connections/organization-picker-drawer.types'
+import { OrganizationPickerDrawer } from '../../connections/picker/organization-picker-drawer.client'
+import type { OrganizationMembershipSelection } from '../../connections/picker/organization-picker-drawer.types'
+import type { OrganizationPickerItem } from '../../connections/picker/organization-picker-drawer.types'
 import type { OrganizationReferenceResolution } from '@rpg/contracts'
 
 type CharacterOrganizationMembershipDrawersProps = {

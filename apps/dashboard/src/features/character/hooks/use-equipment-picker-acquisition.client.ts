@@ -19,7 +19,7 @@ import {
   type EquipmentPickerWorkflowMode,
 } from '../lib/equipment/equipment-step.lib'
 import { buildEquipmentPickerRowActionViewModel } from '../components/equipment/picker/equipment-picker-action.lib'
-import type { EquipmentPickerDrawer } from '../components/equipment/picker/equipment-picker-drawer.client'
+import type { EquipmentPickerDrawer } from '../components/equipment/picker/drawer/equipment-picker-drawer.client'
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 
 export function useEquipmentPickerAcquisition(args: {

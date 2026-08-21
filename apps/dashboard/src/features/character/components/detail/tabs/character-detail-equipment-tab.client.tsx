@@ -37,8 +37,8 @@ import {
 } from '../../../lib/detail/character-sheet-catalog'
 import type { CharacterWealthViewModel } from '../../../lib/display/character-display'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
-import { CatalogSortControl } from '../../picker/catalog-sort-control.client'
-import { pickerSortOption } from '../../picker/catalog-picker-sort-labels.lib'
+import { CatalogSortControl } from '../../picker/sort/catalog-sort-control.client'
+import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetAction } from '../../picker/catalog-toolbar-reset-action.client'
 import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls.client'
 

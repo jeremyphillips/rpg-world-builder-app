@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import type { MagicItemGrantProgress } from '@rpg/contracts'
 
-import { equipmentPickerBudgetFixture } from '../picker/equipment-picker-drawer.fixtures'
+import { equipmentPickerBudgetFixture } from '../picker/drawer/equipment-picker-drawer.fixtures'
 import { EquipmentAcquisitionGuidance } from './equipment-acquisition-guidance.client'
 
 const magicItemProgress: MagicItemGrantProgress[] = [

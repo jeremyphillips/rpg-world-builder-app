@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { equipmentPickerLongswordFixture } from '../../../components/equipment/picker/equipment-picker-drawer.fixtures'
+import { equipmentPickerLongswordFixture } from '../../../components/equipment/picker/drawer/equipment-picker-drawer.fixtures'
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import { projectWeaponRequirementPreview } from './quick-npc-requirement-preview.lib'

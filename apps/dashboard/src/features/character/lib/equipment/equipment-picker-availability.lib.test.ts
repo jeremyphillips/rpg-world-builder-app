@@ -6,8 +6,8 @@ import {
   equipmentPickerItemsFixture,
   equipmentPickerPotionFixture,
   pickerState,
-} from '../../components/equipment/picker/equipment-picker-drawer.fixtures'
-import type { EquipmentPickerItem } from '../../components/equipment/picker/equipment-picker-drawer.types'
+} from '../../components/equipment/picker/drawer/equipment-picker-drawer.fixtures'
+import type { EquipmentPickerItem } from '../../components/equipment/picker/drawer/equipment-picker-drawer.types'
 import {
   resolveEquipmentPickerPurchaseActionState,
   resolveEquipmentPickerRowAvailabilityVm,

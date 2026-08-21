@@ -4,8 +4,8 @@ import { Text } from '@rpg/ui'
 
 import type { EntitySummaryModel } from '@/features/content'
 import type { EquipmentInventoryRow } from '../../../lib/equipment/equipment-step.lib'
-import type { EquipmentInventoryDisplayItem } from './equipment-inventory-summary.lib'
-import { resolveCombinedInventoryDetailLineLabel } from './equipment-inventory-summary.lib'
+import type { EquipmentInventoryDisplayItem } from '../../../lib/equipment/equipment-inventory-summary.lib'
+import { resolveCombinedInventoryDetailLineLabel } from '../../../lib/equipment/equipment-inventory-summary.lib'
 
 function resolveDetailLineLabel(row: EquipmentInventoryRow): string | undefined {
   if (row.stagedRemoval) return row.sourceLabel

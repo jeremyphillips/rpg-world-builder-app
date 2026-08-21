@@ -11,7 +11,7 @@ import {
 } from '../../../lib/fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetEquipmentCards } from '../../../lib/detail/character-sheet-catalog'
-import { EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL } from '../../equipment/picker/equipment-picker-drawer.types'
+import { EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL } from '../../equipment/picker/drawer/equipment-picker-drawer.types'
 import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.client'
 
 beforeAll(() => {

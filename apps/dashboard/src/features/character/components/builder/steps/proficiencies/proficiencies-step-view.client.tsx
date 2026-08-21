@@ -5,7 +5,7 @@ import {
   showsBuilderStepReviewMessage,
   visibleProficiencySections,
 } from '../../../../lib/builder/builder-step-readiness.lib'
-import { ProficiencyPickerDrawer } from '../../../proficiencies/proficiency-picker-drawer.client'
+import { ProficiencyPickerDrawer } from '../../../proficiencies/picker/proficiency-picker-drawer.client'
 import { ProficiencySection } from '../../../proficiencies/proficiency-section.client'
 import { BuilderStepFrame } from '../shared/builder-step-frame.client'
 import { BuilderStepReadinessPanel } from '../shared/builder-step-readiness-panel.client'

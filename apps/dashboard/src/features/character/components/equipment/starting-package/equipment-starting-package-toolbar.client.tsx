@@ -10,7 +10,7 @@ import {
   equipmentInventoryColumnToolbarClasses,
   equipmentInventoryColumnToolbarLinkClasses,
   equipmentInventoryColumnToolbarSeparatorClasses,
-} from '../inventory/equipment-inventory-summary.variants'
+} from '../inventory/equipment-inventory.variants'
 
 export type EquipmentStartingPackageToolbarProps = {
   customizeDisabled: boolean

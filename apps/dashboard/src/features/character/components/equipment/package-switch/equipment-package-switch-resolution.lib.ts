@@ -13,7 +13,7 @@ import {
   formatEquipmentInventoryRemoveLabel,
   type EquipmentInventoryRow,
 } from '../../../lib/equipment/equipment-step.lib'
-import type { PurchasedCategoryGroup } from '../inventory/equipment-inventory-summary.lib'
+import type { PurchasedCategoryGroup } from '../../../lib/equipment/equipment-inventory-summary.lib'
 
 export const PACKAGE_SWITCH_RESOLUTION_TITLE = 'Resolve purchases before switching'
 
