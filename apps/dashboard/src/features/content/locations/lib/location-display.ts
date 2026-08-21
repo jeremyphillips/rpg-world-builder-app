@@ -15,7 +15,7 @@ import { formatDescriptorCount } from '@/lib/actions'
 
 import { ROUTES } from '@/app/routes'
 
-import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer/drawer-context.types'
+import type { DrawerEntityPresentation } from '../../lib/entity/surfaces/drawer/drawer-entity.types'
 
 import type { LocationAuthoringType } from './location-authoring-type'
 import { resolveRegionRelationshipLabelPlural } from './location-contextual-terminology.lib'
@@ -267,7 +267,7 @@ export function buildLocationEntitySummaryVm(
 
 export function buildLocationEntityContextPresentation(
   vm: LocationEntitySummaryVm,
-): DrawerContextEntityPresentation {
+): DrawerEntityPresentation {
   const nearestParent = vm.ancestry.items.at(-1)
 
   return {
@@ -285,7 +285,7 @@ export function buildLocationContextPresentationFromLocation(
     campaignId: string
     href?: string
   },
-): DrawerContextEntityPresentation {
+): DrawerEntityPresentation {
   return buildLocationEntityContextPresentation(buildLocationEntitySummaryVm(location, ctx))
 }
 

@@ -34,7 +34,7 @@ import {
 } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'
 import { applyPeopleKindSlotDownstreamState } from '../../../lib/relationship/location-connection/apply-people-kind-slot-downstream-state.lib'
-import { toDrawerContextEntity } from '../../../lib/relationship/drawer/drawer-context.types'
+import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
@@ -484,7 +484,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
 
   const drawerContextEntities = React.useMemo(
     () => [
-      toDrawerContextEntity(
+      toDrawerEntityBlockModel(
         buildLocationContextPresentationFromLocation(location, { locationsById, campaignId }),
       ),
     ],

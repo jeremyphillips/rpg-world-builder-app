@@ -14,7 +14,7 @@ import {
 } from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
-import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer/drawer-context.types'
+import type { DrawerEntityPresentation } from '../../lib/entity/surfaces/drawer/drawer-entity.types'
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
 import { resolveOrganizationMemberClassAffinityDisplayLabel } from './members/organization-member-class-chip-options.lib'
 import { resolveOrganizationMemberSpeciesAffinityDisplayLabel } from './members/organization-member-species-chip-options.lib'
@@ -31,9 +31,9 @@ export const ORGANIZATION_EMPTY_SECTION_TEXT = {
 
 export const ORGANIZATION_DRAWER_CONTEXT_TYPE_SUFFIX = ' · Organization' as const
 
-export function buildOrganizationDrawerContextEntity(
+export function buildOrganizationDrawerEntityPresentation(
   organization: Pick<Organization, 'name'>,
-): DrawerContextEntityPresentation {
+): DrawerEntityPresentation {
   return {
     heading: organization.name,
     headingSuffix: ORGANIZATION_DRAWER_CONTEXT_TYPE_SUFFIX,

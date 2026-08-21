@@ -1,10 +1,8 @@
 import type { LocationConnectedPartyRow, Organization } from '@rpg/contracts'
 import { getOrganizationDomainLabel } from '@rpg/contracts'
 
-import {
-  ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING,
-  type EntityReplacementCurrentSnapshot,
-} from '../../entity-replacement/entity-replacement-current-entity'
+import { ENTITY_UNAVAILABLE_ORGANIZATION_HEADING } from '../../entity/summary/entity-unavailable-headings.lib'
+import type { EntityReplacementCurrentSnapshot } from '../../entity/surfaces/drawer/replacement/entity-replacement-current.types'
 
 export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
   relationshipId: string
@@ -15,7 +13,7 @@ export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
 
   if (!row || row.subject.type !== 'organization') {
     return {
-      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING },
+      entity: { heading: ENTITY_UNAVAILABLE_ORGANIZATION_HEADING },
       unavailable: true,
     }
   }

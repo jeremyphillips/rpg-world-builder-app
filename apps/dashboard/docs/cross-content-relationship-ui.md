@@ -495,7 +495,7 @@ Inverse existing-edge eyebrows and connected-parties labels use
 Drawer fixed endpoints compose **`DrawerContext`** from feature projections:
 
 - Location: `buildLocationEntityContextPresentation(LocationEntitySummaryVm)` — heading, ` · ${classification.text}`, optional `Located in {nearestParent}` from `ancestry.items.at(-1)` (via [`formatLocatedInSupportingText`](../src/features/content/locations/lib/location-display.ts)).
-- Organization: `buildOrganizationDrawerContextEntity` — `{name} · Organization`.
+- Organization: `buildOrganizationDrawerEntityPresentation` — `{name} · Organization`.
 - Character: `buildCharacterEntityContextPresentation` — `{name} · {PC|NPC}` with identity summary as supporting text (parity with location Located-in).
 
 **DrawerContext composition (all connection-drawer modes):**
@@ -513,7 +513,7 @@ Locked relationship kinds on replace / changeTarget use read-only **`Relationshi
 
 Organization forward relationship rows resolve target presentation via **`buildLocationEntityContextPresentation`** — no hand-rolled ` · ${classification}` or italic Located-in markup.
 
-Parent replacement (Move / Set / Change parent) omits subject **`DrawerContext`** when the drawer title already names the subject. Unavailable parent headings use **`ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING`**.
+Parent replacement (Move / Set / Change parent) omits subject **`DrawerContext`** when the drawer title already names the subject. Unavailable parent headings use **`ENTITY_UNAVAILABLE_LOCATION_HEADING`** from [`entity-unavailable-headings.lib.ts`](../src/features/content/lib/entity/summary/entity-unavailable-headings.lib.ts).
 
 Removed parallel string-context formatters (`RelationshipDrawerContextHeader`, `resolveLocationConnectionContext`, `location-drawer-context.lib.ts`) — drawers consume entity-context presentation helpers only.
 
@@ -578,7 +578,7 @@ Location parent/child editing is **not** a typed-edge relationship. Contained lo
 
 **Parent replacement chrome:** `EntityReplacementSection` with `entityLabel="Parent"` renders **Current parent** / **New parent** labels. Task-oriented helper copy varies by surface (Move / Change / Set). Candidate browse scopes filter the eligible set before search — eligibility always runs first.
 
-**Shared Current→New chrome** lives in neutral [`entity-replacement/`](../src/features/content/lib/entity-replacement/) (`EntityReplacementSection`, current field, replacement labels). Relationship drawers (org forward change-target, location inverse replace-organization) **consume** that layer. Hierarchy must **not** depend on relationship-owned Current/New modules. Eligibility, cycle prevention, and candidates stay domain-owned (`validateLocationParentAssignment` + location-feature helpers). After parent mutation, invalidate/refetch the campaign locations list — do not hand-patch ancestry/children projections.
+**Shared Current→New chrome** lives in [`entity/surfaces/drawer/replacement/`](../src/features/content/lib/entity/surfaces/drawer/replacement/) (`EntityReplacementSection`, current field, replacement labels). Compact drawer entity identity uses [`DrawerEntityBlock`](../src/features/content/lib/entity/surfaces/drawer/drawer-entity-block.client.tsx). Relationship drawers (org forward change-target, location inverse replace-organization) **consume** those layers. Hierarchy must **not** depend on relationship-owned Current/New modules. Eligibility, cycle prevention, and candidates stay domain-owned (`validateLocationParentAssignment` + location-feature helpers). After parent mutation, invalidate/refetch the campaign locations list — do not hand-patch ancestry/children projections.
 
 ## Implementation guard
 

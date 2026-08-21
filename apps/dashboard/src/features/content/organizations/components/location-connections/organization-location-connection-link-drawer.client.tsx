@@ -28,11 +28,11 @@ import {
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildLocationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import { buildEntityMediaFromImageKey } from '../../../lib/entity/summary/entity-media.lib'
-import { EntityReplacementSection } from '../../../lib/entity-replacement/entity-replacement-section.client'
+import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'
-import { toDrawerContextEntity } from '../../../lib/relationship/drawer/drawer-context.types'
-import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity-replacement/entity-replacement-current-entity'
-import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity-replacement/entity-replacement-current-entity'
+import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
+import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
+import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
 import {
   RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES,
   resolveRelationshipAlternatives,
@@ -86,7 +86,7 @@ import {
   resolveOrganizationForwardFamilyAddDrawerHelper,
   resolveOrganizationForwardTargetPresentation,
 } from '../../lib/location-connections/organization-location-connection-surface-copy'
-import { buildOrganizationDrawerContextEntity } from '../../lib/organization-display'
+import { buildOrganizationDrawerEntityPresentation } from '../../lib/organization-display'
 import {
   filterLocationsByTargetBrowseScope,
   ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL,
@@ -468,8 +468,8 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const changeTargetEntityLabel = resolveOrganizationForwardChangeTargetEntityLabel(intent)
 
   const drawerContextEntities = React.useMemo(() => {
-    const organizationEntity = toDrawerContextEntity(
-      buildOrganizationDrawerContextEntity(organization),
+    const organizationEntity = toDrawerEntityBlockModel(
+      buildOrganizationDrawerEntityPresentation(organization),
     )
 
     if (mode === 'add' || mode === 'changeTarget') {
@@ -478,7 +478,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
 
     if (mode === 'changeKind') {
       const locationEntity = lockedLocation
-        ? toDrawerContextEntity(
+        ? toDrawerEntityBlockModel(
             buildLocationEntityContextPresentation(
               buildLocationEntitySummaryVm(lockedLocation, {
                 locationsById,
@@ -486,7 +486,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
               }),
             ),
           )
-        : toDrawerContextEntity({ heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING })
+        : toDrawerEntityBlockModel({ heading: ENTITY_UNAVAILABLE_LOCATION_HEADING })
 
       return [organizationEntity, locationEntity]
     }

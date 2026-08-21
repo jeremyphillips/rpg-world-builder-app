@@ -22,11 +22,11 @@ import {
 
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildOrganizationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
-import { EntityReplacementSection } from '../../../lib/entity-replacement/entity-replacement-section.client'
+import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'
-import { toDrawerContextEntity } from '../../../lib/relationship/drawer/drawer-context.types'
-import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity-replacement/entity-replacement-current-entity'
-import { ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING } from '../../../lib/entity-replacement/entity-replacement-current-entity'
+import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
+import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
+import { ENTITY_UNAVAILABLE_ORGANIZATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
 import { RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL } from '../../../lib/relationship/drawer/relationship-drawer-field-labels'
 import { RelationshipDrawerSubjectField } from '../../../lib/relationship/drawer/relationship-drawer-subject-field.client'
 
@@ -64,7 +64,7 @@ import {
   LOCATION_INVERSE_ORGANIZATION_DRAWER,
 } from '../../lib/connected-parties/location-connection-surface-copy'
 import { buildLocationContextPresentationFromLocation } from '../../lib/location-display'
-import { buildOrganizationDrawerContextEntity } from '../../../organizations/lib/organization-display'
+import { buildOrganizationDrawerEntityPresentation } from '../../../organizations/lib/organization-display'
 
 export const LOCATION_INVERSE_ORG_LINK_CHOOSE_SUBJECT_MESSAGE =
   'Choose an organization to see available connection types.'
@@ -294,7 +294,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     : null
 
   const drawerContextEntities = React.useMemo(() => {
-    const locationEntity = toDrawerContextEntity(
+    const locationEntity = toDrawerEntityBlockModel(
       buildLocationContextPresentationFromLocation(location, { locationsById, campaignId }),
     )
 
@@ -304,8 +304,8 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
 
     if (mode === 'changeKind') {
       const organizationEntity = lockedOrganization
-        ? toDrawerContextEntity(buildOrganizationDrawerContextEntity(lockedOrganization))
-        : toDrawerContextEntity({ heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING })
+        ? toDrawerEntityBlockModel(buildOrganizationDrawerEntityPresentation(lockedOrganization))
+        : toDrawerEntityBlockModel({ heading: ENTITY_UNAVAILABLE_ORGANIZATION_HEADING })
 
       return [locationEntity, organizationEntity]
     }

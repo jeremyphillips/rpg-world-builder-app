@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { resolveLocationInverseCurrentOrganizationEndpoint } from './resolve-relationship-drawer-current-endpoint'
-import { ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING } from '../../entity-replacement/entity-replacement-current-entity'
+import { ENTITY_UNAVAILABLE_ORGANIZATION_HEADING } from '../../entity/summary/entity-unavailable-headings.lib'
 
 describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
   it('returns hydrated organization snapshot from connected party row', () => {
@@ -50,7 +50,7 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
         rows: [],
       }),
     ).toEqual({
-      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_ORGANIZATION_HEADING },
+      entity: { heading: ENTITY_UNAVAILABLE_ORGANIZATION_HEADING },
       unavailable: true,
     })
   })

@@ -12,8 +12,8 @@ import {
 
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildLocationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
-import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity-replacement/entity-replacement-current-entity'
-import { EntityReplacementSection } from '../../../lib/entity-replacement/entity-replacement-section.client'
+import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
+import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section.client'
 import { buildLocationEntitySummarySearchText } from '../../lib/location-display'
 import {
   buildLocationParentReplacementContext,

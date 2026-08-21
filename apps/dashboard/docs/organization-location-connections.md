@@ -65,7 +65,7 @@ read `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.
 Organization→location existing-edge rows, change-target **Current** snapshots, and link-drawer
 candidates compose [`LocationEntitySummaryVm`](../src/features/content/locations/lib/location-display.ts)
 in the organization feature, then map to neutral row / `EntityReplacementCurrentSnapshot` fields.
-Generic relationship and entity-replacement modules stay **entity-agnostic** — they must not import
+Generic relationship and drawer-replacement modules stay **entity-agnostic** — they must not import
 location display helpers.
 
 - **Unresolved targets:** `target: null` is the sole failure state; UI derives unavailable chrome from that.

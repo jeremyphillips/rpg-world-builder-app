@@ -7,7 +7,7 @@ const REPO_ROOT = join(__dirname, '../../../../../../..')
 
 const DETAIL_LANE_FILES = [
   'apps/dashboard/src/features/content/lib/detail/row/detail-entity-row.client.tsx',
-  'apps/dashboard/src/features/content/lib/relationship/drawer/drawer-context-entity-block.client.tsx',
+  'apps/dashboard/src/features/content/lib/entity/surfaces/drawer/drawer-entity-block.client.tsx',
 ] as const
 
 describe('entity detail lane migration guard', () => {

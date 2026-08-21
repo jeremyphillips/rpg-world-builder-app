@@ -8,7 +8,7 @@ import {
   YAWNING_PORTAL,
 } from '../../../locations/fixtures'
 import { buildLocationsById } from '../../../locations/lib/location-display'
-import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
 import {
   buildOrganizationLocationConnectionCards,
   groupOrganizationLocationConnections,
@@ -211,7 +211,7 @@ describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
         campaignId: CAMPAIGN_ID,
       }),
     ).toEqual({
-      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
+      entity: { heading: ENTITY_UNAVAILABLE_LOCATION_HEADING },
       unavailable: true,
     })
   })

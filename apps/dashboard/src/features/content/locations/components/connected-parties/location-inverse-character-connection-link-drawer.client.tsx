@@ -25,7 +25,7 @@ import {
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildCharacterPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'
-import { toDrawerContextEntity } from '../../../lib/relationship/drawer/drawer-context.types'
+import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
 import { toLocationConnectionEligibilityInput } from '../../../lib/relationship/location-connection/location-connection-eligibility-input'
 import {
   buildSubjectLocationConnectionKeySet,
@@ -205,7 +205,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   const availabilityKinds = resolvedAddKind ? [resolvedAddKind] : eligibleKinds
 
   const drawerContextEntities = React.useMemo(() => {
-    const locationEntity = toDrawerContextEntity(
+    const locationEntity = toDrawerEntityBlockModel(
       buildLocationContextPresentationFromLocation(location, { locationsById, campaignId }),
     )
 
@@ -215,7 +215,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
 
     if (mode === 'changeKind') {
       const characterEntity = lockedCharacter
-        ? toDrawerContextEntity(
+        ? toDrawerEntityBlockModel(
             buildCharacterEntityContextPresentation(
               buildConnectedPartyCharacterEntitySummary(lockedCharacter),
             ),

@@ -23,7 +23,7 @@ import {
   resolveLocationParentReplacementCurrentSnapshot,
   resolveLocationParentReplacementMode,
 } from './location-parent-replacement'
-import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
 import {
   buildLocationChildren,
   buildLocationLocatedInSegments,
@@ -118,7 +118,7 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       }),
     ).toEqual({
       parentLocationId: 'missing-parent-id',
-      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
+      entity: { heading: ENTITY_UNAVAILABLE_LOCATION_HEADING },
       unavailable: true,
     })
   })

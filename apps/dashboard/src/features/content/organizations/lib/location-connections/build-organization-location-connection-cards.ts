@@ -18,10 +18,8 @@ import {
   buildLocationEntityContextPresentation,
   type LocationEntitySummaryVm,
 } from '../../../locations/lib/location-display'
-import {
-  ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING,
-  type EntityReplacementCurrentSnapshot,
-} from '../../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
+import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
 import type { OrganizationLocationConnectionPreviewItem } from '../organization-display'
 import {
   ORGANIZATION_FORWARD_FAMILY_PRESENTATION,
@@ -114,7 +112,7 @@ export function resolveOrganizationForwardCurrentLocationEndpoint(input: {
 
   if (!reference?.location) {
     return {
-      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
+      entity: { heading: ENTITY_UNAVAILABLE_LOCATION_HEADING },
       unavailable: true,
     }
   }

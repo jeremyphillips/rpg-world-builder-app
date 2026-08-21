@@ -2,13 +2,13 @@
 
 import { ContentCardMedia, Heading, InsetPanel } from '@rpg/ui'
 
-import { DrawerContextEntityBlock } from '../relationship/drawer/drawer-context-entity-block.client'
-import type { DrawerContextEntityPresentation } from '../relationship/drawer/drawer-context.types'
-import { getContentImageUrl } from '../detail/page/content-image-url'
+import { getContentImageUrl } from '../../../../detail/page/content-image-url'
+import { DrawerEntityBlock } from '../drawer-entity-block.client'
+import type { DrawerEntityPresentation } from '../drawer-entity.types'
 
 export type EntityReplacementCurrentFieldProps = {
   label: string
-  entity: DrawerContextEntityPresentation
+  entity: DrawerEntityPresentation
   imageKey?: string
 }
 
@@ -31,7 +31,7 @@ export function EntityReplacementCurrentField({
               className="shrink-0"
             />
           ) : null}
-          <DrawerContextEntityBlock {...entity} className="min-w-0 flex-1" />
+          <DrawerEntityBlock {...entity} className="min-w-0 flex-1" />
         </div>
       </InsetPanel>
     </div>

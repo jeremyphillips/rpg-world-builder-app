@@ -8,7 +8,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 
-import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
@@ -152,7 +152,7 @@ export function OrganizationLocationConnectionListRow({
   const navigate = useNavigate()
   const presentation = item.target
     ? buildLocationEntityContextPresentation(item.target)
-    : { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING }
+    : { heading: ENTITY_UNAVAILABLE_LOCATION_HEADING }
 
   const actions = buildOrganizationLocationConnectionOverflowActions({
     item,

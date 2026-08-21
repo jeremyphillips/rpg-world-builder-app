@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { EntityReplacementSection } from './entity-replacement-section.client'
 
 const meta = {
-  title: 'Content/EntityReplacement/EntityReplacementSection',
+  title: 'Content/Entity/Surfaces/Drawer/Replacement/EntityReplacementSection',
   component: EntityReplacementSection,
   parameters: { layout: 'padded' },
 } satisfies Meta<typeof EntityReplacementSection>

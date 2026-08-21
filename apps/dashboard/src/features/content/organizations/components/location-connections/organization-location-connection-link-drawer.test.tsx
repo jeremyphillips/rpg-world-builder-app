@@ -25,7 +25,7 @@ import {
   ORGANIZATION_LOCATION_LINK_NO_RESULTS,
 } from './organization-location-connection-link-drawer.client'
 import { RELATIONSHIP_ALTERNATIVES_EMPTY_MESSAGES } from '../../../lib/relationship/list/relationship-alternatives'
-import { ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE } from '../../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.lib'
 import { buildLocationsById } from '../../../locations/lib/location-display'
 
 function withOrganizationLocationDrawerIndex(locations: Parameters<typeof buildLocationsById>[0]) {

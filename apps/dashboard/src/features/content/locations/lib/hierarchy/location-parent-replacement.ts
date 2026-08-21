@@ -17,7 +17,8 @@ import {
   buildLocationsById,
   type LocationEntitySummaryVm,
 } from '../location-display'
-import { ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity-replacement/entity-replacement-current-entity'
+import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
+import type { DrawerEntityPresentation } from '../../../lib/entity/surfaces/drawer/drawer-entity.types'
 
 export const LOCATION_PARENT_REPLACEMENT_ACTION_LABELS = {
   changeParent: 'Change parent',
@@ -30,11 +31,9 @@ export type LocationParentReplacementAction =
 
 export type LocationParentReplacementMode = 'change' | 'set'
 
-import type { DrawerContextEntityPresentation } from '../../../lib/relationship/drawer/drawer-context.types'
-
 export type LocationParentReplacementCurrentSnapshot = {
   parentLocationId: string
-  entity: DrawerContextEntityPresentation
+  entity: DrawerEntityPresentation
   imageKey?: string
   unavailable?: boolean
 }
@@ -78,7 +77,7 @@ export function resolveLocationParentReplacementCurrentSnapshot(input: {
   if (!parent) {
     return {
       parentLocationId,
-      entity: { heading: ENTITY_REPLACEMENT_UNAVAILABLE_LOCATION_HEADING },
+      entity: { heading: ENTITY_UNAVAILABLE_LOCATION_HEADING },
       unavailable: true,
     }
   }

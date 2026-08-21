@@ -23,6 +23,7 @@ surfaces/  — CEC, DEC, catalog rows; imports anatomy/ + summary/ only via depe
   cards/content/     ContentEntityCard
   cards/disclosure/  DisclosureEntityCard, DisclosureEntityCardHeader
   catalog/           CatalogEntityRow, CatalogEntityPickerSheet
+  drawer/            DrawerEntityBlock (compact drawer identity — see [feature-structure.md](./feature-structure.md))
 ```
 
 Dependency direction: `surfaces → anatomy → summary`. `summary/` must not import `anatomy/`;

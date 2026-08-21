@@ -4,10 +4,8 @@ import * as React from 'react'
 
 import { Heading, Text } from '@rpg/ui'
 
-import {
-  ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE,
-  type EntityReplacementCurrentSnapshot,
-} from './entity-replacement-current-entity'
+import { ENTITY_REPLACEMENT_CURRENT_UNAVAILABLE_MESSAGE } from './entity-replacement-current.lib'
+import type { EntityReplacementCurrentSnapshot } from './entity-replacement-current.types'
 import { EntityReplacementCurrentField } from './entity-replacement-current-field.client'
 import { resolveReplacementFieldLabels } from './entity-replacement-field-labels'
 
