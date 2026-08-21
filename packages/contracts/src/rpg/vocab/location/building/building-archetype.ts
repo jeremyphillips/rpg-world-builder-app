@@ -28,8 +28,8 @@
  * Terms are lowercase, trimmed, and deduplicated; they must not duplicate the
  * entry label, aliases, or searchTerms.
  */
-import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import { keysFromEntries, vocabEnumFromEntries } from '../../enum-schema'
+import type { GameTermEntry, VocabularyTerm } from '../../types'
 
 import { BUILDING_ARCHETYPE_SHARD_ENTRIES } from './building-archetypes'
 import type { BuildingFunctionFamily } from './building-function-family'

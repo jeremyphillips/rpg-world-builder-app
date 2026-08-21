@@ -5,8 +5,8 @@
  * Future renames or removals require deliberate migration; do not treat these
  * ids as provisional.
  */
-import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import { keysFromEntries, vocabEnumFromEntries } from '../../enum-schema'
+import type { GameTermEntry, VocabularyTerm } from '../../types'
 
 export const BUILDING_FUNCTION_FAMILY_TERM = {
   label: 'Building Function Family',

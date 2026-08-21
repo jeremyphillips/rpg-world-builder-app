@@ -1,5 +1,5 @@
-import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import { keysFromEntries, vocabEnumFromEntries } from '../../enum-schema'
+import type { GameTermEntry, VocabularyTerm } from '../../types'
 
 export const PLANE_TYPE_TERM = {
   label: 'Plane Type',

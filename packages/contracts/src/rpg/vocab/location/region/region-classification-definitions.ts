@@ -1,4 +1,4 @@
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry } from '../../types'
 import { GEOGRAPHIC_REGION_TYPE_ENTRIES, type GeographicRegionType } from './geographic-region-type'
 import { POLITICAL_REGION_TYPE_ENTRIES, type PoliticalRegionType } from './political-region-type'
 

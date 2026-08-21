@@ -1,5 +1,5 @@
-import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry, PrioritizedEntry, VocabularyTerm } from '../types'
+import { keysFromEntries, vocabEnumFromEntries } from '../../enum-schema'
+import type { GameTermEntry, PrioritizedEntry, VocabularyTerm } from '../../types'
 
 export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS = [
   'site',

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildingClassificationSchema } from '../../content/location/building-classification'
+import { buildingClassificationSchema } from '../../../content/location/building-classification'
 import {
   BUILDING_FACILITY_AUTHORING_GROUP_IDS,
   BUILDING_FACILITY_TYPE_ENTRIES,

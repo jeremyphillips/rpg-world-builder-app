@@ -1,5 +1,5 @@
-import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import { keysFromEntries, vocabEnumFromEntries } from '../../enum-schema'
+import type { GameTermEntry, VocabularyTerm } from '../../types'
 
 export const LOCATION_KIND_TERM = {
   label: 'Location Kind',

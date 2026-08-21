@@ -1,17 +1,17 @@
-import { getBuildingFacilityTypeLabel } from '../../vocab/location/building-facility-type'
-import { getBuildingFormLabel } from '../../vocab/location/building-form'
-import { getInteriorTypeLabel } from '../../vocab/location/interior-type'
+import { getBuildingFacilityTypeLabel } from '../../vocab/location/building/building-facility-type'
+import { getBuildingFormLabel } from '../../vocab/location/building/building-form'
+import { getInteriorTypeLabel } from '../../vocab/location/building/interior-type'
 import {
   getInteriorSubtypeLabel,
   INTERIOR_TYPE_DEFINITIONS,
   type InteriorClassificationType,
-} from '../../vocab/location/interior-type-definitions'
-import { getLocationKindLabel } from '../../vocab/location/kind'
-import { getPlaneTypeLabel } from '../../vocab/location/plane-type'
-import { getRegionTypeLabelForKind } from '../../vocab/location/region-classification-definitions'
-import { getSettlementTypeLabel } from '../../vocab/location/settlement-type'
-import { getSiteTypeLabel } from '../../vocab/location/site-type'
-import { getStructureTypeLabel } from '../../vocab/location/structure-type'
+} from '../../vocab/location/building/interior-type-definitions'
+import { getLocationKindLabel } from '../../vocab/location/region/kind'
+import { getPlaneTypeLabel } from '../../vocab/location/region/plane-type'
+import { getRegionTypeLabelForKind } from '../../vocab/location/region/region-classification-definitions'
+import { getSettlementTypeLabel } from '../../vocab/location/region/settlement-type'
+import { getSiteTypeLabel } from '../../vocab/location/region/site-type'
+import { getStructureTypeLabel } from '../../vocab/location/building/structure-type'
 import type { BuildingClassification } from './building-classification'
 import type { Location } from './location'
 

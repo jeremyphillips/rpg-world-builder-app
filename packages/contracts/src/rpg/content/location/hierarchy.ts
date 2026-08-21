@@ -1,4 +1,4 @@
-import { LOCATION_KIND_IDS, type LocationKind } from '../../vocab/location/kind'
+import { LOCATION_KIND_IDS, type LocationKind } from '../../vocab/location/region/kind'
 
 export type LocationParentRequirement = 'required' | 'optional' | 'forbidden'
 

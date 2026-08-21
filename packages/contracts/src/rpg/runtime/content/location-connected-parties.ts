@@ -5,12 +5,12 @@ import {
   CHARACTER_LOCATION_CONNECTION_FAMILY_IDS,
   characterLocationConnectionKindSchema,
   type CharacterLocationConnectionFamily,
-} from '../../vocab/location/character-location-connection'
+} from '../../vocab/location/connection/character-location-connection'
 import {
   ORGANIZATION_LOCATION_CONNECTION_FAMILY_IDS,
   organizationLocationConnectionKindSchema,
   type OrganizationLocationConnectionFamily,
-} from '../../vocab/location/organization-location-connection'
+} from '../../vocab/location/connection/organization-location-connection'
 import { characterTypeSchema } from '../character/core'
 
 export const LOCATION_CONNECTED_PARTY_SECTION_GROUP_IDS = [

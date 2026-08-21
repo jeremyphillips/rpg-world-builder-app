@@ -642,7 +642,10 @@ describe('Building archetype refactor inventory', () => {
     expect(BUILDING_CORPUS_DISPOSITIONS.apothecary).toEqual({ kind: 'archetype' })
 
     const contractsSource = readFileSync(
-      join(REPO_ROOT, 'packages/contracts/src/rpg/vocab/location/building-facility-type.ts'),
+      join(
+        REPO_ROOT,
+        'packages/contracts/src/rpg/vocab/location/building/building-facility-type.ts',
+      ),
       'utf8',
     )
     expect(contractsSource).not.toContain('outside-building-classification')

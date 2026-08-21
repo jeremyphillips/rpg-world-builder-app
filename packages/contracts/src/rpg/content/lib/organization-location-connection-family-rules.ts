@@ -6,7 +6,7 @@ import {
   type OrganizationLocationConnectionFamily,
   type OrganizationLocationConnectionFamilyExclusivity,
   type OrganizationLocationConnectionKind,
-} from '../../vocab/location/organization-location-connection'
+} from '../../vocab/location/connection/organization-location-connection'
 
 import {
   organizationLocationConnectionLocationSubjectBlocked,

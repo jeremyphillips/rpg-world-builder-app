@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { organizationLocationConnectionKindSchema } from '../vocab/location/organization-location-connection'
+import { organizationLocationConnectionKindSchema } from '../vocab/location/connection/organization-location-connection'
 import { contentStatusSchema } from './lib/envelope'
 import { createLocationInputSchema, locationSchema } from './location'
 import { createOrganizationInputSchema, organizationSchema } from './organization'

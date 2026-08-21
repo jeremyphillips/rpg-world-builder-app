@@ -1,5 +1,5 @@
-import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import { keysFromEntries, vocabEnumFromEntries } from '../../enum-schema'
+import type { GameTermEntry, VocabularyTerm } from '../../types'
 import type { BuildingFunctionFamily } from './building-function-family'
 import type { BuildingForm } from './building-form'
 

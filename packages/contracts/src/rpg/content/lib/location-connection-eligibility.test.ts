@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { CHARACTER_LOCATION_CONNECTION_KIND_IDS } from '../../vocab/location/character-location-connection'
-import { ORGANIZATION_LOCATION_CONNECTION_KIND_IDS } from '../../vocab/location/organization-location-connection'
+import { CHARACTER_LOCATION_CONNECTION_KIND_IDS } from '../../vocab/location/connection/character-location-connection'
+import { ORGANIZATION_LOCATION_CONNECTION_KIND_IDS } from '../../vocab/location/connection/organization-location-connection'
 import type { LocationConnectionEligibilityInput } from './location-connection-eligibility'
 import {
   isOrganizationLocationConnectionEligible,

@@ -25,8 +25,23 @@ const organizationAuthoringPresetIdSchema = z.enum(
 
 export const ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX = 'omt_' as const
 
+type GlobalWithWebCrypto = typeof globalThis & {
+  crypto?: {
+    randomUUID?: () => string
+  }
+}
+
+function createDefaultOrganizationMembershipTitleUuid(): string {
+  const cryptoApi = (globalThis as GlobalWithWebCrypto).crypto
+  if (typeof cryptoApi?.randomUUID === 'function') {
+    return cryptoApi.randomUUID()
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
 export function createOrganizationMembershipTitleId(
-  createId: () => string = () => crypto.randomUUID(),
+  createId: () => string = createDefaultOrganizationMembershipTitleUuid,
 ): string {
   return `${ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX}${createId()}`
 }
@@ -109,7 +124,7 @@ export const organizationMembershipTitlesSchema = z
 
 export function snapshotOrganizationMembershipTitlesFromPreset(
   presetId: OrganizationAuthoringPresetId,
-  createId: () => string = () => crypto.randomUUID(),
+  createId: () => string = createDefaultOrganizationMembershipTitleUuid,
 ): OrganizationMembershipTitleDefinition[] {
   const preset = ORGANIZATION_AUTHORING_PRESETS[presetId]
   return preset.members.titles.map((ref) => {
@@ -136,7 +151,7 @@ export function resolveOrganizationCreateMembershipTitles(input: {
   if (input.sourcePresetId !== undefined) {
     return snapshotOrganizationMembershipTitlesFromPreset(
       input.sourcePresetId,
-      input.createId ?? (() => crypto.randomUUID()),
+      input.createId ?? createDefaultOrganizationMembershipTitleUuid,
     )
   }
   return [...(input.titles ?? [])]

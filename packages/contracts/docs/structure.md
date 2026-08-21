@@ -107,7 +107,12 @@ flowchart BT
 | Public marketing or CMS schemas                                                          | `public/`                           | (scaffold — add when needed)                                                                                                 |
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
-for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).
+for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps,
+`rpg/vocab/organization/` for organization classification and authoring vocab,
+`rpg/vocab/location/{region,building,connection}/` for location taxonomy and
+connection kinds). Quarantined building-archetype research lives under
+`rpg/vocab/location/building/` but is omitted from the public `location/index.ts`
+barrel.
 
 ### `rpg/campaign/` folder ownership
 

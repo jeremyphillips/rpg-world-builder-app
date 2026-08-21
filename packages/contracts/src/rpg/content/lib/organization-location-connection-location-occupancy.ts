@@ -2,7 +2,7 @@ import {
   getOrganizationLocationConnectionMaxSubjectsPerLocation,
   getOrganizationLocationConnectionLabel,
   type OrganizationLocationConnectionKind,
-} from '../../vocab/location/organization-location-connection'
+} from '../../vocab/location/connection/organization-location-connection'
 
 export type OrganizationLocationConnectionEdgeAtLocation = {
   organizationId: string

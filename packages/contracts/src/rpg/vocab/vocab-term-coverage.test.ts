@@ -35,13 +35,13 @@ import { LANGUAGE_CATEGORY_TERM, LANGUAGE_TERM } from './language'
 import { MAGIC_ITEM_CATEGORY_TERM } from './magic-item/category'
 import { MAGIC_ITEM_RARITY_TERM } from './magic-item/rarity'
 import { ATTACK_RESOLUTION_MODE_TERM } from './mechanics/attack-resolution-mode'
-import { BUILDING_ARCHETYPE_TERM } from './location/building-archetype'
+import { BUILDING_ARCHETYPE_TERM } from './location/building/building-archetype'
 import {
   BUILDING_FACILITY_AUTHORING_GROUP_TERM,
   BUILDING_FACILITY_TYPE_TERM,
-} from './location/building-facility-type'
-import { BUILDING_FORM_TERM } from './location/building-form'
-import { BUILDING_FUNCTION_FAMILY_TERM } from './location/building-function-family'
+} from './location/building/building-facility-type'
+import { BUILDING_FORM_TERM } from './location/building/building-form'
+import { BUILDING_FUNCTION_FAMILY_TERM } from './location/building/building-function-family'
 import { EDITION_PRESET_TERM } from './mechanics/edition-preset'
 import { HIT_POINTS_TERM } from './mechanics/hit-points'
 import { MOVEMENT_MODE_TERM, MOVEMENT_OPERATION_TERM } from './movement-mode'

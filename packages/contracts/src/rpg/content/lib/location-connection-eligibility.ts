@@ -1,14 +1,14 @@
-import type { LocationKind } from '../../vocab/location/kind'
-import type { StructureType } from '../../vocab/location/structure-type'
+import type { LocationKind } from '../../vocab/location/region/kind'
+import type { StructureType } from '../../vocab/location/building/structure-type'
 import {
   CHARACTER_LOCATION_CONNECTION_KIND_IDS,
   type CharacterLocationConnectionKind,
-} from '../../vocab/location/character-location-connection'
+} from '../../vocab/location/connection/character-location-connection'
 import {
   ORGANIZATION_LOCATION_CONNECTION_KIND_IDS,
   type OrganizationLocationConnectionKind,
-} from '../../vocab/location/organization-location-connection'
-import { STRUCTURE_TYPE_IDS } from '../../vocab/location/structure-type'
+} from '../../vocab/location/connection/organization-location-connection'
+import { STRUCTURE_TYPE_IDS } from '../../vocab/location/building/structure-type'
 
 /** Canonical location shape for connection eligibility — discriminated body fields only. */
 export type LocationConnectionEligibilityInput = {

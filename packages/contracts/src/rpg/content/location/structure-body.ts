@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { structureTypeSchema } from '../../vocab/location/structure-type'
+import { structureTypeSchema } from '../../vocab/location/building/structure-type'
 import { locationBaseSchema } from './base'
 import { buildingClassificationSchema } from './building-classification'
 

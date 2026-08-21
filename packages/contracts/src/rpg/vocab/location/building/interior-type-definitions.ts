@@ -1,4 +1,4 @@
-import type { GameTermEntry } from '../types'
+import type { GameTermEntry } from '../../types'
 
 type InteriorTypeDefinition = {
   readonly label: string

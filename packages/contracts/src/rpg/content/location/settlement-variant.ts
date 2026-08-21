@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { settlementTypeSchema } from '../../vocab/location/settlement-type'
+import { settlementTypeSchema } from '../../vocab/location/region/settlement-type'
 
 /** Kind-specific fields for `kind: 'settlement'`. */
 export const settlementLocationKindFields = {

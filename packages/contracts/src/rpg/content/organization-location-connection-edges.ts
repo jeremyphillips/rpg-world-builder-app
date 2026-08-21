@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { organizationLocationConnectionKindSchema } from '../vocab/location/organization-location-connection'
+import { organizationLocationConnectionKindSchema } from '../vocab/location/connection/organization-location-connection'
 
 export const organizationLocationConnectionEdgeAtLocationSchema = z.object({
   organizationId: z.string(),

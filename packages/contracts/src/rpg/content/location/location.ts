@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { LOCATION_KIND_IDS } from '../../vocab/location/kind'
+import { LOCATION_KIND_IDS } from '../../vocab/location/region/kind'
 import { formatUnionBranchDescription } from '../../vocab/enum-schema'
 import { createDraftInputSchema } from '../lib/content-input-schemas'
 import { LOCATION_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
@@ -23,14 +23,14 @@ import {
 import { settlementLocationKindFields } from './settlement-variant'
 import { siteLocationKindFields } from './site-variant'
 import { worldLocationKindFields } from './world-variant'
-import { interiorTypeSchema } from '../../vocab/location/interior-type'
-import { planeTypeSchema } from '../../vocab/location/plane-type'
+import { interiorTypeSchema } from '../../vocab/location/building/interior-type'
+import { planeTypeSchema } from '../../vocab/location/region/plane-type'
 import { regionClassificationSchema } from './region-classification'
 import { buildingClassificationSchema } from './building-classification'
 import { interiorClassificationSchema } from './interior-classification'
-import { settlementTypeSchema } from '../../vocab/location/settlement-type'
-import { siteTypeSchema } from '../../vocab/location/site-type'
-import { structureTypeSchema } from '../../vocab/location/structure-type'
+import { settlementTypeSchema } from '../../vocab/location/region/settlement-type'
+import { siteTypeSchema } from '../../vocab/location/region/site-type'
+import { structureTypeSchema } from '../../vocab/location/building/structure-type'
 
 // ---------------------------------------------------------------------------
 // Location — campaign-authored content type discriminated by `kind`. Each

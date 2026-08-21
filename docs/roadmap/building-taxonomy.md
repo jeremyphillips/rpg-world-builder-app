@@ -22,8 +22,8 @@ Create-flow: [`create-flow.md`](../../apps/dashboard/docs/create-flow.md).
 ## Source-of-truth hierarchy
 
 1. **Runtime Form / Facility registries** — what ships  
-   [`building-form.ts`](../../packages/contracts/src/rpg/vocab/location/building-form.ts),
-   [`building-facility-type.ts`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts)
+   [`building-form.ts`](../../packages/contracts/src/rpg/vocab/location/building/building-form.ts),
+   [`building-facility-type.ts`](../../packages/contracts/src/rpg/vocab/location/building/building-facility-type.ts)
 2. **Building refactor inventory** — corpus disposition membership  
    [`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts)
 3. **This roadmap** — current state, deferred work, sequencing policy
@@ -57,13 +57,13 @@ Persisted Building classification is **Form + Facility only**:
 Verified against registry tests and the refactor inventory. If documentation and tests disagree,
 **tests win**.
 
-| Item                                    | Value                                                                                                                      |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Forms                                   | **4** — `house`, `tower`, `hall`, `keep`                                                                                   |
-| Facilities                              | **40** — see [`BUILDING_FACILITY_TYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts) |
-| Research corpus                         | **308**                                                                                                                    |
-| Unresolved (`pending` + `needs-design`) | **56** — see refactor inventory tests                                                                                      |
-| Legacy runtime archetypes (quarantined) | **143**                                                                                                                    |
+| Item                                    | Value                                                                                                                               |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Forms                                   | **4** — `house`, `tower`, `hall`, `keep`                                                                                            |
+| Facilities                              | **40** — see [`BUILDING_FACILITY_TYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building/building-facility-type.ts) |
+| Research corpus                         | **308**                                                                                                                             |
+| Unresolved (`pending` + `needs-design`) | **56** — see refactor inventory tests                                                                                               |
+| Legacy runtime archetypes (quarantined) | **143**                                                                                                                             |
 
 Persisted ids `watchtower` and `lighthouse` are accepted identifier debt (runtime labels: Watch post,
 Beacon station).
@@ -175,7 +175,7 @@ pass**:
 
 | Asset                                                                                                                    | Role                                             |
 | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| [`building-archetype.ts`](../../packages/contracts/src/rpg/vocab/location/building-archetype.ts) + shards                | Quarantined research corpus                      |
+| [`building-archetype.ts`](../../packages/contracts/src/rpg/vocab/location/building/building-archetype.ts) + shards       | Quarantined research corpus                      |
 | [`building-archetype-quarantine.js`](../../packages/config/src/eslint/building-archetype-quarantine.js)                  | ESLint guard — production must not import corpus |
 | [`building-archetype-refactor-inventory.ts`](../../tools/building-refactor/src/building-archetype-refactor-inventory.ts) | Disposition membership SSOT                      |
 

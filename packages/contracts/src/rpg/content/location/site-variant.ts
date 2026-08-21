@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { siteTypeSchema } from '../../vocab/location/site-type'
+import { siteTypeSchema } from '../../vocab/location/region/site-type'
 
 /** Kind-specific fields for `kind: 'site'`. */
 export const siteLocationKindFields = {
