@@ -8,7 +8,7 @@ import {
   formatCharacterMixedHeadingSuffix,
 } from '@/features/character'
 
-import { DetailCollectionPanel } from '../../../lib/detail/collection/detail-collection-panel.client'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel.client'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,

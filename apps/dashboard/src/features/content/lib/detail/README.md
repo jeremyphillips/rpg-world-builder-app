@@ -24,8 +24,8 @@ children. Pick one collection-body grammar below.
 
 ## Grouped collection body
 
-Location-validated today; domain-neutral primitives (`collection/detail-collection-group.*`,
-`collection/detail-collection-row-list.*`):
+Location-validated today; domain-neutral primitives (`collection/group/detail-collection-group.*`,
+`collection/row-list/detail-collection-row-list.*`):
 
 ```text
 DetailCollectionGroup
@@ -94,16 +94,35 @@ detail/
   detail-overflow-menu.*
   detail-collection-grammar.guard.test.ts
   collection/
-    detail-collection-panel.*
-    detail-collection-group.*
-    detail-collection-row-list.*
     detail-collection-chrome.variants.ts
+    panel/
+      detail-collection-panel.*
+      __tests__/
+      __stories__/
+    group/
+      detail-collection-group.*
+      __tests__/
+      __stories__/
+    row-list/
+      detail-collection-row-list.*
+      __tests__/
+      __stories__/
   row/entity/
     detail-entity-row.*
     detail-entity-row-actions.*
   page/       # detail page shell — not collection grammar
   metadata/   # stat rows — not collection grammar
 ```
+
+### Artifact subfolder pilot (DetailCollection only)
+
+`DetailCollection` is piloting artifact subfolders under `collection/{panel,group,row-list}/`.
+Runtime companions (`*.client.tsx`, `*.variants.ts`, …) stay directly visible beside their
+semantic owner. Tests and stories move into `__tests__/` and `__stories__/` so the production
+hierarchy is easier to scan at a glance.
+
+This is currently a **DetailCollection-local** convention. Do not copy it elsewhere without
+evaluating the pilot — global feature-structure docs are unchanged.
 
 ## Admission
 

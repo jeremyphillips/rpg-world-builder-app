@@ -16,7 +16,7 @@ import type {
   OrganizationLocationConnectionMutationContext,
 } from '../../lib/location-connections/organization-location-connection-mutation-context'
 import { OrganizationLocationConnectionListRow } from './organization-location-connection-list-row.client'
-import { DetailCollectionPanel } from '../../../lib/detail/collection/detail-collection-panel.client'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel.client'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import {
   relationshipGroupUsesRootFamilyAdd,

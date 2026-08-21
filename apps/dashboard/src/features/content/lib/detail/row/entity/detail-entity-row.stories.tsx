@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { DetailEntityRow } from './detail-entity-row.client'
 import { DetailOverflowMenu } from '../../detail-overflow-menu.client'
-import { DetailCollectionRowList } from '../../collection/detail-collection-row-list.client'
+import { DetailCollectionRowList } from '../../collection/row-list/detail-collection-row-list.client'
 
 const meta = {
   title: 'Content/Detail/DetailEntityRow',

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { detailCollectionRecordSeparatorVariants } from './detail-collection-chrome.variants'
-import { detailCollectionRowListStructuralSeparatorVariants } from './detail-collection-row-list.variants'
+import { detailCollectionRecordSeparatorVariants } from '../../detail-collection-chrome.variants'
+import { detailCollectionRowListStructuralSeparatorVariants } from '../detail-collection-row-list.variants'
 
 describe('detailCollectionRowListStructuralSeparatorVariants', () => {
   it('applies structural sibling dividers', () => {

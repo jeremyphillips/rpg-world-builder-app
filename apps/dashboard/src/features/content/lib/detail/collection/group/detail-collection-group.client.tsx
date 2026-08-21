@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import { cn, Eyebrow } from '@rpg/ui'
 
-import { detailCollectionGroupHeaderVariants } from './detail-collection-chrome.variants'
+import { detailCollectionGroupHeaderVariants } from '../detail-collection-chrome.variants'
 import { detailCollectionGroupVariants } from './detail-collection-group.variants'
 
 export type DetailCollectionGroupProps = {

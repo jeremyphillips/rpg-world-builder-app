@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { detailCollectionRecordSeparatorVariants } from './detail-collection-chrome.variants'
+import { detailCollectionRecordSeparatorVariants } from '../detail-collection-chrome.variants'
 import {
   detailCollectionRowListStructuralSeparatorVariants,
   type DetailCollectionRowListSeparatorKind,

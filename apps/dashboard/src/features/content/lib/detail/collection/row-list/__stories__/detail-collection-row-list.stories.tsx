@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { DetailEntityRow } from '../row/entity/detail-entity-row.client'
-import { DetailCollectionRowList } from './detail-collection-row-list.client'
+import { DetailEntityRow } from '../../../row/entity/detail-entity-row.client'
+import { DetailCollectionRowList } from '../detail-collection-row-list.client'
 
 const meta = {
   title: 'Content/Detail/DetailCollectionRowList',

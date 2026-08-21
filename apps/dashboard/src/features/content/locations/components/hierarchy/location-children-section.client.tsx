@@ -19,9 +19,9 @@ import {
   detailEntityRowDisclosurePreviewRowVariants,
   resolveDetailEntityRowDisclosurePreviewRowEdge,
 } from '../../../lib/detail/row/entity/detail-entity-row.variants'
-import { DetailCollectionGroup } from '../../../lib/detail/collection/detail-collection-group.client'
-import { DetailCollectionPanel } from '../../../lib/detail/collection/detail-collection-panel.client'
-import { DetailCollectionRowList } from '../../../lib/detail/collection/detail-collection-row-list.client'
+import { DetailCollectionGroup } from '../../../lib/detail/collection/group/detail-collection-group.client'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel.client'
+import { DetailCollectionRowList } from '../../../lib/detail/collection/row-list/detail-collection-row-list.client'
 import {
   DetailOverflowMenu,
   type DetailOverflowAction,
