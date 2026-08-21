@@ -13,7 +13,7 @@ import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character
 import { Text } from '@rpg/ui'
 
 import { resolveReviewReadyMessage } from '../../../../lib/builder-preview/review-step-display'
-import { BuilderStepFrame } from '../builder-step-frame.client'
+import { BuilderStepFrame } from '../shared/builder-step-frame.client'
 import { ReviewAdvisoryWarnings } from './review-advisory-warnings.client'
 import { ReviewRequiredItems } from './review-required-items.client'
 import { ReviewStepSummary } from './review-step-summary.client'

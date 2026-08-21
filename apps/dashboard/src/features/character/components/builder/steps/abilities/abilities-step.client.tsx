@@ -24,9 +24,9 @@ import {
 import { BUILDER_STEP_FORM_IDS } from '../../../../lib/steps/builder-step-form-ids'
 import { BuilderFormContinueRegistration } from '../../builder-form-continue-registration.client'
 import { AbilitiesDraftSync } from './abilities-draft-sync.client'
-import { BuilderStepFrame } from '../builder-step-frame.client'
-import { FixedScoresAssignment } from './fixed-scores-assignment.client'
-import { ManualAbilitiesAssignment } from './manual-abilities-assignment.client'
+import { BuilderStepFrame } from '../shared/builder-step-frame.client'
+import { FixedScoresAssignment } from './assignment/fixed-scores-assignment.client'
+import { ManualAbilitiesAssignment } from './assignment/manual-abilities-assignment.client'
 
 export type AbilitiesStepProps = {
   context: CharacterBuildContext

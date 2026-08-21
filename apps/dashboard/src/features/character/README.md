@@ -82,7 +82,12 @@ sibling folders (`equipment/`, `spells/`, `proficiencies/`, `connections/`,
 | `preview/`   | Live preview sidebar — panel, accordion, section content                          |
 | `fields/`    | Builder choice rendering — `ChoiceSetField`, dependent choice sections            |
 | `inventory/` | Builder row remove affordance (reused by steps and domain pickers)                |
-| `steps/`     | Step panels; large clusters in `abilities/`, `equipment/`, `review/`              |
+| `steps/`     | One folder per canonical step; shared chrome in `steps/shared/`                   |
+
+Each builder step owns a folder (`identity/`, `species/`, `class/`, `abilities/`,
+`proficiencies/`, `equipment/`, `spells/`, `connections/`, `review/`). Shared step wrappers
+(`builder-step-frame`, `builder-step-readiness-panel`) live in `steps/shared/`. Subdivide within a
+step only for stable sub-responsibilities (e.g. `abilities/assignment/`, `abilities/recommendation/`).
 
 Step orchestration hooks stay in `hooks/` (`use-*-step.client.ts`); view models
 stay in `lib/builder/`, `lib/steps/`, and per-concern `lib/<step>/`.

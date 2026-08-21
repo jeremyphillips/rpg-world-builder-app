@@ -1,8 +1,8 @@
 'use client'
 
 import { isBuilderStepReadinessMessageOnly } from '../../../../lib/builder/builder-step-readiness.lib'
-import { BuilderStepFrame } from '../builder-step-frame.client'
-import { BuilderStepReadinessPanel } from '../builder-step-readiness-panel.client'
+import { BuilderStepFrame } from '../shared/builder-step-frame.client'
+import { BuilderStepReadinessPanel } from '../shared/builder-step-readiness-panel.client'
 import { EquipmentStepInteractive } from './equipment-step-interactive.client'
 import type { EquipmentStepProps } from './equipment-step.types'
 import { type useEquipmentStep } from '../../../../hooks/use-equipment-step.client'

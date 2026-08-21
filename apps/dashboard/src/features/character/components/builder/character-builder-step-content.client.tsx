@@ -12,14 +12,14 @@ import type {
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
 import { AbilitiesStep } from './steps/abilities/abilities-step.client'
-import { ClassStep } from './steps/class-step.client'
-import { IdentityStep } from './steps/identity-step.client'
-import { ProficienciesStep } from './steps/proficiencies-step.client'
+import { ClassStep } from './steps/class/class-step.client'
+import { IdentityStep } from './steps/identity/identity-step.client'
+import { ProficienciesStep } from './steps/proficiencies/proficiencies-step.client'
 import { EquipmentStep } from './steps/equipment/equipment-step.client'
 import { ReviewStep } from './steps/review/review-step.client'
-import { SpeciesStep } from './steps/species-step.client'
-import { SpellsStep } from './steps/spells-step.client'
-import { ConnectionsStep } from './steps/connections-step.client'
+import { SpeciesStep } from './steps/species/species-step.client'
+import { SpellsStep } from './steps/spells/spells-step.client'
+import { ConnectionsStep } from './steps/connections/connections-step.client'
 import type { CharacterBuilderNavigateToStep } from '../../lib/builder/character-builder-navigation-options'
 
 export type CharacterBuilderStepContentProps = {

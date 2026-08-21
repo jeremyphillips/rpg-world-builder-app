@@ -19,7 +19,7 @@ import {
   EquipmentStepInventorySection,
   EquipmentStepReplacedClassOptionsNotice,
 } from './equipment-step-sections.client'
-import { BuilderStepReadinessPanel } from '../builder-step-readiness-panel.client'
+import { BuilderStepReadinessPanel } from '../shared/builder-step-readiness-panel.client'
 import type { EquipmentStepProps } from './equipment-step.types'
 import type { useEquipmentStep } from '../../../../hooks/use-equipment-step.client'
 import { useEquipmentPickerAcquisition } from '../../../../hooks/use-equipment-picker-acquisition.client'
