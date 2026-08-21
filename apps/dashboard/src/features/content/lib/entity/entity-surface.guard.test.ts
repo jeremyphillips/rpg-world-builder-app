@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest'
 const REPO_ROOT = join(__dirname, '../../../../../../..')
 const FEATURE_ROOT = join(REPO_ROOT, 'apps/dashboard/src/features')
 const INTERNAL_ENTITY_FILES = new Set([
-  'content/lib/content-entity-card.client.tsx',
-  'content/lib/entity/entity-summary.client.tsx',
+  'content/lib/entity/surfaces/cards/content/content-entity-card.client.tsx',
+  'content/lib/entity/summary/entity-summary.client.tsx',
 ])
 
 function sourceFiles(directory: string): string[] {
@@ -107,8 +107,8 @@ describe('entity surface architecture guard', () => {
 
   it('does not import entity anatomy internals outside allowlist', () => {
     const allowlist = new Set([
-      'content/lib/content-entity-card.client.tsx',
-      'content/lib/entity/disclosure/disclosure-entity-card.client.tsx',
+      'content/lib/entity/surfaces/cards/content/content-entity-card.client.tsx',
+      'content/lib/entity/surfaces/cards/disclosure/disclosure-entity-card.client.tsx',
       'content/lib/detail/row/detail-entity-row.client.tsx',
       'content/lib/relationship/drawer/drawer-context-entity-block.client.tsx',
     ])

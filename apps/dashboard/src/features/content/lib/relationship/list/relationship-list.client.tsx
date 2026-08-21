@@ -9,7 +9,7 @@ import { detailSectionGroupHeaderVariants } from '../../detail/section/detail-se
 import { detailRowListSeparatorVariants } from '../../detail/section/detail-row-list.variants'
 import type { DetailOverflowAction } from '../../detail/row/detail-overflow-menu.client'
 import { CrossContentRelationshipRow } from './cross-content-relationship-row.client'
-import type { EntitySummaryStatusItem } from '../../entity/entity-summary-status.types'
+import type { EntitySummaryStatusItem } from '../../entity/summary/entity-summary-status.types'
 import {
   relationshipListEmptyVariants,
   relationshipListFooterVariants,

@@ -22,7 +22,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { cn, Button, Text, iconGhostControlVariants } from '@rpg/ui'
 import { GripVertical, Trash2 } from 'lucide-react'
 
-import { EntityItem } from '../../lib/content-entity-card.client'
+import { EntityItem } from '@/features/content'
 import {
   masterDetailListDragHandleClasses,
   masterDetailListRowDraggingClasses,

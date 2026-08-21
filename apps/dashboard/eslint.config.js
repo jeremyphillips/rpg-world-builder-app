@@ -31,8 +31,8 @@ const dashboardEntitySurfaceImportGuard = {
   files: ['src/features/**/*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
-    'src/features/content/lib/content-entity-card.client.tsx',
-    'src/features/content/lib/entity/entity-summary.client.tsx',
+    'src/features/content/lib/entity/surfaces/cards/content/content-entity-card.client.tsx',
+    'src/features/content/lib/entity/summary/entity-summary.client.tsx',
   ],
   rules: {
     'no-restricted-imports': [
@@ -140,7 +140,7 @@ const dashboardEntityCatalogPickerImportGuard = {
   files: ['src/features/**/*picker*.{ts,tsx}', 'src/features/**/*drawer*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
-    'src/features/content/lib/entity/catalog/catalog-entity-picker-sheet.client.tsx',
+    'src/features/content/lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client.tsx',
   ],
   rules: {
     'no-restricted-imports': [

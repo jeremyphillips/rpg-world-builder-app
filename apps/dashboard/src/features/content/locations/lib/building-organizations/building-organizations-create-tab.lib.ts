@@ -4,7 +4,7 @@ import {
   type Organization,
 } from '@rpg/contracts'
 
-import type { EntitySummaryModel } from '../../../lib/entity/entity-summary.types'
+import type { EntitySummaryModel } from '../../../lib/entity/summary/entity-summary.types'
 import type {
   BuildingOrganizationDraftPlan,
   BuildingOrganizationRelationshipDraft,

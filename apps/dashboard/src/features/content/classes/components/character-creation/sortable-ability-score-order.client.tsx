@@ -28,7 +28,7 @@ import {
 } from '@rpg/contracts'
 import { dragHandleVariants } from '@rpg/ui'
 
-import { ContentEntityCard } from '../../../lib/content-entity-card.client'
+import { ContentEntityCard } from '@/features/content'
 import { resolveSortableArrayMove } from '../../../lib/utils/sortable-array-move.lib'
 
 export type SortableAbilityScoreOrderProps = {

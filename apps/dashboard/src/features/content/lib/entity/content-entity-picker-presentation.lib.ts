@@ -14,8 +14,8 @@ import {
   type LocationConnectedPartyCharacterOption,
 } from '../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 
-import { buildEntityMediaFromImageKey } from './entity-media.lib'
-import type { EntitySummaryModel } from './entity-summary.types'
+import { buildEntityMediaFromImageKey } from './summary/entity-media.lib'
+import type { EntitySummaryModel } from './summary/entity-summary.types'
 
 type EntitySummaryAdapterOptions = {
   imageKey?: string

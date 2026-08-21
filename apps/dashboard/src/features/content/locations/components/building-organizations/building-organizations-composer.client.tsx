@@ -21,7 +21,7 @@ import {
   CREATE_FLOW_FORM_DENSITY,
 } from '@/lib/create-flow'
 
-import { ContentEntityCard } from '../../../lib/content-entity-card.client'
+import { ContentEntityCard } from '@/features/content'
 import { buildOrganizationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import {
   buildOrganizationFields,

@@ -10,10 +10,7 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import {
-  CatalogEntityPickerSheet,
-  createCatalogEntityRowRenderer,
-} from '../../../lib/content-entity-card.client'
+import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildLocationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity-replacement/entity-replacement-current-entity'
 import { EntityReplacementSection } from '../../../lib/entity-replacement/entity-replacement-section.client'

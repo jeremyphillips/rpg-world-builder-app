@@ -42,7 +42,7 @@ lib/
   detail/           # page/, metadata/, section/, row/ — see feature-structure.md
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client
-  entity/           # Entity anatomy; catalog/, disclosure/ surface splits
+  entity/           # summary/ → item/ → surfaces/ (see content-entity-card.md)
   relationship/     # Cross-content relationship UI; drawer/, list/, picker/, location-connection/
   campaign-access/  # Campaign availability; overview/ row chrome; bulk/ actions
   entity-replacement/  # Shared Current→New drawer chrome
@@ -54,7 +54,7 @@ lib/
 ```
 
 Root-level files are limited to cross-type vocabulary (`content-type-labels.ts`,
-`labels.ts`) and the public entity facade (`content-entity-card.client.tsx`).
+`labels.ts`). Public entity surfaces export from [`index.ts`](./index.ts) by semantic owner module.
 
 Catalog list
 fetching for top-level content types (classes, species, weapons, etc.) is wired

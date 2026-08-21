@@ -5,12 +5,12 @@ import { useId, useState, type ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { EntityItemAnatomy } from '../../entity/entity-item.client'
-import type { EntitySummaryStatusItem } from '../../entity/entity-summary-status.types'
-import type { EntityItemTrailing } from '../../entity/entity-item-trailing.types'
-import { buildEntityContentOffsetStyle } from '../../entity/entity-leading-rail.lib'
-import { projectEntitySummaryModel } from '../../entity/entity-summary-projection.lib'
-import { entitySurfaceInsetVariants } from '../../entity/entity-surface-inset.variants'
+import { EntityItemAnatomy } from '../../entity/item/entity-item.client'
+import type { EntityItemTrailing } from '../../entity/item/entity-item-trailing.types'
+import { buildEntityContentOffsetStyle } from '../../entity/item/entity-leading-rail.lib'
+import { projectEntitySummaryModel } from '../../entity/summary/entity-summary-projection.lib'
+import type { EntitySummaryStatusItem } from '../../entity/summary/entity-summary-status.types'
+import { entitySurfaceInsetVariants } from '../../entity/surfaces/entity-surface-inset.variants'
 import {
   detailEntityRowDisclosureButtonVariants,
   detailEntityRowDisclosureContentVariants,

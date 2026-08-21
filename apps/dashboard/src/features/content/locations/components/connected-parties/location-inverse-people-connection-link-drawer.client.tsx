@@ -27,10 +27,7 @@ import {
 } from '@/features/character'
 
 import { LocationConnectionKindField } from '../../../components/location-connection-kind-field.client'
-import {
-  CatalogEntityPickerSheet,
-  createCatalogEntityRowRenderer,
-} from '../../../lib/content-entity-card.client'
+import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import {
   buildCharacterPickerEntitySummary,
   buildOrganizationPickerEntitySummary,

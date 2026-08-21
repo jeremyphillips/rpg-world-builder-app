@@ -34,21 +34,26 @@ export {
 } from './components/catalog'
 export {
   ContentEntityCard,
-  DisclosureEntityCard,
-  EntityItem,
-  EntitySummary,
-  CatalogEntityRow,
-  CatalogEntityPickerSheet,
-  createCatalogEntityRowRenderer,
+  ContentEntityCardViewLink,
   type ContentEntityCardProps,
+} from './lib/entity/surfaces/cards/content/content-entity-card.client'
+export {
+  DisclosureEntityCard,
   type DisclosureEntityCardProps,
-  type CatalogEntityRowProps,
-  type CatalogEntityPickerSheetProps,
-  type EntityItemTrailing,
-  type EntityItemTrailingSecondary,
-  type EntitySummaryModel,
-  type EntitySummaryStatusItem,
-} from './lib/content-entity-card.client'
+} from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card.client'
+export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
+export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
+export { EntitySummary } from './lib/entity/summary/entity-summary.client'
+export type {
+  EntityItemTrailing,
+  EntityItemTrailingSecondary,
+} from './lib/entity/item/entity-item-trailing.types'
+export { EntityItem } from './lib/entity/item/entity-item.client'
+export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row.client'
+export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row.client'
+export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client'
+export type { CatalogEntityPickerSheetProps } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client'
+export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/catalog-entity-row-renderer.client'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
   CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,

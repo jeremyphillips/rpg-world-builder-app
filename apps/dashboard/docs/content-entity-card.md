@@ -14,6 +14,22 @@ semantic trailing (`action` | `indicator` | `group`), and density.
 **Each visual concern has one owner.** When debugging inset, alignment, or chrome, ask
 which semantic layer owns the concern — see [Ownership hierarchy](#ownership-hierarchy).
 
+## Module layout (`lib/entity/`)
+
+```text
+summary/   — EntitySummaryModel, EntitySummary, projection, media
+item/      — EntityItem anatomy, leading rail, geometry tokens (→ anatomy/ in Phase B)
+surfaces/  — CEC, DEC, catalog rows; imports item/ + summary/ only via dependency direction
+  cards/content/     ContentEntityCard
+  cards/disclosure/  DisclosureEntityCard, DisclosureEntityCardHeader
+  catalog/           CatalogEntityRow, CatalogEntityPickerSheet
+```
+
+Dependency direction: `surfaces → item → summary`. `summary/` must not import `item/`;
+`item/` must not import `surfaces/`. Shared CSS var **names** live in
+`item/entity-geometry.tokens.ts`; surface CVA **values** live in
+`surfaces/entity-surface-inset.variants.ts`.
+
 ## Choose a surface
 
 | Need                                                                                   | Surface                                |
@@ -257,11 +273,11 @@ detail primitives may use `endSlot` for utility controls — that API does not a
 Entity-backed catalog pickers **must** use `CatalogEntityPickerSheet` → `CatalogEntityRow`.
 Raw `CatalogPickerSheet` remains for generic/non-entity catalogs only.
 
-| Layer                                          | Owns                                                                                                                     |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| CLI catalog shell                              | Border, background, hover footprint, structural `p-0`                                                                    |
-| `CatalogEntityRow` inset root                  | Entity inset CSS variables, content-offset when leading utilities present, header padding, optional disclosure body wash |
-| `EntityItem` / `EntityDisclosureHeaderAnatomy` | Three-column identity                                                                                                    |
+| Layer                                       | Owns                                                                                                                     |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| CLI catalog shell                           | Border, background, hover footprint, structural `p-0`                                                                    |
+| `CatalogEntityRow` inset root               | Entity inset CSS variables, content-offset when leading utilities present, header padding, optional disclosure body wash |
+| `EntityItem` / `DisclosureEntityCardHeader` | Three-column identity                                                                                                    |
 
 Features supply entity model, trailing semantics, and optional per-item `details` via
 `renderEntityRow` or `createCatalogEntityRowRenderer`. `rowLayout="entity-card"` is

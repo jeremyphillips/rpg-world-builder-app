@@ -6,7 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { buildLocationDetailViewModel } from '../../lib/location-display'
 import { HARBORFORD, LOCATIONS_LIST } from '../../fixtures'
 import { LocationDetailIdentity } from './location-detail-identity.client'
-import { ContentEntityCard } from '../../../lib/content-entity-card.client'
+import { ContentEntityCard } from '@/features/content'
 
 describe('LocationDetailIdentity', () => {
   it('renders identity rows and located-in links', () => {

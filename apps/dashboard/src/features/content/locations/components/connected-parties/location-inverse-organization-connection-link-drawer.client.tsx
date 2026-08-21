@@ -20,10 +20,7 @@ import {
   resolveCatalogPickerRowActionPhase,
 } from '@/features/character'
 
-import {
-  CatalogEntityPickerSheet,
-  createCatalogEntityRowRenderer,
-} from '../../../lib/content-entity-card.client'
+import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildOrganizationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import { EntityReplacementSection } from '../../../lib/entity-replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'

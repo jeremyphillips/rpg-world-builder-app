@@ -15,7 +15,7 @@ import {
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
 
-import { CatalogEntityPickerSheet, CatalogEntityRow } from '../../../lib/content-entity-card.client'
+import { CatalogEntityPickerSheet, CatalogEntityRow } from '@/features/content'
 
 import {
   buildConnectedPartyCharacterEntitySummary,

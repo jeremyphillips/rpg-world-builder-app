@@ -22,10 +22,7 @@ import {
   LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE,
   characterInverseSubjectHasAvailableKind,
 } from '../../../lib/relationship/location-connection/location-connection-drawer-intent'
-import {
-  CatalogEntityPickerSheet,
-  createCatalogEntityRowRenderer,
-} from '../../../lib/content-entity-card.client'
+import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildCharacterPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'
 import { toDrawerContextEntity } from '../../../lib/relationship/drawer/drawer-context.types'

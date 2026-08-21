@@ -10,7 +10,7 @@ import {
   type CreateWorkflowPanelStatus,
 } from '@/lib/create-flow'
 
-import { ContentEntityCard } from '../../../lib/content-entity-card.client'
+import { ContentEntityCard } from '@/features/content'
 import { DetailOverflowMenu } from '../../../lib/detail/row/detail-overflow-menu.client'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type {

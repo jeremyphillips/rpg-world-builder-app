@@ -13,7 +13,7 @@ import { Button, Text, toast } from '@rpg/ui'
 import { Plus } from 'lucide-react'
 
 import { DetailEntityRow } from '../../../lib/detail/row/detail-entity-row.client'
-import type { EntityItemTrailing } from '../../../lib/entity/entity-item-trailing.types'
+import type { EntityItemTrailing } from '../../../lib/entity/item/entity-item-trailing.types'
 import { DetailEntityRowActions } from '../../../lib/detail/row/detail-entity-row-actions.client'
 import {
   detailEntityRowDisclosurePreviewRowVariants,

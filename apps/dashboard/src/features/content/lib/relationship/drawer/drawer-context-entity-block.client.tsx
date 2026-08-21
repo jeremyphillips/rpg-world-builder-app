@@ -2,8 +2,8 @@
 
 import { cn } from '@rpg/ui'
 
-import { EntityItemAnatomy } from '../../entity/entity-item.client'
-import { projectEntitySummaryModel } from '../../entity/entity-summary-projection.lib'
+import { EntityItemAnatomy } from '../../entity/item/entity-item.client'
+import { projectEntitySummaryModel } from '../../entity/summary/entity-summary-projection.lib'
 import type { DrawerContextEntity } from './drawer-context.types'
 import { drawerContextEntityVariants } from './drawer-context.variants'
 

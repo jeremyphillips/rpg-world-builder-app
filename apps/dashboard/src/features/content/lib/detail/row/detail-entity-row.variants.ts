@@ -2,12 +2,12 @@ import { cva } from 'class-variance-authority'
 
 import { cn, iconGhostControlVariants } from '@rpg/ui'
 
-import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/entity-leading-rail.lib'
 import {
+  ENTITY_CONTENT_OFFSET_VAR,
   ENTITY_SURFACE_INLINE_END_VAR,
   ENTITY_SURFACE_INLINE_START_VAR,
-  entitySurfaceHorizontalInsetClasses,
-} from '../../entity/entity-surface-inset.variants'
+} from '../../entity/item/entity-geometry.tokens'
+import { entitySurfaceHorizontalInsetClasses } from '../../entity/surfaces/entity-surface-inset.variants'
 
 export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {
