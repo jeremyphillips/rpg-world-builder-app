@@ -1,4 +1,4 @@
-import { createElement } from 'react'
+import type { ReactElement } from 'react'
 import { z } from 'zod'
 import {
   ARMOR_CATEGORIES,
@@ -34,15 +34,13 @@ import {
   formatChooseContentTypePlaceholder,
   getContentTypeItemLabel,
 } from '../../content-type-labels'
-import { ProficiencyLinkedGrantRowCue } from '../../../classes/components/character-creation/proficiency-linked-grant-row-cue.client'
-import {
-  LINKED_PROFICIENCY_CHOICE_LABEL,
-  PROFICIENCY_LINK_GRANT_HINT,
-} from '../../../classes/lib/character-creation/class-character-creation-link-labels'
 import {
   EQUIPMENT_GRANT_ITEM_KIND_LABELS,
   EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
   EQUIPMENT_POOL_SOURCE_LABELS,
+  LINKED_PROFICIENCY_CHOICE_LABEL,
+  PROFICIENCY_LINK_GRANT_HINT,
+  PROFICIENCY_LINK_NO_ELIGIBLE_CHOICES_HINT,
 } from './equipment-grant-form-labels'
 
 /** Sentinel for “any category” in single-select pool category fields (Radix Select rejects `''`). */
@@ -307,6 +305,7 @@ export type GrantedEquipmentItemFieldsOptions = Pick<
   | 'allowProficiencyChoiceTarget'
   | 'itemKindOptions'
   | 'grantTargetSourceOptions'
+  | 'renderProficiencyLinkedGrantCue'
 >
 
 export function grantedEquipmentItemFields(
@@ -317,6 +316,7 @@ export function grantedEquipmentItemFields(
     guardVisibility: guard,
     allowProficiencyChoiceTarget = false,
     grantTargetSourceOptions: grantTargetSelectOptions = grantTargetSourceOptions,
+    renderProficiencyLinkedGrantCue,
   } = opts
   const equipmentOptions = referenceEquipmentFieldOptions(ctx.options?.equipment)
   const proficiencyChoiceOptions = ctx.options?.proficiencyChoiceTargets ?? []
@@ -346,14 +346,14 @@ export function grantedEquipmentItemFields(
           disabled: !hasEligibleProficiencyChoices,
           hint: hasEligibleProficiencyChoices
             ? PROFICIENCY_LINK_GRANT_HINT
-            : 'No eligible tool proficiency choices. Add a character-creation tool choice that selects exactly one tool.',
+            : PROFICIENCY_LINK_NO_ELIGIBLE_CHOICES_HINT,
           visibility: visibleForGrantTargetSource('proficiency_choice', guard),
         },
         {
           kind: 'slot',
           name: '_proficiencyLinkedGrantCue',
           visibility: visibleForGrantTargetSource('proficiency_choice', guard),
-          render: () => createElement(ProficiencyLinkedGrantRowCue),
+          render: () => renderProficiencyLinkedGrantCue?.() ?? null,
         },
       ]
     : []
@@ -522,6 +522,8 @@ export type EquipmentGrantItemFieldsOptions = {
   guardVisibility?: FieldVisibility
   /** Enables proficiency-linked grant targets for class starting equipment. */
   allowProficiencyChoiceTarget?: boolean
+  /** Class-specific link cue beneath proficiency-linked grant rows. */
+  renderProficiencyLinkedGrantCue?: () => ReactElement | null
 }
 
 export function equipmentGrantItemFields(
@@ -548,6 +550,7 @@ export function equipmentGrantItemFields(
       allowProficiencyChoiceTarget: opts.allowProficiencyChoiceTarget,
       itemKindOptions: itemKindSelectOptions,
       grantTargetSourceOptions: grantTargetSelectOptions,
+      renderProficiencyLinkedGrantCue: opts.renderProficiencyLinkedGrantCue,
     }),
     ...(opts.extraFields ?? []),
     ...equipmentChoiceGrantFields(ctx, guard),

@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-import { formatProficiencyChoiceOptionDescription } from './class-character-creation-link-labels'
+import { formatProficiencyChoiceOptionDescription } from '../../../lib/forms/grants/equipment-grant-form-labels'
 import { characterCreationProficienciesWithLiveToolLabel } from './class-character-creation-proficiencies-form-values'
 import type { CharacterCreationProficienciesForm } from './class-character-creation-proficiencies-form-fields'
 import { findProficiencyEquipmentReferences } from './class-proficiency-equipment-references.lib'

@@ -2,8 +2,9 @@
 
 import { useWatch } from 'react-hook-form'
 
+import { ProficiencyEquipmentLinkCue } from '../../../lib/forms/grants/proficiency-equipment-link-cue.client'
+import { formatProficiencyLinkEquipmentCue } from '../../../lib/forms/grants/equipment-grant-form-labels'
 import { CHARACTER_CREATION_TOOL_CHOICE_LABEL_PATH } from '../../lib/character-creation/class-character-creation-link-labels'
-import { ProficiencyEquipmentLinkCue } from './proficiency-equipment-link-cue.client'
 
 /** Link cue beneath proficiency-linked starting-equipment grant fields. */
 export function ProficiencyLinkedGrantRowCue() {
@@ -16,8 +17,8 @@ export function ProficiencyLinkedGrantRowCue() {
 
   return (
     <ProficiencyEquipmentLinkCue
-      variant="equipment"
-      choiceLabel={choiceLabel.trim()}
+      message={formatProficiencyLinkEquipmentCue(choiceLabel.trim())}
+      navigateLabel="View choice"
       onNavigate={() => {
         document
           .getElementById('class-character-creation-tool-proficiencies')

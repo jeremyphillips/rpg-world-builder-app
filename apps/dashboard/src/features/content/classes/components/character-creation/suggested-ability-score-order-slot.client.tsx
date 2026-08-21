@@ -7,7 +7,7 @@ import {
   type StandardArray,
 } from '@rpg/contracts'
 
-import type { ClassFormValues } from '../lib/class-form-fields'
+import type { ClassFormValues } from '../../lib/class-form-fields'
 import { SortableAbilityScoreOrder } from './sortable-ability-score-order.client'
 
 type SuggestedAbilityScoreOrderSlotProps = {

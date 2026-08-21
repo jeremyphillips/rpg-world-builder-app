@@ -30,8 +30,20 @@ The **Subclasses** tab uses a list + editor layout: subclasses load from the nes
 | Spell progression grid helpers       | `lib/progression-table-helpers.ts`                                                                                                                               |
 | Cantrip template presets (seed-only) | `lib/cantrips-profiles.ts`                                                                                                                                       |
 | Read-only progression table          | `components/class-progression-table.tsx`                                                                                                                         |
-| Detail feature list item             | `lib/feature-item.tsx`                                                                                                                                           |
+| Detail feature list item             | `components/class-feature-item.tsx`                                                                                                                              |
 | Display registry (detail + builder)  | `lib/class-display.ts` — labels and view models for detail route and builder sheet; join-dependent rendering (skill links, subclasses) stays in route components |
+
+## Components layout
+
+| Area                      | Path                                                                               |
+| ------------------------- | ---------------------------------------------------------------------------------- |
+| Form tab shells           | `components/class-*-tab.client.tsx` (root)                                         |
+| Detail sections           | `components/class-progression-table.tsx`, `class-proficiencies-section.client.tsx` |
+| Detail feature row        | `components/class-feature-item.tsx`                                                |
+| Character creation UI     | `components/character-creation/` — link cues, ability-score ordering               |
+| Subclass master-detail UI | `components/subclasses/` — list/editor panels, gates, delete dialog                |
+
+Proficiency-linked grant labels and the generic link cue live in [`content/lib/forms/grants/`](../../lib/forms/grants/). Class form paths and navigation targets stay in `lib/character-creation/class-character-creation-link-labels.ts`; the class-specific row cue is injected into shared grant fields via `renderProficiencyLinkedGrantCue`.
 
 `class-display.ts` owns intrinsic class data: stat rows, granted proficiencies, choice pool slugs, and features. The detail route joins skill proficiency records for linked choice labels and keeps subclasses and the progression table outside the view model. The builder sheet adapter (`buildClassDetailsSheetContent` in `apps/dashboard/src/features/character/lib/builder-class-option-display.lib.ts`) maps the same registry with `surface: 'builder-sheet'` — compact proficiency choice summaries with option-pool disclosure, level-1 features only.
 

@@ -7,7 +7,7 @@ import type {
 import { formatEquipmentGrantSentence, formatEquipmentPoolLabel } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-import { PROFICIENCY_LINK_SUMMARY } from '../../../classes/lib/character-creation/class-character-creation-link-labels'
+import { PROFICIENCY_LINK_SUMMARY } from './equipment-grant-form-labels'
 import { EQUIPMENT_POOL_CATEGORY_ANY } from './equipment-grant-form-fields'
 import type {
   EquipmentGrantChoiceItemForm,

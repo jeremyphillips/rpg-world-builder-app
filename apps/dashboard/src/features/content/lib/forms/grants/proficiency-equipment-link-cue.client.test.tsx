@@ -5,30 +5,15 @@ import userEvent from '@testing-library/user-event'
 import { ProficiencyEquipmentLinkCue } from './proficiency-equipment-link-cue.client'
 
 describe('ProficiencyEquipmentLinkCue', () => {
-  it('renders equipment variant copy with the referenced choice label', () => {
+  it('renders the provided message', () => {
     render(
       <ProficiencyEquipmentLinkCue
-        variant="equipment"
-        choiceLabel="Artisan's Tools or Musical Instrument"
+        message={'Linked to "Artisan\'s Tools or Musical Instrument" below'}
       />,
     )
 
     expect(
       screen.getByText('Linked to "Artisan\'s Tools or Musical Instrument" below'),
-    ).toBeInTheDocument()
-  })
-
-  it('renders proficiency variant copy with the package label', () => {
-    render(
-      <ProficiencyEquipmentLinkCue
-        variant="proficiency"
-        choiceLabel="Artisan's Tools or Musical Instrument"
-        packageLabel="Standard Equipment"
-      />,
-    )
-
-    expect(
-      screen.getByText('The selected tool is also granted by the Standard Equipment option.'),
     ).toBeInTheDocument()
   })
 
@@ -38,9 +23,9 @@ describe('ProficiencyEquipmentLinkCue', () => {
 
     render(
       <ProficiencyEquipmentLinkCue
-        variant="equipment"
-        choiceLabel="Artisan's Tools or Musical Instrument"
+        message={'Linked to "Artisan\'s Tools or Musical Instrument" below'}
         onNavigate={onNavigate}
+        navigateLabel="View choice"
       />,
     )
 

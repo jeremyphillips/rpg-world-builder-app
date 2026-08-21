@@ -2,8 +2,8 @@
 
 import { UsageReferencesQuerySection } from '@/lib/usage-references/usage-references-query-section.client'
 
-import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
-import { useSubclassEntryUsage } from '../hooks/use-subclass-entry-usage'
+import { isDraftSubclassId } from '../../lib/subclasses/subclass-editor-constants'
+import { useSubclassEntryUsage } from '../../hooks/use-subclass-entry-usage'
 
 export type SubclassUsageReferencesSectionProps = {
   campaignId: string

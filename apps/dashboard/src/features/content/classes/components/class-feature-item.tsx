@@ -1,6 +1,6 @@
 import { Heading, RichTextContent } from '@rpg/ui'
 
-type FeatureItemProps = {
+type ClassFeatureItemProps = {
   feature: {
     level: number
     name: string
@@ -16,7 +16,7 @@ function hasFeatureDescription(description: string | undefined): description is 
   return description !== undefined && description.trim() !== ''
 }
 
-export function FeatureItem({ feature }: FeatureItemProps) {
+export function ClassFeatureItem({ feature }: ClassFeatureItemProps) {
   const heading = featureHeading(feature.level, feature.name)
 
   return (

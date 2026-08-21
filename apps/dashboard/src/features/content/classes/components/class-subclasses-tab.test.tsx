@@ -24,7 +24,7 @@ vi.mock('../hooks/use-subclass-mutations', () => ({
   }),
 }))
 
-vi.mock('./subclass-editor-panel.client', () => ({
+vi.mock('./subclasses/subclass-editor-panel.client', () => ({
   SubclassEditorPanel: ({ onDeleteRequest }: { onDeleteRequest: () => void }) => (
     <div>
       <button type="button" onClick={onDeleteRequest}>

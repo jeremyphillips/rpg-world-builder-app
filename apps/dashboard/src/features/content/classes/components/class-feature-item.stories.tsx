@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
 
-import { FeatureItem } from './feature-item'
+import { ClassFeatureItem } from './class-feature-item'
 
 const meta = {
-  title: 'Content/FeatureItem',
-  component: FeatureItem,
+  title: 'Content/ClassFeatureItem',
+  component: ClassFeatureItem,
   parameters: { layout: 'padded' },
   decorators: [
     (Story) => (
@@ -14,7 +14,7 @@ const meta = {
       </ul>
     ),
   ],
-} satisfies Meta<typeof FeatureItem>
+} satisfies Meta<typeof ClassFeatureItem>
 
 export default meta
 type Story = StoryObj<typeof meta>

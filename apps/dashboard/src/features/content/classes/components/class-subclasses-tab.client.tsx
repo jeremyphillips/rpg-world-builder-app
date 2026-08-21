@@ -39,10 +39,10 @@ import {
   SubclassCreateGate,
   SubclassEmptySelectionGate,
   SubclassLoadingGate,
-} from './class-subclasses-tab-gates'
-import { SubclassEditorPanel } from './subclass-editor-panel.client'
-import { SubclassListPanel } from './subclass-list-panel.client'
-import { SubclassDeleteDialog } from './subclass-delete-dialog.client'
+} from './subclasses/class-subclasses-tab-gates'
+import { SubclassEditorPanel } from './subclasses/subclass-editor-panel.client'
+import { SubclassListPanel } from './subclasses/subclass-list-panel.client'
+import { SubclassDeleteDialog } from './subclasses/subclass-delete-dialog.client'
 import { useSubclassesUsageMeta } from '../hooks/use-subclasses'
 
 export interface ClassSubclassesTabProps {

@@ -3,32 +3,18 @@
 import { Link } from 'lucide-react'
 import { Button, Text } from '@rpg/ui'
 
-import {
-  formatProficiencyLinkEquipmentCue,
-  formatProficiencyLinkProficiencyCue,
-} from '../../lib/character-creation/class-character-creation-link-labels'
-
 export type ProficiencyEquipmentLinkCueProps = {
-  variant: 'equipment' | 'proficiency'
-  choiceLabel: string
-  packageLabel?: string
+  message: string
   onNavigate?: () => void
+  navigateLabel?: string
 }
 
 export function ProficiencyEquipmentLinkCue({
-  variant,
-  choiceLabel,
-  packageLabel,
+  message,
   onNavigate,
+  navigateLabel = 'View',
 }: ProficiencyEquipmentLinkCueProps) {
-  const message =
-    variant === 'equipment'
-      ? formatProficiencyLinkEquipmentCue(choiceLabel)
-      : packageLabel
-        ? formatProficiencyLinkProficiencyCue(packageLabel)
-        : ''
-
-  if (!message) return null
+  if (!message.trim()) return null
 
   return (
     <div className="flex items-start gap-2">
@@ -45,7 +31,7 @@ export function ProficiencyEquipmentLinkCue({
             className="h-auto p-0"
             onClick={onNavigate}
           >
-            {variant === 'equipment' ? 'View choice' : 'View grant'}
+            {navigateLabel}
           </Button>
         ) : null}
       </div>

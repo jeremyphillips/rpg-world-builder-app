@@ -2,19 +2,19 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
-import { FeatureItem } from './feature-item'
+import { ClassFeatureItem } from './class-feature-item'
 
-function renderFeatureItem(feature: Parameters<typeof FeatureItem>[0]['feature']) {
+function renderClassFeatureItem(feature: Parameters<typeof ClassFeatureItem>[0]['feature']) {
   return render(
     <ul>
-      <FeatureItem feature={feature} />
+      <ClassFeatureItem feature={feature} />
     </ul>,
   )
 }
 
-describe('FeatureItem', () => {
+describe('ClassFeatureItem', () => {
   it('renders an h4 heading and body on separate blocks for a single-paragraph feature', () => {
-    renderFeatureItem({
+    renderClassFeatureItem({
       level: 5,
       name: 'Extra Attack',
       description:
@@ -28,7 +28,7 @@ describe('FeatureItem', () => {
   })
 
   it('renders an h4 heading and multiple body paragraphs', () => {
-    renderFeatureItem({
+    renderClassFeatureItem({
       level: 2,
       name: 'Fighting Style',
       description:
@@ -43,7 +43,7 @@ describe('FeatureItem', () => {
   })
 
   it('renders heading-only features without a body', () => {
-    renderFeatureItem({
+    renderClassFeatureItem({
       level: 19,
       name: 'Epic Boon',
     })
@@ -53,7 +53,7 @@ describe('FeatureItem', () => {
   })
 
   itAxe('has no axe accessibility violations for a single-paragraph feature', async () => {
-    const { container } = renderFeatureItem({
+    const { container } = renderClassFeatureItem({
       level: 3,
       name: 'Bonus Proficiencies',
       description: '<p>You gain proficiency with three skills of your choice.</p>',
@@ -62,7 +62,7 @@ describe('FeatureItem', () => {
   })
 
   itAxe('has no axe accessibility violations for a multi-paragraph feature', async () => {
-    const { container } = renderFeatureItem({
+    const { container } = renderClassFeatureItem({
       level: 1,
       name: 'Spellcasting',
       description:
@@ -72,7 +72,7 @@ describe('FeatureItem', () => {
   })
 
   itAxe('has no axe accessibility violations for a heading-only feature', async () => {
-    const { container } = renderFeatureItem({
+    const { container } = renderClassFeatureItem({
       level: 19,
       name: 'Epic Boon',
     })

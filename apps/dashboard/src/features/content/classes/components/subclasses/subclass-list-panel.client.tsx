@@ -5,8 +5,8 @@ import { Trash2 } from 'lucide-react'
 import {
   isSubclassDeletable,
   UNTITLED_SUBCLASS_LABEL,
-} from '../lib/subclasses/subclass-editor-constants'
-import type { SubclassListItem } from '../lib/subclasses/subclass-editor-state'
+} from '../../lib/subclasses/subclass-editor-constants'
+import type { SubclassListItem } from '../../lib/subclasses/subclass-editor-state'
 
 export interface SubclassListPanelProps {
   items: SubclassListItem[]

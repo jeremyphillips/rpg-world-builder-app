@@ -32,18 +32,17 @@ import {
   EQUIPMENT_GRANT_ITEM_KINDS,
 } from '../../../lib/forms/grants/equipment-grant-form-fields'
 import {
+  INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
   STARTING_EQUIPMENT_GRANT_ITEM_KIND_LABELS,
   STARTING_EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
 } from '../../../lib/forms/grants/equipment-grant-form-labels'
-import {
-  INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
-  STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
-} from './class-character-creation-link-labels'
+import { STARTING_EQUIPMENT_ITEM_TYPE_LABEL } from './class-character-creation-link-labels'
 import {
   STARTING_EQUIPMENT_CHOICE_COPY,
   STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX,
   STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX,
 } from './class-starting-equipment-form-labels'
+import { ProficiencyLinkedGrantRowCue } from '../../components/character-creation/proficiency-linked-grant-row-cue.client'
 import {
   equipmentGrantTitle,
   equipmentGrantSummary,
@@ -278,6 +277,7 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
     itemKindOptions: startingEquipmentItemKindOptions,
     grantTargetSourceOptions: startingEquipmentGrantTargetSourceOptions,
     extraFields: startingEquipmentModifierFields(),
+    renderProficiencyLinkedGrantCue: () => createElement(ProficiencyLinkedGrantRowCue),
   })
 }
 

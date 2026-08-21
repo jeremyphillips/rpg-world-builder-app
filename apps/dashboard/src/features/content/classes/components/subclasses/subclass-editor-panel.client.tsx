@@ -7,18 +7,21 @@ import { FormItems, makeResolver } from '@rpg/ui/form'
 import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import { CampaignAccessSection } from '../../lib/campaign-access/campaign-access-section.client'
-import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context.client'
+import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import { CampaignAccessSection } from '../../../lib/campaign-access/campaign-access-section.client'
+import { useCampaignAccessForm } from '../../../lib/campaign-access/campaign-access-form-context.client'
 import { SubclassUsageReferencesSection } from './subclass-usage-references-section.client'
-import { ContentEditHeadingBadges } from '../../lib/campaign-access/content-edit-heading-badges.client'
-import { isDraftSubclassId, isSubclassDeletable } from '../lib/subclasses/subclass-editor-constants'
+import { ContentEditHeadingBadges } from '../../../lib/campaign-access/content-edit-heading-badges.client'
+import {
+  isDraftSubclassId,
+  isSubclassDeletable,
+} from '../../lib/subclasses/subclass-editor-constants'
 import {
   buildSubclassFields,
   type SubclassFormValues,
-} from '../lib/subclasses/subclass-form-fields'
-import { isSubclassFormValuesLike } from '../lib/subclasses/subclass-form-value-snapshot'
-import { subclassFormDef } from '../lib/subclasses/subclass-form-values'
+} from '../../lib/subclasses/subclass-form-fields'
+import { isSubclassFormValuesLike } from '../../lib/subclasses/subclass-form-value-snapshot'
+import { subclassFormDef } from '../../lib/subclasses/subclass-form-values'
 
 export interface SubclassEditorPanelProps {
   subclassId: string
