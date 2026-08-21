@@ -7,7 +7,7 @@ export {
   createTabDiscoveryListClasses as buildingOrganizationsDiscoveryListClasses,
   createTabIntroClasses as buildingOrganizationsTabIntroClasses,
   createTabPanelStackClasses as buildingOrganizationsCreateTabClasses,
-} from '@/lib/create-flow/create-tab-content.variants'
+} from '@/lib/create-flow'
 
 export const buildingOrganizationsIssueListClasses = cn(
   'list-disc space-y-1 pl-5 text-sm text-destructive',

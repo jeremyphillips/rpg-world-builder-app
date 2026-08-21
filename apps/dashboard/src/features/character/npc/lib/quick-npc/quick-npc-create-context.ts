@@ -6,7 +6,7 @@ import type {
   OrganizationPractice,
 } from '@rpg/contracts'
 
-import type { ContentCreateContext } from '@/lib/create-flow/content-create-context'
+import type { ContentCreateContext } from '@/lib/create-flow'
 
 export const QUICK_NPC_CREATE_SUBMIT_LABEL = 'Create NPC' as const
 

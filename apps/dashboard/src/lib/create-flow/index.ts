@@ -8,7 +8,7 @@ export {
   type CreatedContentResult,
   type OnContentCreated,
   invokeOnContentCreated,
-} from './created-content-result.types'
+} from './created-content-result.lib'
 export {
   NestedCreateHandoffError,
   formatNestedCreateHandoffFailure,

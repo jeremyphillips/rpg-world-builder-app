@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { CreatedContentResult } from './created-content-result.types'
+import type { CreatedContentResult } from './created-content-result.lib'
 
 describe('CreatedContentResult contract', () => {
   it('accepts organization, location, and npc nested-create payloads', () => {

@@ -5,6 +5,29 @@ Dashboard create workflows compose under `apps/dashboard/src/lib/create-flow`.
 and optional relationship-draft presentation — not domain forms, persistence, or
 relationship vocabulary.
 
+## Directory layout
+
+This library stays flat under `src/lib/create-flow/`. Filename prefixes group
+concerns — see the colocated README for a placement map.
+
+**Re-evaluate** (re-run the directory organization audit) when:
+
+- another substantial primitive family appears;
+- existing filename families become difficult to browse predictably; or
+- one current family grows into a materially crowded cluster that would benefit from its own boundary.
+
+Soft signals (review triggers, not split rules):
+
+- ~35+ implementation files — worth revisiting, not automatic grounds to subdivide;
+- multiple files cannot be located predictably by prefix;
+- one family grows into a substantial independent cluster;
+- new work repeatedly creates cross-family imports within this directory.
+
+When splitting becomes warranted, likely candidate families include modal shell,
+composition presentation, and add/pending workflow — but **re-run the audit before
+locking folder membership**. Do not assume all tab-spacing, form-density, or handoff
+modules belong in the same subfolder as modal shell without evidence.
+
 Building create-flow Phases 7–8 are **closed**. Remaining Building taxonomy work is planned in
 [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md).
 
@@ -197,7 +220,7 @@ Scoped structural tests (Building composer) and
 ## OnContentCreated handoff
 
 Create modals and nested picker flows share a post-persist callback contract in
-[`created-content-result.types.ts`](../src/lib/create-flow/created-content-result.types.ts).
+[`created-content-result.lib.ts`](../src/lib/create-flow/created-content-result.lib.ts).
 
 | Step                     | Behavior                                                                                                                  |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |

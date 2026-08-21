@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { ContentCreateContext } from '@/lib/create-flow/content-create-context'
+import type { ContentCreateContext } from '@/lib/create-flow'
 
 import { resolveLocationCreateAuthoringCapabilities } from './location-create-authoring-capabilities.lib'
 

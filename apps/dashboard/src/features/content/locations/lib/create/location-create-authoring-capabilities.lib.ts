@@ -1,4 +1,4 @@
-import type { ContentCreateContext } from '@/lib/create-flow/content-create-context'
+import type { ContentCreateContext } from '@/lib/create-flow'
 
 import type { LocationAuthoringType } from '../location-authoring-type'
 
