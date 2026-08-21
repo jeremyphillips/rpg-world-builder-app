@@ -1,11 +1,6 @@
 'use client'
 
-import {
-  type Equipment,
-  type CharacterBuildCatalogIndex,
-  type CharacterBuildContext,
-  type CharacterBuilderDraft,
-} from '@rpg/contracts'
+import { type Equipment } from '@rpg/contracts'
 
 import {
   buildEquipmentDetailViewModel,
@@ -25,6 +20,7 @@ import {
 } from './equipment-picker-item-details.lib'
 import type {
   EquipmentBudgetSummary,
+  EquipmentPickerDrawerProps,
   EquipmentPickerItemState,
 } from '../drawer/equipment-picker-drawer.types'
 import {
@@ -50,11 +46,8 @@ export type EquipmentPickerItemDetailsProps = {
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
   rowActionVm?: EquipmentPickerRowActionViewModel
   manageSources?: EquipmentPickerGrantManageSource
-  draft?: CharacterBuilderDraft
-  context?: CharacterBuildContext
-  catalogIndex?: CharacterBuildCatalogIndex
+  grantAcquisitionContext?: EquipmentPickerDrawerProps['grantAcquisitionContext']
   onApplyMagicItemAcquisition?: (requestedQuantity: number) => boolean
-  onApplyPurchase?: (requestedQuantity: number) => void
   onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
 }
@@ -74,11 +67,8 @@ export function EquipmentPickerItemDetails({
   characterPreviewContext,
   rowActionVm,
   manageSources,
-  draft,
-  context,
-  catalogIndex,
+  grantAcquisitionContext,
   onApplyMagicItemAcquisition,
-  onApplyPurchase,
   onReleaseGrant,
   onRemovePurchase,
 }: EquipmentPickerItemDetailsProps) {
@@ -123,9 +113,7 @@ export function EquipmentPickerItemDetails({
           equipment={equipment}
           rowActionVm={rowActionVm}
           manageSources={manageSources}
-          draft={draft}
-          context={context}
-          catalogIndex={catalogIndex}
+          grantAcquisitionContext={grantAcquisitionContext}
           budget={budget}
           purchaseViewModel={purchaseViewModel}
           grantViewModel={grantViewModel}
@@ -135,7 +123,6 @@ export function EquipmentPickerItemDetails({
           onAddQuantityChange={onAddQuantityChange}
           onCommit={onCommit}
           onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
-          onApplyPurchase={onApplyPurchase}
           onReleaseGrant={onReleaseGrant}
           onRemovePurchase={onRemovePurchase}
           onRemoveFromInventory={onRemoveFromInventory}

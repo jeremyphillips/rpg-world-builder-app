@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, type ComponentProps } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import {
   applyEquipmentStepAction,
@@ -19,7 +19,7 @@ import {
   type EquipmentPickerWorkflowMode,
 } from '../lib/equipment/equipment-step.lib'
 import { buildEquipmentPickerRowActionViewModel } from '../components/equipment/picker/equipment-picker-action.lib'
-import type { EquipmentPickerDrawer } from '../components/equipment/picker/drawer/equipment-picker-drawer.client'
+import type { EquipmentPickerItem } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 
 export function useEquipmentPickerAcquisition(args: {
@@ -28,11 +28,22 @@ export function useEquipmentPickerAcquisition(args: {
   catalogIndex: CharacterBuildCatalogIndex
   budget?: EquipmentBudgetSummary
   showBudget: boolean
+  workflowMode: EquipmentPickerWorkflowMode
   focusedAllowanceId?: string
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
+  onFallbackAdd?: (item: EquipmentPickerItem, quantity: number) => void
 }) {
-  const { draft, context, catalogIndex, budget, showBudget, focusedAllowanceId, onDraftChange } =
-    args
+  const {
+    draft,
+    context,
+    catalogIndex,
+    budget,
+    showBudget,
+    workflowMode,
+    focusedAllowanceId,
+    onDraftChange,
+    onFallbackAdd,
+  } = args
 
   const acquisitionContext = useMemo(
     () =>
@@ -98,10 +109,8 @@ export function useEquipmentPickerAcquisition(args: {
     [draft],
   )
 
-  const handleApplyMagicItemAcquisition: NonNullable<
-    ComponentProps<typeof EquipmentPickerDrawer>['onApplyMagicItemAcquisition']
-  > = useCallback(
-    ({ equipmentId, requestedQuantity }) => {
+  const handleApplyMagicItemAcquisition = useCallback(
+    ({ equipmentId, requestedQuantity }: { equipmentId: string; requestedQuantity: number }) => {
       const result = applyEquipmentAction({
         kind: 'acquire_magic_item',
         equipmentId,
@@ -112,10 +121,8 @@ export function useEquipmentPickerAcquisition(args: {
     [applyEquipmentAction],
   )
 
-  const handleApplyPurchase: NonNullable<
-    ComponentProps<typeof EquipmentPickerDrawer>['onApplyPurchase']
-  > = useCallback(
-    ({ equipmentId, requestedQuantity }) => {
+  const handleApplyPurchase = useCallback(
+    ({ equipmentId, requestedQuantity }: { equipmentId: string; requestedQuantity: number }) => {
       if (!showBudget) return
 
       applyEquipmentAction({
@@ -127,10 +134,16 @@ export function useEquipmentPickerAcquisition(args: {
     [applyEquipmentAction, showBudget],
   )
 
-  const handleReleaseGrant: NonNullable<
-    ComponentProps<typeof EquipmentPickerDrawer>['onReleaseGrant']
-  > = useCallback(
-    ({ allowanceId, equipmentId, quantity }) => {
+  const handleReleaseGrant = useCallback(
+    ({
+      allowanceId,
+      equipmentId,
+      quantity,
+    }: {
+      allowanceId: string
+      equipmentId: string
+      quantity: number
+    }) => {
       applyEquipmentAction({
         kind: 'release_magic_item_grant',
         allowanceId,
@@ -141,10 +154,8 @@ export function useEquipmentPickerAcquisition(args: {
     [applyEquipmentAction],
   )
 
-  const handleRemovePurchase: NonNullable<
-    ComponentProps<typeof EquipmentPickerDrawer>['onRemovePurchase']
-  > = useCallback(
-    ({ purchaseId, quantity }) => {
+  const handleRemovePurchase = useCallback(
+    ({ purchaseId, quantity }: { purchaseId: string; quantity: number }) => {
       applyEquipmentAction({
         kind: 'remove_purchase_quantity',
         purchaseId,
@@ -154,6 +165,26 @@ export function useEquipmentPickerAcquisition(args: {
     [applyEquipmentAction],
   )
 
+  const handleCommitAdd = useCallback(
+    (item: EquipmentPickerItem, quantity: number): boolean | void => {
+      if (workflowMode === 'magic_items') {
+        return handleApplyMagicItemAcquisition({
+          equipmentId: item.equipment.id,
+          requestedQuantity: quantity,
+        })
+      }
+
+      if (showBudget) {
+        handleApplyPurchase({ equipmentId: item.equipment.id, requestedQuantity: quantity })
+        return true
+      }
+
+      onFallbackAdd?.(item, quantity)
+      return true
+    },
+    [handleApplyMagicItemAcquisition, handleApplyPurchase, onFallbackAdd, showBudget, workflowMode],
+  )
+
   return {
     resolveRowActionViewModel,
     resolveGrantManageSources,
@@ -161,5 +192,6 @@ export function useEquipmentPickerAcquisition(args: {
     handleApplyPurchase,
     handleReleaseGrant,
     handleRemovePurchase,
+    handleCommitAdd,
   }
 }

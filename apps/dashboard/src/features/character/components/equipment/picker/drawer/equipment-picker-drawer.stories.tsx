@@ -31,7 +31,7 @@ export const Default: Story = {
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: false,
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
   render: function Render(args) {
     const [open, setOpen] = useState(args.open)
@@ -54,7 +54,7 @@ export const DefaultPathAffordableNow: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: true,
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
 }
 
@@ -65,7 +65,7 @@ export const LowRemainingBudget: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: false,
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
 }
 
@@ -76,7 +76,7 @@ export const HideUnaffordable: Story = {
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: true,
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
 }
 
@@ -88,7 +88,7 @@ export const HideNonProficient: Story = {
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: false,
     filterOutNonProficient: true,
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
 }
 
@@ -107,7 +107,7 @@ export const CharacterPreview: Story = {
       equippedArmor: [],
       budget: equipmentPickerBudgetFixture,
     },
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
 }
 
@@ -119,7 +119,7 @@ export const ClearFilters: Story = {
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: false,
     toolbarResetMode: 'clear_filters',
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
 }
 
@@ -130,7 +130,7 @@ export const SortByPrice: Story = {
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
     filterOutUnaffordable: false,
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
 }
 
@@ -141,7 +141,7 @@ export const OwnedStackable: Story = {
     items: [equipmentPickerItemsFixture[2]!],
     budget: equipmentPickerBudgetFixture,
     ownedPurchaseQuantities: { [equipmentPickerRopeFixture.id]: 2 },
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
   parameters: {
     docs: {
@@ -162,6 +162,6 @@ export const MagicItemsWorkflow: Story = {
     magicItemGrantProgress: equipmentPickerMagicItemProgressFixture,
     onWorkflowModeChange: () => undefined,
     onFocusedAllowanceIdChange: () => undefined,
-    onAddItem: () => undefined,
+    onCommitAdd: () => undefined,
   },
 }

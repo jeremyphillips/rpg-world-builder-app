@@ -183,18 +183,19 @@ export type EquipmentPickerDrawerProps = {
     requestedQuantity: number
   }) => EquipmentPickerRowActionViewModel
   resolveGrantManageSources?: (equipmentId: string) => EquipmentPickerGrantManageSource
-  draft?: CharacterBuilderDraft
-  context?: CharacterBuildContext
-  catalogIndex?: CharacterBuildCatalogIndex
+  /** Pass-through for grant/acquisition panel until Phase 3b weans shared acquisition UI off draft. */
+  grantAcquisitionContext?: {
+    draft: CharacterBuilderDraft
+    context: CharacterBuildContext
+    catalogIndex: CharacterBuildCatalogIndex
+  }
+  onCommitAdd: (item: EquipmentPickerItem, quantity: number) => boolean | void
   onApplyMagicItemAcquisition?: (args: {
     equipmentId: string
     requestedQuantity: number
   }) => boolean
-  onApplyPurchase?: (args: { equipmentId: string; requestedQuantity: number }) => void
   onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
   onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
-  onAddItem: (item: EquipmentPickerItem, quantity: number) => void
-  onAddPartialItem?: (item: EquipmentPickerItem, quantity: number) => void
   onRemoveFromInventory?: (item: EquipmentPickerItem) => void
   onRemoveOneFromInventory?: (item: EquipmentPickerItem) => void
 }

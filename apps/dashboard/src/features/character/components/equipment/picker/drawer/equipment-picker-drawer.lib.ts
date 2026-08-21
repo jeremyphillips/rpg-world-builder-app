@@ -7,7 +7,6 @@ import {
   formatWealthAsGold,
   isEquipmentPickerSupportedKind,
   moneyToCopper,
-  type CharacterBuilderDraft,
   type CharacterWealth,
   type EquipmentPickerBrowseSortContext,
   type EquipmentPickerSupportedKind,
@@ -21,10 +20,7 @@ import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import { assembleEquipmentPickerSearchDocument } from '../../../../lib/equipment/equipment-picker-search.lib'
 
-import {
-  resolveEquipmentOwnedQuantity,
-  type EquipmentPickerWorkflowMode,
-} from '../../../../lib/equipment/equipment-step.lib'
+import { type EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
   resolveEquipmentPickerPurchaseActionState,
   type EquipmentPickerAvailabilityOptions,
@@ -484,14 +480,12 @@ export function getEquipmentPickerDisabledNote(
 export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
   item: EquipmentPickerItem
   workflowMode: EquipmentPickerWorkflowMode
-  draft?: CharacterBuilderDraft
+  ownedQuantity?: number
   rowActionVm?: EquipmentPickerRowActionViewModel
   budget?: EquipmentBudgetSummary
 }): EquipmentPickerItemPresentation {
   const row = buildEquipmentPickerRowViewModel(args.item.equipment)
-  const ownedQuantity = args.draft
-    ? resolveEquipmentOwnedQuantity({ equipmentId: args.item.equipment.id, draft: args.draft })
-    : 0
+  const ownedQuantity = args.ownedQuantity ?? 0
 
   if (!args.rowActionVm) {
     if (args.workflowMode === 'purchase') {

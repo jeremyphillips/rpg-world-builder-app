@@ -50,7 +50,7 @@ describe('EquipmentPickerDrawer', () => {
         items={[equipmentPickerItemsFixture[1]!]}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -71,7 +71,7 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -106,7 +106,7 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[plateArmor]}
         budget={equipmentPickerBudgetFixture}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -141,7 +141,7 @@ describe('EquipmentPickerDrawer', () => {
         items={[plateArmor, equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -159,7 +159,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -175,7 +175,7 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerDefaultPathItemsFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -194,7 +194,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -219,7 +219,7 @@ describe('EquipmentPickerDrawer', () => {
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
         toolbarResetMode="clear_filters"
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -259,7 +259,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -281,7 +281,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -320,7 +320,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -352,7 +352,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -370,7 +370,7 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -389,7 +389,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -403,7 +403,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -414,7 +414,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -423,7 +423,7 @@ describe('EquipmentPickerDrawer', () => {
 
   it('keeps added rows visible after quick-add', async () => {
     const user = userEvent.setup()
-    const onAddItem = vi.fn()
+    const onCommitAdd = vi.fn()
     const cheapGear = equipmentPickerDefaultPathItemsFixture[0]!
 
     render(
@@ -434,20 +434,20 @@ describe('EquipmentPickerDrawer', () => {
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
         ownedPurchaseQuantities={{}}
-        onAddItem={onAddItem}
+        onCommitAdd={onCommitAdd}
       />,
     )
 
     const list = screen.getByRole('list')
     await user.click(within(list).getAllByRole('button', { name: 'Add' })[0]!)
 
-    expect(onAddItem).toHaveBeenCalledWith(cheapGear, 1)
+    expect(onCommitAdd).toHaveBeenCalledWith(cheapGear, 1)
     expect(screen.getByText('Cheap Gear')).toBeInTheDocument()
   })
 
   it('quick-adds quantity 1 from the header rail', async () => {
     const user = userEvent.setup()
-    const onAddItem = vi.fn()
+    const onCommitAdd = vi.fn()
 
     render(
       <EquipmentPickerDrawer
@@ -455,19 +455,19 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
-        onAddItem={onAddItem}
+        onCommitAdd={onCommitAdd}
       />,
     )
 
     const ropeRow = equipmentPickerItemsFixture[2]!
 
     await user.click(screen.getByRole('button', { name: 'Add' }))
-    expect(onAddItem).toHaveBeenCalledWith(ropeRow, 1)
+    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow, 1)
   })
 
   it('commits purchase quantity from the expanded body', async () => {
     const user = userEvent.setup()
-    const onAddItem = vi.fn()
+    const onCommitAdd = vi.fn()
 
     render(
       <EquipmentPickerDrawer
@@ -475,7 +475,7 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
-        onAddItem={onAddItem}
+        onCommitAdd={onCommitAdd}
       />,
     )
 
@@ -484,12 +484,12 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('button', { name: 'Expand Rope' }))
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
 
-    expect(onAddItem).toHaveBeenCalledWith(ropeRow, 1)
+    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow, 1)
   })
 
   it('commits purchase quantity greater than one for stackable gear', async () => {
     const user = userEvent.setup()
-    const onAddItem = vi.fn()
+    const onCommitAdd = vi.fn()
 
     render(
       <EquipmentPickerDrawer
@@ -497,7 +497,7 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[2]!]}
         budget={equipmentPickerBudgetFixture}
-        onAddItem={onAddItem}
+        onCommitAdd={onCommitAdd}
       />,
     )
 
@@ -508,12 +508,12 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rope' }))
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
 
-    expect(onAddItem).toHaveBeenCalledWith(ropeRow, 3)
+    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow, 3)
   })
 
   it('shows owned quantity badge and Add for owned stackables', async () => {
     const user = userEvent.setup()
-    const onAddItem = vi.fn()
+    const onCommitAdd = vi.fn()
     const ropeRow = equipmentPickerItemsFixture[2]!
 
     render(
@@ -523,14 +523,14 @@ describe('EquipmentPickerDrawer', () => {
         items={[ropeRow]}
         budget={equipmentPickerBudgetFixture}
         ownedPurchaseQuantities={{ [ropeRow.equipment.id]: 2 }}
-        onAddItem={onAddItem}
+        onCommitAdd={onCommitAdd}
       />,
     )
 
     const addButton = screen.getByRole('button', { name: 'Add' })
     expect(addButton.parentElement).toHaveTextContent('2')
     await user.click(addButton)
-    expect(onAddItem).toHaveBeenCalledWith(ropeRow, 1)
+    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow, 1)
   })
 
   it('wires remove handlers from the expanded owned stackable body', async () => {
@@ -546,7 +546,7 @@ describe('EquipmentPickerDrawer', () => {
         items={[ropeRow]}
         budget={equipmentPickerBudgetFixture}
         ownedPurchaseQuantities={{ [ropeRow.equipment.id]: 2 }}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
         onRemoveFromInventory={onRemoveFromInventory}
         onRemoveOneFromInventory={onRemoveOneFromInventory}
       />,
@@ -574,7 +574,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         ownedPurchaseQuantities={{ [longsword.equipment.id]: 1 }}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -638,7 +638,7 @@ describe('EquipmentPickerDrawer', () => {
         items={[...equipmentPickerItemsFixture, ...unsupportedItems]}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -662,7 +662,7 @@ describe('EquipmentPickerDrawer', () => {
         workflowMode="magic_items"
         magicItemGrantProgress={equipmentPickerMagicItemProgressFixture}
         onFocusedAllowanceIdChange={onFocusedAllowanceIdChange}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 
@@ -685,7 +685,7 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
         filterOutUnaffordable={false}
-        onAddItem={vi.fn()}
+        onCommitAdd={vi.fn()}
       />,
     )
 

@@ -232,7 +232,7 @@ Step bodies render `BuilderStepReadinessPanel` from readiness `message` /
 
 Collapsed catalog picker headers use **resolver-owned compact summaries** in
 `@rpg/contracts`. Dashboard maps those objects to structured `metadataLines` via
-`apps/dashboard/.../picker/catalog-picker-metadata/` (presentation only — badge
+`apps/dashboard/.../picker/metadata/` (presentation only — badge
 tone, segment layout). Do not rebuild summaries from raw catalog entities in UI.
 
 | Domain    | Builder                               | Resolver field    | Contracts module                                                                 |

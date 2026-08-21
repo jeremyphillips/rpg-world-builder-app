@@ -14,8 +14,18 @@ Resolver catalog: [character-builder-resolvers.md](../../../packages/contracts/d
 | Spells        | `components/spells/picker/spell-picker-drawer.client.tsx`               | `spells/picker/spell-picker-drawer.lib.ts`               |
 | Proficiencies | `components/proficiencies/picker/proficiency-picker-drawer.client.tsx`  | `proficiencies/picker/proficiency-picker-drawer.lib.ts`  |
 
-All three are thin wrappers over `@rpg/content` **`CatalogEntityPickerSheet`**
-(spread sheet props inline — `surface="background"`, `size="lg"`).
+All three are domain composition shells over `@rpg/content` **`CatalogEntityPickerSheet`**
+(spread sheet props inline — `surface="background"`, `size="lg"`). Equipment browse
+state lives in `useEquipmentPickerController`; mutation stays in step/acquisition hooks.
+
+## Layering
+
+```text
+consumer / acquisition hook     → persistence (onCommitAdd, manage callbacks)
+useEquipmentPickerController    → browse / filter / quantity / derived presentation
+domain drawer                   → sheet composition + domain presentation
+CatalogEntityPickerSheet        → catalog row host
+```
 
 ## Commonality matrix
 

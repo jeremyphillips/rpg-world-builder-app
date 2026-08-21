@@ -114,8 +114,10 @@ export function EquipmentStepInteractive({
     catalogIndex: step.catalogIndex,
     budget,
     showBudget: Boolean(showBudget),
+    workflowMode: step.pickerWorkflowMode,
     focusedAllowanceId: step.focusedAllowanceId,
     onDraftChange,
+    onFallbackAdd: handleAddItem,
   })
 
   const showAcquisitionGuidance =
@@ -188,14 +190,11 @@ export function EquipmentStepInteractive({
         isGoldShoppingPath={showShopping}
         resolveRowActionViewModel={pickerAcquisition.resolveRowActionViewModel}
         resolveGrantManageSources={pickerAcquisition.resolveGrantManageSources}
-        draft={draft}
-        context={step.context}
-        catalogIndex={catalogIndex}
+        grantAcquisitionContext={{ draft, context: step.context, catalogIndex }}
+        onCommitAdd={pickerAcquisition.handleCommitAdd}
         onApplyMagicItemAcquisition={pickerAcquisition.handleApplyMagicItemAcquisition}
-        onApplyPurchase={pickerAcquisition.handleApplyPurchase}
         onReleaseGrant={pickerAcquisition.handleReleaseGrant}
         onRemovePurchase={pickerAcquisition.handleRemovePurchase}
-        onAddItem={handleAddItem}
         onRemoveFromInventory={handleRemoveFromInventory}
         onRemoveOneFromInventory={handleRemoveOneFromInventory}
       />
