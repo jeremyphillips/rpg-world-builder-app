@@ -3,17 +3,17 @@ import type { ComponentProps } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
-import { EntityItemAnatomy } from './entity-item.client'
+import { EntityAnatomy } from './entity-anatomy.client'
 import { GREY_COAST_ENTITY } from '../entity.fixture'
 
 function querySlot(container: HTMLElement, slot: 'leading' | 'content' | 'trailing') {
   return container.querySelector(`[data-entity-item-slot="${slot}"]`)
 }
 
-function renderAnatomy(props: Partial<ComponentProps<typeof EntityItemAnatomy>> = {}) {
+function renderAnatomy(props: Partial<ComponentProps<typeof EntityAnatomy>> = {}) {
   const { container } = render(
     <MemoryRouter>
-      <EntityItemAnatomy entity={GREY_COAST_ENTITY} density="compact" {...props} />
+      <EntityAnatomy entity={GREY_COAST_ENTITY} density="compact" {...props} />
     </MemoryRouter>,
   )
 
@@ -27,7 +27,7 @@ function renderAnatomy(props: Partial<ComponentProps<typeof EntityItemAnatomy>> 
   }
 }
 
-describe('EntityItemAnatomy grid placement', () => {
+describe('EntityAnatomy grid placement', () => {
   it('keeps content in column 2 when only content is present', () => {
     const { anatomy, content, queryLeading, queryTrailing } = renderAnatomy()
 
@@ -163,7 +163,7 @@ describe('EntityItemAnatomy grid placement', () => {
 
   it('keeps status in the summary column when trailing action is present', () => {
     render(
-      <EntityItemAnatomy
+      <EntityAnatomy
         density="compact"
         entity={{
           heading: 'Amulet',

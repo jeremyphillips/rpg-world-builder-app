@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
-import { ENTITY_SURFACE_INLINE_END_VAR } from '../../item/entity-geometry.tokens'
+import { ENTITY_SURFACE_INLINE_END_VAR } from '../../anatomy/entity-geometry.tokens'
 import {
   entitySurfaceHorizontalInsetClasses,
   entitySurfaceInsetVariants,

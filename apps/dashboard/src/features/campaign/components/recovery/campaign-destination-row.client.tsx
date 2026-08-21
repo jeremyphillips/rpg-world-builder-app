@@ -3,7 +3,7 @@
 import type { CampaignListItem } from '@rpg/contracts'
 import { Link } from 'react-router-dom'
 
-import { EntityItem } from '@/features/content'
+import { EntityAnatomyHost } from '@/features/content'
 
 import { campaignDestinationRowVariants } from './campaign-destination.variants'
 import { buildCampaignDisplay } from '../../lib/campaign-display'
@@ -41,7 +41,7 @@ export function CampaignDestinationRow({
         onPersistSelection(campaign.id)
       }}
     >
-      <EntityItem
+      <EntityAnatomyHost
         density="comfortable"
         entity={{
           heading: display.name,

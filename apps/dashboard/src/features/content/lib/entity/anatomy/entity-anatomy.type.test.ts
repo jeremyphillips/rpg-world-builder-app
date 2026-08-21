@@ -2,7 +2,7 @@ import { describe, expectTypeOf, it } from 'vitest'
 
 import type { ContentEntityCardProps, DisclosureEntityCardProps } from '@/features/content'
 
-import type { EntityItemProps } from './entity-item.client'
+import type { EntityAnatomyHostProps } from './entity-anatomy.client'
 
 type ConsumerPresentationKeys =
   | 'className'
@@ -25,8 +25,10 @@ type LegacyContentEntityCardKeys =
   | 'chrome'
 
 describe('entity surface closed API', () => {
-  it('EntityItem rejects consumer styling props', () => {
-    expectTypeOf<Extract<keyof EntityItemProps, ConsumerPresentationKeys>>().toEqualTypeOf<never>()
+  it('EntityAnatomyHost rejects consumer styling props', () => {
+    expectTypeOf<
+      Extract<keyof EntityAnatomyHostProps, ConsumerPresentationKeys>
+    >().toEqualTypeOf<never>()
   })
 
   it('ContentEntityCard rejects consumer styling props', () => {
@@ -53,13 +55,13 @@ describe('entity surface closed API', () => {
     >().toEqualTypeOf<never>()
   })
 
-  it('EntityItem accepts semantic seams', () => {
-    expectTypeOf<EntityItemProps>().toMatchTypeOf<{
-      entity: EntityItemProps['entity']
+  it('EntityAnatomyHost accepts semantic seams', () => {
+    expectTypeOf<EntityAnatomyHostProps>().toMatchTypeOf<{
+      entity: EntityAnatomyHostProps['entity']
       headingHref?: string
       leading?: React.ReactNode
-      trailing?: EntityItemProps['trailing']
-      density?: EntityItemProps['density']
+      trailing?: EntityAnatomyHostProps['trailing']
+      density?: EntityAnatomyHostProps['density']
     }>()
   })
 })

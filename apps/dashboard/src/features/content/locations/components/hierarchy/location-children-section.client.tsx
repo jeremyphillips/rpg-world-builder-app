@@ -13,7 +13,7 @@ import { Button, Text, toast } from '@rpg/ui'
 import { Plus } from 'lucide-react'
 
 import { DetailEntityRow } from '../../../lib/detail/row/detail-entity-row.client'
-import type { EntityItemTrailing } from '../../../lib/entity/item/entity-item-trailing.types'
+import type { EntityAnatomyTrailing } from '../../../lib/entity/anatomy/entity-anatomy-trailing.types'
 import { DetailEntityRowActions } from '../../../lib/detail/row/detail-entity-row-actions.client'
 import {
   detailEntityRowDisclosurePreviewRowVariants,
@@ -86,7 +86,7 @@ import type { ReactElement } from 'react'
 
 function detailEntityRowActionTrailing(
   content: ReactElement | undefined,
-): EntityItemTrailing | undefined {
+): EntityAnatomyTrailing | undefined {
   return content ? { kind: 'action', content } : undefined
 }
 

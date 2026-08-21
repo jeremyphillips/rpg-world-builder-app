@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
-import type { EntityItemTrailing } from '../../../item/entity-item-trailing.types'
+import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import { DisclosureEntityCard } from './disclosure-entity-card.client'
 import { HARBOR_DISTRICT_ENTITY } from '../../../entity.fixture'
 
@@ -33,7 +33,7 @@ function DisclosureEntityCardDemo({
 }: {
   density?: 'compact' | 'comfortable'
   dragHandleProps?: typeof mockDragHandleProps
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
   initialCollapsed?: boolean
 }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed)

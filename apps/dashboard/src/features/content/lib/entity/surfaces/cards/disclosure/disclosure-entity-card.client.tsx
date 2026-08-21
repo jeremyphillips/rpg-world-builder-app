@@ -10,8 +10,8 @@ import {
 import {
   buildEntityContentOffsetStyle,
   resolveEntityLeadingUtilityCount,
-} from '../../../item/entity-leading-rail.lib'
-import type { EntityItemTrailing } from '../../../item/entity-item-trailing.types'
+} from '../../../anatomy/entity-leading-rail.lib'
+import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { DisclosureEntityCardHeader } from './disclosure-entity-card-header.client'
 import {
@@ -27,7 +27,7 @@ export type DisclosureEntityCardProps = {
   toolbarAriaLabel: string
   /** Optional consumer drag grip — rendered in the entity leading rail. */
   dragHandle?: ReactNode
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
   /** Links the entity heading only — not whole-row/card navigation. */
   headingHref?: string
   children: ReactNode

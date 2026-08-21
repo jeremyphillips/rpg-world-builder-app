@@ -45,10 +45,10 @@ export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.typ
 export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
 export { EntitySummary } from './lib/entity/summary/entity-summary.client'
 export type {
-  EntityItemTrailing,
-  EntityItemTrailingSecondary,
-} from './lib/entity/item/entity-item-trailing.types'
-export { EntityItem } from './lib/entity/item/entity-item.client'
+  EntityAnatomyTrailing,
+  EntityAnatomyTrailingSecondary,
+} from './lib/entity/anatomy/entity-anatomy-trailing.types'
+export { EntityAnatomyHost } from './lib/entity/anatomy/entity-anatomy.client'
 export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row.client'
 export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row.client'
 export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client'

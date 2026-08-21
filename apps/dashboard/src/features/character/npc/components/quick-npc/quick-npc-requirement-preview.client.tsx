@@ -1,6 +1,6 @@
 'use client'
 
-import { EntityItem, type EntityItemTrailing } from '@/features/content'
+import { EntityAnatomyHost, type EntityAnatomyTrailing } from '@/features/content'
 
 import { mapEquipmentCalloutToStatusItem } from '../../../components/equipment/picker/callouts/equipment-picker-callout-presentation.lib'
 import type { EquipmentPickerCallout } from '../../../components/equipment/picker/drawer/equipment-picker-drawer.types'
@@ -23,10 +23,10 @@ function RequirementPreviewCard({
 }: {
   projection: WeaponRequirementPreviewProjection | SpellRequirementPreviewProjection
   callout?: EquipmentPickerCallout
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
 }) {
   return (
-    <EntityItem
+    <EntityAnatomyHost
       entity={{
         heading: projection.title,
         description: projection.description,
@@ -43,7 +43,7 @@ export function QuickNpcWeaponRequirementPreview({
   trailing,
 }: {
   entry: QuickNpcWeaponRequirementOption
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
 }) {
   const projection = projectWeaponRequirementPreview(entry)
   return (
@@ -60,7 +60,7 @@ export function QuickNpcSpellRequirementPreview({
   trailing,
 }: {
   entry: QuickNpcSpellRequirementOption
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
 }) {
   const projection = projectSpellRequirementPreview(entry)
   return <RequirementPreviewCard projection={projection} trailing={trailing} />

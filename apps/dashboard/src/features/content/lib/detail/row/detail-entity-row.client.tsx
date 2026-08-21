@@ -5,9 +5,9 @@ import { useId, useState, type ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { EntityItemAnatomy } from '../../entity/item/entity-item.client'
-import type { EntityItemTrailing } from '../../entity/item/entity-item-trailing.types'
-import { buildEntityContentOffsetStyle } from '../../entity/item/entity-leading-rail.lib'
+import { EntityAnatomy } from '../../entity/anatomy/entity-anatomy.client'
+import type { EntityAnatomyTrailing } from '../../entity/anatomy/entity-anatomy-trailing.types'
+import { buildEntityContentOffsetStyle } from '../../entity/anatomy/entity-leading-rail.lib'
 import { projectEntitySummaryModel } from '../../entity/summary/entity-summary-projection.lib'
 import type { EntitySummaryStatusItem } from '../../entity/summary/entity-summary-status.types'
 import { entitySurfaceInsetVariants } from '../../entity/surfaces/entity-surface-inset.variants'
@@ -32,7 +32,7 @@ export type DetailEntityRowProps = {
   headingSuffix?: ReactNode
   subheading?: ReactNode
   metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
   inset?: 'self' | 'parent'
   disclosure?: DetailEntityRowDisclosure
   className?: string
@@ -91,7 +91,7 @@ function DetailEntityRowIdentity(
     props
 
   return (
-    <EntityItemAnatomy
+    <EntityAnatomy
       entity={projectEntitySummaryModel({
         heading,
         classification: headingSuffix,

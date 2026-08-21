@@ -5,39 +5,39 @@ import { Link } from 'react-router-dom'
 import { contentCardHeadingLinkVariants, type ContentCardDensity } from '@rpg/ui'
 
 import { EntityLeadingRail } from './entity-leading-rail.client'
-import { EntityItemTrailingSlot } from './entity-item-trailing.client'
-import type { EntityItemTrailing } from './entity-item-trailing.types'
+import { EntityAnatomyTrailingSlot } from './entity-anatomy-trailing.client'
+import type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
 import { EntitySummary } from '../summary/entity-summary.client'
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import {
-  entityItemAnatomyVariants,
-  entityItemContentVariants,
-  entityItemLeadingSlotVariants,
-  entityItemRootVariants,
-  entityItemTrailingSlotVariants,
-} from './entity-item.variants'
+  entityAnatomyVariants,
+  entityAnatomyContentVariants,
+  entityAnatomyLeadingSlotVariants,
+  entityAnatomyHostRootVariants,
+  entityAnatomyTrailingSlotVariants,
+} from './entity-anatomy.variants'
 
-export type { EntityItemTrailing } from './entity-item-trailing.types'
+export type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
 
-export type EntityItemAnatomyProps = {
+export type EntityAnatomyProps = {
   entity: EntitySummaryModel
   /** Links the entity heading only — not whole-row/card navigation. */
   headingHref?: string
   /** Ordered leading utilities; Anatomy is the sole EntityLeadingRail wrapper. */
   leadingUtilities?: readonly ReactNode[]
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
   density?: ContentCardDensity
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
 }
 
-export type EntityItemProps = {
+export type EntityAnatomyHostProps = {
   entity: EntitySummaryModel
   /** Links the entity heading only — not whole-row/card navigation. */
   headingHref?: string
   /** Exactly one leading utility when set — never a multi-control group or fragment. */
   leading?: ReactNode
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
   density?: ContentCardDensity
 }
 
@@ -59,26 +59,26 @@ function resolveLinkedHeading(
   }
 }
 
-export function EntityItemAnatomy({
+export function EntityAnatomy({
   entity,
   headingHref,
   leadingUtilities,
   trailing,
   density = 'comfortable',
   headingEndValue,
-}: EntityItemAnatomyProps) {
+}: EntityAnatomyProps) {
   const resolvedEntity = resolveLinkedHeading(entity, headingHref)
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
   const hasControlChrome = resolvedLeadingUtilities.length > 0 || trailing != null
 
   return (
-    <div className={entityItemAnatomyVariants({ density })}>
+    <div className={entityAnatomyVariants({ density })}>
       {resolvedLeadingUtilities.length > 0 ? (
-        <div className={entityItemLeadingSlotVariants()} data-entity-item-slot="leading">
+        <div className={entityAnatomyLeadingSlotVariants()} data-entity-item-slot="leading">
           <EntityLeadingRail density={density}>{resolvedLeadingUtilities}</EntityLeadingRail>
         </div>
       ) : null}
-      <div className={entityItemContentVariants({ density })} data-entity-item-slot="content">
+      <div className={entityAnatomyContentVariants({ density })} data-entity-item-slot="content">
         {resolvedEntity.media ? <div className="shrink-0">{resolvedEntity.media}</div> : null}
         <EntitySummary
           entity={resolvedEntity}
@@ -89,26 +89,26 @@ export function EntityItemAnatomy({
       </div>
       {trailing ? (
         <div
-          className={entityItemTrailingSlotVariants({ density })}
+          className={entityAnatomyTrailingSlotVariants({ density })}
           data-entity-item-slot="trailing"
         >
-          <EntityItemTrailingSlot trailing={trailing} />
+          <EntityAnatomyTrailingSlot trailing={trailing} />
         </div>
       ) : null}
     </div>
   )
 }
 
-export function EntityItem({
+export function EntityAnatomyHost({
   entity,
   headingHref,
   leading,
   trailing,
   density = 'comfortable',
-}: EntityItemProps) {
+}: EntityAnatomyHostProps) {
   return (
-    <div className={entityItemRootVariants()}>
-      <EntityItemAnatomy
+    <div className={entityAnatomyHostRootVariants()}>
+      <EntityAnatomy
         entity={entity}
         headingHref={headingHref}
         leadingUtilities={leading != null ? [leading] : undefined}

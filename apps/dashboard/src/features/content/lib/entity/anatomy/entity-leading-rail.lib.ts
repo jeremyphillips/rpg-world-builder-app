@@ -34,7 +34,7 @@ export {
 export type EntityLeadingUtilityOptions = {
   dragHandle?: boolean
   disclosure?: boolean
-  /** Single optional utility on CEC / embedded EntityItem (0–1). */
+  /** Single optional utility on CEC / embedded EntityAnatomyHost (0–1). */
   leading?: boolean
 }
 

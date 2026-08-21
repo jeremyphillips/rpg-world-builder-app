@@ -11,7 +11,7 @@ import {
 import {
   ENTITY_BODY_INLINE_START_VAR,
   ENTITY_CONTENT_OFFSET_VAR,
-} from '../../../item/entity-leading-rail.lib'
+} from '../../../anatomy/entity-leading-rail.lib'
 import { HARBOR_DISTRICT_ENTITY } from '../../../entity.fixture'
 
 const mockDragHandleProps = {
@@ -250,7 +250,7 @@ describe('DisclosureEntityCard', () => {
     expect(article?.className).toContain('[--surface-current:var(--card)]')
   })
 
-  it('forwards trailing seam to EntityItem anatomy', () => {
+  it('forwards trailing seam to EntityAnatomyHost anatomy', () => {
     render(
       <DisclosureEntityCard
         itemId="harbor"

@@ -2,14 +2,14 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
-import { EntityItem } from './entity-item.client'
+import { EntityAnatomyHost } from './entity-anatomy.client'
 import { GREY_COAST_ENTITY, HARBOR_DISTRICT_ENTITY } from '../entity.fixture'
 
-describe('EntityItem', () => {
+describe('EntityAnatomyHost', () => {
   it('renders heading, classification, and description', () => {
     render(
       <MemoryRouter>
-        <EntityItem entity={HARBOR_DISTRICT_ENTITY} density="compact" />
+        <EntityAnatomyHost entity={HARBOR_DISTRICT_ENTITY} density="compact" />
       </MemoryRouter>,
     )
 
@@ -21,7 +21,7 @@ describe('EntityItem', () => {
   it('wraps the heading in a link when headingHref is provided', () => {
     render(
       <MemoryRouter>
-        <EntityItem
+        <EntityAnatomyHost
           entity={GREY_COAST_ENTITY}
           headingHref="/campaigns/demo/locations/grey-coast"
           density="compact"
@@ -38,7 +38,7 @@ describe('EntityItem', () => {
   it('renders leading and trailing seams', () => {
     render(
       <MemoryRouter>
-        <EntityItem
+        <EntityAnatomyHost
           entity={GREY_COAST_ENTITY}
           leading={<span data-testid="leading">Grip</span>}
           trailing={{ kind: 'action', content: <button type="button">Select</button> }}

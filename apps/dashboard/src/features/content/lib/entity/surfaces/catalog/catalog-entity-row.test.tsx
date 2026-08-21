@@ -6,7 +6,7 @@ import {
   catalogEntityRowBodyWashVariants,
   catalogEntityRowInsetRootVariants,
 } from './catalog-entity-row.variants'
-import { ENTITY_CONTENT_OFFSET_VAR } from '../../item/entity-leading-rail.lib'
+import { ENTITY_CONTENT_OFFSET_VAR } from '../../anatomy/entity-leading-rail.lib'
 
 const domIds = {
   itemId: 'picker-item-rope',

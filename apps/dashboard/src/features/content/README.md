@@ -42,7 +42,7 @@ lib/
   detail/           # page/, metadata/, section/, row/ — see feature-structure.md
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client
-  entity/           # summary/ → item/ → surfaces/ (see content-entity-card.md)
+  entity/           # summary/ → anatomy/ → surfaces/ (see content-entity-card.md)
   relationship/     # Cross-content relationship UI; drawer/, list/, picker/, location-connection/
   campaign-access/  # Campaign availability; overview/ row chrome; bulk/ actions
   entity-replacement/  # Shared Current→New drawer chrome

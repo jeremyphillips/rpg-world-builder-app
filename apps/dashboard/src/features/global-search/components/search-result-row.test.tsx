@@ -13,12 +13,12 @@ function rowShell(link: HTMLElement): HTMLElement {
   return link.parentElement!
 }
 
-function entityItemRoot(link: HTMLElement): HTMLElement {
+function entityAnatomyHostRoot(link: HTMLElement): HTMLElement {
   return link.nextElementSibling!.firstElementChild as HTMLElement
 }
 
-function entityItemAnatomy(link: HTMLElement): HTMLElement {
-  return entityItemRoot(link).firstElementChild as HTMLElement
+function entityAnatomy(link: HTMLElement): HTMLElement {
+  return entityAnatomyHostRoot(link).firstElementChild as HTMLElement
 }
 
 describe('SearchResultRow', () => {
@@ -76,7 +76,7 @@ describe('SearchResultRow', () => {
     ).toBeInTheDocument()
   })
 
-  it('keeps row inset on the host and EntityItem inset-free for default page rows', () => {
+  it('keeps row inset on the host and EntityAnatomyHost inset-free for default page rows', () => {
     renderWithProviders(
       <SearchResultRow
         title="Fireball"
@@ -92,8 +92,8 @@ describe('SearchResultRow', () => {
     const secondary = screen.getByText('3rd-level evocation · Instantaneous')
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
     const row = rowShell(link)
-    const root = entityItemRoot(link)
-    const anatomy = entityItemAnatomy(link)
+    const root = entityAnatomyHostRoot(link)
+    const anatomy = entityAnatomy(link)
 
     expect(row).toHaveClass(globalSearchGroupContentInsetClasses, 'py-3')
     expect(root.className).not.toMatch(/\bpx-/)
@@ -153,7 +153,7 @@ describe('SearchResultRow', () => {
     const name = screen.getByText('Fire Bolt')
     const classification = screen.getByText('Spell')
     const mixedHeadingRow = name.parentElement as HTMLElement
-    const trailing = entityItemAnatomy(link).querySelector('[data-entity-item-slot="trailing"]')
+    const trailing = entityAnatomy(link).querySelector('[data-entity-item-slot="trailing"]')
 
     expect(name.className).not.toMatch(/\bflex-1\b/)
     expect(mixedHeadingRow.childNodes[0]).toBe(name)
@@ -184,7 +184,7 @@ describe('SearchResultRow', () => {
 
     const link = screen.getByRole('link', { name: 'Champion, Subclass of Aric, Subclass' })
     const row = rowShell(link)
-    const trailing = entityItemAnatomy(link).querySelector('[data-entity-item-slot="trailing"]')
+    const trailing = entityAnatomy(link).querySelector('[data-entity-item-slot="trailing"]')
 
     expect(row).toHaveClass(globalSearchGroupContentInsetClasses, 'py-3')
     expect(trailing).toHaveClass('col-start-3', 'justify-self-end')

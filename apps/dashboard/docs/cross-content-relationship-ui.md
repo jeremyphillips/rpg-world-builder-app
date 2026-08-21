@@ -4,10 +4,10 @@ Dashboard surfaces that show **typed edges** between catalog entities (organizat
 
 ## Entity vs edge
 
-| Surface                                        | Primitive                                                                   | Example                        |
-| ---------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------ |
-| Pick an entity in a drawer                     | Embedded `EntityItem` or `DisclosureEntityCard` + catalog selection actions | Choose an organization to link |
-| Show a persisted relationship on a detail page | `CrossContentRelationshipRow`                                               | The Monarchy                   |
+| Surface                                        | Primitive                                                                          | Example                        |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------ |
+| Pick an entity in a drawer                     | Embedded `EntityAnatomyHost` or `DisclosureEntityCard` + catalog selection actions | Choose an organization to link |
+| Show a persisted relationship on a detail page | `CrossContentRelationshipRow`                                                      | The Monarchy                   |
 
 Do **not** use `ContentEntityCard` as the default relationship row. Kind labels belong in slot/collection headings or optional row classification — not as entity badges duplicating the slot.
 
@@ -42,7 +42,7 @@ Compact list presentation — no card border/background on relationship rows. Ro
 
 ### Entity summary field mapping (detail / relationship lane)
 
-Detail and relationship rows compose **`EntityItem`** (via `DetailEntityRow` or embedded `EntityItemAnatomy`) using the shared **`EntitySummaryModel`** vocabulary:
+Detail and relationship rows compose **`EntityAnatomyHost`** (via `DetailEntityRow` or embedded `EntityAnatomy`) using the shared **`EntitySummaryModel`** vocabulary:
 
 | Row / drawer prop                              | Entity summary field | Notes                                                               |
 | ---------------------------------------------- | -------------------- | ------------------------------------------------------------------- |
@@ -59,30 +59,30 @@ Shared detail-page panel and row chrome live in [`content/lib/detail/`](../src/f
 
 ### Heading vs eyebrow vs row title
 
-| Role                | Element                                  | Visual                                                     | Examples                                 |
-| ------------------- | ---------------------------------------- | ---------------------------------------------------------- | ---------------------------------------- |
-| Panel heading       | `Heading variant="label"` (`h2`/`h3`)    | `heading-style-label` — larger, not uppercase              | City structure, Territorial Authority    |
-| Eyebrow group label | `<Eyebrow size="sm">` (default `as="p"`) | `eyebrow-style-sm` + muted; CSS uppercases title-case copy | Districts, Direct locations, Governed by |
-| Row / item title    | `EntityItem` inside `DetailEntityRow`    | normal emphasis                                            | Dock Ward, org name                      |
+| Role                | Element                                      | Visual                                                     | Examples                                 |
+| ------------------- | -------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------- |
+| Panel heading       | `Heading variant="label"` (`h2`/`h3`)        | `heading-style-label` — larger, not uppercase              | City structure, Territorial Authority    |
+| Eyebrow group label | `<Eyebrow size="sm">` (default `as="p"`)     | `eyebrow-style-sm` + muted; CSS uppercases title-case copy | Districts, Direct locations, Governed by |
+| Row / item title    | `EntityAnatomyHost` inside `DetailEntityRow` | normal emphasis                                            | Dock Ward, org name                      |
 
 Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detail subgroup labels. Do **not** promote subgroup labels to `h3` unless Territorial Authority kind labels also become headings — today they stay out of the document outline.
 
 ### Primitives
 
-| Primitive                | Role                                                                                                                                                                                                               |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `DetailSectionPanel`     | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                                                                       |
-| `DetailSectionGroup`     | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`; optional `endSlot` for trailing header controls                                                                             |
-| `DetailSectionRowList`   | Dividers between direct children — required `separator`: `structural` (hierarchy) or `record` (relationship group `<ul>`)                                                                                          |
-| `DetailEntityRow`        | Thin shell around compact `EntityItem` (`py-1` inset); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` (`expandable` or `reserved`); generic `endSlot` |
-| `DetailEntityRowActions` | Layout-only trailing control cluster (alignment / gap / shrink) — compose inside `endSlot` when a row needs utility + overflow; does not restyle children                                                          |
-| `DetailOverflowMenu`     | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                                                               |
-| `RelationshipList`       | **Only supported typed-edge list chrome** — compound `Root` → `Group` → `Row` (required nesting); owns record separators, slot/section empty, and footer placement via explicit `itemCount` props                  |
+| Primitive                | Role                                                                                                                                                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DetailSectionPanel`     | Bordered section shell (`<section aria-labelledby>`), title/helper, optional `headerEndSlot`                                                                                                                              |
+| `DetailSectionGroup`     | Subgroup shell: optional `<Eyebrow size="sm">` + `px-4 py-2` + inter-group `border-b`; optional `endSlot` for trailing header controls                                                                                    |
+| `DetailSectionRowList`   | Dividers between direct children — required `separator`: `structural` (hierarchy) or `record` (relationship group `<ul>`)                                                                                                 |
+| `DetailEntityRow`        | Thin shell around compact `EntityAnatomyHost` (`py-1` inset); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailSectionGroup`; optional `disclosure` (`expandable` or `reserved`); generic `endSlot` |
+| `DetailEntityRowActions` | Layout-only trailing control cluster (alignment / gap / shrink) — compose inside `endSlot` when a row needs utility + overflow; does not restyle children                                                                 |
+| `DetailOverflowMenu`     | Compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]`                                                                                                                                      |
+| `RelationshipList`       | **Only supported typed-edge list chrome** — compound `Root` → `Group` → `Row` (required nesting); owns record separators, slot/section empty, and footer placement via explicit `itemCount` props                         |
 
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
 
 `DetailEntityRow.endSlot` and section `headerEndSlot` are **detail-host** composition
-seams — not entity-surface trailing APIs. `EntityItem`, `ContentEntityCard`, and
+seams — not entity-surface trailing APIs. `EntityAnatomyHost`, `ContentEntityCard`, and
 `DisclosureEntityCard` use semantic trailing (`action` | `indicator` | `group`) only.
 See [content-entity-card.md](./content-entity-card.md#trailing-kinds).
 
@@ -287,14 +287,14 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 
 ## Drawer building blocks
 
-| Primitive                                                    | Role                                                                                                        |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `DrawerContext`                                              | Lightweight fixed-endpoint composition (`EntityItem` identity, no border/background) — no border/background |
-| `RelationshipDrawerSubjectField`                             | Structured read-only **form** fields only — not entity endpoint chrome                                      |
-| `EntityReplacementCurrentField` / `EntityReplacementSection` | Sunken Current chrome hosting the same entity context composition for searchable replacement flows          |
-| `LocationConnectionKindField`                                | Dumb active kind radios (options, value, onValueChange) — drawer owns summary vs field visibility           |
-| `SelectionSummaryCard`                                       | Completed decision row within sequenced Add drawers and create-modal setup                                  |
-| Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                               |
+| Primitive                                                    | Role                                                                                                               |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `DrawerContext`                                              | Lightweight fixed-endpoint composition (`EntityAnatomyHost` identity, no border/background) — no border/background |
+| `RelationshipDrawerSubjectField`                             | Structured read-only **form** fields only — not entity endpoint chrome                                             |
+| `EntityReplacementCurrentField` / `EntityReplacementSection` | Sunken Current chrome hosting the same entity context composition for searchable replacement flows                 |
+| `LocationConnectionKindField`                                | Dumb active kind radios (options, value, onValueChange) — drawer owns summary vs field visibility                  |
+| `SelectionSummaryCard`                                       | Completed decision row within sequenced Add drawers and create-modal setup                                         |
+| Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                                      |
 
 When a per-kind add action resolves intent before open, **do not** show a kind picker in the drawer.
 

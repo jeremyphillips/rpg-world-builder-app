@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ContentEntityCard } from '@/features/content'
-import { EntityItem } from './entity-item.client'
+import { EntityAnatomyHost } from './entity-anatomy.client'
 import { GREY_COAST_ENTITY, HARBOR_DISTRICT_ENTITY, SILVER_CIRCLE_ENTITY } from '../entity.fixture'
 
 const meta = {
-  title: 'Content/Entity/EntityItem',
+  title: 'Content/Entity/EntityAnatomyHost',
   parameters: { layout: 'padded' },
 } satisfies Meta
 
@@ -15,7 +15,7 @@ type Story = StoryObj<typeof meta>
 export const EmbeddedCompact: Story = {
   render: () => (
     <div className="max-w-md rounded-md border border-border bg-catalog-picker-row-surface">
-      <EntityItem entity={GREY_COAST_ENTITY} density="compact" />
+      <EntityAnatomyHost entity={GREY_COAST_ENTITY} density="compact" />
     </div>
   ),
 }
@@ -23,7 +23,7 @@ export const EmbeddedCompact: Story = {
 export const EmbeddedWithAction: Story = {
   render: () => (
     <div className="max-w-md rounded-md border border-border bg-catalog-picker-row-surface">
-      <EntityItem
+      <EntityAnatomyHost
         entity={HARBOR_DISTRICT_ENTITY}
         density="compact"
         trailing={{
@@ -55,7 +55,7 @@ export const SharedFixtureParity: Story = {
     <div className="flex max-w-md flex-col gap-4">
       <ContentEntityCard entity={SILVER_CIRCLE_ENTITY} density="comfortable" />
       <div className="rounded-md border border-border bg-catalog-picker-row-surface">
-        <EntityItem entity={SILVER_CIRCLE_ENTITY} density="compact" />
+        <EntityAnatomyHost entity={SILVER_CIRCLE_ENTITY} density="compact" />
       </div>
     </div>
   ),

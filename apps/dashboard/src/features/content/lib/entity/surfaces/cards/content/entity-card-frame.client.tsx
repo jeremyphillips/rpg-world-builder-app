@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import { cn } from '@rpg/ui'
 import type { ContentCardDensity } from '@rpg/ui'
 
-import { buildEntityLeadingChromeSizeStyle } from '../../../item/entity-leading-rail.lib'
+import { buildEntityLeadingChromeSizeStyle } from '../../../anatomy/entity-leading-rail.lib'
 import { entityCardFrameVariants } from './entity-card-frame.variants'
 
 type EntityCardFrameProps = {

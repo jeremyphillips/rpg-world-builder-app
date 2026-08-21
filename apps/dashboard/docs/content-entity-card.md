@@ -3,12 +3,12 @@
 Entity identity uses one stack:
 
 ```text
-EntitySummaryModel → EntitySummary → EntityItemAnatomy → embedded host | ContentEntityCard | DisclosureEntityCard
+EntitySummaryModel → EntitySummary → EntityAnatomy → embedded host | ContentEntityCard | DisclosureEntityCard
 ```
 
 `EntitySummaryModel` contains identity content only: `heading`, optional
 `classification`, `description`, `status`, and `media`. It never carries navigation.
-`EntityItem` adds optional heading navigation (`headingHref`), a single leading utility,
+`EntityAnatomyHost` adds optional heading navigation (`headingHref`), a single leading utility,
 semantic trailing (`action` | `indicator` | `group`), and density.
 
 **Each visual concern has one owner.** When debugging inset, alignment, or chrome, ask
@@ -18,23 +18,23 @@ which semantic layer owns the concern — see [Ownership hierarchy](#ownership-h
 
 ```text
 summary/   — EntitySummaryModel, EntitySummary, projection, media
-item/      — EntityItem anatomy, leading rail, geometry tokens (→ anatomy/ in Phase B)
-surfaces/  — CEC, DEC, catalog rows; imports item/ + summary/ only via dependency direction
+anatomy/   — EntityAnatomy, EntityAnatomyHost, leading rail, geometry tokens
+surfaces/  — CEC, DEC, catalog rows; imports anatomy/ + summary/ only via dependency direction
   cards/content/     ContentEntityCard
   cards/disclosure/  DisclosureEntityCard, DisclosureEntityCardHeader
   catalog/           CatalogEntityRow, CatalogEntityPickerSheet
 ```
 
-Dependency direction: `surfaces → item → summary`. `summary/` must not import `item/`;
-`item/` must not import `surfaces/`. Shared CSS var **names** live in
-`item/entity-geometry.tokens.ts`; surface CVA **values** live in
+Dependency direction: `surfaces → anatomy → summary`. `summary/` must not import `anatomy/`;
+`anatomy/` must not import `surfaces/`. Shared CSS var **names** live in
+`anatomy/entity-geometry.tokens.ts`; surface CVA **values** live in
 `surfaces/entity-surface-inset.variants.ts`.
 
 ## Choose a surface
 
 | Need                                                                                   | Surface                                |
 | -------------------------------------------------------------------------------------- | -------------------------------------- |
-| Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityItem`                           |
+| Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityAnatomyHost`                    |
 | Bordered static identity                                                               | `ContentEntityCard`                    |
 | Bordered identity with expandable domain content                                       | `DisclosureEntityCard`                 |
 | Create-tab Add/Pending discovery or pending rows                                       | `ContentEntityCard` + trailing action  |
@@ -43,7 +43,7 @@ Dependency direction: `surfaces → item → summary`. `summary/` must not impor
 
 The host keeps its own navigation, hover, selection, separators, drag behavior, and
 domain controls. Never put a full-row link in `EntitySummaryModel`; when a host owns
-full-row navigation, omit `EntityItem.headingHref`.
+full-row navigation, omit `EntityAnatomyHost.headingHref`.
 
 ---
 
@@ -55,7 +55,7 @@ do not redefine it.
 ```text
 Foundational UI policy          (@rpg/ui — focus, icon controls, drag, interactive rows)
         ↓
-Entity anatomy                  (EntityItem — three-column grid, leading/trailing rails)
+Entity anatomy                  (EntityAnatomyHost — three-column grid, leading/trailing rails)
         ↓
 Surface/card shell              (CEC, DEC — border, density inset, disclosure geometry)
         ↓
@@ -72,26 +72,26 @@ drag chrome, or interactive-row fills.
 
 ### Ownership audit matrix
 
-| Concern                        | Target owner                 | Notes                                                               |
-| ------------------------------ | ---------------------------- | ------------------------------------------------------------------- |
-| Card inset                     | CEC / DEC shell              | Density-aware px/py on surface wrappers                             |
-| Section vs card inset          | Feature section / host       | e.g. equipment panel `px-4 py-4` is section padding, not card inset |
-| Embedded row inset             | Host                         | SearchResultRow, master-detail list, catalog picker row             |
-| EntityItem columns             | EntityItem anatomy           | leading → col 1; content → col 2; trailing → col 3                  |
-| Leading content offset         | Surface root (when needed)   | `--entity-content-offset` on DEC `article`, DER disclosure root     |
-| Trailing rail                  | EntityItem semantic trailing | `action` \| `indicator` \| `group` — no parallel entity `endSlot`   |
-| Disclosure behavior            | CollapsibleListItem          | Collapse state, ARIA, structural DOM                                |
-| DEC header inset               | DEC                          | `disclosureEntityCardHeaderPaddingVariants`                         |
-| DEC body inset                 | DEC                          | Body wash + inline start/end + block rhythm                         |
-| CLI body spacing (entity-card) | **None**                     | `rowLayout="entity-card"` → structural wrapper only                 |
-| Drag chrome                    | Foundational UI              | `dragHandleVariants`, host reveal contract                          |
-| Control/focus chrome           | Foundational UI              | `iconGhostControlVariants`, Button focus stack                      |
-| Separators                     | Host                         | List/section separators, not EntityItem                             |
-| Form-array styling             | DEC + form field rhythm      | Form owns registration; DEC owns card geometry                      |
+| Concern                        | Target owner                        | Notes                                                               |
+| ------------------------------ | ----------------------------------- | ------------------------------------------------------------------- |
+| Card inset                     | CEC / DEC shell                     | Density-aware px/py on surface wrappers                             |
+| Section vs card inset          | Feature section / host              | e.g. equipment panel `px-4 py-4` is section padding, not card inset |
+| Embedded row inset             | Host                                | SearchResultRow, master-detail list, catalog picker row             |
+| EntityAnatomyHost columns      | EntityAnatomyHost anatomy           | leading → col 1; content → col 2; trailing → col 3                  |
+| Leading content offset         | Surface root (when needed)          | `--entity-content-offset` on DEC `article`, DER disclosure root     |
+| Trailing rail                  | EntityAnatomyHost semantic trailing | `action` \| `indicator` \| `group` — no parallel entity `endSlot`   |
+| Disclosure behavior            | CollapsibleListItem                 | Collapse state, ARIA, structural DOM                                |
+| DEC header inset               | DEC                                 | `disclosureEntityCardHeaderPaddingVariants`                         |
+| DEC body inset                 | DEC                                 | Body wash + inline start/end + block rhythm                         |
+| CLI body spacing (entity-card) | **None**                            | `rowLayout="entity-card"` → structural wrapper only                 |
+| Drag chrome                    | Foundational UI                     | `dragHandleVariants`, host reveal contract                          |
+| Control/focus chrome           | Foundational UI                     | `iconGhostControlVariants`, Button focus stack                      |
+| Separators                     | Host                                | List/section separators, not EntityAnatomyHost                      |
+| Form-array styling             | DEC + form field rhythm             | Form owns registration; DEC owns card geometry                      |
 
 ---
 
-## EntityItem
+## EntityAnatomyHost
 
 ### Owns
 
@@ -118,7 +118,7 @@ drag chrome, or interactive-row fills.
 
 ### Consumers must not
 
-- Add `px-*` / `py-*` to anatomy or EntityItem root to fix host or card misalignment
+- Add `px-*` / `py-*` to anatomy or EntityAnatomyHost root to fix host or card misalignment
 - Introduce parallel trailing APIs (`endSlot`, `headingEndSlot`) on entity surfaces
 - Publish `--entity-content-offset` (only surfaces with aligned sibling regions)
 
@@ -127,11 +127,11 @@ Optional DOM children must never alter grid-track ownership: leading → column 
 
 ### Leading utilities contract
 
-| API                                  | Scope                 | Rule                                                                           |
-| ------------------------------------ | --------------------- | ------------------------------------------------------------------------------ |
-| `EntityItem.leading`                 | Public embedded hosts | Exactly **one** utility when set — maps to `[leading]` internally              |
-| `EntityItemAnatomy.leadingUtilities` | Internal / surfaces   | Ordered list of utilities; **Anatomy is the sole `EntityLeadingRail` wrapper** |
-| DEC / DER disclosure                 | Surface composition   | Pass explicit utility nodes — never pre-wrap `EntityLeadingRail`               |
+| API                              | Scope                 | Rule                                                                           |
+| -------------------------------- | --------------------- | ------------------------------------------------------------------------------ |
+| `EntityAnatomyHost.leading`      | Public embedded hosts | Exactly **one** utility when set — maps to `[leading]` internally              |
+| `EntityAnatomy.leadingUtilities` | Internal / surfaces   | Ordered list of utilities; **Anatomy is the sole `EntityLeadingRail` wrapper** |
+| DEC / DER disclosure             | Surface composition   | Pass explicit utility nodes — never pre-wrap `EntityLeadingRail`               |
 
 Surfaces with disclosed sibling content publish `--entity-content-offset` on their root
 from utility **count** and **density**. Anatomy and `EntityLeadingRail` establish the
@@ -177,7 +177,7 @@ DEC is the **sole owner** of entity disclosure header/body geometry.
 DisclosureEntityCard (article)
 ├── CollapsibleListItem (rowLayout="entity-card")
 │   ├── header
-│   │   └── EntityItemAnatomy (inset-free)
+│   │   └── EntityAnatomy (inset-free)
 │   └── body (DEC body wash owns all inset)
 ├── divider (edge-to-edge on shell)
 └── domain children
@@ -205,7 +205,7 @@ DisclosureEntityCard (article)
 
 - Add card inset wrappers around DEC
 - Calculate grip/caret indentation or compensate with negative margins
-- Position trailing controls outside EntityItem anatomy
+- Position trailing controls outside EntityAnatomyHost anatomy
 - Rely on CLI `--content-column-indent` or CLI body `pt-3` for alignment
 
 ### CollapsibleListItem entity-card mode
@@ -247,7 +247,7 @@ via CLI — that path is for anonymous form arrays, not entity-backed disclosure
 
 ---
 
-## Hosts (embedded EntityItem)
+## Hosts (embedded EntityAnatomyHost)
 
 Search, master-detail, catalogs, relationship lists, and similar hosts own:
 
@@ -256,16 +256,16 @@ Search, master-detail, catalogs, relationship lists, and similar hosts own:
 
 ```text
 SearchResultRow          → owns px/py + hover + separator context
-  EntityItem             → owns leading | content | trailing
+  EntityAnatomyHost             → owns leading | content | trailing
 ```
 
-Do not repair missing host inset by adding padding back into EntityItem. Relationship
+Do not repair missing host inset by adding padding back into EntityAnatomyHost. Relationship
 rows may use different host inset than search; shared anatomy does not imply identical
 collection spacing.
 
-Detail and relationship rows compose `DetailEntityRow` → `EntityItemAnatomy`. Non-entity
+Detail and relationship rows compose `DetailEntityRow` → `EntityAnatomy`. Non-entity
 detail primitives may use `endSlot` for utility controls — that API does not apply to
-`EntityItem`, CEC, or DEC. See
+`EntityAnatomyHost`, CEC, or DEC. See
 [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
 
 ### Catalog entity picker rows
@@ -273,11 +273,11 @@ detail primitives may use `endSlot` for utility controls — that API does not a
 Entity-backed catalog pickers **must** use `CatalogEntityPickerSheet` → `CatalogEntityRow`.
 Raw `CatalogPickerSheet` remains for generic/non-entity catalogs only.
 
-| Layer                                       | Owns                                                                                                                     |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| CLI catalog shell                           | Border, background, hover footprint, structural `p-0`                                                                    |
-| `CatalogEntityRow` inset root               | Entity inset CSS variables, content-offset when leading utilities present, header padding, optional disclosure body wash |
-| `EntityItem` / `DisclosureEntityCardHeader` | Three-column identity                                                                                                    |
+| Layer                                              | Owns                                                                                                                     |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| CLI catalog shell                                  | Border, background, hover footprint, structural `p-0`                                                                    |
+| `CatalogEntityRow` inset root                      | Entity inset CSS variables, content-offset when leading utilities present, header padding, optional disclosure body wash |
+| `EntityAnatomyHost` / `DisclosureEntityCardHeader` | Three-column identity                                                                                                    |
 
 Features supply entity model, trailing semantics, and optional per-item `details` via
 `renderEntityRow` or `createCatalogEntityRowRenderer`. `rowLayout="entity-card"` is
@@ -322,14 +322,14 @@ form field stacks).
 
 ## Density
 
-`EntityItemAnatomy` owns identity typography, rhythm, media/leading/trailing geometry.
+`EntityAnatomy` owns identity typography, rhythm, media/leading/trailing geometry.
 Embedded hosts own collection inset. CEC and DEC own bordered shell inset and pass
 density to internal anatomy.
 
 Set density **exactly once**:
 
 - standalone cards: CEC or DEC;
-- embedded hosts: `EntityItem` + host-owned row inset;
+- embedded hosts: `EntityAnatomyHost` + host-owned row inset;
 - never size a shell and nested item independently.
 
 Entity/content **density** (`compact` | `comfortable`) is unrelated to form-control
@@ -351,8 +351,8 @@ policy via `resolveEntityLeadingGeometry({ count, density })`:
 does not add `mr-*` for content-start.
 
 **Publication rule:** publish `--entity-content-offset` only when content outside
-`EntityItemAnatomy` must align to column 2 (DEC disclosed body, DER disclosure body).
-CEC, master-detail, and embedded `EntityItem` hosts need anatomy layout only — CEC may
+`EntityAnatomy` must align to column 2 (DEC disclosed body, DER disclosure body).
+CEC, master-detail, and embedded `EntityAnatomyHost` hosts need anatomy layout only — CEC may
 publish `--leading-chrome-size` when a leading utility is present.
 
 DEC `article` publishes surface inset tokens and `--entity-content-offset`. Body
@@ -402,7 +402,7 @@ mixed heading phrase immediately after the title (`Title · Classification`). It
 trailing-rail value and must not be right-aligned via title `flex-1`, percentage width
 caps, or `ml-auto`. The title may shrink and truncate when the content column is narrow,
 but must not grow solely to push classification away from the name. `EntitySummary`'s outer
-`flex-1` fills EntityItem column 2; mixed-heading title growth is separate and forbidden.
+`flex-1` fills EntityAnatomyHost column 2; mixed-heading title growth is separate and forbidden.
 
 ---
 
@@ -460,18 +460,18 @@ That is not Add/discovery mode at the resting root. See
 ## Relationship rows
 
 Typed cross-content edges on detail pages use `CrossContentRelationshipRow` →
-`DetailEntityRow` → `EntityItemAnatomy`, not card shells. See
+`DetailEntityRow` → `EntityAnatomy`, not card shells. See
 [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
 
 ---
 
 ## Closed consumer API
 
-`EntityItem`, CEC, and DEC deliberately expose no `className`, `style`, padding,
+`EntityAnatomyHost`, CEC, and DEC deliberately expose no `className`, `style`, padding,
 inset, header/body, or divider styling props. Provide semantic data and controls
 through `entity`, `leading`, `trailing`, `headingHref`, and DEC `children` only.
 
-`ContentCardHeading`, `ContentCardBody`, `EntityCardFrame`, `EntityItemAnatomy`, and
+`ContentCardHeading`, `ContentCardBody`, `EntityCardFrame`, `EntityAnatomy`, and
 `EntityLeadingRail` are internal implementation details. Feature code uses the entity
 surfaces above rather than composing those internals directly.
 
@@ -482,18 +482,18 @@ surfaces above rather than composing those internals directly.
 Guards and tests encode ownership — they are not the contract themselves, but they
 prevent regression:
 
-| Guard / test                             | Enforces                                                                 |
-| ---------------------------------------- | ------------------------------------------------------------------------ |
-| `entity-item-anatomy.guard.test.ts`      | EntityItem variants stay inset-free; DEC keeps `rowLayout="entity-card"` |
-| `entity-surface.guard.test.ts`           | Entity-backed grants use DEC shell bridge, not generic ArrayItem card    |
-| `disclosure-entity-card.test.tsx`        | DEC body present; CLI legacy indent absent; leading offset on `article`  |
-| `grant-array-disclosure-shell.test.tsx`  | Grant integration: DEC alignment, no CLI `content-column-indent`         |
-| `collapsible-list-item.variants.test.ts` | Entity-card body classes exclude legacy inset                            |
-| `content-card.variants.test.ts`          | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks |
-| `entity-summary.test.tsx`                | Classification adjacent; status lane spacing and density-sized badges    |
-| `entity-summary-status.type.test.ts`     | Status prop is structured data, not ReactNode                            |
-| `entity-item-trailing.type.test.ts`      | Trailing action/group primary require ReactElement; closed secondary     |
-| AGENTS.md component rule                 | No consumer padding overrides on entity surfaces                         |
+| Guard / test                             | Enforces                                                                        |
+| ---------------------------------------- | ------------------------------------------------------------------------------- |
+| `entity-anatomy.guard.test.ts`           | EntityAnatomyHost variants stay inset-free; DEC keeps `rowLayout="entity-card"` |
+| `entity-surface.guard.test.ts`           | Entity-backed grants use DEC shell bridge, not generic ArrayItem card           |
+| `disclosure-entity-card.test.tsx`        | DEC body present; CLI legacy indent absent; leading offset on `article`         |
+| `grant-array-disclosure-shell.test.tsx`  | Grant integration: DEC alignment, no CLI `content-column-indent`                |
+| `collapsible-list-item.variants.test.ts` | Entity-card body classes exclude legacy inset                                   |
+| `content-card.variants.test.ts`          | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks        |
+| `entity-summary.test.tsx`                | Classification adjacent; status lane spacing and density-sized badges           |
+| `entity-summary-status.type.test.ts`     | Status prop is structured data, not ReactNode                                   |
+| `entity-anatomy-trailing.type.test.ts`   | Trailing action/group primary require ReactElement; closed secondary            |
+| AGENTS.md component rule                 | No consumer padding overrides on entity surfaces                                |
 
 ---
 
@@ -502,11 +502,11 @@ prevent regression:
 Documented policy is authoritative. These items may still exist in code and are tracked
 for cleanup — do not weaken docs to match legacy patterns:
 
-| Item                                           | Status                                                               |
-| ---------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Non-entity ArrayItem CLI content-column indent | **Intentional** for anonymous form arrays only                       |
-| `DetailEntityRow.endSlot`                      | **Intentional** for non-entity detail hosts — not for EntityItem/DEC |
-| Catalog picker entity rows                     | `CatalogEntityPickerSheet` → `CatalogEntityRow`                      | Mandatory for entity-backed pickers; inset on row root, border/bg on CLI shell |
+| Item                                           | Status                                                                      |
+| ---------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Non-entity ArrayItem CLI content-column indent | **Intentional** for anonymous form arrays only                              |
+| `DetailEntityRow.endSlot`                      | **Intentional** for non-entity detail hosts — not for EntityAnatomyHost/DEC |
+| Catalog picker entity rows                     | `CatalogEntityPickerSheet` → `CatalogEntityRow`                             | Mandatory for entity-backed pickers; inset on row root, border/bg on CLI shell |
 
 ---
 

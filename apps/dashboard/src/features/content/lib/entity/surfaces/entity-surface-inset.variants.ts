@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority'
 import {
   ENTITY_SURFACE_INLINE_END_VAR,
   ENTITY_SURFACE_INLINE_START_VAR,
-} from '../item/entity-geometry.tokens'
+} from '../anatomy/entity-geometry.tokens'
 
 export { ENTITY_SURFACE_INLINE_END_VAR, ENTITY_SURFACE_INLINE_START_VAR }
 

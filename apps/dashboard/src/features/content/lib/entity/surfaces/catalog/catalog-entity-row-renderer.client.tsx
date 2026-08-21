@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import type { CatalogPickerCollapsibleRowRenderArgs } from '@rpg/ui'
 
 import { CatalogEntityRow } from './catalog-entity-row.client'
-import type { EntityItemTrailing } from '../../item/entity-item-trailing.types'
+import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 
 export function createCatalogEntityRowRenderer<TItem>({
@@ -14,7 +14,7 @@ export function createCatalogEntityRowRenderer<TItem>({
   buildDetails,
 }: {
   buildEntity: (item: TItem) => EntitySummaryModel
-  buildTrailing: (item: TItem) => EntityItemTrailing | undefined
+  buildTrailing: (item: TItem) => EntityAnatomyTrailing | undefined
   buildHeadingHref?: (item: TItem) => string | undefined
   buildDetails?: (item: TItem) => ReactNode
 }) {

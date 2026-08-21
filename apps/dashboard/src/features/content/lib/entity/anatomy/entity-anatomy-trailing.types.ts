@@ -1,26 +1,26 @@
 import type { ReactElement } from 'react'
 
-export type EntityItemTrailingAction = {
+export type EntityAnatomyTrailingAction = {
   kind: 'action'
   content: ReactElement
 }
 
-export type EntityItemTrailingIndicator =
+export type EntityAnatomyTrailingIndicator =
   | { kind: 'indicator'; variant: 'chevron' }
   | { kind: 'indicator'; variant: 'quantity'; quantity: number; format?: 'compact' | 'label' }
 
-export type EntityItemTrailingSecondary =
+export type EntityAnatomyTrailingSecondary =
   | { kind: 'price'; label: string }
   | { kind: 'quantity'; quantity: number }
   | { kind: 'grantPreview'; label: string }
 
-export type EntityItemTrailingGroup = {
+export type EntityAnatomyTrailingGroup = {
   kind: 'group'
   primary: ReactElement
-  secondary?: EntityItemTrailingSecondary
+  secondary?: EntityAnatomyTrailingSecondary
 }
 
-export type EntityItemTrailing =
-  | EntityItemTrailingAction
-  | EntityItemTrailingIndicator
-  | EntityItemTrailingGroup
+export type EntityAnatomyTrailing =
+  | EntityAnatomyTrailingAction
+  | EntityAnatomyTrailingIndicator
+  | EntityAnatomyTrailingGroup

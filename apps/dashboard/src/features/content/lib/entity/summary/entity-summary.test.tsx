@@ -25,7 +25,7 @@ describe('EntitySummary mixed heading', () => {
     expect(mixedHeadingRow.childNodes[2]).toBe(classification)
   })
 
-  it('preserves outer summary flex-1 for EntityItem content column ownership', () => {
+  it('preserves outer summary flex-1 for EntityAnatomyHost content column ownership', () => {
     const { container } = render(
       <EntitySummary
         entity={{

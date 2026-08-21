@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { cn } from '@rpg/ui'
 
 import { DetailEntityRow } from '../../detail/row/detail-entity-row.client'
-import type { EntityItemTrailing } from '../../entity/item/entity-item-trailing.types'
+import type { EntityAnatomyTrailing } from '../../entity/anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryStatusItem } from '../../entity/summary/entity-summary-status.types'
 import { detailEntityRowSubheadingVariants } from '../../detail/row/detail-entity-row.variants'
 import {
@@ -37,9 +37,9 @@ export type CrossContentRelationshipRowProps = {
    * Trailing controls override.
    * - `undefined` — convenience overflow from `actions` when non-empty
    * - `null` — no trailing controls
-   * - `EntityItemTrailing` — semantic trailing rail content
+   * - `EntityAnatomyTrailing` — semantic trailing rail content
    */
-  trailing?: EntityItemTrailing | null
+  trailing?: EntityAnatomyTrailing | null
   className?: string
 }
 

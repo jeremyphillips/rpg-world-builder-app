@@ -9,7 +9,7 @@ import { Form, type FormItem } from '@rpg/ui/form'
 
 import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
 import { disclosureEntityCardBodyInlineStartClasses } from '../../entity/surfaces/cards/disclosure/disclosure-entity-card.variants'
-import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/item/entity-geometry.tokens'
+import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/anatomy/entity-geometry.tokens'
 
 const grantRowSchema = z.object({
   grantType: z.literal('spells'),

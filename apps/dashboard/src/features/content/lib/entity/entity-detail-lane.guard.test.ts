@@ -17,7 +17,7 @@ describe('entity detail lane migration guard', () => {
       expect(source, `${relativePath} must not import ContentCardHeading`).not.toMatch(
         /ContentCardHeading/,
       )
-      expect(source, `${relativePath} must compose EntityItem`).toMatch(/EntityItemAnatomy/)
+      expect(source, `${relativePath} must compose EntityAnatomyHost`).toMatch(/EntityAnatomy/)
     }
   })
 })

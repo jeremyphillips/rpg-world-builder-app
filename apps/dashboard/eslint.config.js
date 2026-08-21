@@ -43,13 +43,13 @@ const dashboardEntitySurfaceImportGuard = {
             name: '@rpg/ui',
             importNames: ['ContentCardHeading'],
             message:
-              'Entity identity must compose EntityItem, ContentEntityCard, or DisclosureEntityCard. ContentCardHeading is internal to the entity surface.',
+              'Entity identity must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardHeading is internal to the entity surface.',
           },
           {
             name: '@rpg/ui',
             importNames: ['ContentCardBody'],
             message:
-              'Entity presentation must compose EntityItem, ContentEntityCard, or DisclosureEntityCard. ContentCardBody is internal to the entity surface.',
+              'Entity presentation must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardBody is internal to the entity surface.',
           },
         ],
       },

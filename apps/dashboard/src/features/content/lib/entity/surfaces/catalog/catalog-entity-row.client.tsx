@@ -3,9 +3,9 @@
 import type { ReactNode } from 'react'
 import { CollapsibleListItem } from '@rpg/ui'
 
-import { EntityItem } from '../../item/entity-item.client'
-import type { EntityItemTrailing } from '../../item/entity-item-trailing.types'
-import { buildEntityContentOffsetStyle } from '../../item/entity-leading-rail.lib'
+import { EntityAnatomyHost } from '../../anatomy/entity-anatomy.client'
+import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailing.types'
+import { buildEntityContentOffsetStyle } from '../../anatomy/entity-leading-rail.lib'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import { DisclosureEntityCardHeader } from '../cards/disclosure/disclosure-entity-card-header.client'
 import {
@@ -23,7 +23,7 @@ export type CatalogEntityRowProps = {
   summary?: ReactNode
   details?: ReactNode
   entity: EntitySummaryModel
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
   headingHref?: string
 }
 
@@ -80,7 +80,7 @@ export function CatalogEntityRow({
                 density={CATALOG_ENTITY_ROW_DENSITY}
               />
             ) : (
-              <EntityItem
+              <EntityAnatomyHost
                 entity={entity}
                 trailing={trailing}
                 headingHref={headingHref}

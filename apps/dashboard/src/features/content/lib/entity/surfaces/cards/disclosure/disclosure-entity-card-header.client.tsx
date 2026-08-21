@@ -3,14 +3,14 @@
 import type { ReactNode } from 'react'
 import type { CollapsibleListItemDragHandleConfig, ContentCardDensity } from '@rpg/ui'
 
-import { EntityItemAnatomy } from '../../../item/entity-item.client'
-import type { EntityItemTrailing } from '../../../item/entity-item-trailing.types'
+import { EntityAnatomy } from '../../../anatomy/entity-anatomy.client'
+import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { resolveEntityDisclosureLeadingUtilities } from './disclosure-entity-card-header.lib'
 
 export type DisclosureEntityCardHeaderProps = {
   entity: EntitySummaryModel
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
   headingHref?: string
   density?: ContentCardDensity
   /** Optional consumer drag grip — rendered in the entity leading rail. */
@@ -31,7 +31,7 @@ export function DisclosureEntityCardHeader({
   const leadingUtilities = resolveEntityDisclosureLeadingUtilities({ dragHandle, dragHandleProps })
 
   return (
-    <EntityItemAnatomy
+    <EntityAnatomy
       entity={entity}
       headingHref={headingHref}
       leadingUtilities={leadingUtilities}

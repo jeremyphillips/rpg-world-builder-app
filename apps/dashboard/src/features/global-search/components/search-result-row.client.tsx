@@ -10,7 +10,7 @@ import { cn, interactiveFocusVariants } from '@rpg/ui'
 
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
-import { EntityItem } from '@/features/content'
+import { EntityAnatomyHost } from '@/features/content'
 
 import type { GlobalSearchSurfaceContext } from '../lib/global-search-surface.variants'
 import { searchResultRowVariants, type SearchResultRowDensity } from './search-result-row.variants'
@@ -75,7 +75,7 @@ export function SearchResultRow({
         aria-label={accessibleName}
       />
       <div className="pointer-events-none relative">
-        <EntityItem
+        <EntityAnatomyHost
           density={density === 'compact' ? 'compact' : 'comfortable'}
           entity={{
             heading: title,

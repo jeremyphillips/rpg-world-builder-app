@@ -65,7 +65,9 @@ describe('entity surface architecture guard', () => {
       expect(
         source,
         `${relativePath} must not target entity surfaces with descendants`,
-      ).not.toMatch(/\[&_[^\]]*(?:entity-|EntityItem|ContentEntityCard|DisclosureEntityCard)/)
+      ).not.toMatch(
+        /\[&_[^\]]*(?:entity-|EntityAnatomyHost|ContentEntityCard|DisclosureEntityCard)/,
+      )
       expect(source, `${relativePath} must not use !important`).not.toMatch(/!important/)
     }
   })
@@ -91,7 +93,7 @@ describe('entity surface architecture guard', () => {
 
   it('does not use legacy entity trailing or heading link props in feature code', () => {
     const legacyPropPattern =
-      /\b(?:EntityItem|ContentEntityCard|DisclosureEntityCard|DetailEntityRow|CrossContentRelationshipRow)[^;\n]*\b(?:action=|href=|endSlot=)/
+      /\b(?:EntityAnatomyHost|ContentEntityCard|DisclosureEntityCard|DetailEntityRow|CrossContentRelationshipRow)[^;\n]*\b(?:action=|href=|endSlot=)/
 
     for (const path of featureImplementationFiles()) {
       const relativePath = relative(FEATURE_ROOT, path)
@@ -120,8 +122,8 @@ describe('entity surface architecture guard', () => {
       const source = readFileSync(path, 'utf8')
       expect(
         source,
-        `${relativePath} must not compose EntityItemAnatomy or EntityLeadingRail`,
-      ).not.toMatch(/\bEntityItemAnatomy\b|\bEntityLeadingRail\b/)
+        `${relativePath} must not compose EntityAnatomy or EntityLeadingRail`,
+      ).not.toMatch(/\bEntityAnatomy\b|\bEntityLeadingRail\b/)
     }
   })
 })

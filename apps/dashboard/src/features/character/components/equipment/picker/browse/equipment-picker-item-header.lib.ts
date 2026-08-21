@@ -2,7 +2,7 @@ import type { Equipment, MagicItemRarity } from '@rpg/contracts'
 import { getMagicItemRarityLabel } from '@rpg/contracts'
 
 import type {
-  EntityItemTrailingSecondary,
+  EntityAnatomyTrailingSecondary,
   EntitySummaryStatusItem,
   EquipmentPickerRowViewModel,
 } from '@/features/content'
@@ -21,7 +21,7 @@ export type EquipmentPickerAction =
   | { kind: 'none' }
 
 export type EquipmentPickerItemPresentation = {
-  secondary?: EntityItemTrailingSecondary
+  secondary?: EntityAnatomyTrailingSecondary
   statusItems?: readonly EntitySummaryStatusItem[]
   action: EquipmentPickerAction
 }

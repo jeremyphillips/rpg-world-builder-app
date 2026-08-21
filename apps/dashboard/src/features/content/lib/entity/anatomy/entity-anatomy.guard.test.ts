@@ -5,23 +5,23 @@ import { describe, expect, it } from 'vitest'
 
 const ENTITY_ROOT = join(__dirname, '..')
 
-describe('entity item anatomy guard', () => {
+describe('entity anatomy guard', () => {
   it('keeps status row spacing on the canonical lane', () => {
     const source = readFileSync(join(ENTITY_ROOT, 'summary/entity-summary.variants.ts'), 'utf8')
-    expect(source).toMatch(/entityItemStatusRowVariants[\s\S]*mt-1/)
+    expect(source).toMatch(/entitySummaryStatusRowVariants[\s\S]*mt-1/)
   })
 
-  it('does not assign collection inset on EntityItem root', () => {
-    const source = readFileSync(join(ENTITY_ROOT, 'item/entity-item.variants.ts'), 'utf8')
+  it('does not assign collection inset on EntityAnatomyHost root', () => {
+    const source = readFileSync(join(ENTITY_ROOT, 'anatomy/entity-anatomy.variants.ts'), 'utf8')
     expect(source).not.toMatch(/\bpx-\d/)
     expect(source).not.toMatch(/\bpx-\[/)
   })
 
   it('does not publish leading offset vars from anatomy or leading rail', () => {
     for (const file of [
-      'item/entity-item.client.tsx',
-      'item/entity-leading-rail.client.tsx',
-      'item/entity-item-trailing.client.tsx',
+      'anatomy/entity-anatomy.client.tsx',
+      'anatomy/entity-leading-rail.client.tsx',
+      'anatomy/entity-anatomy-trailing.client.tsx',
     ]) {
       const source = readFileSync(join(ENTITY_ROOT, file), 'utf8')
       expect(source, `${file} must not publish --entity-leading-offset`).not.toMatch(
@@ -45,10 +45,13 @@ describe('entity item anatomy guard', () => {
   })
 
   it('keeps explicit grid tracks without global horizontal gap', () => {
-    const variantsSource = readFileSync(join(ENTITY_ROOT, 'item/entity-item.variants.ts'), 'utf8')
+    const variantsSource = readFileSync(
+      join(ENTITY_ROOT, 'anatomy/entity-anatomy.variants.ts'),
+      'utf8',
+    )
     const anatomyBlock = variantsSource.slice(
-      variantsSource.indexOf('export const entityItemAnatomyVariants'),
-      variantsSource.indexOf('export const entityItemLeadingSlotVariants'),
+      variantsSource.indexOf('export const entityAnatomyVariants'),
+      variantsSource.indexOf('export const entityAnatomyLeadingSlotVariants'),
     )
 
     expect(variantsSource).toMatch(/col-start-2/)
@@ -122,21 +125,23 @@ describe('entity item anatomy guard', () => {
     expect(violations).toEqual([])
   })
 
-  it('does not import item/ from summary/', () => {
+  it('does not import anatomy/ from summary/', () => {
     const summaryDir = join(ENTITY_ROOT, 'summary')
     for (const file of readdirSync(summaryDir)) {
       if (!file.endsWith('.ts') && !file.endsWith('.tsx')) continue
       const source = readFileSync(join(summaryDir, file), 'utf8')
-      expect(source, `summary/${file} must not import item/`).not.toMatch(/from ['"].*\/item\//)
+      expect(source, `summary/${file} must not import anatomy/`).not.toMatch(
+        /from ['"].*\/anatomy\//,
+      )
     }
   })
 
-  it('does not import surfaces/ from item/', () => {
-    const itemDir = join(ENTITY_ROOT, 'item')
-    for (const file of readdirSync(itemDir)) {
+  it('does not import surfaces/ from anatomy/', () => {
+    const anatomyDir = join(ENTITY_ROOT, 'anatomy')
+    for (const file of readdirSync(anatomyDir)) {
       if (!file.endsWith('.ts') && !file.endsWith('.tsx')) continue
-      const source = readFileSync(join(itemDir, file), 'utf8')
-      expect(source, `item/${file} must not import surfaces/`).not.toMatch(
+      const source = readFileSync(join(anatomyDir, file), 'utf8')
+      expect(source, `anatomy/${file} must not import surfaces/`).not.toMatch(
         /from ['"].*\/surfaces\//,
       )
     }

@@ -2,7 +2,7 @@
 
 import { cn } from '@rpg/ui'
 
-import { EntityItemAnatomy } from '../../entity/item/entity-item.client'
+import { EntityAnatomy } from '../../entity/anatomy/entity-anatomy.client'
 import { projectEntitySummaryModel } from '../../entity/summary/entity-summary-projection.lib'
 import type { DrawerContextEntity } from './drawer-context.types'
 import { drawerContextEntityVariants } from './drawer-context.variants'
@@ -22,7 +22,7 @@ export function DrawerContextEntityBlock({
 }: DrawerContextEntityBlockProps) {
   return (
     <div className={cn(drawerContextEntityVariants(), className)}>
-      <EntityItemAnatomy
+      <EntityAnatomy
         entity={projectEntitySummaryModel({
           heading,
           classification: headingSuffix,

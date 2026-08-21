@@ -94,7 +94,7 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   `lib/` form modules (`*-form-fields`, `*-form-values`, …) →
   [apps/dashboard/docs/form-lib-conventions.md](apps/dashboard/docs/form-lib-conventions.md).
 - Entity surfaces: do not add consumer-local spacing, typography, border, radius,
-  alignment, divider, or chrome overrides to `EntityItem`,
+  alignment, divider, or chrome overrides to `EntityAnatomyHost`,
   `ContentEntityCard`, or `DisclosureEntityCard`. First determine whether the
   change belongs to the shared surface; genuine domain layout remains inside DEC
   children. Ownership hierarchy and per-primitive contracts →

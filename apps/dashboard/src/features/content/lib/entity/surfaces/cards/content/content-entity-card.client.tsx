@@ -4,8 +4,8 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ContentCardHeadingAction, type ContentCardDensity } from '@rpg/ui'
 
-import { EntityItemAnatomy } from '../../../item/entity-item.client'
-import type { EntityItemTrailing } from '../../../item/entity-item-trailing.types'
+import { EntityAnatomy } from '../../../anatomy/entity-anatomy.client'
+import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { EntityCardFrame } from './entity-card-frame.client'
 
@@ -13,7 +13,7 @@ export type ContentEntityCardProps = {
   entity: EntitySummaryModel
   /** Exactly one leading utility when set — never a multi-control fragment. */
   leading?: ReactNode
-  trailing?: EntityItemTrailing
+  trailing?: EntityAnatomyTrailing
   /** Links the entity heading only — not whole-row/card navigation. */
   headingHref?: string
   density?: ContentCardDensity
@@ -39,7 +39,7 @@ export function ContentEntityCard({
       disabled={disabled}
       leadingUtilityCount={leading ? 1 : 0}
     >
-      <EntityItemAnatomy
+      <EntityAnatomy
         entity={entity}
         headingHref={headingHref}
         leadingUtilities={leading != null ? [leading] : undefined}
