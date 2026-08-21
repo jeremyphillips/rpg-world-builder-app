@@ -1,8 +1,8 @@
 'use client'
 
 import { CharacterOrganizationMembershipDrawers } from './character-organization-membership-drawers.client'
-import { useCharacterOrganizationMembershipsSheet } from '../../hooks/use-character-organization-memberships-sheet.client'
-import type { CharacterOrganizationMembershipSubjectKind } from '../../lib/invalidate-character-organization-membership-queries'
+import { useCharacterOrganizationMembershipsSheet } from '../../../hooks/use-character-organization-memberships-sheet.client'
+import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
 import { CharacterOrganizationsSummary } from './character-organizations-summary.client'
 
 export type CharacterOrganizationMembershipsContainerProps = {

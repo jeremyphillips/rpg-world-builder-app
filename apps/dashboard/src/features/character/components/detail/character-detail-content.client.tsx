@@ -11,15 +11,15 @@ import { ContentDeletionBlockedDialog } from '@/features/content'
 
 import { useDeleteCharacter } from '../../hooks/use-delete-character'
 import type { CharacterDetailViewModel } from '../../lib/display/character-display'
-import { CharacterDetailAbilitiesRow } from './character-detail-abilities-row.client'
-import { CharacterDetailCombatRow } from './character-detail-combat-row.client'
-import { CharacterDetailHeader } from './character-detail-header.client'
+import { CharacterDetailAbilitiesRow } from './sheet/character-detail-abilities-row.client'
+import { CharacterDetailCombatRow } from './sheet/character-detail-combat-row.client'
+import { CharacterDetailHeader } from './sheet/character-detail-header.client'
 import {
   characterDetailAbilitiesStatsSectionClasses,
   characterDetailBodyGridClasses,
-} from './character-detail-sheet.variants'
-import { CharacterDetailStatsRow } from './character-detail-stats-row.client'
-import { CharacterDetailTabs } from './character-detail-tabs.client'
+} from './sheet/character-detail-sheet.variants'
+import { CharacterDetailStatsRow } from './sheet/character-detail-stats-row.client'
+import { CharacterDetailTabs } from './tabs/character-detail-tabs.client'
 
 export type CharacterDetailDeleteConfig = {
   open: boolean

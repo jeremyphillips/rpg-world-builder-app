@@ -15,6 +15,7 @@ Folder layout and the feature-boundary rule are documented in
 | Create route       | `routes/character-create.tsx` (concentration mode)                             |
 | Detail route       | `routes/character-detail.tsx`                                                  |
 | Detail content     | `components/detail/character-detail-content.client.tsx`                        |
+| Detail lib         | `lib/detail/` — sheet catalog cards, tab filters, route error copy             |
 | API clients        | `api/character-client.ts`, `api/ruleset-content-client.ts`                     |
 | Build context      | `hooks/use-build-context.ts`                                                   |
 | Character queries  | `hooks/use-character.ts`, `hooks/use-characters.ts`                            |
@@ -28,6 +29,23 @@ Folder layout and the feature-boundary rule are documented in
 | Character display  | `lib/display/` — list/detail view models                                       |
 | Step hooks         | `hooks/use-equipment-step.client.ts`, `hooks/use-proficiencies-step.client.ts` |
 | Restore affordance | `components/character-builder-draft-restore.client.tsx`                        |
+
+## `components/detail/` layout
+
+Read-only character sheet UI shared by PC and NPC detail routes. Route entry
+points stay at the folder root; subfolders group stable sub-surfaces. Non-UI
+catalog/filter logic lives in `lib/detail/`; view models in `lib/display/`.
+
+| Subfolder      | Responsibility                                                        |
+| -------------- | --------------------------------------------------------------------- |
+| _(root)_       | `character-detail-content`, `character-sheet-detail-shell`            |
+| `sheet/`       | Upper sheet layout — header, ability/stat/combat rows, stat tile, CVA |
+| `tabs/`        | Lower tab region — spells/equipment catalog tabs, narrative           |
+| `status/`      | Route-injected status chrome (`statusSummary` slot)                   |
+| `memberships/` | Campaign org membership summary, container, drawer wiring             |
+
+Builder `equipment/`, `spells/`, and `connections/` folders are separate
+lifecycles — detail tabs and membership composition stay here.
 
 ## `npc/` sub-feature
 

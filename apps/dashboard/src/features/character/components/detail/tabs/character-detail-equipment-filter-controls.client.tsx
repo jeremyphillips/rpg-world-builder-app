@@ -8,7 +8,7 @@ import {
   createCharacterDetailEquipmentFilterSchema,
   type CharacterDetailEquipmentFilterState,
   type CreateCharacterDetailEquipmentFilterSchemaArgs,
-} from '../../lib/detail/character-detail-equipment-filter-schema'
+} from '../../../lib/detail/character-detail-equipment-filter-schema'
 
 type CharacterDetailEquipmentFilterControlsProps = {
   schemaArgs: CreateCharacterDetailEquipmentFilterSchemaArgs

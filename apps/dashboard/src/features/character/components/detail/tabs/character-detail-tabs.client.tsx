@@ -10,16 +10,16 @@ import {
   type CharacterDetailListItem,
   type CharacterDetailListSection,
   type CharacterWealthViewModel,
-} from '../../lib/display/character-display'
+} from '../../../lib/display/character-display'
 import type {
   CharacterSheetEquipmentCard,
   CharacterSheetSpellCard,
-} from '../../lib/detail/character-sheet-catalog'
-import { narrativeFieldCount } from '../../lib/builder-preview/narrative-preview'
+} from '../../../lib/detail/character-sheet-catalog'
+import { narrativeFieldCount } from '../../../lib/builder-preview/narrative-preview'
 import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.client'
 import { CharacterDetailNarrativeSection } from './character-detail-narrative-section.client'
 import { CharacterDetailSpellsTab } from './character-detail-spells-tab.client'
-import { characterDetailTabPanelClasses } from './character-detail-sheet.variants'
+import { characterDetailTabPanelClasses } from '../sheet/character-detail-sheet.variants'
 
 export type CharacterDetailTabsProps = {
   spells: readonly CharacterSheetSpellCard[]

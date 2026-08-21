@@ -6,7 +6,7 @@ import type { OrganizationReferenceResolution } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../lib/display/character-display'
+import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../../lib/display/character-display'
 
 export type CharacterOrganizationsSummaryMembership = OrganizationReferenceResolution
 

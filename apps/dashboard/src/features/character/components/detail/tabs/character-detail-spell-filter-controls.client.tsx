@@ -8,7 +8,7 @@ import {
   createCharacterDetailSpellFilterSchema,
   type CharacterDetailSpellFilterState,
   type CreateCharacterDetailSpellFilterSchemaArgs,
-} from '../../lib/detail/character-detail-spell-filter-schema'
+} from '../../../lib/detail/character-detail-spell-filter-schema'
 
 type CharacterDetailSpellFilterControlsProps = {
   schemaArgs: CreateCharacterDetailSpellFilterSchemaArgs

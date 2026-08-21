@@ -12,12 +12,12 @@ import {
   DisclosureEntityCard,
 } from '@/features/content'
 import { buildSpellDetailViewModel, SpellDetailMetadata } from '@/features/content'
-import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/display/character-display'
+import { CHARACTER_EMPTY_SECTION_TEXT } from '../../../lib/display/character-display'
 import {
   createCharacterDetailSpellFilterSchema,
   countCharacterDetailSpellStructuredFilters,
   type CharacterDetailSpellFilterState,
-} from '../../lib/detail/character-detail-spell-filter-schema'
+} from '../../../lib/detail/character-detail-spell-filter-schema'
 import {
   CHARACTER_DETAIL_SPELL_RESET_VIEW_LABEL,
   CHARACTER_DETAIL_SPELL_SEARCH_MIN_ITEMS,
@@ -25,13 +25,13 @@ import {
   CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS,
   filterCharacterDetailSpellCards,
   resolveCharacterDetailSpellLevelChipOptions,
-} from '../../lib/detail/character-detail-spell-filters.lib'
+} from '../../../lib/detail/character-detail-spell-filters.lib'
 import {
   toSpellCatalogHeaderModel,
   type CharacterSheetSpellCard,
-} from '../../lib/detail/character-sheet-catalog'
-import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
-import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
+} from '../../../lib/detail/character-sheet-catalog'
+import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import { CatalogToolbarResetAction } from '../../picker/catalog-toolbar-reset-action.client'
 import { CharacterDetailSpellFilterControls } from './character-detail-spell-filter-controls.client'
 
 export type CharacterDetailSpellsTabProps = {

@@ -8,10 +8,10 @@ import { pickEquipment } from '@/features/content'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../../lib/fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
-import { buildCharacterSheetEquipmentCards } from '../../lib/detail/character-sheet-catalog'
-import { EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL } from '../equipment/equipment-picker-drawer.types'
+} from '../../../lib/fixtures/character-builder-fixtures'
+import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
+import { buildCharacterSheetEquipmentCards } from '../../../lib/detail/character-sheet-catalog'
+import { EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL } from '../../equipment/equipment-picker-drawer.types'
 import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.client'
 
 beforeAll(() => {

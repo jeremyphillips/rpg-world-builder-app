@@ -12,12 +12,12 @@ import {
   DisclosureEntityCard,
 } from '@/features/content'
 import { buildEquipmentDetailViewModel, EquipmentDetailMetadata } from '@/features/content'
-import { CHARACTER_EMPTY_SECTION_TEXT } from '../../lib/display/character-display'
+import { CHARACTER_EMPTY_SECTION_TEXT } from '../../../lib/display/character-display'
 import {
   createCharacterDetailEquipmentFilterSchema,
   countCharacterDetailEquipmentStructuredFilters,
   type CharacterDetailEquipmentFilterState,
-} from '../../lib/detail/character-detail-equipment-filter-schema'
+} from '../../../lib/detail/character-detail-equipment-filter-schema'
 import {
   CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL,
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS,
@@ -30,16 +30,16 @@ import {
   resolveCharacterDetailEquipmentKindOptions,
   sortCharacterDetailEquipmentCards,
   type CharacterDetailEquipmentSortMode,
-} from '../../lib/detail/character-detail-equipment-filters.lib'
+} from '../../../lib/detail/character-detail-equipment-filters.lib'
 import {
   toEquipmentCatalogHeaderModel,
   type CharacterSheetEquipmentCard,
-} from '../../lib/detail/character-sheet-catalog'
-import type { CharacterWealthViewModel } from '../../lib/display/character-display'
-import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
-import { CatalogSortControl } from '../picker/catalog-sort-control.client'
-import { pickerSortOption } from '../picker/catalog-picker-sort-labels.lib'
-import { CatalogToolbarResetAction } from '../picker/catalog-toolbar-reset-action.client'
+} from '../../../lib/detail/character-sheet-catalog'
+import type { CharacterWealthViewModel } from '../../../lib/display/character-display'
+import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import { CatalogSortControl } from '../../picker/catalog-sort-control.client'
+import { pickerSortOption } from '../../picker/catalog-picker-sort-labels.lib'
+import { CatalogToolbarResetAction } from '../../picker/catalog-toolbar-reset-action.client'
 import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls.client'
 
 export type CharacterDetailEquipmentTabProps = {

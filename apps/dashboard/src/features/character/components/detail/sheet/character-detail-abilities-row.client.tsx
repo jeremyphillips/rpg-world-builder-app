@@ -1,6 +1,6 @@
 'use client'
 
-import type { CharacterAbilityTile } from '../../lib/display/character-display'
+import type { CharacterAbilityTile } from '../../../lib/display/character-display'
 import { CharacterDetailStatTile } from './character-detail-stat-tile.client'
 import {
   characterDetailAbilitiesContainerClasses,

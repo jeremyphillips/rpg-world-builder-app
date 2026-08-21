@@ -5,9 +5,9 @@ import { pickEquipment } from '@/features/content'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../../lib/fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
-import { buildCharacterSheetEquipmentCards } from '../../lib/detail/character-sheet-catalog'
+} from '../../../lib/fixtures/character-builder-fixtures'
+import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
+import { buildCharacterSheetEquipmentCards } from '../../../lib/detail/character-sheet-catalog'
 import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab.client'
 
 const context = createPopulatedStandaloneBuilderContextFixture()

@@ -6,7 +6,7 @@ import {
   CHARACTER_HIT_POINT_LABELS,
   type CharacterDetailStatTileFooter,
   type CharacterHitPointsViewModel,
-} from '../../lib/display/character-display'
+} from '../../../lib/display/character-display'
 import {
   characterDetailStatTileCompactWidthClasses,
   characterDetailStatTileEyebrowClasses,

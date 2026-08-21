@@ -2,14 +2,14 @@
 
 import { ConfirmDialog } from '@rpg/ui'
 
-import { EditOrganizationMembershipDrawer } from '../../components/connections/edit-organization-membership-drawer.client'
+import { EditOrganizationMembershipDrawer } from '../../connections/edit-organization-membership-drawer.client'
 import {
   CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
   type EditOrganizationMembershipOrganization,
-} from '../../components/connections/edit-organization-membership-drawer.types'
-import { OrganizationPickerDrawer } from '../../components/connections/organization-picker-drawer.client'
-import type { OrganizationMembershipSelection } from '../../components/connections/organization-picker-drawer.types'
-import type { OrganizationPickerItem } from '../../components/connections/organization-picker-drawer.types'
+} from '../../connections/edit-organization-membership-drawer.types'
+import { OrganizationPickerDrawer } from '../../connections/organization-picker-drawer.client'
+import type { OrganizationMembershipSelection } from '../../connections/organization-picker-drawer.types'
+import type { OrganizationPickerItem } from '../../connections/organization-picker-drawer.types'
 import type { OrganizationReferenceResolution } from '@rpg/contracts'
 
 type CharacterOrganizationMembershipDrawersProps = {
