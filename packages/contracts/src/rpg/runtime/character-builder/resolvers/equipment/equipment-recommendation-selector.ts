@@ -1,6 +1,6 @@
 import type { Equipment } from '../../../../content/equipment'
-import type { EquipmentPool } from '../../../../content/lib/equipment-grant'
-import type { ToolProficiencyPool } from '../../../../content/lib/proficiency-grant'
+import type { EquipmentPool } from '../../../../content/lib/grants/equipment-grant'
+import type { ToolProficiencyPool } from '../../../../content/lib/grants/proficiency-grant'
 import {
   equipmentMatchesEquipmentPool,
   listEquipmentMatchingPool,

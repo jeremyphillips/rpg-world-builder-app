@@ -1,7 +1,7 @@
 import type { Equipment } from '../../content/equipment'
 import { isArmorEquipment } from '../../content/equipment'
 import { getEquipmentSpellcastingGearKind } from '../../content/equipment/adventuring-gear-variant'
-import type { EquipmentPool } from '../../content/lib/equipment-grant'
+import type { EquipmentPool } from '../../content/lib/grants/equipment-grant'
 import { resolveEquipmentContentId } from '../../content/starting-equipment'
 import { equipmentIdMatchesReference } from './equipment-id-match'
 

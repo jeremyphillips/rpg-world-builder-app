@@ -5,7 +5,7 @@ import type { CharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
 import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
 import { isChoiceStep, resolveEffectiveBuilderSteps } from '../steps'
-import { characterConnectionsSchema } from '../../character/connections'
+import { characterConnectionsSchema } from '../../character/connections/connections'
 import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
 
 import { validationIssue } from './issue'

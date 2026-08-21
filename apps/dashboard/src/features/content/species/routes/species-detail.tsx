@@ -2,8 +2,8 @@ import { useParams } from 'react-router-dom'
 import { Heading, RichTextContent } from '@rpg/ui'
 import type { Species } from '@rpg/contracts'
 
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
-import { WidePage } from '@/components/layout/wide-page'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
+import { WidePage } from '@/components/layout/page/wide-page'
 import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,

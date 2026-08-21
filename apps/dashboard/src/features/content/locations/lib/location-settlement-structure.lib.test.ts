@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { HARBORFORD, DOCK_WARD, YAWNING_PORTAL } from '../fixtures'
-import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
+import { childAuthoringTypesForParentKind } from './create/location-create-shortcuts'
 import {
   isDirectPlaceAuthoringTypeForSettlement,
   isDistrictAuthoringTypeForSettlement,

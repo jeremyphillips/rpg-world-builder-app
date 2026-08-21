@@ -1,40 +1,107 @@
 # Character builder picker chrome
 
-Phase D audit of equipment, spell, and proficiency catalog pickers in the
+Audit of equipment, spell, proficiency, and organization catalog pickers in the
 character builder. Domain item resolution lives in `@rpg/contracts`; this doc
-covers dashboard presentation chrome and what is shared vs domain-specific.
+covers dashboard presentation chrome, ownership boundaries, and what is shared
+vs domain-specific.
+
+Drawer grammars and full surface inventory: [drawer-architecture.md](./drawer-architecture.md).
 
 Resolver catalog: [character-builder-resolvers.md](../../../packages/contracts/docs/character-builder-resolvers.md).
 
+## Architectural rule
+
+Evaluate every new picker against this stack:
+
+```text
+consumer / workflow hook     → persistence and application mutation
+domain controller (optional) → browse / filter / quantity / derived presentation state
+domain drawer                → sheet composition + domain interaction model
+shared picker chrome         → stateless or same-lifecycle UI used by ≥2 character domains
+CatalogEntityPickerSheet     → catalog row host (content)
+```
+
+Three commit layers — do not collapse them:
+
+- **UI commit mechanics** — quantity field value, reset-after-add, pending/success flash
+- **Domain rules** — affordability, stackable max, eligibility (contracts / domain libs)
+- **Application mutation** — purchase intent vs magic-item grant, draft patches, REST membership create
+
+Domain drawers **may** understand their domain interaction model. They **must not**
+understand the persistence mechanism of the consuming surface (builder draft patch vs
+sheet API).
+
+Use the catalog entity picker sheet (or its successor) — do not fork a parallel shell.
+There is no import-string guard; the contract is documented here.
+
 ## Drawer entry points
 
-| Domain        | Drawer                                                          | Lib                                |
-| ------------- | --------------------------------------------------------------- | ---------------------------------- |
-| Equipment     | `components/equipment/equipment-picker-drawer.client.tsx`       | `equipment-picker-drawer.lib.ts`   |
-| Spells        | `components/spells/spell-picker-drawer.client.tsx`              | `spell-picker-drawer.lib.ts`       |
-| Proficiencies | `components/proficiencies/proficiency-picker-drawer.client.tsx` | `proficiency-picker-drawer.lib.ts` |
+| Domain        | Drawer                                                                  | Controller / lib                                           |
+| ------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Equipment     | `components/equipment/picker/drawer/equipment-picker-drawer.client.tsx` | `useEquipmentPickerController` + drawer lib                |
+| Spells        | `components/spells/picker/spell-picker-drawer.client.tsx`               | `useSpellPickerController` + drawer lib + browse-mode lib  |
+| Proficiencies | `components/proficiencies/picker/proficiency-picker-drawer.client.tsx`  | drawer lib only (no controller)                            |
+| Organizations | `components/connections/picker/organization-picker-drawer.client.tsx`   | drawer lib only — builder **and** sheet reuse control case |
 
-All three are thin wrappers over `@rpg/ui` **`CatalogPickerSheet`**, spreading
-`catalogPickerShellProps()` from `components/picker/catalog-picker-shell.lib.ts`.
+All four are domain composition shells over `@rpg/content` **`CatalogEntityPickerSheet`**
+(`surface="background"`, `size="lg"`). Equipment and spell browse state live in domain
+controllers; mutation stays in step/acquisition hooks.
+
+## Layering
+
+```text
+consumer / acquisition hook       → persistence (onCommitAdd, manage callbacks, onSelect)
+useEquipmentPickerController      → equipment browse / filter / quantity / derived presentation
+useSpellPickerController          → spell mode buckets / filter persist / derived lists
+domain drawer                       → sheet composition + domain presentation
+shared picker chrome (components/picker/) → sort, selection actions, reset, empty states
+CatalogEntityPickerSheet            → catalog row host
+CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
+```
+
+## Per-drawer contracts
+
+### EquipmentPickerDrawer
+
+**May know:** equipment domain; browse workflow mode for **presentation** (filters/sorts/budget/callouts); row/detail composition; quantity UI; grant manage **callbacks**; documented pass-through of grant/acquisition context to details until acquisition VM is weaned off draft.
+
+**Must not know:** how a purchase is persisted; how a magic-item grant is applied; character-step mutation implementation; purchase-vs-grant routing on the add path (consumer maps `onCommitAdd`).
+
+### SpellPickerDrawer
+
+**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; spell metadata/markers; selection-full empty states; spell-only selection summary chrome.
+
+**Must not know:** `draft.choiceSelections` shape; how the builder patches draft; campaign/sheet persistence.
+
+### ProficiencyPickerDrawer
+
+**May know:** one active `ChoiceSet`; skill vs other choice types for details; sort/search; `catalogIndex` for **skill catalog presentation**.
+
+**Must not know:** how selections are stored on the draft; step-hook internals.
+
+### OrganizationPickerDrawer
+
+**May know:** organization domain filter; membership title field; selected vs available; pending/error/close-on-success as add-flow interaction.
+
+**Must not know:** builder `draft.connections` vs sheet API vs org-roster consumers; character record shape.
 
 ## Commonality matrix
 
-| Dimension                   | Equipment                       | Spells                   | Proficiencies         | Shared chrome                                                                          |
-| --------------------------- | ------------------------------- | ------------------------ | --------------------- | -------------------------------------------------------------------------------------- |
-| Sheet shell                 | ✓                               | ✓                        | ✓                     | `CatalogPickerSheet` + `catalogPickerShellProps` (`surface="background"`, `size="lg"`) |
-| Search                      | Built-in sheet search           | Same                     | Same                  | `@rpg/ui`                                                                              |
-| Structured filters          | Kind + affordable toggles       | School, level, mechanics | —                     | Equipment ↔ Spells pattern only                                                        |
-| Sort                        | `CatalogSortControl`            | Wrapped sort control     | `CatalogSortControl`  | `CatalogSortControl` + sort mode constants                                             |
-| Reset view / clear          | Dual-mode (clear vs reset)      | Reset slot               | Reset slot            | `catalog-picker-filter-state.lib.ts`, `CatalogToolbarResetSlot`                        |
-| Empty state panel           | Sheet defaults                  | Custom message           | Custom message        | **`CatalogPickerResultsState`**                                                        |
-| Row add/remove              | Commerce / acquisition rail     | Selection actions        | Selection actions     | Spells ↔ Proficiencies: **`CatalogPickerSelectionActions`**                            |
-| Row dimming / disabled note | Domain-specific (affordability) | Shared resolver state    | Shared resolver state | **`catalog-picker-row-state.lib.ts`**                                                  |
-| Empty-state kind/message    | —                               | Choice-set driven        | Choice-set driven     | **`catalog-picker-empty-state.lib.ts`**                                                |
-| Recommendation tabs         | No                              | Yes                      | No                    | Spells only                                                                            |
-| Workflow mode tabs          | Purchase / magic items          | Cantrips / prepared      | No                    | Equipment only                                                                         |
-| Budget / price UI           | Yes                             | No                       | No                    | Equipment only                                                                         |
-| Loading in drawer           | —                               | —                        | —                     | Unused (items resolved before open)                                                    |
-| Error in drawer             | —                               | —                        | —                     | Upstream step readiness gating                                                         |
+| Dimension                   | Equipment                         | Spells                   | Proficiencies         | Shared chrome                                                           |
+| --------------------------- | --------------------------------- | ------------------------ | --------------------- | ----------------------------------------------------------------------- |
+| Sheet shell                 | ✓                                 | ✓                        | ✓                     | `CatalogEntityPickerSheet` (`surface="background"`, `size="lg"`)        |
+| Search                      | Built-in sheet search             | Same                     | Same                  | `@rpg/ui`                                                               |
+| Structured filters          | Kind + affordable toggles         | School, level, mechanics | —                     | Equipment ↔ Spells pattern only                                         |
+| Sort                        | `CatalogSortControl`              | Wrapped sort control     | `CatalogSortControl`  | `CatalogSortControl` + sort mode constants                              |
+| Reset view / clear          | Dual-mode (clear vs reset)        | Reset slot               | Reset slot            | `catalog-picker-filter-state.lib.ts`, `CatalogToolbarResetSlot`         |
+| Empty state panel           | Sheet defaults                    | Custom message           | Custom message        | **`CatalogPickerResultsState`** (spells/proficiencies only)             |
+| Row add/remove              | Commerce / acquisition rail       | Selection actions        | Selection actions     | Spells ↔ Proficiencies: **`CatalogPickerSelectionActions`** (`@rpg/ui`) |
+| Row dimming / disabled note | Domain-specific (affordability)   | Shared resolver state    | Shared resolver state | **`picker/row/catalog-picker-row-state.lib.ts`**                        |
+| Empty-state kind/message    | —                                 | Choice-set driven        | Choice-set driven     | **`picker/results/catalog-picker-empty-state.lib.ts`**                  |
+| Recommendation tabs         | No                                | Yes                      | No                    | Spells only                                                             |
+| Workflow mode tabs          | Purchase / magic items            | Cantrips / prepared      | No                    | Equipment only                                                          |
+| Budget / price UI           | Yes                               | No                       | No                    | Equipment only                                                          |
+| Metadata renderer           | Content `CatalogMetadataRenderer` | Same                     | Same                  | Domain mappers under each `*/picker/`                                   |
 
 ## Contracts vs dashboard ownership
 
@@ -53,10 +120,10 @@ Row state for spells and proficiencies extends `PickerItemStateBase`
 ### Dashboard (presentation + browse UX)
 
 - Filter schemas and filter control wiring (`*-picker-filter-schema.ts`, toolbar clients)
-- Client-side search scoring and sort orchestration (`*-picker-drawer.lib.ts`, `catalog-picker-sort.lib.ts`)
-- Drawer-only browse state (spell mode tabs, equipment workflow mode)
+- Client-side search scoring and sort orchestration (`*-picker-drawer.lib.ts`, `picker/sort/catalog-picker-sort.lib.ts`)
+- Domain controllers for equipment and spell browse lifecycle
 - Row chrome beyond selection actions (equipment acquisition panels, spell markers)
-- Metadata line mapping (`catalog-picker-metadata/`)
+- Metadata line mapping (domain `*/picker/map-*-to-metadata-lines.ts` → `CatalogMetadataLine`)
 - Draft mutations (step hooks)
 
 **Rule:** Do not re-implement domain eligibility, blockers, or affordability in
@@ -65,32 +132,72 @@ only if a non-dashboard consumer appears.
 
 ## Shared picker modules (`components/picker/`)
 
-Extracted in Phase D where proven across **two or more** pickers:
+`components/picker/` is a **shared character picker chrome/composition layer**, not a
+bucket for anything two files import. A module belongs here only when **all** of:
 
-| Module                                        | Role                                                       |
-| --------------------------------------------- | ---------------------------------------------------------- |
-| `catalog-picker-results-state.client.tsx`     | Dashed empty-state `InsetPanel` (spells + proficiencies)   |
-| `catalog-picker-empty-state.lib.ts`           | `no-options` / `selection-full` kind + message mapping     |
-| `catalog-picker-row-state.lib.ts`             | Dimmed row + first disabled-reason note                    |
-| `catalog-picker-filter-state.lib.ts`          | Clearable / reset-view criteria (equipment delegates here) |
-| `catalog-toolbar-reset-action.client.tsx`     | Reset button + layout-stable slot                          |
-| `catalog-sort-control.client.tsx`             | Sort `<Select>`                                            |
-| `catalog-picker-selection-actions.client.tsx` | Add / Remove row actions                                   |
-| `catalog-picker-shell.lib.ts`                 | Shared `CatalogPickerSheet` preset props                   |
+1. at least two character domains use it
+2. semantics are the same
+3. lifecycle is the same or the module is stateless
+4. it has no equipment / spell / proficiency vocabulary or assumptions
+
+Subfolders: `sort/`, `selection/`, `row/`, `results/`. Filter toolbar seams stay at
+picker root.
+
+| Module                                            | Role                                                       |
+| ------------------------------------------------- | ---------------------------------------------------------- |
+| `results/catalog-picker-results-state.client.tsx` | Dashed empty-state `InsetPanel` (spells + proficiencies)   |
+| `results/catalog-picker-empty-state.lib.ts`       | `no-options` / `selection-full` kind + message mapping     |
+| `row/catalog-picker-row-state.lib.ts`             | Dimmed row + first disabled-reason note                    |
+| `catalog-picker-filter-state.lib.ts` (root)       | Clearable / reset-view criteria (equipment delegates here) |
+| `catalog-toolbar-reset-action.client.tsx` (root)  | Reset button + layout-stable slot                          |
+| `sort/catalog-sort-control.client.tsx`            | Sort `<Select>`                                            |
+
+**Promoted to `@rpg/ui`** (import from `@rpg/ui`, not `character/components/picker/`):
+
+| Module                                        | Role                                                  |
+| --------------------------------------------- | ----------------------------------------------------- |
+| `catalog-picker-selection-actions.client.tsx` | Add / Remove row action phases                        |
+| `catalog-picker-row-action.lib.ts`            | Phase resolver (`resolveCatalogPickerRowActionPhase`) |
+
+**Not in `picker/` (domain-owned):**
+
+| Module                                                   | Owner                          |
+| -------------------------------------------------------- | ------------------------------ |
+| `spell-picker-browse-mode.lib.ts`                        | `spells/picker/`               |
+| `useSpellPickerController`                               | `spells/picker/`               |
+| `spell-picker-selection-summary.client.tsx`              | `spells/picker/` (spells only) |
+| `useEquipmentAcquisitionCommitConfirmation`              | `equipment/acquisition/`       |
+| `map-*-compact-summary-to-metadata-lines.ts`             | respective domain `*/picker/`  |
+| `CatalogMetadataRenderer` / `formatCatalogMetadataLines` | `@/features/content`           |
 
 Domain drawer libs keep thin wrappers (e.g. `resolveSpellPickerEmptyStateMessage`)
 so step-specific copy stays co-located with types.
 
-## Explicit non-goals (Phase D)
+## Browse state lifecycle
 
-- One generalized browse/sort/filter controller across all three pickers
-- Merging `equipment-picker-drawer.lib.ts`, `spell-picker-drawer.lib.ts`, and
-  `proficiency-picker-drawer.lib.ts`
+Search for equipment/proficiency/org is **sheet-owned** (`CatalogPickerSheet` `useState`).
+Equipment does not pass `initialSearchQuery`. Spells copy search into the active mode
+bucket and restore via `initialSearchQuery` + `toolbarStateKey`.
+
+| State       | Equipment                            | Spells                                          | Proficiencies          |
+| ----------- | ------------------------------------ | ----------------------------------------------- | ---------------------- |
+| search      | sheet-owned; not persisted by drawer | per-mode bucket; restored on reopen/mode switch | sheet-owned            |
+| sort        | persists across close/reopen         | per-mode bucket                                 | persists while mounted |
+| filters     | persist across close/reopen          | per-mode bucket                                 | none                   |
+| quantity    | reset on close                       | n/a                                             | n/a                    |
+| mode bucket | n/a                                  | persist across close                            | n/a                    |
+
+Controller tests encode these rules directly.
+
+## Explicit non-goals
+
+- One generalized browse/sort/filter controller across all pickers
+- Merging domain drawer libs into a shared module
 - Extracting equipment acquisition / commerce row chrome (single consumer)
-- Promoting client-side filter labels into contracts (presentation-only)
+- Import-string guards requiring `CatalogEntityPickerSheet` in every drawer file
 
-## Follow-up (Phase E+)
+## Follow-up
 
-- Align equipment empty-state messaging with `CatalogPickerResultsState` when product copy is defined
-- Evaluate shared filter-controls hook if a third structured-filter picker appears
-- Spell casting-time filter labels → wire to `CASTING_TIME_UNIT_ENTRIES` vocab (UX hygiene)
+- Equipment intentionally keeps `CatalogPickerSheet` default empty states — its loading/filtered-result lifecycle differs from spell/proficiency choice-set empty kinds (`no-options` / `selection-full`); do not adopt `CatalogPickerResultsState` for visual parity alone
+- Wean equipment acquisition panel VM off `CharacterBuilderDraft` (shared with inventory manage)
+- Wire spell `recommendationsEnabled` when resolver/product work lands

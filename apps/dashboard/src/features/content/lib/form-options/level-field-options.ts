@@ -2,7 +2,7 @@ import { buildGroupedLevelOptions, formatCharacterLevelLabel, type BuildGroupedL
 import type { SelectFieldConfig } from '@rpg/ui/form'
 import { isFieldOptionGroup, type FieldOption, type SelectFieldOptionListItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../forms/content-form-registry'
+import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import { campaignRulesFromCtx, effectiveMaxFromCtx } from './content-campaign-rules'
 
 type LevelSelectDigits = NonNullable<SelectFieldConfig['digits']>

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { buildingFacilityTypeSchema } from '../../vocab/location/building-facility-type'
-import { buildingFormSchema } from '../../vocab/location/building-form'
+import { buildingFacilityTypeSchema } from '../../vocab/location/building/building-facility-type'
+import { buildingFormSchema } from '../../vocab/location/building/building-form'
 
 export const buildingClassificationSchema = z
   .object({

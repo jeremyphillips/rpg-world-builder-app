@@ -1,7 +1,10 @@
 # DrawerShell
 
 Canonical dashboard scaffold for application drawers (create/edit forms and
-informational side panels). Picker workflows use `@rpg/ui`
+informational side panels). Grammar inventory and ownership model:
+[drawer-architecture.md](./drawer-architecture.md).
+
+Picker workflows use `@rpg/ui`
 [`CatalogPickerSheet`](../../../packages/ui/src/components/ui/catalog-picker-sheet.client.tsx);
 read-only builder dossiers use allowlisted
 [`BuilderOptionDetailsSheet`](../../../packages/ui/src/components/ui/builder-option-details-sheet.client.tsx).
@@ -55,7 +58,7 @@ case and a shared token or DrawerShell variant — not local Tailwind overrides.
 - **`composed`** — children render directly under `Sheet.Content` (no auto Body).
   Use with `<Form contentWrapper externalFooter>` and overlay-owned
   `<DrawerShell.Footer><FormShellFooterSlot /></DrawerShell.Footer>` (see
-  [`ContentFormDrawer`](../src/features/content/lib/forms/shells/content-form-drawer.client.tsx)).
+  [`ContentFormDrawer`](../src/features/content/lib/forms/shells/host/content-form-drawer.client.tsx)).
   Form re-applies horizontal inset from `dialogPanelSectionInsetXClasses`.
 
 ## Surface, width, and footer SSOT
@@ -112,7 +115,7 @@ Cancel buttons in form drawers use `DrawerShell.Close`, not `Sheet.Close`.
 | Quick NPC (standalone)                    | Location People drawer Character segment + `QuickNpcCreateModal`         |
 | Vocabulary add/edit                       | `ContentFormDrawer` → `DrawerShell`                                      |
 | Parent replacement / relationship pickers | `CatalogPickerSheet` (aligned tokens)                                    |
-| Character builder catalog pickers         | `CatalogPickerSheet` + `catalogPickerShellProps()`                       |
+| Character builder catalog pickers         | `CatalogEntityPickerSheet` (`surface="background"`, `size="lg"`)         |
 | Species/class option dossier              | `BuilderOptionDetailsSheet` (allowlisted)                                |
 
 Cross-content relationship UI: [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).

@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { characterValidationMessages } from './character-messages'
 import { characterSchema, getCharacterTotalLevel } from './sheet'
-import { characterSelectionSourceSchema } from './selection-sources'
+import { characterSelectionSourceSchema } from './sheet/selection-sources'
 import {
   characterToolProficiencyEntrySchema,
   characterWeaponProficiencyEntrySchema,
-} from './proficiencies'
+} from './sheet/proficiencies'
 
 const timestamps = {
   createdAt: '2026-01-01T00:00:00.000Z',

@@ -4,7 +4,7 @@ import {
   INTERIOR_TYPE_DEFINITIONS,
   type InteriorClassificationType,
   type InteriorSubtype,
-} from '../../vocab/location/interior-type-definitions'
+} from '../../vocab/location/building/interior-type-definitions'
 
 export const interiorClassificationSchema = z.object({
   type: z.string().min(1),

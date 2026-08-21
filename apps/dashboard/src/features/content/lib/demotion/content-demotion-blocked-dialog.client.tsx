@@ -5,7 +5,7 @@ import {
   formatContentDemotionBlockedDescription,
   formatContentDemotionBlockedHeadline,
 } from '../content-type-labels'
-import { ContentUsageBlockedList } from '../content-usage-blocked-list.client'
+import { ContentUsageBlockedList } from '../delete/content-usage-blocked-list.client'
 
 export interface ContentDemotionBlockedDialogProps {
   open: boolean

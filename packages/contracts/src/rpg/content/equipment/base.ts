@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { equipmentCostSchema, weightSchema } from '../../primitives/units'
+import { equipmentCostSchema } from '../../primitives/money'
+import { weightSchema } from '../../primitives/units'
 import { contentBodyBaseSchema } from '../lib/envelope'
 
 /** Shared body fields present on every equipment union variant. */

@@ -33,23 +33,23 @@ import {
   updateOrganizationLocationConnection,
 } from '../../organizations/api/organization-location-connection-client'
 import { useOrganizations } from '../../organizations/hooks/use-organizations'
-import { invalidateLocationConnectionQueries } from '../../lib/invalidate-location-connection-queries'
+import { invalidateLocationConnectionQueries } from '../../lib/relationship/location-connection/invalidate-location-connection-queries'
 import {
   resolveLocationConnectedPartiesSectionEligibility,
   shouldShowLocationConnectedPartiesSection,
-} from '../../lib/location-connected-parties-section-visibility'
+} from '../lib/connected-parties/location-connected-parties-section-visibility'
 import {
   organizationDrawerIntentFromKind,
   type OrganizationConnectionDrawerIntent,
   resolvePeopleSectionOrganizationAddAffordances,
   resolveTerritorialSectionOrganizationAddAffordances,
-} from '../../lib/location-connection-drawer-intent'
-import { toLocationConnectionEligibilityInput } from '../../lib/location-connection-eligibility-input'
-import { peopleSectionHasAvailableTarget } from '../../lib/location-connection-kind-options'
-import type { LocationConnectedPartyEditTarget } from '../components/location-connected-parties-section.client'
-import { buildPeopleKindSlots } from '../components/location-connected-parties-section.client'
-import { buildLocationConnectedPartyCharactersById } from '../lib/location-connected-party-character-options.lib'
-import { resolveLocationInverseCurrentOrganizationEndpoint } from '../../lib/relationship/resolve-relationship-drawer-current-endpoint'
+} from '../../lib/relationship/location-connection/location-connection-drawer-intent'
+import { toLocationConnectionEligibilityInput } from '../../lib/relationship/location-connection/location-connection-eligibility-input'
+import { peopleSectionHasAvailableTarget } from '../lib/connected-parties/location-people-section-kind-options.lib'
+import type { LocationConnectedPartyEditTarget } from '../components/connected-parties/location-connected-parties-section.client'
+import { buildPeopleKindSlots } from '../components/connected-parties/location-connected-parties-section.client'
+import { buildLocationConnectedPartyCharactersById } from '../lib/connected-parties/location-connected-party-character-options.lib'
+import { resolveLocationInverseCurrentOrganizationEndpoint } from '../../lib/relationship/location-connection/location-inverse-current-organization-endpoint'
 import { useLocationConnectedParties } from './use-location-connected-parties'
 
 export const LOCATION_CONNECTED_PARTIES_MUTATION_ERROR =

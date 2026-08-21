@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest'
 const REPO_ROOT = join(__dirname, '../../../../../../..')
 const FEATURE_ROOT = join(REPO_ROOT, 'apps/dashboard/src/features')
 const INTERNAL_ENTITY_FILES = new Set([
-  'content/lib/content-entity-card.client.tsx',
-  'content/lib/entity/entity-summary.client.tsx',
+  'content/lib/entity/surfaces/cards/content/content-entity-card.client.tsx',
+  'content/lib/entity/summary/entity-summary.client.tsx',
 ])
 
 function sourceFiles(directory: string): string[] {
@@ -65,7 +65,9 @@ describe('entity surface architecture guard', () => {
       expect(
         source,
         `${relativePath} must not target entity surfaces with descendants`,
-      ).not.toMatch(/\[&_[^\]]*(?:entity-|EntityItem|ContentEntityCard|DisclosureEntityCard)/)
+      ).not.toMatch(
+        /\[&_[^\]]*(?:entity-|EntityAnatomyHost|ContentEntityCard|DisclosureEntityCard)/,
+      )
       expect(source, `${relativePath} must not use !important`).not.toMatch(/!important/)
     }
   })
@@ -91,7 +93,7 @@ describe('entity surface architecture guard', () => {
 
   it('does not use legacy entity trailing or heading link props in feature code', () => {
     const legacyPropPattern =
-      /\b(?:EntityItem|ContentEntityCard|DisclosureEntityCard|DetailEntityRow|CrossContentRelationshipRow)[^;\n]*\b(?:action=|href=|endSlot=)/
+      /\b(?:EntityAnatomyHost|ContentEntityCard|DisclosureEntityCard|DetailEntityRow|CrossContentRelationshipRow)[^;\n]*\b(?:action=|href=|endSlot=)/
 
     for (const path of featureImplementationFiles()) {
       const relativePath = relative(FEATURE_ROOT, path)
@@ -107,10 +109,10 @@ describe('entity surface architecture guard', () => {
 
   it('does not import entity anatomy internals outside allowlist', () => {
     const allowlist = new Set([
-      'content/lib/content-entity-card.client.tsx',
-      'content/lib/entity/disclosure-entity-card.client.tsx',
-      'content/lib/detail/row/detail-entity-row.client.tsx',
-      'content/lib/relationship/drawer-context-entity-block.client.tsx',
+      'content/lib/entity/surfaces/cards/content/content-entity-card.client.tsx',
+      'content/lib/entity/surfaces/cards/disclosure/disclosure-entity-card.client.tsx',
+      'content/lib/detail/row/entity/detail-entity-row.client.tsx',
+      'content/lib/entity/surfaces/drawer/drawer-entity-block.client.tsx',
     ])
 
     for (const path of featureImplementationFiles()) {
@@ -120,8 +122,8 @@ describe('entity surface architecture guard', () => {
       const source = readFileSync(path, 'utf8')
       expect(
         source,
-        `${relativePath} must not compose EntityItemAnatomy or EntityLeadingRail`,
-      ).not.toMatch(/\bEntityItemAnatomy\b|\bEntityLeadingRail\b/)
+        `${relativePath} must not compose EntityAnatomy or EntityLeadingRail`,
+      ).not.toMatch(/\bEntityAnatomy\b|\bEntityLeadingRail\b/)
     }
   })
 })

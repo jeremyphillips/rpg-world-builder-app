@@ -6,7 +6,7 @@ import type { VariantProps } from 'class-variance-authority'
 
 import { ROUTES } from '@/app/routes'
 
-import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/campaigns-overview-copy'
+import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/overview/campaigns-overview-copy'
 
 type NewCampaignLinkProps = {
   variant: 'default' | 'outline'

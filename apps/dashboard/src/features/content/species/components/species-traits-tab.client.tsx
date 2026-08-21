@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor.client'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   traitItemEyebrow,
   traitItemFields,

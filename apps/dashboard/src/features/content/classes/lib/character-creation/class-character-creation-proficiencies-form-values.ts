@@ -4,8 +4,8 @@ import { isMeaningfulToolProficiencyPool, type ToolProficiencyPool } from '@rpg/
 import {
   toolProficiencyPoolFromFormRow,
   toolProficiencyPoolToFormRow,
-} from '../../../lib/forms/grants/proficiency-grant-form-values'
-import type { ToolProficiencyItemForm } from '../../../lib/forms/grants/proficiency-grant-form-fields'
+} from '../../../lib/forms/grants/proficiency/proficiency-grant-form-values'
+import type { ToolProficiencyItemForm } from '../../../lib/forms/grants/proficiency/proficiency-grant-form-fields'
 import { CHARACTER_CREATION_TOOL_CHOICE_ID } from './class-character-creation-link-labels'
 import type { CharacterCreationProficienciesForm } from './class-character-creation-proficiencies-form-fields'
 import { suggestToolProficiencyChoiceLabel } from './suggest-tool-proficiency-choice-label'

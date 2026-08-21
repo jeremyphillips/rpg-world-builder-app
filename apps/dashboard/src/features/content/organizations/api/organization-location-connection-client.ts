@@ -2,4 +2,4 @@ export {
   createOrganizationLocationConnection,
   deleteOrganizationLocationConnection,
   updateOrganizationLocationConnection,
-} from '../../lib/organization-location-connection-client'
+} from './organization-location-connection-client.impl'

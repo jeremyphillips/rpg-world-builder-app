@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import type { ContentUsageBlocker, ContentSource, ContentTypeKey } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
-import type { AnyContentFormDef } from '../forms/content-form-registry'
+import type { AnyContentFormDef } from '../forms/registry/content-form-registry'
 import { notifyContentDeleted } from '@/lib/notify'
 import { fetchContentDeletionAvailability, useDeleteContent } from '../list/use-content-mutations'
 

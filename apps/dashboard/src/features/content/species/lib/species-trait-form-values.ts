@@ -1,6 +1,6 @@
 import { type ContentTrait, resolveGrantGroupsFromContent } from '@rpg/contracts'
 
-import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
+import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
 import {
   grantGroupsToFormRows,
   formRowsToGrantGroups,

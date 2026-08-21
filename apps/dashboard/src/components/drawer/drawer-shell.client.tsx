@@ -13,8 +13,6 @@ export type DrawerShellProps = {
   title: React.ReactNode
   children: React.ReactNode
   description?: React.ReactNode
-  /** Escape hatch — overrides the shared dialogTitle heading style. */
-  titleClassName?: string
   footer?: React.ReactNode
   /**
    * scrolling — shell body owns overflow-y scroll (informational / custom content).
@@ -31,7 +29,6 @@ export function DrawerShell({
   title,
   children,
   description,
-  titleClassName,
   footer,
   bodyMode = 'scrolling',
 }: DrawerShellProps) {
@@ -42,11 +39,7 @@ export function DrawerShell({
         size="lg"
         {...(!description ? { 'aria-describedby': undefined } : {})}
       >
-        <Sheet.Header
-          headline={title}
-          description={description}
-          headlineClassName={titleClassName}
-        />
+        <Sheet.Header headline={title} description={description} />
         {bodyMode === 'composed' ? (
           children
         ) : (

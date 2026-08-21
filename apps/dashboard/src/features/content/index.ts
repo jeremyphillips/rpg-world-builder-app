@@ -29,26 +29,32 @@ export {
   CatalogCollapsibleList,
   buildCatalogDisclosureLabel,
   CatalogMetadataRenderer,
+  formatCatalogMetadataLines,
   type CatalogCollapsibleListProps,
   type CatalogMetadataLine,
 } from './components/catalog'
 export {
   ContentEntityCard,
-  DisclosureEntityCard,
-  EntityItem,
-  EntitySummary,
-  CatalogEntityRow,
-  CatalogEntityPickerSheet,
-  createCatalogEntityRowRenderer,
+  ContentEntityCardViewLink,
   type ContentEntityCardProps,
+} from './lib/entity/surfaces/cards/content/content-entity-card.client'
+export {
+  DisclosureEntityCard,
   type DisclosureEntityCardProps,
-  type CatalogEntityRowProps,
-  type CatalogEntityPickerSheetProps,
-  type EntityItemTrailing,
-  type EntityItemTrailingSecondary,
-  type EntitySummaryModel,
-  type EntitySummaryStatusItem,
-} from './lib/content-entity-card.client'
+} from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card.client'
+export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
+export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
+export { EntitySummary } from './lib/entity/summary/entity-summary.client'
+export type {
+  EntityAnatomyTrailing,
+  EntityAnatomyTrailingSecondary,
+} from './lib/entity/anatomy/entity-anatomy-trailing.types'
+export { EntityAnatomyHost } from './lib/entity/anatomy/entity-anatomy.client'
+export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row.client'
+export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row.client'
+export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client'
+export type { CatalogEntityPickerSheetProps } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client'
+export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/catalog-entity-row-renderer.client'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
   CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
@@ -151,20 +157,20 @@ export { SpellDetailMetadata } from './spells/components/spell-detail-metadata.c
 export {
   ContentCreateShell,
   ContentFormShellResolver,
-} from './lib/forms/shells/content-create-shell'
-export { ContentFormDrawer } from './lib/forms/shells/content-form-drawer.client'
+} from './lib/forms/shells/create/content-create-shell'
+export { ContentFormDrawer } from './lib/forms/shells/host/content-form-drawer.client'
 export type {
   ContentFormDrawerFormProps,
   ContentFormDrawerProps,
-} from './lib/forms/shells/content-form-drawer.client'
-export { ContentFormHost } from './lib/forms/shells/content-form-host.client'
+} from './lib/forms/shells/host/content-form-drawer.client'
+export { ContentFormHost } from './lib/forms/shells/host/content-form-host.client'
 export type {
   ContentFormHostChrome,
   ContentFormHostFormProps,
   ContentFormHostLeaveBridge,
   ContentFormHostProps,
-} from './lib/forms/shells/content-form-host.client'
-export { ContentEditShell } from './lib/forms/shells/content-edit-shell'
+} from './lib/forms/shells/host/content-form-host.client'
+export { ContentEditShell } from './lib/forms/shells/edit/content-edit-shell'
 export {
   buildGrantSummaryModel,
   buildSpellGrantVocabulary,
@@ -177,12 +183,12 @@ export {
   type GrantSummaryItem,
   type GrantSummaryKind,
   type GrantSummaryModel,
-} from './lib/grant-display'
+} from './lib/forms/grants/grant-display'
 export {
   contentFormRegistry,
   type ContentFormDef,
   type ContentFormCtx,
-} from './lib/forms/content-form-registry'
+} from './lib/forms/registry/content-form-registry'
 export {
   buildContentFormOptionSets,
   referenceClassFieldOptions,
@@ -199,4 +205,4 @@ export {
   useContentWriteMutation,
 } from './lib/list/use-content-mutations'
 export { ContentDeletionBlockedDialog } from './lib/delete/content-deletion-blocked-dialog.client'
-export { ContentCampaignAvailabilityAction } from './lib/overview/content-campaign-availability-action.client'
+export { ContentCampaignAvailabilityAction } from './lib/campaign-access/overview/content-campaign-availability-action.client'

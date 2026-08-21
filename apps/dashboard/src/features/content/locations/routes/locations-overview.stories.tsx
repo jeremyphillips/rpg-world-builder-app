@@ -13,9 +13,9 @@ import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
 
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
-import { LocationCreateActions } from '../components/location-create-actions.client'
+import { LocationCreateActions } from '../components/create/location-create-actions.client'
 import { LOCATIONS_LIST } from '../fixtures'
-import { locationsColumns } from '../lib/locations-overview-columns'
+import { locationsColumns } from '../lib/overview/locations-overview-columns'
 
 function createLocationsOverviewQueryClient() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })

@@ -1,6 +1,6 @@
 import { Heading, Spinner, Text } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 
 import { DashboardHomeSections } from './dashboard-home-sections'
 import { DashboardHomeStarterCards } from './dashboard-home-starter-cards'

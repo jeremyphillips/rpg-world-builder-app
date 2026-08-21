@@ -34,8 +34,8 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { economyFields } from '../../lib/forms/fields/content-economy-form-fields'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import { rollFormObjectSchema } from '../../lib/forms/mechanics/roll-form-values'
 import {
   allRegisteredKindFieldGroups,

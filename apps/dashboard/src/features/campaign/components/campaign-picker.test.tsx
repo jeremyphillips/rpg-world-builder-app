@@ -13,7 +13,7 @@ import { renderWithProviders } from '@/test/render'
 import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 import { makeSessionUser } from '@/test/fixtures/session'
 
-import { CAMPAIGN_ONBOARDING_INDEX_ROW_BODY } from '../lib/campaign-onboarding-copy'
+import { CAMPAIGN_ONBOARDING_INDEX_ROW_BODY } from '../lib/onboarding/campaign-onboarding-copy'
 import { CampaignPicker } from './campaign-picker'
 
 import type * as ApiClient from '@rpg/api-client'

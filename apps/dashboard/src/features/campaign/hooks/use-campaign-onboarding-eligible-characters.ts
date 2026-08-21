@@ -8,7 +8,7 @@ import {
 } from '../api/campaign-onboarding-client'
 import { campaignMembersQueryKey } from './use-campaign-members'
 import { campaignOnboardingContextQueryKey } from './use-campaign-onboarding-context'
-import { invalidateCampaignCharacterControlQueries } from '../lib/invalidate-campaign-character-control-queries'
+import { invalidateCampaignCharacterControlQueries } from '../lib/characters/invalidate-campaign-character-control-queries'
 
 export const campaignOnboardingEligibleCharactersQueryKey = (campaignId: string) =>
   ['campaigns', campaignId, 'onboarding-eligible-characters'] as const

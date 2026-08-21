@@ -1,7 +1,7 @@
 import type { LocationKind } from '@rpg/contracts'
 
 import type { LocationAuthoringType } from '@/features/content/locations/lib/location-authoring-type'
-import type { LocationCreateIntent } from '@/features/content/locations/lib/location-create-session'
+import type { LocationCreateIntent } from '@/features/content/locations/lib/create/session/location-create-session'
 
 export type LocationCreateIntentOverrides = Partial<LocationCreateIntent> & {
   authoringType: LocationAuthoringType

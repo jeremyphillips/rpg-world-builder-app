@@ -10,7 +10,7 @@ import { Form, FormSaveFooter } from '@rpg/ui/form'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifyDuplicateContentCreated } from '@/lib/notify'
 
-import { resolveContentPostCreateEditHref } from '../forms/shells/content-form-navigation'
+import { resolveContentPostCreateEditHref } from '../forms/shells/layout/content-form-navigation'
 import {
   buildDuplicateContentDefaultValues,
   duplicateContentFormFields,

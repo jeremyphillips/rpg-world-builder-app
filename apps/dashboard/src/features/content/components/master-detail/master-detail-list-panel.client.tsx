@@ -22,7 +22,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { cn, Button, Text, iconGhostControlVariants } from '@rpg/ui'
 import { GripVertical, Trash2 } from 'lucide-react'
 
-import { EntityItem } from '../../lib/content-entity-card.client'
+import { EntityAnatomyHost } from '@/features/content'
 import {
   masterDetailListDragHandleClasses,
   masterDetailListRowDraggingClasses,
@@ -173,7 +173,7 @@ function MasterDetailListRowContent({
 
   return (
     <div className={masterDetailListRowClassName(active, isSelected, showDragHandle)}>
-      <EntityItem
+      <EntityAnatomyHost
         density="compact"
         leading={
           showDragHandle && dragHandleProps ? (

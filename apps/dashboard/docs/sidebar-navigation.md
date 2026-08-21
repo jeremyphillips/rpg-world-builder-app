@@ -18,7 +18,6 @@ sidebar/
     sidebar-nav-model.ts          # discriminated section model
     match-sidebar-nav-href.ts     # shared active-route matcher
     section-has-active-item.ts    # collapse forcing helper
-    resolve-dashboard-navigation-scope.ts
     sidebar-preferences.ts
   hooks/
     use-sidebar-section-preferences.ts
@@ -26,7 +25,9 @@ sidebar/
 
 ## Scope ownership
 
-`resolveDashboardNavigationScope` mirrors the route tree: `campaignId` from
+`resolveDashboardNavigationScope` lives at
+[`layout/resolve-dashboard-navigation-scope.ts`](../src/components/layout/resolve-dashboard-navigation-scope.ts)
+(shared by sidebar and topbar). It mirrors the route tree: `campaignId` from
 `useParams` is present only under `CampaignLayoutRoute` (`/campaigns/:campaignId/*`).
 Global AppShell routes (e.g. `/characters`) always render `GlobalSidebarNav`, even
 when `preferredCampaignId` is set in the campaign store.
@@ -64,4 +65,5 @@ Route-forced open does not rewrite persisted preference.
 ## Related docs
 
 - [feature-structure.md](./feature-structure.md) — dashboard feature layout
+- [layout/README.md](../src/components/layout/README.md) — layout subtree decision map
 - [packages/ui/README.md](../../../packages/ui/README.md) — shared nav primitives

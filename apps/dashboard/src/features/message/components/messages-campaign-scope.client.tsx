@@ -13,10 +13,10 @@ import {
   formatMessagesScopeSummary,
 } from '../lib/messages-copy'
 import type { MessagesFilterState } from '../lib/messages-filter-schema'
-import {
-  messagesWorkspaceListChromeInsetClasses,
-  messagesWorkspaceScopeUtilityClasses,
-} from './messages-workspace.variants'
+import { directListChromeInsetClasses } from './direct-list/direct-list.variants'
+
+const messagesCampaignScopeUtilityClasses =
+  'flex flex-wrap items-center justify-between gap-2 text-muted-foreground'
 
 type MessagesCampaignScopeChromeProps = {
   schema: FilterSchema<unknown, MessagesFilterState>
@@ -47,7 +47,7 @@ function MessagesCampaignScopeUtility({
   }
 
   return (
-    <div className={messagesWorkspaceScopeUtilityClasses}>
+    <div className={messagesCampaignScopeUtilityClasses}>
       <Text variant="small">{formatMessagesScopeSummary(scopedCount ?? 0, hiddenCount)}</Text>
       <button
         type="button"
@@ -134,7 +134,7 @@ export function MessagesOutOfScopePin({
   campaignId,
 }: MessagesOutOfScopePinProps) {
   return (
-    <div className={`border-b border-border py-3 ${messagesWorkspaceListChromeInsetClasses}`}>
+    <div className={`border-b border-border py-3 ${directListChromeInsetClasses}`}>
       <Text variant="small" className="uppercase tracking-wide">
         {MESSAGES_SCOPE_COPY.outOfScopeEyebrow}
       </Text>

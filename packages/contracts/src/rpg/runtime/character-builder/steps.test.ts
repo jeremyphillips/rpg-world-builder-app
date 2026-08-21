@@ -21,7 +21,7 @@ import { CHOICE_TYPES } from './choice-set'
 import { createEmptyCharacterBuilderDraft } from './draft/draft'
 import type { CharacterBuilderDraft } from './draft/draft'
 import type { ChoiceSet } from './choice-set'
-import type { Organization } from '../../content/organization'
+import type { Organization } from '../../content/organization/organization'
 
 // ---------------------------------------------------------------------------
 // Fixtures

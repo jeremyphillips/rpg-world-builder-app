@@ -7,9 +7,9 @@ import { renderWithProviders } from '@/test/render'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../lib/character-builder-fixtures'
+} from '../lib/fixtures/character-builder-fixtures'
 import { buildCharacterDetailViewModel } from '../lib/display/character-display'
-import { SAMPLE_PC } from '../lib/character-fixtures'
+import { SAMPLE_PC } from '../lib/fixtures/character-fixtures'
 import { CharacterDetail } from './character-detail'
 
 vi.mock('../hooks/use-character')

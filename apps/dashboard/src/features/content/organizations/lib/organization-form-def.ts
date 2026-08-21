@@ -1,21 +1,19 @@
 import type { CreateOrganizationInput, Organization } from '@rpg/contracts'
 
-import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
-import { organizationsQueryKey, useOrganizations } from '../hooks/use-organizations'
+import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
 import {
+  buildOrganizationCreateInput,
   buildOrganizationFields,
+  buildOrganizationFormValueSyncs,
+  organizationCreateDefaultValues,
   organizationDraftFormSchema,
   organizationFormSchema,
   organizationNameField,
-  type OrganizationFormValues,
-} from './organization-form-fields'
-import { buildOrganizationFormValueSyncs } from '../../lib/forms/organization-form-projection'
-import { resolveDiscoverableOrganizationMemberClasses } from './organization-member-class-discoverable.lib'
-import {
-  buildOrganizationCreateInput,
-  organizationCreateDefaultValues,
   organizationToFormValues,
-} from './organization-form-values'
+  type OrganizationFormValues,
+} from '../../lib/forms/organization-form-projection'
+import { organizationsQueryKey, useOrganizations } from '../hooks/use-organizations'
+import { resolveDiscoverableOrganizationMemberClasses } from './members/organization-member-class-discoverable.lib'
 
 const organizationFormDef: ContentFormDef<
   Organization,

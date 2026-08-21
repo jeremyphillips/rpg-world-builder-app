@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 
 import { CampaignSidebarNav } from './campaign-sidebar-nav'
 import { GlobalSidebarNav } from './global-sidebar-nav'
-import { resolveDashboardNavigationScope } from './lib/resolve-dashboard-navigation-scope'
+import { resolveDashboardNavigationScope } from '@/components/layout/resolve-dashboard-navigation-scope'
 
 export function SidebarNav() {
   const { campaignId } = useParams<{ campaignId?: string }>()

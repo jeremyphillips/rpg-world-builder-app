@@ -17,14 +17,14 @@ import {
   type GrantRowType,
   GRANT_DEFAULT_UNLOCK_LEVEL,
 } from './grant-form-schema'
-import type { EquipmentGrantItemForm } from './equipment-grant-form-fields'
-import { equipmentGrantFromFormRow, equipmentGrantToFormRow } from './equipment-grant-form-values'
+import type { EquipmentGrantItemForm } from './equipment/equipment-grant-form-fields'
+import { equipmentGrantFromFormRow, equipmentGrantToFormRow } from './equipment/equipment-grant-form-values'
 import type {
   ArmorTrainingItemForm,
   SkillProficiencyItemForm,
   ToolProficiencyItemForm,
   WeaponProficiencyItemForm,
-} from './proficiency-grant-form-fields'
+} from './proficiency/proficiency-grant-form-fields'
 import {
   armorTrainingGrantFromFormRow,
   armorTrainingGrantToFormRow,
@@ -34,7 +34,7 @@ import {
   toolProficiencyGrantToFormRow,
   weaponProficiencyGrantFromFormRow,
   weaponProficiencyGrantToFormRow,
-} from './proficiency-grant-form-values'
+} from './proficiency/proficiency-grant-form-values'
 
 // ---------------------------------------------------------------------------
 // Empty row factory

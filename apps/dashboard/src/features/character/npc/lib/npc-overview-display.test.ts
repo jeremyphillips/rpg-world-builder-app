@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../../lib/character-builder-fixtures'
-import { makeCampaignNpcListItem } from '../../lib/character-fixtures'
+} from '../../lib/fixtures/character-builder-fixtures'
+import { makeCampaignNpcListItem } from '../../lib/fixtures/character-fixtures'
 import { resolveNpcOverviewClassName, resolveNpcOverviewSpeciesName } from './npc-overview-display'
 
 const context = createPopulatedStandaloneBuilderContextFixture()

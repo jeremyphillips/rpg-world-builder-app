@@ -1,9 +1,9 @@
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { WidePage } from '@/components/layout/page/wide-page'
 
-import { CampaignCharacterStatusSummary } from '../../components/detail/campaign-character-status-summary.client'
+import { CampaignCharacterStatusSummary } from '../../components/detail/status/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'
-import { CharacterOrganizationMembershipsContainer } from '../../components/detail/character-organization-memberships-container.client'
+import { CharacterOrganizationMembershipsContainer } from '../../components/detail/memberships/character-organization-memberships-container.client'
 import { NpcStatusEditAction } from '../components/npc-status-edit-action.client'
 import { useNpcDetailPage } from '../hooks/use-npc-detail-page.client'
 

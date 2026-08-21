@@ -13,7 +13,7 @@ import {
   formatContentDeletedMessage,
 } from '@/features/content/lib/content-type-labels'
 import { DUPLICATE_CONTENT_CREATED_MESSAGE } from '@/features/content/lib/duplication/duplicate-content-labels'
-import type { CoordinatedSaveSavedEvent } from '@/features/content/lib/forms/shells/content-save-session.lib'
+import type { CoordinatedSaveSavedEvent } from '@/features/content/lib/forms/shells/session/content-save-session.lib'
 
 const CHANGES_SAVED_MESSAGE = 'Changes saved.'
 const CAMPAIGN_ACCESS_UPDATE_FALLBACK = 'Could not update campaign access.'

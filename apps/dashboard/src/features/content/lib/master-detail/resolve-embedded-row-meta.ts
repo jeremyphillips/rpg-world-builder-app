@@ -6,7 +6,7 @@ import {
   type Availability,
   type AvailabilityReason,
 } from '@/lib/availability'
-import type { ContentFormCtx } from '../forms/content-form-registry'
+import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 
 import type { MasterDetailListBadge } from '../../components/master-detail/master-detail-list-panel.client'

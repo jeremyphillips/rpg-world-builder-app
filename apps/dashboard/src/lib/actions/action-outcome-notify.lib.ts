@@ -5,7 +5,7 @@ import {
 } from '@rpg/contracts'
 import { toast } from '@rpg/ui'
 
-import type { ActionLifecycleCloseReason } from './action-lifecycle.types'
+import type { ActionLifecycleCloseReason } from './lifecycle/action-lifecycle.types'
 import {
   formatActionMixedResult,
   formatActionPartialSuccess,

@@ -1,6 +1,6 @@
 import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 
-import type { EntitySummaryStatusItem } from '../../lib/entity/entity-summary-status.types'
+import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'
 
 export interface MasterDetailListBadge {
   label: string

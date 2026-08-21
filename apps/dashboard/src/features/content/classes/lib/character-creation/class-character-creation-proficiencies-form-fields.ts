@@ -4,17 +4,17 @@ import { type FormItem } from '@rpg/ui/form'
 
 import { vocabularyHubLabel } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { referenceSkillFieldOptions } from '../../../lib/form-options/content-field-option.lib'
 import {
   CHARACTER_CREATION_TOOL_POOL_FIELD_NAMES,
   TOOL_PROFICIENCY_POOL_SOURCES,
   toolProficiencyPoolFormFields,
-} from '../../../lib/forms/tool-proficiency-pool-form-fields'
+} from '../../../lib/forms/grants/proficiency/tool-proficiency-pool-form-fields'
 import {
   refineToolProficiencyPoolFormRow,
   type ToolProficiencyPoolFormRow,
-} from '../../../lib/forms/tool-proficiency-pool-form-validation'
+} from '../../../lib/forms/grants/proficiency/tool-proficiency-pool-form-validation'
 import {
   CHARACTER_CREATION_TOOL_CHOICE_LABEL_PATH,
   TOOL_PROFICIENCY_CHOICE_LABEL_FIELD,

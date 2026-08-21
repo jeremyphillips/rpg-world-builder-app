@@ -5,9 +5,9 @@ import {
   contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
-} from '../../lib/forms/content-form-registry'
+} from '../../lib/forms/registry/content-form-registry'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
+import { finalizeContentInput } from '../../lib/forms/registry/content-form-key-helpers'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
 import {
   buildSpeciesTabs,

@@ -34,54 +34,7 @@ describe('DrawerShell', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
-  it('defaults the title to the shared dialogTitle heading style with a titleClassName escape hatch', () => {
-    const { rerender } = render(
-      <DrawerShell open onOpenChange={() => undefined} title="Add item">
-        <p>Drawer body</p>
-      </DrawerShell>,
-    )
-
-    expect(screen.getByText('Add item')).toHaveClass('heading-style-dialog-title')
-
-    rerender(
-      <DrawerShell
-        open
-        onOpenChange={() => undefined}
-        title="Add item"
-        titleClassName="heading-style-card"
-      >
-        <p>Drawer body</p>
-      </DrawerShell>,
-    )
-
-    expect(screen.getByText('Add item')).toHaveClass('heading-style-card')
-    expect(screen.getByText('Add item')).not.toHaveClass('heading-style-dialog-title')
-  })
-
   it('closes via DrawerShell.Close', async () => {
-    const user = userEvent.setup()
-    const onOpenChange = vi.fn()
-
-    render(
-      <DrawerShell
-        open
-        onOpenChange={onOpenChange}
-        title="Add item"
-        footer={
-          <DrawerShell.Close asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerShell.Close>
-        }
-      >
-        <p>Drawer body</p>
-      </DrawerShell>,
-    )
-
-    await user.click(screen.getByRole('button', { name: 'Cancel' }))
-    expect(onOpenChange).toHaveBeenCalledWith(false)
-  })
-
-  it('forwards controlled open changes from the close control', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
 

@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
 import { formatGroupedNumber } from './number-format'
-import { CURRENCIES, getCurrencyAbbrev, moneyToCp, type Currency, type Money } from './units'
+import { CURRENCIES, getCurrencyAbbrev, moneyToCp, type Currency, type Money } from './money'
 
 // ---------------------------------------------------------------------------
 // Multi-denomination coin wealth — wallet / budget shape (cp, sp, gp, pp).
-// Catalog item prices use {@link Money} in units.ts instead.
+// Catalog item prices use {@link Money} in money.ts instead.
 // ---------------------------------------------------------------------------
 
 export const coinWealthSchema = z.object({

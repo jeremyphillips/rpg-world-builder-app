@@ -1,6 +1,6 @@
 import type { Equipment } from '../../../../content/equipment'
-import type { EquipmentPool } from '../../../../content/lib/equipment-grant'
-import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-grant'
+import type { EquipmentPool } from '../../../../content/lib/grants/equipment-grant'
+import { formatEquipmentPoolLabel } from '../../../../content/lib/grants/equipment-grant'
 import { listEquipmentMatchingPool, toEquipmentContentId } from '../../../creature/equipment'
 import type { ChoiceSetOption } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'

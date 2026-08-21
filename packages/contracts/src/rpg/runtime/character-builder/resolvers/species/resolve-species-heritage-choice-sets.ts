@@ -1,4 +1,4 @@
-import { resolveTraitName } from '../../../../content/lib/trait-display'
+import { resolveTraitName } from '../../../../content/lib/grants/trait-display'
 import type { Species } from '../../../../content/species'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'

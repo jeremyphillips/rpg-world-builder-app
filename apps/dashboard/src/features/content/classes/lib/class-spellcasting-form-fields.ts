@@ -23,7 +23,7 @@ import {
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { titleCase } from '../../lib/utils/title-case'
 import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'
 

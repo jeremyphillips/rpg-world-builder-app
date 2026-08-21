@@ -9,11 +9,11 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table.client'
-import { LocationCreateActions } from '../components/location-create-actions.client'
-import { BulkChangeParentLocationDialog } from '../components/bulk-change-parent-location-dialog.client'
+import { LocationCreateActions } from '../components/create/location-create-actions.client'
+import { BulkChangeParentLocationDialog } from '../components/hierarchy/bulk-change-parent-location-dialog.client'
 import { useLocations } from '../hooks/use-locations'
-import { BULK_CHANGE_PARENT_MENU_LABEL } from '../lib/bulk/bulk-change-parent-labels'
-import { locationsColumns, locationsFilterSchema } from '../lib/locations-overview-columns'
+import { BULK_CHANGE_PARENT_MENU_LABEL } from '../lib/hierarchy/bulk/bulk-change-parent-labels'
+import { locationsColumns, locationsFilterSchema } from '../lib/overview/locations-overview-columns'
 
 export function LocationsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()

@@ -1,4 +1,4 @@
-import type { EntitySummaryModel } from './entity-summary.types'
+import type { EntitySummaryModel } from './summary/entity-summary.types'
 
 export const HARBOR_DISTRICT_ENTITY: EntitySummaryModel = {
   heading: 'Harbor District',

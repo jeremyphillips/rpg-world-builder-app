@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../character-builder-fixtures'
+import { createStandaloneBuilderContextFixture } from '../fixtures/character-builder-fixtures'
 import {
   resolveBuilderDraftValidationIssues,
   resolveStepValidationIssuesAfterDraftChange,

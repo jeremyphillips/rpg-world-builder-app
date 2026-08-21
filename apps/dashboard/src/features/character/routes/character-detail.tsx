@@ -5,12 +5,12 @@ import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 
 import { CharacterDetailContent } from '../components/detail/character-detail-content.client'
 import { CharacterSheetDetailShell } from '../components/detail/character-sheet-detail-shell'
-import { CharacterVitalSummary } from '../components/detail/character-vital-summary.client'
+import { CharacterVitalSummary } from '../components/detail/status/character-vital-summary.client'
 import { StandaloneCharacterRedirectGuard } from '../components/standalone-character-redirect-guard.client'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
 import { buildCharacterDetailViewModel } from '../lib/display/character-display'
-import { resolveQueryErrorLabel } from '../lib/resolve-query-error-label.lib'
+import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 
 function CharacterDetailBody() {
   const { characterId } = useParams<{ characterId: string }>()

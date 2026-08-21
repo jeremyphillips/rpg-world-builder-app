@@ -34,9 +34,9 @@ export const buildingArchetypeAppQuarantine = {
 export const buildingArchetypeContractsQuarantine = {
   files: ['src/**/*.{ts,tsx}'],
   ignores: [
-    'src/rpg/vocab/location/building-archetype.ts',
-    'src/rpg/vocab/location/building-archetype.test.ts',
-    'src/rpg/vocab/location/building-archetypes/**',
+    'src/rpg/vocab/location/building/building-archetype.ts',
+    'src/rpg/vocab/location/building/building-archetype.test.ts',
+    'src/rpg/vocab/location/building/building-archetypes/**',
     'src/rpg/vocab/vocab-term-coverage.test.ts',
   ],
   rules: {

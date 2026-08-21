@@ -1,8 +1,8 @@
 import type { StartingWealthRules } from '../../../campaign/rules/starting-wealth'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { Equipment } from '../../../content/equipment'
-import type { EquipmentChoiceGrant } from '../../../content/lib/equipment-grant'
-import type { CharacterWealthGrant } from '../../../content/lib/wealth-grant'
+import type { EquipmentChoiceGrant } from '../../../content/lib/grants/equipment-grant'
+import type { CharacterWealthGrant } from '../../../content/lib/grants/wealth-grant'
 import type {
   StartingEquipmentGrantedItem,
   StartingEquipmentOption,
@@ -21,8 +21,8 @@ import {
   type CharacterEquipment,
   type CharacterEquipmentEntry,
   type CharacterWealth,
-} from '../../character/equipment-inventory'
-import type { CharacterSelectionSource } from '../../character/selection-sources'
+} from '../../character/sheet/equipment-inventory'
+import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { deriveEquipmentBudgetSummary } from '../resolvers/equipment/equipment-budget'

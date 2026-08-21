@@ -5,7 +5,7 @@ vi.mock('@/features/campaign/api/campaign-client')
 
 import { listCampaigns as listCampaignsFn } from '@/features/campaign/api/campaign-client'
 import { CAMPAIGNS_QUERY_ERROR_MESSAGE } from '@/features/campaign'
-import { CAMPAIGNS_OVERVIEW_COPY } from '@/features/campaign/lib/campaigns-overview-copy'
+import { CAMPAIGNS_OVERVIEW_COPY } from '@/features/campaign/lib/overview/campaigns-overview-copy'
 import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 import { renderWithProviders } from '@/test/render'
 import { CampaignsOverview } from './campaigns-overview'

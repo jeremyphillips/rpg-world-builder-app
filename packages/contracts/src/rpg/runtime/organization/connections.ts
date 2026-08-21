@@ -1,1 +1,1 @@
-export * from '../../content/organization-connections'
+export * from '../../content/organization/connections'

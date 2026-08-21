@@ -3,9 +3,9 @@ import { ABILITY_ENTRIES, ABILITY_IDS, CLASS_HIT_DICE, formatHitDie } from '@rpg
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { HIT_DIE_SELECT_DIGITS } from '../../lib/form-options/level-field-options'
-import { SuggestedAbilityScoreOrderSlot } from '../components/suggested-ability-score-order-slot.client'
+import { SuggestedAbilityScoreOrderSlot } from '../components/character-creation/suggested-ability-score-order-slot.client'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,

@@ -1,4 +1,4 @@
-import { getLocationKindLabel, type LocationKind } from '../../vocab/location/kind'
+import { getLocationKindLabel, type LocationKind } from '../../vocab/location/region/kind'
 
 import {
   getParentRequirement,

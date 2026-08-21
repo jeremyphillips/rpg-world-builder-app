@@ -1,4 +1,4 @@
-import type { CharacterProficiencies } from '../../../character/proficiencies'
+import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 import type { SkillProficiencyCompactSummary } from '../../../../content/lib/skill-proficiency-compact-display'
 import { buildSkillProficiencyCompactSummary } from '../../../../content/lib/skill-proficiency-compact-display'
 import type { ChoiceSet } from '../../choice-set'

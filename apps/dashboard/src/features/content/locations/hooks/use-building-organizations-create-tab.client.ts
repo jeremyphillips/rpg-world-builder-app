@@ -15,7 +15,7 @@ import type {
 import { areCreateCompositionChildWorkflowViewsEqual } from '@/lib/create-flow'
 
 import { useOrganizations } from '../../organizations'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { filterReferenceableCatalogRows } from '../../lib/form-options/content-reference-catalog.lib'
 import type { OrganizationFormValues } from '../../lib/forms/organization-form-projection'
 import {
@@ -29,7 +29,7 @@ import {
   type BuildingOrganizationDraftIssue,
   type BuildingOrganizationDraftPlan,
   type BuildingOrganizationRelationshipDraft,
-} from '../lib/building-organization-create-drafts'
+} from '../lib/building-organizations/building-organization-create-drafts'
 import {
   buildExistingOrganizationCommitPlan,
   buildNewOrganizationCommitPlan,
@@ -49,12 +49,12 @@ import {
   type BuildingOrganizationComposerStage,
   type BuildingOrganizationComposerTarget,
   type BuildingOrganizationEditingDecision,
-} from '../lib/building-organizations-create-tab-controller.lib'
+} from '../lib/building-organizations/building-organizations-create-tab-controller.lib'
 import type { CreateWorkflowDraftPanelController } from '@/lib/create-flow'
 import {
   resolveBuildingOrganizationTargetDomainLabel,
   resolveBuildingOrganizationTargetName,
-} from '../lib/building-organizations-create-tab.lib'
+} from '../lib/building-organizations/building-organizations-create-tab.lib'
 
 export type {
   BuildingOrganizationComposerMode,

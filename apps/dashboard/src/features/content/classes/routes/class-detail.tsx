@@ -6,9 +6,9 @@ import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
-import { WidePage } from '@/components/layout/wide-page'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { useCampaignRules } from '@/features/campaign'
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
@@ -18,9 +18,9 @@ import { ContentDetailResolver } from '../../lib/detail/page/content-detail-reso
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section.client'
-import { ClassProgressionTable } from '../components/class-progression-table'
-import { ClassProficienciesSection } from '../components/class-proficiencies-section.client'
-import { FeatureItem } from '../lib/feature-item'
+import { ClassProgressionTable } from '../components/detail/class-progression-table'
+import { ClassProficienciesSection } from '../components/detail/class-proficiencies-section'
+import { ClassFeatureItem as ClassFeatureRow } from '../components/detail/class-feature-item'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 import {
   buildClassDetailViewModel,
@@ -34,7 +34,7 @@ function SubclassFeaturesList({ features }: { features: Subclass['features'] }) 
   return (
     <ul className="mt-4 space-y-4" role="list">
       {sorted.map((feature) => (
-        <FeatureItem key={feature.id} feature={feature} />
+        <ClassFeatureRow key={feature.id} feature={feature} />
       ))}
     </ul>
   )
@@ -79,16 +79,16 @@ function ClassFeaturesSection({
       </Heading>
       <ul className="space-y-4" role="list">
         {section.items.map((item) => (
-          <ClassFeatureItem key={item.id} item={item} />
+          <ClassFeatureDetailRow key={item.id} item={item} />
         ))}
       </ul>
     </section>
   )
 }
 
-function ClassFeatureItem({ item }: { item: ClassFeatureDetailItem }) {
+function ClassFeatureDetailRow({ item }: { item: ClassFeatureDetailItem }) {
   return (
-    <FeatureItem
+    <ClassFeatureRow
       feature={{
         level: item.level,
         name: item.title,

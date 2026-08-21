@@ -1,5 +1,5 @@
-import type { ToolProficiencyPool } from '../../../../content/lib/proficiency-grant'
-import type { ToolProficiencyChoice } from '../../../../content/lib/proficiency-grant-set'
+import type { ToolProficiencyPool } from '../../../../content/lib/grants/proficiency-grant'
+import type { ToolProficiencyChoice } from '../../../../content/lib/grants/proficiency-grant-set'
 import type { CreatureEquipmentCatalog } from '../../../creature/equipment'
 import {
   listToolsMatchingPool,

@@ -2,7 +2,7 @@ import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mec
 import type { ClassHitDie } from '../../../primitives/dice'
 import type { Ability } from '../../../vocab/ability'
 import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
-import type { CharacterSkillToolProficiencyRank } from '../proficiencies'
+import type { CharacterSkillToolProficiencyRank } from '../sheet/proficiencies'
 
 // ---------------------------------------------------------------------------
 // Derived stat helpers — pure functions over raw scores and catalog data.
@@ -169,4 +169,5 @@ export * from './armor-class'
 export * from './hit-points-at-level'
 export * from './preview-equipped-armor'
 export * from './profile'
+export * from './sheet-derivation-input'
 export * from './weapon-attack'

@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { geographicRegionTypeSchema } from '../../vocab/location/geographic-region-type'
-import { politicalRegionTypeSchema } from '../../vocab/location/political-region-type'
+import { geographicRegionTypeSchema } from '../../vocab/location/region/geographic-region-type'
+import { politicalRegionTypeSchema } from '../../vocab/location/region/political-region-type'
 import {
   getRegionTypeEntry,
   type RegionClassificationKind,
-} from '../../vocab/location/region-classification-definitions'
+} from '../../vocab/location/region/region-classification-definitions'
 
 const politicalRegionClassificationSchema = z.object({
   kind: z.literal('political'),

@@ -1,7 +1,7 @@
 import type { Equipment } from '../../../../content/equipment'
 import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase-equipment'
 import { isEquipmentStackable } from '../../../../content/equipment/stackable'
-import { formatMoney } from '../../../../primitives/units'
+import { formatMoney } from '../../../../primitives/money'
 import { copperToDisplayWealth, formatWealth } from '../../../../primitives/wealth'
 import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft/draft'
 import { moneyToCopper, wealthToCopper, type EquipmentBudgetSummary } from './equipment-budget'

@@ -52,7 +52,7 @@ describe('MasterDetailListPanel', () => {
     expect(props.onRemove).toHaveBeenCalledWith(0)
   })
 
-  it('renders classification through EntityItem and hides protected row removal', () => {
+  it('renders classification through EntityAnatomyHost and hides protected row removal', () => {
     const protectedItems: MasterDetailListItem[] = [
       {
         id: 'a',

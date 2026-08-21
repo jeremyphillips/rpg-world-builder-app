@@ -7,8 +7,8 @@ import { useFilterState } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
-import { PageHeader } from '@/components/layout/page-header'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
 
 import { useAdminUserRouteContext } from '../lib/admin-user-route-context'

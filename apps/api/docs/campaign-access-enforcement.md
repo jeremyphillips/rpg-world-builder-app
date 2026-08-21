@@ -31,7 +31,7 @@ this in `requireCampaignRole` as `req.campaignMembership.pcCharacterIds`.
 
 ### `ContentViewer` mapping
 
-Contracts export `ContentViewer` (`packages/contracts/src/rpg/content/lib/content-viewer-access.ts`):
+Contracts export `ContentViewer` ([`packages/contracts/src/rpg/campaign/campaign-content-viewer.ts`](../../../packages/contracts/src/rpg/campaign/campaign-content-viewer.ts)):
 
 ```ts
 type ContentViewer =
@@ -222,6 +222,6 @@ of scope** — add an explicit opt-in flag only when that workflow ships.
 
 ## Related docs
 
-- Contracts: `packages/contracts/src/rpg/content/lib/content-viewer-access.ts`
+- Contracts: [`campaign-content-viewer.ts`](../../../packages/contracts/src/rpg/campaign/campaign-content-viewer.ts) (`ContentViewer`); [`content-viewer-character-relationships.ts`](../../../packages/contracts/src/rpg/content/lib/campaign-access/content-viewer-character-relationships.ts) (viewer↔character wire on content records)
 - Participation model: `packages/contracts/ROLES.md`
 - Dashboard campaign access UX: `apps/dashboard/src/features/content/lib/campaign-access/README.md`

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getCrossContentRelationshipProjection } from './lib/cross-content-relationship-projection'
+import { getCrossContentRelationshipProjection } from './lib/relationship/cross-content-relationship-projection'
 import {
   classesOfferingSkillChoice,
   classSkillChoiceDisplaySummary,

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   equipmentPickerChainMailFixture,
   equipmentPickerLongswordFixture,
-} from '../../components/equipment/equipment-picker-drawer.fixtures'
+} from '../../components/equipment/picker/drawer/equipment-picker-drawer.fixtures'
 import { createCharacterDetailEquipmentFilterSchema } from './character-detail-equipment-filter-schema'
 import {
   CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC,

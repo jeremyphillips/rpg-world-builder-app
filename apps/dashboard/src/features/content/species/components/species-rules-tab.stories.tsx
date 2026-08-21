@@ -5,7 +5,7 @@ import { defaultMulticlassingRules, buildContentPurposeSelectors } from '@rpg/co
 import { pickClass } from '../../lib/fixtures/pick'
 
 import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { SpeciesRulesTab } from './species-rules-tab.client'
 
 const meta = {

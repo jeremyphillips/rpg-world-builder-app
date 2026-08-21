@@ -84,16 +84,20 @@ Cross-type helpers live under `src/features/content/lib/` in concern subfolders
 (mirror `equipment/lib/shared/`). Sub-area `lib/` keeps per-type form and table
 config; parent `lib/` is the shared layer only.
 
-| Subfolder        | Responsibility                                                                                                         |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `fixtures/`      | Story/test IDs and `pick*()` catalog helpers                                                                           |
-| `forms/`         | `ContentFormDef` registry, create/edit shells (`shells/`), grant splits (`grants/`), shared field builders (`fields/`) |
-| `form-options/`  | Cross-type select options (levels, rich-text link targets)                                                             |
-| `overview/`      | List route shell, table column/filter builders, source badge                                                           |
-| `detail/`        | Catalog detail pages (`page/`), hero metadata (`metadata/`), section chrome (`section/`), row chrome (`row/`)          |
-| `master-detail/` | Embedded array editor hooks, row meta, campaign availability, validation                                               |
-| `list/`          | Content list API/query factories, client, mutation hooks                                                               |
-| `utils/`         | Small shared helpers (e.g. `title-case`)                                                                               |
+| Subfolder                                        | Responsibility                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `fixtures/`                                      | Story/test IDs and `pick*()` catalog helpers                                                                                                                                                                                                                                                                       |
+| `forms/`                                         | Cross-type form infra — `registry/`, `validation/`, `fields/`, `mechanics/`, `grants/` (+ `equipment/`, `proficiency/`), `shells/` (+ lifecycle subfolders); see [`forms/README.md`](../src/features/content/lib/forms/README.md)                                                                                  |
+| `form-options/`                                  | Cross-type select options (levels, rich-text link targets)                                                                                                                                                                                                                                                         |
+| `overview/`                                      | List route shell, table column/filter builders, source badge; hooks in `overview/hooks/`                                                                                                                                                                                                                           |
+| `detail/`                                        | Catalog detail pages (`page/`), hero metadata (`metadata/`), section chrome (`section/`), row chrome (`row/`)                                                                                                                                                                                                      |
+| `master-detail/`                                 | Embedded array editor hooks, row meta, campaign availability, validation                                                                                                                                                                                                                                           |
+| `list/`                                          | Content list API/query factories, client, mutation hooks                                                                                                                                                                                                                                                           |
+| `entity/`                                        | Entity anatomy stack — `summary/`, `anatomy/`, `surfaces/` (`cards/`, `catalog/`, `drawer/`, `drawer/replacement/`); unavailable headings in `summary/entity-unavailable-headings.lib.ts` — see [content-entity-card.md](./content-entity-card.md) for card surfaces                                               |
+| `relationship/`                                  | Cross-content relationship interaction semantics and reusable surfaces; `core/`, `list/`, `drawer/`, `nested-create/`, `location-connection/` (adapter) — see [relationship README](../src/features/content/lib/relationship/README.md) and [cross-content-relationship-ui.md](./cross-content-relationship-ui.md) |
+| `campaign-access/`                               | Campaign availability form, bulk actions, overview row chrome in `overview/` — see [campaign-access README](../src/features/content/lib/campaign-access/README.md)                                                                                                                                                 |
+| `delete/`, `demotion/`, `duplication/`, `usage/` | Content lifecycle dialogs and helpers                                                                                                                                                                                                                                                                              |
+| `utils/`                                         | Small shared helpers (e.g. `title-case`, `sortable-array-move`)                                                                                                                                                                                                                                                    |
 
 Interactive widgets (master-detail panels) stay in `content/components/`; feat
 prerequisite editing lives under `feats/components/`.
@@ -161,6 +165,20 @@ Example key-files table:
 | List route | `routes/classes-overview.tsx` |
 ```
 
+## Character builder ownership model
+
+```text
+builder/steps/<step>/     → step-specific composition and workflows
+components/<domain>/      → reusable domain capabilities (picker | inventory | acquisition)
+lib/<domain>/             → pure cross-surface logic
+```
+
+Builder step folders own step-specific UI (proficiency sections/rows, spell
+choice/summary cards, equipment package-switch modal). Domain folders under
+`components/equipment/`, `components/proficiencies/picker/`, and
+`components/spells/picker/` stay reusable. Domain UI must not import from
+`components/builder/steps/**`.
+
 ## Character builder co-located `*.lib.ts` modules
 
 Under `character/components/`, keep view-model helpers beside the component tree
@@ -169,15 +187,41 @@ formatting, UI state reducers). Move to `character/lib/<concern>/` only when the
 module is reused across components, imported outside the subtree, or is an
 independently testable view-model seam.
 
-| Location                            | Keep co-located when…                           |
-| ----------------------------------- | ----------------------------------------------- |
-| `components/picker/*.lib.ts`        | Shared picker chrome (search/sort/filter shell) |
-| `components/equipment/*.lib.ts`     | Drawer/inventory/modal view models              |
-| `components/spells/*.lib.ts`        | Spell drawer-only helpers                       |
-| `components/proficiencies/*.lib.ts` | Proficiency drawer-only helpers                 |
+| Location                                   | Keep co-located when…                                         |
+| ------------------------------------------ | ------------------------------------------------------------- |
+| `components/picker/*.lib.ts`               | Shared picker chrome (search/sort/filter shell)               |
+| `components/equipment/picker/**/*.lib.ts`  | Equipment picker/drawer view models                           |
+| `components/spells/picker/*.lib.ts`        | Spell drawer-only helpers                                     |
+| `components/proficiencies/picker/*.lib.ts` | Proficiency drawer-only helpers                               |
+| `components/connections/*.lib.ts`          | Picker/edit drawer view models (filter/sort stays co-located) |
+
+Package-switch resolution state lives in
+`character/lib/equipment/equipment-package-switch-resolution.lib.ts` (pure logic,
+no presentation). Modal UI lives in
+`character/components/builder/steps/equipment/package-switch/`.
+
+Title membership semantics (`ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`, radio mappers) live in
+`character/lib/organization-membership/organization-membership-title.lib.ts` when reused outside
+the connections subtree.
 
 Step orchestration hooks belong in `character/hooks/` (`use-*-step.client.ts`), not
-under `components/steps/`.
+under `components/builder/steps/`.
+
+## Organizations component layout
+
+`content/organizations/components/` mirrors `lib/` concerns without deep nesting:
+
+| Folder                  | Role                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `create/`               | Create-lifecycle UI only (provider, preset bridge, nested create modal)                                                  |
+| `members/`              | Detail members composition (flat filename roles: `*-detail-section`, `*-section`, `*-detail-drawers`, `*-picker-drawer`) |
+| `location-connections/` | Detail org→location links (flat: `*-detail-section`, `*-section`, `*-list-row`, `*-link-drawer`)                         |
+
+Flat member and location-connection folders are a local discoverability choice,
+not a rule that Organization families must stay flat. Domain contracts and policy
+belong in `organizations/lib/members/` and `organizations/lib/location-connections/`.
+Feature drawers compose shared primitives from `content/lib/relationship/` — they
+do not move there. Detail → [`organizations/README.md`](../src/features/content/organizations/README.md).
 
 ## Related docs
 

@@ -4,7 +4,7 @@ import type { CampaignInviteInviteeListItem } from '@rpg/contracts'
 
 import { makeCampaignListItem, VIEWER_STATE } from '@/test/fixtures/campaigns'
 
-import { filterPendingInvitesForMembership } from '@/features/campaign/lib/filter-pending-invites-for-membership'
+import { filterPendingInvitesForMembership } from '@/features/campaign'
 
 import {
   resolveDashboardHomeSections,

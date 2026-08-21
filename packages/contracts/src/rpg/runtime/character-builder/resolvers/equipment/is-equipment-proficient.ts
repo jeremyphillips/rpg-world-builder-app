@@ -1,7 +1,7 @@
 import type { Equipment } from '../../../../content/equipment'
 import { isToolProficient } from '../../../creature/proficiencies'
 import { toEquipmentContentId } from '../../../creature/equipment'
-import type { CharacterProficiencies } from '../../../character/proficiencies'
+import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 
 function weaponIdMatchesEquipment(
   weaponId: string,

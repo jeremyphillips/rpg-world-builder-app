@@ -1,6 +1,6 @@
 import { cn, dragHandleVariants, dragSurfaceVariants, interactiveRowVariants } from '@rpg/ui'
 
-/** Outer row layout — host-owned inset for embedded EntityItem. */
+/** Outer row layout — host-owned inset for embedded EntityAnatomyHost. */
 export const masterDetailListRowLayoutClasses =
   'flex items-center gap-0 rounded-md border border-transparent px-3 py-2'
 

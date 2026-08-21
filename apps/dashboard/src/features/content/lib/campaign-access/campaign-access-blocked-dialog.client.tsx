@@ -1,6 +1,6 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
 
-import { ActionBlockedDialog } from '@/lib/actions/action-blocked-dialog.client'
+import { ActionBlockedDialog } from '@/lib/actions'
 
 import {
   formatCampaignAccessBlockedDescription,

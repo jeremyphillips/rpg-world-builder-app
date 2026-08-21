@@ -6,7 +6,7 @@ import { Button, Text } from '@rpg/ui'
 import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor.client'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { isEmbeddedRowSystemLocked } from '../../lib/master-detail/is-embedded-row-system-locked'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import {

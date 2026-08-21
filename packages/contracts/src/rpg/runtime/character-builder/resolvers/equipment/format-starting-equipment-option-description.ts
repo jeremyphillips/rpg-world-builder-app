@@ -1,10 +1,10 @@
-import type { CharacterWealthGrant } from '../../../../content/lib/wealth-grant'
+import type { CharacterWealthGrant } from '../../../../content/lib/grants/wealth-grant'
 import { joinNaturalList } from '../../../../primitives/prose'
 import { formatWealth, formatWealthAsGold, wealthToCopper } from '../../../../primitives/wealth'
 import {
   characterWealthFromGrant,
   type CharacterWealth,
-} from '../../../character/equipment-inventory'
+} from '../../../character/sheet/equipment-inventory'
 import type { StartingEquipmentOptionSummaryItem } from './resolve-starting-equipment-option-summaries'
 
 export const DEFAULT_STANDARD_EQUIPMENT_LABEL = 'standard equipment'

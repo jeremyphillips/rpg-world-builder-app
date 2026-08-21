@@ -7,7 +7,7 @@ import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
 import { Trash2 } from 'lucide-react'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { useIsSuperadmin } from '@/features/auth'
 
 import { DeleteUserDialog } from '../components/delete-user-dialog.client'

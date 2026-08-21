@@ -4,9 +4,9 @@ import { useMemo } from 'react'
 import { Text } from '@rpg/ui'
 import { Form } from '@rpg/ui/form'
 
-import { PageHeader } from '@/components/layout/page-header'
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import {

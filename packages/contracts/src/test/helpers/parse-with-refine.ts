@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { refineLevelRangeTable } from '../../rpg/primitives/level-range-table'
+import { refineLevelRangeTable } from '../../rpg/primitives/level'
 
 export function parseWithRefine(
   rows: { minLevel: number; maxLevel: number }[],

@@ -4,8 +4,8 @@ import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 import { Navigate, useLocation, useParams } from 'react-router-dom'
 
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { useCampaigns } from '@/features/campaign'
 
 import { useCharacter } from '../hooks/use-character'

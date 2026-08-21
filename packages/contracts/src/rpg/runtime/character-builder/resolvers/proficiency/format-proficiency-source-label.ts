@@ -4,7 +4,7 @@ import {
   type FormatSelectionSourceLabelOptions,
   type SelectionSourceRowKind,
 } from '../../../character/format-selection-source-label'
-import type { CharacterSelectionSource } from '../../../character/selection-sources'
+import type { CharacterSelectionSource } from '../../../character/sheet/selection-sources'
 
 export type ProficiencySourceRowKind = SelectionSourceRowKind
 

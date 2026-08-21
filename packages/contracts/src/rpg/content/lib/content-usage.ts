@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { vocabularyUsageReferenceSchema } from '../../vocab/vocabulary-usage'
-import { contentViewerCharacterRelationshipsSchema } from './content-viewer-character-relationships'
+import { contentViewerCharacterRelationshipsSchema } from './campaign-access/content-viewer-character-relationships'
 import { USAGE_REFERENCE_PREVIEW_LIMIT } from '../../primitives/usage/preview-limits'
 
 export { USAGE_REFERENCE_PREVIEW_LIMIT as CONTENT_USAGE_SUMMARY_LIMIT } from '../../primitives/usage/preview-limits'

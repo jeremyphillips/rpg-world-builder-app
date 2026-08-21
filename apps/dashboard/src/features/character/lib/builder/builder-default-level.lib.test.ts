@@ -4,7 +4,7 @@ import {
   createCampaignNpcBuilderContextFixture,
   createCampaignPcBuilderContextFixture,
   createStandaloneBuilderContextFixture,
-} from '../character-builder-fixtures'
+} from '../fixtures/character-builder-fixtures'
 import { resolveFullBuilderDefaultLevel } from './builder-default-level.lib'
 
 describe('resolveFullBuilderDefaultLevel', () => {

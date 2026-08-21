@@ -8,8 +8,8 @@ import type {
 import { RowActionsMenu } from '@rpg/ui'
 
 import { CampaignAccessBlockedDialog } from '../campaign-access/campaign-access-blocked-dialog.client'
-import { ContentCampaignAvailabilityAction } from './content-campaign-availability-action.client'
-import { useContentCampaignAvailabilityToggle } from './use-content-campaign-availability-toggle.client'
+import { ContentCampaignAvailabilityAction } from '../campaign-access/overview/content-campaign-availability-action.client'
+import { useContentCampaignAvailabilityToggle } from './hooks/use-content-campaign-availability-toggle.client'
 
 export interface ContentOverviewRowActionsProps {
   campaignId: string

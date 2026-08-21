@@ -19,12 +19,12 @@ import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/v
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   embeddedArrayResolverField,
   embeddedMasterDetailTabValidation,
   prefixFormItems,
-} from '../../lib/forms/tabbed-form-resolver-fields'
+} from '../../lib/forms/validation/tabbed-form-resolver-fields'
 import { SpeciesHeritageTab } from '../components/species-heritage-tab.client'
 import { SpeciesRulesTab } from '../components/species-rules-tab.client'
 import { SpeciesTraitsTab } from '../components/species-traits-tab.client'

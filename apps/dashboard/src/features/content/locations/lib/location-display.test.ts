@@ -18,7 +18,7 @@ import {
   formatLocatedInSupportingText,
   LOCATION_UNKNOWN_ANCESTOR_LABEL,
 } from './location-display'
-import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
+import { LOCATION_UNCONTAINED_LABEL } from './hierarchy/location-parent-replacement-surface-copy'
 
 const CAMPAIGN_ID = STORY_CAMPAIGN_ID
 

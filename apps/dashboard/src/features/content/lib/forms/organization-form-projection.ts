@@ -32,19 +32,19 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
-import type { ContentFormCtx, ContentFormInputCtx } from './content-form-registry'
-import { draftOptionalSelect } from './draft-form-schema-helpers'
+import type { ContentFormCtx, ContentFormInputCtx } from './registry/content-form-registry'
+import { draftOptionalSelect } from './validation/draft-form-schema-helpers'
 import { descriptionField, nameField } from './fields/content-identity-form-fields'
-import { finalizeContentInput, slugForInputParse } from './content-form-key-helpers'
-import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/organization-practice-combobox-ranking'
+import { finalizeContentInput, slugForInputParse } from './registry/content-form-key-helpers'
+import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/authoring/organization-practice-combobox-ranking'
 import {
   buildMemberClassAffinityChipOptions,
   ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT,
-} from '../../organizations/lib/organization-member-class-chip-options.lib'
+} from '../../organizations/lib/members/organization-member-class-chip-options.lib'
 import {
   buildMemberSpeciesAffinityChipOptions,
   ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT,
-} from '../../organizations/lib/organization-member-species-chip-options.lib'
+} from '../../organizations/lib/members/organization-member-species-chip-options.lib'
 
 const organizationDomainOptions = toOptions(
   ORGANIZATION_DOMAIN_IDS,

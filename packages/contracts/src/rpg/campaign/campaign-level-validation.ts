@@ -1,5 +1,5 @@
 import { ABSOLUTE_MAX_CHARACTER_LEVEL } from '../primitives/level'
-import { levelValidationMessages } from '../primitives/level-messages'
+import { levelValidationMessages } from '../primitives/level'
 
 export type ExtendedMaxValidationResult = { valid: true } | { valid: false; message: string }
 

@@ -53,7 +53,7 @@ import {
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 
-import type { ContentFormCtx } from '../content-form-registry'
+import type { ContentFormCtx } from '../registry/content-form-registry'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
 import {
   referenceEquipmentFieldOptions,
@@ -63,8 +63,8 @@ import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcast
 import {
   equipmentGrantItemFields,
   type EquipmentGrantItemForm,
-} from './equipment-grant-form-fields'
-import { equipmentGrantSummary, equipmentGrantTitle } from './equipment-grant-form-values'
+} from './equipment/equipment-grant-form-fields'
+import { equipmentGrantSummary, equipmentGrantTitle } from './equipment/equipment-grant-form-values'
 import {
   proficiencyGrantItemFields,
   type ArmorTrainingItemForm,
@@ -72,7 +72,7 @@ import {
   type SkillProficiencyItemForm,
   type ToolProficiencyItemForm,
   type WeaponProficiencyItemForm,
-} from './proficiency-grant-form-fields'
+} from './proficiency/proficiency-grant-form-fields'
 import {
   armorTrainingGrantSummary,
   armorTrainingGrantTitle,
@@ -82,7 +82,7 @@ import {
   toolProficiencyGrantTitle,
   weaponProficiencyGrantSummary,
   weaponProficiencyGrantTitle,
-} from './proficiency-grant-form-values'
+} from './proficiency/proficiency-grant-form-values'
 import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
 import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
 import {

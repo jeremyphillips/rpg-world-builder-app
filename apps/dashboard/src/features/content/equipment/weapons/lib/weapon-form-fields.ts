@@ -33,7 +33,7 @@ import {
   SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
 } from '../../../lib/forms/fields/content-identity-form-fields'
 import { weaponDamageFields } from '../../../lib/forms/mechanics/weapon-damage-fields'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,

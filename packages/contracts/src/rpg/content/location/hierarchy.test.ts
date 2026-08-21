@@ -8,7 +8,7 @@ import {
   isValidParentKind,
   validateLocationParentRequirement,
 } from './hierarchy'
-import { LOCATION_KIND_IDS } from '../../vocab/location/kind'
+import { LOCATION_KIND_IDS } from '../../vocab/location/region/kind'
 
 describe('LOCATION_KIND_DEFINITIONS integrity', () => {
   it('defines hierarchy policy for every location kind', () => {

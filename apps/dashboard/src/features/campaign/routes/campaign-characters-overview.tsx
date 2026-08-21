@@ -3,16 +3,16 @@ import type { CampaignCharacterListItem } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { OverviewPageShell } from '@/components/layout/overview-page-shell'
+import { OverviewPageShell } from '@/components/layout/page/overview-page-shell'
 import { CharacterListCard } from '@/features/character'
 import { normalizeListController, resolveCharacterControllerDisplay } from '@/features/character'
 
 import { useCampaignBuildContext } from '@/features/character'
-import { resolveQueryErrorLabel } from '@/features/character'
+import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaignCharacters } from '../hooks/use-campaign-characters'
 import { useCampaigns } from '../hooks/use-campaigns'
-import type { CampaignCharactersListContextModel } from '../lib/build-campaign-character-navigation-context'
+import type { CampaignCharactersListContextModel } from '../lib/characters/build-campaign-character-navigation-context'
 
 const CAMPAIGN_CHARACTERS_LIST_EMPTY_MESSAGES = {
   no_controlled_character: 'No character is currently assigned to you.',

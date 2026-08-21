@@ -1,5 +1,5 @@
 import type { CharacterClass } from '../../../content/classes/class'
-import type { CharacterProficiencies } from '../../character/proficiencies'
+import type { CharacterProficiencies } from '../../character/sheet/proficiencies'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterLanguageAssemblyContext } from './assemble-language-proficiencies'
 import { assembleLanguageProficiencyEntries } from './assemble-language-proficiencies'

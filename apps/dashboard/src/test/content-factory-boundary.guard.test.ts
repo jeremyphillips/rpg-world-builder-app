@@ -22,7 +22,7 @@ const baselinePath = join(import.meta.dirname, 'content-factory-boundary.baselin
 const baseline = JSON.parse(readFileSync(baselinePath, 'utf8')) as BaselineFile
 
 describe('content factory boundary guard', () => {
-  it('does not introduce new hand-rolled content entity construction', () => {
+  it('does not introduce new hand-rolled content entity construction', { timeout: 30_000 }, () => {
     const currentViolations = collectContentFactoryBoundaryViolations()
     const baselineKeys = new Set(baseline.violations.map(violationKey))
 

@@ -1,6 +1,6 @@
 import { MAX_CHARACTER_LEVEL, type CreateFeatInput, type Feat } from '@rpg/contracts'
 
-import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
+import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { useFeats, featsQueryKey } from '../hooks/use-feats'
 import {

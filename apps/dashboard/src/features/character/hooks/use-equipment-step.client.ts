@@ -45,10 +45,11 @@ import {
 import { useEquipmentMagicItemWorkflow } from './use-equipment-magic-item-workflow.client'
 import { withChoiceSetSelections } from '../lib/choice-sets/choice-set-selections'
 import { resolveEquipmentStepSurface } from '../lib/equipment/resolve-equipment-step-surface.lib'
-import { resolveEquipmentPickerCharacterPreviewContext } from '../components/equipment/equipment-picker-character-preview.lib'
-import { resolvePackageSwitchCommitErrorFromIssues } from '../components/equipment/equipment-package-switch-resolution.lib'
-import type { EquipmentPickerDrawer } from '../components/equipment/equipment-picker-drawer.client'
-import type { EquipmentStepInventorySectionProps } from '../components/steps/equipment-step-sections.client'
+import { resolveEquipmentPickerCharacterPreviewContext } from '../components/equipment/picker/details/equipment-picker-character-preview.lib'
+import { resolvePackageSwitchCommitErrorFromIssues } from '../lib/equipment/equipment-package-switch-resolution.lib'
+import type { EquipmentPickerItem } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
+import type { EquipmentPickerDrawer } from '../components/equipment/picker/drawer/equipment-picker-drawer.client'
+import type { EquipmentStepInventorySectionProps } from '../components/builder/steps/equipment/equipment-step-sections.client'
 
 type PendingEquipmentSelection = {
   optionId: string
@@ -570,10 +571,7 @@ export function useEquipmentStep(args: {
     }
   }
 
-  const handleAddItem: ComponentProps<typeof EquipmentPickerDrawer>['onAddItem'] = (
-    item,
-    quantity,
-  ) => {
+  const handleAddItem = (item: EquipmentPickerItem, quantity: number) => {
     if (pickerWorkflowMode === 'magic_items') {
       applyEquipmentAction({
         kind: 'acquire_magic_item',

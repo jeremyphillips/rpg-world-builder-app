@@ -5,8 +5,8 @@ import { useParams } from 'react-router-dom'
 import { Text } from '@rpg/ui'
 import { useFilterState } from '@rpg/ui/filters'
 
-import { PageHeader } from '@/components/layout/page-header'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
 import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
 

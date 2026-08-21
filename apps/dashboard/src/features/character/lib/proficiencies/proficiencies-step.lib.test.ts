@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft, resolveAvailableChoices } from '@rpg/contracts'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../fixtures/character-builder-fixtures'
 import {
   choiceSetsForProficienciesStep,
   formatProficiencyChoiceAddLabel,

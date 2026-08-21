@@ -103,7 +103,7 @@ memberships until connections adopt `membershipTitleId` referencing organization
 removed. Titles come only from the create-boundary snapshot or explicit manual catalog —
 never from domain / form / function inference at runtime.
 
-Detail: [`organization-membership-titles.ts`](../../../packages/contracts/src/rpg/content/organization-membership-titles.ts),
+Detail: [`organization/membership-titles.ts`](../../../packages/contracts/src/rpg/content/organization/membership-titles.ts),
 [`organization-membership-title.ts`](../../../packages/contracts/src/rpg/vocab/organization-membership-title.ts).
 
 ### Detail surfaces

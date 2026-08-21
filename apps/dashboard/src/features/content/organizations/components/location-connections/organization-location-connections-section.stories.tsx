@@ -1,0 +1,77 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+
+import { buildLocationsById } from '../../../locations/lib/location-display'
+import { GREYSHORE } from '../../../locations/fixtures'
+import { buildOrganizationLocationConnectionCards } from '../../lib/location-connections/build-organization-location-connection-cards'
+import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../../lib/organization-display'
+import {
+  ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
+  OrganizationLocationConnectionsSection,
+} from './organization-location-connections-section.client'
+
+const meta = {
+  title: 'Content/Organizations/OrganizationLocationConnectionsSection',
+  component: OrganizationLocationConnectionsSection,
+  parameters: { layout: 'padded' },
+} satisfies Meta<typeof OrganizationLocationConnectionsSection>
+
+export default meta
+type Story = StoryObj<typeof OrganizationLocationConnectionsSection>
+
+const sampleLocationConnections = {
+  ...buildOrganizationLocationConnectionCards(
+    [
+      {
+        connection: { id: 'conn-1', locationId: GREYSHORE.id, kind: 'governs' },
+        location: GREYSHORE,
+      },
+    ],
+    {
+      campaignId: 'camp-1',
+      locationsById: buildLocationsById([GREYSHORE]),
+    },
+  ),
+  emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
+}
+
+export const WithConnections: Story = {
+  args: {
+    locationConnections: sampleLocationConnections,
+    canManage: true,
+    showEmptySection: true,
+    visibleFamilies: ['territorial_authority', 'site'],
+    canAddToFamily: { territorial_authority: true, site: true },
+  },
+}
+
+export const ManagerEmptySiteFamily: Story = {
+  args: {
+    locationConnections: {
+      previewItems: [],
+      total: 0,
+      emptyText: ORGANIZATION_EMPTY_SECTION_TEXT.locationConnections,
+    },
+    canManage: true,
+    showEmptySection: true,
+    visibleFamilies: ['site'],
+    canAddToFamily: { site: true },
+  },
+}
+
+export const PopulatedWithoutAdd: Story = {
+  args: {
+    locationConnections: sampleLocationConnections,
+    canManage: true,
+    showEmptySection: true,
+    visibleFamilies: ['territorial_authority'],
+    canAddToFamily: { territorial_authority: false },
+  },
+}
+
+export const Error: Story = {
+  args: {
+    locationConnections: sampleLocationConnections,
+    isError: true,
+    errorText: ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR,
+  },
+}

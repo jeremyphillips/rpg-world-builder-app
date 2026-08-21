@@ -50,12 +50,13 @@ coverage from `pnpm coverage` via `--coverage ./coverage/coverage-final.json`
 
 ## Agent skills
 
-| Skill                                                          | Use when                                                                                                       |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| [`new-content-type`](.cursor/skills/new-content-type/SKILL.md) | Adding or auditing a top-level catalog content type (contracts, catalog, API, dashboard, integration manifest) |
-| [`spell-resolution`](.cursor/skills/spell-resolution/SKILL.md) | Spell resolution, effects, modeling, promotion, resolution UI                                                  |
-| [`dev-bench`](.cursor/skills/dev-bench/SKILL.md)               | Capturing gaps and tickets via `pnpm bench`                                                                    |
-| [`pr-review`](.cursor/skills/pr-review/SKILL.md)               | Structured PR review — SSOT drift, parallel paths, ownership, styling hacks, silent failures, wiring gaps      |
+| Skill                                                                                  | Use when                                                                                                                 |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| [`new-content-type`](.cursor/skills/new-content-type/SKILL.md)                         | Adding or auditing a top-level catalog content type (contracts, catalog, API, dashboard, integration manifest)           |
+| [`spell-resolution`](.cursor/skills/spell-resolution/SKILL.md)                         | Spell resolution, effects, modeling, promotion, resolution UI                                                            |
+| [`dev-bench`](.cursor/skills/dev-bench/SKILL.md)                                       | Capturing gaps and tickets via `pnpm bench`                                                                              |
+| [`pr-review`](.cursor/skills/pr-review/SKILL.md)                                       | Structured PR review — SSOT drift, parallel paths, ownership, styling hacks, silent failures, wiring gaps                |
+| [`directory-organization-audit`](.cursor/skills/directory-organization-audit/SKILL.md) | Directory organization strategy for crowded or misaligned folders — ownership, flat vs nested structure, move vs extract |
 
 Policy depth for content types → [`docs/content-types.md`](docs/content-types.md).
 
@@ -93,7 +94,7 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   `lib/` form modules (`*-form-fields`, `*-form-values`, …) →
   [apps/dashboard/docs/form-lib-conventions.md](apps/dashboard/docs/form-lib-conventions.md).
 - Entity surfaces: do not add consumer-local spacing, typography, border, radius,
-  alignment, divider, or chrome overrides to `EntityItem`,
+  alignment, divider, or chrome overrides to `EntityAnatomyHost`,
   `ContentEntityCard`, or `DisclosureEntityCard`. First determine whether the
   change belongs to the shared surface; genuine domain layout remains inside DEC
   children. Ownership hierarchy and per-primitive contracts →

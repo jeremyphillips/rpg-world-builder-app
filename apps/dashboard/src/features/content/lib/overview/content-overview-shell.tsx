@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { buttonVariants } from '@rpg/ui'
 
-import { OverviewPageShell } from '@/components/layout/overview-page-shell'
+import { OverviewPageShell } from '@/components/layout/page/overview-page-shell'
 import { useCanManageCampaign } from '@/features/campaign'
 
 type ContentOverviewShellProps = {

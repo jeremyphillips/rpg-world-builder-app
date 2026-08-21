@@ -7,12 +7,12 @@ purpose). At least one must be present on persisted classification.
 **Facility is the primary authoring/discovery axis; Form is optional structural precision.** Setup
 requires a Facility discovery group (including Browse all), not a persisted `facilityType`.
 
-| Concern                        | Where to read                                                                                                                                                                                                                            |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Runtime model**              | This document + [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building-form.ts) and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts)                |
-| **Taxonomy planning / status** | [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md)                                                                                                                                                        |
-| **Semantic gates / history**   | [`building-taxonomy-evidence.md`](../../../docs/analysis/building-taxonomy-evidence.md) — only when boundary reasoning is needed                                                                                                         |
-| **Frozen research corpus**     | [`building-taxonomy-discovery.md`](../../../docs/discovery/building-taxonomy-discovery.md) — digest; full record in [`archive/building-taxonomy-discovery-v0.5.md`](../../../docs/discovery/archive/building-taxonomy-discovery-v0.5.md) |
+| Concern                        | Where to read                                                                                                                                                                                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Runtime model**              | This document + [`building-form.ts`](../../../packages/contracts/src/rpg/vocab/location/building/building-form.ts) and [`building-facility-type.ts`](../../../packages/contracts/src/rpg/vocab/location/building/building-facility-type.ts) |
+| **Taxonomy planning / status** | [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md)                                                                                                                                                           |
+| **Semantic gates / history**   | [`building-taxonomy-evidence.md`](../../../docs/analysis/building-taxonomy-evidence.md) — only when boundary reasoning is needed                                                                                                            |
+| **Frozen research corpus**     | [`building-taxonomy-discovery.md`](../../../docs/discovery/building-taxonomy-discovery.md) — digest; full record in [`archive/building-taxonomy-discovery-v0.5.md`](../../../docs/discovery/archive/building-taxonomy-discovery-v0.5.md)    |
 
 Do not start from the frozen discovery corpus to learn the current shipped model.
 
@@ -66,7 +66,7 @@ claim. Facility and Organization may coexist on the same Building.
 
 Persisted Building classification is **only** `classification.form` and/or
 `classification.facilityType`. The 143-entry `BuildingArchetype` registry
-([`building-archetype.ts`](../../../packages/contracts/src/rpg/vocab/location/building-archetype.ts))
+([`building-archetype.ts`](../../../packages/contracts/src/rpg/vocab/location/building/building-archetype.ts))
 is a **quarantined research corpus** — not exported from runtime barrels, not imported by
 production apps (ESLint-enforced). It may inform future presets or manifestation migration; both
 remain **deferred** — see [`building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md#deferred).
@@ -136,7 +136,7 @@ first, then sequentially POSTs each district as a child `kind: 'district'` Locat
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).
 
 Storybook: tag `phase-7-building-flows` and `phase-20-building-flows` on
-[`location-create-modal.stories.tsx`](../src/features/content/locations/components/location-create-modal.stories.tsx).
+[`location-create-modal.stories.tsx`](../src/features/content/locations/components/create/location-create-modal.stories.tsx).
 
 ## Authoring modules
 

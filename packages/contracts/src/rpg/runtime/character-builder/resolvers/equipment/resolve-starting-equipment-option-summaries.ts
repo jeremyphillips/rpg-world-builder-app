@@ -1,7 +1,7 @@
 import type { Equipment } from '../../../../content/equipment'
 import type { CharacterClass } from '../../../../content/classes/class'
-import type { CharacterWealthGrant } from '../../../../content/lib/wealth-grant'
-import type { EquipmentPool } from '../../../../content/lib/equipment-grant'
+import type { CharacterWealthGrant } from '../../../../content/lib/grants/wealth-grant'
+import type { EquipmentPool } from '../../../../content/lib/grants/equipment-grant'
 import type { StartingEquipmentOption } from '../../../../content/starting-equipment'
 import {
   isProficiencyLinkedStartingEquipmentGrant,
@@ -11,13 +11,13 @@ import {
   startingEquipmentGrantProficiencyChoiceId,
 } from '../../../../content/starting-equipment'
 import { eligibleProficiencyChoiceTargetIds } from '../../validation/resolve-eligible-proficiency-choice-targets'
-import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-grant'
+import { formatEquipmentPoolLabel } from '../../../../content/lib/grants/equipment-grant'
 import {
   isEquipmentPoolFullyAvailable,
   isGrantedEquipmentAvailable,
   toEquipmentContentId,
 } from '../../../creature/equipment'
-import type { CharacterEquipment } from '../../../character/equipment-inventory'
+import type { CharacterEquipment } from '../../../character/sheet/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
@@ -25,7 +25,7 @@ import {
   inventoryBucketForEquipment,
   inventoryBucketForEquipmentKind,
   type CharacterWealth,
-} from '../../../character/equipment-inventory'
+} from '../../../character/sheet/equipment-inventory'
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
 import {
   formatStartingEquipmentPackageDescription,

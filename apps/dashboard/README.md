@@ -36,7 +36,7 @@ See [`docs/auth-guard.md`](./docs/auth-guard.md) for the full data-flow diagram.
 ```text
 src/
   app/           providers, router, routes.ts, lazy-routes, breadcrumbs
-  components/    layout shells (AppShell, NarrowPage, WidePage, PageHeader, …)
+  components/    layout chrome (shell/, topbar/, breadcrumb/, page/, sidebar/ — see layout/README.md)
   features/      feature-first domains (see status table below)
   lib/           shared data-table helpers, form guards, api utilities
   routes/        bootstrap screens (dashboard home, landing redirect)

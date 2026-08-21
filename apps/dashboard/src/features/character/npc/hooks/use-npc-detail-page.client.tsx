@@ -11,7 +11,7 @@ import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { useCharacterOrganizationReferences } from '../../hooks/use-character-organization-references'
 import { useCharacterLocationReferences } from '../../hooks/use-character-location-references'
 import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
-import { resolveQueryErrorLabel } from '../../lib/resolve-query-error-label.lib'
+import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useNpcDeleteFlow } from './use-npc-delete-flow.client'
 import { useNpc } from './use-npcs'
 

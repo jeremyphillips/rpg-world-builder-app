@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { CampaignInviteInviteeListItem, CampaignListItem } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
+import { IndexPageEmptyState } from '@/components/layout/page/index-page-intro'
 import {
   CAMPAIGNS_QUERY_ERROR_MESSAGE,
   CampaignPicker,
@@ -10,8 +10,8 @@ import {
   filterPendingInvitesForMembership,
 } from '@/features/campaign'
 
-import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/campaigns-overview-copy'
-import type { CampaignsOverviewViewState } from '../lib/campaigns-overview-view'
+import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/overview/campaigns-overview-copy'
+import type { CampaignsOverviewViewState } from '../lib/overview/campaigns-overview-view'
 
 type CampaignsOverviewBodyProps = {
   viewState: CampaignsOverviewViewState

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { slugSchema } from '@rpg/contracts'
 import { type FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   classFeatureItemFields,
   featureRowFormSchema,

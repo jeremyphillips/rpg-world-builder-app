@@ -42,11 +42,11 @@ Dashboard drawers delegate to these helpers through `location-connection-duplica
 
 ### Headquarters location policy
 
-`headquarters` is eligible only on **structure-family locations**: building, fortification, or generic structure profiles. Settlements, regions, districts, interiors, and other profiles reject it via [`location-connection-eligibility.ts`](../../../packages/contracts/src/rpg/content/lib/location-connection-eligibility.ts).
+`headquarters` is eligible only on **structure-family locations**: building, fortification, or generic structure profiles. Settlements, regions, districts, interiors, and other profiles reject it via [`location-connection-eligibility.ts`](../../../packages/contracts/src/rpg/content/lib/relationship/location-connection-eligibility.ts).
 
 Each organization may have at most **one** headquarters connection across all locations (`maxSubjectsPerOrganization` on the kind vocab entry). Family add drawers keep headquarters visible when that slot is occupied and show `Already set at {locationName}.` as the unavailable reason.
 
-Picker copy for headquarters (field helper, search placeholder, change-location drawer title) lives in dashboard target presentation config — see [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/organization-location-connection-surface-copy.ts) and [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
+Picker copy for headquarters (field helper, search placeholder, change-location drawer title) lives in dashboard target presentation config — see [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/location-connections/organization-location-connection-surface-copy.ts) and [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
 
 Mutation candidate filtering (add, change location, replace organization) always evaluates the **persisted or selected relationship kind**, never the union of kinds represented by a drawer intent family.
 
@@ -65,7 +65,7 @@ read `getOrganizationLocationConnectionDisplayLabel(kind, 'forward')`.
 Organization→location existing-edge rows, change-target **Current** snapshots, and link-drawer
 candidates compose [`LocationEntitySummaryVm`](../src/features/content/locations/lib/location-display.ts)
 in the organization feature, then map to neutral row / `EntityReplacementCurrentSnapshot` fields.
-Generic relationship and entity-replacement modules stay **entity-agnostic** — they must not import
+Generic relationship and drawer-replacement modules stay **entity-agnostic** — they must not import
 location display helpers.
 
 - **Unresolved targets:** `target: null` is the sole failure state; UI derives unavailable chrome from that.
@@ -75,4 +75,4 @@ location display helpers.
 
 Cross-org singleton occupancy for forward authoring uses `GET .../content/organization-location-connection-edges` (campaign-scoped edges grouped by `locationId`).
 
-Mutation overflow availability for change-target operations uses [`RelationshipCandidateSet`](../src/features/content/lib/relationship/relationship-candidate-set.ts) — see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md) for completeness invariants.
+Mutation overflow availability for change-target operations uses [`RelationshipCandidateSet`](../src/features/content/lib/relationship/core/relationship-candidate-set.ts) — see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md) for completeness invariants.

@@ -10,7 +10,7 @@ import {
 } from '@/features/vocabulary'
 import { SPECIES_STAT_LABELS } from '@/features/content'
 
-vi.mock('@/components/layout/use-breadcrumb-label', () => ({
+vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 vi.mock('../../lib/usage/content-usage-references-section.client', () => ({

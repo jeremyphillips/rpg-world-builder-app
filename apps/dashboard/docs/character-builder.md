@@ -19,12 +19,12 @@ Implementation lives in `src/features/character/` — see
 Advanced steps (Equipment, Spells, Proficiencies) use a **derived readiness**
 layer from contracts instead of ad-hoc empty/blocked branches in each step view.
 
-| Layer         | Module                                                     | Role                                                                  |
-| ------------- | ---------------------------------------------------------- | --------------------------------------------------------------------- |
-| Contracts     | `resolveBuilderStepReadiness`                              | Single source of truth for blocked / N/A / empty / choices / complete |
-| Dashboard lib | `lib/builder-step-readiness.lib.ts`                        | Message-only vs interactive UI; proficiencies section filtering       |
-| UI            | `components/steps/builder-step-readiness-panel.client.tsx` | Renders readiness `message` + `helperText`                            |
-| Rail          | `lib/builder-step-visual-status.ts`                        | Maps readiness → `StepStatus` (`locked` = not applicable)             |
+| Layer         | Module                                                                    | Role                                                                  |
+| ------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Contracts     | `resolveBuilderStepReadiness`                                             | Single source of truth for blocked / N/A / empty / choices / complete |
+| Dashboard lib | `lib/builder/builder-step-readiness.lib.ts`                               | Message-only vs interactive UI; proficiencies section filtering       |
+| UI            | `components/builder/steps/shared/builder-step-readiness-panel.client.tsx` | Renders readiness `message` + `helperText`                            |
+| Rail          | `lib/builder/builder-step-visual-status.ts`                               | Maps readiness → `StepStatus` (`locked` = not applicable)             |
 
 ### Proficiencies partial block
 

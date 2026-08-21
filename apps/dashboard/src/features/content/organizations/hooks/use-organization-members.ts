@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { getOrganizationMembers } from '../api/organization-members-client'
-import { ORGANIZATION_MEMBERS_PAGE_SIZE } from '../lib/organization-members.constants'
+import { ORGANIZATION_MEMBERS_PAGE_SIZE } from '../lib/members/organization-members.constants'
 
 export function organizationMembersQueryKey(
   campaignId: string | undefined,

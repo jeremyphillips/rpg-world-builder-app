@@ -1,8 +1,8 @@
 import type { SpeciesHeritage } from '@rpg/contracts'
 import { buildItemDefaultValues } from '@rpg/ui/form'
 
-import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { heritageScalarFields, type HeritageForm } from './species-heritage-form-fields'
 import { traitItemFields, type TraitRowForm } from './species-trait-form-fields'
 import {

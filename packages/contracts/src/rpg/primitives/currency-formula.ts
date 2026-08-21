@@ -5,7 +5,7 @@ import {
   formatScaledDiceFormula,
   scaledDiceFormulaSchema,
 } from './dice-formula'
-import { currencySchema, formatMoney, moneyToCp, type Currency } from './units'
+import { currencySchema, formatMoney, moneyToCp, type Currency } from './money'
 
 // ---------------------------------------------------------------------------
 // Currency dice formula — scaled dice roll denominated in a coin type.

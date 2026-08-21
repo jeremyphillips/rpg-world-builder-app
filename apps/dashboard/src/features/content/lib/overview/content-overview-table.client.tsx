@@ -31,7 +31,7 @@ import type {
   ContentOverviewPageSize,
   ContentOverviewPreferences,
 } from './content-overview-preferences'
-import { useContentOverviewTable } from './use-content-overview-table.client'
+import { useContentOverviewTable } from './hooks/use-content-overview-table.client'
 
 export type {
   ContentOverviewBulkExtension,

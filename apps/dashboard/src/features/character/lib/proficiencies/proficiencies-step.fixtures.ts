@@ -18,7 +18,7 @@ import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import { pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
 import { makeClassStored } from '@/test/fixtures/factories/additional/class-stored'
 
-import { createPopulatedStandaloneBuilderContextFixture } from '../character-builder-fixtures'
+import { createPopulatedStandaloneBuilderContextFixture } from '../fixtures/character-builder-fixtures'
 
 const RULESET = DEFAULT_SYSTEM_RULESET_ID
 

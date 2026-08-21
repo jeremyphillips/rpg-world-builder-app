@@ -1,5 +1,5 @@
-import type { CharacterSpellEntry } from '../../character/spells'
-import type { CharacterSelectionSource } from '../../character/selection-sources'
+import type { CharacterSpellEntry } from '../../character/sheet/spells'
+import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'

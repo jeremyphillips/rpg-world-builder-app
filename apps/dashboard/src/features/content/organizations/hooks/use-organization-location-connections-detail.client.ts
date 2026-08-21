@@ -20,20 +20,23 @@ import {
   organizationDrawerIntentFromKind,
   resolveVisibleOrganizationConnectionFamilies,
   type OrganizationConnectionDrawerIntent,
-} from '../../lib/location-connection-drawer-intent'
-import { resolveRelationshipAlternatives } from '../../lib/relationship/relationship-alternatives'
-import type { OrganizationForwardDrawerMode } from '../../lib/relationship/relationship-mutation-mode'
+} from '../../lib/relationship/location-connection/location-connection-drawer-intent'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
+import { resolveRelationshipAlternatives } from '../../lib/relationship/location-connection/location-connection-alternatives'
+import type { OrganizationForwardDrawerMode } from '../../lib/relationship/location-connection/location-connection-mutation-mode'
 import { useCampaignOrganizationLocationConnectionEdges } from './use-campaign-organization-location-connection-edges'
 import { useOrganizationLocationConnectionMutations } from './use-organization-location-connection-mutations'
 import { useOrganizationLocationReferences } from './use-organization-location-references'
 import {
   buildOrganizationLocationConnectionCards,
   resolveOrganizationForwardCurrentLocationEndpoint,
-} from '../lib/build-organization-location-connection-cards'
+} from '../lib/location-connections/build-organization-location-connection-cards'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
-import type { OrganizationLocationConnectionEditTarget } from '../components/organization-location-connections-section.client'
-import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../components/organization-location-connections-section.client'
-import type { OrganizationLocationConnectionMutationContext } from '../components/organization-location-connection-relationship-row.client'
+import type {
+  OrganizationLocationConnectionEditTarget,
+  OrganizationLocationConnectionMutationContext,
+} from '../lib/location-connections/organization-location-connection-mutation-context'
+import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../lib/location-connections/organization-location-connection-surface-copy'
 
 type EditDrawerState = {
   mode: Extract<OrganizationForwardDrawerMode, 'changeKind' | 'changeTarget'>
@@ -140,6 +143,7 @@ export function useOrganizationLocationConnectionsDetail(
         },
         connections: existingConnections,
         edgesByLocationId,
+        copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       }).alternatives,
     [
       canManage,

@@ -28,7 +28,7 @@ import { useCampaignCharacterDetail as useCampaignCharacterDetailFn } from '../h
 import { useCampaigns as useCampaignsFn } from '../hooks/use-campaigns'
 import { useCampaignCharacterNavigationContext as useCampaignCharacterNavigationContextFn } from '../hooks/use-campaign-character-navigation-context'
 import { ROUTES } from '@/app/routes'
-import { CAMPAIGN_CHARACTER_NAV_LABELS } from '../lib/build-campaign-character-navigation-context'
+import { CAMPAIGN_CHARACTER_NAV_LABELS } from '../lib/characters/build-campaign-character-navigation-context'
 
 const useCampaignCharacterDetail = vi.mocked(useCampaignCharacterDetailFn)
 const useCampaigns = vi.mocked(useCampaignsFn)

@@ -1,4 +1,4 @@
-import { isMeaningfulLanguageProficiencyChoice } from '../../../../content/lib/proficiency-grant-set'
+import { isMeaningfulLanguageProficiencyChoice } from '../../../../content/lib/grants/proficiency-grant-set'
 import { getLanguageLabel } from '../../../../vocab/language'
 import { resolveLanguagesFromChoiceSource } from '../../../creature/languages'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'

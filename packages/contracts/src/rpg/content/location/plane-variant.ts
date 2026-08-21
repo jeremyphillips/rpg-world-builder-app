@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { planeTypeSchema } from '../../vocab/location/plane-type'
+import { planeTypeSchema } from '../../vocab/location/region/plane-type'
 
 /** Kind-specific fields for `kind: 'plane'`. */
 export const planeLocationKindFields = {

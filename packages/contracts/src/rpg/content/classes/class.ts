@@ -16,7 +16,7 @@ import {
   skillProficiencyGrantSetSchema,
   toolProficiencyGrantSetSchema,
   weaponProficiencyGrantSetSchema,
-} from '../lib/proficiency-grant-set'
+} from '../lib/grants/proficiency-grant-set'
 import { CLASS_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
 import { createDraftInputSchema, draftStoredSchema } from '../lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'

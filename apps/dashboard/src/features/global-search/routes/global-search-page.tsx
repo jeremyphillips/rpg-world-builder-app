@@ -3,12 +3,12 @@
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/narrow-page'
-import { PageHeader } from '@/components/layout/page-header'
-import { pageHeaderSectionGapClasses } from '@/components/layout/page-spacing.variants'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
 
 import { GlobalSearchField } from '../components/global-search-field.client'
-import { GlobalSearchResultsBody } from '../components/global-search-results-body.client'
+import { GlobalSearchResultsBody } from '../components/results/global-search-results-body.client'
 import { useGlobalSearchPage } from '../hooks/use-global-search-page'
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
 import { resolveGlobalSearchHref } from '../lib/resolve-global-search-href'

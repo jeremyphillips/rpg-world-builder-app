@@ -1,6 +1,6 @@
 import type { ClassStored } from './classes/class'
 import type { SkillId } from './skill-proficiency'
-import { isMeaningfulProficiencyChoice } from './lib/proficiency-grant-set'
+import { isMeaningfulProficiencyChoice } from './lib/grants/proficiency-grant-set'
 
 /** Minimal class fields for class-owned skill choice read helpers. */
 export type ClassSkillChoiceSource = Pick<ClassStored, 'slug' | 'characterCreation'>

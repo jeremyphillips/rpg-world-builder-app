@@ -13,7 +13,7 @@ export {
   fetchCharacterCreationRules,
   type BuilderCatalogLists,
 } from './api/ruleset-content-client'
-export { CharacterBuilderDraftRestore } from './components/character-builder-draft-restore.client'
+export { CharacterBuilderDraftRestore } from './components/builder/chrome/character-builder-draft-restore.client'
 export { CharacterListCard } from './components/character-list-card.client'
 export type { CharacterListCardData } from './components/character-list-card.lib'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
@@ -40,28 +40,19 @@ export {
 export { charactersQueryKey, useCharacters } from './hooks/use-characters'
 export { useCreateCharacter } from './hooks/use-create-character'
 export { useDeleteCharacter } from './hooks/use-delete-character'
-export { CharacterBuilderShell } from './components/character-builder-shell.client'
-export { CampaignCharacterStatusSummary } from './components/detail/campaign-character-status-summary.client'
+export { CharacterBuilderShell } from './components/builder/character-builder-shell.client'
+export { CampaignCharacterStatusSummary } from './components/detail/status/campaign-character-status-summary.client'
 export { CharacterDetailContent } from './components/detail/character-detail-content.client'
-export { CharacterOrganizationsSummary } from './components/detail/character-organizations-summary.client'
-export { CharacterOrganizationMembershipsContainer } from './components/detail/character-organization-memberships-container.client'
+export { CharacterOrganizationsSummary } from './components/detail/memberships/character-organizations-summary.client'
+export { CharacterOrganizationMembershipsContainer } from './components/detail/memberships/character-organization-memberships-container.client'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
-export { BuilderInventoryRemoveAction } from './components/builder/builder-inventory-remove-action.client'
+export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action.client'
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'
-export { CatalogPickerSelectionActions } from './components/picker/catalog-picker-selection-actions.client'
 export {
-  CatalogPickerMetadataRenderer,
-  type CatalogPickerMetadataLine,
-} from './components/picker/catalog-picker-metadata'
-export { catalogPickerShellProps } from './components/picker/catalog-picker-shell.lib'
-export { compareName, scoreAndFilterPickerItems } from './components/picker/catalog-picker-sort.lib'
-export {
-  CatalogEntityRow,
-  CatalogEntityPickerSheet,
-  createCatalogEntityRowRenderer,
-} from '@/features/content'
-export { resolveCatalogPickerRowActionPhase } from './components/picker/catalog-picker-row-action.lib'
-export { CATALOG_PICKER_COMMIT_SUCCESS_MS } from './components/picker/use-catalog-picker-commit-confirmation.client'
+  compareName,
+  scoreAndFilterPickerItems,
+} from './components/picker/sort/catalog-picker-sort.lib'
+export { EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS } from './components/equipment/acquisition/use-equipment-acquisition-commit-confirmation.client'
 export {
   characterOrganizationReferencesQueryKey,
   useCharacterOrganizationReferences,
@@ -76,9 +67,9 @@ export {
 export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field.client'
 export {
   membershipRadioValueFromTitle,
+  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   titleFromMembershipRadioValue,
-} from './components/connections/organization-membership-title-field.lib'
-export { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './components/connections/organization-membership-title-field.types'
+} from './lib/organization-membership/organization-membership-title.lib'
 export {
   createCharacterOrganizationMembership,
   deleteCharacterOrganizationMembership,
@@ -94,27 +85,28 @@ export {
 } from './hooks/use-character-location-references'
 export { useCreateNpc } from './npc/hooks/use-create-npc'
 export { useNpcs, npcsQueryKey } from './npc/hooks/use-npcs'
+export { fetchCampaignNpcs, invalidateCampaignNpcQueries } from './npc/lib/fetch-campaign-npcs.lib'
 export {
   mapContentCreateContextToQuickNpcCreateContext,
   QUICK_NPC_CREATE_SUBMIT_LABEL,
   type QuickNpcCreateFormOrganization,
   type QuickNpcCreateContext,
-} from './npc/lib/quick-npc-create-context'
+} from './npc/lib/quick-npc/quick-npc-create-context'
 export {
   QuickNpcCreateModal,
   QUICK_NPC_CREATE_TITLE,
-} from './npc/components/quick-npc-create-modal.client'
+} from './npc/components/quick-npc/quick-npc-create-modal.client'
 export {
   QuickNpcAuthoringForm,
   type QuickNpcAuthoringFormProps,
-} from './npc/components/quick-npc-authoring-form.client'
+} from './npc/components/quick-npc/quick-npc-authoring-form.client'
 export {
   type QuickNpcAuthoringValues,
   type QuickNpcSetupValues,
-} from './npc/lib/quick-npc-form-fields'
-export { buildQuickNpcClassRadioCardPresentation } from './npc/lib/quick-npc-class-option-groups.lib'
-export { resolveQuickNpcClassOptionGroups } from './npc/lib/quick-npc-class-option-groups.lib'
-export { buildQuickNpcSpeciesRadioCardPresentation } from './npc/lib/quick-npc-species-option-groups.lib'
+} from './npc/lib/quick-npc/quick-npc-form-fields'
+export { buildQuickNpcClassRadioCardPresentation } from './npc/lib/quick-npc/quick-npc-class-option-groups.lib'
+export { resolveQuickNpcClassOptionGroups } from './npc/lib/quick-npc/quick-npc-class-option-groups.lib'
+export { buildQuickNpcSpeciesRadioCardPresentation } from './npc/lib/quick-npc/quick-npc-species-option-groups.lib'
 export {
   buildCharacterDetailViewModel,
   buildCharacterCardViewModel,
@@ -133,14 +125,18 @@ export {
   type CharacterCardViewModel,
   type CharacterEntitySummaryVm,
 } from './lib/display/character-display'
+export {
+  buildCharacterPickerOptionEntitySummary,
+  buildCharacterPickerOptionSearchText,
+  type CharacterPickerOption,
+} from './lib/picker/character-picker-option.lib'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
 export { formatContentReferenceLabel } from './lib/display/format-content-reference-label'
 export {
-  resolveQueryErrorLabel,
-  combineQueryPending,
-  combineQueryError,
-} from './lib/resolve-query-error-label.lib'
-export { SAMPLE_PC, makeCampaignNpcListItem, makeCampaignNpcDetail } from './lib/character-fixtures'
+  SAMPLE_PC,
+  makeCampaignNpcListItem,
+  makeCampaignNpcDetail,
+} from './lib/fixtures/character-fixtures'
 export {
   populatedBuilderCatalog,
   createStandaloneBuilderContextFixture,
@@ -148,7 +144,7 @@ export {
   createStandaloneBuilderCatalogIndexFixture,
   createCampaignNpcBuilderContextFixture,
   createCampaignPcBuilderContextFixture,
-} from './lib/character-builder-fixtures'
+} from './lib/fixtures/character-builder-fixtures'
 export { isNonEmptyCharacterBuilderDraft } from './lib/draft/is-non-empty-character-builder-draft'
 export {
   createCharacterBuilderStore,

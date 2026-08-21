@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { buildCampaignCharacterNavigationContext } from '../lib/build-campaign-character-navigation-context'
+import { buildCampaignCharacterNavigationContext } from '../lib/characters/build-campaign-character-navigation-context'
 import { useCampaigns } from './use-campaigns'
 
 /** Resolve campaign character navigation and list context for the active campaign. */

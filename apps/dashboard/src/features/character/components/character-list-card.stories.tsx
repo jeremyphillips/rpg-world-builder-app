@@ -5,8 +5,8 @@ import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-l
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
-} from '../lib/character-builder-fixtures'
-import { SAMPLE_PC } from '../lib/character-fixtures'
+} from '../lib/fixtures/character-builder-fixtures'
+import { SAMPLE_PC } from '../lib/fixtures/character-fixtures'
 import { CharacterListCard } from './character-list-card.client'
 
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(

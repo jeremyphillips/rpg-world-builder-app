@@ -1,4 +1,4 @@
-import type { ContentFormCtx } from '../forms/content-form-registry'
+import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import type { AvailabilityReason } from '@/lib/availability'
 import { resolveEmbeddedRowMeta } from './resolve-embedded-row-meta'
 import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel.client'

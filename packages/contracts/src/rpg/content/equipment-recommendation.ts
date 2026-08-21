@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { absoluteLevelSchema } from '../primitives/level'
-import { equipmentPoolSchema } from './lib/equipment-grant'
+import { equipmentPoolSchema } from './lib/grants/equipment-grant'
 
 // ---------------------------------------------------------------------------
 // Equipment recommendations — tiered picker guidance for character creation.

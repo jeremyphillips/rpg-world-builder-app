@@ -17,7 +17,7 @@ import {
 import type {
   OrganizationMembershipSelection,
   OrganizationPickerItem,
-} from '../components/connections/organization-picker-drawer.types'
+} from '../components/connections/picker/organization-picker-drawer.types'
 import { useCharacterOrganizationMembershipMutations } from './use-character-organization-membership-mutations'
 import { useCharacterOrganizationReferences } from './use-character-organization-references'
 import type { CharacterOrganizationMembershipSubjectKind } from '../lib/invalidate-character-organization-membership-queries'

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 
-import type { AnyContentFormDef } from '../forms/content-form-registry'
+import type { AnyContentFormDef } from '../forms/registry/content-form-registry'
 import {
   createContent,
   deleteContent,

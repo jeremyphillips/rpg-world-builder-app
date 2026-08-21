@@ -7,17 +7,17 @@ import {
   characterHitPointsSchema,
   characterSpeciesSchema,
   npcCharacterClassesSchema,
-} from './core'
+} from './sheet/core'
 import {
   characterEquipmentSchema,
   characterFeatEntrySchema,
   characterWealthSchema,
-} from './equipment-inventory'
-import { characterNarrativeSchema } from './narrative'
-import { characterSpellEntrySchema } from './spells'
-import { characterProficienciesSchema } from './proficiencies'
-import { characterVitalStateSchema } from './character-vital'
-import { characterConnectionsSchema } from './connections'
+} from './sheet/equipment-inventory'
+import { characterNarrativeSchema } from './sheet/narrative'
+import { characterSpellEntrySchema } from './sheet/spells'
+import { characterProficienciesSchema } from './sheet/proficiencies'
+import { characterVitalStateSchema } from './sheet/character-vital'
+import { characterConnectionsSchema } from './connections/connections'
 
 // ---------------------------------------------------------------------------
 // Character — player characters and campaign-owned NPCs. This is a stored sheet

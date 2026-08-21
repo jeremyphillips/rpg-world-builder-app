@@ -31,8 +31,8 @@ const dashboardEntitySurfaceImportGuard = {
   files: ['src/features/**/*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
-    'src/features/content/lib/content-entity-card.client.tsx',
-    'src/features/content/lib/entity/entity-summary.client.tsx',
+    'src/features/content/lib/entity/surfaces/cards/content/content-entity-card.client.tsx',
+    'src/features/content/lib/entity/summary/entity-summary.client.tsx',
   ],
   rules: {
     'no-restricted-imports': [
@@ -43,13 +43,13 @@ const dashboardEntitySurfaceImportGuard = {
             name: '@rpg/ui',
             importNames: ['ContentCardHeading'],
             message:
-              'Entity identity must compose EntityItem, ContentEntityCard, or DisclosureEntityCard. ContentCardHeading is internal to the entity surface.',
+              'Entity identity must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardHeading is internal to the entity surface.',
           },
           {
             name: '@rpg/ui',
             importNames: ['ContentCardBody'],
             message:
-              'Entity presentation must compose EntityItem, ContentEntityCard, or DisclosureEntityCard. ContentCardBody is internal to the entity surface.',
+              'Entity presentation must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardBody is internal to the entity surface.',
           },
         ],
       },
@@ -90,8 +90,8 @@ const dashboardSemanticStyleLayerGuards = {
   ignores: [
     '**/*.{test,integration.test,stories}.ts',
     // Host navigation accent — row hover stays local (F9); focus migrated (F6).
-    'src/features/character/components/character-builder-shell.variants.ts',
-    'src/features/character/components/steps/score-token.variants.ts',
+    'src/features/character/components/builder/character-builder-shell.variants.ts',
+    'src/features/character/components/builder/steps/abilities/assignment/score-token.variants.ts',
   ],
   rules: {
     'no-restricted-syntax': [
@@ -140,7 +140,7 @@ const dashboardEntityCatalogPickerImportGuard = {
   files: ['src/features/**/*picker*.{ts,tsx}', 'src/features/**/*drawer*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
-    'src/features/content/lib/entity/catalog-entity-picker-sheet.client.tsx',
+    'src/features/content/lib/entity/surfaces/catalog/catalog-entity-picker-sheet.client.tsx',
   ],
   rules: {
     'no-restricted-imports': [
@@ -163,7 +163,7 @@ const dashboardDragHandleGuard = {
   files: ['src/features/**/*.variants.ts'],
   ignores: [
     '**/*.{test,integration.test,stories}.ts',
-    'src/features/character/components/steps/score-token.variants.ts',
+    'src/features/character/components/builder/steps/abilities/assignment/score-token.variants.ts',
   ],
   rules: {
     'no-restricted-syntax': [
@@ -219,13 +219,13 @@ const dashboardContentPickerPolicyGuards = {
   files: [
     'src/features/**/*picker*.{ts,tsx}',
     'src/features/**/*drawer*.{ts,tsx}',
-    'src/features/content/locations/lib/location-*-field-options*.ts',
-    'src/features/content/locations/lib/building-organizations-create-tab-controller.lib.ts',
-    'src/features/content/locations/lib/location-parent-replacement.ts',
-    'src/features/content/locations/lib/bulk/build-bulk-change-parent-fields.ts',
-    'src/features/content/lib/location-connection-drawer-intent.ts',
-    'src/features/content/organizations/lib/organization-member-class-discoverable.lib.ts',
-    'src/features/content/organizations/lib/organization-member-species-discoverable.lib.ts',
+    'src/features/content/locations/lib/hierarchy/location-*-field-options*.ts',
+    'src/features/content/locations/lib/building-organizations/building-organizations-create-tab-controller.lib.ts',
+    'src/features/content/locations/lib/hierarchy/location-parent-replacement.ts',
+    'src/features/content/locations/lib/hierarchy/bulk/build-bulk-change-parent-fields.ts',
+    'src/features/content/lib/relationship/location-connection/location-connection-drawer-intent.ts',
+    'src/features/content/organizations/lib/members/organization-member-class-discoverable.lib.ts',
+    'src/features/content/organizations/lib/members/organization-member-species-discoverable.lib.ts',
   ],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
@@ -297,6 +297,28 @@ const dashboardContentPickerPolicyGuards = {
   },
 }
 
+const dashboardContentCharacterPickerChromeGuard = {
+  files: ['src/features/content/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: [
+              '@/features/character/components/picker/**',
+              '**/features/character/components/picker/**',
+            ],
+            message:
+              'Catalog picker selection-action chrome lives in @rpg/ui. Import CatalogPickerSelectionActions, CatalogPickerActionButton, and resolveCatalogPickerRowActionPhase from @rpg/ui.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardCharacterBuilderPlayActorGuard = {
   files: ['src/features/character/**/*.{ts,tsx}'],
   ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
@@ -324,5 +346,6 @@ export default [
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,
   dashboardContentPickerPolicyGuards,
+  dashboardContentCharacterPickerChromeGuard,
   dashboardCharacterBuilderPlayActorGuard,
 ]

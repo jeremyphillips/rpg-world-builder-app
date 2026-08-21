@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import { Route, Routes } from 'react-router-dom'
 
 import { renderWithProviders } from '@/test/render'
-import { CAMPAIGN_CHARACTER_NAV_LABELS } from '../lib/build-campaign-character-navigation-context'
+import { CAMPAIGN_CHARACTER_NAV_LABELS } from '../lib/characters/build-campaign-character-navigation-context'
 
 vi.mock('../hooks/use-campaign-character-navigation-context')
 vi.mock('../hooks/use-campaign-characters')

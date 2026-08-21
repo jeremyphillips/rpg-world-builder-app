@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 import { Text } from '@rpg/ui'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { effectArrayFields } from '../lib/effects/effect-form-fields'
 import { spellEffectsFormSchema } from '../lib/effects/effect-form-schema'
 import { SpellEffectsPreview } from './spell-effects-preview.client'

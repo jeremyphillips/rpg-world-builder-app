@@ -1,12 +1,12 @@
 import type { CampaignInviteInviteeListItem, CampaignListItem } from '@rpg/contracts'
 
-import { readStoredCampaignId } from '@/features/campaign/lib/navigation/selected-campaign-storage'
-import { resolveContinueCampaign } from '@/features/campaign/lib/navigation/campaign-selection'
+import { readStoredCampaignId } from '@/features/campaign'
+import { resolveContinueCampaign } from '@/features/campaign'
 import {
   resolveCampaignRecoveryPromotions,
   type CampaignRecoveryPromotion,
-} from '@/features/campaign/lib/campaign-recovery-promotions.lib'
-import { filterPendingInvitesForMembership } from '@/features/campaign/lib/filter-pending-invites-for-membership'
+} from '@/features/campaign'
+import { filterPendingInvitesForMembership } from '@/features/campaign'
 
 type CampaignPreferenceUser =
   | {

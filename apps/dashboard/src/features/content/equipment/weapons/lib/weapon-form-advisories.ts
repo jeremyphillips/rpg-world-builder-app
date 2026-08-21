@@ -6,7 +6,7 @@ import {
   type WeaponPropertyModeAdvisory,
 } from '@rpg/contracts'
 
-import type { AdvisoryFormSubmitOptions } from '../../../lib/forms/shells/use-advisory-form-submit'
+import type { AdvisoryFormSubmitOptions } from '../../../lib/forms/shells/layout/use-advisory-form-submit'
 import type { EquipmentFormValues } from '../../lib/equipment-form-fields'
 
 /** Merges route-scoped kind when the Kind field is omitted from family equipment forms. */

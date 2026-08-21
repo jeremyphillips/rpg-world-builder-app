@@ -4,13 +4,13 @@ import { equipmentModifierSchema } from '../../../content/equipment/modifier'
 import { builderLevelSchema } from '../../../primitives/level'
 import { abilitySchema } from '../../../vocab/ability'
 import { optionalAlignmentSchema } from '../../../vocab/alignment'
-import { characterNarrativeSchema } from '../../character/narrative'
+import { characterNarrativeSchema } from '../../character/sheet/narrative'
 import { abilityGenerationMethodSchema } from '../ability/ability-generation'
 import { characterBuilderStepIdSchema } from '../../../character-builder/step-ids'
 import type { CharacterBuilderDraftScope } from './draft-scope'
 import { characterBuilderDraftScopeSchema } from './draft-scope'
 import { magicItemGrantSelectionSchema } from '../equipment/magic-item-selection'
-import { characterConnectionsSchema } from '../../character/connections'
+import { characterConnectionsSchema } from '../../character/connections/connections'
 
 // ---------------------------------------------------------------------------
 // CharacterBuilderDraft — the temporary workflow object. Allowed to represent

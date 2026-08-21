@@ -1,8 +1,8 @@
 import { Link, useParams } from 'react-router-dom'
 import { Card, CardHeader, CardTitle } from '@rpg/ui'
 
-import { PageHeader } from '@/components/layout/page-header'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { ROUTES } from '@/app/routes'
 import { getContentTypeCollectionLabel } from '@/features/content/lib/content-type-labels'
 

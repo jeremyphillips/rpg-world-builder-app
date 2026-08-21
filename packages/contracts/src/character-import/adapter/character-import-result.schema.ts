@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { characterAbilityScoresSchema } from '../../rpg/runtime/character/core'
+import { characterAbilityScoresSchema } from '../../rpg/runtime/character/sheet/core'
 import { coinWealthSchema } from '../../rpg/primitives/wealth'
 import { alignmentSchema } from '../../rpg/vocab/alignment'
 import { DND_BEYOND_PAYLOAD_VERSION } from '../dnd-beyond/dnd-beyond-version'

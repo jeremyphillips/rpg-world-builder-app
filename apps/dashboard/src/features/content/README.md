@@ -11,6 +11,7 @@ feature (one ESLint boundary element) made of several content-type sub-areas:
 | [`skill-proficiencies`](./skill-proficiencies) | Skills and proficiencies                            |
 | [`equipment`](./equipment)                     | Unified equipment catalog (weapons, armor, gear, …) |
 | [`locations`](./locations)                     | Places in the world (regions, sites, maps)          |
+| [`organizations`](./organizations)             | Factions, guilds, governments, and similar groups   |
 | [`monsters`](./monsters)                       | Monsters / statblock entries                        |
 
 Sub-areas are folders inside this feature, not separate boundary elements, so
@@ -31,15 +32,28 @@ builders (`*-stat-rows.ts`).
 
 ```text
 lib/
-  fixtures/       # STORY_* IDs, pick*() catalog helpers
-  forms/            # registry + key helpers; shells/, fields/, grants/ subfolders
+  fixtures/         # STORY_* IDs, pick*() catalog helpers
+  forms/            # cross-type form infra — see forms/README.md
+                    #   registry/, validation/, fields/, mechanics/, grants/{equipment,proficiency}/
+                    #   shells/{layout,create,edit,host,submit,session}/
+                    #   root seam: organization-form-projection.ts
   form-options/     # Level, rich-text link options
-  overview/         # List shell, table config, source badge
+  overview/         # List shell, table config, source badge; hooks/ subfolder
   detail/           # page/, metadata/, section/, row/ — see feature-structure.md
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client
-  utils/            # title-case and other small helpers
+  entity/           # summary/ → anatomy/ → surfaces/ (drawer/, cards/, catalog/ — see feature-structure.md)
+  relationship/     # Cross-content relationship UI; core/, list/, drawer/, nested-create/, location-connection/ — see relationship/README.md
+  campaign-access/  # Campaign availability; overview/ row chrome; bulk/ actions
+  delete/           # Deletion blocked dialog + usage-blocked list
+  demotion/         # Demotion blocked dialog
+  duplication/      # Duplicate-content dialog
+  usage/            # Entry usage references section
+  utils/            # title-case, sortable-array-move, other small helpers
 ```
+
+Root-level files are limited to cross-type vocabulary (`content-type-labels.ts`,
+`labels.ts`). Public entity surfaces export from [`index.ts`](./index.ts) by semantic owner module.
 
 Catalog list
 fetching for top-level content types (classes, species, weapons, etc.) is wired
@@ -54,10 +68,11 @@ the same way: each sub-area's `hooks/use-*.ts` exports aliased
 `useCreate*` / `useUpdate*` hooks at module level. Generic create/edit shells
 call [`useContentWriteMutation`](./lib/list/use-content-mutations.ts) with the
 registered `ContentFormDef` (including optional `invalidateQueryKeys` — classes
-also refresh skill proficiencies). Future sub-areas (`locations/`, `monsters/`)
-should follow the same list + mutation factory pattern in their `hooks/use-*.ts`.
+also refresh skill proficiencies). [`locations/`](./locations) and future sub-areas
+(`monsters/`) follow the same list + mutation factory pattern in their
+`hooks/use-*.ts`.
 
-Class [`FeatureItem`](./classes/lib/feature-item.tsx) rows render level + name headings inline
+Class [`ClassFeatureItem`](./classes/components/detail/class-feature-item.tsx) rows render level + name headings inline
 via local `featureHeading()` (no separate formatter module); stored feature
 descriptions are body-only HTML (`<p>`, `<strong>` subsections).
 
@@ -73,7 +88,7 @@ fails without a visible error — check inactive tabs.
 Detail and overview authoring controls (Edit, New, row actions) are gated by
 [`useCanManageCampaign`](./campaign/hooks/use-can-manage-campaign.ts) — owner or
 co-owner membership from `GET /api/campaigns`. Create/edit routes use
-[`ContentAuthoringGate`](./lib/forms/shells/content-authoring-gate.tsx) for the same check.
+[`ContentAuthoringGate`](./lib/forms/shells/layout/content-authoring-gate.tsx) for the same check.
 
 ## Master-detail abstraction
 

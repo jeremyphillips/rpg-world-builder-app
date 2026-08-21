@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { usageBlockerSourceKeySchema } from '../content/catalog-entity-usage-blocker'
+import { usageBlockerSourceKeySchema } from './usage-blocker-source-key'
 
 export const ruleUsageBlockerArmSchema = z.object({
   kind: z.literal('rule'),

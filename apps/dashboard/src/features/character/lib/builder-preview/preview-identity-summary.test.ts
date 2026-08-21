@@ -7,7 +7,7 @@ import { pickSpecies } from '@/features/content'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   populatedBuilderCatalog,
-} from '../character-builder-fixtures'
+} from '../fixtures/character-builder-fixtures'
 import {
   getPreviewAlignmentLine,
   getPreviewIdentityName,

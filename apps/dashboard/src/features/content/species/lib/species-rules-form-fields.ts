@@ -16,7 +16,7 @@ import {
   getContentTypeMidSentenceLabel,
   formatChooseContentTypePlaceholder,
 } from '../../lib/content-type-labels'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { campaignSettingHref } from '@/lib/availability'
 import {
   SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,

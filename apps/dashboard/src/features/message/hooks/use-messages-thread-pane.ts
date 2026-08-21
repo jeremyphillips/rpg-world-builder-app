@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useSession } from '@/features/auth'
 import { useRealtimeStatus } from '@/features/realtime'
 

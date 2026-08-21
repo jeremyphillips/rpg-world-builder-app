@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import { lanternGuild } from './organization-picker-drawer.fixtures'
+import { lanternGuild } from './picker/organization-picker-drawer.fixtures'
 import { EditOrganizationMembershipDrawer } from './edit-organization-membership-drawer.client'
 
 describe('EditOrganizationMembershipDrawer', () => {
@@ -106,6 +106,55 @@ describe('EditOrganizationMembershipDrawer', () => {
     )
 
     expect(screen.getByRole('radio', { name: 'Custom Chronicler' })).toBeChecked()
+  })
+
+  it('resets title selection when reopened for the same membership', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+
+    const { rerender } = render(
+      <EditOrganizationMembershipDrawer
+        open
+        onOpenChange={onOpenChange}
+        organization={lanternGuild}
+        characterName="Frug Daergel"
+        currentTitle="Guildmaster"
+        onSave={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: 'No title' }))
+    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+
+    rerender(
+      <EditOrganizationMembershipDrawer
+        open={false}
+        onOpenChange={onOpenChange}
+        organization={lanternGuild}
+        characterName="Frug Daergel"
+        currentTitle="Guildmaster"
+        onSave={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    )
+
+    rerender(
+      <EditOrganizationMembershipDrawer
+        open
+        onOpenChange={onOpenChange}
+        organization={lanternGuild}
+        characterName="Frug Daergel"
+        currentTitle="Guildmaster"
+        onSave={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('radio', { name: 'Guildmaster' })).toBeChecked()
   })
 
   itAxe('has no axe accessibility violations', async () => {

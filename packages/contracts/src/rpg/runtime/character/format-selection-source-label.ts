@@ -2,8 +2,11 @@ import {
   getContentTypeSentenceForm,
   getContentTypeTerm,
 } from '../../content/lib/content-type-terms'
-import { LANGUAGE_GRANTS_SOURCE_ID } from './languages'
-import type { CharacterSelectionSource, CharacterSelectionSourceKind } from './selection-sources'
+import { LANGUAGE_GRANTS_SOURCE_ID } from './sheet/languages'
+import type {
+  CharacterSelectionSource,
+  CharacterSelectionSourceKind,
+} from './sheet/selection-sources'
 
 // ---------------------------------------------------------------------------
 // Shared provenance labels for character rows (equipment, proficiencies, …).

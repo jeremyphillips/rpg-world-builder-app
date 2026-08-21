@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
-import { interiorTypeSchema } from '../../vocab/location/interior-type'
+import { interiorTypeSchema } from '../../vocab/location/building/interior-type'
 import { locationBaseSchema } from './base'
 import {
   interiorClassificationSchema,
   isInteriorClassificationTypeValid,
   type InteriorClassification,
 } from './interior-classification'
-import type { InteriorClassificationType } from '../../vocab/location/interior-type-definitions'
+import type { InteriorClassificationType } from '../../vocab/location/building/interior-type-definitions'
 
 const interiorLocationFields = {
   kind: z.literal('interior'),

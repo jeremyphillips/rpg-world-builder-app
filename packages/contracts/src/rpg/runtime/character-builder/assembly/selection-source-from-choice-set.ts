@@ -1,4 +1,4 @@
-import type { CharacterSelectionSource } from '../../character/selection-sources'
+import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 import type { ChoiceSet, ChoiceSourceType } from '../choice-set'
 
 function selectionKindForSourceType(

@@ -11,15 +11,15 @@ them for form validation (react-hook-form + `@hookform/resolvers/zod`).
 
 Source lives under `src/shared/`, `src/rpg/`, and isolated `dev-bench/`:
 
-| Layer      | Path                  | Purpose                                               |
-| ---------- | --------------------- | ----------------------------------------------------- |
-| Validation | `src/validation/`     | `defineMessage` + global validation message catalog   |
-| Shared     | `src/shared/`         | Auth, users, roles, routes, uploads, errors, assets   |
-| Vocabulary | `src/rpg/vocab/`      | Closed-set game terms + open vocabulary set ids       |
-| Primitives | `src/rpg/primitives/` | Shared value types (levels, dice, units, ruleset id)  |
-| Content    | `src/rpg/content/`    | Catalog content types (species, weapons, classes, …)  |
-| Runtime    | `src/rpg/runtime/`    | Stored character sheets (builder/sheet contracts)     |
-| Campaign   | `src/rpg/campaign/`   | Campaign identity, rules, membership, ruleset patches |
+| Layer      | Path                  | Purpose                                                                                                                                                                     |
+| ---------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Validation | `src/validation/`     | `defineMessage` + global validation message catalog                                                                                                                         |
+| Shared     | `src/shared/`         | Auth, users, roles, routes, uploads, errors, assets                                                                                                                         |
+| Vocabulary | `src/rpg/vocab/`      | Closed-set game terms + open vocabulary set ids                                                                                                                             |
+| Primitives | `src/rpg/primitives/` | Shared value types, semantic mini-packages (`level/`, `usage/`, …), catalog-identity admission boundary — [exact tree in docs/structure.md](docs/structure.md#current-tree) |
+| Content    | `src/rpg/content/`    | Catalog content types (species, weapons, classes, …)                                                                                                                        |
+| Runtime    | `src/rpg/runtime/`    | Stored character sheets (builder/sheet contracts)                                                                                                                           |
+| Campaign   | `src/rpg/campaign/`   | Campaign identity, rules, membership, ruleset patches                                                                                                                       |
 
 Dependency rules, ESLint enforcement, and where to put new modules →
 [docs/structure.md](docs/structure.md).

@@ -7,7 +7,7 @@ import { type FormItem } from '@rpg/ui/form'
 import { buildActiveLanguageFieldOptions } from '@/features/vocabulary'
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { SpeciesCultureNamingAlert } from '../components/species-culture-naming-alert.client'
 import { SpeciesPersonalNameComponentsField } from '../components/species-personal-name-components-field.client'
 

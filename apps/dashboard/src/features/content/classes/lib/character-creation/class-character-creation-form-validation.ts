@@ -5,7 +5,7 @@ import {
   type CharacterClass,
 } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { CHARACTER_CREATION_TOOL_CHOICE_ID } from './class-character-creation-link-labels'
 import {
   characterCreationProficienciesWithLiveToolLabel,

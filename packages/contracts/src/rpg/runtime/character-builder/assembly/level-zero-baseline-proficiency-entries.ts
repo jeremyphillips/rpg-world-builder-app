@@ -5,8 +5,8 @@ import type { LanguageSeedOption } from '../../../vocab/language'
 import type {
   CharacterArmorProficiencyEntry,
   CharacterWeaponProficiencyEntry,
-} from '../../character/proficiencies'
-import type { CharacterSelectionSource } from '../../character/selection-sources'
+} from '../../character/sheet/proficiencies'
+import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 
 export const LEVEL_ZERO_BASELINE_PROFICIENCY_SOURCE: CharacterSelectionSource[] = [
   { kind: 'characterCreation', sourceId: 'levelZeroNpcs', grantId: 'baseline' },

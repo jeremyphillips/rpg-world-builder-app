@@ -6,7 +6,7 @@ import { renderHook } from '@testing-library/react'
 
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 
-import { buildCampaignCharacterNavigationContext } from '../lib/build-campaign-character-navigation-context'
+import { buildCampaignCharacterNavigationContext } from '../lib/characters/build-campaign-character-navigation-context'
 import { useCampaignCharacterNavigationContext } from './use-campaign-character-navigation-context'
 
 vi.mock('./use-campaigns', () => ({

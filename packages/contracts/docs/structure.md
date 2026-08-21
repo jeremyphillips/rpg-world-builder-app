@@ -21,9 +21,9 @@ packages/contracts/src/
   shared/               # auth, user, roles, routes, errors, csrf, upload, assets
   rpg/
     vocab/              # closed-set game terms + open vocabulary set ids
-    primitives/         # shared value types (levels, dice, units, authored content, ruleset id)
+    primitives/         # shared value types; semantic mini-packages; primitives/content/ admission boundary
     content/            # catalog content types (species, weapons, classes, …)
-      lib/              # envelope, grants, content-key, content-type-keys, …
+      lib/              # envelope, grants, content-key, cross-type policy, …
       classes/          # class body, spellcasting, subclasses
         spellcasting/   # spellcasting schema + slot progression tables
     runtime/            # stored character sheets + builder runtime (not catalog content)
@@ -75,16 +75,21 @@ flowchart BT
 | ---------------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | A shared validation message or message primitive                                         | `validation/`                       | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
 | A closed id set with labels (and optional SRD text)                                      | `rpg/vocab/`                        | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`, `rpg/vocab/personal-name-component.ts`                                 |
-| A reusable value type used across content types                                          | `rpg/primitives/`                   | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
-| Sparse coin wealth grants (starting equipment, level 0 NPC wealth)                       | `rpg/primitives/`                   | `rpg/primitives/character-wealth-grant.ts` (re-exported from `rpg/content/lib/wealth-grant.ts`)                              |
+| A reusable value type used across content types                                          | `rpg/primitives/`                   | `rpg/primitives/dice.ts`, `rpg/primitives/money.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`         |
+| Coin-denominated price/value objects (catalog costs, formulas)                           | `rpg/primitives/`                   | `rpg/primitives/money.ts` — physical quantities stay in `units.ts`                                                           |
+| Level bounds, tier-table validation, level-scoped authoring (cross-domain primitive)     | `rpg/primitives/level/`             | `level.ts`, `level-messages.ts`, `level-range-table.ts`, … — not under Character by consumer frequency                       |
+| Roll / effect-card composition primitives                                                | `rpg/primitives/mechanics/`         | `roll.ts`, `effect-base.ts`, …                                                                                               |
+| Catalog modeling status ladder, gaps, derivation                                         | `rpg/primitives/modeling/`          | `schema.ts`, `status.ts`, `gap-codes.ts`, …                                                                                  |
+| Sparse coin wealth grants (starting equipment, level 0 NPC wealth)                       | `rpg/primitives/`                   | `rpg/primitives/character-wealth-grant.ts` (re-exported from `rpg/content/lib/grants/wealth-grant.ts`)                       |
 | Shared proficiency grant/choice input schemas (content + campaign)                       | `rpg/primitives/proficiency/`       | `proficiency-grant-set.ts`, `typed-proficiency-grant-set.ts`, `character-creation-proficiency-rules.ts`                      |
-| Weapon mode presentation formatters (extracted from vocab)                               | `rpg/primitives/weapon/`            | `mode-compatibility-messages.ts`                                                                                             |
-| Catalog content type or its DTOs/patches                                                 | `rpg/content/`                      | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
-| Shared content helpers (grants, envelope, keys)                                          | `rpg/content/lib/`                  | `rpg/content/lib/grants.ts`                                                                                                  |
+| Weapon mode form hints (authoring presentation from vocab labels + prose)                | `rpg/content/equipment/`            | `weapon-mode-compatibility-messages.ts` — equipment authoring semantics, not a primitive concept                             |
+| Catalog content type or its DTOs/patches                                                 | `rpg/content/`                      | `rpg/content/species.ts`, `rpg/content/organization/organization.ts`, `rpg/content/classes/class.ts`                         |
+| Shared content helpers (envelope, keys, cross-type policy)                               | `rpg/content/lib/`                  | `rpg/content/lib/envelope.ts`, `rpg/content/lib/grants/grants.ts`                                                            |
 | Domain-neutral action/transport envelopes (no RPG semantics)                             | `src/lib/`                          | `lib/action-validation.ts`, `lib/paginated-items.ts`, `lib/usage-guard-action-validation.ts`                                 |
 | Catalog type identity closed sets                                                        | `rpg/primitives/content/`           | `primitives/content/content-type-keys.ts`                                                                                    |
-| Generic usage reference / shared blocker union                                           | `rpg/primitives/usage/`             | `primitives/usage/usage-blocker.ts`                                                                                          |
-| Viewer–content relationship wire model                                                   | `rpg/primitives/character/`         | `primitives/character/viewer-character-relationship.ts`                                                                      |
+| Usage reference + blocker wire model (character, catalog, rule arms)                     | `rpg/primitives/usage/`             | `catalog-usage-reference.ts`, `catalog-entity-usage-blocker.ts`, `usage-blocker.ts`, … — semantic mini-package               |
+| Viewer–catalog character relationship wire envelope                                      | `rpg/primitives/`                   | `viewer-character-relationship.ts` — cross-layer wire shape; not a Character-named folder by consumption alone               |
+| Campaign-specific max-level override / resolved level cap (policy)                       | `rpg/campaign/`                     | Campaign rules and patches — **consumes** Level primitives from `rpg/primitives/level/`                                      |
 | Vocabulary disable/result availability                                                   | `rpg/vocab/`                        | `vocab/vocabulary-disable-availability.ts`                                                                                   |
 | Equipment family URL path segments                                                       | `rpg/vocab/equipment/`              | `vocab/equipment/family-path.ts`                                                                                             |
 | Creature-like runtime primitives (PC, NPC, monster)                                      | `rpg/runtime/creature/`             | `languages.ts`, `equipment.ts`, `spellcasting.ts` — see [runtime-resolution-boundaries.md](runtime-resolution-boundaries.md) |
@@ -107,7 +112,166 @@ flowchart BT
 | Public marketing or CMS schemas                                                          | `public/`                           | (scaffold — add when needed)                                                                                                 |
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
-for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps).
+for spellcasting + class body, `rpg/content/organization/` for organization catalog
+contracts, `rpg/vocab/weapon/` for weapon term maps,
+`rpg/vocab/organization/` for organization classification and authoring vocab,
+`rpg/vocab/location/{region,building,connection}/` for location taxonomy and
+connection kinds). Quarantined building-archetype research lives under
+`rpg/vocab/location/building/` but is omitted from the public `location/index.ts`
+barrel.
+
+### `rpg/primitives/` organization
+
+Top-level layout follows **semantic ownership**, not consumer domain (Character,
+Weapon, Spell, …) or file count.
+
+```text
+primitives/
+  <concept>.ts       # one cohesive reusable value or wire primitive
+  <concept>/         # semantic mini-package — several modules, one lifecycle
+  content/           # only currently demonstrated admission boundary
+```
+
+**Core invariant:** a folder is not justified because files share a noun, because
+a higher layer frequently consumes the primitive, or because it was documented
+there previously.
+
+#### Current tree
+
+Exact production layout under `packages/contracts/src/rpg/primitives/`:
+
+```text
+primitives/
+  index.ts
+
+  level/                         # mini-package
+    index.ts
+    level.ts
+    level-messages.ts
+    level-range-table.ts
+    level-range-table-authoring.ts
+    (+ co-located *.test.ts)
+
+  usage/                         # mini-package
+    catalog-usage-reference.ts
+    catalog-entity-usage-blocker.ts
+    character-usage-reference.ts
+    usage-blocker.ts
+    usage-blocker-source-key.ts
+    rule-blocker.ts
+    read-usage-blocker-source-key.ts
+    preview-limits.ts
+
+  proficiency/  mechanics/  modeling/
+
+  content/
+    content-type-keys.ts         # admission boundary only
+
+  money.ts  units.ts  wealth.ts  character-wealth-grant.ts
+  viewer-character-relationship.ts
+  dice.ts  dice-formula.ts  currency-formula.ts  area-geometry.ts
+  standard-array.ts  standard-array-messages.ts
+  authored-content.ts  versioned-template.ts  ruleset.ts
+  prose.ts  number-format.ts  format-slug.ts  same-string-set.ts
+  (+ co-located *.test.ts for root modules)
+```
+
+Weapon mode form hints live in `rpg/content/equipment/weapon-mode-compatibility-messages.ts`
+(equipment authoring presentation — re-exported from `rpg/content/equipment.ts`).
+
+There is **no** `character/` or `weapon/` folder under `primitives/`.
+
+#### Standalone root files (`<concept>.ts`)
+
+Use a root file when one module (or a tight pair such as `foo.ts` + `foo-messages.ts`)
+expresses a single reusable concept: dice, wealth, authored-content body fields,
+viewer–catalog relationship wire shapes, and similar value/wire primitives.
+
+Do **not** add `helpers/`, `utils/`, `domains/`, `values/`, or `systems/` under
+`primitives/`.
+
+#### Semantic mini-packages (`<concept>/`)
+
+Use a subfolder when **several modules collaborate on one independently nameable
+concept with a shared lifecycle**. Current examples:
+
+| Folder         | Owns                                                                                         |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| `level/`       | Numeric tier bounds, validation messages, level-range tables, level-scoped authoring helpers |
+| `usage/`       | Catalog/character usage references, blocker union, source keys, preview limits               |
+| `proficiency/` | Proficiency grant/choice inputs and character-creation language rules                        |
+| `mechanics/`   | Roll values and effect-card composition blocks                                               |
+| `modeling/`    | Catalog modeling status ladder, gap codes, derivation helpers                                |
+
+**Level is not a Character subdomain.** Campaign, content, runtime, and builder
+all consume level primitives. Generic bounds and tier validation belong in
+`level/`; campaign-specific max-level **policy** belongs in `rpg/campaign/` and
+imports Level primitives.
+
+**Folder revisit triggers (semantic — not file counts):**
+
+- Several collaborating modules share one lifecycle → consider a mini-package.
+- Root filename prefixes no longer communicate hierarchy → audit for a mini-package or rename.
+- Independent sub-responsibilities emerge within a flat group → shallow split _inside_ an existing mini-package when membership is clear.
+- A third related file **prompts review**; it does not automatically justify a new folder.
+
+#### Admission boundary (`primitives/content/`)
+
+`content/` is the **only currently demonstrated** admission boundary in this tree.
+It holds catalog **identity** primitives — closed sets and keys that lower layers
+(`rpg/vocab/`, other `rpg/primitives/` modules) may reference **without**
+importing the Content domain layer (`rpg/content/`). Schemas, behavior, and DTO
+composition stay in `rpg/content/`.
+
+Add another boundary folder only when dependency evidence establishes a **distinct**
+lower-layer contract that cannot be represented clearly as a root primitive or
+semantic mini-package.
+
+#### Character-named paths — do not create by default
+
+Do **not** create `primitives/character/` (or revive it) unless a **coherent
+Character primitive family** exists: multiple modules whose **meaning** is
+Character-domain-specific, not merely consumed by character flows. Difficulty naming
+one file at root is not sufficient.
+
+Never nest by consumption alone: `level/`, `proficiency/`, `money`, `wealth`,
+`standard-array`, `dice`, `mechanics/`, `modeling/`, and similar cross-domain
+concepts stay independent.
+
+#### Authoring presentation — not primitives by default
+
+Domain-specific **authoring presentation** that composes vocab labels with generic
+formatting (`prose`, slug helpers, etc.) belongs in the owning **content,
+campaign, or runtime** module — not in `primitives/` — unless dependency evidence
+shows a lower layer that **cannot legally import** that domain.
+
+**Ownership test:**
+
+```text
+Does the module describe a primitive concept?
+  └─ No → not primitives/ by default
+
+Does it describe domain authoring semantics (e.g. equipment weapon form hints)?
+  └─ Yes → owning content/campaign/runtime module
+
+Can all production consumers legally depend on that domain layer?
+  ├─ Yes → place there (e.g. weapon mode hints → rpg/content/equipment/)
+  └─ No  → identify the lower-layer consumer; do not default to primitives/
+```
+
+Before moving presentation out of `primitives/`, confirm `rpg/vocab/**` does not
+import the module — never introduce `vocab → content` to fix folder semantics.
+Content should import vocab labels and own the formatter.
+
+Mechanical ease and barrel stability alone are **not** reasons to keep authoring
+copy in `primitives/`.
+
+#### Cross-layer wire shapes
+
+Wire envelopes referenced by both `rpg/content/` and `rpg/campaign/` (without
+either importing the other) belong in `rpg/primitives/` as **precisely named root
+files** or semantic mini-packages — not under `rpg/content/lib/` and not under
+consumer-named folders such as `character/`.
 
 ### `rpg/campaign/` folder ownership
 
@@ -128,6 +292,26 @@ meet the 2–3 module threshold; do not add `lib/`, `utils/`, or `helpers/`.
 **Hard rule:** `viewer/` is membership + open roster → viewer classification, not
 “anything a human viewer sees.” `campaign-content-viewer.ts` stays at root because
 content discovery authz is a separate concept from recovery `viewerState`.
+
+### `rpg/content/lib/` folder ownership
+
+Root keeps catalog envelope/write spine (`envelope.ts`, `content-key.ts`,
+`content-input-schemas.ts`, `draft-authored-content.ts`, `content-validation-intent.ts`),
+cross-type registries (`content-type-terms.ts`, `content-type-capabilities.ts`,
+`content-access-capabilities.ts`), lifecycle wire (`content-deletion.ts`,
+`content-duplication.ts`, `content-usage.ts`, …), shared reference primitives
+(`character-content-reference.ts`, `organization-content-reference.ts`), sparse rules
+(`requirement-expression.ts`, `multiclassing-validation.ts`), and catalog entity
+presentation helpers (`equipment-compact-display.ts`, `skill-proficiency-*-display.ts`).
+
+| Folder             | Owns                                                                                          | Not allowed                                                     |
+| ------------------ | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `grants/`          | Grant payloads, pool choices, grant validation messages, grant-linked trait display           | Equipment/skill catalog compact display; connection eligibility |
+| `relationship/`    | Cross-content projection registry, location-connection eligibility, org↔location family rules | Mongo reference-path descriptors; campaign access visibility    |
+| `campaign-access/` | Resolved campaign access fields, bulk access, viewer↔character relationships on content       | Content deletion/usage lifecycle; grant mechanics               |
+
+Domain subfolders meet the stable-responsibility threshold; do not add `utils/` or
+`helpers/` under `lib/`.
 
 Domain-local short names inside folders (e.g. `character/eligibility-contracts.ts`);
 the `campaign/index.ts` barrel preserves external symbol names for
@@ -283,7 +467,7 @@ path should document a layer boundary:
 | `@rpg/contracts`                       | `src/index.ts`                       | Default — runtime, campaign, content, vocab, shared        |
 | `@rpg/contracts/shared`                | `src/shared/index.ts`                | Auth, user, roles, routes, errors                          |
 | `@rpg/contracts/vocab`                 | `src/rpg/vocab/index.ts`             | Label/format helpers, vocabulary sets                      |
-| `@rpg/contracts/primitives`            | `src/rpg/primitives/index.ts`        | Dice, levels, ruleset id                                   |
+| `@rpg/contracts/primitives`            | `src/rpg/primitives/index.ts`        | Dice, levels, money, units, ruleset id                     |
 | `@rpg/contracts/content`               | `src/rpg/content/index.ts`           | Content schemas and DTOs                                   |
 | `@rpg/contracts/runtime`               | `src/rpg/runtime/index.ts`           | Character sheet runtime contracts                          |
 | `@rpg/contracts/rpg/character-builder` | `src/rpg/character-builder/index.ts` | Builder wire contracts (step ids, validation, acquisition) |
@@ -380,7 +564,7 @@ Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocabularyOptionIdSchema` and catalog seeds; see
 [docs/vocabulary.md](../../../docs/vocabulary.md).
 
-**NPC authoring templates** ([`npc-authoring-template.ts`](../src/rpg/vocab/npc-authoring-template.ts))
+**NPC authoring templates** ([`npc-authoring-template.ts`](../src/rpg/vocab/organization/npc-authoring-template.ts))
 follow the same two-layer pattern with an extended entry shape:
 
 ```ts
@@ -395,7 +579,7 @@ labels for Quick NPC recommended-build readouts. Optional `classAffinityIds` are
 class recommendations — organization `members.classAffinityIds` remain the path for
 organization-specific or homebrew classes. Preset membership-title refs carry contextual
 `{ templateId, level }` recommendations that snapshot into organization-owned titles at create;
-see [`organization-membership-titles.ts`](../src/rpg/content/organization-membership-titles.ts) and
+see [`organization/membership-titles.ts`](../src/rpg/content/organization/membership-titles.ts) and
 `resolveOrganizationNpcClassRecommendationIds` in
 [`organization-member-class-recommendations.ts`](../src/rpg/runtime/character/organization-member-class-recommendations.ts).
 

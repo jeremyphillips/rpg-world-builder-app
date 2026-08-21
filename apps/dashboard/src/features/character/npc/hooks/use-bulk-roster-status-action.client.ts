@@ -9,8 +9,11 @@ import {
   type CharacterBulkRosterFormValues,
 } from '@rpg/contracts'
 
-import { notifyActionOutcomes, NPC_ROSTER_STATUS_ACTION } from '@/lib/actions'
-import type { ActionLifecycleCloseEvent } from '@/lib/actions/action-lifecycle.types'
+import {
+  notifyActionOutcomes,
+  NPC_ROSTER_STATUS_ACTION,
+  type ActionLifecycleCloseEvent,
+} from '@/lib/actions'
 
 import { mapNpcDetailToListItem } from '../api/npc-client'
 import { npcQueryKey, npcsQueryKey } from './use-npcs'

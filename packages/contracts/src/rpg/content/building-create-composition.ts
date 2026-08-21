@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
-import { organizationLocationConnectionKindSchema } from '../vocab/location/organization-location-connection'
+import { organizationLocationConnectionKindSchema } from '../vocab/location/connection/organization-location-connection'
 import { contentStatusSchema } from './lib/envelope'
 import { createLocationInputSchema, locationSchema } from './location'
 import { createOrganizationInputSchema, organizationSchema } from './organization'
-import { organizationLocationConnectionSchema } from './organization-location-connection'
+import { organizationLocationConnectionSchema } from './organization/location-connection'
 
 const draftIdSchema = z.string().trim().min(1).max(120)
 

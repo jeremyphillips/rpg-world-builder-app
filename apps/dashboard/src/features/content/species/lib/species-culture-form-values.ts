@@ -1,6 +1,6 @@
 import type { ContentSource, SpeciesCultureConfig } from '@rpg/contracts'
 
-import { deriveSlugForCreate } from '../../lib/forms/content-form-key-helpers'
+import { deriveSlugForCreate } from '../../lib/forms/registry/content-form-key-helpers'
 import type { SpeciesCultureFormValues } from './species-culture-form-fields'
 
 function buildPersistedNaming(

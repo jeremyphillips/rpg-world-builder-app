@@ -7,7 +7,7 @@ import {
   type CreatureTypeVocabulary,
 } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 
 const seedCreatureTypeVocabulary = buildSeedCreatureTypeVocabulary()

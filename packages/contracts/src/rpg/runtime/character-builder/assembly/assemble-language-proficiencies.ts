@@ -9,9 +9,9 @@ import {
   assembleLanguageProficiencyIds,
   LANGUAGE_GRANTS_SOURCE_ID,
   mergeLanguageProficiencyEntries,
-} from '../../character/languages'
-import type { CharacterProficiencies } from '../../character/proficiencies'
-import type { CharacterSelectionSource } from '../../character/selection-sources'
+} from '../../character/sheet/languages'
+import type { CharacterProficiencies } from '../../character/sheet/proficiencies'
+import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'

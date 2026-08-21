@@ -1,4 +1,4 @@
-import { formatMoney, type EquipmentCost } from '../../primitives/units'
+import { formatMoney, type EquipmentCost } from '../../primitives/money'
 
 /** Formats a market price when present; returns `undefined` when `cost` is null. */
 export function formatEquipmentCostLabel(cost: EquipmentCost): string | undefined {

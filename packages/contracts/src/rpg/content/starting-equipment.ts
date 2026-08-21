@@ -1,19 +1,19 @@
 import { z } from 'zod'
 
-import { contentChoiceOptionSchema, contentChoiceSchema } from './lib/choice'
+import { contentChoiceOptionSchema, contentChoiceSchema } from './lib/grants/choice'
 import {
   equipmentChoiceGrantObjectSchema,
   normalizeEquipmentChoiceGrant,
-} from './lib/equipment-grant'
+} from './lib/grants/equipment-grant'
 import { equipmentModifierSchema } from './equipment/modifier'
 import { equipmentRecommendationsSchema } from './equipment-recommendation'
-import { characterWealthGrantSchema } from './lib/wealth-grant'
+import { characterWealthGrantSchema } from './lib/grants/wealth-grant'
 import {
   skillProficiencyChoiceGroupDraftSchema,
   skillProficiencyChoiceGroupSchema,
   toolProficiencyChoiceGroupDraftSchema,
   toolProficiencyChoiceGroupSchema,
-} from './lib/proficiency-grant-set'
+} from './lib/grants/proficiency-grant-set'
 import { abilityScoreOrderSchema } from '../primitives/standard-array'
 
 // ---------------------------------------------------------------------------

@@ -11,20 +11,20 @@ import {
   type LocationKind,
 } from '@rpg/contracts'
 
-import { formatDescriptorCount } from '@/lib/actions/action-count-grammar'
+import { formatDescriptorCount } from '@/lib/actions'
 
 import { ROUTES } from '@/app/routes'
 
-import type { DrawerContextEntityPresentation } from '../../lib/relationship/drawer-context.types'
+import type { DrawerEntityPresentation } from '../../lib/entity/surfaces/drawer/drawer-entity.types'
 
 import type { LocationAuthoringType } from './location-authoring-type'
 import { resolveRegionRelationshipLabelPlural } from './location-contextual-terminology.lib'
-import { childAuthoringTypesForParentKind } from './location-create-shortcuts'
+import { childAuthoringTypesForParentKind } from './create/location-create-shortcuts'
 import {
   resolveLocationParentReplacementAction,
   type LocationParentReplacementAction,
-} from './location-parent-replacement'
-import { LOCATION_UNCONTAINED_LABEL } from './location-parent-replacement-surface-copy'
+} from './hierarchy/location-parent-replacement'
+import { LOCATION_UNCONTAINED_LABEL } from './hierarchy/location-parent-replacement-surface-copy'
 import {
   formatLocationStructureSplitCount,
   partitionLocationsByStructureGroup,
@@ -267,7 +267,7 @@ export function buildLocationEntitySummaryVm(
 
 export function buildLocationEntityContextPresentation(
   vm: LocationEntitySummaryVm,
-): DrawerContextEntityPresentation {
+): DrawerEntityPresentation {
   const nearestParent = vm.ancestry.items.at(-1)
 
   return {
@@ -285,7 +285,7 @@ export function buildLocationContextPresentationFromLocation(
     campaignId: string
     href?: string
   },
-): DrawerContextEntityPresentation {
+): DrawerEntityPresentation {
   return buildLocationEntityContextPresentation(buildLocationEntitySummaryVm(location, ctx))
 }
 

@@ -15,9 +15,9 @@ Working artifact for the building classification discovery process. Companion
 research notes: the superseded taxonomy plan (Candidate Model A and its
 outlier catalogue). Discovery-era shipped vocab (`building-type-definitions.ts`)
 was later replaced by Form and Facility registries — see
-[`building-form.ts`](../../packages/contracts/src/rpg/vocab/location/building-form.ts)
+[`building-form.ts`](../../packages/contracts/src/rpg/vocab/location/building/building-form.ts)
 and
-[`building-facility-type.ts`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts).
+[`building-facility-type.ts`](../../packages/contracts/src/rpg/vocab/location/building/building-facility-type.ts).
 
 | Phase                                     | Status                                           |
 | ----------------------------------------- | ------------------------------------------------ |
@@ -981,7 +981,7 @@ Phase 5 decision record. The discovery-era freeze on
 ## Editorial appendix — Phase 5 function-family curation (2026-08-03)
 
 Canonical function-family vocabulary landed in
-[`building-function-family.ts`](../../packages/contracts/src/rpg/vocab/location/building-function-family.ts).
+[`building-function-family.ts`](../../packages/contracts/src/rpg/vocab/location/building/building-function-family.ts).
 This section records editorial decisions; ids are **persisted vocabulary** after
 this commit — future renames require deliberate migration.
 
@@ -1030,9 +1030,9 @@ refactor inventory, not a contracts module):
 `packages/contracts/src/rpg/vocab/location/building-corpus-disposition.ts` was never the
 runtime SSOT.
 Comprehensive registry shards compose
-[`BUILDING_ARCHETYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building-archetype.ts)
+[`BUILDING_ARCHETYPE_ENTRIES`](../../packages/contracts/src/rpg/vocab/location/building/building-archetype.ts)
 via neutral alphabetical files under
-[`building-archetypes/`](../../packages/contracts/src/rpg/vocab/location/building-archetypes/).
+[`building-archetypes/`](../../packages/contracts/src/rpg/vocab/location/building/building-archetypes/).
 
 ### Corpus coverage
 
@@ -1177,8 +1177,8 @@ exactly one final disposition; corpus dispositions reject placeholder `of: 'n'` 
 The discovery corpus and dimensional evidence above remain frozen. **Runtime Building
 classification no longer uses Model E** (`classification.archetype`, function override, or
 specialization). Shipped axes are **Building Form** and **Building Facility type** only — see
-[`building-form.ts`](../../packages/contracts/src/rpg/vocab/location/building-form.ts) and
-[`building-facility-type.ts`](../../packages/contracts/src/rpg/vocab/location/building-facility-type.ts).
+[`building-form.ts`](../../packages/contracts/src/rpg/vocab/location/building/building-form.ts) and
+[`building-facility-type.ts`](../../packages/contracts/src/rpg/vocab/location/building/building-facility-type.ts).
 
 The quarantined `BuildingArchetype` registry is migration evidence, not product vocabulary.
 Authoring guidance:

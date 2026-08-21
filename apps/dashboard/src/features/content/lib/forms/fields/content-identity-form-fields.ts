@@ -1,7 +1,7 @@
 import type { NumberInputDigits } from '@rpg/ui'
 import type { FieldConfig, InlineSentenceFieldConfig, RowConfig } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../content-form-registry'
+import type { ContentFormCtx } from '../registry/content-form-registry'
 
 type GroupField = FieldConfig | RowConfig
 

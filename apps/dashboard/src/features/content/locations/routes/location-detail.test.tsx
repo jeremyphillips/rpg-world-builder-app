@@ -15,7 +15,7 @@ const { useCanManageCampaignMock } = vi.hoisted(() => ({
   useCanManageCampaignMock: vi.fn(() => false),
 }))
 
-vi.mock('@/components/layout/use-breadcrumb-label', () => ({
+vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 vi.mock('@/features/campaign', () => ({
@@ -30,9 +30,14 @@ vi.mock('@/features/character', async (importOriginal) => {
     useNpcs: vi.fn(() => ({ data: [] })),
   }
 })
-vi.mock('../components/location-connected-parties-detail-sections.client', () => ({
-  LocationConnectedPartiesDetailSections: () => <section aria-label="Connected parties sections" />,
-}))
+vi.mock(
+  '../components/connected-parties/location-connected-parties-detail-sections.client',
+  () => ({
+    LocationConnectedPartiesDetailSections: () => (
+      <section aria-label="Connected parties sections" />
+    ),
+  }),
+)
 vi.mock('@/features/content/organizations/hooks/use-organizations', () => ({
   useOrganizations: vi.fn(() => ({ data: [] })),
 }))

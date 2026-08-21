@@ -4,7 +4,7 @@ import {
   NEUTRAL_EQUIPMENT_RECOMMENDATION,
   type EquipmentRecommendation,
 } from '../../../../content/equipment-recommendation'
-import type { CharacterProficiencies } from '../../../character/proficiencies'
+import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 import type { EquipmentPickerItem } from '../picker/equipment-picker-item'
 import { isEquipmentPickerSupportedKind } from '../picker/equipment-picker-supported-kinds'
 import type { EquipmentBudgetSummary } from './equipment-budget'

@@ -5,9 +5,9 @@ import {
   formatContentListLoadErrorMessage,
   formatContentNotFoundMessage,
 } from '@/features/content/lib/content-type-labels'
-import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
+import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useLocations } from '../hooks/use-locations'
-import '../lib/location-form-def'
+import '../lib/forms/location-form-def'
 
 export function LocationEdit() {
   const { campaignId = '', locationId = '' } = useParams<{

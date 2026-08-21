@@ -5,7 +5,7 @@ import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
-import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
+import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 // Registers the equipment form def into the content form registry on module load.
 import '../lib/equipment-form-def'
 import { useEquipment } from '../hooks/use-equipment'

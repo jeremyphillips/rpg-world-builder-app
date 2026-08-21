@@ -1,1 +1,1 @@
-export * from '../../content/organization-location-reference'
+export * from '../../content/organization/location-reference'

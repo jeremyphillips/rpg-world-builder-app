@@ -7,8 +7,8 @@ import {
   inventoryBucketForEquipment,
   type CharacterEquipment,
   type CharacterEquipmentEntry,
-} from '../../../character/equipment-inventory'
-import type { CharacterSelectionSource } from '../../../character/selection-sources'
+} from '../../../character/sheet/equipment-inventory'
+import type { CharacterSelectionSource } from '../../../character/sheet/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type {
   CharacterBuilderDraft,

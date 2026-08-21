@@ -10,7 +10,7 @@ import {
   combineQueryError,
   combineQueryPending,
   resolveQueryErrorLabel,
-} from '@/features/character'
+} from '@/lib/query/query-state.lib'
 
 import { useCampaignCharacter } from './use-campaign-character'
 

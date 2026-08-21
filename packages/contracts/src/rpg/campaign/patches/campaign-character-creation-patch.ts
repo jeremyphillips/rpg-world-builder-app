@@ -1,8 +1,7 @@
 import { z } from 'zod'
 
 import { ABSOLUTE_MAX_CHARACTER_LEVEL, MAX_CHARACTER_LEVEL } from '../../primitives/level'
-import { levelValidationMessages } from '../../primitives/level-messages'
-import { refineLevelRangeTable } from '../../primitives/level-range-table'
+import { levelValidationMessages, refineLevelRangeTable } from '../../primitives/level'
 import { creatureTypeSchema, type CreatureTypeId } from '../../vocab/creature-type'
 import { resolveMaxCharacterLevel } from '../campaign-rules'
 import { validateExtendedMaxLevel } from '../campaign-level-validation'

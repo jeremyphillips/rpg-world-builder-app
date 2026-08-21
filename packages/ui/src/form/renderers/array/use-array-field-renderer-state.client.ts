@@ -10,28 +10,15 @@
 import * as React from 'react'
 import type { UseFieldArrayReturn } from 'react-hook-form'
 
-import {
-  fieldArrayItemListClasses,
-  fieldStackRhythmVariants,
-} from '../../../components/ui/field.variants'
-import {
-  isNestedArraySection,
-  resolveArrayAddAction,
-  resolveArrayItemConfig,
-  resolveArrayItemReorder,
-  resolveArrayItemVariant,
-} from '../../config/array/array-item-config.lib'
 import type { ArrayConfig } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
-import { resolveFormDensity } from '../../form-density'
-import { resolveArrayLegendPresentation } from '../../form-heading.lib'
-import { hasNamedArrayHeading, resolveArrayHeading } from '../../resolve-container-heading.lib'
 import { countInvalidArrayItems, countIssuesForArrayPath } from '../../errors'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
 import { useFormUiContext } from '../../context/form-ui.context'
 import { useFocusFirstArrayIssue } from './use-focus-first-array-issue.client'
 import { useArrayFieldAppend } from './use-array-field-append.client'
+import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-chrome.lib'
 
 type UseArrayFieldRendererStateOptions = {
   config: ArrayConfig
@@ -57,34 +44,37 @@ export function useArrayFieldRendererState({
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
   const { density, depth, inRhythmStack, namedGroupDepth } = useFormSectionContext()
-  const { rhythm, size } = resolveFormDensity(density)
-  const itemConfig = resolveArrayItemConfig(config)
-  const addAction = resolveArrayAddAction(config)
+  const chrome = resolveArrayFieldRendererChrome({
+    config,
+    density,
+    depth,
+    inRhythmStack,
+    namedGroupDepth,
+    fieldsLength: fields.length,
+  })
   const {
-    label: addActionLabel = 'Add item',
-    variant: addActionVariant = 'outline',
-    layout: addActionLayout = 'stacked',
-    size: addActionSize,
-    icon: showAddIcon = true,
-    menu: addActionMenu,
-  } = addAction ?? {}
-  const arrayHeading = resolveArrayHeading(config)
-  const legend = arrayHeading?.label ?? config.legend ?? ''
-  const hasNamedHeading = hasNamedArrayHeading(config)
-  /** Legend typography uses depth before this array's own heading increment. */
-  const legendNamedGroupDepth = hasNamedHeading ? Math.max(0, namedGroupDepth - 1) : namedGroupDepth
-  const { legendSize, legendScale } = resolveArrayLegendPresentation(legendNamedGroupDepth, size)
-  const { min = 0, max } = config
-  const itemCollapsible = itemConfig.collapsible
-  const itemCollapseKey = itemConfig.collapseKey
-  const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
-  const itemBodyStackClasses = fieldStackRhythmVariants({ rhythm })
-  const nested = isNestedArraySection(depth)
-  const omitSectionBottomMargin = nested || inRhythmStack
-  const variant = resolveArrayItemVariant(config, { nested })
-  const reorder = resolveArrayItemReorder(config)
-  const sortableEnabled = reorder === 'dragHandle' && fields.length > 1
-  const collapsible = itemCollapsible && variant === 'detailed'
+    addAction,
+    addActionLabel,
+    addActionVariant,
+    addActionLayout,
+    addActionSize,
+    showAddIcon,
+    addActionMenu,
+    collapsible,
+    itemCollapseKey,
+    itemConfig,
+    itemListClasses,
+    itemBodyStackClasses,
+    legend,
+    legendScale,
+    legendSize,
+    max,
+    min,
+    nested,
+    omitSectionBottomMargin,
+    sortableEnabled,
+    variant,
+  } = chrome
 
   const getItemValues = React.useCallback(
     (index: number) => (getValues(`${fullName}.${index}`) ?? {}) as Record<string, unknown>,

@@ -4,10 +4,10 @@ import type { CampaignOnboardingContext } from '@rpg/contracts'
 import { buttonVariants, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 
-import { CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY } from '../lib/campaign-onboarding-copy'
-import { CampaignOnboardingClient } from '../components/campaign-onboarding.client'
+import { CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY } from '../lib/onboarding/campaign-onboarding-copy'
+import { CampaignOnboardingClient } from '../components/onboarding/campaign-onboarding.client'
 
 export function CampaignOnboardingBody({
   context,

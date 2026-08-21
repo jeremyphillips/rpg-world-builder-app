@@ -16,7 +16,7 @@ import {
 import { makeClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
-import { buildEquipmentInventoryLayout } from '../../components/equipment/equipment-inventory-summary.lib'
+import { buildEquipmentInventoryViewModel } from './equipment-inventory-summary.lib'
 import {
   isUniqueEquipmentOwnedInDraft,
   listEquipmentInventoryRowsFromDraft,
@@ -143,13 +143,13 @@ describe('equipment package conversion integration', () => {
     }
 
     const budget = deriveEquipmentBudgetSummary(convertedDraft, catalogIndex)!
-    const layout = buildEquipmentInventoryLayout(convertedDraft, catalogIndex)!
+    const viewModel = buildEquipmentInventoryViewModel(convertedDraft, catalogIndex)!
     const rows = listEquipmentInventoryRowsFromDraft(convertedDraft, catalogIndex)
 
     const daggerRow = rows.find((row) => row.entry.equipmentId === equipmentStepDaggerFixture.id)
     const torchRow = rows.find((row) => row.entry.equipmentId === torchFixture.id)
 
-    expect(layout.mode).toBe('gold')
+    expect(viewModel.startingEquipment.kind).toBe('gold_option')
     expect(daggerRow?.entry.quantity).toBe(5)
     expect(daggerRow?.quantityMode).toBe('editable')
     expect(daggerRow?.removeTarget).toEqual(

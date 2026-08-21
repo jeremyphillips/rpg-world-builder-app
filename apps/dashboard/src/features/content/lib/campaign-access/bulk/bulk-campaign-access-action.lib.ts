@@ -20,7 +20,7 @@ import {
   createBatchValidateStrategy,
   mergeBatchValidationTargets,
   resolveActionBatchValidationForLifecycle,
-} from '@/lib/actions/action-validate-strategy'
+} from '@/lib/actions'
 
 import {
   fetchContentCampaignAccessAvailabilityBatch,

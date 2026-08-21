@@ -71,7 +71,7 @@ toast({
 ```
 
 **Wired:** overview row campaign availability toggle
-([`use-content-campaign-availability-toggle.client.ts`](../src/features/content/lib/overview/use-content-campaign-availability-toggle.client.ts)).
+([`use-content-campaign-availability-toggle.client.ts`](../src/features/content/lib/overview/hooks/use-content-campaign-availability-toggle.client.ts)).
 
 **Not toast:** delete confirm errors (dialog owns recovery), edit-save `formError` (inline header).
 

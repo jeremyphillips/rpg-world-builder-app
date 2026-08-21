@@ -13,7 +13,7 @@ import {
 import { DIE_FACES } from '@rpg/contracts/primitives'
 import { toOptions } from '@rpg/ui/form'
 
-import { buildLevelRangeTiersArrayField } from '../../forms/fields/level-range-table-form-fields'
+import { buildLevelRangeTiersArrayField } from '../../forms/level-range-table-form-fields'
 import type { LevelRangeArrayConfig } from '../../forms/array-patterns'
 
 import {
