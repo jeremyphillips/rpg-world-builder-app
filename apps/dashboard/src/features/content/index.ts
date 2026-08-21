@@ -29,6 +29,7 @@ export {
   CatalogCollapsibleList,
   buildCatalogDisclosureLabel,
   CatalogMetadataRenderer,
+  formatCatalogMetadataLines,
   type CatalogCollapsibleListProps,
   type CatalogMetadataLine,
 } from './components/catalog'

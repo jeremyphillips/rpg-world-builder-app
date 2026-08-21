@@ -1,10 +1,10 @@
 import type { SpellPickerCompactSummary } from '@rpg/contracts'
 
-import type { CatalogPickerMetadataLine } from '../catalog-picker-metadata.types'
+import type { CatalogMetadataLine } from '@/features/content'
 
 export function mapSpellPickerCompactSummaryToMetadataLines(
   summary: SpellPickerCompactSummary,
-): CatalogPickerMetadataLine[] {
+): CatalogMetadataLine[] {
   return [
     {
       segments: summary.castingSummary.map((text) => ({

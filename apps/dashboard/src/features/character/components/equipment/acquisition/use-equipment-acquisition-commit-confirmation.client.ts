@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-export const CATALOG_PICKER_COMMIT_SUCCESS_MS = 1000
+export const EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS = 1000
 
-export const CATALOG_PICKER_ADDED_LABEL = '✓ Added'
+export const EQUIPMENT_ACQUISITION_ADDED_LABEL = '✓ Added'
 
-export function useCatalogPickerCommitConfirmation(args: {
+export function useEquipmentAcquisitionCommitConfirmation(args: {
   commit: (requestedQuantity: number) => boolean
 }) {
   const { commit } = args
@@ -19,7 +19,7 @@ export function useCatalogPickerCommitConfirmation(args: {
 
     const timer = window.setTimeout(
       () => setSuccessQuantity(undefined),
-      CATALOG_PICKER_COMMIT_SUCCESS_MS,
+      EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS,
     )
     return () => window.clearTimeout(timer)
   }, [successQuantity])

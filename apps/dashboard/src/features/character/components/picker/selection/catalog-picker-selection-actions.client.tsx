@@ -6,7 +6,7 @@ import { Text } from '@rpg/ui'
 import { CatalogPickerActionButton } from './catalog-picker-action-button.client'
 import type { CatalogPickerRowActionPhase } from '../row/catalog-picker-row-action.lib'
 import { resolveCatalogPickerRowActionPhase } from '../row/catalog-picker-row-action.lib'
-import { CATALOG_PICKER_ADDED_LABEL } from '../use-catalog-picker-commit-confirmation.client'
+const CATALOG_PICKER_ADDED_LABEL = '✓ Added'
 
 export type CatalogPickerSelectionActionsProps = {
   /** Explicit phase — takes precedence over legacy `selected` / pending / success flags. */

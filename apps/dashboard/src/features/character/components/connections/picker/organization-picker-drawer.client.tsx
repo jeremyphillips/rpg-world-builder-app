@@ -5,8 +5,11 @@ import * as React from 'react'
 import { getOrganizationDomainLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Button, SelectField, Text } from '@rpg/ui'
 
-import { CatalogPickerMetadataRenderer } from '../../picker/metadata'
-import { CatalogEntityPickerSheet, CatalogEntityRow } from '@/features/content'
+import {
+  CatalogEntityPickerSheet,
+  CatalogEntityRow,
+  CatalogMetadataRenderer,
+} from '@/features/content'
 import { CatalogPickerSelectionActions } from '../../picker/selection/catalog-picker-selection-actions.client'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action.client'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field.client'
@@ -181,7 +184,7 @@ export function OrganizationPickerDrawer({
             entity={{
               heading: organization.name,
               description: (
-                <CatalogPickerMetadataRenderer
+                <CatalogMetadataRenderer
                   lines={[
                     {
                       segments: [

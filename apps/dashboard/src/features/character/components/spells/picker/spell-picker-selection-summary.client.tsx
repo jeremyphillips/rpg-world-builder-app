@@ -4,21 +4,21 @@ import { Check } from 'lucide-react'
 
 import { Text } from '@rpg/ui'
 
-import { catalogPickerSelectionSummaryClasses } from './catalog-picker-selection-summary.variants'
+import { spellPickerSelectionSummaryClasses } from './spell-picker-selection-summary.variants'
 
-export type CatalogPickerSelectionSummaryProps = {
+export type SpellPickerSelectionSummaryProps = {
   complete?: boolean
   countText: string
   metadata?: string
 }
 
-export function CatalogPickerSelectionSummary({
+export function SpellPickerSelectionSummary({
   complete = false,
   countText,
   metadata,
-}: CatalogPickerSelectionSummaryProps) {
+}: SpellPickerSelectionSummaryProps) {
   return (
-    <Text as="span" variant="muted" className={catalogPickerSelectionSummaryClasses}>
+    <Text as="span" variant="muted" className={spellPickerSelectionSummaryClasses}>
       <span className={complete ? 'inline-flex items-center gap-1 text-success' : undefined}>
         {complete ? <Check aria-hidden className="size-3.5 shrink-0" /> : null}
         <span>{countText}</span>

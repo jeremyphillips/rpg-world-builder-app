@@ -1,17 +1,17 @@
 'use client'
 
 export {
-  CATALOG_PICKER_COMMIT_SUCCESS_MS as COMMIT_SUCCESS_DISPLAY_MS,
-  useCatalogPickerCommitConfirmation,
-} from '../components/picker/use-catalog-picker-commit-confirmation.client'
+  EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS as COMMIT_SUCCESS_DISPLAY_MS,
+  useEquipmentAcquisitionCommitConfirmation,
+} from '../components/equipment/acquisition/use-equipment-acquisition-commit-confirmation.client'
 
-import { useCatalogPickerCommitConfirmation } from '../components/picker/use-catalog-picker-commit-confirmation.client'
+import { useEquipmentAcquisitionCommitConfirmation } from '../components/equipment/acquisition/use-equipment-acquisition-commit-confirmation.client'
 
-/** @deprecated Use {@link useCatalogPickerCommitConfirmation}. */
+/** @deprecated Use {@link useEquipmentAcquisitionCommitConfirmation}. */
 export function useEquipmentAcquisitionQuantityCommit(args: {
   commit: (requestedQuantity: number) => boolean
 }) {
-  const { confirm, ...rest } = useCatalogPickerCommitConfirmation(args)
+  const { confirm, ...rest } = useEquipmentAcquisitionCommitConfirmation(args)
   return {
     ...rest,
     commitQuantity: confirm,

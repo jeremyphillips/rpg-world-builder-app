@@ -1,10 +1,10 @@
 import type { SkillProficiencyCompactSummary } from '@rpg/contracts'
 
-import type { CatalogPickerMetadataLine } from '../catalog-picker-metadata.types'
+import type { CatalogMetadataLine } from '@/features/content'
 
 export function mapSkillProficiencyCompactSummaryToMetadataLines(
   summary: SkillProficiencyCompactSummary,
-): CatalogPickerMetadataLine[] {
+): CatalogMetadataLine[] {
   return [
     {
       segments: [{ type: 'text', text: summary.abilityLabel }],

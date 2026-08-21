@@ -54,17 +54,18 @@ acquisition panel, and starting package. Builder-only package-switch modal lives
 under `components/builder/steps/equipment/package-switch/`. Shared catalog chrome
 lives in `components/picker/` (not here).
 
-| Subfolder           | Responsibility                                                                    |
-| ------------------- | --------------------------------------------------------------------------------- |
-| `picker/drawer/`    | Equipment picker shell, types, fixtures                                           |
-| `picker/browse/`    | Filters, budget header, catalog result rows                                       |
-| `picker/details/`   | Item detail panel + character preview                                             |
-| `picker/purchase/`  | Picker purchase/grant UI (not step-level acquisition)                             |
-| `picker/callouts/`  | Picker callout logic + presentation                                               |
-| `inventory/`        | Step inventory — `summary/`, `row/`, `column/`, `purchased/`, `added/`, `manage/` |
-| `acquisition/`      | Step acquisition panel, guidance, commit labels                                   |
-| `starting-package/` | Starting-equipment option cards, package card, toolbar                            |
-| `package-switch/`   | **Temporary stub** — conversion editor only (starting-package follow-up)          |
+| Subfolder                                                   | Responsibility                                                                               |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `picker/drawer/`                                            | Equipment picker shell, types, fixtures, `useEquipmentPickerController`                      |
+| `picker/browse/`                                            | Filters, budget header, catalog result rows                                                  |
+| `picker/details/`                                           | Item detail panel + character preview                                                        |
+| `picker/purchase/`                                          | Picker purchase/grant UI (not step-level acquisition)                                        |
+| `picker/callouts/`                                          | Picker callout logic + presentation                                                          |
+| `picker/map-equipment-compact-summary-to-metadata-lines.ts` | Equipment metadata mapper                                                                    |
+| `inventory/`                                                | Step inventory — `summary/`, `row/`, `column/`, `purchased/`, `added/`, `manage/`            |
+| `acquisition/`                                              | Step acquisition panel, guidance, commit labels, `useEquipmentAcquisitionCommitConfirmation` |
+| `starting-package/`                                         | Starting-equipment option cards, package card, toolbar                                       |
+| `package-switch/`                                           | **Temporary stub** — conversion editor only (starting-package follow-up)                     |
 
 Inventory layout VM: `lib/equipment/equipment-inventory-summary.lib.ts`. Package-switch
 resolution state: `lib/equipment/equipment-package-switch-resolution.lib.ts` (pure logic,
@@ -75,6 +76,16 @@ no presentation). Shared inventory CVA: `inventory/equipment-inventory.variants.
 Thin domain folders — `picker/` only. Builder step composition (sections, rows,
 spell choice/summary cards) lives under `components/builder/steps/proficiencies/` and
 `components/builder/steps/spells/`.
+
+| Subfolder / file                                                                  | Responsibility                              |
+| --------------------------------------------------------------------------------- | ------------------------------------------- |
+| `spells/picker/spell-picker-drawer.*`                                             | Spell catalog drawer shell                  |
+| `spells/picker/use-spell-picker-controller.client.ts`                             | Mode buckets, filter persist, derived lists |
+| `spells/picker/spell-picker-browse-mode.lib.ts`                                   | Per-mode browse bucket helpers              |
+| `spells/picker/spell-picker-selection-summary.client.tsx`                         | Spell-only selection count chrome           |
+| `spells/picker/map-spell-picker-compact-summary-to-metadata-lines.ts`             | Spell metadata mapper                       |
+| `proficiencies/picker/proficiency-picker-drawer.*`                                | Proficiency catalog drawer shell            |
+| `proficiencies/picker/map-skill-proficiency-compact-summary-to-metadata-lines.ts` | Skill metadata mapper                       |
 
 ## `components/connections/` layout
 

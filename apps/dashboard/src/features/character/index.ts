@@ -50,10 +50,6 @@ export { BuilderInventoryRemoveAction } from './components/builder/inventory/bui
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'
 export { CatalogPickerSelectionActions } from './components/picker/selection/catalog-picker-selection-actions.client'
 export {
-  CatalogPickerMetadataRenderer,
-  type CatalogPickerMetadataLine,
-} from './components/picker/metadata'
-export {
   compareName,
   scoreAndFilterPickerItems,
 } from './components/picker/sort/catalog-picker-sort.lib'
@@ -63,7 +59,7 @@ export {
   createCatalogEntityRowRenderer,
 } from '@/features/content'
 export { resolveCatalogPickerRowActionPhase } from './components/picker/row/catalog-picker-row-action.lib'
-export { CATALOG_PICKER_COMMIT_SUCCESS_MS } from './components/picker/use-catalog-picker-commit-confirmation.client'
+export { EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS } from './components/equipment/acquisition/use-equipment-acquisition-commit-confirmation.client'
 export {
   characterOrganizationReferencesQueryKey,
   useCharacterOrganizationReferences,

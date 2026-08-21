@@ -6,7 +6,6 @@ import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
 import {
-  CatalogPickerMetadataRenderer,
   CatalogPickerSelectionActions,
   formatCharacterInlineSummary,
   ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
@@ -15,7 +14,11 @@ import {
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
 
-import { CatalogEntityPickerSheet, CatalogEntityRow } from '@/features/content'
+import {
+  CatalogEntityPickerSheet,
+  CatalogEntityRow,
+  CatalogMetadataRenderer,
+} from '@/features/content'
 
 import {
   buildConnectedPartyCharacterEntitySummary,
@@ -226,7 +229,7 @@ export function OrganizationMemberPickerDrawer({
             entity={{
               heading: candidate.name,
               description: formatCandidateIdentityLine(candidate) ? (
-                <CatalogPickerMetadataRenderer
+                <CatalogMetadataRenderer
                   lines={[
                     {
                       segments: [{ type: 'text', text: formatCandidateIdentityLine(candidate)! }],

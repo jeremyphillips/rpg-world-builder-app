@@ -1,5 +1,5 @@
 import { EQUIPMENT_ACQUISITION_ADDING_LABEL } from '../../../lib/equipment/equipment-step.lib'
-import { CATALOG_PICKER_ADDED_LABEL } from '../../picker/use-catalog-picker-commit-confirmation.client'
+import { EQUIPMENT_ACQUISITION_ADDED_LABEL } from './use-equipment-acquisition-commit-confirmation.client'
 
 import { formatAcquisitionCommitSuccessButtonLabel } from './equipment-acquisition-panel.lib'
 
@@ -18,4 +18,4 @@ export function resolveAcquisitionCommitButtonLabel(args: {
   return args.primaryActionLabel
 }
 
-export { CATALOG_PICKER_ADDED_LABEL }
+export { EQUIPMENT_ACQUISITION_ADDED_LABEL }

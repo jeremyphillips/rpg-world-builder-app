@@ -2,13 +2,14 @@
 
 import type { CatalogPickerCollapsibleRowRenderArgs } from '@rpg/ui'
 
-import { buildEquipmentPickerRowViewModel, CatalogEntityRow } from '@/features/content'
-import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equipment-acquisition-quantity-commit.client'
 import {
-  CatalogPickerMetadataRenderer,
-  mapEquipmentCompactSummaryToMetadataLines,
-} from '../../../picker/metadata'
+  buildEquipmentPickerRowViewModel,
+  CatalogEntityRow,
+  CatalogMetadataRenderer,
+} from '@/features/content'
+import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equipment-acquisition-quantity-commit.client'
 import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment-acquisition-commit-labels.lib'
+import { mapEquipmentCompactSummaryToMetadataLines } from '../map-equipment-compact-summary-to-metadata-lines'
 import { EquipmentPickerCommerce } from './equipment-picker-commerce.client'
 import { buildEquipmentPickerEntityStatus } from '../callouts/equipment-picker-callout-presentation.lib'
 import { getEquipmentPickerCallout } from '../callouts/equipment-picker-callout.lib'
@@ -77,7 +78,7 @@ export function EquipmentPickerDisclosureRow({
         heading: row.name,
         classification: row.kindLabel,
         description: (
-          <CatalogPickerMetadataRenderer
+          <CatalogMetadataRenderer
             lines={mapEquipmentCompactSummaryToMetadataLines({
               kindLabel: row.kindLabel,
               comparisonGroups: row.comparisonGroups,

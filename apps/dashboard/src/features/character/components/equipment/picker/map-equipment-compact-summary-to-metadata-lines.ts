@@ -1,10 +1,10 @@
 import type { EquipmentCompactSummary } from '@rpg/contracts'
 
-import type { CatalogPickerMetadataLine } from '../catalog-picker-metadata.types'
+import type { CatalogMetadataLine } from '@/features/content'
 
 export function mapEquipmentCompactSummaryToMetadataLines(
   summary: EquipmentCompactSummary,
-): CatalogPickerMetadataLine[] {
+): CatalogMetadataLine[] {
   if (summary.comparisonGroups.length === 0) return []
 
   return [

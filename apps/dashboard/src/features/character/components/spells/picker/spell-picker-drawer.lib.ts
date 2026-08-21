@@ -14,7 +14,7 @@ import {
 import { normalizeSearchQuery } from '@rpg/ui'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
-import { sanitizeModeBrowseState } from '../../picker/catalog-picker-browse-mode.lib'
+import { sanitizeModeBrowseState } from './spell-picker-browse-mode.lib'
 import {
   resolveCatalogPickerEmptyStateKind,
   resolveCatalogPickerEmptyStateMessage,

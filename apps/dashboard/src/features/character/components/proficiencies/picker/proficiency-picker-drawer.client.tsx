@@ -2,13 +2,14 @@
 
 import * as React from 'react'
 
-import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import {
+  CatalogEntityPickerSheet,
+  CatalogMetadataRenderer,
+  createCatalogEntityRowRenderer,
+} from '@/features/content'
 
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
-import {
-  CatalogPickerMetadataRenderer,
-  mapSkillProficiencyCompactSummaryToMetadataLines,
-} from '../../picker/metadata'
+import { mapSkillProficiencyCompactSummaryToMetadataLines } from './map-skill-proficiency-compact-summary-to-metadata-lines'
 import { CatalogPickerSelectionActions } from '../../picker/selection/catalog-picker-selection-actions.client'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state.client'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control.client'
@@ -155,7 +156,7 @@ export function ProficiencyPickerDrawer({
           return {
             heading: item.label,
             description: item.compactSummary ? (
-              <CatalogPickerMetadataRenderer
+              <CatalogMetadataRenderer
                 lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ) : undefined,
