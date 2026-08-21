@@ -6,6 +6,9 @@ import {
   TERRITORIAL_AUTHORITY_SECTION_HELPER,
 } from './location-connection-surface-copy'
 
+export const LOCATION_PEOPLE_QUICK_NPC_CREATE_UNAVAILABLE_MESSAGE =
+  'Quick NPC creation is unavailable — campaign build data failed to load.'
+
 export const LOCATION_CONNECTED_PARTIES_SECTION_LABELS: Record<
   LocationConnectedPartySectionGroup,
   string

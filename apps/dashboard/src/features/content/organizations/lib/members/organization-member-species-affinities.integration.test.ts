@@ -4,7 +4,7 @@ import { flattenSelectFieldOptions } from '@rpg/ui/form'
 
 import { buildQuickNpcSpeciesRadioCardPresentation } from '@/features/character'
 import { makeSpecies } from '@/test/fixtures/factories/species'
-import type { OrganizationMemberPickerCandidate } from '../../components/members/organization-member-picker-drawer.client'
+import type { OrganizationMemberPickerCandidate } from '../../lib/members/organization-member-picker-drawer.lib'
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import {
   buildOrganizationCreateInput,

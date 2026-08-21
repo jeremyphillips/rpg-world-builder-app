@@ -49,6 +49,23 @@ export type OrganizationLocationTargetBrowseScopeOption = {
   disabled?: boolean
 }
 
+export function resolveEffectiveTargetBrowseScope(
+  selectedScope: OrganizationLocationTargetBrowseScope,
+  options: readonly OrganizationLocationTargetBrowseScopeOption[],
+  showBrowseScopeControl: boolean,
+): OrganizationLocationTargetBrowseScope {
+  if (!showBrowseScopeControl) {
+    return selectedScope
+  }
+
+  const activeScope = options.find((option) => option.value === selectedScope)
+  if (activeScope?.disabled && selectedScope !== 'all') {
+    return 'all'
+  }
+
+  return selectedScope
+}
+
 /** Configured scopes stay visible; disable scopes with zero post-eligibility candidates. */
 export function resolveTargetBrowseScopeOptions(
   scopes: readonly OrganizationLocationTargetBrowseScope[],

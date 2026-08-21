@@ -60,11 +60,9 @@ import {
   buildingOrganizationsDiscoveryCreateActionClasses,
   buildingOrganizationsDiscoveryListClasses,
 } from './building-organizations-create-tab.variants'
-import {
-  OrganizationAuthoringFormShell,
-  OrganizationAuthoringPresetBridge,
-} from '../../../organizations/components/authoring/organization-authoring-form-shell.client'
-import { useOrganizationAuthoringContext } from '../../../organizations/components/authoring/organization-authoring-context.client'
+import { OrganizationAuthoringFormShell } from '../../../organizations/components/create/organization-authoring-form-shell.client'
+import { OrganizationAuthoringPresetBridge } from '../../../organizations/components/create/organization-authoring-preset-bridge.client'
+import { useOrganizationAuthoringContext } from '../../../organizations/components/create/organization-authoring-context.client'
 
 function toRelationshipRadioOptions(
   options: readonly BuildingOrganizationRelationshipKindOption[],

@@ -2,10 +2,7 @@
 
 import * as React from 'react'
 
-import type {
-  OrganizationLocationConnectionFamily,
-  OrganizationLocationConnectionKind,
-} from '@rpg/contracts'
+import type { OrganizationLocationConnectionFamily } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
 
 import type { OrganizationLocationConnectionsViewModel } from '../../lib/organization-display'
@@ -14,10 +11,11 @@ import {
   ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER,
   resolveOrganizationForwardFamilyPresentation,
 } from '../../lib/location-connections/organization-location-connection-surface-copy'
-import {
-  OrganizationLocationConnectionListRow,
-  type OrganizationLocationConnectionMutationContext,
-} from './organization-location-connection-relationship-row.client'
+import type {
+  OrganizationLocationConnectionEditTarget,
+  OrganizationLocationConnectionMutationContext,
+} from '../../lib/location-connections/organization-location-connection-mutation-context'
+import { OrganizationLocationConnectionListRow } from './organization-location-connection-list-row.client'
 import { DetailSectionPanel } from '../../../lib/detail/section/detail-section-panel.client'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import {
@@ -27,15 +25,6 @@ import {
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
   'Could not load organization location connections.'
-
-export const ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR =
-  'Could not update location connections for this organization.'
-
-export type OrganizationLocationConnectionEditTarget = {
-  connectionId: string
-  locationId: string
-  kind: OrganizationLocationConnectionKind
-}
 
 export type OrganizationLocationConnectionsSectionProps = {
   locationConnections: OrganizationLocationConnectionsViewModel

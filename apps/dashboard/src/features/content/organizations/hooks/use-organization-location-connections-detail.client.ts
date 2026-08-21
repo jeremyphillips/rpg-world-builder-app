@@ -32,9 +32,11 @@ import {
   resolveOrganizationForwardCurrentLocationEndpoint,
 } from '../lib/location-connections/build-organization-location-connection-cards'
 import { ORGANIZATION_EMPTY_SECTION_TEXT } from '../lib/organization-display'
-import type { OrganizationLocationConnectionEditTarget } from '../components/location-connections/organization-location-connections-section.client'
-import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../components/location-connections/organization-location-connections-section.client'
-import type { OrganizationLocationConnectionMutationContext } from '../components/location-connections/organization-location-connection-relationship-row.client'
+import type {
+  OrganizationLocationConnectionEditTarget,
+  OrganizationLocationConnectionMutationContext,
+} from '../lib/location-connections/organization-location-connection-mutation-context'
+import { ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR } from '../lib/location-connections/organization-location-connection-surface-copy'
 
 type EditDrawerState = {
   mode: Extract<OrganizationForwardDrawerMode, 'changeKind' | 'changeTarget'>

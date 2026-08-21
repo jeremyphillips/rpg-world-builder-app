@@ -229,6 +229,9 @@ export function resolveOrganizationForwardChangeTargetEntityLabel(
   return intent === 'territorial_authority' ? 'Territory' : 'Location'
 }
 
+export const ORGANIZATION_LOCATION_CONNECTION_MUTATION_ERROR =
+  'Could not update location connections for this organization.'
+
 export function resolveOrganizationForwardAddDrawerTitle(
   kind: OrganizationLocationConnectionKind,
 ): string {

@@ -19,8 +19,10 @@ import {
 } from '@/features/character'
 
 import { buildLocationConnectedPartyCharactersById } from '../../locations/lib/connected-parties/location-connected-party-character-options.lib'
-import type { OrganizationMemberPickerCandidate } from '../components/members/organization-member-picker-drawer.client'
-import type { OrganizationMemberPickerCommit } from '../components/members/organization-member-picker-drawer.client'
+import type {
+  OrganizationMemberPickerCandidate,
+  OrganizationMemberPickerCommit,
+} from '../lib/members/organization-member-picker-drawer.lib'
 import {
   buildOrganizationMemberRows,
   type OrganizationMemberRowVm,

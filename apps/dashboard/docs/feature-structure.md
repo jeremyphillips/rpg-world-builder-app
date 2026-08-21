@@ -207,6 +207,22 @@ the connections subtree.
 Step orchestration hooks belong in `character/hooks/` (`use-*-step.client.ts`), not
 under `components/builder/steps/`.
 
+## Organizations component layout
+
+`content/organizations/components/` mirrors `lib/` concerns without deep nesting:
+
+| Folder                  | Role                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `create/`               | Create-lifecycle UI only (provider, preset bridge, nested create modal)                                                  |
+| `members/`              | Detail members composition (flat filename roles: `*-detail-section`, `*-section`, `*-detail-drawers`, `*-picker-drawer`) |
+| `location-connections/` | Detail org→location links (flat: `*-detail-section`, `*-section`, `*-list-row`, `*-link-drawer`)                         |
+
+Flat member and location-connection folders are a local discoverability choice,
+not a rule that Organization families must stay flat. Domain contracts and policy
+belong in `organizations/lib/members/` and `organizations/lib/location-connections/`.
+Feature drawers compose shared primitives from `content/lib/relationship/` — they
+do not move there. Detail → [`organizations/README.md`](../src/features/content/organizations/README.md).
+
 ## Related docs
 
 | Doc                                                  | Use for                                                   |

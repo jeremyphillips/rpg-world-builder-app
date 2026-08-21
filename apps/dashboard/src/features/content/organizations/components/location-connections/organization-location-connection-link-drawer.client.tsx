@@ -91,6 +91,7 @@ import { buildOrganizationDrawerEntityPresentation } from '../../lib/organizatio
 import {
   filterLocationsByTargetBrowseScope,
   ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL,
+  resolveEffectiveTargetBrowseScope,
   resolveTargetBrowseScopeOptions,
   type OrganizationLocationTargetBrowseScope,
 } from '../../lib/location-connections/organization-location-target-browse-scope'
@@ -528,18 +529,15 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const showTargetBrowseScopeControl =
     browseScopeOptions.length > 0 && showLocationPicker && !showMutationEmptyState
 
-  const effectiveLocationBrowseScope = React.useMemo(() => {
-    if (!showTargetBrowseScopeControl) {
-      return locationBrowseScope
-    }
-
-    const activeScope = browseScopeOptions.find((option) => option.value === locationBrowseScope)
-    if (activeScope?.disabled && locationBrowseScope !== 'all') {
-      return 'all'
-    }
-
-    return locationBrowseScope
-  }, [browseScopeOptions, locationBrowseScope, showTargetBrowseScopeControl])
+  const effectiveLocationBrowseScope = React.useMemo(
+    () =>
+      resolveEffectiveTargetBrowseScope(
+        locationBrowseScope,
+        browseScopeOptions,
+        showTargetBrowseScopeControl,
+      ),
+    [browseScopeOptions, locationBrowseScope, showTargetBrowseScopeControl],
+  )
 
   const pickerLocations = React.useMemo(() => {
     if (!showTargetBrowseScopeControl) {

@@ -23,18 +23,16 @@ import {
 import {
   buildConnectedPartyCharacterEntitySummary,
   buildConnectedPartyCharacterPickerSearchText,
-  type LocationConnectedPartyCharacterOption,
 } from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 import {
   filterAndSortOrganizationMemberPickerCandidates,
   formatOrganizationMemberPickerStatusBadgeLabel,
-  ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
   ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL,
+  type OrganizationMemberPickerCandidate,
+  type OrganizationMemberPickerCommit,
   type OrganizationMemberSelectionPolicy,
 } from '../../lib/members/organization-member-picker-drawer.lib'
 import { ORGANIZATION_MEMBER_ADD_FAILED } from '../../lib/members/organization-members.constants'
-
-export { ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL }
 
 export const ORGANIZATION_MEMBER_PICKER_TITLE = 'Add member'
 export const ORGANIZATION_MEMBER_PICKER_SUBMIT_LABEL = 'Add member'
@@ -44,22 +42,6 @@ export const ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE = 'No characters are av
 export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL = 'Create new NPC'
 export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE =
   'Quick NPC creation is unavailable — campaign build data failed to load.'
-
-/** Campaign PC/NPC option plus whether the character already holds a membership here. */
-export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterOption & {
-  isMember: boolean
-  /** Existing membership title when isMember is true. */
-  membershipTitle?: string
-  /** True when the character matches stored org class or species affinities intersected with availability. */
-  isRecommended?: boolean
-}
-
-export type OrganizationMemberPickerCommit = {
-  characterId: string
-  characterType: 'pc' | 'npc'
-  title?: string
-  priority?: number
-}
 
 export type OrganizationMemberPickerQuickNpc = {
   /** Enables the "Create new NPC" entry action. */

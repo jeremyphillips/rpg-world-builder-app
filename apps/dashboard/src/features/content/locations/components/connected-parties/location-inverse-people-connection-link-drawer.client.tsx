@@ -75,7 +75,7 @@ import {
   resolvePeopleKindSlotSubjectTypeFieldLabel,
 } from '../../lib/connected-parties/location-connected-parties-people-kind-slots'
 import { buildLocationContextPresentationFromLocation } from '../../lib/location-display'
-import { ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE } from '../../../organizations/components/members/organization-member-picker-drawer.client'
+import { LOCATION_PEOPLE_QUICK_NPC_CREATE_UNAVAILABLE_MESSAGE } from '../../../locations/lib/connected-parties/location-connected-parties-section-copy'
 import {
   revalidateCreatedNpcForInverseDrawer,
   revalidateCreatedOrganizationForInverseDrawer,
@@ -443,7 +443,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     if (quickNpc?.buildContextFailed) {
       return {
         state: 'unavailable' as const,
-        message: ORGANIZATION_MEMBER_PICKER_CREATE_NPC_UNAVAILABLE_MESSAGE,
+        message: LOCATION_PEOPLE_QUICK_NPC_CREATE_UNAVAILABLE_MESSAGE,
       }
     }
     return characterNestedCreateAuxiliaryAction

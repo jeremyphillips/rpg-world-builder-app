@@ -7,6 +7,7 @@ import { makeLocation } from '@/test/fixtures/factories/location'
 import {
   filterLocationsByTargetBrowseScope,
   locationMatchesTargetBrowseScope,
+  resolveEffectiveTargetBrowseScope,
   resolveTargetBrowseScopeOptions,
 } from './organization-location-target-browse-scope'
 
@@ -64,5 +65,16 @@ describe('organization-location-target-browse-scope', () => {
       { value: 'settlement', label: 'Settlements', disabled: true },
       { value: 'region', label: 'Regions', disabled: true },
     ])
+  })
+
+  it('falls back to all when the selected scope is disabled', () => {
+    const options = resolveTargetBrowseScopeOptions(
+      ['all', 'settlement', 'region'],
+      [location('region', 'region-1')],
+    )
+
+    expect(resolveEffectiveTargetBrowseScope('settlement', options, true)).toBe('all')
+    expect(resolveEffectiveTargetBrowseScope('region', options, true)).toBe('region')
+    expect(resolveEffectiveTargetBrowseScope('settlement', options, false)).toBe('settlement')
   })
 })

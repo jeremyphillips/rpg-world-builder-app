@@ -2,18 +2,13 @@
 
 import { useNavigate } from 'react-router-dom'
 
-import type {
-  Location,
-  OrganizationLocationConnectionEdgeAtLocation,
-  OrganizationLocationConnectionKind,
-} from '@rpg/contracts'
+import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
 
 import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
-  type RelationshipCandidateSet,
 } from '../../../lib/relationship/location-connection/location-connection-alternatives'
 import {
   buildRelationshipOverflowActions,
@@ -22,21 +17,8 @@ import {
 import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
 import { buildLocationEntityContextPresentation } from '../../../locations/lib/location-display'
 import type { OrganizationLocationConnectionPreviewItem } from '../../lib/organization-display'
+import type { OrganizationLocationConnectionMutationContext } from '../../lib/location-connections/organization-location-connection-mutation-context'
 import { resolveOrganizationForwardOverflowLabels } from '../../lib/location-connections/organization-location-connection-surface-copy'
-
-export type OrganizationLocationConnectionMutationContext = {
-  subjectOrganizationId: string
-  locationCandidates: RelationshipCandidateSet<Location>
-  connections: ReadonlyArray<{
-    id?: string
-    locationId: string
-    kind: OrganizationLocationConnectionKind
-  }>
-  edgesByLocationId?: Readonly<
-    Record<string, readonly OrganizationLocationConnectionEdgeAtLocation[]>
-  >
-  occupancyLoaded?: boolean
-}
 
 export function buildOrganizationLocationConnectionOverflowActions(input: {
   item: OrganizationLocationConnectionPreviewItem

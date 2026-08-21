@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { OrganizationMemberPickerCandidate } from '../../components/members/organization-member-picker-drawer.client'
+import type { OrganizationMemberPickerCandidate } from '../../lib/members/organization-member-picker-drawer.lib'
 import {
   ORGANIZATION_MEMBER_PICKER_AVAILABLE_CLASSES,
   ORGANIZATION_MEMBER_PICKER_AVAILABLE_SPECIES,

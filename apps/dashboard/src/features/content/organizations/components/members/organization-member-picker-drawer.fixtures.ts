@@ -2,7 +2,7 @@ import type { OrganizationDomain } from '@rpg/contracts'
 
 import { pickClass, pickSpecies } from '@/test/fixtures/pick'
 
-import type { OrganizationMemberPickerCandidate } from './organization-member-picker-drawer.client'
+import type { OrganizationMemberPickerCandidate } from '../../lib/members/organization-member-picker-drawer.lib'
 
 const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
 const ROGUE_CLASS_ID = 'srd-cc-5.2.1:rogue'

@@ -136,17 +136,14 @@ vi.mock('../../../organizations', () => ({
   useOrganizations: () => ({ data: organizationCatalog, isPending: false, isError: false }),
 }))
 
-vi.mock(
-  '../../../organizations/components/authoring/organization-authoring-context.client',
-  () => ({
-    OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
-    useOrganizationAuthoringContext: () => ({
-      practiceRecommendations: [],
-      setPracticeRecommendations: vi.fn(),
-      clearPracticeRecommendations: vi.fn(),
-    }),
+vi.mock('../../../organizations/components/create/organization-authoring-context.client', () => ({
+  OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
+  useOrganizationAuthoringContext: () => ({
+    practiceRecommendations: [],
+    setPracticeRecommendations: vi.fn(),
+    clearPracticeRecommendations: vi.fn(),
   }),
-)
+}))
 
 vi.mock('../../../lib/campaign-access/campaign-access-api', () => ({
   updateRouteContentCampaignAccess: (...args: unknown[]) =>

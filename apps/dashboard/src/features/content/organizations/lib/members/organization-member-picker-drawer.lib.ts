@@ -8,10 +8,27 @@ import { normalizeSearchQuery } from '@rpg/search'
 import { chainComparators, compareNumberDescending } from '@rpg/search/ranking'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
-import { buildConnectedPartyCharacterPickerSearchText } from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
+import {
+  buildConnectedPartyCharacterPickerSearchText,
+  type LocationConnectedPartyCharacterOption,
+} from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 import { compareName, scoreAndFilterPickerItems } from '@/features/character'
 
-import type { OrganizationMemberPickerCandidate } from '../../components/members/organization-member-picker-drawer.client'
+/** Campaign PC/NPC option plus whether the character already holds a membership here. */
+export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterOption & {
+  isMember: boolean
+  /** Existing membership title when isMember is true. */
+  membershipTitle?: string
+  /** True when the character matches stored org class or species affinities intersected with availability. */
+  isRecommended?: boolean
+}
+
+export type OrganizationMemberPickerCommit = {
+  characterId: string
+  characterType: 'pc' | 'npc'
+  title?: string
+  priority?: number
+}
 
 export const ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL = 'Member'
 export const ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL = 'Recommended'

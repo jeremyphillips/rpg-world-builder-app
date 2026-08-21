@@ -10,7 +10,7 @@ import { buildLocationsById } from '../../../locations/lib/location-display'
 import { ALDERMERE, YAWNING_PORTAL, LOCATIONS_LIST } from '../../../locations/fixtures'
 import { buildOrganizationLocationConnectionCards } from '../../lib/location-connections/build-organization-location-connection-cards'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
-import { OrganizationLocationConnectionListRow } from './organization-location-connection-relationship-row.client'
+import { OrganizationLocationConnectionListRow } from './organization-location-connection-list-row.client'
 
 const CAMPAIGN_ID = 'camp_1'
 const locationsById = buildLocationsById(LOCATIONS_LIST)
