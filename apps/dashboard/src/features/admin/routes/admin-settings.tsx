@@ -1,6 +1,6 @@
 import { Heading, Text } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 
 export function AdminSettings() {
   return (

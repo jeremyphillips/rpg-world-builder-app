@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { Heading } from '@rpg/ui'
 
-import { PageLoadState, type PageLoadStateProps } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageLoadState, type PageLoadStateProps } from '@/components/layout/page/page-load-state'
+import { WidePage } from '@/components/layout/page/wide-page'
 
 import { CHARACTER_SHEET_ERROR_LABELS } from '../../lib/detail/character-sheet-error-labels'
 

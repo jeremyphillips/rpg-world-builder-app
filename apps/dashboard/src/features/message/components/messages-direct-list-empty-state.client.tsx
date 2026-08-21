@@ -1,4 +1,4 @@
-import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
+import { IndexPageEmptyState } from '@/components/layout/page/index-page-intro'
 
 import { MessagesStartConversationLink } from './messages-start-conversation-link.client'
 import { messagesWorkspaceListChromeInsetClasses } from './messages-workspace.variants'

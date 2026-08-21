@@ -1,6 +1,6 @@
 import { Heading } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { ChangePasswordSection } from '../components/change-password-section'
 import { ProfileSection } from '../components/profile-section'
 

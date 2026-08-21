@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { CampaignInviteInviteeListItem, CampaignListItem } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
+import { IndexPageEmptyState } from '@/components/layout/page/index-page-intro'
 import {
   CAMPAIGNS_QUERY_ERROR_MESSAGE,
   CampaignPicker,

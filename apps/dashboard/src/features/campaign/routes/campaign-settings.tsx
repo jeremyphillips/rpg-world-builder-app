@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'

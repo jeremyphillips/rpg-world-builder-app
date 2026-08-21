@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { WidePage } from '@/components/layout/page/wide-page'
 
 import { CharacterBuilderShell } from '../../components/character-builder-shell.client'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'

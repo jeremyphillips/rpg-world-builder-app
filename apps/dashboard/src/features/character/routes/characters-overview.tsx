@@ -5,9 +5,9 @@ import { buttonVariants, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
-import { IndexPageEmptyState, IndexPageIntro } from '@/components/layout/index-page-intro'
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { IndexPageEmptyState, IndexPageIntro } from '@/components/layout/page/index-page-intro'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacters } from '../hooks/use-characters'

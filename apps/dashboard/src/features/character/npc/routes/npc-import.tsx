@@ -2,8 +2,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { buttonVariants, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/narrow-page'
-import { PageLoadState } from '@/components/layout/page-load-state'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { useCampaignBuildContext } from '@/features/character'
 import { NpcAuthoringGate } from '@/features/character'
 

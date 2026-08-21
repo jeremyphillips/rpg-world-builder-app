@@ -3,8 +3,8 @@
 import type { CampaignOnboardingIncompleteContext } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { useSession } from '@/features/auth'
 import { CharacterBuilderShell } from '@/features/character'
 import { useCampaignPcOnboardingBuildContext } from '@/features/character'

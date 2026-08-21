@@ -123,35 +123,35 @@ For layout-only decorators, use page shells or a `<div>` — not a router.
 
 ## Page layout
 
-Every route picks **one width shell** from `components/layout/`:
+Every route picks **one width shell** from `components/layout/page/`:
 
-| Shell                                                    | Width                | Typical routes                                                 |
-| -------------------------------------------------------- | -------------------- | -------------------------------------------------------------- |
-| [`NarrowPage`](../src/components/layout/narrow-page.tsx) | Centered `max-w-4xl` | Settings, wizards, account settings, content create/edit forms |
-| [`WidePage`](../src/components/layout/wide-page.tsx)     | Full main column     | Lists, hubs, detail pages, tables                              |
+| Shell                                                         | Width                | Typical routes                                                 |
+| ------------------------------------------------------------- | -------------------- | -------------------------------------------------------------- |
+| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx) | Centered `max-w-4xl` | Settings, wizards, account settings, content create/edit forms |
+| [`WidePage`](../src/components/layout/page/wide-page.tsx)     | Full main column     | Lists, hubs, detail pages, tables                              |
 
 Nested readable columns inside `WidePage` use
-[`narrowPageContentClasses`](../src/components/layout/page-content.variants.ts)
+[`narrowPageContentClasses`](../src/components/layout/page/page-content.variants.ts)
 (left-aligned `max-w-narrow-content`, ~660px) — narrower than `NarrowPage`, for prose
 body sections on catalog detail routes.
 
 Shared spacing tokens live in
-[`page-spacing.variants.ts`](../src/components/layout/page-spacing.variants.ts):
+[`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts):
 `compact` (space-y-2), `list` (space-y-4), `relaxed` (space-y-6), `loose`
 (space-y-10). Pass `className="pb-10"` on long narrow forms so the sticky footer
 clears the viewport.
 
 ### Page chrome (composes inside a width shell)
 
-| Component                                                       | Role                                          |
-| --------------------------------------------------------------- | --------------------------------------------- |
-| [`PageHeader`](../src/components/layout/page-header.tsx)        | Page title + optional actions                 |
-| [`PageLoadState`](../src/components/layout/page-load-state.tsx) | Spinner / error / ready body beneath a header |
+| Component                                                            | Role                                          |
+| -------------------------------------------------------------------- | --------------------------------------------- |
+| [`PageHeader`](../src/components/layout/page/page-header.tsx)        | Page title + optional actions                 |
+| [`PageLoadState`](../src/components/layout/page/page-load-state.tsx) | Spinner / error / ready body beneath a header |
 
 ```tsx
-import { NarrowPage } from '@/components/layout/narrow-page'
-import { PageHeader } from '@/components/layout/page-header'
-import { WidePage } from '@/components/layout/wide-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { WidePage } from '@/components/layout/page/wide-page'
 
 // Narrow form page
 <NarrowPage spacing="relaxed" className="pb-10">
@@ -182,7 +182,7 @@ import { WidePage } from '@/components/layout/wide-page'
   not nest wide tables inside the layout.
 
 ```tsx
-import { WidePage } from '@/components/layout/wide-page'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { ContentDetailLayout } from '@/features/content/lib/detail/page/content-detail-layout'
 ;<WidePage spacing="relaxed">
   <ContentDetailLayout

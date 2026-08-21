@@ -6,8 +6,8 @@ import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
-import { WidePage } from '@/components/layout/wide-page'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'

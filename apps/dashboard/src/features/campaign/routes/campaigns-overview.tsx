@@ -1,5 +1,5 @@
-import { IndexPageIntro } from '@/components/layout/index-page-intro'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { IndexPageIntro } from '@/components/layout/page/index-page-intro'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { useCampaigns } from '@/features/campaign'
 import { usePendingCampaignInvites } from '@/features/campaign-invite'
 

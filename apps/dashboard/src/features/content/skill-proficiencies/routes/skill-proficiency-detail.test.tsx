@@ -5,7 +5,7 @@ import type { ClassListItem } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
-vi.mock('@/components/layout/use-breadcrumb-label', () => ({
+vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 vi.mock('../../lib/usage/content-usage-references-section.client', () => ({

@@ -6,9 +6,9 @@ import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
-import { WidePage } from '@/components/layout/wide-page'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { useCampaignRules } from '@/features/campaign'
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'

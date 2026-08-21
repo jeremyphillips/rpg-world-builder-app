@@ -9,7 +9,7 @@ import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { CITY_COUNCIL } from '../fixtures'
 import { OrganizationDetailContent } from './organization-detail'
 
-vi.mock('@/components/layout/use-breadcrumb-label', () => ({
+vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 vi.mock('@/features/campaign', () => ({

@@ -2,7 +2,7 @@
 
 import { ComboboxField, Text } from '@rpg/ui'
 
-import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
+import { IndexPageEmptyState } from '@/components/layout/page/index-page-intro'
 
 import type { DirectConversationRecipient } from '@rpg/contracts'
 

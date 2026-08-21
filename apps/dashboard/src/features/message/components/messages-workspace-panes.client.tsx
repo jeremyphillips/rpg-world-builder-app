@@ -6,8 +6,8 @@ import { Text, toast } from '@rpg/ui'
 import type { ConversationListScope } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
-import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { IndexPageEmptyState } from '@/components/layout/page/index-page-intro'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 
 import { MessagesDirectListContent } from './messages-direct-list-content.client'
 import { MessageThreadBody } from './message-thread-body.client'

@@ -3,12 +3,13 @@ import { Outlet } from 'react-router-dom'
 
 import { useSyncActiveCampaign } from '@/features/campaign'
 import { GlobalSearchProvider } from '@/features/global-search'
-import { Sidebar } from './sidebar/index'
-import { Topbar } from './topbar'
-import { AppBreadcrumb } from './app-breadcrumb'
+import { AppBreadcrumb } from '@/components/layout/breadcrumb/app-breadcrumb'
+import { BreadcrumbLabelProvider } from '@/components/layout/breadcrumb/breadcrumb-context'
+import { useResolvedBreadcrumbs } from '@/components/layout/breadcrumb/use-resolved-breadcrumbs'
+import { Sidebar } from '@/components/layout/sidebar'
+import { Topbar } from '@/components/layout/topbar/topbar'
+
 import { appShellBreadcrumbRailClasses, appShellMainClasses } from './app-shell.variants'
-import { BreadcrumbLabelProvider } from './breadcrumb-context'
-import { useResolvedBreadcrumbs } from './use-resolved-breadcrumbs'
 
 function AppShellBreadcrumbRail() {
   const crumbs = useResolvedBreadcrumbs()

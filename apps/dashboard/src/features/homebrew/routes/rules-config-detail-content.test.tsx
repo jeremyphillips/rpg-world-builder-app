@@ -46,7 +46,7 @@ vi.mock('@/features/campaign', async (importOriginal) => {
   }
 })
 
-vi.mock('@/components/layout/use-breadcrumb-label', () => ({
+vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 

@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom'
 import type { Organization } from '@rpg/contracts'
 import { RichTextContent } from '@rpg/ui'
 
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
-import { WidePage } from '@/components/layout/wide-page'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
+import { WidePage } from '@/components/layout/page/wide-page'
 import {
   formatContentListLoadErrorMessage,
   formatContentNotFoundMessage,

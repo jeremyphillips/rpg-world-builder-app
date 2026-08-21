@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom'
 import { Heading, Text } from '@rpg/ui'
 
-import { PageHeader } from '@/components/layout/page-header'
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 

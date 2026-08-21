@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { buttonVariants } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { OverviewPageShell } from '@/components/layout/overview-page-shell'
+import { OverviewPageShell } from '@/components/layout/page/overview-page-shell'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { NpcsOverviewTable } from '../components/npcs-overview-table.client'

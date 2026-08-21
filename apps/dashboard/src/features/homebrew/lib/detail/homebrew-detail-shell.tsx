@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { WidePage } from '@/components/layout/wide-page'
+import { WidePage } from '@/components/layout/page/wide-page'
 
 export type HomebrewDetailShellProps = {
   nav: ReactNode

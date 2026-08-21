@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
-import { PageLoadState } from '@/components/layout/page-load-state'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
 
 import { CampaignDisplayName } from '../components/campaign-display-name'
 import { MessagesOverviewEntryActions } from '@/features/message'

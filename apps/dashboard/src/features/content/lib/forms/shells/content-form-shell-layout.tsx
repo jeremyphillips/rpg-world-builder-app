@@ -8,7 +8,7 @@ import type {
 } from '@rpg/contracts'
 import { Heading, InsetPanel } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { weaponAdvisorySubmitOptions } from '../../../equipment/weapons'
 import { resolveContentFormValueSyncs } from './content-form-host-projection'
 import { useContentFormOptions } from '../../form-options/content-form-options'

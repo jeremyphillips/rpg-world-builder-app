@@ -7,7 +7,7 @@ import type {
 import { Heading, Text } from '@rpg/ui'
 import { useRef, useState, type ReactNode } from 'react'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler } from '@/lib/use-submit-handler'

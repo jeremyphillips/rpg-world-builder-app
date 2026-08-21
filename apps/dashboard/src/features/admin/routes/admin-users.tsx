@@ -1,7 +1,7 @@
 'use client'
 
-import { PageHeader } from '@/components/layout/page-header'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { Text } from '@rpg/ui'
 
 import { AdminUsersOverviewTable } from '../components/admin-users-overview-table.client'

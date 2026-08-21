@@ -82,8 +82,8 @@ import {
   SpellEditRoute,
   SpellsOverviewRoute,
 } from '@/app/lazy-routes'
-import { AppShell } from '@/components/layout/app-shell'
-import { ConcentrationShell } from '@/components/layout/concentration-shell'
+import { AppShell } from '@/components/layout/shell/app-shell'
+import { ConcentrationShell } from '@/components/layout/shell/concentration-shell'
 import { DashboardHome } from '@/routes/dashboard-home'
 
 // Vite serves the app under `base: "/app/"`; React Router needs the matching

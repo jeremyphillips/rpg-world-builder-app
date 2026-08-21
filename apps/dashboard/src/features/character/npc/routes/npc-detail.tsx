@@ -1,5 +1,5 @@
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { WidePage } from '@/components/layout/page/wide-page'
 
 import { CampaignCharacterStatusSummary } from '../../components/detail/campaign-character-status-summary.client'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content.client'

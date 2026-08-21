@@ -2,8 +2,8 @@
 
 import { Outlet, useParams } from 'react-router-dom'
 
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 
 import { useAdminUser } from '../hooks/use-admin-user'
 import { AdminUserRouteProvider } from '../lib/admin-user-route-context'

@@ -3,8 +3,8 @@ import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { buttonVariants, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 
 import { CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY } from '../lib/onboarding/campaign-onboarding-copy'
 import { useCampaignOnboardingContext } from '../hooks/use-campaign-onboarding-context'

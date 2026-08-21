@@ -1,6 +1,6 @@
-import { PageHeader } from '@/components/layout/page-header'
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageHeader } from './page-header'
+import { PageLoadState } from './page-load-state'
+import { WidePage } from './wide-page'
 
 type OverviewPageShellProps = {
   heading: string

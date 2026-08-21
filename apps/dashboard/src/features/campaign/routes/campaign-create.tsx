@@ -4,7 +4,7 @@ import { Heading, Wizard, type WizardStepDef } from '@rpg/ui'
 import { WizardStepForm } from '@rpg/ui/form'
 
 import { uploadFile } from '@/lib/api-client'
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import {
   createRulesFields,
   createRulesSchema,

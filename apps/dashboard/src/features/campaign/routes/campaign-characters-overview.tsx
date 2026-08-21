@@ -3,7 +3,7 @@ import type { CampaignCharacterListItem } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { OverviewPageShell } from '@/components/layout/overview-page-shell'
+import { OverviewPageShell } from '@/components/layout/page/overview-page-shell'
 import { CharacterListCard } from '@/features/character'
 import { normalizeListController, resolveCharacterControllerDisplay } from '@/features/character'
 

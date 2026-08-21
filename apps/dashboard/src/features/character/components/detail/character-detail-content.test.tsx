@@ -12,7 +12,7 @@ import { buildCharacterDetailViewModel } from '../../lib/display/character-displ
 import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
 import { CharacterDetailContent } from './character-detail-content.client'
 
-vi.mock('@/components/layout/use-breadcrumb-label', () => ({
+vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 

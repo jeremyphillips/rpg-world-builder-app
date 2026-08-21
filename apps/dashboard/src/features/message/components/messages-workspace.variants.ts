@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '@rpg/ui'
 
-import { pageHeaderSectionGapClasses } from '@/components/layout/page-spacing.variants'
+import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
 
 /** Full-height workspace root — fills the app-shell main column. */
 export const messagesWorkspaceRootClasses = 'flex min-h-0 flex-1 flex-col gap-4'

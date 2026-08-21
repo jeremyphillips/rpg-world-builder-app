@@ -1,6 +1,6 @@
 import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 
-import { PageLoadState } from '@/components/layout/page-load-state'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
 
 import { CharacterBuilderShell } from '../components/character-builder-shell.client'
 import { characterBuilderRouteClasses } from '../components/character-builder-shell.variants'

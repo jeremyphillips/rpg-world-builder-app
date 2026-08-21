@@ -3,7 +3,7 @@
 import { Link } from 'react-router-dom'
 import { Text } from '@rpg/ui'
 
-import { IndexPageEmptyState } from '@/components/layout/index-page-intro'
+import { IndexPageEmptyState } from '@/components/layout/page/index-page-intro'
 
 import { MESSAGES_EMPTY_COPY } from '../lib/messages-copy'
 import {

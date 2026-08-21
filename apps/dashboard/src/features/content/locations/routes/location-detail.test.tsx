@@ -15,7 +15,7 @@ const { useCanManageCampaignMock } = vi.hoisted(() => ({
   useCanManageCampaignMock: vi.fn(() => false),
 }))
 
-vi.mock('@/components/layout/use-breadcrumb-label', () => ({
+vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 vi.mock('@/features/campaign', () => ({

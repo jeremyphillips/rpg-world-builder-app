@@ -6,7 +6,7 @@ import type { ContentUsageBlocker } from '@rpg/contracts'
 import { ConfirmDialog } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { useSetBreadcrumbLabel } from '@/components/layout/use-breadcrumb-label'
+import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { ContentDeletionBlockedDialog } from '@/features/content'
 
 import { useDeleteCharacter } from '../../hooks/use-delete-character'

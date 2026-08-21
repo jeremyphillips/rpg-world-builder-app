@@ -2,9 +2,9 @@
 
 import { Button } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
-import { PageHeader } from '@/components/layout/page-header'
-import { pageHeaderSectionGapClasses } from '@/components/layout/page-spacing.variants'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
 
 import { NotificationInboxBody } from '../components/notification-inbox-body.client'
 import { NotificationInboxHeader } from '../components/notification-inbox-header.client'

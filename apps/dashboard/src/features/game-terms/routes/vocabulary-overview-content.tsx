@@ -10,9 +10,9 @@ import {
 } from '@rpg/contracts'
 import { buttonVariants } from '@rpg/ui'
 
-import { PageHeader } from '@/components/layout/page-header'
-import { PageLoadState } from '@/components/layout/page-load-state'
-import { WidePage } from '@/components/layout/wide-page'
+import { PageHeader } from '@/components/layout/page/page-header'
+import { PageLoadState } from '@/components/layout/page/page-load-state'
+import { WidePage } from '@/components/layout/page/wide-page'
 import { useCanManageCampaign } from '@/features/campaign'
 import { notifyVocabularyEntryCreated, notifyVocabularyEntrySaved } from '@/lib/notify'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'

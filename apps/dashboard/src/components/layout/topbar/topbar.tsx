@@ -4,7 +4,7 @@ import { useSession } from '@/features/auth'
 import { GlobalSearchTopbar } from '@/features/global-search'
 import { NotificationBellMenu } from '@/features/notification'
 
-import { appShellHorizontalPaddingClasses } from './app-shell.variants'
+import { appShellHorizontalPaddingClasses } from '@/components/layout/shell/app-shell.variants'
 import { TopbarTitleSlot } from './topbar-title-slot'
 import { TopbarUserMenu } from './topbar-user-menu'
 

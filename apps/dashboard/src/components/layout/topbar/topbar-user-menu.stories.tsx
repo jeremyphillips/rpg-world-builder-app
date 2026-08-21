@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ThemeProvider } from '@rpg/ui'
 
-import { withDashboardProviders } from '../../../.storybook/decorators'
+import { withDashboardProviders } from '../../../../.storybook/decorators'
 
 import { TopbarUserMenu } from './topbar-user-menu'
 

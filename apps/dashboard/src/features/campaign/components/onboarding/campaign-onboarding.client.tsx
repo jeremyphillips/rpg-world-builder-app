@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type { CampaignOnboardingIncompleteContext } from '@rpg/contracts'
 import { Heading, RadioCard, Text } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/narrow-page'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 
 import {
   CAMPAIGN_ONBOARDING_RECONNECT_BODY,

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Card, CardContent, Heading } from '@rpg/ui'
 
-import { narrowPageContentClasses } from '@/components/layout/page-content.variants'
+import { narrowPageContentClasses } from '@/components/layout/page/page-content.variants'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { ContentDetailEditAction } from './content-detail-edit-action'
