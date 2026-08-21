@@ -95,7 +95,7 @@ export type SpellPickerBrowseState = {
 export type SpellPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  className: string
+  characterClassName: string
   cantripChoiceSet?: ChoiceSet
   preparedChoiceSet?: ChoiceSet
   cantripSelectedIds: string[]

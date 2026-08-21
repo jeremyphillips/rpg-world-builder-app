@@ -76,7 +76,7 @@ export function SpellsStepPicker({
       onOpenChange={(open) => {
         if (!open) onClose()
       }}
-      className={className}
+      characterClassName={className}
       cantripChoiceSet={cantripChoiceSet}
       preparedChoiceSet={preparedChoiceSet}
       cantripSelectedIds={draft.choiceSelections[cantripChoiceSet?.id ?? ''] ?? []}

@@ -14,7 +14,7 @@ import {
 import { SPELL_PICKER_MODE_CANTRIPS } from './spell-picker-drawer.types'
 
 const baseArgs = {
-  className: 'Wizard',
+  characterClassName: 'Wizard',
   cantripChoiceSet: spellPickerCantripChoiceSetFixture,
   cantripSelectedIds: [] as string[],
   preparedSelectedIds: [] as string[],

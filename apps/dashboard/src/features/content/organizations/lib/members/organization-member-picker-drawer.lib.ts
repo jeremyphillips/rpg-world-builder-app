@@ -9,13 +9,14 @@ import { chainComparators, compareNumberDescending } from '@rpg/search/ranking'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
 import {
-  buildConnectedPartyCharacterPickerSearchText,
-  type LocationConnectedPartyCharacterOption,
-} from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
-import { compareName, scoreAndFilterPickerItems } from '@/features/character'
+  buildCharacterPickerOptionSearchText,
+  compareName,
+  scoreAndFilterPickerItems,
+  type CharacterPickerOption,
+} from '@/features/character'
 
 /** Campaign PC/NPC option plus whether the character already holds a membership here. */
-export type OrganizationMemberPickerCandidate = LocationConnectedPartyCharacterOption & {
+export type OrganizationMemberPickerCandidate = CharacterPickerOption & {
   isMember: boolean
   /** Existing membership title when isMember is true. */
   membershipTitle?: string
@@ -127,7 +128,7 @@ function scoreOrganizationMemberPickerCandidate(
     {
       fields: [
         {
-          text: buildConnectedPartyCharacterPickerSearchText(candidate),
+          text: buildCharacterPickerOptionSearchText(candidate),
           weight: 1,
           role: 'label',
         },

@@ -4,20 +4,12 @@ import type {
   CharacterBuildCatalogIndex,
 } from '@rpg/contracts'
 
-import {
-  buildCharacterCardViewModel,
-  buildCharacterEntitySummaryVmFromTransport,
-  buildCharacterEntitySummarySearchText,
-} from '@/features/character'
+import { buildCharacterCardViewModel, type CharacterPickerOption } from '@/features/character'
 
-export type LocationConnectedPartyCharacterOption = {
-  id: string
-  name: string
-  summary: string
-  characterType: 'pc' | 'npc'
-  classIds: readonly string[]
-  speciesId?: string
-}
+export type { CharacterPickerOption }
+
+/** Connected-party slotting alias — same transport shape as generic character picker options. */
+export type LocationConnectedPartyCharacterOption = CharacterPickerOption
 
 /** Merges open campaign PCs and NPCs into a sorted lookup for connected-party rows. */
 export function buildLocationConnectedPartyCharactersById(
@@ -47,19 +39,7 @@ export function buildLocationConnectedPartyCharactersById(
   return new Map(entries.map((entry) => [entry.id, entry]))
 }
 
-export function buildConnectedPartyCharacterEntitySummary(
-  option: LocationConnectedPartyCharacterOption,
-) {
-  return buildCharacterEntitySummaryVmFromTransport({
-    id: option.id,
-    name: option.name,
-    summary: option.summary,
-    characterType: option.characterType,
-  })
-}
-
-export function buildConnectedPartyCharacterPickerSearchText(
-  option: LocationConnectedPartyCharacterOption,
-): string {
-  return buildCharacterEntitySummarySearchText(buildConnectedPartyCharacterEntitySummary(option))
-}
+export {
+  buildCharacterPickerOptionEntitySummary as buildConnectedPartyCharacterEntitySummary,
+  buildCharacterPickerOptionSearchText as buildConnectedPartyCharacterPickerSearchText,
+} from '@/features/character'

@@ -27,7 +27,7 @@ function renderCantripDrawer(overrides: Partial<ComponentProps<typeof SpellPicke
     <SpellPickerDrawer
       open
       onOpenChange={vi.fn()}
-      className="Wizard"
+      characterClassName="Wizard"
       cantripChoiceSet={spellPickerCantripChoiceSetFixture}
       cantripSelectedIds={[spellPickerMageHandFixture.id, spellPickerDetectMagicFixture.id]}
       preparedSelectedIds={[]}
@@ -118,7 +118,7 @@ describe('SpellPickerDrawer', () => {
       <SpellPickerDrawer
         open
         onOpenChange={vi.fn()}
-        className="Wizard"
+        characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
         preparedSelectedIds={[]}
@@ -135,7 +135,7 @@ describe('SpellPickerDrawer', () => {
       <SpellPickerDrawer
         open
         onOpenChange={vi.fn()}
-        className="Wizard"
+        characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[spellPickerMageHandFixture.id, spellPickerDetectMagicFixture.id]}
         preparedSelectedIds={[]}
@@ -152,7 +152,7 @@ describe('SpellPickerDrawer', () => {
       <SpellPickerDrawer
         open
         onOpenChange={vi.fn()}
-        className="Wizard"
+        characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
         preparedSelectedIds={[]}
@@ -174,7 +174,7 @@ describe('SpellPickerDrawer', () => {
       <SpellPickerDrawer
         open
         onOpenChange={vi.fn()}
-        className="Wizard"
+        characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
         preparedSelectedIds={[]}
@@ -195,7 +195,7 @@ describe('SpellPickerDrawer', () => {
       <SpellPickerDrawer
         open
         onOpenChange={vi.fn()}
-        className="Wizard"
+        characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[spellPickerMageHandFixture.id]}
         preparedSelectedIds={[]}

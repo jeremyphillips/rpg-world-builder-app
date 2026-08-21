@@ -44,7 +44,7 @@ vi.mock('@/features/character', async (importOriginal) => {
         </span>
       </div>
     ),
-    EditOrganizationMembershipDrawer: () => null,
+    EditOrganizationMembershipDrawer: () => <h2>Edit organization membership</h2>,
   }
 })
 
@@ -173,6 +173,40 @@ describe('OrganizationMembersDetailDrawers', () => {
       contentType: 'npcs',
       id: 'npc-created-1',
     })
+  })
+
+  it('renders the edit membership drawer for the active roster row', () => {
+    renderWithProviders(
+      <OrganizationMembersDetailDrawers
+        organization={organization}
+        detail={createDetail({
+          drawerState: {
+            mode: 'edit',
+            row: {
+              characterId: 'char-1',
+              name: 'Verna',
+              characterType: 'pc',
+              identityLine: 'PC',
+              detailHref: '/campaigns/campaign-test-1/characters/char-1',
+              title: 'Journeyman',
+            },
+          },
+          editingRow: {
+            characterId: 'char-1',
+            name: 'Verna',
+            characterType: 'pc',
+            identityLine: 'PC',
+            detailHref: '/campaigns/campaign-test-1/characters/char-1',
+            title: 'Journeyman',
+          },
+        })}
+      />,
+    )
+
+    expect(
+      screen.getByRole('heading', { name: 'Edit organization membership' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Add member' })).not.toBeInTheDocument()
   })
 
   it('does not render overlays when the viewer cannot manage members', () => {

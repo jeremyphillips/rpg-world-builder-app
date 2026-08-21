@@ -42,7 +42,7 @@ export type { SpellPickerDrawerProps } from './spell-picker-drawer.types'
 export function SpellPickerDrawer({
   open,
   onOpenChange,
-  className,
+  characterClassName,
   cantripChoiceSet,
   preparedChoiceSet,
   cantripSelectedIds,
@@ -118,7 +118,11 @@ export function SpellPickerDrawer({
         <SpellPickerSelectionSummary
           complete={selectionComplete}
           countText={formatSpellPickerSelectionCountText(activeSelectedIds.length, selectionLimit)}
-          metadata={formatSpellPickerSelectionMetadata(mode, className, activePreparedLevel)}
+          metadata={formatSpellPickerSelectionMetadata(
+            mode,
+            characterClassName,
+            activePreparedLevel,
+          )}
         />
       }
       recommendationsEnabled={recommendationsEnabled}

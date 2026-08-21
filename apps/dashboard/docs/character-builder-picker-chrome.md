@@ -92,7 +92,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 | Structured filters          | Kind + affordable toggles         | School, level, mechanics | —                     | Equipment ↔ Spells pattern only                                  |
 | Sort                        | `CatalogSortControl`              | Wrapped sort control     | `CatalogSortControl`  | `CatalogSortControl` + sort mode constants                       |
 | Reset view / clear          | Dual-mode (clear vs reset)        | Reset slot               | Reset slot            | `catalog-picker-filter-state.lib.ts`, `CatalogToolbarResetSlot`  |
-| Empty state panel           | Sheet defaults                    | Custom message           | Custom message        | **`CatalogPickerResultsState`**                                  |
+| Empty state panel           | Sheet defaults                    | Custom message           | Custom message        | **`CatalogPickerResultsState`** (spells/proficiencies only)      |
 | Row add/remove              | Commerce / acquisition rail       | Selection actions        | Selection actions     | Spells ↔ Proficiencies: **`CatalogPickerSelectionActions`**      |
 | Row dimming / disabled note | Domain-specific (affordability)   | Shared resolver state    | Shared resolver state | **`picker/row/catalog-picker-row-state.lib.ts`**                 |
 | Empty-state kind/message    | —                                 | Choice-set driven        | Choice-set driven     | **`picker/results/catalog-picker-empty-state.lib.ts`**           |
@@ -190,6 +190,6 @@ Controller tests encode these rules directly.
 
 ## Follow-up
 
-- Align equipment empty-state messaging with `CatalogPickerResultsState` when product copy is defined
+- Equipment intentionally keeps `CatalogPickerSheet` default empty states — its loading/filtered-result lifecycle differs from spell/proficiency choice-set empty kinds (`no-options` / `selection-full`); do not adopt `CatalogPickerResultsState` for visual parity alone
 - Wean equipment acquisition panel VM off `CharacterBuilderDraft` (shared with inventory manage)
 - Wire spell `recommendationsEnabled` when resolver/product work lands

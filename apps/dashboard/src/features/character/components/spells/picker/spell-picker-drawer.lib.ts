@@ -176,13 +176,13 @@ export function formatSpellPickerSelectionCountText(selectedCount: number, max: 
 
 export function formatSpellPickerSelectionMetadata(
   mode: SpellPickerMode,
-  className: string,
+  characterClassName: string,
   activePreparedLevel?: number,
 ): string {
   if (mode === SPELL_PICKER_MODE_CANTRIPS) {
-    return `${className} cantrips`
+    return `${characterClassName} cantrips`
   }
-  const base = `${className} spells`
+  const base = `${characterClassName} spells`
   if (activePreparedLevel === undefined) return base
   return `${base} · ${formatSpellLevel(activePreparedLevel)} level`
 }

@@ -125,6 +125,11 @@ export {
   type CharacterCardViewModel,
   type CharacterEntitySummaryVm,
 } from './lib/display/character-display'
+export {
+  buildCharacterPickerOptionEntitySummary,
+  buildCharacterPickerOptionSearchText,
+  type CharacterPickerOption,
+} from './lib/picker/character-picker-option.lib'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
 export { formatContentReferenceLabel } from './lib/display/format-content-reference-label'
 export {
