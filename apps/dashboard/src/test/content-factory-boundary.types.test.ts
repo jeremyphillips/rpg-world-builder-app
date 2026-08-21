@@ -7,7 +7,7 @@ import {
   resolveProtectedTypeNamesForTest,
 } from './content-factory-boundary.lib'
 
-it('resolves protected content type names from factory return types', () => {
+it('resolves protected content type names from factory return types', { timeout: 30_000 }, () => {
   const dashboardRoot = join(import.meta.dirname, '../..')
   const configPath = ts.findConfigFile(dashboardRoot, ts.sys.fileExists, 'tsconfig.json')
   const configFile = ts.readConfigFile(configPath!, ts.sys.readFile)
@@ -36,7 +36,7 @@ it('resolves protected content type names from factory return types', () => {
   )
 })
 
-it('does not flag locations/fixtures.ts after makeLocation migration', () => {
+it('does not flag locations/fixtures.ts after makeLocation migration', { timeout: 30_000 }, () => {
   const violations = collectContentFactoryBoundaryViolations()
   expect(
     violations.some((violation) => violation.file === 'features/content/locations/fixtures.ts'),

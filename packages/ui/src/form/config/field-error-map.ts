@@ -1,11 +1,8 @@
 import { fieldValidationMessages, midSentenceLabel, singularizeLabel } from '@rpg/contracts'
 
-import type { FieldConfig, FormItem } from '../field-config'
-import { arrayItemLabel } from './array/array-item-label.lib'
-import { fieldCategory } from './field-error-map-category.lib'
-import { registerFieldPaths, type RegistryEntry } from './field-error-map-register.lib'
-import { resolveArrayItemHeader } from './array/array-item-config.lib'
-import { resolveArrayHeading } from '../resolve-container-heading.lib'
+import type { FormItem } from '../field-config'
+import type { RegistryEntry } from './field-error-map-register.lib'
+import { registerFormItems } from './field-error-map-register-items.lib'
 
 // ---------------------------------------------------------------------------
 // Field-aware Zod error map (tier 1 of the validation-message architecture).
@@ -33,51 +30,10 @@ export interface RawZodIssueLike {
   maximum?: number | bigint
 }
 
-function registerField(
-  registry: Map<string, RegistryEntry>,
-  prefix: string,
-  field: FieldConfig,
-): void {
-  registerFieldPaths(registry, prefix, field, fieldCategory(field))
-}
-
-function registerItems(
-  registry: Map<string, RegistryEntry>,
-  prefix: string,
-  items: FormItem[],
-): void {
-  for (const item of items) {
-    if (!('kind' in item)) {
-      registerField(registry, prefix, item)
-    } else if (item.kind === 'array') {
-      const arrayKey = prefix ? `${prefix}.${item.name}` : item.name
-      const arrayLabel = resolveArrayHeading(item)?.label ?? item.legend ?? item.name
-      const header = resolveArrayItemHeader(item, arrayLabel)
-      registry.set(arrayKey, {
-        label: arrayLabel,
-        category: 'array',
-        itemLabel: arrayItemLabel(header, arrayLabel),
-      })
-      registerItems(registry, `${arrayKey}.*`, item.fields)
-    } else if (item.kind === 'slot') {
-      const slotKey = prefix ? `${prefix}.${item.name}` : item.name
-      registry.set(slotKey, {
-        label: item.label ?? item.name,
-        category: 'text',
-      })
-    } else if (item.kind === 'dependent') {
-      registerItems(registry, prefix, [item.controller])
-      registerItems(registry, prefix, item.dependents.fields as FormItem[])
-    } else if (item.kind === 'group' || item.kind === 'row') {
-      registerItems(registry, prefix, item.fields as FormItem[])
-    }
-  }
-}
-
 /** Field lookup keyed by dot-joined path with array indices normalized to `*`. */
 export function buildFieldRegistry(items: FormItem[]): Map<string, RegistryEntry> {
   const registry = new Map<string, RegistryEntry>()
-  registerItems(registry, '', items)
+  registerFormItems(registry, '', items)
   return registry
 }
 

@@ -7,8 +7,8 @@ import {
   EditOrganizationMembershipDrawer,
   formatRemoveMembershipHeadline,
   QuickNpcCreateModal,
+  type EditOrganizationMembershipOrganization,
 } from '@/features/character'
-import type { EditOrganizationMembershipOrganization } from '@/features/character/components/connections/edit-organization-membership-drawer.types'
 
 import type { useOrganizationMembersDetail } from '../../hooks/use-organization-members-detail.client'
 import { ORGANIZATION_ROSTER_EDIT_MEMBERSHIP_COPY } from '../../lib/members/organization-members.constants'

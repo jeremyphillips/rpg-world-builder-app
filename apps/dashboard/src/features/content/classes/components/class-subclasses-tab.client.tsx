@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { useState } from 'react'
 import { useWatch } from 'react-hook-form'
 import { ConfirmDialog } from '@rpg/ui'
@@ -72,6 +73,104 @@ function useSubclassTabData(
   return {
     subclasses: subclassesOverride ?? query.data ?? EMPTY_SUBCLASSES,
     isPending: subclassesOverride ? false : query.isPending,
+  }
+}
+
+type ClassSubclassesTabGateState = {
+  kind: 'gate'
+  element: React.ReactElement
+}
+
+type ClassSubclassesTabBodyState = {
+  kind: 'body'
+  campaignId: string
+  classId: string
+  formCtx: ContentFormCtx
+  editor: ReturnType<typeof useSubclassEditorState>
+  defaultFeatureLevel: number
+  usageSummaryLabels?: ContentUsageSummaryLabels
+}
+
+type ClassSubclassesTabState = ClassSubclassesTabGateState | ClassSubclassesTabBodyState
+
+function resolveSubclassUsageMetaQuery(
+  mode: ClassSubclassesTabProps['mode'],
+  campaignId?: string,
+  classId?: string,
+) {
+  const enabled = mode === 'edit' && Boolean(campaignId) && Boolean(classId)
+  return {
+    campaignId: enabled ? campaignId : undefined,
+    classId: enabled ? classId : undefined,
+  }
+}
+
+function resolveSubclassTabGate({
+  mode,
+  campaignId,
+  classId,
+  subclassChoiceFeature,
+  isPending,
+}: {
+  mode: ClassSubclassesTabProps['mode']
+  campaignId?: string
+  classId?: string
+  subclassChoiceFeature: FeatureRowForm | undefined
+  isPending: boolean
+}): React.ReactElement | null {
+  if (mode === 'create' || !campaignId || !classId) {
+    return <SubclassCreateGate />
+  }
+  if (!subclassChoiceFeature) {
+    return <SubclassChoiceLevelGate />
+  }
+  if (isPending) {
+    return <SubclassLoadingGate />
+  }
+  return null
+}
+
+function useClassSubclassesTabState({
+  campaignId,
+  classId,
+  mode = 'create',
+  formCtx = {},
+  subclassesOverride,
+}: ClassSubclassesTabProps): ClassSubclassesTabState {
+  const features = useWatch({ name: 'features' }) as FeatureRowForm[] | undefined
+  const subclassChoiceFeature = features?.find(isSubclassChoiceFeatureRow)
+  const { subclasses, isPending } = useSubclassTabData(
+    mode,
+    campaignId,
+    classId,
+    subclassesOverride,
+  )
+  const usageMetaQuery = resolveSubclassUsageMetaQuery(mode, campaignId, classId)
+  const { data: usageMeta } = useSubclassesUsageMeta(
+    usageMetaQuery.campaignId,
+    usageMetaQuery.classId,
+  )
+  const editor = useSubclassEditorState(classId, subclasses)
+
+  const gate = resolveSubclassTabGate({
+    mode,
+    campaignId,
+    classId,
+    subclassChoiceFeature,
+    isPending,
+  })
+  if (gate) {
+    return { kind: 'gate', element: gate }
+  }
+
+  return {
+    kind: 'body',
+    campaignId: campaignId!,
+    classId: classId!,
+    formCtx,
+    editor,
+    defaultFeatureLevel: Number(subclassChoiceFeature!.level),
+    usageSummaryLabels: usageMeta?.usageSummaryLabels,
   }
 }
 
@@ -439,48 +538,22 @@ function ClassSubclassesTabBody({
   )
 }
 
-export function ClassSubclassesTab({
-  campaignId,
-  classId,
-  mode = 'create',
-  formCtx = {},
-  subclassesOverride,
-}: ClassSubclassesTabProps) {
-  const features = useWatch({ name: 'features' }) as FeatureRowForm[] | undefined
-  const subclassChoiceFeature = features?.find(isSubclassChoiceFeatureRow)
-  const { subclasses, isPending } = useSubclassTabData(
-    mode,
-    campaignId,
-    classId,
-    subclassesOverride,
-  )
-  const { data: usageMeta } = useSubclassesUsageMeta(
-    mode === 'edit' && campaignId && classId ? campaignId : undefined,
-    mode === 'edit' && campaignId && classId ? classId : undefined,
-  )
-  const editor = useSubclassEditorState(classId, subclasses)
+export function ClassSubclassesTab(props: ClassSubclassesTabProps) {
+  const state = useClassSubclassesTabState(props)
 
-  if (mode === 'create' || !campaignId || !classId) {
-    return <SubclassCreateGate />
-  }
-
-  if (!subclassChoiceFeature) {
-    return <SubclassChoiceLevelGate />
-  }
-
-  if (isPending) {
-    return <SubclassLoadingGate />
+  if (state.kind === 'gate') {
+    return state.element
   }
 
   return (
     <CampaignAccessFormProvider>
       <ClassSubclassesTabBody
-        campaignId={campaignId}
-        classId={classId}
-        formCtx={formCtx}
-        editor={editor}
-        defaultFeatureLevel={Number(subclassChoiceFeature.level)}
-        usageSummaryLabels={usageMeta?.usageSummaryLabels}
+        campaignId={state.campaignId}
+        classId={state.classId}
+        formCtx={state.formCtx}
+        editor={state.editor}
+        defaultFeatureLevel={state.defaultFeatureLevel}
+        usageSummaryLabels={state.usageSummaryLabels}
       />
     </CampaignAccessFormProvider>
   )

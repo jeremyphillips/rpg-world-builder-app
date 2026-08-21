@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
-import { createCampaignNpcBuilderContextFixture } from '@/features/character/lib/fixtures/character-builder-fixtures'
+import { createCampaignNpcBuilderContextFixture } from '@/features/character'
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { makeSpecies } from '@/test/fixtures/factories/species'
 

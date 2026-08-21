@@ -106,7 +106,9 @@ function QuickNpcCreateModalSession({
   const [authoringPending, setAuthoringPending] = React.useState(false)
   const pendingSetupSummaryEditRef = React.useRef<SetupSummaryEditTarget | null>(null)
   const setupValuesRef = React.useRef(state.setupValues)
-  setupValuesRef.current = state.setupValues
+  React.useEffect(() => {
+    setupValuesRef.current = state.setupValues
+  }, [state.setupValues])
   const { trustedClose } = usePendingAwareOpenChange({
     pending: authoringPending,
     onOpenChange,

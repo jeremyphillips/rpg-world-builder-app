@@ -7,7 +7,6 @@ import { useSanitizedFilterState } from '@rpg/ui/filters'
 
 import { hasCatalogPickerResetViewCriteria } from '../picker/catalog-picker-filter-state.lib'
 import {
-  createBrowseStateByMode,
   resolveModeBrowseState,
   updateModeBrowseState,
 } from '../picker/catalog-picker-browse-mode.lib'
@@ -31,7 +30,6 @@ import {
   getSpellPickerDisabledNote,
   itemsForSpellPickerMode,
   resolveActivePreparedLevelSuffix,
-  resolveInitialSpellPickerMode,
   resolveSpellPickerEmptyStateKind,
   resolveSpellPickerEmptyStateMessage,
   resolveValidSpellPickerSortModes,
@@ -63,6 +61,7 @@ import {
   SpellPickerPrimaryFilterControls,
   SpellPickerSortControl,
 } from './spell-picker-toolbar.client'
+import { useSpellPickerDrawerOpenSync } from './use-spell-picker-drawer-open-sync.client'
 
 export type { SpellPickerDrawerProps } from './spell-picker-drawer.types'
 
@@ -86,45 +85,21 @@ export function SpellPickerDrawer({
     () => resolveSpellPickerModes({ cantripChoiceSet, preparedChoiceSet }),
     [cantripChoiceSet, preparedChoiceSet],
   )
-  const [mode, setMode] = React.useState<SpellPickerMode>(() =>
-    resolveInitialSpellPickerMode(modes, initialMode),
-  )
-  const [browseBuckets, setBrowseBuckets] = React.useState(() =>
-    createBrowseStateByMode(modes, (entry) =>
-      createDefaultSpellPickerBrowseState(entry, recommendationsEnabled),
-    ),
-  )
-  const [browseState, setBrowseState] = React.useState<SpellPickerBrowseState>(() =>
-    createDefaultSpellPickerBrowseState(
-      resolveInitialSpellPickerMode(modes, initialMode),
-      recommendationsEnabled,
-    ),
-  )
-  const [openSyncKey, setOpenSyncKey] = React.useState(0)
+  const {
+    browseBuckets,
+    browseState,
+    mode,
+    openSyncKey,
+    setBrowseBuckets,
+    setBrowseState,
+    setMode,
+  } = useSpellPickerDrawerOpenSync({
+    open,
+    initialMode,
+    modes,
+    recommendationsEnabled,
+  })
   const sheetStateRef = React.useRef({ searchQuery: '', activeTabId: '' })
-  const openBrowseSyncKey = open
-    ? `${String(initialMode)}:${modes.join(',')}:${recommendationsEnabled}`
-    : 'closed'
-  const [trackedOpenBrowseSyncKey, setTrackedOpenBrowseSyncKey] = React.useState(openBrowseSyncKey)
-
-  if (open && openBrowseSyncKey !== trackedOpenBrowseSyncKey) {
-    setTrackedOpenBrowseSyncKey(openBrowseSyncKey)
-    const nextMode = resolveInitialSpellPickerMode(modes, initialMode)
-    setMode(nextMode)
-    const resolved = resolveModeBrowseState(browseBuckets, nextMode, (entry) =>
-      createDefaultSpellPickerBrowseState(entry, recommendationsEnabled),
-    )
-    if (resolved.initialized) setBrowseBuckets(resolved.buckets)
-    const sanitized = sanitizeSpellPickerBrowseState(
-      nextMode,
-      resolved.state,
-      recommendationsEnabled,
-    )
-    setBrowseState(sanitized)
-    setOpenSyncKey((current) => current + 1)
-  } else if (!open && trackedOpenBrowseSyncKey !== 'closed') {
-    setTrackedOpenBrowseSyncKey('closed')
-  }
 
   const activeChoiceSet = choiceSetForSpellPickerMode(mode, cantripChoiceSet, preparedChoiceSet)
   const activeSelectedIds = selectedIdsForSpellPickerMode(
