@@ -166,8 +166,8 @@ Shared dashboard extractions (dual consumers — content + vocabulary):
 | --------------------------- | ------------------------------------------------------------------ |
 | Unavailable row chrome      | `@/lib/overview/overview-unavailable-chrome.ts`                    |
 | Availability filter field   | `@/lib/overview/create-campaign-availability-filter-field.ts`      |
-| Bulk actions menu shell     | `@/lib/overview/overview-bulk-actions-menu.client.tsx`             |
-| Usage blocked list          | `@/lib/usage-blocked/usage-blocked-list.client.tsx`                |
+| Bulk actions menu shell     | `@/lib/overview/overview-bulk-actions-menu.tsx`                    |
+| Usage blocked list          | `@/lib/usage-blocked/usage-blocked-list.tsx`                       |
 | Campaign availability field | `@/lib/campaign-availability/campaign-availability-form-fields.ts` |
 | Usage reference primitives  | `@/lib/usage-references/*`                                         |
 

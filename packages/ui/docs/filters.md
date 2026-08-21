@@ -428,7 +428,7 @@ or behavior.
 ### Active chips in feature pages
 
 Dashboard list surfaces compose `PrimaryFilterPanel` from
-`apps/dashboard/src/lib/data-table/primary-filter-bar-region.client.tsx`:
+`apps/dashboard/src/lib/data-table/primary-filter-bar-region.tsx`:
 
 ```tsx
 <PrimaryFilterPanel

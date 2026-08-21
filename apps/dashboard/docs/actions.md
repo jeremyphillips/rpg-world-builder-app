@@ -59,7 +59,7 @@ cycle at the module level:
 
 - `dialog/action-dialog-shell` → `resolution/action-target-resolution-list`
 - `resolution/action-resolution-row-detail` → `blocker/action-blocker-references`
-- `blocker/action-blocked-dialog` → `dialog/action-dialog-shell.lib` (constants only — not `shell.client`)
+- `blocker/action-blocked-dialog` → `dialog/action-dialog-shell.lib` (constants only — not `action-dialog-shell.tsx`)
 
 Resolution does not import dialog; the cycle breaks at `shell.lib`.
 

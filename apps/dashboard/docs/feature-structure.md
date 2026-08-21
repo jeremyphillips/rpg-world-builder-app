@@ -49,10 +49,21 @@ Full splitting map → [code-splitting.md](./code-splitting.md).
 
 ### `components/`
 
+**Naming SSOT** for dashboard modules — also summarized in
+[feature-conventions.md § Component naming](./feature-conventions.md#component-naming).
+
 Components and hooks use `<name>.tsx` / `<name>.ts` — no `.client` suffix and no
 `'use client'` directive. The dashboard is a client-rendered Vite SPA; unlike
 Next.js apps in this monorepo, filename suffixes do not mark a server/client
 boundary here.
+
+| Artifact            | Pattern              |
+| ------------------- | -------------------- |
+| Component / surface | `<name>.tsx`         |
+| Hook                | `use-<name>.ts`      |
+| Variants            | `<name>.variants.ts` |
+| Story               | `<name>.stories.tsx` |
+| Test                | `<name>.test.tsx`    |
 
 Every component gets co-located `*.stories.tsx` (CSF3); logic-bearing or
 interactive components also get `*.test.tsx`.

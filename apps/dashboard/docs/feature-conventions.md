@@ -30,6 +30,16 @@ modules in the entry chunk and defeat code splitting. See
 [code-splitting.md](./code-splitting.md) for the full splitting map and rules
 for adding routes.
 
+## Component naming
+
+Dashboard modules use plain `<name>.tsx` / `<name>.ts` — no `.client` suffix, no
+`'use client'` directive. Co-located `*.variants.ts`, `*.stories.tsx`, and
+`*.test.tsx` follow the same base name.
+
+`@rpg/ui` and `apps/public` (Next.js) retain `<name>.client.tsx` + `'use client'`
+for interactive surfaces. Artifact table and hooks rules →
+[feature-structure.md § components](./feature-structure.md#components).
+
 See the implemented [`auth`](../src/features/auth) feature for a worked example.
 
 ## Boundary rule
