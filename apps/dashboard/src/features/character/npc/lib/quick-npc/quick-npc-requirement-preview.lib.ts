@@ -1,5 +1,5 @@
-import type { EquipmentPickerCallout } from '../../../components/equipment/equipment-picker-drawer.types'
-import { getEquipmentPickerCallout } from '../../../components/equipment/equipment-picker-callout.lib'
+import type { EquipmentPickerCallout } from '../../../components/equipment/picker/equipment-picker-drawer.types'
+import { getEquipmentPickerCallout } from '../../../components/equipment/picker/equipment-picker-callout.lib'
 import {
   formatCatalogPickerMetadataLines,
   mapEquipmentCompactSummaryToMetadataLines,

@@ -34,8 +34,8 @@ import {
   EQUIPMENT_STEP_BROWSE_LABEL,
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
 } from '../../lib/equipment/equipment-step.lib'
-import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/equipment-picker-drawer.types'
-import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../equipment/equipment-picker-purchase.lib'
+import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../equipment/picker/equipment-picker-drawer.types'
+import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../equipment/picker/equipment-picker-purchase.lib'
 import { EquipmentStep } from './equipment-step.client'
 
 const context = createStandaloneBuilderContextFixture({

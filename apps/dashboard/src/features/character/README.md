@@ -47,6 +47,23 @@ catalog/filter logic lives in `lib/detail/`; view models in `lib/display/`.
 Builder `equipment/`, `spells/`, and `connections/` folders are separate
 lifecycles — detail tabs and membership composition stay here.
 
+## `components/equipment/` layout
+
+Builder equipment acquisition UI — catalog drawer, step inventory, acquisition
+panel, starting package, and package-switch modal. Shared catalog chrome lives in
+`components/picker/` (not here).
+
+| Subfolder           | Responsibility                                              |
+| ------------------- | ----------------------------------------------------------- |
+| `picker/`           | Equipment picker drawer, budget header, purchase/grant rows |
+| `inventory/`        | Step inventory columns, rows, manage panel, summary VM      |
+| `acquisition/`      | Acquisition panel, guidance, commit labels                  |
+| `starting-package/` | Starting-equipment option cards, package card, toolbar      |
+| `package-switch/`   | Package-switch resolution modal and conversion editor       |
+
+Co-located `*.lib.ts` view models stay beside their surface per
+[feature-structure.md § Character builder co-location](../../docs/feature-structure.md#character-builder-co-located-lib-modules).
+
 ## `npc/` sub-feature
 
 Campaign-scoped NPC roster, Quick NPC nested create, bulk roster status, and thin

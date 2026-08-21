@@ -8,11 +8,11 @@ Resolver catalog: [character-builder-resolvers.md](../../../packages/contracts/d
 
 ## Drawer entry points
 
-| Domain        | Drawer                                                          | Lib                                |
-| ------------- | --------------------------------------------------------------- | ---------------------------------- |
-| Equipment     | `components/equipment/equipment-picker-drawer.client.tsx`       | `equipment-picker-drawer.lib.ts`   |
-| Spells        | `components/spells/spell-picker-drawer.client.tsx`              | `spell-picker-drawer.lib.ts`       |
-| Proficiencies | `components/proficiencies/proficiency-picker-drawer.client.tsx` | `proficiency-picker-drawer.lib.ts` |
+| Domain        | Drawer                                                           | Lib                                |
+| ------------- | ---------------------------------------------------------------- | ---------------------------------- |
+| Equipment     | `components/equipment/picker/equipment-picker-drawer.client.tsx` | `equipment-picker-drawer.lib.ts`   |
+| Spells        | `components/spells/spell-picker-drawer.client.tsx`               | `spell-picker-drawer.lib.ts`       |
+| Proficiencies | `components/proficiencies/proficiency-picker-drawer.client.tsx`  | `proficiency-picker-drawer.lib.ts` |
 
 All three are thin wrappers over `@rpg/ui` **`CatalogPickerSheet`**, spreading
 `catalogPickerShellProps()` from `components/picker/catalog-picker-shell.lib.ts`.

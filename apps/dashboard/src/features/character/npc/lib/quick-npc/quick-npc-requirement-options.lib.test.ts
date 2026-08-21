@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../../components/equipment/equipment-picker-drawer.types'
+import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../../components/equipment/picker/equipment-picker-drawer.types'
 import {
   createEquipmentStepContextFixture,
   equipmentStepBardClassFixture,
@@ -19,7 +19,7 @@ import {
   resolveQuickNpcWeaponRequirementOptions,
 } from './quick-npc-requirement-options.lib'
 import { quickNpcMemberSetupWithNoTitle } from './quick-npc-test-fixtures'
-import { getEquipmentPickerCallout } from '../../../components/equipment/equipment-picker-callout.lib'
+import { getEquipmentPickerCallout } from '../../../components/equipment/picker/equipment-picker-callout.lib'
 
 const setup = quickNpcMemberSetupWithNoTitle({
   speciesId: 'species-1',

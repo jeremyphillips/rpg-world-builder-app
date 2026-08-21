@@ -45,9 +45,9 @@ import {
 import { useEquipmentMagicItemWorkflow } from './use-equipment-magic-item-workflow.client'
 import { withChoiceSetSelections } from '../lib/choice-sets/choice-set-selections'
 import { resolveEquipmentStepSurface } from '../lib/equipment/resolve-equipment-step-surface.lib'
-import { resolveEquipmentPickerCharacterPreviewContext } from '../components/equipment/equipment-picker-character-preview.lib'
-import { resolvePackageSwitchCommitErrorFromIssues } from '../components/equipment/equipment-package-switch-resolution.lib'
-import type { EquipmentPickerDrawer } from '../components/equipment/equipment-picker-drawer.client'
+import { resolveEquipmentPickerCharacterPreviewContext } from '../components/equipment/picker/equipment-picker-character-preview.lib'
+import { resolvePackageSwitchCommitErrorFromIssues } from '../components/equipment/package-switch/equipment-package-switch-resolution.lib'
+import type { EquipmentPickerDrawer } from '../components/equipment/picker/equipment-picker-drawer.client'
 import type { EquipmentStepInventorySectionProps } from '../components/steps/equipment-step-sections.client'
 
 type PendingEquipmentSelection = {

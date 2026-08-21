@@ -1,5 +1,5 @@
 import { EQUIPMENT_ACQUISITION_ADDING_LABEL } from '../../lib/equipment/equipment-step.lib'
-import { formatAcquisitionCommitSuccessButtonLabel } from '../equipment/equipment-acquisition-panel.lib'
+import { formatAcquisitionCommitSuccessButtonLabel } from '../equipment/acquisition/equipment-acquisition-panel.lib'
 
 import { CATALOG_PICKER_ADDED_LABEL } from './use-catalog-picker-commit-confirmation.client'
 

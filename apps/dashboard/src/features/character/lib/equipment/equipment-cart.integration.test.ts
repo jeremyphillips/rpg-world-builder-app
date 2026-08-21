@@ -12,7 +12,7 @@ import {
   startingEquipmentChoiceSetId,
 } from '@rpg/contracts'
 
-import { buildEquipmentInventoryViewModel } from '../../components/equipment/equipment-inventory-summary.lib'
+import { buildEquipmentInventoryViewModel } from '../../components/equipment/inventory/equipment-inventory-summary.lib'
 import {
   createEquipmentStepContextWithMagicItemGrantsFixture,
   equipmentStepBattleaxeFixture,

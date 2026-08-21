@@ -84,21 +84,21 @@ Cross-type helpers live under `src/features/content/lib/` in concern subfolders
 (mirror `equipment/lib/shared/`). Sub-area `lib/` keeps per-type form and table
 config; parent `lib/` is the shared layer only.
 
-| Subfolder                                        | Responsibility                                                                                                                                                              |
-| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `fixtures/`                                      | Story/test IDs and `pick*()` catalog helpers                                                                                                                                |
+| Subfolder                                        | Responsibility                                                                                                                                                                                                                    |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fixtures/`                                      | Story/test IDs and `pick*()` catalog helpers                                                                                                                                                                                      |
 | `forms/`                                         | Cross-type form infra — `registry/`, `validation/`, `fields/`, `mechanics/`, `grants/` (+ `equipment/`, `proficiency/`), `shells/` (+ lifecycle subfolders); see [`forms/README.md`](../src/features/content/lib/forms/README.md) |
-| `form-options/`                                  | Cross-type select options (levels, rich-text link targets)                                                                                                                  |
-| `overview/`                                      | List route shell, table column/filter builders, source badge; hooks in `overview/hooks/`                                                                                    |
-| `detail/`                                        | Catalog detail pages (`page/`), hero metadata (`metadata/`), section chrome (`section/`), row chrome (`row/`)                                                               |
-| `master-detail/`                                 | Embedded array editor hooks, row meta, campaign availability, validation                                                                                                    |
-| `list/`                                          | Content list API/query factories, client, mutation hooks                                                                                                                    |
-| `entity/`                                        | Entity anatomy stack; surface splits in `catalog/`, `disclosure/` — see [content-entity-card.md](./content-entity-card.md)                                                  |
-| `relationship/`                                  | Cross-content relationship presentation; `drawer/`, `list/`, `picker/`, `location-connection/` — see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md) |
-| `campaign-access/`                               | Campaign availability form, bulk actions, overview row chrome in `overview/` — see [campaign-access README](../src/features/content/lib/campaign-access/README.md)          |
-| `entity-replacement/`                            | Shared Current→New chrome for relationship drawers                                                                                                                          |
-| `delete/`, `demotion/`, `duplication/`, `usage/` | Content lifecycle dialogs and helpers                                                                                                                                       |
-| `utils/`                                         | Small shared helpers (e.g. `title-case`, `sortable-array-move`)                                                                                                             |
+| `form-options/`                                  | Cross-type select options (levels, rich-text link targets)                                                                                                                                                                        |
+| `overview/`                                      | List route shell, table column/filter builders, source badge; hooks in `overview/hooks/`                                                                                                                                          |
+| `detail/`                                        | Catalog detail pages (`page/`), hero metadata (`metadata/`), section chrome (`section/`), row chrome (`row/`)                                                                                                                     |
+| `master-detail/`                                 | Embedded array editor hooks, row meta, campaign availability, validation                                                                                                                                                          |
+| `list/`                                          | Content list API/query factories, client, mutation hooks                                                                                                                                                                          |
+| `entity/`                                        | Entity anatomy stack; surface splits in `catalog/`, `disclosure/` — see [content-entity-card.md](./content-entity-card.md)                                                                                                        |
+| `relationship/`                                  | Cross-content relationship presentation; `drawer/`, `list/`, `picker/`, `location-connection/` — see [cross-content-relationship-ui.md](./cross-content-relationship-ui.md)                                                       |
+| `campaign-access/`                               | Campaign availability form, bulk actions, overview row chrome in `overview/` — see [campaign-access README](../src/features/content/lib/campaign-access/README.md)                                                                |
+| `entity-replacement/`                            | Shared Current→New chrome for relationship drawers                                                                                                                                                                                |
+| `delete/`, `demotion/`, `duplication/`, `usage/` | Content lifecycle dialogs and helpers                                                                                                                                                                                             |
+| `utils/`                                         | Small shared helpers (e.g. `title-case`, `sortable-array-move`)                                                                                                                                                                   |
 
 Interactive widgets (master-detail panels) stay in `content/components/`; feat
 prerequisite editing lives under `feats/components/`.
@@ -174,12 +174,12 @@ formatting, UI state reducers). Move to `character/lib/<concern>/` only when the
 module is reused across components, imported outside the subtree, or is an
 independently testable view-model seam.
 
-| Location                            | Keep co-located when…                           |
-| ----------------------------------- | ----------------------------------------------- |
-| `components/picker/*.lib.ts`        | Shared picker chrome (search/sort/filter shell) |
-| `components/equipment/*.lib.ts`     | Drawer/inventory/modal view models              |
-| `components/spells/*.lib.ts`        | Spell drawer-only helpers                       |
-| `components/proficiencies/*.lib.ts` | Proficiency drawer-only helpers                 |
+| Location                            | Keep co-located when…                                      |
+| ----------------------------------- | ---------------------------------------------------------- |
+| `components/picker/*.lib.ts`        | Shared picker chrome (search/sort/filter shell)            |
+| `components/equipment/*/*.lib.ts`   | Drawer/inventory/modal view models (per surface subfolder) |
+| `components/spells/*.lib.ts`        | Spell drawer-only helpers                                  |
+| `components/proficiencies/*.lib.ts` | Proficiency drawer-only helpers                            |
 
 Step orchestration hooks belong in `character/hooks/` (`use-*-step.client.ts`), not
 under `components/steps/`.

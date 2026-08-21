@@ -16,7 +16,7 @@ import {
 import { makeClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
-import { buildEquipmentInventoryLayout } from '../../components/equipment/equipment-inventory-summary.lib'
+import { buildEquipmentInventoryLayout } from '../../components/equipment/inventory/equipment-inventory-summary.lib'
 import {
   isUniqueEquipmentOwnedInDraft,
   listEquipmentInventoryRowsFromDraft,

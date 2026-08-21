@@ -18,8 +18,8 @@ import {
   resolveEquipmentAcquisitionContext,
   type EquipmentPickerWorkflowMode,
 } from '../lib/equipment/equipment-step.lib'
-import { buildEquipmentPickerRowActionViewModel } from '../components/equipment/equipment-picker-action.lib'
-import type { EquipmentPickerDrawer } from '../components/equipment/equipment-picker-drawer.client'
+import { buildEquipmentPickerRowActionViewModel } from '../components/equipment/picker/equipment-picker-action.lib'
+import type { EquipmentPickerDrawer } from '../components/equipment/picker/equipment-picker-drawer.client'
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 
 export function useEquipmentPickerAcquisition(args: {

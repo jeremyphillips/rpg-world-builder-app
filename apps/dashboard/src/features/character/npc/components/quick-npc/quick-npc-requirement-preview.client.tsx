@@ -2,8 +2,8 @@
 
 import { EntityItem, type EntityItemTrailing } from '@/features/content'
 
-import { mapEquipmentCalloutToStatusItem } from '../../../components/equipment/equipment-picker-callout-presentation.lib'
-import type { EquipmentPickerCallout } from '../../../components/equipment/equipment-picker-drawer.types'
+import { mapEquipmentCalloutToStatusItem } from '../../../components/equipment/picker/equipment-picker-callout-presentation.lib'
+import type { EquipmentPickerCallout } from '../../../components/equipment/picker/equipment-picker-drawer.types'
 
 import {
   projectSpellRequirementPreview,
