@@ -35,15 +35,19 @@ components/create/
 components/members/
   OrganizationMembersDetailSection
   ├── OrganizationMembersSection
+  │     └── DetailCollectionPanel → RelationshipList (relationship body)
   └── OrganizationMembersDetailDrawers
         └── OrganizationMemberPickerDrawer
 
 components/location-connections/
   OrganizationLocationConnectionsDetailSection
   ├── OrganizationLocationConnectionsSection
-  │     └── OrganizationLocationConnectionListRow
+  │     └── DetailCollectionPanel × family → RelationshipList
+  │           └── OrganizationLocationConnectionListRow
   └── OrganizationLocationConnectionLinkDrawer
 ```
+
+Detail collection grammar: [`content/lib/detail/README.md`](../lib/detail/README.md).
 
 ### Supported cross-feature entry points
 

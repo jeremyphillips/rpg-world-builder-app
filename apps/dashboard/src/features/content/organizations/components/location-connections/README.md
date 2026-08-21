@@ -1,17 +1,22 @@
 # location-connections (`organizations/components/location-connections`)
 
 Organization detail **location connections** — forward typed-edge sections and the
-sequenced add/change/replace drawer. List chrome composes `RelationshipList`; drawer
-composition roots stay in this folder.
+sequenced add/change/replace drawer. Each family panel uses `DetailCollectionPanel`
+with `RelationshipList` as the collection body (not grouped collection Group/RowList).
+Drawer composition roots stay in this folder.
 
 Orientation: [drawer-architecture.md](../../../../../docs/drawer-architecture.md).
 Relationship grammars: [relationship/README.md](../../../lib/relationship/README.md).
+Detail collection grammar: [detail/README.md](../../../lib/detail/README.md).
 
 ## Composition tree
 
 ```text
 organization detail route
-  └─ OrganizationLocationConnectionsSection
+  └─ OrganizationLocationConnectionsDetailSection
+       └─ OrganizationLocationConnectionsSection
+            └─ DetailCollectionPanel × family
+                 └─ RelationshipList → OrganizationLocationConnectionListRow
        └─ OrganizationLocationConnectionLinkDrawer (G2/G3/G4 by mode)
             ├─ CatalogEntityPickerSheet
             ├─ DrawerContext / KindField / SubjectField

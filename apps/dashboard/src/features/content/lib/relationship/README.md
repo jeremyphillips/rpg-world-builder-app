@@ -104,6 +104,14 @@ co-located drawer tests. InvOrg/InvChar stay composition-only. Persistence stays
 
 ## Guards
 
-- [`list/relationship-list-migration.guard.test.ts`](./list/relationship-list-migration.guard.test.ts) — typed-edge sections use `RelationshipList`; sections must not import `list/row/**`.
+- [`detail/detail-collection-grammar.guard.test.ts`](../detail/detail-collection-grammar.guard.test.ts) — typed-edge sections use `RelationshipList` for subgroup/list anatomy; must not import grouped collection body components or `list/row/**` directly.
 - [`drawer/sequenced-relationship-drawer-drift.test.ts`](./drawer/sequenced-relationship-drawer-drift.test.ts) — nested-create hook boundaries.
 - [`entity/entity-drawer-surface.guard.test.ts`](../entity/entity-drawer-surface.guard.test.ts) — entity drawer layers vs relationship drawer.
+
+## Collection-body style contract
+
+`RelationshipList.Group` imports group header and record separator tokens from
+[`detail/collection/detail-collection-chrome.variants.ts`](../detail/collection/detail-collection-chrome.variants.ts)
+— the same public contract used by grouped collection body primitives. Do not import
+private `detail-collection-group.variants.ts` or `detail-collection-row-list.variants.ts`
+from relationship code. Detail: [detail/README.md](../detail/README.md).
