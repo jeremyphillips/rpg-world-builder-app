@@ -9,7 +9,7 @@ import { sessionQueryKey } from '@/features/auth'
 import {
   resolveCampaignEntryDestination,
   resolveSwitchCampaignPath,
-} from '../lib/campaign-destination.lib'
+} from '../lib/recovery/campaign-destination.lib'
 import { useCampaignStore } from '../store/campaign-store'
 import { useCampaigns } from './use-campaigns'
 

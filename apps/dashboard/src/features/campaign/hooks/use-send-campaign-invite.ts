@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { sendCampaignInvite } from '../api/campaign-overview-client'
 import { campaignInvitesQueryKey } from './use-campaign-invites'
-import { INVITE_MEMBER_DIALOG_COPY } from '../lib/campaign-overview-labels'
+import { INVITE_MEMBER_DIALOG_COPY } from '../lib/overview/campaign-overview-labels'
 
 export function useSendCampaignInvite(campaignId: string | undefined) {
   const queryClient = useQueryClient()

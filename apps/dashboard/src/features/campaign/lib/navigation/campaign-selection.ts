@@ -12,9 +12,9 @@ import {
   isCampaignOnboardingIncomplete,
   isCampaignRecoveryRequired,
   resolveCampaignRecoveryState,
-} from '../campaign-recovery-state'
-import type { CampaignsQueryState } from '../resolve-campaign-topbar-title-state'
-import { resolveCampaignTopbarTitleState } from '../resolve-campaign-topbar-title-state'
+} from '../recovery/campaign-recovery-state'
+import type { CampaignsQueryState } from './resolve-campaign-topbar-title-state'
+import { resolveCampaignTopbarTitleState } from './resolve-campaign-topbar-title-state'
 import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
 
 export { resolveActiveCampaignSummary, resolveLandingCampaignId } from '@rpg/contracts'

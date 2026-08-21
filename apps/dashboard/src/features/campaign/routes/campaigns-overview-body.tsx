@@ -10,8 +10,8 @@ import {
   filterPendingInvitesForMembership,
 } from '@/features/campaign'
 
-import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/campaigns-overview-copy'
-import type { CampaignsOverviewViewState } from '../lib/campaigns-overview-view'
+import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/overview/campaigns-overview-copy'
+import type { CampaignsOverviewViewState } from '../lib/overview/campaigns-overview-view'
 
 type CampaignsOverviewBodyProps = {
   viewState: CampaignsOverviewViewState

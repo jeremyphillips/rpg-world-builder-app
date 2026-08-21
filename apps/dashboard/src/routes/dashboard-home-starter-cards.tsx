@@ -3,7 +3,7 @@ import { buttonVariants } from '@rpg/ui'
 
 import { StarterActionCard } from '@/components/layout/starter-action-card'
 import { ROUTES } from '@/app/routes'
-import { NewCampaignLink } from '@/features/campaign/components/new-campaign-link.client'
+import { NewCampaignLink } from '@/features/campaign'
 
 import { DASHBOARD_HOME_COPY } from './dashboard-home-copy'
 

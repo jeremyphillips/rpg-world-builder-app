@@ -1,7 +1,7 @@
 import { useCampaignInvites } from '../hooks/use-campaign-invites'
 import { useCampaignMembers } from '../hooks/use-campaign-members'
 import { useCampaignParty } from '../hooks/use-campaign-party'
-import { resolveOverviewQueryState } from '../lib/campaign-overview-query-state'
+import { resolveOverviewQueryState } from '../lib/overview/campaign-overview-query-state'
 
 export function useCampaignOverviewData(campaignId: string | undefined, canManage: boolean) {
   const membersQuery = useCampaignMembers(campaignId)

@@ -8,19 +8,20 @@ export {
   CampaignTopbarTitleMissing,
   CampaignTopbarTitleSkeleton,
 } from './components/campaign-topbar-title'
-export { ContinueCampaignCard } from './components/continue-campaign-card.client'
+export { ContinueCampaignCard } from './components/recovery/continue-campaign-card.client'
 export {
   CampaignRecoveryPromotionCard,
   FinishJoiningCampaignCard,
-} from './components/campaign-recovery-promotion-card.client'
-export { PendingCampaignInvitation } from './components/pending-campaign-invitation.client'
-export { PendingCampaignInvitationsSection } from './components/pending-campaign-invitations-section.client'
-export { CampaignCharacterEligibilityAlert } from './components/campaign-character-eligibility-alert.client'
+} from './components/recovery/campaign-recovery-promotion-card.client'
+export { PendingCampaignInvitation } from './components/recovery/pending-campaign-invitation.client'
+export { PendingCampaignInvitationsSection } from './components/recovery/pending-campaign-invitations-section.client'
+export { CampaignCharacterEligibilityAlert } from './components/onboarding/campaign-character-eligibility-alert.client'
 export { ExtendedProgressionEffects } from './components/extended-progression-effects.client'
 export {
   ExtendedLevelRangeSummary,
   StandardLevelRangeSummary,
 } from './components/level-range-summary.client'
+export { NewCampaignLink } from './components/new-campaign-link.client'
 export {
   buildRulesConfigFields,
   CHARACTER_CONFIGURATION_SECTIONS,
@@ -67,7 +68,7 @@ export {
   campaignDestinationChevronClasses,
   campaignDestinationListVariants,
   campaignDestinationRowVariants,
-} from './components/campaign-destination.variants'
+} from './components/recovery/campaign-destination.variants'
 export { useCampaignCharacter, campaignCharacterQueryKey } from './hooks/use-campaign-character'
 export {
   useCampaignCharacters,
@@ -80,15 +81,15 @@ export {
   type CampaignCharacterNavigationContext,
   type CampaignCharacterNavModel,
   type CampaignCharactersListContextModel,
-} from './lib/build-campaign-character-navigation-context'
-export { isCampaignCharactersNavActive } from './lib/is-campaign-characters-nav-active'
-export { invalidateCampaignCharacterControlQueries } from './lib/invalidate-campaign-character-control-queries'
+} from './lib/characters/build-campaign-character-navigation-context'
+export { isCampaignCharactersNavActive } from './lib/characters/is-campaign-characters-nav-active'
+export { invalidateCampaignCharacterControlQueries } from './lib/characters/invalidate-campaign-character-control-queries'
 export { useCampaignRules } from './hooks/use-campaign-rules'
 export { useCampaigns, campaignsQueryKey } from './hooks/use-campaigns'
 export { useCampaignTemplates, campaignTemplatesQueryKey } from './hooks/use-campaign-templates'
 export { useActiveCampaignId } from './hooks/use-active-campaign-id'
-export { hasCampaignRows } from './lib/campaign-list-view.lib'
-export { filterPendingInvitesForMembership } from './lib/filter-pending-invites-for-membership'
+export { hasCampaignRows } from './lib/overview/campaign-list-view.lib'
+export { filterPendingInvitesForMembership } from './lib/onboarding/filter-pending-invites-for-membership'
 export {
   isCampaignMembershipOnboardingIncomplete,
   isCampaignOnboardingIncomplete,
@@ -96,7 +97,7 @@ export {
   isCampaignRecoveryRequired,
   resolveCampaignRecoveryState,
   type CampaignRecoveryState,
-} from './lib/campaign-recovery-state'
+} from './lib/recovery/campaign-recovery-state'
 export {
   listRecoverableCampaigns,
   resolveCampaignRecoveryPromotions,
@@ -108,7 +109,7 @@ export {
   toFinishJoiningPromotion,
   resolvePromotedFinishJoining,
   countIncompleteCampaigns,
-} from './lib/campaign-recovery-promotions.lib'
+} from './lib/recovery/campaign-recovery-promotions.lib'
 export {
   resolveCampaignDestination,
   resolveCampaignEntryDestination,
@@ -116,7 +117,7 @@ export {
   resolveSwitchCampaignPath,
   shouldRunCampaignSelectionSideEffect,
   type CampaignDestination,
-} from './lib/campaign-destination.lib'
+} from './lib/recovery/campaign-destination.lib'
 export {
   useOpenCampaign,
   usePersistCampaignSelection,
@@ -152,4 +153,4 @@ export {
   mapCampaignTopbarTitleState,
   resolveCampaignTopbarTitleState,
   type CampaignTopbarTitleState,
-} from './lib/resolve-campaign-topbar-title-state'
+} from './lib/navigation/resolve-campaign-topbar-title-state'

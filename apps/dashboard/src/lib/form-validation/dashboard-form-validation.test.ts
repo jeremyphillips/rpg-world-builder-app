@@ -31,9 +31,9 @@ import {
   flavorSchema,
   identityFields,
   identitySchema,
-} from '@/features/campaign/lib/profile/campaign-profile-form-fields'
-import { campaignSettingsSchema } from '@/features/campaign/lib/campaign-settings-form-values'
-import { buildWorldSettingsFields } from '@/features/campaign/lib/world/world-settings-form-fields'
+} from '@/features/campaign/lib/settings/campaign-profile-form-fields'
+import { campaignSettingsSchema } from '@/features/campaign/lib/settings/campaign-settings-form-values'
+import { buildWorldSettingsFields } from '@/features/campaign/lib/settings/world-settings-form-fields'
 import { accountFields, accountFormSchema } from '@/features/user/lib/account-fields'
 import {
   changePasswordFields,

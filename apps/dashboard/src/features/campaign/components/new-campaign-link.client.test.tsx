@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/campaigns-overview-copy'
+import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/overview/campaigns-overview-copy'
 import { NewCampaignLink } from './new-campaign-link.client'
 
 describe('NewCampaignLink', () => {

@@ -10,14 +10,14 @@ import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useExistingImageField } from '@/lib/use-existing-image-field'
 import { useLocations } from '@/features/content'
 
-import { flavorFields, identityFields } from '../lib/profile/campaign-profile-form-fields'
-import { buildWorldSettingsFields } from '../lib/world/world-settings-form-fields'
+import { flavorFields, identityFields } from '../lib/settings/campaign-profile-form-fields'
+import { buildWorldSettingsFields } from '../lib/settings/world-settings-form-fields'
 import {
   buildUpdateCampaignInput,
   campaignSettingsSchema,
   mapCampaignToSettingsValues,
   type CampaignSettingsValues,
-} from '../lib/campaign-settings-form-values'
+} from '../lib/settings/campaign-settings-form-values'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useUpdateCampaign } from '../hooks/use-update-campaign'
 

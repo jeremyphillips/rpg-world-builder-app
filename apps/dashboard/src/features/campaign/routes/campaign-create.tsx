@@ -19,19 +19,19 @@ import {
   flavorFields,
   type IdentityValues,
   type FlavorValues,
-} from '../lib/profile/campaign-profile-form-fields'
+} from '../lib/settings/campaign-profile-form-fields'
 import {
   buildCreateCampaignInput,
   type CampaignCreateValues,
-} from '../lib/campaign-settings-form-values'
-import { ReviewStep } from '../components/steps/review-step'
-import { InviteMembersStep } from '../components/steps/invite-members-step'
+} from '../lib/settings/campaign-settings-form-values'
+import { ReviewStep } from '../components/create/review-step'
+import { InviteMembersStep } from '../components/create/invite-members-step'
 import {
   BLANK_CAMPAIGN_TEMPLATE_VALUE,
   CampaignTemplateChooser,
-} from '../components/campaign-template-chooser.client'
+} from '../components/create/campaign-template-chooser.client'
 import { useCampaignTemplates } from '../hooks/use-campaign-templates'
-import { mapCampaignTemplateToCreateValues } from '../lib/campaign-template-form-values'
+import { mapCampaignTemplateToCreateValues } from '../lib/settings/campaign-template-form-values'
 
 const STEPS: WizardStepDef[] = [
   { id: 'identity', label: 'Identity' },

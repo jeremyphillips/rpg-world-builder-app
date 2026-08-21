@@ -12,7 +12,7 @@ import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaignCharacters } from '../hooks/use-campaign-characters'
 import { useCampaigns } from '../hooks/use-campaigns'
-import type { CampaignCharactersListContextModel } from '../lib/build-campaign-character-navigation-context'
+import type { CampaignCharactersListContextModel } from '../lib/characters/build-campaign-character-navigation-context'
 
 const CAMPAIGN_CHARACTERS_LIST_EMPTY_MESSAGES = {
   no_controlled_character: 'No character is currently assigned to you.',

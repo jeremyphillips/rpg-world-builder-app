@@ -4,12 +4,12 @@ import { useCampaigns } from '@/features/campaign'
 import { usePendingCampaignInvites } from '@/features/campaign-invite'
 
 import { NewCampaignLink } from '../components/new-campaign-link.client'
-import { hasCampaignRows } from '../lib/campaign-list-view.lib'
+import { hasCampaignRows } from '../lib/overview/campaign-list-view.lib'
 import {
   resolveCampaignsOverviewDescription,
   resolveCampaignsOverviewViewState,
-} from '../lib/campaigns-overview-view'
-import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/campaigns-overview-copy'
+} from '../lib/overview/campaigns-overview-view'
+import { CAMPAIGNS_OVERVIEW_COPY } from '../lib/overview/campaigns-overview-copy'
 import { CampaignsOverviewBody } from './campaigns-overview-body'
 
 /** Global campaigns index — list, select, and resume campaigns. */
