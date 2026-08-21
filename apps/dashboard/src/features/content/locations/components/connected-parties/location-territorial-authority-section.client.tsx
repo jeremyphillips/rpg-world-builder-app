@@ -31,6 +31,7 @@ import {
   TERRITORIAL_AUTHORITY_SECTION_HELPER,
   TERRITORIAL_AUTHORITY_SLOT_COPY,
 } from '../../lib/connected-parties/location-connection-surface-copy'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
 import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section.client'
 import { TERRITORIAL_AUTHORITY_HEADING_ID } from '../../lib/connected-parties/location-connected-parties-section-layout'
 
@@ -85,6 +86,7 @@ function buildTerritorialOverflowActions(input: {
     location: input.mutationContext.location,
     rows: input.mutationContext.rows,
     organizationCandidates: input.mutationContext.organizationCandidates,
+    copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
   })
 
   const editTarget: LocationConnectedPartyEditTarget = {

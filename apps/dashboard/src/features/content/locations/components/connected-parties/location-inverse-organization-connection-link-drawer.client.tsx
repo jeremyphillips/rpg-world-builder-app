@@ -54,6 +54,7 @@ import {
   buildOrganizationInverseLocationConnectionKindOptions,
   resolveActiveConnectionKind,
 } from '../../../lib/relationship/location-connection/location-connection-kind-options'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
 import {
   resolveLocationInverseOrganizationAddDrawerInstruction,
   resolveLocationInverseOrganizationAddDrawerTitle,
@@ -189,6 +190,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
         connections,
         edgesAtLocation,
         excludeConnectionId: excludeRelationshipId,
+        copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       })
     }
 
@@ -199,6 +201,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       connections,
       edgesAtLocation,
       excludeConnectionId: excludeRelationshipId,
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
   }, [
     edgesAtLocation,

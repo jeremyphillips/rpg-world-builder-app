@@ -2,10 +2,16 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-const SEQUENCED_ADD_DRAWER_FILES = [
+const NESTED_CREATE_DRAWER_FILES = [
   fileURLToPath(
     new URL(
       '../../../organizations/components/location-connections/organization-location-connection-link-drawer.client.tsx',
+      import.meta.url,
+    ),
+  ),
+  fileURLToPath(
+    new URL(
+      '../../../locations/components/connected-parties/location-inverse-organization-connection-link-drawer.client.tsx',
       import.meta.url,
     ),
   ),
@@ -17,42 +23,17 @@ const SEQUENCED_ADD_DRAWER_FILES = [
   ),
 ] as const
 
-const NESTED_CREATE_DRAWER_FILES = [
-  ...SEQUENCED_ADD_DRAWER_FILES,
-  fileURLToPath(
-    new URL(
-      '../../../locations/components/connected-parties/location-inverse-organization-connection-link-drawer.client.tsx',
-      import.meta.url,
-    ),
-  ),
-] as const
-
 const NESTED_CREATE_RESOLVER_IMPORT =
   "from '../../../lib/relationship/nested-create/relationship-picker-create-intents.lib'"
 const NESTED_CREATE_ORG_RESOLVER_IMPORT =
   "from '../../../lib/relationship/nested-create/relationship-picker-nested-create.lib'"
 const NESTED_CREATE_CHARACTER_RESOLVER_IMPORT = 'resolveRelationshipPickerCharacterCreateIntents'
 
+/**
+ * Sequenced-Add / change-kind / replace drawer grammars are behavior-tested in co-located
+ * `*-connection-link-drawer.test.tsx` files — not via JSX-order or import-string guards here.
+ */
 describe('sequenced relationship drawer drift', () => {
-  for (const filePath of SEQUENCED_ADD_DRAWER_FILES) {
-    const label = filePath.split('/').at(-1)
-
-    it(`${label} uses SelectionSummaryCard and LocationConnectionKindField`, () => {
-      const source = readFileSync(filePath, 'utf8')
-
-      expect(source).toContain('SelectionSummaryCard')
-      expect(source).toContain('LocationConnectionKindField')
-    })
-
-    it(`${label} does not import collapse chrome or LocationConnectionKindStep`, () => {
-      const source = readFileSync(filePath, 'utf8')
-
-      expect(source).not.toContain('ChooserSummaryCard')
-      expect(source).not.toContain('CollapsibleRadioCardField')
-      expect(source).not.toContain('LocationConnectionKindStep')
-    })
-  }
-
   const nestedCreateDrawerExpectations: Record<
     string,
     {

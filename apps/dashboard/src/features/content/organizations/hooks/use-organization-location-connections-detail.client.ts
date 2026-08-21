@@ -21,6 +21,7 @@ import {
   resolveVisibleOrganizationConnectionFamilies,
   type OrganizationConnectionDrawerIntent,
 } from '../../lib/relationship/location-connection/location-connection-drawer-intent'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
 import { resolveRelationshipAlternatives } from '../../lib/relationship/location-connection/location-connection-alternatives'
 import type { OrganizationForwardDrawerMode } from '../../lib/relationship/location-connection/location-connection-mutation-mode'
 import { useCampaignOrganizationLocationConnectionEdges } from './use-campaign-organization-location-connection-edges'
@@ -140,6 +141,7 @@ export function useOrganizationLocationConnectionsDetail(
         },
         connections: existingConnections,
         edgesByLocationId,
+        copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       }).alternatives,
     [
       canManage,

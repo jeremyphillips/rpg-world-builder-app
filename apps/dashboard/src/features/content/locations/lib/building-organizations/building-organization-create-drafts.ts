@@ -9,6 +9,7 @@ import {
 } from '@rpg/contracts'
 
 import { buildOrganizationLocationConnectionKindOptions } from '../../../lib/relationship/location-connection/location-connection-kind-options'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../connected-parties/location-connection-kind-options-copy.lib'
 import {
   organizationFormSchema,
   type OrganizationFormValues,
@@ -296,6 +297,7 @@ export function buildBuildingOrganizationRelationshipKindOptions(input: {
       locationId: PENDING_BUILDING_LOCATION_ID,
       kinds: eligibleKinds,
       edgesAtLocation: pendingEdges(input.plan.relationships),
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     }).map((option) => ({
       value: option.value as OrganizationLocationConnectionKind,
       label: option.label,

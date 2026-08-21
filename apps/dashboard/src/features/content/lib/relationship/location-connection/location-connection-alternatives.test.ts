@@ -9,6 +9,7 @@ import {
   testSettlementLocation,
 } from '@/features/content/lib/fixtures/location-test-helpers'
 
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
 import {
   assertRelationshipAlternativesMatchCapabilities,
   hasResolvedRelationshipMutationAlternative,
@@ -31,6 +32,7 @@ describe('resolveRelationshipAlternatives', () => {
     const otherRegion = lankhmarRegion({ id: 'region-2', name: 'Neuromancer', slug: 'neuromancer' })
 
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: true,
@@ -60,6 +62,7 @@ describe('resolveRelationshipAlternatives', () => {
     const guildhall = guildhallBuilding()
 
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: true,
@@ -91,6 +94,7 @@ describe('resolveRelationshipAlternatives', () => {
     })
 
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: true,
@@ -117,6 +121,7 @@ describe('resolveRelationshipAlternatives', () => {
     })
 
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: true,
@@ -138,6 +143,7 @@ describe('resolveRelationshipAlternatives', () => {
     const kingdom = lankhmarRegion()
 
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: false,
@@ -162,6 +168,7 @@ describe('resolveRelationshipAlternatives', () => {
     const lankhmar = lankhmarRegion()
 
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: true,
@@ -186,6 +193,7 @@ describe('resolveRelationshipAlternatives', () => {
     const lankhmar = lankhmarRegion()
 
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: true,
@@ -204,6 +212,7 @@ describe('resolveRelationshipAlternatives', () => {
 
   it('supports server availability snapshots without catalog scans', () => {
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       relationship: {
@@ -242,6 +251,7 @@ describe('resolveRelationshipAlternatives', () => {
     ]
 
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'location_inverse_organization',
       canManage: true,
       canEditRow: true,
@@ -306,6 +316,7 @@ describe('architectural invariant: overflow mutations require alternatives', () 
     {
       name: 'geographic_presence forward',
       input: {
+        copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
         surface: 'organization_forward' as const,
         canManage: true,
         occupancyLoaded: true,
@@ -330,6 +341,7 @@ describe('architectural invariant: overflow mutations require alternatives', () 
     {
       name: 'site forward with kind alternatives',
       input: {
+        copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
         surface: 'organization_forward' as const,
         canManage: true,
         occupancyLoaded: true,
@@ -409,6 +421,7 @@ describe('mutation availability chain', () => {
   it('keeps changeTarget visible and avoids authoritative-empty drawer state for partial candidate sets', () => {
     const lankhmar = lankhmarRegion()
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: true,

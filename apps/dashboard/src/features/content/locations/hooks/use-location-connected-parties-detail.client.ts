@@ -45,7 +45,7 @@ import {
   resolveTerritorialSectionOrganizationAddAffordances,
 } from '../../lib/relationship/location-connection/location-connection-drawer-intent'
 import { toLocationConnectionEligibilityInput } from '../../lib/relationship/location-connection/location-connection-eligibility-input'
-import { peopleSectionHasAvailableTarget } from '../../lib/relationship/location-connection/location-connection-kind-options'
+import { peopleSectionHasAvailableTarget } from '../lib/connected-parties/location-people-section-kind-options.lib'
 import type { LocationConnectedPartyEditTarget } from '../components/connected-parties/location-connected-parties-section.client'
 import { buildPeopleKindSlots } from '../components/connected-parties/location-connected-parties-section.client'
 import { buildLocationConnectedPartyCharactersById } from '../lib/connected-parties/location-connected-party-character-options.lib'

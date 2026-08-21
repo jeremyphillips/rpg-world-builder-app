@@ -47,9 +47,10 @@ import {
 import { buildSubjectLocationConnectionKeySet } from '../../../lib/relationship/location-connection/location-connection-duplicate-keys'
 import {
   buildPeopleSectionKindOptions,
-  resolveActiveConnectionKind,
   resolvePeopleKindSlotFromOptionValue,
-} from '../../../lib/relationship/location-connection/location-connection-kind-options'
+} from '../../lib/connected-parties/location-people-section-kind-options.lib'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
+import { resolveActiveConnectionKind } from '../../../lib/relationship/location-connection/location-connection-kind-options'
 import { resolveConnectionKindDecisionPresentation } from '../../../lib/relationship/location-connection/location-connection-kind-decision-presentation'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
 import {
@@ -172,6 +173,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         characterIds,
         canAddOrganization,
         canAddCharacter,
+        copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       }),
     [
       canAddCharacter,

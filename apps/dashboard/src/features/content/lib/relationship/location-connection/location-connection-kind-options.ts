@@ -1,7 +1,6 @@
 import type {
   CharacterLocationConnectionKind,
   Location,
-  LocationConnectedPartyRow,
   OrganizationLocationConnectionEdgeAtLocation,
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
@@ -19,30 +18,16 @@ import {
   resolveOrganizationLocationConnectionLocationOccupant,
 } from '@rpg/contracts'
 
+import { isOrganizationLocationConnectionKindBlockedForLocation } from './location-connection-duplicate-keys'
 import {
-  buildSubjectLocationConnectionKeySet,
-  isOrganizationLocationConnectionKindBlockedForLocation,
-} from './location-connection-duplicate-keys'
-import {
-  characterInverseSubjectHasAvailableKind,
   organizationForwardKindHasAvailableLocation,
   LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON,
   ORGANIZATION_DRAWER_FULLY_LINKED_REASONS,
-  organizationInverseSubjectHasAvailableKind,
   resolveKindsForOrganizationDrawerIntent,
   resolveOrganizationKindsForDrawerIntent,
   type OrganizationConnectionDrawerIntent,
 } from './location-connection-drawer-intent'
-import {
-  resolveTerritorialKindOccupiedReason,
-  TERRITORIAL_AUTHORITY_DRAWER,
-} from '../../../locations/lib/connected-parties/location-connection-surface-copy'
-import {
-  resolveInverseCharacterKindDescription,
-  resolveInverseOrganizationKindDescription,
-} from '../../../locations/lib/connected-parties/location-inverse-relationship-description'
-import type { PeopleKindSlot } from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
-import { peopleKindSlotKey } from '../../../locations/lib/connected-parties/location-connected-parties-people-kind-slots'
+import type { LocationConnectionKindOptionsCopy } from './location-connection-kind-options-copy'
 
 export type LocationConnectionKindOption = {
   value: string
@@ -100,6 +85,7 @@ function resolveOrganizationLocationConnectionKindDisabledReason(input: {
   }>
   edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
   excludeConnectionId?: string
+  copy: LocationConnectionKindOptionsCopy
 }): string | undefined {
   const perOrgBlocked = organizationLocationConnectionKindBlockedForOrganizationAtLocation({
     locationId: input.locationId,
@@ -110,7 +96,7 @@ function resolveOrganizationLocationConnectionKindDisabledReason(input: {
 
   if (perOrgBlocked) {
     if (input.kind === 'claims') {
-      return TERRITORIAL_AUTHORITY_DRAWER.duplicateClaimReason
+      return input.copy.duplicateClaimReason
     }
     return LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON
   }
@@ -136,7 +122,7 @@ function resolveOrganizationLocationConnectionKindDisabledReason(input: {
 
   if (input.kind === 'governs' || input.kind === 'controls') {
     const occupantName = occupant.subjectName ?? 'Another organization'
-    return resolveTerritorialKindOccupiedReason({
+    return input.copy.resolveTerritorialKindOccupiedReason({
       kind: input.kind,
       occupantName,
     })
@@ -161,6 +147,7 @@ export function buildOrganizationLocationChangeKindOptions(input: {
   }>
   edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
   excludeConnectionId?: string
+  copy: LocationConnectionKindOptionsCopy
 }): LocationConnectionKindOption[] {
   const profileKinds = resolveOrganizationKindsForDrawerIntent(input.location, input.intent)
   const currentKindStale = !profileKinds.includes(input.currentKind)
@@ -173,6 +160,7 @@ export function buildOrganizationLocationChangeKindOptions(input: {
     connections: input.connections,
     edgesAtLocation: input.edgesAtLocation,
     excludeConnectionId: input.excludeConnectionId,
+    copy: input.copy,
   })
 
   if (!currentKindStale) {
@@ -234,6 +222,7 @@ export function buildOrganizationLocationConnectionKindOptions(input: {
   }>
   edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
   excludeConnectionId?: string
+  copy: LocationConnectionKindOptionsCopy
 }): LocationConnectionKindOption[] {
   const connections = input.connections ?? []
 
@@ -260,6 +249,7 @@ export function buildOrganizationLocationConnectionKindOptions(input: {
             connections,
             edgesAtLocation: input.edgesAtLocation,
             excludeConnectionId: input.excludeConnectionId,
+            copy: input.copy,
           })
         : undefined,
     }
@@ -277,6 +267,7 @@ export function buildOrganizationInverseLocationConnectionKindOptions(input: {
   }>
   edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[]
   excludeConnectionId?: string
+  copy: LocationConnectionKindOptionsCopy
 }): LocationConnectionKindOption[] {
   const connections = input.connections ?? []
 
@@ -293,7 +284,7 @@ export function buildOrganizationInverseLocationConnectionKindOptions(input: {
     return {
       value: kind,
       label: getOrganizationLocationConnectionDisplayLabel(kind, 'inverse'),
-      description: resolveInverseOrganizationKindDescription(kind, input.location),
+      description: input.copy.resolveInverseOrganizationKindDescription(kind, input.location),
       disabled,
       disabledReason: disabled
         ? resolveOrganizationLocationConnectionKindDisabledReason({
@@ -303,6 +294,7 @@ export function buildOrganizationInverseLocationConnectionKindOptions(input: {
             connections,
             edgesAtLocation: input.edgesAtLocation,
             excludeConnectionId: input.excludeConnectionId,
+            copy: input.copy,
           })
         : undefined,
     }
@@ -428,13 +420,14 @@ export function buildCharacterInverseLocationConnectionKindOptions(input: {
   location: Location
   kinds: readonly CharacterLocationConnectionKind[]
   disabledKinds?: ReadonlySet<CharacterLocationConnectionKind>
+  copy: LocationConnectionKindOptionsCopy
 }): LocationConnectionKindOption[] {
   const disabledKinds = input.disabledKinds ?? new Set<CharacterLocationConnectionKind>()
 
   return input.kinds.map((kind) => ({
     value: kind,
     label: getCharacterLocationConnectionDisplayLabel(kind, 'inverse'),
-    description: resolveInverseCharacterKindDescription(kind, input.location),
+    description: input.copy.resolveInverseCharacterKindDescription(kind, input.location),
     disabled: disabledKinds.has(kind),
     disabledReason: disabledKinds.has(kind)
       ? LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON
@@ -466,124 +459,4 @@ export function resolveActiveConnectionKind(
   }
 
   return null
-}
-
-export const PEOPLE_SECTION_KIND_FULLY_LINKED_REASON =
-  'All eligible people and organizations are already linked for this relationship type.'
-
-function resolvePeopleKindSlotDescription(slot: PeopleKindSlot, location: Location): string {
-  const organizationBinding = slot.bindings.find(
-    (binding) => binding.subjectType === 'organization',
-  )
-  if (organizationBinding?.subjectType === 'organization') {
-    return resolveInverseOrganizationKindDescription(organizationBinding.kind, location)
-  }
-
-  const characterBinding = slot.bindings.find((binding) => binding.subjectType === 'character')
-  if (characterBinding?.subjectType === 'character') {
-    return resolveInverseCharacterKindDescription(characterBinding.kind, location)
-  }
-
-  return ''
-}
-
-export function peopleKindSlotHasAvailableTarget(input: {
-  slot: PeopleKindSlot
-  locationId: string
-  rows: readonly LocationConnectedPartyRow[]
-  organizationIds: readonly string[]
-  characterIds: readonly string[]
-  canAddOrganization: boolean
-  canAddCharacter: boolean
-}): boolean {
-  const organizationRows = input.rows.filter((row) => row.subject.type === 'organization')
-  const characterRows = input.rows.filter((row) => row.subject.type === 'character')
-  const characterExistingKeys = buildSubjectLocationConnectionKeySet(characterRows)
-
-  for (const binding of input.slot.bindings) {
-    if (binding.subjectType === 'organization' && input.canAddOrganization) {
-      const hasOrganizationTarget = input.organizationIds.some((organizationId) =>
-        organizationInverseSubjectHasAvailableKind(
-          organizationId,
-          input.locationId,
-          [binding.kind],
-          organizationRows,
-        ),
-      )
-      if (hasOrganizationTarget) {
-        return true
-      }
-    }
-
-    if (binding.subjectType === 'character' && input.canAddCharacter) {
-      const hasCharacterTarget = input.characterIds.some((characterId) =>
-        characterInverseSubjectHasAvailableKind(characterId, [binding.kind], characterExistingKeys),
-      )
-      if (hasCharacterTarget) {
-        return true
-      }
-    }
-  }
-
-  return false
-}
-
-export function peopleSectionHasAvailableTarget(input: {
-  kindSlots: readonly PeopleKindSlot[]
-  locationId: string
-  rows: readonly LocationConnectedPartyRow[]
-  organizationIds: readonly string[]
-  characterIds: readonly string[]
-  canAddOrganization: boolean
-  canAddCharacter: boolean
-}): boolean {
-  return input.kindSlots.some((slot) =>
-    peopleKindSlotHasAvailableTarget({
-      slot,
-      locationId: input.locationId,
-      rows: input.rows,
-      organizationIds: input.organizationIds,
-      characterIds: input.characterIds,
-      canAddOrganization: input.canAddOrganization,
-      canAddCharacter: input.canAddCharacter,
-    }),
-  )
-}
-
-export function buildPeopleSectionKindOptions(input: {
-  location: Location
-  kindSlots: readonly PeopleKindSlot[]
-  locationId: string
-  rows: readonly LocationConnectedPartyRow[]
-  organizationIds: readonly string[]
-  characterIds: readonly string[]
-  canAddOrganization: boolean
-  canAddCharacter: boolean
-}): LocationConnectionKindOption[] {
-  return input.kindSlots.map((slot) => {
-    const disabled = !peopleKindSlotHasAvailableTarget({
-      slot,
-      locationId: input.locationId,
-      rows: input.rows,
-      organizationIds: input.organizationIds,
-      characterIds: input.characterIds,
-      canAddOrganization: input.canAddOrganization,
-      canAddCharacter: input.canAddCharacter,
-    })
-
-    return {
-      value: peopleKindSlotKey(slot),
-      label: slot.heading,
-      description: resolvePeopleKindSlotDescription(slot, input.location),
-      disabled,
-      disabledReason: disabled ? PEOPLE_SECTION_KIND_FULLY_LINKED_REASON : undefined,
-    }
-  })
-}
-
-export function resolvePeopleKindSlotFromOptionValue(
-  kindSlots: readonly PeopleKindSlot[],
-  value: string,
-): PeopleKindSlot | undefined {
-  return kindSlots.find((slot) => peopleKindSlotKey(slot) === value)
 }

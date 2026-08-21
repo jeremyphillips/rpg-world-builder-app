@@ -27,6 +27,7 @@ import {
 
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildLocationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
 import { buildEntityMediaFromImageKey } from '../../../lib/entity/summary/entity-media.lib'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section.client'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'
@@ -231,6 +232,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
         locationCandidates,
         connections: existingConnections,
         edgesByLocationId,
+        copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       }).alternatives
     }
     return undefined
@@ -292,6 +294,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
       connections: existingConnections,
       edgesAtLocation: resolveEdgesAtLocation(lockedLocation.id, edgesByLocationId),
       excludeConnectionId,
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
   }, [
     edgesByLocationId,

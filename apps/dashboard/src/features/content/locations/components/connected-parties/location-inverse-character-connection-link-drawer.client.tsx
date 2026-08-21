@@ -24,6 +24,7 @@ import {
 } from '../../../lib/relationship/location-connection/location-connection-drawer-intent'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildCharacterPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context.client'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
 import { toLocationConnectionEligibilityInput } from '../../../lib/relationship/location-connection/location-connection-eligibility-input'
@@ -142,6 +143,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       location,
       kinds: eligibleKinds,
       disabledKinds,
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
   }, [
     eligibleKinds,

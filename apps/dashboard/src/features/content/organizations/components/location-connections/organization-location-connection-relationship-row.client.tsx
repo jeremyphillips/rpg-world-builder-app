@@ -19,6 +19,7 @@ import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
 } from '../../../lib/relationship/list/relationship-overflow-actions'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
 import { buildLocationEntityContextPresentation } from '../../../locations/lib/location-display'
 import type { OrganizationLocationConnectionPreviewItem } from '../../lib/organization-display'
 import { resolveOrganizationForwardOverflowLabels } from '../../lib/location-connections/organization-location-connection-surface-copy'
@@ -68,6 +69,7 @@ export function buildOrganizationLocationConnectionOverflowActions(input: {
     locationCandidates: input.mutationContext.locationCandidates,
     connections: input.mutationContext.connections,
     edgesByLocationId: input.mutationContext.edgesByLocationId,
+    copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
   })
 
   const labels = resolveOrganizationForwardOverflowLabels(input.item.family)

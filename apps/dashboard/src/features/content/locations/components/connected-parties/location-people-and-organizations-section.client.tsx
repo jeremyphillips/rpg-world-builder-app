@@ -22,6 +22,7 @@ import {
   relationshipGroupUsesRootFamilyAdd,
   resolveLocationConnectedPartyRelationshipPresentation,
 } from '../../../lib/relationship/list/relationship-group-presentation'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
 import { LOCATION_INVERSE_PEOPLE_OVERFLOW } from '../../lib/connected-parties/location-connection-surface-copy'
 import type { PeopleKindSlot } from '../../lib/connected-parties/location-connected-parties-people-kind-slots'
@@ -83,6 +84,7 @@ function buildPeopleOverflowActions(input: {
           },
           location: input.mutationContext.location,
           rows: input.mutationContext.rows,
+          copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
         })
       : resolveRelationshipAlternatives({
           surface: 'location_inverse_character',
@@ -97,6 +99,7 @@ function buildPeopleOverflowActions(input: {
           },
           location: input.mutationContext.location,
           rows: input.mutationContext.rows,
+          copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
         })
 
   const handlers: Partial<Record<RelationshipOverflowActionId, () => void>> = {

@@ -9,7 +9,7 @@ import { YAWNING_PORTAL, LOCATIONS_LIST } from '../../fixtures'
 import { buildLocationsById } from '../../lib/location-display'
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { CITY_COUNCIL } from '../../../organizations/fixtures'
-import { PEOPLE_SECTION_KIND_FULLY_LINKED_REASON } from '../../../lib/relationship/location-connection/location-connection-kind-options'
+import { PEOPLE_SECTION_KIND_FULLY_LINKED_REASON } from '../../lib/connected-parties/location-people-section-kind-options.lib'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
 import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer.client'
 import {

@@ -21,6 +21,7 @@ import {
   canReopenConnectionKindDecision,
   ORGANIZATION_LOCATION_CONNECTION_STALE_CURRENT_KIND_REASON,
 } from './location-connection-kind-options'
+import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
 import { resolveRelationshipAlternatives } from './location-connection-alternatives'
 
 function headquartersRow(organizationId = 'org-1'): LocationConnectedPartyRow {
@@ -96,6 +97,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
       connections: [{ id: 'conn-1', locationId: location.id, kind: currentKind }],
       edgesAtLocation: [],
       excludeConnectionId: 'conn-1',
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
 
     assertChangeKindPickerIncludesCurrentKind(options, currentKind)
@@ -113,6 +115,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
       connections: [{ id: 'conn-1', locationId: location.id, kind: currentKind }],
       edgesAtLocation: [],
       excludeConnectionId: 'conn-1',
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
 
     const staleCurrent = options.find((option) => option.value === currentKind)
@@ -146,6 +149,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
       connections: [{ id: connectionId, locationId: location.id, kind: currentKind }],
       edgesAtLocation,
       excludeConnectionId: connectionId,
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
 
     const inverseOptions = buildOrganizationLocationChangeKindOptions({
@@ -156,6 +160,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
       connections: inverseConnections,
       edgesAtLocation,
       excludeConnectionId: connectionId,
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
 
     expect(forwardOptions).toEqual(inverseOptions)
@@ -171,6 +176,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
     const location = guildhallBuilding()
     const currentKind = 'headquarters' as const
     const resolved = resolveRelationshipAlternatives({
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
       surface: 'organization_forward',
       canManage: true,
       occupancyLoaded: true,
@@ -192,6 +198,7 @@ describe('buildOrganizationLocationChangeKindOptions', () => {
       connections: [{ id: 'conn-1', locationId: location.id, kind: currentKind }],
       edgesAtLocation: [],
       excludeConnectionId: 'conn-1',
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
 
     assertChangeKindGatingAlignsWithPicker({
@@ -236,6 +243,7 @@ describe('inverse location connection kind options', () => {
       kinds: ['headquarters', 'owns'],
       connections: [],
       edgesAtLocation: [],
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
 
     expect(options).toEqual([
@@ -257,6 +265,7 @@ describe('inverse location connection kind options', () => {
     const options = buildCharacterInverseLocationConnectionKindOptions({
       location,
       kinds: ['works_at', 'resides_at'],
+      copy: LOCATION_CONNECTION_KIND_OPTIONS_COPY,
     })
 
     expect(options[0]?.description).toBe('Works at or is regularly present at this building.')

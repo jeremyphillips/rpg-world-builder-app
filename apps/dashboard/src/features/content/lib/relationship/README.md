@@ -44,13 +44,13 @@ Feature `*-link-drawer.client.tsx` files are **composition roots** in
 
 ## Public entry files
 
-| Folder                 | Supported imports                                                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `core/`                | `relationship-candidate-set`, `relationship-mutation-capabilities`, `relationship-mutation-mode`                                                                   |
-| `list/`                | `relationship-list.client` (`RelationshipList`), `relationship-overflow-actions`, `relationship-group-presentation` (typed-edge group action placement)            |
-| `drawer/`              | `drawer-context.client`, `relationship-drawer-subject-field.client`, `relationship-drawer-field-labels` (`RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL`)           |
-| `nested-create/`       | `use-relationship-picker-nested-create.client`, intent resolvers, `revalidateCreated*` helpers                                                                     |
-| `location-connection/` | eligibility, duplicate-keys, drawer-intent, kind-options, kind-decision-presentation, KindField, alternatives, invalidate, current-endpoint, mutation-mode aliases |
+| Folder                 | Supported imports                                                                                                                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `core/`                | `relationship-candidate-set`, `relationship-mutation-capabilities`, `relationship-mutation-mode`                                                                                             |
+| `list/`                | `relationship-list.client` (`RelationshipList`), `relationship-overflow-actions`, `relationship-group-presentation` (typed-edge group action placement)                                      |
+| `drawer/`              | `drawer-context.client`, `relationship-drawer-subject-field.client`, `relationship-drawer-field-labels` (`RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL`)                                     |
+| `nested-create/`       | `use-relationship-picker-nested-create.client`, intent resolvers, `revalidateCreated*` helpers                                                                                               |
+| `location-connection/` | eligibility, duplicate-keys, drawer-intent, kind-options, kind-options-copy (type), kind-decision-presentation, KindField, alternatives, invalidate, current-endpoint, mutation-mode aliases |
 
 **Private:** `list/row/cross-content-relationship-row.client` (use `RelationshipList.Row`
 only), list Empty/Footer internals, nested-create modals/handoff helpers (reached via the hook).
@@ -87,19 +87,20 @@ Classifies typed-edge sections into `meaningful_slots` (labeled structural group
 Wired by location territorial/people sections and organization forward family sections.
 Domain copy stays in feature `lib/` — this module owns **action placement semantics** only.
 
-### `location-connection-kind-options.ts` → Location copy — **violation (Phase 7)**
+### `location-connection-kind-options.ts` → Location copy — **resolved (Phase 7)**
 
-**Current:** adapter imports `locations/lib/connected-parties` copy/slots.
+Location supplies domain copy through
+[`location-connection-kind-options-copy.lib.ts`](../../locations/lib/connected-parties/location-connection-kind-options-copy.lib.ts)
+(`LOCATION_CONNECTION_KIND_OPTIONS_COPY`). Kind builders and `resolveRelationshipAlternatives`
+accept `copy: LocationConnectionKindOptionsCopy`. People-section kind slot builders live in
+[`location-people-section-kind-options.lib.ts`](../../locations/lib/connected-parties/location-people-section-kind-options.lib.ts).
 
-**Desired:** Location supplies domain eligibility/configuration **into** adapter
-inputs; generic Relationship must not reach into Location-owned policy.
+### Feature drawer controllers — **composition-only (Phase 8)**
 
-Fix in **Phase 7** (separate architectural PR — not combined with folder moves).
-
-```text
-CURRENT (wrong):  location-connection/kind-options → locations/lib/connected-parties
-DESIRED:          locations/lib/connected-parties → location-connection/kind-options (inputs)
-```
+Fwd and People drawers remain composition roots. A cohesion pass did not yield a small semantic
+hook (`subject`, `kindOptions`, `canSubmit`, `submit`, `reset`) without exporting dozens of
+state/setter pairs — prefer pure derivations (`resolveConnectionKindDecisionPresentation`) and
+co-located drawer tests. InvOrg/InvChar stay composition-only. Persistence stays on `onSubmit*`.
 
 ## Guards
 

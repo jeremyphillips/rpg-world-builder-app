@@ -31,6 +31,7 @@ import {
   buildOrganizationInverseLocationConnectionKindOptions,
   type LocationConnectionKindOption,
 } from './location-connection-kind-options'
+import type { LocationConnectionKindOptionsCopy } from './location-connection-kind-options-copy'
 import {
   availabilityFromStructuralCount,
   resolveCatalogMutationAvailability,
@@ -86,6 +87,7 @@ type SharedAlternativesInput = {
   canRemoveRow?: boolean
   occupancyLoaded?: boolean
   availabilitySnapshot?: RelationshipAvailabilitySnapshot
+  copy: LocationConnectionKindOptionsCopy
 }
 
 export type OrganizationForwardRelationshipAlternativesInput = SharedAlternativesInput & {
@@ -185,8 +187,9 @@ function buildEnabledInverseKindOptions(
     locationId: string
     kind: OrganizationLocationConnectionKind
   }>,
-  edgesAtLocation?: readonly OrganizationLocationConnectionEdgeAtLocation[],
-  excludeConnectionId?: string,
+  edgesAtLocation: readonly OrganizationLocationConnectionEdgeAtLocation[] | undefined,
+  excludeConnectionId: string | undefined,
+  copy: LocationConnectionKindOptionsCopy,
 ): LocationConnectionKindOption[] {
   return buildOrganizationInverseLocationConnectionKindOptions({
     location,
@@ -195,6 +198,7 @@ function buildEnabledInverseKindOptions(
     connections,
     edgesAtLocation,
     excludeConnectionId,
+    copy,
   }).filter((option) => !option.disabled)
 }
 
@@ -287,6 +291,7 @@ function resolveOrganizationForwardAlternatives(
           connections,
           edgesAtLocation,
           relationship.connectionId,
+          input.copy,
         )
       : []
 
@@ -405,6 +410,7 @@ function resolveLocationInverseOrganizationAlternatives(
           inverseConnections,
           edgesAtLocation,
           relationship.relationshipId,
+          input.copy,
         )
       : []
 
@@ -479,6 +485,7 @@ function resolveLocationInverseCharacterAlternatives(
       ? buildCharacterInverseLocationConnectionKindOptions({
           location,
           kinds: alternateKinds,
+          copy: input.copy,
         }).filter((option) => !option.disabled)
       : []
 
