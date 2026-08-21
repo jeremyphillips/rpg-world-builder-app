@@ -297,6 +297,28 @@ const dashboardContentPickerPolicyGuards = {
   },
 }
 
+const dashboardContentCharacterPickerChromeGuard = {
+  files: ['src/features/content/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: [
+              '@/features/character/components/picker/**',
+              '**/features/character/components/picker/**',
+            ],
+            message:
+              'Catalog picker selection-action chrome lives in @rpg/ui. Import CatalogPickerSelectionActions, CatalogPickerActionButton, and resolveCatalogPickerRowActionPhase from @rpg/ui.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardCharacterBuilderPlayActorGuard = {
   files: ['src/features/character/**/*.{ts,tsx}'],
   ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
@@ -324,5 +346,6 @@ export default [
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,
   dashboardContentPickerPolicyGuards,
+  dashboardContentCharacterPickerChromeGuard,
   dashboardCharacterBuilderPlayActorGuard,
 ]

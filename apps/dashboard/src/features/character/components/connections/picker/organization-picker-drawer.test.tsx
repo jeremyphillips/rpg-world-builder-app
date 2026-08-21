@@ -108,6 +108,48 @@ describe('OrganizationPickerDrawer', () => {
     expect(screen.getByText('No organizations are available.')).toBeInTheDocument()
   })
 
+  it('resets transactional membership config when the drawer closes', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+
+    const { rerender } = render(
+      <OrganizationPickerDrawer
+        open
+        onOpenChange={onOpenChange}
+        items={organizationPickerItems.map((item) => ({ ...item, selected: false }))}
+        onAdd={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
+    await user.click(screen.getByRole('radio', { name: 'Guildmaster' }))
+    expect(screen.getByRole('radio', { name: 'Guildmaster' })).toBeChecked()
+
+    await user.keyboard('{Escape}')
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+
+    rerender(
+      <OrganizationPickerDrawer
+        open={false}
+        onOpenChange={onOpenChange}
+        items={organizationPickerItems.map((item) => ({ ...item, selected: false }))}
+        onAdd={vi.fn()}
+      />,
+    )
+
+    rerender(
+      <OrganizationPickerDrawer
+        open
+        onOpenChange={onOpenChange}
+        items={organizationPickerItems.map((item) => ({ ...item, selected: false }))}
+        onAdd={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
+    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
+  })
+
   it('closes from the keyboard', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()

@@ -19,12 +19,9 @@ import {
   SelectionSummaryCard,
   SelectionSummaryChangeAction,
   Text,
-} from '@rpg/ui'
-
-import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
-} from '@/features/character'
+} from '@rpg/ui'
 
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'

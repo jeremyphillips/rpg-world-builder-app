@@ -16,15 +16,11 @@ import {
   SelectionSummaryCard,
   SelectionSummaryChangeAction,
   Text,
-} from '@rpg/ui'
-
-import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
-import type { ContentCreateContext } from '@/lib/create-flow'
-import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
-} from '@/features/character'
-
+} from '@rpg/ui'
+import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
+import type { ContentCreateContext } from '@/lib/create-flow'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildLocationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'

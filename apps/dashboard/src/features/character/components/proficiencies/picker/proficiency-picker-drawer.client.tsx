@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import { CatalogPickerSelectionActions } from '@rpg/ui'
+
 import {
   CatalogEntityPickerSheet,
   CatalogMetadataRenderer,
@@ -10,7 +12,6 @@ import {
 
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from './map-skill-proficiency-compact-summary-to-metadata-lines'
-import { CatalogPickerSelectionActions } from '../../picker/selection/catalog-picker-selection-actions.client'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state.client'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control.client'
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'

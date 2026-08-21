@@ -48,17 +48,10 @@ export { CharacterOrganizationMembershipsContainer } from './components/detail/m
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
 export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action.client'
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'
-export { CatalogPickerSelectionActions } from './components/picker/selection/catalog-picker-selection-actions.client'
 export {
   compareName,
   scoreAndFilterPickerItems,
 } from './components/picker/sort/catalog-picker-sort.lib'
-export {
-  CatalogEntityRow,
-  CatalogEntityPickerSheet,
-  createCatalogEntityRowRenderer,
-} from '@/features/content'
-export { resolveCatalogPickerRowActionPhase } from './components/picker/row/catalog-picker-row-action.lib'
 export { EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS } from './components/equipment/acquisition/use-equipment-acquisition-commit-confirmation.client'
 export {
   characterOrganizationReferencesQueryKey,

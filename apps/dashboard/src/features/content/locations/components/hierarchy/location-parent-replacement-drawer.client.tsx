@@ -3,12 +3,13 @@
 import * as React from 'react'
 
 import type { Location } from '@rpg/contracts'
-import { Button, SegmentedControl, Text } from '@rpg/ui'
-
 import {
+  Button,
+  SegmentedControl,
+  Text,
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
-} from '@/features/character'
+} from '@rpg/ui'
 
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildLocationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'

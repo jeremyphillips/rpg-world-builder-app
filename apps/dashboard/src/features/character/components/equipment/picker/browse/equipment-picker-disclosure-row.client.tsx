@@ -33,9 +33,10 @@ export function EquipmentPickerDisclosureRow({
   isGoldShoppingPath = false,
   onCommit,
 }: EquipmentPickerDisclosureRowProps) {
-  const { isPending, successQuantity, commitQuantity } = useEquipmentAcquisitionQuantityCommit({
-    commit: () => onCommit?.() ?? false,
-  })
+  const { isPending, successQuantity, commitFailed, commitQuantity } =
+    useEquipmentAcquisitionQuantityCommit({
+      commit: () => onCommit?.() ?? false,
+    })
 
   const item = rowArgs.item
   const row = buildEquipmentPickerRowViewModel(item.equipment)
@@ -58,6 +59,8 @@ export function EquipmentPickerDisclosureRow({
               disabled={presentation.action.kind === 'add' ? presentation.action.disabled : false}
               buttonLabel={addButtonLabel}
               isPending={isPending}
+              successQuantity={successQuantity}
+              commitFailed={commitFailed}
               onAdd={() => commitQuantity(1)}
             />
           ),

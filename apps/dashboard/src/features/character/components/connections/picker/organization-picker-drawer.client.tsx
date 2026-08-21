@@ -3,14 +3,13 @@
 import * as React from 'react'
 
 import { getOrganizationDomainLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Button, SelectField, Text } from '@rpg/ui'
+import { Button, SelectField, Text, CatalogPickerSelectionActions } from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
   CatalogEntityRow,
   CatalogMetadataRenderer,
 } from '@/features/content'
-import { CatalogPickerSelectionActions } from '../../picker/selection/catalog-picker-selection-actions.client'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action.client'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field.client'
 import {
@@ -56,6 +55,7 @@ export function OrganizationPickerDrawer({
   const [submitError, setSubmitError] = React.useState<string | null>(null)
 
   const resetMembershipConfig = React.useCallback(() => {
+    setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
     setExpandedItemId(null)
     setSelectedTitle(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
     setSubmitError(null)

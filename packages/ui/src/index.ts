@@ -661,6 +661,18 @@ export {
   type CatalogToolbarTab,
   type CatalogToolbarTabs,
 } from './components/ui/catalog-picker-sheet.client'
+export {
+  CatalogPickerActionButton,
+  type CatalogPickerActionButtonProps,
+} from './components/ui/catalog-picker-action-button.client'
+export {
+  CatalogPickerSelectionActions,
+  type CatalogPickerSelectionActionsProps,
+} from './components/ui/catalog-picker-selection-actions.client'
+export {
+  resolveCatalogPickerRowActionPhase,
+  type CatalogPickerRowActionPhase,
+} from './components/ui/catalog-picker-row-action.lib'
 export { CatalogToolbar } from './components/ui/catalog-toolbar.client'
 export {
   CatalogFilterChips,

@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, type ButtonProps } from '@rpg/ui'
+import { Button, type ButtonProps } from './button.client'
 
 export type CatalogPickerActionButtonProps = {
   children: React.ReactNode

@@ -1,12 +1,11 @@
 'use client'
 
 import type { ButtonProps } from '@rpg/ui'
-import { Badge } from '@rpg/ui'
-
-import { CatalogPickerActionButton } from '../../../picker/selection/catalog-picker-action-button.client'
+import { Badge, CatalogPickerActionButton, Text } from '@rpg/ui'
 import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment-acquisition-commit-labels.lib'
 
 const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
+const EQUIPMENT_PICKER_ADD_FAILED_LABEL = 'Could not add this item.'
 
 export type EquipmentPickerCommerceProps = {
   ownedQuantity: number
@@ -15,6 +14,7 @@ export type EquipmentPickerCommerceProps = {
   buttonLabel?: string
   isPending?: boolean
   successQuantity?: number
+  commitFailed?: boolean
   onAdd: () => void
   buttonVariant?: ButtonProps['variant']
 }
@@ -26,6 +26,7 @@ export function EquipmentPickerCommerce({
   buttonLabel,
   isPending = false,
   successQuantity,
+  commitFailed = false,
   onAdd,
   buttonVariant,
 }: EquipmentPickerCommerceProps) {
@@ -52,6 +53,11 @@ export function EquipmentPickerCommerce({
         >
           {label}
         </CatalogPickerActionButton>
+      ) : null}
+      {commitFailed ? (
+        <Text as="span" variant="destructive" className="text-sm" role="status">
+          {EQUIPMENT_PICKER_ADD_FAILED_LABEL}
+        </Text>
       ) : null}
     </>
   )

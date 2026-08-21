@@ -3,10 +3,9 @@
 import * as React from 'react'
 
 import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
+import { Button, Text, CatalogPickerSelectionActions } from '@rpg/ui'
 
 import {
-  CatalogPickerSelectionActions,
   formatCharacterInlineSummary,
   ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   OrganizationMembershipTitleField,

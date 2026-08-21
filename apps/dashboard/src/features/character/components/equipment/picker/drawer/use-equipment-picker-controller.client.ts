@@ -237,10 +237,13 @@ export function useEquipmentPickerController({
   )
 
   const handleCommitAdd = React.useCallback(
-    (item: EquipmentPickerItem) => {
+    (item: EquipmentPickerItem): boolean => {
       const quantity = addQuantities[item.equipment.id] ?? 1
-      onCommitAdd(item, quantity)
-      resetAddQuantityAfterCommit(item)
+      const applied = onCommitAdd(item, quantity) !== false
+      if (applied) {
+        resetAddQuantityAfterCommit(item)
+      }
+      return applied
     },
     [addQuantities, onCommitAdd, resetAddQuantityAfterCommit],
   )

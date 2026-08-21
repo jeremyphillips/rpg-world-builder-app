@@ -47,12 +47,20 @@ export function EditOrganizationMembershipDrawer({
   const [submitError, setSubmitError] = React.useState<string | null>(null)
   const [confirmRemoveOpen, setConfirmRemoveOpen] = React.useState(false)
 
+  const resetSessionState = React.useCallback(() => {
+    setSelectedTitle(membershipRadioValueFromTitle(currentTitle))
+    setPending(false)
+    setSubmitError(null)
+    setConfirmRemoveOpen(false)
+  }, [currentTitle])
+
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
       if (pending) return
+      if (!nextOpen) resetSessionState()
       onOpenChange(nextOpen)
     },
-    [onOpenChange, pending],
+    [onOpenChange, pending, resetSessionState],
   )
 
   const handleSave = React.useCallback(async () => {

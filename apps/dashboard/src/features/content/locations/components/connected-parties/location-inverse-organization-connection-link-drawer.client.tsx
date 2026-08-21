@@ -12,14 +12,14 @@ import {
   getOrganizationDomainLabel,
   getOrganizationLocationConnectionDisplayLabel,
 } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
-
-import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import {
+  Button,
+  Text,
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
-} from '@/features/character'
+} from '@rpg/ui'
 
+import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
 import { buildOrganizationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section.client'

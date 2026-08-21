@@ -36,4 +36,18 @@ describe('useEquipmentAcquisitionCommitConfirmation', () => {
     expect(result.current.isSuccess).toBe(false)
     vi.useRealTimers()
   })
+
+  it('surfaces row-phase failure when commit returns false', () => {
+    const commit = vi.fn(() => false)
+
+    const { result } = renderHook(() => useEquipmentAcquisitionCommitConfirmation({ commit }))
+
+    act(() => {
+      result.current.confirm(1)
+    })
+
+    expect(commit).toHaveBeenCalledWith(1)
+    expect(result.current.isSuccess).toBe(false)
+    expect(result.current.commitFailed).toBe(true)
+  })
 })

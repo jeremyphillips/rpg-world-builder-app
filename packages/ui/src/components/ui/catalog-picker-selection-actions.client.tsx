@@ -1,11 +1,12 @@
 'use client'
 
-import type { ButtonProps } from '@rpg/ui'
-import { Text } from '@rpg/ui'
+import type { ButtonProps } from './button.client'
+import { Text } from './text'
 
 import { CatalogPickerActionButton } from './catalog-picker-action-button.client'
-import type { CatalogPickerRowActionPhase } from '../row/catalog-picker-row-action.lib'
-import { resolveCatalogPickerRowActionPhase } from '../row/catalog-picker-row-action.lib'
+import type { CatalogPickerRowActionPhase } from './catalog-picker-row-action.lib'
+import { resolveCatalogPickerRowActionPhase } from './catalog-picker-row-action.lib'
+
 const CATALOG_PICKER_ADDED_LABEL = '✓ Added'
 
 export type CatalogPickerSelectionActionsProps = {

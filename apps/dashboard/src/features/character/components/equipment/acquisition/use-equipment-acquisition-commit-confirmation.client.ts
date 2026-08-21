@@ -13,6 +13,7 @@ export function useEquipmentAcquisitionCommitConfirmation(args: {
   const [quantity, setQuantityState] = useState(1)
   const [isPending, setIsPending] = useState(false)
   const [successQuantity, setSuccessQuantity] = useState<number | undefined>()
+  const [commitFailed, setCommitFailed] = useState(false)
 
   useEffect(() => {
     if (successQuantity === undefined) return
@@ -26,6 +27,7 @@ export function useEquipmentAcquisitionCommitConfirmation(args: {
 
   const setQuantity = useCallback((next: number) => {
     setSuccessQuantity(undefined)
+    setCommitFailed(false)
     setQuantityState(next)
   }, [])
 
@@ -34,11 +36,14 @@ export function useEquipmentAcquisitionCommitConfirmation(args: {
       if (isPending) return false
 
       setIsPending(true)
+      setCommitFailed(false)
       try {
         const applied = commit(requestedQuantity)
         if (applied) {
           setQuantityState(1)
           setSuccessQuantity(requestedQuantity)
+        } else {
+          setCommitFailed(true)
         }
         return applied
       } finally {
@@ -50,6 +55,7 @@ export function useEquipmentAcquisitionCommitConfirmation(args: {
 
   const clearSuccess = useCallback(() => {
     setSuccessQuantity(undefined)
+    setCommitFailed(false)
   }, [])
 
   return {
@@ -58,6 +64,7 @@ export function useEquipmentAcquisitionCommitConfirmation(args: {
     isPending,
     successQuantity,
     isSuccess: successQuantity !== undefined,
+    commitFailed,
     confirm,
     clearSuccess,
   }

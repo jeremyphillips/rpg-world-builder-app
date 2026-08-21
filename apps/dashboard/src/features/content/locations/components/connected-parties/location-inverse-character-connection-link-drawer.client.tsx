@@ -8,14 +8,14 @@ import type {
   LocationConnectedPartyRow,
 } from '@rpg/contracts'
 import { resolveLocationConnectionEligibility } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
-
-import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import {
+  Button,
+  Text,
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
-} from '@/features/character'
+} from '@rpg/ui'
 
+import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field.client'
 import {
   CHARACTER_DRAWER_FULLY_LINKED_REASON,
   LOCATION_INVERSE_CHARACTER_CHANGE_KIND_SUBMIT_LABEL,
