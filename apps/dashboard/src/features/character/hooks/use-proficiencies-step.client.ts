@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 
 import { withChoiceSetSelections } from '../lib/choice-sets/choice-set-selections'
-import type { ProficienciesStepProps } from '../components/steps/proficiencies-step.types'
+import type { ProficienciesStepProps } from '../components/builder/steps/proficiencies-step.types'
 
 export function useProficienciesStep({
   context,

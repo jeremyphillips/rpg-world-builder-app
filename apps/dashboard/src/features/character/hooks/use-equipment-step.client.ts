@@ -48,7 +48,7 @@ import { resolveEquipmentStepSurface } from '../lib/equipment/resolve-equipment-
 import { resolveEquipmentPickerCharacterPreviewContext } from '../components/equipment/picker/equipment-picker-character-preview.lib'
 import { resolvePackageSwitchCommitErrorFromIssues } from '../components/equipment/package-switch/equipment-package-switch-resolution.lib'
 import type { EquipmentPickerDrawer } from '../components/equipment/picker/equipment-picker-drawer.client'
-import type { EquipmentStepInventorySectionProps } from '../components/steps/equipment-step-sections.client'
+import type { EquipmentStepInventorySectionProps } from '../components/builder/steps/equipment/equipment-step-sections.client'
 
 type PendingEquipmentSelection = {
   optionId: string

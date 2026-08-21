@@ -90,8 +90,8 @@ const dashboardSemanticStyleLayerGuards = {
   ignores: [
     '**/*.{test,integration.test,stories}.ts',
     // Host navigation accent — row hover stays local (F9); focus migrated (F6).
-    'src/features/character/components/character-builder-shell.variants.ts',
-    'src/features/character/components/steps/score-token.variants.ts',
+    'src/features/character/components/builder/character-builder-shell.variants.ts',
+    'src/features/character/components/builder/steps/abilities/score-token.variants.ts',
   ],
   rules: {
     'no-restricted-syntax': [
@@ -163,7 +163,7 @@ const dashboardDragHandleGuard = {
   files: ['src/features/**/*.variants.ts'],
   ignores: [
     '**/*.{test,integration.test,stories}.ts',
-    'src/features/character/components/steps/score-token.variants.ts',
+    'src/features/character/components/builder/steps/abilities/score-token.variants.ts',
   ],
   rules: {
     'no-restricted-syntax': [

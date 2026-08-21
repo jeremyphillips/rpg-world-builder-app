@@ -11,7 +11,7 @@ import {
   resolveSelectedSpellLabels,
 } from '../../lib/spells/spells-step.lib'
 import { shouldShowSelectionFullNotice } from '../../lib/choice-sets/selection-counter.lib'
-import { BuilderInventoryRemoveAction } from '../builder/builder-inventory-remove-action.client'
+import { BuilderInventoryRemoveAction } from '../builder/inventory/builder-inventory-remove-action.client'
 import {
   spellChoiceSectionClasses,
   spellChoiceSectionCounterRowClasses,

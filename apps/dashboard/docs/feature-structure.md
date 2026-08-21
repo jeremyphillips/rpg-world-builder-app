@@ -182,7 +182,7 @@ independently testable view-model seam.
 | `components/proficiencies/*.lib.ts` | Proficiency drawer-only helpers                            |
 
 Step orchestration hooks belong in `character/hooks/` (`use-*-step.client.ts`), not
-under `components/steps/`.
+under `components/builder/steps/`.
 
 ## Related docs
 

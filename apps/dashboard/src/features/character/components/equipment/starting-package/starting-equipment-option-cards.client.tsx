@@ -13,7 +13,7 @@ import {
 } from '@rpg/contracts'
 import { ComboboxField, RadioCardItem, RadioGroup, Text, cn } from '@rpg/ui'
 
-import { ChoiceSetField } from '../../choice-set-field.client'
+import { ChoiceSetField } from '../../builder/fields/choice-set-field.client'
 import {
   EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE,
   EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION,

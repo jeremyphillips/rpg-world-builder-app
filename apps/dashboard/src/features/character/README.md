@@ -28,7 +28,7 @@ Folder layout and the feature-boundary rule are documented in
 | Choice-set wiring  | `lib/choice-sets/`                                                             |
 | Character display  | `lib/display/` — list/detail view models                                       |
 | Step hooks         | `hooks/use-equipment-step.client.ts`, `hooks/use-proficiencies-step.client.ts` |
-| Restore affordance | `components/character-builder-draft-restore.client.tsx`                        |
+| Restore affordance | `components/builder/chrome/character-builder-draft-restore.client.tsx`         |
 
 ## `components/detail/` layout
 
@@ -63,6 +63,29 @@ panel, starting package, and package-switch modal. Shared catalog chrome lives i
 
 Co-located `*.lib.ts` view models stay beside their surface per
 [feature-structure.md § Character builder co-location](../../docs/feature-structure.md#character-builder-co-located-lib-modules).
+
+## `components/builder/` layout
+
+Builder-only presentation and composition. Reusable character-domain UI stays in
+sibling folders (`equipment/`, `spells/`, `proficiencies/`, `connections/`,
+`picker/`).
+
+> If a component exists because `CharacterBuilder` exists, it belongs under
+> `components/builder/`. If a component is reusable outside the builder, keep it
+> under its domain folder. Builder steps may import domain UI; domain UI must not
+> depend on builder step implementation.
+
+| Subfolder    | Responsibility                                                                    |
+| ------------ | --------------------------------------------------------------------------------- |
+| _(root)_     | Shell orchestration — `character-builder-shell`, step router, form↔footer glue    |
+| `chrome/`    | Persistent builder chrome — rail, panel frame, footer, validation, level, restore |
+| `preview/`   | Live preview sidebar — panel, accordion, section content                          |
+| `fields/`    | Builder choice rendering — `ChoiceSetField`, dependent choice sections            |
+| `inventory/` | Builder row remove affordance (reused by steps and domain pickers)                |
+| `steps/`     | Step panels; large clusters in `abilities/`, `equipment/`, `review/`              |
+
+Step orchestration hooks stay in `hooks/` (`use-*-step.client.ts`); view models
+stay in `lib/builder/`, `lib/steps/`, and per-concern `lib/<step>/`.
 
 ## `npc/` sub-feature
 

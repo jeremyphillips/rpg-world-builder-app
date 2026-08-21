@@ -13,7 +13,7 @@ export {
   fetchCharacterCreationRules,
   type BuilderCatalogLists,
 } from './api/ruleset-content-client'
-export { CharacterBuilderDraftRestore } from './components/character-builder-draft-restore.client'
+export { CharacterBuilderDraftRestore } from './components/builder/chrome/character-builder-draft-restore.client'
 export { CharacterListCard } from './components/character-list-card.client'
 export type { CharacterListCardData } from './components/character-list-card.lib'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
@@ -40,13 +40,13 @@ export {
 export { charactersQueryKey, useCharacters } from './hooks/use-characters'
 export { useCreateCharacter } from './hooks/use-create-character'
 export { useDeleteCharacter } from './hooks/use-delete-character'
-export { CharacterBuilderShell } from './components/character-builder-shell.client'
+export { CharacterBuilderShell } from './components/builder/character-builder-shell.client'
 export { CampaignCharacterStatusSummary } from './components/detail/status/campaign-character-status-summary.client'
 export { CharacterDetailContent } from './components/detail/character-detail-content.client'
 export { CharacterOrganizationsSummary } from './components/detail/memberships/character-organizations-summary.client'
 export { CharacterOrganizationMembershipsContainer } from './components/detail/memberships/character-organization-memberships-container.client'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
-export { BuilderInventoryRemoveAction } from './components/builder/builder-inventory-remove-action.client'
+export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action.client'
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate.client'
 export { CatalogPickerSelectionActions } from './components/picker/catalog-picker-selection-actions.client'
 export {

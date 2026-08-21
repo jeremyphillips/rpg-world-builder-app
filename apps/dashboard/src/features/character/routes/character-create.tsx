@@ -2,8 +2,8 @@ import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 
-import { CharacterBuilderShell } from '../components/character-builder-shell.client'
-import { characterBuilderRouteClasses } from '../components/character-builder-shell.variants'
+import { CharacterBuilderShell } from '../components/builder/character-builder-shell.client'
+import { characterBuilderRouteClasses } from '../components/builder/character-builder-shell.variants'
 import { useBuildContext } from '../hooks/use-build-context'
 
 export function CharacterCreate() {
