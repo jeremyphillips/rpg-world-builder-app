@@ -1,5 +1,5 @@
-import type { LanguageProficiencyGrantSet } from '../../content/lib/grants/proficiency-grant-set'
-import { dedupeLanguageIds } from '../creature/languages'
+import type { LanguageProficiencyGrantSet } from '../../../content/lib/grants/proficiency-grant-set'
+import { dedupeLanguageIds } from '../../creature/languages'
 import type { CharacterLanguageProficiencyEntry, CharacterProficiencies } from './proficiencies'
 
 // ---------------------------------------------------------------------------

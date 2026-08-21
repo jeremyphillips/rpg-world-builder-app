@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Species } from '../../content/species'
+import type { Species } from '../../../content/species'
 import {
   characterMatchesOrganizationMemberSpeciesRecommendations,
   resolveOrganizationMemberSpeciesRecommendationIds,

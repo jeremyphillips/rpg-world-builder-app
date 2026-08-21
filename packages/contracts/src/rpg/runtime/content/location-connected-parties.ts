@@ -11,7 +11,7 @@ import {
   organizationLocationConnectionKindSchema,
   type OrganizationLocationConnectionFamily,
 } from '../../vocab/location/connection/organization-location-connection'
-import { characterTypeSchema } from '../character/core'
+import { characterTypeSchema } from '../character/sheet/core'
 
 export const LOCATION_CONNECTED_PARTY_SECTION_GROUP_IDS = [
   'territorial_authority',

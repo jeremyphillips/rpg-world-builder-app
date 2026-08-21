@@ -81,14 +81,31 @@ from a layer below it in this diagram, it is in the wrong module.
 
 **May import:** `runtime/creature/`, `rpg/content/`, `rpg/vocab/`, `rpg/campaign/`
 
-**Must not import:** `runtime/character-builder/`
+**Must not import:** `runtime/character-builder/` draft or ChoiceSet semantics.
+
+**Subfolders:**
+
+| Subfolder                  | Owns                                                                     |
+| -------------------------- | ------------------------------------------------------------------------ |
+| `sheet/`                   | Constituent persisted sheet field schemas (`core`, `proficiencies`, …)   |
+| `connections/`             | Character-side connection subdocuments                                   |
+| `organization-membership/` | Character↔organization membership API, recommendations, member read DTOs |
+| `summary/`                 | List/card/reference summary DTOs and formatting                          |
+| `derive/`                  | Read-model math and derivation-input assembly                            |
+
+**Root (`sheet.ts`, wire inputs, cross-slice modules):** compositor, create/patch
+inputs, validation messages, shared provenance labeling.
 
 **Subfolder `runtime/character/derive/`:** Read-model math from an **already built**
-character (modifiers, AC, profile). Use `derive*` / `resolve*` for formulas only —
-not grant expansion or builder draft logic.
+character (modifiers, AC, profile). `derive/sheet-derivation-input.ts` may import
+`CharacterBuildCatalogIndex` from character-builder **only** for indexed-catalog
+lookup when assembling derivation input from a persisted sheet — not draft semantics.
 
-**Exists today:** `character/languages.ts`, `character/proficiencies.ts` (schemas),
-`character/derive/*`
+**Exists today:** `character/sheet/*`, `character/summary/*`, `character/derive/*`,
+`character-builder/preview/builder-summary-parts.ts` (draft summary parts)
+
+**Campaign participation:** bulk roster and overview capabilities live in
+`rpg/campaign/character/` (`bulk-roster.ts`, `overview-capabilities.ts`).
 
 ---
 
@@ -149,7 +166,8 @@ runtime/creature/*
 
 runtime/character/*
   → may import creature
-  → never character-builder
+  → must not import character-builder draft / ChoiceSet semantics
+  → derive/sheet-derivation-input.ts may import CharacterBuildCatalogIndex only
 
 runtime/monster/*   (future)
   → may import creature
@@ -186,16 +204,16 @@ assembly step.
 
 ### Filename patterns
 
-| Pattern                                   | Location                       | Example                                                   |
-| ----------------------------------------- | ------------------------------ | --------------------------------------------------------- |
-| `{domain}.ts`                             | `runtime/creature/`            | `languages.ts`                                            |
-| `{domain}.ts`                             | `runtime/character/`           | `languages.ts`, `equipment-inventory.ts`                  |
-| `{aspect}.ts`                             | `runtime/character/derive/`    | `armor-class.ts`, `profile.ts`                            |
-| `resolve-{scope}-{domain}-choice-sets.ts` | `character-builder/resolvers/` | `resolve-language-choice-sets.ts`                         |
-| `resolve-{scope}-{domain}-choices.ts`     | `character-builder/resolvers/` | Thin adapter only; **migrate** impl to `*-choice-sets.ts` |
-| `assemble-{domain}.ts`                    | `character-builder/assembly/`  | `assemble-language-proficiencies.ts`                      |
-| `assemble-{aggregate}.ts`                 | `character-builder/assembly/`  | `assemble-proficiencies.ts`                               |
-| `{domain}-pool-options.ts`                | `character-builder/resolvers/` | Shared option builders (no `ChoiceSet` id); keep small    |
+| Pattern                                   | Location                       | Example                                                     |
+| ----------------------------------------- | ------------------------------ | ----------------------------------------------------------- |
+| `{domain}.ts`                             | `runtime/creature/`            | `languages.ts`                                              |
+| `{domain}.ts`                             | `runtime/character/sheet/`     | `proficiencies.ts`, `equipment-inventory.ts`                |
+| `{aspect}.ts`                             | `runtime/character/derive/`    | `armor-class.ts`, `profile.ts`, `sheet-derivation-input.ts` |
+| `resolve-{scope}-{domain}-choice-sets.ts` | `character-builder/resolvers/` | `resolve-language-choice-sets.ts`                           |
+| `resolve-{scope}-{domain}-choices.ts`     | `character-builder/resolvers/` | Thin adapter only; **migrate** impl to `*-choice-sets.ts`   |
+| `assemble-{domain}.ts`                    | `character-builder/assembly/`  | `assemble-language-proficiencies.ts`                        |
+| `assemble-{aggregate}.ts`                 | `character-builder/assembly/`  | `assemble-proficiencies.ts`                                 |
+| `{domain}-pool-options.ts`                | `character-builder/resolvers/` | Shared option builders (no `ChoiceSet` id); keep small      |
 
 ### `scope` segment (builder ChoiceSet files)
 

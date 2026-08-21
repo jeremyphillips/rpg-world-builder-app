@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { absoluteLevelSchema } from '../../primitives/level'
-import { characterValidationMessages } from './character-messages'
-import { characterAbilityScoreSchema } from '../../vocab/ability'
-import { creatureRuntimeHitPointsSchema } from '../../content/creature'
+import { absoluteLevelSchema } from '../../../primitives/level'
+import { characterValidationMessages } from '../character-messages'
+import { characterAbilityScoreSchema } from '../../../vocab/ability'
+import { creatureRuntimeHitPointsSchema } from '../../../content/creature'
 
 // ---------------------------------------------------------------------------
 // Core identity and progression

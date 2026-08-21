@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { EQUIPMENT_KINDS } from '../../vocab/equipment/kind'
+import { EQUIPMENT_KINDS } from '../../../vocab/equipment/kind'
 import {
   CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
   EQUIPMENT_KIND_TO_INVENTORY_BUCKET,

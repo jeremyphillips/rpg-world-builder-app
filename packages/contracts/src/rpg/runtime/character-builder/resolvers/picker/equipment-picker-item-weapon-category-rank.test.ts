@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Equipment } from '../../../../content/equipment'
-import type { CharacterProficiencies } from '../../../character/proficiencies'
+import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 import {
   characterPrefersMartialWeaponBrowseOrder,
   getEquipmentWeaponCategoryBrowseRank,

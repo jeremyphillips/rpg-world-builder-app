@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { locationDraftStoredSchema, locationSchema } from '../../content/location/location'
+import { locationDraftStoredSchema, locationSchema } from '../../../content/location/location'
 import { characterLocationConnectionSchema } from './location-connection'
 
 /** Saved-reference read result; null preserves an explicitly missing/deleted reference. */

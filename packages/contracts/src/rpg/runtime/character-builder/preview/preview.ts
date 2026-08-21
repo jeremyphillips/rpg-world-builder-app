@@ -1,7 +1,7 @@
 import type { CharacterDerivedProfile } from '../../character/derive/profile'
 import { isArmorEquipment } from '../../../content/equipment'
 import { deriveCharacterProfile } from '../../character/derive/profile'
-import type { CharacterProficiencies } from '../../character/proficiencies'
+import type { CharacterProficiencies } from '../../character/sheet/proficiencies'
 import { formatFieldMessage } from '../../../../validation/define-message'
 import { resolveUnresolvedChoiceSetSummaries } from '../readiness/resolve-unresolved-choice-set-summaries'
 import type { ChoiceSet } from '../choice-set'

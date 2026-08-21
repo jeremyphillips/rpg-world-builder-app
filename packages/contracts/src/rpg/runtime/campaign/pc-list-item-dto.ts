@@ -1,7 +1,7 @@
 import { type z } from 'zod'
 
 import { pcCharacterSchema } from '../character/sheet'
-import { characterCardCampaignSchema } from '../character/character-card-dtos'
+import { characterCardCampaignSchema } from '../character/summary/character-card-dtos'
 import { characterRouteContextSchema } from './character-route-context'
 
 // ---------------------------------------------------------------------------

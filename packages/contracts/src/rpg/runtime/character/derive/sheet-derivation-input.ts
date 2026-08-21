@@ -1,13 +1,18 @@
 import type {
   CharacterBuildCatalogIndex,
   ResolvedCharacterCreationRules,
-} from '../character-builder/context'
-import type { CharacterDerivationInput } from './derive/profile'
-import { resolveEquippedArmorFromInventory } from './equipment-inventory'
-import type { Character } from './sheet'
-import { getCharacterTotalLevel } from './sheet'
+} from '../../character-builder/context'
+import { resolveEquippedArmorFromInventory } from '../sheet/equipment-inventory'
+import type { Character } from '../sheet'
+import { getCharacterTotalLevel } from '../sheet'
+import type { CharacterDerivationInput } from './profile'
 
-/** Adapts a persisted character sheet into the global character derivation input shape. */
+/**
+ * Adapts a persisted character sheet into the global character derivation input shape.
+ *
+ * Exception: imports `CharacterBuildCatalogIndex` from character-builder for shared
+ * indexed-catalog lookup — not draft or ChoiceSet semantics.
+ */
 export function toCharacterSheetDerivationInput(
   character: Character,
   catalogIndex: CharacterBuildCatalogIndex,

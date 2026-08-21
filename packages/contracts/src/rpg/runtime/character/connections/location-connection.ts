@@ -3,7 +3,7 @@ import { z } from 'zod'
 import {
   characterLocationConnectionKindSchema,
   type CharacterLocationConnectionKind,
-} from '../../vocab/location/connection/character-location-connection'
+} from '../../../vocab/location/connection/character-location-connection'
 
 export const characterLocationConnectionSchema = z.object({
   id: z.string().min(1),

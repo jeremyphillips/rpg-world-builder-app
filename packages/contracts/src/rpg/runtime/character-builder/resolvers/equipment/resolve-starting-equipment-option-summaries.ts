@@ -17,7 +17,7 @@ import {
   isGrantedEquipmentAvailable,
   toEquipmentContentId,
 } from '../../../creature/equipment'
-import type { CharacterEquipment } from '../../../character/equipment-inventory'
+import type { CharacterEquipment } from '../../../character/sheet/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
@@ -25,7 +25,7 @@ import {
   inventoryBucketForEquipment,
   inventoryBucketForEquipmentKind,
   type CharacterWealth,
-} from '../../../character/equipment-inventory'
+} from '../../../character/sheet/equipment-inventory'
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
 import {
   formatStartingEquipmentPackageDescription,

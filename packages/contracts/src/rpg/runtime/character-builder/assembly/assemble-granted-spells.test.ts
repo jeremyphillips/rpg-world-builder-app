@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { assembleGrantedSpells, mergeCharacterSpellEntries } from './assemble-granted-spells'
-import type { CharacterSpellEntry } from '../../character/spells'
+import type { CharacterSpellEntry } from '../../character/sheet/spells'
 
 describe('assembleGrantedSpells', () => {
   it('assembles free-cast-only racial spells outside class collections', () => {

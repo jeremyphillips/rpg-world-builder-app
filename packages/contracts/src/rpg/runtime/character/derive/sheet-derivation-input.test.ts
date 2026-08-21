@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { indexCharacterBuildCatalog } from '../character-builder/context'
-import { builderTestCatalog, builderTestRules } from '../character-builder/test-fixtures'
-import { deriveCharacterProfile } from './derive/profile'
-import type { PcCharacter } from './sheet'
-import { toCharacterSheetDerivationInput } from './sheet-derivation'
+import { indexCharacterBuildCatalog } from '../../character-builder/context'
+import { builderTestCatalog, builderTestRules } from '../../character-builder/test-fixtures'
+import type { PcCharacter } from '../sheet'
+import { deriveCharacterProfile } from './profile'
+import { toCharacterSheetDerivationInput } from './sheet-derivation-input'
 
 const catalogIndex = indexCharacterBuildCatalog(builderTestCatalog)
 

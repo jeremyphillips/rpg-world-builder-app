@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { ClassStored } from '../../../content/classes/class'
 import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../primitives/proficiency/character-creation-proficiency-rules'
-import { LANGUAGE_GRANTS_SOURCE_ID } from '../../character/languages'
+import { LANGUAGE_GRANTS_SOURCE_ID } from '../../character/sheet/languages'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import {
   assembleLanguageProficiencyEntries,

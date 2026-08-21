@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { characterNarrativeSchema } from '../../rpg/runtime/character/narrative'
-import { characterHitPointsSchema } from '../../rpg/runtime/character/core'
+import { characterNarrativeSchema } from '../../rpg/runtime/character/sheet/narrative'
+import { characterHitPointsSchema } from '../../rpg/runtime/character/sheet/core'
 import { toolCategorySchema } from '../../rpg/vocab/equipment/tool-category'
 import {
   CHARACTER_IMPORT_FIELD_STATUSES,

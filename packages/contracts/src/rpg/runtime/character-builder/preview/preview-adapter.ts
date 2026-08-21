@@ -8,7 +8,7 @@ import type { CharacterBuilderDraft } from '../draft/draft'
 import {
   resolveEquippedArmorFromInventory,
   EMPTY_CHARACTER_EQUIPMENT,
-} from '../../character/equipment-inventory'
+} from '../../character/sheet/equipment-inventory'
 import { assembleStartingEquipment } from '../assembly/assemble-starting-equipment'
 
 /** Adapts a builder draft into the global character derivation input shape. */

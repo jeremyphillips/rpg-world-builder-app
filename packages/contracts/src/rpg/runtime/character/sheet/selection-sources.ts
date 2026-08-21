@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { characterValidationMessages } from './character-messages'
+import { characterValidationMessages } from '../character-messages'
 
 // ---------------------------------------------------------------------------
 // Source / provenance records

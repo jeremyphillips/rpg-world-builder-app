@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { characterRouteContextSchema } from '../campaign/character-route-context'
+import { characterRouteContextSchema } from '../../campaign/character-route-context'
 
 // ---------------------------------------------------------------------------
 // Character list card — reusable transport DTOs for player-facing pickers.
@@ -29,12 +29,6 @@ export const campaignCharacterCardSchema = characterCardSummarySchema.extend({
 
 export type CampaignCharacterCardDto = z.infer<typeof campaignCharacterCardSchema>
 
-/** @deprecated Prefer {@link campaignCharacterCardSchema} — retained for existing list DTO imports. */
-export const characterCardViewModelSchema = campaignCharacterCardSchema
-
-/** @deprecated Prefer {@link CampaignCharacterCardDto}. */
-export type CharacterCardViewModelDto = CampaignCharacterCardDto
-
 export const personalCharacterCardSchema = characterCardSummarySchema.extend({
   routeContext: characterRouteContextSchema,
 })
@@ -46,3 +40,8 @@ export const organizationCharacterCardSchema = characterCardSummarySchema.extend
 })
 
 export type OrganizationCharacterCardDto = z.infer<typeof organizationCharacterCardSchema>
+
+/** Transport summary for a character sheet row. Not a UI view model. */
+export const characterSummaryDtoSchema = characterCardSummarySchema
+
+export type CharacterSummaryDto = z.infer<typeof characterSummaryDtoSchema>

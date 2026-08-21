@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { usageFrequencySchema } from '../../vocab/usage-frequency'
+import { usageFrequencySchema } from '../../../vocab/usage-frequency'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
 // ---------------------------------------------------------------------------

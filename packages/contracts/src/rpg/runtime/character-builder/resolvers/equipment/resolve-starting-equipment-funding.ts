@@ -15,7 +15,7 @@ import {
 import {
   characterWealthFromGrant,
   type CharacterWealth,
-} from '../../../character/equipment-inventory'
+} from '../../../character/sheet/equipment-inventory'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type {
   CharacterBuilderDraft,

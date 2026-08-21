@@ -1,5 +1,5 @@
 import type { CharacterClass } from '../../../content/classes/class'
-import type { CharacterToolProficiencyEntry } from '../../character/proficiencies'
+import type { CharacterToolProficiencyEntry } from '../../character/sheet/proficiencies'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'

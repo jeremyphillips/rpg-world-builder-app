@@ -1,5 +1,5 @@
 import type { Equipment } from '../../../../content/equipment'
-import type { CharacterProficiencies } from '../../../character/proficiencies'
+import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 import type { WeaponCategory } from '../../../../vocab/weapon/category'
 
 /**

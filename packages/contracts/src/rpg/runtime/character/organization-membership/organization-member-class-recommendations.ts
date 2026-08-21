@@ -1,4 +1,4 @@
-import type { CharacterClass } from '../../content/classes/class'
+import type { CharacterClass } from '../../../content/classes/class'
 
 import { intersectPersistedContentIds } from './intersect-persisted-content-ids'
 

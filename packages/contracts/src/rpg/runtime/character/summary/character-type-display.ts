@@ -1,6 +1,6 @@
-import type { GameTermEntry, VocabularyTerm } from '../../vocab/types'
+import type { GameTermEntry, VocabularyTerm } from '../../../vocab/types'
 
-import { CHARACTER_TYPES, type CharacterType } from './core'
+import { CHARACTER_TYPES, type CharacterType } from '../sheet/core'
 
 export const CHARACTER_TYPE_TERM = {
   label: 'Character type',

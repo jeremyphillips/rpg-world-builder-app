@@ -19,7 +19,7 @@ import {
 } from '../../../../content/equipment-recommendation'
 import { equipmentIdMatchesReference } from '../../../creature/equipment-id-match'
 import { listEquipmentMatchingPool, toEquipmentContentId } from '../../../creature/equipment'
-import type { CharacterProficiencies } from '../../../character/proficiencies'
+import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { ChoiceSet } from '../../choice-set'

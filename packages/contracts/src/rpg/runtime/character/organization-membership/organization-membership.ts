@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import type { OrganizationMembershipTitleDefinition } from '../../content/organization/membership-titles'
-import { resolveOrganizationMembershipTitleDefinitionByLabel } from '../../content/organization/membership-titles'
-import { comparePriorityDescending } from '../../vocab/types'
-import { characterOrganizationConnectionSchema } from './connections'
+import type { OrganizationMembershipTitleDefinition } from '../../../content/organization/membership-titles'
+import { resolveOrganizationMembershipTitleDefinitionByLabel } from '../../../content/organization/membership-titles'
+import { comparePriorityDescending } from '../../../vocab/types'
+import { characterOrganizationConnectionSchema } from '../connections/connections'
 
 /** Body for nested POST …/organization-memberships. */
 export const createCharacterOrganizationMembershipInputSchema =

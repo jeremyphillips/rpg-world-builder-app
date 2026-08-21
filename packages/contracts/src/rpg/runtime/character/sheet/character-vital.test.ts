@@ -1,18 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  CHARACTER_BULK_ROSTER_FORM_DEFAULT,
-  applyBulkRosterStatusOperations,
-  countBulkRosterStatusChanges,
-  isBulkRosterStatusNoOp,
-} from './character-bulk-roster'
 import { createDefaultCharacterVitalState, normalizeCharacterVital } from './character-vital'
 import {
   applyCharacterVitalTransitionMetadata,
   mergeCharacterVitalPatch,
-} from './update-character-vital'
-import { createDefaultCampaignRosterState } from '../../campaign/character/participation'
-import { applyCampaignRosterTransitionMetadata } from '../../campaign/character/update-roster'
+} from '../update-character-vital'
+import { createDefaultCampaignRosterState } from '../../../campaign/character/participation'
+import { applyCampaignRosterTransitionMetadata } from '../../../campaign/character/update-roster'
 
 const TIMESTAMP = '2026-03-01T12:00:00.000Z'
 const EARLIER_TIMESTAMP = '2026-02-01T12:00:00.000Z'
@@ -83,29 +77,5 @@ describe('campaign roster patch', () => {
         timestamp: TIMESTAMP,
       }),
     ).toEqual({ status: 'inactive', changedAt: TIMESTAMP })
-  })
-})
-
-describe('bulk roster operations', () => {
-  const roster = createDefaultCampaignRosterState()
-
-  it('returns empty patch when unchanged', () => {
-    expect(applyBulkRosterStatusOperations(roster, CHARACTER_BULK_ROSTER_FORM_DEFAULT)).toEqual({})
-  })
-
-  it('counts roster changes', () => {
-    const result = countBulkRosterStatusChanges([{ roster }, { roster: { status: 'inactive' } }], {
-      rosterStatus: { kind: 'set', value: 'retired' },
-    })
-    expect(result.wouldChangeCount).toBe(2)
-    expect(result.unchangedCount).toBe(0)
-  })
-
-  it('detects no-op bulk roster apply', () => {
-    expect(
-      isBulkRosterStatusNoOp(roster, {
-        rosterStatus: { kind: 'set', value: 'active' },
-      }),
-    ).toBe(true)
   })
 })

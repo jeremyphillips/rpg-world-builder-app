@@ -1,5 +1,5 @@
 import type { CreateCharacterInput } from '../character/create-input'
-import { createDefaultCharacterVitalState } from '../character/character-vital'
+import { createDefaultCharacterVitalState } from '../character/sheet/character-vital'
 import type { Character, PcCharacter } from '../character/sheet'
 
 /**

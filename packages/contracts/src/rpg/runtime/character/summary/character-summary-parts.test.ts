@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { formatCharacterSummary } from './character-summary-format'
-import {
-  resolveBuilderCharacterSummaryParts,
-  resolveCharacterSummaryParts,
-} from './resolve-character-summary-parts'
+import { resolveCharacterSummaryParts } from './character-summary-parts'
 
 const lookup = {
   speciesName: (id: string) => {
@@ -82,45 +79,5 @@ describe('resolveCharacterSummaryParts', () => {
     )
 
     expect(formatCharacterSummary(parts)).toBe('Dwarf · Level 4 Fighter')
-  })
-})
-
-describe('resolveBuilderCharacterSummaryParts', () => {
-  it('supports incomplete builder drafts', () => {
-    expect(
-      formatCharacterSummary(
-        resolveBuilderCharacterSummaryParts(
-          {
-            species: { speciesId: 'srd-cc-5.2.1:dwarf' },
-            class: { level: 4 },
-          },
-          lookup,
-        ),
-      ),
-    ).toBe('Dwarf')
-
-    expect(
-      formatCharacterSummary(
-        resolveBuilderCharacterSummaryParts(
-          {
-            species: {},
-            class: { classId: 'srd-cc-5.2.1:fighter', level: 4 },
-          },
-          lookup,
-        ),
-      ),
-    ).toBe('Level 4 Fighter')
-
-    expect(
-      formatCharacterSummary(
-        resolveBuilderCharacterSummaryParts(
-          {
-            species: { speciesId: 'srd-cc-5.2.1:elf' },
-            class: { level: 0 },
-          },
-          lookup,
-        ),
-      ),
-    ).toBe('Elf · Level 0')
   })
 })

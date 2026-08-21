@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
-import { characterCardViewModelSchema } from '../character/character-card-dtos'
+import { campaignCharacterCardSchema } from '../character/summary/character-card-dtos'
 
 // ---------------------------------------------------------------------------
 // Campaign party PC list item — composed character card + member + roster wire shape.
 // ---------------------------------------------------------------------------
 
 export const campaignPartyPcListItemSchema = z.object({
-  character: characterCardViewModelSchema,
+  character: campaignCharacterCardSchema,
   member: z
     .object({
       id: z.string().min(1),

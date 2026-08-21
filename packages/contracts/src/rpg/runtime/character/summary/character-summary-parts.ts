@@ -1,10 +1,5 @@
-import type {
-  CharacterBuilderDraftClass,
-  CharacterBuilderDraftSpecies,
-} from '../character-builder/draft/draft'
-
 import type { CharacterSummaryParts } from './character-summary-format'
-import type { Character } from './sheet'
+import type { Character } from '../sheet'
 
 export type CharacterSummaryLabelLookup = {
   speciesName: (speciesId: string) => string | undefined
@@ -13,7 +8,7 @@ export type CharacterSummaryLabelLookup = {
   subclassName?: (subclassId: string) => string | undefined
 }
 
-function resolveSpeciesPart(
+export function resolveSpeciesSummaryPart(
   speciesId: string,
   heritageId: string | undefined,
   lookup: CharacterSummaryLabelLookup,
@@ -56,39 +51,15 @@ export function resolveCharacterSummaryParts(
   character: Pick<Character, 'classes' | 'species'>,
   lookup: CharacterSummaryLabelLookup,
 ): CharacterSummaryParts {
-  const species = resolveSpeciesPart(character.species.id, character.species.heritageId, lookup)
+  const species = resolveSpeciesSummaryPart(
+    character.species.id,
+    character.species.heritageId,
+    lookup,
+  )
 
   return {
     ...(species ? { species } : {}),
     ...(character.classes.length === 0 ? { classlessLevel: 0 } : {}),
     classes: resolveClassParts(character.classes, lookup),
-  }
-}
-
-export function resolveBuilderCharacterSummaryParts(
-  draft: {
-    species: Pick<CharacterBuilderDraftSpecies, 'speciesId' | 'heritageId'>
-    class: Pick<CharacterBuilderDraftClass, 'classId' | 'level'>
-  },
-  lookup: CharacterSummaryLabelLookup,
-): CharacterSummaryParts {
-  const species = draft.species.speciesId
-    ? resolveSpeciesPart(draft.species.speciesId, draft.species.heritageId, lookup)
-    : undefined
-
-  const classes =
-    draft.class.classId && lookup.className(draft.class.classId)
-      ? [
-          {
-            name: lookup.className(draft.class.classId)!,
-            level: draft.class.level,
-          },
-        ]
-      : []
-
-  return {
-    ...(species ? { species } : {}),
-    ...(classes.length === 0 && draft.class.level === 0 ? { classlessLevel: 0 } : {}),
-    classes,
   }
 }

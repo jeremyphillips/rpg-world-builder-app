@@ -29,7 +29,7 @@ import { assembleStartingEquipment } from '../assembly/assemble-starting-equipme
 import {
   characterWealthFromGrant,
   EMPTY_CHARACTER_EQUIPMENT,
-} from '../../character/equipment-inventory'
+} from '../../character/sheet/equipment-inventory'
 import { normalizeCharacterWealthGrant } from '../../../primitives/character-wealth-grant'
 import { mapCreateInputZodIssueMessage } from './finalize-zod-issue-messages'
 import { validateCharacterBuild } from '../validate/validate-character-build'

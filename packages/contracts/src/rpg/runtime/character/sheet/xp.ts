@@ -1,6 +1,6 @@
-import { xpRequiredForLevel, type XpProgressionBody } from '../../content/xp-progression'
-import type { Character } from './sheet'
-import { getCharacterTotalLevel } from './sheet'
+import { xpRequiredForLevel, type XpProgressionBody } from '../../../content/xp-progression'
+import type { Character } from '../sheet'
+import { getCharacterTotalLevel } from '../sheet'
 
 // ---------------------------------------------------------------------------
 // Character XP — level threshold lookup and mutation eligibility.

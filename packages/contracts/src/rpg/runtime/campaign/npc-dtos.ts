@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { characterClassEntrySchema, characterSpeciesSchema } from '../character/core'
-import { characterVitalStateSchema } from '../character/character-vital'
+import { characterClassEntrySchema, characterSpeciesSchema } from '../character/sheet/core'
+import { characterVitalStateSchema } from '../character/sheet/character-vital'
 import { characterVitalPatchSchema } from '../character/update-character-vital'
 import { npcCharacterSchema } from '../character/sheet'
 import { campaignCharacterParticipationSchema } from '../../campaign/character/participation'

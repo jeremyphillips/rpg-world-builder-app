@@ -5,10 +5,10 @@ import {
   appendEquipmentEntry,
   EMPTY_CHARACTER_EQUIPMENT,
   type CharacterEquipment,
-} from '../rpg/runtime/character/equipment-inventory'
-import type { CharacterProficiencies } from '../rpg/runtime/character/proficiencies'
-import type { CharacterSpellEntry } from '../rpg/runtime/character/spells'
-import type { CharacterSelectionSource } from '../rpg/runtime/character/selection-sources'
+} from '../rpg/runtime/character/sheet/equipment-inventory'
+import type { CharacterProficiencies } from '../rpg/runtime/character/sheet/proficiencies'
+import type { CharacterSpellEntry } from '../rpg/runtime/character/sheet/spells'
+import type { CharacterSelectionSource } from '../rpg/runtime/character/sheet/selection-sources'
 import type { Alignment } from '../rpg/vocab/alignment'
 import type { SystemRulesetId } from '../rpg/primitives/ruleset'
 import type { CharacterImportResult } from './adapter/character-import-result.schema'

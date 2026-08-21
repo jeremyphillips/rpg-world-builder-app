@@ -1,4 +1,4 @@
-import type { Species } from '../../content/species'
+import type { Species } from '../../../content/species'
 
 import { intersectPersistedContentIds } from './intersect-persisted-content-ids'
 

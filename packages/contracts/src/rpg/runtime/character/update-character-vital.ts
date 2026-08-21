@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { characterVitalStatusSchema } from '../../vocab/character-vital-status'
-import { characterVitalStateSchema, type CharacterVitalState } from './character-vital'
+import { characterVitalStateSchema, type CharacterVitalState } from './sheet/character-vital'
 
 // ---------------------------------------------------------------------------
 // Vital patch — client-writable status and note.

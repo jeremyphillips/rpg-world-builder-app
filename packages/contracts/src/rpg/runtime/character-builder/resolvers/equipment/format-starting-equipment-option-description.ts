@@ -4,7 +4,7 @@ import { formatWealth, formatWealthAsGold, wealthToCopper } from '../../../../pr
 import {
   characterWealthFromGrant,
   type CharacterWealth,
-} from '../../../character/equipment-inventory'
+} from '../../../character/sheet/equipment-inventory'
 import type { StartingEquipmentOptionSummaryItem } from './resolve-starting-equipment-option-summaries'
 
 export const DEFAULT_STANDARD_EQUIPMENT_LABEL = 'standard equipment'

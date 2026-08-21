@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { characterValidationMessages } from './character-messages'
-import { armorCategorySchema } from '../../vocab/armor/category'
-import { toolCategorySchema } from '../../vocab/equipment/tool-category'
-import { languageIdSchema } from '../../vocab/language'
-import { weaponCategorySchema } from '../../vocab/weapon/category'
-import { skillSchema } from '../../content/skill-proficiency'
+import { characterValidationMessages } from '../character-messages'
+import { armorCategorySchema } from '../../../vocab/armor/category'
+import { toolCategorySchema } from '../../../vocab/equipment/tool-category'
+import { languageIdSchema } from '../../../vocab/language'
+import { weaponCategorySchema } from '../../../vocab/weapon/category'
+import { skillSchema } from '../../../content/skill-proficiency'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
 /**

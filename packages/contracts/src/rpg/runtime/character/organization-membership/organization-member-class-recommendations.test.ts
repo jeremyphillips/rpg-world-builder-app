@@ -6,7 +6,7 @@ import {
   resolveOrganizationMemberClassRecommendations,
   resolveOrganizationNpcClassRecommendationIds,
 } from './organization-member-class-recommendations'
-import type { CharacterClass } from '../../content/classes/class'
+import type { CharacterClass } from '../../../content/classes/class'
 
 function makeClass(slug: string, id = `srd-cc-5.2.1:${slug}`): CharacterClass {
   return {

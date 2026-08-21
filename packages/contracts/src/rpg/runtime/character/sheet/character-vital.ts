@@ -3,7 +3,7 @@ import { z } from 'zod'
 import {
   characterVitalStatusSchema,
   type CharacterVitalStatus,
-} from '../../vocab/character-vital-status'
+} from '../../../vocab/character-vital-status'
 
 // ---------------------------------------------------------------------------
 // Character vital — intrinsic life/death state on the character record.

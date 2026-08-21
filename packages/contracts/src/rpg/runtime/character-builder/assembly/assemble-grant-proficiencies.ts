@@ -7,7 +7,7 @@ import type {
   CharacterSkillProficiencyEntry,
   CharacterToolProficiencyEntry,
   CharacterWeaponProficiencyEntry,
-} from '../../character/proficiencies'
+} from '../../character/sheet/proficiencies'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { collectSourcedGrants } from './collect-sourced-grants'

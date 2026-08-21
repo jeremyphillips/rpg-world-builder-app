@@ -8,8 +8,8 @@ import { getSlotRow, SLOT_TABLES } from '../../../content/classes/spellcasting/s
 import { proficiencyBonus } from '../../../primitives/level'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
 import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
-import type { CharacterProficiencies } from '../proficiencies'
-import type { CharacterSkillToolProficiencyRank } from '../proficiencies'
+import type { CharacterProficiencies } from '../sheet/proficiencies'
+import type { CharacterSkillToolProficiencyRank } from '../sheet/proficiencies'
 import {
   abilityModifier,
   hasSavingThrowProficiency,
