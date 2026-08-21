@@ -5,7 +5,7 @@ import {
   getOrganizationDomainDiscoveryTerms,
   getOrganizationDomainLabel,
   organizationDomainSchema,
-} from './organization-domain'
+} from './domain'
 
 describe('Organization Domain vocabulary', () => {
   it('defines the exact single-domain set', () => {

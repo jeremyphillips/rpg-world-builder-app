@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_PRACTICE_IDS } from './organization-practice'
+import { ORGANIZATION_PRACTICE_IDS } from './practice'
 import {
   ORGANIZATION_PRACTICE_PRESENTATION_FAMILIES,
   ORGANIZATION_PRACTICE_PRESENTATION_FAMILY_BY_ID,
   getOrganizationPracticePresentationFamily,
-} from './organization-practice-presentation-family'
+} from './practice-presentation-family'
 
 describe('Organization Practice presentation families', () => {
   it('assigns exactly one UI-only family to every practice id', () => {

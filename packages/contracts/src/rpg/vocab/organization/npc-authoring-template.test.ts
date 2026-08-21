@@ -9,7 +9,7 @@ import {
   NPC_AUTHORING_TEMPLATE_TERM,
   npcAuthoringTemplateIdSchema,
 } from './npc-authoring-template'
-import { ORGANIZATION_PRESET_MEMBER_CLASS_AFFINITIES } from './organization-preset-member-class-affinities'
+import { ORGANIZATION_PRESET_MEMBER_CLASS_AFFINITIES } from './preset-member-class-affinities'
 
 describe('NPC authoring template vocabulary', () => {
   it('registers taxonomy term metadata', () => {

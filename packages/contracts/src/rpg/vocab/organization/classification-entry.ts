@@ -1,4 +1,4 @@
-import type { GameTermEntry } from './types'
+import type { GameTermEntry } from '../types'
 
 /** Canonical Organization classification entry with local discovery metadata. */
 export type OrganizationClassificationEntry = GameTermEntry & {

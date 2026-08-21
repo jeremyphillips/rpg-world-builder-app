@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_AUTHORING_PRESET_IDS } from './organization-authoring-preset'
+import { ORGANIZATION_AUTHORING_PRESET_IDS } from './authoring-preset'
 import {
   ORGANIZATION_PRESET_MEMBER_CLASS_AFFINITIES,
   resolveOrganizationPresetMemberClassAffinityIds,
-} from './organization-preset-member-class-affinities'
-import type { CharacterClass } from '../content/classes/class'
+} from './preset-member-class-affinities'
+import type { CharacterClass } from '../../content/classes/class'
 
 function makeClass(slug: string, id = `srd-cc-5.2.1:${slug}`): CharacterClass {
   return {

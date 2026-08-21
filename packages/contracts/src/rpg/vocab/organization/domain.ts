@@ -1,7 +1,7 @@
-import { keysFromEntries, vocabEnumFromEntries } from './enum-schema'
-import type { OrganizationClassificationEntry } from './organization-classification-entry'
-import { getOrganizationClassificationDiscoveryTerms } from './organization-classification-entry'
-import type { VocabularyTerm } from './types'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
+import type { OrganizationClassificationEntry } from './classification-entry'
+import { getOrganizationClassificationDiscoveryTerms } from './classification-entry'
+import type { VocabularyTerm } from '../types'
 
 export const ORGANIZATION_DOMAIN_TERM = {
   label: 'Organization Domain',

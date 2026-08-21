@@ -1,13 +1,7 @@
-import {
-  getOrganizationFunctionDiscoveryTerms,
-  type OrganizationFunction,
-} from './organization-function'
-import {
-  getOrganizationPracticeDiscoveryTerms,
-  type OrganizationPractice,
-} from './organization-practice'
-import { getOrganizationDomainDiscoveryTerms, type OrganizationDomain } from './organization-domain'
-import { getOrganizationFormDiscoveryTerms, type OrganizationForm } from './organization-form'
+import { getOrganizationFunctionDiscoveryTerms, type OrganizationFunction } from './function'
+import { getOrganizationPracticeDiscoveryTerms, type OrganizationPractice } from './practice'
+import { getOrganizationDomainDiscoveryTerms, type OrganizationDomain } from './domain'
+import { getOrganizationFormDiscoveryTerms, type OrganizationForm } from './form'
 
 export function getOrganizationClassificationDiscoveryText(input: {
   organizationDomain: OrganizationDomain

@@ -6,15 +6,15 @@ import {
   ORGANIZATION_AUTHORING_PRESET_IDS,
   ORGANIZATION_AUTHORING_PRESETS,
   type OrganizationAuthoringPresetId,
-} from './organization-authoring-preset'
-import { getOrganizationMembershipTitleEntry } from './organization-membership-title'
-import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from './organization-member-title-entry'
+} from './authoring-preset'
+import { getOrganizationMembershipTitleEntry } from './membership-title'
+import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from './member-title-entry'
 import { getNpcAuthoringTemplateEntry } from './npc-authoring-template'
-import { ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS } from './organization-preset-membership-title-refs'
-import { ORGANIZATION_DOMAIN_IDS } from './organization-domain'
-import { ORGANIZATION_FORM_IDS } from './organization-form'
-import { ORGANIZATION_FUNCTION_IDS } from './organization-function'
-import { ORGANIZATION_PRACTICE_IDS } from './organization-practice'
+import { ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS } from './preset-membership-title-refs'
+import { ORGANIZATION_DOMAIN_IDS } from './domain'
+import { ORGANIZATION_FORM_IDS } from './form'
+import { ORGANIZATION_FUNCTION_IDS } from './function'
+import { ORGANIZATION_PRACTICE_IDS } from './practice'
 
 function normalizePresetLabel(label: string): string {
   return label.trim().toLowerCase()

@@ -1,18 +1,18 @@
-import type { GameTermEntry } from './types'
+import type { GameTermEntry } from '../types'
 import {
   ORGANIZATION_MEMBERSHIP_TITLE_ENTRIES,
   type OrganizationMembershipTitleId,
-} from './organization-membership-title-entries'
+} from './membership-title-entries'
 
-export type { OrganizationMembershipTitleId } from './organization-membership-title-entries'
-export { ORGANIZATION_MEMBERSHIP_TITLE_ENTRIES } from './organization-membership-title-entries'
+export type { OrganizationMembershipTitleId } from './membership-title-entries'
+export { ORGANIZATION_MEMBERSHIP_TITLE_ENTRIES } from './membership-title-entries'
 
 /** Canonical reusable organization membership title — no priority (contextual per preset/org). */
 export type OrganizationMembershipTitleEntry = GameTermEntry & {
   readonly searchTerms?: readonly string[]
 }
 
-import type { VocabularyTerm } from './types'
+import type { VocabularyTerm } from '../types'
 
 export const ORGANIZATION_MEMBERSHIP_TITLE_TERM = {
   label: 'Organization Membership Title',

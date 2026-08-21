@@ -5,7 +5,7 @@ import {
   getOrganizationMembershipTitleDiscoveryTerms,
   ORGANIZATION_MEMBERSHIP_TITLE_ENTRIES,
   ORGANIZATION_MEMBERSHIP_TITLE_TERM,
-} from './organization-membership-title'
+} from './membership-title'
 
 describe('organization membership title vocabulary', () => {
   it('registers taxonomy term metadata', () => {

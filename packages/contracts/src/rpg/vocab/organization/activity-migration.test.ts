@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_FUNCTION_IDS } from './organization-function'
-import { ORGANIZATION_PRACTICE_IDS } from './organization-practice'
+import { ORGANIZATION_FUNCTION_IDS } from './function'
+import { ORGANIZATION_PRACTICE_IDS } from './practice'
 import {
   ORGANIZATION_ACTIVITY_MIGRATION,
   ORGANIZATION_ACTIVITY_PARTITION_IDS,
   migrateOrganizationActivities,
-} from './organization-activity-migration'
+} from './activity-migration'
 
 describe('organization activity migration map', () => {
   it('maps every partition id exactly once to an existing function or practice', () => {

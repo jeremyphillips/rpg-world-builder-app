@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import { organizationDomainSchema } from '../vocab/organization-domain'
-import { organizationFunctionSchema } from '../vocab/organization-function'
-import { organizationFormSchema } from '../vocab/organization-form'
-import { organizationPracticeSchema } from '../vocab/organization-practice'
+import { organizationDomainSchema } from '../vocab/organization/domain'
+import { organizationFunctionSchema } from '../vocab/organization/function'
+import { organizationFormSchema } from '../vocab/organization/form'
+import { organizationPracticeSchema } from '../vocab/organization/practice'
 import { organizationConnectionsSchema } from './organization-connections'
 import {
   organizationCreateMembershipTitlesInputRefinement,

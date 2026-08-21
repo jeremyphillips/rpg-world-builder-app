@@ -4,7 +4,7 @@ import {
   ORGANIZATION_FORM_IDS,
   getOrganizationFormDiscoveryTerms,
   organizationFormSchema,
-} from './organization-form'
+} from './form'
 
 describe('Organization Form vocabulary', () => {
   it('keeps the first form set reusable and narrow', () => {

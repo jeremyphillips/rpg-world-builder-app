@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { getOrganizationFunctionEntry, ORGANIZATION_FUNCTION_IDS } from './organization-function'
+import { getOrganizationFunctionEntry, ORGANIZATION_FUNCTION_IDS } from './function'
 import {
   ORGANIZATION_PRACTICE_ENTRIES,
   ORGANIZATION_PRACTICE_IDS,
   getOrganizationPracticeDiscoveryTerms,
   getOrganizationPracticeEntry,
   organizationPracticeSchema,
-} from './organization-practice'
+} from './practice'
 
 const EXPECTED_PRACTICE_IDS = [
   'blacksmithing',

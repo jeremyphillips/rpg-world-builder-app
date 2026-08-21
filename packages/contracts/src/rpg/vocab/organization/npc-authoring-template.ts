@@ -1,6 +1,6 @@
-import { keysFromEntries, vocabEnumFromEntries } from './enum-schema'
-import type { GameTermEntry } from './types'
-import type { VocabularyTerm } from './types'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
+import type { GameTermEntry } from '../types'
+import type { VocabularyTerm } from '../types'
 
 /**
  * Canonical class slug seed — resolved to catalog class ids at recommendation time.

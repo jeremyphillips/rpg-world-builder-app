@@ -5,7 +5,7 @@ import {
   ORGANIZATION_FUNCTION_IDS,
   getOrganizationFunctionEntry,
   organizationFunctionSchema,
-} from './organization-function'
+} from './function'
 
 describe('Organization Function vocabulary', () => {
   it('keeps the registry narrow and schema-backed', () => {

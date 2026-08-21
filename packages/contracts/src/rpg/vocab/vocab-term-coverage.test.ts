@@ -64,11 +64,11 @@ import { WEAPON_CATEGORY_TERM } from './weapon/category'
 import { WEAPON_MASTERY_TERM } from './weapon/mastery'
 import { WEAPON_MODE_TERM } from './weapon/mode'
 import { WEAPON_PROPERTY_TERM } from './weapon/property'
-import { ORGANIZATION_FUNCTION_TERM } from './organization-function'
-import { ORGANIZATION_PRACTICE_TERM } from './organization-practice'
-import { ORGANIZATION_DOMAIN_TERM } from './organization-domain'
-import { ORGANIZATION_FORM_TERM } from './organization-form'
-import { NPC_AUTHORING_TEMPLATE_TERM } from './npc-authoring-template'
+import { ORGANIZATION_FUNCTION_TERM } from './organization/function'
+import { ORGANIZATION_PRACTICE_TERM } from './organization/practice'
+import { ORGANIZATION_DOMAIN_TERM } from './organization/domain'
+import { ORGANIZATION_FORM_TERM } from './organization/form'
+import { NPC_AUTHORING_TEMPLATE_TERM } from './organization/npc-authoring-template'
 
 /** Closed `rpg/vocab` modules — each `*_ENTRIES` map has a sibling `*_TERM`. */
 const RPG_VOCAB_CLOSED_TERMS = [

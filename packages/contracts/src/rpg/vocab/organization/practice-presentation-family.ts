@@ -1,4 +1,4 @@
-import type { OrganizationPractice } from './organization-practice'
+import type { OrganizationPractice } from './practice'
 
 /** UI-only browse families for the Practice combobox. Not persisted and not eligibility rules. */
 export const ORGANIZATION_PRACTICE_PRESENTATION_FAMILIES = [

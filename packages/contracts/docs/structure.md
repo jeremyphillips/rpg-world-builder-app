@@ -380,7 +380,7 @@ Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocabularyOptionIdSchema` and catalog seeds; see
 [docs/vocabulary.md](../../../docs/vocabulary.md).
 
-**NPC authoring templates** ([`npc-authoring-template.ts`](../src/rpg/vocab/npc-authoring-template.ts))
+**NPC authoring templates** ([`npc-authoring-template.ts`](../src/rpg/vocab/organization/npc-authoring-template.ts))
 follow the same two-layer pattern with an extended entry shape:
 
 ```ts

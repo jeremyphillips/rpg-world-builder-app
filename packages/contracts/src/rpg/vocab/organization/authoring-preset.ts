@@ -1,11 +1,11 @@
-import type { OrganizationDomain } from './organization-domain'
-import type { OrganizationForm } from './organization-form'
-import type { OrganizationFunction } from './organization-function'
-import type { OrganizationPractice } from './organization-practice'
+import type { OrganizationDomain } from './domain'
+import type { OrganizationForm } from './form'
+import type { OrganizationFunction } from './function'
+import type { OrganizationPractice } from './practice'
 import {
   ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS,
   type OrganizationPresetMembershipTitleRef,
-} from './organization-preset-membership-title-refs'
+} from './preset-membership-title-refs'
 
 /**
  * Ephemeral familiar starting points for organization authoring.

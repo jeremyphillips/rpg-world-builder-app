@@ -1,4 +1,4 @@
-import type { OrganizationAuthoringPresetId } from './organization-authoring-preset'
+import type { OrganizationAuthoringPresetId } from './authoring-preset'
 
 /** Minimal discoverable class row for preset slug → id seeding. */
 export type OrganizationPresetMemberClassSeedTarget = {

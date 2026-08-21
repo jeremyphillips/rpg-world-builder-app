@@ -5,14 +5,14 @@ import {
   ORGANIZATION_AUTHORING_PRESETS,
   ORGANIZATION_AUTHORING_PRESET_IDS,
   type OrganizationAuthoringPresetId,
-} from '../vocab/organization-authoring-preset'
-import { npcAuthoringTemplateIdSchema } from '../vocab/npc-authoring-template'
-import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from '../vocab/organization-member-title-entry'
-import type { OrganizationMembershipTitlePriority } from '../vocab/organization-member-title-entry'
+} from '../vocab/organization/authoring-preset'
+import { npcAuthoringTemplateIdSchema } from '../vocab/organization/npc-authoring-template'
+import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from '../vocab/organization/member-title-entry'
+import type { OrganizationMembershipTitlePriority } from '../vocab/organization/member-title-entry'
 import {
   getOrganizationMembershipTitleEntry,
   type OrganizationMembershipTitleId,
-} from '../vocab/organization-membership-title'
+} from '../vocab/organization/membership-title'
 import { comparePriorityDescending } from '../vocab/types'
 import { vocabularyOptionIdSchema } from '../vocab/vocabulary'
 
@@ -39,7 +39,7 @@ export const organizationMembershipTitlePrioritySchema = z.union([
   z.literal(ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES[4]),
 ])
 
-export type { OrganizationMembershipTitlePriority } from '../vocab/organization-member-title-entry'
+export type { OrganizationMembershipTitlePriority } from '../vocab/organization/member-title-entry'
 
 export const organizationPresetNpcRecommendationSchema = z.object({
   templateId: npcAuthoringTemplateIdSchema,

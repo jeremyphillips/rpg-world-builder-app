@@ -1,5 +1,5 @@
-import type { OrganizationFunction } from './organization-function'
-import type { OrganizationPractice } from './organization-practice'
+import type { OrganizationFunction } from './function'
+import type { OrganizationPractice } from './practice'
 
 /**
  * Partition keys for the functions/practices split — not a claim that every id was

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { getOrganizationClassificationDiscoveryText } from './organization-classification-discovery'
-import { getOrganizationDomainDiscoveryTerms } from './organization-domain'
-import { getOrganizationFormDiscoveryTerms } from './organization-form'
-import { getOrganizationFunctionDiscoveryTerms } from './organization-function'
-import { getOrganizationPracticeDiscoveryTerms } from './organization-practice'
+import { getOrganizationClassificationDiscoveryText } from './classification-discovery'
+import { getOrganizationDomainDiscoveryTerms } from './domain'
+import { getOrganizationFormDiscoveryTerms } from './form'
+import { getOrganizationFunctionDiscoveryTerms } from './function'
+import { getOrganizationPracticeDiscoveryTerms } from './practice'
 
 describe('getOrganizationClassificationDiscoveryText', () => {
   it('concatenates domain, form, function, and practice discovery terms', () => {
