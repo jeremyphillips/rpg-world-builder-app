@@ -70,10 +70,10 @@ import { useRelationshipPickerNestedCreate } from '../../../lib/relationship/nes
 import {
   buildOrganizationFamilyKindOptions,
   buildOrganizationLocationChangeKindOptions,
-  canReopenConnectionKindDecision,
   resolveActiveConnectionKind,
   type LocationConnectionKindOption,
 } from '../../../lib/relationship/location-connection/location-connection-kind-options'
+import { resolveConnectionKindDecisionPresentation } from '../../../lib/relationship/location-connection/location-connection-kind-decision-presentation'
 import { organizationLocationConnectionHasAvailableKind } from '../../../lib/relationship/location-connection/location-connection-duplicate-keys'
 import type { OrganizationForwardDrawerMode } from '../../../lib/relationship/location-connection/location-connection-mutation-mode'
 import {
@@ -368,11 +368,14 @@ function OrganizationLocationConnectionLinkDrawerContent({
     organizationId,
   ])
 
-  const canEditKind = canReopenConnectionKindDecision(kindOptions)
-  const kindDecisionComplete = showKindStep && Boolean(activeKind)
-  const showKindField =
-    showKindStep && (!kindDecisionComplete || editingKind || (kindDecisionComplete && !canEditKind))
-  const showKindSummary = showKindStep && canEditKind && kindDecisionComplete && !editingKind
+  const { canEditKind, showKindField, showKindSummary } = resolveConnectionKindDecisionPresentation(
+    {
+      kindOptions,
+      selectedValue: activeKind,
+      editingKind,
+      showKindStep,
+    },
+  )
   const selectedKindOption = kindOptions.find((option) => option.value === activeKind)
   const kindFieldLabel = ORGANIZATION_DRAWER_KIND_FIELD_LABELS[intent]
   const kindChangeAriaLabel = RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL

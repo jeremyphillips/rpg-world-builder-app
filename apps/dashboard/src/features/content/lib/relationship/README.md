@@ -44,13 +44,13 @@ Feature `*-link-drawer.client.tsx` files are **composition roots** in
 
 ## Public entry files
 
-| Folder                 | Supported imports                                                                                                                                        |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `core/`                | `relationship-candidate-set`, `relationship-mutation-capabilities`, `relationship-mutation-mode`                                                         |
-| `list/`                | `relationship-list.client` (`RelationshipList`), `relationship-overflow-actions` (`buildRelationshipOverflowActions`, overflow action id type)           |
-| `drawer/`              | `drawer-context.client`, `relationship-drawer-subject-field.client`, `relationship-drawer-field-labels` (`RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL`) |
-| `nested-create/`       | `use-relationship-picker-nested-create.client`, intent resolvers, `revalidateCreated*` helpers                                                           |
-| `location-connection/` | eligibility, duplicate-keys, drawer-intent, kind-options, KindField, alternatives, invalidate, current-endpoint, mutation-mode aliases                   |
+| Folder                 | Supported imports                                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `core/`                | `relationship-candidate-set`, `relationship-mutation-capabilities`, `relationship-mutation-mode`                                                                   |
+| `list/`                | `relationship-list.client` (`RelationshipList`), `relationship-overflow-actions`, `relationship-group-presentation` (typed-edge group action placement)            |
+| `drawer/`              | `drawer-context.client`, `relationship-drawer-subject-field.client`, `relationship-drawer-field-labels` (`RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL`)           |
+| `nested-create/`       | `use-relationship-picker-nested-create.client`, intent resolvers, `revalidateCreated*` helpers                                                                     |
+| `location-connection/` | eligibility, duplicate-keys, drawer-intent, kind-options, kind-decision-presentation, KindField, alternatives, invalidate, current-endpoint, mutation-mode aliases |
 
 **Private:** `list/row/cross-content-relationship-row.client` (use `RelationshipList.Row`
 only), list Empty/Footer internals, nested-create modals/handoff helpers (reached via the hook).
@@ -80,13 +80,12 @@ Do **not** extend InvOrg/InvChar `add` without `addKind` with sequenced overlay
 
 ## Known seams
 
-### `relationship-group-presentation.ts` — **unresolved**
+### `relationship-group-presentation.ts` — **shared list group policy**
 
-Referenced in docs; **zero production consumers**. **Not SSOT** until wired.
-
-Phase 6 decision: does the module own semantic grouping **policy**, or is it only a
-label map? Colocate beside the consuming surface if copy-only; wire here only if
-multiple surfaces independently need the same grouping semantics.
+Classifies typed-edge sections into `meaningful_slots` (labeled structural groups with
+`Group` `headerAction`) vs `sparse_groups` (family-level add on `RelationshipList.Root`).
+Wired by location territorial/people sections and organization forward family sections.
+Domain copy stays in feature `lib/` — this module owns **action placement semantics** only.
 
 ### `location-connection-kind-options.ts` → Location copy — **violation (Phase 7)**
 

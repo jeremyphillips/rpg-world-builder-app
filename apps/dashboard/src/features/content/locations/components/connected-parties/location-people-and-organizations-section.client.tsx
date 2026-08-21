@@ -18,6 +18,10 @@ import {
   buildRelationshipOverflowActions,
   type RelationshipOverflowActionId,
 } from '../../../lib/relationship/list/relationship-overflow-actions'
+import {
+  relationshipGroupUsesRootFamilyAdd,
+  resolveLocationConnectedPartyRelationshipPresentation,
+} from '../../../lib/relationship/list/relationship-group-presentation'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
 import { LOCATION_INVERSE_PEOPLE_OVERFLOW } from '../../lib/connected-parties/location-connection-surface-copy'
 import type { PeopleKindSlot } from '../../lib/connected-parties/location-connected-parties-people-kind-slots'
@@ -31,6 +35,13 @@ import {
   toLocationConnectedPartyEditTarget,
   type LocationConnectedPartyEditTarget,
 } from './location-connected-parties-section.client'
+
+const PEOPLE_AND_ORGANIZATIONS_GROUP_PRESENTATION =
+  resolveLocationConnectedPartyRelationshipPresentation('people_and_organizations')
+
+if (!relationshipGroupUsesRootFamilyAdd(PEOPLE_AND_ORGANIZATIONS_GROUP_PRESENTATION)) {
+  throw new Error('People and organizations section requires sparse_groups group presentation')
+}
 
 export type LocationPeopleMutationContext = {
   location: Location

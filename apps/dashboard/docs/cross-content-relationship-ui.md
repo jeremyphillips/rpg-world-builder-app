@@ -442,7 +442,7 @@ Rules:
 
 ## Presentation policy
 
-Relationship direction does **not** determine whether empty kinds are displayed. Use dashboard presentation policy in [`relationship-group-presentation.ts`](../src/features/content/lib/relationship/list/relationship-group-presentation.ts):
+Relationship direction does **not** determine whether empty kinds are displayed. Section/family classification lives in [`relationship-group-presentation.ts`](../src/features/content/lib/relationship/list/relationship-group-presentation.ts) (`resolveLocationConnectedPartyRelationshipPresentation`, `resolveOrganizationLocationConnectionFamilyPresentation`). Use `relationshipGroupUsesLabeledSlotActions` / `relationshipGroupUsesRootFamilyAdd` to branch `RelationshipList` action placement — domain copy stays in feature `lib/`.
 
 | Presentation           | When to use                                                                                        |
 | ---------------------- | -------------------------------------------------------------------------------------------------- |

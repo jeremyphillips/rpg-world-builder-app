@@ -22,6 +22,10 @@ import {
   type RelationshipOverflowActionId,
 } from '../../../lib/relationship/list/relationship-overflow-actions'
 import {
+  relationshipGroupUsesLabeledSlotActions,
+  resolveLocationConnectedPartyRelationshipPresentation,
+} from '../../../lib/relationship/list/relationship-group-presentation'
+import {
   TERRITORIAL_AUTHORITY_OVERFLOW,
   TERRITORIAL_AUTHORITY_SECTION_HEADING,
   TERRITORIAL_AUTHORITY_SECTION_HELPER,
@@ -31,6 +35,13 @@ import type { LocationConnectedPartyEditTarget } from './location-connected-part
 import { TERRITORIAL_AUTHORITY_HEADING_ID } from '../../lib/connected-parties/location-connected-parties-section-layout'
 
 export { TERRITORIAL_AUTHORITY_SECTION_EMPTY } from '../../lib/connected-parties/location-connection-surface-copy'
+
+const TERRITORIAL_AUTHORITY_GROUP_PRESENTATION =
+  resolveLocationConnectedPartyRelationshipPresentation('territorial_authority')
+
+if (!relationshipGroupUsesLabeledSlotActions(TERRITORIAL_AUTHORITY_GROUP_PRESENTATION)) {
+  throw new Error('Territorial authority section requires meaningful_slots group presentation')
+}
 
 const SINGLETON_KINDS = [
   'governs',

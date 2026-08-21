@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   LOCATION_CONNECTED_PARTY_RELATIONSHIP_PRESENTATION,
   ORGANIZATION_LOCATION_CONNECTION_FAMILY_PRESENTATION,
+  relationshipGroupUsesLabeledSlotActions,
+  relationshipGroupUsesRootFamilyAdd,
   resolveLocationConnectedPartyRelationshipPresentation,
   resolveOrganizationLocationConnectionFamilyPresentation,
 } from './relationship-group-presentation'
@@ -28,5 +30,12 @@ describe('relationship-group-presentation', () => {
       territorial_authority: 'sparse_groups',
     })
     expect(resolveOrganizationLocationConnectionFamilyPresentation('site')).toBe('sparse_groups')
+  })
+
+  it('maps presentation modes to RelationshipList action placement', () => {
+    expect(relationshipGroupUsesLabeledSlotActions('meaningful_slots')).toBe(true)
+    expect(relationshipGroupUsesLabeledSlotActions('sparse_groups')).toBe(false)
+    expect(relationshipGroupUsesRootFamilyAdd('sparse_groups')).toBe(true)
+    expect(relationshipGroupUsesRootFamilyAdd('meaningful_slots')).toBe(false)
   })
 })

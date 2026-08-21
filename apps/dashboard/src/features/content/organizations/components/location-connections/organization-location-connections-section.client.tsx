@@ -20,6 +20,10 @@ import {
 } from './organization-location-connection-relationship-row.client'
 import { DetailSectionPanel } from '../../../lib/detail/section/detail-section-panel.client'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
+import {
+  relationshipGroupUsesRootFamilyAdd,
+  resolveOrganizationLocationConnectionFamilyPresentation,
+} from '../../../lib/relationship/list/relationship-group-presentation'
 
 export const ORGANIZATION_LOCATION_CONNECTIONS_LOAD_ERROR =
   'Could not load organization location connections.'
@@ -111,15 +115,19 @@ export function OrganizationLocationConnectionsSection({
           {familiesToRender.map((family) => {
             const familyGroup = populatedFamilyMap.get(family)
             const familyPresentation = resolveOrganizationForwardFamilyPresentation(family)
+            const groupPresentation =
+              resolveOrganizationLocationConnectionFamilyPresentation(family)
+            const familyAddAtRoot = relationshipGroupUsesRootFamilyAdd(groupPresentation)
             const familyAddEnabled = canManage && Boolean(canAddToFamily[family])
             const familyItemCount =
               familyGroup?.kindGroups.reduce(
                 (count, kindGroup) => count + kindGroup.items.length,
                 0,
               ) ?? 0
-            const addAction = familyAddEnabled
-              ? { label: familyPresentation.add, onSelect: () => onAddFamily?.(family) }
-              : undefined
+            const addAction =
+              familyAddAtRoot && familyAddEnabled
+                ? { label: familyPresentation.add, onSelect: () => onAddFamily?.(family) }
+                : undefined
 
             return (
               <DetailSectionPanel

@@ -47,10 +47,10 @@ import {
 import { buildSubjectLocationConnectionKeySet } from '../../../lib/relationship/location-connection/location-connection-duplicate-keys'
 import {
   buildPeopleSectionKindOptions,
-  canReopenConnectionKindDecision,
   resolveActiveConnectionKind,
   resolvePeopleKindSlotFromOptionValue,
 } from '../../../lib/relationship/location-connection/location-connection-kind-options'
+import { resolveConnectionKindDecisionPresentation } from '../../../lib/relationship/location-connection/location-connection-kind-decision-presentation'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
 import {
   resolveLocationInverseCharacterAddDrawerInstruction,
@@ -209,12 +209,17 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   )
 
   const effectiveSubjectType = subjectTypeOverride ?? selectableSubjectTypes[0] ?? null
-  const canEditKind = canReopenConnectionKindDecision(kindOptions)
-  const kindDecisionComplete = Boolean(activeSlotKey)
-  const showKindField =
-    kindOptions.length > 0 &&
-    (!kindDecisionComplete || editingKind || (kindDecisionComplete && !canEditKind))
-  const showKindSummary = canEditKind && kindDecisionComplete && !editingKind
+  const kindDecisionPresentation = React.useMemo(
+    () =>
+      resolveConnectionKindDecisionPresentation({
+        kindOptions,
+        selectedValue: activeSlotKey,
+        editingKind,
+        showKindStep: kindOptions.length > 0,
+      }),
+    [kindOptions, activeSlotKey, editingKind],
+  )
+  const { canEditKind, showKindField, showKindSummary } = kindDecisionPresentation
   const selectedKindOption = kindOptions.find((option) => option.value === activeSlotKey)
   const kindFieldLabel = LOCATION_PEOPLE_SECTION_SURFACE_COPY.kindFieldLabel
   const kindChangeAriaLabel = RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL
