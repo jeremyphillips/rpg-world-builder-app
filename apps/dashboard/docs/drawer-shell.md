@@ -1,7 +1,10 @@
 # DrawerShell
 
 Canonical dashboard scaffold for application drawers (create/edit forms and
-informational side panels). Picker workflows use `@rpg/ui`
+informational side panels). Grammar inventory and ownership model:
+[drawer-architecture.md](./drawer-architecture.md).
+
+Picker workflows use `@rpg/ui`
 [`CatalogPickerSheet`](../../../packages/ui/src/components/ui/catalog-picker-sheet.client.tsx);
 read-only builder dossiers use allowlisted
 [`BuilderOptionDetailsSheet`](../../../packages/ui/src/components/ui/builder-option-details-sheet.client.tsx).
