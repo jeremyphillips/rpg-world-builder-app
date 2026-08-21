@@ -18,9 +18,9 @@ import { ContentDetailResolver } from '../../lib/detail/page/content-detail-reso
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section.client'
-import { ClassProgressionTable } from '../components/class-progression-table'
-import { ClassProficienciesSection } from '../components/class-proficiencies-section.client'
-import { ClassFeatureItem as ClassFeatureRow } from '../components/class-feature-item'
+import { ClassProgressionTable } from '../components/detail/class-progression-table'
+import { ClassProficienciesSection } from '../components/detail/class-proficiencies-section'
+import { ClassFeatureItem as ClassFeatureRow } from '../components/detail/class-feature-item'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 import {
   buildClassDetailViewModel,

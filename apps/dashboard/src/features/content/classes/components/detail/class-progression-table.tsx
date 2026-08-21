@@ -15,7 +15,7 @@ import {
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 
-import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
+import { isSubclassChoiceFeatureRow } from '../../lib/class-subclass-choice-features'
 
 type ProgressionRow = {
   level: number

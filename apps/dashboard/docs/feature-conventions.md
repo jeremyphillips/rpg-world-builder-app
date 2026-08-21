@@ -177,7 +177,7 @@ import { WidePage } from '@/components/layout/page/wide-page'
   for description and sections. Pass static rows via `statRows` or hook-driven
   rows via `metadata` (e.g. species creature type). Not a page width shell.
 
-  Full-width blocks (e.g. [`ClassProgressionTable`](../src/features/content/classes/components/class-progression-table.tsx))
+  Full-width blocks (e.g. [`ClassProgressionTable`](../src/features/content/classes/components/detail/class-progression-table.tsx))
   render as **siblings** below `ContentDetailLayout` in the same `WidePage` — do
   not nest wide tables inside the layout.
 

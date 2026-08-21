@@ -3,13 +3,16 @@ import type { SkillProficiency } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
-import { ContentLinkBadge, ContentStaticBadge } from '../../lib/detail/metadata/content-link-badge'
+import {
+  ContentLinkBadge,
+  ContentStaticBadge,
+} from '../../../lib/detail/metadata/content-link-badge'
 import {
   CLASS_DISPLAY_NONE,
   CLASS_PROFICIENCY_GROUP_LABELS,
   type ClassDisplayVocabulary,
   type ClassProficienciesViewModel,
-} from '../lib/class-display'
+} from '../../lib/class-display'
 
 type ClassProficienciesSectionProps = {
   section: ClassProficienciesViewModel

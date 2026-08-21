@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
-import { pickClass } from '../../lib/fixtures/pick'
+import { pickClass } from '../../../lib/fixtures/pick'
 import { ClassProgressionTable } from './class-progression-table'
 
 const meta = {

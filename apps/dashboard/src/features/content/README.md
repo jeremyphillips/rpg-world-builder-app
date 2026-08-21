@@ -73,7 +73,7 @@ also refresh skill proficiencies). [`locations/`](./locations) and future sub-ar
 (`monsters/`) follow the same list + mutation factory pattern in their
 `hooks/use-*.ts`.
 
-Class [`ClassFeatureItem`](./classes/components/class-feature-item.tsx) rows render level + name headings inline
+Class [`ClassFeatureItem`](./classes/components/detail/class-feature-item.tsx) rows render level + name headings inline
 via local `featureHeading()` (no separate formatter module); stored feature
 descriptions are body-only HTML (`<p>`, `<strong>` subsections).
 

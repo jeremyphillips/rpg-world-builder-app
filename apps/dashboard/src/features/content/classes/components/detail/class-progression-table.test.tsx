@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
-import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
-import { pickClass } from '../../lib/fixtures/pick'
+import { defaultCampaignRules } from '../../../lib/form-options/content-campaign-rules'
+import { pickClass } from '../../../lib/fixtures/pick'
 import { ClassProgressionTable } from './class-progression-table'
 
 describe('ClassProgressionTable', () => {
