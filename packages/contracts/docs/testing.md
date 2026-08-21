@@ -8,7 +8,7 @@ what it owns — not the full stack.
 
 | Layer               | Owns                                               | Example                                            |
 | ------------------- | -------------------------------------------------- | -------------------------------------------------- |
-| Primitives          | Level-range table messages, overlap/gap/end-at-max | `level-range-table.test.ts`                        |
+| Primitives          | Level-range table messages, overlap/gap/end-at-max | `level/level-range-table.test.ts`                  |
 | Campaign rules      | Starting wealth merge, sparse diff, tier lookup    | `starting-wealth.test.ts`                          |
 | Campaign patches    | Resolve defaults, happy-path merge                 | `campaign-character-creation-patch.test.ts`        |
 | Validation matrices | Cross-field `safeParse*` / request-body rules      | `*-validation.test.ts`                             |

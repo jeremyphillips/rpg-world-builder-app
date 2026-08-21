@@ -10,17 +10,17 @@ locale catalog keyed by id.
 ```mermaid
 flowchart LR
     tier1["Tier 1: global defaults<br/>src/validation/messages.ts"] --> errorMap["Field-aware error map<br/>@rpg/ui/form makeResolver"]
-    tier2["Tier 2: domain catalogs<br/>e.g. primitives/level-messages.ts"] --> refine["refine / superRefine<br/>(message baked into issue)"]
+    tier2["Tier 2: domain catalogs<br/>e.g. primitives/level/level-messages.ts"] --> refine["refine / superRefine<br/>(message baked into issue)"]
     tier3["Tier 3: form overrides<br/>dashboard lib modules"] --> refine
     errorMap --> rhf["react-hook-form errors"]
     refine --> rhf
 ```
 
-| Tier                | What                                                                                                                                                                                                  | Where                                                                                                                                                                | Example                                       |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| 1 — Global defaults | Boilerplate for required/min/max/integer/options/items. Schemas stay message-free (`z.number().int().min(1)`); the form layer's error map formats raw Zod issues with the field's configured `label`. | `src/validation/messages.ts` (`fieldValidationMessages`)                                                                                                             | `Level must be at least 1.`                   |
-| 2 — Domain catalogs | Cross-field domain rules shared across schemas and apps. Messages are baked into `ctx.addIssue` / `.refine` at parse time.                                                                            | Co-located with the domain, e.g. `rpg/primitives/level-messages.ts` (`levelValidationMessages`), `rpg/content/xp-progression.ts` (`xpProgressionValidationMessages`) | `Level 5 is not covered by any tier.`         |
-| 3 — Form overrides  | Rules specific to one form's shape. Same `defineMessage` primitive, defined next to the form schema in the app.                                                                                       | Dashboard `lib/` modules, e.g. `starting-wealth-form-fields.ts` (`startingWealthValidationMessages`)                                                                 | `Bonus gold rolls must use a multiplier (×).` |
+| Tier                | What                                                                                                                                                                                                  | Where                                                                                                                                                                      | Example                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| 1 — Global defaults | Boilerplate for required/min/max/integer/options/items. Schemas stay message-free (`z.number().int().min(1)`); the form layer's error map formats raw Zod issues with the field's configured `label`. | `src/validation/messages.ts` (`fieldValidationMessages`)                                                                                                                   | `Level must be at least 1.`                   |
+| 2 — Domain catalogs | Cross-field domain rules shared across schemas and apps. Messages are baked into `ctx.addIssue` / `.refine` at parse time.                                                                            | Co-located with the domain, e.g. `rpg/primitives/level/level-messages.ts` (`levelValidationMessages`), `rpg/content/xp-progression.ts` (`xpProgressionValidationMessages`) | `Level 5 is not covered by any tier.`         |
+| 3 — Form overrides  | Rules specific to one form's shape. Same `defineMessage` primitive, defined next to the form schema in the app.                                                                                       | Dashboard `lib/` modules, e.g. `starting-wealth-form-fields.ts` (`startingWealthValidationMessages`)                                                                       | `Bonus gold rolls must use a multiplier (×).` |
 
 Precedence is automatic: Zod only consults the tier-1 error map for issues that
 have no message of their own, so tier-2/3 messages set via `.refine` /
@@ -77,12 +77,12 @@ Contract/API draft schemas do not need this — they never see the UI sentinel.
 
 ## Naming conventions
 
-| Thing          | Convention                                                                                          | Example                            |
-| -------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| Message id     | `validation.<scope>.<rule>` (camelCase segments)                                                    | `validation.level.rangeOverlap`    |
-| Catalog const  | `<scope>ValidationMessages`                                                                         | `levelValidationMessages`          |
-| File           | `<domain>-messages.ts` next to the domain module; small domains may keep an in-file section instead | `rpg/primitives/level-messages.ts` |
-| Global catalog | `fieldValidationMessages` in `src/validation/messages.ts`                                           | —                                  |
+| Thing          | Convention                                                                                          | Example                                  |
+| -------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| Message id     | `validation.<scope>.<rule>` (camelCase segments)                                                    | `validation.level.rangeOverlap`          |
+| Catalog const  | `<scope>ValidationMessages`                                                                         | `levelValidationMessages`                |
+| File           | `<domain>-messages.ts` next to the domain module; small domains may keep an in-file section instead | `rpg/primitives/level/level-messages.ts` |
+| Global catalog | `fieldValidationMessages` in `src/validation/messages.ts`                                           | —                                        |
 
 | Catalog const                                    | Scope prefix                                    | Owns                                                                 |
 | ------------------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------------- |

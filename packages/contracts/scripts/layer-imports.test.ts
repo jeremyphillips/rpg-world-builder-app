@@ -12,6 +12,14 @@ const deletedPaths = [
   'rpg/content/lib/equipment-family-path.ts',
   'rpg/content/lib/viewer-character-relationship.ts',
   'shared/paginated-items.ts',
+  'rpg/primitives/character/viewer-character-relationship.ts',
+  'rpg/primitives/weapon/mode-compatibility-messages.ts',
+  'rpg/primitives/level.ts',
+  'rpg/primitives/level-messages.ts',
+  'rpg/primitives/level-range-table.ts',
+  'rpg/primitives/level-range-table-authoring.ts',
+  'rpg/primitives/content/catalog-usage-reference.ts',
+  'rpg/primitives/content/catalog-entity-usage-blocker.ts',
 ]
 
 const forbiddenPatterns: Array<{ label: string; roots: string[]; pattern: RegExp }> = [

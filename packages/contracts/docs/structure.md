@@ -75,7 +75,8 @@ flowchart BT
 | ---------------------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | A shared validation message or message primitive                                         | `validation/`                       | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
 | A closed id set with labels (and optional SRD text)                                      | `rpg/vocab/`                        | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`, `rpg/vocab/personal-name-component.ts`                                 |
-| A reusable value type used across content types                                          | `rpg/primitives/`                   | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
+| A reusable value type used across content types                                          | `rpg/primitives/`                   | `rpg/primitives/dice.ts`, `rpg/primitives/money.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`         |
+| Coin-denominated price/value objects (catalog costs, formulas)                           | `rpg/primitives/`                   | `rpg/primitives/money.ts` — physical quantities stay in `units.ts`                                                           |
 | Level bounds, tier-table validation, level-scoped authoring (cross-domain primitive)     | `rpg/primitives/level/`             | `level.ts`, `level-messages.ts`, `level-range-table.ts`, … — not under Character by consumer frequency                       |
 | Roll / effect-card composition primitives                                                | `rpg/primitives/mechanics/`         | `roll.ts`, `effect-base.ts`, …                                                                                               |
 | Catalog modeling status ladder, gaps, derivation                                         | `rpg/primitives/modeling/`          | `schema.ts`, `status.ts`, `gap-codes.ts`, …                                                                                  |
@@ -86,7 +87,7 @@ flowchart BT
 | Shared content helpers (envelope, keys, cross-type policy)                               | `rpg/content/lib/`                  | `rpg/content/lib/envelope.ts`, `rpg/content/lib/grants/grants.ts`                                                            |
 | Domain-neutral action/transport envelopes (no RPG semantics)                             | `src/lib/`                          | `lib/action-validation.ts`, `lib/paginated-items.ts`, `lib/usage-guard-action-validation.ts`                                 |
 | Catalog type identity closed sets                                                        | `rpg/primitives/content/`           | `primitives/content/content-type-keys.ts`                                                                                    |
-| Usage reference + blocker wire model (character, catalog, rule arms)                     | `rpg/primitives/usage/`             | `usage-blocker.ts`, `character-usage-reference.ts`, … — semantic mini-package, not catalog identity                          |
+| Usage reference + blocker wire model (character, catalog, rule arms)                     | `rpg/primitives/usage/`             | `catalog-usage-reference.ts`, `catalog-entity-usage-blocker.ts`, `usage-blocker.ts`, … — semantic mini-package               |
 | Viewer–catalog character relationship wire envelope                                      | `rpg/primitives/`                   | `viewer-character-relationship.ts` — cross-layer wire shape; not a Character-named folder by consumption alone               |
 | Campaign-specific max-level override / resolved level cap (policy)                       | `rpg/campaign/`                     | Campaign rules and patches — **consumes** Level primitives from `rpg/primitives/level/`                                      |
 | Vocabulary disable/result availability                                                   | `rpg/vocab/`                        | `vocab/vocabulary-disable-availability.ts`                                                                                   |
@@ -122,8 +123,7 @@ barrel.
 ### `rpg/primitives/` organization
 
 Top-level layout follows **semantic ownership**, not consumer domain (Character,
-Weapon, Spell, …) or file count. Exact paths after refactors are updated in this
-doc once moves land — this section states **placement rules** only.
+Weapon, Spell, …) or file count.
 
 ```text
 primitives/
@@ -135,6 +135,51 @@ primitives/
 **Core invariant:** a folder is not justified because files share a noun, because
 a higher layer frequently consumes the primitive, or because it was documented
 there previously.
+
+#### Current tree
+
+Exact production layout under `packages/contracts/src/rpg/primitives/`:
+
+```text
+primitives/
+  index.ts
+
+  level/                         # mini-package
+    index.ts
+    level.ts
+    level-messages.ts
+    level-range-table.ts
+    level-range-table-authoring.ts
+    (+ co-located *.test.ts)
+
+  usage/                         # mini-package
+    catalog-usage-reference.ts
+    catalog-entity-usage-blocker.ts
+    character-usage-reference.ts
+    usage-blocker.ts
+    usage-blocker-source-key.ts
+    rule-blocker.ts
+    read-usage-blocker-source-key.ts
+    preview-limits.ts
+
+  proficiency/  mechanics/  modeling/
+
+  content/
+    content-type-keys.ts         # admission boundary only
+
+  money.ts  units.ts  wealth.ts  character-wealth-grant.ts
+  viewer-character-relationship.ts
+  dice.ts  dice-formula.ts  currency-formula.ts  area-geometry.ts
+  standard-array.ts  standard-array-messages.ts
+  authored-content.ts  versioned-template.ts  ruleset.ts
+  prose.ts  number-format.ts  format-slug.ts  same-string-set.ts
+  (+ co-located *.test.ts for root modules)
+```
+
+Weapon mode form hints live in `rpg/content/equipment/weapon-mode-compatibility-messages.ts`
+(equipment authoring presentation — re-exported from `rpg/content/equipment.ts`).
+
+There is **no** `character/` or `weapon/` folder under `primitives/`.
 
 #### Standalone root files (`<concept>.ts`)
 
@@ -153,7 +198,7 @@ concept with a shared lifecycle**. Current examples:
 | Folder         | Owns                                                                                         |
 | -------------- | -------------------------------------------------------------------------------------------- |
 | `level/`       | Numeric tier bounds, validation messages, level-range tables, level-scoped authoring helpers |
-| `usage/`       | Usage references, blocker union, source keys, preview limits                                 |
+| `usage/`       | Catalog/character usage references, blocker union, source keys, preview limits               |
 | `proficiency/` | Proficiency grant/choice inputs and character-creation language rules                        |
 | `mechanics/`   | Roll values and effect-card composition blocks                                               |
 | `modeling/`    | Catalog modeling status ladder, gap codes, derivation helpers                                |
@@ -422,7 +467,7 @@ path should document a layer boundary:
 | `@rpg/contracts`                       | `src/index.ts`                       | Default — runtime, campaign, content, vocab, shared        |
 | `@rpg/contracts/shared`                | `src/shared/index.ts`                | Auth, user, roles, routes, errors                          |
 | `@rpg/contracts/vocab`                 | `src/rpg/vocab/index.ts`             | Label/format helpers, vocabulary sets                      |
-| `@rpg/contracts/primitives`            | `src/rpg/primitives/index.ts`        | Dice, levels, ruleset id                                   |
+| `@rpg/contracts/primitives`            | `src/rpg/primitives/index.ts`        | Dice, levels, money, units, ruleset id                     |
 | `@rpg/contracts/content`               | `src/rpg/content/index.ts`           | Content schemas and DTOs                                   |
 | `@rpg/contracts/runtime`               | `src/rpg/runtime/index.ts`           | Character sheet runtime contracts                          |
 | `@rpg/contracts/rpg/character-builder` | `src/rpg/character-builder/index.ts` | Builder wire contracts (step ids, validation, acquisition) |
