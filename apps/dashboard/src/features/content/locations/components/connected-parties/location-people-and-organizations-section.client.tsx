@@ -8,7 +8,7 @@ import {
   formatCharacterMixedHeadingSuffix,
 } from '@/features/character'
 
-import { DetailSectionPanel } from '../../../lib/detail/section/detail-section-panel.client'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/detail-collection-panel.client'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,
@@ -236,7 +236,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
     : undefined
 
   return (
-    <DetailSectionPanel heading={heading} headingId={headingId} helper={helper}>
+    <DetailCollectionPanel heading={heading} headingId={headingId} helper={helper}>
       <RelationshipList.Root itemCount={rows.length} emptyLabel={sectionEmpty} action={addAction}>
         {populatedSlots.map((slot) => {
           const slotRows = rowsForSlot(slot, rowsByBinding)
@@ -295,6 +295,6 @@ export function LocationPeopleAndOrganizationsSectionBody({
           )
         })}
       </RelationshipList.Root>
-    </DetailSectionPanel>
+    </DetailCollectionPanel>
   )
 }

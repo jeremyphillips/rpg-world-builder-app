@@ -6,8 +6,8 @@ import {
   ENTITY_CONTENT_OFFSET_VAR,
   ENTITY_SURFACE_INLINE_END_VAR,
   ENTITY_SURFACE_INLINE_START_VAR,
-} from '../../entity/anatomy/entity-geometry.tokens'
-import { entitySurfaceHorizontalInsetClasses } from '../../entity/surfaces/entity-surface-inset.variants'
+} from '../../../entity/anatomy/entity-geometry.tokens'
+import { entitySurfaceHorizontalInsetClasses } from '../../../entity/surfaces/entity-surface-inset.variants'
 
 export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {

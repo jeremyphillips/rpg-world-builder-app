@@ -5,12 +5,12 @@ import { useId, useState, type ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { EntityAnatomy } from '../../entity/anatomy/entity-anatomy.client'
-import type { EntityAnatomyTrailing } from '../../entity/anatomy/entity-anatomy-trailing.types'
-import { buildEntityContentOffsetStyle } from '../../entity/anatomy/entity-leading-rail.lib'
-import { projectEntitySummaryModel } from '../../entity/summary/entity-summary-projection.lib'
-import type { EntitySummaryStatusItem } from '../../entity/summary/entity-summary-status.types'
-import { entitySurfaceInsetVariants } from '../../entity/surfaces/entity-surface-inset.variants'
+import { EntityAnatomy } from '../../../entity/anatomy/entity-anatomy.client'
+import type { EntityAnatomyTrailing } from '../../../entity/anatomy/entity-anatomy-trailing.types'
+import { buildEntityContentOffsetStyle } from '../../../entity/anatomy/entity-leading-rail.lib'
+import { projectEntitySummaryModel } from '../../../entity/summary/entity-summary-projection.lib'
+import type { EntitySummaryStatusItem } from '../../../entity/summary/entity-summary-status.types'
+import { entitySurfaceInsetVariants } from '../../../entity/surfaces/entity-surface-inset.variants'
 import {
   detailEntityRowDisclosureButtonVariants,
   detailEntityRowDisclosureContentVariants,

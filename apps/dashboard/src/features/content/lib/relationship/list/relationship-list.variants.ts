@@ -4,7 +4,7 @@ export const relationshipListRootVariants = cva(
   '[&>[data-slot=relationship-list-group]+[data-slot=relationship-list-group]]:border-t [&>[data-slot=relationship-list-group]+[data-slot=relationship-list-group]]:border-border-subtle',
 )
 
-/** Relationship list group shell — no DetailSectionGroup border-b. */
+/** Relationship list group shell — no DetailCollectionGroup border-b. */
 export const relationshipListGroupVariants = cva('border-b-0 px-4 py-2')
 
 export const relationshipListEmptyVariants = cva(

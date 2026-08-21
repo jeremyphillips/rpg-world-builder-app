@@ -5,9 +5,11 @@ import { Plus } from 'lucide-react'
 
 import { Button, Eyebrow, Text, cn } from '@rpg/ui'
 
-import { detailSectionGroupHeaderVariants } from '../../detail/section/detail-section-group.variants'
-import { detailRowListSeparatorVariants } from '../../detail/section/detail-row-list.variants'
-import type { DetailOverflowAction } from '../../detail/row/detail-overflow-menu.client'
+import {
+  detailCollectionGroupHeaderVariants,
+  detailCollectionRecordSeparatorVariants,
+} from '../../detail/collection/detail-collection-chrome.variants'
+import type { DetailOverflowAction } from '../../detail/detail-overflow-menu.client'
 import { CrossContentRelationshipRow } from './row/cross-content-relationship-row.client'
 import type { EntitySummaryStatusItem } from '../../entity/summary/entity-summary-status.types'
 import {
@@ -174,7 +176,7 @@ function RelationshipListGroup({
       <div data-slot="relationship-list-group" className={relationshipListGroupVariants()}>
         {showHeader ? (
           <div
-            className={detailSectionGroupHeaderVariants()}
+            className={detailCollectionGroupHeaderVariants()}
             data-slot="relationship-list-group-header"
           >
             {label ? <Eyebrow size="sm">{label}</Eyebrow> : null}
@@ -194,14 +196,14 @@ function RelationshipListGroup({
     <div data-slot="relationship-list-group" className={relationshipListGroupVariants()}>
       {showHeader ? (
         <div
-          className={detailSectionGroupHeaderVariants()}
+          className={detailCollectionGroupHeaderVariants()}
           data-slot="relationship-list-group-header"
         >
           {label ? <Eyebrow size="sm">{label}</Eyebrow> : null}
           {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
         </div>
       ) : null}
-      <ul className={cn(detailRowListSeparatorVariants({ kind: 'record' }))}>{children}</ul>
+      <ul className={cn(detailCollectionRecordSeparatorVariants())}>{children}</ul>
     </div>
   )
 }

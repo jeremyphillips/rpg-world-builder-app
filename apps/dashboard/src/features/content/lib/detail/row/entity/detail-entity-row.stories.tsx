@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { DetailEntityRow } from './detail-entity-row.client'
-import { DetailOverflowMenu } from './detail-overflow-menu.client'
-import { DetailSectionRowList } from '../section/detail-section-row-list.client'
+import { DetailOverflowMenu } from '../../detail-overflow-menu.client'
+import { DetailCollectionRowList } from '../../collection/detail-collection-row-list.client'
 
 const meta = {
   title: 'Content/Detail/DetailEntityRow',
@@ -23,7 +23,7 @@ export const Default: Story = {
 
 export const WithOverflow: Story = {
   render: () => (
-    <DetailSectionRowList separator="structural">
+    <DetailCollectionRowList separator="structural">
       <DetailEntityRow
         heading="The Silver Eel"
         headingHref="/campaigns/demo/locations/silver-eel"
@@ -58,13 +58,13 @@ export const WithOverflow: Story = {
           ),
         }}
       />
-    </DetailSectionRowList>
+    </DetailCollectionRowList>
   ),
 }
 
 export const WithDisclosure: Story = {
   render: () => (
-    <DetailSectionRowList separator="structural">
+    <DetailCollectionRowList separator="structural">
       <DetailEntityRow
         heading="Dock Ward"
         headingHref="/campaigns/demo/locations/dock-ward"
@@ -73,7 +73,7 @@ export const WithDisclosure: Story = {
           mode: 'expandable',
           label: 'locations in Dock Ward',
           content: (
-            <DetailSectionRowList separator="structural">
+            <DetailCollectionRowList separator="structural">
               <DetailEntityRow
                 heading="The Silver Eel"
                 headingHref="/campaigns/demo/locations/silver-eel"
@@ -86,7 +86,7 @@ export const WithDisclosure: Story = {
                 headingSuffix=" · Building · Guildhall"
                 inset="parent"
               />
-            </DetailSectionRowList>
+            </DetailCollectionRowList>
           ),
         }}
         trailing={{
@@ -108,6 +108,6 @@ export const WithDisclosure: Story = {
         headingSuffix=" · District · 0 locations"
         disclosure={{ mode: 'reserved' }}
       />
-    </DetailSectionRowList>
+    </DetailCollectionRowList>
   ),
 }

@@ -4,14 +4,14 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { DetailEntityRow } from '../../../detail/row/detail-entity-row.client'
+import { DetailEntityRow } from '../../../detail/row/entity/detail-entity-row.client'
 import type { EntityAnatomyTrailing } from '../../../entity/anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryStatusItem } from '../../../entity/summary/entity-summary-status.types'
-import { detailEntityRowSubheadingVariants } from '../../../detail/row/detail-entity-row.variants'
+import { detailEntityRowSubheadingVariants } from '../../../detail/row/entity/detail-entity-row.variants'
 import {
   DetailOverflowMenu,
   type DetailOverflowAction,
-} from '../../../detail/row/detail-overflow-menu.client'
+} from '../../../detail/detail-overflow-menu.client'
 
 export type CrossContentRelationshipRowProps = {
   relationshipEyebrow?: ReactNode

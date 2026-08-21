@@ -12,20 +12,20 @@ import {
 import { Button, Text, toast } from '@rpg/ui'
 import { Plus } from 'lucide-react'
 
-import { DetailEntityRow } from '../../../lib/detail/row/detail-entity-row.client'
+import { DetailEntityRow } from '../../../lib/detail/row/entity/detail-entity-row.client'
 import type { EntityAnatomyTrailing } from '../../../lib/entity/anatomy/entity-anatomy-trailing.types'
-import { DetailEntityRowActions } from '../../../lib/detail/row/detail-entity-row-actions.client'
+import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions.client'
 import {
   detailEntityRowDisclosurePreviewRowVariants,
   resolveDetailEntityRowDisclosurePreviewRowEdge,
-} from '../../../lib/detail/row/detail-entity-row.variants'
-import { DetailSectionGroup } from '../../../lib/detail/section/detail-section-group.client'
-import { DetailSectionPanel } from '../../../lib/detail/section/detail-section-panel.client'
-import { DetailSectionRowList } from '../../../lib/detail/section/detail-section-row-list.client'
+} from '../../../lib/detail/row/entity/detail-entity-row.variants'
+import { DetailCollectionGroup } from '../../../lib/detail/collection/detail-collection-group.client'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/detail-collection-panel.client'
+import { DetailCollectionRowList } from '../../../lib/detail/collection/detail-collection-row-list.client'
 import {
   DetailOverflowMenu,
   type DetailOverflowAction,
-} from '../../../lib/detail/row/detail-overflow-menu.client'
+} from '../../../lib/detail/detail-overflow-menu.client'
 import type {
   LocationChildItem,
   LocationChildrenViewModel,
@@ -146,7 +146,7 @@ function LocationStructurePreviewChildRows({
   inset: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList separator="structural">
+    <DetailCollectionRowList separator="structural">
       {rows.map((child, childIndex) => (
         <DetailEntityRow
           key={child.item.id}
@@ -159,7 +159,7 @@ function LocationStructurePreviewChildRows({
           })}
         />
       ))}
-    </DetailSectionRowList>
+    </DetailCollectionRowList>
   )
 }
 
@@ -327,7 +327,7 @@ function LocationStructureRows({
   inset?: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList separator="structural">
+    <DetailCollectionRowList separator="structural">
       {rows.map((row, index) => (
         <LocationStructureRow
           key={row.item.id}
@@ -341,7 +341,7 @@ function LocationStructureRows({
           inset={inset}
         />
       ))}
-    </DetailSectionRowList>
+    </DetailCollectionRowList>
   )
 }
 
@@ -359,7 +359,7 @@ function LocationChildRows({
   inset?: 'self' | 'parent'
 }) {
   return (
-    <DetailSectionRowList separator="structural">
+    <DetailCollectionRowList separator="structural">
       {items.map((item) => {
         const actions = buildChildRowActions(item, canManage, onMove, onView)
 
@@ -378,7 +378,7 @@ function LocationChildRows({
           />
         )
       })}
-    </DetailSectionRowList>
+    </DetailCollectionRowList>
   )
 }
 
@@ -446,7 +446,11 @@ function LocationStructureGroups({
   return (
     <>
       {groups.map((group) => (
-        <DetailSectionGroup key={group.id} label={group.label} endSlot={resolveGroupEndSlot(group)}>
+        <DetailCollectionGroup
+          key={group.id}
+          label={group.label}
+          action={resolveGroupEndSlot(group)}
+        >
           {group.expandableItems && group.expandableItems.length > 0 ? (
             <LocationStructureRows
               rows={group.expandableItems}
@@ -469,7 +473,7 @@ function LocationStructureGroups({
               inset="parent"
             />
           )}
-        </DetailSectionGroup>
+        </DetailCollectionGroup>
       ))}
     </>
   )
@@ -566,11 +570,11 @@ export function LocationChildrenSection({
 
   return (
     <>
-      <DetailSectionPanel
+      <DetailCollectionPanel
         heading={heading}
         headingId="location-children-heading"
         helper={helper}
-        headerEndSlot={
+        action={
           !groups && canManage ? (
             <LocationAddChildMenu
               parentKind={parentKind}
@@ -600,7 +604,7 @@ export function LocationChildrenSection({
             onView={(href) => navigate(href)}
           />
         )}
-      </DetailSectionPanel>
+      </DetailCollectionPanel>
 
       {createIntent ? (
         <LocationCreateModal

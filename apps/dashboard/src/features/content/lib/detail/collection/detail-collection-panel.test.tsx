@@ -2,19 +2,19 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { DetailSectionPanel } from './detail-section-panel.client'
+import { DetailCollectionPanel } from './detail-collection-panel.client'
 
-describe('DetailSectionPanel', () => {
-  it('renders semantic section with heading, helper, and header end slot', () => {
+describe('DetailCollectionPanel', () => {
+  it('renders semantic section with heading, helper, and panel action', () => {
     const { container } = render(
-      <DetailSectionPanel
+      <DetailCollectionPanel
         heading="Territorial Authority"
         headingId="territorial-authority-heading"
         helper="Organizations that govern, control, or claim this location."
-        headerEndSlot={<button type="button">Add</button>}
+        action={<button type="button">Add</button>}
       >
         <p>Body content</p>
-      </DetailSectionPanel>,
+      </DetailCollectionPanel>,
     )
 
     const section = container.querySelector('section')
@@ -39,13 +39,13 @@ describe('DetailSectionPanel', () => {
 
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
-      <DetailSectionPanel
+      <DetailCollectionPanel
         heading="Territorial Authority"
         headingId="territorial-authority-heading"
         helper="Organizations that govern, control, or claim this location."
       >
         <p>Body content</p>
-      </DetailSectionPanel>,
+      </DetailCollectionPanel>,
     )
 
     await expectNoAxeViolations(container)

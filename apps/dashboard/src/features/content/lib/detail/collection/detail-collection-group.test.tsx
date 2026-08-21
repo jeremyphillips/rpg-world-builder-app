@@ -2,14 +2,14 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { DetailSectionGroup } from './detail-section-group.client'
+import { DetailCollectionGroup } from './detail-collection-group.client'
 
-describe('DetailSectionGroup', () => {
+describe('DetailCollectionGroup', () => {
   it('renders label via Eyebrow size=sm and preserves children', () => {
     const { container } = render(
-      <DetailSectionGroup label="Districts">
+      <DetailCollectionGroup label="Districts">
         <p>Row content</p>
-      </DetailSectionGroup>,
+      </DetailCollectionGroup>,
     )
 
     const label = screen.getByText('Districts')
@@ -27,20 +27,20 @@ describe('DetailSectionGroup', () => {
 
   it('omits eyebrow chrome when label is absent', () => {
     const { container } = render(
-      <DetailSectionGroup>
+      <DetailCollectionGroup>
         <p>Row content</p>
-      </DetailSectionGroup>,
+      </DetailCollectionGroup>,
     )
 
     expect(screen.getByText('Row content')).toBeInTheDocument()
     expect(container.querySelector('.eyebrow-style-sm')).not.toBeInTheDocument()
   })
 
-  it('renders endSlot in the subgroup header without eligibility logic', () => {
+  it('renders action in the subgroup header without eligibility logic', () => {
     render(
-      <DetailSectionGroup label="Districts" endSlot={<button type="button">Add district</button>}>
+      <DetailCollectionGroup label="Districts" action={<button type="button">Add district</button>}>
         <p>Row content</p>
-      </DetailSectionGroup>,
+      </DetailCollectionGroup>,
     )
 
     expect(screen.getByText('Districts')).toBeInTheDocument()
@@ -48,11 +48,11 @@ describe('DetailSectionGroup', () => {
     expect(screen.getByText('Row content')).toBeInTheDocument()
   })
 
-  it('renders endSlot without a label when only trailing controls are needed', () => {
+  it('renders action without a label when only trailing controls are needed', () => {
     render(
-      <DetailSectionGroup endSlot={<button type="button">Add district</button>}>
+      <DetailCollectionGroup action={<button type="button">Add district</button>}>
         <p>Row content</p>
-      </DetailSectionGroup>,
+      </DetailCollectionGroup>,
     )
 
     expect(screen.queryByText('Districts')).not.toBeInTheDocument()
@@ -61,9 +61,9 @@ describe('DetailSectionGroup', () => {
 
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
-      <DetailSectionGroup label="Governed by">
+      <DetailCollectionGroup label="Governed by">
         <p>The Monarchy</p>
-      </DetailSectionGroup>,
+      </DetailCollectionGroup>,
     )
 
     await expectNoAxeViolations(container)

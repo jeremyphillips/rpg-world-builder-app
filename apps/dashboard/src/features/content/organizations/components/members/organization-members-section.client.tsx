@@ -2,8 +2,8 @@
 
 import { SemanticText, Text } from '@rpg/ui'
 
-import { DetailSectionPanel } from '../../../lib/detail/section/detail-section-panel.client'
-import type { DetailOverflowAction } from '../../../lib/detail/row/detail-overflow-menu.client'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/detail-collection-panel.client'
+import type { DetailOverflowAction } from '../../../lib/detail/detail-overflow-menu.client'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import type { OrganizationMemberRowVm } from '../../lib/members/build-organization-member-rows'
 import { ORGANIZATION_SECTION_LABELS } from '../../lib/organization-display'
@@ -159,7 +159,7 @@ export function OrganizationMembersSection({
   onRemoveMember,
 }: OrganizationMembersSectionProps) {
   return (
-    <DetailSectionPanel
+    <DetailCollectionPanel
       heading={ORGANIZATION_SECTION_LABELS.members}
       headingId={ORGANIZATION_MEMBERS_HEADING_ID}
     >
@@ -181,6 +181,6 @@ export function OrganizationMembersSection({
           onRemoveMember={onRemoveMember}
         />
       )}
-    </DetailSectionPanel>
+    </DetailCollectionPanel>
   )
 }

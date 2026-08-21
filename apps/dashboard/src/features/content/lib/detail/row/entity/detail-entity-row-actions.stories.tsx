@@ -5,7 +5,7 @@ import { Button } from '@rpg/ui'
 
 import { DetailEntityRow } from './detail-entity-row.client'
 import { DetailEntityRowActions } from './detail-entity-row-actions.client'
-import { DetailOverflowMenu } from './detail-overflow-menu.client'
+import { DetailOverflowMenu } from '../../detail-overflow-menu.client'
 
 const meta = {
   title: 'Content/Detail/DetailEntityRowActions',
