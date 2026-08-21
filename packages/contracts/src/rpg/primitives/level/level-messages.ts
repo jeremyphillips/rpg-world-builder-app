@@ -1,5 +1,5 @@
-import { defineMessage } from '../../validation/define-message'
-import { betweenCopy } from '../../validation/messages'
+import { defineMessage } from '../../../validation/define-message'
+import { betweenCopy } from '../../../validation/messages'
 
 // ---------------------------------------------------------------------------
 // Level / level-range-table validation messages (tier 2 domain catalog).

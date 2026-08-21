@@ -84,6 +84,11 @@ export { canPurchaseEquipment } from './equipment/can-purchase-equipment'
 
 export { formatEquipmentCostLabel } from './equipment/format-equipment-cost-label'
 
+export {
+  formatWeaponMasteryModeHint,
+  formatWeaponPropertyModeHint,
+} from './equipment/weapon-mode-compatibility-messages'
+
 export { equipmentVariantValidationMessages } from './equipment/equipment-variant-messages'
 
 export {

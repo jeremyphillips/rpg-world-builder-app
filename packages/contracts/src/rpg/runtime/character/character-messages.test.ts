@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { levelValidationMessages } from '../../primitives/level-messages'
+import { levelValidationMessages } from '../../primitives/level'
 
 import { characterValidationMessages } from './character-messages'
 

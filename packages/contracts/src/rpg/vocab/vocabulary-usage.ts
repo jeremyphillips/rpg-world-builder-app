@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { catalogUsageReferenceSchema } from '../primitives/content/catalog-usage-reference'
+import { catalogUsageReferenceSchema } from '../primitives/usage/catalog-usage-reference'
 import { characterUsageReferenceSchema } from '../primitives/usage/character-usage-reference'
 
 /** Informational usage reference — same identity blockers reuse at operation boundaries. */

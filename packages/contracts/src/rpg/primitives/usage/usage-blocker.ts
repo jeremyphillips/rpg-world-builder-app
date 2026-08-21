@@ -1,9 +1,7 @@
 import { z } from 'zod'
 
-import {
-  catalogEntityUsageBlockerArmSchema,
-  usageBlockerSourceKeySchema,
-} from '../content/catalog-entity-usage-blocker'
+import { catalogEntityUsageBlockerArmSchema } from './catalog-entity-usage-blocker'
+import { usageBlockerSourceKeySchema } from './usage-blocker-source-key'
 import { characterUsageReferenceSchema } from './character-usage-reference'
 import { ruleUsageBlockerArmSchema } from './rule-blocker'
 

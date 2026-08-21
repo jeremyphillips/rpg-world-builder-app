@@ -19,7 +19,7 @@ import {
   validateExtendedMaxLevel,
 } from '@rpg/contracts'
 
-import { levelValidationMessages } from '../primitives/level-messages'
+import { levelValidationMessages } from '../primitives/level'
 
 import { baseCharacterCreationPatch } from '../../test/fixtures/character-creation-patch'
 

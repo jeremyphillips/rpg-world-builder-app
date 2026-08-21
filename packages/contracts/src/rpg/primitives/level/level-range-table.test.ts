@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { levelValidationMessages } from './level-messages'
-import { parseWithRefine } from '../../test/helpers/parse-with-refine'
+import { parseWithRefine } from '../../../test/helpers/parse-with-refine'
 
 describe('refineLevelRangeTable', () => {
   it('accepts a valid contiguous table', () => {

@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 export const USAGE_BLOCKER_SOURCE_KEYS = {
   character_usage: 'character_usage',
   location_parent: 'location_parent',
@@ -14,3 +16,5 @@ export const USAGE_BLOCKER_SOURCE_KEY_VALUES = [
   USAGE_BLOCKER_SOURCE_KEYS.campaign_primary_world,
   USAGE_BLOCKER_SOURCE_KEYS.unknown,
 ] as const satisfies readonly UsageBlockerSourceKey[]
+
+export const usageBlockerSourceKeySchema = z.enum(USAGE_BLOCKER_SOURCE_KEY_VALUES)

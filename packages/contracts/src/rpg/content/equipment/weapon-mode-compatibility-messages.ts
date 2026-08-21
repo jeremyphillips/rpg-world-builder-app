@@ -1,4 +1,4 @@
-import { joinNaturalList } from '../prose'
+import { joinNaturalList } from '../../primitives/prose'
 import {
   WEAPON_MASTERIES_INCOMPATIBLE_WITH_MODE,
   WEAPON_PROPERTIES_INCOMPATIBLE_WITH_MODE,

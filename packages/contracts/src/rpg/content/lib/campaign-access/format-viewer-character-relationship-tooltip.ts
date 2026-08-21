@@ -6,7 +6,7 @@ import {
   type CharacterRelationshipKind,
   type ViewerCharacterRelationshipGroup,
   type ViewerCharacterRelationships,
-} from '../../../primitives/character/viewer-character-relationship'
+} from '../../../primitives/viewer-character-relationship'
 
 const PREFIX_GROUP_LABELS: Record<Exclude<CharacterRelationshipKind, 'has' | 'member'>, string> = {
   class: `${CLASS_CONTENT_TYPE_TERM.label} of`,

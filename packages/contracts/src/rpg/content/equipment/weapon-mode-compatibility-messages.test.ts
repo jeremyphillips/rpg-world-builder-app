@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   formatWeaponMasteryModeHint,
   formatWeaponPropertyModeHint,
-} from '../../primitives/weapon/mode-compatibility-messages'
+} from './weapon-mode-compatibility-messages'
 
 describe('formatWeaponPropertyModeHint', () => {
   it('returns undefined when mode is unset', () => {

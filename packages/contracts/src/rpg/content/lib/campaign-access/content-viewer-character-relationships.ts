@@ -4,7 +4,7 @@ import {
   characterRelationshipSchema,
   characterRelationshipKindSchema,
   viewerCharacterRelationshipsPresentationSchema,
-} from '../../../primitives/character/viewer-character-relationship'
+} from '../../../primitives/viewer-character-relationship'
 import { USAGE_REFERENCE_PREVIEW_LIMIT } from '../../../primitives/usage/preview-limits'
 
 /** Content overview preview — relationship groups capped for list-row chrome. */

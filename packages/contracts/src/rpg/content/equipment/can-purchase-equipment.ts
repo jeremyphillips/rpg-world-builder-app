@@ -1,5 +1,5 @@
 import type { Equipment } from '../equipment'
-import type { Money } from '../../primitives/units'
+import type { Money } from '../../primitives/money'
 
 /** Returns true when equipment has a stored market price suitable for purchase flows. */
 export function canPurchaseEquipment<T extends Pick<Equipment, 'cost'>>(

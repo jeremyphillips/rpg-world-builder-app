@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { CONTENT_TYPE_KEYS } from './content-type-keys'
+import { CONTENT_TYPE_KEYS } from '../content/content-type-keys'
 
 /** Catalog-entity usage reference — references a content catalog row by type + identity. */
 export const catalogUsageReferenceSchema = z.object({

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { systemRulesetIdSchema, type SystemRulesetId } from '../../primitives/ruleset'
 import { tierBonusGoldSchema } from '../../primitives/currency-formula'
 import { absoluteLevelSchema } from '../../primitives/level'
-import { levelRangeTiersSchema } from '../../primitives/level-range-table'
+import { levelRangeTiersSchema } from '../../primitives/level'
 import { magicItemRaritySchema } from '../../vocab/magic-item/rarity'
 
 function refineUniqueMagicItemGrantRarities(
