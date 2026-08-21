@@ -136,7 +136,7 @@ first, then sequentially POSTs each district as a child `kind: 'district'` Locat
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).
 
 Storybook: tag `phase-7-building-flows` and `phase-20-building-flows` on
-[`location-create-modal.stories.tsx`](../src/features/content/locations/components/location-create-modal.stories.tsx).
+[`location-create-modal.stories.tsx`](../src/features/content/locations/components/create/location-create-modal.stories.tsx).
 
 ## Authoring modules
 

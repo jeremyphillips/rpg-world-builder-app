@@ -51,24 +51,46 @@ matching the form suffix split in
 Overview list config lives under `lib/overview/`; `location-display.ts` stays at
 root because it is consumed across detail, overview, organizations, and pickers.
 
-## Component prefix families
+## `components/` layout
 
-| Prefix                                                               | Concern                         |
-| -------------------------------------------------------------------- | ------------------------------- |
-| `location-create-*`                                                  | Create modal, page, setup hosts |
-| `location-connected-parties-*` / `location-inverse-*`                | Connected parties detail        |
-| `building-organizations-*`                                           | Building org composition tab    |
-| `location-children-*` / `location-parent-*` / `bulk-change-parent-*` | Hierarchy editing               |
+Concern subfolders mirror `lib/` where responsibilities align (see
+[`organizations/README`](../organizations/README.md) for the pairing pattern).
+
+```text
+components/
+  create/                  # modal, page, form shell orchestration (root)
+    setup/                 # setup host, session, per-kind setup panels
+    composition/           # settlement composition context + form slot
+  connected-parties/       # detail sections, inverse relationship drawers
+  hierarchy/               # children, parent replacement, bulk change
+  building-organizations/  # building org composition tab UI
+  detail/                  # detail identity + metadata chrome
+```
+
+| Concern              | Logic                         | UI                                   |
+| -------------------- | ----------------------------- | ------------------------------------ |
+| Create orchestration | `lib/create/session/`, root   | `components/create/`                 |
+| Create setup gate    | `lib/create/setup/`           | `components/create/setup/`           |
+| Create composition   | `lib/create/composition/`     | `components/create/composition/`     |
+| Connected parties    | `lib/connected-parties/`      | `components/connected-parties/`      |
+| Hierarchy            | `lib/hierarchy/`              | `components/hierarchy/`              |
+| Building orgs tab    | `lib/building-organizations/` | `components/building-organizations/` |
+| Detail presentation  | `lib/location-display.ts`     | `components/detail/`                 |
+
+Settlement starting-districts form slot (`components/create/composition/`) is wired
+via intentional `kind: 'slot'` in `lib/forms/location-form-fields.ts` per
+[form-lib-conventions.md](../../../../docs/form-lib-conventions.md).
 
 ## Key files
 
-| Area                    | Path                                                                                   |
-| ----------------------- | -------------------------------------------------------------------------------------- |
-| Form def                | `lib/forms/location-form-def.ts`                                                       |
-| Display registry        | `lib/location-display.ts`                                                              |
-| List route              | `routes/locations-overview.tsx`                                                        |
-| Overview columns        | `lib/overview/locations-overview-columns.tsx`                                          |
-| Building orgs reference | `lib/building-organizations/`, `components/building-organizations-composer.client.tsx` |
+| Area                    | Path                                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Form def                | `lib/forms/location-form-def.ts`                                                                              |
+| Display registry        | `lib/location-display.ts`                                                                                     |
+| List route              | `routes/locations-overview.tsx`                                                                               |
+| Overview columns        | `lib/overview/locations-overview-columns.tsx`                                                                 |
+| Building orgs reference | `lib/building-organizations/`, `components/building-organizations/building-organizations-composer.client.tsx` |
+| Create modal            | `components/create/location-create-modal.client.tsx`                                                          |
 
 ## Watch — cross-feature import boundaries
 

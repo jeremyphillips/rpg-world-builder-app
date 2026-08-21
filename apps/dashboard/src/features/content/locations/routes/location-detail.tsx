@@ -15,9 +15,9 @@ import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
-import { LocationChildrenSection } from '../components/location-children-section.client'
-import { LocationConnectedPartiesDetailSections } from '../components/location-connected-parties-detail-sections.client'
-import { LocationDetailMetadata } from '../components/location-detail-metadata.client'
+import { LocationChildrenSection } from '../components/hierarchy/location-children-section.client'
+import { LocationConnectedPartiesDetailSections } from '../components/connected-parties/location-connected-parties-detail-sections.client'
+import { LocationDetailMetadata } from '../components/detail/location-detail-metadata.client'
 import { useLocations } from '../hooks/use-locations'
 import { buildLocationDetailViewModel } from '../lib/location-display'
 

@@ -44,7 +44,7 @@ vi.mock('./relationship-picker-nested-create.lib', async (importOriginal) => {
   }
 })
 
-vi.mock('../../../locations/components/location-create-modal.client', () => ({
+vi.mock('../../../locations/components/create/location-create-modal.client', () => ({
   LocationCreateModal: ({
     open,
     createContext,

@@ -1,6 +1,7 @@
 import type { LocationConnectedPartySectionGroup } from '@rpg/contracts'
 
-import { TERRITORIAL_AUTHORITY_HEADING_ID } from '../../components/location-territorial-authority-section.client'
+export const TERRITORIAL_AUTHORITY_HEADING_ID =
+  'location-connected-parties-territorial_authority-heading' as const
 
 export function usesFieldGroupHeader(sectionGroup: LocationConnectedPartySectionGroup): boolean {
   return sectionGroup === 'territorial_authority' || sectionGroup === 'people_and_organizations'

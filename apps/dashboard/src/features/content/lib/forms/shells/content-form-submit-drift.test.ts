@@ -9,7 +9,7 @@ const organizationCreateModalPath = fileURLToPath(
   ),
 )
 const locationCreateFormPath = fileURLToPath(
-  new URL('../../../locations/components/location-create-form.client.tsx', import.meta.url),
+  new URL('../../../locations/components/create/location-create-form.client.tsx', import.meta.url),
 )
 const contentCreateShellPath = fileURLToPath(new URL('./content-create-shell.tsx', import.meta.url))
 

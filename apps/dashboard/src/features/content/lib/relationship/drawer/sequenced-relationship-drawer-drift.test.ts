@@ -11,7 +11,7 @@ const SEQUENCED_ADD_DRAWER_FILES = [
   ),
   fileURLToPath(
     new URL(
-      '../../../locations/components/location-inverse-people-connection-link-drawer.client.tsx',
+      '../../../locations/components/connected-parties/location-inverse-people-connection-link-drawer.client.tsx',
       import.meta.url,
     ),
   ),
@@ -21,7 +21,7 @@ const NESTED_CREATE_DRAWER_FILES = [
   ...SEQUENCED_ADD_DRAWER_FILES,
   fileURLToPath(
     new URL(
-      '../../../locations/components/location-inverse-organization-connection-link-drawer.client.tsx',
+      '../../../locations/components/connected-parties/location-inverse-organization-connection-link-drawer.client.tsx',
       import.meta.url,
     ),
   ),
@@ -30,7 +30,7 @@ const NESTED_CREATE_DRAWER_FILES = [
 const NESTED_CREATE_RESOLVER_IMPORT =
   "from '../../../lib/relationship/picker/relationship-picker-create-intents.lib'"
 const NESTED_CREATE_ORG_RESOLVER_IMPORT =
-  "from '../../lib/relationship/picker/relationship-picker-nested-create.lib'"
+  "from '../../../lib/relationship/picker/relationship-picker-nested-create.lib'"
 const NESTED_CREATE_CHARACTER_RESOLVER_IMPORT = 'resolveRelationshipPickerCharacterCreateIntents'
 
 describe('sequenced relationship drawer drift', () => {
@@ -115,7 +115,7 @@ describe('sequenced relationship drawer drift', () => {
     const source = readFileSync(
       fileURLToPath(
         new URL(
-          '../../../locations/components/location-inverse-organization-connection-link-drawer.client.tsx',
+          '../../../locations/components/connected-parties/location-inverse-organization-connection-link-drawer.client.tsx',
           import.meta.url,
         ),
       ),

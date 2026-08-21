@@ -8,8 +8,8 @@ const REPO_ROOT = join(__dirname, '../../../../../../../..')
 const RELATIONSHIP_SECTION_FILES = [
   'apps/dashboard/src/features/content/organizations/components/members/organization-members-section.client.tsx',
   'apps/dashboard/src/features/content/organizations/components/location-connections/organization-location-connections-section.client.tsx',
-  'apps/dashboard/src/features/content/locations/components/location-people-and-organizations-section.client.tsx',
-  'apps/dashboard/src/features/content/locations/components/location-territorial-authority-section.client.tsx',
+  'apps/dashboard/src/features/content/locations/components/connected-parties/location-people-and-organizations-section.client.tsx',
+  'apps/dashboard/src/features/content/locations/components/connected-parties/location-territorial-authority-section.client.tsx',
 ] as const
 
 const LEGACY_PATTERNS = [
