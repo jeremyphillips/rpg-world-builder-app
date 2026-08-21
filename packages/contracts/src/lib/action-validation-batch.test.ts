@@ -8,8 +8,8 @@ import {
   isBatchTargetFailureOutcome,
   uniqueTargetIdsRefinement,
 } from './action-validation-batch'
-import { contentCampaignAccessAvailabilitySchema } from '../rpg/content/lib/campaign-access'
-import { contentCampaignAccessAvailabilityBatchRequestSchema } from '../rpg/content/lib/campaign-access-batch'
+import { contentCampaignAccessAvailabilitySchema } from '../rpg/content/lib/campaign-access/campaign-access'
+import { contentCampaignAccessAvailabilityBatchRequestSchema } from '../rpg/content/lib/campaign-access/campaign-access-batch'
 import { vocabularyDisableAvailabilityBatchRequestSchema } from '../rpg/vocab/vocabulary-disable-availability-batch'
 import { mapContentCampaignAccessAvailabilityBatchResponse } from '../rpg/content/lib/content-action-validation'
 import { mapVocabularyDisableAvailabilityBatchResponse } from '../rpg/vocab/vocabulary-action-validation'

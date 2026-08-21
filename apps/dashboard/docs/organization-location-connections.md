@@ -42,7 +42,7 @@ Dashboard drawers delegate to these helpers through `location-connection-duplica
 
 ### Headquarters location policy
 
-`headquarters` is eligible only on **structure-family locations**: building, fortification, or generic structure profiles. Settlements, regions, districts, interiors, and other profiles reject it via [`location-connection-eligibility.ts`](../../../packages/contracts/src/rpg/content/lib/location-connection-eligibility.ts).
+`headquarters` is eligible only on **structure-family locations**: building, fortification, or generic structure profiles. Settlements, regions, districts, interiors, and other profiles reject it via [`location-connection-eligibility.ts`](../../../packages/contracts/src/rpg/content/lib/relationship/location-connection-eligibility.ts).
 
 Each organization may have at most **one** headquarters connection across all locations (`maxSubjectsPerOrganization` on the kind vocab entry). Family add drawers keep headquarters visible when that slot is occupied and show `Already set at {locationName}.` as the unavailable reason.
 

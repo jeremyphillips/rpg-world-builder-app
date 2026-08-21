@@ -6,7 +6,7 @@ import type {
   SkillProficiencyPool,
   ToolProficiencyPool,
   WeaponProficiencyPool,
-} from '../../content/lib/proficiency-grant'
+} from '../../content/lib/grants/proficiency-grant'
 import { getSkillName } from '../../content/skill-proficiency'
 import type { ToolCategory } from '../../vocab/equipment/tool-category'
 import type { CreatureEquipmentCatalog } from './equipment'

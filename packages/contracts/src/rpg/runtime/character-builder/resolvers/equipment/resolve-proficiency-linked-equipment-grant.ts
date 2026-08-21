@@ -1,6 +1,6 @@
 import type { Equipment } from '../../../../content/equipment'
 import type { CharacterClass } from '../../../../content/classes/class'
-import type { ToolProficiencyChoice } from '../../../../content/lib/proficiency-grant-set'
+import type { ToolProficiencyChoice } from '../../../../content/lib/grants/proficiency-grant-set'
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'

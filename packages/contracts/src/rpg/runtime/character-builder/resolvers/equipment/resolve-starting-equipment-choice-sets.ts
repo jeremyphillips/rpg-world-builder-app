@@ -1,6 +1,6 @@
 import type { CharacterClass } from '../../../../content/classes/class'
 import { getContentTypeCapitalizedSentenceLabel } from '../../../../content/lib/content-type-terms'
-import { formatEquipmentPoolLabel } from '../../../../content/lib/equipment-grant'
+import { formatEquipmentPoolLabel } from '../../../../content/lib/grants/equipment-grant'
 import type { StartingEquipmentItem } from '../../../../content/starting-equipment'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'

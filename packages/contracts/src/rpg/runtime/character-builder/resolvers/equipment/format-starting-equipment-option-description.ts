@@ -1,4 +1,4 @@
-import type { CharacterWealthGrant } from '../../../../content/lib/wealth-grant'
+import type { CharacterWealthGrant } from '../../../../content/lib/grants/wealth-grant'
 import { joinNaturalList } from '../../../../primitives/prose'
 import { formatWealth, formatWealthAsGold, wealthToCopper } from '../../../../primitives/wealth'
 import {

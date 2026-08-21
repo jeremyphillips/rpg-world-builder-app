@@ -3,7 +3,7 @@ import type { CharacterClass } from '../../../content/classes/class'
 import type { Equipment } from '../../../content/equipment'
 import type { Species } from '../../../content/species'
 import type { Spell } from '../../../content/spell'
-import type { Organization } from '../../../content/organization'
+import type { Organization } from '../../../content/organization/organization'
 import {
   isContentPlayableFor,
   type ContentResolutionRow,

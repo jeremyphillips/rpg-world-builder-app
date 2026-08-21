@@ -29,7 +29,7 @@ write affordances must gate on declared registry capability
 ## Projection registry
 
 `@rpg/contracts` exposes a **descriptive-only** registry in
-[`cross-content-relationship-projection.ts`](../packages/contracts/src/rpg/content/lib/cross-content-relationship-projection.ts).
+[`cross-content-relationship-projection.ts`](../packages/contracts/src/rpg/content/lib/relationship/cross-content-relationship-projection.ts).
 
 **Invariants:**
 
@@ -42,7 +42,7 @@ write affordances must gate on declared registry capability
    implementation filenames.
 
 Connection kind eligibility is enforced server-side via
-[`location-connection-eligibility.ts`](../packages/contracts/src/rpg/content/lib/location-connection-eligibility.ts)
+[`location-connection-eligibility.ts`](../packages/contracts/src/rpg/content/lib/relationship/location-connection-eligibility.ts)
 — the dashboard capability layer derives from it; API validators consult the
 same resolver.
 

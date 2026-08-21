@@ -1,6 +1,6 @@
 import type { CharacterClass } from '../../../content/classes/class'
-import type { ToolProficiencyChoice } from '../../../content/lib/proficiency-grant-set'
-import { isMeaningfulToolProficiencyChoice } from '../../../content/lib/proficiency-grant-set'
+import type { ToolProficiencyChoice } from '../../../content/lib/grants/proficiency-grant-set'
+import { isMeaningfulToolProficiencyChoice } from '../../../content/lib/grants/proficiency-grant-set'
 import type { CharacterBuildCatalogIndex } from '../context'
 import { resolveToolPoolChoiceOptions } from '../resolvers/proficiency/resolve-tool-pool-choice-options'
 

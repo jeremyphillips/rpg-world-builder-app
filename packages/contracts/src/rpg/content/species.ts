@@ -9,7 +9,7 @@ import {
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { movementSpeedsDraftSchema, movementSpeedsSchema } from '../vocab/movement-mode'
-import { contentNamedChoiceSchema } from './lib/choice'
+import { contentNamedChoiceSchema } from './lib/grants/choice'
 import {
   contentTraitSchema,
   contentGrantSchema,

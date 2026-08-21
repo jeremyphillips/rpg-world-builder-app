@@ -1,5 +1,5 @@
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
-import { isMeaningfulProficiencyChoice } from '../../../../content/lib/proficiency-grant-set'
+import { isMeaningfulProficiencyChoice } from '../../../../content/lib/grants/proficiency-grant-set'
 import { getProficiencyDomainCompactLabel } from '../../../../vocab/proficiency'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'

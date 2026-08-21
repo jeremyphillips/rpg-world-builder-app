@@ -76,11 +76,11 @@ flowchart BT
 | A shared validation message or message primitive                                         | `validation/`                       | `validation/messages.ts` (see [validation-messages.md](validation-messages.md))                                              |
 | A closed id set with labels (and optional SRD text)                                      | `rpg/vocab/`                        | `rpg/vocab/sense.ts`, `rpg/vocab/weapon/property.ts`, `rpg/vocab/personal-name-component.ts`                                 |
 | A reusable value type used across content types                                          | `rpg/primitives/`                   | `rpg/primitives/dice.ts`, `rpg/primitives/units.ts`, `rpg/primitives/authored-content.ts`                                    |
-| Sparse coin wealth grants (starting equipment, level 0 NPC wealth)                       | `rpg/primitives/`                   | `rpg/primitives/character-wealth-grant.ts` (re-exported from `rpg/content/lib/wealth-grant.ts`)                              |
+| Sparse coin wealth grants (starting equipment, level 0 NPC wealth)                       | `rpg/primitives/`                   | `rpg/primitives/character-wealth-grant.ts` (re-exported from `rpg/content/lib/grants/wealth-grant.ts`)                       |
 | Shared proficiency grant/choice input schemas (content + campaign)                       | `rpg/primitives/proficiency/`       | `proficiency-grant-set.ts`, `typed-proficiency-grant-set.ts`, `character-creation-proficiency-rules.ts`                      |
 | Weapon mode presentation formatters (extracted from vocab)                               | `rpg/primitives/weapon/`            | `mode-compatibility-messages.ts`                                                                                             |
-| Catalog content type or its DTOs/patches                                                 | `rpg/content/`                      | `rpg/content/species.ts`, `rpg/content/classes/class.ts`                                                                     |
-| Shared content helpers (grants, envelope, keys)                                          | `rpg/content/lib/`                  | `rpg/content/lib/grants.ts`                                                                                                  |
+| Catalog content type or its DTOs/patches                                                 | `rpg/content/`                      | `rpg/content/species.ts`, `rpg/content/organization/organization.ts`, `rpg/content/classes/class.ts`                         |
+| Shared content helpers (envelope, keys, cross-type policy)                               | `rpg/content/lib/`                  | `rpg/content/lib/envelope.ts`, `rpg/content/lib/grants/grants.ts`                                                            |
 | Domain-neutral action/transport envelopes (no RPG semantics)                             | `src/lib/`                          | `lib/action-validation.ts`, `lib/paginated-items.ts`, `lib/usage-guard-action-validation.ts`                                 |
 | Catalog type identity closed sets                                                        | `rpg/primitives/content/`           | `primitives/content/content-type-keys.ts`                                                                                    |
 | Generic usage reference / shared blocker union                                           | `rpg/primitives/usage/`             | `primitives/usage/usage-blocker.ts`                                                                                          |
@@ -107,7 +107,8 @@ flowchart BT
 | Public marketing or CMS schemas                                                          | `public/`                           | (scaffold — add when needed)                                                                                                 |
 
 Nested folders are fine when a domain splits cleanly (e.g. `rpg/content/classes/`
-for spellcasting + class body, `rpg/vocab/weapon/` for weapon term maps,
+for spellcasting + class body, `rpg/content/organization/` for organization catalog
+contracts, `rpg/vocab/weapon/` for weapon term maps,
 `rpg/vocab/organization/` for organization classification and authoring vocab,
 `rpg/vocab/location/{region,building,connection}/` for location taxonomy and
 connection kinds). Quarantined building-archetype research lives under
@@ -133,6 +134,26 @@ meet the 2–3 module threshold; do not add `lib/`, `utils/`, or `helpers/`.
 **Hard rule:** `viewer/` is membership + open roster → viewer classification, not
 “anything a human viewer sees.” `campaign-content-viewer.ts` stays at root because
 content discovery authz is a separate concept from recovery `viewerState`.
+
+### `rpg/content/lib/` folder ownership
+
+Root keeps catalog envelope/write spine (`envelope.ts`, `content-key.ts`,
+`content-input-schemas.ts`, `draft-authored-content.ts`, `content-validation-intent.ts`),
+cross-type registries (`content-type-terms.ts`, `content-type-capabilities.ts`,
+`content-access-capabilities.ts`), lifecycle wire (`content-deletion.ts`,
+`content-duplication.ts`, `content-usage.ts`, …), shared reference primitives
+(`character-content-reference.ts`, `organization-content-reference.ts`), sparse rules
+(`requirement-expression.ts`, `multiclassing-validation.ts`), and catalog entity
+presentation helpers (`equipment-compact-display.ts`, `skill-proficiency-*-display.ts`).
+
+| Folder             | Owns                                                                                          | Not allowed                                                     |
+| ------------------ | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `grants/`          | Grant payloads, pool choices, grant validation messages, grant-linked trait display           | Equipment/skill catalog compact display; connection eligibility |
+| `relationship/`    | Cross-content projection registry, location-connection eligibility, org↔location family rules | Mongo reference-path descriptors; campaign access visibility    |
+| `campaign-access/` | Resolved campaign access fields, bulk access, viewer↔character relationships on content       | Content deletion/usage lifecycle; grant mechanics               |
+
+Domain subfolders meet the stable-responsibility threshold; do not add `utils/` or
+`helpers/` under `lib/`.
 
 Domain-local short names inside folders (e.g. `character/eligibility-contracts.ts`);
 the `campaign/index.ts` barrel preserves external symbol names for
@@ -400,7 +421,7 @@ labels for Quick NPC recommended-build readouts. Optional `classAffinityIds` are
 class recommendations — organization `members.classAffinityIds` remain the path for
 organization-specific or homebrew classes. Preset membership-title refs carry contextual
 `{ templateId, level }` recommendations that snapshot into organization-owned titles at create;
-see [`organization-membership-titles.ts`](../src/rpg/content/organization-membership-titles.ts) and
+see [`organization/membership-titles.ts`](../src/rpg/content/organization/membership-titles.ts) and
 `resolveOrganizationNpcClassRecommendationIds` in
 [`organization-member-class-recommendations.ts`](../src/rpg/runtime/character/organization-member-class-recommendations.ts).
 

@@ -1,7 +1,7 @@
 import type { CharacterClass } from '../../../../content/classes/class'
-import type { EquipmentPool } from '../../../../content/lib/equipment-grant'
-import type { ToolProficiencyPool } from '../../../../content/lib/proficiency-grant'
-import { isMeaningfulToolProficiencyChoice } from '../../../../content/lib/proficiency-grant-set'
+import type { EquipmentPool } from '../../../../content/lib/grants/equipment-grant'
+import type { ToolProficiencyPool } from '../../../../content/lib/grants/proficiency-grant'
+import { isMeaningfulToolProficiencyChoice } from '../../../../content/lib/grants/proficiency-grant-set'
 import type { StartingEquipmentOption } from '../../../../content/starting-equipment'
 import {
   isProficiencyLinkedStartingEquipmentGrant,

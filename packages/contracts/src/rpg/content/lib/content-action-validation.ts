@@ -11,8 +11,8 @@ import {
   type ActionTargetResult,
 } from '../../../lib/action-validation'
 import { mapUsageGuardAvailabilityToActionTarget } from '../../../lib/usage-guard-action-validation'
-import type { ContentCampaignAccessAvailabilityBatchResponse } from './campaign-access-batch'
-import type { ContentCampaignAccessUpdateResult } from './campaign-access'
+import type { ContentCampaignAccessAvailabilityBatchResponse } from './campaign-access/campaign-access-batch'
+import type { ContentCampaignAccessUpdateResult } from './campaign-access/campaign-access'
 import type { ContentUsageBlocker } from './content-usage-blocker'
 
 export type { UsageGuardAvailabilityWire } from '../../../lib/usage-guard-action-validation'

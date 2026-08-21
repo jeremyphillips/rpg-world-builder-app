@@ -1,8 +1,8 @@
 import type { StartingWealthRules } from '../../../campaign/rules/starting-wealth'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { Equipment } from '../../../content/equipment'
-import type { EquipmentChoiceGrant } from '../../../content/lib/equipment-grant'
-import type { CharacterWealthGrant } from '../../../content/lib/wealth-grant'
+import type { EquipmentChoiceGrant } from '../../../content/lib/grants/equipment-grant'
+import type { CharacterWealthGrant } from '../../../content/lib/grants/wealth-grant'
 import type {
   StartingEquipmentGrantedItem,
   StartingEquipmentOption,

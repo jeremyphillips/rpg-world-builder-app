@@ -21,7 +21,7 @@
  *   `mapHeritageOptionToDetailItem`: grant summary lines via this helper (Phase 2, done)
  * - `apps/dashboard/src/features/content/species/lib/species-display.ts` — card
  *   `summaryItems`: trait names only → `formatGrantSummaryInline` (Phase 4, pending)
- * - `packages/contracts/src/rpg/content/lib/trait-display.ts` — `deriveGrantGroupDisplay`:
+ * - `packages/contracts/src/rpg/content/lib/grants/trait-display.ts` — `deriveGrantGroupDisplay`:
  *   partial grant → prose HTML; eventually delegate compact labels (Phase 4+, pending)
  * - `apps/dashboard/src/features/content/classes/lib/class-display.ts` —
  *   `mapFeatureToDetailItem`: prose only → grouped grant summaries (Phase 4, pending)

@@ -1,4 +1,4 @@
-import type { LanguageProficiencyGrantSet } from '../../content/lib/proficiency-grant-set'
+import type { LanguageProficiencyGrantSet } from '../../content/lib/grants/proficiency-grant-set'
 import type { LanguageSeedOption } from '../../vocab/language'
 
 // ---------------------------------------------------------------------------
