@@ -11,8 +11,6 @@ export const ORGANIZATION_PICKER_NO_ITEMS_MESSAGE = 'No organizations are availa
 export const ORGANIZATION_PICKER_TITLE = 'Choose organization'
 export const ORGANIZATION_PICKER_DESCRIPTION = 'Choose an organization connected to this character.'
 
-export { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
-
 export type OrganizationPickerDomainFilter =
   | typeof ORGANIZATION_PICKER_ALL_DOMAINS
   | OrganizationDomain

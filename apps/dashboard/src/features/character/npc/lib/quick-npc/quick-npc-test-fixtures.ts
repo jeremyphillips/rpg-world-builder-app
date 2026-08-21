@@ -1,4 +1,4 @@
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../../components/connections/organization-membership-title-field.types'
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../../lib/organization-membership/organization-membership-title.lib'
 import type {
   QuickNpcCreateContext,
   QuickNpcCreateFormOrganization,

@@ -1,6 +1,6 @@
 import { resolveOrganizationMembershipMetadata, type CharacterBuildContext } from '@rpg/contracts'
 
-import { titleFromMembershipRadioValue } from '../../../components/connections/organization-membership-title-field.lib'
+import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import { buildQuickNpcCreateInput } from './quick-npc-create'
 import {

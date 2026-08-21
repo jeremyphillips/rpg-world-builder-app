@@ -18,7 +18,7 @@ import { OrganizationMembershipTitleField } from './organization-membership-titl
 import {
   membershipRadioValueFromTitle,
   titleFromMembershipRadioValue,
-} from './organization-membership-title-field.lib'
+} from '../../lib/organization-membership/organization-membership-title.lib'
 import {
   CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
   formatRemoveMembershipHeadline,

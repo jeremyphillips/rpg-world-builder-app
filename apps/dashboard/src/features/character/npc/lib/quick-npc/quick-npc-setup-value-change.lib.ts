@@ -6,8 +6,10 @@ import {
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../../components/connections/organization-membership-title-field.types'
-import { titleFromMembershipRadioValue } from '../../../components/connections/organization-membership-title-field.lib'
+import {
+  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+  titleFromMembershipRadioValue,
+} from '../../../lib/organization-membership/organization-membership-title.lib'
 
 import { resolveQuickNpcDefaultLevel, type QuickNpcSetupValues } from './quick-npc-form-fields'
 import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'

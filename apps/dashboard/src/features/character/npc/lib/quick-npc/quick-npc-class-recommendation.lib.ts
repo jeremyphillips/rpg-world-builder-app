@@ -8,7 +8,7 @@ import {
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
-import { titleFromMembershipRadioValue } from '../../../components/connections/organization-membership-title-field.lib'
+import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'

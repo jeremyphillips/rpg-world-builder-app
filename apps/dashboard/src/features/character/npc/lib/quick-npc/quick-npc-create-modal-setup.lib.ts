@@ -9,7 +9,7 @@ import {
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
-import { buildOrganizationMembershipTitleRadioOptions } from '../../../components/connections/organization-membership-title-field.lib'
+import { buildOrganizationMembershipTitleRadioOptions } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
   isCreateSetupChoiceComplete,
   type CreateSetupExternalDecision,

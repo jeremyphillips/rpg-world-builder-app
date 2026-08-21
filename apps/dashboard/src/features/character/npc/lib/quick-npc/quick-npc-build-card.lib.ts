@@ -26,7 +26,7 @@ import {
   resolveQuickNpcClassRecommendationIds,
   resolveQuickNpcSelectedTitleRecommendation,
 } from './quick-npc-class-recommendation.lib'
-import { titleFromMembershipRadioValue } from '../../../components/connections/organization-membership-title-field.lib'
+import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
 export const QUICK_NPC_BUILD_FIELD_LABEL = 'Build' as const
 export const QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL = 'Recommended build' as const

@@ -1,7 +1,8 @@
 import type { OrganizationMembershipTitleDefinition } from '@rpg/contracts'
 import { sortOrganizationMembershipTitleDefinitionsForDisplay } from '@rpg/contracts'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
+/** UI-only sentinel — never persisted as a membership title. */
+export const ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE = '__no_title__'
 
 export function buildOrganizationMembershipTitleRadioOptions(input: {
   titles: readonly OrganizationMembershipTitleDefinition[]

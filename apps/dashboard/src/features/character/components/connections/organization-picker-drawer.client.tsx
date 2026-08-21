@@ -10,8 +10,10 @@ import { CatalogEntityPickerSheet, CatalogEntityRow } from '@/features/content'
 import { CatalogPickerSelectionActions } from '../picker/catalog-picker-selection-actions.client'
 import { CatalogToolbarResetSlot } from '../picker/catalog-toolbar-reset-action.client'
 import { OrganizationMembershipTitleField } from './organization-membership-title-field.client'
-import { titleFromMembershipRadioValue } from './organization-membership-title-field.lib'
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
+import {
+  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+  titleFromMembershipRadioValue,
+} from '../../lib/organization-membership/organization-membership-title.lib'
 import {
   buildOrganizationPickerDomainOptions,
   filterAndSortOrganizationPickerItems,

@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   buildOrganizationMembershipTitleRadioOptions,
   membershipRadioValueFromTitle,
+  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   titleFromMembershipRadioValue,
-} from './organization-membership-title-field.lib'
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
+} from './organization-membership-title.lib'
 
 const sampleCatalog = [
   { id: 'omt_1', label: 'Guildmaster', priority: 50 as const },

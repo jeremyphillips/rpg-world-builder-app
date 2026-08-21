@@ -76,9 +76,9 @@ export {
 export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field.client'
 export {
   membershipRadioValueFromTitle,
+  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   titleFromMembershipRadioValue,
-} from './components/connections/organization-membership-title-field.lib'
-export { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './components/connections/organization-membership-title-field.types'
+} from './lib/organization-membership/organization-membership-title.lib'
 export {
   createCharacterOrganizationMembership,
   deleteCharacterOrganizationMembership,

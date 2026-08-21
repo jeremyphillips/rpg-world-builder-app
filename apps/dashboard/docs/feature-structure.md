@@ -174,12 +174,17 @@ formatting, UI state reducers). Move to `character/lib/<concern>/` only when the
 module is reused across components, imported outside the subtree, or is an
 independently testable view-model seam.
 
-| Location                            | Keep co-located when…                                      |
-| ----------------------------------- | ---------------------------------------------------------- |
-| `components/picker/*.lib.ts`        | Shared picker chrome (search/sort/filter shell)            |
-| `components/equipment/*/*.lib.ts`   | Drawer/inventory/modal view models (per surface subfolder) |
-| `components/spells/*.lib.ts`        | Spell drawer-only helpers                                  |
-| `components/proficiencies/*.lib.ts` | Proficiency drawer-only helpers                            |
+| Location                            | Keep co-located when…                                         |
+| ----------------------------------- | ------------------------------------------------------------- |
+| `components/picker/*.lib.ts`        | Shared picker chrome (search/sort/filter shell)               |
+| `components/equipment/*/*.lib.ts`   | Drawer/inventory/modal view models (per surface subfolder)    |
+| `components/spells/*.lib.ts`        | Spell drawer-only helpers                                     |
+| `components/proficiencies/*.lib.ts` | Proficiency drawer-only helpers                               |
+| `components/connections/*.lib.ts`   | Picker/edit drawer view models (filter/sort stays co-located) |
+
+Title membership semantics (`ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`, radio mappers) live in
+`character/lib/organization-membership/organization-membership-title.lib.ts` when reused outside
+the connections subtree.
 
 Step orchestration hooks belong in `character/hooks/` (`use-*-step.client.ts`), not
 under `components/builder/steps/`.

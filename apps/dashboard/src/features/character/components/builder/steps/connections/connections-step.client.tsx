@@ -20,7 +20,7 @@ import {
   connectionsStepEmptyClasses,
   connectionsStepHeaderClasses,
   connectionsStepListClasses,
-} from '../../../connections/organization-picker-drawer.variants'
+} from './connections-step.variants'
 import { BuilderStepFrame } from '../shared/builder-step-frame.client'
 
 export type ConnectionsStepProps = {

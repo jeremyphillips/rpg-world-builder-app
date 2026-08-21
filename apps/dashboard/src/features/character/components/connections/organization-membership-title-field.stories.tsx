@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
 
+import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../lib/organization-membership/organization-membership-title.lib'
+
 import { OrganizationMembershipTitleField } from './organization-membership-title-field.client'
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from './organization-membership-title-field.types'
 
 const sampleCatalog = [
   { id: 'omt_1', label: 'Guildmaster', priority: 50 as const },
