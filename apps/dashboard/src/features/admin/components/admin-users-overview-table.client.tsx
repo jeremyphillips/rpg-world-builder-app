@@ -11,8 +11,8 @@ import {
   getSchemaFieldsByPlacement,
 } from '@rpg/ui/filters'
 
-import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
-import { useOverviewQueryState } from '@/lib/overview-query-state/use-overview-query-state.client'
+import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
+import { useOverviewQueryState } from '@/lib/overview-query-state/use-overview-query-state'
 import { serializeOverviewSort } from '@/lib/overview-query-state/overview-query-state'
 
 import { AdminUserRowActions } from '../components/admin-user-row-actions.client'

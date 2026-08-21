@@ -35,11 +35,11 @@ Neutral layer (src/lib):        Policy shells (features / src/lib):
 
 Shared modules:
 
-| Module                      | Path                                                 | Role                                                      |
-| --------------------------- | ---------------------------------------------------- | --------------------------------------------------------- |
-| `OverviewTableFrame`        | `src/lib/data-table/overview-table-frame.client.tsx` | Table chrome, slots, `DataTable` wiring                   |
-| `createOverviewPreferences` | `src/lib/overview-preferences/`                      | Per-consumer prefs storage (visibility, order, page size) |
-| `useOverviewQueryState`     | `src/lib/overview-query-state/`                      | URL or local filter/sort/page sync                        |
+| Module                      | Path                                          | Role                                                      |
+| --------------------------- | --------------------------------------------- | --------------------------------------------------------- |
+| `OverviewTableFrame`        | `src/lib/data-table/overview-table-frame.tsx` | Table chrome, slots, `DataTable` wiring                   |
+| `createOverviewPreferences` | `src/lib/overview-preferences/`               | Per-consumer prefs storage (visibility, order, page size) |
+| `useOverviewQueryState`     | `src/lib/overview-query-state/`               | URL or local filter/sort/page sync                        |
 
 ### State ownership
 
@@ -183,5 +183,5 @@ links, grouping, scrolling, or rich `secondary` metadata.
 
 - Content overview tables: [content-overviews.md](./content-overviews.md)
 - Column builders and DataTable recipes: [feature-conventions.md § DataTable](./feature-conventions.md#datatable-column-recipes)
-- `CatalogOverviewTable` module: `src/lib/data-table/catalog-overview-table.client.tsx`
-- `OverviewTableFrame` module: `src/lib/data-table/overview-table-frame.client.tsx`
+- `CatalogOverviewTable` module: `src/lib/data-table/catalog-overview-table.tsx`
+- `OverviewTableFrame` module: `src/lib/data-table/overview-table-frame.tsx`

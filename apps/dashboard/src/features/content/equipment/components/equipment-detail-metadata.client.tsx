@@ -2,10 +2,7 @@
 
 import { Heading, RichTextContent } from '@rpg/ui'
 
-import {
-  ContentStatRow,
-  type ContentStatRowSize,
-} from '../../lib/detail/metadata/content-stat-row.client'
+import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/metadata/content-stat-row'
 import { type EquipmentDetailViewModel } from '../lib/equipment-display'
 
 export type EquipmentDetailMetadataProps = {

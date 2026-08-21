@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
-import { DetailEntityRow } from './detail-entity-row.client'
-import { DetailCollectionRowList } from '../../collection/row-list/detail-collection-row-list.client'
+import { DetailEntityRow } from './detail-entity-row'
+import { DetailCollectionRowList } from '../../collection/row-list/detail-collection-row-list'
 
 describe('DetailEntityRow', () => {
   it('renders heading link, inline heading suffix, and end slot with row padding', () => {

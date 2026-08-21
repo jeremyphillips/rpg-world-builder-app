@@ -1,6 +1,6 @@
 import type { ContentUsageBlocker } from '@rpg/contracts'
 
-import { UsageBlockedList } from '@/lib/usage-blocked/usage-blocked-list.client'
+import { UsageBlockedList } from '@/lib/usage-blocked/usage-blocked-list'
 
 export interface ContentUsageBlockedListProps {
   blockers: ContentUsageBlocker[]

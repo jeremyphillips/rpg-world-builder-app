@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { DetailCollectionGroup } from '../detail-collection-group.client'
+import { DetailCollectionGroup } from '../detail-collection-group'
 
 describe('DetailCollectionGroup', () => {
   it('renders label via Eyebrow size=sm and preserves children', () => {

@@ -9,7 +9,7 @@ import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
 import { PageHeader } from '@/components/layout/page/page-header'
 import { NarrowPage } from '@/components/layout/page/narrow-page'
-import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
+import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region'
 
 import { useAdminUserRouteContext } from '../lib/admin-user-route-context'
 import { useAdminUserCharacters } from '../hooks/use-admin-user-characters'

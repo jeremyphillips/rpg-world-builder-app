@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { WEAPON_MASTERY_ENTRIES } from '@rpg/contracts'
 
-import { ContentStatRow } from './content-stat-row.client'
+import { ContentStatRow } from './content-stat-row'
 
 const meta = {
   title: 'Content/ContentStatRow',

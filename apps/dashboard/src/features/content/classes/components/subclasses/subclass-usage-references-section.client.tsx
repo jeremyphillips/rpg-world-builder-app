@@ -1,6 +1,6 @@
 'use client'
 
-import { UsageReferencesQuerySection } from '@/lib/usage-references/usage-references-query-section.client'
+import { UsageReferencesQuerySection } from '@/lib/usage-references/usage-references-query-section'
 
 import { isDraftSubclassId } from '../../lib/subclasses/subclass-editor-constants'
 import { useSubclassEntryUsage } from '../../hooks/use-subclass-entry-usage'

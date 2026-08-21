@@ -1,6 +1,6 @@
 'use client'
 
-import { UsageReferencesQuerySection } from '@/lib/usage-references/usage-references-query-section.client'
+import { UsageReferencesQuerySection } from '@/lib/usage-references/usage-references-query-section'
 
 import { useContentEntryUsage } from './use-content-entry-usage'
 

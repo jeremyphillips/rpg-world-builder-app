@@ -11,7 +11,7 @@ import {
 } from '@/lib/create-flow'
 
 import { ContentEntityCard } from '@/features/content'
-import { DetailOverflowMenu } from '../../../lib/detail/detail-overflow-menu.client'
+import { DetailOverflowMenu } from '../../../lib/detail/detail-overflow-menu'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type {
   BuildingOrganizationDraftIssue,

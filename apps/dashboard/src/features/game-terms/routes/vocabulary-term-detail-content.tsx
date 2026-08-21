@@ -15,7 +15,7 @@ import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { WidePage } from '@/components/layout/page/wide-page'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useCanManageCampaign } from '@/features/campaign'
-import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section.client'
+import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section'
 import { notifyVocabularyEntrySaved } from '@/lib/notify'
 
 import {

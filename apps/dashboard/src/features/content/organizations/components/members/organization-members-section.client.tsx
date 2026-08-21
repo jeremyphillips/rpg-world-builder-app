@@ -2,8 +2,8 @@
 
 import { SemanticText, Text } from '@rpg/ui'
 
-import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel.client'
-import type { DetailOverflowAction } from '../../../lib/detail/detail-overflow-menu.client'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel'
+import type { DetailOverflowAction } from '../../../lib/detail/detail-overflow-menu'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import type { OrganizationMemberRowVm } from '../../lib/members/build-organization-member-rows'
 import { ORGANIZATION_SECTION_LABELS } from '../../lib/organization-display'

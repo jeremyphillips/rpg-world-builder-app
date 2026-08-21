@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 
-import { CharacterRelationshipIndicator } from './character-relationship-indicator.client'
+import { CharacterRelationshipIndicator } from './character-relationship-indicator'
 
 describe('CharacterRelationshipIndicator', () => {
   it('renders nothing when envelope is absent', () => {

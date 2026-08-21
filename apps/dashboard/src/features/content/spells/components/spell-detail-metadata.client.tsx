@@ -3,10 +3,7 @@
 import { Heading, RichTextContent } from '@rpg/ui'
 
 import { ContentStaticBadge } from '../../lib/detail/metadata/content-link-badge'
-import {
-  ContentStatRow,
-  type ContentStatRowSize,
-} from '../../lib/detail/metadata/content-stat-row.client'
+import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/metadata/content-stat-row'
 import { SPELL_DETAIL_SECTION_LABELS, type SpellDetailViewModel } from '../lib/spell-display'
 
 export type SpellDetailMetadataProps = {

@@ -11,7 +11,7 @@ import { dataTableNameLinkCellVariants } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import type { DuplicateContentSource } from '../duplication/duplicate-content-dialog.client'
-import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
+import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator'
 import { ContentStatusNameBadge } from './content-status-name-badge.client'
 import { ContentAccessMetadata } from '../campaign-access/overview/content-access-metadata.client'
 import { ContentOverviewUtilityActions } from './content-overview-utility-actions.client'

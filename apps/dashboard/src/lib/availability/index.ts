@@ -26,5 +26,5 @@ export {
   type AvailabilityReasonDefinition,
   type AvailabilitySeverity,
 } from './availability-reason-registry'
-export { AvailabilityBadge, type AvailabilityBadgeProps } from './availability-badge.client'
-export { AvailabilityAlert, type AvailabilityAlertProps } from './availability-alert.client'
+export { AvailabilityBadge, type AvailabilityBadgeProps } from './availability-badge'
+export { AvailabilityAlert, type AvailabilityAlertProps } from './availability-alert'

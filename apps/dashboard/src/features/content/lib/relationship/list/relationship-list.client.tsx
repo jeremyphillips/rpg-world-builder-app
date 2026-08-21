@@ -9,7 +9,7 @@ import {
   detailCollectionGroupHeaderVariants,
   detailCollectionRecordSeparatorVariants,
 } from '../../detail/collection/detail-collection-chrome.variants'
-import type { DetailOverflowAction } from '../../detail/detail-overflow-menu.client'
+import type { DetailOverflowAction } from '../../detail/detail-overflow-menu'
 import { CrossContentRelationshipRow } from './row/cross-content-relationship-row.client'
 import type { EntitySummaryStatusItem } from '../../entity/summary/entity-summary-status.types'
 import {

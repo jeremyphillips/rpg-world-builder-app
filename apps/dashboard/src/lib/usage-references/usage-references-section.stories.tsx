@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { VocabularyUsageReference } from '@rpg/contracts'
 
-import { UsageReferencesSection } from './usage-references-section.client'
+import { UsageReferencesSection } from './usage-references-section'
 
 const SAMPLE_REFERENCES: VocabularyUsageReference[] = Array.from({ length: 12 }, (_, index) => ({
   kind: 'content',

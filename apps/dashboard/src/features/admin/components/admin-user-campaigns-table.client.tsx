@@ -7,8 +7,8 @@ import { useFilterState } from '@rpg/ui/filters'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { WidePage } from '@/components/layout/page/wide-page'
-import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
-import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region.client'
+import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
+import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region'
 
 import { AdminUserContextLine } from '../components/admin-user-tab-nav.client'
 import { useAdminUserCampaigns } from '../hooks/use-admin-user-campaigns'

@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
-import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel.client'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list.client'
 import {
   isRelationshipMutationActionVisible,

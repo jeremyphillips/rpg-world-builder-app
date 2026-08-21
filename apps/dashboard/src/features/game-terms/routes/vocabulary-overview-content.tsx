@@ -15,7 +15,7 @@ import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { WidePage } from '@/components/layout/page/wide-page'
 import { useCanManageCampaign } from '@/features/campaign'
 import { notifyVocabularyEntryCreated, notifyVocabularyEntrySaved } from '@/lib/notify'
-import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
+import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
 
 import { BulkVocabularyAvailabilityDialog } from '../components/bulk-vocabulary-availability-dialog.client'
 import {

@@ -55,7 +55,7 @@ Detail and relationship rows compose **`EntityAnatomyHost`** (via `DetailEntityR
 
 ## Collection-oriented detail surfaces
 
-Shared collection-oriented detail chrome lives in [`content/lib/detail/`](../src/features/content/lib/detail/) (`collection/`, `row/entity/`, `detail-overflow-menu.client.tsx`). Relationship and hierarchy sections **compose** these primitives — they do not duplicate panel shells. Catalog read routes also use `detail/page/` and `detail/metadata/` for non-collection patterns. See [detail/README.md](../src/features/content/lib/detail/README.md) for the two collection-body grammars.
+Shared collection-oriented detail chrome lives in [`content/lib/detail/`](../src/features/content/lib/detail/) (`collection/`, `row/entity/`, `detail-overflow-menu.tsx`). Relationship and hierarchy sections **compose** these primitives — they do not duplicate panel shells. Catalog read routes also use `detail/page/` and `detail/metadata/` for non-collection patterns. See [detail/README.md](../src/features/content/lib/detail/README.md) for the two collection-body grammars.
 
 ### Heading vs eyebrow vs row title
 
@@ -76,7 +76,7 @@ Do **not** use `Text variant="emphasis"` or raw `uppercase tracking-*` for detai
 | `DetailCollectionRowList` | Row-list dividers between direct children — required `separator`: `structural` (hierarchy) or `record` (relationship group `<ul>` via shared chrome tokens)                                                                        |
 | `DetailEntityRow`         | Thin shell around compact `EntityAnatomyHost` (`py-1` inset); default `inset="self"` adds `px-4`; use `inset="parent"` inside `DetailCollectionGroup`; optional `disclosure` (`expandable` or `reserved`); `trailing` for controls |
 | `DetailEntityRowActions`  | Companion primitive — layout-only trailing control cluster (alignment / gap / shrink); compose inside `DetailEntityRow.trailing` when a row needs utility + overflow                                                               |
-| `DetailOverflowMenu`      | Detail-surface compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]` ([`detail-overflow-menu.client.tsx`](../src/features/content/lib/detail/detail-overflow-menu.client.tsx))                      |
+| `DetailOverflowMenu`      | Detail-surface compact ghost icon trigger + dropdown over `{ id, label, destructive?, onSelect }[]` ([`detail-overflow-menu.tsx`](../src/features/content/lib/detail/detail-overflow-menu.tsx))                                    |
 | `RelationshipList`        | **Only supported typed-edge list chrome** — compound `Root` → `Group` → `Row` (required nesting); owns record separators, slot/section empty, and footer placement via explicit `itemCount` props                                  |
 
 Primitive APIs must stay presentation-only — no relationship kinds, hierarchy semantics, or mutation builders in props. Features supply plain labels, hrefs, slots, and pre-built action arrays.
@@ -258,10 +258,10 @@ Both actions remain in the subgroup header for empty and populated states. Direc
 
 ## Populated row vs empty container
 
-| Responsibility                    | Owner                                                                                                                                                 |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Populated edge summary + overflow | `CrossContentRelationshipRow` (composes `DetailEntityRow` + `DetailOverflowMenu`)                                                                     |
-| Overflow actions                  | `DetailOverflowMenu` from `content/lib/detail/detail-overflow-menu.client.tsx` (feature supplies `{ id, label, destructive? }`; compact icon trigger) |
+| Responsibility                    | Owner                                                                                                                                          |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Populated edge summary + overflow | `CrossContentRelationshipRow` (composes `DetailEntityRow` + `DetailOverflowMenu`)                                                              |
+| Overflow actions                  | `DetailOverflowMenu` from `content/lib/detail/detail-overflow-menu.tsx` (feature supplies `{ id, label, destructive? }`; compact icon trigger) |
 
 Relationship rows build overflow action arrays via **`buildRelationshipOverflowActions`** in [`resolve-relationship-overflow-actions.ts`](../src/features/content/lib/relationship/list/relationship-overflow-actions.ts), which returns `DetailOverflowAction[]`. Alternatives derive from **`resolveRelationshipAlternatives`** in [`relationship-alternatives.ts`](../src/features/content/lib/relationship/location-connection/location-connection-alternatives.ts). Each operation exposes `{ supported, availability, isResolving? }` where `availability` is `available | unavailable | unknown`.
 

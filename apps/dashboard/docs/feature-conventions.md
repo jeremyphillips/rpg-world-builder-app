@@ -246,7 +246,7 @@ Catalog and homebrew overview tables share styling via `@rpg/ui` cell helpers
 [`src/lib/data-table/column-builders.tsx`](../src/lib/data-table/column-builders.tsx).
 
 Non-content list routes compose
-[`CatalogOverviewTable`](../src/lib/data-table/catalog-overview-table.client.tsx)
+[`CatalogOverviewTable`](../src/lib/data-table/catalog-overview-table.tsx)
 (utility strip, column prefs, optional filters). Content lists use
 `ContentOverviewTable` — layer boundaries and collection-summary columns are
 documented in [catalog-overview-tables.md](./catalog-overview-tables.md).

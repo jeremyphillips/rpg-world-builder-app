@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { DetailCollectionPanel } from '../detail-collection-panel.client'
+import { DetailCollectionPanel } from '../detail-collection-panel'
 
 describe('DetailCollectionPanel', () => {
   it('renders semantic section with heading, helper, and panel action', () => {

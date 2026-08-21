@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { AvailabilityAlert } from './availability-alert.client'
+import { AvailabilityAlert } from './availability-alert'
 import { resolveAvailability } from './availability'
 
 const meta = {

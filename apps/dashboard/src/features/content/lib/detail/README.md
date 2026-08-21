@@ -79,10 +79,10 @@ DetailEntityRow
 
 Companion primitives (composed by features, not imported by `DetailEntityRow` itself):
 
-| Primitive                | Role                                                                                                        |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| `DetailEntityRowActions` | Layout-only trailing control cluster                                                                        |
-| `DetailOverflowMenu`     | Detail-surface compact overflow menu ([`detail-overflow-menu.client.tsx`](detail-overflow-menu.client.tsx)) |
+| Primitive                | Role                                                                                          |
+| ------------------------ | --------------------------------------------------------------------------------------------- |
+| `DetailEntityRowActions` | Layout-only trailing control cluster                                                          |
+| `DetailOverflowMenu`     | Detail-surface compact overflow menu ([`detail-overflow-menu.tsx`](detail-overflow-menu.tsx)) |
 
 `DetailOverflowMenu` also appears on `ContentEntityCard` in building-orgs create — a
 documented cross-surface reuse of detail overflow chrome, not entity-surface ownership.
@@ -117,7 +117,7 @@ detail/
 ### Artifact subfolder pilot (DetailCollection only)
 
 `DetailCollection` is piloting artifact subfolders under `collection/{panel,group,row-list}/`.
-Runtime companions (`*.client.tsx`, `*.variants.ts`, …) stay directly visible beside their
+Runtime companions (`*.tsx`, `*.variants.ts`, …) stay directly visible beside their
 semantic owner. Tests and stories move into `__tests__/` and `__stories__/` so the production
 hierarchy is easier to scan at a glance.
 

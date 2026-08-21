@@ -9,7 +9,7 @@ import {
 import { cn, interactiveFocusVariants } from '@rpg/ui'
 
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
-import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator.client'
+import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator'
 import { EntityAnatomyHost } from '@/features/content'
 
 import type { GlobalSearchSurfaceContext } from '../../lib/global-search-surface.variants'

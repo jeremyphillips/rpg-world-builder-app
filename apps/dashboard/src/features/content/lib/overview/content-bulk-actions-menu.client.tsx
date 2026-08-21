@@ -3,7 +3,7 @@
 import {
   OverviewBulkActionsMenu,
   type OverviewBulkAction,
-} from '@/lib/overview/overview-bulk-actions-menu.client'
+} from '@/lib/overview/overview-bulk-actions-menu'
 
 import {
   CONTENT_BULK_ACTION_EDIT_CAMPAIGN_ACCESS_LABEL,

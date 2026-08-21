@@ -16,7 +16,7 @@ import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge.client'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
-import { ContentStatRow } from '../../lib/detail/metadata/content-stat-row.client'
+import { ContentStatRow } from '../../lib/detail/metadata/content-stat-row'
 import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentLinkBadge } from '../../lib/detail/metadata/content-link-badge'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section.client'

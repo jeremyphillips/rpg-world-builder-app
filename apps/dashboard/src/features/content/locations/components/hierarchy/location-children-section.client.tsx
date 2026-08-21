@@ -12,20 +12,20 @@ import {
 import { Button, Text, toast } from '@rpg/ui'
 import { Plus } from 'lucide-react'
 
-import { DetailEntityRow } from '../../../lib/detail/row/entity/detail-entity-row.client'
+import { DetailEntityRow } from '../../../lib/detail/row/entity/detail-entity-row'
 import type { EntityAnatomyTrailing } from '../../../lib/entity/anatomy/entity-anatomy-trailing.types'
-import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions.client'
+import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions'
 import {
   detailEntityRowDisclosurePreviewRowVariants,
   resolveDetailEntityRowDisclosurePreviewRowEdge,
 } from '../../../lib/detail/row/entity/detail-entity-row.variants'
-import { DetailCollectionGroup } from '../../../lib/detail/collection/group/detail-collection-group.client'
-import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel.client'
-import { DetailCollectionRowList } from '../../../lib/detail/collection/row-list/detail-collection-row-list.client'
+import { DetailCollectionGroup } from '../../../lib/detail/collection/group/detail-collection-group'
+import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel'
+import { DetailCollectionRowList } from '../../../lib/detail/collection/row-list/detail-collection-row-list'
 import {
   DetailOverflowMenu,
   type DetailOverflowAction,
-} from '../../../lib/detail/detail-overflow-menu.client'
+} from '../../../lib/detail/detail-overflow-menu'
 import type {
   LocationChildItem,
   LocationChildrenViewModel,

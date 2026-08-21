@@ -57,9 +57,9 @@ Deep imports are allowed only when the barrel causes a concrete problem:
 Folder relationships (`dialog → resolution → blocker → dialog`) do not form a JavaScript import
 cycle at the module level:
 
-- `dialog/action-dialog-shell.client` → `resolution/action-target-resolution-list.client`
-- `resolution/action-resolution-row-detail.client` → `blocker/action-blocker-references.client`
-- `blocker/action-blocked-dialog.client` → `dialog/action-dialog-shell.lib` (constants only — not `shell.client`)
+- `dialog/action-dialog-shell` → `resolution/action-target-resolution-list`
+- `resolution/action-resolution-row-detail` → `blocker/action-blocker-references`
+- `blocker/action-blocked-dialog` → `dialog/action-dialog-shell.lib` (constants only — not `shell.client`)
 
 Resolution does not import dialog; the cycle breaks at `shell.lib`.
 
@@ -141,20 +141,20 @@ Post-close summaries use `deriveActionApplySummary(outcomes)` — single `fullSu
 
 ## Components
 
-| Module                                            | Role                                                                     |
-| ------------------------------------------------- | ------------------------------------------------------------------------ |
-| `lifecycle/use-action-lifecycle`                  | Phase machine, validate/apply orchestration                              |
-| `dialog/action-dialog-shell.client`               | Layout for configure / resolve / result                                  |
-| `resolution/action-target-resolution-list.client` | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
-| `blocker/action-blocked-dialog.client`            | Single blocked projection — header + flat reference list only            |
-| `blocker/action-blocker-references.client`        | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
-| `action-messages.ts`                              | Shared blocked/success/result copy                                       |
-| `action-apply-summary.lib.ts`                     | `deriveActionApplySummary` — shared post-apply ids + `fullSuccess`       |
-| `action-outcome-notify.lib.ts`                    | Post-close toast policy (`shouldNotifyActionOutcomes`)                   |
-| `dialog/action-dialog-close.lib.ts`               | Close ordering + idempotency (`finalizeActionDialogCloseWithOutcomes`)   |
-| `validation/action-validate-strategy.ts`          | Fan-out and batch validate strategies + lifecycle result resolution      |
-| `validation/action-validate-batch.ts`             | Shared batch POST helper for validate transport                          |
-| `validation/fan-out-validate.ts`                  | Concurrency-5 fan-out harness (parity / explicit rollback only)          |
+| Module                                     | Role                                                                     |
+| ------------------------------------------ | ------------------------------------------------------------------------ |
+| `lifecycle/use-action-lifecycle`           | Phase machine, validate/apply orchestration                              |
+| `dialog/action-dialog-shell`               | Layout for configure / resolve / result                                  |
+| `resolution/action-target-resolution-list` | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
+| `blocker/action-blocked-dialog`            | Single blocked projection — header + flat reference list only            |
+| `blocker/action-blocker-references`        | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
+| `action-messages.ts`                       | Shared blocked/success/result copy                                       |
+| `action-apply-summary.lib.ts`              | `deriveActionApplySummary` — shared post-apply ids + `fullSuccess`       |
+| `action-outcome-notify.lib.ts`             | Post-close toast policy (`shouldNotifyActionOutcomes`)                   |
+| `dialog/action-dialog-close.lib.ts`        | Close ordering + idempotency (`finalizeActionDialogCloseWithOutcomes`)   |
+| `validation/action-validate-strategy.ts`   | Fan-out and batch validate strategies + lifecycle result resolution      |
+| `validation/action-validate-batch.ts`      | Shared batch POST helper for validate transport                          |
+| `validation/fan-out-validate.ts`           | Concurrency-5 fan-out harness (parity / explicit rollback only)          |
 
 ## Batch validate transport (Phase 2)
 

@@ -3,7 +3,7 @@
 import { Link } from 'react-router-dom'
 import { Button, Text } from '@rpg/ui'
 
-import { ContentStatRow } from '../../../lib/detail/metadata/content-stat-row.client'
+import { ContentStatRow } from '../../../lib/detail/metadata/content-stat-row'
 import {
   contentStatRowLabelVariants,
   contentStatRowValueVariants,

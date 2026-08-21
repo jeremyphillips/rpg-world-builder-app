@@ -6,7 +6,7 @@ import {
   CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL,
   formatShowUnavailableAriaLabel,
 } from '../campaign-access-table-labels'
-import { buildOverviewAvailabilitySupplement } from '@/lib/overview/overview-availability-supplement.client'
+import { buildOverviewAvailabilitySupplement } from '@/lib/overview/overview-availability-supplement'
 import { resolveAvailabilityFilteredEmptyCopy } from '@/lib/overview/availability-empty-state-copy.lib'
 import type { CampaignAvailabilityScope } from '@/lib/overview/campaign-availability-scope.lib'
 

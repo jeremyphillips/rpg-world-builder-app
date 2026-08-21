@@ -6,7 +6,7 @@ import type { FilterSchema } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { CAMPAIGN_SCOPE_FILTER_ID, INVALID_CAMPAIGN_SCOPE_COPY } from '@/lib/filters'
-import { PrimaryFilterPanel } from '@/lib/data-table/primary-filter-bar-region.client'
+import { PrimaryFilterPanel } from '@/lib/data-table/primary-filter-bar-region'
 import {
   MESSAGES_SCOPE_COPY,
   formatMessagesOutOfScopeSupporting,

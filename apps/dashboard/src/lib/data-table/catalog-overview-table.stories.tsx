@@ -3,7 +3,7 @@ import type { ColumnDef } from '@rpg/ui'
 import { SortableHeader } from '@rpg/ui'
 import { createEqualsFilter } from '@rpg/ui/filters'
 
-import { CatalogOverviewTable } from './catalog-overview-table.client'
+import { CatalogOverviewTable } from './catalog-overview-table'
 
 type RosterRow = {
   id: string

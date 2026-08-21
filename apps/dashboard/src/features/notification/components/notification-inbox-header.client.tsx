@@ -4,7 +4,7 @@ import { Alert, Button } from '@rpg/ui'
 import type { Notification } from '@rpg/contracts'
 import type { FilterSchema } from '@rpg/ui/filters'
 
-import { PrimaryFilterPanel } from '@/lib/data-table/primary-filter-bar-region.client'
+import { PrimaryFilterPanel } from '@/lib/data-table/primary-filter-bar-region'
 
 import { NOTIFICATION_COPY } from '../lib/notification-copy'
 import type { NotificationInboxFilterState } from '../lib/notification-inbox-filter-schema'

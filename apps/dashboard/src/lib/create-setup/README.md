@@ -20,7 +20,7 @@ footer     → derived from completion semantics (Cancel-only / disabled Continu
 - **Sequence model** (`useCreateSetupSequence`) is owned by the feature setup phase and passed to
   `CreateSetupPanel`, `CreateSetupFooter`, and sibling UI (e.g. Quick NPC Build card). One instance
   — no forked reopen state.
-- **Panel** (`create-setup-panel-items.client.tsx`) maps active sets to `RadioCardField` with
+- **Panel** (`create-setup-panel-items.tsx`) maps active sets to `RadioCardField` with
   reselect opt-in; completed non-active sets render partial rows in declared `summaryGroup` cards
   (or standalone single-row cards when ungrouped).
 - **`summaryGroup`** — set-level semantic grouping. A group renders whenever it has ≥1 completed

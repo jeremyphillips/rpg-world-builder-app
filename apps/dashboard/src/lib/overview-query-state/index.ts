@@ -24,4 +24,4 @@ export {
   type OverviewQueryHistoryMode,
   type OverviewQueryStateMode,
   type UseOverviewQueryStateOptions,
-} from './use-overview-query-state.client'
+} from './use-overview-query-state'

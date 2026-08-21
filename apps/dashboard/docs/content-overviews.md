@@ -40,7 +40,7 @@ table card — row 1 for result context, row 2 for selection and column controls
 - Supplement copy: `5 hidden · Show` when availability is **Available**; `5 unavailable shown · Hide`
   when **All**; omitted when **Unavailable** is selected.
 
-Shared modules: `overview-result-summary.client.tsx`, `overview-selection-cluster.client.tsx`.
+Shared modules: `overview-result-summary.tsx`, `overview-selection-cluster.tsx`.
 
 ## Selection mode (managers)
 
@@ -81,8 +81,8 @@ only **updated** targets leave selection; blocked targets remain selected for re
 
 | Module                                        | Role                                                 |
 | --------------------------------------------- | ---------------------------------------------------- |
-| `overview-result-summary.client.tsx`          | Shared result count + supplemental disclosure        |
-| `overview-selection-cluster.client.tsx`       | Browse Select trigger and selection-mode actions     |
+| `overview-result-summary.tsx`                 | Shared result count + supplemental disclosure        |
+| `overview-selection-cluster.tsx`              | Browse Select trigger and selection-mode actions     |
 | `content-bulk-actions-menu.client.tsx`        | Bulk actions dropdown (availability + extensions)    |
 | `use-content-overview-selection.ts`           | Selection mode state, cap, filter pruning            |
 | `use-content-overview-bulk-selection.ts`      | Shared selection for multiple bulk dialogs           |

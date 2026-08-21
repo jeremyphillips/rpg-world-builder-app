@@ -111,7 +111,7 @@ describe('entity surface architecture guard', () => {
     const allowlist = new Set([
       'content/lib/entity/surfaces/cards/content/content-entity-card.client.tsx',
       'content/lib/entity/surfaces/cards/disclosure/disclosure-entity-card.client.tsx',
-      'content/lib/detail/row/entity/detail-entity-row.client.tsx',
+      'content/lib/detail/row/entity/detail-entity-row.tsx',
       'content/lib/entity/surfaces/drawer/drawer-entity-block.client.tsx',
     ])
 

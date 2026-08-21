@@ -6,7 +6,7 @@ import { supportsCharacterBulkRosterStatus } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 import { applyFilterSchema } from '@rpg/ui/filters'
 
-import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
+import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
 import { useCanManageCampaign } from '@/features/campaign'
 
 import { BulkRosterStatusDialog } from './bulk-roster-status-dialog.client'

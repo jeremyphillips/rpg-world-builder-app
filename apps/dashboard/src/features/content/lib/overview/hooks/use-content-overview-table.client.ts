@@ -20,7 +20,7 @@ import {
 
 import { getContentTypeMidSentenceLabel } from '../../content-type-labels'
 import { useCanManageCampaign } from '@/features/campaign'
-import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu.client'
+import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu'
 import {
   applyOverviewAdvancedOpenPreferences,
   applyOverviewColumnChangePreferences,

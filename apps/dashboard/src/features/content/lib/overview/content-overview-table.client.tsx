@@ -8,15 +8,15 @@ import {
 } from '@rpg/contracts'
 import { type ColumnDef, type ColumnChangeState, type DataTableUtilityControls } from '@rpg/ui'
 
-import { CatalogOverviewFilterChrome } from '@/lib/data-table/catalog-overview-table.client'
+import { CatalogOverviewFilterChrome } from '@/lib/data-table/catalog-overview-table'
 import {
   overviewUnavailableNameCellClassName,
   overviewUnavailableRowClassName,
 } from '@/lib/overview/overview-unavailable-chrome'
-import { OverviewResultSummary } from '@/lib/data-table/overview-result-summary.client'
-import { OverviewSelectionCluster } from '@/lib/data-table/overview-selection-cluster.client'
-import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame.client'
-import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu.client'
+import { OverviewResultSummary } from '@/lib/data-table/overview-result-summary'
+import { OverviewSelectionCluster } from '@/lib/data-table/overview-selection-cluster'
+import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame'
+import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu'
 
 import { ContentOverviewRowActions } from './content-overview-row-actions'
 import { ContentBulkActionsMenu } from './content-bulk-actions-menu.client'

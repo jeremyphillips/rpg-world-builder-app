@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { VocabularyOptionWithUsage } from '@rpg/contracts'
 
-import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table.client'
+import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
 
 import { vocabularyColumns } from './vocabulary-overview-columns'
 
