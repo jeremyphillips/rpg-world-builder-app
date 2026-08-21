@@ -10,7 +10,7 @@ import {
   type ContentCampaignAccessPatch,
 } from '@rpg/contracts'
 
-import { postActionBatchValidate } from '@/lib/actions/action-validate-batch'
+import { postActionBatchValidate } from '@/lib/actions'
 
 import { CSRF_HEADER } from '@/lib/api-client'
 

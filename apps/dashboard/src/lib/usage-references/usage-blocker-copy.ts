@@ -1,10 +1,6 @@
 import { USAGE_BLOCKER_SOURCE_KEYS, type UsageBlockerSourceKey } from '@rpg/contracts'
 
-import {
-  formatCountPhrase,
-  formatDescriptorCount,
-  type BulkActionDescriptor,
-} from '@/lib/actions/action-count-grammar'
+import { formatCountPhrase, formatDescriptorCount, type BulkActionDescriptor } from '@/lib/actions'
 
 export type UsageBlockerCopyContext = {
   blockedTargetCount: number

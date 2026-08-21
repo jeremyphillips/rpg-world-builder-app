@@ -11,8 +11,7 @@ import {
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
 
-import { notifyActionOutcomes } from '@/lib/actions/action-outcome-notify.lib'
-import type { ActionLifecycleCloseEvent } from '@/lib/actions/action-lifecycle.types'
+import { notifyActionOutcomes, type ActionLifecycleCloseEvent } from '@/lib/actions'
 import { vocabularySetQueryKey } from '@/features/vocabulary'
 
 import {

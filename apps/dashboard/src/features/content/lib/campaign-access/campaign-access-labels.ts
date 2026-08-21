@@ -1,4 +1,8 @@
-import { ACTION_PLAN_UNCHANGED_REASONS, type ActionPlanUnchangedReason } from '@rpg/contracts'
+import {
+  ACTION_PLAN_UNCHANGED_REASONS,
+  type ActionPlanUnchangedReason,
+  type UsageBlockerSourceKey,
+} from '@rpg/contracts'
 
 import {
   formatAllSelectedDescriptorCount,
@@ -7,14 +11,11 @@ import {
   formatDescriptorCount,
   formatWouldChangeUnchangedSummary,
   type BulkActionDescriptor,
-} from '@/lib/actions/action-count-grammar'
-import { formatUsageBlockerBulkDescription } from '@/lib/usage-references/usage-blocker-copy'
-import type { UsageBlockerSourceKey } from '@rpg/contracts'
-import {
   CONTENT_AVAILABILITY_OFF_ACTION,
   formatActionBlockedDescription,
   formatActionBlockedTitle,
-} from '@/lib/actions/action-messages'
+} from '@/lib/actions'
+import { formatUsageBlockerBulkDescription } from '@/lib/usage-references/usage-blocker-copy'
 
 /** Subgroup legend for the campaign access disclosure. */
 export const CAMPAIGN_ACCESS_SECTION_LEGEND = 'Campaign availability'

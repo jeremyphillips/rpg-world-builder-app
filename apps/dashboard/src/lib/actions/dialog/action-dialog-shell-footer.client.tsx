@@ -9,7 +9,7 @@ import {
   ACTION_RESOLVE_APPLY_LABEL,
   ACTION_RESOLVE_BACK_LABEL,
   ACTION_RETRY_FAILED_LABEL,
-} from './action-messages'
+} from '../action-messages'
 import {
   shouldRenderActionConfigureApplyButton,
   shouldRenderActionResolveApplyButton,
@@ -17,7 +17,7 @@ import {
   shouldRenderActionRetryFailedButton,
 } from './action-dialog-shell-footer.lib'
 import { resolveActionCancelLabel } from './action-dialog-shell.lib'
-import type { ActionLifecyclePhase } from './action-lifecycle.types'
+import type { ActionLifecyclePhase } from '../lifecycle/action-lifecycle.types'
 
 export type ActionDialogShellFooterProps = {
   phase: ActionLifecyclePhase

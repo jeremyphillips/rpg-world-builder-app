@@ -3,7 +3,7 @@
 import type { ActionTargetFailure } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
-import type { ActionResolutionRowModel } from './action-lifecycle.types'
+import type { ActionResolutionRowModel } from '../lifecycle/action-lifecycle.types'
 import { actionResolutionListVariants } from './action-resolution-list.variants'
 import { ActionTargetResolutionRow } from './action-target-resolution-row.client'
 

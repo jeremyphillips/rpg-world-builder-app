@@ -11,8 +11,8 @@ import {
   shouldRenderActionConfigureBody,
   shouldRenderActionResolutionList,
 } from './action-dialog-shell.lib'
-import type { ActionLifecyclePhase } from './action-lifecycle.types'
-import { ActionTargetResolutionList } from './action-target-resolution-list.client'
+import type { ActionLifecyclePhase } from '../lifecycle/action-lifecycle.types'
+import { ActionTargetResolutionList } from '../resolution/action-target-resolution-list.client'
 
 export type ActionDialogShellProps<TBlocker, TFailure extends ActionTargetFailure> = {
   open: boolean

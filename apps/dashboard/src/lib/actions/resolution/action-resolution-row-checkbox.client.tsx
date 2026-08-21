@@ -3,7 +3,7 @@
 import type { ActionTargetFailure } from '@rpg/contracts'
 import { Checkbox } from '@rpg/ui'
 
-import type { ActionResolutionRowModel } from './action-lifecycle.types'
+import type { ActionResolutionRowModel } from '../lifecycle/action-lifecycle.types'
 import { usesActionResolutionAlignmentCheckbox } from './action-resolution-row.lib'
 
 export type ActionResolutionRowCheckboxProps<TBlocker, TFailure extends ActionTargetFailure> = {

@@ -9,8 +9,7 @@ import {
   type LocationParentAssignmentBlocker,
 } from '@rpg/contracts'
 
-import { notifyActionOutcomes } from '@/lib/actions/action-outcome-notify.lib'
-import type { ActionLifecycleCloseEvent } from '@/lib/actions/action-lifecycle.types'
+import { notifyActionOutcomes, type ActionLifecycleCloseEvent } from '@/lib/actions'
 import { patchContentOverviewListLocationParent } from '@/features/content/lib/overview/content-overview-list-cache.lib'
 
 import { invalidateLocationHierarchyQueries } from '../lib/hierarchy/invalidate-location-hierarchy-queries'

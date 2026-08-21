@@ -10,7 +10,7 @@ import {
   type VocabularyOptionSetId,
 } from '@rpg/contracts'
 
-import { postActionBatchValidate } from '@/lib/actions/action-validate-batch'
+import { postActionBatchValidate } from '@/lib/actions'
 import { deleteJson, patchJson, postJson, request } from '@/lib/api-client'
 
 function vocabularySetPath(campaignId: string, setId: VocabularyOptionSetId) {

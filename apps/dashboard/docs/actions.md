@@ -15,6 +15,54 @@ owns the shell, lifecycle controller, formatters, fan-out validate client, and t
 | Lifecycle + shell + formatters                  | `apps/dashboard/src/lib/actions/`          |
 | Field builders, apply mutations, labels         | Feature `lib/`                             |
 
+## Directory layout
+
+Physical organization under `apps/dashboard/src/lib/actions/` — **external code imports from
+`@/lib/actions` only**; subfolder paths are internal.
+
+```text
+actions/
+  index.ts                    # sole public entry
+
+  action-messages.*           # cross-cutting policy/copy (root)
+  action-count-grammar.*
+  action-toast-policy.*
+  action-outcome-notify.*
+  action-apply-summary.*
+
+  dialog/                     # modal shell + close ordering
+  resolution/                 # bulk resolve/result list + row chrome
+  blocker/                    # single blocked + reference lists
+  validation/                 # validate transport + strategies
+  lifecycle/                  # phase machine hook + types
+```
+
+Root policy modules stay flat — they are genuinely cross-cutting seams, not a `policy/` bucket.
+
+### Import guidance
+
+```ts
+import { useActionLifecycle, ActionDialogShell, postActionBatchValidate } from '@/lib/actions'
+import type { ActionLifecycleCloseEvent, BulkActionDescriptor } from '@/lib/actions'
+```
+
+Deep imports are allowed only when the barrel causes a concrete problem:
+
+| Reason           | Example                                                 |
+| ---------------- | ------------------------------------------------------- |
+| `vi.mock` target | `vi.mock('@/lib/actions/action-outcome-notify.lib', …)` |
+
+### Module graph (verified acyclic)
+
+Folder relationships (`dialog → resolution → blocker → dialog`) do not form a JavaScript import
+cycle at the module level:
+
+- `dialog/action-dialog-shell.client` → `resolution/action-target-resolution-list.client`
+- `resolution/action-resolution-row-detail.client` → `blocker/action-blocker-references.client`
+- `blocker/action-blocked-dialog.client` → `dialog/action-dialog-shell.lib` (constants only — not `shell.client`)
+
+Resolution does not import dialog; the cycle breaks at `shell.lib`.
+
 ## Lifecycle
 
 ```text
@@ -93,20 +141,20 @@ Post-close summaries use `deriveActionApplySummary(outcomes)` — single `fullSu
 
 ## Components
 
-| Module                         | Role                                                                     |
-| ------------------------------ | ------------------------------------------------------------------------ |
-| `useActionLifecycle`           | Phase machine, validate/apply orchestration                              |
-| `ActionDialogShell`            | Layout for configure / resolve / result                                  |
-| `ActionTargetResolutionList`   | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
-| `ActionBlockedDialog`          | Single blocked projection — header + flat reference list only            |
-| `ActionBlockerReferences`      | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
-| `action-messages.ts`           | Shared blocked/success/result copy                                       |
-| `action-apply-summary.lib.ts`  | `deriveActionApplySummary` — shared post-apply ids + `fullSuccess`       |
-| `action-outcome-notify.lib.ts` | Post-close toast policy (`shouldNotifyActionOutcomes`)                   |
-| `action-dialog-close.lib.ts`   | Close ordering + idempotency (`finalizeActionDialogCloseWithOutcomes`)   |
-| `action-validate-strategy.ts`  | Fan-out and batch validate strategies + lifecycle result resolution      |
-| `action-validate-batch.ts`     | Shared batch POST helper for validate transport                          |
-| `fan-out-validate.ts`          | Concurrency-5 fan-out harness (parity / explicit rollback only)          |
+| Module                                            | Role                                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------------------ |
+| `lifecycle/use-action-lifecycle`                  | Phase machine, validate/apply orchestration                              |
+| `dialog/action-dialog-shell.client`               | Layout for configure / resolve / result                                  |
+| `resolution/action-target-resolution-list.client` | Bounded scroll region (`bg-surface-subtle`) for bulk resolve/result rows |
+| `blocker/action-blocked-dialog.client`            | Single blocked projection — header + flat reference list only            |
+| `blocker/action-blocker-references.client`        | Grouped summaries in bulk rows; flat bulleted links in single blocked    |
+| `action-messages.ts`                              | Shared blocked/success/result copy                                       |
+| `action-apply-summary.lib.ts`                     | `deriveActionApplySummary` — shared post-apply ids + `fullSuccess`       |
+| `action-outcome-notify.lib.ts`                    | Post-close toast policy (`shouldNotifyActionOutcomes`)                   |
+| `dialog/action-dialog-close.lib.ts`               | Close ordering + idempotency (`finalizeActionDialogCloseWithOutcomes`)   |
+| `validation/action-validate-strategy.ts`          | Fan-out and batch validate strategies + lifecycle result resolution      |
+| `validation/action-validate-batch.ts`             | Shared batch POST helper for validate transport                          |
+| `validation/fan-out-validate.ts`                  | Concurrency-5 fan-out harness (parity / explicit rollback only)          |
 
 ## Batch validate transport (Phase 2)
 

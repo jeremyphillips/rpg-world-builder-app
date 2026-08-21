@@ -4,8 +4,8 @@ import type { ContentUsageBlocker } from '@rpg/contracts'
 import { Button, Modal } from '@rpg/ui'
 
 import { ActionBlockerReferences } from './action-blocker-references.client'
-import { ACTION_DIALOG_MODAL_SIZE } from './action-dialog-shell.lib'
-import { ACTION_CLOSE_LABEL } from './action-messages'
+import { ACTION_DIALOG_MODAL_SIZE } from '../dialog/action-dialog-shell.lib'
+import { ACTION_CLOSE_LABEL } from '../action-messages'
 
 export type ActionBlockedDialogProps = {
   open: boolean

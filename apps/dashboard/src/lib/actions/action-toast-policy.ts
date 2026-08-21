@@ -1,4 +1,4 @@
-import type { ActionLifecyclePhase } from './action-lifecycle.types'
+import type { ActionLifecyclePhase } from './lifecycle/action-lifecycle.types'
 
 export type ActionToastPolicyInput = {
   modalOpen: boolean

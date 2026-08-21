@@ -3,7 +3,7 @@
 import type { ActionTargetFailure } from '@rpg/contracts'
 import { Eyebrow } from '@rpg/ui'
 
-import type { ActionResolutionRowModel } from './action-lifecycle.types'
+import type { ActionResolutionRowModel } from '../lifecycle/action-lifecycle.types'
 import { actionResolutionRowVariants } from './action-resolution-list.variants'
 import { ActionResolutionRowCheckbox } from './action-resolution-row-checkbox.client'
 import { ActionResolutionRowDetail } from './action-resolution-row-detail.client'

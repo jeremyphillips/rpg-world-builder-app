@@ -3,9 +3,9 @@
 import type { ActionTargetFailure, ContentUsageBlocker } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
 
-import { ActionBlockerReferences } from './action-blocker-references.client'
-import { actionBlockerReferenceRowListClasses } from './action-blocker-references.lib'
-import type { ActionResolutionRowModel } from './action-lifecycle.types'
+import { ActionBlockerReferences } from '../blocker/action-blocker-references.client'
+import { actionBlockerReferenceRowListClasses } from '../blocker/action-blocker-references.lib'
+import type { ActionResolutionRowModel } from '../lifecycle/action-lifecycle.types'
 
 function hasUsageReferenceBlockers(blockers: readonly unknown[]): boolean {
   return blockers.some(

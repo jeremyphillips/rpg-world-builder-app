@@ -1,4 +1,4 @@
-import type { ActionResolutionRowState } from './action-lifecycle.types'
+import type { ActionResolutionRowState } from '../lifecycle/action-lifecycle.types'
 
 /** Row states that share blocked/failed issue chrome and alignment-checkbox behavior. */
 export const ACTION_RESOLUTION_ISSUE_ROW_STATES = [

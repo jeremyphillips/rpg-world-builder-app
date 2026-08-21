@@ -1,8 +1,8 @@
 import { partitionApplyOutcomes, type ActionTargetFailure } from '@rpg/contracts'
 
-import { deriveActionApplySummary } from './action-apply-summary.lib'
-import type { ActionLifecycleCloseEvent } from './action-lifecycle.types'
-import { shouldNotifyActionOutcomes } from './action-outcome-notify.lib'
+import { deriveActionApplySummary } from '../action-apply-summary.lib'
+import type { ActionLifecycleCloseEvent } from '../lifecycle/action-lifecycle.types'
+import { shouldNotifyActionOutcomes } from '../action-outcome-notify.lib'
 
 /** Close the dialog first, then run post-close side effects (toast, selection sync). */
 export function finalizeActionDialogClose(

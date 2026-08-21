@@ -11,7 +11,7 @@ import {
   type LocationKind,
 } from '@rpg/contracts'
 
-import { formatDescriptorCount } from '@/lib/actions/action-count-grammar'
+import { formatDescriptorCount } from '@/lib/actions'
 
 import { ROUTES } from '@/app/routes'
 

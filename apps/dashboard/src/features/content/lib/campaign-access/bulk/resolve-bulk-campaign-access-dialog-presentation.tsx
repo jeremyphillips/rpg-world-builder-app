@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { UsageBlockerSourceKey } from '@rpg/contracts'
 
-import type { BulkActionDescriptor } from '@/lib/actions/action-count-grammar'
+import type { BulkActionDescriptor } from '@/lib/actions'
 
 import {
   BULK_CAMPAIGN_ACCESS_DIALOG_HEADLINE,

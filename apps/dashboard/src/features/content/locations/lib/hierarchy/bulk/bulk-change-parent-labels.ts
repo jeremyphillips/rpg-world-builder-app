@@ -9,7 +9,7 @@ import {
   formatSubjectVerb,
   formatWouldChangeUnchangedSummary,
   type BulkActionDescriptor,
-} from '@/lib/actions/action-count-grammar'
+} from '@/lib/actions'
 
 export const BULK_CHANGE_PARENT_DESCRIPTOR: BulkActionDescriptor = {
   nounSingular: 'location',
