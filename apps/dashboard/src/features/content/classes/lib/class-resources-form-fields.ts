@@ -1,7 +1,7 @@
 import { type FormItem } from '@rpg/ui/form'
 
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
 function resourceItemFields(ctx: ContentFormCtx): FormItem[] {
   const levelOptions = getLevelFieldOptions(ctx)

@@ -15,7 +15,7 @@ import type {
 import { areCreateCompositionChildWorkflowViewsEqual } from '@/lib/create-flow'
 
 import { useOrganizations } from '../../organizations'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { filterReferenceableCatalogRows } from '../../lib/form-options/content-reference-catalog.lib'
 import type { OrganizationFormValues } from '../../lib/forms/organization-form-projection'
 import {

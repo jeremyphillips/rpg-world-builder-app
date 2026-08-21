@@ -3,8 +3,8 @@ import { type CreateSubclassInput, type Subclass, type SubclassFeature } from '@
 import {
   envelopeSlugFields,
   finalizeContentInput,
-} from '../../../lib/forms/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../../lib/forms/content-form-registry'
+} from '../../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../../lib/forms/registry/content-form-registry'
 import { featuresFromFormValues, featureToFormRow } from '../class-feature-form-fields'
 import { subclassFormSchema, type SubclassFormValues } from './subclass-form-fields'
 

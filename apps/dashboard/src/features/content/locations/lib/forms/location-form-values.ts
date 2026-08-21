@@ -10,8 +10,8 @@ import {
 import {
   finalizeContentInput,
   slugForInputParse,
-} from '../../../lib/forms/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../../lib/forms/content-form-registry'
+} from '../../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   canonicalFieldsForAuthoringType,
   resolveLocationAuthoringType,

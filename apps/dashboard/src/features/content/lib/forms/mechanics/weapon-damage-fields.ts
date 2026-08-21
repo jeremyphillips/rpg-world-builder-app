@@ -1,6 +1,6 @@
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../content-form-registry'
+import type { ContentFormCtx } from '../registry/content-form-registry'
 import { damageTypeField } from './damage-type-field'
 import { rollValueFieldConfigs } from './roll-value-fields'
 

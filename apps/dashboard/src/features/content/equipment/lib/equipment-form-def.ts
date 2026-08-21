@@ -1,7 +1,7 @@
 import type { ZodType } from 'zod'
 import { type CreateEquipmentInput, type Equipment } from '@rpg/contracts'
 
-import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
+import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
 import { equipmentEconomyFormDefaults } from './equipment-economy-form-values'

@@ -7,7 +7,7 @@ import {
   type ResolvedCampaignRules,
 } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../forms/content-form-registry'
+import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 
 export function defaultCampaignRules(): ResolvedCampaignRules {
   return {

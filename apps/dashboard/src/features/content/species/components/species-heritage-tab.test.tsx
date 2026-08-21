@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { draconicHeritageForm } from '@/test/fixtures/factories/additional/heritage'
 import { TestFormShell } from '@/test/form-shell'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { HeritageForm } from '../../species/lib/species-heritage-form-fields'
 import { SpeciesHeritageTab } from './species-heritage-tab.client'
 

@@ -26,14 +26,14 @@ import {
   EQUIPMENT_GRANT_ITEM_KINDS,
   EQUIPMENT_POOL_CATEGORY_ANY,
   equipmentGrantItemFormSchema,
-} from './equipment-grant-form-fields'
+} from './equipment/equipment-grant-form-fields'
 import {
   armorTrainingItemFormSchema,
   PROFICIENCY_POOL_CATEGORY_ANY,
   skillProficiencyItemFormSchema,
   toolProficiencyItemFormSchema,
   weaponProficiencyItemFormSchema,
-} from './proficiency-grant-form-fields'
+} from './proficiency/proficiency-grant-form-fields'
 
 const BASE_GRANT_TYPES = [
   'resistances',

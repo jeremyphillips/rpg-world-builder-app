@@ -13,10 +13,10 @@ import {
 } from '@rpg/contracts'
 import type { FormItem, RowFieldItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type { LocationFormCtx } from './location-form-ctx'
 import { descriptionField, nameField } from '../../../lib/forms/fields/content-identity-form-fields'
-import { draftOptionalSelect } from '../../../lib/forms/draft-form-schema-helpers'
+import { draftOptionalSelect } from '../../../lib/forms/validation/draft-form-schema-helpers'
 import {
   buildLocationClassificationFields,
   buildLocationPrimaryClassificationFields,

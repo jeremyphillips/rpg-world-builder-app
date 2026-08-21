@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor.client'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   classFeatureItemFields,
   featureItemEyebrow,

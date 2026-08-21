@@ -33,7 +33,10 @@ builders (`*-stat-rows.ts`).
 ```text
 lib/
   fixtures/         # STORY_* IDs, pick*() catalog helpers
-  forms/            # registry + key helpers; shells/, fields/, grants/ subfolders
+  forms/            # cross-type form infra — see forms/README.md
+                    #   registry/, validation/, fields/, mechanics/, grants/{equipment,proficiency}/
+                    #   shells/{layout,create,edit,host,submit,session}/
+                    #   root seam: organization-form-projection.ts
   form-options/     # Level, rich-text link options
   overview/         # List shell, table config, source badge; hooks/ subfolder
   detail/           # page/, metadata/, section/, row/ — see feature-structure.md
@@ -86,7 +89,7 @@ fails without a visible error — check inactive tabs.
 Detail and overview authoring controls (Edit, New, row actions) are gated by
 [`useCanManageCampaign`](./campaign/hooks/use-can-manage-campaign.ts) — owner or
 co-owner membership from `GET /api/campaigns`. Create/edit routes use
-[`ContentAuthoringGate`](./lib/forms/shells/content-authoring-gate.tsx) for the same check.
+[`ContentAuthoringGate`](./lib/forms/shells/layout/content-authoring-gate.tsx) for the same check.
 
 ## Master-detail abstraction
 

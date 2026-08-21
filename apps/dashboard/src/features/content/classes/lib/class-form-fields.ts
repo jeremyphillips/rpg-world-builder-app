@@ -12,12 +12,12 @@ import { type TabbedFormTab } from '@rpg/ui/form'
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
-import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import {
   embeddedArrayResolverField,
   embeddedMasterDetailTabValidation,
-} from '../../lib/forms/tabbed-form-resolver-fields'
+} from '../../lib/forms/validation/tabbed-form-resolver-fields'
 import { ClassFeaturesTab } from '../components/class-features-tab.client'
 import { ClassCharacterCreationTab } from '../components/class-character-creation-tab.client'
 import { ClassSubclassesTab } from '../components/class-subclasses-tab.client'

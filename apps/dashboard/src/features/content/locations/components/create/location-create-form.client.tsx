@@ -25,15 +25,15 @@ import {
   invalidateContentFormDefQueries,
   useContentWriteMutation,
 } from '../../../lib/list/use-content-mutations'
-import { contentFormFields, type ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import { contentFormFields, type ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   ContentFormHost,
   type ContentFormHostChrome,
   type ContentFormHostLeaveBridge,
-} from '../../../lib/forms/shells/content-form-host.client'
-import { ContentFormHeader } from '../../../lib/forms/shells/content-form-shell-layout.lib'
-import { useContentFormSubmit } from '../../../lib/forms/shells/content-form-submit'
-import { resolveContentFormNavigationFields } from '../../../lib/forms/shells/content-form-host-projection'
+} from '../../../lib/forms/shells/host/content-form-host.client'
+import { ContentFormHeader } from '../../../lib/forms/shells/layout/content-form-shell-layout.lib'
+import { useContentFormSubmit } from '../../../lib/forms/shells/submit/content-form-submit'
+import { resolveContentFormNavigationFields } from '../../../lib/forms/shells/host/content-form-host-projection'
 import { resolveBuildingCreateViewForPath } from '../../lib/create/setup/location-building-create-invalid-submit.lib'
 import { fixedCreateToInitialValues } from '../../lib/create/location-create-shortcuts'
 import '../../lib/forms/location-form-def'

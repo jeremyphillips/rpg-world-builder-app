@@ -23,9 +23,9 @@ import {
 import type {
   ContentFormHostChrome,
   ContentFormHostLeaveBridge,
-} from '../../../lib/forms/shells/content-form-host.client'
-import { ContentFormOptionsGate } from '../../../lib/forms/shells/content-form-shell-layout'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+} from '../../../lib/forms/shells/host/content-form-host.client'
+import { ContentFormOptionsGate } from '../../../lib/forms/shells/layout/content-form-shell-layout'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { formatContentCreateActionLabel } from '../../../lib/content-type-labels'
 import {
   completeLocationCreateSetup,

@@ -5,9 +5,9 @@ import type { ContentSource } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import { notifyPublishSuccess } from '@/lib/notify'
-import type { AnyContentFormDef } from '../forms/content-form-registry'
+import type { AnyContentFormDef } from '../forms/registry/content-form-registry'
 import { usePublishContent } from '../list/use-content-mutations'
-import { useContentEditPublishRequest } from '../forms/shells/content-edit-publish-context.client'
+import { useContentEditPublishRequest } from '../forms/shells/edit/content-edit-publish-context.client'
 
 type UseContentPublishFlowOptions = {
   def: Pick<AnyContentFormDef, 'routeKey' | 'queryKey' | 'invalidateQueryKeys'>

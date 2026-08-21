@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { formatContentCreateHeading } from '@/features/content/lib/content-type-labels'
-import { ContentCreateShell } from '../../lib/forms/shells/content-create-shell'
+import { ContentCreateShell } from '../../lib/forms/shells/create/content-create-shell'
 // Registers the class form def into the content form registry on module load.
 import '../lib/class-form-def'
 

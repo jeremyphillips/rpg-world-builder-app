@@ -1,6 +1,6 @@
 import type { CreateOrganizationInput, Organization } from '@rpg/contracts'
 
-import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/content-form-registry'
+import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
 import {
   buildOrganizationCreateInput,
   buildOrganizationFields,

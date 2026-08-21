@@ -5,7 +5,7 @@ import {
   formatContentListLoadErrorMessage,
   formatContentNotFoundMessage,
 } from '@/features/content/lib/content-type-labels'
-import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
+import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useLocations } from '../hooks/use-locations'
 import '../lib/forms/location-form-def'
 

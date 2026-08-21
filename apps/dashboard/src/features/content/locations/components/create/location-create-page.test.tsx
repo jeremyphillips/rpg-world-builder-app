@@ -17,7 +17,7 @@ vi.mock('@/features/campaign', () => ({
   useCampaigns: () => ({ data: [] }),
 }))
 
-vi.mock('../../../lib/forms/shells/content-create-shell', () => ({
+vi.mock('../../../lib/forms/shells/create/content-create-shell', () => ({
   ContentCreateShell: ({ heading }: { heading: string }) => (
     <div data-testid="content-create-shell">{heading}</div>
   ),

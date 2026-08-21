@@ -9,8 +9,8 @@ import {
 } from '@rpg/contracts'
 
 import { costFromForm, type EquipmentCostFormValue } from './equipment-economy-form-values'
-import { slugForInputParse } from '../../lib/forms/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+import { slugForInputParse } from '../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import type { weightFromForm } from '../../lib/forms/fields/content-economy-form-fields'
 
 import type { EquipmentFormValues, EquipmentFormValuesFor } from './equipment-form-fields'

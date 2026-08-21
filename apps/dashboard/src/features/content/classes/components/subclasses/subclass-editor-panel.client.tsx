@@ -7,7 +7,7 @@ import { FormItems, makeResolver } from '@rpg/ui/form'
 import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { CampaignAccessSection } from '../../../lib/campaign-access/campaign-access-section.client'
 import { useCampaignAccessForm } from '../../../lib/campaign-access/campaign-access-form-context.client'
 import { SubclassUsageReferencesSection } from './subclass-usage-references-section.client'

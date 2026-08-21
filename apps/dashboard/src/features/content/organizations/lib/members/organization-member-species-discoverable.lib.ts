@@ -1,6 +1,6 @@
 import type { Species } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
 /** Campaign-eligible species for organization member species affinity authoring. */
 export function resolveDiscoverableOrganizationMemberSpecies(ctx: ContentFormCtx): Species[] {

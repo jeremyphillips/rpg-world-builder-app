@@ -19,19 +19,19 @@ import {
   formatContentCreateActionLabel,
   formatContentCreateHeading,
 } from '../../../lib/content-type-labels'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   ContentFormHost,
   type ContentFormHostLeaveBridge,
-} from '../../../lib/forms/shells/content-form-host.client'
-import { ContentFormHeader } from '../../../lib/forms/shells/content-form-shell-layout.lib'
-import { useContentFormSubmit } from '../../../lib/forms/shells/content-form-submit'
+} from '../../../lib/forms/shells/host/content-form-host.client'
+import { ContentFormHeader } from '../../../lib/forms/shells/layout/content-form-shell-layout.lib'
+import { useContentFormSubmit } from '../../../lib/forms/shells/submit/content-form-submit'
 import {
   resolveContentFormHostConfig,
   resolveContentFormNavigationFields,
-} from '../../../lib/forms/shells/content-form-host-projection'
+} from '../../../lib/forms/shells/host/content-form-host-projection'
 import { useContentWriteMutation } from '../../../lib/list/use-content-mutations'
-import { ContentFormOptionsGate } from '../../../lib/forms/shells/content-form-shell-layout'
+import { ContentFormOptionsGate } from '../../../lib/forms/shells/layout/content-form-shell-layout'
 import {
   OrganizationAuthoringFormShell,
   OrganizationAuthoringPresetBridge,

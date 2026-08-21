@@ -1,6 +1,6 @@
 import type { FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { effectItemFieldsForKinds } from '../../../lib/effects/effect-item-fields.lib'
 import { RESOLUTION_EFFECT_KINDS } from './resolution-effect-add-menu.lib'
 

@@ -7,7 +7,7 @@ import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import type { Availability, AvailabilityReason } from '@/lib/availability'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { resolveMasterDetailRowKey } from '../../lib/master-detail/content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from '../../lib/master-detail/build-embedded-master-detail-list-item'
 import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'

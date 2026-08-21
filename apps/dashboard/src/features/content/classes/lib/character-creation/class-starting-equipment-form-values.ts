@@ -14,12 +14,12 @@ import {
   wealthGrantMoneyFromForm,
   wealthGrantMoneyToForm,
 } from '../../../lib/forms/fields/content-economy-form-fields'
-import { applyStableIdsForChoiceOptions } from '../../../lib/forms/content-form-key-helpers'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import { applyStableIdsForChoiceOptions } from '../../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   equipmentGrantFromFormRow,
   equipmentGrantToFormRow,
-} from '../../../lib/forms/grants/equipment-grant-form-values'
+} from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
 import {
   startingEquipmentOptionItemFields,
   type StartingEquipmentForm,

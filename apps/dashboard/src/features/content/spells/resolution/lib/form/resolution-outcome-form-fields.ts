@@ -4,7 +4,7 @@ import type { FormItem } from '@rpg/ui/form'
 
 import { SpellResolutionOutcomeApplicationSection } from '../../components/outcomes/spell-resolution-outcome-application-section.client'
 
-import { embeddedArrayResolverField } from '../../../../lib/forms/tabbed-form-resolver-fields'
+import { embeddedArrayResolverField } from '../../../../lib/forms/validation/tabbed-form-resolver-fields'
 import { readOutcomeApplications } from './resolution-outcome-applications.lib'
 import {
   formatEffectReferenceTitle,

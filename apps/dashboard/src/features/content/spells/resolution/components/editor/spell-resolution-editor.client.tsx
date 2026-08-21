@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { resolutionFields } from '../../lib/form/resolution-form-fields'
 import { optionalResolutionFormSchema } from '../../lib/form/resolution-form-schema'
 

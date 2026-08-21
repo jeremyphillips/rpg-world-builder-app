@@ -5,7 +5,7 @@ import { defaultMulticlassingRules } from '@rpg/contracts'
 
 import { TestFormShell } from '@/test/form-shell'
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { SpeciesRulesTab } from './species-rules-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {

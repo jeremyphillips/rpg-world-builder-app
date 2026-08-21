@@ -17,7 +17,7 @@ import {
   grantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
 import { formRowsToGrantGroups } from '../../lib/forms/grants/grant-form-values'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { traitKindOptions } from './species-trait-form-labels'
 
 /** Species trait row validation messages (tier 3 form overrides). */

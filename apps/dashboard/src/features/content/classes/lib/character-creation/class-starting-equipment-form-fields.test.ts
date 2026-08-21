@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildContentPurposeSelectors } from '@rpg/contracts'
 
 import { pickClass, pickEquipment } from '../../../lib/fixtures/pick'
-import { equipmentGrantSummary } from '../../../lib/forms/grants/equipment-grant-form-values'
+import { equipmentGrantSummary } from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
 import {
   startingEquipmentChoiceItemFormSchema,
   startingEquipmentFormSchema,

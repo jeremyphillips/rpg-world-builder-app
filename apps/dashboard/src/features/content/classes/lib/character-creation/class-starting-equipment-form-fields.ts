@@ -21,7 +21,7 @@ import {
   wealthGrantMoneyField,
   wealthGrantMoneyFromForm,
 } from '../../../lib/forms/fields/content-economy-form-fields'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { referenceEquipmentFieldOptions } from '../../../lib/form-options/content-field-option.lib'
 import { EntityDisclosureArrayItemShell } from '../../../lib/entity/disclosure/entity-disclosure-array-item-shell.client'
 import {
@@ -30,12 +30,12 @@ import {
   equipmentGrantValidationMessages,
   grantedEquipmentItemFormSchema,
   EQUIPMENT_GRANT_ITEM_KINDS,
-} from '../../../lib/forms/grants/equipment-grant-form-fields'
+} from '../../../lib/forms/grants/equipment/equipment-grant-form-fields'
 import {
   INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
   STARTING_EQUIPMENT_GRANT_ITEM_KIND_LABELS,
   STARTING_EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
-} from '../../../lib/forms/grants/equipment-grant-form-labels'
+} from '../../../lib/forms/grants/equipment/equipment-grant-form-labels'
 import { STARTING_EQUIPMENT_ITEM_TYPE_LABEL } from './class-character-creation-link-labels'
 import {
   STARTING_EQUIPMENT_CHOICE_COPY,
@@ -46,7 +46,7 @@ import { ProficiencyLinkedGrantRowCue } from '../../components/character-creatio
 import {
   equipmentGrantTitle,
   equipmentGrantSummary,
-} from '../../../lib/forms/grants/equipment-grant-form-values'
+} from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
 
 /** Starting equipment validation messages (tier 3 form overrides). */
 export const startingEquipmentValidationMessages = {

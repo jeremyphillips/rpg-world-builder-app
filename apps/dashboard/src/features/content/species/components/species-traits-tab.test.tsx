@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TestFormShell } from '@/test/form-shell'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { SpeciesTraitsTab } from './species-traits-tab.client'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {

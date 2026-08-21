@@ -20,7 +20,7 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   referenceSkillFieldOptions,
   referenceToolFieldOptions,

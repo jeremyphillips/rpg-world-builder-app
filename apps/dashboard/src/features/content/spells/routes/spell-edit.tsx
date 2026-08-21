@@ -5,7 +5,7 @@ import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
-import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
+import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useSpells } from '../hooks/use-spells'
 // Registers the spell form def into the content form registry on module load.
 import '../lib/spell-form-def'

@@ -13,7 +13,7 @@ import {
   locationToFormValues,
 } from './location-form-values'
 import type { LocationFormValues } from './location-form-fields'
-import { resolveContentFormSchema } from '../../../lib/forms/shells/content-edit-load'
+import { resolveContentFormSchema } from '../../../lib/forms/shells/edit/content-edit-load'
 import { locationFormDef } from './location-form-def'
 import type { LocationFormCtx } from './location-form-ctx'
 

@@ -2,7 +2,7 @@ import { unionPersistedOptions, type Location } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { formatContentReferenceLabel } from '@/features/character'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { CONTENT_REFERENCE_UNRESOLVED_SUFFIX } from '../../../organizations/lib/members/organization-member-class-chip-options.lib'
 import { buildParentLocationOptions } from './location-parent-picker'
 

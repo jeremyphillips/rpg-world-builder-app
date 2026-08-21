@@ -14,8 +14,8 @@ import {
   deriveSlugForCreate,
   finalizeContentInput,
   slugForInputParse,
-} from '../../lib/forms/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+} from '../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import { cultureToFormValues } from './species-culture-form-fields'
 import { cultureFromFormValues } from './species-culture-form-values'
 import { heritageFromFormValues, heritageToFormRow } from './species-heritage-form-values'

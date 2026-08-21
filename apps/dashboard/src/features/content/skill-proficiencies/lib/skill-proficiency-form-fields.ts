@@ -2,9 +2,9 @@ import { z } from 'zod'
 import { abilitySchema, ABILITY_ENTRIES, ABILITY_IDS, slugSchema } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
+import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,

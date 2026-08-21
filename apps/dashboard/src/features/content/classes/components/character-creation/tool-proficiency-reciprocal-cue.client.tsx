@@ -2,8 +2,8 @@
 
 import { useWatch } from 'react-hook-form'
 
-import { ProficiencyEquipmentLinkCue } from '../../../lib/forms/grants/proficiency-equipment-link-cue.client'
-import { formatProficiencyLinkProficiencyCue } from '../../../lib/forms/grants/equipment-grant-form-labels'
+import { ProficiencyEquipmentLinkCue } from '../../../lib/forms/grants/proficiency/proficiency-equipment-link-cue.client'
+import { formatProficiencyLinkProficiencyCue } from '../../../lib/forms/grants/equipment/equipment-grant-form-labels'
 import {
   CHARACTER_CREATION_TOOL_CHOICE_ID,
   STARTING_EQUIPMENT_FIELD_NAME,

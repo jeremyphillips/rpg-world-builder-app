@@ -12,7 +12,7 @@ import {
 
 import { ContentEntityCard } from '../../../lib/content-entity-card.client'
 import { DetailOverflowMenu } from '../../../lib/detail/row/detail-overflow-menu.client'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type {
   BuildingOrganizationDraftIssue,
   BuildingOrganizationDraftPlan,

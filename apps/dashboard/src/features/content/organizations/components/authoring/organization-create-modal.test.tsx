@@ -29,7 +29,7 @@ vi.mock('../../../lib/list/use-content-mutations', async (importOriginal) => {
   }
 })
 
-vi.mock('../../../lib/forms/shells/content-form-shell-layout', () => ({
+vi.mock('../../../lib/forms/shells/layout/content-form-shell-layout', () => ({
   ContentFormOptionsGate: ({ children }: { children: (ctx: object) => ReactNode }) =>
     children({
       campaignId: STORY_CAMPAIGN_ID,

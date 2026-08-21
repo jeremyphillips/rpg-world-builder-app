@@ -7,8 +7,8 @@ import {
   type Feat,
 } from '@rpg/contracts'
 
-import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+import { finalizeContentInput, slugForInputParse } from '../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import { requirementEditorDefaultValue } from './requirement-editor-form-schema'
 import {
   requirementEditorToExpression,

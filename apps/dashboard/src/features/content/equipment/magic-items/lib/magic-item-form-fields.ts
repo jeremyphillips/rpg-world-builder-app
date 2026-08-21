@@ -10,7 +10,7 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { referenceMagicItemBaseEquipmentFieldOptions } from '../../../lib/form-options/content-field-option.lib'
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 

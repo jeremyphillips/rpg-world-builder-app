@@ -32,10 +32,10 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
-import type { ContentFormCtx, ContentFormInputCtx } from './content-form-registry'
-import { draftOptionalSelect } from './draft-form-schema-helpers'
+import type { ContentFormCtx, ContentFormInputCtx } from './registry/content-form-registry'
+import { draftOptionalSelect } from './validation/draft-form-schema-helpers'
 import { descriptionField, nameField } from './fields/content-identity-form-fields'
-import { finalizeContentInput, slugForInputParse } from './content-form-key-helpers'
+import { finalizeContentInput, slugForInputParse } from './registry/content-form-key-helpers'
 import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/authoring/organization-practice-combobox-ranking'
 import {
   buildMemberClassAffinityChipOptions,

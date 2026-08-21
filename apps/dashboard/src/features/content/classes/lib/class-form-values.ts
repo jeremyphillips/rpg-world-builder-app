@@ -13,8 +13,8 @@ import {
   type Spellcasting,
 } from '@rpg/contracts'
 
-import { finalizeContentInput, slugForInputParse } from '../../lib/forms/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+import { finalizeContentInput, slugForInputParse } from '../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import type { ClassFormValues } from './class-form-fields'
 import { createAsiFeature } from './class-asi-features'
 import { createSubclassChoiceFeature } from './class-subclass-choice-features'

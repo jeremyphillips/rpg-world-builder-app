@@ -30,7 +30,7 @@ import { useLocations } from '../../locations/hooks/use-locations'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { useSpecies } from '../../species/hooks/use-species'
 import { useSpells } from '../../spells/hooks/use-spells'
-import type { ContentFormCtx } from '../forms/content-form-registry'
+import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import {
   buildRichTextInternalLinkOptions,
   RICH_TEXT_LINK_CONTENT_TYPE_OPTIONS,

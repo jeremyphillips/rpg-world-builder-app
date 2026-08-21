@@ -1,6 +1,6 @@
 import type { LocationKind, RegionClassification, SettlementType, SiteType } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
 import type { LocationAuthoringType } from '../location-authoring-type'
 

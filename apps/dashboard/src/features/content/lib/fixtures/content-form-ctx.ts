@@ -1,7 +1,7 @@
 import type { ResolvedCampaignRules } from '@rpg/contracts'
 
 import { defaultCampaignRules } from '../form-options/content-campaign-rules'
-import type { ContentFormCtx } from '../forms/content-form-registry'
+import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 
 export const TEST_CAMPAIGN_ID = 'camp_1'
 

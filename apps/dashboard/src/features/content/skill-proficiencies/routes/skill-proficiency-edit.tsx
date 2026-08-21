@@ -5,7 +5,7 @@ import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
-import { ContentEditShell } from '../../lib/forms/shells/content-edit-shell'
+import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
 // Registers the skill proficiency form def into the content form registry on module load.
 import '../lib/skill-proficiency-form-def'

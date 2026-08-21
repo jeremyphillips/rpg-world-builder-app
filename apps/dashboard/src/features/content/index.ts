@@ -151,20 +151,20 @@ export { SpellDetailMetadata } from './spells/components/spell-detail-metadata.c
 export {
   ContentCreateShell,
   ContentFormShellResolver,
-} from './lib/forms/shells/content-create-shell'
-export { ContentFormDrawer } from './lib/forms/shells/content-form-drawer.client'
+} from './lib/forms/shells/create/content-create-shell'
+export { ContentFormDrawer } from './lib/forms/shells/host/content-form-drawer.client'
 export type {
   ContentFormDrawerFormProps,
   ContentFormDrawerProps,
-} from './lib/forms/shells/content-form-drawer.client'
-export { ContentFormHost } from './lib/forms/shells/content-form-host.client'
+} from './lib/forms/shells/host/content-form-drawer.client'
+export { ContentFormHost } from './lib/forms/shells/host/content-form-host.client'
 export type {
   ContentFormHostChrome,
   ContentFormHostFormProps,
   ContentFormHostLeaveBridge,
   ContentFormHostProps,
-} from './lib/forms/shells/content-form-host.client'
-export { ContentEditShell } from './lib/forms/shells/content-edit-shell'
+} from './lib/forms/shells/host/content-form-host.client'
+export { ContentEditShell } from './lib/forms/shells/edit/content-edit-shell'
 export {
   buildGrantSummaryModel,
   buildSpellGrantVocabulary,
@@ -182,7 +182,7 @@ export {
   contentFormRegistry,
   type ContentFormDef,
   type ContentFormCtx,
-} from './lib/forms/content-form-registry'
+} from './lib/forms/registry/content-form-registry'
 export {
   buildContentFormOptionSets,
   referenceClassFieldOptions,

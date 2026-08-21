@@ -36,16 +36,16 @@ Reference: locations Location type projection —
 ### ContentFormDef → ContentFormHost projection
 
 When a `ContentFormDef` registry entry is wired directly to
-[`ContentFormHost`](../src/features/content/lib/forms/shells/content-form-host.client.tsx)
+[`ContentFormHost`](../src/features/content/lib/forms/shells/host/content-form-host.client.tsx)
 (modals, drawers, nested create flows), use
-[`resolveContentFormHostConfig`](../src/features/content/lib/forms/shells/content-form-host-projection.ts)
+[`resolveContentFormHostConfig`](../src/features/content/lib/forms/shells/host/content-form-host-projection.ts)
 for def-owned props — do not hand-pick subsets of `schema`, `fields`, `valueSyncs`, or
 `defaultValues`.
 
 Page/edit shells (`ContentCreateShell`, `ContentEditShell`) route through
-[`ContentFormLayout`](../src/features/content/lib/forms/shells/content-form-shell-layout.tsx),
+[`ContentFormLayout`](../src/features/content/lib/forms/shells/layout/content-form-shell-layout.tsx),
 which resolves `valueSyncs` via
-[`resolveContentFormValueSyncs`](../src/features/content/lib/forms/shells/content-form-host-projection.ts)
+[`resolveContentFormValueSyncs`](../src/features/content/lib/forms/shells/host/content-form-host-projection.ts)
 only. Do not call `resolveContentFormHostConfig` there — the Host-specific helper is for
 `ContentFormHost` adapters.
 
@@ -158,12 +158,12 @@ optional. Plain `someVocabSchema.optional()` still validates the `''` sentinel
 against the enum and blocks Save Draft.
 
 Use **`draftOptionalSelect(schema)`** from
-[`lib/forms/draft-form-schema-helpers.ts`](../src/features/content/lib/forms/draft-form-schema-helpers.ts)
+[`lib/forms/validation/draft-form-schema-helpers.ts`](../src/features/content/lib/forms/validation/draft-form-schema-helpers.ts)
 for every optional closed-vocab field on draft paths — including nested `unit`
 keys inside optional `inputSelect` / `inputUnit` objects.
 
 ```ts
-import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
+import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 
 export const armorEquipmentDraftFormSchema = z.object({
   armorCategory: draftOptionalSelect(armorCategorySchema),
@@ -205,7 +205,7 @@ assert:
    `assertInvalidSubmitUsesRefinedMessages(schema, fields, { invalidValue })`
 
 Dashboard forms: `apps/dashboard/src/lib/form-validation/dashboard-form-validation.test.ts`.
-Content catalog: `apps/dashboard/src/features/content/lib/forms/content-form-validation.test.ts`.
+Content catalog: `apps/dashboard/src/features/content/lib/forms/validation/content-form-validation.test.ts`.
 Public auth: `apps/public/src/features/auth/lib/auth-form-validation.test.ts`.
 
 Out-of-scope deferrals (non-form schemas, future i18n/API seams)
@@ -264,6 +264,12 @@ classes/lib/character-creation/class-starting-equipment-form-*.ts
 classes/lib/subclasses/subclass-form-*.ts
 campaign/lib/rules/character-configuration/character-configuration-form-*.ts
 ```
+
+**Parent `content/lib/forms/`** uses the same subfolder rule at infrastructure
+scale (`registry/`, `validation/`, `shells/{layout,create,edit,host,submit,session}/`,
+`grants/{equipment,proficiency}/`). Flat prefixes above apply to **per-type**
+sub-area `lib/`, not parent form infra. Map →
+[`forms/README.md`](../src/features/content/lib/forms/README.md).
 
 ## When to split
 
@@ -344,14 +350,17 @@ These modules support many content types but are **not** per-type form splits:
 
 | Module                    | Path                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ContentFormDef contract   | `content/lib/forms/registry/` — `content-form-registry.ts`, `content-form-key-helpers.ts` (envelope/id helpers at the write boundary)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Validation / resolver     | `content/lib/forms/validation/` — `draft-form-schema-helpers.ts`, `content-publish-validation.lib.ts`, `tabbed-form-resolver-fields.ts`, `tabbed-form-validation-test-utils.ts`, `content-form-validation.test.ts`                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | Identity field builders   | `content/lib/forms/fields/content-identity-form-fields.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Economy field builders    | `content/lib/forms/fields/content-economy-form-fields.ts` (+ digit configs in `equipment/lib/`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | Speed/mass field builders | `content/lib/forms/fields/content-speed-form-fields.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| Grant row helpers         | `content/lib/forms/grants/grant-form-schema.ts` (`GRANT_TYPES` for consumer pickers, `GRANT_ROW_TYPES` / `GRANT_ROW_TYPE_LABELS` when equipment rows are representable, `GrantType`, `GRANT_TYPE_LABELS`), `grant-template-registry.ts` (authoring templates + `createDefault` for add-menu items), `grant-add-menu.lib.ts` (maps registry → `ArrayConfig.addActionMenu`), `grant-form-fields.ts`, `grant-form-values.ts`, `equipment-grant-form-fields.ts`, `equipment-grant-form-values.ts`, `equipment-grant-form-labels.ts`, `proficiency-grant-form-fields.ts`, `proficiency-grant-form-values.ts`, `proficiency-grant-form-labels.ts` |
+| Mechanics field builders  | `content/lib/forms/mechanics/` — `roll-form-values.ts`, `roll-value-fields.ts`, `damage-effect-fields.ts`, `weapon-damage-fields.ts`, `damage-type-field.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Grant row helpers         | `content/lib/forms/grants/` — union/core at root (`grant-form-schema.ts`, `grant-form-fields.ts`, `grant-template-registry.ts`, …); typed splits in `grants/equipment/` and `grants/proficiency/` (includes `tool-proficiency-pool-form-*`, `proficiency-equipment-link-cue.client.tsx`)                                                                                                                                                                                                                                                                                                                                                   |
 | Campaign rules from ctx   | `content/lib/form-options/content-campaign-rules.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | Level select builders     | `content/lib/form-options/level-field-options.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| Content form registry     | `content/lib/forms/content-form-registry.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| Create/edit shells        | `content/lib/forms/shells/` (create/edit shells, layout, load, authoring gate)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Create/edit shells        | `content/lib/forms/shells/` — `layout/`, `create/`, `edit/`, `host/`, `submit/`, `session/`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Cross-consumer projection | `content/lib/forms/organization-form-projection.ts` (root seam — sole shared projection today)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 ### Create vs edit action state
 
@@ -372,7 +381,7 @@ separate until aligned in a follow-up.
 
 Create surfaces that use `ContentFormDef` (`ContentFormHost`, create modals, future drawers) must
 route publish/create submit through `useContentFormSubmit` in
-[`content-form-submit.ts`](../src/features/content/lib/forms/shells/content-form-submit.ts).
+[`content-form-submit.ts`](../src/features/content/lib/forms/shells/submit/content-form-submit.ts).
 Do **not** call `resolveContentFormSchema(..., 'publish').parse()` in feature submit handlers.
 
 The hook runs: draft validation (RHF, already done) → commit validation via

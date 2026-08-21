@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { SpeciesCharacterCreationForm } from './species-rules-form-fields'
 
 /** Species character-creation form validation messages (tier 3 form overrides). */

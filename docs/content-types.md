@@ -246,7 +246,7 @@ Catalog records carry three distinct identifier layers. Authors edit **display n
 | Envelope **`slug`** | `fighter`, `wood-elf`                   | `deriveContentKey(name)` on first POST | **No** — homebrew and system patches  |
 | Nested **`id`**     | `rage`, `darkvision` on traits/features | Same helper, scoped to parent          | **No** — rename display `name` freely |
 
-Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`deriveContentKey`, `assignStableContentIds`, `assertStableContentIds`). Dashboard forms use `apps/dashboard/src/features/content/lib/forms/content-form-key-helpers.ts`; the API normalizes writes in `apps/api/src/features/content/lib/apply-content-keys.ts` before Zod validation.
+Shared helpers: `packages/contracts/src/rpg/content/lib/content-key.ts` (`deriveContentKey`, `assignStableContentIds`, `assertStableContentIds`). Dashboard forms use `apps/dashboard/src/features/content/lib/forms/registry/content-form-key-helpers.ts`; the API normalizes writes in `apps/api/src/features/content/lib/apply-content-keys.ts` before Zod validation.
 
 **Today:** homebrew records carry `status: 'draft' | 'published'` on the content envelope. Campaign managers (`owner`/`co-owner`) create with **Save draft** or **Publish**, promote drafts from the edit shell, and demote published homebrew when no active characters reference it. Non-managers receive only published records from list endpoints; slug assignment still happens on first POST (draft included).
 
@@ -904,7 +904,7 @@ Note: URL segments and dashboard/API subfolders use the content type key (kebab-
 
 For an authorable type, also map the form definition's API `routeKey` to its
 `CONTENT_ROUTES` section in
-`apps/dashboard/src/features/content/lib/forms/shells/content-form-navigation.ts`.
+`apps/dashboard/src/features/content/lib/forms/shells/layout/content-form-navigation.ts`.
 The shared create shell uses this registration to navigate to the saved
 entity's edit route. Add a post-create navigation test for the new type; the
 route-manifest drift test only verifies the `CONTENT_ROUTES` entry itself.

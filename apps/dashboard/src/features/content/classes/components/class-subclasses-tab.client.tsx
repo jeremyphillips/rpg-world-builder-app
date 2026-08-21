@@ -13,7 +13,7 @@ import type {
 import { getErrorMessage } from '@rpg/contracts'
 
 import { AvailabilityAlert, resolveAvailability } from '@/lib/availability'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { useCreateSubclass, useUpdateSubclass } from '../hooks/use-subclass-mutations'
 import { useReportSubclassUnsavedEdits } from '../hooks/subclass-unsaved-edits-context.client'
@@ -32,7 +32,7 @@ import {
   useCampaignAccessForm,
 } from '../../lib/campaign-access/campaign-access-form-context.client'
 import { isDefaultCampaignAccessPatch } from '../../lib/campaign-access/campaign-access-state'
-import { runCoordinatedContentSave } from '../../lib/forms/shells/content-save-session.lib'
+import { runCoordinatedContentSave } from '../../lib/forms/shells/session/content-save-session.lib'
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
 import {
   SubclassChoiceLevelGate,

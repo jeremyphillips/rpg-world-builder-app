@@ -9,8 +9,8 @@ import {
   contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
-} from '../../lib/forms/content-form-registry'
-import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
+} from '../../lib/forms/registry/content-form-registry'
+import { finalizeContentInput } from '../../lib/forms/registry/content-form-key-helpers'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { classesQueryKey, useClasses } from '../hooks/use-classes'
 import {

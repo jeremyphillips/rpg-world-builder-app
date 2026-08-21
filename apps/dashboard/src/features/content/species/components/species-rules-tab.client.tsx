@@ -10,7 +10,7 @@ import { AvailabilityAlert, campaignSettingHref, resolveAvailability } from '@/l
 import { disableFormItems } from '@/lib/disable-form-items'
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import {
   LEVEL_LIMITS_FIELD_PREFIX,

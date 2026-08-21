@@ -24,8 +24,8 @@ import {
   grantGroupsToFormRows,
   formRowsToGrantGroups,
 } from '../../lib/forms/grants/grant-form-values'
-import { applyStableIdsForUpdate } from '../../lib/forms/content-form-key-helpers'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 

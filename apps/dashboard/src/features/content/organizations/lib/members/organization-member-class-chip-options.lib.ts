@@ -4,7 +4,7 @@ import type { FieldOption } from '@rpg/ui/form'
 
 import { CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL } from '../../../lib/campaign-access/campaign-access-table-labels'
 import { formatContentReferenceLabel } from '@/features/character'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   resolveDiscoverableOrganizationMemberClasses,
   resolveOrganizationMemberClassCatalogClasses,

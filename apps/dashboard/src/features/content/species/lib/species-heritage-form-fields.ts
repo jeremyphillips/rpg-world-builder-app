@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { type FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { HERITAGE_NAME_HINT } from './species-heritage-form-labels'
 import { traitRowDraftFormSchema, traitRowFormSchema } from './species-trait-form-fields'
 

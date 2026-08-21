@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { pickClass } from '../../lib/fixtures/pick'
 import { characterCreationProficienciesToFormValues } from '../lib/character-creation/class-character-creation-proficiencies-form-values'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'

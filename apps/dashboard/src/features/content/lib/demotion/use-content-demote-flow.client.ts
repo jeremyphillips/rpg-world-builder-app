@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import type { ContentUsageBlocker, ContentSource } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
-import type { AnyContentFormDef } from '../forms/content-form-registry'
+import type { AnyContentFormDef } from '../forms/registry/content-form-registry'
 import { fetchContentDemotionAvailability, useDemoteContent } from '../list/use-content-mutations'
 
 type UseContentDemoteFlowOptions = {

@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { SpellResolutionEffectRemoveControl } from '../../components/effects/spell-resolution-effect-remove-control.client'
 import { SpellResolutionEffectAddControl } from '../../components/effects/spell-resolution-effect-add-control.client'
 import { SpellResolutionEffectsApplicationLabel } from '../../components/effects/spell-resolution-effects-application-label.client'

@@ -33,9 +33,9 @@ import {
   getContentTypeCollectionLabel,
 } from '../../lib/content-type-labels'
 import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
-import type { ContentFormCtx } from '../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { referenceSpellcastingClassFieldOptions } from '../../lib/form-options/content-field-option.lib'
-import { draftOptionalSelect } from '../../lib/forms/draft-form-schema-helpers'
+import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import {
   castingTimeUnitOptions,
   conditionTagOptions,

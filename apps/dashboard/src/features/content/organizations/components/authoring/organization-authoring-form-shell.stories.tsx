@@ -5,8 +5,8 @@ import { Form } from '@rpg/ui/form'
 
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
-import { ContentFormOptionsGate } from '../../../lib/forms/shells/content-form-shell-layout'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { ContentFormOptionsGate } from '../../../lib/forms/shells/layout/content-form-shell-layout'
 import {
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,

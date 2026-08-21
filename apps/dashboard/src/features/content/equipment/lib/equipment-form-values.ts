@@ -7,8 +7,8 @@ import {
 } from '@rpg/contracts'
 
 import { weightFromForm, weightToForm } from '../../lib/forms/fields/content-economy-form-fields'
-import { finalizeContentInput } from '../../lib/forms/content-form-key-helpers'
-import type { ContentFormInputCtx } from '../../lib/forms/content-form-registry'
+import { finalizeContentInput } from '../../lib/forms/registry/content-form-key-helpers'
+import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import { costToForm } from './equipment-economy-form-values'
 import { armorFormValuesFromEntity, buildArmorInput } from '../armor/lib/armor-form-values'
 import {

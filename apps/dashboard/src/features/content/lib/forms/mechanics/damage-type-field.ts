@@ -9,7 +9,7 @@ import { toOptions, type FieldConfig, type FieldOption, type FieldVisibility } f
 
 import { buildActiveDamageTypeFieldOptions, vocabularyFieldLabel } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../content-form-registry'
+import type { ContentFormCtx } from '../registry/content-form-registry'
 
 const DAMAGE_TYPE_PLACEHOLDER = 'Choose…'
 

@@ -1,6 +1,6 @@
 import type { CharacterClass } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
 /** Campaign-eligible classes for organization member class affinity authoring. */
 export function resolveDiscoverableOrganizationMemberClasses(

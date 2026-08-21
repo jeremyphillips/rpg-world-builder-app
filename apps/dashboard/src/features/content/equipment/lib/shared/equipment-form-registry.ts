@@ -1,7 +1,7 @@
 import type { EquipmentKind } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../../lib/forms/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { serviceFormFieldGroup } from '../../services/lib/service-form-fields'
 import { mountFormFieldGroup } from '../../mounts/lib/mount-form-fields'
 import { toolFormFieldGroup } from '../../tools/lib/tool-form-fields'
