@@ -4,7 +4,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
 import { makeConversation } from '@/test/fixtures/conversations'
-import { MESSAGES_STATUS_COPY } from '../lib/messages-copy'
+import { MESSAGES_STATUS_COPY } from '../../lib/messages-copy'
 
 import { ConversationList } from './conversation-list.client'
 

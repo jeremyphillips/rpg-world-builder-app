@@ -2,10 +2,11 @@
 
 import { ROUTES } from '@/app/routes'
 
-import { MESSAGES_ACTION_COPY } from '../lib/messages-copy'
+import { MESSAGES_ACTION_COPY } from '../../lib/messages-copy'
 
 import { MessagesMobileBackLink } from './messages-workspace-empty-states.client'
-import { MessagesDraftThreadPane, MessagesThreadPane } from './messages-workspace-panes.client'
+import { MessagesDraftThreadPane } from './messages-workspace-draft-thread-pane.client'
+import { MessagesThreadPane } from './messages-workspace-thread-pane.client'
 
 export function MessagesWorkspaceActiveThread({
   conversationId,

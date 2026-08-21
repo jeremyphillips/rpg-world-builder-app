@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
-import { MESSAGES_ACTION_COPY } from '../lib/messages-copy'
+import { MESSAGES_ACTION_COPY } from '../../lib/messages-copy'
 
 import { MessageComposer } from './message-composer.client'
 

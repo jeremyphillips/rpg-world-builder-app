@@ -11,8 +11,8 @@ import {
   TooltipTrigger,
 } from '@rpg/ui'
 
-import { MESSAGES_ACTION_COPY, MESSAGES_FORM_COPY } from '../lib/messages-copy'
-import { messagesWorkspaceComposerTextareaClasses } from './messages-workspace.variants'
+import { MESSAGES_ACTION_COPY, MESSAGES_FORM_COPY } from '../../lib/messages-copy'
+import { messageComposerTextareaClasses } from './message-thread.variants'
 
 type MessageComposerProps = {
   draft: string
@@ -67,7 +67,7 @@ export function MessageComposer({
           onChange={(event) => onDraftChange(event.target.value)}
           onKeyDown={handleKeyDown}
           rows={1}
-          className={messagesWorkspaceComposerTextareaClasses}
+          className={messageComposerTextareaClasses}
         />
       </div>
       <TooltipProvider>

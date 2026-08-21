@@ -5,7 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { renderWithProviders } from '@/test/render'
 
 import { MessagesWorkspaceHeader } from './messages-workspace-header.client'
-import { MESSAGES_ACTION_COPY } from '../lib/messages-copy'
+import { MESSAGES_ACTION_COPY } from '../../lib/messages-copy'
 
 describe('MessagesWorkspaceHeader', () => {
   it('renders the page heading and primary new message action', () => {

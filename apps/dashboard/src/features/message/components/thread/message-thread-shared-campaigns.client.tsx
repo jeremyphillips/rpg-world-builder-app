@@ -6,14 +6,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, buttonVariant
 import { ROUTES } from '@/app/routes'
 import { CampaignDisplayNameList } from '@/features/campaign'
 
-import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
+import { MESSAGES_A11Y_COPY } from '../../lib/messages-copy'
 import {
   buildMessageThreadSharedCampaignDisplay,
   formatMessageThreadSharedCampaignOverflowTooltip,
   formatMessageThreadSharedCampaignOverflowTriggerLabel,
   resolveMessageThreadSharedCampaignsPresentation,
-} from '../lib/message-thread-shared-campaigns-presentation.lib'
-import { MessagesMetadata } from './messages-metadata.client'
+} from '../../lib/message-thread-shared-campaigns-presentation.lib'
+import { MessagesMetadata } from '../messages-metadata.client'
 
 const SHARED_CAMPAIGN_SEPARATOR = ', '
 

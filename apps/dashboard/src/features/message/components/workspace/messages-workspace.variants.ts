@@ -1,5 +1,3 @@
-import { cva } from 'class-variance-authority'
-
 import { cn } from '@rpg/ui'
 
 import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
@@ -22,54 +20,6 @@ export const messagesWorkspaceRightScrollClasses =
   'scrollbar-slim min-h-0 flex-1 overflow-y-auto p-4'
 
 export const messagesWorkspaceRightFooterClasses = 'shrink-0 border-t border-border p-4'
-
-export const messagesWorkspaceThreadHeaderClasses = 'shrink-0 border-b border-border px-4 py-3'
-
-export const messagesWorkspacePreviewEyebrowClasses = 'px-4 pt-3'
-
-export const messagesWorkspaceListChromeInsetClasses = 'px-3'
-
-export const messagesWorkspaceMessageGroupClasses = 'flex max-w-[85%] flex-col gap-1'
-
-export const messagesWorkspaceMessageThreadClasses = 'flex flex-col gap-6'
-
-export const messageBubbleVariants = cva('inline-block rounded-lg px-3 py-2 text-left', {
-  variants: {
-    sender: {
-      self: 'bg-message-bubble-self text-message-bubble-self-foreground',
-      peer: 'bg-message-bubble-peer text-message-bubble-peer-foreground',
-    },
-  },
-  defaultVariants: {
-    sender: 'peer',
-  },
-})
-
-export const messagesWorkspaceMetadataClasses = 'text-xs text-muted-foreground'
-
-export const messagesWorkspaceMessageGroupTimestampClasses = 'mt-1 block'
-
-export const messagesWorkspaceDateSeparatorClasses = 'py-1 text-center'
-
-export const conversationListRowVariants = cva(
-  'flex items-start gap-3 px-3 py-3 transition-colors hover:bg-muted',
-  {
-    variants: {
-      selected: {
-        true: 'border-l-2 border-row-selected-border bg-row-selected hover:bg-row-selected',
-        false: 'border-l-2 border-transparent',
-      },
-    },
-    defaultVariants: {
-      selected: false,
-    },
-  },
-)
-
-export const conversationListTitleUnreadClasses = 'font-body-emphasis'
-
-export const messagesWorkspaceComposerTextareaClasses =
-  'min-h-[2.5rem] max-h-40 resize-none overflow-y-auto'
 
 export const messagesWorkspaceEmptyStateClasses =
   'flex min-h-0 flex-1 flex-col items-center justify-center p-6 text-center'

@@ -1,8 +1,8 @@
 import { IndexPageEmptyState } from '@/components/layout/page/index-page-intro'
 
 import { MessagesStartConversationLink } from './messages-start-conversation-link.client'
-import { messagesWorkspaceListChromeInsetClasses } from './messages-workspace.variants'
-import { MESSAGES_EMPTY_COPY } from '../lib/messages-copy'
+import { directListChromeInsetClasses } from './direct-list.variants'
+import { MESSAGES_EMPTY_COPY } from '../../lib/messages-copy'
 
 export function MessagesDirectListEmptyState({
   campaignId,
@@ -11,7 +11,7 @@ export function MessagesDirectListEmptyState({
   campaignId?: string
   isScopedEmpty: boolean
 }) {
-  const insetClassName = messagesWorkspaceListChromeInsetClasses
+  const insetClassName = directListChromeInsetClasses
 
   if (isScopedEmpty) {
     return (

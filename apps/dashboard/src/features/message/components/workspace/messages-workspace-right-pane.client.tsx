@@ -1,7 +1,7 @@
 'use client'
 
-import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
-import type { MessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
+import { MESSAGES_A11Y_COPY } from '../../lib/messages-copy'
+import type { MessagesWorkspaceRouteState } from '../../lib/resolve-messages-workspace-route-state.lib'
 import { MessagesWorkspaceRightPaneContent } from './messages-workspace-right-pane-content.client'
 import {
   messagesWorkspaceRightPaneClasses,

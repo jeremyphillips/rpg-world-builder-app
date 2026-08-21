@@ -5,7 +5,7 @@ import { ROUTES } from '@/app/routes'
 import { renderWithProviders } from '@/test/render'
 
 import { MessagesStartConversationLink } from './messages-start-conversation-link.client'
-import { MESSAGES_ACTION_COPY } from '../lib/messages-copy'
+import { MESSAGES_ACTION_COPY } from '../../lib/messages-copy'
 
 describe('MessagesStartConversationLink', () => {
   it('links to the new-message route as a mobile fallback action', () => {

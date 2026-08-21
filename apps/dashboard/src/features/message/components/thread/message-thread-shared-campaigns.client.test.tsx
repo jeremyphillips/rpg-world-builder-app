@@ -6,7 +6,7 @@ import { ROUTES } from '@/app/routes'
 import { renderWithProviders } from '@/test/render'
 
 import { MessageThreadSharedCampaigns } from './message-thread-shared-campaigns.client'
-import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
+import { MESSAGES_A11Y_COPY } from '../../lib/messages-copy'
 
 describe('MessageThreadSharedCampaigns', () => {
   it('renders a campaign icon and comma-separated linked campaign names', () => {

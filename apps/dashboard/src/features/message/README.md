@@ -120,8 +120,8 @@ recipients response — do not filter `data.campaigns` ad hoc in pane components
 
 ### Thread group timestamps
 
-Message bubbles use `messageBubbleVariants({ sender: 'self' | 'peer' })` — self fills
-map to `--message-bubble-self-*` (info + on-solid foreground); peer fills map to
+Message bubbles use `messageBubbleVariants({ sender: 'self' | 'peer' })` from
+`thread/message-thread.variants.ts` — self fills map to `--message-bubble-self-*` (info + on-solid foreground); peer fills map to
 `--message-bubble-peer-*` (muted wash + default foreground).
 
 Message groups use semantic list markup (`ul > li` per segment/group; bubbles as
@@ -133,21 +133,84 @@ final message in the group. Relative group labels refresh via one thread-level
 ### Conversation list inset
 
 The direct list pane is edge-to-edge. Loading, error, empty, scope hint, and
-out-of-scope pin chrome use deliberate horizontal inset (`px-3`); conversation rows
-keep edge-to-edge backgrounds via row CVA padding.
+out-of-scope pin chrome use deliberate horizontal inset (`directListChromeInsetClasses`);
+conversation rows keep edge-to-edge backgrounds via row CVA padding.
 
 ## Layout
+
+Components are grouped by **semantic surface**, not consumer count. `MessagesWorkspaceShell`
+is route-mounted (`routes/messages-workspace.tsx`) and is the feature's reusable workspace
+composition root.
+
+### Composition tree
+
+```text
+MessagesWorkspaceShell                          [components/workspace/messages-workspace-shell]
+├── MessagesWorkspaceHeader
+├── MessagesCampaignScopeChrome                   [components/messages-campaign-scope — root shared]
+├── MessagesDirectListPane                      [workspace/messages-workspace-direct-list-pane]
+│   └── direct-list/*                           (content, status, empty, conversation-list)
+├── MessagesRecipientPickerPane                 [workspace/messages-workspace-recipient-picker-pane]
+│   └── new-message-form                        [workspace/new-message-form — picker-only]
+└── MessagesWorkspaceRightPane
+    └── MessagesWorkspaceRightPaneContent
+        ├── MessagesDirectEmptyRightPane          [workspace/empty-states]
+        ├── MessagesNewNeutralRightPane           [workspace/empty-states]
+        └── MessagesWorkspaceThreadSection        [workspace/thread-section]
+            ├── MessagesWorkspaceActiveThread
+            │   ├── MessagesMobileBackLink        [workspace/empty-states]
+            │   └── MessagesThreadPane            [workspace/messages-workspace-thread-pane]
+            │       └── thread/*
+            ├── MessagesWorkspaceDraftThread
+            │   ├── MessagesMobileBackLink
+            │   └── MessagesDraftThreadPane       [workspace/messages-workspace-draft-thread-pane]
+            │       └── thread/* (header + composer)
+            └── MessagesWorkspacePreviewThread
+                └── MessagesThreadPane (preview)
+                    └── thread/*
+```
+
+Pane files document their parent in a header comment. `MessagesDirectListPane` and
+`MessagesRecipientPickerPane` are shell children; `MessagesThreadPane` and
+`MessagesDraftThreadPane` are thread-section children.
+
+### Folder map
+
+| Path                                            | Role                                                                   |
+| ----------------------------------------------- | ---------------------------------------------------------------------- |
+| `components/workspace/`                         | Responsive shell, right-pane orchestration, pane composition units     |
+| `components/thread/`                            | Thread body, header, composer, preview chrome, shared-campaign display |
+| `components/direct-list/`                       | Conversation list pane (rows, status, empty, start link)               |
+| `components/messages-campaign-scope.client.tsx` | Root shared — filter chrome + out-of-scope pin (workspace + list)      |
+| `components/messages-metadata.client.tsx`       | Root shared — quiet metadata / `<time>` (thread + list)                |
+| `components/messages-entry-links.client.tsx`    | Root shared — barrel-exported nav/overview entry links                 |
+
+### Dependency direction
+
+```text
+workspace       →  thread | direct-list | root-shared
+thread          →  root-shared only
+direct-list     →  root-shared + messages-campaign-scope
+messages-campaign-scope → lib + direct-list inset token
+```
+
+Thread and direct-list do **not** import `workspace/messages-workspace.variants`. Workspace
+layout chrome is passed into thread surfaces where needed (for example scroll/footer class
+names on `MessageThreadBody`).
+
+### Variant ownership
+
+| File                                       | Owns                                                    |
+| ------------------------------------------ | ------------------------------------------------------- |
+| `workspace/messages-workspace.variants.ts` | Grid, pane visibility, empty-state layout, mobile back  |
+| `thread/message-thread.variants.ts`        | Bubbles, groups, composer, thread header/preview chrome |
+| `direct-list/direct-list.variants.ts`      | List row CVA, list inset, unread title weight           |
+
+### Data and policy
 
 | Path                                                      | Responsibility                                                            |
 | --------------------------------------------------------- | ------------------------------------------------------------------------- |
 | `routes/messages-workspace.tsx`                           | Unified workspace shell export                                            |
-| `components/messages-workspace-shell.client.tsx`          | PageHeader, filter/scope chrome, pane orchestration                       |
-| `components/messages-workspace-header.client.tsx`         | Messages H1 + primary New message / recipient Cancel                      |
-| `components/messages-workspace-panes.client.tsx`          | List, thread, and recipient picker panes                                  |
-| `components/messages-workspace-thread-section.client.tsx` | Active / draft / preview thread wrappers + `isPaneVisible`                |
-| `components/messages-campaign-scope.client.tsx`           | Filter panel host, utility, invalid notice, out-of-scope pin              |
-| `components/messages-entry-links.client.tsx`              | Campaign/global entry links for nav and overview                          |
-| `components/messages-metadata.client.tsx`                 | Shared quiet metadata / `<time>` presentation                             |
 | `api/conversations.ts`                                    | Same-origin conversation API client                                       |
 | `hooks/use-conversations.ts`                              | Conversation list query with poll-while-visible                           |
 | `hooks/use-conversation-messages.ts`                      | Infinite message pages for a thread                                       |

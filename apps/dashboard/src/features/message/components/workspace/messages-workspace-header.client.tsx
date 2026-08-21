@@ -5,7 +5,7 @@ import { Button } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 
-import { MESSAGES_ACTION_COPY, MESSAGES_A11Y_COPY } from '../lib/messages-copy'
+import { MESSAGES_ACTION_COPY, MESSAGES_A11Y_COPY } from '../../lib/messages-copy'
 
 type MessagesWorkspaceHeaderProps = {
   isNewRoute: boolean

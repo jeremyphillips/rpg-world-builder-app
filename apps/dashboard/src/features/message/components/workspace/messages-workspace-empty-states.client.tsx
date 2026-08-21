@@ -5,7 +5,7 @@ import { Text } from '@rpg/ui'
 
 import { IndexPageEmptyState } from '@/components/layout/page/index-page-intro'
 
-import { MESSAGES_EMPTY_COPY } from '../lib/messages-copy'
+import { MESSAGES_EMPTY_COPY } from '../../lib/messages-copy'
 import {
   messagesWorkspaceEmptyStateClasses,
   messagesWorkspaceMobileBackClasses,

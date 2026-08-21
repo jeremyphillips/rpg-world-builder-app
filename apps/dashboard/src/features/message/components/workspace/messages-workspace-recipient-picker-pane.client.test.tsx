@@ -7,11 +7,11 @@ import {
   MESSAGES_ACTION_COPY,
   MESSAGES_EMPTY_COPY,
   MESSAGES_PREVIEW_COPY,
-} from '../lib/messages-copy'
+} from '../../lib/messages-copy'
 
-import { MessagesRecipientPickerPane } from './messages-workspace-panes.client'
+import { MessagesRecipientPickerPane } from './messages-workspace-recipient-picker-pane.client'
 
-vi.mock('../hooks/use-conversation-recipients', () => ({
+vi.mock('../../hooks/use-conversation-recipients', () => ({
   useConversationRecipients: () => ({
     data: {
       recipientsByUserId: {},
@@ -23,7 +23,7 @@ vi.mock('../hooks/use-conversation-recipients', () => ({
   }),
 }))
 
-vi.mock('../hooks/use-conversation-actions', () => ({
+vi.mock('../../hooks/use-conversation-actions', () => ({
   useConversationActions: () => ({
     createConversation: { mutateAsync: vi.fn(), isPending: false },
   }),

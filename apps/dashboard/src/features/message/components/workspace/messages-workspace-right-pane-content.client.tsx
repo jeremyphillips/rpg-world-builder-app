@@ -10,7 +10,7 @@ import {
   MessagesWorkspacePreviewThread,
 } from './messages-workspace-thread-section.client'
 import type { MessagesWorkspaceRightPaneProps } from './messages-workspace-right-pane.client'
-import { resolveMessagesWorkspaceRightPaneVariant } from '../lib/resolve-messages-workspace-right-pane-variant.lib'
+import { resolveMessagesWorkspaceRightPaneVariant } from '../../lib/resolve-messages-workspace-right-pane-variant.lib'
 
 const RIGHT_PANE_VARIANT_RENDERERS = {
   'active-thread': (props: MessagesWorkspaceRightPaneProps) =>

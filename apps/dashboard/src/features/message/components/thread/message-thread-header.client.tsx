@@ -4,7 +4,7 @@ import { Text } from '@rpg/ui'
 import type { ConversationSharedCampaign } from '@rpg/contracts'
 
 import { MessageThreadSharedCampaigns } from './message-thread-shared-campaigns.client'
-import { messagesWorkspaceThreadHeaderClasses } from './messages-workspace.variants'
+import { messageThreadHeaderClasses } from './message-thread.variants'
 
 type MessageThreadHeaderProps = {
   peerDisplayName: string | undefined
@@ -16,7 +16,7 @@ export function MessageThreadHeader({
   sharedCampaigns,
 }: MessageThreadHeaderProps) {
   return (
-    <header className={messagesWorkspaceThreadHeaderClasses}>
+    <header className={messageThreadHeaderClasses}>
       <Text as="h2" className="text-lg text-foreground-subtle">
         {peerDisplayName ?? 'Conversation'}
       </Text>

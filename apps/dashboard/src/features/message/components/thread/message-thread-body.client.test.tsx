@@ -5,7 +5,7 @@ import { makeDirectMessage } from '@/test/fixtures/messages'
 import { renderWithProviders } from '@/test/render'
 
 import { MessageThreadBody } from './message-thread-body.client'
-import { buildMessageThreadSegments } from '../lib/build-message-thread-segments.lib'
+import { buildMessageThreadSegments } from '../../lib/build-message-thread-segments.lib'
 
 vi.mock('@/lib/react/use-relative-time-now', () => ({
   useRelativeTimeNow: () => new Date('2026-07-30T15:00:00.000Z'),

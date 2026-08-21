@@ -11,7 +11,7 @@ import {
   MESSAGES_ERROR_COPY,
   MESSAGES_FORM_COPY,
   MESSAGES_STATUS_COPY,
-} from '../lib/messages-copy'
+} from '../../lib/messages-copy'
 
 type NewMessageFormProps = {
   recipients: DirectConversationRecipient[]

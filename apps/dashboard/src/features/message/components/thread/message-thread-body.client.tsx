@@ -11,8 +11,8 @@ import {
 } from '@/lib/datetime/format-datetime'
 import { useRelativeTimeNow } from '@/lib/react/use-relative-time-now'
 
-import type { useConversationActions } from '../hooks/use-conversation-actions'
-import { buildMessageThreadSegments } from '../lib/build-message-thread-segments.lib'
+import type { useConversationActions } from '../../hooks/use-conversation-actions'
+import { buildMessageThreadSegments } from '../../lib/build-message-thread-segments.lib'
 import {
   MESSAGES_ACTION_COPY,
   MESSAGES_A11Y_COPY,
@@ -20,18 +20,16 @@ import {
   MESSAGES_STATUS_COPY,
   formatMessageBubbleAriaLabel,
   formatMessageGroupAriaLabel,
-} from '../lib/messages-copy'
+} from '../../lib/messages-copy'
+import { MessagesMetadataTime } from '../messages-metadata.client'
 import { MessageComposer } from './message-composer.client'
-import { MessagesMetadataTime } from './messages-metadata.client'
 import {
   messageBubbleVariants,
-  messagesWorkspaceDateSeparatorClasses,
-  messagesWorkspaceMessageGroupClasses,
-  messagesWorkspaceMessageGroupTimestampClasses,
-  messagesWorkspaceMessageThreadClasses,
-  messagesWorkspaceRightFooterClasses,
-  messagesWorkspaceRightScrollClasses,
-} from './messages-workspace.variants'
+  messageThreadClasses,
+  messageThreadDateSeparatorClasses,
+  messageThreadGroupClasses,
+  messageThreadGroupTimestampClasses,
+} from './message-thread.variants'
 
 type MessageThreadBodyProps = {
   currentUserId: string | undefined
@@ -44,6 +42,8 @@ type MessageThreadBodyProps = {
   sendMessage: ReturnType<typeof useConversationActions>['sendMessage']
   layout?: 'page' | 'workspace'
   showComposer?: boolean
+  scrollWrapperClassName?: string
+  footerWrapperClassName?: string
 }
 
 function MessageGroupTimestamp({
@@ -59,10 +59,7 @@ function MessageGroupTimestamp({
     <MessagesMetadataTime
       dateTime={timestamp}
       title={formatFullDateTime(timestamp)}
-      className={[
-        messagesWorkspaceMessageGroupTimestampClasses,
-        isOwn ? 'text-right' : 'text-left',
-      ].join(' ')}
+      className={[messageThreadGroupTimestampClasses, isOwn ? 'text-right' : 'text-left'].join(' ')}
     >
       {formatMessageGroupTime(timestamp, now)}
     </MessagesMetadataTime>
@@ -80,6 +77,8 @@ export function MessageThreadBody({
   sendMessage,
   layout = 'workspace',
   showComposer = true,
+  scrollWrapperClassName,
+  footerWrapperClassName,
 }: MessageThreadBodyProps) {
   const [draft, setDraft] = React.useState('')
   const clientMessageIdRef = React.useRef<string | null>(null)
@@ -135,7 +134,7 @@ export function MessageThreadBody({
       ) : null}
 
       <ul
-        className={messagesWorkspaceMessageThreadClasses}
+        className={messageThreadClasses}
         aria-label={MESSAGES_A11Y_COPY.messages}
         aria-live="polite"
         aria-relevant="additions"
@@ -145,7 +144,7 @@ export function MessageThreadBody({
             return (
               <li
                 key={`date-${segment.timestamp}-${index}`}
-                className={messagesWorkspaceDateSeparatorClasses}
+                className={messageThreadDateSeparatorClasses}
               >
                 <MessagesMetadataTime
                   dateTime={segment.timestamp}
@@ -165,7 +164,7 @@ export function MessageThreadBody({
               className={isOwn ? 'self-end text-right' : 'self-start text-left'}
               aria-label={formatMessageGroupAriaLabel(isOwn, peerDisplayName, group.timestamp)}
             >
-              <div className={messagesWorkspaceMessageGroupClasses}>
+              <div className={messageThreadGroupClasses}>
                 {group.messages.map((message) => (
                   <div
                     key={message.id}
@@ -205,8 +204,10 @@ export function MessageThreadBody({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className={messagesWorkspaceRightScrollClasses}>{history}</div>
-      {composer ? <div className={messagesWorkspaceRightFooterClasses}>{composer}</div> : null}
+      <div className={scrollWrapperClassName}>{history}</div>
+      {composer && footerWrapperClassName ? (
+        <div className={footerWrapperClassName}>{composer}</div>
+      ) : null}
     </div>
   )
 }

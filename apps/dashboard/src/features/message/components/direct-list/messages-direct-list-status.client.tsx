@@ -1,7 +1,7 @@
 import { Text } from '@rpg/ui'
 
-import { MESSAGES_ERROR_COPY, MESSAGES_STATUS_COPY } from '../lib/messages-copy'
-import { messagesWorkspaceListChromeInsetClasses } from './messages-workspace.variants'
+import { MESSAGES_ERROR_COPY, MESSAGES_STATUS_COPY } from '../../lib/messages-copy'
+import { directListChromeInsetClasses } from './direct-list.variants'
 
 export function MessagesDirectListStatus({
   isPending,
@@ -14,7 +14,7 @@ export function MessagesDirectListStatus({
 }) {
   if (isPending) {
     return (
-      <Text variant="muted" className={messagesWorkspaceListChromeInsetClasses}>
+      <Text variant="muted" className={directListChromeInsetClasses}>
         {MESSAGES_STATUS_COPY.loadingConversations}
       </Text>
     )
@@ -22,7 +22,7 @@ export function MessagesDirectListStatus({
 
   if (isError || isConversationLookupError) {
     return (
-      <Text variant="destructive" role="alert" className={messagesWorkspaceListChromeInsetClasses}>
+      <Text variant="destructive" role="alert" className={directListChromeInsetClasses}>
         {MESSAGES_ERROR_COPY.loadConversations}
       </Text>
     )

@@ -11,12 +11,12 @@ import {
   MESSAGES_STATUS_COPY,
   formatMessagesScopedListFilterLabel,
   formatMessagesUnreadBadge,
-} from '../lib/messages-copy'
-import { MessagesMetadata } from './messages-metadata.client'
+} from '../../lib/messages-copy'
+import { MessagesMetadata } from '../messages-metadata.client'
 import {
   conversationListRowVariants,
   conversationListTitleUnreadClasses,
-} from './messages-workspace.variants'
+} from './direct-list.variants'
 
 type ConversationListProps = {
   conversations: Conversation[]

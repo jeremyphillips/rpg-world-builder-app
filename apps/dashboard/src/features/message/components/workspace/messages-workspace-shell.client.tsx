@@ -7,7 +7,7 @@ import { ROUTES } from '@/app/routes'
 import { useCampaigns } from '@/features/campaign'
 import { useFilterUrlState } from '@/lib/filters'
 
-import { MessagesCampaignScopeChrome } from './messages-campaign-scope.client'
+import { MessagesCampaignScopeChrome } from '../messages-campaign-scope.client'
 import {
   messagesWorkspaceBodyClasses,
   messagesWorkspaceHeaderSectionClasses,
@@ -17,22 +17,20 @@ import {
   messagesWorkspaceRootClasses,
   messagesWorkspaceScopeChromeMobileHiddenOnNewClasses,
 } from './messages-workspace.variants'
-import {
-  MessagesDirectListPane,
-  MessagesRecipientPickerPane,
-} from './messages-workspace-panes.client'
+import { MessagesDirectListPane } from './messages-workspace-direct-list-pane.client'
+import { MessagesRecipientPickerPane } from './messages-workspace-recipient-picker-pane.client'
 import { MessagesWorkspaceHeader } from './messages-workspace-header.client'
 import { MessagesWorkspaceRightPane } from './messages-workspace-right-pane.client'
-import { useMessagesCampaignScopeEffects } from '../hooks/use-messages-campaign-scope-effects'
-import { useStripLegacyMessagesMode } from '../hooks/use-strip-legacy-messages-mode'
-import { createMessagesFilterSchema } from '../lib/messages-filter-schema'
-import { MESSAGES_A11Y_COPY } from '../lib/messages-copy'
+import { useMessagesCampaignScopeEffects } from '../../hooks/use-messages-campaign-scope-effects'
+import { useStripLegacyMessagesMode } from '../../hooks/use-strip-legacy-messages-mode'
+import { createMessagesFilterSchema } from '../../lib/messages-filter-schema'
+import { MESSAGES_A11Y_COPY } from '../../lib/messages-copy'
 import {
   isMessagesNewRoute,
   resolveMessagesNewCancelTarget,
-} from '../lib/messages-workspace-routing.lib'
-import { resolveMessagesWorkspaceChromeVisibility } from '../lib/messages-workspace-chrome.lib'
-import { resolveMessagesWorkspaceRouteState } from '../lib/resolve-messages-workspace-route-state.lib'
+} from '../../lib/messages-workspace-routing.lib'
+import { resolveMessagesWorkspaceChromeVisibility } from '../../lib/messages-workspace-chrome.lib'
+import { resolveMessagesWorkspaceRouteState } from '../../lib/resolve-messages-workspace-route-state.lib'
 
 export function MessagesWorkspaceShell() {
   const location = useLocation()

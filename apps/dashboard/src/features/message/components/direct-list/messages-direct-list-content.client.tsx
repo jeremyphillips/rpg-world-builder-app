@@ -6,17 +6,17 @@ import { Text } from '@rpg/ui'
 import { ConversationList } from './conversation-list.client'
 import { MessagesDirectListEmptyState } from './messages-direct-list-empty-state.client'
 import { MessagesDirectListStatus } from './messages-direct-list-status.client'
-import { MessagesOutOfScopePin } from './messages-campaign-scope.client'
+import { MessagesOutOfScopePin } from '../messages-campaign-scope.client'
 import {
   isScopedConversationListEmpty,
   resolveOutOfScopeConversation,
-} from '../lib/messages-campaign-scope-state.lib'
+} from '../../lib/messages-campaign-scope-state.lib'
 import {
   resolveDirectListVisibility,
   shouldShowLoadedScopeHint,
-} from '../lib/messages-direct-list-presentation.lib'
-import { formatMessagesLoadedScopeHint } from '../lib/messages-copy'
-import { messagesWorkspaceListChromeInsetClasses } from './messages-workspace.variants'
+} from '../../lib/messages-direct-list-presentation.lib'
+import { formatMessagesLoadedScopeHint } from '../../lib/messages-copy'
+import { directListChromeInsetClasses } from './direct-list.variants'
 
 type MessagesDirectListContentProps = {
   activeConversationId?: string
@@ -41,10 +41,7 @@ function MessagesLoadedScopeHint({
   scopedCount: number
 }) {
   return (
-    <Text
-      variant="small"
-      className={`mb-2 text-muted-foreground ${messagesWorkspaceListChromeInsetClasses}`}
-    >
+    <Text variant="small" className={`mb-2 text-muted-foreground ${directListChromeInsetClasses}`}>
       {formatMessagesLoadedScopeHint(loadedCount, scopedCount)}
     </Text>
   )
