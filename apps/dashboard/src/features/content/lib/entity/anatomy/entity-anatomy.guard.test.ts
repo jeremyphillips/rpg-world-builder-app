@@ -94,7 +94,7 @@ describe('entity anatomy guard', () => {
     const featureRoot = join(ENTITY_ROOT, '../..')
     const allowlist = new Set([
       join(ENTITY_ROOT, 'surfaces/catalog/catalog-entity-picker-sheet.tsx'),
-      join(ENTITY_ROOT, 'surfaces/cards/content/content-entity-card.test.tsx'),
+      join(ENTITY_ROOT, 'surfaces/cards/content/__tests__/content-entity-card.test.tsx'),
     ])
     const entityPickerPattern =
       /(picker|drawer)\.(client|integration)\.(tsx|ts)$|(picker|drawer)\.client\.(tsx|ts)$/
