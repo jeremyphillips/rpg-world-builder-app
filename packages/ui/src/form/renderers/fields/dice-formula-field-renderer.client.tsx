@@ -3,6 +3,7 @@
 import { useController } from 'react-hook-form'
 
 import { DiceFormulaField } from '../../../components/ui/dice-formula-field.client'
+import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import type { DiceFormulaValue } from '../../../components/ui/dice-formula-field.lib'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { DiceFormulaFieldConfig } from '../../field-config'
@@ -54,6 +55,7 @@ export function DiceFormulaFieldRenderer({
   return (
     <DiceFormulaField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       error={error}
       hint={hint}

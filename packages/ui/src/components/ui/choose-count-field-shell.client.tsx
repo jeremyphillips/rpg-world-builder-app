@@ -3,21 +3,17 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import {
-  FieldErrorText,
-  FieldHintBelowLabel,
-  FieldHintErrorBelowControl,
-  type FieldSize,
-} from './field.client'
+import { type FieldSize } from './field.client'
 import { fieldWidthVariants, type FieldWidth } from './field-control.variants'
+import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import { fieldAnatomyIds, fieldDescribedBy } from './choose-count-field.lib'
 import {
-  fieldAnatomyStackVariants,
   fieldLabelVariants,
-  fieldSetResetClasses,
+  fieldSetInFlowLegendClasses,
   type FieldHintPosition,
 } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
+import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 
@@ -39,6 +35,7 @@ interface ChooseCountFieldShellProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
+  chrome?: FieldChrome
   labelVisibility?: FieldLabelVisibility
   children: (anatomy: ChooseCountFieldAnatomy) => React.ReactNode
 }
@@ -55,54 +52,54 @@ export function ChooseCountFieldShell({
   disabled,
   size = 'md',
   width = 'full',
+  chrome,
   labelVisibility = 'visible',
   children,
 }: ChooseCountFieldShellProps) {
   const { legendId, chooseId, hintId, errorId } = fieldAnatomyIds(id)
   const describedBy = fieldDescribedBy(error, hint, errorId, hintId)
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
-    <fieldset
-      id={id}
-      aria-describedby={describedBy}
-      aria-invalid={error ? true : undefined}
-      disabled={disabled}
-      className={cn(
-        fieldSetResetClasses,
-        fieldAnatomyStackVariants({ size }),
-        fieldWidthVariants({ width }),
-      )}
-    >
-      <legend
-        id={legendId}
-        className={cn(fieldLabelVariants({ size }), labelVisibility === 'srOnly' && 'sr-only')}
+    <div className={fieldWidthVariants({ width: rootWidth })}>
+      <FieldsetChromeFrame
+        chrome={chrome}
+        size={size}
+        error={error}
+        errorId={errorId}
+        fieldsetProps={{
+          id,
+          'aria-describedby': describedBy,
+          'aria-invalid': error ? true : undefined,
+          disabled,
+        }}
       >
-        <FieldLabelContent
-          label={label}
-          required={required}
-          showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-          info={info}
-        />
-      </legend>
-      {hintPosition === 'below-label' ? (
-        <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
-      ) : null}
-      {children({ legendId, chooseId, hintId, errorId })}
-      {hintPosition === 'below-label' ? (
-        error ? (
-          <FieldErrorText id={errorId} size={size}>
-            {error}
-          </FieldErrorText>
-        ) : null
-      ) : (
-        <FieldHintErrorBelowControl
+        <FieldsetChromeAnatomy
+          hintPosition={hintPosition}
           hint={hint}
           error={error}
           hintId={hintId}
-          errorId={errorId}
-          size={size}
-        />
-      )}
-    </fieldset>
+          legend={
+            <legend
+              id={legendId}
+              className={cn(
+                fieldSetInFlowLegendClasses,
+                fieldLabelVariants({ size }),
+                labelVisibility === 'srOnly' && 'sr-only',
+              )}
+            >
+              <FieldLabelContent
+                label={label}
+                required={required}
+                showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+                info={info}
+              />
+            </legend>
+          }
+        >
+          {children({ legendId, chooseId, hintId, errorId })}
+        </FieldsetChromeAnatomy>
+      </FieldsetChromeFrame>
+    </div>
   )
 }

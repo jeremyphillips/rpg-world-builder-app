@@ -63,7 +63,7 @@ export interface FieldChromeContext {
   fieldChromeSuppressed?: boolean
 }
 
-/** Resolves leaf/row/slot chrome from explicit config, ancestor cascade, suppression, or default. */
+/** Resolves leaf/row/slot/dependent chrome from explicit config, ancestor cascade, suppression, or default. */
 export function resolveEffectiveFieldChrome(
   config: { chrome?: FieldChrome },
   context: FieldChromeContext,

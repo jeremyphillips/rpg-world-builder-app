@@ -153,14 +153,6 @@ export function SelectField({
     </Select>
   )
 
-  const chromedSelect = hasActiveFieldChrome(chrome) ? (
-    <FieldChromeShell chrome={chrome} size={size}>
-      {select}
-    </FieldChromeShell>
-  ) : (
-    select
-  )
-
   if (labelPosition === 'settings') {
     return (
       <FormField
@@ -184,17 +176,8 @@ export function SelectField({
   }
 
   if (labelPosition === 'inline') {
-    return (
-      <Field.Root
-        id={id}
-        error={error}
-        invalid={invalid}
-        describedBy={describedBy}
-        hint={hint}
-        required={required}
-        width={rootWidth}
-        size={size}
-      >
+    const inlineBody = (
+      <>
         <div className={fieldInlineControlRowClasses}>
           {resolvedHintPosition === 'below-label' ? (
             <div className={fieldLabelHintStackClasses}>
@@ -208,9 +191,30 @@ export function SelectField({
               <FieldLabelContent label={label} required={required} info={info} />
             </Field.Label>
           )}
-          {chromedSelect}
+          {select}
         </div>
         {resolvedHintPosition === 'below-control' ? <Field.Hint /> : null}
+      </>
+    )
+
+    return (
+      <Field.Root
+        id={id}
+        error={error}
+        invalid={invalid}
+        describedBy={describedBy}
+        hint={hint}
+        required={required}
+        width={rootWidth}
+        size={size}
+      >
+        {hasActiveFieldChrome(chrome) ? (
+          <FieldChromeShell chrome={chrome} size={size}>
+            {inlineBody}
+          </FieldChromeShell>
+        ) : (
+          inlineBody
+        )}
         <Field.Error />
       </Field.Root>
     )

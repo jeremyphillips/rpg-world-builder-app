@@ -138,7 +138,6 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
       label: 'Has spellcasting',
     },
     dependents: {
-      panel: { surface: { emphasis: 'subtle' } },
       fields: [
         {
           type: 'select',

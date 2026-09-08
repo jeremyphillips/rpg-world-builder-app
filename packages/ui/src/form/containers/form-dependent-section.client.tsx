@@ -4,6 +4,11 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
+import { FieldChromeShell } from '../../components/ui/field-chrome-shell'
+import {
+  hasActiveFieldChrome,
+  resolveEffectiveFieldChrome,
+} from '../../components/ui/field-chrome.variants'
 import {
   DEFAULT_DEPENDENT_SURFACE,
   resolveDependentPresentation,
@@ -58,13 +63,23 @@ export function DependentSection({
   renderNestedItems,
 }: DependentSectionProps) {
   const parentContext = useFormSectionContext()
-  const { rhythm } = resolveFormDensity(parentContext.density)
+  const { rhythm, size } = resolveFormDensity(parentContext.density)
+  const dependentChrome = resolveEffectiveFieldChrome(item, {
+    fieldChromeCascade: parentContext.fieldChromeCascade,
+    fieldChromeSuppressed:
+      Boolean(parentContext.fieldChromeSuppressed) && !parentContext.insideDependentContainer,
+  })
   const childContext = React.useMemo(
     () =>
       buildFormSectionChildContext(parentContext, depth, {
         fieldChromeCascade: item.dependents.fieldChrome ?? parentContext.fieldChromeCascade,
+        fieldChromeSuppressed: hasActiveFieldChrome(dependentChrome) || undefined,
+        insideDependentContainer:
+          hasActiveFieldChrome(dependentChrome) ||
+          parentContext.insideDependentContainer ||
+          undefined,
       }),
-    [parentContext, depth, item.dependents.fieldChrome],
+    [parentContext, depth, item.dependents.fieldChrome, dependentChrome],
   )
   const controller = item.controller
   const dependents = item.dependents.fields
@@ -100,7 +115,15 @@ export function DependentSection({
     </div>
   )
 
-  return <FieldSeparatorWrapper separator={item.separator}>{stackBody}</FieldSeparatorWrapper>
+  const chromedStack = hasActiveFieldChrome(dependentChrome) ? (
+    <FieldChromeShell chrome={dependentChrome} size={size}>
+      {stackBody}
+    </FieldChromeShell>
+  ) : (
+    stackBody
+  )
+
+  return <FieldSeparatorWrapper separator={item.separator}>{chromedStack}</FieldSeparatorWrapper>
 }
 
 interface DependentFieldsRegionProps {

@@ -155,10 +155,11 @@ controller field gates indented dependents:
 - Field `[0]` (controller) — switch, select, etc. — always visible.
 - Fields `[1..]` (dependents) use rhythm-derived `pl-8` / `pl-9` when `dependents.inset` is `true` (default).
 - **`dependents.inset`**: `boolean` — controller-relative positioning. Default `true`. Set `false` for no dependent indentation.
-- **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` — decorative boundary only. Default `'none'`. Does not enable or disable inset.
+- **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` — decorative boundary only. Default `'rail'`. Does not enable or disable inset.
 - **`inset: false` + `chrome: 'rail'`** — rail decoration without controller-relative indentation. No runtime ancestor inspection.
 - Nested dependent regions may independently use inset and/or rails/panels when they represent genuine nested dependencies — nested rails are supported and intentional.
-- Shared factories (e.g. mode-dependent grant sets) default to `inset: true`, `chrome: 'none'` but accept `dependents: { inset?, chrome? }` overrides at the call site.
+- Shared factories (e.g. mode-dependent grant sets) inherit inset + rail; pass `dependents: { inset?, chrome? }` to override.
+- The whole `kind: 'dependent'` stack (controller + dependents) defaults to one shared field container (`chrome?: FieldChrome` on `DependentConfig`). Nested dependents still get their own containers. Array item shells suppress the wrapper. Child leaves/rows/slots inside an active container are unboxed.
 - Dependents hidden when the gate predicate is false — no empty inset.
 - `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
   to "switch is true". For select/other controllers, pass an explicit predicate for hide
@@ -241,18 +242,22 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 ## Field container chrome (default)
 
-Every leaf field, shared row, and slot rendered by the schema-driven `<Form>` gets a default boxed
-container: solid background + border + 16px padding (`{ variant: 'container' }`). Resolution order:
+Every leaf field, shared row, slot, and `kind: 'dependent'` stack rendered by the schema-driven
+`<Form>` gets a default boxed container: solid background + border + 16px padding
+(`{ variant: 'container' }`). **Label and hint sit inside the box; validation errors sit
+outside.** Chip and choose-count fields keep a real `<legend>` (direct fieldset child) but
+put the visible box on `FieldChromeShell` around a **borderless** fieldset — UA legend
+overlay cannot sit on the container border. Resolution order:
 
-1. Explicit `chrome` on the leaf, row, or slot (`{ variant: 'none' }` opts out)
+1. Explicit `chrome` on the leaf, row, slot, or dependent (`{ variant: 'none' }` opts out)
 2. Nearest ancestor `fieldChrome` on a group, array, or dependent region
-3. Section suppression (array item shells, dependent panel/rail wrappers, fields inside a shared row container)
+3. Section suppression (array item shells, dependent panel/rail wrappers, fields inside a shared row or dependent container)
 4. Global default `{ variant: 'container' }`
 
-| Authoring knob                                                       | Applies to                   |
-| -------------------------------------------------------------------- | ---------------------------- |
-| `chrome?: FieldChrome` on leaf fields, `kind: 'row'`, `kind: 'slot'` | That node only               |
-| `fieldChrome?: FieldChrome` on `group`, `array`, `dependents`        | Descendant leaves/rows/slots |
+| Authoring knob                                                                            | Applies to                   |
+| ----------------------------------------------------------------------------------------- | ---------------------------- |
+| `chrome?: FieldChrome` on leaf fields, `kind: 'row'`, `kind: 'slot'`, `kind: 'dependent'` | That node only               |
+| `fieldChrome?: FieldChrome` on `group`, `array`, `dependents`                             | Descendant leaves/rows/slots |
 
 Group `chrome` (fieldset treatment: divider, callout, accent, …) remains separate from leaf
 container chrome. Prefer removing neutral group `outline` / `panel` / `rail` chrome in favor of

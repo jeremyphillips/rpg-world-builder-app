@@ -168,6 +168,8 @@ Schema-driven form fields default to a boxed container shell (`{ variant: 'conta
 - Public utility: `bg-field-container` in `globals.css`.
 - Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
 - Padding: 16px (`p-4`).
+- Fieldset leaves (`ChipsField`, choose-count shells) wrap a borderless `<fieldset>` in
+  `FieldChromeShell` so `<legend>` cannot sit on the visible container border.
 
 Opt out with `{ variant: 'none' }` on a leaf, row, or slot; cascade with `fieldChrome` on groups, arrays, or dependent regions. Suppressed automatically inside array item cards, dependent panel/rail regions, and shared row containers.
 

@@ -1,6 +1,6 @@
 import { cn } from '../../lib/utils'
 import type { DependentChrome, DependentDependentsConfig } from '../../form/field-config'
-import { DEFAULT_DEPENDENT_INSET } from '../../form/field-config'
+import { DEFAULT_DEPENDENT_CHROME, DEFAULT_DEPENDENT_INSET } from '../../form/field-config'
 import { resolveDependentInsetClasses, type FieldRhythm } from './field.variants'
 import { resolveFieldRailClasses, type FieldRailTone } from './field-rail.variants'
 import {
@@ -66,7 +66,7 @@ export function resolveDependentPresentation(
   dependents: DependentDependentsConfig & { inset: boolean },
   rhythm: FieldRhythm,
 ): ResolvedDependentPresentation {
-  const { inset, chrome = 'none' } = dependents
+  const { inset, chrome = DEFAULT_DEPENDENT_CHROME } = dependents
   const insetClassName = resolveDependentInsetClasses(inset, rhythm)
 
   if (chrome === 'none') {

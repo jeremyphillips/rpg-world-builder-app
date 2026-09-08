@@ -86,7 +86,7 @@ Legacy `dependents.surface` maps to `chrome: 'panel'`. Chrome does not affect ti
 | `hideLabel` / `labelHidden`        | `labelVisibility: 'srOnly'`                                                |
 | `label: ''`                        | Non-whitespace `label` + `labelVisibility: 'srOnly'` or structural heading |
 | `dependents.surface`               | `dependents.chrome: 'panel'` with `panel.surface`                          |
-| `dependents.chrome: 'inset'`       | `inset: true`; add `chrome: 'rail'` when a boundary is needed              |
+| `dependents.chrome: 'inset'`       | `inset: true` (rail is the default decorative chrome)                      |
 | `dependents.layout: 'inset'`       | `inset: true` (default)                                                    |
 | `dependents.layout: 'flush'`       | `inset: false`                                                             |
 

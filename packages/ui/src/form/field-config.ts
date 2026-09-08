@@ -966,6 +966,9 @@ export type DependentChrome = 'none' | 'rail' | 'panel'
 /** Default controller-relative positioning for dependent regions. */
 export const DEFAULT_DEPENDENT_INSET = true
 
+/** Default decorative boundary for dependent regions. */
+export const DEFAULT_DEPENDENT_CHROME: DependentChrome = 'rail'
+
 export interface DependentDependentsConfig {
   fields: GroupFieldItem[]
   /**
@@ -975,7 +978,7 @@ export interface DependentDependentsConfig {
   visibility?: FieldVisibility
   /** Controller-relative indentation. @default {@link DEFAULT_DEPENDENT_INSET} */
   inset?: boolean
-  /** Decorative treatment only. @default 'none' */
+  /** Decorative treatment only. @default {@link DEFAULT_DEPENDENT_CHROME} */
   chrome?: DependentChrome
   /** Default leaf/row container treatment for nested fields. */
   fieldChrome?: FieldChrome
@@ -1014,6 +1017,8 @@ export interface DependentConfig {
   /** Trailing divider after this dependent section within parent rhythm. */
   separator?: FieldSeparator
   className?: string
+  /** Shared container around the controller + dependents stack. Inherits cascade when omitted. */
+  chrome?: FieldChrome
   /** Optional DOM id on the dependent wrapper — for in-page scroll anchors. */
   id?: string
   /** Opt-in navigation metadata for sidebar / scroll-spy consumers. */

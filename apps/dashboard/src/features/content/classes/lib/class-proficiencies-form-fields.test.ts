@@ -31,7 +31,7 @@ describe('proficienciesFields', () => {
     expect(armorChips).not.toHaveProperty('chrome')
   })
 
-  it('opts nested tool fields out of default containers via group fieldChrome', () => {
+  it('keeps the nested Tools group as a named subsection without fieldChrome override', () => {
     const skillsAndTools = proficienciesFields({ options: {} })[2]
     if (!skillsAndTools || !isContainer(skillsAndTools) || skillsAndTools.kind !== 'group') {
       throw new Error('Expected skills & tools group')
@@ -41,7 +41,7 @@ describe('proficienciesFields', () => {
     expect(toolsGroup).toMatchObject({
       kind: 'group',
       legend: 'Tools',
-      fieldChrome: { variant: 'none' },
     })
+    expect(toolsGroup).not.toHaveProperty('fieldChrome')
   })
 })

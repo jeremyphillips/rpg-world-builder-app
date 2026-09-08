@@ -21,6 +21,7 @@ import { hasNamedGroupHeading, resolveGroupHeading } from '../resolve-container-
 import type {
   GroupConfig,
   GroupFieldItem,
+  RadioFieldConfig,
   SelectFieldConfig,
   SwitchFieldConfig,
 } from '../field-config'
@@ -144,9 +145,11 @@ export function isLeafSwitch(item: GroupFieldItem): item is SwitchFieldConfig {
   return !('kind' in item) && item.type === 'switch'
 }
 
-/** Leaf switch or select — used for dependent-stack `aria-labelledby`. */
+/** Leaf switch, select, or radio — used for dependent-stack `aria-labelledby`. */
 export function isLeafController(
   item: GroupFieldItem,
-): item is SwitchFieldConfig | SelectFieldConfig {
-  return !('kind' in item) && (item.type === 'switch' || item.type === 'select')
+): item is SwitchFieldConfig | SelectFieldConfig | RadioFieldConfig {
+  return (
+    !('kind' in item) && (item.type === 'switch' || item.type === 'select' || item.type === 'radio')
+  )
 }

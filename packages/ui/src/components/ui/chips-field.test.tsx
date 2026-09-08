@@ -303,11 +303,12 @@ describe('ChipsField', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('renders panel chrome around chips only, with legend above the shell', () => {
+  it('renders panel chrome around legend, hint, and chips, with error outside the shell', () => {
     const { container } = render(
       <ChipsField
         id="alignment"
         label="Alignment"
+        hint="Pick one"
         options={playStyleOptions}
         multiple={false}
         chrome={{ variant: 'panel' }}
@@ -316,12 +317,57 @@ describe('ChipsField', () => {
 
     const fieldset = container.querySelector('fieldset')!
     const legend = fieldset.querySelector('legend')
-    const chromeShell = fieldset.querySelector('.rounded-md.border.bg-surface-subtle')
+    const shell = fieldset.parentElement
 
     expect(legend).toHaveTextContent('Alignment')
-    expect(chromeShell).toBeTruthy()
-    expect(chromeShell?.contains(legend)).toBe(false)
-    expect(chromeShell?.querySelector('button')).toBeTruthy()
+    expect(fieldset).toHaveClass('border-0')
+    expect(fieldset).not.toHaveClass('rounded-md')
+    expect(shell).toHaveClass('rounded-md', 'border', 'bg-surface-subtle')
+    expect(shell).toHaveTextContent('Pick one')
+    expect(fieldset.querySelector('button')).toBeTruthy()
+  })
+
+  it('puts container chrome on a wrapper so the legend is not on the fieldset border', () => {
+    const { container } = render(
+      <ChipsField
+        id="abilities"
+        label="Primary abilities"
+        hint="Select up to 2 abilities"
+        options={playStyleOptions}
+        multiple
+        chrome={{ variant: 'container' }}
+      />,
+    )
+
+    const fieldset = container.querySelector('fieldset')!
+    const shell = fieldset.parentElement
+
+    expect(fieldset).toHaveClass('border-0')
+    expect(shell).toHaveClass('rounded-md', 'border', 'bg-field-container', 'p-4')
+    expect(shell).toHaveTextContent('Primary abilities')
+    expect(shell).toHaveTextContent('Select up to 2 abilities')
+  })
+
+  it('keeps validation errors outside panel chrome', () => {
+    const { container } = render(
+      <ChipsField
+        id="alignment"
+        label="Alignment"
+        options={playStyleOptions}
+        multiple={false}
+        chrome={{ variant: 'panel' }}
+        error="Select an alignment."
+      />,
+    )
+
+    const fieldset = container.querySelector('fieldset')
+    const error = container.querySelector('[role="alert"]')
+    const shell = fieldset?.parentElement
+
+    expect(shell).toHaveClass('rounded-md', 'border', 'bg-surface-subtle')
+    expect(error).toHaveTextContent('Select an alignment.')
+    expect(fieldset?.contains(error)).toBe(false)
+    expect(shell?.contains(error)).toBe(false)
   })
 
   it('has no accessibility violations when required and in error state', async () => {

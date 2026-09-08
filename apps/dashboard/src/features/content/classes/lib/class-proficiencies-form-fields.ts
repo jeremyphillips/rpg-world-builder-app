@@ -154,7 +154,6 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'group',
           legend: 'Tools',
-          fieldChrome: { variant: 'none' },
           fields: [
             {
               type: 'chips',

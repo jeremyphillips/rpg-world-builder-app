@@ -7,6 +7,7 @@ import {
   type EditableGridColumn,
   type EditableGridValue,
 } from '../../../components/ui/editable-grid.client'
+import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import {
   editableGridDependsOn,
   type EditableGridColumnConfig,
@@ -81,6 +82,7 @@ export function EditableGridFieldRenderer({
   return (
     <EditableGrid
       id={id}
+      {...pickFieldChromeProps(config)}
       legend={config.label}
       info={config.info}
       columns={columns}

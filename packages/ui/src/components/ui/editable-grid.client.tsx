@@ -15,6 +15,8 @@ import {
 } from './dropdown-menu.client'
 import { Field } from './field.client'
 import { FieldLabelContent } from './field-label-content'
+import { FieldChromeShell } from './field-chrome-shell'
+import { hasActiveFieldChrome, type FieldChrome } from './field-chrome.variants'
 import { resolveFieldGroupLegendClassName } from './field.variants'
 import { NumberInput } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
@@ -63,6 +65,7 @@ export interface EditableGridProps {
   templates?: EditableGridTemplates
   disabled?: boolean
   className?: string
+  chrome?: FieldChrome
 }
 
 type PendingTemplate = {
@@ -258,6 +261,7 @@ export function EditableGrid({
   templates,
   disabled,
   className,
+  chrome,
 }: EditableGridProps) {
   const [pendingTemplate, setPendingTemplate] = React.useState<PendingTemplate | null>(null)
   const rowIndexes = React.useMemo(
@@ -278,79 +282,85 @@ export function EditableGrid({
     setPendingTemplate(null)
   }, [onChange, pendingTemplate, value])
 
+  const grid = (
+    <>
+      {legend ? (
+        <legend className={cn(resolveFieldGroupLegendClassName(), 'flex items-center gap-1.5')}>
+          <FieldLabelContent label={legend} info={info} />
+        </legend>
+      ) : null}
+      <Table className={editableGridTableVariants()}>
+        <TableHeader>
+          <TableRow>
+            <TableHead scope="col" className={editableGridStickyHeaderVariants()}>
+              {ROW_LABEL_HEADER}
+            </TableHead>
+            {columns.map((column) => (
+              <TableHead key={column.key} scope="col" className={editableGridHeaderCellVariants()}>
+                <EditableGridColumnHeader
+                  column={column}
+                  templates={templates?.[column.key]}
+                  disabled={disabled}
+                  onTemplateSelect={(template) =>
+                    setPendingTemplate({
+                      columnKey: column.key,
+                      columnLabel: column.label,
+                      template,
+                    })
+                  }
+                />
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rowIndexes.map((rowIndex) => (
+            <TableRow key={rowIndex} className="group">
+              <TableHead
+                scope="row"
+                className={cn(editableGridStickyCellVariants(), 'text-center font-medium')}
+              >
+                {rowLabel(rowIndex)}
+              </TableHead>
+              {columns.map((column) => {
+                const cell = value[column.key]?.[rowIndex] ?? null
+                return (
+                  <TableCell key={column.key} className={editableGridDataCellVariants()}>
+                    {column.control === 'select' ? (
+                      <EditableGridSelectCell
+                        column={column}
+                        rowIndex={rowIndex}
+                        cell={cell}
+                        disabled={disabled}
+                        onChange={(next) => handleCellChange(column.key, rowIndex, next)}
+                      />
+                    ) : (
+                      <EditableGridNumberCell
+                        column={column}
+                        rowIndex={rowIndex}
+                        cell={cell}
+                        disabled={disabled}
+                        onChange={(next) => handleCellChange(column.key, rowIndex, next)}
+                      />
+                    )}
+                  </TableCell>
+                )
+              })}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
+  )
+
   return (
     <Field.Root id={id} error={error} width="full" className={className}>
       <fieldset className="min-w-0 border-0 p-0">
-        {legend ? (
-          <legend className={cn(resolveFieldGroupLegendClassName(), 'flex items-center gap-1.5')}>
-            <FieldLabelContent label={legend} info={info} />
-          </legend>
-        ) : null}
-        <Table className={editableGridTableVariants()}>
-          <TableHeader>
-            <TableRow>
-              <TableHead scope="col" className={editableGridStickyHeaderVariants()}>
-                {ROW_LABEL_HEADER}
-              </TableHead>
-              {columns.map((column) => (
-                <TableHead
-                  key={column.key}
-                  scope="col"
-                  className={editableGridHeaderCellVariants()}
-                >
-                  <EditableGridColumnHeader
-                    column={column}
-                    templates={templates?.[column.key]}
-                    disabled={disabled}
-                    onTemplateSelect={(template) =>
-                      setPendingTemplate({
-                        columnKey: column.key,
-                        columnLabel: column.label,
-                        template,
-                      })
-                    }
-                  />
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rowIndexes.map((rowIndex) => (
-              <TableRow key={rowIndex} className="group">
-                <TableHead
-                  scope="row"
-                  className={cn(editableGridStickyCellVariants(), 'text-center font-medium')}
-                >
-                  {rowLabel(rowIndex)}
-                </TableHead>
-                {columns.map((column) => {
-                  const cell = value[column.key]?.[rowIndex] ?? null
-                  return (
-                    <TableCell key={column.key} className={editableGridDataCellVariants()}>
-                      {column.control === 'select' ? (
-                        <EditableGridSelectCell
-                          column={column}
-                          rowIndex={rowIndex}
-                          cell={cell}
-                          disabled={disabled}
-                          onChange={(next) => handleCellChange(column.key, rowIndex, next)}
-                        />
-                      ) : (
-                        <EditableGridNumberCell
-                          column={column}
-                          rowIndex={rowIndex}
-                          cell={cell}
-                          disabled={disabled}
-                          onChange={(next) => handleCellChange(column.key, rowIndex, next)}
-                        />
-                      )}
-                    </TableCell>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {hasActiveFieldChrome(chrome) ? (
+          <FieldChromeShell chrome={chrome}>{grid}</FieldChromeShell>
+        ) : (
+          grid
+        )}
       </fieldset>
       <Field.Error />
       <ConfirmDialog

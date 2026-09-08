@@ -3,24 +3,13 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
+import { Field, type FieldSize } from './field.client'
+import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
 import {
-  hasActiveFieldChrome,
-  resolveFieldAnatomyWidth,
-  type FieldChrome,
-} from './field-chrome.variants'
-import { FieldChromeShell } from './field-chrome-shell'
-import {
-  Field,
-  FieldErrorText,
-  FieldHintBelowLabel,
-  FieldHintErrorBelowControl,
-  type FieldSize,
-} from './field.client'
-import {
-  fieldAnatomyStackVariants,
   fieldChipWrapGapClasses,
   fieldLabelVariants,
-  fieldSetResetClasses,
+  fieldSetInFlowLegendClasses,
   type FieldHintPosition,
 } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
@@ -194,54 +183,45 @@ export function ChipsField({
 
   return (
     <div className={outerWidthClass}>
-      <fieldset
-        id={id}
-        aria-describedby={resolvedDescribedBy}
-        aria-invalid={hasError || undefined}
-        disabled={disabled}
-        className={cn(fieldSetResetClasses, fieldAnatomyStackVariants({ size }))}
-        onBlur={onBlur}
+      <FieldsetChromeFrame
+        chrome={chrome}
+        size={size}
+        error={error}
+        errorId={errorId}
+        fieldsetProps={{
+          id,
+          'aria-describedby': resolvedDescribedBy,
+          'aria-invalid': hasError || undefined,
+          disabled,
+          onBlur,
+        }}
       >
-        <legend
-          id={legendId}
-          className={cn(fieldLabelVariants({ size }), labelVisibility === 'srOnly' && 'sr-only')}
+        <FieldsetChromeAnatomy
+          hintPosition={hintPosition}
+          hint={hint}
+          error={error}
+          hintId={hintId}
+          legend={
+            <legend
+              id={legendId}
+              className={cn(
+                fieldSetInFlowLegendClasses,
+                fieldLabelVariants({ size }),
+                labelVisibility === 'srOnly' && 'sr-only',
+              )}
+            >
+              <FieldLabelContent
+                label={label}
+                required={required}
+                showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
+                info={info}
+              />
+            </legend>
+          }
         >
-          <FieldLabelContent
-            label={label}
-            required={required}
-            showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-            info={info}
-          />
-        </legend>
-
-        {hintPosition === 'below-label' ? (
-          <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
-        ) : null}
-
-        {hasActiveFieldChrome(chrome) ? (
-          <FieldChromeShell chrome={chrome} size={size}>
-            {chipsOptions}
-          </FieldChromeShell>
-        ) : (
-          chipsOptions
-        )}
-
-        {hintPosition === 'below-label' ? (
-          error ? (
-            <FieldErrorText id={errorId} size={size}>
-              {error}
-            </FieldErrorText>
-          ) : null
-        ) : (
-          <FieldHintErrorBelowControl
-            hint={hint}
-            error={error}
-            hintId={hintId}
-            errorId={errorId}
-            size={size}
-          />
-        )}
-      </fieldset>
+          {chipsOptions}
+        </FieldsetChromeAnatomy>
+      </FieldsetChromeFrame>
     </div>
   )
 }

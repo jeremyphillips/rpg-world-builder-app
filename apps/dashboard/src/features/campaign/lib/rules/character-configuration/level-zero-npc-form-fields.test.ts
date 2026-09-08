@@ -18,7 +18,7 @@ function expectAllowDependent(fields: ReturnType<typeof levelZeroNpcsFields>): D
 }
 
 describe('levelZeroNpcsFields', () => {
-  it('keeps Allow dependents undecorated at the group and dependent layers', () => {
+  it('keeps Allow dependents inset by default at the group and dependent layers', () => {
     const allow = expectAllowDependent(
       levelZeroNpcsFields({ languageOptions: [], armorOptions: [], weaponOptions: [] }),
     )
@@ -52,7 +52,7 @@ describe('levelZeroNpcsFields', () => {
     ).toBe(true)
   })
 
-  it('keeps nested grant-set dependents undecorated', () => {
+  it('keeps nested grant-set dependents inset without panel chrome', () => {
     const allow = expectAllowDependent(
       levelZeroNpcsFields({ languageOptions: [], armorOptions: [], weaponOptions: [] }),
     )

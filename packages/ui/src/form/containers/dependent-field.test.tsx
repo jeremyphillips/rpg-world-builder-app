@@ -99,23 +99,27 @@ function queryChromeShell(container: HTMLElement) {
 }
 
 describe('dependent field', () => {
-  it('keeps the toggle outside the dependents chrome region', async () => {
+  it('keeps the toggle outside the dependents region and inside the shared field container', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm()
 
     const dependent = container.querySelector('[data-field-dependent]')
     expect(dependent).toBeInTheDocument()
 
+    const fieldContainer = container.querySelector('.bg-field-container')
     const switchControl = screen.getByRole('switch', { name: 'Enable feature' })
-    expect(queryChromeShell(container)).toBeNull()
+    expect(fieldContainer).toContainElement(switchControl)
+    expect(queryDependentsRegion(container)).toBeNull()
 
     await user.click(switchControl)
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveClass(dependentInsetClasses)
-      expect(queryChromeShell(container)).toBeNull()
+      expect(region).toHaveAttribute('data-field-dependent-rail', '')
+      expect(region).not.toContainElement(switchControl)
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
+      expect(fieldContainer).toContainElement(screen.getByLabelText('Feature value'))
     })
   })
 
@@ -152,7 +156,7 @@ describe('dependent field', () => {
     expect(dependent).toHaveAttribute('aria-labelledby', expect.stringContaining('featureEnabled'))
   })
 
-  it('defaults to inset positioning without decorative chrome when inset and chrome are omitted', async () => {
+  it('defaults to inset + rail when inset and chrome are omitted', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([dependentField()])
 
@@ -161,8 +165,9 @@ describe('dependent field', () => {
     await waitFor(() => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveClass(dependentInsetClasses)
-      expect(queryChromeShell(container)).toBeNull()
+      expect(region).toHaveAttribute('data-field-dependent-rail', '')
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
+      expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     })
   })
 
@@ -279,6 +284,7 @@ describe('dependent field', () => {
     expect(
       container.querySelectorAll('[data-field-dependent-fields][data-field-dependent-rail]'),
     ).toHaveLength(2)
+    expect(container.querySelectorAll('.bg-field-container')).toHaveLength(2)
     expect(screen.getByLabelText('Categories')).toBeInTheDocument()
   })
 
