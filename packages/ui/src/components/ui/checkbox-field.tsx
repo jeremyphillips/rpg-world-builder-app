@@ -14,6 +14,7 @@ import { resolveFieldPresentation } from './field-row-presentation.lib'
 
 import { FieldChromeShell } from './field-chrome-shell'
 import type { FieldChromeProps } from './field-chrome.variants'
+import { resolveFieldAnatomyWidth } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 import type { FieldLabelPresentationProps } from './field-label-props'
 import { cn } from '../../lib/utils'
@@ -48,6 +49,7 @@ export function CheckboxField({
   chrome,
   ...checkboxProps
 }: CheckboxFieldProps) {
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
   const presentation = resolveFieldPresentation({
     size,
     labelLayout: 'inline',
@@ -77,7 +79,7 @@ export function CheckboxField({
       describedBy={describedBy}
       hint={hint}
       required={required}
-      width={width}
+      width={rootWidth}
       size={size}
     >
       <FieldChromeShell chrome={chrome} size={size}>

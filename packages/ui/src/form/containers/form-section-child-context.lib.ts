@@ -29,6 +29,8 @@ export function buildArraySectionChildContext(
     arrayItemTone: chrome.tone ?? parent.arrayItemTone,
     namedGroupDepth: childNamedGroupDepth,
     headingTier: hasNamedHeading ? 'leaf' : parent.headingTier,
+    fieldChromeCascade: config.fieldChrome ?? parent.fieldChromeCascade,
+    fieldChromeSuppressed: true,
   })
 }
 

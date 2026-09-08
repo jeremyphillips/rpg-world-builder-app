@@ -60,8 +60,11 @@ export function DependentSection({
   const parentContext = useFormSectionContext()
   const { rhythm } = resolveFormDensity(parentContext.density)
   const childContext = React.useMemo(
-    () => buildFormSectionChildContext(parentContext, depth),
-    [parentContext, depth],
+    () =>
+      buildFormSectionChildContext(parentContext, depth, {
+        fieldChromeCascade: item.dependents.fieldChrome ?? parentContext.fieldChromeCascade,
+      }),
+    [parentContext, depth, item.dependents.fieldChrome],
   )
   const controller = item.controller
   const dependents = item.dependents.fields
@@ -136,6 +139,58 @@ function GatedDependentFieldsRegion({
   return <DependentFieldsRegionContent {...props} />
 }
 
+function rhythmStack(content: React.ReactNode, rhythm: DependentFieldsRegionProps['rhythm']) {
+  return <div className={fieldStackRhythmVariants({ rhythm })}>{content}</div>
+}
+
+function wrapDependentFieldsContent({
+  chromeWrapperClassName,
+  scope,
+  rhythm,
+  dependentsContent,
+  dependentChildContext,
+  arrayItemContext,
+  useArrayItemScope,
+  suppressFieldChrome,
+}: {
+  chromeWrapperClassName?: string
+  scope: DependentConfig['dependents']['scope']
+  rhythm: DependentFieldsRegionProps['rhythm']
+  dependentsContent: React.ReactNode
+  dependentChildContext: FormSectionContextValue
+  arrayItemContext: FormSectionContextValue | null
+  useArrayItemScope: boolean
+  suppressFieldChrome: boolean
+}) {
+  if (chromeWrapperClassName && scope === 'wrapper') {
+    return (
+      <FormSectionContext.Provider value={dependentChildContext}>
+        <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeWrapperClassName)}>
+          {dependentsContent}
+        </div>
+      </FormSectionContext.Provider>
+    )
+  }
+
+  if (useArrayItemScope && arrayItemContext) {
+    return (
+      <FormSectionContext.Provider value={arrayItemContext}>
+        {rhythmStack(dependentsContent, rhythm)}
+      </FormSectionContext.Provider>
+    )
+  }
+
+  if (suppressFieldChrome) {
+    return (
+      <FormSectionContext.Provider value={dependentChildContext}>
+        {rhythmStack(dependentsContent, rhythm)}
+      </FormSectionContext.Provider>
+    )
+  }
+
+  return rhythmStack(dependentsContent, rhythm)
+}
+
 function DependentFieldsRegionContent({
   dependentsChrome,
   inset = DEFAULT_DEPENDENT_INSET,
@@ -169,13 +224,15 @@ function DependentFieldsRegionContent({
     depth: depth + 1,
   })
 
-  const rhythmWrapper = (content: React.ReactNode) => (
-    <div className={fieldStackRhythmVariants({ rhythm })}>{content}</div>
-  )
-
   const chromeWrapperClassName = presentation.chromeWrapperClassName
   const railClassName = presentation.railClassName
   const showRail = Boolean(railClassName && scope === 'wrapper')
+  const suppressFieldChrome =
+    scope === 'wrapper' && (presentation.chrome === 'panel' || presentation.chrome === 'rail')
+  const dependentChildContext = React.useMemo(
+    () => (suppressFieldChrome ? { ...parentContext, fieldChromeSuppressed: true } : parentContext),
+    [parentContext, suppressFieldChrome],
+  )
 
   return (
     <div
@@ -183,17 +240,16 @@ function DependentFieldsRegionContent({
       data-field-dependent-fields=""
       {...(showRail ? { 'data-field-dependent-rail': '' } : {})}
     >
-      {chromeWrapperClassName && scope === 'wrapper' ? (
-        <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeWrapperClassName)}>
-          {dependentsContent}
-        </div>
-      ) : useArrayItemScope && arrayItemContext ? (
-        <FormSectionContext.Provider value={arrayItemContext}>
-          {rhythmWrapper(dependentsContent)}
-        </FormSectionContext.Provider>
-      ) : (
-        rhythmWrapper(dependentsContent)
-      )}
+      {wrapDependentFieldsContent({
+        chromeWrapperClassName,
+        scope,
+        rhythm,
+        dependentsContent,
+        dependentChildContext,
+        arrayItemContext,
+        useArrayItemScope,
+        suppressFieldChrome,
+      })}
     </div>
   )
 }

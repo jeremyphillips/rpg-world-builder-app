@@ -160,6 +160,17 @@ Do not merge text-tuned values onto solid status hues.
 
 Switch unchecked track uses `--switch-track*` — separate from field border ownership.
 
+## Field container chrome
+
+Schema-driven form fields default to a boxed container shell (`{ variant: 'container' }`):
+
+- Layer 2 token: `--field-container` — lightest surface in light mode (`--palette-surface-field`), darkest in dark mode (`--palette-surface-sunken`).
+- Public utility: `bg-field-container` in `globals.css`.
+- Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
+- Padding: 16px (`p-4`).
+
+Opt out with `{ variant: 'none' }` on a leaf, row, or slot; cascade with `fieldChrome` on groups, arrays, or dependent regions. Suppressed automatically inside array item cards, dependent panel/rail regions, and shared row containers.
+
 **Choice indicators** (radio, checkbox, RadioCard decorative control) use
 `border-choice-control` (`--choice-control-border`), composed toward `--surface-current` — not
 `border-input`.

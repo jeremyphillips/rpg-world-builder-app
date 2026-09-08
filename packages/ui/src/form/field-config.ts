@@ -313,11 +313,14 @@ interface BaseFieldConfig {
    * Visual shell around the full field anatomy (label + control + messages).
    * Discriminated union — not a flat enum:
    *
-   * - `{ variant: 'plain' }` — default, no extra shell
+   * - omitted — resolves from ancestor `fieldChrome` cascade, section suppression, or
+   *   `{ variant: 'container' }` (default boxed shell)
+   * - `{ variant: 'none' }` — explicit opt-out (replaces deprecated `plain`)
+   * - `{ variant: 'container', tone? }` — solid bg + border + 16px padding
    * - `{ variant: 'panel', tone? }` — filled panel wash
-   * - `{ variant: 'outline', tone? }` — border-only inset (`faint` | `subtle` | `default` | `strong`, or semantic tones)
+   * - `{ variant: 'outline', tone? }` — border-only inset
    *
-   * Distinct from container `surface` / `tone` chrome on arrays and dependents.
+   * Distinct from container `chrome` / `tone` on groups, arrays, and dependents.
    */
   chrome?: FieldChrome
   /**
@@ -937,6 +940,8 @@ export interface RowConfig {
   align?: FieldRowAlignment
   /** Trailing divider after this row within a group/stack rhythm. */
   separator?: FieldSeparator
+  /** Shared container shell around the row's fields. Inherits cascade when omitted. */
+  chrome?: FieldChrome
   /** When hidden, the whole row unmounts. */
   visibility?: FieldVisibility
   /**
@@ -972,6 +977,8 @@ export interface DependentDependentsConfig {
   inset?: boolean
   /** Decorative treatment only. @default 'none' */
   chrome?: DependentChrome
+  /** Default leaf/row container treatment for nested fields. */
+  fieldChrome?: FieldChrome
   /** Panel wash options — only when `chrome === 'panel'`. */
   panel?: { surface?: SurfaceConfig; tone?: SemanticSurfaceTone }
   /**
@@ -1054,6 +1061,8 @@ export interface GroupConfig {
    * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-chrome).
    */
   chrome?: FieldGroupChrome
+  /** Default leaf/row/slot container treatment for fields nested in this group. */
+  fieldChrome?: FieldChrome
   /**
    * Open/collapse and summary behavior for the group container.
    * `legend` — collapsible fieldset; `summary` — collapsed summary + Change/Done chrome.
@@ -1228,6 +1237,8 @@ export interface ArrayConfig {
   id?: string
   className?: string
   separator?: FieldSeparator
+  /** Default leaf/row/slot container treatment for item fields. */
+  fieldChrome?: FieldChrome
   errorPlacement?: 'auto' | 'field' | 'row'
 }
 

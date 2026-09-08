@@ -90,13 +90,11 @@ export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
       options: featCategoryOptions,
       multiple: false,
       required: true,
-      chrome: { variant: 'outline' },
     },
     descriptionField(ctx),
     {
       kind: 'group',
       legend: 'Prerequisites',
-      chrome: { variant: 'panel' },
       fields: [
         {
           kind: 'slot',

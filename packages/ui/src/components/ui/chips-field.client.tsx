@@ -3,9 +3,12 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import type { FieldChrome } from './field-chrome.variants'
+import {
+  hasActiveFieldChrome,
+  resolveFieldAnatomyWidth,
+  type FieldChrome,
+} from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
-import { hasActiveFieldChrome } from './field-chrome.variants'
 import {
   Field,
   FieldErrorText,
@@ -171,6 +174,8 @@ export function ChipsField({
     errorId,
     hintId,
   )
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
+  const outerWidthClass = rootWidth === 'auto' ? 'w-auto' : 'w-full'
 
   const chipsOptions = (
     <ChipsFieldOptions
@@ -188,7 +193,7 @@ export function ChipsField({
   )
 
   return (
-    <div className={width === 'auto' ? 'w-auto' : 'w-full'}>
+    <div className={outerWidthClass}>
       <fieldset
         id={id}
         aria-describedby={resolvedDescribedBy}
@@ -250,7 +255,7 @@ export function ChipsFormField(props: ChipsFieldProps) {
       error={props.error}
       hint={props.hint}
       required={props.required}
-      width={props.width}
+      width={resolveFieldAnatomyWidth(props.width, props.chrome)}
       size={props.size}
     >
       <ChipsField {...props} />

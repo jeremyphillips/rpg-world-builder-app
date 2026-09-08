@@ -8,6 +8,7 @@ import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
 import type { FieldChrome } from './field-chrome.variants'
+import { resolveFieldAnatomyWidth } from './field-chrome.variants'
 import type { FieldControlBand } from './field-control-band.variants'
 import type { FieldValidationProps } from './field-validation-props'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
@@ -60,7 +61,7 @@ export function RadioFieldShell({
       hint={hint}
       required={required}
       size={size}
-      width={width}
+      width={resolveFieldAnatomyWidth(width, chrome)}
     >
       <FieldLayout
         hintPosition={hintPosition}

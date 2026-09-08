@@ -25,7 +25,10 @@ import { useFieldErrorPresentation } from '../context/array-item-presentation.co
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
-import { pickFieldChromeProps } from '../../components/ui/field-chrome.variants'
+import {
+  pickFieldChromeProps,
+  resolveFieldChromeProps,
+} from '../../components/ui/field-chrome.variants'
 import { collectFieldDynamicDependsOn } from '../field-config'
 import { FieldDerivedMetaProvider } from '../../components/ui/field-derived-meta-context.client'
 import { renderSpecializedField } from './fields/field-renderer-specialized.client'
@@ -578,14 +581,19 @@ function wrapFieldDerivedMetaPresentation(
  * adapter. Must be rendered inside a `FormProvider` (the `<Form>` renderer).
  */
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
-  const { density } = useFormSectionContext()
-  const { fullName, id } = buildFieldRendererIds(config, idPrefix, namePrefix)
+  const sectionContext = useFormSectionContext()
+  const { density } = sectionContext
+  const chromeProps = resolveFieldChromeProps(config, sectionContext)
+  const chromedConfig = { ...config, ...chromeProps } as FieldConfig
+  const { fullName, id } = buildFieldRendererIds(chromedConfig, idPrefix, namePrefix)
 
-  const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
+  const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(chromedConfig), namePrefix)
   const optionAvailability =
-    config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
+    chromedConfig.type === 'chips' || chromedConfig.type === 'select'
+      ? chromedConfig.optionAvailability
+      : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
-  const resolved = resolveFieldRenderConfig(config, density, dynamicValues, optionValues)
+  const resolved = resolveFieldRenderConfig(chromedConfig, density, dynamicValues, optionValues)
 
   const specialized = renderSpecializedField({
     renderConfig: resolved.config,
@@ -599,13 +607,13 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     return wrapFieldDerivedMetaPresentation(specialized, resolved)
   }
 
-  if (config.type === 'select') {
-    if (config.optionalDisclosure) {
-      assertOptionalDisclosureFieldConfig(config)
+  if (chromedConfig.type === 'select') {
+    if (chromedConfig.optionalDisclosure) {
+      assertOptionalDisclosureFieldConfig(chromedConfig)
       return wrapFieldDerivedMetaPresentation(
         <OptionalDisclosureSelectFieldRenderer
-          config={config}
-          disclosure={config.optionalDisclosure}
+          config={chromedConfig}
+          disclosure={chromedConfig.optionalDisclosure}
           fullName={fullName}
           id={id}
           namePrefix={namePrefix}
@@ -615,18 +623,23 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     }
 
     return wrapFieldDerivedMetaPresentation(
-      <SelectFieldRenderer config={config} fullName={fullName} id={id} namePrefix={namePrefix} />,
+      <SelectFieldRenderer
+        config={chromedConfig}
+        fullName={fullName}
+        id={id}
+        namePrefix={namePrefix}
+      />,
       resolved,
     )
   }
 
-  if (config.type === 'textSuggestions') {
-    if (config.optionalDisclosure) {
-      assertOptionalDisclosureFieldConfig(config)
+  if (chromedConfig.type === 'textSuggestions') {
+    if (chromedConfig.optionalDisclosure) {
+      assertOptionalDisclosureFieldConfig(chromedConfig)
       return wrapFieldDerivedMetaPresentation(
         <OptionalDisclosureTextSuggestionsFieldRenderer
-          config={config}
-          disclosure={config.optionalDisclosure}
+          config={chromedConfig}
+          disclosure={chromedConfig.optionalDisclosure}
           fullName={fullName}
           id={id}
           namePrefix={namePrefix}
@@ -637,7 +650,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
 
     return wrapFieldDerivedMetaPresentation(
       <TextSuggestionsFieldRenderer
-        config={config}
+        config={chromedConfig}
         fullName={fullName}
         id={id}
         namePrefix={namePrefix}
@@ -648,7 +661,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
 
   return wrapFieldDerivedMetaPresentation(
     <StandardFieldRenderer
-      config={config}
+      config={chromedConfig}
       renderConfig={resolved.config as StandardFieldConfig}
       controlSize={resolved.controlSize}
       hint={resolved.hint}

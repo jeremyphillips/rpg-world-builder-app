@@ -124,6 +124,7 @@
    * Field control chrome — text-like inputs and grouped field shells.
    * Public utilities: `border-input`, `bg-input`, and state variants in globals.css.
    */
+  --field-container: var(--palette-surface-sunken);
   --field-control-bg: var(--palette-field-bg);
   --field-control-bg-default: var(--palette-field-bg);
   --field-control-bg-on-muted: var(--surface-subtle);

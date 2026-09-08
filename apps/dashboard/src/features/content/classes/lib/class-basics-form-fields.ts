@@ -25,18 +25,22 @@ export function coreAttributesFields(ctx?: ContentFormCtx): FormItem[] {
 
   return [
     {
-      kind: 'row',
+      kind: 'group',
       fields: [
         {
           type: 'chips',
           name: 'primaryAbilities',
           label: 'Primary abilities',
-          chrome: { variant: 'panel' },
           options: abilityOptions,
           max: 2,
           required: true,
           hint: 'Select up to 2 abilities',
         },
+      ],
+    },
+    {
+      kind: 'group',
+      fields: [
         {
           type: 'select',
           name: 'hitDie',

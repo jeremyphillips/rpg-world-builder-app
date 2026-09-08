@@ -53,7 +53,6 @@ export function languageProficiencyFields(
       ...(navigation?.id ? { id: navigation.id } : {}),
       ...(navigation ? { navigation } : {}),
       ...(navigation ? { className: SCROLL_SECTION_ANCHOR_CLASS } : {}),
-      chrome: { variant: 'panel' },
       fields: [
         languageGrantItemsField({
           path: LANGUAGE_GRANTS_ITEMS_PATH,

@@ -67,7 +67,6 @@ export const flavorFields: FormItem[] = [
     multiple: true,
     hint: 'Pick as many as apply.',
     options: toOptions(PLAY_STYLES, PLAY_STYLE_LABELS),
-    chrome: { variant: 'panel' },
   },
   {
     type: 'chips',
@@ -76,7 +75,6 @@ export const flavorFields: FormItem[] = [
     multiple: true,
     hint: 'Pick as many as apply.',
     options: toOptions(MOODS, MOOD_LABELS),
-    chrome: { variant: 'panel' },
   },
   {
     type: 'chips',
@@ -84,7 +82,6 @@ export const flavorFields: FormItem[] = [
     label: 'Magic Level',
     multiple: false,
     options: toOptions(MAGIC_LEVELS, MAGIC_LEVEL_LABELS),
-    chrome: { variant: 'panel' },
   },
   {
     type: 'chips',
@@ -92,6 +89,5 @@ export const flavorFields: FormItem[] = [
     label: 'Difficulty',
     multiple: false,
     options: toOptions(DIFFICULTIES, DIFFICULTY_LABELS),
-    chrome: { variant: 'panel' },
   },
 ]

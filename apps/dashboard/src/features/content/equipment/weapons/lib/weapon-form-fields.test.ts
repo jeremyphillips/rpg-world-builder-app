@@ -38,15 +38,11 @@ describe('weapon kindFieldGroups', () => {
     expectComposedKindGroups('weapon', '')
   })
 
-  it('uses panel chrome on the weapon group and raised panel on Damage', () => {
+  it('does not declare group chrome on the weapon group or Damage subsection', () => {
     const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
-    expect(weaponGroup).toMatchObject({
-      chrome: { variant: 'panel' },
-    })
+    expect(weaponGroup).not.toHaveProperty('chrome')
     const damageGroup = damageGroupFromWeaponGroup(weaponGroup)
-    expect(damageGroup).toMatchObject({
-      chrome: { variant: 'panel', elevation: 'raised' },
-    })
+    expect(damageGroup).not.toHaveProperty('chrome')
   })
 
   it('uses subsection legend size on the nested Damage group', () => {

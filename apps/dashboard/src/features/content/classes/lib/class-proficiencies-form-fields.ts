@@ -94,13 +94,11 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Defenses',
-      chrome: { variant: 'outline' },
       fields: [
         {
           type: 'chips',
           name: 'proficiencies.savingThrows',
           label: 'Saving throws',
-          chrome: { variant: 'panel' },
           options: abilityOptions,
           max: 2,
           required: true,
@@ -109,7 +107,6 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'group',
-          chrome: { variant: 'rail' },
           fields: [
             {
               type: 'chips',
@@ -124,7 +121,6 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Weapons',
-      chrome: { variant: 'outline' },
       fields: [
         modeDependentGrantSetField({
           modeFieldName: 'weaponProficiencyMode',
@@ -148,19 +144,17 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: `Granted ${getProficiencyDomainCompactLabel('skill').toLowerCase()} & tools`,
-      chrome: { variant: 'outline' },
       fields: [
         {
           type: 'chips',
           name: 'proficiencies.skills.items',
           label: `Granted ${getProficiencyDomainSentenceForm('skill', 2)}`,
-          chrome: { variant: 'panel' },
           options: skillOptions,
         },
         {
           kind: 'group',
           legend: 'Tools',
-          chrome: { variant: 'panel' },
+          fieldChrome: { variant: 'none' },
           fields: [
             {
               type: 'chips',

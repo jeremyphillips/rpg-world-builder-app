@@ -63,8 +63,17 @@ export function GroupFieldSection({
         inGroup: true,
         namedGroupDepth: childNamedGroupDepth,
         headingTier: hasNamedHeading ? groupTier : parentContext.headingTier,
+        fieldChromeCascade: item.fieldChrome ?? parentContext.fieldChromeCascade,
       }),
-    [parentContext, depth, groupDensity, childNamedGroupDepth, groupTier, hasNamedHeading],
+    [
+      parentContext,
+      depth,
+      groupDensity,
+      childNamedGroupDepth,
+      groupTier,
+      hasNamedHeading,
+      item.fieldChrome,
+    ],
   )
   const description = React.useMemo(() => {
     const hint = heading?.hint ?? item.description

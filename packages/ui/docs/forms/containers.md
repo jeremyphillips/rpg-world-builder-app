@@ -239,6 +239,25 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 }
 ```
 
+## Field container chrome (default)
+
+Every leaf field, shared row, and slot rendered by the schema-driven `<Form>` gets a default boxed
+container: solid background + border + 16px padding (`{ variant: 'container' }`). Resolution order:
+
+1. Explicit `chrome` on the leaf, row, or slot (`{ variant: 'none' }` opts out)
+2. Nearest ancestor `fieldChrome` on a group, array, or dependent region
+3. Section suppression (array item shells, dependent panel/rail wrappers, fields inside a shared row container)
+4. Global default `{ variant: 'container' }`
+
+| Authoring knob                                                       | Applies to                   |
+| -------------------------------------------------------------------- | ---------------------------- |
+| `chrome?: FieldChrome` on leaf fields, `kind: 'row'`, `kind: 'slot'` | That node only               |
+| `fieldChrome?: FieldChrome` on `group`, `array`, `dependents`        | Descendant leaves/rows/slots |
+
+Group `chrome` (fieldset treatment: divider, callout, accent, …) remains separate from leaf
+container chrome. Prefer removing neutral group `outline` / `panel` / `rail` chrome in favor of
+per-field containers; keep semantic group chrome (warning accent summaries, callouts).
+
 ## Field separators
 
 `separator` on a leaf, row, or slot → trailing `border-b` before the next sibling.

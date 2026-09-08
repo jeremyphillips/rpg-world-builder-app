@@ -5,7 +5,11 @@ import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { FormField } from './form-field'
 import { FieldChromeShell } from './field-chrome-shell'
-import { hasActiveFieldChrome, type FieldChromeProps } from './field-chrome.variants'
+import {
+  hasActiveFieldChrome,
+  resolveFieldAnatomyWidth,
+  type FieldChromeProps,
+} from './field-chrome.variants'
 import {
   Select,
   SelectContent,
@@ -121,6 +125,7 @@ export function SelectField({
 }: SelectFieldProps) {
   const resolvedPlaceholder = resolveSelectPlaceholder(label, placeholder)
   const resolvedHintPosition = hintPosition ?? 'below-label'
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const selectTrigger =
     labelPosition === 'settings' ? (
@@ -168,7 +173,7 @@ export function SelectField({
         hintPosition={hintPosition}
         info={info}
         required={required}
-        width={width}
+        width={rootWidth}
         size={size}
         labelPosition="settings"
         chrome={chrome}
@@ -187,7 +192,7 @@ export function SelectField({
         describedBy={describedBy}
         hint={hint}
         required={required}
-        width={width}
+        width={rootWidth}
         size={size}
       >
         <div className={fieldInlineControlRowClasses}>
@@ -219,7 +224,7 @@ export function SelectField({
       describedBy={describedBy}
       hint={hint}
       required={required}
-      width={width}
+      width={rootWidth}
       size={size}
     >
       <FieldLayout

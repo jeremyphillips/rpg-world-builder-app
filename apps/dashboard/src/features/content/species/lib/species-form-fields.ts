@@ -163,7 +163,6 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
       label: getVocabularyTermLabel(CREATURE_SIZE_TERM),
       options: creatureSizeOptions,
       required: true,
-      chrome: { variant: 'panel' },
     },
     movementArrayField(),
   ]

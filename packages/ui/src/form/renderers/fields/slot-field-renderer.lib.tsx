@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react'
 
 import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
-import { hasActiveFieldChrome } from '../../../components/ui/field-chrome.variants'
+import {
+  hasActiveFieldChrome,
+  type FieldChrome,
+} from '../../../components/ui/field-chrome.variants'
 import type { FieldSize } from '../../../components/ui/field.client'
 import type { FieldRhythm } from '../../../components/ui/field.variants'
 import { fieldGroupDescriptionClasses } from '../../../components/ui/field.variants'
@@ -49,13 +52,15 @@ export function wrapSlotFieldBody(
   body: ReactNode,
   config: SlotConfig,
   chromeSize: FieldSize,
+  resolvedChrome?: FieldChrome,
 ): ReactNode {
   const heading = resolveSlotHeading(config)
+  const chrome = resolvedChrome ?? config.chrome
 
-  if (hasActiveFieldChrome(config.chrome)) {
+  if (hasActiveFieldChrome(chrome)) {
     return (
       <FieldChromeShell
-        chrome={config.chrome}
+        chrome={chrome}
         size={chromeSize}
         className={!heading && !config.hint ? config.className : undefined}
       >
