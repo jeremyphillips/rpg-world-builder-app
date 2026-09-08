@@ -217,7 +217,7 @@ describe('dependent field', () => {
     })
   })
 
-  it('allows nested inset + rail regions without suppressing inner chrome', async () => {
+  it('keeps nested inset + rail regions without nested field containers', async () => {
     const nestedSchema = z.object({
       allow: z.boolean(),
       armorMode: z.string(),
@@ -284,8 +284,10 @@ describe('dependent field', () => {
     expect(
       container.querySelectorAll('[data-field-dependent-fields][data-field-dependent-rail]'),
     ).toHaveLength(2)
-    expect(container.querySelectorAll('.bg-field-container')).toHaveLength(2)
-    expect(screen.getByLabelText('Categories')).toBeInTheDocument()
+    expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
+    const fieldContainer = container.querySelector('.bg-field-container')
+    expect(fieldContainer).toContainElement(screen.getByRole('switch', { name: 'Allow' }))
+    expect(fieldContainer).toContainElement(screen.getByLabelText('Categories'))
   })
 
   it('inherits comfortable density on the outer dependent wrapper by default', async () => {

@@ -33,11 +33,6 @@ export interface FormSectionContextValue {
   fieldChromeCascade?: FieldChrome
   /** When true, leaf fields default to no container unless explicitly configured. */
   fieldChromeSuppressed?: boolean
-  /**
-   * True when a parent `kind: 'dependent'` already wrapped its stack in a field
-   * container. Nested dependents still resolve their own wrapper chrome.
-   */
-  insideDependentContainer?: boolean
 }
 
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
@@ -61,7 +56,6 @@ export interface FormSectionContextOverrides {
   inRhythmStack?: boolean
   fieldChromeCascade?: FieldChrome
   fieldChromeSuppressed?: boolean
-  insideDependentContainer?: boolean
 }
 
 function filterUndefined<T extends object>(value: T): Partial<T> {
@@ -84,7 +78,6 @@ function inheritSectionContextFields(
     inRhythmStack: parent.inRhythmStack,
     fieldChromeCascade: parent.fieldChromeCascade,
     fieldChromeSuppressed: parent.fieldChromeSuppressed,
-    insideDependentContainer: parent.insideDependentContainer,
   }
 
   return overrides ? { ...inherited, ...filterUndefined(overrides) } : inherited

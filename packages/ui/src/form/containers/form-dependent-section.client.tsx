@@ -66,18 +66,14 @@ export function DependentSection({
   const { rhythm, size } = resolveFormDensity(parentContext.density)
   const dependentChrome = resolveEffectiveFieldChrome(item, {
     fieldChromeCascade: parentContext.fieldChromeCascade,
-    fieldChromeSuppressed:
-      Boolean(parentContext.fieldChromeSuppressed) && !parentContext.insideDependentContainer,
+    fieldChromeSuppressed: Boolean(parentContext.fieldChromeSuppressed),
   })
   const childContext = React.useMemo(
     () =>
       buildFormSectionChildContext(parentContext, depth, {
         fieldChromeCascade: item.dependents.fieldChrome ?? parentContext.fieldChromeCascade,
-        fieldChromeSuppressed: hasActiveFieldChrome(dependentChrome) || undefined,
-        insideDependentContainer:
-          hasActiveFieldChrome(dependentChrome) ||
-          parentContext.insideDependentContainer ||
-          undefined,
+        fieldChromeSuppressed:
+          hasActiveFieldChrome(dependentChrome) || parentContext.fieldChromeSuppressed || undefined,
       }),
     [parentContext, depth, item.dependents.fieldChrome, dependentChrome],
   )

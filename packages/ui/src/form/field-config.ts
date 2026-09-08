@@ -314,13 +314,13 @@ interface BaseFieldConfig {
    * Discriminated union — not a flat enum:
    *
    * - omitted — resolves from ancestor `fieldChrome` cascade, section suppression, or
-   *   `{ variant: 'container' }` (default boxed shell)
+   *   `{ variant: 'container' }` when this field is a top-level form unit
    * - `{ variant: 'none' }` — explicit opt-out (replaces deprecated `plain`)
    * - `{ variant: 'container', tone? }` — solid bg + border + 16px padding
    * - `{ variant: 'panel', tone? }` — filled panel wash
    * - `{ variant: 'outline', tone? }` — border-only inset
    *
-   * Distinct from container `chrome` / `tone` on groups, arrays, and dependents.
+   * Distinct from FieldGroup `chrome` (fieldset treatment) and dependent rail/panel chrome.
    */
   chrome?: FieldChrome
   /**
@@ -1066,7 +1066,10 @@ export interface GroupConfig {
    * Tones vary by variant — see [containers.md](../../docs/forms/containers.md#group-chrome).
    */
   chrome?: FieldGroupChrome
-  /** Default leaf/row/slot container treatment for fields nested in this group. */
+  /**
+   * Shared field-container override for this group’s field stack (legend stays outside).
+   * Also cascades to descendants when the shared container is opted out with `none`.
+   */
   fieldChrome?: FieldChrome
   /**
    * Open/collapse and summary behavior for the group container.

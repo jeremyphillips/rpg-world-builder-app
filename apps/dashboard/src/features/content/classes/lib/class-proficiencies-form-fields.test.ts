@@ -1,28 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { isContainer, type GroupConfig } from '@rpg/ui/form'
+import { isContainer } from '@rpg/ui/form'
 
 import { proficienciesFields } from './class-proficiencies-form-fields'
 
 describe('proficienciesFields', () => {
-  it('wraps armor chips in an anonymous layout group without group chrome', () => {
+  it('keeps armor chips as a sibling field inside Defenses', () => {
     const defenses = proficienciesFields({ options: {} })[0]
     if (!defenses || !isContainer(defenses) || defenses.kind !== 'group') {
       throw new Error('Expected Defenses group')
     }
 
-    const armorGroup = defenses.fields[1]
-    if (!armorGroup || !isContainer(armorGroup) || armorGroup.kind !== 'group') {
-      throw new Error('Expected anonymous armor group')
-    }
-
-    expect(armorGroup).toMatchObject({
-      kind: 'group',
-    })
-    expect(armorGroup).not.toHaveProperty('legend')
-    expect(armorGroup).not.toHaveProperty('heading')
-    expect(armorGroup).not.toHaveProperty('chrome')
-
-    const armorChips = (armorGroup as GroupConfig).fields[0]
+    const armorChips = defenses.fields[1]
     expect(armorChips).toMatchObject({
       type: 'chips',
       name: 'proficiencies.armor',

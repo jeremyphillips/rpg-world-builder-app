@@ -171,7 +171,10 @@ Schema-driven form fields default to a boxed container shell (`{ variant: 'conta
 - Fieldset leaves (`ChipsField`, choose-count shells) wrap a borderless `<fieldset>` in
   `FieldChromeShell` so `<legend>` cannot sit on the visible container border.
 
-Opt out with `{ variant: 'none' }` on a leaf, row, or slot; cascade with `fieldChrome` on groups, arrays, or dependent regions. Suppressed automatically inside array item cards, dependent panel/rail regions, and shared row containers.
+Opt out with `{ variant: 'none' }` on a top-level leaf, row, slot, or dependent, or
+`fieldChrome: { variant: 'none' }` on a group. Nested content under a top-level container
+unit is suppressed automatically (including nested groups and nested dependents). Array
+item cards keep their own shell model.
 
 **Choice indicators** (radio, checkbox, RadioCard decorative control) use
 `border-choice-control` (`--choice-control-border`), composed toward `--surface-current` — not

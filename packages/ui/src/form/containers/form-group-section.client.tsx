@@ -4,6 +4,12 @@ import * as React from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { FieldGroup } from '../../components/ui/field-group'
+import { FieldChromeShell } from '../../components/ui/field-chrome-shell'
+import {
+  hasActiveFieldChrome,
+  resolveEffectiveFieldChrome,
+} from '../../components/ui/field-chrome.variants'
+import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import { resolveFormDensity } from '../form-density'
 import { cn } from '../../lib/utils'
 import {
@@ -57,6 +63,13 @@ export function GroupFieldSection({
     hasNamedHeading,
     parentContext.namedGroupDepth,
   )
+  const groupFieldChrome = resolveEffectiveFieldChrome(
+    { chrome: item.fieldChrome },
+    {
+      fieldChromeCascade: parentContext.fieldChromeCascade,
+      fieldChromeSuppressed: Boolean(parentContext.fieldChromeSuppressed),
+    },
+  )
   const childContext = React.useMemo(
     () =>
       buildFormSectionChildContext(parentContext, depth, {
@@ -65,6 +78,10 @@ export function GroupFieldSection({
         namedGroupDepth: childNamedGroupDepth,
         headingTier: hasNamedHeading ? groupTier : parentContext.headingTier,
         fieldChromeCascade: item.fieldChrome ?? parentContext.fieldChromeCascade,
+        fieldChromeSuppressed:
+          hasActiveFieldChrome(groupFieldChrome) ||
+          parentContext.fieldChromeSuppressed ||
+          undefined,
       }),
     [
       parentContext,
@@ -74,6 +91,7 @@ export function GroupFieldSection({
       groupTier,
       hasNamedHeading,
       item.fieldChrome,
+      groupFieldChrome,
     ],
   )
   const description = React.useMemo(() => {
@@ -81,6 +99,27 @@ export function GroupFieldSection({
     if (!hint) return undefined
     return typeof hint === 'string' ? hint : normalizeFieldHint(hint).text
   }, [heading?.hint, item.description])
+
+  const nestedFields = renderNestedItems({
+    items: item.fields,
+    idPrefix,
+    namePrefix,
+    depth: depth + 1,
+  })
+
+  // FieldGroup's body rhythm only gaps its direct children. A shared FieldChromeShell
+  // is one child, so sibling field gap must live inside the shell.
+  const chromedFields = hasActiveFieldChrome(groupFieldChrome) ? (
+    <FieldChromeShell
+      chrome={groupFieldChrome}
+      size={groupSize}
+      className={fieldStackRhythmVariants({ rhythm: groupRhythm })}
+    >
+      <FormSectionContext.Provider value={childContext}>{nestedFields}</FormSectionContext.Provider>
+    </FieldChromeShell>
+  ) : (
+    <FormSectionContext.Provider value={childContext}>{nestedFields}</FormSectionContext.Provider>
+  )
 
   return (
     <FieldGroup
@@ -100,14 +139,7 @@ export function GroupFieldSection({
       collapseKey={item.id}
       formControl={control}
     >
-      <FormSectionContext.Provider value={childContext}>
-        {renderNestedItems({
-          items: item.fields,
-          idPrefix,
-          namePrefix,
-          depth: depth + 1,
-        })}
-      </FormSectionContext.Provider>
+      {chromedFields}
     </FieldGroup>
   )
 }

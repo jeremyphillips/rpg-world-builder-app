@@ -193,7 +193,7 @@ function ContentEditEntityFormBody<
     <ContentAuthoringGate campaignId={campaignId}>
       <NarrowPage spacing="relaxed" className="pb-10">
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             <Heading variant="page" as="h1">
               {headingFn(entity.name)}
             </Heading>

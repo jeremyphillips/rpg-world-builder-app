@@ -106,15 +106,10 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
           separator: 'subtle',
         },
         {
-          kind: 'group',
-          fields: [
-            {
-              type: 'chips',
-              name: 'proficiencies.armor',
-              label: 'Armor training',
-              options: armorCategoryOptions,
-            },
-          ],
+          type: 'chips',
+          name: 'proficiencies.armor',
+          label: 'Armor training',
+          options: armorCategoryOptions,
         },
       ],
     },
