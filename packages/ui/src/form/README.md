@@ -13,7 +13,7 @@ subpaths under this directory.
 | `renderers/`        | Core `FieldRenderer` registry (`field-renderer.client.tsx`, lazy loading)               |
 | `renderers/array/`  | Repeatable array entry (`array-field-renderer.client.tsx`) plus item chrome and helpers |
 | `renderers/fields/` | Specialized leaf field adapters (inline sentence, input select, slot, …)                |
-| `containers/`       | Structural items: groups, rows, stacks, arrays, conditionals                            |
+| `containers/`       | Structural items: groups, rows, columns, stacks, arrays, conditionals                   |
 | `shells/`           | Top-level `<Form>`, `<TabbedForm>`, wizard step wrapper                                 |
 | `chrome/`           | Save footer, actions bar, sticky tab chrome                                             |
 

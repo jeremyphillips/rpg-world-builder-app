@@ -4,7 +4,6 @@ import {
   ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
-  getProficiencyDomainCompactLabel,
   getProficiencyDomainSentenceForm,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
@@ -87,86 +86,102 @@ export const proficienciesDraftFormSchema = proficienciesFormSchema.extend({
   savingThrows: z.array(abilitySchema).max(2).default([]),
 })
 
+const grantedSkillProficienciesLegend = `Granted ${getProficiencyDomainSentenceForm('skill', 2)}`
+const grantedToolProficienciesLegend = `Granted ${getProficiencyDomainSentenceForm('tool', 2)}`
+
 export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
   const skillOptions = referenceSkillFieldOptions(ctx.options?.skills)
 
+  const defensesGroup: FormItem = {
+    kind: 'group',
+    legend: 'Defenses',
+    fields: [
+      {
+        type: 'chips',
+        name: 'proficiencies.savingThrows',
+        label: 'Saving throws',
+        options: abilityOptions,
+        max: 2,
+        required: true,
+        hint: SAVING_THROWS_HINT,
+        separator: 'subtle',
+      },
+      {
+        type: 'chips',
+        name: 'proficiencies.armor',
+        label: 'Armor training',
+        options: armorCategoryOptions,
+      },
+    ],
+  }
+
+  const weaponsGroup: FormItem = {
+    kind: 'group',
+    legend: 'Weapons',
+    fields: [
+      modeDependentGrantSetField({
+        modeFieldName: 'weaponProficiencyMode',
+        modes: WEAPON_PROFICIENCY_MODES,
+        modeLabels: WEAPON_PROFICIENCY_MODE_LABELS,
+        categoriesPath: 'proficiencies.weapons.categories',
+        itemsPath: 'proficiencies.weapons.items',
+        label: 'Weapon proficiency mode',
+        hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
+        categoryOptions: weaponCategoryOptions,
+        itemOptions: referenceWeaponFieldOptions(ctx.options?.equipment),
+        categoriesLabel: 'Weapon proficiencies',
+        itemsLabel: 'Weapon choices',
+        categoriesHint: WEAPON_PROFICIENCIES_HINT,
+        categoryMode: 'categories',
+        specificMode: 'individual',
+        labelVisibility: 'srOnly',
+      }),
+    ],
+  }
+
+  const grantedSkillsGroup: FormItem = {
+    kind: 'group',
+    legend: grantedSkillProficienciesLegend,
+    fields: [
+      {
+        type: 'chips',
+        name: 'proficiencies.skills.items',
+        label: grantedSkillProficienciesLegend,
+        labelVisibility: 'srOnly',
+        options: skillOptions,
+      },
+    ],
+  }
+
+  const grantedToolsGroup: FormItem = {
+    kind: 'group',
+    legend: grantedToolProficienciesLegend,
+    fields: [
+      {
+        type: 'chips',
+        name: 'proficiencies.tools.categories',
+        label: 'Tool categories',
+        options: toolCategoryOptions,
+      },
+      {
+        type: 'combobox',
+        name: 'proficiencies.tools.items',
+        label: 'Specific tools',
+        multiple: true,
+        options: referenceToolFieldOptions(ctx.options?.equipment),
+        placeholder: 'Choose tools…',
+        width: 'xl',
+      },
+    ],
+  }
+
   return [
     {
-      kind: 'group',
-      legend: 'Defenses',
-      fields: [
-        {
-          type: 'chips',
-          name: 'proficiencies.savingThrows',
-          label: 'Saving throws',
-          options: abilityOptions,
-          max: 2,
-          required: true,
-          hint: SAVING_THROWS_HINT,
-          separator: 'subtle',
-        },
-        {
-          type: 'chips',
-          name: 'proficiencies.armor',
-          label: 'Armor training',
-          options: armorCategoryOptions,
-        },
-      ],
-    },
-    {
-      kind: 'group',
-      legend: 'Weapons',
-      fields: [
-        modeDependentGrantSetField({
-          modeFieldName: 'weaponProficiencyMode',
-          modes: WEAPON_PROFICIENCY_MODES,
-          modeLabels: WEAPON_PROFICIENCY_MODE_LABELS,
-          categoriesPath: 'proficiencies.weapons.categories',
-          itemsPath: 'proficiencies.weapons.items',
-          label: 'Weapon proficiency mode',
-          hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
-          categoryOptions: weaponCategoryOptions,
-          itemOptions: referenceWeaponFieldOptions(ctx.options?.equipment),
-          categoriesLabel: 'Weapon proficiencies',
-          itemsLabel: 'Weapon choices',
-          categoriesHint: WEAPON_PROFICIENCIES_HINT,
-          categoryMode: 'categories',
-          specificMode: 'individual',
-          labelVisibility: 'srOnly',
-        }),
-      ],
-    },
-    {
-      kind: 'group',
-      legend: `Granted ${getProficiencyDomainCompactLabel('skill').toLowerCase()} & tools`,
-      fields: [
-        {
-          type: 'chips',
-          name: 'proficiencies.skills.items',
-          label: `Granted ${getProficiencyDomainSentenceForm('skill', 2)}`,
-          options: skillOptions,
-        },
-        {
-          kind: 'group',
-          legend: 'Tools',
-          fields: [
-            {
-              type: 'chips',
-              name: 'proficiencies.tools.categories',
-              label: 'Tool categories',
-              options: toolCategoryOptions,
-            },
-            {
-              type: 'combobox',
-              name: 'proficiencies.tools.items',
-              label: 'Specific tools',
-              multiple: true,
-              options: referenceToolFieldOptions(ctx.options?.equipment),
-              placeholder: 'Choose tools…',
-              width: 'xl',
-            },
-          ],
-        },
+      kind: 'columns',
+      collapseOrder: 'interleave',
+      columns: [
+        { fields: [defensesGroup, grantedSkillsGroup] },
+        { fields: [weaponsGroup, grantedToolsGroup] },
       ],
     },
   ]

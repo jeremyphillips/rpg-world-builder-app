@@ -1,17 +1,18 @@
 # Form containers
 
-Structural items in a `fields` config: groups, rows, stacks, arrays, and slots. Density
+Structural items in a `fields` config: groups, rows, columns, stacks, arrays, and slots. Density
 defaults: [forms hub — Form density](../forms.md#form-density).
 
 ## Overview
 
-| `kind`  | Semantics            | Density boundary? | Default density | Fieldset legend |
-| ------- | -------------------- | ----------------- | --------------- | --------------- |
-| `group` | Named subsection     | yes (optional)    | inherit parent  | yes             |
-| `row`   | Horizontal siblings  | no                | inherit parent  | no              |
-| `stack` | Layout-only column   | no                | inherit parent  | no              |
-| `array` | `useFieldArray` list | yes (optional)    | `compact`       | yes (`array`)   |
-| `slot`  | Custom `render()` UI | no                | inherit parent  | optional label  |
+| `kind`    | Semantics            | Density boundary? | Default density | Fieldset legend |
+| --------- | -------------------- | ----------------- | --------------- | --------------- |
+| `group`   | Named subsection     | yes (optional)    | inherit parent  | yes             |
+| `row`     | Horizontal siblings  | no                | inherit parent  | no              |
+| `columns` | Side-by-side stacks  | no                | inherit parent  | no              |
+| `stack`   | Layout-only column   | no                | inherit parent  | no              |
+| `array`   | `useFieldArray` list | yes (optional)    | `compact`       | yes (`array`)   |
+| `slot`    | Custom `render()` UI | no                | inherit parent  | optional label  |
 
 ## Component entry files
 
@@ -23,6 +24,7 @@ matches the exported component name in kebab-case:
 | `ArrayFieldRenderer`    | [`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)       |
 | `ArrayFormItemSection`  | [`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx) |
 | `ConditionalArrayField` | [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx) |
+| `ColumnsFieldSection`   | [`form-columns-section.client.tsx`](../src/form/containers/form-columns-section.client.tsx)            |
 | `SlotFieldRenderer`     | [`slot-field-renderer.client.tsx`](../src/form/renderers/fields/slot-field-renderer.client.tsx)        |
 | `FieldRenderer`         | [`field-renderer.client.tsx`](../src/form/renderers/field-renderer.client.tsx)                         |
 
@@ -141,6 +143,35 @@ apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 Side-by-side leaf fields and slots in a wrapping flex row. Row-level `visibility`, `separator`,
 and `className`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
 
+## Columns
+
+Side-by-side **vertical stacks** of mixed form items (`kind: 'columns'`). Not a `row` — rows
+are wrapping leaf siblings on one control band. Columns is layout-only: no fieldset, no
+shared field container. Each child stays a top-level chrome unit.
+
+Wide (`md` / 768px+): CSS grid of independent `FormRhythmStack`s. Narrow default: the same
+stacks in one column (all of column 1, then column 2). Optional `collapseOrder` reorders
+DOM below `md` so tab order matches the single-column layout — do not use CSS `order`.
+
+```ts
+{
+  kind: 'columns',
+  // collapseOrder: 'columns' (default) | 'interleave' | [[column, index], …]
+  columns: [
+    { fields: [/* description, primary abilities, hit die */] },
+    { fields: [/* suggested ability scores */] },
+  ],
+}
+```
+
+| `collapseOrder`       | Collapsed reading order                                                      |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `'columns'` (default) | Concatenate left to right — CSS-only                                         |
+| `'interleave'`        | Zip `c1[0], c2[0], c1[1], c2[1], …` then leftovers — `matchMedia` below `md` |
+| tuple list            | Explicit `[columnIndex, fieldIndex]` pairs; every field exactly once         |
+
+Prefer `defineColumnsField()` for completion.
+
 ## Stacks
 
 Layout-only — one slot in outer rhythm, no fieldset. Use `kind: 'dependent'` when a
@@ -246,10 +277,12 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 Every **top-level** `FormItem` in the schema `fields: []` gets one boxed field container —
 solid background + border + 16px padding (`{ variant: 'container' }`) — regardless of
-`kind` (`leaf`, `group`, `dependent`, `row`, `slot`). **Nothing nested inside that item**
-(nested `fields`, dependent controller/dependents, nested groups, nested dependents, rows,
-slots) receives field-container treatment. Arrays keep the existing **item-shell** model
-(elevated cards), not a field-container wrap of the whole list.
+`kind` (`leaf`, `group`, `dependent`, `row`, `slot`). `kind: 'columns'` is layout-only:
+the wrapper has no field container; **each column child** is treated as a top-level unit.
+**Nothing nested inside** a chromed unit (nested `fields`, dependent controller/dependents,
+nested groups, nested dependents, rows, slots) receives field-container treatment. Arrays
+keep the existing **item-shell** model (elevated cards), not a field-container wrap of the
+whole list.
 
 **Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
 borderless `<fieldset>` (legend, description, and field stack) in `FieldChromeShell`,

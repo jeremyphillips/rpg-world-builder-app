@@ -12,7 +12,6 @@ import { type TabbedFormTab } from '@rpg/ui/form'
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
-import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import {
@@ -141,7 +140,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [descriptionField(ctx), ...coreAttributesFields(ctx)],
+      fields: coreAttributesFields(ctx),
     },
     {
       id: 'proficiencies',

@@ -329,9 +329,10 @@ panel/outline stacks) in feature components when `FormItem[]` can express it.
 
 - **Fields** — `type` / `kind: 'slot'` entries in `*-form-fields.ts`; labels, hints, `info`,
   `labelPosition`, `separator`, and disabled state live in config.
-- **Containers** — `kind: 'group' | 'row' | 'stack' | 'dependent'` with `chrome` for
+- **Containers** — `kind: 'group' | 'row' | 'columns' | 'dependent'` with `chrome` for
   visual treatment and `disclosure` for compact settings sections (campaign access is
-  the reference implementation).
+  the reference implementation). `kind: 'columns'` is layout-only (independent stacks at
+  `md+`); each child stays a top-level chrome unit.
 - **Persistence** — may stay in a section shell (`CampaignAccessSection`, create/edit
   shells) when it uses a separate API or RHF form — but the **rendered UI** must still flow
   through `FormProvider` + `FormItems` over the field builder.

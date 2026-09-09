@@ -1,5 +1,6 @@
 import type {
   ArrayConfig,
+  ColumnsConfig,
   ComboboxFieldConfig,
   DependentConfig,
   DiceFormulaFieldConfig,
@@ -49,6 +50,11 @@ export function defineDependentField<const T extends DependentConfig>(config: T)
 
 /** Named fieldset subsection (`kind: 'group'`). */
 export function defineGroupField<const T extends GroupConfig>(config: T): T {
+  return config
+}
+
+/** Multi-column layout (`kind: 'columns'`). */
+export function defineColumnsField<const T extends ColumnsConfig>(config: T): T {
   return config
 }
 

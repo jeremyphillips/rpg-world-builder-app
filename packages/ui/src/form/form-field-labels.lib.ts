@@ -1,4 +1,5 @@
 import type { FieldConfig, FormItem, GroupFieldItem, RowConfig } from './field-config'
+import { resolveColumnsCollapseSequence } from './config/form-columns-collapse.lib'
 import { isNonWhitespaceLabel } from './form-heading.lib'
 
 function isLeafField(item: FormItem | GroupFieldItem | RowConfig): item is FieldConfig {
@@ -19,6 +20,14 @@ function assertLeafFieldLabels(
 
     if (item.kind === 'row') {
       assertLeafFieldLabels(item.fields, `${path}.row`)
+      continue
+    }
+
+    if (item.kind === 'columns') {
+      assertLeafFieldLabels(
+        resolveColumnsCollapseSequence(item.columns, item.collapseOrder),
+        `${path}.columns`,
+      )
       continue
     }
 

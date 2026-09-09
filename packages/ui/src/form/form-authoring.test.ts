@@ -9,6 +9,7 @@ import type {
 import {
   defineArrayField,
   defineComboboxField,
+  defineColumnsField,
   defineDiceFormulaField,
   defineForm,
   defineFormItems,
@@ -127,6 +128,13 @@ describe('form-authoring helpers', () => {
         legend: 'Identity',
         fields: [{ type: 'text', name: 'name', label: 'Name' }],
       }),
+      defineColumnsField({
+        kind: 'columns',
+        columns: [
+          { fields: [{ type: 'text', name: 'left', label: 'Left' }] },
+          { fields: [{ type: 'text', name: 'right', label: 'Right' }] },
+        ],
+      }),
       defineDependentField({
         kind: 'dependent',
         controller: { type: 'switch', name: 'enabled', label: 'Enabled' },
@@ -142,7 +150,7 @@ describe('form-authoring helpers', () => {
       }),
     ])
 
-    expect(fields).toHaveLength(3)
+    expect(fields).toHaveLength(4)
   })
 
   it('requires non-whitespace labels on leaf fields', () => {

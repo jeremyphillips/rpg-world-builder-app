@@ -147,7 +147,7 @@ via `resolveFormDensity` — do not set rhythm and size independently on shells.
 | Form shells (`Form`, `TabbedForm`, `FormFieldStack`, `FormSectionProvider`) | yes                    | `comfortable`        |
 | `kind: 'group'`                                                             | yes                    | inherit parent       |
 | `kind: 'array'`                                                             | yes                    | `compact`            |
-| `kind: 'dependent'`, `kind: 'slot'`, `kind: 'row'`                          | no                     | inherit parent       |
+| `kind: 'dependent'`, `kind: 'slot'`, `kind: 'row'`, `kind: 'columns'`       | no                     | inherit parent       |
 
 | `density`     | Sibling gap | Label → control | Control scale (`sm` / `md`) |
 | ------------- | ----------- | --------------- | --------------------------- |
@@ -185,6 +185,7 @@ the renderer. Plain object literals remain fully valid.
 | `defineArrayField()`          | `kind: 'array'` — repeatable lists                |
 | `defineSelectField()`         | `type: 'select'`                                  |
 | `defineStackField()`          | `kind: 'stack'` — controller + dependents         |
+| `defineColumnsField()`        | `kind: 'columns'` — side-by-side stacks           |
 | `defineGroupField()`          | `kind: 'group'` — fieldset subsection             |
 | `defineComboboxField()`       | `type: 'combobox'`                                |
 | `defineInlineSentenceField()` | `type: 'inlineSentence'`                          |
@@ -193,7 +194,7 @@ the renderer. Plain object literals remain fully valid.
 Simple leaf types (`text`, `number`, `checkbox`, …) do not need helpers.
 
 **VS Code snippets** (`.vscode/form.code-snippets`): `form-def`, `form-items`, `form-array`,
-`form-group`, `form-stack`. Snippet comments reference inventory const names (`FIELD_WIDTHS`,
+`form-group`, `form-stack`, `form-columns`. Snippet comments reference inventory const names (`FIELD_WIDTHS`,
 `SEMANTIC_SURFACE_TONES`) — import from `@rpg/ui/form` when using those tokens in code.
 
 JSDoc on complex configs in [field-config.ts](../src/form/field-config.ts) documents
@@ -222,13 +223,14 @@ not as a renderer requirement.
 
 ## Container kinds
 
-| `kind`  | Purpose                          | Detail                                              |
-| ------- | -------------------------------- | --------------------------------------------------- |
-| `group` | Named fieldset subsection        | [containers.md](./forms/containers.md#groups)       |
-| `row`   | Horizontal siblings              | [containers.md](./forms/containers.md#rows)         |
-| `stack` | Layout column (dependent stacks) | [containers.md](./forms/containers.md#stacks)       |
-| `array` | Repeatable `useFieldArray`       | [containers.md](./forms/containers.md#array-fields) |
-| `slot`  | Custom `render()` region         | [containers.md](./forms/containers.md#slot-fields)  |
+| `kind`    | Purpose                          | Detail                                              |
+| --------- | -------------------------------- | --------------------------------------------------- |
+| `group`   | Named fieldset subsection        | [containers.md](./forms/containers.md#groups)       |
+| `row`     | Horizontal siblings              | [containers.md](./forms/containers.md#rows)         |
+| `columns` | Side-by-side vertical stacks     | [containers.md](./forms/containers.md#columns)      |
+| `stack`   | Layout column (dependent stacks) | [containers.md](./forms/containers.md#stacks)       |
+| `array`   | Repeatable `useFieldArray`       | [containers.md](./forms/containers.md#array-fields) |
+| `slot`    | Custom `render()` region         | [containers.md](./forms/containers.md#slot-fields)  |
 
 Collapsible sections, separators, nested groups: [containers.md](./forms/containers.md).
 
@@ -437,7 +439,7 @@ Runnable recipes beat copying from docs. Start at `Forms/Form`, `Forms/TabbedFor
 | Doc                                                    | Contents                                              |
 | ------------------------------------------------------ | ----------------------------------------------------- |
 | [field-types.md](./forms/field-types.md)               | richtext, combobox, editableGrid, chips, inputUnit, … |
-| [containers.md](./forms/containers.md)                 | group, row, stack, array, slot                        |
+| [containers.md](./forms/containers.md)                 | group, row, columns, stack, array, slot               |
 | [heading-hierarchy.md](./forms/heading-hierarchy.md)   | heading tiers, labelVisibility, migration notes       |
 | [sizing-and-spacing.md](./forms/sizing-and-spacing.md) | size, width, digits, rhythm tokens                    |
 | [patterns.md](./forms/patterns.md)                     | TabbedForm chrome, FormCard, wizard, Storybook index  |

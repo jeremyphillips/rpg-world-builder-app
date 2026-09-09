@@ -22,6 +22,7 @@ const REQUIRED_PUBLIC_EXPORTS = [
   'defineSelectField',
   'defineDependentField',
   'defineGroupField',
+  'defineColumnsField',
   'defineComboboxField',
   'defineDiceFormulaField',
   'defineInlineSentenceField',

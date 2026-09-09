@@ -9,6 +9,7 @@
 | Named top-level group (`namedGroupDepth === 0`)             | `section`                                   |
 | Named group under a named ancestor (`namedGroupDepth >= 1`) | `subsection` (cap — no deeper visual tiers) |
 | Anonymous layout group (no `heading` / `legend`)            | Transparent — does not increment depth      |
+| `kind: 'columns'`                                           | Transparent — does not increment depth      |
 | `kind: 'slot'` or `kind: 'row'` with `heading`              | `leaf`                                      |
 | Leaf field                                                  | `leaf`                                      |
 

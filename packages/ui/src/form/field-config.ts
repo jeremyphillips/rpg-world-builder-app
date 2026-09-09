@@ -38,6 +38,13 @@ import type { FieldGroupChrome } from '../components/ui/field-group-chrome.varia
 import type { FieldGroupDisclosure } from '../components/ui/field-group-disclosure.types'
 import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type { ArrayItemShellRenderProps } from './config/array/array-item-shell-render.types'
+import {
+  DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
+  columnsNeedBreakpointReorder,
+  resolveColumnsCollapseSequence,
+  type FormColumnsCollapseIndex,
+  type FormColumnsCollapseOrder,
+} from './config/form-columns-collapse.lib'
 import type {
   FieldHintPosition,
   FieldLabelPosition,
@@ -47,6 +54,13 @@ import type { FormDensity } from './form-density'
 import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
 
 export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
+export {
+  DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
+  columnsNeedBreakpointReorder,
+  resolveColumnsCollapseSequence,
+  type FormColumnsCollapseIndex,
+  type FormColumnsCollapseOrder,
+}
 
 /** Opt-in sidebar / in-page navigation anchor on semantic containers. */
 export type FormNavigationAnchor = {
@@ -951,12 +965,13 @@ export interface RowConfig {
   errorPlacement?: 'auto' | 'field' | 'row'
 }
 
-/** Fields allowed inside a `group` or `dependent` — may nest one level or more. */
+/** Fields allowed inside a `group`, `dependent`, or column stack — may nest. */
 export type GroupFieldItem =
   | FieldConfig
   | RowConfig
   | SlotConfig
   | GroupConfig
+  | ColumnsConfig
   | DependentConfig
   | ArrayConfig
 
@@ -1077,6 +1092,49 @@ export interface GroupConfig {
    * `legend` — collapsible fieldset; `summary` — collapsed summary + Change/Done chrome.
    */
   disclosure?: FieldGroupDisclosure
+}
+
+/**
+ * One vertical stack in a `kind: 'columns'` layout.
+ */
+export interface FormColumnsColumn {
+  fields: FormItem[]
+}
+
+/**
+ * Multi-column layout (`kind: 'columns'`). Layout-only — no fieldset, no shared
+ * field container. Each child remains a top-level chrome unit.
+ *
+ * Wide (`md+`): independent stacks. Narrow default: column 1 then column 2
+ * (`collapseOrder: 'columns'`). `'interleave'` / tuples reorder DOM below `md`.
+ *
+ * Use `defineColumnsField()` for completion.
+ *
+ * @example
+ * defineColumnsField({
+ *   kind: 'columns',
+ *   columns: [
+ *     { fields: [{ type: 'text', name: 'title', label: 'Title' }] },
+ *     { fields: [{ type: 'select', name: 'hitDie', label: 'Hit die', options: [] }] },
+ *   ],
+ * })
+ */
+export interface ColumnsConfig {
+  kind: 'columns'
+  /** At least two stacks. */
+  columns: [FormColumnsColumn, FormColumnsColumn, ...FormColumnsColumn[]]
+  /**
+   * Collapsed reading order. Default `'columns'` (CSS-only). `'interleave'` and
+   * tuples use a breakpoint so DOM order matches the single-column layout.
+   */
+  collapseOrder?: FormColumnsCollapseOrder
+  className?: string
+  /** Optional DOM id on the columns wrapper — for in-page scroll anchors. */
+  id?: string
+  /** Trailing divider after this columns block within parent rhythm. */
+  separator?: FieldSeparator
+  /** When hidden, the whole columns block unmounts. */
+  visibility?: FieldVisibility
 }
 
 /** Layout profile for repeatable array item chrome. */
@@ -1279,21 +1337,22 @@ export interface SlotConfig {
  * Any item allowed at the top level of a form's `fields` array (or a tab panel).
  *
  * Leaf fields (`FieldConfig`), horizontal rows (`kind: 'row'`), and containers
- * (`group`, `dependent`, `array`, `slot`). Wrap trees with `defineForm()` or reusable
+ * (`group`, `columns`, `dependent`, `array`, `slot`). Wrap trees with `defineForm()` or reusable
  * sections with `defineFormItems()` — plain arrays remain valid.
  */
 export type FormItem =
   | FieldConfig
   | RowConfig
   | GroupConfig
+  | ColumnsConfig
   | DependentConfig
   | ArrayConfig
   | SlotConfig
 
-/** Narrows a `FormItem` to a container (row/group/dependent/array/slot) vs. a leaf field. */
+/** Narrows a `FormItem` to a container (row/group/columns/dependent/array/slot) vs. a leaf field. */
 export function isContainer(
   item: FormItem,
-): item is RowConfig | GroupConfig | DependentConfig | ArrayConfig | SlotConfig {
+): item is RowConfig | GroupConfig | ColumnsConfig | DependentConfig | ArrayConfig | SlotConfig {
   return 'kind' in item
 }
 
@@ -1316,6 +1375,10 @@ export function flattenFields(items: Array<FormItem | RowConfig>): FieldConfig[]
     } else if (item.kind === 'dependent') {
       fields.push(item.controller)
       fields.push(...flattenFields(item.dependents.fields as Array<FormItem | RowConfig>))
+    } else if (item.kind === 'columns') {
+      fields.push(
+        ...flattenFields(resolveColumnsCollapseSequence(item.columns, item.collapseOrder)),
+      )
     } else {
       fields.push(...flattenFields(item.fields as Array<FormItem | RowConfig>))
     }
@@ -1504,6 +1567,11 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
       }
     } else if (item.kind === 'group') {
       Object.assign(values, buildDefaultValues(item.fields as FormItem[]))
+    } else if (item.kind === 'columns') {
+      Object.assign(
+        values,
+        buildDefaultValues(resolveColumnsCollapseSequence(item.columns, item.collapseOrder)),
+      )
     } else if (item.kind === 'dependent') {
       assignFieldDefaultValues(item.controller, values)
       Object.assign(values, buildDefaultValues(item.dependents.fields as FormItem[]))

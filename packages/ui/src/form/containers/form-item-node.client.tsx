@@ -5,6 +5,7 @@ import { useFormSectionContext } from '../context/form-section.context'
 import { FieldNode } from './form-conditional.client'
 import { ConditionalGroup, GroupFieldSection } from './form-group-section.client'
 import { ConditionalRow, RowFieldSection } from './form-row-section.client'
+import { ColumnsFieldSection, ConditionalColumns } from './form-columns-section.client'
 import {
   ConditionalDependent,
   DependentSection,
@@ -104,6 +105,29 @@ export function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormI
     )
   }
 
+  if (item.kind === 'columns') {
+    if (item.visibility) {
+      return (
+        <ConditionalColumns
+          item={item}
+          idPrefix={idPrefix}
+          namePrefix={namePrefix}
+          depth={depth}
+          renderNestedItems={renderNestedFormItems}
+        />
+      )
+    }
+    return (
+      <ColumnsFieldSection
+        item={item}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+        depth={depth}
+        renderNestedItems={renderNestedFormItems}
+      />
+    )
+  }
+
   if (item.kind === 'dependent') {
     if (item.visibility) {
       return (
@@ -164,6 +188,13 @@ function prefixFormItemKey(namePrefix: string | undefined, key: string): string 
   return namePrefix ? `${namePrefix}.${key}` : key
 }
 
+const UNNAMED_CONTAINER_KEY_PREFIX = {
+  group: true,
+  columns: true,
+  dependent: true,
+  row: true,
+} as const
+
 export function formItemKey(
   item: FormItem | RowConfig,
   index: number,
@@ -175,20 +206,11 @@ export function formItemKey(
     return prefixFormItemKey(namePrefix, key)
   }
 
-  if (!('kind' in item)) return String(index)
-
-  switch (item.kind) {
-    case 'group':
-      return prefixFormItemKey(namePrefix, `group-${index}`)
-    case 'dependent':
-      return prefixFormItemKey(namePrefix, `dependent-${index}`)
-    case 'row':
-      return prefixFormItemKey(namePrefix, `row-${index}`)
-    case 'slot':
-      return prefixFormItemKey(namePrefix, item.name)
-    default:
-      return String(index)
+  if ('kind' in item && item.kind in UNNAMED_CONTAINER_KEY_PREFIX) {
+    return prefixFormItemKey(namePrefix, `${item.kind}-${index}`)
   }
+
+  return String(index)
 }
 
 export type { RenderNestedFormItemsProps } from './form-dependent-section.client'
