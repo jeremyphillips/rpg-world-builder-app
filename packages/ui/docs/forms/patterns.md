@@ -10,12 +10,13 @@ After the first failed submit: tab triggers show error counts, Save switches to 
 tab and focuses its control, and the sticky footer shows a summary with **Review {tab}** links.
 Inactive panels suppress per-field error text until their tab is active.
 
-**Sticky chrome** (default `stickyChrome={true}`): tab list `sticky top-0`; `FormActionsBar`
-sticky bottom with footer. Pass `stickyChrome={false}` for flat layout. Overlay pattern:
-use `externalFooter` with `FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar
-inside scroll content. Overlay owners render shell chrome (`Modal.Footer`, `Sheet.Footer`,
-`DrawerShell.Footer`) and place `<FormShellFooterSlot />` inside for semantic footer content.
-Use `FormShellSubmitButton` for submit actions rendered outside the `<form>` element.
+**Sticky chrome** (default `stickyChrome={true}`): section control `sticky top-0` in the field
+column; `FormActionsBar` sticky bottom with footer. Pass `stickyChrome={false}` for flat layout.
+Overlay pattern: use `externalFooter` with `FormShellFooterScope` / `FormShellFooterSlot`
+instead of sticky bar inside scroll content. Overlay owners render shell chrome
+(`Modal.Footer`, `Sheet.Footer`, `DrawerShell.Footer`) and place `<FormShellFooterSlot />`
+inside for semantic footer content. Use `FormShellSubmitButton` for submit actions rendered
+outside the `<form>` element.
 
 Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentClasses`.
 

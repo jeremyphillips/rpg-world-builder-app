@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { CampaignNpcDetail } from '@rpg/contracts'
+import { TABBED_FORM_SECTIONS_ARIA_LABEL } from '@rpg/ui/form'
 
 import { makeCampaignNpcDetail } from '@/test/fixtures/factories/additional/character'
 
@@ -257,7 +258,7 @@ describe('QuickNpcCreateModal', () => {
       screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
-    expect(screen.queryByRole('tab', { name: 'Details' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Details' })).not.toBeInTheDocument()
   })
 
   it('returns to authoring when a setup row is reconfirmed without changing the value', async () => {
@@ -268,7 +269,7 @@ describe('QuickNpcCreateModal', () => {
     await user.click(screen.getByRole('button', { name: 'Change role' }))
     await user.click(screen.getByRole('radio', { name: /no title/i }))
 
-    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Details' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
   })
 
@@ -321,7 +322,9 @@ describe('QuickNpcCreateModal', () => {
     expect(scrollRegion).toBeTruthy()
     expect(scrollRegion?.className).toContain('min-h-0')
     expect(scrollRegion?.className).toContain('pb-6')
-    expect(scrollRegion).toContainElement(screen.getByRole('tablist'))
+    expect(scrollRegion).toContainElement(
+      screen.getByRole('group', { name: TABBED_FORM_SECTIONS_ARIA_LABEL }),
+    )
   })
 
   it('walks setup then authoring and returns to add on cancel', async () => {
@@ -329,7 +332,7 @@ describe('QuickNpcCreateModal', () => {
     const { props } = renderModal()
 
     await completeSetup(user)
-    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Details' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.onCancel).toHaveBeenCalledTimes(1)
@@ -643,7 +646,7 @@ describe('QuickNpcCreateModal standalone context', () => {
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     expect(screen.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Continue' }))
-    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Details' })).toBeInTheDocument()
   })
 
   it('blocks build until class is selected when campaign min is above 0', async () => {

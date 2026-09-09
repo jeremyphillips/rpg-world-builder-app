@@ -30,14 +30,17 @@ you need — and consider whether the gap belongs in the renderer.
 ## TabbedForm
 
 All tab panels stay mounted so every field registers and Save validates the **merged** schema.
+Section navigation is a [`SegmentedControl`](../src/components/ui/segmented-control.client.tsx)
+in the same field-stack column as `FormItems` / FieldGroups.
 
-After the first failed submit, invalid tabs show **count badges** on their triggers, the form
-**auto-switches** to the first invalid tab and focuses its control, and a **footer summary**
+After the first failed submit, invalid sections show **count badges** on their triggers, the form
+**auto-switches** to the first invalid section and focuses its control, and a **footer summary**
 (`role="status"`) lists affected tabs with **Review {tab}** actions. Badges and the summary
 live-update as errors are fixed and disappear when validation passes. Inactive panels still
 suppress inline error text until their tab is active.
 
-Optional non-field UI: `TabbedFormTab.header`. Sticky chrome, sheets, and footers:
+Optional `TabbedFormTab.leadingIcon` (decorative Lucide node with `aria-hidden`). Optional
+non-field UI: `TabbedFormTab.header`. Sticky chrome, sheets, and footers:
 [patterns.md](./forms/patterns.md#tabbedform).
 
 ### `errorPaths` for header-only tabs

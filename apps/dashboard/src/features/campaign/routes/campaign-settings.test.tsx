@@ -75,10 +75,10 @@ describe('CampaignSettings', () => {
   it('shows identity, flavor, and world tabs', async () => {
     renderSettings()
     await screen.findByDisplayValue('Sunless Citadel')
-    expect(screen.getByRole('tab', { name: 'Identity' })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'Flavor' })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'World' })).toBeInTheDocument()
-    expect(screen.queryByRole('tab', { name: 'Rules' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Identity' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Flavor' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'World' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Rules' })).not.toBeInTheDocument()
   })
 
   it('shows the saved banner preview when the campaign has an imageKey', async () => {

@@ -254,5 +254,6 @@ describe('speciesFormDef.buildTabs', () => {
     const tabs = speciesFormDef.buildTabs!({})
     expect(tabs).toHaveLength(4)
     expect(tabs.map((tab) => tab.id)).toEqual(['basics', 'traits', 'heritage', 'rules'])
+    expect(tabs.every((tab) => tab.leadingIcon)).toBe(true)
   })
 })

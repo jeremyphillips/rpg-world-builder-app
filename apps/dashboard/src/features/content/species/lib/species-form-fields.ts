@@ -18,6 +18,7 @@ import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/vocabulary'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
+import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
@@ -208,5 +209,5 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       ],
       header: createElement(SpeciesRulesTab, { formCtx: ctx }),
     },
-  ]
+  ].map(withContentFormTabIcon)
 }

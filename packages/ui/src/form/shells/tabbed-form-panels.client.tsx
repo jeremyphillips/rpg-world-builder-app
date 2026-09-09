@@ -6,8 +6,11 @@ import type { ZodType } from 'zod'
 
 import { cn } from '../../lib/utils'
 import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
+import {
+  SegmentedControl,
+  type SegmentedControlOption,
+} from '../../components/ui/segmented-control.client'
 import { Text } from '../../components/ui/text'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs.client'
 import { FormItems } from '../containers/form-items.client'
 import { ArrayItemPresentationContext } from '../context/array-item-presentation.context'
 import { useFormSectionContext } from '../context/form-section.context'
@@ -16,20 +19,27 @@ import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import { buildDefaultValues, type FormItem } from '../field-config'
 import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-validation-state.client'
 import { FormActionsBar } from '../chrome/form-actions-bar'
-import { getTabPanelIdPrefix } from './tabbed-form-id.lib'
+import { getTabPanelElementId, getTabPanelIdPrefix } from './tabbed-form-id.lib'
 import { TabbedFormTabIssueBadge } from './tabbed-form-tab-issue-badge.client'
 import {
   formFooterSpacingClasses,
   formStickyTabsClasses,
+  formTabbedInactivePanelClasses,
+  formTabbedNavOverflowClasses,
   formTabPanelsBottomPaddingClasses,
 } from '../chrome/form-chrome.variants'
 import { warnHeaderOnlyTabValidationWiring } from './warn-header-only-tab-validation-wiring'
+
+/** Accessible name for the TabbedForm section control. */
+export const TABBED_FORM_SECTIONS_ARIA_LABEL = 'Form sections'
 
 /** A single tab definition: an id, a display label, and its ordered fields. */
 export interface TabbedFormTab {
   id: string
   label: string
   fields: FormItem[]
+  /** Optional leading icon for the section control (decorative; pass `aria-hidden`). */
+  leadingIcon?: React.ReactNode
   /**
    * Extra root paths whose validation issues belong to this tab (merged with
    * prefixes inferred from `fields`; supplements only — does not replace them).
@@ -139,7 +149,14 @@ function TabbedFormTabPanel({
   const isActive = activeTabId === tab.id
 
   return (
-    <TabsContent value={tab.id} forceMount data-tab-panel={tab.id}>
+    <div
+      role="region"
+      id={getTabPanelElementId(formId, tab.id)}
+      aria-label={tab.label}
+      data-tab-panel={tab.id}
+      data-state={isActive ? 'active' : 'inactive'}
+      className={cn(!isActive && formTabbedInactivePanelClasses)}
+    >
       <ArrayItemPresentationContext.Provider
         value={{ suppressFieldErrorText: !isActive, rowSummaryId: undefined }}
       >
@@ -150,8 +167,25 @@ function TabbedFormTabPanel({
           ) : null}
         </div>
       </ArrayItemPresentationContext.Provider>
-    </TabsContent>
+    </div>
   )
+}
+
+function buildTabbedFormSectionOptions(
+  tabs: TabbedFormTab[],
+  formId: string,
+  issueCountForTab: (tabId: string) => number,
+): SegmentedControlOption<string>[] {
+  return tabs.map((tab) => ({
+    value: tab.id,
+    label: tab.label,
+    leadingIcon: tab.leadingIcon,
+    trailing: <TabbedFormTabIssueBadge count={issueCountForTab(tab.id)} />,
+    buttonProps: {
+      'data-tab-trigger': tab.id,
+      'aria-controls': getTabPanelElementId(formId, tab.id),
+    },
+  }))
 }
 
 export function TabbedFormPanels({
@@ -170,25 +204,32 @@ export function TabbedFormPanels({
     () => new Map(tabStates.map((state) => [state.tabId, state])),
     [tabStates],
   )
+  const sectionOptions = React.useMemo(
+    () =>
+      buildTabbedFormSectionOptions(tabs, formId, (tabId) => tabStateById.get(tabId)?.count ?? 0),
+    [formId, tabStateById, tabs],
+  )
   const panelClassName = cn(
     fieldStackRhythmVariants({ rhythm }),
     stickyChrome && !omitPanelBottomPadding ? formTabPanelsBottomPaddingClasses : undefined,
   )
 
   return (
-    <Tabs value={activeTabId} onValueChange={onActiveTabChange} variant="line">
-      <div className={cn(stickyChrome ? formStickyTabsClasses : undefined, stickyTabsClassName)}>
-        <TabsList>
-          {tabs.map((tab) => {
-            const issueCount = tabStateById.get(tab.id)?.count ?? 0
-            return (
-              <TabsTrigger key={tab.id} value={tab.id} data-tab-trigger={tab.id}>
-                {tab.label}
-                <TabbedFormTabIssueBadge count={issueCount} />
-              </TabsTrigger>
-            )
-          })}
-        </TabsList>
+    <div className={fieldStackRhythmVariants({ rhythm })}>
+      <div
+        className={cn(
+          formTabbedNavOverflowClasses,
+          stickyChrome ? formStickyTabsClasses : undefined,
+          stickyTabsClassName,
+        )}
+      >
+        <SegmentedControl
+          value={activeTabId}
+          options={sectionOptions}
+          onValueChange={onActiveTabChange}
+          fullWidth
+          aria-label={TABBED_FORM_SECTIONS_ARIA_LABEL}
+        />
       </div>
       {tabs.map((tab) => (
         <TabbedFormTabPanel
@@ -199,7 +240,7 @@ export function TabbedFormPanels({
           activeTabId={activeTabId}
         />
       ))}
-    </Tabs>
+    </div>
   )
 }
 

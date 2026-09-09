@@ -688,6 +688,7 @@ export {
 export {
   SegmentedControl,
   type SegmentedControlOption,
+  type SegmentedControlOptionButtonProps,
   type SegmentedControlProps,
   type SegmentedControlSegmentWidth,
 } from './components/ui/segmented-control.client'

@@ -234,7 +234,8 @@ paths. `errorPaths` drives tab UX; `resolverFields` drives validation message co
 - `embeddedArrayResolverField(name, legend, itemFields)` — resolver-only array config.
 
 **Reference implementations:** `buildSpeciesTabs` and `buildClassTabs` in
-`species-form-fields.ts` / `class-form-fields.ts`. Non-form chrome tabs (e.g. class
+`species-form-fields.ts` / `class-form-fields.ts`. Section icons come from
+`content-form-tab-icons.ts` (`TabbedFormTab.leadingIcon`). Non-form chrome tabs (e.g. class
 subclasses management) set `skipHeaderOnlyValidationWiring: true`.
 
 **Tests:** `assertHeaderOnlyTabsHaveValidationWiring(tabs)` in

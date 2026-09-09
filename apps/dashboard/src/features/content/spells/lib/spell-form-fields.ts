@@ -23,6 +23,7 @@ import {
   vocabularyFieldLabel,
 } from '@/features/vocabulary'
 
+import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import {
   descriptionField,
   feetInputUnitField,
@@ -613,5 +614,5 @@ export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       resolverFields: resolutionOutcomeApplicationsResolverFields(),
     },
     { id: 'tags', label: 'Tags', fields: tagFields(ctx) },
-  ]
+  ].map(withContentFormTabIcon)
 }

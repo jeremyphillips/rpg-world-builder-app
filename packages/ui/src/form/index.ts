@@ -61,6 +61,7 @@ export {
 export {
   TabbedForm,
   collectTabbedFormResolverItems,
+  TABBED_FORM_SECTIONS_ARIA_LABEL,
   type TabbedFormProps,
   type TabbedFormTab,
 } from './shells/tabbed-form.client'
@@ -94,6 +95,8 @@ export {
   formStickyActionsBarTransparentClasses,
   formStickyTabsClasses,
   formStickyTabsTransparentClasses,
+  formTabbedInactivePanelClasses,
+  formTabbedNavOverflowClasses,
   formTabPanelsBottomPaddingClasses,
   formTabbedChromeRhythmStackClasses,
   formSheetScrollRegionClasses,
