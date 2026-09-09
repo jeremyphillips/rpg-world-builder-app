@@ -9,7 +9,12 @@ import {
   hasActiveFieldChrome,
   resolveEffectiveFieldChrome,
 } from '../../components/ui/field-chrome.variants'
-import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
+import { isSummaryDisclosure } from '../../components/ui/field-group-disclosure.types'
+import {
+  fieldGroupBottomMarginClasses,
+  fieldSetChromeContainClasses,
+  fieldStackRhythmVariants,
+} from '../../components/ui/field.variants'
 import { resolveFormDensity } from '../form-density'
 import { cn } from '../../lib/utils'
 import {
@@ -34,6 +39,7 @@ import type {
 import { normalizeFieldHint } from '../field-config'
 import { useVisibilityValues } from './form-conditional.client'
 import type { RenderNestedFormItems } from './form-dependent-section.client'
+import type { FieldChrome } from '../../components/ui/field-chrome.variants'
 
 interface GroupFieldSectionProps {
   item: GroupConfig
@@ -41,6 +47,79 @@ interface GroupFieldSectionProps {
   namePrefix?: string
   depth: number
   renderNestedItems: RenderNestedFormItems
+}
+
+interface GroupContainerLayout {
+  chromeActive: boolean
+  wrapEntireGroup: boolean
+  inParentRhythm: boolean
+}
+
+function resolveGroupContainerLayout(
+  groupFieldChrome: FieldChrome | undefined,
+  disclosure: GroupConfig['disclosure'],
+  parentContext: ReturnType<typeof useFormSectionContext>,
+): GroupContainerLayout {
+  const chromeActive = hasActiveFieldChrome(groupFieldChrome)
+  return {
+    chromeActive,
+    wrapEntireGroup: chromeActive && !(disclosure && isSummaryDisclosure(disclosure)),
+    inParentRhythm: Boolean(parentContext.inGroup || parentContext.inRhythmStack),
+  }
+}
+
+function GroupFieldStackBody({
+  nestedFields,
+  chromeActive,
+  wrapEntireGroup,
+  groupFieldChrome,
+  groupSize,
+  groupRhythm,
+}: {
+  nestedFields: React.ReactNode
+  chromeActive: boolean
+  wrapEntireGroup: boolean
+  groupFieldChrome: FieldChrome | undefined
+  groupSize: ReturnType<typeof resolveFormDensity>['size']
+  groupRhythm: ReturnType<typeof resolveFormDensity>['rhythm']
+}) {
+  if (!chromeActive || wrapEntireGroup) return nestedFields
+
+  return (
+    <FieldChromeShell
+      chrome={groupFieldChrome}
+      size={groupSize}
+      className={fieldStackRhythmVariants({ rhythm: groupRhythm })}
+    >
+      {nestedFields}
+    </FieldChromeShell>
+  )
+}
+
+function GroupFieldOuterChrome({
+  wrapEntireGroup,
+  groupFieldChrome,
+  groupSize,
+  inParentRhythm,
+  children,
+}: {
+  wrapEntireGroup: boolean
+  groupFieldChrome: FieldChrome | undefined
+  groupSize: ReturnType<typeof resolveFormDensity>['size']
+  inParentRhythm: boolean
+  children: React.ReactNode
+}) {
+  if (!wrapEntireGroup) return children
+
+  return (
+    <FieldChromeShell
+      chrome={groupFieldChrome}
+      size={groupSize}
+      className={inParentRhythm ? undefined : fieldGroupBottomMarginClasses}
+    >
+      {children}
+    </FieldChromeShell>
+  )
 }
 
 export function GroupFieldSection({
@@ -100,28 +179,35 @@ export function GroupFieldSection({
     return typeof hint === 'string' ? hint : normalizeFieldHint(hint).text
   }, [heading?.hint, item.description])
 
-  const nestedFields = renderNestedItems({
-    items: item.fields,
-    idPrefix,
-    namePrefix,
-    depth: depth + 1,
-  })
-
-  // FieldGroup's body rhythm only gaps its direct children. A shared FieldChromeShell
-  // is one child, so sibling field gap must live inside the shell.
-  const chromedFields = hasActiveFieldChrome(groupFieldChrome) ? (
-    <FieldChromeShell
-      chrome={groupFieldChrome}
-      size={groupSize}
-      className={fieldStackRhythmVariants({ rhythm: groupRhythm })}
-    >
-      <FormSectionContext.Provider value={childContext}>{nestedFields}</FormSectionContext.Provider>
-    </FieldChromeShell>
-  ) : (
-    <FormSectionContext.Provider value={childContext}>{nestedFields}</FormSectionContext.Provider>
+  const nestedFields = (
+    <FormSectionContext.Provider value={childContext}>
+      {renderNestedItems({
+        items: item.fields,
+        idPrefix,
+        namePrefix,
+        depth: depth + 1,
+      })}
+    </FormSectionContext.Provider>
   )
 
-  return (
+  const { chromeActive, wrapEntireGroup, inParentRhythm } = resolveGroupContainerLayout(
+    groupFieldChrome,
+    item.disclosure,
+    parentContext,
+  )
+
+  const groupBody = (
+    <GroupFieldStackBody
+      nestedFields={nestedFields}
+      chromeActive={chromeActive}
+      wrapEntireGroup={wrapEntireGroup}
+      groupFieldChrome={groupFieldChrome}
+      groupSize={groupSize}
+      groupRhythm={groupRhythm}
+    />
+  )
+
+  const group = (
     <FieldGroup
       id={item.id}
       legend={heading?.label ?? item.legend}
@@ -131,7 +217,8 @@ export function GroupFieldSection({
       description={description}
       className={cn(
         item.className,
-        (parentContext.inGroup || parentContext.inRhythmStack) && 'mb-0',
+        wrapEntireGroup && fieldSetChromeContainClasses,
+        (inParentRhythm || wrapEntireGroup) && 'mb-0',
       )}
       chrome={item.chrome}
       disclosure={item.disclosure}
@@ -139,8 +226,19 @@ export function GroupFieldSection({
       collapseKey={item.id}
       formControl={control}
     >
-      {chromedFields}
+      {groupBody}
     </FieldGroup>
+  )
+
+  return (
+    <GroupFieldOuterChrome
+      wrapEntireGroup={wrapEntireGroup}
+      groupFieldChrome={groupFieldChrome}
+      groupSize={groupSize}
+      inParentRhythm={inParentRhythm}
+    >
+      {group}
+    </GroupFieldOuterChrome>
   )
 }
 

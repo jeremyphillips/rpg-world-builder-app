@@ -1067,8 +1067,9 @@ export interface GroupConfig {
    */
   chrome?: FieldGroupChrome
   /**
-   * Shared field-container override for this group’s field stack (legend stays outside).
-   * Also cascades to descendants when the shared container is opted out with `none`.
+   * Shared field-container override for this group’s fieldset (legend, description,
+   * and field stack). Also cascades to descendants when the shared container is
+   * opted out with `none`.
    */
   fieldChrome?: FieldChrome
   /**

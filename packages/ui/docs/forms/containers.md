@@ -131,7 +131,9 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 ```
 
 Legend header margin (`mb-5` / `mb-4`) lives on the legend header block; `<legend>` is `w-full`
-and sits **outside** panel, outline, inset, and callout boxes. Divider and accent-top chrome
+and sits **outside** panel, outline, inset, and callout **group chrome** boxes. The default
+field container wraps the whole fieldset, including the legend and description — see
+[Field container chrome](#field-container-chrome-default). Divider and accent-top chrome
 apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 
 ## Rows
@@ -249,11 +251,11 @@ solid background + border + 16px padding (`{ variant: 'container' }`) — regard
 slots) receives field-container treatment. Arrays keep the existing **item-shell** model
 (elevated cards), not a field-container wrap of the whole list.
 
-**Label and hint sit inside the box; validation errors sit outside.** For groups, the
-fieldset **legend stays outside** the field container (field stack only is wrapped). Chip
-and choose-count fields keep a real `<legend>` (direct fieldset child) but put the visible
-box on `FieldChromeShell` around a **borderless** fieldset — UA legend overlay cannot sit
-on the container border.
+**Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
+borderless `<fieldset>` (legend, description, and field stack) in `FieldChromeShell`,
+matching chip and choose-count fields — UA legend overlay cannot sit on the container
+border. Summary-disclosure groups still wrap only the expanded field stack so collapsed
+summary chrome stays outside the box.
 
 Resolution order:
 

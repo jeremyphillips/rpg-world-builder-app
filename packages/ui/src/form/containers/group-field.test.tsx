@@ -16,11 +16,12 @@ const schema = z.object({
 })
 
 describe('group field container', () => {
-  it('wraps a top-level group field stack in one shared field container', () => {
+  it('wraps a top-level group fieldset in one shared field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
         legend: 'Defenses',
+        description: 'Saving throws and armor training.',
         fields: [
           {
             type: 'chips',
@@ -56,10 +57,13 @@ describe('group field container', () => {
     expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     const shell = container.querySelector('.bg-field-container')
     expect(shell).toBeInstanceOf(HTMLElement)
-    expect(shell).toHaveClass('flex', 'flex-col', 'gap-6')
+    const fieldset = screen.getByRole('group', { name: /Defenses/ })
+    expect(shell).toContainElement(fieldset)
+    expect(fieldset).toHaveClass('border-0', 'flex', 'flex-col')
+    expect(shell).toContainElement(screen.getByText('Defenses'))
+    expect(shell).toContainElement(screen.getByText('Saving throws and armor training.'))
     expect(shell).toContainElement(screen.getByText('Saving throws'))
     expect(shell).toContainElement(screen.getByText('Armor training'))
-    expect(screen.getByRole('group', { name: 'Defenses' })).toContainElement(shell as HTMLElement)
   })
 
   it('keeps nested groups inside the parent field container', () => {
@@ -106,6 +110,7 @@ describe('group field container', () => {
 
     expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     const shell = container.querySelector('.bg-field-container')
+    expect(shell).toContainElement(screen.getByText('Granted skills & tools'))
     expect(shell).toContainElement(screen.getByText('Granted skills'))
     expect(shell).toContainElement(screen.getByRole('group', { name: 'Tools' }))
     expect(shell).toContainElement(screen.getByLabelText('Specific tools'))
@@ -155,6 +160,7 @@ describe('group field container', () => {
 
     expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     const shell = container.querySelector('.bg-field-container')
+    expect(shell).toContainElement(screen.getByText('Weapons'))
     expect(shell).toContainElement(screen.getByText('Weapon proficiency mode'))
     expect(shell).toContainElement(screen.getByText('Weapon categories'))
   })
@@ -187,5 +193,46 @@ describe('group field container', () => {
 
     expect(container.querySelector('.bg-field-container')).toBeNull()
     expect(screen.getByLabelText('Note')).toBeInTheDocument()
+  })
+
+  it('keeps summary-disclosure headers outside the field container', () => {
+    const fields: FormItem[] = [
+      {
+        kind: 'group',
+        id: 'availability',
+        legend: 'Campaign availability',
+        disclosure: {
+          variant: 'summary',
+          defaultOpen: true,
+          openLabel: 'Change',
+          closeLabel: 'Done',
+          resolveSummary: () => ({ primary: 'Available' }),
+        },
+        fields: [
+          {
+            type: 'text',
+            name: 'note',
+            label: 'Note',
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form
+        schema={schema}
+        fields={fields}
+        defaultValues={{ savingThrows: [], armor: [] }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const shell = container.querySelector('.bg-field-container')
+    expect(shell).toBeInstanceOf(HTMLElement)
+    expect(shell).toContainElement(screen.getByLabelText('Note'))
+    expect(shell).not.toContainElement(screen.getByText('Campaign availability'))
+    expect(screen.getByRole('group', { name: /Campaign availability/ })).toContainElement(
+      shell as HTMLElement,
+    )
   })
 })

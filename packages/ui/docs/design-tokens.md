@@ -168,8 +168,9 @@ Schema-driven form fields default to a boxed container shell (`{ variant: 'conta
 - Public utility: `bg-field-container` in `globals.css`.
 - Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
 - Padding: 16px (`p-4`).
-- Fieldset leaves (`ChipsField`, choose-count shells) wrap a borderless `<fieldset>` in
-  `FieldChromeShell` so `<legend>` cannot sit on the visible container border.
+- Fieldset leaves (`ChipsField`, choose-count shells) and schema `kind: 'group'` wrap a
+  borderless `<fieldset>` in `FieldChromeShell` so `<legend>` cannot sit on the visible
+  container border. Group legends and description text render inside that box.
 
 Opt out with `{ variant: 'none' }` on a top-level leaf, row, slot, or dependent, or
 `fieldChrome: { variant: 'none' }` on a group. Nested content under a top-level container
