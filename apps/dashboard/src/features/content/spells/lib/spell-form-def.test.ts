@@ -6,7 +6,14 @@ import {
   ELDRITCH_BLAST_RESOLUTION,
   type CreateSpellInput,
 } from '@rpg/contracts'
-import type { FormItem, GroupConfig, RowConfig, ArrayConfig } from '@rpg/ui/form'
+import {
+  isContainer,
+  resolveColumnsCollapseSequence,
+  type FormItem,
+  type GroupConfig,
+  type RowConfig,
+  type ArrayConfig,
+} from '@rpg/ui/form'
 
 import { makeSpell } from '@/test/fixtures/factories/spell'
 import { RESOLUTION_FORM_FIXTURES } from '../resolution/fixtures'
@@ -15,29 +22,33 @@ import { RESOLUTION_SECTION_LABELS } from '../resolution/lib/form/resolution-for
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')
 
-function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined {
-  for (const field of fields) {
-    if ('kind' in field && field.kind === 'group') {
-      if (field.legend === legend) return field
-      const nested = findGroup(field.fields, legend)
-      if (nested) return nested
-    }
-  }
-
-  return undefined
-}
-
 function walkNestedFormItems(fields: FormItem[], visit: (field: FormItem) => void): void {
   for (const field of fields) {
     visit(field)
-    if ('kind' in field && field.kind === 'group') {
+    if (!isContainer(field)) continue
+    if (field.kind === 'group') {
       walkNestedFormItems(field.fields, visit)
+      continue
     }
-    if ('kind' in field && field.kind === 'dependent') {
+    if (field.kind === 'dependent') {
       visit(field.controller)
       walkNestedFormItems(field.dependents.fields, visit)
+      continue
+    }
+    if (field.kind === 'columns') {
+      walkNestedFormItems(resolveColumnsCollapseSequence(field.columns, field.collapseOrder), visit)
     }
   }
+}
+
+function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined {
+  let found: GroupConfig | undefined
+  walkNestedFormItems(fields, (field) => {
+    if (!found && isContainer(field) && field.kind === 'group' && field.legend === legend) {
+      found = field
+    }
+  })
+  return found
 }
 
 function findArrayField(fields: FormItem[], name: string): ArrayConfig | undefined {
@@ -66,6 +77,10 @@ function collectFieldNames(fields: FormItem[]): string[] {
     } else if ('kind' in field && field.kind === 'dependent') {
       names.push(field.controller.name)
       names.push(...collectFieldNames(field.dependents.fields))
+    } else if ('kind' in field && field.kind === 'columns') {
+      names.push(
+        ...collectFieldNames(resolveColumnsCollapseSequence(field.columns, field.collapseOrder)),
+      )
     }
   }
   return names
@@ -415,5 +430,64 @@ describe('spellFormDef create vs update modes', () => {
 
     const input = spellFormDef.toInput(formValues, { entity: spellWithResolution })
     expect(input.resolution).toBeNull()
+  })
+})
+
+describe('spellFormDef basics tab', () => {
+  function basicsColumns() {
+    const basics = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'basics')
+    const [columns] = basics?.fields ?? []
+    if (!columns || !isContainer(columns) || columns.kind !== 'columns') {
+      throw new Error('Expected spell Basics columns layout')
+    }
+    return columns
+  }
+
+  it('authors School, Classes, and Description on the left and Level on the right', () => {
+    const columns = basicsColumns()
+    expect(columns.collapseOrder).toBe('interleave')
+
+    const [left, right] = columns.columns
+    expect(
+      left?.fields.map((field) =>
+        'legend' in field ? field.legend : 'name' in field ? field.name : undefined,
+      ),
+    ).toEqual(['School', 'classIds', 'description'])
+    expect(right?.fields.map((field) => ('legend' in field ? field.legend : undefined))).toEqual([
+      'Level',
+    ])
+  })
+
+  it('stacks School, Level, Classes, then Description', () => {
+    const columns = basicsColumns()
+    expect(
+      resolveColumnsCollapseSequence(columns.columns, columns.collapseOrder).map((field) =>
+        'legend' in field ? field.legend : 'name' in field ? field.name : undefined,
+      ),
+    ).toEqual(['School', 'Level', 'classIds', 'description'])
+  })
+
+  it('uses a single-select level chip with nested scaling dependents', () => {
+    const levelGroup = findGroup(
+      spellFormDef.buildTabs!({}).find((tab) => tab.id === 'basics')?.fields ?? [],
+      'Level',
+    )
+    const levelDependent = levelGroup?.fields[0]
+    if (!levelDependent || !isContainer(levelDependent) || levelDependent.kind !== 'dependent') {
+      throw new Error('Expected Level dependent')
+    }
+
+    expect(levelDependent.controller).toMatchObject({
+      type: 'chips',
+      name: 'level',
+      multiple: false,
+    })
+    expect(levelDependent.controller).not.toHaveProperty('defaultValue')
+    expect(levelDependent.dependents.visibility).toEqual(
+      expect.objectContaining({ dependsOn: ['level'] }),
+    )
+    expect(
+      levelDependent.dependents.fields.map((field) => ('name' in field ? field.name : undefined)),
+    ).toEqual(['cantripScaling', 'higherLevelSlotEffect'])
   })
 })
