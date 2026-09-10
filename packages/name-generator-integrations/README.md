@@ -27,13 +27,14 @@ Core and data must not import this package.
 
 ## Public API
 
-| Export                         | Role                                                  |
-| ------------------------------ | ----------------------------------------------------- |
-| `buildNamingCultureContext`    | Species → `NamingCultureContext`                      |
-| `resolveNamingConvention`      | Definition + context → `NamingConvention`             |
-| `resolveCampaignConventions`   | Campaign species + bindings → conventions             |
-| `resolveStandaloneConventions` | `STANDALONE_NAMING_CULTURES` + bindings → conventions |
-| `buildSpeciesNamingOptions`    | Derived UI view model for species filter              |
+| Export                          | Role                                                  |
+| ------------------------------- | ----------------------------------------------------- |
+| `buildNamingCultureContext`     | Species → `NamingCultureContext`                      |
+| `resolveSpeciesCultureContexts` | Species + heritage cultures → one context per culture |
+| `resolveNamingConvention`       | Definition + context → `NamingConvention`             |
+| `resolveCampaignConventions`    | Campaign species + bindings → conventions             |
+| `resolveStandaloneConventions`  | `STANDALONE_NAMING_CULTURES` + bindings → conventions |
+| `buildSpeciesNamingOptions`     | Derived UI view model for species filter              |
 
 ## Convention composition
 
@@ -43,7 +44,7 @@ Dashboard (and tests) compose explicitly — there is no single merged list func
 const campaignConventions = resolveCampaignConventions({
   species,
   bindings: CULTURE_CONVENTION_BINDINGS,
-  heritageAliases: HERITAGE_CULTURE_ALIASES,
+  heritageCultures: HERITAGE_NAMING_CULTURES,
 })
 const standaloneConventions = resolveStandaloneConventions({
   cultures: STANDALONE_NAMING_CULTURES,
@@ -63,6 +64,15 @@ context, then merges explicit definition associations by semantic key:
 | `language:{languageId}` | `language:elvish` |
 
 When strengths conflict, the higher rank wins: `primary` > `secondary` > `influenced`.
+
+## Heritage cultures
+
+`resolveCampaignConventions` resolves one culture context per species plus one
+per matching `HERITAGE_NAMING_CULTURES` row (matched on species slug and the
+heritage option ids present on the campaign species), so lineages such as
+`elven-drow` get their own conventions with their own language associations.
+`buildSpeciesNamingOptions` reports the naming-relevant heritages — each with the
+culture id it routes to — for the dashboard heritage filter.
 
 ## Commands
 

@@ -2,6 +2,10 @@ export { STANDALONE_NAMING_CULTURES } from './cultures/standalone-cultures'
 export { CULTURE_CONVENTION_BINDINGS } from './definitions/culture-bindings'
 export { HERITAGE_CULTURE_ALIASES } from './heritage/heritage-culture-aliases'
 export {
+  getHeritageNamingCulture,
+  HERITAGE_NAMING_CULTURES,
+} from './heritage/heritage-naming-cultures'
+export {
   buildCultureContextFields,
   getConventionCultureId,
   getNamingCulture,

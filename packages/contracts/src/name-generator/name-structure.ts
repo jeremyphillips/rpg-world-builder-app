@@ -13,6 +13,7 @@ export const NAME_PART_ROLES = [
   'epithet',
   'title',
   'descriptor',
+  'emblem',
   'placeRoot',
   'placeSuffix',
   'organizationType',

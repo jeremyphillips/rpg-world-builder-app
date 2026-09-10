@@ -30,6 +30,7 @@ export const NAME_POOL_ROLES = [
   'epithet',
   'title',
   'descriptor',
+  'emblem',
   'placeRoot',
   'placeSuffix',
   'organizationType',

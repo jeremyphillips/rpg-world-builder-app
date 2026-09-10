@@ -76,6 +76,14 @@ function conventionHasCulture(convention: NamingConvention, cultureId: string): 
   )
 }
 
+/** Base culture plus every heritage-routed culture the species can reach. */
+function getSpeciesCultureIds(option: SpeciesNamingOption): string[] {
+  return [
+    ...option.cultureIds,
+    ...(option.heritageOptions ?? []).map((heritage) => heritage.cultureId),
+  ]
+}
+
 function conventionMatchesSpecies(
   convention: NamingConvention,
   speciesId: string,
@@ -95,7 +103,9 @@ function conventionMatchesSpecies(
     )
   }
 
-  return option.cultureIds.some((cultureId) => conventionHasCulture(convention, cultureId))
+  return getSpeciesCultureIds(option).some((cultureId) =>
+    conventionHasCulture(convention, cultureId),
+  )
 }
 
 export function filterConventionsByPartialFilters(
@@ -234,6 +244,18 @@ function getStandaloneCultureLanguageIds(
   return culture.languageIds
 }
 
+function getSelectedSpeciesOption(
+  speciesId: string | undefined,
+  speciesNamingOptions: readonly SpeciesNamingOption[],
+): SpeciesNamingOption | undefined {
+  if (speciesId === undefined) {
+    return undefined
+  }
+
+  const option = speciesNamingOptions.find((entry) => entry.speciesId === speciesId)
+  return option?.disabled === false ? option : undefined
+}
+
 function buildCultureOptions(
   conventions: readonly NamingConvention[],
   filters: PartialFilters,
@@ -259,17 +281,11 @@ function buildCultureOptions(
     }
   }
 
-  if (filters.speciesId !== undefined) {
-    const speciesOption = speciesNamingOptions.find(
-      (option) => option.speciesId === filters.speciesId,
-    )
-    if (speciesOption !== undefined && !speciesOption.disabled) {
-      for (const cultureId of speciesOption.cultureIds) {
-        const culture = cultures.find((entry) => entry.id === cultureId)
-        if (culture !== undefined) {
-          selectableCultures.set(culture.id, culture)
-        }
-      }
+  const speciesOption = getSelectedSpeciesOption(filters.speciesId, speciesNamingOptions)
+  for (const cultureId of speciesOption === undefined ? [] : getSpeciesCultureIds(speciesOption)) {
+    const culture = cultures.find((entry) => entry.id === cultureId)
+    if (culture !== undefined) {
+      selectableCultures.set(culture.id, culture)
     }
   }
 
@@ -279,6 +295,18 @@ function buildCultureOptions(
       label: culture.label,
     }))
     .sort((left, right) => left.label.localeCompare(right.label))
+}
+
+function buildHeritageOptions(
+  filters: PartialFilters,
+  speciesNamingOptions: readonly SpeciesNamingOption[],
+): FilterOption[] {
+  const speciesOption = getSelectedSpeciesOption(filters.speciesId, speciesNamingOptions)
+
+  return (speciesOption?.heritageOptions ?? []).map((option) => ({
+    id: option.id,
+    label: option.label,
+  }))
 }
 
 function buildGenderStyleOptions(): FilterOption[] {
@@ -323,8 +351,12 @@ export function deriveVisibleFilters(
 
   const showLanguageCulture = SUBJECTS_WITH_LANGUAGE_CULTURE_FILTER.has(filters.subjectKind)
 
+  const showSpecies =
+    SUBJECTS_WITH_SPECIES_FILTER.has(filters.subjectKind) && hasSpeciesAssociations
+
   return {
-    species: SUBJECTS_WITH_SPECIES_FILTER.has(filters.subjectKind) && hasSpeciesAssociations,
+    species: showSpecies,
+    heritage: showSpecies && buildHeritageOptions(filters, speciesNamingOptions).length > 0,
     language: showLanguageCulture && hasLanguageAssociations,
     culture: showLanguageCulture && hasCultureAssociations,
     genderStyle: SUBJECTS_WITH_GENDER_FILTER.has(filters.subjectKind),
@@ -361,6 +393,7 @@ export function deriveFilterOptions(
   return {
     subjectKinds: buildSubjectOptions(conventions),
     speciesIds: buildSpeciesOptions(speciesNamingOptions),
+    heritageIds: buildHeritageOptions(filters, speciesNamingOptions),
     languageIds: buildLanguageOptions(languageConventions, cultures),
     cultureIds: buildCultureOptions(cultureConventions, filters, cultures, speciesNamingOptions),
     genderStyles: buildGenderStyleOptions(),
@@ -381,6 +414,8 @@ export function isFilterValueValid(
       return options.subjectKinds.some((option) => option.id === value)
     case 'speciesId':
       return options.speciesIds.some((option) => option.id === value)
+    case 'heritageId':
+      return options.heritageIds.some((option) => option.id === value)
     case 'languageId':
       return options.languageIds.some((option) => option.id === value)
     case 'cultureId':

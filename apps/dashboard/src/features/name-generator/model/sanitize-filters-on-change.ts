@@ -19,6 +19,9 @@ function stripInvalidOptionalFilters(
   if (isFilterValueValid('speciesId', filters.speciesId, options)) {
     next.speciesId = filters.speciesId
   }
+  if (isFilterValueValid('heritageId', filters.heritageId, options)) {
+    next.heritageId = filters.heritageId
+  }
   if (isFilterValueValid('languageId', filters.languageId, options)) {
     next.languageId = filters.languageId
   }

@@ -21,6 +21,8 @@ export const NO_PERSONAL_NAMING_CONVENTION_REASON =
 export type NamingHeritageOption = {
   id: string
   label: string
+  /** Naming culture this heritage routes to — selecting it should select this culture. */
+  cultureId: string
 }
 
 export type SpeciesNamingOption = {
@@ -34,16 +36,16 @@ export type SpeciesNamingOption = {
 }
 
 function resolveHeritageTargetCultureId({
-  speciesId,
+  speciesSlug,
   heritageId,
   heritageAliases,
 }: {
-  speciesId: string
+  speciesSlug: string
   heritageId: string
   heritageAliases: readonly HeritageCultureAlias[]
 }): string | undefined {
   return heritageAliases.find(
-    (alias) => alias.speciesId === speciesId && alias.heritageId === heritageId,
+    (alias) => alias.speciesSlug === speciesSlug && alias.heritageId === heritageId,
   )?.targetCultureId
 }
 
@@ -62,7 +64,7 @@ export function deriveSpeciesNamingCultureIds({
 
   if (heritageOptionId !== undefined) {
     const targetCultureId = resolveHeritageTargetCultureId({
-      speciesId: species.id,
+      speciesSlug: species.slug,
       heritageId: heritageOptionId,
       heritageAliases,
     })
@@ -80,15 +82,18 @@ function conventionMatchesCulture(
   convention: NamingConvention,
   cultureId: string,
   heritageAliases: readonly HeritageCultureAlias[],
-  speciesId: string,
+  speciesSlug: string,
 ): boolean {
   const targetCultureIds = new Set<string>([cultureId])
 
   for (const alias of heritageAliases) {
-    if (alias.speciesId === speciesId && alias.targetCultureId === cultureId) {
+    if (alias.speciesSlug !== speciesSlug) {
+      continue
+    }
+    if (alias.targetCultureId === cultureId) {
       targetCultureIds.add(alias.heritageId)
     }
-    if (alias.speciesId === speciesId && alias.heritageId === cultureId) {
+    if (alias.heritageId === cultureId) {
       targetCultureIds.add(alias.targetCultureId)
     }
   }
@@ -102,14 +107,14 @@ function getConventionIdsForCultures(
   conventions: readonly NamingConvention[],
   cultureIds: readonly string[],
   heritageAliases: readonly HeritageCultureAlias[],
-  speciesId: string,
+  speciesSlug: string,
   subjectKind: NameSubjectKind = 'person',
 ): string[] {
   return conventions
     .filter((convention) => convention.subjectKinds.includes(subjectKind))
     .filter((convention) =>
       cultureIds.some((cultureId) =>
-        conventionMatchesCulture(convention, cultureId, heritageAliases, speciesId),
+        conventionMatchesCulture(convention, cultureId, heritageAliases, speciesSlug),
       ),
     )
     .map((convention) => convention.id)
@@ -126,17 +131,23 @@ export function getPersonConventionIdsForSpecies({
   heritageAliases?: readonly HeritageCultureAlias[]
 }): string[] {
   const cultureIds = deriveSpeciesNamingCultureIds({ species, heritageAliases })
-  return getConventionIdsForCultures(conventions, cultureIds, heritageAliases, species.id, 'person')
+  return getConventionIdsForCultures(
+    conventions,
+    cultureIds,
+    heritageAliases,
+    species.slug,
+    'person',
+  )
 }
 
 function hasPersonalConvention(
   conventions: readonly NamingConvention[],
   cultureIds: readonly string[],
   heritageAliases: readonly HeritageCultureAlias[],
-  speciesId: string,
+  speciesSlug: string,
 ): boolean {
   return (
-    getConventionIdsForCultures(conventions, cultureIds, heritageAliases, speciesId, 'person')
+    getConventionIdsForCultures(conventions, cultureIds, heritageAliases, speciesSlug, 'person')
       .length > 0
   )
 }
@@ -164,7 +175,7 @@ export function getNamingRelevantHeritages({
     conventions,
     baseCultureIds,
     heritageAliases,
-    species.id,
+    species.slug,
   )
 
   const relevant: NamingHeritageOption[] = []
@@ -178,16 +189,19 @@ export function getNamingRelevantHeritages({
       conventions,
       heritageCultureIds,
       heritageAliases,
-      species.id,
+      species.slug,
     )
 
+    const cultureId = heritageCultureIds[0]
     if (
-      !arraysEqual(baseCultureIds, heritageCultureIds) ||
-      !arraysEqual(baseConventionIds, heritageConventionIds)
+      cultureId !== undefined &&
+      (!arraysEqual(baseCultureIds, heritageCultureIds) ||
+        !arraysEqual(baseConventionIds, heritageConventionIds))
     ) {
       relevant.push({
         id: option.id,
         label: option.name ?? option.id,
+        cultureId,
       })
     }
   }
@@ -201,7 +215,7 @@ function resolveEnabledSpeciesNamingOption(
   heritageAliases: readonly HeritageCultureAlias[],
 ): SpeciesNamingOption | undefined {
   const cultureIds = deriveSpeciesNamingCultureIds({ species, heritageAliases })
-  if (!hasPersonalConvention(conventions, cultureIds, heritageAliases, species.id)) {
+  if (!hasPersonalConvention(conventions, cultureIds, heritageAliases, species.slug)) {
     return {
       speciesId: species.id,
       label: species.name,
@@ -218,7 +232,7 @@ function resolveEnabledSpeciesNamingOption(
     conventions,
     resolveConventionCultureId: (cultureId) => {
       const alias = heritageAliases.find(
-        (entry) => entry.speciesId === species.id && entry.heritageId === cultureId,
+        (entry) => entry.speciesSlug === species.slug && entry.heritageId === cultureId,
       )
       return alias?.targetCultureId ?? cultureId
     },

@@ -6,8 +6,7 @@ export const elvenSettlementDefinition = {
   key: 'settlement',
   id: 'elvish-settlement',
   label: 'Elven settlement names',
-  description: 'Settlement names sharing elvish linguistic pools with personal conventions.',
-  subjectKinds: ['settlement', 'landmark'],
+  description: 'Settlement names built from elvish place roots and settlement suffixes.',
   structures: [
     {
       id: 'compound-place',
@@ -21,7 +20,11 @@ export const elvenSettlementDefinition = {
   ],
   partBindings: [
     { partKey: 'placeRoot', collectionId: 'elvish-place-root-pool', sourceKey: 'placeRoot' },
-    { partKey: 'placeSuffix', collectionId: 'elvish-place-suffix-pool', sourceKey: 'placeSuffix' },
+    {
+      partKey: 'placeSuffix',
+      collectionId: 'elvish-place-suffix-pool',
+      sourceKey: 'placeSuffix',
+    },
   ],
   collectionIds: ['elvish-place-root-pool', 'elvish-place-suffix-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,

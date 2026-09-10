@@ -20,7 +20,7 @@ export const akanPersonalDefinition = {
     },
   ],
   partBindings: [
-    { partKey: 'given', collectionId: 'akan-given-pool', sourceKey: 'given-masc' },
+    { partKey: 'given', collectionId: 'akan-given-pool' },
     { partKey: 'family', collectionId: 'akan-family-pool', sourceKey: 'family' },
   ],
   collectionIds: ['akan-given-pool', 'akan-family-pool'],

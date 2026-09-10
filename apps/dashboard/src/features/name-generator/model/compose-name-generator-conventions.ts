@@ -4,13 +4,14 @@ import { getSpeciesCultureDisplayName } from '@rpg/contracts/rpg/content'
 import {
   CULTURE_CONVENTION_BINDINGS,
   HERITAGE_CULTURE_ALIASES,
+  HERITAGE_NAMING_CULTURES,
   listStaticConventions,
   STANDALONE_NAMING_CULTURES,
 } from '@rpg/name-generator-data'
 import {
-  buildNamingCultureContext,
   buildSpeciesNamingOptions,
   resolveCampaignConventions,
+  resolveSpeciesCultureContexts,
   resolveStandaloneConventions,
   type SpeciesCultureInput,
   type SpeciesNamingOption,
@@ -51,7 +52,7 @@ export function composeNameGeneratorConventions(
   const campaignConventions = resolveCampaignConventions({
     species,
     bindings: CULTURE_CONVENTION_BINDINGS,
-    heritageAliases: HERITAGE_CULTURE_ALIASES,
+    heritageCultures: HERITAGE_NAMING_CULTURES,
   })
   const standaloneConventions = resolveStandaloneConventions({
     cultures: STANDALONE_NAMING_CULTURES,
@@ -102,12 +103,18 @@ export function buildCultureFilterContexts(
   }
 
   for (const entry of species) {
-    const context = buildNamingCultureContext(entry)
-    contexts.set(context.cultureId, {
-      id: context.cultureId,
-      label: context.cultureLabel,
-      languageIds: context.languageIds,
+    const speciesContexts = resolveSpeciesCultureContexts({
+      species: entry,
+      heritageCultures: HERITAGE_NAMING_CULTURES,
     })
+
+    for (const context of speciesContexts) {
+      contexts.set(context.cultureId, {
+        id: context.cultureId,
+        label: context.cultureLabel,
+        languageIds: context.languageIds,
+      })
+    }
   }
 
   for (const convention of listStaticConventions()) {

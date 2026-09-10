@@ -1,7 +1,8 @@
 import type {
-  HeritageCultureAlias,
+  HeritageNamingCulture,
   NamingConvention,
   NamingConventionDefinition,
+  NamingCultureContext,
 } from '@rpg/contracts/name-generator'
 import { isSpeciesNamingSupported } from '@rpg/contracts/rpg/content'
 import type { SpeciesCultureConfig } from '@rpg/contracts/rpg/content'
@@ -21,37 +22,43 @@ export type SpeciesCultureInput = {
   }
 }
 
-function resolveTargetCultureId(species: SpeciesCultureInput): string {
-  return buildNamingCultureContext(species).cultureId
-}
-
-function resolveDefinitionsForSpecies({
+/**
+ * Naming culture contexts a species contributes: its own culture, plus one per
+ * heritage naming culture whose heritage options the species actually offers.
+ */
+export function resolveSpeciesCultureContexts({
   species,
-  bindings,
+  heritageCultures = [],
 }: {
   species: SpeciesCultureInput
-  bindings: Readonly<Record<string, readonly NamingConventionDefinition[]>>
-}): NamingConvention[] {
-  const cultureId = resolveTargetCultureId(species)
-  const definitions = bindings[cultureId]
+  heritageCultures?: readonly HeritageNamingCulture[]
+}): NamingCultureContext[] {
+  const baseContext = buildNamingCultureContext(species)
+  const heritageOptionIds = new Set((species.heritage?.options ?? []).map((option) => option.id))
 
-  if (definitions === undefined) {
-    return []
-  }
+  const heritageContexts = heritageCultures
+    .filter(
+      (culture) =>
+        culture.speciesSlug === species.slug &&
+        culture.heritageIds.some((heritageId) => heritageOptionIds.has(heritageId)),
+    )
+    .map((culture) => ({
+      cultureId: culture.id,
+      cultureLabel: culture.label,
+      languageIds: culture.languageIds ?? baseContext.languageIds,
+    }))
 
-  const context = buildNamingCultureContext(species)
-
-  return definitions.map((definition) => resolveNamingConvention({ context, definition }))
+  return [baseContext, ...heritageContexts]
 }
 
 export function resolveCampaignConventions({
   species,
   bindings,
-  heritageAliases: _heritageAliases = [],
+  heritageCultures = [],
 }: {
   species: readonly SpeciesCultureInput[]
   bindings: Readonly<Record<string, readonly NamingConventionDefinition[]>>
-  heritageAliases?: readonly HeritageCultureAlias[]
+  heritageCultures?: readonly HeritageNamingCulture[]
 }): NamingConvention[] {
   const conventions: NamingConvention[] = []
   const seenIds = new Set<string>()
@@ -62,23 +69,22 @@ export function resolveCampaignConventions({
       continue
     }
 
-    const cultureId = resolveTargetCultureId(entry)
-    if (processedCultureIds.has(cultureId)) {
-      continue
-    }
-
-    processedCultureIds.add(cultureId)
-
-    for (const convention of resolveDefinitionsForSpecies({
-      species: entry,
-      bindings,
-    })) {
-      if (seenIds.has(convention.id)) {
+    for (const context of resolveSpeciesCultureContexts({ species: entry, heritageCultures })) {
+      if (processedCultureIds.has(context.cultureId)) {
         continue
       }
 
-      seenIds.add(convention.id)
-      conventions.push(convention)
+      processedCultureIds.add(context.cultureId)
+
+      for (const definition of bindings[context.cultureId] ?? []) {
+        const convention = resolveNamingConvention({ context, definition })
+        if (seenIds.has(convention.id)) {
+          continue
+        }
+
+        seenIds.add(convention.id)
+        conventions.push(convention)
+      }
     }
   }
 

@@ -104,9 +104,9 @@ describe('speciesFormDef round-trips', () => {
     expect(input.languageAffinities).toEqual(['dwarvish'])
   })
 
-  it('human: omits languageAffinities when empty on save', () => {
-    const human = SRD_SPECIES.find((s) => s.slug === 'human')!
-    const formValues = speciesFormDef.toFormValues(human) as SpeciesFormValues
+  it('tiefling: omits languageAffinities when empty on save', () => {
+    const tiefling = SRD_SPECIES.find((s) => s.slug === 'tiefling')!
+    const formValues = speciesFormDef.toFormValues(tiefling) as SpeciesFormValues
     expect(formValues.languageAffinities).toEqual([])
 
     const input = speciesFormDef.toInput(formValues)

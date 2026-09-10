@@ -135,7 +135,7 @@ const CAMPAIGN_PARITY_CASES: ParityCase[] = [
       { kind: 'culture', cultureId: 'elven', strength: 'primary' },
       { kind: 'language', languageId: 'elvish', strength: 'primary' },
     ],
-    subjectKinds: ['settlement', 'landmark'],
+    subjectKinds: ['settlement'],
   },
   {
     speciesKey: 'dwarf',
@@ -169,7 +169,7 @@ const CAMPAIGN_PARITY_CASES: ParityCase[] = [
       { kind: 'culture', cultureId: 'halfling', strength: 'primary' },
       { kind: 'language', languageId: 'halfling', strength: 'primary' },
     ],
-    subjectKinds: ['settlement', 'landmark'],
+    subjectKinds: ['settlement'],
   },
   {
     speciesKey: 'gnome',
@@ -186,7 +186,7 @@ const CAMPAIGN_PARITY_CASES: ParityCase[] = [
       { kind: 'culture', cultureId: 'gnome', strength: 'primary' },
       { kind: 'language', languageId: 'gnomish', strength: 'primary' },
     ],
-    subjectKinds: ['settlement', 'landmark'],
+    subjectKinds: ['settlement'],
   },
   {
     speciesKey: 'dragonborn',
@@ -273,17 +273,36 @@ describe('resolveCampaignConventions ordering', () => {
     expect(conventions.map((convention) => convention.id)).toEqual([
       'dwarven-personal',
       'dwarven-settlement',
+      'dwarven-clan',
+      'dwarven-landmark',
+      'dwarven-faction',
       'elvish-personal',
       'elvish-settlement',
+      'elvish-family',
+      'elvish-landmark',
+      'elvish-faction',
       'halfling-personal',
       'halfling-settlement',
+      'halfling-family',
+      'halfling-landmark',
       'gnomish-personal',
       'gnomish-settlement',
+      'gnomish-family',
+      'gnomish-landmark',
       'draconic-dragonborn-personal',
       'draconic-dragonborn-clan',
+      'draconic-dragonborn-settlement',
+      'draconic-dragonborn-landmark',
       'goliath-personal',
+      'goliath-clan',
+      'goliath-settlement',
+      'goliath-landmark',
       'infernal-tiefling-personal',
+      'infernal-tiefling-settlement',
+      'infernal-tiefling-landmark',
       'orc-personal',
+      'orc-settlement',
+      'orc-landmark',
     ])
   })
 })
@@ -298,6 +317,7 @@ describe('resolveStandaloneConventions', () => {
     expect(convention?.id).toBe('akan-personal')
     expect(convention?.associations).toEqual([
       { kind: 'culture', cultureId: 'akan', strength: 'primary' },
+      { kind: 'language', languageId: 'common', strength: 'primary' },
       { kind: 'region', regionId: 'west-africa' },
     ])
   })

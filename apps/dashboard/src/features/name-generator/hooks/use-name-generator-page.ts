@@ -27,6 +27,8 @@ import { GENERATE_COUNT } from '../model/name-generator.constants'
 import { recommendNameGeneratorMatches } from '../model/recommend-name-generator-matches'
 import { resetNameGeneratorFilters } from '../model/sanitize-filters-on-change'
 
+const EMPTY_RESULTS: GeneratedName[] = []
+
 function isNameGeneratorPageError(error: unknown): error is NameGeneratorPageError {
   return (
     typeof error === 'object' &&
@@ -92,13 +94,22 @@ export function useNameGeneratorPage() {
     [conventions, cultureContexts, filterContext, filterOptions],
   )
   const matchCountLabel = useMemo(() => formatMatchCountLabel(matches.length), [matches.length])
+
+  // Results belong to the filters that produced them: once the filters match no
+  // convention there is nothing left to show.
+  const hasMatches = matches.length > 0
+  const visibleResults = hasMatches ? results : EMPTY_RESULTS
+  const visibleStatus = hasMatches ? status : 'idle'
+  const visibleError = hasMatches ? error : undefined
+  const visiblePartialCount = hasMatches ? partialCount : undefined
+
   const resultsSummary: NameGeneratorResultsSummary | undefined = useMemo(() => {
-    if (status !== 'success') {
+    if (visibleStatus !== 'success') {
       return undefined
     }
 
     return formatResultsSummary(filters, activeMatches, partialCount, getConvention)
-  }, [activeMatches, filters, getConvention, partialCount, status])
+  }, [activeMatches, filters, getConvention, partialCount, visibleStatus])
 
   const setFilters = useCallback((next: NameGeneratorFilters) => {
     setFiltersState(next)
@@ -162,11 +173,11 @@ export function useNameGeneratorPage() {
     matches,
     matchCount: matches.length,
     matchCountLabel,
-    results,
-    seed,
-    status,
-    error,
-    partialCount,
+    results: visibleResults,
+    seed: hasMatches ? seed : undefined,
+    status: visibleStatus,
+    error: visibleError,
+    partialCount: visiblePartialCount,
     resultsSummary,
     isGenerateDisabled: matches.length === 0 || status === 'loading',
     setFilters,

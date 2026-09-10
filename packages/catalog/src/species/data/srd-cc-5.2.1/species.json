@@ -829,6 +829,7 @@
     "movement": {
       "walk": 30
     },
+    "languageAffinities": ["common"],
     "traits": [
       {
         "kind": "custom",

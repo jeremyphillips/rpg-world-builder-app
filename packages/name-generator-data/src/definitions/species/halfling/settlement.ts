@@ -6,8 +6,7 @@ export const halflingSettlementDefinition = {
   key: 'settlement',
   id: 'halfling-settlement',
   label: 'Common Halfling settlement names',
-  description: 'Settlement names sharing halfling linguistic pools with personal conventions.',
-  subjectKinds: ['settlement', 'landmark'],
+  description: 'Settlement names built from halfling place roots and settlement suffixes.',
   structures: [
     {
       id: 'compound-place',

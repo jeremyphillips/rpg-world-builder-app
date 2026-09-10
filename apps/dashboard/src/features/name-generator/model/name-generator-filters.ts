@@ -4,6 +4,7 @@ import type { LanguageId } from '@rpg/contracts'
 export type NameGeneratorFilters = {
   subjectKind: NameSubjectKind
   speciesId?: string
+  heritageId?: string
   languageId?: LanguageId
   cultureId?: string
   genderStyle?: NameGenderStyle
@@ -34,6 +35,7 @@ export type FilterOption = {
 export type NameGeneratorFilterOptions = {
   subjectKinds: FilterOption[]
   speciesIds: FilterOption[]
+  heritageIds: FilterOption[]
   languageIds: FilterOption[]
   cultureIds: FilterOption[]
   genderStyles: FilterOption[]
@@ -41,6 +43,7 @@ export type NameGeneratorFilterOptions = {
 
 export type NameGeneratorVisibleFilters = {
   species: boolean
+  heritage: boolean
   language: boolean
   culture: boolean
   genderStyle: boolean

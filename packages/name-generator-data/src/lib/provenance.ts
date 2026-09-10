@@ -7,11 +7,11 @@ export const FIXTURE_COLLECTION_PROVENANCE = {
     methodology: 'original-fictional',
   },
   historicalCurated: {
-    sourceName: 'RPG World Builder curated historical fixture',
+    sourceName: 'RPG World Builder curated historical pool',
     license: 'original',
     methodology: 'curated',
     notes:
-      'Small original test pool inspired by public-domain naming patterns — not production data.',
+      'Curated from widely documented real-world naming traditions using common English orthography. Sized to what is genuinely attested rather than padded to match fictional pools.',
   },
   conventionCuration: {
     sourceName: 'RPG World Builder naming convention registry',

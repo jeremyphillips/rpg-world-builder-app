@@ -4,7 +4,11 @@ import { NAME_SUBJECT_KIND_ENTRIES, toVocabOptions } from '@rpg/contracts/name-g
 import { ELVISH_PERSONAL_CONVENTION } from '@rpg/contracts/name-generator/test-fixtures'
 import { STATIC_CONVENTIONS } from '@rpg/name-generator-data'
 
-import { deriveFilterOptions, isFilterValueValid } from './derive-filter-options'
+import {
+  deriveFilterOptions,
+  deriveVisibleFilters,
+  isFilterValueValid,
+} from './derive-filter-options'
 import type { NameGeneratorFilters } from './name-generator-filters'
 import type { SpeciesNamingOption } from '@rpg/name-generator-integrations'
 
@@ -52,5 +56,60 @@ describe('deriveFilterOptions subject kind labels', () => {
     )
 
     expect(isFilterValueValid('languageId', 'elvish', options)).toBe(true)
+  })
+})
+
+const heritageFilterContext = {
+  speciesNamingOptions: [
+    {
+      speciesId: 'srd-cc-5.2.1:elf',
+      label: 'Elf',
+      disabled: false,
+      cultureIds: ['elven'],
+      subjectKinds: ['person'],
+      heritageOptions: [{ id: 'drow', label: 'Drow', cultureId: 'elven-drow' }],
+    },
+  ] satisfies SpeciesNamingOption[],
+  cultures: [
+    { id: 'elven', label: 'Elven', languageIds: ['elvish'] },
+    { id: 'elven-drow', label: 'Drow', languageIds: ['elvish', 'undercommon'] },
+  ],
+}
+
+describe('deriveFilterOptions heritage', () => {
+  const conventions = [ELVISH_PERSONAL_CONVENTION, ...STATIC_CONVENTIONS]
+
+  it('offers heritage options only once a species with naming-relevant heritages is selected', () => {
+    const withoutSpecies = { subjectKind: 'person' } as NameGeneratorFilters
+    const withSpecies = {
+      subjectKind: 'person',
+      speciesId: 'srd-cc-5.2.1:elf',
+    } as NameGeneratorFilters
+
+    expect(
+      deriveFilterOptions(withoutSpecies, conventions, heritageFilterContext).heritageIds,
+    ).toEqual([])
+    expect(deriveVisibleFilters(withoutSpecies, conventions, heritageFilterContext).heritage).toBe(
+      false,
+    )
+    expect(
+      deriveFilterOptions(withSpecies, conventions, heritageFilterContext).heritageIds,
+    ).toEqual([{ id: 'drow', label: 'Drow' }])
+    expect(deriveVisibleFilters(withSpecies, conventions, heritageFilterContext).heritage).toBe(
+      true,
+    )
+  })
+
+  it('keeps a heritage-routed culture selectable for the species', () => {
+    const filters = {
+      subjectKind: 'person',
+      speciesId: 'srd-cc-5.2.1:elf',
+      heritageId: 'drow',
+      cultureId: 'elven-drow',
+    } as NameGeneratorFilters
+    const options = deriveFilterOptions(filters, conventions, heritageFilterContext)
+
+    expect(isFilterValueValid('heritageId', 'drow', options)).toBe(true)
+    expect(isFilterValueValid('cultureId', 'elven-drow', options)).toBe(true)
   })
 })
