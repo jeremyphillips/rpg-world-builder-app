@@ -16,7 +16,7 @@ import { Form } from '@rpg/ui/form'
 
 import { ROUTES } from '@/lib/routes'
 import { login, register } from '../api/auth-client'
-import { signupFields } from '../lib/auth-form-fields'
+import { signupFieldsWithLockedEmail } from '../lib/auth-form-fields'
 
 export interface SignupFormProps {
   /** Called after a successful signup. Defaults to a same-origin redirect to the dashboard. */
@@ -32,16 +32,10 @@ export function SignupForm({ onSuccess, lockedEmail }: SignupFormProps) {
   const emailFromQuery = searchParams.get('email') ?? undefined
   const resolvedLockedEmail = lockedEmail ?? emailFromQuery
 
-  const fields = useMemo(() => {
-    if (!resolvedLockedEmail) return signupFields
-
-    return signupFields.map((field) => {
-      if ('name' in field && field.name === 'email') {
-        return { ...field, disabled: true }
-      }
-      return field
-    })
-  }, [resolvedLockedEmail])
+  const fields = useMemo(
+    () => signupFieldsWithLockedEmail(resolvedLockedEmail),
+    [resolvedLockedEmail],
+  )
 
   const onSubmit = async (values: RegisterInput) => {
     setFormError(null)

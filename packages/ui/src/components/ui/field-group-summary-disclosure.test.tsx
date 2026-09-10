@@ -26,7 +26,7 @@ function SummaryDisclosureHarness({
         legendSize="array"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
-          variant: 'summary',
+          variant: 'inline',
           defaultOpen: false,
           resolveSummary: (values) => ({
             primary: values.available ? `Available · ${values.visibilityMode}` : 'Unavailable',
@@ -58,7 +58,7 @@ function StructuredStatusDisclosureHarness({
         legendSize="array"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
-          variant: 'summary',
+          variant: 'inline',
           defaultOpen: false,
           resolveSummary: (values) => {
             if (!values.available) {
@@ -96,7 +96,7 @@ function SummaryDisclosureNoPanelDividerHarness() {
         legend="Campaign availability"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
-          variant: 'summary',
+          variant: 'inline',
           defaultOpen: true,
           panelDivider: false,
           resolveSummary: () => ({ primary: 'Available' }),
@@ -119,7 +119,7 @@ function CompactSummaryDisclosureHarness() {
         size="sm"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
-          variant: 'summary',
+          variant: 'inline',
           defaultOpen: false,
           resolveSummary: () => ({
             status: { label: 'Available', tone: 'success', indicator: 'dot' },
@@ -133,16 +133,25 @@ function CompactSummaryDisclosureHarness() {
   )
 }
 
-describe('FieldGroup summary disclosure', () => {
-  it('renders collapsed summary and opens from Change', async () => {
+describe('FieldGroup inline disclosure', () => {
+  it('renders collapsed summary as a single tab stop and opens from the trigger', async () => {
     const user = userEvent.setup()
     render(<SummaryDisclosureHarness />)
 
     expect(screen.getByText('Campaign availability')).toBeInTheDocument()
     expect(screen.getByText('Available · all_players')).toBeInTheDocument()
     expect(screen.getByText('Expanded fields')).not.toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Change' })).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    const trigger = screen.getByRole('button', { name: /Available/ })
+    expect(trigger).toHaveAccessibleName('Available · all_players')
+
+    await user.tab()
+    expect(trigger).toHaveFocus()
+    await user.tab()
+    expect(trigger).not.toHaveFocus()
+
+    await user.click(trigger)
     expect(screen.getByText('Expanded fields')).toBeVisible()
   })
 
@@ -197,12 +206,15 @@ describe('FieldGroup summary disclosure', () => {
     expect(dot).toHaveAttribute('aria-hidden', 'true')
   })
 
-  it('closes from Done', async () => {
+  it('closes from Done in the expanded panel footer', async () => {
     const user = userEvent.setup()
-    render(<SummaryDisclosureHarness />)
+    const { container } = render(<SummaryDisclosureHarness />)
 
-    await user.click(screen.getByRole('button', { name: 'Change' }))
-    await user.click(screen.getByRole('button', { name: 'Done' }))
+    await user.click(screen.getByRole('button', { name: /Available/ }))
+    const done = screen.getByRole('button', { name: 'Done' })
+    expect(container.querySelector('#access-panel')).toContainElement(done)
+
+    await user.click(done)
 
     expect(screen.getByText('Expanded fields')).not.toBeVisible()
   })
@@ -211,7 +223,7 @@ describe('FieldGroup summary disclosure', () => {
     const user = userEvent.setup()
     const { container } = render(<SummaryDisclosureHarness />)
 
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('button', { name: /Available/ }))
 
     const panel = container.querySelector('#access-panel')
     expect(panel).toHaveClass('border-t', 'border-border', 'pt-3')
@@ -233,7 +245,7 @@ describe('FieldGroup summary disclosure', () => {
   it('has no accessibility violations when expanded', async () => {
     const user = userEvent.setup()
     const { container } = render(<SummaryDisclosureHarness />)
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    await user.click(screen.getByRole('button', { name: /Available/ }))
     await expectNoAxeViolations(container)
   })
 

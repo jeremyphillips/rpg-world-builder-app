@@ -7,6 +7,7 @@ import {
   useFormSectionContext,
   type FormSectionContextValue,
 } from '../../context/form-section.context'
+import { resolveFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import { resolveFormDensity } from '../../form-density'
 import type { SlotConfig } from '../../field-config'
 import {
@@ -22,8 +23,10 @@ export interface SlotFieldRendererProps {
 
 /** Renders custom form UI supplied by the field config inside `FormProvider`. */
 export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
-  const { density } = useFormSectionContext()
+  const sectionContext = useFormSectionContext()
+  const { density } = sectionContext
   const { rhythm, size } = resolveFormDensity(density)
+  const { chrome: resolvedChrome } = resolveFieldChromeProps(config, sectionContext)
   const content = config.render()
 
   const body = buildSlotFieldBody(config, content, rhythm, size)
@@ -31,7 +34,7 @@ export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
 
   return (
     <FieldSeparatorWrapper separator={config.separator}>
-      {wrapSlotFieldBody(body, config, size)}
+      {wrapSlotFieldBody(body, config, size, resolvedChrome)}
     </FieldSeparatorWrapper>
   )
 }

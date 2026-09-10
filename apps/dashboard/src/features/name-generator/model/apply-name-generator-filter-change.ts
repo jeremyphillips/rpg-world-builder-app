@@ -70,6 +70,24 @@ function applySpeciesFilterSideEffects({
   }
 }
 
+function applyHeritageFilterSideEffects({
+  next,
+  heritageId,
+  speciesNamingOptions,
+}: {
+  next: NameGeneratorFilters
+  heritageId: string
+  speciesNamingOptions: readonly SpeciesNamingOption[]
+}): void {
+  const speciesOption = speciesNamingOptions.find(
+    (option) => option.speciesId === next.speciesId && !option.disabled,
+  )
+  const heritage = speciesOption?.heritageOptions?.find((option) => option.id === heritageId)
+  if (heritage !== undefined) {
+    next.cultureId = heritage.cultureId
+  }
+}
+
 export function applyNameGeneratorFilterChange({
   filters,
   key,
@@ -103,6 +121,7 @@ export function applyNameGeneratorFilterChange({
       break
     case 'speciesId':
       next.speciesId = value
+      delete next.heritageId
       applySpeciesFilterSideEffects({
         next,
         previous: filters,
@@ -112,11 +131,18 @@ export function applyNameGeneratorFilterChange({
         cultureContexts,
       })
       break
+    case 'heritageId':
+      next.heritageId = value
+      applyHeritageFilterSideEffects({ next, heritageId: value, speciesNamingOptions })
+      break
     case 'languageId':
       next.languageId = value
       break
     case 'cultureId':
       next.cultureId = value
+      break
+    case 'regionId':
+      next.regionId = value
       break
     default:
       break

@@ -6,6 +6,7 @@ import type { SemanticSurfaceTone } from '../../components/ui/field-dependent.va
 import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
 import type { FieldSize } from '../../components/ui/field.client'
+import type { FieldChrome } from '../../components/ui/field-chrome.variants'
 import { cn } from '../../lib/utils'
 import { DEFAULT_FORM_DENSITY, resolveFormDensity, type FormDensity } from '../form-density'
 import { resolveFieldControlSize } from '../resolve-field-control-size.lib'
@@ -28,6 +29,10 @@ export interface FormSectionContextValue {
   inGroup?: boolean
   /** True when a parent rhythm stack (`gap-*`) spaces sibling sections. */
   inRhythmStack?: boolean
+  /** Nearest ancestor `fieldChrome` cascade for leaf/row/slot container resolution. */
+  fieldChromeCascade?: FieldChrome
+  /** When true, leaf fields default to no container unless explicitly configured. */
+  fieldChromeSuppressed?: boolean
 }
 
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
@@ -49,6 +54,8 @@ export interface FormSectionContextOverrides {
   arrayItemTone?: SemanticSurfaceTone
   inGroup?: boolean
   inRhythmStack?: boolean
+  fieldChromeCascade?: FieldChrome
+  fieldChromeSuppressed?: boolean
 }
 
 function filterUndefined<T extends object>(value: T): Partial<T> {
@@ -69,6 +76,8 @@ function inheritSectionContextFields(
     arrayItemTone: parent.arrayItemTone,
     inGroup: parent.inGroup,
     inRhythmStack: parent.inRhythmStack,
+    fieldChromeCascade: parent.fieldChromeCascade,
+    fieldChromeSuppressed: parent.fieldChromeSuppressed,
   }
 
   return overrides ? { ...inherited, ...filterUndefined(overrides) } : inherited

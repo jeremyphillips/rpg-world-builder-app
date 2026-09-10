@@ -1,4 +1,5 @@
 import type { FormItem } from '../field-config'
+import { resolveColumnsCollapseSequence } from './form-columns-collapse.lib'
 import { arrayItemLabel } from './array/array-item-label.lib'
 import { resolveArrayItemHeader } from './array/array-item-config.lib'
 import { resolveArrayHeading } from '../resolve-container-heading.lib'
@@ -57,9 +58,18 @@ function registerDependentItem(
 function registerContainerItem(
   registry: Map<string, RegistryEntry>,
   prefix: string,
-  item: Extract<FormItem, { kind: 'group' | 'row' }>,
+  item: Extract<FormItem, { kind: 'group' | 'row' | 'columns' }>,
   registerItems: (registry: Map<string, RegistryEntry>, prefix: string, items: FormItem[]) => void,
 ): void {
+  if (item.kind === 'columns') {
+    registerItems(
+      registry,
+      prefix,
+      resolveColumnsCollapseSequence(item.columns, item.collapseOrder),
+    )
+    return
+  }
+
   registerItems(registry, prefix, item.fields as FormItem[])
 }
 
@@ -86,6 +96,7 @@ export function registerFormItems(
         break
       case 'group':
       case 'row':
+      case 'columns':
         registerContainerItem(registry, prefix, item, registerFormItems)
         break
     }

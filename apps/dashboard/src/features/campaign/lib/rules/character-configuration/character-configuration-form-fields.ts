@@ -367,8 +367,6 @@ function progressionGroup(): FormItem {
             defaultValue: false,
           },
           dependents: {
-            chrome: 'panel',
-            panel: { surface: { emphasis: 'default' } },
             fields: [
               {
                 kind: 'row',
@@ -441,8 +439,6 @@ function multiclassingGroup(): FormItem {
           defaultValue: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
         },
         dependents: {
-          chrome: 'panel',
-          panel: { surface: { emphasis: 'default' } },
           fields: [
             {
               type: 'number',
@@ -598,7 +594,6 @@ function creationSectionItems({
             legend: 'Starting wealth by level',
             description:
               'Adds or replaces the class’s baseline starting equipment for characters created at higher levels.',
-            chrome: { variant: 'rail' },
             fields: [
               {
                 type: 'text',

@@ -60,7 +60,6 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Mechanics',
-      chrome: { variant: 'panel' },
       fields: [
         {
           type: 'chips',

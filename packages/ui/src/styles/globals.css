@@ -407,6 +407,10 @@
   color: var(--field-control-fg);
 }
 
+@utility bg-field-container {
+  background-color: var(--field-container);
+}
+
 @utility border-input-hover {
   border-color: var(--field-control-border-hover);
 }

@@ -23,6 +23,10 @@ import {
   type ContentFormHostLeaveBridge,
 } from '../../../lib/forms/shells/host/content-form-host'
 import { ContentFormHeader } from '../../../lib/forms/shells/layout/content-form-shell-layout.lib'
+import {
+  CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE,
+  CONTENT_FORM_IDENTITY_LAYOUT_STACKED,
+} from '../../../lib/forms/shells/content-form-presentation.lib'
 import { useContentFormSubmit } from '../../../lib/forms/shells/submit/content-form-submit'
 import {
   resolveContentFormHostConfig,
@@ -151,6 +155,8 @@ function OrganizationCreateModalForm({
               ctx={ctx}
               formKey={formKey}
               campaignId={campaignId}
+              identityLayout={CONTENT_FORM_IDENTITY_LAYOUT_STACKED}
+              availabilityPresentation={CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE}
               onCampaignAccessDraftChange={(patch) => {
                 campaignAccessDraftRef.current = patch
               }}

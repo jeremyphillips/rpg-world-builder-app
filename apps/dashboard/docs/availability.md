@@ -18,7 +18,9 @@ type Availability = { status: 'active' | 'inactive'; reasons?: AvailabilityReaso
 - **`combineAvailabilityReasons(activeByCampaignToggle, extraReasons?)`** — merges
   optional extra reasons from feature producers. (Legacy per-row **Active in
   campaign** toggles were removed; persisted campaign access lives on
-  `campaignAccess` — see content README.)
+  `campaignAccess` — see content README.) The authoring control is
+  `CampaignAvailabilityField` (`dialog` on full routes, in-place `disclosure` in
+  overlays) — [campaign-access README](../src/features/content/lib/campaign-access/README.md).
 - **`resolveAvailabilityBadge(availability)`** — rail-card `Inactive` badge data
   (`MasterDetailListBadge`-compatible).
 - **`resolveAvailabilityAlertVariant(availability)`** — maps primary reason

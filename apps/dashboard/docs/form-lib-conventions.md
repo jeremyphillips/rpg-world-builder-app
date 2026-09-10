@@ -234,7 +234,8 @@ paths. `errorPaths` drives tab UX; `resolverFields` drives validation message co
 - `embeddedArrayResolverField(name, legend, itemFields)` — resolver-only array config.
 
 **Reference implementations:** `buildSpeciesTabs` and `buildClassTabs` in
-`species-form-fields.ts` / `class-form-fields.ts`. Non-form chrome tabs (e.g. class
+`species-form-fields.ts` / `class-form-fields.ts`. Section icons come from
+`content-form-tab-icons.ts` (`TabbedFormTab.leadingIcon`). Non-form chrome tabs (e.g. class
 subclasses management) set `skipHeaderOnlyValidationWiring: true`.
 
 **Tests:** `assertHeaderOnlyTabsHaveValidationWiring(tabs)` in
@@ -328,10 +329,13 @@ panel/outline stacks) in feature components when `FormItem[]` can express it.
 
 - **Fields** — `type` / `kind: 'slot'` entries in `*-form-fields.ts`; labels, hints, `info`,
   `labelPosition`, `separator`, and disabled state live in config.
-- **Containers** — `kind: 'group' | 'row' | 'stack' | 'dependent'` with `chrome` for
+- **Containers** — `kind: 'group' | 'row' | 'columns' | 'dependent'` with `chrome` for
   visual treatment and `disclosure` for compact settings sections (campaign access is
-  the reference implementation).
-- **Persistence** — may stay in a section shell (`CampaignAccessSection`, create/edit
+  the reference implementation). `kind: 'row'` is one shared field container for sibling
+  leaves/slots. `kind: 'columns'` is layout-only (independent stacks at `md+`); each child
+  stays a top-level chrome unit. Content identity on full routes uses a row so Name and
+  Campaign availability share a box.
+- **Persistence** — may stay in a section shell (`CampaignAvailabilityField`, create/edit
   shells) when it uses a separate API or RHF form — but the **rendered UI** must still flow
   through `FormProvider` + `FormItems` over the field builder.
 - **Escape hatch** — `kind: 'slot'` for behavior that truly cannot be config-shaped (e.g.

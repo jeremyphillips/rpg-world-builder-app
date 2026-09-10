@@ -1,3 +1,5 @@
+import { createElement } from 'react'
+import { CircleCheck, Code, FileText, Link as LinkIcon } from 'lucide-react'
 import { z } from 'zod'
 
 import {
@@ -30,6 +32,13 @@ import {
   type FormItem,
   type TabbedFormTab,
 } from '@rpg/ui/form'
+
+const TICKET_DETAIL_TAB_ICONS = {
+  overview: FileText,
+  links: LinkIcon,
+  code: Code,
+  'done-when': CircleCheck,
+} as const
 
 const acceptanceCriterionSchema = z.object({
   text: z.string().min(1),
@@ -176,6 +185,7 @@ export function buildTicketDetailTabs(options: {
     {
       id: 'overview',
       label: 'Overview',
+      leadingIcon: createElement(TICKET_DETAIL_TAB_ICONS.overview, { 'aria-hidden': true }),
       fields: [
         { type: 'text', name: 'title', label: 'Title', required: true },
         {
@@ -246,6 +256,7 @@ export function buildTicketDetailTabs(options: {
     {
       id: 'links',
       label: 'Links',
+      leadingIcon: createElement(TICKET_DETAIL_TAB_ICONS.links, { 'aria-hidden': true }),
       fields: [
         {
           type: 'combobox',
@@ -270,6 +281,7 @@ export function buildTicketDetailTabs(options: {
     {
       id: 'code',
       label: 'Code',
+      leadingIcon: createElement(TICKET_DETAIL_TAB_ICONS.code, { 'aria-hidden': true }),
       fields: [
         {
           kind: 'array',
@@ -300,6 +312,7 @@ export function buildTicketDetailTabs(options: {
     {
       id: 'done-when',
       label: 'Done when',
+      leadingIcon: createElement(TICKET_DETAIL_TAB_ICONS['done-when'], { 'aria-hidden': true }),
       fields: [
         {
           kind: 'array',

@@ -16,7 +16,10 @@ export {
 export type { NamingHeritageOption, SpeciesNamingOption } from './build-species-naming-options'
 export { dedupeAssociations } from './dedupe-associations'
 export { getDefaultSubjectKinds } from './default-subject-kinds'
-export { resolveCampaignConventions } from './resolve-campaign-conventions'
+export {
+  resolveCampaignConventions,
+  resolveSpeciesCultureContexts,
+} from './resolve-campaign-conventions'
 export type { SpeciesCultureInput } from './resolve-campaign-conventions'
 export { resolveNamingConvention } from './resolve-naming-convention'
 export { resolveSpeciesPersonNaming } from './resolve-species-person-naming'

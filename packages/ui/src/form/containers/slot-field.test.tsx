@@ -273,6 +273,37 @@ describe('SlotFieldRenderer', () => {
     expect(chromeShell).toContainElement(screen.getByText('Optional author notes.'))
   })
 
+  it('applies row width tokens on the slot wrapper', () => {
+    const rowFields: FormItem[] = [
+      {
+        kind: 'row',
+        fields: [
+          { type: 'text', name: 'name', label: 'Name', required: true, width: 'full' },
+          {
+            kind: 'slot',
+            name: 'notes',
+            width: '1/3',
+            render: () => <NotesSlot />,
+          },
+        ],
+      },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={rowFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const notes = screen.getByRole('textbox', { name: 'Notes' })
+    expect(notes.parentElement).toHaveClass('min-w-0', 'max-w-1/3', 'basis-0', 'grow-[4]')
+    expect(container.querySelector('[data-field-row]')).toContainElement(notes)
+  })
+
   it('hides a slot when its visibility predicate is false', () => {
     const conditionalFields: FormItem[] = [
       {

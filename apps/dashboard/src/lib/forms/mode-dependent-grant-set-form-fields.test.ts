@@ -16,7 +16,7 @@ function expectDependentField(
 }
 
 describe('modeDependentGrantSetField', () => {
-  it('returns a dependent field with undecorated dependents and no panel chrome on chips', () => {
+  it('returns a dependent field with inset dependents and no panel chrome on chips', () => {
     const item = expectDependentField(
       modeDependentGrantSetField({
         modeFieldName: 'weaponProficiencyMode',

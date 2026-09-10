@@ -160,6 +160,23 @@ Do not merge text-tuned values onto solid status hues.
 
 Switch unchecked track uses `--switch-track*` — separate from field border ownership.
 
+## Field container chrome
+
+Schema-driven form fields default to a boxed container shell (`{ variant: 'container' }`):
+
+- Layer 2 token: `--field-container` — lightest surface in light mode (`--palette-surface-field`), darkest in dark mode (`--palette-surface-sunken`).
+- Public utility: `bg-field-container` in `globals.css`.
+- Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
+- Padding: 16px (`p-4`).
+- Fieldset leaves (`ChipsField`, choose-count shells) and schema `kind: 'group'` wrap a
+  borderless `<fieldset>` in `FieldChromeShell` so `<legend>` cannot sit on the visible
+  container border. Group legends and description text render inside that box.
+
+Opt out with `{ variant: 'none' }` on a top-level leaf, row, slot, or dependent, or
+`fieldChrome: { variant: 'none' }` on a group. Nested content under a top-level container
+unit is suppressed automatically (including nested groups and nested dependents). Array
+item cards keep their own shell model.
+
 **Choice indicators** (radio, checkbox, RadioCard decorative control) use
 `border-choice-control` (`--choice-control-border`), composed toward `--surface-current` — not
 `border-input`.

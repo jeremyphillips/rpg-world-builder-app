@@ -5,13 +5,13 @@ import type { Control, FieldValues } from 'react-hook-form'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
+import type { FieldChrome } from './field-chrome.variants'
 import type { FieldGroupChromeClassNames } from './field-group-chrome.variants'
 import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosure as FieldGroupSummaryDisclosureView } from './field-group-summary-disclosure.client'
 import {
   fieldGroupBottomMarginClasses,
   fieldSetResetClasses,
-  fieldStackRhythmVariants,
   type FieldRhythm,
 } from './field.variants'
 
@@ -24,6 +24,7 @@ export type SummaryDisclosureFieldGroupShellProps = {
   uiStateKey?: string
   collapseKey: string
   chromeClasses: FieldGroupChromeClassNames
+  fieldChrome?: FieldChrome
   disclosure: FieldGroupSummaryDisclosure
   formControl: Control<FieldValues>
   children: ReactNode
@@ -39,6 +40,7 @@ export function SummaryDisclosureFieldGroupShell({
   uiStateKey,
   collapseKey,
   chromeClasses,
+  fieldChrome,
   disclosure,
   formControl,
   children,
@@ -63,14 +65,15 @@ export function SummaryDisclosureFieldGroupShell({
         legendId={legendId}
         panelId={panelId}
         size={size}
+        rhythm={rhythm}
+        chromeBodyClassName={chromeClasses.body}
+        fieldChrome={fieldChrome}
         disclosure={disclosure}
         uiStateKey={uiStateKey}
         collapseKey={collapseKey}
         control={formControl}
       >
-        <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeClasses.body)}>
-          {children}
-        </div>
+        {children}
       </FieldGroupSummaryDisclosureView>
     </fieldset>
   )

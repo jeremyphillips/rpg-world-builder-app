@@ -29,7 +29,10 @@ import {
 } from './tabbed-form-panels.client'
 
 export type { TabbedFormTab }
-export { collectTabbedFormResolverItems } from './tabbed-form-panels.client'
+export {
+  collectTabbedFormResolverItems,
+  TABBED_FORM_SECTIONS_ARIA_LABEL,
+} from './tabbed-form-panels.client'
 
 export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Merged Zod schema covering all tabs' fields combined. */
@@ -51,8 +54,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    */
   footer?: React.ReactNode | ((form: UseFormReturn<TFieldValues>) => React.ReactNode)
   /**
-   * Content rendered inside the form before the tab strip. Pass a function to
-   * read form state (e.g. for hoisted identity fields above tabs).
+   * Content rendered inside the form before the section control. Pass a function to
+   * read form state (e.g. for hoisted identity fields above sections).
    */
   header?: React.ReactNode | ((form: UseFormReturn<TFieldValues>) => React.ReactNode)
   /** Optional id for the `<form>` element. */
@@ -76,11 +79,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    */
   density?: FormDensity
   /**
-   * When true (default), the tab list sticks to the top and the footer sticks to
+   * When true (default), the section control sticks to the top and the footer sticks to
    * the bottom while scrolling long panels.
    */
   stickyChrome?: boolean
-  /** Extra classes merged onto the sticky tab list wrapper (overrides default surface). */
+  /** Extra classes merged onto the sticky section-control wrapper (overrides default surface). */
   stickyTabsClassName?: string
   /** Extra classes merged onto the sticky actions bar (overrides default surface). */
   stickyActionsBarClassName?: string

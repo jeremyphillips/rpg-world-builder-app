@@ -6,4 +6,5 @@ export type NamingCultureContext = {
   cultureId: string
   cultureLabel: string
   languageIds: readonly string[]
+  regionIds?: readonly string[]
 }

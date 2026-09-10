@@ -2,24 +2,34 @@
 
 import * as React from 'react'
 import type { Control, FieldValues } from 'react-hook-form'
-import { useFormState, useWatch } from 'react-hook-form'
+import { useFormState } from 'react-hook-form'
 
 import {
   readGroupCollapseOpen,
   writeGroupCollapseOpen,
 } from '../../form/config/group-collapse-storage.lib'
 import { accordionContentVariants } from './accordion.variants'
-import { resolveChromeClasses } from './chrome.variants'
+import { Button } from './button.client'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
+import { FieldChromeShell } from './field-chrome-shell'
+import type { FieldChrome } from './field-chrome.variants'
 import type { FieldSize } from './field.client'
 import type { FieldGroupSummary, FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosureCollapsed } from './field-group-summary-disclosure-collapsed.client'
 import { FieldGroupSummaryDisclosureExpandedHeader } from './field-group-summary-disclosure-expanded-header.client'
-import { resolveFieldGroupSummaryDisclosurePanelClasses } from './field-group-summary-disclosure.variants'
-
-const DEFAULT_OPEN_LABEL = 'Change'
-const DEFAULT_CLOSE_LABEL = 'Done'
-const DEFAULT_UNSAVED_SUFFIX = ' · Unsaved'
+import {
+  fieldGroupSummaryDisclosureFooterClasses,
+  fieldGroupSummaryDisclosureShellClasses,
+  resolveFieldGroupSummaryDisclosurePanelClasses,
+} from './field-group-summary-disclosure.variants'
+import {
+  DEFAULT_SUMMARY_CLOSE_LABEL,
+  DEFAULT_SUMMARY_OPEN_LABEL,
+  DEFAULT_SUMMARY_UNSAVED_SUFFIX,
+  useSummaryDisclosureWatchedValues,
+} from './field-group-summary-watch.lib'
+import { fieldStackRhythmVariants, type FieldRhythm } from './field.variants'
+import { cn } from '../../lib/utils'
 
 function useSummaryDisclosureOpenState(options: {
   collapseKey: string
@@ -47,25 +57,14 @@ function useSummaryDisclosureOpenState(options: {
   return [open, onOpenChange]
 }
 
-function useSummaryDisclosureWatchedValues<TFieldValues extends FieldValues>(
-  control: Control<TFieldValues>,
-  summaryDependsOn: readonly string[] | undefined,
-): Record<string, unknown> {
-  const allValues = useWatch({ control }) as Record<string, unknown>
-  return React.useMemo(() => {
-    if (!summaryDependsOn?.length) return allValues
-    return summaryDependsOn.reduce<Record<string, unknown>>((acc, path) => {
-      acc[path] = allValues[path]
-      return acc
-    }, {})
-  }, [allValues, summaryDependsOn])
-}
-
 export type FieldGroupSummaryDisclosureProps<TFieldValues extends FieldValues = FieldValues> = {
   legend: string
   panelId: string
   legendId: string
   size?: FieldSize
+  rhythm?: FieldRhythm
+  chromeBodyClassName?: string
+  fieldChrome?: FieldChrome
   disclosure: FieldGroupSummaryDisclosure
   uiStateKey?: string
   collapseKey: string
@@ -79,13 +78,11 @@ function FieldGroupSummaryDisclosureHeader({
   legendId,
   panelId,
   size,
-  closeLabel,
   openLabel,
   unsavedSuffix,
   showDirtySuffix,
   disabled,
   summary,
-  collapsedChromeClasses,
   onOpenChange,
 }: {
   open: boolean
@@ -93,30 +90,20 @@ function FieldGroupSummaryDisclosureHeader({
   legendId: string
   panelId: string
   size: FieldSize
-  closeLabel: string
   openLabel: string
   unsavedSuffix: string
   showDirtySuffix: boolean
   disabled: boolean
   summary: FieldGroupSummary
-  collapsedChromeClasses: string | undefined
   onOpenChange: (open: boolean) => void
 }) {
   if (open) {
     return (
-      <FieldGroupSummaryDisclosureExpandedHeader
-        legend={legend}
-        legendId={legendId}
-        panelId={panelId}
-        size={size}
-        closeLabel={closeLabel}
-        disabled={disabled}
-        onClose={() => onOpenChange(false)}
-      />
+      <FieldGroupSummaryDisclosureExpandedHeader legend={legend} legendId={legendId} size={size} />
     )
   }
 
-  const collapsed = (
+  return (
     <FieldGroupSummaryDisclosureCollapsed
       legend={legend}
       legendId={legendId}
@@ -130,13 +117,66 @@ function FieldGroupSummaryDisclosureHeader({
       onOpen={() => onOpenChange(true)}
     />
   )
+}
 
-  return collapsedChromeClasses ? (
-    <div className={collapsedChromeClasses} data-summary-chrome>
-      {collapsed}
+function FieldGroupSummaryDisclosurePanel({
+  size,
+  rhythm,
+  chromeBodyClassName,
+  fieldChrome,
+  closeLabel,
+  disabled,
+  panelId,
+  children,
+  onClose,
+}: {
+  size: FieldSize
+  rhythm: FieldRhythm
+  chromeBodyClassName?: string
+  fieldChrome?: FieldChrome
+  closeLabel: string
+  disabled: boolean
+  panelId: string
+  children: React.ReactNode
+  onClose: () => void
+}) {
+  const footer = (
+    <div className={fieldGroupSummaryDisclosureFooterClasses}>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        aria-expanded
+        aria-controls={panelId}
+        disabled={disabled}
+        onClick={onClose}
+      >
+        {closeLabel}
+      </Button>
     </div>
-  ) : (
-    collapsed
+  )
+
+  const body = (
+    <>
+      {children}
+      {footer}
+    </>
+  )
+
+  if (chromeBodyClassName) {
+    return (
+      <div className={cn(chromeBodyClassName, fieldStackRhythmVariants({ rhythm }))}>{body}</div>
+    )
+  }
+
+  return (
+    <FieldChromeShell
+      chrome={fieldChrome}
+      size={size}
+      className={fieldStackRhythmVariants({ rhythm })}
+    >
+      {body}
+    </FieldChromeShell>
   )
 }
 
@@ -146,6 +186,9 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
   panelId,
   legendId,
   size = 'md',
+  rhythm = 'compact',
+  chromeBodyClassName,
+  fieldChrome,
   disclosure,
   uiStateKey,
   collapseKey,
@@ -165,37 +208,49 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
     [disclosure, watchedValues],
   )
 
-  const openLabel = disclosure.openLabel ?? DEFAULT_OPEN_LABEL
-  const closeLabel = disclosure.closeLabel ?? DEFAULT_CLOSE_LABEL
-  const unsavedSuffix = disclosure.unsavedSuffix ?? DEFAULT_UNSAVED_SUFFIX
+  const openLabel = disclosure.openLabel ?? DEFAULT_SUMMARY_OPEN_LABEL
+  const closeLabel = disclosure.closeLabel ?? DEFAULT_SUMMARY_CLOSE_LABEL
+  const unsavedSuffix = disclosure.unsavedSuffix ?? DEFAULT_SUMMARY_UNSAVED_SUFFIX
   const showDirtySuffix = Boolean(disclosure.showDirtySuffix && isDirty)
   const disabled = disclosure.disabled ?? false
   const panelClasses = open
     ? resolveFieldGroupSummaryDisclosurePanelClasses(disclosure.panelDivider ?? true)
     : undefined
-  const collapsedChromeClasses = !open ? resolveChromeClasses(summary.chrome) : undefined
 
   return (
-    <Collapsible open={open} onOpenChange={onOpenChange} className="flex min-w-0 flex-col gap-1">
+    <Collapsible
+      open={open}
+      onOpenChange={onOpenChange}
+      className={fieldGroupSummaryDisclosureShellClasses}
+    >
       <FieldGroupSummaryDisclosureHeader
         open={open}
         legend={legend}
         legendId={legendId}
         panelId={panelId}
         size={size}
-        closeLabel={closeLabel}
         openLabel={openLabel}
         unsavedSuffix={unsavedSuffix}
         showDirtySuffix={showDirtySuffix}
         disabled={disabled}
         summary={summary}
-        collapsedChromeClasses={collapsedChromeClasses}
         onOpenChange={onOpenChange}
       />
 
       <CollapsibleContent forceMount className={accordionContentVariants()}>
         <div id={panelId} hidden={!open} className={panelClasses}>
-          {children}
+          <FieldGroupSummaryDisclosurePanel
+            size={size}
+            rhythm={rhythm}
+            chromeBodyClassName={chromeBodyClassName}
+            fieldChrome={fieldChrome}
+            closeLabel={closeLabel}
+            disabled={disabled}
+            panelId={panelId}
+            onClose={() => onOpenChange(false)}
+          >
+            {children}
+          </FieldGroupSummaryDisclosurePanel>
         </div>
       </CollapsibleContent>
     </Collapsible>

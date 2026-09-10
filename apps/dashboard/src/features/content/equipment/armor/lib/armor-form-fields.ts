@@ -47,7 +47,6 @@ export function armorFormFieldGroup(): FormItem {
   return {
     kind: 'group',
     legend: '',
-    chrome: { variant: 'panel' },
     fields: [
       {
         kind: 'row',

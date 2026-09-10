@@ -112,6 +112,49 @@ describe('SegmentedControl', () => {
     expect(screen.queryByRole('button', { pressed: true })).not.toBeInTheDocument()
   })
 
+  it('renders a leading icon that is hidden from the accessible name', () => {
+    render(
+      <SegmentedControl
+        aria-label="Modes"
+        value="alpha"
+        options={[
+          {
+            value: 'alpha',
+            label: 'Alpha',
+            leadingIcon: <span data-testid="leading-icon">★</span>,
+          },
+        ]}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Alpha' })).toBeInTheDocument()
+    expect(screen.getByTestId('leading-icon').parentElement).toHaveAttribute('aria-hidden')
+  })
+
+  it('forwards trailing content and button props onto the segment', () => {
+    render(
+      <SegmentedControl
+        aria-label="Modes"
+        value="alpha"
+        options={[
+          {
+            value: 'alpha',
+            label: 'Alpha',
+            trailing: <span data-testid="trailing">2</span>,
+            buttonProps: { 'data-tab-trigger': 'alpha', 'aria-controls': 'alpha-panel' },
+          },
+        ]}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    const segment = screen.getByRole('button', { name: /Alpha/ })
+    expect(screen.getByTestId('trailing')).toBeInTheDocument()
+    expect(segment).toHaveAttribute('data-tab-trigger', 'alpha')
+    expect(segment).toHaveAttribute('aria-controls', 'alpha-panel')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <SegmentedControl

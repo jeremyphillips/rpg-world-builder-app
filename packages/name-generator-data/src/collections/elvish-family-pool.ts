@@ -6,7 +6,7 @@ export const elvishFamilyPoolCollection = {
   id: 'elvish-family-pool',
   label: 'Elvish family names',
   description: 'Fixture family-name pool for elven personal conventions.',
-  subjectKinds: ['person'],
+  subjectKinds: ['person', 'family'],
   generator: {
     type: 'sample',
     pools: [

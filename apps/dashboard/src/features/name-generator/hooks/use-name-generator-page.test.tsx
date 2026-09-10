@@ -88,6 +88,35 @@ describe('useNameGeneratorPage', () => {
     expect(result.current.filters).toEqual({ subjectKind: 'person' })
   })
 
+  it('drops generated results once the filters match no convention', async () => {
+    const generateNameBatch = vi
+      .spyOn(generateNameBatchModule, 'generateNameBatch')
+      .mockResolvedValue({
+        results: [{ value: 'A', conventionId: 'elvish-personal', structureId: 'full', parts: {} }],
+        seed: 'seed-a',
+        matches: [{ conventionId: 'elvish-personal', score: 10, reasons: [] }],
+      })
+
+    const { result } = renderHook(() => useNameGeneratorPage())
+
+    await act(async () => {
+      await result.current.generate()
+    })
+
+    expect(result.current.results).toHaveLength(1)
+    expect(result.current.status).toBe('success')
+
+    act(() => {
+      result.current.setFilters({ subjectKind: 'ship' })
+    })
+
+    expect(result.current.results).toEqual([])
+    expect(result.current.status).toBe('idle')
+    expect(result.current.resultsSummary).toBeUndefined()
+
+    generateNameBatch.mockRestore()
+  })
+
   it('preserves filters while regenerating with a new seed', async () => {
     const generateNameBatch = vi
       .spyOn(generateNameBatchModule, 'generateNameBatch')

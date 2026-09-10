@@ -28,6 +28,15 @@ describe('resolveFieldRailClasses', () => {
 })
 
 describe('resolveDependentPresentation', () => {
+  it('defaults omitted chrome to rail', () => {
+    const presentation = resolveDependentPresentation(
+      { fields: [], inset: DEFAULT_DEPENDENT_INSET },
+      'comfortable',
+    )
+    expect(presentation.chrome).toBe('rail')
+    expect(presentation.railClassName).toContain('before:left-2')
+  })
+
   it('applies content inset when inset is true', () => {
     const presentation = resolveDependentPresentation(
       { fields: [], inset: DEFAULT_DEPENDENT_INSET, chrome: 'none' },

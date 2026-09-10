@@ -3,6 +3,7 @@ import { collectArraySections } from './resolve-field-order'
 import type { FormIssue } from './form-issue.types'
 import type { FormItem } from '../field-config'
 import { isContainer } from '../field-config'
+import { resolveColumnsCollapseSequence } from '../config/form-columns-collapse.lib'
 
 /** Minimal tab shape for path ownership — avoids shell import cycles. */
 export type TabValidationTab = {
@@ -38,6 +39,14 @@ function collectPrefixesFromItems(items: readonly FormItem[], prefixes: string[]
     if (item.kind === 'dependent') {
       prefixes.push(item.controller.name)
       collectPrefixesFromItems(item.dependents.fields, prefixes)
+      continue
+    }
+
+    if (item.kind === 'columns') {
+      collectPrefixesFromItems(
+        resolveColumnsCollapseSequence(item.columns, item.collapseOrder),
+        prefixes,
+      )
       continue
     }
 

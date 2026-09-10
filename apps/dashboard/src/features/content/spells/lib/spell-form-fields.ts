@@ -23,6 +23,7 @@ import {
   vocabularyFieldLabel,
 } from '@/features/vocabulary'
 
+import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import {
   descriptionField,
   feetInputUnitField,
@@ -116,6 +117,13 @@ function visibleWhenLeveledSpell(): FieldVisibility {
       const level = spellFormLevelValue(v.level)
       return level !== undefined && level > 0
     },
+  }
+}
+
+function visibleWhenSpellLevelSelected(): FieldVisibility {
+  return {
+    dependsOn: ['level'],
+    visibleWhen: (v) => spellFormLevelValue(v.level) !== undefined,
   }
 }
 
@@ -265,62 +273,83 @@ export type SpellFormValues = z.infer<typeof spellFormSchema>
 
 function basicsFields(ctx: ContentFormCtx): FormItem[] {
   const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
+  const richTextLinks = {
+    linkable: true as const,
+    internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+    contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+  }
 
-  return [
-    {
-      kind: 'row',
-      fields: [
-        {
-          type: 'select',
-          name: 'school',
-          label: 'School',
-          options: schoolOptions,
-          required: true,
-          width: 'xl',
-        },
-        {
+  const schoolGroup: FormItem = {
+    kind: 'group',
+    legend: 'School',
+    fields: [
+      {
+        type: 'select',
+        name: 'school',
+        label: 'School',
+        labelVisibility: 'srOnly',
+        options: schoolOptions,
+        required: true,
+      },
+    ],
+  }
+
+  const levelGroup: FormItem = {
+    kind: 'group',
+    legend: 'Level',
+    fields: [
+      {
+        kind: 'dependent',
+        controller: {
           type: 'chips',
           name: 'level',
           label: 'Level',
+          labelVisibility: 'srOnly',
           options: spellLevelOptions,
+          multiple: false,
           required: true,
-          width: 'md',
         },
-      ],
-    },
-    {
-      kind: 'row',
-      fields: [
-        {
-          type: 'combobox',
-          name: 'classIds',
-          label: getContentTypeCollectionLabel('classes'),
-          multiple: true,
-          options: referenceSpellcastingClassFieldOptions(ctx.options?.classes),
-          placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
-          required: true,
-          width: '1/2',
+        dependents: {
+          visibility: visibleWhenSpellLevelSelected(),
+          fields: [
+            {
+              type: 'richtext',
+              name: 'cantripScaling',
+              label: SPELL_SECTION_LABELS.cantripScaling,
+              ...richTextLinks,
+              visibility: visibleWhenCantripLevel(),
+            },
+            {
+              type: 'richtext',
+              name: 'higherLevelSlotEffect',
+              label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+              ...richTextLinks,
+              visibility: visibleWhenLeveledSpell(),
+            },
+          ],
         },
+      },
+    ],
+  }
+
+  const classesField: FormItem = {
+    type: 'combobox',
+    name: 'classIds',
+    label: getContentTypeCollectionLabel('classes'),
+    multiple: true,
+    options: referenceSpellcastingClassFieldOptions(ctx.options?.classes),
+    placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
+    required: true,
+  }
+
+  return [
+    {
+      kind: 'columns',
+      collapseOrder: 'interleave',
+      columns: [
+        { fields: [schoolGroup, classesField, descriptionField(ctx)] },
+        { fields: [levelGroup] },
       ],
-    },
-    descriptionField(ctx),
-    {
-      type: 'richtext',
-      name: 'cantripScaling',
-      label: SPELL_SECTION_LABELS.cantripScaling,
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: visibleWhenCantripLevel(),
-    },
-    {
-      type: 'richtext',
-      name: 'higherLevelSlotEffect',
-      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: visibleWhenLeveledSpell(),
     },
   ]
 }
@@ -330,7 +359,6 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Casting time',
-      chrome: { variant: 'panel' },
       fields: [
         {
           kind: 'row',
@@ -371,7 +399,6 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Range',
-      chrome: { variant: 'panel' },
       fields: [
         {
           kind: 'row',
@@ -404,7 +431,6 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Duration',
-      chrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -460,7 +486,6 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Components',
-      chrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -498,7 +523,6 @@ function castingFields(): FormItem[] {
     {
       kind: 'group',
       legend: 'Area of effect',
-      chrome: { variant: 'outline' },
       fields: [
         {
           kind: 'row',
@@ -618,5 +642,5 @@ export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       resolverFields: resolutionOutcomeApplicationsResolverFields(),
     },
     { id: 'tags', label: 'Tags', fields: tagFields(ctx) },
-  ]
+  ].map(withContentFormTabIcon)
 }

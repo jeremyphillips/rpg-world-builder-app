@@ -107,20 +107,21 @@ Collapsed summary disclosure for unavailable campaign access:
 {
   status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
   detail: 'DM only',
-  secondary: 'Hidden from discovery and selection in this campaign.',
   chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' },
 }
 ```
 
-| Element               | Treatment                                    |
-| --------------------- | -------------------------------------------- |
-| Left accent rail      | `resolveChromeAccentClasses` — warning faint |
-| `CircleSlash` icon    | `text-semantic-warning`                      |
-| `Unavailable` label   | `text-semantic-warning`                      |
-| **Change**            | `text-primary` (text button)                 |
-| `DM only` detail      | `text-muted-foreground`                      |
-| Secondary consequence | `text-xs text-muted-foreground`              |
-| Section legend        | `Text variant="muted"`                       |
+Status, detail, and **Change** share one line; the summary omits a `secondary`
+consequence line. Trigger copy is 12px (`text-xs`) at every field size.
+
+| Element             | Treatment                                             |
+| ------------------- | ----------------------------------------------------- |
+| Left accent rail    | `resolveChromeAccentClasses` — warning faint          |
+| `CircleSlash` icon  | `text-semantic-warning`                               |
+| `Unavailable` label | `text-semantic-warning`                               |
+| **Change**          | `aria-hidden` affordance on the single trigger button |
+| `DM only` detail    | `text-muted-foreground`                               |
+| Section legend      | `Text variant="muted"`                                |
 
 Expanded state stays visually neutral (inset chrome only). Validate in Storybook
 light and dark: **Content → Campaign Access → SectionUnavailable** and

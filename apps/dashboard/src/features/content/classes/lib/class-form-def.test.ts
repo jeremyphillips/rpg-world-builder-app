@@ -460,5 +460,6 @@ describe('classFormDef.buildTabs', () => {
       'subclasses',
       'characterCreation',
     ])
+    expect(tabs.every((tab) => tab.leadingIcon)).toBe(true)
   })
 })

@@ -11,20 +11,38 @@ Campaign availability is a **separate form surface** from content body fields. I
 
 ## Disclosure UX
 
-Collapsed summary comes from `resolveCampaignAccessSummary`. The group uses `disclosure: { variant: 'summary' }` on `buildCampaignAccessFields`. While dirty, the summary appends ` · Unsaved` and the panel stays open until **Done**.
+Collapsed summary comes from `resolveCampaignAccessSummary`. The group uses
+`disclosure: { variant: 'inline' | 'dialog' }` via `presentation` on
+`CampaignAvailabilityField` (`buildCampaignAvailabilityFields`).
 
-`CampaignAccessSection` accepts optional `density` — typically inherited from the parent form via `ContentFormHeader` (`useFormSectionContext`) or from `useCreateFlowFormDensity()` inside create modals. Summary chrome and field labels follow the same `compact` / `comfortable` scale as sibling form fields.
+| Host                          | `availabilityPresentation` | `identityLayout` |
+| ----------------------------- | -------------------------- | ---------------- |
+| Full create/edit routes       | `dialog`                   | `inline`         |
+| Create modals, subclass panel | `disclosure`               | `stacked`        |
+
+`identityLayout: 'inline'` is a `kind: 'row'` so Name and Campaign availability share one
+field container (`width: 'full'` + `width: '1/3'`, top-aligned). Stacked overlays keep them
+as sibling top-level fields.
+
+`presentation` defaults to `disclosure` so a new overlay host cannot accidentally nest a
+dialog. The page shell opts into `dialog`. While dirty, the summary appends ` · Unsaved`.
+Inline **Done** is an outline button in the expanded panel footer; the dialog **Done** is the
+single footer action. Both only dismiss the editor — nothing commits until the page Save.
+
+`CampaignAvailabilityField` accepts optional `density` — typically inherited from the parent form via `ContentFormHeader` (`useFormSectionContext`) or from `useCreateFlowFormDensity()` inside create modals. Summary chrome and field labels follow the same `compact` / `comfortable` scale as sibling form fields.
 
 The collapsed disclosure renders as a **status row**:
 
 - **Available** — success dot, `Available` label, and configured player-access `detail` (e.g. `DM only`) on one line; no tinted wrapper.
-- **Unavailable** — faint warning accent shell (`chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' }`), `Unavailable` label with warning inactive icon, preserved `detail` (configured access mode), and a neutral secondary consequence line (`CAMPAIGN_ACCESS_UNAVAILABLE_SUMMARY_SECONDARY`).
+- **Unavailable** — faint warning accent shell (`chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' }`), `Unavailable` label with warning inactive icon, and preserved `detail` (configured access mode).
 
-`detail` reflects the **configured** player-access mode even when availability is off — it is preserved, not erased. The secondary line explains that the setting is not currently effective.
+Status, `· Unsaved`, and the **Change** affordance stay on that one line, at 12px in both compact and comfortable forms. Consequence copy lives in the switch hint and the row tooltip, not the summary.
+
+`detail` reflects the **configured** player-access mode even when availability is off — it is preserved, not erased.
 
 ## Participant context
 
-`CampaignAccessFormProvider` owns reactive participant state (`isDirty`, `isPending`, `save`, `reset`). `CampaignAccessSection` registers bindings via `useCampaignAccessParticipantUpdater`. Shells and guards consume `useCampaignAccessForm()`.
+`CampaignAccessFormProvider` owns reactive participant state (`isDirty`, `isPending`, `save`, `reset`). `CampaignAvailabilityField` registers bindings via `useCampaignAccessParticipantUpdater`. Shells and guards consume `useCampaignAccessForm()`.
 
 Availability toggle preflight uses a narrow `CampaignAccessAvailabilityProvider` inside the section — separate from participant state.
 
@@ -83,7 +101,7 @@ No unified Save — Publish / Save draft stay pending-only. Campaign access uses
 ## Testing
 
 - Coordinator matrix: `content-save-session.test.ts`
-- Section behavior: `campaign-access-section.test.tsx`
+- Section behavior: `campaign-availability-field.test.tsx`
 - Shell wiring: `content-save-session.integration.test.tsx`
 - Participant contract: `campaign-access-form-context.test.tsx`
 - Bulk preview: `campaign-access/bulk/resolve-bulk-campaign-access-preview.test.ts`
@@ -111,7 +129,9 @@ Do not share `FormItem[]` builders between detail and bulk — share options, la
 ## Participant picker
 
 `useCampaignAccessParticipantRoster` loads `GET …/content/access-participants`.
-`buildCampaignAccessFields` renders a conditional `participantIds` combobox when
+`buildCampaignAccessFields` renders **Player access** as a `kind: 'dependent'` controller
+whose gated dependent is the `participantIds` combobox — inset behind a rail (the
+`DependentConfig` defaults) and shown only while availability is on and
 `visibilityMode === 'specific_players'`.
 
 Subclass editor save orchestration reuses `CampaignAccessFormProvider` and

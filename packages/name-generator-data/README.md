@@ -7,7 +7,8 @@ loaders for the experimental name generator foundation.
 
 - Slim `NamingConventionDefinition` objects and `CULTURE_CONVENTION_BINDINGS`
 - `listStaticConventions()` for unmigrated exceptional conventions only
-- `STANDALONE_NAMING_CULTURES` and `HERITAGE_CULTURE_ALIASES`
+- `STANDALONE_NAMING_CULTURES`, `HERITAGE_NAMING_CULTURES`, and the derived
+  `HERITAGE_CULTURE_ALIASES` routing rows
 - Lazy collection loading (`loadNameCollection`) via trusted import map
 
 Resolution of catalog-bound definitions into full `NamingConvention` objects
@@ -39,6 +40,7 @@ integrations  (buildNamingCultureContext, resolveCampaignConventions, …)
 import {
   CULTURE_CONVENTION_BINDINGS,
   HERITAGE_CULTURE_ALIASES,
+  HERITAGE_NAMING_CULTURES,
   listStaticConventions,
   loadNameCollection,
   STANDALONE_NAMING_CULTURES,
@@ -55,6 +57,7 @@ Dashboard convention composition:
 const campaignConventions = resolveCampaignConventions({
   species,
   bindings: CULTURE_CONVENTION_BINDINGS,
+  heritageCultures: HERITAGE_NAMING_CULTURES,
 })
 const standaloneConventions = resolveStandaloneConventions({
   cultures: STANDALONE_NAMING_CULTURES,
@@ -70,9 +73,42 @@ const conventions = [...campaignConventions, ...standaloneConventions, ...listSt
 | `CULTURE_CONVENTION_BINDINGS`    | data         | Slim definitions keyed by culture id                                        |
 | `listStaticConventions()`        | data         | Unmigrated full conventions (`faction-general`, `draconic-dragon-personal`) |
 | `resolveCampaignConventions()`   | integrations | Species catalog → conventions                                               |
-| `resolveStandaloneConventions()` | integrations | Standalone cultures (e.g. akan) → conventions                               |
+| `resolveStandaloneConventions()` | integrations | Standalone cultures (Akan plus the real-world roster) → conventions         |
 
 Do not add a `listConventions()` that silently merges static and resolved output.
+
+## Real-world cultures and the region axis
+
+Standalone cultures in `STANDALONE_NAMING_CULTURES` carry `regionIds` and
+`languageIds: ['common']`. `resolveNamingConvention` injects those as convention
+associations — do not hand-write region associations on the definitions.
+
+Region-to-culture map (each region is a grouping axis, not a second name for
+Culture — several regions now have two cultures):
+
+| Region         | Cultures              |
+| -------------- | --------------------- |
+| West Africa    | Akan, Yoruba          |
+| Scandinavia    | Norse                 |
+| British Isles  | Anglo-Saxon, Gaelic   |
+| East Asia      | Japanese, Han Chinese |
+| Eastern Europe | Slavic                |
+| Mediterranean  | Roman                 |
+| Near East      | Arabic                |
+
+Recipe for a new real-world culture:
+
+1. Add a `STANDALONE_NAMING_CULTURES` row with `origin: 'historical'`, a
+   `NAME_REGION_ENTRIES` id, and `languageIds: ['common']`.
+2. Add definitions under `definitions/culture/<id>/` and bind them in
+   `CULTURE_CONVENTION_BINDINGS`.
+3. Register pools in both `collections/manifest.ts` and `collections/import-map.ts`.
+4. Attested given/family lists stay at what is documented (`methodology: 'curated'`).
+   Morpheme-composed pools use `methodology: 'pattern-derived'` via the
+   `patternDerived` provenance preset — do not reuse `historicalCurated` for those.
+5. Prefix-based toponyms use the `placePrefix` part role (`{placePrefix}{placeRoot}`).
+   Gender-varying particles and suffixes belong in gendered pools, never in
+   format text. Variable-length names need separate structures, not optional parts.
 
 ## Adding a culture-bound convention
 
@@ -81,6 +117,37 @@ Do not add a `listConventions()` that silently merges static and resolved output
 3. Remove the legacy full convention from `conventions/manifest.ts` once parity tests pass.
 
 Preserve explicit `id`, `label`, and `description` when they differ from generated defaults.
+
+Every culture may bind at most one definition per `NAMING_CONVENTION_KEYS` entry
+(`personal`, `family`, `clan`, `settlement`, `landmark`, `faction`) — enforced by
+`manifest.test.ts`.
+
+## Heritage naming cultures
+
+`heritage/heritage-naming-cultures.ts` is the source of truth for lineages that
+name differently from their base species culture (elf high/wood/drow, dragonborn
+metallic/chromatic, tiefling abyssal/chthonic). Each row names the culture id,
+the heritage option ids that route to it, and optional `languageIds` that
+override the species language affinity. `HERITAGE_CULTURE_ALIASES` is derived
+from it — add heritages in the registry only.
+
+A heritage culture must have `CULTURE_CONVENTION_BINDINGS` entries; otherwise
+`resolveCampaignConventions` resolves nothing for it and the dashboard heritage
+filter has nothing to select.
+
+## Collection assets
+
+Pools live in `src/collections/<collection-id>.ts` and must be registered in both
+`collections/manifest.ts` and the trusted `collections/import-map.ts` allowlist.
+`collection-integrity.test.ts` asserts every pool is deduplicated,
+`localeCompare`-sorted, and within 10% of the manifest's
+`approximateResultCount`.
+
+Morpheme-composed pools (place roots, place/landmark suffixes, heritage given
+names, faction descriptors/emblems/org types) are generated — edit the tables in
+[`tools/scripts/generate-name-pools.mjs`](../../tools/scripts/generate-name-pools.mjs)
+and re-run `node tools/scripts/generate-name-pools.mjs` rather than hand-editing
+the emitted files.
 
 ## Adding a static (exceptional) convention
 

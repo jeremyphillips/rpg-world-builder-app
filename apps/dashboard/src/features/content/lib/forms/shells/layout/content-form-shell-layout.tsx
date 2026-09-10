@@ -21,6 +21,10 @@ import {
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 import type { CoordinatedSaveSavedEvent } from '../session/use-content-save-session'
 import { ContentSchemaFormShell } from './content-schema-form-shell'
+import {
+  CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
+  CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
+} from '../content-form-presentation.lib'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 
 export function ContentFormComingSoon() {
@@ -143,6 +147,8 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         campaignAccess,
         onCampaignAccessDraftChange,
         onCampaignAccessPersisted,
+        identityLayout: CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
+        availabilityPresentation: CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
       }}
       headerPrefix={formHeaderPrefix}
     />

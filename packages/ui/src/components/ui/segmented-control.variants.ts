@@ -58,3 +58,6 @@ export const segmentedControlMetadataVariants = cva('text-xs tabular-nums', {
     active: false,
   },
 })
+
+export const segmentedControlLeadingIconClasses =
+  'inline-flex shrink-0 leading-none [&_svg]:size-icon-glyph-sm'

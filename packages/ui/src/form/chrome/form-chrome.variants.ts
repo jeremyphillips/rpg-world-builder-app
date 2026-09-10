@@ -8,6 +8,12 @@ export const formStickyTabsClasses =
 export const formStickyTabsTransparentClasses =
   'bg-transparent supports-[backdrop-filter]:bg-transparent backdrop-blur-none'
 
+/** Keeps a long segmented section control scrollable inside the field column. */
+export const formTabbedNavOverflowClasses = 'min-w-0 overflow-x-auto'
+
+/** Visually hide inactive TabbedForm panels while keeping them mounted. */
+export const formTabbedInactivePanelClasses = 'hidden'
+
 /** Bottom padding on tab panels so the last field clears the sticky actions bar. */
 /** removed pb-24 as it did not seem to be necessary */
 export const formTabPanelsBottomPaddingClasses = ''

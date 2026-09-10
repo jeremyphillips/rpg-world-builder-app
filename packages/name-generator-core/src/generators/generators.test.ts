@@ -26,6 +26,29 @@ describe('generateSamplePart', () => {
     expect(['Aelar', 'Adran', 'Aramil']).toContain(masculine)
   })
 
+  it('samples the union of role pools when gender has no match or fallback', () => {
+    const rng = createSeededRng('neutral-union')
+    const values = new Set<string>()
+    for (let index = 0; index < 20; index += 1) {
+      values.add(
+        generateSamplePart(
+          {
+            type: 'sample',
+            pools: [
+              { id: 'given-masc', role: 'given', genderStyle: 'masculine', values: ['Bagak'] },
+              { id: 'given-fem', role: 'given', genderStyle: 'feminine', values: ['Bagasha'] },
+            ],
+          },
+          rng,
+          { genderStyle: 'neutral' },
+        ),
+      )
+    }
+
+    expect(values.has('Bagak')).toBe(true)
+    expect(values.has('Bagasha')).toBe(true)
+  })
+
   it('throws for empty pools', () => {
     const rng = createSeededRng('empty')
     expect(() =>

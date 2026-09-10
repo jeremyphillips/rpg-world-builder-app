@@ -8,6 +8,7 @@ import type { FieldHintPosition } from './field.variants'
 import type { FieldDigits } from './field-digit-metrics'
 import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
+import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import { FieldLabelContent } from './field-label-content'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import type { FieldOption } from '../../form/field-config'
@@ -32,6 +33,7 @@ export interface LevelRangeFieldProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
+  chrome?: FieldChrome
   digits?: FieldDigits
   onMinChange?: (value: number) => void
   onMaxChange?: (value: number) => void
@@ -66,6 +68,7 @@ export function LevelRangeField({
   disabled,
   size = 'md',
   width,
+  chrome,
   digits = 2,
   onMinChange,
   onMaxChange,
@@ -76,12 +79,15 @@ export function LevelRangeField({
   const maxString = maxValue !== undefined ? String(maxValue) : undefined
   const minOptionNodes = useMemo(() => renderOptions(minOptions), [minOptions])
   const maxOptionNodes = useMemo(() => renderOptions(maxOptions), [maxOptions])
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={width} size={size}>
+    <Field.Root id={id} error={error} hint={hint} required={required} width={rootWidth} size={size}>
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
+        chrome={chrome}
+        size={size}
         label={
           <Field.Label>
             <FieldLabelContent label={label} info={info} />

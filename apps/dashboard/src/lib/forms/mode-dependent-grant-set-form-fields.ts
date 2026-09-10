@@ -55,7 +55,7 @@ function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibil
   }
 }
 
-/** Shared mode radio + dependent grant-set editors — decoration is owned by parent composition. */
+/** Shared mode radio + dependent grant-set editors. */
 export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOptions): FormItem {
   const {
     modeFieldName,

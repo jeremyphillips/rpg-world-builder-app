@@ -16,7 +16,9 @@ export const SUBJECTS_WITH_GENDER_FILTER = new Set<NameSubjectKind>(['person'])
 
 export const SUBJECTS_WITH_LANGUAGE_CULTURE_FILTER = new Set<NameSubjectKind>([
   'person',
+  'family',
   'settlement',
+  'landmark',
   'clan',
   'faction',
   'organization',

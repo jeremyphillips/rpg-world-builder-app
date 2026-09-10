@@ -19,11 +19,17 @@ function stripInvalidOptionalFilters(
   if (isFilterValueValid('speciesId', filters.speciesId, options)) {
     next.speciesId = filters.speciesId
   }
+  if (isFilterValueValid('heritageId', filters.heritageId, options)) {
+    next.heritageId = filters.heritageId
+  }
   if (isFilterValueValid('languageId', filters.languageId, options)) {
     next.languageId = filters.languageId
   }
   if (isFilterValueValid('cultureId', filters.cultureId, options)) {
     next.cultureId = filters.cultureId
+  }
+  if (isFilterValueValid('regionId', filters.regionId, options)) {
+    next.regionId = filters.regionId
   }
   if (isFilterValueValid('genderStyle', filters.genderStyle, options)) {
     next.genderStyle = filters.genderStyle

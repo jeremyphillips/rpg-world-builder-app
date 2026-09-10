@@ -9,7 +9,14 @@ import type { NameSubjectKind } from './subject-kind'
 // Naming convention definitions — slim catalog-bound shapes resolved at runtime.
 // ---------------------------------------------------------------------------
 
-export const NAMING_CONVENTION_KEYS = ['personal', 'settlement', 'clan'] as const
+export const NAMING_CONVENTION_KEYS = [
+  'personal',
+  'family',
+  'clan',
+  'settlement',
+  'landmark',
+  'faction',
+] as const
 
 export type NamingConventionKey = (typeof NAMING_CONVENTION_KEYS)[number]
 

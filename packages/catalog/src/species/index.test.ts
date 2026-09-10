@@ -182,7 +182,7 @@ describe('SRD 5.2.1 species seed', () => {
     }
   })
 
-  it('seeds languageAffinities on ancestral species and omits them elsewhere', () => {
+  it('seeds languageAffinities on species with an ancestral tongue and omits them elsewhere', () => {
     const withAffinities = new Map(
       species
         .filter((entry) => entry.languageAffinities)
@@ -196,11 +196,10 @@ describe('SRD 5.2.1 species seed', () => {
     expect(withAffinities.get('goliath')).toEqual(['giant'])
     expect(withAffinities.get('halfling')).toEqual(['halfling'])
     expect(withAffinities.get('orc')).toEqual(['orc'])
-    expect(withAffinities.size).toBe(7)
+    expect(withAffinities.get('human')).toEqual(['common'])
+    expect(withAffinities.size).toBe(8)
 
-    for (const slug of ['human', 'tiefling'] as const) {
-      expect(species.find((entry) => entry.slug === slug)?.languageAffinities).toBeUndefined()
-    }
+    expect(species.find((entry) => entry.slug === 'tiefling')?.languageAffinities).toBeUndefined()
   })
 
   it('stores non-empty descriptions as rich-text HTML', () => {

@@ -6,8 +6,7 @@ export const gnomeSettlementDefinition = {
   key: 'settlement',
   id: 'gnomish-settlement',
   label: 'Common Gnomish settlement names',
-  description: 'Settlement names sharing gnomish linguistic pools with personal conventions.',
-  subjectKinds: ['settlement', 'landmark'],
+  description: 'Settlement names built from gnomish place roots and settlement suffixes.',
   structures: [
     {
       id: 'compound-place',
@@ -21,7 +20,11 @@ export const gnomeSettlementDefinition = {
   ],
   partBindings: [
     { partKey: 'placeRoot', collectionId: 'gnomish-place-root-pool', sourceKey: 'placeRoot' },
-    { partKey: 'placeSuffix', collectionId: 'gnomish-place-suffix-pool', sourceKey: 'placeSuffix' },
+    {
+      partKey: 'placeSuffix',
+      collectionId: 'gnomish-place-suffix-pool',
+      sourceKey: 'placeSuffix',
+    },
   ],
   collectionIds: ['gnomish-place-root-pool', 'gnomish-place-suffix-pool'],
   provenance: FIXTURE_COLLECTION_PROVENANCE.conventionCuration,

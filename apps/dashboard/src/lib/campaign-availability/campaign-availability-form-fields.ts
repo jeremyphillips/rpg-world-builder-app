@@ -1,4 +1,8 @@
-import type { FormItem, FieldGroupSummary, FormDensity } from '@rpg/ui/form'
+import type { FieldGroupSummary, FormItem, FormDensity } from '@rpg/ui/form'
+
+import { resolveVocabularyAvailabilitySummary } from './availability-status-summary.lib'
+
+export { resolveVocabularyAvailabilitySummary }
 
 import {
   CAMPAIGN_ACCESS_AVAILABLE_HINT,
@@ -6,9 +10,11 @@ import {
   CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
   CAMPAIGN_ACCESS_CHANGE_LABEL,
   CAMPAIGN_ACCESS_DONE_LABEL,
+  CAMPAIGN_ACCESS_SECTION_HINT,
   CAMPAIGN_ACCESS_SECTION_LEGEND,
-  CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
 } from '@/features/content/lib/campaign-access/campaign-access-labels'
+
+export type CampaignAvailabilityPresentation = 'dialog' | 'disclosure'
 
 export type CampaignAvailabilityFieldCtx = {
   groupId: string
@@ -18,18 +24,8 @@ export type CampaignAvailabilityFieldCtx = {
   groupDensity?: FormDensity
   /** Override for content immediate-preflight switch slot. */
   availabilityField?: FormItem
-}
-
-export function resolveVocabularyAvailabilitySummary(available: boolean): FieldGroupSummary {
-  if (!available) {
-    return {
-      status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
-    }
-  }
-
-  return {
-    status: { label: 'Available', tone: 'success', indicator: 'dot' },
-  }
+  /** Where the editor renders. Defaults to in-place disclosure. */
+  presentation?: CampaignAvailabilityPresentation
 }
 
 function defaultAvailabilitySwitchField(pending: boolean): FormItem {
@@ -47,25 +43,37 @@ function defaultAvailabilitySwitchField(pending: boolean): FormItem {
 
 /** Availability-only disclosure group — shared by content and vocabulary consumers. */
 export function buildCampaignAvailabilityFields(ctx: CampaignAvailabilityFieldCtx): FormItem[] {
+  const presentation = ctx.presentation ?? 'disclosure'
+  const disclosure =
+    presentation === 'dialog'
+      ? {
+          variant: 'dialog' as const,
+          openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
+          closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
+          disabled: ctx.pending,
+          hint: CAMPAIGN_ACCESS_SECTION_HINT,
+          dialogHeadline: CAMPAIGN_ACCESS_SECTION_LEGEND,
+          summaryDependsOn: ctx.summaryDependsOn,
+          resolveSummary: ctx.resolveSummary,
+        }
+      : {
+          variant: 'inline' as const,
+          defaultOpen: false,
+          panelDivider: false,
+          openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
+          closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
+          disabled: ctx.pending,
+          summaryDependsOn: ctx.summaryDependsOn,
+          resolveSummary: ctx.resolveSummary,
+        }
+
   return [
     {
       kind: 'group',
       id: ctx.groupId,
       legend: CAMPAIGN_ACCESS_SECTION_LEGEND,
-      chrome: { variant: 'rail' },
       density: ctx.groupDensity ?? 'compact',
-      disclosure: {
-        variant: 'summary',
-        defaultOpen: false,
-        panelDivider: false,
-        openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
-        closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
-        unsavedSuffix: CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
-        showDirtySuffix: true,
-        disabled: ctx.pending,
-        summaryDependsOn: ctx.summaryDependsOn,
-        resolveSummary: ctx.resolveSummary,
-      },
+      disclosure,
       fields: [ctx.availabilityField ?? defaultAvailabilitySwitchField(ctx.pending)],
     },
   ]

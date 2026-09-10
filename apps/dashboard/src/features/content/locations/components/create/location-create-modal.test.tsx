@@ -162,8 +162,8 @@ vi.mock('../../../lib/forms/shells/layout/content-form-shell-layout', () => ({
     }),
 }))
 
-vi.mock('../../../lib/campaign-access/campaign-access-section', () => ({
-  CampaignAccessSection: ({
+vi.mock('../../../lib/campaign-access/campaign-availability-field', () => ({
+  CampaignAvailabilityField: ({
     onDraftChange,
   }: {
     onDraftChange?: (patch: ContentCampaignAccessPatch) => void

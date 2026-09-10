@@ -9,7 +9,7 @@ import type { NameGeneratorFilters } from './name-generator-filters'
 
 function matchSatisfiesSelectedFilters(
   match: NamingRecommendation,
-  filters: Pick<NameGeneratorFilters, 'languageId' | 'cultureId' | 'speciesId'>,
+  filters: Pick<NameGeneratorFilters, 'languageId' | 'cultureId' | 'speciesId' | 'regionId'>,
 ): boolean {
   if (filters.languageId !== undefined) {
     const hasLanguage = match.reasons.some(
@@ -29,13 +29,22 @@ function matchSatisfiesSelectedFilters(
     }
   }
 
+  if (filters.regionId !== undefined) {
+    const hasRegion = match.reasons.some(
+      (reason) => reason.kind === 'region' && reason.regionId === filters.regionId,
+    )
+    if (!hasRegion) {
+      return false
+    }
+  }
+
   return true
 }
 
 export function recommendNameGeneratorMatches(
   context: NamingContext,
   conventions: readonly NamingConvention[],
-  filters: Pick<NameGeneratorFilters, 'languageId' | 'cultureId' | 'speciesId'> = {},
+  filters: Pick<NameGeneratorFilters, 'languageId' | 'cultureId' | 'speciesId' | 'regionId'> = {},
 ): NamingRecommendation[] {
   const eligibleConventions = conventions.filter((convention) =>
     convention.subjectKinds.includes(context.subjectKind),

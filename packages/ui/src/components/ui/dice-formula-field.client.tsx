@@ -4,18 +4,13 @@ import * as React from 'react'
 
 import { DIE_FACES } from '@rpg/contracts/primitives'
 
-import { cn } from '../../lib/utils'
-import {
-  Field,
-  FieldErrorText,
-  FieldHintBelowLabel,
-  FieldHintErrorBelowControl,
-  type FieldSize,
-} from './field.client'
+import { FieldLayout } from './field-layout'
+import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
+import { Field, type FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
-import { fieldWidthVariants } from './field-control.variants'
 import { FieldLabelContent } from './field-label-content'
 import { DiceFormulaControls } from './dice-formula-field-controls.client'
+import { DiceFormulaInlineField } from './dice-formula-field-inline.client'
 import {
   applyDiceFormulaPatch,
   DICE_FORMULA_OPERATORS,
@@ -29,14 +24,7 @@ import {
   resolveDiceFormulaValue,
   shouldShowModifierFields,
 } from './dice-formula-field.lib'
-import { FieldLayout } from './field-layout'
-import {
-  fieldAnatomyStackVariants,
-  fieldInlineControlRowClasses,
-  fieldLabelHintStackClasses,
-  fieldLabelVariants,
-  type FieldHintPosition,
-} from './field.variants'
+import type { FieldHintPosition } from './field.variants'
 
 export interface DiceFormulaFieldProps {
   id: string
@@ -52,6 +40,7 @@ export interface DiceFormulaFieldProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
+  chrome?: FieldChrome
   labelPosition?: DiceFormulaLabelPosition
   modifierMode?: DiceFormulaModifierMode
   faces?: readonly number[]
@@ -83,6 +72,7 @@ export function DiceFormulaField({
   disabled = false,
   size = 'md',
   width = 'full',
+  chrome,
   labelPosition = 'above',
   modifierMode = 'optional',
   faces = DIE_FACES,
@@ -101,6 +91,7 @@ export function DiceFormulaField({
   const hasError = Boolean(error)
   const describedBy = hasError ? errorId : hint ? hintId : undefined
   const showModifierFields = shouldShowModifierFields(modifierMode, resolved)
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const update = React.useCallback(
     (patch: DiceFormulaPatch) => {
@@ -136,50 +127,30 @@ export function DiceFormulaField({
 
   if (labelPosition === 'inline') {
     return (
-      <div
+      <DiceFormulaInlineField
         id={id}
-        aria-describedby={describedBy}
-        aria-invalid={hasError || undefined}
-        className={cn(fieldAnatomyStackVariants({ size }), fieldWidthVariants({ width }))}
+        label={label}
+        error={error}
+        hint={hint}
+        hintPosition={hintPosition}
+        info={info}
+        required={required}
+        size={size}
+        width={rootWidth}
+        chrome={chrome}
+        inlineLabelId={inlineLabelId}
+        hintId={hintId}
+        errorId={errorId}
+        describedBy={describedBy}
+        hasError={hasError}
+        controls={controls}
         onBlur={onBlur}
-      >
-        <div className={fieldInlineControlRowClasses}>
-          {hintPosition === 'below-label' ? (
-            <div className={fieldLabelHintStackClasses}>
-              <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
-                <FieldLabelContent label={label} required={required} info={info} />
-              </span>
-              <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
-            </div>
-          ) : (
-            <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
-              <FieldLabelContent label={label} required={required} info={info} />
-            </span>
-          )}
-          {controls}
-        </div>
-
-        {hintPosition === 'below-label' ? (
-          error ? (
-            <FieldErrorText id={errorId} size={size}>
-              {error}
-            </FieldErrorText>
-          ) : null
-        ) : (
-          <FieldHintErrorBelowControl
-            hint={hint}
-            error={error}
-            hintId={hintId}
-            errorId={errorId}
-            size={size}
-          />
-        )}
-      </div>
+      />
     )
   }
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={rootWidth}>
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
@@ -198,6 +169,8 @@ export function DiceFormulaField({
             {controls}
           </div>
         }
+        chrome={chrome}
+        size={size}
       />
     </Field.Root>
   )

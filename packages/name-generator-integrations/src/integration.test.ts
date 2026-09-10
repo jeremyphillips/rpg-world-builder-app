@@ -5,7 +5,7 @@ import { generateName, generateNames, recommendConventions } from '@rpg/name-gen
 import {
   clearNameCollectionCache,
   CULTURE_CONVENTION_BINDINGS,
-  HERITAGE_CULTURE_ALIASES,
+  HERITAGE_NAMING_CULTURES,
   listStaticConventions,
   loadNameCollection,
   STANDALONE_NAMING_CULTURES,
@@ -37,6 +37,13 @@ const CAMPAIGN_SPECIES: SpeciesCultureInput[] = [
       naming: { supported: true, personalNameComponents: ['family'] },
     },
     languageAffinities: ['elvish'],
+    heritage: {
+      options: [
+        { id: 'drow', name: 'Drow' },
+        { id: 'high-elf', name: 'High Elf' },
+        { id: 'wood-elf', name: 'Wood Elf' },
+      ],
+    },
   },
   {
     id: 'srd-cc-5.2.1:halfling',
@@ -53,6 +60,12 @@ const CAMPAIGN_SPECIES: SpeciesCultureInput[] = [
     source: 'system',
     culture: { naming: { supported: true, personalNameComponents: ['clan'] } },
     languageAffinities: ['draconic'],
+    heritage: {
+      options: [
+        { id: 'gold', name: 'Gold (Fire)' },
+        { id: 'red', name: 'Red (Fire)' },
+      ],
+    },
   },
   {
     id: 'srd-cc-5.2.1:gnome',
@@ -71,6 +84,14 @@ const CAMPAIGN_SPECIES: SpeciesCultureInput[] = [
     languageAffinities: ['giant'],
   },
   {
+    id: 'srd-cc-5.2.1:human',
+    slug: 'human',
+    name: 'Human',
+    source: 'system',
+    culture: { naming: { supported: true, personalNameComponents: ['family'] } },
+    languageAffinities: ['common'],
+  },
+  {
     id: 'srd-cc-5.2.1:orc',
     slug: 'orc',
     name: 'Orc',
@@ -84,6 +105,13 @@ const CAMPAIGN_SPECIES: SpeciesCultureInput[] = [
     name: 'Tiefling',
     source: 'system',
     culture: { naming: { supported: true, personalNameComponents: ['virtue'] } },
+    heritage: {
+      options: [
+        { id: 'abyssal', name: 'Abyssal' },
+        { id: 'chthonic', name: 'Chthonic' },
+        { id: 'infernal', name: 'Infernal' },
+      ],
+    },
   },
 ]
 
@@ -92,7 +120,7 @@ function composeIntegrationConventions(): NamingConvention[] {
     ...resolveCampaignConventions({
       species: CAMPAIGN_SPECIES,
       bindings: CULTURE_CONVENTION_BINDINGS,
-      heritageAliases: HERITAGE_CULTURE_ALIASES,
+      heritageCultures: HERITAGE_NAMING_CULTURES,
     }),
     ...resolveStandaloneConventions({
       cultures: STANDALONE_NAMING_CULTURES,
@@ -284,23 +312,120 @@ describe('name generator integration', () => {
     expect(structureIds).toEqual(new Set(['given-only', 'given-virtue']))
   })
 
+  it('routes elf lineages and dragonborn ancestries to their own conventions', () => {
+    const ids = conventions.map((convention) => convention.id)
+
+    expect(ids).toContain('elvish-drow-personal')
+    expect(ids).toContain('elvish-high-personal')
+    expect(ids).toContain('elvish-wood-personal')
+    expect(ids).toContain('draconic-metallic-personal')
+    expect(ids).toContain('draconic-chromatic-personal')
+    expect(ids).toContain('abyssal-tiefling-personal')
+    expect(ids).toContain('chthonic-tiefling-personal')
+  })
+
+  it('ranks drow personal above base elven for a drow culture context', () => {
+    const recommendations = recommendConventions(
+      {
+        subjectKind: 'person',
+        languageIds: ['undercommon'],
+        cultureIds: ['elven-drow'],
+      },
+      conventions,
+    )
+
+    expect(recommendations[0]?.conventionId).toBe('elvish-drow-personal')
+  })
+
   it.each([
     'draconic-dragon-personal',
     'draconic-dragonborn-personal',
     'draconic-dragonborn-clan',
+    'draconic-dragonborn-settlement',
+    'draconic-dragonborn-landmark',
+    'draconic-metallic-personal',
+    'draconic-chromatic-personal',
     'dwarven-personal',
     'dwarven-settlement',
+    'dwarven-clan',
+    'dwarven-landmark',
+    'dwarven-faction',
     'elvish-personal',
     'elvish-settlement',
+    'elvish-family',
+    'elvish-landmark',
+    'elvish-faction',
+    'elvish-high-personal',
+    'elvish-wood-personal',
+    'elvish-drow-personal',
     'halfling-personal',
     'halfling-settlement',
+    'halfling-family',
+    'halfling-landmark',
     'infernal-tiefling-personal',
+    'infernal-tiefling-settlement',
+    'infernal-tiefling-landmark',
+    'abyssal-tiefling-personal',
+    'chthonic-tiefling-personal',
     'gnomish-personal',
     'gnomish-settlement',
+    'gnomish-family',
+    'gnomish-landmark',
     'goliath-personal',
+    'goliath-clan',
+    'goliath-settlement',
+    'goliath-landmark',
+    'goliath-faction',
+    'human-personal',
+    'human-family',
+    'human-settlement',
+    'human-landmark',
+    'human-faction',
     'orc-personal',
+    'orc-settlement',
+    'orc-landmark',
+    'orc-clan',
+    'orc-faction',
     'faction-general',
     'akan-personal',
+    'akan-family',
+    'norse-personal',
+    'anglo-saxon-personal',
+    'anglo-saxon-settlement',
+    'anglo-saxon-landmark',
+    'japanese-personal',
+    'japanese-family',
+    'japanese-settlement',
+    'japanese-landmark',
+    'gaelic-personal',
+    'gaelic-family',
+    'gaelic-settlement',
+    'gaelic-landmark',
+    'slavic-personal',
+    'slavic-family',
+    'slavic-settlement',
+    'slavic-landmark',
+    'han-chinese-personal',
+    'han-chinese-family',
+    'han-chinese-settlement',
+    'han-chinese-landmark',
+    'yoruba-personal',
+    'yoruba-family',
+    'yoruba-settlement',
+    'yoruba-landmark',
+    'roman-personal',
+    'roman-family',
+    'roman-settlement',
+    'roman-landmark',
+    'arabic-personal',
+    'arabic-family',
+    'arabic-settlement',
+    'arabic-landmark',
+    'gnomish-faction',
+    'halfling-faction',
+    'infernal-tiefling-family',
+    'infernal-tiefling-faction',
+    'draconic-dragonborn-faction',
   ] as const)('generates deterministic names for %s', async (conventionId) => {
     clearNameCollectionCache()
     const { convention, collections } = await loadConventionCollections(conventions, conventionId)

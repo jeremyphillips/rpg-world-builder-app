@@ -6,6 +6,7 @@ export type {
   FieldGroupLegendDisclosure,
   FieldGroupSummary,
   FieldGroupSummaryDisclosure,
+  FieldGroupDialogDisclosure,
   ChromeConfig,
   ChromeVariant,
   ContentTone,

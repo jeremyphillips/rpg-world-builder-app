@@ -331,6 +331,7 @@ export {
   type FieldGroupLegendDisclosure,
   type FieldGroupSummary,
   type FieldGroupSummaryDisclosure,
+  type FieldGroupDialogDisclosure,
   type FieldGroupLegendSize,
   type FieldGroupProps,
 } from './components/ui/field-group'
@@ -688,6 +689,7 @@ export {
 export {
   SegmentedControl,
   type SegmentedControlOption,
+  type SegmentedControlOptionButtonProps,
   type SegmentedControlProps,
   type SegmentedControlSegmentWidth,
 } from './components/ui/segmented-control.client'

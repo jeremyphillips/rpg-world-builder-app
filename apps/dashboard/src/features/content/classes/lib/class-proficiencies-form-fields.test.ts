@@ -1,33 +1,77 @@
 import { describe, expect, it } from 'vitest'
-import { isContainer, type GroupConfig } from '@rpg/ui/form'
+import { getProficiencyDomainSentenceForm } from '@rpg/contracts'
+import { isContainer, type FormItem } from '@rpg/ui/form'
 
 import { proficienciesFields } from './class-proficiencies-form-fields'
 
+function proficienciesColumns(fields: FormItem[] = proficienciesFields({ options: {} })) {
+  const [columns] = fields
+  if (!columns || !isContainer(columns) || columns.kind !== 'columns') {
+    throw new Error('Expected proficiencies columns layout')
+  }
+  return columns
+}
+
 describe('proficienciesFields', () => {
-  it('wraps armor chips in an anonymous inset group without field panel chrome', () => {
-    const defenses = proficienciesFields({ options: {} })[0]
+  it('authors Defenses and granted skills on the left, Weapons and tools on the right', () => {
+    const columns = proficienciesColumns()
+    expect(columns.collapseOrder).toBe('interleave')
+    expect(columns.columns).toHaveLength(2)
+
+    const [left, right] = columns.columns
+    expect(left?.fields.map((field) => ('legend' in field ? field.legend : undefined))).toEqual([
+      'Defenses',
+      `Granted ${getProficiencyDomainSentenceForm('skill', 2)}`,
+    ])
+    expect(right?.fields.map((field) => ('legend' in field ? field.legend : undefined))).toEqual([
+      'Weapons',
+      `Granted ${getProficiencyDomainSentenceForm('tool', 2)}`,
+    ])
+  })
+
+  it('keeps armor chips as a sibling field inside Defenses', () => {
+    const defenses = proficienciesColumns().columns[0]?.fields[0]
     if (!defenses || !isContainer(defenses) || defenses.kind !== 'group') {
       throw new Error('Expected Defenses group')
     }
 
-    const armorGroup = defenses.fields[1]
-    if (!armorGroup || !isContainer(armorGroup) || armorGroup.kind !== 'group') {
-      throw new Error('Expected anonymous armor group')
-    }
-
-    expect(armorGroup).toMatchObject({
-      kind: 'group',
-      chrome: { variant: 'rail' },
-    })
-    expect(armorGroup).not.toHaveProperty('legend')
-    expect(armorGroup).not.toHaveProperty('heading')
-
-    const armorChips = (armorGroup as GroupConfig).fields[0]
+    const armorChips = defenses.fields[1]
     expect(armorChips).toMatchObject({
       type: 'chips',
       name: 'proficiencies.armor',
       label: 'Armor training',
     })
     expect(armorChips).not.toHaveProperty('chrome')
+  })
+
+  it('uses rail chrome on the weapon proficiency grant-set dependents', () => {
+    const weaponsGroup = proficienciesColumns().columns[1]?.fields[0]
+    if (!weaponsGroup || !isContainer(weaponsGroup) || weaponsGroup.kind !== 'group') {
+      throw new Error('Expected Weapons group')
+    }
+
+    const [weaponGrantSet] = weaponsGroup.fields
+    if (!weaponGrantSet || !isContainer(weaponGrantSet) || weaponGrantSet.kind !== 'dependent') {
+      throw new Error('Expected weapon proficiency dependent')
+    }
+
+    expect(weaponGrantSet.dependents).toMatchObject({ chrome: 'rail' })
+  })
+
+  it('gives granted tools its own group with category and item fields', () => {
+    const toolsGroup = proficienciesColumns().columns[1]?.fields[1]
+    if (!toolsGroup || !isContainer(toolsGroup) || toolsGroup.kind !== 'group') {
+      throw new Error('Expected granted tools group')
+    }
+
+    expect(toolsGroup).toMatchObject({
+      kind: 'group',
+      legend: `Granted ${getProficiencyDomainSentenceForm('tool', 2)}`,
+    })
+    expect(toolsGroup).not.toHaveProperty('fieldChrome')
+    expect(toolsGroup.fields.map((field) => ('name' in field ? field.name : undefined))).toEqual([
+      'proficiencies.tools.categories',
+      'proficiencies.tools.items',
+    ])
   })
 })

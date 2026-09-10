@@ -1,4 +1,5 @@
 import type { DependentConfig, FormItem, GroupConfig, RowConfig } from './field-config'
+import { resolveColumnsCollapseSequence } from './config/form-columns-collapse.lib'
 import { resolveGroupHeading, resolveRowHeading } from './resolve-container-heading.lib'
 
 export type CollectedNavigationAnchor = {
@@ -50,6 +51,15 @@ function walkNavigationContainers(
       continue
     }
 
+    if ('kind' in item && item.kind === 'columns') {
+      walkNavigationContainers(
+        resolveColumnsCollapseSequence(item.columns, item.collapseOrder),
+        options,
+        result,
+      )
+      continue
+    }
+
     if (!isNavigationContainer(item)) {
       continue
     }
@@ -94,6 +104,11 @@ function collectNavigationMismatches(items: readonly FormItem[]): NavigationMism
 
   function walk(current: readonly FormItem[]) {
     for (const item of current) {
+      if ('kind' in item && item.kind === 'columns') {
+        walk(resolveColumnsCollapseSequence(item.columns, item.collapseOrder))
+        continue
+      }
+
       if (!isNavigationContainer(item)) continue
 
       if (item.navigation) {

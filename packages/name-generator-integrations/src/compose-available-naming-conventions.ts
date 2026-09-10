@@ -1,7 +1,7 @@
 import type { NamingConvention } from '@rpg/contracts/name-generator'
 import {
   CULTURE_CONVENTION_BINDINGS,
-  HERITAGE_CULTURE_ALIASES,
+  HERITAGE_NAMING_CULTURES,
   listStaticConventions,
   STANDALONE_NAMING_CULTURES,
 } from '@rpg/name-generator-data'
@@ -24,7 +24,7 @@ export function composeAvailableNamingConventions(
   const campaignConventions = resolveCampaignConventions({
     species,
     bindings: CULTURE_CONVENTION_BINDINGS,
-    heritageAliases: HERITAGE_CULTURE_ALIASES,
+    heritageCultures: HERITAGE_NAMING_CULTURES,
   })
   const standaloneConventions = resolveStandaloneConventions({
     cultures: STANDALONE_NAMING_CULTURES,

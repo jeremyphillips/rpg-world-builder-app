@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useController } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
+import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import {
   coerceInlineSentenceSelectValue,
   filterVisibleInlineSentenceSegments,
@@ -213,6 +214,7 @@ export function InlineSentenceFieldRenderer({
   return (
     <InlineSentenceField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       segments={visibleSegments}
       controls={controls}

@@ -28,11 +28,17 @@ function stripInvalidOptionalFilters(
   if (isFilterValueValid('speciesId', filters.speciesId, options)) {
     next.speciesId = filters.speciesId
   }
+  if (isFilterValueValid('heritageId', filters.heritageId, options)) {
+    next.heritageId = filters.heritageId
+  }
   if (isFilterValueValid('languageId', filters.languageId, options)) {
     next.languageId = filters.languageId
   }
   if (isFilterValueValid('cultureId', filters.cultureId, options)) {
     next.cultureId = filters.cultureId
+  }
+  if (isFilterValueValid('regionId', filters.regionId, options)) {
+    next.regionId = filters.regionId
   }
   if (isFilterValueValid('genderStyle', filters.genderStyle, options)) {
     next.genderStyle = filters.genderStyle
@@ -77,6 +83,17 @@ export function createNameGeneratorFilterSchema(
         visible: (state) => deriveVisibleFilters(state, conventions, filterContext).species,
         getValue: () => '',
       }),
+      createEqualsFilter<GeneratedName, NameGeneratorFilters, 'heritageId', string>({
+        id: 'heritageId',
+        label: 'Heritage',
+        showAllOption: true,
+        options: filterOptions.heritageIds.map((option) => ({
+          value: option.id,
+          label: option.label,
+        })),
+        visible: (state) => deriveVisibleFilters(state, conventions, filterContext).heritage,
+        getValue: () => '',
+      }),
       createEqualsFilter<GeneratedName, NameGeneratorFilters, 'languageId', string>({
         id: 'languageId',
         label: 'Language',
@@ -97,6 +114,17 @@ export function createNameGeneratorFilterSchema(
           label: option.label,
         })),
         visible: (state) => deriveVisibleFilters(state, conventions, filterContext).culture,
+        getValue: () => '',
+      }),
+      createEqualsFilter<GeneratedName, NameGeneratorFilters, 'regionId', string>({
+        id: 'regionId',
+        label: 'Region',
+        showAllOption: true,
+        options: filterOptions.regionIds.map((option) => ({
+          value: option.id,
+          label: option.label,
+        })),
+        visible: (state) => deriveVisibleFilters(state, conventions, filterContext).region,
         getValue: () => '',
       }),
       createEqualsFilter<GeneratedName, NameGeneratorFilters, 'genderStyle', NameGenderStyle>({
@@ -130,6 +158,16 @@ export function createNameGeneratorFilterSchema(
             filters: context.previous,
             key: 'speciesId',
             value: next.speciesId,
+            speciesNamingOptions: filterContext.speciesNamingOptions,
+            conventions,
+            cultureContexts,
+          })
+        }
+        if (context.changedId === 'heritageId' && next.heritageId) {
+          normalized = applyNameGeneratorFilterChange({
+            filters: next,
+            key: 'heritageId',
+            value: next.heritageId,
             speciesNamingOptions: filterContext.speciesNamingOptions,
             conventions,
             cultureContexts,

@@ -7,9 +7,12 @@ describe('field-group disclosure', () => {
     expect(resolveDisclosureDefaultOpen({ variant: 'legend' })).toBe(true)
   })
 
-  it('defaults summary disclosure to closed', () => {
+  it('defaults inline and dialog disclosure to closed', () => {
     expect(
-      resolveDisclosureDefaultOpen({ variant: 'summary', resolveSummary: () => ({ primary: '' }) }),
+      resolveDisclosureDefaultOpen({ variant: 'inline', resolveSummary: () => ({ primary: '' }) }),
+    ).toBe(false)
+    expect(
+      resolveDisclosureDefaultOpen({ variant: 'dialog', resolveSummary: () => ({ primary: '' }) }),
     ).toBe(false)
   })
 
@@ -17,7 +20,7 @@ describe('field-group disclosure', () => {
     expect(resolveDisclosureDefaultOpen({ variant: 'legend', defaultOpen: false })).toBe(false)
     expect(
       resolveDisclosureDefaultOpen({
-        variant: 'summary',
+        variant: 'inline',
         defaultOpen: true,
         resolveSummary: () => ({ primary: '' }),
       }),

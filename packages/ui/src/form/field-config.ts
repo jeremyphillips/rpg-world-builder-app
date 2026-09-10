@@ -38,6 +38,13 @@ import type { FieldGroupChrome } from '../components/ui/field-group-chrome.varia
 import type { FieldGroupDisclosure } from '../components/ui/field-group-disclosure.types'
 import type { ArrayAddMenuConfig } from './config/array/array-add-menu.lib'
 import type { ArrayItemShellRenderProps } from './config/array/array-item-shell-render.types'
+import {
+  DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
+  columnsNeedBreakpointReorder,
+  resolveColumnsCollapseSequence,
+  type FormColumnsCollapseIndex,
+  type FormColumnsCollapseOrder,
+} from './config/form-columns-collapse.lib'
 import type {
   FieldHintPosition,
   FieldLabelPosition,
@@ -47,6 +54,13 @@ import type { FormDensity } from './form-density'
 import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
 
 export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
+export {
+  DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
+  columnsNeedBreakpointReorder,
+  resolveColumnsCollapseSequence,
+  type FormColumnsCollapseIndex,
+  type FormColumnsCollapseOrder,
+}
 
 /** Opt-in sidebar / in-page navigation anchor on semantic containers. */
 export type FormNavigationAnchor = {
@@ -60,6 +74,7 @@ export type {
   FieldGroupDisclosure,
   FieldGroupSummary,
   FieldGroupSummaryDisclosure,
+  FieldGroupDialogDisclosure,
   ChromeBorderAccent,
   ChromeConfig,
   ChromeVariant,
@@ -313,11 +328,14 @@ interface BaseFieldConfig {
    * Visual shell around the full field anatomy (label + control + messages).
    * Discriminated union — not a flat enum:
    *
-   * - `{ variant: 'plain' }` — default, no extra shell
+   * - omitted — resolves from ancestor `fieldChrome` cascade, section suppression, or
+   *   `{ variant: 'container' }` when this field is a top-level form unit
+   * - `{ variant: 'none' }` — explicit opt-out (replaces deprecated `plain`)
+   * - `{ variant: 'container', tone? }` — solid bg + border + 16px padding
    * - `{ variant: 'panel', tone? }` — filled panel wash
-   * - `{ variant: 'outline', tone? }` — border-only inset (`faint` | `subtle` | `default` | `strong`, or semantic tones)
+   * - `{ variant: 'outline', tone? }` — border-only inset
    *
-   * Distinct from container `surface` / `tone` chrome on arrays and dependents.
+   * Distinct from FieldGroup `chrome` (fieldset treatment) and dependent rail/panel chrome.
    */
   chrome?: FieldChrome
   /**
@@ -937,6 +955,8 @@ export interface RowConfig {
   align?: FieldRowAlignment
   /** Trailing divider after this row within a group/stack rhythm. */
   separator?: FieldSeparator
+  /** Shared container shell around the row's fields. Inherits cascade when omitted. */
+  chrome?: FieldChrome
   /** When hidden, the whole row unmounts. */
   visibility?: FieldVisibility
   /**
@@ -946,12 +966,13 @@ export interface RowConfig {
   errorPlacement?: 'auto' | 'field' | 'row'
 }
 
-/** Fields allowed inside a `group` or `dependent` — may nest one level or more. */
+/** Fields allowed inside a `group`, `dependent`, or column stack — may nest. */
 export type GroupFieldItem =
   | FieldConfig
   | RowConfig
   | SlotConfig
   | GroupConfig
+  | ColumnsConfig
   | DependentConfig
   | ArrayConfig
 
@@ -960,6 +981,9 @@ export type DependentChrome = 'none' | 'rail' | 'panel'
 
 /** Default controller-relative positioning for dependent regions. */
 export const DEFAULT_DEPENDENT_INSET = true
+
+/** Default decorative boundary for dependent regions. */
+export const DEFAULT_DEPENDENT_CHROME: DependentChrome = 'rail'
 
 export interface DependentDependentsConfig {
   fields: GroupFieldItem[]
@@ -970,8 +994,10 @@ export interface DependentDependentsConfig {
   visibility?: FieldVisibility
   /** Controller-relative indentation. @default {@link DEFAULT_DEPENDENT_INSET} */
   inset?: boolean
-  /** Decorative treatment only. @default 'none' */
+  /** Decorative treatment only. @default {@link DEFAULT_DEPENDENT_CHROME} */
   chrome?: DependentChrome
+  /** Default leaf/row container treatment for nested fields. */
+  fieldChrome?: FieldChrome
   /** Panel wash options — only when `chrome === 'panel'`. */
   panel?: { surface?: SurfaceConfig; tone?: SemanticSurfaceTone }
   /**
@@ -1007,6 +1033,8 @@ export interface DependentConfig {
   /** Trailing divider after this dependent section within parent rhythm. */
   separator?: FieldSeparator
   className?: string
+  /** Shared container around the controller + dependents stack. Inherits cascade when omitted. */
+  chrome?: FieldChrome
   /** Optional DOM id on the dependent wrapper — for in-page scroll anchors. */
   id?: string
   /** Opt-in navigation metadata for sidebar / scroll-spy consumers. */
@@ -1055,10 +1083,69 @@ export interface GroupConfig {
    */
   chrome?: FieldGroupChrome
   /**
+   * Shared field-container override for this group’s fieldset (legend, description,
+   * and field stack). Also cascades to descendants when the shared container is
+   * opted out with `none`.
+   */
+  fieldChrome?: FieldChrome
+  /**
    * Open/collapse and summary behavior for the group container.
-   * `legend` — collapsible fieldset; `summary` — collapsed summary + Change/Done chrome.
+   * `legend` — collapsible fieldset; `inline` — collapsed summary + in-place editor;
+   * `dialog` — collapsed summary that opens the editor in a modal.
    */
   disclosure?: FieldGroupDisclosure
+}
+
+/**
+ * One vertical stack in a `kind: 'columns'` layout.
+ */
+export interface FormColumnsColumn {
+  fields: FormItem[]
+}
+
+/** Column width ratio at `md+` for two-column layouts. */
+export type FormColumnsWidths = 'equal' | 'primary-detail'
+
+/**
+ * Multi-column layout (`kind: 'columns'`). Layout-only — no fieldset, no shared
+ * field container. Each child remains a top-level chrome unit.
+ *
+ * Wide (`md+`): independent stacks. Narrow default: column 1 then column 2
+ * (`collapseOrder: 'columns'`). `'interleave'` / tuples reorder DOM below `md`.
+ *
+ * Use `defineColumnsField()` for completion.
+ *
+ * @example
+ * defineColumnsField({
+ *   kind: 'columns',
+ *   columns: [
+ *     { fields: [{ type: 'text', name: 'title', label: 'Title' }] },
+ *     { fields: [{ type: 'select', name: 'hitDie', label: 'Hit die', options: [] }] },
+ *   ],
+ * })
+ */
+export interface ColumnsConfig {
+  kind: 'columns'
+  /** At least two stacks. */
+  columns: [FormColumnsColumn, FormColumnsColumn, ...FormColumnsColumn[]]
+  /**
+   * Collapsed reading order. Default `'columns'` (CSS-only). `'interleave'` and
+   * tuples use a breakpoint so DOM order matches the single-column layout.
+   */
+  collapseOrder?: FormColumnsCollapseOrder
+  /**
+   * Column width ratio at `md+`. Default `'equal'`. `'primary-detail'` is `2fr` /
+   * `minmax(18rem, 1fr)` — a primary stack with a supporting control.
+   * Ignored when there are three or more columns.
+   */
+  widths?: FormColumnsWidths
+  className?: string
+  /** Optional DOM id on the columns wrapper — for in-page scroll anchors. */
+  id?: string
+  /** Trailing divider after this columns block within parent rhythm. */
+  separator?: FieldSeparator
+  /** When hidden, the whole columns block unmounts. */
+  visibility?: FieldVisibility
 }
 
 /** Layout profile for repeatable array item chrome. */
@@ -1228,6 +1315,8 @@ export interface ArrayConfig {
   id?: string
   className?: string
   separator?: FieldSeparator
+  /** Default leaf/row/slot container treatment for item fields. */
+  fieldChrome?: FieldChrome
   errorPlacement?: 'auto' | 'field' | 'row'
 }
 
@@ -1245,6 +1334,11 @@ export interface SlotConfig {
   label?: string
   /** @deprecated Use `heading.hint`. */
   hint?: string
+  /**
+   * Width of the slot wrapper within a `kind: 'row'` — same tokens as leaf
+   * `width`. Ignored outside a row.
+   */
+  width?: FieldWidth
   className?: string
   /** When hidden, the slot unmounts and any registered values clear with `shouldUnregister`. */
   visibility?: FieldVisibility
@@ -1259,21 +1353,22 @@ export interface SlotConfig {
  * Any item allowed at the top level of a form's `fields` array (or a tab panel).
  *
  * Leaf fields (`FieldConfig`), horizontal rows (`kind: 'row'`), and containers
- * (`group`, `dependent`, `array`, `slot`). Wrap trees with `defineForm()` or reusable
+ * (`group`, `columns`, `dependent`, `array`, `slot`). Wrap trees with `defineForm()` or reusable
  * sections with `defineFormItems()` — plain arrays remain valid.
  */
 export type FormItem =
   | FieldConfig
   | RowConfig
   | GroupConfig
+  | ColumnsConfig
   | DependentConfig
   | ArrayConfig
   | SlotConfig
 
-/** Narrows a `FormItem` to a container (row/group/dependent/array/slot) vs. a leaf field. */
+/** Narrows a `FormItem` to a container (row/group/columns/dependent/array/slot) vs. a leaf field. */
 export function isContainer(
   item: FormItem,
-): item is RowConfig | GroupConfig | DependentConfig | ArrayConfig | SlotConfig {
+): item is RowConfig | GroupConfig | ColumnsConfig | DependentConfig | ArrayConfig | SlotConfig {
   return 'kind' in item
 }
 
@@ -1296,6 +1391,10 @@ export function flattenFields(items: Array<FormItem | RowConfig>): FieldConfig[]
     } else if (item.kind === 'dependent') {
       fields.push(item.controller)
       fields.push(...flattenFields(item.dependents.fields as Array<FormItem | RowConfig>))
+    } else if (item.kind === 'columns') {
+      fields.push(
+        ...flattenFields(resolveColumnsCollapseSequence(item.columns, item.collapseOrder)),
+      )
     } else {
       fields.push(...flattenFields(item.fields as Array<FormItem | RowConfig>))
     }
@@ -1484,6 +1583,11 @@ export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
       }
     } else if (item.kind === 'group') {
       Object.assign(values, buildDefaultValues(item.fields as FormItem[]))
+    } else if (item.kind === 'columns') {
+      Object.assign(
+        values,
+        buildDefaultValues(resolveColumnsCollapseSequence(item.columns, item.collapseOrder)),
+      )
     } else if (item.kind === 'dependent') {
       assignFieldDefaultValues(item.controller, values)
       Object.assign(values, buildDefaultValues(item.dependents.fields as FormItem[]))
