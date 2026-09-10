@@ -14,6 +14,7 @@ export const CONTENT_PREVIEW_STATUS_NONE = 'None'
 export const CONTENT_PREVIEW_STATUS_NOT_CONFIGURED = 'Not configured'
 export const CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER =
   'A brief description will appear here once provided.'
+export const CONTENT_PREVIEW_NOT_SET = 'Not set'
 
 export function contentPreviewHeaderTitle(term: VocabularyTerm): string {
   return `${term.label} Preview`
@@ -34,7 +35,8 @@ export function contentPreviewAsPlayerHelper(term: VocabularyTerm): string {
 }
 
 export function contentPreviewAttentionTitle(count: number): string {
-  return `${count} sections need attention.`
+  const noun = count === 1 ? 'section' : 'sections'
+  return `${count} ${noun} need attention.`
 }
 
 export function contentPreviewDefaultFeaturesStatus(count: number): string {

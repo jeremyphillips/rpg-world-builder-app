@@ -1,13 +1,21 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { cardSurfaceClasses } from '../ui/card.variants'
+import { cardRadiusClasses } from '../ui/card.variants'
 import { iconGlyphRootClasses } from '../ui/icon-glyph.variants'
+import { establishSurfaceCurrent } from '../ui/surface-current.lib'
+
+/** Shared 12px muted copy below the preview header and in section chrome. */
+export const previewRailCaptionTextClasses = 'text-xs text-muted-foreground'
 
 export const previewRailRootVariants = cva('flex min-w-0 flex-col gap-4', {
   variants: {
     chrome: {
-      card: cn('w-[21rem] max-w-[21rem] p-4', cardSurfaceClasses),
+      card: cn(
+        'w-[21rem] max-w-[21rem] border border-border-subtle bg-field-container p-4 text-card-foreground',
+        cardRadiusClasses,
+        establishSurfaceCurrent('field-container'),
+      ),
       plain: 'w-full',
     },
     sticky: {
@@ -27,7 +35,7 @@ export const previewRailIdentityRowClasses = 'flex items-center gap-3'
 
 export const previewRailIdentityContentClasses = 'min-w-0 flex-1'
 
-export const previewRailDividerClasses = 'border-t border-border'
+export const previewRailDividerClasses = 'border-t border-border-subtle'
 
 export const previewRailMediaFallbackVariants = cva(
   'flex size-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground',
@@ -35,8 +43,10 @@ export const previewRailMediaFallbackVariants = cva(
 
 export const previewRailMediaIconClasses = iconGlyphRootClasses.lg
 
-export const previewRailAvailabilityRowClasses =
-  'mt-1 flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground'
+export const previewRailAvailabilityRowClasses = cn(
+  'mt-1 flex min-w-0 items-center gap-1.5',
+  previewRailCaptionTextClasses,
+)
 
 export const previewRailAvailabilityInactiveIconClasses = cn(
   iconGlyphRootClasses.md,
@@ -55,9 +65,9 @@ export const previewRailFactValueClasses = 'text-sm text-foreground'
 export const previewRailSectionsHeaderClasses = 'flex flex-col gap-1'
 
 export const previewRailAccordionCardClasses =
-  'overflow-hidden rounded-md border border-border bg-background'
+  'overflow-hidden rounded-md border border-border-subtle'
 
-export const previewRailAccordionItemClasses = 'border-b border-border last:border-b-0'
+export const previewRailAccordionItemClasses = 'border-b border-border-subtle last:border-b-0'
 
 /** Tight inset for grouped-list accordion bodies (overrides default AccordionContent inner padding). */
 export const previewRailAccordionContentClasses = '[&>div]:px-3 [&>div]:pb-3 [&>div]:pt-1'
@@ -75,11 +85,20 @@ export const previewRailSectionMarkerToneClasses = {
   complete: 'text-semantic-success',
   idle: 'text-muted-foreground',
   attention: 'text-semantic-warning',
+  incomplete: 'text-muted-foreground',
 } as const
 
-export const previewRailSectionBodyClasses = 'flex flex-col gap-3 rounded-md bg-sunken p-3'
+export const previewRailSectionBodyClasses =
+  'flex flex-col gap-3 rounded-md border border-border-subtle bg-background p-3'
 
-export const previewRailSectionBodyDescriptionClasses = 'line-clamp-3 text-sm text-muted-foreground'
+export const previewRailSectionBodyDescriptionClasses = cn(
+  'line-clamp-3',
+  previewRailCaptionTextClasses,
+)
+
+export const previewRailStatusPanelDescriptionClasses = previewRailCaptionTextClasses
+
+export const previewRailActionHelperTextClasses = previewRailCaptionTextClasses
 
 export const previewRailStatusPanelIconClasses = cn(
   'mt-0.5 size-5 shrink-0',

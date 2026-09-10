@@ -25,6 +25,7 @@ import {
 import { cn } from '../../lib/utils'
 import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
 import {
+  collectTabbedFormResolverItems,
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
   TabbedFormPanels,
@@ -167,7 +168,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     setHasAttemptedSubmit(true)
   }, [])
   const { form, validateSilently } = useTabbedFormSetup({ schema, tabs, defaultValues, mode })
-  const allFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
+  const allFields = React.useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
   const tabbedChrome = React.useMemo(
     () => ({ formId, tabs, activeTabId, setActiveTabId }),
     [formId, tabs, activeTabId, setActiveTabId],

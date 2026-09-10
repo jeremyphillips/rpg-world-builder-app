@@ -12,6 +12,7 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import { isMeaningfulCharacterCreationToolChoice } from './character-creation/class-character-creation-proficiencies-form-values'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
+  CONTENT_PREVIEW_NOT_SET,
   CONTENT_PREVIEW_STATUS_NONE,
   CONTENT_PREVIEW_STATUS_NOT_CONFIGURED,
   CONTENT_PREVIEW_STATUS_OFF,
@@ -65,22 +66,32 @@ function classPreviewName(values: ClassFormValues): string {
   return trimmed ? trimmed : contentPreviewUnnamedName(CLASS_CONTENT_TYPE_TERM)
 }
 
-function formatHitDie(hitDie: number | undefined): string {
-  return `d${hitDie ?? 8}`
+function formatHitDiePreview(hitDie: ClassFormValues['hitDie'] | string | undefined): string {
+  if (hitDie === undefined || hitDie === null || hitDie === '') {
+    return CONTENT_PREVIEW_NOT_SET
+  }
+
+  const face = Number(hitDie)
+  if (!Number.isFinite(face) || face <= 0) {
+    return CONTENT_PREVIEW_NOT_SET
+  }
+
+  return `d${face}`
 }
 
-function formatPrimaryAbilities(
+function formatPrimaryAbilitiesPreview(
   abilities: ClassFormValues['primaryAbilities'] | undefined,
 ): string {
-  return (abilities ?? []).map(getAbilityLabel).join(', ')
+  const labels = (abilities ?? []).map(getAbilityLabel)
+  return labels.length > 0 ? labels.join(', ') : CONTENT_PREVIEW_NOT_SET
 }
 
 function identityFacts(values: ClassFormValues): PreviewRailFact[] {
   return [
-    { label: CLASS_PREVIEW_FACT_LABELS.hitDie, value: formatHitDie(values.hitDie) },
+    { label: CLASS_PREVIEW_FACT_LABELS.hitDie, value: formatHitDiePreview(values.hitDie) },
     {
       label: CLASS_PREVIEW_FACT_LABELS.primaryAbilities,
-      value: formatPrimaryAbilities(values.primaryAbilities),
+      value: formatPrimaryAbilitiesPreview(values.primaryAbilities),
     },
   ]
 }
@@ -111,8 +122,10 @@ function skillLabel(slug: string, ctx: ContentFormCtx): string {
 }
 
 function appendFact(facts: PreviewRailFact[], label: string, items: readonly string[]): void {
-  if (items.length === 0) return
-  facts.push({ label, value: formatPreviewRailOverflowList(items) })
+  facts.push({
+    label,
+    value: items.length > 0 ? formatPreviewRailOverflowList(items) : CONTENT_PREVIEW_NOT_SET,
+  })
 }
 
 function isSeededDefaultFeatureSet(features: ClassFormValues['features'] | undefined): boolean {
@@ -207,24 +220,20 @@ function spellcastingFacts(
   const facts: PreviewRailFact[] = []
   if (!spellcasting) return facts
 
-  if (spellcasting.ability) {
-    facts.push({
-      label: CLASS_PREVIEW_FACT_LABELS.spellcastingAbility,
-      value: getAbilityLabel(spellcasting.ability),
-    })
-  }
-  if (spellcasting.level != null) {
-    facts.push({
-      label: CLASS_PREVIEW_FACT_LABELS.spellcastingLevel,
-      value: String(spellcasting.level),
-    })
-  }
-  if (spellcasting.progression) {
-    facts.push({
-      label: CLASS_PREVIEW_FACT_LABELS.progression,
-      value: getSpellcastingProgressionLabel(spellcasting.progression),
-    })
-  }
+  facts.push({
+    label: CLASS_PREVIEW_FACT_LABELS.spellcastingAbility,
+    value: spellcasting.ability ? getAbilityLabel(spellcasting.ability) : CONTENT_PREVIEW_NOT_SET,
+  })
+  facts.push({
+    label: CLASS_PREVIEW_FACT_LABELS.spellcastingLevel,
+    value: spellcasting.level != null ? String(spellcasting.level) : CONTENT_PREVIEW_NOT_SET,
+  })
+  facts.push({
+    label: CLASS_PREVIEW_FACT_LABELS.progression,
+    value: spellcasting.progression
+      ? getSpellcastingProgressionLabel(spellcasting.progression)
+      : CONTENT_PREVIEW_NOT_SET,
+  })
 
   return facts
 }
@@ -358,7 +367,7 @@ export function classDetailSourceFromFormValues(
   return {
     name: classPreviewName(values),
     hitDie: values.hitDie ?? 8,
-    primaryAbilities: values.primaryAbilities ?? ['str'],
+    primaryAbilities: values.primaryAbilities ?? [],
     description: values.description,
     proficiencies: proficienciesFromFormValues(
       values.proficiencies ?? classCreateDefaultValues.proficiencies!,

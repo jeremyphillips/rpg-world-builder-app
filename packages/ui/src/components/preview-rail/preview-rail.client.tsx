@@ -33,6 +33,7 @@ import {
   previewRailAccordionContentClasses,
   previewRailAccordionItemClasses,
   previewRailActionButtonClasses,
+  previewRailActionHelperTextClasses,
   previewRailActionStackClasses,
   previewRailAvailabilityDetailSeparatorClasses,
   previewRailAvailabilityInactiveIconClasses,
@@ -54,8 +55,10 @@ import {
   previewRailSectionMarkerToneClasses,
   previewRailSectionStatusSpacerClasses,
   previewRailSectionTriggerClasses,
+  previewRailCaptionTextClasses,
   previewRailSectionsHeaderClasses,
   previewRailStatusPanelContentClasses,
+  previewRailStatusPanelDescriptionClasses,
   previewRailStatusPanelIconClasses,
 } from './preview-rail.variants'
 
@@ -146,7 +149,7 @@ function PreviewRailAvailabilityLine({
       ) : (
         <CircleSlash aria-hidden className={previewRailAvailabilityInactiveIconClasses} />
       )}
-      <span className="font-medium text-foreground">{statusLabel}</span>
+      <span className="font-medium">{statusLabel}</span>
       {detail ? (
         <>
           <span aria-hidden className={previewRailAvailabilityDetailSeparatorClasses}>
@@ -231,7 +234,7 @@ function PreviewRailSections({
         <Heading variant="subsection" as="h3">
           {title}
         </Heading>
-        {description ? <Text variant="small">{description}</Text> : null}
+        {description ? <p className={previewRailCaptionTextClasses}>{description}</p> : null}
       </div>
       <Accordion
         type="single"
@@ -265,6 +268,10 @@ function PreviewRailSectionMarker({ marker }: { marker: PreviewRailSectionMarker
 
   if (marker === 'attention') {
     return <CircleAlert aria-hidden className={className} />
+  }
+
+  if (marker === 'incomplete') {
+    return <Circle aria-hidden className={className} />
   }
 
   return <CircleSlash aria-hidden className={className} />
@@ -377,7 +384,9 @@ function PreviewRailStatusPanel({
         {resolvedIcon}
         <div className={previewRailStatusPanelContentClasses}>
           <p className="font-body-emphasis text-foreground">{title}</p>
-          {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
+          {description ? (
+            <p className={previewRailStatusPanelDescriptionClasses}>{description}</p>
+          ) : null}
         </div>
       </div>
     </Alert>
@@ -405,7 +414,7 @@ function PreviewRailAction({ label, helperText, icon, onClick, disabled }: Previ
         {icon ? <span aria-hidden>{icon}</span> : null}
         {label}
       </Button>
-      {helperText ? <Text variant="small">{helperText}</Text> : null}
+      {helperText ? <p className={previewRailActionHelperTextClasses}>{helperText}</p> : null}
     </div>
   )
 }

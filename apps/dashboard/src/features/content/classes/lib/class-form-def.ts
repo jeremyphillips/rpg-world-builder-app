@@ -41,9 +41,7 @@ import {
 function characterCreationToFormValues(
   entity: CharacterClass,
 ): ClassFormValues['characterCreation'] {
-  const primaryAbilities = entity.primaryAbilities?.length
-    ? entity.primaryAbilities
-    : classCreateDefaultValues.primaryAbilities!
+  const primaryAbilities = entity.primaryAbilities ?? []
 
   return {
     proficiencies: characterCreationProficienciesToFormValues(entity.characterCreation),
@@ -79,8 +77,8 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     name: entity.name,
     slug: entity.slug,
     description: entity.description,
-    primaryAbilities: entity.primaryAbilities ?? classCreateDefaultValues.primaryAbilities!,
-    hitDie: entity.hitDie ?? classCreateDefaultValues.hitDie!,
+    primaryAbilities: entity.primaryAbilities ?? [],
+    hitDie: entity.hitDie,
     hasSpellcasting: entity.spellcasting !== undefined,
     weaponProficiencyMode:
       entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0

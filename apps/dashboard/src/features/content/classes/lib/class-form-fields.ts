@@ -32,6 +32,7 @@ import {
   proficienciesDraftFormSchema,
   proficienciesFields,
   proficienciesFormSchema,
+  refineClassWeaponProficiencies,
 } from './class-proficiencies-form-fields'
 import { resourcesArrayField } from './class-resources-form-fields'
 import { createSpellcastingFormSchema, spellcastingFields } from './class-spellcasting-form-fields'
@@ -69,29 +70,33 @@ export function createClassFormSchema(
     entries: z.array(resourceEntryFormSchema).min(1),
   })
 
-  return z.object({
-    name: z.string().min(1),
-    slug: slugSchema.optional(),
-    description: z.string().optional(),
-    primaryAbilities: z.array(abilitySchema).min(1).max(2),
-    hitDie: z.coerce.number().pipe(hitDieSchema),
-    hasSpellcasting: z.boolean(),
-    weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
-    spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
-    proficiencies: proficienciesFormSchema,
-    features: z.array(createFeatureRowFormSchema(maxLevel)),
-    resources: z.array(resourceRowFormSchema).optional(),
-    characterCreation: z
-      .object({
-        startingEquipment: startingEquipmentFormSchema.optional(),
-        proficiencies: characterCreationProficienciesFormSchema.optional(),
-        abilityScoreOrder: abilityScoreOrderSchema.optional(),
-      })
-      .optional()
-      .superRefine((characterCreation, ctx) => {
-        refineCharacterCreationSaveValidation(characterCreation, ctx, formCtx)
-      }),
-  })
+  return z
+    .object({
+      name: z.string().min(1),
+      slug: slugSchema.optional(),
+      description: z.string().optional(),
+      primaryAbilities: z.array(abilitySchema).min(1).max(2),
+      hitDie: z.coerce.number().pipe(hitDieSchema),
+      hasSpellcasting: z.boolean(),
+      weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
+      spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
+      proficiencies: proficienciesFormSchema,
+      features: z.array(createFeatureRowFormSchema(maxLevel)),
+      resources: z.array(resourceRowFormSchema).optional(),
+      characterCreation: z
+        .object({
+          startingEquipment: startingEquipmentFormSchema.optional(),
+          proficiencies: characterCreationProficienciesFormSchema.optional(),
+          abilityScoreOrder: abilityScoreOrderSchema.optional(),
+        })
+        .optional()
+        .superRefine((characterCreation, ctx) => {
+          refineCharacterCreationSaveValidation(characterCreation, ctx, formCtx)
+        }),
+    })
+    .superRefine((values, ctx) => {
+      refineClassWeaponProficiencies(values, ctx)
+    })
 }
 
 export function createClassDraftFormSchema(
@@ -141,17 +146,19 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'basics',
       label: 'Basics',
       fields: coreAttributesFields(ctx),
-      errorPaths: ['name'],
+      errorPaths: ['name', 'hitDie', 'primaryAbilities', 'description'],
     },
     {
       id: 'proficiencies',
       label: 'Proficiencies',
       fields: proficienciesFields(ctx),
+      errorPaths: ['proficiencies', 'weaponProficiencyMode'],
     },
     {
       id: 'spellcasting',
       label: 'Spellcasting',
       fields: spellcastingFields(ctx),
+      errorPaths: ['hasSpellcasting', 'spellcasting'],
     },
     {
       id: 'features',

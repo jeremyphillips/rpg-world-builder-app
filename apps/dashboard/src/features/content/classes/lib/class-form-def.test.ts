@@ -21,6 +21,22 @@ function roundTripFormInput(slug: string) {
   return { characterClass, formValues, input }
 }
 
+function publishReadyClassValues(overrides: Partial<ClassFormValues> = {}): ClassFormValues {
+  return {
+    ...classFormDef.createDefaultValues,
+    name: 'Custom Class',
+    hitDie: 8,
+    primaryAbilities: ['str'],
+    proficiencies: {
+      ...classFormDef.createDefaultValues!.proficiencies!,
+      savingThrows: ['str'],
+      weapons: { categories: ['simple'], items: [] },
+    },
+    features: [],
+    ...overrides,
+  } as ClassFormValues
+}
+
 function expectBardSpellcastingRoundTrip(): void {
   const { characterClass, formValues, input } = roundTripFormInput('bard')
   const expected = characterClass.spellcasting!
@@ -285,19 +301,17 @@ describe('classFormDef round-trips', () => {
   })
 
   it('toInput omits categories when individual weapons mode is on', () => {
-    const formValues = {
-      ...classFormDef.createDefaultValues,
-      name: 'Custom Class',
+    const formValues = publishReadyClassValues({
       weaponProficiencyMode: 'individual',
       proficiencies: {
         ...classFormDef.createDefaultValues!.proficiencies!,
+        savingThrows: ['str'],
         weapons: {
           categories: ['simple'],
           items: ['dagger', 'longsword'],
         },
       },
-      features: [],
-    } as ClassFormValues
+    })
 
     const input = classFormDef.toInput(formValues)
     expect(input.proficiencies.weapons).toEqual({
@@ -307,30 +321,23 @@ describe('classFormDef round-trips', () => {
   })
 
   it('toInput omits characterCreation when starting equipment is absent', () => {
-    const formValues = {
-      ...classFormDef.createDefaultValues,
-      name: 'Custom Class',
-      features: [],
-    } as ClassFormValues
+    const formValues = publishReadyClassValues()
 
     const input = classFormDef.toInput(formValues)
     expect(input).not.toHaveProperty('characterCreation')
   })
 
   it('toInput omits items when category mode is on', () => {
-    const formValues = {
-      ...classFormDef.createDefaultValues,
-      name: 'Custom Class',
-      weaponProficiencyMode: 'categories',
+    const formValues = publishReadyClassValues({
       proficiencies: {
         ...classFormDef.createDefaultValues!.proficiencies!,
+        savingThrows: ['str'],
         weapons: {
           categories: ['simple', 'martial'],
           items: ['dagger'],
         },
       },
-      features: [],
-    } as ClassFormValues
+    })
 
     const input = classFormDef.toInput(formValues)
     expect(input.proficiencies.weapons).toEqual({
@@ -409,11 +416,9 @@ describe('classFormDef round-trips', () => {
 
 describe('classFormDef create vs update modes', () => {
   it('create: derives slug and assigns feature ids for new rows', () => {
-    const formValues = {
-      ...classFormDef.createDefaultValues,
-      name: 'Custom Class',
+    const formValues = publishReadyClassValues({
       features: [{ name: 'Second Wind', level: 1, grants: [] }],
-    } as ClassFormValues
+    })
     const input = classFormDef.toInput(formValues)
     expect(input.slug).toBe(deriveContentKey('Custom Class'))
     expect(input.features[0]?.id).toBe('second-wind')

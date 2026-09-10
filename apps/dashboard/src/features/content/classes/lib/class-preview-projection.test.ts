@@ -9,6 +9,7 @@ import {
 } from './class-preview-projection'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
+  CONTENT_PREVIEW_NOT_SET,
   CONTENT_PREVIEW_STATUS_NONE,
   CONTENT_PREVIEW_STATUS_NOT_CONFIGURED,
   CONTENT_PREVIEW_STATUS_OFF,
@@ -39,8 +40,8 @@ describe('class preview projection', () => {
 
     expect(identity.name).toBe('Unnamed Class')
     expect(identity.facts).toEqual([
-      { label: CLASS_PREVIEW_FACT_LABELS.hitDie, value: 'd8' },
-      { label: CLASS_PREVIEW_FACT_LABELS.primaryAbilities, value: 'Strength' },
+      { label: CLASS_PREVIEW_FACT_LABELS.hitDie, value: CONTENT_PREVIEW_NOT_SET },
+      { label: CLASS_PREVIEW_FACT_LABELS.primaryAbilities, value: CONTENT_PREVIEW_NOT_SET },
     ])
   })
 
@@ -66,16 +67,22 @@ describe('class preview projection', () => {
     })
   })
 
-  it('omits empty proficiency rows and reports Ready for defaults', () => {
+  it('renders Not set for empty proficiency rows on fresh create', () => {
     const sections = buildClassPreviewSections(createValues(), emptyCtx)
 
-    expect(sections.proficiencies?.status).toBe('Ready')
-    expect(sections.proficiencies?.facts?.map((fact) => fact.label)).toEqual(['Saving throws'])
+    expect(sections.proficiencies?.facts).toEqual([
+      { label: CLASS_PREVIEW_FACT_LABELS.savingThrows, value: CONTENT_PREVIEW_NOT_SET },
+      { label: CLASS_PREVIEW_FACT_LABELS.armorTraining, value: CONTENT_PREVIEW_NOT_SET },
+      { label: CLASS_PREVIEW_FACT_LABELS.weapons, value: CONTENT_PREVIEW_NOT_SET },
+      { label: CLASS_PREVIEW_FACT_LABELS.skills, value: CONTENT_PREVIEW_NOT_SET },
+    ])
   })
 
-  it('keeps Basics statusless before submit when the name is empty', () => {
+  it('shows an incomplete Basics marker before submit when the name is empty', () => {
     const sections = buildClassPreviewSections(createValues(), emptyCtx)
-    expect(resolveContentPreviewSectionPresentation(sections.basics!, false, false)).toEqual({})
+    expect(resolveContentPreviewSectionPresentation(sections.basics!, false, false)).toEqual({
+      marker: 'incomplete',
+    })
   })
 
   it('reads subclass count from the tab resource, not route mode', () => {

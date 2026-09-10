@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import type { AlertVariant } from '../ui/alert'
 import type { SemanticTextTone } from '../ui/semantic-text/semantic-text.variants'
 
-export type PreviewRailSectionMarker = 'complete' | 'idle' | 'attention'
+export type PreviewRailSectionMarker = 'complete' | 'idle' | 'attention' | 'incomplete'
 
 export type PreviewRailStatusTone = SemanticTextTone
 

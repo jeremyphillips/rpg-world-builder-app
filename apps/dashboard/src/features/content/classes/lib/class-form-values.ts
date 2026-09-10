@@ -339,19 +339,15 @@ function spellcastingFromFormValues(
 }
 
 export const classCreateDefaultValues: Partial<ClassFormValues> = {
-  primaryAbilities: ['str'],
-  hitDie: 8,
   hasSpellcasting: false,
   weaponProficiencyMode: 'categories',
   spellcasting: {
     level: 1,
-    progression: 'full',
-    ability: 'int',
     preparation: 'prepared',
     progressionTable: emptyProgressionTable(),
   },
   proficiencies: {
-    savingThrows: ['str'],
+    savingThrows: [],
     armor: [],
     weapons: { categories: [], items: [] },
     tools: { categories: [], items: [] },
@@ -363,7 +359,7 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
       tools: { choose: 0, poolSource: 'filtered', poolToolCategories: [] },
     },
     abilityScoreOrder: resolveClassAbilityScoreOrder({
-      primaryAbilities: ['str'],
+      primaryAbilities: [],
     }),
   },
   features: [

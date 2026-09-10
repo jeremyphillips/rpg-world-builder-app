@@ -25,7 +25,7 @@ export function resolveContentPreviewSectionPresentation(
 ): ContentPreviewSectionPresentation {
   if (!sectionValid) {
     if (!hasAttemptedSubmit) {
-      return {}
+      return { marker: 'incomplete' }
     }
 
     return {

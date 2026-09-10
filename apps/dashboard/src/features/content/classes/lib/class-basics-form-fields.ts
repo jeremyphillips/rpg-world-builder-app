@@ -4,7 +4,6 @@ import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { HIT_DIE_SELECT_DIGITS } from '../../lib/form-options/level-field-options'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import { SuggestedAbilityScoreOrderSlot } from '../components/character-creation/suggested-ability-score-order-slot'
 
@@ -41,13 +40,12 @@ export function coreAttributesFields(ctx?: ContentFormCtx): FormItem[] {
               hint: 'Select up to 2 abilities',
             },
             {
-              type: 'select',
+              type: 'chips',
               name: 'hitDie',
               label: 'Hit die',
               options: hitDieOptions,
+              multiple: false,
               required: true,
-              digits: HIT_DIE_SELECT_DIGITS,
-              width: 'auto',
             },
           ],
         },

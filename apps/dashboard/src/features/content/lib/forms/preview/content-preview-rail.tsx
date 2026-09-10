@@ -302,7 +302,7 @@ export function ContentPreviewRail(props: ContentPreviewRailProps) {
         <Sheet.Content
           side={isMdUp ? 'right' : 'bottom'}
           size="lg"
-          surface="card"
+          surface="background"
           closeLabel="Close preview"
         >
           <Sheet.Header

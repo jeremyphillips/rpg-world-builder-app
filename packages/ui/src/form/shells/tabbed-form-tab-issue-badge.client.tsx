@@ -1,7 +1,6 @@
 'use client'
 
 import { Badge } from '../../components/ui/badge'
-import { tabbedFormTabIssueSeparatorClasses } from './tabbed-form-tab-issue.variants'
 
 function tabIssueAttentionLabel(count: number): string {
   return `${count} ${count === 1 ? 'field needs' : 'fields need'} attention`
@@ -17,9 +16,6 @@ export function TabbedFormTabIssueBadge({ count }: TabbedFormTabIssueBadgeProps)
 
   return (
     <>
-      <span aria-hidden className={tabbedFormTabIssueSeparatorClasses}>
-        {' · '}
-      </span>
       <Badge
         appearance="soft"
         tone="destructive"

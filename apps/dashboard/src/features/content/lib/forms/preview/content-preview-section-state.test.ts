@@ -8,14 +8,14 @@ import {
 import { resolveContentPreviewSectionPresentation } from './content-preview-section-state'
 
 describe('resolveContentPreviewSectionPresentation', () => {
-  it('keeps statusless rows when the section is invalid before submit', () => {
+  it('shows an incomplete marker when the section is invalid before submit', () => {
     expect(
       resolveContentPreviewSectionPresentation(
         { derivedKind: 'ready', status: CONTENT_PREVIEW_STATUS_READY },
         false,
         false,
       ),
-    ).toEqual({})
+    ).toEqual({ marker: 'incomplete' })
   })
 
   it('promotes invalid sections to Needs attention after submit', () => {

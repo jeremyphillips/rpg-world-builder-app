@@ -94,7 +94,7 @@ export const FreshCreate: Story = {
         description="Overview of this class and its current configuration."
         defaultValue="basics"
       >
-        <PreviewRail.Section id="basics" label="Basics">
+        <PreviewRail.Section id="basics" label="Basics" marker="incomplete">
           <PreviewRail.SectionBody
             description="A brief description will appear here once provided."
             facts={identityFacts}

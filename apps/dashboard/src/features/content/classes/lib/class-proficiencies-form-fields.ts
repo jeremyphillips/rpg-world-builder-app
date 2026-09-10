@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z, type RefinementCtx } from 'zod'
 import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
@@ -25,7 +25,7 @@ import {
   referenceToolFieldOptions,
   referenceWeaponFieldOptions,
 } from '../../lib/form-options/content-field-option.lib'
-import { WEAPON_PROFICIENCY_MODES } from './class-form-constants'
+import { WEAPON_PROFICIENCY_MODES, type WeaponProficiencyMode } from './class-form-constants'
 import {
   INDIVIDUAL_WEAPONS_TOGGLE_HINT,
   SAVING_THROWS_HINT,
@@ -86,6 +86,35 @@ export const proficienciesDraftFormSchema = proficienciesFormSchema.extend({
   savingThrows: z.array(abilitySchema).max(2).default([]),
 })
 
+export function refineClassWeaponProficiencies(
+  values: {
+    weaponProficiencyMode: WeaponProficiencyMode
+    proficiencies: z.infer<typeof proficienciesFormSchema>
+  },
+  ctx: RefinementCtx,
+): void {
+  const { weaponProficiencyMode, proficiencies } = values
+
+  if (weaponProficiencyMode === 'categories') {
+    if (proficiencies.weapons.categories.length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['proficiencies', 'weapons', 'categories'],
+        message: 'Add at least one weapon proficiency',
+      })
+    }
+    return
+  }
+
+  if ((proficiencies.weapons.items ?? []).length === 0) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['proficiencies', 'weapons', 'items'],
+      message: 'Add at least one weapon choice',
+    })
+  }
+}
+
 const grantedSkillProficienciesLegend = `Granted ${getProficiencyDomainSentenceForm('skill', 2)}`
 const grantedToolProficienciesLegend = `Granted ${getProficiencyDomainSentenceForm('tool', 2)}`
 
@@ -135,6 +164,8 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         categoryMode: 'categories',
         specificMode: 'individual',
         labelVisibility: 'srOnly',
+        categoriesRequired: true,
+        itemsRequired: true,
         dependents: { chrome: 'rail' },
       }),
     ],
