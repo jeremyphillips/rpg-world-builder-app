@@ -331,9 +331,11 @@ panel/outline stacks) in feature components when `FormItem[]` can express it.
   `labelPosition`, `separator`, and disabled state live in config.
 - **Containers** — `kind: 'group' | 'row' | 'columns' | 'dependent'` with `chrome` for
   visual treatment and `disclosure` for compact settings sections (campaign access is
-  the reference implementation). `kind: 'columns'` is layout-only (independent stacks at
-  `md+`); each child stays a top-level chrome unit.
-- **Persistence** — may stay in a section shell (`CampaignAccessSection`, create/edit
+  the reference implementation). `kind: 'row'` is one shared field container for sibling
+  leaves/slots. `kind: 'columns'` is layout-only (independent stacks at `md+`); each child
+  stays a top-level chrome unit. Content identity on full routes uses a row so Name and
+  Campaign availability share a box.
+- **Persistence** — may stay in a section shell (`CampaignAvailabilityField`, create/edit
   shells) when it uses a separate API or RHF form — but the **rendered UI** must still flow
   through `FormProvider` + `FormItems` over the field builder.
 - **Escape hatch** — `kind: 'slot'` for behavior that truly cannot be config-shaped (e.g.

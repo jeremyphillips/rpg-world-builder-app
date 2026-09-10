@@ -56,6 +56,30 @@ describe('Field', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
+  it('omits htmlFor when associate is false', () => {
+    render(
+      <Field.Root id="availability" hint="Helper.">
+        <Field.Label associate={false} id="availability-label">
+          Campaign availability
+        </Field.Label>
+        <Field.Control>
+          <button type="button" aria-labelledby="availability-label">
+            Open
+          </button>
+        </Field.Control>
+        <Field.Hint />
+      </Field.Root>,
+    )
+
+    const heading = screen.getByText('Campaign availability')
+    expect(heading.tagName).toBe('SPAN')
+    expect(heading).not.toHaveAttribute('for')
+    expect(screen.getByRole('button', { name: 'Campaign availability' })).toHaveAttribute(
+      'aria-labelledby',
+      'availability-label',
+    )
+  })
+
   it('throws when a part is used outside Field.Root', () => {
     expect(() => render(<Field.Label>Orphan</Field.Label>)).toThrow(/Field\.Label/)
   })

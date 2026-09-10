@@ -5,6 +5,7 @@ import {
   hasActiveFieldChrome,
   type FieldChrome,
 } from '../../../components/ui/field-chrome.variants'
+import { fieldWidthVariants } from '../../../components/ui/field-control.variants'
 import type { FieldSize } from '../../../components/ui/field.client'
 import type { FieldRhythm } from '../../../components/ui/field.variants'
 import { fieldGroupDescriptionClasses } from '../../../components/ui/field.variants'
@@ -13,6 +14,11 @@ import { FormRhythmStack } from '../../context/form-section.context'
 import type { SlotConfig } from '../../field-config'
 import { CompositeGroup } from '../../presentation/composite-group.client'
 import { resolveSlotHeading } from '../../resolve-container-heading.lib'
+
+function withSlotWidth(body: ReactNode, width: SlotConfig['width']): ReactNode {
+  if (!width) return body
+  return <div className={fieldWidthVariants({ width })}>{body}</div>
+}
 
 export function buildSlotFieldBody(
   config: SlotConfig,
@@ -58,20 +64,21 @@ export function wrapSlotFieldBody(
   const chrome = resolvedChrome ?? config.chrome
 
   if (hasActiveFieldChrome(chrome)) {
-    return (
+    return withSlotWidth(
       <FieldChromeShell
         chrome={chrome}
         size={chromeSize}
         className={!heading && !config.hint ? config.className : undefined}
       >
         {body}
-      </FieldChromeShell>
+      </FieldChromeShell>,
+      config.width,
     )
   }
 
   if (!heading && !config.hint && config.className) {
-    return <div className={config.className}>{body}</div>
+    return withSlotWidth(<div className={config.className}>{body}</div>, config.width)
   }
 
-  return body
+  return withSlotWidth(body, config.width)
 }

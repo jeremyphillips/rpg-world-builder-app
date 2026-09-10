@@ -20,6 +20,10 @@ import { formatUsageBlockerBulkDescription } from '@/lib/usage-references/usage-
 /** Subgroup legend for the campaign access disclosure. */
 export const CAMPAIGN_ACCESS_SECTION_LEGEND = 'Campaign availability'
 
+/** Helper text under the dialog-presentation availability trigger. */
+export const CAMPAIGN_ACCESS_SECTION_HINT =
+  'Controls where this content can be discovered and used.'
+
 /** Switch label for the campaign access section. */
 export const CAMPAIGN_ACCESS_AVAILABLE_LABEL = 'Available in this campaign'
 
@@ -30,10 +34,6 @@ export const CAMPAIGN_ACCESS_AVAILABLE_HINT =
 /** Switch hint when availability is off. */
 export const CAMPAIGN_ACCESS_UNAVAILABLE_HINT =
   'This content cannot be discovered or selected in this campaign.'
-
-/** Collapsed disclosure secondary line when availability is off. */
-export const CAMPAIGN_ACCESS_UNAVAILABLE_SUMMARY_SECONDARY =
-  'Hidden from discovery and selection in this campaign.'
 
 /** Label-level tooltip for the availability switch. */
 export const CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP =

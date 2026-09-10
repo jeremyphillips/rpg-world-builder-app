@@ -202,7 +202,7 @@ describe('group field container', () => {
         id: 'availability',
         legend: 'Campaign availability',
         disclosure: {
-          variant: 'summary',
+          variant: 'inline',
           defaultOpen: true,
           openLabel: 'Change',
           closeLabel: 'Done',

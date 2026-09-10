@@ -9,7 +9,10 @@ import {
   hasActiveFieldChrome,
   resolveEffectiveFieldChrome,
 } from '../../components/ui/field-chrome.variants'
-import { isSummaryDisclosure } from '../../components/ui/field-group-disclosure.types'
+import {
+  isDialogDisclosure,
+  isInlineDisclosure,
+} from '../../components/ui/field-group-disclosure.types'
 import {
   fieldGroupBottomMarginClasses,
   fieldSetChromeContainClasses,
@@ -52,6 +55,7 @@ interface GroupFieldSectionProps {
 interface GroupContainerLayout {
   chromeActive: boolean
   wrapEntireGroup: boolean
+  skipNestedFieldChrome: boolean
   inParentRhythm: boolean
 }
 
@@ -61,9 +65,12 @@ function resolveGroupContainerLayout(
   parentContext: ReturnType<typeof useFormSectionContext>,
 ): GroupContainerLayout {
   const chromeActive = hasActiveFieldChrome(groupFieldChrome)
+  const inlineDisclosure = Boolean(disclosure && isInlineDisclosure(disclosure))
+  const dialogDisclosure = Boolean(disclosure && isDialogDisclosure(disclosure))
   return {
     chromeActive,
-    wrapEntireGroup: chromeActive && !(disclosure && isSummaryDisclosure(disclosure)),
+    wrapEntireGroup: chromeActive && !inlineDisclosure && !dialogDisclosure,
+    skipNestedFieldChrome: inlineDisclosure,
     inParentRhythm: Boolean(parentContext.inGroup || parentContext.inRhythmStack),
   }
 }
@@ -72,6 +79,7 @@ function GroupFieldStackBody({
   nestedFields,
   chromeActive,
   wrapEntireGroup,
+  skipNestedFieldChrome,
   groupFieldChrome,
   groupSize,
   groupRhythm,
@@ -79,11 +87,12 @@ function GroupFieldStackBody({
   nestedFields: React.ReactNode
   chromeActive: boolean
   wrapEntireGroup: boolean
+  skipNestedFieldChrome: boolean
   groupFieldChrome: FieldChrome | undefined
   groupSize: ReturnType<typeof resolveFormDensity>['size']
   groupRhythm: ReturnType<typeof resolveFormDensity>['rhythm']
 }) {
-  if (!chromeActive || wrapEntireGroup) return nestedFields
+  if (!chromeActive || wrapEntireGroup || skipNestedFieldChrome) return nestedFields
 
   return (
     <FieldChromeShell
@@ -190,17 +199,15 @@ export function GroupFieldSection({
     </FormSectionContext.Provider>
   )
 
-  const { chromeActive, wrapEntireGroup, inParentRhythm } = resolveGroupContainerLayout(
-    groupFieldChrome,
-    item.disclosure,
-    parentContext,
-  )
+  const { chromeActive, wrapEntireGroup, skipNestedFieldChrome, inParentRhythm } =
+    resolveGroupContainerLayout(groupFieldChrome, item.disclosure, parentContext)
 
   const groupBody = (
     <GroupFieldStackBody
       nestedFields={nestedFields}
       chromeActive={chromeActive}
       wrapEntireGroup={wrapEntireGroup}
+      skipNestedFieldChrome={skipNestedFieldChrome}
       groupFieldChrome={groupFieldChrome}
       groupSize={groupSize}
       groupRhythm={groupRhythm}

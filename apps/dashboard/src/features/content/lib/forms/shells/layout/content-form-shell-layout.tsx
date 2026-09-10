@@ -143,6 +143,8 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         campaignAccess,
         onCampaignAccessDraftChange,
         onCampaignAccessPersisted,
+        identityLayout: 'inline',
+        availabilityPresentation: 'dialog',
       }}
       headerPrefix={formHeaderPrefix}
     />

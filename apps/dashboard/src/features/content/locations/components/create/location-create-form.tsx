@@ -342,6 +342,8 @@ function LocationCreateFormShell({
                   ctx={locationCtx}
                   formKey={formKey}
                   campaignId={campaignId}
+                  identityLayout="stacked"
+                  availabilityPresentation="disclosure"
                   onCampaignAccessDraftChange={(patch) => {
                     campaignAccessDraftRef.current = patch
                   }}

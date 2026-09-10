@@ -102,6 +102,10 @@ export {
   formSheetScrollRegionClasses,
 } from './chrome/form-chrome.variants'
 export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
+export {
+  FORM_COLUMNS_WIDTH_EQUAL,
+  FORM_COLUMNS_WIDTH_PRIMARY_DETAIL,
+} from './containers/form-columns.variants'
 
 export {
   flattenFields,
@@ -189,10 +193,12 @@ export {
   type FormColumnsColumn,
   type FormColumnsCollapseIndex,
   type FormColumnsCollapseOrder,
+  type FormColumnsWidths,
   type FieldGroupChrome,
   type FieldGroupDisclosure,
   type FieldGroupSummary,
   type FieldGroupSummaryDisclosure,
+  type FieldGroupDialogDisclosure,
   type ChromeConfig,
   type ChromeVariant,
   type ContentTone,

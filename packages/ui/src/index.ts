@@ -331,6 +331,7 @@ export {
   type FieldGroupLegendDisclosure,
   type FieldGroupSummary,
   type FieldGroupSummaryDisclosure,
+  type FieldGroupDialogDisclosure,
   type FieldGroupLegendSize,
   type FieldGroupProps,
 } from './components/ui/field-group'

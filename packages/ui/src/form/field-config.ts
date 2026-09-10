@@ -74,6 +74,7 @@ export type {
   FieldGroupDisclosure,
   FieldGroupSummary,
   FieldGroupSummaryDisclosure,
+  FieldGroupDialogDisclosure,
   ChromeBorderAccent,
   ChromeConfig,
   ChromeVariant,
@@ -1089,7 +1090,8 @@ export interface GroupConfig {
   fieldChrome?: FieldChrome
   /**
    * Open/collapse and summary behavior for the group container.
-   * `legend` — collapsible fieldset; `summary` — collapsed summary + Change/Done chrome.
+   * `legend` — collapsible fieldset; `inline` — collapsed summary + in-place editor;
+   * `dialog` — collapsed summary that opens the editor in a modal.
    */
   disclosure?: FieldGroupDisclosure
 }
@@ -1100,6 +1102,9 @@ export interface GroupConfig {
 export interface FormColumnsColumn {
   fields: FormItem[]
 }
+
+/** Column width ratio at `md+` for two-column layouts. */
+export type FormColumnsWidths = 'equal' | 'primary-detail'
 
 /**
  * Multi-column layout (`kind: 'columns'`). Layout-only — no fieldset, no shared
@@ -1128,6 +1133,12 @@ export interface ColumnsConfig {
    * tuples use a breakpoint so DOM order matches the single-column layout.
    */
   collapseOrder?: FormColumnsCollapseOrder
+  /**
+   * Column width ratio at `md+`. Default `'equal'`. `'primary-detail'` is `2fr` /
+   * `minmax(18rem, 1fr)` — a primary stack with a supporting control.
+   * Ignored when there are three or more columns.
+   */
+  widths?: FormColumnsWidths
   className?: string
   /** Optional DOM id on the columns wrapper — for in-page scroll anchors. */
   id?: string
@@ -1323,6 +1334,11 @@ export interface SlotConfig {
   label?: string
   /** @deprecated Use `heading.hint`. */
   hint?: string
+  /**
+   * Width of the slot wrapper within a `kind: 'row'` — same tokens as leaf
+   * `width`. Ignored outside a row.
+   */
+  width?: FieldWidth
   className?: string
   /** When hidden, the slot unmounts and any registered values clear with `shouldUnregister`. */
   visibility?: FieldVisibility

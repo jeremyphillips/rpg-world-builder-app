@@ -219,7 +219,7 @@ function SummaryDisclosureDemo() {
         rhythm="compact"
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
-          variant: 'summary',
+          variant: 'inline',
           defaultOpen: false,
           summaryDependsOn: ['available', 'visibilityMode'],
           showDirtySuffix: true,
@@ -256,12 +256,72 @@ function SummaryDisclosureDemo() {
   )
 }
 
-export const SummaryDisclosure: Story = {
+function DialogDisclosureDemo() {
+  const form = useForm({
+    defaultValues: { available: true, visibilityMode: 'all_players' },
+  })
+
+  return (
+    <FormProvider {...form}>
+      <FieldGroup
+        id="campaign-access-dialog"
+        legend="Campaign availability"
+        legendSize="array"
+        rhythm="compact"
+        formControl={form.control as unknown as Control<FieldValues>}
+        disclosure={{
+          variant: 'dialog',
+          hint: 'Controls where this content can be discovered and used.',
+          dialogHeadline: 'Campaign availability',
+          summaryDependsOn: ['available', 'visibilityMode'],
+          showDirtySuffix: true,
+          resolveSummary: (values) => {
+            const detail = values.visibilityMode === 'all_players' ? 'All players' : 'DM only'
+
+            if (!values.available) {
+              return {
+                status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
+                detail,
+                secondary: 'Hidden from discovery and selection in this campaign.',
+                chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' },
+              }
+            }
+
+            return {
+              status: { label: 'Available', tone: 'success', indicator: 'dot' },
+              detail,
+            }
+          },
+        }}
+      >
+        <TextField id="demo-available-dialog" label="Available in this campaign" />
+        <SelectField
+          id="demo-visibility-dialog"
+          label="Player access"
+          options={[
+            { label: 'All players', value: 'all_players' },
+            { label: 'DM only', value: 'dm_only' },
+          ]}
+        />
+      </FieldGroup>
+    </FormProvider>
+  )
+}
+
+export const InlineDisclosure: Story = {
   args: {
     legend: 'Campaign availability',
     children: null,
   },
   render: () => <SummaryDisclosureDemo />,
+}
+
+export const DialogDisclosure: Story = {
+  args: {
+    legend: 'Campaign availability',
+    children: null,
+  },
+  render: () => <DialogDisclosureDemo />,
 }
 
 /** Mirrors resolution form Target + How it resolves panels and Effects inset. */

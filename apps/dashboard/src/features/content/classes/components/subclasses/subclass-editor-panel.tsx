@@ -6,7 +6,7 @@ import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contract
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { CampaignAccessSection } from '../../../lib/campaign-access/campaign-access-section'
+import { CampaignAvailabilityField } from '../../../lib/campaign-access/campaign-availability-field'
 import { useCampaignAccessForm } from '../../../lib/campaign-access/campaign-access-form-context'
 import { SubclassUsageReferencesSection } from './subclass-usage-references-section'
 import { ContentEditHeadingBadges } from '../../../lib/campaign-access/content-edit-heading-badges'
@@ -20,6 +20,10 @@ import {
 } from '../../lib/subclasses/subclass-form-fields'
 import { isSubclassFormValuesLike } from '../../lib/subclasses/subclass-form-value-snapshot'
 import { subclassFormDef } from '../../lib/subclasses/subclass-form-values'
+import {
+  buildContentIdentityFields,
+  CONTENT_IDENTITY_AVAILABILITY_SLOT_NAME,
+} from '../../../lib/forms/fields/content-identity-form-fields'
 
 export interface SubclassEditorPanelProps {
   subclassId: string
@@ -131,18 +135,30 @@ export function SubclassEditorPanel({
           />
         </div>
 
-        <FormItems items={[nameFieldItem]} idPrefix={`subclass-editor-${subclassId}-name`} />
-
-        <CampaignAccessSection
-          campaignId={campaignId}
-          targetType="subclasses"
-          classId={classId}
-          entityId={isDraftSubclassId(subclassId) ? undefined : subclassId}
-          initialAccess={campaignAccess}
-          onDraftChange={(patch) => {
-            campaignAccessDraftRef.current = patch
-          }}
-          onPersistedChange={setCampaignAccess}
+        <FormItems
+          items={buildContentIdentityFields({
+            layout: 'stacked',
+            nameItem: nameFieldItem,
+            availabilityItem: {
+              kind: 'slot',
+              name: CONTENT_IDENTITY_AVAILABILITY_SLOT_NAME,
+              render: () => (
+                <CampaignAvailabilityField
+                  campaignId={campaignId}
+                  targetType="subclasses"
+                  classId={classId}
+                  entityId={isDraftSubclassId(subclassId) ? undefined : subclassId}
+                  presentation="disclosure"
+                  initialAccess={campaignAccess}
+                  onDraftChange={(patch) => {
+                    campaignAccessDraftRef.current = patch
+                  }}
+                  onPersistedChange={setCampaignAccess}
+                />
+              ),
+            },
+          })}
+          idPrefix={`subclass-editor-${subclassId}-identity`}
         />
 
         <FormItems items={bodyFields} idPrefix={`subclass-editor-${subclassId}`} />

@@ -112,7 +112,7 @@ describe('Form section rendering', () => {
         id: 'summary-group',
         legend: 'Campaign availability',
         disclosure: {
-          variant: 'summary',
+          variant: 'inline',
           defaultOpen: false,
           openLabel: 'Change',
           closeLabel: 'Done',

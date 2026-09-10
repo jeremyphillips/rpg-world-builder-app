@@ -60,13 +60,14 @@ function ColumnsStacks({
   const parentContext = useFormSectionContext()
   const { rhythm } = resolveFormDensity(parentContext.density)
   const count = resolveFormColumnsGridCount(item.columns.length)
+  const ratio = item.widths ?? 'equal'
 
   return (
     <div
       id={item.id}
       data-form-columns=""
       data-form-columns-layout="stacks"
-      className={cn(formColumnsGridVariants({ count, rhythm }), item.className)}
+      className={cn(formColumnsGridVariants({ count, ratio, rhythm }), item.className)}
     >
       {item.columns.map((column, columnIndex) => (
         <FormRhythmStack key={`column-${columnIndex}`} className="min-w-0">

@@ -1,3 +1,4 @@
+import type { ModalSize } from './modal.variants'
 import type { ChromeConfig } from './visual-vocabulary.types'
 
 export type {
@@ -40,9 +41,9 @@ export interface FieldGroupLegendDisclosure {
   collapseKey?: string
 }
 
-/** Collapsed summary + Change / expanded Done for settings-style groups. Requires `FormProvider`. */
+/** Collapsed summary + expanded in-place editor for settings-style groups. Requires `FormProvider`. */
 export interface FieldGroupSummaryDisclosure {
-  variant: 'summary'
+  variant: 'inline'
   defaultOpen?: boolean
   /** Stable key for uiStateKey persistence; falls back to group `id` or legend slug. */
   collapseKey?: string
@@ -63,7 +64,28 @@ export interface FieldGroupSummaryDisclosure {
   summaryDependsOn?: readonly string[]
 }
 
-export type FieldGroupDisclosure = FieldGroupLegendDisclosure | FieldGroupSummaryDisclosure
+/** Collapsed faux-input summary that opens the editor in a modal. Requires `FormProvider`. */
+export interface FieldGroupDialogDisclosure {
+  variant: 'dialog'
+  openLabel?: string
+  /** Footer dismiss action — edits apply live, so this only closes the modal. */
+  closeLabel?: string
+  disabled?: boolean
+  unsavedSuffix?: string
+  showDirtySuffix?: boolean
+  /** Bottom-aligned helper text under the faux-input trigger. */
+  hint?: string
+  dialogHeadline?: string
+  dialogDescription?: string
+  dialogSize?: ModalSize
+  resolveSummary: (values: Record<string, unknown>) => FieldGroupSummary
+  summaryDependsOn?: readonly string[]
+}
+
+export type FieldGroupDisclosure =
+  | FieldGroupLegendDisclosure
+  | FieldGroupSummaryDisclosure
+  | FieldGroupDialogDisclosure
 
 export function isLegendDisclosure(
   disclosure: FieldGroupDisclosure,
@@ -71,17 +93,25 @@ export function isLegendDisclosure(
   return disclosure.variant === 'legend'
 }
 
-export function isSummaryDisclosure(
+export function isInlineDisclosure(
   disclosure: FieldGroupDisclosure,
 ): disclosure is FieldGroupSummaryDisclosure {
-  return disclosure.variant === 'summary'
+  return disclosure.variant === 'inline'
 }
 
-/** Default open state when `defaultOpen` is omitted — legend groups open, summary groups closed. */
+export function isDialogDisclosure(
+  disclosure: FieldGroupDisclosure,
+): disclosure is FieldGroupDialogDisclosure {
+  return disclosure.variant === 'dialog'
+}
+
+/** Default open state when `defaultOpen` is omitted — legend groups open, inline/dialog closed. */
 export function resolveDisclosureDefaultOpen(
   disclosure: FieldGroupDisclosure | undefined,
 ): boolean {
   if (!disclosure) return true
-  if (disclosure.defaultOpen !== undefined) return disclosure.defaultOpen
+  if ('defaultOpen' in disclosure && disclosure.defaultOpen !== undefined) {
+    return disclosure.defaultOpen
+  }
   return disclosure.variant === 'legend'
 }

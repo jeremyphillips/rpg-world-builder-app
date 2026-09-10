@@ -23,6 +23,6 @@ Do **not** hand-build form section chrome in feature components when `FormItem[]
 
 ## Reference
 
-- Campaign availability: `campaign-access-form-fields.ts` — `disclosure: { variant: 'summary' }` on the group
+- Campaign availability: `campaign-access-form-fields.ts` — `disclosure: { variant: 'inline' | 'dialog' }` on the group
 - Containers: [packages/ui/docs/forms/containers.md](../../packages/ui/docs/forms/containers.md)
 - Dashboard conventions: [apps/dashboard/docs/form-lib-conventions.md](../../apps/dashboard/docs/form-lib-conventions.md)

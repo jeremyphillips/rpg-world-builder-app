@@ -2,7 +2,10 @@ import { createElement } from 'react'
 import type { ContentAccessTargetType, ContentCampaignAccessPatch } from '@rpg/contracts'
 import type { FormDensity, FormItem, GroupConfig } from '@rpg/ui/form'
 
-import { buildCampaignAvailabilityFields } from '@/lib/campaign-availability/campaign-availability-form-fields'
+import {
+  buildCampaignAvailabilityFields,
+  type CampaignAvailabilityPresentation,
+} from '@/lib/campaign-availability/campaign-availability-form-fields'
 
 import { CampaignAccessAvailableSwitch } from './campaign-access-available-switch'
 import {
@@ -32,6 +35,7 @@ export type CampaignAccessFormCtx = {
   groupId: string
   participantOptions?: ReadonlyArray<{ value: string; label: string }>
   groupDensity?: FormDensity
+  presentation?: CampaignAvailabilityPresentation
 }
 
 function buildParticipantField(ctx: CampaignAccessFormCtx): FormItem[] {
@@ -69,6 +73,7 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
     groupId: ctx.groupId,
     pending: ctx.pending,
     groupDensity: ctx.groupDensity,
+    presentation: ctx.presentation,
     summaryDependsOn: ['available', 'visibilityMode', 'participantIds'],
     resolveSummary: (values) =>
       resolveCampaignAccessSummary(

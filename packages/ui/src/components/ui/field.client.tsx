@@ -153,18 +153,27 @@ FieldRoot.displayName = 'Field.Root'
 export type FieldLabelProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
   /** Inline toggle first-line alignment — typography stays on `fieldLabelVariants`. */
   placement?: FieldLabelPlacement
+  /**
+   * When false, render a non-associating heading (`<span>`) instead of `<label htmlFor>`.
+   * Use for controls that are not labelable (e.g. dialog-trigger buttons) and wire
+   * `aria-labelledby` on the control instead.
+   */
+  associate?: boolean
 }
 
 const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
-  ({ className, children, placement, ...props }, ref) => {
+  ({ className, children, placement, associate = true, htmlFor, ...props }, ref) => {
     const { controlId, size } = useFieldContext('Field.Label')
+    const classNames = cn(fieldLabelVariants({ size, placement }), className)
+    if (!associate) {
+      return (
+        <span ref={ref as React.Ref<HTMLSpanElement>} className={classNames} {...props}>
+          {children}
+        </span>
+      )
+    }
     return (
-      <label
-        ref={ref}
-        htmlFor={controlId}
-        className={cn(fieldLabelVariants({ size, placement }), className)}
-        {...props}
-      >
+      <label ref={ref} htmlFor={htmlFor ?? controlId} className={classNames} {...props}>
         {children}
       </label>
     )

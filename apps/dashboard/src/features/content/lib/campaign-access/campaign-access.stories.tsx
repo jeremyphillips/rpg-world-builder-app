@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
-import { CampaignAccessSection } from './campaign-access-section'
+import { CampaignAvailabilityField } from './campaign-availability-field'
 import { CampaignAccessFormProvider } from './campaign-access-form-context'
 import { ContentEditHeadingBadges } from './content-edit-heading-badges'
 
@@ -15,18 +15,35 @@ export default meta
 
 type Story = StoryObj<typeof meta>
 
-export const SectionDefault: Story = {
+export const FieldDefault: Story = {
   render: () => (
     <CampaignAccessFormProvider>
-      <CampaignAccessSection campaignId="story-campaign" targetType="feats" entityId="story-feat" />
+      <CampaignAvailabilityField
+        campaignId="story-campaign"
+        targetType="feats"
+        entityId="story-feat"
+      />
     </CampaignAccessFormProvider>
   ),
 }
 
-export const SectionUnavailable: Story = {
+export const FieldDialog: Story = {
   render: () => (
     <CampaignAccessFormProvider>
-      <CampaignAccessSection
+      <CampaignAvailabilityField
+        campaignId="story-campaign"
+        targetType="feats"
+        entityId="story-feat"
+        presentation="dialog"
+      />
+    </CampaignAccessFormProvider>
+  ),
+}
+
+export const FieldUnavailable: Story = {
+  render: () => (
+    <CampaignAccessFormProvider>
+      <CampaignAvailabilityField
         campaignId="story-campaign"
         targetType="feats"
         entityId="story-feat"

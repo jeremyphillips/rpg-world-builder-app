@@ -151,6 +151,8 @@ function OrganizationCreateModalForm({
               ctx={ctx}
               formKey={formKey}
               campaignId={campaignId}
+              identityLayout="stacked"
+              availabilityPresentation="disclosure"
               onCampaignAccessDraftChange={(patch) => {
                 campaignAccessDraftRef.current = patch
               }}

@@ -36,13 +36,14 @@ import {
 } from './campaign-access-form-context'
 import { buildCampaignAccessFields } from './campaign-access-form-fields'
 import { formatCampaignAccessParticipantOptionLabel } from './campaign-access-labels'
+import type { CampaignAvailabilityPresentation } from '@/lib/campaign-availability/campaign-availability-form-fields'
 import {
   isDefaultCampaignAccessPatch,
   resolvedToCampaignAccessPatch,
 } from './campaign-access-state'
 import { useCampaignAccessParticipantRoster } from './use-campaign-access-participant-roster'
 
-export interface CampaignAccessSectionProps {
+export interface CampaignAvailabilityFieldProps {
   campaignId: string
   targetType: ContentAccessTargetType
   /** Present on edit; omitted on create until the entity exists. */
@@ -59,9 +60,14 @@ export interface CampaignAccessSectionProps {
   onPersistedChange?: (access: ResolvedContentCampaignAccess) => void
   /** Inherits parent form density when omitted. */
   density?: FormDensity
+  /**
+   * Where the editor renders. Defaults to `'disclosure'` so overlay hosts cannot
+   * accidentally nest a dialog. Full-page shells opt into `'dialog'`.
+   */
+  presentation?: CampaignAvailabilityPresentation
 }
 
-export function CampaignAccessSection({
+export function CampaignAvailabilityField({
   campaignId,
   targetType,
   entityId,
@@ -71,7 +77,8 @@ export function CampaignAccessSection({
   entityName,
   onPersistedChange,
   density,
-}: CampaignAccessSectionProps) {
+  presentation = 'disclosure',
+}: CampaignAvailabilityFieldProps) {
   const createFlowDensity = useCreateFlowFormDensity()
   const resolvedDensity = density ?? createFlowDensity ?? DEFAULT_FORM_DENSITY
   const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
@@ -113,8 +120,9 @@ export function CampaignAccessSection({
         groupId,
         participantOptions,
         groupDensity: resolvedDensity,
+        presentation,
       }),
-    [groupId, participantOptions, resolvedDensity, targetType],
+    [groupId, participantOptions, presentation, resolvedDensity, targetType],
   )
 
   const resolver = useMemo(
@@ -142,6 +150,7 @@ export function CampaignAccessSection({
         groupId,
         participantOptions,
         groupDensity: resolvedDensity,
+        presentation,
       }),
     [
       available,
@@ -149,6 +158,7 @@ export function CampaignAccessSection({
       initialPatch.available,
       participantOptions,
       pending,
+      presentation,
       resolvedDensity,
       targetType,
     ],

@@ -84,17 +84,18 @@ exclusive** — omit for plain fieldset behavior.
 | `callout` | Alert-shaped surface on the **field stack** only. `tone`: `info` (default), `success`, `warning`, `destructive`, `neutral`, or `default`.                                                                                                                                     |
 | `accent`  | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                            |
 
-`chrome` composes with `disclosure` — e.g. `outline` surface on the field stack inside a
-summary-disclosure group.
+`chrome` composes with `disclosure` — e.g. `outline` surface on the field stack inside an
+inline-disclosure group.
 
 ### Group `disclosure`
 
 Optional open/collapse and summary behavior. Composes with `chrome`.
 
-| `variant` | Use                                                                                                                                                                                                                                                                                    |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `legend`  | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen` (default `true`); optional `collapseKey` for `uiStateKey` persistence.                                                                                                                       |
-| `summary` | Compact collapsed summary + **Change** / expanded **Done** for settings sections. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `panelDivider` (default `true`), `openLabel` / `closeLabel`. Fields stay mounted (hidden) when collapsed. Requires `FormProvider`. |
+| `variant` | Use                                                                                                                                                                                                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `legend`  | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen` (default `true`); optional `collapseKey` for `uiStateKey` persistence.                                                                                                                  |
+| `inline`  | Compact collapsed summary (faux input) that expands in place. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `panelDivider` (default `true`), `openLabel` / `closeLabel`. **Done** is an outline button in the expanded panel footer. Requires `FormProvider`. |
+| `dialog`  | Same collapsed faux-input summary; the editor opens in a modal. **Done** (`closeLabel`) is the single footer action — edits apply live, so it only dismisses. `hint` sits under the trigger. `dialogHeadline` defaults to the group legend. Requires `FormProvider`.              |
 
 `resolveSummary` returns a `FieldGroupSummary`:
 
@@ -111,7 +112,7 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
   kind: 'group',
   legend: 'Campaign availability',
   disclosure: {
-    variant: 'summary',
+    variant: 'inline',
     defaultOpen: false,
     summaryDependsOn: ['available', 'visibilityMode'],
     showDirtySuffix: true,
@@ -141,7 +142,9 @@ apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 ## Rows
 
 Side-by-side leaf fields and slots in a wrapping flex row. Row-level `visibility`, `separator`,
-and `className`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
+and `className`. A top-level row is **one** field container — unlike `columns`, siblings share
+the box. Slots accept the same `width` tokens as leaf fields (`full`, fractions, `auto`, …).
+Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
 
 ## Columns
 
@@ -149,13 +152,17 @@ Side-by-side **vertical stacks** of mixed form items (`kind: 'columns'`). Not a 
 are wrapping leaf siblings on one control band. Columns is layout-only: no fieldset, no
 shared field container. Each child stays a top-level chrome unit.
 
-Wide (`md` / 768px+): CSS grid of independent `FormRhythmStack`s. Narrow default: the same
-stacks in one column (all of column 1, then column 2). Optional `collapseOrder` reorders
-DOM below `md` so tab order matches the single-column layout — do not use CSS `order`.
+Wide (`md` / 768px+): CSS grid of independent `FormRhythmStack`s. Optional `widths`:
+`'equal'` (default, `md:grid-cols-2`) or `'primary-detail'`
+(`md:grid-cols-[2fr_minmax(18rem,1fr)]`) — a primary column with a supporting control.
+Ignored for three-or-more column layouts. Narrow default: the same stacks in
+one column (all of column 1, then column 2). Optional `collapseOrder` reorders DOM
+below `md` so tab order matches the single-column layout — do not use CSS `order`.
 
 ```ts
 {
   kind: 'columns',
+  // widths: 'equal' (default) | 'primary-detail'
   // collapseOrder: 'columns' (default) | 'interleave' | [[column, index], …]
   columns: [
     { fields: [/* description, primary abilities, hit die */] },
@@ -566,7 +573,8 @@ Custom UI inside `FormProvider`. `name` aligns with a form value; defaults from 
 
 Slots inherit parent section `density`. Slot components should call
 `useFormSectionContext()` and resolve `resolveFormDensity(density)` when threading scale into
-hand-built controls.
+hand-built controls. Inside a `kind: 'row'`, set `width` on the slot the same way as a leaf
+field so it participates in the flex split.
 
 Optional `label` + `hint` wrap content in `FieldGroup`. `separator` adds a trailing
 divider after the slot (same as leaf fields and rows).

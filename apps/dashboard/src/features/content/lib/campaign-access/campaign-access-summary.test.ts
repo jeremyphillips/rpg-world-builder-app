@@ -65,7 +65,6 @@ describe('resolveCampaignAccessSummary', () => {
     ).toEqual({
       status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
       detail: 'DM only',
-      secondary: 'Hidden from discovery and selection in this campaign.',
       chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' },
     })
   })

@@ -11,7 +11,6 @@ import { FieldGroupSummaryDisclosure as FieldGroupSummaryDisclosureView } from '
 import {
   fieldGroupBottomMarginClasses,
   fieldSetResetClasses,
-  fieldStackRhythmVariants,
   type FieldRhythm,
 } from './field.variants'
 
@@ -63,14 +62,14 @@ export function SummaryDisclosureFieldGroupShell({
         legendId={legendId}
         panelId={panelId}
         size={size}
+        rhythm={rhythm}
+        chromeBodyClassName={chromeClasses.body}
         disclosure={disclosure}
         uiStateKey={uiStateKey}
         collapseKey={collapseKey}
         control={formControl}
       >
-        <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeClasses.body)}>
-          {children}
-        </div>
+        {children}
       </FieldGroupSummaryDisclosureView>
     </fieldset>
   )
