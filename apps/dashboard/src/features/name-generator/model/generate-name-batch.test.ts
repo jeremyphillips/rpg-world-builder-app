@@ -107,6 +107,13 @@ describe('generateNameBatch', () => {
     }
 
     const loadCollection = vi.fn(async () => tinyOrcGivenCollection)
+    const orcPersonal = getOrcConvention('orc-personal')
+    const givenOnlyOrcPersonal = {
+      ...orcPersonal!,
+      structures: orcPersonal!.structures.filter((structure) => structure.id === 'given-only'),
+      partBindings: orcPersonal!.partBindings.filter((binding) => binding.partKey === 'given'),
+      collectionIds: ['orc-given-pool'],
+    }
 
     const batch = await generateNameBatch(
       {
@@ -116,7 +123,12 @@ describe('generateNameBatch', () => {
         speciesId: 'srd-cc-5.2.1:orc',
       },
       { seed: 'orc-partial', count: 10 },
-      { loadCollection, conventions: orcConventions, getConvention: getOrcConvention },
+      {
+        loadCollection,
+        conventions: orcConventions,
+        getConvention: (conventionId) =>
+          conventionId === 'orc-personal' ? givenOnlyOrcPersonal : getOrcConvention(conventionId),
+      },
     )
 
     expect(batch.results).toHaveLength(3)

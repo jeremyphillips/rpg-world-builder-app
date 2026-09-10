@@ -10,6 +10,7 @@ export function buildNamingContext(filters: NameGeneratorFilters): NamingContext
   return {
     subjectKind: filters.subjectKind,
     ...(filters.languageId !== undefined ? { languageIds: [filters.languageId] } : {}),
+    ...(filters.regionId !== undefined ? { regionIds: [filters.regionId] } : {}),
     ...cultureFields,
     ...(filters.speciesId !== undefined ? { speciesIds: [filters.speciesId] } : {}),
   }

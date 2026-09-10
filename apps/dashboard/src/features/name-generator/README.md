@@ -33,6 +33,11 @@ name differently from its base culture (`heritageOptions` on
 also selects the culture it routes to, so recommendation scoring sees e.g.
 `elven-drow` rather than `elven`; changing species clears it.
 
+The Region filter appears only when a region-bearing convention is in scope for
+the current subject. Language, culture, and region option lists are derived from
+the conventions that still match the other selected filters — offered values
+must produce at least one recommendation (`model/filter-matrix.test.ts`).
+
 Results are cleared whenever the filter combination has no matching convention,
 so the list never shows names from a stale selection.
 

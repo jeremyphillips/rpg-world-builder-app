@@ -7,7 +7,6 @@ export const akanPersonalDefinition = {
   id: 'akan-personal',
   label: 'Akan personal names',
   description: 'Historical akan personal naming with given and family structure.',
-  associations: [{ kind: 'region', regionId: 'west-africa' }],
   structures: [
     {
       id: 'full',

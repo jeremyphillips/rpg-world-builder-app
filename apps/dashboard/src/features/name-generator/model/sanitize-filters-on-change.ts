@@ -28,6 +28,9 @@ function stripInvalidOptionalFilters(
   if (isFilterValueValid('cultureId', filters.cultureId, options)) {
     next.cultureId = filters.cultureId
   }
+  if (isFilterValueValid('regionId', filters.regionId, options)) {
+    next.regionId = filters.regionId
+  }
   if (isFilterValueValid('genderStyle', filters.genderStyle, options)) {
     next.genderStyle = filters.genderStyle
   }

@@ -31,6 +31,10 @@ export function resolveNamingConvention({
         languageId,
         strength: 'primary' as const,
       })),
+      ...(context.regionIds ?? []).map((regionId) => ({
+        kind: 'region' as const,
+        regionId,
+      })),
       ...(definition.associations ?? []),
     ]),
     structures: [...definition.structures],

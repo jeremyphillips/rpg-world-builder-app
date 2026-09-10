@@ -37,6 +37,9 @@ function stripInvalidOptionalFilters(
   if (isFilterValueValid('cultureId', filters.cultureId, options)) {
     next.cultureId = filters.cultureId
   }
+  if (isFilterValueValid('regionId', filters.regionId, options)) {
+    next.regionId = filters.regionId
+  }
   if (isFilterValueValid('genderStyle', filters.genderStyle, options)) {
     next.genderStyle = filters.genderStyle
   }
@@ -111,6 +114,17 @@ export function createNameGeneratorFilterSchema(
           label: option.label,
         })),
         visible: (state) => deriveVisibleFilters(state, conventions, filterContext).culture,
+        getValue: () => '',
+      }),
+      createEqualsFilter<GeneratedName, NameGeneratorFilters, 'regionId', string>({
+        id: 'regionId',
+        label: 'Region',
+        showAllOption: true,
+        options: filterOptions.regionIds.map((option) => ({
+          value: option.id,
+          label: option.label,
+        })),
+        visible: (state) => deriveVisibleFilters(state, conventions, filterContext).region,
         getValue: () => '',
       }),
       createEqualsFilter<GeneratedName, NameGeneratorFilters, 'genderStyle', NameGenderStyle>({

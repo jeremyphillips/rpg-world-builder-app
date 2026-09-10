@@ -3,7 +3,11 @@ import type {
   NamingConvention,
   NameSubjectKind,
 } from '@rpg/contracts/name-generator'
-import { NAME_SUBJECT_KIND_ENTRIES, toVocabOptions } from '@rpg/contracts/name-generator'
+import {
+  getNameRegionLabel,
+  NAME_SUBJECT_KIND_ENTRIES,
+  toVocabOptions,
+} from '@rpg/contracts/name-generator'
 import { getLanguageLabel } from '@rpg/contracts'
 import type { SpeciesNamingOption } from '@rpg/name-generator-integrations'
 import { getConventionCultureId, STANDALONE_NAMING_CULTURES } from '@rpg/name-generator-data'
@@ -25,7 +29,7 @@ import type {
 
 type PartialFilters = Pick<
   NameGeneratorFilters,
-  'subjectKind' | 'speciesId' | 'languageId' | 'cultureId'
+  'subjectKind' | 'speciesId' | 'languageId' | 'cultureId' | 'regionId'
 >
 
 export type NameGeneratorFilterContext = {
@@ -73,6 +77,12 @@ function conventionHasCulture(convention: NamingConvention, cultureId: string): 
   return convention.associations.some(
     (association) =>
       association.kind === 'culture' && association.cultureId === conventionCultureId,
+  )
+}
+
+function conventionHasRegion(convention: NamingConvention, regionId: string): boolean {
+  return convention.associations.some(
+    (association) => association.kind === 'region' && association.regionId === regionId,
   )
 }
 
@@ -139,6 +149,10 @@ export function filterConventionsByPartialFilters(
       return false
     }
 
+    if (filters.regionId !== undefined && !conventionHasRegion(convention, filters.regionId)) {
+      return false
+    }
+
     return true
   })
 }
@@ -164,6 +178,9 @@ function collectAssociationIds(
           break
         case 'species':
           ids.add(association.speciesId)
+          break
+        case 'region':
+          ids.add(association.regionId)
           break
         default:
           break
@@ -220,17 +237,20 @@ function buildLanguageOptions(
     }
   }
 
-  for (const culture of cultures) {
-    for (const languageId of culture.languageIds) {
-      ids.add(languageId)
-    }
-  }
-
   return [...ids]
     .sort((left, right) => left.localeCompare(right))
     .map((id) => ({
       id,
       label: getLanguageLabel(id),
+    }))
+}
+
+function buildRegionOptions(conventions: readonly NamingConvention[]): FilterOption[] {
+  return collectAssociationIds(conventions, 'region')
+    .sort((left, right) => left.localeCompare(right))
+    .map((id) => ({
+      id,
+      label: getNameRegionLabel(id),
     }))
 }
 
@@ -258,9 +278,7 @@ function getSelectedSpeciesOption(
 
 function buildCultureOptions(
   conventions: readonly NamingConvention[],
-  filters: PartialFilters,
   cultures: readonly NamingCultureFilterContext[],
-  speciesNamingOptions: readonly SpeciesNamingOption[],
 ): FilterOption[] {
   const referencedCultureIds = new Set(collectAssociationIds(conventions, 'culture'))
   const selectableCultures = new Map<string, NamingCultureFilterContext>()
@@ -278,14 +296,6 @@ function buildCultureOptions(
         label: culture.label,
         languageIds: getStandaloneCultureLanguageIds(culture),
       })
-    }
-  }
-
-  const speciesOption = getSelectedSpeciesOption(filters.speciesId, speciesNamingOptions)
-  for (const cultureId of speciesOption === undefined ? [] : getSpeciesCultureIds(speciesOption)) {
-    const culture = cultures.find((entry) => entry.id === cultureId)
-    if (culture !== undefined) {
-      selectableCultures.set(culture.id, culture)
     }
   }
 
@@ -331,34 +341,42 @@ function subjectConventionsHaveLanguageData(
   )
 }
 
+function deriveAssociationVisibility(
+  subjectConventions: readonly NamingConvention[],
+  context?: NameGeneratorFilterContext,
+): Pick<NameGeneratorVisibleFilters, 'language' | 'culture' | 'species' | 'region'> {
+  const cultures = context?.cultures ?? []
+  const speciesNamingOptions = context?.speciesNamingOptions ?? []
+
+  return {
+    language: subjectConventionsHaveLanguageData(subjectConventions, cultures),
+    culture: collectAssociationIds(subjectConventions, 'culture').length > 0 || cultures.length > 0,
+    species:
+      collectAssociationIds(subjectConventions, 'species').length > 0 ||
+      speciesNamingOptions.some((option) => !option.disabled),
+    region: collectAssociationIds(subjectConventions, 'region').length > 0,
+  }
+}
+
 export function deriveVisibleFilters(
   filters: NameGeneratorFilters,
   conventions: readonly NamingConvention[],
   context?: NameGeneratorFilterContext,
 ): NameGeneratorVisibleFilters {
-  const cultures = context?.cultures ?? []
   const speciesNamingOptions = context?.speciesNamingOptions ?? []
   const subjectConventions = conventions.filter((convention) =>
     convention.subjectKinds.includes(filters.subjectKind),
   )
-
-  const hasLanguageAssociations = subjectConventionsHaveLanguageData(subjectConventions, cultures)
-  const hasCultureAssociations =
-    collectAssociationIds(subjectConventions, 'culture').length > 0 || cultures.length > 0
-  const hasSpeciesAssociations =
-    collectAssociationIds(subjectConventions, 'species').length > 0 ||
-    speciesNamingOptions.some((option) => !option.disabled)
-
+  const associations = deriveAssociationVisibility(subjectConventions, context)
   const showLanguageCulture = SUBJECTS_WITH_LANGUAGE_CULTURE_FILTER.has(filters.subjectKind)
-
-  const showSpecies =
-    SUBJECTS_WITH_SPECIES_FILTER.has(filters.subjectKind) && hasSpeciesAssociations
+  const showSpecies = SUBJECTS_WITH_SPECIES_FILTER.has(filters.subjectKind) && associations.species
 
   return {
     species: showSpecies,
     heritage: showSpecies && buildHeritageOptions(filters, speciesNamingOptions).length > 0,
-    language: showLanguageCulture && hasLanguageAssociations,
-    culture: showLanguageCulture && hasCultureAssociations,
+    language: showLanguageCulture && associations.language,
+    culture: showLanguageCulture && associations.culture,
+    region: showLanguageCulture && associations.region,
     genderStyle: SUBJECTS_WITH_GENDER_FILTER.has(filters.subjectKind),
   }
 }
@@ -374,6 +392,7 @@ export function deriveFilterOptions(
       subjectKind: filters.subjectKind,
       speciesId: filters.speciesId,
       cultureId: filters.cultureId,
+      regionId: filters.regionId,
     },
     context,
   )
@@ -383,6 +402,17 @@ export function deriveFilterOptions(
       subjectKind: filters.subjectKind,
       speciesId: filters.speciesId,
       languageId: filters.languageId,
+      regionId: filters.regionId,
+    },
+    context,
+  )
+  const regionConventions = filterConventionsByPartialFilters(
+    conventions,
+    {
+      subjectKind: filters.subjectKind,
+      speciesId: filters.speciesId,
+      languageId: filters.languageId,
+      cultureId: filters.cultureId,
     },
     context,
   )
@@ -395,7 +425,8 @@ export function deriveFilterOptions(
     speciesIds: buildSpeciesOptions(speciesNamingOptions),
     heritageIds: buildHeritageOptions(filters, speciesNamingOptions),
     languageIds: buildLanguageOptions(languageConventions, cultures),
-    cultureIds: buildCultureOptions(cultureConventions, filters, cultures, speciesNamingOptions),
+    cultureIds: buildCultureOptions(cultureConventions, cultures),
+    regionIds: buildRegionOptions(regionConventions),
     genderStyles: buildGenderStyleOptions(),
   }
 }
@@ -420,6 +451,8 @@ export function isFilterValueValid(
       return options.languageIds.some((option) => option.id === value)
     case 'cultureId':
       return options.cultureIds.some((option) => option.id === value)
+    case 'regionId':
+      return options.regionIds.some((option) => option.id === value)
     case 'genderStyle':
       return options.genderStyles.some((option) => option.id === value)
     default:

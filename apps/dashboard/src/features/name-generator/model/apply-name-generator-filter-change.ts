@@ -141,6 +141,9 @@ export function applyNameGeneratorFilterChange({
     case 'cultureId':
       next.cultureId = value
       break
+    case 'regionId':
+      next.regionId = value
+      break
     default:
       break
   }

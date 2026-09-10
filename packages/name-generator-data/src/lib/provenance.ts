@@ -18,4 +18,11 @@ export const FIXTURE_COLLECTION_PROVENANCE = {
     license: 'original',
     methodology: 'curated',
   },
+  patternDerived: {
+    sourceName: 'RPG World Builder pattern-derived pool',
+    license: 'original',
+    methodology: 'pattern-derived',
+    notes:
+      'Generated from documented morphemes rather than padded attested lists. See each collection description for the morpheme source.',
+  },
 } as const satisfies Record<string, NameCollectionProvenance>

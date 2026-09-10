@@ -24,7 +24,18 @@ describe('STANDALONE_NAMING_CULTURES', () => {
   })
 
   it('keeps only standalone cultures outside the species catalog', () => {
-    expect(STANDALONE_NAMING_CULTURES.map((culture) => culture.id)).toEqual(['akan'])
+    expect(STANDALONE_NAMING_CULTURES.map((culture) => culture.id)).toEqual([
+      'akan',
+      'anglo-saxon',
+      'arabic',
+      'gaelic',
+      'han-chinese',
+      'japanese',
+      'norse',
+      'roman',
+      'slavic',
+      'yoruba',
+    ])
     for (const cultureId of SPECIES_CULTURE_IDS as readonly string[]) {
       expect(STANDALONE_NAMING_CULTURES.some((culture) => culture.id === cultureId)).toBe(false)
     }

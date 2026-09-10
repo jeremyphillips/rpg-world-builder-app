@@ -76,8 +76,22 @@ const heritageFilterContext = {
   ],
 }
 
+const ELVISH_DROW_PERSONAL_CONVENTION = {
+  ...ELVISH_PERSONAL_CONVENTION,
+  id: 'elvish-drow-personal',
+  associations: [
+    { kind: 'culture' as const, cultureId: 'elven-drow', strength: 'primary' as const },
+    { kind: 'language' as const, languageId: 'elvish', strength: 'primary' as const },
+    { kind: 'language' as const, languageId: 'undercommon', strength: 'primary' as const },
+  ],
+}
+
 describe('deriveFilterOptions heritage', () => {
-  const conventions = [ELVISH_PERSONAL_CONVENTION, ...STATIC_CONVENTIONS]
+  const conventions = [
+    ELVISH_PERSONAL_CONVENTION,
+    ELVISH_DROW_PERSONAL_CONVENTION,
+    ...STATIC_CONVENTIONS,
+  ]
 
   it('offers heritage options only once a species with naming-relevant heritages is selected', () => {
     const withoutSpecies = { subjectKind: 'person' } as NameGeneratorFilters

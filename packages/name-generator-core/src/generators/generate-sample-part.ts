@@ -48,9 +48,32 @@ function selectSamplePool(
         return pool
       }
     }
+
+    return unionRolePools(generator.pools)
   }
 
   return generator.pools[0]
+}
+
+function unionRolePools(pools: readonly NamePool[]): NamePool | undefined {
+  if (pools.length === 0) {
+    return undefined
+  }
+
+  if (pools.length === 1) {
+    return pools[0]
+  }
+
+  const values = [...new Set(pools.flatMap((pool) => pool.values))]
+  if (values.length === 0) {
+    return undefined
+  }
+
+  return {
+    id: 'union',
+    role: pools[0]?.role ?? 'given',
+    values,
+  }
 }
 
 export function generateSamplePart(

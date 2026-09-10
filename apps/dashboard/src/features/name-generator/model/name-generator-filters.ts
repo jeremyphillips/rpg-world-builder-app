@@ -7,6 +7,7 @@ export type NameGeneratorFilters = {
   heritageId?: string
   languageId?: LanguageId
   cultureId?: string
+  regionId?: string
   genderStyle?: NameGenderStyle
 }
 
@@ -38,6 +39,7 @@ export type NameGeneratorFilterOptions = {
   heritageIds: FilterOption[]
   languageIds: FilterOption[]
   cultureIds: FilterOption[]
+  regionIds: FilterOption[]
   genderStyles: FilterOption[]
 }
 
@@ -46,6 +48,7 @@ export type NameGeneratorVisibleFilters = {
   heritage: boolean
   language: boolean
   culture: boolean
+  region: boolean
   genderStyle: boolean
 }
 

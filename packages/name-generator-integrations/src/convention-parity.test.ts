@@ -249,6 +249,7 @@ describe('resolveNamingConvention parity', () => {
       cultureId: 'akan',
       cultureLabel: 'Akan',
       languageIds: [],
+      regionIds: ['west-africa'],
     }
     const legacy = buildLegacyConvention({
       context,
@@ -285,34 +286,42 @@ describe('resolveCampaignConventions ordering', () => {
       'halfling-settlement',
       'halfling-family',
       'halfling-landmark',
+      'halfling-faction',
       'gnomish-personal',
       'gnomish-settlement',
       'gnomish-family',
       'gnomish-landmark',
+      'gnomish-faction',
       'draconic-dragonborn-personal',
       'draconic-dragonborn-clan',
       'draconic-dragonborn-settlement',
       'draconic-dragonborn-landmark',
+      'draconic-dragonborn-faction',
       'goliath-personal',
       'goliath-clan',
       'goliath-settlement',
       'goliath-landmark',
+      'goliath-faction',
       'infernal-tiefling-personal',
       'infernal-tiefling-settlement',
       'infernal-tiefling-landmark',
+      'infernal-tiefling-family',
+      'infernal-tiefling-faction',
       'orc-personal',
       'orc-settlement',
       'orc-landmark',
+      'orc-clan',
+      'orc-faction',
     ])
   })
 })
 
 describe('resolveStandaloneConventions', () => {
   it('resolves akan personal convention from standalone culture metadata', () => {
-    const [convention] = resolveStandaloneConventions({
+    const convention = resolveStandaloneConventions({
       cultures: STANDALONE_NAMING_CULTURES,
       bindings: CULTURE_CONVENTION_BINDINGS,
-    })
+    }).find((entry) => entry.id === 'akan-personal')
 
     expect(convention?.id).toBe('akan-personal')
     expect(convention?.associations).toEqual([

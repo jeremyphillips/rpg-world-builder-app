@@ -6,7 +6,7 @@ export const infernalTieflingVirtuePoolCollection = {
   id: 'infernal-tiefling-virtue-pool',
   label: 'Infernal tiefling virtue names',
   description: 'Fixture virtue-name pool for optional infernal-tiefling surnames.',
-  subjectKinds: ['person'],
+  subjectKinds: ['person', 'family'],
   generator: {
     type: 'sample',
     pools: [

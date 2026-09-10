@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { PERSONAL_NAME_COMPONENT_TERM } from './personal-name-component'
+import { NAME_REGION_TERM } from '../../name-generator/region'
 import { NAME_SUBJECT_KIND_TERM } from '../../name-generator/subject-kind'
 import {
   SPELL_APPLICATION_PATTERN_TERM,
@@ -138,6 +139,7 @@ const RPG_VOCAB_OPEN_TERMS = [
 
 const NAME_GENERATOR_TERMS = [
   NAME_SUBJECT_KIND_TERM,
+  NAME_REGION_TERM,
   PERSONAL_NAME_COMPONENT_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
@@ -182,7 +184,7 @@ describe('rpg/vocab term coverage', () => {
 
 describe('name-generator term coverage', () => {
   it('defines vocab terms for every *_ENTRIES map', () => {
-    expect(NAME_GENERATOR_TERMS).toHaveLength(2)
+    expect(NAME_GENERATOR_TERMS).toHaveLength(3)
     for (const term of NAME_GENERATOR_TERMS) {
       expectVocabularyTerm(term)
     }

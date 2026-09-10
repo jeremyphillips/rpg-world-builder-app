@@ -8,12 +8,13 @@ import type { NamingCulture } from '@rpg/contracts/name-generator'
 import { resolveNamingConvention } from './resolve-naming-convention'
 
 function buildStandaloneCultureContext(
-  culture: Pick<NamingCulture, 'id' | 'label' | 'languageIds'>,
+  culture: Pick<NamingCulture, 'id' | 'label' | 'languageIds' | 'regionIds'>,
 ): NamingCultureContext {
   return {
     cultureId: culture.id,
     cultureLabel: culture.label,
     languageIds: culture.languageIds ?? [],
+    ...(culture.regionIds !== undefined ? { regionIds: culture.regionIds } : {}),
   }
 }
 
@@ -21,7 +22,7 @@ export function resolveStandaloneConventions({
   cultures,
   bindings,
 }: {
-  cultures: readonly Pick<NamingCulture, 'id' | 'label' | 'languageIds'>[]
+  cultures: readonly Pick<NamingCulture, 'id' | 'label' | 'languageIds' | 'regionIds'>[]
   bindings: Readonly<Record<string, readonly NamingConventionDefinition[]>>
 }): NamingConvention[] {
   const conventions: NamingConvention[] = []
