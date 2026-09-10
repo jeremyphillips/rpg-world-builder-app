@@ -34,14 +34,19 @@ describe('buildContentIdentityFields', () => {
     }
   })
 
-  it('returns a flat stack for stacked layout', () => {
+  it('returns a shared field-container stack for stacked layout', () => {
     expect(
       buildContentIdentityFields({
         layout: 'stacked',
         nameItem: nameField(),
         availabilityItem,
       }),
-    ).toEqual([nameField(), availabilityItem])
+    ).toEqual([
+      {
+        kind: 'group',
+        fields: [nameField(), availabilityItem],
+      },
+    ])
   })
 
   it('rejects non-leaf identity items for inline layout', () => {

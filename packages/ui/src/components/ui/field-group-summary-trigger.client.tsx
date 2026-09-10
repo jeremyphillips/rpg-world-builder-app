@@ -84,6 +84,7 @@ function FieldGroupSummaryStatusRow({
       className={cn(
         fieldGroupSummaryStatusLineVariants({ size }),
         fieldGroupSummaryTriggerTypographyClasses,
+        'min-w-0 flex-1 truncate',
       )}
     >
       {status.indicator === 'dot' ? (
@@ -111,7 +112,11 @@ function FieldGroupSummaryStatusRow({
           <span aria-hidden className={fieldGroupSummaryStatusDetailSeparatorClasses}>
             ·
           </span>
-          <Text as="span" variant="muted" className={fieldGroupSummaryTriggerTypographyClasses}>
+          <Text
+            as="span"
+            variant="muted"
+            className={cn(fieldGroupSummaryTriggerTypographyClasses, 'truncate')}
+          >
             {summary.detail}
           </Text>
         </>

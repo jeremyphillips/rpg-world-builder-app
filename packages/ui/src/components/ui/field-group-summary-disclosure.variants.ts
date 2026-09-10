@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
+import { fieldSizeTypographyClasses } from './field-sizing.variants'
 
 /** Summary disclosure legend + status copy — follows resolved section control scale. */
 export const fieldGroupSummaryDisclosureLegendVariants = cva('', {
@@ -32,12 +32,6 @@ export const fieldGroupSummaryPrimaryVariants = cva('', {
     size: 'md',
   },
 })
-
-export function resolveFieldGroupSummaryDisclosureExpandedLegendClassName(
-  size: FieldSizeToken = 'md',
-): string {
-  return cn(fieldGroupSummaryDisclosureLegendVariants({ size }), 'font-medium')
-}
 
 /** Expanded field stack top divider when `panelDivider` is enabled (default). */
 export const fieldGroupSummaryDisclosurePanelDividerClasses = 'border-t border-border'

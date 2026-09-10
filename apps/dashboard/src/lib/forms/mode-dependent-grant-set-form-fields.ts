@@ -101,7 +101,7 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
           }
         : {}),
       inset: dependentsPresentation?.inset ?? DEFAULT_DEPENDENT_INSET,
-      ...(dependentsPresentation?.chrome ? { chrome: dependentsPresentation.chrome } : {}),
+      chrome: dependentsPresentation?.chrome ?? 'none',
       fields: [
         {
           type: 'chips',

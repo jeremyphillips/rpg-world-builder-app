@@ -26,21 +26,9 @@ export const fieldGroupSummaryTriggerShellClasses = cn(
 export const fieldGroupSummaryTriggerSizeVariants = cva('', {
   variants: {
     size: {
-      sm: cn(
-        fieldControlSizeClasses.sm,
-        'h-auto min-h-8',
-        fieldGroupSummaryTriggerTypographyClasses,
-      ),
-      md: cn(
-        fieldControlSizeClasses.md,
-        'h-auto min-h-9',
-        fieldGroupSummaryTriggerTypographyClasses,
-      ),
-      lg: cn(
-        fieldControlSizeClasses.lg,
-        'h-auto min-h-11',
-        fieldGroupSummaryTriggerTypographyClasses,
-      ),
+      sm: cn(fieldControlSizeClasses.sm, fieldGroupSummaryTriggerTypographyClasses),
+      md: cn(fieldControlSizeClasses.md, fieldGroupSummaryTriggerTypographyClasses),
+      lg: cn(fieldControlSizeClasses.lg, fieldGroupSummaryTriggerTypographyClasses),
     },
   },
   defaultVariants: {
@@ -48,9 +36,9 @@ export const fieldGroupSummaryTriggerSizeVariants = cva('', {
   },
 })
 
-/** Status line, dirty suffix, and the `Change` affordance share one wrapping row. */
+/** Status line and optional dirty suffix — truncates before the `Change` affordance. */
 export const fieldGroupSummaryTriggerBodyClasses =
-  'flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5'
+  'flex min-w-0 flex-1 flex-nowrap items-center gap-x-1.5 overflow-hidden'
 
 /** Secondary explanatory copy drops below the status line inside the wrapping body. */
 export const fieldGroupSummaryTriggerSecondaryClasses = 'basis-full'

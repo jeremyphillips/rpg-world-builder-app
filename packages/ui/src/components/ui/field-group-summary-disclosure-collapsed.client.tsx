@@ -1,8 +1,7 @@
 import type { FieldSize } from './field.client'
 import type { FieldGroupSummary } from './field-group-disclosure.types'
 import { FieldGroupSummaryTrigger } from './field-group-summary-trigger.client'
-import { fieldGroupSummaryDisclosureLegendVariants } from './field-group-summary-disclosure.variants'
-import { Text } from './text'
+import { fieldLabelVariants } from './field.variants'
 
 export type FieldGroupSummaryDisclosureCollapsedProps = {
   legend: string
@@ -31,13 +30,9 @@ export function FieldGroupSummaryDisclosureCollapsed({
 }: FieldGroupSummaryDisclosureCollapsedProps) {
   return (
     <>
-      <Text
-        id={legendId}
-        variant="muted"
-        className={fieldGroupSummaryDisclosureLegendVariants({ size })}
-      >
+      <span id={legendId} className={fieldLabelVariants({ size })}>
         {legend}
-      </Text>
+      </span>
       <FieldGroupSummaryTrigger
         size={size}
         summary={summary}

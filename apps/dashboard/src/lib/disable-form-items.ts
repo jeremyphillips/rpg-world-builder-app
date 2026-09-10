@@ -1,5 +1,6 @@
 import type {
   ColumnsConfig,
+  DependentConfig,
   FieldConfig,
   FormItem,
   GroupFieldItem,
@@ -39,7 +40,21 @@ function disableGroupField(item: GroupFieldItem, disabled: boolean): GroupFieldI
       })) as ColumnsConfig['columns'],
     }
   }
+  if (item.kind === 'dependent') {
+    return disableDependentConfig(item, disabled)
+  }
   return item
+}
+
+function disableDependentConfig<T extends DependentConfig>(item: T, disabled: boolean): T {
+  return {
+    ...item,
+    controller: disableFieldConfig(item.controller, disabled),
+    dependents: {
+      ...item.dependents,
+      fields: item.dependents.fields.map((field) => disableFormItem(field, disabled)),
+    },
+  }
 }
 
 function disableFormItem(item: FormItem, disabled: boolean): FormItem {
@@ -63,6 +78,9 @@ function disableFormItem(item: FormItem, disabled: boolean): FormItem {
         fields: column.fields.map((field) => disableFormItem(field, disabled)),
       })) as ColumnsConfig['columns'],
     }
+  }
+  if (item.kind === 'dependent') {
+    return disableDependentConfig(item, disabled)
   }
   return item
 }

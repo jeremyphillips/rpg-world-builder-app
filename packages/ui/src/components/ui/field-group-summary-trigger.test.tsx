@@ -55,7 +55,7 @@ describe('FieldGroupSummaryTrigger', () => {
     expect(screen.getByText('Change')).toHaveClass('text-xs')
   })
 
-  it('keeps the dirty suffix and Change on the status line', () => {
+  it('keeps the dirty suffix on one row with Change on the right', () => {
     render(
       <FieldGroupSummaryTrigger
         size="md"
@@ -71,12 +71,12 @@ describe('FieldGroupSummaryTrigger', () => {
       />,
     )
 
-    const statusLine = screen.getByText('Available').parentElement!
-    const body = statusLine.parentElement!
+    const trigger = screen.getByRole('button', { name: /Available/ })
+    const body = screen.getByText('Available').closest('[class*="flex-nowrap"]')!
 
-    expect(body).toHaveClass('flex', 'flex-wrap', 'items-center')
+    expect(body).toHaveClass('flex-nowrap', 'overflow-hidden')
     expect(body).toContainElement(screen.getByText(/Unsaved/))
-    expect(body.nextElementSibling).toHaveTextContent('Change')
+    expect(trigger).toHaveTextContent('Change')
   })
 
   itAxe('has no axe violations', async () => {

@@ -98,7 +98,12 @@ export function buildContentIdentityFields(input: {
   availabilityItem: FormItem
 }): FormItem[] {
   if (input.layout === 'stacked') {
-    return [input.nameItem, input.availabilityItem]
+    return [
+      {
+        kind: 'group',
+        fields: [input.nameItem, input.availabilityItem],
+      },
+    ]
   }
 
   return [

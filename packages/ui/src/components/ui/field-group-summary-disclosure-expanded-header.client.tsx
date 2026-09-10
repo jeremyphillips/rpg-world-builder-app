@@ -1,6 +1,5 @@
 import type { FieldSize } from './field.client'
-import { resolveFieldGroupSummaryDisclosureExpandedLegendClassName } from './field-group-summary-disclosure.variants'
-import { Text } from './text'
+import { fieldLabelVariants } from './field.variants'
 
 export type FieldGroupSummaryDisclosureExpandedHeaderProps = {
   legend: string
@@ -14,8 +13,8 @@ export function FieldGroupSummaryDisclosureExpandedHeader({
   size,
 }: FieldGroupSummaryDisclosureExpandedHeaderProps) {
   return (
-    <Text id={legendId} className={resolveFieldGroupSummaryDisclosureExpandedLegendClassName(size)}>
+    <span id={legendId} className={fieldLabelVariants({ size })}>
       {legend}
-    </Text>
+    </span>
   )
 }

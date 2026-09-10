@@ -40,9 +40,9 @@ describe('modeDependentGrantSetField', () => {
       },
       dependents: {
         inset: DEFAULT_DEPENDENT_INSET,
+        chrome: 'none',
       },
     })
-    expect(item.dependents).not.toHaveProperty('chrome')
     expect(item.dependents).not.toHaveProperty('panel')
 
     const chips = item.dependents.fields[0]

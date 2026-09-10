@@ -8,7 +8,6 @@ import {
   CAMPAIGN_ACCESS_DONE_LABEL,
   CAMPAIGN_ACCESS_SECTION_HINT,
   CAMPAIGN_ACCESS_SECTION_LEGEND,
-  CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
 } from '@/features/content/lib/campaign-access/campaign-access-labels'
 
 export type CampaignAvailabilityPresentation = 'dialog' | 'disclosure'
@@ -59,8 +58,6 @@ export function buildCampaignAvailabilityFields(ctx: CampaignAvailabilityFieldCt
           variant: 'dialog' as const,
           openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
           closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
-          unsavedSuffix: CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
-          showDirtySuffix: true,
           disabled: ctx.pending,
           hint: CAMPAIGN_ACCESS_SECTION_HINT,
           dialogHeadline: CAMPAIGN_ACCESS_SECTION_LEGEND,
@@ -73,8 +70,6 @@ export function buildCampaignAvailabilityFields(ctx: CampaignAvailabilityFieldCt
           panelDivider: false,
           openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
           closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
-          unsavedSuffix: CAMPAIGN_ACCESS_UNSAVED_SUFFIX,
-          showDirtySuffix: true,
           disabled: ctx.pending,
           summaryDependsOn: ctx.summaryDependsOn,
           resolveSummary: ctx.resolveSummary,

@@ -177,7 +177,8 @@ describe('CampaignAvailabilityField', () => {
     expect(campaignAccessApi.updateContentCampaignAccess).not.toHaveBeenCalled()
 
     await user.click(screen.getByRole('button', { name: 'Done' }))
-    expect(screen.getByText(/Unsaved/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Available|Unavailable/ })).toBeInTheDocument()
+    expect(screen.queryByText(/Unsaved/)).not.toBeInTheDocument()
   })
 
   it('tracks create-time draft changes without calling the API', async () => {
