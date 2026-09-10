@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import type { ContentAccessTargetType, ContentCampaignAccessPatch } from '@rpg/contracts'
-import type { FormDensity, FormItem, GroupConfig } from '@rpg/ui/form'
+import { defineDependentField } from '@rpg/ui/form'
+import type { FieldConfig, FormDensity, FormItem, GroupConfig, GroupFieldItem } from '@rpg/ui/form'
 
 import {
   buildCampaignAvailabilityFields,
@@ -38,30 +39,54 @@ export type CampaignAccessFormCtx = {
   presentation?: CampaignAvailabilityPresentation
 }
 
-function buildParticipantField(ctx: CampaignAccessFormCtx): FormItem[] {
-  if (!ctx.participantOptions) {
-    return []
+function buildParticipantField(ctx: CampaignAccessFormCtx): FieldConfig {
+  return {
+    type: 'combobox',
+    name: 'participantIds',
+    label: CAMPAIGN_ACCESS_PARTICIPANTS_LABEL,
+    hint: CAMPAIGN_ACCESS_PARTICIPANTS_HINT,
+    info: CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
+    multiple: true,
+    options: [...(ctx.participantOptions ?? [])],
+    placeholder: 'Choose players…',
+    required: true,
+    disabled: !ctx.available || ctx.pending,
+  }
+}
+
+/** Player access controller with Selected players as an inset, railed dependent. */
+function buildPlayerAccessField(ctx: CampaignAccessFormCtx): GroupFieldItem {
+  const playerAccess: FieldConfig = {
+    type: 'select',
+    name: 'visibilityMode',
+    label: CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
+    labelPosition: 'settings',
+    hint: resolveCampaignAccessPlayerAccessHint(ctx),
+    info: CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
+    width: 'full',
+    disabled: !ctx.available || ctx.pending,
+    options: buildCampaignAccessVisibilityOptions(ctx.targetType, {
+      includeSpecificPlayers: true,
+    }),
+    optionAvailability: campaignAccessVisibilityOptionAvailability(),
   }
 
-  return [
-    {
-      type: 'combobox',
-      name: 'participantIds',
-      label: CAMPAIGN_ACCESS_PARTICIPANTS_LABEL,
-      hint: CAMPAIGN_ACCESS_PARTICIPANTS_HINT,
-      info: CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
-      multiple: true,
-      options: [...ctx.participantOptions],
-      placeholder: 'Choose players…',
-      required: true,
-      disabled: !ctx.available || ctx.pending,
+  if (!ctx.participantOptions) {
+    return playerAccess
+  }
+
+  return defineDependentField({
+    kind: 'dependent',
+    controller: playerAccess,
+    dependents: {
       visibility: {
         dependsOn: ['available', 'visibilityMode'],
         visibleWhen: (values) =>
           Boolean(values.available) && values.visibilityMode === 'specific_players',
       },
+      fields: [buildParticipantField(ctx)],
     },
-  ]
+  })
 }
 
 export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[] {
@@ -99,24 +124,7 @@ export function buildCampaignAccessFields(ctx: CampaignAccessFormCtx): FormItem[
   return [
     {
       ...availabilityGroup,
-      fields: [
-        ...(availabilityGroup.fields ?? []),
-        {
-          type: 'select',
-          name: 'visibilityMode',
-          label: CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
-          labelPosition: 'settings',
-          hint: resolveCampaignAccessPlayerAccessHint(ctx),
-          info: CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
-          width: 'full',
-          disabled: !ctx.available || ctx.pending,
-          options: buildCampaignAccessVisibilityOptions(ctx.targetType, {
-            includeSpecificPlayers: true,
-          }),
-          optionAvailability: campaignAccessVisibilityOptionAvailability(),
-        },
-        ...buildParticipantField(ctx),
-      ],
+      fields: [...(availabilityGroup.fields ?? []), buildPlayerAccessField(ctx)],
     },
   ]
 }

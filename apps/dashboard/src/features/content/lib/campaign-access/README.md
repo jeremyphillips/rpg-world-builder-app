@@ -38,7 +38,7 @@ The collapsed disclosure renders as a **status row**:
 
 Status, `· Unsaved`, and the **Change** affordance stay on that one line, at 12px in both compact and comfortable forms. Consequence copy lives in the switch hint and the row tooltip, not the summary.
 
-`detail` reflects the **configured** player-access mode even when availability is off — it is preserved, not erased. The secondary line explains that the setting is not currently effective.
+`detail` reflects the **configured** player-access mode even when availability is off — it is preserved, not erased.
 
 ## Participant context
 
@@ -129,7 +129,9 @@ Do not share `FormItem[]` builders between detail and bulk — share options, la
 ## Participant picker
 
 `useCampaignAccessParticipantRoster` loads `GET …/content/access-participants`.
-`buildCampaignAccessFields` renders a conditional `participantIds` combobox when
+`buildCampaignAccessFields` renders **Player access** as a `kind: 'dependent'` controller
+whose gated dependent is the `participantIds` combobox — inset behind a rail (the
+`DependentConfig` defaults) and shown only while availability is on and
 `visibilityMode === 'specific_players'`.
 
 Subclass editor save orchestration reuses `CampaignAccessFormProvider` and

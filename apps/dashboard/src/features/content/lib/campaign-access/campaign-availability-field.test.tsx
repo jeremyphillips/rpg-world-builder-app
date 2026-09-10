@@ -104,12 +104,12 @@ describe('CampaignAvailabilityField', () => {
     expect(screen.getByRole('combobox', { name: 'Player access' })).toHaveClass('text-xs')
   })
 
-  it('shows the participant picker when specific players is selected', async () => {
+  it('shows the participant picker inset behind a rail when specific players is selected', async () => {
     vi.mocked(participantRoster.useCampaignAccessParticipantRoster).mockReturnValue({
       data: [{ id: 'pc-1', name: 'Aldric', playerDisplayName: 'Player One' }],
     } as unknown as ReturnType<typeof participantRoster.useCampaignAccessParticipantRoster>)
 
-    renderField(
+    const { container } = renderField(
       <CampaignAvailabilityField
         campaignId="campaign-1"
         targetType="feats"
@@ -126,7 +126,25 @@ describe('CampaignAvailabilityField', () => {
 
     await userEvent.setup().click(screen.getByRole('button', { name: /Available/ }))
 
-    expect(screen.getByRole('combobox', { name: 'Selected players' })).toBeInTheDocument()
+    const rail = container.querySelector('[data-field-dependent-rail]')
+    expect(rail).toBeInTheDocument()
+    expect(rail).toContainElement(screen.getByRole('combobox', { name: 'Selected players' }))
+    expect(rail).not.toContainElement(screen.getByRole('combobox', { name: 'Player access' }))
+  })
+
+  it('hides the participant rail while player access is not specific players', async () => {
+    vi.mocked(participantRoster.useCampaignAccessParticipantRoster).mockReturnValue({
+      data: [{ id: 'pc-1', name: 'Aldric', playerDisplayName: 'Player One' }],
+    } as unknown as ReturnType<typeof participantRoster.useCampaignAccessParticipantRoster>)
+
+    const { container } = renderField(
+      <CampaignAvailabilityField campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
+    )
+
+    await userEvent.setup().click(screen.getByRole('button', { name: /Available/ }))
+
+    expect(screen.getByRole('combobox', { name: 'Player access' })).toBeInTheDocument()
+    expect(container.querySelector('[data-field-dependent-rail]')).not.toBeInTheDocument()
   })
 
   it('marks availability dirty without PATCH on edit toggle', async () => {
