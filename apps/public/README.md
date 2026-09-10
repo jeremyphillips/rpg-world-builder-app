@@ -6,11 +6,11 @@ the browser to the dashboard at `/app/`.
 
 ## Routes
 
-| Route     | Type   | Purpose                                                 |
-| --------- | ------ | ------------------------------------------------------- |
-| `/`       | Server | Landing page — `SiteHeader` + `SiteHero` + `SiteFooter` |
-| `/login`  | Server | Renders the client `LoginForm` (guest-only via redirect) |
-| `/signup` | Server | Renders the client `SignupForm` (guest-only via redirect) |
+| Route     | Type   | Purpose                                                                               |
+| --------- | ------ | ------------------------------------------------------------------------------------- |
+| `/`       | Server | Landing page — `SiteHeader` + landing sections (`components/landing/`) + `SiteFooter` |
+| `/login`  | Server | Renders the client `LoginForm` (guest-only via redirect)                              |
+| `/signup` | Server | Renders the client `SignupForm` (guest-only via redirect)                             |
 
 Forms are client components built with `react-hook-form` + `@hookform/resolvers/zod`,
 validating against the shared schemas in [`@rpg/contracts`](../../packages/contracts)
@@ -59,7 +59,10 @@ src/
     page.tsx            # landing
     login/page.tsx
     signup/page.tsx
-  components/            # SiteHeader, SiteHeaderNav (client), SiteHero, SiteFooter
+  components/            # SiteHeader, SiteHeaderNav (client), SiteFooter
+    landing/             # landing page sections (hero, features, homebrew,
+                         # how-it-works, CTA) + ScrollReveal (client) + copy
+                         # constants in landing-content.ts
   features/
     auth/               # feature-first: forms, hooks, api client (public via index.ts)
       components/        # LoginForm, SignupForm, AuthRedirect ("use client")
