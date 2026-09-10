@@ -20,7 +20,7 @@ export const BottomSide: Story = {
       <Sheet.Trigger asChild>
         <Button className="m-8">Open bottom sheet</Button>
       </Sheet.Trigger>
-      <Sheet.Content side="bottom" size="lg" surface="card">
+      <Sheet.Content side="bottom" size="lg" surface="field-container">
         <Sheet.Header headline="Class Preview" />
         <Sheet.Body>Preview rail content</Sheet.Body>
       </Sheet.Content>

@@ -67,7 +67,7 @@ export function ContentEditPublishBridge({
 
     publishRequest.setPublishRequest(async () => {
       const values = form.getValues()
-      const isValid = validateContentPublishValues(form, publishSchema, values)
+      const isValid = validateContentPublishValues(form, publishSchema, values, fields)
       if (!isValid) {
         ui.markPublishAttempted()
         onPublishValidationFailed?.()

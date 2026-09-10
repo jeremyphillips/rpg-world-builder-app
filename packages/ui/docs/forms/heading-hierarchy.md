@@ -20,7 +20,7 @@ Array legend typography derives from **parent** named-group depth plus section `
 1. **Typography** — `resolveHeadingTypography` / `HeadingPresentation`
 2. **Container semantics** — `FieldGroup` (fieldset), `CompositeGroup` (fieldset or `role="group"`), `FormFieldLabel` (control labels)
 
-Heading presentation does not force container choice. Slots use leaf-tier `CompositeGroup` with `useFieldset={false}`.
+Heading presentation does not force container choice. Slots use leaf-tier `CompositeGroup` with `useFieldset={false}`. Leaf headings use `fieldLabelHintStackClasses` for label→hint and the shared anatomy token for heading cluster→body (same 6px comfortable gap as fields).
 
 ## Label visibility
 

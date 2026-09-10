@@ -28,54 +28,58 @@ export const MockComposition: Story = {
         availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
         facts={identityFacts}
       />
-      <PreviewRail.Sections
-        description="Overview of this class and its current configuration."
-        defaultValue="basics"
-      >
-        <PreviewRail.Section
-          id="basics"
-          label="Basics"
-          marker="complete"
-          status="Ready"
-          statusTone="success"
+      <PreviewRail.ScrollRegion>
+        <PreviewRail.Sections
+          description="Overview of this class and its current configuration."
+          defaultValue="basics"
         >
-          <PreviewRail.SectionBody
-            description="A brief description will appear here once provided."
-            facts={identityFacts}
+          <PreviewRail.Section
+            id="basics"
+            label="Basics"
+            marker="complete"
+            status="Ready"
+            statusTone="success"
+          >
+            <PreviewRail.SectionBody
+              description="A brief description will appear here once provided."
+              facts={identityFacts}
+            />
+          </PreviewRail.Section>
+          <PreviewRail.Section
+            id="proficiencies"
+            label="Proficiencies"
+            marker="complete"
+            status="Ready"
+            statusTone="success"
           />
-        </PreviewRail.Section>
-        <PreviewRail.Section
-          id="proficiencies"
-          label="Proficiencies"
-          marker="complete"
-          status="Ready"
-          statusTone="success"
+          <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="idle" status="Off" />
+          <PreviewRail.Section
+            id="features"
+            label="Features"
+            marker="complete"
+            status="5 default features"
+          />
+          <PreviewRail.Section id="subclasses" label="Subclasses" marker="idle" status="None" />
+          <PreviewRail.Section
+            id="characterCreation"
+            label="Character creation"
+            marker="idle"
+            status="Not configured"
+          />
+        </PreviewRail.Sections>
+      </PreviewRail.ScrollRegion>
+      <PreviewRail.Footer>
+        <PreviewRail.StatusPanel
+          variant="success"
+          title="Ready to publish"
+          description="Required configuration is complete."
         />
-        <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="idle" status="Off" />
-        <PreviewRail.Section
-          id="features"
-          label="Features"
-          marker="complete"
-          status="5 default features"
+        <PreviewRail.Action
+          label="Preview as player"
+          helperText="See how this class will appear to players in your campaign."
+          icon={<Eye />}
         />
-        <PreviewRail.Section id="subclasses" label="Subclasses" marker="idle" status="None" />
-        <PreviewRail.Section
-          id="characterCreation"
-          label="Character creation"
-          marker="idle"
-          status="Not configured"
-        />
-      </PreviewRail.Sections>
-      <PreviewRail.StatusPanel
-        variant="success"
-        title="Ready to publish"
-        description="Required configuration is complete."
-      />
-      <PreviewRail.Action
-        label="Preview as player"
-        helperText="See how this class will appear to players in your campaign."
-        icon={<Eye />}
-      />
+      </PreviewRail.Footer>
     </PreviewRail>
   ),
 }
@@ -90,34 +94,38 @@ export const FreshCreate: Story = {
         availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
         facts={identityFacts}
       />
-      <PreviewRail.Sections
-        description="Overview of this class and its current configuration."
-        defaultValue="basics"
-      >
-        <PreviewRail.Section id="basics" label="Basics" marker="incomplete">
-          <PreviewRail.SectionBody
-            description="A brief description will appear here once provided."
-            facts={identityFacts}
+      <PreviewRail.ScrollRegion>
+        <PreviewRail.Sections
+          description="Overview of this class and its current configuration."
+          defaultValue="basics"
+        >
+          <PreviewRail.Section id="basics" label="Basics" marker="incomplete">
+            <PreviewRail.SectionBody
+              description="A brief description will appear here once provided."
+              facts={identityFacts}
+            />
+          </PreviewRail.Section>
+          <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="idle" status="Off" />
+          <PreviewRail.Section
+            id="features"
+            label="Features"
+            marker="complete"
+            status="5 default features"
           />
-        </PreviewRail.Section>
-        <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="idle" status="Off" />
-        <PreviewRail.Section
-          id="features"
-          label="Features"
-          marker="complete"
-          status="5 default features"
+        </PreviewRail.Sections>
+      </PreviewRail.ScrollRegion>
+      <PreviewRail.Footer>
+        <PreviewRail.StatusPanel
+          variant="default"
+          title="Not ready to publish"
+          description="Required configuration is incomplete."
         />
-      </PreviewRail.Sections>
-      <PreviewRail.StatusPanel
-        variant="default"
-        title="Not ready to publish"
-        description="Required configuration is incomplete."
-      />
-      <PreviewRail.Action
-        label="Preview as player"
-        helperText="See how this class will appear to players in your campaign."
-        icon={<Eye />}
-      />
+        <PreviewRail.Action
+          label="Preview as player"
+          helperText="See how this class will appear to players in your campaign."
+          icon={<Eye />}
+        />
+      </PreviewRail.Footer>
     </PreviewRail>
   ),
 }
@@ -132,24 +140,28 @@ export const PostSubmitAttention: Story = {
         availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
         facts={identityFacts}
       />
-      <PreviewRail.Sections defaultValue="basics">
-        <PreviewRail.Section
-          id="basics"
-          label="Basics"
-          marker="attention"
-          status="Needs attention"
-          statusTone="warning"
-        />
-        <PreviewRail.Section
-          id="proficiencies"
-          label="Proficiencies"
-          marker="attention"
-          status="Needs attention"
-          statusTone="warning"
-        />
-      </PreviewRail.Sections>
-      <PreviewRail.StatusPanel variant="warning" title="2 sections need attention." />
-      <PreviewRail.Action label="Preview as player" icon={<Eye />} />
+      <PreviewRail.ScrollRegion>
+        <PreviewRail.Sections defaultValue="basics">
+          <PreviewRail.Section
+            id="basics"
+            label="Basics"
+            marker="attention"
+            status="Needs attention"
+            statusTone="warning"
+          />
+          <PreviewRail.Section
+            id="proficiencies"
+            label="Proficiencies"
+            marker="attention"
+            status="Needs attention"
+            statusTone="warning"
+          />
+        </PreviewRail.Sections>
+      </PreviewRail.ScrollRegion>
+      <PreviewRail.Footer>
+        <PreviewRail.StatusPanel variant="warning" title="2 sections need attention." />
+        <PreviewRail.Action label="Preview as player" icon={<Eye />} />
+      </PreviewRail.Footer>
     </PreviewRail>
   ),
 }

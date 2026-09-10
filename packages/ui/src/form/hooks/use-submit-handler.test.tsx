@@ -110,4 +110,24 @@ describe('useSubmitHandler', () => {
 
     expect(result.current.formError).toBe('Mapped message')
   })
+
+  it('suppresses formError when mapError returns null', async () => {
+    const { result } = renderHook(() =>
+      useSubmitHandler<{ name: string }>({
+        submit: async () => {
+          throw new Error('Content form commit validation failed.')
+        },
+        fallbackMessage: 'Could not save.',
+        mapError: () => null,
+        absorbErrors: true,
+      }),
+    )
+
+    const form = renderHook(() => useForm<{ name: string }>({ defaultValues: { name: '' } }))
+    await act(async () => {
+      await result.current.onSubmit({ name: 'A' }, form.result.current)
+    })
+
+    expect(result.current.formError).toBeUndefined()
+  })
 })

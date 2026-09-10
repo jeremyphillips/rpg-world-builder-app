@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from '../../components/ui/field.client'
+import { fieldAnatomyStackVariants } from '../../components/ui/field.variants'
 import type { FormHeading } from '../form-heading.lib'
 import { HeadingPresentation } from './heading-presentation.client'
 
@@ -40,10 +41,11 @@ export function CompositeGroup({
       size={size}
     />
   )
+  const stackClassName = cn('min-w-0', fieldAnatomyStackVariants({ size }), className)
 
   if (useFieldset) {
     return (
-      <fieldset id={id} className={cn('min-w-0 border-0 p-0', className)}>
+      <fieldset id={id} className={cn('border-0 p-0', stackClassName)}>
         {presentation}
         {children}
       </fieldset>
@@ -51,7 +53,7 @@ export function CompositeGroup({
   }
 
   return (
-    <div id={id} role="group" aria-labelledby={headingId} className={cn('min-w-0', className)}>
+    <div id={id} role="group" aria-labelledby={headingId} className={stackClassName}>
       {presentation}
       {children}
     </div>

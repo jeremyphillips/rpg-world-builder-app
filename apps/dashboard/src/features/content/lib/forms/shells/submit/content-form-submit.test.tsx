@@ -131,7 +131,9 @@ describe('useContentFormSubmit', () => {
 
     expect(persist).not.toHaveBeenCalled()
     expect(result.current.formError).toBeUndefined()
+    expect(result.current.formError).not.toBe('Content form commit validation failed.')
     expect(form.getFieldState('name').error?.message).toBeTruthy()
+    expect(form.getFieldState('name').error?.message).not.toMatch(/commit validation/i)
   })
 
   it('calls persist once and resolves on success', async () => {

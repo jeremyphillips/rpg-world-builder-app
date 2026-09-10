@@ -21,38 +21,51 @@ describe('PreviewRail', () => {
             { label: 'Primary abilities', value: 'Strength' },
           ]}
         />
-        <PreviewRail.Sections defaultValue="basics">
-          <PreviewRail.Section
-            id="basics"
-            label="Basics"
-            marker="complete"
-            status="Ready"
-            statusTone="success"
-          >
-            <PreviewRail.SectionBody
-              description="A brief description will appear here once provided."
-              facts={[
-                { label: 'Primary abilities', value: 'Strength' },
-                { label: 'Hit die', value: 'd8' },
-              ]}
+        <PreviewRail.ScrollRegion data-testid="preview-rail-scroll">
+          <PreviewRail.Sections defaultValue="basics">
+            <PreviewRail.Section
+              id="basics"
+              label="Basics"
+              marker="complete"
+              status="Ready"
+              statusTone="success"
+            >
+              <PreviewRail.SectionBody
+                description="A brief description will appear here once provided."
+                facts={[
+                  { label: 'Primary abilities', value: 'Strength' },
+                  { label: 'Hit die', value: 'd8' },
+                ]}
+              />
+            </PreviewRail.Section>
+            <PreviewRail.Section
+              id="spellcasting"
+              label="Spellcasting"
+              marker="idle"
+              status="Off"
             />
-          </PreviewRail.Section>
-          <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="idle" status="Off" />
-        </PreviewRail.Sections>
-        <PreviewRail.StatusPanel
-          variant="success"
-          title="Ready to publish"
-          description="Required configuration is complete."
-        />
-        <PreviewRail.Action
-          label="Preview as player"
-          helperText="See how this class will appear to players in your campaign."
-          icon={<Eye />}
-        />
+          </PreviewRail.Sections>
+        </PreviewRail.ScrollRegion>
+        <PreviewRail.Footer>
+          <PreviewRail.StatusPanel
+            variant="success"
+            title="Ready to publish"
+            description="Required configuration is complete."
+          />
+          <PreviewRail.Action
+            label="Preview as player"
+            helperText="See how this class will appear to players in your campaign."
+            icon={<Eye />}
+          />
+        </PreviewRail.Footer>
       </PreviewRail>,
     )
 
     expect(screen.getByRole('complementary')).toHaveClass('sticky')
+    expect(screen.getByRole('complementary').className).toContain(
+      'max-h-[calc(100dvh-5rem-1.5rem)]',
+    )
+    expect(screen.getByTestId('preview-rail-scroll')).toHaveClass('overflow-y-auto')
     expect(screen.getByRole('heading', { name: 'Class Preview' })).toBeInTheDocument()
     expect(screen.getByText('Draft')).toBeInTheDocument()
     expect(screen.getByText('Available')).toBeInTheDocument()

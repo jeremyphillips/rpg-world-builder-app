@@ -19,7 +19,7 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col gap-4', {
       plain: 'w-full',
     },
     sticky: {
-      true: 'sticky self-start top-20',
+      true: 'sticky self-start top-20 max-h-[calc(100dvh-5rem-1.5rem)] min-h-0',
       false: '',
     },
   },
@@ -29,9 +29,16 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col gap-4', {
   },
 })
 
-export const previewRailHeaderRowClasses = 'flex items-center justify-between gap-2'
+export const previewRailHeaderRowClasses = 'flex shrink-0 items-center justify-between gap-2'
+
+export const previewRailIdentityStackClasses = 'flex shrink-0 flex-col gap-4'
 
 export const previewRailIdentityRowClasses = 'flex items-center gap-3'
+
+/** Sections-only scroll body — header, identity, and footer stay put. */
+export const previewRailScrollRegionClasses = 'min-h-0 flex-1 overflow-y-auto'
+
+export const previewRailFooterClasses = 'flex shrink-0 flex-col gap-4'
 
 export const previewRailIdentityContentClasses = 'min-w-0 flex-1'
 

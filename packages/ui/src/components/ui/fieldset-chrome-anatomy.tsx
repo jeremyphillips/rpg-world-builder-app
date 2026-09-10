@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from 'react'
+import { cloneElement, isValidElement, type ComponentProps, type ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { FieldErrorText, FieldHintBelowLabel, FieldHintText, type FieldSize } from './field.client'
@@ -6,6 +6,7 @@ import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
 import {
   fieldAnatomyStackVariants,
+  fieldLabelHintStackClasses,
   fieldSetChromeContainClasses,
   fieldSetResetClasses,
   type FieldHintPosition,
@@ -31,6 +32,27 @@ export interface FieldsetChromeFrameProps {
   children: ReactNode
 }
 
+function legendWithBelowLabelHint(legend: ReactNode, hint: ReactNode): ReactNode {
+  if (!hint) return legend
+  if (!isValidElement<{ className?: string; children?: ReactNode }>(legend)) {
+    return (
+      <>
+        {legend}
+        {hint}
+      </>
+    )
+  }
+
+  return cloneElement(legend, {
+    children: (
+      <div className={fieldLabelHintStackClasses}>
+        {legend.props.children}
+        {hint}
+      </div>
+    ),
+  })
+}
+
 /**
  * Border/padding for leaf fieldsets live on {@link FieldChromeShell} around a reset
  * `<fieldset>`, so UA `<legend>` cannot sit on the visible container border. Keep
@@ -46,7 +68,7 @@ export function FieldsetChromeAnatomy({
   children,
 }: Omit<FieldsetChromeAnatomyProps, 'size' | 'errorId'>) {
   const belowLabelHint =
-    hintPosition === 'below-label' ? (
+    hintPosition === 'below-label' && hint && !error ? (
       <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
     ) : null
   const belowControlHint =
@@ -56,8 +78,7 @@ export function FieldsetChromeAnatomy({
 
   return (
     <>
-      {legend}
-      {belowLabelHint}
+      {legendWithBelowLabelHint(legend, belowLabelHint)}
       {children}
       {belowControlHint}
     </>
@@ -74,15 +95,16 @@ export function FieldsetChromeFrame({
   children,
 }: FieldsetChromeFrameProps) {
   const { className: fieldsetClassName, ...restFieldsetProps } = fieldsetProps
+  const anatomyStack = fieldAnatomyStackVariants({ size })
 
   return (
-    <FieldChromeShell chrome={chrome} size={size}>
+    <FieldChromeShell chrome={chrome} size={size} className={anatomyStack}>
       <fieldset
         {...restFieldsetProps}
         className={cn(
           fieldSetResetClasses,
           fieldSetChromeContainClasses,
-          fieldAnatomyStackVariants({ size }),
+          anatomyStack,
           fieldsetClassName,
         )}
       >

@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import type { ZodIssue, ZodType } from 'zod'
 import {
+  collectTabbedFormResolverItems,
   resolveTabValidationState,
+  safeParseWithFieldErrors,
   type FormIssue,
   type FormItem,
   type TabbedFormTab,
@@ -31,7 +33,7 @@ function computePublishValidation<TValues extends FieldValues>(
   tabs: TabbedFormTab[],
   fields: FormItem[],
 ): Pick<ContentPublishValidation, 'isPublishReady' | 'issues' | 'invalidTabIds'> {
-  const parsed = schema.safeParse(values)
+  const parsed = safeParseWithFieldErrors(schema, values, fields)
   if (parsed.success) {
     return { isPublishReady: true, issues: [], invalidTabIds: new Set() }
   }
@@ -62,10 +64,7 @@ export function useContentPublishValidation<TValues extends FieldValues>({
 }): ContentPublishValidation {
   const { control, getValues } = useFormContext<TValues>()
   const watchedValues = useWatch({ control })
-  const fields = useMemo(
-    () => tabs.flatMap((tab) => [...tab.fields, ...(tab.resolverFields ?? [])]),
-    [tabs],
-  )
+  const fields = useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
 
   const [validation, setValidation] = useState<ContentPublishValidation>(() => ({
     ...computePublishValidation(schema, getValues(), tabs, fields),

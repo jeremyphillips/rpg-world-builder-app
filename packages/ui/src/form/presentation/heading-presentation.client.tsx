@@ -6,6 +6,7 @@ import { cn } from '../../lib/utils'
 import {
   fieldGroupDescriptionTypographyClasses,
   fieldGroupLegendHeaderStackClasses,
+  fieldLabelHintStackClasses,
   fieldLabelVariants,
   resolveFieldGroupLegendClassName,
   type FieldGroupLegendScale,
@@ -76,8 +77,10 @@ export function HeadingPresentation({
   const hintNode = renderHint(hint, tier)
 
   if (hintNode) {
+    const hintStackClasses =
+      tier === 'leaf' ? fieldLabelHintStackClasses : fieldGroupLegendHeaderStackClasses
     return (
-      <Component id={id} className={cn(fieldGroupLegendHeaderStackClasses, className)}>
+      <Component id={id} className={cn(hintStackClasses, className)}>
         <span className={labelClassName}>{label}</span>
         {hintNode}
       </Component>

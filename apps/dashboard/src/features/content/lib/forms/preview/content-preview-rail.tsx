@@ -202,28 +202,32 @@ function ContentPreviewRailView({
         availability={resolveContentPreviewAvailability(access, accessSummary)}
         facts={identity.facts}
       />
-      <PreviewRail.Sections
-        title={CONTENT_PREVIEW_SECTIONS_TITLE}
-        description={contentPreviewSectionsDescription(term)}
-        value={openSection}
-        onValueChange={(value) => onOpenSectionChange({ forTabId: activeTabId, value })}
-      >
-        <ContentPreviewRailSectionList
-          tabs={tabs}
-          sections={sections}
-          invalidTabIds={invalidTabIds}
-          hasAttemptedPublish={hasAttemptedPublish}
+      <PreviewRail.ScrollRegion>
+        <PreviewRail.Sections
+          title={CONTENT_PREVIEW_SECTIONS_TITLE}
+          description={contentPreviewSectionsDescription(term)}
+          value={openSection}
+          onValueChange={(value) => onOpenSectionChange({ forTabId: activeTabId, value })}
+        >
+          <ContentPreviewRailSectionList
+            tabs={tabs}
+            sections={sections}
+            invalidTabIds={invalidTabIds}
+            hasAttemptedPublish={hasAttemptedPublish}
+          />
+        </PreviewRail.Sections>
+      </PreviewRail.ScrollRegion>
+      <PreviewRail.Footer>
+        <PreviewRail.StatusPanel
+          {...resolveContentPreviewReadinessPanel(valid, hasAttemptedPublish, attentionCount)}
         />
-      </PreviewRail.Sections>
-      <PreviewRail.StatusPanel
-        {...resolveContentPreviewReadinessPanel(valid, hasAttemptedPublish, attentionCount)}
-      />
-      <PreviewRail.Action
-        label={CONTENT_PREVIEW_AS_PLAYER_LABEL}
-        helperText={contentPreviewAsPlayerHelper(term)}
-        icon={<Eye />}
-        onClick={onPreviewAsPlayer}
-      />
+        <PreviewRail.Action
+          label={CONTENT_PREVIEW_AS_PLAYER_LABEL}
+          helperText={contentPreviewAsPlayerHelper(term)}
+          icon={<Eye />}
+          onClick={onPreviewAsPlayer}
+        />
+      </PreviewRail.Footer>
     </PreviewRail>
   )
 }
@@ -302,7 +306,7 @@ export function ContentPreviewRail(props: ContentPreviewRailProps) {
         <Sheet.Content
           side={isMdUp ? 'right' : 'bottom'}
           size="lg"
-          surface="background"
+          surface="field-container"
           closeLabel="Close preview"
         >
           <Sheet.Header

@@ -30,6 +30,10 @@ export const sheetContentVariants = cva(
           'border-border bg-background text-foreground',
           establishSurfaceCurrent('background'),
         ),
+        'field-container': cn(
+          'border-border bg-field-container text-foreground',
+          establishSurfaceCurrent('field-container'),
+        ),
       },
       size: {
         md: 'max-w-md',

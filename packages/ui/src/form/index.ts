@@ -283,7 +283,13 @@ export {
   type DiceFormulaTailOperator,
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
-export { makeFieldErrorMap, type RawZodIssueLike } from './config/field-error-map'
+export {
+  makeFieldErrorMap,
+  safeParseWithFieldErrors,
+  UNLABELED_FIELD_LABEL,
+  UNLABELED_ITEM_LABEL,
+  type RawZodIssueLike,
+} from './config/field-error-map'
 export {
   makeResolver,
   createValidateSilently,
@@ -329,6 +335,7 @@ export {
 export {
   useSubmitHandler,
   type FormSubmitHandler,
+  type MapFormError,
   type UseSubmitHandlerOptions,
   type UseSubmitHandlerResult,
 } from './hooks/use-submit-handler.client'

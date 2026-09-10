@@ -5,7 +5,11 @@ import {
   type FieldRowAlignment,
   type FieldRowLayout,
 } from './field-control-band.variants'
-import { fieldLabelVariants, fieldSettingsRowClasses } from './field.variants'
+import {
+  fieldAnatomyAlignVariants,
+  fieldLabelVariants,
+  fieldSettingsRowClasses,
+} from './field.variants'
 import type { FieldSizeToken } from './field-sizing.variants'
 
 /**
@@ -54,12 +58,15 @@ function resolveGroupClassName(labelLayout: FieldLabelLayout): string {
   }
 }
 
-function resolveAlignmentAnchorClassName(labelLayout: FieldLabelLayout): string {
+function resolveAlignmentAnchorClassName(
+  labelLayout: FieldLabelLayout,
+  size: FieldSizeToken,
+): string {
   switch (labelLayout) {
     case 'stacked':
-      // `gap-y-2` (not `gap-2` / `space-y-2`) keeps this distinct from form rhythm
-      // stacks and Field.Root anatomy, which tests often query by those class tuples.
-      return 'flex flex-col gap-y-2'
+      // `gap-y-*` (not `space-y-*`) keeps this distinct from Field.Root anatomy
+      // class tuples while sharing the same size map.
+      return fieldAnatomyAlignVariants({ size })
     case 'settings':
       return ''
     case 'inline':
@@ -85,7 +92,7 @@ export function resolveFieldPresentation(config: FieldPresentationConfig): Field
     controlBandClassName: fieldControlBandVariants({ size, band: controlBand }),
     labelClassName: fieldLabelVariants({ size }),
     controlSize: size,
-    alignmentAnchorClassName: resolveAlignmentAnchorClassName(labelLayout),
+    alignmentAnchorClassName: resolveAlignmentAnchorClassName(labelLayout, size),
   }
 }
 

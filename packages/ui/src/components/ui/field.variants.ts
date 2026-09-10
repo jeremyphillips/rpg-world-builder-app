@@ -27,7 +27,7 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
  * - `fieldRowLayoutClasses` — deprecated alias; prefer `resolveFieldRowClasses`
- * - `fieldChipWrapGapClasses` — chip pill row spacing inside `ChipsField`
+ * - `fieldChipWrapGapClasses` — chip pill row gap only (no vertical pad) inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — group/section hint typography (spacing lives on the legend header)
  * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
  * - `fieldGroupLegendHeaderMarginVariants` — space below a legend header (legend alone or legend + hint)
@@ -48,13 +48,34 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldToggleDependentStackClasses` — compact stack rhythm alias (backward compatible)
  * - `fieldSeparatorVariants` — trailing divider after a leaf field or row
  */
+/**
+ * Label/heading cluster → control and control → validation / bottom hint.
+ * Compact `sm` is 4px; comfortable `md`/`lg` is 6px. Keep
+ * {@link fieldAnatomyAlignVariants} in lockstep — same sizes, `gap-y` for
+ * alignment anchors that must not share `space-y` class tuples.
+ */
 export const fieldAnatomyStackVariants = cva('', {
   variants: {
     size: {
       /** Dense forms (`FormDensity: 'compact'`) — 4px label-to-control gap. */
       sm: 'space-y-1',
-      md: 'space-y-2',
-      lg: 'space-y-2',
+      /** Comfortable default — 6px label-to-control / control-to-message gap. */
+      md: 'space-y-1.5',
+      lg: 'space-y-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Stacked label→control alignment gap — same size map as {@link fieldAnatomyStackVariants}. */
+export const fieldAnatomyAlignVariants = cva('flex flex-col', {
+  variants: {
+    size: {
+      sm: 'gap-y-1',
+      md: 'gap-y-1.5',
+      lg: 'gap-y-1.5',
     },
   },
   defaultVariants: {
@@ -73,7 +94,8 @@ export const fieldGroupSectionOuterMarginResetClasses = 'mb-0'
 export const fieldGroupFlexStackClasses = 'flex flex-col gap-8'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
-export const fieldChipWrapGapClasses = 'gap-2 pt-1'
+/** Horizontal + wrap gap between chip pills — vertical label→chips spacing is the anatomy token. */
+export const fieldChipWrapGapClasses = 'gap-2'
 export const fieldGroupDescriptionTypographyClasses =
   'font-normal leading-normal text-muted-foreground'
 /** Group/subgroup hint copy — spacing is applied on the legend header wrapper. */

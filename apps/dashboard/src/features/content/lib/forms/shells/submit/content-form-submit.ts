@@ -10,12 +10,13 @@ import {
   type FormItem,
   type FormSubmitHandler,
   type FormUiContextValue,
+  type MapFormError,
   type UseSubmitHandlerResult,
 } from '@rpg/ui/form'
 
 import {
+  applyContentPublishValidation,
   applyValidationIssuesToForm,
-  zodIssuesToValidationIssues,
 } from '../../validation/content-publish-validation.lib'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 import { resolveContentFormSchema, resolveContentPublishSchema } from '../edit/content-edit-load'
@@ -43,7 +44,7 @@ export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
   /** Final commit intent — default `'publish'`. */
   commitValidationIntent?: ContentValidationIntent
   fallbackMessage: string
-  mapError?: (error: unknown) => string | undefined
+  mapError?: MapFormError
   invalidPresentation?: ContentFormInvalidPresentation
   /** Applied immediately before commit schema validation. Persist still receives raw form values. */
   prepareCommitValues?: (values: TValues) => TValues
@@ -103,6 +104,22 @@ export function presentContentFormInvalidSubmit<TFieldValues extends FieldValues
   })
 }
 
+function presentPersistValidationFailure<TFieldValues extends FieldValues>(
+  form: UseFormReturn<TFieldValues>,
+  error: unknown,
+  presentation: ContentFormInvalidPresentation | undefined,
+  ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
+): void {
+  const issues = getApiValidationIssues(error)
+  if (!issues || !presentation) return
+
+  form.clearErrors()
+  applyValidationIssuesToForm(form, issues)
+  presentContentFormInvalidSubmit(form, ui, presentation, {
+    firstInvalidPath: issues[0]?.path,
+  })
+}
+
 export function useContentFormSubmit<TValues extends FieldValues>(
   options: UseContentFormSubmitOptions<TValues>,
 ): UseContentFormSubmitResult<TValues> {
@@ -130,16 +147,18 @@ export function useContentFormSubmit<TValues extends FieldValues>(
   const { onSubmit, formError } = useSubmitHandler<TValues>({
     fallbackMessage,
     mapError: (error) => {
-      if (error instanceof ContentFormSubmitValidationFailed) return undefined
+      if (error instanceof ContentFormSubmitValidationFailed) return null
       return mapError?.(error)
     },
     submit: async (values, form) => {
       const commitValues = prepareCommitValues?.(values) ?? values
-      const commitResult = publishSchema.safeParse(commitValues)
-      if (!commitResult.success) {
-        form.clearErrors()
-        const issues = zodIssuesToValidationIssues(commitResult.error.issues)
-        applyValidationIssuesToForm(form, issues)
+      const issues = applyContentPublishValidation(
+        form,
+        publishSchema,
+        commitValues,
+        invalidPresentation?.resolverFields ?? [],
+      )
+      if (issues) {
         if (commitValidationIntent === 'publish') {
           uiRef.current?.markPublishAttempted()
         }
@@ -154,14 +173,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       try {
         await persist(values, form)
       } catch (err) {
-        const issues = getApiValidationIssues(err)
-        if (issues && invalidPresentation) {
-          form.clearErrors()
-          applyValidationIssuesToForm(form, issues)
-          presentContentFormInvalidSubmit(form, uiRef.current, invalidPresentation, {
-            firstInvalidPath: issues[0]?.path,
-          })
-        }
+        presentPersistValidationFailure(form, err, invalidPresentation, uiRef.current)
         throw err
       }
     },

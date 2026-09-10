@@ -39,12 +39,15 @@ import {
   previewRailAvailabilityInactiveIconClasses,
   previewRailAvailabilityRowClasses,
   previewRailDividerClasses,
+  previewRailFooterClasses,
   previewRailFactLabelClasses,
   previewRailFactValueClasses,
   previewRailFactsGridClasses,
   previewRailHeaderRowClasses,
   previewRailIdentityContentClasses,
   previewRailIdentityRowClasses,
+  previewRailIdentityStackClasses,
+  previewRailScrollRegionClasses,
   previewRailMediaFallbackVariants,
   previewRailMediaIconClasses,
   previewRailRootVariants,
@@ -171,7 +174,7 @@ export type PreviewRailIdentityProps = {
 
 function PreviewRailIdentity({ media, name, availability, facts }: PreviewRailIdentityProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className={previewRailIdentityStackClasses}>
       <div className={previewRailIdentityRowClasses}>
         {media}
         <div className={previewRailIdentityContentClasses}>
@@ -419,6 +422,30 @@ function PreviewRailAction({ label, helperText, icon, onClick, disabled }: Previ
   )
 }
 
+function PreviewRailScrollRegion({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'>) {
+  return (
+    <div className={cn(previewRailScrollRegionClasses, className)} {...props}>
+      {children}
+    </div>
+  )
+}
+
+function PreviewRailFooter({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<'div'>) {
+  return (
+    <div className={cn(previewRailFooterClasses, className)} {...props}>
+      {children}
+    </div>
+  )
+}
+
 export const PreviewRail = Object.assign(PreviewRailRoot, {
   Header: PreviewRailHeader,
   DraftBadge: PreviewRailDraftBadge,
@@ -426,6 +453,8 @@ export const PreviewRail = Object.assign(PreviewRailRoot, {
   AvailabilityLine: PreviewRailAvailabilityLine,
   Identity: PreviewRailIdentity,
   Facts: PreviewRailFacts,
+  ScrollRegion: PreviewRailScrollRegion,
+  Footer: PreviewRailFooter,
   Sections: PreviewRailSections,
   Section: PreviewRailSection,
   SectionBody: PreviewRailSectionBody,
@@ -446,4 +475,6 @@ export {
   PreviewRailSectionBody,
   PreviewRailStatusPanel,
   PreviewRailAction,
+  PreviewRailScrollRegion,
+  PreviewRailFooter,
 }

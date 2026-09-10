@@ -54,6 +54,7 @@ describe('ContentFormDef create submit drift guard', () => {
 
     expect(submitSource).toContain('resolveContentPublishSchema')
     expect(railSource).toContain('resolveContentPublishSchema')
-    expect(validationSource).toContain('schema.safeParse')
+    expect(submitSource).toContain('applyContentPublishValidation')
+    expect(validationSource).toContain('safeParseWithFieldErrors')
   })
 })

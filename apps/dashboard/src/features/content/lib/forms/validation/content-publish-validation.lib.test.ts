@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest'
 import { useForm } from 'react-hook-form'
 import { renderHook, act } from '@testing-library/react'
 import { z } from 'zod'
+import { formatFieldMessage } from '@rpg/contracts'
+import type { FormItem } from '@rpg/ui/form'
 
 import {
   applyValidationIssuesToForm,
@@ -67,5 +69,45 @@ describe('validateContentPublishValues', () => {
 
     expect(valid).toBe(false)
     expect(result.current.getFieldState('name').error?.message).toBeTruthy()
+  })
+
+  it('maps empty name, empty chips, and invalid coerce numbers to catalog copy', () => {
+    const schema = z.object({
+      name: z.string().min(1),
+      primaryAbilities: z.array(z.string()).min(1),
+      quantity: z.coerce.number(),
+    })
+    const fields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name', required: true },
+      { type: 'chips', name: 'primaryAbilities', label: 'Primary abilities', options: [] },
+      { type: 'number', name: 'quantity', label: 'Quantity' },
+    ]
+    const { result } = renderHook(() =>
+      useForm<{ name: string; primaryAbilities: string[]; quantity: number }>({
+        defaultValues: { name: '', primaryAbilities: [], quantity: Number.NaN },
+      }),
+    )
+
+    let valid = true
+    act(() => {
+      valid = validateContentPublishValues(
+        result.current,
+        schema,
+        { name: '', primaryAbilities: [], quantity: Number.NaN },
+        fields,
+      )
+    })
+
+    expect(valid).toBe(false)
+    expect(formatFieldMessage(result.current.getFieldState('name').error?.message ?? '')).toBe(
+      'Name is required.',
+    )
+    expect(
+      formatFieldMessage(result.current.getFieldState('primaryAbilities').error?.message ?? ''),
+    ).toBe('Add at least one primary ability.')
+    expect(formatFieldMessage(result.current.getFieldState('quantity').error?.message ?? '')).toBe(
+      'Enter a valid number.',
+    )
+    expect(result.current.getFieldState('name').error?.message).not.toMatch(/Too small|NaN/i)
   })
 })
