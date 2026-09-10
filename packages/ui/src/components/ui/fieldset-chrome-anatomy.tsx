@@ -64,7 +64,7 @@ export function FieldsetChromeAnatomy({
   )
 }
 
-/** Leaf fieldset + chrome shell + error sibling (errors stay outside the box). */
+/** Leaf fieldset + chrome shell; error is a sibling of the fieldset inside the shell. */
 export function FieldsetChromeFrame({
   chrome,
   size = 'md',
@@ -76,22 +76,20 @@ export function FieldsetChromeFrame({
   const { className: fieldsetClassName, ...restFieldsetProps } = fieldsetProps
 
   return (
-    <>
-      <FieldChromeShell chrome={chrome} size={size}>
-        <fieldset
-          {...restFieldsetProps}
-          className={cn(
-            fieldSetResetClasses,
-            fieldSetChromeContainClasses,
-            fieldAnatomyStackVariants({ size }),
-            fieldsetClassName,
-          )}
-        >
-          {children}
-        </fieldset>
-      </FieldChromeShell>
+    <FieldChromeShell chrome={chrome} size={size}>
+      <fieldset
+        {...restFieldsetProps}
+        className={cn(
+          fieldSetResetClasses,
+          fieldSetChromeContainClasses,
+          fieldAnatomyStackVariants({ size }),
+          fieldsetClassName,
+        )}
+      >
+        {children}
+      </fieldset>
       <FieldsetChromeError error={error} errorId={errorId} size={size} />
-    </>
+    </FieldChromeShell>
   )
 }
 

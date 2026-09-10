@@ -211,11 +211,14 @@ export function SelectField({
         {hasActiveFieldChrome(chrome) ? (
           <FieldChromeShell chrome={chrome} size={size}>
             {inlineBody}
+            <Field.Error />
           </FieldChromeShell>
         ) : (
-          inlineBody
+          <>
+            {inlineBody}
+            <Field.Error />
+          </>
         )}
-        <Field.Error />
       </Field.Root>
     )
   }

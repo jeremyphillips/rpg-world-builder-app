@@ -22,6 +22,7 @@ type ContentEditPublishBridgeProps = {
   fields: FormItem[]
   formId: string
   onPublish: () => Promise<void>
+  onPublishValidationFailed?: () => void
 }
 
 function presentPublishValidationErrors<TFieldValues extends FieldValues>(
@@ -54,6 +55,7 @@ export function ContentEditPublishBridge({
   fields,
   formId,
   onPublish,
+  onPublishValidationFailed,
 }: ContentEditPublishBridgeProps) {
   const publishRequest = useContentEditPublishRequest()
   const form = useFormContext<FieldValues>()
@@ -67,6 +69,8 @@ export function ContentEditPublishBridge({
       const values = form.getValues()
       const isValid = validateContentPublishValues(form, publishSchema, values)
       if (!isValid) {
+        ui.markPublishAttempted()
+        onPublishValidationFailed?.()
         presentPublishValidationErrors(form, fields, formId, tabbedChrome, ui)
         return
       }
@@ -79,12 +83,24 @@ export function ContentEditPublishBridge({
 
         form.clearErrors()
         applyValidationIssuesToForm(form, issues)
+        ui.markPublishAttempted()
+        onPublishValidationFailed?.()
         presentPublishValidationErrors(form, fields, formId, tabbedChrome, ui)
       }
     })
 
     return () => publishRequest.setPublishRequest(null)
-  }, [fields, form, formId, onPublish, publishRequest, publishSchema, tabbedChrome, ui])
+  }, [
+    fields,
+    form,
+    formId,
+    onPublish,
+    onPublishValidationFailed,
+    publishRequest,
+    publishSchema,
+    tabbedChrome,
+    ui,
+  ])
 
   return null
 }

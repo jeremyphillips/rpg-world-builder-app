@@ -119,7 +119,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
 
   const uiRef = useRef<Pick<
     FormUiContextValue,
-    'markSubmitAttempted' | 'addValidationSessionExpandKeys'
+    'markSubmitAttempted' | 'markPublishAttempted' | 'addValidationSessionExpandKeys'
   > | null>(null)
 
   const publishSchema =
@@ -140,6 +140,9 @@ export function useContentFormSubmit<TValues extends FieldValues>(
         form.clearErrors()
         const issues = zodIssuesToValidationIssues(commitResult.error.issues)
         applyValidationIssuesToForm(form, issues)
+        if (commitValidationIntent === 'publish') {
+          uiRef.current?.markPublishAttempted()
+        }
         if (invalidPresentation) {
           presentContentFormInvalidSubmit(form, uiRef.current, invalidPresentation, {
             firstInvalidPath: issues[0]?.path,

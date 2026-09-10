@@ -27,7 +27,7 @@ export type ContentPreviewReadinessPanel = {
 
 export function resolveContentPreviewReadinessPanel(
   valid: boolean,
-  hasAttemptedSubmit: boolean,
+  hasAttemptedPublish: boolean,
   attentionCount: number,
 ): ContentPreviewReadinessPanel {
   if (valid) {
@@ -38,7 +38,7 @@ export function resolveContentPreviewReadinessPanel(
     }
   }
 
-  if (hasAttemptedSubmit) {
+  if (hasAttemptedPublish) {
     return {
       variant: 'warning',
       title: contentPreviewAttentionTitle(attentionCount),

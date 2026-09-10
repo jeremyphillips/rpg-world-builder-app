@@ -15,8 +15,8 @@ const contentCreateShellPath = fileURLToPath(
   new URL('../create/content-create-shell.tsx', import.meta.url),
 )
 const contentFormSubmitPath = fileURLToPath(new URL('./content-form-submit.ts', import.meta.url))
-const previewReadinessPath = fileURLToPath(
-  new URL('../../preview/use-content-publish-readiness.ts', import.meta.url),
+const previewValidationPath = fileURLToPath(
+  new URL('../../validation/content-form-publish-validation.client.tsx', import.meta.url),
 )
 const previewRailPath = fileURLToPath(
   new URL('../../preview/content-preview-rail.tsx', import.meta.url),
@@ -50,10 +50,10 @@ describe('ContentFormDef create submit drift guard', () => {
   it('requires publish submit and the preview rail to share resolveContentPublishSchema', () => {
     const submitSource = readFileSync(contentFormSubmitPath, 'utf8')
     const railSource = readFileSync(previewRailPath, 'utf8')
-    const readinessSource = readFileSync(previewReadinessPath, 'utf8')
+    const validationSource = readFileSync(previewValidationPath, 'utf8')
 
     expect(submitSource).toContain('resolveContentPublishSchema')
     expect(railSource).toContain('resolveContentPublishSchema')
-    expect(readinessSource).toContain('schema.safeParse')
+    expect(validationSource).toContain('schema.safeParse')
   })
 })

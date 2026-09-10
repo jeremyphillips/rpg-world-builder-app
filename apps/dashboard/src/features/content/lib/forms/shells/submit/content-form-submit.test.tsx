@@ -33,6 +33,7 @@ const testCtx = { campaignId: 'camp-1', mode: 'create' } as ContentFormCtx
 
 const uiValue = {
   markSubmitAttempted: vi.fn(),
+  markPublishAttempted: vi.fn(),
   addValidationSessionExpandKeys: vi.fn(),
   validationSessionExpandKeys: new Set<string>(),
   clearValidationSessionExpandKeys: vi.fn(),
@@ -40,6 +41,9 @@ const uiValue = {
   validationPresentation: 'progressive' as const,
   fields: [],
   hasAttemptedSubmit: false,
+  hasAttemptedPublish: false,
+  publishPresentationIssues: [],
+  publishPresentationEnabled: false,
   removeValidationSessionExpandKeys: vi.fn(),
 } as FormUiContextValue
 
@@ -217,6 +221,7 @@ describe('useContentFormSubmit', () => {
     ).rejects.toBeInstanceOf(ContentFormSubmitValidationFailed)
 
     expect(uiValue.markSubmitAttempted).toHaveBeenCalled()
+    expect(uiValue.markPublishAttempted).toHaveBeenCalled()
     expect(persist).not.toHaveBeenCalled()
   })
 })

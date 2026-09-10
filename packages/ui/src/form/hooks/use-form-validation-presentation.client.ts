@@ -44,26 +44,37 @@ function isItemPrefixTouched(itemPrefix: string, touchedPaths: readonly string[]
 }
 
 export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
-  const { validationPresentation, hasAttemptedSubmit, fields: contextFields } = useFormUiContext()
+  const {
+    validationPresentation,
+    hasAttemptedSubmit,
+    hasAttemptedPublish,
+    publishPresentationIssues,
+    publishPresentationEnabled,
+    fields: contextFields,
+  } = useFormUiContext()
   const fields = fieldsOverride ?? contextFields
   const { errors, touchedFields } = useFormState()
-  const issues = React.useMemo(() => prepareFormIssues(errors, fields), [errors, fields])
+  const rhfIssues = React.useMemo(() => prepareFormIssues(errors, fields), [errors, fields])
+  const issues =
+    publishPresentationEnabled && hasAttemptedPublish ? publishPresentationIssues : rhfIssues
   const touchedPaths = React.useMemo(() => flattenTouchedPaths(touchedFields), [touchedFields])
 
   const shouldShowRowIssues = React.useCallback(
     (itemPrefix: string, group: Pick<ArrayItemIssueGroup, 'totalCount'>) => {
       if (group.totalCount === 0) return false
       if (validationPresentation === 'always') return true
-      if (hasAttemptedSubmit) return true
+      if (hasAttemptedPublish || hasAttemptedSubmit) return true
       return isItemPrefixTouched(itemPrefix, touchedPaths)
     },
-    [validationPresentation, hasAttemptedSubmit, touchedPaths],
+    [validationPresentation, hasAttemptedPublish, hasAttemptedSubmit, touchedPaths],
   )
 
   return {
     fields,
     issues,
     hasAttemptedSubmit,
+    hasAttemptedPublish,
+    publishPresentationEnabled,
     shouldShowRowIssues,
   }
 }

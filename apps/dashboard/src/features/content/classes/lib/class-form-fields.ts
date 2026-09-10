@@ -35,7 +35,11 @@ import {
   refineClassWeaponProficiencies,
 } from './class-proficiencies-form-fields'
 import { resourcesArrayField } from './class-resources-form-fields'
-import { createSpellcastingFormSchema, spellcastingFields } from './class-spellcasting-form-fields'
+import {
+  createSpellcastingDraftFormSchema,
+  createSpellcastingFormSchema,
+  spellcastingFields,
+} from './class-spellcasting-form-fields'
 import { startingEquipmentFormSchema } from './character-creation/class-starting-equipment-form-fields'
 import { refineCharacterCreationSaveValidation } from './character-creation/class-character-creation-form-validation'
 import {
@@ -121,7 +125,7 @@ export function createClassDraftFormSchema(
     hitDie: draftOptionalSelect(z.coerce.number().pipe(hitDieSchema)),
     hasSpellcasting: z.boolean(),
     weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
-    spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
+    spellcasting: createSpellcastingDraftFormSchema(maxLevel).optional(),
     proficiencies: proficienciesDraftFormSchema,
     features: z.array(createFeatureRowDraftFormSchema(maxLevel)).default([]),
     resources: z.array(resourceRowDraftFormSchema).optional(),

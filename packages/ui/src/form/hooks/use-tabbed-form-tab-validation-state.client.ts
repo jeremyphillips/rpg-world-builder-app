@@ -20,9 +20,9 @@ const EMPTY_TAB_VALIDATION_STATE: TabValidationState = {
 
 function gateTabValidationState(
   tabStates: TabValidationState[],
-  hasAttemptedSubmit: boolean,
+  showTabBadges: boolean,
 ): TabValidationState[] {
-  if (hasAttemptedSubmit) return tabStates
+  if (showTabBadges) return tabStates
 
   return tabStates.map((state) => ({
     ...EMPTY_TAB_VALIDATION_STATE,
@@ -30,18 +30,22 @@ function gateTabValidationState(
   }))
 }
 
-/** Per-tab validation counts and issues, gated until the first failed submit. */
+/** Per-tab validation counts and issues, gated until publish or submit presentation activates. */
 export function useTabbedFormTabValidationState(tabs: TabbedFormTab[]) {
   const allFields = React.useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
-  const { issues, hasAttemptedSubmit } = useFormValidationPresentation(allFields)
+  const { issues, hasAttemptedSubmit, hasAttemptedPublish, publishPresentationEnabled } =
+    useFormValidationPresentation(allFields)
 
   const tabStates = React.useMemo(
     () => resolveTabValidationState(issues, tabs, allFields),
     [issues, tabs, allFields],
   )
 
+  const showTabBadges = publishPresentationEnabled ? hasAttemptedPublish : hasAttemptedSubmit
+
   return {
     hasAttemptedSubmit,
-    tabStates: gateTabValidationState(tabStates, hasAttemptedSubmit),
+    hasAttemptedPublish,
+    tabStates: gateTabValidationState(tabStates, showTabBadges),
   }
 }

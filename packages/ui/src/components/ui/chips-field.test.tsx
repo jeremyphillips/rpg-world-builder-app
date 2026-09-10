@@ -367,7 +367,7 @@ describe('ChipsField', () => {
     expect(shell).toHaveClass('rounded-md', 'border', 'bg-surface-subtle')
     expect(error).toHaveTextContent('Select an alignment.')
     expect(fieldset?.contains(error)).toBe(false)
-    expect(shell?.contains(error)).toBe(false)
+    expect(shell?.contains(error)).toBe(true)
   })
 
   it('has no accessibility violations when required and in error state', async () => {

@@ -220,6 +220,19 @@ describe('createClassDraftInputSchema', () => {
       }).success,
     ).toBe(true)
   })
+
+  it('accepts create-default-shaped drafts without hit die or proficiencies', () => {
+    const parsed = createClassDraftInputSchema.parse({
+      slug: 'new-class',
+      name: '',
+      features: [],
+    })
+
+    expect(parsed.name).toBe('Untitled Class')
+    expect(parsed.features).toEqual([])
+    expect(parsed).not.toHaveProperty('hitDie')
+    expect(parsed).not.toHaveProperty('proficiencies')
+  })
 })
 
 describe('updateClassInputSchema', () => {

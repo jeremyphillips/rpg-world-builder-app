@@ -21,10 +21,10 @@ const IDLE_KINDS = new Set<ContentPreviewDerivedKind>(['off', 'none', 'notConfig
 export function resolveContentPreviewSectionPresentation(
   section: ContentPreviewSection,
   sectionValid: boolean,
-  hasAttemptedSubmit: boolean,
+  hasAttemptedPublish: boolean,
 ): ContentPreviewSectionPresentation {
   if (!sectionValid) {
-    if (!hasAttemptedSubmit) {
+    if (!hasAttemptedPublish) {
       return { marker: 'incomplete' }
     }
 

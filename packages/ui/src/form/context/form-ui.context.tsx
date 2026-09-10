@@ -5,6 +5,7 @@ import type { FieldValues } from 'react-hook-form'
 
 import type { FormItem } from '../field-config'
 import type { SilentValidationResult } from '../config/form-resolver'
+import type { FormIssue } from '../errors/form-issue.types'
 
 export type FormValidationPresentation = 'progressive' | 'always'
 
@@ -22,6 +23,13 @@ export interface FormUiContextValue {
   /** Set after the first failed submit for the form instance. */
   hasAttemptedSubmit: boolean
   markSubmitAttempted: () => void
+  /** Set after a failed publish/commit validation attempt (content forms). */
+  hasAttemptedPublish: boolean
+  markPublishAttempted: () => void
+  /** Live publish-schema issues merged into presentation when {@link hasAttemptedPublish}. */
+  publishPresentationIssues: FormIssue[]
+  /** When true, tab badges and publish overlay use {@link hasAttemptedPublish} instead of submit. */
+  publishPresentationEnabled: boolean
   /** Ephemeral expand overrides keyed by `${fullName}:${collapseKey}`. */
   validationSessionExpandKeys: ReadonlySet<ValidationSessionExpandKey>
   addValidationSessionExpandKeys: (keys: readonly ValidationSessionExpandKey[]) => void
@@ -38,6 +46,10 @@ const defaultContext: FormUiContextValue = {
   fields: [],
   hasAttemptedSubmit: false,
   markSubmitAttempted: () => undefined,
+  hasAttemptedPublish: false,
+  markPublishAttempted: () => undefined,
+  publishPresentationIssues: [],
+  publishPresentationEnabled: false,
   validationSessionExpandKeys: new Set(),
   addValidationSessionExpandKeys: () => undefined,
   removeValidationSessionExpandKeys: () => undefined,
@@ -57,6 +69,10 @@ export interface FormUiProviderProps {
   hasAttemptedSubmit?: boolean
   /** Called when a failed submit marks the form as attempted (external state mode). */
   onMarkSubmitAttempted?: () => void
+  hasAttemptedPublish?: boolean
+  onMarkPublishAttempted?: () => void
+  publishPresentationIssues?: FormIssue[]
+  publishPresentationEnabled?: boolean
   validateSilently?: ValidateSilently
   children: React.ReactNode
 }
@@ -68,15 +84,21 @@ export function FormUiProvider({
   validationPresentation = 'progressive',
   hasAttemptedSubmit: externalHasAttemptedSubmit,
   onMarkSubmitAttempted,
+  hasAttemptedPublish: externalHasAttemptedPublish,
+  onMarkPublishAttempted,
+  publishPresentationIssues = [],
+  publishPresentationEnabled = false,
   validateSilently,
   children,
 }: FormUiProviderProps) {
   const [localHasAttemptedSubmit, setLocalHasAttemptedSubmit] = React.useState(false)
+  const [localHasAttemptedPublish, setLocalHasAttemptedPublish] = React.useState(false)
   const [validationSessionExpandKeys, setValidationSessionExpandKeys] = React.useState<
     ReadonlySet<ValidationSessionExpandKey>
   >(() => new Set())
 
   const hasAttemptedSubmit = externalHasAttemptedSubmit ?? localHasAttemptedSubmit
+  const hasAttemptedPublish = externalHasAttemptedPublish ?? localHasAttemptedPublish
 
   const markSubmitAttempted = React.useCallback(() => {
     if (onMarkSubmitAttempted) {
@@ -85,6 +107,14 @@ export function FormUiProvider({
     }
     setLocalHasAttemptedSubmit(true)
   }, [onMarkSubmitAttempted])
+
+  const markPublishAttempted = React.useCallback(() => {
+    if (onMarkPublishAttempted) {
+      onMarkPublishAttempted()
+      return
+    }
+    setLocalHasAttemptedPublish(true)
+  }, [onMarkPublishAttempted])
 
   const addValidationSessionExpandKeys = React.useCallback(
     (keys: readonly ValidationSessionExpandKey[]) => {
@@ -117,6 +147,10 @@ export function FormUiProvider({
       fields,
       hasAttemptedSubmit,
       markSubmitAttempted,
+      hasAttemptedPublish,
+      markPublishAttempted,
+      publishPresentationIssues,
+      publishPresentationEnabled,
       validationSessionExpandKeys,
       addValidationSessionExpandKeys,
       removeValidationSessionExpandKeys,
@@ -128,6 +162,10 @@ export function FormUiProvider({
       fields,
       hasAttemptedSubmit,
       markSubmitAttempted,
+      hasAttemptedPublish,
+      markPublishAttempted,
+      publishPresentationIssues,
+      publishPresentationEnabled,
       validationSessionExpandKeys,
       addValidationSessionExpandKeys,
       removeValidationSessionExpandKeys,

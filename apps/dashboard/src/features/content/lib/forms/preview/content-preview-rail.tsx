@@ -89,7 +89,7 @@ function ContentPreviewRailBody({
   const { pendingAccess } = useCampaignAccessForm()
   const publishSchema = useMemo(() => resolveContentPublishSchema(def, ctx), [def, ctx])
   const readiness = useContentPublishReadiness({ schema: publishSchema, tabs })
-  const { hasAttemptedSubmit, tabStates } = useTabbedFormTabValidationState(tabs)
+  const { hasAttemptedPublish, tabStates } = useTabbedFormTabValidationState(tabs)
   const activeTabId = chromeCtx?.activeTabId ?? tabs[0]?.id ?? ''
   const [manualSection, setManualSection] = useState<{ forTabId: string; value: string } | null>(
     null,
@@ -137,7 +137,7 @@ function ContentPreviewRailBody({
       tabs={tabs}
       sections={sections}
       invalidTabIds={readiness.invalidTabIds}
-      hasAttemptedSubmit={hasAttemptedSubmit}
+      hasAttemptedPublish={hasAttemptedPublish}
       valid={readiness.valid}
       attentionCount={attentionCount}
       onPreviewAsPlayer={() => setPlayerOpen(true)}
@@ -161,7 +161,7 @@ type ContentPreviewRailViewProps = {
   tabs: TabbedFormTab[]
   sections: Record<string, ContentPreviewSection | null>
   invalidTabIds: ReadonlySet<string>
-  hasAttemptedSubmit: boolean
+  hasAttemptedPublish: boolean
   valid: boolean
   attentionCount: number
   onPreviewAsPlayer: () => void
@@ -183,7 +183,7 @@ function ContentPreviewRailView({
   tabs,
   sections,
   invalidTabIds,
-  hasAttemptedSubmit,
+  hasAttemptedPublish,
   valid,
   attentionCount,
   onPreviewAsPlayer,
@@ -212,11 +212,11 @@ function ContentPreviewRailView({
           tabs={tabs}
           sections={sections}
           invalidTabIds={invalidTabIds}
-          hasAttemptedSubmit={hasAttemptedSubmit}
+          hasAttemptedPublish={hasAttemptedPublish}
         />
       </PreviewRail.Sections>
       <PreviewRail.StatusPanel
-        {...resolveContentPreviewReadinessPanel(valid, hasAttemptedSubmit, attentionCount)}
+        {...resolveContentPreviewReadinessPanel(valid, hasAttemptedPublish, attentionCount)}
       />
       <PreviewRail.Action
         label={CONTENT_PREVIEW_AS_PLAYER_LABEL}
@@ -232,12 +232,12 @@ function ContentPreviewRailSectionList({
   tabs,
   sections,
   invalidTabIds,
-  hasAttemptedSubmit,
+  hasAttemptedPublish,
 }: {
   tabs: TabbedFormTab[]
   sections: Record<string, ContentPreviewSection | null>
   invalidTabIds: ReadonlySet<string>
-  hasAttemptedSubmit: boolean
+  hasAttemptedPublish: boolean
 }) {
   return tabs.map((tab) => {
     const section = sections[tab.id]
@@ -249,7 +249,7 @@ function ContentPreviewRailSectionList({
         label={tab.label}
         section={section}
         sectionValid={!invalidTabIds.has(tab.id)}
-        hasAttemptedSubmit={hasAttemptedSubmit}
+        hasAttemptedPublish={hasAttemptedPublish}
       />
     )
   })
@@ -260,18 +260,18 @@ function PreviewRailSectionItem({
   label,
   section,
   sectionValid,
-  hasAttemptedSubmit,
+  hasAttemptedPublish,
 }: {
   tabId: string
   label: string
   section: ContentPreviewSection
   sectionValid: boolean
-  hasAttemptedSubmit: boolean
+  hasAttemptedPublish: boolean
 }) {
   const presentation = resolveContentPreviewSectionPresentation(
     section,
     sectionValid,
-    hasAttemptedSubmit,
+    hasAttemptedPublish,
   )
 
   return (

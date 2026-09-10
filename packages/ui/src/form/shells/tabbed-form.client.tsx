@@ -9,6 +9,7 @@ import { type FileFieldPropsMap, type FormItem, type FormValueSync } from '../fi
 import type { FormDensity } from '../form-density'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormUiContextValue, FormValidationPresentation } from '../context/form-ui.context'
+import type { FormIssue } from '../errors/form-issue.types'
 import { navigateTabbedFormInvalidSubmit } from './navigate-tabbed-form-invalid-submit.client'
 import { TabbedFormChromeContext } from './tabbed-form-chrome.context'
 import type { ValidateSilently } from '../context/form-ui.context'
@@ -103,6 +104,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   valueSyncs?: FormValueSync[]
   /** See `FormProps['validationPresentation']`. */
   validationPresentation?: FormValidationPresentation
+  /** Live publish issues for content-form presentation after a failed publish attempt. */
+  hasAttemptedPublish?: boolean
+  onMarkPublishAttempted?: () => void
+  publishPresentationIssues?: FormIssue[]
+  publishPresentationEnabled?: boolean
   /**
    * Optional right-column content rendered inside `FormProvider` (e.g. a preview
    * rail). Hidden below `2xl`; the footer stays in the form column.
@@ -157,6 +163,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   externalFooter = false,
   valueSyncs,
   validationPresentation,
+  hasAttemptedPublish,
+  onMarkPublishAttempted,
+  publishPresentationIssues,
+  publishPresentationEnabled,
   aside,
   tabRowTrailing,
 }: TabbedFormProps<TFieldValues>) {
@@ -277,6 +287,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         validationPresentation={validationPresentation}
         hasAttemptedSubmit={hasAttemptedSubmit}
         onMarkSubmitAttempted={markSubmitAttempted}
+        hasAttemptedPublish={hasAttemptedPublish}
+        onMarkPublishAttempted={onMarkPublishAttempted}
+        publishPresentationIssues={publishPresentationIssues}
+        publishPresentationEnabled={publishPresentationEnabled}
         validateSilently={validateSilently as ValidateSilently}
         onInvalidSubmit={handleInvalidSubmit}
         onSubmit={onSubmit}

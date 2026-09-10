@@ -78,7 +78,7 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     slug: entity.slug,
     description: entity.description,
     primaryAbilities: entity.primaryAbilities ?? [],
-    hitDie: entity.hitDie,
+    hitDie: (entity.hitDie ?? '') as ClassFormValues['hitDie'],
     hasSpellcasting: entity.spellcasting !== undefined,
     weaponProficiencyMode:
       entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0

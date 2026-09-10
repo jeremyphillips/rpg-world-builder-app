@@ -166,8 +166,9 @@ alignment semantics are shared across forms and filters.
 | Field presentation | `resolveFieldPresentation` | `labelLayout`: `hidden` \| `stacked` \| `inline` \| `settings`                                                                                                                |
 | Row classes        | `resolveFieldRowClasses`   | Default `align: 'control-edge'` → `items-end`; rows with `derivedMeta.reserveSpace` default to `align: 'start'` → `items-start`; form gap `gap-6`, toolbar/filter gap `gap-2` |
 
-`Field.Error` and `hintPosition="below-control"` stay **outside** `data-field-align` so
-row `items-end` targets label + control band, not messages.
+`Field.Error` and `hintPosition="below-control"` stay **outside** `data-field-align` and, when
+field chrome is active, render **inside** `FieldChromeShell` as a sibling of the fieldset (legend
+remains a direct fieldset child). Row `items-end` still targets label + control band, not messages.
 
 **Toggle exception:** hint-bearing `CheckboxField` / inline `SwitchField` keep
 first-line control columns (`h-4` / `h-5`) inside a `content-sized` band — do not force

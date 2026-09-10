@@ -29,20 +29,10 @@ const SKILL_PROFICIENCY_PLURAL_LABEL = vocabularyHubLabel(PROFICIENCY_DOMAIN_ENT
  * `characterCreation.proficiencies.skills.choices[0]` on save until multi-package
  * skill choice UI exists.
  */
-export const characterCreationSkillChoiceFormSchema = z
-  .object({
-    choose: z.coerce.number().int().min(0),
-    from: z.array(skillSchema),
-  })
-  .superRefine((data, ctx) => {
-    if (data.choose > 0 && data.from.length < data.choose) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['from'],
-        message: `Add at least ${data.choose} skills to the pool`,
-      })
-    }
-  })
+export const characterCreationSkillChoiceFormSchema = z.object({
+  choose: z.coerce.number().int().min(0),
+  from: z.array(skillSchema),
+})
 
 /**
  * First-choice-only outlier: flat pool form fields map to

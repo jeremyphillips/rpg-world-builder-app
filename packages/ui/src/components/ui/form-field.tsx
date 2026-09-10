@@ -113,9 +113,13 @@ export function FormField({
     const chromedRow = hasActiveFieldChrome(chrome) ? (
       <FieldChromeShell chrome={chrome} size={size}>
         {settingsRow}
+        <Field.Error />
       </FieldChromeShell>
     ) : (
-      settingsRow
+      <>
+        {settingsRow}
+        <Field.Error />
+      </>
     )
 
     return (
@@ -130,7 +134,6 @@ export function FormField({
         width={rootWidth}
       >
         {chromedRow}
-        <Field.Error />
       </Field.Root>
     )
   }

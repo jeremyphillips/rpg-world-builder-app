@@ -335,8 +335,8 @@ export const fieldErrorTextVariants = cva('', {
   variants: {
     size: {
       sm: 'text-xs',
-      md: 'text-md',
-      lg: 'text-md',
+      md: 'text-xs',
+      lg: 'text-xs',
     },
   },
   defaultVariants: {
