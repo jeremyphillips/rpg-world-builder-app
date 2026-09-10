@@ -54,6 +54,8 @@ Do not sprinkle ad-hoc `space-y-*` on field wrappers in apps — adjust shared t
 | `fieldArrayItemClasses`               | `p-4 border`                     | Chrome around one array item                                                                                  |
 | `fieldArrayItemActionsClasses`        | `mt-3`                           | Above array item move/remove controls                                                                         |
 | `fieldSetResetClasses`                | `m-0 border-0 p-0`               | Strip UA fieldset chrome                                                                                      |
+| `fieldSetChromeContainClasses`        | `flex flex-col`                  | Column stack for a reset leaf fieldset (chrome lives on the wrapping shell)                                   |
+| `fieldSetInFlowLegendClasses`         | `min-w-0 p-0`                    | Reset UA legend padding on chip / choose-count captions                                                       |
 | `fieldSurfaceToneVariants`            | border + bg wash                 | Shared tone for stack dependents wrapper and array item shells (`SurfaceConfig` + `tone`)                     |
 | `fieldGroupBodyShellLayoutClasses`    | `rounded-md border p-4`          | Panel and outline group `chrome` body shell (16px padding)                                                    |
 | `resolveFieldDependentsChromeClasses` | `rounded-md border p-3` + wash   | Wrapper chrome for toggle-dependent dependents (`dependents.scope: 'wrapper'`)                                |

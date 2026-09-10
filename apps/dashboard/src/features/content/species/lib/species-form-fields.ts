@@ -18,6 +18,7 @@ import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/vocabulary'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
+import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
@@ -147,25 +148,40 @@ export type SpeciesFormValues = z.infer<typeof speciesFormSchema>
 function attributesFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
-      kind: 'row',
-      fields: [
-        vocabularySelectFieldForTerm(CREATURE_TYPE_TERM, {
-          name: 'creatureType',
-          options: getCharacterCreatureTypeFieldOptions(ctx),
-          required: true,
-          width: 'lg',
-        }),
+      kind: 'columns',
+      collapseOrder: [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [0, 2],
+        [1, 1],
+      ],
+      columns: [
+        {
+          fields: [
+            vocabularySelectFieldForTerm(CREATURE_TYPE_TERM, {
+              name: 'creatureType',
+              options: getCharacterCreatureTypeFieldOptions(ctx),
+              required: true,
+            }),
+            movementArrayField(),
+            cultureFields(ctx),
+          ],
+        },
+        {
+          fields: [
+            {
+              type: 'chips',
+              name: 'sizes',
+              label: getVocabularyTermLabel(CREATURE_SIZE_TERM),
+              options: creatureSizeOptions,
+              required: true,
+            },
+            descriptionField(ctx),
+          ],
+        },
       ],
     },
-    {
-      type: 'chips',
-      name: 'sizes',
-      label: getVocabularyTermLabel(CREATURE_SIZE_TERM),
-      options: creatureSizeOptions,
-      required: true,
-      chrome: { variant: 'panel' },
-    },
-    movementArrayField(),
   ]
 }
 
@@ -174,7 +190,7 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'basics',
       label: 'Basics',
-      fields: [...attributesFields(ctx), cultureFields(ctx), descriptionField(ctx)],
+      fields: attributesFields(ctx),
     },
     {
       id: 'traits',
@@ -209,5 +225,5 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       ],
       header: createElement(SpeciesRulesTab, { formCtx: ctx }),
     },
-  ]
+  ].map(withContentFormTabIcon)
 }

@@ -1,4 +1,5 @@
 import { useMemo, type ReactNode } from 'react'
+import { Globe, IdCard, Palette } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
@@ -46,9 +47,24 @@ export function CampaignSettings() {
 
   const tabs = useMemo(
     (): TabbedFormTab[] => [
-      { id: 'identity', label: 'Identity', fields: identityFields },
-      { id: 'flavor', label: 'Flavor', fields: flavorFields },
-      { id: 'world', label: 'World', fields: buildWorldSettingsFields(locations) },
+      {
+        id: 'identity',
+        label: 'Identity',
+        leadingIcon: <IdCard aria-hidden />,
+        fields: identityFields,
+      },
+      {
+        id: 'flavor',
+        label: 'Flavor',
+        leadingIcon: <Palette aria-hidden />,
+        fields: flavorFields,
+      },
+      {
+        id: 'world',
+        label: 'World',
+        leadingIcon: <Globe aria-hidden />,
+        fields: buildWorldSettingsFields(locations),
+      },
     ],
     [locations],
   )

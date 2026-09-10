@@ -128,18 +128,15 @@ export function characterCreationProficienciesFields(
     {
       kind: 'group',
       legend: 'Proficiencies',
-      chrome: { variant: 'rail' },
       fields: [
         {
           kind: 'group',
           legend: SKILL_PROFICIENCY_PLURAL_LABEL,
-          chrome: { variant: 'panel' },
           fields: characterCreationSkillChoiceFields(ctx),
         },
         {
           kind: 'group',
           legend: 'Tool Proficiencies',
-          chrome: { variant: 'panel' },
           id: 'class-character-creation-tool-proficiencies',
           fields: characterCreationToolChoiceFields(ctx, toolChoiceExtraFields),
         },

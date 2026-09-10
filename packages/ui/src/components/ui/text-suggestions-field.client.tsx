@@ -3,8 +3,9 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Field, FieldHintText } from './field.client'
+import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
+import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldHintPosition } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
 import { fieldAnatomyStackClasses } from './field.variants'
@@ -27,6 +28,7 @@ export interface TextSuggestionsFieldProps {
   disabled?: boolean
   size?: React.ComponentProps<typeof Field.Root>['size']
   width?: React.ComponentProps<typeof Field.Root>['width']
+  chrome?: FieldChrome
   onBlur?: () => void
   /** Used when the visible label is provided by a parent shell (e.g. optional disclosure). */
   ariaLabel?: string
@@ -42,12 +44,13 @@ export function TextSuggestionsField({
   placeholder,
   error,
   hint,
-  hintPosition: _hintPosition,
+  hintPosition = 'below-label',
   info,
   required = false,
   disabled = false,
   size = 'md',
   width = 'full',
+  chrome,
   onBlur,
   ariaLabel,
 }: TextSuggestionsFieldProps) {
@@ -60,10 +63,14 @@ export function TextSuggestionsField({
     undefined
   const inputAriaLabel = ariaLabel ?? (label.trim() ? label : undefined)
   const showLabel = Boolean(label.trim())
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
-    <Field.Root id={id} error={error} required={required} size={size} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={rootWidth}>
       <FieldLayout
+        hintPosition={hintPosition}
+        chrome={chrome}
+        size={size}
         label={
           showLabel ? (
             <Field.Label id={`${id}-label`} htmlFor={id}>
@@ -85,7 +92,6 @@ export function TextSuggestionsField({
               onChange={field.handleInputChange}
               onBlur={field.handleInputBlur}
             />
-            {hint ? <FieldHintText id={hintId}>{hint}</FieldHintText> : null}
             {showSuggestions ? (
               <TextSuggestionsActions
                 suggestions={suggestions}

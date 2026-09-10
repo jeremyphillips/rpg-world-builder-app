@@ -1,4 +1,4 @@
-import { isContainer, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import { isContainer, type ColumnsConfig, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
 function joinFieldPath(prefix: string, name: string): string {
   return prefix ? `${prefix}.${name}` : name
@@ -47,6 +47,15 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
         ...item.dependents,
         fields: prefixFormItems(item.dependents.fields, prefix),
       },
+    }
+  }
+
+  if (item.kind === 'columns') {
+    return {
+      ...item,
+      columns: item.columns.map((column) => ({
+        fields: prefixFormItems(column.fields, prefix),
+      })) as ColumnsConfig['columns'],
     }
   }
 

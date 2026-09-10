@@ -4,7 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { CampaignAccessSection } from './campaign-access-section'
+import { CampaignAvailabilityField } from './campaign-availability-field'
 import { CampaignAccessFormProvider } from './campaign-access-form-context'
 import * as campaignAccessApi from './campaign-access-api'
 import * as participantRoster from './use-campaign-access-participant-roster'
@@ -18,15 +18,19 @@ vi.mock('./use-campaign-access-participant-roster', () => ({
   useCampaignAccessParticipantRoster: vi.fn(() => ({ data: [] })),
 }))
 
-function renderSection(ui: ReactElement) {
+function renderField(ui: ReactElement) {
   return render(<CampaignAccessFormProvider>{ui}</CampaignAccessFormProvider>)
 }
 
-async function expandCampaignAccess(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole('button', { name: 'Change' }))
+async function expandInlineAvailability(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: /Available|Unavailable/ }))
 }
 
-describe('CampaignAccessSection', () => {
+async function expandDialogAvailability(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: 'Campaign availability' }))
+}
+
+describe('CampaignAvailabilityField', () => {
   beforeEach(() => {
     vi.mocked(campaignAccessApi.fetchContentCampaignAccessAvailability).mockReset()
     vi.mocked(campaignAccessApi.updateContentCampaignAccess).mockReset()
@@ -37,8 +41,8 @@ describe('CampaignAccessSection', () => {
 
   it('renders collapsed summary and expanded availability controls', async () => {
     const user = userEvent.setup()
-    renderSection(
-      <CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
+    renderField(
+      <CampaignAvailabilityField campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
     )
 
     expect(screen.getByText('Campaign availability')).toBeInTheDocument()
@@ -48,17 +52,43 @@ describe('CampaignAccessSection', () => {
     expect(screen.getByRole('group', { name: /Campaign availability/ })).toHaveClass('mb-0')
     expect(screen.getByRole('group', { name: /Campaign availability/ })).not.toHaveClass('mb-8')
 
-    await expandCampaignAccess(user)
+    await expandInlineAvailability(user)
 
     expect(screen.getByRole('switch', { name: 'Available in this campaign' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Player access' })).toBeInTheDocument()
     expect(screen.getByText('All players')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument()
+  })
+
+  it('opens the editor in a dialog when presentation is dialog', async () => {
+    const user = userEvent.setup()
+    renderField(
+      <CampaignAvailabilityField
+        campaignId="campaign-1"
+        targetType="feats"
+        entityId="feat-1"
+        presentation="dialog"
+      />,
+    )
+
+    expect(
+      screen.getByText('Controls where this content can be discovered and used.'),
+    ).toBeInTheDocument()
+    await expandDialogAvailability(user)
+
+    const dialog = screen.getByRole('dialog', { name: 'Campaign availability' })
+    expect(screen.getByRole('switch', { name: 'Available in this campaign' })).toBeInTheDocument()
+    expect(dialog).toContainElement(screen.getByRole('button', { name: 'Done' }))
+
+    await user.click(screen.getByRole('button', { name: 'Done' }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('uses compact label scale when density is compact', async () => {
     const user = userEvent.setup()
-    renderSection(
-      <CampaignAccessSection
+    renderField(
+      <CampaignAvailabilityField
         campaignId="campaign-1"
         targetType="feats"
         entityId="feat-1"
@@ -68,7 +98,7 @@ describe('CampaignAccessSection', () => {
 
     expect(screen.getByText('Campaign availability')).toHaveClass('text-xs')
 
-    await expandCampaignAccess(user)
+    await expandInlineAvailability(user)
 
     expect(screen.getByText('Available in this campaign')).toHaveClass('text-xs')
     expect(screen.getByRole('combobox', { name: 'Player access' })).toHaveClass('text-xs')
@@ -79,8 +109,8 @@ describe('CampaignAccessSection', () => {
       data: [{ id: 'pc-1', name: 'Aldric', playerDisplayName: 'Player One' }],
     } as unknown as ReturnType<typeof participantRoster.useCampaignAccessParticipantRoster>)
 
-    renderSection(
-      <CampaignAccessSection
+    renderField(
+      <CampaignAvailabilityField
         campaignId="campaign-1"
         targetType="feats"
         entityId="feat-1"
@@ -94,7 +124,7 @@ describe('CampaignAccessSection', () => {
       />,
     )
 
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Change' }))
+    await userEvent.setup().click(screen.getByRole('button', { name: /Available/ }))
 
     expect(screen.getByRole('combobox', { name: 'Selected players' })).toBeInTheDocument()
   })
@@ -105,8 +135,8 @@ describe('CampaignAccessSection', () => {
       status: 'allowed',
     })
 
-    renderSection(
-      <CampaignAccessSection
+    renderField(
+      <CampaignAvailabilityField
         campaignId="campaign-1"
         targetType="feats"
         entityId="feat-1"
@@ -120,7 +150,7 @@ describe('CampaignAccessSection', () => {
       />,
     )
 
-    await expandCampaignAccess(user)
+    await expandInlineAvailability(user)
     await user.click(screen.getByRole('switch', { name: /Available in this campaign/ }))
 
     await waitFor(() => {
@@ -136,15 +166,15 @@ describe('CampaignAccessSection', () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
 
-    renderSection(
-      <CampaignAccessSection
+    renderField(
+      <CampaignAvailabilityField
         campaignId="campaign-1"
         targetType="feats"
         onDraftChange={onDraftChange}
       />,
     )
 
-    await expandCampaignAccess(user)
+    await expandInlineAvailability(user)
     await user.click(screen.getByRole('switch', { name: 'Available in this campaign' }))
 
     expect(campaignAccessApi.updateContentCampaignAccess).not.toHaveBeenCalled()
@@ -154,8 +184,8 @@ describe('CampaignAccessSection', () => {
   })
 
   it('shows unavailable summary without opening the disclosure', () => {
-    renderSection(
-      <CampaignAccessSection
+    renderField(
+      <CampaignAvailabilityField
         campaignId="campaign-1"
         targetType="feats"
         entityId="feat-1"
@@ -170,12 +200,13 @@ describe('CampaignAccessSection', () => {
     )
 
     expect(screen.getByRole('button', { name: /Unavailable/ })).toHaveAccessibleName(
-      'Unavailable. DM only. Hidden from discovery and selection in this campaign.',
+      'Unavailable. DM only',
     )
     expect(
-      screen.getByText('Hidden from discovery and selection in this campaign.'),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
+      screen.queryByText('Hidden from discovery and selection in this campaign.'),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Change')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Change' })).not.toBeInTheDocument()
   })
 
   it('restores availability toggle when preflight is blocked', async () => {
@@ -185,8 +216,8 @@ describe('CampaignAccessSection', () => {
       blockers: [{ kind: 'rule', code: 'npc_reference', message: 'Referenced by an NPC.' }],
     })
 
-    renderSection(
-      <CampaignAccessSection
+    renderField(
+      <CampaignAvailabilityField
         campaignId="campaign-1"
         targetType="feats"
         entityId="feat-1"
@@ -200,7 +231,7 @@ describe('CampaignAccessSection', () => {
       />,
     )
 
-    await expandCampaignAccess(user)
+    await expandInlineAvailability(user)
     await user.click(screen.getByRole('switch', { name: /Available in this campaign/ }))
 
     await waitFor(() => {
@@ -210,8 +241,8 @@ describe('CampaignAccessSection', () => {
   })
 
   itAxe('has no axe violations', async () => {
-    const { container } = renderSection(
-      <CampaignAccessSection campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
+    const { container } = renderField(
+      <CampaignAvailabilityField campaignId="campaign-1" targetType="feats" entityId="feat-1" />,
     )
     await expectNoAxeViolations(container)
   })

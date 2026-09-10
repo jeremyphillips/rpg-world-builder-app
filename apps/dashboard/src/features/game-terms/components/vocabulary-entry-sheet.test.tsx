@@ -99,4 +99,28 @@ describe('VocabularyEntrySheet', () => {
       status: 'active',
     })
   })
+
+  it('expands campaign availability in place without a nested dialog', async () => {
+    const user = userEvent.setup()
+
+    renderWithProviders(
+      <VocabularyEntrySheet
+        open
+        onOpenChange={vi.fn()}
+        mode="create"
+        campaignId="camp_1"
+        setId="creature-types"
+        createHeadline="Add creature type"
+        isPending={false}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Available' }))
+
+    expect(screen.getByRole('switch', { name: 'Available in this campaign' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument()
+    expect(screen.queryByRole('dialog', { name: 'Campaign availability' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('dialog')).toHaveLength(1)
+  })
 })

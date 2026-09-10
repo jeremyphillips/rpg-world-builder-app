@@ -61,6 +61,7 @@ export {
 export {
   TabbedForm,
   collectTabbedFormResolverItems,
+  TABBED_FORM_SECTIONS_ARIA_LABEL,
   type TabbedFormProps,
   type TabbedFormTab,
 } from './shells/tabbed-form.client'
@@ -94,17 +95,26 @@ export {
   formStickyActionsBarTransparentClasses,
   formStickyTabsClasses,
   formStickyTabsTransparentClasses,
+  formTabbedInactivePanelClasses,
+  formTabbedNavOverflowClasses,
   formTabPanelsBottomPaddingClasses,
   formTabbedChromeRhythmStackClasses,
   formSheetScrollRegionClasses,
 } from './chrome/form-chrome.variants'
 export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
+export {
+  FORM_COLUMNS_WIDTH_EQUAL,
+  FORM_COLUMNS_WIDTH_PRIMARY_DETAIL,
+} from './containers/form-columns.variants'
 
 export {
   flattenFields,
   fieldDefaultValue,
   buildDefaultValues,
   buildItemDefaultValues,
+  DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
+  columnsNeedBreakpointReorder,
+  resolveColumnsCollapseSequence,
   editableGridDependsOn,
   isContainer,
   toOptions,
@@ -179,10 +189,16 @@ export {
   type RowFieldItem,
   type GroupConfig,
   type GroupFieldItem,
+  type ColumnsConfig,
+  type FormColumnsColumn,
+  type FormColumnsCollapseIndex,
+  type FormColumnsCollapseOrder,
+  type FormColumnsWidths,
   type FieldGroupChrome,
   type FieldGroupDisclosure,
   type FieldGroupSummary,
   type FieldGroupSummaryDisclosure,
+  type FieldGroupDialogDisclosure,
   type ChromeConfig,
   type ChromeVariant,
   type ContentTone,
@@ -198,6 +214,7 @@ export {
   type FieldLabelVisibility,
   type FormNavigationAnchor,
   type DependentChrome,
+  DEFAULT_DEPENDENT_CHROME,
   DEFAULT_DEPENDENT_INSET,
   type DependentConfig,
   type DependentDependentsConfig,
@@ -227,6 +244,7 @@ export {
 export {
   defineArrayField,
   defineComboboxField,
+  defineColumnsField,
   defineDiceFormulaField,
   defineForm,
   defineFormItems,

@@ -89,7 +89,6 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'group',
     legend: 'Culture',
-    chrome: { variant: 'panel', emphasis: 'subtle' },
     fields: [
       {
         type: 'switch',
@@ -125,7 +124,6 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
         label: 'Language affinities',
         hint: 'Recommended languages for origin picks. Does not grant languages or expand selectable pools.',
         options: buildActiveLanguageFieldOptions(ctx.languageVocabulary),
-        chrome: { variant: 'panel' },
       },
       {
         type: 'switch',

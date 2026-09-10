@@ -5,3 +5,23 @@
  */
 @import '@rpg/ui/styles.css';
 @source "../../node_modules/@rpg/ui/src";
+
+/*
+ * Landing page entrance animation (hero load-in). Consumed via
+ * `motion-safe:animate-landing-rise` so reduced-motion users never see it.
+ * Scroll-driven reveals use ScrollReveal (IntersectionObserver + transitions).
+ */
+@theme {
+  --animate-landing-rise: landing-rise 0.7s ease-out both;
+
+  @keyframes landing-rise {
+    from {
+      opacity: 0;
+      translate: 0 1.25rem;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+}

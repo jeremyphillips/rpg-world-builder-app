@@ -1,17 +1,18 @@
 # Form containers
 
-Structural items in a `fields` config: groups, rows, stacks, arrays, and slots. Density
+Structural items in a `fields` config: groups, rows, columns, stacks, arrays, and slots. Density
 defaults: [forms hub — Form density](../forms.md#form-density).
 
 ## Overview
 
-| `kind`  | Semantics            | Density boundary? | Default density | Fieldset legend |
-| ------- | -------------------- | ----------------- | --------------- | --------------- |
-| `group` | Named subsection     | yes (optional)    | inherit parent  | yes             |
-| `row`   | Horizontal siblings  | no                | inherit parent  | no              |
-| `stack` | Layout-only column   | no                | inherit parent  | no              |
-| `array` | `useFieldArray` list | yes (optional)    | `compact`       | yes (`array`)   |
-| `slot`  | Custom `render()` UI | no                | inherit parent  | optional label  |
+| `kind`    | Semantics            | Density boundary? | Default density | Fieldset legend |
+| --------- | -------------------- | ----------------- | --------------- | --------------- |
+| `group`   | Named subsection     | yes (optional)    | inherit parent  | yes             |
+| `row`     | Horizontal siblings  | no                | inherit parent  | no              |
+| `columns` | Side-by-side stacks  | no                | inherit parent  | no              |
+| `stack`   | Layout-only column   | no                | inherit parent  | no              |
+| `array`   | `useFieldArray` list | yes (optional)    | `compact`       | yes (`array`)   |
+| `slot`    | Custom `render()` UI | no                | inherit parent  | optional label  |
 
 ## Component entry files
 
@@ -23,6 +24,7 @@ matches the exported component name in kebab-case:
 | `ArrayFieldRenderer`    | [`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)       |
 | `ArrayFormItemSection`  | [`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx) |
 | `ConditionalArrayField` | [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx) |
+| `ColumnsFieldSection`   | [`form-columns-section.client.tsx`](../src/form/containers/form-columns-section.client.tsx)            |
 | `SlotFieldRenderer`     | [`slot-field-renderer.client.tsx`](../src/form/renderers/fields/slot-field-renderer.client.tsx)        |
 | `FieldRenderer`         | [`field-renderer.client.tsx`](../src/form/renderers/field-renderer.client.tsx)                         |
 
@@ -82,17 +84,18 @@ exclusive** — omit for plain fieldset behavior.
 | `callout` | Alert-shaped surface on the **field stack** only. `tone`: `info` (default), `success`, `warning`, `destructive`, `neutral`, or `default`.                                                                                                                                     |
 | `accent`  | Light emphasis — `edge: 'top'` (`border-t-2 pt-4`) or `edge: 'legendRail'` (primary/semantic rail on legend only).                                                                                                                                                            |
 
-`chrome` composes with `disclosure` — e.g. `outline` surface on the field stack inside a
-summary-disclosure group.
+`chrome` composes with `disclosure` — e.g. `outline` surface on the field stack inside an
+inline-disclosure group.
 
 ### Group `disclosure`
 
 Optional open/collapse and summary behavior. Composes with `chrome`.
 
-| `variant` | Use                                                                                                                                                                                                                                                                                    |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `legend`  | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen` (default `true`); optional `collapseKey` for `uiStateKey` persistence.                                                                                                                       |
-| `summary` | Compact collapsed summary + **Change** / expanded **Done** for settings sections. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `panelDivider` (default `true`), `openLabel` / `closeLabel`. Fields stay mounted (hidden) when collapsed. Requires `FormProvider`. |
+| `variant` | Use                                                                                                                                                                                                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `legend`  | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen` (default `true`); optional `collapseKey` for `uiStateKey` persistence.                                                                                                                  |
+| `inline`  | Compact collapsed summary (faux input) that expands in place. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `panelDivider` (default `true`), `openLabel` / `closeLabel`. **Done** is an outline button in the expanded panel footer. Requires `FormProvider`. |
+| `dialog`  | Same collapsed faux-input summary; the editor opens in a modal. **Done** (`closeLabel`) is the single footer action — edits apply live, so it only dismisses. `hint` sits under the trigger. `dialogHeadline` defaults to the group legend. Requires `FormProvider`.              |
 
 `resolveSummary` returns a `FieldGroupSummary`:
 
@@ -109,7 +112,7 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
   kind: 'group',
   legend: 'Campaign availability',
   disclosure: {
-    variant: 'summary',
+    variant: 'inline',
     defaultOpen: false,
     summaryDependsOn: ['available', 'visibilityMode'],
     showDirtySuffix: true,
@@ -131,13 +134,50 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 ```
 
 Legend header margin (`mb-5` / `mb-4`) lives on the legend header block; `<legend>` is `w-full`
-and sits **outside** panel, outline, inset, and callout boxes. Divider and accent-top chrome
+and sits **outside** panel, outline, inset, and callout **group chrome** boxes. The default
+field container wraps the whole fieldset, including the legend and description — see
+[Field container chrome](#field-container-chrome-default). Divider and accent-top chrome
 apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 
 ## Rows
 
 Side-by-side leaf fields and slots in a wrapping flex row. Row-level `visibility`, `separator`,
-and `className`. Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
+and `className`. A top-level row is **one** field container — unlike `columns`, siblings share
+the box. Slots accept the same `width` tokens as leaf fields (`full`, fractions, `auto`, …).
+Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
+
+## Columns
+
+Side-by-side **vertical stacks** of mixed form items (`kind: 'columns'`). Not a `row` — rows
+are wrapping leaf siblings on one control band. Columns is layout-only: no fieldset, no
+shared field container. Each child stays a top-level chrome unit.
+
+Wide (`md` / 768px+): CSS grid of independent `FormRhythmStack`s. Optional `widths`:
+`'equal'` (default, `md:grid-cols-2`) or `'primary-detail'`
+(`md:grid-cols-[2fr_minmax(18rem,1fr)]`) — a primary column with a supporting control.
+Ignored for three-or-more column layouts. Narrow default: the same stacks in
+one column (all of column 1, then column 2). Optional `collapseOrder` reorders DOM
+below `md` so tab order matches the single-column layout — do not use CSS `order`.
+
+```ts
+{
+  kind: 'columns',
+  // widths: 'equal' (default) | 'primary-detail'
+  // collapseOrder: 'columns' (default) | 'interleave' | [[column, index], …]
+  columns: [
+    { fields: [/* description, primary abilities, hit die */] },
+    { fields: [/* suggested ability scores */] },
+  ],
+}
+```
+
+| `collapseOrder`       | Collapsed reading order                                                      |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `'columns'` (default) | Concatenate left to right — CSS-only                                         |
+| `'interleave'`        | Zip `c1[0], c2[0], c1[1], c2[1], …` then leftovers — `matchMedia` below `md` |
+| tuple list            | Explicit `[columnIndex, fieldIndex]` pairs; every field exactly once         |
+
+Prefer `defineColumnsField()` for completion.
 
 ## Stacks
 
@@ -155,10 +195,11 @@ controller field gates indented dependents:
 - Field `[0]` (controller) — switch, select, etc. — always visible.
 - Fields `[1..]` (dependents) use rhythm-derived `pl-8` / `pl-9` when `dependents.inset` is `true` (default).
 - **`dependents.inset`**: `boolean` — controller-relative positioning. Default `true`. Set `false` for no dependent indentation.
-- **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` — decorative boundary only. Default `'none'`. Does not enable or disable inset.
+- **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` — decorative boundary only. Default `'rail'`. Does not enable or disable inset.
 - **`inset: false` + `chrome: 'rail'`** — rail decoration without controller-relative indentation. No runtime ancestor inspection.
 - Nested dependent regions may independently use inset and/or rails/panels when they represent genuine nested dependencies — nested rails are supported and intentional.
-- Shared factories (e.g. mode-dependent grant sets) default to `inset: true`, `chrome: 'none'` but accept `dependents: { inset?, chrome? }` overrides at the call site.
+- Shared factories (e.g. mode-dependent grant sets) inherit inset + rail; pass `dependents: { inset?, chrome? }` to override.
+- A top-level `kind: 'dependent'` stack (controller + dependents) gets one shared field container (`chrome?: FieldChrome` on `DependentConfig`). Nested dependents keep inset/rail decoration but do **not** get additional field containers. Array item shells suppress the wrapper. Child leaves/rows/slots inside an active container are unboxed.
 - Dependents hidden when the gate predicate is false — no empty inset.
 - `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
   to "switch is true". For select/other controllers, pass an explicit predicate for hide
@@ -238,6 +279,42 @@ Dependent stack with an array dependent — use `arrayItems` scope:
   },
 }
 ```
+
+## Field container chrome (default)
+
+Every **top-level** `FormItem` in the schema `fields: []` gets one boxed field container —
+solid background + border + 16px padding (`{ variant: 'container' }`) — regardless of
+`kind` (`leaf`, `group`, `dependent`, `row`, `slot`). `kind: 'columns'` is layout-only:
+the wrapper has no field container; **each column child** is treated as a top-level unit.
+**Nothing nested inside** a chromed unit (nested `fields`, dependent controller/dependents,
+nested groups, nested dependents, rows, slots) receives field-container treatment. Arrays
+keep the existing **item-shell** model (elevated cards), not a field-container wrap of the
+whole list.
+
+**Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
+borderless `<fieldset>` (legend, description, and field stack) in `FieldChromeShell`,
+matching chip and choose-count fields — UA legend overlay cannot sit on the container
+border. Summary-disclosure groups still wrap only the expanded field stack so collapsed
+summary chrome stays outside the box.
+
+Resolution order:
+
+1. Explicit `chrome` on the leaf, row, slot, or dependent — or `fieldChrome` on a group
+   (`{ variant: 'none' }` opts out)
+2. Nearest ancestor `fieldChrome` cascade on a group, array, or dependent region
+3. Section suppression (anything nested under a top-level container unit; array item shells;
+   dependent panel/rail wrappers)
+4. Global default `{ variant: 'container' }` (top-level units only)
+
+| Authoring knob                                                                            | Applies to                                      |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `chrome?: FieldChrome` on leaf fields, `kind: 'row'`, `kind: 'slot'`, `kind: 'dependent'` | That top-level node’s shared container          |
+| `fieldChrome?: FieldChrome` on `group`                                                    | That group’s shared field container (+ cascade) |
+| `fieldChrome?: FieldChrome` on `array` / `dependents`                                     | Cascade / opt-out for nested resolution         |
+
+Group `chrome` (fieldset treatment: divider, callout, accent, …) remains separate from the
+field container. Prefer semantic group chrome only (warning accents, callouts); neutral
+outline/panel/rail group chrome is redundant with the shared field container.
 
 ## Field separators
 
@@ -496,7 +573,8 @@ Custom UI inside `FormProvider`. `name` aligns with a form value; defaults from 
 
 Slots inherit parent section `density`. Slot components should call
 `useFormSectionContext()` and resolve `resolveFormDensity(density)` when threading scale into
-hand-built controls.
+hand-built controls. Inside a `kind: 'row'`, set `width` on the slot the same way as a leaf
+field so it participates in the flex split.
 
 Optional `label` + `hint` wrap content in `FieldGroup`. `separator` adds a trailing
 divider after the slot (same as leaf fields and rows).

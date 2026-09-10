@@ -5,16 +5,25 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import {
   segmentedControlLabelVariants,
+  segmentedControlLeadingIconClasses,
   segmentedControlMetadataVariants,
   segmentedControlRootVariants,
   segmentedControlSegmentVariants,
 } from './segmented-control.variants'
+
+export type SegmentedControlOptionButtonProps = {
+  'aria-controls'?: string
+  'data-tab-trigger'?: string
+}
 
 export type SegmentedControlOption<TValue extends string> = {
   value: TValue
   label: string
   disabled?: boolean
   metadata?: string
+  leadingIcon?: React.ReactNode
+  trailing?: React.ReactNode
+  buttonProps?: SegmentedControlOptionButtonProps
 }
 
 export type SegmentedControlSegmentWidth = 'equal' | 'auto'
@@ -110,6 +119,7 @@ export function SegmentedControl<TValue extends string>({
         return (
           <button
             key={option.value}
+            {...option.buttonProps}
             ref={(node) => {
               buttonRefs.current[index] = node
             }}
@@ -121,12 +131,18 @@ export function SegmentedControl<TValue extends string>({
             onClick={() => selectSegment(index)}
             onKeyDown={(event) => handleKeyDown(event, index)}
           >
+            {option.leadingIcon ? (
+              <span aria-hidden className={segmentedControlLeadingIconClasses}>
+                {option.leadingIcon}
+              </span>
+            ) : null}
             <span className={segmentedControlLabelVariants({ segmentWidth })}>{option.label}</span>
             {option.metadata ? (
               <span className={segmentedControlMetadataVariants({ active: isActive })}>
                 {option.metadata}
               </span>
             ) : null}
+            {option.trailing}
           </button>
         )
       })}

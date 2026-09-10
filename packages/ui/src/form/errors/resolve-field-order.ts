@@ -1,5 +1,6 @@
 import type { ArrayConfig, FieldConfig, FormItem, RowConfig } from '../field-config'
 import { isContainer } from '../field-config'
+import { resolveColumnsCollapseSequence } from '../config/form-columns-collapse.lib'
 import { inlineSentenceBoundNames } from '../../components/ui/inline-sentence-field.lib'
 
 type FieldOrderContainer = Extract<FormItem, { kind: string }>
@@ -32,6 +33,11 @@ function walkContainerItem(item: FieldOrderContainer, prefix: string, paths: str
 
   if (item.kind === 'dependent') {
     walkItems([item.controller, ...item.dependents.fields], prefix, paths)
+    return
+  }
+
+  if (item.kind === 'columns') {
+    walkItems(resolveColumnsCollapseSequence(item.columns, item.collapseOrder), prefix, paths)
     return
   }
 
@@ -99,6 +105,15 @@ function walkArraySections(
 
     if (item.kind === 'dependent') {
       walkArraySections([item.controller, ...item.dependents.fields], namePrefix, sections)
+      continue
+    }
+
+    if (item.kind === 'columns') {
+      walkArraySections(
+        resolveColumnsCollapseSequence(item.columns, item.collapseOrder),
+        namePrefix,
+        sections,
+      )
       continue
     }
 

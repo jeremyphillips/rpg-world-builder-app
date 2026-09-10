@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 
 import type { FieldOption } from '../../form/field-config'
 import type { FieldSize } from './field.client'
+import type { FieldChrome } from './field-chrome.variants'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 import type { FieldDigits } from './field-digit-metrics'
@@ -44,6 +45,7 @@ export interface InlineChooseCountFieldProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
+  chrome?: FieldChrome
   labelVisibility?: FieldLabelVisibility
 }
 
@@ -75,6 +77,7 @@ export function InlineChooseCountField({
   disabled,
   size = 'md',
   width,
+  chrome,
   labelVisibility = 'visible',
 }: InlineChooseCountFieldProps) {
   const selectOptionNodes = useMemo(
@@ -99,6 +102,7 @@ export function InlineChooseCountField({
       disabled={disabled}
       size={size}
       width={width}
+      chrome={chrome}
       labelVisibility={labelVisibility}
     >
       {({ chooseId }) => (

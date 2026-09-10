@@ -77,6 +77,41 @@ describe('collectFormNavigationAnchors', () => {
       { id: 'nested', label: 'Nested', sectionId: undefined, depth: 1 },
     ])
   })
+
+  it('walks columns without incrementing navigation depth', () => {
+    const items: FormItem[] = [
+      {
+        kind: 'columns',
+        columns: [
+          {
+            fields: [
+              {
+                kind: 'group',
+                id: 'left',
+                navigation: { id: 'left', label: 'Left' },
+                fields: [],
+              },
+            ],
+          },
+          {
+            fields: [
+              {
+                kind: 'group',
+                id: 'right',
+                navigation: { id: 'right', label: 'Right' },
+                fields: [],
+              },
+            ],
+          },
+        ],
+      },
+    ]
+
+    expect(collectFormNavigationAnchors(items)).toEqual([
+      { id: 'left', label: 'Left', sectionId: undefined, depth: 0 },
+      { id: 'right', label: 'Right', sectionId: undefined, depth: 0 },
+    ])
+  })
 })
 
 describe('assertNavigationIdsMatchDomIds', () => {

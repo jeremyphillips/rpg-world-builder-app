@@ -105,3 +105,15 @@ export const SizeLarge: Story = {
     chipSize: 'lg',
   },
 }
+
+export const ContainerChrome: Story = {
+  args: {
+    label: 'Primary abilities',
+    hint: 'Select up to 2 abilities',
+    options: difficultyOptions,
+    multiple: true,
+    max: 2,
+    value: ['dangerous'],
+    chrome: { variant: 'container' },
+  },
+}

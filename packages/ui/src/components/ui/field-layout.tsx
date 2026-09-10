@@ -28,7 +28,7 @@ export interface FieldLayoutProps {
  * Default hint placement is below the label with a tighter label→hint gap.
  *
  * Alignment anchor (`data-field-align`) wraps label + control band so row
- * `items-end` aligns control edges; `Field.Error` and below-control hints stay outside.
+ * `items-end` aligns control edges; `Field.Error` stays outside the chrome shell.
  */
 export function FieldLayout({
   hintPosition = 'below-label',

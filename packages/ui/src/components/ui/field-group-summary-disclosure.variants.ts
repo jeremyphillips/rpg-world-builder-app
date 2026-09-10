@@ -2,7 +2,6 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
-import { optionalFieldDisclosureActionButtonClasses } from './optional-field-disclosure.variants'
 
 /** Summary disclosure legend + status copy — follows resolved section control scale. */
 export const fieldGroupSummaryDisclosureLegendVariants = cva('', {
@@ -40,13 +39,6 @@ export function resolveFieldGroupSummaryDisclosureExpandedLegendClassName(
   return cn(fieldGroupSummaryDisclosureLegendVariants({ size }), 'font-medium')
 }
 
-/** Compact text action buttons (Change / Done) — matches optional field disclosure. */
-export const fieldGroupSummaryDisclosureActionButtonClasses =
-  optionalFieldDisclosureActionButtonClasses
-
-/** Expanded header row with legend + Done action. */
-export const fieldGroupSummaryDisclosureHeaderClasses = 'flex items-center justify-between gap-2'
-
 /** Expanded field stack top divider when `panelDivider` is enabled (default). */
 export const fieldGroupSummaryDisclosurePanelDividerClasses = 'border-t border-border'
 
@@ -65,3 +57,6 @@ export function resolveFieldGroupSummaryDisclosurePanelClasses(panelDivider = tr
     fieldGroupSummaryDisclosurePanelPaddingClasses,
   )
 }
+
+/** Right-aligned outline Done control at the bottom of the expanded panel. */
+export const fieldGroupSummaryDisclosureFooterClasses = 'flex justify-end pt-3'

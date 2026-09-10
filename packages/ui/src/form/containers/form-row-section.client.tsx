@@ -3,11 +3,20 @@
 import * as React from 'react'
 
 import { FieldRow } from '../../components/ui/field-row'
+import { FieldChromeShell } from '../../components/ui/field-chrome-shell'
+import {
+  hasActiveFieldChrome,
+  resolveEffectiveFieldChrome,
+} from '../../components/ui/field-chrome.variants'
 import {
   ArrayItemPresentationContext,
   resolveErrorPlacement,
 } from '../context/array-item-presentation.context'
-import { useFormSectionContext } from '../context/form-section.context'
+import {
+  FormSectionContext,
+  buildFormSectionChildContext,
+  useFormSectionContext,
+} from '../context/form-section.context'
 import type { RowConfig } from '../field-config'
 import { isRowSlotItem, resolveRowFieldAlign, resolveRowFieldGap } from '../field-config'
 import { CompositeGroup } from '../presentation/composite-group.client'
@@ -33,40 +42,58 @@ export function RowFieldSection({
 }: RowFieldSectionProps) {
   const parentContext = useFormSectionContext()
   const { size } = resolveFormDensity(parentContext.density)
+  const rowChrome = resolveEffectiveFieldChrome(item, parentContext)
+  const rowChildContext = React.useMemo(
+    () =>
+      buildFormSectionChildContext(parentContext, depth, {
+        fieldChromeSuppressed: hasActiveFieldChrome(rowChrome) || undefined,
+      }),
+    [parentContext, depth, rowChrome],
+  )
   const parent = React.useContext(ArrayItemPresentationContext)
   const suppress = resolveErrorPlacement(item.errorPlacement, 'detailed', true)
   const value = suppress ? { ...parent, suppressFieldErrorText: true } : parent
   const heading = resolveRowHeading(item)
 
   const row = (
-    <FieldRow
-      align={resolveRowFieldAlign(item)}
-      gap={resolveRowFieldGap(item.spacing)}
-      className={item.className}
-    >
-      {item.fields.map((field) => {
-        if (isRowSlotItem(field)) {
+    <FormSectionContext.Provider value={rowChildContext}>
+      <FieldRow
+        align={resolveRowFieldAlign(item)}
+        gap={resolveRowFieldGap(item.spacing)}
+        className={item.className}
+      >
+        {item.fields.map((field) => {
+          if (isRowSlotItem(field)) {
+            return (
+              <SlotFormItemSection
+                key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
+                item={field}
+                parentContext={rowChildContext}
+                depth={depth}
+                namePrefix={namePrefix}
+              />
+            )
+          }
+
           return (
-            <SlotFormItemSection
+            <FieldNode
               key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-              item={field}
-              parentContext={parentContext}
-              depth={depth}
+              config={field}
+              idPrefix={idPrefix}
               namePrefix={namePrefix}
             />
           )
-        }
+        })}
+      </FieldRow>
+    </FormSectionContext.Provider>
+  )
 
-        return (
-          <FieldNode
-            key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-            config={field}
-            idPrefix={idPrefix}
-            namePrefix={namePrefix}
-          />
-        )
-      })}
-    </FieldRow>
+  const rowBody = hasActiveFieldChrome(rowChrome) ? (
+    <FieldChromeShell chrome={rowChrome} size={size}>
+      {row}
+    </FieldChromeShell>
+  ) : (
+    row
   )
 
   const body = heading ? (
@@ -77,14 +104,14 @@ export function RowFieldSection({
       id={item.id}
       className={item.className}
     >
-      {row}
+      {rowBody}
     </CompositeGroup>
   ) : item.id || item.className ? (
     <div id={item.id} className={item.className}>
-      {row}
+      {rowBody}
     </div>
   ) : (
-    row
+    rowBody
   )
 
   return (

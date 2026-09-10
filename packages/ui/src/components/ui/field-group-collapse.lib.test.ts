@@ -10,7 +10,7 @@ describe('field-group-collapse.lib', () => {
     expect(
       resolveFieldGroupCollapseKey({
         disclosure: {
-          variant: 'summary',
+          variant: 'inline',
           collapseKey: 'access',
           resolveSummary: () => ({ primary: '' }),
         },

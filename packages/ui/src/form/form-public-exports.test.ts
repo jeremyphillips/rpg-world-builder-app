@@ -12,6 +12,7 @@ import type {
 const REQUIRED_PUBLIC_EXPORTS = [
   'FIELD_WIDTHS',
   'DEFAULT_DEPENDENT_INSET',
+  'DEFAULT_DEPENDENT_CHROME',
   'DEFAULT_DEPENDENT_SURFACE',
   'DICE_FORMULA_TAIL_OPERATORS',
   'DICE_FORMULA_OPERATORS',
@@ -21,6 +22,7 @@ const REQUIRED_PUBLIC_EXPORTS = [
   'defineSelectField',
   'defineDependentField',
   'defineGroupField',
+  'defineColumnsField',
   'defineComboboxField',
   'defineDiceFormulaField',
   'defineInlineSentenceField',

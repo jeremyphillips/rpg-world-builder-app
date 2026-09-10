@@ -12,6 +12,7 @@ import { parseChooseCount } from './choose-count-field.lib'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
+import type { FieldChrome } from './field-chrome.variants'
 import { fieldInlineSentenceClasses } from './field.variants'
 import {
   indexInlineSentenceControls,
@@ -61,6 +62,7 @@ export interface InlineSentenceFieldProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
+  chrome?: FieldChrome
   labelVisibility?: FieldLabelVisibility
   chipSize?: CompactLabelSize
 }
@@ -182,6 +184,7 @@ export function InlineSentenceField({
   disabled,
   size = 'md',
   width,
+  chrome,
   labelVisibility = 'visible',
   chipSize,
 }: InlineSentenceFieldProps) {
@@ -200,6 +203,7 @@ export function InlineSentenceField({
       disabled={disabled}
       size={size}
       width={width}
+      chrome={chrome}
       labelVisibility={labelVisibility}
     >
       {({ legendId }) => (

@@ -13,6 +13,7 @@ import {
   flattenSelectFieldOptions,
   LevelRangeField,
 } from '../../../components/ui/level-range-field.client'
+import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import {
   applyArrayFilterSelectOptions,
   useArrayFieldContext,
@@ -186,6 +187,7 @@ export function LevelRangeFieldRenderer({
   return (
     <LevelRangeField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       minId={minId}
       maxId={maxId}

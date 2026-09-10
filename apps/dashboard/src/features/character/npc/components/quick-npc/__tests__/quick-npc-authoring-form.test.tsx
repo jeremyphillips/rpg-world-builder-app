@@ -153,12 +153,12 @@ describe('QuickNpcAuthoringForm', () => {
     const user = userEvent.setup()
     renderAuthoringForm()
 
-    await user.click(screen.getByRole('tab', { name: /requirements/i }))
+    await user.click(screen.getByRole('button', { name: /requirements/i }))
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
     await waitFor(() => {
       expect(
-        screen.getByRole('tab', { name: /Details.*1 field needs attention/i }),
+        screen.getByRole('button', { name: /Details.*1 field needs attention/i }),
       ).toBeInTheDocument()
     })
   })

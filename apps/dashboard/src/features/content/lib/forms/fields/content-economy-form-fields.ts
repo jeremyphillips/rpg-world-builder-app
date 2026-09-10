@@ -72,8 +72,6 @@ export function costFields(
         width,
       },
       dependents: {
-        chrome: 'panel',
-        panel: { surface: { emphasis: 'subtle' } },
         fields: [costInputField({ kind, width })],
       },
     },

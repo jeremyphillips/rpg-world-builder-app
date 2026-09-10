@@ -7,6 +7,7 @@ import { ChevronDown } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
+import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 import { ListboxOptionButton } from './listbox-option.client'
@@ -72,6 +73,7 @@ export interface InputSelectFieldProps {
   unitDisabled?: boolean
   size?: FieldSize
   width?: FieldWidth
+  chrome?: FieldChrome
   min?: number
   max?: number
   step?: number
@@ -390,6 +392,7 @@ export function InputSelectField({
   unitDisabled = false,
   size = 'md',
   width = 'full',
+  chrome,
   min,
   max,
   step,
@@ -408,12 +411,15 @@ export function InputSelectField({
   const describedBy = hasError ? `${id}-error` : hint ? `${id}-hint` : undefined
   const layout = inputType === 'number' && valueDigits != null ? 'intrinsic' : 'stretch'
   const isLabelUnit = unitMode === 'label'
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={rootWidth}>
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
+        chrome={chrome}
+        size={size}
         label={
           <Field.Label id={`${id}-label`} htmlFor={valueId}>
             <FieldLabelContent

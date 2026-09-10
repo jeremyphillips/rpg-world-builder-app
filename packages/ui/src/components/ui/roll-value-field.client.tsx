@@ -5,13 +5,14 @@ import * as React from 'react'
 import { DIE_FACES } from '@rpg/contracts/primitives'
 
 import { cn } from '../../lib/utils'
-import { Field, FieldErrorText, FieldHintErrorBelowControl, type FieldSize } from './field.client'
+import { Field, type FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
 import { FieldLabelContent } from './field-label-content'
 import { ADD_DICE_LABEL, DiceFormulaControls } from './dice-formula-field-controls.client'
 import type { DiceFormulaPatch } from './dice-formula-field.lib'
 import { FieldLayout } from './field-layout'
+import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldHintPosition } from './field.variants'
 import {
   applyRollValueFieldPatch,
@@ -48,6 +49,7 @@ export interface RollValueFieldProps {
   disabled?: boolean
   size?: FieldSize
   width?: FieldWidth
+  chrome?: FieldChrome
   faces?: readonly number[]
   countMin?: number
   countMax?: number
@@ -71,6 +73,7 @@ export function RollValueField({
   disabled = false,
   size = 'md',
   width = 'full',
+  chrome,
   faces = DIE_FACES,
   countMin = 1,
   countMax = 99,
@@ -93,6 +96,7 @@ export function RollValueField({
   const inlineLabelId = `${id}-inline-label`
   const hasError = Boolean(error)
   const describedBy = hasError ? errorId : hint ? hintId : undefined
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const applyPatch = React.useCallback(
     (patch: DiceFormulaPatch) => {
@@ -159,7 +163,7 @@ export function RollValueField({
   )
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={width}>
+    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={rootWidth}>
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
@@ -182,20 +186,9 @@ export function RollValueField({
             {controls}
           </div>
         }
+        chrome={chrome}
+        size={size}
       />
-      {hintPosition === 'below-label' && error ? (
-        <FieldErrorText id={errorId} size={size}>
-          {error}
-        </FieldErrorText>
-      ) : hintPosition !== 'below-label' ? (
-        <FieldHintErrorBelowControl
-          hint={hint}
-          error={error}
-          hintId={hintId}
-          errorId={errorId}
-          size={size}
-        />
-      ) : null}
     </Field.Root>
   )
 }

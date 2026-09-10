@@ -72,8 +72,6 @@ const dependentFields: FormItem[] = [
       hint: 'Enable to configure the threshold below.',
     },
     dependents: {
-      chrome: 'panel',
-      panel: { surface: { emphasis: 'subtle' } },
       fields: dependentFieldItems,
     },
   },
@@ -172,7 +170,7 @@ export const PlainGroup: Story = {
   },
 }
 
-/** Switch-gated dependent field with subtle dependents-only chrome (production pattern). */
+/** Switch-gated dependent field — shared container, inset rail dependents. */
 export const DependentField: Story = {
   args: {
     schema: stackSchema,
@@ -278,6 +276,78 @@ export const SelectDependentField: Story = {
       schema={selectDependentSchema}
       fields={selectDependentFields}
       defaultValues={{ classPolicyMode: 'only', classPolicyClassIds: ['fighter'] }}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
+}
+
+const grantSetSchema = z.object({
+  weaponProficiencyMode: z.string(),
+  weaponCategories: z.array(z.string()).optional(),
+  weaponItems: z.array(z.string()).optional(),
+})
+
+/** Radio controller + inset rail dependents sharing one field container. */
+export const RadioGrantSet: Story = {
+  args: {} as Story['args'],
+  render: () => (
+    <Form<z.infer<typeof grantSetSchema>>
+      schema={grantSetSchema}
+      fields={[
+        {
+          kind: 'dependent',
+          controller: {
+            type: 'radio',
+            name: 'weaponProficiencyMode',
+            label: 'Weapon proficiency mode',
+            labelVisibility: 'srOnly',
+            orientation: 'horizontal',
+            options: [
+              { label: 'Categories', value: 'categories' },
+              { label: 'Individual weapons', value: 'individual' },
+            ],
+            defaultValue: 'categories',
+            hint: {
+              text: 'Choose how this class grants weapon training.',
+              position: 'below-control',
+            },
+          },
+          dependents: {
+            fields: [
+              {
+                type: 'chips',
+                name: 'weaponCategories',
+                label: 'Weapon proficiencies',
+                options: [
+                  { label: 'Simple', value: 'simple' },
+                  { label: 'Martial', value: 'martial' },
+                ],
+                visibility: {
+                  dependsOn: ['weaponProficiencyMode'],
+                  visibleWhen: (values) => values.weaponProficiencyMode === 'categories',
+                },
+              },
+              {
+                type: 'combobox',
+                name: 'weaponItems',
+                label: 'Weapon choices',
+                multiple: true,
+                options: [
+                  { label: 'Longsword', value: 'longsword' },
+                  { label: 'Rapier', value: 'rapier' },
+                ],
+                placeholder: 'Choose weapons…',
+                visibility: {
+                  dependsOn: ['weaponProficiencyMode'],
+                  visibleWhen: (values) => values.weaponProficiencyMode === 'individual',
+                },
+              },
+            ],
+          },
+        },
+      ]}
+      defaultValues={{ weaponProficiencyMode: 'categories', weaponCategories: ['simple'] }}
       onSubmit={action('submit')}
       className="max-w-lg"
     />

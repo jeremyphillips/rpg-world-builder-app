@@ -79,5 +79,26 @@
       "  ],",
       "})"
     ]
+  },
+  "Form columns layout": {
+    "prefix": "form-columns",
+    "description": "Side-by-side stacks with defineColumnsField",
+    "scope": "typescript,typescriptreact",
+    "body": [
+      "defineColumnsField({",
+      "  kind: 'columns',",
+      "  columns: [",
+      "    {",
+      "      fields: [",
+      "        $0",
+      "      ],",
+      "    },",
+      "    {",
+      "      fields: [",
+      "      ],",
+      "    },",
+      "  ],",
+      "})"
+    ]
   }
 }

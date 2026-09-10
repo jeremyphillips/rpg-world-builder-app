@@ -48,3 +48,12 @@ export const WithDigits: Story = {
     ],
   },
 }
+
+export const InlineWithChrome: Story = {
+  args: {
+    labelPosition: 'inline',
+    hint: 'Inline label and hint sit inside the container.',
+    chrome: { variant: 'container' },
+    defaultValue: 'n',
+  },
+}

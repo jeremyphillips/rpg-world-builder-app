@@ -2,9 +2,12 @@
 
 import type { ReactElement, ReactNode } from 'react'
 
-import type { FieldChrome } from './field-chrome.variants'
+import {
+  hasActiveFieldChrome,
+  resolveFieldAnatomyWidth,
+  type FieldChrome,
+} from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
-import { hasActiveFieldChrome } from './field-chrome.variants'
 import type { FieldControlBand } from './field-control-band.variants'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
@@ -86,6 +89,8 @@ export function FormField({
   controlBand = 'single-line',
   children,
 }: FormFieldProps) {
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
+
   if (labelPosition === 'settings') {
     const presentation = resolveFieldPresentation({
       size,
@@ -122,7 +127,7 @@ export function FormField({
         hint={hint}
         required={required}
         size={size}
-        width={width}
+        width={rootWidth}
       >
         {chromedRow}
         <Field.Error />
@@ -139,7 +144,7 @@ export function FormField({
       hint={hint}
       required={required}
       size={size}
-      width={width}
+      width={rootWidth}
     >
       <FieldLayout
         hintPosition={hintPosition}

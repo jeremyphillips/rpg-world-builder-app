@@ -42,9 +42,9 @@ describe('ChooseCountFieldShell', () => {
     )
 
     const senseTypeRoot = screen.getByLabelText('Sense type').closest('.grow-\\[8\\]')
-    const rangeFieldset = screen.getByLabelText('Range').closest('fieldset')
+    const rangeRoot = screen.getByLabelText('Range').closest('.grow-\\[4\\]')
 
     expect(senseTypeRoot).toHaveClass('max-w-2/3')
-    expect(rangeFieldset).toHaveClass('grow-[4]', 'max-w-1/3')
+    expect(rangeRoot).toHaveClass('max-w-1/3')
   })
 })

@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import type { FieldOption } from '../../form/field-config'
 import type { FieldSize } from './field.client'
+import type { FieldChrome } from './field-chrome.variants'
 import type { FieldWidth } from './field-control.variants'
 import { ChipsFieldOptions } from './chips-field.client'
 import type { CompactLabelSize } from './compact-label.lib'
@@ -38,6 +39,7 @@ export interface ChooseFromChipsFieldProps {
   size?: FieldSize
   chipSize?: CompactLabelSize
   width?: FieldWidth
+  chrome?: FieldChrome
 }
 
 /**
@@ -66,6 +68,7 @@ export function ChooseFromChipsField({
   size = 'md',
   chipSize,
   width,
+  chrome,
 }: ChooseFromChipsFieldProps) {
   const resolvedChipSize = chipSize ?? size
   return (
@@ -80,6 +83,7 @@ export function ChooseFromChipsField({
       disabled={disabled}
       size={size}
       width={width}
+      chrome={chrome}
     >
       {({ legendId, chooseId }) => (
         <>

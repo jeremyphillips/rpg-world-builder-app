@@ -21,7 +21,6 @@ export function resolutionAreaFormFields(): FormItem[] {
     {
       kind: 'group',
       legend: RESOLUTION_FIELD_LABELS.areaOfEffect,
-      chrome: { variant: 'outline' },
       visibility: areaVisibility,
       fields: [
         {

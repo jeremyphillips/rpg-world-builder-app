@@ -127,9 +127,12 @@ schema-driven `<Form>` / `<TabbedForm>` shells inside create workflows.
 `CreateModalShell`. Drawers and page create keep the form-system default
 (`comfortable`) unless they pass an explicit `density`.
 
-`ContentFormHeader` passes parent form `density` into `CampaignAccessSection` so
+`ContentFormHeader` passes parent form `density` into `CampaignAvailabilityField` so
 campaign availability labels, disclosure chrome, and sibling header spacing follow
-the same rhythm as body fields.
+the same rhythm as body fields. Overlay hosts (`CreateModalShell`, the subclass
+panel) pass `availabilityPresentation="disclosure"` so the editor expands in place
+instead of opening a nested dialog. Full-page shells pass `availabilityPresentation="dialog"`
+with `identityLayout="inline"`.
 
 ## Nested composition presentation
 

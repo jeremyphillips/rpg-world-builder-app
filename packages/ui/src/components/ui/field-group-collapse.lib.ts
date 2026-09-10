@@ -9,8 +9,12 @@ export function resolveFieldGroupCollapseKey(options: {
   id?: string
   legend?: string
 }): string {
+  const disclosureKey =
+    options.disclosure && options.disclosure.variant !== 'dialog'
+      ? options.disclosure.collapseKey
+      : undefined
   return (
-    options.disclosure?.collapseKey ??
+    disclosureKey ??
     options.collapseKey ??
     options.id ??
     (options.legend ? slugifyGroupCollapseKey(options.legend) || 'group-section' : 'group-section')

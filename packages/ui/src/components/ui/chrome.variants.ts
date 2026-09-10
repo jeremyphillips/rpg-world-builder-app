@@ -14,7 +14,7 @@ import {
 } from './surface.variants'
 import type { ChromeConfig, SupportedSemanticChrome } from './visual-vocabulary.types'
 
-export type ChromeBodyLayout = 'group' | 'field' | 'summary-accent' | 'callout'
+export type ChromeBodyLayout = 'group' | 'field' | 'summary-accent' | 'summary-trigger' | 'callout'
 
 type SupportedChromeKey = 'warning:faint' | 'warning:subtle' | 'neutral:subtle'
 
@@ -80,6 +80,8 @@ function resolveChromeBodyLayoutClasses(layout: ChromeBodyLayout, paddingClasses
       return cn(fieldShellLayoutClasses, paddingClasses)
     case 'summary-accent':
       return 'flex flex-col gap-2 rounded-tr-md rounded-br-md rounded-tl-none rounded-bl-none p-3'
+    case 'summary-trigger':
+      return 'relative rounded-tr-md rounded-br-md rounded-tl-none rounded-bl-none'
     case 'callout':
       return 'rounded-lg border p-4'
     case 'group':
@@ -151,10 +153,14 @@ export function resolveChromeCalloutClasses(chrome: ChromeConfig): string {
   return cn(resolveChromeBodyLayoutClasses('callout'), resolveCalloutShellClasses(chrome))
 }
 
-function resolveAccentChromeClasses(chrome: ChromeConfig): string {
+function resolveAccentChromeClasses(
+  chrome: ChromeConfig,
+  layout: ChromeBodyLayout = 'summary-accent',
+): string {
   if (!isSupportedSemanticChrome(chrome)) return ''
+  const bodyLayout = layout === 'summary-trigger' ? 'summary-trigger' : 'summary-accent'
   return cn(
-    resolveChromeBodyLayoutClasses('summary-accent'),
+    resolveChromeBodyLayoutClasses(bodyLayout),
     resolveChromeShellClasses(chrome),
     resolveChromeAccentClasses(chrome),
   )
@@ -163,7 +169,7 @@ function resolveAccentChromeClasses(chrome: ChromeConfig): string {
 type ChromeResolveOptions = { layout: ChromeBodyLayout; paddingClasses: string }
 
 function resolveVariantChromeClasses(chrome: ChromeConfig, options: ChromeResolveOptions): string {
-  if (chrome.variant === 'accent') return resolveAccentChromeClasses(chrome)
+  if (chrome.variant === 'accent') return resolveAccentChromeClasses(chrome, options.layout)
   if (chrome.variant === 'panel') {
     return resolveChromePanelClasses(chrome, options.layout, options.paddingClasses)
   }

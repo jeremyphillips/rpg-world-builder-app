@@ -196,7 +196,6 @@ export function buildOrganizationFields(
       options: organizationDomainOptions,
       multiple: false,
       required: true,
-      chrome: { variant: 'outline' },
     },
     {
       type: 'select',
@@ -216,7 +215,6 @@ export function buildOrganizationFields(
       hint: { text: ORGANIZATION_FUNCTION_FIELD_HINT, position: 'below-control' },
       options: organizationFunctionOptions,
       multiple: true,
-      chrome: { variant: 'outline' },
     },
     {
       type: 'combobox',
@@ -247,7 +245,6 @@ export function buildOrganizationFields(
         selectedMemberClassAffinityIds ?? ctx.organizationMemberClassAffinitySeedIds ?? [],
       ),
       multiple: true,
-      chrome: { variant: 'outline' },
     },
     {
       type: 'chips',
@@ -262,7 +259,6 @@ export function buildOrganizationFields(
         selectedMemberSpeciesAffinityIds ?? ctx.organizationMemberSpeciesAffinitySeedIds ?? [],
       ),
       multiple: true,
-      chrome: { variant: 'outline' },
     },
     { ...descriptionField(ctx), name: fieldPath(prefix, 'description') },
   )

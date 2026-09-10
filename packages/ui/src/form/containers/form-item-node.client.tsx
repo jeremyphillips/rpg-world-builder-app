@@ -1,10 +1,18 @@
 'use client'
 
-import { isContainer, type FormItem, type RowConfig } from '../field-config'
+import {
+  isContainer,
+  type ColumnsConfig,
+  type DependentConfig,
+  type FormItem,
+  type GroupConfig,
+  type RowConfig,
+} from '../field-config'
 import { useFormSectionContext } from '../context/form-section.context'
 import { FieldNode } from './form-conditional.client'
 import { ConditionalGroup, GroupFieldSection } from './form-group-section.client'
 import { ConditionalRow, RowFieldSection } from './form-row-section.client'
+import { ColumnsFieldSection, ConditionalColumns } from './form-columns-section.client'
 import {
   ConditionalDependent,
   DependentSection,
@@ -51,6 +59,33 @@ interface FormItemNodeProps {
   depth: number
 }
 
+interface ContainerNodeProps<Item> {
+  item: Item
+  idPrefix: string
+  namePrefix?: string
+  depth: number
+}
+
+function RowNode({ item, index, ...props }: ContainerNodeProps<RowConfig> & { index: number }) {
+  const Component = item.visibility ? ConditionalRow : RowFieldSection
+  return <Component item={item} index={index} {...props} />
+}
+
+function GroupNode({ item, ...props }: ContainerNodeProps<GroupConfig>) {
+  const Component = item.visibility ? ConditionalGroup : GroupFieldSection
+  return <Component item={item} renderNestedItems={renderNestedFormItems} {...props} />
+}
+
+function ColumnsNode({ item, ...props }: ContainerNodeProps<ColumnsConfig>) {
+  const Component = item.visibility ? ConditionalColumns : ColumnsFieldSection
+  return <Component item={item} renderNestedItems={renderNestedFormItems} {...props} />
+}
+
+function DependentNode({ item, ...props }: ContainerNodeProps<DependentConfig>) {
+  const Component = item.visibility ? ConditionalDependent : DependentSection
+  return <Component item={item} renderNestedItems={renderNestedFormItems} {...props} />
+}
+
 export function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormItemNodeProps) {
   const parentContext = useFormSectionContext()
 
@@ -58,73 +93,22 @@ export function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormI
     return <FieldNode config={item} idPrefix={idPrefix} namePrefix={namePrefix} />
   }
 
+  const containerProps = { idPrefix, namePrefix, depth }
+
   if (item.kind === 'row') {
-    if (item.visibility) {
-      return (
-        <ConditionalRow
-          item={item}
-          index={index}
-          idPrefix={idPrefix}
-          namePrefix={namePrefix}
-          depth={depth}
-        />
-      )
-    }
-    return (
-      <RowFieldSection
-        item={item}
-        index={index}
-        idPrefix={idPrefix}
-        namePrefix={namePrefix}
-        depth={depth}
-      />
-    )
+    return <RowNode item={item} index={index} {...containerProps} />
   }
 
   if (item.kind === 'group') {
-    if (item.visibility) {
-      return (
-        <ConditionalGroup
-          item={item}
-          idPrefix={idPrefix}
-          namePrefix={namePrefix}
-          depth={depth}
-          renderNestedItems={renderNestedFormItems}
-        />
-      )
-    }
-    return (
-      <GroupFieldSection
-        item={item}
-        idPrefix={idPrefix}
-        namePrefix={namePrefix}
-        depth={depth}
-        renderNestedItems={renderNestedFormItems}
-      />
-    )
+    return <GroupNode item={item} {...containerProps} />
+  }
+
+  if (item.kind === 'columns') {
+    return <ColumnsNode item={item} {...containerProps} />
   }
 
   if (item.kind === 'dependent') {
-    if (item.visibility) {
-      return (
-        <ConditionalDependent
-          item={item}
-          idPrefix={idPrefix}
-          namePrefix={namePrefix}
-          depth={depth}
-          renderNestedItems={renderNestedFormItems}
-        />
-      )
-    }
-    return (
-      <DependentSection
-        item={item}
-        idPrefix={idPrefix}
-        namePrefix={namePrefix}
-        depth={depth}
-        renderNestedItems={renderNestedFormItems}
-      />
-    )
+    return <DependentNode item={item} {...containerProps} />
   }
 
   if (item.kind === 'slot') {
@@ -164,6 +148,13 @@ function prefixFormItemKey(namePrefix: string | undefined, key: string): string 
   return namePrefix ? `${namePrefix}.${key}` : key
 }
 
+const UNNAMED_CONTAINER_KEY_PREFIX = {
+  group: true,
+  columns: true,
+  dependent: true,
+  row: true,
+} as const
+
 export function formItemKey(
   item: FormItem | RowConfig,
   index: number,
@@ -175,20 +166,11 @@ export function formItemKey(
     return prefixFormItemKey(namePrefix, key)
   }
 
-  if (!('kind' in item)) return String(index)
-
-  switch (item.kind) {
-    case 'group':
-      return prefixFormItemKey(namePrefix, `group-${index}`)
-    case 'dependent':
-      return prefixFormItemKey(namePrefix, `dependent-${index}`)
-    case 'row':
-      return prefixFormItemKey(namePrefix, `row-${index}`)
-    case 'slot':
-      return prefixFormItemKey(namePrefix, item.name)
-    default:
-      return String(index)
+  if ('kind' in item && item.kind in UNNAMED_CONTAINER_KEY_PREFIX) {
+    return prefixFormItemKey(namePrefix, `${item.kind}-${index}`)
   }
+
+  return String(index)
 }
 
 export type { RenderNestedFormItemsProps } from './form-dependent-section.client'

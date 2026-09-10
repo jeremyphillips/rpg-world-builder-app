@@ -14,7 +14,6 @@ export function vehicleFormFieldGroup(): FormItem {
   return {
     kind: 'group',
     legend: '',
-    chrome: { variant: 'panel' },
     fields: [
       {
         type: 'select',

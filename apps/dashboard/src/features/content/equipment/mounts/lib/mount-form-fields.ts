@@ -14,7 +14,6 @@ export function mountFormFieldGroup(): FormItem {
   return {
     kind: 'group',
     legend: '',
-    chrome: { variant: 'outline' },
     fields: mountCapacitySpeedFields(),
   }
 }

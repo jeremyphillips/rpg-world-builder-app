@@ -17,13 +17,33 @@ describe('buildCampaignAvailabilityFields', () => {
 
     const availabilityGroup = group as GroupConfig
     expect(availabilityGroup.kind).toBe('group')
-    expect(availabilityGroup.disclosure?.variant).toBe('summary')
-    if (availabilityGroup.disclosure?.variant === 'summary') {
+    expect(availabilityGroup.disclosure?.variant).toBe('inline')
+    if (availabilityGroup.disclosure?.variant === 'inline') {
       expect(availabilityGroup.disclosure.resolveSummary({ available: false }).status?.label).toBe(
         'Unavailable',
       )
     }
     expect(availabilityGroup.fields).toHaveLength(1)
     expect(availabilityGroup.fields?.[0]).toMatchObject({ name: 'available', type: 'switch' })
+  })
+
+  it('maps dialog presentation to the dialog disclosure variant and hint', () => {
+    const [group] = buildCampaignAvailabilityFields({
+      groupId: 'test-group',
+      pending: false,
+      presentation: 'dialog',
+      summaryDependsOn: ['available'],
+      resolveSummary: () => ({ status: { label: 'Available', tone: 'success', indicator: 'dot' } }),
+    })
+
+    const availabilityGroup = group as GroupConfig
+    expect(availabilityGroup.disclosure?.variant).toBe('dialog')
+    if (availabilityGroup.disclosure?.variant === 'dialog') {
+      expect(availabilityGroup.disclosure.hint).toBe(
+        'Controls where this content can be discovered and used.',
+      )
+      expect(availabilityGroup.disclosure.dialogHeadline).toBe('Campaign availability')
+      expect(availabilityGroup.disclosure.closeLabel).toBe('Done')
+    }
   })
 })

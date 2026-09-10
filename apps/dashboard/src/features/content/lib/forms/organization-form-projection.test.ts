@@ -83,7 +83,6 @@ describe('organization form projection', () => {
       type: 'chips',
       label: 'Functions',
       hint: { text: 'What this organization broadly does.', position: 'below-control' },
-      chrome: { variant: 'outline' },
       options:
         standaloneFunctions && 'options' in standaloneFunctions ? standaloneFunctions.options : [],
       multiple: true,
@@ -113,7 +112,6 @@ describe('organization form projection', () => {
       type: 'chips',
       label: 'Functions',
       hint: { text: 'What this organization broadly does.', position: 'below-control' },
-      chrome: { variant: 'outline' },
       multiple: true,
     })
     const practicesField = fields.find(({ name }) => name === 'practices')?.item

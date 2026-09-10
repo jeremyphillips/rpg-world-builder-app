@@ -4,7 +4,7 @@ import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 import { z } from 'zod'
 
-import { TabbedForm } from './tabbed-form.client'
+import { TabbedForm, TABBED_FORM_SECTIONS_ARIA_LABEL } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
 import { FormShellFooterScope, FormShellFooterSlot } from '../chrome/form-shell-footer.context'
 import { FormShellSubmitButton } from '../chrome/form-shell-submit-button'
@@ -54,12 +54,16 @@ const tabs: TabbedFormTab[] = [
   },
 ]
 
+function getSectionsNav() {
+  return screen.getByRole('group', { name: TABBED_FORM_SECTIONS_ARIA_LABEL })
+}
+
 describe('TabbedForm', () => {
   it('renders all tab triggers', () => {
     render(<TabbedForm<TestValues> schema={schema} tabs={tabs} onSubmit={vi.fn()} />)
-    expect(screen.getByRole('tab', { name: 'Identity' })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'Rules' })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'Flavor' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Identity' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Rules' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Flavor' })).toBeInTheDocument()
   })
 
   it('shows the first tab panel by default', () => {
@@ -69,7 +73,7 @@ describe('TabbedForm', () => {
 
   it('switches tabs on click', async () => {
     render(<TabbedForm<TestValues> schema={schema} tabs={tabs} onSubmit={vi.fn()} />)
-    await userEvent.click(screen.getByRole('tab', { name: 'Rules' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Rules' }))
     expect(screen.getByLabelText('Starting level')).toBeInTheDocument()
   })
 
@@ -133,7 +137,7 @@ describe('TabbedForm', () => {
     const rhythmStack = header.parentElement
 
     expect(rhythmStack).toHaveClass('gap-4')
-    expect(rhythmStack).toContainElement(screen.getByRole('tablist'))
+    expect(rhythmStack).toContainElement(getSectionsNav())
   })
 
   it('renders tab header content above fields', async () => {
@@ -147,7 +151,7 @@ describe('TabbedForm', () => {
       },
     ]
     render(<TabbedForm<TestValues> schema={schema} tabs={tabsWithHeader} onSubmit={vi.fn()} />)
-    await userEvent.click(screen.getByRole('tab', { name: 'Notes' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Notes' }))
     expect(screen.getByText('Notes are managed elsewhere.')).toBeInTheDocument()
   })
 
@@ -161,8 +165,8 @@ describe('TabbedForm', () => {
       />,
     )
 
-    const tablist = screen.getByRole('tablist')
-    expect(tablist.parentElement).toHaveClass('sticky')
+    const sectionsNav = getSectionsNav()
+    expect(sectionsNav.parentElement).toHaveClass('sticky')
     expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('sticky')
   })
 
@@ -178,9 +182,9 @@ describe('TabbedForm', () => {
       />,
     )
 
-    const tablist = screen.getByRole('tablist')
-    expect(tablist.parentElement).toHaveClass('sticky', 'bg-transparent')
-    expect(tablist.parentElement).not.toHaveClass('bg-background')
+    const sectionsNav = getSectionsNav()
+    expect(sectionsNav.parentElement).toHaveClass('sticky', 'bg-transparent')
+    expect(sectionsNav.parentElement).not.toHaveClass('bg-background')
     expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('bg-transparent')
   })
 
@@ -196,8 +200,8 @@ describe('TabbedForm', () => {
       />,
     )
 
-    const tablist = screen.getByRole('tablist')
-    expect(tablist.parentElement).not.toHaveClass('sticky')
+    const sectionsNav = getSectionsNav()
+    expect(sectionsNav.parentElement).not.toHaveClass('sticky')
     expect(screen.queryByRole('toolbar', { name: 'Form actions' })).not.toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong.')
   })
@@ -248,7 +252,7 @@ describe('TabbedForm', () => {
     expect(scrollRegion).toBeTruthy()
     expect(scrollRegion?.className).toContain('min-h-0')
     expect(scrollRegion?.className).toContain('pb-6')
-    expect(scrollRegion).toContainElement(screen.getByRole('tablist'))
+    expect(scrollRegion).toContainElement(getSectionsNav())
   })
 
   it('submits via an external footer button associated with form id', async () => {
@@ -299,7 +303,7 @@ describe('TabbedForm', () => {
       />,
     )
 
-    expect(screen.getByTestId('wrapped-content')).toContainElement(screen.getByRole('tablist'))
+    expect(screen.getByTestId('wrapped-content')).toContainElement(getSectionsNav())
   })
 
   it('does not show tab issue badges before the first failed submit', () => {
@@ -313,8 +317,8 @@ describe('TabbedForm', () => {
       />,
     )
 
-    expect(screen.getByRole('tab', { name: 'Identity' })).toHaveTextContent('Identity')
-    expect(screen.getByRole('tab', { name: 'Rules' })).toHaveTextContent('Rules')
+    expect(screen.getByRole('button', { name: 'Identity' })).toHaveTextContent('Identity')
+    expect(screen.getByRole('button', { name: 'Rules' })).toHaveTextContent('Rules')
     expect(screen.queryByText(/fields need attention/i)).not.toBeInTheDocument()
   })
 
@@ -353,15 +357,14 @@ describe('TabbedForm', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: /Notes.*1 field needs attention/i })).toHaveAttribute(
-        'aria-selected',
-        'true',
-      )
+      expect(
+        screen.getByRole('button', { name: /Notes.*1 field needs attention/i }),
+      ).toHaveAttribute('aria-pressed', 'true')
     })
     const notesInput = screen.getByRole('textbox', { name: 'Notes' })
     expect(notesInput).toHaveFocus()
-    expect(screen.getByRole('tab', { name: 'Identity' })).toHaveTextContent('Identity')
-    expect(screen.getByRole('tab', { name: /Notes/ })).toHaveTextContent('1')
+    expect(screen.getByRole('button', { name: 'Identity' })).toHaveTextContent('Identity')
+    expect(within(getSectionsNav()).getByRole('button', { name: /Notes/ })).toHaveTextContent('1')
   })
 
   it('uses resolverFields for tier-1 validation copy on header-only paths', async () => {
@@ -404,7 +407,7 @@ describe('TabbedForm', () => {
       />,
     )
 
-    await user.click(screen.getByRole('tab', { name: 'Meta' }))
+    await user.click(screen.getByRole('button', { name: 'Meta' }))
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
@@ -454,7 +457,10 @@ describe('TabbedForm', () => {
       'id',
       'campaign-form-notes-notes',
     )
-    expect(screen.getByRole('tab', { name: /Notes/i })).toHaveAttribute('aria-selected', 'true')
+    expect(within(getSectionsNav()).getByRole('button', { name: /Notes/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
   })
 
   it('propagates issue badges to a hidden tab after a failed submit', async () => {
@@ -509,7 +515,10 @@ describe('TabbedForm', () => {
       expect(screen.getByRole('textbox', { name: 'Label' })).toHaveAttribute('aria-invalid', 'true')
     })
 
-    expect(screen.getByRole('tab', { name: /Grants/i })).toHaveAttribute('aria-selected', 'true')
+    expect(within(getSectionsNav()).getByRole('button', { name: /Grants/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
     expect(screen.getByRole('textbox', { name: 'Label' })).toHaveFocus()
 
     await waitFor(() => {
@@ -519,7 +528,7 @@ describe('TabbedForm', () => {
     })
 
     expect(
-      screen.getByRole('tab', { name: /Grants.*1 field needs attention/i }),
+      screen.getByRole('button', { name: /Grants.*1 field needs attention/i }),
     ).toBeInTheDocument()
   })
 
@@ -562,7 +571,7 @@ describe('TabbedForm', () => {
     })
     expect(screen.getByText('Name is required')).toBeInTheDocument()
 
-    const notesPanel = screen.getByRole('tabpanel', { name: /Notes/i })
+    const notesPanel = screen.getByRole('region', { name: 'Notes' })
     const notesInput = within(notesPanel).getByRole('textbox', { name: 'Notes' })
     expect(notesInput).toHaveAttribute('aria-invalid', 'true')
     expect(screen.queryByText('Notes are required')).not.toBeInTheDocument()
@@ -657,7 +666,10 @@ describe('TabbedForm', () => {
       'id',
       'review-form-notes-notes',
     )
-    expect(screen.getByRole('tab', { name: /Notes/i })).toHaveAttribute('aria-selected', 'true')
+    expect(within(getSectionsNav()).getByRole('button', { name: /Notes/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
   })
 
   it('clears tab badges and the validation summary after errors are fixed', async () => {
@@ -708,7 +720,7 @@ describe('TabbedForm', () => {
     await waitFor(() => {
       expect(screen.queryByRole('status')).not.toBeInTheDocument()
     })
-    expect(screen.getByRole('tab', { name: 'Notes' })).toHaveTextContent('Notes')
+    expect(screen.getByRole('button', { name: 'Notes' })).toHaveTextContent('Notes')
     expect(screen.queryByText(/fields need attention/i)).not.toBeInTheDocument()
   })
 

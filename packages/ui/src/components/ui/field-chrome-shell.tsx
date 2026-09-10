@@ -11,7 +11,7 @@ export interface FieldChromeShellProps {
   children: ReactNode
 }
 
-/** Wraps the control region in panel/outline chrome when configured. */
+/** Wraps field anatomy (label + hint + control) when chrome is active. */
 export function FieldChromeShell({
   chrome,
   size = 'md',

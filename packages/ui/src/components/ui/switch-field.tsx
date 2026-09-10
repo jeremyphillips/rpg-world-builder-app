@@ -7,6 +7,7 @@ import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import { FormField } from './form-field'
 import { FieldChromeShell } from './field-chrome-shell'
 import type { FieldChromeProps } from './field-chrome.variants'
+import { resolveFieldAnatomyWidth } from './field-chrome.variants'
 import { Switch } from './switch.client'
 import {
   fieldInlineSwitchControlColumnClasses,
@@ -64,6 +65,7 @@ export function SwitchField({
   ...switchProps
 }: SwitchFieldProps) {
   const resolvedHintPosition = hintPosition ?? 'below-label'
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const labelNode = (
     <Field.Label
@@ -92,7 +94,7 @@ export function SwitchField({
         hintPosition={hintPosition}
         info={info}
         required={required}
-        width={width}
+        width={rootWidth}
         size={size}
         labelPosition="settings"
         chrome={chrome}
@@ -111,7 +113,7 @@ export function SwitchField({
         describedBy={describedBy}
         hint={hint}
         required={required}
-        width={width}
+        width={rootWidth}
         size={size}
       >
         <FieldLayout
@@ -140,7 +142,7 @@ export function SwitchField({
       describedBy={describedBy}
       hint={hint}
       required={required}
-      width={width}
+      width={rootWidth}
       size={size}
     >
       <FieldChromeShell chrome={chrome} size={size}>

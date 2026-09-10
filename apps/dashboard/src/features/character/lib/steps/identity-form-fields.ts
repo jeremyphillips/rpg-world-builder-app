@@ -100,12 +100,10 @@ export const identityFormFields: FormItem[] = [
     multiple: false,
     options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
     width: 'full',
-    chrome: { variant: 'panel' },
   },
   {
     kind: 'group',
     legend: 'Narrative',
-    chrome: { variant: 'rail' },
     fields: [
       narrativeArrayField(
         'personalityTraits',

@@ -22,6 +22,8 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  *   (nested array sections omit this; parent stack/group rhythm owns spacing)
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
+ * - `fieldSetChromeContainClasses` — column stack for borderless leaf fieldset anatomy
+ * - `fieldSetInFlowLegendClasses` — reset UA legend padding on chip / choose-count captions
  * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowGapClasses` — horizontal + wrap gap between fields in a row
  * - `fieldRowLayoutClasses` — deprecated alias; prefer `resolveFieldRowClasses`
@@ -125,6 +127,9 @@ export type FieldArrayItemVariantProps = VariantProps<typeof fieldArrayItemVaria
 /** @deprecated Use `fieldArrayItemVariants` — retained for legacy class assertions. */
 export const fieldArrayItemClasses = fieldArrayItemVariants({ variant: 'detailed' })
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
+/** Column stack for a reset leaf `<fieldset>` whose chrome lives on a wrapping shell. */
+export const fieldSetChromeContainClasses = 'flex flex-col'
+export const fieldSetInFlowLegendClasses = 'min-w-0 p-0'
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
 /**

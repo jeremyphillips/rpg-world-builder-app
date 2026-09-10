@@ -7,7 +7,8 @@ import type { FieldGroupChrome } from './field-group-chrome.variants'
 import { resolveFieldGroupChromeClassNames } from './field-group-chrome.variants'
 import { resolveFieldGroupCollapseKey } from './field-group-collapse.lib'
 import type { FieldGroupDisclosure } from './field-group-disclosure.types'
-import { isSummaryDisclosure } from './field-group-disclosure.types'
+import { isDialogDisclosure, isInlineDisclosure } from './field-group-disclosure.types'
+import { FieldGroupDialogRoute } from './field-group-dialog-route.client'
 import { FieldGroupSummaryRoute } from './field-group-summary-route.client'
 import { StandardFieldGroupBody } from './field-group-standard-body.client'
 import {
@@ -49,7 +50,7 @@ export interface FieldGroupProps {
    * Stable key for collapsible persistence — defaults to `id` or a slug of `legend`.
    */
   collapseKey?: string
-  /** Required for `disclosure.variant: 'summary'`. */
+  /** Required for `disclosure.variant: 'inline' | 'dialog'`. */
   formControl?: Control<FieldValues>
   children: React.ReactNode
 }
@@ -86,7 +87,24 @@ export function FieldGroup({
     legend,
   })
 
-  if (disclosure && isSummaryDisclosure(disclosure)) {
+  if (disclosure && isDialogDisclosure(disclosure)) {
+    return (
+      <FieldGroupDialogRoute
+        id={id}
+        legend={legend}
+        size={size}
+        rhythm={rhythm}
+        className={className}
+        collapseKey={resolvedCollapseKey}
+        disclosure={disclosure}
+        formControl={formControl}
+      >
+        {children}
+      </FieldGroupDialogRoute>
+    )
+  }
+
+  if (disclosure && isInlineDisclosure(disclosure)) {
     return (
       <FieldGroupSummaryRoute
         id={id}

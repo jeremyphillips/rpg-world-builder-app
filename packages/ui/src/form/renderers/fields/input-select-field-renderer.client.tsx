@@ -3,6 +3,7 @@
 import { useController, useWatch } from 'react-hook-form'
 
 import { InputSelectField } from '../../../components/ui/input-select-field.client'
+import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import { resolveValueDigitsFromConfig } from '../../config/input-field-value-digits.lib'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
@@ -97,6 +98,7 @@ export function InputSelectFieldRenderer({
   return (
     <InputSelectField
       id={id}
+      {...pickFieldChromeProps(config)}
       label={config.label}
       inputType={config.inputType}
       options={config.options ?? []}

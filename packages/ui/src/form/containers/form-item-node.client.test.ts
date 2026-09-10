@@ -17,4 +17,13 @@ describe('formItemKey', () => {
 
     expect(formItemKey(field, 0, 'items.0')).toBe('items.0.label-text-0')
   })
+
+  it('keys unnamed containers by kind and index', () => {
+    expect(formItemKey({ kind: 'columns', columns: [{ fields: [] }, { fields: [] }] }, 0)).toBe(
+      'columns-0',
+    )
+    expect(formItemKey({ kind: 'group', legend: 'Basics', fields: [] }, 2, 'panel')).toBe(
+      'panel.group-2',
+    )
+  })
 })

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { BookOpen, Flag, ListChecks, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
 import { SegmentedControl } from './segmented-control.client'
@@ -41,6 +42,25 @@ export const SearchFilterCounts: Story = {
       { value: 'characters', label: 'Characters', metadata: '3' },
       { value: 'content', label: 'Content', metadata: '14' },
       { value: 'game-terms', label: 'Game Terms', metadata: '7' },
+    ],
+    onValueChange: () => undefined,
+  },
+  render: (args) => {
+    const [value, setValue] = useState(args.value)
+    return <SegmentedControl {...args} value={value} onValueChange={(next) => setValue(next)} />
+  },
+}
+
+export const LeadingIcons: Story = {
+  args: {
+    'aria-label': 'Form sections',
+    value: 'basics',
+    fullWidth: true,
+    options: [
+      { value: 'basics', label: 'Basics', leadingIcon: <BookOpen aria-hidden /> },
+      { value: 'proficiencies', label: 'Proficiencies', leadingIcon: <ListChecks aria-hidden /> },
+      { value: 'spellcasting', label: 'Spellcasting', leadingIcon: <Sparkles aria-hidden /> },
+      { value: 'features', label: 'Features', leadingIcon: <Flag aria-hidden /> },
     ],
     onValueChange: () => undefined,
   },
