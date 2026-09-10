@@ -15,6 +15,7 @@ import {
 } from '../../components/ui/field-group-disclosure.types'
 import {
   fieldGroupBottomMarginClasses,
+  fieldGroupSectionOuterMarginResetClasses,
   fieldSetChromeContainClasses,
   fieldStackRhythmVariants,
 } from '../../components/ui/field.variants'
@@ -225,9 +226,10 @@ export function GroupFieldSection({
       className={cn(
         item.className,
         wrapEntireGroup && fieldSetChromeContainClasses,
-        (inParentRhythm || wrapEntireGroup) && 'mb-0',
+        (inParentRhythm || wrapEntireGroup) && fieldGroupSectionOuterMarginResetClasses,
       )}
       chrome={item.chrome}
+      fieldChrome={groupFieldChrome}
       disclosure={item.disclosure}
       uiStateKey={uiStateKey}
       collapseKey={item.id}

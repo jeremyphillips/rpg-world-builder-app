@@ -79,6 +79,7 @@ function buildPlayerAccessField(ctx: CampaignAccessFormCtx): GroupFieldItem {
     kind: 'dependent',
     controller: playerAccess,
     dependents: {
+      chrome: 'rail',
       visibility: {
         dependsOn: ['available', 'visibilityMode'],
         visibleWhen: (values) =>

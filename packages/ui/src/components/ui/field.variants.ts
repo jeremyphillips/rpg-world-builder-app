@@ -68,6 +68,8 @@ export const fieldAnatomyStackClasses = fieldAnatomyStackVariants({ size: 'md' }
 export const fieldLabelHintStackClasses = 'flex flex-col gap-1'
 export const fieldGroupStackClasses = 'flex flex-col gap-6'
 export const fieldGroupBottomMarginClasses = 'mb-8'
+/** Omits standalone group bottom margin when a parent rhythm stack owns sibling gap. */
+export const fieldGroupSectionOuterMarginResetClasses = 'mb-0'
 export const fieldGroupFlexStackClasses = 'flex flex-col gap-8'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'

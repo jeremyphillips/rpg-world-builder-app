@@ -1,6 +1,8 @@
 import { CONTENT_VISIBILITY_MODE_ENTRIES, type ContentCampaignAccessPatch } from '@rpg/contracts'
 import type { FieldGroupSummary } from '@rpg/ui/form'
 
+import { resolveAvailabilityStatusSummary } from '@/lib/campaign-availability/availability-status-summary.lib'
+
 function formatSpecificPlayersCount(count: number): string {
   return count === 1 ? '1 specific player' : `${count} specific players`
 }
@@ -19,18 +21,5 @@ export function resolveCampaignAccessDetail(
 export function resolveCampaignAccessSummary(
   access: Pick<ContentCampaignAccessPatch, 'available' | 'visibilityMode' | 'participantIds'>,
 ): FieldGroupSummary {
-  const detail = resolveCampaignAccessDetail(access)
-
-  if (!access.available) {
-    return {
-      status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
-      detail,
-      chrome: { variant: 'accent', tone: 'warning', emphasis: 'faint' },
-    }
-  }
-
-  return {
-    status: { label: 'Available', tone: 'success', indicator: 'dot' },
-    detail,
-  }
+  return resolveAvailabilityStatusSummary(access.available, resolveCampaignAccessDetail(access))
 }

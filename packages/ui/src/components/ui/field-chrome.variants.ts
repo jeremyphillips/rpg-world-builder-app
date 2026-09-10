@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { resolveChromeOutlineClasses, resolveChromePanelClasses } from './chrome.variants'
-import { fieldShellLayoutClasses, resolveOutlineBorderClasses } from './field-surface.variants'
+import { fieldShellLayoutClasses } from './field-surface.variants'
 import { resolveSurfaceClasses } from './surface.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import type {
@@ -181,29 +181,4 @@ export function resolveFieldChromeClassNames(
     default:
       return ''
   }
-}
-
-/** Resolves classes for a row/slot shared container shell. */
-export function resolveFieldContainerShellClassNames(chrome: FieldChrome | undefined): string {
-  const normalized = normalizeFieldChrome(chrome)
-  if (!normalized || normalized.variant === 'none') return ''
-
-  if (normalized.variant === 'container') {
-    return resolveFieldContainerClasses(normalized)
-  }
-
-  if (normalized.variant === 'panel') {
-    return resolveChromePanelClasses(normalized, 'field', fieldChromePaddingContainerClasses)
-  }
-
-  if (normalized.variant === 'outline') {
-    return cn(
-      fieldShellLayoutClasses,
-      fieldChromePaddingContainerClasses,
-      'bg-transparent',
-      resolveOutlineBorderClasses(normalized.emphasis, normalized.tone, normalized.borderAccent),
-    )
-  }
-
-  return ''
 }

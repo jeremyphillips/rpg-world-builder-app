@@ -1,4 +1,8 @@
-import type { FormItem, FieldGroupSummary, FormDensity } from '@rpg/ui/form'
+import type { FieldGroupSummary, FormItem, FormDensity } from '@rpg/ui/form'
+
+import { resolveVocabularyAvailabilitySummary } from './availability-status-summary.lib'
+
+export { resolveVocabularyAvailabilitySummary }
 
 import {
   CAMPAIGN_ACCESS_AVAILABLE_HINT,
@@ -22,18 +26,6 @@ export type CampaignAvailabilityFieldCtx = {
   availabilityField?: FormItem
   /** Where the editor renders. Defaults to in-place disclosure. */
   presentation?: CampaignAvailabilityPresentation
-}
-
-export function resolveVocabularyAvailabilitySummary(available: boolean): FieldGroupSummary {
-  if (!available) {
-    return {
-      status: { label: 'Unavailable', tone: 'warning', indicator: 'inactive' },
-    }
-  }
-
-  return {
-    status: { label: 'Available', tone: 'success', indicator: 'dot' },
-  }
 }
 
 function defaultAvailabilitySwitchField(pending: boolean): FormItem {

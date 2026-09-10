@@ -2,6 +2,13 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
+import {
+  CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
+  CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE,
+  CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
+  CONTENT_FORM_IDENTITY_LAYOUT_STACKED,
+} from '../content-form-presentation.lib'
+
 const organizationCreateModalPath = fileURLToPath(
   new URL(
     '../../../../organizations/components/create/organization-create-modal.tsx',
@@ -21,17 +28,29 @@ const contentFormLayoutPath = fileURLToPath(
 describe('campaign availability overlay presentation drift guard', () => {
   it('requires overlay hosts to opt into disclosure presentation', () => {
     expect(readFileSync(organizationCreateModalPath, 'utf8')).toContain(
-      'availabilityPresentation="disclosure"',
+      'CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE',
     )
     expect(readFileSync(locationCreateFormPath, 'utf8')).toContain(
-      'availabilityPresentation="disclosure"',
+      'CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE',
     )
-    expect(readFileSync(subclassEditorPanelPath, 'utf8')).toContain('presentation="disclosure"')
+    expect(readFileSync(subclassEditorPanelPath, 'utf8')).toContain(
+      'CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE',
+    )
+    expect(readFileSync(subclassEditorPanelPath, 'utf8')).toContain(
+      'buildContentAvailabilitySlotItem',
+    )
   })
 
   it('requires the page shell to opt into dialog presentation', () => {
     const source = readFileSync(contentFormLayoutPath, 'utf8')
-    expect(source).toContain("availabilityPresentation: 'dialog'")
-    expect(source).toContain("identityLayout: 'inline'")
+    expect(source).toContain('CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG')
+    expect(source).toContain('CONTENT_FORM_IDENTITY_LAYOUT_INLINE')
+  })
+
+  it('keeps presentation constants stable', () => {
+    expect(CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE).toBe('disclosure')
+    expect(CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG).toBe('dialog')
+    expect(CONTENT_FORM_IDENTITY_LAYOUT_STACKED).toBe('stacked')
+    expect(CONTENT_FORM_IDENTITY_LAYOUT_INLINE).toBe('inline')
   })
 })

@@ -724,6 +724,33 @@ describe('TabbedForm', () => {
     expect(screen.queryByText(/fields need attention/i)).not.toBeInTheDocument()
   })
 
+  it('uses segmented-control section semantics with aria-controls and hidden inactive panels', () => {
+    render(
+      <TabbedForm<TestValues> id="campaign-form" schema={schema} tabs={tabs} onSubmit={vi.fn()} />,
+    )
+
+    const identityTrigger = screen.getByRole('button', { name: 'Identity' })
+    const rulesPanel = document.getElementById('campaign-form-panel-rules')
+    const identityPanel = document.getElementById('campaign-form-panel-identity')
+
+    expect(identityTrigger).toHaveAttribute('aria-controls', 'campaign-form-panel-identity')
+    expect(identityTrigger).toHaveAttribute('aria-pressed', 'true')
+    expect(rulesPanel).toHaveClass('hidden')
+    expect(identityPanel).not.toHaveClass('hidden')
+  })
+
+  it('activates sections with arrow keys on the segmented control', async () => {
+    const user = userEvent.setup()
+    render(<TabbedForm<TestValues> schema={schema} tabs={tabs} onSubmit={vi.fn()} />)
+
+    const identityTrigger = screen.getByRole('button', { name: 'Identity' })
+    identityTrigger.focus()
+    await user.keyboard('{ArrowRight}')
+
+    expect(screen.getByRole('button', { name: 'Rules' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByLabelText('Starting level')).toBeInTheDocument()
+  })
+
   it('has no accessibility violations', async () => {
     const user = userEvent.setup()
     const { container } = render(

@@ -13,6 +13,9 @@ export const fieldGroupSummaryDisclosureLegendVariants = cva('', {
   },
 })
 
+/** Collapsed legend + summary trigger stack inside inline disclosure groups. */
+export const fieldGroupSummaryDisclosureShellClasses = 'flex min-w-0 flex-col gap-1'
+
 /** Status row container — indicator, label, and detail at field label scale. */
 export const fieldGroupSummaryStatusLineVariants = cva('flex min-w-0 items-center gap-1.5', {
   variants: {

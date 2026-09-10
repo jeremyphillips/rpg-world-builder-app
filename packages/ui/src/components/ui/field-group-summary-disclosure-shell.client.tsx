@@ -5,6 +5,7 @@ import type { Control, FieldValues } from 'react-hook-form'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
+import type { FieldChrome } from './field-chrome.variants'
 import type { FieldGroupChromeClassNames } from './field-group-chrome.variants'
 import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosure as FieldGroupSummaryDisclosureView } from './field-group-summary-disclosure.client'
@@ -23,6 +24,7 @@ export type SummaryDisclosureFieldGroupShellProps = {
   uiStateKey?: string
   collapseKey: string
   chromeClasses: FieldGroupChromeClassNames
+  fieldChrome?: FieldChrome
   disclosure: FieldGroupSummaryDisclosure
   formControl: Control<FieldValues>
   children: ReactNode
@@ -38,6 +40,7 @@ export function SummaryDisclosureFieldGroupShell({
   uiStateKey,
   collapseKey,
   chromeClasses,
+  fieldChrome,
   disclosure,
   formControl,
   children,
@@ -64,6 +67,7 @@ export function SummaryDisclosureFieldGroupShell({
         size={size}
         rhythm={rhythm}
         chromeBodyClassName={chromeClasses.body}
+        fieldChrome={fieldChrome}
         disclosure={disclosure}
         uiStateKey={uiStateKey}
         collapseKey={collapseKey}

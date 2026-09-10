@@ -11,14 +11,15 @@ import {
 import { accordionContentVariants } from './accordion.variants'
 import { Button } from './button.client'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
-import { DEFAULT_FIELD_CHROME } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
+import type { FieldChrome } from './field-chrome.variants'
 import type { FieldSize } from './field.client'
 import type { FieldGroupSummary, FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosureCollapsed } from './field-group-summary-disclosure-collapsed.client'
 import { FieldGroupSummaryDisclosureExpandedHeader } from './field-group-summary-disclosure-expanded-header.client'
 import {
   fieldGroupSummaryDisclosureFooterClasses,
+  fieldGroupSummaryDisclosureShellClasses,
   resolveFieldGroupSummaryDisclosurePanelClasses,
 } from './field-group-summary-disclosure.variants'
 import {
@@ -63,6 +64,7 @@ export type FieldGroupSummaryDisclosureProps<TFieldValues extends FieldValues = 
   size?: FieldSize
   rhythm?: FieldRhythm
   chromeBodyClassName?: string
+  fieldChrome?: FieldChrome
   disclosure: FieldGroupSummaryDisclosure
   uiStateKey?: string
   collapseKey: string
@@ -121,6 +123,7 @@ function FieldGroupSummaryDisclosurePanel({
   size,
   rhythm,
   chromeBodyClassName,
+  fieldChrome,
   closeLabel,
   disabled,
   panelId,
@@ -130,6 +133,7 @@ function FieldGroupSummaryDisclosurePanel({
   size: FieldSize
   rhythm: FieldRhythm
   chromeBodyClassName?: string
+  fieldChrome?: FieldChrome
   closeLabel: string
   disabled: boolean
   panelId: string
@@ -167,7 +171,7 @@ function FieldGroupSummaryDisclosurePanel({
 
   return (
     <FieldChromeShell
-      chrome={DEFAULT_FIELD_CHROME}
+      chrome={fieldChrome}
       size={size}
       className={fieldStackRhythmVariants({ rhythm })}
     >
@@ -184,6 +188,7 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
   size = 'md',
   rhythm = 'compact',
   chromeBodyClassName,
+  fieldChrome,
   disclosure,
   uiStateKey,
   collapseKey,
@@ -213,7 +218,11 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
     : undefined
 
   return (
-    <Collapsible open={open} onOpenChange={onOpenChange} className="flex min-w-0 flex-col gap-1">
+    <Collapsible
+      open={open}
+      onOpenChange={onOpenChange}
+      className={fieldGroupSummaryDisclosureShellClasses}
+    >
       <FieldGroupSummaryDisclosureHeader
         open={open}
         legend={legend}
@@ -234,6 +243,7 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
             size={size}
             rhythm={rhythm}
             chromeBodyClassName={chromeBodyClassName}
+            fieldChrome={fieldChrome}
             closeLabel={closeLabel}
             disabled={disabled}
             panelId={panelId}

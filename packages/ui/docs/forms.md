@@ -33,6 +33,11 @@ All tab panels stay mounted so every field registers and Save validates the **me
 Section navigation is a [`SegmentedControl`](../src/components/ui/segmented-control.client.tsx)
 in the same field-stack column as `FormItems` / FieldGroups.
 
+**Accessibility model:** TabbedForm intentionally uses a **toggle-button group** (`role="group"`,
+`aria-pressed`, `aria-controls`) — not the WAI-ARIA Tabs pattern. Section buttons activate on
+click and on arrow keys; inactive panels stay mounted but use the `hidden` class. This matches
+settings-style section switching rather than roving tablist focus.
+
 After the first failed submit, invalid sections show **count badges** on their triggers, the form
 **auto-switches** to the first invalid section and focuses its control, and a **footer summary**
 (`role="status"`) lists affected tabs with **Review {tab}** actions. Badges and the summary

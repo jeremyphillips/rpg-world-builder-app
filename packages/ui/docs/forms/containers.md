@@ -87,6 +87,19 @@ exclusive** — omit for plain fieldset behavior.
 `chrome` composes with `disclosure` — e.g. `outline` surface on the field stack inside an
 inline-disclosure group.
 
+### Group `fieldChrome` vs `chrome`
+
+Two knobs — do not stack redundant boxes:
+
+| Knob                          | Owns                                                                         | Use for                                                     |
+| ----------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `fieldChrome`                 | Shared **field container** around the whole group (legend + fields)          | Default boxed sections, campaign availability identity rows |
+| `chrome` (`FieldGroupChrome`) | Semantic treatment on the **field stack** (rail, panel, outline, callout, …) | Legend stays outside; decorates dependents only             |
+
+Inline disclosure groups skip the outer `fieldChrome` wrap while collapsed; the **expanded**
+panel uses the resolved `fieldChrome` via `FieldChromeShell` (same path as non-disclosure
+groups). `chrome` body classes still win when both are set.
+
 ### Group `disclosure`
 
 Optional open/collapse and summary behavior. Composes with `chrome`.
@@ -176,6 +189,10 @@ below `md` so tab order matches the single-column layout — do not use CSS `ord
 | `'columns'` (default) | Concatenate left to right — CSS-only                                         |
 | `'interleave'`        | Zip `c1[0], c2[0], c1[1], c2[1], …` then leftovers — `matchMedia` below `md` |
 | tuple list            | Explicit `[columnIndex, fieldIndex]` pairs; every field exactly once         |
+
+Custom `collapseOrder` values other than `'columns'` use `matchMedia` below `md` — expect a
+single-column first paint that remounts to the wide grid after hydration. Prefer `'columns'`
+(default) when tab order matches left-to-right stacking.
 
 Prefer `defineColumnsField()` for completion.
 
@@ -293,9 +310,10 @@ whole list.
 
 **Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
 borderless `<fieldset>` (legend, description, and field stack) in `FieldChromeShell`,
-matching chip and choose-count fields — UA legend overlay cannot sit on the container
-border. Summary-disclosure groups still wrap only the expanded field stack so collapsed
-summary chrome stays outside the box.
+matching chip, choose-count, and `EditableGrid` fields — UA legend overlay cannot sit on
+the container border. Use `FieldsetChromeFrame` so `<legend>` stays a direct fieldset child.
+Summary-disclosure groups still wrap only the expanded field stack so collapsed summary
+chrome stays outside the box.
 
 Resolution order:
 

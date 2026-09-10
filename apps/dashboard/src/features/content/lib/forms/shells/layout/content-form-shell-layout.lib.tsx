@@ -11,7 +11,7 @@ import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes
 import type { CampaignAvailabilityPresentation } from '@/lib/campaign-availability/campaign-availability-form-fields'
 
 import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context'
-import { CampaignAvailabilityField } from '../../../campaign-access/campaign-availability-field'
+import { buildContentAvailabilitySlotItem } from '../../fields/content-availability-slot.lib'
 import {
   useContentSaveSession,
   type CoordinatedSaveSavedEvent,
@@ -20,7 +20,6 @@ import { ContentFormFooter } from './content-form-footer'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 import {
   buildContentIdentityFields,
-  CONTENT_IDENTITY_AVAILABILITY_SLOT_NAME,
   type ContentIdentityLayout,
 } from '../../fields/content-identity-form-fields'
 
@@ -54,22 +53,16 @@ export function ContentFormHeader({
   const idPrefix = formKey ?? 'content-form'
   const nameItem = def.nameField(ctx)
   const availabilityItem: FormItem | undefined = campaignId
-    ? {
-        kind: 'slot',
-        name: CONTENT_IDENTITY_AVAILABILITY_SLOT_NAME,
-        render: () => (
-          <CampaignAvailabilityField
-            campaignId={campaignId}
-            targetType={def.routeKey as ContentTypeKey}
-            entityId={entityId}
-            density={density}
-            presentation={availabilityPresentation}
-            initialAccess={campaignAccess}
-            onDraftChange={onCampaignAccessDraftChange}
-            onPersistedChange={onCampaignAccessPersisted}
-          />
-        ),
-      }
+    ? buildContentAvailabilitySlotItem({
+        campaignId,
+        targetType: def.routeKey as ContentTypeKey,
+        entityId,
+        density,
+        presentation: availabilityPresentation,
+        initialAccess: campaignAccess,
+        onDraftChange: onCampaignAccessDraftChange,
+        onPersistedChange: onCampaignAccessPersisted,
+      })
     : undefined
 
   const items = availabilityItem

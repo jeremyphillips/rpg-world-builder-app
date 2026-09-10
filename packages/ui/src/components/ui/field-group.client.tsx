@@ -3,6 +3,7 @@
 import type { Control, FieldValues } from 'react-hook-form'
 
 import type { FieldSize } from './field.client'
+import type { FieldChrome } from './field-chrome.variants'
 import type { FieldGroupChrome } from './field-group-chrome.variants'
 import { resolveFieldGroupChromeClassNames } from './field-group-chrome.variants'
 import { resolveFieldGroupCollapseKey } from './field-group-collapse.lib'
@@ -39,6 +40,8 @@ export interface FieldGroupProps {
   id?: string
   /** Visual treatment for the legend + field stack — variants are mutually exclusive. */
   chrome?: FieldGroupChrome
+  /** Resolved field-container chrome for inline disclosure expanded panels. */
+  fieldChrome?: FieldChrome
   /** Open/collapse and summary behavior for the group container. */
   disclosure?: FieldGroupDisclosure
   /**
@@ -68,6 +71,7 @@ export function FieldGroup({
   className,
   id,
   chrome,
+  fieldChrome,
   disclosure,
   uiStateKey,
   collapseKey,
@@ -115,6 +119,7 @@ export function FieldGroup({
         uiStateKey={uiStateKey}
         collapseKey={resolvedCollapseKey}
         chromeClasses={chromeClasses}
+        fieldChrome={fieldChrome}
         disclosure={disclosure}
         formControl={formControl}
       >

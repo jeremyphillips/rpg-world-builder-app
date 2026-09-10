@@ -44,6 +44,20 @@ describe('proficienciesFields', () => {
     expect(armorChips).not.toHaveProperty('chrome')
   })
 
+  it('uses rail chrome on the weapon proficiency grant-set dependents', () => {
+    const weaponsGroup = proficienciesColumns().columns[1]?.fields[0]
+    if (!weaponsGroup || !isContainer(weaponsGroup) || weaponsGroup.kind !== 'group') {
+      throw new Error('Expected Weapons group')
+    }
+
+    const [weaponGrantSet] = weaponsGroup.fields
+    if (!weaponGrantSet || !isContainer(weaponGrantSet) || weaponGrantSet.kind !== 'dependent') {
+      throw new Error('Expected weapon proficiency dependent')
+    }
+
+    expect(weaponGrantSet.dependents).toMatchObject({ chrome: 'rail' })
+  })
+
   it('gives granted tools its own group with category and item fields', () => {
     const toolsGroup = proficienciesColumns().columns[1]?.fields[1]
     if (!toolsGroup || !isContainer(toolsGroup) || toolsGroup.kind !== 'group') {
