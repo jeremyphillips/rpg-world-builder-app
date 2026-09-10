@@ -364,7 +364,12 @@ These modules support many content types but are **not** per-type form splits:
 | Campaign rules from ctx   | `content/lib/form-options/content-campaign-rules.ts`                                                                                                                                                                                                                              |
 | Level select builders     | `content/lib/form-options/level-field-options.ts`                                                                                                                                                                                                                                 |
 | Create/edit shells        | `content/lib/forms/shells/` — `layout/`, `create/`, `edit/`, `host/`, `submit/`, `session/`                                                                                                                                                                                       |
+| Preview rail glue         | `content/lib/forms/preview/` — `ContentFormDef.preview` contract, publish-readiness hook, rail/sheet/player hosts. Per-type projections live next to `*-form-def.ts` (Class: `classes/lib/class-preview-projection.ts`). Types without `preview` keep today's NarrowPage layout.  |
 | Cross-consumer projection | `content/lib/forms/organization-form-projection.ts` (root seam — sole shared projection today)                                                                                                                                                                                    |
+
+### `ContentFormDef.preview`
+
+Optional. When present, create/edit shells switch to `WidePage`, inline form-column breadcrumbs, and a `2xl` persistent PreviewRail (sheet + compact **Preview** trigger below that). Register three builders — `buildIdentity`, `buildSections`, `buildPreviewDetail` — keyed so `buildSections` keys **exactly equal** `buildTabs` ids (`null` = explicit opt-out). Shared copy comes from `CONTENT_TYPE_TERMS`. Publish readiness uses `resolveContentPublishSchema` (the same helper as the Publish action). Class is the reference implementation (`class-preview-projection.ts`); types without `preview` keep NarrowPage.
 
 ### Create vs edit action state
 

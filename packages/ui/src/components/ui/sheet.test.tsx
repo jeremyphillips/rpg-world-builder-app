@@ -108,6 +108,16 @@ describe('Sheet', () => {
     expect(dialog).toHaveFocus()
   })
 
+  it('anchors a bottom sheet to the viewport bottom', async () => {
+    const user = userEvent.setup()
+    renderSheet({ side: 'bottom' })
+    await user.click(screen.getByRole('button', { name: 'Open sheet' }))
+    const dialog = await screen.findByRole('dialog')
+
+    expect(dialog).toHaveClass('inset-x-0', 'bottom-0', 'max-w-none')
+    expect(dialog.className).toContain('slide-in-from-bottom')
+  })
+
   it('hosts combobox popovers inside the sheet content layer', async () => {
     const user = userEvent.setup()
     const options = Array.from({ length: 20 }, (_, index) => ({

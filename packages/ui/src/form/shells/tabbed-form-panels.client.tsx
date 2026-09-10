@@ -25,7 +25,9 @@ import {
   formFooterSpacingClasses,
   formStickyTabsClasses,
   formTabbedInactivePanelClasses,
+  formTabbedNavControlWrapClasses,
   formTabbedNavOverflowClasses,
+  formTabbedNavWithTrailingClasses,
   formTabPanelsBottomPaddingClasses,
 } from '../chrome/form-chrome.variants'
 import { warnHeaderOnlyTabValidationWiring } from './warn-header-only-tab-validation-wiring'
@@ -133,6 +135,8 @@ interface TabbedFormPanelsProps {
   stickyTabsClassName?: string
   /** When true, skip extra bottom padding (external footer owns spacing). */
   omitPanelBottomPadding: boolean
+  /** Trailing control on the sticky tab row (hidden by the consumer below `2xl` as needed). */
+  tabRowTrailing?: React.ReactNode
 }
 
 function TabbedFormTabPanel({
@@ -196,6 +200,7 @@ export function TabbedFormPanels({
   stickyChrome,
   stickyTabsClassName,
   omitPanelBottomPadding,
+  tabRowTrailing,
 }: TabbedFormPanelsProps) {
   const { density } = useFormSectionContext()
   const { rhythm } = resolveFormDensity(density)
@@ -213,23 +218,33 @@ export function TabbedFormPanels({
     fieldStackRhythmVariants({ rhythm }),
     stickyChrome && !omitPanelBottomPadding ? formTabPanelsBottomPaddingClasses : undefined,
   )
+  const sectionControl = (
+    <SegmentedControl
+      value={activeTabId}
+      options={sectionOptions}
+      onValueChange={onActiveTabChange}
+      fullWidth
+      aria-label={TABBED_FORM_SECTIONS_ARIA_LABEL}
+    />
+  )
 
   return (
     <div className={fieldStackRhythmVariants({ rhythm })}>
       <div
         className={cn(
-          formTabbedNavOverflowClasses,
+          tabRowTrailing ? formTabbedNavWithTrailingClasses : formTabbedNavOverflowClasses,
           stickyChrome ? formStickyTabsClasses : undefined,
           stickyTabsClassName,
         )}
       >
-        <SegmentedControl
-          value={activeTabId}
-          options={sectionOptions}
-          onValueChange={onActiveTabChange}
-          fullWidth
-          aria-label={TABBED_FORM_SECTIONS_ARIA_LABEL}
-        />
+        {tabRowTrailing ? (
+          <>
+            <div className={formTabbedNavControlWrapClasses}>{sectionControl}</div>
+            {tabRowTrailing}
+          </>
+        ) : (
+          sectionControl
+        )}
       </div>
       {tabs.map((tab) => (
         <TabbedFormTabPanel

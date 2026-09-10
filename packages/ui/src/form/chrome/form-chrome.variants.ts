@@ -11,6 +11,25 @@ export const formStickyTabsTransparentClasses =
 /** Keeps a long segmented section control scrollable inside the field column. */
 export const formTabbedNavOverflowClasses = 'min-w-0 overflow-x-auto'
 
+/** Tab row with a trailing compact action (e.g. Preview below `2xl`). */
+export const formTabbedNavWithTrailingClasses = 'flex items-center gap-2'
+
+/** Scrollable segmented control when a trailing action shares the sticky tab row. */
+export const formTabbedNavControlWrapClasses = 'min-w-0 flex-1 overflow-x-auto'
+
+/**
+ * TabbedForm body + aside grid. Below `2xl` the form column stays `max-w-4xl` and
+ * centered; at `2xl` the rail sits in a second column (~21rem) with a large gap.
+ */
+export const formTabbedAsideGridClasses =
+  'mx-auto w-full max-w-4xl 2xl:mx-0 2xl:grid 2xl:max-w-none 2xl:grid-cols-[minmax(0,56rem)_21rem] 2xl:items-start 2xl:gap-6'
+
+export const formTabbedAsideBodyClasses = 'min-w-0 2xl:col-start-1 2xl:row-start-1'
+
+export const formTabbedAsideSlotClasses = 'hidden min-w-0 2xl:col-start-2 2xl:row-start-1 2xl:block'
+
+export const formTabbedAsideFooterClasses = 'min-w-0 2xl:col-start-1 2xl:row-start-2'
+
 /** Visually hide inactive TabbedForm panels while keeping them mounted. */
 export const formTabbedInactivePanelClasses = 'hidden'
 

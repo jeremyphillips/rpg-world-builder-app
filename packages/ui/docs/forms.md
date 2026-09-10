@@ -68,6 +68,17 @@ when fields live outside the tab's `fields` array.
 }
 ```
 
+### Aside + compact Preview
+
+Optional `aside` renders inside `FormProvider` (consumers use `useWatch` / `useFormContext`).
+When present, the body is a two-column grid from `2xl`: form column `minmax(0, 56rem)`, aside
+`21rem`, gap `gap-6`. The sticky footer stays in the form column. Below `2xl` the aside is
+hidden. `tabRowTrailing` places a compact action on the sticky tab row (dashboard uses this
+for **Preview**). `TabbedFormChromeContext` exposes `activeTabId`.
+
+Classes: `formTabbedAsideGridClasses` and siblings in `form-chrome.variants.ts`. PreviewRail
+primitives live in `@rpg/ui` (`PreviewRail`).
+
 Content catalog examples: `buildSpeciesTabs` and `buildClassTabs` in the dashboard
 species/class `*-form-fields.ts` modules.
 

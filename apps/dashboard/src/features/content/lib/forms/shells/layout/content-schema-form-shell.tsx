@@ -17,6 +17,12 @@ import {
   ContentFormSaveFooter,
   type ContentFormFooterShellProps,
 } from './content-form-shell-layout.lib'
+import { hasContentFormPreview } from '../../preview/content-form-preview.types'
+import {
+  ContentPreviewCompactTrigger,
+  ContentPreviewRail,
+} from '../../preview/content-preview-rail'
+import { ContentPreviewUiProvider } from '../../preview/content-preview-ui-context'
 
 interface ContentSchemaFormShellProps<
   TFormValues extends FieldValues,
@@ -38,6 +44,7 @@ interface ContentSchemaFormShellProps<
   headerPrefix?: React.ReactNode
   fields?: FormItem[]
   tabs?: TabbedFormTab[]
+  previewDraftBadge?: boolean
 }
 
 function useContentSchemaSubmitHandler<TFormValues extends FieldValues>(
@@ -112,6 +119,7 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
   saveDraftPending,
   onSaved,
   onLeaveGuardReady,
+  previewDraftBadge = false,
 }: ContentSchemaFormShellProps<TFormValues>) {
   const handleSubmit = useContentSchemaSubmitHandler(onSubmit, beforeSubmit)
   const footerShellProps: ContentFormFooterShellProps<TFormValues> = {
@@ -146,22 +154,37 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
     />
   )
 
+  const previewEnabled = hasContentFormPreview(headerProps.def) && Boolean(tabs)
+
   return (
     <CampaignAccessFormProvider>
       {tabs ? (
-        <TabbedForm<TFormValues>
-          key={formKey}
-          id={formKey}
-          uiStateKey={formKey}
-          schema={schema}
-          tabs={tabs}
-          defaultValues={defaultValues}
-          valueSyncs={valueSyncs}
-          onSubmit={handleSubmit}
-          formError={formError}
-          header={header}
-          footer={footer}
-        />
+        <ContentPreviewUiProvider>
+          <TabbedForm<TFormValues>
+            key={formKey}
+            id={formKey}
+            uiStateKey={formKey}
+            schema={schema}
+            tabs={tabs}
+            defaultValues={defaultValues}
+            valueSyncs={valueSyncs}
+            onSubmit={handleSubmit}
+            formError={formError}
+            header={header}
+            footer={footer}
+            aside={
+              previewEnabled ? (
+                <ContentPreviewRail
+                  def={headerProps.def}
+                  ctx={headerProps.ctx}
+                  tabs={tabs}
+                  showDraftBadge={previewDraftBadge}
+                />
+              ) : undefined
+            }
+            tabRowTrailing={previewEnabled ? <ContentPreviewCompactTrigger /> : undefined}
+          />
+        </ContentPreviewUiProvider>
       ) : (
         <Form<TFormValues>
           key={formKey}

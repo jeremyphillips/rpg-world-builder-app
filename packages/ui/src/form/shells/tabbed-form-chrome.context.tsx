@@ -7,6 +7,7 @@ import type { TabbedFormTab } from './tabbed-form-panels.client'
 export type TabbedFormChromeContextValue = {
   formId: string
   tabs: TabbedFormTab[]
+  activeTabId: string
   setActiveTabId: (tabId: string) => void
 }
 

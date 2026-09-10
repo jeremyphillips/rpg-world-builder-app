@@ -16,6 +16,10 @@ import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
 import { FormRhythmStack } from '../context/form-section.context'
 import {
   formSheetScrollRegionClasses,
+  formTabbedAsideBodyClasses,
+  formTabbedAsideFooterClasses,
+  formTabbedAsideGridClasses,
+  formTabbedAsideSlotClasses,
   formTabbedChromeRhythmStackClasses,
 } from '../chrome/form-chrome.variants'
 import { cn } from '../../lib/utils'
@@ -98,6 +102,16 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   valueSyncs?: FormValueSync[]
   /** See `FormProps['validationPresentation']`. */
   validationPresentation?: FormValidationPresentation
+  /**
+   * Optional right-column content rendered inside `FormProvider` (e.g. a preview
+   * rail). Hidden below `2xl`; the footer stays in the form column.
+   */
+  aside?: React.ReactNode
+  /**
+   * Trailing control on the sticky tab/SegmentedControl row (e.g. a compact
+   * Preview trigger below `2xl`).
+   */
+  tabRowTrailing?: React.ReactNode
 }
 
 function buildExternalFooterContent(
@@ -142,6 +156,8 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   externalFooter = false,
   valueSyncs,
   validationPresentation,
+  aside,
+  tabRowTrailing,
 }: TabbedFormProps<TFieldValues>) {
   const generatedFormId = React.useId()
   const formId = id ?? generatedFormId
@@ -153,8 +169,8 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   const { form, validateSilently } = useTabbedFormSetup({ schema, tabs, defaultValues, mode })
   const allFields = React.useMemo(() => tabs.flatMap((tab) => tab.fields), [tabs])
   const tabbedChrome = React.useMemo(
-    () => ({ formId, tabs, setActiveTabId }),
-    [formId, tabs, setActiveTabId],
+    () => ({ formId, tabs, activeTabId, setActiveTabId }),
+    [formId, tabs, activeTabId, setActiveTabId],
   )
   const resolvedFooter = resolveSchemaFormFooter(footer, form)
   const resolvedHeader = resolveSchemaFormFooter(header, form)
@@ -202,6 +218,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       stickyChrome={stickyChrome}
       stickyTabsClassName={stickyTabsClassName}
       omitPanelBottomPadding={externalFooter}
+      tabRowTrailing={tabRowTrailing}
     />
   )
 
@@ -221,6 +238,31 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       {contentWrapper ? contentWrapper(panels) : panels}
     </FormRhythmStack>
   )
+
+  const footerRegion = !externalFooter ? (
+    <TabbedFormFooterRegion
+      hasFooterRegion={Boolean(formError || resolvedFooter)}
+      stickyChrome={stickyChrome}
+      stickyActionsBarClassName={stickyActionsBarClassName}
+      formError={formError}
+      validationSummary={validationSummary}
+      resolvedFooter={resolvedFooter}
+    />
+  ) : null
+
+  const defaultLayout =
+    aside && !externalFooter ? (
+      <div className={formTabbedAsideGridClasses}>
+        <div className={formTabbedAsideBodyClasses}>{defaultBody}</div>
+        <div className={formTabbedAsideSlotClasses}>{aside}</div>
+        <div className={formTabbedAsideFooterClasses}>{footerRegion}</div>
+      </div>
+    ) : (
+      <>
+        {defaultBody}
+        {footerRegion}
+      </>
+    )
 
   return (
     <TabbedFormChromeContext.Provider value={tabbedChrome}>
@@ -251,17 +293,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
           ? contentWrapper
             ? contentWrapper(externalFooterBody)
             : externalFooterBody
-          : defaultBody}
-        {!externalFooter ? (
-          <TabbedFormFooterRegion
-            hasFooterRegion={Boolean(formError || resolvedFooter)}
-            stickyChrome={stickyChrome}
-            stickyActionsBarClassName={stickyActionsBarClassName}
-            formError={formError}
-            validationSummary={validationSummary}
-            resolvedFooter={resolvedFooter}
-          />
-        ) : null}
+          : defaultLayout}
       </SchemaFormShell>
     </TabbedFormChromeContext.Provider>
   )

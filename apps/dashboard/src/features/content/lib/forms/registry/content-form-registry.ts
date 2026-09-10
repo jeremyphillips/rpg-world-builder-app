@@ -21,6 +21,7 @@ import type {
 
 import type { ContentListQueryResult } from '../../list/content-client'
 import type { ContentFormOptionSets } from '../../form-options/content-form-options'
+import type { ContentFormPreviewConfig } from '../preview/content-form-preview.types'
 
 /**
  * Context passed to `buildFields` / `buildTabs`. Carries campaign-scoped catalog
@@ -163,6 +164,11 @@ export interface ContentFormDef<
    *   `flattenFields(buildFields({}))` paths for flat types.
    */
   coverage?: 'structural' | 'roundtrip-only'
+  /**
+   * When set, create/edit shells use WidePage + inline breadcrumbs and reserve the
+   * preview rail slot. Projection builders are required when `preview` is present.
+   */
+  preview?: ContentFormPreviewConfig<TFormValues>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- all three params are erased at the registry boundary; each def is strongly typed internally

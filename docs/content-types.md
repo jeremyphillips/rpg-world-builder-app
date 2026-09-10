@@ -1079,6 +1079,10 @@ The class form (`class-form-def.ts`) binds a form-only composite `spellcasting.p
 
 See [packages/ui/docs/forms/field-types.md](../packages/ui/docs/forms/field-types.md#editable-grid-editablegrid) for the `editableGrid` field config shape.
 
+### Class preview rail
+
+Class create/edit registers `ContentFormDef.preview` (`class-preview-projection.ts`). The compact rail is structural `@rpg/ui` `PreviewRail` chrome plus a Class projection: live identity facts, per-tab section summaries, publish-schema readiness (same helper as Publish), and **Preview as player** (in-memory `ClassDetailViewModel` → `ClassDetailBody`). Types without a `preview` block keep today's NarrowPage layout.
+
 ### Read-only detail view
 
 `ClassProgressionTable` on the class detail page fill-forwards `cantrips` and `spellsAvailable`, shows resource columns from `resources[]`, and spell-slot columns via `formatSpellLevel` from `@rpg/contracts`. Stories: `Content/Classes/ClassProgressionTable`.

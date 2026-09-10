@@ -18,7 +18,7 @@ import {
   zodIssuesToValidationIssues,
 } from '../../validation/content-publish-validation.lib'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
-import { resolveContentFormSchema } from '../edit/content-edit-load'
+import { resolveContentFormSchema, resolveContentPublishSchema } from '../edit/content-edit-load'
 
 /** Internal sentinel — commit validation failed after field errors were applied. */
 export class ContentFormSubmitValidationFailed extends Error {
@@ -122,7 +122,10 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     'markSubmitAttempted' | 'addValidationSessionExpandKeys'
   > | null>(null)
 
-  const publishSchema = resolveContentFormSchema(def, ctx, commitValidationIntent)
+  const publishSchema =
+    commitValidationIntent === 'publish'
+      ? resolveContentPublishSchema(def, ctx)
+      : resolveContentFormSchema(def, ctx, commitValidationIntent)
 
   const { onSubmit, formError } = useSubmitHandler<TValues>({
     fallbackMessage,

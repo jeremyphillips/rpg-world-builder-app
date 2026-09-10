@@ -10,14 +10,16 @@ import { establishSurfaceCurrent } from './surface-current.lib'
  */
 export const sheetContentVariants = cva(
   cn(
-    'fixed z-50 flex h-full flex-col overflow-hidden shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
+    'fixed z-50 flex flex-col overflow-hidden shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
   ),
   {
     variants: {
       side: {
         right:
-          'inset-y-0 right-0 w-full border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
-        left: 'inset-y-0 left-0 w-full border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+          'inset-y-0 right-0 h-full w-full border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
+        left: 'inset-y-0 left-0 h-full w-full border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left',
+        bottom:
+          'inset-x-0 bottom-0 h-[90dvh] max-h-[90dvh] w-full border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
       },
       surface: {
         card: cn(
@@ -34,6 +36,12 @@ export const sheetContentVariants = cva(
         lg: 'max-w-[550px]',
       },
     },
+    compoundVariants: [
+      {
+        side: 'bottom',
+        class: 'max-w-none',
+      },
+    ],
     defaultVariants: {
       side: 'right',
       surface: 'card',

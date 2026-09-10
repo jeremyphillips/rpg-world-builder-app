@@ -66,6 +66,7 @@ export {
   type TabbedFormTab,
 } from './shells/tabbed-form.client'
 export { useTabbedFormChrome } from './shells/tabbed-form-chrome.context'
+export { useTabbedFormTabValidationState } from './hooks/use-tabbed-form-tab-validation-state.client'
 export { FormSaveFooter, type FormSaveFooterProps } from './chrome/form-save-footer'
 export { FormFooterActions, type FormFooterActionsProps } from './chrome/form-footer-actions'
 export { FormActionsBar, type FormActionsBarProps } from './chrome/form-actions-bar'
@@ -97,6 +98,12 @@ export {
   formStickyTabsTransparentClasses,
   formTabbedInactivePanelClasses,
   formTabbedNavOverflowClasses,
+  formTabbedNavWithTrailingClasses,
+  formTabbedNavControlWrapClasses,
+  formTabbedAsideGridClasses,
+  formTabbedAsideBodyClasses,
+  formTabbedAsideSlotClasses,
+  formTabbedAsideFooterClasses,
   formTabPanelsBottomPaddingClasses,
   formTabbedChromeRhythmStackClasses,
   formSheetScrollRegionClasses,
@@ -301,8 +308,12 @@ export {
   buildValidationSessionExpandKey,
   resolveInvalidSubmitNavigation,
   prepareFormIssues,
+  resolveTabValidationState,
+  pathOwnsIssue,
   type ArrayItemIssueGroup,
   type ArraySectionMeta,
+  type TabValidationState,
+  type TabValidationTab,
 } from './errors'
 export {
   useFormValidationPresentation,

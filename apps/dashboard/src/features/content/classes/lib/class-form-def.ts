@@ -32,6 +32,11 @@ import {
 import { featureToFormRow } from './class-feature-form-fields'
 import { startingEquipmentToFormValues } from './character-creation/class-starting-equipment-form-values'
 import { characterCreationProficienciesToFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
+import {
+  buildClassPreviewDetail,
+  buildClassPreviewIdentity,
+  buildClassPreviewSections,
+} from './class-preview-projection'
 
 function characterCreationToFormValues(
   entity: CharacterClass,
@@ -104,6 +109,12 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     'characterCreation.startingEquipment.options':
       entity.characterCreation?.startingEquipment?.options.map((option) => option.id) ?? [],
   }),
+
+  preview: {
+    buildIdentity: buildClassPreviewIdentity,
+    buildSections: buildClassPreviewSections,
+    buildPreviewDetail: buildClassPreviewDetail,
+  },
 }
 
 contentFormRegistry['classes'] = classFormDef

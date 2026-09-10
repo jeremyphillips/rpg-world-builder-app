@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import { TabbedForm, TABBED_FORM_SECTIONS_ARIA_LABEL } from './tabbed-form.client'
 import type { TabbedFormTab } from './tabbed-form.client'
+import { useTabbedFormChrome } from './tabbed-form-chrome.context'
 import { FormShellFooterScope, FormShellFooterSlot } from '../chrome/form-shell-footer.context'
 import { FormShellSubmitButton } from '../chrome/form-shell-submit-button'
 import { FormItems } from '../containers/form-items.client'
@@ -186,6 +187,62 @@ describe('TabbedForm', () => {
     expect(sectionsNav.parentElement).toHaveClass('sticky', 'bg-transparent')
     expect(sectionsNav.parentElement).not.toHaveClass('bg-background')
     expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('bg-transparent')
+  })
+
+  it('renders an aside in a 2xl grid and keeps the footer in the form column', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        aside={<aside data-testid="preview-aside">Preview</aside>}
+        footer={<button type="submit">Save changes</button>}
+      />,
+    )
+
+    const aside = screen.getByTestId('preview-aside')
+    const slot = aside.parentElement
+    const grid = slot?.parentElement
+    expect(slot).toHaveClass('2xl:col-start-2', '2xl:row-start-1')
+    expect(grid).toHaveClass('2xl:grid-cols-[minmax(0,56rem)_21rem]')
+    expect(grid).toContainElement(screen.getByRole('toolbar', { name: 'Form actions' }))
+    expect(screen.getByRole('textbox', { name: /Campaign name/i })).toBeInTheDocument()
+  })
+
+  it('renders a trailing control on the sticky tab row', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        tabRowTrailing={<button type="button">Preview</button>}
+      />,
+    )
+
+    const preview = screen.getByRole('button', { name: 'Preview' })
+    const tabRow = preview.parentElement
+    expect(tabRow).toHaveClass('sticky')
+    expect(tabRow).toContainElement(getSectionsNav())
+  })
+
+  it('exposes activeTabId on tabbed form chrome context', async () => {
+    function ActiveTabProbe() {
+      const chrome = useTabbedFormChrome()
+      return <span data-testid="active-tab">{chrome?.activeTabId}</span>
+    }
+
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        header={<ActiveTabProbe />}
+      />,
+    )
+
+    expect(screen.getByTestId('active-tab')).toHaveTextContent('identity')
+    await userEvent.click(screen.getByRole('button', { name: 'Rules' }))
+    expect(screen.getByTestId('active-tab')).toHaveTextContent('rules')
   })
 
   it('renders a flat layout when stickyChrome is false', () => {

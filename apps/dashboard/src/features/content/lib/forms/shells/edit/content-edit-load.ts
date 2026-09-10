@@ -22,6 +22,14 @@ export function resolveContentFormSchema(
   return def.schema
 }
 
+/** Publish schema used by both the Publish action and the preview-rail readiness parse. */
+export function resolveContentPublishSchema(
+  def: Pick<AnyContentFormDef, 'schema' | 'draftSchema' | 'resolveSchema'>,
+  ctx: ContentFormCtx,
+) {
+  return resolveContentFormSchema(def, ctx, 'publish')
+}
+
 export function validationIntentForEditEntity(
   status: ContentStatus | undefined,
 ): ContentValidationIntent {

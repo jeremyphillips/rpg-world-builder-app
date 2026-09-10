@@ -20,6 +20,10 @@ outside the `<form>` element.
 
 Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentClasses`.
 
+Optional `aside` (inside `FormProvider`) + `tabRowTrailing` for a compact tab-row action. At `2xl`
+the body is a two-column grid (form `minmax(0, 56rem)` + aside `21rem`); the footer stays in the
+form column. `activeTabId` is on `TabbedFormChromeContext`.
+
 Non-field tab intro copy: `TabbedFormTab.header`. Omit `fields` for content-only panels.
 
 See [forms hub — TabbedForm](../forms.md#tabbedform).

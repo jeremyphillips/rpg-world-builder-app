@@ -8,7 +8,11 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { ContentUsageBlocker, ResolvedContentCampaignAccess } from '@rpg/contracts'
+import type {
+  ContentCampaignAccessPatch,
+  ContentUsageBlocker,
+  ResolvedContentCampaignAccess,
+} from '@rpg/contracts'
 
 export type CampaignAccessSaveResult =
   | { status: 'skipped' }
@@ -25,6 +29,8 @@ export type CampaignAccessFormContextValue = {
   readPendingAvailable?: () => boolean | undefined
   /** True when the availability flag differs from persisted baseline. */
   readAccessAvailabilityChanged?: () => boolean | undefined
+  /** Live campaign-access draft for preview identity (nested RHF form). */
+  pendingAccess?: ContentCampaignAccessPatch
 }
 
 const defaultSave = async (): Promise<CampaignAccessSaveResult> => ({ status: 'skipped' })
@@ -40,7 +46,10 @@ const CampaignAccessFormContext = createContext<CampaignAccessFormContextValue>(
   DEFAULT_CAMPAIGN_ACCESS_PARTICIPANT,
 )
 
-type ParticipantSnapshot = Pick<CampaignAccessFormContextValue, 'isDirty' | 'isPending'>
+type ParticipantSnapshot = Pick<
+  CampaignAccessFormContextValue,
+  'isDirty' | 'isPending' | 'pendingAccess'
+>
 
 const ParticipantRegistryContext = createContext<
   ((bindings: CampaignAccessFormContextValue) => void) | null
@@ -71,7 +80,11 @@ export function CampaignAccessFormProvider({ children }: { children: ReactNode }
     resetRef.current = bindings.reset
     readPendingAvailableRef.current = bindings.readPendingAvailable
     readAccessAvailabilityChangedRef.current = bindings.readAccessAvailabilityChanged
-    setSnapshot({ isDirty: bindings.isDirty, isPending: bindings.isPending })
+    setSnapshot({
+      isDirty: bindings.isDirty,
+      isPending: bindings.isPending,
+      pendingAccess: bindings.pendingAccess,
+    })
   }, [])
 
   const value = useMemo<CampaignAccessFormContextValue>(
@@ -113,13 +126,14 @@ export function useCampaignAccessParticipantUpdater(bindings: CampaignAccessForm
     register({
       isDirty: bindings.isDirty,
       isPending: bindings.isPending,
+      pendingAccess: bindings.pendingAccess,
       save: () => bindingsRef.current.save(),
       reset: () => bindingsRef.current.reset(),
       readPendingAvailable: () => bindingsRef.current.readPendingAvailable?.(),
       readAccessAvailabilityChanged: () => bindingsRef.current.readAccessAvailabilityChanged?.(),
     })
     return () => register(DEFAULT_CAMPAIGN_ACCESS_PARTICIPANT)
-  }, [bindings.isDirty, bindings.isPending, register])
+  }, [bindings.isDirty, bindings.isPending, bindings.pendingAccess, register])
 }
 
 /** Read-only participant state for shells, guards, and disclosure. */

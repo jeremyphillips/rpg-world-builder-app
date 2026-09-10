@@ -14,6 +14,20 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+export const BottomSide: Story = {
+  render: () => (
+    <Sheet.Root>
+      <Sheet.Trigger asChild>
+        <Button className="m-8">Open bottom sheet</Button>
+      </Sheet.Trigger>
+      <Sheet.Content side="bottom" size="lg" surface="card">
+        <Sheet.Header headline="Class Preview" />
+        <Sheet.Body>Preview rail content</Sheet.Body>
+      </Sheet.Content>
+    </Sheet.Root>
+  ),
+}
+
 export const RightSide: Story = {
   render: () => (
     <Sheet.Root>

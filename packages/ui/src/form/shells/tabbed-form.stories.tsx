@@ -96,6 +96,23 @@ export const Default: Story = {
   },
 }
 
+export const WithAside: StoryObj = {
+  render: () => (
+    <TabbedForm<CampaignForm>
+      schema={schema}
+      tabs={tabs}
+      onSubmit={action('submit')}
+      footer={<FormSaveFooter submitLabel="Save changes" />}
+      tabRowTrailing={
+        <button type="button" className="2xl:hidden">
+          Preview
+        </button>
+      }
+      aside={<aside className="rounded-md border border-border bg-card p-4">Preview rail</aside>}
+    />
+  ),
+}
+
 const longSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().max(500).optional(),

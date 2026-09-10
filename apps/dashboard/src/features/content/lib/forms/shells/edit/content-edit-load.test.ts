@@ -7,6 +7,7 @@ import {
   findContentEditEntity,
   loadContentEditFormState,
   resolveContentFormSchema,
+  resolveContentPublishSchema,
 } from './content-edit-load'
 
 const baseOptionsCtx: ContentFormCtx = {
@@ -77,6 +78,7 @@ describe('resolveContentFormSchema', () => {
 
     expect(resolveContentFormSchema(def, baseOptionsCtx, 'draft')).toBe(draftSchema)
     expect(resolveContentFormSchema(def, baseOptionsCtx, 'publish')).toBe(schema)
+    expect(resolveContentPublishSchema(def, baseOptionsCtx)).toBe(schema)
   })
 })
 

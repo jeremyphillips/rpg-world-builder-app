@@ -21,6 +21,8 @@ import {
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 import type { CoordinatedSaveSavedEvent } from '../session/use-content-save-session'
 import { ContentSchemaFormShell } from './content-schema-form-shell'
+import { ContentFormInlineBreadcrumb } from './content-form-page-shell'
+import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import {
   CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
   CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
@@ -71,6 +73,7 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   onSaved?: (event: CoordinatedSaveSavedEvent) => void
   onLeaveGuardReady?: (guard: Pick<UnsavedChangesConfirmController, 'runTrusted'>) => void
   formHeaderPrefix?: React.ReactNode
+  previewDraftBadge?: boolean
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -98,6 +101,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onSaved,
   onLeaveGuardReady,
   formHeaderPrefix,
+  previewDraftBadge = false,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const weaponAdvisoryOptions = React.useMemo((): AdvisoryFormSubmitOptions<TFormValues> => {
@@ -150,7 +154,17 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         identityLayout: CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
         availabilityPresentation: CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
       }}
-      headerPrefix={formHeaderPrefix}
+      headerPrefix={
+        hasContentFormPreview(def) ? (
+          <>
+            <ContentFormInlineBreadcrumb />
+            {formHeaderPrefix}
+          </>
+        ) : (
+          formHeaderPrefix
+        )
+      }
+      previewDraftBadge={previewDraftBadge}
     />
   )
 }

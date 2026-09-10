@@ -13,7 +13,10 @@ import {
   type Spellcasting,
 } from '@rpg/contracts'
 
-import { finalizeContentInput, slugForInputParse } from '../../lib/forms/registry/content-form-key-helpers'
+import {
+  finalizeContentInput,
+  slugForInputParse,
+} from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import type { ClassFormValues } from './class-form-fields'
 import { createAsiFeature } from './class-asi-features'
@@ -64,7 +67,7 @@ function normalizeClassToolProficiencies(
   }
 }
 
-function proficienciesFromFormValues(
+export function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
   hasSpecificWeapons: boolean,
 ): ClassProficiencies {
