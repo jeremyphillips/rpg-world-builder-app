@@ -43,7 +43,7 @@ function resolvePublishIssueMessage(
   hasAttemptedPublish: boolean,
 ): string | undefined {
   if (!publishPresentationEnabled || !hasAttemptedPublish || !fieldPath) return undefined
-  return issues.find((issue) => issue.path === fieldPath)?.message
+  return resolveFieldErrorMessage(issues.find((issue) => issue.path === fieldPath)?.message)
 }
 
 function fieldHasPresentationIssue(

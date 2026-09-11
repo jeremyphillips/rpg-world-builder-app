@@ -18,7 +18,7 @@ import { resolveFormDensity } from '../form-density'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import { buildDefaultValues, type FormItem } from '../field-config'
 import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-validation-state.client'
-import { FormActionsBar } from '../chrome/form-actions-bar'
+import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-actions-bar'
 import { getTabPanelElementId, getTabPanelIdPrefix } from './tabbed-form-id.lib'
 import { TabbedFormTabIssueBadge } from './tabbed-form-tab-issue-badge.client'
 import {
@@ -74,6 +74,7 @@ export interface TabbedFormFooterRegionProps {
   hasFooterRegion: boolean
   stickyChrome: boolean
   stickyActionsBarClassName?: string
+  actionsBarPlacement?: FormActionsBarPlacement
   formError?: string | null
   validationSummary?: React.ReactNode
   resolvedFooter: React.ReactNode
@@ -285,6 +286,7 @@ function TabbedFormFlatFooter({
 export function TabbedFormFooterRegion({
   stickyChrome,
   stickyActionsBarClassName,
+  actionsBarPlacement = 'sticky',
   formError,
   validationSummary,
   resolvedFooter,
@@ -295,6 +297,7 @@ export function TabbedFormFooterRegion({
         className={stickyActionsBarClassName}
         formError={formError}
         validationSummary={validationSummary}
+        placement={actionsBarPlacement}
       >
         {resolvedFooter}
       </FormActionsBar>

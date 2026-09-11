@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
-import type { ZodIssue, ZodType } from 'zod'
+import type { ZodType } from 'zod'
 import {
   collectTabbedFormResolverItems,
+  formIssuesFromZodIssues,
   resolveTabValidationState,
   safeParseWithFieldErrors,
   type FormIssue,
@@ -19,14 +20,6 @@ export type ContentPublishValidation = {
   isChecking: boolean
 }
 
-function zodIssuesToFormIssues(issues: ZodIssue[]): FormIssue[] {
-  return issues.map((issue) => ({
-    path: issue.path.map(String).join('.'),
-    message: issue.message,
-    severity: 'field' as const,
-  }))
-}
-
 function computePublishValidation<TValues extends FieldValues>(
   schema: ZodType<TValues>,
   values: TValues,
@@ -38,7 +31,7 @@ function computePublishValidation<TValues extends FieldValues>(
     return { isPublishReady: true, issues: [], invalidTabIds: new Set() }
   }
 
-  const issues = zodIssuesToFormIssues(parsed.error.issues)
+  const issues = formIssuesFromZodIssues(parsed.error.issues)
   const tabStates = resolveTabValidationState(issues, tabs, fields)
   return {
     isPublishReady: false,

@@ -375,6 +375,7 @@ export {
   fieldInlineSentenceClasses,
   fieldInlineSwitchControlColumnClasses,
   fieldInlineToggleRowClasses,
+  fieldLabelContentClusterClasses,
   fieldLabelHintStackClasses,
   fieldLabelVariants,
   fieldRowLayoutClasses,

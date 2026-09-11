@@ -38,13 +38,8 @@ function pushFieldErrorIssue(
   pathPrefix: string,
   issues: FormIssue[],
 ): void {
-  const decoded = decodeStructuredMessage(node.message)
   issues.push({
-    path: pathPrefix,
-    message: decoded?.field ?? node.message,
-    summaryMessage: decoded?.summary,
-    messageId: decoded?.messageId,
-    messageParams: decoded?.params,
+    ...formIssueFromEncodedMessage(pathPrefix, node.message),
     severity: 'field',
     ...parseArrayItemContext(pathPrefix),
   })
@@ -79,6 +74,31 @@ function walkFieldErrors(node: FieldErrors, pathPrefix: string, issues: FormIssu
   if (typeof node !== 'object' || node === null) return
 
   walkFieldErrorObject(node, pathPrefix, issues)
+}
+
+/** Decodes a Zod/RHF issue string into field + summary FormIssue copy. */
+export function formIssueFromEncodedMessage(
+  path: string,
+  message: string,
+): Pick<FormIssue, 'path' | 'message' | 'summaryMessage' | 'messageId' | 'messageParams'> {
+  const decoded = decodeStructuredMessage(message)
+  return {
+    path,
+    message: decoded?.field ?? message,
+    summaryMessage: decoded?.summary,
+    messageId: decoded?.messageId,
+    messageParams: decoded?.params,
+  }
+}
+
+/** Maps Zod issues onto display-ready {@link FormIssue}s (structured payloads decoded). */
+export function formIssuesFromZodIssues(
+  issues: ReadonlyArray<{ path: PropertyKey[]; message: string }>,
+): FormIssue[] {
+  return issues.map((issue) => ({
+    ...formIssueFromEncodedMessage(issue.path.map(String).join('.'), issue.message),
+    severity: 'field' as const,
+  }))
 }
 
 /** Walk nested RHF `FieldErrors` into a flat list of actionable issues. */

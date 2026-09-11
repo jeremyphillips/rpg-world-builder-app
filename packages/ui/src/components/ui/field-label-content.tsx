@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
-import { fieldLabelVariants } from './field.variants'
+import { fieldLabelContentClusterClasses, fieldLabelVariants } from './field.variants'
 import { InfoTooltip } from './tooltip.client'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
@@ -29,11 +29,11 @@ export function FieldLabelContent({
   const visibleMarker = showRequiredMarker ?? Boolean(required)
 
   return (
-    <>
+    <span className={fieldLabelContentClusterClasses}>
       {label}
       {visibleMarker ? <RequiredIndicator /> : null}
       {info ? <InfoTooltip aria-label={`About ${label}`}>{info}</InfoTooltip> : null}
-    </>
+    </span>
   )
 }
 

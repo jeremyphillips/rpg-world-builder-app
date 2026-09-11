@@ -168,7 +168,11 @@ describe('TabbedForm', () => {
 
     const sectionsNav = getSectionsNav()
     expect(sectionsNav.parentElement).toHaveClass('sticky')
-    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('sticky')
+    const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
+    expect(toolbar).toHaveClass('shrink-0')
+    expect(toolbar).not.toHaveClass('sticky')
+    expect(toolbar.closest('.overflow-y-auto')).toBeNull()
+    expect(toolbar.parentElement).toHaveClass('flex', 'flex-col')
   })
 
   it('merges stickyTabsClassName and stickyActionsBarClassName onto sticky chrome', () => {
@@ -203,9 +207,14 @@ describe('TabbedForm', () => {
     const aside = screen.getByTestId('preview-aside')
     const slot = aside.parentElement
     const grid = slot?.parentElement
+    const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
+    const formColumn = toolbar.parentElement
+
     expect(slot).toHaveClass('2xl:col-start-2', '2xl:row-start-1')
     expect(grid).toHaveClass('2xl:grid-cols-[minmax(0,56rem)_21rem]')
-    expect(grid).toContainElement(screen.getByRole('toolbar', { name: 'Form actions' }))
+    expect(formColumn).toHaveClass('2xl:col-start-1')
+    expect(grid).toContainElement(formColumn)
+    expect(grid?.childElementCount).toBe(2)
     expect(screen.getByRole('textbox', { name: /Campaign name/i })).toBeInTheDocument()
   })
 

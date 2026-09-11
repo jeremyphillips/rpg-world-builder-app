@@ -21,7 +21,13 @@ describe('ContentFormPageShell', () => {
       </ContentFormPageShell>,
     )
 
-    expect(container.firstChild).toHaveClass('mx-auto', 'max-w-4xl')
+    expect(container.firstChild).toHaveClass(
+      'mx-auto',
+      'max-w-4xl',
+      'flex',
+      'flex-1',
+      'overflow-hidden',
+    )
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
   })
 
@@ -32,7 +38,7 @@ describe('ContentFormPageShell', () => {
       </ContentFormPageShell>,
     )
 
-    expect(container.firstChild).toHaveClass('w-full')
+    expect(container.firstChild).toHaveClass('w-full', 'flex', 'flex-1', 'overflow-hidden')
     expect(container.firstChild).not.toHaveClass('max-w-4xl')
   })
 })

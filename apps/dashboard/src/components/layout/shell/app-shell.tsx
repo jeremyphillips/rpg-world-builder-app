@@ -35,9 +35,9 @@ export function AppShell() {
   return (
     <BreadcrumbLabelProvider>
       <GlobalSearchProvider>
-        <div className="flex min-h-dvh bg-background">
+        <div className="flex h-dvh max-h-dvh overflow-hidden bg-background">
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-background">
+          <div className="flex h-dvh min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
             <Topbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
             <AppShellBreadcrumbRail />
             <main className={appShellMainClasses}>

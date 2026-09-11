@@ -18,10 +18,11 @@ import { FormRhythmStack } from '../context/form-section.context'
 import {
   formSheetScrollRegionClasses,
   formTabbedAsideBodyClasses,
-  formTabbedAsideFooterClasses,
   formTabbedAsideGridClasses,
   formTabbedAsideSlotClasses,
   formTabbedChromeRhythmStackClasses,
+  formStickyScrollBodyClasses,
+  formStickyScrollShellClasses,
 } from '../chrome/form-chrome.variants'
 import { cn } from '../../lib/utils'
 import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
@@ -243,36 +244,60 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     </div>
   )
 
-  const defaultBody = (
-    <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
-      {resolvedHeader}
-      {contentWrapper ? contentWrapper(panels) : panels}
-    </FormRhythmStack>
-  )
-
   const footerRegion = !externalFooter ? (
     <TabbedFormFooterRegion
       hasFooterRegion={Boolean(formError || resolvedFooter)}
       stickyChrome={stickyChrome}
       stickyActionsBarClassName={stickyActionsBarClassName}
+      actionsBarPlacement={stickyChrome ? 'docked' : 'sticky'}
       formError={formError}
       validationSummary={validationSummary}
       resolvedFooter={resolvedFooter}
     />
   ) : null
 
-  const defaultLayout =
-    aside && !externalFooter ? (
-      <div className={formTabbedAsideGridClasses}>
-        <div className={formTabbedAsideBodyClasses}>{defaultBody}</div>
-        <div className={formTabbedAsideSlotClasses}>{aside}</div>
-        <div className={formTabbedAsideFooterClasses}>{footerRegion}</div>
+  const scrollableBody = (
+    <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
+      {resolvedHeader}
+      {contentWrapper ? contentWrapper(panels) : panels}
+    </FormRhythmStack>
+  )
+
+  const columnBody =
+    stickyChrome && !externalFooter ? (
+      <div className={formStickyScrollShellClasses}>
+        <div className={formStickyScrollBodyClasses}>{scrollableBody}</div>
+        {footerRegion}
       </div>
     ) : (
       <>
-        {defaultBody}
+        {scrollableBody}
         {footerRegion}
       </>
+    )
+
+  const defaultLayout =
+    aside && !externalFooter ? (
+      <div className={formTabbedAsideGridClasses}>
+        <div
+          className={cn(formTabbedAsideBodyClasses, stickyChrome && formStickyScrollShellClasses)}
+        >
+          {stickyChrome ? (
+            <>
+              <div className={formStickyScrollBodyClasses}>{scrollableBody}</div>
+              {footerRegion}
+            </>
+          ) : (
+            <>
+              {scrollableBody}
+              {footerRegion}
+            </>
+          )}
+        </div>
+        <div className={formTabbedAsideSlotClasses}>{aside}</div>
+      </div>
+    ) : (
+      columnBody
     )
 
   return (
@@ -298,6 +323,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         externalFooterContent={externalFooterContent}
         className={cn(
           externalFooter && 'flex min-h-0 flex-1 flex-col',
+          stickyChrome && !externalFooter && 'flex min-h-0 flex-1 flex-col',
           resolveTabbedFormShellClassName(className, stickyChrome, externalFooter),
         )}
       >

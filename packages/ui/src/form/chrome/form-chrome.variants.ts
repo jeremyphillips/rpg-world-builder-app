@@ -22,12 +22,13 @@ export const formTabbedNavControlWrapClasses = 'min-w-0 flex-1 overflow-x-auto'
  * centered; at `2xl` the rail sits in a second column (~21rem) with a large gap.
  */
 export const formTabbedAsideGridClasses =
-  'mx-auto w-full max-w-4xl 2xl:mx-0 2xl:grid 2xl:max-w-none 2xl:grid-cols-[minmax(0,56rem)_21rem] 2xl:items-start 2xl:gap-6'
+  'mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col 2xl:mx-0 2xl:grid 2xl:max-w-none 2xl:grid-cols-[minmax(0,56rem)_21rem] 2xl:items-stretch 2xl:gap-6'
 
 export const formTabbedAsideBodyClasses = 'min-w-0 2xl:col-start-1 2xl:row-start-1'
 
 export const formTabbedAsideSlotClasses = 'hidden min-w-0 2xl:col-start-2 2xl:row-start-1 2xl:block'
 
+/** @deprecated Footer lives in the form column scroll shell — not a separate grid row. */
 export const formTabbedAsideFooterClasses = 'min-w-0 2xl:col-start-1 2xl:row-start-2'
 
 /** Visually hide inactive TabbedForm panels while keeping them mounted. */
@@ -46,6 +47,16 @@ export const formTabbedChromeRhythmStackClasses = 'gap-4'
 /** Sticky actions bar — save/cancel and form-level errors stay reachable on long forms. */
 export const formStickyActionsBarClasses =
   'sticky bottom-0 z-20 mt-6 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
+
+/** Docked actions bar — flex-column footer below a bounded scroll body (content forms). */
+export const formDockedActionsBarClasses =
+  'z-20 mt-6 shrink-0 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
+
+/** Column shell for sticky chrome — pairs scroll body with a docked footer. */
+export const formStickyScrollShellClasses = 'flex min-h-0 flex-1 flex-col'
+
+/** Scrollable field column when the footer is docked below it. */
+export const formStickyScrollBodyClasses = dialogPanelScrollRegionClasses
 
 /**
  * Sheet/drawer/modal scroll region — grows inside a flex column shell with a docked

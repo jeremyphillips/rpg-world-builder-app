@@ -69,7 +69,11 @@ export { useTabbedFormChrome } from './shells/tabbed-form-chrome.context'
 export { useTabbedFormTabValidationState } from './hooks/use-tabbed-form-tab-validation-state.client'
 export { FormSaveFooter, type FormSaveFooterProps } from './chrome/form-save-footer'
 export { FormFooterActions, type FormFooterActionsProps } from './chrome/form-footer-actions'
-export { FormActionsBar, type FormActionsBarProps } from './chrome/form-actions-bar'
+export {
+  FormActionsBar,
+  type FormActionsBarPlacement,
+  type FormActionsBarProps,
+} from './chrome/form-actions-bar'
 export {
   FormShellFooterScope,
   FormShellFooterSlot,
@@ -93,9 +97,12 @@ export {
   formActionsBarPrimaryGroupClasses,
   formFooterSpacingClasses,
   formStickyActionsBarClasses,
+  formDockedActionsBarClasses,
   formStickyActionsBarTransparentClasses,
   formStickyTabsClasses,
   formStickyTabsTransparentClasses,
+  formStickyScrollShellClasses,
+  formStickyScrollBodyClasses,
   formTabbedInactivePanelClasses,
   formTabbedNavOverflowClasses,
   formTabbedNavWithTrailingClasses,
@@ -300,6 +307,8 @@ export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-i
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
 export {
   flattenFormIssues,
+  formIssueFromEncodedMessage,
+  formIssuesFromZodIssues,
   classifyFormIssue,
   classifyFormIssues,
   groupIssuesForItemPrefix,

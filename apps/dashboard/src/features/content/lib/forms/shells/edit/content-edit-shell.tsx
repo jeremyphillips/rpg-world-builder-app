@@ -12,6 +12,7 @@ import type { ZodType } from 'zod'
 
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
+import { contentFormPageShellHeadingClasses } from '../layout/content-form-page-shell.variants'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
@@ -252,7 +253,9 @@ function ContentEditEntityFormBody<
   const formBody = (
     <ContentAuthoringGate campaignId={campaignId}>
       <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
-        {usePreviewLayout ? null : heading}
+        {usePreviewLayout ? null : (
+          <div className={contentFormPageShellHeadingClasses}>{heading}</div>
+        )}
 
         <ContentFormLayout
           def={def}

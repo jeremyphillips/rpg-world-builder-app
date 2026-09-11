@@ -4,10 +4,11 @@ import { Text } from '../../components/ui/text'
 import { cn } from '../../lib/utils'
 import { FormItems } from '../containers/form-items.client'
 import { FormRhythmStack } from '../context/form-section.context'
-import { FormActionsBar } from '../chrome/form-actions-bar'
+import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-actions-bar'
 import {
   formFooterSpacingClasses,
   formSheetScrollRegionClasses,
+  formStickyScrollBodyClasses,
 } from '../chrome/form-chrome.variants'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
@@ -52,22 +53,34 @@ export function FormShellFieldStack({
 
   const scrollWrappedStack = externalFooter ? (
     <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
+  ) : stickyFooter ? (
+    <div className={formStickyScrollBodyClasses}>{stack}</div>
   ) : (
     stack
   )
 
-  return contentWrapper ? contentWrapper(scrollWrappedStack) : scrollWrappedStack
+  return contentWrapper && !stickyFooter ? contentWrapper(scrollWrappedStack) : scrollWrappedStack
 }
 
 export type FormFooterRegionProps = {
   stickyFooter: boolean
   formError?: string | null
   footer: ReactNode
+  actionsBarPlacement?: FormActionsBarPlacement
 }
 
-export function FormFooterRegion({ stickyFooter, formError, footer }: FormFooterRegionProps) {
+export function FormFooterRegion({
+  stickyFooter,
+  formError,
+  footer,
+  actionsBarPlacement = 'sticky',
+}: FormFooterRegionProps) {
   if (stickyFooter) {
-    return <FormActionsBar formError={formError}>{footer}</FormActionsBar>
+    return (
+      <FormActionsBar formError={formError} placement={actionsBarPlacement}>
+        {footer}
+      </FormActionsBar>
+    )
   }
 
   if (!footer) {

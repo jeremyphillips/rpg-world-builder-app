@@ -9,6 +9,7 @@ import { useRef, useState, type ReactNode } from 'react'
 
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
+import { contentFormPageShellHeadingClasses } from '../layout/content-form-page-shell.variants'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
@@ -283,9 +284,11 @@ export function ContentCreateShell({
   return (
     <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
       {!usePreviewLayout ? (
-        <Heading variant="page" as="h1">
-          {heading}
-        </Heading>
+        <div className={contentFormPageShellHeadingClasses}>
+          <Heading variant="page" as="h1">
+            {heading}
+          </Heading>
+        </div>
       ) : null}
 
       {def ? (

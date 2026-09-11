@@ -11,6 +11,8 @@ describe('FieldLabelContent', () => {
     render(<FieldLabelContent label="Name" required showRequiredMarker />)
     expect(screen.getByText('*')).toHaveAttribute('aria-hidden', 'true')
     expect(screen.getAllByText('*')).toHaveLength(1)
+    expect(screen.getByText('Name').closest('span')).toContainElement(screen.getByText('*'))
+    expect(screen.getByText('Name').closest('span')).toHaveClass('inline-flex')
   })
 
   it('omits the visible marker when showRequiredMarker is false', () => {

@@ -64,8 +64,6 @@ function resolveAlignmentAnchorClassName(
 ): string {
   switch (labelLayout) {
     case 'stacked':
-      // `gap-y-*` (not `space-y-*`) keeps this distinct from Field.Root anatomy
-      // class tuples while sharing the same size map.
       return fieldAnatomyAlignVariants({ size })
     case 'settings':
       return ''

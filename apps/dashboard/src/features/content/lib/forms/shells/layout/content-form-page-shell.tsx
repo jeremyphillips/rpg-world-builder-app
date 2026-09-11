@@ -7,7 +7,10 @@ import { useResolvedBreadcrumbs } from '@/components/layout/breadcrumb/use-resol
 import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { WidePage } from '@/components/layout/page/wide-page'
 
-import { contentFormInlineBreadcrumbClasses } from './content-form-page-shell.variants'
+import {
+  contentFormInlineBreadcrumbClasses,
+  contentFormPageShellClasses,
+} from './content-form-page-shell.variants'
 
 export interface ContentFormPageShellProps {
   usePreviewLayout: boolean
@@ -37,14 +40,14 @@ export function ContentFormPageShell({
 }: ContentFormPageShellProps) {
   if (!usePreviewLayout) {
     return (
-      <NarrowPage spacing="relaxed" className={cn('pb-10', className)}>
+      <NarrowPage spacing="relaxed" className={cn(contentFormPageShellClasses, className)}>
         {children}
       </NarrowPage>
     )
   }
 
   return (
-    <WidePage spacing="relaxed" className={cn('pb-10', className)}>
+    <WidePage spacing="relaxed" className={cn(contentFormPageShellClasses, className)}>
       {children}
     </WidePage>
   )

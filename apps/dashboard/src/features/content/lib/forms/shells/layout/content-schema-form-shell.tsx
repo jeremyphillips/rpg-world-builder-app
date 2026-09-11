@@ -199,50 +199,56 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
     <>
       {tabs ? (
         <ContentPreviewUiProvider>
-          <TabbedForm<TFormValues>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <TabbedForm<TFormValues>
+              key={formKey}
+              id={formKey}
+              uiStateKey={formKey}
+              schema={schema}
+              tabs={tabs}
+              defaultValues={defaultValues}
+              valueSyncs={valueSyncs}
+              onSubmit={handleSubmit}
+              formError={formError}
+              header={header}
+              footer={footer}
+              className="flex min-h-0 flex-1 flex-col"
+              hasAttemptedPublish={hasAttemptedPublish}
+              onMarkPublishAttempted={markPublishAttempted}
+              publishPresentationIssues={publishPresentationIssues}
+              publishPresentationEnabled={previewEnabled}
+              aside={
+                previewEnabled ? (
+                  <ContentPreviewRail
+                    def={headerProps.def}
+                    ctx={headerProps.ctx}
+                    tabs={tabs}
+                    showDraftBadge={previewDraftBadge}
+                  />
+                ) : undefined
+              }
+              tabRowTrailing={previewEnabled ? <ContentPreviewCompactTrigger /> : undefined}
+            />
+          </div>
+        </ContentPreviewUiProvider>
+      ) : (
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <Form<TFormValues>
             key={formKey}
             id={formKey}
             uiStateKey={formKey}
             schema={schema}
-            tabs={tabs}
+            fields={fields ?? []}
             defaultValues={defaultValues}
-            valueSyncs={valueSyncs}
             onSubmit={handleSubmit}
             formError={formError}
+            valueSyncs={valueSyncs}
+            stickyFooter
+            className="flex min-h-0 flex-1 flex-col"
             header={header}
             footer={footer}
-            hasAttemptedPublish={hasAttemptedPublish}
-            onMarkPublishAttempted={markPublishAttempted}
-            publishPresentationIssues={publishPresentationIssues}
-            publishPresentationEnabled={previewEnabled}
-            aside={
-              previewEnabled ? (
-                <ContentPreviewRail
-                  def={headerProps.def}
-                  ctx={headerProps.ctx}
-                  tabs={tabs}
-                  showDraftBadge={previewDraftBadge}
-                />
-              ) : undefined
-            }
-            tabRowTrailing={previewEnabled ? <ContentPreviewCompactTrigger /> : undefined}
           />
-        </ContentPreviewUiProvider>
-      ) : (
-        <Form<TFormValues>
-          key={formKey}
-          id={formKey}
-          uiStateKey={formKey}
-          schema={schema}
-          fields={fields ?? []}
-          defaultValues={defaultValues}
-          onSubmit={handleSubmit}
-          formError={formError}
-          valueSyncs={valueSyncs}
-          stickyFooter
-          header={header}
-          footer={footer}
-        />
+        </div>
       )}
       {submitConfirmDialog}
     </>
