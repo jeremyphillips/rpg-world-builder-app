@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom'
-import { Heading, RichTextContent } from '@rpg/ui'
 import type { Species } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
@@ -16,97 +15,14 @@ import {
   getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 import { getCreatureTypeLabel } from '../lib/creature-type-field-options'
-import {
-  buildSpeciesDetailViewModel,
-  type SpeciesDetailItem,
-  type SpeciesDetailViewModel,
-} from '../lib/species-display'
+import { buildSpeciesDetailViewModel } from '../lib/species-display'
 import { useSpecies } from '../hooks/use-species'
-import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
-import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
+import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
-
-// ---------------------------------------------------------------------------
-// Sub-components (markup only — labels and formatting live in species-display)
-// ---------------------------------------------------------------------------
-
-function TraitItem({ item }: { item: SpeciesDetailItem }) {
-  return (
-    <li className="space-y-1">
-      <Heading variant="subsection" as="h3">
-        {item.title}
-      </Heading>
-      {item.bodyHtml && <RichTextContent html={item.bodyHtml} size="md" tone="muted" />}
-    </li>
-  )
-}
-
-function TraitsSection({
-  section,
-}: {
-  section: Extract<SpeciesDetailViewModel['sections'][number], { id: 'traits' }>
-}) {
-  return (
-    <section aria-labelledby="traits-heading">
-      <Heading variant="section" as="h2" id="traits-heading" className="mb-4">
-        {section.title}
-      </Heading>
-      <ul className="space-y-4" role="list">
-        {section.items.map((item) => (
-          <TraitItem key={item.id} item={item} />
-        ))}
-      </ul>
-    </section>
-  )
-}
-
-function HeritageSection({
-  section,
-}: {
-  section: Extract<SpeciesDetailViewModel['sections'][number], { id: 'heritage' }>
-}) {
-  return (
-    <section aria-labelledby={`heritage-${section.heritageId}-heading`}>
-      <Heading
-        variant="section"
-        as="h2"
-        id={`heritage-${section.heritageId}-heading`}
-        className="mb-2 capitalize"
-      >
-        {section.title}
-      </Heading>
-      {section.descriptionHtml && (
-        <RichTextContent html={section.descriptionHtml} size="md" tone="muted" className="mb-4" />
-      )}
-      <ul className="space-y-4" role="list">
-        {section.items.map((item) => (
-          <TraitItem key={item.id} item={item} />
-        ))}
-      </ul>
-    </section>
-  )
-}
-
-function SpeciesDetailSections({ sections }: { sections: SpeciesDetailViewModel['sections'] }) {
-  return (
-    <>
-      {sections.map((section) =>
-        section.id === 'traits' ? (
-          <TraitsSection key={section.id} section={section} />
-        ) : (
-          <HeritageSection key={section.id} section={section} />
-        ),
-      )}
-    </>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Main detail component
-// ---------------------------------------------------------------------------
+import { SpeciesDetailBody } from '../components/detail/species-detail-body'
 
 type SpeciesDetailContentProps = { species: Species; campaignId: string }
 
@@ -126,27 +42,21 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
 
   return (
     <WidePage>
-      <ContentDetailLayout
+      <SpeciesDetailBody
         name={species.name}
         nameBadge={<ContentStatusNameBadge status={species.status} />}
         imageUrl={getContentImageUrl(species.imageKey)}
         imageName={species.name}
+        viewModel={viewModel}
         campaignId={campaignId}
         editHref={contentEditHref('species', campaignId, species.id)}
-        statRows={viewModel.statRows}
-        descriptionContent={
-          viewModel.descriptionHtml ? (
-            <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
-          ) : undefined
-        }
       >
-        <SpeciesDetailSections sections={viewModel.sections} />
         <ContentUsageReferencesSection
           campaignId={campaignId}
           routeKey="species"
           entityId={species.id}
         />
-      </ContentDetailLayout>
+      </SpeciesDetailBody>
     </WidePage>
   )
 }

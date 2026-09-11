@@ -18,6 +18,8 @@ import {
   spellCreateDefaultValues,
   spellToFormValues,
 } from './spell-form-values'
+import { buildSpellPreviewIdentity, buildSpellPreviewSections } from './spell-preview-projection'
+import { SpellPreviewPlayerHost } from './spell-preview-player-host'
 
 const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> = {
   routeKey: 'spells',
@@ -33,6 +35,12 @@ const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> = {
     buildSpellCreateInput(values, ctx, validationIntent),
   useListQuery: useSpells,
   queryKey: spellsQueryKey,
+
+  preview: {
+    buildIdentity: buildSpellPreviewIdentity,
+    buildSections: buildSpellPreviewSections,
+    renderPlayerPreview: SpellPreviewPlayerHost,
+  },
 }
 
 contentFormRegistry['spells'] = spellFormDef
