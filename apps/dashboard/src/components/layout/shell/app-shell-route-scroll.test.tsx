@@ -46,7 +46,7 @@ describe('AppShell route scroll ownership', () => {
     )
     const root = container.firstElementChild
     expect(root).toHaveClass(...pageScrollClasses.viewport.split(/\s+/))
-    expect(root).not.toHaveClass('py-8')
+    expect(root).not.toHaveClass('pt-8', 'pb-8')
   })
 
   it('documents messages workspace as a viewport shell exception', () => {

@@ -15,7 +15,10 @@ column; `FormActionsBar` docks below a bounded scroll body (`formStickyScrollShe
 `formStickyScrollBodyClasses`) so save actions stay at the bottom of the viewport on long page
 forms. Pass `stickyChrome={false}` for flat layout. Dashboard content create/edit routes mount
 `ContentFormPageShell` with `scroll="viewport" spacing="none"` so the page shell fills the app
-main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer.
+main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer
+(flush to the viewport bottom). Top inset scrolls with form content via
+`formViewportScrollBodyTopInsetClasses` on `scrollBodyClassName`; preview-rail vertical gutter lives
+on `formTabbedAsideSlotTopInsetClasses` / `formTabbedAsideSlotBottomInsetClasses`.
 Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
 reserved scrollbar gutters. Overlay pattern: use `externalFooter` with
 `FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar inside scroll content.

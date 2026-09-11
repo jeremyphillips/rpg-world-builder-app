@@ -1,6 +1,14 @@
+/** Top shell inset below the breadcrumb rail. */
+export const pageShellInsetTopClasses = 'pt-8'
+
+/** Bottom shell inset above the viewport edge (scrollable routes). */
+export const pageShellInsetBottomClasses = 'pb-8'
+
 /** Vertical shell inset below the breadcrumb rail — not child rhythm. */
 export const pageShellInsetClasses = {
-  page: 'py-8',
+  page: `${pageShellInsetTopClasses} ${pageShellInsetBottomClasses}`,
+  /** Viewport-bound forms — top inset only; docked footer sits flush at the bottom. */
+  'page-top': pageShellInsetTopClasses,
   none: '',
 } as const
 

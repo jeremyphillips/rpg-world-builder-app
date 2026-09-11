@@ -20,7 +20,8 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col gap-4', {
       plain: 'w-full',
     },
     sticky: {
-      true: 'sticky self-start top-0 max-h-full min-h-0',
+      /** Fills a viewport-bounded aside column; internal ScrollRegion owns overflow. */
+      true: 'h-full max-h-full min-h-0',
       false: '',
     },
   },

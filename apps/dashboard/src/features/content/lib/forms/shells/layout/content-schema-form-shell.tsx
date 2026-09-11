@@ -4,6 +4,7 @@ import type { ZodType } from 'zod'
 import {
   Form,
   TabbedForm,
+  formViewportScrollBodyTopInsetClasses,
   type FormIssue,
   type FormItem,
   type FormValueSync,
@@ -213,6 +214,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
               header={header}
               footer={footer}
               className="flex min-h-0 flex-1 flex-col"
+              scrollBodyClassName={formViewportScrollBodyTopInsetClasses}
               hasAttemptedPublish={hasAttemptedPublish}
               onMarkPublishAttempted={markPublishAttempted}
               publishPresentationIssues={publishPresentationIssues}
@@ -245,6 +247,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
             valueSyncs={valueSyncs}
             stickyFooter
             className="flex min-h-0 flex-1 flex-col"
+            scrollBodyClassName={formViewportScrollBodyTopInsetClasses}
             header={header}
             footer={footer}
           />

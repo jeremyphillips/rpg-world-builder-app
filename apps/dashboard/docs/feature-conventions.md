@@ -148,11 +148,11 @@ Scroll vs inset vs child rhythm are **independent**:
 
 Every route picks **one width shell** from `components/layout/page/`:
 
-| Shell                                                                                                 | Width                | Typical routes                                                  |
-| ----------------------------------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------- |
-| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx)                                         | Centered `max-w-4xl` | Settings, wizards, account settings, simple forms               |
-| [`WidePage`](../src/components/layout/page/wide-page.tsx)                                             | Full main column     | Lists, hubs, detail pages, tables                               |
-| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Narrow or wide       | Catalog create/edit — always `scroll="viewport" spacing="none"` |
+| Shell                                                                                                 | Width                | Typical routes                                                                                           |
+| ----------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------- |
+| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx)                                         | Centered `max-w-4xl` | Settings, wizards, account settings, simple forms                                                        |
+| [`WidePage`](../src/components/layout/page/wide-page.tsx)                                             | Full main column     | Lists, hubs, detail pages, tables                                                                        |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Narrow or wide       | Catalog create/edit — `scroll="viewport" spacing="none"`; top inset on form scroll body + preview column |
 
 Nested readable columns inside `WidePage` use
 [`narrowPageContentClasses`](../src/components/layout/page/page-content.variants.ts)

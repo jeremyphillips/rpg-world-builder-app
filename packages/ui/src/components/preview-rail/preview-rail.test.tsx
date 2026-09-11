@@ -61,10 +61,11 @@ describe('PreviewRail', () => {
       </PreviewRail>,
     )
 
-    expect(screen.getByRole('complementary')).toHaveClass('sticky', 'top-0')
+    expect(screen.getByRole('complementary').className).toContain('h-full')
     expect(screen.getByRole('complementary').className).toContain('max-h-full')
+    expect(screen.getByRole('complementary').className).toContain('min-h-0')
     expect(screen.getByTestId('preview-rail-scroll')).toHaveClass('overflow-y-auto')
-    expect(screen.getByTestId('preview-rail-scroll').className).toContain('scrollbar-gutter-stable')
+    expect(screen.getByTestId('preview-rail-scroll').className).toContain('pe-2.5')
     expect(screen.getByRole('heading', { name: 'Class Preview' })).toBeInTheDocument()
     expect(screen.getByText('Draft')).toBeInTheDocument()
     expect(screen.getByText('Available')).toBeInTheDocument()

@@ -51,6 +51,8 @@ export interface FormProps<TFieldValues extends FieldValues> {
   className?: string
   /** Classes for the fields wrapper; e.g. `formCardContentClass` inside a `FormCard`. */
   contentClassName?: string
+  /** Extra classes on the bounded scroll body when `stickyFooter` is true. */
+  scrollBodyClassName?: string
   /** Optional id for the `<form>`; also the prefix for generated control ids. */
   id?: string
   /**
@@ -127,6 +129,7 @@ export function Form<TFieldValues extends FieldValues>({
   header,
   className,
   contentClassName,
+  scrollBodyClassName,
   id,
   uiStateKey,
   fileFieldProps,
@@ -196,6 +199,7 @@ export function Form<TFieldValues extends FieldValues>({
             formId={formId}
             fields={fields}
             contentClassName={contentClassName}
+            scrollBodyClassName={scrollBodyClassName}
             externalFooter={externalFooter}
             stickyFooter={stickyFooter}
             formError={formError}
@@ -216,6 +220,7 @@ export function Form<TFieldValues extends FieldValues>({
             formId={formId}
             fields={fields}
             contentClassName={contentClassName}
+            scrollBodyClassName={scrollBodyClassName}
             externalFooter={externalFooter}
             stickyFooter={stickyFooter}
             formError={formError}

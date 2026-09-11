@@ -26,7 +26,9 @@ export function CampaignLayout() {
         campaignsError={campaignsError}
         isOnboardingRoute={isOnboardingRoute}
       />
-      <Outlet />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <Outlet />
+      </div>
     </div>
   )
 }

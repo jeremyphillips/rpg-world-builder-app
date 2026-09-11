@@ -1,3 +1,4 @@
+import { cn } from '../../lib/utils'
 import { dialogPanelScrollRegionClasses } from '../../components/ui/dialog-panel.variants'
 
 /** Sticky tab list wrapper — keeps section tabs visible while scrolling long panels. */
@@ -22,11 +23,33 @@ export const formTabbedNavControlWrapClasses = 'min-w-0 flex-1 overflow-x-auto'
  * centered; at `2xl` the rail sits in a second column (~21rem) with a large gap.
  */
 export const formTabbedAsideGridClasses =
-  'mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col 2xl:mx-0 2xl:grid 2xl:max-w-none 2xl:grid-cols-[minmax(0,56rem)_21rem] 2xl:items-stretch 2xl:gap-6'
+  'mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col 2xl:mx-0 2xl:grid 2xl:h-full 2xl:max-w-none 2xl:grid-cols-[minmax(0,56rem)_21rem] 2xl:grid-rows-[minmax(0,1fr)] 2xl:items-stretch 2xl:gap-6'
 
-export const formTabbedAsideBodyClasses = 'min-w-0 2xl:col-start-1 2xl:row-start-1'
+export const formTabbedAsideBodyClasses =
+  'min-h-0 min-w-0 2xl:col-start-1 2xl:h-full 2xl:row-start-1'
 
-export const formTabbedAsideSlotClasses = 'hidden min-w-0 2xl:col-start-2 2xl:row-start-1 2xl:block'
+/**
+ * Top inset for viewport-bound form scroll bodies — scrolls away with content so
+ * sticky tabs can reach the breadcrumb edge. Matches dashboard `pageShellInsetTopClasses`.
+ */
+export const formViewportScrollBodyTopInsetClasses = 'pt-8'
+
+/**
+ * Top inset for the preview-rail column — matches dashboard `pageShellInsetTopClasses`.
+ */
+export const formTabbedAsideSlotTopInsetClasses = '2xl:pt-8'
+
+/**
+ * Bottom inset for the preview-rail column — matches dashboard
+ * `pageShellInsetBottomClasses` (`pb-8`) while the form footer stays flush.
+ */
+export const formTabbedAsideSlotBottomInsetClasses = '2xl:pb-8'
+
+export const formTabbedAsideSlotClasses = cn(
+  'hidden min-h-0 min-w-0 2xl:col-start-2 2xl:flex 2xl:h-full 2xl:flex-col 2xl:row-start-1',
+  formTabbedAsideSlotTopInsetClasses,
+  formTabbedAsideSlotBottomInsetClasses,
+)
 
 /** @deprecated Footer lives in the form column scroll shell — not a separate grid row. */
 export const formTabbedAsideFooterClasses = 'min-w-0 2xl:col-start-1 2xl:row-start-2'

@@ -4,7 +4,11 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Heading } from '@rpg/ui'
 
 import { pageScrollClasses } from './page-scroll.variants'
-import { pageShellInsetClasses } from './page-spacing.variants'
+import {
+  pageShellInsetBottomClasses,
+  pageShellInsetClasses,
+  pageShellInsetTopClasses,
+} from './page-spacing.variants'
 import { WidePage } from './wide-page'
 
 describe('WidePage', () => {
@@ -29,6 +33,18 @@ describe('WidePage', () => {
     const root = container.firstElementChild
     expect(root).toHaveClass(...pageScrollClasses.viewport.split(/\s+/))
     expect(root).not.toHaveClass(...pageShellInsetClasses.page.split(/\s+/))
+  })
+
+  it('supports top-only shell inset for viewport-bound forms', () => {
+    const { container } = render(
+      <WidePage scroll="viewport" spacing="page-top">
+        <p>Form body</p>
+      </WidePage>,
+    )
+
+    const root = container.firstElementChild
+    expect(root).toHaveClass(...pageShellInsetTopClasses.split(/\s+/))
+    expect(root).not.toHaveClass(...pageShellInsetBottomClasses.split(/\s+/))
   })
 
   it('defaults to page scroll with shell inset', () => {

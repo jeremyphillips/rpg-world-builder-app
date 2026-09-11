@@ -17,6 +17,7 @@ export type FormShellFieldStackProps = {
   formId: string
   fields: FormItem[]
   contentClassName?: string
+  scrollBodyClassName?: string
   externalFooter: boolean
   stickyFooter: boolean
   formError?: string | null
@@ -29,6 +30,7 @@ export function FormShellFieldStack({
   formId,
   fields,
   contentClassName,
+  scrollBodyClassName,
   externalFooter,
   stickyFooter,
   formError,
@@ -54,7 +56,7 @@ export function FormShellFieldStack({
   const scrollWrappedStack = externalFooter ? (
     <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
   ) : stickyFooter ? (
-    <div className={formStickyScrollBodyClasses}>{stack}</div>
+    <div className={cn(formStickyScrollBodyClasses, scrollBodyClassName)}>{stack}</div>
   ) : (
     stack
   )

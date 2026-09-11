@@ -13,6 +13,7 @@ import { FormItems } from '../containers/form-items.client'
 import { submitAndExpectPayload } from '../test-utils'
 import {
   formStickyActionsBarTransparentClasses,
+  formStickyScrollBodyClasses,
   formStickyTabsTransparentClasses,
 } from '../chrome/form-chrome.variants'
 
@@ -173,6 +174,14 @@ describe('TabbedForm', () => {
     expect(toolbar).not.toHaveClass('sticky')
     expect(toolbar.closest('.overflow-y-auto')).toBeNull()
     expect(toolbar.parentElement).toHaveClass('flex', 'flex-col')
+
+    const scrollRegion = sectionsNav.closest('.overflow-y-auto')
+    expect(scrollRegion?.className).toContain('scrollbar-slim')
+    expect(scrollRegion?.className).toContain('pe-2.5')
+    expect(scrollRegion?.className).toContain('ps-1')
+    for (const token of formStickyScrollBodyClasses.split(/\s+/)) {
+      expect(scrollRegion?.className).toContain(token)
+    }
   })
 
   it('merges stickyTabsClassName and stickyActionsBarClassName onto sticky chrome', () => {

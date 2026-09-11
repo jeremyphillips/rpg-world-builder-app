@@ -94,6 +94,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   stickyTabsClassName?: string
   /** Extra classes merged onto the sticky actions bar (overrides default surface). */
   stickyActionsBarClassName?: string
+  /** Extra classes merged onto the bounded scroll body (e.g. top inset that scrolls with content). */
+  scrollBodyClassName?: string
   /** Wrap tab chrome and panels (e.g. `<Sheet.Body>` in a drawer layout). */
   contentWrapper?: (content: React.ReactNode) => React.ReactNode
   /**
@@ -160,6 +162,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   stickyChrome = true,
   stickyTabsClassName,
   stickyActionsBarClassName,
+  scrollBodyClassName,
   contentWrapper,
   externalFooter = false,
   valueSyncs,
@@ -263,10 +266,12 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     </FormRhythmStack>
   )
 
+  const scrollBodyClasses = cn(formStickyScrollBodyClasses, scrollBodyClassName)
+
   const columnBody =
     stickyChrome && !externalFooter ? (
       <div className={formStickyScrollShellClasses}>
-        <div className={formStickyScrollBodyClasses}>{scrollableBody}</div>
+        <div className={scrollBodyClasses}>{scrollableBody}</div>
         {footerRegion}
       </div>
     ) : (
@@ -284,7 +289,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         >
           {stickyChrome ? (
             <>
-              <div className={formStickyScrollBodyClasses}>{scrollableBody}</div>
+              <div className={scrollBodyClasses}>{scrollableBody}</div>
               {footerRegion}
             </>
           ) : (

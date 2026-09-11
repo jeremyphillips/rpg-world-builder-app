@@ -42,10 +42,10 @@ export const dialogPanelStableBodyVariants = cva(
 export const dialogPanelScrollRegionBottomInsetClasses = 'pb-6'
 
 /**
- * Horizontal inset so `ring-2` + `ring-offset-2` focus rings stay inside
- * `overflow-y-auto` scroll regions (see accordion section content pattern).
+ * Inline-start inset so `ring-2` + `ring-offset-2` focus rings stay inside scroll
+ * regions. Inline-end reserve lives on {@link boundedScrollRegionEndInsetClasses}.
  */
-export const dialogPanelScrollRegionFocusClearanceClasses = 'px-1'
+export const dialogPanelScrollRegionFocusClearanceClasses = 'ps-1'
 
 /**
  * Inner scroll region for overlay shells with a docked footer (`stableBody`,

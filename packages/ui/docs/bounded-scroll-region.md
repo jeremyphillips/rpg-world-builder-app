@@ -8,22 +8,25 @@ or control edges.
 [`boundedScrollRegionClasses`](../src/components/ui/bounded-scroll-region.variants.ts):
 
 ```text
-overflow-y-auto scrollbar-slim scrollbar-gutter-stable
+overflow-y-auto scrollbar-slim pe-2.5
 ```
 
 The primitive owns **scrollbar behavior only** — do not embed `min-h-0`, `flex-1`,
-or padding. Consumers compose layout sizing and insets separately.
+or unrelated padding. [`boundedScrollRegionEndInsetClasses`](../src/components/ui/bounded-scroll-region.variants.ts)
+(`pe-2.5`, `calc(var(--spacing) * 2.5)`) reserves inline-end space so content ends
+before the scrollbar thumb.
 
-[`scrollbar-gutter-stable`](../src/styles/globals.css) reserves gutter space via
-`scrollbar-gutter: stable`.
+[`scrollbar-gutter-stable`](../src/styles/globals.css) remains available as an optional
+utility but is not composed into the primitive — explicit end inset is more reliable
+across overlay scrollbar platforms.
 
 ## Composition
 
-| Consumer                                                                                    | Composition                                        |
-| ------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)           | `min-h-0 flex-1` + primitive + bottom/focus insets |
-| [`previewRailScrollRegionClasses`](../src/components/preview-rail/preview-rail.variants.ts) | `min-h-0 flex-1` + primitive                       |
-| [`formStickyScrollBodyClasses`](../src/form/chrome/form-chrome.variants.ts)                 | re-exports `dialogPanelScrollRegionClasses`        |
+| Consumer                                                                                    | Composition                                          |
+| ------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)           | `min-h-0 flex-1` + primitive + `ps-1` + bottom inset |
+| [`previewRailScrollRegionClasses`](../src/components/preview-rail/preview-rail.variants.ts) | `min-h-0 flex-1` + primitive                         |
+| [`formStickyScrollBodyClasses`](../src/form/chrome/form-chrome.variants.ts)                 | re-exports `dialogPanelScrollRegionClasses`          |
 
 ## Follow-up adopters
 
