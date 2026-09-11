@@ -8,6 +8,7 @@ import {
   getSpellRoleTagLabel,
   getSpellSchoolLabel,
   effectiveSpellModelingStatus,
+  parseSelectNumberInput,
   spellDeliveryMethodSchema,
   type Spell,
 } from '@rpg/contracts'
@@ -52,18 +53,16 @@ import {
   type SpellDisplayVocabulary,
 } from './spell-display'
 import {
-  spellAreaOfEffectFromFormValues,
-  spellCastingTimeFromFormValues,
-  spellComponentsFromFormValues,
+  trySpellAreaOfEffectFromFormValues,
+  trySpellCastingTimeFromFormValues,
   spellCreateDefaultValues,
-  spellDurationFromFormValues,
-  spellRangeFromFormValues,
   spellTagsFromFormValues,
+  trySpellComponentsFromFormValues,
+  trySpellDurationFromFormValues,
+  trySpellRangeFromFormValues,
   type SpellFormAreaOfEffect,
   type SpellFormCastingTime,
   type SpellFormComponents,
-  type SpellFormDuration,
-  type SpellFormRange,
   type SpellFormTags,
 } from './spell-form-values'
 import { SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
@@ -152,14 +151,6 @@ function mergedCastingTime(values: SpellFormValues): SpellFormCastingTime {
   return values.castingTime ?? spellCreateDefaultValues.castingTime!
 }
 
-function mergedRange(values: SpellFormValues): SpellFormRange {
-  return values.range ?? spellCreateDefaultValues.range!
-}
-
-function mergedDuration(values: SpellFormValues): SpellFormDuration {
-  return values.duration ?? spellCreateDefaultValues.duration!
-}
-
 function mergedComponents(values: SpellFormValues): SpellFormComponents {
   return values.components ?? spellCreateDefaultValues.components!
 }
@@ -184,13 +175,18 @@ export function buildSpellPreviewIdentity(
   }
 }
 
+function formatLevelPreview(level: unknown): string {
+  const parsed = parseSelectNumberInput(level)
+  if (parsed === undefined) return CONTENT_PREVIEW_NOT_SET
+  return formatSpellLevelLabel(parsed)
+}
+
 function buildBasicsSection(values: SpellFormValues, ctx: ContentFormCtx): ContentPreviewSection {
   const classLabels = (values.classIds ?? []).map((id) => formatClassLabel(id, ctx))
   const facts: PreviewRailFact[] = [
     {
       label: SPELL_PREVIEW_FACT_LABELS.level,
-      value:
-        values.level !== undefined ? formatSpellLevelLabel(values.level) : CONTENT_PREVIEW_NOT_SET,
+      value: formatLevelPreview(values.level),
     },
     {
       label: SPELL_PREVIEW_FACT_LABELS.school,
@@ -215,28 +211,41 @@ function buildBasicsSection(values: SpellFormValues, ctx: ContentFormCtx): Conte
 }
 
 function buildCastingSection(values: SpellFormValues): ContentPreviewSection {
-  const castingTime = spellCastingTimeFromFormValues(mergedCastingTime(values))
-  const range = spellRangeFromFormValues(mergedRange(values))
-  const duration = spellDurationFromFormValues(mergedDuration(values))
-  const components = spellComponentsFromFormValues(mergedComponents(values))
-  const areaOfEffect = spellAreaOfEffectFromFormValues(mergedArea(values))
+  const castingTime = trySpellCastingTimeFromFormValues(mergedCastingTime(values))
+  const range = trySpellRangeFromFormValues(values.range)
+  const duration = trySpellDurationFromFormValues(values.duration)
+  const components = trySpellComponentsFromFormValues(mergedComponents(values))
+  const areaOfEffect = trySpellAreaOfEffectFromFormValues(mergedArea(values))
   const deliveryMethod = spellDeliveryMethodFromFormValues(values.deliveryMethod)
 
   const facts: PreviewRailFact[] = [
     {
       label: SPELL_PREVIEW_FACT_LABELS.castingTime,
-      value: formatCastingTime(castingTime),
+      value: castingTime ? formatCastingTime(castingTime) : CONTENT_PREVIEW_NOT_SET,
     },
-    { label: SPELL_PREVIEW_FACT_LABELS.range, value: formatSpellRange(range) },
-    { label: SPELL_PREVIEW_FACT_LABELS.duration, value: formatSpellDuration(duration) },
-    { label: SPELL_PREVIEW_FACT_LABELS.components, value: formatSpellComponents(components) },
+    {
+      label: SPELL_PREVIEW_FACT_LABELS.range,
+      value: range ? formatSpellRange(range) : CONTENT_PREVIEW_NOT_SET,
+    },
+    {
+      label: SPELL_PREVIEW_FACT_LABELS.duration,
+      value: duration ? formatSpellDuration(duration) : CONTENT_PREVIEW_NOT_SET,
+    },
+    {
+      label: SPELL_PREVIEW_FACT_LABELS.components,
+      value: components ? formatSpellComponents(components) : CONTENT_PREVIEW_NOT_SET,
+    },
     {
       label: SPELL_PREVIEW_FACT_LABELS.ritual,
-      value: castingTime.canBeCastAsRitual ? 'Yes' : 'No',
+      value: castingTime ? (castingTime.canBeCastAsRitual ? 'Yes' : 'No') : CONTENT_PREVIEW_NOT_SET,
     },
     {
       label: SPELL_PREVIEW_FACT_LABELS.concentration,
-      value: spellRequiresConcentration(duration) ? 'Yes' : 'No',
+      value: duration
+        ? spellRequiresConcentration(duration)
+          ? 'Yes'
+          : 'No'
+        : CONTENT_PREVIEW_NOT_SET,
     },
   ]
 
@@ -269,8 +278,8 @@ function buildResolutionSection(values: SpellFormValues): ContentPreviewSection 
     }
   }
 
-  const spell = spellDetailSourceFromFormValues(values)
-  const status = effectiveSpellModelingStatus(spell)
+  const resolution = resolutionToStored(values.resolution as ResolutionFormValues | undefined)
+  const status = effectiveSpellModelingStatus({ resolution })
 
   return {
     derivedKind: 'ready',
@@ -314,18 +323,33 @@ export function buildSpellPreviewSections(
   }
 }
 
-export function spellDetailSourceFromFormValues(values: SpellFormValues): Spell {
-  const castingTime = spellCastingTimeFromFormValues(mergedCastingTime(values))
-  const range = spellRangeFromFormValues(mergedRange(values))
-  const duration = spellDurationFromFormValues(mergedDuration(values))
-  const components = spellComponentsFromFormValues(mergedComponents(values))
+function spellPreviewDetailOptionalFields(values: SpellFormValues) {
   const tags = spellTagsFromFormValues(values.tags)
-  const areaOfEffect = spellAreaOfEffectFromFormValues(mergedArea(values))
+  const areaOfEffect = trySpellAreaOfEffectFromFormValues(mergedArea(values))
   const deliveryMethod = spellDeliveryMethodFromFormValues(values.deliveryMethod)
   const resolutionConfigured = isResolutionFormConfigured(values as Record<string, unknown>)
   const resolution = resolutionConfigured
     ? resolutionToStored(values.resolution as ResolutionFormValues | undefined)
     : undefined
+
+  return {
+    ...(tags ? { tags } : {}),
+    ...(areaOfEffect ? { areaOfEffect } : {}),
+    ...(deliveryMethod ? { deliveryMethod } : {}),
+    ...(resolution ? { resolution } : {}),
+  }
+}
+
+export function spellDetailSourceFromFormValues(values: SpellFormValues): Spell | undefined {
+  const level = parseSelectNumberInput(values.level)
+  const range = trySpellRangeFromFormValues(values.range)
+  const duration = trySpellDurationFromFormValues(values.duration)
+  const components = trySpellComponentsFromFormValues(mergedComponents(values))
+  const castingTime = trySpellCastingTimeFromFormValues(mergedCastingTime(values))
+
+  if (level === undefined || !range || !duration || !components || !castingTime) {
+    return undefined
+  }
 
   return {
     ...PREVIEW_SPELL_ENVELOPE,
@@ -335,7 +359,7 @@ export function spellDetailSourceFromFormValues(values: SpellFormValues): Spell 
     source: 'homebrew',
     status: 'draft',
     school: values.school ?? '',
-    level: values.level ?? 0,
+    level,
     classIds: values.classIds ?? [],
     description: values.description,
     cantripScaling: values.cantripScaling,
@@ -344,10 +368,47 @@ export function spellDetailSourceFromFormValues(values: SpellFormValues): Spell 
     range,
     duration,
     components,
-    ...(tags ? { tags } : {}),
-    ...(areaOfEffect ? { areaOfEffect } : {}),
-    ...(deliveryMethod ? { deliveryMethod } : {}),
-    ...(resolution ? { resolution } : {}),
+    ...spellPreviewDetailOptionalFields(values),
+  }
+}
+
+function buildIncompleteSpellPreviewDetailViewModel(
+  values: SpellFormValues,
+  ctx: ContentFormCtx,
+): SpellDetailViewModel {
+  const basics = buildBasicsSection(values, ctx)
+  const casting = buildCastingSection(values)
+  const tagLabels = collectTagLabels(values.tags, ctx)
+  const classLabels = (values.classIds ?? []).map((id) => formatClassLabel(id, ctx))
+
+  return {
+    statRows: [...(basics.facts ?? []), ...(casting.facts ?? [])].map((fact) => ({
+      label: fact.label,
+      value: String(fact.value),
+    })),
+    descriptionHtml: values.description || undefined,
+    proseSections: {},
+    tagLabels,
+    classLabels,
+    ...(classLabels.length > 0
+      ? {
+          classesSection: {
+            title: SPELL_SECTION_LABELS.classes,
+            items: (values.classIds ?? []).map((slug) => ({
+              slug,
+              label: formatClassLabel(slug, ctx),
+            })),
+          },
+        }
+      : {}),
+    ...(tagLabels.length > 0
+      ? {
+          tagsSection: {
+            title: SPELL_SECTION_LABELS.tags,
+            labels: tagLabels,
+          },
+        }
+      : {}),
   }
 }
 
@@ -355,8 +416,10 @@ export function buildSpellPreviewDetailViewModel(
   values: SpellFormValues,
   ctx: ContentFormCtx,
 ): SpellDetailViewModel {
-  return buildSpellDetailViewModel(
-    spellDetailSourceFromFormValues(values),
-    spellPreviewVocabulary(ctx),
-  )
+  const spell = spellDetailSourceFromFormValues(values)
+  if (!spell) {
+    return buildIncompleteSpellPreviewDetailViewModel(values, ctx)
+  }
+
+  return buildSpellDetailViewModel(spell, spellPreviewVocabulary(ctx))
 }

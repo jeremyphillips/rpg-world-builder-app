@@ -96,6 +96,11 @@ field labels instead of Zod defaults.
 Pair `resolverFields` with `errorPaths` on header-only tabs: `errorPaths` drives tab
 badges and the footer summary; `resolverFields` drives inline message copy.
 
+Tab badges appear after **any** failed submit or publish attempt
+(`hasAttemptedSubmit || hasAttemptedPublish`). Content forms with preview enabled
+auto-own the hoisted `name` field on the first tab — do not hand-wire `errorPaths:
+['name']` per feature.
+
 Dashboard helpers: `prefixFormItems`, `embeddedArrayResolverField`, and
 `embeddedMasterDetailTabValidation` in `tabbed-form-resolver-fields.ts` (dashboard).
 Dev-only warnings fire when header-only tabs omit wiring; set

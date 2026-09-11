@@ -331,6 +331,7 @@ export {
   resolveInvalidSubmitNavigation,
   prepareFormIssues,
   resolveTabValidationState,
+  collectTabPathPrefixes,
   pathOwnsIssue,
   type ArrayItemIssueGroup,
   type ArraySectionMeta,

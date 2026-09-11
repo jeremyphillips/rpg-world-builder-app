@@ -472,6 +472,48 @@ describe('TabbedForm', () => {
     expect(within(getSectionsNav()).getByRole('button', { name: /Notes/ })).toHaveTextContent('1')
   })
 
+  it('shows tab badges after a failed submit when publish presentation is enabled', async () => {
+    const user = userEvent.setup()
+    const draftSchema = z.object({
+      name: z.string(),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof draftSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        schema={draftSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', notes: '' }}
+        footer={<button type="submit">Save</button>}
+        publishPresentationEnabled
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Notes.*1 field needs attention/i }),
+      ).toBeInTheDocument()
+    })
+  })
+
   it('uses resolverFields for tier-1 validation copy on header-only paths', async () => {
     const user = userEvent.setup()
     const validationSchema = z.object({
