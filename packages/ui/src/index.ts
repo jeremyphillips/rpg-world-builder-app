@@ -43,11 +43,12 @@ export {
   EmphasisDetailLine,
   type EmphasisDetailLineProps,
 } from './components/ui/emphasis-detail-line'
-export { Alert, type AlertProps, type AlertVariant } from './components/ui/alert'
+export { Alert, type AlertDensity, type AlertProps, type AlertVariant } from './components/ui/alert'
 export {
   alertVariants,
   alertTitleVariants,
   alertDescriptionVariants,
+  ALERT_DENSITIES,
   ALERT_VARIANTS,
   type AlertVariantProps,
 } from './components/ui/alert.variants'
@@ -375,6 +376,7 @@ export {
   fieldInlineSentenceClasses,
   fieldInlineSwitchControlColumnClasses,
   fieldInlineToggleRowClasses,
+  fieldLabelContentClusterClasses,
   fieldLabelHintStackClasses,
   fieldLabelVariants,
   fieldRowLayoutClasses,
@@ -434,6 +436,42 @@ export {
   type RichTextLinkPickerContentTypeOption,
 } from './components/ui/rich-text-link-picker.client'
 export { PreviewCard, type PreviewCardProps } from './components/ui/preview-card.client'
+export {
+  PreviewRail,
+  PreviewRailAction,
+  PreviewRailAvailabilityLine,
+  PreviewRailDraftBadge,
+  PreviewRailFacts,
+  PreviewRailHeader,
+  PreviewRailIdentity,
+  PreviewRailMedia,
+  PreviewRailFooter,
+  PreviewRailRoot,
+  PreviewRailScrollRegion,
+  PreviewRailSection,
+  PreviewRailSectionBody,
+  PreviewRailSections,
+  PreviewRailStatusPanel,
+  formatPreviewRailOverflowList,
+  type PreviewRailActionProps,
+  type PreviewRailAvailability,
+  type PreviewRailAvailabilityLineProps,
+  type PreviewRailChrome,
+  type PreviewRailDraftBadgeProps,
+  type PreviewRailFact,
+  type PreviewRailFactsProps,
+  type PreviewRailHeaderProps,
+  type PreviewRailIdentityProps,
+  type PreviewRailMediaProps,
+  type PreviewRailProps,
+  type PreviewRailSectionBodyProps,
+  type PreviewRailSectionMarker,
+  type PreviewRailSectionProps,
+  type PreviewRailSectionsProps,
+  type PreviewRailStatusPanelProps,
+  type PreviewRailStatusPanelVariant,
+  type PreviewRailStatusTone,
+} from './components/preview-rail'
 export { ContentCard, type ContentCardProps } from './components/ui/content-card.client'
 export {
   ContentCardBody,
@@ -597,6 +635,30 @@ export {
   type ModalContentVariantProps,
   type ModalSize,
 } from './components/ui/modal.variants'
+export {
+  boundedScrollRegionClasses,
+  boundedScrollRegionEndInsetClasses,
+} from './components/ui/bounded-scroll-region.variants'
+export {
+  ScrollBoundaryRegion,
+  useScrollBoundaryRegion,
+  type ScrollBoundaryRegionProps,
+} from './components/ui/scroll-boundary-region.client'
+export {
+  resolveScrollBoundaryState,
+  SCROLL_BOUNDARY_END_TOLERANCE_PX,
+  type ScrollBoundaryState,
+} from './components/ui/scroll-boundary-region.lib'
+export {
+  scrollBoundaryBottomShadowClasses,
+  scrollBoundaryRegionRootClasses,
+  scrollBoundaryRegionViewportClasses,
+  scrollBoundaryBottomShadowHeightClasses,
+  scrollBoundaryBottomShadowTintClasses,
+  scrollBoundaryTopShadowHeightClasses,
+  scrollBoundaryTopShadowTintClasses,
+  scrollBoundaryTopShadowClasses,
+} from './components/ui/scroll-boundary-region.variants'
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
@@ -797,6 +859,18 @@ export { Spinner, type SpinnerProps } from './components/ui/spinner'
 export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
 export { StatusDot, type StatusDotProps } from './components/ui/status-dot'
 export { statusDotVariants, type StatusDotVariantProps } from './components/ui/status-dot.variants'
+export {
+  StatusIcon,
+  type StatusIconProps,
+  type StatusIconVariant,
+} from './components/ui/status-icon.client'
+export {
+  statusIconVariants,
+  statusIconGlyphVariants,
+  STATUS_ICON_VARIANTS,
+  STATUS_ICON_TOOLTIP_LABELS,
+  type StatusIconVariantProps,
+} from './components/ui/status-icon.variants'
 export {
   Collapsible,
   CollapsibleTrigger,

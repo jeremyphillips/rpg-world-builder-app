@@ -41,6 +41,15 @@ export const CLASS_DISPLAY_NONE = 'None' as const
 
 export type ClassDisplaySurface = 'content-detail' | 'builder-sheet'
 
+/** Fields the detail view model actually reads — preview may supply an in-memory source. */
+export type ClassDetailViewModelSource = Pick<
+  CharacterClass,
+  'name' | 'hitDie' | 'primaryAbilities' | 'proficiencies' | 'features'
+> & {
+  description?: string
+  characterCreation?: CharacterClass['characterCreation']
+}
+
 export type ClassDisplayVocabulary = {
   resolveToolLabel: (slug: string) => string
 }
@@ -128,11 +137,15 @@ function joinDisplayList(values: string[]): string {
   return values.length > 0 ? values.join(', ') : CLASS_DISPLAY_NONE
 }
 
-function formatGrantedArmorValue(armor: CharacterClass['proficiencies']['armor']): string {
+function formatGrantedArmorValue(
+  armor: ClassDetailViewModelSource['proficiencies']['armor'],
+): string {
   return joinDisplayList(armor.categories.map(formatArmorCategoryDisplay))
 }
 
-function formatGrantedWeaponsValue(weapons: CharacterClass['proficiencies']['weapons']): string {
+function formatGrantedWeaponsValue(
+  weapons: ClassDetailViewModelSource['proficiencies']['weapons'],
+): string {
   const parts = [
     ...weapons.categories.map(formatWeaponCategoryDisplay),
     ...weapons.items.map(formatSlugLabel),
@@ -142,7 +155,7 @@ function formatGrantedWeaponsValue(weapons: CharacterClass['proficiencies']['wea
 }
 
 function formatGrantedToolsValue(
-  tools: NonNullable<CharacterClass['proficiencies']['tools']>,
+  tools: NonNullable<ClassDetailViewModelSource['proficiencies']['tools']>,
   vocabulary: ClassDisplayVocabulary,
 ): string {
   const parts = [
@@ -153,13 +166,15 @@ function formatGrantedToolsValue(
   return joinDisplayList(parts)
 }
 
-function hasGrantedTools(tools: CharacterClass['proficiencies']['tools'] | undefined): boolean {
+function hasGrantedTools(
+  tools: ClassDetailViewModelSource['proficiencies']['tools'] | undefined,
+): boolean {
   if (!tools) return false
   return tools.categories.length > 0 || tools.items.length > 0
 }
 
 function buildGrantedProficiencyRows(
-  characterClass: CharacterClass,
+  characterClass: ClassDetailViewModelSource,
   vocabulary: ClassDisplayVocabulary,
 ): ClassProficiencyGrantRow[] {
   const { proficiencies } = characterClass
@@ -217,8 +232,13 @@ function buildProficiencyChoiceRow({
   }
 }
 
-function buildSkillsChoiceRow(characterClass: CharacterClass): ClassProficiencyChoiceRow {
-  const { choose, optionSlugs } = classSkillChoiceDisplaySummary(characterClass)
+function buildSkillsChoiceRow(
+  characterClass: ClassDetailViewModelSource,
+): ClassProficiencyChoiceRow {
+  const { choose, optionSlugs } = classSkillChoiceDisplaySummary({
+    slug: '',
+    characterCreation: characterClass.characterCreation,
+  })
 
   return buildProficiencyChoiceRow({
     id: 'skills',
@@ -228,7 +248,9 @@ function buildSkillsChoiceRow(characterClass: CharacterClass): ClassProficiencyC
   })
 }
 
-function buildToolsChoiceRow(characterClass: CharacterClass): ClassProficiencyChoiceRow {
+function buildToolsChoiceRow(
+  characterClass: ClassDetailViewModelSource,
+): ClassProficiencyChoiceRow {
   const choice = (characterClass.characterCreation?.proficiencies?.tools?.choices ?? []).find(
     isMeaningfulToolProficiencyChoice,
   )
@@ -273,7 +295,7 @@ function buildLanguagesChoiceRow(): ClassProficiencyChoiceRow {
 }
 
 function buildProficiencyChoiceRows(
-  characterClass: CharacterClass,
+  characterClass: ClassDetailViewModelSource,
   surface: ClassDisplaySurface,
 ): ClassProficiencyChoiceRow[] {
   const skills = buildSkillsChoiceRow(characterClass)
@@ -288,7 +310,7 @@ function buildProficiencyChoiceRows(
 }
 
 function buildClassStatRows(
-  characterClass: CharacterClass,
+  characterClass: ClassDetailViewModelSource,
   surface: ClassDisplaySurface,
 ): ContentStatRowData[] {
   const hitDieValue =
@@ -326,7 +348,7 @@ function sortFeatures(features: readonly ClassFeature[]): ClassFeature[] {
 }
 
 function buildFeaturesSection(
-  characterClass: CharacterClass,
+  characterClass: ClassDetailViewModelSource,
   features: readonly ClassFeature[],
 ): Extract<ClassDetailViewModel['sections'][number], { id: 'features' }> {
   return {
@@ -346,7 +368,7 @@ export function buildClassCardViewModel(characterClass: CharacterClass): ClassCa
 }
 
 export function buildClassDetailViewModel(
-  characterClass: CharacterClass,
+  characterClass: ClassDetailViewModelSource,
   vocabulary: ClassDisplayVocabulary,
   options: BuildClassDetailViewModelOptions = {},
 ): ClassDetailViewModel {

@@ -21,6 +21,7 @@ import type {
 
 import type { ContentListQueryResult } from '../../list/content-client'
 import type { ContentFormOptionSets } from '../../form-options/content-form-options'
+import type { ContentFormPreviewConfig } from '../preview/content-form-preview.types'
 
 /**
  * Context passed to `buildFields` / `buildTabs`. Carries campaign-scoped catalog
@@ -93,6 +94,7 @@ export interface ContentFormDef<
   TEntity extends { id: string; name: string },
   TFormValues extends FieldValues,
   TCreateInput,
+  TPreviewResources = unknown,
 > {
   /** Kebab-case route key used in URLs and API paths (e.g. `'species'`). */
   routeKey: string
@@ -163,10 +165,15 @@ export interface ContentFormDef<
    *   `flattenFields(buildFields({}))` paths for flat types.
    */
   coverage?: 'structural' | 'roundtrip-only'
+  /**
+   * When set, create/edit shells use WidePage and reserve the preview rail slot.
+   * Projection builders are required when `preview` is present.
+   */
+  preview?: ContentFormPreviewConfig<TFormValues, TPreviewResources>
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- all three params are erased at the registry boundary; each def is strongly typed internally
-export type AnyContentFormDef = ContentFormDef<any, any, any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- all params are erased at the registry boundary; each def is strongly typed internally
+export type AnyContentFormDef = ContentFormDef<any, any, any, any>
 
 /**
  * The global content form registry. Each content type that supports create/edit

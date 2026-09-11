@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority'
 
+import { boundedScrollRegionClasses } from './bounded-scroll-region.variants'
 import { cn } from '../../lib/utils'
 
 /**
@@ -41,10 +42,10 @@ export const dialogPanelStableBodyVariants = cva(
 export const dialogPanelScrollRegionBottomInsetClasses = 'pb-6'
 
 /**
- * Horizontal inset so `ring-2` + `ring-offset-2` focus rings stay inside
- * `overflow-y-auto` scroll regions (see accordion section content pattern).
+ * Inline-start inset so `ring-2` + `ring-offset-2` focus rings stay inside scroll
+ * regions. Inline-end reserve lives on {@link boundedScrollRegionEndInsetClasses}.
  */
-export const dialogPanelScrollRegionFocusClearanceClasses = 'px-1'
+export const dialogPanelScrollRegionFocusClearanceClasses = 'ps-1'
 
 /**
  * Inner scroll region for overlay shells with a docked footer (`stableBody`,
@@ -52,7 +53,8 @@ export const dialogPanelScrollRegionFocusClearanceClasses = 'px-1'
  * clearance so the last block can scroll fully into view.
  */
 export const dialogPanelScrollRegionClasses = cn(
-  'min-h-0 flex-1 overflow-y-auto',
+  'min-h-0 flex-1',
+  boundedScrollRegionClasses,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionFocusClearanceClasses,
 )

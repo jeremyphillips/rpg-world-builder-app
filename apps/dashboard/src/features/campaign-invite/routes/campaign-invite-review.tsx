@@ -12,7 +12,7 @@ export function CampaignInviteReviewRoute() {
   const parsedInviteId = inviteId && isCampaignInviteId(inviteId) ? inviteId : null
 
   return (
-    <NarrowPage spacing="compact">
+    <NarrowPage rhythm="compact">
       {parsedInviteId ? (
         <CampaignInviteReviewPage inviteId={parsedInviteId} />
       ) : (

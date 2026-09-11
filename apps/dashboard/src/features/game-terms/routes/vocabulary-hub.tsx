@@ -49,7 +49,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
   )
 
   return (
-    <WidePage spacing="relaxed">
+    <WidePage rhythm="relaxed">
       <PageHeader heading={GAME_TERMS_HUB_LABEL} />
       <Text variant="muted">{GAME_TERMS_HUB_DESCRIPTION}</Text>
 

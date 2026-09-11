@@ -17,6 +17,8 @@ describe('coreAttributesFields', () => {
       'primaryAbilities',
       'hitDie',
     ])
+    const hitDie = left?.fields[2]
+    expect(hitDie).toMatchObject({ type: 'chips', name: 'hitDie', multiple: false, required: true })
     expect(right?.fields).toHaveLength(1)
     const slot = right?.fields[0]
     expect(slot).toMatchObject({

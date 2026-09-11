@@ -332,10 +332,7 @@ const router = createBrowserRouter(
                   } satisfies CrumbHandle,
                   children: [
                     { index: true, element: <ClassesOverviewRoute /> },
-                    {
-                      path: 'new',
-                      element: <ClassCreateRoute />,
-                    },
+                    { path: 'new', element: <ClassCreateRoute /> },
                     {
                       path: ':classId',
                       element: <Outlet />,

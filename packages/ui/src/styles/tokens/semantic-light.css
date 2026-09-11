@@ -220,6 +220,21 @@
   --semantic-destructive-outline-foreground: var(--foreground);
 
   /*
+   * StatusIcon disc fills — neutral idle/incomplete washes on canvas (not surface-relative ink).
+   */
+  --status-icon-idle-bg: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-fg-subtle),
+    var(--background)
+  );
+  --status-icon-incomplete-bg: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-fg-disabled),
+    var(--background)
+  );
+  --status-icon-neutral-foreground: var(--semantic-success-strong-foreground);
+
+  /*
    * Choice indicators — radio/checkbox rings on panel surfaces (not field-input chrome).
    */
   --choice-control-border: color-mix(

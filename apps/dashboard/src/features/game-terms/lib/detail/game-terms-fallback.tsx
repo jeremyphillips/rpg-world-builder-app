@@ -20,7 +20,7 @@ export function GameTermsFallback({
   campaignId,
 }: GameTermsFallbackProps) {
   return (
-    <WidePage spacing="relaxed">
+    <WidePage rhythm="relaxed">
       <PageHeader heading={heading} />
       <Heading variant="section" as="h2">
         Not found

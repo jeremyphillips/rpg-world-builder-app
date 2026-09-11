@@ -51,7 +51,7 @@ export function HomebrewDetailFallback({
   )
 
   if (status === 'unknown') {
-    return <WidePage spacing="relaxed">{body}</WidePage>
+    return <WidePage rhythm="relaxed">{body}</WidePage>
   }
 
   return <HomebrewDetailMain>{body}</HomebrewDetailMain>

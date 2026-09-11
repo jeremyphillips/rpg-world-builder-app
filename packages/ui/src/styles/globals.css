@@ -137,6 +137,9 @@
   --color-semantic-destructive-strong: var(--semantic-destructive-strong-bg);
   --color-semantic-destructive-strong-foreground: var(--semantic-destructive-strong-foreground);
   --color-semantic-destructive-outline-foreground: var(--semantic-destructive-outline-foreground);
+  --color-status-icon-idle: var(--status-icon-idle-bg);
+  --color-status-icon-incomplete: var(--status-icon-incomplete-bg);
+  --color-status-icon-neutral-foreground: var(--status-icon-neutral-foreground);
   --color-selected-control: var(--selected-control);
   --color-selected-control-foreground: var(--selected-control-foreground);
   --color-selected-control-border: var(--selected-control-border);
@@ -325,6 +328,10 @@
   --icon-glyph-md: 0.875rem;
   --icon-glyph-lg: 1rem;
 
+  /* StatusIcon off-slash — smaller than the icon-glyph ladder (Lucide slash reads heavier). */
+  --status-icon-slash-sm: 0.375rem;
+  --status-icon-slash-md: 0.5rem;
+
   /*
    * Control action hit targets — generic control chrome (icon buttons, row actions).
    * Field control bands remain in field-sizing; number-stepper aligns to field height.
@@ -392,6 +399,28 @@
 @utility size-icon-glyph-lg {
   width: var(--icon-glyph-lg);
   height: var(--icon-glyph-lg);
+}
+
+@utility size-status-icon-slash-sm {
+  width: var(--status-icon-slash-sm);
+  height: var(--status-icon-slash-sm);
+}
+
+@utility size-status-icon-slash-md {
+  width: var(--status-icon-slash-md);
+  height: var(--status-icon-slash-md);
+}
+
+@utility bg-status-icon-idle {
+  background-color: var(--status-icon-idle-bg);
+}
+
+@utility bg-status-icon-incomplete {
+  background-color: var(--status-icon-incomplete-bg);
+}
+
+@utility text-status-icon-neutral-foreground {
+  color: var(--status-icon-neutral-foreground);
 }
 
 @utility border-input {
@@ -728,6 +757,10 @@
       transparent
     );
   }
+}
+
+@utility scrollbar-gutter-stable {
+  scrollbar-gutter: stable;
 }
 
 @layer base {

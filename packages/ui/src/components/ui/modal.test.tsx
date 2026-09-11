@@ -214,6 +214,26 @@ describe('Modal', () => {
     expect(content.className).toContain('max-h-[85vh]')
   })
 
+  it('applies xl width and small-viewport full-screen classes', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open</Button>
+        </Modal.Trigger>
+        <Modal.Content size="xl" data-testid="modal-content">
+          <Modal.Header headline="Wide preview" />
+          <Modal.Body>Body content</Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Open' }))
+    const content = await screen.findByTestId('modal-content')
+    expect(content).toHaveClass('max-w-5xl')
+    expect(content.className).toContain('max-md:h-dvh')
+  })
+
   it('applies default stable size explicitly the same as implicit stable layout', async () => {
     const user = userEvent.setup()
     render(

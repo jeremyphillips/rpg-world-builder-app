@@ -23,11 +23,11 @@ export const ArrayItemPresentationContext = React.createContext<ArrayItemPresent
 export function resolveErrorPlacement(
   errorPlacement: ErrorPlacement | undefined,
   variant: 'compact' | 'detailed',
-  isHorizontalRow: boolean,
+  _isHorizontalRow: boolean,
 ): boolean {
   if (errorPlacement === 'field') return false
   if (errorPlacement === 'row') return true
-  return variant === 'compact' || isHorizontalRow
+  return variant === 'compact'
 }
 
 export interface FieldErrorPresentation {
@@ -36,22 +36,74 @@ export interface FieldErrorPresentation {
   describedBy: string | undefined
 }
 
+function resolvePublishIssueMessage(
+  fieldPath: string | undefined,
+  issues: ReturnType<typeof useFormValidationPresentation>['issues'],
+  publishPresentationEnabled: boolean,
+  hasAttemptedPublish: boolean,
+): string | undefined {
+  if (!publishPresentationEnabled || !hasAttemptedPublish || !fieldPath) return undefined
+  return resolveFieldErrorMessage(issues.find((issue) => issue.path === fieldPath)?.message)
+}
+
+function fieldHasPresentationIssue(
+  fieldPath: string | undefined,
+  issues: ReturnType<typeof useFormValidationPresentation>['issues'],
+  presentationActive: boolean,
+): boolean {
+  return Boolean(
+    fieldPath && presentationActive && issues.some((issue) => issue.path === fieldPath),
+  )
+}
+
+function resolvePresentedFieldError(
+  message: unknown,
+  fieldPath: string | undefined,
+  issues: ReturnType<typeof useFormValidationPresentation>['issues'],
+  presentation: Pick<
+    ReturnType<typeof useFormValidationPresentation>,
+    'hasAttemptedSubmit' | 'hasAttemptedPublish' | 'publishPresentationEnabled'
+  >,
+): Pick<FieldErrorPresentation, 'error' | 'invalid'> & { hasError: boolean } {
+  const resolvedError = resolveFieldErrorMessage(typeof message === 'string' ? message : undefined)
+  const presentationActive =
+    (presentation.publishPresentationEnabled && presentation.hasAttemptedPublish) ||
+    presentation.hasAttemptedSubmit
+  const visibleError =
+    resolvedError ??
+    resolvePublishIssueMessage(
+      fieldPath,
+      issues,
+      presentation.publishPresentationEnabled,
+      presentation.hasAttemptedPublish,
+    )
+  const hasError =
+    Boolean(visibleError) || fieldHasPresentationIssue(fieldPath, issues, presentationActive)
+
+  return {
+    error: visibleError,
+    invalid: hasError || undefined,
+    hasError,
+  }
+}
+
 /** Maps a raw RHF error message to visible/suppressed field presentation props. */
 export function useFieldErrorPresentation(
   message: unknown,
   fieldPath?: string,
 ): FieldErrorPresentation {
   const { suppressFieldErrorText, rowSummaryId } = React.useContext(ArrayItemPresentationContext)
-  const { issues, hasAttemptedSubmit } = useFormValidationPresentation()
-  const resolvedError = resolveFieldErrorMessage(typeof message === 'string' ? message : undefined)
-  const hasIndexedIssue = Boolean(
-    fieldPath && hasAttemptedSubmit && issues.some((issue) => issue.path === fieldPath),
+  const presentation = useFormValidationPresentation()
+  const { error, invalid, hasError } = resolvePresentedFieldError(
+    message,
+    fieldPath,
+    presentation.issues,
+    presentation,
   )
-  const hasError = Boolean(resolvedError) || hasIndexedIssue
 
   return {
-    error: suppressFieldErrorText ? undefined : resolvedError,
-    invalid: hasError || undefined,
+    error: suppressFieldErrorText ? undefined : error,
+    invalid,
     describedBy: suppressFieldErrorText && hasError ? rowSummaryId : undefined,
   }
 }

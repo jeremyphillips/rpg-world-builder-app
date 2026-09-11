@@ -14,6 +14,8 @@ export interface ContentEditHeadingBadgesProps {
   source: ContentSource
   status: ContentStatus
   campaignAccess: ResolvedContentCampaignAccess
+  /** When true, the Draft badge is omitted (shown on the preview rail instead). */
+  omitDraft?: boolean
 }
 
 export function ContentEditHeadingBadges({
@@ -21,8 +23,9 @@ export function ContentEditHeadingBadges({
   source,
   status,
   campaignAccess,
+  omitDraft = false,
 }: ContentEditHeadingBadgesProps) {
-  const isDraft = source === 'homebrew' && status === 'draft'
+  const isDraft = !omitDraft && source === 'homebrew' && status === 'draft'
   const sourceBadge = CONTENT_SOURCE_BADGE[source]
   const showSource = shouldPresentContentSource(contentType)
 

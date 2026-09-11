@@ -5,7 +5,11 @@ export type {
   ArrayItemIssueGroup,
 } from './form-issue.types'
 export { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
-export { flattenFormIssues } from './flatten-form-issues'
+export {
+  flattenFormIssues,
+  formIssueFromEncodedMessage,
+  formIssuesFromZodIssues,
+} from './flatten-form-issues'
 export { classifyFormIssue, classifyFormIssues } from './classify-form-issue'
 export {
   filterIssuesForItemPrefix,

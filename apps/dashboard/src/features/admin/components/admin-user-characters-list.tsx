@@ -64,7 +64,7 @@ export function AdminUserCharactersPage() {
   const { user } = useAdminUserRouteContext()
 
   return (
-    <NarrowPage spacing="list">
+    <NarrowPage rhythm="list">
       <PageHeader heading="Characters" />
       <Text variant="muted">Player characters owned by this user.</Text>
       <Text variant="muted" className="text-sm">

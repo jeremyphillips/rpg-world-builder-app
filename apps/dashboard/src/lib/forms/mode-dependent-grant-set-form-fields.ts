@@ -46,6 +46,8 @@ export type ModeDependentGrantSetFieldOptions = {
   /** Trailing divider after this grant-set block within parent rhythm. */
   separator?: FieldConfig['separator']
   dependents?: DependentPresentationOptions
+  categoriesRequired?: boolean
+  itemsRequired?: boolean
 }
 
 function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibility {
@@ -55,16 +57,23 @@ function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibil
   }
 }
 
-/** Shared mode radio + dependent grant-set editors. */
-export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOptions): FormItem {
+function grantSetDependentsVisibility(
+  modeFieldName: string,
+  emptyMode?: string,
+): FieldVisibility | undefined {
+  if (!emptyMode) return undefined
+
+  return {
+    dependsOn: [modeFieldName],
+    visibleWhen: (watched) => watched[modeFieldName] !== emptyMode,
+  }
+}
+
+function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): FormItem[] {
   const {
     modeFieldName,
-    modes,
-    modeLabels,
     categoriesPath,
     itemsPath,
-    label,
-    hint,
     categoryOptions,
     itemOptions,
     categoriesLabel = 'Categories',
@@ -73,11 +82,49 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
     itemsHint,
     categoryMode,
     specificMode,
-    emptyMode,
+    categoriesRequired,
+    itemsRequired,
+  } = options
+
+  return [
+    {
+      type: 'chips',
+      name: categoriesPath,
+      label: categoriesLabel,
+      ...(categoriesHint ? { hint: categoriesHint } : {}),
+      options: categoryOptions,
+      ...(categoriesRequired ? { required: true } : {}),
+      visibility: visibleWhenGrantMode(modeFieldName, categoryMode),
+    },
+    {
+      type: 'combobox',
+      name: itemsPath,
+      label: itemsLabel,
+      ...(itemsHint ? { hint: itemsHint } : {}),
+      multiple: true,
+      options: itemOptions,
+      placeholder: 'Choose items…',
+      width: 'xl',
+      ...(itemsRequired ? { required: true } : {}),
+      visibility: visibleWhenGrantMode(modeFieldName, specificMode),
+    },
+  ]
+}
+
+/** Shared mode radio + dependent grant-set editors. */
+export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOptions): FormItem {
+  const {
+    modeFieldName,
+    modes,
+    modeLabels,
+    label,
+    hint,
     labelVisibility,
     separator,
     dependents: dependentsPresentation,
+    emptyMode,
   } = options
+  const visibility = grantSetDependentsVisibility(modeFieldName, emptyMode)
 
   return {
     kind: 'dependent',
@@ -92,37 +139,10 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
       ...(labelVisibility === 'srOnly' ? { labelVisibility } : {}),
     },
     dependents: {
-      ...(emptyMode
-        ? {
-            visibility: {
-              dependsOn: [modeFieldName],
-              visibleWhen: (watched) => watched[modeFieldName] !== emptyMode,
-            },
-          }
-        : {}),
+      ...(visibility ? { visibility } : {}),
       inset: dependentsPresentation?.inset ?? DEFAULT_DEPENDENT_INSET,
       chrome: dependentsPresentation?.chrome ?? 'none',
-      fields: [
-        {
-          type: 'chips',
-          name: categoriesPath,
-          label: categoriesLabel,
-          ...(categoriesHint ? { hint: categoriesHint } : {}),
-          options: categoryOptions,
-          visibility: visibleWhenGrantMode(modeFieldName, categoryMode),
-        },
-        {
-          type: 'combobox',
-          name: itemsPath,
-          label: itemsLabel,
-          ...(itemsHint ? { hint: itemsHint } : {}),
-          multiple: true,
-          options: itemOptions,
-          placeholder: 'Choose items…',
-          width: 'xl',
-          visibility: visibleWhenGrantMode(modeFieldName, specificMode),
-        },
-      ],
+      fields: grantSetDependentFields(options),
     },
   }
 }

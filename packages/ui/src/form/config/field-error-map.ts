@@ -1,6 +1,8 @@
 import { fieldValidationMessages, midSentenceLabel, singularizeLabel } from '@rpg/contracts'
+import type { ZodType } from 'zod'
 
 import type { FormItem } from '../field-config'
+import type { FieldMessageCategory } from './field-error-map-category.lib'
 import type { RegistryEntry } from './field-error-map-register.lib'
 import { registerFormItems } from './field-error-map-register-items.lib'
 
@@ -198,10 +200,39 @@ const ISSUE_FORMATTERS: Record<
   invalid_format: (issue, entry, path) => formatInvalidFormat(issue, entry, path),
 }
 
+/** Label used when the issue path is not in the form field registry. */
+export const UNLABELED_FIELD_LABEL = 'This field'
+/** Generic singular item label for unregistered array minimums. */
+export const UNLABELED_ITEM_LABEL = 'item'
+
+function inferUnlabeledCategory(issue: RawZodIssueLike): FieldMessageCategory {
+  if (issue.origin === 'array') return 'multi'
+  if (
+    issue.origin === 'number' ||
+    issue.origin === 'int' ||
+    issue.expected === 'number' ||
+    issue.expected === 'int'
+  ) {
+    return 'number'
+  }
+  if (issue.expected === 'boolean') return 'boolean'
+  return 'text'
+}
+
+function unlabeledEntry(issue: RawZodIssueLike): RegistryEntry {
+  return {
+    label: UNLABELED_FIELD_LABEL,
+    category: inferUnlabeledCategory(issue),
+    itemLabel: UNLABELED_ITEM_LABEL,
+  }
+}
+
 /**
- * Builds a Zod 4 per-parse error customizer for a form's field tree. Returning
- * `undefined` keeps Zod's default message for unregistered paths; registered
- * paths always receive catalog-backed copy (with a last-resort catch-all).
+ * Builds a Zod 4 per-parse error customizer for a form's field tree. Known
+ * issue codes always receive catalog-backed copy — registered paths use the
+ * field label; unregistered paths use unlabeled fallbacks (`This field` /
+ * `item`). Custom `.refine` / `.superRefine` messages stay on the issue and
+ * are not rewritten here.
  */
 export function makeFieldErrorMap(
   items: FormItem[],
@@ -210,12 +241,23 @@ export function makeFieldErrorMap(
 
   return (issue) => {
     const path = issue.path ?? []
-    const entry = lookupEntry(registry, path)
-    if (!entry || issue.code === undefined) return undefined
+    const entry = lookupEntry(registry, path) ?? unlabeledEntry(issue)
+    if (issue.code === undefined) {
+      return fieldValidationMessages.invalidField({ label: entry.label })
+    }
 
     const formatted = ISSUE_FORMATTERS[issue.code]?.(issue, entry, path)
     if (formatted !== undefined) return formatted
 
     return fieldValidationMessages.invalidField({ label: entry.label })
   }
+}
+
+/** `schema.safeParse` that always formats issues through {@link makeFieldErrorMap}. */
+export function safeParseWithFieldErrors<T>(
+  schema: ZodType<T>,
+  values: unknown,
+  items: FormItem[],
+) {
+  return schema.safeParse(values, { error: makeFieldErrorMap(items) })
 }

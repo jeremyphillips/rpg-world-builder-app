@@ -6,7 +6,7 @@ import { ProfileSection } from '../components/profile-section'
 
 export function AccountSettings() {
   return (
-    <NarrowPage spacing="loose">
+    <NarrowPage rhythm="loose">
       <Heading variant="page" as="h1">
         Account Settings
       </Heading>

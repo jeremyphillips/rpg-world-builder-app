@@ -6,11 +6,15 @@ import type {
 } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS, getErrorMessage } from '@rpg/contracts'
 import { Heading, Spinner, Text } from '@rpg/ui'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { NarrowPage } from '@/components/layout/page/narrow-page'
+
+import { hasContentFormPreview } from '../../preview/content-form-preview.types'
+import { ContentFormPageShell } from '../layout/content-form-page-shell'
+import { contentFormPageShellHeadingClasses } from '../layout/content-form-page-shell.variants'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
@@ -22,7 +26,11 @@ import {
   type AnyContentFormDef,
   type ContentFormCtx,
 } from '../../registry/content-form-registry'
-import { findContentEditEntity, loadContentEditFormState } from './content-edit-load'
+import {
+  findContentEditEntity,
+  loadContentEditFormState,
+  resolveContentPublishSchema,
+} from './content-edit-load'
 import {
   ContentFormNotRegistered,
   ContentFormOptionsGate,
@@ -38,8 +46,43 @@ import { useContentDemoteFlow } from '../../../demotion/use-content-demote-flow'
 import { useContentPublishFlow } from '../../../demotion/use-content-publish-flow'
 import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions'
 import { ContentEditPublishProvider } from './content-edit-publish-context'
-import { resolveContentFormSchema } from './content-edit-load'
 import { ContentEditHeadingBadges } from '../../../campaign-access/content-edit-heading-badges'
+
+function ContentEditFormHeading({
+  heading,
+  contentTypeKey,
+  source,
+  status,
+  campaignAccess,
+  omitDraft = false,
+  lifecycle,
+}: {
+  heading: string
+  contentTypeKey: ContentTypeKey
+  source: ContentSource
+  status: ContentStatus
+  campaignAccess: ResolvedContentCampaignAccess
+  omitDraft?: boolean
+  lifecycle: ReactNode
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex min-w-0 flex-wrap items-center gap-2">
+        <Heading variant="page" as="h1">
+          {heading}
+        </Heading>
+        <ContentEditHeadingBadges
+          contentType={contentTypeKey}
+          source={source}
+          status={status}
+          campaignAccess={campaignAccess}
+          omitDraft={omitDraft}
+        />
+      </div>
+      {lifecycle}
+    </div>
+  )
+}
 
 export interface ContentEditShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -144,7 +187,7 @@ function ContentEditEntityFormBody<
   const [campaignAccess, setCampaignAccess] = useState(
     () => entity.campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   )
-  const publishSchema = resolveContentFormSchema(def, layoutCtx, 'publish')
+  const publishSchema = resolveContentPublishSchema(def, layoutCtx)
   const deleteFlow = useContentDeleteFlow({
     def,
     campaignId,
@@ -188,30 +231,33 @@ function ContentEditEntityFormBody<
   const headerError =
     deleteFlow.deleteError ?? publishFlow.publishError ?? demoteFlow.demoteError ?? formError
   const showLifecycleActions = entity.source === 'homebrew'
+  const usePreviewLayout = hasContentFormPreview(def)
+  const heading = (
+    <ContentEditFormHeading
+      heading={headingFn(entity.name)}
+      contentTypeKey={contentTypeKey}
+      source={entity.source}
+      status={entity.status}
+      campaignAccess={campaignAccess}
+      omitDraft={usePreviewLayout}
+      lifecycle={
+        showLifecycleActions ? (
+          <ContentEditLifecycleActions
+            publishFlow={publishFlow}
+            demoteFlow={demoteFlow}
+            deleteFlow={deleteFlow}
+          />
+        ) : null
+      }
+    />
+  )
 
   const formBody = (
     <ContentAuthoringGate campaignId={campaignId}>
-      <NarrowPage spacing="relaxed" className="pb-10">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <Heading variant="page" as="h1">
-              {headingFn(entity.name)}
-            </Heading>
-            <ContentEditHeadingBadges
-              contentType={contentTypeKey}
-              source={entity.source}
-              status={entity.status}
-              campaignAccess={campaignAccess}
-            />
-          </div>
-          {showLifecycleActions ? (
-            <ContentEditLifecycleActions
-              publishFlow={publishFlow}
-              demoteFlow={demoteFlow}
-              deleteFlow={deleteFlow}
-            />
-          ) : null}
-        </div>
+      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
+        {usePreviewLayout ? null : (
+          <div className={contentFormPageShellHeadingClasses}>{heading}</div>
+        )}
 
         <ContentFormLayout
           def={def}
@@ -232,8 +278,10 @@ function ContentEditEntityFormBody<
           onSaved={handleCoordinatedSaveSuccess}
           publishSchema={entity.status === 'draft' ? publishSchema : undefined}
           onPublish={entity.status === 'draft' ? handlePublish : undefined}
+          previewDraftBadge={usePreviewLayout && entity.status === 'draft'}
+          formHeaderPrefix={usePreviewLayout ? heading : undefined}
         />
-      </NarrowPage>
+      </ContentFormPageShell>
 
       <ContentDeletionConfirmDialog
         open={deleteFlow.confirmOpen}
@@ -421,17 +469,21 @@ export function ContentEditShell({
 }: ContentEditShellProps) {
   if (isPending) {
     return (
-      <div className="flex justify-center py-8">
-        <Spinner />
-      </div>
+      <NarrowPage>
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      </NarrowPage>
     )
   }
 
   if (isError) {
     return (
-      <Text variant="destructive" role="alert">
-        {loadErrorLabel}
-      </Text>
+      <NarrowPage>
+        <Text variant="destructive" role="alert">
+          {loadErrorLabel}
+        </Text>
+      </NarrowPage>
     )
   }
 

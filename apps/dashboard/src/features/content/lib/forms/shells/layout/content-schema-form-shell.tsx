@@ -4,6 +4,8 @@ import type { ZodType } from 'zod'
 import {
   Form,
   TabbedForm,
+  formViewportScrollBodyTopInsetClasses,
+  type FormIssue,
   type FormItem,
   type FormValueSync,
   type TabbedFormTab,
@@ -17,6 +19,14 @@ import {
   ContentFormSaveFooter,
   type ContentFormFooterShellProps,
 } from './content-form-shell-layout.lib'
+import { hasContentFormPreview } from '../../preview/content-form-preview.types'
+import {
+  ContentPreviewCompactTrigger,
+  ContentPreviewRail,
+} from '../../preview/content-preview-rail'
+import { ContentPreviewUiProvider } from '../../preview/content-preview-ui-context'
+import { resolveContentPublishSchema } from '../edit/content-edit-load'
+import { ContentFormPublishValidationBridge } from '../../validation/content-form-publish-validation.client'
 
 interface ContentSchemaFormShellProps<
   TFormValues extends FieldValues,
@@ -38,6 +48,7 @@ interface ContentSchemaFormShellProps<
   headerPrefix?: React.ReactNode
   fields?: FormItem[]
   tabs?: TabbedFormTab[]
+  previewDraftBadge?: boolean
 }
 
 function useContentSchemaSubmitHandler<TFormValues extends FieldValues>(
@@ -66,6 +77,7 @@ function ContentSchemaFormFooter<TFormValues extends FieldValues>({
   formKey,
   publishFields,
   footerShellProps,
+  onPublishValidationFailed,
 }: {
   form: UseFormReturn<TFormValues>
   publishSchema?: ZodType<TFormValues>
@@ -73,6 +85,7 @@ function ContentSchemaFormFooter<TFormValues extends FieldValues>({
   formKey?: string
   publishFields: FormItem[]
   footerShellProps: ContentFormFooterShellProps<TFormValues>
+  onPublishValidationFailed: () => void
 }) {
   return (
     <>
@@ -82,6 +95,7 @@ function ContentSchemaFormFooter<TFormValues extends FieldValues>({
           fields={publishFields}
           formId={formKey}
           onPublish={onPublish}
+          onPublishValidationFailed={onPublishValidationFailed}
         />
       ) : null}
       <ContentFormSaveFooter form={form} {...footerShellProps} />
@@ -89,7 +103,17 @@ function ContentSchemaFormFooter<TFormValues extends FieldValues>({
   )
 }
 
-export function ContentSchemaFormShell<TFormValues extends FieldValues>({
+export function ContentSchemaFormShell<TFormValues extends FieldValues>(
+  props: ContentSchemaFormShellProps<TFormValues>,
+) {
+  return (
+    <CampaignAccessFormProvider>
+      <ContentSchemaFormShellBody<TFormValues> key={props.formKey} {...props} />
+    </CampaignAccessFormProvider>
+  )
+}
+
+function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
   schema,
   defaultValues,
   formKey,
@@ -112,8 +136,25 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
   saveDraftPending,
   onSaved,
   onLeaveGuardReady,
+  previewDraftBadge = false,
 }: ContentSchemaFormShellProps<TFormValues>) {
+  const [hasAttemptedPublish, setHasAttemptedPublish] = React.useState(false)
+  const [publishPresentationIssues, setPublishPresentationIssues] = React.useState<FormIssue[]>([])
+  const markPublishAttempted = React.useCallback(() => {
+    setHasAttemptedPublish(true)
+  }, [])
+  const handlePublishIssuesChange = React.useCallback(
+    ({ issues }: { issues: readonly FormIssue[] }) => {
+      setPublishPresentationIssues([...issues])
+    },
+    [],
+  )
+
   const handleSubmit = useContentSchemaSubmitHandler(onSubmit, beforeSubmit)
+  const resolvedPublishSchema = React.useMemo(
+    () => publishSchema ?? resolveContentPublishSchema(headerProps.def, headerProps.ctx),
+    [headerProps.ctx, headerProps.def, publishSchema],
+  )
   const footerShellProps: ContentFormFooterShellProps<TFormValues> = {
     formMode,
     backHref,
@@ -129,10 +170,18 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
     () => (tabs ? tabs.flatMap((tab) => tab.fields) : (fields ?? [])),
     [fields, tabs],
   )
+  const previewEnabled = hasContentFormPreview(headerProps.def) && Boolean(tabs)
   const header = () => (
     <>
       {headerPrefix}
       <ContentFormHeader {...headerProps} formKey={formKey} />
+      {previewEnabled ? (
+        <ContentFormPublishValidationBridge
+          schema={resolvedPublishSchema}
+          tabs={tabs!}
+          onValidationChange={handlePublishIssuesChange}
+        />
+      ) : null}
     </>
   )
   const footer = (form: UseFormReturn<TFormValues>) => (
@@ -143,42 +192,68 @@ export function ContentSchemaFormShell<TFormValues extends FieldValues>({
       formKey={formKey}
       publishFields={publishFields}
       footerShellProps={footerShellProps}
+      onPublishValidationFailed={markPublishAttempted}
     />
   )
 
   return (
-    <CampaignAccessFormProvider>
+    <>
       {tabs ? (
-        <TabbedForm<TFormValues>
-          key={formKey}
-          id={formKey}
-          uiStateKey={formKey}
-          schema={schema}
-          tabs={tabs}
-          defaultValues={defaultValues}
-          valueSyncs={valueSyncs}
-          onSubmit={handleSubmit}
-          formError={formError}
-          header={header}
-          footer={footer}
-        />
+        <ContentPreviewUiProvider>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <TabbedForm<TFormValues>
+              key={formKey}
+              id={formKey}
+              uiStateKey={formKey}
+              schema={schema}
+              tabs={tabs}
+              defaultValues={defaultValues}
+              valueSyncs={valueSyncs}
+              onSubmit={handleSubmit}
+              formError={formError}
+              header={header}
+              footer={footer}
+              className="flex min-h-0 flex-1 flex-col"
+              scrollBodyClassName={formViewportScrollBodyTopInsetClasses}
+              hasAttemptedPublish={hasAttemptedPublish}
+              onMarkPublishAttempted={markPublishAttempted}
+              publishPresentationIssues={publishPresentationIssues}
+              publishPresentationEnabled={previewEnabled}
+              aside={
+                previewEnabled ? (
+                  <ContentPreviewRail
+                    def={headerProps.def}
+                    ctx={headerProps.ctx}
+                    tabs={tabs}
+                    showDraftBadge={previewDraftBadge}
+                  />
+                ) : undefined
+              }
+              tabRowTrailing={previewEnabled ? <ContentPreviewCompactTrigger /> : undefined}
+            />
+          </div>
+        </ContentPreviewUiProvider>
       ) : (
-        <Form<TFormValues>
-          key={formKey}
-          id={formKey}
-          uiStateKey={formKey}
-          schema={schema}
-          fields={fields ?? []}
-          defaultValues={defaultValues}
-          onSubmit={handleSubmit}
-          formError={formError}
-          valueSyncs={valueSyncs}
-          stickyFooter
-          header={header}
-          footer={footer}
-        />
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <Form<TFormValues>
+            key={formKey}
+            id={formKey}
+            uiStateKey={formKey}
+            schema={schema}
+            fields={fields ?? []}
+            defaultValues={defaultValues}
+            onSubmit={handleSubmit}
+            formError={formError}
+            valueSyncs={valueSyncs}
+            stickyFooter
+            className="flex min-h-0 flex-1 flex-col"
+            scrollBodyClassName={formViewportScrollBodyTopInsetClasses}
+            header={header}
+            footer={footer}
+          />
+        </div>
       )}
       {submitConfirmDialog}
-    </CampaignAccessFormProvider>
+    </>
   )
 }

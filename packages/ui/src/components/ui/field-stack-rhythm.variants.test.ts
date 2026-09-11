@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  fieldAnatomyAlignVariants,
   fieldAnatomyStackVariants,
+  fieldChipWrapGapClasses,
+  fieldLabelHintStackClasses,
+  fieldLabelVariants,
   fieldArrayItemListClasses,
   fieldGroupLegendHeaderMarginVariants,
   fieldGroupLegendVariants,
@@ -13,12 +17,33 @@ import {
 
 describe('fieldAnatomyStackVariants', () => {
   it('maps sm to 4px label-to-control gap', () => {
-    expect(fieldAnatomyStackVariants({ size: 'sm' })).toContain('space-y-1')
+    expect(fieldAnatomyStackVariants({ size: 'sm' })).toContain('gap-y-1')
   })
 
-  it('maps md and lg to 8px label-to-control gap', () => {
-    expect(fieldAnatomyStackVariants({ size: 'md' })).toContain('space-y-2')
-    expect(fieldAnatomyStackVariants({ size: 'lg' })).toContain('space-y-2')
+  it('maps md and lg to 6px label-to-control gap', () => {
+    expect(fieldAnatomyStackVariants({ size: 'md' })).toContain('gap-y-1.5')
+    expect(fieldAnatomyStackVariants({ size: 'lg' })).toContain('gap-y-1.5')
+  })
+
+  it('keeps stacked alignment on the same size map via gap-y', () => {
+    expect(fieldAnatomyAlignVariants({ size: 'sm' })).toContain('gap-y-1')
+    expect(fieldAnatomyAlignVariants({ size: 'md' })).toContain('gap-y-1.5')
+    expect(fieldAnatomyAlignVariants({ size: 'lg' })).toContain('gap-y-1.5')
+  })
+
+  it('uses 2px between a label cluster and its below-label hint', () => {
+    expect(fieldLabelHintStackClasses).toContain('gap-0.5')
+  })
+
+  it('limits chip wrap classes to pill-row gap', () => {
+    expect(fieldChipWrapGapClasses).toBe('gap-2')
+    expect(fieldChipWrapGapClasses).not.toContain('pt-')
+  })
+
+  it('maps default label placement to the type-scale line box', () => {
+    expect(fieldLabelVariants({ size: 'sm' })).toContain('min-h-4')
+    expect(fieldLabelVariants({ size: 'md' })).toContain('min-h-[1.375rem]')
+    expect(fieldLabelVariants({ size: 'lg' })).toContain('min-h-[1.375rem]')
   })
 })
 

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { Button } from './button.client'
 import { Alert } from './alert'
-import { ALERT_VARIANTS } from './alert.variants'
+import { ALERT_DENSITIES, ALERT_VARIANTS } from './alert.variants'
 
 const meta = {
   title: 'Primitives/Alert',
@@ -61,6 +61,31 @@ export const AllVariants: Story = {
           key={variant}
           variant={variant}
           title={`${variant.charAt(0).toUpperCase()}${variant.slice(1)} alert`}
+          description="Supporting copy uses the shared muted description tone."
+        />
+      ))}
+    </div>
+  ),
+}
+
+export const Compact: Story = {
+  args: {
+    density: 'compact',
+    variant: 'success',
+    title: 'Ready to publish',
+    description: 'Required configuration is complete.',
+  },
+}
+
+export const AllDensities: Story = {
+  render: () => (
+    <div className="space-y-4">
+      {ALERT_DENSITIES.map((density) => (
+        <Alert
+          key={density}
+          density={density}
+          variant="warning"
+          title={`${density.charAt(0).toUpperCase()}${density.slice(1)} density`}
           description="Supporting copy uses the shared muted description tone."
         />
       ))}

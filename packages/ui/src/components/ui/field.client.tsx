@@ -14,6 +14,7 @@ import {
   fieldAnatomyStackVariants,
   fieldErrorTextVariants,
   fieldLabelVariants,
+  type FieldHintPosition,
   type FieldLabelPlacement,
 } from './field.variants'
 import { resolveControlRequiredProps } from './field-required.lib'
@@ -30,6 +31,7 @@ interface FieldContextValue {
   hasHint: boolean
   hasDerivedMeta: boolean
   describedBy: string | undefined
+  hintPosition: FieldHintPosition
   size: FieldSize
   required: boolean
   error?: string
@@ -63,8 +65,10 @@ export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
   invalid?: boolean
   /** Overrides the auto-computed `aria-describedby` for the control. */
   describedBy?: string
-  /** Helper text shown when there is no error. */
+  /** Helper text shown when there is no error (below-control) or always (below-label). */
   hint?: string
+  /** Where helper text renders — drives hint visibility and `aria-describedby`. */
+  hintPosition?: FieldHintPosition
 }
 
 const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
@@ -79,6 +83,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
       invalid,
       describedBy: describedByOverride,
       hint,
+      hintPosition = 'below-label',
       className,
       children,
       ...props
@@ -94,9 +99,12 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
     const hasError = invalid ?? Boolean(error)
     const hasHint = Boolean(hint)
     const hasDerivedMeta = Boolean(derivedMeta?.rows.length)
-    const autoDescribedBy = hasError
-      ? errorId
-      : [hasHint && hintId, hasDerivedMeta && derivedMetaId].filter(Boolean).join(' ') || undefined
+    const describedByParts = [
+      hasHint && (!hasError || hintPosition === 'below-label') && hintId,
+      hasError && errorId,
+      hasDerivedMeta && derivedMetaId,
+    ].filter(Boolean)
+    const autoDescribedBy = describedByParts.length > 0 ? describedByParts.join(' ') : undefined
     const describedBy = describedByOverride ?? autoDescribedBy
 
     const value = React.useMemo<FieldContextValue>(
@@ -109,6 +117,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         hasHint,
         hasDerivedMeta,
         describedBy,
+        hintPosition,
         size,
         required,
         error,
@@ -123,6 +132,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         hasHint,
         hasDerivedMeta,
         describedBy,
+        hintPosition,
         size,
         required,
         error,
@@ -248,13 +258,12 @@ export function FieldErrorText({
   )
 }
 
-/** Hint for below-label placement — hidden while an error is present. */
+/** Hint for below-label placement — stays visible when an error is present. */
 export function FieldHintBelowLabel({
   hint,
-  error,
   hintId,
-}: FieldHintErrorContent & Pick<FieldMessageIds, 'hintId'>) {
-  if (error || !hint) return null
+}: Pick<FieldHintErrorContent, 'hint'> & Pick<FieldMessageIds, 'hintId'>) {
+  if (!hint) return null
   return <FieldHintText id={hintId}>{hint}</FieldHintText>
 }
 
@@ -280,8 +289,9 @@ export function FieldHintErrorBelowControl({
 export type FieldHintProps = React.HTMLAttributes<HTMLParagraphElement>
 
 function FieldHint({ className, children, ...props }: FieldHintProps) {
-  const { hintId, hasError, hasHint, hint } = useFieldContext('Field.Hint')
-  if (hasError || !hasHint) return null
+  const { hintId, hasError, hasHint, hint, hintPosition } = useFieldContext('Field.Hint')
+  if (!hasHint) return null
+  if (hasError && hintPosition === 'below-control') return null
   return (
     <Text id={hintId} variant="caption" className={className} {...props}>
       {children ?? hint}

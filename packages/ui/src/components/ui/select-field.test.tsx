@@ -37,7 +37,7 @@ describe('SelectField', () => {
     expect(screen.getByLabelText('Alignment')).toHaveTextContent('Select Alignment…')
   })
 
-  it('renders the error and marks the trigger invalid, hiding the hint', () => {
+  it('renders the error and marks the trigger invalid while keeping below-label hint visible', () => {
     render(
       <SelectField
         id="alignment"
@@ -48,7 +48,7 @@ describe('SelectField', () => {
       />,
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Required.')
-    expect(screen.queryByText('Pick one.')).not.toBeInTheDocument()
+    expect(screen.getByText('Pick one.')).toBeInTheDocument()
     expect(screen.getByLabelText('Alignment')).toHaveAttribute('aria-invalid', 'true')
   })
 

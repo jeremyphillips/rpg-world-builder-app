@@ -37,7 +37,7 @@ export function ContentFormComingSoon() {
 
 export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: string }) {
   return (
-    <NarrowPage spacing="relaxed" className="pb-10">
+    <NarrowPage rhythm="relaxed" className="pb-10">
       <Heading variant="page" as="h1">
         {heading}
       </Heading>
@@ -71,6 +71,7 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   onSaved?: (event: CoordinatedSaveSavedEvent) => void
   onLeaveGuardReady?: (guard: Pick<UnsavedChangesConfirmController, 'runTrusted'>) => void
   formHeaderPrefix?: React.ReactNode
+  previewDraftBadge?: boolean
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -98,6 +99,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onSaved,
   onLeaveGuardReady,
   formHeaderPrefix,
+  previewDraftBadge = false,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const weaponAdvisoryOptions = React.useMemo((): AdvisoryFormSubmitOptions<TFormValues> => {
@@ -151,6 +153,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         availabilityPresentation: CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
       }}
       headerPrefix={formHeaderPrefix}
+      previewDraftBadge={previewDraftBadge}
     />
   )
 }

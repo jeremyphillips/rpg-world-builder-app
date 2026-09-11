@@ -39,13 +39,34 @@ describe('Field', () => {
     expect(input).not.toHaveAttribute('aria-invalid')
   })
 
-  it('switches to the error: aria-invalid, describedby points at the alert, hint hidden', () => {
+  it('keeps below-label hint visible with error: aria-invalid, describedby includes both ids', () => {
     renderField({ hint: 'Your display name.', error: 'Name is required.' })
     const input = screen.getByLabelText('Name')
     expect(input).toHaveAttribute('aria-invalid', 'true')
-    expect(input).toHaveAttribute('aria-describedby', 'name-error')
+    expect(input).toHaveAttribute('aria-describedby', 'name-hint name-error')
     expect(screen.getByRole('alert')).toHaveTextContent('Name is required.')
-    expect(screen.queryByText('Your display name.')).not.toBeInTheDocument()
+    expect(screen.getByText('Your display name.')).toBeInTheDocument()
+  })
+
+  it('hides below-control hint when invalid and points describedby at the error only', () => {
+    render(
+      <Field.Root
+        id="bio"
+        error="Bio is required."
+        hint="Shown on the profile."
+        hintPosition="below-control"
+      >
+        <Field.Label>Bio</Field.Label>
+        <Field.Control>
+          <Input />
+        </Field.Control>
+        <Field.Hint />
+        <Field.Error />
+      </Field.Root>,
+    )
+    const input = screen.getByLabelText('Bio')
+    expect(input).toHaveAttribute('aria-describedby', 'bio-error')
+    expect(screen.queryByText('Shown on the profile.')).not.toBeInTheDocument()
   })
 
   it('marks invalid without rendering error text when invalid is set alone', () => {

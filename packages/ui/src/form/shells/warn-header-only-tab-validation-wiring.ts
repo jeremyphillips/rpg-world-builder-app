@@ -1,4 +1,4 @@
-import type { TabbedFormTab } from './tabbed-form-panels.client'
+import type { TabbedFormTab } from './tabbed-form-panels.lib'
 
 function isHeaderOnlyTab(tab: TabbedFormTab): boolean {
   return tab.fields.length === 0 && tab.header !== undefined

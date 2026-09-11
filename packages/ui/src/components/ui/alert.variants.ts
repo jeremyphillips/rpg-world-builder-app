@@ -7,28 +7,34 @@ export const ALERT_VARIANTS = ['default', 'info', 'success', 'warning', 'destruc
 
 export type AlertVariant = (typeof ALERT_VARIANTS)[number]
 
-export const alertVariants = cva(
-  'flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-start',
-  {
-    variants: {
-      variant: {
-        default: cn(
-          'border-border bg-surface-muted text-foreground',
-          establishSurfaceCurrent('surface-muted'),
-        ),
-        info: 'border-info-muted bg-info-subtle text-foreground',
-        success: 'border-success-muted bg-success-subtle text-foreground',
-        warning: 'border-warning-muted bg-warning-subtle text-foreground',
-        destructive: 'border-destructive-muted bg-destructive-subtle text-foreground',
-      },
+export const ALERT_DENSITIES = ['comfortable', 'compact'] as const
+
+export type AlertDensity = (typeof ALERT_DENSITIES)[number]
+
+export const alertVariants = cva('flex flex-col rounded-lg border sm:flex-row sm:items-start', {
+  variants: {
+    variant: {
+      default: cn(
+        'border-border bg-surface-muted text-foreground',
+        establishSurfaceCurrent('surface-muted'),
+      ),
+      info: 'border-info-muted bg-info-subtle text-foreground',
+      success: 'border-success-muted bg-success-subtle text-foreground',
+      warning: 'border-warning-muted bg-warning-subtle text-foreground',
+      destructive: 'border-destructive-muted bg-destructive-subtle text-foreground',
     },
-    defaultVariants: {
-      variant: 'default',
+    density: {
+      comfortable: 'gap-3 p-4',
+      compact: 'gap-2 px-3 py-2.5',
     },
   },
-)
+  defaultVariants: {
+    variant: 'default',
+    density: 'comfortable',
+  },
+})
 
-export const alertTitleVariants = cva('heading-style-alert', {
+export const alertTitleVariants = cva('', {
   variants: {
     variant: {
       default: 'text-foreground',
@@ -37,9 +43,14 @@ export const alertTitleVariants = cva('heading-style-alert', {
       warning: 'text-foreground',
       destructive: 'text-foreground',
     },
+    density: {
+      comfortable: 'heading-style-alert',
+      compact: 'text-sm font-body-emphasis',
+    },
   },
   defaultVariants: {
     variant: 'default',
+    density: 'comfortable',
   },
 })
 
@@ -52,9 +63,14 @@ export const alertDescriptionVariants = cva('text-sm text-muted-foreground', {
       warning: '',
       destructive: '',
     },
+    density: {
+      comfortable: '',
+      compact: '',
+    },
   },
   defaultVariants: {
     variant: 'default',
+    density: 'comfortable',
   },
 })
 

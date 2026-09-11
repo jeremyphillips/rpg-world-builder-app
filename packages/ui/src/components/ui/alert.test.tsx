@@ -43,6 +43,19 @@ describe('Alert', () => {
     expect(alert).toHaveClass(`border-${variant}-muted`, `bg-${variant}-subtle`)
   })
 
+  it('applies comfortable density by default', () => {
+    render(<Alert title="Status" />)
+    expect(screen.getByRole('alert')).toHaveClass('p-4')
+    expect(screen.getByText('Status')).toHaveClass('heading-style-alert')
+  })
+
+  it('applies compact density padding and title sizing', () => {
+    render(<Alert density="compact" title="Status" description="Details" />)
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveClass('px-3', 'py-2.5')
+    expect(screen.getByText('Status')).toHaveClass('text-sm', 'font-body-emphasis')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <Alert

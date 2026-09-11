@@ -144,7 +144,7 @@ function VocabularyTermDetailPage({
 
   return (
     <>
-      <WidePage spacing="relaxed">
+      <WidePage rhythm="relaxed">
         <PageLoadState
           isPending={isPending}
           isError={isError}

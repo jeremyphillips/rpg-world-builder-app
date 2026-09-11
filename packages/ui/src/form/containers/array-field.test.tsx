@@ -1094,11 +1094,11 @@ describe('ArrayFieldRenderer', () => {
     const compactRow = document.querySelector('[data-compact-inline-row]')
     expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
 
-    expect(screen.getByRole('textbox', { name: 'Description' }).closest('.space-y-1')).toHaveClass(
-      'flex-1',
+    expect(screen.getByRole('textbox', { name: 'Description' }).closest('.flex-1')).toHaveClass(
+      'w-full',
     )
-    expect(screen.getByRole('spinbutton', { name: 'DC' }).closest('.space-y-1')).toHaveClass(
-      'flex-none',
+    expect(screen.getByRole('spinbutton', { name: 'DC' }).closest('.flex-none')).toHaveClass(
+      'w-fit',
     )
   })
 

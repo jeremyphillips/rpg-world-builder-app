@@ -3,13 +3,16 @@
 import { useState } from 'react'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 
+export type MapFormError = (error: unknown) => string | null | undefined
+
 function toFormError(
   error: unknown,
   fallback: string,
-  mapError?: (error: unknown) => string | undefined,
+  mapError?: MapFormError,
 ): string | undefined {
   if (!error) return undefined
   const mapped = mapError?.(error)
+  if (mapped === null) return undefined
   if (mapped !== undefined) return mapped
   return error instanceof Error ? error.message : fallback
 }
@@ -22,7 +25,7 @@ export type FormSubmitHandler<TValues extends FieldValues> = (
 export interface UseSubmitHandlerOptions<TValues extends FieldValues> {
   submit: FormSubmitHandler<TValues>
   fallbackMessage: string
-  mapError?: (error: unknown) => string | undefined
+  mapError?: MapFormError
   /**
    * When true, swallowed submit failures resolve without rethrowing. Prefer leaving
    * this unset so callers can gate success chrome on a rejected submit Promise.

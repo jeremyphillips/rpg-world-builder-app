@@ -66,9 +66,14 @@ export {
   type TabbedFormTab,
 } from './shells/tabbed-form.client'
 export { useTabbedFormChrome } from './shells/tabbed-form-chrome.context'
+export { useTabbedFormTabValidationState } from './hooks/use-tabbed-form-tab-validation-state.client'
 export { FormSaveFooter, type FormSaveFooterProps } from './chrome/form-save-footer'
 export { FormFooterActions, type FormFooterActionsProps } from './chrome/form-footer-actions'
-export { FormActionsBar, type FormActionsBarProps } from './chrome/form-actions-bar'
+export {
+  FormActionsBar,
+  type FormActionsBarPlacement,
+  type FormActionsBarProps,
+} from './chrome/form-actions-bar'
 export {
   FormShellFooterScope,
   FormShellFooterSlot,
@@ -92,15 +97,31 @@ export {
   formActionsBarPrimaryGroupClasses,
   formFooterSpacingClasses,
   formStickyActionsBarClasses,
+  formDockedActionsBarClasses,
   formStickyActionsBarTransparentClasses,
   formStickyTabsClasses,
   formStickyTabsTransparentClasses,
+  formStickyScrollShellClasses,
+  formStickyScrollBodyClasses,
   formTabbedInactivePanelClasses,
   formTabbedNavOverflowClasses,
-  formTabPanelsBottomPaddingClasses,
+  formTabbedNavWithTrailingClasses,
+  formTabbedNavControlWrapClasses,
+  formTabbedAsideGridClasses,
+  formTabbedAsideBodyClasses,
+  formTabbedAsideSlotClasses,
+  formTabbedAsideSlotTopInsetClasses,
+  formTabbedAsideSlotBottomInsetClasses,
+  formTabbedPreviewRailCompactTriggerHiddenClasses,
+  formViewportScrollBodyTopInsetClasses,
+  formTabbedAsideFooterClasses,
   formTabbedChromeRhythmStackClasses,
   formSheetScrollRegionClasses,
 } from './chrome/form-chrome.variants'
+export {
+  FormScrollBodyTopInset,
+  FormViewportScrollTopInset,
+} from './chrome/form-viewport-scroll-top-inset.client'
 export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
 export {
   FORM_COLUMNS_WIDTH_EQUAL,
@@ -276,7 +297,13 @@ export {
   type DiceFormulaTailOperator,
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
-export { makeFieldErrorMap, type RawZodIssueLike } from './config/field-error-map'
+export {
+  makeFieldErrorMap,
+  safeParseWithFieldErrors,
+  UNLABELED_FIELD_LABEL,
+  UNLABELED_ITEM_LABEL,
+  type RawZodIssueLike,
+} from './config/field-error-map'
 export {
   makeResolver,
   createValidateSilently,
@@ -287,6 +314,8 @@ export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-i
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
 export {
   flattenFormIssues,
+  formIssueFromEncodedMessage,
+  formIssuesFromZodIssues,
   classifyFormIssue,
   classifyFormIssues,
   groupIssuesForItemPrefix,
@@ -301,8 +330,12 @@ export {
   buildValidationSessionExpandKey,
   resolveInvalidSubmitNavigation,
   prepareFormIssues,
+  resolveTabValidationState,
+  pathOwnsIssue,
   type ArrayItemIssueGroup,
   type ArraySectionMeta,
+  type TabValidationState,
+  type TabValidationTab,
 } from './errors'
 export {
   useFormValidationPresentation,
@@ -318,6 +351,7 @@ export {
 export {
   useSubmitHandler,
   type FormSubmitHandler,
+  type MapFormError,
   type UseSubmitHandlerOptions,
   type UseSubmitHandlerResult,
 } from './hooks/use-submit-handler.client'

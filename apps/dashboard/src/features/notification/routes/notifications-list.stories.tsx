@@ -36,7 +36,7 @@ const previewItems = [
 
 function NotificationsListPagePreview() {
   return (
-    <NarrowPage spacing="compact">
+    <NarrowPage rhythm="compact">
       <div className={pageHeaderSectionGapClasses}>
         <PageHeader
           heading={NOTIFICATION_COPY.title}

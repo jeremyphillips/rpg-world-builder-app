@@ -1,6 +1,7 @@
 import type { ApiValidationIssue } from '@rpg/contracts'
 import type { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodIssue, ZodType } from 'zod'
+import { safeParseWithFieldErrors, type FormItem } from '@rpg/ui/form'
 
 export function applyValidationIssuesToForm<TFieldValues extends FieldValues>(
   form: UseFormReturn<TFieldValues>,
@@ -22,15 +23,26 @@ export function zodIssuesToValidationIssues(issues: ZodIssue[]): ApiValidationIs
   }))
 }
 
+export function applyContentPublishValidation<TFieldValues extends FieldValues>(
+  form: UseFormReturn<TFieldValues>,
+  publishSchema: ZodType<TFieldValues>,
+  values: TFieldValues,
+  items: FormItem[] = [],
+): ApiValidationIssue[] | null {
+  const result = safeParseWithFieldErrors(publishSchema, values, items)
+  if (result.success) return null
+
+  const issues = zodIssuesToValidationIssues(result.error.issues)
+  form.clearErrors()
+  applyValidationIssuesToForm(form, issues)
+  return issues
+}
+
 export function validateContentPublishValues<TFieldValues extends FieldValues>(
   form: UseFormReturn<TFieldValues>,
   publishSchema: ZodType<TFieldValues>,
   values: TFieldValues,
+  items: FormItem[] = [],
 ): boolean {
-  const result = publishSchema.safeParse(values)
-  if (result.success) return true
-
-  form.clearErrors()
-  applyValidationIssuesToForm(form, zodIssuesToValidationIssues(result.error.issues))
-  return false
+  return applyContentPublishValidation(form, publishSchema, values, items) === null
 }

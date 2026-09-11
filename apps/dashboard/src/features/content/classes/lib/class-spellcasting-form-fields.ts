@@ -24,6 +24,7 @@ import {
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import { titleCase } from '../../lib/utils/title-case'
 import { CANTRIPS_KNOWN_PROFILES } from './cantrips-profiles'
 
@@ -76,6 +77,21 @@ export function createSpellcastingFormSchema(maxLevel: number) {
     progression: z.enum(SPELLCASTING_PROGRESSIONS).optional(),
     ability: abilitySchema.optional(),
     preparation: z.enum(SPELL_PREPARATION_MODES).optional(),
+    requiredGear: z.array(spellcastingGearKindSchema).optional(),
+    focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
+    recommendedGear: z.array(spellcastingGearKindSchema).optional(),
+    progressionTable: progressionTableFormSchema.optional(),
+  })
+}
+
+export function createSpellcastingDraftFormSchema(maxLevel: number) {
+  const levelField = campaignLevelField(maxLevel)
+  return z.object({
+    level: draftOptionalSelect(levelField),
+    description: z.string().optional(),
+    progression: draftOptionalSelect(z.enum(SPELLCASTING_PROGRESSIONS)),
+    ability: draftOptionalSelect(abilitySchema),
+    preparation: draftOptionalSelect(z.enum(SPELL_PREPARATION_MODES)),
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
     focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
@@ -156,27 +172,31 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
           visibility: visibleWhenSpellcasting(),
           fields: [
             {
-              type: 'select',
+              type: 'chips',
               name: 'spellcasting.progression',
               label: 'Progression',
               options: spellcastingProgressionOptions,
+              multiple: false,
               required: true,
             },
             {
-              type: 'select',
-              name: 'spellcasting.ability',
-              label: 'Spellcasting ability',
-              options: abilityOptions,
-              required: true,
-            },
-            {
-              type: 'select',
+              type: 'chips',
               name: 'spellcasting.preparation',
               label: 'Preparation',
               options: spellPreparationOptions,
+              multiple: false,
               required: true,
             },
           ],
+        },
+        {
+          type: 'chips',
+          name: 'spellcasting.ability',
+          label: 'Spellcasting ability',
+          options: abilityOptions,
+          multiple: false,
+          required: true,
+          visibility: visibleWhenSpellcasting(),
         },
         {
           type: 'combobox',

@@ -42,7 +42,9 @@ describe('resolveFieldPresentation', () => {
 
     if (labelLayout === 'stacked') {
       expect(presentation.groupClassName).toContain('flex-col')
-      expect(presentation.alignmentAnchorClassName).toContain('gap-y-2')
+      expect(presentation.alignmentAnchorClassName).toContain(
+        size === 'sm' ? 'gap-y-1' : 'gap-y-1.5',
+      )
     }
     if (labelLayout === 'inline') {
       expect(presentation.groupClassName).toContain('items-center')

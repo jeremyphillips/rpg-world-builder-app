@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from 'react'
+import { cloneElement, isValidElement, type ComponentProps, type ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { FieldErrorText, FieldHintBelowLabel, FieldHintText, type FieldSize } from './field.client'
@@ -6,7 +6,10 @@ import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
 import {
   fieldAnatomyStackVariants,
+  fieldLabelHintStackClasses,
+  fieldLabelVariants,
   fieldSetChromeContainClasses,
+  fieldSetInFlowLegendClasses,
   fieldSetResetClasses,
   type FieldHintPosition,
 } from './field.variants'
@@ -31,6 +34,42 @@ export interface FieldsetChromeFrameProps {
   children: ReactNode
 }
 
+function wrapLegendCluster(
+  legend: ReactNode,
+  options: {
+    size: FieldSize
+    belowLabelHint: ReactNode
+  },
+): ReactNode {
+  if (!isValidElement<{ className?: string; children?: ReactNode }>(legend)) {
+    return (
+      <>
+        {legend}
+        {options.belowLabelHint}
+      </>
+    )
+  }
+
+  const { className: legendClassName, children: labelContent, ...legendRest } = legend.props
+
+  const labelLine = <div className={fieldLabelVariants({ size: options.size })}>{labelContent}</div>
+
+  const cluster = options.belowLabelHint ? (
+    <div className={fieldLabelHintStackClasses}>
+      {labelLine}
+      {options.belowLabelHint}
+    </div>
+  ) : (
+    labelLine
+  )
+
+  return cloneElement(legend, {
+    ...legendRest,
+    className: cn(fieldSetInFlowLegendClasses, legendClassName),
+    children: cluster,
+  })
+}
+
 /**
  * Border/padding for leaf fieldsets live on {@link FieldChromeShell} around a reset
  * `<fieldset>`, so UA `<legend>` cannot sit on the visible container border. Keep
@@ -38,16 +77,17 @@ export interface FieldsetChromeFrameProps {
  * {@link FieldsetChromeFrame}.
  */
 export function FieldsetChromeAnatomy({
+  size = 'md',
   hintPosition = 'below-label',
   hint,
   error,
   hintId,
   legend,
   children,
-}: Omit<FieldsetChromeAnatomyProps, 'size' | 'errorId'>) {
+}: Omit<FieldsetChromeAnatomyProps, 'errorId'>) {
   const belowLabelHint =
-    hintPosition === 'below-label' ? (
-      <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+    hintPosition === 'below-label' && hint ? (
+      <FieldHintBelowLabel hint={hint} hintId={hintId} />
     ) : null
   const belowControlHint =
     hintPosition === 'below-control' && hint && !error ? (
@@ -56,15 +96,14 @@ export function FieldsetChromeAnatomy({
 
   return (
     <>
-      {legend}
-      {belowLabelHint}
+      {wrapLegendCluster(legend, { size, belowLabelHint })}
       {children}
       {belowControlHint}
     </>
   )
 }
 
-/** Leaf fieldset + chrome shell + error sibling (errors stay outside the box). */
+/** Leaf fieldset + chrome shell; error is a sibling of the fieldset inside the shell. */
 export function FieldsetChromeFrame({
   chrome,
   size = 'md',
@@ -74,24 +113,23 @@ export function FieldsetChromeFrame({
   children,
 }: FieldsetChromeFrameProps) {
   const { className: fieldsetClassName, ...restFieldsetProps } = fieldsetProps
+  const anatomyStack = fieldAnatomyStackVariants({ size })
 
   return (
-    <>
-      <FieldChromeShell chrome={chrome} size={size}>
-        <fieldset
-          {...restFieldsetProps}
-          className={cn(
-            fieldSetResetClasses,
-            fieldSetChromeContainClasses,
-            fieldAnatomyStackVariants({ size }),
-            fieldsetClassName,
-          )}
-        >
-          {children}
-        </fieldset>
-      </FieldChromeShell>
+    <FieldChromeShell chrome={chrome} size={size} className={anatomyStack}>
+      <fieldset
+        {...restFieldsetProps}
+        className={cn(
+          fieldSetResetClasses,
+          fieldSetChromeContainClasses,
+          anatomyStack,
+          fieldsetClassName,
+        )}
+      >
+        {children}
+      </fieldset>
       <FieldsetChromeError error={error} errorId={errorId} size={size} />
-    </>
+    </FieldChromeShell>
   )
 }
 

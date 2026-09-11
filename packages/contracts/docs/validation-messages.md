@@ -24,7 +24,9 @@ flowchart LR
 
 Precedence is automatic: Zod only consults the tier-1 error map for issues that
 have no message of their own, so tier-2/3 messages set via `.refine` /
-`superRefine` always win, and unmapped paths fall back to Zod defaults.
+`superRefine` always win. Unregistered paths still receive unlabeled catalog
+copy (`This field` / `item`) — UI parse paths never surface Zod's English
+defaults.
 
 ## Defining messages
 
@@ -252,7 +254,9 @@ field category:
 | `too_small` / `too_big` array `exact`   | array / multi           | `Add exactly {n} {items label}.`                                   |
 | registered path, unhandled code         | any                     | `{label} is invalid.` (catch-all safety net)                       |
 
-Unregistered paths still return `undefined` → Zod's default message. Categories cover
+Unregistered paths use the same formatters with unlabeled fallbacks
+(`This field is required.`, `Add at least one item.`, `Enter a valid number.`).
+Categories cover
 every `FieldType` (chips/combobox split on `multiple`, `chooseFromChips`
 registers both the chip path and the count path, `levelRange` registers the
 min/max names, `editableGrid` registers each column key, `diceFormula` registers

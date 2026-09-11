@@ -113,9 +113,13 @@ export function FormField({
     const chromedRow = hasActiveFieldChrome(chrome) ? (
       <FieldChromeShell chrome={chrome} size={size}>
         {settingsRow}
+        <Field.Error />
       </FieldChromeShell>
     ) : (
-      settingsRow
+      <>
+        {settingsRow}
+        <Field.Error />
+      </>
     )
 
     return (
@@ -125,12 +129,12 @@ export function FormField({
         invalid={invalid}
         describedBy={describedBy}
         hint={hint}
+        hintPosition={hintPosition}
         required={required}
         size={size}
         width={rootWidth}
       >
         {chromedRow}
-        <Field.Error />
       </Field.Root>
     )
   }
@@ -142,6 +146,7 @@ export function FormField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       size={size}
       width={rootWidth}

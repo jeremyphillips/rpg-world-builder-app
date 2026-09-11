@@ -119,7 +119,7 @@ export function CharactersOverview() {
   )
 
   return (
-    <NarrowPage spacing="list">
+    <NarrowPage rhythm="list">
       <IndexPageIntro
         title="Characters"
         description={CHARACTERS_OVERVIEW_COPY.description}

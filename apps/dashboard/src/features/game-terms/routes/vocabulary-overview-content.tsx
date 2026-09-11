@@ -113,7 +113,7 @@ function VocabularyOverviewPage({
 
   return (
     <>
-      <WidePage spacing="relaxed">
+      <WidePage rhythm="relaxed">
         <PageHeader heading={setLabel} actions={newAction} />
         <PageLoadState
           isPending={isPending}

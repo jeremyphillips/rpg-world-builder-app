@@ -21,4 +21,11 @@ describe('sheetContentVariants', () => {
     )
     expect(sheetContentVariants({ size: 'lg' })).toContain('max-w-[550px]')
   })
+
+  it('supports field-container surface', () => {
+    expect(sheetContentVariants({ surface: 'field-container' })).toContain('bg-field-container')
+    expect(sheetContentVariants({ surface: 'field-container' })).toContain(
+      '[--surface-current:var(--field-container)]',
+    )
+  })
 })

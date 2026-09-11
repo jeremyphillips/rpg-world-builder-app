@@ -2,16 +2,10 @@
 
 import * as React from 'react'
 
-import { cn } from '../../lib/utils'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import { Field, type FieldSize } from './field.client'
 import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
-import {
-  fieldChipWrapGapClasses,
-  fieldLabelVariants,
-  fieldSetInFlowLegendClasses,
-  type FieldHintPosition,
-} from './field.variants'
+import { fieldChipWrapGapClasses, type FieldHintPosition } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldOption } from '../../form/field-config'
@@ -162,6 +156,7 @@ export function ChipsField({
     describedBy,
     errorId,
     hintId,
+    hintPosition,
   )
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
   const outerWidthClass = rootWidth === 'auto' ? 'w-auto' : 'w-full'
@@ -197,19 +192,13 @@ export function ChipsField({
         }}
       >
         <FieldsetChromeAnatomy
+          size={size}
           hintPosition={hintPosition}
           hint={hint}
           error={error}
           hintId={hintId}
           legend={
-            <legend
-              id={legendId}
-              className={cn(
-                fieldSetInFlowLegendClasses,
-                fieldLabelVariants({ size }),
-                labelVisibility === 'srOnly' && 'sr-only',
-              )}
-            >
+            <legend id={legendId} className={labelVisibility === 'srOnly' ? 'sr-only' : undefined}>
               <FieldLabelContent
                 label={label}
                 required={required}

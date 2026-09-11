@@ -4,11 +4,13 @@ import { Text } from '../../components/ui/text'
 import { cn } from '../../lib/utils'
 import { FormItems } from '../containers/form-items.client'
 import { FormRhythmStack } from '../context/form-section.context'
-import { FormActionsBar } from '../chrome/form-actions-bar'
+import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-actions-bar'
 import {
   formFooterSpacingClasses,
   formSheetScrollRegionClasses,
+  formStickyScrollBodyClasses,
 } from '../chrome/form-chrome.variants'
+import { FormScrollBodyTopInset } from '../chrome/form-viewport-scroll-top-inset.client'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
 
@@ -16,6 +18,7 @@ export type FormShellFieldStackProps = {
   formId: string
   fields: FormItem[]
   contentClassName?: string
+  scrollBodyClassName?: string
   externalFooter: boolean
   stickyFooter: boolean
   formError?: string | null
@@ -24,10 +27,41 @@ export type FormShellFieldStackProps = {
   contentWrapper?: (content: React.ReactNode) => React.ReactNode
 }
 
+type FormShellFieldStackScrollWrapOptions = Pick<
+  FormShellFieldStackProps,
+  'contentClassName' | 'scrollBodyClassName' | 'externalFooter' | 'stickyFooter'
+>
+
+function wrapFormShellFieldStackScroll(
+  stack: ReactNode,
+  {
+    contentClassName,
+    scrollBodyClassName,
+    externalFooter,
+    stickyFooter,
+  }: FormShellFieldStackScrollWrapOptions,
+): ReactNode {
+  if (externalFooter) {
+    return <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
+  }
+
+  if (stickyFooter) {
+    return (
+      <div className={formStickyScrollBodyClasses}>
+        {scrollBodyClassName ? <FormScrollBodyTopInset className={scrollBodyClassName} /> : null}
+        {stack}
+      </div>
+    )
+  }
+
+  return stack
+}
+
 export function FormShellFieldStack({
   formId,
   fields,
   contentClassName,
+  scrollBodyClassName,
   externalFooter,
   stickyFooter,
   formError,
@@ -50,24 +84,35 @@ export function FormShellFieldStack({
     </FormRhythmStack>
   )
 
-  const scrollWrappedStack = externalFooter ? (
-    <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
-  ) : (
-    stack
-  )
+  const scrollWrappedStack = wrapFormShellFieldStackScroll(stack, {
+    contentClassName,
+    scrollBodyClassName,
+    externalFooter,
+    stickyFooter,
+  })
 
-  return contentWrapper ? contentWrapper(scrollWrappedStack) : scrollWrappedStack
+  return contentWrapper && !stickyFooter ? contentWrapper(scrollWrappedStack) : scrollWrappedStack
 }
 
 export type FormFooterRegionProps = {
   stickyFooter: boolean
   formError?: string | null
   footer: ReactNode
+  actionsBarPlacement?: FormActionsBarPlacement
 }
 
-export function FormFooterRegion({ stickyFooter, formError, footer }: FormFooterRegionProps) {
+export function FormFooterRegion({
+  stickyFooter,
+  formError,
+  footer,
+  actionsBarPlacement = 'sticky',
+}: FormFooterRegionProps) {
   if (stickyFooter) {
-    return <FormActionsBar formError={formError}>{footer}</FormActionsBar>
+    return (
+      <FormActionsBar formError={formError} placement={actionsBarPlacement}>
+        {footer}
+      </FormActionsBar>
+    )
   }
 
   if (!footer) {

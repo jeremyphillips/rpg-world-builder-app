@@ -62,7 +62,7 @@ export function AdminUserCampaignsTable() {
 
 export function AdminUserCampaignsPage() {
   return (
-    <WidePage spacing="list">
+    <WidePage rhythm="list">
       <PageHeader heading="Campaigns" />
       <Text variant="muted">Campaigns this user owns, co-owns, or has joined.</Text>
       <AdminUserContextLine />

@@ -20,6 +20,8 @@ describe('Sidebar', () => {
     expect(overlay?.className).toContain('bg-overlay')
     expect(document.querySelector('aside')).toHaveClass(sidebarAsideVariants({ open: false }))
     expect(document.querySelector('aside')?.className).toContain('w-sidebar')
+    expect(document.querySelector('aside')?.className).toContain('h-dvh')
+    expect(document.querySelector('aside')?.className).toContain('overflow-hidden')
 
     rerender(<Sidebar isOpen onClose={() => undefined} />)
     expect(document.querySelector('aside')).toHaveClass(sidebarAsideVariants({ open: true }))

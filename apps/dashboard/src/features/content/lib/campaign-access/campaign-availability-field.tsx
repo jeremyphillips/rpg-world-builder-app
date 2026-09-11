@@ -258,13 +258,14 @@ export function CampaignAvailabilityField({
       () => ({
         isDirty,
         isPending: pending,
+        pendingAccess: (watchedValues ?? form.getValues()) as ContentCampaignAccessPatch,
         save,
         reset,
         readPendingAvailable: () => form.getValues().available,
         readAccessAvailabilityChanged: () =>
           form.getValues().available !== persistedBaseline.available,
       }),
-      [form, isDirty, pending, reset, save],
+      [form, isDirty, pending, reset, save, watchedValues],
     ),
   )
 

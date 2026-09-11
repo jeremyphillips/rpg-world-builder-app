@@ -28,7 +28,7 @@ export interface FieldLayoutProps {
  * Default hint placement is below the label with a tighter label→hint gap.
  *
  * Alignment anchor (`data-field-align`) wraps label + control band so row
- * `items-end` aligns control edges; `Field.Error` stays outside the chrome shell.
+ * `items-end` aligns control edges. Validation text stays inside chrome when active.
  */
 export function FieldLayout({
   hintPosition = 'below-label',
@@ -85,15 +85,14 @@ export function FieldLayout({
   const chromedBody = hasActiveFieldChrome(chrome) ? (
     <FieldChromeShell chrome={chrome} size={size}>
       {fieldBody}
+      <Field.Error />
     </FieldChromeShell>
   ) : (
-    fieldBody
-  )
-
-  return (
     <>
-      {chromedBody}
+      {fieldBody}
       <Field.Error />
     </>
   )
+
+  return chromedBody
 }

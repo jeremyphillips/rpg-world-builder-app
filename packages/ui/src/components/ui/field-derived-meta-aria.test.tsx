@@ -6,7 +6,7 @@ import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
 
 describe('Field aria-describedby with derived metadata', () => {
-  it('uses error id exclusively when invalid', () => {
+  it('combines below-label hint and error ids when invalid', () => {
     render(
       <FieldDerivedMetaProvider meta={{ rows: [{ label: 'Typical uses', value: 'Care' }] }}>
         <Field.Root id="archetype" error="Required" hint="Choose an archetype.">
@@ -19,7 +19,10 @@ describe('Field aria-describedby with derived metadata', () => {
     )
 
     const control = screen.getByLabelText('Archetype')
-    expect(control).toHaveAttribute('aria-describedby', 'archetype-error')
+    expect(control).toHaveAttribute(
+      'aria-describedby',
+      'archetype-hint archetype-error archetype-derived-meta',
+    )
   })
 
   it('uses hint id when only hint is present', () => {

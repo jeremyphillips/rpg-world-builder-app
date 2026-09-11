@@ -65,7 +65,7 @@ export function DiceFormulaInlineField({
             <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>
               <FieldLabelContent label={label} required={required} info={info} />
             </span>
-            <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+            <FieldHintBelowLabel hint={hint} hintId={hintId} />
           </div>
         ) : (
           <span id={inlineLabelId} className={cn(fieldLabelVariants({ size }), 'shrink-0')}>

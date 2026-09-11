@@ -52,8 +52,20 @@ function CollapsibleSidebarSection({
   )
 }
 
-/** Campaign workspace navigation — rendered only under `CampaignLayoutRoute`. */
-export function CampaignSidebarNav({ campaignId }: CampaignSidebarNavProps) {
+/** Fixed campaign chrome — exit link and switcher above scrollable nav sections. */
+export function CampaignSidebarChrome({ campaignId: _campaignId }: CampaignSidebarNavProps) {
+  return (
+    <>
+      <AllCampaignsLink />
+      <div className="py-1">
+        <CampaignSwitcher showLabel={false} />
+      </div>
+    </>
+  )
+}
+
+/** Scrollable campaign nav sections — rendered inside `SidebarNav` scroll region. */
+export function CampaignSidebarNavSections({ campaignId }: CampaignSidebarNavProps) {
   const { pathname } = useLocation()
   const canManageCampaign = useCanManageCampaign(campaignId)
   const isElevatedPlatformRole = useIsElevatedPlatformRole()
@@ -68,10 +80,6 @@ export function CampaignSidebarNav({ campaignId }: CampaignSidebarNavProps) {
 
   return (
     <>
-      <AllCampaignsLink />
-      <div className="py-1">
-        <CampaignSwitcher showLabel={false} />
-      </div>
       {sections.map((section) => (
         <CollapsibleSidebarSection
           key={section.id}
@@ -81,6 +89,16 @@ export function CampaignSidebarNav({ campaignId }: CampaignSidebarNavProps) {
           disabled={sectionHasActiveItem(pathname, section)}
         />
       ))}
+    </>
+  )
+}
+
+/** Campaign workspace navigation — rendered only under `CampaignLayoutRoute`. */
+export function CampaignSidebarNav({ campaignId }: CampaignSidebarNavProps) {
+  return (
+    <>
+      <CampaignSidebarChrome campaignId={campaignId} />
+      <CampaignSidebarNavSections campaignId={campaignId} />
     </>
   )
 }

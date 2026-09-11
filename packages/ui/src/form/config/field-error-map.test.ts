@@ -3,7 +3,12 @@ import { z } from 'zod'
 
 import { formatFieldMessage } from '@rpg/contracts'
 
-import { makeFieldErrorMap } from './field-error-map'
+import {
+  makeFieldErrorMap,
+  safeParseWithFieldErrors,
+  UNLABELED_FIELD_LABEL,
+  UNLABELED_ITEM_LABEL,
+} from './field-error-map'
 import type { FormItem } from '../field-config'
 
 const testFields: FormItem[] = [
@@ -200,9 +205,33 @@ describe('makeFieldErrorMap', () => {
     )
   })
 
-  it('falls back to the Zod default for unregistered paths', () => {
-    const schema = z.object({ unknownField: z.string() })
+  it('formats unregistered paths with unlabeled catalog copy', () => {
+    const schema = z.object({ unknownField: z.string().min(1) })
 
-    expect(messageFor(schema, {})).toBe('Invalid input: expected string, received undefined')
+    expect(messageFor(schema, {})).toBe(`${UNLABELED_FIELD_LABEL} is required.`)
+    expect(messageFor(schema, { unknownField: '' })).toBe(`${UNLABELED_FIELD_LABEL} is required.`)
+  })
+
+  it('formats unregistered array minimums with a generic item label', () => {
+    const schema = z.object({ tags: z.array(z.string()).min(1) })
+
+    expect(messageFor(schema, { tags: [] })).toBe(`Add at least one ${UNLABELED_ITEM_LABEL}.`)
+  })
+
+  it('formats unregistered invalid numbers without Zod NaN copy', () => {
+    const schema = z.object({ quantity: z.coerce.number() })
+
+    expect(messageFor(schema, { quantity: 'x' })).toBe('Enter a valid number.')
+    expect(messageFor(schema, { quantity: Number.NaN })).toBe('Enter a valid number.')
+  })
+
+  it('safeParseWithFieldErrors applies the field-aware map', () => {
+    const result = safeParseWithFieldErrors(z.object({ name: z.string().min(1) }), { name: '' }, [
+      { type: 'text', name: 'name', label: 'Name' },
+    ])
+
+    expect(result.success).toBe(false)
+    if (result.success) throw new Error('expected failure')
+    expect(formatFieldMessage(result.error.issues[0]!.message)).toBe('Name is required.')
   })
 })

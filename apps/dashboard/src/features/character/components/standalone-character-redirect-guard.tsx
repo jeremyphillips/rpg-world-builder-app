@@ -52,7 +52,7 @@ export function StandaloneCharacterRedirectGuard({
 
   if (isCharacterPending || (isCharacterSuccess && isRoutingPending)) {
     return (
-      <WidePage spacing="relaxed">
+      <WidePage rhythm="relaxed">
         <PageLoadState isPending isError={false} defaultErrorLabel="Could not load character.">
           {null}
         </PageLoadState>

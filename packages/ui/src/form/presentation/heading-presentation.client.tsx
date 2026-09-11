@@ -6,11 +6,14 @@ import { cn } from '../../lib/utils'
 import {
   fieldGroupDescriptionTypographyClasses,
   fieldGroupLegendHeaderStackClasses,
+  fieldLabelHintStackClasses,
   fieldLabelVariants,
+  fieldSetInFlowLegendClasses,
   resolveFieldGroupLegendClassName,
   type FieldGroupLegendScale,
 } from '../../components/ui/field.variants'
 import type { FieldSize } from '../../components/ui/field.client'
+import { FieldLabelContent } from '../../components/ui/field-label-content'
 import { Text } from '../../components/ui/text'
 import type { FieldHintConfig } from '../field-config'
 import { normalizeFieldHint } from '../field-config'
@@ -61,6 +64,14 @@ function renderHint(hint: string | FieldHintConfig | undefined, tier: FormHeadin
   )
 }
 
+function renderLeafLabelLine(label: string, size: FieldSize): ReactNode {
+  return (
+    <div className={fieldLabelVariants({ size })}>
+      <FieldLabelContent label={label} />
+    </div>
+  )
+}
+
 /** Styled heading label + hint — typography only; no container semantics. */
 export function HeadingPresentation({
   tier,
@@ -75,9 +86,32 @@ export function HeadingPresentation({
   const labelClassName = resolveHeadingLabelClassName(tier, size, arrayScale)
   const hintNode = renderHint(hint, tier)
 
-  if (hintNode) {
+  if (tier === 'leaf') {
+    const legendContents = Component === 'legend' ? fieldSetInFlowLegendClasses : undefined
+    const labelLine = renderLeafLabelLine(label, size)
+
+    if (hintNode) {
+      return (
+        <Component id={id} className={cn(legendContents, className)}>
+          <div className={fieldLabelHintStackClasses}>
+            {labelLine}
+            {hintNode}
+          </div>
+        </Component>
+      )
+    }
+
     return (
-      <Component id={id} className={cn(fieldGroupLegendHeaderStackClasses, className)}>
+      <Component id={id} className={cn(legendContents, className)}>
+        {labelLine}
+      </Component>
+    )
+  }
+
+  if (hintNode) {
+    const hintStackClasses = fieldGroupLegendHeaderStackClasses
+    return (
+      <Component id={id} className={cn(hintStackClasses, className)}>
         <span className={labelClassName}>{label}</span>
         {hintNode}
       </Component>

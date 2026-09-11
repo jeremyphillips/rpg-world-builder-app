@@ -133,23 +133,35 @@ For layout-only decorators, use page shells or a `<div>` — not a router.
 
 ## Page layout
 
+`AppShell` `<main>` is a non-scrolling flex column (`overflow-hidden`, horizontal
+gutter only). Every routed leaf must mount a **scroll owner** beneath it — usually
+`WidePage` / `NarrowPage` with `scroll="page"` (default), or a viewport-bound shell
+for forms and full-height workspaces.
+
+Scroll vs inset vs child rhythm are **independent**:
+
+| Prop      | SSOT                                                                                 | Default   | Role                                                                                |
+| --------- | ------------------------------------------------------------------------------------ | --------- | ----------------------------------------------------------------------------------- |
+| `scroll`  | [`page-scroll.variants.ts`](../src/components/layout/page/page-scroll.variants.ts)   | `page`    | `page` → `overflow-y-auto`; `viewport` → `overflow-hidden` (descendant owns scroll) |
+| `spacing` | [`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts) | `page`    | Shell vertical inset (`py-8` or `none`)                                             |
+| `rhythm`  | same file (`pageSpacingClasses`)                                                     | `compact` | Direct-child `space-y-*` only                                                       |
+
 Every route picks **one width shell** from `components/layout/page/`:
 
-| Shell                                                         | Width                | Typical routes                                                 |
-| ------------------------------------------------------------- | -------------------- | -------------------------------------------------------------- |
-| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx) | Centered `max-w-4xl` | Settings, wizards, account settings, content create/edit forms |
-| [`WidePage`](../src/components/layout/page/wide-page.tsx)     | Full main column     | Lists, hubs, detail pages, tables                              |
+| Shell                                                                                                 | Width                | Typical routes                                                                                           |
+| ----------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------- |
+| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx)                                         | Centered `max-w-4xl` | Settings, wizards, account settings, simple forms                                                        |
+| [`WidePage`](../src/components/layout/page/wide-page.tsx)                                             | Full main column     | Lists, hubs, detail pages, tables                                                                        |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Narrow or wide       | Catalog create/edit — `scroll="viewport" spacing="none"`; top inset on form scroll body + preview column |
 
 Nested readable columns inside `WidePage` use
 [`narrowPageContentClasses`](../src/components/layout/page/page-content.variants.ts)
 (left-aligned `max-w-narrow-content`, ~660px) — narrower than `NarrowPage`, for prose
 body sections on catalog detail routes.
 
-Shared spacing tokens live in
-[`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts):
-`compact` (space-y-2), `list` (space-y-4), `relaxed` (space-y-6), `loose`
-(space-y-10). Pass `className="pb-10"` on long narrow forms so the sticky footer
-clears the viewport.
+Child rhythm tokens (`compact`, `list`, `relaxed`, `loose`) live in
+[`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts).
+Pass them via the `rhythm` prop — not `spacing`.
 
 ### Page chrome (composes inside a width shell)
 
@@ -163,17 +175,22 @@ import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { PageHeader } from '@/components/layout/page/page-header'
 import { WidePage } from '@/components/layout/page/wide-page'
 
-// Narrow form page
-<NarrowPage spacing="relaxed" className="pb-10">
-  <PageHeader heading="New Species" />
-  {/* form */}
+// Narrow settings page
+<NarrowPage rhythm="relaxed">
+  <PageHeader heading="Account" />
+  {/* sections */}
 </NarrowPage>
 
 // Full-width hub (no domain shell needed)
-<WidePage spacing="relaxed">
+<WidePage rhythm="relaxed">
   <PageHeader heading="Equipment" />
   {/* card grid */}
 </WidePage>
+
+// Content catalog create/edit — viewport-bound; TabbedForm owns scroll + docked footer
+<ContentFormPageShell usePreviewLayout={hasPreview}>
+  {/* form */}
+</ContentFormPageShell>
 ```
 
 ### Domain layouts (feature-specific, nest inside a width shell)
@@ -194,7 +211,7 @@ import { WidePage } from '@/components/layout/page/wide-page'
 ```tsx
 import { WidePage } from '@/components/layout/page/wide-page'
 import { ContentDetailLayout } from '@/features/content/lib/detail/page/content-detail-layout'
-;<WidePage spacing="relaxed">
+;<WidePage rhythm="relaxed">
   <ContentDetailLayout
     name={item.name}
     statRows={rows}

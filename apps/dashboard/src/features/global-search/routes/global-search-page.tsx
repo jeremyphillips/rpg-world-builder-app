@@ -28,7 +28,7 @@ export function GlobalSearchPage() {
   } = useGlobalSearchPage(campaignId)
 
   return (
-    <NarrowPage spacing="list">
+    <NarrowPage rhythm="list">
       <div className={pageHeaderSectionGapClasses}>
         <PageHeader heading={GLOBAL_SEARCH_COPY.pageTitle} />
         <form

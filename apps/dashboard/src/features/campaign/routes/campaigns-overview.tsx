@@ -34,7 +34,7 @@ export function CampaignsOverview() {
   )
 
   return (
-    <NarrowPage spacing="relaxed">
+    <NarrowPage rhythm="relaxed">
       <IndexPageIntro
         title="Campaigns"
         description={description}

@@ -6,7 +6,7 @@ import { NameGeneratorPage } from '../components/name-generator-page'
 
 export function NameGeneratorRoute() {
   return (
-    <NarrowPage spacing="relaxed">
+    <NarrowPage rhythm="relaxed">
       <Heading variant="page" as="h1">
         Name Generator
       </Heading>

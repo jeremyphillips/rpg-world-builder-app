@@ -59,28 +59,32 @@ function buildEligibleProficiencyChoiceIds(
   return eligibleProficiencyChoiceTargetIds(characterClass, catalogIndex)
 }
 
-export function refineCharacterCreationSaveValidation(
-  characterCreation: CharacterCreationFormSlice | undefined,
+function refineCharacterCreationSkillChoice(
+  skills: CharacterCreationProficienciesForm['skills'] | undefined,
+  ctx: z.RefinementCtx,
+): void {
+  if (!skills || skills.choose <= 0 || skills.from.length >= skills.choose) return
+
+  ctx.addIssue({
+    code: 'custom',
+    message: `Add at least ${skills.choose} skills to the pool`,
+    path: ['proficiencies', 'skills', 'from'],
+  })
+}
+
+function refineCharacterCreationStartingEquipmentLinks(
+  characterCreation: CharacterCreationFormSlice,
   ctx: z.RefinementCtx,
   formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
 ): void {
-  const tools = characterCreation?.proficiencies?.tools
-
-  if (isMeaningfulCharacterCreationToolChoice(tools) && !tools.label?.trim()) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Enter a label for the tool proficiency choice.',
-      path: ['proficiencies', 'tools', 'label'],
-    })
-  }
-
-  const startingEquipment = characterCreation?.startingEquipment
+  const tools = characterCreation.proficiencies?.tools
+  const startingEquipment = characterCreation.startingEquipment
   if (!startingEquipment?.options?.length) return
 
   const definedToolChoiceIds = isMeaningfulCharacterCreationToolChoice(tools)
     ? new Set([CHARACTER_CREATION_TOOL_CHOICE_ID])
     : new Set<string>()
-  const eligibleIds = buildEligibleProficiencyChoiceIds(characterCreation?.proficiencies, formCtx)
+  const eligibleIds = buildEligibleProficiencyChoiceIds(characterCreation.proficiencies, formCtx)
 
   for (const [optionIndex, option] of startingEquipment.options.entries()) {
     for (const [itemIndex, item] of option.items.entries()) {
@@ -106,5 +110,27 @@ export function refineCharacterCreationSaveValidation(
         },
       )
     }
+  }
+}
+
+export function refineCharacterCreationSaveValidation(
+  characterCreation: CharacterCreationFormSlice | undefined,
+  ctx: z.RefinementCtx,
+  formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
+): void {
+  refineCharacterCreationSkillChoice(characterCreation?.proficiencies?.skills, ctx)
+
+  const tools = characterCreation?.proficiencies?.tools
+
+  if (isMeaningfulCharacterCreationToolChoice(tools) && !tools.label?.trim()) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Enter a label for the tool proficiency choice.',
+      path: ['proficiencies', 'tools', 'label'],
+    })
+  }
+
+  if (characterCreation) {
+    refineCharacterCreationStartingEquipmentLinks(characterCreation, ctx, formCtx)
   }
 }

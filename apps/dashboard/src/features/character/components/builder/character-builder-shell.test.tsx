@@ -209,9 +209,14 @@ describe('CharacterBuilderShell', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      formatFieldMessage(characterBuilderValidationMessages.nameRequired()),
+    const nameRequiredMessage = formatFieldMessage(
+      characterBuilderValidationMessages.nameRequired(),
     )
+    expect(
+      screen
+        .getAllByRole('alert')
+        .some((alert) => alert.textContent?.includes(nameRequiredMessage)),
+    ).toBe(true)
     expect(
       within(stepRail).getByRole('button', { name: /Identity, has blocking validation issues/i }),
     ).toBeInTheDocument()

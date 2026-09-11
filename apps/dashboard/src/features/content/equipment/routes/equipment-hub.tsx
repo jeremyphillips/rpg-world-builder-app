@@ -18,7 +18,7 @@ type EquipmentHubContentProps = {
 
 export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
   return (
-    <WidePage spacing="relaxed">
+    <WidePage rhythm="relaxed">
       <PageHeader heading={getContentTypeCollectionLabel('equipment')} />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {EQUIPMENT_FAMILY_PATHS.map((family) => (

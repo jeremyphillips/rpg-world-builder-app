@@ -32,13 +32,17 @@ import {
 import { featureToFormRow } from './class-feature-form-fields'
 import { startingEquipmentToFormValues } from './character-creation/class-starting-equipment-form-values'
 import { characterCreationProficienciesToFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
+import { ClassPreviewPlayerHost } from './class-preview-player-host'
+import { buildClassPreviewIdentity, buildClassPreviewSections } from './class-preview-projection'
+import {
+  ClassPreviewResourcesProvider,
+  type ClassPreviewResources,
+} from './class-preview-resources'
 
 function characterCreationToFormValues(
   entity: CharacterClass,
 ): ClassFormValues['characterCreation'] {
-  const primaryAbilities = entity.primaryAbilities?.length
-    ? entity.primaryAbilities
-    : classCreateDefaultValues.primaryAbilities!
+  const primaryAbilities = entity.primaryAbilities ?? []
 
   return {
     proficiencies: characterCreationProficienciesToFormValues(entity.characterCreation),
@@ -55,7 +59,12 @@ function characterCreationToFormValues(
   }
 }
 
-const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassInput> = {
+const classFormDef: ContentFormDef<
+  CharacterClass,
+  ClassFormValues,
+  CreateClassInput,
+  ClassPreviewResources
+> = {
   routeKey: 'classes',
 
   schema: classFormSchema,
@@ -74,8 +83,8 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     name: entity.name,
     slug: entity.slug,
     description: entity.description,
-    primaryAbilities: entity.primaryAbilities ?? classCreateDefaultValues.primaryAbilities!,
-    hitDie: entity.hitDie ?? classCreateDefaultValues.hitDie!,
+    primaryAbilities: entity.primaryAbilities ?? [],
+    hitDie: (entity.hitDie ?? '') as ClassFormValues['hitDie'],
     hasSpellcasting: entity.spellcasting !== undefined,
     weaponProficiencyMode:
       entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0
@@ -104,6 +113,13 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
     'characterCreation.startingEquipment.options':
       entity.characterCreation?.startingEquipment?.options.map((option) => option.id) ?? [],
   }),
+
+  preview: {
+    buildIdentity: buildClassPreviewIdentity,
+    buildSections: buildClassPreviewSections,
+    PreviewResources: ClassPreviewResourcesProvider,
+    renderPlayerPreview: ClassPreviewPlayerHost,
+  },
 }
 
 contentFormRegistry['classes'] = classFormDef

@@ -5,6 +5,7 @@ import * as AccordionPrimitive from '@radix-ui/react-accordion'
 import { ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { iconGlyphRootClasses } from './icon-glyph.variants'
 import {
   accordionContentVariants,
   accordionContentInnerVariants,
@@ -72,7 +73,12 @@ const AccordionTrigger = React.forwardRef<
         {...props}
       >
         {children}
-        <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+        <ChevronDown
+          className={cn(
+            iconGlyphRootClasses.lg,
+            'shrink-0 text-muted-foreground transition-transform duration-200',
+          )}
+        />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )

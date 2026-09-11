@@ -18,6 +18,7 @@ import {
   type FormValidationPresentation,
   type ValidateSilently,
 } from '../context/form-ui.context'
+import type { FormIssue } from '../errors/form-issue.types'
 import type { FileFieldPropsMap, FormItem } from '../field-config'
 import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
 import {
@@ -61,6 +62,10 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   /** Shared submit-attempt flag for tabbed layouts; see `FormUiProvider`. */
   hasAttemptedSubmit?: boolean
   onMarkSubmitAttempted?: () => void
+  hasAttemptedPublish?: boolean
+  onMarkPublishAttempted?: () => void
+  publishPresentationIssues?: FormIssue[]
+  publishPresentationEnabled?: boolean
   validateSilently?: ValidateSilently
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void
   /** Overrides default failed-submit navigation (expand keys + focus). */
@@ -210,6 +215,10 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   validationPresentation = 'progressive',
   hasAttemptedSubmit,
   onMarkSubmitAttempted,
+  hasAttemptedPublish,
+  onMarkPublishAttempted,
+  publishPresentationIssues,
+  publishPresentationEnabled,
   validateSilently,
   onSubmit,
   onInvalidSubmit,
@@ -232,6 +241,10 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
           validationPresentation={validationPresentation}
           hasAttemptedSubmit={hasAttemptedSubmit}
           onMarkSubmitAttempted={onMarkSubmitAttempted}
+          hasAttemptedPublish={hasAttemptedPublish}
+          onMarkPublishAttempted={onMarkPublishAttempted}
+          publishPresentationIssues={publishPresentationIssues}
+          publishPresentationEnabled={publishPresentationEnabled}
           validateSilently={validateSilently}
         >
           <SchemaFormElement

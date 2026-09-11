@@ -55,6 +55,7 @@ export const modalContentVariants = cva(
         sm: 'max-w-sm',
         md: 'max-w-lg',
         lg: 'max-w-2xl',
+        xl: 'max-w-5xl max-md:inset-0 max-md:left-0 max-md:top-0 max-md:h-dvh max-md:max-h-none max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none',
       },
       layout: {
         content: '',

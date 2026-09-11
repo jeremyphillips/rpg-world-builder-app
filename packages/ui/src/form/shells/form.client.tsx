@@ -20,6 +20,7 @@ import {
 import { assertOptionalDisclosureFieldConfigs } from '../config/optional-disclosure-config.lib'
 import type { FormValidationPresentation } from '../context/form-ui.context'
 import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
+import { formStickyScrollShellClasses } from '../chrome/form-chrome.variants'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -50,6 +51,8 @@ export interface FormProps<TFieldValues extends FieldValues> {
   className?: string
   /** Classes for the fields wrapper; e.g. `formCardContentClass` inside a `FormCard`. */
   contentClassName?: string
+  /** Extra classes on the bounded scroll body when `stickyFooter` is true. */
+  scrollBodyClassName?: string
   /** Optional id for the `<form>`; also the prefix for generated control ids. */
   id?: string
   /**
@@ -126,6 +129,7 @@ export function Form<TFieldValues extends FieldValues>({
   header,
   className,
   contentClassName,
+  scrollBodyClassName,
   id,
   uiStateKey,
   fileFieldProps,
@@ -183,26 +187,56 @@ export function Form<TFieldValues extends FieldValues>({
       onSubmit={onSubmit}
       externalFooter={externalFooter}
       externalFooterContent={externalFooterContent}
-      className={cn(externalFooter && 'flex min-h-0 flex-1 flex-col', className)}
+      className={cn(
+        externalFooter && 'flex min-h-0 flex-1 flex-col',
+        stickyFooter && !externalFooter && 'flex min-h-0 flex-1 flex-col',
+        className,
+      )}
     >
-      <FormShellFieldStack
-        formId={formId}
-        fields={fields}
-        contentClassName={contentClassName}
-        externalFooter={externalFooter}
-        stickyFooter={stickyFooter}
-        formError={formError}
-        valueSyncs={valueSyncs}
-        header={resolvedHeader}
-        contentWrapper={contentWrapper}
-      />
-      {!externalFooter ? (
-        <FormFooterRegion
-          stickyFooter={stickyFooter}
-          formError={formError}
-          footer={resolvedFooter}
-        />
-      ) : null}
+      {stickyFooter && !externalFooter ? (
+        <div className={formStickyScrollShellClasses}>
+          <FormShellFieldStack
+            formId={formId}
+            fields={fields}
+            contentClassName={contentClassName}
+            scrollBodyClassName={scrollBodyClassName}
+            externalFooter={externalFooter}
+            stickyFooter={stickyFooter}
+            formError={formError}
+            valueSyncs={valueSyncs}
+            header={resolvedHeader}
+            contentWrapper={contentWrapper}
+          />
+          <FormFooterRegion
+            stickyFooter={stickyFooter}
+            formError={formError}
+            footer={resolvedFooter}
+            actionsBarPlacement="docked"
+          />
+        </div>
+      ) : (
+        <>
+          <FormShellFieldStack
+            formId={formId}
+            fields={fields}
+            contentClassName={contentClassName}
+            scrollBodyClassName={scrollBodyClassName}
+            externalFooter={externalFooter}
+            stickyFooter={stickyFooter}
+            formError={formError}
+            valueSyncs={valueSyncs}
+            header={resolvedHeader}
+            contentWrapper={contentWrapper}
+          />
+          {!externalFooter ? (
+            <FormFooterRegion
+              stickyFooter={stickyFooter}
+              formError={formError}
+              footer={resolvedFooter}
+            />
+          ) : null}
+        </>
+      )}
     </SchemaFormShell>
   )
 }

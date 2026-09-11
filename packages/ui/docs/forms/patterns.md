@@ -11,14 +11,29 @@ tab and focuses its control, and the sticky footer shows a summary with **Review
 Inactive panels suppress per-field error text until their tab is active.
 
 **Sticky chrome** (default `stickyChrome={true}`): section control `sticky top-0` in the field
-column; `FormActionsBar` sticky bottom with footer. Pass `stickyChrome={false}` for flat layout.
-Overlay pattern: use `externalFooter` with `FormShellFooterScope` / `FormShellFooterSlot`
-instead of sticky bar inside scroll content. Overlay owners render shell chrome
-(`Modal.Footer`, `Sheet.Footer`, `DrawerShell.Footer`) and place `<FormShellFooterSlot />`
-inside for semantic footer content. Use `FormShellSubmitButton` for submit actions rendered
-outside the `<form>` element.
+column; `FormActionsBar` docks below a bounded scroll body (`formStickyScrollShellClasses` +
+`formStickyScrollBodyClasses`) so save actions stay at the bottom of the viewport on long page
+forms. Pass `stickyChrome={false}` for flat layout. Dashboard content create/edit routes mount
+`ContentFormPageShell` with `scroll="viewport" spacing="none"` so the page shell fills the app
+main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer
+(flush to the viewport bottom). Top inset scrolls away via `scrollBodyClassName` (typically
+`formViewportScrollBodyTopInsetClasses`) as the first child inside the scroll region — not as
+padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail vertical gutter
+lives on `formTabbedAsideSlotTopInsetClasses` / `formTabbedAsideSlotBottomInsetClasses`.
+Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
+reserved scrollbar gutters. Overlay pattern: use `externalFooter` with
+`FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar inside scroll content.
+Overlay owners render shell chrome (`Modal.Footer`, `Sheet.Footer`, `DrawerShell.Footer`) and
+place `<FormShellFooterSlot />` inside for semantic footer content. Use `FormShellSubmitButton`
+for submit actions rendered outside the `<form>` element.
 
 Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentClasses`.
+
+Optional `aside` (inside `FormProvider`) + `tabRowTrailing` for a compact tab-row action. At `xl`
+the body is a centered two-column grid (form `minmax(0, 1fr)` + aside `280px`; at `2xl` form
+`minmax(0, 56rem)` + aside `21rem`); the footer stays in the form column below the scroll body
+(not a separate grid row). `activeTabId` is on
+`TabbedFormChromeContext`.
 
 Non-field tab intro copy: `TabbedFormTab.header`. Omit `fields` for content-only panels.
 

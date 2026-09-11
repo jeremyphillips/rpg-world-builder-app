@@ -7,7 +7,9 @@ import type {
 import { Heading, Text } from '@rpg/ui'
 import { useRef, useState, type ReactNode } from 'react'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { hasContentFormPreview } from '../../preview/content-form-preview.types'
+import { ContentFormPageShell } from '../layout/content-form-page-shell'
+import { contentFormPageShellHeadingClasses } from '../layout/content-form-page-shell.variants'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
@@ -57,6 +59,8 @@ interface ContentCreateFormBodyProps {
   campaignId: string
   backHref: string
   ctx: ContentFormCtx
+  heading: string
+  usePreviewLayout: boolean
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
   prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
@@ -69,6 +73,8 @@ function ContentCreateFormBody({
   campaignId,
   backHref,
   ctx,
+  heading,
+  usePreviewLayout,
   initialValues,
   formCtx,
   prepareSubmitValues,
@@ -185,8 +191,14 @@ function ContentCreateFormBody({
         onLeaveGuardReady={(guard) => {
           leaveGuardRef.current = guard
         }}
+        previewDraftBadge={usePreviewLayout}
         formHeaderPrefix={
           <>
+            {usePreviewLayout ? (
+              <Heading variant="page" as="h1">
+                {heading}
+              </Heading>
+            ) : null}
             <UiBridge />
             {formHeaderPrefix}
           </>
@@ -201,6 +213,8 @@ interface ContentCreateFormProps {
   contentTypeKey: ContentTypeKey
   campaignId: string
   backHref: string
+  heading: string
+  usePreviewLayout: boolean
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
   prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
@@ -212,6 +226,8 @@ function ContentCreateForm({
   contentTypeKey,
   campaignId,
   backHref,
+  heading,
+  usePreviewLayout,
   initialValues,
   formCtx,
   prepareSubmitValues,
@@ -225,6 +241,8 @@ function ContentCreateForm({
           contentTypeKey={contentTypeKey}
           campaignId={campaignId}
           backHref={backHref}
+          heading={heading}
+          usePreviewLayout={usePreviewLayout}
           ctx={{
             ...optionsCtx,
             ...formCtx,
@@ -261,12 +279,17 @@ export function ContentCreateShell({
   formHeaderPrefix,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
+  const usePreviewLayout = def != null && hasContentFormPreview(def)
 
   return (
-    <NarrowPage spacing="relaxed" className="pb-10">
-      <Heading variant="page" as="h1">
-        {heading}
-      </Heading>
+    <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
+      {!usePreviewLayout ? (
+        <div className={contentFormPageShellHeadingClasses}>
+          <Heading variant="page" as="h1">
+            {heading}
+          </Heading>
+        </div>
+      ) : null}
 
       {def ? (
         <ContentAuthoringGate campaignId={campaignId}>
@@ -275,6 +298,8 @@ export function ContentCreateShell({
             contentTypeKey={contentType as ContentTypeKey}
             campaignId={campaignId}
             backHref={backHref}
+            heading={heading}
+            usePreviewLayout={usePreviewLayout}
             initialValues={initialValues}
             formCtx={formCtx}
             prepareSubmitValues={prepareSubmitValues}
@@ -284,7 +309,7 @@ export function ContentCreateShell({
       ) : (
         <ContentFormComingSoon />
       )}
-    </NarrowPage>
+    </ContentFormPageShell>
   )
 }
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { boundedScrollRegionClasses } from './bounded-scroll-region.variants'
 import {
   dialogContentFocusShellClasses,
   dialogPanelActionRowClasses,
@@ -50,11 +51,12 @@ describe('dialog-panel variants', () => {
   })
 
   it('applies bottom inset on inner scroll regions above docked footers', () => {
-    expect(dialogPanelScrollRegionClasses).toContain('overflow-y-auto')
+    expect(dialogPanelScrollRegionClasses).toContain(boundedScrollRegionClasses)
     expect(dialogPanelScrollRegionClasses).toContain('min-h-0')
     expect(dialogPanelScrollRegionClasses).toContain('flex-1')
     expect(dialogPanelScrollRegionClasses).toContain(dialogPanelScrollRegionBottomInsetClasses)
-    expect(dialogPanelScrollRegionClasses).toContain('px-1')
+    expect(dialogPanelScrollRegionClasses).toContain('ps-1')
+    expect(dialogPanelScrollRegionClasses).toContain('pe-2.5')
     expect(dialogPanelScrollRegionBottomInsetClasses).toBe('pb-6')
   })
 
