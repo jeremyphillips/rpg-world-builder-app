@@ -16,7 +16,8 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  *
  * Spacing tokens below:
  * - `fieldAnatomyStackVariants` — label / control / hint inside one field (by control scale)
- * - `fieldLabelHintStackClasses` — label + hint cluster when hint sits below the label
+ * - `fieldLabelContentClusterClasses` — label + required marker + info on one line
+ * - `fieldLabelHintStackClasses` — label cluster + hint when hint sits below the label (2px)
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
  * - `fieldGroupBottomMarginClasses` — space below standalone group/array fieldsets (omitted when a parent rhythm stack owns sibling gap)
  *   (nested array sections omit this; parent stack/group rhythm owns spacing)
@@ -51,17 +52,17 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
 /**
  * Label/heading cluster → control and control → validation / bottom hint.
  * Compact `sm` is 4px; comfortable `md`/`lg` is 6px. Keep
- * {@link fieldAnatomyAlignVariants} in lockstep — same sizes, `gap-y` for
- * alignment anchors that must not share `space-y` class tuples.
+ * {@link fieldAnatomyAlignVariants} in lockstep. Both use `gap-y` so fieldset
+ * `m-0` cannot collapse the control → validation sibling.
  */
-export const fieldAnatomyStackVariants = cva('', {
+export const fieldAnatomyStackVariants = cva('flex flex-col', {
   variants: {
     size: {
       /** Dense forms (`FormDensity: 'compact'`) — 4px label-to-control gap. */
-      sm: 'space-y-1',
+      sm: 'gap-y-1',
       /** Comfortable default — 6px label-to-control / control-to-message gap. */
-      md: 'space-y-1.5',
-      lg: 'space-y-1.5',
+      md: 'gap-y-1.5',
+      lg: 'gap-y-1.5',
     },
   },
   defaultVariants: {
@@ -85,8 +86,10 @@ export const fieldAnatomyAlignVariants = cva('flex flex-col', {
 
 /** Comfortable default — prefer {@link fieldAnatomyStackVariants} when `size` is known. */
 export const fieldAnatomyStackClasses = fieldAnatomyStackVariants({ size: 'md' })
-/** Tighter gap between a field label and its hint when `hintPosition="below-label"`. */
-export const fieldLabelHintStackClasses = 'flex flex-col gap-1'
+/** Label + required marker + info — one inline cluster so hint stacks cannot split the asterisk. */
+export const fieldLabelContentClusterClasses = 'inline-flex items-center gap-1.5'
+/** Label + below-label hint — 2px; cluster → control gap is the anatomy token. */
+export const fieldLabelHintStackClasses = 'flex flex-col gap-0.5'
 export const fieldGroupStackClasses = 'flex flex-col gap-6'
 export const fieldGroupBottomMarginClasses = 'mb-8'
 /** Omits standalone group bottom margin when a parent rhythm stack owns sibling gap. */
@@ -153,7 +156,8 @@ export const fieldArrayItemClasses = fieldArrayItemVariants({ variant: 'detailed
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 /** Column stack for a reset leaf `<fieldset>` whose chrome lives on a wrapping shell. */
 export const fieldSetChromeContainClasses = 'flex flex-col'
-export const fieldSetInFlowLegendClasses = 'min-w-0 p-0'
+/** `contents` so legend children participate in fieldset flex gap. */
+export const fieldSetInFlowLegendClasses = 'contents min-w-0 p-0'
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
 /**
@@ -344,6 +348,11 @@ export const fieldLabelVariants = cva(
         inlineCheckbox: 'min-h-4',
       },
     },
+    compoundVariants: [
+      { placement: 'default', size: 'sm', class: 'min-h-4' },
+      { placement: 'default', size: 'md', class: 'min-h-[1.375rem]' },
+      { placement: 'default', size: 'lg', class: 'min-h-[1.375rem]' },
+    ],
     defaultVariants: {
       size: 'md',
       placement: 'default',

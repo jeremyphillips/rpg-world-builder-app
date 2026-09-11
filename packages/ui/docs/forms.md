@@ -139,7 +139,7 @@ import { Field, FieldLayout } from '@rpg/ui'
 Centralized in `Field.Root` context:
 
 - **Labelling** — `Field.Label` → `htmlFor`; `Field.Control` injects matching `id`.
-- **`aria-describedby`** — hint id, or error id when present (error wins; hint hides).
+- **`aria-describedby`** — follows visible helper text: below-label hints stay linked with the error id when invalid; below-control supporting text yields to the error id only.
 - **`aria-invalid`** — on error; drives destructive styling via variant, not a prop.
 - **Error** — `Field.Error` with `role="alert"` + `aria-live="polite"`.
 - **Required** — visual `*` is `aria-hidden`; constraint lives in Zod.
@@ -147,6 +147,11 @@ Centralized in `Field.Root` context:
 **Info tooltip:** pass `info` to wrappers for a focusable `[i]` button with `aria-label`.
 
 **Hint vs error.** Hints are guidance; errors are validation. Never encode required-ness as a hint.
+
+| `hintPosition`          | Role                                   | When invalid                                   |
+| ----------------------- | -------------------------------------- | ---------------------------------------------- |
+| `below-label` (default) | Description / guidance under the label | Stays visible; error renders under the control |
+| `below-control`         | Supporting text under the control      | Replaced by the field error (same slot)        |
 
 **Hint placement.** `hintPosition`: `below-label` (default) or `below-control`.
 
@@ -165,10 +170,10 @@ via `resolveFormDensity` — do not set rhythm and size independently on shells.
 | `kind: 'array'`                                                             | yes                    | `compact`            |
 | `kind: 'dependent'`, `kind: 'slot'`, `kind: 'row'`, `kind: 'columns'`       | no                     | inherit parent       |
 
-| `density`     | Sibling gap | Label → control     | Control scale (`sm` / `md`) |
-| ------------- | ----------- | ------------------- | --------------------------- |
-| `comfortable` | `gap-6`     | `space-y-1.5` (6px) | `md`                        |
-| `compact`     | `gap-3`     | `space-y-1` (4px)   | `sm`                        |
+| `density`     | Sibling gap | Label → control   | Control scale (`sm` / `md`) |
+| ------------- | ----------- | ----------------- | --------------------------- |
+| `comfortable` | `gap-6`     | `gap-y-1.5` (6px) | `md`                        |
+| `compact`     | `gap-3`     | `gap-y-1` (4px)   | `sm`                        |
 
 **Leaf escape hatch:** `controlSizeOverride` on a field config changes control height only —
 not sibling rhythm. Rare; prefer section `density`. Production usage is intentionally

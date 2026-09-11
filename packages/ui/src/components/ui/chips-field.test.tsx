@@ -173,7 +173,11 @@ describe('ChipsField', () => {
         error="Select at least one."
       />,
     )
-    expect(screen.getByRole('alert')).toHaveTextContent('Select at least one.')
+    const error = screen.getByRole('alert')
+    const fieldset = error.previousElementSibling
+    expect(error).toHaveTextContent('Select at least one.')
+    expect(fieldset?.tagName).toBe('FIELDSET')
+    expect(error.parentElement).toHaveClass('gap-y-1.5')
   })
 
   it('uses compact error text for sm fields', () => {
@@ -248,7 +252,7 @@ describe('ChipsField', () => {
     expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-md')
   })
 
-  it('uses md label type scale by default', () => {
+  it('uses md label type scale on the inner label line by default', () => {
     render(
       <ChipsField
         id="play-style"
@@ -258,7 +262,65 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByText('Play Style')).toHaveClass('text-md')
+    expect(screen.getByText('Play Style').closest('div')).toHaveClass('text-md')
+  })
+
+  it('keeps below-label hint visible when invalid', () => {
+    render(
+      <ChipsField
+        id="abilities"
+        label="Primary abilities"
+        hint="Select up to 2 abilities"
+        options={playStyleOptions}
+        multiple
+        value={[]}
+        error="Add at least one primary ability."
+      />,
+    )
+    expect(screen.getByText('Select up to 2 abilities')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('Add at least one primary ability.')
+  })
+
+  it('applies anatomy gap between the label cluster and chip wrap', () => {
+    const { container } = render(
+      <ChipsField
+        id="abilities"
+        label="Primary abilities"
+        hint="Select up to 2 abilities"
+        options={playStyleOptions}
+        multiple
+        value={[]}
+      />,
+    )
+
+    const fieldset = container.querySelector('fieldset')
+    const legend = screen.getByText('Primary abilities').closest('legend')
+    const chipWrap = legend?.nextElementSibling
+
+    expect(fieldset).toHaveClass('gap-y-1.5')
+    expect(legend).toHaveClass('contents')
+    expect(chipWrap).toHaveClass('flex', 'flex-wrap', 'gap-2')
+  })
+
+  it('keeps the required marker inline with the label when a below-label hint is present', () => {
+    render(
+      <ChipsField
+        id="progression"
+        label="Progression"
+        hint="Choose how this class gains spell slots."
+        options={playStyleOptions}
+        multiple={false}
+        required
+        value=""
+      />,
+    )
+
+    const cluster = screen.getByText('Progression')
+    expect(cluster).toHaveClass('inline-flex')
+    expect(cluster).toContainElement(screen.getByText('*'))
+    expect(cluster).not.toContainElement(
+      screen.getByText('Choose how this class gains spell slots.'),
+    )
   })
 
   it('disables all options when disabled', () => {

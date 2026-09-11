@@ -96,11 +96,13 @@ describe('CampaignAvailabilityField', () => {
       />,
     )
 
-    expect(screen.getByText('Campaign availability')).toHaveClass('text-xs')
+    expect(screen.getByText('Campaign availability').closest('span,legend,h3')).toHaveClass(
+      'text-xs',
+    )
 
     await expandInlineAvailability(user)
 
-    expect(screen.getByText('Available in this campaign')).toHaveClass('text-xs')
+    expect(screen.getByText('Available in this campaign').closest('label')).toHaveClass('text-xs')
     expect(screen.getByRole('combobox', { name: 'Player access' })).toHaveClass('text-xs')
   })
 

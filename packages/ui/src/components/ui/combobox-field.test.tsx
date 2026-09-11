@@ -344,7 +344,7 @@ describe('ComboboxField', () => {
       />,
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Required.')
-    expect(screen.queryByText('Pick one.')).not.toBeInTheDocument()
+    expect(screen.getByText('Pick one.')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Spells' })).toHaveAttribute('aria-invalid', 'true')
   })
 

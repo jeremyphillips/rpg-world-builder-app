@@ -2,16 +2,12 @@
 
 import * as React from 'react'
 
-import { cn } from '../../lib/utils'
 import { type FieldSize } from './field.client'
 import { fieldWidthVariants, type FieldWidth } from './field-control.variants'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
-import { fieldAnatomyIds, fieldDescribedBy } from './choose-count-field.lib'
-import {
-  fieldLabelVariants,
-  fieldSetInFlowLegendClasses,
-  type FieldHintPosition,
-} from './field.variants'
+import { fieldAnatomyIds } from './choose-count-field.lib'
+import { resolveFieldDescribedBy } from './field-validation-props'
+import { type FieldHintPosition } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
 import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
@@ -57,7 +53,15 @@ export function ChooseCountFieldShell({
   children,
 }: ChooseCountFieldShellProps) {
   const { legendId, chooseId, hintId, errorId } = fieldAnatomyIds(id)
-  const describedBy = fieldDescribedBy(error, hint, errorId, hintId)
+  const describedBy = resolveFieldDescribedBy(
+    error,
+    undefined,
+    hint,
+    undefined,
+    errorId,
+    hintId,
+    hintPosition,
+  )
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
@@ -75,19 +79,13 @@ export function ChooseCountFieldShell({
         }}
       >
         <FieldsetChromeAnatomy
+          size={size}
           hintPosition={hintPosition}
           hint={hint}
           error={error}
           hintId={hintId}
           legend={
-            <legend
-              id={legendId}
-              className={cn(
-                fieldSetInFlowLegendClasses,
-                fieldLabelVariants({ size }),
-                labelVisibility === 'srOnly' && 'sr-only',
-              )}
-            >
+            <legend id={legendId} className={labelVisibility === 'srOnly' ? 'sr-only' : undefined}>
               <FieldLabelContent
                 label={label}
                 required={required}

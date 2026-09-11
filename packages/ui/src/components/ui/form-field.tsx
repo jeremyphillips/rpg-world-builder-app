@@ -129,6 +129,7 @@ export function FormField({
         invalid={invalid}
         describedBy={describedBy}
         hint={hint}
+        hintPosition={hintPosition}
         required={required}
         size={size}
         width={rootWidth}
@@ -145,6 +146,7 @@ export function FormField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       size={size}
       width={rootWidth}

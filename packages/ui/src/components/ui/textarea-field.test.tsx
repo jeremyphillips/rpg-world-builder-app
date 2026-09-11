@@ -15,10 +15,10 @@ describe('TextareaField', () => {
     expect(textarea).toHaveValue('A bard.')
   })
 
-  it('renders the error and marks the textarea invalid', () => {
+  it('renders the error and marks the textarea invalid while keeping below-label hint visible', () => {
     render(<TextareaField id="bio" label="Biography" hint="Optional." error="Required." />)
     expect(screen.getByRole('alert')).toHaveTextContent('Required.')
-    expect(screen.queryByText('Optional.')).not.toBeInTheDocument()
+    expect(screen.getByText('Optional.')).toBeInTheDocument()
     expect(screen.getByLabelText('Biography')).toHaveAttribute('aria-invalid', 'true')
   })
 

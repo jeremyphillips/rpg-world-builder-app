@@ -8,7 +8,7 @@ import { CheckboxField } from './checkbox-field'
 describe('CheckboxField', () => {
   it('applies field size to the label', () => {
     render(<CheckboxField id="homebrew" label="Allow homebrew" size="sm" />)
-    expect(screen.getByText('Allow homebrew')).toHaveClass('text-xs')
+    expect(screen.getByText('Allow homebrew').closest('label')).toHaveClass('text-xs')
   })
 
   it('toggles via its associated label', async () => {
@@ -38,11 +38,11 @@ describe('CheckboxField', () => {
         hint="Includes third-party content in search results."
       />,
     )
-    const label = screen.getByText('Allow homebrew')
+    const label = screen.getByText('Allow homebrew').closest('label')
     const hint = screen.getByText('Includes third-party content in search results.')
-    const textColumn = label.parentElement
+    const textColumn = label?.parentElement
 
-    expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-1')
+    expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-0.5')
     expect(textColumn).toContainElement(hint)
   })
 
@@ -57,7 +57,7 @@ describe('CheckboxField', () => {
 
     const anchor = container.querySelector('[data-field-align]')
     expect(anchor).not.toBeNull()
-    const row = screen.getByText('Allow homebrew').parentElement?.parentElement
+    const row = screen.getByText('Allow homebrew').closest('label')?.parentElement?.parentElement
     expect(row).toHaveClass('flex', 'gap-2')
     expect(row?.firstElementChild).toHaveClass('flex', 'h-4', 'shrink-0', 'items-center')
   })

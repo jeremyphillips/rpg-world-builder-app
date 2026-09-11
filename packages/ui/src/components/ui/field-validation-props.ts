@@ -1,3 +1,5 @@
+import type { FieldHintPosition } from './field.variants'
+
 /** Shared validation presentation props for field wrappers. */
 export interface FieldValidationProps {
   error?: string
@@ -21,10 +23,16 @@ export function resolveFieldDescribedBy(
   describedBy: string | undefined,
   errorId: string,
   hintId: string,
+  hintPosition: FieldHintPosition = 'below-label',
 ): string | undefined {
   if (describedBy) return describedBy
   const hasError = fieldHasValidationError(error, invalid)
-  if (hasError) return errorId
+  if (hasError) {
+    if (hintPosition === 'below-label' && hint) {
+      return `${hintId} ${errorId}`
+    }
+    return errorId
+  }
   if (hint) return hintId
   return undefined
 }

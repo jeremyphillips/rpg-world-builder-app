@@ -7,7 +7,9 @@ import { FieldChromeShell } from './field-chrome-shell'
 import {
   fieldAnatomyStackVariants,
   fieldLabelHintStackClasses,
+  fieldLabelVariants,
   fieldSetChromeContainClasses,
+  fieldSetInFlowLegendClasses,
   fieldSetResetClasses,
   type FieldHintPosition,
 } from './field.variants'
@@ -32,24 +34,39 @@ export interface FieldsetChromeFrameProps {
   children: ReactNode
 }
 
-function legendWithBelowLabelHint(legend: ReactNode, hint: ReactNode): ReactNode {
-  if (!hint) return legend
+function wrapLegendCluster(
+  legend: ReactNode,
+  options: {
+    size: FieldSize
+    belowLabelHint: ReactNode
+  },
+): ReactNode {
   if (!isValidElement<{ className?: string; children?: ReactNode }>(legend)) {
     return (
       <>
         {legend}
-        {hint}
+        {options.belowLabelHint}
       </>
     )
   }
 
+  const { className: legendClassName, children: labelContent, ...legendRest } = legend.props
+
+  const labelLine = <div className={fieldLabelVariants({ size: options.size })}>{labelContent}</div>
+
+  const cluster = options.belowLabelHint ? (
+    <div className={fieldLabelHintStackClasses}>
+      {labelLine}
+      {options.belowLabelHint}
+    </div>
+  ) : (
+    labelLine
+  )
+
   return cloneElement(legend, {
-    children: (
-      <div className={fieldLabelHintStackClasses}>
-        {legend.props.children}
-        {hint}
-      </div>
-    ),
+    ...legendRest,
+    className: cn(fieldSetInFlowLegendClasses, legendClassName),
+    children: cluster,
   })
 }
 
@@ -60,16 +77,17 @@ function legendWithBelowLabelHint(legend: ReactNode, hint: ReactNode): ReactNode
  * {@link FieldsetChromeFrame}.
  */
 export function FieldsetChromeAnatomy({
+  size = 'md',
   hintPosition = 'below-label',
   hint,
   error,
   hintId,
   legend,
   children,
-}: Omit<FieldsetChromeAnatomyProps, 'size' | 'errorId'>) {
+}: Omit<FieldsetChromeAnatomyProps, 'errorId'>) {
   const belowLabelHint =
-    hintPosition === 'below-label' && hint && !error ? (
-      <FieldHintBelowLabel hint={hint} error={error} hintId={hintId} />
+    hintPosition === 'below-label' && hint ? (
+      <FieldHintBelowLabel hint={hint} hintId={hintId} />
     ) : null
   const belowControlHint =
     hintPosition === 'below-control' && hint && !error ? (
@@ -78,7 +96,7 @@ export function FieldsetChromeAnatomy({
 
   return (
     <>
-      {legendWithBelowLabelHint(legend, belowLabelHint)}
+      {wrapLegendCluster(legend, { size, belowLabelHint })}
       {children}
       {belowControlHint}
     </>

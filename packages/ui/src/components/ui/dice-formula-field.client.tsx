@@ -89,7 +89,14 @@ export function DiceFormulaField({
   const errorId = `${id}-error`
   const inlineLabelId = `${id}-inline-label`
   const hasError = Boolean(error)
-  const describedBy = hasError ? errorId : hint ? hintId : undefined
+  const describedBy =
+    hasError && hint && hintPosition === 'below-label'
+      ? `${hintId} ${errorId}`
+      : hasError
+        ? errorId
+        : hint
+          ? hintId
+          : undefined
   const showModifierFields = shouldShowModifierFields(modifierMode, resolved)
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 

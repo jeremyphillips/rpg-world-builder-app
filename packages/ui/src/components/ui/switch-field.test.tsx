@@ -8,7 +8,7 @@ import { SwitchField } from './switch-field'
 describe('SwitchField', () => {
   it('applies field size to the label', () => {
     render(<SwitchField id="notify" label="Email reminders" size="sm" />)
-    expect(screen.getByText('Email reminders')).toHaveClass('text-xs')
+    expect(screen.getByText('Email reminders').closest('label')).toHaveClass('text-xs')
   })
 
   it('keeps inline label typography on fieldLabelVariants', () => {
@@ -72,17 +72,17 @@ describe('SwitchField', () => {
         hint="When off, characters cannot take levels in additional classes."
       />,
     )
-    const label = screen.getByText('Allow multiclassing')
+    const label = screen.getByText('Allow multiclassing').closest('label')
     const hint = screen.getByText('When off, characters cannot take levels in additional classes.')
-    const textColumn = label.parentElement
+    const textColumn = label?.parentElement
 
     expect(textColumn).not.toBeNull()
-    expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-1')
+    expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-0.5')
     expect(textColumn).toContainElement(hint)
     expect(
-      textColumn!.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
+      textColumn!.compareDocumentPosition(label!) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
-    const row = label.parentElement?.parentElement
+    const row = textColumn?.parentElement
     expect(row).toHaveClass('flex', 'gap-2')
     expect(row?.firstElementChild).toHaveClass('flex', 'h-5', 'shrink-0', 'items-center')
     expect(container.querySelector('[data-field-align]')).not.toBeNull()

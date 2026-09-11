@@ -13,7 +13,7 @@ describe('DiceFormulaField', () => {
   it('renders the label and dice controls', () => {
     render(<DiceFormulaField id="roll" label="Roll" modifierMode="optional" />)
 
-    const label = screen.getByText('Roll')
+    const label = screen.getByText('Roll').closest('label')
     expect(label).toHaveAttribute('id', 'roll-label')
     expect(label).toHaveAttribute('for', 'roll-count')
 

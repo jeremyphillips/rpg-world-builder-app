@@ -84,9 +84,25 @@ describe('FormField', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('prefers the error over the hint', () => {
+  it('keeps below-label hint visible when an error is present', () => {
     render(
       <FormField id="name" label="Name" hint="Your display name." error="Name is required.">
+        <input id="name" />
+      </FormField>,
+    )
+    expect(screen.getByText('Name is required.')).toBeInTheDocument()
+    expect(screen.getByText('Your display name.')).toBeInTheDocument()
+  })
+
+  it('replaces below-control supporting text with the error', () => {
+    render(
+      <FormField
+        id="name"
+        label="Name"
+        hint="Your display name."
+        hintPosition="below-control"
+        error="Name is required."
+      >
         <input id="name" />
       </FormField>,
     )
