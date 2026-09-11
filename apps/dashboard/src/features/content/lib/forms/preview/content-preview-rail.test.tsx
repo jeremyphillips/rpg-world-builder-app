@@ -11,7 +11,7 @@ function SheetOpenProbe() {
 }
 
 describe('ContentPreviewCompactTrigger', () => {
-  it('is hidden from the 2xl persistent-rail breakpoint and opens the sheet host', async () => {
+  it('is hidden from the xl persistent-rail breakpoint and opens the sheet host', async () => {
     const user = userEvent.setup()
 
     render(
@@ -22,7 +22,7 @@ describe('ContentPreviewCompactTrigger', () => {
     )
 
     const trigger = screen.getByRole('button', { name: 'Preview' })
-    expect(trigger).toHaveClass('2xl:hidden')
+    expect(trigger).toHaveClass('xl:hidden')
     expect(screen.getByTestId('sheet-open')).toHaveTextContent('false')
 
     await user.click(trigger)

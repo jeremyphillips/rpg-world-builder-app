@@ -112,12 +112,12 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   publishPresentationEnabled?: boolean
   /**
    * Optional right-column content rendered inside `FormProvider` (e.g. a preview
-   * rail). Hidden below `2xl`; the footer stays in the form column.
+   * rail). Hidden below `xl`; the footer stays in the form column.
    */
   aside?: React.ReactNode
   /**
    * Trailing control on the sticky tab/SegmentedControl row (e.g. a compact
-   * Preview trigger below `2xl`).
+   * Preview trigger below `xl`).
    */
   tabRowTrailing?: React.ReactNode
 }

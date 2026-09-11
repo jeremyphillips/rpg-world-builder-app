@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { CheckCircle2, Circle, CircleAlert, CircleSlash } from 'lucide-react'
+import { CircleSlash } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import {
@@ -21,6 +21,7 @@ import { contentCardMediaVariants } from '../ui/content-card.variants'
 import { Heading } from '../ui/heading'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
 import { StatusDot } from '../ui/status-dot'
+import { StatusIcon, type StatusIconVariant } from '../ui/status-icon.client'
 import { Text } from '../ui/text'
 import type {
   PreviewRailAvailability,
@@ -64,16 +65,15 @@ import {
   previewRailSectionBodyClasses,
   previewRailSectionBodyDescriptionClasses,
   previewRailSectionInsetVariants,
+  previewRailSectionChevronSpacerClasses,
   previewRailSectionLabelClasses,
-  previewRailSectionMarkerClasses,
-  previewRailSectionMarkerToneClasses,
+  previewRailSectionStaticRowClasses,
   previewRailSectionStatusSpacerClasses,
   previewRailSectionTriggerClasses,
   previewRailCaptionTextClasses,
   previewRailSectionsHeaderClasses,
   previewRailStatusPanelContentClasses,
   previewRailStatusPanelDescriptionClasses,
-  previewRailStatusPanelIconClasses,
 } from './preview-rail.variants'
 
 const PreviewRailContext = React.createContext<PreviewRailChrome>('card')
@@ -319,25 +319,22 @@ export type PreviewRailSectionProps = {
   marker?: PreviewRailSectionMarker
   status?: string
   statusTone?: PreviewRailStatusTone
+  /** When false, the row is static — no chevron and no accordion panel. Default: true. */
+  expandable?: boolean
   children?: React.ReactNode
 }
 
+const PREVIEW_RAIL_MARKER_TO_STATUS_ICON = {
+  complete: 'ready',
+  attention: 'needsAttention',
+  incomplete: 'incomplete',
+  off: 'off',
+  none: 'none',
+  notConfigured: 'notConfigured',
+} as const satisfies Record<PreviewRailSectionMarker, StatusIconVariant>
+
 function PreviewRailSectionMarker({ marker }: { marker: PreviewRailSectionMarker }) {
-  const className = cn(previewRailSectionMarkerClasses, previewRailSectionMarkerToneClasses[marker])
-
-  if (marker === 'complete') {
-    return <CheckCircle2 aria-hidden className={className} />
-  }
-
-  if (marker === 'attention') {
-    return <CircleAlert aria-hidden className={className} />
-  }
-
-  if (marker === 'incomplete') {
-    return <Circle aria-hidden className={className} />
-  }
-
-  return <CircleSlash aria-hidden className={className} />
+  return <StatusIcon variant={PREVIEW_RAIL_MARKER_TO_STATUS_ICON[marker]} size="sm" />
 }
 
 function PreviewRailSectionStatus({
@@ -356,27 +353,66 @@ function PreviewRailSectionStatus({
   )
 }
 
+function PreviewRailSectionRowChrome({
+  label,
+  marker,
+  status,
+  statusTone,
+  trailing,
+}: {
+  label: string
+  marker?: PreviewRailSectionMarker
+  status?: string
+  statusTone?: PreviewRailStatusTone
+  trailing?: React.ReactNode
+}) {
+  return (
+    <>
+      {marker ? <PreviewRailSectionMarker marker={marker} /> : null}
+      <span className={previewRailSectionLabelClasses}>{label}</span>
+      <span className={previewRailSectionStatusSpacerClasses} />
+      {status ? <PreviewRailSectionStatus status={status} statusTone={statusTone} /> : null}
+      {trailing}
+    </>
+  )
+}
+
 function PreviewRailSection({
   id,
   label,
   marker,
   status,
   statusTone,
+  expandable = true,
   children,
 }: PreviewRailSectionProps) {
+  if (!expandable) {
+    return (
+      <div className={previewRailAccordionItemClasses}>
+        <div className={previewRailSectionStaticRowClasses}>
+          <PreviewRailSectionRowChrome
+            label={label}
+            marker={marker}
+            status={status}
+            statusTone={statusTone}
+            trailing={<span aria-hidden className={previewRailSectionChevronSpacerClasses} />}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <AccordionItem value={id} className={previewRailAccordionItemClasses}>
       <AccordionTrigger className={previewRailSectionTriggerClasses}>
-        {marker ? <PreviewRailSectionMarker marker={marker} /> : null}
-        <span className={previewRailSectionLabelClasses}>{label}</span>
-        <span className={previewRailSectionStatusSpacerClasses} />
-        {status ? <PreviewRailSectionStatus status={status} statusTone={statusTone} /> : null}
+        <PreviewRailSectionRowChrome
+          label={label}
+          marker={marker}
+          status={status}
+          statusTone={statusTone}
+        />
       </AccordionTrigger>
-      {children ? (
-        <AccordionContent className={previewRailAccordionContentClasses}>
-          {children}
-        </AccordionContent>
-      ) : null}
+      <AccordionContent className={previewRailAccordionContentClasses}>{children}</AccordionContent>
     </AccordionItem>
   )
 }
@@ -399,31 +435,14 @@ function PreviewRailSectionBody({ description, facts, children }: PreviewRailSec
   )
 }
 
+const PREVIEW_RAIL_STATUS_PANEL_TO_STATUS_ICON = {
+  success: 'ready',
+  warning: 'needsAttention',
+  default: 'incomplete',
+} as const satisfies Record<PreviewRailStatusPanelVariant, StatusIconVariant>
+
 function resolveStatusPanelIcon(variant: PreviewRailStatusPanelVariant) {
-  if (variant === 'success') {
-    return (
-      <CheckCircle2
-        aria-hidden
-        className={cn(previewRailStatusPanelIconClasses, 'text-semantic-success')}
-      />
-    )
-  }
-
-  if (variant === 'warning') {
-    return (
-      <CircleAlert
-        aria-hidden
-        className={cn(previewRailStatusPanelIconClasses, 'text-semantic-warning')}
-      />
-    )
-  }
-
-  return (
-    <Circle
-      aria-hidden
-      className={cn(previewRailStatusPanelIconClasses, 'text-muted-foreground')}
-    />
-  )
+  return <StatusIcon variant={PREVIEW_RAIL_STATUS_PANEL_TO_STATUS_ICON[variant]} size="md" />
 }
 
 export type PreviewRailStatusPanelProps = {

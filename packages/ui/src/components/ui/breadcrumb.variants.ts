@@ -1,7 +1,7 @@
 import { iconGlyphDirectChildClasses } from './icon-glyph.variants'
 
 export const breadcrumbListVariants =
-  'flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5'
+  'flex flex-wrap items-center gap-1.5 break-words text-xs text-muted-foreground sm:gap-2.5'
 
 export const breadcrumbItemVariants = 'inline-flex items-center gap-1.5'
 

@@ -1,5 +1,11 @@
 import { cn } from '../../lib/utils'
 import { dialogPanelScrollRegionClasses } from '../../components/ui/dialog-panel.variants'
+import {
+  previewRailTabbedAsideGridColsAt2xlClasses,
+  previewRailTabbedAsideGridColsBelow2xlClasses,
+  previewRailTabbedAsideGridMaxWidthAt2xlClasses,
+  previewRailTabbedAsideGridMaxWidthBelow2xlClasses,
+} from '../../components/preview-rail/preview-rail.variants'
 
 /** Sticky tab list wrapper — keeps section tabs visible while scrolling long panels. */
 export const formStickyTabsClasses =
@@ -12,21 +18,26 @@ export const formStickyTabsTransparentClasses =
 /** Keeps a long segmented section control scrollable inside the field column. */
 export const formTabbedNavOverflowClasses = 'min-w-0 overflow-x-auto'
 
-/** Tab row with a trailing compact action (e.g. Preview below `2xl`). */
+/** Tab row with a trailing compact action (e.g. Preview below `xl`). */
 export const formTabbedNavWithTrailingClasses = 'flex items-center gap-2'
 
 /** Scrollable segmented control when a trailing action shares the sticky tab row. */
 export const formTabbedNavControlWrapClasses = 'min-w-0 flex-1 overflow-x-auto'
 
 /**
- * TabbedForm body + aside grid. Below `2xl` the form column stays `max-w-4xl` and
- * centered; at `2xl` the rail sits in a second column (~21rem) with a large gap.
+ * TabbedForm body + aside grid. Below `xl` the form column stays `max-w-4xl` and
+ * centered; from `xl` the rail sits in a second column ({@link previewRailAsideWidthBelow2xl}
+ * until `2xl`, then {@link previewRailAsideWidthAt2xl}) with a large gap.
  */
-export const formTabbedAsideGridClasses =
-  'mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col 2xl:mx-0 2xl:grid 2xl:h-full 2xl:max-w-none 2xl:grid-cols-[minmax(0,56rem)_21rem] 2xl:grid-rows-[minmax(0,1fr)] 2xl:items-stretch 2xl:gap-6'
+export const formTabbedAsideGridClasses = cn(
+  'mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col xl:grid xl:h-full xl:grid-rows-[minmax(0,1fr)] xl:items-stretch xl:gap-6',
+  previewRailTabbedAsideGridColsBelow2xlClasses,
+  previewRailTabbedAsideGridColsAt2xlClasses,
+  previewRailTabbedAsideGridMaxWidthBelow2xlClasses,
+  previewRailTabbedAsideGridMaxWidthAt2xlClasses,
+)
 
-export const formTabbedAsideBodyClasses =
-  'min-h-0 min-w-0 2xl:col-start-1 2xl:h-full 2xl:row-start-1'
+export const formTabbedAsideBodyClasses = 'min-h-0 min-w-0 xl:col-start-1 xl:h-full xl:row-start-1'
 
 /**
  * Top inset for viewport-bound form scroll bodies — apply via
@@ -39,22 +50,25 @@ export const formViewportScrollBodyTopInsetClasses = 'pt-8'
 /**
  * Top inset for the preview-rail column — matches dashboard `pageShellInsetTopClasses`.
  */
-export const formTabbedAsideSlotTopInsetClasses = '2xl:pt-8'
+export const formTabbedAsideSlotTopInsetClasses = 'xl:pt-8'
 
 /**
  * Bottom inset for the preview-rail column — matches dashboard
  * `pageShellInsetBottomClasses` (`pb-8`) while the form footer stays flush.
  */
-export const formTabbedAsideSlotBottomInsetClasses = '2xl:pb-8'
+export const formTabbedAsideSlotBottomInsetClasses = 'xl:pb-8'
+
+/** Hide compact preview trigger when the persistent rail column is visible (`xl` and up). */
+export const formTabbedPreviewRailCompactTriggerHiddenClasses = 'xl:hidden'
 
 export const formTabbedAsideSlotClasses = cn(
-  'hidden min-h-0 min-w-0 2xl:col-start-2 2xl:flex 2xl:h-full 2xl:flex-col 2xl:row-start-1',
+  'hidden min-h-0 min-w-0 xl:col-start-2 xl:flex xl:h-full xl:flex-col xl:row-start-1',
   formTabbedAsideSlotTopInsetClasses,
   formTabbedAsideSlotBottomInsetClasses,
 )
 
 /** @deprecated Footer lives in the form column scroll shell — not a separate grid row. */
-export const formTabbedAsideFooterClasses = 'min-w-0 2xl:col-start-1 2xl:row-start-2'
+export const formTabbedAsideFooterClasses = 'min-w-0 xl:col-start-1 xl:row-start-2'
 
 /** Visually hide inactive TabbedForm panels while keeping them mounted. */
 export const formTabbedInactivePanelClasses = 'hidden'

@@ -112,6 +112,7 @@ export {
   formTabbedAsideSlotClasses,
   formTabbedAsideSlotTopInsetClasses,
   formTabbedAsideSlotBottomInsetClasses,
+  formTabbedPreviewRailCompactTriggerHiddenClasses,
   formViewportScrollBodyTopInsetClasses,
   formTabbedAsideFooterClasses,
   formTabPanelsBottomPaddingClasses,

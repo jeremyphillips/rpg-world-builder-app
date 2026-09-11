@@ -71,6 +71,7 @@ describe('class preview projection', () => {
       derivedKind: 'notConfigured',
       status: CONTENT_PREVIEW_STATUS_NOT_CONFIGURED,
     })
+    expect(sections.characterCreation?.facts).toBeUndefined()
   })
 
   it('renders Not set for empty proficiency rows on fresh create', () => {

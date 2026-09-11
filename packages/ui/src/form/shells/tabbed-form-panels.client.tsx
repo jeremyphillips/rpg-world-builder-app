@@ -105,7 +105,7 @@ interface TabbedFormPanelsProps {
   stickyTabsClassName?: string
   /** When true, skip extra bottom padding (external footer owns spacing). */
   omitPanelBottomPadding: boolean
-  /** Trailing control on the sticky tab row (hidden by the consumer below `2xl` as needed). */
+  /** Trailing control on the sticky tab row (hidden by the consumer below `xl` as needed). */
   tabRowTrailing?: React.ReactNode
 }
 

@@ -263,6 +263,14 @@ function buildFeaturesSection(values: ClassFormValues): ContentPreviewSection {
     status: isDefault
       ? contentPreviewDefaultFeaturesStatus(count)
       : contentPreviewFeaturesStatus(count),
+    facts: [
+      {
+        label: 'Features',
+        value: formatPreviewRailOverflowList(
+          features.map((feature) => feature.name?.trim() || 'Unnamed feature'),
+        ),
+      },
+    ],
   }
 }
 
@@ -287,41 +295,47 @@ function buildSubclassesSection(resources?: ContentPreviewResources): ContentPre
   }
 }
 
+function buildCharacterCreationFacts(
+  values: ClassFormValues,
+  ctx: ContentFormCtx,
+): PreviewRailFact[] {
+  const facts: PreviewRailFact[] = []
+  const skillFrom = values.characterCreation?.proficiencies?.skills.from ?? []
+  const skillChoose = values.characterCreation?.proficiencies?.skills.choose ?? 0
+
+  facts.push({
+    label: CLASS_PREVIEW_FACT_LABELS.skillChoices,
+    value:
+      skillFrom.length > 0
+        ? `Choose ${skillChoose} · ${formatPreviewRailOverflowList(
+            skillFrom.map((slug) => skillLabel(slug, ctx)),
+          )}`
+        : CONTENT_PREVIEW_NOT_SET,
+  })
+
+  const equipmentCount = values.characterCreation?.startingEquipment?.options.length ?? 0
+  facts.push({
+    label: CLASS_PREVIEW_FACT_LABELS.startingEquipment,
+    value:
+      equipmentCount > 0
+        ? `${equipmentCount} ${equipmentCount === 1 ? 'option' : 'options'}`
+        : CONTENT_PREVIEW_NOT_SET,
+  })
+
+  return facts
+}
+
 function buildCharacterCreationSection(
   values: ClassFormValues,
   ctx: ContentFormCtx,
 ): ContentPreviewSection {
-  if (!isCharacterCreationConfigured(values)) {
-    return {
-      derivedKind: 'notConfigured',
-      status: CONTENT_PREVIEW_STATUS_NOT_CONFIGURED,
-    }
-  }
-
-  const facts: PreviewRailFact[] = []
-  const skillFrom = values.characterCreation?.proficiencies?.skills.from ?? []
-  const skillChoose = values.characterCreation?.proficiencies?.skills.choose ?? 0
-  if (skillFrom.length > 0) {
-    facts.push({
-      label: CLASS_PREVIEW_FACT_LABELS.skillChoices,
-      value: `Choose ${skillChoose} · ${formatPreviewRailOverflowList(
-        skillFrom.map((slug) => skillLabel(slug, ctx)),
-      )}`,
-    })
-  }
-
-  const equipmentCount = values.characterCreation?.startingEquipment?.options.length ?? 0
-  if (equipmentCount > 0) {
-    facts.push({
-      label: CLASS_PREVIEW_FACT_LABELS.startingEquipment,
-      value: `${equipmentCount} ${equipmentCount === 1 ? 'option' : 'options'}`,
-    })
-  }
+  const facts = buildCharacterCreationFacts(values, ctx)
+  const configured = isCharacterCreationConfigured(values)
 
   return {
-    derivedKind: 'ready',
-    status: CONTENT_PREVIEW_STATUS_READY,
-    facts,
+    derivedKind: configured ? 'ready' : 'notConfigured',
+    status: configured ? CONTENT_PREVIEW_STATUS_READY : CONTENT_PREVIEW_STATUS_NOT_CONFIGURED,
+    ...(configured ? { facts } : {}),
   }
 }
 

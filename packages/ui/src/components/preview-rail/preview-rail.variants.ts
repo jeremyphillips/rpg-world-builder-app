@@ -5,6 +5,25 @@ import { cardRadiusClasses } from '../ui/card.variants'
 import { iconGlyphRootClasses } from '../ui/icon-glyph.variants'
 import { establishSurfaceCurrent } from '../ui/surface-current.lib'
 
+/** Persistent preview-rail column width from `xl` until `2xl`. */
+export const previewRailAsideWidthBelow2xl = '280px'
+
+/** Persistent preview-rail column width at `2xl` and above. */
+export const previewRailAsideWidthAt2xl = '21rem'
+
+/** TabbedForm grid tracks when the persistent preview rail is visible below `2xl`. */
+export const previewRailTabbedAsideGridColsBelow2xlClasses = 'xl:grid-cols-[minmax(0,1fr)_280px]'
+
+/** TabbedForm grid tracks when the persistent preview rail is visible at `2xl` and above. */
+export const previewRailTabbedAsideGridColsAt2xlClasses = '2xl:grid-cols-[minmax(0,56rem)_21rem]'
+
+/** Centered TabbedForm max width below `2xl` (form cap + gap + preview rail). */
+export const previewRailTabbedAsideGridMaxWidthBelow2xlClasses =
+  'xl:max-w-[calc(56rem+1.5rem+280px)]'
+
+/** Centered TabbedForm max width at `2xl` and above. */
+export const previewRailTabbedAsideGridMaxWidthAt2xlClasses = '2xl:max-w-[calc(56rem+1.5rem+21rem)]'
+
 /** Shared 12px muted copy below the preview header and in section chrome. */
 export const previewRailCaptionTextClasses = 'text-xs text-muted-foreground'
 
@@ -43,7 +62,7 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col', {
   variants: {
     chrome: {
       card: cn(
-        'w-[21rem] max-w-[21rem] border border-border-subtle bg-field-container text-card-foreground',
+        'w-full max-w-[280px] border border-border-subtle bg-field-container text-card-foreground 2xl:max-w-[21rem]',
         cardRadiusClasses,
         establishSurfaceCurrent('field-container'),
       ),
@@ -124,18 +143,17 @@ export const previewRailAccordionContentClasses = '[&>div]:px-3 [&>div]:pb-3 [&>
 export const previewRailSectionTriggerClasses =
   'flex flex-1 items-center justify-start gap-2 px-3 py-2.5 text-left text-sm font-body-emphasis hover:text-foreground/80 hover:no-underline'
 
+/** Reserves chevron width on static section rows so status text aligns with expandable rows. */
+export const previewRailSectionChevronSpacerClasses = 'size-4 shrink-0'
+
+export const previewRailSectionStaticRowClasses = cn(
+  previewRailSectionTriggerClasses,
+  'w-full cursor-default hover:text-inherit',
+)
+
 export const previewRailSectionLabelClasses = 'min-w-0 shrink-0'
 
 export const previewRailSectionStatusSpacerClasses = 'min-w-0 flex-1'
-
-export const previewRailSectionMarkerClasses = iconGlyphRootClasses.md
-
-export const previewRailSectionMarkerToneClasses = {
-  complete: 'text-semantic-success',
-  idle: 'text-muted-foreground',
-  attention: 'text-semantic-warning',
-  incomplete: 'text-muted-foreground',
-} as const
 
 export const previewRailSectionBodyClasses =
   'flex flex-col gap-3 rounded-md border border-border-subtle bg-surface-faint p-3'
@@ -148,11 +166,6 @@ export const previewRailSectionBodyDescriptionClasses = cn(
 export const previewRailStatusPanelDescriptionClasses = previewRailCaptionTextClasses
 
 export const previewRailActionHelperTextClasses = previewRailCaptionTextClasses
-
-export const previewRailStatusPanelIconClasses = cn(
-  'mt-0.5 size-5 shrink-0',
-  iconGlyphRootClasses.lg,
-)
 
 export const previewRailStatusPanelContentClasses = 'min-w-0 flex-1'
 

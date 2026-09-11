@@ -34,12 +34,7 @@ describe('PreviewRail', () => {
                 ]}
               />
             </PreviewRail.Section>
-            <PreviewRail.Section
-              id="spellcasting"
-              label="Spellcasting"
-              marker="idle"
-              status="Off"
-            />
+            <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="off" status="Off" />
           </PreviewRail.Sections>
         </PreviewRail.ScrollRegion>
         <PreviewRail.Footer>
@@ -70,6 +65,20 @@ describe('PreviewRail', () => {
 
     const basicsTrigger = screen.getByRole('button', { name: /Basics/ })
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'true')
+    expect(
+      basicsTrigger.querySelector('.rounded-full.bg-semantic-success-strong'),
+    ).toBeInTheDocument()
+    expect(
+      screen
+        .getByRole('button', { name: /Spellcasting/ })
+        .querySelector('.rounded-full.bg-\\[var\\(--foreground-subtle\\)\\]'),
+    ).toBeInTheDocument()
+    expect(
+      screen
+        .getByText('Ready to publish')
+        .closest('[role="alert"]')
+        ?.querySelector('.rounded-full.bg-semantic-success-strong.size-5'),
+    ).toBeInTheDocument()
     await user.click(basicsTrigger)
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'false')
   })
@@ -116,5 +125,24 @@ describe('PreviewRail', () => {
 
     expect(screen.getByRole('button', { name: 'Basics' })).toBeInTheDocument()
     expect(screen.queryByLabelText(/complete/i)).not.toBeInTheDocument()
+  })
+
+  it('renders non-expandable sections as static rows without a chevron', () => {
+    render(
+      <PreviewRail>
+        <PreviewRail.Sections defaultValue="">
+          <PreviewRail.Section
+            id="spellcasting"
+            label="Spellcasting"
+            marker="off"
+            status="Off"
+            expandable={false}
+          />
+        </PreviewRail.Sections>
+      </PreviewRail>,
+    )
+
+    expect(screen.queryByRole('button', { name: /Spellcasting/i })).not.toBeInTheDocument()
+    expect(screen.getByText('Off')).toBeInTheDocument()
   })
 })

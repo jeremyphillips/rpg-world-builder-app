@@ -51,19 +51,32 @@ export const MockComposition: Story = {
             status="Ready"
             statusTone="success"
           />
-          <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="idle" status="Off" />
+          <PreviewRail.Section
+            id="spellcasting"
+            label="Spellcasting"
+            marker="off"
+            status="Off"
+            expandable={false}
+          />
           <PreviewRail.Section
             id="features"
             label="Features"
             marker="complete"
             status="5 default features"
           />
-          <PreviewRail.Section id="subclasses" label="Subclasses" marker="idle" status="None" />
+          <PreviewRail.Section
+            id="subclasses"
+            label="Subclasses"
+            marker="none"
+            status="None"
+            expandable={false}
+          />
           <PreviewRail.Section
             id="characterCreation"
             label="Character creation"
-            marker="idle"
+            marker="notConfigured"
             status="Not configured"
+            expandable={false}
           />
         </PreviewRail.Sections>
       </PreviewRail.ScrollRegion>
@@ -103,7 +116,13 @@ export const FreshCreate: Story = {
               facts={identityFacts}
             />
           </PreviewRail.Section>
-          <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="idle" status="Off" />
+          <PreviewRail.Section
+            id="spellcasting"
+            label="Spellcasting"
+            marker="off"
+            status="Off"
+            expandable={false}
+          />
           <PreviewRail.Section
             id="features"
             label="Features"

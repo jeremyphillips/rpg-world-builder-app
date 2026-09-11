@@ -35,7 +35,11 @@ import {
   resolvePreviewRailFallbackIcon,
   resolvePreviewRailOpenSection,
 } from './content-preview-rail.lib'
-import { resolveContentPreviewSectionPresentation } from './content-preview-section-state'
+import {
+  isContentPreviewSectionExpandable,
+  resolveContentPreviewSectionBodyProps,
+  resolveContentPreviewSectionPresentation,
+} from './content-preview-section-state'
 import { contentPreviewCompactTriggerClasses } from './content-preview-rail.variants'
 import { useContentPreviewUi } from './content-preview-ui-context'
 import { useContentPublishReadiness } from './use-content-publish-readiness'
@@ -282,6 +286,8 @@ function PreviewRailSectionItem({
     sectionValid,
     hasAttemptedPublish,
   )
+  const expandable = isContentPreviewSectionExpandable(section)
+  const bodyProps = resolveContentPreviewSectionBodyProps(section)
 
   return (
     <PreviewRail.Section
@@ -290,10 +296,9 @@ function PreviewRailSectionItem({
       marker={presentation.marker}
       status={presentation.status}
       statusTone={presentation.statusTone}
+      expandable={expandable}
     >
-      {section.description || (section.facts && section.facts.length > 0) ? (
-        <PreviewRail.SectionBody description={section.description} facts={section.facts} />
-      ) : null}
+      {bodyProps ? <PreviewRail.SectionBody {...bodyProps} /> : null}
     </PreviewRail.Section>
   )
 }

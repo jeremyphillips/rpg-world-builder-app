@@ -11,4 +11,4 @@ export const appShellHorizontalPaddingClasses = 'px-4 sm:px-6'
 export const appShellMainClasses = `flex min-h-0 flex-1 flex-col overflow-hidden ${appShellHorizontalPaddingClasses}`
 
 /** Breadcrumb rail — shares horizontal gutter with main content. */
-export const appShellBreadcrumbRailClasses = `border-b border-border py-3 ${appShellHorizontalPaddingClasses}`
+export const appShellBreadcrumbRailClasses = `border-b border-border py-1.5 ${appShellHorizontalPaddingClasses}`

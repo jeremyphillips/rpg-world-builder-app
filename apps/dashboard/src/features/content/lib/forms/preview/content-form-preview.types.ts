@@ -28,6 +28,12 @@ export type ContentPreviewSection = {
   facts?: PreviewRailFact[]
 }
 
+/** Props for {@link PreviewRail.SectionBody} derived from a preview section projection. */
+export type ContentPreviewSectionBodyProps = {
+  description?: string
+  facts?: PreviewRailFact[]
+}
+
 export type ContentPreviewDetail = {
   name: string
   imageSrc?: string

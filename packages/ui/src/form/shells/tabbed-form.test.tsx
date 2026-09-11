@@ -225,7 +225,7 @@ describe('TabbedForm', () => {
     expect(screen.getByRole('toolbar', { name: 'Form actions' })).toHaveClass('bg-transparent')
   })
 
-  it('renders an aside in a 2xl grid and keeps the footer in the form column', () => {
+  it('renders an aside in an xl grid and keeps the footer in the form column', () => {
     render(
       <TabbedForm<TestValues>
         schema={schema}
@@ -242,9 +242,16 @@ describe('TabbedForm', () => {
     const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
     const formColumn = toolbar.parentElement
 
-    expect(slot).toHaveClass('2xl:col-start-2', '2xl:row-start-1')
-    expect(grid).toHaveClass('2xl:grid-cols-[minmax(0,56rem)_21rem]')
-    expect(formColumn).toHaveClass('2xl:col-start-1')
+    expect(slot).toHaveClass('xl:col-start-2', 'xl:row-start-1')
+    expect(grid).toHaveClass(
+      'mx-auto',
+      'xl:grid-cols-[minmax(0,1fr)_280px]',
+      'xl:max-w-[calc(56rem+1.5rem+280px)]',
+      '2xl:grid-cols-[minmax(0,56rem)_21rem]',
+      '2xl:max-w-[calc(56rem+1.5rem+21rem)]',
+    )
+    expect(grid).not.toHaveClass('xl:mx-0')
+    expect(formColumn).toHaveClass('xl:col-start-1')
     expect(grid).toContainElement(formColumn)
     expect(grid?.childElementCount).toBe(2)
     expect(screen.getByRole('textbox', { name: /Campaign name/i })).toBeInTheDocument()

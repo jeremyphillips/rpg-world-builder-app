@@ -71,8 +71,10 @@ when fields live outside the tab's `fields` array.
 ### Aside + compact Preview
 
 Optional `aside` renders inside `FormProvider` (consumers use `useWatch` / `useFormContext`).
-When present, the body is a two-column grid from `2xl`: form column `minmax(0, 56rem)`, aside
-`21rem`, gap `gap-6`. The sticky footer stays in the form column. Below `2xl` the aside is
+When present, the body is a centered two-column grid from `xl`: form column `minmax(0, 1fr)` with
+aside `280px` until `2xl`, then form `minmax(0, 56rem)` with aside `21rem`; gap `gap-6`. Max
+width is `calc(56rem + 1.5rem + rail width)` so the block stays centered in wide shells. The
+sticky footer stays in the form column. Below `xl` the aside is
 hidden. `tabRowTrailing` places a compact action on the sticky tab row (dashboard uses this
 for **Preview**). `TabbedFormChromeContext` exposes `activeTabId`.
 

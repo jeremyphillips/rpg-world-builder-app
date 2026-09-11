@@ -104,7 +104,7 @@ export const WithAside: StoryObj = {
       onSubmit={action('submit')}
       footer={<FormSaveFooter submitLabel="Save changes" />}
       tabRowTrailing={
-        <button type="button" className="2xl:hidden">
+        <button type="button" className="xl:hidden">
           Preview
         </button>
       }
