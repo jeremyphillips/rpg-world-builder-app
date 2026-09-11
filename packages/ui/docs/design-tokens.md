@@ -264,3 +264,19 @@ Storybook: **Design tokens → Icon glyph** and **Control action**.
 
 Enforcement: `icon-glyph-sizing-ban.test.ts` — raw `[&_svg]:size-*` / inline Lucide
 `size-*` in component implementations is forbidden (grandfather list until Phase 6 inline cleanup).
+
+### StatusIcon exceptions
+
+Module: [`status-icon.variants.ts`](../src/components/ui/status-icon.variants.ts)
+
+Neutral disc fills use dedicated Layer 2 recipes — not surface-relative ink roles:
+
+| Role                                    | Utility                               |
+| --------------------------------------- | ------------------------------------- |
+| Idle / off / none / not configured disc | `bg-status-icon-idle`                 |
+| Incomplete / validation disc            | `bg-status-icon-incomplete`           |
+| Neutral glyph on grey discs             | `text-status-icon-neutral-foreground` |
+
+The off-slash glyph is **not** on the 10/12/14/16 icon-glyph ladder. It uses
+`size-status-icon-slash-sm` (6px) and `size-status-icon-slash-md` (8px) with a heavier
+Lucide `strokeWidth` than other variants.

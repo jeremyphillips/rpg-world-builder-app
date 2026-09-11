@@ -39,11 +39,3 @@ export function contentPreviewAttentionTitle(count: number): string {
   const noun = count === 1 ? 'section' : 'sections'
   return `${count} ${noun} need attention.`
 }
-
-export function contentPreviewDefaultFeaturesStatus(count: number): string {
-  return `${count} default features`
-}
-
-export function contentPreviewFeaturesStatus(count: number): string {
-  return `${count} features`
-}

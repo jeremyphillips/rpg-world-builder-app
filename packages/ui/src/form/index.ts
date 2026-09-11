@@ -115,7 +115,6 @@ export {
   formTabbedPreviewRailCompactTriggerHiddenClasses,
   formViewportScrollBodyTopInsetClasses,
   formTabbedAsideFooterClasses,
-  formTabPanelsBottomPaddingClasses,
   formTabbedChromeRhythmStackClasses,
   formSheetScrollRegionClasses,
 } from './chrome/form-chrome.variants'

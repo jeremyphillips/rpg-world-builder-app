@@ -22,14 +22,17 @@ export const STATUS_ICON_TOOLTIP_LABELS = {
   notConfigured: 'Not configured',
 } as const satisfies Record<StatusIconVariant, string>
 
+/** Default Lucide stroke width for every glyph except off-slash. */
 export const STATUS_ICON_STROKE_WIDTH = 4
+/** Heavier stroke for the off slash — reads lighter at a smaller glyph size. */
 export const STATUS_ICON_OFF_SLASH_STROKE_WIDTH = 7
-/** Overrides default glyph sizing — Lucide slash reads larger/heavier than check/minus. */
-export const STATUS_ICON_OFF_SLASH_SIZE_SM_CLASSES = '!size-[6px]'
-export const STATUS_ICON_OFF_SLASH_SIZE_MD_CLASSES = '!size-[8px]'
 
-const statusIconNeutralSurfaceClasses =
-  'bg-[var(--foreground-subtle)] text-semantic-success-strong-foreground dark:bg-semantic-neutral-strong dark:text-semantic-neutral-strong-foreground'
+/** Hides the redundant outer ring on Lucide CircleAlert when rendered on a solid disc. */
+export const statusIconAlertRingHiddenClasses = '[&>circle]:hidden'
+
+const statusIconNeutralDiscClasses = 'bg-status-icon-idle text-status-icon-neutral-foreground'
+
+const statusIconNeutralGlyphClasses = 'text-status-icon-neutral-foreground'
 
 export const statusIconVariants = cva(
   'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full',
@@ -38,11 +41,10 @@ export const statusIconVariants = cva(
       variant: {
         ready: 'bg-semantic-success-strong text-semantic-success-strong-foreground',
         needsAttention: 'bg-semantic-warning-strong text-semantic-warning-strong-foreground',
-        incomplete:
-          'bg-[var(--foreground-disabled)] text-semantic-success-strong-foreground dark:bg-semantic-neutral-strong dark:text-semantic-neutral-strong-foreground',
-        off: statusIconNeutralSurfaceClasses,
-        none: statusIconNeutralSurfaceClasses,
-        notConfigured: statusIconNeutralSurfaceClasses,
+        incomplete: 'bg-status-icon-incomplete text-status-icon-neutral-foreground',
+        off: statusIconNeutralDiscClasses,
+        none: statusIconNeutralDiscClasses,
+        notConfigured: statusIconNeutralDiscClasses,
       },
       size: {
         sm: 'size-4',
@@ -56,18 +58,15 @@ export const statusIconVariants = cva(
   },
 )
 
-/** Shared glyph color for solid-disc icons — matches the ready checkmark. */
-export const statusIconGlyphForegroundClasses = 'text-semantic-success-strong-foreground'
-
 export const statusIconGlyphVariants = cva('', {
   variants: {
     variant: {
       ready: '',
-      incomplete: statusIconGlyphForegroundClasses,
-      off: statusIconGlyphForegroundClasses,
-      none: statusIconGlyphForegroundClasses,
-      notConfigured: statusIconGlyphForegroundClasses,
-      needsAttention: '[&>circle]:hidden',
+      incomplete: statusIconNeutralGlyphClasses,
+      off: statusIconNeutralGlyphClasses,
+      none: statusIconNeutralGlyphClasses,
+      notConfigured: statusIconNeutralGlyphClasses,
+      needsAttention: statusIconAlertRingHiddenClasses,
     },
     size: {
       sm: '',
@@ -120,12 +119,12 @@ export const statusIconGlyphVariants = cva('', {
     {
       variant: 'off',
       size: 'sm',
-      class: STATUS_ICON_OFF_SLASH_SIZE_SM_CLASSES,
+      class: 'size-status-icon-slash-sm',
     },
     {
       variant: 'off',
       size: 'md',
-      class: STATUS_ICON_OFF_SLASH_SIZE_MD_CLASSES,
+      class: 'size-status-icon-slash-md',
     },
   ],
   defaultVariants: {

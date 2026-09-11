@@ -213,6 +213,13 @@
   --semantic-destructive-outline-foreground: var(--semantic-destructive);
 
   /*
+   * StatusIcon disc fills — both neutral greys collapse to strong-neutral in dark mode.
+   */
+  --status-icon-idle-bg: var(--semantic-neutral-strong-bg);
+  --status-icon-incomplete-bg: var(--semantic-neutral-strong-bg);
+  --status-icon-neutral-foreground: var(--semantic-success-strong-foreground);
+
+  /*
    * Choice indicators — radio/checkbox rings on panel surfaces (not field-input chrome).
    */
   --choice-control-border: color-mix(

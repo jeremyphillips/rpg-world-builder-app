@@ -28,7 +28,6 @@ import {
   formTabbedNavControlWrapClasses,
   formTabbedNavOverflowClasses,
   formTabbedNavWithTrailingClasses,
-  formTabPanelsBottomPaddingClasses,
 } from '../chrome/form-chrome.variants'
 import { warnHeaderOnlyTabValidationWiring } from './warn-header-only-tab-validation-wiring'
 import { collectTabbedFormResolverItems, type TabbedFormTab } from './tabbed-form-panels.lib'
@@ -103,8 +102,6 @@ interface TabbedFormPanelsProps {
   onActiveTabChange: (tabId: string) => void
   stickyChrome: boolean
   stickyTabsClassName?: string
-  /** When true, skip extra bottom padding (external footer owns spacing). */
-  omitPanelBottomPadding: boolean
   /** Trailing control on the sticky tab row (hidden by the consumer below `xl` as needed). */
   tabRowTrailing?: React.ReactNode
 }
@@ -169,7 +166,6 @@ export function TabbedFormPanels({
   onActiveTabChange,
   stickyChrome,
   stickyTabsClassName,
-  omitPanelBottomPadding,
   tabRowTrailing,
 }: TabbedFormPanelsProps) {
   const { density } = useFormSectionContext()
@@ -184,10 +180,7 @@ export function TabbedFormPanels({
       buildTabbedFormSectionOptions(tabs, formId, (tabId) => tabStateById.get(tabId)?.count ?? 0),
     [formId, tabStateById, tabs],
   )
-  const panelClassName = cn(
-    fieldStackRhythmVariants({ rhythm }),
-    stickyChrome && !omitPanelBottomPadding ? formTabPanelsBottomPaddingClasses : undefined,
-  )
+  const panelClassName = fieldStackRhythmVariants({ rhythm })
   const sectionControl = (
     <SegmentedControl
       value={activeTabId}

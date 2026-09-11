@@ -22,7 +22,7 @@ describe('PreviewRail', () => {
             <PreviewRail.Section
               id="basics"
               label="Basics"
-              marker="complete"
+              marker="ready"
               status="Ready"
               statusTone="success"
             >
@@ -34,7 +34,13 @@ describe('PreviewRail', () => {
                 ]}
               />
             </PreviewRail.Section>
-            <PreviewRail.Section id="spellcasting" label="Spellcasting" marker="off" status="Off" />
+            <PreviewRail.Section
+              id="spellcasting"
+              label="Spellcasting"
+              marker="off"
+              status="Off"
+              expandable={false}
+            />
           </PreviewRail.Sections>
         </PreviewRail.ScrollRegion>
         <PreviewRail.Footer>
@@ -70,8 +76,9 @@ describe('PreviewRail', () => {
     ).toBeInTheDocument()
     expect(
       screen
-        .getByRole('button', { name: /Spellcasting/ })
-        .querySelector('.rounded-full.bg-\\[var\\(--foreground-subtle\\)\\]'),
+        .getByText('Spellcasting')
+        .closest('[class*="border-b"]')
+        ?.querySelector('.rounded-full.bg-status-icon-idle'),
     ).toBeInTheDocument()
     expect(
       screen
@@ -144,5 +151,6 @@ describe('PreviewRail', () => {
 
     expect(screen.queryByRole('button', { name: /Spellcasting/i })).not.toBeInTheDocument()
     expect(screen.getByText('Off')).toBeInTheDocument()
+    expect(document.querySelector('[aria-hidden].size-4.shrink-0')).toBeInTheDocument()
   })
 })

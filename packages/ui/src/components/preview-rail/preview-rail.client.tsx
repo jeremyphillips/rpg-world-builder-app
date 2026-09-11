@@ -21,7 +21,8 @@ import { contentCardMediaVariants } from '../ui/content-card.variants'
 import { Heading } from '../ui/heading'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
 import { StatusDot } from '../ui/status-dot'
-import { StatusIcon, type StatusIconVariant } from '../ui/status-icon.client'
+import { StatusIcon } from '../ui/status-icon.client'
+import type { StatusIconVariant } from '../ui/status-icon.variants'
 import { Text } from '../ui/text'
 import type {
   PreviewRailAvailability,
@@ -68,6 +69,7 @@ import {
   previewRailSectionChevronSpacerClasses,
   previewRailSectionLabelClasses,
   previewRailSectionStaticRowClasses,
+  previewRailSectionStatusClasses,
   previewRailSectionStatusSpacerClasses,
   previewRailSectionTriggerClasses,
   previewRailCaptionTextClasses,
@@ -324,17 +326,8 @@ export type PreviewRailSectionProps = {
   children?: React.ReactNode
 }
 
-const PREVIEW_RAIL_MARKER_TO_STATUS_ICON = {
-  complete: 'ready',
-  attention: 'needsAttention',
-  incomplete: 'incomplete',
-  off: 'off',
-  none: 'none',
-  notConfigured: 'notConfigured',
-} as const satisfies Record<PreviewRailSectionMarker, StatusIconVariant>
-
 function PreviewRailSectionMarker({ marker }: { marker: PreviewRailSectionMarker }) {
-  return <StatusIcon variant={PREVIEW_RAIL_MARKER_TO_STATUS_ICON[marker]} size="sm" />
+  return <StatusIcon variant={marker} size="sm" />
 }
 
 function PreviewRailSectionStatus({
@@ -347,7 +340,7 @@ function PreviewRailSectionStatus({
   const emphasis = statusTone === 'neutral' ? 'low' : 'medium'
 
   return (
-    <SemanticText tone={statusTone} emphasis={emphasis} className="shrink-0">
+    <SemanticText tone={statusTone} emphasis={emphasis} className={previewRailSectionStatusClasses}>
       {status}
     </SemanticText>
   )

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
@@ -18,7 +18,6 @@ import { Eye, type LucideIcon } from 'lucide-react'
 
 import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context'
 import { resolveCampaignAccessSummary } from '../../campaign-access/campaign-access-summary'
-import { useSubclasses } from '../../../classes/hooks/use-subclasses'
 import type { AnyContentFormDef, ContentFormCtx } from '../registry/content-form-registry'
 import { resolveContentPublishSchema } from '../shells/edit/content-edit-load'
 import {
@@ -44,7 +43,6 @@ import { contentPreviewCompactTriggerClasses } from './content-preview-rail.vari
 import { useContentPreviewUi } from './content-preview-ui-context'
 import { useContentPublishReadiness } from './use-content-publish-readiness'
 import { useMediaMinWidth, VIEWPORT_MD_MIN_QUERY } from './use-media-min-width'
-import { ContentPreviewPlayerHost } from './content-preview-player-host'
 import type { ContentPreviewIdentity, ContentPreviewSection } from './content-form-preview.types'
 
 export function ContentPreviewCompactTrigger() {
@@ -98,60 +96,58 @@ function ContentPreviewRailBody({
   const [manualSection, setManualSection] = useState<{ forTabId: string; value: string } | null>(
     null,
   )
-
-  useEffect(() => {
-    setManualSection(null)
-  }, [activeTabId])
-
   const openSection = resolvePreviewRailOpenSection(activeTabId, manualSection)
   const preview = def.preview
   const contentTypeKey = def.routeKey as ContentTypeKey
   const term = getContentTypeTerm(contentTypeKey)
   const FallbackIcon = resolvePreviewRailFallbackIcon(contentTypeKey)
-  const isClassPreview = def.routeKey === 'classes'
-
-  const { data: subclasses = [] } = useSubclasses(
-    isClassPreview ? ctx.campaignId : undefined,
-    isClassPreview ? ctx.entityId : undefined,
-  )
 
   const identity = useMemo(() => preview?.buildIdentity(values, ctx), [preview, values, ctx])
-  const sections = useMemo(
-    () => preview?.buildSections(values, ctx, { subclasses }) ?? {},
-    [preview, values, ctx, subclasses],
-  )
 
   const access = pendingAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
   const accessSummary = resolveCampaignAccessSummary(access)
   const attentionCount = tabStates.filter((state) => state.count > 0).length
+  const renderPlayerPreview = preview?.renderPlayerPreview
 
   if (!preview || !identity) {
     return null
   }
 
-  return (
-    <ContentPreviewRailView
-      chrome={chrome}
-      sticky={sticky}
-      hideHeader={hideHeader}
-      showDraftBadge={showDraftBadge}
-      term={term}
-      FallbackIcon={FallbackIcon}
-      identity={identity}
-      access={access}
-      accessSummary={accessSummary}
-      openSection={openSection}
-      activeTabId={activeTabId}
-      onOpenSectionChange={setManualSection}
-      tabs={tabs}
-      sections={sections}
-      invalidTabIds={readiness.invalidTabIds}
-      hasAttemptedPublish={hasAttemptedPublish}
-      valid={readiness.valid}
-      attentionCount={attentionCount}
-      onPreviewAsPlayer={() => setPlayerOpen(true)}
-    />
-  )
+  const renderView = (resources?: unknown) => {
+    const sections = preview.buildSections(values, ctx, resources)
+
+    return (
+      <ContentPreviewRailView
+        chrome={chrome}
+        sticky={sticky}
+        hideHeader={hideHeader}
+        showDraftBadge={showDraftBadge}
+        term={term}
+        FallbackIcon={FallbackIcon}
+        identity={identity}
+        access={access}
+        accessSummary={accessSummary}
+        openSection={openSection}
+        activeTabId={activeTabId}
+        onOpenSectionChange={setManualSection}
+        tabs={tabs}
+        sections={sections}
+        invalidTabIds={readiness.invalidTabIds}
+        hasAttemptedPublish={hasAttemptedPublish}
+        valid={readiness.valid}
+        attentionCount={attentionCount}
+        showPlayerPreviewAction={Boolean(renderPlayerPreview)}
+        onPreviewAsPlayer={() => setPlayerOpen(true)}
+      />
+    )
+  }
+
+  const PreviewResources = preview.PreviewResources
+  if (PreviewResources) {
+    return <PreviewResources ctx={ctx}>{renderView}</PreviewResources>
+  }
+
+  return renderView()
 }
 
 type ContentPreviewRailViewProps = {
@@ -173,6 +169,7 @@ type ContentPreviewRailViewProps = {
   hasAttemptedPublish: boolean
   valid: boolean
   attentionCount: number
+  showPlayerPreviewAction: boolean
   onPreviewAsPlayer: () => void
 }
 
@@ -195,6 +192,7 @@ function ContentPreviewRailView({
   hasAttemptedPublish,
   valid,
   attentionCount,
+  showPlayerPreviewAction,
   onPreviewAsPlayer,
 }: ContentPreviewRailViewProps) {
   return (
@@ -230,12 +228,14 @@ function ContentPreviewRailView({
         <PreviewRail.StatusPanel
           {...resolveContentPreviewReadinessPanel(valid, hasAttemptedPublish, attentionCount)}
         />
-        <PreviewRail.Action
-          label={CONTENT_PREVIEW_AS_PLAYER_LABEL}
-          helperText={contentPreviewAsPlayerHelper(term)}
-          icon={<Eye />}
-          onClick={onPreviewAsPlayer}
-        />
+        {showPlayerPreviewAction ? (
+          <PreviewRail.Action
+            label={CONTENT_PREVIEW_AS_PLAYER_LABEL}
+            helperText={contentPreviewAsPlayerHelper(term)}
+            icon={<Eye />}
+            onClick={onPreviewAsPlayer}
+          />
+        ) : null}
       </PreviewRail.Footer>
     </PreviewRail>
   )
@@ -308,6 +308,9 @@ export function ContentPreviewRail(props: ContentPreviewRailProps) {
   const isMdUp = useMediaMinWidth(VIEWPORT_MD_MIN_QUERY)
   const term = getContentTypeTerm(props.def.routeKey as ContentTypeKey)
   const title = contentPreviewHeaderTitle(term)
+  const { control, getValues } = useFormContext<FieldValues>()
+  const values = (useWatch({ control }) ?? getValues()) as FieldValues
+  const renderPlayerPreview = props.def.preview?.renderPlayerPreview
 
   return (
     <>
@@ -328,12 +331,14 @@ export function ContentPreviewRail(props: ContentPreviewRailProps) {
           </Sheet.Body>
         </Sheet.Content>
       </Sheet.Root>
-      <ContentPreviewPlayerHost
-        def={props.def}
-        ctx={props.ctx}
-        open={playerOpen}
-        onOpenChange={setPlayerOpen}
-      />
+      {renderPlayerPreview
+        ? renderPlayerPreview({
+            values,
+            ctx: props.ctx,
+            open: playerOpen,
+            onOpenChange: setPlayerOpen,
+          })
+        : null}
     </>
   )
 }

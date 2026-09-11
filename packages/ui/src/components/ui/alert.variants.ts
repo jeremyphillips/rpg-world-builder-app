@@ -25,7 +25,7 @@ export const alertVariants = cva('flex flex-col rounded-lg border sm:flex-row sm
     },
     density: {
       comfortable: 'gap-3 p-4',
-      compact: 'gap-2 px-3 py-[10px]',
+      compact: 'gap-2 px-3 py-2.5',
     },
   },
   defaultVariants: {

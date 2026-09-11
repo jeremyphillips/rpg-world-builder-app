@@ -35,7 +35,7 @@ export const MockComposition: Story = {
           <PreviewRail.Section
             id="basics"
             label="Basics"
-            marker="complete"
+            marker="ready"
             status="Ready"
             statusTone="success"
           >
@@ -47,7 +47,7 @@ export const MockComposition: Story = {
           <PreviewRail.Section
             id="proficiencies"
             label="Proficiencies"
-            marker="complete"
+            marker="ready"
             status="Ready"
             statusTone="success"
           />
@@ -61,7 +61,7 @@ export const MockComposition: Story = {
           <PreviewRail.Section
             id="features"
             label="Features"
-            marker="complete"
+            marker="ready"
             status="5 default features"
           />
           <PreviewRail.Section
@@ -110,7 +110,7 @@ export const FreshCreate: Story = {
           description="Overview of this class and its current configuration."
           defaultValue="basics"
         >
-          <PreviewRail.Section id="basics" label="Basics" marker="incomplete">
+          <PreviewRail.Section id="basics" label="Basics" marker="incomplete" status="Incomplete">
             <PreviewRail.SectionBody
               description="A brief description will appear here once provided."
               facts={identityFacts}
@@ -126,7 +126,7 @@ export const FreshCreate: Story = {
           <PreviewRail.Section
             id="features"
             label="Features"
-            marker="complete"
+            marker="ready"
             status="5 default features"
           />
         </PreviewRail.Sections>
@@ -161,14 +161,14 @@ export const PostSubmitAttention: Story = {
           <PreviewRail.Section
             id="basics"
             label="Basics"
-            marker="attention"
+            marker="needsAttention"
             status="Needs attention"
             statusTone="warning"
           />
           <PreviewRail.Section
             id="proficiencies"
             label="Proficiencies"
-            marker="attention"
+            marker="needsAttention"
             status="Needs attention"
             statusTone="warning"
           />

@@ -1,28 +1,13 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import {
+  formTabbedAsideCardMaxWidthAt2xlClasses,
+  formTabbedAsideCardMaxWidthBelow2xlClasses,
+} from '../../form/chrome/form-chrome.variants'
 import { cardRadiusClasses } from '../ui/card.variants'
 import { iconGlyphRootClasses } from '../ui/icon-glyph.variants'
 import { establishSurfaceCurrent } from '../ui/surface-current.lib'
-
-/** Persistent preview-rail column width from `xl` until `2xl`. */
-export const previewRailAsideWidthBelow2xl = '280px'
-
-/** Persistent preview-rail column width at `2xl` and above. */
-export const previewRailAsideWidthAt2xl = '21rem'
-
-/** TabbedForm grid tracks when the persistent preview rail is visible below `2xl`. */
-export const previewRailTabbedAsideGridColsBelow2xlClasses = 'xl:grid-cols-[minmax(0,1fr)_280px]'
-
-/** TabbedForm grid tracks when the persistent preview rail is visible at `2xl` and above. */
-export const previewRailTabbedAsideGridColsAt2xlClasses = '2xl:grid-cols-[minmax(0,56rem)_21rem]'
-
-/** Centered TabbedForm max width below `2xl` (form cap + gap + preview rail). */
-export const previewRailTabbedAsideGridMaxWidthBelow2xlClasses =
-  'xl:max-w-[calc(56rem+1.5rem+280px)]'
-
-/** Centered TabbedForm max width at `2xl` and above. */
-export const previewRailTabbedAsideGridMaxWidthAt2xlClasses = '2xl:max-w-[calc(56rem+1.5rem+21rem)]'
 
 /** Shared 12px muted copy below the preview header and in section chrome. */
 export const previewRailCaptionTextClasses = 'text-xs text-muted-foreground'
@@ -40,7 +25,7 @@ export const previewRailSectionInsetVariants = cva('', {
 })
 
 /** Inset below header content, above the full-width section border. */
-export const previewRailHeaderSectionBottomInsetClasses = 'pb-[10px]'
+export const previewRailHeaderSectionBottomInsetClasses = 'pb-2.5'
 
 /** Full-width shell below the title row; border omitted when Identity follows. */
 export const previewRailHeaderSectionShellClasses = cn(
@@ -62,7 +47,9 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col', {
   variants: {
     chrome: {
       card: cn(
-        'w-full max-w-[280px] border border-border-subtle bg-field-container text-card-foreground 2xl:max-w-[21rem]',
+        'w-full border border-border-subtle bg-field-container text-card-foreground',
+        formTabbedAsideCardMaxWidthBelow2xlClasses,
+        formTabbedAsideCardMaxWidthAt2xlClasses,
         cardRadiusClasses,
         establishSurfaceCurrent('field-container'),
       ),
@@ -154,6 +141,8 @@ export const previewRailSectionStaticRowClasses = cn(
 export const previewRailSectionLabelClasses = 'min-w-0 shrink-0'
 
 export const previewRailSectionStatusSpacerClasses = 'min-w-0 flex-1'
+
+export const previewRailSectionStatusClasses = 'shrink-0'
 
 export const previewRailSectionBodyClasses =
   'flex flex-col gap-3 rounded-md border border-border-subtle bg-surface-faint p-3'

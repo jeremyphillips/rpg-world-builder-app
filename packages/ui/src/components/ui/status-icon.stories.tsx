@@ -31,6 +31,13 @@ export const WithoutTooltip: Story = {
   },
 }
 
+export const WithTooltip: Story = {
+  args: {
+    variant: 'ready',
+    tooltip: true,
+  },
+}
+
 export const CustomTooltip: Story = {
   args: {
     variant: 'ready',

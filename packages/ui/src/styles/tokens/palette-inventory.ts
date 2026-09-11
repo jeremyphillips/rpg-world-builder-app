@@ -278,6 +278,13 @@ export const SURFACE_RELATIVE_CHROME_ROLES = [
   '--card-selected-border',
 ] as const
 
+/** StatusIcon disc fill roles composed in semantic-*.css. */
+export const STATUS_ICON_SEMANTIC_ROLES = [
+  '--status-icon-idle-bg',
+  '--status-icon-incomplete-bg',
+  '--status-icon-neutral-foreground',
+] as const
+
 /** Layer 2 interaction recipe roles composed in semantic-*.css (not Layer 1). */
 export const INTERACTION_SEMANTIC_ROLES = [
   '--control-hover-bg',

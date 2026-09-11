@@ -2,14 +2,9 @@ import type { ReactNode } from 'react'
 
 import type { AlertVariant } from '../ui/alert'
 import type { SemanticTextTone } from '../ui/semantic-text/semantic-text.variants'
+import type { StatusIconVariant } from '../ui/status-icon.variants'
 
-export type PreviewRailSectionMarker =
-  | 'complete'
-  | 'attention'
-  | 'incomplete'
-  | 'off'
-  | 'none'
-  | 'notConfigured'
+export type PreviewRailSectionMarker = StatusIconVariant
 
 export type PreviewRailStatusTone = SemanticTextTone
 

@@ -52,7 +52,7 @@ describe('Alert', () => {
   it('applies compact density padding and title sizing', () => {
     render(<Alert density="compact" title="Status" description="Details" />)
     const alert = screen.getByRole('alert')
-    expect(alert).toHaveClass('px-3', 'py-[10px]')
+    expect(alert).toHaveClass('px-3', 'py-2.5')
     expect(screen.getByText('Status')).toHaveClass('text-sm', 'font-body-emphasis')
   })
 

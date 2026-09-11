@@ -53,8 +53,8 @@ export type { StatusIconVariant } from './status-icon.variants'
 export interface StatusIconProps
   extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'>, StatusIconVariantProps {
   /**
-   * Tooltip copy — enabled by default with variant labels. Pass `false` to hide or a
-   * string to override the default variant label.
+   * Tooltip copy — opt-in with variant labels. Pass `true` to show the default label or a
+   * string to override it.
    */
   tooltip?: boolean | string
   /** Visible helper copy beside the icon — separate from the hover tooltip. */
@@ -128,7 +128,7 @@ export function StatusIcon({
   className,
   variant,
   size,
-  tooltip = true,
+  tooltip = false,
   label,
   ...props
 }: StatusIconProps) {

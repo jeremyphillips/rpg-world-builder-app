@@ -5,12 +5,11 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { StatusIcon } from './status-icon.client'
 import {
-  STATUS_ICON_OFF_SLASH_SIZE_MD_CLASSES,
-  STATUS_ICON_OFF_SLASH_SIZE_SM_CLASSES,
   STATUS_ICON_OFF_SLASH_STROKE_WIDTH,
   STATUS_ICON_STROKE_WIDTH,
   STATUS_ICON_TOOLTIP_LABELS,
   STATUS_ICON_VARIANTS,
+  statusIconAlertRingHiddenClasses,
 } from './status-icon.variants'
 
 function getStatusIconDisc(container: HTMLElement) {
@@ -25,6 +24,12 @@ describe('StatusIcon', () => {
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 
+  it('does not show a tooltip by default', () => {
+    const { container } = render(<StatusIcon variant="ready" />)
+    expect(getStatusIconDisc(container)).toBeInTheDocument()
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+  })
+
   it('renders an optional visible label', () => {
     render(<StatusIcon variant="ready" label="Ready" tooltip={false} />)
     expect(screen.getByText('Ready')).toBeInTheDocument()
@@ -35,9 +40,9 @@ describe('StatusIcon', () => {
     expect(getStatusIconDisc(container)).toHaveClass('rounded-full')
   })
 
-  it('shows the default variant tooltip on hover', async () => {
+  it('shows the variant tooltip when enabled', async () => {
     const user = userEvent.setup()
-    const { container } = render(<StatusIcon variant="incomplete" />)
+    const { container } = render(<StatusIcon variant="incomplete" tooltip />)
 
     await user.hover(getStatusIconDisc(container)!)
 
@@ -63,38 +68,33 @@ describe('StatusIcon', () => {
     )
   })
 
-  it('uses distinct neutral surfaces for off and incomplete in light mode', () => {
+  it('uses distinct neutral disc recipes for off and incomplete', () => {
     const { container: offContainer } = render(<StatusIcon variant="off" tooltip={false} />)
     const { container: incompleteContainer } = render(
       <StatusIcon variant="incomplete" tooltip={false} />,
     )
 
-    expect(getStatusIconDisc(offContainer)).toHaveClass(
-      'overflow-hidden',
-      'rounded-full',
-      'bg-[var(--foreground-subtle)]',
-      'dark:bg-semantic-neutral-strong',
-    )
-    expect(getStatusIconDisc(incompleteContainer)).toHaveClass(
-      'bg-[var(--foreground-disabled)]',
-      'dark:bg-semantic-neutral-strong',
-    )
+    expect(getStatusIconDisc(offContainer)).toHaveClass('bg-status-icon-idle')
+    expect(getStatusIconDisc(incompleteContainer)).toHaveClass('bg-status-icon-incomplete')
   })
 
-  it('matches the ready checkmark glyph color on neutral and validation glyphs', () => {
+  it('matches the neutral glyph foreground on grey discs', () => {
     const { container: offContainer } = render(<StatusIcon variant="off" tooltip={false} />)
     const { container: noneContainer } = render(<StatusIcon variant="none" tooltip={false} />)
     const { container: incompleteContainer } = render(
       <StatusIcon variant="incomplete" tooltip={false} />,
     )
 
-    expect(offContainer.querySelector('svg')).toHaveClass('text-semantic-success-strong-foreground')
-    expect(noneContainer.querySelector('svg')).toHaveClass(
-      'text-semantic-success-strong-foreground',
-    )
+    expect(offContainer.querySelector('svg')).toHaveClass('text-status-icon-neutral-foreground')
+    expect(noneContainer.querySelector('svg')).toHaveClass('text-status-icon-neutral-foreground')
     expect(incompleteContainer.querySelector('svg')).toHaveClass(
-      'text-semantic-success-strong-foreground',
+      'text-status-icon-neutral-foreground',
     )
+  })
+
+  it('hides the CircleAlert outer ring on needsAttention', () => {
+    const { container } = render(<StatusIcon variant="needsAttention" tooltip={false} />)
+    expect(container.querySelector('svg')).toHaveClass(statusIconAlertRingHiddenClasses)
   })
 
   it('uses the default stroke width on every glyph except off', () => {
@@ -118,11 +118,11 @@ describe('StatusIcon', () => {
       <StatusIcon variant="off" size="md" tooltip={false} />,
     )
 
-    expect(smContainer.querySelector('svg')).toHaveClass(STATUS_ICON_OFF_SLASH_SIZE_SM_CLASSES)
+    expect(smContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-sm')
     expect(smContainer.querySelector('svg')?.getAttribute('stroke-width')).toBe(
       String(STATUS_ICON_OFF_SLASH_STROKE_WIDTH),
     )
-    expect(mdContainer.querySelector('svg')).toHaveClass(STATUS_ICON_OFF_SLASH_SIZE_MD_CLASSES)
+    expect(mdContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-md')
     expect(mdContainer.querySelector('svg')?.getAttribute('stroke-width')).toBe(
       String(STATUS_ICON_OFF_SLASH_STROKE_WIDTH),
     )

@@ -16,9 +16,6 @@ export function isContentPreviewSectionExpandable(section: ContentPreviewSection
   return false
 }
 
-/** @deprecated Use {@link isContentPreviewSectionExpandable}. */
-export const hasContentPreviewSectionBody = isContentPreviewSectionExpandable
-
 /** Maps a section projection to PreviewRail section-body props when expandable. */
 export function resolveContentPreviewSectionBodyProps(
   section: ContentPreviewSection,
@@ -59,11 +56,8 @@ export function resolveDerivedContentPreviewPresentation(
       }
     case 'ready':
     case 'count':
-    case 'prepared':
-    case 'known':
-    case 'fullList':
       return {
-        marker: 'complete',
+        marker: 'ready',
         status: section.status,
         statusTone: section.status === CONTENT_PREVIEW_STATUS_READY ? 'success' : undefined,
       }
@@ -78,7 +72,7 @@ export function resolveDerivedContentPreviewPresentation(
  * Part 2 precedence + marker mapping.
  * `sectionValid` comes from the live publish-schema parse (not tab badges).
  *
- * Validation markers (`incomplete`, `attention`) always mean publish validation —
+ * Validation markers (`incomplete`, `needsAttention`) always mean publish validation —
  * never optional content that has not been authored.
  */
 export function resolveContentPreviewSectionPresentation(
@@ -92,7 +86,7 @@ export function resolveContentPreviewSectionPresentation(
     }
 
     return {
-      marker: 'attention',
+      marker: 'needsAttention',
       status: CONTENT_PREVIEW_NEEDS_ATTENTION,
       statusTone: 'warning',
     }

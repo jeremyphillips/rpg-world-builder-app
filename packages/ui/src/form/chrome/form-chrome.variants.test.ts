@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  previewRailTabbedAsideGridColsAt2xlClasses,
-  previewRailTabbedAsideGridColsBelow2xlClasses,
-  previewRailTabbedAsideGridMaxWidthAt2xlClasses,
-  previewRailTabbedAsideGridMaxWidthBelow2xlClasses,
-} from '../../components/preview-rail/preview-rail.variants'
-import {
   formTabbedAsideBodyClasses,
   formTabbedAsideGridClasses,
+  formTabbedAsideGridColsAt2xlClasses,
+  formTabbedAsideGridColsBelow2xlClasses,
+  formTabbedAsideGridMaxWidthAt2xlClasses,
+  formTabbedAsideGridMaxWidthBelow2xlClasses,
   formTabbedAsideSlotBottomInsetClasses,
   formTabbedAsideSlotClasses,
   formTabbedAsideSlotTopInsetClasses,
@@ -22,15 +20,15 @@ describe('formTabbedAside layout tokens', () => {
   })
 
   it('uses a narrower preview-rail column below 2xl', () => {
-    expect(formTabbedAsideGridClasses).toContain(previewRailTabbedAsideGridColsBelow2xlClasses)
-    expect(formTabbedAsideGridClasses).toContain(previewRailTabbedAsideGridColsAt2xlClasses)
+    expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridColsBelow2xlClasses)
+    expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridColsAt2xlClasses)
   })
 
   it('keeps the preview-rail grid centered with a capped max width', () => {
     expect(formTabbedAsideGridClasses).toContain('mx-auto')
     expect(formTabbedAsideGridClasses).not.toContain('xl:mx-0')
-    expect(formTabbedAsideGridClasses).toContain(previewRailTabbedAsideGridMaxWidthBelow2xlClasses)
-    expect(formTabbedAsideGridClasses).toContain(previewRailTabbedAsideGridMaxWidthAt2xlClasses)
+    expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridMaxWidthBelow2xlClasses)
+    expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridMaxWidthAt2xlClasses)
   })
 
   it('fills grid cells for scroll + docked footer columns', () => {

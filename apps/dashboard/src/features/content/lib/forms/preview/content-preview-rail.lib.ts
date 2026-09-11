@@ -1,7 +1,7 @@
 import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import type { PreviewRailAvailability, PreviewRailStatusPanelVariant } from '@rpg/ui'
 import type { FieldGroupSummary } from '@rpg/ui/form'
-import type { LucideIcon } from 'lucide-react'
+import { FileText, type LucideIcon } from 'lucide-react'
 
 import {
   SIDEBAR_NAV_ICONS,
@@ -56,7 +56,7 @@ export function resolvePreviewRailFallbackIcon(contentTypeKey: string): LucideIc
   if (contentTypeKey in SIDEBAR_NAV_ICONS) {
     return SIDEBAR_NAV_ICONS[contentTypeKey as SidebarNavIconId]
   }
-  return SIDEBAR_NAV_ICONS.classes
+  return FileText
 }
 
 export function resolvePreviewRailOpenSection(

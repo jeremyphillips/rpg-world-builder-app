@@ -17,16 +17,13 @@ import {
   CONTENT_PREVIEW_STATUS_NOT_CONFIGURED,
   CONTENT_PREVIEW_STATUS_OFF,
   CONTENT_PREVIEW_STATUS_READY,
-  contentPreviewDefaultFeaturesStatus,
-  contentPreviewFeaturesStatus,
   contentPreviewUnnamedName,
 } from '../../lib/forms/preview/content-form-preview-copy'
 import type {
-  ContentPreviewDetail,
   ContentPreviewIdentity,
-  ContentPreviewResources,
   ContentPreviewSection,
 } from '../../lib/forms/preview/content-form-preview.types'
+import type { ClassPreviewResources } from './class-preview-resources'
 import { featuresFromFormValues } from './class-feature-form-fields'
 import type { ClassFormValues } from './class-form-fields'
 import { classCreateDefaultValues, proficienciesFromFormValues } from './class-form-values'
@@ -36,6 +33,14 @@ import {
   type ClassDetailViewModelSource,
   type ClassDisplayVocabulary,
 } from './class-display'
+
+function contentPreviewDefaultFeaturesStatus(count: number): string {
+  return `${count} default features`
+}
+
+function contentPreviewFeaturesStatus(count: number): string {
+  return `${count} features`
+}
 
 export const CLASS_PREVIEW_FACT_LABELS = {
   hitDie: 'Hit die',
@@ -194,14 +199,6 @@ function buildProficienciesSection(
   }
 }
 
-function spellcastingDerivedKind(
-  preparation: string | undefined,
-): ContentPreviewSection['derivedKind'] {
-  if (preparation === 'known') return 'known'
-  if (preparation === 'full_list') return 'fullList'
-  return 'prepared'
-}
-
 function spellcastingFacts(
   spellcasting: ClassFormValues['spellcasting'] | undefined,
 ): PreviewRailFact[] {
@@ -240,7 +237,7 @@ function buildSpellcastingSection(values: ClassFormValues): ContentPreviewSectio
   const preparation = spellcasting?.preparation
 
   return {
-    derivedKind: spellcastingDerivedKind(preparation),
+    derivedKind: 'ready',
     status: preparation ? getSpellPreparationModeLabel(preparation) : CONTENT_PREVIEW_STATUS_READY,
     facts: spellcastingFacts(spellcasting),
   }
@@ -274,7 +271,7 @@ function buildFeaturesSection(values: ClassFormValues): ContentPreviewSection {
   }
 }
 
-function buildSubclassesSection(resources?: ContentPreviewResources): ContentPreviewSection {
+function buildSubclassesSection(resources?: ClassPreviewResources): ContentPreviewSection {
   const subclasses = resources?.subclasses ?? []
   if (subclasses.length === 0) {
     return {
@@ -342,7 +339,7 @@ function buildCharacterCreationSection(
 export function buildClassPreviewSections(
   values: ClassFormValues,
   ctx: ContentFormCtx,
-  resources?: ContentPreviewResources,
+  resources?: ClassPreviewResources,
 ): Record<string, ContentPreviewSection | null> {
   return {
     basics: buildBasicsSection(values),
@@ -405,15 +402,4 @@ export function buildClassPreviewDetailViewModel(
       surface: 'content-detail',
     },
   )
-}
-
-export function buildClassPreviewDetail(
-  values: ClassFormValues,
-  ctx: ContentFormCtx,
-): ContentPreviewDetail {
-  return {
-    name: classPreviewName(values),
-    descriptionHtml: values.description,
-    viewModel: buildClassPreviewDetailViewModel(values, ctx),
-  }
 }

@@ -35,13 +35,13 @@ describe('resolveContentPreviewSectionPresentation', () => {
         true,
       ),
     ).toEqual({
-      marker: 'attention',
+      marker: 'needsAttention',
       status: CONTENT_PREVIEW_NEEDS_ATTENTION,
       statusTone: 'warning',
     })
   })
 
-  it('maps Ready to a complete marker with success tone', () => {
+  it('maps Ready to a ready marker with success tone', () => {
     expect(
       resolveContentPreviewSectionPresentation(
         { derivedKind: 'ready', status: CONTENT_PREVIEW_STATUS_READY },
@@ -49,7 +49,7 @@ describe('resolveContentPreviewSectionPresentation', () => {
         false,
       ),
     ).toEqual({
-      marker: 'complete',
+      marker: 'ready',
       status: CONTENT_PREVIEW_STATUS_READY,
       statusTone: 'success',
     })
@@ -70,14 +70,8 @@ describe('resolveDerivedContentPreviewPresentation', () => {
     })
   })
 
-  it.each([
-    'ready',
-    'count',
-    'prepared',
-    'known',
-    'fullList',
-  ] as const satisfies readonly ContentPreviewDerivedKind[])(
-    'maps %s to complete',
+  it.each(['ready', 'count'] as const satisfies readonly ContentPreviewDerivedKind[])(
+    'maps %s to ready',
     (derivedKind) => {
       expect(
         resolveDerivedContentPreviewPresentation({
@@ -85,7 +79,7 @@ describe('resolveDerivedContentPreviewPresentation', () => {
           status: 'Prepared',
         }),
       ).toEqual({
-        marker: 'complete',
+        marker: 'ready',
         status: 'Prepared',
       })
     },
@@ -98,7 +92,7 @@ describe('resolveDerivedContentPreviewPresentation', () => {
         status: '20 features',
       }),
     ).toEqual({
-      marker: 'complete',
+      marker: 'ready',
       status: '20 features',
     })
   })

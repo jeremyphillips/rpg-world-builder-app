@@ -32,11 +32,12 @@ import {
 import { featureToFormRow } from './class-feature-form-fields'
 import { startingEquipmentToFormValues } from './character-creation/class-starting-equipment-form-values'
 import { characterCreationProficienciesToFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
+import { ClassPreviewPlayerHost } from './class-preview-player-host'
+import { buildClassPreviewIdentity, buildClassPreviewSections } from './class-preview-projection'
 import {
-  buildClassPreviewDetail,
-  buildClassPreviewIdentity,
-  buildClassPreviewSections,
-} from './class-preview-projection'
+  ClassPreviewResourcesProvider,
+  type ClassPreviewResources,
+} from './class-preview-resources'
 
 function characterCreationToFormValues(
   entity: CharacterClass,
@@ -58,7 +59,12 @@ function characterCreationToFormValues(
   }
 }
 
-const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassInput> = {
+const classFormDef: ContentFormDef<
+  CharacterClass,
+  ClassFormValues,
+  CreateClassInput,
+  ClassPreviewResources
+> = {
   routeKey: 'classes',
 
   schema: classFormSchema,
@@ -111,7 +117,8 @@ const classFormDef: ContentFormDef<CharacterClass, ClassFormValues, CreateClassI
   preview: {
     buildIdentity: buildClassPreviewIdentity,
     buildSections: buildClassPreviewSections,
-    buildPreviewDetail: buildClassPreviewDetail,
+    PreviewResources: ClassPreviewResourcesProvider,
+    renderPlayerPreview: ClassPreviewPlayerHost,
   },
 }
 

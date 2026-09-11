@@ -230,7 +230,6 @@ export function TabbedForm<TFieldValues extends FieldValues>({
       onActiveTabChange={setActiveTabId}
       stickyChrome={stickyChrome}
       stickyTabsClassName={stickyTabsClassName}
-      omitPanelBottomPadding={externalFooter}
       tabRowTrailing={tabRowTrailing}
     />
   )

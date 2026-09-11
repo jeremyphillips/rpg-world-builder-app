@@ -13,7 +13,6 @@ import {
   CONTENT_PREVIEW_STATUS_NONE,
   CONTENT_PREVIEW_STATUS_NOT_CONFIGURED,
   CONTENT_PREVIEW_STATUS_OFF,
-  contentPreviewDefaultFeaturesStatus,
 } from '../../lib/forms/preview/content-form-preview-copy'
 import { resolveContentPreviewSectionPresentation } from '../../lib/forms/preview/content-preview-section-state'
 
@@ -61,7 +60,7 @@ describe('class preview projection', () => {
     })
     expect(sections.features).toMatchObject({
       derivedKind: 'count',
-      status: contentPreviewDefaultFeaturesStatus(5),
+      status: '5 default features',
     })
     expect(sections.subclasses).toMatchObject({
       derivedKind: 'none',

@@ -869,11 +869,6 @@ export {
   statusIconGlyphVariants,
   STATUS_ICON_VARIANTS,
   STATUS_ICON_TOOLTIP_LABELS,
-  STATUS_ICON_STROKE_WIDTH,
-  STATUS_ICON_OFF_SLASH_STROKE_WIDTH,
-  STATUS_ICON_OFF_SLASH_SIZE_SM_CLASSES,
-  STATUS_ICON_OFF_SLASH_SIZE_MD_CLASSES,
-  statusIconGlyphForegroundClasses,
   type StatusIconVariantProps,
 } from './components/ui/status-icon.variants'
 export {
