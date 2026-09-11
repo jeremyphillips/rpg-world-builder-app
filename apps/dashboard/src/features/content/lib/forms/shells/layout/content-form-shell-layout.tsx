@@ -21,8 +21,6 @@ import {
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 import type { CoordinatedSaveSavedEvent } from '../session/use-content-save-session'
 import { ContentSchemaFormShell } from './content-schema-form-shell'
-import { ContentFormInlineBreadcrumb } from './content-form-page-shell'
-import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import {
   CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
   CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
@@ -39,7 +37,7 @@ export function ContentFormComingSoon() {
 
 export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: string }) {
   return (
-    <NarrowPage spacing="relaxed" className="pb-10">
+    <NarrowPage rhythm="relaxed" className="pb-10">
       <Heading variant="page" as="h1">
         {heading}
       </Heading>
@@ -154,16 +152,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         identityLayout: CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
         availabilityPresentation: CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
       }}
-      headerPrefix={
-        hasContentFormPreview(def) ? (
-          <>
-            <ContentFormInlineBreadcrumb />
-            {formHeaderPrefix}
-          </>
-        ) : (
-          formHeaderPrefix
-        )
-      }
+      headerPrefix={formHeaderPrefix}
       previewDraftBadge={previewDraftBadge}
     />
   )

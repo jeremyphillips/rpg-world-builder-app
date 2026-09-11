@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority'
 
+import { boundedScrollRegionClasses } from '../ui/bounded-scroll-region.variants'
 import { cn } from '../../lib/utils'
 import { cardRadiusClasses } from '../ui/card.variants'
 import { iconGlyphRootClasses } from '../ui/icon-glyph.variants'
@@ -19,7 +20,7 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col gap-4', {
       plain: 'w-full',
     },
     sticky: {
-      true: 'sticky self-start top-20 max-h-[calc(100dvh-5rem-1.5rem)] min-h-0',
+      true: 'sticky self-start top-0 max-h-full min-h-0',
       false: '',
     },
   },
@@ -36,7 +37,7 @@ export const previewRailIdentityStackClasses = 'flex shrink-0 flex-col gap-4'
 export const previewRailIdentityRowClasses = 'flex items-center gap-3'
 
 /** Sections-only scroll body — header, identity, and footer stay put. */
-export const previewRailScrollRegionClasses = 'min-h-0 flex-1 overflow-y-auto'
+export const previewRailScrollRegionClasses = cn('min-h-0 flex-1', boundedScrollRegionClasses)
 
 export const previewRailFooterClasses = 'flex shrink-0 flex-col gap-4'
 

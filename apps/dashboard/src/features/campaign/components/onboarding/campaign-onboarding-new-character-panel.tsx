@@ -26,7 +26,7 @@ export function CampaignOnboardingNewCharacterPanel({
   } = useCampaignPcOnboardingBuildContext(campaignId, session?.user.id)
 
   return (
-    <WidePage spacing="relaxed" className="flex min-h-0 flex-1 flex-col">
+    <WidePage scroll="viewport" spacing="none" rhythm="relaxed">
       <div className="mb-4 flex flex-col gap-1">
         <Heading variant="section" as="h2">
           {context.campaign.name}

@@ -33,7 +33,7 @@ export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
   )
 
   return (
-    <WidePage spacing="relaxed">
+    <WidePage rhythm="relaxed">
       <PageHeader heading="Homebrew" />
       <Text variant="muted">{HOMEBREW_DESCRIPTION}</Text>
 

@@ -28,7 +28,7 @@ export function CharacterSheetDetailShell({
   children,
 }: CharacterSheetDetailShellProps) {
   return (
-    <WidePage spacing="relaxed">
+    <WidePage rhythm="relaxed">
       {scope === 'campaign' ? (
         <Heading variant="page" as="h1" className="mb-6">
           Campaign character

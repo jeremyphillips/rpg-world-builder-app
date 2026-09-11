@@ -4,11 +4,7 @@ import { findBrowsableVocabularyCategory } from '@rpg/contracts'
 import { AdminRouteGuard } from '@/features/admin'
 import { AuthGuard } from '@/features/auth'
 import { ROUTES } from '@/app/routes'
-import type {
-  BreadcrumbModeHandle,
-  BreadcrumbPlacementHandle,
-  CrumbHandle,
-} from '@/app/breadcrumbs'
+import type { BreadcrumbModeHandle, CrumbHandle } from '@/app/breadcrumbs'
 import { collectionCrumbHref, entityDetailCrumbHref } from '@/app/breadcrumbs'
 import {
   EQUIPMENT_FAMILY_PATHS,
@@ -336,11 +332,7 @@ const router = createBrowserRouter(
                   } satisfies CrumbHandle,
                   children: [
                     { index: true, element: <ClassesOverviewRoute /> },
-                    {
-                      path: 'new',
-                      element: <ClassCreateRoute />,
-                      handle: { breadcrumbPlacement: 'inline' } satisfies BreadcrumbPlacementHandle,
-                    },
+                    { path: 'new', element: <ClassCreateRoute /> },
                     {
                       path: ':classId',
                       element: <Outlet />,
@@ -358,10 +350,7 @@ const router = createBrowserRouter(
                         {
                           path: 'edit',
                           element: <ClassEditRoute />,
-                          handle: {
-                            breadcrumbMode: 'edit',
-                            breadcrumbPlacement: 'inline',
-                          } satisfies BreadcrumbModeHandle & BreadcrumbPlacementHandle,
+                          handle: { breadcrumbMode: 'edit' } satisfies BreadcrumbModeHandle,
                         },
                       ],
                     },

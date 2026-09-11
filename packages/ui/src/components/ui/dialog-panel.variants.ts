@@ -1,5 +1,6 @@
 import { cva } from 'class-variance-authority'
 
+import { boundedScrollRegionClasses } from './bounded-scroll-region.variants'
 import { cn } from '../../lib/utils'
 
 /**
@@ -52,7 +53,8 @@ export const dialogPanelScrollRegionFocusClearanceClasses = 'px-1'
  * clearance so the last block can scroll fully into view.
  */
 export const dialogPanelScrollRegionClasses = cn(
-  'min-h-0 flex-1 overflow-y-auto',
+  'min-h-0 flex-1',
+  boundedScrollRegionClasses,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionFocusClearanceClasses,
 )

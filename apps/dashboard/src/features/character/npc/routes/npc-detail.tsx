@@ -21,7 +21,7 @@ export function NpcDetail() {
   } = useNpcDetailPage()
 
   return (
-    <WidePage spacing="relaxed">
+    <WidePage rhythm="relaxed">
       <PageLoadState
         isPending={isPending}
         isError={isError}

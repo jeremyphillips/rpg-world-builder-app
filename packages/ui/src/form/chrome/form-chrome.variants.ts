@@ -46,11 +46,11 @@ export const formTabbedChromeRhythmStackClasses = 'gap-4'
 
 /** Sticky actions bar — save/cancel and form-level errors stay reachable on long forms. */
 export const formStickyActionsBarClasses =
-  'sticky bottom-0 z-20 mt-6 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
+  'sticky bottom-0 z-20 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
 
 /** Docked actions bar — flex-column footer below a bounded scroll body (content forms). */
 export const formDockedActionsBarClasses =
-  'z-20 mt-6 shrink-0 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
+  'z-20 shrink-0 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
 
 /** Column shell for sticky chrome — pairs scroll body with a docked footer. */
 export const formStickyScrollShellClasses = 'flex min-h-0 flex-1 flex-col'

@@ -375,7 +375,7 @@ These modules support many content types but are **not** per-type form splits:
 
 ### `ContentFormDef.preview`
 
-Optional. When present, create/edit shells switch to `WidePage`, inline form-column breadcrumbs, and a `2xl` persistent PreviewRail (sheet + compact **Preview** trigger below that). Register three builders — `buildIdentity`, `buildSections`, `buildPreviewDetail` — keyed so `buildSections` keys **exactly equal** `buildTabs` ids (`null` = explicit opt-out). Shared copy comes from `CONTENT_TYPE_TERMS`. Publish readiness uses `resolveContentPublishSchema` (the same helper as the Publish action). Class is the reference implementation (`class-preview-projection.ts`); types without `preview` keep NarrowPage.
+Optional. When present, create/edit shells switch to `WidePage` and a `2xl` persistent PreviewRail (sheet + compact **Preview** trigger below that). Register three builders — `buildIdentity`, `buildSections`, `buildPreviewDetail` — keyed so `buildSections` keys **exactly equal** `buildTabs` ids (`null` = explicit opt-out). Shared copy comes from `CONTENT_TYPE_TERMS`. Publish readiness uses `resolveContentPublishSchema` (the same helper as the Publish action). Class is the reference implementation (`class-preview-projection.ts`); types without `preview` keep NarrowPage.
 
 ### Create vs edit action state
 

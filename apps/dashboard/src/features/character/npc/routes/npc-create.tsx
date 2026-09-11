@@ -13,7 +13,7 @@ export function NpcCreate() {
 
   return (
     <NpcAuthoringGate campaignId={campaignId}>
-      <WidePage spacing="relaxed" className="flex min-h-0 flex-1 flex-col">
+      <WidePage scroll="viewport" spacing="none" rhythm="relaxed">
         <PageLoadState
           isPending={isPending}
           isError={isError}

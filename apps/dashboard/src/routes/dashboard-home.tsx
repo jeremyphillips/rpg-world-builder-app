@@ -17,11 +17,17 @@ export function DashboardHome() {
   } = useDashboardHomeViewModel()
 
   if (isPending) {
-    return <Spinner />
+    return (
+      <NarrowPage>
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      </NarrowPage>
+    )
   }
 
   return (
-    <NarrowPage spacing="relaxed">
+    <NarrowPage rhythm="relaxed">
       <div className="space-y-1">
         <Heading variant="page" as="h1">
           {welcome.title}

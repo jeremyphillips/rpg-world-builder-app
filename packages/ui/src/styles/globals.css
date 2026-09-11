@@ -730,6 +730,10 @@
   }
 }
 
+@utility scrollbar-gutter-stable {
+  scrollbar-gutter: stable;
+}
+
 @layer base {
   /* Structural default only — semantic shells must set an explicit border role utility. */
   * {

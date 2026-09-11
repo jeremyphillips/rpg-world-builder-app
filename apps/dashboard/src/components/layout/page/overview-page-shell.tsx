@@ -23,7 +23,7 @@ export function OverviewPageShell({
   children,
 }: OverviewPageShellProps) {
   return (
-    <WidePage spacing="list">
+    <WidePage rhythm="list">
       <PageHeader heading={heading} actions={actions} />
       <PageLoadState
         isPending={isPending}

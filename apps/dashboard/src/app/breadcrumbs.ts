@@ -27,10 +27,6 @@ export interface BreadcrumbModeHandle {
   breadcrumbMode: 'edit'
 }
 
-export interface BreadcrumbPlacementHandle {
-  breadcrumbPlacement: 'inline'
-}
-
 /**
  * Shape every route's `handle` must satisfy to participate in breadcrumbs.
  * Attach via `handle: { crumb: … }` on a `createBrowserRouter` route object.
@@ -55,15 +51,6 @@ export function hasBreadcrumbMode(handle: unknown): handle is BreadcrumbModeHand
     handle !== null &&
     'breadcrumbMode' in handle &&
     (handle as BreadcrumbModeHandle).breadcrumbMode === 'edit'
-  )
-}
-
-export function hasInlineBreadcrumbPlacement(handle: unknown): handle is BreadcrumbPlacementHandle {
-  return (
-    typeof handle === 'object' &&
-    handle !== null &&
-    'breadcrumbPlacement' in handle &&
-    (handle as BreadcrumbPlacementHandle).breadcrumbPlacement === 'inline'
   )
 }
 

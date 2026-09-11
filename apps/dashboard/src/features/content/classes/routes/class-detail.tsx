@@ -61,7 +61,7 @@ export function ClassDetailContent({
   })
 
   return (
-    <WidePage spacing="relaxed">
+    <WidePage rhythm="relaxed">
       <ClassDetailBody
         name={characterClass.name}
         nameBadge={<ContentStatusNameBadge status={characterClass.status} />}

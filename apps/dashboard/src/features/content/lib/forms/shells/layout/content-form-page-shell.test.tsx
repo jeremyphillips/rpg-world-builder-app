@@ -1,20 +1,17 @@
 import type { ReactElement } from 'react'
-import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { describe, expect, it } from 'vitest'
+import { render } from '@testing-library/react'
+
+import { pageScrollClasses } from '@/components/layout/page/page-scroll.variants'
 
 import { ContentFormPageShell } from './content-form-page-shell'
 
-vi.mock('@/components/layout/breadcrumb/use-resolved-breadcrumbs', () => ({
-  useResolvedBreadcrumbs: () => [{ label: 'Classes', href: '/classes' }],
-}))
-
 function renderShell(ui: ReactElement) {
-  return render(<MemoryRouter>{ui}</MemoryRouter>)
+  return render(ui)
 }
 
 describe('ContentFormPageShell', () => {
-  it('uses NarrowPage when preview layout is disabled', () => {
+  it('uses NarrowPage viewport shell when preview layout is disabled', () => {
     const { container } = renderShell(
       <ContentFormPageShell usePreviewLayout={false}>
         <p>Form body</p>
@@ -24,21 +21,19 @@ describe('ContentFormPageShell', () => {
     expect(container.firstChild).toHaveClass(
       'mx-auto',
       'max-w-4xl',
-      'flex',
-      'flex-1',
-      'overflow-hidden',
+      ...pageScrollClasses.viewport.split(/\s+/),
     )
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+    expect(container.firstChild).not.toHaveClass('py-8')
   })
 
-  it('uses WidePage when preview layout is enabled', () => {
+  it('uses WidePage viewport shell when preview layout is enabled', () => {
     const { container } = renderShell(
       <ContentFormPageShell usePreviewLayout>
         <p>Form body</p>
       </ContentFormPageShell>,
     )
 
-    expect(container.firstChild).toHaveClass('w-full', 'flex', 'flex-1', 'overflow-hidden')
-    expect(container.firstChild).not.toHaveClass('max-w-4xl')
+    expect(container.firstChild).toHaveClass('w-full', ...pageScrollClasses.viewport.split(/\s+/))
+    expect(container.firstChild).not.toHaveClass('max-w-4xl', 'py-8')
   })
 })

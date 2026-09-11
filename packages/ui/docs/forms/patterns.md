@@ -13,9 +13,11 @@ Inactive panels suppress per-field error text until their tab is active.
 **Sticky chrome** (default `stickyChrome={true}`): section control `sticky top-0` in the field
 column; `FormActionsBar` docks below a bounded scroll body (`formStickyScrollShellClasses` +
 `formStickyScrollBodyClasses`) so save actions stay at the bottom of the viewport on long page
-forms. Pass `stickyChrome={false}` for flat layout. Dashboard content create/edit routes use
-`ContentFormPageShell` (`overflow-hidden flex-1`) inside the viewport-bounded app shell so the
-docked footer stays at the bottom of the main column. Overlay pattern: use `externalFooter` with
+forms. Pass `stickyChrome={false}` for flat layout. Dashboard content create/edit routes mount
+`ContentFormPageShell` with `scroll="viewport" spacing="none"` so the page shell fills the app
+main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer.
+Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
+reserved scrollbar gutters. Overlay pattern: use `externalFooter` with
 `FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar inside scroll content.
 Overlay owners render shell chrome (`Modal.Footer`, `Sheet.Footer`, `DrawerShell.Footer`) and
 place `<FormShellFooterSlot />` inside for semantic footer content. Use `FormShellSubmitButton`

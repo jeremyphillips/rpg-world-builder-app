@@ -24,7 +24,7 @@ export const Compact: Story = {
 
 export const Relaxed: Story = {
   render: () => (
-    <NarrowPage spacing="relaxed">
+    <NarrowPage rhythm="relaxed">
       <Heading variant="page" as="h1">
         New Species
       </Heading>
@@ -35,7 +35,7 @@ export const Relaxed: Story = {
 
 export const Loose: Story = {
   render: () => (
-    <NarrowPage spacing="loose">
+    <NarrowPage rhythm="loose">
       <Heading variant="page" as="h1">
         Account Settings
       </Heading>

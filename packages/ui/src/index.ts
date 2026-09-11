@@ -634,6 +634,7 @@ export {
   type ModalContentVariantProps,
   type ModalSize,
 } from './components/ui/modal.variants'
+export { boundedScrollRegionClasses } from './components/ui/bounded-scroll-region.variants'
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,

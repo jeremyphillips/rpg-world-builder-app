@@ -31,7 +31,7 @@ export function CampaignDetail() {
       }
 
   return (
-    <NarrowPage spacing="list">
+    <NarrowPage rhythm="list">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <CampaignDisplayName display={display} surface="page" />
         <div className="flex flex-wrap items-center gap-2">

@@ -10,6 +10,8 @@ import { useCallback, useState, type ReactNode } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
+import { NarrowPage } from '@/components/layout/page/narrow-page'
+
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import { contentFormPageShellHeadingClasses } from '../layout/content-form-page-shell.variants'
@@ -467,17 +469,21 @@ export function ContentEditShell({
 }: ContentEditShellProps) {
   if (isPending) {
     return (
-      <div className="flex justify-center py-8">
-        <Spinner />
-      </div>
+      <NarrowPage>
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      </NarrowPage>
     )
   }
 
   if (isError) {
     return (
-      <Text variant="destructive" role="alert">
-        {loadErrorLabel}
-      </Text>
+      <NarrowPage>
+        <Text variant="destructive" role="alert">
+          {loadErrorLabel}
+        </Text>
+      </NarrowPage>
     )
   }
 
