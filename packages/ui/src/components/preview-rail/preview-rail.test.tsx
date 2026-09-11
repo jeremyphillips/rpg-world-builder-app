@@ -16,10 +16,6 @@ describe('PreviewRail', () => {
           media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
           name="Fighter"
           availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
-          facts={[
-            { label: 'Hit die', value: 'd8' },
-            { label: 'Primary abilities', value: 'Strength' },
-          ]}
         />
         <PreviewRail.ScrollRegion data-testid="preview-rail-scroll">
           <PreviewRail.Sections defaultValue="basics">
@@ -76,6 +72,37 @@ describe('PreviewRail', () => {
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'true')
     await user.click(basicsTrigger)
     expect(basicsTrigger).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('omits the identity metadata divider when facts are absent', () => {
+    const { container } = render(
+      <PreviewRail>
+        <PreviewRail.Identity
+          media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+          name="Fighter"
+          availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+        />
+      </PreviewRail>,
+    )
+
+    expect(container.querySelector('[data-slot="preview-rail-identity"] .border-t')).toBeNull()
+  })
+
+  it('renders identity metadata with a divider when facts are provided', () => {
+    const { container } = render(
+      <PreviewRail>
+        <PreviewRail.Identity
+          name="Fighter"
+          availability={{ available: true, statusLabel: 'Available' }}
+          facts={[{ label: 'Hit die', value: 'd8' }]}
+        />
+      </PreviewRail>,
+    )
+
+    expect(
+      container.querySelector('[data-slot="preview-rail-identity"] .border-t'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Hit die')).toBeInTheDocument()
   })
 
   it('renders a statusless section without a marker icon', () => {

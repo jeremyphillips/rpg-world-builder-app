@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   resolveContentPreviewAvailability,
   resolveContentPreviewReadinessPanel,
+  resolvePreviewRailOpenSection,
 } from './content-preview-rail.lib'
 import {
   CONTENT_PREVIEW_NOT_READY_TITLE,
@@ -20,6 +21,30 @@ describe('resolveContentPreviewReadinessPanel', () => {
     expect(resolveContentPreviewReadinessPanel(false, false, 2).title).toBe(
       CONTENT_PREVIEW_NOT_READY_TITLE,
     )
+  })
+})
+
+describe('resolvePreviewRailOpenSection', () => {
+  it('follows the active tab by default', () => {
+    expect(resolvePreviewRailOpenSection('proficiencies', null)).toBe('proficiencies')
+  })
+
+  it('honors a manual override for the active tab', () => {
+    expect(
+      resolvePreviewRailOpenSection('proficiencies', {
+        forTabId: 'proficiencies',
+        value: '',
+      }),
+    ).toBe('')
+  })
+
+  it('ignores manual overrides from another tab', () => {
+    expect(
+      resolvePreviewRailOpenSection('spellcasting', {
+        forTabId: 'proficiencies',
+        value: '',
+      }),
+    ).toBe('spellcasting')
   })
 })
 

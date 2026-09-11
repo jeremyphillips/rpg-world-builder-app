@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { TabbedFormTab } from './tabbed-form-panels.client'
+import type { TabbedFormTab } from './tabbed-form-panels.lib'
 
 export type TabbedFormChromeContextValue = {
   formId: string

@@ -5,13 +5,15 @@ import {
   alertDescriptionVariants,
   alertTitleVariants,
   alertVariants,
+  type AlertDensity,
   type AlertVariant,
 } from './alert.variants'
 
-export type { AlertVariant }
+export type { AlertDensity, AlertVariant }
 
 export interface AlertProps extends Omit<React.ComponentPropsWithoutRef<'div'>, 'title'> {
   variant?: AlertVariant
+  density?: AlertDensity
   title?: React.ReactNode
   description?: React.ReactNode
   /** Optional action controls (e.g. links or buttons) rendered beside the copy. */
@@ -24,6 +26,7 @@ export interface AlertProps extends Omit<React.ComponentPropsWithoutRef<'div'>, 
  */
 export function Alert({
   variant = 'default',
+  density = 'comfortable',
   title,
   description,
   actions,
@@ -34,16 +37,19 @@ export function Alert({
   const hasCopy = title != null || description != null || children != null
 
   return (
-    <div role="alert" className={cn(alertVariants({ variant }), className)} {...props}>
+    <div role="alert" className={cn(alertVariants({ variant, density }), className)} {...props}>
       {hasCopy ? (
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           {title ? (
-            <p className={alertTitleVariants({ variant })} data-slot="alert-title">
+            <p className={alertTitleVariants({ variant, density })} data-slot="alert-title">
               {title}
             </p>
           ) : null}
           {description ? (
-            <p className={alertDescriptionVariants({ variant })} data-slot="alert-description">
+            <p
+              className={alertDescriptionVariants({ variant, density })}
+              data-slot="alert-description"
+            >
               {description}
             </p>
           ) : null}

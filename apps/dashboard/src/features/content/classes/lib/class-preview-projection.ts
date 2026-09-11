@@ -1,10 +1,10 @@
 import {
   CLASS_CONTENT_TYPE_TERM,
-  getAbilityLabel,
-  getArmorCategoryEntry,
+  getAbilityCompactLabel,
+  getArmorCategoryPreviewLabel,
   getSpellPreparationModeLabel,
   getSpellcastingProgressionLabel,
-  getWeaponCategoryEntry,
+  getWeaponCategoryPreviewLabel,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
@@ -82,7 +82,7 @@ function formatHitDiePreview(hitDie: ClassFormValues['hitDie'] | string | undefi
 function formatPrimaryAbilitiesPreview(
   abilities: ClassFormValues['primaryAbilities'] | undefined,
 ): string {
-  const labels = (abilities ?? []).map(getAbilityLabel)
+  const labels = (abilities ?? []).map(getAbilityCompactLabel)
   return labels.length > 0 ? labels.join(', ') : CONTENT_PREVIEW_NOT_SET
 }
 
@@ -94,17 +94,6 @@ function identityFacts(values: ClassFormValues): PreviewRailFact[] {
       value: formatPrimaryAbilitiesPreview(values.primaryAbilities),
     },
   ]
-}
-
-function formatArmorCategory(category: string): string {
-  if (category === 'shields') return 'Shields'
-  const label = getArmorCategoryEntry(category)?.label
-  return label ? label.replace(/ Armor$/, ' armor') : category
-}
-
-function formatWeaponCategory(category: string): string {
-  const label = getWeaponCategoryEntry(category)?.label
-  return label ? label.replace(/ Weapon$/, ' weapons') : category
 }
 
 function formatSlugLabel(slug: string): string {
@@ -155,7 +144,6 @@ export function buildClassPreviewIdentity(
 ): ContentPreviewIdentity {
   return {
     name: classPreviewName(values),
-    facts: identityFacts(values),
   }
 }
 
@@ -180,16 +168,16 @@ function buildProficienciesSection(
   appendFact(
     facts,
     CLASS_PREVIEW_FACT_LABELS.savingThrows,
-    (proficiencies?.savingThrows ?? []).map(getAbilityLabel),
+    (proficiencies?.savingThrows ?? []).map(getAbilityCompactLabel),
   )
   appendFact(
     facts,
     CLASS_PREVIEW_FACT_LABELS.armorTraining,
-    (proficiencies?.armor ?? []).map(formatArmorCategory),
+    (proficiencies?.armor ?? []).map(getArmorCategoryPreviewLabel),
   )
 
   const weapons = [
-    ...(proficiencies?.weapons.categories ?? []).map(formatWeaponCategory),
+    ...(proficiencies?.weapons.categories ?? []).map(getWeaponCategoryPreviewLabel),
     ...(proficiencies?.weapons.items ?? []).map(formatSlugLabel),
   ]
   appendFact(facts, CLASS_PREVIEW_FACT_LABELS.weapons, weapons)
@@ -222,7 +210,9 @@ function spellcastingFacts(
 
   facts.push({
     label: CLASS_PREVIEW_FACT_LABELS.spellcastingAbility,
-    value: spellcasting.ability ? getAbilityLabel(spellcasting.ability) : CONTENT_PREVIEW_NOT_SET,
+    value: spellcasting.ability
+      ? getAbilityCompactLabel(spellcasting.ability)
+      : CONTENT_PREVIEW_NOT_SET,
   })
   facts.push({
     label: CLASS_PREVIEW_FACT_LABELS.spellcastingLevel,

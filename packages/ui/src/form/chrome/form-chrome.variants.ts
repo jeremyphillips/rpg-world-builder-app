@@ -29,8 +29,10 @@ export const formTabbedAsideBodyClasses =
   'min-h-0 min-w-0 2xl:col-start-1 2xl:h-full 2xl:row-start-1'
 
 /**
- * Top inset for viewport-bound form scroll bodies — scrolls away with content so
- * sticky tabs can reach the breadcrumb edge. Matches dashboard `pageShellInsetTopClasses`.
+ * Top inset for viewport-bound form scroll bodies — apply via
+ * {@link FormViewportScrollTopInset} as the first child inside the scroll region
+ * (not on the scroll container itself) so sticky tabs can reach `top-0`. Matches
+ * dashboard `pageShellInsetTopClasses`.
  */
 export const formViewportScrollBodyTopInsetClasses = 'pt-8'
 

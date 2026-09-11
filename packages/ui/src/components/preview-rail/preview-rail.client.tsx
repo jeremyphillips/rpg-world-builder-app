@@ -11,6 +11,8 @@ import {
   AccordionTrigger,
 } from '../ui/accordion.client'
 import { Alert } from '../ui/alert'
+import { alertTitleVariants } from '../ui/alert.variants'
+import { ScrollBoundaryRegion } from '../ui/scroll-boundary-region.client'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button.client'
 import { ContentCardHeading } from '../ui/content-card-heading.client'
@@ -40,19 +42,28 @@ import {
   previewRailAvailabilityRowClasses,
   previewRailDividerClasses,
   previewRailFooterClasses,
+  previewRailFooterSectionShellClasses,
+  previewRailFactCompactTextClasses,
   previewRailFactLabelClasses,
   previewRailFactValueClasses,
   previewRailFactsGridClasses,
+  previewRailFactsGridCompactClasses,
   previewRailHeaderRowClasses,
+  previewRailHeaderSectionContentClasses,
+  previewRailHeaderSectionShellClasses,
   previewRailIdentityContentClasses,
   previewRailIdentityRowClasses,
+  previewRailIdentitySectionContentClasses,
+  previewRailIdentitySectionShellClasses,
   previewRailIdentityStackClasses,
-  previewRailScrollRegionClasses,
+  previewRailScrollRegionContentClasses,
+  previewRailScrollRegionShellClasses,
   previewRailMediaFallbackVariants,
   previewRailMediaIconClasses,
   previewRailRootVariants,
   previewRailSectionBodyClasses,
   previewRailSectionBodyDescriptionClasses,
+  previewRailSectionInsetVariants,
   previewRailSectionLabelClasses,
   previewRailSectionMarkerClasses,
   previewRailSectionMarkerToneClasses,
@@ -64,6 +75,12 @@ import {
   previewRailStatusPanelDescriptionClasses,
   previewRailStatusPanelIconClasses,
 } from './preview-rail.variants'
+
+const PreviewRailContext = React.createContext<PreviewRailChrome>('card')
+
+function usePreviewRailChrome() {
+  return React.useContext(PreviewRailContext)
+}
 
 export type PreviewRailProps = React.ComponentPropsWithoutRef<'aside'> & {
   chrome?: PreviewRailChrome
@@ -78,9 +95,11 @@ function PreviewRailRoot({
   ...props
 }: PreviewRailProps) {
   return (
-    <aside className={cn(previewRailRootVariants({ chrome, sticky }), className)} {...props}>
-      {children}
-    </aside>
+    <PreviewRailContext.Provider value={chrome}>
+      <aside className={cn(previewRailRootVariants({ chrome, sticky }), className)} {...props}>
+        {children}
+      </aside>
+    </PreviewRailContext.Provider>
   )
 }
 
@@ -90,12 +109,22 @@ export type PreviewRailHeaderProps = {
 }
 
 function PreviewRailHeader({ title, badge }: PreviewRailHeaderProps) {
+  const chrome = usePreviewRailChrome()
+
   return (
-    <div className={previewRailHeaderRowClasses}>
-      <Heading variant="card" as="h2" className="min-w-0 truncate">
-        {title}
-      </Heading>
-      {badge ? <div className="shrink-0">{badge}</div> : null}
+    <div className={previewRailHeaderSectionShellClasses}>
+      <div
+        className={cn(
+          previewRailHeaderRowClasses,
+          previewRailSectionInsetVariants({ chrome }),
+          previewRailHeaderSectionContentClasses,
+        )}
+      >
+        <Heading variant="card" as="h2" className="min-w-0 truncate">
+          {title}
+        </Heading>
+        {badge ? <div className="shrink-0">{badge}</div> : null}
+      </div>
     </div>
   )
 }
@@ -173,39 +202,70 @@ export type PreviewRailIdentityProps = {
 }
 
 function PreviewRailIdentity({ media, name, availability, facts }: PreviewRailIdentityProps) {
+  const chrome = usePreviewRailChrome()
+
   return (
-    <div className={previewRailIdentityStackClasses}>
-      <div className={previewRailIdentityRowClasses}>
-        {media}
-        <div className={previewRailIdentityContentClasses}>
-          <ContentCardHeading heading={name} density="comfortable" />
-          <PreviewRailAvailabilityLine {...availability} />
+    <div className={previewRailIdentitySectionShellClasses} data-slot="preview-rail-identity">
+      <div
+        className={cn(
+          previewRailIdentityStackClasses,
+          previewRailSectionInsetVariants({ chrome }),
+          previewRailIdentitySectionContentClasses,
+        )}
+      >
+        <div className={previewRailIdentityRowClasses}>
+          {media}
+          <div className={previewRailIdentityContentClasses}>
+            <ContentCardHeading heading={name} density="comfortable" />
+            <PreviewRailAvailabilityLine {...availability} />
+          </div>
         </div>
+        {facts && facts.length > 0 ? (
+          <>
+            <div className={previewRailDividerClasses} />
+            <PreviewRailFacts facts={facts} />
+          </>
+        ) : null}
       </div>
-      {facts && facts.length > 0 ? (
-        <>
-          <div className={previewRailDividerClasses} />
-          <PreviewRailFacts facts={facts} />
-          <div className={previewRailDividerClasses} />
-        </>
-      ) : null}
     </div>
   )
 }
 
 export type PreviewRailFactsProps = {
   facts: PreviewRailFact[]
+  /** Accordion bodies use tighter metadata typography. */
+  density?: 'comfortable' | 'compact'
 }
 
-function PreviewRailFacts({ facts }: PreviewRailFactsProps) {
+function PreviewRailFacts({ facts, density = 'comfortable' }: PreviewRailFactsProps) {
+  const compact = density === 'compact'
+
   return (
-    <dl className={previewRailFactsGridClasses}>
+    <dl
+      className={cn(
+        previewRailFactsGridClasses,
+        compact ? previewRailFactsGridCompactClasses : null,
+      )}
+    >
       {facts.map((fact) => (
         <React.Fragment key={fact.label}>
-          <Text as="dt" variant="muted" className={previewRailFactLabelClasses}>
+          <Text
+            as="dt"
+            variant="muted"
+            className={cn(
+              previewRailFactLabelClasses,
+              compact ? previewRailFactCompactTextClasses : null,
+            )}
+          >
             {fact.label}
           </Text>
-          <Text as="dd" className={previewRailFactValueClasses}>
+          <Text
+            as="dd"
+            className={cn(
+              previewRailFactValueClasses,
+              compact ? previewRailFactCompactTextClasses : null,
+            )}
+          >
             {fact.value}
           </Text>
         </React.Fragment>
@@ -333,7 +393,7 @@ function PreviewRailSectionBody({ description, facts, children }: PreviewRailSec
       {description ? (
         <p className={previewRailSectionBodyDescriptionClasses}>{description}</p>
       ) : null}
-      {facts && facts.length > 0 ? <PreviewRailFacts facts={facts} /> : null}
+      {facts && facts.length > 0 ? <PreviewRailFacts facts={facts} density="compact" /> : null}
       {children}
     </div>
   )
@@ -382,11 +442,11 @@ function PreviewRailStatusPanel({
   const resolvedIcon = icon ?? resolveStatusPanelIcon(variant)
 
   return (
-    <Alert variant={variant}>
-      <div className="flex w-full items-start gap-3">
+    <Alert variant={variant} density="compact">
+      <div className="flex w-full items-start gap-2">
         {resolvedIcon}
         <div className={previewRailStatusPanelContentClasses}>
-          <p className="font-body-emphasis text-foreground">{title}</p>
+          <p className={alertTitleVariants({ variant, density: 'compact' })}>{title}</p>
           {description ? (
             <p className={previewRailStatusPanelDescriptionClasses}>{description}</p>
           ) : null}
@@ -427,10 +487,16 @@ function PreviewRailScrollRegion({
   children,
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) {
+  const chrome = usePreviewRailChrome()
+
   return (
-    <div className={cn(previewRailScrollRegionClasses, className)} {...props}>
-      {children}
-    </div>
+    <ScrollBoundaryRegion
+      className={cn(previewRailScrollRegionShellClasses, className)}
+      viewportClassName={previewRailSectionInsetVariants({ chrome })}
+      {...props}
+    >
+      <div className={previewRailScrollRegionContentClasses}>{children}</div>
+    </ScrollBoundaryRegion>
   )
 }
 
@@ -439,9 +505,20 @@ function PreviewRailFooter({
   children,
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) {
+  const chrome = usePreviewRailChrome()
+
   return (
-    <div className={cn(previewRailFooterClasses, className)} {...props}>
-      {children}
+    <div className={previewRailFooterSectionShellClasses}>
+      <div
+        className={cn(
+          previewRailFooterClasses,
+          previewRailSectionInsetVariants({ chrome }),
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </div>
     </div>
   )
 }

@@ -15,6 +15,7 @@ import {
   formStickyActionsBarTransparentClasses,
   formStickyScrollBodyClasses,
   formStickyTabsTransparentClasses,
+  formViewportScrollBodyTopInsetClasses,
 } from '../chrome/form-chrome.variants'
 
 const schema = z.object({
@@ -182,6 +183,28 @@ describe('TabbedForm', () => {
     for (const token of formStickyScrollBodyClasses.split(/\s+/)) {
       expect(scrollRegion?.className).toContain(token)
     }
+  })
+
+  it('renders scrollBodyClassName as a scroll-away inset inside the scroll region', () => {
+    render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        scrollBodyClassName={formViewportScrollBodyTopInsetClasses}
+      />,
+    )
+
+    const sectionsNav = getSectionsNav()
+    const scrollRegion = sectionsNav.closest('.overflow-y-auto')
+    expect(scrollRegion?.className).not.toContain('pt-8')
+
+    const inset = scrollRegion?.querySelector('[aria-hidden="true"]')
+    expect(inset).toHaveClass('pt-8', 'shrink-0')
+    expect(inset).not.toBeNull()
+    expect(
+      inset!.compareDocumentPosition(sectionsNav) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it('merges stickyTabsClassName and stickyActionsBarClassName onto sticky chrome', () => {

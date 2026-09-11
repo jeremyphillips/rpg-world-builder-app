@@ -19,7 +19,7 @@ import {
   tabbedFormErrorSummaryReviewButtonClasses,
 } from './tabbed-form-error-summary.variants'
 import { navigateTabbedFormToTabIssue } from './navigate-tabbed-form-invalid-submit.client'
-import type { TabbedFormTab } from './tabbed-form-panels.client'
+import type { TabbedFormTab } from './tabbed-form-panels.lib'
 
 export interface TabbedFormErrorSummaryProps {
   tabs: TabbedFormTab[]
@@ -43,23 +43,13 @@ export function TabbedFormErrorSummary({
   const { hasAttemptedSubmit, tabStates } = useTabbedFormTabValidationState(tabs)
 
   const invalidTabs = React.useMemo(
-    () =>
-      tabs.filter((tab) => (tabStates.find((state) => state.tabId === tab.id)?.count ?? 0) > 0),
+    () => tabs.filter((tab) => (tabStates.find((state) => state.tabId === tab.id)?.count ?? 0) > 0),
     [tabs, tabStates],
   )
 
   const handleReviewTab = React.useCallback(
     (tabId: string) => {
-      navigateTabbedFormToTabIssue(
-        form,
-        fields,
-        formId,
-        tabs,
-        ui,
-        tabId,
-        onActiveTabChange,
-        errors,
-      )
+      navigateTabbedFormToTabIssue(form, fields, formId, tabs, ui, tabId, onActiveTabChange, errors)
     },
     [form, fields, formId, tabs, ui, onActiveTabChange, errors],
   )

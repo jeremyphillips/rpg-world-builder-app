@@ -24,22 +24,20 @@ import {
   formStickyScrollBodyClasses,
   formStickyScrollShellClasses,
 } from '../chrome/form-chrome.variants'
+import { FormScrollBodyTopInset } from '../chrome/form-viewport-scroll-top-inset.client'
 import { cn } from '../../lib/utils'
 import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
+import { collectTabbedFormResolverItems, type TabbedFormTab } from './tabbed-form-panels.lib'
 import {
-  collectTabbedFormResolverItems,
   resolveTabbedFormShellClassName,
   TabbedFormFooterRegion,
   TabbedFormPanels,
+  TABBED_FORM_SECTIONS_ARIA_LABEL,
   useTabbedFormSetup,
-  type TabbedFormTab,
 } from './tabbed-form-panels.client'
 
 export type { TabbedFormTab }
-export {
-  collectTabbedFormResolverItems,
-  TABBED_FORM_SECTIONS_ARIA_LABEL,
-} from './tabbed-form-panels.client'
+export { collectTabbedFormResolverItems, TABBED_FORM_SECTIONS_ARIA_LABEL }
 
 export interface TabbedFormProps<TFieldValues extends FieldValues> {
   /** Merged Zod schema covering all tabs' fields combined. */
@@ -260,13 +258,16 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   ) : null
 
   const scrollableBody = (
-    <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
-      {resolvedHeader}
-      {contentWrapper ? contentWrapper(panels) : panels}
-    </FormRhythmStack>
+    <>
+      {scrollBodyClassName ? <FormScrollBodyTopInset className={scrollBodyClassName} /> : null}
+      <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
+        {resolvedHeader}
+        {contentWrapper ? contentWrapper(panels) : panels}
+      </FormRhythmStack>
+    </>
   )
 
-  const scrollBodyClasses = cn(formStickyScrollBodyClasses, scrollBodyClassName)
+  const scrollBodyClasses = formStickyScrollBodyClasses
 
   const columnBody =
     stickyChrome && !externalFooter ? (

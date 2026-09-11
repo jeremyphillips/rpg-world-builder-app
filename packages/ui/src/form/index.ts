@@ -118,6 +118,10 @@ export {
   formTabbedChromeRhythmStackClasses,
   formSheetScrollRegionClasses,
 } from './chrome/form-chrome.variants'
+export {
+  FormScrollBodyTopInset,
+  FormViewportScrollTopInset,
+} from './chrome/form-viewport-scroll-top-inset.client'
 export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
 export {
   FORM_COLUMNS_WIDTH_EQUAL,

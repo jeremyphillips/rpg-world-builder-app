@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
-import { getTermSentenceForm } from './types'
+import { getTermCompactLabel, getTermSentenceForm } from './types'
 import type { GameTermEntry, VocabularyTerm } from './types'
 import { abilityValidationMessages } from './ability-messages'
 
@@ -22,6 +22,7 @@ export const ABILITY_SCORE_TERM = {
 export const ABILITY_ENTRIES = {
   str: {
     label: 'Strength',
+    compactLabel: 'STR',
     description: 'Physical might',
     sentence: {
       singular: 'strength',
@@ -30,6 +31,7 @@ export const ABILITY_ENTRIES = {
   },
   dex: {
     label: 'Dexterity',
+    compactLabel: 'DEX',
     description: 'Agility, reflexes, and balance',
     sentence: {
       singular: 'dexterity',
@@ -38,6 +40,7 @@ export const ABILITY_ENTRIES = {
   },
   con: {
     label: 'Constitution',
+    compactLabel: 'CON',
     description: 'Health and stamina',
     sentence: {
       singular: 'constitution',
@@ -46,6 +49,7 @@ export const ABILITY_ENTRIES = {
   },
   int: {
     label: 'Intelligence',
+    compactLabel: 'INT',
     description: 'Reasoning and memory',
     sentence: {
       singular: 'intelligence',
@@ -54,6 +58,7 @@ export const ABILITY_ENTRIES = {
   },
   wis: {
     label: 'Wisdom',
+    compactLabel: 'WIS',
     description: 'Perceptiveness and mental fortitude',
     sentence: {
       singular: 'wisdom',
@@ -62,6 +67,7 @@ export const ABILITY_ENTRIES = {
   },
   cha: {
     label: 'Charisma',
+    compactLabel: 'CHA',
     description: 'Force of personality',
     sentence: {
       singular: 'charisma',
@@ -128,6 +134,13 @@ export function getAbilityEntry(id: string): GameTermEntry | undefined {
 /** Returns the display label for an ability id. Falls back to the raw value. */
 export function getAbilityLabel(id: string): string {
   return getAbilityEntry(id)?.label ?? id
+}
+
+/** Returns the compact abbreviation for tight UI surfaces (STR, DEX, …). */
+export function getAbilityCompactLabel(id: string): string {
+  const entry = getAbilityEntry(id)
+  if (entry) return getTermCompactLabel(entry)
+  return id.toUpperCase()
 }
 
 /** Lowercase ability phrase for generated prose (e.g. spellcasting ability text). */

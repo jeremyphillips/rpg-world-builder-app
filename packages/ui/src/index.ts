@@ -43,11 +43,12 @@ export {
   EmphasisDetailLine,
   type EmphasisDetailLineProps,
 } from './components/ui/emphasis-detail-line'
-export { Alert, type AlertProps, type AlertVariant } from './components/ui/alert'
+export { Alert, type AlertDensity, type AlertProps, type AlertVariant } from './components/ui/alert'
 export {
   alertVariants,
   alertTitleVariants,
   alertDescriptionVariants,
+  ALERT_DENSITIES,
   ALERT_VARIANTS,
   type AlertVariantProps,
 } from './components/ui/alert.variants'
@@ -638,6 +639,26 @@ export {
   boundedScrollRegionClasses,
   boundedScrollRegionEndInsetClasses,
 } from './components/ui/bounded-scroll-region.variants'
+export {
+  ScrollBoundaryRegion,
+  useScrollBoundaryRegion,
+  type ScrollBoundaryRegionProps,
+} from './components/ui/scroll-boundary-region.client'
+export {
+  resolveScrollBoundaryState,
+  SCROLL_BOUNDARY_END_TOLERANCE_PX,
+  type ScrollBoundaryState,
+} from './components/ui/scroll-boundary-region.lib'
+export {
+  scrollBoundaryBottomShadowClasses,
+  scrollBoundaryRegionRootClasses,
+  scrollBoundaryRegionViewportClasses,
+  scrollBoundaryBottomShadowHeightClasses,
+  scrollBoundaryBottomShadowTintClasses,
+  scrollBoundaryTopShadowHeightClasses,
+  scrollBoundaryTopShadowTintClasses,
+  scrollBoundaryTopShadowClasses,
+} from './components/ui/scroll-boundary-region.variants'
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,

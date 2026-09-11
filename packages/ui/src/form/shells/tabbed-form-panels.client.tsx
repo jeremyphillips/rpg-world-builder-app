@@ -16,7 +16,7 @@ import { ArrayItemPresentationContext } from '../context/array-item-presentation
 import { useFormSectionContext } from '../context/form-section.context'
 import { resolveFormDensity } from '../form-density'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
-import { buildDefaultValues, type FormItem } from '../field-config'
+import { buildDefaultValues } from '../field-config'
 import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-validation-state.client'
 import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-actions-bar'
 import { getTabPanelElementId, getTabPanelIdPrefix } from './tabbed-form-id.lib'
@@ -31,44 +31,13 @@ import {
   formTabPanelsBottomPaddingClasses,
 } from '../chrome/form-chrome.variants'
 import { warnHeaderOnlyTabValidationWiring } from './warn-header-only-tab-validation-wiring'
+import { collectTabbedFormResolverItems, type TabbedFormTab } from './tabbed-form-panels.lib'
+
+export type { TabbedFormTab }
+export { collectTabbedFormResolverItems }
 
 /** Accessible name for the TabbedForm section control. */
 export const TABBED_FORM_SECTIONS_ARIA_LABEL = 'Form sections'
-
-/** A single tab definition: an id, a display label, and its ordered fields. */
-export interface TabbedFormTab {
-  id: string
-  label: string
-  fields: FormItem[]
-  /** Optional leading icon for the section control (decorative; pass `aria-hidden`). */
-  leadingIcon?: React.ReactNode
-  /**
-   * Extra root paths whose validation issues belong to this tab (merged with
-   * prefixes inferred from `fields`; supplements only — does not replace them).
-   */
-  errorPaths?: string[]
-  /**
-   * Field configs merged into the Zod resolver error map only — not rendered.
-   * Use for header/master-detail editors whose controls register under paths
-   * outside `fields` (e.g. `heritage.name` with `namePrefix` in the tab header).
-   */
-  resolverFields?: FormItem[]
-  /**
-   * Optional non-field UI rendered above this tab's fields (intro copy, links,
-   * placeholders). Omit fields for a panel that is entirely non-input content.
-   */
-  header?: React.ReactNode
-  /**
-   * When true, skips dev warnings and dashboard test assertions for header-only
-   * validation wiring (e.g. non-form chrome tabs like subclass management).
-   */
-  skipHeaderOnlyValidationWiring?: boolean
-}
-
-/** Merges visible tab fields with supplemental resolver-only configs. */
-export function collectTabbedFormResolverItems(tabs: readonly TabbedFormTab[]): FormItem[] {
-  return tabs.flatMap((tab) => [...tab.fields, ...(tab.resolverFields ?? [])])
-}
 
 export interface TabbedFormFooterRegionProps {
   hasFooterRegion: boolean

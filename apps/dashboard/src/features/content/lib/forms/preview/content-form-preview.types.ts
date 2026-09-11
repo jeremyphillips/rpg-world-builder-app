@@ -17,7 +17,8 @@ export type ContentPreviewDerivedKind =
 export type ContentPreviewIdentity = {
   name: string
   imageSrc?: string
-  facts: PreviewRailFact[]
+  /** Optional header metadata — omit when facts belong in a scroll section instead. */
+  facts?: PreviewRailFact[]
 }
 
 export type ContentPreviewSection = {

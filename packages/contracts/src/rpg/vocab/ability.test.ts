@@ -8,6 +8,7 @@ import {
   abilityScoreSchema,
   buildGroupedSpellcastingAbilityOptions,
   characterAbilityScoreSchema,
+  getAbilityCompactLabel,
   getAbilitySentenceForm,
 } from './ability'
 import { formatFieldMessage } from '../../validation/define-message'
@@ -77,6 +78,18 @@ describe('ability sentence forms', () => {
   it('returns lowercase ability phrases for generated prose', () => {
     expect(getAbilitySentenceForm('str', 1)).toBe('strength')
     expect(getAbilitySentenceForm('cha', 2)).toBe('charisma')
+  })
+})
+
+describe('getAbilityCompactLabel', () => {
+  it('returns uppercase abbreviations from vocabulary entries', () => {
+    expect(getAbilityCompactLabel('str')).toBe('STR')
+    expect(getAbilityCompactLabel('dex')).toBe('DEX')
+    expect(getAbilityCompactLabel('int')).toBe('INT')
+  })
+
+  it('falls back to an uppercased raw id', () => {
+    expect(getAbilityCompactLabel('custom')).toBe('CUSTOM')
   })
 })
 

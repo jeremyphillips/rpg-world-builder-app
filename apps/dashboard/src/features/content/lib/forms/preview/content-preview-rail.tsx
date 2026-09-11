@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
@@ -94,6 +94,11 @@ function ContentPreviewRailBody({
   const [manualSection, setManualSection] = useState<{ forTabId: string; value: string } | null>(
     null,
   )
+
+  useEffect(() => {
+    setManualSection(null)
+  }, [activeTabId])
+
   const openSection = resolvePreviewRailOpenSection(activeTabId, manualSection)
   const preview = def.preview
   const contentTypeKey = def.routeKey as ContentTypeKey
@@ -200,7 +205,7 @@ function ContentPreviewRailView({
         media={<PreviewRail.Media imageSrc={identity.imageSrc} fallbackIcon={<FallbackIcon />} />}
         name={identity.name}
         availability={resolveContentPreviewAvailability(access, accessSummary)}
-        facts={identity.facts}
+        {...(identity.facts && identity.facts.length > 0 ? { facts: identity.facts } : {})}
       />
       <PreviewRail.ScrollRegion>
         <PreviewRail.Sections

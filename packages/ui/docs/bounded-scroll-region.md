@@ -22,11 +22,24 @@ across overlay scrollbar platforms.
 
 ## Composition
 
-| Consumer                                                                                    | Composition                                          |
-| ------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)           | `min-h-0 flex-1` + primitive + `ps-1` + bottom inset |
-| [`previewRailScrollRegionClasses`](../src/components/preview-rail/preview-rail.variants.ts) | `min-h-0 flex-1` + primitive                         |
-| [`formStickyScrollBodyClasses`](../src/form/chrome/form-chrome.variants.ts)                 | re-exports `dialogPanelScrollRegionClasses`          |
+| Consumer                                                                                         | Composition                                                                                           |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)                | `min-h-0 flex-1` + primitive + `ps-1` + bottom inset                                                  |
+| [`previewRailScrollRegionShellClasses`](../src/components/preview-rail/preview-rail.variants.ts) | `min-h-0 flex-1` via [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx) |
+| [`formStickyScrollBodyClasses`](../src/form/chrome/form-chrome.variants.ts)                      | re-exports `dialogPanelScrollRegionClasses`                                                           |
+
+## Scroll boundary shadows
+
+[`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx)
+composes the bounded scroll viewport with low-elevation, surface-relative gradient
+shadows at the top and bottom edges:
+
+- `scrollTop === 0` → no top shadow (adjacent header owns the divider)
+- `scrollTop > 0` → subtle downward fade
+- not at scroll end → subtle upward fade
+- at scroll end → no bottom shadow (adjacent footer owns the divider)
+
+Storybook: **Primitives/ScrollBoundaryRegion**.
 
 ## Follow-up adopters
 

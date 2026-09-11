@@ -35,11 +35,17 @@ describe('class preview projection', () => {
     expect(Object.keys(sections).sort()).toEqual([...tabs.map((tab) => tab.id)].sort())
   })
 
-  it('uses Unnamed Class and live identity facts including defaults', () => {
+  it('uses Unnamed Class without header metadata facts', () => {
     const identity = buildClassPreviewIdentity(createValues(), emptyCtx)
 
     expect(identity.name).toBe('Unnamed Class')
-    expect(identity.facts).toEqual([
+    expect(identity.facts).toBeUndefined()
+  })
+
+  it('projects hit die and primary abilities into the basics section', () => {
+    const sections = buildClassPreviewSections(createValues(), emptyCtx)
+
+    expect(sections.basics?.facts).toEqual([
       { label: CLASS_PREVIEW_FACT_LABELS.hitDie, value: CONTENT_PREVIEW_NOT_SET },
       { label: CLASS_PREVIEW_FACT_LABELS.primaryAbilities, value: CONTENT_PREVIEW_NOT_SET },
     ])
@@ -83,6 +89,49 @@ describe('class preview projection', () => {
     expect(resolveContentPreviewSectionPresentation(sections.basics!, false, false)).toEqual({
       marker: 'incomplete',
     })
+  })
+
+  it('uses compact vocabulary labels for preview rail facts', () => {
+    const sections = buildClassPreviewSections(
+      createValues({
+        hitDie: 8,
+        primaryAbilities: ['str', 'dex'],
+        proficiencies: {
+          ...classCreateDefaultValues.proficiencies!,
+          savingThrows: ['con', 'wis'],
+          armor: ['light', 'shields'],
+          weapons: {
+            categories: ['simple', 'martial'],
+            items: [],
+          },
+        },
+        hasSpellcasting: true,
+        spellcasting: {
+          ...classCreateDefaultValues.spellcasting!,
+          ability: 'int',
+        },
+      }),
+      emptyCtx,
+    )
+
+    expect(sections.basics?.facts).toEqual([
+      { label: CLASS_PREVIEW_FACT_LABELS.hitDie, value: 'd8' },
+      { label: CLASS_PREVIEW_FACT_LABELS.primaryAbilities, value: 'STR, DEX' },
+    ])
+    expect(sections.proficiencies?.facts).toEqual([
+      { label: CLASS_PREVIEW_FACT_LABELS.savingThrows, value: 'CON, WIS' },
+      {
+        label: CLASS_PREVIEW_FACT_LABELS.armorTraining,
+        value: 'light, shields',
+      },
+      { label: CLASS_PREVIEW_FACT_LABELS.weapons, value: 'simple, martial' },
+      { label: CLASS_PREVIEW_FACT_LABELS.skills, value: CONTENT_PREVIEW_NOT_SET },
+    ])
+    expect(sections.spellcasting?.facts).toEqual(
+      expect.arrayContaining([
+        { label: CLASS_PREVIEW_FACT_LABELS.spellcastingAbility, value: 'INT' },
+      ]),
+    )
   })
 
   it('reads subclass count from the tab resource, not route mode', () => {

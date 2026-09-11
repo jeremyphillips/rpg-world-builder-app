@@ -20,7 +20,7 @@ import { collectArraySections } from '../errors/resolve-field-order'
 import { resolveIssueFocusControlId } from '../errors/resolve-issue-focus-target'
 import type { FormItem } from '../field-config'
 import type { FormUiContextValue } from '../context/form-ui.context'
-import type { TabbedFormTab } from './tabbed-form-panels.client'
+import type { TabbedFormTab } from './tabbed-form-panels.lib'
 import { getTabPanelIdPrefix } from './tabbed-form-id.lib'
 
 function getItemValuesFromForm<TFieldValues extends FieldValues>(

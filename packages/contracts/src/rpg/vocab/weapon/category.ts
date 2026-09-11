@@ -1,6 +1,11 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import { formatVocabularySlugLabel } from '../format-slug-label'
-import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from '../types'
+import {
+  getTermCompactLabel,
+  getTermSentenceForm,
+  type GameTermEntry,
+  type VocabularyTerm,
+} from '../types'
 
 // ---------------------------------------------------------------------------
 // Weapon categories — simple/martial taxonomy consumed by class proficiencies
@@ -19,6 +24,7 @@ export const WEAPON_CATEGORY_TERM = {
 export const WEAPON_CATEGORY_ENTRIES = {
   simple: {
     label: 'Simple Weapon',
+    compactLabel: 'simple',
     description:
       'Simple weapons are easy to use. Most creatures can wield a simple weapon even without training.',
     sentence: {
@@ -28,6 +34,7 @@ export const WEAPON_CATEGORY_ENTRIES = {
   },
   martial: {
     label: 'Martial Weapon',
+    compactLabel: 'martial',
     description:
       'Martial weapons require training to use effectively. Most warriors use martial weapons because of their superior damage and versatility.',
     sentence: {
@@ -68,4 +75,10 @@ export function getWeaponCategoryCompactLabel(category: string): string {
     return `${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}`
   }
   return `${formatVocabularySlugLabel(category)} weapons`
+}
+
+/** Short preview label for rail summaries (e.g. "Simple", "Martial"). */
+export function getWeaponCategoryPreviewLabel(category: string): string {
+  const entry = getWeaponCategoryEntry(category)
+  return entry ? getTermCompactLabel(entry) : formatVocabularySlugLabel(category)
 }

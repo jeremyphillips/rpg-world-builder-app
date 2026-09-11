@@ -2,6 +2,7 @@ import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { formatVocabularySlugLabel } from '../format-slug-label'
 import {
+  getTermCompactLabel,
   getTermLabelSingular,
   getTermSentenceForm,
   type GameTermEntry,
@@ -25,6 +26,7 @@ export const ARMOR_CATEGORY_TERM = {
 export const ARMOR_CATEGORY_ENTRIES = {
   light: {
     label: 'Light Armor',
+    compactLabel: 'light',
     description: '1 minute to don or doff.',
     sentence: {
       singular: 'suit of light armor',
@@ -33,6 +35,7 @@ export const ARMOR_CATEGORY_ENTRIES = {
   },
   medium: {
     label: 'Medium Armor',
+    compactLabel: 'medium',
     description: '5 minutes to don and 1 minute to doff.',
     sentence: {
       singular: 'suit of medium armor',
@@ -41,6 +44,7 @@ export const ARMOR_CATEGORY_ENTRIES = {
   },
   heavy: {
     label: 'Heavy Armor',
+    compactLabel: 'heavy',
     description: '10 minutes to don and 5 minutes to doff.',
     sentence: {
       singular: 'suit of heavy armor',
@@ -49,6 +53,7 @@ export const ARMOR_CATEGORY_ENTRIES = {
   },
   shields: {
     label: 'Shield',
+    compactLabel: 'shields',
     description: 'Utilize action to don or doff.',
     sentence: {
       singular: 'shield',
@@ -93,4 +98,10 @@ export function getArmorCategoryCompactLabel(category: string): string {
   const entry = getArmorCategoryEntry(category)
   if (!entry) return formatVocabularySlugLabel(category)
   return entry.label.replace(/ Armor$/, ' armor')
+}
+
+/** Short preview label for rail summaries (e.g. "Light", "Shields"). */
+export function getArmorCategoryPreviewLabel(category: string): string {
+  const entry = getArmorCategoryEntry(category)
+  return entry ? getTermCompactLabel(entry) : formatVocabularySlugLabel(category)
 }

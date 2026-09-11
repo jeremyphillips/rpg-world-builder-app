@@ -1,6 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-import { boundedScrollRegionClasses } from '../ui/bounded-scroll-region.variants'
 import { cn } from '../../lib/utils'
 import { cardRadiusClasses } from '../ui/card.variants'
 import { iconGlyphRootClasses } from '../ui/icon-glyph.variants'
@@ -9,11 +8,42 @@ import { establishSurfaceCurrent } from '../ui/surface-current.lib'
 /** Shared 12px muted copy below the preview header and in section chrome. */
 export const previewRailCaptionTextClasses = 'text-xs text-muted-foreground'
 
-export const previewRailRootVariants = cva('flex min-w-0 flex-col gap-4', {
+export const previewRailSectionInsetVariants = cva('', {
+  variants: {
+    chrome: {
+      card: 'px-4',
+      plain: '',
+    },
+  },
+  defaultVariants: {
+    chrome: 'card',
+  },
+})
+
+/** Inset below header content, above the full-width section border. */
+export const previewRailHeaderSectionBottomInsetClasses = 'pb-[10px]'
+
+/** Full-width shell below the title row; border omitted when Identity follows. */
+export const previewRailHeaderSectionShellClasses = cn(
+  'shrink-0 border-b border-border-subtle',
+  previewRailHeaderSectionBottomInsetClasses,
+  'has-[+[data-slot=preview-rail-identity]]:border-b-0 has-[+[data-slot=preview-rail-identity]]:pb-0',
+)
+
+/** Full-width shell terminating the header block (identity + optional title). */
+export const previewRailIdentitySectionShellClasses = cn(
+  'shrink-0 border-b border-border-subtle',
+  previewRailHeaderSectionBottomInsetClasses,
+)
+
+/** Full-width shell above footer actions. */
+export const previewRailFooterSectionShellClasses = 'shrink-0 border-t border-border-subtle'
+
+export const previewRailRootVariants = cva('flex min-w-0 flex-col', {
   variants: {
     chrome: {
       card: cn(
-        'w-[21rem] max-w-[21rem] border border-border-subtle bg-field-container p-4 text-card-foreground',
+        'w-[21rem] max-w-[21rem] border border-border-subtle bg-field-container text-card-foreground',
         cardRadiusClasses,
         establishSurfaceCurrent('field-container'),
       ),
@@ -31,16 +61,22 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col gap-4', {
   },
 })
 
-export const previewRailHeaderRowClasses = 'flex shrink-0 items-center justify-between gap-2'
+export const previewRailHeaderRowClasses = 'flex items-center justify-between gap-2'
 
-export const previewRailIdentityStackClasses = 'flex shrink-0 flex-col gap-4'
+export const previewRailHeaderSectionContentClasses = 'pt-4'
+
+export const previewRailIdentityStackClasses = 'flex flex-col gap-4'
+
+export const previewRailIdentitySectionContentClasses = 'pt-4'
 
 export const previewRailIdentityRowClasses = 'flex items-center gap-3'
 
 /** Sections-only scroll body — header, identity, and footer stay put. */
-export const previewRailScrollRegionClasses = cn('min-h-0 flex-1', boundedScrollRegionClasses)
+export const previewRailScrollRegionShellClasses = 'min-h-0 flex-1'
 
-export const previewRailFooterClasses = 'flex shrink-0 flex-col gap-4'
+export const previewRailScrollRegionContentClasses = 'pb-4 pt-4'
+
+export const previewRailFooterClasses = 'flex flex-col gap-4 py-4'
 
 export const previewRailIdentityContentClasses = 'min-w-0 flex-1'
 
@@ -67,9 +103,13 @@ export const previewRailAvailabilityDetailSeparatorClasses = 'text-muted-foregro
 export const previewRailFactsGridClasses =
   'grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-x-3 gap-y-2'
 
+export const previewRailFactsGridCompactClasses = 'gap-y-1.5'
+
 export const previewRailFactLabelClasses = 'text-sm text-muted-foreground'
 
 export const previewRailFactValueClasses = 'text-sm text-foreground'
+
+export const previewRailFactCompactTextClasses = 'text-xs'
 
 export const previewRailSectionsHeaderClasses = 'flex flex-col gap-1'
 
@@ -98,10 +138,10 @@ export const previewRailSectionMarkerToneClasses = {
 } as const
 
 export const previewRailSectionBodyClasses =
-  'flex flex-col gap-3 rounded-md border border-border-subtle bg-background p-3'
+  'flex flex-col gap-3 rounded-md border border-border-subtle bg-surface-faint p-3'
 
 export const previewRailSectionBodyDescriptionClasses = cn(
-  'line-clamp-3',
+  'line-clamp-2',
   previewRailCaptionTextClasses,
 )
 

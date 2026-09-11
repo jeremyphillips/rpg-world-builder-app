@@ -26,7 +26,6 @@ export const MockComposition: Story = {
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Fighter"
         availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
-        facts={identityFacts}
       />
       <PreviewRail.ScrollRegion>
         <PreviewRail.Sections
@@ -92,7 +91,6 @@ export const FreshCreate: Story = {
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Unnamed Class"
         availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
-        facts={identityFacts}
       />
       <PreviewRail.ScrollRegion>
         <PreviewRail.Sections
@@ -138,7 +136,6 @@ export const PostSubmitAttention: Story = {
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Unnamed Class"
         availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
-        facts={identityFacts}
       />
       <PreviewRail.ScrollRegion>
         <PreviewRail.Sections defaultValue="basics">
@@ -174,7 +171,6 @@ export const LongNameTruncation: Story = {
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="The Order of the Radiant Banner and Eternal Vigil"
         availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
-        facts={identityFacts}
       />
     </PreviewRail>
   ),
@@ -189,7 +185,6 @@ export const SheetHost: Story = {
           media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
           name="Fighter"
           availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
-          facts={identityFacts}
         />
         <PreviewRail.StatusPanel
           variant="success"
@@ -209,7 +204,6 @@ export const UnavailableIdentity: Story = {
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Fighter"
         availability={{ available: false, statusLabel: 'Unavailable', detail: 'All players' }}
-        facts={identityFacts}
       />
     </PreviewRail>
   ),
@@ -218,6 +212,20 @@ export const UnavailableIdentity: Story = {
 export const PlainChrome: Story = {
   render: () => (
     <PreviewRail chrome="plain">
+      <PreviewRail.Identity
+        media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+        name="Fighter"
+        availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+      />
+    </PreviewRail>
+  ),
+}
+
+export const WithIdentityMetadata: Story = {
+  name: 'With identity metadata',
+  render: () => (
+    <PreviewRail>
+      <PreviewRail.Header title="Class Preview" />
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Fighter"

@@ -10,6 +10,7 @@ import {
   formSheetScrollRegionClasses,
   formStickyScrollBodyClasses,
 } from '../chrome/form-chrome.variants'
+import { FormScrollBodyTopInset } from '../chrome/form-viewport-scroll-top-inset.client'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
 
@@ -24,6 +25,36 @@ export type FormShellFieldStackProps = {
   valueSyncs?: FormValueSync[]
   header?: ReactNode
   contentWrapper?: (content: React.ReactNode) => React.ReactNode
+}
+
+type FormShellFieldStackScrollWrapOptions = Pick<
+  FormShellFieldStackProps,
+  'contentClassName' | 'scrollBodyClassName' | 'externalFooter' | 'stickyFooter'
+>
+
+function wrapFormShellFieldStackScroll(
+  stack: ReactNode,
+  {
+    contentClassName,
+    scrollBodyClassName,
+    externalFooter,
+    stickyFooter,
+  }: FormShellFieldStackScrollWrapOptions,
+): ReactNode {
+  if (externalFooter) {
+    return <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
+  }
+
+  if (stickyFooter) {
+    return (
+      <div className={formStickyScrollBodyClasses}>
+        {scrollBodyClassName ? <FormScrollBodyTopInset className={scrollBodyClassName} /> : null}
+        {stack}
+      </div>
+    )
+  }
+
+  return stack
 }
 
 export function FormShellFieldStack({
@@ -53,13 +84,12 @@ export function FormShellFieldStack({
     </FormRhythmStack>
   )
 
-  const scrollWrappedStack = externalFooter ? (
-    <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
-  ) : stickyFooter ? (
-    <div className={cn(formStickyScrollBodyClasses, scrollBodyClassName)}>{stack}</div>
-  ) : (
-    stack
-  )
+  const scrollWrappedStack = wrapFormShellFieldStackScroll(stack, {
+    contentClassName,
+    scrollBodyClassName,
+    externalFooter,
+    stickyFooter,
+  })
 
   return contentWrapper && !stickyFooter ? contentWrapper(scrollWrappedStack) : scrollWrappedStack
 }

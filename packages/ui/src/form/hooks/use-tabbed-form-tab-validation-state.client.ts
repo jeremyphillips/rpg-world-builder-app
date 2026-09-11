@@ -9,7 +9,7 @@ import {
 import {
   collectTabbedFormResolverItems,
   type TabbedFormTab,
-} from '../shells/tabbed-form-panels.client'
+} from '../shells/tabbed-form-panels.lib'
 import { useFormValidationPresentation } from './use-form-validation-presentation.client'
 
 const EMPTY_TAB_VALIDATION_STATE: TabValidationState = {
