@@ -17,12 +17,13 @@ import { CollapsibleListItemActions } from './collapsible-list-item-actions.clie
 import {
   collapsibleListItemDraggingClasses,
   collapsibleListItemHeaderRowClassesForRowLayout,
-  collapsibleListItemHeaderRowPaddingClasses,
   collapsibleListItemHeaderStackClasses,
   collapsibleListItemHeaderStackSummaryGapClasses,
   collapsibleListItemHeaderSummaryClasses,
+  collapsibleListItemHeaderVerticalPaddingVariants,
   collapsibleListItemMainClasses,
   collapsibleListItemShellVariants,
+  type CollapsibleListItemDensity,
   type CollapsibleListItemLeadingChromeOptions,
   type CollapsibleListItemRowLayout,
   type CollapsibleListItemShellPreset,
@@ -31,6 +32,7 @@ import {
 export type {
   CollapsibleListItemShellPreset,
   CollapsibleListItemRowLayout,
+  CollapsibleListItemDensity,
 } from './collapsible-list-item.variants'
 
 export type CollapsibleListItemActionsAlign = 'start' | 'center'
@@ -45,14 +47,13 @@ export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadin
   preset?: CollapsibleListItemShellPreset
   /** Catalog row layout — `entity-card` drops content inset for embedded entity cards. */
   rowLayout?: CollapsibleListItemRowLayout
+  density?: CollapsibleListItemDensity
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
   className?: string
   toolbar?: React.ReactNode
   body?: React.ReactNode
   summary?: React.ReactNode
-  /** When true, an expanded disclosure body is visible below the header stack. */
-  bodyExpanded?: boolean
   main?: React.ReactNode
   actions?: React.ReactNode
 }
@@ -94,9 +95,7 @@ function resolveCollapsibleListItemShellLayout({
 
 interface CollapsibleListItemCenterActionsContentProps {
   headerRowClasses: string
-  rowLayout: CollapsibleListItemRowLayout
-  hasSummary: boolean
-  bodyExpanded: boolean
+  density: CollapsibleListItemDensity
   leadingChrome: CollapsibleListItemLeadingChromeOptions
   toolbar: React.ReactNode
   summary?: React.ReactNode
@@ -106,19 +105,14 @@ interface CollapsibleListItemCenterActionsContentProps {
 
 function CollapsibleListItemCenterActionsContent({
   headerRowClasses,
-  rowLayout,
-  hasSummary,
-  bodyExpanded,
+  density,
   leadingChrome,
   toolbar,
   summary,
   actions,
   body,
 }: CollapsibleListItemCenterActionsContentProps) {
-  const headerRowPadding =
-    rowLayout === 'entity-card'
-      ? undefined
-      : collapsibleListItemHeaderRowPaddingClasses(hasSummary, bodyExpanded)
+  const headerRowPadding = collapsibleListItemHeaderVerticalPaddingVariants({ density })
 
   return (
     <>
@@ -153,13 +147,13 @@ export function CollapsibleListItemShell({
   actionsAlign = 'start',
   preset = 'default',
   rowLayout = 'default',
+  density = 'compact',
   surface,
   tone,
   className,
   toolbar,
   body,
   summary,
-  bodyExpanded = false,
   main,
   actions,
 }: CollapsibleListItemShellProps) {
@@ -207,9 +201,7 @@ export function CollapsibleListItemShell({
       ) : actionsAlign === 'center' ? (
         <CollapsibleListItemCenterActionsContent
           headerRowClasses={headerRowClasses}
-          rowLayout={rowLayout}
-          hasSummary={Boolean(summary)}
-          bodyExpanded={Boolean(resolvedBody) && bodyExpanded}
+          density={density}
           leadingChrome={leadingChrome}
           toolbar={resolvedToolbar}
           summary={summary}

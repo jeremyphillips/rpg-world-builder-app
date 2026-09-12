@@ -7,12 +7,11 @@ import {
 import {
   collapsibleListItemBackgroundBodyClasses,
   collapsibleListItemBodyClasses,
+  collapsibleListItemBodyFrameClasses,
   collapsibleListItemCollapseButtonClasses,
   collapsibleListItemDisclosureShellPaddingClasses,
   collapsibleListItemEntityCardBodyClasses,
-  collapsibleListItemHeaderRowBottomPaddingClasses,
-  collapsibleListItemHeaderRowPaddingClasses,
-  collapsibleListItemHeaderRowTopPaddingClasses,
+  collapsibleListItemHeaderVerticalPaddingVariants,
   collapsibleListItemShellVariants,
 } from './collapsible-list-item.variants'
 
@@ -23,17 +22,19 @@ describe('collapsibleListItemShellVariants', () => {
   })
 })
 
-describe('collapsibleListItemHeaderRowPaddingClasses', () => {
-  it('omits header bottom pad only when summary is visible and body is expanded', () => {
-    expect(collapsibleListItemHeaderRowPaddingClasses(true, true)).toBe(
-      collapsibleListItemHeaderRowTopPaddingClasses,
+describe('collapsibleListItemHeaderVerticalPaddingVariants', () => {
+  it('resolves compact and comfortable header rhythm', () => {
+    expect(collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' })).toBe('py-2')
+    expect(collapsibleListItemHeaderVerticalPaddingVariants({ density: 'comfortable' })).toBe(
+      'py-3',
     )
-    expect(collapsibleListItemHeaderRowPaddingClasses(true, false)).toContain(
-      collapsibleListItemHeaderRowBottomPaddingClasses,
-    )
-    expect(collapsibleListItemHeaderRowPaddingClasses(false, true)).toContain(
-      collapsibleListItemHeaderRowBottomPaddingClasses,
-    )
+    expect(collapsibleListItemHeaderVerticalPaddingVariants()).toBe('py-2')
+  })
+})
+
+describe('collapsibleListItemBodyFrameClasses', () => {
+  it('owns divider and symmetric vertical rhythm without surface tone', () => {
+    expect(collapsibleListItemBodyFrameClasses).toBe('border-t border-border-subtle py-3')
   })
 })
 
@@ -49,8 +50,7 @@ describe('collapsibleListItemBodyClasses', () => {
     expect(classes).toBe(collapsibleListItemEntityCardBodyClasses)
     expect(classes).not.toContain('content-column-indent')
     expect(classes).not.toContain('content-inline-start')
-    expect(classes).not.toContain('pt-3')
-    expect(classes).not.toContain('pb-3')
+    expect(classes).not.toContain('py-3')
     expect(classes).not.toContain('pl-')
     expect(classes).not.toContain('pr-')
   })
@@ -63,10 +63,10 @@ describe('collapsibleListItemBodyClasses', () => {
     })
 
     expect(classes).toContain(collapsibleListItemContentInlineStartClasses)
+    expect(classes).toContain(collapsibleListItemBodyFrameClasses)
     expect(classes).toContain('-ml-2')
     expect(classes).toContain('-mr-3')
     expect(classes).toContain('bg-background')
-    expect(classes).toContain('pt-3')
     expect(classes).not.toContain(collapsibleListItemContentColumnIndentClasses)
   })
 
@@ -78,13 +78,13 @@ describe('collapsibleListItemBodyClasses', () => {
     })
 
     expect(classes).toContain(collapsibleListItemContentInlineStartClasses)
-    expect(classes).toContain('pt-3')
+    expect(classes).toContain(collapsibleListItemBodyFrameClasses)
     expect(classes).toContain('pr-3')
   })
 
   it('uses the canvas plane for default array-item body wash', () => {
     expect(collapsibleListItemBackgroundBodyClasses).toContain('bg-background')
-    expect(collapsibleListItemBackgroundBodyClasses).toContain('border-t')
+    expect(collapsibleListItemBackgroundBodyClasses).toContain(collapsibleListItemBodyFrameClasses)
     expect(collapsibleListItemBackgroundBodyClasses).toContain(
       '[--surface-current:var(--background)]',
     )

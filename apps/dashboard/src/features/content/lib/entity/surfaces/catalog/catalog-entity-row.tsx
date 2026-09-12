@@ -60,6 +60,7 @@ export function CatalogEntityRow({
         toolbarAriaLabel={toolbarLabel}
         preset="catalog"
         rowLayout="entity-card"
+        density={CATALOG_ENTITY_ROW_DENSITY}
         toolbarCompact
         toolbarLeadingChrome="none"
         actionsAlign="center"

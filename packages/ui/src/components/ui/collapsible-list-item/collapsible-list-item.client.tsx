@@ -21,6 +21,7 @@ import {
 import {
   collapsibleListItemBodyClasses,
   resolveCollapsibleListItemDomIds,
+  type CollapsibleListItemDensity,
   type CollapsibleListItemLeadingChromeOptions,
   type CollapsibleListItemRowLayout,
 } from './collapsible-list-item.variants'
@@ -49,6 +50,7 @@ export interface CollapsibleListItemProps {
   preset?: CollapsibleListItemShellPreset
   /** Catalog row layout — `entity-card` drops content inset for embedded entity cards. */
   rowLayout?: CollapsibleListItemRowLayout
+  density?: CollapsibleListItemDensity
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
   layout?: 'default' | 'compactRow'
@@ -131,6 +133,7 @@ function CollapsibleListItemRoot({
   dragHandleProps,
   preset = 'default',
   rowLayout = 'default',
+  density = 'compact',
   surface,
   tone,
   layout = 'default',
@@ -219,6 +222,7 @@ function CollapsibleListItemRoot({
         actionsAlign={actionsAlign}
         preset={preset}
         rowLayout={rowLayout}
+        density={density}
         surface={surface}
         tone={tone}
         className={className}
@@ -240,7 +244,6 @@ function CollapsibleListItemRoot({
           />
         }
         summary={actionsAlign === 'center' ? summary : undefined}
-        bodyExpanded={Boolean(body) && !collapsed}
         body={
           body ? (
             <CollapsibleListItemBody

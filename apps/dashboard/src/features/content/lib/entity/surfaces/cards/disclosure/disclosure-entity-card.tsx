@@ -79,13 +79,14 @@ export function DisclosureEntityCard({
         showDragHandle={showDragHandle}
         dragHandleProps={dragHandleProps}
         rowLayout="entity-card"
+        density={density}
         actionsAlign="center"
         toolbarCompact
         toolbarLeadingChrome="none"
         className={disclosureEntityCardListItemVariants()}
-        bodyClassName={disclosureEntityCardBodyWashVariants({ density })}
+        bodyClassName={disclosureEntityCardBodyWashVariants()}
         header={
-          <div className={disclosureEntityCardHeaderPaddingVariants({ density })}>
+          <div className={disclosureEntityCardHeaderPaddingVariants()}>
             <DisclosureEntityCardHeader
               entity={entity}
               headingHref={headingHref}

@@ -9,6 +9,7 @@ import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
 import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
 import { submitAndExpectPayload } from '../test-utils'
+import { collapsibleListItemHeaderVerticalPaddingVariants } from '../../components/ui/collapsible-list-item/collapsible-list-item.variants'
 
 // ── Schema ──────────────────────────────────────────────────────────────────
 
@@ -826,13 +827,14 @@ describe('ArrayFieldRenderer', () => {
     const headerStack = headerRow.firstElementChild as HTMLElement
     const summary = screen.getByText('See in the dark', { selector: 'p' })
 
-    expect(headerRow).toHaveClass('pt-[calc(var(--spacing)*2)]')
-    expect(headerRow).not.toHaveClass('pb-[calc(var(--spacing)*2)]')
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
     expect(headerStack).toHaveClass('gap-0.5')
     expect(headerStack).toContainElement(summary)
   })
 
-  it('restores header bottom padding when a summarized item is collapsed', async () => {
+  it('keeps header rhythm invariant when a summarized item is collapsed', async () => {
     const user = userEvent.setup()
 
     render(
@@ -852,7 +854,9 @@ describe('ArrayFieldRenderer', () => {
 
     const itemShell = screen.getByRole('group', { name: /Darkvision/ })
     const headerRow = itemShell.firstElementChild as HTMLElement
-    expect(headerRow).toHaveClass('pb-[calc(var(--spacing)*2)]')
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
   })
 
   it('shows item summaries while expanded and collapsed', async () => {

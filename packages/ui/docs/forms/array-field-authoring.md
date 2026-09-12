@@ -91,6 +91,14 @@ body / actions slots as catalog picker rows. The header plane defaults to
 `bg-surface-subtle`; the disclosure body bleeds to the shell edge on `bg-background` with
 field content aligned via `--content-inline-start`.
 
+**CollapsibleListItem rhythm contract** (form arrays, DEC, catalog — not `DetailEntityRow`):
+
+- **Shared geometry:** header vertical padding (`density`: compact `py-2`, comfortable
+  `py-3`), title→summary `gap-0.5`, body divider + `py-3` via `collapsibleListItemBodyFrameClasses`
+- **Not shared:** typography metrics, horizontal inset systems, body surface tone
+- **Invariant:** text anatomy never owns external vertical spacing (`pb-*` on summary/issue
+  lines is forbidden); header rhythm does not change between collapsed and expanded state
+
 `itemCollapsible: true` implies `itemVariant: 'detailed'` unless the author **explicitly**
 sets `itemVariant: 'compact'` (collapsible is ignored on compact rows). Nested arrays with
 `itemCollapsible: true` therefore keep disclosure chrome instead of silently auto-compacting.

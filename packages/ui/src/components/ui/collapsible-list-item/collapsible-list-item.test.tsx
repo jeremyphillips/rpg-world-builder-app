@@ -9,6 +9,7 @@ import { CollapsibleListItem } from './collapsible-list-item.client'
 import {
   collapsibleListItemDisclosureShellPaddingClasses,
   collapsibleListItemHeaderStackSummaryGapClasses,
+  collapsibleListItemHeaderVerticalPaddingVariants,
 } from './collapsible-list-item.variants'
 
 describe('CollapsibleListItem', () => {
@@ -107,8 +108,9 @@ describe('CollapsibleListItem', () => {
     expect(shell).toHaveClass('pb-0')
     expect(shell).not.toHaveClass('grid-cols-[minmax(0,1fr)_auto]')
     expect(headerRow).toHaveClass('flex', 'items-center')
-    expect(headerRow).toHaveClass('pt-[calc(var(--spacing)*2)]')
-    expect(headerRow).not.toHaveClass('pb-[calc(var(--spacing)*2)]')
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
     expect(headerStack).toHaveClass(collapsibleListItemHeaderStackSummaryGapClasses)
     expect(headerRow.contains(addButton)).toBe(true)
     expect(summary).toHaveClass('pl-[var(--content-column-indent)]')
@@ -138,7 +140,7 @@ describe('CollapsibleListItem', () => {
     )
   })
 
-  it('restores header row bottom padding when summary is visible but body is collapsed', () => {
+  it('keeps header row rhythm invariant when summary is visible but body is collapsed', () => {
     const { container } = render(
       <CollapsibleListItem
         itemId="theta"
@@ -155,10 +157,12 @@ describe('CollapsibleListItem', () => {
     )
 
     const headerRow = (container.firstChild as HTMLElement).firstElementChild as HTMLElement
-    expect(headerRow).toHaveClass('pb-[calc(var(--spacing)*2)]')
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
   })
 
-  it('keeps header row bottom padding when summary is absent', () => {
+  it('keeps header row rhythm when summary is absent', () => {
     const { container } = render(
       <CollapsibleListItem
         itemId="eta"
@@ -174,10 +178,40 @@ describe('CollapsibleListItem', () => {
     )
 
     const headerRow = (container.firstChild as HTMLElement).firstElementChild as HTMLElement
-    expect(headerRow).toHaveClass('pb-[calc(var(--spacing)*2)]')
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
     expect(headerRow.firstElementChild).not.toHaveClass(
       collapsibleListItemHeaderStackSummaryGapClasses,
     )
+  })
+
+  it('uses the same compact header rhythm when expanded as when collapsed', () => {
+    const sharedProps = {
+      itemId: 'iota',
+      titleId: 'iota-title',
+      toolbarAriaLabel: 'Iota item',
+      collapsible: true,
+      onToggleCollapse: vi.fn(),
+      actionsAlign: 'center' as const,
+      header: <span>Iota header</span>,
+      summary: <span>Iota summary</span>,
+      body: <p>Expanded details</p>,
+    }
+
+    const { container: collapsedContainer } = render(
+      <CollapsibleListItem {...sharedProps} collapsed />,
+    )
+    const { container: expandedContainer } = render(
+      <CollapsibleListItem {...sharedProps} collapsed={false} />,
+    )
+
+    const collapsedHeaderRow = (collapsedContainer.firstChild as HTMLElement)
+      .firstElementChild as HTMLElement
+    const expandedHeaderRow = (expandedContainer.firstChild as HTMLElement)
+      .firstElementChild as HTMLElement
+
+    expect(collapsedHeaderRow.className).toBe(expandedHeaderRow.className)
   })
 
   it('applies catalog picker row surface tone on the shell', () => {
