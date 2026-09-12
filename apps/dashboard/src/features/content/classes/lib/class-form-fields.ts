@@ -150,7 +150,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'basics',
       label: 'Basics',
       fields: coreAttributesFields(ctx),
-      errorPaths: ['name', 'hitDie', 'primaryAbilities', 'description'],
+      errorPaths: ['hitDie', 'primaryAbilities', 'description'],
     },
     {
       id: 'proficiencies',

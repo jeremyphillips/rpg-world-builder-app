@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -28,6 +28,11 @@ function TabShell({
   )
 }
 
+async function deleteOptionViaOverflow(user: ReturnType<typeof userEvent.setup>, title: string) {
+  await user.click(screen.getByRole('button', { name: new RegExp(`Actions for ${title}`, 'i') }))
+  await user.click(screen.getByRole('menuitem', { name: /Delete option/i }))
+}
+
 describe('SpeciesHeritageTab', () => {
   it('shows the empty state when there is no heritage', () => {
     render(<TabShell />)
@@ -52,7 +57,9 @@ describe('SpeciesHeritageTab', () => {
     expect(screen.getByTestId('detail-heritage')).toHaveTextContent('heritage')
     expect(screen.getByRole('button', { name: /Add option/i })).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Breath Weapon/ }),
+      within(screen.getByRole('navigation', { name: 'Heritage options' })).getByRole('button', {
+        name: /Breath Weapon/i,
+      }),
     ).toBeInTheDocument()
   })
 
@@ -60,7 +67,7 @@ describe('SpeciesHeritageTab', () => {
     const user = userEvent.setup()
     render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
 
-    await user.click(screen.getByRole('button', { name: /Remove Breath Weapon/i }))
+    await deleteOptionViaOverflow(user, 'Breath Weapon')
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete option?')
 
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
@@ -73,8 +80,10 @@ describe('SpeciesHeritageTab', () => {
   it('locks system options on a system species', () => {
     render(<TabShell heritage={draconicHeritageForm} entitySource="system" />)
 
-    expect(screen.getByText('System')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Remove Breath Weapon/i })).not.toBeInTheDocument()
+    expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
+    expect(
+      screen.queryByRole('button', { name: /Actions for Breath Weapon/i }),
+    ).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove heritage/i })).not.toBeInTheDocument()
   })
 
@@ -84,7 +93,7 @@ describe('SpeciesHeritageTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add option/i }))
 
-    expect(screen.getByRole('button', { name: /Remove Trait 2/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Actions for Trait 2/i })).toBeInTheDocument()
   })
 
   it('allows removing heritage on homebrew species', async () => {

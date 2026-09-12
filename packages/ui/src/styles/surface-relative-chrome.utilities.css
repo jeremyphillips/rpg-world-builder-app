@@ -123,3 +123,23 @@
     );
   }
 }
+
+@utility divide-border-subtle {
+  & > :not(:last-child) {
+    border-color: color-mix(
+      in oklch,
+      var(--foreground) var(--mix-border-subtle),
+      var(--surface-current)
+    );
+  }
+}
+
+@utility divide-border-faint {
+  & > :not(:last-child) {
+    border-color: color-mix(
+      in oklch,
+      var(--foreground) var(--mix-border-faint),
+      var(--surface-current)
+    );
+  }
+}

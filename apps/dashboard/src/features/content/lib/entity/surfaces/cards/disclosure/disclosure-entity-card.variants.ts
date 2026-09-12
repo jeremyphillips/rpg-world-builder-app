@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
+import { cn, collapsibleListItemBodyFrameClasses, establishSurfaceCurrent } from '@rpg/ui'
 
 import { ENTITY_SURFACE_INLINE_END_VAR } from '../../../anatomy/entity-geometry.tokens'
 import {
@@ -14,11 +14,11 @@ export const disclosureEntityCardBodyInlineStartClasses = 'pl-[var(--entity-body
 /** Body content end: surface inline-end inset only — independent of trailing actions. */
 export const disclosureEntityCardBodyInlineEndClasses = `pr-[var(${ENTITY_SURFACE_INLINE_END_VAR})]`
 
-/** Bordered disclosure shell — owns card plane so nested form hosts cannot bleed fill. */
+/** Bordered disclosure shell — subtle header plane; body wash uses canvas below. */
 export const disclosureEntityCardShellVariants = cva(
   cn(
-    'w-full min-w-0 overflow-hidden rounded-md border border-border bg-card',
-    establishSurfaceCurrent('card'),
+    'w-full min-w-0 overflow-hidden rounded-md border border-border bg-surface-subtle',
+    establishSurfaceCurrent('surface-subtle'),
   ),
   {
     variants: {
@@ -55,20 +55,9 @@ export function disclosureEntityCardArticleVariants({
 /** Strip CollapsibleListItem outer chrome — density tokens live on DEC article. */
 export const disclosureEntityCardListItemVariants = cva('border-0 rounded-none shadow-none')
 
-/** Surface-aware header inset — fills the CLI toolbar region so anatomy column 3 can align trailing. */
+/** Surface-aware header inset — horizontal only; CLI owns vertical rhythm. */
 export const disclosureEntityCardHeaderPaddingVariants = cva(
   cn('w-full min-w-0', entitySurfaceHorizontalInsetClasses),
-  {
-    variants: {
-      density: {
-        compact: 'py-2',
-        comfortable: 'py-3',
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-    },
-  },
 )
 
 /**
@@ -77,20 +66,10 @@ export const disclosureEntityCardHeaderPaddingVariants = cva(
  */
 export const disclosureEntityCardBodyWashVariants = cva(
   cn(
-    'border-t border-border-subtle bg-surface-muted',
-    establishSurfaceCurrent('surface-muted'),
+    collapsibleListItemBodyFrameClasses,
+    'bg-background',
+    establishSurfaceCurrent('background'),
     disclosureEntityCardBodyInlineStartClasses,
     disclosureEntityCardBodyInlineEndClasses,
   ),
-  {
-    variants: {
-      density: {
-        compact: 'pb-3 pt-3',
-        comfortable: 'pb-3 pt-3',
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-    },
-  },
 )

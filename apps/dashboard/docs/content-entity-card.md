@@ -82,8 +82,10 @@ drag chrome, or interactive-row fills.
 | Leading content offset         | Surface root (when needed)          | `--entity-content-offset` on DEC `article`, DER disclosure root     |
 | Trailing rail                  | EntityAnatomyHost semantic trailing | `action` \| `indicator` \| `group` — no parallel entity `endSlot`   |
 | Disclosure behavior            | CollapsibleListItem                 | Collapse state, ARIA, structural DOM                                |
-| DEC header inset               | DEC                                 | `disclosureEntityCardHeaderPaddingVariants`                         |
-| DEC body inset                 | DEC                                 | Body wash + inline start/end + block rhythm                         |
+| CLI header vertical rhythm     | CollapsibleListItem                 | `collapsibleListItemHeaderVerticalPaddingVariants` (density)        |
+| CLI body frame                 | CollapsibleListItem                 | `collapsibleListItemBodyFrameClasses` (divider + `py-3`)            |
+| DEC header horizontal inset    | DEC                                 | `disclosureEntityCardHeaderPaddingVariants` (no vertical padding)   |
+| DEC body inset                 | DEC                                 | Body wash tone + entity inline start/end on shared body frame       |
 | CLI body spacing (entity-card) | **None**                            | `rowLayout="entity-card"` → structural wrapper only                 |
 | Drag chrome                    | Foundational UI                     | `dragHandleVariants`, host reveal contract                          |
 | Control/focus chrome           | Foundational UI                     | `iconGhostControlVariants`, Button focus stack                      |
@@ -172,14 +174,16 @@ geometry and offset on `article`.
 
 ## DisclosureEntityCard
 
-DEC is the **sole owner** of entity disclosure header/body geometry.
+DEC is the **sole owner** of entity disclosure horizontal geometry and body surface tone.
+**CollapsibleListItem owns vertical rhythm** for all CollapsibleListItem-based rows (DEC,
+catalog, form arrays). `DetailEntityRow` is outside this contract.
 
 ```text
 DisclosureEntityCard (article)
-├── CollapsibleListItem (rowLayout="entity-card")
-│   ├── header
-│   │   └── EntityAnatomy (inset-free)
-│   └── body (DEC body wash owns all inset)
+├── CollapsibleListItem (rowLayout="entity-card", density)
+│   ├── header row — CLI vertical padding
+│   │   └── EntityAnatomy (horizontal inset only)
+│   └── body — shared body frame + DEC wash tone + entity inline inset
 ├── divider (edge-to-edge on shell)
 └── domain children
 ```
@@ -187,9 +191,19 @@ DisclosureEntityCard (article)
 ### Owns
 
 - Card surface chrome and disabled presentation on `article`
-- Density-aware **header** inset (`disclosureEntityCardHeaderPaddingVariants`)
+- Density-aware **horizontal** header inset (`disclosureEntityCardHeaderPaddingVariants`)
 - `--entity-surface-inline-start`, `--entity-surface-inline-end`, and `--entity-content-offset` publication on `article`
-- Complete **body** inset: inline-start = density + content offset; inline-end = density; block rhythm via density
+- Complete **body** horizontal inset: inline-start = density + content offset; inline-end = density; body surface tone on the shared CLI body frame
+
+### CollapsibleListItem rhythm contract
+
+Applies to CollapsibleListItem-based rows only (not `DetailEntityRow`):
+
+- **Shared:** header vertical padding (density-resolved), title→summary gap, body divider,
+  body vertical padding (`collapsibleListItemBodyFrameClasses`)
+- **Not shared:** typography metrics, horizontal inset systems, body surface tone
+- **Invariant:** text nodes never contribute external header spacing; header rhythm is
+  identical collapsed vs expanded
 
 ### Consumer supplies
 
@@ -207,7 +221,7 @@ DisclosureEntityCard (article)
 - Add card inset wrappers around DEC
 - Calculate grip/caret indentation or compensate with negative margins
 - Position trailing controls outside EntityAnatomyHost anatomy
-- Rely on CLI `--content-column-indent` or CLI body `pt-3` for alignment
+- Rely on CLI `--content-column-indent` or duplicate body vertical padding on adapter wrappers
 
 ### CollapsibleListItem entity-card mode
 

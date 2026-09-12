@@ -40,13 +40,14 @@ import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schem
 import {
   castingTimeUnitOptions,
   conditionTagOptions,
-  deliveryMethodOptions,
+  deliveryMethodChipOptions,
   durationKindOptions,
   durationUnitOptions,
   functionTagOptions,
   areaGeometryShapeOptions,
   rangeKindOptions,
   roleTagOptions,
+  SPELL_CASTING_SELECT_PLACEHOLDER,
   SPELL_DURATION_KINDS,
   spellLevelOptions,
 } from './spell-form-labels'
@@ -261,6 +262,7 @@ export const spellFormSchema = spellFormObjectSchema.superRefine(refineSpellComp
 
 export const spellDraftFormSchema = spellFormObjectSchema.extend({
   name: z.string(),
+  school: draftOptionalSelect(spellSchoolIdSchema),
   level: draftOptionalSelect(spellFormLevelSchema),
   classIds: z.array(z.string()).default([]),
   castingTime: spellFormObjectSchema.shape.castingTime.optional(),
@@ -279,57 +281,43 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
     contentTypeOptions: ctx.options?.richTextContentTypeOptions,
   }
 
-  const schoolGroup: FormItem = {
-    kind: 'group',
-    legend: 'School',
-    fields: [
-      {
-        type: 'select',
-        name: 'school',
-        label: 'School',
-        labelVisibility: 'srOnly',
-        options: schoolOptions,
-        required: true,
-      },
-    ],
+  const schoolField: FormItem = {
+    type: 'select',
+    name: 'school',
+    label: 'School',
+    options: schoolOptions,
+    required: true,
   }
 
-  const levelGroup: FormItem = {
-    kind: 'group',
-    legend: 'Level',
-    fields: [
-      {
-        kind: 'dependent',
-        controller: {
-          type: 'chips',
-          name: 'level',
-          label: 'Level',
-          labelVisibility: 'srOnly',
-          options: spellLevelOptions,
-          multiple: false,
-          required: true,
+  const levelField: FormItem = {
+    kind: 'dependent',
+    controller: {
+      type: 'chips',
+      name: 'level',
+      label: 'Level',
+      options: spellLevelOptions,
+      multiple: false,
+      required: true,
+    },
+    dependents: {
+      visibility: visibleWhenSpellLevelSelected(),
+      fields: [
+        {
+          type: 'richtext',
+          name: 'cantripScaling',
+          label: SPELL_SECTION_LABELS.cantripScaling,
+          ...richTextLinks,
+          visibility: visibleWhenCantripLevel(),
         },
-        dependents: {
-          visibility: visibleWhenSpellLevelSelected(),
-          fields: [
-            {
-              type: 'richtext',
-              name: 'cantripScaling',
-              label: SPELL_SECTION_LABELS.cantripScaling,
-              ...richTextLinks,
-              visibility: visibleWhenCantripLevel(),
-            },
-            {
-              type: 'richtext',
-              name: 'higherLevelSlotEffect',
-              label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
-              ...richTextLinks,
-              visibility: visibleWhenLeveledSpell(),
-            },
-          ],
+        {
+          type: 'richtext',
+          name: 'higherLevelSlotEffect',
+          label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+          ...richTextLinks,
+          visibility: visibleWhenLeveledSpell(),
         },
-      },
-    ],
+      ],
+    },
   }
 
   const classesField: FormItem = {
@@ -347,8 +335,8 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
       kind: 'columns',
       collapseOrder: 'interleave',
       columns: [
-        { fields: [schoolGroup, classesField, descriptionField(ctx)] },
-        { fields: [levelGroup] },
+        { fields: [schoolField, classesField, descriptionField(ctx)] },
+        { fields: [levelField] },
       ],
     },
   ]
@@ -408,6 +396,7 @@ function castingFields(): FormItem[] {
               name: 'range.kind',
               label: 'Kind',
               options: rangeKindOptions,
+              placeholder: SPELL_CASTING_SELECT_PLACEHOLDER,
               required: true,
               width: 'lg',
             },
@@ -440,6 +429,7 @@ function castingFields(): FormItem[] {
               name: 'duration.kind',
               label: 'Duration kind',
               options: durationKindOptions,
+              placeholder: SPELL_CASTING_SELECT_PLACEHOLDER,
               required: true,
               width: 'lg',
             },
@@ -585,10 +575,11 @@ function castingFields(): FormItem[] {
       ],
     },
     {
-      type: 'select',
+      type: 'chips',
       name: 'deliveryMethod',
       label: 'Delivery method',
-      options: deliveryMethodOptions,
+      options: deliveryMethodChipOptions,
+      multiple: false,
       hint: 'Attack-roll delivery for spells that use spell attacks.',
       width: 'auto',
     },

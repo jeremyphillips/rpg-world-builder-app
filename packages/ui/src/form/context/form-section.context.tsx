@@ -21,7 +21,7 @@ export interface FormSectionContextValue {
   headingTier: FormHeadingTier
   /** Section density — rhythm and control scale resolve via {@link resolveFormDensity}. */
   density: FormDensity
-  /** Surface config for array item shells — defaults to raised when unset. */
+  /** Surface config for array item shells — defaults to subtle when unset. */
   arrayItemSurface?: SurfaceConfig
   /** Optional semantic wash for array item shells. */
   arrayItemTone?: SemanticSurfaceTone

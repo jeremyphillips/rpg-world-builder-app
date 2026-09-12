@@ -31,9 +31,10 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
       fieldName={TRAITS_FIELD_NAME}
       itemFields={fields}
       itemNoun={TRAIT_NOUN}
+      listTitle="Traits"
       ariaLabel="Traits"
       addLabel="Add trait"
-      emptyListLabel="No traits yet. Add one to get started."
+      emptyListLabel="No traits yet.\nAdd a trait to configure its grants and description."
       idPrefix="species-trait"
       mapListItem={({ row, index }) => ({
         title: traitItemTitle((row ?? {}) as TraitRowForm, index),

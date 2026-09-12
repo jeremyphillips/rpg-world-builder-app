@@ -57,15 +57,16 @@ describe('findFirstInvalidRowIndex', () => {
 })
 
 describe('autoSelectFirstInvalid', () => {
-  it('selects the first invalid row index', () => {
+  it('selects the first invalid row field id', () => {
     const errors = {
       features: [undefined, { name: { message: 'Required', type: 'required' } }],
     } as unknown as FieldErrors
-    const select = vi.fn()
+    const selectFieldId = vi.fn()
+    const fields = [{ id: 'field-a' }, { id: 'field-b' }]
 
-    autoSelectFirstInvalid(errors, 'features', select)
+    autoSelectFirstInvalid(errors, 'features', fields, selectFieldId)
 
-    expect(select).toHaveBeenCalledWith(1)
+    expect(selectFieldId).toHaveBeenCalledWith('field-b')
   })
 })
 

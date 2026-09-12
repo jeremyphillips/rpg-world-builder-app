@@ -79,19 +79,36 @@ defineArrayField({
 
 ## `itemVariant` / `item.surface` / `itemCollapsible`
 
-| Goal                                              | `itemVariant`       | `item.surface` / `item.tone`                                    | `itemCollapsible`     |
-| ------------------------------------------------- | ------------------- | --------------------------------------------------------------- | --------------------- |
-| Single inline control per row (tags, simple refs) | `auto` or `compact` | `{ elevation: 'raised' }` (default) or `{ emphasis: 'subtle' }` | omit / `false`        |
-| Multi-field block with header toolbar             | `detailed`          | raised, subtle, or semantic `tone`                              | `true` for long forms |
-| Nested array inside another item                  | `auto` → compact    | match parent or subtle wash                                     | usually `false`       |
-| Grant-style picker rows                           | `detailed`          | `{ elevation: 'raised' }`                                       | `true`                |
+| Goal                                              | `itemVariant`       | `item.surface` / `item.tone`                           | `itemCollapsible`     |
+| ------------------------------------------------- | ------------------- | ------------------------------------------------------ | --------------------- |
+| Single inline control per row (tags, simple refs) | `auto` or `compact` | default subtle header (omit `item.surface`)            | omit / `false`        |
+| Multi-field block with header toolbar             | `detailed` or omit  | override only — default is subtle header + canvas body | `true` for long forms |
+| Nested array inside another item                  | `auto` → compact    | match parent or omit                                   | `true` → detailed     |
+| Grant-style entity rows                           | `detailed`          | use `item.renderShell` — not `item.surface` alone      | `true`                |
 
-`itemCollapsible` applies to **detailed** items only — ignored for compact/nested
-auto-compact rows.
+**Detailed collapsible items compose `CollapsibleListItem`** — the same header / summary /
+body / actions slots as catalog picker rows. The header plane defaults to
+`bg-surface-subtle`; the disclosure body bleeds to the shell edge on `bg-background` with
+field content aligned via `--content-inline-start`.
 
-`item.surface` uses `SurfaceConfig` (`emphasis`, `elevation`). Optional `item.tone`
-applies a semantic wash (`info` | `success` | `warning` | `destructive`). Default surface:
-`{ elevation: 'raised' }`.
+**CollapsibleListItem rhythm contract** (form arrays, DEC, catalog — not `DetailEntityRow`):
+
+- **Shared geometry:** header vertical padding (`density`: compact `py-2`, comfortable
+  `py-3`), title→summary `gap-0.5`, body divider + `py-3` via `collapsibleListItemBodyFrameClasses`
+- **Not shared:** typography metrics, horizontal inset systems, body surface tone
+- **Invariant:** text anatomy never owns external vertical spacing (`pb-*` on summary/issue
+  lines is forbidden); header rhythm does not change between collapsed and expanded state
+
+`itemCollapsible: true` implies `itemVariant: 'detailed'` unless the author **explicitly**
+sets `itemVariant: 'compact'` (collapsible is ignored on compact rows). Nested arrays with
+`itemCollapsible: true` therefore keep disclosure chrome instead of silently auto-compacting.
+
+`item.surface` is an **override** — default subtle header + canvas body need no `item.surface`.
+Uses `SurfaceConfig` (`emphasis`, `elevation`). Optional `item.tone` applies a semantic wash
+(`info` | `success` | `warning` | `destructive`).
+
+When spreading an array builder, **merge** `item` — `item: { surface: … }` replaces the
+whole config and drops `collapsible`, `variant`, `header`, and `reorder`.
 
 ## `itemHeader` patterns
 
@@ -169,7 +186,10 @@ filterSelectOptions: ({ arrayItems, rowIndex, fieldName, options, watchedValues 
   options.filter(/* remove values selected in other rows */),
 ```
 
-`dependsOn` / `visibleWhen` on **item** fields use item-relative names.
+`dependsOn` / `visibleWhen` on **item** fields use item-relative names. Prefix with `../`
+to watch a parent path segment; use multiple hops for grandparent-row siblings — e.g. grant
+rows under `features.0.grants.0` can use `dependsOn: ['../../level']` to react to
+`features.0.level`.
 
 ## `arrayPattern`
 
@@ -188,11 +208,13 @@ arrayPattern: {
 
 1. **Absolute names in item `fields`** — use `name: 'label'`, not `traits.0.label`.
 2. **Missing `fallback`** — required on every `itemHeader`.
-3. **`itemCollapsible` on compact rows** — has no effect; switch to `itemVariant: 'detailed'`.
-4. **Zod mismatch** — hidden item fields need `z.optional()`; `min`/`max` should mirror schema.
-5. **Empty `legend` without parent label** — omit legend only when a parent stack/group
+3. **`itemCollapsible` on compact rows** — has no effect when `itemVariant: 'compact'` is explicit.
+4. **Replacing `item` when spreading builders** — merge (`item: { ...built.item, … }`) instead of
+   overwriting; a bare `item: { surface: … }` drops collapsible/header config.
+5. **Zod mismatch** — hidden item fields need `z.optional()`; `min`/`max` should mirror schema.
+6. **Empty `legend` without parent label** — omit legend only when a parent stack/group
    already labels the block (see [containers.md](./containers.md#array-fields)).
-6. **Resolver `.omit` in nested items** — works on top-level keys only, not inside array items.
+7. **Resolver `.omit` in nested items** — works on top-level keys only, not inside array items.
 
 ## Related
 

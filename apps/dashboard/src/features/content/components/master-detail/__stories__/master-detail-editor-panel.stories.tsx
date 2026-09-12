@@ -9,9 +9,12 @@ const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name', requir
 
 const selectedEditor: UseMasterDetailArrayResult = {
   fields: [{ id: 'field-a' }, { id: 'field-b' }],
+  selectedFieldId: 'field-a',
   selectedIndex: 0,
   select: () => {},
   handleAdd: () => {},
+  lastAddedFieldId: null,
+  clearLastAddedFieldId: () => {},
   deleteIndex: null,
   requestRemove: () => {},
   cancelRemove: () => {},
@@ -21,10 +24,12 @@ const selectedEditor: UseMasterDetailArrayResult = {
   move: () => {},
   moveUp: () => {},
   moveDown: () => {},
+  normalizeOrder: () => {},
 }
 
 const unselectedEditor: UseMasterDetailArrayResult = {
   ...selectedEditor,
+  selectedFieldId: null,
   selectedIndex: null,
 }
 
@@ -45,6 +50,12 @@ function PanelStory({
         itemFields={itemFields}
         fieldName="traits"
         idPrefix="class-feature"
+        itemNoun="feature"
+        selectedIdentity={{
+          title: 'Rage',
+          meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+          deletable: true,
+        }}
         showValidationBanner={showValidationBanner}
         emptySelectionLabel={masterDetailEmptySelectionLabel('feature')}
       />

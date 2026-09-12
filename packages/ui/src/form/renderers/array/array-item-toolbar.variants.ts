@@ -76,9 +76,8 @@ export const arrayItemHeaderDividerClasses = 'mx-1.5 text-muted-foreground'
 /** Fallback label after the divider (lighter than primary). */
 export const arrayItemHeaderFallbackClasses = 'text-xs font-light text-muted-foreground'
 
-/** Summary line below the title row — tight leading; pb-1 separates from item body fields. */
-export const arrayItemHeaderSummaryClasses =
-  'truncate pb-1 text-xs leading-none text-muted-foreground'
+/** Summary line below the title row — typography only; spacing owned by CLI header rhythm. */
+export const arrayItemHeaderSummaryClasses = 'truncate text-xs leading-none text-muted-foreground'
 
 /** Leading toolbar row — grip, caret, and title/compact fields only (no trailing actions). */
 export const arrayItemToolbarRowClasses = collapsibleListItemToolbarRowClasses
@@ -93,8 +92,10 @@ export function arrayItemHeaderSummaryIndentClasses(
   return resolveCollapsibleListItemLeadingChrome(options).contentColumnIndentClasses
 }
 
-/** Aligns detailed item bodies with the toolbar content column. */
-export const arrayItemBodyClasses = collapsibleListItemBodyClasses
+/** @deprecated Detailed items compose `CollapsibleListItem` — use `collapsibleListItemBodyClasses`. */
+export function arrayItemBodyClasses(options: CollapsibleListItemLeadingChromeOptions): string {
+  return collapsibleListItemBodyClasses(options)
+}
 
 /** Inline field region for compact items (same row as toolbar). */
 export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'

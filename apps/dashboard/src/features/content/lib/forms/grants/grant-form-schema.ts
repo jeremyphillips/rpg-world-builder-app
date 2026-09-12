@@ -229,9 +229,10 @@ function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
     .object({
       grantType: z.enum(GRANT_ROW_TYPES),
       /**
-       * Unlock level for this grant row. `undefined` = default group ("When feature is gained").
-       * For class/subclass features this must be > feature.level; for species traits it is a
-       * character level.
+       * Unlock level for this grant row. `undefined` or `default` = the parent unlock
+       * (feature level for class/subclass features; level 1 for species traits).
+       * Class/subclass feature grants may also pick a later character level (> feature.level).
+       * Species trait grants pick any character level independently.
        */
       unlockLevel: z
         .union([

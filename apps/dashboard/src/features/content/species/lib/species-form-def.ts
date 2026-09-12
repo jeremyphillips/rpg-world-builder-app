@@ -22,6 +22,11 @@ import {
   speciesCreateDefaultValues,
   speciesToFormValues,
 } from './species-form-values'
+import {
+  buildSpeciesPreviewIdentity,
+  buildSpeciesPreviewSections,
+} from './species-preview-projection'
+import { SpeciesPreviewPlayerHost } from './species-preview-player-host'
 
 const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesInput> = {
   routeKey: 'species',
@@ -57,6 +62,12 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     traits: entity.traits.map((trait) => trait.id),
     'heritage.options': entity.heritage?.options.map((option) => option.id) ?? [],
   }),
+
+  preview: {
+    buildIdentity: buildSpeciesPreviewIdentity,
+    buildSections: buildSpeciesPreviewSections,
+    renderPlayerPreview: SpeciesPreviewPlayerHost,
+  },
 }
 
 contentFormRegistry['species'] = speciesFormDef

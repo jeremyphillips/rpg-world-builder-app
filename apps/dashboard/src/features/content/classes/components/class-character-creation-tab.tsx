@@ -99,9 +99,10 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
       fieldName={STARTING_EQUIPMENT_OPTIONS_FIELD_NAME}
       itemFields={optionFields}
       itemNoun={STARTING_EQUIPMENT_OPTION_NOUN}
+      listTitle="Packages"
       ariaLabel="Starting equipment packages"
       addLabel={ADD_STARTING_EQUIPMENT_OPTION_LABEL}
-      emptyListLabel="No packages yet. Add one to get started."
+      emptyListLabel="No packages yet.\nAdd a package to configure its equipment choices."
       idPrefix="class-starting-equipment-option"
       editor={editor}
       leadingContent={

@@ -64,11 +64,23 @@ export function findFirstInvalidRowIndex(errors: FieldErrors, name: string): num
   return null
 }
 
+export function findIndexByFieldId(
+  fields: ReadonlyArray<{ id: string }>,
+  fieldId: string | null,
+): number | null {
+  if (fieldId === null) return null
+  const index = fields.findIndex((field) => field.id === fieldId)
+  return index >= 0 ? index : null
+}
+
 export function autoSelectFirstInvalid(
   errors: FieldErrors,
   name: string,
-  select: (index: number) => void,
+  fields: ReadonlyArray<{ id: string }>,
+  selectFieldId: (fieldId: string) => void,
 ): void {
   const index = findFirstInvalidRowIndex(errors, name)
-  if (index !== null) select(index)
+  if (index === null) return
+  const field = fields[index]
+  if (field) selectFieldId(field.id)
 }

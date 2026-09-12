@@ -14,9 +14,9 @@ export const arrayItemIssueSummaryClasses = cva(
   {
     variants: {
       placement: {
-        collapsed: 'pb-1 text-destructive',
+        collapsed: 'text-destructive',
         expanded: 'mb-3 text-destructive',
-        compactSummary: 'pb-1 text-destructive font-normal',
+        compactSummary: 'text-destructive font-normal',
       },
     },
     defaultVariants: {

@@ -1,4 +1,4 @@
-import type { MasterDetailListBadge } from '@/features/content/components/master-detail/master-detail-list-panel'
+import type { MasterDetailListBadge } from '@/features/content/components/master-detail/master-detail-row-badges'
 
 import {
   AVAILABILITY_REASON_CODES,

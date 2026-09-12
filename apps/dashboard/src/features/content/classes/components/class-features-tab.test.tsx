@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -48,6 +48,11 @@ const unarmored: Feature = {
   grants: [],
 }
 
+async function deleteViaOverflow(user: ReturnType<typeof userEvent.setup>, title: string) {
+  await user.click(screen.getByRole('button', { name: new RegExp(`Actions for ${title}`, 'i') }))
+  await user.click(screen.getByRole('menuitem', { name: /Delete feature/i }))
+}
+
 describe('ClassFeaturesTab', () => {
   it('shows the empty state when there are no features', () => {
     render(<TabShell />)
@@ -61,20 +66,30 @@ describe('ClassFeaturesTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
 
-    expect(screen.getByRole('button', { name: /^(?!Remove|Drag).*Feature 1/ })).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('navigation', { name: 'Features' })).getByRole('button', {
+        name: /Feature 1/i,
+      }),
+    ).toBeInTheDocument()
     expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.0')
   })
 
-  it('renders a level eyebrow for each row', () => {
+  it('renders structured meta for each row', () => {
     render(<TabShell features={[rage]} />)
-    expect(screen.getByText('Level 1')).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('navigation', { name: 'Features' })).getByText('Level 1 · Homebrew'),
+    ).toBeInTheDocument()
   })
 
   it('selects another feature when its row is clicked', async () => {
     const user = userEvent.setup()
     render(<TabShell features={[rage, unarmored]} />)
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Unarmored Defense/ }))
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Features' })).getByRole('button', {
+        name: /Unarmored Defense/i,
+      }),
+    )
     expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.1')
   })
 
@@ -82,7 +97,7 @@ describe('ClassFeaturesTab', () => {
     const user = userEvent.setup()
     render(<TabShell features={[rage]} entitySource="homebrew" />)
 
-    await user.click(screen.getByRole('button', { name: /Remove Rage/i }))
+    await deleteViaOverflow(user, 'Rage')
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete feature?')
 
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
@@ -92,7 +107,7 @@ describe('ClassFeaturesTab', () => {
     })
   })
 
-  it('locks system features on a system class (no remove control, System badge)', () => {
+  it('locks system features on a system class (no overflow delete, System meta)', () => {
     render(
       <TabShell
         features={[rage]}
@@ -101,8 +116,8 @@ describe('ClassFeaturesTab', () => {
       />,
     )
 
-    expect(screen.getByText('System')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Remove Rage/i })).not.toBeInTheDocument()
+    expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
+    expect(screen.queryByRole('button', { name: /Actions for Rage/i })).not.toBeInTheDocument()
   })
 
   it('allows deleting newly added rows even on a system class', async () => {
@@ -111,10 +126,10 @@ describe('ClassFeaturesTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
 
-    expect(screen.getByRole('button', { name: /Remove Feature 2/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Actions for Feature 2/i })).toBeInTheDocument()
   })
 
-  it('shows inactive badge and availability alert for subclass-choice rows when subclassing is disabled', () => {
+  it('shows availability alert for subclass-choice rows when subclassing is disabled', () => {
     const subclassChoice: Feature = {
       kind: 'subclass-choice',
       id: 'fighter-subclass',
@@ -131,7 +146,6 @@ describe('ClassFeaturesTab', () => {
       />,
     )
 
-    expect(screen.getAllByText('Inactive').length).toBeGreaterThan(0)
     expect(screen.getByText(/Subclass choices are disabled/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Enable subclasses' })).toHaveAttribute(
       'href',

@@ -305,7 +305,7 @@ solid background + border + 16px padding (`{ variant: 'container' }`) — regard
 the wrapper has no field container; **each column child** is treated as a top-level unit.
 **Nothing nested inside** a chromed unit (nested `fields`, dependent controller/dependents,
 nested groups, nested dependents, rows, slots) receives field-container treatment. Arrays
-keep the existing **item-shell** model (elevated cards), not a field-container wrap of the
+keep the existing **item-shell** model (subtle header + canvas body), not a field-container wrap of the
 whole list.
 
 **Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
@@ -348,8 +348,11 @@ Token: `fieldSeparatorVariants`. Do not use row `className` for recurring divide
 ## Array fields
 
 Repeatable section via `useFieldArray`. Item field names are **relative** (renderer prefixes
-`arrayName.index`). Item shells default to the **elevated** surface (`bg-card` + raised shadow);
-use `item.surface` / `item.tone` or stack `dependents.surface` + `dependents.scope: 'arrayItems'` to override.
+`arrayName.index`). Detailed collapsible items compose `CollapsibleListItem` — subtle header
+(`bg-surface-subtle`) plus a **full-bleed** canvas body (`bg-background`). Compact inline rows
+and `item.renderShell` entity cards are the other array-item layouts. Use `item.surface` /
+`item.tone` or stack `dependents.surface` + `dependents.scope: 'arrayItems'` only when
+overriding the default header.
 
 **Authoring guide:** [array-field-authoring.md](./array-field-authoring.md) — headers, chrome
 decision table, add menus, nested arrays, and common mistakes.
@@ -392,10 +395,12 @@ See [Component entry files](#component-entry-files).
 stacks, groups, or array items) also omit it so parent `fieldStackRhythmVariants` gap
 controls spacing.
 
-**Item chrome:** Each row renders a header toolbar (optional drag handle, optional collapse
-caret, title, remove). `itemVariant: 'auto'` picks `compact` when item fields are a single
-leaf `row`; otherwise `detailed`. Nested arrays inside another item default to compact;
-pass `itemVariant: 'detailed'` to keep grant-style collapsible headers inside nested groups.
+**Item chrome:** Detailed rows compose `CollapsibleListItem` (header, summary, body, actions).
+Compact inline rows use `ArrayItemShell` with `layout="compactRow"`. `itemVariant: 'auto'`
+picks `compact` when item fields are a single leaf `row`; otherwise `detailed`.
+`itemCollapsible: true` implies `detailed` unless `itemVariant: 'compact'` is explicit —
+including nested arrays. Pass `itemVariant: 'detailed'` only when auto-resolution would
+pick compact but disclosure chrome is still required without `itemCollapsible`.
 
 ```ts
 {
@@ -457,7 +462,7 @@ Optional hooks:
 inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,
 `digits`, …) compose the same way as schema `kind: 'row'` fields.
 
-| `item.surface` / `item.tone` | Item shell — defaults to `{ elevation: 'raised' }`; override with subtle wash or semantic tone |
+| `item.surface` / `item.tone` | Item header — defaults to `{ emphasis: 'subtle' }`; override with raised elevation or semantic tone |
 | `itemHeader` | Primary/fallback labels; optional `summary` on a second row below the title (detailed). |
 | `itemHeader.showFallbackInHeader` | When true, appends ` · {fallback}` after the primary title (default `false`). |
 | `itemCollapsible` | Detailed items only — collapse body into header row. |

@@ -64,6 +64,10 @@ describe('PreviewRail', () => {
     expect(screen.getByTestId('preview-rail-scroll')).toHaveClass('overflow-y-auto')
     expect(screen.getByTestId('preview-rail-scroll').className).toContain('pe-2.5')
     expect(screen.getByRole('heading', { name: 'Class Preview' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Sections' })).toHaveClass(
+      'eyebrow-style-sm',
+      'text-foreground',
+    )
     expect(screen.getByText('Draft')).toBeInTheDocument()
     expect(screen.getByText('Available')).toBeInTheDocument()
     expect(screen.getByText('All players')).toBeInTheDocument()

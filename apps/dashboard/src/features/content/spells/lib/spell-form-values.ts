@@ -24,7 +24,10 @@ import {
   type SpellTags,
 } from '@rpg/contracts'
 
-import { finalizeContentInput, slugForInputParse } from '../../lib/forms/registry/content-form-key-helpers'
+import {
+  finalizeContentInput,
+  slugForInputParse,
+} from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import { SPELL_AREA_GEOMETRY_NONE, SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 import type { SpellFormValues } from './spell-form-fields'
@@ -104,11 +107,8 @@ export const spellCreateDefaultValues: Partial<SpellFormValues> = {
     normal: { value: 1, unit: 'action' },
     canBeCastAsRitual: false,
   },
-  range: { kind: 'self' },
-  duration: { kind: 'instantaneous', value: 1, unit: 'round' },
   components: { verbal: true, somatic: true, material: { enabled: false } },
   areaOfEffect: { ...EMPTY_SPELL_AREA_OF_EFFECT },
-  deliveryMethod: SPELL_DELIVERY_METHOD_NONE,
 }
 
 export function spellCastingTimeToFormValues(castingTime: SpellCastingTime): SpellFormCastingTime {
@@ -134,6 +134,24 @@ export function spellCastingTimeFromFormValues(
     },
     canBeCastAsRitual: castingTime.canBeCastAsRitual,
   })
+}
+
+export function trySpellCastingTimeFromFormValues(
+  castingTime: SpellFormCastingTime | undefined,
+): SpellCastingTime | undefined {
+  if (!castingTime) return undefined
+
+  const { value, unit, trigger } = castingTime.normal
+  const result = spellCastingTimeSchema.safeParse({
+    normal: {
+      value,
+      unit,
+      ...(unit === 'reaction' && trigger?.trim() ? { trigger: trigger.trim() } : {}),
+    },
+    canBeCastAsRitual: castingTime.canBeCastAsRitual,
+  })
+
+  return result.success ? result.data : undefined
 }
 
 export function spellRangeToFormValues(range: SpellRange): SpellFormRange {
@@ -224,7 +242,7 @@ export function spellComponentsToFormValues(components: SpellComponents): SpellF
   }
 }
 
-export function spellComponentsFromFormValues(components: SpellFormComponents): SpellComponents {
+function spellComponentsPayloadFromFormValues(components: SpellFormComponents): SpellComponents {
   const parsed: SpellComponents = {}
   if (components.verbal) parsed.verbal = true
   if (components.somatic) parsed.somatic = true
@@ -234,7 +252,79 @@ export function spellComponentsFromFormValues(components: SpellFormComponents): 
       parsed.material = { description: materialDescription }
     }
   }
-  return spellComponentsSchema.parse(parsed)
+  return parsed
+}
+
+export function trySpellComponentsFromFormValues(
+  components: SpellFormComponents | undefined,
+): SpellComponents | undefined {
+  if (!components) return undefined
+  const result = spellComponentsSchema.safeParse(spellComponentsPayloadFromFormValues(components))
+  return result.success ? result.data : undefined
+}
+
+export function spellComponentsFromFormValues(components: SpellFormComponents): SpellComponents {
+  return spellComponentsSchema.parse(spellComponentsPayloadFromFormValues(components))
+}
+
+export function trySpellRangeFromFormValues(
+  range: SpellFormRange | undefined,
+): SpellRange | undefined {
+  if (!range?.kind) return undefined
+  const result = spellRangeSchema.safeParse(
+    range.kind === 'distance'
+      ? {
+          kind: 'distance',
+          value: { value: range.value?.value ?? 0, unit: 'ft' },
+        }
+      : range.kind === 'special'
+        ? {
+            kind: 'special',
+            description: range.description?.trim() ?? '',
+          }
+        : { kind: range.kind },
+  )
+  return result.success ? result.data : undefined
+}
+
+function trySpellTimedDurationFromForm(duration: SpellFormDuration): SpellDuration | undefined {
+  const base = {
+    kind: 'timed' as const,
+    value: duration.value ?? 1,
+    unit: duration.unit ?? 'round',
+  }
+  const timedPayload = duration.concentration
+    ? {
+        ...base,
+        concentration: true as const,
+        ...(duration.upTo ? { upTo: true as const } : {}),
+      }
+    : duration.upTo
+      ? { ...base, upTo: true as const }
+      : base
+  const result = spellDurationSchema.safeParse(timedPayload)
+  return result.success ? result.data : undefined
+}
+
+export function trySpellDurationFromFormValues(
+  duration: SpellFormDuration | undefined,
+): SpellDuration | undefined {
+  if (!duration?.kind) return undefined
+
+  if (duration.kind === 'timed') {
+    return trySpellTimedDurationFromForm(duration)
+  }
+
+  if (duration.kind === 'special') {
+    const result = spellDurationSchema.safeParse({
+      kind: 'special',
+      description: duration.description?.trim() ?? '',
+    })
+    return result.success ? result.data : undefined
+  }
+
+  const result = spellDurationSchema.safeParse({ kind: duration.kind })
+  return result.success ? result.data : undefined
 }
 
 export function spellTagsToFormValues(tags: Spell['tags']): SpellFormTags {
@@ -396,6 +486,54 @@ export function spellAreaOfEffectFromFormValues(
   return AREA_GEOMETRY_FROM_FORM_VALUES[shape](areaOfEffect)
 }
 
+function areaGeometryCandidateFromFormValues(
+  shape: AreaGeometryShape,
+  area: SpellFormAreaOfEffect,
+): unknown {
+  switch (shape) {
+    case 'sphere':
+      return { shape, radius: toPositiveDistance(area.radius) }
+    case 'emanation':
+      return { shape, radius: toPositiveDistance(area.radius) }
+    case 'cone':
+      return { shape, length: toPositiveDistance(area.length) }
+    case 'cube':
+      return { shape, size: toPositiveDistance(area.size) }
+    case 'line':
+      return {
+        shape,
+        length: toPositiveDistance(area.length),
+        width: toPositiveDistance(area.width),
+      }
+    case 'cylinder':
+      return {
+        shape,
+        radius: toPositiveDistance(area.radius),
+        height: toPositiveDistance(area.height),
+      }
+    case 'special':
+      return { shape, description: area.description?.trim() ?? '' }
+    default:
+      return undefined
+  }
+}
+
+export function trySpellAreaOfEffectFromFormValues(
+  areaOfEffect: SpellFormAreaOfEffect | undefined,
+): AreaGeometry | undefined {
+  if (!areaOfEffect?.shape || areaOfEffect.shape === SPELL_AREA_GEOMETRY_NONE) {
+    return undefined
+  }
+
+  const shapeResult = areaGeometryShapeSchema.safeParse(areaOfEffect.shape)
+  if (!shapeResult.success) return undefined
+
+  const result = areaGeometrySchema.safeParse(
+    areaGeometryCandidateFromFormValues(shapeResult.data, areaOfEffect),
+  )
+  return result.success ? result.data : undefined
+}
+
 /** Maps resolution form state to create/update payload semantics. */
 export function resolutionToPatchInput(
   values: SpellFormValues,
@@ -424,18 +562,14 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     ...(entity.castingTime
       ? { castingTime: spellCastingTimeToFormValues(entity.castingTime) }
       : { castingTime: spellCreateDefaultValues.castingTime! }),
-    ...(entity.range
-      ? { range: spellRangeToFormValues(entity.range) }
-      : { range: spellCreateDefaultValues.range! }),
-    ...(entity.duration
-      ? { duration: spellDurationToFormValues(entity.duration) }
-      : { duration: spellCreateDefaultValues.duration! }),
+    ...(entity.range ? { range: spellRangeToFormValues(entity.range) } : {}),
+    ...(entity.duration ? { duration: spellDurationToFormValues(entity.duration) } : {}),
     ...(entity.components
       ? { components: spellComponentsToFormValues(entity.components) }
       : { components: spellCreateDefaultValues.components! }),
     tags: spellTagsToFormValues(entity.tags),
     areaOfEffect: spellAreaOfEffectToFormValues(entity.areaOfEffect),
-    deliveryMethod: entity.deliveryMethod ?? SPELL_DELIVERY_METHOD_NONE,
+    ...(entity.deliveryMethod ? { deliveryMethod: entity.deliveryMethod } : {}),
     ...(entity.resolution && isSpellResolutionEditorEligible(entity)
       ? (() => {
           const resolution = resolutionToForm(entity.resolution)
@@ -452,17 +586,31 @@ function spellDeliveryMethodFromForm(deliveryMethod: string | undefined) {
     : undefined
 }
 
+function spellSchoolForWire(
+  school: SpellFormValues['school'] | undefined,
+  validationIntent: ContentValidationIntent,
+) {
+  const trimmed = typeof school === 'string' ? school.trim() : ''
+  if (!trimmed) {
+    return validationIntent === 'draft' ? undefined : school
+  }
+  return trimmed
+}
+
 function spellIdentityWireFields(
   persistedValues: Omit<SpellFormValues, 'effects'>,
   ctx?: ContentFormInputCtx<Spell>,
+  validationIntent: ContentValidationIntent = 'publish',
 ) {
+  const school = spellSchoolForWire(persistedValues.school, validationIntent)
+
   return {
     slug: slugForInputParse(persistedValues.name, ctx),
     name: persistedValues.name,
     description: persistedValues.description || undefined,
     cantripScaling: persistedValues.cantripScaling || undefined,
     higherLevelSlotEffect: persistedValues.higherLevelSlotEffect || undefined,
-    school: persistedValues.school,
+    ...(school !== undefined ? { school } : {}),
   }
 }
 
@@ -510,7 +658,7 @@ function spellPublishWirePayload(values: SpellFormValues, ctx?: ContentFormInput
   const resolution = resolutionToPatchInput(values, ctx)
 
   return {
-    ...spellIdentityWireFields(persistedValues, ctx),
+    ...spellIdentityWireFields(persistedValues, ctx, 'publish'),
     level: persistedValues.level,
     classIds: persistedValues.classIds,
     castingTime: spellCastingTimeFromFormValues(
@@ -531,7 +679,7 @@ function spellDraftWirePayload(values: SpellFormValues, ctx?: ContentFormInputCt
   const tags = spellTagsFromFormValues(persistedValues.tags)
 
   return {
-    ...spellIdentityWireFields(persistedValues, ctx),
+    ...spellIdentityWireFields(persistedValues, ctx, 'draft'),
     ...spellDraftOptionalCastingBlock(persistedValues),
     ...(tags ? { tags } : {}),
     ...spellOptionalAreaAndDelivery(persistedValues),

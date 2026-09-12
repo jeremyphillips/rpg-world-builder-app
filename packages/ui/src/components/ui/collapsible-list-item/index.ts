@@ -10,12 +10,14 @@ export {
 export {
   collapsibleListItemActionsRailClasses,
   collapsibleListItemBodyClasses,
+  collapsibleListItemBodyFrameClasses,
   collapsibleListItemChromeButtonClasses,
   collapsibleListItemCollapseButtonClasses,
   collapsibleListItemDraggingClasses,
   collapsibleListItemDragHandleClasses,
   collapsibleListItemHeaderRowClasses,
   collapsibleListItemHeaderSummaryClasses,
+  collapsibleListItemHeaderVerticalPaddingVariants,
   collapsibleListItemMainClasses,
   collapsibleListItemShellClasses,
   collapsibleListItemShellInsetClasses,
@@ -23,6 +25,7 @@ export {
   collapsibleListItemShellVariants,
   collapsibleListItemToolbarContentClasses,
   collapsibleListItemToolbarRowClasses,
+  type CollapsibleListItemDensity,
 } from './collapsible-list-item.variants'
 
 export { CollapsibleListItemActions } from './collapsible-list-item-actions.client'

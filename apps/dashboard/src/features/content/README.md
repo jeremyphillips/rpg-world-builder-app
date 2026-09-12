@@ -100,13 +100,14 @@ list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 
 | Piece                                                                                                 | Role                                                                                                                                                                                    |
 | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`useMasterDetailArray`](./lib/master-detail/use-master-detail-array.ts)                              | Binds to a parent-form field array (`useFieldArray`); tracks selection (derived/clamped), delete-confirm flow, row reorder, and validation surfacing.                                   |
-| [`MasterDetailListPanel`](./components/master-detail/master-detail-list-panel.tsx)                    | Sidebar: add button + selectable rows with optional eyebrow, status badge, per-row delete, and drag-to-reorder (keyboard-accessible handle).                                            |
-| [`MasterDetailEditorPanel`](./components/master-detail/master-detail-editor-panel.tsx)                | Detail column: validation banner, selected row `FormItems`, or empty-selection hint.                                                                                                    |
+| [`useMasterDetailArray`](./lib/master-detail/use-master-detail-array.ts)                              | Binds to a parent-form field array (`useFieldArray`); tracks selection by stable RHF field id, delete-confirm flow, optional `normalizeOrder(compareRows)`, and validation surfacing.   |
+| [`MasterDetailListPanel`](./components/master-detail/master-detail-list-panel.tsx)                    | Bordered collection rail: `listTitle` + Add header, whole-row selection with tint/inset accent, structured meta subtitle (`eyebrow · sourceLabel`).                                     |
+| [`MasterDetailEditorPanel`](./components/master-detail/master-detail-editor-panel.tsx)                | Bordered detail rail: compact identity header, overflow delete (hidden when locked), validation banner, selected row `FormItems`, or empty-selection hint.                              |
 | [`MasterDetailDeleteDialog`](./components/master-detail/master-detail-delete-dialog.tsx)              | Shared `ConfirmDialog` wrapper for row removal.                                                                                                                                         |
 | [`MasterDetailValidationBanner`](./components/master-detail/master-detail-validation-banner.tsx)      | Post-submit alert when unselected list rows have validation errors.                                                                                                                     |
-| [`buildEmbeddedMasterDetailListItem`](./lib/master-detail/build-embedded-master-detail-list-item.ts)  | Builds a list row with source badges and `deletable`.                                                                                                                                   |
-| [`resolveEmbeddedRowMeta`](./lib/master-detail/resolve-embedded-row-meta.ts)                          | Derives system/homebrew source, delete-lock, and badge set for embedded rows.                                                                                                           |
+| [`buildEmbeddedMasterDetailListItem`](./lib/master-detail/build-embedded-master-detail-list-item.ts)  | Builds a list row with structured meta (`eyebrow`, `sourceLabel`) and detail `deletable`.                                                                                               |
+| [`resolveEmbeddedRowMeta`](./lib/master-detail/resolve-embedded-row-meta.ts)                          | Derives system/homebrew source label, delete-lock, and availability for embedded rows.                                                                                                  |
+| [`joinMasterDetailItemMeta`](./lib/master-detail/master-detail-item-meta.ts)                          | Shared `·` join for list rows and detail identity subtitles.                                                                                                                            |
 | [`isEmbeddedRowSystemLocked`](./lib/master-detail/is-embedded-row-system-locked.ts)                   | Shared delete-lock policy when embedded rows have no per-row `source`.                                                                                                                  |
 | [`content-campaign-availability`](./lib/master-detail/content-campaign-availability.ts)               | Shared row-key helpers for master-detail lists.                                                                                                                                         |
 | [`FormEmbeddedMasterDetailEditor`](./components/master-detail/form-embedded-master-detail-editor.tsx) | Composite wiring for form-embedded arrays: list + detail + delete dialog over the parent form. Optional `leadingContent` for fields above the grid (uses `fieldGroupFlexStackClasses`). |
@@ -121,11 +122,22 @@ fit this composite.
 `useMasterDetailArray` resolves validation errors for nested dot paths (e.g.
 `heritage.options`) so error badges and auto-select work on inner lists.
 
-`FormEmbeddedMasterDetailEditor` defaults: sortable list, delete controls, and
-System/Homebrew badges. Pass
-`ContentFormCtx.embeddedSeedRowIds` (populated on edit via
-`ContentFormDef.extractEmbeddedSeedRowIds`) so only seed rows lock on system
-entities; newly added rows show Homebrew and remain deletable.
+**Action ownership:** the list rail owns collection actions (**Add**). Item
+mutation/destructive actions live on the detail overflow menu (**Delete** only in
+this pass). Prevents delete/duplicate/availability controls from leaking onto
+list rows.
+
+**Ordering:** domain policy, not presentation. The hook exposes
+`normalizeOrder(compareRows, { appendFieldId })` with stable equal-key ordering;
+callers decide when to invoke it. Class Features normalizes by level after add
+and after the selected row's level commit only — editing name/description/grants
+must not reorder. Other embedded-array consumers stay append-only.
+
+`FormEmbeddedMasterDetailEditor` requires separate `listTitle` (visible header)
+and `ariaLabel` (nav accessible name). Pass `ContentFormCtx.embeddedSeedRowIds`
+(populated on edit via `ContentFormDef.extractEmbeddedSeedRowIds`) so only seed
+rows lock on system entities; newly added rows show Homebrew and remain deletable
+from the detail overflow menu.
 
 Scope notes:
 

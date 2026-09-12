@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   CLASS_FEATURE_KINDS,
   campaignLevelSchema,
+  classValidationMessages,
   MAX_CHARACTER_LEVEL,
   resolveGrantGroupsFromContent,
   type ClassFeature,
@@ -18,6 +19,7 @@ import {
 import {
   GRANT_TYPES,
   GRANT_TYPE_LABELS,
+  GRANT_DEFAULT_UNLOCK_LEVEL,
   createGrantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
 import {
@@ -31,14 +33,35 @@ import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/
 
 export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
-  return z.object({
-    id: z.string().min(1).optional(),
-    kind: z.enum(CLASS_FEATURE_KINDS).optional(),
-    name: z.string().min(1),
-    description: z.string().optional(),
-    level: levelField,
-    grants: z.array(createGrantRowFormSchema(maxLevel)),
-  })
+  return z
+    .object({
+      id: z.string().min(1).optional(),
+      kind: z.enum(CLASS_FEATURE_KINDS).optional(),
+      name: z.string().min(1),
+      description: z.string().optional(),
+      level: levelField,
+      grants: z.array(createGrantRowFormSchema(maxLevel)),
+    })
+    .superRefine((row, ctx) => {
+      for (const [index, grant] of (row.grants ?? []).entries()) {
+        const unlockLevel = grant.unlockLevel
+        if (unlockLevel === undefined || unlockLevel === GRANT_DEFAULT_UNLOCK_LEVEL) continue
+
+        const numericUnlock = typeof unlockLevel === 'number' ? unlockLevel : Number(unlockLevel)
+        if (!Number.isFinite(numericUnlock)) continue
+
+        if (numericUnlock <= row.level) {
+          ctx.addIssue({
+            code: 'custom',
+            message: classValidationMessages.grantGroupUnlockAfterFeatureLevel({
+              unlockLevel: numericUnlock,
+              featureLevel: row.level,
+            }),
+            path: ['grants', index, 'unlockLevel'],
+          })
+        }
+      }
+    })
 }
 
 /** Draft feature row — name may be empty while authoring. */
@@ -116,7 +139,9 @@ export function classFeatureItemFields(
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
     },
-    ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx),
+    ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx, {
+      inheritUnlockFromParentField: 'level',
+    }),
   ]
 }
 

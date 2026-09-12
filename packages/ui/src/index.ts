@@ -347,6 +347,7 @@ export {
 } from './components/ui/chrome.variants'
 export {
   establishSurfaceCurrent,
+  portalDropdownSurfaceClasses,
   portalPopoverSurfaceClasses,
   SURFACE_CURRENT_PLANES,
   type SurfaceCurrentPlane,
@@ -611,6 +612,10 @@ export {
   DropdownMenuRadioGroup,
 } from './components/ui/dropdown-menu.client'
 export {
+  DropdownMenuItemContent,
+  type DropdownMenuItemContentProps,
+} from './components/ui/dropdown-menu-item-content'
+export {
   UserMenuTrigger,
   type UserMenuTriggerProps,
 } from './components/ui/user-menu-trigger.client'
@@ -697,10 +702,13 @@ export {
   CollapsibleListItemToolbar,
   buildCollapsibleListItemLeadingChromeStyle,
   collapsibleListItemBodyClasses,
+  collapsibleListItemBodyFrameClasses,
   collapsibleListItemChromeColumnClasses,
+  collapsibleListItemHeaderVerticalPaddingVariants,
   type CollapsibleListItemActionsProps,
   type CollapsibleListItemBodyProps,
   type CollapsibleListItemCollapseButtonProps,
+  type CollapsibleListItemDensity,
   type CollapsibleListItemDragHandleConfig,
   type CollapsibleListItemDragHandleProps,
   type CollapsibleListItemProps,

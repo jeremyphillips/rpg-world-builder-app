@@ -128,6 +128,7 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(body?.className).toContain(disclosureEntityCardBodyInlineStartClasses)
     expect(body?.className).toContain('pr-[var(--entity-surface-inline-end)]')
     expect(body).toHaveClass('border-t')
+    expect(body).toHaveClass('bg-background')
     expect(body?.className).not.toContain('content-column-indent')
     expect(body?.className).not.toContain('content-inline-start')
 
@@ -150,6 +151,39 @@ describe('grant array DisclosureEntityCard shell', () => {
     await user.clear(ability)
     await user.type(ability, 'int')
     expect(ability).toHaveValue('int')
+  })
+
+  it('toggles collapse when the grants array is nested inside a detail group', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form
+        schema={formSchema}
+        fields={[
+          {
+            kind: 'group',
+            fieldChrome: { variant: 'none' },
+            fields: grantFields,
+          },
+        ]}
+        defaultValues={twoGrantDefaults}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const expand = screen.getByRole('button', { name: /Expand Grants · Speak with Animals/i })
+    expect(expand).toHaveClass('cursor-pointer')
+
+    const firstRow = screen
+      .getByText('Speak with Animals', { selector: '.font-body-emphasis' })
+      .closest('[data-array-item-prefix]') as HTMLElement
+    const ability = within(firstRow).getByLabelText('Spellcasting ability')
+    expect(ability.closest('[hidden]')).toBeTruthy()
+
+    await user.click(expand)
+
+    expect(ability.closest('[hidden]')).toBeNull()
   })
 
   it('removes the row without leaving a disclosure toggle conflict', async () => {

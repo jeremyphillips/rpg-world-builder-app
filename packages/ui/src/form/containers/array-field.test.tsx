@@ -9,6 +9,7 @@ import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
 import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
 import { submitAndExpectPayload } from '../test-utils'
+import { collapsibleListItemHeaderVerticalPaddingVariants } from '../../components/ui/collapsible-list-item/collapsible-list-item.variants'
 
 // ── Schema ──────────────────────────────────────────────────────────────────
 
@@ -171,21 +172,21 @@ describe('ArrayFieldRenderer', () => {
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
-    expect(itemShell).toHaveClass('bg-card')
-    expect(itemShell).toHaveClass('shadow-surface-raised')
+    expect(itemShell).toHaveClass('bg-surface-subtle')
+    expect(itemShell).not.toHaveClass('bg-card')
     const dependentsRegion = addButton.closest('[data-field-dependent-fields]')
     expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
-    expect(dependentsRegion?.querySelector('.bg-card')).toBe(itemShell)
+    expect(dependentsRegion?.querySelector('.bg-surface-subtle')).toBe(itemShell)
   })
 
   it('applies item surface override on array item shells', async () => {
     const user = userEvent.setup()
-    const subtleFields: FormItem[] = [
+    const raisedFields: FormItem[] = [
       {
         kind: 'array',
         name: 'traits',
         legend: 'Traits',
-        item: { surface: { emphasis: 'subtle' } },
+        item: { surface: { elevation: 'raised' } },
         fields: traitFields,
         addAction: { label: 'Add trait' },
       },
@@ -194,7 +195,7 @@ describe('ArrayFieldRenderer', () => {
     render(
       <Form<Values>
         schema={schema}
-        fields={subtleFields}
+        fields={raisedFields}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,
@@ -203,9 +204,9 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait #1' })
-    expect(itemShell).toHaveClass('bg-surface-subtle')
-    expect(itemShell).toHaveClass('border-border')
-    expect(itemShell).not.toHaveClass('bg-card')
+    expect(itemShell).toHaveClass('bg-card')
+    expect(itemShell).toHaveClass('shadow-surface-raised')
+    expect(itemShell).not.toHaveClass('bg-surface-subtle')
   })
 
   it('defaults the add control to the outline button variant', () => {
@@ -379,14 +380,20 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('option', { name: 'Movement bonus' })).toBeInTheDocument()
   })
 
-  it('defaults array item shells to elevated card chrome', async () => {
+  it('defaults array item shells to a subtle header and canvas body', async () => {
     const user = userEvent.setup()
     renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait #1' })
-    expect(itemShell).toHaveClass('bg-card')
-    expect(itemShell).toHaveClass('shadow-surface-raised')
+    expect(itemShell).toHaveClass('bg-surface-subtle')
+    expect(itemShell).toHaveClass('border-border')
+    expect(itemShell).not.toHaveClass('bg-card')
+    expect(itemShell).not.toHaveClass('shadow-surface-raised')
+
+    const body = itemShell.querySelector('[id$="-body"]')
+    expect(body).toHaveClass('bg-background')
+    expect(body).toHaveClass('border-t')
   })
 
   it('uses gap-6 between comfortable-density array items while keeping gap-6 inside item bodies', async () => {
@@ -430,9 +437,8 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass(
       'rounded-md',
       'border',
-      'border-card-border',
-      'bg-card',
-      'shadow-surface-raised',
+      'border-border',
+      'bg-surface-subtle',
       'pl-2',
     )
   })
@@ -773,6 +779,84 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getAllByRole('button', { name: /Remove Traits · Trait #/ })).toHaveLength(2)
     expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass('pl-2')
     expect(screen.getByRole('group', { name: 'Trait #1' })).not.toHaveClass('pl-10')
+  })
+
+  it('bleeds detailed collapsible item bodies to the shell edge via CollapsibleListItem', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const itemShell = screen.getByRole('group', { name: 'Trait 1' })
+    expect(itemShell).toHaveClass('pb-0')
+    const body = itemShell.querySelector('[id$="-body"]')
+    expect(body).not.toBeNull()
+    expect(body).toHaveClass('bg-background')
+    expect(body).toHaveClass('-ml-2')
+    expect(body).toHaveClass('-mr-3')
+    expect(body).toHaveClass('pl-[var(--content-inline-start)]')
+    expect(body).not.toHaveClass('pl-[var(--content-column-indent)]')
+  })
+
+  it('stacks summary subheadlines with a 2px gap below the title row', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+    await user.type(screen.getByRole('textbox', { name: 'Description' }), 'See in the dark')
+
+    const itemShell = screen.getByRole('group', { name: /Darkvision/ })
+    const headerRow = itemShell.firstElementChild as HTMLElement
+    const headerStack = headerRow.firstElementChild as HTMLElement
+    const summary = screen.getByText('See in the dark', { selector: 'p' })
+
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
+    expect(headerStack).toHaveClass('gap-0.5')
+    expect(headerStack).toContainElement(summary)
+  })
+
+  it('keeps header rhythm invariant when a summarized item is collapsed', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+
+    const collapseTrigger = screen.getByRole('button', { name: /Collapse .*Darkvision/ })
+    await user.click(collapseTrigger)
+
+    const itemShell = screen.getByRole('group', { name: /Darkvision/ })
+    const headerRow = itemShell.firstElementChild as HTMLElement
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
   })
 
   it('shows item summaries while expanded and collapsed', async () => {

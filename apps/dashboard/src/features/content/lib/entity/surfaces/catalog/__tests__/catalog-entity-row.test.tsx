@@ -38,6 +38,9 @@ describe('CatalogEntityRow', () => {
     expect(shell).toHaveClass('p-0')
     expect(shell).not.toHaveClass('pl-2')
 
+    const headerRow = shell.firstElementChild as HTMLElement
+    expect(headerRow).toHaveClass('py-2')
+
     const leading = document.querySelector('[data-entity-item-slot="leading"]')
     expect(leading?.querySelector('button[aria-expanded]')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
@@ -61,6 +64,9 @@ describe('CatalogEntityRow', () => {
 
     expect(screen.queryByRole('button', { name: 'The Foos' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
+
+    const headerRow = screen.getByRole('group').firstElementChild as HTMLElement
+    expect(headerRow).toHaveClass('py-2')
   })
 
   it('aligns expanded body with entity inline start and end inset', () => {

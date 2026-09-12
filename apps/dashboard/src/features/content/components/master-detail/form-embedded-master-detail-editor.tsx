@@ -33,6 +33,9 @@ export interface FormEmbeddedMasterDetailEditorProps {
   itemFields: FormItem[]
   /** Singular noun for delete dialog and empty-selection copy, e.g. `trait`. */
   itemNoun: string
+  /** Visible collection title in the list header. */
+  listTitle: ReactNode
+  /** Accessible name for the list nav — must remain independent from `listTitle`. */
   ariaLabel: string
   addLabel: string
   emptyListLabel: string
@@ -40,16 +43,15 @@ export interface FormEmbeddedMasterDetailEditorProps {
   idPrefix: string
   mapListItem: (
     ctx: FormEmbeddedMasterDetailMapListItemContext,
-  ) => Pick<MasterDetailListItem, 'title' | 'eyebrow'>
+  ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
   /**
    * Optional pre-bound editor state. Pass when the parent must coordinate with
-   * `useMasterDetailArray` (e.g. cancel a pending delete when removing a parent
-   * object). When omitted, this component binds its own field array.
+   * `useMasterDetailArray` (e.g. level normalization or cancel a pending delete
+   * when removing a parent object). When omitted, this component binds its own
+   * field array.
    */
   editor?: UseMasterDetailArrayResult
-  /** When false, rows cannot be reordered. Defaults to `true`. */
-  sortable?: boolean
-  /** When false, hides row delete controls entirely. Defaults to `true`. */
+  /** When false, hides detail overflow delete. Defaults to `true`. */
   showDelete?: boolean
   /**
    * Optional fields or chrome rendered above the list/detail grid with standard
@@ -72,13 +74,13 @@ function FormEmbeddedMasterDetailEditorBody({
   fieldName,
   itemFields,
   itemNoun,
+  listTitle,
   ariaLabel,
   addLabel,
   emptyListLabel,
   idPrefix,
   mapListItem,
   editor,
-  sortable = true,
   showDelete = true,
   leadingContent,
   resolveRowReasons,
@@ -132,6 +134,17 @@ function FormEmbeddedMasterDetailEditorBody({
     return { status: 'inactive', reasons: [...extraReasons] }
   }, [editor.fields, editor.selectedIndex, resolveRowReasons, watched])
 
+  const selectedIdentity = useMemo(() => {
+    if (editor.selectedIndex === null) return undefined
+    const item = items[editor.selectedIndex]
+    if (!item) return undefined
+    return {
+      title: item.title,
+      meta: item.meta,
+      deletable: item.deletable,
+    }
+  }, [editor.selectedIndex, items])
+
   const showValidationBanner = showMasterDetailUnselectedRowErrors(editor, submitCount)
 
   const deleteName =
@@ -150,13 +163,12 @@ function FormEmbeddedMasterDetailEditorBody({
       <MasterDetailListPanel
         items={items}
         selectedIndex={editor.selectedIndex}
+        listTitle={listTitle}
         ariaLabel={ariaLabel}
         addLabel={addLabel}
         emptyLabel={emptyListLabel}
         onAdd={editor.handleAdd}
         onSelect={editor.select}
-        onRemove={editor.requestRemove}
-        onMove={sortable ? editor.move : undefined}
       />
 
       <MasterDetailEditorPanel
@@ -164,6 +176,8 @@ function FormEmbeddedMasterDetailEditorBody({
         itemFields={itemFields}
         fieldName={fieldName}
         idPrefix={idPrefix}
+        itemNoun={itemNoun}
+        selectedIdentity={selectedIdentity}
         showValidationBanner={showValidationBanner}
         emptySelectionLabel={masterDetailEmptySelectionLabel(itemNoun)}
         campaignId={formCtx.campaignId}

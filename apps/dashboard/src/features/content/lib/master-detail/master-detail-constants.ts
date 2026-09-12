@@ -4,3 +4,7 @@ export const MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE =
 export function masterDetailEmptySelectionLabel(itemNoun: string): string {
   return `Select a ${itemNoun} to edit, or add one to get started.`
 }
+
+export function masterDetailEmptyListLabel(itemNounPlural: string, detailHint: string): string {
+  return `No ${itemNounPlural} yet.\n${detailHint}`
+}

@@ -22,9 +22,10 @@ function EditorStory({
         fieldName="features"
         itemFields={itemFields}
         itemNoun="feature"
+        listTitle="Features"
         ariaLabel="Features"
         addLabel="Add feature"
-        emptyListLabel="No features yet. Add one to get started."
+        emptyListLabel="No features yet.\nAdd a feature to configure its level, grants, and description."
         idPrefix="class-feature"
         mapListItem={({ row, index }) => {
           const feature = row as FeatureRow | undefined

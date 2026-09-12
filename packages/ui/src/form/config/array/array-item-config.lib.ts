@@ -84,7 +84,12 @@ export function resolveArrayItemVariant(
   config: ArrayConfig,
   options: { nested: boolean },
 ): Exclude<ArrayItemVariant, 'auto'> {
-  const explicit = resolveArrayItemConfig(config).variant ?? 'auto'
+  const itemConfig = resolveArrayItemConfig(config)
+  const explicit = itemConfig.variant ?? 'auto'
+
+  if (explicit === 'compact') return 'compact'
+  if (itemConfig.collapsible) return 'detailed'
+
   if (options.nested) {
     if (explicit === 'detailed') return 'detailed'
     return 'compact'
