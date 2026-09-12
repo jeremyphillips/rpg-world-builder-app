@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useWatch } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
 import { draconicHeritageForm } from '@/test/fixtures/factories/additional/heritage'
@@ -14,6 +15,11 @@ vi.mock('@rpg/ui/form', async (importOriginal) => {
   return stubUiFormItems(importOriginal)
 })
 
+function HeritageValuesProbe() {
+  const heritage = useWatch({ name: 'heritage' }) as HeritageForm | undefined
+  return <pre data-testid="heritage-values">{JSON.stringify(heritage)}</pre>
+}
+
 function TabShell({
   heritage,
   entitySource,
@@ -24,6 +30,7 @@ function TabShell({
   return (
     <TestFormShell defaultValues={{ heritage }}>
       <SpeciesHeritageTab formCtx={{ entitySource }} />
+      <HeritageValuesProbe />
     </TestFormShell>
   )
 }
@@ -36,20 +43,28 @@ async function deleteOptionViaOverflow(user: ReturnType<typeof userEvent.setup>,
 describe('SpeciesHeritageTab', () => {
   it('shows the empty state when there is no heritage', () => {
     render(<TabShell />)
-    expect(screen.getByText(/No heritage yet/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Add heritage/i })).toBeInTheDocument()
+    expect(screen.getByText(/No heritage group yet/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        /Create a set of heritage choices players can select during character creation/i,
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Set up heritage/i })).toBeInTheDocument()
   })
 
   it('adds heritage and shows scalar fields plus options master-detail', async () => {
     const user = userEvent.setup()
     render(<TabShell />)
 
-    await user.click(screen.getByRole('button', { name: /Add heritage/i }))
+    await user.click(screen.getByRole('button', { name: /Set up heritage/i }))
 
     await waitFor(() => {
       expect(screen.getByTestId('detail-heritage')).toHaveTextContent('heritage')
     })
     expect(screen.getByTestId('detail-heritage-options-0')).toHaveTextContent('heritage.options.0')
+    expect(
+      JSON.parse(screen.getByTestId('heritage-values').textContent ?? '{}').options[0],
+    ).toMatchObject({ kind: 'custom' })
   })
 
   it('renders heritage scalar fields and options list when pre-filled', () => {
@@ -73,7 +88,7 @@ describe('SpeciesHeritageTab', () => {
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
 
     await waitFor(() => {
-      expect(screen.getByText(/No options yet/i)).toBeInTheDocument()
+      expect(screen.getByText(/No options added\./i)).toBeInTheDocument()
     })
   })
 
@@ -103,7 +118,7 @@ describe('SpeciesHeritageTab', () => {
     await user.click(screen.getByRole('button', { name: /Remove heritage/i }))
 
     await waitFor(() => {
-      expect(screen.getByText(/No heritage yet/i)).toBeInTheDocument()
+      expect(screen.getByText(/No heritage group yet/i)).toBeInTheDocument()
     })
   })
 
@@ -114,5 +129,8 @@ describe('SpeciesHeritageTab', () => {
     await user.click(screen.getByRole('button', { name: /Add option/i }))
 
     expect(screen.getByTestId('detail-heritage-options-1')).toHaveTextContent('heritage.options.1')
+    expect(
+      JSON.parse(screen.getByTestId('heritage-values').textContent ?? '{}').options[1],
+    ).toMatchObject({ kind: 'custom' })
   })
 })

@@ -18,6 +18,7 @@ import {
 } from '@rpg/contracts'
 
 import { speciesFormDef, speciesDraftFormSchema, type SpeciesFormValues } from './species-form-def'
+import { createTraitRowDefaultValues } from './species-trait-form-values'
 
 const SRD_SPECIES = loadSeedSpecies('srd-cc-5.2.1')
 
@@ -191,6 +192,65 @@ describe('speciesFormDef create vs update modes', () => {
     )
   })
 
+  it('new authored trait defaults to custom and remains custom after save/reload', () => {
+    const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
+    const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
+    formValues.traits = [{ ...createTraitRowDefaultValues(), name: 'Keen Senses' }]
+    const input = speciesFormDef.toInput(formValues, { entity: elf })
+    expect(input.traits).toHaveLength(1)
+    expect(input.traits[0]?.kind).toBe('custom')
+
+    const reloaded = speciesFormDef.toFormValues({
+      ...elf,
+      traits: input.traits,
+    }) as SpeciesFormValues
+    expect(reloaded.traits[0]?.kind).toBe('custom')
+  })
+
+  it('existing grant trait remains grant after grant edit and reload', () => {
+    const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
+    const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
+    const darkvision = formValues.traits.find((t) => t.id === 'darkvision')!
+    expect(darkvision.kind).toBe('grant')
+    const senseRow = darkvision.grants.find((grant) => grant.grantType === 'senses')
+    expect(senseRow).toBeDefined()
+    senseRow!.senseRange = 120
+
+    const input = speciesFormDef.toInput(formValues, { entity: elf })
+    const saved = input.traits.find((t) => t.id === 'darkvision')
+    expect(saved?.kind).toBe('grant')
+
+    const reloaded = speciesFormDef.toFormValues({
+      ...elf,
+      traits: input.traits,
+    }) as SpeciesFormValues
+    expect(reloaded.traits.find((t) => t.id === 'darkvision')?.kind).toBe('grant')
+    const reloadedSense = reloaded.traits
+      .find((t) => t.id === 'darkvision')
+      ?.grants.find((grant) => grant.grantType === 'senses')
+    expect(reloadedSense?.senseRange).toBe(120)
+  })
+
+  it('heritage option create/save/reload stays custom', () => {
+    const dragonborn = SRD_SPECIES.find((s) => s.slug === 'dragonborn')!
+    const formValues = speciesFormDef.toFormValues(dragonborn) as SpeciesFormValues
+    expect(formValues.heritage?.options.every((option) => option.kind === 'custom')).toBe(true)
+
+    formValues.heritage!.options.push({
+      ...createTraitRowDefaultValues(),
+      kind: 'custom',
+      name: 'Homebrew Ancestry',
+    })
+    const input = speciesFormDef.toInput(formValues, { entity: dragonborn })
+    expect(input.heritage?.options.every((option) => option.kind === 'custom')).toBe(true)
+
+    const reloaded = speciesFormDef.toFormValues({
+      ...dragonborn,
+      heritage: input.heritage,
+    }) as SpeciesFormValues
+    expect(reloaded.heritage?.options.every((option) => option.kind === 'custom')).toBe(true)
+  })
+
   it('draft: accepts name and creature type only', () => {
     const input = speciesFormDef.toInput(
       {
@@ -221,10 +281,27 @@ describe('speciesFormDef create vs update modes', () => {
         heritage: {
           name: 'Lineage',
           choose: 1,
-          options: [{ kind: 'grant', overrideDisplay: false, grants: [] }],
+          options: [{ kind: 'custom', overrideDisplay: false, grants: [] }],
         },
       }),
     ).not.toThrow()
+  })
+
+  it('draft form schema: rejects grant-kind heritage options', () => {
+    expect(
+      speciesDraftFormSchema.safeParse({
+        name: 'Custom Species',
+        creatureType: 'humanoid',
+        sizes: [],
+        movement: [],
+        traits: [],
+        heritage: {
+          name: 'Lineage',
+          choose: 1,
+          options: [{ kind: 'grant', overrideDisplay: false, grants: [] }],
+        },
+      }).success,
+    ).toBe(false)
   })
 })
 

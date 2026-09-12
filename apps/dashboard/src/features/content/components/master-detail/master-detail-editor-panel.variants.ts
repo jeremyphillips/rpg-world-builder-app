@@ -22,14 +22,14 @@ export const masterDetailEditorValidationBannerClasses = cn(
 
 export const masterDetailEditorIdentityCopyClasses = 'min-w-0 space-y-0.5'
 
-export const masterDetailEditorTitleClasses = 'truncate text-sm font-medium text-foreground'
+export const masterDetailEditorTitleClasses = 'truncate text-lg font-medium text-foreground'
 
 export const masterDetailEditorMetaClasses = 'truncate text-xs text-muted-foreground'
 
 export const masterDetailEditorBodyClasses = 'px-4 py-4'
 
-export const masterDetailEditorEmptyClasses =
-  'px-4 py-6 text-sm text-muted-foreground whitespace-pre-line'
+export const masterDetailEditorEmptyShellClasses =
+  'flex min-h-48 flex-col bg-transparent md:col-span-2'
 
 export function masterDetailEditorShellClassName(className?: string): string {
   return cn(masterDetailEditorShellClasses, className)

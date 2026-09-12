@@ -1,25 +1,33 @@
 import { useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { Button, Text } from '@rpg/ui'
-import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
+import { FormItems } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { isEmbeddedRowSystemLocked } from '../../lib/master-detail/is-embedded-row-system-locked'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import {
-  ADD_HERITAGE_LABEL,
   ADD_HERITAGE_OPTION_LABEL,
-  HERITAGE_EMPTY_MESSAGE,
-  HERITAGE_OPTION_NOUN,
+  HERITAGE_EMPTY_DESCRIPTION,
+  HERITAGE_EMPTY_TITLE,
+  HERITAGE_OPTION_MASTER_DETAIL_ITEM_NOUN,
+  SET_UP_HERITAGE_LABEL,
 } from '../lib/species-heritage-form-labels'
 import { heritageDefaultValues } from '../lib/species-heritage-form-values'
 import { heritageScalarFields, type HeritageForm } from '../lib/species-heritage-form-fields'
 import {
-  traitItemFields,
+  heritageOptionItemFields,
   traitItemTitle,
   type TraitRowForm,
 } from '../lib/species-trait-form-fields'
+import { traitItemDefaultValues } from '../lib/species-trait-form-values'
+import {
+  speciesHeritageEmptyStateContentClasses,
+  speciesHeritageEmptyStateDescriptionClasses,
+  speciesHeritageEmptyStateShellClasses,
+  speciesHeritageEmptyStateTitleClasses,
+} from './species-heritage-tab.variants'
 
 const HERITAGE_FIELD_NAME = 'heritage'
 const OPTIONS_FIELD_NAME = 'heritage.options'
@@ -32,20 +40,25 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
   const { setValue } = useFormContext()
 
   return (
-    <div className="space-y-3">
-      <Text variant="muted" className="text-sm">
-        {HERITAGE_EMPTY_MESSAGE}
-      </Text>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => {
-          setValue(HERITAGE_FIELD_NAME, heritageDefaultValues(formCtx), { shouldDirty: true })
-        }}
-      >
-        {ADD_HERITAGE_LABEL}
-      </Button>
+    <div className={speciesHeritageEmptyStateShellClasses}>
+      <div className={speciesHeritageEmptyStateContentClasses} role="status">
+        <Text as="p" className={speciesHeritageEmptyStateTitleClasses}>
+          {HERITAGE_EMPTY_TITLE}
+        </Text>
+        <Text as="p" className={speciesHeritageEmptyStateDescriptionClasses}>
+          {HERITAGE_EMPTY_DESCRIPTION}
+        </Text>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setValue(HERITAGE_FIELD_NAME, heritageDefaultValues(formCtx), { shouldDirty: true })
+          }}
+        >
+          {SET_UP_HERITAGE_LABEL}
+        </Button>
+      </div>
     </div>
   )
 }
@@ -80,8 +93,8 @@ function HeritageScalarSection({
 
 function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   const { setValue } = useFormContext()
-  const traitFields = useMemo(() => traitItemFields(formCtx), [formCtx])
-  const makeOptionDefaults = useCallback(() => buildItemDefaultValues(traitFields), [traitFields])
+  const traitFields = useMemo(() => heritageOptionItemFields(formCtx), [formCtx])
+  const makeOptionDefaults = useCallback(() => traitItemDefaultValues(traitFields), [traitFields])
   const editor = useMasterDetailArray(OPTIONS_FIELD_NAME, makeOptionDefaults)
   const heritage = useWatch({ name: HERITAGE_FIELD_NAME }) as HeritageForm | undefined
 
@@ -95,11 +108,10 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
       formCtx={formCtx}
       fieldName={OPTIONS_FIELD_NAME}
       itemFields={traitFields}
-      itemNoun={HERITAGE_OPTION_NOUN}
+      itemNoun={HERITAGE_OPTION_MASTER_DETAIL_ITEM_NOUN}
       listTitle="Options"
       ariaLabel="Heritage options"
       addLabel={ADD_HERITAGE_OPTION_LABEL}
-      emptyListLabel="No options yet.\nAdd an option to configure its grants and description."
       idPrefix="species-heritage-option"
       editor={editor}
       leadingContent={
@@ -118,8 +130,8 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
 
 /**
  * Heritage tab: scalar name/description at the top, master-detail over
- * `heritage.options` below. Empty state offers a single "Add heritage"
- * control; once present, options use the same trait editor as the Traits tab.
+ * `heritage.options` below. Empty state offers **Set up heritage**; once present,
+ * options use the same trait editor as the Traits tab.
  */
 export function SpeciesHeritageTab({ formCtx }: SpeciesHeritageTabProps) {
   const heritage = useWatch({ name: HERITAGE_FIELD_NAME }) as HeritageForm | undefined

@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { Text } from '@rpg/ui'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
@@ -12,10 +11,13 @@ import {
   joinMasterDetailItemMeta,
   type MasterDetailItemMeta,
 } from '../../lib/master-detail/master-detail-item-meta'
+import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
+import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
+import { MasterDetailEditorEmptyState } from './master-detail-editor-empty-state'
 import {
   masterDetailEditorBodyClasses,
-  masterDetailEditorEmptyClasses,
+  masterDetailEditorEmptyShellClasses,
   masterDetailEditorIdentityClasses,
   masterDetailEditorIdentityCopyClasses,
   masterDetailEditorMetaClasses,
@@ -39,9 +41,8 @@ export interface MasterDetailEditorPanelProps {
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
   showValidationBanner: boolean
-  emptySelectionLabel: string
-  /** Singular noun for delete overflow copy, e.g. `trait`. */
-  itemNoun: string
+  /** Singular noun vocabulary for delete overflow copy and empty-selection messaging. */
+  itemNoun: MasterDetailItemNounTerm
   selectedIdentity?: MasterDetailEditorIdentity
   campaignId?: string
   rowAvailability?: Availability
@@ -87,11 +88,12 @@ function MasterDetailEditorIdentityHeader({
   onDelete,
 }: {
   identity: MasterDetailEditorIdentity
-  itemNoun: string
+  itemNoun: MasterDetailItemNounTerm
   onDelete: () => void
 }) {
   const metaLine = identity.meta ? joinMasterDetailItemMeta(identity.meta) : undefined
   const deletable = identity.deletable !== false
+  const itemNounLabel = masterDetailItemNounLabel(itemNoun)
 
   return (
     <div className={masterDetailEditorIdentityClasses}>
@@ -102,7 +104,7 @@ function MasterDetailEditorIdentityHeader({
       {deletable ? (
         <DetailOverflowMenu
           triggerLabel={`Actions for ${identity.title}`}
-          actions={[detailOverflowDeleteAction(`Delete ${itemNoun}`, onDelete)]}
+          actions={[detailOverflowDeleteAction(`Delete ${itemNounLabel}`, onDelete)]}
         />
       ) : null}
     </div>
@@ -119,7 +121,6 @@ export function MasterDetailEditorPanel({
   fieldName,
   idPrefix,
   showValidationBanner,
-  emptySelectionLabel,
   itemNoun,
   selectedIdentity,
   campaignId,
@@ -129,6 +130,7 @@ export function MasterDetailEditorPanel({
   const selectedIndex = editor.selectedIndex
   const selectedFieldId = editor.selectedFieldId
   const hasSelectedRow = selectedIndex !== null && Boolean(selectedFieldId)
+  const useEmptyShell = !hasSelectedRow && !showValidationBanner
 
   useEffect(() => {
     if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
@@ -142,7 +144,11 @@ export function MasterDetailEditorPanel({
   }, [editor, selectedFieldId])
 
   return (
-    <div className={masterDetailEditorShellClassName()}>
+    <div
+      className={
+        useEmptyShell ? masterDetailEditorEmptyShellClasses : masterDetailEditorShellClassName()
+      }
+    >
       {showValidationBanner ? (
         <div className={masterDetailEditorValidationBannerClasses}>
           <MasterDetailValidationBanner visible />
@@ -170,11 +176,9 @@ export function MasterDetailEditorPanel({
             />
           </div>
         </>
-      ) : (
-        <Text variant="muted" className={masterDetailEditorEmptyClasses}>
-          {!showValidationBanner ? emptySelectionLabel : null}
-        </Text>
-      )}
+      ) : useEmptyShell ? (
+        <MasterDetailEditorEmptyState itemNoun={itemNoun} />
+      ) : null}
     </div>
   )
 }

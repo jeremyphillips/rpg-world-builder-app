@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react'
 import { Plus } from 'lucide-react'
-import { Button, Text, cn } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import {
   joinMasterDetailItemMeta,
   type MasterDetailItemMeta,
 } from '../../lib/master-detail/master-detail-item-meta'
+import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
+import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
   masterDetailListEmptyClasses,
   masterDetailListHeaderClasses,
@@ -42,7 +44,7 @@ export interface MasterDetailListPanelProps {
   /** Accessible name for the list `<nav>` — independent from `listTitle`. */
   ariaLabel: string
   addLabel: string
-  emptyLabel: string
+  itemNoun: MasterDetailItemNounTerm
   onAdd: () => void
   onSelect: (index: number) => void
 }
@@ -86,10 +88,12 @@ export function MasterDetailListPanel({
   listTitle,
   ariaLabel,
   addLabel,
-  emptyLabel,
+  itemNoun,
   onAdd,
   onSelect,
 }: MasterDetailListPanelProps) {
+  const emptyLabel = masterDetailEmptyListLabel(itemNoun)
+
   return (
     <nav aria-label={ariaLabel} className={masterDetailListShellClasses}>
       <div className={masterDetailListHeaderClasses}>
@@ -101,7 +105,7 @@ export function MasterDetailListPanel({
       </div>
 
       {items.length === 0 ? (
-        <Text variant="muted" className={cn(masterDetailListEmptyClasses, 'whitespace-pre-line')}>
+        <Text variant="muted" className={masterDetailListEmptyClasses}>
           {emptyLabel}
         </Text>
       ) : (

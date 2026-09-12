@@ -1,4 +1,5 @@
 import { type ContentTrait, resolveGrantGroupsFromContent } from '@rpg/contracts'
+import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
 import {
@@ -6,6 +7,23 @@ import {
   formRowsToGrantGroups,
 } from '../../lib/forms/grants/grant-form-values'
 import { traitItemTitle, type TraitRowForm } from './species-trait-form-fields'
+
+export function createTraitRowDefaultValues(): TraitRowForm {
+  return {
+    kind: 'custom',
+    overrideDisplay: false,
+    name: '',
+    description: '',
+    grants: [],
+  }
+}
+
+export function traitItemDefaultValues(itemFields: FormItem[]): TraitRowForm {
+  return {
+    ...buildItemDefaultValues(itemFields),
+    ...createTraitRowDefaultValues(),
+  }
+}
 
 export function traitToFormRow(trait: ContentTrait): TraitRowForm {
   if (trait.kind === 'grant') {

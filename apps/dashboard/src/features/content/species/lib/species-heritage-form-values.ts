@@ -1,15 +1,48 @@
-import type { SpeciesHeritage } from '@rpg/contracts'
+import { resolveTraitDisplay, type GrantContentTrait, type SpeciesHeritage } from '@rpg/contracts'
 import { buildItemDefaultValues } from '@rpg/ui/form'
 
 import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { heritageScalarFields, type HeritageForm } from './species-heritage-form-fields'
-import { traitItemFields, type TraitRowForm } from './species-trait-form-fields'
+import { grantGroupsToFormRows } from '../../lib/forms/grants/grant-form-values'
+import {
+  type HeritageForm,
+  type HeritageOptionRowForm,
+  heritageScalarFields,
+} from './species-heritage-form-fields'
+import { heritageOptionItemFields } from './species-trait-form-fields'
 import {
   traitFromFormRow,
+  traitItemDefaultValues,
   traitRowsWithNamesForIdAssignment,
   traitToFormRow,
 } from './species-trait-form-values'
+
+/**
+ * Unexpected grant-shaped heritage options are converted to authored custom
+ * rows at load so save cannot flip the discriminator on a grant-only shape.
+ */
+export function heritageGrantOptionToCustomFormRow(
+  option: GrantContentTrait,
+): HeritageOptionRowForm {
+  const display = resolveTraitDisplay(option)
+  return {
+    id: option.id,
+    kind: 'custom',
+    overrideDisplay: false,
+    name: display.name,
+    description: display.descriptionHtml,
+    grants: grantGroupsToFormRows(option.grantGroups),
+  }
+}
+
+export function heritageOptionToFormRow(
+  option: SpeciesHeritage['options'][number],
+): HeritageOptionRowForm {
+  if (option.kind === 'grant') {
+    return heritageGrantOptionToCustomFormRow(option)
+  }
+  return { ...traitToFormRow(option), kind: 'custom' }
+}
 
 export function heritageToFormRow(heritage: SpeciesHeritage): HeritageForm {
   return {
@@ -17,7 +50,7 @@ export function heritageToFormRow(heritage: SpeciesHeritage): HeritageForm {
     name: heritage.name,
     description: heritage.description,
     choose: heritage.choose,
-    options: heritage.options.map(traitToFormRow),
+    options: heritage.options.map(heritageOptionToFormRow),
   }
 }
 
@@ -60,6 +93,6 @@ export function heritageDefaultValues(ctx: ContentFormCtx): HeritageForm {
       'name' | 'description'
     >),
     choose: 1,
-    options: [buildItemDefaultValues(traitItemFields(ctx)) as TraitRowForm],
+    options: [{ ...traitItemDefaultValues(heritageOptionItemFields(ctx)), kind: 'custom' }],
   }
 }

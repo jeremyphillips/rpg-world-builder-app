@@ -5,7 +5,11 @@ import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TestFormShell } from '@/test/form-shell'
-import { masterDetailEmptySelectionLabel } from '../../../lib/master-detail/master-detail-constants'
+import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../../../species/lib/species-trait-form-labels'
+import {
+  masterDetailEmptySelectionHeading,
+  masterDetailEmptySelectionSubhead,
+} from '../../../lib/master-detail/master-detail-constants'
 import type { UseMasterDetailArrayResult } from '../../../lib/master-detail/use-master-detail-array'
 import { MasterDetailEditorPanel } from '../master-detail-editor-panel'
 
@@ -62,10 +66,9 @@ describe('MasterDetailEditorPanel', () => {
         itemFields={itemFields}
         fieldName="traits"
         idPrefix="species-trait"
-        itemNoun="trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={selectedIdentity}
         showValidationBanner={false}
-        emptySelectionLabel={masterDetailEmptySelectionLabel('trait')}
       />,
     )
 
@@ -84,10 +87,9 @@ describe('MasterDetailEditorPanel', () => {
         itemFields={itemFields}
         fieldName="traits"
         idPrefix="species-trait"
-        itemNoun="trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={selectedIdentity}
         showValidationBanner={false}
-        emptySelectionLabel={masterDetailEmptySelectionLabel('trait')}
       />,
     )
 
@@ -104,48 +106,52 @@ describe('MasterDetailEditorPanel', () => {
         itemFields={itemFields}
         fieldName="traits"
         idPrefix="species-trait"
-        itemNoun="trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={{ ...selectedIdentity, deletable: false }}
         showValidationBanner={false}
-        emptySelectionLabel={masterDetailEmptySelectionLabel('trait')}
       />,
     )
 
     expect(screen.queryByRole('button', { name: /Actions for Rage/i })).not.toBeInTheDocument()
   })
 
-  it('renders the empty-selection hint when nothing is selected', () => {
+  it('renders the empty-selection state when nothing is selected', () => {
     render(
       <PanelShell
         editor={makeEditor({ selectedIndex: null, selectedFieldId: null })}
         itemFields={itemFields}
         fieldName="traits"
         idPrefix="species-trait"
-        itemNoun="trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         showValidationBanner={false}
-        emptySelectionLabel={masterDetailEmptySelectionLabel('trait')}
       />,
     )
 
-    expect(screen.getByText(masterDetailEmptySelectionLabel('trait'))).toBeInTheDocument()
+    expect(
+      screen.getByText(masterDetailEmptySelectionHeading(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(masterDetailEmptySelectionSubhead(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
+    ).toBeInTheDocument()
     expect(screen.queryByTestId('detail-form')).not.toBeInTheDocument()
   })
 
-  it('hides the empty-selection hint when the validation banner is visible', () => {
+  it('hides the empty-selection state when the validation banner is visible', () => {
     render(
       <PanelShell
         editor={makeEditor({ selectedIndex: null, selectedFieldId: null })}
         itemFields={itemFields}
         fieldName="traits"
         idPrefix="species-trait"
-        itemNoun="trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         showValidationBanner
-        emptySelectionLabel={masterDetailEmptySelectionLabel('trait')}
       />,
     )
 
     expect(screen.getByRole('alert')).toBeInTheDocument()
-    expect(screen.queryByText(masterDetailEmptySelectionLabel('trait'))).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(masterDetailEmptySelectionHeading(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
+    ).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations when a row is selected', async () => {
@@ -155,10 +161,9 @@ describe('MasterDetailEditorPanel', () => {
         itemFields={itemFields}
         fieldName="traits"
         idPrefix="species-trait"
-        itemNoun="trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={selectedIdentity}
         showValidationBanner={false}
-        emptySelectionLabel={masterDetailEmptySelectionLabel('trait')}
       />,
     )
 

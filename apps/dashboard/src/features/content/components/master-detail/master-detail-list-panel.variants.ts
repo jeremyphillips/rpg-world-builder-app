@@ -23,7 +23,7 @@ export const masterDetailListHeaderClasses = cn(
   masterDetailRailBorderClasses,
 )
 
-export const masterDetailListTitleClasses = 'min-w-0 text-sm font-medium text-foreground'
+export const masterDetailListTitleClasses = 'min-w-0 text-lg font-medium text-foreground'
 
 /** Unpadded list section — rows bleed to shell edges. */
 export const masterDetailListItemsClasses = masterDetailRailRowSeparatorClasses

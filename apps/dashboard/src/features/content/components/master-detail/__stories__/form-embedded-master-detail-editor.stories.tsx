@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { FormEmbeddedMasterDetailEditor } from '../form-embedded-master-detail-editor'
 
 const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name', required: true }]
@@ -21,11 +22,10 @@ function EditorStory({
         formCtx={{ entitySource }}
         fieldName="features"
         itemFields={itemFields}
-        itemNoun="feature"
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
         listTitle="Features"
         ariaLabel="Features"
         addLabel="Add feature"
-        emptyListLabel="No features yet.\nAdd a feature to configure its level, grants, and description."
         idPrefix="class-feature"
         mapListItem={({ row, index }) => {
           const feature = row as FeatureRow | undefined

@@ -1,9 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useWatch } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TestFormShell } from '@/test/form-shell'
-import { masterDetailEmptySelectionLabel } from '../../../lib/master-detail/master-detail-constants'
+import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../../../species/lib/species-trait-form-labels'
+import {
+  masterDetailEmptyListLabel,
+  masterDetailEmptySelectionHeading,
+} from '../../../lib/master-detail/master-detail-constants'
 import { FormEmbeddedMasterDetailEditor } from '../form-embedded-master-detail-editor'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
@@ -30,11 +35,10 @@ function EditorShell({
         formCtx={{ entitySource, embeddedSeedRowIds }}
         fieldName="traits"
         itemFields={itemFields}
-        itemNoun="trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         listTitle="Traits"
         ariaLabel="Traits"
         addLabel="Add trait"
-        emptyListLabel="No traits yet.\nAdd a trait to configure its grants and description."
         idPrefix="species-trait"
         mapListItem={({ row, index }) => ({
           title: (row as TraitRow | undefined)?.name || `Trait ${index + 1}`,
@@ -49,8 +53,12 @@ describe('FormEmbeddedMasterDetailEditor', () => {
   it('renders an empty list with the add control', () => {
     render(<EditorShell />)
     expect(screen.getByRole('button', { name: /Add trait/i })).toBeInTheDocument()
-    expect(screen.getByText(/No traits yet/i)).toBeInTheDocument()
-    expect(screen.getByText(masterDetailEmptySelectionLabel('trait'))).toBeInTheDocument()
+    expect(
+      screen.getByText(masterDetailEmptyListLabel(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(masterDetailEmptySelectionHeading(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
+    ).toBeInTheDocument()
   })
 
   it('adds a row and shows the detail form for the selection', async () => {
@@ -80,7 +88,9 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
 
     await waitFor(() => {
-      expect(screen.getByText(/No traits yet/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(masterDetailEmptyListLabel(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
+      ).toBeInTheDocument()
     })
   })
 
@@ -107,11 +117,10 @@ describe('FormEmbeddedMasterDetailEditor', () => {
             formCtx={{}}
             fieldName="traits"
             itemFields={[{ type: 'text', name: 'name', label: 'Name' }]}
-            itemNoun="trait"
+            itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
             listTitle="Traits"
             ariaLabel="Traits"
             addLabel="Add trait"
-            emptyListLabel="No traits yet.\nAdd a trait to configure its grants and description."
             idPrefix="species-trait"
             leadingContent={<p>Choose how many traits apply.</p>}
             mapListItem={({ index }) => ({ title: `Trait ${index + 1}` })}
@@ -126,5 +135,43 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     const list = screen.getByRole('navigation', { name: 'Traits' })
 
     expect(leading.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('uses makeItemDefaults when appending a row', async () => {
+    const user = userEvent.setup()
+
+    function TraitsValuesProbe() {
+      const traits = useWatch({ name: 'traits' }) as TraitRow[] | undefined
+      return <pre data-testid="traits-values">{JSON.stringify(traits)}</pre>
+    }
+
+    function DefaultsShell() {
+      return (
+        <TestFormShell defaultValues={{ traits: [] }}>
+          <FormEmbeddedMasterDetailEditor
+            formCtx={{}}
+            fieldName="traits"
+            itemFields={[{ type: 'text', name: 'name', label: 'Name' }]}
+            itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
+            listTitle="Traits"
+            ariaLabel="Traits"
+            addLabel="Add trait"
+            idPrefix="species-trait"
+            makeItemDefaults={() => ({ kind: 'custom', name: '', grants: [] })}
+            mapListItem={({ index }) => ({ title: `Trait ${index + 1}` })}
+          />
+          <TraitsValuesProbe />
+        </TestFormShell>
+      )
+    }
+
+    render(<DefaultsShell />)
+    await user.click(screen.getByRole('button', { name: /Add trait/i }))
+
+    await waitFor(() => {
+      expect(JSON.parse(screen.getByTestId('traits-values').textContent ?? '[]')[0]).toMatchObject({
+        kind: 'custom',
+      })
+    })
   })
 })

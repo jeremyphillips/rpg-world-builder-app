@@ -8,7 +8,8 @@ import type { Availability, AvailabilityReason } from '@/lib/availability'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { resolveMasterDetailRowKey } from '../../lib/master-detail/content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from '../../lib/master-detail/build-embedded-master-detail-list-item'
-import { masterDetailEmptySelectionLabel } from '../../lib/master-detail/master-detail-constants'
+import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
+import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
 import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail/master-detail-validation'
 import {
   useMasterDetailArray,
@@ -31,14 +32,13 @@ export interface FormEmbeddedMasterDetailEditorProps {
   /** Parent form field path, e.g. `traits`, `features`, or `heritage.options`. */
   fieldName: string
   itemFields: FormItem[]
-  /** Singular noun for delete dialog and empty-selection copy, e.g. `trait`. */
-  itemNoun: string
+  /** Singular noun vocabulary for delete dialog, empty copy, and overflow actions. */
+  itemNoun: MasterDetailItemNounTerm
   /** Visible collection title in the list header. */
   listTitle: ReactNode
   /** Accessible name for the list nav — must remain independent from `listTitle`. */
   ariaLabel: string
   addLabel: string
-  emptyListLabel: string
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
   mapListItem: (
@@ -51,6 +51,13 @@ export interface FormEmbeddedMasterDetailEditorProps {
    * field array.
    */
   editor?: UseMasterDetailArrayResult
+  /**
+   * Factory for newly appended rows. When omitted, defaults are derived from
+   * `itemFields`. Pass this to seed hidden form state that is not a visible field
+   * (for example a discriminator that must still be complete). Ignored when
+   * `editor` is provided — that hook already owns its factory.
+   */
+  makeItemDefaults?: () => Record<string, unknown>
   /** When false, hides detail overflow delete. Defaults to `true`. */
   showDelete?: boolean
   /**
@@ -65,7 +72,10 @@ export interface FormEmbeddedMasterDetailEditorProps {
   }) => readonly AvailabilityReason[]
 }
 
-interface FormEmbeddedMasterDetailEditorBodyProps extends FormEmbeddedMasterDetailEditorProps {
+interface FormEmbeddedMasterDetailEditorBodyProps extends Omit<
+  FormEmbeddedMasterDetailEditorProps,
+  'editor' | 'makeItemDefaults'
+> {
   editor: UseMasterDetailArrayResult
 }
 
@@ -77,7 +87,6 @@ function FormEmbeddedMasterDetailEditorBody({
   listTitle,
   ariaLabel,
   addLabel,
-  emptyListLabel,
   idPrefix,
   mapListItem,
   editor,
@@ -166,7 +175,7 @@ function FormEmbeddedMasterDetailEditorBody({
         listTitle={listTitle}
         ariaLabel={ariaLabel}
         addLabel={addLabel}
-        emptyLabel={emptyListLabel}
+        itemNoun={itemNoun}
         onAdd={editor.handleAdd}
         onSelect={editor.select}
       />
@@ -179,7 +188,6 @@ function FormEmbeddedMasterDetailEditorBody({
         itemNoun={itemNoun}
         selectedIdentity={selectedIdentity}
         showValidationBanner={showValidationBanner}
-        emptySelectionLabel={masterDetailEmptySelectionLabel(itemNoun)}
         campaignId={formCtx.campaignId}
         rowAvailability={selectedRowAvailability}
       />
@@ -189,7 +197,7 @@ function FormEmbeddedMasterDetailEditorBody({
   const deleteDialog = (
     <MasterDetailDeleteDialog
       open={editor.deleteIndex !== null}
-      itemNoun={itemNoun}
+      itemNoun={masterDetailItemNounLabel(itemNoun)}
       itemName={deleteName}
       onOpenChange={(open) => {
         if (!open) editor.cancelRemove()
@@ -218,12 +226,13 @@ function FormEmbeddedMasterDetailEditorBody({
   )
 }
 
-function FormEmbeddedMasterDetailEditorWithHook(
-  props: Omit<FormEmbeddedMasterDetailEditorProps, 'editor'>,
-) {
+function FormEmbeddedMasterDetailEditorWithHook({
+  makeItemDefaults: makeItemDefaultsProp,
+  ...props
+}: Omit<FormEmbeddedMasterDetailEditorProps, 'editor'>) {
   const makeItemDefaults = useCallback(
-    () => buildItemDefaultValues(props.itemFields),
-    [props.itemFields],
+    () => makeItemDefaultsProp?.() ?? buildItemDefaultValues(props.itemFields),
+    [makeItemDefaultsProp, props.itemFields],
   )
   const editor = useMasterDetailArray(props.fieldName, makeItemDefaults)
   return <FormEmbeddedMasterDetailEditorBody {...props} editor={editor} />
@@ -235,10 +244,11 @@ function FormEmbeddedMasterDetailEditorWithHook(
  */
 export function FormEmbeddedMasterDetailEditor({
   editor,
+  makeItemDefaults,
   ...props
 }: FormEmbeddedMasterDetailEditorProps) {
   if (editor) {
     return <FormEmbeddedMasterDetailEditorBody {...props} editor={editor} />
   }
-  return <FormEmbeddedMasterDetailEditorWithHook {...props} />
+  return <FormEmbeddedMasterDetailEditorWithHook makeItemDefaults={makeItemDefaults} {...props} />
 }

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { MasterDetailListPanel } from '../master-detail-list-panel'
 
 const meta = {
@@ -24,7 +25,7 @@ export const Default: Story = {
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
-    emptyLabel: 'No features yet.\nAdd a feature to configure its level, grants, and description.',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
     onSelect: () => {},
   },
@@ -56,7 +57,7 @@ export const WithProtectedSystemRow: Story = {
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
-    emptyLabel: 'No features yet.\nAdd a feature to configure its level, grants, and description.',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
     onSelect: () => {},
   },
@@ -69,7 +70,7 @@ export const Empty: Story = {
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
-    emptyLabel: 'No features yet.\nAdd a feature to configure its level, grants, and description.',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
     onSelect: () => {},
   },

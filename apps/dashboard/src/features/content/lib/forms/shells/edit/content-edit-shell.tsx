@@ -10,8 +10,6 @@ import { useCallback, useState, type ReactNode } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
-
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import { contentFormPageShellHeadingClasses } from '../layout/content-form-page-shell.variants'
@@ -467,27 +465,28 @@ export function ContentEditShell({
   contentTypeKey,
   formCtx,
 }: ContentEditShellProps) {
+  const def = contentFormRegistry[contentType]
+  const usePreviewLayout = def != null && hasContentFormPreview(def)
+
   if (isPending) {
     return (
-      <NarrowPage>
+      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
         <div className="flex justify-center">
           <Spinner />
         </div>
-      </NarrowPage>
+      </ContentFormPageShell>
     )
   }
 
   if (isError) {
     return (
-      <NarrowPage>
+      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
         <Text variant="destructive" role="alert">
           {loadErrorLabel}
         </Text>
-      </NarrowPage>
+      </ContentFormPageShell>
     )
   }
-
-  const def = contentFormRegistry[contentType]
 
   if (!def) {
     return <ContentFormNotRegistered />

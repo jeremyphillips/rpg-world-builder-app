@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
+import { masterDetailEmptyListLabel } from '../../../lib/master-detail/master-detail-constants'
 import { MasterDetailListPanel, type MasterDetailListItem } from '../master-detail-list-panel'
 
 const items: MasterDetailListItem[] = [
@@ -25,7 +27,7 @@ function baseProps() {
     listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
-    emptyLabel: 'No features yet.\nAdd a feature to configure its level, grants, and description.',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: vi.fn(),
     onSelect: vi.fn(),
   }
@@ -59,9 +61,8 @@ describe('MasterDetailListPanel', () => {
 
   it('renders the empty label when there are no items', () => {
     render(<MasterDetailListPanel {...baseProps()} items={[]} selectedIndex={null} />)
-    expect(screen.getByText(/No features yet/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/Add a feature to configure its level, grants, and description/i),
+      screen.getByText(masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN)),
     ).toBeInTheDocument()
   })
 

@@ -1,16 +1,16 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
-  traitItemEyebrow,
   traitItemFields,
   traitItemTitle,
   type TraitRowForm,
 } from '../lib/species-trait-form-fields'
+import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../lib/species-trait-form-labels'
+import { traitItemDefaultValues } from '../lib/species-trait-form-values'
 
 const TRAITS_FIELD_NAME = 'traits'
-const TRAIT_NOUN = 'trait'
 
 export interface SpeciesTraitsTabProps {
   formCtx: ContentFormCtx
@@ -24,21 +24,21 @@ export interface SpeciesTraitsTabProps {
  */
 export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
   const fields = useMemo(() => traitItemFields(formCtx), [formCtx])
+  const makeItemDefaults = useCallback(() => traitItemDefaultValues(fields), [fields])
 
   return (
     <FormEmbeddedMasterDetailEditor
       formCtx={formCtx}
       fieldName={TRAITS_FIELD_NAME}
       itemFields={fields}
-      itemNoun={TRAIT_NOUN}
+      itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
       listTitle="Traits"
       ariaLabel="Traits"
       addLabel="Add trait"
-      emptyListLabel="No traits yet.\nAdd a trait to configure its grants and description."
       idPrefix="species-trait"
+      makeItemDefaults={makeItemDefaults}
       mapListItem={({ row, index }) => ({
         title: traitItemTitle((row ?? {}) as TraitRowForm, index),
-        eyebrow: traitItemEyebrow(row as TraitRowForm | undefined),
       })}
     />
   )

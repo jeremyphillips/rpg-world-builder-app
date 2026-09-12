@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { masterDetailEmptySelectionLabel } from '../../../lib/master-detail/master-detail-constants'
+import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import type { UseMasterDetailArrayResult } from '../../../lib/master-detail/use-master-detail-array'
 import { MasterDetailEditorPanel } from '../master-detail-editor-panel'
 
@@ -50,14 +50,13 @@ function PanelStory({
         itemFields={itemFields}
         fieldName="traits"
         idPrefix="class-feature"
-        itemNoun="feature"
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={{
           title: 'Rage',
           meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
           deletable: true,
         }}
         showValidationBanner={showValidationBanner}
-        emptySelectionLabel={masterDetailEmptySelectionLabel('feature')}
       />
     </FormProvider>
   )

@@ -56,7 +56,14 @@ export const HomebrewWithTraits: Story = {
           id: 't3',
           kind: 'grant',
           overrideDisplay: false,
-          grants: [],
+          grants: [
+            {
+              grantType: 'senses',
+              unlockLevel: 'default',
+              senseType: 'darkvision',
+              senseRange: 60,
+            },
+          ],
         },
       ]}
     />

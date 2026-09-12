@@ -56,7 +56,7 @@ async function deleteViaOverflow(user: ReturnType<typeof userEvent.setup>, title
 describe('ClassFeaturesTab', () => {
   it('shows the empty state when there are no features', () => {
     render(<TabShell />)
-    expect(screen.getByText(/No features yet/i)).toBeInTheDocument()
+    expect(screen.getByText(/No features added\./i)).toBeInTheDocument()
     expect(screen.getByText(/Select a feature to edit/i)).toBeInTheDocument()
   })
 
@@ -103,7 +103,7 @@ describe('ClassFeaturesTab', () => {
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
 
     await waitFor(() => {
-      expect(screen.getByText(/No features yet/i)).toBeInTheDocument()
+      expect(screen.getByText(/No features added\./i)).toBeInTheDocument()
     })
   })
 

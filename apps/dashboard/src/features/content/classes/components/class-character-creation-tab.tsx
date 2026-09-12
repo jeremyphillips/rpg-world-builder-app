@@ -10,7 +10,7 @@ import {
   ADD_STARTING_EQUIPMENT_LABEL,
   ADD_STARTING_EQUIPMENT_OPTION_LABEL,
   STARTING_EQUIPMENT_EMPTY_MESSAGE,
-  STARTING_EQUIPMENT_OPTION_NOUN,
+  STARTING_EQUIPMENT_OPTION_MASTER_DETAIL_ITEM_NOUN,
   STARTING_EQUIPMENT_SECTION_DESCRIPTION,
   STARTING_EQUIPMENT_SECTION_TITLE,
 } from '../lib/character-creation/class-starting-equipment-form-labels'
@@ -98,11 +98,10 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
       formCtx={enrichedFormCtx}
       fieldName={STARTING_EQUIPMENT_OPTIONS_FIELD_NAME}
       itemFields={optionFields}
-      itemNoun={STARTING_EQUIPMENT_OPTION_NOUN}
+      itemNoun={STARTING_EQUIPMENT_OPTION_MASTER_DETAIL_ITEM_NOUN}
       listTitle="Packages"
       ariaLabel="Starting equipment packages"
       addLabel={ADD_STARTING_EQUIPMENT_OPTION_LABEL}
-      emptyListLabel="No packages yet.\nAdd a package to configure its equipment choices."
       idPrefix="class-starting-equipment-option"
       editor={editor}
       leadingContent={

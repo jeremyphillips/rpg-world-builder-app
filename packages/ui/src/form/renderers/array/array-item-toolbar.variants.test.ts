@@ -6,6 +6,8 @@ import {
   arrayItemCompactRowClasses,
   arrayItemCompactGripClasses,
   arrayItemDragHandleClasses,
+  arrayItemHeaderSummaryClasses,
+  arrayItemHeaderTitleClasses,
   arrayItemMainClasses,
   arrayItemRemoveButtonClasses,
   arrayItemShellClasses,
@@ -17,6 +19,13 @@ import {
 import { resolveFieldContainerChromeClasses } from '../../../components/ui/field-surface.variants'
 
 describe('array item shell variants', () => {
+  it('uses leading-snug on truncated header copy so descenders are not clipped', () => {
+    expect(arrayItemHeaderTitleClasses).toContain('leading-snug')
+    expect(arrayItemHeaderTitleClasses).not.toContain('leading-none')
+    expect(arrayItemHeaderSummaryClasses).toContain('leading-snug')
+    expect(arrayItemHeaderSummaryClasses).not.toContain('leading-none')
+  })
+
   it('uses a two-column grid with top-aligned actions and shell padding', () => {
     expect(arrayItemShellClasses).toContain('grid-cols-[minmax(0,1fr)_auto]')
     expect(arrayItemShellClasses).toContain('items-start')

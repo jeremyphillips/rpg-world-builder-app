@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useWatch } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TestFormShell } from '@/test/form-shell'
@@ -20,6 +21,11 @@ type Trait = {
   grants: never[]
 }
 
+function TraitsValuesProbe() {
+  const traits = useWatch({ name: 'traits' }) as Trait[] | undefined
+  return <pre data-testid="traits-values">{JSON.stringify(traits)}</pre>
+}
+
 function TabShell({
   traits = [] as Trait[],
   entitySource,
@@ -30,6 +36,7 @@ function TabShell({
   return (
     <TestFormShell defaultValues={{ traits }}>
       <SpeciesTraitsTab formCtx={{ entitySource }} />
+      <TraitsValuesProbe />
     </TestFormShell>
   )
 }
@@ -57,7 +64,7 @@ async function deleteViaOverflow(user: ReturnType<typeof userEvent.setup>, title
 describe('SpeciesTraitsTab', () => {
   it('shows the empty state when there are no traits', () => {
     render(<TabShell />)
-    expect(screen.getByText(/No traits yet/i)).toBeInTheDocument()
+    expect(screen.getByText(/No traits added\./i)).toBeInTheDocument()
     expect(screen.getByText(/Select a trait to edit/i)).toBeInTheDocument()
   })
 
@@ -73,13 +80,37 @@ describe('SpeciesTraitsTab', () => {
       }),
     ).toBeInTheDocument()
     expect(screen.getByTestId('trait-detail')).toHaveTextContent('traits.0')
+    expect(JSON.parse(screen.getByTestId('traits-values').textContent ?? '[]')[0]).toMatchObject({
+      kind: 'custom',
+    })
   })
 
-  it('renders structured meta for each row', () => {
+  it('renders source meta without a Custom or Grant eyebrow', () => {
     render(<TabShell traits={[darkvision]} />)
-    expect(
-      within(screen.getByRole('navigation', { name: 'Traits' })).getByText('Custom · Homebrew'),
-    ).toBeInTheDocument()
+    const list = screen.getByRole('navigation', { name: 'Traits' })
+    expect(within(list).getByText('Homebrew')).toBeInTheDocument()
+    expect(within(list).queryByText(/Custom/)).not.toBeInTheDocument()
+    expect(within(list).queryByText(/Grant/)).not.toBeInTheDocument()
+    expect(within(list).queryByText(/Derived/)).not.toBeInTheDocument()
+  })
+
+  it('keeps a loaded grant trait as grant in form state', () => {
+    render(
+      <TabShell
+        traits={[
+          {
+            id: 't-grant',
+            kind: 'grant',
+            overrideDisplay: false,
+            grants: [],
+          },
+        ]}
+      />,
+    )
+
+    expect(JSON.parse(screen.getByTestId('traits-values').textContent ?? '[]')[0]).toMatchObject({
+      kind: 'grant',
+    })
   })
 
   it('selects another trait when its row is clicked', async () => {
@@ -104,7 +135,7 @@ describe('SpeciesTraitsTab', () => {
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
 
     await waitFor(() => {
-      expect(screen.getByText(/No traits yet/i)).toBeInTheDocument()
+      expect(screen.getByText(/No traits added\./i)).toBeInTheDocument()
     })
   })
 

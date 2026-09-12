@@ -5,8 +5,8 @@ import { buildItemDefaultValues } from '@rpg/ui/form'
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
 import { campaignRulesFromCtx } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
+import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../lib/class-feature-form-labels'
 import {
   classFeatureItemFields,
   featureItemEyebrow,
@@ -16,7 +16,6 @@ import {
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 
 const FEATURES_FIELD_NAME = 'features'
-const FEATURE_NOUN = 'feature'
 
 function compareFeaturesByLevel(left: unknown, right: unknown): number {
   const readLevel = (row: unknown) => {
@@ -100,14 +99,10 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
       formCtx={formCtx}
       fieldName={FEATURES_FIELD_NAME}
       itemFields={fields}
-      itemNoun={FEATURE_NOUN}
+      itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
       listTitle="Features"
       ariaLabel="Features"
       addLabel="Add feature"
-      emptyListLabel={masterDetailEmptyListLabel(
-        'features',
-        'Add a feature to configure its level, grants, and description.',
-      )}
       idPrefix="class-feature"
       editor={editor}
       mapListItem={({ row, index }) => ({
