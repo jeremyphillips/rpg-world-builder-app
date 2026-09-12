@@ -611,7 +611,6 @@ function creationSectionItems({
               {
                 ...(buildStartingWealthTiersField() as ArrayConfig),
                 name: `${prefix}.tiers`,
-                item: { surface: { elevation: 'raised' } },
               },
             ],
           },

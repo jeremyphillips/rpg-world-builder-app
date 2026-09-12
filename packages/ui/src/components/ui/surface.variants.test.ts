@@ -53,11 +53,10 @@ describe('resolveSurfaceClasses', () => {
     expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })
 
-  it('uses approved tokens for raised array item surface', () => {
+  it('uses approved tokens for subtle array item surface', () => {
     const classes = resolveSurfaceClasses(DEFAULT_ARRAY_ITEM_SURFACE)
-    expect(classes).toContain('bg-card')
-    expect(classes).toContain('[--surface-current:var(--card)]')
-    expect(classes).toContain('shadow-surface-raised')
+    expect(classes).toContain('bg-surface-subtle')
+    expect(classes).toContain('[--surface-current:var(--surface-subtle)]')
     expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })
 

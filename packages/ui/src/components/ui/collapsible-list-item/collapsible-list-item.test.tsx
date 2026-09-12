@@ -101,7 +101,9 @@ describe('CollapsibleListItem', () => {
     expect(headerRow).toHaveClass('flex', 'items-center')
     expect(headerRow.contains(addButton)).toBe(true)
     expect(summary).toHaveClass('pl-[var(--content-column-indent)]')
-    expect(body).toHaveClass('pl-[var(--content-column-indent)]')
+    expect(body).toHaveClass('pl-[var(--content-inline-start)]')
+    expect(body).toHaveClass('-ml-2')
+    expect(body).toHaveClass('bg-background')
     expect(screen.getByRole('group', { name: 'Item actions' })).toBeInTheDocument()
   })
 

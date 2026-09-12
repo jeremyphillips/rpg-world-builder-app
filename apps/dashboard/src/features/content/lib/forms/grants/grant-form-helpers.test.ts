@@ -8,8 +8,10 @@ import {
 } from '@rpg/ui/form'
 
 import {
+  buildGrantUnlockLevelOptions,
   formatDamageTypeRowSummary,
   formatFeatChoiceRowSummary,
+  formatGrantDefaultUnlockLabel,
   formatGrantRowPrimary,
   formatGrantRowSummary,
   formatLanguageRowSummary,
@@ -108,6 +110,44 @@ describe('grantItemFields react keys', () => {
     const prefix = 'features.1.grants.0'
 
     expect(walkDuplicateFormItemKeys(fields, prefix)).toEqual([])
+  })
+
+  it('wires parent-relative optionsResolve when inheriting unlock from feature level', () => {
+    const fields = grantItemFields(
+      GRANT_TYPES,
+      GRANT_TYPE_LABELS,
+      { options: {} },
+      { inheritUnlockFromParentField: 'level' },
+    )
+    const unlockField = fields.find((field) => 'name' in field && field.name === 'unlockLevel')
+
+    expect(unlockField).toMatchObject({
+      optionsResolve: {
+        dependsOn: ['../../level'],
+      },
+    })
+  })
+})
+
+describe('buildGrantUnlockLevelOptions', () => {
+  const levelOptions = [
+    { value: '1', label: 'Level 1' },
+    { value: '2', label: 'Level 2' },
+    { value: '3', label: 'Level 3' },
+    { value: '5', label: 'Level 5' },
+    { value: '7', label: 'Level 7' },
+  ]
+
+  it('includes all campaign levels when no parent level is provided', () => {
+    const options = buildGrantUnlockLevelOptions(levelOptions)
+    expect(options.map((option) => option.value)).toEqual(['default', '1', '2', '3', '5', '7'])
+    expect(options[0]?.label).toBe(formatGrantDefaultUnlockLabel())
+  })
+
+  it('excludes levels at or below the parent feature level', () => {
+    const options = buildGrantUnlockLevelOptions(levelOptions, 3)
+    expect(options.map((option) => option.value)).toEqual(['default', '5', '7'])
+    expect(options[0]?.label).toBe(formatGrantDefaultUnlockLabel(3))
   })
 })
 

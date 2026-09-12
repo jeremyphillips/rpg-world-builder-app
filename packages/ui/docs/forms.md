@@ -345,7 +345,9 @@ import { toOptions } from '@rpg/ui/form'
 > hidden fields still validate. Keep schemas plain or gate rules yourself.
 
 Array item conditionals use **relative** `dependsOn` names — see
-[containers.md](./forms/containers.md#conditional-fields-in-items).
+[containers.md](./forms/containers.md#conditional-fields-in-items). Prefix with `../` to watch a
+parent path segment from a nested array item; use multiple hops to reach a grandparent row
+(e.g. `../../level` inside `features.0.grants.0` watches `features.0.level`).
 
 ## `useSubmitHandler` — form-level error adapter
 

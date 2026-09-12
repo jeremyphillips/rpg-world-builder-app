@@ -21,11 +21,21 @@ import { NestedFormItems } from '../../containers/form-item-node.client'
 import { FieldNode } from '../../containers/form-conditional.client'
 import { SlotFormItemSection } from '../fields/slot-field-renderer.client'
 import type { ArrayItemIssueProminence } from './array-item-issue.variants'
+import { CollapsibleListItem } from '../../../components/ui/collapsible-list-item'
+import { DEFAULT_ARRAY_ITEM_SURFACE } from '../../../components/ui/field-dependent.variants'
 import { FieldRow } from '../../../components/ui/field-row'
-import { ArrayItemToolbar, ArrayItemDragHandle } from './array-item-header.client'
+import {
+  ArrayItemDragHandle,
+  ArrayItemHeaderContent,
+  ArrayItemHeaderSummary,
+  ArrayItemToolbar,
+} from './array-item-header.client'
 import { ArrayItemCompactRow } from './array-item-compact-row.client'
-import { ArrayItemActionsRail, ArrayItemShell } from './array-item-shell.client'
-import { arrayItemBodyClasses } from './array-item-toolbar.variants'
+import {
+  ArrayItemActionsContent,
+  ArrayItemActionsRail,
+  ArrayItemShell,
+} from './array-item-shell.client'
 import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
 import { ArrayItemIssueSummary } from './array-item-issue.client'
 import { useArrayFieldItemContentState } from './use-array-field-item-content-state.client'
@@ -89,22 +99,26 @@ function ArrayFieldItemActionsRailSlot({
   badgeProminence,
   variant,
   embedded,
-}: ArrayFieldItemActionsRailProps) {
-  return (
-    <ArrayItemActionsRail
-      removeAriaLabel={`Remove ${header.ariaLabel}`}
-      canRemove={canRemove}
-      showDefaultRemove={showDefaultItemRemove}
-      customRemove={customRemove}
-      onRemove={onRemove}
-      issueCount={showIssueChrome ? issueCount : 0}
-      issueRowLabel={rowLabel}
-      onIssuePress={onFocusIssue}
-      badgeProminence={showIssueChrome ? badgeProminence : 'nav'}
-      compact={variant === 'compact'}
-      embedded={embedded}
-    />
-  )
+  bare = false,
+}: ArrayFieldItemActionsRailProps & { bare?: boolean }) {
+  const contentProps = {
+    removeAriaLabel: `Remove ${header.ariaLabel}`,
+    canRemove,
+    showDefaultRemove: showDefaultItemRemove,
+    customRemove,
+    onRemove,
+    issueCount: showIssueChrome ? issueCount : 0,
+    issueRowLabel: rowLabel,
+    onIssuePress: onFocusIssue,
+    badgeProminence: showIssueChrome ? badgeProminence : 'nav',
+    compact: variant === 'compact',
+  }
+
+  if (bare) {
+    return <ArrayItemActionsContent {...contentProps} />
+  }
+
+  return <ArrayItemActionsRail {...contentProps} embedded={embedded} />
 }
 
 interface CompactInlineArrayFieldItemProps extends ArrayFieldItemChromeProps {
@@ -214,7 +228,7 @@ function CompactInlineArrayFieldItem({
   )
 }
 
-interface ToolbarArrayFieldItemProps extends ArrayFieldItemChromeProps {
+interface CompactToolbarArrayFieldItemProps extends ArrayFieldItemChromeProps {
   legend: string
   index: number
   headerConfig: ArrayItemHeaderConfig
@@ -225,15 +239,13 @@ interface ToolbarArrayFieldItemProps extends ArrayFieldItemChromeProps {
   collapsed: boolean
   onToggleCollapse: () => void
   bodyId: string
-  variant: 'compact' | 'detailed'
   issueSummary?: ArrayItemIssueSummaryProps
   watchedSummaryContext?: Record<string, unknown>
   fieldsNode: React.ReactNode
-  leadingChrome: { showDragHandle: boolean; collapsible: boolean }
   actionsRail: React.ReactNode
 }
 
-function ToolbarArrayFieldItem({
+function CompactToolbarArrayFieldItem({
   titleId,
   itemPrefix,
   gripVisible,
@@ -249,13 +261,11 @@ function ToolbarArrayFieldItem({
   collapsed,
   onToggleCollapse,
   bodyId,
-  variant,
   issueSummary,
   watchedSummaryContext,
   fieldsNode,
-  leadingChrome,
   actionsRail,
-}: ToolbarArrayFieldItemProps) {
+}: CompactToolbarArrayFieldItemProps) {
   return (
     <ArrayItemShell
       titleId={titleId}
@@ -264,46 +274,117 @@ function ToolbarArrayFieldItem({
       collapsible={collapsible}
       dragging={dragging}
       main={
-        <>
-          <ArrayItemToolbar
-            legend={legend}
-            index={index}
-            headerConfig={headerConfig}
-            itemValues={itemValues}
-            watchedPrimary={watchedPrimary}
-            watchedSummaryContext={watchedSummaryContext}
-            showDragHandle={showDragHandle}
-            dragHandleProps={
-              dragHandleProps
-                ? {
-                    ariaLabel: '',
-                    attributes: dragHandleProps.attributes,
-                    listeners: dragHandleProps.listeners,
-                  }
-                : undefined
-            }
-            collapsible={collapsible}
-            collapsed={collapsed}
-            onToggleCollapse={onToggleCollapse}
-            bodyId={bodyId}
-            titleId={titleId}
-            compact={variant === 'compact'}
-            issueSummary={issueSummary}
-          >
-            {variant === 'compact' ? fieldsNode : null}
-          </ArrayItemToolbar>
-          {variant === 'detailed' ? (
-            <div
-              id={bodyId}
-              hidden={collapsed || undefined}
-              className={arrayItemBodyClasses(leadingChrome)}
-              aria-hidden={collapsed}
-            >
-              {fieldsNode}
-            </div>
-          ) : null}
-        </>
+        <ArrayItemToolbar
+          legend={legend}
+          index={index}
+          headerConfig={headerConfig}
+          itemValues={itemValues}
+          watchedPrimary={watchedPrimary}
+          watchedSummaryContext={watchedSummaryContext}
+          showDragHandle={showDragHandle}
+          dragHandleProps={
+            dragHandleProps
+              ? {
+                  ariaLabel: '',
+                  attributes: dragHandleProps.attributes,
+                  listeners: dragHandleProps.listeners,
+                }
+              : undefined
+          }
+          collapsible={collapsible}
+          collapsed={collapsed}
+          onToggleCollapse={onToggleCollapse}
+          bodyId={bodyId}
+          titleId={titleId}
+          compact
+          issueSummary={issueSummary}
+        >
+          {fieldsNode}
+        </ArrayItemToolbar>
       }
+      actions={actionsRail}
+    />
+  )
+}
+
+interface DetailedArrayFieldItemProps extends ArrayFieldItemChromeProps {
+  itemId: string
+  header: ResolvedArrayItemHeader
+  headerConfig: ArrayItemHeaderConfig
+  itemValues: Record<string, unknown>
+  index: number
+  watchedSummaryContext?: Record<string, unknown>
+  showDragHandle: boolean
+  dragHandleProps?: ArrayFieldItemContentProps['dragHandleProps']
+  collapsed: boolean
+  onToggleCollapse: () => void
+  bodyId: string
+  issueSummary?: ArrayItemIssueSummaryProps
+  fieldsNode: React.ReactNode
+  leadingChrome: { showDragHandle: boolean; collapsible: boolean }
+  actionsRail: React.ReactNode
+}
+
+function DetailedArrayFieldItem({
+  titleId,
+  itemPrefix,
+  itemId,
+  collapsible,
+  dragging,
+  header,
+  headerConfig,
+  itemValues,
+  index,
+  watchedSummaryContext,
+  showDragHandle,
+  dragHandleProps,
+  collapsed,
+  onToggleCollapse,
+  bodyId,
+  issueSummary,
+  fieldsNode,
+  leadingChrome,
+  actionsRail,
+}: DetailedArrayFieldItemProps) {
+  const { arrayItemSurface, arrayItemTone } = useFormSectionContext()
+  const summary = headerConfig.summary?.(itemValues, index, watchedSummaryContext) ?? undefined
+  const summaryNode =
+    summary || issueSummary ? (
+      <ArrayItemHeaderSummary
+        summary={summary}
+        issueSummary={issueSummary}
+        collapsed={collapsed}
+        leadingChrome={leadingChrome}
+      />
+    ) : undefined
+
+  return (
+    <CollapsibleListItem
+      itemId={itemId}
+      titleId={titleId}
+      bodyId={bodyId}
+      itemPrefix={itemPrefix}
+      toolbarAriaLabel={header.ariaLabel}
+      collapsible={collapsible}
+      collapsed={collapsed}
+      onToggleCollapse={onToggleCollapse}
+      showDragHandle={showDragHandle}
+      dragHandleProps={
+        dragHandleProps
+          ? {
+              attributes: dragHandleProps.attributes,
+              listeners: dragHandleProps.listeners,
+              isDragging: dragHandleProps.isDragging,
+            }
+          : undefined
+      }
+      dragging={dragging}
+      surface={arrayItemSurface ?? DEFAULT_ARRAY_ITEM_SURFACE}
+      tone={arrayItemTone}
+      actionsAlign="center"
+      header={<ArrayItemHeaderContent header={header} />}
+      summary={summaryNode}
+      body={fieldsNode}
       actions={actionsRail}
     />
   )
@@ -384,6 +465,7 @@ export function ArrayFieldItemContent({
     </ArrayFieldContext.Provider>
   ) : undefined
 
+  const actionsEmbedded = Boolean(compactInlineRow) || Boolean(itemConfig.renderShell)
   const actionsRail = (
     <ArrayFieldItemActionsRailSlot
       header={header}
@@ -397,7 +479,8 @@ export function ArrayFieldItemContent({
       onFocusIssue={focusIssue}
       badgeProminence={badgeProminence}
       variant={variant}
-      embedded={Boolean(compactInlineRow) || Boolean(itemConfig.renderShell)}
+      embedded={actionsEmbedded}
+      bare={variant === 'detailed' && !compactInlineRow && !itemConfig.renderShell}
     />
   )
 
@@ -438,22 +521,43 @@ export function ArrayFieldItemContent({
     })
   }
 
+  if (variant === 'compact') {
+    return (
+      <CompactToolbarArrayFieldItem
+        {...chromeProps}
+        legend={legend}
+        index={index}
+        headerConfig={headerConfig}
+        itemValues={itemValues}
+        watchedPrimary={watchedPrimary}
+        showDragHandle={showDragHandle}
+        dragHandleProps={dragHandleProps}
+        collapsed={collapsed}
+        onToggleCollapse={onToggleCollapse}
+        bodyId={bodyId}
+        issueSummary={issueSummary}
+        watchedSummaryContext={watchedSummaryContext}
+        fieldsNode={fieldsNode}
+        actionsRail={actionsRail}
+      />
+    )
+  }
+
   return (
-    <ToolbarArrayFieldItem
+    <DetailedArrayFieldItem
       {...chromeProps}
-      legend={legend}
-      index={index}
+      itemId={itemId}
+      header={header}
       headerConfig={headerConfig}
       itemValues={itemValues}
-      watchedPrimary={watchedPrimary}
+      index={index}
+      watchedSummaryContext={watchedSummaryContext}
       showDragHandle={showDragHandle}
       dragHandleProps={dragHandleProps}
       collapsed={collapsed}
       onToggleCollapse={onToggleCollapse}
       bodyId={bodyId}
-      variant={variant}
       issueSummary={issueSummary}
-      watchedSummaryContext={watchedSummaryContext}
       fieldsNode={fieldsNode}
       leadingChrome={leadingChrome}
       actionsRail={actionsRail}

@@ -70,6 +70,23 @@ export const collapsibleListItemCatalogBodyClasses = cn(
   establishSurfaceCurrent('surface-muted'),
 )
 
+/**
+ * Expanded array-item body — canvas plane under a subtle header.
+ */
+export const collapsibleListItemBackgroundBodyClasses = cn(
+  'border-t border-border-subtle bg-background',
+  establishSurfaceCurrent('background'),
+)
+
+/**
+ * Default disclosure body — bleeds to shell edges; inner fields restore copy alignment
+ * with the title column via `--content-inline-start`.
+ */
+export const collapsibleListItemDefaultBodyClasses = cn(
+  collapsibleListItemBackgroundBodyClasses,
+  '-ml-2 -mr-3 pb-3 pt-0',
+)
+
 export function collapsibleListItemHeaderRowClassesForRowLayout(
   rowLayout: CollapsibleListItemRowLayout = 'default',
 ): string {
@@ -79,33 +96,36 @@ export function collapsibleListItemHeaderRowClassesForRowLayout(
 }
 
 /** Item shell — border and shell padding; actions rail sits inside padded box on row 1. */
-export const collapsibleListItemShellVariants = cva(cn('relative rounded-md border'), {
-  variants: {
-    layout: {
-      default: cn(
-        'grid grid-cols-[minmax(0,1fr)_auto] items-start',
-        collapsibleListItemShellPaddingClasses,
-      ),
-      headerActions: cn('flex flex-col', collapsibleListItemShellPaddingClasses),
-      compactRow: cn(collapsibleListItemShellPaddingClasses, 'pt-[calc(var(--spacing)*2)]'),
-      entityCardHeaderActions: cn(
-        'flex flex-col',
-        collapsibleListItemEntityCardShellPaddingClasses,
-      ),
+export const collapsibleListItemShellVariants = cva(
+  cn('relative overflow-hidden rounded-md border'),
+  {
+    variants: {
+      layout: {
+        default: cn(
+          'grid grid-cols-[minmax(0,1fr)_auto] items-start',
+          collapsibleListItemShellPaddingClasses,
+        ),
+        headerActions: cn('flex flex-col', collapsibleListItemShellPaddingClasses),
+        compactRow: cn(collapsibleListItemShellPaddingClasses, 'pt-[calc(var(--spacing)*2)]'),
+        entityCardHeaderActions: cn(
+          'flex flex-col',
+          collapsibleListItemEntityCardShellPaddingClasses,
+        ),
+      },
+      preset: {
+        default: 'border-border',
+        catalog: cn(
+          collapsibleListItemCatalogChromeClasses,
+          collapsibleListItemCatalogShellExtraClasses,
+        ),
+      },
     },
-    preset: {
-      default: 'border-border',
-      catalog: cn(
-        collapsibleListItemCatalogChromeClasses,
-        collapsibleListItemCatalogShellExtraClasses,
-      ),
+    defaultVariants: {
+      layout: 'default',
+      preset: 'default',
     },
   },
-  defaultVariants: {
-    layout: 'default',
-    preset: 'default',
-  },
-})
+)
 
 /** Preset-aware shell classes — use when composing rows outside the shell component. */
 export function collapsibleListItemShellPresetClasses(
@@ -161,7 +181,10 @@ export function collapsibleListItemDragHandleClasses(options: { compact?: boolea
 }
 
 /** Collapse caret in detailed item headers. */
-export const collapsibleListItemCollapseButtonClasses = collapsibleListItemChromeButtonClasses
+export const collapsibleListItemCollapseButtonClasses = cn(
+  collapsibleListItemChromeButtonClasses,
+  'cursor-pointer',
+)
 
 /** Leading toolbar row — grip, caret, and title/compact fields only (no trailing actions). */
 export function collapsibleListItemToolbarRowClasses(
@@ -211,7 +234,7 @@ export function collapsibleListItemBodyClasses(
     )
   }
 
-  return cn(resolved.contentColumnIndentClasses, 'pt-3')
+  return cn(collapsibleListItemDefaultBodyClasses, resolved.contentInlineStartClasses, 'pt-3 pr-3')
 }
 
 /**

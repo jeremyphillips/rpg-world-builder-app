@@ -93,8 +93,10 @@ export function arrayItemHeaderSummaryIndentClasses(
   return resolveCollapsibleListItemLeadingChrome(options).contentColumnIndentClasses
 }
 
-/** Aligns detailed item bodies with the toolbar content column. */
-export const arrayItemBodyClasses = collapsibleListItemBodyClasses
+/** @deprecated Detailed items compose `CollapsibleListItem` — use `collapsibleListItemBodyClasses`. */
+export function arrayItemBodyClasses(options: CollapsibleListItemLeadingChromeOptions): string {
+  return collapsibleListItemBodyClasses(options)
+}
 
 /** Inline field region for compact items (same row as toolbar). */
 export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'
