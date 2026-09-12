@@ -240,6 +240,7 @@ function CollapsibleListItemRoot({
           />
         }
         summary={actionsAlign === 'center' ? summary : undefined}
+        bodyExpanded={Boolean(body) && !collapsed}
         body={
           body ? (
             <CollapsibleListItemBody

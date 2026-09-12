@@ -795,6 +795,7 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait 1' })
+    expect(itemShell).toHaveClass('pb-0')
     const body = itemShell.querySelector('[id$="-body"]')
     expect(body).not.toBeNull()
     expect(body).toHaveClass('bg-background')
@@ -802,6 +803,56 @@ describe('ArrayFieldRenderer', () => {
     expect(body).toHaveClass('-mr-3')
     expect(body).toHaveClass('pl-[var(--content-inline-start)]')
     expect(body).not.toHaveClass('pl-[var(--content-column-indent)]')
+  })
+
+  it('stacks summary subheadlines with a 2px gap below the title row', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+    await user.type(screen.getByRole('textbox', { name: 'Description' }), 'See in the dark')
+
+    const itemShell = screen.getByRole('group', { name: /Darkvision/ })
+    const headerRow = itemShell.firstElementChild as HTMLElement
+    const headerStack = headerRow.firstElementChild as HTMLElement
+    const summary = screen.getByText('See in the dark', { selector: 'p' })
+
+    expect(headerRow).toHaveClass('pt-[calc(var(--spacing)*2)]')
+    expect(headerRow).not.toHaveClass('pb-[calc(var(--spacing)*2)]')
+    expect(headerStack).toHaveClass('gap-0.5')
+    expect(headerStack).toContainElement(summary)
+  })
+
+  it('restores header bottom padding when a summarized item is collapsed', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.type(screen.getByRole('textbox', { name: 'Trait name' }), 'Darkvision')
+
+    const collapseTrigger = screen.getByRole('button', { name: /Collapse .*Darkvision/ })
+    await user.click(collapseTrigger)
+
+    const itemShell = screen.getByRole('group', { name: /Darkvision/ })
+    const headerRow = itemShell.firstElementChild as HTMLElement
+    expect(headerRow).toHaveClass('pb-[calc(var(--spacing)*2)]')
   })
 
   it('shows item summaries while expanded and collapsed', async () => {

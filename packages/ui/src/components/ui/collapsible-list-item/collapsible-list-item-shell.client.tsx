@@ -17,6 +17,9 @@ import { CollapsibleListItemActions } from './collapsible-list-item-actions.clie
 import {
   collapsibleListItemDraggingClasses,
   collapsibleListItemHeaderRowClassesForRowLayout,
+  collapsibleListItemHeaderRowPaddingClasses,
+  collapsibleListItemHeaderStackClasses,
+  collapsibleListItemHeaderStackSummaryGapClasses,
   collapsibleListItemHeaderSummaryClasses,
   collapsibleListItemMainClasses,
   collapsibleListItemShellVariants,
@@ -48,6 +51,8 @@ export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadin
   toolbar?: React.ReactNode
   body?: React.ReactNode
   summary?: React.ReactNode
+  /** When true, an expanded disclosure body is visible below the header stack. */
+  bodyExpanded?: boolean
   main?: React.ReactNode
   actions?: React.ReactNode
 }
@@ -87,6 +92,54 @@ function resolveCollapsibleListItemShellLayout({
   return rowLayout === 'entity-card' ? 'entityCardHeaderActions' : 'headerActions'
 }
 
+interface CollapsibleListItemCenterActionsContentProps {
+  headerRowClasses: string
+  hasSummary: boolean
+  bodyExpanded: boolean
+  leadingChrome: CollapsibleListItemLeadingChromeOptions
+  toolbar: React.ReactNode
+  summary?: React.ReactNode
+  actions?: React.ReactNode
+  body?: React.ReactNode
+}
+
+function CollapsibleListItemCenterActionsContent({
+  headerRowClasses,
+  hasSummary,
+  bodyExpanded,
+  leadingChrome,
+  toolbar,
+  summary,
+  actions,
+  body,
+}: CollapsibleListItemCenterActionsContentProps) {
+  return (
+    <>
+      <div
+        className={cn(
+          headerRowClasses,
+          collapsibleListItemHeaderRowPaddingClasses(hasSummary, bodyExpanded),
+        )}
+      >
+        <div
+          className={cn(
+            collapsibleListItemHeaderStackClasses,
+            summary && collapsibleListItemHeaderStackSummaryGapClasses,
+            'min-w-0 flex-1',
+          )}
+        >
+          {toolbar}
+          {summary ? (
+            <div className={collapsibleListItemHeaderSummaryClasses(leadingChrome)}>{summary}</div>
+          ) : null}
+        </div>
+        {actions}
+      </div>
+      {body}
+    </>
+  )
+}
+
 /** Grid shell — toolbar row + optional body + trailing actions rail. */
 export function CollapsibleListItemShell({
   titleId,
@@ -104,6 +157,7 @@ export function CollapsibleListItemShell({
   toolbar,
   body,
   summary,
+  bodyExpanded = false,
   main,
   actions,
 }: CollapsibleListItemShellProps) {
@@ -149,16 +203,16 @@ export function CollapsibleListItemShell({
       {layout === 'compactRow' ? (
         resolvedToolbar
       ) : actionsAlign === 'center' ? (
-        <>
-          <div className={headerRowClasses}>
-            <div className="min-w-0 flex-1">{resolvedToolbar}</div>
-            {resolvedActions}
-          </div>
-          {summary ? (
-            <div className={collapsibleListItemHeaderSummaryClasses(leadingChrome)}>{summary}</div>
-          ) : null}
-          {resolvedBody}
-        </>
+        <CollapsibleListItemCenterActionsContent
+          headerRowClasses={headerRowClasses}
+          hasSummary={Boolean(summary)}
+          bodyExpanded={Boolean(resolvedBody) && bodyExpanded}
+          leadingChrome={leadingChrome}
+          toolbar={resolvedToolbar}
+          summary={summary}
+          actions={resolvedActions}
+          body={resolvedBody}
+        />
       ) : (
         <>
           <div className={collapsibleListItemMainClasses}>

@@ -40,6 +40,12 @@ export const collapsibleListItemShellInsetClasses = 'calc(var(--spacing) * 2)'
 /** Fixed shell padding — inline-start matches legacy inset; inline-end/block-end use spacing 3. */
 export const collapsibleListItemShellPaddingClasses = cn('pl-2 pr-3 pb-3 pt-0')
 
+/**
+ * Disclosure shell padding — inline inset only; bottom pad is owned by the body wash
+ * (default array items and catalog picker rows).
+ */
+export const collapsibleListItemDisclosureShellPaddingClasses = cn('pl-2 pr-3 pt-0 pb-0')
+
 /** Shared 24×24 hit target for grip, collapse caret, and remove (WCAG 2.2 AA minimum). */
 export const collapsibleListItemChromeButtonClasses = iconGhostControlVariants({
   hover: 'text',
@@ -105,7 +111,7 @@ export const collapsibleListItemShellVariants = cva(
           'grid grid-cols-[minmax(0,1fr)_auto] items-start',
           collapsibleListItemShellPaddingClasses,
         ),
-        headerActions: cn('flex flex-col', collapsibleListItemShellPaddingClasses),
+        headerActions: cn('flex flex-col', collapsibleListItemDisclosureShellPaddingClasses),
         compactRow: cn(collapsibleListItemShellPaddingClasses, 'pt-[calc(var(--spacing)*2)]'),
         entityCardHeaderActions: cn(
           'flex flex-col',
@@ -144,12 +150,39 @@ export const collapsibleListItemShellClasses = cn(
 export const collapsibleListItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2)]'
 
 /** Toolbar + actions on one row when actions center on the title row only. */
-export const collapsibleListItemHeaderRowClasses = cn(
-  'flex w-full min-w-0 items-center gap-2',
-  'py-[calc(var(--spacing)*2)]',
-)
+export const collapsibleListItemHeaderRowClasses = 'flex w-full min-w-0 items-center gap-2'
 
-/** Summary below the header row — left indent matches body/content column. */
+/** Top inset for the header row above title/summary stack. */
+export const collapsibleListItemHeaderRowTopPaddingClasses = 'pt-[calc(var(--spacing)*2)]'
+
+/** Bottom inset when the header row has no summary subheadline. */
+export const collapsibleListItemHeaderRowBottomPaddingClasses = 'pb-[calc(var(--spacing)*2)]'
+
+/** Title + optional summary stack inside the header row main column. */
+export const collapsibleListItemHeaderStackClasses = 'flex min-w-0 flex-col'
+
+/** Gap between title block and summary subheadline (2px). */
+export const collapsibleListItemHeaderStackSummaryGapClasses = 'gap-0.5'
+
+/**
+ * Header row vertical inset. When a summary subheadline is visible and the body is
+ * expanded, bottom pad stays on the body wash; collapsed rows restore bottom pad here.
+ */
+export function collapsibleListItemHeaderRowPaddingClasses(
+  hasSummary: boolean,
+  bodyExpanded = false,
+): string {
+  if (hasSummary && bodyExpanded) {
+    return collapsibleListItemHeaderRowTopPaddingClasses
+  }
+
+  return cn(
+    collapsibleListItemHeaderRowTopPaddingClasses,
+    collapsibleListItemHeaderRowBottomPaddingClasses,
+  )
+}
+
+/** Summary below the title — left indent matches body/content column. */
 export function collapsibleListItemHeaderSummaryClasses(
   options: CollapsibleListItemLeadingChromeOptions,
 ): string {

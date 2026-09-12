@@ -8,8 +8,34 @@ import {
   collapsibleListItemBackgroundBodyClasses,
   collapsibleListItemBodyClasses,
   collapsibleListItemCollapseButtonClasses,
+  collapsibleListItemDisclosureShellPaddingClasses,
   collapsibleListItemEntityCardBodyClasses,
+  collapsibleListItemHeaderRowBottomPaddingClasses,
+  collapsibleListItemHeaderRowPaddingClasses,
+  collapsibleListItemHeaderRowTopPaddingClasses,
+  collapsibleListItemShellVariants,
 } from './collapsible-list-item.variants'
+
+describe('collapsibleListItemShellVariants', () => {
+  it('drops shell bottom padding on disclosure headerActions rows', () => {
+    expect(collapsibleListItemShellVariants({ layout: 'headerActions' })).toContain('pb-0')
+    expect(collapsibleListItemDisclosureShellPaddingClasses).toContain('pb-0')
+  })
+})
+
+describe('collapsibleListItemHeaderRowPaddingClasses', () => {
+  it('omits header bottom pad only when summary is visible and body is expanded', () => {
+    expect(collapsibleListItemHeaderRowPaddingClasses(true, true)).toBe(
+      collapsibleListItemHeaderRowTopPaddingClasses,
+    )
+    expect(collapsibleListItemHeaderRowPaddingClasses(true, false)).toContain(
+      collapsibleListItemHeaderRowBottomPaddingClasses,
+    )
+    expect(collapsibleListItemHeaderRowPaddingClasses(false, true)).toContain(
+      collapsibleListItemHeaderRowBottomPaddingClasses,
+    )
+  })
+})
 
 describe('collapsibleListItemBodyClasses', () => {
   it('returns structural-only classes for entity-card row layout', () => {
