@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Plus } from 'lucide-react'
 import { Button, Text, cn } from '@rpg/ui'
 
 import {
@@ -94,6 +95,7 @@ export function MasterDetailListPanel({
       <div className={masterDetailListHeaderClasses}>
         <div className={masterDetailListTitleClasses}>{listTitle}</div>
         <Button type="button" variant="outline" size="sm" onClick={onAdd}>
+          <Plus aria-hidden />
           {addLabel}
         </Button>
       </div>

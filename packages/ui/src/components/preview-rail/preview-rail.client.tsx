@@ -18,6 +18,7 @@ import { Button } from '../ui/button.client'
 import { ContentCardHeading } from '../ui/content-card-heading.client'
 import { ContentCardMedia } from '../ui/content-card-parts.client'
 import { contentCardMediaVariants } from '../ui/content-card.variants'
+import { Eyebrow } from '../ui/eyebrow'
 import { Heading } from '../ui/heading'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
 import { StatusDot } from '../ui/status-dot'
@@ -296,9 +297,9 @@ function PreviewRailSections({
   return (
     <div className="flex flex-col gap-3">
       <div className={previewRailSectionsHeaderClasses}>
-        <Heading variant="subsection" as="h3">
+        <Eyebrow as="h3" size="sm" tone="foreground">
           {title}
-        </Heading>
+        </Eyebrow>
         {description ? <p className={previewRailCaptionTextClasses}>{description}</p> : null}
       </div>
       <Accordion

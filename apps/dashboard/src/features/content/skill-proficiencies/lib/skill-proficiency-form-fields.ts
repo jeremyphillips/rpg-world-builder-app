@@ -3,7 +3,7 @@ import { abilitySchema, ABILITY_ENTRIES, ABILITY_IDS, slugSchema } from '@rpg/co
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
+import { descriptionField, nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 
 const abilityOptions = toOptions(
@@ -43,20 +43,8 @@ export type SkillProficiencyDraftFormValues = z.infer<typeof skillProficiencyDra
 
 export { nameField as skillProficiencyNameField }
 
-export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
+export function buildSkillProficiencyFields(ctx: ContentFormCtx): FormItem[] {
   return [
-    {
-      kind: 'group',
-      legend: 'Identity',
-      fields: [
-        {
-          type: 'textarea',
-          name: 'description',
-          label: 'Summary',
-          hint: 'Short fragment used in the "{Name} covers …" lead sentence on the detail page.',
-        },
-      ],
-    },
     {
       kind: 'group',
       legend: 'Mechanics',
@@ -107,5 +95,6 @@ export function buildSkillProficiencyFields(_ctx: ContentFormCtx): FormItem[] {
         },
       ],
     },
+    descriptionField(ctx),
   ]
 }

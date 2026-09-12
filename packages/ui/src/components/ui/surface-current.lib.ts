@@ -37,3 +37,6 @@ export function establishSurfaceCurrent(plane: SurfaceCurrentPlane): string {
 
 /** Rebinds `--surface-current` on portaled popover content roots. */
 export const portalPopoverSurfaceClasses = establishSurfaceCurrent('popover')
+
+/** Rebinds `--surface-current` on portaled dropdown menu surfaces. */
+export const portalDropdownSurfaceClasses = establishSurfaceCurrent('field-container')

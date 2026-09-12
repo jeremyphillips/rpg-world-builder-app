@@ -1,17 +1,32 @@
-import { cn, interactiveFocusVariants, interactiveRowVariants } from '@rpg/ui'
+import {
+  cn,
+  establishSurfaceCurrent,
+  interactiveFocusVariants,
+  interactiveRowVariants,
+} from '@rpg/ui'
+
+import {
+  masterDetailRailBorderClasses,
+  masterDetailRailRowSeparatorClasses,
+} from './master-detail-rail.variants'
 
 /** Bordered collection shell for the master rail. */
-export const masterDetailListShellClasses =
-  'overflow-hidden rounded-lg border border-border bg-card'
+export const masterDetailListShellClasses = cn(
+  'overflow-hidden rounded-lg border bg-field-container text-foreground',
+  masterDetailRailBorderClasses,
+  establishSurfaceCurrent('field-container'),
+)
 
 /** Header row inside the shell — collection title and Add action. */
-export const masterDetailListHeaderClasses =
-  'flex items-center justify-between gap-3 border-b border-border px-3 py-2.5'
+export const masterDetailListHeaderClasses = cn(
+  'flex items-center justify-between gap-3 border-b px-3 py-2.5',
+  masterDetailRailBorderClasses,
+)
 
 export const masterDetailListTitleClasses = 'min-w-0 text-sm font-medium text-foreground'
 
 /** Unpadded list section — rows bleed to shell edges. */
-export const masterDetailListItemsClasses = 'divide-y divide-border'
+export const masterDetailListItemsClasses = masterDetailRailRowSeparatorClasses
 
 export function masterDetailListRowClasses(options: {
   active?: boolean
@@ -20,15 +35,17 @@ export function masterDetailListRowClasses(options: {
   const active = options.active !== false
 
   return cn(
-    'relative flex w-full flex-col items-start gap-0.5 px-3 py-2.5 text-left transition-colors',
+    'relative flex w-full flex-col items-start gap-0.5 border-0 py-2.5 pl-5 pr-3 text-left transition-colors',
     interactiveFocusVariants({ context: 'standalone' }),
     interactiveRowVariants({
       interaction: 'hoverable',
-      state: active ? 'default' : 'inactive',
+      state: 'default',
       hoverFamily: options.isSelected ? 'none' : 'selectable',
-      selected: options.isSelected ? 'fill' : 'none',
-      selectedHover: options.isSelected ? 'row' : 'none',
+      selected: 'none',
+      selectedHover: 'none',
     }),
+    !active && 'text-muted-foreground',
+    options.isSelected && 'bg-surface-muted text-foreground hover:bg-surface-muted',
     options.isSelected &&
       'before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary',
   )

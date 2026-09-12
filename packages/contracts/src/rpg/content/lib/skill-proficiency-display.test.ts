@@ -88,10 +88,22 @@ describe('formatSkillProficiencySummarySentence', () => {
     ).toBe('Stealth covers moving unseen and unheard.')
   })
 
+  it('strips rich-text markup before building the lead sentence', () => {
+    expect(
+      formatSkillProficiencySummarySentence({
+        name: 'Athletics',
+        description: '<p>Physical challenges involving strength, movement, and force.</p>',
+      }),
+    ).toBe('Athletics covers physical challenges involving strength, movement, and force.')
+  })
+
   it('returns undefined when description is missing or blank', () => {
     expect(formatSkillProficiencySummarySentence({ name: 'Athletics' })).toBeUndefined()
     expect(
       formatSkillProficiencySummarySentence({ name: 'Athletics', description: '   ' }),
+    ).toBeUndefined()
+    expect(
+      formatSkillProficiencySummarySentence({ name: 'Athletics', description: '<p></p>' }),
     ).toBeUndefined()
   })
 })

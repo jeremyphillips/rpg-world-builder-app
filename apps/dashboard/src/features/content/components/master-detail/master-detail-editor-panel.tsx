@@ -3,7 +3,11 @@ import { Text } from '@rpg/ui'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
-import { DetailOverflowMenu } from '../../lib/detail/detail-overflow-menu'
+import {
+  DetailOverflowMenu,
+  detailOverflowDeleteAction,
+} from '../../lib/detail/detail-overflow-menu'
+import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
 import {
   joinMasterDetailItemMeta,
   type MasterDetailItemMeta,
@@ -17,6 +21,7 @@ import {
   masterDetailEditorMetaClasses,
   masterDetailEditorShellClassName,
   masterDetailEditorTitleClasses,
+  masterDetailEditorValidationBannerClasses,
 } from './master-detail-editor-panel.variants'
 import { MasterDetailValidationBanner } from './master-detail-validation-banner'
 
@@ -68,7 +73,7 @@ function MasterDetailSelectedRowEditor({
       ) : null}
       <FormItems
         key={selectedFieldId}
-        items={itemFields}
+        items={wrapMasterDetailDetailFields(itemFields)}
         idPrefix={`${idPrefix}-${selectedFieldId}`}
         namePrefix={`${fieldName}.${selectedIndex}`}
       />
@@ -97,14 +102,7 @@ function MasterDetailEditorIdentityHeader({
       {deletable ? (
         <DetailOverflowMenu
           triggerLabel={`Actions for ${identity.title}`}
-          actions={[
-            {
-              id: 'delete',
-              label: `Delete ${itemNoun}`,
-              destructive: true,
-              onSelect: onDelete,
-            },
-          ]}
+          actions={[detailOverflowDeleteAction(`Delete ${itemNoun}`, onDelete)]}
         />
       ) : null}
     </div>
@@ -146,7 +144,7 @@ export function MasterDetailEditorPanel({
   return (
     <div className={masterDetailEditorShellClassName()}>
       {showValidationBanner ? (
-        <div className="border-b border-border px-4 py-3">
+        <div className={masterDetailEditorValidationBannerClasses}>
           <MasterDetailValidationBanner visible />
         </div>
       ) : null}
