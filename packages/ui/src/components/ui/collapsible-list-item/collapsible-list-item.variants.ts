@@ -165,8 +165,11 @@ export const collapsibleListItemHeaderStackClasses = 'flex min-w-0 flex-col'
 export const collapsibleListItemHeaderStackSummaryGapClasses = 'gap-0.5'
 
 /**
- * Header row vertical inset. When a summary subheadline is visible and the body is
- * expanded, bottom pad stays on the body wash; collapsed rows restore bottom pad here.
+ * Header row vertical inset for default disclosure rows. Entity-card hosts own header
+ * padding — omit CLI vertical inset when `rowLayout === 'entity-card'`.
+ *
+ * When a summary subheadline is visible and the body is expanded, bottom pad stays on
+ * the body wash; collapsed rows restore bottom pad here.
  */
 export function collapsibleListItemHeaderRowPaddingClasses(
   hasSummary: boolean,

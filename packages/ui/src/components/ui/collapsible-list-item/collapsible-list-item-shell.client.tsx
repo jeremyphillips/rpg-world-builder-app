@@ -94,6 +94,7 @@ function resolveCollapsibleListItemShellLayout({
 
 interface CollapsibleListItemCenterActionsContentProps {
   headerRowClasses: string
+  rowLayout: CollapsibleListItemRowLayout
   hasSummary: boolean
   bodyExpanded: boolean
   leadingChrome: CollapsibleListItemLeadingChromeOptions
@@ -105,6 +106,7 @@ interface CollapsibleListItemCenterActionsContentProps {
 
 function CollapsibleListItemCenterActionsContent({
   headerRowClasses,
+  rowLayout,
   hasSummary,
   bodyExpanded,
   leadingChrome,
@@ -113,14 +115,14 @@ function CollapsibleListItemCenterActionsContent({
   actions,
   body,
 }: CollapsibleListItemCenterActionsContentProps) {
+  const headerRowPadding =
+    rowLayout === 'entity-card'
+      ? undefined
+      : collapsibleListItemHeaderRowPaddingClasses(hasSummary, bodyExpanded)
+
   return (
     <>
-      <div
-        className={cn(
-          headerRowClasses,
-          collapsibleListItemHeaderRowPaddingClasses(hasSummary, bodyExpanded),
-        )}
-      >
+      <div className={cn(headerRowClasses, headerRowPadding)}>
         <div
           className={cn(
             collapsibleListItemHeaderStackClasses,
@@ -205,6 +207,7 @@ export function CollapsibleListItemShell({
       ) : actionsAlign === 'center' ? (
         <CollapsibleListItemCenterActionsContent
           headerRowClasses={headerRowClasses}
+          rowLayout={rowLayout}
           hasSummary={Boolean(summary)}
           bodyExpanded={Boolean(resolvedBody) && bodyExpanded}
           leadingChrome={leadingChrome}
