@@ -31,9 +31,10 @@ function EditorShell({
         fieldName="traits"
         itemFields={itemFields}
         itemNoun="trait"
+        listTitle="Traits"
         ariaLabel="Traits"
         addLabel="Add trait"
-        emptyListLabel="No traits yet. Add one to get started."
+        emptyListLabel="No traits yet.\nAdd a trait to configure its grants and description."
         idPrefix="species-trait"
         mapListItem={({ row, index }) => ({
           title: (row as TraitRow | undefined)?.name || `Trait ${index + 1}`,
@@ -63,7 +64,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     })
   })
 
-  it('confirms deletion through the shared dialog', async () => {
+  it('confirms deletion through the detail overflow menu', async () => {
     const user = userEvent.setup()
     render(
       <EditorShell
@@ -72,7 +73,8 @@ describe('FormEmbeddedMasterDetailEditor', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /Remove Darkvision/i }))
+    await user.click(screen.getByRole('button', { name: /Actions for Darkvision/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Delete trait/i }))
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete trait?')
 
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
@@ -82,7 +84,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     })
   })
 
-  it('locks system seed rows on a system entity', () => {
+  it('joins structured meta in the list and hides overflow delete for system seed rows', () => {
     render(
       <EditorShell
         entitySource="system"
@@ -91,8 +93,10 @@ describe('FormEmbeddedMasterDetailEditor', () => {
       />,
     )
 
-    expect(screen.getByText('System')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Remove Darkvision/i })).not.toBeInTheDocument()
+    expect(screen.getAllByText('Custom · System').length).toBeGreaterThan(0)
+    expect(
+      screen.queryByRole('button', { name: /Actions for Darkvision/i }),
+    ).not.toBeInTheDocument()
   })
 
   it('renders leadingContent above the editor grid', () => {
@@ -104,9 +108,10 @@ describe('FormEmbeddedMasterDetailEditor', () => {
             fieldName="traits"
             itemFields={[{ type: 'text', name: 'name', label: 'Name' }]}
             itemNoun="trait"
+            listTitle="Traits"
             ariaLabel="Traits"
             addLabel="Add trait"
-            emptyListLabel="No traits yet. Add one to get started."
+            emptyListLabel="No traits yet.\nAdd a trait to configure its grants and description."
             idPrefix="species-trait"
             leadingContent={<p>Choose how many traits apply.</p>}
             mapListItem={({ index }) => ({ title: `Trait ${index + 1}` })}
@@ -120,7 +125,6 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     const leading = screen.getByText('Choose how many traits apply.')
     const list = screen.getByRole('navigation', { name: 'Traits' })
 
-    // Leading content must precede the editor grid in document order.
     expect(leading.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })

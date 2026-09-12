@@ -12,22 +12,21 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 const items = [
-  { id: 'a', title: 'Rage', eyebrow: 'Level 1' },
-  { id: 'b', title: 'Unarmored Defense', eyebrow: 'Level 1' },
-  { id: 'c', title: 'Reckless Attack', eyebrow: 'Level 2' },
+  { id: 'a', title: 'Rage', meta: { eyebrow: 'Level 1', sourceLabel: 'System' } },
+  { id: 'b', title: 'Unarmored Defense', meta: { eyebrow: 'Level 1', sourceLabel: 'Homebrew' } },
+  { id: 'c', title: 'Reckless Attack', meta: { eyebrow: 'Level 2', sourceLabel: 'Homebrew' } },
 ]
 
 export const Default: Story = {
   args: {
     items,
     selectedIndex: 0,
+    listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
-    emptyLabel: 'No features yet. Add one to get started.',
+    emptyLabel: 'No features yet.\nAdd a feature to configure its level, grants, and description.',
     onAdd: () => {},
     onSelect: () => {},
-    onRemove: () => {},
-    onMove: () => {},
   },
 }
 
@@ -37,35 +36,29 @@ export const WithProtectedSystemRow: Story = {
       {
         id: 'a',
         title: 'Rage',
-        eyebrow: 'Level 1',
-        badges: [{ label: 'System', appearance: 'soft', tone: 'neutral' }],
+        meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
         deletable: false,
       },
       {
         id: 'b',
         title: 'Custom Fury',
-        eyebrow: 'Level 3',
-        badges: [{ label: 'Homebrew', appearance: 'outline', tone: 'neutral' }],
+        meta: { eyebrow: 'Level 3', sourceLabel: 'Homebrew' },
       },
       {
         id: 'c',
         title: 'Legacy Option',
-        eyebrow: 'Level 5',
-        badges: [
-          { label: 'System', appearance: 'soft', tone: 'neutral' },
-          { label: 'Inactive', appearance: 'outline', tone: 'warning' },
-        ],
+        meta: { eyebrow: 'Level 5', sourceLabel: 'System' },
         active: false,
         deletable: false,
       },
     ],
     selectedIndex: 0,
+    listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
-    emptyLabel: 'No features yet. Add one to get started.',
+    emptyLabel: 'No features yet.\nAdd a feature to configure its level, grants, and description.',
     onAdd: () => {},
     onSelect: () => {},
-    onRemove: () => {},
   },
 }
 
@@ -73,11 +66,11 @@ export const Empty: Story = {
   args: {
     items: [],
     selectedIndex: null,
+    listTitle: 'Features',
     ariaLabel: 'Features',
     addLabel: 'Add feature',
-    emptyLabel: 'No features yet. Add one to get started.',
+    emptyLabel: 'No features yet.\nAdd a feature to configure its level, grants, and description.',
     onAdd: () => {},
     onSelect: () => {},
-    onRemove: () => {},
   },
 }

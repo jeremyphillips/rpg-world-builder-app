@@ -6,7 +6,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
   const field = { id: 'rhf-1' }
   const hasRowError = vi.fn(() => false)
 
-  it('marks system seed rows as non-deletable with System and Homebrew badges context', () => {
+  it('marks system seed rows as non-deletable with structured meta', () => {
     const item = buildEmbeddedMasterDetailListItem({
       field,
       index: 0,
@@ -21,15 +21,14 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     expect(item).toMatchObject({
       id: 'rhf-1',
       title: 'Rage',
-      eyebrow: 'Level 1',
+      meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
       deletable: false,
       hasError: false,
       active: true,
-      badges: [{ label: 'System', appearance: 'soft', tone: 'neutral' }],
     })
   })
 
-  it('allows homebrew rows to be deleted with a Homebrew badge', () => {
+  it('allows homebrew rows to be deleted with homebrew source meta', () => {
     const item = buildEmbeddedMasterDetailListItem({
       field,
       index: 1,
@@ -43,9 +42,9 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     expect(item).toMatchObject({
       id: 'rhf-1',
       title: 'Custom Feature',
+      meta: { sourceLabel: 'Homebrew' },
       deletable: true,
       hasError: false,
-      badges: [{ label: 'Homebrew', appearance: 'outline', tone: 'neutral' }],
     })
   })
 
@@ -63,7 +62,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
 
     expect(item.hasError).toBe(true)
     expect(item.active).toBe(true)
-    expect(item.badges).toEqual([{ label: 'Homebrew', appearance: 'outline', tone: 'neutral' }])
+    expect(item.meta).toEqual({ sourceLabel: 'Homebrew' })
     expect(hasRowError).toHaveBeenCalledWith(0)
   })
 })

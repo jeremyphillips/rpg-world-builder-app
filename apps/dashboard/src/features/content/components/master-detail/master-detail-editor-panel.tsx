@@ -1,9 +1,30 @@
+import { useEffect, useRef } from 'react'
 import { Text } from '@rpg/ui'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
+import { DetailOverflowMenu } from '../../lib/detail/detail-overflow-menu'
+import {
+  joinMasterDetailItemMeta,
+  type MasterDetailItemMeta,
+} from '../../lib/master-detail/master-detail-item-meta'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
+import {
+  masterDetailEditorBodyClasses,
+  masterDetailEditorEmptyClasses,
+  masterDetailEditorIdentityClasses,
+  masterDetailEditorIdentityCopyClasses,
+  masterDetailEditorMetaClasses,
+  masterDetailEditorShellClassName,
+  masterDetailEditorTitleClasses,
+} from './master-detail-editor-panel.variants'
 import { MasterDetailValidationBanner } from './master-detail-validation-banner'
+
+export interface MasterDetailEditorIdentity {
+  title: string
+  meta?: MasterDetailItemMeta
+  deletable?: boolean
+}
 
 export interface MasterDetailEditorPanelProps {
   editor: UseMasterDetailArrayResult
@@ -14,6 +35,9 @@ export interface MasterDetailEditorPanelProps {
   idPrefix: string
   showValidationBanner: boolean
   emptySelectionLabel: string
+  /** Singular noun for delete overflow copy, e.g. `trait`. */
+  itemNoun: string
+  selectedIdentity?: MasterDetailEditorIdentity
   campaignId?: string
   rowAvailability?: Availability
 }
@@ -52,19 +76,44 @@ function MasterDetailSelectedRowEditor({
   )
 }
 
-function MasterDetailEmptySelectionHint({ visible, label }: { visible: boolean; label: string }) {
-  if (!visible) return null
+function MasterDetailEditorIdentityHeader({
+  identity,
+  itemNoun,
+  onDelete,
+}: {
+  identity: MasterDetailEditorIdentity
+  itemNoun: string
+  onDelete: () => void
+}) {
+  const metaLine = identity.meta ? joinMasterDetailItemMeta(identity.meta) : undefined
+  const deletable = identity.deletable !== false
 
   return (
-    <Text variant="muted" className="text-sm">
-      {label}
-    </Text>
+    <div className={masterDetailEditorIdentityClasses}>
+      <div className={masterDetailEditorIdentityCopyClasses}>
+        <div className={masterDetailEditorTitleClasses}>{identity.title}</div>
+        {metaLine ? <div className={masterDetailEditorMetaClasses}>{metaLine}</div> : null}
+      </div>
+      {deletable ? (
+        <DetailOverflowMenu
+          triggerLabel={`Actions for ${identity.title}`}
+          actions={[
+            {
+              id: 'delete',
+              label: `Delete ${itemNoun}`,
+              destructive: true,
+              onSelect: onDelete,
+            },
+          ]}
+        />
+      ) : null}
+    </div>
   )
 }
 
 /**
- * Detail column for a form-embedded master-detail editor: validation banner,
- * selected row form, or empty-selection hint.
+ * Detail column for a form-embedded master-detail editor: one bordered surface
+ * with compact identity, overflow delete, validation banner, and selected row form.
  */
 export function MasterDetailEditorPanel({
   editor,
@@ -73,31 +122,60 @@ export function MasterDetailEditorPanel({
   idPrefix,
   showValidationBanner,
   emptySelectionLabel,
+  itemNoun,
+  selectedIdentity,
   campaignId,
   rowAvailability,
 }: MasterDetailEditorPanelProps) {
+  const bodyRef = useRef<HTMLDivElement>(null)
   const selectedIndex = editor.selectedIndex
-  const selectedFieldId = selectedIndex !== null ? editor.fields[selectedIndex]?.id : undefined
+  const selectedFieldId = editor.selectedFieldId
   const hasSelectedRow = selectedIndex !== null && Boolean(selectedFieldId)
 
+  useEffect(() => {
+    if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
+    const root = bodyRef.current
+    if (!root) return
+    const focusable = root.querySelector<HTMLElement>(
+      'input:not([type="hidden"]), select, textarea, [contenteditable="true"]',
+    )
+    focusable?.focus()
+    editor.clearLastAddedFieldId()
+  }, [editor, selectedFieldId])
+
   return (
-    <div className="space-y-3 md:col-span-2">
-      <MasterDetailValidationBanner visible={showValidationBanner} />
-      {hasSelectedRow && selectedFieldId ? (
-        <MasterDetailSelectedRowEditor
-          itemFields={itemFields}
-          fieldName={fieldName}
-          idPrefix={idPrefix}
-          selectedFieldId={selectedFieldId}
-          selectedIndex={selectedIndex}
-          campaignId={campaignId}
-          rowAvailability={rowAvailability}
-        />
+    <div className={masterDetailEditorShellClassName()}>
+      {showValidationBanner ? (
+        <div className="border-b border-border px-4 py-3">
+          <MasterDetailValidationBanner visible />
+        </div>
+      ) : null}
+
+      {hasSelectedRow && selectedFieldId && selectedIdentity ? (
+        <>
+          <MasterDetailEditorIdentityHeader
+            identity={selectedIdentity}
+            itemNoun={itemNoun}
+            onDelete={() => {
+              if (selectedIndex !== null) editor.requestRemove(selectedIndex)
+            }}
+          />
+          <div ref={bodyRef} className={masterDetailEditorBodyClasses}>
+            <MasterDetailSelectedRowEditor
+              itemFields={itemFields}
+              fieldName={fieldName}
+              idPrefix={idPrefix}
+              selectedFieldId={selectedFieldId}
+              selectedIndex={selectedIndex}
+              campaignId={campaignId}
+              rowAvailability={rowAvailability}
+            />
+          </div>
+        </>
       ) : (
-        <MasterDetailEmptySelectionHint
-          visible={!showValidationBanner}
-          label={emptySelectionLabel}
-        />
+        <Text variant="muted" className={masterDetailEditorEmptyClasses}>
+          {!showValidationBanner ? emptySelectionLabel : null}
+        </Text>
       )}
     </div>
   )

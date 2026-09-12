@@ -96,9 +96,10 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
       fieldName={OPTIONS_FIELD_NAME}
       itemFields={traitFields}
       itemNoun={HERITAGE_OPTION_NOUN}
+      listTitle="Options"
       ariaLabel="Heritage options"
       addLabel={ADD_HERITAGE_OPTION_LABEL}
-      emptyListLabel="No options yet. Add one to get started."
+      emptyListLabel="No options yet.\nAdd an option to configure its grants and description."
       idPrefix="species-heritage-option"
       editor={editor}
       leadingContent={

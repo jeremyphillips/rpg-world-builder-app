@@ -1,25 +1,14 @@
 import type { ContentSource } from '@rpg/contracts'
 
-import {
-  resolveAvailability,
-  resolveAvailabilityBadge,
-  type Availability,
-  type AvailabilityReason,
-} from '@/lib/availability'
+import { resolveAvailability, type Availability, type AvailabilityReason } from '@/lib/availability'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
-import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
-
-import type { MasterDetailListBadge } from '../../components/master-detail/master-detail-list-panel'
 
 export type EmbeddedRowSource = 'system' | 'homebrew'
 
-const SOURCE_BADGE = {
-  system: { appearance: 'soft', tone: 'neutral', label: 'System' },
-  homebrew: { appearance: 'outline', tone: 'neutral', label: 'Homebrew' },
-} as const satisfies Record<
-  EmbeddedRowSource,
-  { appearance: BadgeAppearance; tone: BadgeTone; label: string }
->
+const SOURCE_LABELS = {
+  system: 'System',
+  homebrew: 'Homebrew',
+} as const satisfies Record<EmbeddedRowSource, string>
 
 export interface ResolveEmbeddedRowMetaParams {
   row: { id?: string } | undefined
@@ -30,8 +19,8 @@ export interface ResolveEmbeddedRowMetaParams {
 
 export interface EmbeddedRowMeta {
   source: EmbeddedRowSource
+  sourceLabel: string
   deletable: boolean
-  badges: MasterDetailListBadge[]
   availability: Availability
 }
 
@@ -56,17 +45,11 @@ export function resolveEmbeddedRowMeta({
 }: ResolveEmbeddedRowMetaParams): EmbeddedRowMeta {
   const source = resolveEmbeddedRowSource(row, entitySource, seedRowIds)
   const availability = resolveAvailability(extraReasons)
-  const badges: MasterDetailListBadge[] = [SOURCE_BADGE[source]]
-
-  const availabilityBadge = resolveAvailabilityBadge(availability)
-  if (availabilityBadge) {
-    badges.push(availabilityBadge)
-  }
 
   return {
     source,
+    sourceLabel: SOURCE_LABELS[source],
     deletable: source !== 'system',
-    badges,
     availability,
   }
 }

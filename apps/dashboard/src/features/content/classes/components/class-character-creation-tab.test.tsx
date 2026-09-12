@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -50,6 +50,13 @@ const bardStartingEquipment = startingEquipmentToFormValues(
 
 const monkSeedIds = monkStartingEquipment.options.map((option) => option.id!)
 
+function packageListRow(name: string | RegExp) {
+  return within(screen.getByRole('navigation', { name: 'Starting equipment packages' })).getByRole(
+    'button',
+    { name },
+  )
+}
+
 describe('ClassCharacterCreationTab', () => {
   it('shows skill and tool proficiency choices even when there is no starting equipment', () => {
     render(<TabShell />)
@@ -77,12 +84,8 @@ describe('ClassCharacterCreationTab', () => {
     await waitFor(() => {
       expect(screen.getByText('Character can choose one package from below')).toBeInTheDocument()
     })
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Starting Gold/ }),
-    ).toBeInTheDocument()
+    expect(packageListRow(/Standard Equipment/)).toBeInTheDocument()
+    expect(packageListRow(/Starting Gold/)).toBeInTheDocument()
   })
 
   it('renders monk packages when pre-filled', () => {
@@ -98,12 +101,8 @@ describe('ClassCharacterCreationTab', () => {
       />,
     )
     expect(screen.getByText('Character can choose one package from below')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Starting Gold/ }),
-    ).toBeInTheDocument()
+    expect(packageListRow(/Standard Equipment/)).toBeInTheDocument()
+    expect(packageListRow(/Starting Gold/)).toBeInTheDocument()
   })
 
   it('renders bard pool choice packages when pre-filled', async () => {
@@ -122,7 +121,7 @@ describe('ClassCharacterCreationTab', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }))
+    await user.click(packageListRow(/Standard Equipment/))
     expect(screen.queryByRole('textbox', { name: /Option id/i })).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
   })
@@ -141,13 +140,15 @@ describe('ClassCharacterCreationTab', () => {
       />,
     )
 
-    expect(screen.getAllByText('System').length).toBeGreaterThanOrEqual(1)
-    expect(screen.queryByRole('button', { name: /Remove Starting Gold/i })).not.toBeInTheDocument()
+    expect(screen.getAllByText(/System/).length).toBeGreaterThanOrEqual(1)
     expect(
-      screen.queryByRole('button', { name: /Remove Standard Equipment/i }),
+      screen.queryByRole('button', { name: /Actions for Starting Gold/i }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Actions for Standard Equipment/i }),
     ).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Starting Gold/ }))
+    await user.click(packageListRow(/Starting Gold/))
     expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
   })
 

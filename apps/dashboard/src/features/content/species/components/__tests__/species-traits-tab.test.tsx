@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -49,6 +49,11 @@ const feyAncestry: Trait = {
   grants: [],
 }
 
+async function deleteViaOverflow(user: ReturnType<typeof userEvent.setup>, title: string) {
+  await user.click(screen.getByRole('button', { name: new RegExp(`Actions for ${title}`, 'i') }))
+  await user.click(screen.getByRole('menuitem', { name: /Delete trait/i }))
+}
+
 describe('SpeciesTraitsTab', () => {
   it('shows the empty state when there are no traits', () => {
     render(<TabShell />)
@@ -62,20 +67,30 @@ describe('SpeciesTraitsTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
 
-    expect(screen.getByRole('button', { name: /^(?!Remove|Drag).*Trait 1/ })).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('navigation', { name: 'Traits' })).getByRole('button', {
+        name: /Trait 1/i,
+      }),
+    ).toBeInTheDocument()
     expect(screen.getByTestId('trait-detail')).toHaveTextContent('traits.0')
   })
 
-  it('renders a kind eyebrow for each row', () => {
+  it('renders structured meta for each row', () => {
     render(<TabShell traits={[darkvision]} />)
-    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('navigation', { name: 'Traits' })).getByText('Custom · Homebrew'),
+    ).toBeInTheDocument()
   })
 
   it('selects another trait when its row is clicked', async () => {
     const user = userEvent.setup()
     render(<TabShell traits={[darkvision, feyAncestry]} />)
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Fey Ancestry/ }))
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Traits' })).getByRole('button', {
+        name: /Fey Ancestry/i,
+      }),
+    )
     expect(screen.getByTestId('trait-detail')).toHaveTextContent('traits.1')
   })
 
@@ -83,7 +98,7 @@ describe('SpeciesTraitsTab', () => {
     const user = userEvent.setup()
     render(<TabShell traits={[darkvision]} entitySource="homebrew" />)
 
-    await user.click(screen.getByRole('button', { name: /Remove Darkvision/i }))
+    await deleteViaOverflow(user, 'Darkvision')
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete trait?')
 
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
@@ -93,11 +108,13 @@ describe('SpeciesTraitsTab', () => {
     })
   })
 
-  it('locks system traits on a system species (no remove control, System badge)', () => {
+  it('locks system traits on a system species (no overflow delete, System meta)', () => {
     render(<TabShell traits={[darkvision]} entitySource="system" />)
 
-    expect(screen.getByText('System')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Remove Darkvision/i })).not.toBeInTheDocument()
+    expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
+    expect(
+      screen.queryByRole('button', { name: /Actions for Darkvision/i }),
+    ).not.toBeInTheDocument()
   })
 
   it('allows deleting newly added rows even on a system species', async () => {
@@ -106,6 +123,6 @@ describe('SpeciesTraitsTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
 
-    expect(screen.getByRole('button', { name: /Remove Trait 2/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Actions for Trait 2/i })).toBeInTheDocument()
   })
 })

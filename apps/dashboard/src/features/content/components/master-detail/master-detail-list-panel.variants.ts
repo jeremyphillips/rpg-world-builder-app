@@ -1,39 +1,42 @@
-import { cn, dragHandleVariants, dragSurfaceVariants, interactiveRowVariants } from '@rpg/ui'
+import { cn, interactiveFocusVariants, interactiveRowVariants } from '@rpg/ui'
 
-/** Outer row layout — host-owned inset for embedded EntityAnatomyHost. */
-export const masterDetailListRowLayoutClasses =
-  'flex items-center gap-0 rounded-md border border-transparent px-3 py-2'
+/** Bordered collection shell for the master rail. */
+export const masterDetailListShellClasses =
+  'overflow-hidden rounded-lg border border-border bg-card'
 
-/** Enables hover/focus reveal for the drag handle in sortable rows. */
-export const masterDetailListRowSortableClasses = 'group'
+/** Header row inside the shell — collection title and Add action. */
+export const masterDetailListHeaderClasses =
+  'flex items-center justify-between gap-3 border-b border-border px-3 py-2.5'
 
-export function masterDetailListRowSurfaceClasses(options: {
+export const masterDetailListTitleClasses = 'min-w-0 text-sm font-medium text-foreground'
+
+/** Unpadded list section — rows bleed to shell edges. */
+export const masterDetailListItemsClasses = 'divide-y divide-border'
+
+export function masterDetailListRowClasses(options: {
   active?: boolean
   isSelected: boolean
 }): string {
   const active = options.active !== false
 
-  return interactiveRowVariants({
-    interaction: 'hoverable',
-    state: active ? 'default' : 'inactive',
-    hoverFamily: options.isSelected ? 'none' : 'selectable',
-    selected: options.isSelected ? 'bordered' : 'none',
-    selectedHover: options.isSelected ? 'row' : 'none',
-  })
-}
-
-/** Host-local leading inset for the sortable grip column. */
-export const masterDetailListDragHandleInsetClasses = 'ml-0.5'
-
-export function masterDetailListDragHandleClasses(isDragging = false): string {
   return cn(
-    masterDetailListDragHandleInsetClasses,
-    dragHandleVariants({ visibility: 'hoverReveal', dragging: isDragging }),
+    'relative flex w-full flex-col items-start gap-0.5 px-3 py-2.5 text-left transition-colors',
+    interactiveFocusVariants({ context: 'standalone' }),
+    interactiveRowVariants({
+      interaction: 'hoverable',
+      state: active ? 'default' : 'inactive',
+      hoverFamily: options.isSelected ? 'none' : 'selectable',
+      selected: options.isSelected ? 'fill' : 'none',
+      selectedHover: options.isSelected ? 'row' : 'none',
+    }),
+    options.isSelected &&
+      'before:absolute before:inset-y-1 before:left-0 before:w-0.5 before:rounded-full before:bg-primary',
   )
 }
 
-/** Selectable label region inside a row. */
-export const masterDetailListRowSelectClasses = 'min-w-0 flex-1 rounded-md text-left'
+export const masterDetailListRowTitleClasses =
+  'min-w-0 truncate text-sm font-medium text-foreground'
 
-/** Applied to the row wrapper while it is being dragged. */
-export const masterDetailListRowDraggingClasses = dragSurfaceVariants({ dragging: true })
+export const masterDetailListRowMetaClasses = 'min-w-0 truncate text-xs text-muted-foreground'
+
+export const masterDetailListEmptyClasses = 'px-3 py-4 text-sm text-muted-foreground'
