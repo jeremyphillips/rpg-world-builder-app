@@ -13,3 +13,7 @@ export const speciesHeritageEmptyStateContentClasses = 'flex max-w-md flex-col i
 export const speciesHeritageEmptyStateTitleClasses = 'text-lg font-medium text-foreground'
 
 export const speciesHeritageEmptyStateDescriptionClasses = 'text-sm text-muted-foreground'
+
+export const speciesHeritageGroupShellClasses = 'relative'
+
+export const speciesHeritageGroupActionsClasses = 'absolute right-0 top-0 z-10'

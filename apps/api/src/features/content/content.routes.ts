@@ -7,6 +7,7 @@ import { requireCampaignRole } from '../../middleware/require-role'
 import { validate } from '../../middleware/validate'
 import * as controller from './content.controller'
 import * as subclassController from './subclasses/subclass-write.handlers'
+import * as speciesHeritageRemovalController from './species/species-heritage-removal.handlers'
 import * as characterLocationConnectionController from './characters/character-location-connection.handlers'
 import * as characterOrganizationMembershipController from './characters/character-organization-membership.handlers'
 import * as organizationLocationConnectionController from './organizations/organization-location-connection.handlers'
@@ -205,6 +206,13 @@ contentRouter.delete(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   subclassController.deleteSubclassItem,
+)
+
+contentRouter.get(
+  '/species/:entityId/heritage-removal-availability',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  speciesHeritageRemovalController.getSpeciesHeritageRemovalAvailabilityHandler,
 )
 
 // Any campaign member may read the resolved catalog (characters consume it).

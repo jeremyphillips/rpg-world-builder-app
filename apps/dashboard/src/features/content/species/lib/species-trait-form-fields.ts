@@ -170,5 +170,5 @@ export function traitItemTitle(values: Record<string, unknown>, index: number): 
       })
     }
   }
-  return row.name || `Trait ${index + 1}`
+  return row.name?.trim() || ''
 }

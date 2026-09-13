@@ -68,7 +68,7 @@ describe('ClassFeaturesTab', () => {
 
     expect(
       within(screen.getByRole('navigation', { name: 'Features' })).getByRole('button', {
-        name: /Feature 1/i,
+        name: /Unnamed Feature/i,
       }),
     ).toBeInTheDocument()
     expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.0')
@@ -126,7 +126,7 @@ describe('ClassFeaturesTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
 
-    expect(screen.getByRole('button', { name: /Actions for Feature 2/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Actions for Unnamed Feature/i })).toBeInTheDocument()
   })
 
   it('shows availability alert for subclass-choice rows when subclassing is disabled', () => {

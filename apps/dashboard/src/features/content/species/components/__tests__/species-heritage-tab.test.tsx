@@ -8,12 +8,24 @@ import { TestFormShell } from '@/test/form-shell'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type { HeritageForm } from '../../../species/lib/species-heritage-form-fields'
+import type * as SpeciesApi from '../../../species/api/species-api'
+import { fetchSpeciesHeritageRemovalAvailability } from '../../../species/api/species-api'
 import { SpeciesHeritageTab } from '../species-heritage-tab'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
   const { stubUiFormItems } = await import('@/test/mocks/ui-form')
   return stubUiFormItems(importOriginal)
 })
+
+vi.mock('../../../species/api/species-api', async (importOriginal) => {
+  const actual = await importOriginal<typeof SpeciesApi>()
+  return {
+    ...actual,
+    fetchSpeciesHeritageRemovalAvailability: vi.fn(),
+  }
+})
+
+const mockFetchHeritageRemovalAvailability = vi.mocked(fetchSpeciesHeritageRemovalAvailability)
 
 function HeritageValuesProbe() {
   const heritage = useWatch({ name: 'heritage' }) as HeritageForm | undefined
@@ -23,13 +35,17 @@ function HeritageValuesProbe() {
 function TabShell({
   heritage,
   entitySource,
+  campaignId = 'camp-1',
+  entityId = 'species-1',
 }: {
   heritage?: HeritageForm
   entitySource?: ContentFormCtx['entitySource']
+  campaignId?: string
+  entityId?: string
 }) {
   return (
     <TestFormShell defaultValues={{ heritage }}>
-      <SpeciesHeritageTab formCtx={{ entitySource }} />
+      <SpeciesHeritageTab formCtx={{ entitySource, campaignId, entityId }} />
       <HeritageValuesProbe />
     </TestFormShell>
   )
@@ -37,7 +53,12 @@ function TabShell({
 
 async function deleteOptionViaOverflow(user: ReturnType<typeof userEvent.setup>, title: string) {
   await user.click(screen.getByRole('button', { name: new RegExp(`Actions for ${title}`, 'i') }))
-  await user.click(screen.getByRole('menuitem', { name: /Delete option/i }))
+  await user.click(screen.getByRole('menuitem', { name: /Delete heritage option/i }))
+}
+
+async function removeHeritageGroupViaOverflow(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: /Heritage group actions/i }))
+  await user.click(screen.getByRole('menuitem', { name: /Remove heritage group/i }))
 }
 
 describe('SpeciesHeritageTab', () => {
@@ -83,12 +104,12 @@ describe('SpeciesHeritageTab', () => {
     render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
 
     await deleteOptionViaOverflow(user, 'Breath Weapon')
-    expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete option?')
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('Delete heritage option?')
 
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
 
     await waitFor(() => {
-      expect(screen.getByText(/No options added\./i)).toBeInTheDocument()
+      expect(screen.getByText(/No heritage options added\./i)).toBeInTheDocument()
     })
   })
 
@@ -99,7 +120,9 @@ describe('SpeciesHeritageTab', () => {
     expect(
       screen.queryByRole('button', { name: /Actions for Breath Weapon/i }),
     ).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Remove heritage/i })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Heritage group actions/i }),
+    ).not.toBeInTheDocument()
   })
 
   it('allows deleting newly added options even on a system species', async () => {
@@ -108,18 +131,51 @@ describe('SpeciesHeritageTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add option/i }))
 
-    expect(screen.getByRole('button', { name: /Actions for Trait 2/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /Actions for Unnamed heritage option/i }),
+    ).toBeInTheDocument()
   })
 
-  it('allows removing heritage on homebrew species', async () => {
+  it('allows removing heritage on homebrew species after availability check', async () => {
     const user = userEvent.setup()
+    mockFetchHeritageRemovalAvailability.mockResolvedValue({ status: 'allowed' })
     render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
 
-    await user.click(screen.getByRole('button', { name: /Remove heritage/i }))
+    await removeHeritageGroupViaOverflow(user)
+    expect(mockFetchHeritageRemovalAvailability).toHaveBeenCalledWith('camp-1', 'species-1')
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('Remove heritage group?')
+
+    await user.click(screen.getByRole('button', { name: /^Remove$/ }))
 
     await waitFor(() => {
       expect(screen.getByText(/No heritage group yet/i)).toBeInTheDocument()
     })
+  })
+
+  it('shows blocked dialog when characters use heritage options', async () => {
+    const user = userEvent.setup()
+    mockFetchHeritageRemovalAvailability.mockResolvedValue({
+      status: 'blocked',
+      blockers: [
+        {
+          kind: 'usage',
+          usage: {
+            kind: 'character',
+            id: 'npc-1',
+            label: 'Heritage NPC',
+            characterType: 'npc',
+            campaignId: 'camp-1',
+          },
+        },
+      ],
+    })
+    render(<TabShell heritage={draconicHeritageForm} entitySource="homebrew" />)
+
+    await removeHeritageGroupViaOverflow(user)
+
+    expect(screen.getByRole('dialog')).toHaveTextContent('Cannot delete Draconic Ancestry')
+    expect(screen.getByRole('link', { name: 'Heritage NPC' })).toBeInTheDocument()
+    expect(screen.getByTestId('detail-heritage')).toBeInTheDocument()
   })
 
   it('adds and selects an option in the master-detail editor', async () => {

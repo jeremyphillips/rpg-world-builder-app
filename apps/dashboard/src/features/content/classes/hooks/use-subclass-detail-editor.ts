@@ -44,8 +44,7 @@ export function useSubclassDetailEditor({
 }: UseSubclassDetailEditorOptions) {
   const campaignAccessForm = useCampaignAccessForm()
   const fields = buildSubclassFields(formCtx, { defaultFeatureLevel })
-  const nameFieldItem = fields[0]
-  if (!nameFieldItem) {
+  if (!fields[0]) {
     throw new Error('Subclass fields must include a name field.')
   }
 
@@ -118,8 +117,7 @@ export function useSubclassDetailEditor({
 
   return {
     form,
-    nameFieldItem,
-    bodyFields: fields.slice(1),
+    fields,
     campaignAccess,
     handleCampaignAccessDraft,
     handleCampaignAccessPersisted,

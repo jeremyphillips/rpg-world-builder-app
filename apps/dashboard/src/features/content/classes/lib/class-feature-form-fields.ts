@@ -81,11 +81,8 @@ export const featureRowFormSchema = createFeatureRowFormSchema()
 
 export type FeatureRowForm = z.infer<typeof featureRowFormSchema>
 
-export function featureItemTitle(
-  row: Pick<FeatureRowForm, 'name'> | undefined,
-  index: number,
-): string {
-  return (typeof row?.name === 'string' && row.name.trim()) || `Feature ${index + 1}`
+export function featureItemTitle(row: Pick<FeatureRowForm, 'name'> | undefined): string {
+  return typeof row?.name === 'string' ? row.name.trim() : ''
 }
 
 export function featureItemEyebrow(

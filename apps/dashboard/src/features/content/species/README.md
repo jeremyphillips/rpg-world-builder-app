@@ -9,7 +9,7 @@ The **Traits** tab is a master-detail editor over the species's embedded `traits
 
 The **Heritage** tab edits an optional singular `heritage` object: scalar **name** (with a hint for lineage/ancestry wording) and **description** at the top, then a master-detail list over `heritage.options` (authored custom trait rows; the form contract does not allow grant options). An empty state offers **Set up heritage**; once present, options use **Add option**. No list eyebrows on options.
 
-Delete-locking is **derived** because species traits and heritage have no per-row `source` in the contract: when editing a species whose `source` is `system`, its already-saved heritage block and saved options are protected (no remove control, **System** badge) while newly added options stay deletable; homebrew species allow removing the heritage block and any option. Removable rows confirm via the shared `MasterDetailDeleteDialog`. This mirrors the classes **Features** tab policy.
+Delete-locking is **derived** because species traits and heritage have no per-row `source` in the contract: when editing a species whose `source` is `system`, its already-saved heritage block and saved options are protected (no remove control, **System** badge) while newly added options stay deletable; homebrew species allow removing the heritage group (overflow on the name/description container) and any option. Heritage group removal preflights `GET …/species/:entityId/heritage-removal-availability` and blocks when campaign characters reference any saved heritage option; blocked deletes reuse `ContentDeletionBlockedDialog`. Removable option rows confirm via the shared `MasterDetailDeleteDialog`. This mirrors the classes **Features** tab policy.
 
 ## Key files
 
@@ -25,6 +25,7 @@ Delete-locking is **derived** because species traits and heritage have no per-ro
 | Shared master-detail lock helper    | [`content/lib/master-detail/is-embedded-row-system-locked.ts`](../lib/master-detail/is-embedded-row-system-locked.ts) |
 | Traits tab (master-detail)          | `components/species-traits-tab.tsx`                                                                                   |
 | Heritage tab (master-detail)        | `components/species-heritage-tab.tsx`                                                                                 |
+| Heritage removal flow               | `hooks/use-heritage-removal-flow.tsx`, `api/species-api.ts` (`fetchSpeciesHeritageRemovalAvailability`)               |
 
 ## Related docs
 

@@ -76,7 +76,7 @@ describe('SpeciesTraitsTab', () => {
 
     expect(
       within(screen.getByRole('navigation', { name: 'Traits' })).getByRole('button', {
-        name: /Trait 1/i,
+        name: /Unnamed Trait/i,
       }),
     ).toBeInTheDocument()
     expect(screen.getByTestId('trait-detail')).toHaveTextContent('traits.0')
@@ -154,6 +154,6 @@ describe('SpeciesTraitsTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
 
-    expect(screen.getByRole('button', { name: /Actions for Trait 2/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Actions for Unnamed Trait/i })).toBeInTheDocument()
   })
 })

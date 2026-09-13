@@ -4,14 +4,22 @@ import { Button, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
+import {
+  DetailOverflowMenu,
+  detailOverflowDeleteAction,
+} from '../../lib/detail/detail-overflow-menu'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { isEmbeddedRowSystemLocked } from '../../lib/master-detail/is-embedded-row-system-locked'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
+import { useHeritageRemovalFlow } from '../hooks/use-heritage-removal-flow'
 import {
   ADD_HERITAGE_OPTION_LABEL,
   HERITAGE_EMPTY_DESCRIPTION,
   HERITAGE_EMPTY_TITLE,
+  HERITAGE_GROUP_OVERFLOW_LABEL,
+  HERITAGE_OPTIONS_LIST_TITLE,
   HERITAGE_OPTION_MASTER_DETAIL_ITEM_NOUN,
+  REMOVE_HERITAGE_GROUP_ACTION,
   SET_UP_HERITAGE_LABEL,
 } from '../lib/species-heritage-form-labels'
 import { heritageDefaultValues } from '../lib/species-heritage-form-values'
@@ -27,6 +35,8 @@ import {
   speciesHeritageEmptyStateDescriptionClasses,
   speciesHeritageEmptyStateShellClasses,
   speciesHeritageEmptyStateTitleClasses,
+  speciesHeritageGroupActionsClasses,
+  speciesHeritageGroupShellClasses,
 } from './species-heritage-tab.variants'
 
 const HERITAGE_FIELD_NAME = 'heritage'
@@ -74,19 +84,41 @@ function HeritageScalarSection({
 }) {
   const scalarFields = useMemo(() => heritageScalarFields(formCtx), [formCtx])
   const heritageLocked = isEmbeddedRowSystemLocked(heritage, formCtx.entitySource)
+  const showRemovalAction = formCtx.entitySource === 'homebrew' && !heritageLocked
+
+  const { handleRemoveClick, removePending, removeError, dialogs } = useHeritageRemovalFlow({
+    campaignId: formCtx.campaignId,
+    speciesId: formCtx.entityId,
+    heritageName: heritage?.name,
+    onRemoved: onRemove,
+  })
 
   return (
-    <div className="space-y-3">
+    <div className={speciesHeritageGroupShellClasses}>
+      {showRemovalAction ? (
+        <div className={speciesHeritageGroupActionsClasses}>
+          <DetailOverflowMenu
+            triggerLabel={HERITAGE_GROUP_OVERFLOW_LABEL}
+            actions={[detailOverflowDeleteAction(REMOVE_HERITAGE_GROUP_ACTION, handleRemoveClick)]}
+          />
+        </div>
+      ) : null}
       <FormItems
         items={scalarFields}
         idPrefix="species-heritage"
         namePrefix={HERITAGE_FIELD_NAME}
       />
-      {!heritageLocked ? (
-        <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
-          Remove heritage
-        </Button>
+      {removeError ? (
+        <Text variant="destructive" role="alert">
+          {removeError}
+        </Text>
       ) : null}
+      {removePending ? (
+        <Text variant="muted" aria-live="polite">
+          Checking whether heritage can be removed…
+        </Text>
+      ) : null}
+      {dialogs}
     </div>
   )
 }
@@ -98,10 +130,10 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   const editor = useMasterDetailArray(OPTIONS_FIELD_NAME, makeOptionDefaults)
   const heritage = useWatch({ name: HERITAGE_FIELD_NAME }) as HeritageForm | undefined
 
-  const handleRemoveHeritage = () => {
+  const handleRemoveHeritage = useCallback(() => {
     setValue(HERITAGE_FIELD_NAME, undefined, { shouldDirty: true })
     editor.cancelRemove()
-  }
+  }, [editor, setValue])
 
   return (
     <FormEmbeddedMasterDetailEditor
@@ -109,7 +141,7 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
       fieldName={OPTIONS_FIELD_NAME}
       itemFields={traitFields}
       itemNoun={HERITAGE_OPTION_MASTER_DETAIL_ITEM_NOUN}
-      listTitle="Options"
+      listTitle={HERITAGE_OPTIONS_LIST_TITLE}
       ariaLabel="Heritage options"
       addLabel={ADD_HERITAGE_OPTION_LABEL}
       idPrefix="species-heritage-option"

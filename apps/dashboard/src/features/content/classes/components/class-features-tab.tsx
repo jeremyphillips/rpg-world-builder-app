@@ -105,8 +105,8 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
       addLabel="Add feature"
       idPrefix="class-feature"
       editor={editor}
-      mapListItem={({ row, index }) => ({
-        title: featureItemTitle(row as FeatureRowForm | undefined, index),
+      mapListItem={({ row }) => ({
+        title: featureItemTitle(row as FeatureRowForm | undefined),
         eyebrow: featureItemEyebrow(row as FeatureRowForm | undefined),
       })}
       resolveRowReasons={resolveRowReasons}

@@ -5,6 +5,7 @@ import { FormItems } from '@rpg/ui/form'
 import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { wrapMasterDetailDetailFields } from '../../../lib/master-detail/wrap-master-detail-detail-fields'
 import { useSubclassDetailEditor } from '../../hooks/use-subclass-detail-editor'
 import type { SubclassFormValues } from '../../lib/subclasses/subclass-form-fields'
 import { isDraftSubclassId } from '../../lib/subclasses/subclass-editor-constants'
@@ -49,11 +50,9 @@ export function SubclassDetailEditor(props: SubclassDetailEditorProps) {
       />
 
       <FormItems
-        items={[panel.nameFieldItem]}
-        idPrefix={`subclass-editor-${subclassId}-identity`}
+        items={wrapMasterDetailDetailFields(panel.fields)}
+        idPrefix={`subclass-editor-${subclassId}`}
       />
-
-      <FormItems items={panel.bodyFields} idPrefix={`subclass-editor-${subclassId}`} />
 
       <SubclassUsageReferencesSection
         campaignId={campaignId}
