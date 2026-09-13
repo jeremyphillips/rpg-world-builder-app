@@ -27,11 +27,11 @@ function EditorStory({
         ariaLabel="Features"
         addLabel="Add feature"
         idPrefix="class-feature"
-        mapListItem={({ row, index }) => {
+        mapListItem={({ row }) => {
           const feature = row as FeatureRow | undefined
           const name = typeof feature?.name === 'string' ? feature.name.trim() : ''
           return {
-            title: name || `Feature ${index + 1}`,
+            title: name,
             eyebrow: feature?.level !== undefined ? `Level ${feature.level}` : undefined,
           }
         }}

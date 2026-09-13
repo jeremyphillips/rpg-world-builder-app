@@ -2,41 +2,15 @@ import { useEffect, useRef } from 'react'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
-import {
-  DetailOverflowMenu,
-  detailOverflowDeleteAction,
-} from '../../lib/detail/detail-overflow-menu'
 import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
-import {
-  joinMasterDetailItemMeta,
-  type MasterDetailItemMeta,
-} from '../../lib/master-detail/master-detail-item-meta'
-import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
-import { MasterDetailEditorEmptyState } from './master-detail-editor-empty-state'
 import {
-  masterDetailEditorBodyClasses,
-  masterDetailEditorEmptyShellClasses,
-  masterDetailEditorIdentityClasses,
-  masterDetailEditorAvailabilityClasses,
-  masterDetailEditorIdentityCopyClasses,
-  masterDetailEditorMetaClasses,
-  masterDetailEditorShellClassName,
-  masterDetailEditorTitleClasses,
-  masterDetailEditorValidationBannerClasses,
-} from './master-detail-editor-panel.variants'
-import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
-import { MasterDetailAvailabilityHeaderLine } from './master-detail-availability-header-line'
-import { MasterDetailValidationBanner } from './master-detail-validation-banner'
+  MasterDetailEditorShell,
+  type MasterDetailEditorIdentity,
+} from './master-detail-editor-shell'
 
-export interface MasterDetailEditorIdentity {
-  title: string
-  meta?: MasterDetailItemMeta
-  deletable?: boolean
-  availability?: MasterDetailAvailabilityPresentation
-  onAvailabilityChange?: () => void
-}
+export type { MasterDetailEditorIdentity }
 
 export interface MasterDetailEditorPanelProps {
   editor: UseMasterDetailArrayResult
@@ -87,43 +61,6 @@ function MasterDetailSelectedRowEditor({
   )
 }
 
-function MasterDetailEditorIdentityHeader({
-  identity,
-  itemNoun,
-  onDelete,
-}: {
-  identity: MasterDetailEditorIdentity
-  itemNoun: MasterDetailItemNounTerm
-  onDelete: () => void
-}) {
-  const metaLine = identity.meta ? joinMasterDetailItemMeta(identity.meta) : undefined
-  const deletable = identity.deletable !== false
-  const itemNounLabel = masterDetailItemNounLabel(itemNoun)
-
-  return (
-    <div className={masterDetailEditorIdentityClasses}>
-      <div className={masterDetailEditorIdentityCopyClasses}>
-        <div className={masterDetailEditorTitleClasses}>{identity.title}</div>
-        {metaLine ? <div className={masterDetailEditorMetaClasses}>{metaLine}</div> : null}
-        {identity.availability && identity.onAvailabilityChange ? (
-          <div className={masterDetailEditorAvailabilityClasses}>
-            <MasterDetailAvailabilityHeaderLine
-              availability={identity.availability}
-              onAvailabilityChange={identity.onAvailabilityChange}
-            />
-          </div>
-        ) : null}
-      </div>
-      {deletable ? (
-        <DetailOverflowMenu
-          triggerLabel={`Actions for ${identity.title}`}
-          actions={[detailOverflowDeleteAction(`Delete ${itemNounLabel}`, onDelete)]}
-        />
-      ) : null}
-    </div>
-  )
-}
-
 /**
  * Detail column for a form-embedded master-detail editor: one bordered surface
  * with compact identity, overflow delete, validation banner, and selected row form.
@@ -143,7 +80,6 @@ export function MasterDetailEditorPanel({
   const selectedIndex = editor.selectedIndex
   const selectedFieldId = editor.selectedFieldId
   const hasSelectedRow = selectedIndex !== null && Boolean(selectedFieldId)
-  const useEmptyShell = !hasSelectedRow && !showValidationBanner
 
   useEffect(() => {
     if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
@@ -157,41 +93,26 @@ export function MasterDetailEditorPanel({
   }, [editor, selectedFieldId])
 
   return (
-    <div
-      className={
-        useEmptyShell ? masterDetailEditorEmptyShellClasses : masterDetailEditorShellClassName()
-      }
+    <MasterDetailEditorShell
+      itemNoun={itemNoun}
+      selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
+      onDelete={() => {
+        if (selectedIndex !== null) editor.requestRemove(selectedIndex)
+      }}
+      showValidationBanner={showValidationBanner}
+      bodyRef={bodyRef}
     >
-      {showValidationBanner ? (
-        <div className={masterDetailEditorValidationBannerClasses}>
-          <MasterDetailValidationBanner visible />
-        </div>
+      {hasSelectedRow && selectedFieldId && selectedIndex !== null ? (
+        <MasterDetailSelectedRowEditor
+          itemFields={itemFields}
+          fieldName={fieldName}
+          idPrefix={idPrefix}
+          selectedFieldId={selectedFieldId}
+          selectedIndex={selectedIndex}
+          campaignId={campaignId}
+          rowAvailability={rowAvailability}
+        />
       ) : null}
-
-      {hasSelectedRow && selectedFieldId && selectedIdentity ? (
-        <>
-          <MasterDetailEditorIdentityHeader
-            identity={selectedIdentity}
-            itemNoun={itemNoun}
-            onDelete={() => {
-              if (selectedIndex !== null) editor.requestRemove(selectedIndex)
-            }}
-          />
-          <div ref={bodyRef} className={masterDetailEditorBodyClasses}>
-            <MasterDetailSelectedRowEditor
-              itemFields={itemFields}
-              fieldName={fieldName}
-              idPrefix={idPrefix}
-              selectedFieldId={selectedFieldId}
-              selectedIndex={selectedIndex}
-              campaignId={campaignId}
-              rowAvailability={rowAvailability}
-            />
-          </div>
-        </>
-      ) : useEmptyShell ? (
-        <MasterDetailEditorEmptyState itemNoun={itemNoun} />
-      ) : null}
-    </div>
+    </MasterDetailEditorShell>
   )
 }

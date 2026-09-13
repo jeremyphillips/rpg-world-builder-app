@@ -171,7 +171,7 @@ and [`master-detail/`](../src/features/content/lib/master-detail/):
 | `useMasterDetailAvailabilityFilter`                                   | Default-hide unavailable rows, identity-based pin for selected unavailable rows                   |
 | `MasterDetailAvailabilityHeaderLine`                                  | Editor line 3: `● Available` / inactive unavailable + **Change** (consumer opens dialog)          |
 
-**Pilot consumer:** subclass list + editor panels. **Blocked this pass:** form-embedded
+**Pilot consumer:** subclasses via [`NestedResourceMasterDetailEditor`](../src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx) on [`ClassSubclassesTab`](../src/features/content/classes/components/class-subclasses-tab.tsx). **Blocked this pass:** form-embedded
 arrays (features, traits, heritage) — no per-row `campaignAccess` API/contracts yet;
 those rows continue to inherit parent access with rules-only inactive badges.
 

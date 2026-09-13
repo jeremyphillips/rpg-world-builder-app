@@ -40,8 +40,8 @@ function EditorShell({
         ariaLabel="Traits"
         addLabel="Add trait"
         idPrefix="species-trait"
-        mapListItem={({ row, index }) => ({
-          title: (row as TraitRow | undefined)?.name || `Trait ${index + 1}`,
+        mapListItem={({ row }) => ({
+          title: (row as TraitRow | undefined)?.name ?? '',
           eyebrow: (row as TraitRow | undefined)?.kind === 'grant' ? 'Grant' : 'Custom',
         })}
       />
@@ -70,6 +70,8 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     await waitFor(() => {
       expect(screen.getByTestId('detail-traits-0')).toHaveTextContent('traits.0')
     })
+    expect(screen.getAllByText('Unnamed Trait').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: /Actions for Unnamed Trait/i })).toBeInTheDocument()
   })
 
   it('confirms deletion through the detail overflow menu', async () => {
@@ -123,7 +125,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
             addLabel="Add trait"
             idPrefix="species-trait"
             leadingContent={<p>Choose how many traits apply.</p>}
-            mapListItem={({ index }) => ({ title: `Trait ${index + 1}` })}
+            mapListItem={() => ({ title: '' })}
           />
         </TestFormShell>
       )
@@ -158,7 +160,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
             addLabel="Add trait"
             idPrefix="species-trait"
             makeItemDefaults={() => ({ kind: 'custom', name: '', grants: [] })}
-            mapListItem={({ index }) => ({ title: `Trait ${index + 1}` })}
+            mapListItem={() => ({ title: '' })}
           />
           <TraitsValuesProbe />
         </TestFormShell>

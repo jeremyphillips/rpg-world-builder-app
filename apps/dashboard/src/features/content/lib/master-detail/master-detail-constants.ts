@@ -22,3 +22,15 @@ export function masterDetailEmptySelectionSubhead(itemNoun: MasterDetailItemNoun
   const plural = getTermSentenceForm(itemNoun, 2)
   return `Select ${withArticle(singular)} to edit once ${plural} have been added.`
 }
+
+export function masterDetailUnnamedItemTitle(itemNoun: MasterDetailItemNounTerm): string {
+  return `Unnamed ${itemNoun.label}`
+}
+
+export function masterDetailItemTitle(
+  title: string | undefined,
+  itemNoun: MasterDetailItemNounTerm,
+): string {
+  const trimmed = title?.trim() ?? ''
+  return trimmed || masterDetailUnnamedItemTitle(itemNoun)
+}

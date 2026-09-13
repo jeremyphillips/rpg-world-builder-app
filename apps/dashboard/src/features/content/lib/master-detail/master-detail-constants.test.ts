@@ -7,6 +7,8 @@ import {
   masterDetailEmptySelectionHeading,
   masterDetailEmptySelectionSubhead,
   masterDetailItemNounLabel,
+  masterDetailItemTitle,
+  masterDetailUnnamedItemTitle,
 } from './master-detail-constants'
 
 describe('masterDetail empty-state copy', () => {
@@ -28,5 +30,14 @@ describe('masterDetail empty-state copy', () => {
 
   it('derives singular labels for destructive actions', () => {
     expect(masterDetailItemNounLabel(TRAIT_MASTER_DETAIL_ITEM_NOUN)).toBe('trait')
+  })
+
+  it('formats unnamed row titles from vocabulary labels', () => {
+    expect(masterDetailUnnamedItemTitle(TRAIT_MASTER_DETAIL_ITEM_NOUN)).toBe('Unnamed Trait')
+    expect(masterDetailUnnamedItemTitle(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN)).toBe(
+      'Unnamed Feature',
+    )
+    expect(masterDetailItemTitle('  ', TRAIT_MASTER_DETAIL_ITEM_NOUN)).toBe('Unnamed Trait')
+    expect(masterDetailItemTitle('Darkvision', TRAIT_MASTER_DETAIL_ITEM_NOUN)).toBe('Darkvision')
   })
 })

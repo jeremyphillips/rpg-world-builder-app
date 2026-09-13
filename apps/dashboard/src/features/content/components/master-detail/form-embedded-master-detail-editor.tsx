@@ -9,7 +9,10 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import { resolveMasterDetailRowKey } from '../../lib/master-detail/content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from '../../lib/master-detail/build-embedded-master-detail-list-item'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
-import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
+import {
+  masterDetailItemNounLabel,
+  masterDetailItemTitle,
+} from '../../lib/master-detail/master-detail-constants'
 import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail/master-detail-validation'
 import {
   useMasterDetailArray,
@@ -17,6 +20,7 @@ import {
 } from '../../lib/master-detail/use-master-detail-array'
 import { MasterDetailDeleteDialog } from './master-detail-delete-dialog'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel'
+import { MasterDetailGrid } from './master-detail-grid'
 import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel'
 
 export interface FormEmbeddedMasterDetailMapListItemContext {
@@ -121,7 +125,7 @@ function FormEmbeddedMasterDetailEditorBody({
       entitySource: formCtx.entitySource,
       seedRowIds,
       hasRowError: editor.hasRowError,
-      title: listDisplay.title,
+      title: masterDetailItemTitle(listDisplay.title, itemNoun),
       eyebrow: listDisplay.eyebrow,
       showDelete,
       extraReasons: resolveRowReasons?.({
@@ -158,17 +162,20 @@ function FormEmbeddedMasterDetailEditorBody({
 
   const deleteName =
     editor.deleteIndex !== null
-      ? mapListItem({
-          field: editor.fields[editor.deleteIndex]!,
-          index: editor.deleteIndex,
-          row: watched?.[editor.deleteIndex],
-          entitySource: formCtx.entitySource,
-          hasRowError: editor.hasRowError,
-        }).title
+      ? masterDetailItemTitle(
+          mapListItem({
+            field: editor.fields[editor.deleteIndex]!,
+            index: editor.deleteIndex,
+            row: watched?.[editor.deleteIndex],
+            entitySource: formCtx.entitySource,
+            hasRowError: editor.hasRowError,
+          }).title,
+          itemNoun,
+        )
       : ''
 
   const masterDetailGrid = (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <MasterDetailGrid>
       <MasterDetailListPanel
         items={items}
         selectedIndex={editor.selectedIndex}
@@ -191,7 +198,7 @@ function FormEmbeddedMasterDetailEditorBody({
         campaignId={formCtx.campaignId}
         rowAvailability={selectedRowAvailability}
       />
-    </div>
+    </MasterDetailGrid>
   )
 
   const deleteDialog = (

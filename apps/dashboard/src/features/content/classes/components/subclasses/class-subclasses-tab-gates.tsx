@@ -26,11 +26,3 @@ export function SubclassLoadingGate() {
     </div>
   )
 }
-
-export function SubclassEmptySelectionGate() {
-  return (
-    <InsetPanel borderStyle="dashed" surface={{}} size="lg" align="center">
-      <InsetPanel.Text>Select a subclass or add a new one.</InsetPanel.Text>
-    </InsetPanel>
-  )
-}

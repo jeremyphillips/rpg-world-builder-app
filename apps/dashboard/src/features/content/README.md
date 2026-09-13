@@ -112,13 +112,19 @@ list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 | [`isEmbeddedRowSystemLocked`](./lib/master-detail/is-embedded-row-system-locked.ts)                           | Shared delete-lock policy when embedded rows have no per-row `source`.                                                                                                                                                                                                                                                                   |
 | [`content-campaign-availability`](./lib/master-detail/content-campaign-availability.ts)                       | Shared row-key helpers for master-detail lists.                                                                                                                                                                                                                                                                                          |
 | [`FormEmbeddedMasterDetailEditor`](./components/master-detail/form-embedded-master-detail-editor.tsx)         | Composite wiring for form-embedded arrays: list + detail + delete dialog over the parent form. Optional `leadingContent` for fields above the grid (uses `fieldGroupFlexStackClasses`). Optional `makeItemDefaults` seeds newly added rows (hidden discriminators, complete form state) without binding a second `useMasterDetailArray`. |
+| [`NestedResourceMasterDetailEditor`](./components/master-detail/nested-resource-master-detail-editor.tsx)     | Composite for independently persisted nested API resources (subclasses today): shared grid/list/shell chrome with domain-owned `renderDetail`, id-based selection, and overflow-only delete. Does not fetch, mutate, save, or bind to RHF field arrays.                                                                                  |
+| [`MasterDetailGrid`](./components/master-detail/master-detail-grid.tsx)                                       | Shared two-column grid wrapper used by both composites.                                                                                                                                                                                                                                                                                  |
+| [`MasterDetailEditorShell`](./components/master-detail/master-detail-editor-shell.tsx)                        | Shared bordered detail rail: validation banner, identity header (line-3 availability + overflow delete), and body slot or empty state.                                                                                                                                                                                                   |
+| [`resolveSelectedIndexById`](./lib/master-detail/resolve-master-detail-selected-index.ts)                     | Maps stable domain row ids to list indices for `MasterDetailListPanel`.                                                                                                                                                                                                                                                                  |
 
-It is presentation-only over the parent form, so global save and validation are
-unchanged. Use `FormEmbeddedMasterDetailEditor` for the standard traits/features
-pattern. Pass `leadingContent` when a tab needs extra fields above the list (e.g.
-species **Heritage** scalar header, classes **Character creation** choose count).
-Compose the lower-level pieces directly only when you need layout that does not
-fit this composite.
+`FormEmbeddedMasterDetailEditor` is presentation-only over the parent form, so
+global save and validation are unchanged. Use it for the standard traits/features
+pattern. Use `NestedResourceMasterDetailEditor` when rows are independently
+persisted nested resources with domain-owned fetch/save/delete (subclasses on
+**ClassSubclassesTab**). Pass `leadingContent` when a tab needs extra fields above
+the grid (e.g. species **Heritage** scalar header, classes **Character creation**
+choose count). Compose the lower-level pieces directly only when you need layout
+that does not fit either composite.
 
 `useMasterDetailArray` resolves validation errors for nested dot paths (e.g.
 `heritage.options`) so error badges and auto-select work on inner lists.
@@ -148,9 +154,10 @@ Scope notes:
   access from their parent content type — no per-row campaign access UI yet (contract/API
   gate; do not fake local-only availability on those rows).
 - Subclass campaign access is persisted via the shared `ContentCampaignAccessModel`.
-  The subclass pilot uses shared master-detail availability primitives: stable rail
-  counts + default-hide unavailable rows, broad header copy + **Change** opening
-  `CampaignAvailabilityField` (`presentation: 'dialog'`), and the existing save session.
+  Subclasses use `NestedResourceMasterDetailEditor` with shared master-detail
+  availability primitives: stable rail counts + default-hide unavailable rows,
+  broad header copy + **Change** opening `CampaignAvailabilityField`
+  (`presentation: 'dialog'`), and the existing save session.
   Top-level edit shells coordinate body + access dirty state through a unified save session —
   see [campaign-access/README.md](lib/campaign-access/README.md) and
   [availability.md](../../../docs/availability.md#persisted-campaign-access-nested-master-detail).
