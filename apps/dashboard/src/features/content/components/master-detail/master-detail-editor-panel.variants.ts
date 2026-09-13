@@ -4,7 +4,7 @@ import { masterDetailRailBorderClasses } from './master-detail-rail.variants'
 
 /** Single bordered surface for the detail rail. */
 export const masterDetailEditorShellClasses = cn(
-  'overflow-hidden rounded-lg border bg-field-container text-foreground md:col-span-2',
+  'self-start overflow-hidden rounded-lg border bg-field-container text-foreground md:col-span-2',
   masterDetailRailBorderClasses,
   establishSurfaceCurrent('field-container'),
 )
@@ -31,7 +31,7 @@ export const masterDetailEditorAvailabilityClasses = 'pt-0.5'
 export const masterDetailEditorBodyClasses = 'px-4 py-4'
 
 export const masterDetailEditorEmptyShellClasses =
-  'flex min-h-48 flex-col bg-transparent md:col-span-2'
+  'flex min-h-48 flex-col self-start bg-transparent md:col-span-2'
 
 export function masterDetailEditorShellClassName(className?: string): string {
   return cn(masterDetailEditorShellClasses, className)

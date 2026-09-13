@@ -1,4 +1,5 @@
 import {
+  boundedScrollRegionClasses,
   cn,
   establishSurfaceCurrent,
   interactiveFocusVariants,
@@ -19,7 +20,7 @@ export const masterDetailListShellClasses = cn(
 
 /** Header row inside the shell — collection title and Add action. */
 export const masterDetailListHeaderClasses = cn(
-  'flex items-center justify-between gap-3 border-b px-3 py-2.5',
+  'flex shrink-0 items-center justify-between gap-3 border-b px-3 py-2.5',
   masterDetailRailBorderClasses,
 )
 
@@ -61,5 +62,13 @@ export const masterDetailListRowAvailabilityClasses = 'min-w-0'
 export const masterDetailListEmptyClasses = 'px-3 py-4 text-sm text-muted-foreground'
 
 /** Stable availability count row below the list header. */
-export const masterDetailListCountSupplementClasses =
-  'flex flex-wrap items-center gap-x-1 px-3 py-1.5 text-xs text-muted-foreground'
+export const masterDetailListCountSupplementClasses = cn(
+  'flex shrink-0 flex-wrap items-center gap-x-1 px-3 py-1.5 text-xs text-muted-foreground',
+)
+
+/** Scrollable item-list body — consumes `--master-detail-list-max-block-size` from the grid. */
+export const masterDetailListScrollClasses = cn(
+  boundedScrollRegionClasses,
+  'max-h-[min(var(--master-detail-list-max-block-size),40dvh)]',
+  'md:max-h-[min(var(--master-detail-list-max-block-size),70dvh)]',
+)

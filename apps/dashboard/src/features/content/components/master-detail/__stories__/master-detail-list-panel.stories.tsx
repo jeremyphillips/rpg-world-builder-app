@@ -1,12 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
+import { MasterDetailGrid } from '../master-detail-grid'
 import { MasterDetailListPanel } from '../master-detail-list-panel'
 
 const meta = {
   title: 'Content/MasterDetailListPanel',
   component: MasterDetailListPanel,
   parameters: { layout: 'padded' },
+  decorators: [
+    (Story) => (
+      <MasterDetailGrid>
+        <Story />
+      </MasterDetailGrid>
+    ),
+  ],
 } satisfies Meta<typeof MasterDetailListPanel>
 
 export default meta
@@ -18,6 +26,12 @@ const items = [
   { id: 'c', title: 'Reckless Attack', meta: { eyebrow: 'Level 2', sourceLabel: 'Homebrew' } },
 ]
 
+const longItems = Array.from({ length: 20 }, (_, index) => ({
+  id: `feature-${index}`,
+  title: `Feature ${index + 1}`,
+  meta: { eyebrow: `Level ${index + 1}`, sourceLabel: 'Homebrew' as const },
+}))
+
 export const Default: Story = {
   args: {
     items,
@@ -28,6 +42,43 @@ export const Default: Story = {
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
     onSelect: () => {},
+  },
+}
+
+export const LongCollection: Story = {
+  args: {
+    items: longItems,
+    selectedIndex: 0,
+    listTitle: 'Features',
+    ariaLabel: 'Features',
+    addLabel: 'Add feature',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
+    onAdd: () => {},
+    onSelect: () => {},
+    countSupplement: <span>20 available</span>,
+  },
+}
+
+export const ConstrainedViewport: Story = {
+  decorators: [
+    (Story) => (
+      <div className="h-64 [--master-detail-list-max-block-size:12rem]">
+        <MasterDetailGrid>
+          <Story />
+        </MasterDetailGrid>
+      </div>
+    ),
+  ],
+  args: {
+    items: longItems,
+    selectedIndex: 0,
+    listTitle: 'Features',
+    ariaLabel: 'Features',
+    addLabel: 'Add feature',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
+    onAdd: () => {},
+    onSelect: () => {},
+    countSupplement: <span>20 available</span>,
   },
 }
 

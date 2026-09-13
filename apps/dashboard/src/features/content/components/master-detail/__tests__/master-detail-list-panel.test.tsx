@@ -1,11 +1,16 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
+import { isElementOutsideScrollport } from '../../../lib/master-detail/is-element-outside-scrollport'
 import { masterDetailEmptyListLabel } from '../../../lib/master-detail/master-detail-constants'
 import { MasterDetailListPanel, type MasterDetailListItem } from '../master-detail-list-panel'
+
+vi.mock('../../../lib/master-detail/is-element-outside-scrollport', () => ({
+  isElementOutsideScrollport: vi.fn(() => false),
+}))
 
 const items: MasterDetailListItem[] = [
   {
@@ -33,7 +38,18 @@ function baseProps() {
   }
 }
 
+beforeAll(() => {
+  if (!HTMLElement.prototype.scrollIntoView) {
+    HTMLElement.prototype.scrollIntoView = vi.fn()
+  }
+})
+
 describe('MasterDetailListPanel', () => {
+  beforeEach(() => {
+    vi.mocked(isElementOutsideScrollport).mockReturnValue(false)
+    vi.mocked(HTMLElement.prototype.scrollIntoView as typeof vi.fn).mockClear()
+  })
+
   it('calls onAdd when the add button is clicked', async () => {
     const user = userEvent.setup()
     const props = baseProps()
@@ -84,6 +100,7 @@ describe('MasterDetailListPanel', () => {
     expect(
       screen.getByText(masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN)),
     ).toBeInTheDocument()
+    expect(document.querySelector('[data-master-detail-list-scroll]')).toBeNull()
   })
 
   it('marks rows with validation errors', () => {
@@ -106,6 +123,59 @@ describe('MasterDetailListPanel', () => {
 
     expect(screen.queryByRole('button', { name: /Remove/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Drag to reorder/i })).not.toBeInTheDocument()
+  })
+
+  it('keeps header and count supplement outside the scroll region', () => {
+    render(<MasterDetailListPanel {...baseProps()} countSupplement={<span>2 available</span>} />)
+
+    const scrollRegion = document.querySelector('[data-master-detail-list-scroll]')
+    expect(scrollRegion).toBeInTheDocument()
+    expect(scrollRegion).toHaveClass('overflow-y-auto')
+    expect(scrollRegion?.className).toContain('var(--master-detail-list-max-block-size)')
+    expect(scrollRegion).not.toContainElement(screen.getByRole('button', { name: /Add feature/i }))
+    expect(scrollRegion).not.toContainElement(screen.getByText('2 available'))
+  })
+
+  it('does not scroll into view on initial mount', () => {
+    render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+
+    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
+  })
+
+  it('scrolls the selected row into view when selection identity changes off-scrollport', () => {
+    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+
+    vi.mocked(isElementOutsideScrollport).mockReturnValue(true)
+    rerender(<MasterDetailListPanel {...baseProps()} selectedIndex={1} />)
+
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' })
+  })
+
+  it('scrolls into view when the visible list projection changes off-scrollport', () => {
+    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+
+    vi.mocked(isElementOutsideScrollport).mockReturnValue(true)
+    rerender(
+      <MasterDetailListPanel
+        {...baseProps()}
+        selectedIndex={0}
+        items={[
+          { id: 'x', title: 'Revealed Row' },
+          { id: 'b', title: 'Unarmored Defense' },
+        ]}
+      />,
+    )
+
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' })
+  })
+
+  it('does not scroll into view when the selected row is already in the scrollport', () => {
+    const { rerender } = render(<MasterDetailListPanel {...baseProps()} selectedIndex={0} />)
+
+    vi.mocked(isElementOutsideScrollport).mockReturnValue(false)
+    rerender(<MasterDetailListPanel {...baseProps()} selectedIndex={1} />)
+
+    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
   })
 
   itAxe('has no axe accessibility violations', async () => {
