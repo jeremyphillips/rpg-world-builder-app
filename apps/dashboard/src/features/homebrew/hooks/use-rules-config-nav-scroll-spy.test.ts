@@ -4,15 +4,10 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  PAGE_SCROLL_CONTAINER_ATTR,
-  PAGE_SCROLL_CONTAINER_VALUE,
-} from '@/components/layout/page/page-scroll.variants'
-
 import { useRulesConfigNavScrollSpy } from './use-rules-config-nav-scroll-spy'
 import {
   collectNavScrollSpyAnchors,
-  measureAnchorTopRelativeToScrollRoot,
+  measureAnchorTopRelativeToViewport,
   resolveActiveNavFromEntries,
 } from './use-rules-config-nav-scroll-spy.lib'
 
@@ -35,22 +30,8 @@ describe('collectNavScrollSpyAnchors', () => {
   })
 })
 
-describe('measureAnchorTopRelativeToScrollRoot', () => {
-  it('measures relative to the page scroll container when present', () => {
-    const scrollRoot = document.createElement('div')
-    scrollRoot.getBoundingClientRect = () =>
-      ({
-        top: 100,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: 0,
-        height: 0,
-        x: 0,
-        y: 100,
-        toJSON: () => ({}),
-      }) as DOMRect
-
+describe('measureAnchorTopRelativeToViewport', () => {
+  it('measures relative to the viewport with a scroll offset', () => {
     const anchor = document.createElement('div')
     anchor.getBoundingClientRect = () =>
       ({
@@ -65,7 +46,7 @@ describe('measureAnchorTopRelativeToScrollRoot', () => {
         toJSON: () => ({}),
       }) as DOMRect
 
-    expect(measureAnchorTopRelativeToScrollRoot(anchor, scrollRoot, 32)).toBe(8)
+    expect(measureAnchorTopRelativeToViewport(anchor, 32)).toBe(108)
   })
 })
 
@@ -86,10 +67,6 @@ describe('useRulesConfigNavScrollSpy', () => {
     }
 
     vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
-
-    const scrollRoot = document.createElement('div')
-    scrollRoot.setAttribute(PAGE_SCROLL_CONTAINER_ATTR, PAGE_SCROLL_CONTAINER_VALUE)
-    document.body.appendChild(scrollRoot)
   })
 
   afterEach(() => {
@@ -97,14 +74,10 @@ describe('useRulesConfigNavScrollSpy', () => {
     document.body.innerHTML = ''
   })
 
-  it('observes anchors relative to the page scroll container', () => {
-    const scrollRoot = document.querySelector(
-      `[${PAGE_SCROLL_CONTAINER_ATTR}="${PAGE_SCROLL_CONTAINER_VALUE}"]`,
-    )
-
+  it('observes anchors relative to the viewport for document scroll', () => {
     renderHook(() => useRulesConfigNavScrollSpy([{ id: 'creation', label: 'Creation' }]))
 
-    expect(observerOptions?.root).toBe(scrollRoot)
+    expect(observerOptions?.root).toBeNull()
   })
 })
 
@@ -130,29 +103,6 @@ describe('resolveActiveNavFromEntries', () => {
     ).toEqual({
       activeSectionId: 'creation',
       activeLeafId: 'creation-standard-array',
-    })
-  })
-
-  it('falls back to the highest visible section when no leaf is visible', () => {
-    expect(
-      resolveActiveNavFromEntries([
-        {
-          id: 'creation',
-          sectionId: 'creation',
-          isLeaf: false,
-          top: 5,
-          ratio: 1,
-        },
-        {
-          id: 'progression',
-          sectionId: 'progression',
-          isLeaf: false,
-          top: 120,
-          ratio: 0.2,
-        },
-      ]),
-    ).toEqual({
-      activeSectionId: 'creation',
     })
   })
 })

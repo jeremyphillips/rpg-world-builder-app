@@ -20,7 +20,7 @@ export type FormStickyScrollBodyProps = {
 }
 
 /**
- * Docked-footer scroll slot. Viewport-bound forms use clip + scroller; page-scroll
+ * Docked-footer scroll slot. Viewport-bound forms use clip + scroller; document-scroll
  * forms use a single growing scroller so fields are not collapsed by `overflow-hidden`.
  */
 export function FormStickyScrollBody({

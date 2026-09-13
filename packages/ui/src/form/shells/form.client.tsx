@@ -72,10 +72,10 @@ export interface FormProps<TFieldValues extends FieldValues> {
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
   /**
-   * Page shell owns scroll (`pageScrollClasses.page`). With `stickyFooter`, fields grow
-   * naturally and the actions bar sticks during ancestor scroll — no docked inner scroller.
+   * Document scroll owns vertical movement. With `stickyFooter`, fields grow naturally and
+   * the actions bar sticks during document scroll — no docked inner scroller.
    */
-  pageScroll?: boolean
+  documentScroll?: boolean
   /**
    * Wrap scrollable field content (e.g. `<DrawerShell.Body>` in composed drawer flows).
    * Pair with {@link externalFooter} so footer content renders in overlay shell chrome.
@@ -138,7 +138,7 @@ export function Form<TFieldValues extends FieldValues>({
   fileFieldProps,
   mode,
   stickyFooter = false,
-  pageScroll = false,
+  documentScroll = false,
   contentWrapper,
   externalFooter = false,
   density,
@@ -178,8 +178,8 @@ export function Form<TFieldValues extends FieldValues>({
     [externalFooter, formError, formId, resolvedFooter],
   )
 
-  const usesDockedStickyFooter = stickyFooter && !externalFooter && !pageScroll
-  const usesPageScrollStickyFooter = stickyFooter && !externalFooter && pageScroll
+  const usesDockedStickyFooter = stickyFooter && !externalFooter && !documentScroll
+  const usesDocumentScrollStickyFooter = stickyFooter && !externalFooter && documentScroll
 
   return (
     <SchemaFormShell
@@ -197,7 +197,6 @@ export function Form<TFieldValues extends FieldValues>({
       className={cn(
         externalFooter && 'flex min-h-0 flex-1 flex-col',
         usesDockedStickyFooter && 'flex min-h-0 flex-1 flex-col',
-        usesPageScrollStickyFooter && 'flex min-h-full flex-col',
         className,
       )}
     >
@@ -214,7 +213,7 @@ export function Form<TFieldValues extends FieldValues>({
         contentWrapper={contentWrapper}
         footer={resolvedFooter}
         usesDockedStickyFooter={usesDockedStickyFooter}
-        usesPageScrollStickyFooter={usesPageScrollStickyFooter}
+        usesDocumentScrollStickyFooter={usesDocumentScrollStickyFooter}
       />
     </SchemaFormShell>
   )

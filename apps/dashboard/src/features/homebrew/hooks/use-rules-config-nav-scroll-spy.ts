@@ -5,10 +5,9 @@ import type { RulesConfigNavSection } from '@/features/campaign'
 import {
   buildRulesConfigNavObserverRootMargin,
   collectNavScrollSpyAnchors,
-  measureAnchorTopRelativeToScrollRoot,
+  measureAnchorTopRelativeToViewport,
   resolveActiveNavFromEntries,
-  resolvePageScrollContainer,
-  RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
+  resolveRulesConfigNavScrollOffsetPx,
   type NavScrollSpyEntry,
 } from './use-rules-config-nav-scroll-spy.lib'
 
@@ -21,19 +20,15 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
     if (anchors.length === 0) return
     if (typeof IntersectionObserver === 'undefined') return
 
-    const scrollRoot = resolvePageScrollContainer()
     const ratios = new Map<string, number>()
 
     const updateActive = () => {
+      const scrollOffsetPx = resolveRulesConfigNavScrollOffsetPx()
       const entries: NavScrollSpyEntry[] = anchors.flatMap((anchor) => {
         const element = document.getElementById(anchor.id)
         if (!element) return []
 
-        const top = measureAnchorTopRelativeToScrollRoot(
-          element,
-          scrollRoot,
-          RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
-        )
+        const top = measureAnchorTopRelativeToViewport(element, scrollOffsetPx)
         return [
           {
             ...anchor,
@@ -56,7 +51,7 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
         updateActive()
       },
       {
-        root: scrollRoot,
+        root: null,
         rootMargin: buildRulesConfigNavObserverRootMargin(),
         threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
       },
@@ -68,13 +63,12 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
     }
 
     updateActive()
-    const scrollTarget = scrollRoot ?? window
-    scrollTarget.addEventListener('scroll', updateActive, { passive: true })
+    window.addEventListener('scroll', updateActive, { passive: true })
     window.addEventListener('resize', updateActive)
 
     return () => {
       observer.disconnect()
-      scrollTarget.removeEventListener('scroll', updateActive)
+      window.removeEventListener('scroll', updateActive)
       window.removeEventListener('resize', updateActive)
     }
   }, [anchors])

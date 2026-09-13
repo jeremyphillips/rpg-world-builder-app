@@ -1,5 +1,3 @@
-import { pageScrollContainerSelector } from '@/components/layout/page/page-scroll.variants'
-
 import type { RulesConfigNavSection } from '@/features/campaign'
 
 export type NavScrollSpyAnchor = {
@@ -64,31 +62,31 @@ export function resolveActiveNavFromEntries(entries: readonly NavScrollSpyEntry[
   return activeSection ? { activeSectionId: activeSection.id } : {}
 }
 
-/** Default offset for page shell top inset + `scroll-mt-8` anchor margin. */
-export const RULES_CONFIG_NAV_SCROLL_OFFSET_PX = 32
+/** Reads sticky app chrome block size for scroll-spy offset (document scroll). */
+export function resolveStickyChromeBlockSizePx(): number {
+  const chrome = document.querySelector('[data-app-sticky-chrome]')
+  if (chrome instanceof HTMLElement) {
+    return chrome.getBoundingClientRect().height
+  }
+
+  return 88
+}
+
+/** Default offset below sticky chrome + anchor scroll margin. */
+export function resolveRulesConfigNavScrollOffsetPx(): number {
+  return resolveStickyChromeBlockSizePx() + 32
+}
 
 export function buildRulesConfigNavObserverRootMargin(
-  scrollOffsetPx = RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
+  scrollOffsetPx = resolveRulesConfigNavScrollOffsetPx(),
 ) {
   return `-${scrollOffsetPx}px 0px -55% 0px`
 }
 
-/** Resolves the route page scrollport (`PageScrollShell`). */
-export function resolvePageScrollContainer(): Element | null {
-  return document.querySelector(pageScrollContainerSelector)
-}
-
-/** Distance from a scroll root's top edge after applying the nav offset. */
-export function measureAnchorTopRelativeToScrollRoot(
+/** Distance from the viewport top after applying the nav offset (document scroll). */
+export function measureAnchorTopRelativeToViewport(
   element: Element,
-  scrollRoot: Element | null,
-  scrollOffsetPx = RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
+  scrollOffsetPx = resolveRulesConfigNavScrollOffsetPx(),
 ): number {
-  const elementRect = element.getBoundingClientRect()
-  if (!scrollRoot) {
-    return elementRect.top - scrollOffsetPx
-  }
-
-  const rootRect = scrollRoot.getBoundingClientRect()
-  return elementRect.top - rootRect.top - scrollOffsetPx
+  return element.getBoundingClientRect().top - scrollOffsetPx
 }

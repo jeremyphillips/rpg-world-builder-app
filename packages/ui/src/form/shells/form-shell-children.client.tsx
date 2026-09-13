@@ -19,10 +19,10 @@ type FormShellChildrenProps = {
   contentWrapper?: (content: ReactNode) => ReactNode
   footer: ReactNode
   usesDockedStickyFooter: boolean
-  usesPageScrollStickyFooter: boolean
+  usesDocumentScrollStickyFooter: boolean
 }
 
-/** Footer/body layout branches for {@link Form} — docked, page-scroll, or default. */
+/** Footer/body layout branches for {@link Form} — docked, document-scroll, or default. */
 export function FormShellChildren({
   formId,
   fields,
@@ -36,7 +36,7 @@ export function FormShellChildren({
   contentWrapper,
   footer,
   usesDockedStickyFooter,
-  usesPageScrollStickyFooter,
+  usesDocumentScrollStickyFooter,
 }: FormShellChildrenProps) {
   if (usesDockedStickyFooter) {
     return (
@@ -63,7 +63,7 @@ export function FormShellChildren({
     )
   }
 
-  if (usesPageScrollStickyFooter) {
+  if (usesDocumentScrollStickyFooter) {
     return (
       <>
         <FormShellFieldStack
@@ -78,14 +78,12 @@ export function FormShellChildren({
           header={header}
           contentWrapper={contentWrapper}
         />
-        <div className="mt-auto">
-          <FormFooterRegion
-            stickyFooter
-            formError={formError}
-            footer={footer}
-            actionsBarPlacement="sticky"
-          />
-        </div>
+        <FormFooterRegion
+          stickyFooter
+          formError={formError}
+          footer={footer}
+          actionsBarPlacement="sticky"
+        />
       </>
     )
   }

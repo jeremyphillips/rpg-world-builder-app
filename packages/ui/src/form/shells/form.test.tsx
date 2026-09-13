@@ -245,26 +245,24 @@ describe('Form', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
-  it('grows with content when pageScroll and stickyFooter are both enabled', () => {
+  it('follows content when documentScroll and stickyFooter are both enabled', () => {
     const { container } = render(
       <Form<Values>
         schema={schema}
         fields={[{ type: 'text', name: 'name', label: 'Name' }]}
         onSubmit={vi.fn()}
         stickyFooter
-        pageScroll
+        documentScroll
         footer={<button type="submit">Save</button>}
       />,
     )
 
     const form = container.querySelector('form')
-    expect(form).toHaveClass('flex')
-    expect(form).toHaveClass('min-h-full')
-    expect(form).toHaveClass('flex-col')
+    expect(form).not.toHaveClass('min-h-full')
     expect(form).not.toHaveClass('flex-1')
     expect(container.querySelector('.form-scroll-body-container')).toBeNull()
     expect(container.querySelector('.overflow-y-auto')).toBeNull()
-    expect(screen.getByRole('toolbar', { name: 'Form actions' }).parentElement).toHaveClass(
+    expect(screen.getByRole('toolbar', { name: 'Form actions' }).parentElement).not.toHaveClass(
       'mt-auto',
     )
     expect(screen.getByRole('toolbar', { name: 'Form actions' })).toBeInTheDocument()

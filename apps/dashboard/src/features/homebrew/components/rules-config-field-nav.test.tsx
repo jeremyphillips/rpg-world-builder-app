@@ -30,13 +30,12 @@ describe('RulesConfigFieldNav', () => {
     render(<RulesConfigFieldNav {...defaultNavProps} />)
 
     const rail = screen.getByRole('navigation', { name: 'Character configuration sections' })
-    expect(rail).toHaveClass(
+    expect(rail.parentElement).toHaveClass(
       'lg:sticky',
-      'lg:top-0',
+      'lg:top-[var(--app-sticky-chrome-block-size)]',
       'lg:self-start',
-      'bg-surface-subtle',
-      'rounded-lg',
     )
+    expect(rail).toHaveClass('bg-surface-faint', 'rounded-lg')
     expect(rail).toHaveTextContent('Creation')
     expect(rail).toHaveTextContent('Starting level')
     expect(rail).toHaveTextContent('Progression')

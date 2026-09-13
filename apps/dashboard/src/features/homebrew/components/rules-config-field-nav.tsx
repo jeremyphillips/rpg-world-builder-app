@@ -1,15 +1,12 @@
 import { Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@rpg/ui'
 
 import type { RulesConfigNavLeaf, RulesConfigNavSection } from '@/features/campaign'
-import {
-  measureAnchorTopRelativeToScrollRoot,
-  resolvePageScrollContainer,
-  RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
-} from '@/features/homebrew/hooks/use-rules-config-nav-scroll-spy.lib'
+import { resolveRulesConfigNavScrollOffsetPx } from '@/features/homebrew/hooks/use-rules-config-nav-scroll-spy.lib'
 
 import {
+  rulesConfigFieldNavPanelClasses,
+  rulesConfigFieldNavRailSlotClasses,
   rulesConfigFieldNavShellClasses,
-  rulesConfigFieldNavStickyClasses,
 } from './rules-config-field-nav.variants'
 
 export type { RulesConfigNavLeaf, RulesConfigNavSection }
@@ -26,21 +23,9 @@ function scrollToAnchor(anchorId: string) {
   const anchor = document.getElementById(anchorId)
   if (!anchor) return
 
-  const scrollRoot = resolvePageScrollContainer()
-  if (!scrollRoot) {
-    anchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    return
-  }
-
-  const top = measureAnchorTopRelativeToScrollRoot(
-    anchor,
-    scrollRoot,
-    RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
-  )
-  scrollRoot.scrollTo({
-    top: scrollRoot.scrollTop + top,
-    behavior: 'smooth',
-  })
+  const offset = resolveRulesConfigNavScrollOffsetPx()
+  const top = window.scrollY + anchor.getBoundingClientRect().top - offset
+  window.scrollTo({ top, behavior: 'smooth' })
 }
 
 type MobileNavItem = {
@@ -91,9 +76,9 @@ export function RulesConfigFieldNav({
   const mobileItems = buildMobileNavItems(sections)
 
   return (
-    <div className="flex shrink-0 flex-col gap-4">
+    <div className={rulesConfigFieldNavRailSlotClasses}>
       <nav
-        className={cn(rulesConfigFieldNavStickyClasses, rulesConfigFieldNavShellClasses)}
+        className={cn(rulesConfigFieldNavPanelClasses, rulesConfigFieldNavShellClasses)}
         aria-label={navLabel}
       >
         <Eyebrow size="sm" className="mb-2">

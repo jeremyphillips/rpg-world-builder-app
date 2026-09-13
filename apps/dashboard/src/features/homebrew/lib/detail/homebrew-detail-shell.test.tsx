@@ -59,6 +59,21 @@ describe('HomebrewDetailMain', () => {
 })
 
 describe('HomebrewDetailShell', () => {
+  it('composes a document-flow row without a route scrollport', () => {
+    const { container } = render(
+      <HomebrewDetailShell nav={<nav aria-label="Test hub nav">Hub nav</nav>}>
+        <p>Ready content</p>
+      </HomebrewDetailShell>,
+    )
+
+    expect(container.querySelector('[data-scroll-container]')).toBeNull()
+    expect(container.querySelector('.overflow-y-auto')).toBeNull()
+
+    const mainColumn = screen.getByText('Ready content').parentElement
+    expect(mainColumn).toHaveClass('max-w-xl', 'flex-1')
+    expect(mainColumn).not.toHaveClass('min-h-full', 'min-h-0')
+  })
+
   it('renders hub nav alongside main content', () => {
     render(
       <HomebrewDetailShell nav={<nav aria-label="Test hub nav">Hub nav</nav>}>

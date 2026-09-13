@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 
-import { viewportFillClasses } from '@/components/layout/page/page-scroll.variants'
 import { NarrowPage } from '@/components/layout/page/narrow-page'
-import { ViewportShell } from '@/components/layout/page/viewport-shell'
+import { ViewportWorkspace } from '@/components/layout/page/viewport-workspace'
+import { viewportWorkspacePaneClasses } from '@/components/layout/page/viewport-workspace.variants'
 import { WidePage } from '@/components/layout/page/wide-page'
 
 import { contentFormPageShellBodyClasses } from './content-form-page-shell.variants'
@@ -19,19 +19,17 @@ export function ContentFormPageShell({
   children,
   className,
 }: ContentFormPageShellProps) {
-  const widthShell = usePreviewLayout ? (
-    <WidePage spacing="none" className={viewportFillClasses}>
-      <div className={contentFormPageShellBodyClasses}>{children}</div>
-    </WidePage>
-  ) : (
-    <NarrowPage spacing="none" className={viewportFillClasses}>
-      {children}
-    </NarrowPage>
-  )
-
   return (
-    <ViewportShell className={className}>
-      <div className={viewportFillClasses}>{widthShell}</div>
-    </ViewportShell>
+    <ViewportWorkspace className={className}>
+      {usePreviewLayout ? (
+        <WidePage spacing="none" className={viewportWorkspacePaneClasses}>
+          <div className={contentFormPageShellBodyClasses}>{children}</div>
+        </WidePage>
+      ) : (
+        <NarrowPage spacing="none" className={viewportWorkspacePaneClasses}>
+          {children}
+        </NarrowPage>
+      )}
+    </ViewportWorkspace>
   )
 }

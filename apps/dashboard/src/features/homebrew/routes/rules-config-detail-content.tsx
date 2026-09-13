@@ -138,7 +138,7 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
             onSubmit={onSubmit}
             formError={formError}
             stickyFooter={canManage}
-            pageScroll={true}
+            documentScroll
             className="overflow-visible"
             footer={canManage ? saveFooter : undefined}
           />
@@ -207,7 +207,7 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
             onSubmit={onSubmit}
             formError={formError}
             stickyFooter={canManage}
-            pageScroll={true}
+            documentScroll
             className="overflow-visible"
             footer={canManage ? saveFooter : undefined}
           />

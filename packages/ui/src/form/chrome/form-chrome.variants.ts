@@ -186,7 +186,7 @@ const formStickyScrollBodyScrollSurfaceClasses = cn(
 )
 
 /**
- * Legacy docked-footer slot when no clip is applied — prefer `pageScroll` on `<Form>`
+ * Legacy docked-footer slot when no clip is applied — prefer `documentScroll` on `<Form>`
  * so the page shell owns scroll instead of composing an inner scroller here.
  */
 export const formStickyScrollBodyUnboundedClasses = 'min-h-0 flex-1'

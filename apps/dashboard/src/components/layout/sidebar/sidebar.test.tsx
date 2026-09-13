@@ -21,6 +21,7 @@ describe('Sidebar', () => {
     expect(document.querySelector('aside')).toHaveClass(sidebarAsideVariants({ open: false }))
     expect(document.querySelector('aside')?.className).toContain('w-sidebar')
     expect(document.querySelector('aside')?.className).toContain('h-dvh')
+    expect(document.querySelector('aside')?.className).toContain('md:sticky')
     expect(document.querySelector('aside')?.className).toContain('overflow-hidden')
 
     rerender(<Sidebar isOpen onClose={() => undefined} />)

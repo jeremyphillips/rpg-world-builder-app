@@ -24,7 +24,7 @@ footer. Master-detail list rails offset sticky `top` with
 `--master-detail-shell-max-block-size`. The scroll body is also a size container
 (`form-scroll-body-container` on the clip slot only, `boundedScroll` on `FormStickyScrollBody`) so
 descendants can cap against the definite flex column above the footer; the inner scroller owns
-`overflow-y-auto`. Plain `<Form stickyFooter pageScroll>` on page-scroll routes omits the docked
+`overflow-y-auto`. Plain `<Form stickyFooter documentScroll>` on document-scroll routes omits the docked
 column and inner scroller so fields keep their natural height; the actions bar uses sticky
 placement during ancestor scroll. Pass `stickyChrome={false}` for
 flat layout. Dashboard content create/edit routes mount

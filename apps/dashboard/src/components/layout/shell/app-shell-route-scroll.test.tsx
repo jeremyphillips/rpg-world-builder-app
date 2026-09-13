@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
 
 import { ContentFormPageShell } from '@/features/content/lib/forms/shells/layout/content-form-page-shell'
 import {
@@ -9,48 +8,41 @@ import {
 } from '@/features/message/components/workspace/messages-workspace.variants'
 
 import { NarrowPage } from '../page/narrow-page'
-import {
-  PAGE_SCROLL_CONTAINER_ATTR,
-  PAGE_SCROLL_CONTAINER_VALUE,
-  pageScrollFillWrapperClasses,
-  pageScrollShellClasses,
-  pageScrollStickyFooterClearanceClasses,
-  viewportShellClasses,
-} from '../page/page-scroll.variants'
-import { PageScrollShell } from '../page/page-scroll-shell'
-import { ViewportShell } from '../page/viewport-shell'
+import { viewportWorkspaceClasses } from '../page/viewport-workspace.variants'
+import { ViewportWorkspace } from '../page/viewport-workspace'
 import { WidePage } from '../page/wide-page'
-import { appShellMainClasses } from './app-shell.variants'
+import { appShellMainClasses, appShellRootClasses } from './app-shell.variants'
 
 /**
- * AppShell `<main>` is a permanent frame (`overflow-hidden`). Route-level mode roots
- * own scroll semantics beneath it:
- *
- * - `PageScrollShell` — route scrollport (`overflow-y-auto`)
- * - `ViewportShell` — route scroll boundary (`overflow-hidden`)
- * - `messagesWorkspaceRootClasses` — messages workspace custom viewport shell
+ * Document scroll is the default. Ordinary routes never establish a vertical scrollport.
+ * ViewportWorkspace is the bounded exception for multi-pane editors.
  */
 describe('AppShell route scroll ownership', () => {
-  it('main is a non-scrolling frame', () => {
-    expect(appShellMainClasses).toContain('overflow-hidden')
-    expect(appShellMainClasses).not.toContain('overflow-y-auto')
+  it('does not lock the document on the app shell root', () => {
+    expect(appShellRootClasses).toContain('min-h-dvh')
+    expect(appShellRootClasses).not.toContain('overflow-hidden')
+    expect(appShellRootClasses).not.toMatch(/(?:^|\s)h-dvh(?:\s|$)/)
+    expect(appShellRootClasses).not.toContain('max-h-dvh')
   })
 
-  it('PageScrollShell is the route scrollport with a separate fill wrapper', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <PageScrollShell>
-          <p>Body</p>
-        </PageScrollShell>
-      </MemoryRouter>,
-    )
+  it('main is not a height contract or scrollport', () => {
+    expect(appShellMainClasses).toContain('min-w-0')
+    expect(appShellMainClasses).toContain('flex-1')
+    expect(appShellMainClasses).not.toContain('overflow-hidden')
+    expect(appShellMainClasses).not.toContain('overflow-y-auto')
+    expect(appShellMainClasses).not.toContain('min-h-0')
+    expect(appShellMainClasses).not.toContain('min-h-full')
+    expect(appShellMainClasses).not.toContain('h-full')
+  })
 
-    const scrollport = container.querySelector(
-      `[${PAGE_SCROLL_CONTAINER_ATTR}="${PAGE_SCROLL_CONTAINER_VALUE}"]`,
+  it('html, body, and #root are not viewport-locked in the dashboard mount', () => {
+    document.body.innerHTML = '<div id="root"></div>'
+
+    expect(document.documentElement.className).not.toMatch(/overflow-hidden|h-full|h-dvh/)
+    expect(document.body.className).not.toMatch(/overflow-hidden|h-full|h-dvh/)
+    expect(document.getElementById('root')?.className ?? '').not.toMatch(
+      /overflow-hidden|h-full|h-dvh/,
     )
-    expect(scrollport).toHaveClass(...pageScrollShellClasses.split(/\s+/))
-    expect(scrollport).toHaveClass(pageScrollStickyFooterClearanceClasses)
-    expect(scrollport?.firstElementChild).toHaveClass(...pageScrollFillWrapperClasses.split(/\s+/))
   })
 
   it('WidePage has no overflow classes', () => {
@@ -73,31 +65,32 @@ describe('AppShell route scroll ownership', () => {
     expect(root).not.toHaveClass('overflow-y-auto', 'overflow-hidden')
   })
 
-  it('ContentFormPageShell uses ViewportShell fill chain without shell inset on the width shell', () => {
+  it('ContentFormPageShell uses ViewportWorkspace without shell inset on the width shell', () => {
     const { container } = render(
       <ContentFormPageShell usePreviewLayout>
         <p>Form</p>
       </ContentFormPageShell>,
     )
-    const boundary = container.firstElementChild
-    expect(boundary).toHaveClass(...viewportShellClasses.split(/\s+/))
-    expect(boundary?.firstElementChild).toHaveClass('flex-1', 'min-h-0')
+    const workspace = container.firstElementChild
+    expect(workspace).toHaveClass(...viewportWorkspaceClasses.split(/\s+/).filter(Boolean))
 
-    const widthShell = boundary?.firstElementChild?.firstElementChild
+    const widthShell = workspace?.firstElementChild
     expect(widthShell).not.toHaveClass('pt-8', 'pb-8')
   })
 
-  it('documents messages workspace as a viewport shell exception', () => {
-    expect(messagesWorkspaceRootClasses).toContain('flex-1')
+  it('documents messages workspace as a viewport workspace exception', () => {
+    expect(messagesWorkspaceRootClasses).toContain('min-h-0')
     expect(messagesWorkspaceBodyClasses).toContain('overflow-hidden')
   })
 
-  it('ViewportShell is the route scroll boundary', () => {
+  it('ViewportWorkspace is a bounded workspace with explicit block size', () => {
     const { container } = render(
-      <ViewportShell>
+      <ViewportWorkspace>
         <p>Body</p>
-      </ViewportShell>,
+      </ViewportWorkspace>,
     )
-    expect(container.firstElementChild).toHaveClass(...viewportShellClasses.split(/\s+/))
+    expect(container.firstElementChild).toHaveClass(
+      ...viewportWorkspaceClasses.split(/\s+/).filter(Boolean),
+    )
   })
 })
