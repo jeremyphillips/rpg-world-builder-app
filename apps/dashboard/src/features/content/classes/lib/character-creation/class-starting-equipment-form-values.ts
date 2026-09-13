@@ -8,20 +8,17 @@ import {
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
 } from '@rpg/contracts'
-import { buildItemDefaultValues } from '@rpg/ui/form'
-
 import {
   wealthGrantMoneyFromForm,
   wealthGrantMoneyToForm,
 } from '../../../lib/forms/fields/content-economy-form-fields'
 import { applyStableIdsForChoiceOptions } from '../../../lib/forms/registry/content-form-key-helpers'
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   equipmentGrantFromFormRow,
   equipmentGrantToFormRow,
 } from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
 import {
-  startingEquipmentOptionItemFields,
+  type StartingEquipmentDraftForm,
   type StartingEquipmentForm,
   type StartingEquipmentItemForm,
   type StartingEquipmentOptionForm,
@@ -144,24 +141,9 @@ export function startingEquipmentFromFormValues(
   }
 }
 
-export function startingEquipmentDefaultValues(ctx: ContentFormCtx): StartingEquipmentForm {
-  const standardOption = {
-    ...(buildItemDefaultValues(
-      startingEquipmentOptionItemFields(ctx),
-    ) as StartingEquipmentOptionForm),
-    id: 'standard-equipment',
-    label: 'Standard Equipment',
-    items: [],
-  }
-
-  const goldOption: StartingEquipmentOptionForm = {
-    id: 'starting-gold',
-    label: 'Starting Gold',
-    items: [],
-  }
-
+export function startingEquipmentEmptyFormValues(): StartingEquipmentDraftForm {
   return {
     choose: 1,
-    options: [standardOption, goldOption],
+    options: [],
   }
 }

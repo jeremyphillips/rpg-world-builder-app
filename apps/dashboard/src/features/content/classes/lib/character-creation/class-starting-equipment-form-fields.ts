@@ -9,7 +9,6 @@ import {
   SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
-import { Heading } from '@rpg/ui'
 import {
   toOptions,
   type ArrayItemShellRenderProps,
@@ -38,8 +37,9 @@ import {
 } from '../../../lib/forms/grants/equipment/equipment-grant-form-labels'
 import { STARTING_EQUIPMENT_ITEM_TYPE_LABEL } from './class-character-creation-link-labels'
 import {
-  STARTING_EQUIPMENT_CHOICE_COPY,
   STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX,
+  STARTING_EQUIPMENT_GROUP_DESCRIPTION,
+  STARTING_EQUIPMENT_GROUP_LEGEND,
   STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX,
 } from './class-starting-equipment-form-labels'
 import { ProficiencyLinkedGrantRowCue } from '../../components/character-creation/proficiency-linked-grant-row-cue'
@@ -163,7 +163,14 @@ export const startingEquipmentFormSchema = z.object({
   options: z.array(startingEquipmentOptionFormSchema).min(1),
 })
 
+/** Draft starting equipment form — packages may be incomplete while authoring. */
+export const startingEquipmentDraftFormSchema = z.object({
+  choose: z.literal(1).default(1),
+  options: z.array(startingEquipmentOptionFormSchema).default([]),
+})
+
 export type StartingEquipmentForm = z.infer<typeof startingEquipmentFormSchema>
+export type StartingEquipmentDraftForm = z.infer<typeof startingEquipmentDraftFormSchema>
 
 export function startingEquipmentOptionTitle(
   row: Pick<StartingEquipmentOptionForm, 'id' | 'label'> | undefined,
@@ -249,13 +256,14 @@ export function startingEquipmentModifierFields(): FormItem[] {
   ]
 }
 
-export function startingEquipmentChooseFields(): FormItem[] {
+export function startingEquipmentSectionIntroFields(): FormItem[] {
   return [
     {
-      kind: 'slot',
-      name: '_startingEquipmentChoiceCopy',
-      render: () =>
-        createElement(Heading, { variant: 'subsection', as: 'p' }, STARTING_EQUIPMENT_CHOICE_COPY),
+      kind: 'group',
+      id: 'class-starting-equipment-heading',
+      legend: STARTING_EQUIPMENT_GROUP_LEGEND,
+      description: STARTING_EQUIPMENT_GROUP_DESCRIPTION,
+      fields: [],
     },
   ]
 }

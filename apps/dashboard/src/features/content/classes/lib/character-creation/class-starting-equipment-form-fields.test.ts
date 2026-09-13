@@ -5,6 +5,7 @@ import { pickClass, pickEquipment } from '../../../lib/fixtures/pick'
 import { equipmentGrantSummary } from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
 import {
   startingEquipmentChoiceItemFormSchema,
+  startingEquipmentDraftFormSchema,
   startingEquipmentFormSchema,
   startingEquipmentItemFields,
   startingEquipmentItemTitle,
@@ -202,6 +203,13 @@ describe('startingEquipmentItemFields', () => {
 })
 
 describe('startingEquipmentFormSchema validation', () => {
+  it('draft schema accepts an empty options array', () => {
+    expect(startingEquipmentDraftFormSchema.parse({ choose: 1, options: [] })).toEqual({
+      choose: 1,
+      options: [],
+    })
+  })
+
   it('rejects a pool choice item without pool configuration', () => {
     const result = startingEquipmentChoiceItemFormSchema.safeParse({
       itemKind: 'choice',

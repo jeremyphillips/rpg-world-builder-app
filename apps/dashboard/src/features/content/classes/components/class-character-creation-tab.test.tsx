@@ -8,7 +8,10 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import { pickClass } from '../../lib/fixtures/pick'
 import { characterCreationProficienciesToFormValues } from '../lib/character-creation/class-character-creation-proficiencies-form-values'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
-import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
+import {
+  startingEquipmentEmptyFormValues,
+  startingEquipmentToFormValues,
+} from '../lib/character-creation/class-starting-equipment-form-values'
 import { ClassCharacterCreationTab } from './class-character-creation-tab'
 
 function TabShell({
@@ -23,8 +26,8 @@ function TabShell({
   const form = useForm({
     defaultValues: {
       characterCreation: {
+        startingEquipment: startingEquipment ?? startingEquipmentEmptyFormValues(),
         ...(proficiencies ? { proficiencies } : characterCreationProficienciesToFormValues()),
-        ...(startingEquipment ? { startingEquipment } : {}),
       },
     },
   })
@@ -58,34 +61,31 @@ function packageListRow(name: string | RegExp) {
 }
 
 describe('ClassCharacterCreationTab', () => {
-  it('shows skill and tool proficiency choices even when there is no starting equipment', () => {
+  it('shows skill and tool proficiency choices with an empty starting-equipment master-detail', () => {
     render(<TabShell />)
     expect(screen.getAllByText('Character chooses').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Skill Proficiencies from:')).toBeInTheDocument()
     expect(
       screen.getByText(/Define the class's baseline equipment and wealth/i),
     ).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Class starting options' })).toBeInTheDocument()
-    expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Starting equipment/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Add package/i })).toBeInTheDocument()
+    expect(screen.getByText(/No packages added/i)).toBeInTheDocument()
   })
 
-  it('shows the empty state when there is no starting equipment', () => {
-    render(<TabShell />)
-    expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Add starting equipment/i })).toBeInTheDocument()
-  })
-
-  it('adds starting equipment and shows choice copy plus package master-detail', async () => {
+  it('adds a package via the master-detail list action', async () => {
     const user = userEvent.setup()
     render(<TabShell />)
 
-    await user.click(screen.getByRole('button', { name: /Add starting equipment/i }))
+    await user.click(screen.getByRole('button', { name: /Add package/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('Character can choose one package from below')).toBeInTheDocument()
+      expect(packageListRow(/Unnamed Package/)).toBeInTheDocument()
     })
-    expect(packageListRow(/Standard Equipment/)).toBeInTheDocument()
-    expect(packageListRow(/Starting Gold/)).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
+    expect(
+      screen.queryByText('Character can choose one package from below'),
+    ).not.toBeInTheDocument()
   })
 
   it('renders monk packages when pre-filled', () => {
@@ -100,7 +100,6 @@ describe('ClassCharacterCreationTab', () => {
         }}
       />,
     )
-    expect(screen.getByText('Character can choose one package from below')).toBeInTheDocument()
     expect(packageListRow(/Standard Equipment/)).toBeInTheDocument()
     expect(packageListRow(/Starting Gold/)).toBeInTheDocument()
   })

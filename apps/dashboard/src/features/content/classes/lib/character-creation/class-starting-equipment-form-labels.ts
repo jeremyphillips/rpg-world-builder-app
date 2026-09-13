@@ -1,12 +1,8 @@
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
 
-export const STARTING_EQUIPMENT_SECTION_TITLE = 'Class starting options'
-export const STARTING_EQUIPMENT_SECTION_DESCRIPTION =
-  "Define the class's baseline equipment and wealth. Starting-wealth tiers may add to or replace these options at higher levels."
-export const STARTING_EQUIPMENT_CHOICE_COPY = 'Character can choose one package from below'
-export const ADD_STARTING_EQUIPMENT_LABEL = 'Add starting equipment'
-export const STARTING_EQUIPMENT_EMPTY_MESSAGE =
-  'No starting equipment yet. Add packages players choose from at character creation.'
+export const STARTING_EQUIPMENT_GROUP_LEGEND = 'Starting equipment'
+export const STARTING_EQUIPMENT_GROUP_DESCRIPTION =
+  "Define the class's baseline equipment and wealth. Characters choose one package during character creation."
 export const STARTING_EQUIPMENT_OPTION_MASTER_DETAIL_ITEM_NOUN = defineMasterDetailItemNoun({
   label: 'Package',
   singular: 'package',

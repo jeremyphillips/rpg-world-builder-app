@@ -30,7 +30,10 @@ import {
   spellcastingToFormValues,
 } from './class-form-values'
 import { featureToFormRow } from './class-feature-form-fields'
-import { startingEquipmentToFormValues } from './character-creation/class-starting-equipment-form-values'
+import {
+  startingEquipmentEmptyFormValues,
+  startingEquipmentToFormValues,
+} from './character-creation/class-starting-equipment-form-values'
 import { characterCreationProficienciesToFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
 import { ClassPreviewPlayerHost } from './class-preview-player-host'
 import { buildClassPreviewIdentity, buildClassPreviewSections } from './class-preview-projection'
@@ -49,13 +52,9 @@ function characterCreationToFormValues(
     abilityScoreOrder: entity.characterCreation?.abilityScoreOrder
       ? ([...entity.characterCreation.abilityScoreOrder] as AbilityScoreOrder)
       : resolveClassAbilityScoreOrder({ primaryAbilities }),
-    ...(entity.characterCreation?.startingEquipment
-      ? {
-          startingEquipment: startingEquipmentToFormValues(
-            entity.characterCreation.startingEquipment,
-          ),
-        }
-      : {}),
+    startingEquipment: entity.characterCreation?.startingEquipment
+      ? startingEquipmentToFormValues(entity.characterCreation.startingEquipment)
+      : startingEquipmentEmptyFormValues(),
   }
 }
 

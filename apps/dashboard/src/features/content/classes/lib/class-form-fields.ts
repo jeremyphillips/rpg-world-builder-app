@@ -40,7 +40,10 @@ import {
   createSpellcastingFormSchema,
   spellcastingFields,
 } from './class-spellcasting-form-fields'
-import { startingEquipmentFormSchema } from './character-creation/class-starting-equipment-form-fields'
+import {
+  startingEquipmentDraftFormSchema,
+  startingEquipmentFormSchema,
+} from './character-creation/class-starting-equipment-form-fields'
 import { refineCharacterCreationSaveValidation } from './character-creation/class-character-creation-form-validation'
 import {
   characterCreationProficienciesFormSchema,
@@ -131,7 +134,7 @@ export function createClassDraftFormSchema(
     resources: z.array(resourceRowDraftFormSchema).optional(),
     characterCreation: z
       .object({
-        startingEquipment: startingEquipmentFormSchema.optional(),
+        startingEquipment: startingEquipmentDraftFormSchema.optional(),
         proficiencies: characterCreationProficienciesFormSchema.optional(),
         abilityScoreOrder: abilityScoreOrderSchema.optional(),
       })
