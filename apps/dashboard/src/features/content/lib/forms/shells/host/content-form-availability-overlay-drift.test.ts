@@ -21,6 +21,18 @@ const locationCreateFormPath = fileURLToPath(
 const subclassEditorPanelPath = fileURLToPath(
   new URL('../../../../classes/components/subclasses/subclass-editor-panel.tsx', import.meta.url),
 )
+const subclassEditorCampaignAccessFieldPath = fileURLToPath(
+  new URL(
+    '../../../../classes/components/subclasses/subclass-editor-campaign-access-field.tsx',
+    import.meta.url,
+  ),
+)
+const subclassEditorPanelHeaderPath = fileURLToPath(
+  new URL(
+    '../../../../classes/components/subclasses/subclass-editor-panel-header.tsx',
+    import.meta.url,
+  ),
+)
 const contentFormLayoutPath = fileURLToPath(
   new URL('../layout/content-form-shell-layout.tsx', import.meta.url),
 )
@@ -33,11 +45,14 @@ describe('campaign availability overlay presentation drift guard', () => {
     expect(readFileSync(locationCreateFormPath, 'utf8')).toContain(
       'CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE',
     )
-    expect(readFileSync(subclassEditorPanelPath, 'utf8')).toContain(
-      'CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE',
+    expect(readFileSync(subclassEditorPanelHeaderPath, 'utf8')).toContain(
+      'MasterDetailAvailabilityHeaderLine',
+    )
+    expect(readFileSync(subclassEditorCampaignAccessFieldPath, 'utf8')).toContain(
+      'presentation="dialog"',
     )
     expect(readFileSync(subclassEditorPanelPath, 'utf8')).toContain(
-      'buildContentAvailabilitySlotItem',
+      'SubclassEditorCampaignAccessField',
     )
   })
 

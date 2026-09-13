@@ -145,12 +145,39 @@ Per-code presentation: title, description, severity, badge label, optional
 
 ## Master-detail integration
 
-Embedded editors combine toggle state + optional `resolveRowReasons` on
+### Campaign rules inactive (orthogonal)
+
+Embedded editors combine optional `resolveRowReasons` on
 [`FormEmbeddedMasterDetailEditor`](../src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx):
 
 1. `resolveRowReasons({ row, rowKey, index })` → `AvailabilityReason[]`
 2. [`resolveEmbeddedRowMeta`](../src/features/content/lib/master-detail/resolve-embedded-row-meta.ts) calls `combineAvailabilityReasons`
 3. Inactive badge on the rail; [`MasterDetailEditorPanel`](../src/features/content/components/master-detail/master-detail-editor-panel.tsx) renders `AvailabilityAlert` above the row form
+
+`AvailabilityReason` codes (`subclasses-disabled`, …) explain **rules-derived**
+inactive state. They are separate from persisted **`campaignAccess.available`**
+broad availability on nested content that supports per-row campaign access.
+
+### Persisted campaign access (nested master-detail)
+
+Shared presentation lives under [`campaign-access/`](../src/features/content/lib/campaign-access/)
+and [`master-detail/`](../src/features/content/lib/master-detail/):
+
+| Piece                                                                 | Role                                                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `formatAvailabilityCountSummary` + `buildAvailabilityCountSupplement` | Shared count copy + Show/Hide (`stable` on master-detail rails, `conditional` on overview tables) |
+| `resolveBroadAvailabilityPresentation`                                | Broad `Available` / `Unavailable` header copy — **no** player-access detail                       |
+| `MasterDetailAvailabilityPresentation`                                | Thin list + editor contract (`rowId`, `isAvailable`, `statusLabel`)                               |
+| `useMasterDetailAvailabilityFilter`                                   | Default-hide unavailable rows, identity-based pin for selected unavailable rows                   |
+| `MasterDetailAvailabilityHeaderLine`                                  | Editor line 3: `● Available` / inactive unavailable + **Change** (consumer opens dialog)          |
+
+**Pilot consumer:** subclass list + editor panels. **Blocked this pass:** form-embedded
+arrays (features, traits, heritage) — no per-row `campaignAccess` API/contracts yet;
+those rows continue to inherit parent access with rules-only inactive badges.
+
+Consumers build one `MasterDetailAvailabilityPresentation[]` and pass the same objects to
+list filter/counts and the selected editor header. Persistence stays consumer-owned
+(`CampaignAvailabilityField`, save session, PATCH).
 
 ## Adding a reason code
 

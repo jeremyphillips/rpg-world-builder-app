@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ConfirmDialog } from '@rpg/ui'
 
 import type { ContentUsageSummaryLabels, ResolvedSubclass } from '@rpg/contracts'
@@ -11,6 +11,7 @@ import { useClassSubclassesTabState, useSubclassTabSave } from '../hooks/use-cla
 import { useReportSubclassUnsavedEdits } from '../hooks/subclass-unsaved-edits-context'
 import { useSubclassDeleteFlow } from '../hooks/use-subclass-delete-flow'
 import type { SubclassEditorState } from '../hooks/use-subclass-editor-state'
+import { buildSubclassAvailabilityPresentations } from '../lib/subclasses/subclass-availability.lib'
 import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
 import type { SubclassTabGateKind } from '../lib/subclasses/subclass-tab-state.lib'
 import {
@@ -94,6 +95,22 @@ function ClassSubclassesTabBody({
     editor,
   })
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null)
+  const [accessOverrides, setAccessOverrides] = useState<Record<string, boolean>>({})
+
+  const availabilityItems = useMemo(
+    () =>
+      buildSubclassAvailabilityPresentations(editor.listItems, editor.subclasses, accessOverrides),
+    [accessOverrides, editor.listItems, editor.subclasses],
+  )
+
+  const selectedAvailability = useMemo(
+    () => availabilityItems.find((item) => item.rowId === editor.selectedId),
+    [availabilityItems, editor.selectedId],
+  )
+
+  const handleAvailabilityChange = useCallback((subclassId: string, isAvailable: boolean) => {
+    setAccessOverrides((current) => ({ ...current, [subclassId]: isAvailable }))
+  }, [])
 
   useReportSubclassUnsavedEdits(editor.hasUnsavedEdits)
 
@@ -148,6 +165,7 @@ function ClassSubclassesTabBody({
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <SubclassListPanel
             items={editor.listItems}
+            availabilityItems={availabilityItems}
             selectedId={editor.selectedId}
             modifiedIds={editor.modifiedIds}
             usageSummaryLabels={usageSummaryLabels}
@@ -157,13 +175,14 @@ function ClassSubclassesTabBody({
           />
 
           <div className="md:col-span-2">
-            {editor.selectedId && editor.selectedValues ? (
+            {editor.selectedId && editor.selectedValues && selectedAvailability ? (
               <SubclassEditorPanel
                 key={editor.selectedId}
                 subclassId={editor.selectedId}
                 classId={classId}
                 campaignId={campaignId}
                 entity={editor.selectedEntity}
+                availability={selectedAvailability}
                 defaultValues={editor.selectedValues}
                 defaultFeatureLevel={defaultFeatureLevel}
                 formCtx={formCtx}
@@ -171,6 +190,7 @@ function ClassSubclassesTabBody({
                 isBodyDirty={isBodyDirty}
                 isAccessDirty={isAccessDirty}
                 onValuesChange={editor.handleValuesChange}
+                onAvailabilityChange={handleAvailabilityChange}
                 onSave={handleSave}
                 onDeleteRequest={() => handleDeleteRequest(editor.selectedId!)}
               />

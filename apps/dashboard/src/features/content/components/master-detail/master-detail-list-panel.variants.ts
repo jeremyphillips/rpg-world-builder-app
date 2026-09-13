@@ -57,3 +57,7 @@ export const masterDetailListRowTitleClasses =
 export const masterDetailListRowMetaClasses = 'min-w-0 truncate text-xs text-muted-foreground'
 
 export const masterDetailListEmptyClasses = 'px-3 py-4 text-sm text-muted-foreground'
+
+/** Stable availability count row below the list header. */
+export const masterDetailListCountSupplementClasses =
+  'flex flex-wrap items-center gap-x-1 px-3 pb-2.5 text-xs text-muted-foreground'

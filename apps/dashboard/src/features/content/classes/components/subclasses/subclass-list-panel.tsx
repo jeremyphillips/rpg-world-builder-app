@@ -2,14 +2,19 @@ import type { ContentUsageSummaryLabels } from '@rpg/contracts'
 import { cn, Badge, Button, Text, iconGhostControlVariants, interactiveRowVariants } from '@rpg/ui'
 import { Trash2 } from 'lucide-react'
 
+import { buildAvailabilityCountSupplement } from '../../../lib/campaign-access/availability-count-supplement'
+import type { MasterDetailAvailabilityPresentation } from '../../../lib/master-detail/master-detail-availability.types'
+import { useMasterDetailAvailabilityFilter } from '../../../lib/master-detail/use-master-detail-availability-filter'
 import {
   isSubclassDeletable,
   UNTITLED_SUBCLASS_LABEL,
 } from '../../lib/subclasses/subclass-editor-constants'
 import type { SubclassListItem } from '../../lib/subclasses/subclass-editor-state'
+import { subclassListCountSupplementClasses } from './subclass-list-panel.variants'
 
 export interface SubclassListPanelProps {
   items: SubclassListItem[]
+  availabilityItems: MasterDetailAvailabilityPresentation[]
   selectedId: string | null
   modifiedIds: ReadonlySet<string>
   usageSummaryLabels?: ContentUsageSummaryLabels
@@ -94,6 +99,7 @@ interface SubclassListRowProps {
   item: SubclassListItem
   isSelected: boolean
   isModified: boolean
+  isAvailable: boolean
   usageSummaryLabels?: ContentUsageSummaryLabels
   onSelect: (id: string) => void
   onDeleteRequest: (id: string) => void
@@ -118,6 +124,7 @@ function SubclassListRow({
   item,
   isSelected,
   isModified,
+  isAvailable,
   usageSummaryLabels,
   onSelect,
   onDeleteRequest,
@@ -132,6 +139,7 @@ function SubclassListRow({
           className={cn(
             'min-w-0 flex-1 rounded-md px-3 py-2 text-left text-sm',
             interactiveRowVariants({ interaction: 'hoverable', hoverFamily: 'selectable' }),
+            !isAvailable && !isSelected && 'text-muted-foreground',
           )}
         >
           <span className="block truncate font-medium">{item.name || UNTITLED_SUBCLASS_LABEL}</span>
@@ -151,6 +159,7 @@ function SubclassListRow({
 
 export function SubclassListPanel({
   items,
+  availabilityItems,
   selectedId,
   modifiedIds,
   usageSummaryLabels,
@@ -158,24 +167,56 @@ export function SubclassListPanel({
   onAdd,
   onDeleteRequest,
 }: SubclassListPanelProps) {
+  const availabilityById = new Map(availabilityItems.map((item) => [item.rowId, item]))
+  const filterableItems = items.map((item) => {
+    const availability = availabilityById.get(item.id)
+    return {
+      ...item,
+      rowId: item.id,
+      isAvailable: availability?.isAvailable ?? true,
+      statusLabel: availability?.statusLabel ?? 'Available',
+    }
+  })
+
+  const { showUnavailable, scope, visibleItems, showUnavailableItems, hideUnavailableItems } =
+    useMasterDetailAvailabilityFilter({
+      items: filterableItems,
+      selectedRowId: selectedId,
+    })
+
+  const countSupplement = buildAvailabilityCountSupplement({
+    scope,
+    showUnavailable,
+    layout: 'stable',
+    onShow: showUnavailableItems,
+    onHide: hideUnavailableItems,
+  })
+
   return (
     <nav aria-label="Subclasses" className="flex flex-col gap-3">
       <Button type="button" variant="outline" size="sm" onClick={onAdd}>
         Add subclass
       </Button>
 
-      {items.length === 0 ? (
+      {items.length > 0 ? (
+        <div className={subclassListCountSupplementClasses}>{countSupplement}</div>
+      ) : null}
+
+      {visibleItems.length === 0 ? (
         <Text variant="muted" className="text-sm">
-          No subclasses yet. Add one to get started.
+          {items.length === 0
+            ? 'No subclasses yet. Add one to get started.'
+            : 'No available subclasses match the current filter.'}
         </Text>
       ) : (
         <ul className="space-y-1" role="list">
-          {items.map((item) => (
+          {visibleItems.map((item) => (
             <SubclassListRow
               key={item.id}
               item={item}
               isSelected={item.id === selectedId}
               isModified={modifiedIds.has(item.id)}
+              isAvailable={item.isAvailable}
               usageSummaryLabels={usageSummaryLabels}
               onSelect={onSelect}
               onDeleteRequest={onDeleteRequest}

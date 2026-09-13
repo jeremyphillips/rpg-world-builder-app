@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { buildMasterDetailAvailabilityPresentation } from '../../../lib/master-detail/master-detail-availability.types'
 import { SUBCLASSES_FOR_FIGHTER } from '../../fixtures'
 import { SubclassListPanel } from './subclass-list-panel'
 
@@ -19,9 +20,14 @@ const items = SUBCLASSES_FOR_FIGHTER.map((subclass) => ({
   classId: subclass.classId,
 }))
 
+const availabilityItems = items.map((item) =>
+  buildMasterDetailAvailabilityPresentation(item.id, item.id !== items[1]?.id),
+)
+
 export const Default: Story = {
   args: {
     items,
+    availabilityItems,
     selectedId: items[0]?.id ?? null,
     modifiedIds: new Set<string>(),
     onSelect: () => {},
@@ -33,6 +39,7 @@ export const Default: Story = {
 export const WithModified: Story = {
   args: {
     items,
+    availabilityItems,
     selectedId: items[0]?.id ?? null,
     modifiedIds: new Set([items[0]!.id]),
     onSelect: () => {},

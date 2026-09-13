@@ -26,6 +26,8 @@ export const masterDetailEditorTitleClasses = 'truncate text-lg font-medium text
 
 export const masterDetailEditorMetaClasses = 'truncate text-xs text-muted-foreground'
 
+export const masterDetailEditorAvailabilityClasses = 'pt-0.5'
+
 export const masterDetailEditorBodyClasses = 'px-4 py-4'
 
 export const masterDetailEditorEmptyShellClasses =

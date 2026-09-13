@@ -144,6 +144,7 @@ export function useSubclassEditorState(
   const hasUnsavedEdits = drafts.length > 0 || modifiedIds.size > 0
 
   return {
+    subclasses,
     listItems,
     modifiedIds,
     selectedId,

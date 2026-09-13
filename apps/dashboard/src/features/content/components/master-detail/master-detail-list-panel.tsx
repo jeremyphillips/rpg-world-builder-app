@@ -9,6 +9,7 @@ import {
 import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
+  masterDetailListCountSupplementClasses,
   masterDetailListEmptyClasses,
   masterDetailListHeaderClasses,
   masterDetailListItemsClasses,
@@ -47,6 +48,8 @@ export interface MasterDetailListPanelProps {
   itemNoun: MasterDetailItemNounTerm
   onAdd: () => void
   onSelect: (index: number) => void
+  /** Optional stable availability count row rendered below the list header. */
+  countSupplement?: ReactNode
 }
 
 interface MasterDetailListRowProps {
@@ -91,6 +94,7 @@ export function MasterDetailListPanel({
   itemNoun,
   onAdd,
   onSelect,
+  countSupplement,
 }: MasterDetailListPanelProps) {
   const emptyLabel = masterDetailEmptyListLabel(itemNoun)
 
@@ -103,6 +107,10 @@ export function MasterDetailListPanel({
           {addLabel}
         </Button>
       </div>
+
+      {countSupplement ? (
+        <div className={masterDetailListCountSupplementClasses}>{countSupplement}</div>
+      ) : null}
 
       {items.length === 0 ? (
         <Text variant="muted" className={masterDetailListEmptyClasses}>

@@ -19,18 +19,23 @@ import {
   masterDetailEditorBodyClasses,
   masterDetailEditorEmptyShellClasses,
   masterDetailEditorIdentityClasses,
+  masterDetailEditorAvailabilityClasses,
   masterDetailEditorIdentityCopyClasses,
   masterDetailEditorMetaClasses,
   masterDetailEditorShellClassName,
   masterDetailEditorTitleClasses,
   masterDetailEditorValidationBannerClasses,
 } from './master-detail-editor-panel.variants'
+import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
+import { MasterDetailAvailabilityHeaderLine } from './master-detail-availability-header-line'
 import { MasterDetailValidationBanner } from './master-detail-validation-banner'
 
 export interface MasterDetailEditorIdentity {
   title: string
   meta?: MasterDetailItemMeta
   deletable?: boolean
+  availability?: MasterDetailAvailabilityPresentation
+  onAvailabilityChange?: () => void
 }
 
 export interface MasterDetailEditorPanelProps {
@@ -100,6 +105,14 @@ function MasterDetailEditorIdentityHeader({
       <div className={masterDetailEditorIdentityCopyClasses}>
         <div className={masterDetailEditorTitleClasses}>{identity.title}</div>
         {metaLine ? <div className={masterDetailEditorMetaClasses}>{metaLine}</div> : null}
+        {identity.availability && identity.onAvailabilityChange ? (
+          <div className={masterDetailEditorAvailabilityClasses}>
+            <MasterDetailAvailabilityHeaderLine
+              availability={identity.availability}
+              onAvailabilityChange={identity.onAvailabilityChange}
+            />
+          </div>
+        ) : null}
       </div>
       {deletable ? (
         <DetailOverflowMenu

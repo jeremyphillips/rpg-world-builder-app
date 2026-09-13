@@ -1,33 +1,29 @@
-import { useEffect, useRef, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { useRef } from 'react'
+import { FormProvider } from 'react-hook-form'
 import { Button } from '@rpg/ui'
-import { FormItems, makeResolver } from '@rpg/ui/form'
+import { FormItems } from '@rpg/ui/form'
 import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
-import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { useCampaignAccessForm } from '../../../lib/campaign-access/campaign-access-form-context'
-import { buildContentAvailabilitySlotItem } from '../../../lib/forms/fields/content-availability-slot.lib'
-import { CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE } from '../../../lib/forms/shells/content-form-presentation.lib'
-import { SubclassUsageReferencesSection } from './subclass-usage-references-section'
-import { ContentEditHeadingBadges } from '../../../lib/campaign-access/content-edit-heading-badges'
+import { openCampaignAvailabilityDialog } from '../../../lib/campaign-access/open-campaign-availability-dialog.lib'
+import type { MasterDetailAvailabilityPresentation } from '../../../lib/master-detail/master-detail-availability.types'
+import { useSubclassEditorPanel } from '../../hooks/use-subclass-editor-panel'
 import {
   isDraftSubclassId,
   isSubclassDeletable,
+  UNTITLED_SUBCLASS_LABEL,
 } from '../../lib/subclasses/subclass-editor-constants'
-import {
-  buildSubclassFields,
-  type SubclassFormValues,
-} from '../../lib/subclasses/subclass-form-fields'
-import { isSubclassFormValuesLike } from '../../lib/subclasses/subclass-form-value-snapshot'
-import { subclassFormDef } from '../../lib/subclasses/subclass-form-values'
-import { buildContentIdentityFields } from '../../../lib/forms/fields/content-identity-form-fields'
+import type { SubclassFormValues } from '../../lib/subclasses/subclass-form-fields'
+import { SubclassEditorCampaignAccessField } from './subclass-editor-campaign-access-field'
+import { SubclassEditorPanelHeader } from './subclass-editor-panel-header'
+import { SubclassUsageReferencesSection } from './subclass-usage-references-section'
 
 export interface SubclassEditorPanelProps {
   subclassId: string
   classId: string
   campaignId: string
   entity?: ResolvedSubclass
+  availability: MasterDetailAvailabilityPresentation
   defaultValues: SubclassFormValues
   defaultFeatureLevel?: number
   formCtx: ContentFormCtx
@@ -35,6 +31,7 @@ export interface SubclassEditorPanelProps {
   isBodyDirty?: boolean
   isAccessDirty?: boolean
   onValuesChange: (values: SubclassFormValues) => void
+  onAvailabilityChange: (subclassId: string, isAvailable: boolean) => void
   onSave: (
     values: SubclassFormValues,
     options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null; accessOnly?: boolean },
@@ -42,118 +39,55 @@ export interface SubclassEditorPanelProps {
   onDeleteRequest: () => void
 }
 
-export function SubclassEditorPanel({
-  subclassId,
-  classId,
-  campaignId,
-  entity,
-  defaultValues,
-  defaultFeatureLevel,
-  formCtx,
-  savePending = false,
-  isBodyDirty = false,
-  isAccessDirty = false,
-  onValuesChange,
-  onSave,
-  onDeleteRequest,
-}: SubclassEditorPanelProps) {
-  const campaignAccessForm = useCampaignAccessForm()
+export function SubclassEditorPanel(props: SubclassEditorPanelProps) {
+  const {
+    subclassId,
+    classId,
+    campaignId,
+    entity,
+    availability,
+    savePending = false,
+    onDeleteRequest,
+  } = props
+  const campaignAccessDialogRef = useRef<HTMLDivElement>(null)
   const source = entity?.source ?? (isDraftSubclassId(subclassId) ? 'homebrew' : 'system')
   const status = entity?.status ?? (isDraftSubclassId(subclassId) ? 'draft' : 'published')
   const deletable = isSubclassDeletable(source, subclassId)
-  const fields = buildSubclassFields(formCtx, { defaultFeatureLevel })
-  const nameFieldItem = fields[0]
-  if (!nameFieldItem) {
-    throw new Error('Subclass fields must include a name field.')
-  }
-  const bodyFields = fields.slice(1)
-  const onSaveRef = useRef(onSave)
-  const onValuesChangeRef = useRef(onValuesChange)
-  const campaignAccessDraftRef = useRef<ContentCampaignAccessPatch | null>(null)
-  const [campaignAccess, setCampaignAccess] = useState(
-    () => entity?.campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS,
-  )
-
-  useEffect(() => {
-    onSaveRef.current = onSave
-  }, [onSave])
-
-  useEffect(() => {
-    onValuesChangeRef.current = onValuesChange
-  }, [onValuesChange])
-
-  useEffect(() => {
-    setCampaignAccess(entity?.campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS)
-  }, [entity?.campaignAccess, subclassId])
-
-  const resolver = makeResolver<SubclassFormValues>(subclassFormDef.schema, fields)
-
-  const form = useForm<SubclassFormValues>({
-    resolver,
-    defaultValues,
-    mode: 'onSubmit',
-  })
-
-  useEffect(() => {
-    const subscription = form.watch((values) => {
-      if (!isSubclassFormValuesLike(values)) return
-      onValuesChangeRef.current(values)
-    })
-    return () => subscription.unsubscribe()
-  }, [form])
-
-  const handleSave = () => {
-    if (isDraftSubclassId(subclassId)) {
-      void form.handleSubmit((values: SubclassFormValues) =>
-        onSaveRef.current(values, { campaignAccessDraft: campaignAccessDraftRef.current }),
-      )()
-      return
-    }
-
-    const hasUnsavedEdits = isBodyDirty || isAccessDirty || campaignAccessForm.isDirty
-    if (!hasUnsavedEdits) return
-
-    if (isBodyDirty) {
-      void form.handleSubmit((values: SubclassFormValues) => onSaveRef.current(values))()
-      return
-    }
-
-    void onSaveRef.current(form.getValues(), { accessOnly: true })
-  }
+  const panel = useSubclassEditorPanel(props)
+  const displayName = panel.watchedName?.trim() || entity?.name || UNTITLED_SUBCLASS_LABEL
 
   return (
-    <FormProvider {...form}>
+    <FormProvider {...panel.form}>
       <div className="space-y-6">
-        <div className="flex justify-end">
-          <ContentEditHeadingBadges
-            contentType="classes"
-            source={source}
-            status={status}
-            campaignAccess={campaignAccess}
-          />
-        </div>
+        <SubclassEditorPanelHeader
+          displayName={displayName}
+          subclassId={subclassId}
+          source={source}
+          status={status}
+          availability={availability}
+          savePending={savePending}
+          onAvailabilityChange={() =>
+            openCampaignAvailabilityDialog(campaignAccessDialogRef.current)
+          }
+        />
+
+        <SubclassEditorCampaignAccessField
+          dialogRef={campaignAccessDialogRef}
+          campaignId={campaignId}
+          classId={classId}
+          subclassId={subclassId}
+          isDraft={isDraftSubclassId(subclassId)}
+          campaignAccess={panel.campaignAccess}
+          onDraftChange={panel.handleCampaignAccessDraft}
+          onPersistedChange={panel.handleCampaignAccessPersisted}
+        />
 
         <FormItems
-          items={buildContentIdentityFields({
-            layout: 'stacked',
-            nameItem: nameFieldItem,
-            availabilityItem: buildContentAvailabilitySlotItem({
-              campaignId,
-              targetType: 'subclasses',
-              classId,
-              entityId: isDraftSubclassId(subclassId) ? undefined : subclassId,
-              presentation: CONTENT_FORM_AVAILABILITY_PRESENTATION_DISCLOSURE,
-              initialAccess: campaignAccess,
-              onDraftChange: (patch) => {
-                campaignAccessDraftRef.current = patch
-              },
-              onPersistedChange: setCampaignAccess,
-            }),
-          })}
+          items={[panel.nameFieldItem]}
           idPrefix={`subclass-editor-${subclassId}-identity`}
         />
 
-        <FormItems items={bodyFields} idPrefix={`subclass-editor-${subclassId}`} />
+        <FormItems items={panel.bodyFields} idPrefix={`subclass-editor-${subclassId}`} />
 
         <SubclassUsageReferencesSection
           campaignId={campaignId}
@@ -172,7 +106,7 @@ export function SubclassEditorPanel({
               Delete subclass
             </Button>
           ) : null}
-          <Button type="button" disabled={savePending} onClick={handleSave}>
+          <Button type="button" disabled={savePending} onClick={panel.handleSave}>
             Save subclass
           </Button>
         </div>
