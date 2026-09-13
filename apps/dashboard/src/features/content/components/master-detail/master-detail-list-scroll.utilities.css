@@ -1,0 +1,22 @@
+/*
+ * Master-detail list scroll viewport cap — consumes `--master-detail-list-max-block-size`
+ * (definite-host override, higher priority) and optionally subtracts
+ * `--rpg-content-bottom-inset` from viewport-relative fallback caps only.
+ *
+ * Does not compute remaining height to the docked footer; it is a conservative
+ * viewport cap when the environmental inset is published by sticky-chrome forms.
+ */
+
+@utility master-detail-list-scroll-viewport-cap {
+  max-height: min(
+    var(--master-detail-list-max-block-size),
+    max(0px, calc(40dvh - var(--rpg-content-bottom-inset, 0px)))
+  );
+
+  @media (min-width: 768px) {
+    max-height: min(
+      var(--master-detail-list-max-block-size),
+      max(0px, calc(70dvh - var(--rpg-content-bottom-inset, 0px)))
+    );
+  }
+}

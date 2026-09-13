@@ -23,6 +23,7 @@ import {
   formTabbedChromeRhythmStackClasses,
   formStickyScrollBodyClasses,
   formStickyScrollShellClasses,
+  formStickyScrollShellWithDockedFooterClasses,
 } from '../chrome/form-chrome.variants'
 import { FormScrollBodyTopInset } from '../chrome/form-viewport-scroll-top-inset.client'
 import { cn } from '../../lib/utils'
@@ -268,9 +269,14 @@ export function TabbedForm<TFieldValues extends FieldValues>({
 
   const scrollBodyClasses = formStickyScrollBodyClasses
 
+  const stickyScrollShellClasses =
+    stickyChrome && !externalFooter
+      ? formStickyScrollShellWithDockedFooterClasses
+      : formStickyScrollShellClasses
+
   const columnBody =
     stickyChrome && !externalFooter ? (
-      <div className={formStickyScrollShellClasses}>
+      <div className={stickyScrollShellClasses}>
         <div className={scrollBodyClasses}>{scrollableBody}</div>
         {footerRegion}
       </div>
@@ -284,9 +290,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   const defaultLayout =
     aside && !externalFooter ? (
       <div className={formTabbedAsideGridClasses}>
-        <div
-          className={cn(formTabbedAsideBodyClasses, stickyChrome && formStickyScrollShellClasses)}
-        >
+        <div className={cn(formTabbedAsideBodyClasses, stickyChrome && stickyScrollShellClasses)}>
           {stickyChrome ? (
             <>
               <div className={scrollBodyClasses}>{scrollableBody}</div>

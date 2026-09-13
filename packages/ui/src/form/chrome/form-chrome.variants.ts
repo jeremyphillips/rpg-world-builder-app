@@ -101,12 +101,42 @@ export const formTabbedChromeRhythmStackClasses = 'gap-4'
 export const formStickyActionsBarClasses =
   'sticky bottom-0 z-20 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
 
-/** Docked actions bar — flex-column footer below a bounded scroll body (content forms). */
-export const formDockedActionsBarClasses =
-  'z-20 shrink-0 border-t border-border bg-background pt-4 pb-4 supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm'
+/**
+ * Standard docked actions bar vertical footprint (single control row, no validation
+ * summary). SSOT for docked footer geometry and {@link RPG_CONTENT_BOTTOM_INSET_VAR}.
+ */
+export const RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR = '--rpg-form-docked-actions-bar-block-size'
+
+export const formDockedActionsBarBlockSizeContractClasses = cn(
+  `[${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR}:4.5rem]`,
+)
+
+/**
+ * Standard bottom viewport space reserved by surrounding chrome. Bounded inner panels
+ * may subtract this from viewport-relative fallback caps — not remaining content height.
+ */
+export const RPG_CONTENT_BOTTOM_INSET_VAR = '--rpg-content-bottom-inset'
 
 /** Column shell for sticky chrome — pairs scroll body with a docked footer. */
 export const formStickyScrollShellClasses = 'flex min-h-0 flex-1 flex-col'
+
+/**
+ * Sticky-chrome shell that docks a standard actions bar below the scroll body.
+ * Publishes {@link RPG_CONTENT_BOTTOM_INSET_VAR} for viewport-relative bounded panels.
+ */
+export const formStickyScrollShellWithDockedFooterClasses = cn(
+  formStickyScrollShellClasses,
+  formDockedActionsBarBlockSizeContractClasses,
+  `[${RPG_CONTENT_BOTTOM_INSET_VAR}:var(${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR})]`,
+)
+
+/** Docked actions bar — flex-column footer below a bounded scroll body (content forms). */
+export const formDockedActionsBarClasses = cn(
+  formDockedActionsBarBlockSizeContractClasses,
+  'z-20 box-border shrink-0 border-t border-border bg-background supports-[backdrop-filter]:bg-background/95 supports-[backdrop-filter]:backdrop-blur-sm',
+  `min-h-[var(${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR})]`,
+  'flex flex-col justify-center py-4',
+)
 
 /** Scrollable field column when the footer is docked below it. */
 export const formStickyScrollBodyClasses = dialogPanelScrollRegionClasses

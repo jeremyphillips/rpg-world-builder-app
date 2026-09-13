@@ -28,6 +28,17 @@ across overlay scrollbar platforms.
 | [`previewRailScrollRegionShellClasses`](../src/components/preview-rail/preview-rail.variants.ts) | `min-h-0 flex-1` via [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx) |
 | [`formStickyScrollBodyClasses`](../src/form/chrome/form-chrome.variants.ts)                      | re-exports `dialogPanelScrollRegionClasses`                                                           |
 
+## Environmental bottom inset
+
+Sticky-chrome forms with a docked footer use `formStickyScrollShellWithDockedFooterClasses` to
+publish `--rpg-content-bottom-inset` (derived from the standard docked actions bar block-size
+contract). Bounded inner panels may subtract it from viewport-relative fallback `max-height` caps.
+It communicates standard bottom viewport space reserved by surrounding chrome — not remaining
+content height, and not dynamic footer growth (validation summaries may exceed the reserved
+footprint).
+
+Dashboard master-detail list scroll (`master-detail-list-scroll-viewport-cap`) is one consumer.
+
 ## Scroll boundary shadows
 
 [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx)

@@ -130,8 +130,7 @@ describe('MasterDetailListPanel', () => {
 
     const scrollRegion = document.querySelector('[data-master-detail-list-scroll]')
     expect(scrollRegion).toBeInTheDocument()
-    expect(scrollRegion).toHaveClass('overflow-y-auto')
-    expect(scrollRegion?.className).toContain('var(--master-detail-list-max-block-size)')
+    expect(scrollRegion).toHaveClass('overflow-y-auto', 'master-detail-list-scroll-viewport-cap')
     expect(scrollRegion).not.toContainElement(screen.getByRole('button', { name: /Add feature/i }))
     expect(scrollRegion).not.toContainElement(screen.getByText('2 available'))
   })

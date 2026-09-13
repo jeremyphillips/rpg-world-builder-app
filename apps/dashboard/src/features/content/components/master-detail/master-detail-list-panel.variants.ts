@@ -69,6 +69,5 @@ export const masterDetailListCountSupplementClasses = cn(
 /** Scrollable item-list body — consumes `--master-detail-list-max-block-size` from the grid. */
 export const masterDetailListScrollClasses = cn(
   boundedScrollRegionClasses,
-  'max-h-[min(var(--master-detail-list-max-block-size),40dvh)]',
-  'md:max-h-[min(var(--master-detail-list-max-block-size),70dvh)]',
+  'master-detail-list-scroll-viewport-cap',
 )

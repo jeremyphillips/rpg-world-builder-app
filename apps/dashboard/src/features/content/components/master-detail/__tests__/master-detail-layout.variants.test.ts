@@ -12,8 +12,9 @@ describe('master-detail layout variants', () => {
 
   it('consumes the list max-block-size token without restating the raw length', () => {
     expect(masterDetailListScrollClasses).toContain('overflow-y-auto')
-    expect(masterDetailListScrollClasses).toContain('var(--master-detail-list-max-block-size)')
+    expect(masterDetailListScrollClasses).toContain('master-detail-list-scroll-viewport-cap')
     expect(masterDetailListScrollClasses).not.toContain('28rem')
+    expect(masterDetailListScrollClasses).not.toContain('70dvh')
   })
 
   it('keeps the detail shell content-sized', () => {

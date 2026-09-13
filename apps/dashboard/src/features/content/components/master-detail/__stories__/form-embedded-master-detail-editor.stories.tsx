@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
-
+import { Button } from '@rpg/ui'
 import type { FormItem } from '@rpg/ui/form'
+import {
+  formDockedActionsBarClasses,
+  formStickyScrollBodyClasses,
+  formStickyScrollShellWithDockedFooterClasses,
+} from '@rpg/ui/form'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { FormEmbeddedMasterDetailEditor } from '../form-embedded-master-detail-editor'
@@ -88,6 +93,26 @@ export const ConstrainedViewport: Story = {
   render: () => (
     <div className="h-64 [--master-detail-list-max-block-size:12rem]">
       <EditorStory features={longFeatures} />
+    </div>
+  ),
+}
+
+export const WithStickyFormFooter: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: () => (
+    <div className="flex h-[32rem] min-h-0 flex-col overflow-hidden bg-background">
+      <div className={formStickyScrollShellWithDockedFooterClasses}>
+        <div className={formStickyScrollBodyClasses}>
+          <div className="p-6">
+            <EditorStory features={longFeatures} />
+          </div>
+        </div>
+        <div className={formDockedActionsBarClasses}>
+          <div className="flex justify-end px-6">
+            <Button type="button">Save changes</Button>
+          </div>
+        </div>
+      </div>
     </div>
   ),
 }

@@ -20,7 +20,7 @@ import {
 import { assertOptionalDisclosureFieldConfigs } from '../config/optional-disclosure-config.lib'
 import type { FormValidationPresentation } from '../context/form-ui.context'
 import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
-import { formStickyScrollShellClasses } from '../chrome/form-chrome.variants'
+import { formStickyScrollShellWithDockedFooterClasses } from '../chrome/form-chrome.variants'
 
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
@@ -194,7 +194,7 @@ export function Form<TFieldValues extends FieldValues>({
       )}
     >
       {stickyFooter && !externalFooter ? (
-        <div className={formStickyScrollShellClasses}>
+        <div className={formStickyScrollShellWithDockedFooterClasses}>
           <FormShellFieldStack
             formId={formId}
             fields={fields}

@@ -1,4 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Button } from '@rpg/ui'
+import {
+  formDockedActionsBarClasses,
+  formStickyScrollBodyClasses,
+  formStickyScrollShellWithDockedFooterClasses,
+} from '@rpg/ui/form'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { MasterDetailGrid } from '../master-detail-grid'
@@ -69,6 +75,42 @@ export const ConstrainedViewport: Story = {
       </div>
     ),
   ],
+  args: {
+    items: longItems,
+    selectedIndex: 0,
+    listTitle: 'Features',
+    ariaLabel: 'Features',
+    addLabel: 'Add feature',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
+    onAdd: () => {},
+    onSelect: () => {},
+    countSupplement: <span>20 available</span>,
+  },
+}
+
+export const WithStickyFormFooter: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: (args) => (
+    <div className="flex h-[32rem] min-h-0 flex-col overflow-hidden bg-background">
+      <div className={formStickyScrollShellWithDockedFooterClasses}>
+        <div className={formStickyScrollBodyClasses}>
+          <div className="p-6">
+            <MasterDetailGrid>
+              <MasterDetailListPanel {...args} />
+              <div className="self-start rounded-lg border border-border-subtle px-4 py-3 text-sm text-muted-foreground md:col-span-2">
+                Detail column stays content-sized beside the bounded list rail.
+              </div>
+            </MasterDetailGrid>
+          </div>
+        </div>
+        <div className={formDockedActionsBarClasses}>
+          <div className="flex justify-end px-6">
+            <Button type="button">Save changes</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  ),
   args: {
     items: longItems,
     selectedIndex: 0,
