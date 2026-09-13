@@ -69,6 +69,7 @@ export type FieldGroupSummaryDisclosureProps<TFieldValues extends FieldValues = 
   uiStateKey?: string
   collapseKey: string
   control: Control<TFieldValues>
+  namePrefix?: string
   children: React.ReactNode
 }
 
@@ -193,9 +194,14 @@ export function FieldGroupSummaryDisclosure<TFieldValues extends FieldValues = F
   uiStateKey,
   collapseKey,
   control,
+  namePrefix,
   children,
 }: FieldGroupSummaryDisclosureProps<TFieldValues>) {
-  const watchedValues = useSummaryDisclosureWatchedValues(control, disclosure.summaryDependsOn)
+  const watchedValues = useSummaryDisclosureWatchedValues(
+    control,
+    disclosure.summaryDependsOn,
+    namePrefix,
+  )
   const { isDirty } = useFormState({ control })
   const [open, onOpenChange] = useSummaryDisclosureOpenState({
     collapseKey,

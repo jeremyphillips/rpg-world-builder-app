@@ -27,6 +27,7 @@ export type SummaryDisclosureFieldGroupShellProps = {
   fieldChrome?: FieldChrome
   disclosure: FieldGroupSummaryDisclosure
   formControl: Control<FieldValues>
+  namePrefix?: string
   children: ReactNode
 }
 
@@ -43,6 +44,7 @@ export function SummaryDisclosureFieldGroupShell({
   fieldChrome,
   disclosure,
   formControl,
+  namePrefix,
   children,
 }: SummaryDisclosureFieldGroupShellProps) {
   const legendId = `${id ?? collapseKey}-legend`
@@ -72,6 +74,7 @@ export function SummaryDisclosureFieldGroupShell({
         uiStateKey={uiStateKey}
         collapseKey={collapseKey}
         control={formControl}
+        namePrefix={namePrefix}
       >
         {children}
       </FieldGroupSummaryDisclosureView>
