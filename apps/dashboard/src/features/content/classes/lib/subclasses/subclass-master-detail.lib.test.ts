@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { buildMasterDetailAvailabilityPresentation } from '../../../lib/master-detail/master-detail-availability.types'
-import { buildSubclassSelectedIdentity } from './subclass-editor-panel.lib'
+import { buildSubclassSelectedIdentity } from './subclass-master-detail.lib'
 
 describe('buildSubclassSelectedIdentity', () => {
   it('returns undefined when required selection state is missing', () => {

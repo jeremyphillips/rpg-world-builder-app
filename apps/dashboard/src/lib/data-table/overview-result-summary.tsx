@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import { formatOverviewResultLabel } from './overview-selection-cluster.lib'
 import {
   overviewResultSummaryDotVariants,
-  overviewResultSummaryPipeVariants,
   overviewResultSummaryVariants,
 } from './overview-result-summary.variants'
 
@@ -37,9 +36,7 @@ export function OverviewResultSummary({
       </span>
       {supplementalContent ? (
         <>
-          <span aria-hidden className={overviewResultSummaryPipeVariants()}>
-            |
-          </span>
+          <OverviewResultSummaryDotSeparator />
           {supplementalContent}
         </>
       ) : null}

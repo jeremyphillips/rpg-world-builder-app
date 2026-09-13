@@ -1,6 +1,6 @@
 import type { MasterDetailListItem } from '../../../components/master-detail/master-detail-list-panel'
 import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
-import { resolveSubclassEditorSourceLabel } from './subclass-editor-panel.lib'
+import { resolveSubclassSourceLabel } from './subclass-master-detail.lib'
 import { isDraftSubclassId, isSubclassDeletable } from './subclass-editor-constants'
 import type { SubclassListItem } from './subclass-editor-state'
 import { SUBCLASS_MASTER_DETAIL_ITEM_NOUN } from './subclass-form-labels'
@@ -28,7 +28,7 @@ export function buildSubclassMasterDetailListItem({
     title: masterDetailItemTitle(item.name, SUBCLASS_MASTER_DETAIL_ITEM_NOUN),
     meta: {
       ...(isModified ? { eyebrow: 'Modified' } : {}),
-      sourceLabel: resolveSubclassEditorSourceLabel(
+      sourceLabel: resolveSubclassSourceLabel(
         item.id,
         item.source === 'unsaved' ? 'homebrew' : item.source,
         item.source === 'unsaved' || isDraftSubclassId(item.id) ? 'draft' : 'published',

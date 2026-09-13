@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { ConfirmDialog } from '@rpg/ui'
 
-import type { ContentUsageSummaryLabels, ResolvedSubclass } from '@rpg/contracts'
+import type { ResolvedSubclass } from '@rpg/contracts'
 
 import { AvailabilityAlert, resolveAvailability } from '@/lib/availability'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -18,7 +18,7 @@ import type { SubclassEditorState } from '../hooks/use-subclass-editor-state'
 import { buildSubclassMasterDetailListItem } from '../lib/subclasses/build-subclass-master-detail-list-item'
 import { buildSubclassAvailabilityPresentations } from '../lib/subclasses/subclass-availability.lib'
 import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
-import { buildSubclassSelectedIdentity } from '../lib/subclasses/subclass-editor-panel.lib'
+import { buildSubclassSelectedIdentity } from '../lib/subclasses/subclass-master-detail.lib'
 import { SUBCLASS_MASTER_DETAIL_ITEM_NOUN } from '../lib/subclasses/subclass-form-labels'
 import type { SubclassTabGateKind } from '../lib/subclasses/subclass-tab-state.lib'
 import {
@@ -84,7 +84,6 @@ function ClassSubclassesTabBody({
   formCtx: ContentFormCtx
   editor: SubclassEditorState
   defaultFeatureLevel: number
-  usageSummaryLabels?: ContentUsageSummaryLabels
 }) {
   const {
     handleSave,
@@ -249,7 +248,7 @@ function ClassSubclassesTabBody({
           ariaLabel="Subclasses"
           addLabel="Add subclass"
           itemNoun={SUBCLASS_MASTER_DETAIL_ITEM_NOUN}
-          countSupplement={editor.listItems.length > 0 ? countSupplement : undefined}
+          countSupplement={countSupplement}
           selectedIdentity={selectedIdentity}
           onDelete={editor.selectedId ? () => handleDeleteRequest(editor.selectedId!) : undefined}
           renderDetail={({ rowId }) =>
@@ -327,7 +326,6 @@ export function ClassSubclassesTab(props: ClassSubclassesTabProps) {
         formCtx={state.formCtx}
         editor={state.editor}
         defaultFeatureLevel={state.defaultFeatureLevel}
-        usageSummaryLabels={state.usageSummaryLabels}
       />
     </CampaignAccessFormProvider>
   )

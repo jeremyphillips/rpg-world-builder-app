@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { useWatch } from 'react-hook-form'
 
-import type {
-  ContentCampaignAccessPatch,
-  ContentUsageSummaryLabels,
-  ResolvedSubclass,
-} from '@rpg/contracts'
+import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -13,14 +9,13 @@ import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access
 import { useCreateSubclass, useUpdateSubclass } from './use-subclass-mutations'
 import type { FeatureRowForm } from '../lib/class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
-import { useSubclasses, useSubclassesUsageMeta } from './use-subclasses'
+import { useSubclasses } from './use-subclasses'
 import { useSubclassEditorState, type SubclassEditorState } from './use-subclass-editor-state'
 import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
 import type { SubclassFormValues } from '../lib/subclasses/subclass-form-fields'
 import {
   resolveDefaultFeatureLevel,
   resolveSubclassTabGate,
-  resolveSubclassUsageMetaQuery,
   type SubclassTabGateKind,
   type SubclassTabMode,
 } from '../lib/subclasses/subclass-tab-state.lib'
@@ -53,7 +48,6 @@ export type ClassSubclassesTabBodyState = {
   formCtx: ContentFormCtx
   editor: SubclassEditorState
   defaultFeatureLevel: number
-  usageSummaryLabels?: ContentUsageSummaryLabels
 }
 
 export type ClassSubclassesTabState = ClassSubclassesTabGateState | ClassSubclassesTabBodyState
@@ -91,11 +85,6 @@ export function useClassSubclassesTabState(
     classId,
     subclassesOverride,
   )
-  const usageMetaQuery = resolveSubclassUsageMetaQuery(mode, campaignId, classId)
-  const { data: usageMeta } = useSubclassesUsageMeta(
-    usageMetaQuery.campaignId,
-    usageMetaQuery.classId,
-  )
   const editor = useSubclassEditorState(classId, subclasses)
 
   const gate = resolveSubclassTabGate({
@@ -121,7 +110,6 @@ export function useClassSubclassesTabState(
     formCtx,
     editor,
     defaultFeatureLevel,
-    usageSummaryLabels: usageMeta?.usageSummaryLabels,
   }
 }
 

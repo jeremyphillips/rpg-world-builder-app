@@ -3527,15 +3527,6 @@
       "variantForms": ["singular"]
     },
     {
-      "path": "apps/dashboard/src/features/content/classes/components/subclass-list-panel.stories.tsx",
-      "line": 7,
-      "column": 10,
-      "context": "story_fixture",
-      "disposition": "unknown",
-      "value": "Content/Classes/SubclassListPanel",
-      "variantForms": ["derived_collection_label"]
-    },
-    {
       "path": "apps/dashboard/src/features/content/classes/hooks/use-classes.ts",
       "line": 4,
       "column": 29,

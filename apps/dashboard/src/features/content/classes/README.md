@@ -12,7 +12,7 @@ Delete-locking is **derived** because class features have no per-feature `source
 
 The **Character creation** tab edits optional `characterCreation.startingEquipment`: a schema-driven intro group (legend + description in field-container chrome) above a master-detail package list. Packages (`standard`, `gold`, `heavy`, etc.) carry **granted** items (`kind: 'grant'` — specific gear received automatically), **choice** items (`kind: 'choice'` — player picks from a pool), wealth grants, and spellcasting focus modifiers. See `grantedEquipmentItemSchema` in `@rpg/contracts` for the discriminant vocabulary. Packages stay fully editable on system classes (no delete lock). Authors add packages via **Add package**; no default rows are seeded.
 
-The **Subclasses** tab uses a list + editor layout: subclasses load from the nested API (system + homebrew + patches), each row has an **Active in campaign** toggle (dedicated availability PATCH), and **Save subclass** persists the full body via nested POST/PATCH. Homebrew rows delete through the shared deletion flow (`409` when characters reference the subclass). Authoring is gated until the class is saved and until the **Features** tab includes the explicit subclass-choice feature.
+The **Subclasses** tab uses the shared [`NestedResourceMasterDetailEditor`](../components/master-detail/nested-resource-master-detail-editor.tsx): subclasses load from the nested API (system + homebrew + patches), broad campaign availability + **Change** live in the detail shell, and **Save subclass** persists the full body via nested POST/PATCH. Homebrew rows delete through the detail overflow menu and shared deletion flow (`409` when characters reference the subclass). Authoring is gated until the class is saved and until the **Features** tab includes the explicit subclass-choice feature.
 
 ## Key files
 
@@ -37,12 +37,12 @@ The **Subclasses** tab uses a list + editor layout: subclasses load from the nes
 
 ## Components layout
 
-| Area                      | Path                                                                         |
-| ------------------------- | ---------------------------------------------------------------------------- |
-| Form tab shells           | `components/class-*-tab.tsx` (root)                                          |
-| Detail presentation       | `components/detail/` — progression table, proficiencies section, feature row |
-| Character creation UI     | `components/character-creation/` — link cues, ability-score ordering         |
-| Subclass master-detail UI | `components/subclasses/` — list/editor panels, gates, delete dialog          |
+| Area                      | Path                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Form tab shells           | `components/class-*-tab.tsx` (root)                                                                     |
+| Detail presentation       | `components/detail/` — progression table, proficiencies section, feature row                            |
+| Character creation UI     | `components/character-creation/` — link cues, ability-score ordering                                    |
+| Subclass master-detail UI | `components/subclasses/` — detail body, gates, delete dialog; shared `NestedResourceMasterDetailEditor` |
 
 Proficiency-linked grant labels and the generic link cue live in [`content/lib/forms/grants/`](../../lib/forms/grants/). Class form paths and navigation targets stay in `lib/character-creation/class-character-creation-link-labels.ts`; the class-specific row cue is injected into shared grant fields via `renderProficiencyLinkedGrantCue`.
 

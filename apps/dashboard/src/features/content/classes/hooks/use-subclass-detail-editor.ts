@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { makeResolver } from '@rpg/ui/form'
 import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
@@ -14,7 +14,7 @@ import { isSubclassFormValuesLike } from '../lib/subclasses/subclass-form-value-
 import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
 import { subclassFormDef } from '../lib/subclasses/subclass-form-values'
 
-type UseSubclassEditorPanelOptions = {
+type UseSubclassDetailEditorOptions = {
   subclassId: string
   entity?: ResolvedSubclass
   defaultValues: SubclassFormValues
@@ -30,7 +30,7 @@ type UseSubclassEditorPanelOptions = {
   ) => Promise<void>
 }
 
-export function useSubclassEditorPanel({
+export function useSubclassDetailEditor({
   subclassId,
   entity,
   defaultValues,
@@ -41,7 +41,7 @@ export function useSubclassEditorPanel({
   onValuesChange,
   onAvailabilityChange,
   onSave,
-}: UseSubclassEditorPanelOptions) {
+}: UseSubclassDetailEditorOptions) {
   const campaignAccessForm = useCampaignAccessForm()
   const fields = buildSubclassFields(formCtx, { defaultFeatureLevel })
   const nameFieldItem = fields[0]
@@ -78,8 +78,6 @@ export function useSubclassEditorPanel({
     defaultValues,
     mode: 'onSubmit',
   })
-
-  const watchedName = useWatch({ control: form.control, name: 'name' })
 
   useEffect(() => {
     const subscription = form.watch((values) => {
@@ -123,7 +121,6 @@ export function useSubclassEditorPanel({
     nameFieldItem,
     bodyFields: fields.slice(1),
     campaignAccess,
-    watchedName,
     handleCampaignAccessDraft,
     handleCampaignAccessPersisted,
     handleSave,

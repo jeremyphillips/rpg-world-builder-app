@@ -5,11 +5,12 @@ import {
   formatHiddenUnavailableNotice,
   formatNoAvailableMatchesLabel,
   formatUnavailableMatchesLine,
-} from '../campaign-access/campaign-access-table-labels'
+} from './campaign-access-table-labels'
 
 describe('campaign-access-table-labels', () => {
-  it('formats availability count summaries for master-detail rails', () => {
-    expect(formatAvailabilityCountSummary(13, 0)).toBe('13 available · 0 unavailable')
+  it('formats zero-suppressed availability bucket summaries', () => {
+    expect(formatAvailabilityCountSummary(13, 0)).toBe('13 available')
+    expect(formatAvailabilityCountSummary(0, 2)).toBe('2 unavailable')
     expect(formatAvailabilityCountSummary(1, 1)).toBe('1 available · 1 unavailable')
   })
 

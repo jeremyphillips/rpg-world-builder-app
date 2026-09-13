@@ -1,5 +1,6 @@
 import { Button, InlineInactiveStatus } from '@rpg/ui'
 
+import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary'
 import { CAMPAIGN_ACCESS_CHANGE_LABEL } from '../../lib/campaign-access/campaign-access-labels'
 import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
 import {
@@ -39,6 +40,7 @@ export function MasterDetailAvailabilityHeaderLine({
           <InlineInactiveStatus label={availability.statusLabel} />
         )}
       </span>
+      <OverviewResultSummaryDotSeparator />
       <Button
         type="button"
         variant="link"

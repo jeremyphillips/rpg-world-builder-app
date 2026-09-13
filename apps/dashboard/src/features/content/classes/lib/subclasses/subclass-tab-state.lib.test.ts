@@ -1,31 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import type { FeatureRowForm } from '../class-feature-form-fields'
-import {
-  resolveDefaultFeatureLevel,
-  resolveSubclassTabGate,
-  resolveSubclassUsageMetaQuery,
-} from './subclass-tab-state.lib'
+import { resolveDefaultFeatureLevel, resolveSubclassTabGate } from './subclass-tab-state.lib'
 
 function subclassChoiceFeature(level = 3): FeatureRowForm {
   return { name: 'Subclass', level, grants: [] }
 }
-
-describe('resolveSubclassUsageMetaQuery', () => {
-  it('enables usage meta only in edit mode with campaign and class ids', () => {
-    expect(resolveSubclassUsageMetaQuery('edit', 'campaign-1', 'class-1')).toEqual({
-      campaignId: 'campaign-1',
-      classId: 'class-1',
-    })
-  })
-
-  it('disables usage meta in create mode', () => {
-    expect(resolveSubclassUsageMetaQuery('create', 'campaign-1', 'class-1')).toEqual({
-      campaignId: undefined,
-      classId: undefined,
-    })
-  })
-})
 
 describe('resolveSubclassTabGate', () => {
   it('returns create when mode is create or ids are missing', () => {

@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 import { cn } from '@rpg/ui'
 
 export const masterDetailAvailabilityHeaderLineClasses =
-  'flex items-center justify-between gap-3 text-xs'
+  'flex flex-wrap items-center gap-x-1 text-xs'
 
 export const masterDetailAvailabilityHeaderStatusClasses = 'min-w-0 flex items-center gap-1.5'
 

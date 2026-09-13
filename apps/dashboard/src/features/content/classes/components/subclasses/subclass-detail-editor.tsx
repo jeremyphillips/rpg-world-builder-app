@@ -5,7 +5,7 @@ import { FormItems } from '@rpg/ui/form'
 import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { useSubclassEditorPanel } from '../../hooks/use-subclass-editor-panel'
+import { useSubclassDetailEditor } from '../../hooks/use-subclass-detail-editor'
 import type { SubclassFormValues } from '../../lib/subclasses/subclass-form-fields'
 import { isDraftSubclassId } from '../../lib/subclasses/subclass-editor-constants'
 import { SubclassEditorCampaignAccessField } from './subclass-editor-campaign-access-field'
@@ -33,7 +33,7 @@ export interface SubclassDetailEditorProps {
 
 export function SubclassDetailEditor(props: SubclassDetailEditorProps) {
   const { subclassId, classId, campaignId, savePending = false, campaignAccessDialogRef } = props
-  const panel = useSubclassEditorPanel(props)
+  const panel = useSubclassDetailEditor(props)
 
   return (
     <FormProvider {...panel.form}>

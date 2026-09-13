@@ -8,11 +8,14 @@ import {
   CAMPAIGN_ACCESS_TABLE_HIDE_LABEL,
   CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL,
   CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL,
-  formatAvailabilityCountSummary,
   formatHideUnavailableAriaLabel,
   formatShowAllCampaignAvailabilityAriaLabel,
   formatShowUnavailableAriaLabel,
 } from './campaign-access-table-labels'
+import {
+  joinAvailabilityCountSummarySegments,
+  resolveAvailabilityCountSummaryParts,
+} from './availability-count-summary.lib'
 
 export type AvailabilityCountSupplementLayout = 'stable' | 'conditional'
 
@@ -83,29 +86,34 @@ function AvailabilityCountSupplementActions({
   )
 }
 
-/** Shared available/unavailable count row with optional Show/Hide affordance. */
+/** Shared unavailable-count row with optional Show/Hide affordance. */
 export function buildAvailabilityCountSupplement(
   options: BuildAvailabilityCountSupplementOptions,
 ): ReactNode {
-  const { scope, showUnavailable, onShow, onHide, layout, actionVariant, pluralNoun } = options
+  const { scope, showUnavailable, onShow, onHide, actionVariant, pluralNoun } = options
+  const totalCount = scope.availableCount + scope.unavailableCount
+  const summaryParts = resolveAvailabilityCountSummaryParts({
+    totalCount,
+    unavailableCount: scope.unavailableCount,
+  })
 
-  if (layout === 'conditional' && scope.unavailableCount === 0) {
-    return null
-  }
+  if (!summaryParts) return null
 
-  const countLine = formatAvailabilityCountSummary(scope.availableCount, scope.unavailableCount)
+  const countLine = joinAvailabilityCountSummarySegments(summaryParts.segments)
 
   return (
     <>
       <span>{countLine}</span>
-      <AvailabilityCountSupplementActions
-        showUnavailable={showUnavailable}
-        unavailableCount={scope.unavailableCount}
-        onShow={onShow}
-        onHide={onHide}
-        actionVariant={actionVariant}
-        pluralNoun={pluralNoun}
-      />
+      {summaryParts.showUnavailableToggle ? (
+        <AvailabilityCountSupplementActions
+          showUnavailable={showUnavailable}
+          unavailableCount={scope.unavailableCount}
+          onShow={onShow}
+          onHide={onHide}
+          actionVariant={actionVariant}
+          pluralNoun={pluralNoun}
+        />
+      ) : null}
     </>
   )
 }

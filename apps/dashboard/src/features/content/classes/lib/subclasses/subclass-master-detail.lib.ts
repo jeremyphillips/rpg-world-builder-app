@@ -16,7 +16,7 @@ const SOURCE_BADGE_LABEL = {
   unsaved: 'Unsaved',
 } as const
 
-export function resolveSubclassEditorSourceLabel(
+export function resolveSubclassSourceLabel(
   subclassId: string,
   source: ContentSource,
   status: ContentStatus,
@@ -83,7 +83,7 @@ export function buildSubclassSelectedIdentity({
     title: resolveSubclassDisplayName(selectedValues, selectedListItem),
     meta: {
       ...(modifiedIds.has(selectedId) ? { eyebrow: 'Modified' } : {}),
-      sourceLabel: resolveSubclassEditorSourceLabel(selectedId, source, status),
+      sourceLabel: resolveSubclassSourceLabel(selectedId, source, status),
     },
     deletable: isSubclassDeletable(source, selectedId),
     availability: selectedAvailability,
