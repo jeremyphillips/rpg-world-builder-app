@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import type { FeatureRowForm } from '../class-feature-form-fields'
+import type { SubclassFeatureRowForm } from '../class-feature-form-fields'
 import { resolveDefaultFeatureLevel, resolveSubclassTabGate } from './subclass-tab-state.lib'
 
-function subclassChoiceFeature(level = 3): FeatureRowForm {
+function subclassChoiceFeature(level = 3): SubclassFeatureRowForm {
   return { name: 'Subclass', level, grants: [] }
 }
 

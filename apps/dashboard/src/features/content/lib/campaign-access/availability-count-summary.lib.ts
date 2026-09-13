@@ -50,8 +50,8 @@ export function formatAvailabilityCountSummary(
 }
 
 /**
- * Shared availability supplement semantics for master-detail rails and data tables.
- * Omits the summary entirely for empty collections and when no unavailable rows exist.
+ * Overview / conditional supplement — omits implied availability; unavailable-only copy.
+ * Omits the summary for empty collections and when no unavailable rows exist.
  */
 export function resolveAvailabilityCountSummaryParts(input: {
   totalCount: number
@@ -65,6 +65,26 @@ export function resolveAvailabilityCountSummaryParts(input: {
   return {
     segments: [unavailable],
     showUnavailableToggle: true,
+  }
+}
+
+/**
+ * Master-detail stable supplement — pair counts with zero-bucket suppression.
+ * Renders nothing for an empty collection.
+ */
+export function resolveStableMasterDetailCountSummaryParts(input: {
+  availableCount: number
+  unavailableCount: number
+}): AvailabilityCountSummaryParts | null {
+  const totalCount = input.availableCount + input.unavailableCount
+  if (totalCount <= 0) return null
+
+  const summary = formatAvailabilityCountSummary(input.availableCount, input.unavailableCount)
+  if (!summary) return null
+
+  return {
+    segments: [summary],
+    showUnavailableToggle: input.unavailableCount > 0,
   }
 }
 

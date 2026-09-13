@@ -7,19 +7,26 @@ import { OverviewResultSummary } from '@/lib/data-table/overview-result-summary'
 import { buildAvailabilityCountSupplement } from './availability-count-supplement'
 
 describe('buildAvailabilityCountSupplement', () => {
-  it('omits the summary when all rows are available', () => {
+  it('renders available-only copy for stable master-detail rails', () => {
+    render(
+      <>
+        {buildAvailabilityCountSupplement({
+          scope: { availableCount: 13, unavailableCount: 0, visibleCount: 13 },
+          showUnavailable: false,
+          layout: 'stable',
+          onShow: vi.fn(),
+          onHide: vi.fn(),
+        })}
+      </>,
+    )
+
+    expect(screen.getByText('13 available')).toBeInTheDocument()
     expect(
-      buildAvailabilityCountSupplement({
-        scope: { availableCount: 13, unavailableCount: 0, visibleCount: 13 },
-        showUnavailable: false,
-        layout: 'stable',
-        onShow: vi.fn(),
-        onHide: vi.fn(),
-      }),
+      screen.queryByRole('button', { name: 'Show all campaign availability states' }),
     ).toBeNull()
   })
 
-  it('renders hidden unavailable copy with Show for master-detail rails', () => {
+  it('renders mixed pair counts with Show for master-detail rails', () => {
     render(
       <>
         {buildAvailabilityCountSupplement({
@@ -32,8 +39,7 @@ describe('buildAvailabilityCountSupplement', () => {
       </>,
     )
 
-    expect(screen.getByText('1 unavailable')).toBeInTheDocument()
-    expect(screen.queryByText(/^\d+ available$/)).not.toBeInTheDocument()
+    expect(screen.getByText('13 available · 1 unavailable')).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Show all campaign availability states' }),
     ).toBeInTheDocument()
@@ -71,7 +77,7 @@ describe('buildAvailabilityCountSupplement', () => {
       </>,
     )
 
-    expect(screen.getByText('1 unavailable')).toBeInTheDocument()
+    expect(screen.getByText('13 available · 1 unavailable')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Hide unavailable items' }))
     expect(onHide).toHaveBeenCalledOnce()
   })

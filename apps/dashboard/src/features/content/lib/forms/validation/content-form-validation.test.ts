@@ -349,7 +349,7 @@ describe('embedded content sub-forms validation', () => {
     const fields = classFeatureItemFields(ctx)
     assertFieldPathsRegistered(fields)
     assertRegistryCoverage(schema, fields, {
-      exemptPaths: [...SERVER_ROW_EXEMPT, ...GRANT_NESTED_EXEMPT],
+      exemptPaths: [...SERVER_ROW_EXEMPT, ...GRANT_NESTED_EXEMPT, 'available'],
     })
     assertInvalidSubmitUsesRefinedMessages(schema, fields, {
       invalidValue: { name: '', level: 1, grants: [] },

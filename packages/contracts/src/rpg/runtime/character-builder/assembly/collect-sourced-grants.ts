@@ -1,3 +1,4 @@
+import { classFeaturesUnlockedAtLevel } from '../../../content/classes/class-feature-availability'
 import type { CharacterClass } from '../../../content/classes/class'
 import type { ContentGrant, GrantGroupSource } from '../../../content/lib/grants'
 import {
@@ -62,16 +63,14 @@ function classFeatureGrants(
   characterClass: CharacterClass,
   characterLevel: number,
 ): SourcedContentGrant[] {
-  return characterClass.features.flatMap((feature) => {
-    if (feature.level > characterLevel) return []
-
-    return traitSourcedGrants(
+  return classFeaturesUnlockedAtLevel(characterClass.features, characterLevel).flatMap((feature) =>
+    traitSourcedGrants(
       feature,
       [{ kind: 'classFeature', sourceId: characterClass.id, grantId: feature.id }],
       characterLevel,
       feature.level,
-    )
-  })
+    ),
+  )
 }
 
 /** Returns unlocked grants from species traits, heritage, and class features. */

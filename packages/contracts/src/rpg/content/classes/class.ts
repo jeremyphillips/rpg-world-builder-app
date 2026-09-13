@@ -74,6 +74,29 @@ export const classFeatureSchema = z.preprocess(
 
 export type ClassFeature = z.infer<typeof classFeatureSchema>
 
+const classBodyFeatureAvailabilityFields = {
+  available: z.boolean().optional(),
+} as const
+
+const classBodyCustomFeatureSchema = customClassFeatureSchema.extend(
+  classBodyFeatureAvailabilityFields,
+)
+
+const classBodySubclassChoiceFeatureSchema = subclassChoiceClassFeatureSchema.extend(
+  classBodyFeatureAvailabilityFields,
+)
+
+/** Class-body feature — class feature shape plus optional campaign availability. */
+export const classBodyFeatureSchema = z.preprocess(
+  normalizeContentTrait,
+  z.discriminatedUnion('kind', [
+    classBodyCustomFeatureSchema,
+    classBodySubclassChoiceFeatureSchema,
+  ]),
+)
+
+export type ClassBodyFeature = z.infer<typeof classBodyFeatureSchema>
+
 /** Subclass features share the class feature shape (level + optional grants). */
 export const subclassFeatureSchema = classFeatureSchema
 
@@ -128,7 +151,7 @@ export const classStoredBodySchema = contentBodyBaseSchema.extend({
   hitDie: hitDieSchema,
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesSchema,
-  features: z.array(classFeatureSchema),
+  features: z.array(classBodyFeatureSchema),
   resources: z.array(classResourceSchema).optional(),
   characterCreation: classCharacterCreationSchema.optional(),
 })
@@ -143,7 +166,7 @@ export const classBodyDraftSchema = draftAuthoredContentBodySchema(
   hitDie: hitDieSchema.optional(),
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesDraftSchema.optional(),
-  features: z.array(classFeatureSchema).default([]),
+  features: z.array(classBodyFeatureSchema).default([]),
   resources: z.array(classResourceSchema).optional(),
   characterCreation: classCharacterCreationDraftSchema.optional(),
 })
@@ -185,7 +208,7 @@ export type ClassListItem = z.infer<typeof classListItemSchema>
 
 type ClassSubclassChoiceFeatureSource = {
   slug: string
-  features: readonly ClassFeature[]
+  features: readonly ClassBodyFeature[]
 }
 
 /** Finds the explicit feature row that marks when a class chooses a subclass. */

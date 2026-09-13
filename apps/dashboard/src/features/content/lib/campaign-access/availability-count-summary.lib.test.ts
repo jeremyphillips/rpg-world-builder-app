@@ -5,6 +5,7 @@ import {
   formatDataTableCountSummary,
   joinAvailabilityCountSummarySegments,
   resolveAvailabilityCountSummaryParts,
+  resolveStableMasterDetailCountSummaryParts,
 } from './availability-count-summary.lib'
 
 describe('formatAvailabilityCountSummary', () => {
@@ -38,6 +39,41 @@ describe('resolveAvailabilityCountSummaryParts', () => {
   it('returns plural unavailable copy for all-unavailable collections', () => {
     expect(resolveAvailabilityCountSummaryParts({ totalCount: 5, unavailableCount: 5 })).toEqual({
       segments: ['5 unavailable'],
+      showUnavailableToggle: true,
+    })
+  })
+})
+
+describe('resolveStableMasterDetailCountSummaryParts', () => {
+  it('returns null for an empty collection', () => {
+    expect(
+      resolveStableMasterDetailCountSummaryParts({ availableCount: 0, unavailableCount: 0 }),
+    ).toBeNull()
+  })
+
+  it('returns available-only copy when every row is available', () => {
+    expect(
+      resolveStableMasterDetailCountSummaryParts({ availableCount: 3, unavailableCount: 0 }),
+    ).toEqual({
+      segments: ['3 available'],
+      showUnavailableToggle: false,
+    })
+  })
+
+  it('returns unavailable-only copy when every row is unavailable', () => {
+    expect(
+      resolveStableMasterDetailCountSummaryParts({ availableCount: 0, unavailableCount: 2 }),
+    ).toEqual({
+      segments: ['2 unavailable'],
+      showUnavailableToggle: true,
+    })
+  })
+
+  it('joins mixed non-zero buckets', () => {
+    expect(
+      resolveStableMasterDetailCountSummaryParts({ availableCount: 3, unavailableCount: 2 }),
+    ).toEqual({
+      segments: ['3 available · 2 unavailable'],
       showUnavailableToggle: true,
     })
   })

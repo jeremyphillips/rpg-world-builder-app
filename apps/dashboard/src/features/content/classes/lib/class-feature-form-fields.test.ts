@@ -4,6 +4,7 @@ import {
   createFeatureRowFormSchema,
   featureFromFormRow,
   featureToFormRow,
+  subclassFeatureFromFormRow,
   formatFeatureRowSummary,
 } from './class-feature-form-fields'
 import { GRANT_DEFAULT_UNLOCK_LEVEL } from '../../lib/forms/grants/grant-form-schema'
@@ -21,12 +22,38 @@ describe('class feature form round-trip', () => {
     expect(featureFromFormRow({ ...row, id: feature.id }).kind).toBe('subclass-choice')
   })
 
+  it('omits available from subclass feature save', () => {
+    const row = {
+      id: 'improved-critical',
+      name: 'Improved Critical',
+      level: 3,
+      grants: [],
+      available: false,
+    }
+    expect(subclassFeatureFromFormRow(row)).not.toHaveProperty('available')
+  })
+
+  it('persists available false on class feature save and omits when true', () => {
+    const row = {
+      id: 'second-wind',
+      name: 'Second Wind',
+      level: 1,
+      grants: [],
+      available: false,
+    }
+    expect(featureFromFormRow(row).available).toBe(false)
+
+    const availableRow = { ...row, available: true }
+    expect(featureFromFormRow(availableRow)).not.toHaveProperty('available')
+  })
+
   it('defaults missing kind to custom on save', () => {
     const row = {
       id: 'second-wind',
       name: 'Second Wind',
       level: 1,
       grants: [],
+      available: true,
     }
     expect(featureFromFormRow(row).kind).toBe('custom')
   })

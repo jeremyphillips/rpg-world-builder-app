@@ -150,9 +150,11 @@ from the detail overflow menu.
 
 Scope notes:
 
-- Embedded array rows (class features, species traits/heritage) inherit campaign
-  access from their parent content type — no per-row campaign access UI yet (contract/API
-  gate; do not fake local-only availability on those rows).
+- Class **Features** support per-row campaign availability (`available` on
+  `classBodyFeatureSchema`, saved with the class). Opt in via
+  `FormEmbeddedMasterDetailEditor` `availability={{ fieldName: 'available' }}`.
+- Other embedded arrays (species traits/heritage, starting-equipment packages) still
+  inherit parent access — no per-row availability UI yet.
 - Subclass campaign access is persisted via the shared `ContentCampaignAccessModel`.
   Subclasses use `NestedResourceMasterDetailEditor` with shared master-detail
   availability primitives: stable rail counts + default-hide unavailable rows,

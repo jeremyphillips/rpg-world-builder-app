@@ -9,7 +9,7 @@ import { ClassFeaturesTab } from './class-features-tab'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
   const { stubUiFormItems } = await import('@/test/mocks/ui-form')
-  return stubUiFormItems(importOriginal, 'feature-detail')
+  return stubUiFormItems(importOriginal)
 })
 
 type Feature = {
@@ -19,6 +19,7 @@ type Feature = {
   level: number
   description: string
   grants: never[]
+  available?: boolean
 }
 
 function TabShell({
@@ -71,7 +72,7 @@ describe('ClassFeaturesTab', () => {
         name: /Unnamed Feature/i,
       }),
     ).toBeInTheDocument()
-    expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.0')
+    expect(screen.getAllByText('features.0').length).toBeGreaterThan(0)
   })
 
   it('renders structured meta for each row', () => {
@@ -90,7 +91,7 @@ describe('ClassFeaturesTab', () => {
         name: /Unarmored Defense/i,
       }),
     )
-    expect(screen.getByTestId('feature-detail')).toHaveTextContent('features.1')
+    expect(screen.getAllByText('features.1').length).toBeGreaterThan(0)
   })
 
   it('confirms deletion through the dialog and removes the row', async () => {
@@ -127,6 +128,19 @@ describe('ClassFeaturesTab', () => {
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
 
     expect(screen.getByRole('button', { name: /Actions for Unnamed Feature/i })).toBeInTheDocument()
+  })
+
+  it('renders stable availability counts on the list rail', () => {
+    render(<TabShell features={[rage, { ...unarmored, id: 'f2', available: false }]} />)
+
+    expect(screen.getByText('1 available · 1 unavailable')).toBeInTheDocument()
+  })
+
+  it('renders broad availability and Change on the selected feature header', () => {
+    render(<TabShell features={[rage]} />)
+
+    expect(screen.getAllByText('Available').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
   })
 
   it('shows availability alert for subclass-choice rows when subclassing is disabled', () => {

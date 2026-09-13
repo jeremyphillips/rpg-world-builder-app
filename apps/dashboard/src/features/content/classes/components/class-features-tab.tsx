@@ -34,7 +34,10 @@ export interface ClassFeaturesTabProps {
 export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
   const fields = useMemo(() => classFeatureItemFields(formCtx), [formCtx])
   const campaignRules = campaignRulesFromCtx(formCtx)
-  const makeItemDefaults = useCallback(() => buildItemDefaultValues(fields), [fields])
+  const makeItemDefaults = useCallback(
+    () => ({ ...buildItemDefaultValues(fields), available: true }),
+    [fields],
+  )
   const editor = useMasterDetailArray(FEATURES_FIELD_NAME, makeItemDefaults)
 
   const previousFieldsLengthRef = useRef(editor.fields.length)
@@ -110,6 +113,7 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
         eyebrow: featureItemEyebrow(row as FeatureRowForm | undefined),
       })}
       resolveRowReasons={resolveRowReasons}
+      availability={{ fieldName: 'available' }}
     />
   )
 }

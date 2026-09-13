@@ -1,4 +1,5 @@
 import type { LanguageSeedOption } from '../../../vocab/language'
+import { classFeaturesUnlockedAtLevel } from '../../../content/classes/class-feature-availability'
 import type { CharacterClass } from '../../../content/classes/class'
 import {
   getUnlockedGrantsAtLevel,
@@ -80,9 +81,7 @@ function classFeatureLanguageProficiencies(
 ): CharacterProficiencies['languages'] {
   const entries: CharacterProficiencies['languages'] = []
 
-  for (const feature of characterClass.features) {
-    if (feature.level > characterLevel) continue
-
+  for (const feature of classFeaturesUnlockedAtLevel(characterClass.features, characterLevel)) {
     const groups = resolveGrantGroupsFromContent(feature, { level: feature.level })
     const grants = getUnlockedGrantsAtLevel(groups, characterLevel, feature.level)
 

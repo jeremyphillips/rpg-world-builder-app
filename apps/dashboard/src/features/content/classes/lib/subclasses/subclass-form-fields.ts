@@ -5,9 +5,9 @@ import { type FormItem } from '@rpg/ui/form'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   classFeatureItemFields,
-  featureRowFormSchema,
   formatFeatureRowSummary,
-  type FeatureRowForm,
+  subclassFeatureRowFormSchema,
+  type SubclassFeatureRowForm,
 } from '../class-feature-form-fields'
 
 export const subclassFormSchema = z.object({
@@ -15,7 +15,7 @@ export const subclassFormSchema = z.object({
   slug: slugSchema.optional(),
   tagline: z.string().optional(),
   description: z.string().optional(),
-  features: z.array(featureRowFormSchema),
+  features: z.array(subclassFeatureRowFormSchema),
 })
 
 export type SubclassFormValues = z.infer<typeof subclassFormSchema>
@@ -50,7 +50,7 @@ export function buildSubclassFields(
         header: {
           fallback: (index) => `Feature ${index + 1}`,
           primaryField: 'name',
-          summary: (values) => formatFeatureRowSummary(values as FeatureRowForm),
+          summary: (values) => formatFeatureRowSummary(values as SubclassFeatureRowForm),
         },
       },
       fields: classFeatureItemFields(ctx, options),

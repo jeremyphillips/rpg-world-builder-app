@@ -14,7 +14,7 @@ export function resolveSubclassTabGate({
   mode: SubclassTabMode | undefined
   campaignId?: string
   classId?: string
-  subclassChoiceFeature: FeatureRowForm | undefined
+  subclassChoiceFeature: Pick<FeatureRowForm, 'level'> | undefined
   isPending: boolean
 }): SubclassTabGateKind | null {
   if (mode === 'create' || !campaignId || !classId) {
@@ -30,7 +30,7 @@ export function resolveSubclassTabGate({
 }
 
 export function resolveDefaultFeatureLevel(
-  subclassChoiceFeature: FeatureRowForm | undefined,
+  subclassChoiceFeature: Pick<FeatureRowForm, 'level'> | undefined,
 ): number | null {
   if (!subclassChoiceFeature) return null
   return Number(subclassChoiceFeature.level)

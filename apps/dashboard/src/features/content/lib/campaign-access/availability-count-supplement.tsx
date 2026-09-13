@@ -15,6 +15,7 @@ import {
 import {
   joinAvailabilityCountSummarySegments,
   resolveAvailabilityCountSummaryParts,
+  resolveStableMasterDetailCountSummaryParts,
 } from './availability-count-summary.lib'
 
 export type AvailabilityCountSupplementLayout = 'stable' | 'conditional'
@@ -90,12 +91,18 @@ function AvailabilityCountSupplementActions({
 export function buildAvailabilityCountSupplement(
   options: BuildAvailabilityCountSupplementOptions,
 ): ReactNode {
-  const { scope, showUnavailable, onShow, onHide, actionVariant, pluralNoun } = options
+  const { scope, showUnavailable, onShow, onHide, layout, actionVariant, pluralNoun } = options
   const totalCount = scope.availableCount + scope.unavailableCount
-  const summaryParts = resolveAvailabilityCountSummaryParts({
-    totalCount,
-    unavailableCount: scope.unavailableCount,
-  })
+  const summaryParts =
+    layout === 'stable'
+      ? resolveStableMasterDetailCountSummaryParts({
+          availableCount: scope.availableCount,
+          unavailableCount: scope.unavailableCount,
+        })
+      : resolveAvailabilityCountSummaryParts({
+          totalCount,
+          unavailableCount: scope.unavailableCount,
+        })
 
   if (!summaryParts) return null
 

@@ -1,4 +1,5 @@
 import {
+  availableClassFeatures,
   CLASS_CONTENT_TYPE_TERM,
   getAbilityCompactLabel,
   getArmorCategoryPreviewLabel,
@@ -244,7 +245,7 @@ function buildSpellcastingSection(values: ClassFormValues): ContentPreviewSectio
 }
 
 function buildFeaturesSection(values: ClassFormValues): ContentPreviewSection {
-  const features = values.features ?? []
+  const features = availableClassFeatures(values.features ?? [])
   if (features.length === 0) {
     return {
       derivedKind: 'none',

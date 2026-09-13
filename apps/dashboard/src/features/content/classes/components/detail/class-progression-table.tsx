@@ -15,6 +15,7 @@ import {
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 
+import { projectVisibleClassFeatures } from '../../lib/class-display'
 import { isSubclassChoiceFeatureRow } from '../../lib/class-subclass-choice-features'
 
 type ProgressionRow = {
@@ -120,8 +121,12 @@ function buildRows(
   subclassingEnabled: boolean,
 ): ProgressionRow[] {
   const slotTable = slotTableFor(characterClass)
+  const visibleFeatures = projectVisibleClassFeatures(characterClass.features, {
+    subclassingEnabled,
+  })
+  const classForProgression = { ...characterClass, features: visibleFeatures }
   return Array.from({ length: maxCharacterLevel }, (_, i) =>
-    buildRow(i + 1, characterClass, slotTable, subclassingEnabled),
+    buildRow(i + 1, classForProgression, slotTable, subclassingEnabled),
   )
 }
 

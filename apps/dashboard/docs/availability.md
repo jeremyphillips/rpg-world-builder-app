@@ -163,17 +163,17 @@ broad availability on nested content that supports per-row campaign access.
 Shared presentation lives under [`campaign-access/`](../src/features/content/lib/campaign-access/)
 and [`master-detail/`](../src/features/content/lib/master-detail/):
 
-| Piece                                                                 | Role                                                                                                                                                         |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `availability-count-summary.lib` + `buildAvailabilityCountSupplement` | Shared count semantics (zero suppression, omit implied availability) + Show/Hide actions (`stable` on master-detail rails, `conditional` on overview tables) |
-| `resolveBroadAvailabilityPresentation`                                | Broad `Available` / `Unavailable` header copy — **no** player-access detail                                                                                  |
-| `MasterDetailAvailabilityPresentation`                                | Thin list + editor contract (`rowId`, `isAvailable`, `statusLabel`)                                                                                          |
-| `useMasterDetailAvailabilityFilter`                                   | Default-hide unavailable rows, identity-based pin for selected unavailable rows                                                                              |
-| `MasterDetailAvailabilityHeaderLine`                                  | Editor line 3: `● Available` / inactive unavailable + **Change** (consumer opens dialog)                                                                     |
+| Piece                                                                 | Role                                                                                                                                                                                                                                                                 |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `availability-count-summary.lib` + `buildAvailabilityCountSupplement` | Shared count semantics + Show/Hide actions. **Stable** master-detail rails use pair counts (`3 available`, `2 unavailable`, or `3 available · 2 unavailable`; nothing when empty). **Conditional** overview tables omit implied availability beside the result count |
+| `resolveBroadAvailabilityPresentation`                                | Broad `Available` / `Unavailable` header copy — **no** player-access detail                                                                                                                                                                                          |
+| `MasterDetailAvailabilityPresentation`                                | Thin list + editor contract (`rowId`, `isAvailable`, `statusLabel`)                                                                                                                                                                                                  |
+| `useMasterDetailAvailabilityFilter`                                   | Default-hide unavailable rows, identity-based pin for selected unavailable rows                                                                                                                                                                                      |
+| `MasterDetailAvailabilityHeaderLine`                                  | Editor line 3: `● Available` / inactive unavailable + **Change** (consumer opens dialog)                                                                                                                                                                             |
 
-**Pilot consumer:** subclasses via [`NestedResourceMasterDetailEditor`](../src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx) on [`ClassSubclassesTab`](../src/features/content/classes/components/class-subclasses-tab.tsx). **Blocked this pass:** form-embedded
-arrays (features, traits, heritage) — no per-row `campaignAccess` API/contracts yet;
-those rows continue to inherit parent access with rules-only inactive badges.
+**Nested API consumer:** subclasses via [`NestedResourceMasterDetailEditor`](../src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx) on [`ClassSubclassesTab`](../src/features/content/classes/components/class-subclasses-tab.tsx).
+
+**Form-embedded consumer:** class **Features** via [`FormEmbeddedMasterDetailEditor`](../src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx) with `availability={{ fieldName: 'available' }}` — broad header + availability-only dialog; persisted on the class body (`classBodyFeatureSchema.available`). **Blocked:** species traits, heritage options, starting-equipment packages.
 
 Consumers build one `MasterDetailAvailabilityPresentation[]` and pass the same objects to
 list filter/counts and the selected editor header. Persistence stays consumer-owned

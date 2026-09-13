@@ -1,4 +1,5 @@
 import {
+  availableClassFeatures,
   formatToolProficiencyPoolLabel,
   getAbilityLabel,
   getArmorCategoryEntry,
@@ -8,9 +9,12 @@ import {
   isMeaningfulToolProficiencyChoice,
   getProficiencyDomainCompactLabel,
   type CharacterClass,
+  type ClassBodyFeature,
   type ClassFeature,
   type ProficiencyChoice,
 } from '@rpg/contracts'
+
+import { isSubclassChoiceFeatureRow } from './class-subclass-choice-features'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
@@ -358,6 +362,26 @@ function buildFeaturesSection(
   }
 }
 
+export type ProjectVisibleClassFeaturesOptions = {
+  subclassingEnabled?: boolean
+  surface?: 'content-detail' | 'builder-sheet'
+}
+
+/** Campaign-available class features for display and progression surfaces. */
+export function projectVisibleClassFeatures(
+  features: readonly ClassBodyFeature[],
+  options: ProjectVisibleClassFeaturesOptions = {},
+): ClassBodyFeature[] {
+  let visible = availableClassFeatures(features)
+  if (options.subclassingEnabled === false) {
+    visible = visible.filter((feature) => !isSubclassChoiceFeatureRow(feature))
+  }
+  if (options.surface === 'builder-sheet') {
+    visible = visible.filter((feature) => feature.level === 1)
+  }
+  return visible
+}
+
 export function buildClassCardViewModel(characterClass: CharacterClass): ClassCardViewModel {
   const abilities = characterClass.primaryAbilities.map(getAbilityLabel).join(' or ')
 
@@ -374,8 +398,7 @@ export function buildClassDetailViewModel(
 ): ClassDetailViewModel {
   const surface = options.surface ?? 'content-detail'
   const features = options.features ?? characterClass.features
-  const visibleFeatures =
-    surface === 'builder-sheet' ? features.filter((feature) => feature.level === 1) : features
+  const visibleFeatures = projectVisibleClassFeatures(features, { surface })
 
   const sections: ClassDetailViewModel['sections'] = [
     {

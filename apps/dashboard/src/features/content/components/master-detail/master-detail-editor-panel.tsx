@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
@@ -25,6 +25,9 @@ export interface MasterDetailEditorPanelProps {
   selectedIdentity?: MasterDetailEditorIdentity
   campaignId?: string
   rowAvailability?: Availability
+  /** Availability-only dialog fields — rendered sr-only beside the row form. */
+  availabilityFormItems?: FormItem[]
+  availabilityDialogRef?: RefObject<HTMLDivElement | null>
 }
 
 interface MasterDetailSelectedRowEditorProps {
@@ -35,6 +38,8 @@ interface MasterDetailSelectedRowEditorProps {
   selectedIndex: number
   campaignId?: string
   rowAvailability?: Availability
+  availabilityFormItems?: FormItem[]
+  availabilityDialogRef?: RefObject<HTMLDivElement | null>
 }
 
 function MasterDetailSelectedRowEditor({
@@ -45,11 +50,22 @@ function MasterDetailSelectedRowEditor({
   selectedIndex,
   campaignId,
   rowAvailability,
+  availabilityFormItems,
+  availabilityDialogRef,
 }: MasterDetailSelectedRowEditorProps) {
   return (
     <>
       {rowAvailability?.status === 'inactive' && campaignId ? (
         <AvailabilityAlert availability={rowAvailability} context={{ campaignId }} />
+      ) : null}
+      {availabilityFormItems ? (
+        <div ref={availabilityDialogRef} className="sr-only" aria-hidden={false}>
+          <FormItems
+            items={availabilityFormItems}
+            idPrefix={`${idPrefix}-${selectedFieldId}-availability`}
+            namePrefix={`${fieldName}.${selectedIndex}`}
+          />
+        </div>
       ) : null}
       <FormItems
         key={selectedFieldId}
@@ -75,6 +91,8 @@ export function MasterDetailEditorPanel({
   selectedIdentity,
   campaignId,
   rowAvailability,
+  availabilityFormItems,
+  availabilityDialogRef,
 }: MasterDetailEditorPanelProps) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const selectedIndex = editor.selectedIndex
@@ -111,6 +129,8 @@ export function MasterDetailEditorPanel({
           selectedIndex={selectedIndex}
           campaignId={campaignId}
           rowAvailability={rowAvailability}
+          availabilityFormItems={availabilityFormItems}
+          availabilityDialogRef={availabilityDialogRef}
         />
       ) : null}
     </MasterDetailEditorShell>

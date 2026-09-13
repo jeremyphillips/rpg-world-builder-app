@@ -18,8 +18,7 @@ import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { ClassProgressionTable } from '../components/detail/class-progression-table'
 import { ClassDetailBody } from '../components/detail/class-detail-body'
-import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
-import { buildClassDetailViewModel } from '../lib/class-display'
+import { buildClassDetailViewModel, projectVisibleClassFeatures } from '../lib/class-display'
 
 type ClassDetailContentProps = {
   characterClass: CharacterClass
@@ -43,9 +42,9 @@ export function ClassDetailContent({
   useSetBreadcrumbLabel(characterClass.name)
   const campaignRules = useCampaignRules(campaignId)
   const subclassingEnabled = campaignRules.subclassing.enabled
-  const visibleFeatures = subclassingEnabled
-    ? characterClass.features
-    : characterClass.features.filter((feature) => !isSubclassChoiceFeatureRow(feature))
+  const visibleFeatures = projectVisibleClassFeatures(characterClass.features, {
+    subclassingEnabled,
+  })
 
   const vocabulary = {
     resolveToolLabel: (slug: string) =>
