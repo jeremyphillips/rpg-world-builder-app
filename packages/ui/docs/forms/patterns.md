@@ -22,8 +22,10 @@ for the **dvh fallback only**; slight under-fill is preferable to overlap with t
 footer. Master-detail list rails offset sticky `top` with
 `var(--rpg-form-sticky-tabs-block-size)` and cap via one resolved
 `--master-detail-shell-max-block-size`. The scroll body is also a size container
-(`form-scroll-body-container` on the clip slot only) so descendants can cap against the definite
-flex column above the footer; the inner scroller owns `overflow-y-auto`. Pass `stickyChrome={false}` for
+(`form-scroll-body-container` on the clip slot only, `boundedScroll` on `FormStickyScrollBody`) so
+descendants can cap against the definite flex column above the footer; the inner scroller owns
+`overflow-y-auto`. Plain `<Form stickyFooter>` on page-scroll routes omits the clip so fields keep
+their natural height. Pass `stickyChrome={false}` for
 flat layout. Dashboard content create/edit routes mount
 `ContentFormPageShell` with `scroll="viewport" spacing="none"` so the page shell fills the app
 main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer

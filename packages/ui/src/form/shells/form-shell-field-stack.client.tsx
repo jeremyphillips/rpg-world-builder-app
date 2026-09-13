@@ -46,7 +46,12 @@ function wrapFormShellFieldStackScroll(
 
   if (stickyFooter) {
     return (
-      <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName}>{stack}</FormStickyScrollBody>
+      <FormStickyScrollBody
+        scrollBodyClassName={scrollBodyClassName}
+        boundedScroll={Boolean(scrollBodyClassName)}
+      >
+        {stack}
+      </FormStickyScrollBody>
     )
   }
 

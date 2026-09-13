@@ -178,12 +178,26 @@ export const formStickyScrollBodyClipClasses = cn(
   'form-scroll-body-container',
 )
 
-/** Inner scroller inside the clip slot — owns overflow and end-of-scroll padding. */
-export const formStickyScrollBodyScrollerClasses = cn(
-  'h-full min-h-0',
+/** Shared scroll padding/behavior for docked-footer form bodies. */
+const formStickyScrollBodyScrollSurfaceClasses = cn(
   boundedScrollRegionClasses,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionFocusClearanceClasses,
+)
+
+/**
+ * Page-scroll sticky footer — single scroller grows with content; no clip slot.
+ * Use on routes where the page shell owns scroll (`pageScrollClasses.page`).
+ */
+export const formStickyScrollBodyUnboundedClasses = cn(
+  'min-h-0 flex-1',
+  formStickyScrollBodyScrollSurfaceClasses,
+)
+
+/** Inner scroller inside the viewport-bound clip slot. */
+export const formStickyScrollBodyScrollerClasses = cn(
+  'h-full min-h-0',
+  formStickyScrollBodyScrollSurfaceClasses,
 )
 
 /**

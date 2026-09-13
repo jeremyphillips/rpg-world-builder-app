@@ -277,7 +277,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
 
   const columnBody = usesDockedScrollBody ? (
     <div className={stickyScrollShellClasses}>
-      <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName}>
+      <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName} boundedScroll>
         {scrollableBody}
       </FormStickyScrollBody>
       {footerRegion}
@@ -300,7 +300,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         >
           {usesDockedScrollBody ? (
             <>
-              <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName}>
+              <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName} boundedScroll>
                 {scrollableBody}
               </FormStickyScrollBody>
               {footerRegion}

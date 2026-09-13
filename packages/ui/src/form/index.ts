@@ -111,6 +111,7 @@ export {
   formStickyScrollBodyClasses,
   formStickyScrollBodyClipClasses,
   formStickyScrollBodyScrollerClasses,
+  formStickyScrollBodyUnboundedClasses,
   formTabbedInactivePanelClasses,
   formTabbedNavOverflowClasses,
   formTabbedNavWithTrailingClasses,
