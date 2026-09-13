@@ -7,7 +7,7 @@ import {
   type ContentTypeKey,
   type VocabularyTerm,
 } from '@rpg/contracts'
-import { Button, PreviewRail, Sheet } from '@rpg/ui'
+import { Button, PreviewRail, Sheet, type PreviewRailLayout } from '@rpg/ui'
 import {
   useTabbedFormChrome,
   useTabbedFormTabValidationState,
@@ -71,7 +71,7 @@ export type ContentPreviewRailProps = {
 
 type PreviewRailBodyProps = ContentPreviewRailProps & {
   chrome: 'card' | 'plain'
-  sticky?: boolean
+  layout?: PreviewRailLayout
   hideHeader?: boolean
 }
 
@@ -81,7 +81,7 @@ function ContentPreviewRailBody({
   tabs,
   showDraftBadge,
   chrome,
-  sticky = false,
+  layout = 'default',
   hideHeader = false,
 }: PreviewRailBodyProps) {
   const { control, getValues } = useFormContext<FieldValues>()
@@ -119,7 +119,7 @@ function ContentPreviewRailBody({
     return (
       <ContentPreviewRailView
         chrome={chrome}
-        sticky={sticky}
+        layout={layout}
         hideHeader={hideHeader}
         showDraftBadge={showDraftBadge}
         term={term}
@@ -152,7 +152,7 @@ function ContentPreviewRailBody({
 
 type ContentPreviewRailViewProps = {
   chrome: 'card' | 'plain'
-  sticky?: boolean
+  layout: PreviewRailLayout
   hideHeader: boolean
   showDraftBadge: boolean
   term: VocabularyTerm
@@ -175,7 +175,7 @@ type ContentPreviewRailViewProps = {
 
 function ContentPreviewRailView({
   chrome,
-  sticky,
+  layout,
   hideHeader,
   showDraftBadge,
   term,
@@ -196,7 +196,7 @@ function ContentPreviewRailView({
   onPreviewAsPlayer,
 }: ContentPreviewRailViewProps) {
   return (
-    <PreviewRail chrome={chrome} sticky={sticky}>
+    <PreviewRail chrome={chrome} layout={layout}>
       {hideHeader ? null : (
         <PreviewRail.Header
           title={contentPreviewHeaderTitle(term)}
@@ -314,7 +314,7 @@ export function ContentPreviewRail(props: ContentPreviewRailProps) {
 
   return (
     <>
-      <ContentPreviewRailBody {...props} chrome="card" sticky />
+      <ContentPreviewRailBody {...props} chrome="card" layout="fill" />
       <Sheet.Root open={sheetOpen} onOpenChange={setSheetOpen}>
         <Sheet.Content
           side={isMdUp ? 'right' : 'bottom'}

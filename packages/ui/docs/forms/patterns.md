@@ -32,8 +32,8 @@ flat layout. Dashboard content create/edit routes mount
 main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer
 (flush to the viewport bottom). Top inset scrolls away via `scrollBodyClassName` (typically
 `formViewportScrollBodyTopInsetClasses`) as the first child inside the scroll region — not as
-padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail vertical gutter
-lives on `formTabbedAsideSlotTopInsetClasses` / `formTabbedAsideSlotBottomInsetClasses`.
+padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail top gutter
+lives on `formTabbedAsideSlotTopInsetClasses` (no bottom inset — docked footer is flush).
 Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
 reserved scrollbar gutters. Overlay pattern: use `externalFooter` with
 `FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar inside scroll content.

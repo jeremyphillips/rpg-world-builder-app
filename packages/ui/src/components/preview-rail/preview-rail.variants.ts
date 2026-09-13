@@ -55,15 +55,15 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col', {
       ),
       plain: 'w-full',
     },
-    sticky: {
+    layout: {
+      default: '',
       /** Fills a viewport-bounded aside column; internal ScrollRegion owns overflow. */
-      true: 'h-full max-h-full min-h-0',
-      false: '',
+      fill: 'min-h-0 w-full min-w-0 flex-1',
     },
   },
   defaultVariants: {
     chrome: 'card',
-    sticky: false,
+    layout: 'default',
   },
 })
 
@@ -164,5 +164,5 @@ export const previewRailActionButtonClasses = 'w-full'
 
 export type PreviewRailRootVariantProps = {
   chrome?: 'card' | 'plain'
-  sticky?: boolean
+  layout?: 'default' | 'fill'
 }

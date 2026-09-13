@@ -29,6 +29,7 @@ import type {
   PreviewRailAvailability,
   PreviewRailChrome,
   PreviewRailFact,
+  PreviewRailLayout,
   PreviewRailSectionMarker,
   PreviewRailStatusPanelVariant,
   PreviewRailStatusTone,
@@ -87,19 +88,36 @@ function usePreviewRailChrome() {
 
 export type PreviewRailProps = React.ComponentPropsWithoutRef<'aside'> & {
   chrome?: PreviewRailChrome
+  layout?: PreviewRailLayout
+  /** @deprecated Use `layout="fill"` for viewport-bounded aside columns. */
   sticky?: boolean
+}
+
+function resolvePreviewRailLayout(
+  layout: PreviewRailLayout | undefined,
+  sticky: boolean | undefined,
+): PreviewRailLayout {
+  if (layout) return layout
+  if (sticky) return 'fill'
+  return 'default'
 }
 
 function PreviewRailRoot({
   chrome = 'card',
-  sticky = false,
+  layout,
+  sticky,
   className,
   children,
   ...props
 }: PreviewRailProps) {
+  const resolvedLayout = resolvePreviewRailLayout(layout, sticky)
+
   return (
     <PreviewRailContext.Provider value={chrome}>
-      <aside className={cn(previewRailRootVariants({ chrome, sticky }), className)} {...props}>
+      <aside
+        className={cn(previewRailRootVariants({ chrome, layout: resolvedLayout }), className)}
+        {...props}
+      >
         {children}
       </aside>
     </PreviewRailContext.Provider>

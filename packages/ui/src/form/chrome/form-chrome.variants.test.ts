@@ -15,7 +15,6 @@ import {
   formTabbedAsideGridColsBelow2xlClasses,
   formTabbedAsideGridMaxWidthAt2xlClasses,
   formTabbedAsideGridMaxWidthBelow2xlClasses,
-  formTabbedAsideSlotBottomInsetClasses,
   formTabbedAsideSlotClasses,
   formTabbedAsideSlotTopInsetClasses,
   formViewportScrollBodyTopInsetClasses,
@@ -28,7 +27,9 @@ import {
 describe('formTabbedAside layout tokens', () => {
   it('bounds the xl grid row to the viewport flex shell', () => {
     expect(formTabbedAsideGridClasses).toContain('xl:grid-rows-[minmax(0,1fr)]')
-    expect(formTabbedAsideGridClasses).toContain('xl:h-full')
+    expect(formTabbedAsideGridClasses).toContain('flex-1')
+    expect(formTabbedAsideGridClasses).toContain('min-h-0')
+    expect(formTabbedAsideGridClasses).not.toContain('xl:h-full')
   })
 
   it('uses a narrower preview-rail column below 2xl', () => {
@@ -44,18 +45,19 @@ describe('formTabbedAside layout tokens', () => {
   })
 
   it('fills grid cells for scroll + docked footer columns', () => {
-    expect(formTabbedAsideBodyClasses).toContain('xl:h-full')
     expect(formTabbedAsideBodyClasses).toContain('min-h-0')
-    expect(formTabbedAsideSlotClasses).toContain('xl:h-full')
+    expect(formTabbedAsideBodyClasses).not.toContain('xl:h-full')
+    expect(formTabbedAsideSlotClasses).toContain('min-h-0')
     expect(formTabbedAsideSlotClasses).toContain('xl:flex')
     expect(formTabbedAsideSlotClasses).toContain('xl:flex-col')
+    expect(formTabbedAsideSlotClasses).not.toContain('xl:h-full')
   })
 
-  it('applies vertical inset on the preview-rail column only', () => {
+  it('applies top inset on the preview-rail column only (footer stays flush)', () => {
     expect(formTabbedAsideSlotTopInsetClasses).toBe('xl:pt-8')
-    expect(formTabbedAsideSlotBottomInsetClasses).toBe('xl:pb-8')
     expect(formTabbedAsideSlotClasses).toContain(formTabbedAsideSlotTopInsetClasses)
-    expect(formTabbedAsideSlotClasses).toContain(formTabbedAsideSlotBottomInsetClasses)
+    expect(formTabbedAsideSlotClasses).not.toContain('pb-8')
+    expect(formTabbedAsideSlotClasses).not.toContain('xl:pb-8')
   })
 
   it('defines scroll-body top inset that scrolls with form content', () => {

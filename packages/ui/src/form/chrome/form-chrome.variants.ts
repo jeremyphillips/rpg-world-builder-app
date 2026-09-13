@@ -53,14 +53,14 @@ export const formTabbedNavControlWrapClasses = 'min-w-0 flex-1 overflow-x-auto'
  * until `2xl`, then {@link formTabbedAsideWidthAt2xl}) with a large gap.
  */
 export const formTabbedAsideGridClasses = cn(
-  'mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col xl:grid xl:h-full xl:grid-rows-[minmax(0,1fr)] xl:items-stretch xl:gap-6',
+  'mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col xl:grid xl:grid-rows-[minmax(0,1fr)] xl:items-stretch xl:gap-6',
   formTabbedAsideGridColsBelow2xlClasses,
   formTabbedAsideGridColsAt2xlClasses,
   formTabbedAsideGridMaxWidthBelow2xlClasses,
   formTabbedAsideGridMaxWidthAt2xlClasses,
 )
 
-export const formTabbedAsideBodyClasses = 'min-h-0 min-w-0 xl:col-start-1 xl:h-full xl:row-start-1'
+export const formTabbedAsideBodyClasses = 'min-h-0 min-w-0 xl:col-start-1 xl:row-start-1'
 
 /**
  * Top inset for viewport-bound form scroll bodies — apply via
@@ -75,19 +75,13 @@ export const formViewportScrollBodyTopInsetClasses = 'pt-8'
  */
 export const formTabbedAsideSlotTopInsetClasses = 'xl:pt-8'
 
-/**
- * Bottom inset for the preview-rail column — matches dashboard
- * `pageShellInsetBottomClasses` (`pb-8`) while the form footer stays flush.
- */
-export const formTabbedAsideSlotBottomInsetClasses = 'xl:pb-8'
-
 /** Hide compact preview trigger when the persistent rail column is visible (`xl` and up). */
 export const formTabbedPreviewRailCompactTriggerHiddenClasses = 'xl:hidden'
 
+/** Viewport-bounded aside column — flex column + min-h-0 so PreviewRail fill can cap height. */
 export const formTabbedAsideSlotClasses = cn(
-  'hidden min-h-0 min-w-0 xl:col-start-2 xl:flex xl:h-full xl:flex-col xl:row-start-1',
+  'hidden min-h-0 min-w-0 xl:col-start-2 xl:flex xl:flex-col xl:row-start-1',
   formTabbedAsideSlotTopInsetClasses,
-  formTabbedAsideSlotBottomInsetClasses,
 )
 
 /** @deprecated Footer lives in the form column scroll shell — not a separate grid row. */

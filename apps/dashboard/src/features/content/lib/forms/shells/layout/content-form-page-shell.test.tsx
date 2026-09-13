@@ -21,10 +21,13 @@ function renderShell(ui: ReactElement) {
 function expectViewportWorkspaceChain(container: HTMLElement) {
   const workspace = container.firstElementChild
   expect(workspace).toHaveClass(...viewportWorkspaceClasses.split(/\s+/).filter(Boolean))
+  expect(workspace).toHaveClass('flex', 'flex-col', 'overflow-hidden')
   expect(workspace).not.toHaveClass(...pageShellInsetBottomClasses.split(/\s+/))
 
   const widthShell = workspace?.firstElementChild
   expect(widthShell).toHaveClass(...viewportWorkspacePaneClasses.split(/\s+/))
+  expect(widthShell).toHaveClass('flex-1', 'min-h-0', 'flex-col')
+  expect(widthShell).not.toHaveClass('h-full', 'overflow-hidden')
   expect(widthShell).not.toHaveClass(
     ...pageShellInsetTopClasses.split(/\s+/),
     ...pageShellInsetBottomClasses.split(/\s+/),

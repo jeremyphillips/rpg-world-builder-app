@@ -458,6 +458,7 @@ export {
   type PreviewRailAvailability,
   type PreviewRailAvailabilityLineProps,
   type PreviewRailChrome,
+  type PreviewRailLayout,
   type PreviewRailDraftBadgeProps,
   type PreviewRailFact,
   type PreviewRailFactsProps,

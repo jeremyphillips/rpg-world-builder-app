@@ -5,10 +5,10 @@ export const APP_STICKY_CHROME_BLOCK_SIZE_VAR = '--app-sticky-chrome-block-size'
 export const appStickyChromeBlockSizeFallback = 'calc(3rem + 2.5rem)'
 
 /**
- * Bounded workspace root — explicit block size; no flex-height chain from main.
- * Panes inside establish `min-h-0` and local scroll themselves.
+ * Bounded workspace root — explicit block size; flex column; sole clip owner.
+ * Children must not grow the workspace block-size (`min-h-0` or internal scroll).
  */
-export const viewportWorkspaceClasses = `min-w-0 overflow-hidden [block-size:calc(100dvh-var(${APP_STICKY_CHROME_BLOCK_SIZE_VAR},${appStickyChromeBlockSizeFallback}))]`
+export const viewportWorkspaceClasses = `flex min-w-0 flex-col overflow-hidden [block-size:calc(100dvh-var(${APP_STICKY_CHROME_BLOCK_SIZE_VAR},${appStickyChromeBlockSizeFallback}))]`
 
-/** Direct child pane inside a viewport workspace — clips and passes height to scrollports. */
-export const viewportWorkspacePaneClasses = 'flex min-h-0 min-w-0 flex-col overflow-hidden'
+/** Direct child pane — fills workspace via flex; defers clipping to scroll owners below. */
+export const viewportWorkspacePaneClasses = 'flex min-h-0 min-w-0 flex-1 flex-col'
