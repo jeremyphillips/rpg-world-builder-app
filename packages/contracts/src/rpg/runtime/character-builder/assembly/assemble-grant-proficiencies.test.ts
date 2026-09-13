@@ -5,6 +5,7 @@ import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { indexCharacterBuildCatalog } from '../context'
 import { assembleGrantSkillProficiencyEntries } from './assemble-grant-proficiencies'
 import { resolveSpeciesTraitGrantChoiceSets } from '../resolvers/species/resolve-species-trait-grant-choice-sets'
+import { createCharacterBuildContext } from '../test-fixtures'
 import { assembleSkillProficiencyEntries } from './assemble-skill-proficiencies'
 import { stealthSkill, proficiencyTestCatalog } from '../proficiency-test-fixtures'
 
@@ -91,7 +92,11 @@ describe('assembleGrantSkillProficiencyEntries', () => {
       ...createEmptyCharacterBuilderDraft(),
       species: { speciesId: speciesWithSkillGrant.id },
     }
-    const choiceSets = resolveSpeciesTraitGrantChoiceSets(draft, catalogIndex)
+    const choiceSets = resolveSpeciesTraitGrantChoiceSets(
+      draft,
+      catalogIndex,
+      createCharacterBuildContext(),
+    )
     const skillChoiceSet = choiceSets.find(
       (choiceSet) => choiceSet.choiceType === 'skillProficiency',
     )

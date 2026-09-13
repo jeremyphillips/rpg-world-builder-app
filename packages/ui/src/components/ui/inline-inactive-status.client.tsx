@@ -2,6 +2,7 @@
 
 import { CircleSlash } from 'lucide-react'
 
+import { cn } from '../../lib/utils'
 import {
   fieldGroupSummaryStatusIndicatorVariants,
   fieldGroupSummaryStatusLabelVariants,
@@ -15,7 +16,7 @@ export type InlineInactiveStatusProps = {
 /** Circle-slash inactive status inline with primary labels — matches overview table metadata. */
 export function InlineInactiveStatus({ label, className }: InlineInactiveStatusProps) {
   return (
-    <span className={className ?? 'inline-flex shrink-0 items-center gap-1 text-xs'}>
+    <span className={cn('inline-flex shrink-0 items-center gap-1 text-xs', className)}>
       <CircleSlash
         aria-hidden
         className={fieldGroupSummaryStatusIndicatorVariants({
@@ -23,7 +24,9 @@ export function InlineInactiveStatus({ label, className }: InlineInactiveStatusP
           tone: 'warning',
         })}
       />
-      <span className={fieldGroupSummaryStatusLabelVariants({ tone: 'warning' })}>{label}</span>
+      <span className={cn(fieldGroupSummaryStatusLabelVariants({ tone: 'warning' }), 'text-xs')}>
+        {label}
+      </span>
     </span>
   )
 }

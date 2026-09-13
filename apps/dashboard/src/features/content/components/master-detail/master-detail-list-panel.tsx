@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Plus } from 'lucide-react'
-import { Button, Text } from '@rpg/ui'
+import { Button, InlineInactiveStatus, Text } from '@rpg/ui'
 
 import {
   joinMasterDetailItemMeta,
@@ -14,6 +14,7 @@ import {
   masterDetailListHeaderClasses,
   masterDetailListItemsClasses,
   masterDetailListRowClasses,
+  masterDetailListRowAvailabilityClasses,
   masterDetailListRowMetaClasses,
   masterDetailListRowTitleClasses,
   masterDetailListShellClasses,
@@ -35,6 +36,8 @@ export interface MasterDetailListItem {
   active?: boolean
   /** When false, detail overflow hides delete. Not shown on list rows. */
   deletable?: boolean
+  /** Broad campaign availability label rendered below the title when unavailable. */
+  availabilityStatusLabel?: 'Unavailable'
 }
 
 export interface MasterDetailListPanelProps {
@@ -74,6 +77,12 @@ function MasterDetailListRow({ item, index, isSelected, onSelect }: MasterDetail
       >
         {metaLine ? <span className={masterDetailListRowMetaClasses}>{metaLine}</span> : null}
         <span className={masterDetailListRowTitleClasses}>{item.title}</span>
+        {item.availabilityStatusLabel ? (
+          <InlineInactiveStatus
+            label={item.availabilityStatusLabel}
+            className={masterDetailListRowAvailabilityClasses}
+          />
+        ) : null}
         {item.hasError ? <span className="sr-only">Has validation errors</span> : null}
       </button>
     </li>

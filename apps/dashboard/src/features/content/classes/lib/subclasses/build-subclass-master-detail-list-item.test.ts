@@ -20,6 +20,7 @@ describe('buildSubclassMasterDetailListItem', () => {
       title: 'Champion',
       meta: { eyebrow: 'Modified', sourceLabel: 'System' },
       active: false,
+      availabilityStatusLabel: 'Unavailable',
       deletable: false,
     })
   })

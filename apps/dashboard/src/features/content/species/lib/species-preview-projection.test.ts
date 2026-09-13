@@ -84,7 +84,14 @@ describe('species preview projection', () => {
     const sections = buildSpeciesPreviewSections(
       createValues({
         traits: [
-          { id: 't1', kind: 'custom', overrideDisplay: false, name: 'Darkvision', grants: [] },
+          {
+            id: 't1',
+            kind: 'custom',
+            overrideDisplay: false,
+            name: 'Darkvision',
+            grants: [],
+            available: true,
+          },
         ],
       }),
       emptyCtx,
@@ -106,7 +113,18 @@ describe('species preview projection', () => {
           description: '',
           choose: 1,
           options: [
-            { id: 'o1', kind: 'custom', overrideDisplay: false, name: 'Cantrip', grants: [] },
+            {
+              id: 'o1',
+              kind: 'custom',
+              overrideDisplay: false,
+              name: 'Cantrip',
+              grants: [],
+              campaignAccess: {
+                available: true,
+                visibilityMode: 'all_players',
+                participantIds: [],
+              },
+            },
           ],
         },
       }),

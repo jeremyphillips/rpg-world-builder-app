@@ -1,4 +1,5 @@
 import type { HeritageForm } from '@/features/content/species/lib/species-heritage-form-fields'
+import { createHeritageOptionCampaignAccessDefaults } from '@/features/content/species/lib/species-trait-form-fields'
 
 const DEFAULT_HERITAGE_OPTION = {
   kind: 'custom' as const,
@@ -6,6 +7,7 @@ const DEFAULT_HERITAGE_OPTION = {
   name: 'Test Option',
   description: '',
   grants: [],
+  campaignAccess: createHeritageOptionCampaignAccessDefaults(),
 }
 
 const DEFAULT_HERITAGE_FORM = {
@@ -36,6 +38,7 @@ export const draconicHeritageForm = makeHeritageForm({
       name: 'Breath Weapon',
       description: '',
       grants: [],
+      campaignAccess: createHeritageOptionCampaignAccessDefaults(),
     },
   ],
 })

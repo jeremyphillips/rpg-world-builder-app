@@ -40,6 +40,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
       mapListItem={({ row, index }) => ({
         title: traitItemTitle((row ?? {}) as TraitRowForm, index),
       })}
+      access={{ kind: 'availability', fieldName: 'available' }}
     />
   )
 }

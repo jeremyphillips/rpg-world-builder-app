@@ -15,6 +15,10 @@ import {
   type EmbeddedMasterDetailRow,
 } from '../../lib/master-detail/build-embedded-master-detail-rows'
 import { resolveMasterDetailRowKey } from '../../lib/master-detail/content-campaign-availability'
+import {
+  normalizeFormEmbeddedMasterDetailAccess,
+  type FormEmbeddedMasterDetailAccessConfig,
+} from '../../lib/master-detail/master-detail-access.types'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
   masterDetailItemNounLabel,
@@ -22,6 +26,7 @@ import {
 } from '../../lib/master-detail/master-detail-constants'
 import { buildMasterDetailAvailabilityFormFields } from '../../lib/master-detail/master-detail-availability-form-fields'
 import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail/master-detail-validation'
+import { MasterDetailBodyCampaignAccessDialogFields } from './master-detail-body-campaign-access-dialog-fields'
 import { useMasterDetailAvailabilityFilter } from '../../lib/master-detail/use-master-detail-availability-filter'
 import {
   useMasterDetailArray,
@@ -83,7 +88,9 @@ export interface FormEmbeddedMasterDetailEditorProps {
     rowKey: string
     index: number
   }) => readonly AvailabilityReason[]
-  /** Opt-in row availability presentation and filtering (e.g. `{ fieldName: 'available' }`). */
+  /** Mutually exclusive row access presentation and filtering. */
+  access?: FormEmbeddedMasterDetailAccessConfig
+  /** @deprecated Use `access={{ kind: 'availability', fieldName: 'available' }}`. */
   availability?: { fieldName: string }
 }
 
@@ -108,29 +115,30 @@ function FormEmbeddedMasterDetailEditorBody({
   showDelete = true,
   leadingContent,
   resolveRowReasons,
+  access: accessProp,
   availability,
 }: FormEmbeddedMasterDetailEditorBodyProps) {
   const {
     formState: { submitCount },
   } = useFormContext()
 
+  const access = normalizeFormEmbeddedMasterDetailAccess(accessProp, availability)
   const watched = useWatch({ name: fieldName }) as unknown[] | undefined
   const availabilityDialogRef = useRef<HTMLDivElement>(null)
-
   const seedRowIds = useMemo(() => {
     const ids = formCtx.embeddedSeedRowIds?.[fieldName]
     return ids?.length ? new Set(ids) : undefined
   }, [formCtx.embeddedSeedRowIds, fieldName])
 
   const allRows = useMemo((): EmbeddedMasterDetailRow[] => {
-    if (availability) {
+    if (access) {
       return buildEmbeddedMasterDetailRows({
         fields: editor.fields,
         watched,
         formCtx,
         itemNoun,
         showDelete,
-        availabilityFieldName: availability.fieldName,
+        access,
         mapListItem,
         hasRowError: editor.hasRowError,
         seedRowIds,
@@ -176,7 +184,7 @@ function FormEmbeddedMasterDetailEditorBody({
       }
     })
   }, [
-    availability,
+    access,
     editor.fields,
     editor.hasRowError,
     formCtx,
@@ -189,21 +197,36 @@ function FormEmbeddedMasterDetailEditorBody({
   ])
 
   const availabilityItems = useMemo(
-    () => (availability ? allRows.map((row) => row.availability) : []),
-    [allRows, availability],
+    () => (access ? allRows.map((row) => row.availability) : []),
+    [access, allRows],
   )
 
-  const { showUnavailable, scope, visibleItems, showUnavailableItems, hideUnavailableItems } =
-    useMasterDetailAvailabilityFilter({
-      items: availabilityItems,
-      selectedRowId: editor.selectedFieldId,
-    })
+  const handleAvailabilitySelectionChange = useCallback(
+    (rowId: string) => {
+      const row = allRows.find((entry) => entry.fieldId === rowId)
+      if (row) editor.select(row.formIndex)
+    },
+    [allRows, editor],
+  )
+
+  const {
+    showUnavailable,
+    scope,
+    visibleItems,
+    hiddenUnavailableCount,
+    showUnavailableItems,
+    hideUnavailableItems,
+  } = useMasterDetailAvailabilityFilter({
+    items: availabilityItems,
+    selectedRowId: editor.selectedFieldId,
+    onSelectedRowIdChange: handleAvailabilitySelectionChange,
+  })
 
   const visibleRows = useMemo(() => {
-    if (!availability) return allRows
+    if (!access) return allRows
     const visibleIds = new Set(visibleItems.map((item) => item.rowId))
     return allRows.filter((row) => visibleIds.has(row.fieldId))
-  }, [allRows, availability, visibleItems])
+  }, [access, allRows, visibleItems])
 
   const listItems = useMemo(() => visibleRows.map((row) => row.item), [visibleRows])
 
@@ -231,7 +254,7 @@ function FormEmbeddedMasterDetailEditorBody({
       title: selectedRow.item.title,
       meta: selectedRow.item.meta,
       deletable: selectedRow.item.deletable,
-      ...(availability && selectedRow.availability
+      ...(access && selectedRow.availability
         ? {
             availability: selectedRow.availability,
             onAvailabilityChange: () =>
@@ -239,15 +262,29 @@ function FormEmbeddedMasterDetailEditorBody({
           }
         : {}),
     }
-  }, [availability, selectedRow])
+  }, [access, selectedRow])
 
-  const availabilityFormItems = useMemo(
-    () =>
-      availability && selectedRow
-        ? buildMasterDetailAvailabilityFormFields(selectedRow.fieldId)
-        : undefined,
-    [availability, selectedRow],
-  )
+  const availabilityFormItems = useMemo((): FormItem[] | undefined => {
+    if (!access || !selectedRow || access.kind !== 'availability') return undefined
+    return buildMasterDetailAvailabilityFormFields(selectedRow.fieldId)
+  }, [access, selectedRow])
+
+  const availabilityNamePrefix = useMemo(() => {
+    if (!access || !selectedRow || access.kind !== 'availability') return undefined
+    return `${fieldName}.${selectedRow.formIndex}`
+  }, [access, fieldName, selectedRow])
+
+  const campaignAccessDialog =
+    access?.kind === 'campaignAccess' && selectedRow ? (
+      <MasterDetailBodyCampaignAccessDialogFields
+        access={access}
+        formCtx={formCtx}
+        fieldName={fieldName}
+        idPrefix={idPrefix}
+        selectedRow={selectedRow}
+        dialogRef={availabilityDialogRef}
+      />
+    ) : null
 
   const showValidationBanner = showMasterDetailUnselectedRowErrors(editor, submitCount)
 
@@ -265,10 +302,17 @@ function FormEmbeddedMasterDetailEditorBody({
         )
       : ''
 
-  const countSupplement = availability
+  const isSelectedRowVisible = useMemo(() => {
+    if (!access) return true
+    if (!editor.selectedFieldId) return false
+    return visibleRows.some((row) => row.fieldId === editor.selectedFieldId)
+  }, [access, editor.selectedFieldId, visibleRows])
+
+  const countSupplement = access
     ? buildAvailabilityCountSupplement({
         scope,
         showUnavailable,
+        hiddenUnavailableCount,
         layout: 'stable',
         onShow: showUnavailableItems,
         onHide: hideUnavailableItems,
@@ -309,11 +353,13 @@ function FormEmbeddedMasterDetailEditorBody({
         fieldName={fieldName}
         idPrefix={idPrefix}
         itemNoun={itemNoun}
+        showSelectedDetail={isSelectedRowVisible}
         selectedIdentity={selectedIdentity}
         showValidationBanner={showValidationBanner}
         campaignId={formCtx.campaignId}
         rowAvailability={selectedRowAvailability}
         availabilityFormItems={availabilityFormItems}
+        availabilityNamePrefix={availabilityNamePrefix}
         availabilityDialogRef={availabilityDialogRef}
       />
     </MasterDetailGrid>
@@ -335,6 +381,7 @@ function FormEmbeddedMasterDetailEditorBody({
     return (
       <>
         {masterDetailGrid}
+        {campaignAccessDialog}
         {deleteDialog}
       </>
     )
@@ -346,6 +393,7 @@ function FormEmbeddedMasterDetailEditorBody({
         {leadingContent}
         {masterDetailGrid}
       </div>
+      {campaignAccessDialog}
       {deleteDialog}
     </>
   )

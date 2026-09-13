@@ -79,7 +79,9 @@ describe('SpeciesTraitsTab', () => {
         name: /Unnamed Trait/i,
       }),
     ).toBeInTheDocument()
-    expect(screen.getByTestId('trait-detail')).toHaveTextContent('traits.0')
+    expect(
+      screen.getAllByTestId('trait-detail').some((element) => element.textContent === 'traits.0'),
+    ).toBe(true)
     expect(JSON.parse(screen.getByTestId('traits-values').textContent ?? '[]')[0]).toMatchObject({
       kind: 'custom',
     })
@@ -122,7 +124,9 @@ describe('SpeciesTraitsTab', () => {
         name: /Fey Ancestry/i,
       }),
     )
-    expect(screen.getByTestId('trait-detail')).toHaveTextContent('traits.1')
+    expect(
+      screen.getAllByTestId('trait-detail').some((element) => element.textContent === 'traits.1'),
+    ).toBe(true)
   })
 
   it('confirms deletion through the dialog and removes the row', async () => {

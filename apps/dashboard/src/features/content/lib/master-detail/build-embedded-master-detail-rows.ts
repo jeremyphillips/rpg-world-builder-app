@@ -1,3 +1,5 @@
+import type { ResolvedContentCampaignAccess } from '@rpg/contracts'
+
 import type { AvailabilityReason } from '@/lib/availability'
 
 import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel'
@@ -6,14 +8,17 @@ import { resolveMasterDetailRowKey } from './content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from './build-embedded-master-detail-list-item'
 import { buildMasterDetailAvailabilityPresentation } from './master-detail-availability.types'
 import type { MasterDetailAvailabilityPresentation } from './master-detail-availability.types'
+import type { FormEmbeddedMasterDetailAccessConfig } from './master-detail-access.types'
 import type { MasterDetailItemNounTerm } from './master-detail-item-noun'
 import { masterDetailItemTitle } from './master-detail-constants'
+import { readRowLocalCampaignAccess } from './master-detail-effective-access.lib'
 
 export type EmbeddedMasterDetailRow = {
   fieldId: string
   formIndex: number
   item: MasterDetailListItem
   availability: MasterDetailAvailabilityPresentation
+  localCampaignAccess?: ResolvedContentCampaignAccess
 }
 
 export type BuildEmbeddedMasterDetailRowsParams = {
@@ -22,7 +27,7 @@ export type BuildEmbeddedMasterDetailRowsParams = {
   formCtx: ContentFormCtx
   itemNoun: MasterDetailItemNounTerm
   showDelete: boolean
-  availabilityFieldName: string
+  access: FormEmbeddedMasterDetailAccessConfig
   mapListItem: (ctx: {
     field: { id: string }
     index: number
@@ -39,10 +44,25 @@ export type BuildEmbeddedMasterDetailRowsParams = {
   }) => readonly AvailabilityReason[]
 }
 
-function readRowAvailability(row: unknown, fieldName: string): boolean {
+function readRowLocalAvailability(row: unknown, fieldName: string): boolean {
   if (typeof row !== 'object' || row === null) return true
   const value = (row as Record<string, unknown>)[fieldName]
   return value !== false
+}
+
+function resolveRowLocalAvailability(
+  row: unknown,
+  access: FormEmbeddedMasterDetailAccessConfig,
+): { isAvailable: boolean; localCampaignAccess?: ResolvedContentCampaignAccess } {
+  if (access.kind === 'availability') {
+    return { isAvailable: readRowLocalAvailability(row, access.fieldName) }
+  }
+
+  const localCampaignAccess = readRowLocalCampaignAccess(row, access.fieldName)
+  return {
+    isAvailable: localCampaignAccess.available,
+    localCampaignAccess,
+  }
 }
 
 /** Single source of truth for form-embedded master-detail row projection. */
@@ -52,7 +72,7 @@ export function buildEmbeddedMasterDetailRows({
   formCtx,
   itemNoun,
   showDelete,
-  availabilityFieldName,
+  access,
   mapListItem,
   hasRowError,
   seedRowIds,
@@ -85,7 +105,7 @@ export function buildEmbeddedMasterDetailRows({
       showDelete,
       extraReasons,
     })
-    const isAvailable = readRowAvailability(row, availabilityFieldName)
+    const { isAvailable, localCampaignAccess } = resolveRowLocalAvailability(row, access)
     const availability = buildMasterDetailAvailabilityPresentation(field.id, isAvailable)
 
     return {
@@ -94,8 +114,10 @@ export function buildEmbeddedMasterDetailRows({
       item: {
         ...listItem,
         active: listItem.active !== false && isAvailable,
+        ...(isAvailable ? {} : { availabilityStatusLabel: 'Unavailable' as const }),
       },
       availability,
+      localCampaignAccess,
     }
   })
 }

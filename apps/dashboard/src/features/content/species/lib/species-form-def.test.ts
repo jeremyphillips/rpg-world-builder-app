@@ -18,6 +18,7 @@ import {
 } from '@rpg/contracts'
 
 import { speciesFormDef, speciesDraftFormSchema, type SpeciesFormValues } from './species-form-def'
+import { createHeritageOptionCampaignAccessDefaults } from './species-trait-form-fields'
 import { createTraitRowDefaultValues } from './species-trait-form-values'
 
 const SRD_SPECIES = loadSeedSpecies('srd-cc-5.2.1')
@@ -140,7 +141,15 @@ describe('speciesFormDef create vs update modes', () => {
     const formValues = {
       ...speciesFormDef.createDefaultValues,
       name: 'Custom Species',
-      traits: [{ kind: 'custom', name: 'Darkvision', overrideDisplay: false, grants: [] }],
+      traits: [
+        {
+          kind: 'custom',
+          name: 'Darkvision',
+          overrideDisplay: false,
+          grants: [],
+          available: true,
+        },
+      ],
     } as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
     expect(input.slug).toBe(deriveContentKey('Custom Species'))
@@ -240,6 +249,7 @@ describe('speciesFormDef create vs update modes', () => {
       ...createTraitRowDefaultValues(),
       kind: 'custom',
       name: 'Homebrew Ancestry',
+      campaignAccess: createHeritageOptionCampaignAccessDefaults(),
     })
     const input = speciesFormDef.toInput(formValues, { entity: dragonborn })
     expect(input.heritage?.options.every((option) => option.kind === 'custom')).toBe(true)
@@ -281,7 +291,14 @@ describe('speciesFormDef create vs update modes', () => {
         heritage: {
           name: 'Lineage',
           choose: 1,
-          options: [{ kind: 'custom', overrideDisplay: false, grants: [] }],
+          options: [
+            {
+              kind: 'custom',
+              overrideDisplay: false,
+              grants: [],
+              campaignAccess: createHeritageOptionCampaignAccessDefaults(),
+            },
+          ],
         },
       }),
     ).not.toThrow()

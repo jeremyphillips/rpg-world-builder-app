@@ -50,6 +50,7 @@ export const WithProtectedSystemRow: Story = {
         title: 'Legacy Option',
         meta: { eyebrow: 'Level 5', sourceLabel: 'System' },
         active: false,
+        availabilityStatusLabel: 'Unavailable',
         deletable: false,
       },
     ],

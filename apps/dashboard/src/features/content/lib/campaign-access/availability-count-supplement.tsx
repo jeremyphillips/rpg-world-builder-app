@@ -29,12 +29,15 @@ export type BuildAvailabilityCountSupplementOptions = {
   onHide: () => void
   layout: AvailabilityCountSupplementLayout
   actionVariant?: AvailabilityCountSupplementActionVariant
+  /** Master-detail rows hidden by the unavailable filter (excludes pinned selections). */
+  hiddenUnavailableCount?: number
   /** Overview Show-unavailable aria label copy. */
   pluralNoun?: string
 }
 
 function AvailabilityCountSupplementActions({
   showUnavailable,
+  hiddenUnavailableCount,
   unavailableCount,
   onShow,
   onHide,
@@ -43,10 +46,9 @@ function AvailabilityCountSupplementActions({
 }: Pick<
   BuildAvailabilityCountSupplementOptions,
   'showUnavailable' | 'onShow' | 'onHide' | 'actionVariant' | 'pluralNoun'
-> & { unavailableCount: number }) {
-  if (unavailableCount === 0) return null
-
+> & { hiddenUnavailableCount: number; unavailableCount: number }) {
   if (showUnavailable) {
+    if (unavailableCount === 0) return null
     return (
       <>
         <OverviewResultSummaryDotSeparator />
@@ -65,6 +67,8 @@ function AvailabilityCountSupplementActions({
       </>
     )
   }
+
+  if (hiddenUnavailableCount === 0) return null
 
   return (
     <>
@@ -91,7 +95,16 @@ function AvailabilityCountSupplementActions({
 export function buildAvailabilityCountSupplement(
   options: BuildAvailabilityCountSupplementOptions,
 ): ReactNode {
-  const { scope, showUnavailable, onShow, onHide, layout, actionVariant, pluralNoun } = options
+  const {
+    scope,
+    showUnavailable,
+    onShow,
+    onHide,
+    layout,
+    actionVariant,
+    pluralNoun,
+    hiddenUnavailableCount = scope.unavailableCount,
+  } = options
   const totalCount = scope.availableCount + scope.unavailableCount
   const summaryParts =
     layout === 'stable'
@@ -107,13 +120,20 @@ export function buildAvailabilityCountSupplement(
   if (!summaryParts) return null
 
   const countLine = joinAvailabilityCountSummarySegments(summaryParts.segments)
+  const showToggleAction =
+    layout === 'stable'
+      ? showUnavailable
+        ? scope.unavailableCount > 0
+        : hiddenUnavailableCount > 0
+      : summaryParts.showUnavailableToggle
 
   return (
     <>
       <span>{countLine}</span>
-      {summaryParts.showUnavailableToggle ? (
+      {showToggleAction ? (
         <AvailabilityCountSupplementActions
           showUnavailable={showUnavailable}
+          hiddenUnavailableCount={hiddenUnavailableCount}
           unavailableCount={scope.unavailableCount}
           onShow={onShow}
           onHide={onHide}

@@ -150,11 +150,12 @@ from the detail overflow menu.
 
 Scope notes:
 
-- Class **Features** support per-row campaign availability (`available` on
-  `classBodyFeatureSchema`, saved with the class). Opt in via
-  `FormEmbeddedMasterDetailEditor` `availability={{ fieldName: 'available' }}`.
-- Other embedded arrays (species traits/heritage, starting-equipment packages) still
-  inherit parent access — no per-row availability UI yet.
+- Class **Features** and species **traits** use availability-only body rows
+  (`access={{ kind: 'availability', fieldName: 'available' }}`).
+- Species **heritage options** use body-embedded `campaignAccess`
+  (`access={{ kind: 'campaignAccess', fieldName: 'campaignAccess', resolveParentAccess }}`)
+  with the body-bound form adapter — not overlay PATCH.
+- Starting-equipment packages still inherit parent access only.
 - Subclass campaign access is persisted via the shared `ContentCampaignAccessModel`.
   Subclasses use `NestedResourceMasterDetailEditor` with shared master-detail
   availability primitives: stable rail counts + default-hide unavailable rows,

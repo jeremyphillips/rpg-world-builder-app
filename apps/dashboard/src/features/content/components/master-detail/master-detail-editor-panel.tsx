@@ -22,11 +22,15 @@ export interface MasterDetailEditorPanelProps {
   showValidationBanner: boolean
   /** Singular noun vocabulary for delete overflow copy and empty-selection messaging. */
   itemNoun: MasterDetailItemNounTerm
+  /** When false, renders the shared empty detail state even if the editor has a selection. */
+  showSelectedDetail?: boolean
   selectedIdentity?: MasterDetailEditorIdentity
   campaignId?: string
   rowAvailability?: Availability
   /** Availability-only dialog fields — rendered sr-only beside the row form. */
   availabilityFormItems?: FormItem[]
+  /** Override RHF prefix for availability dialog fields (defaults to row prefix). */
+  availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
 }
 
@@ -39,6 +43,7 @@ interface MasterDetailSelectedRowEditorProps {
   campaignId?: string
   rowAvailability?: Availability
   availabilityFormItems?: FormItem[]
+  availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
 }
 
@@ -51,8 +56,11 @@ function MasterDetailSelectedRowEditor({
   campaignId,
   rowAvailability,
   availabilityFormItems,
+  availabilityNamePrefix,
   availabilityDialogRef,
 }: MasterDetailSelectedRowEditorProps) {
+  const resolvedAvailabilityNamePrefix = availabilityNamePrefix ?? `${fieldName}.${selectedIndex}`
+
   return (
     <>
       {rowAvailability?.status === 'inactive' && campaignId ? (
@@ -63,7 +71,7 @@ function MasterDetailSelectedRowEditor({
           <FormItems
             items={availabilityFormItems}
             idPrefix={`${idPrefix}-${selectedFieldId}-availability`}
-            namePrefix={`${fieldName}.${selectedIndex}`}
+            namePrefix={resolvedAvailabilityNamePrefix}
           />
         </div>
       ) : null}
@@ -88,16 +96,18 @@ export function MasterDetailEditorPanel({
   idPrefix,
   showValidationBanner,
   itemNoun,
+  showSelectedDetail = true,
   selectedIdentity,
   campaignId,
   rowAvailability,
   availabilityFormItems,
+  availabilityNamePrefix,
   availabilityDialogRef,
 }: MasterDetailEditorPanelProps) {
   const bodyRef = useRef<HTMLDivElement>(null)
   const selectedIndex = editor.selectedIndex
   const selectedFieldId = editor.selectedFieldId
-  const hasSelectedRow = selectedIndex !== null && Boolean(selectedFieldId)
+  const hasSelectedRow = showSelectedDetail && selectedIndex !== null && Boolean(selectedFieldId)
 
   useEffect(() => {
     if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
@@ -130,6 +140,7 @@ export function MasterDetailEditorPanel({
           campaignId={campaignId}
           rowAvailability={rowAvailability}
           availabilityFormItems={availabilityFormItems}
+          availabilityNamePrefix={availabilityNamePrefix}
           availabilityDialogRef={availabilityDialogRef}
         />
       ) : null}

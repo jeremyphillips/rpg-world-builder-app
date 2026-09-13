@@ -18,6 +18,7 @@ import {
   grantGroupsSchema,
 } from './lib/grants'
 import { languageIdSchema } from '../vocab/language'
+import { contentCampaignAccessSchema } from './lib/campaign-access/campaign-access'
 import { speciesCharacterCreationSchema } from './species-character-creation'
 import { speciesCultureConfigSchema } from './species-culture'
 import { SPECIES_CONTENT_TYPE_TERM } from './lib/content-type-terms'
@@ -41,7 +42,20 @@ export {
 }
 export type { ContentTrait, ContentGrant, GrantUnlock, GrantGroup, GrantGroups } from './lib/grants'
 
-export type SpeciesTrait = z.infer<typeof contentTraitSchema>
+export const speciesBodyTraitSchema = contentTraitSchema.and(
+  z.object({ available: z.boolean().optional() }),
+)
+
+export type SpeciesBodyTrait = z.infer<typeof speciesBodyTraitSchema>
+
+/** @deprecated Prefer {@link SpeciesBodyTrait} — alias retained for existing imports. */
+export type SpeciesTrait = SpeciesBodyTrait
+
+export const speciesHeritageOptionSchema = contentTraitSchema.and(
+  z.object({ campaignAccess: contentCampaignAccessSchema.partial().optional() }),
+)
+
+export type SpeciesHeritageOption = z.infer<typeof speciesHeritageOptionSchema>
 
 /**
  * A player choice made at character creation (e.g. Elven Lineage, Draconic
@@ -49,14 +63,14 @@ export type SpeciesTrait = z.infer<typeof contentTraitSchema>
  * Wording like "lineage" vs "ancestry" lives in `name`, not a separate field.
  */
 export const speciesHeritageSchema = contentNamedChoiceSchema.extend({
-  options: z.array(contentTraitSchema).min(1),
+  options: z.array(speciesHeritageOptionSchema).min(1),
 })
 
 export type SpeciesHeritage = z.infer<typeof speciesHeritageSchema>
 
 /** Draft heritage — options may be empty while authoring. */
 export const speciesHeritageDraftSchema = contentNamedChoiceSchema.omit({ options: true }).extend({
-  options: z.array(contentTraitSchema).default([]),
+  options: z.array(speciesHeritageOptionSchema).default([]),
 })
 
 export type SpeciesHeritageDraft = z.infer<typeof speciesHeritageDraftSchema>
@@ -76,7 +90,7 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
   languageAffinities: z.array(languageIdSchema).optional(),
   /** Cultural affiliation and naming capability for generator integration. */
   culture: speciesCultureConfigSchema.optional(),
-  traits: z.array(contentTraitSchema),
+  traits: z.array(speciesBodyTraitSchema),
   heritage: speciesHeritageSchema.optional(),
   /** Species-authored data consumed only when the campaign enables the matching rule. */
   characterCreation: speciesCharacterCreationSchema.optional(),
@@ -93,7 +107,7 @@ export const speciesBodyDraftSchema = draftAuthoredContentBodySchema(
   movement: movementSpeedsDraftSchema,
   languageAffinities: z.array(languageIdSchema).optional(),
   culture: speciesCultureConfigSchema.optional(),
-  traits: z.array(contentTraitSchema).default([]),
+  traits: z.array(speciesBodyTraitSchema).default([]),
   heritage: speciesHeritageDraftSchema.optional(),
   characterCreation: speciesCharacterCreationSchema.optional(),
 })

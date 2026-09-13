@@ -59,6 +59,26 @@ describe('MasterDetailListPanel', () => {
     expect(screen.getByText('Level 1 · Homebrew')).toBeInTheDocument()
   })
 
+  it('renders campaign-unavailable metadata below the title', () => {
+    render(
+      <MasterDetailListPanel
+        {...baseProps()}
+        items={[
+          {
+            id: 'a',
+            title: 'Legacy Option',
+            meta: { eyebrow: 'Level 5', sourceLabel: 'System' },
+            active: false,
+            availabilityStatusLabel: 'Unavailable',
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('Legacy Option')).toBeInTheDocument()
+    expect(screen.getByText('Unavailable')).toBeInTheDocument()
+  })
+
   it('renders the empty label when there are no items', () => {
     render(<MasterDetailListPanel {...baseProps()} items={[]} selectedIndex={null} />)
     expect(

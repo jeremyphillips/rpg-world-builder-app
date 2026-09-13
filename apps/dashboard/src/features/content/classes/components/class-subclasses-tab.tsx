@@ -121,11 +121,24 @@ function ClassSubclassesTabBody({
     [availabilityItems, editor.listItems],
   )
 
-  const { showUnavailable, scope, visibleItems, showUnavailableItems, hideUnavailableItems } =
-    useMasterDetailAvailabilityFilter({
-      items: filterableItems,
-      selectedRowId: editor.selectedId,
-    })
+  const {
+    showUnavailable,
+    scope,
+    visibleItems,
+    hiddenUnavailableCount,
+    showUnavailableItems,
+    hideUnavailableItems,
+  } = useMasterDetailAvailabilityFilter({
+    items: filterableItems,
+    selectedRowId: editor.selectedId,
+    onSelectedRowIdChange: editor.setSelectedId,
+  })
+
+  const isSelectedRowVisible = useMemo(
+    () =>
+      editor.selectedId !== null && visibleItems.some((item) => item.rowId === editor.selectedId),
+    [editor.selectedId, visibleItems],
+  )
 
   const listItems = useMemo(
     () =>
@@ -142,6 +155,7 @@ function ClassSubclassesTabBody({
   const countSupplement = buildAvailabilityCountSupplement({
     scope,
     showUnavailable,
+    hiddenUnavailableCount,
     layout: 'stable',
     onShow: showUnavailableItems,
     onHide: hideUnavailableItems,
@@ -241,7 +255,7 @@ function ClassSubclassesTabBody({
 
         <NestedResourceMasterDetailEditor
           items={listItems}
-          selectedRowId={editor.selectedId}
+          selectedRowId={isSelectedRowVisible ? editor.selectedId : null}
           onSelectRow={handleSelect}
           onAdd={editor.handleAdd}
           listTitle="Subclasses"
@@ -249,7 +263,7 @@ function ClassSubclassesTabBody({
           addLabel="Add subclass"
           itemNoun={SUBCLASS_MASTER_DETAIL_ITEM_NOUN}
           countSupplement={countSupplement}
-          selectedIdentity={selectedIdentity}
+          selectedIdentity={isSelectedRowVisible ? selectedIdentity : undefined}
           onDelete={editor.selectedId ? () => handleDeleteRequest(editor.selectedId!) : undefined}
           renderDetail={({ rowId }) =>
             editor.selectedValues ? (

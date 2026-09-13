@@ -9,7 +9,7 @@ import {
   resolveGrantGroupsFromContent,
   resolveTraitDisplay,
   type Species,
-  type SpeciesTrait,
+  type SpeciesBodyTrait,
 } from '@rpg/contracts'
 
 import {
@@ -19,6 +19,12 @@ import {
   type GrantDisplayVocabulary,
 } from '../../lib/forms/grants/grant-display'
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
+import {
+  projectVisibleHeritageOptions,
+  projectVisibleSpeciesTraits,
+  resolveSpeciesDisplayAccess,
+  type SpeciesDisplayProjectionContext,
+} from './species-display-projection'
 
 export const SPECIES_STAT_LABELS = {
   creatureType: getVocabularyTermLabel(CREATURE_TYPE_TERM),
@@ -67,7 +73,7 @@ export type SpeciesDetailViewModel = {
 }
 
 function collectSenses(
-  traits: SpeciesTrait[],
+  traits: SpeciesBodyTrait[],
   resolveSenseLabel: (type: string) => string,
 ): string {
   const senses = traits.flatMap((trait) =>
@@ -112,7 +118,7 @@ function buildSpeciesStatRows(
   return rows
 }
 
-function mapTraitToDetailItem(trait: SpeciesTrait): SpeciesDetailItem {
+function mapTraitToDetailItem(trait: SpeciesBodyTrait): SpeciesDetailItem {
   const display = resolveTraitDisplay(trait)
   return {
     id: trait.id,
@@ -129,7 +135,7 @@ function toGrantDisplayVocabulary(vocabulary: SpeciesDisplayVocabulary): GrantDi
 }
 
 function mapHeritageOptionToDetailItem(
-  trait: SpeciesTrait,
+  trait: SpeciesBodyTrait,
   vocabulary: SpeciesDisplayVocabulary,
 ): SpeciesDetailItem {
   const display = resolveTraitDisplay(trait)
@@ -166,31 +172,37 @@ export function buildSpeciesCardViewModel(
 export function buildSpeciesDetailViewModel(
   species: Species,
   vocabulary: SpeciesDisplayVocabulary,
+  projection?: SpeciesDisplayProjectionContext,
 ): SpeciesDetailViewModel {
   const sections: SpeciesDetailViewModel['sections'] = []
+  const projectionCtx = projection ?? {
+    speciesAccess: resolveSpeciesDisplayAccess(species),
+  }
+  const visibleTraits = projectVisibleSpeciesTraits(species.traits, projectionCtx)
 
-  if (species.traits.length > 0) {
+  if (visibleTraits.length > 0) {
     sections.push({
       id: 'traits',
       title: SPECIES_SECTION_LABELS.traits,
-      items: species.traits.map(mapTraitToDetailItem),
+      items: visibleTraits.map(mapTraitToDetailItem),
     })
   }
 
   if (species.heritage) {
-    sections.push({
-      id: 'heritage',
-      heritageId: species.heritage.id,
-      title: species.heritage.name,
-      descriptionHtml: species.heritage.description,
-      items: species.heritage.options.map((option) =>
-        mapHeritageOptionToDetailItem(option, vocabulary),
-      ),
-    })
+    const visibleOptions = projectVisibleHeritageOptions(species.heritage.options, projectionCtx)
+    if (visibleOptions.length > 0) {
+      sections.push({
+        id: 'heritage',
+        heritageId: species.heritage.id,
+        title: species.heritage.name,
+        descriptionHtml: species.heritage.description,
+        items: visibleOptions.map((option) => mapHeritageOptionToDetailItem(option, vocabulary)),
+      })
+    }
   }
 
   return {
-    statRows: buildSpeciesStatRows(species, vocabulary),
+    statRows: buildSpeciesStatRows({ ...species, traits: visibleTraits }, vocabulary),
     descriptionHtml: species.description,
     sections,
   }

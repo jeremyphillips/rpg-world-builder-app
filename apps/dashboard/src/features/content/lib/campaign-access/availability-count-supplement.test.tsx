@@ -95,6 +95,26 @@ describe('buildAvailabilityCountSupplement', () => {
     ).toBeNull()
   })
 
+  it('omits Show when the only hidden unavailable row is pinned in the selection', () => {
+    render(
+      <>
+        {buildAvailabilityCountSupplement({
+          scope: { availableCount: 1, unavailableCount: 1, visibleCount: 1 },
+          showUnavailable: false,
+          hiddenUnavailableCount: 0,
+          layout: 'stable',
+          onShow: vi.fn(),
+          onHide: vi.fn(),
+        })}
+      </>,
+    )
+
+    expect(screen.getByText('1 available · 1 unavailable')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Show all campaign availability states' }),
+    ).toBeNull()
+  })
+
   it('integrates with OverviewResultSummary without restating available rows', () => {
     const { container } = render(
       <OverviewResultSummary

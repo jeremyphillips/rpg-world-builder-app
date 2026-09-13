@@ -29,7 +29,9 @@ import {
   traitItemTitle,
   type TraitRowForm,
 } from '../lib/species-trait-form-fields'
-import { traitItemDefaultValues } from '../lib/species-trait-form-values'
+import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context'
+import { resolveSpeciesParentCampaignAccess } from '../lib/resolve-species-parent-campaign-access'
+import { heritageOptionItemDefaultValues } from '../lib/species-trait-form-values'
 import {
   speciesHeritageEmptyStateContentClasses,
   speciesHeritageEmptyStateDescriptionClasses,
@@ -125,10 +127,26 @@ function HeritageScalarSection({
 
 function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   const { setValue } = useFormContext()
+  const { pendingAccess } = useCampaignAccessForm()
   const traitFields = useMemo(() => heritageOptionItemFields(formCtx), [formCtx])
-  const makeOptionDefaults = useCallback(() => traitItemDefaultValues(traitFields), [traitFields])
+  const makeOptionDefaults = useCallback(
+    () => heritageOptionItemDefaultValues(traitFields),
+    [traitFields],
+  )
   const editor = useMasterDetailArray(OPTIONS_FIELD_NAME, makeOptionDefaults)
   const heritage = useWatch({ name: HERITAGE_FIELD_NAME }) as HeritageForm | undefined
+  const resolveParentAccess = useCallback(
+    () => resolveSpeciesParentCampaignAccess(pendingAccess),
+    [pendingAccess],
+  )
+  const accessConfig = useMemo(
+    () => ({
+      kind: 'campaignAccess' as const,
+      fieldName: 'campaignAccess' as const,
+      resolveParentAccess: () => resolveParentAccess(),
+    }),
+    [resolveParentAccess],
+  )
 
   const handleRemoveHeritage = useCallback(() => {
     setValue(HERITAGE_FIELD_NAME, undefined, { shouldDirty: true })
@@ -156,6 +174,7 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
       mapListItem={({ row, index }) => ({
         title: traitItemTitle((row ?? {}) as TraitRowForm, index),
       })}
+      access={accessConfig}
     />
   )
 }

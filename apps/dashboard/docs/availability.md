@@ -163,13 +163,13 @@ broad availability on nested content that supports per-row campaign access.
 Shared presentation lives under [`campaign-access/`](../src/features/content/lib/campaign-access/)
 and [`master-detail/`](../src/features/content/lib/master-detail/):
 
-| Piece                                                                 | Role                                                                                                                                                                                                                                                                 |
-| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `availability-count-summary.lib` + `buildAvailabilityCountSupplement` | Shared count semantics + Show/Hide actions. **Stable** master-detail rails use pair counts (`3 available`, `2 unavailable`, or `3 available · 2 unavailable`; nothing when empty). **Conditional** overview tables omit implied availability beside the result count |
-| `resolveBroadAvailabilityPresentation`                                | Broad `Available` / `Unavailable` header copy — **no** player-access detail                                                                                                                                                                                          |
-| `MasterDetailAvailabilityPresentation`                                | Thin list + editor contract (`rowId`, `isAvailable`, `statusLabel`)                                                                                                                                                                                                  |
-| `useMasterDetailAvailabilityFilter`                                   | Default-hide unavailable rows, identity-based pin for selected unavailable rows                                                                                                                                                                                      |
-| `MasterDetailAvailabilityHeaderLine`                                  | Editor line 3: `● Available` / inactive unavailable + **Change** (consumer opens dialog)                                                                                                                                                                             |
+| Piece                                                                       | Role                                                                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `availability-count-summary.lib` + `buildAvailabilityCountSupplement`       | Shared count semantics + Show/Hide actions. **Stable** master-detail rails use pair counts (`3 available`, `2 unavailable`, or `3 available · 2 unavailable`; nothing when empty). **Conditional** overview tables omit implied availability beside the result count                         |
+| `resolveBroadAvailabilityPresentation`                                      | Broad `Available` / `Unavailable` header copy — **no** player-access detail                                                                                                                                                                                                                  |
+| `MasterDetailAvailabilityPresentation`                                      | Thin list + editor contract (`rowId`, `isAvailable`, `statusLabel`)                                                                                                                                                                                                                          |
+| `deriveMasterDetailAvailabilityState` + `useMasterDetailAvailabilityFilter` | Default-hide unavailable rows; pin the selected row when it becomes unavailable (expires on another selection); Show/Hide from `hiddenUnavailableCount` (no Show when only the pinned row is hidden); explicit Hide moves selection next/previous available or empty detail when none remain |
+| `MasterDetailAvailabilityHeaderLine`                                        | Editor line 3: `● Available` / inactive unavailable + **Change** (consumer opens dialog)                                                                                                                                                                                                     |
 
 **Nested API consumer:** subclasses via [`NestedResourceMasterDetailEditor`](../src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx) on [`ClassSubclassesTab`](../src/features/content/classes/components/class-subclasses-tab.tsx).
 
@@ -233,3 +233,21 @@ Picker and relationship surfaces derive selectable sets from content resolution 
 Dashboard ESLint guards block raw list hooks and local `status === 'draft'|'published'`
 filters in picker modules. See `dashboardContentPickerPolicyGuards` in
 `apps/dashboard/eslint.config.js`.
+
+## Species three-tier availability
+
+| Tier                 | Rows                 | Persisted shape          | Authoring rail                  | Runtime                                         |
+| -------------------- | -------------------- | ------------------------ | ------------------------------- | ----------------------------------------------- |
+| **Species**          | top-level entity     | overlay `campaignAccess` | overlay field (unchanged)       | species gate                                    |
+| **Heritage options** | `heritage.options[]` | body `campaignAccess`    | **local** child access          | `resolveEffectiveCampaignAccess(parent, child)` |
+| **Species traits**   | `traits[]`           | body `available?`        | **local** `available !== false` | inherit species + trait boolean                 |
+
+**Local vs effective authoring:** the left rail, counts, and pin use **local child
+state** only — making a species unavailable does **not** hide heritage rows that
+remain locally available. Effective narrowing surfaces in the editor header/dialog
+copy and in runtime filtering.
+
+**Body-bound heritage adapter:** embedded heritage rows use
+`buildBodyCampaignAccessFormFields` (parent-form RHF binding, UI narrowing hints).
+Do **not** mount `CampaignAvailabilityField` on heritage options — it owns overlay
+PATCH and save-session integration.

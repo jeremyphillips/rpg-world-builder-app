@@ -113,7 +113,7 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
         eyebrow: featureItemEyebrow(row as FeatureRowForm | undefined),
       })}
       resolveRowReasons={resolveRowReasons}
-      availability={{ fieldName: 'available' }}
+      access={{ kind: 'availability', fieldName: 'available' }}
     />
   )
 }

@@ -90,12 +90,28 @@ export function refinePublishedTraitRow(
 
 export const traitRowDraftFormSchema = traitRowObjectSchema(
   contentTraitKindSchema.default('custom'),
-)
+).extend({
+  available: z.boolean().default(true),
+})
 
 export const traitRowFormSchema = traitRowDraftFormSchema.superRefine(refinePublishedTraitRow)
 
+const heritageCampaignAccessFormSchema = z.object({
+  available: z.boolean().default(true),
+  visibilityMode: z.enum(['all_players', 'dm_only', 'specific_players']).default('all_players'),
+  participantIds: z.array(z.string()).default([]),
+})
+
 export function heritageOptionRowObjectSchema() {
-  return traitRowObjectSchema(z.literal('custom').default('custom'))
+  return traitRowObjectSchema(z.literal('custom').default('custom')).extend({
+    campaignAccess: heritageCampaignAccessFormSchema.default(
+      heritageCampaignAccessFormSchema.parse({}),
+    ),
+  })
+}
+
+export function createHeritageOptionCampaignAccessDefaults() {
+  return heritageCampaignAccessFormSchema.parse({})
 }
 
 export type TraitRowForm = z.infer<typeof traitRowFormSchema>
