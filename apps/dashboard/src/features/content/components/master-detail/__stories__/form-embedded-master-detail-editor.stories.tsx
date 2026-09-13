@@ -4,7 +4,7 @@ import { Button } from '@rpg/ui'
 import type { FormItem } from '@rpg/ui/form'
 import {
   formDockedActionsBarClasses,
-  formStickyScrollBodyClasses,
+  FormStickyScrollBody,
   formStickyScrollShellWithDockedFooterClasses,
   formStickyTabsClasses,
 } from '@rpg/ui/form'
@@ -103,7 +103,7 @@ export const WithStickyFormFooter: Story = {
   render: () => (
     <div className="flex h-[32rem] min-h-0 flex-col overflow-hidden bg-background">
       <div className={formStickyScrollShellWithDockedFooterClasses}>
-        <div className={formStickyScrollBodyClasses}>
+        <FormStickyScrollBody>
           <div className="p-6">
             <div
               className={`${formStickyTabsClasses} mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-sm text-muted-foreground`}
@@ -112,7 +112,7 @@ export const WithStickyFormFooter: Story = {
             </div>
             <EditorStory features={longFeatures} />
           </div>
-        </div>
+        </FormStickyScrollBody>
         <div className={formDockedActionsBarClasses}>
           <div className="flex justify-end px-6">
             <Button type="button">Save changes</Button>

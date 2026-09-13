@@ -5,7 +5,8 @@ import {
   formDockedActionsBarClasses,
   formDockedFooterFloorGapContractClasses,
   formDockedScrollTopChromeBlockSizeContractClasses,
-  formStickyScrollBodyClasses,
+  formStickyScrollBodyClipClasses,
+  formStickyScrollBodyScrollerClasses,
   formStickyScrollShellClasses,
   formStickyScrollShellWithDockedFooterClasses,
   formTabbedAsideBodyClasses,
@@ -87,8 +88,12 @@ describe('docked form footer geometry', () => {
     )
   })
 
-  it('marks the sticky scroll body as a size container for bounded inner panels', () => {
-    expect(formStickyScrollBodyClasses).toContain('form-scroll-body-container')
+  it('splits the sticky scroll slot into a clip container and inner scroller', () => {
+    expect(formStickyScrollBodyClipClasses).toContain('form-scroll-body-container')
+    expect(formStickyScrollBodyClipClasses).toContain('overflow-hidden')
+    expect(formStickyScrollBodyClipClasses).not.toContain('overflow-y-auto')
+    expect(formStickyScrollBodyScrollerClasses).toContain('overflow-y-auto')
+    expect(formStickyScrollBodyScrollerClasses).not.toContain('form-scroll-body-container')
   })
 
   it('derives docked actions bar min-height from the shared block-size contract', () => {

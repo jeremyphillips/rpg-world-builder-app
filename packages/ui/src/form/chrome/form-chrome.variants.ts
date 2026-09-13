@@ -1,5 +1,10 @@
+import { boundedScrollRegionClasses } from '../../components/ui/bounded-scroll-region.variants'
+import {
+  dialogPanelScrollRegionBottomInsetClasses,
+  dialogPanelScrollRegionFocusClearanceClasses,
+  dialogPanelScrollRegionClasses,
+} from '../../components/ui/dialog-panel.variants'
 import { cn } from '../../lib/utils'
-import { dialogPanelScrollRegionClasses } from '../../components/ui/dialog-panel.variants'
 
 /** Persistent preview-rail / TabbedForm aside column width from `xl` until `2xl`. */
 export const formTabbedAsideWidthBelow2xl = '280px'
@@ -164,11 +169,28 @@ export const formDockedActionsBarClasses = cn(
   'flex flex-col justify-center py-4',
 )
 
-/** Scrollable field column when the footer is docked below it. */
-export const formStickyScrollBodyClasses = cn(
-  dialogPanelScrollRegionClasses,
+/**
+ * Clip slot above a docked footer — definite size container without scroll. Pairs with
+ * {@link formStickyScrollBodyScrollerClasses} inside {@link FormStickyScrollBody}.
+ */
+export const formStickyScrollBodyClipClasses = cn(
+  'flex min-h-0 flex-1 flex-col overflow-hidden',
   'form-scroll-body-container',
 )
+
+/** Inner scroller inside the clip slot — owns overflow and end-of-scroll padding. */
+export const formStickyScrollBodyScrollerClasses = cn(
+  'h-full min-h-0',
+  boundedScrollRegionClasses,
+  dialogPanelScrollRegionBottomInsetClasses,
+  dialogPanelScrollRegionFocusClearanceClasses,
+)
+
+/**
+ * @deprecated Use {@link FormStickyScrollBody} (clip + scroller). Kept for tests that
+ * assert scroller tokens on the inner overflow region.
+ */
+export const formStickyScrollBodyClasses = formStickyScrollBodyScrollerClasses
 
 /**
  * Sheet/drawer/modal scroll region — grows inside a flex column shell with a docked

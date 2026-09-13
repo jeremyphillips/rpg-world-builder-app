@@ -109,6 +109,8 @@ export {
   RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR,
   formDockedActionsBarBlockSizeContractClasses,
   formStickyScrollBodyClasses,
+  formStickyScrollBodyClipClasses,
+  formStickyScrollBodyScrollerClasses,
   formTabbedInactivePanelClasses,
   formTabbedNavOverflowClasses,
   formTabbedNavWithTrailingClasses,
@@ -128,6 +130,10 @@ export {
   FormScrollBodyTopInset,
   FormViewportScrollTopInset,
 } from './chrome/form-viewport-scroll-top-inset.client'
+export {
+  FormStickyScrollBody,
+  type FormStickyScrollBodyProps,
+} from './chrome/form-sticky-scroll-body.client'
 export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
 export {
   FORM_COLUMNS_WIDTH_EQUAL,

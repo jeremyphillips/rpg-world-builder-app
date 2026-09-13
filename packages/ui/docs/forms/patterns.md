@@ -12,7 +12,7 @@ Inactive panels suppress per-field error text until their tab is active.
 
 **Sticky chrome** (default `stickyChrome={true}`): section control `sticky top-0` in the field
 column; `FormActionsBar` docks below a bounded scroll body
-(`formStickyScrollShellWithDockedFooterClasses` + `formStickyScrollBodyClasses`) so save actions
+(`formStickyScrollShellWithDockedFooterClasses` + `FormStickyScrollBody`) so save actions
 stay at the bottom of the viewport on long page forms. The docked-footer shell composition
 publishes `--rpg-content-bottom-inset` (standard docked actions bar footprint via
 `--rpg-form-docked-actions-bar-block-size`) and augments `--rpg-content-top-inset` with
@@ -22,7 +22,8 @@ for the **dvh fallback only**; slight under-fill is preferable to overlap with t
 footer. Master-detail list rails offset sticky `top` with
 `var(--rpg-form-sticky-tabs-block-size)` and cap via one resolved
 `--master-detail-shell-max-block-size`. The scroll body is also a size container
-(`form-scroll-body-container`) so descendants can cap against the flex column. Pass `stickyChrome={false}` for
+(`form-scroll-body-container` on the clip slot only) so descendants can cap against the definite
+flex column above the footer; the inner scroller owns `overflow-y-auto`. Pass `stickyChrome={false}` for
 flat layout. Dashboard content create/edit routes mount
 `ContentFormPageShell` with `scroll="viewport" spacing="none"` so the page shell fills the app
 main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer

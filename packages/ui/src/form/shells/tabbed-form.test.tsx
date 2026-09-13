@@ -13,7 +13,8 @@ import { FormItems } from '../containers/form-items.client'
 import { submitAndExpectPayload } from '../test-utils'
 import {
   formStickyActionsBarTransparentClasses,
-  formStickyScrollBodyClasses,
+  formStickyScrollBodyClipClasses,
+  formStickyScrollBodyScrollerClasses,
   formStickyTabsTransparentClasses,
   formViewportScrollBodyTopInsetClasses,
 } from '../chrome/form-chrome.variants'
@@ -180,9 +181,17 @@ describe('TabbedForm', () => {
     expect(scrollRegion?.className).toContain('scrollbar-slim')
     expect(scrollRegion?.className).toContain('pe-2.5')
     expect(scrollRegion?.className).toContain('ps-1')
-    for (const token of formStickyScrollBodyClasses.split(/\s+/)) {
+    for (const token of formStickyScrollBodyScrollerClasses.split(/\s+/)) {
       expect(scrollRegion?.className).toContain(token)
     }
+
+    const clipRegion = sectionsNav.closest('.form-scroll-body-container')
+    expect(clipRegion).toHaveClass('overflow-hidden')
+    expect(clipRegion).not.toHaveClass('overflow-y-auto')
+    for (const token of formStickyScrollBodyClipClasses.split(/\s+/)) {
+      expect(clipRegion?.className).toContain(token)
+    }
+    expect(clipRegion?.contains(toolbar)).toBe(false)
   })
 
   it('renders scrollBodyClassName as a scroll-away inset inside the scroll region', () => {

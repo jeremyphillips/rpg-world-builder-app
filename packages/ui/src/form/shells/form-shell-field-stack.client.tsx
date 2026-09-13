@@ -8,9 +8,8 @@ import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-act
 import {
   formFooterSpacingClasses,
   formSheetScrollRegionClasses,
-  formStickyScrollBodyClasses,
 } from '../chrome/form-chrome.variants'
-import { FormScrollBodyTopInset } from '../chrome/form-viewport-scroll-top-inset.client'
+import { FormStickyScrollBody } from '../chrome/form-sticky-scroll-body.client'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
 
@@ -47,10 +46,7 @@ function wrapFormShellFieldStackScroll(
 
   if (stickyFooter) {
     return (
-      <div className={formStickyScrollBodyClasses}>
-        {scrollBodyClassName ? <FormScrollBodyTopInset className={scrollBodyClassName} /> : null}
-        {stack}
-      </div>
+      <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName}>{stack}</FormStickyScrollBody>
     )
   }
 
