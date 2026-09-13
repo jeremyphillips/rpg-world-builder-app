@@ -1,6 +1,11 @@
 import { Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@rpg/ui'
 
 import type { RulesConfigNavLeaf, RulesConfigNavSection } from '@/features/campaign'
+import {
+  measureAnchorTopRelativeToScrollRoot,
+  resolvePageScrollContainer,
+  RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
+} from '@/features/homebrew/hooks/use-rules-config-nav-scroll-spy.lib'
 
 import {
   rulesConfigFieldNavShellClasses,
@@ -18,7 +23,24 @@ type RulesConfigFieldNavProps = {
 }
 
 function scrollToAnchor(anchorId: string) {
-  document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const anchor = document.getElementById(anchorId)
+  if (!anchor) return
+
+  const scrollRoot = resolvePageScrollContainer()
+  if (!scrollRoot) {
+    anchor.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    return
+  }
+
+  const top = measureAnchorTopRelativeToScrollRoot(
+    anchor,
+    scrollRoot,
+    RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
+  )
+  scrollRoot.scrollTo({
+    top: scrollRoot.scrollTop + top,
+    behavior: 'smooth',
+  })
 }
 
 type MobileNavItem = {
@@ -69,7 +91,7 @@ export function RulesConfigFieldNav({
   const mobileItems = buildMobileNavItems(sections)
 
   return (
-    <>
+    <div className="flex shrink-0 flex-col gap-4">
       <nav
         className={cn(rulesConfigFieldNavStickyClasses, rulesConfigFieldNavShellClasses)}
         aria-label={navLabel}
@@ -148,6 +170,6 @@ export function RulesConfigFieldNav({
           </SelectContent>
         </Select>
       </div>
-    </>
+    </div>
   )
 }

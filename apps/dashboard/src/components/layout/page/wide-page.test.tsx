@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Heading } from '@rpg/ui'
 
-import { pageScrollClasses } from './page-scroll.variants'
 import {
   pageShellInsetBottomClasses,
   pageShellInsetClasses,
@@ -23,21 +22,21 @@ describe('WidePage', () => {
     expect(screen.getByRole('heading', { name: 'Equipment' })).toBeInTheDocument()
   })
 
-  it('applies scroll and spacing independently', () => {
+  it('applies spacing without overflow classes', () => {
     const { container } = render(
-      <WidePage scroll="viewport" spacing="none">
+      <WidePage spacing="none">
         <p>Form body</p>
       </WidePage>,
     )
 
     const root = container.firstElementChild
-    expect(root).toHaveClass(...pageScrollClasses.viewport.split(/\s+/))
     expect(root).not.toHaveClass(...pageShellInsetClasses.page.split(/\s+/))
+    expect(root).not.toHaveClass('overflow-y-auto', 'overflow-hidden')
   })
 
-  it('supports top-only shell inset for viewport-bound forms', () => {
+  it('supports top-only shell inset', () => {
     const { container } = render(
-      <WidePage scroll="viewport" spacing="page-top">
+      <WidePage spacing="page-top">
         <p>Form body</p>
       </WidePage>,
     )
@@ -47,7 +46,7 @@ describe('WidePage', () => {
     expect(root).not.toHaveClass(...pageShellInsetBottomClasses.split(/\s+/))
   })
 
-  it('defaults to page scroll with shell inset', () => {
+  it('defaults to shell inset without overflow classes', () => {
     const { container } = render(
       <WidePage>
         <p>Body</p>
@@ -55,8 +54,8 @@ describe('WidePage', () => {
     )
 
     const root = container.firstElementChild
-    expect(root).toHaveClass(...pageScrollClasses.page.split(/\s+/))
     expect(root).toHaveClass(...pageShellInsetClasses.page.split(/\s+/))
+    expect(root).not.toHaveClass('overflow-y-auto', 'overflow-hidden')
   })
 
   itAxe('has no axe accessibility violations', async () => {

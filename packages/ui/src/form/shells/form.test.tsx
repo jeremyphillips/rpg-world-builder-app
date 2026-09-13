@@ -258,9 +258,15 @@ describe('Form', () => {
     )
 
     const form = container.querySelector('form')
+    expect(form).toHaveClass('flex')
+    expect(form).toHaveClass('min-h-full')
+    expect(form).toHaveClass('flex-col')
     expect(form).not.toHaveClass('flex-1')
     expect(container.querySelector('.form-scroll-body-container')).toBeNull()
     expect(container.querySelector('.overflow-y-auto')).toBeNull()
+    expect(screen.getByRole('toolbar', { name: 'Form actions' }).parentElement).toHaveClass(
+      'mt-auto',
+    )
     expect(screen.getByRole('toolbar', { name: 'Form actions' })).toBeInTheDocument()
   })
 

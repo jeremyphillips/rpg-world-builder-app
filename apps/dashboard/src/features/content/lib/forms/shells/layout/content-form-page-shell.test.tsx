@@ -2,49 +2,66 @@ import type { ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 
-import { pageScrollClasses } from '@/components/layout/page/page-scroll.variants'
 import {
   pageShellInsetBottomClasses,
   pageShellInsetTopClasses,
 } from '@/components/layout/page/page-spacing.variants'
+import {
+  viewportFillClasses,
+  viewportShellClasses,
+} from '@/components/layout/page/page-scroll.variants'
 
+import { contentFormPageShellBodyClasses } from './content-form-page-shell.variants'
 import { ContentFormPageShell } from './content-form-page-shell'
 
 function renderShell(ui: ReactElement) {
   return render(ui)
 }
 
+function expectViewportFillChain(container: HTMLElement) {
+  const boundary = container.firstElementChild
+  expect(boundary).toHaveClass(...viewportShellClasses.split(/\s+/))
+  expect(boundary).not.toHaveClass(...pageShellInsetBottomClasses.split(/\s+/))
+
+  const fillWrapper = boundary?.firstElementChild
+  expect(fillWrapper).toHaveClass(...viewportFillClasses.split(/\s+/))
+
+  const widthShell = fillWrapper?.firstElementChild
+  expect(widthShell).toHaveClass(...viewportFillClasses.split(/\s+/))
+  expect(widthShell).not.toHaveClass(
+    ...pageShellInsetTopClasses.split(/\s+/),
+    ...pageShellInsetBottomClasses.split(/\s+/),
+  )
+
+  return { boundary, fillWrapper, widthShell }
+}
+
 describe('ContentFormPageShell', () => {
-  it('uses NarrowPage viewport shell without shell inset when preview layout is disabled', () => {
+  it('uses ViewportShell fill chain and NarrowPage without shell inset when preview is disabled', () => {
     const { container } = renderShell(
       <ContentFormPageShell usePreviewLayout={false}>
         <p>Form body</p>
       </ContentFormPageShell>,
     )
 
-    expect(container.firstChild).toHaveClass(
-      'mx-auto',
-      'max-w-4xl',
-      ...pageScrollClasses.viewport.split(/\s+/),
-    )
-    expect(container.firstChild).not.toHaveClass(
-      ...pageShellInsetTopClasses.split(/\s+/),
-      ...pageShellInsetBottomClasses.split(/\s+/),
-    )
+    const { widthShell } = expectViewportFillChain(container)
+    expect(widthShell).toHaveClass('mx-auto', 'max-w-4xl')
+    expect(widthShell?.firstElementChild?.textContent).toBe('Form body')
   })
 
-  it('uses WidePage viewport shell without shell inset when preview layout is enabled', () => {
+  it('uses ViewportShell fill chain, body wrapper, and WidePage when preview is enabled', () => {
     const { container } = renderShell(
       <ContentFormPageShell usePreviewLayout>
         <p>Form body</p>
       </ContentFormPageShell>,
     )
 
-    expect(container.firstChild).toHaveClass('w-full', ...pageScrollClasses.viewport.split(/\s+/))
-    expect(container.firstChild).not.toHaveClass(
-      'max-w-4xl',
-      ...pageShellInsetTopClasses.split(/\s+/),
-      ...pageShellInsetBottomClasses.split(/\s+/),
-    )
+    const { widthShell } = expectViewportFillChain(container)
+    expect(widthShell).toHaveClass('w-full')
+    expect(widthShell).not.toHaveClass('max-w-4xl')
+
+    const body = widthShell?.firstElementChild
+    expect(body).toHaveClass(...contentFormPageShellBodyClasses.split(/\s+/))
+    expect(body?.textContent).toBe('Form body')
   })
 })

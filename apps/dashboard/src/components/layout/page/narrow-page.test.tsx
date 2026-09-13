@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { Heading } from '@rpg/ui'
 
-import { pageScrollClasses } from './page-scroll.variants'
 import { pageShellInsetClasses } from './page-spacing.variants'
 import { NarrowPage } from './narrow-page'
 
@@ -19,16 +18,16 @@ describe('NarrowPage', () => {
     expect(screen.getByRole('heading', { name: 'Profile' })).toBeInTheDocument()
   })
 
-  it('viewport scroll with none spacing does not apply py-8', () => {
+  it('applies spacing without overflow classes', () => {
     const { container } = render(
-      <NarrowPage scroll="viewport" spacing="none">
+      <NarrowPage spacing="none">
         <p>Form body</p>
       </NarrowPage>,
     )
 
     const root = container.firstElementChild
-    expect(root).toHaveClass(...pageScrollClasses.viewport.split(/\s+/))
     expect(root).not.toHaveClass(...pageShellInsetClasses.page.split(/\s+/))
+    expect(root).not.toHaveClass('overflow-y-auto', 'overflow-hidden')
   })
 
   itAxe('has no axe accessibility violations', async () => {

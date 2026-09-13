@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { pageScrollClasses, type PageScroll } from './page-scroll.variants'
 import {
   pageShellInsetClasses,
   pageSpacingClasses,
@@ -13,8 +12,6 @@ import { widePageBaseClasses } from './wide-page.variants'
 
 export interface WidePageProps {
   children: ReactNode
-  /** Overflow ownership. Default: page (this shell scrolls). */
-  scroll?: PageScroll
   /** Vertical shell inset below the breadcrumb rail. Default: page (`py-8`); use `page-top` for viewport forms. */
   spacing?: PageShellInset
   /** Vertical rhythm between direct children. Default: compact (`space-y-2`). */
@@ -25,7 +22,6 @@ export interface WidePageProps {
 /** Full-width page column for lists, hubs, and detail routes. */
 export function WidePage({
   children,
-  scroll = 'page',
   spacing = 'page',
   rhythm = 'compact',
   className,
@@ -34,7 +30,6 @@ export function WidePage({
     <div
       className={cn(
         widePageBaseClasses,
-        pageScrollClasses[scroll],
         pageShellInsetClasses[spacing],
         pageSpacingClasses[rhythm],
         className,

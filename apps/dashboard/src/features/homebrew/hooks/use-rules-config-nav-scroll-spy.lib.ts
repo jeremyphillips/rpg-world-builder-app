@@ -1,3 +1,5 @@
+import { pageScrollContainerSelector } from '@/components/layout/page/page-scroll.variants'
+
 import type { RulesConfigNavSection } from '@/features/campaign'
 
 export type NavScrollSpyAnchor = {
@@ -69,4 +71,24 @@ export function buildRulesConfigNavObserverRootMargin(
   scrollOffsetPx = RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
 ) {
   return `-${scrollOffsetPx}px 0px -55% 0px`
+}
+
+/** Resolves the route page scrollport (`PageScrollShell`). */
+export function resolvePageScrollContainer(): Element | null {
+  return document.querySelector(pageScrollContainerSelector)
+}
+
+/** Distance from a scroll root's top edge after applying the nav offset. */
+export function measureAnchorTopRelativeToScrollRoot(
+  element: Element,
+  scrollRoot: Element | null,
+  scrollOffsetPx = RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
+): number {
+  const elementRect = element.getBoundingClientRect()
+  if (!scrollRoot) {
+    return elementRect.top - scrollOffsetPx
+  }
+
+  const rootRect = scrollRoot.getBoundingClientRect()
+  return elementRect.top - rootRect.top - scrollOffsetPx
 }

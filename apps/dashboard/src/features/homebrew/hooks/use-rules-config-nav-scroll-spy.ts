@@ -5,7 +5,9 @@ import type { RulesConfigNavSection } from '@/features/campaign'
 import {
   buildRulesConfigNavObserverRootMargin,
   collectNavScrollSpyAnchors,
+  measureAnchorTopRelativeToScrollRoot,
   resolveActiveNavFromEntries,
+  resolvePageScrollContainer,
   RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
   type NavScrollSpyEntry,
 } from './use-rules-config-nav-scroll-spy.lib'
@@ -19,6 +21,7 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
     if (anchors.length === 0) return
     if (typeof IntersectionObserver === 'undefined') return
 
+    const scrollRoot = resolvePageScrollContainer()
     const ratios = new Map<string, number>()
 
     const updateActive = () => {
@@ -26,12 +29,16 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
         const element = document.getElementById(anchor.id)
         if (!element) return []
 
-        const rect = element.getBoundingClientRect()
+        const top = measureAnchorTopRelativeToScrollRoot(
+          element,
+          scrollRoot,
+          RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
+        )
         return [
           {
             ...anchor,
-            top: rect.top - RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
-            ratio: ratios.get(anchor.id) ?? (rect.top <= RULES_CONFIG_NAV_SCROLL_OFFSET_PX ? 1 : 0),
+            top,
+            ratio: ratios.get(anchor.id) ?? (top <= 0 ? 1 : 0),
           },
         ]
       })
@@ -49,7 +56,7 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
         updateActive()
       },
       {
-        root: null,
+        root: scrollRoot,
         rootMargin: buildRulesConfigNavObserverRootMargin(),
         threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
       },
@@ -61,12 +68,13 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
     }
 
     updateActive()
-    window.addEventListener('scroll', updateActive, { passive: true })
+    const scrollTarget = scrollRoot ?? window
+    scrollTarget.addEventListener('scroll', updateActive, { passive: true })
     window.addEventListener('resize', updateActive)
 
     return () => {
       observer.disconnect()
-      window.removeEventListener('scroll', updateActive)
+      scrollTarget.removeEventListener('scroll', updateActive)
       window.removeEventListener('resize', updateActive)
     }
   }, [anchors])
