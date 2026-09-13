@@ -108,7 +108,7 @@ export const formStickyActionsBarClasses =
 export const RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR = '--rpg-form-docked-actions-bar-block-size'
 
 export const formDockedActionsBarBlockSizeContractClasses = cn(
-  `[${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR}:4.5rem]`,
+  `[${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR}:69px]`,
 )
 
 /**
@@ -117,17 +117,43 @@ export const formDockedActionsBarBlockSizeContractClasses = cn(
  */
 export const RPG_CONTENT_BOTTOM_INSET_VAR = '--rpg-content-bottom-inset'
 
+/** Layout gap between bounded inner panels and docked footer chrome. */
+export const RPG_CONTENT_FLOOR_GAP_VAR = '--rpg-content-floor-gap'
+
+export const formDockedFooterFloorGapContractClasses = `[${RPG_CONTENT_FLOOR_GAP_VAR}:1rem]`
+
+/**
+ * Standard top viewport space reserved by surrounding chrome (app shell, page heading,
+ * form scroll chrome). Bounded inner panels may subtract this from viewport caps.
+ */
+export const RPG_CONTENT_TOP_INSET_VAR = '--rpg-content-top-inset'
+
+/**
+ * Conservative block-size contracts for scrollable content above tab panels inside a
+ * docked-footer form column. Summed into {@link RPG_CONTENT_TOP_INSET_VAR} on
+ * {@link formStickyScrollShellWithDockedFooterClasses} only.
+ */
+export const formDockedScrollTopChromeBlockSizeContractClasses = cn(
+  '[--rpg-form-viewport-scroll-body-top-inset:2rem]',
+  '[--rpg-form-identity-header-block-size:8rem]',
+  '[--rpg-form-sticky-tabs-block-size:3rem]',
+  '[--rpg-form-docked-scroll-top-chrome-inset:calc(var(--rpg-form-viewport-scroll-body-top-inset)+var(--rpg-form-identity-header-block-size)+var(--rpg-form-sticky-tabs-block-size))]',
+)
+
 /** Column shell for sticky chrome — pairs scroll body with a docked footer. */
 export const formStickyScrollShellClasses = 'flex min-h-0 flex-1 flex-col'
 
 /**
  * Sticky-chrome shell that docks a standard actions bar below the scroll body.
- * Publishes {@link RPG_CONTENT_BOTTOM_INSET_VAR} for viewport-relative bounded panels.
+ * Publishes environmental inset variables for viewport-relative bounded panels.
  */
 export const formStickyScrollShellWithDockedFooterClasses = cn(
   formStickyScrollShellClasses,
   formDockedActionsBarBlockSizeContractClasses,
-  `[${RPG_CONTENT_BOTTOM_INSET_VAR}:var(${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR})]`,
+  formDockedFooterFloorGapContractClasses,
+  formDockedScrollTopChromeBlockSizeContractClasses,
+  `[${RPG_CONTENT_BOTTOM_INSET_VAR}:calc(var(${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR})+var(${RPG_CONTENT_FLOOR_GAP_VAR}))]`,
+  `[${RPG_CONTENT_TOP_INSET_VAR}:calc(var(${RPG_CONTENT_TOP_INSET_VAR},0px)+var(--rpg-form-docked-scroll-top-chrome-inset))]`,
 )
 
 /** Docked actions bar — flex-column footer below a bounded scroll body (content forms). */
@@ -139,7 +165,10 @@ export const formDockedActionsBarClasses = cn(
 )
 
 /** Scrollable field column when the footer is docked below it. */
-export const formStickyScrollBodyClasses = dialogPanelScrollRegionClasses
+export const formStickyScrollBodyClasses = cn(
+  dialogPanelScrollRegionClasses,
+  'form-scroll-body-container',
+)
 
 /**
  * Sheet/drawer/modal scroll region — grows inside a flex column shell with a docked

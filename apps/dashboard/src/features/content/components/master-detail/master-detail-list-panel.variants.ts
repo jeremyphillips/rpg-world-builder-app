@@ -1,9 +1,9 @@
 import {
-  boundedScrollRegionClasses,
   cn,
   establishSurfaceCurrent,
   interactiveFocusVariants,
   interactiveRowVariants,
+  scrollBoundaryRegionRootClasses,
 } from '@rpg/ui'
 
 import {
@@ -11,11 +11,17 @@ import {
   masterDetailRailRowSeparatorClasses,
 } from './master-detail-rail.variants'
 
+/** Fixed chrome above the item list — header row plus optional availability count. */
+export const masterDetailListChromeBlockSizeContractClasses =
+  '[--master-detail-list-chrome-block-size:5.5rem]'
+
 /** Bordered collection shell for the master rail. */
 export const masterDetailListShellClasses = cn(
-  'overflow-hidden rounded-lg border bg-field-container text-foreground',
+  'sticky top-[var(--rpg-form-sticky-tabs-block-size,0px)] flex min-h-[min(8rem,var(--master-detail-shell-max-block-size))] flex-col self-start overflow-hidden rounded-lg border bg-field-container text-foreground md:min-h-[min(12rem,var(--master-detail-shell-max-block-size))]',
   masterDetailRailBorderClasses,
   establishSurfaceCurrent('field-container'),
+  masterDetailListChromeBlockSizeContractClasses,
+  'master-detail-list-shell-viewport-cap',
 )
 
 /** Header row inside the shell — collection title and Add action. */
@@ -63,11 +69,13 @@ export const masterDetailListEmptyClasses = 'px-3 py-4 text-sm text-muted-foregr
 
 /** Stable availability count row below the list header. */
 export const masterDetailListCountSupplementClasses = cn(
-  'flex shrink-0 flex-wrap items-center gap-x-1 px-3 py-1.5 text-xs text-muted-foreground',
+  'flex shrink-0 flex-wrap items-center gap-x-1 border-b px-3 py-1.5 text-xs text-muted-foreground',
+  masterDetailRailBorderClasses,
 )
 
-/** Scrollable item-list body — consumes `--master-detail-list-max-block-size` from the grid. */
-export const masterDetailListScrollClasses = cn(
-  boundedScrollRegionClasses,
-  'master-detail-list-scroll-viewport-cap',
-)
+/** Scroll boundary shell for the item list — pairs with {@link masterDetailListScrollViewportClasses}. */
+export const masterDetailListScrollRegionClasses = scrollBoundaryRegionRootClasses
+
+/** Scrollable item-list viewport — no scrollbar gutter reserve. */
+export const masterDetailListScrollViewportClasses =
+  'min-h-0 flex-1 overflow-y-auto pe-0 scrollbar-slim'

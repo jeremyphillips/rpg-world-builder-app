@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   formDockedActionsBarBlockSizeContractClasses,
   formDockedActionsBarClasses,
+  formDockedFooterFloorGapContractClasses,
+  formDockedScrollTopChromeBlockSizeContractClasses,
+  formStickyScrollBodyClasses,
   formStickyScrollShellClasses,
   formStickyScrollShellWithDockedFooterClasses,
   formTabbedAsideBodyClasses,
@@ -16,6 +19,8 @@ import {
   formTabbedAsideSlotTopInsetClasses,
   formViewportScrollBodyTopInsetClasses,
   RPG_CONTENT_BOTTOM_INSET_VAR,
+  RPG_CONTENT_FLOOR_GAP_VAR,
+  RPG_CONTENT_TOP_INSET_VAR,
   RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR,
 } from './form-chrome.variants'
 
@@ -68,8 +73,22 @@ describe('docked form footer geometry', () => {
       formDockedActionsBarBlockSizeContractClasses,
     )
     expect(formStickyScrollShellWithDockedFooterClasses).toContain(
-      `[${RPG_CONTENT_BOTTOM_INSET_VAR}:var(${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR})]`,
+      formDockedFooterFloorGapContractClasses,
     )
+    expect(formStickyScrollShellWithDockedFooterClasses).toContain(
+      formDockedScrollTopChromeBlockSizeContractClasses,
+    )
+    expect(formStickyScrollShellWithDockedFooterClasses).toContain(
+      `[${RPG_CONTENT_BOTTOM_INSET_VAR}:calc(var(${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR})+var(${RPG_CONTENT_FLOOR_GAP_VAR}))]`,
+    )
+    expect(formStickyScrollShellWithDockedFooterClasses).toContain(RPG_CONTENT_TOP_INSET_VAR)
+    expect(formDockedActionsBarBlockSizeContractClasses).toContain(
+      `[${RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR}:69px]`,
+    )
+  })
+
+  it('marks the sticky scroll body as a size container for bounded inner panels', () => {
+    expect(formStickyScrollBodyClasses).toContain('form-scroll-body-container')
   })
 
   it('derives docked actions bar min-height from the shared block-size contract', () => {

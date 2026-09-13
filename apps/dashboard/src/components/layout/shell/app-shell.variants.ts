@@ -8,7 +8,7 @@
 export const appShellHorizontalPaddingClasses = 'px-4 sm:px-6'
 
 /** Primary routed content column below the breadcrumb rail — scroll owned by page shells. */
-export const appShellMainClasses = `flex min-h-0 flex-1 flex-col overflow-hidden ${appShellHorizontalPaddingClasses}`
+export const appShellMainClasses = `flex min-h-0 flex-1 flex-col overflow-hidden ${appShellHorizontalPaddingClasses} [--rpg-content-top-inset:calc(3rem+2.5rem)]`
 
 /** Breadcrumb rail — shares horizontal gutter with main content. */
 export const appShellBreadcrumbRailClasses = `border-b border-border py-1.5 ${appShellHorizontalPaddingClasses}`

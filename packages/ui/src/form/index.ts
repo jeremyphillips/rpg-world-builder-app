@@ -104,6 +104,8 @@ export {
   formStickyScrollShellClasses,
   formStickyScrollShellWithDockedFooterClasses,
   RPG_CONTENT_BOTTOM_INSET_VAR,
+  RPG_CONTENT_FLOOR_GAP_VAR,
+  RPG_CONTENT_TOP_INSET_VAR,
   RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR,
   formDockedActionsBarBlockSizeContractClasses,
   formStickyScrollBodyClasses,

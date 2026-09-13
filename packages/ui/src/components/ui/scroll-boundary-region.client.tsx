@@ -50,6 +50,8 @@ export function useScrollBoundaryRegion() {
 
 export type ScrollBoundaryRegionProps = React.ComponentPropsWithoutRef<'div'> & {
   viewportClassName?: string
+  /** Optional ref to the scroll viewport (merged with the internal measurement ref). */
+  viewportRef?: React.Ref<HTMLDivElement>
 }
 
 /**
@@ -58,13 +60,37 @@ export type ScrollBoundaryRegionProps = React.ComponentPropsWithoutRef<'div'> & 
  * this primitive only adds low-elevation gradient fades when content scrolls
  * underneath the boundary.
  */
+function assignScrollBoundaryViewportRef(
+  node: HTMLDivElement | null,
+  internalRef: React.RefObject<HTMLDivElement | null>,
+  externalRef?: React.Ref<HTMLDivElement>,
+) {
+  internalRef.current = node
+
+  if (typeof externalRef === 'function') {
+    externalRef(node)
+    return
+  }
+
+  if (externalRef) {
+    externalRef.current = node
+  }
+}
+
 export function ScrollBoundaryRegion({
   className,
   viewportClassName,
+  viewportRef: externalViewportRef,
   children,
   ...viewportProps
 }: ScrollBoundaryRegionProps) {
   const { viewportRef, state } = useScrollBoundaryRegion()
+  const setViewportRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      assignScrollBoundaryViewportRef(node, viewportRef, externalViewportRef)
+    },
+    [externalViewportRef, viewportRef],
+  )
 
   return (
     <div className={cn(scrollBoundaryRegionRootClasses, className)}>
@@ -74,7 +100,7 @@ export function ScrollBoundaryRegion({
         className={scrollBoundaryTopShadowClasses}
       />
       <div
-        ref={viewportRef}
+        ref={setViewportRef}
         className={cn(scrollBoundaryRegionViewportClasses, viewportClassName)}
         {...viewportProps}
       >

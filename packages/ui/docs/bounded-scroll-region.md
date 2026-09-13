@@ -31,13 +31,23 @@ across overlay scrollbar platforms.
 ## Environmental bottom inset
 
 Sticky-chrome forms with a docked footer use `formStickyScrollShellWithDockedFooterClasses` to
-publish `--rpg-content-bottom-inset` (derived from the standard docked actions bar block-size
-contract). Bounded inner panels may subtract it from viewport-relative fallback `max-height` caps.
-It communicates standard bottom viewport space reserved by surrounding chrome — not remaining
+publish `--rpg-content-bottom-inset` and augment `--rpg-content-top-inset` (derived from the
+standard docked actions bar block-size contract and conservative scroll-chrome contracts).
+Bounded inner panels may subtract these from viewport-relative fallback `max-height` caps.
+It communicates standard viewport space reserved by surrounding chrome — not remaining
 content height, and not dynamic footer growth (validation summaries may exceed the reserved
-footprint).
+footprint). The form scroll body is also a size container (`form-scroll-body-container`) so
+descendants can cap against the flex column instead of raw `dvh`.
 
-Dashboard master-detail list scroll (`master-detail-list-scroll-viewport-cap`) is one consumer.
+Dashboard master-detail list shells publish a single resolved cap
+(`--master-detail-shell-max-block-size` via `master-detail-list-shell-viewport-cap`) consumed
+by `max-height` and min-height floors — the `min()` / `calc()` is not restated per rule.
+Outside `form-scroll-body-container`, the cap is `min(content-cap, 100dvh - top-inset -
+bottom-inset)`. Inside the container, it also considers `100cqh - docked-scroll-top-chrome -
+floor-gap` — never raw `100cqh` alone. Slight **under-fill is preferable to overlap** with the
+docked footer; `--rpg-content-bottom-inset` applies to the **dvh fallback only** (the scroll
+body already excludes the footer). The list scroll body does not compose
+`boundedScrollRegionEndInsetClasses` — no inline-end gutter reserve.
 
 ## Scroll boundary shadows
 

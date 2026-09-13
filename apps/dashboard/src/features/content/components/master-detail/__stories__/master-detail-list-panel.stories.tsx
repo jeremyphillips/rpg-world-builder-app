@@ -4,6 +4,7 @@ import {
   formDockedActionsBarClasses,
   formStickyScrollBodyClasses,
   formStickyScrollShellWithDockedFooterClasses,
+  formStickyTabsClasses,
 } from '@rpg/ui/form'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
@@ -95,6 +96,11 @@ export const WithStickyFormFooter: Story = {
       <div className={formStickyScrollShellWithDockedFooterClasses}>
         <div className={formStickyScrollBodyClasses}>
           <div className="p-6">
+            <div
+              className={`${formStickyTabsClasses} mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-sm text-muted-foreground`}
+            >
+              Dummy section tabs
+            </div>
             <MasterDetailGrid>
               <MasterDetailListPanel {...args} />
               <div className="self-start rounded-lg border border-border-subtle px-4 py-3 text-sm text-muted-foreground md:col-span-2">

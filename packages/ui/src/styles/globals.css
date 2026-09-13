@@ -5,6 +5,7 @@
 @import './tokens/palette-dark.css';
 @import './tokens/semantic-dark.css';
 @import './surface-relative-chrome.utilities.css';
+@import './form-scroll-body.utilities.css';
 
 @plugin '@tailwindcss/typography';
 

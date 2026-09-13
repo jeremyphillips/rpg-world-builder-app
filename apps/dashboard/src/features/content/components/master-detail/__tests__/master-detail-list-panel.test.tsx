@@ -129,10 +129,15 @@ describe('MasterDetailListPanel', () => {
     render(<MasterDetailListPanel {...baseProps()} countSupplement={<span>2 available</span>} />)
 
     const scrollRegion = document.querySelector('[data-master-detail-list-scroll]')
+    const listShell = scrollRegion?.closest('nav')
     expect(scrollRegion).toBeInTheDocument()
-    expect(scrollRegion).toHaveClass('overflow-y-auto', 'master-detail-list-scroll-viewport-cap')
+    expect(scrollRegion).toHaveClass('overflow-y-auto', 'scrollbar-slim', 'pe-0')
+    expect(scrollRegion?.parentElement).toHaveClass('relative')
+    expect(scrollRegion).not.toHaveClass('master-detail-list-shell-viewport-cap')
+    expect(listShell).toHaveClass('master-detail-list-shell-viewport-cap')
     expect(scrollRegion).not.toContainElement(screen.getByRole('button', { name: /Add feature/i }))
     expect(scrollRegion).not.toContainElement(screen.getByText('2 available'))
+    expect(screen.getByText('2 available').parentElement).toHaveClass('border-b')
   })
 
   it('does not scroll into view on initial mount', () => {

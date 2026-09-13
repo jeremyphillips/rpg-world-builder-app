@@ -1,22 +1,41 @@
 /*
- * Master-detail list scroll viewport cap — consumes `--master-detail-list-max-block-size`
- * (definite-host override, higher priority) and optionally subtracts
- * `--rpg-content-bottom-inset` from viewport-relative fallback caps only.
+ * Master-detail list shell viewport cap — publishes `--master-detail-shell-max-block-size`
+ * once; consumers read that var for max-height and min-height floors.
  *
- * Does not compute remaining height to the docked footer; it is a conservative
- * viewport cap when the environmental inset is published by sticky-chrome forms.
+ * Inside a docked-footer form scroll body (`form-scroll-body-container`), also caps
+ * against container block-size minus conservative top-chrome and floor gap — never raw
+ * `100cqh` alone.
  */
 
-@utility master-detail-list-scroll-viewport-cap {
-  max-height: min(
-    var(--master-detail-list-max-block-size),
-    max(0px, calc(40dvh - var(--rpg-content-bottom-inset, 0px)))
+@utility master-detail-list-shell-viewport-cap {
+  --master-detail-shell-max-block-size: min(
+    calc(
+      var(--master-detail-list-max-block-size) + var(--master-detail-list-chrome-block-size, 0px)
+    ),
+    max(
+      0px,
+      calc(100dvh - var(--rpg-content-top-inset, 0px) - var(--rpg-content-bottom-inset, 0px))
+    )
   );
 
-  @media (min-width: 768px) {
-    max-height: min(
-      var(--master-detail-list-max-block-size),
-      max(0px, calc(70dvh - var(--rpg-content-bottom-inset, 0px)))
+  max-height: var(--master-detail-shell-max-block-size);
+
+  @container form-scroll-body (min-height: 0) {
+    --master-detail-shell-max-block-size: min(
+      calc(
+        var(--master-detail-list-max-block-size) + var(--master-detail-list-chrome-block-size, 0px)
+      ),
+      max(
+        0px,
+        calc(100dvh - var(--rpg-content-top-inset, 0px) - var(--rpg-content-bottom-inset, 0px))
+      ),
+      max(
+        0px,
+        calc(
+          100cqh - var(--rpg-form-docked-scroll-top-chrome-inset, 0px) -
+            var(--rpg-content-floor-gap, 0px)
+        )
+      )
     );
   }
 }

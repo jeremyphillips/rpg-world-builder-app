@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { Plus } from 'lucide-react'
-import { Button, InlineInactiveStatus, Text } from '@rpg/ui'
+import { Button, InlineInactiveStatus, ScrollBoundaryRegion, Text } from '@rpg/ui'
 
 import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
 import {
@@ -18,7 +18,8 @@ import {
   masterDetailListRowAvailabilityClasses,
   masterDetailListRowMetaClasses,
   masterDetailListRowTitleClasses,
-  masterDetailListScrollClasses,
+  masterDetailListScrollRegionClasses,
+  masterDetailListScrollViewportClasses,
   masterDetailListShellClasses,
   masterDetailListTitleClasses,
 } from './master-detail-list-panel.variants'
@@ -184,10 +185,11 @@ export function MasterDetailListPanel({
           {emptyLabel}
         </Text>
       ) : (
-        <div
-          ref={scrollRef}
+        <ScrollBoundaryRegion
+          className={masterDetailListScrollRegionClasses}
+          viewportClassName={masterDetailListScrollViewportClasses}
+          viewportRef={scrollRef}
           data-master-detail-list-scroll
-          className={masterDetailListScrollClasses}
         >
           <ul className={masterDetailListItemsClasses} role="list">
             {items.map((item, index) => (
@@ -201,7 +203,7 @@ export function MasterDetailListPanel({
               />
             ))}
           </ul>
-        </div>
+        </ScrollBoundaryRegion>
       )}
     </nav>
   )
