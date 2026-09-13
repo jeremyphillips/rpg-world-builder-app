@@ -2,6 +2,11 @@ import { Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 
 import type { RulesConfigNavLeaf, RulesConfigNavSection } from '@/features/campaign'
 
+import {
+  rulesConfigFieldNavShellClasses,
+  rulesConfigFieldNavStickyClasses,
+} from './rules-config-field-nav.variants'
+
 export type { RulesConfigNavLeaf, RulesConfigNavSection }
 
 type RulesConfigFieldNavProps = {
@@ -66,10 +71,10 @@ export function RulesConfigFieldNav({
   return (
     <>
       <nav
-        className="hidden w-56 shrink-0 lg:sticky lg:top-20 lg:block lg:self-start"
+        className={cn(rulesConfigFieldNavStickyClasses, rulesConfigFieldNavShellClasses)}
         aria-label={navLabel}
       >
-        <Eyebrow size="sm" className="mb-2 px-3">
+        <Eyebrow size="sm" className="mb-2">
           Sections
         </Eyebrow>
         <ul className="space-y-1">

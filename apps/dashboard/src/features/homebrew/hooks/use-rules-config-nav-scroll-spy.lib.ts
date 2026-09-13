@@ -62,8 +62,8 @@ export function resolveActiveNavFromEntries(entries: readonly NavScrollSpyEntry[
   return activeSection ? { activeSectionId: activeSection.id } : {}
 }
 
-/** Default offset for sticky app header + `scroll-mt-20` anchor margin. */
-export const RULES_CONFIG_NAV_SCROLL_OFFSET_PX = 80
+/** Default offset for page shell top inset + `scroll-mt-8` anchor margin. */
+export const RULES_CONFIG_NAV_SCROLL_OFFSET_PX = 32
 
 export function buildRulesConfigNavObserverRootMargin(
   scrollOffsetPx = RULES_CONFIG_NAV_SCROLL_OFFSET_PX,

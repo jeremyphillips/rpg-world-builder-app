@@ -252,8 +252,12 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
   })
 
   it('renders the character configuration form with section navigation', async () => {
-    renderDetail()
+    const { container } = renderDetail()
     await expectCharacterConfigurationReady()
+
+    const mainColumn = container.querySelector('.max-w-xl')
+    expect(mainColumn?.querySelector('.overflow-y-auto')).toBeNull()
+    expect(mainColumn?.querySelector('.form-scroll-body-container')).toBeNull()
 
     expect(
       screen.getByRole('navigation', { name: 'Character configuration sections' }),

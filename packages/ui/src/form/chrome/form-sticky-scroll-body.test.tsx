@@ -13,8 +13,8 @@ describe('FormStickyScrollBody', () => {
 
     expect(screen.getByText('Character starting level')).toBeVisible()
     expect(container.querySelector('.form-scroll-body-container')).toBeNull()
-    expect(container.firstElementChild).toHaveClass('overflow-y-auto')
-    expect(container.firstElementChild).not.toHaveClass('overflow-hidden')
+    expect(container.querySelector('.overflow-y-auto')).toBeNull()
+    expect(container.querySelector('.overflow-hidden')).toBeNull()
   })
 
   it('renders viewport-bound content inside the clip slot', () => {

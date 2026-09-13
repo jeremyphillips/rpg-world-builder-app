@@ -186,13 +186,10 @@ const formStickyScrollBodyScrollSurfaceClasses = cn(
 )
 
 /**
- * Page-scroll sticky footer — single scroller grows with content; no clip slot.
- * Use on routes where the page shell owns scroll (`pageScrollClasses.page`).
+ * Legacy docked-footer slot when no clip is applied — prefer `pageScroll` on `<Form>`
+ * so the page shell owns scroll instead of composing an inner scroller here.
  */
-export const formStickyScrollBodyUnboundedClasses = cn(
-  'min-h-0 flex-1',
-  formStickyScrollBodyScrollSurfaceClasses,
-)
+export const formStickyScrollBodyUnboundedClasses = 'min-h-0 flex-1'
 
 /** Inner scroller inside the viewport-bound clip slot. */
 export const formStickyScrollBodyScrollerClasses = cn(

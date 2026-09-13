@@ -245,6 +245,25 @@ describe('Form', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
+  it('grows with content when pageScroll and stickyFooter are both enabled', () => {
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={[{ type: 'text', name: 'name', label: 'Name' }]}
+        onSubmit={vi.fn()}
+        stickyFooter
+        pageScroll
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const form = container.querySelector('form')
+    expect(form).not.toHaveClass('flex-1')
+    expect(container.querySelector('.form-scroll-body-container')).toBeNull()
+    expect(container.querySelector('.overflow-y-auto')).toBeNull()
+    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toBeInTheDocument()
+  })
+
   it('omits HTML min/max on number fields so values like 20 can be edited to 15', async () => {
     const levelSchema = z.object({
       level: z.number().int().min(1).max(30),

@@ -6,5 +6,5 @@ export type HomebrewDetailMainProps = {
 
 /** Vertical rhythm stack for hub detail main-column content beneath {@link PageHeader}. */
 export function HomebrewDetailMain({ children }: HomebrewDetailMainProps) {
-  return <div className="flex flex-col gap-3">{children}</div>
+  return <div className="flex flex-col gap-3 overflow-visible">{children}</div>
 }

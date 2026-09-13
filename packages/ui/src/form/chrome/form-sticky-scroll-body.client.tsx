@@ -34,6 +34,10 @@ export function FormStickyScrollBody({
   ) : null
 
   if (!boundedScroll) {
+    if (!inset && !className) {
+      return children
+    }
+
     return (
       <div className={cn(formStickyScrollBodyUnboundedClasses, className)}>
         {inset}

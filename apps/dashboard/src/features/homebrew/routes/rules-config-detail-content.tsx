@@ -138,6 +138,8 @@ function CharacterConfigurationForm({ campaignId }: { campaignId: string }) {
             onSubmit={onSubmit}
             formError={formError}
             stickyFooter={canManage}
+            pageScroll={true}
+            className="overflow-visible"
             footer={canManage ? saveFooter : undefined}
           />
         </HomebrewDetailMain>
@@ -205,6 +207,8 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
             onSubmit={onSubmit}
             formError={formError}
             stickyFooter={canManage}
+            pageScroll={true}
+            className="overflow-visible"
             footer={canManage ? saveFooter : undefined}
           />
         </HomebrewDetailMain>

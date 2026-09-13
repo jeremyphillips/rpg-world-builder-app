@@ -74,6 +74,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
   /**
+   * Page shell owns scroll (`pageScrollClasses.page`). With `stickyFooter`, fields grow
+   * naturally and the actions bar sticks during ancestor scroll — no docked inner scroller.
+   */
+  pageScroll?: boolean
+  /**
    * Wrap scrollable field content (e.g. `<DrawerShell.Body>` in composed drawer flows).
    * Pair with {@link externalFooter} so footer content renders in overlay shell chrome.
    */
@@ -135,6 +140,7 @@ export function Form<TFieldValues extends FieldValues>({
   fileFieldProps,
   mode,
   stickyFooter = false,
+  pageScroll = false,
   contentWrapper,
   externalFooter = false,
   density,
@@ -174,6 +180,9 @@ export function Form<TFieldValues extends FieldValues>({
     [externalFooter, formError, formId, resolvedFooter],
   )
 
+  const usesDockedStickyFooter = stickyFooter && !externalFooter && !pageScroll
+  const usesPageScrollStickyFooter = stickyFooter && !externalFooter && pageScroll
+
   return (
     <SchemaFormShell
       form={form}
@@ -189,11 +198,11 @@ export function Form<TFieldValues extends FieldValues>({
       externalFooterContent={externalFooterContent}
       className={cn(
         externalFooter && 'flex min-h-0 flex-1 flex-col',
-        stickyFooter && !externalFooter && 'flex min-h-0 flex-1 flex-col',
+        usesDockedStickyFooter && 'flex min-h-0 flex-1 flex-col',
         className,
       )}
     >
-      {stickyFooter && !externalFooter ? (
+      {usesDockedStickyFooter ? (
         <div className={formStickyScrollShellWithDockedFooterClasses}>
           <FormShellFieldStack
             formId={formId}
@@ -214,6 +223,27 @@ export function Form<TFieldValues extends FieldValues>({
             actionsBarPlacement="docked"
           />
         </div>
+      ) : usesPageScrollStickyFooter ? (
+        <>
+          <FormShellFieldStack
+            formId={formId}
+            fields={fields}
+            contentClassName={contentClassName}
+            scrollBodyClassName={scrollBodyClassName}
+            externalFooter={externalFooter}
+            stickyFooter={false}
+            formError={undefined}
+            valueSyncs={valueSyncs}
+            header={resolvedHeader}
+            contentWrapper={contentWrapper}
+          />
+          <FormFooterRegion
+            stickyFooter
+            formError={formError}
+            footer={resolvedFooter}
+            actionsBarPlacement="sticky"
+          />
+        </>
       ) : (
         <>
           <FormShellFieldStack
