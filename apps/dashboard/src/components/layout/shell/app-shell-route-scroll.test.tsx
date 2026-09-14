@@ -11,7 +11,13 @@ import { NarrowPage } from '../page/narrow-page'
 import { viewportWorkspaceClasses } from '../page/viewport-workspace.variants'
 import { ViewportWorkspace } from '../page/viewport-workspace'
 import { WidePage } from '../page/wide-page'
-import { appShellMainClasses, appShellRootClasses } from './app-shell.variants'
+import {
+  appShellContentColumnViewportLockClasses,
+  appShellContentColumnClasses,
+  appShellMainViewportLockClasses,
+  appShellMainClasses,
+  appShellRootClasses,
+} from './app-shell.variants'
 
 /**
  * Document scroll is the default. Ordinary routes never establish a vertical scrollport.
@@ -32,6 +38,7 @@ describe('AppShell route scroll ownership', () => {
     expect(appShellMainClasses).toContain('min-h-0')
     expect(appShellMainClasses).not.toContain('overflow-hidden')
     expect(appShellMainClasses).not.toContain('overflow-y-auto')
+    expect(appShellMainViewportLockClasses).toContain('overflow-hidden')
     expect(appShellMainClasses).not.toContain('min-h-full')
     expect(appShellMainClasses).not.toContain('h-full')
   })
@@ -77,6 +84,14 @@ describe('AppShell route scroll ownership', () => {
 
     const widthShell = workspace?.firstElementChild
     expect(widthShell).not.toHaveClass('pt-8', 'pb-8')
+  })
+
+  it('defines runtime viewport lock tokens for ViewportWorkspace routes', () => {
+    expect(appShellContentColumnViewportLockClasses).toContain('h-dvh')
+    expect(appShellContentColumnViewportLockClasses).toContain('max-h-dvh')
+    expect(appShellContentColumnViewportLockClasses).toContain('overflow-hidden')
+    expect(appShellMainViewportLockClasses).toContain('h-0')
+    expect(appShellContentColumnClasses).not.toMatch(/(?:^|\s)h-dvh(?:\s|$)/)
   })
 
   it('documents messages workspace as a viewport workspace exception', () => {

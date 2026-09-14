@@ -251,8 +251,14 @@ describe('TabbedForm', () => {
     const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
     const formColumn = toolbar.parentElement
 
-    expect(slot).toHaveClass('min-h-0', 'xl:col-start-2', 'xl:flex-col', 'xl:row-start-1')
-    expect(slot).not.toHaveClass('xl:h-full')
+    expect(slot).toHaveClass(
+      'min-h-0',
+      'xl:col-start-2',
+      'xl:flex-col',
+      'xl:h-full',
+      'xl:row-start-1',
+    )
+    expect(formColumn).toHaveClass('xl:h-full', 'flex-col')
     expect(grid).toHaveClass(
       'mx-auto',
       'xl:grid-cols-[minmax(0,1fr)_280px]',

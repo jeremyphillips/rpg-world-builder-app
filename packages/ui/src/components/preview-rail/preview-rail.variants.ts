@@ -58,7 +58,7 @@ export const previewRailRootVariants = cva('flex min-w-0 flex-col', {
     layout: {
       default: '',
       /** Fills a viewport-bounded aside column; internal ScrollRegion owns overflow. */
-      fill: 'min-h-0 w-full min-w-0 flex-1',
+      fill: 'min-h-0 w-full min-w-0 flex-1 overflow-hidden',
     },
   },
   defaultVariants: {

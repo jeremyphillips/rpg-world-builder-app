@@ -150,7 +150,15 @@ describe('PreviewRail', () => {
     )
 
     const rail = screen.getByRole('complementary')
-    expect(rail).toHaveClass('flex-1', 'min-h-0', 'min-w-0', 'w-full', 'flex', 'flex-col')
+    expect(rail).toHaveClass(
+      'flex-1',
+      'min-h-0',
+      'min-w-0',
+      'w-full',
+      'flex',
+      'flex-col',
+      'overflow-hidden',
+    )
     expect(screen.getByTestId('preview-rail-scroll')).toHaveClass('min-h-0', 'flex-1')
   })
 

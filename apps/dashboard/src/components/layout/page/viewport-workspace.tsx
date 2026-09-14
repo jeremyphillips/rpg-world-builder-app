@@ -2,7 +2,12 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { viewportWorkspaceClasses } from './viewport-workspace.variants'
+import { useViewportWorkspaceShellLock } from './use-viewport-workspace-shell-lock'
+import {
+  VIEWPORT_WORKSPACE_FILL_ATTR,
+  VIEWPORT_WORKSPACE_FILL_VALUE,
+  viewportWorkspaceClasses,
+} from './viewport-workspace.variants'
 
 export interface ViewportWorkspaceProps {
   children: ReactNode
@@ -14,5 +19,14 @@ export interface ViewportWorkspaceProps {
  * Ordinary document-scroll routes must not use this primitive.
  */
 export function ViewportWorkspace({ children, className }: ViewportWorkspaceProps) {
-  return <div className={cn(viewportWorkspaceClasses, className)}>{children}</div>
+  useViewportWorkspaceShellLock()
+
+  return (
+    <div
+      className={cn(viewportWorkspaceClasses, className)}
+      {...{ [VIEWPORT_WORKSPACE_FILL_ATTR]: VIEWPORT_WORKSPACE_FILL_VALUE }}
+    >
+      {children}
+    </div>
+  )
 }

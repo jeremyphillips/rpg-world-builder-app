@@ -10,6 +10,8 @@ import { Sidebar } from '@/components/layout/sidebar'
 import { Topbar } from '@/components/layout/topbar/topbar'
 
 import {
+  APP_SHELL_CONTENT_COLUMN_ATTR,
+  APP_SHELL_MAIN_ATTR,
   appShellBreadcrumbRailClasses,
   appShellContentColumnClasses,
   appShellMainClasses,
@@ -43,12 +45,15 @@ export function AppShell() {
       <GlobalSearchProvider>
         <div className={appShellRootClasses}>
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          <div className={appShellContentColumnClasses}>
+          <div
+            className={appShellContentColumnClasses}
+            {...{ [APP_SHELL_CONTENT_COLUMN_ATTR]: '' }}
+          >
             <div className={appShellStickyChromeClasses} data-app-sticky-chrome>
               <Topbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
               <AppShellBreadcrumbRail />
             </div>
-            <main className={appShellMainClasses}>
+            <main className={appShellMainClasses} {...{ [APP_SHELL_MAIN_ATTR]: '' }}>
               <Outlet />
             </main>
           </div>

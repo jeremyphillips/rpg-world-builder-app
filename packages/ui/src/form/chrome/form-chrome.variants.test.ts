@@ -16,6 +16,7 @@ import {
   formTabbedAsideGridMaxWidthAt2xlClasses,
   formTabbedAsideGridMaxWidthBelow2xlClasses,
   formTabbedAsideSlotClasses,
+  formTabbedAsideSlotBottomInsetClasses,
   formTabbedAsideSlotTopInsetClasses,
   formViewportScrollBodyTopInsetClasses,
   RPG_CONTENT_BOTTOM_INSET_VAR,
@@ -29,7 +30,7 @@ describe('formTabbedAside layout tokens', () => {
     expect(formTabbedAsideGridClasses).toContain('xl:grid-rows-[minmax(0,1fr)]')
     expect(formTabbedAsideGridClasses).toContain('flex-1')
     expect(formTabbedAsideGridClasses).toContain('min-h-0')
-    expect(formTabbedAsideGridClasses).not.toContain('xl:h-full')
+    expect(formTabbedAsideGridClasses).toContain('overflow-hidden')
   })
 
   it('uses a narrower preview-rail column below 2xl', () => {
@@ -46,17 +47,19 @@ describe('formTabbedAside layout tokens', () => {
 
   it('fills grid cells for scroll + docked footer columns', () => {
     expect(formTabbedAsideBodyClasses).toContain('min-h-0')
-    expect(formTabbedAsideBodyClasses).not.toContain('xl:h-full')
+    expect(formTabbedAsideBodyClasses).toContain('xl:h-full')
+    expect(formTabbedAsideBodyClasses).toContain('flex-col')
     expect(formTabbedAsideSlotClasses).toContain('min-h-0')
     expect(formTabbedAsideSlotClasses).toContain('xl:flex')
     expect(formTabbedAsideSlotClasses).toContain('xl:flex-col')
-    expect(formTabbedAsideSlotClasses).not.toContain('xl:h-full')
+    expect(formTabbedAsideSlotClasses).toContain('xl:h-full')
   })
 
-  it('applies top inset on the preview-rail column only (footer stays flush)', () => {
+  it('applies top and bottom inset on the preview-rail column (form footer stays flush)', () => {
     expect(formTabbedAsideSlotTopInsetClasses).toBe('xl:pt-8')
+    expect(formTabbedAsideSlotBottomInsetClasses).toBe('xl:pb-4')
     expect(formTabbedAsideSlotClasses).toContain(formTabbedAsideSlotTopInsetClasses)
-    expect(formTabbedAsideSlotClasses).not.toContain('pb-8')
+    expect(formTabbedAsideSlotClasses).toContain(formTabbedAsideSlotBottomInsetClasses)
     expect(formTabbedAsideSlotClasses).not.toContain('xl:pb-8')
   })
 

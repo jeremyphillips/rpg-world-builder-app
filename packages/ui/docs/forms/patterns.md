@@ -33,7 +33,8 @@ main column without page-level scroll; TabbedForm owns the bounded scroll body a
 (flush to the viewport bottom). Top inset scrolls away via `scrollBodyClassName` (typically
 `formViewportScrollBodyTopInsetClasses`) as the first child inside the scroll region — not as
 padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail top gutter
-lives on `formTabbedAsideSlotTopInsetClasses` (no bottom inset — docked footer is flush).
+lives on `formTabbedAsideSlotTopInsetClasses`; bottom breathing room on
+`formTabbedAsideSlotBottomInsetClasses` (`xl:pb-4`). The form-column docked footer stays flush.
 Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
 reserved scrollbar gutters. Overlay pattern: use `externalFooter` with
 `FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar inside scroll content.
