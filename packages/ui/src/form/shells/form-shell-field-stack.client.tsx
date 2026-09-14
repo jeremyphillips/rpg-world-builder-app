@@ -20,6 +20,7 @@ export type FormShellFieldStackProps = {
   scrollBodyClassName?: string
   externalFooter: boolean
   stickyFooter: boolean
+  boundedScroll?: boolean
   formError?: string | null
   valueSyncs?: FormValueSync[]
   header?: ReactNode
@@ -28,7 +29,7 @@ export type FormShellFieldStackProps = {
 
 type FormShellFieldStackScrollWrapOptions = Pick<
   FormShellFieldStackProps,
-  'contentClassName' | 'scrollBodyClassName' | 'externalFooter' | 'stickyFooter'
+  'contentClassName' | 'scrollBodyClassName' | 'externalFooter' | 'stickyFooter' | 'boundedScroll'
 >
 
 function wrapFormShellFieldStackScroll(
@@ -38,6 +39,7 @@ function wrapFormShellFieldStackScroll(
     scrollBodyClassName,
     externalFooter,
     stickyFooter,
+    boundedScroll,
   }: FormShellFieldStackScrollWrapOptions,
 ): ReactNode {
   if (externalFooter) {
@@ -48,7 +50,7 @@ function wrapFormShellFieldStackScroll(
     return (
       <FormStickyScrollBody
         scrollBodyClassName={scrollBodyClassName}
-        boundedScroll={Boolean(scrollBodyClassName)}
+        boundedScroll={boundedScroll ?? Boolean(scrollBodyClassName)}
       >
         {stack}
       </FormStickyScrollBody>
@@ -65,6 +67,7 @@ export function FormShellFieldStack({
   scrollBodyClassName,
   externalFooter,
   stickyFooter,
+  boundedScroll,
   formError,
   valueSyncs,
   header,
@@ -90,6 +93,7 @@ export function FormShellFieldStack({
     scrollBodyClassName,
     externalFooter,
     stickyFooter,
+    boundedScroll,
   })
 
   return contentWrapper && !stickyFooter ? contentWrapper(scrollWrappedStack) : scrollWrappedStack

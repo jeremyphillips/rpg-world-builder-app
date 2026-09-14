@@ -1,9 +1,10 @@
 import { cn } from '@rpg/ui'
 
 import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
+import { viewportWorkspacePaneClasses } from '@/components/layout/page/viewport-workspace.variants'
 
-/** Full-height workspace root — fills the app-shell main column. */
-export const messagesWorkspaceRootClasses = 'flex min-h-0 flex-1 flex-col gap-4'
+/** Full-height workspace pane — fills ViewportWorkspace with header + body grid. */
+export const messagesWorkspaceRootClasses = cn(viewportWorkspacePaneClasses, 'gap-4')
 
 export const messagesWorkspaceHeaderSectionClasses = cn(pageHeaderSectionGapClasses, 'shrink-0')
 

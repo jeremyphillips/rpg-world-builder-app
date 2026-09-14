@@ -48,6 +48,7 @@ export function FormShellChildren({
           scrollBodyClassName={scrollBodyClassName}
           externalFooter={externalFooter}
           stickyFooter={stickyFooter}
+          boundedScroll
           formError={formError}
           valueSyncs={valueSyncs}
           header={header}

@@ -20,6 +20,7 @@ import {
   ContentFormSaveFooter,
   type ContentFormFooterShellProps,
 } from './content-form-shell-layout.lib'
+import { contentSchemaFormFillClasses } from './content-form-page-shell.variants'
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import {
   ContentPreviewCompactTrigger,
@@ -220,7 +221,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
     <>
       {tabbedFormTabs ? (
         <ContentPreviewUiProvider>
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className={contentSchemaFormFillClasses}>
             <TabbedForm<TFormValues>
               key={formKey}
               id={formKey}
@@ -254,7 +255,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
           </div>
         </ContentPreviewUiProvider>
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className={contentSchemaFormFillClasses}>
           <Form<TFormValues>
             key={formKey}
             id={formKey}

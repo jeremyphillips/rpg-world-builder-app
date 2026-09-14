@@ -144,9 +144,19 @@ may own vertical scrolling.
 | Scroll container    | Intentional custom scrollport (`overflow-y-auto`)     |
 | `ViewportWorkspace` | Opt-in bounded multi-pane editor shell                |
 
+**ViewportWorkspace consumers** (bounded routes — no document scrollbar):
+
+| Consumer                                                                                              | Route pattern       |
+| ----------------------------------------------------------------------------------------------------- | ------------------- |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Catalog create/edit |
+| [`MessagesWorkspaceShell`](../src/features/message/components/workspace/messages-workspace-shell.tsx) | `/messages`         |
+
 `AppShell` publishes `--app-sticky-chrome-block-size` (sticky topbar + breadcrumb)
-for workspace bounds and chrome-aware sticky rails. `<main>` is horizontal gutter
-only (`min-w-0 flex-1`) — not a height contract or scrollport.
+for workspace bounds and chrome-aware sticky rails; `<main>` aliases
+`--rpg-content-top-inset` from that variable. `<main>` is horizontal gutter
+only (`min-w-0 flex-1`) for document-scroll routes — not a height contract or
+scrollport. When a descendant mounts `data-viewport-fill="workspace"`, AppShell
+`:has()` caps the content column at one viewport height and main at `h-0`.
 
 Inset vs child rhythm are **independent** on width shells:
 

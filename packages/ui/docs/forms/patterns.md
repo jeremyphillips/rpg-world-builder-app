@@ -28,13 +28,15 @@ descendants can cap against the definite flex column above the footer; the inner
 column and inner scroller so fields keep their natural height; the actions bar uses sticky
 placement during ancestor scroll. Pass `stickyChrome={false}` for
 flat layout. Dashboard content create/edit routes mount
-`ContentFormPageShell` with `scroll="viewport" spacing="none"` so the page shell fills the app
-main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer
-(flush to the viewport bottom). Top inset scrolls away via `scrollBodyClassName` (typically
-`formViewportScrollBodyTopInsetClasses`) as the first child inside the scroll region — not as
-padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail top gutter
-lives on `formTabbedAsideSlotTopInsetClasses`; bottom breathing room on
-`formTabbedAsideSlotBottomInsetClasses` (`xl:pb-4`). The form-column docked footer stays flush.
+`ContentFormPageShell` (`ViewportWorkspace` + width shell with `spacing="none"`) so the page
+fills the app main column without document scroll; TabbedForm owns the bounded scroll body and
+docked footer (flush to the viewport bottom). Top inset scrolls away via `scrollBodyClassName`
+(typically `formViewportScrollBodyTopInsetClasses`) as the first child inside the scroll region —
+not as padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail top
+gutter lives on `formTabbedAsideSlotTopInsetClasses`; bottom breathing room on
+`formTabbedAsideSlotBottomInsetClasses` (`xl:pb-4` — intentional inset so preview content clears
+the docked form footer; the form-column footer itself stays flush). Plain `<Form>` with docked
+sticky footer passes `boundedScroll` on the scroll body when `usesDockedStickyFooter`.
 Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
 reserved scrollbar gutters. Overlay pattern: use `externalFooter` with
 `FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar inside scroll content.

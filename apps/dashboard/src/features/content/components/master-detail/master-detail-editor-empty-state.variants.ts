@@ -1,6 +1,3 @@
-export const masterDetailEditorEmptyShellClasses =
-  'flex min-h-48 flex-col self-start bg-transparent md:col-span-2'
-
 export const masterDetailEditorEmptyStateContentClasses =
   'flex flex-1 flex-col items-center justify-center gap-3 px-6 py-10 text-center'
 

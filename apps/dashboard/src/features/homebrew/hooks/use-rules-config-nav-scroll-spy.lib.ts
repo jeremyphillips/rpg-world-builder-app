@@ -1,4 +1,5 @@
 import type { RulesConfigNavSection } from '@/features/campaign'
+import { appStickyChromeBlockSizeFallbackPx } from '@/components/layout/shell/app-shell.variants'
 
 export type NavScrollSpyAnchor = {
   id: string
@@ -69,7 +70,7 @@ export function resolveStickyChromeBlockSizePx(): number {
     return chrome.getBoundingClientRect().height
   }
 
-  return 88
+  return appStickyChromeBlockSizeFallbackPx
 }
 
 /** Default offset below sticky chrome + anchor scroll margin. */

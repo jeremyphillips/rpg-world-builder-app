@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 
-import { viewportWorkspaceClasses } from './viewport-workspace.variants'
+import {
+  VIEWPORT_WORKSPACE_FILL_ATTR,
+  VIEWPORT_WORKSPACE_FILL_VALUE,
+  viewportWorkspaceClasses,
+} from './viewport-workspace.variants'
 import { ViewportWorkspace } from './viewport-workspace'
 
 describe('ViewportWorkspace', () => {
@@ -17,5 +21,6 @@ describe('ViewportWorkspace', () => {
     expect(root).toHaveClass('flex', 'flex-1', 'flex-col', 'overflow-hidden', 'min-h-0', 'h-0')
     expect(root?.className).not.toContain('block-size:')
     expect(root).not.toHaveAttribute('data-scroll-container')
+    expect(root).toHaveAttribute(VIEWPORT_WORKSPACE_FILL_ATTR, VIEWPORT_WORKSPACE_FILL_VALUE)
   })
 })

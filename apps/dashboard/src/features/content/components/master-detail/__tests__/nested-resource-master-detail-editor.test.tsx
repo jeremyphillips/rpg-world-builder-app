@@ -85,6 +85,13 @@ describe('NestedResourceMasterDetailEditor', () => {
     expect(screen.getByText(masterDetailEmptySelectionHeading(itemNoun))).toBeInTheDocument()
   })
 
+  it('renders empty detail through shared shell spanning both grid columns', () => {
+    const { container } = render(<EditorHarness items={[]} selectedRowId={null} />)
+
+    const emptyShell = container.querySelector('[role="status"]')?.parentElement
+    expect(emptyShell).toHaveClass('md:col-span-2')
+  })
+
   it('selects a row and renders detail content for the row id', async () => {
     const user = userEvent.setup()
     const onSelectRow = vi.fn()

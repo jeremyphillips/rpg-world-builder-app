@@ -7,7 +7,6 @@ import {
   selectIdAtIndex,
 } from '../../lib/master-detail/resolve-master-detail-selected-index'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
-import { MasterDetailEditorEmptyState } from './master-detail-editor-empty-state'
 import {
   MasterDetailEditorShell,
   type MasterDetailEditorIdentity,
@@ -78,7 +77,7 @@ export function NestedResourceMasterDetailEditor({
         {renderDetail({ rowId: selectedRowId })}
       </MasterDetailEditorShell>
     ) : (
-      <MasterDetailEditorEmptyState itemNoun={itemNoun} />
+      <MasterDetailEditorShell itemNoun={itemNoun} />
     )
 
   const masterDetailGrid = (

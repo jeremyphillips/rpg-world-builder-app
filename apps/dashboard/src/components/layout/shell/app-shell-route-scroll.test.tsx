@@ -12,12 +12,14 @@ import { viewportWorkspaceClasses } from '../page/viewport-workspace.variants'
 import { ViewportWorkspace } from '../page/viewport-workspace'
 import { WidePage } from '../page/wide-page'
 import {
-  appShellContentColumnViewportLockClasses,
   appShellContentColumnClasses,
-  appShellMainViewportLockClasses,
   appShellMainClasses,
   appShellRootClasses,
 } from './app-shell.variants'
+import {
+  VIEWPORT_WORKSPACE_FILL_ATTR,
+  VIEWPORT_WORKSPACE_FILL_VALUE,
+} from '../page/viewport-workspace.variants'
 
 /**
  * Document scroll is the default. Ordinary routes never establish a vertical scrollport.
@@ -36,9 +38,8 @@ describe('AppShell route scroll ownership', () => {
     expect(appShellMainClasses).toContain('flex-1')
     expect(appShellMainClasses).toContain('flex-col')
     expect(appShellMainClasses).toContain('min-h-0')
-    expect(appShellMainClasses).not.toContain('overflow-hidden')
     expect(appShellMainClasses).not.toContain('overflow-y-auto')
-    expect(appShellMainViewportLockClasses).toContain('overflow-hidden')
+    expect(appShellMainClasses).toContain('has-[[data-viewport-fill=workspace]]:overflow-hidden')
     expect(appShellMainClasses).not.toContain('min-h-full')
     expect(appShellMainClasses).not.toContain('h-full')
   })
@@ -86,16 +87,19 @@ describe('AppShell route scroll ownership', () => {
     expect(widthShell).not.toHaveClass('pt-8', 'pb-8')
   })
 
-  it('defines runtime viewport lock tokens for ViewportWorkspace routes', () => {
-    expect(appShellContentColumnViewportLockClasses).toContain('h-dvh')
-    expect(appShellContentColumnViewportLockClasses).toContain('max-h-dvh')
-    expect(appShellContentColumnViewportLockClasses).toContain('overflow-hidden')
-    expect(appShellMainViewportLockClasses).toContain('h-0')
+  it('defines :has() viewport lock tokens for ViewportWorkspace routes', () => {
+    expect(appShellContentColumnClasses).toContain('has-[[data-viewport-fill=workspace]]:h-dvh')
+    expect(appShellContentColumnClasses).toContain('has-[[data-viewport-fill=workspace]]:max-h-dvh')
+    expect(appShellContentColumnClasses).toContain(
+      'has-[[data-viewport-fill=workspace]]:overflow-hidden',
+    )
+    expect(appShellMainClasses).toContain('has-[[data-viewport-fill=workspace]]:h-0')
     expect(appShellContentColumnClasses).not.toMatch(/(?:^|\s)h-dvh(?:\s|$)/)
   })
 
-  it('documents messages workspace as a viewport workspace exception', () => {
+  it('documents messages workspace as a ViewportWorkspace pane', () => {
     expect(messagesWorkspaceRootClasses).toContain('min-h-0')
+    expect(messagesWorkspaceRootClasses).toContain('flex-1')
     expect(messagesWorkspaceBodyClasses).toContain('overflow-hidden')
   })
 
@@ -105,8 +109,8 @@ describe('AppShell route scroll ownership', () => {
         <p>Body</p>
       </ViewportWorkspace>,
     )
-    expect(container.firstElementChild).toHaveClass(
-      ...viewportWorkspaceClasses.split(/\s+/).filter(Boolean),
-    )
+    const root = container.firstElementChild
+    expect(root).toHaveClass(...viewportWorkspaceClasses.split(/\s+/).filter(Boolean))
+    expect(root).toHaveAttribute(VIEWPORT_WORKSPACE_FILL_ATTR, VIEWPORT_WORKSPACE_FILL_VALUE)
   })
 })

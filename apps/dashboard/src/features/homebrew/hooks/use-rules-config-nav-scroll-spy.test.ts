@@ -4,11 +4,14 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { appStickyChromeBlockSizeFallbackPx } from '@/components/layout/shell/app-shell.variants'
+
 import { useRulesConfigNavScrollSpy } from './use-rules-config-nav-scroll-spy'
 import {
   collectNavScrollSpyAnchors,
   measureAnchorTopRelativeToViewport,
   resolveActiveNavFromEntries,
+  resolveStickyChromeBlockSizePx,
 } from './use-rules-config-nav-scroll-spy.lib'
 
 describe('collectNavScrollSpyAnchors', () => {
@@ -27,6 +30,12 @@ describe('collectNavScrollSpyAnchors', () => {
       { id: 'creation-starting-level', sectionId: 'creation', isLeaf: true },
       { id: 'progression', sectionId: 'progression', isLeaf: false },
     ])
+  })
+})
+
+describe('resolveStickyChromeBlockSizePx', () => {
+  it('falls back to the named app shell chrome block size', () => {
+    expect(resolveStickyChromeBlockSizePx()).toBe(appStickyChromeBlockSizeFallbackPx)
   })
 })
 
