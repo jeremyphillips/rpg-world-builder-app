@@ -6,24 +6,24 @@ import {
   assembleComboboxOptionSearchDocument,
   optionMatchesQuery,
   rankOptionsByQuery,
-  type LabelValueDescriptionOption,
+  type LabelValueMetadataOption,
 } from './option-query.lib'
 
-const fireBoltOption: LabelValueDescriptionOption = {
+const fireBoltOption: LabelValueMetadataOption = {
   value: 'fire-bolt',
   label: 'Fire Bolt',
-  description: 'Cantrip',
+  metadata: 'Cantrip',
 }
 
-function legacyOptionMatchesQuery(option: LabelValueDescriptionOption, query: string): boolean {
+function legacyOptionMatchesQuery(option: LabelValueMetadataOption, query: string): boolean {
   const normalized = query.trim().toLowerCase()
   if (!normalized) return true
 
   const fields = [
     { text: option.label, weight: 1, role: 'label' as const },
     { text: option.value, weight: 1, role: 'alias' as const },
-    ...(option.description
-      ? [{ text: option.description, weight: 1, role: 'description' as const }]
+    ...(option.metadata
+      ? [{ text: option.metadata, weight: 1, role: 'description' as const }]
       : []),
   ]
 
@@ -37,7 +37,7 @@ describe('option-query.lib', () => {
       fields: [
         { key: 'label', text: 'Fire Bolt', role: 'primary' },
         { key: 'value', text: 'fire-bolt', role: 'keyword' },
-        { key: 'description', text: 'Cantrip', role: 'secondary' },
+        { key: 'metadata', text: 'Cantrip', role: 'secondary' },
       ],
     })
   })
@@ -58,7 +58,7 @@ describe('option-query.lib', () => {
   })
 
   it('matches fire ball to fireball labels', () => {
-    const fireballOption: LabelValueDescriptionOption = {
+    const fireballOption: LabelValueMetadataOption = {
       value: 'fireball',
       label: 'Fireball',
     }
@@ -68,7 +68,7 @@ describe('option-query.lib', () => {
   })
 
   it('assembles keyword fields from searchTerms', () => {
-    const option: LabelValueDescriptionOption = {
+    const option: LabelValueMetadataOption = {
       value: 'stable',
       label: 'Stable',
       searchTerms: ['horses', 'lodging'],
@@ -86,7 +86,7 @@ describe('option-query.lib', () => {
   })
 
   it('matches composed searchTerms with the forgiving profile', () => {
-    const option: LabelValueDescriptionOption = {
+    const option: LabelValueMetadataOption = {
       value: 'stable',
       label: 'Stable',
       searchTerms: ['horses'],
@@ -97,11 +97,11 @@ describe('option-query.lib', () => {
   })
 
   it('ranks label exact match above search-term-only match', () => {
-    const libraryOption: LabelValueDescriptionOption = {
+    const libraryOption: LabelValueMetadataOption = {
       value: 'library',
       label: 'Library',
     }
-    const archiveOption: LabelValueDescriptionOption = {
+    const archiveOption: LabelValueMetadataOption = {
       value: 'archive',
       label: 'Archive',
       searchTerms: ['library'],

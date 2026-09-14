@@ -31,18 +31,18 @@ const castingTimeOptions: InputSelectOption[] = Object.entries(CASTING_TIME_UNIT
   ([value, entry]) => ({
     value,
     label: entry.label,
-    description: entry.description,
+    metadata: entry.description,
   }),
 )
 
 const searchableUnitOptions: InputSelectOption[] = [
   ...currencyOptions,
-  { value: 'ep', label: 'Electrum (ep)', description: 'Legacy coinage — homebrew only.' },
-  { value: 'sc', label: 'Sovereign (sc)', description: 'Custom campaign coin.' },
-  { value: 'shard', label: 'Astral shard', description: 'Planar trade currency.' },
-  { value: 'credit', label: 'Credits', description: 'Sci-fantasy variant.' },
-  { value: 'token', label: 'Trade token', description: 'Guild-issued scrip.' },
-  { value: 'barter', label: 'Barter goods', description: 'Non-coin exchange.' },
+  { value: 'ep', label: 'Electrum (ep)', metadata: 'Legacy coinage — homebrew only.' },
+  { value: 'sc', label: 'Sovereign (sc)', metadata: 'Custom campaign coin.' },
+  { value: 'shard', label: 'Astral shard', metadata: 'Planar trade currency.' },
+  { value: 'credit', label: 'Credits', metadata: 'Sci-fantasy variant.' },
+  { value: 'token', label: 'Trade token', metadata: 'Guild-issued scrip.' },
+  { value: 'barter', label: 'Barter goods', metadata: 'Non-coin exchange.' },
 ]
 
 type HarnessProps = Omit<

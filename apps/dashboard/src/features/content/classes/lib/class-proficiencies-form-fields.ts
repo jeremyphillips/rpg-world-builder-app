@@ -15,7 +15,7 @@ import {
   toolCategorySchema,
   weaponCategorySchema,
 } from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { COMBOBOX_FILTER_ALL_VALUE, toOptions, type FormItem } from '@rpg/ui/form'
 
 import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
 
@@ -200,6 +200,13 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         label: 'Specific tools',
         multiple: true,
         options: referenceToolFieldOptions(ctx.options?.equipment),
+        filterSelect: {
+          ariaLabel: 'Filter by tool category',
+          options: [
+            { value: COMBOBOX_FILTER_ALL_VALUE, label: 'All categories' },
+            ...toolCategoryOptions,
+          ],
+        },
         placeholder: 'Choose tools…',
         width: 'full',
       },

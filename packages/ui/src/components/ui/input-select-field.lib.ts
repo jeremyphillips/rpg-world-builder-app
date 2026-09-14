@@ -3,7 +3,7 @@ import { optionMatchesQuery } from './option-query.lib'
 export interface InputSelectOption {
   label: string
   value: string
-  description?: string
+  metadata?: string
 }
 
 export function filterInputSelectOptions(

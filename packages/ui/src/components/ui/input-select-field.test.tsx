@@ -77,7 +77,7 @@ describe('InputSelectField', () => {
         options={[
           ...options,
           { label: 'PP', value: 'pp' },
-          { label: 'Astral shard', value: 'shard', description: 'Planar currency' },
+          { label: 'Astral shard', value: 'shard', metadata: 'Planar currency' },
         ]}
       />,
     )

@@ -58,6 +58,8 @@ export interface ComboboxFieldProps
   renderOption?: ComboboxRenderOption
   /** Custom filter/rank for panel options; selected values must remain visible when set. */
   resolveFilteredOptions?: ResolveComboboxFilteredOptions
+  /** Optional filter row below search — hosts own filter UI and state. */
+  filter?: React.ReactNode
   hintPosition?: FieldHintPosition
 }
 
@@ -73,6 +75,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
     enableSearch = true,
     renderSelectedItem,
     renderOption,
+    filter,
   } = props
   const control = useComboboxControl(props)
 
@@ -108,6 +111,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
           searchInputRef={control.searchInputRef}
           listboxRef={control.listboxRef}
           renderOption={renderOption}
+          filter={filter}
           onQueryChange={control.handleQueryChange}
           onNavigationKeyDown={control.handleNavigationKeyDown}
           onOpenAutoFocus={control.focusPanelOnOpen}
@@ -157,6 +161,7 @@ export function ComboboxField({
   renderSelectedItem,
   renderOption,
   resolveFilteredOptions,
+  filter,
   hintPosition,
   chrome,
 }: ComboboxFieldProps) {
@@ -204,6 +209,7 @@ export function ComboboxField({
             renderSelectedItem={renderSelectedItem}
             renderOption={renderOption}
             resolveFilteredOptions={resolveFilteredOptions}
+            filter={filter}
           />
         }
         chrome={chrome}

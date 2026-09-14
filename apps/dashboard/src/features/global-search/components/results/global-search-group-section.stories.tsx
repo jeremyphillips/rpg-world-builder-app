@@ -77,17 +77,13 @@ export const PanelContext: Story = {
   decorators: [
     (Story) => (
       <div
-        className={`w-96 border border-border bg-surface-subtle ${establishSurfaceCurrent('surface-subtle')}`}
+        className={`w-96 border border-border bg-surface-lift ${establishSurfaceCurrent('surface-lift')}`}
       >
         <Story />
       </div>
     ),
   ],
-  args: {
-    ...PageContext.args,
-    rowDensity: 'compact',
-    surfaceContext: 'preview',
-  },
+  args: PageContext.args,
 }
 
 export const CompleteAfterTruncated: Story = {
@@ -98,7 +94,5 @@ export const CompleteAfterTruncated: Story = {
     sections: [truncatedSection, completeSection],
     resolveHref: () => '/campaigns/demo/game-terms/darkvision',
     showAllHref: () => '/campaigns/demo/search?group=game-terms',
-    rowDensity: 'compact',
-    surfaceContext: 'preview',
   },
 }

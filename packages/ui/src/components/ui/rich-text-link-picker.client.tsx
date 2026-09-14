@@ -9,7 +9,10 @@ import { cn } from '../../lib/utils'
 import { portalPopoverSurfaceClasses } from './surface-current.lib'
 import { Checkbox } from './checkbox.client'
 import { Input } from './input.client'
-import { RichTextLinkPreviewCard } from './rich-text-link-preview-card.client'
+import { ListResultEmpty, ListResultList } from './list-result-list.client'
+import { ListResultItem } from './list-result-item.client'
+import { ListResultToolbar } from './list-result-toolbar.client'
+import { ListResultViewport } from './list-result-viewport.client'
 import {
   buildExternalLinkPickerValue,
   buildInternalLinkPickerValue,
@@ -41,6 +44,13 @@ const DEFAULT_CONTENT_TYPE_OPTIONS: RichTextLinkPickerContentTypeOption[] = [
 ]
 
 const EMPTY_SEARCH_MESSAGE = 'No content matches your search.'
+
+function resolveInternalLinkClassification(contentType: string, eyebrowLabel?: string): string {
+  if (eyebrowLabel) return eyebrowLabel
+  if (contentType.toLowerCase() === 'spell') return 'Spell'
+  if (contentType.toLowerCase() === 'feat') return 'Feat'
+  return contentType.charAt(0).toUpperCase() + contentType.slice(1)
+}
 
 function serializeLinkPickerInitialValue(
   initialValue: Partial<RichTextLinkPickerValue> | undefined,
@@ -178,70 +188,98 @@ function RichTextLinkPickerForm({
         </TabsList>
 
         <TabsContent value="internal" className="space-y-3">
-          <div className="grid grid-cols-[minmax(0,1fr)_9rem] gap-2">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search content"
-                aria-label="Search internal content"
-                size="sm"
-                className="pl-8"
-              />
-            </div>
-            <Select value={contentType} onValueChange={setContentType}>
-              <SelectTrigger size="sm" aria-label="Filter by content type">
-                <SelectValue placeholder={RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL_LABEL} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL}>
-                  {RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL_LABEL}
-                </SelectItem>
-                {contentTypeOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {selectedInternalOption ? (
-            <RichTextLinkPreviewCard
-              tone="selected"
-              layout="card"
-              title={selectedInternalOption.title}
-              contentType={selectedInternalOption.contentType}
-              eyebrowLabel={selectedInternalOption.eyebrowLabel}
-              sourceLabel={selectedInternalOption.sourceLabel}
-              onClear={() => setSelectedOptionId(null)}
-            />
-          ) : (
-            <div className="max-h-40 overflow-auto">
-              {filteredInternalOptions.length === 0 ? (
-                <p className="px-3 py-1.5 text-xs text-muted-foreground">{EMPTY_SEARCH_MESSAGE}</p>
-              ) : (
-                filteredInternalOptions.map((option) => (
-                  <RichTextLinkPreviewCard
-                    key={option.id}
-                    title={option.title}
-                    contentType={option.contentType}
-                    eyebrowLabel={option.eyebrowLabel}
-                    sourceLabel={option.sourceLabel}
-                    interactive
-                    tone={selectedOptionId === option.id ? 'selected' : 'default'}
-                    onSelect={() => {
-                      setSelectedOptionId(option.id)
-                      if (internalDisplayText.trim().length === 0) {
-                        setInternalDisplayText(option.title)
-                      }
-                    }}
+          <div className="overflow-hidden rounded-md border border-border">
+            <ListResultToolbar
+              search={
+                <div className="relative flex h-8 w-full items-center">
+                  <Search className="pointer-events-none absolute left-0 size-3.5 text-muted-foreground" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Search content"
+                    aria-label="Search internal content"
+                    size="sm"
+                    className="border-0 bg-transparent pl-6 shadow-none"
                   />
-                ))
+                </div>
+              }
+              filter={
+                <Select value={contentType} onValueChange={setContentType}>
+                  <SelectTrigger size="sm" aria-label="Filter by content type">
+                    <SelectValue placeholder={RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL_LABEL} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL}>
+                      {RICH_TEXT_LINK_CONTENT_TYPE_FILTER_ALL_LABEL}
+                    </SelectItem>
+                    {contentTypeOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              }
+            />
+
+            <ListResultViewport className="max-h-40">
+              {selectedInternalOption ? (
+                <ListResultList>
+                  <ListResultItem
+                    name={selectedInternalOption.title}
+                    classification={resolveInternalLinkClassification(
+                      selectedInternalOption.contentType,
+                      selectedInternalOption.eyebrowLabel,
+                    )}
+                    metadata={selectedInternalOption.sourceLabel}
+                    selected
+                    trailingAction={
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="size-7"
+                        aria-label="Clear selected internal link"
+                        onClick={() => setSelectedOptionId(null)}
+                      >
+                        <X className="size-3.5" />
+                      </Button>
+                    }
+                  />
+                </ListResultList>
+              ) : (
+                <ListResultList>
+                  {filteredInternalOptions.length === 0 ? (
+                    <ListResultEmpty>{EMPTY_SEARCH_MESSAGE}</ListResultEmpty>
+                  ) : (
+                    filteredInternalOptions.map((option) => (
+                      <ListResultItem
+                        key={option.id}
+                        name={option.title}
+                        classification={resolveInternalLinkClassification(
+                          option.contentType,
+                          option.eyebrowLabel,
+                        )}
+                        metadata={option.sourceLabel}
+                        selected={selectedOptionId === option.id}
+                        asChild
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedOptionId(option.id)
+                            if (internalDisplayText.trim().length === 0) {
+                              setInternalDisplayText(option.title)
+                            }
+                          }}
+                        />
+                      </ListResultItem>
+                    ))
+                  )}
+                </ListResultList>
               )}
-            </div>
-          )}
+            </ListResultViewport>
+          </div>
 
           <Input
             value={internalDisplayText}

@@ -61,7 +61,7 @@ export function mapChoiceSetOptionsToComboboxOptions(
   return options.map((option) => ({
     value: option.id,
     label: option.label,
-    description: option.description,
+    metadata: option.description,
   }))
 }
 

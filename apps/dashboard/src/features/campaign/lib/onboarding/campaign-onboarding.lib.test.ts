@@ -50,7 +50,7 @@ describe('buildCharacterOptions', () => {
 
     expect(options[0]).toMatchObject({
       disabled: true,
-      description: 'Campaign starts at level 1',
+      metadata: 'Campaign starts at level 1',
     })
   })
 })

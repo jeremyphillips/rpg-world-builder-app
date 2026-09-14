@@ -66,6 +66,7 @@
   --color-muted: var(--muted);
   --color-sunken: var(--sunken);
   --color-surface-faint: var(--surface-faint);
+  --color-surface-lift: var(--surface-lift);
   --color-surface-subtle: var(--surface-subtle);
   --color-surface-muted: var(--surface-muted);
   --color-surface-strong: var(--surface-strong);
@@ -481,7 +482,7 @@
 
 /*
  * Field control fills resolve globally via `--field-control-bg` in semantic-*.css
- * (`--palette-surface-field`). Rare shell overrides set `--field-control-bg` locally
+ * (`--palette-surface-lift`). Rare shell overrides set `--field-control-bg` locally
  * in the component that creates an unusual parent context — no global parent matrix.
  */
 

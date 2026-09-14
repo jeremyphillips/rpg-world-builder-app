@@ -6,15 +6,11 @@ import { renderWithProviders } from '@/test/render'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 import { globalSearchGroupContentInsetClasses } from '../../lib/global-search-group.variants'
-import {
-  resolveGlobalSearchHeadingSurfaceClasses,
-  resolveGlobalSearchRowHoverSurfaceClasses,
-} from '../../lib/global-search-surface.variants'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
 import { GlobalSearchGroupSection } from './global-search-group-section'
 
 function rowShell(link: HTMLElement): HTMLElement {
-  return link.parentElement!
+  return link
 }
 
 function document(
@@ -36,10 +32,6 @@ function renderSection(
   section: GlobalSearchGroupSectionModel,
   sectionIndex: number,
   sections: readonly GlobalSearchGroupSectionModel[],
-  options?: {
-    rowDensity?: 'compact' | 'default'
-    surfaceContext?: 'preview' | 'page'
-  },
 ) {
   return renderWithProviders(
     <GlobalSearchGroupSection
@@ -48,14 +40,12 @@ function renderSection(
       sections={sections}
       resolveHref={() => '/campaigns/demo/spells/fireball'}
       showAllHref={() => '/campaigns/demo/search?group=content'}
-      rowDensity={options?.rowDensity}
-      surfaceContext={options?.surfaceContext}
     />,
   )
 }
 
 describe('GlobalSearchGroupSection', () => {
-  it('renders a complete group without show-all spacing or row borders', () => {
+  it('renders a complete group without show-all spacing', () => {
     const sections: GlobalSearchGroupSectionModel[] = [
       {
         filterGroup: 'game-terms',
@@ -68,16 +58,11 @@ describe('GlobalSearchGroupSection', () => {
 
     expect(screen.queryByRole('link', { name: /Show all/i })).not.toBeInTheDocument()
     expect(container.querySelector('section')).not.toHaveClass('pb-4')
-    expect(container.querySelector('[class*="border-border-faint"]')).toBeInTheDocument()
-    expect(rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))).toHaveClass(
-      'border-b-0',
-    )
-    expect(rowShell(screen.getByRole('link', { name: 'Result 2, Spell' }))).toHaveClass(
-      'border-b-0',
-    )
+    expect(container.querySelector('.divide-y')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Game terms · 2/i })).toBeInTheDocument()
   })
 
-  it('co-locates content inset with heading chrome and list row hover shells on page', () => {
+  it('uses shared list-result heading and list chrome', () => {
     const sections: GlobalSearchGroupSectionModel[] = [
       {
         filterGroup: 'content',
@@ -86,59 +71,14 @@ describe('GlobalSearchGroupSection', () => {
       },
     ]
 
-    const { container } = renderSection(sections[0]!, 0, sections, { surfaceContext: 'page' })
-    const heading = container.querySelector('section > div')
-    const list = container.querySelector('[class*="border-border-faint"]')
+    const { container } = renderSection(sections[0]!, 0, sections)
+    const heading = screen.getByRole('heading', { name: /Content · 1/i })
+    const list = container.querySelector('.bg-surface-lift')
     const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
-    expect(heading).toHaveClass(resolveGlobalSearchHeadingSurfaceClasses('page'))
-    expect(heading?.className).toContain('border-border-subtle')
-    expect(heading).toHaveClass(globalSearchGroupContentInsetClasses)
-    expect(list?.className).not.toContain('px-3')
-    expect(row).toHaveClass(globalSearchGroupContentInsetClasses)
-    expect(row).toHaveClass(resolveGlobalSearchRowHoverSurfaceClasses('page'))
-    expect(row).toHaveClass('py-3')
-  })
-
-  it('uses muted headings and hover on preview surface context', () => {
-    const sections: GlobalSearchGroupSectionModel[] = [
-      {
-        filterGroup: 'content',
-        items: [document('1')],
-        totalCount: 1,
-      },
-    ]
-
-    const { container } = renderSection(sections[0]!, 0, sections, {
-      surfaceContext: 'preview',
-      rowDensity: 'compact',
-    })
-    const heading = container.querySelector('section > div')
-    const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
-
-    expect(heading).toHaveClass(resolveGlobalSearchHeadingSurfaceClasses('preview'))
-    expect(row).toHaveClass(resolveGlobalSearchRowHoverSurfaceClasses('preview'))
-    expect(row).toHaveClass('py-2')
-  })
-
-  it('adds first-heading top inset in parity with preview groups', () => {
-    const sections: GlobalSearchGroupSectionModel[] = [
-      {
-        filterGroup: 'content',
-        items: [document('1')],
-        totalCount: 1,
-      },
-    ]
-
-    const { container: pageContainer } = renderSection(sections[0]!, 0, sections, {
-      surfaceContext: 'page',
-    })
-    expect(pageContainer.querySelector('section > div')).toHaveClass('pt-2')
-
-    const { container: previewContainer } = renderSection(sections[0]!, 0, sections, {
-      surfaceContext: 'preview',
-    })
-    expect(previewContainer.querySelector('section > div')).toHaveClass('pt-2')
+    expect(heading).toHaveClass('bg-surface-faint', 'pt-2')
+    expect(list).toHaveClass('divide-y', 'divide-border-faint')
+    expect(row).toHaveClass('px-3', 'py-2')
   })
 
   it('renders truncated groups with show-all and bottom spacing', () => {
@@ -158,6 +98,9 @@ describe('GlobalSearchGroupSection', () => {
       }),
     ).toBeInTheDocument()
     expect(container.querySelector('section')).toHaveClass('pb-4')
+    expect(screen.getByRole('link', { name: /Show all/i })).toHaveClass(
+      globalSearchGroupContentInsetClasses,
+    )
   })
 
   it('adds a top border when following a complete group', () => {
@@ -174,11 +117,11 @@ describe('GlobalSearchGroupSection', () => {
       },
     ]
 
-    const { container } = renderSection(sections[1]!, 1, sections)
-    const heading = container.querySelector('[class*="border-t"]')
+    renderSection(sections[1]!, 1, sections)
+    const heading = screen.getByRole('heading', { name: /Content · 14/i })
 
-    expect(heading?.className).toContain('border-t')
-    expect(heading?.className).toContain('border-border-subtle')
+    expect(heading.className).toContain('border-t')
+    expect(heading.className).toContain('border-border-subtle')
   })
 
   it('omits a top border when following a truncated group', () => {
@@ -195,31 +138,10 @@ describe('GlobalSearchGroupSection', () => {
       },
     ]
 
-    const { container } = renderSection(sections[1]!, 1, sections)
-    const headingShell = container.querySelector('section > div')
+    renderSection(sections[1]!, 1, sections)
+    const heading = screen.getByRole('heading', { name: /Game terms · 1/i })
 
-    expect(headingShell?.className).not.toContain('border-t')
-  })
-
-  it('adds top inset on the first preview group heading', () => {
-    const sections: GlobalSearchGroupSectionModel[] = [
-      {
-        filterGroup: 'content',
-        items: [document('1')],
-        totalCount: 14,
-      },
-    ]
-
-    const { container } = renderSection(sections[0]!, 0, sections, {
-      surfaceContext: 'preview',
-    })
-    const headingShell = container.querySelector('section > div')
-    const showAll = screen.getByRole('link', {
-      name: `${GLOBAL_SEARCH_COPY.showAllInGroup(14, 'Content')} →`,
-    })
-
-    expect(headingShell).toHaveClass('pt-2')
-    expect(showAll).toHaveClass(globalSearchGroupContentInsetClasses)
+    expect(heading.className).not.toContain('border-t')
   })
 
   itAxe('has no axe accessibility violations', async () => {

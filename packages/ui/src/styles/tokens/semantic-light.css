@@ -41,6 +41,7 @@
   --secondary: var(--palette-surface-secondary);
   --secondary-foreground: var(--foreground);
   --surface-faint: var(--palette-surface-faint);
+  --surface-lift: var(--palette-surface-lift);
   --surface-subtle: var(--palette-surface-subtle);
   --surface-muted: var(--palette-surface-muted);
   --surface-strong: var(--palette-surface-strong);
@@ -132,7 +133,7 @@
    * Field control chrome — text-like inputs and grouped field shells.
    * Public utilities: `border-input`, `bg-input`, and state variants in globals.css.
    */
-  --field-container: var(--palette-surface-field);
+  --field-container: var(--palette-surface-lift);
   --field-control-bg: var(--palette-field-bg);
   --field-control-bg-default: var(--palette-field-bg);
   --field-control-bg-on-muted: var(--surface-subtle);

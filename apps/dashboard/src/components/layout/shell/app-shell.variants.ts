@@ -27,7 +27,7 @@ export const appShellContentColumnClasses =
  * Sticky dashboard chrome (topbar + breadcrumb) pinned while the document scrolls.
  * Publishes `--app-sticky-chrome-block-size` for sticky rail offsets.
  */
-export const appShellStickyChromeClasses = 'sticky top-0 z-20 shrink-0 bg-background'
+export const appShellStickyChromeClasses = 'sticky top-0 z-30 shrink-0 bg-background'
 
 /**
  * Primary routed content column — flex participant for ViewportWorkspace fill;

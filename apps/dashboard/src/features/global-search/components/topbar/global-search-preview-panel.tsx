@@ -145,7 +145,6 @@ export function GlobalSearchPreviewPanel({
             resolveHref={resolveHref}
             onResultActivate={onClose}
             showAllHref={showAllHref}
-            inset="panel"
           />
         ) : null}
       </div>

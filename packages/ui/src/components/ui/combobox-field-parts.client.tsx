@@ -16,19 +16,19 @@ import type {
   ComboboxRenderOption,
   ComboboxRenderSelectedItem,
 } from './combobox-field.types'
-import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxSelectedItemsRowVariants,
   comboboxSelectedListVariants,
   comboboxContentVariants,
-  comboboxEmptyVariants,
-  comboboxListVariants,
   comboboxSearchInputVariants,
   comboboxSearchRowVariants,
   comboboxTriggerOpenVariants,
-  comboboxOptionVariants,
 } from './combobox-field.variants'
+import { ListResultEmpty, ListResultList } from './list-result-list.client'
+import { ListResultItem } from './list-result-item.client'
+import { ListResultToolbar } from './list-result-toolbar.client'
+import { ListResultViewport } from './list-result-viewport.client'
 import { PopoverLayerPortal } from './layer-portal-container.client'
 
 interface ComboboxTriggerProps {
@@ -109,45 +109,63 @@ function ComboboxOptionItem({
   onHighlight,
   onSelect,
 }: ComboboxOptionItemProps) {
+  const checkSlot = isSelected ? (
+    <Check className="size-4 shrink-0" aria-hidden />
+  ) : (
+    <span className="size-4 shrink-0" aria-hidden />
+  )
+
   if (renderOption) {
     return (
+      <ListResultItem
+        highlighted={isHighlighted}
+        selected={isSelected}
+        disabled={isDisabled}
+        content={
+          <span className="flex min-w-0 flex-1 items-center gap-2">
+            <span className="min-w-0 flex-1">
+              {renderOption(option, { selected: isSelected, disabled: isDisabled, size })}
+            </span>
+            {checkSlot}
+          </span>
+        }
+        asChild
+      >
+        <button
+          id={optionId}
+          type="button"
+          role="option"
+          aria-selected={isSelected}
+          aria-label={option.label}
+          disabled={isDisabled}
+          onMouseEnter={onHighlight}
+          onClick={onSelect}
+        />
+      </ListResultItem>
+    )
+  }
+
+  return (
+    <ListResultItem
+      name={option.label}
+      classification={option.classification}
+      metadata={option.metadata}
+      highlighted={isHighlighted}
+      selected={isSelected}
+      disabled={isDisabled}
+      endSlot={checkSlot}
+      asChild
+    >
       <button
         id={optionId}
         type="button"
         role="option"
         aria-selected={isSelected}
-        aria-label={option.label}
-        data-active={isHighlighted}
-        data-disabled={isDisabled}
         disabled={isDisabled}
-        className={comboboxOptionVariants()}
         onMouseEnter={onHighlight}
         onClick={onSelect}
-      >
-        <span className="flex min-w-0 flex-1 items-center gap-2">
-          <span className="min-w-0 flex-1">
-            {renderOption(option, { selected: isSelected, disabled: isDisabled, size })}
-          </span>
-        </span>
-        {isSelected ? (
-          <Check className="size-4 shrink-0" aria-hidden />
-        ) : (
-          <span className="size-4 shrink-0" aria-hidden />
-        )}
-      </button>
-    )
-  }
-
-  return (
-    <ListboxOptionButton
-      option={option}
-      optionId={optionId}
-      isSelected={isSelected}
-      isHighlighted={isHighlighted}
-      isDisabled={isDisabled}
-      onHighlight={onHighlight}
-      onSelect={onSelect}
-    />
+      />
+    </ListResultItem>
   )
 }
 
@@ -158,6 +176,7 @@ interface ComboboxSearchFieldProps {
   size: FieldSize
   query: string
   activeOptionId?: string
+  filter?: React.ReactNode
   searchInputRef: React.RefObject<HTMLInputElement | null>
   onQueryChange: (value: string) => void
   onSearchKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
@@ -171,27 +190,33 @@ export function ComboboxSearchField({
   size,
   query,
   activeOptionId,
+  filter,
   searchInputRef,
   onQueryChange,
   onSearchKeyDown,
 }: ComboboxSearchFieldProps) {
   return (
-    <div className={comboboxSearchRowVariants({ size })}>
-      <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
-      <input
-        ref={searchInputRef}
-        id={searchId}
-        type="search"
-        value={query}
-        onChange={(event) => onQueryChange(event.target.value)}
-        onKeyDown={onSearchKeyDown}
-        placeholder={`Search ${label.toLowerCase()}…`}
-        aria-label={`Search ${label}`}
-        aria-controls={listboxId}
-        aria-activedescendant={activeOptionId}
-        className={comboboxSearchInputVariants()}
-      />
-    </div>
+    <ListResultToolbar
+      search={
+        <div className={comboboxSearchRowVariants({ size })}>
+          <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
+          <input
+            ref={searchInputRef}
+            id={searchId}
+            type="search"
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
+            onKeyDown={onSearchKeyDown}
+            placeholder={`Search ${label.toLowerCase()}…`}
+            aria-label={`Search ${label}`}
+            aria-controls={listboxId}
+            aria-activedescendant={activeOptionId}
+            className={comboboxSearchInputVariants()}
+          />
+        </div>
+      }
+      filter={filter}
+    />
   )
 }
 
@@ -211,6 +236,7 @@ interface ComboboxPanelProps {
   atMax: boolean
   generatedId: string
   renderOption?: ComboboxRenderOption
+  filter?: React.ReactNode
   searchInputRef: React.RefObject<HTMLInputElement | null>
   listboxRef: React.RefObject<HTMLDivElement | null>
   onQueryChange: (value: string) => void
@@ -236,6 +262,7 @@ export function ComboboxPanel({
   atMax,
   generatedId,
   renderOption,
+  filter,
   searchInputRef,
   listboxRef,
   onQueryChange,
@@ -265,46 +292,48 @@ export function ComboboxPanel({
             size={size}
             query={query}
             activeOptionId={activeOptionId}
+            filter={filter}
             searchInputRef={searchInputRef}
             onQueryChange={onQueryChange}
             onSearchKeyDown={onNavigationKeyDown}
           />
         ) : null}
 
-        <div
-          ref={listboxRef}
-          id={listboxId}
-          role="listbox"
-          tabIndex={enableSearch ? undefined : -1}
-          aria-label={label}
-          aria-multiselectable={multiple || undefined}
-          aria-activedescendant={enableSearch ? undefined : activeOptionId}
-          onKeyDown={enableSearch ? undefined : onNavigationKeyDown}
-          className={comboboxListVariants()}
-        >
-          {filteredOptions.length > 0 ? (
-            filteredOptions.map((option, index) => {
-              const isSelected = selected.includes(option.value)
-              const isDisabled = isComboboxOptionDisabled(option, multiple, atMax, isSelected)
-              return (
-                <ComboboxOptionItem
-                  key={option.value}
-                  option={option}
-                  optionId={`${generatedId}-option-${option.value}`}
-                  isSelected={isSelected}
-                  isHighlighted={index === highlightedIndex}
-                  isDisabled={isDisabled}
-                  size={size}
-                  renderOption={renderOption}
-                  onHighlight={() => onHighlight(index)}
-                  onSelect={() => onSelect(option.value)}
-                />
-              )
-            })
-          ) : (
-            <p className={comboboxEmptyVariants()}>{emptyMessage}</p>
-          )}
-        </div>
+        <ListResultViewport>
+          <ListResultList
+            ref={listboxRef}
+            id={listboxId}
+            role="listbox"
+            tabIndex={enableSearch ? undefined : -1}
+            aria-label={label}
+            aria-multiselectable={multiple || undefined}
+            aria-activedescendant={enableSearch ? undefined : activeOptionId}
+            onKeyDown={enableSearch ? undefined : onNavigationKeyDown}
+          >
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option, index) => {
+                const isSelected = selected.includes(option.value)
+                const isDisabled = isComboboxOptionDisabled(option, multiple, atMax, isSelected)
+                return (
+                  <ComboboxOptionItem
+                    key={option.value}
+                    option={option}
+                    optionId={`${generatedId}-option-${option.value}`}
+                    isSelected={isSelected}
+                    isHighlighted={index === highlightedIndex}
+                    isDisabled={isDisabled}
+                    size={size}
+                    renderOption={renderOption}
+                    onHighlight={() => onHighlight(index)}
+                    onSelect={() => onSelect(option.value)}
+                  />
+                )
+              })
+            ) : (
+              <ListResultEmpty>{emptyMessage}</ListResultEmpty>
+            )}
+          </ListResultList>
+        </ListResultViewport>
       </PopoverPrimitive.Content>
     </PopoverLayerPortal>
   )

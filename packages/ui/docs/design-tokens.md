@@ -74,7 +74,8 @@ etc.) are custom `@utility` definitions in `surface-relative-chrome.utilities.cs
 `--surface-sunken-shadow`) — raised panels use the former; `InsetPanel` defaults to `surface="sunken"`
 (fill + sunken shadow). Use `surface="muted"` or `surface="subtle"` for flat wash panels.
 | Secondary | `bg-secondary` | Alternate **interactive** surface (e.g. Button `secondary`) |
-| Field | `bg-input`, `border-input` | Editable control chrome — canvas lifted toward white (light) or panel (dark) |
+| Lift plane | `bg-surface-lift` | Canvas lifted toward white (light) or panel (dark) — searchable list panels and field fills |
+| Field | `bg-input`, `border-input` | Editable control chrome — aliases the lift plane |
 
 `bg-muted` aliases `bg-surface-muted` for shadcn compatibility — prefer `bg-surface-*` in new code.
 
@@ -149,7 +150,7 @@ Do not merge text-tuned values onto solid status hues.
 
 - Layer 2: `--field-control-*` matrix in `semantic-*.css`.
 - Public utilities: `border-input`, `bg-input`, and state variants in `globals.css`.
-- **Global fill:** `--field-control-bg` → `--palette-surface-field` everywhere. No
+- **Global fill:** `--field-control-bg` → `--palette-surface-lift` everywhere. No
   parent-scoped re-scoping in `globals.css` under `.bg-card` / `.bg-surface-*`.
 - **Rare overrides:** set `--field-control-bg` locally in the component that creates an
   unusual shell context — e.g. `resolveFieldControlSurfaceClasses('default' | 'onMuted')`
@@ -164,7 +165,7 @@ Switch unchecked track uses `--switch-track*` — separate from field border own
 
 Schema-driven form fields default to a boxed container shell (`{ variant: 'container' }`):
 
-- Layer 2 token: `--field-container` — lightest surface in light mode (`--palette-surface-field`), darkest in dark mode (`--palette-surface-sunken`).
+- Layer 2 token: `--field-container` — lightest surface in light mode (`--palette-surface-lift`), darkest in dark mode (`--palette-surface-sunken`).
 - Public utility: `bg-field-container` in `globals.css`.
 - Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
 - Padding: 16px (`p-4`).

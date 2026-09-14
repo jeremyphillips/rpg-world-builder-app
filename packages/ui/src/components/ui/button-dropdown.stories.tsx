@@ -13,25 +13,25 @@ const items = [
   {
     id: 'skill-proficiency',
     label: 'Skill proficiency',
-    description: 'Grant proficiency with specific skills or a player choice from a pool.',
+    metadata: 'Grant proficiency with specific skills or a player choice from a pool.',
     groupId: 'proficiencies',
   },
   {
     id: 'weapon-proficiency',
     label: 'Weapon proficiency',
-    description: 'Grant proficiency with specific weapons, a category, or a player choice.',
+    metadata: 'Grant proficiency with specific weapons, a category, or a player choice.',
     groupId: 'proficiencies',
   },
   {
     id: 'language',
     label: 'Language',
-    description: 'Grant knowledge of a language.',
+    metadata: 'Grant knowledge of a language.',
     groupId: 'character-options',
   },
   {
     id: 'movement-bonus',
     label: 'Movement',
-    description: 'Grant a movement speed, increase a speed, or match one speed to another.',
+    metadata: 'Grant a movement speed, increase a speed, or match one speed to another.',
     groupId: 'combat-traits',
     searchTerms: [{ text: 'walking speed', weight: 1, role: 'keyword' as const }],
   },
@@ -67,7 +67,7 @@ export const WithDuplicateNote: Story = {
       {
         id: 'armor-training',
         label: 'Armor training',
-        description: 'Already on this feature.',
+        metadata: 'Already on this feature.',
         groupId: 'proficiencies',
         disabled: true,
         note: 'Already added',

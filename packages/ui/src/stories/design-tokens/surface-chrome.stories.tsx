@@ -63,7 +63,7 @@ const OWNERSHIP_ROWS = [
   },
   { shell: 'Avatar bg-muted glyph chip', ownership: 'inherits', plane: '—' },
   { shell: 'Segmented selected pill', ownership: 'inherits', plane: '—' },
-  { shell: 'Field input chrome', ownership: 'field plane', plane: '--palette-surface-field' },
+  { shell: 'Field input chrome', ownership: 'field plane', plane: '--palette-surface-lift' },
 ] as const
 
 const INTERACTION_SAMPLES = [

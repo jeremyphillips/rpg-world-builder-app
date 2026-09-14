@@ -16,8 +16,8 @@ export function buildButtonDropdownSearchFields(
   groupLabelById: ReadonlyMap<string, string>,
 ): WeightedSearchField[] {
   const fields: WeightedSearchField[] = [{ text: item.label, weight: 1, role: 'label' }]
-  if (item.description) {
-    fields.push({ text: item.description, weight: 1, role: 'description' })
+  if (item.metadata) {
+    fields.push({ text: item.metadata, weight: 1, role: 'description' })
   }
   if (item.groupId) {
     const groupLabel = groupLabelById.get(item.groupId)

@@ -35,6 +35,7 @@
   --secondary: var(--palette-surface-secondary);
   --secondary-foreground: var(--foreground);
   --surface-faint: var(--palette-surface-faint);
+  --surface-lift: var(--palette-surface-lift);
   --surface-subtle: var(--palette-surface-subtle);
   --surface-muted: var(--palette-surface-muted);
   --surface-strong: var(--palette-surface-strong);

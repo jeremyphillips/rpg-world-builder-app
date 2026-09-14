@@ -10,7 +10,7 @@ import {
 
 import { CheckboxField } from '../../components/ui/checkbox-field'
 import { ChipsField } from '../../components/ui/chips-field.client'
-import { ComboboxField } from '../../components/ui/combobox-field.client'
+import { ComboboxFieldRenderer } from './fields/combobox-field-renderer.client'
 import { NumberField } from '../../components/ui/number-field'
 import { RadioCardField } from '../../components/ui/radio-card-field'
 import { RadioGroupField } from '../../components/ui/radio-group-field'
@@ -499,28 +499,15 @@ const fieldRenderers: {
     labelVisibility,
     ...validation
   }) => (
-    <ComboboxField
+    <ComboboxFieldRenderer
+      config={config}
+      controlSize={controlSize}
+      field={field}
       id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={labelVisibility}
-      options={config.options}
-      multiple={config.multiple}
-      max={config.max}
-      placeholder={config.placeholder}
-      {...fieldValidationProps(validation)}
       hint={hint}
       hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={controlSize}
-      disabled={config.disabled}
-      value={field.value ?? fieldDefaultValue(config)}
-      onChange={field.onChange}
-      onBlur={field.onBlur}
-      renderSelectedItem={config.renderSelectedItem}
-      resolveFilteredOptions={config.resolveFilteredOptions}
+      labelVisibility={labelVisibility}
+      {...fieldValidationProps(validation)}
     />
   ),
   editableGrid: ({ config, field, id, namePrefix, ...validation }) => (

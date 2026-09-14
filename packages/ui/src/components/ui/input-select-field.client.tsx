@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
@@ -10,14 +10,14 @@ import { FieldLayout } from './field-layout'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
-import { ListboxOptionButton } from './listbox-option.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxContentVariants,
-  comboboxEmptyVariants,
-  comboboxListVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
+import { ListResultEmpty, ListResultList } from './list-result-list.client'
+import { ListResultItem } from './list-result-item.client'
+import { ListResultViewport } from './list-result-viewport.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
 import { PopoverLayerPortal } from './layer-portal-container.client'
 import { Input } from './input.client'
@@ -216,23 +216,40 @@ function SearchableUnitSelect({
             onQueryChange={setQuery}
           />
 
-          <div id={listboxId} role="listbox" aria-label={label} className={comboboxListVariants()}>
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option) => {
-                const isSelected = option.value === unit
-                return (
-                  <ListboxOptionButton
-                    key={option.value}
-                    option={option}
-                    isSelected={isSelected}
-                    onSelect={() => handleSelect(option.value)}
-                  />
-                )
-              })
-            ) : (
-              <p className={comboboxEmptyVariants()}>{EMPTY_UNIT_MESSAGE}</p>
-            )}
-          </div>
+          <ListResultViewport>
+            <ListResultList id={listboxId} role="listbox" aria-label={label}>
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => {
+                  const isSelected = option.value === unit
+                  return (
+                    <ListResultItem
+                      key={option.value}
+                      name={option.label}
+                      metadata={option.metadata}
+                      selected={isSelected}
+                      endSlot={
+                        isSelected ? (
+                          <Check className="size-4 shrink-0" aria-hidden />
+                        ) : (
+                          <span className="size-4 shrink-0" aria-hidden />
+                        )
+                      }
+                      asChild
+                    >
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        onClick={() => handleSelect(option.value)}
+                      />
+                    </ListResultItem>
+                  )
+                })
+              ) : (
+                <ListResultEmpty>{EMPTY_UNIT_MESSAGE}</ListResultEmpty>
+              )}
+            </ListResultList>
+          </ListResultViewport>
         </PopoverPrimitive.Content>
       </PopoverLayerPortal>
     </PopoverPrimitive.Root>

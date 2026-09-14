@@ -10,7 +10,7 @@ const meta = {
     option: {
       value: sampleTicket.id,
       label: `${sampleTicket.key} — ${sampleTicket.title}`,
-      description: sampleTicket.status,
+      metadata: sampleTicket.status,
     },
     ticket: sampleTicket,
     onRemove: () => undefined,

@@ -169,11 +169,11 @@ describe('surface-relative chrome formulas', () => {
       const fieldDisabled = extractRoleValue(css, '--palette-field-fg-disabled') ?? ''
 
       expect(placeholder).toContain('color-mix')
-      expect(placeholder).toContain('var(--palette-surface-field)')
+      expect(placeholder).toContain('var(--palette-surface-lift)')
       expect(placeholder).not.toContain('surface-current')
 
       expect(fieldDisabled).toContain('color-mix')
-      expect(fieldDisabled).toContain('var(--palette-surface-field)')
+      expect(fieldDisabled).toContain('var(--palette-surface-lift)')
       expect(fieldDisabled).not.toContain('surface-current')
     }
   })
