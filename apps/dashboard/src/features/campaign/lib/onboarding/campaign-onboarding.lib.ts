@@ -14,7 +14,7 @@ export function buildCharacterOptions(
   return characters.map((entry) => ({
     value: entry.characterId,
     label: entry.name,
-    description: entry.eligibility.eligible
+    metadata: entry.eligibility.eligible
       ? entry.summary
       : formatComboboxBlockingDescription(entry.eligibility.blockingIssues),
     disabled: !entry.eligibility.eligible,

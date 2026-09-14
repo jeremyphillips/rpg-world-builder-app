@@ -9,8 +9,6 @@ import { Badge, ListResultItem, cn, interactiveFocusVariants } from '@rpg/ui'
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator'
 
-export type SearchResultRowDensity = 'compact' | 'default'
-
 export type SearchResultRowProps = {
   title: string
   secondary: string
@@ -18,8 +16,6 @@ export type SearchResultRowProps = {
   href: string
   campaignUnavailable?: boolean
   onActivate?: () => void
-  /** Reserved for host density wiring; list-result chrome is shared today. */
-  density?: SearchResultRowDensity
   className?: string
   viewerCharacterRelationships?: ViewerCharacterRelationships
 }

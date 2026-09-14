@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 
@@ -12,6 +12,25 @@ export const listResultToolbarFilterRowVariants = cva('border-t border-border px
 /** Visual-only group heading; hosts own section / listbox group semantics. */
 export const listResultGroupHeadingVariants = cva(
   'border-b border-border-subtle bg-surface-faint px-3 py-1',
+  {
+    variants: {
+      /** Top inset for the first heading in stacked result panels. */
+      first: {
+        true: 'pt-2',
+        false: '',
+      },
+      /** Separator when this group follows a complete (non-truncated) group. */
+      follows: {
+        none: '',
+        complete: 'border-t border-border-subtle',
+        truncated: '',
+      },
+    },
+    defaultVariants: {
+      first: false,
+      follows: 'none',
+    },
+  },
 )
 
 /** Bounded scrollport — toolbar stays fixed outside this region. */
@@ -83,3 +102,5 @@ export const listResultItemNameVariants = cva('truncate font-body-emphasis text-
 export const listResultItemClassificationVariants = cva('truncate text-sm text-muted-foreground')
 
 export const listResultItemMetadataVariants = cva('truncate text-xs text-muted-foreground')
+
+export type ListResultGroupHeadingVariantProps = VariantProps<typeof listResultGroupHeadingVariants>

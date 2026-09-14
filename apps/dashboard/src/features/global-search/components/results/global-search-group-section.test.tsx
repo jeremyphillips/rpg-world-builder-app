@@ -32,9 +32,6 @@ function renderSection(
   section: GlobalSearchGroupSectionModel,
   sectionIndex: number,
   sections: readonly GlobalSearchGroupSectionModel[],
-  options?: {
-    rowDensity?: 'compact' | 'default'
-  },
 ) {
   return renderWithProviders(
     <GlobalSearchGroupSection
@@ -43,7 +40,6 @@ function renderSection(
       sections={sections}
       resolveHref={() => '/campaigns/demo/spells/fireball'}
       showAllHref={() => '/campaigns/demo/search?group=content'}
-      rowDensity={options?.rowDensity}
     />,
   )
 }
@@ -80,7 +76,7 @@ describe('GlobalSearchGroupSection', () => {
     const list = container.querySelector('.bg-surface-lift')
     const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
-    expect(heading).toHaveClass('bg-surface-faint')
+    expect(heading).toHaveClass('bg-surface-faint', 'pt-2')
     expect(list).toHaveClass('divide-y', 'divide-border-faint')
     expect(row).toHaveClass('px-3', 'py-2')
   })
@@ -105,6 +101,47 @@ describe('GlobalSearchGroupSection', () => {
     expect(screen.getByRole('link', { name: /Show all/i })).toHaveClass(
       globalSearchGroupContentInsetClasses,
     )
+  })
+
+  it('adds a top border when following a complete group', () => {
+    const sections: GlobalSearchGroupSectionModel[] = [
+      {
+        filterGroup: 'game-terms',
+        items: [document('1', 'game-terms')],
+        totalCount: 1,
+      },
+      {
+        filterGroup: 'content',
+        items: [document('2')],
+        totalCount: 14,
+      },
+    ]
+
+    renderSection(sections[1]!, 1, sections)
+    const heading = screen.getByRole('heading', { name: /Content · 14/i })
+
+    expect(heading.className).toContain('border-t')
+    expect(heading.className).toContain('border-border-subtle')
+  })
+
+  it('omits a top border when following a truncated group', () => {
+    const sections: GlobalSearchGroupSectionModel[] = [
+      {
+        filterGroup: 'content',
+        items: [document('1')],
+        totalCount: 14,
+      },
+      {
+        filterGroup: 'game-terms',
+        items: [document('2', 'game-terms')],
+        totalCount: 1,
+      },
+    ]
+
+    renderSection(sections[1]!, 1, sections)
+    const heading = screen.getByRole('heading', { name: /Game terms · 1/i })
+
+    expect(heading.className).not.toContain('border-t')
   })
 
   itAxe('has no axe accessibility violations', async () => {

@@ -20,7 +20,6 @@ export const ICON_GLYPH_SIZING_EXEMPT_FILES = new Set([
   'packages/ui/src/components/ui/radio-group.client.tsx',
   'packages/ui/src/components/ui/rich-text-editor-toolbar.client.tsx',
   'packages/ui/src/components/ui/rich-text-link-picker.client.tsx',
-  'packages/ui/src/components/ui/rich-text-link-preview-card.client.tsx',
   'packages/ui/src/components/ui/select.client.tsx',
   'packages/ui/src/components/ui/theme-switch.client.tsx',
   'packages/ui/src/components/ui/toast-provider.client.tsx',

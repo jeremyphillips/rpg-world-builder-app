@@ -15,7 +15,6 @@ export type GlobalSearchGroupedResultsProps = {
   onResultActivate?: () => void
   onShowAll?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => void
   showAllHref?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => string
-  inset?: 'panel'
 }
 
 export function GlobalSearchGroupedResults({
@@ -24,13 +23,10 @@ export function GlobalSearchGroupedResults({
   onResultActivate,
   onShowAll,
   showAllHref,
-  inset,
 }: GlobalSearchGroupedResultsProps) {
   if (sections.length === 0) {
     return null
   }
-
-  const rowDensity = inset === 'panel' ? 'compact' : 'default'
 
   const sectionElements = sections.map((section, sectionIndex) => (
     <GlobalSearchGroupSection
@@ -42,7 +38,6 @@ export function GlobalSearchGroupedResults({
       onResultActivate={onResultActivate}
       onShowAll={onShowAll}
       showAllHref={showAllHref}
-      rowDensity={rowDensity}
     />
   ))
 

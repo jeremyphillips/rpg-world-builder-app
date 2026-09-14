@@ -84,7 +84,7 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
         .map((item) => ({
           value: item.id,
           label: `${item.key} — ${item.title}`,
-          description: item.status,
+          metadata: item.status,
         })),
     [allTickets, ticket.id],
   )

@@ -45,12 +45,11 @@ export const CampaignUnavailable: Story = {
   },
 }
 
-export const Compact: Story = {
+export const LongSecondary: Story = {
   args: {
     title: 'Fireball',
     secondary: '3rd-level evocation · Instantaneous · Very long summary that should truncate',
     typeLabel: 'Spell',
     href: '/campaigns/demo/spells/fireball',
-    density: 'compact',
   },
 }

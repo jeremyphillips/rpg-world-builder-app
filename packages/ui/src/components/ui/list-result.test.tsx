@@ -113,6 +113,26 @@ describe('ListResultGroupHeading', () => {
       'content-group',
     )
   })
+
+  it('applies first inset and follows-complete top border', () => {
+    const { rerender } = render(
+      <ListResultGroupHeading first follows="none" as="h2">
+        Content · 14
+      </ListResultGroupHeading>,
+    )
+
+    const firstHeading = screen.getByRole('heading', { name: 'Content · 14' })
+    expect(firstHeading).toHaveClass('pt-2')
+    expect(firstHeading.className).not.toContain('border-t')
+
+    rerender(
+      <ListResultGroupHeading follows="complete" as="h2">
+        Game terms · 2
+      </ListResultGroupHeading>,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Game terms · 2' }).className).toContain('border-t')
+  })
 })
 
 describe('ListResultViewport', () => {
