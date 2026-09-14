@@ -6,10 +6,22 @@ export const rulesConfigFieldNavShellClasses = cn(
   establishSurfaceCurrent('surface-faint'),
 )
 
-/** Sticky slot for document-scroll hub detail layouts — direct flex-row sibling of main column. */
-export const rulesConfigFieldNavRailSlotClasses = cn(
-  'flex shrink-0 flex-col gap-4 lg:sticky lg:top-[var(--app-sticky-chrome-block-size)] lg:self-start',
-)
+/**
+ * Stretch column beside the main form — full row height, not sticky itself.
+ * Sticky belongs on the short inner {@link rulesConfigFieldNavStickyClasses} nav panel.
+ */
+export const rulesConfigFieldNavRailSlotClasses =
+  'flex shrink-0 flex-col gap-4 lg:w-56 lg:self-stretch'
 
-/** Desktop rail width — applied to the nav panel inside the sticky slot. */
-export const rulesConfigFieldNavPanelClasses = 'hidden w-56 lg:block'
+/**
+ * Desktop nav panel — sticky within the stretch column.
+ * `top` uses a calc fallback because `--app-sticky-chrome-block-size` may not resolve on this node.
+ */
+export const rulesConfigFieldNavStickyClasses =
+  'lg:sticky lg:top-[var(--app-sticky-chrome-block-size,calc(3rem+2.5rem))] lg:self-start'
+
+/** Desktop rail width — applied to the nav panel inside the stretch column. */
+export const rulesConfigFieldNavPanelClasses = cn(
+  'hidden w-56 lg:block',
+  rulesConfigFieldNavStickyClasses,
+)

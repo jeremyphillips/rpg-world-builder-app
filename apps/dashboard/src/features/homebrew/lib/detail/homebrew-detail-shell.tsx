@@ -24,7 +24,7 @@ export type HomebrewDetailShellProps = {
 export function HomebrewDetailShell({ nav, children }: HomebrewDetailShellProps) {
   return (
     <WidePage rhythm="list">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
         {nav}
         <div className="mx-auto min-w-0 w-full max-w-xl flex-1 overflow-visible">{children}</div>
       </div>
