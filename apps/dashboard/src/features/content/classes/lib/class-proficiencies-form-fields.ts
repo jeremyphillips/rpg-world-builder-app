@@ -166,7 +166,6 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         labelVisibility: 'srOnly',
         categoriesRequired: true,
         itemsRequired: true,
-        dependents: { chrome: 'rail' },
       }),
     ],
   }

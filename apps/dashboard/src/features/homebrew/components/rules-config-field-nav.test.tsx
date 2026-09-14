@@ -44,19 +44,22 @@ describe('RulesConfigFieldNav', () => {
     expect(rail).toHaveTextContent('Extended progression')
   })
 
-  it('marks the active section without a leaf', () => {
+  it('marks the active section without a leaf using bold foreground text', () => {
     render(<RulesConfigFieldNav {...defaultNavProps} activeSectionId="progression" />)
 
-    expect(screen.getByRole('link', { name: 'Progression' })).toHaveAttribute(
-      'aria-current',
-      'location',
-    )
+    const activeSection = screen.getByRole('link', { name: 'Progression' })
+    expect(activeSection).toHaveAttribute('aria-current', 'location')
+    expect(activeSection).toHaveClass('font-bold', 'text-foreground')
+    expect(activeSection).not.toHaveClass('bg-accent')
     expect(screen.getByRole('link', { name: 'Standard max level' })).not.toHaveAttribute(
       'aria-current',
     )
+
+    const leafList = activeSection.closest('li')?.querySelector('ul')
+    expect(leafList).toHaveClass('border-neutral-contrast')
   })
 
-  it('marks the active leaf and keeps its parent section unhighlighted', () => {
+  it('marks the active leaf and keeps its parent section bold but muted in the active group', () => {
     render(
       <RulesConfigFieldNav
         {...defaultNavProps}
@@ -65,10 +68,17 @@ describe('RulesConfigFieldNav', () => {
       />,
     )
 
-    expect(screen.getByRole('link', { name: 'Creation' })).not.toHaveAttribute('aria-current')
+    const parentSection = screen.getByRole('link', { name: 'Creation' })
+    expect(parentSection).not.toHaveAttribute('aria-current')
+    expect(parentSection).toHaveClass('font-bold', 'text-muted-foreground')
+    expect(parentSection).not.toHaveClass('text-foreground', 'bg-accent')
+
     const activeLeaf = screen.getByRole('link', { name: 'Standard array' })
     expect(activeLeaf).toHaveAttribute('aria-current', 'true')
-    expect(activeLeaf).toHaveClass('font-bold')
+    expect(activeLeaf).toHaveClass('font-bold', 'text-foreground')
+
+    const leafList = parentSection.closest('li')?.querySelector('ul')
+    expect(leafList).toHaveClass('border-l-2', 'border-neutral-contrast')
   })
 
   it('scrolls to a section from the mobile select', async () => {

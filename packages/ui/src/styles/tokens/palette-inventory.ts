@@ -273,6 +273,7 @@ export const SURFACE_RELATIVE_CHROME_ROLES = [
   '--border-subtle',
   '--border-default',
   '--border-strong',
+  '--border-neutral-contrast',
   '--border',
   '--card-border',
   '--card-selected-border',

@@ -370,6 +370,7 @@ function progressionGroup(): FormItem {
             fields: [
               {
                 kind: 'row',
+                align: 'start',
                 visibility: visibleWhenExtendedProgression(),
                 fields: [
                   {
@@ -386,7 +387,7 @@ function progressionGroup(): FormItem {
                   {
                     type: 'number',
                     name: 'extendedMaxLevel',
-                    label: 'Extended max level',
+                    label: 'Max level',
                     min: 1,
                     max: ABSOLUTE_MAX_CHARACTER_LEVEL,
                     required: true,

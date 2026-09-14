@@ -62,6 +62,10 @@
   );
 }
 
+@utility border-neutral-contrast {
+  border-color: var(--border-neutral-contrast);
+}
+
 @utility border-card-selected-border {
   border-color: color-mix(
     in oklch,

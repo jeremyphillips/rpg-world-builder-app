@@ -92,6 +92,11 @@ describe('surface-relative chrome utilities', () => {
     },
   )
 
+  it('defines border-neutral-contrast from the palette neutral-contrast bridge', () => {
+    const block = readUtilityBlock(utilitiesCss, 'border-neutral-contrast')
+    expect(block).toContain('border-color: var(--border-neutral-contrast)')
+  })
+
   it('uses live var(--border) in the base safety-net rule without --color-border', () => {
     const baseRule = globalsCss.match(
       /@layer base\s*\{[\s\S]*?\*[\s\S]*?border-color:\s*([^;]+);/,

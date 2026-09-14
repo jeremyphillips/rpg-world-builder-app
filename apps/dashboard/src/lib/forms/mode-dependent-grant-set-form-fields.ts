@@ -1,5 +1,6 @@
 import {
   type DependentChrome,
+  DEFAULT_DEPENDENT_CHROME,
   DEFAULT_DEPENDENT_INSET,
   type FieldConfig,
   type FieldOption,
@@ -104,7 +105,7 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
       multiple: true,
       options: itemOptions,
       placeholder: 'Choose items…',
-      width: 'xl',
+      width: 'full',
       ...(itemsRequired ? { required: true } : {}),
       visibility: visibleWhenGrantMode(modeFieldName, specificMode),
     },
@@ -141,7 +142,7 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
     dependents: {
       ...(visibility ? { visibility } : {}),
       inset: dependentsPresentation?.inset ?? DEFAULT_DEPENDENT_INSET,
-      chrome: dependentsPresentation?.chrome ?? 'none',
+      chrome: dependentsPresentation?.chrome ?? DEFAULT_DEPENDENT_CHROME,
       fields: grantSetDependentFields(options),
     },
   }

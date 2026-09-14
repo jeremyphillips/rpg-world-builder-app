@@ -5,8 +5,10 @@ import { resolveRulesConfigNavScrollOffsetPx } from '@/features/homebrew/hooks/u
 
 import {
   rulesConfigFieldNavLeafLinkClasses,
+  rulesConfigFieldNavLeafListClasses,
   rulesConfigFieldNavPanelClasses,
   rulesConfigFieldNavRailSlotClasses,
+  rulesConfigFieldNavSectionLinkClasses,
   rulesConfigFieldNavShellClasses,
 } from './rules-config-field-nav.variants'
 
@@ -65,6 +67,16 @@ function resolveMobileSelectValue(
   return sections[0]?.id ?? ''
 }
 
+function resolveSectionLinkState(
+  sectionId: string,
+  activeSectionId?: string,
+  activeLeafId?: string,
+): 'inactive' | 'active' | 'activeWithLeaf' {
+  if (activeSectionId !== sectionId) return 'inactive'
+  if (activeLeafId) return 'activeWithLeaf'
+  return 'active'
+}
+
 /** Desktop anchor rail + mobile select for in-page rules configuration sections. */
 export function RulesConfigFieldNav({
   sections,
@@ -87,7 +99,11 @@ export function RulesConfigFieldNav({
         </Eyebrow>
         <ul className="space-y-1">
           {sections.map((section) => {
-            const isSectionActive = activeSectionId === section.id && !activeLeafId
+            const sectionLinkState = resolveSectionLinkState(
+              section.id,
+              activeSectionId,
+              activeLeafId,
+            )
 
             return (
               <li key={section.id}>
@@ -97,18 +113,17 @@ export function RulesConfigFieldNav({
                     event.preventDefault()
                     scrollToAnchor(section.id)
                   }}
-                  aria-current={isSectionActive ? 'location' : undefined}
-                  className={cn(
-                    'block rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                    isSectionActive
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                  )}
+                  aria-current={sectionLinkState === 'active' ? 'location' : undefined}
+                  className={rulesConfigFieldNavSectionLinkClasses({ state: sectionLinkState })}
                 >
                   {section.label}
                 </a>
                 {section.leaves && section.leaves.length > 0 ? (
-                  <ul className="ml-3.5 mt-1 space-y-0.5 border-l border-border pl-2">
+                  <ul
+                    className={rulesConfigFieldNavLeafListClasses({
+                      active: sectionLinkState !== 'inactive',
+                    })}
+                  >
                     {section.leaves.map((leaf) => (
                       <li key={leaf.id}>
                         <a

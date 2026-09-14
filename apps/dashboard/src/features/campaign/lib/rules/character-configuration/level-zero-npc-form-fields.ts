@@ -9,7 +9,7 @@ import {
   hitDieSchema,
   levelZeroProficiencyBonusSchema,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
+import { DEFAULT_DEPENDENT_CHROME, toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
 import {
   wealthGrantMoneyField,
@@ -132,6 +132,7 @@ export function levelZeroNpcsFields({
             defaultValue: true,
           },
           dependents: {
+            chrome: DEFAULT_DEPENDENT_CHROME,
             fields: [
               standardArrayFormFields({
                 name: 'levelZeroStandardArray',
@@ -148,7 +149,7 @@ export function levelZeroNpcsFields({
                     hint: 'Hit die used for level 0 NPC hit points.',
                     options: hitDieOptions,
                     width: '1/2',
-                    digits: 3,
+                    digits: 4,
                   },
                   {
                     type: 'select',

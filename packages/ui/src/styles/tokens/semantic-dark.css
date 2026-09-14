@@ -108,6 +108,7 @@
     var(--foreground) var(--mix-border-strong),
     var(--surface-current)
   );
+  --border-neutral-contrast: var(--palette-neutral-contrast);
   --border: var(--border-default);
   --card-border: color-mix(in oklch, var(--primary) var(--mix-card-border), var(--surface-current));
   --card-selected-border: color-mix(

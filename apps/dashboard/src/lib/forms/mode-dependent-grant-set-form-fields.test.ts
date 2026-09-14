@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_DEPENDENT_INSET, isContainer, type DependentConfig } from '@rpg/ui/form'
+import {
+  DEFAULT_DEPENDENT_CHROME,
+  DEFAULT_DEPENDENT_INSET,
+  isContainer,
+  type DependentConfig,
+} from '@rpg/ui/form'
 
 import {
   modeDependentGrantSetField,
@@ -16,7 +21,7 @@ function expectDependentField(
 }
 
 describe('modeDependentGrantSetField', () => {
-  it('returns a dependent field with inset dependents and no panel chrome on chips', () => {
+  it('returns a dependent field with inset rail dependents and no panel chrome on chips', () => {
     const item = expectDependentField(
       modeDependentGrantSetField({
         modeFieldName: 'weaponProficiencyMode',
@@ -40,7 +45,7 @@ describe('modeDependentGrantSetField', () => {
       },
       dependents: {
         inset: DEFAULT_DEPENDENT_INSET,
-        chrome: 'none',
+        chrome: DEFAULT_DEPENDENT_CHROME,
       },
     })
     expect(item.dependents).not.toHaveProperty('panel')
@@ -49,6 +54,9 @@ describe('modeDependentGrantSetField', () => {
     expect(chips).toMatchObject({ type: 'chips' })
     expect(chips).not.toHaveProperty('chrome')
     expect(item.controller).not.toHaveProperty('separator')
+
+    const combobox = item.dependents.fields[1]
+    expect(combobox).toMatchObject({ type: 'combobox', width: 'full' })
   })
 })
 
