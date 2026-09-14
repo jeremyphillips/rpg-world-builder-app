@@ -4,6 +4,7 @@ import { FormStickyScrollBody, formStickyScrollShellWithDockedFooterClasses } fr
 
 import {
   characterBuilderFormCompactPreviewSlotClasses,
+  characterBuilderFormScrollViewportClasses,
   characterBuilderShellFormColumnClasses,
 } from './character-builder-shell.variants'
 
@@ -22,7 +23,10 @@ export function CharacterBuilderFormColumn({
   return (
     <div className={characterBuilderShellFormColumnClasses}>
       <div className={formStickyScrollShellWithDockedFooterClasses}>
-        <FormStickyScrollBody boundedScroll>
+        <FormStickyScrollBody
+          boundedScroll
+          scrollViewportClassName={characterBuilderFormScrollViewportClasses}
+        >
           {compactPreview ? (
             <div className={characterBuilderFormCompactPreviewSlotClasses}>{compactPreview}</div>
           ) : null}

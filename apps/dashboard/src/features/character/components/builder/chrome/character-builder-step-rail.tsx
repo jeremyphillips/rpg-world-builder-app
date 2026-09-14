@@ -28,6 +28,7 @@ import {
   characterBuilderStepRailItemActiveClasses,
   characterBuilderStepRailItemClasses,
   characterBuilderStepRailItemLabelActiveClasses,
+  characterBuilderStepRailNavClasses,
 } from '../character-builder-shell.variants'
 
 export type CharacterBuilderStepRailProps = {
@@ -85,7 +86,11 @@ export function CharacterBuilderStepRail({
   )
 
   return (
-    <nav aria-label="Character builder steps" onKeyDown={handleStepRailKeyDown}>
+    <nav
+      aria-label="Character builder steps"
+      className={characterBuilderStepRailNavClasses}
+      onKeyDown={handleStepRailKeyDown}
+    >
       <ol className={characterBuilderStepRailClasses}>
         {effectiveSteps.map((step, index) => {
           const visualStatus = resolveStepVisualStatus({

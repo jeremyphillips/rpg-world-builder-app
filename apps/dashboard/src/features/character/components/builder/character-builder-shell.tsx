@@ -19,7 +19,15 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import { buttonVariants, Button, Heading, Spinner, Text, Alert } from '@rpg/ui'
+import {
+  buttonVariants,
+  Button,
+  Heading,
+  ScrollBoundaryRegion,
+  Spinner,
+  Text,
+  Alert,
+} from '@rpg/ui'
 
 import { CampaignCharacterEligibilityAlert } from '@/features/campaign'
 import { useCompleteCampaignOnboarding } from '@/features/campaign'
@@ -77,6 +85,7 @@ import {
   characterBuilderShellNavColumnClasses,
   characterBuilderShellPreviewColumnClasses,
   characterBuilderShellRootClasses,
+  characterBuilderNavScrollViewportClasses,
 } from './character-builder-shell.variants'
 import { CharacterBuilderStepContent } from './character-builder-step-content'
 import { CharacterBuilderStepRail } from './chrome/character-builder-step-rail'
@@ -480,16 +489,18 @@ export function CharacterBuilderShell({
 
         <div className={characterBuilderShellBodyClasses}>
           <div className={characterBuilderShellNavColumnClasses}>
-            <CharacterBuilderStepRail
-              draft={draft}
-              currentStepId={currentStepId}
-              context={context}
-              catalogIndex={catalogIndex}
-              resolvedChoiceSets={resolvedChoiceSets}
-              draftValidationIssues={draftValidationIssues}
-              validationVisibleStepIds={railValidationVisibleStepIds}
-              onStepSelect={navigateToStep}
-            />
+            <ScrollBoundaryRegion viewportClassName={characterBuilderNavScrollViewportClasses}>
+              <CharacterBuilderStepRail
+                draft={draft}
+                currentStepId={currentStepId}
+                context={context}
+                catalogIndex={catalogIndex}
+                resolvedChoiceSets={resolvedChoiceSets}
+                draftValidationIssues={draftValidationIssues}
+                validationVisibleStepIds={railValidationVisibleStepIds}
+                onStepSelect={navigateToStep}
+              />
+            </ScrollBoundaryRegion>
           </div>
           <CharacterBuilderFormColumn
             compactPreview={

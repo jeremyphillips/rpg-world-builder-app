@@ -28,5 +28,6 @@ describe('FormStickyScrollBody', () => {
     const clip = container.querySelector('.form-scroll-body-container')
     expect(clip).toHaveClass('overflow-hidden')
     expect(clip?.querySelector('.overflow-y-auto')).toBeTruthy()
+    expect(clip?.querySelector('[data-visible="false"].bg-gradient-to-b')).toBeInTheDocument()
   })
 })

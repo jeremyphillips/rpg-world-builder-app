@@ -1,9 +1,12 @@
+'use client'
+
 import type { ReactNode } from 'react'
 
+import { ScrollBoundaryRegion } from '../../components/ui/scroll-boundary-region.client'
 import { cn } from '../../lib/utils'
 import {
   formStickyScrollBodyClipClasses,
-  formStickyScrollBodyScrollerClasses,
+  formStickyScrollBodyScrollViewportClasses,
   formStickyScrollBodyUnboundedClasses,
 } from './form-chrome.variants'
 import { FormScrollBodyTopInset } from './form-viewport-scroll-top-inset.client'
@@ -11,6 +14,8 @@ import { FormScrollBodyTopInset } from './form-viewport-scroll-top-inset.client'
 export type FormStickyScrollBodyProps = {
   children: ReactNode
   scrollBodyClassName?: string
+  /** Overrides merged onto the bounded scroll viewport (after default scroller tokens). */
+  scrollViewportClassName?: string
   className?: string
   /**
    * Viewport-bound docked-footer column — overflow-hidden clip + inner scroller so
@@ -26,6 +31,7 @@ export type FormStickyScrollBodyProps = {
 export function FormStickyScrollBody({
   children,
   scrollBodyClassName,
+  scrollViewportClassName,
   className,
   boundedScroll = false,
 }: FormStickyScrollBodyProps) {
@@ -48,10 +54,13 @@ export function FormStickyScrollBody({
 
   return (
     <div className={cn(formStickyScrollBodyClipClasses, className)}>
-      <div className={formStickyScrollBodyScrollerClasses}>
+      <ScrollBoundaryRegion
+        className="h-full min-h-0 flex-1 flex-col"
+        viewportClassName={cn(formStickyScrollBodyScrollViewportClasses, scrollViewportClassName)}
+      >
         {inset}
         {children}
-      </div>
+      </ScrollBoundaryRegion>
     </div>
   )
 }

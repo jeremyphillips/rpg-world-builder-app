@@ -52,6 +52,12 @@ export type ScrollBoundaryRegionProps = React.ComponentPropsWithoutRef<'div'> & 
   viewportClassName?: string
   /** Optional ref to the scroll viewport (merged with the internal measurement ref). */
   viewportRef?: React.Ref<HTMLDivElement>
+  /** When false, suppresses the top gradient (e.g. adjacent chrome owns the divider). */
+  showTopBoundaryShadow?: boolean
+  /** When false, suppresses the bottom gradient (e.g. a docked footer owns the edge). */
+  showBottomBoundaryShadow?: boolean
+  /** Called when scroll position or viewport size changes boundary visibility. */
+  onBoundaryStateChange?: (state: ScrollBoundaryState) => void
 }
 
 /**
@@ -81,6 +87,9 @@ export function ScrollBoundaryRegion({
   className,
   viewportClassName,
   viewportRef: externalViewportRef,
+  showTopBoundaryShadow = true,
+  showBottomBoundaryShadow = true,
+  onBoundaryStateChange,
   children,
   ...viewportProps
 }: ScrollBoundaryRegionProps) {
@@ -92,11 +101,15 @@ export function ScrollBoundaryRegion({
     [externalViewportRef, viewportRef],
   )
 
+  React.useEffect(() => {
+    onBoundaryStateChange?.(state)
+  }, [onBoundaryStateChange, state])
+
   return (
     <div className={cn(scrollBoundaryRegionRootClasses, className)}>
       <div
         aria-hidden
-        data-visible={state.showTopShadow}
+        data-visible={showTopBoundaryShadow && state.showTopShadow}
         className={scrollBoundaryTopShadowClasses}
       />
       <div
@@ -108,7 +121,7 @@ export function ScrollBoundaryRegion({
       </div>
       <div
         aria-hidden
-        data-visible={state.showBottomShadow}
+        data-visible={showBottomBoundaryShadow && state.showBottomShadow}
         className={scrollBoundaryBottomShadowClasses}
       />
     </div>

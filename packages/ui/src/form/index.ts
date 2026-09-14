@@ -110,6 +110,7 @@ export {
   formDockedActionsBarBlockSizeContractClasses,
   formStickyScrollBodyClasses,
   formStickyScrollBodyClipClasses,
+  formStickyScrollBodyScrollViewportClasses,
   formStickyScrollBodyScrollerClasses,
   formStickyScrollBodyUnboundedClasses,
   formTabbedInactivePanelClasses,

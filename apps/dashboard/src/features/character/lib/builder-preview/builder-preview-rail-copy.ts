@@ -1,4 +1,4 @@
-export const BUILDER_PREVIEW_HEADER_TITLE = 'Preview'
+export const BUILDER_PREVIEW_HEADER_TITLE = 'Character preview'
 
 export const BUILDER_PREVIEW_SECTIONS_TITLE = 'Sections'
 

@@ -50,6 +50,7 @@ export function buildAbilitiesStepFormFields({
           {
             kind: 'slot' as const,
             name: 'fixedScoresAssignment',
+            chrome: { variant: 'none' },
             render: renderFixedScoresAssignment,
           },
         ]
@@ -57,6 +58,7 @@ export function buildAbilitiesStepFormFields({
           {
             kind: 'slot' as const,
             name: 'manualAbilitiesAssignment',
+            chrome: { variant: 'none' },
             render: renderManualAbilitiesAssignment,
           },
         ]

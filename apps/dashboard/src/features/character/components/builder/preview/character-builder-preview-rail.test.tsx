@@ -48,7 +48,7 @@ describe('CharacterBuilderPreviewRail', () => {
   it('renders PreviewRail identity, sections, and footer from the shared projection', () => {
     render(<CharacterBuilderPreviewRail {...railProps} />)
 
-    expect(screen.getByRole('heading', { name: 'Preview' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Character preview' })).toBeInTheDocument()
     expect(screen.getByText(PREVIEW_UNNAMED_CHARACTER)).toBeInTheDocument()
     expect(screen.getByText('Level 1 · Choose class')).toBeInTheDocument()
     expect(screen.getByText(PREVIEW_CHOOSE_SPECIES)).toBeInTheDocument()
@@ -97,7 +97,7 @@ describe('CharacterBuilderPreviewRail', () => {
         hideHeader
       />,
     )
-    expect(screen.queryByRole('heading', { name: 'Preview' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Character preview' })).not.toBeInTheDocument()
     expect(screen.getByText(PREVIEW_UNNAMED_CHARACTER)).toBeInTheDocument()
     expect(screen.getByText('Builder incomplete')).toBeInTheDocument()
   })
