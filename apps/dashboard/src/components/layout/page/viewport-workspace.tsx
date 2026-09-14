@@ -10,7 +10,7 @@ export interface ViewportWorkspaceProps {
 }
 
 /**
- * Bounded multi-pane workspace — explicit block size; panes own local scrollports.
+ * Bounded multi-pane workspace — flex-fills the app-shell main column; panes own local scrollports.
  * Ordinary document-scroll routes must not use this primitive.
  */
 export function ViewportWorkspace({ children, className }: ViewportWorkspaceProps) {

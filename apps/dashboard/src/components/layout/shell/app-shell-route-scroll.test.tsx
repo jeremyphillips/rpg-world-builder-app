@@ -25,12 +25,13 @@ describe('AppShell route scroll ownership', () => {
     expect(appShellRootClasses).not.toContain('max-h-dvh')
   })
 
-  it('main is not a height contract or scrollport', () => {
+  it('main is a flex column participant but not a scrollport', () => {
     expect(appShellMainClasses).toContain('min-w-0')
     expect(appShellMainClasses).toContain('flex-1')
+    expect(appShellMainClasses).toContain('flex-col')
+    expect(appShellMainClasses).toContain('min-h-0')
     expect(appShellMainClasses).not.toContain('overflow-hidden')
     expect(appShellMainClasses).not.toContain('overflow-y-auto')
-    expect(appShellMainClasses).not.toContain('min-h-0')
     expect(appShellMainClasses).not.toContain('min-h-full')
     expect(appShellMainClasses).not.toContain('h-full')
   })
@@ -83,7 +84,7 @@ describe('AppShell route scroll ownership', () => {
     expect(messagesWorkspaceBodyClasses).toContain('overflow-hidden')
   })
 
-  it('ViewportWorkspace is a bounded workspace with explicit block size', () => {
+  it('ViewportWorkspace is a bounded workspace that flex-fills main', () => {
     const { container } = render(
       <ViewportWorkspace>
         <p>Body</p>

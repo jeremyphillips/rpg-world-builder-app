@@ -5,7 +5,7 @@ import { viewportWorkspaceClasses } from './viewport-workspace.variants'
 import { ViewportWorkspace } from './viewport-workspace'
 
 describe('ViewportWorkspace', () => {
-  it('is a bounded flex column workspace with explicit block size and overflow hidden', () => {
+  it('is a bounded flex column workspace that fills remaining main height', () => {
     const { container } = render(
       <ViewportWorkspace>
         <p>Body</p>
@@ -14,9 +14,8 @@ describe('ViewportWorkspace', () => {
 
     const root = container.firstElementChild
     expect(root).toHaveClass(...viewportWorkspaceClasses.split(/\s+/).filter(Boolean))
-    expect(root).toHaveClass('flex', 'flex-col', 'overflow-hidden', 'min-h-0')
-    expect(root?.className).toContain('block-size:')
-    expect(root?.className).toContain('max-block-size:')
+    expect(root).toHaveClass('flex', 'flex-1', 'flex-col', 'overflow-hidden', 'min-h-0')
+    expect(root?.className).not.toContain('block-size:')
     expect(root).not.toHaveAttribute('data-scroll-container')
   })
 })
