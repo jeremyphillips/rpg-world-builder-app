@@ -14,8 +14,9 @@ describe('ViewportWorkspace', () => {
 
     const root = container.firstElementChild
     expect(root).toHaveClass(...viewportWorkspaceClasses.split(/\s+/).filter(Boolean))
-    expect(root).toHaveClass('flex', 'flex-col', 'overflow-hidden')
+    expect(root).toHaveClass('flex', 'flex-col', 'overflow-hidden', 'min-h-0')
     expect(root?.className).toContain('block-size:')
+    expect(root?.className).toContain('max-block-size:')
     expect(root).not.toHaveAttribute('data-scroll-container')
   })
 })
