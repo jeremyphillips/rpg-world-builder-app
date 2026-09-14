@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import {
   buildDefaultValues,
+  COMBOBOX_FILTER_ALL_VALUE,
   fieldDefaultValue,
   type ComboboxFieldConfig,
   type FormItem,
@@ -120,6 +121,53 @@ describe('Form combobox field', () => {
 
     expect(locationRoot).toHaveClass('grow-[4]', 'max-w-1/3')
     expect(archetypeRoot).toHaveClass('grow-[8]', 'max-w-2/3')
+  })
+
+  it('filters combobox options by category from filterSelect', async () => {
+    const user = userEvent.setup()
+    const schema = z.object({ tools: z.array(z.string()) })
+    const fields: FormItem[] = [
+      {
+        type: 'combobox',
+        name: 'tools',
+        label: 'Specific tools',
+        multiple: true,
+        options: [
+          {
+            value: 'thieves-tools',
+            label: "Thieves' tools",
+            filterCategory: 'thieves',
+          },
+          {
+            value: 'lute',
+            label: 'Lute',
+            filterCategory: 'musical_instrument',
+          },
+        ],
+        filterSelect: {
+          ariaLabel: 'Filter by tool category',
+          options: [
+            { value: COMBOBOX_FILTER_ALL_VALUE, label: 'All categories' },
+            { value: 'thieves', label: "Thieves' tools" },
+            { value: 'musical_instrument', label: 'Musical instrument' },
+          ],
+        },
+      },
+    ]
+
+    render(
+      <Form schema={schema} fields={fields} defaultValues={{ tools: [] }} onSubmit={vi.fn()} />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Specific tools' }))
+    expect(screen.getByRole('option', { name: "Thieves' tools" })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Lute' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: 'Filter by tool category' }))
+    await user.click(screen.getByRole('option', { name: "Thieves' tools" }))
+
+    expect(screen.getByRole('option', { name: "Thieves' tools" })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Lute' })).not.toBeInTheDocument()
   })
 
   it('applies custom resolveFilteredOptions order in the panel', async () => {

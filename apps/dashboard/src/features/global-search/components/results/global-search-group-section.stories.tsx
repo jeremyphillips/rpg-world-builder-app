@@ -77,7 +77,7 @@ export const PanelContext: Story = {
   decorators: [
     (Story) => (
       <div
-        className={`w-96 border border-border bg-surface-subtle ${establishSurfaceCurrent('surface-subtle')}`}
+        className={`w-96 border border-border bg-surface-lift ${establishSurfaceCurrent('surface-lift')}`}
       >
         <Story />
       </div>

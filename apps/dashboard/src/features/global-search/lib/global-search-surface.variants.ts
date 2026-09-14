@@ -1,6 +1,6 @@
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
-/** Wash ladder context for preview panel (subtle base) vs search route (faint base). */
+/** Wash ladder context for preview panel (lift base) vs search route (faint base). */
 export type GlobalSearchSurfaceContext = 'preview' | 'page'
 
 const GLOBAL_SEARCH_HEADING_SURFACE_CLASSES: Record<GlobalSearchSurfaceContext, string> = {

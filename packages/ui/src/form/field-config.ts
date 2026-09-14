@@ -123,6 +123,10 @@ export interface FieldOption {
   description?: string
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
   searchTerms?: readonly string[]
+  /** Optional classification shown inline after the label in combobox panels. */
+  classification?: string
+  /** Category slug matched by combobox `filterSelect` (e.g. tool category id). */
+  filterCategory?: string
   /** Feature chips rendered by `radioCard` fields; ignored by other option controls. */
   meta?: string[]
   /** Inline title badge rendered by `radioCard` fields; ignored by other option controls. */
@@ -701,6 +705,18 @@ export interface LevelRangeFieldConfig extends BaseFieldConfig {
  *   placeholder: 'Search tags…',
  * })
  */
+/** Sentinel value for combobox category filters that show every option. */
+export const COMBOBOX_FILTER_ALL_VALUE = 'all'
+
+export interface ComboboxFilterSelectConfig {
+  /** Accessible name for the category filter select. */
+  ariaLabel: string
+  /** Filter options — include `{ value: COMBOBOX_FILTER_ALL_VALUE, label: 'All …' }` when needed. */
+  options: FieldOption[]
+  /** Initial filter value. Defaults to the first option value. */
+  defaultValue?: string
+}
+
 export interface ComboboxFieldConfig extends BaseFieldConfig {
   type: 'combobox'
   options: FieldOption[]
@@ -727,6 +743,8 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
     query: string,
     selected: string[],
   ) => FieldOption[]
+  /** Optional category filter row in the combobox panel toolbar. */
+  filterSelect?: ComboboxFilterSelectConfig
 }
 
 export type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'

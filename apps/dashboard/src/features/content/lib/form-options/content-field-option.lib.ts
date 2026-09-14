@@ -3,6 +3,7 @@ import {
   isArmorEquipment,
   isMagicItemBaseEquipment,
   isWeaponEquipment,
+  TOOL_CATEGORY_ENTRIES,
   type CharacterClass,
   type ContentSource,
   type ContentTypeKey,
@@ -11,6 +12,7 @@ import {
   type Feat,
   type SkillProficiency,
   type Spell,
+  type ToolEquipment,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
@@ -93,9 +95,15 @@ export function referenceArmorFieldOptions(
 export function referenceToolFieldOptions(
   selectors: ContentPurposeSelectors<Equipment> | undefined,
 ): FieldOption[] {
-  return toSortedContentFieldOptions(
-    selectors?.forReference().filter((item) => item.kind === 'tool'),
-    'equipment',
+  return sortFieldOptions(
+    selectors
+      ?.forReference()
+      .filter((item): item is ToolEquipment => item.kind === 'tool')
+      .map((item) => ({
+        ...toContentFieldOption(item, 'equipment'),
+        filterCategory: item.toolCategory,
+        classification: TOOL_CATEGORY_ENTRIES[item.toolCategory].label,
+      })) ?? [],
   )
 }
 
