@@ -63,14 +63,18 @@ import {
   validateBuilderStepSubmit,
 } from '../../lib/builder/validate-builder-step'
 import { CharacterBuilderDraftRestore } from './chrome/character-builder-draft-restore'
+import { CharacterBuilderFormColumn } from './character-builder-form-column'
 import { CharacterBuilderFooter } from './chrome/character-builder-footer'
 import { CharacterBuilderLevelControl } from './chrome/character-builder-level-control'
-import { CharacterBuilderPreviewPanel } from './preview/character-builder-preview-panel'
+import {
+  CharacterBuilderPreviewRail,
+  CharacterBuilderPreviewSheet,
+} from './preview/character-builder-preview-rail'
 import {
   characterBuilderShellBodyClasses,
-  characterBuilderShellColumnClasses,
   characterBuilderShellHeaderClasses,
   characterBuilderShellHeaderTitleRowClasses,
+  characterBuilderShellNavColumnClasses,
   characterBuilderShellPreviewColumnClasses,
   characterBuilderShellRootClasses,
 } from './character-builder-shell.variants'
@@ -475,7 +479,7 @@ export function CharacterBuilderShell({
         </header>
 
         <div className={characterBuilderShellBodyClasses}>
-          <div className={characterBuilderShellColumnClasses}>
+          <div className={characterBuilderShellNavColumnClasses}>
             <CharacterBuilderStepRail
               draft={draft}
               currentStepId={currentStepId}
@@ -487,61 +491,84 @@ export function CharacterBuilderShell({
               onStepSelect={navigateToStep}
             />
           </div>
-          <div className={characterBuilderShellColumnClasses}>
-            <CharacterBuilderStepContent
-              stepId={currentStepId}
-              context={context}
-              draft={draft}
-              preview={preview}
-              resolvedChoiceSets={resolvedChoiceSets}
-              validationIssues={stepValidationIssues}
-              reviewValidationHeading={chrome.reviewValidationHeading}
-              onDraftChange={applyDraftPatch}
-              onStepComplete={attemptStepAdvance}
-              onFormContinueValidationFailed={handleFormContinueValidationFailed}
-              onNavigateToStep={navigateToStep}
-              equipmentPickerFocus={pendingEquipmentPickerFocus}
-              onEquipmentPickerFocusConsumed={handleEquipmentPickerFocusConsumed}
-            />
-          </div>
+          <CharacterBuilderFormColumn
+            compactPreview={
+              <CharacterBuilderPreviewSheet
+                draft={draft}
+                context={context}
+                catalogIndex={catalogIndex}
+                preview={preview}
+                resolvedChoiceSets={resolvedChoiceSets}
+                currentStepId={currentStepId}
+                canCreateCharacter={canCreateCharacter}
+                validationVisibleStepIds={railValidationVisibleStepIds}
+                validationIssues={validationIssues}
+              />
+            }
+            scrollContent={
+              <>
+                {isReviewBuilderStep(currentStepId) && campaignEligibilityError ? (
+                  <CampaignCharacterEligibilityAlert
+                    blockingIssues={campaignEligibilityError.blockingIssues}
+                    warnings={campaignEligibilityError.warnings}
+                    heading={chrome.reviewValidationHeading}
+                  />
+                ) : null}
+
+                {isReviewBuilderStep(currentStepId) && createError ? (
+                  <Text variant="destructive" role="alert">
+                    {createError}
+                  </Text>
+                ) : null}
+
+                <CharacterBuilderStepContent
+                  stepId={currentStepId}
+                  context={context}
+                  draft={draft}
+                  preview={preview}
+                  resolvedChoiceSets={resolvedChoiceSets}
+                  validationIssues={stepValidationIssues}
+                  reviewValidationHeading={chrome.reviewValidationHeading}
+                  onDraftChange={applyDraftPatch}
+                  onStepComplete={attemptStepAdvance}
+                  onFormContinueValidationFailed={handleFormContinueValidationFailed}
+                  onNavigateToStep={navigateToStep}
+                  equipmentPickerFocus={pendingEquipmentPickerFocus}
+                  onEquipmentPickerFocusConsumed={handleEquipmentPickerFocusConsumed}
+                />
+              </>
+            }
+            footer={
+              <CharacterBuilderFooter
+                currentStepId={currentStepId}
+                steps={effectiveSteps}
+                canCreateCharacter={canCreateCharacter}
+                isCreating={isCreating}
+                createLabel={chrome.createLabel}
+                creatingLabel={chrome.creatingLabel}
+                reviewFooterHint={chrome.reviewFooterHint}
+                onBack={() => shiftStep('back')}
+                onContinue={handleContinue}
+                onCreateCharacter={() => {
+                  void handleCreateCharacter()
+                }}
+              />
+            }
+          />
           <div className={characterBuilderShellPreviewColumnClasses}>
-            <CharacterBuilderPreviewPanel
+            <CharacterBuilderPreviewRail
               draft={draft}
               context={context}
               catalogIndex={catalogIndex}
               preview={preview}
+              resolvedChoiceSets={resolvedChoiceSets}
+              currentStepId={currentStepId}
+              canCreateCharacter={canCreateCharacter}
+              validationVisibleStepIds={railValidationVisibleStepIds}
+              validationIssues={validationIssues}
             />
           </div>
         </div>
-
-        {isReviewBuilderStep(currentStepId) && campaignEligibilityError ? (
-          <CampaignCharacterEligibilityAlert
-            blockingIssues={campaignEligibilityError.blockingIssues}
-            warnings={campaignEligibilityError.warnings}
-            heading={chrome.reviewValidationHeading}
-          />
-        ) : null}
-
-        {isReviewBuilderStep(currentStepId) && createError ? (
-          <Text variant="destructive" role="alert">
-            {createError}
-          </Text>
-        ) : null}
-
-        <CharacterBuilderFooter
-          currentStepId={currentStepId}
-          steps={effectiveSteps}
-          canCreateCharacter={canCreateCharacter}
-          isCreating={isCreating}
-          createLabel={chrome.createLabel}
-          creatingLabel={chrome.creatingLabel}
-          reviewFooterHint={chrome.reviewFooterHint}
-          onBack={() => shiftStep('back')}
-          onContinue={handleContinue}
-          onCreateCharacter={() => {
-            void handleCreateCharacter()
-          }}
-        />
       </div>
     </>
   )

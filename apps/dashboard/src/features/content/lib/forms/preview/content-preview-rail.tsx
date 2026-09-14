@@ -206,7 +206,11 @@ function ContentPreviewRailView({
       <PreviewRail.Identity
         media={<PreviewRail.Media imageSrc={identity.imageSrc} fallbackIcon={<FallbackIcon />} />}
         name={identity.name}
-        availability={resolveContentPreviewAvailability(access, accessSummary)}
+        status={
+          <PreviewRail.AvailabilityLine
+            {...resolveContentPreviewAvailability(access, accessSummary)}
+          />
+        }
         {...(identity.facts && identity.facts.length > 0 ? { facts: identity.facts } : {})}
       />
       <PreviewRail.ScrollRegion>

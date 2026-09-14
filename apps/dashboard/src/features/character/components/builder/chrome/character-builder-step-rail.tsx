@@ -11,17 +11,16 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import { cn, Text } from '@rpg/ui'
-import { CheckCircle2, Circle, CircleAlert, CircleDot, Lock, type LucideIcon } from 'lucide-react'
+import { cn, StatusIcon, Text } from '@rpg/ui'
 
 import {
   resolveStepRailKeyboardDirection,
   resolveStepRailKeyboardTarget,
 } from '../../../lib/builder/character-builder-step-rail-keyboard.lib'
+import { resolveStepStatusIconVariant } from '../../../lib/builder/builder-step-status-icon.lib'
 import {
   resolveStepVisualStatus,
   stepStatusAriaLabel,
-  type StepStatus,
 } from '../../../lib/builder/builder-step-visual-status'
 import {
   characterBuilderStepRailClasses,
@@ -43,22 +42,6 @@ export type CharacterBuilderStepRailProps = {
   /** Steps that may show a rail error after a failed Continue or Create. */
   validationVisibleStepIds: readonly CharacterBuilderStepId[]
   onStepSelect: (stepId: CharacterBuilderStepId) => void
-}
-
-const STEP_STATUS_ICONS: Record<StepStatus, LucideIcon> = {
-  idle: Circle,
-  active: CircleDot,
-  complete: CheckCircle2,
-  error: CircleAlert,
-  locked: Lock,
-}
-
-const STEP_STATUS_ICON_CLASSES: Record<StepStatus, string> = {
-  idle: 'text-muted-foreground',
-  active: 'text-foreground',
-  complete: 'text-success',
-  error: 'text-destructive',
-  locked: 'text-muted-foreground',
 }
 
 export function CharacterBuilderStepRail({
@@ -116,7 +99,6 @@ export function CharacterBuilderStepRail({
             catalogIndex,
           })
           const isActive = currentStepId === step.id
-          const Icon = STEP_STATUS_ICONS[visualStatus]
 
           return (
             <li key={step.id}>
@@ -134,12 +116,10 @@ export function CharacterBuilderStepRail({
                 )}
                 onClick={() => onStepSelect(step.id)}
               >
-                <Icon
-                  aria-hidden
-                  className={cn(
-                    characterBuilderStepRailIconClasses,
-                    STEP_STATUS_ICON_CLASSES[visualStatus],
-                  )}
+                <StatusIcon
+                  variant={resolveStepStatusIconVariant(visualStatus)}
+                  size="sm"
+                  className={characterBuilderStepRailIconClasses}
                 />
                 <span className="min-w-0 space-y-0.5">
                   <Text

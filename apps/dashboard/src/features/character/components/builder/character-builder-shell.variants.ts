@@ -1,13 +1,10 @@
 import { cn, interactiveFocusVariants } from '@rpg/ui'
+import {
+  formTabbedAsideSlotBottomInsetClasses,
+  formTabbedPreviewRailCompactTriggerHiddenClasses,
+} from '@rpg/ui/form'
 
-/** Route wrapper — fills the concentration viewport below padding. */
-export const characterBuilderRouteClasses =
-  'mx-auto flex h-dvh max-w-screen-2xl min-h-0 flex-col px-6 py-8'
-
-/**
- * Shell root — flex column filling the route. `--character-builder-header-offset`
- * reserves space when a fixed app header is added later.
- */
+/** Shell root — flex column filling the page shell body. */
 export const characterBuilderShellRootClasses =
   'flex min-h-0 flex-1 flex-col gap-6 [--character-builder-header-offset:0px]'
 
@@ -17,18 +14,39 @@ export const characterBuilderShellHeaderClasses = 'flex shrink-0 items-start jus
 export const characterBuilderShellHeaderTitleRowClasses =
   'flex min-w-0 flex-1 flex-wrap items-center gap-x-8 gap-y-2'
 
-/** Three-column body — columns scroll independently inside the remaining height. */
-export const characterBuilderShellBodyClasses =
-  'grid min-h-0 flex-1 grid-cols-1 gap-6 overflow-hidden lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_minmax(14rem,18rem)]'
+/**
+ * Three-column body — step nav, form (docked footer), preview aside.
+ * Preview column is hidden below `xl`; compact sheet trigger lives in the form column.
+ */
+export const characterBuilderShellBodyClasses = cn(
+  'grid min-h-0 flex-1 grid-cols-1 gap-6 overflow-hidden',
+  // Literal strings only — Tailwind must see the full class at scan time (no template interpolation).
+  'xl:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_280px]',
+  '2xl:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_21rem]',
+)
 
-export const characterBuilderShellColumnClasses = 'scrollbar-slim min-h-0 min-w-0 overflow-y-auto'
+/** Left step nav — independent scroll. */
+export const characterBuilderShellNavColumnClasses =
+  'scrollbar-slim min-h-0 min-w-0 overflow-y-auto'
 
-/** Preview column — defers scroll to the panel body so the eyebrow stays visible. */
-export const characterBuilderShellPreviewColumnClasses =
+/** Middle form column — bounded scroll + docked footer. */
+export const characterBuilderShellFormColumnClasses =
   'flex min-h-0 min-w-0 flex-col overflow-hidden'
 
-export const characterBuilderShellFooterClasses =
-  'shrink-0 border-t border-border bg-background py-4'
+/** Preview aside — fill height; hidden below `xl`. */
+export const characterBuilderShellPreviewColumnClasses = cn(
+  'hidden min-h-0 min-w-0 flex-col overflow-hidden xl:flex xl:h-full',
+  formTabbedAsideSlotBottomInsetClasses,
+)
+
+/** Compact preview trigger slot — below `xl` only; no desktop margin in the form column. */
+export const characterBuilderFormCompactPreviewSlotClasses =
+  'mb-4 flex shrink-0 justify-end xl:hidden'
+
+export const characterBuilderPreviewCompactTriggerClasses = cn(
+  'shrink-0',
+  formTabbedPreviewRailCompactTriggerHiddenClasses,
+)
 
 export const characterBuilderStepRailClasses = 'space-y-1'
 
@@ -43,24 +61,10 @@ export const characterBuilderStepRailItemActiveClasses =
 
 export const characterBuilderStepRailItemLabelActiveClasses = 'font-semibold text-foreground'
 
-export const characterBuilderStepRailIconClasses = 'mt-0.5 size-4 shrink-0'
-
-export const characterBuilderPreviewAccordionTriggerClasses =
-  'text-base font-medium leading-none hover:no-underline'
-
-export const characterBuilderPreviewAccordionTriggerStackClasses =
-  'flex min-w-0 flex-1 flex-col items-start gap-0.5 pr-2 text-left'
+export const characterBuilderStepRailIconClasses = 'mt-0.5 shrink-0'
 
 export const characterBuilderStepPanelClasses =
   'min-w-0 space-y-4 rounded-lg border border-border p-6'
-
-export const characterBuilderPreviewPanelRootClasses = 'flex min-h-0 min-w-0 flex-1 flex-col gap-2'
-
-/** Scrollable layout for preview inset panel — surface chrome from `InsetPanel`. */
-export const characterBuilderPreviewPanelInsetClasses =
-  'scrollbar-slim flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto rounded-lg'
-
-export const characterBuilderPreviewIdentitySummaryClasses = 'space-y-1 border-b border-border pb-4'
 
 export const characterBuilderPreviewCombatGridClasses = 'grid grid-cols-2 gap-3'
 

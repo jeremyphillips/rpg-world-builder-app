@@ -59,7 +59,12 @@ const dashboardEntitySurfaceImportGuard = {
 
 const dashboardSheetImportGuard = {
   files: ['src/features/**/*.{ts,tsx}', 'src/lib/**/*.{ts,tsx}'],
-  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    // Compact PreviewRail sheet hosts — same chrome contract as TabbedForm preview.
+    'src/features/content/lib/forms/preview/content-preview-rail.tsx',
+    'src/features/character/components/builder/preview/character-builder-preview-rail.tsx',
+  ],
   rules: {
     'no-restricted-imports': [
       'error',

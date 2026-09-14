@@ -218,11 +218,12 @@ function PreviewRailAvailabilityLine({
 export type PreviewRailIdentityProps = {
   media?: React.ReactNode
   name: React.ReactNode
-  availability: PreviewRailAvailability
+  /** Primary detail line under the name — availability, level/class, etc. */
+  status: React.ReactNode
   facts?: PreviewRailFact[]
 }
 
-function PreviewRailIdentity({ media, name, availability, facts }: PreviewRailIdentityProps) {
+function PreviewRailIdentity({ media, name, status, facts }: PreviewRailIdentityProps) {
   const chrome = usePreviewRailChrome()
 
   return (
@@ -238,7 +239,7 @@ function PreviewRailIdentity({ media, name, availability, facts }: PreviewRailId
           {media}
           <div className={previewRailIdentityContentClasses}>
             <ContentCardHeading heading={name} density="comfortable" />
-            <PreviewRailAvailabilityLine {...availability} />
+            {status}
           </div>
         </div>
         {facts && facts.length > 0 ? (
