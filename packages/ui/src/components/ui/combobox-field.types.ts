@@ -7,7 +7,9 @@ export interface ComboboxFieldOption {
   value: string
   disabled?: boolean
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
-  description?: string
+  metadata?: string
+  /** Optional classification shown inline after the label (`Name · Classification`). */
+  classification?: string
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
   searchTerms?: readonly string[]
 }
@@ -63,4 +65,6 @@ export interface ComboboxFieldControlProps {
   renderOption?: ComboboxRenderOption
   /** Custom filter/rank for panel options; selected values must remain visible when set. */
   resolveFilteredOptions?: ResolveComboboxFilteredOptions
+  /** Optional filter row below search — hosts own filter UI and state. */
+  filter?: React.ReactNode
 }

@@ -8,7 +8,7 @@ export type ButtonDropdownWidth = 'full' | 'fit'
 export type ButtonDropdownItem = {
   id: string
   label: string
-  description?: string
+  metadata?: string
   groupId?: string
   searchTerms?: WeightedSearchField[]
   disabled?: boolean

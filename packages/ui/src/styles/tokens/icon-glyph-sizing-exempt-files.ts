@@ -15,7 +15,6 @@ export const ICON_GLYPH_SIZING_EXEMPT_FILES = new Set([
   'packages/ui/src/components/ui/dialog-parts.client.tsx',
   'packages/ui/src/components/ui/file-dropzone.client.tsx',
   'packages/ui/src/components/ui/input-select-field.client.tsx',
-  'packages/ui/src/components/ui/listbox-option.client.tsx',
   'packages/ui/src/components/ui/notification-bell.client.tsx',
   'packages/ui/src/components/ui/notification-preview-item.client.tsx',
   'packages/ui/src/components/ui/radio-group.client.tsx',

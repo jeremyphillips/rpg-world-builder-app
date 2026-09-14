@@ -15,13 +15,13 @@ const items = [
   {
     id: 'skill-proficiency',
     label: 'Skill proficiency',
-    description: 'Specific skills or a pool',
+    metadata: 'Specific skills or a pool',
     groupId: 'proficiencies',
   },
   {
     id: 'movement-bonus',
     label: 'Movement bonus',
-    description: 'Increase speed',
+    metadata: 'Increase speed',
     groupId: 'combat-traits',
     searchTerms: [{ text: 'walk', weight: 1, role: 'keyword' as const }],
   },

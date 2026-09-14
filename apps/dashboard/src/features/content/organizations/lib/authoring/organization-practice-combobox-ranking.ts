@@ -1,7 +1,7 @@
 import type { OrganizationPractice } from '@rpg/contracts'
-import { rankOptionsByQuery, type LabelValueDescriptionOption } from '@rpg/ui'
+import { rankOptionsByQuery, type LabelValueMetadataOption } from '@rpg/ui'
 
-function prependSelectedNonMatches<T extends LabelValueDescriptionOption>(
+function prependSelectedNonMatches<T extends LabelValueMetadataOption>(
   options: readonly T[],
   matched: readonly T[],
   selected: readonly string[],
@@ -16,7 +16,7 @@ function prependSelectedNonMatches<T extends LabelValueDescriptionOption>(
   return [...selectedExtras, ...matched]
 }
 
-function rankEmptyQueryOrganizationPractices<T extends LabelValueDescriptionOption>(
+function rankEmptyQueryOrganizationPractices<T extends LabelValueMetadataOption>(
   options: readonly T[],
   selected: readonly string[],
   recommendedPracticeIds: readonly OrganizationPractice[],
@@ -49,7 +49,7 @@ function rankEmptyQueryOrganizationPractices<T extends LabelValueDescriptionOpti
   return ranked
 }
 
-export function rankOrganizationPracticeComboboxOptions<T extends LabelValueDescriptionOption>(
+export function rankOrganizationPracticeComboboxOptions<T extends LabelValueMetadataOption>(
   options: readonly T[],
   query: string,
   selected: readonly string[],

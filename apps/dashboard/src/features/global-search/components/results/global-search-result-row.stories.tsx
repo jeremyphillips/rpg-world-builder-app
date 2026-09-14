@@ -52,6 +52,5 @@ export const Compact: Story = {
     typeLabel: 'Spell',
     href: '/campaigns/demo/spells/fireball',
     density: 'compact',
-    borderless: true,
   },
 }

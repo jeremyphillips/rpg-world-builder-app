@@ -14,20 +14,20 @@ const items = [
   {
     id: 'skill-proficiency',
     label: 'Skill proficiency',
-    description: 'Grant proficiency with specific skills or a pool.',
+    metadata: 'Grant proficiency with specific skills or a pool.',
     groupId: 'proficiencies',
   },
   {
     id: 'movement-bonus',
     label: 'Movement bonus',
-    description: 'Increase a movement mode speed.',
+    metadata: 'Increase a movement mode speed.',
     groupId: 'combat-traits',
     searchTerms: [{ text: 'walking speed', weight: 1, role: 'keyword' as const }],
   },
   {
     id: 'language',
     label: 'Language',
-    description: 'Grant knowledge of a language.',
+    metadata: 'Grant knowledge of a language.',
     groupId: 'proficiencies',
     disabled: true,
     note: 'Already added',
@@ -45,7 +45,7 @@ describe('ButtonDropdown', () => {
     expect(screen.getByText('Proficiencies & training')).toBeInTheDocument()
     expect(screen.getByRole('searchbox', { name: 'Search Add grant' })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: /Skill proficiency/i })).toBeInTheDocument()
-    expect(screen.getByText('Already added')).toBeInTheDocument()
+    expect(screen.getByText(/Already added/i)).toBeInTheDocument()
   })
 
   it('selects an item and closes the panel', async () => {
@@ -153,9 +153,9 @@ describe('ButtonDropdown', () => {
     expect(screen.getByRole('button', { name: 'Add grant' })).toHaveClass('w-fit', 'shrink-0')
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
-    expect(screen.getByRole('listbox', { name: 'Add grant' }).parentElement).toHaveClass(
-      'min-w-[var(--popover-menu-min-width)]',
-    )
+    expect(
+      screen.getByRole('listbox', { name: 'Add grant' }).parentElement?.parentElement,
+    ).toHaveClass('min-w-[var(--popover-menu-min-width)]')
   })
 
   it('does not apply fit width classes by default', () => {

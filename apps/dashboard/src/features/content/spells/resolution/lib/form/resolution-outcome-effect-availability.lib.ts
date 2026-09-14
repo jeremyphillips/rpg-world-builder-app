@@ -105,7 +105,7 @@ function toUnavailableMenuItem(
   return {
     id: effect.id,
     label: formatEffectReferenceTitle(reference),
-    description: formatEffectReferenceDescription(reference),
+    metadata: formatEffectReferenceDescription(reference),
     groupId: 'unavailable',
     disabled: true,
   }

@@ -66,7 +66,7 @@ function fieldFillContrastChecks(paletteCss: string): {
     resolvePaletteVar(paletteCss, '--palette-neutral-contrast') ?? '',
   )!
 
-  const fieldRaw = resolvePaletteVar(paletteCss, '--palette-surface-field') ?? ''
+  const fieldRaw = resolvePaletteVar(paletteCss, '--palette-surface-lift') ?? ''
   const fieldL = fieldRaw.includes('white')
     ? blendedLightness(baseL, 1, 50)
     : blendedLightness(baseL, panelL, 30)
@@ -105,7 +105,7 @@ describe('token contrast smoke checks', () => {
       expect(fg).toContain('color-mix')
       expect(fg).toContain('var(--palette-fg-default)')
       expect(bg).toContain('color-mix')
-      expect(bg).toContain('var(--palette-surface-field)')
+      expect(bg).toContain('var(--palette-surface-lift)')
     }
   })
 
@@ -115,7 +115,7 @@ describe('token contrast smoke checks', () => {
       const fieldBg = resolvePaletteVar(css, '--palette-field-bg') ?? ''
       expect(placeholder).toContain('color-mix')
       expect(placeholder).toContain('var(--palette-fg-default)')
-      expect(placeholder).toContain('var(--palette-surface-field)')
+      expect(placeholder).toContain('var(--palette-surface-lift)')
       expect(fieldBg).toContain('color-mix')
       expect(fieldBg).toContain('var(--palette-surface-base)')
     }

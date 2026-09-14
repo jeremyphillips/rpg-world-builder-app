@@ -1,8 +1,8 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 
+import { ListResultList } from '@rpg/ui'
+
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
-import type { GlobalSearchSurfaceContext } from '../../lib/global-search-group.variants'
-import { globalSearchResultListClasses } from '../../lib/global-search-group.variants'
 import { isGlobalSearchCampaignUnavailable } from '../../lib/global-search-result-presentation'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
 import { GlobalSearchEmptyPrompt } from './global-search-empty-prompt'
@@ -30,7 +30,6 @@ export function GlobalSearchGroupedResults({
     return null
   }
 
-  const surfaceContext: GlobalSearchSurfaceContext = inset === 'panel' ? 'preview' : 'page'
   const rowDensity = inset === 'panel' ? 'compact' : 'default'
 
   const sectionElements = sections.map((section, sectionIndex) => (
@@ -44,7 +43,6 @@ export function GlobalSearchGroupedResults({
       onShowAll={onShowAll}
       showAllHref={showAllHref}
       rowDensity={rowDensity}
-      surfaceContext={surfaceContext}
     />
   ))
 
@@ -74,7 +72,7 @@ export function GlobalSearchFlatResults({
   }
 
   return (
-    <div className={globalSearchResultListClasses}>
+    <ListResultList>
       {results.map((document) => (
         <SearchResultRow
           key={document.id}
@@ -84,11 +82,9 @@ export function GlobalSearchFlatResults({
           href={resolveHref(document)}
           campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
           onActivate={onResultActivate}
-          borderless
-          surfaceContext="page"
           viewerCharacterRelationships={document.viewerCharacterRelationships}
         />
       ))}
-    </div>
+    </ListResultList>
   )
 }

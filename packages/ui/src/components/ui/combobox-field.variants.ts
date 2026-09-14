@@ -38,37 +38,23 @@ export const comboboxContentVariants = cva(
  * Search row pinned to the top of the combobox panel — matches trigger field-control
  * height/background so the open panel reads as one expanded input.
  */
-export const comboboxSearchRowVariants = cva(
-  'flex items-center gap-2 border-b border-border bg-input px-3',
-  {
-    variants: {
-      size: {
-        sm: 'h-8 text-xs',
-        md: 'h-9 text-md',
-        lg: 'h-11 text-base',
-      },
-    },
-    defaultVariants: {
-      size: 'md',
+export const comboboxSearchRowVariants = cva('flex w-full items-center gap-2 px-3', {
+  variants: {
+    size: {
+      sm: 'h-8 text-xs',
+      md: 'h-9 text-md',
+      lg: 'h-11 text-base',
     },
   },
-)
+  defaultVariants: {
+    size: 'md',
+  },
+})
 
 /** Inner search control — no standalone field chrome; the search row owns the input look. */
 export const comboboxSearchInputVariants = cva(
   'min-w-0 flex-1 border-0 bg-transparent shadow-none rounded-none dark:bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
 )
-
-/** Scrollable listbox region — flush so option hover states span the panel width. */
-export const comboboxListVariants = cva('max-h-60 overflow-y-auto p-0')
-
-/** Individual selectable option row. */
-export const comboboxOptionVariants = cva(
-  'relative flex w-full cursor-default select-none items-start gap-2 rounded-none px-3 py-1.5 text-left text-sm outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground data-[active=true]:bg-accent data-[active=true]:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
-)
-
-/** Empty-state message when the filter matches nothing. */
-export const comboboxEmptyVariants = cva('px-3 py-4 text-center text-sm text-muted-foreground')
 
 /** Dismissible-badge row shown below the trigger in multi-select mode. */
 export const comboboxSelectedItemsRowVariants = cva('flex flex-wrap gap-1.5 pt-2')

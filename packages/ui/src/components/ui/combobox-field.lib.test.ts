@@ -15,7 +15,7 @@ import { optionMatchesQuery } from './option-query.lib'
 
 const options = [
   { value: 'dagger', label: 'Dagger' },
-  { value: 'fire-bolt', label: 'Fire Bolt', description: 'Cantrip' },
+  { value: 'fire-bolt', label: 'Fire Bolt', metadata: 'Cantrip' },
 ]
 
 describe('combobox-field.lib', () => {
@@ -25,7 +25,7 @@ describe('combobox-field.lib', () => {
     expect(normalizeSelected(false, '')).toEqual([])
   })
 
-  it('filters options by label, value, and description', () => {
+  it('filters options by label, value, and metadata', () => {
     expect(optionMatchesQuery(options[1]!, 'cantrip')).toBe(true)
     expect(filterOptions(options, 'bolt')).toHaveLength(1)
   })

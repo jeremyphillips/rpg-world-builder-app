@@ -1,21 +1,15 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
-import { Eyebrow, cn } from '@rpg/ui'
+import { ListResultGroupHeading, ListResultList, cn } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
-import {
-  deriveGlobalSearchPreviewGroupFollows,
-  deriveGlobalSearchPreviewGroupState,
-} from '../../lib/global-search-preview-group'
+import { deriveGlobalSearchPreviewGroupState } from '../../lib/global-search-preview-group'
 import {
   globalSearchGroupContentInsetClasses,
   globalSearchGroupHeadingCountClasses,
-  globalSearchGroupHeadingVariants,
   globalSearchGroupSectionVariants,
   globalSearchGroupShowAllLinkVariants,
-  globalSearchResultListClasses,
-  type GlobalSearchSurfaceContext,
 } from '../../lib/global-search-group.variants'
 import { isGlobalSearchCampaignUnavailable } from '../../lib/global-search-result-presentation'
 import type { GlobalSearchGroupSection as GlobalSearchGroupSectionModel } from '../../lib/rank-global-search'
@@ -30,23 +24,20 @@ export type GlobalSearchGroupSectionProps = {
   onShowAll?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => void
   showAllHref?: (filterGroup: GlobalSearchGroupSectionModel['filterGroup']) => string
   rowDensity?: SearchResultRowDensity
-  surfaceContext?: GlobalSearchSurfaceContext
 }
 
 export function GlobalSearchGroupSection({
   section,
-  sectionIndex,
-  sections,
+  sectionIndex: _sectionIndex,
+  sections: _sections,
   resolveHref,
   onResultActivate,
   onShowAll,
   showAllHref,
   rowDensity = 'default',
-  surfaceContext = 'page',
 }: GlobalSearchGroupSectionProps) {
   const groupLabel = getGlobalSearchFilterGroupLabel(section.filterGroup)
   const state = deriveGlobalSearchPreviewGroupState(section)
-  const follows = deriveGlobalSearchPreviewGroupFollows(sections, sectionIndex)
   const showGroupAction = state === 'truncated'
   const showAllTarget = showAllHref?.(section.filterGroup) ?? `#show-all-${section.filterGroup}`
   const showAllLabel = `${GLOBAL_SEARCH_COPY.showAllInGroup(section.totalCount, groupLabel)} →`
@@ -54,32 +45,22 @@ export function GlobalSearchGroupSection({
     globalSearchGroupShowAllLinkVariants(),
     globalSearchGroupContentInsetClasses,
   )
+  const headingId = `global-search-group-${section.filterGroup}`
 
   return (
     <section
       aria-label={`${groupLabel}, ${section.totalCount} results`}
       className={globalSearchGroupSectionVariants({ state })}
     >
-      <div
-        className={cn(
-          globalSearchGroupHeadingVariants({
-            surfaceContext,
-            first: sectionIndex === 0,
-            follows,
-          }),
-          globalSearchGroupContentInsetClasses,
-        )}
-      >
-        <Eyebrow size="sm">
-          {groupLabel}
-          <span className={globalSearchGroupHeadingCountClasses}>
-            {' · '}
-            {section.totalCount}
-          </span>
-        </Eyebrow>
-      </div>
+      <ListResultGroupHeading id={headingId} as="h2">
+        {groupLabel}
+        <span className={globalSearchGroupHeadingCountClasses}>
+          {' · '}
+          {section.totalCount}
+        </span>
+      </ListResultGroupHeading>
 
-      <div className={globalSearchResultListClasses}>
+      <ListResultList>
         {section.items.map((document) => (
           <SearchResultRow
             key={document.id}
@@ -89,13 +70,11 @@ export function GlobalSearchGroupSection({
             href={resolveHref(document)}
             campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
             onActivate={onResultActivate}
-            borderless
             density={rowDensity}
-            surfaceContext={surfaceContext}
             viewerCharacterRelationships={document.viewerCharacterRelationships}
           />
         ))}
-      </div>
+      </ListResultList>
 
       {showGroupAction ? (
         onShowAll ? (

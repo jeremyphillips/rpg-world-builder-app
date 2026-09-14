@@ -12,7 +12,7 @@ export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-muted',
   'surface-strong',
   'surface-panel',
-  'surface-field',
+  'surface-lift',
   'surface-sunken',
   'surface-secondary',
   'surface-accent',

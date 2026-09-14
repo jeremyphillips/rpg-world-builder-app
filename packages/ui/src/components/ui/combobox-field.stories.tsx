@@ -35,11 +35,11 @@ const weaponOptions = [
 ]
 
 const spellOptions = [
-  { value: 'fire-bolt', label: 'Fire Bolt', description: 'Cantrip' },
-  { value: 'mage-hand', label: 'Mage Hand', description: 'Cantrip' },
-  { value: 'shield', label: 'Shield', description: 'Level 1' },
-  { value: 'magic-missile', label: 'Magic Missile', description: 'Level 1' },
-  { value: 'custom-ray', label: 'Ray of Custom', description: 'Homebrew' },
+  { value: 'fire-bolt', label: 'Fire Bolt', metadata: 'Cantrip' },
+  { value: 'mage-hand', label: 'Mage Hand', metadata: 'Cantrip' },
+  { value: 'shield', label: 'Shield', metadata: 'Level 1' },
+  { value: 'magic-missile', label: 'Magic Missile', metadata: 'Level 1' },
+  { value: 'custom-ray', label: 'Ray of Custom', metadata: 'Homebrew' },
 ]
 
 const toolOptions = [

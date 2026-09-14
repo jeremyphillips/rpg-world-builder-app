@@ -124,7 +124,7 @@ describe('rankItems', () => {
 
 describe('optionMatchesQuery wrapper', () => {
   it('matches label, value, and description substrings', () => {
-    const option = { value: 'fire-bolt', label: 'Fire Bolt', description: 'Cantrip' }
+    const option = { value: 'fire-bolt', label: 'Fire Bolt', metadata: 'Cantrip' }
     expect(optionMatchesQuery(option, '')).toBe(true)
     expect(optionMatchesQuery(option, 'bolt')).toBe(true)
     expect(optionMatchesQuery(option, 'fire-bolt')).toBe(true)

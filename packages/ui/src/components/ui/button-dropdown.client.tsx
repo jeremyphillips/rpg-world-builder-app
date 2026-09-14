@@ -8,13 +8,11 @@ import { buttonSizeToComboboxFieldSize } from '../../components/ui/field-sizing.
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
-import {
-  comboboxContentVariants,
-  comboboxEmptyVariants,
-  comboboxListVariants,
-} from './combobox-field.variants'
-import { Eyebrow } from './eyebrow'
-import { PreviewCard } from './preview-card.client'
+import { comboboxContentVariants } from './combobox-field.variants'
+import { ListResultEmpty, ListResultList } from './list-result-list.client'
+import { ListResultGroupHeading } from './list-result-group-heading.client'
+import { ListResultItem } from './list-result-item.client'
+import { ListResultViewport } from './list-result-viewport.client'
 import { useButtonDropdownControl } from './use-button-dropdown-control.client'
 import type {
   ButtonDropdownGroup,
@@ -60,6 +58,11 @@ function groupHeadingsForItems(
   return sections
 }
 
+function resolveButtonDropdownMetadata(item: ButtonDropdownItem): string | undefined {
+  const parts = [item.metadata, item.note].filter((part) => part && part.length > 0)
+  return parts.length > 0 ? parts.join(' · ') : undefined
+}
+
 function ButtonDropdownItemRow({
   item,
   optionId,
@@ -75,37 +78,35 @@ function ButtonDropdownItemRow({
 }) {
   if (item.disabled) {
     return (
-      <div aria-disabled="true">
-        <PreviewCard
-          title={item.label}
-          description={item.description}
-          tone="transparent"
-          density="compact"
-          footerSlot={item.note}
-          className="opacity-50"
-        />
-      </div>
+      <ListResultItem
+        name={item.label}
+        metadata={resolveButtonDropdownMetadata(item)}
+        disabled
+        interactive={false}
+      />
     )
   }
 
   return (
-    <div onMouseEnter={onHighlight}>
-      <PreviewCard
-        title={item.label}
-        description={item.description}
-        tone="transparent"
-        density="compact"
-        interactive
-        optionId={optionId}
-        isHighlighted={isHighlighted}
-        footerSlot={item.note}
-        onSelect={onSelect}
+    <ListResultItem
+      name={item.label}
+      metadata={resolveButtonDropdownMetadata(item)}
+      highlighted={isHighlighted}
+      asChild
+    >
+      <button
+        id={optionId}
+        type="button"
+        role="option"
+        aria-selected={false}
+        onMouseEnter={onHighlight}
+        onClick={onSelect}
       />
-    </div>
+    </ListResultItem>
   )
 }
 
-/** Outline button that opens a searchable, grouped menu of preview-card options. */
+/** Outline button that opens a searchable, grouped menu of list-result options. */
 export function ButtonDropdown({
   label,
   groups,
@@ -193,57 +194,62 @@ export function ButtonDropdown({
             />
           ) : null}
 
-          <div
-            ref={listboxRef}
-            id={listboxId}
-            role="listbox"
-            tabIndex={enableSearch ? undefined : -1}
-            aria-label={label}
-            aria-activedescendant={enableSearch ? undefined : activeOptionId}
-            onKeyDown={enableSearch ? undefined : handleNavigationKeyDown}
-            className={comboboxListVariants()}
-          >
-            {displayItems.length === 0 ? (
-              <p className={comboboxEmptyVariants()}>{emptyMessage}</p>
-            ) : searchActive ? (
-              displayItems.map((item) => (
-                <ButtonDropdownItemRow
-                  key={item.id}
-                  item={item}
-                  optionId={`${generatedId}-option-${item.id}`}
-                  isHighlighted={highlightIndexForItem(item) === highlightedIndex}
-                  onHighlight={() => {
-                    const index = highlightIndexForItem(item)
-                    if (index >= 0) setActiveIndex(index)
-                  }}
-                  onSelect={() => selectItem(item.id)}
-                />
-              ))
-            ) : (
-              groupedSections.map(({ group, items: sectionItems }) => (
-                <div key={group?.id ?? '__ungrouped'}>
-                  {group ? (
-                    <div className="px-3 pb-1 pt-1">
-                      <Eyebrow size="xs">{group.label}</Eyebrow>
-                    </div>
-                  ) : null}
-                  {sectionItems.map((item) => (
-                    <ButtonDropdownItemRow
-                      key={item.id}
-                      item={item}
-                      optionId={`${generatedId}-option-${item.id}`}
-                      isHighlighted={highlightIndexForItem(item) === highlightedIndex}
-                      onHighlight={() => {
-                        const index = highlightIndexForItem(item)
-                        if (index >= 0) setActiveIndex(index)
-                      }}
-                      onSelect={() => selectItem(item.id)}
-                    />
-                  ))}
-                </div>
-              ))
-            )}
-          </div>
+          <ListResultViewport>
+            <ListResultList
+              ref={listboxRef}
+              id={listboxId}
+              role="listbox"
+              tabIndex={enableSearch ? undefined : -1}
+              aria-label={label}
+              aria-activedescendant={enableSearch ? undefined : activeOptionId}
+              onKeyDown={enableSearch ? undefined : handleNavigationKeyDown}
+            >
+              {displayItems.length === 0 ? (
+                <ListResultEmpty>{emptyMessage}</ListResultEmpty>
+              ) : searchActive ? (
+                displayItems.map((item) => (
+                  <ButtonDropdownItemRow
+                    key={item.id}
+                    item={item}
+                    optionId={`${generatedId}-option-${item.id}`}
+                    isHighlighted={highlightIndexForItem(item) === highlightedIndex}
+                    onHighlight={() => {
+                      const index = highlightIndexForItem(item)
+                      if (index >= 0) setActiveIndex(index)
+                    }}
+                    onSelect={() => selectItem(item.id)}
+                  />
+                ))
+              ) : (
+                groupedSections.map(({ group, items: sectionItems }) => (
+                  <div
+                    key={group?.id ?? '__ungrouped'}
+                    role="group"
+                    aria-labelledby={group ? `${generatedId}-group-${group.id}` : undefined}
+                  >
+                    {group ? (
+                      <ListResultGroupHeading id={`${generatedId}-group-${group.id}`}>
+                        {group.label}
+                      </ListResultGroupHeading>
+                    ) : null}
+                    {sectionItems.map((item) => (
+                      <ButtonDropdownItemRow
+                        key={item.id}
+                        item={item}
+                        optionId={`${generatedId}-option-${item.id}`}
+                        isHighlighted={highlightIndexForItem(item) === highlightedIndex}
+                        onHighlight={() => {
+                          const index = highlightIndexForItem(item)
+                          if (index >= 0) setActiveIndex(index)
+                        }}
+                        onSelect={() => selectItem(item.id)}
+                      />
+                    ))}
+                  </div>
+                ))
+              )}
+            </ListResultList>
+          </ListResultViewport>
         </PopoverPrimitive.Content>
       </PopoverPrimitive.Portal>
     </PopoverPrimitive.Root>

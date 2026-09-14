@@ -16,8 +16,8 @@ const weaponOptions = [
 ]
 
 const spellOptions = [
-  { value: 'fire-bolt', label: 'Fire Bolt', description: 'Cantrip' },
-  { value: 'magic-missile', label: 'Magic Missile', description: 'Level 1' },
+  { value: 'fire-bolt', label: 'Fire Bolt', metadata: 'Cantrip' },
+  { value: 'magic-missile', label: 'Magic Missile', metadata: 'Level 1' },
 ]
 
 describe('ComboboxField', () => {
@@ -482,7 +482,7 @@ describe('ComboboxField', () => {
         multiple
         value={[]}
         renderOption={(option) => (
-          <span data-testid="custom-interior">{option.description ?? option.label}</span>
+          <span data-testid="custom-interior">{option.metadata ?? option.label}</span>
         )}
       />,
     )

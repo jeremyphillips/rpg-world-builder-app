@@ -86,7 +86,6 @@ export const PanelContext: Story = {
   args: {
     ...PageContext.args,
     rowDensity: 'compact',
-    surfaceContext: 'preview',
   },
 }
 
@@ -99,6 +98,5 @@ export const CompleteAfterTruncated: Story = {
     resolveHref: () => '/campaigns/demo/game-terms/darkvision',
     showAllHref: () => '/campaigns/demo/search?group=game-terms',
     rowDensity: 'compact',
-    surfaceContext: 'preview',
   },
 }

@@ -15,7 +15,7 @@
   --palette-fg-on-status: oklch(0.186 0.029 64.3);
 
   /* Derived or aliased surfaces — keep semantic names, single source of truth */
-  --palette-surface-field: color-mix(in oklch, var(--palette-surface-base) 50%, white);
+  --palette-surface-lift: color-mix(in oklch, var(--palette-surface-base) 50%, white);
   --palette-fg-on-solid: var(--palette-surface-base);
   --palette-surface-secondary: var(--palette-surface-panel);
   --palette-surface-accent: var(--palette-neutral-contrast);
@@ -61,22 +61,22 @@
   --palette-overlay: oklch(from var(--palette-fg-on-status) l c h / 0.5);
 
   /* Field control — global fill; no parent-context matrix */
-  --palette-field-bg: var(--palette-surface-field);
+  --palette-field-bg: var(--palette-surface-lift);
   --palette-field-bg-readonly: var(--palette-surface-subtle);
   --palette-field-bg-disabled: color-mix(
     in oklch,
-    var(--palette-surface-field) 35%,
+    var(--palette-surface-lift) 35%,
     var(--palette-surface-base)
   );
   --palette-field-border: color-mix(
     in oklch,
     var(--palette-fg-default) 20%,
-    var(--palette-surface-field)
+    var(--palette-surface-lift)
   );
   --palette-field-border-hover: color-mix(
     in oklch,
     var(--palette-fg-default) 32%,
-    var(--palette-surface-field)
+    var(--palette-surface-lift)
   );
   --palette-field-border-readonly: color-mix(
     in oklch,
@@ -91,12 +91,12 @@
   --palette-field-placeholder: color-mix(
     in oklch,
     var(--palette-fg-default) 58%,
-    var(--palette-surface-field)
+    var(--palette-surface-lift)
   );
   --palette-field-fg-disabled: color-mix(
     in oklch,
     var(--palette-fg-default) 42%,
-    var(--palette-surface-field)
+    var(--palette-surface-lift)
   );
 
   /* Switch track — distinct from field border ownership */

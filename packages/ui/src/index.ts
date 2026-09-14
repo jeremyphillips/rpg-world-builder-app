@@ -26,7 +26,7 @@ export {
   optionMatchesQuery,
   rankOptionsByQuery,
   scoreOptionQuery,
-  type LabelValueDescriptionOption,
+  type LabelValueMetadataOption,
 } from './components/ui/option-query.lib'
 export { Heading, type HeadingProps } from './components/ui/heading'
 export { headingVariants, type HeadingVariantProps } from './components/ui/heading.variants'
@@ -436,7 +436,38 @@ export {
   type RichTextLinkPickerInternalOption,
   type RichTextLinkPickerContentTypeOption,
 } from './components/ui/rich-text-link-picker.client'
-export { PreviewCard, type PreviewCardProps } from './components/ui/preview-card.client'
+export {
+  ListResultToolbar,
+  type ListResultToolbarProps,
+} from './components/ui/list-result-toolbar.client'
+export {
+  ListResultGroupHeading,
+  type ListResultGroupHeadingProps,
+} from './components/ui/list-result-group-heading.client'
+export {
+  ListResultViewport,
+  type ListResultViewportProps,
+} from './components/ui/list-result-viewport.client'
+export {
+  ListResultList,
+  ListResultEmpty,
+  type ListResultListProps,
+  type ListResultEmptyProps,
+} from './components/ui/list-result-list.client'
+export {
+  ListResultItem,
+  ListResultItemIdentity,
+  type ListResultItemProps,
+  type ListResultItemIdentityProps,
+} from './components/ui/list-result-item.client'
+export {
+  listResultToolbarVariants,
+  listResultGroupHeadingVariants,
+  listResultViewportVariants,
+  listResultListVariants,
+  listResultItemShellVariants,
+  listResultItemMainVariants,
+} from './components/ui/list-result.variants'
 export {
   PreviewRail,
   PreviewRailAction,
@@ -553,25 +584,6 @@ export {
   type ButtonDropdownItem,
   type ButtonDropdownProps,
 } from './components/ui/button-dropdown.client'
-export {
-  previewCardRootVariants,
-  previewCardBodyVariants,
-  previewCardTitleVariants,
-  previewCardDescriptionVariants,
-  type PreviewCardRootVariantProps,
-  type PreviewCardLayout,
-} from './components/ui/preview-card.variants'
-export {
-  RichTextLinkPreviewCard,
-  type RichTextLinkPreviewCardProps,
-} from './components/ui/rich-text-link-preview-card.client'
-export {
-  richTextLinkPreviewCardRootVariants,
-  richTextLinkPreviewCardTitleVariants,
-  richTextLinkPreviewCardMetaVariants,
-  type RichTextLinkPreviewCardRootVariantProps,
-} from './components/ui/rich-text-link-preview-card.variants'
-
 export {
   Tooltip,
   TooltipTrigger,
