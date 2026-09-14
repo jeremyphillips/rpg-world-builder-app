@@ -29,23 +29,17 @@ export type WealthGrantMoneyForm = { amount: number; currency: Currency }
 export function wealthGrantMoneyField(namePrefix: string): FormItem[] {
   return [
     {
-      kind: 'group',
-      legend: 'Wealth',
-      fields: [
-        {
-          type: 'inputSelect',
-          name: namePrefix,
-          label: 'Wealth',
-          inputType: 'number',
-          valueKey: 'amount',
-          unitKey: 'currency',
-          options: currencyOptions,
-          min: 0,
-          width: 'lg',
-          formatGrouped: true,
-          defaultValue: { amount: 0, currency: 'gp' as Currency },
-        },
-      ],
+      type: 'inputSelect',
+      name: namePrefix,
+      label: 'Wealth',
+      inputType: 'number',
+      valueKey: 'amount',
+      unitKey: 'currency',
+      options: currencyOptions,
+      min: 0,
+      width: 'lg',
+      formatGrouped: true,
+      defaultValue: { amount: 0, currency: 'gp' as Currency },
     },
   ]
 }

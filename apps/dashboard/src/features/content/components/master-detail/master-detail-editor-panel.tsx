@@ -1,9 +1,16 @@
-import { Text } from '@rpg/ui'
+import { useEffect, useRef, type RefObject } from 'react'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
+import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
+import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
-import { MasterDetailValidationBanner } from './master-detail-validation-banner'
+import {
+  MasterDetailEditorShell,
+  type MasterDetailEditorIdentity,
+} from './master-detail-editor-shell'
+
+export type { MasterDetailEditorIdentity }
 
 export interface MasterDetailEditorPanelProps {
   editor: UseMasterDetailArrayResult
@@ -13,9 +20,18 @@ export interface MasterDetailEditorPanelProps {
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
   showValidationBanner: boolean
-  emptySelectionLabel: string
+  /** Singular noun vocabulary for delete overflow copy and empty-selection messaging. */
+  itemNoun: MasterDetailItemNounTerm
+  /** When false, renders the shared empty detail state even if the editor has a selection. */
+  showSelectedDetail?: boolean
+  selectedIdentity?: MasterDetailEditorIdentity
   campaignId?: string
   rowAvailability?: Availability
+  /** Availability-only dialog fields — rendered sr-only beside the row form. */
+  availabilityFormItems?: FormItem[]
+  /** Override RHF prefix for availability dialog fields (defaults to row prefix). */
+  availabilityNamePrefix?: string
+  availabilityDialogRef?: RefObject<HTMLDivElement | null>
 }
 
 interface MasterDetailSelectedRowEditorProps {
@@ -26,6 +42,9 @@ interface MasterDetailSelectedRowEditorProps {
   selectedIndex: number
   campaignId?: string
   rowAvailability?: Availability
+  availabilityFormItems?: FormItem[]
+  availabilityNamePrefix?: string
+  availabilityDialogRef?: RefObject<HTMLDivElement | null>
 }
 
 function MasterDetailSelectedRowEditor({
@@ -36,15 +55,29 @@ function MasterDetailSelectedRowEditor({
   selectedIndex,
   campaignId,
   rowAvailability,
+  availabilityFormItems,
+  availabilityNamePrefix,
+  availabilityDialogRef,
 }: MasterDetailSelectedRowEditorProps) {
+  const resolvedAvailabilityNamePrefix = availabilityNamePrefix ?? `${fieldName}.${selectedIndex}`
+
   return (
     <>
       {rowAvailability?.status === 'inactive' && campaignId ? (
         <AvailabilityAlert availability={rowAvailability} context={{ campaignId }} />
       ) : null}
+      {availabilityFormItems ? (
+        <div ref={availabilityDialogRef} className="sr-only" aria-hidden={false}>
+          <FormItems
+            items={availabilityFormItems}
+            idPrefix={`${idPrefix}-${selectedFieldId}-availability`}
+            namePrefix={resolvedAvailabilityNamePrefix}
+          />
+        </div>
+      ) : null}
       <FormItems
         key={selectedFieldId}
-        items={itemFields}
+        items={wrapMasterDetailDetailFields(itemFields)}
         idPrefix={`${idPrefix}-${selectedFieldId}`}
         namePrefix={`${fieldName}.${selectedIndex}`}
       />
@@ -52,19 +85,9 @@ function MasterDetailSelectedRowEditor({
   )
 }
 
-function MasterDetailEmptySelectionHint({ visible, label }: { visible: boolean; label: string }) {
-  if (!visible) return null
-
-  return (
-    <Text variant="muted" className="text-sm">
-      {label}
-    </Text>
-  )
-}
-
 /**
- * Detail column for a form-embedded master-detail editor: validation banner,
- * selected row form, or empty-selection hint.
+ * Detail column for a form-embedded master-detail editor: one bordered surface
+ * with compact identity, overflow delete, validation banner, and selected row form.
  */
 export function MasterDetailEditorPanel({
   editor,
@@ -72,18 +95,42 @@ export function MasterDetailEditorPanel({
   fieldName,
   idPrefix,
   showValidationBanner,
-  emptySelectionLabel,
+  itemNoun,
+  showSelectedDetail = true,
+  selectedIdentity,
   campaignId,
   rowAvailability,
+  availabilityFormItems,
+  availabilityNamePrefix,
+  availabilityDialogRef,
 }: MasterDetailEditorPanelProps) {
+  const bodyRef = useRef<HTMLDivElement>(null)
   const selectedIndex = editor.selectedIndex
-  const selectedFieldId = selectedIndex !== null ? editor.fields[selectedIndex]?.id : undefined
-  const hasSelectedRow = selectedIndex !== null && Boolean(selectedFieldId)
+  const selectedFieldId = editor.selectedFieldId
+  const hasSelectedRow = showSelectedDetail && selectedIndex !== null && Boolean(selectedFieldId)
+
+  useEffect(() => {
+    if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
+    const root = bodyRef.current
+    if (!root) return
+    const focusable = root.querySelector<HTMLElement>(
+      'input:not([type="hidden"]), select, textarea, [contenteditable="true"]',
+    )
+    focusable?.focus()
+    editor.clearLastAddedFieldId()
+  }, [editor, selectedFieldId])
 
   return (
-    <div className="space-y-3 md:col-span-2">
-      <MasterDetailValidationBanner visible={showValidationBanner} />
-      {hasSelectedRow && selectedFieldId ? (
+    <MasterDetailEditorShell
+      itemNoun={itemNoun}
+      selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
+      onDelete={() => {
+        if (selectedIndex !== null) editor.requestRemove(selectedIndex)
+      }}
+      showValidationBanner={showValidationBanner}
+      bodyRef={bodyRef}
+    >
+      {hasSelectedRow && selectedFieldId && selectedIndex !== null ? (
         <MasterDetailSelectedRowEditor
           itemFields={itemFields}
           fieldName={fieldName}
@@ -92,13 +139,11 @@ export function MasterDetailEditorPanel({
           selectedIndex={selectedIndex}
           campaignId={campaignId}
           rowAvailability={rowAvailability}
+          availabilityFormItems={availabilityFormItems}
+          availabilityNamePrefix={availabilityNamePrefix}
+          availabilityDialogRef={availabilityDialogRef}
         />
-      ) : (
-        <MasterDetailEmptySelectionHint
-          visible={!showValidationBanner}
-          label={emptySelectionLabel}
-        />
-      )}
-    </div>
+      ) : null}
+    </MasterDetailEditorShell>
   )
 }

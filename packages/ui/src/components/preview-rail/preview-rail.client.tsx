@@ -18,6 +18,7 @@ import { Button } from '../ui/button.client'
 import { ContentCardHeading } from '../ui/content-card-heading.client'
 import { ContentCardMedia } from '../ui/content-card-parts.client'
 import { contentCardMediaVariants } from '../ui/content-card.variants'
+import { Eyebrow } from '../ui/eyebrow'
 import { Heading } from '../ui/heading'
 import { SemanticText } from '../ui/semantic-text/semantic-text'
 import { StatusDot } from '../ui/status-dot'
@@ -28,6 +29,7 @@ import type {
   PreviewRailAvailability,
   PreviewRailChrome,
   PreviewRailFact,
+  PreviewRailLayout,
   PreviewRailSectionMarker,
   PreviewRailStatusPanelVariant,
   PreviewRailStatusTone,
@@ -86,19 +88,36 @@ function usePreviewRailChrome() {
 
 export type PreviewRailProps = React.ComponentPropsWithoutRef<'aside'> & {
   chrome?: PreviewRailChrome
+  layout?: PreviewRailLayout
+  /** @deprecated Use `layout="fill"` for viewport-bounded aside columns. */
   sticky?: boolean
+}
+
+function resolvePreviewRailLayout(
+  layout: PreviewRailLayout | undefined,
+  sticky: boolean | undefined,
+): PreviewRailLayout {
+  if (layout) return layout
+  if (sticky) return 'fill'
+  return 'default'
 }
 
 function PreviewRailRoot({
   chrome = 'card',
-  sticky = false,
+  layout,
+  sticky,
   className,
   children,
   ...props
 }: PreviewRailProps) {
+  const resolvedLayout = resolvePreviewRailLayout(layout, sticky)
+
   return (
     <PreviewRailContext.Provider value={chrome}>
-      <aside className={cn(previewRailRootVariants({ chrome, sticky }), className)} {...props}>
+      <aside
+        className={cn(previewRailRootVariants({ chrome, layout: resolvedLayout }), className)}
+        {...props}
+      >
         {children}
       </aside>
     </PreviewRailContext.Provider>
@@ -296,9 +315,9 @@ function PreviewRailSections({
   return (
     <div className="flex flex-col gap-3">
       <div className={previewRailSectionsHeaderClasses}>
-        <Heading variant="subsection" as="h3">
+        <Eyebrow as="h3" size="sm" tone="foreground">
           {title}
-        </Heading>
+        </Eyebrow>
         {description ? <p className={previewRailCaptionTextClasses}>{description}</p> : null}
       </div>
       <Accordion

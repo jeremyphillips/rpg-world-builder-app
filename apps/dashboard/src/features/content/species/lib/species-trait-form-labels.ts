@@ -1,9 +1,11 @@
-import { CONTENT_TRAIT_KINDS } from '@rpg/contracts'
-import { toOptions } from '@rpg/ui/form'
+import { defineMasterDetailItemNoun } from '../../lib/master-detail/master-detail-item-noun'
 
-export const TRAIT_KIND_LABELS = {
-  custom: 'Custom',
-  grant: 'From grants',
-} as const satisfies Record<(typeof CONTENT_TRAIT_KINDS)[number], string>
+export const TRAIT_MASTER_DETAIL_ITEM_NOUN = defineMasterDetailItemNoun({
+  label: 'Trait',
+  singular: 'trait',
+  plural: 'traits',
+})
 
-export const traitKindOptions = toOptions(CONTENT_TRAIT_KINDS, TRAIT_KIND_LABELS)
+export const TRAIT_DERIVED_DISPLAY_DESCRIPTION = 'Display is generated from this trait’s grant.'
+
+export const TRAIT_OVERRIDE_DISPLAY_LABEL = 'Override generated name and description'

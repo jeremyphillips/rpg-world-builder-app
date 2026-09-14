@@ -50,6 +50,7 @@ import {
   refineSpeciesMovementRows,
 } from './species-movement-form-fields'
 import {
+  heritageOptionItemFields,
   traitItemFields,
   traitRowDraftFormSchema,
   traitRowFormSchema,
@@ -210,7 +211,11 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       errorPaths: ['heritage'],
       resolverFields: [
         ...prefixFormItems(heritageScalarFields(ctx), 'heritage'),
-        embeddedArrayResolverField('heritage.options', 'Heritage options', traitItemFields(ctx)),
+        embeddedArrayResolverField(
+          'heritage.options',
+          'Heritage options',
+          heritageOptionItemFields(ctx),
+        ),
       ],
       header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
     },

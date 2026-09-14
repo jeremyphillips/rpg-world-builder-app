@@ -1,4 +1,12 @@
+import { classFeaturesUnlockedAtLevel } from '../../../content/classes/class-feature-availability'
 import type { CharacterClass } from '../../../content/classes/class'
+import {
+  isEffectiveAvailable,
+  resolveDefaultSpeciesAccess,
+  resolveEffectiveCampaignAccess,
+  resolveEffectiveSpeciesTraitAccess,
+  type ResolvedContentCampaignAccess,
+} from '../../../content/lib/campaign-access'
 import type { ContentGrant, GrantGroupSource } from '../../../content/lib/grants'
 import {
   getUnlockedGrantsAtLevel,
@@ -33,23 +41,39 @@ function traitSourcedGrants(
   return grants.map((grant) => ({ grant, sources }))
 }
 
-function speciesTraitGrants(species: Species, characterLevel: number): SourcedContentGrant[] {
-  return species.traits.flatMap((trait) =>
-    traitSourcedGrants(
+type SpeciesWithAccess = Species & {
+  campaignAccess?: ResolvedContentCampaignAccess
+}
+
+function speciesTraitGrants(
+  species: SpeciesWithAccess,
+  characterLevel: number,
+): SourcedContentGrant[] {
+  const speciesAccess = resolveDefaultSpeciesAccess(species.campaignAccess)
+
+  return species.traits.flatMap((trait) => {
+    const effective = resolveEffectiveSpeciesTraitAccess(speciesAccess, trait)
+    if (!isEffectiveAvailable(effective)) return []
+
+    return traitSourcedGrants(
       trait,
       [{ kind: 'speciesTrait', sourceId: species.id, grantId: trait.id }],
       characterLevel,
-    ),
-  )
+    )
+  })
 }
 
 function heritageOptionGrants(
-  species: Species,
+  species: SpeciesWithAccess,
   heritageOptionId: string,
   characterLevel: number,
 ): SourcedContentGrant[] {
   const heritageOption = species.heritage?.options.find((option) => option.id === heritageOptionId)
   if (!heritageOption) return []
+
+  const speciesAccess = resolveDefaultSpeciesAccess(species.campaignAccess)
+  const effective = resolveEffectiveCampaignAccess(speciesAccess, heritageOption.campaignAccess)
+  if (!isEffectiveAvailable(effective)) return []
 
   return traitSourcedGrants(
     heritageOption,
@@ -62,16 +86,14 @@ function classFeatureGrants(
   characterClass: CharacterClass,
   characterLevel: number,
 ): SourcedContentGrant[] {
-  return characterClass.features.flatMap((feature) => {
-    if (feature.level > characterLevel) return []
-
-    return traitSourcedGrants(
+  return classFeaturesUnlockedAtLevel(characterClass.features, characterLevel).flatMap((feature) =>
+    traitSourcedGrants(
       feature,
       [{ kind: 'classFeature', sourceId: characterClass.id, grantId: feature.id }],
       characterLevel,
       feature.level,
-    )
-  })
+    ),
+  )
 }
 
 /** Returns unlocked grants from species traits, heritage, and class features. */

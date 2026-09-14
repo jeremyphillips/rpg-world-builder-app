@@ -1,6 +1,16 @@
 import { Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@rpg/ui'
 
 import type { RulesConfigNavLeaf, RulesConfigNavSection } from '@/features/campaign'
+import { resolveRulesConfigNavScrollOffsetPx } from '@/features/homebrew/hooks/use-rules-config-nav-scroll-spy.lib'
+
+import {
+  rulesConfigFieldNavLeafLinkClasses,
+  rulesConfigFieldNavLeafListClasses,
+  rulesConfigFieldNavPanelClasses,
+  rulesConfigFieldNavRailSlotClasses,
+  rulesConfigFieldNavSectionLinkClasses,
+  rulesConfigFieldNavShellClasses,
+} from './rules-config-field-nav.variants'
 
 export type { RulesConfigNavLeaf, RulesConfigNavSection }
 
@@ -13,7 +23,12 @@ type RulesConfigFieldNavProps = {
 }
 
 function scrollToAnchor(anchorId: string) {
-  document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const anchor = document.getElementById(anchorId)
+  if (!anchor) return
+
+  const offset = resolveRulesConfigNavScrollOffsetPx()
+  const top = window.scrollY + anchor.getBoundingClientRect().top - offset
+  window.scrollTo({ top, behavior: 'smooth' })
 }
 
 type MobileNavItem = {
@@ -52,6 +67,16 @@ function resolveMobileSelectValue(
   return sections[0]?.id ?? ''
 }
 
+function resolveSectionLinkState(
+  sectionId: string,
+  activeSectionId?: string,
+  activeLeafId?: string,
+): 'inactive' | 'active' | 'activeWithLeaf' {
+  if (activeSectionId !== sectionId) return 'inactive'
+  if (activeLeafId) return 'activeWithLeaf'
+  return 'active'
+}
+
 /** Desktop anchor rail + mobile select for in-page rules configuration sections. */
 export function RulesConfigFieldNav({
   sections,
@@ -64,17 +89,21 @@ export function RulesConfigFieldNav({
   const mobileItems = buildMobileNavItems(sections)
 
   return (
-    <>
+    <div className={rulesConfigFieldNavRailSlotClasses}>
       <nav
-        className="hidden w-56 shrink-0 lg:sticky lg:top-20 lg:block lg:self-start"
+        className={cn(rulesConfigFieldNavPanelClasses, rulesConfigFieldNavShellClasses)}
         aria-label={navLabel}
       >
-        <Eyebrow size="sm" className="mb-2 px-3">
+        <Eyebrow size="sm" className="mb-2">
           Sections
         </Eyebrow>
         <ul className="space-y-1">
           {sections.map((section) => {
-            const isSectionActive = activeSectionId === section.id && !activeLeafId
+            const sectionLinkState = resolveSectionLinkState(
+              section.id,
+              activeSectionId,
+              activeLeafId,
+            )
 
             return (
               <li key={section.id}>
@@ -84,18 +113,17 @@ export function RulesConfigFieldNav({
                     event.preventDefault()
                     scrollToAnchor(section.id)
                   }}
-                  aria-current={isSectionActive ? 'location' : undefined}
-                  className={cn(
-                    'block rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                    isSectionActive
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                  )}
+                  aria-current={sectionLinkState === 'active' ? 'location' : undefined}
+                  className={rulesConfigFieldNavSectionLinkClasses({ state: sectionLinkState })}
                 >
                   {section.label}
                 </a>
                 {section.leaves && section.leaves.length > 0 ? (
-                  <ul className="ml-3.5 mt-1 space-y-0.5 border-l border-border pl-2">
+                  <ul
+                    className={rulesConfigFieldNavLeafListClasses({
+                      active: sectionLinkState !== 'inactive',
+                    })}
+                  >
                     {section.leaves.map((leaf) => (
                       <li key={leaf.id}>
                         <a
@@ -105,12 +133,9 @@ export function RulesConfigFieldNav({
                             scrollToAnchor(leaf.id)
                           }}
                           aria-current={activeLeafId === leaf.id ? 'true' : undefined}
-                          className={cn(
-                            'block rounded-md py-1.5 pl-2 pr-3 text-sm font-normal transition-colors',
-                            activeLeafId === leaf.id
-                              ? 'text-foreground'
-                              : 'text-muted-foreground hover:text-foreground',
-                          )}
+                          className={rulesConfigFieldNavLeafLinkClasses({
+                            active: activeLeafId === leaf.id,
+                          })}
                         >
                           {leaf.label}
                         </a>
@@ -143,6 +168,6 @@ export function RulesConfigFieldNav({
           </SelectContent>
         </Select>
       </div>
-    </>
+    </div>
   )
 }

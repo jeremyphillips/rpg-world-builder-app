@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isContainer, type DependentConfig } from '@rpg/ui/form'
+import { DEFAULT_DEPENDENT_CHROME, isContainer, type DependentConfig } from '@rpg/ui/form'
 
 import { LEVEL_ZERO_NPCS_ENABLED, levelZeroNpcsFields } from './level-zero-npc-form-fields'
 
@@ -28,7 +28,7 @@ describe('levelZeroNpcsFields', () => {
       name: LEVEL_ZERO_NPCS_ENABLED,
       label: 'Allow',
     })
-    expect(allow.dependents).toMatchObject({})
+    expect(allow.dependents).toMatchObject({ chrome: DEFAULT_DEPENDENT_CHROME })
     expect(allow.dependents.inset).not.toBe(false)
     expect(
       allow.dependents.fields.some(
@@ -52,7 +52,7 @@ describe('levelZeroNpcsFields', () => {
     ).toBe(true)
   })
 
-  it('keeps nested grant-set dependents inset without panel chrome', () => {
+  it('keeps nested grant-set dependents inset with rail chrome and without panel chrome', () => {
     const allow = expectAllowDependent(
       levelZeroNpcsFields({ languageOptions: [], armorOptions: [], weaponOptions: [] }),
     )
@@ -63,7 +63,7 @@ describe('levelZeroNpcsFields', () => {
 
     expect(nestedDependents.length).toBeGreaterThanOrEqual(2)
     for (const nested of nestedDependents) {
-      expect(nested.dependents).toMatchObject({})
+      expect(nested.dependents).toMatchObject({ chrome: DEFAULT_DEPENDENT_CHROME })
       expect(nested.dependents.inset).not.toBe(false)
       expect(nested.dependents).not.toHaveProperty('panel')
     }

@@ -145,12 +145,39 @@ Per-code presentation: title, description, severity, badge label, optional
 
 ## Master-detail integration
 
-Embedded editors combine toggle state + optional `resolveRowReasons` on
+### Campaign rules inactive (orthogonal)
+
+Embedded editors combine optional `resolveRowReasons` on
 [`FormEmbeddedMasterDetailEditor`](../src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx):
 
 1. `resolveRowReasons({ row, rowKey, index })` → `AvailabilityReason[]`
 2. [`resolveEmbeddedRowMeta`](../src/features/content/lib/master-detail/resolve-embedded-row-meta.ts) calls `combineAvailabilityReasons`
 3. Inactive badge on the rail; [`MasterDetailEditorPanel`](../src/features/content/components/master-detail/master-detail-editor-panel.tsx) renders `AvailabilityAlert` above the row form
+
+`AvailabilityReason` codes (`subclasses-disabled`, …) explain **rules-derived**
+inactive state. They are separate from persisted **`campaignAccess.available`**
+broad availability on nested content that supports per-row campaign access.
+
+### Persisted campaign access (nested master-detail)
+
+Shared presentation lives under [`campaign-access/`](../src/features/content/lib/campaign-access/)
+and [`master-detail/`](../src/features/content/lib/master-detail/):
+
+| Piece                                                                       | Role                                                                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `availability-count-summary.lib` + `buildAvailabilityCountSupplement`       | Shared count semantics + Show/Hide actions. **Stable** master-detail rails use pair counts (`3 available`, `2 unavailable`, or `3 available · 2 unavailable`; nothing when empty). **Conditional** overview tables omit implied availability beside the result count                         |
+| `resolveBroadAvailabilityPresentation`                                      | Broad `Available` / `Unavailable` header copy — **no** player-access detail                                                                                                                                                                                                                  |
+| `MasterDetailAvailabilityPresentation`                                      | Thin list + editor contract (`rowId`, `isAvailable`, `statusLabel`)                                                                                                                                                                                                                          |
+| `deriveMasterDetailAvailabilityState` + `useMasterDetailAvailabilityFilter` | Default-hide unavailable rows; pin the selected row when it becomes unavailable (expires on another selection); Show/Hide from `hiddenUnavailableCount` (no Show when only the pinned row is hidden); explicit Hide moves selection next/previous available or empty detail when none remain |
+| `MasterDetailAvailabilityHeaderLine`                                        | Editor line 3: `● Available` / inactive unavailable + **Change** (consumer opens dialog)                                                                                                                                                                                                     |
+
+**Nested API consumer:** subclasses via [`NestedResourceMasterDetailEditor`](../src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx) on [`ClassSubclassesTab`](../src/features/content/classes/components/class-subclasses-tab.tsx).
+
+**Form-embedded consumer:** class **Features** via [`FormEmbeddedMasterDetailEditor`](../src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx) with `availability={{ fieldName: 'available' }}` — broad header + availability-only dialog; persisted on the class body (`classBodyFeatureSchema.available`). **Blocked:** species traits, heritage options, starting-equipment packages.
+
+Consumers build one `MasterDetailAvailabilityPresentation[]` and pass the same objects to
+list filter/counts and the selected editor header. Persistence stays consumer-owned
+(`CampaignAvailabilityField`, save session, PATCH).
 
 ## Adding a reason code
 
@@ -206,3 +233,21 @@ Picker and relationship surfaces derive selectable sets from content resolution 
 Dashboard ESLint guards block raw list hooks and local `status === 'draft'|'published'`
 filters in picker modules. See `dashboardContentPickerPolicyGuards` in
 `apps/dashboard/eslint.config.js`.
+
+## Species three-tier availability
+
+| Tier                 | Rows                 | Persisted shape          | Authoring rail                  | Runtime                                         |
+| -------------------- | -------------------- | ------------------------ | ------------------------------- | ----------------------------------------------- |
+| **Species**          | top-level entity     | overlay `campaignAccess` | overlay field (unchanged)       | species gate                                    |
+| **Heritage options** | `heritage.options[]` | body `campaignAccess`    | **local** child access          | `resolveEffectiveCampaignAccess(parent, child)` |
+| **Species traits**   | `traits[]`           | body `available?`        | **local** `available !== false` | inherit species + trait boolean                 |
+
+**Local vs effective authoring:** the left rail, counts, and pin use **local child
+state** only — making a species unavailable does **not** hide heritage rows that
+remain locally available. Effective narrowing surfaces in the editor header/dialog
+copy and in runtime filtering.
+
+**Body-bound heritage adapter:** embedded heritage rows use
+`buildBodyCampaignAccessFormFields` (parent-form RHF binding, UI narrowing hints).
+Do **not** mount `CampaignAvailabilityField` on heritage options — it owns overlay
+PATCH and save-session integration.

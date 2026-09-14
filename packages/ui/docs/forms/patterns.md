@@ -11,15 +11,32 @@ tab and focuses its control, and the sticky footer shows a summary with **Review
 Inactive panels suppress per-field error text until their tab is active.
 
 **Sticky chrome** (default `stickyChrome={true}`): section control `sticky top-0` in the field
-column; `FormActionsBar` docks below a bounded scroll body (`formStickyScrollShellClasses` +
-`formStickyScrollBodyClasses`) so save actions stay at the bottom of the viewport on long page
-forms. Pass `stickyChrome={false}` for flat layout. Dashboard content create/edit routes mount
-`ContentFormPageShell` with `scroll="viewport" spacing="none"` so the page shell fills the app
-main column without page-level scroll; TabbedForm owns the bounded scroll body and docked footer
-(flush to the viewport bottom). Top inset scrolls away via `scrollBodyClassName` (typically
-`formViewportScrollBodyTopInsetClasses`) as the first child inside the scroll region — not as
-padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail vertical gutter
-lives on `formTabbedAsideSlotTopInsetClasses` / `formTabbedAsideSlotBottomInsetClasses`.
+column; `FormActionsBar` docks below a bounded scroll body
+(`formStickyScrollShellWithDockedFooterClasses` + `FormStickyScrollBody`) so save actions
+stay at the bottom of the viewport on long page forms. The docked-footer shell composition
+publishes `--rpg-content-bottom-inset` (standard docked actions bar footprint via
+`--rpg-form-docked-actions-bar-block-size`) and augments `--rpg-content-top-inset` with
+conservative scroll-chrome contracts for bounded inner panels that subtract them from
+viewport-relative fallback caps — not remaining content height. `--rpg-content-bottom-inset` is
+for the **dvh fallback only**; slight under-fill is preferable to overlap with the docked
+footer. Master-detail list rails offset sticky `top` with
+`var(--rpg-form-sticky-tabs-block-size)` and cap via one resolved
+`--master-detail-shell-max-block-size`. The scroll body is also a size container
+(`form-scroll-body-container` on the clip slot only, `boundedScroll` on `FormStickyScrollBody`) so
+descendants can cap against the definite flex column above the footer; the inner scroller owns
+`overflow-y-auto`. Plain `<Form stickyFooter documentScroll>` on document-scroll routes omits the docked
+column and inner scroller so fields keep their natural height; the actions bar uses sticky
+placement during ancestor scroll. Pass `stickyChrome={false}` for
+flat layout. Dashboard content create/edit routes mount
+`ContentFormPageShell` (`ViewportWorkspace` + width shell with `spacing="none"`) so the page
+fills the app main column without document scroll; TabbedForm owns the bounded scroll body and
+docked footer (flush to the viewport bottom). Top inset scrolls away via `scrollBodyClassName`
+(typically `formViewportScrollBodyTopInsetClasses`) as the first child inside the scroll region —
+not as padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail top
+gutter lives on `formTabbedAsideSlotTopInsetClasses`; bottom breathing room on
+`formTabbedAsideSlotBottomInsetClasses` (`xl:pb-4` — intentional inset so preview content clears
+the docked form footer; the form-column footer itself stays flush). Plain `<Form>` with docked
+sticky footer passes `boundedScroll` on the scroll body when `usesDockedStickyFooter`.
 Inner scroll regions compose [`boundedScrollRegionClasses`](../bounded-scroll-region.md) for
 reserved scrollbar gutters. Overlay pattern: use `externalFooter` with
 `FormShellFooterScope` / `FormShellFooterSlot` instead of sticky bar inside scroll content.

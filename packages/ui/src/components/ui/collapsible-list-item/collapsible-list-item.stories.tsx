@@ -91,6 +91,15 @@ export const NotCollapsible: Story = {
   render: () => <CollapsibleListItemDemo collapsible={false} initialCollapsed={false} />,
 }
 
+export const CollapsedAndExpanded: Story = {
+  render: () => (
+    <div className="grid max-w-xl gap-4">
+      <CollapsibleListItemDemo initialCollapsed />
+      <CollapsibleListItemDemo initialCollapsed={false} />
+    </div>
+  ),
+}
+
 export const CompoundApi: Story = {
   render: () => (
     <CollapsibleListItem.Root

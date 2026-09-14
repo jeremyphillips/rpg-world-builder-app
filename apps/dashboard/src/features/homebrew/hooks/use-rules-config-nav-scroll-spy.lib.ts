@@ -1,4 +1,5 @@
 import type { RulesConfigNavSection } from '@/features/campaign'
+import { appStickyChromeBlockSizeFallbackPx } from '@/components/layout/shell/app-shell.variants'
 
 export type NavScrollSpyAnchor = {
   id: string
@@ -28,8 +29,10 @@ export function collectNavScrollSpyAnchors(
 }
 
 /**
- * Picks the active section + optional leaf from visible anchor entries.
- * Prefers the highest visible leaf; otherwise the highest visible section.
+ * Picks the active section + optional leaf from anchor positions relative to the sticky offset.
+ * Entries must be in document order (nav anchor order). Uses the last anchor at or above the
+ * offset line — not the closest to the line — so earlier sections do not keep winning once a
+ * later section has crossed. Before the first cross, highlights the nearest anchor below the line.
  */
 export function resolveActiveNavFromEntries(entries: readonly NavScrollSpyEntry[]): {
   activeSectionId?: string
@@ -39,34 +42,51 @@ export function resolveActiveNavFromEntries(entries: readonly NavScrollSpyEntry[
     return {}
   }
 
-  const visible = entries.filter((entry) => entry.ratio > 0)
-  if (visible.length === 0) {
-    return {}
-  }
-
-  const sorted = [...visible].sort((a, b) => {
-    if (a.top !== b.top) return a.top - b.top
-    if (a.isLeaf !== b.isLeaf) return a.isLeaf ? -1 : 1
-    return b.ratio - a.ratio
-  })
-
-  const activeLeaf = sorted.find((entry) => entry.isLeaf)
-  if (activeLeaf) {
-    return {
-      activeSectionId: activeLeaf.sectionId,
-      activeLeafId: activeLeaf.id,
+  let winner: NavScrollSpyEntry | undefined
+  for (const entry of entries) {
+    if (entry.top <= 0) {
+      winner = entry
     }
   }
 
-  const activeSection = sorted.find((entry) => !entry.isLeaf)
-  return activeSection ? { activeSectionId: activeSection.id } : {}
+  if (!winner) {
+    const nearestBelow = [...entries].sort((a, b) => a.top - b.top)[0]
+    if (!nearestBelow) return {}
+    return nearestBelow.isLeaf
+      ? { activeSectionId: nearestBelow.sectionId, activeLeafId: nearestBelow.id }
+      : { activeSectionId: nearestBelow.id }
+  }
+
+  return winner.isLeaf
+    ? { activeSectionId: winner.sectionId, activeLeafId: winner.id }
+    : { activeSectionId: winner.id }
 }
 
-/** Default offset for sticky app header + `scroll-mt-20` anchor margin. */
-export const RULES_CONFIG_NAV_SCROLL_OFFSET_PX = 80
+/** Reads sticky app chrome block size for scroll-spy offset (document scroll). */
+export function resolveStickyChromeBlockSizePx(): number {
+  const chrome = document.querySelector('[data-app-sticky-chrome]')
+  if (chrome instanceof HTMLElement) {
+    return chrome.getBoundingClientRect().height
+  }
+
+  return appStickyChromeBlockSizeFallbackPx
+}
+
+/** Default offset below sticky chrome + anchor scroll margin. */
+export function resolveRulesConfigNavScrollOffsetPx(): number {
+  return resolveStickyChromeBlockSizePx() + 32
+}
 
 export function buildRulesConfigNavObserverRootMargin(
-  scrollOffsetPx = RULES_CONFIG_NAV_SCROLL_OFFSET_PX,
+  scrollOffsetPx = resolveRulesConfigNavScrollOffsetPx(),
 ) {
   return `-${scrollOffsetPx}px 0px -55% 0px`
+}
+
+/** Distance from the viewport top after applying the nav offset (document scroll). */
+export function measureAnchorTopRelativeToViewport(
+  element: Element,
+  scrollOffsetPx = resolveRulesConfigNavScrollOffsetPx(),
+): number {
+  return element.getBoundingClientRect().top - scrollOffsetPx
 }

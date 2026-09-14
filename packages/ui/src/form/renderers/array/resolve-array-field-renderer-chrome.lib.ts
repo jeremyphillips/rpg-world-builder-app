@@ -57,7 +57,9 @@ export function resolveArrayFieldRendererChrome({
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
   const sortableEnabled = reorder === 'dragHandle' && fieldsLength > 1
-  const collapsible = itemCollapsible && variant === 'detailed'
+  // Entity-backed `renderShell` rows (DEC grants, etc.) keep collapse wiring even when
+  // nested sections auto-resolve to compact — the shell always renders disclosure chrome.
+  const collapsible = itemCollapsible && (variant === 'detailed' || Boolean(itemConfig.renderShell))
 
   return {
     addAction,

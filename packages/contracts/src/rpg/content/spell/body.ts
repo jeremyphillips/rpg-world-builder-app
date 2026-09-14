@@ -86,7 +86,7 @@ export const spellComponentsDraftSchema = z.object({
 export const spellBodyDraftSchema = draftAuthoredContentBodySchema(
   SPELL_CONTENT_TYPE_TERM.label,
 ).extend({
-  school: spellSchoolIdSchema,
+  school: spellSchoolIdSchema.optional(),
   level: spellContentLevelSchema.optional(),
   classIds: z.array(classSlugSchema).default([]),
   tags: spellTagsSchema.optional(),

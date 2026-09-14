@@ -29,7 +29,10 @@ import {
   progressionTableToFormValues,
   type ProgressionTableFormValue,
 } from './progression-table-helpers'
-import { startingEquipmentFromFormValues } from './character-creation/class-starting-equipment-form-values'
+import {
+  startingEquipmentEmptyFormValues,
+  startingEquipmentFromFormValues,
+} from './character-creation/class-starting-equipment-form-values'
 import { characterCreationProficienciesFromFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
 
 type ResourceRowForm = {
@@ -354,6 +357,7 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
     skills: { items: [] },
   },
   characterCreation: {
+    startingEquipment: startingEquipmentEmptyFormValues(),
     proficiencies: {
       skills: { choose: 2, from: [] },
       tools: { choose: 0, poolSource: 'filtered', poolToolCategories: [] },

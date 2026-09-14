@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
-import { useController } from 'react-hook-form'
+import { useEffect, useMemo, useRef } from 'react'
+import { useController, type UseControllerReturn } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
@@ -19,12 +19,18 @@ import type {
   InlineSentenceBoundControl,
   InlineSentenceBoundNumber,
   InlineSentenceBoundSelect,
+  InlineSentenceSelectSegment,
 } from '../../../components/ui/inline-sentence-field.types'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { resolveSelectPlaceholder } from '../../config/field-placeholder.lib'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import type { InlineSentenceFieldConfig } from '../../field-config'
-import { resolveFieldHintPresentation } from '../../field-config'
+import {
+  collectFieldDynamicDependsOn,
+  flattenSelectFieldOptions,
+  resolveFieldHintPresentation,
+  resolveInlineSentenceSelectSegmentOptions,
+} from '../../field-config'
 import { useFieldControlSize } from '../../context/form-section.context'
 
 export interface InlineSentenceFieldRendererProps {
@@ -36,6 +42,76 @@ export interface InlineSentenceFieldRendererProps {
 
 function resolveFullName(namePrefix: string | undefined, name: string): string {
   return namePrefix ? `${namePrefix}.${name}` : name
+}
+
+type InlineSentenceController = UseControllerReturn<Record<string, unknown>>
+type ResolvedInlineSentenceSelectOptions = ReturnType<typeof flattenSelectFieldOptions>
+
+function resolveInlineSentenceSelectFallback(
+  segment: InlineSentenceSelectSegment,
+  resolvedOptions: ResolvedInlineSentenceSelectOptions,
+): ReturnType<typeof coerceInlineSentenceSelectValue> {
+  return (
+    segment.defaultValue ?? resolvedOptions[0]?.value ?? coerceInlineSentenceSelectValue(undefined)
+  )
+}
+
+function shouldApplyInlineSentenceSelectFallback(
+  currentValue: ReturnType<typeof coerceInlineSentenceSelectValue>,
+  validValues: ReadonlySet<string>,
+  fallbackValue: ReturnType<typeof coerceInlineSentenceSelectValue>,
+  fieldValue: unknown,
+): boolean {
+  if (currentValue !== undefined && validValues.has(currentValue)) return false
+  if (fallbackValue === undefined) return false
+  return fieldValue !== fallbackValue
+}
+
+function syncResolvedInlineSentenceSelectValue(
+  segment: InlineSentenceSelectSegment,
+  configName: string,
+  controllerByName: ReadonlyMap<string, InlineSentenceController>,
+  resolvedSelectOptionsBySegment: ReadonlyMap<string, ResolvedInlineSentenceSelectOptions>,
+): void {
+  if (segment.name !== configName) return
+
+  const controller = controllerByName.get(segment.name)
+  const resolvedOptions = resolvedSelectOptionsBySegment.get(segment.name)
+  if (!controller || !resolvedOptions) return
+
+  const currentValue = coerceInlineSentenceSelectValue(controller.field.value)
+  const validValues = new Set(resolvedOptions.map((option) => option.value))
+  const fallbackValue = resolveInlineSentenceSelectFallback(segment, resolvedOptions)
+
+  if (
+    !shouldApplyInlineSentenceSelectFallback(
+      currentValue,
+      validValues,
+      fallbackValue,
+      controller.field.value,
+    )
+  ) {
+    return
+  }
+
+  controller.field.onChange(fallbackValue)
+}
+
+function syncResolvedInlineSentenceSelectValues(
+  visibleSegments: InlineSentenceFieldConfig['segments'],
+  configName: string,
+  controllerByName: ReadonlyMap<string, InlineSentenceController>,
+  resolvedSelectOptionsBySegment: ReadonlyMap<string, ResolvedInlineSentenceSelectOptions>,
+): void {
+  for (const segment of visibleSegments) {
+    if (segment.kind !== 'select') continue
+    syncResolvedInlineSentenceSelectValue(
+      segment,
+      configName,
+      controllerByName,
+      resolvedSelectOptionsBySegment,
+    )
+  }
 }
 
 function useInlineSentenceControllers(uniqueBoundNames: readonly string[], namePrefix?: string) {
@@ -112,6 +188,7 @@ export function InlineSentenceFieldRenderer({
     [config.segments],
   )
   const segmentVisibilityValues = useDependsOnValues(segmentVisibilityDeps, namePrefix)
+  const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
   const visibleSegments = useMemo(
     () => filterVisibleInlineSentenceSegments(config.segments, segmentVisibilityValues),
     [config.segments, segmentVisibilityValues],
@@ -136,6 +213,47 @@ export function InlineSentenceFieldRenderer({
     ...controllers.map(({ fieldState }) => fieldState.error?.message),
     error,
   )
+
+  const resolvedSelectOptionsBySegment = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof flattenSelectFieldOptions>>()
+    for (const segment of visibleSegments) {
+      if (segment.kind !== 'select') continue
+      const resolved = flattenSelectFieldOptions(
+        resolveInlineSentenceSelectSegmentOptions(
+          config,
+          segment.name,
+          dynamicValues,
+          segment.options,
+        ),
+      )
+      map.set(segment.name, resolved)
+    }
+    return map
+  }, [config, dynamicValues, visibleSegments])
+
+  const isMountRef = useRef(true)
+
+  useEffect(() => {
+    if (!config.optionsResolve) return
+
+    if (isMountRef.current) {
+      isMountRef.current = false
+      return
+    }
+
+    syncResolvedInlineSentenceSelectValues(
+      visibleSegments,
+      config.name,
+      controllerByName,
+      resolvedSelectOptionsBySegment,
+    )
+  }, [
+    config.name,
+    config.optionsResolve,
+    controllerByName,
+    resolvedSelectOptionsBySegment,
+    visibleSegments,
+  ])
 
   const controls = useMemo(() => {
     const result: InlineSentenceBoundControl[] = []
@@ -165,26 +283,29 @@ export function InlineSentenceFieldRenderer({
         continue
       }
 
-      const selectLabel = segment.ariaLabel ?? config.label
+      const selectSegment = segment as InlineSentenceSelectSegment
+      const selectLabel = selectSegment.ariaLabel ?? config.label
+      const resolvedOptions =
+        resolvedSelectOptionsBySegment.get(segment.name) ?? selectSegment.options
       const selectControl: InlineSentenceBoundSelect = {
         kind: 'select',
         id: controlId,
         name: segment.name,
         value: coerceInlineSentenceSelectValue(field.value),
-        options: segment.options,
-        digits: segment.digits,
-        width: segment.width,
-        placeholder: resolveSelectPlaceholder(selectLabel, segment.placeholder),
+        options: resolvedOptions,
+        digits: selectSegment.digits,
+        width: selectSegment.width,
+        placeholder: resolveSelectPlaceholder(selectLabel, selectSegment.placeholder),
         ariaLabel: selectLabel,
         onChange: (next) =>
-          field.onChange(resolveInlineSentenceSelectChange(next, segment.options)),
+          field.onChange(resolveInlineSentenceSelectChange(next, resolvedOptions)),
         onBlur: field.onBlur,
       }
       result.push(selectControl)
     }
 
     return result
-  }, [config.label, controllerByName, id, visibleSegments])
+  }, [config.label, controllerByName, id, resolvedSelectOptionsBySegment, visibleSegments])
 
   const belowControl = useMemo((): InlineSentenceBoundChips | undefined => {
     if (!config.below) return undefined

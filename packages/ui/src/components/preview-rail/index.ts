@@ -32,6 +32,7 @@ export type {
   PreviewRailAvailability,
   PreviewRailChrome,
   PreviewRailFact,
+  PreviewRailLayout,
   PreviewRailSectionMarker,
   PreviewRailStatusPanelVariant,
   PreviewRailStatusTone,

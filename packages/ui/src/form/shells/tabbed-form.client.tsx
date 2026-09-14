@@ -21,9 +21,10 @@ import {
   formTabbedAsideGridClasses,
   formTabbedAsideSlotClasses,
   formTabbedChromeRhythmStackClasses,
-  formStickyScrollBodyClasses,
   formStickyScrollShellClasses,
+  formStickyScrollShellWithDockedFooterClasses,
 } from '../chrome/form-chrome.variants'
+import { FormStickyScrollBody } from '../chrome/form-sticky-scroll-body.client'
 import { FormScrollBodyTopInset } from '../chrome/form-viewport-scroll-top-inset.client'
 import { cn } from '../../lib/utils'
 import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
@@ -256,9 +257,13 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     />
   ) : null
 
+  const usesDockedScrollBody = stickyChrome && !externalFooter
+
   const scrollableBody = (
     <>
-      {scrollBodyClassName ? <FormScrollBodyTopInset className={scrollBodyClassName} /> : null}
+      {scrollBodyClassName && !usesDockedScrollBody ? (
+        <FormScrollBodyTopInset className={scrollBodyClassName} />
+      ) : null}
       <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
         {resolvedHeader}
         {contentWrapper ? contentWrapper(panels) : panels}
@@ -266,30 +271,38 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     </>
   )
 
-  const scrollBodyClasses = formStickyScrollBodyClasses
+  const stickyScrollShellClasses = usesDockedScrollBody
+    ? formStickyScrollShellWithDockedFooterClasses
+    : formStickyScrollShellClasses
 
-  const columnBody =
-    stickyChrome && !externalFooter ? (
-      <div className={formStickyScrollShellClasses}>
-        <div className={scrollBodyClasses}>{scrollableBody}</div>
-        {footerRegion}
-      </div>
-    ) : (
-      <>
+  const columnBody = usesDockedScrollBody ? (
+    <div className={stickyScrollShellClasses}>
+      <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName} boundedScroll>
         {scrollableBody}
-        {footerRegion}
-      </>
-    )
+      </FormStickyScrollBody>
+      {footerRegion}
+    </div>
+  ) : (
+    <>
+      {scrollableBody}
+      {footerRegion}
+    </>
+  )
 
   const defaultLayout =
     aside && !externalFooter ? (
       <div className={formTabbedAsideGridClasses}>
         <div
-          className={cn(formTabbedAsideBodyClasses, stickyChrome && formStickyScrollShellClasses)}
+          className={cn(
+            formTabbedAsideBodyClasses,
+            usesDockedScrollBody && stickyScrollShellClasses,
+          )}
         >
-          {stickyChrome ? (
+          {usesDockedScrollBody ? (
             <>
-              <div className={scrollBodyClasses}>{scrollableBody}</div>
+              <FormStickyScrollBody scrollBodyClassName={scrollBodyClassName} boundedScroll>
+                {scrollableBody}
+              </FormStickyScrollBody>
               {footerRegion}
             </>
           ) : (

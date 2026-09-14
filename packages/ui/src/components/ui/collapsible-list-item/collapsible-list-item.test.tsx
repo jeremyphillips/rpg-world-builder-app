@@ -6,7 +6,11 @@ import { describe, expect, it, vi } from 'vitest'
 import { Button } from '../button.client'
 import { Text } from '../text'
 import { CollapsibleListItem } from './collapsible-list-item.client'
-import { collapsibleListItemShellPaddingClasses } from './collapsible-list-item.variants'
+import {
+  collapsibleListItemDisclosureShellPaddingClasses,
+  collapsibleListItemHeaderStackSummaryGapClasses,
+  collapsibleListItemHeaderVerticalPaddingVariants,
+} from './collapsible-list-item.variants'
 
 describe('CollapsibleListItem', () => {
   it('renders header content and positions actions in the header row', () => {
@@ -25,7 +29,10 @@ describe('CollapsibleListItem', () => {
 
     expect(screen.getByText('Alpha header')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
-    expect(container.firstChild).toHaveClass('flex-col', collapsibleListItemShellPaddingClasses)
+    expect(container.firstChild).toHaveClass(
+      'flex-col',
+      collapsibleListItemDisclosureShellPaddingClasses,
+    )
   })
 
   it('wires collapse button aria attributes and toggles expanded body', async () => {
@@ -92,16 +99,24 @@ describe('CollapsibleListItem', () => {
 
     const shell = container.firstChild as HTMLElement
     const headerRow = shell.firstElementChild as HTMLElement
+    const headerStack = headerRow.firstElementChild as HTMLElement
     const addButton = screen.getByRole('button', { name: 'Add' })
     const body = screen.getByText('Expanded details').parentElement
     const summary = screen.getByText('Warning badge').parentElement
 
-    expect(shell).toHaveClass('flex-col', collapsibleListItemShellPaddingClasses)
+    expect(shell).toHaveClass('flex-col', collapsibleListItemDisclosureShellPaddingClasses)
+    expect(shell).toHaveClass('pb-0')
     expect(shell).not.toHaveClass('grid-cols-[minmax(0,1fr)_auto]')
     expect(headerRow).toHaveClass('flex', 'items-center')
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
+    expect(headerStack).toHaveClass(collapsibleListItemHeaderStackSummaryGapClasses)
     expect(headerRow.contains(addButton)).toBe(true)
     expect(summary).toHaveClass('pl-[var(--content-column-indent)]')
-    expect(body).toHaveClass('pl-[var(--content-column-indent)]')
+    expect(body).toHaveClass('pl-[var(--content-inline-start)]')
+    expect(body).toHaveClass('-ml-2')
+    expect(body).toHaveClass('bg-background')
     expect(screen.getByRole('group', { name: 'Item actions' })).toBeInTheDocument()
   })
 
@@ -119,7 +134,84 @@ describe('CollapsibleListItem', () => {
       />,
     )
 
-    expect(container.firstChild).toHaveClass('flex-col', collapsibleListItemShellPaddingClasses)
+    expect(container.firstChild).toHaveClass(
+      'flex-col',
+      collapsibleListItemDisclosureShellPaddingClasses,
+    )
+  })
+
+  it('keeps header row rhythm invariant when summary is visible but body is collapsed', () => {
+    const { container } = render(
+      <CollapsibleListItem
+        itemId="theta"
+        titleId="theta-title"
+        toolbarAriaLabel="Theta item"
+        collapsible
+        collapsed
+        onToggleCollapse={vi.fn()}
+        actionsAlign="center"
+        header={<span>Theta header</span>}
+        summary={<span>Theta summary</span>}
+        body={<p>Expanded details</p>}
+      />,
+    )
+
+    const headerRow = (container.firstChild as HTMLElement).firstElementChild as HTMLElement
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
+  })
+
+  it('keeps header row rhythm when summary is absent', () => {
+    const { container } = render(
+      <CollapsibleListItem
+        itemId="eta"
+        titleId="eta-title"
+        toolbarAriaLabel="Eta item"
+        collapsible
+        collapsed={false}
+        onToggleCollapse={vi.fn()}
+        actionsAlign="center"
+        header={<span>Eta header</span>}
+        body={<p>Expanded details</p>}
+      />,
+    )
+
+    const headerRow = (container.firstChild as HTMLElement).firstElementChild as HTMLElement
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
+    expect(headerRow.firstElementChild).not.toHaveClass(
+      collapsibleListItemHeaderStackSummaryGapClasses,
+    )
+  })
+
+  it('uses the same compact header rhythm when expanded as when collapsed', () => {
+    const sharedProps = {
+      itemId: 'iota',
+      titleId: 'iota-title',
+      toolbarAriaLabel: 'Iota item',
+      collapsible: true,
+      onToggleCollapse: vi.fn(),
+      actionsAlign: 'center' as const,
+      header: <span>Iota header</span>,
+      summary: <span>Iota summary</span>,
+      body: <p>Expanded details</p>,
+    }
+
+    const { container: collapsedContainer } = render(
+      <CollapsibleListItem {...sharedProps} collapsed />,
+    )
+    const { container: expandedContainer } = render(
+      <CollapsibleListItem {...sharedProps} collapsed={false} />,
+    )
+
+    const collapsedHeaderRow = (collapsedContainer.firstChild as HTMLElement)
+      .firstElementChild as HTMLElement
+    const expandedHeaderRow = (expandedContainer.firstChild as HTMLElement)
+      .firstElementChild as HTMLElement
+
+    expect(collapsedHeaderRow.className).toBe(expandedHeaderRow.className)
   })
 
   it('applies catalog picker row surface tone on the shell', () => {

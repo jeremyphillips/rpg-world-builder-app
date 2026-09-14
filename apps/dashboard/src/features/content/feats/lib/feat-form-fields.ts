@@ -109,7 +109,7 @@ export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Repeatable',
+      legend: '',
       fields: [
         {
           type: 'switch',

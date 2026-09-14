@@ -7,7 +7,7 @@ import type { ZodType } from 'zod'
 import { cn } from '../../lib/utils'
 import type { FormDensity } from '../form-density'
 import { resolveSchemaFormFooter, SchemaFormShell } from './schema-form-shell.client'
-import { FormFooterRegion, FormShellFieldStack } from './form-shell-field-stack.client'
+import { FormShellChildren } from './form-shell-children.client'
 import { createValidateSilently, makeResolver } from '../config/form-resolver'
 import type { ValidateSilently } from '../context/form-ui.context'
 import {
@@ -20,8 +20,6 @@ import {
 import { assertOptionalDisclosureFieldConfigs } from '../config/optional-disclosure-config.lib'
 import type { FormValidationPresentation } from '../context/form-ui.context'
 import type { FormShellExternalFooterContent } from '../chrome/form-shell-footer.context'
-import { formStickyScrollShellClasses } from '../chrome/form-chrome.variants'
-
 export interface FormProps<TFieldValues extends FieldValues> {
   /** Zod schema (typically from `@rpg/contracts`) driving validation + types. */
   schema: ZodType<TFieldValues>
@@ -73,6 +71,11 @@ export interface FormProps<TFieldValues extends FieldValues> {
   mode?: 'onSubmit' | 'onChange' | 'onBlur' | 'onTouched' | 'all'
   /** When true, the footer sticks to the bottom while field content scrolls. */
   stickyFooter?: boolean
+  /**
+   * Document scroll owns vertical movement. With `stickyFooter`, fields grow naturally and
+   * the actions bar sticks during document scroll — no docked inner scroller.
+   */
+  documentScroll?: boolean
   /**
    * Wrap scrollable field content (e.g. `<DrawerShell.Body>` in composed drawer flows).
    * Pair with {@link externalFooter} so footer content renders in overlay shell chrome.
@@ -135,6 +138,7 @@ export function Form<TFieldValues extends FieldValues>({
   fileFieldProps,
   mode,
   stickyFooter = false,
+  documentScroll = false,
   contentWrapper,
   externalFooter = false,
   density,
@@ -174,6 +178,9 @@ export function Form<TFieldValues extends FieldValues>({
     [externalFooter, formError, formId, resolvedFooter],
   )
 
+  const usesDockedStickyFooter = stickyFooter && !externalFooter && !documentScroll
+  const usesDocumentScrollStickyFooter = stickyFooter && !externalFooter && documentScroll
+
   return (
     <SchemaFormShell
       form={form}
@@ -189,54 +196,25 @@ export function Form<TFieldValues extends FieldValues>({
       externalFooterContent={externalFooterContent}
       className={cn(
         externalFooter && 'flex min-h-0 flex-1 flex-col',
-        stickyFooter && !externalFooter && 'flex min-h-0 flex-1 flex-col',
+        usesDockedStickyFooter && 'flex min-h-0 flex-1 flex-col',
         className,
       )}
     >
-      {stickyFooter && !externalFooter ? (
-        <div className={formStickyScrollShellClasses}>
-          <FormShellFieldStack
-            formId={formId}
-            fields={fields}
-            contentClassName={contentClassName}
-            scrollBodyClassName={scrollBodyClassName}
-            externalFooter={externalFooter}
-            stickyFooter={stickyFooter}
-            formError={formError}
-            valueSyncs={valueSyncs}
-            header={resolvedHeader}
-            contentWrapper={contentWrapper}
-          />
-          <FormFooterRegion
-            stickyFooter={stickyFooter}
-            formError={formError}
-            footer={resolvedFooter}
-            actionsBarPlacement="docked"
-          />
-        </div>
-      ) : (
-        <>
-          <FormShellFieldStack
-            formId={formId}
-            fields={fields}
-            contentClassName={contentClassName}
-            scrollBodyClassName={scrollBodyClassName}
-            externalFooter={externalFooter}
-            stickyFooter={stickyFooter}
-            formError={formError}
-            valueSyncs={valueSyncs}
-            header={resolvedHeader}
-            contentWrapper={contentWrapper}
-          />
-          {!externalFooter ? (
-            <FormFooterRegion
-              stickyFooter={stickyFooter}
-              formError={formError}
-              footer={resolvedFooter}
-            />
-          ) : null}
-        </>
-      )}
+      <FormShellChildren
+        formId={formId}
+        fields={fields}
+        contentClassName={contentClassName}
+        scrollBodyClassName={scrollBodyClassName}
+        externalFooter={externalFooter}
+        stickyFooter={stickyFooter}
+        formError={formError}
+        valueSyncs={valueSyncs}
+        header={resolvedHeader}
+        contentWrapper={contentWrapper}
+        footer={resolvedFooter}
+        usesDockedStickyFooter={usesDockedStickyFooter}
+        usesDocumentScrollStickyFooter={usesDocumentScrollStickyFooter}
+      />
     </SchemaFormShell>
   )
 }

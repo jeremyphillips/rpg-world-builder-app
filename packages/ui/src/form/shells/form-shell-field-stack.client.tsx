@@ -8,9 +8,8 @@ import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-act
 import {
   formFooterSpacingClasses,
   formSheetScrollRegionClasses,
-  formStickyScrollBodyClasses,
 } from '../chrome/form-chrome.variants'
-import { FormScrollBodyTopInset } from '../chrome/form-viewport-scroll-top-inset.client'
+import { FormStickyScrollBody } from '../chrome/form-sticky-scroll-body.client'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
 
@@ -21,6 +20,7 @@ export type FormShellFieldStackProps = {
   scrollBodyClassName?: string
   externalFooter: boolean
   stickyFooter: boolean
+  boundedScroll?: boolean
   formError?: string | null
   valueSyncs?: FormValueSync[]
   header?: ReactNode
@@ -29,7 +29,7 @@ export type FormShellFieldStackProps = {
 
 type FormShellFieldStackScrollWrapOptions = Pick<
   FormShellFieldStackProps,
-  'contentClassName' | 'scrollBodyClassName' | 'externalFooter' | 'stickyFooter'
+  'contentClassName' | 'scrollBodyClassName' | 'externalFooter' | 'stickyFooter' | 'boundedScroll'
 >
 
 function wrapFormShellFieldStackScroll(
@@ -39,6 +39,7 @@ function wrapFormShellFieldStackScroll(
     scrollBodyClassName,
     externalFooter,
     stickyFooter,
+    boundedScroll,
   }: FormShellFieldStackScrollWrapOptions,
 ): ReactNode {
   if (externalFooter) {
@@ -47,10 +48,12 @@ function wrapFormShellFieldStackScroll(
 
   if (stickyFooter) {
     return (
-      <div className={formStickyScrollBodyClasses}>
-        {scrollBodyClassName ? <FormScrollBodyTopInset className={scrollBodyClassName} /> : null}
+      <FormStickyScrollBody
+        scrollBodyClassName={scrollBodyClassName}
+        boundedScroll={boundedScroll ?? Boolean(scrollBodyClassName)}
+      >
         {stack}
-      </div>
+      </FormStickyScrollBody>
     )
   }
 
@@ -64,6 +67,7 @@ export function FormShellFieldStack({
   scrollBodyClassName,
   externalFooter,
   stickyFooter,
+  boundedScroll,
   formError,
   valueSyncs,
   header,
@@ -89,6 +93,7 @@ export function FormShellFieldStack({
     scrollBodyClassName,
     externalFooter,
     stickyFooter,
+    boundedScroll,
   })
 
   return contentWrapper && !stickyFooter ? contentWrapper(scrollWrappedStack) : scrollWrappedStack

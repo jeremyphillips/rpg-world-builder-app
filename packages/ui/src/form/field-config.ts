@@ -616,6 +616,8 @@ export interface InlineSentenceFieldConfig extends BaseFieldConfig {
   below?: InlineSentenceBelowChips
   /** Pill scale for `below` chips; defaults to field `size`. */
   chipSize?: FieldSize
+  /** Dynamic options for bound select segments (typically the segment matching `name`). */
+  optionsResolve?: FieldDynamicSelectOptions
 }
 
 /**
@@ -1641,8 +1643,23 @@ export function collectFieldDynamicDependsOn(field: {
   const hintDependsOn = normalizeFieldHint(field.hint).resolve?.dependsOn ?? []
   const derivedMetaDependsOn = field.derivedMeta?.dependsOn ?? []
   const optionsResolveDependsOn =
-    field.type === 'select' && field.optionsResolve ? field.optionsResolve.dependsOn : []
+    (field.type === 'select' || field.type === 'inlineSentence') && field.optionsResolve
+      ? field.optionsResolve.dependsOn
+      : []
   return [...new Set([...hintDependsOn, ...derivedMetaDependsOn, ...optionsResolveDependsOn])]
+}
+
+/** Resolves inline-sentence select options, applying dynamic resolution when configured. */
+export function resolveInlineSentenceSelectSegmentOptions(
+  config: InlineSentenceFieldConfig,
+  segmentName: string,
+  values: Record<string, unknown>,
+  staticOptions: SelectFieldOptionListItem[],
+): SelectFieldOptionListItem[] {
+  if (config.optionsResolve && segmentName === config.name) {
+    return [...config.optionsResolve.optionsWhen(values)]
+  }
+  return staticOptions
 }
 
 /** Resolves static and dynamic hint text for a field config. */

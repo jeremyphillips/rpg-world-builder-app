@@ -55,6 +55,8 @@ export interface FieldGroupProps {
   collapseKey?: string
   /** Required for `disclosure.variant: 'inline' | 'dialog'`. */
   formControl?: Control<FieldValues>
+  /** Prefix for resolving `summaryDependsOn` paths inside array/nested scopes. */
+  namePrefix?: string
   children: React.ReactNode
 }
 
@@ -76,6 +78,7 @@ export function FieldGroup({
   uiStateKey,
   collapseKey,
   formControl,
+  namePrefix,
   children,
 }: FieldGroupProps) {
   const legendScale =
@@ -102,6 +105,7 @@ export function FieldGroup({
         collapseKey={resolvedCollapseKey}
         disclosure={disclosure}
         formControl={formControl}
+        namePrefix={namePrefix}
       >
         {children}
       </FieldGroupDialogRoute>
@@ -122,6 +126,7 @@ export function FieldGroup({
         fieldChrome={fieldChrome}
         disclosure={disclosure}
         formControl={formControl}
+        namePrefix={namePrefix}
       >
         {children}
       </FieldGroupSummaryRoute>

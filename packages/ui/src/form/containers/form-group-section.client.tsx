@@ -234,6 +234,7 @@ export function GroupFieldSection({
       uiStateKey={uiStateKey}
       collapseKey={item.id}
       formControl={control}
+      namePrefix={namePrefix}
     >
       {groupBody}
     </FieldGroup>

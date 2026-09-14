@@ -10,11 +10,12 @@ import { useCallback, useState, type ReactNode } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
-
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
-import { contentFormPageShellHeadingClasses } from '../layout/content-form-page-shell.variants'
+import {
+  contentFormPageShellBodyClasses,
+  contentFormPageShellHeadingClasses,
+} from '../layout/content-form-page-shell.variants'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
@@ -252,35 +253,42 @@ function ContentEditEntityFormBody<
     />
   )
 
+  const formLayout = (
+    <ContentFormLayout
+      def={def}
+      ctx={layoutCtx}
+      formKey={entity.id}
+      schema={schema}
+      defaultValues={defaultValues}
+      formMode="edit"
+      contentTypeKey={contentTypeKey}
+      campaignId={campaignId}
+      entityId={entity.id}
+      campaignAccess={campaignAccess}
+      onCampaignAccessPersisted={setCampaignAccess}
+      submitLabel="Save changes"
+      submitPending={submitPending}
+      formError={headerError}
+      onSubmit={onSubmit}
+      onSaved={handleCoordinatedSaveSuccess}
+      publishSchema={entity.status === 'draft' ? publishSchema : undefined}
+      onPublish={entity.status === 'draft' ? handlePublish : undefined}
+      previewDraftBadge={usePreviewLayout && entity.status === 'draft'}
+      formHeaderPrefix={usePreviewLayout ? heading : undefined}
+    />
+  )
+
   const formBody = (
     <ContentAuthoringGate campaignId={campaignId}>
       <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
-        {usePreviewLayout ? null : (
-          <div className={contentFormPageShellHeadingClasses}>{heading}</div>
+        {usePreviewLayout ? (
+          formLayout
+        ) : (
+          <div className={contentFormPageShellBodyClasses}>
+            <div className={contentFormPageShellHeadingClasses}>{heading}</div>
+            {formLayout}
+          </div>
         )}
-
-        <ContentFormLayout
-          def={def}
-          ctx={layoutCtx}
-          formKey={entity.id}
-          schema={schema}
-          defaultValues={defaultValues}
-          formMode="edit"
-          contentTypeKey={contentTypeKey}
-          campaignId={campaignId}
-          entityId={entity.id}
-          campaignAccess={campaignAccess}
-          onCampaignAccessPersisted={setCampaignAccess}
-          submitLabel="Save changes"
-          submitPending={submitPending}
-          formError={headerError}
-          onSubmit={onSubmit}
-          onSaved={handleCoordinatedSaveSuccess}
-          publishSchema={entity.status === 'draft' ? publishSchema : undefined}
-          onPublish={entity.status === 'draft' ? handlePublish : undefined}
-          previewDraftBadge={usePreviewLayout && entity.status === 'draft'}
-          formHeaderPrefix={usePreviewLayout ? heading : undefined}
-        />
       </ContentFormPageShell>
 
       <ContentDeletionConfirmDialog
@@ -467,27 +475,28 @@ export function ContentEditShell({
   contentTypeKey,
   formCtx,
 }: ContentEditShellProps) {
+  const def = contentFormRegistry[contentType]
+  const usePreviewLayout = def != null && hasContentFormPreview(def)
+
   if (isPending) {
     return (
-      <NarrowPage>
+      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
         <div className="flex justify-center">
           <Spinner />
         </div>
-      </NarrowPage>
+      </ContentFormPageShell>
     )
   }
 
   if (isError) {
     return (
-      <NarrowPage>
+      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
         <Text variant="destructive" role="alert">
           {loadErrorLabel}
         </Text>
-      </NarrowPage>
+      </ContentFormPageShell>
     )
   }
-
-  const def = contentFormRegistry[contentType]
 
   if (!def) {
     return <ContentFormNotRegistered />

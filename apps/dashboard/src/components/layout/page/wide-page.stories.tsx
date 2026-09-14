@@ -1,6 +1,8 @@
 import { Heading, Text } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ViewportWorkspace } from './viewport-workspace'
+import { viewportWorkspacePaneClasses } from './viewport-workspace.variants'
 import { WidePage } from './wide-page'
 
 const meta = {
@@ -35,11 +37,13 @@ export const Relaxed: Story = {
 
 export const ViewportBound: Story = {
   render: () => (
-    <WidePage scroll="viewport" spacing="none" className="border border-dashed border-border">
-      <Heading variant="page" as="h1">
-        Class editor
-      </Heading>
-      <Text variant="muted">Flush below breadcrumbs — form column owns scroll.</Text>
-    </WidePage>
+    <ViewportWorkspace className="border border-dashed border-border">
+      <WidePage spacing="none" className={viewportWorkspacePaneClasses}>
+        <Heading variant="page" as="h1">
+          Class editor
+        </Heading>
+        <Text variant="muted">Flush below breadcrumbs — form column owns scroll.</Text>
+      </WidePage>
+    </ViewportWorkspace>
   ),
 }

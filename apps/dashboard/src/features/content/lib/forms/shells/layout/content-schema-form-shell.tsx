@@ -4,6 +4,7 @@ import type { ZodType } from 'zod'
 import {
   Form,
   TabbedForm,
+  collectTabbedFormResolverItems,
   formViewportScrollBodyTopInsetClasses,
   type FormIssue,
   type FormItem,
@@ -19,6 +20,7 @@ import {
   ContentFormSaveFooter,
   type ContentFormFooterShellProps,
 } from './content-form-shell-layout.lib'
+import { contentSchemaFormFillClasses } from './content-form-page-shell.variants'
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import {
   ContentPreviewCompactTrigger,
@@ -27,6 +29,8 @@ import {
 import { ContentPreviewUiProvider } from '../../preview/content-preview-ui-context'
 import { resolveContentPublishSchema } from '../edit/content-edit-load'
 import { ContentFormPublishValidationBridge } from '../../validation/content-form-publish-validation.client'
+import { ContentCreatePublishValidationBridge } from './content-create-publish-validation-bridge.client'
+import { augmentTabsWithHoistedName } from './content-schema-form-tabs.lib'
 
 interface ContentSchemaFormShellProps<
   TFormValues extends FieldValues,
@@ -166,21 +170,38 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
     onSaved,
     onLeaveGuardReady,
   }
-  const publishFields = React.useMemo(
-    () => (tabs ? tabs.flatMap((tab) => tab.fields) : (fields ?? [])),
-    [fields, tabs],
+  const tabbedFormTabs = React.useMemo(
+    () =>
+      tabs
+        ? augmentTabsWithHoistedName(tabs, headerProps.def.nameField(headerProps.ctx))
+        : undefined,
+    [headerProps.ctx, headerProps.def, tabs],
   )
-  const previewEnabled = hasContentFormPreview(headerProps.def) && Boolean(tabs)
+  const publishFields = React.useMemo(
+    () => (tabbedFormTabs ? collectTabbedFormResolverItems(tabbedFormTabs) : (fields ?? [])),
+    [fields, tabbedFormTabs],
+  )
+  const previewEnabled = hasContentFormPreview(headerProps.def) && Boolean(tabbedFormTabs)
   const header = () => (
     <>
       {headerPrefix}
       <ContentFormHeader {...headerProps} formKey={formKey} />
       {previewEnabled ? (
-        <ContentFormPublishValidationBridge
-          schema={resolvedPublishSchema}
-          tabs={tabs!}
-          onValidationChange={handlePublishIssuesChange}
-        />
+        <>
+          <ContentFormPublishValidationBridge
+            schema={resolvedPublishSchema}
+            tabs={tabbedFormTabs!}
+            onValidationChange={handlePublishIssuesChange}
+          />
+          {formMode === 'create' ? (
+            <ContentCreatePublishValidationBridge
+              publishSchema={resolvedPublishSchema}
+              publishFields={publishFields}
+              onPublishAttempted={markPublishAttempted}
+              onPublishIssuesChange={handlePublishIssuesChange}
+            />
+          ) : null}
+        </>
       ) : null}
     </>
   )
@@ -198,15 +219,15 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
 
   return (
     <>
-      {tabs ? (
+      {tabbedFormTabs ? (
         <ContentPreviewUiProvider>
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className={contentSchemaFormFillClasses}>
             <TabbedForm<TFormValues>
               key={formKey}
               id={formKey}
               uiStateKey={formKey}
               schema={schema}
-              tabs={tabs}
+              tabs={tabbedFormTabs}
               defaultValues={defaultValues}
               valueSyncs={valueSyncs}
               onSubmit={handleSubmit}
@@ -224,7 +245,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
                   <ContentPreviewRail
                     def={headerProps.def}
                     ctx={headerProps.ctx}
-                    tabs={tabs}
+                    tabs={tabbedFormTabs}
                     showDraftBadge={previewDraftBadge}
                   />
                 ) : undefined
@@ -234,7 +255,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
           </div>
         </ContentPreviewUiProvider>
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className={contentSchemaFormFillClasses}>
           <Form<TFormValues>
             key={formKey}
             id={formKey}

@@ -15,5 +15,5 @@ export const resolveSpeciesTraitGrantChoices: ChoiceSourceResolver = (
     return []
   }
 
-  return resolveSpeciesTraitGrantChoiceSets(draft, catalogIndex)
+  return resolveSpeciesTraitGrantChoiceSets(draft, catalogIndex, context)
 }

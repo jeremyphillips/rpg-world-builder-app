@@ -4,7 +4,7 @@ import { type FieldOption, type FormItem, type FormNavigationAnchor } from '@rpg
 
 import { languageGrantItemsField } from './language-grant-form-fields'
 
-const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-20'
+const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-8'
 
 export const LANGUAGE_GRANTS_ITEMS_PATH = 'languageProficiencyGrants.items' as const
 export const LANGUAGE_CHOICE_CHOOSE_PATH = 'languageProficiencyChoice.choose' as const

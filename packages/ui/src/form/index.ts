@@ -102,7 +102,16 @@ export {
   formStickyTabsClasses,
   formStickyTabsTransparentClasses,
   formStickyScrollShellClasses,
+  formStickyScrollShellWithDockedFooterClasses,
+  RPG_CONTENT_BOTTOM_INSET_VAR,
+  RPG_CONTENT_FLOOR_GAP_VAR,
+  RPG_CONTENT_TOP_INSET_VAR,
+  RPG_FORM_DOCKED_ACTIONS_BAR_BLOCK_SIZE_VAR,
+  formDockedActionsBarBlockSizeContractClasses,
   formStickyScrollBodyClasses,
+  formStickyScrollBodyClipClasses,
+  formStickyScrollBodyScrollerClasses,
+  formStickyScrollBodyUnboundedClasses,
   formTabbedInactivePanelClasses,
   formTabbedNavOverflowClasses,
   formTabbedNavWithTrailingClasses,
@@ -110,8 +119,8 @@ export {
   formTabbedAsideGridClasses,
   formTabbedAsideBodyClasses,
   formTabbedAsideSlotClasses,
-  formTabbedAsideSlotTopInsetClasses,
   formTabbedAsideSlotBottomInsetClasses,
+  formTabbedAsideSlotTopInsetClasses,
   formTabbedPreviewRailCompactTriggerHiddenClasses,
   formViewportScrollBodyTopInsetClasses,
   formTabbedAsideFooterClasses,
@@ -122,6 +131,10 @@ export {
   FormScrollBodyTopInset,
   FormViewportScrollTopInset,
 } from './chrome/form-viewport-scroll-top-inset.client'
+export {
+  FormStickyScrollBody,
+  type FormStickyScrollBodyProps,
+} from './chrome/form-sticky-scroll-body.client'
 export { WizardStepForm, type WizardStepFormProps } from './shells/wizard-step-form.client'
 export {
   FORM_COLUMNS_WIDTH_EQUAL,
@@ -331,6 +344,7 @@ export {
   resolveInvalidSubmitNavigation,
   prepareFormIssues,
   resolveTabValidationState,
+  collectTabPathPrefixes,
   pathOwnsIssue,
   type ArrayItemIssueGroup,
   type ArraySectionMeta,

@@ -252,6 +252,14 @@ describe('createSpellDraftInputSchema', () => {
     expect(parsed.classIds).toEqual([])
   })
 
+  it('allows draft payloads without school', () => {
+    const parsed = createSpellDraftInputSchema.parse({
+      slug: 'draft-spell',
+      name: 'Draft Spell',
+    })
+    expect(parsed.school).toBeUndefined()
+  })
+
   it('allows empty classIds on draft', () => {
     expect(
       createSpellDraftInputSchema.safeParse({

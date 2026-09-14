@@ -92,7 +92,7 @@ const EXTENDED_PROGRESSION_ENABLED = 'extendedProgressionEnabled'
 const MULTICLASSING_ENABLED = 'multiclassingEnabled'
 const PRIMARY_ABILITY_MINIMUM_ENABLED = 'primaryAbilityMinimumEnabled'
 const SUBCLASS_CHOICES_ENABLED = 'subclassChoicesEnabled'
-const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-20'
+const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-8'
 
 const configRulesObjectSchema = z.object({
   startingLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
@@ -370,6 +370,7 @@ function progressionGroup(): FormItem {
             fields: [
               {
                 kind: 'row',
+                align: 'start',
                 visibility: visibleWhenExtendedProgression(),
                 fields: [
                   {
@@ -386,7 +387,7 @@ function progressionGroup(): FormItem {
                   {
                     type: 'number',
                     name: 'extendedMaxLevel',
-                    label: 'Extended max level',
+                    label: 'Max level',
                     min: 1,
                     max: ABSOLUTE_MAX_CHARACTER_LEVEL,
                     required: true,
@@ -611,7 +612,6 @@ function creationSectionItems({
               {
                 ...(buildStartingWealthTiersField() as ArrayConfig),
                 name: `${prefix}.tiers`,
-                item: { surface: { elevation: 'raised' } },
               },
             ],
           },

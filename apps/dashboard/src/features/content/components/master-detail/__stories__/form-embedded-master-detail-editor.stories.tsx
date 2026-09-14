@@ -1,18 +1,36 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
+import { Button } from '@rpg/ui'
+import type { FormItem } from '@rpg/ui/form'
+import {
+  formDockedActionsBarClasses,
+  FormStickyScrollBody,
+  formStickyScrollShellWithDockedFooterClasses,
+  formStickyTabsClasses,
+} from '@rpg/ui/form'
 
+import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { FormEmbeddedMasterDetailEditor } from '../form-embedded-master-detail-editor'
 
-const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name', required: true }]
+const itemFields: FormItem[] = [{ type: 'text', name: 'name', label: 'Name', required: true }]
+
+const tallItemFields = Array.from({ length: 12 }, (_, index) => ({
+  type: 'text' as const,
+  name: `field${index}`,
+  label: `Detail field ${index + 1}`,
+  required: true,
+}))
 
 type FeatureRow = { id?: string; name?: string; level?: number }
 
 function EditorStory({
   features = [] as FeatureRow[],
   entitySource,
+  fields = itemFields,
 }: {
   features?: FeatureRow[]
   entitySource?: 'system' | 'homebrew'
+  fields?: FormItem[]
 }) {
   const form = useForm({ defaultValues: { features } })
   return (
@@ -20,17 +38,17 @@ function EditorStory({
       <FormEmbeddedMasterDetailEditor
         formCtx={{ entitySource }}
         fieldName="features"
-        itemFields={itemFields}
-        itemNoun="feature"
+        itemFields={fields}
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
+        listTitle="Features"
         ariaLabel="Features"
         addLabel="Add feature"
-        emptyListLabel="No features yet. Add one to get started."
         idPrefix="class-feature"
-        mapListItem={({ row, index }) => {
+        mapListItem={({ row }) => {
           const feature = row as FeatureRow | undefined
           const name = typeof feature?.name === 'string' ? feature.name.trim() : ''
           return {
-            title: name || `Feature ${index + 1}`,
+            title: name,
             eyebrow: feature?.level !== undefined ? `Level ${feature.level}` : undefined,
           }
         }}
@@ -38,6 +56,12 @@ function EditorStory({
     </FormProvider>
   )
 }
+
+const longFeatures = Array.from({ length: 20 }, (_, index) => ({
+  id: `f${index}`,
+  name: `Feature ${index + 1}`,
+  level: index + 1,
+}))
 
 const meta = {
   title: 'Content/FormEmbeddedMasterDetailEditor',
@@ -54,6 +78,55 @@ export const Empty: Story = {
 export const WithRows: Story = {
   render: () => (
     <EditorStory
+      features={[
+        { id: 'f1', name: 'Rage', level: 1 },
+        { id: 'f2', name: 'Reckless Attack', level: 2 },
+      ]}
+    />
+  ),
+}
+
+export const LongCollection: Story = {
+  render: () => <EditorStory features={longFeatures} />,
+}
+
+export const ConstrainedViewport: Story = {
+  render: () => (
+    <div className="h-64 [--master-detail-list-max-block-size:12rem]">
+      <EditorStory features={longFeatures} />
+    </div>
+  ),
+}
+
+export const WithStickyFormFooter: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: () => (
+    <div className="flex h-[32rem] min-h-0 flex-col overflow-hidden bg-background">
+      <div className={formStickyScrollShellWithDockedFooterClasses}>
+        <FormStickyScrollBody>
+          <div className="p-6">
+            <div
+              className={`${formStickyTabsClasses} mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-sm text-muted-foreground`}
+            >
+              Dummy section tabs
+            </div>
+            <EditorStory features={longFeatures} />
+          </div>
+        </FormStickyScrollBody>
+        <div className={formDockedActionsBarClasses}>
+          <div className="flex justify-end px-6">
+            <Button type="button">Save changes</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  ),
+}
+
+export const TallerDetailThanRail: Story = {
+  render: () => (
+    <EditorStory
+      fields={tallItemFields}
       features={[
         { id: 'f1', name: 'Rage', level: 1 },
         { id: 'f2', name: 'Reckless Attack', level: 2 },

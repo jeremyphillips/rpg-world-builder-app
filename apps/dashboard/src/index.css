@@ -8,4 +8,5 @@
  */
 @import '@fontsource-variable/inter';
 @import '@rpg/ui/styles.css';
+@import './features/content/components/master-detail/master-detail-list-scroll.utilities.css';
 @source "../node_modules/@rpg/ui/src";

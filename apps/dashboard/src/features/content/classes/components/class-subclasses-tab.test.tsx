@@ -24,16 +24,6 @@ vi.mock('../hooks/use-subclass-mutations', () => ({
   }),
 }))
 
-vi.mock('./subclasses/subclass-editor-panel', () => ({
-  SubclassEditorPanel: ({ onDeleteRequest }: { onDeleteRequest: () => void }) => (
-    <div>
-      <button type="button" onClick={onDeleteRequest}>
-        Mock delete subclass
-      </button>
-    </div>
-  ),
-}))
-
 const QueryWrapper = makeQueryWrapper()
 
 function ClassFormShell({
@@ -89,9 +79,11 @@ describe('ClassSubclassesTab', () => {
 
     await user.click(screen.getByRole('button', { name: /Add subclass/i }))
 
-    expect(screen.getByText('Untitled subclass')).toBeInTheDocument()
-    expect(screen.getByText('Unsaved')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Mock delete subclass/i })).toBeInTheDocument()
+    expect(screen.getAllByText('Untitled subclass').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Unsaved').length).toBeGreaterThan(0)
+    expect(
+      screen.getByRole('button', { name: /Actions for Untitled subclass/i }),
+    ).toBeInTheDocument()
   })
 
   it('opens ConfirmDialog and removes a draft on confirm', async () => {
@@ -99,7 +91,8 @@ describe('ClassSubclassesTab', () => {
     render(<ClassFormShell />)
 
     await user.click(screen.getByRole('button', { name: /Add subclass/i }))
-    await user.click(screen.getByRole('button', { name: /Delete Untitled subclass/i }))
+    await user.click(screen.getByRole('button', { name: /Actions for Untitled subclass/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Delete subclass/i }))
 
     expect(screen.getByRole('alertdialog')).toBeInTheDocument()
 

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
+
 import { QueryClientProvider } from '@tanstack/react-query'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
@@ -252,8 +253,14 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
   })
 
   it('renders the character configuration form with section navigation', async () => {
-    renderDetail()
+    const { container } = renderDetail()
     await expectCharacterConfigurationReady()
+
+    expect(container.querySelector('[data-scroll-container]')).toBeNull()
+
+    const mainColumn = container.querySelector('.max-w-xl')
+    expect(mainColumn?.querySelector('.overflow-y-auto')).toBeNull()
+    expect(mainColumn?.querySelector('.form-scroll-body-container')).toBeNull()
 
     expect(
       screen.getByRole('navigation', { name: 'Character configuration sections' }),

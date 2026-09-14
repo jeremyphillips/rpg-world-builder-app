@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveCampaignAccessSummary } from './campaign-access-summary'
+import {
+  resolveCampaignAccessDetail,
+  resolveCampaignAccessSummary,
+} from './campaign-access-summary'
 
 describe('resolveCampaignAccessSummary', () => {
   it('summarizes available all-players access', () => {
@@ -52,6 +55,26 @@ describe('resolveCampaignAccessSummary', () => {
     ).toEqual({
       status: { label: 'Available', tone: 'success', indicator: 'dot' },
       detail: '1 specific player',
+    })
+  })
+
+  it('falls back to default visibility mode when mode is missing', () => {
+    expect(
+      resolveCampaignAccessDetail({
+        visibilityMode: undefined as unknown as 'all_players',
+        participantIds: [],
+      }),
+    ).toBe('All players')
+
+    expect(
+      resolveCampaignAccessSummary({
+        available: true,
+        visibilityMode: undefined as unknown as 'all_players',
+        participantIds: [],
+      }),
+    ).toEqual({
+      status: { label: 'Available', tone: 'success', indicator: 'dot' },
+      detail: 'All players',
     })
   })
 

@@ -29,6 +29,7 @@ export type FieldGroupDialogDisclosureProps<TFieldValues extends FieldValues = F
   className?: string
   disclosure: FieldGroupDialogDisclosureConfig
   control: Control<TFieldValues>
+  namePrefix?: string
   children: React.ReactNode
 }
 
@@ -42,9 +43,14 @@ export function FieldGroupDialogDisclosure<TFieldValues extends FieldValues = Fi
   className,
   disclosure,
   control,
+  namePrefix,
   children,
 }: FieldGroupDialogDisclosureProps<TFieldValues>) {
-  const watchedValues = useSummaryDisclosureWatchedValues(control, disclosure.summaryDependsOn)
+  const watchedValues = useSummaryDisclosureWatchedValues(
+    control,
+    disclosure.summaryDependsOn,
+    namePrefix,
+  )
   const { isDirty } = useFormState({ control })
   const [open, setOpen] = React.useState(false)
 

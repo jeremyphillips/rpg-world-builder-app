@@ -133,26 +133,45 @@ For layout-only decorators, use page shells or a `<div>` — not a router.
 
 ## Page layout
 
-`AppShell` `<main>` is a non-scrolling flex column (`overflow-hidden`, horizontal
-gutter only). Every routed leaf must mount a **scroll owner** beneath it — usually
-`WidePage` / `NarrowPage` with `scroll="page"` (default), or a viewport-bound shell
-for forms and full-height workspaces.
+**Central invariant:** ordinary routes participate in document flow and never
+establish a vertical scrollport. The browser (`html`/`body`) owns vertical scrolling
+by default. Only bounded workspaces and intentionally independent component panes
+may own vertical scrolling.
 
-Scroll vs inset vs child rhythm are **independent**:
+| Term                | Meaning                                               |
+| ------------------- | ----------------------------------------------------- |
+| Document scroll     | Default — browser scroll; no route-level scroll shell |
+| Scroll container    | Intentional custom scrollport (`overflow-y-auto`)     |
+| `ViewportWorkspace` | Opt-in bounded multi-pane editor shell                |
 
-| Prop      | SSOT                                                                                 | Default   | Role                                                                                |
-| --------- | ------------------------------------------------------------------------------------ | --------- | ----------------------------------------------------------------------------------- |
-| `scroll`  | [`page-scroll.variants.ts`](../src/components/layout/page/page-scroll.variants.ts)   | `page`    | `page` → `overflow-y-auto`; `viewport` → `overflow-hidden` (descendant owns scroll) |
-| `spacing` | [`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts) | `page`    | Shell vertical inset (`py-8` or `none`)                                             |
-| `rhythm`  | same file (`pageSpacingClasses`)                                                     | `compact` | Direct-child `space-y-*` only                                                       |
+**ViewportWorkspace consumers** (bounded routes — no document scrollbar):
+
+| Consumer                                                                                              | Route pattern       |
+| ----------------------------------------------------------------------------------------------------- | ------------------- |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Catalog create/edit |
+| [`MessagesWorkspaceShell`](../src/features/message/components/workspace/messages-workspace-shell.tsx) | `/messages`         |
+
+`AppShell` publishes `--app-sticky-chrome-block-size` (sticky topbar + breadcrumb)
+for workspace bounds and chrome-aware sticky rails; `<main>` aliases
+`--rpg-content-top-inset` from that variable. `<main>` is horizontal gutter
+only (`min-w-0 flex-1`) for document-scroll routes — not a height contract or
+scrollport. When a descendant mounts `data-viewport-fill="workspace"`, AppShell
+`:has()` caps the content column at one viewport height and main at `h-0`.
+
+Inset vs child rhythm are **independent** on width shells:
+
+| Prop      | SSOT                                                                                 | Default   | Role                                    |
+| --------- | ------------------------------------------------------------------------------------ | --------- | --------------------------------------- |
+| `spacing` | [`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts) | `page`    | Shell vertical inset (`py-8` or `none`) |
+| `rhythm`  | same file (`pageSpacingClasses`)                                                     | `compact` | Direct-child `space-y-*` only           |
 
 Every route picks **one width shell** from `components/layout/page/`:
 
-| Shell                                                                                                 | Width                | Typical routes                                                                                           |
-| ----------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------- |
-| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx)                                         | Centered `max-w-4xl` | Settings, wizards, account settings, simple forms                                                        |
-| [`WidePage`](../src/components/layout/page/wide-page.tsx)                                             | Full main column     | Lists, hubs, detail pages, tables                                                                        |
-| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Narrow or wide       | Catalog create/edit — `scroll="viewport" spacing="none"`; top inset on form scroll body + preview column |
+| Shell                                                                                                 | Width                | Typical routes                                                                         |
+| ----------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------- |
+| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx)                                         | Centered `max-w-4xl` | Settings, wizards, account settings, simple forms                                      |
+| [`WidePage`](../src/components/layout/page/wide-page.tsx)                                             | Full main column     | Lists, hubs, detail pages, tables, Rules Config                                        |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Narrow or wide       | Catalog create/edit — wraps `ViewportWorkspace`; form panes own scroll + docked footer |
 
 Nested readable columns inside `WidePage` use
 [`narrowPageContentClasses`](../src/components/layout/page/page-content.variants.ts)
@@ -187,7 +206,7 @@ import { WidePage } from '@/components/layout/page/wide-page'
   {/* card grid */}
 </WidePage>
 
-// Content catalog create/edit — viewport-bound; TabbedForm owns scroll + docked footer
+// Content catalog create/edit — ViewportWorkspace; TabbedForm owns scroll + docked footer
 <ContentFormPageShell usePreviewLayout={hasPreview}>
   {/* form */}
 </ContentFormPageShell>

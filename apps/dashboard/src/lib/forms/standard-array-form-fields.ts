@@ -5,7 +5,7 @@ import {
 } from '@rpg/contracts'
 import type { FormItem, FormNavigationAnchor } from '@rpg/ui/form'
 
-const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-20'
+const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-8'
 
 export type StandardArrayFormFieldOptions = {
   name?: string

@@ -21,7 +21,7 @@ export async function stubUiFormItems(
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
-    FormItems: ({ namePrefix }: { namePrefix?: string }) => (
+    FormItems: ({ namePrefix }: { namePrefix?: string; idPrefix?: string }) => (
       <div data-testid={typeof testId === 'string' ? testId : testId(namePrefix)}>{namePrefix}</div>
     ),
   }

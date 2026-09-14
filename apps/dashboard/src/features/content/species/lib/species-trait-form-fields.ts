@@ -18,7 +18,10 @@ import {
 } from '../../lib/forms/grants/grant-form-schema'
 import { formRowsToGrantGroups } from '../../lib/forms/grants/grant-form-values'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { traitKindOptions } from './species-trait-form-labels'
+import {
+  TRAIT_DERIVED_DISPLAY_DESCRIPTION,
+  TRAIT_OVERRIDE_DISPLAY_LABEL,
+} from './species-trait-form-labels'
 
 /** Species trait row validation messages (tier 3 form overrides). */
 export const speciesTraitValidationMessages = {
@@ -44,10 +47,10 @@ export function visibleForGrantOverrides(): FieldVisibility {
   }
 }
 
-export const traitRowFormSchema = z
-  .object({
+function traitRowObjectSchema<Kind extends z.ZodType>(kindSchema: Kind) {
+  return z.object({
     id: z.string().min(1).optional(),
-    kind: contentTraitKindSchema.default('custom'),
+    kind: kindSchema,
     /** Form-only — not persisted; derived from stored overrides on load. */
     overrideDisplay: z.boolean().default(false),
     name: z.string().optional(),
@@ -56,50 +59,65 @@ export const traitRowFormSchema = z
     descriptionOverride: z.string().optional(),
     grants: z.array(grantRowFormSchema),
   })
-  .superRefine((row, ctx) => {
-    if (row.kind === 'custom' && !row.name?.trim()) {
+}
+
+export function refinePublishedTraitRow(
+  row: {
+    kind?: string
+    name?: string
+    grants: z.infer<typeof grantRowFormSchema>[]
+  },
+  ctx: z.RefinementCtx,
+): void {
+  if (row.kind === 'custom' && !row.name?.trim()) {
+    ctx.addIssue({
+      code: 'custom',
+      message: fieldValidationMessages.requiredText({ label: 'Name' }),
+      path: ['name'],
+    })
+  }
+  if (row.kind === 'grant') {
+    const grantGroups = formRowsToGrantGroups(row.grants)
+    if (!isGrantGroupsEligible(grantGroups)) {
       ctx.addIssue({
         code: 'custom',
-        message: fieldValidationMessages.requiredText({ label: 'Name' }),
-        path: ['name'],
+        message: speciesTraitValidationMessages.grantRowRequired(),
+        path: ['grants'],
       })
     }
-    if (row.kind === 'grant') {
-      const grantGroups = formRowsToGrantGroups(row.grants)
-      if (!isGrantGroupsEligible(grantGroups)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: speciesTraitValidationMessages.grantRowRequired(),
-          path: ['grants'],
-        })
-      }
-    }
-  })
+  }
+}
 
-/** Draft trait row — skips publish completeness checks (empty grants, blank names). */
-export const traitRowDraftFormSchema = z.object({
-  id: z.string().min(1).optional(),
-  kind: contentTraitKindSchema.default('custom'),
-  overrideDisplay: z.boolean().default(false),
-  name: z.string().optional(),
-  description: z.string().optional(),
-  nameOverride: z.string().optional(),
-  descriptionOverride: z.string().optional(),
-  grants: z.array(grantRowFormSchema),
+export const traitRowDraftFormSchema = traitRowObjectSchema(
+  contentTraitKindSchema.default('custom'),
+).extend({
+  available: z.boolean().default(true),
 })
+
+export const traitRowFormSchema = traitRowDraftFormSchema.superRefine(refinePublishedTraitRow)
+
+const heritageCampaignAccessFormSchema = z.object({
+  available: z.boolean().default(true),
+  visibilityMode: z.enum(['all_players', 'dm_only', 'specific_players']).default('all_players'),
+  participantIds: z.array(z.string()).default([]),
+})
+
+export function heritageOptionRowObjectSchema() {
+  return traitRowObjectSchema(z.literal('custom').default('custom')).extend({
+    campaignAccess: heritageCampaignAccessFormSchema.default(
+      heritageCampaignAccessFormSchema.parse({}),
+    ),
+  })
+}
+
+export function createHeritageOptionCampaignAccessDefaults() {
+  return heritageCampaignAccessFormSchema.parse({})
+}
 
 export type TraitRowForm = z.infer<typeof traitRowFormSchema>
 
 export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
-    {
-      type: 'select',
-      name: 'kind',
-      label: 'Trait kind',
-      options: traitKindOptions,
-      required: true,
-      defaultValue: 'custom',
-    },
     {
       type: 'text',
       name: 'name',
@@ -117,30 +135,41 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
       visibility: visibleForTraitKind('custom'),
     },
     {
-      type: 'switch',
-      name: 'overrideDisplay',
-      label: 'Custom name and description',
+      kind: 'group',
+      description: TRAIT_DERIVED_DISPLAY_DESCRIPTION,
       visibility: visibleForTraitKind('grant'),
-    },
-    {
-      type: 'text',
-      name: 'nameOverride',
-      label: 'Custom name',
-      placeholder: 'Leave blank to use the default',
-      visibility: visibleForGrantOverrides(),
-    },
-    {
-      type: 'richtext',
-      name: 'descriptionOverride',
-      label: 'Custom description',
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      hint: 'Leave blank to use the default',
-      visibility: visibleForGrantOverrides(),
+      fields: [
+        {
+          type: 'switch',
+          name: 'overrideDisplay',
+          label: TRAIT_OVERRIDE_DISPLAY_LABEL,
+        },
+        {
+          type: 'text',
+          name: 'nameOverride',
+          label: 'Name',
+          placeholder: 'Leave blank to use the default',
+          visibility: visibleForGrantOverrides(),
+        },
+        {
+          type: 'richtext',
+          name: 'descriptionOverride',
+          label: 'Description',
+          linkable: true,
+          internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+          contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+          hint: 'Leave blank to use the default',
+          visibility: visibleForGrantOverrides(),
+        },
+      ],
     },
     ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx),
   ]
+}
+
+/** Heritage options always use authored custom traits. */
+export function heritageOptionItemFields(ctx: ContentFormCtx): FormItem[] {
+  return traitItemFields(ctx)
 }
 
 export function traitItemTitle(values: Record<string, unknown>, index: number): string {
@@ -156,12 +185,6 @@ export function traitItemTitle(values: Record<string, unknown>, index: number): 
         descriptionOverride: row.descriptionOverride,
       })
     }
-    return `Grant trait ${index + 1}`
   }
-  return row.name || `Trait ${index + 1}`
-}
-
-export function traitItemEyebrow(row: TraitRowForm | undefined): string | undefined {
-  if (!row?.kind) return undefined
-  return row.kind === 'grant' ? 'Grant' : 'Custom'
+  return row.name?.trim() || ''
 }

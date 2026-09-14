@@ -29,16 +29,18 @@ character id enters `participantIds`. See
 `ContentOverviewTable` composes `OverviewTableFrame` with `DataTableUtilityBar` inside the
 table card — row 1 for result context, row 2 for selection and column controls.
 
-| Row | Content                                                                                                   |
-| --- | --------------------------------------------------------------------------------------------------------- |
-| 1   | Plain `N results` via `OverviewResultSummary`; optional hidden-unavailable supplement (`5 hidden · Show`) |
-| 2   | **Select** / selection cluster (managers) and compact column visibility (`Choose visible columns`)        |
+| Row | Content                                                                                                                     |
+| --- | --------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Plain `N results` via `OverviewResultSummary`; optional hidden-unavailable supplement (`13 results · 1 unavailable · Show`) |
+| 2   | **Select** / selection cluster (managers) and compact column visibility (`Choose visible columns`)                          |
 
 - Result count reflects rows after all filters (including campaign availability).
 - Hidden-unavailable supplement uses filter-scoped counts from `deriveCampaignAvailabilityScope`
   against rows matching primary + additional filters — not the global catalog total.
-- Supplement copy: `5 hidden · Show` when availability is **Available**; `5 unavailable shown · Hide`
-  when **All**; omitted when **Unavailable** is selected.
+- Supplement copy uses the shared `resolveAvailabilityCountSummaryParts` formatter. When availability
+  is **Available**, the row reads `13 results · 1 unavailable · Show`; when **All**, the same
+  unavailable count plus `Hide unavailable`; omitted when **Unavailable** is selected or when no rows are hidden.
+  Available rows are implied by the visible result count and are not restated.
 
 Shared modules: `overview-result-summary.tsx`, `overview-selection-cluster.tsx`.
 

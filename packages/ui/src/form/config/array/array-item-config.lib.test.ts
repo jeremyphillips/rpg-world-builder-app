@@ -41,6 +41,34 @@ describe('array-item-config.lib', () => {
     ).toBe('detailed')
   })
 
+  it('resolves collapsible arrays to detailed unless variant is explicitly compact', () => {
+    expect(
+      resolveArrayItemVariant(
+        {
+          kind: 'array',
+          name: 'entries',
+          legend: 'Entries',
+          item: { collapsible: true },
+          fields: [{ type: 'text', name: 'label', label: 'Label' }],
+        },
+        { nested: true },
+      ),
+    ).toBe('detailed')
+
+    expect(
+      resolveArrayItemVariant(
+        {
+          kind: 'array',
+          name: 'examples',
+          legend: 'Examples',
+          item: { collapsible: true, variant: 'compact' },
+          fields: [{ type: 'text', name: 'label', label: 'Label' }],
+        },
+        { nested: false },
+      ),
+    ).toBe('compact')
+  })
+
   it('auto-selects compact for a single leaf row', () => {
     const config = {
       kind: 'array' as const,

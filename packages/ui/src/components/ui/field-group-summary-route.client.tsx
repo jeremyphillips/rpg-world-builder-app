@@ -21,6 +21,7 @@ export type FieldGroupSummaryRouteProps = {
   fieldChrome?: FieldChrome
   disclosure: FieldGroupSummaryDisclosure
   formControl?: Control<FieldValues>
+  namePrefix?: string
   children: React.ReactNode
 }
 
@@ -37,6 +38,7 @@ export function FieldGroupSummaryRoute({
   fieldChrome,
   disclosure,
   formControl,
+  namePrefix,
   children,
 }: FieldGroupSummaryRouteProps) {
   const { legend: resolvedLegend, formControl: resolvedFormControl } =
@@ -56,6 +58,7 @@ export function FieldGroupSummaryRoute({
       fieldChrome={fieldChrome}
       disclosure={disclosure}
       formControl={resolvedFormControl}
+      namePrefix={namePrefix}
     >
       {children}
     </SummaryDisclosureFieldGroupShell>

@@ -22,6 +22,15 @@ import { RESOLUTION_SECTION_LABELS } from '../resolution/lib/form/resolution-for
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')
 
+function publishReadySpellFormValues(overrides: Partial<SpellFormValues> = {}) {
+  return {
+    ...spellFormDef.createDefaultValues,
+    range: { kind: 'self' as const },
+    duration: { kind: 'instantaneous' as const },
+    ...overrides,
+  }
+}
+
 function walkNestedFormItems(fields: FormItem[], visit: (field: FormItem) => void): void {
   for (const field of fields) {
     visit(field)
@@ -323,9 +332,14 @@ describe('spellFormDef resolution integration', () => {
     expect(spellFormDef.createDefaultValues).not.toHaveProperty('resolution')
   })
 
+  it('createDefaultValues omits range and duration', () => {
+    expect(spellFormDef.createDefaultValues).not.toHaveProperty('range')
+    expect(spellFormDef.createDefaultValues).not.toHaveProperty('duration')
+  })
+
   it('spellFormSchema coerces string level values from select fields', () => {
     const parsed = spellFormSchema.parse({
-      ...spellFormDef.createDefaultValues,
+      ...publishReadySpellFormValues(),
       name: 'Test',
       school: 'evocation',
       level: '1',
@@ -336,7 +350,7 @@ describe('spellFormDef resolution integration', () => {
 
   it('spellFormSchema rejects empty level select sentinel', () => {
     const result = spellFormSchema.safeParse({
-      ...spellFormDef.createDefaultValues,
+      ...publishReadySpellFormValues(),
       name: 'Test',
       school: 'evocation',
       level: '',
@@ -347,7 +361,7 @@ describe('spellFormDef resolution integration', () => {
 
   it('spellFormSchema rejects missing level on create defaults', () => {
     const result = spellFormSchema.safeParse({
-      ...spellFormDef.createDefaultValues,
+      ...publishReadySpellFormValues(),
       name: 'Test',
       school: 'evocation',
       classIds: ['wizard'],
@@ -355,9 +369,20 @@ describe('spellFormDef resolution integration', () => {
     expect(result.success).toBe(false)
   })
 
+  it('spellFormSchema rejects missing range and duration on create defaults', () => {
+    const result = spellFormSchema.safeParse({
+      ...spellFormDef.createDefaultValues,
+      name: 'Test',
+      school: 'evocation',
+      level: 1,
+      classIds: ['wizard'],
+    })
+    expect(result.success).toBe(false)
+  })
+
   it('spellFormSchema accepts optional resolution', () => {
     const parsed = spellFormSchema.parse({
-      ...spellFormDef.createDefaultValues,
+      ...publishReadySpellFormValues(),
       name: 'Test',
       school: 'evocation',
       level: 0,
@@ -385,7 +410,7 @@ describe('spellFormDef resolution integration', () => {
 describe('spellFormDef create vs update modes', () => {
   it('create: derives slug from name when slug is omitted', () => {
     const formValues = {
-      ...spellFormDef.createDefaultValues,
+      ...publishReadySpellFormValues(),
       name: 'Custom Bolt',
       school: 'evocation',
       level: 1,
@@ -443,36 +468,32 @@ describe('spellFormDef basics tab', () => {
     return columns
   }
 
+  function basicsFieldKey(field: FormItem): string | undefined {
+    if ('name' in field && typeof field.name === 'string') return field.name
+    if (isContainer(field) && field.kind === 'dependent' && 'name' in field.controller) {
+      return field.controller.name
+    }
+    return undefined
+  }
+
   it('authors School, Classes, and Description on the left and Level on the right', () => {
     const columns = basicsColumns()
     expect(columns.collapseOrder).toBe('interleave')
 
     const [left, right] = columns.columns
-    expect(
-      left?.fields.map((field) =>
-        'legend' in field ? field.legend : 'name' in field ? field.name : undefined,
-      ),
-    ).toEqual(['School', 'classIds', 'description'])
-    expect(right?.fields.map((field) => ('legend' in field ? field.legend : undefined))).toEqual([
-      'Level',
-    ])
+    expect(left?.fields.map(basicsFieldKey)).toEqual(['school', 'classIds', 'description'])
+    expect(right?.fields.map(basicsFieldKey)).toEqual(['level'])
   })
 
   it('stacks School, Level, Classes, then Description', () => {
     const columns = basicsColumns()
     expect(
-      resolveColumnsCollapseSequence(columns.columns, columns.collapseOrder).map((field) =>
-        'legend' in field ? field.legend : 'name' in field ? field.name : undefined,
-      ),
-    ).toEqual(['School', 'Level', 'classIds', 'description'])
+      resolveColumnsCollapseSequence(columns.columns, columns.collapseOrder).map(basicsFieldKey),
+    ).toEqual(['school', 'level', 'classIds', 'description'])
   })
 
   it('uses a single-select level chip with nested scaling dependents', () => {
-    const levelGroup = findGroup(
-      spellFormDef.buildTabs!({}).find((tab) => tab.id === 'basics')?.fields ?? [],
-      'Level',
-    )
-    const levelDependent = levelGroup?.fields[0]
+    const levelDependent = basicsColumns().columns[1]?.fields[0]
     if (!levelDependent || !isContainer(levelDependent) || levelDependent.kind !== 'dependent') {
       throw new Error('Expected Level dependent')
     }
@@ -480,6 +501,7 @@ describe('spellFormDef basics tab', () => {
     expect(levelDependent.controller).toMatchObject({
       type: 'chips',
       name: 'level',
+      label: 'Level',
       multiple: false,
     })
     expect(levelDependent.controller).not.toHaveProperty('defaultValue')

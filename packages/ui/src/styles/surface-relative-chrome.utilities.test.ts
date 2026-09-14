@@ -24,6 +24,8 @@ const SURFACE_RELATIVE_UTILITY_NAMES = [
   'border-semantic-neutral-border',
   'bg-border',
   'divide-border',
+  'divide-border-subtle',
+  'divide-border-faint',
 ] as const
 
 type MixSource = 'foreground' | 'primary'
@@ -60,6 +62,8 @@ const UTILITY_INGREDIENT_OWNERSHIP = {
   'border-semantic-neutral-border': { mixSource: 'foreground', mixVar: '--mix-border-default' },
   'bg-border': { mixSource: 'foreground', mixVar: '--mix-border-default' },
   'divide-border': { mixSource: 'foreground', mixVar: '--mix-border-default' },
+  'divide-border-subtle': { mixSource: 'foreground', mixVar: '--mix-border-subtle' },
+  'divide-border-faint': { mixSource: 'foreground', mixVar: '--mix-border-faint' },
 } satisfies Record<(typeof SURFACE_RELATIVE_UTILITY_NAMES)[number], UtilityIngredientOwnership>
 
 function readUtilityBlock(css: string, utilityName: string): string {
@@ -87,6 +91,11 @@ describe('surface-relative chrome utilities', () => {
       expect(block).toContain('var(--surface-current)')
     },
   )
+
+  it('defines border-neutral-contrast from the palette neutral-contrast bridge', () => {
+    const block = readUtilityBlock(utilitiesCss, 'border-neutral-contrast')
+    expect(block).toContain('border-color: var(--border-neutral-contrast)')
+  })
 
   it('uses live var(--border) in the base safety-net rule without --color-border', () => {
     const baseRule = globalsCss.match(

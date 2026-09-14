@@ -153,7 +153,8 @@ describe('CatalogOverviewTable', () => {
     )
 
     expect(screen.getByText('1 result')).toBeInTheDocument()
-    expect(screen.getByText('1 hidden')).toBeInTheDocument()
+    expect(screen.getByText('1 unavailable')).toBeInTheDocument()
+    expect(screen.queryByText(/1 available/i)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /show all/i })).toBeInTheDocument()
   })
 })

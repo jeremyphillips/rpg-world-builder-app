@@ -22,3 +22,6 @@ export type PreviewRailAvailability = {
 export type PreviewRailStatusPanelVariant = Extract<AlertVariant, 'default' | 'success' | 'warning'>
 
 export type PreviewRailChrome = 'card' | 'plain'
+
+/** Bounded aside fill — flex-1 inside a min-h-0 flex column; internal ScrollRegion scrolls. */
+export type PreviewRailLayout = 'default' | 'fill'

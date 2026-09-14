@@ -21,4 +21,19 @@ describe('ContentFormDef preview coverage', () => {
 
     expect(Object.keys(sections).sort()).toEqual([...tabs.map((tab) => tab.id)].sort())
   })
+
+  it.each(previewEntries)(
+    '$routeKey preview builds identity and sections from create defaults without throwing',
+    (def) => {
+      const ctx = {
+        campaignId: 'camp_1',
+        mode: 'create' as const,
+        entitySource: 'homebrew' as const,
+      }
+      const values = { ...def.createDefaultValues, name: '' }
+
+      expect(() => def.preview!.buildIdentity(values, ctx)).not.toThrow()
+      expect(() => def.preview!.buildSections(values, ctx)).not.toThrow()
+    },
+  )
 })

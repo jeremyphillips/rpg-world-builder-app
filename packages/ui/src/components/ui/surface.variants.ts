@@ -73,8 +73,8 @@ export function resolveSurfaceClasses(config: SurfaceChromeConfig = {}): string 
 /** Default neutral panel wash when chrome omits tone and emphasis. */
 export const DEFAULT_PANEL_SURFACE: SurfaceConfig = { emphasis: 'subtle', elevation: 'flat' }
 
-/** Default array item shell — raised card plane. */
-export const DEFAULT_ARRAY_ITEM_SURFACE: SurfaceConfig = { elevation: 'raised' }
+/** Default array item header — subtle wash; collapsible body uses the canvas plane. */
+export const DEFAULT_ARRAY_ITEM_SURFACE: SurfaceConfig = { emphasis: 'subtle', elevation: 'flat' }
 
 /** Default dependent container wash. */
 export const DEFAULT_DEPENDENT_SURFACE: SurfaceConfig = { emphasis: 'subtle', elevation: 'flat' }

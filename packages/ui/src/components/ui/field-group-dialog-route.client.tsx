@@ -17,6 +17,7 @@ export type FieldGroupDialogRouteProps = {
   collapseKey: string
   disclosure: FieldGroupDialogDisclosure
   formControl?: Control<FieldValues>
+  namePrefix?: string
   children: ReactNode
 }
 
@@ -30,6 +31,7 @@ export function FieldGroupDialogRoute({
   collapseKey,
   disclosure,
   formControl,
+  namePrefix,
   children,
 }: FieldGroupDialogRouteProps) {
   const { legend: resolvedLegend, formControl: resolvedFormControl } =
@@ -48,6 +50,7 @@ export function FieldGroupDialogRoute({
       className={className}
       disclosure={disclosure}
       control={resolvedFormControl}
+      namePrefix={namePrefix}
     >
       {children}
     </FieldGroupDialogDisclosureView>

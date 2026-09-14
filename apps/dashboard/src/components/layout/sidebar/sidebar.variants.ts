@@ -30,7 +30,7 @@ export const sidebarNavScrollClasses =
 
 export const sidebarAsideVariants = cva(
   cn(
-    'fixed inset-y-0 left-0 z-50 flex h-dvh max-h-dvh w-sidebar shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar transition-transform md:static md:translate-x-0',
+    'fixed inset-y-0 left-0 z-50 flex h-dvh max-h-dvh w-sidebar shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar transition-transform md:sticky md:top-0 md:translate-x-0',
     establishSurfaceCurrent('sidebar'),
   ),
   {

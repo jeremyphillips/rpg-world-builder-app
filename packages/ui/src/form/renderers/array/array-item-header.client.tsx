@@ -42,7 +42,7 @@ export function ArrayItemDragHandle(props: ArrayItemDragHandleProps) {
   return <CollapsibleListItemDragHandle {...props} />
 }
 
-function renderArrayItemTitleLine(header: ResolvedArrayItemHeader): React.ReactNode {
+export function renderArrayItemTitleLine(header: ResolvedArrayItemHeader): React.ReactNode {
   if (header.primary) {
     return (
       <>
@@ -180,6 +180,55 @@ function ArrayItemTitleRow({
   )
 }
 
+export interface ArrayItemHeaderContentProps {
+  header: ResolvedArrayItemHeader
+}
+
+/** Visible title line for detailed array items — grip/caret live in CollapsibleListItemToolbar. */
+export function ArrayItemHeaderContent({ header }: ArrayItemHeaderContentProps) {
+  if (header.srOnly) return <span className="sr-only">{header.ariaLabel}</span>
+
+  return <div className={arrayItemHeaderTitleClasses}>{renderArrayItemTitleLine(header)}</div>
+}
+
+export interface ArrayItemHeaderSummaryProps {
+  summary?: string
+  issueSummary?: ArrayItemIssueSummaryProps
+  collapsed: boolean
+  leadingChrome: ArrayItemLeadingChromeOptions
+  /** When true, summary lines include toolbar-column indent (stuffed-main shell path). */
+  indentSummary?: boolean
+}
+
+export function ArrayItemHeaderSummary({
+  summary,
+  issueSummary,
+  collapsed,
+  leadingChrome,
+  indentSummary = false,
+}: ArrayItemHeaderSummaryProps) {
+  if (!summary && !issueSummary) return null
+
+  const summaryIndent = indentSummary
+    ? arrayItemHeaderSummaryIndentClasses(leadingChrome)
+    : undefined
+
+  return (
+    <>
+      {issueSummary ? (
+        <ArrayItemIssueSummary
+          {...issueSummary}
+          placement={issueSummary.placement ?? (collapsed ? 'collapsed' : 'expanded')}
+          className={cn(issueSummary.className, summaryIndent)}
+        />
+      ) : null}
+      {summary ? (
+        <p className={cn(arrayItemHeaderSummaryClasses, summaryIndent)}>{summary}</p>
+      ) : null}
+    </>
+  )
+}
+
 interface ArrayItemHeaderExtrasProps {
   summary?: string
   issueSummary?: ArrayItemIssueSummaryProps
@@ -194,25 +243,13 @@ function ArrayItemHeaderExtras({
   leadingChrome,
 }: ArrayItemHeaderExtrasProps) {
   return (
-    <>
-      {issueSummary ? (
-        <ArrayItemIssueSummary
-          {...issueSummary}
-          placement={issueSummary.placement ?? (collapsed ? 'collapsed' : 'expanded')}
-          className={cn(issueSummary.className, arrayItemHeaderSummaryIndentClasses(leadingChrome))}
-        />
-      ) : null}
-      {summary ? (
-        <p
-          className={cn(
-            arrayItemHeaderSummaryClasses,
-            arrayItemHeaderSummaryIndentClasses(leadingChrome),
-          )}
-        >
-          {summary}
-        </p>
-      ) : null}
-    </>
+    <ArrayItemHeaderSummary
+      summary={summary}
+      issueSummary={issueSummary}
+      collapsed={collapsed}
+      leadingChrome={leadingChrome}
+      indentSummary
+    />
   )
 }
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   SURFACE_CURRENT_PLANES,
   establishSurfaceCurrent,
+  portalDropdownSurfaceClasses,
   portalPopoverSurfaceClasses,
 } from './surface-current.lib'
 
@@ -13,5 +14,9 @@ describe('establishSurfaceCurrent', () => {
 
   it('exports portal popover establish classes', () => {
     expect(portalPopoverSurfaceClasses).toBe('[--surface-current:var(--popover)]')
+  })
+
+  it('exports portal dropdown establish classes', () => {
+    expect(portalDropdownSurfaceClasses).toBe('[--surface-current:var(--field-container)]')
   })
 })

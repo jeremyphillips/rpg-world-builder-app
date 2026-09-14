@@ -67,7 +67,7 @@ describe('DisclosureEntityCard', () => {
 
     const body = screen.getByText('Expanded inventory details').parentElement
     expect(body).not.toHaveAttribute('hidden')
-    expect(body).toHaveClass('border-t', 'bg-surface-muted')
+    expect(body).toHaveClass('border-t', 'bg-background')
     expect(body).toHaveClass(disclosureEntityCardBodyInlineStartClasses)
     expect(body).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
 
@@ -231,9 +231,9 @@ describe('DisclosureEntityCard', () => {
     expect(article).toHaveClass('opacity-60')
   })
 
-  it('owns card plane fill independent of parent host surfaces', () => {
+  it('owns subtle header fill independent of parent host surfaces', () => {
     const { container } = render(
-      <div className="bg-surface-subtle">
+      <div className="bg-surface-muted">
         <DisclosureEntityCard
           itemId="harbor"
           toolbarAriaLabel="Harbor District"
@@ -246,8 +246,8 @@ describe('DisclosureEntityCard', () => {
     )
 
     const article = container.querySelector('article')
-    expect(article).toHaveClass('bg-card')
-    expect(article?.className).toContain('[--surface-current:var(--card)]')
+    expect(article).toHaveClass('bg-surface-subtle')
+    expect(article?.className).toContain('[--surface-current:var(--surface-subtle)]')
   })
 
   it('forwards trailing seam to EntityAnatomyHost anatomy', () => {

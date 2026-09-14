@@ -417,7 +417,7 @@ describe('classFormDef round-trips', () => {
 describe('classFormDef create vs update modes', () => {
   it('create: derives slug and assigns feature ids for new rows', () => {
     const formValues = publishReadyClassValues({
-      features: [{ name: 'Second Wind', level: 1, grants: [] }],
+      features: [{ name: 'Second Wind', level: 1, grants: [], available: true }],
     })
     const input = classFormDef.toInput(formValues)
     expect(input.slug).toBe(deriveContentKey('Custom Class'))

@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
+import { cn, collapsibleListItemBodyFrameClasses, establishSurfaceCurrent } from '@rpg/ui'
 
 import { ENTITY_SURFACE_INLINE_END_VAR } from '../../anatomy/entity-geometry.tokens'
 import {
@@ -24,18 +24,18 @@ export const catalogEntityRowInsetRootVariants = cva('w-full min-w-0', {
   },
 })
 
-/** Header padding — horizontal inset from surface tokens; compact vertical rhythm. */
+/** Header padding — horizontal inset from surface tokens only; CLI owns vertical rhythm. */
 export const catalogEntityRowHeaderPaddingVariants = cva(
-  cn('w-full min-w-0 py-2', entitySurfaceHorizontalInsetClasses),
+  cn('w-full min-w-0', entitySurfaceHorizontalInsetClasses),
 )
 
 /** Expanded body wash — entity-aware inline start/end; replaces CLI catalog bleed. */
 export const catalogEntityRowBodyWashVariants = cva(
   cn(
-    'border-t border-border-subtle bg-surface-muted',
+    collapsibleListItemBodyFrameClasses,
+    'bg-surface-muted',
     establishSurfaceCurrent('surface-muted'),
     catalogEntityRowBodyInlineStartClasses,
     catalogEntityRowBodyInlineEndClasses,
-    'pb-3 pt-3',
   ),
 )

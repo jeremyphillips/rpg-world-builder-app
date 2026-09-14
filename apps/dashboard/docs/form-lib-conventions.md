@@ -245,8 +245,18 @@ paths. `errorPaths` drives tab UX; `resolverFields` drives validation message co
 subclasses management) set `skipHeaderOnlyValidationWiring: true`.
 
 **Tests:** `assertHeaderOnlyTabsHaveValidationWiring(tabs)` in
-`tabbed-form-validation-test-utils.ts` — used by `content-form-validation.test.ts`
+`tabbed-form-validation-test-utils.ts` — used by `content-form-tab-ownership.test.ts`
 and co-located form tests.
+
+**Hoisted name ownership:** `ContentSchemaFormShell` augments the first tab with
+`errorPaths: ['name']` and the def's `nameField` in `resolverFields` via
+`augmentTabsWithHoistedName` — feature `buildTabs` helpers should not repeat this.
+
+**Registry drift guards** (`content-form-tab-ownership.test.ts`):
+
+1. Every publish-schema top-level key is owned by a tab prefix (plus automated name).
+2. `draftSchema.safeParse({ ...createDefaultValues, name: 'X' })` succeeds for every def.
+3. Header-only tab wiring is asserted for species, classes, and spells.
 
 Level-range tier arrays use `buildLevelRangeTiersArrayField` with
 `arrayPattern: { kind: 'levelRange' }`. Cross-row select filtering uses

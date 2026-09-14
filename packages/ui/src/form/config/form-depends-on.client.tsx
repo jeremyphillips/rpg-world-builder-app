@@ -3,13 +3,15 @@
 import * as React from 'react'
 import { useWatch } from 'react-hook-form'
 
+import { resolveDependsOnWatchName } from './form-depends-on.lib'
+
 /** Watches `dependsOn` fields and returns a map keyed by relative field names. */
 export function useDependsOnValues(
   dependsOn: readonly string[],
   namePrefix?: string,
 ): Record<string, unknown> {
   const prefixedDeps = React.useMemo(
-    () => (namePrefix ? dependsOn.map((dep) => `${namePrefix}.${dep}`) : [...dependsOn]),
+    () => dependsOn.map((dep) => resolveDependsOnWatchName(dep, namePrefix)),
     [dependsOn, namePrefix],
   )
   const watched = useWatch({

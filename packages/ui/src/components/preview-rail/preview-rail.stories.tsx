@@ -182,6 +182,78 @@ export const PostSubmitAttention: Story = {
   ),
 }
 
+export const ViewportAsideFill: Story = {
+  name: 'Viewport aside fill',
+  parameters: { layout: 'fullscreen' },
+  render: () => (
+    <div className="flex h-[32rem] flex-col overflow-hidden bg-background p-8">
+      <div className="mx-auto flex min-h-0 w-full max-w-[calc(56rem+1.5rem+280px)] flex-1 xl:grid xl:grid-cols-[minmax(0,1fr)_280px] xl:grid-rows-[minmax(0,1fr)] xl:gap-6">
+        <div className="min-h-0 rounded-md border border-dashed border-border-subtle bg-muted" />
+        <div className="hidden min-h-0 xl:flex xl:flex-col">
+          <PreviewRail layout="fill">
+            <PreviewRail.Header title="Class Preview" badge={<PreviewRail.DraftBadge />} />
+            <PreviewRail.Identity
+              media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
+              name="Fighter"
+              availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+            />
+            <PreviewRail.ScrollRegion>
+              <PreviewRail.Sections defaultValue="basics">
+                <PreviewRail.Section
+                  id="basics"
+                  label="Basics"
+                  marker="ready"
+                  status="Ready"
+                  statusTone="success"
+                >
+                  <PreviewRail.SectionBody
+                    description="A brief description will appear here once provided."
+                    facts={identityFacts}
+                  />
+                </PreviewRail.Section>
+                <PreviewRail.Section
+                  id="features"
+                  label="Features"
+                  marker="ready"
+                  status="5 default features"
+                />
+                <PreviewRail.Section
+                  id="spellcasting"
+                  label="Spellcasting"
+                  marker="off"
+                  status="Off"
+                  expandable={false}
+                />
+                <PreviewRail.Section
+                  id="equipment"
+                  label="Equipment"
+                  marker="ready"
+                  status="Ready"
+                  statusTone="success"
+                />
+                <PreviewRail.Section
+                  id="subclasses"
+                  label="Subclasses"
+                  marker="incomplete"
+                  status="Incomplete"
+                />
+              </PreviewRail.Sections>
+            </PreviewRail.ScrollRegion>
+            <PreviewRail.Footer>
+              <PreviewRail.StatusPanel
+                variant="success"
+                title="Ready to publish"
+                description="Required configuration is complete."
+              />
+              <PreviewRail.Action label="Preview as player" icon={<Eye />} />
+            </PreviewRail.Footer>
+          </PreviewRail>
+        </div>
+      </div>
+    </div>
+  ),
+}
+
 export const LongNameTruncation: Story = {
   render: () => (
     <PreviewRail sticky>

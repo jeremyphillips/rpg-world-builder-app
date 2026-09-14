@@ -1,0 +1,26 @@
+import { describe, expect, it } from 'vitest'
+import { render } from '@testing-library/react'
+
+import {
+  VIEWPORT_WORKSPACE_FILL_ATTR,
+  VIEWPORT_WORKSPACE_FILL_VALUE,
+  viewportWorkspaceClasses,
+} from './viewport-workspace.variants'
+import { ViewportWorkspace } from './viewport-workspace'
+
+describe('ViewportWorkspace', () => {
+  it('is a bounded flex column workspace that fills remaining main height', () => {
+    const { container } = render(
+      <ViewportWorkspace>
+        <p>Body</p>
+      </ViewportWorkspace>,
+    )
+
+    const root = container.firstElementChild
+    expect(root).toHaveClass(...viewportWorkspaceClasses.split(/\s+/).filter(Boolean))
+    expect(root).toHaveClass('flex', 'flex-1', 'flex-col', 'overflow-hidden', 'min-h-0', 'h-0')
+    expect(root?.className).not.toContain('block-size:')
+    expect(root).not.toHaveAttribute('data-scroll-container')
+    expect(root).toHaveAttribute(VIEWPORT_WORKSPACE_FILL_ATTR, VIEWPORT_WORKSPACE_FILL_VALUE)
+  })
+})

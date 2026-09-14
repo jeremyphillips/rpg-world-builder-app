@@ -57,6 +57,40 @@ export interface ArrayItemActionsRailProps {
   className?: string
 }
 
+/** Action controls without the outer rail shell — for CollapsibleListItem `actions` slot. */
+export function ArrayItemActionsContent({
+  removeAriaLabel,
+  canRemove,
+  onRemove,
+  showDefaultRemove = true,
+  customRemove,
+  issueCount = 0,
+  issueRowLabel,
+  onIssuePress,
+  badgeProminence = 'nav',
+  compact = false,
+}: Omit<ArrayItemActionsRailProps, 'embedded' | 'className'>) {
+  return (
+    <>
+      <ArrayItemIssueBadge
+        issueCount={issueCount}
+        rowLabel={issueRowLabel ?? removeAriaLabel.replace(/^Remove\s+/, '')}
+        onPress={onIssuePress}
+        compact={compact}
+        prominence={badgeProminence}
+      />
+      {customRemove}
+      {showDefaultRemove ? (
+        <ArrayItemRemoveButton
+          ariaLabel={removeAriaLabel}
+          canRemove={canRemove}
+          onRemove={onRemove}
+        />
+      ) : null}
+    </>
+  )
+}
+
 /**
  * Top-right action cluster for one array item row.
  */
@@ -80,21 +114,18 @@ export function ArrayItemActionsRail({
       aria-label="Item actions"
       className={cn(arrayItemActionsRailClasses({ compact, embedded }), className)}
     >
-      <ArrayItemIssueBadge
+      <ArrayItemActionsContent
+        removeAriaLabel={removeAriaLabel}
+        canRemove={canRemove}
+        onRemove={onRemove}
+        showDefaultRemove={showDefaultRemove}
+        customRemove={customRemove}
         issueCount={issueCount}
-        rowLabel={issueRowLabel ?? removeAriaLabel.replace(/^Remove\s+/, '')}
-        onPress={onIssuePress}
+        issueRowLabel={issueRowLabel}
+        onIssuePress={onIssuePress}
+        badgeProminence={badgeProminence}
         compact={compact}
-        prominence={badgeProminence}
       />
-      {customRemove}
-      {showDefaultRemove ? (
-        <ArrayItemRemoveButton
-          ariaLabel={removeAriaLabel}
-          canRemove={canRemove}
-          onRemove={onRemove}
-        />
-      ) : null}
     </div>
   )
 }

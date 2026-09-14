@@ -1,0 +1,33 @@
+/*
+ * Master-detail list shell viewport cap — publishes `--master-detail-shell-max-block-size`
+ * once for the always-valid dvh + content fallback; consumers read that var for min-height
+ * floors. Inside `form-scroll-body-container`, tighten max-height against the definite clip
+ * slot without redefining the fallback custom property (invalid 100cqh must not wipe it).
+ */
+
+@utility master-detail-list-shell-viewport-cap {
+  --master-detail-shell-max-block-size: min(
+    calc(
+      var(--master-detail-list-max-block-size) + var(--master-detail-list-chrome-block-size, 0px)
+    ),
+    max(
+      0px,
+      calc(100dvh - var(--rpg-content-top-inset, 0px) - var(--rpg-content-bottom-inset, 0px))
+    )
+  );
+
+  max-height: var(--master-detail-shell-max-block-size);
+
+  @container form-scroll-body (min-height: 0) {
+    max-height: min(
+      var(--master-detail-shell-max-block-size),
+      max(
+        0px,
+        calc(
+          100cqh - var(--rpg-form-docked-scroll-top-chrome-inset, 0px) -
+            var(--rpg-content-floor-gap, 0px)
+        )
+      )
+    );
+  }
+}

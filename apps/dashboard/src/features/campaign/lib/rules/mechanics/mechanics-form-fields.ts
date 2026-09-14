@@ -41,7 +41,7 @@ type MechanicsFieldOptions = {
 }
 
 const EDITION_PRESET_RECOMMENDED_BADGE = 'Recommended'
-const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-20'
+const SCROLL_SECTION_ANCHOR_CLASS = 'scroll-mt-8'
 
 function editionPresetOptionsWithRecommendedBadge(options: FieldOption[]): FieldOption[] {
   return options.map((option) =>

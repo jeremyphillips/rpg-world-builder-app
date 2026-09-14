@@ -6,6 +6,8 @@ import {
   arrayItemCompactRowClasses,
   arrayItemCompactGripClasses,
   arrayItemDragHandleClasses,
+  arrayItemHeaderSummaryClasses,
+  arrayItemHeaderTitleClasses,
   arrayItemMainClasses,
   arrayItemRemoveButtonClasses,
   arrayItemShellClasses,
@@ -17,6 +19,13 @@ import {
 import { resolveFieldContainerChromeClasses } from '../../../components/ui/field-surface.variants'
 
 describe('array item shell variants', () => {
+  it('uses leading-snug on truncated header copy so descenders are not clipped', () => {
+    expect(arrayItemHeaderTitleClasses).toContain('leading-snug')
+    expect(arrayItemHeaderTitleClasses).not.toContain('leading-none')
+    expect(arrayItemHeaderSummaryClasses).toContain('leading-snug')
+    expect(arrayItemHeaderSummaryClasses).not.toContain('leading-none')
+  })
+
   it('uses a two-column grid with top-aligned actions and shell padding', () => {
     expect(arrayItemShellClasses).toContain('grid-cols-[minmax(0,1fr)_auto]')
     expect(arrayItemShellClasses).toContain('items-start')
@@ -70,13 +79,24 @@ describe('array item shell variants', () => {
     )
   })
 
-  it('derives body indent from chrome count via shell CSS variable', () => {
+  it('bleeds detailed bodies to the shell edge with inline-start content inset', () => {
     expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: false })).toContain(
-      '--content-column-indent',
+      '--content-inline-start',
     )
     expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toContain(
+      '--content-inline-start',
+    )
+    expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toContain('-ml-2')
+    expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).not.toContain(
       '--content-column-indent',
     )
+  })
+
+  it('paints the collapsible body on the canvas plane', () => {
+    const classes = arrayItemBodyClasses({ showDragHandle: true, collapsible: true })
+    expect(classes).toContain('bg-background')
+    expect(classes).toContain('border-t')
+    expect(classes).toContain('[--surface-current:var(--background)]')
   })
 
   it('applies shared surface classes for array item chrome', () => {

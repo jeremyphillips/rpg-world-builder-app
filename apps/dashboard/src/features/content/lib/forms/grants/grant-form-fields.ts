@@ -37,6 +37,8 @@ import {
   type FieldVisibility,
   type FormItem,
   type InlineSentenceFieldConfig,
+  type SelectFieldOptionListItem,
+  flattenSelectFieldOptions,
 } from '@rpg/ui/form'
 import { createElement } from 'react'
 
@@ -92,6 +94,47 @@ import {
   GRANT_ROW_TYPE_LABELS,
   type GrantType,
 } from './grant-form-schema'
+
+export type GrantItemFieldsOptions = {
+  /** When set, grant unlock defaults to the parent row field and only later levels are selectable. */
+  inheritUnlockFromParentField?: 'level'
+}
+
+function parseParentUnlockLevel(parentLevel: unknown): number | undefined {
+  if (parentLevel === undefined || parentLevel === null || parentLevel === '') return undefined
+  const level = typeof parentLevel === 'number' ? parentLevel : Number(parentLevel)
+  return Number.isFinite(level) ? level : undefined
+}
+
+/** Default unlock label; includes parent level when inheriting from a class feature row. */
+export function formatGrantDefaultUnlockLabel(parentLevel?: number): string {
+  if (parentLevel !== undefined) {
+    return `${GRANT_DEFAULT_UNLOCK_LABEL} (level ${parentLevel})`
+  }
+  return GRANT_DEFAULT_UNLOCK_LABEL
+}
+
+/** Builds Granted-at select options, optionally scoped to levels after a parent feature level. */
+export function buildGrantUnlockLevelOptions(
+  levelOptions: SelectFieldOptionListItem[],
+  parentLevelInput?: unknown,
+): FieldOption[] {
+  const parentLevel = parseParentUnlockLevel(parentLevelInput)
+  const defaultOption: FieldOption = {
+    value: GRANT_DEFAULT_UNLOCK_LEVEL,
+    label: formatGrantDefaultUnlockLabel(parentLevel),
+  }
+
+  const flatLevels = flattenSelectFieldOptions(
+    withLevelOptionLabels(levelOptions, formatGrantUnlockLevelLabel),
+  )
+
+  if (parentLevel === undefined) {
+    return [defaultOption, ...flatLevels]
+  }
+
+  return [defaultOption, ...flatLevels.filter((option) => Number(option.value) > parentLevel)]
+}
 
 const movementModeOptions: FieldOption[] = MOVEMENT_MODES.map((mode) => ({
   value: mode,
@@ -571,6 +614,7 @@ export function grantItemFields<T extends string>(
   grantTypes: readonly T[],
   _labels: Record<T, string>,
   ctx: ContentFormCtx,
+  options?: GrantItemFieldsOptions,
 ): FormItem[] {
   const spellOptions = toSortedContentFieldOptions(ctx.options?.spells?.forReference(), 'spells')
   const featOptions = toSortedContentFieldOptions(ctx.options?.feats?.forReference(), 'feats')
@@ -579,10 +623,8 @@ export function grantItemFields<T extends string>(
   const languageOptions = buildActiveLanguageFieldOptions(ctx.languageVocabulary)
   const levelOptions = getLevelFieldOptions(ctx)
 
-  const unlockLevelOptions = [
-    { value: GRANT_DEFAULT_UNLOCK_LEVEL, label: GRANT_DEFAULT_UNLOCK_LABEL },
-    ...withLevelOptionLabels(levelOptions, formatGrantUnlockLevelLabel),
-  ]
+  const unlockLevelOptions = buildGrantUnlockLevelOptions(levelOptions)
+  const inheritUnlockFromParent = options?.inheritUnlockFromParentField === 'level'
 
   return [
     ...grantTypeMissingRepairFields(),
@@ -592,6 +634,15 @@ export function grantItemFields<T extends string>(
       label: 'Granted at',
       labelVisibility: 'srOnly',
       visibility: visibleWhenGrantTypeSet(),
+      ...(inheritUnlockFromParent
+        ? {
+            optionsResolve: {
+              dependsOn: ['../../level'],
+              optionsWhen: (values: Record<string, unknown>) =>
+                buildGrantUnlockLevelOptions(levelOptions, values['../../level']),
+            },
+          }
+        : {}),
       segments: [
         { kind: 'text', value: 'Grant this', tone: 'label' },
         {
@@ -781,6 +832,7 @@ export function grantArrayFields<T extends string>(
   grantTypes: readonly T[],
   labels: Record<T, string>,
   ctx: ContentFormCtx,
+  options?: GrantItemFieldsOptions,
 ): FormItem[] {
   const rowLabels = labels as Record<string, string>
   const headerContext = buildGrantRowHeaderContext(rowLabels, ctx)
@@ -803,7 +855,7 @@ export function grantArrayFields<T extends string>(
         },
         renderShell: renderGrantArrayItemShell,
       },
-      fields: grantItemFields(grantTypes, labels, ctx),
+      fields: grantItemFields(grantTypes, labels, ctx, options),
     },
   ]
 }

@@ -1,11 +1,26 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
 import { Form } from '../../shells/form.client'
 import type { FormItem } from '../../field-config'
+
+function RaiseFeatureLevelButton() {
+  const form = useFormContext()
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        form.setValue('features.0.level', '6', { shouldDirty: true, shouldValidate: true })
+      }
+    >
+      Raise level
+    </button>
+  )
+}
 
 const selectOnlySchema = z.object({
   unlockLevel: z.string(),
@@ -331,5 +346,114 @@ describe('InlineSentenceField form integration', () => {
     )
 
     expect(screen.getByRole('combobox', { name: 'Die faces' })).toHaveTextContent('10')
+  })
+
+  it('resolves parent-relative options and snaps invalid unlock values', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+
+    const schema = z.object({
+      features: z.array(
+        z.object({
+          level: z.coerce.number(),
+          grants: z.array(
+            z.object({
+              unlockLevel: z.union([z.literal('default'), z.coerce.number()]),
+            }),
+          ),
+        }),
+      ),
+    })
+
+    const fields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'features',
+        fields: [
+          {
+            type: 'select',
+            name: 'level',
+            label: 'Level',
+            options: [
+              { value: '3', label: 'Level 3' },
+              { value: '6', label: 'Level 6' },
+            ],
+          },
+          {
+            kind: 'array',
+            name: 'grants',
+            fields: [
+              {
+                type: 'inlineSentence',
+                name: 'unlockLevel',
+                label: 'Granted at',
+                optionsResolve: {
+                  dependsOn: ['../../level'],
+                  optionsWhen: (values) => {
+                    const parentLevel = Number(values['../../level'])
+                    const defaultOption = {
+                      value: 'default',
+                      label: `when feature is gained (level ${parentLevel})`,
+                    }
+                    const laterLevels = [
+                      { value: '5', label: 'at level 5' },
+                      { value: '7', label: 'at level 7' },
+                    ].filter((option) => Number(option.value) > parentLevel)
+
+                    return [defaultOption, ...laterLevels]
+                  },
+                },
+                segments: [
+                  {
+                    kind: 'select',
+                    name: 'unlockLevel',
+                    options: [
+                      { value: 'default', label: 'when feature is gained' },
+                      { value: '5', label: 'at level 5' },
+                      { value: '7', label: 'at level 7' },
+                    ],
+                    defaultValue: 'default',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        defaultValues={{
+          features: [{ level: '3', grants: [{ unlockLevel: '5' }] }],
+        }}
+        onSubmit={onSubmit}
+        footer={
+          <>
+            <RaiseFeatureLevelButton />
+            <button type="submit">Save</button>
+          </>
+        }
+      />,
+    )
+
+    const unlockTrigger = screen.getByRole('combobox', { name: 'Granted at' })
+    expect(unlockTrigger).toHaveTextContent('at level 5')
+
+    await user.click(screen.getByRole('button', { name: 'Raise level' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('combobox', { name: 'Granted at' })).toHaveTextContent(
+        'when feature is gained (level 6)',
+      )
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    expect(onSubmit).toHaveBeenCalledWith(
+      { features: [{ level: 6, grants: [{ unlockLevel: 'default' }] }] },
+      expect.anything(),
+    )
   })
 })

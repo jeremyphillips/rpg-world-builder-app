@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
+import { ViewportWorkspace } from '@/components/layout/page/viewport-workspace'
 import { useCampaigns } from '@/features/campaign'
 import { useFilterUrlState } from '@/lib/filters'
 
@@ -93,48 +94,50 @@ export function MessagesWorkspaceShell() {
   const activeCampaignId = filters.campaignId ?? routeState.campaignId
 
   return (
-    <div className={messagesWorkspaceRootClasses}>
-      <div className={messagesWorkspaceHeaderSectionClasses}>
-        <MessagesWorkspaceHeader
-          isNewRoute={routeState.isNewRoute}
-          onNewMessage={handleNewMessage}
-          onCancel={handleCancelNewMessage}
-        />
-
-        <div className={scopeChromeClasses}>
-          <MessagesCampaignScopeChrome
-            schema={schema}
-            filters={filters}
-            onFilterChange={setFilterValue}
-            clearFilterField={clearFilterField}
-            resetFilters={resetFilters}
-            scopedCount={campaignScope.scopedCount}
-            hiddenCount={campaignScope.hiddenCount}
-            showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
-            onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
+    <ViewportWorkspace>
+      <div className={messagesWorkspaceRootClasses}>
+        <div className={messagesWorkspaceHeaderSectionClasses}>
+          <MessagesWorkspaceHeader
+            isNewRoute={routeState.isNewRoute}
+            onNewMessage={handleNewMessage}
+            onCancel={handleCancelNewMessage}
           />
-        </div>
-      </div>
 
-      <div className={messagesWorkspaceBodyClasses}>
-        <aside className={leftPaneClasses} aria-label={MESSAGES_A11Y_COPY.conversations}>
-          {routeState.isNewRoute ? (
-            <MessagesRecipientPickerPane campaignId={activeCampaignId} />
-          ) : (
-            <MessagesDirectListPane
-              activeConversationId={routeState.activeConversationId}
-              campaignId={activeCampaignId}
-              scope={campaignScope.scope}
-              loadedCount={campaignScope.loadedCount}
+          <div className={scopeChromeClasses}>
+            <MessagesCampaignScopeChrome
+              schema={schema}
+              filters={filters}
+              onFilterChange={setFilterValue}
+              clearFilterField={clearFilterField}
+              resetFilters={resetFilters}
               scopedCount={campaignScope.scopedCount}
-              hasMoreConversations={campaignScope.hasMoreConversations}
+              hiddenCount={campaignScope.hiddenCount}
+              showInvalidScopeNotice={campaignScope.showInvalidScopeNotice}
+              onDismissInvalidScopeNotice={campaignScope.dismissInvalidScopeNotice}
             />
-          )}
-        </aside>
+          </div>
+        </div>
 
-        <MessagesWorkspaceRightPane {...routeState} campaignId={activeCampaignId} />
+        <div className={messagesWorkspaceBodyClasses}>
+          <aside className={leftPaneClasses} aria-label={MESSAGES_A11Y_COPY.conversations}>
+            {routeState.isNewRoute ? (
+              <MessagesRecipientPickerPane campaignId={activeCampaignId} />
+            ) : (
+              <MessagesDirectListPane
+                activeConversationId={routeState.activeConversationId}
+                campaignId={activeCampaignId}
+                scope={campaignScope.scope}
+                loadedCount={campaignScope.loadedCount}
+                scopedCount={campaignScope.scopedCount}
+                hasMoreConversations={campaignScope.hasMoreConversations}
+              />
+            )}
+          </aside>
+
+          <MessagesWorkspaceRightPane {...routeState} campaignId={activeCampaignId} />
+        </div>
+        <Outlet />
       </div>
-      <Outlet />
-    </div>
+    </ViewportWorkspace>
   )
 }

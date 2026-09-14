@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react'
 
 import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { ViewportWorkspace } from '@/components/layout/page/viewport-workspace'
+import { viewportWorkspacePaneClasses } from '@/components/layout/page/viewport-workspace.variants'
 import { WidePage } from '@/components/layout/page/wide-page'
+
+import { contentFormPageShellBodyClasses } from './content-form-page-shell.variants'
 
 export interface ContentFormPageShellProps {
   usePreviewLayout: boolean
@@ -15,17 +19,17 @@ export function ContentFormPageShell({
   children,
   className,
 }: ContentFormPageShellProps) {
-  if (!usePreviewLayout) {
-    return (
-      <NarrowPage scroll="viewport" spacing="none" className={className}>
-        {children}
-      </NarrowPage>
-    )
-  }
-
   return (
-    <WidePage scroll="viewport" spacing="none" className={className}>
-      {children}
-    </WidePage>
+    <ViewportWorkspace className={className}>
+      {usePreviewLayout ? (
+        <WidePage spacing="none" className={viewportWorkspacePaneClasses}>
+          <div className={contentFormPageShellBodyClasses}>{children}</div>
+        </WidePage>
+      ) : (
+        <NarrowPage spacing="none" className={viewportWorkspacePaneClasses}>
+          {children}
+        </NarrowPage>
+      )}
+    </ViewportWorkspace>
   )
 }

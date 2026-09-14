@@ -223,7 +223,7 @@ const arrayItemsScopeSchema = z.object({
   caps: z.array(z.object({ classId: z.string(), maxLevel: z.string() })),
 })
 
-/** Dependent field with array dependents — item shells use elevated card chrome by default. */
+/** Dependent field with array dependents — item shells use a subtle header by default. */
 export const DependentFieldArrayItemsScope: Story = {
   args: {} as Story['args'],
   render: () => (

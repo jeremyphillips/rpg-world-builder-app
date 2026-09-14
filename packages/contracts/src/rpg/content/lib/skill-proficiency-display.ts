@@ -1,3 +1,4 @@
+import { stripHtmlTags } from '../../../lib/strip-html-tags'
 import type { SkillProficiency } from '../skill-proficiency'
 
 export const SKILL_PROFICIENCY_SECTION_LABELS = {
@@ -43,7 +44,7 @@ type SkillProficiencySummaryInput = Pick<SkillProficiency, 'name' | 'description
 export function formatSkillProficiencySummarySentence(
   skill: SkillProficiencySummaryInput,
 ): string | undefined {
-  const predicate = skill.description?.trim()
+  const predicate = stripHtmlTags(skill.description ?? '').trim()
   if (!predicate) return undefined
 
   const withoutTrailingPeriod = predicate.replace(/\.+$/, '')

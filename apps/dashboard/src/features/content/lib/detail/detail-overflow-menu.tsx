@@ -1,4 +1,5 @@
-import { MoreHorizontal } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { MoreHorizontal, Trash2 } from 'lucide-react'
 
 import {
   Button,
@@ -6,11 +7,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuItemContent,
 } from '@rpg/ui'
 
 export type DetailOverflowAction = {
   id: string
   label: string
+  icon?: ReactNode
   destructive?: boolean
   disabled?: boolean
   onSelect: () => void
@@ -19,6 +22,20 @@ export type DetailOverflowAction = {
 export type DetailOverflowMenuProps = {
   actions: readonly DetailOverflowAction[]
   triggerLabel: string
+}
+
+/** Standard destructive delete action with trash icon for detail overflow menus. */
+export function detailOverflowDeleteAction(
+  label: string,
+  onSelect: () => void,
+): DetailOverflowAction {
+  return {
+    id: 'delete',
+    label,
+    icon: <Trash2 aria-hidden />,
+    destructive: true,
+    onSelect,
+  }
 }
 
 export function DetailOverflowMenu({ actions, triggerLabel }: DetailOverflowMenuProps) {
@@ -47,7 +64,7 @@ export function DetailOverflowMenu({ actions, triggerLabel }: DetailOverflowMenu
             className={action.destructive ? 'text-destructive focus:text-destructive' : undefined}
             onSelect={() => action.onSelect()}
           >
-            {action.label}
+            <DropdownMenuItemContent icon={action.icon} label={action.label} />
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

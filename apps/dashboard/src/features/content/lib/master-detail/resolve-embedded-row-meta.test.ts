@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { resolveEmbeddedRowMeta } from './resolve-embedded-row-meta'
 
 describe('resolveEmbeddedRowMeta', () => {
-  it('combines extra availability reasons into badges', () => {
+  it('marks inactive availability without list badges', () => {
     const meta = resolveEmbeddedRowMeta({
       row: { id: 'fighter-subclass' },
       entitySource: 'system',
@@ -14,10 +14,7 @@ describe('resolveEmbeddedRowMeta', () => {
     })
 
     expect(meta.availability.status).toBe('inactive')
-    expect(meta.badges).toEqual([
-      { label: 'System', appearance: 'soft', tone: 'neutral' },
-      { label: 'Inactive', appearance: 'outline', tone: 'warning' },
-    ])
+    expect(meta.sourceLabel).toBe('System')
     expect(meta.deletable).toBe(false)
   })
 
@@ -27,7 +24,7 @@ describe('resolveEmbeddedRowMeta', () => {
       entitySource: 'homebrew',
     })
 
-    expect(meta.badges).toEqual([{ label: 'Homebrew', appearance: 'outline', tone: 'neutral' }])
+    expect(meta.sourceLabel).toBe('Homebrew')
     expect(meta.deletable).toBe(true)
     expect(meta.availability.status).toBe('active')
   })

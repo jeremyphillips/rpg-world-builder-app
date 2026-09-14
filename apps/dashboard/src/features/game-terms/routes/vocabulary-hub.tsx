@@ -29,6 +29,7 @@ function formatTermCount(count: number): string {
   return count === 1 ? '1 term' : `${count} terms`
 }
 
+/** Surface-owned copy: vocabulary sets use "terms", not results/items. */
 function formatUnavailableCount(count: number): string {
   return count === 1 ? '1 unavailable' : `${count} unavailable`
 }

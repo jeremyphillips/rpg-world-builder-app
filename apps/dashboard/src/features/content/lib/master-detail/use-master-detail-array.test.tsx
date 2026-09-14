@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest'
 
 import { useMasterDetailArray } from './use-master-detail-array'
 
-type FeatureRow = { name: string }
+type FeatureRow = { name: string; level?: number }
 
 function createFormWrapper<T extends FieldValues>(defaultValues: DefaultValues<T>) {
   const holder: { form?: UseFormReturn<T, unknown, T> } = {}
@@ -39,7 +39,7 @@ function Wrapper({ children }: { children: ReactNode }) {
   return <FormProvider {...form}>{children}</FormProvider>
 }
 
-const makeDefaults = () => ({ name: '' })
+const makeDefaults = () => ({ name: '', level: 1 })
 
 function setup() {
   return renderHook(() => useMasterDetailArray('features', makeDefaults), { wrapper: Wrapper })
@@ -176,7 +176,7 @@ describe('useMasterDetailArray', () => {
     expect(result.current.selectedIndex).toBe(1)
   })
 
-  it('moves a row and keeps the selection on the moved row', () => {
+  it('moves a row and keeps the selection on the moved row by field id', () => {
     const { Wrapper, getForm } = createFormWrapper({
       features: [{ name: 'A' }, { name: 'B' }, { name: 'C' }],
     })
@@ -184,6 +184,7 @@ describe('useMasterDetailArray', () => {
       wrapper: Wrapper,
     })
 
+    const selectedFieldId = result.current.fields[0]?.id
     act(() => result.current.select(0))
     act(() => result.current.moveDown(0))
 
@@ -192,7 +193,45 @@ describe('useMasterDetailArray', () => {
         .getValues('features')
         .map((row) => row.name),
     ).toEqual(['B', 'A', 'C'])
+    expect(result.current.selectedFieldId).toBe(selectedFieldId)
     expect(result.current.selectedIndex).toBe(1)
+  })
+
+  it('retains selection by field id after normalizeOrder moves a re-leveled row', () => {
+    const { Wrapper, getForm } = createFormWrapper({
+      features: [
+        { name: 'A', level: 1 },
+        { name: 'B', level: 12 },
+        { name: 'C', level: 1 },
+      ],
+    })
+    const { result } = renderHook(() => useMasterDetailArray('features', makeDefaults), {
+      wrapper: Wrapper,
+    })
+
+    act(() => result.current.select(1))
+    const selectedFieldId = result.current.selectedFieldId
+
+    act(() => {
+      getForm().setValue('features.1.level', 1, { shouldDirty: true })
+    })
+
+    act(() => {
+      result.current.normalizeOrder(
+        (left, right) =>
+          ((left as FeatureRow).level ?? Number.POSITIVE_INFINITY) -
+          ((right as FeatureRow).level ?? Number.POSITIVE_INFINITY),
+        { appendFieldId: selectedFieldId ?? undefined },
+      )
+    })
+
+    expect(result.current.selectedFieldId).toBe(selectedFieldId)
+    expect(result.current.selectedIndex).toBe(2)
+    expect(
+      getForm()
+        .getValues('features')
+        .map((row) => row.name),
+    ).toEqual(['A', 'C', 'B'])
   })
 
   it('does not move up the first row', () => {

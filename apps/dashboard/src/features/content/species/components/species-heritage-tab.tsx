@@ -1,25 +1,45 @@
 import { useCallback, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { Button, Text } from '@rpg/ui'
-import { buildItemDefaultValues, FormItems } from '@rpg/ui/form'
+import { FormItems } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
+import {
+  DetailOverflowMenu,
+  detailOverflowDeleteAction,
+} from '../../lib/detail/detail-overflow-menu'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { isEmbeddedRowSystemLocked } from '../../lib/master-detail/is-embedded-row-system-locked'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
+import { useHeritageRemovalFlow } from '../hooks/use-heritage-removal-flow'
 import {
-  ADD_HERITAGE_LABEL,
   ADD_HERITAGE_OPTION_LABEL,
-  HERITAGE_EMPTY_MESSAGE,
-  HERITAGE_OPTION_NOUN,
+  HERITAGE_EMPTY_DESCRIPTION,
+  HERITAGE_EMPTY_TITLE,
+  HERITAGE_GROUP_OVERFLOW_LABEL,
+  HERITAGE_OPTIONS_LIST_TITLE,
+  HERITAGE_OPTION_MASTER_DETAIL_ITEM_NOUN,
+  REMOVE_HERITAGE_GROUP_ACTION,
+  SET_UP_HERITAGE_LABEL,
 } from '../lib/species-heritage-form-labels'
 import { heritageDefaultValues } from '../lib/species-heritage-form-values'
 import { heritageScalarFields, type HeritageForm } from '../lib/species-heritage-form-fields'
 import {
-  traitItemFields,
+  heritageOptionItemFields,
   traitItemTitle,
   type TraitRowForm,
 } from '../lib/species-trait-form-fields'
+import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context'
+import { resolveSpeciesParentCampaignAccess } from '../lib/resolve-species-parent-campaign-access'
+import { heritageOptionItemDefaultValues } from '../lib/species-trait-form-values'
+import {
+  speciesHeritageEmptyStateContentClasses,
+  speciesHeritageEmptyStateDescriptionClasses,
+  speciesHeritageEmptyStateShellClasses,
+  speciesHeritageEmptyStateTitleClasses,
+  speciesHeritageGroupActionsClasses,
+  speciesHeritageGroupShellClasses,
+} from './species-heritage-tab.variants'
 
 const HERITAGE_FIELD_NAME = 'heritage'
 const OPTIONS_FIELD_NAME = 'heritage.options'
@@ -32,20 +52,25 @@ function HeritageEmptyState({ formCtx }: { formCtx: ContentFormCtx }) {
   const { setValue } = useFormContext()
 
   return (
-    <div className="space-y-3">
-      <Text variant="muted" className="text-sm">
-        {HERITAGE_EMPTY_MESSAGE}
-      </Text>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => {
-          setValue(HERITAGE_FIELD_NAME, heritageDefaultValues(formCtx), { shouldDirty: true })
-        }}
-      >
-        {ADD_HERITAGE_LABEL}
-      </Button>
+    <div className={speciesHeritageEmptyStateShellClasses}>
+      <div className={speciesHeritageEmptyStateContentClasses} role="status">
+        <Text as="p" className={speciesHeritageEmptyStateTitleClasses}>
+          {HERITAGE_EMPTY_TITLE}
+        </Text>
+        <Text as="p" className={speciesHeritageEmptyStateDescriptionClasses}>
+          {HERITAGE_EMPTY_DESCRIPTION}
+        </Text>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setValue(HERITAGE_FIELD_NAME, heritageDefaultValues(formCtx), { shouldDirty: true })
+          }}
+        >
+          {SET_UP_HERITAGE_LABEL}
+        </Button>
+      </div>
     </div>
   )
 }
@@ -61,44 +86,82 @@ function HeritageScalarSection({
 }) {
   const scalarFields = useMemo(() => heritageScalarFields(formCtx), [formCtx])
   const heritageLocked = isEmbeddedRowSystemLocked(heritage, formCtx.entitySource)
+  const showRemovalAction = formCtx.entitySource === 'homebrew' && !heritageLocked
+
+  const { handleRemoveClick, removePending, removeError, dialogs } = useHeritageRemovalFlow({
+    campaignId: formCtx.campaignId,
+    speciesId: formCtx.entityId,
+    heritageName: heritage?.name,
+    onRemoved: onRemove,
+  })
 
   return (
-    <div className="space-y-3">
+    <div className={speciesHeritageGroupShellClasses}>
+      {showRemovalAction ? (
+        <div className={speciesHeritageGroupActionsClasses}>
+          <DetailOverflowMenu
+            triggerLabel={HERITAGE_GROUP_OVERFLOW_LABEL}
+            actions={[detailOverflowDeleteAction(REMOVE_HERITAGE_GROUP_ACTION, handleRemoveClick)]}
+          />
+        </div>
+      ) : null}
       <FormItems
         items={scalarFields}
         idPrefix="species-heritage"
         namePrefix={HERITAGE_FIELD_NAME}
       />
-      {!heritageLocked ? (
-        <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
-          Remove heritage
-        </Button>
+      {removeError ? (
+        <Text variant="destructive" role="alert">
+          {removeError}
+        </Text>
       ) : null}
+      {removePending ? (
+        <Text variant="muted" aria-live="polite">
+          Checking whether heritage can be removed…
+        </Text>
+      ) : null}
+      {dialogs}
     </div>
   )
 }
 
 function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   const { setValue } = useFormContext()
-  const traitFields = useMemo(() => traitItemFields(formCtx), [formCtx])
-  const makeOptionDefaults = useCallback(() => buildItemDefaultValues(traitFields), [traitFields])
+  const { pendingAccess } = useCampaignAccessForm()
+  const traitFields = useMemo(() => heritageOptionItemFields(formCtx), [formCtx])
+  const makeOptionDefaults = useCallback(
+    () => heritageOptionItemDefaultValues(traitFields),
+    [traitFields],
+  )
   const editor = useMasterDetailArray(OPTIONS_FIELD_NAME, makeOptionDefaults)
   const heritage = useWatch({ name: HERITAGE_FIELD_NAME }) as HeritageForm | undefined
+  const resolveParentAccess = useCallback(
+    () => resolveSpeciesParentCampaignAccess(pendingAccess),
+    [pendingAccess],
+  )
+  const accessConfig = useMemo(
+    () => ({
+      kind: 'campaignAccess' as const,
+      fieldName: 'campaignAccess' as const,
+      resolveParentAccess: () => resolveParentAccess(),
+    }),
+    [resolveParentAccess],
+  )
 
-  const handleRemoveHeritage = () => {
+  const handleRemoveHeritage = useCallback(() => {
     setValue(HERITAGE_FIELD_NAME, undefined, { shouldDirty: true })
     editor.cancelRemove()
-  }
+  }, [editor, setValue])
 
   return (
     <FormEmbeddedMasterDetailEditor
       formCtx={formCtx}
       fieldName={OPTIONS_FIELD_NAME}
       itemFields={traitFields}
-      itemNoun={HERITAGE_OPTION_NOUN}
+      itemNoun={HERITAGE_OPTION_MASTER_DETAIL_ITEM_NOUN}
+      listTitle={HERITAGE_OPTIONS_LIST_TITLE}
       ariaLabel="Heritage options"
       addLabel={ADD_HERITAGE_OPTION_LABEL}
-      emptyListLabel="No options yet. Add one to get started."
       idPrefix="species-heritage-option"
       editor={editor}
       leadingContent={
@@ -111,14 +174,15 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
       mapListItem={({ row, index }) => ({
         title: traitItemTitle((row ?? {}) as TraitRowForm, index),
       })}
+      access={accessConfig}
     />
   )
 }
 
 /**
  * Heritage tab: scalar name/description at the top, master-detail over
- * `heritage.options` below. Empty state offers a single "Add heritage"
- * control; once present, options use the same trait editor as the Traits tab.
+ * `heritage.options` below. Empty state offers **Set up heritage**; once present,
+ * options use the same trait editor as the Traits tab.
  */
 export function SpeciesHeritageTab({ formCtx }: SpeciesHeritageTabProps) {
   const heritage = useWatch({ name: HERITAGE_FIELD_NAME }) as HeritageForm | undefined

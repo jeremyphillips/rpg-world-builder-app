@@ -1,0 +1,5 @@
+/** Size container for bounded inner panels inside docked-footer form scroll bodies. */
+@utility form-scroll-body-container {
+  container-type: size;
+  container-name: form-scroll-body;
+}

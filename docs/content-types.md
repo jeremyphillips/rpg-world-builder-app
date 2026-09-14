@@ -46,7 +46,7 @@ Grant-only traits must pass `isGrantGroupsEligible()` — exactly one default gr
 - **Aggregate** mechanics (e.g. species stat-row senses) with `flattenGrantGroups(resolveGrantGroupsFromContent(trait))` — read atomic grants, not derived prose.
 - **Vocab** (`SENSE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, etc.) holds reference definitions; grant traits omit redundant catalog copy when SRD player-facing wording is derivable.
 
-Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`).
+Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`). The species authoring form keeps `kind` as hidden form state: new traits and heritage options default to `custom`; existing `grant` traits keep a derived editor. The dashboard does not expose a kind selector.
 
 ### `featChoice` atomic grants
 

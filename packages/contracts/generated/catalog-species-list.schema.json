@@ -121,7 +121,20 @@
       "traits": {
         "type": "array",
         "items": {
-          "$ref": "#/definitions/__schema8"
+          "allOf": [
+            {
+              "$ref": "#/definitions/__schema8"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "available": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
         }
       },
       "heritage": {
@@ -137,7 +150,7 @@
             "minItems": 1,
             "type": "array",
             "items": {
-              "$ref": "#/definitions/__schema8"
+              "$ref": "#/definitions/__schema90"
             }
           },
           "id": {
@@ -189,7 +202,7 @@
                     "description": "all | only | all_except"
                   },
                   "classIds": {
-                    "$ref": "#/definitions/__schema91"
+                    "$ref": "#/definitions/__schema92"
                   }
                 },
                 "required": [
@@ -209,10 +222,10 @@
             "type": "object",
             "properties": {
               "maxCharacterLevel": {
-                "$ref": "#/definitions/__schema93"
+                "$ref": "#/definitions/__schema94"
               },
               "classLevelCaps": {
-                "$ref": "#/definitions/__schema94"
+                "$ref": "#/definitions/__schema95"
               }
             },
             "required": [
@@ -2117,6 +2130,43 @@
       "type": "string"
     },
     "__schema90": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema8"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "campaignAccess": {
+              "type": "object",
+              "properties": {
+                "available": {
+                  "type": "boolean"
+                },
+                "visibilityMode": {
+                  "type": "string",
+                  "enum": [
+                    "all_players",
+                    "dm_only",
+                    "specific_players"
+                  ],
+                  "description": "all_players | dm_only | specific_players"
+                },
+                "participantIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema91": {
       "type": "string",
       "enum": [
         "all",
@@ -2125,17 +2175,17 @@
       ],
       "description": "all | only | all_except"
     },
-    "__schema91": {
+    "__schema92": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema92"
+        "$ref": "#/definitions/__schema93"
       }
     },
-    "__schema92": {
+    "__schema93": {
       "type": "string",
       "minLength": 1
     },
-    "__schema93": {
+    "__schema94": {
       "anyOf": [
         {
           "$ref": "#/definitions/__schema12"
@@ -2145,13 +2195,13 @@
         }
       ]
     },
-    "__schema94": {
+    "__schema95": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "classId": {
-            "$ref": "#/definitions/__schema92"
+            "$ref": "#/definitions/__schema93"
           },
           "maxLevel": {
             "$ref": "#/definitions/__schema12"

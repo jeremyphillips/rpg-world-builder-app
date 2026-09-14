@@ -26,7 +26,32 @@ across overlay scrollbar platforms.
 | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
 | [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)                | `min-h-0 flex-1` + primitive + `ps-1` + bottom inset                                                  |
 | [`previewRailScrollRegionShellClasses`](../src/components/preview-rail/preview-rail.variants.ts) | `min-h-0 flex-1` via [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx) |
-| [`formStickyScrollBodyClasses`](../src/form/chrome/form-chrome.variants.ts)                      | re-exports `dialogPanelScrollRegionClasses`                                                           |
+| [`FormStickyScrollBody`](../src/form/chrome/form-sticky-scroll-body.client.tsx)                  | clip slot (`form-scroll-body-container`, `overflow-hidden`) + inner scroller                          |
+| [`formStickyScrollBodyScrollerClasses`](../src/form/chrome/form-chrome.variants.ts)              | inner scroller — `overflow-y-auto`, end-of-scroll padding                                             |
+
+## Environmental bottom inset
+
+Sticky-chrome forms with a docked footer use `formStickyScrollShellWithDockedFooterClasses` to
+publish `--rpg-content-bottom-inset` and augment `--rpg-content-top-inset` (derived from the
+standard docked actions bar block-size contract and conservative scroll-chrome contracts).
+Bounded inner panels may subtract these from viewport-relative fallback `max-height` caps.
+It communicates standard viewport space reserved by surrounding chrome — not remaining
+content height, and not dynamic footer growth (validation summaries may exceed the reserved
+footprint). The form scroll body is also a size container (`form-scroll-body-container`) so
+descendants can cap against the flex column instead of raw `dvh`.
+
+Dashboard master-detail list shells publish a single resolved fallback cap
+(`--master-detail-shell-max-block-size` via `master-detail-list-shell-viewport-cap`) consumed
+by min-height floors and as the always-valid `max-height` baseline — the fallback custom
+property is never redefined inside `@container form-scroll-body`. Outside the container, the
+fallback is `min(content-cap, 100dvh - top-inset - bottom-inset)`. Inside the container,
+`max-height` tightens with `min(fallback, 100cqh - docked-scroll-top-chrome - floor-gap)` only
+— never raw `100cqh` alone and never a second `min()` that can invalidate the fallback when
+`cqh` is unreliable. Docked forms split the scroll slot: `FormStickyScrollBody` clip
+(`overflow-hidden` size container) + inner scroller so sticky rails cannot paint into the footer
+sibling even when caps underestimate. Slight **under-fill is preferable to overlap**;
+`--rpg-content-bottom-inset` applies to the **dvh fallback only**. The list scroll body does
+not compose `boundedScrollRegionEndInsetClasses` — no inline-end gutter reserve.
 
 ## Scroll boundary shadows
 

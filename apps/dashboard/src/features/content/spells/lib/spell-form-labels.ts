@@ -63,6 +63,8 @@ export const castingTimeUnitOptions = toOptions(
   ) as Record<(typeof CASTING_TIME_UNITS)[number], string>,
 )
 
+export const SPELL_CASTING_SELECT_PLACEHOLDER = 'Choose…'
+
 export const rangeKindOptions = toOptions(
   SPELL_RANGE_KINDS,
   Object.fromEntries(
@@ -89,6 +91,14 @@ export const deliveryMethodOptions: FieldOption[] = [
     ) as Record<(typeof SPELL_DELIVERY_METHODS)[number], string>,
   ),
 ]
+
+/** Attack-roll delivery chips — omit the explicit None sentinel; unset means none. */
+export const deliveryMethodChipOptions: FieldOption[] = toOptions(
+  SPELL_DELIVERY_METHODS,
+  Object.fromEntries(
+    SPELL_DELIVERY_METHODS.map((m) => [m, SPELL_DELIVERY_METHOD_ENTRIES[m].label]),
+  ) as Record<(typeof SPELL_DELIVERY_METHODS)[number], string>,
+)
 
 export const roleTagOptions = toOptions(
   SPELL_ROLE_TAGS,

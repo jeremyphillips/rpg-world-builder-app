@@ -1,386 +1,209 @@
-import type { CSSProperties } from 'react'
-import { useMemo } from 'react'
-import {
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
-import { CSS } from '@dnd-kit/utilities'
-import { cn, Button, Text, iconGhostControlVariants } from '@rpg/ui'
-import { GripVertical, Trash2 } from 'lucide-react'
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
+import { Plus } from 'lucide-react'
+import { Button, InlineInactiveStatus, ScrollBoundaryRegion, Text } from '@rpg/ui'
 
-import { EntityAnatomyHost } from '@/features/content'
+import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
 import {
-  masterDetailListDragHandleClasses,
-  masterDetailListRowDraggingClasses,
-  masterDetailListRowLayoutClasses,
-  masterDetailListRowSelectClasses,
-  masterDetailListRowSortableClasses,
-  masterDetailListRowSurfaceClasses,
+  joinMasterDetailItemMeta,
+  type MasterDetailItemMeta,
+} from '../../lib/master-detail/master-detail-item-meta'
+import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
+import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
+import {
+  masterDetailListCountSupplementClasses,
+  masterDetailListEmptyClasses,
+  masterDetailListHeaderClasses,
+  masterDetailListItemsClasses,
+  masterDetailListRowClasses,
+  masterDetailListRowAvailabilityClasses,
+  masterDetailListRowMetaClasses,
+  masterDetailListRowTitleClasses,
+  masterDetailListScrollRegionClasses,
+  masterDetailListScrollViewportClasses,
+  masterDetailListShellClasses,
+  masterDetailListTitleClasses,
 } from './master-detail-list-panel.variants'
-import { resolveMasterDetailListMove } from '../../lib/master-detail/master-detail-list-move'
-import { buildMasterDetailRowStatus } from './master-detail-row-badges'
 
-import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
-
-export interface MasterDetailListBadge {
-  label: string
-  appearance: BadgeAppearance
-  tone: BadgeTone
-}
+export type { MasterDetailItemMeta }
 
 export interface MasterDetailListItem {
   /** Stable React key (use the RHF field id, not a domain id). */
   id: string
   /** Display label for the row. */
   title: string
-  /** Optional small label rendered above the title (e.g. "Level 3"). */
-  eyebrow?: string
-  /** Optional status badges (e.g. System, Homebrew, Inactive). */
-  badges?: MasterDetailListBadge[]
+  /** Structured subtitle parts joined with ` · ` for display. */
+  meta?: MasterDetailItemMeta
   /** When true, surfaces a validation error indicator on the row. */
   hasError?: boolean
   /** When false, row uses inactive styling. Defaults to `true`. */
   active?: boolean
-  /**
-   * Whether the row shows a remove control. Defaults to `true`; pass `false`
-   * for protected rows (e.g. system content).
-   */
+  /** When false, detail overflow hides delete. Not shown on list rows. */
   deletable?: boolean
+  /** Broad campaign availability label rendered below the title when unavailable. */
+  availabilityStatusLabel?: 'Unavailable'
 }
 
 export interface MasterDetailListPanelProps {
   items: MasterDetailListItem[]
   selectedIndex: number | null
-  /** Accessible name for the list `<nav>`. */
+  /** Visible collection title in the list header. */
+  listTitle: ReactNode
+  /** Accessible name for the list `<nav>` — independent from `listTitle`. */
   ariaLabel: string
   addLabel: string
-  emptyLabel: string
+  itemNoun: MasterDetailItemNounTerm
   onAdd: () => void
   onSelect: (index: number) => void
-  /** Invoked when a deletable row's remove control is activated. */
-  onRemove: (index: number) => void
-  /** When provided, rows can be reordered via drag handle (and keyboard). */
-  onMove?: (from: number, to: number) => void
-}
-
-interface MasterDetailListRowContentProps {
-  item: MasterDetailListItem
-  index: number
-  isSelected: boolean
-  isDragging?: boolean
-  showDragHandle: boolean
-  dragHandleProps?: {
-    attributes: ReturnType<typeof useSortable>['attributes']
-    listeners: ReturnType<typeof useSortable>['listeners']
-  }
-  onSelect: (index: number) => void
-  onRemove: (index: number) => void
-}
-
-function MasterDetailListRowStatus({
-  hasError,
-  badges,
-}: Pick<MasterDetailListItem, 'hasError' | 'badges'>) {
-  return buildMasterDetailRowStatus({ hasError, badges })
-}
-
-function masterDetailListRowClassName(
-  active: boolean,
-  isSelected: boolean,
-  showDragHandle: boolean,
-) {
-  return cn(
-    masterDetailListRowLayoutClasses,
-    masterDetailListRowSurfaceClasses({ active, isSelected }),
-    showDragHandle && masterDetailListRowSortableClasses,
-  )
-}
-
-type MasterDetailListDragHandleProps = {
-  title: string
-  isDragging?: boolean
-  dragHandleProps: NonNullable<MasterDetailListRowContentProps['dragHandleProps']>
-}
-
-function MasterDetailListDragHandle({
-  title,
-  isDragging = false,
-  dragHandleProps,
-}: MasterDetailListDragHandleProps) {
-  return (
-    <button
-      type="button"
-      className={masterDetailListDragHandleClasses(isDragging)}
-      aria-label={`Drag to reorder ${title}`}
-      onClick={(event) => event.stopPropagation()}
-      {...dragHandleProps.attributes}
-      {...dragHandleProps.listeners}
-    >
-      <GripVertical className="size-3.5" aria-hidden />
-    </button>
-  )
-}
-
-type MasterDetailListRowRemoveButtonProps = {
-  title: string
-  index: number
-  onRemove: (index: number) => void
-}
-
-function MasterDetailListRowRemoveButton({
-  title,
-  index,
-  onRemove,
-}: MasterDetailListRowRemoveButtonProps) {
-  return (
-    <button
-      type="button"
-      className={iconGhostControlVariants({ hover: 'destructiveSubtle', layout: 'flex' })}
-      aria-label={`Remove ${title}`}
-      onClick={() => onRemove(index)}
-    >
-      <Trash2 aria-hidden />
-    </button>
-  )
-}
-
-function MasterDetailListRowContent({
-  item,
-  index,
-  isSelected,
-  isDragging = false,
-  showDragHandle,
-  dragHandleProps,
-  onSelect,
-  onRemove,
-}: MasterDetailListRowContentProps) {
-  const deletable = item.deletable !== false
-  const active = item.active !== false
-
-  return (
-    <div className={masterDetailListRowClassName(active, isSelected, showDragHandle)}>
-      <EntityAnatomyHost
-        density="compact"
-        leading={
-          showDragHandle && dragHandleProps ? (
-            <MasterDetailListDragHandle
-              title={item.title}
-              isDragging={isDragging}
-              dragHandleProps={dragHandleProps}
-            />
-          ) : undefined
-        }
-        trailing={
-          deletable
-            ? {
-                kind: 'action',
-                content: (
-                  <MasterDetailListRowRemoveButton
-                    title={item.title}
-                    index={index}
-                    onRemove={onRemove}
-                  />
-                ),
-              }
-            : undefined
-        }
-        entity={{
-          heading: (
-            <button
-              type="button"
-              aria-current={isSelected ? 'true' : undefined}
-              aria-invalid={item.hasError ? true : undefined}
-              onClick={() => onSelect(index)}
-              className={masterDetailListRowSelectClasses}
-            >
-              {item.title}
-            </button>
-          ),
-          classification: item.eyebrow,
-          status: MasterDetailListRowStatus({ hasError: item.hasError, badges: item.badges }),
-        }}
-      />
-    </div>
-  )
+  /** Optional stable availability count row rendered below the list header. */
+  countSupplement?: ReactNode
 }
 
 interface MasterDetailListRowProps {
   item: MasterDetailListItem
   index: number
   isSelected: boolean
-  showDragHandle: boolean
   onSelect: (index: number) => void
-  onRemove: (index: number) => void
+  selectedRowRef?: RefObject<HTMLButtonElement | null>
 }
 
 function MasterDetailListRow({
   item,
   index,
   isSelected,
-  showDragHandle,
   onSelect,
-  onRemove,
+  selectedRowRef,
 }: MasterDetailListRowProps) {
+  const active = item.active !== false
+  const metaLine = item.meta ? joinMasterDetailItemMeta(item.meta) : undefined
+
   return (
     <li>
-      <MasterDetailListRowContent
-        item={item}
-        index={index}
-        isSelected={isSelected}
-        showDragHandle={showDragHandle}
-        onSelect={onSelect}
-        onRemove={onRemove}
-      />
+      <button
+        ref={isSelected ? selectedRowRef : undefined}
+        type="button"
+        aria-current={isSelected ? 'true' : undefined}
+        aria-invalid={item.hasError ? true : undefined}
+        onClick={() => onSelect(index)}
+        className={masterDetailListRowClasses({ active, isSelected })}
+      >
+        {metaLine ? <span className={masterDetailListRowMetaClasses}>{metaLine}</span> : null}
+        <span className={masterDetailListRowTitleClasses}>{item.title}</span>
+        {item.availabilityStatusLabel ? (
+          <InlineInactiveStatus
+            label={item.availabilityStatusLabel}
+            className={masterDetailListRowAvailabilityClasses}
+          />
+        ) : null}
+        {item.hasError ? <span className="sr-only">Has validation errors</span> : null}
+      </button>
     </li>
   )
 }
 
-type SortableMasterDetailListRowProps = MasterDetailListRowProps
-
-function SortableMasterDetailListRow(props: SortableMasterDetailListRowProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: props.item.id,
-  })
-
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+function resolveSelectedItemId(
+  items: MasterDetailListItem[],
+  selectedIndex: number | null,
+): string | null {
+  if (selectedIndex === null || selectedIndex < 0 || selectedIndex >= items.length) {
+    return null
   }
-
-  return (
-    <li
-      ref={setNodeRef}
-      style={style}
-      className={cn(isDragging && masterDetailListRowDraggingClasses)}
-    >
-      <MasterDetailListRowContent
-        item={props.item}
-        index={props.index}
-        isSelected={props.isSelected}
-        isDragging={isDragging}
-        showDragHandle={props.showDragHandle}
-        dragHandleProps={{ attributes, listeners }}
-        onSelect={props.onSelect}
-        onRemove={props.onRemove}
-      />
-    </li>
-  )
+  return items[selectedIndex]?.id ?? null
 }
 
-interface MasterDetailListItemsProps {
-  items: MasterDetailListItem[]
-  selectedIndex: number | null
-  onMove?: (from: number, to: number) => void
-  onSelect: (index: number) => void
-  onRemove: (index: number) => void
-}
-
-function MasterDetailListItems({
-  items,
-  selectedIndex,
-  onMove,
-  onSelect,
-  onRemove,
-}: MasterDetailListItemsProps) {
-  const sortableEnabled = Boolean(onMove) && items.length > 1
-  const showDragHandle = sortableEnabled
-  const itemIds = useMemo(() => items.map((item) => item.id), [items])
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  )
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    if (!onMove) return
-    const move = resolveMasterDetailListMove(items, event)
-    if (move) onMove(move.from, move.to)
-  }
-
-  const rowProps = (item: MasterDetailListItem, index: number) => ({
-    item,
-    index,
-    isSelected: index === selectedIndex,
-    showDragHandle,
-    onSelect,
-    onRemove,
-  })
-
-  const list = (
-    <ul className="space-y-1" role="list">
-      {items.map((item, index) =>
-        sortableEnabled ? (
-          <SortableMasterDetailListRow key={item.id} {...rowProps(item, index)} />
-        ) : (
-          <MasterDetailListRow key={item.id} {...rowProps(item, index)} />
-        ),
-      )}
-    </ul>
-  )
-
-  if (!sortableEnabled) return list
-
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      modifiers={[restrictToVerticalAxis]}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-        {list}
-      </SortableContext>
-    </DndContext>
-  )
+function buildVisibleListProjection(items: readonly MasterDetailListItem[]): string {
+  return items.map((item) => item.id).join('\0')
 }
 
 /**
- * Generic sidebar for a master-detail editor: an add button plus a selectable,
- * optionally-removable list with optional eyebrow and status badges per row.
- * Presentation only — selection and array mutation are owned by the parent (see
- * `useMasterDetailArray`).
+ * Generic sidebar for a master-detail editor: bordered collection shell with
+ * list title + Add, and whole-row selection with tint and inset start accent.
+ * Presentation only — selection and array mutation are owned by the parent.
  */
 export function MasterDetailListPanel({
   items,
   selectedIndex,
+  listTitle,
   ariaLabel,
   addLabel,
-  emptyLabel,
+  itemNoun,
   onAdd,
   onSelect,
-  onRemove,
-  onMove,
+  countSupplement,
 }: MasterDetailListPanelProps) {
+  const emptyLabel = masterDetailEmptyListLabel(itemNoun)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const selectedRowRef = useRef<HTMLButtonElement>(null)
+  const didMountRef = useRef(false)
+  const previousSelectionIdRef = useRef<string | null>(null)
+  const previousProjectionRef = useRef('')
+
+  const selectedItemId = resolveSelectedItemId(items, selectedIndex)
+  const visibleProjection = buildVisibleListProjection(items)
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true
+      previousSelectionIdRef.current = selectedItemId
+      previousProjectionRef.current = visibleProjection
+      return
+    }
+
+    const selectionChanged = selectedItemId !== previousSelectionIdRef.current
+    const projectionChanged = visibleProjection !== previousProjectionRef.current
+
+    previousSelectionIdRef.current = selectedItemId
+    previousProjectionRef.current = visibleProjection
+
+    if (!selectionChanged && !projectionChanged) return
+    if (!selectedItemId) return
+
+    const row = selectedRowRef.current
+    const scrollport = scrollRef.current
+    if (!row || !scrollport) return
+
+    if (isElementOutsideScrollport(row, scrollport)) {
+      row.scrollIntoView({ block: 'nearest' })
+    }
+  }, [selectedItemId, visibleProjection])
+
   return (
-    <nav aria-label={ariaLabel} className="flex flex-col gap-3">
-      <Button type="button" variant="outline" size="sm" onClick={onAdd}>
-        {addLabel}
-      </Button>
+    <nav aria-label={ariaLabel} className={masterDetailListShellClasses}>
+      <div className={masterDetailListHeaderClasses}>
+        <div className={masterDetailListTitleClasses}>{listTitle}</div>
+        <Button type="button" variant="outline" size="sm" onClick={onAdd}>
+          <Plus aria-hidden />
+          {addLabel}
+        </Button>
+      </div>
+
+      {countSupplement ? (
+        <div className={masterDetailListCountSupplementClasses}>{countSupplement}</div>
+      ) : null}
 
       {items.length === 0 ? (
-        <Text variant="muted" className="text-sm">
+        <Text variant="muted" className={masterDetailListEmptyClasses}>
           {emptyLabel}
         </Text>
       ) : (
-        <MasterDetailListItems
-          items={items}
-          selectedIndex={selectedIndex}
-          onMove={onMove}
-          onSelect={onSelect}
-          onRemove={onRemove}
-        />
+        <ScrollBoundaryRegion
+          className={masterDetailListScrollRegionClasses}
+          viewportClassName={masterDetailListScrollViewportClasses}
+          viewportRef={scrollRef}
+          data-master-detail-list-scroll
+        >
+          <ul className={masterDetailListItemsClasses} role="list">
+            {items.map((item, index) => (
+              <MasterDetailListRow
+                key={item.id}
+                item={item}
+                index={index}
+                isSelected={index === selectedIndex}
+                onSelect={onSelect}
+                selectedRowRef={selectedRowRef}
+              />
+            ))}
+          </ul>
+        </ScrollBoundaryRegion>
       )}
     </nav>
   )

@@ -13,7 +13,8 @@ import { FormItems } from '../containers/form-items.client'
 import { submitAndExpectPayload } from '../test-utils'
 import {
   formStickyActionsBarTransparentClasses,
-  formStickyScrollBodyClasses,
+  formStickyScrollBodyClipClasses,
+  formStickyScrollBodyScrollerClasses,
   formStickyTabsTransparentClasses,
   formViewportScrollBodyTopInsetClasses,
 } from '../chrome/form-chrome.variants'
@@ -180,9 +181,17 @@ describe('TabbedForm', () => {
     expect(scrollRegion?.className).toContain('scrollbar-slim')
     expect(scrollRegion?.className).toContain('pe-2.5')
     expect(scrollRegion?.className).toContain('ps-1')
-    for (const token of formStickyScrollBodyClasses.split(/\s+/)) {
+    for (const token of formStickyScrollBodyScrollerClasses.split(/\s+/)) {
       expect(scrollRegion?.className).toContain(token)
     }
+
+    const clipRegion = sectionsNav.closest('.form-scroll-body-container')
+    expect(clipRegion).toHaveClass('overflow-hidden')
+    expect(clipRegion).not.toHaveClass('overflow-y-auto')
+    for (const token of formStickyScrollBodyClipClasses.split(/\s+/)) {
+      expect(clipRegion?.className).toContain(token)
+    }
+    expect(clipRegion?.contains(toolbar)).toBe(false)
   })
 
   it('renders scrollBodyClassName as a scroll-away inset inside the scroll region', () => {
@@ -242,7 +251,14 @@ describe('TabbedForm', () => {
     const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
     const formColumn = toolbar.parentElement
 
-    expect(slot).toHaveClass('xl:col-start-2', 'xl:row-start-1')
+    expect(slot).toHaveClass(
+      'min-h-0',
+      'xl:col-start-2',
+      'xl:flex-col',
+      'xl:h-full',
+      'xl:row-start-1',
+    )
+    expect(formColumn).toHaveClass('xl:h-full', 'flex-col')
     expect(grid).toHaveClass(
       'mx-auto',
       'xl:grid-cols-[minmax(0,1fr)_280px]',
@@ -470,6 +486,48 @@ describe('TabbedForm', () => {
     expect(notesInput).toHaveFocus()
     expect(screen.getByRole('button', { name: 'Identity' })).toHaveTextContent('Identity')
     expect(within(getSectionsNav()).getByRole('button', { name: /Notes/ })).toHaveTextContent('1')
+  })
+
+  it('shows tab badges after a failed submit when publish presentation is enabled', async () => {
+    const user = userEvent.setup()
+    const draftSchema = z.object({
+      name: z.string(),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof draftSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        schema={draftSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', notes: '' }}
+        footer={<button type="submit">Save</button>}
+        publishPresentationEnabled
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Notes.*1 field needs attention/i }),
+      ).toBeInTheDocument()
+    })
   })
 
   it('uses resolverFields for tier-1 validation copy on header-only paths', async () => {

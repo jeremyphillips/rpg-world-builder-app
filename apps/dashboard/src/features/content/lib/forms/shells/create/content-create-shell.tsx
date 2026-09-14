@@ -9,7 +9,10 @@ import { useRef, useState, type ReactNode } from 'react'
 
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
-import { contentFormPageShellHeadingClasses } from '../layout/content-form-page-shell.variants'
+import {
+  contentFormPageShellBodyClasses,
+  contentFormPageShellHeadingClasses,
+} from '../layout/content-form-page-shell.variants'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
@@ -281,33 +284,38 @@ export function ContentCreateShell({
   const def = contentFormRegistry[contentType]
   const usePreviewLayout = def != null && hasContentFormPreview(def)
 
+  const formContent = def ? (
+    <ContentAuthoringGate campaignId={campaignId}>
+      <ContentCreateForm
+        def={def}
+        contentTypeKey={contentType as ContentTypeKey}
+        campaignId={campaignId}
+        backHref={backHref}
+        heading={heading}
+        usePreviewLayout={usePreviewLayout}
+        initialValues={initialValues}
+        formCtx={formCtx}
+        prepareSubmitValues={prepareSubmitValues}
+        formHeaderPrefix={formHeaderPrefix}
+      />
+    </ContentAuthoringGate>
+  ) : (
+    <ContentFormComingSoon />
+  )
+
   return (
     <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
       {!usePreviewLayout ? (
-        <div className={contentFormPageShellHeadingClasses}>
-          <Heading variant="page" as="h1">
-            {heading}
-          </Heading>
+        <div className={contentFormPageShellBodyClasses}>
+          <div className={contentFormPageShellHeadingClasses}>
+            <Heading variant="page" as="h1">
+              {heading}
+            </Heading>
+          </div>
+          {formContent}
         </div>
-      ) : null}
-
-      {def ? (
-        <ContentAuthoringGate campaignId={campaignId}>
-          <ContentCreateForm
-            def={def}
-            contentTypeKey={contentType as ContentTypeKey}
-            campaignId={campaignId}
-            backHref={backHref}
-            heading={heading}
-            usePreviewLayout={usePreviewLayout}
-            initialValues={initialValues}
-            formCtx={formCtx}
-            prepareSubmitValues={prepareSubmitValues}
-            formHeaderPrefix={formHeaderPrefix}
-          />
-        </ContentAuthoringGate>
       ) : (
-        <ContentFormComingSoon />
+        formContent
       )}
     </ContentFormPageShell>
   )

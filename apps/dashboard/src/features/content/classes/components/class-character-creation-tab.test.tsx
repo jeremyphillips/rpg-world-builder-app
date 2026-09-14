@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -8,7 +8,10 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import { pickClass } from '../../lib/fixtures/pick'
 import { characterCreationProficienciesToFormValues } from '../lib/character-creation/class-character-creation-proficiencies-form-values'
 import { type StartingEquipmentForm } from '../lib/character-creation/class-starting-equipment-form-fields'
-import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
+import {
+  startingEquipmentEmptyFormValues,
+  startingEquipmentToFormValues,
+} from '../lib/character-creation/class-starting-equipment-form-values'
 import { ClassCharacterCreationTab } from './class-character-creation-tab'
 
 function TabShell({
@@ -23,8 +26,8 @@ function TabShell({
   const form = useForm({
     defaultValues: {
       characterCreation: {
+        startingEquipment: startingEquipment ?? startingEquipmentEmptyFormValues(),
         ...(proficiencies ? { proficiencies } : characterCreationProficienciesToFormValues()),
-        ...(startingEquipment ? { startingEquipment } : {}),
       },
     },
   })
@@ -50,39 +53,39 @@ const bardStartingEquipment = startingEquipmentToFormValues(
 
 const monkSeedIds = monkStartingEquipment.options.map((option) => option.id!)
 
+function packageListRow(name: string | RegExp) {
+  return within(screen.getByRole('navigation', { name: 'Starting equipment packages' })).getByRole(
+    'button',
+    { name },
+  )
+}
+
 describe('ClassCharacterCreationTab', () => {
-  it('shows skill and tool proficiency choices even when there is no starting equipment', () => {
+  it('shows skill and tool proficiency choices with an empty starting-equipment master-detail', () => {
     render(<TabShell />)
     expect(screen.getAllByText('Character chooses').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Skill Proficiencies from:')).toBeInTheDocument()
     expect(
       screen.getByText(/Define the class's baseline equipment and wealth/i),
     ).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Class starting options' })).toBeInTheDocument()
-    expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /Starting equipment/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Add package/i })).toBeInTheDocument()
+    expect(screen.getByText(/No packages added/i)).toBeInTheDocument()
   })
 
-  it('shows the empty state when there is no starting equipment', () => {
-    render(<TabShell />)
-    expect(screen.getByText(/No starting equipment yet/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Add starting equipment/i })).toBeInTheDocument()
-  })
-
-  it('adds starting equipment and shows choice copy plus package master-detail', async () => {
+  it('adds a package via the master-detail list action', async () => {
     const user = userEvent.setup()
     render(<TabShell />)
 
-    await user.click(screen.getByRole('button', { name: /Add starting equipment/i }))
+    await user.click(screen.getByRole('button', { name: /Add package/i }))
 
     await waitFor(() => {
-      expect(screen.getByText('Character can choose one package from below')).toBeInTheDocument()
+      expect(packageListRow(/Unnamed Package/)).toBeInTheDocument()
     })
+    expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
     expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Starting Gold/ }),
-    ).toBeInTheDocument()
+      screen.queryByText('Character can choose one package from below'),
+    ).not.toBeInTheDocument()
   })
 
   it('renders monk packages when pre-filled', () => {
@@ -97,13 +100,8 @@ describe('ClassCharacterCreationTab', () => {
         }}
       />,
     )
-    expect(screen.getByText('Character can choose one package from below')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /^(?!Remove|Drag).*Starting Gold/ }),
-    ).toBeInTheDocument()
+    expect(packageListRow(/Standard Equipment/)).toBeInTheDocument()
+    expect(packageListRow(/Starting Gold/)).toBeInTheDocument()
   })
 
   it('renders bard pool choice packages when pre-filled', async () => {
@@ -122,7 +120,7 @@ describe('ClassCharacterCreationTab', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Standard Equipment/ }))
+    await user.click(packageListRow(/Standard Equipment/))
     expect(screen.queryByRole('textbox', { name: /Option id/i })).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
   })
@@ -141,13 +139,15 @@ describe('ClassCharacterCreationTab', () => {
       />,
     )
 
-    expect(screen.getAllByText('System').length).toBeGreaterThanOrEqual(1)
-    expect(screen.queryByRole('button', { name: /Remove Starting Gold/i })).not.toBeInTheDocument()
+    expect(screen.getAllByText(/System/).length).toBeGreaterThanOrEqual(1)
     expect(
-      screen.queryByRole('button', { name: /Remove Standard Equipment/i }),
+      screen.queryByRole('button', { name: /Actions for Starting Gold/i }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Actions for Standard Equipment/i }),
     ).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /^(?!Remove|Drag).*Starting Gold/ }))
+    await user.click(packageListRow(/Starting Gold/))
     expect(screen.getByRole('group', { name: /Items/i })).toBeInTheDocument()
   })
 

@@ -9,7 +9,16 @@ import { useResolvedBreadcrumbs } from '@/components/layout/breadcrumb/use-resol
 import { Sidebar } from '@/components/layout/sidebar'
 import { Topbar } from '@/components/layout/topbar/topbar'
 
-import { appShellBreadcrumbRailClasses, appShellMainClasses } from './app-shell.variants'
+import {
+  APP_SHELL_CONTENT_COLUMN_ATTR,
+  APP_SHELL_MAIN_ATTR,
+  appShellBreadcrumbRailClasses,
+  appShellContentColumnClasses,
+  appShellMainClasses,
+  appShellRootClasses,
+  appShellStickyChromeClasses,
+} from './app-shell.variants'
+import { usePathnameScrollReset } from './use-pathname-scroll-reset'
 
 function AppShellBreadcrumbRail() {
   const crumbs = useResolvedBreadcrumbs()
@@ -29,16 +38,22 @@ function AppShellBreadcrumbRail() {
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   useSyncActiveCampaign()
+  usePathnameScrollReset()
 
   return (
     <BreadcrumbLabelProvider>
       <GlobalSearchProvider>
-        <div className="flex h-dvh max-h-dvh overflow-hidden bg-background">
+        <div className={appShellRootClasses}>
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-          <div className="flex h-dvh min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background">
-            <Topbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
-            <AppShellBreadcrumbRail />
-            <main className={appShellMainClasses}>
+          <div
+            className={appShellContentColumnClasses}
+            {...{ [APP_SHELL_CONTENT_COLUMN_ATTR]: '' }}
+          >
+            <div className={appShellStickyChromeClasses} data-app-sticky-chrome>
+              <Topbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen((o) => !o)} />
+              <AppShellBreadcrumbRail />
+            </div>
+            <main className={appShellMainClasses} {...{ [APP_SHELL_MAIN_ATTR]: '' }}>
               <Outlet />
             </main>
           </div>

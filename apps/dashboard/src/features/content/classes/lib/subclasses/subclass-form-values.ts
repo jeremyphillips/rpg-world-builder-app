@@ -1,11 +1,11 @@
-import { type CreateSubclassInput, type Subclass, type SubclassFeature } from '@rpg/contracts'
+import { type CreateSubclassInput, type Subclass } from '@rpg/contracts'
 
 import {
   envelopeSlugFields,
   finalizeContentInput,
 } from '../../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../../lib/forms/registry/content-form-registry'
-import { featuresFromFormValues, featureToFormRow } from '../class-feature-form-fields'
+import { featureToFormRow, subclassFeaturesFromFormValues } from '../class-feature-form-fields'
 import { subclassFormSchema, type SubclassFormValues } from './subclass-form-fields'
 
 export function subclassCreateDefaultValues(defaultFeatureLevel?: number): SubclassFormValues {
@@ -41,10 +41,7 @@ export const subclassFormDef = {
         name: values.name,
         tagline: values.tagline || undefined,
         description: values.description || undefined,
-        features: featuresFromFormValues(
-          values.features,
-          ctx?.entity?.features,
-        ) as SubclassFeature[],
+        features: subclassFeaturesFromFormValues(values.features, ctx?.entity?.features),
       },
       ctx,
     ) as CreateSubclassInput,

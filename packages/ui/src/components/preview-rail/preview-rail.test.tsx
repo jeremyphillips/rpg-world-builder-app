@@ -58,12 +58,14 @@ describe('PreviewRail', () => {
       </PreviewRail>,
     )
 
-    expect(screen.getByRole('complementary').className).toContain('h-full')
-    expect(screen.getByRole('complementary').className).toContain('max-h-full')
-    expect(screen.getByRole('complementary').className).toContain('min-h-0')
+    expect(screen.getByRole('complementary')).toHaveClass('flex-1', 'min-h-0', 'min-w-0', 'w-full')
     expect(screen.getByTestId('preview-rail-scroll')).toHaveClass('overflow-y-auto')
     expect(screen.getByTestId('preview-rail-scroll').className).toContain('pe-2.5')
     expect(screen.getByRole('heading', { name: 'Class Preview' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Sections' })).toHaveClass(
+      'eyebrow-style-sm',
+      'text-foreground',
+    )
     expect(screen.getByText('Draft')).toBeInTheDocument()
     expect(screen.getByText('Available')).toBeInTheDocument()
     expect(screen.getByText('All players')).toBeInTheDocument()
@@ -119,6 +121,45 @@ describe('PreviewRail', () => {
       container.querySelector('[data-slot="preview-rail-identity"] .border-t'),
     ).toBeInTheDocument()
     expect(screen.getByText('Hit die')).toBeInTheDocument()
+  })
+
+  it('maps deprecated sticky to layout fill classes', () => {
+    render(
+      <PreviewRail sticky>
+        <PreviewRail.Header title="Class Preview" />
+      </PreviewRail>,
+    )
+
+    expect(screen.getByRole('complementary')).toHaveClass('flex-1', 'min-h-0')
+  })
+
+  it('applies layout fill inside a bounded flex column aside slot', () => {
+    render(
+      <div className="flex h-64 flex-col overflow-hidden">
+        <div className="flex min-h-0 flex-col">
+          <PreviewRail layout="fill">
+            <PreviewRail.Header title="Class Preview" />
+            <PreviewRail.ScrollRegion data-testid="preview-rail-scroll">
+              <PreviewRail.Sections>
+                <PreviewRail.Section id="basics" label="Basics" />
+              </PreviewRail.Sections>
+            </PreviewRail.ScrollRegion>
+          </PreviewRail>
+        </div>
+      </div>,
+    )
+
+    const rail = screen.getByRole('complementary')
+    expect(rail).toHaveClass(
+      'flex-1',
+      'min-h-0',
+      'min-w-0',
+      'w-full',
+      'flex',
+      'flex-col',
+      'overflow-hidden',
+    )
+    expect(screen.getByTestId('preview-rail-scroll')).toHaveClass('min-h-0', 'flex-1')
   })
 
   it('renders a statusless section without a marker icon', () => {

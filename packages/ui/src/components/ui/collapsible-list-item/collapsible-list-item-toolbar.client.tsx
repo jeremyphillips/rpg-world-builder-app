@@ -109,7 +109,7 @@ export function CollapsibleListItemToolbar({
 }: CollapsibleListItemToolbarProps) {
   const renderLeadingChromeInToolbar = leadingChromePlacement === 'toolbar'
   const headerContentClasses = cn(
-    'flex min-w-0 min-h-0 flex-1',
+    'flex min-w-0 flex-1',
     compact ? 'items-start' : 'items-center',
     renderLeadingChromeInToolbar
       ? collapsibleListItemToolbarContentClasses(leadingChrome)

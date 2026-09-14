@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createFeatureRowFormSchema,
   featureFromFormRow,
   featureToFormRow,
+  subclassFeatureFromFormRow,
   formatFeatureRowSummary,
 } from './class-feature-form-fields'
+import { GRANT_DEFAULT_UNLOCK_LEVEL } from '../../lib/forms/grants/grant-form-schema'
 
 describe('class feature form round-trip', () => {
   it('preserves subclass-choice kind through form conversion', () => {
@@ -19,12 +22,38 @@ describe('class feature form round-trip', () => {
     expect(featureFromFormRow({ ...row, id: feature.id }).kind).toBe('subclass-choice')
   })
 
+  it('omits available from subclass feature save', () => {
+    const row = {
+      id: 'improved-critical',
+      name: 'Improved Critical',
+      level: 3,
+      grants: [],
+      available: false,
+    }
+    expect(subclassFeatureFromFormRow(row)).not.toHaveProperty('available')
+  })
+
+  it('persists available false on class feature save and omits when true', () => {
+    const row = {
+      id: 'second-wind',
+      name: 'Second Wind',
+      level: 1,
+      grants: [],
+      available: false,
+    }
+    expect(featureFromFormRow(row).available).toBe(false)
+
+    const availableRow = { ...row, available: true }
+    expect(featureFromFormRow(availableRow)).not.toHaveProperty('available')
+  })
+
   it('defaults missing kind to custom on save', () => {
     const row = {
       id: 'second-wind',
       name: 'Second Wind',
       level: 1,
       grants: [],
+      available: true,
     }
     expect(featureFromFormRow(row).kind).toBe('custom')
   })
@@ -59,5 +88,61 @@ describe('formatFeatureRowSummary', () => {
         grants: [],
       }),
     ).toBe('Level 5')
+  })
+})
+
+describe('createFeatureRowFormSchema', () => {
+  it('rejects grant unlock levels at or below the feature level', () => {
+    const schema = createFeatureRowFormSchema()
+    const result = schema.safeParse({
+      name: 'Domain Spells',
+      level: 3,
+      grants: [
+        {
+          grantType: 'languages',
+          unlockLevel: 3,
+          language: 'common',
+        },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(
+        result.error.issues.some((issue) => issue.path.join('.') === 'grants.0.unlockLevel'),
+      ).toBe(true)
+    }
+  })
+
+  it('accepts default unlock and later unlock levels', () => {
+    const schema = createFeatureRowFormSchema()
+
+    expect(
+      schema.safeParse({
+        name: 'Domain Spells',
+        level: 3,
+        grants: [
+          {
+            grantType: 'languages',
+            unlockLevel: GRANT_DEFAULT_UNLOCK_LEVEL,
+            language: 'common',
+          },
+        ],
+      }).success,
+    ).toBe(true)
+
+    expect(
+      schema.safeParse({
+        name: 'Domain Spells',
+        level: 3,
+        grants: [
+          {
+            grantType: 'languages',
+            unlockLevel: 5,
+            language: 'common',
+          },
+        ],
+      }).success,
+    ).toBe(true)
   })
 })
