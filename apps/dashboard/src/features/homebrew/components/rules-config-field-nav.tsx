@@ -4,6 +4,7 @@ import type { RulesConfigNavLeaf, RulesConfigNavSection } from '@/features/campa
 import { resolveRulesConfigNavScrollOffsetPx } from '@/features/homebrew/hooks/use-rules-config-nav-scroll-spy.lib'
 
 import {
+  rulesConfigFieldNavLeafLinkClasses,
   rulesConfigFieldNavPanelClasses,
   rulesConfigFieldNavRailSlotClasses,
   rulesConfigFieldNavShellClasses,
@@ -117,12 +118,9 @@ export function RulesConfigFieldNav({
                             scrollToAnchor(leaf.id)
                           }}
                           aria-current={activeLeafId === leaf.id ? 'true' : undefined}
-                          className={cn(
-                            'block rounded-md py-1.5 pl-2 pr-3 text-sm font-normal transition-colors',
-                            activeLeafId === leaf.id
-                              ? 'text-foreground'
-                              : 'text-muted-foreground hover:text-foreground',
-                          )}
+                          className={rulesConfigFieldNavLeafLinkClasses({
+                            active: activeLeafId === leaf.id,
+                          })}
                         >
                           {leaf.label}
                         </a>

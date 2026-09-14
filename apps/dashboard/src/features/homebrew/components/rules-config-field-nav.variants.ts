@@ -1,3 +1,5 @@
+import { cva } from 'class-variance-authority'
+
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
 /** Bordered faint shell for the desktop rules configuration section rail. */
@@ -24,4 +26,20 @@ export const rulesConfigFieldNavStickyClasses =
 export const rulesConfigFieldNavPanelClasses = cn(
   'hidden w-56 lg:block',
   rulesConfigFieldNavStickyClasses,
+)
+
+/** Nested section leaf links in the desktop rules configuration rail. */
+export const rulesConfigFieldNavLeafLinkClasses = cva(
+  'block rounded-md py-1.5 pl-2 pr-3 text-sm transition-colors',
+  {
+    variants: {
+      active: {
+        true: 'font-bold text-foreground',
+        false: 'font-normal text-muted-foreground hover:text-foreground',
+      },
+    },
+    defaultVariants: {
+      active: false,
+    },
+  },
 )

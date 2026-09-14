@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from 'react'
 import type { RulesConfigNavSection } from '@/features/campaign'
 
 import {
-  buildRulesConfigNavObserverRootMargin,
   collectNavScrollSpyAnchors,
   measureAnchorTopRelativeToViewport,
   resolveActiveNavFromEntries,
@@ -18,9 +17,6 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
 
   useEffect(() => {
     if (anchors.length === 0) return
-    if (typeof IntersectionObserver === 'undefined') return
-
-    const ratios = new Map<string, number>()
 
     const updateActive = () => {
       const scrollOffsetPx = resolveRulesConfigNavScrollOffsetPx()
@@ -33,7 +29,7 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
           {
             ...anchor,
             top,
-            ratio: ratios.get(anchor.id) ?? (top <= 0 ? 1 : 0),
+            ratio: 0,
           },
         ]
       })
@@ -43,33 +39,24 @@ export function useRulesConfigNavScrollSpy(sections: readonly RulesConfigNavSect
       setActiveLeafId(next.activeLeafId)
     }
 
-    const observer = new IntersectionObserver(
-      (records) => {
-        for (const record of records) {
-          ratios.set(record.target.id, record.intersectionRatio)
-        }
-        updateActive()
-      },
-      {
-        root: null,
-        rootMargin: buildRulesConfigNavObserverRootMargin(),
-        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
-      },
-    )
-
-    for (const anchor of anchors) {
-      const element = document.getElementById(anchor.id)
-      if (element) observer.observe(element)
-    }
-
     updateActive()
-    window.addEventListener('scroll', updateActive, { passive: true })
-    window.addEventListener('resize', updateActive)
+    const onScroll = () => updateActive()
+    const onResize = () => updateActive()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize)
+
+    const retryTimer = window.setInterval(() => {
+      const found = anchors.filter((anchor) => document.getElementById(anchor.id)).length
+      if (found === anchors.length) {
+        window.clearInterval(retryTimer)
+        updateActive()
+      }
+    }, 100)
 
     return () => {
-      observer.disconnect()
-      window.removeEventListener('scroll', updateActive)
-      window.removeEventListener('resize', updateActive)
+      window.clearInterval(retryTimer)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
     }
   }, [anchors])
 

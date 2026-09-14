@@ -66,10 +66,9 @@ describe('RulesConfigFieldNav', () => {
     )
 
     expect(screen.getByRole('link', { name: 'Creation' })).not.toHaveAttribute('aria-current')
-    expect(screen.getByRole('link', { name: 'Standard array' })).toHaveAttribute(
-      'aria-current',
-      'true',
-    )
+    const activeLeaf = screen.getByRole('link', { name: 'Standard array' })
+    expect(activeLeaf).toHaveAttribute('aria-current', 'true')
+    expect(activeLeaf).toHaveClass('font-bold')
   })
 
   it('scrolls to a section from the mobile select', async () => {

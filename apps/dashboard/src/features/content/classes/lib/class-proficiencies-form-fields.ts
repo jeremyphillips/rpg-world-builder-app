@@ -202,7 +202,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         multiple: true,
         options: referenceToolFieldOptions(ctx.options?.equipment),
         placeholder: 'Choose tools…',
-        width: 'xl',
+        width: 'full',
       },
     ],
   }
