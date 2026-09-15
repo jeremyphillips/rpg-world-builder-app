@@ -5,7 +5,9 @@ import {
   fieldAnatomyStackVariants,
   fieldChipWrapGapClasses,
   fieldLabelHintStackClasses,
+  fieldLabelRegionVariants,
   fieldLabelVariants,
+  fieldMessageRegionVariants,
   fieldArrayItemListClasses,
   fieldGroupLegendHeaderMarginVariants,
   fieldStackRhythmVariants,
@@ -33,6 +35,13 @@ describe('fieldAnatomyStackVariants', () => {
 
   it('uses 2px between a label cluster and its below-label hint', () => {
     expect(fieldLabelHintStackClasses).toContain('gap-0.5')
+  })
+
+  it('keeps three-region padding on the same size map via has-*', () => {
+    expect(fieldLabelRegionVariants({ size: 'sm' })).toContain('has-[*]:pb-1')
+    expect(fieldLabelRegionVariants({ size: 'md' })).toContain('has-[*]:pb-1.5')
+    expect(fieldMessageRegionVariants({ size: 'sm' })).toContain('has-[*]:pt-1')
+    expect(fieldMessageRegionVariants({ size: 'md' })).toContain('has-[*]:pt-1.5')
   })
 
   it('limits chip wrap classes to pill-row gap', () => {

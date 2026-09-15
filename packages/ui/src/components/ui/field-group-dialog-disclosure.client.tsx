@@ -67,7 +67,7 @@ export function FieldGroupDialogDisclosure<TFieldValues extends FieldValues = Fi
   const headline = disclosure.dialogHeadline ?? legend
 
   return (
-    <Field.Root hint={disclosure.hint} className={className}>
+    <Field.Root hint={disclosure.hint} className={className} anatomy>
       <FieldLayout
         hintPosition="below-control"
         wrapControl={false}

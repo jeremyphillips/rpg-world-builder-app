@@ -15,7 +15,9 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `field-row-presentation.lib.ts` — `resolveFieldPresentation`, `resolveFieldRowClasses`
  *
  * Spacing tokens below:
- * - `fieldAnatomyStackVariants` — label / control / hint inside one field (by control scale)
+ * - `fieldAnatomyStackVariants` — legacy Root stack gap (non-anatomy compositions)
+ * - `fieldLabelRegionVariants` / `fieldMessageRegionVariants` — region-owned padding for flat three-region anatomy
+ * - `fieldControlRegionClasses` — control region shell (no intrinsic spacing)
  * - `fieldLabelContentClusterClasses` — label + required marker + info on one line
  * - `fieldLabelHintStackClasses` — label cluster + hint when hint sits below the label (2px)
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
@@ -83,6 +85,44 @@ export const fieldAnatomyAlignVariants = cva('flex flex-col', {
     size: 'md',
   },
 })
+
+/**
+ * Label-region → control spacing for flat three-region anatomy.
+ * Padding applies via `has-[*]` so empty regions (null children / whitespace only)
+ * contribute no height. Lockstep with {@link fieldAnatomyStackVariants}.
+ */
+export const fieldLabelRegionVariants = cva('min-w-0 in-data-[field-row-participant]:self-end', {
+  variants: {
+    size: {
+      sm: 'has-[*]:pb-1',
+      md: 'has-[*]:pb-1.5',
+      lg: 'has-[*]:pb-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/**
+ * Control → message-region spacing for flat three-region anatomy.
+ * Padding applies via `has-[*]` so empty regions contribute no height.
+ */
+export const fieldMessageRegionVariants = cva('min-w-0', {
+  variants: {
+    size: {
+      sm: 'has-[*]:pt-1',
+      md: 'has-[*]:pt-1.5',
+      lg: 'has-[*]:pt-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Control region — no intrinsic spacing; band sizing lives on the control band. */
+export const fieldControlRegionClasses = 'min-w-0'
 
 /** Comfortable default — prefer {@link fieldAnatomyStackVariants} when `size` is known. */
 export const fieldAnatomyStackClasses = fieldAnatomyStackVariants({ size: 'md' })

@@ -18,12 +18,12 @@ import {
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 import { resolveFieldPresentation } from './field-row-presentation.lib'
-
-export type SwitchLabelPosition = FieldLabelPosition | 'inline'
-
+import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
 import type { FieldValidationProps } from './field-validation-props'
 import type { FieldLabelPresentationProps } from './field-label-props'
 import { cn } from '../../lib/utils'
+
+export type SwitchLabelPosition = FieldLabelPosition | 'inline'
 
 export interface SwitchFieldProps
   extends
@@ -115,6 +115,7 @@ export function SwitchField({
         required={required}
         width={rootWidth}
         size={size}
+        anatomy
       >
         <FieldLayout
           hintPosition={resolvedHintPosition}
@@ -134,6 +135,31 @@ export function SwitchField({
     controlBand: 'content-sized',
   })
 
+  const regions = (
+    <>
+      {/* Inline toggles keep the label beside the control; label region stays empty. */}
+      <FieldLabelRegion size={size} />
+      <FieldControlRegion>
+        <div className={presentation.controlBandClassName}>
+          <div className={fieldInlineToggleRowClasses}>
+            <div className={fieldInlineSwitchControlColumnClasses}>
+              <Field.Control>
+                <Switch {...switchProps} />
+              </Field.Control>
+            </div>
+            <div className={fieldLabelHintStackClasses}>
+              {labelNode}
+              <Field.Hint />
+            </div>
+          </div>
+        </div>
+      </FieldControlRegion>
+      <FieldMessageRegion size={size}>
+        <Field.Error />
+      </FieldMessageRegion>
+    </>
+  )
+
   return (
     <Field.Root
       id={id}
@@ -144,25 +170,11 @@ export function SwitchField({
       required={required}
       width={rootWidth}
       size={size}
+      anatomy
     >
-      <FieldChromeShell chrome={chrome} size={size}>
-        <div data-field-align="" className={presentation.alignmentAnchorClassName}>
-          <div className={presentation.controlBandClassName}>
-            <div className={fieldInlineToggleRowClasses}>
-              <div className={fieldInlineSwitchControlColumnClasses}>
-                <Field.Control>
-                  <Switch {...switchProps} />
-                </Field.Control>
-              </div>
-              <div className={fieldLabelHintStackClasses}>
-                {labelNode}
-                <Field.Hint />
-              </div>
-            </div>
-          </div>
-        </div>
+      <FieldChromeShell chrome={chrome} size={size} className={cn('flex flex-col')}>
+        {regions}
       </FieldChromeShell>
-      <Field.Error />
     </Field.Root>
   )
 }

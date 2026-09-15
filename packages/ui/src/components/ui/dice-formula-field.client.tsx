@@ -157,7 +157,15 @@ export function DiceFormulaField({
   }
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={rootWidth}>
+    <Field.Root
+      id={id}
+      error={error}
+      hint={hint}
+      required={required}
+      size={size}
+      width={rootWidth}
+      anatomy
+    >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}

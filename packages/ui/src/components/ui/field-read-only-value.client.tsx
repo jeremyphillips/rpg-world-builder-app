@@ -133,6 +133,7 @@ export function FieldReadOnlyValueField({
       required={required}
       width={width}
       size={size}
+      anatomy={Boolean(label.trim())}
     >
       {label.trim() ? (
         <FieldLayout
@@ -148,9 +149,11 @@ export function FieldReadOnlyValueField({
           size={size}
         />
       ) : (
-        valueNode
+        <>
+          {valueNode}
+          <Field.Error />
+        </>
       )}
-      <Field.Error />
     </Field.Root>
   )
 }

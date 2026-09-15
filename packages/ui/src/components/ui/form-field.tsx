@@ -150,6 +150,7 @@ export function FormField({
       required={required}
       size={size}
       width={rootWidth}
+      anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}

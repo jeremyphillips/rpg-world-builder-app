@@ -66,7 +66,15 @@ export function TextSuggestionsField({
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} size={size} width={rootWidth}>
+    <Field.Root
+      id={id}
+      error={error}
+      hint={hint}
+      required={required}
+      size={size}
+      width={rootWidth}
+      anatomy
+    >
       <FieldLayout
         hintPosition={hintPosition}
         chrome={chrome}

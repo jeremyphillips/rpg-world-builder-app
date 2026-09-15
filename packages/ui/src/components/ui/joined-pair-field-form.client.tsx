@@ -123,6 +123,7 @@ export function JoinedPairFieldForm({
       width={resolveFieldAnatomyWidth(width, chrome)}
       size={size}
       {...pickFieldChromeProps({ chrome })}
+      anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}

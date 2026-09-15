@@ -63,17 +63,21 @@ describe('FieldRow', () => {
     expect(container.firstChild).not.toHaveClass('items-end')
   })
 
-  it('wraps each field’s label + control band in a data-field-align anchor', () => {
+  it('wraps each field’s label + control in three-region anatomy', () => {
     const { container } = render(
       <FieldRow>
         <TextField id="first" label="First name" />
       </FieldRow>,
     )
 
-    const anchor = container.querySelector('[data-field-align]')
-    expect(anchor).not.toBeNull()
-    expect(anchor).toContainElement(screen.getByText('First name'))
-    expect(anchor).toContainElement(screen.getByLabelText('First name'))
+    const root = container.querySelector('[data-field-anatomy]')
+    expect(root).not.toBeNull()
+    expect(root?.querySelector('[data-field-label-region]')).toContainElement(
+      screen.getByText('First name'),
+    )
+    expect(root?.querySelector('[data-field-control-region]')).toContainElement(
+      screen.getByLabelText('First name'),
+    )
   })
 
   itAxe('has no axe accessibility violations', async () => {

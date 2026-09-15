@@ -11,9 +11,9 @@ describe('RichTextField', () => {
     expect(screen.getByRole('button', { name: 'Bold' })).toBeInTheDocument()
   })
 
-  it('keeps the editor shell full width inside the control band', () => {
+  it('keeps the editor shell full width inside the control region', () => {
     const { container } = render(<RichTextField id="bio" label="Biography" />)
-    const band = container.querySelector('[data-field-align] > .flex.w-full')
+    const band = container.querySelector('[data-field-control-region] > .flex.w-full')
     const editor = screen.getByRole('textbox', { name: 'Biography' }).closest('.relative')
 
     expect(band).toHaveClass('w-full', 'min-w-0')

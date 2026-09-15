@@ -82,7 +82,15 @@ export function LevelRangeField({
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
-    <Field.Root id={id} error={error} hint={hint} required={required} width={rootWidth} size={size}>
+    <Field.Root
+      id={id}
+      error={error}
+      hint={hint}
+      required={required}
+      width={rootWidth}
+      size={size}
+      anatomy
+    >
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}

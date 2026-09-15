@@ -179,6 +179,7 @@ export function ComboboxField({
       required={required}
       width={rootWidth}
       size={size}
+      anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}

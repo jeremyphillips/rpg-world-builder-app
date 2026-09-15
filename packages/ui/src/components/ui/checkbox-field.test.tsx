@@ -55,8 +55,9 @@ describe('CheckboxField', () => {
       />,
     )
 
-    const anchor = container.querySelector('[data-field-align]')
-    expect(anchor).not.toBeNull()
+    expect(container.querySelector('[data-field-control-region]')).not.toBeNull()
+    expect(container.querySelector('[data-field-label-region]')).not.toBeNull()
+    expect(container.querySelector('[data-field-message-region]')).not.toBeNull()
     const row = screen.getByText('Allow homebrew').closest('label')?.parentElement?.parentElement
     expect(row).toHaveClass('flex', 'gap-2')
     expect(row?.firstElementChild).toHaveClass('flex', 'h-4', 'shrink-0', 'items-center')
