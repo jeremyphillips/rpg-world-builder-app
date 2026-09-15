@@ -36,6 +36,14 @@ export interface FieldErrorPresentation {
   describedBy: string | undefined
 }
 
+function issueMatchesFieldPath(
+  issue: { path: string; presentationPath?: string },
+  fieldPath: string,
+) {
+  const presentationPath = issue.presentationPath ?? issue.path
+  return presentationPath === fieldPath || issue.path === fieldPath
+}
+
 function resolvePublishIssueMessage(
   fieldPath: string | undefined,
   issues: ReturnType<typeof useFormValidationPresentation>['issues'],
@@ -43,7 +51,8 @@ function resolvePublishIssueMessage(
   hasAttemptedPublish: boolean,
 ): string | undefined {
   if (!publishPresentationEnabled || !hasAttemptedPublish || !fieldPath) return undefined
-  return resolveFieldErrorMessage(issues.find((issue) => issue.path === fieldPath)?.message)
+  const issue = issues.find((entry) => issueMatchesFieldPath(entry, fieldPath))
+  return resolveFieldErrorMessage(issue?.message)
 }
 
 function fieldHasPresentationIssue(
@@ -52,16 +61,23 @@ function fieldHasPresentationIssue(
   presentationActive: boolean,
 ): boolean {
   return Boolean(
-    fieldPath && presentationActive && issues.some((issue) => issue.path === fieldPath),
+    fieldPath &&
+    presentationActive &&
+    issues.some((issue) => issueMatchesFieldPath(issue, fieldPath)),
   )
 }
 
-function resolvePresentedFieldError(
+export type FieldValidationPresentationState = Pick<
+  ReturnType<typeof useFormValidationPresentation>,
+  'issues' | 'hasAttemptedSubmit' | 'hasAttemptedPublish' | 'publishPresentationEnabled'
+>
+
+export function resolvePresentedFieldError(
   message: unknown,
   fieldPath: string | undefined,
-  issues: ReturnType<typeof useFormValidationPresentation>['issues'],
+  issues: FieldValidationPresentationState['issues'],
   presentation: Pick<
-    ReturnType<typeof useFormValidationPresentation>,
+    FieldValidationPresentationState,
     'hasAttemptedSubmit' | 'hasAttemptedPublish' | 'publishPresentationEnabled'
   >,
 ): Pick<FieldErrorPresentation, 'error' | 'invalid'> & { hasError: boolean } {
@@ -87,13 +103,14 @@ function resolvePresentedFieldError(
   }
 }
 
-/** Maps a raw RHF error message to visible/suppressed field presentation props. */
-export function useFieldErrorPresentation(
+/** Maps a raw RHF / publish issue to field presentation props (no React hook). */
+export function resolvePresentedFieldValidation(
   message: unknown,
-  fieldPath?: string,
+  fieldPath: string | undefined,
+  presentation: FieldValidationPresentationState,
+  suppressFieldErrorText: boolean,
+  rowSummaryId: string | undefined,
 ): FieldErrorPresentation {
-  const { suppressFieldErrorText, rowSummaryId } = React.useContext(ArrayItemPresentationContext)
-  const presentation = useFormValidationPresentation()
   const { error, invalid, hasError } = resolvePresentedFieldError(
     message,
     fieldPath,
@@ -106,6 +123,23 @@ export function useFieldErrorPresentation(
     invalid,
     describedBy: suppressFieldErrorText && hasError ? rowSummaryId : undefined,
   }
+}
+
+/** Maps a raw RHF error message to visible/suppressed field presentation props. */
+export function useFieldErrorPresentation(
+  message: unknown,
+  fieldPath?: string,
+): FieldErrorPresentation {
+  const { suppressFieldErrorText, rowSummaryId } = React.useContext(ArrayItemPresentationContext)
+  const presentation = useFormValidationPresentation()
+
+  return resolvePresentedFieldValidation(
+    message,
+    fieldPath,
+    presentation,
+    suppressFieldErrorText,
+    rowSummaryId,
+  )
 }
 
 /** Combines multiple field errors with suppression semantics. */

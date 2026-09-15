@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
-import { useController, type UseControllerReturn } from 'react-hook-form'
+import { useContext, useEffect, useMemo, useRef } from 'react'
+import { useController, useFormState, type UseControllerReturn } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
@@ -27,14 +27,23 @@ import type {
   InlineSentenceJoinedPairSegment,
   InlineSentenceSelectSegment,
 } from '../../../components/ui/inline-sentence-field.types'
-import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
+import { useFieldRowParticipation } from '../../../components/ui/field-row-anatomy.context'
+import {
+  ArrayItemPresentationContext,
+  resolvePresentedFieldValidation,
+} from '../../context/array-item-presentation.context'
+import {
+  resolveFirstFieldErrorMessage,
+  resolveNestedFieldErrorMessage,
+} from '../../errors/resolve-field-error-message'
+import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
+import { resolveRowAwareFieldHintPresentation } from '../../config/resolve-row-field-hint.lib'
 import { resolveSelectPlaceholder } from '../../config/field-placeholder.lib'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import type { InlineSentenceFieldConfig } from '../../field-config'
 import {
   collectFieldDynamicDependsOn,
   flattenSelectFieldOptions,
-  resolveFieldHintPresentation,
   resolveInlineSentenceSelectSegmentOptions,
 } from '../../field-config'
 import { useFieldControlSize } from '../../context/form-section.context'
@@ -188,8 +197,9 @@ function buildInlineSentenceJoinedPairSelectControl(options: {
   position: 'start' | 'end'
   id: string
   controllerByName: ReadonlyMap<string, InlineSentenceController>
+  hasError?: boolean
 }): InlineSentenceBoundJoinedPairSelect {
-  const { occupant, position, id, controllerByName } = options
+  const { occupant, position, id, controllerByName, hasError } = options
   const controller = controllerByName.get(occupant.name)
   const field = controller?.field
 
@@ -206,6 +216,7 @@ function buildInlineSentenceJoinedPairSelectControl(options: {
     digits: occupant.digits,
     placeholder: occupant.placeholder,
     ariaLabel: occupant.ariaLabel,
+    hasError,
     onChange: field?.onChange,
     onBlur: field?.onBlur,
   }
@@ -217,13 +228,16 @@ function buildInlineSentenceJoinedPairControl(options: {
   configName: string
   id: string
   controllerByName: ReadonlyMap<string, InlineSentenceController>
-  fieldErrors: Array<string | undefined>
+  boundValidations: ReadonlyMap<string, ReturnType<typeof resolvePresentedFieldValidation>>
 }): InlineSentenceBoundJoinedPair {
-  const { segment, segmentIndex, configName, id, controllerByName, fieldErrors } = options
+  const { segment, segmentIndex, configName, id, controllerByName, boundValidations } = options
   assertAllowedJoinedPairComposition({ start: segment.start, end: segment.end })
 
   const segmentKey = inlineSentenceJoinedPairSegmentKey(configName, segmentIndex)
-  const hasError = fieldErrors.some(Boolean)
+  const startHasError = boundValidations.get(segment.start.name)?.invalid
+  const endHasError =
+    segment.end.kind === 'select' ? boundValidations.get(segment.end.name)?.invalid : false
+  const hasError = Boolean(startHasError || endHasError)
   const startId = `${id}-${segment.start.name.replaceAll('.', '-')}`
   const endId =
     segment.end.kind === 'select' ? `${id}-${segment.end.name.replaceAll('.', '-')}` : `${id}-label`
@@ -242,6 +256,7 @@ function buildInlineSentenceJoinedPairControl(options: {
             max: segment.start.max,
             digits: segment.start.digits,
             ariaLabel: segment.start.ariaLabel,
+            hasError: startHasError,
             onChange: field?.onChange,
             onBlur: field?.onBlur,
           }
@@ -252,6 +267,7 @@ function buildInlineSentenceJoinedPairControl(options: {
           position: 'start',
           id: startId,
           controllerByName,
+          hasError: startHasError,
         })
 
   const end =
@@ -266,6 +282,7 @@ function buildInlineSentenceJoinedPairControl(options: {
           position: 'end',
           id: endId,
           controllerByName,
+          hasError: endHasError,
         })
 
   return {
@@ -285,6 +302,7 @@ export function InlineSentenceFieldRenderer({
   namePrefix,
   error,
 }: InlineSentenceFieldRendererProps) {
+  const inAnatomyRow = useFieldRowParticipation()
   const controlSize = useFieldControlSize(config.controlSizeOverride)
   const segmentVisibilityDeps = useMemo(
     () => inlineSentenceSegmentVisibilityDeps(config.segments),
@@ -312,8 +330,44 @@ export function InlineSentenceFieldRenderer({
     return map
   }, [controllers, uniqueBoundNames])
 
+  const presentation = useFormValidationPresentation()
+  const { errors } = useFormState()
+  const { suppressFieldErrorText, rowSummaryId } = useContext(ArrayItemPresentationContext)
+
+  const boundValidations = useMemo(() => {
+    const validations = new Map<string, ReturnType<typeof resolvePresentedFieldValidation>>()
+
+    for (const name of uniqueBoundNames) {
+      const fullPath = resolveFullName(namePrefix, name)
+      const controller = controllerByName.get(name)
+      const rhfMessage =
+        resolveNestedFieldErrorMessage(errors, fullPath) ?? controller?.fieldState.error?.message
+
+      validations.set(
+        name,
+        resolvePresentedFieldValidation(
+          rhfMessage,
+          fullPath,
+          presentation,
+          suppressFieldErrorText,
+          rowSummaryId,
+        ),
+      )
+    }
+
+    return validations
+  }, [
+    controllerByName,
+    errors,
+    namePrefix,
+    presentation,
+    rowSummaryId,
+    suppressFieldErrorText,
+    uniqueBoundNames,
+  ])
+
   const combinedError = resolveFirstFieldErrorMessage(
-    ...controllers.map(({ fieldState }) => fieldState.error?.message),
+    ...uniqueBoundNames.map((name) => boundValidations.get(name)?.error),
     error,
   )
 
@@ -370,7 +424,7 @@ export function InlineSentenceFieldRenderer({
             configName: config.name,
             id,
             controllerByName,
-            fieldErrors: controllers.map(({ fieldState }) => fieldState.error?.message),
+            boundValidations,
           }),
         )
         return
@@ -394,6 +448,7 @@ export function InlineSentenceFieldRenderer({
           max: segment.max,
           digits: segment.digits,
           ariaLabel: segment.ariaLabel,
+          hasError: boundValidations.get(segment.name)?.invalid,
           onChange: field.onChange,
           onBlur: field.onBlur,
         }
@@ -415,6 +470,7 @@ export function InlineSentenceFieldRenderer({
         width: selectSegment.width,
         placeholder: resolveSelectPlaceholder(selectLabel, selectSegment.placeholder),
         ariaLabel: selectLabel,
+        hasError: boundValidations.get(segment.name)?.invalid,
         onChange: (next) =>
           field.onChange(resolveInlineSentenceSelectChange(next, resolvedOptions)),
         onBlur: field.onBlur,
@@ -424,6 +480,7 @@ export function InlineSentenceFieldRenderer({
 
     return result
   }, [
+    boundValidations,
     config.label,
     config.name,
     controllerByName,
@@ -456,7 +513,7 @@ export function InlineSentenceFieldRenderer({
     }
   }, [config.below, config.chipSize, controllerByName, id])
 
-  const hintPresentation = resolveFieldHintPresentation(config, {})
+  const hintPresentation = resolveRowAwareFieldHintPresentation(config, {}, inAnatomyRow)
 
   return (
     <InlineSentenceField

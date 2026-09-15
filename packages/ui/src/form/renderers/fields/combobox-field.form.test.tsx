@@ -116,11 +116,13 @@ describe('Form combobox field', () => {
       />,
     )
 
-    const locationRoot = screen.getByLabelText('Location type').closest('.grow-\\[4\\]')
-    const archetypeRoot = screen.getByLabelText('Archetype').closest('.grow-\\[8\\]')
+    const locationRoot = screen
+      .getByLabelText('Location type')
+      .closest('[data-field-row-participant]')
+    const archetypeRoot = screen.getByLabelText('Archetype').closest('[data-field-row-participant]')
 
-    expect(locationRoot).toHaveClass('grow-[4]', 'max-w-1/3')
-    expect(archetypeRoot).toHaveClass('grow-[8]', 'max-w-2/3')
+    expect(locationRoot).toHaveClass('min-w-0', 'w-full', 'grid-rows-subgrid')
+    expect(archetypeRoot).toHaveClass('min-w-0', 'w-full', 'grid-rows-subgrid')
   })
 
   it('filters combobox options by category from filterSelect', async () => {

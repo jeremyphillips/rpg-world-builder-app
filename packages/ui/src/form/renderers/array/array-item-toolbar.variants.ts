@@ -110,13 +110,13 @@ function arrayItemCompactInlineSelfAlign(align: ArrayCompactInlineAlign): string
   return 'self-start'
 }
 
-/** Unlabeled inline rows center grip/actions with the field row unless explicitly overridden. */
+/** Unlabeled inline rows top-align grip/actions with the anatomy field row unless overridden. */
 export function resolveArrayItemCompactInlineAlign(
   align: ArrayCompactInlineAlign | undefined,
   unlabeled: boolean,
 ): ArrayCompactInlineAlign {
   if (align !== undefined) return align
-  if (unlabeled) return 'center'
+  if (unlabeled) return 'start'
   return 'start'
 }
 

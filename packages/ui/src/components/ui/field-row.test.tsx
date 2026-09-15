@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -35,6 +36,24 @@ describe('FieldRow', () => {
 
     const fieldRoot = screen.getByLabelText('Kind').closest('.max-w-64')
     expect(fieldRoot).toHaveClass('in-data-[field-row]:w-64')
+  })
+
+  it('renders anatomy-grid layout for schema rows', () => {
+    const { container } = render(
+      <FieldRow
+        layout="anatomy-grid"
+        className="field-row-anatomy-grid"
+        style={{ '--row-cols': '1fr 1fr' } as CSSProperties}
+        data-field-row-anatomy=""
+      >
+        <TextField id="first" label="First name" />
+        <TextField id="last" label="Last name" />
+      </FieldRow>,
+    )
+
+    expect(container.firstChild).toHaveAttribute('data-field-row-anatomy', '')
+    expect(container.firstChild).toHaveClass('field-row-anatomy-grid')
+    expect(container.firstChild).not.toHaveClass('flex')
   })
 
   it('renders its child fields side by side with control-edge alignment', () => {

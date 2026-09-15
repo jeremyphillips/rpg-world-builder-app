@@ -165,12 +165,15 @@ function ControlTopProbe({ fieldId, revision }: { fieldId: string; revision: str
     const control = input
       ?.closest('[data-field-anatomy]')
       ?.querySelector('[data-field-control-region]')
-    if (!control) {
-      setTop((prev) => (prev === null ? prev : null))
-      return
-    }
-    const next = Math.round(control.getBoundingClientRect().top)
-    setTop((prev) => (prev === next ? prev : next))
+    const frame = requestAnimationFrame(() => {
+      if (!control) {
+        setTop((prev) => (prev === null ? prev : null))
+        return
+      }
+      const next = Math.round(control.getBoundingClientRect().top)
+      setTop((prev) => (prev === next ? prev : next))
+    })
+    return () => cancelAnimationFrame(frame)
   }, [fieldId, revision])
 
   return (

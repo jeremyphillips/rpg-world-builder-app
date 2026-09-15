@@ -160,8 +160,10 @@ describe('Form section rendering', () => {
     )
 
     const row = container.querySelector('[data-field-row]')
-    expect(row).toHaveClass('gap-4')
-    expect(row).not.toHaveClass('gap-6')
+    expect(row).toHaveAttribute('data-field-row-anatomy', '')
+    expect(row).toHaveClass('gap-x-4')
+    expect(row).not.toHaveClass('gap-x-6')
+    expect(row).not.toHaveClass('flex')
   })
 
   it('renders default row spacing as gap-6 on FieldRow', () => {
@@ -180,7 +182,9 @@ describe('Form section rendering', () => {
     )
 
     const row = container.querySelector('[data-field-row]')
-    expect(row).toHaveClass('gap-6')
-    expect(row).not.toHaveClass('gap-4')
+    expect(row).toHaveAttribute('data-field-row-anatomy', '')
+    expect(row).toHaveClass('gap-x-6')
+    expect(row).not.toHaveClass('gap-x-4')
+    expect(row).not.toHaveClass('flex')
   })
 })

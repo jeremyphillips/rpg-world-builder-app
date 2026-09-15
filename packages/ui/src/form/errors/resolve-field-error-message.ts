@@ -1,22 +1,33 @@
 import { formatFieldMessage } from '@rpg/contracts'
 import type { FieldError, FieldErrors } from 'react-hook-form'
 
-/** Walks a dotted RHF path to read a leaf field error message. */
-export function resolveNestedFieldErrorMessage(
-  errors: FieldErrors,
-  path: string,
-): string | undefined {
+function readFieldErrorMessage(node: unknown): string | undefined {
+  if (node && typeof node === 'object' && 'message' in node) {
+    const message = (node as FieldError).message
+    return typeof message === 'string' ? message : undefined
+  }
+  return undefined
+}
+
+function walkFieldErrorsNode(errors: FieldErrors, path: string): unknown {
   const segments = path.split('.')
   let node: unknown = errors
   for (const segment of segments) {
     if (node == null || typeof node !== 'object') return undefined
     node = (node as Record<string, unknown>)[segment]
   }
-  if (node && typeof node === 'object' && 'message' in node) {
-    const message = (node as FieldError).message
-    return typeof message === 'string' ? message : undefined
-  }
-  return undefined
+  return node
+}
+
+/** Walks a dotted RHF path to read a leaf field error message. */
+export function resolveNestedFieldErrorMessage(
+  errors: FieldErrors,
+  path: string,
+): string | undefined {
+  const direct = readFieldErrorMessage(walkFieldErrorsNode(errors, path))
+  if (direct) return direct
+
+  return readFieldErrorMessage(walkFieldErrorsNode(errors, `${path}.root`))
 }
 
 /** Decodes structured validation payloads for control-level display. */

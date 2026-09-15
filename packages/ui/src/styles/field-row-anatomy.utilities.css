@@ -1,0 +1,11 @@
+/*
+ * Schema anatomy-row collapse — when the row container is narrower than the
+ * token-derived minimum, stack fields in independent three-row subgrid bands.
+ */
+@layer components {
+  @container field-row (max-width: var(--row-collapse-min, 0px)) {
+    .field-row-anatomy-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

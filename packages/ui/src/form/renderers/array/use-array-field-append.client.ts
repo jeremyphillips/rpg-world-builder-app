@@ -3,9 +3,9 @@
 /**
  * React hook that wires array "Add" interactions to `useFieldArray`.
  *
- * Exposes `appendItem` for the plain button path, `appendFromAddMenu` for
- * `ArrayConfig.addActionMenu` template selections (merge defaults, expand, focus),
- * and live `addActionMenuItems` with duplicate-policy presentation applied.
+ * Exposes `appendItem` for the plain button path, `appendItemWithDefaults` for
+ * explicit payloads / add-menu merges, and live `addActionMenuItems` with
+ * duplicate-policy presentation applied.
  */
 import * as React from 'react'
 import type { UseFieldArrayAppend, UseFieldArrayReturn } from 'react-hook-form'
@@ -15,6 +15,7 @@ import { resolveArrayAddAction } from '../../config/array/array-item-config.lib'
 import type { ValidationSessionExpandKey } from '../../errors'
 import type { ArrayConfig } from '../../field-config'
 import {
+  assertAppendPayload,
   buildArrayAddMenuExpandKeys,
   buildStaticArrayItemDefaults,
   mergeArrayAddMenuDefaults,
@@ -50,28 +51,25 @@ export function useArrayFieldAppend({
     [config.fields],
   )
 
-  const appendItem = React.useCallback(
-    (defaults?: Record<string, unknown>) => {
-      const nextDefaults =
-        defaults ??
-        resolveArrayAppendDefaults(
-          config,
-          staticItemDefaults,
-          (getValues(fullName) as unknown[]) ?? [],
-        )
-      append(nextDefaults)
-    },
-    [append, config, fullName, getValues, staticItemDefaults],
-  )
+  const appendItem = React.useCallback(() => {
+    append(
+      resolveArrayAppendDefaults(
+        config,
+        staticItemDefaults,
+        (getValues(fullName) as unknown[]) ?? [],
+      ),
+    )
+  }, [append, config, fullName, getValues, staticItemDefaults])
 
-  const appendWithDefaults = React.useCallback(
+  const appendItemWithDefaults = React.useCallback(
     (defaults: Record<string, unknown>) => {
+      const payload = assertAppendPayload(defaults)
       const newIndex = fields.length
-      append(defaults)
+      append(payload)
 
       if (collapsible) {
         addValidationSessionExpandKeys(
-          buildArrayAddMenuExpandKeys(fullName, newIndex, defaults, itemCollapseKey),
+          buildArrayAddMenuExpandKeys(fullName, newIndex, payload, itemCollapseKey),
         )
       }
 
@@ -85,10 +83,9 @@ export function useArrayFieldAppend({
       const menuItem = resolveArrayAddAction(config)?.menu?.items.find((item) => item.id === itemId)
       if (!menuItem) return
 
-      const mergedDefaults = mergeArrayAddMenuDefaults(menuItem, staticItemDefaults)
-      appendWithDefaults(mergedDefaults)
+      appendItemWithDefaults(mergeArrayAddMenuDefaults(menuItem, staticItemDefaults, config.fields))
     },
-    [appendWithDefaults, config, staticItemDefaults],
+    [appendItemWithDefaults, config, staticItemDefaults],
   )
 
   const addActionMenu = resolveArrayAddAction(config)?.menu
@@ -98,5 +95,5 @@ export function useArrayFieldAppend({
     return buildArrayAddMenuItems(addActionMenu, watchedItems ?? [])
   }, [addActionMenu, watchedItems])
 
-  return { appendItem, appendFromAddMenu, appendWithDefaults, addActionMenuItems }
+  return { appendItem, appendItemWithDefaults, appendFromAddMenu, addActionMenuItems }
 }

@@ -4,6 +4,7 @@
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldConfig, FieldDerivedMeta, JoinedPairFieldConfig } from '../field-config'
 import { resolveFieldConfigPrimaryName } from '../field-config'
+import { resolveRowAwareFieldHintPresentation } from '../config/resolve-row-field-hint.lib'
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
@@ -66,18 +67,25 @@ function resolveDerivedMetaPresentation(
   }
 }
 
+export type ResolveFieldRenderConfigOptions = {
+  inAnatomyRow?: boolean
+}
+
 /** Applies inherited density, dynamic hints, derived metadata, and option availability to a field config. */
 export function resolveFieldRenderConfig(
   config: FieldConfig,
   density: FormDensity,
   dynamicValues: Record<string, unknown>,
   optionValues: Record<string, unknown>,
+  options: ResolveFieldRenderConfigOptions = {},
 ): ResolvedFieldRenderConfig {
   const controlSize = resolveFieldControlSize({
     density,
     override: config.controlSizeOverride,
   })
-  const hintPresentation = resolveFieldHintPresentation(config, dynamicValues)
+  const hintPresentation = options.inAnatomyRow
+    ? resolveRowAwareFieldHintPresentation(config, dynamicValues, true)
+    : resolveFieldHintPresentation(config, dynamicValues)
   const derivedMetaPresentation = resolveDerivedMetaPresentation(config, dynamicValues)
 
   const basePresentation = {

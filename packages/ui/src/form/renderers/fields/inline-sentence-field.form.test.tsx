@@ -457,6 +457,68 @@ describe('InlineSentenceField form integration', () => {
     )
   })
 
+  it('surfaces bound select validation from submit errors', async () => {
+    const user = userEvent.setup()
+
+    const schema = z
+      .object({
+        movementOperation: z.string(),
+        movementFeet: z.string().optional(),
+      })
+      .superRefine((row, ctx) => {
+        if (row.movementFeet === undefined || row.movementFeet === '') {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Movement speed is required.',
+            path: ['movementFeet'],
+          })
+        }
+      })
+
+    const fields: FormItem[] = [
+      {
+        type: 'inlineSentence',
+        name: 'movement',
+        label: 'Movement',
+        labelVisibility: 'srOnly',
+        segments: [
+          {
+            kind: 'select',
+            name: 'movementOperation',
+            options: [{ value: 'increase', label: 'increases by' }],
+            defaultValue: 'increase',
+          },
+          {
+            kind: 'select',
+            name: 'movementFeet',
+            options: [{ value: '5', label: '+5 ft' }],
+            ariaLabel: 'Movement speed',
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        defaultValues={{ movementOperation: 'increase' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Movement speed is required.')).toBeInTheDocument()
+    })
+    expect(screen.getByRole('combobox', { name: 'Movement speed' })).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    )
+  })
+
   it('submits joined-pair select + label segments with numeric select values', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()

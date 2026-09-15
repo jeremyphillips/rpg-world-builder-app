@@ -10,11 +10,9 @@ import {
 } from '../../context/array-item-presentation.context'
 import type { ResolvedArrayItemHeader } from '../../config/array/array-item-config.lib'
 import type { ArrayItemConfig, RowConfig, RowFieldItem } from '../../field-config'
-import { isRowSlotItem, resolveFieldConfigPrimaryName } from '../../field-config'
+import { resolveRowFieldGap } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
-import { FieldNode } from '../../containers/form-conditional.client'
-import { SlotFormItemSection } from '../fields/slot-field-renderer.client'
-import { FieldRow } from '../../../components/ui/field-row'
+import { AnatomyFieldRow } from '../../presentation/anatomy-field-row.client'
 import { ArrayItemCompactRow } from './array-item-compact-row.client'
 import { ArrayItemDragHandleSlot } from './array-item-drag-handle-slot.client'
 import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
@@ -41,26 +39,15 @@ function FlatNoHeaderInlineFields({
 
   return (
     <ArrayItemPresentationContext.Provider value={rowPresentationValue}>
-      <FieldRow className={inlineRow?.className}>
-        {inlineFields.map((field) =>
-          isRowSlotItem(field) ? (
-            <SlotFormItemSection
-              key={field.name}
-              item={field}
-              parentContext={parentContext}
-              depth={1}
-              namePrefix={namePrefix}
-            />
-          ) : (
-            <FieldNode
-              key={resolveFieldConfigPrimaryName(field)}
-              config={field}
-              idPrefix={idPrefix}
-              namePrefix={namePrefix}
-            />
-          ),
-        )}
-      </FieldRow>
+      <AnatomyFieldRow
+        fields={inlineFields}
+        gap={resolveRowFieldGap(inlineRow?.spacing)}
+        className={inlineRow?.className}
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+        parentContext={parentContext}
+        depth={1}
+      />
     </ArrayItemPresentationContext.Provider>
   )
 }

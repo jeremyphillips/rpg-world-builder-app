@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 
+import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { cn } from '../../lib/utils'
 import type { FieldWidth } from './field-control.variants'
 import {
@@ -106,7 +107,9 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
     const controlId = id ?? generatedId
     const { meta: derivedMeta } = useFieldDerivedMetaContext()
     const hasDerivedMeta = Boolean(derivedMeta?.rows.length)
-    const useAnatomy = anatomy || rowParticipation
+    const inAnatomyRow = useFieldRowParticipation()
+    const effectiveRowParticipation = rowParticipation || inAnatomyRow
+    const useAnatomy = anatomy || effectiveRowParticipation
 
     const value = React.useMemo<FieldContextValue>(
       () =>
@@ -140,12 +143,12 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
           ref={ref}
           data-field={name}
           data-field-anatomy={useAnatomy ? '' : undefined}
-          data-field-row-participant={rowParticipation ? '' : undefined}
+          data-field-row-participant={effectiveRowParticipation ? '' : undefined}
           className={resolveFieldRootClassName({
             size,
             width,
             anatomy,
-            rowParticipation,
+            rowParticipation: effectiveRowParticipation,
             className,
           })}
           {...props}

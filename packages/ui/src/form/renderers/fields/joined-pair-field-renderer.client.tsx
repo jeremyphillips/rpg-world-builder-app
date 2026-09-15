@@ -5,9 +5,10 @@ import { useController } from 'react-hook-form'
 import { JoinedPairFieldForm } from '../../../components/ui/joined-pair-field-form.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import type { JoinedPairFieldConfig } from '../../field-config'
+import { useFieldRowParticipation } from '../../../components/ui/field-row-anatomy.context'
 import { useFieldControlSize } from '../../context/form-section.context'
 import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
-import { resolveFieldHintPresentation } from '../../field-config'
+import { resolveRowAwareFieldHintPresentation } from '../../config/resolve-row-field-hint.lib'
 import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import {
   buildJoinedPairControls,
@@ -24,6 +25,7 @@ export interface JoinedPairFieldRendererProps {
 
 /** RHF adapter for standalone `joinedPair` fields — one controller per bound occupant. */
 export function JoinedPairFieldRenderer({ config, id, namePrefix }: JoinedPairFieldRendererProps) {
+  const inAnatomyRow = useFieldRowParticipation()
   const controlSize = useFieldControlSize(config.controlSizeOverride)
   const { startPath, endPath } = resolveJoinedPairBoundPaths(config, namePrefix)
   const ids = resolveJoinedPairControlIds(id, config)
@@ -40,7 +42,7 @@ export function JoinedPairFieldRenderer({ config, id, namePrefix }: JoinedPairFi
     endPath,
   )
   const validation = useFieldErrorPresentation(combinedError, startPath)
-  const hintPresentation = resolveFieldHintPresentation(config, {})
+  const hintPresentation = resolveRowAwareFieldHintPresentation(config, {}, inAnatomyRow)
   const labelVisibility = resolveFieldLabelVisibility(config)
   const controls = buildJoinedPairControls(
     config,

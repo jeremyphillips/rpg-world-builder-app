@@ -1307,15 +1307,15 @@ describe('ArrayFieldRenderer', () => {
     const compactRow = document.querySelector('[data-compact-inline-row]')
     expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
 
-    expect(screen.getByRole('textbox', { name: 'Description' }).closest('.flex-1')).toHaveClass(
-      'w-full',
-    )
-    expect(screen.getByRole('spinbutton', { name: 'DC' }).closest('.flex-none')).toHaveClass(
-      'w-fit',
-    )
+    expect(
+      screen.getByRole('textbox', { name: 'Description' }).closest('[data-field-row-participant]'),
+    ).toHaveClass('min-w-0', 'w-full')
+    expect(
+      screen.getByRole('spinbutton', { name: 'DC' }).closest('[data-field-row-participant]'),
+    ).toHaveClass('w-fit')
   })
 
-  it('centers unlabeled compact inline grip and actions with the field row by default', () => {
+  it('top-aligns unlabeled compact inline grip and actions with the anatomy field row by default', () => {
     const centeredCompactRowFields: FormItem[] = [
       {
         kind: 'array',
@@ -1352,14 +1352,14 @@ describe('ArrayFieldRenderer', () => {
     )
 
     const compactRow = document.querySelector('[data-compact-inline-row]')
-    expect(compactRow).toHaveAttribute('data-compact-inline-align', 'center')
-    expect(compactRow).toHaveClass('items-center')
+    expect(compactRow).toHaveAttribute('data-compact-inline-align', 'start')
+    expect(compactRow).toHaveClass('items-start')
 
     const gripColumn = compactRow?.firstElementChild?.nextElementSibling
-    expect(gripColumn).toHaveClass('self-center')
+    expect(gripColumn).toHaveClass('self-start')
 
     const actionsColumn = compactRow?.querySelector('[aria-label="Item actions"]')?.parentElement
-    expect(actionsColumn).toHaveClass('self-center')
+    expect(actionsColumn).toHaveClass('self-start')
   })
 
   it('shows issue badge, row summary, and legend link after failed submit', async () => {
@@ -1841,7 +1841,7 @@ describe('ArrayFieldRenderer', () => {
         expect(flatShell).toBeInTheDocument()
         expect(flatShell).toHaveAttribute('data-array-item-content-layout', 'inline')
         expect(document.querySelector('[data-compact-inline-row]')).toBeInTheDocument()
-        expect(document.querySelector('[data-compact-inline-align="center"]')).toBeInTheDocument()
+        expect(document.querySelector('[data-compact-inline-align="start"]')).toBeInTheDocument()
 
         unmount()
       }

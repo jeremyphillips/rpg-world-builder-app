@@ -37,6 +37,14 @@ function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly s
   return left.path.localeCompare(right.path)
 }
 
+function countUniquePresentationPaths(issues: readonly FormIssue[]): number {
+  const paths = new Set<string>()
+  for (const issue of issues) {
+    paths.add(issue.presentationPath ?? issue.path)
+  }
+  return paths.size
+}
+
 function buildIssueGroup(
   itemPrefix: string,
   arrayPath: string,
@@ -52,7 +60,7 @@ function buildIssueGroup(
     itemPrefix,
     arrayPath,
     itemIndex,
-    totalCount: sortedIssues.length,
+    totalCount: countUniquePresentationPaths(sortedIssues),
     sortedIssues,
     headerIssues: sortedIssues.filter((issue) => issue.severity !== 'field'),
     fieldIssues,

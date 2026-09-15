@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 
+import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { Field, type FieldSize } from './field.client'
 import { FieldLabelContent } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
@@ -50,6 +51,7 @@ export function CheckboxField({
   chrome,
   ...checkboxProps
 }: CheckboxFieldProps) {
+  const inAnatomyRow = useFieldRowParticipation()
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
   const presentation = resolveFieldPresentation({
     size,
@@ -86,12 +88,13 @@ export function CheckboxField({
             </div>
             <div className={fieldLabelHintStackClasses}>
               {labelNode}
-              <Field.Hint />
+              {!inAnatomyRow && <Field.Hint />}
             </div>
           </div>
         </div>
       </FieldControlRegion>
       <FieldMessageRegion size={size}>
+        {inAnatomyRow && <Field.Hint />}
         <Field.Error />
       </FieldMessageRegion>
     </>
@@ -104,6 +107,7 @@ export function CheckboxField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={inAnatomyRow ? 'below-control' : undefined}
       required={required}
       width={rootWidth}
       size={size}

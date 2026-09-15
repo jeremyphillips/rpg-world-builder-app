@@ -36,7 +36,12 @@ export {
 export {
   resolveFieldErrorMessage,
   resolveFirstFieldErrorMessage,
+  resolveNestedFieldErrorMessage,
 } from './resolve-field-error-message'
+export {
+  enrichFormIssuesWithPresentationPaths,
+  resolveFormIssuePresentationPath,
+} from './resolve-form-issue-presentation-path.lib'
 export {
   buildValidationSessionExpandKey,
   resolveValidationExpandKeys,

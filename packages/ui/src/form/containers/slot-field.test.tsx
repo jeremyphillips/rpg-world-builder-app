@@ -324,8 +324,10 @@ describe('SlotFieldRenderer', () => {
     )
 
     const notes = screen.getByRole('textbox', { name: 'Notes' })
-    expect(notes.parentElement).toHaveClass('min-w-0', 'max-w-1/3', 'basis-0', 'grow-[4]')
-    expect(container.querySelector('[data-field-row]')).toContainElement(notes)
+    expect(container.querySelector('[data-field-row-anatomy]')).toContainElement(notes)
+    expect(
+      screen.getByRole('textbox', { name: 'Name' }).closest('[data-field-row-participant]'),
+    ).toHaveClass('grid-rows-subgrid')
   })
 
   it('hides a slot when its visibility predicate is false', () => {

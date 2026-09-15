@@ -63,9 +63,9 @@ export function ArrayFieldRenderer({
     return registerArrayFieldMutators(form.control, fullName, {
       getValues: () => fields.map((_, index) => form.getValues(`${fullName}.${index}`)),
       remove,
-      append: state.appendWithDefaults,
+      append: state.appendItemWithDefaults,
     })
-  }, [form, fullName, fields, remove, state.appendWithDefaults])
+  }, [form, fullName, fields, remove, state.appendItemWithDefaults])
 
   return (
     <ArrayFieldRendererFieldset

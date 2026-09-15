@@ -21,8 +21,8 @@ import {
 import { resolveFieldContainerChromeClasses } from '../../../components/ui/field-surface.variants'
 
 describe('resolveArrayItemCompactInlineAlign', () => {
-  it('defaults unlabeled inline rows to center alignment', () => {
-    expect(resolveArrayItemCompactInlineAlign(undefined, true)).toBe('center')
+  it('defaults unlabeled inline rows to start alignment', () => {
+    expect(resolveArrayItemCompactInlineAlign(undefined, true)).toBe('start')
   })
 
   it('honors explicit inlineAlign overrides on unlabeled rows', () => {

@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 
+import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
@@ -64,7 +65,8 @@ export function SwitchField({
   chrome,
   ...switchProps
 }: SwitchFieldProps) {
-  const resolvedHintPosition = hintPosition ?? 'below-label'
+  const inAnatomyRow = useFieldRowParticipation()
+  const resolvedHintPosition = inAnatomyRow ? 'below-control' : (hintPosition ?? 'below-label')
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const labelNode = (
@@ -149,12 +151,13 @@ export function SwitchField({
             </div>
             <div className={fieldLabelHintStackClasses}>
               {labelNode}
-              <Field.Hint />
+              {!inAnatomyRow && <Field.Hint />}
             </div>
           </div>
         </div>
       </FieldControlRegion>
       <FieldMessageRegion size={size}>
+        {inAnatomyRow && <Field.Hint />}
         <Field.Error />
       </FieldMessageRegion>
     </>
@@ -167,6 +170,7 @@ export function SwitchField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={resolvedHintPosition}
       required={required}
       width={rootWidth}
       size={size}

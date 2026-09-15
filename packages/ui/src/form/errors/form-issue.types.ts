@@ -10,6 +10,11 @@ export type FormIssueScope = 'form' | 'section' | 'array' | 'item' | 'field'
 export type FormIssue = {
   /** Dot path from form root, e.g. `startingWealth.tiers.1.minLevel`. */
   path: string
+  /**
+   * Canonical control path for badges, counts, and `aria-invalid`. Defaults to
+   * {@link path} when omitted (pre-enrichment callers).
+   */
+  presentationPath?: string
   /** Full field-context message shown beside the control. */
   message: string
   /** Shorter summary label for collapsed row chrome; falls back to `message`. */

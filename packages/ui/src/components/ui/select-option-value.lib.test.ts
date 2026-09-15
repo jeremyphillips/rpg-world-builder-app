@@ -35,8 +35,13 @@ describe('select-option-value.lib', () => {
   it('encodes stored values only when they match a known option', () => {
     const options = [{ value: 30, label: '30' }]
     expect(encodeStoredSelectOptionValue(30, options)).toBe('n:30')
-    expect(encodeStoredSelectOptionValue('30', options)).toBeUndefined()
+    expect(encodeStoredSelectOptionValue('30', options)).toBe('n:30')
     expect(encodeStoredSelectOptionValue(undefined, options)).toBeUndefined()
+  })
+
+  it('coerces numeric stored values against string numeric options for display', () => {
+    const options = [{ value: '30', label: '30' }]
+    expect(encodeStoredSelectOptionValue(30, options)).toBe('s:30')
   })
 
   it('compares option values with strict typing', () => {

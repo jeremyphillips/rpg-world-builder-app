@@ -33,13 +33,33 @@ export function decodeSelectOptionValue(encoded: string): TypedSelectOptionValue
   return undefined
 }
 
+function findSelectOptionForStoredValue(
+  stored: unknown,
+  options: readonly TypedSelectOption[],
+): TypedSelectOption | undefined {
+  const direct = options.find((option) => selectOptionValuesEqual(option.value, stored))
+  if (direct) return direct
+
+  // z.coerce.number and legacy defaults can leave numeric state on string options (or vice versa).
+  if (typeof stored === 'number' && Number.isFinite(stored)) {
+    return options.find(
+      (option) => typeof option.value === 'string' && option.value === String(stored),
+    )
+  }
+  if (typeof stored === 'string' && /^\d+$/.test(stored)) {
+    const asNumber = Number(stored)
+    return options.find((option) => typeof option.value === 'number' && option.value === asNumber)
+  }
+  return undefined
+}
+
 /** Encodes a stored form value when it matches a known option; otherwise undefined. */
 export function encodeStoredSelectOptionValue(
   stored: unknown,
   options: readonly TypedSelectOption[],
 ): string | undefined {
   if (stored === undefined || stored === null || stored === '') return undefined
-  const match = options.find((option) => selectOptionValuesEqual(option.value, stored))
+  const match = findSelectOptionForStoredValue(stored, options)
   return match ? encodeSelectOptionValue(match.value) : undefined
 }
 

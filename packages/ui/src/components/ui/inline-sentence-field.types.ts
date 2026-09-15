@@ -92,6 +92,7 @@ export type InlineSentenceBoundNumber = {
   max?: number
   digits?: FieldDigits
   ariaLabel?: string
+  hasError?: boolean
   onChange?: (value: number | undefined) => void
   onBlur?: () => void
 }
@@ -106,6 +107,7 @@ export type InlineSentenceBoundSelect = {
   width?: FieldWidth
   placeholder?: string
   ariaLabel?: string
+  hasError?: boolean
   onChange?: (value: string) => void
   onBlur?: () => void
 }

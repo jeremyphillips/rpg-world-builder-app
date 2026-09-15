@@ -61,6 +61,7 @@ import type {
 import { fieldDefaultValue, resolveFieldConfigPrimaryName } from '../field-config'
 import { assertOptionalDisclosureFieldConfig } from '../config/optional-disclosure-config.lib'
 import { useDependsOnValues } from '../config/form-depends-on.client'
+import { useFieldRowParticipation } from '../../components/ui/field-row-anatomy.context'
 import { useFormSectionContext } from '../context/form-section.context'
 import { resolveFieldLabelVisibility, type FieldLabelVisibility } from '../form-heading.lib'
 import type { JsonFieldProps } from '../../components/ui/json-field.client'
@@ -575,6 +576,7 @@ function wrapFieldDerivedMetaPresentation(
  */
 export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererProps) {
   const sectionContext = useFormSectionContext()
+  const inAnatomyRow = useFieldRowParticipation()
   const { density } = sectionContext
   const chromeProps = resolveFieldChromeProps(config, sectionContext)
   const chromedConfig = { ...config, ...chromeProps } as FieldConfig
@@ -589,7 +591,9 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
       ? chromedConfig.optionAvailability
       : undefined
   const optionValues = useDependsOnValues(optionAvailability?.dependsOn ?? [], namePrefix)
-  const resolved = resolveFieldRenderConfig(chromedConfig, density, dynamicValues, optionValues)
+  const resolved = resolveFieldRenderConfig(chromedConfig, density, dynamicValues, optionValues, {
+    inAnatomyRow,
+  })
 
   const specialized = renderSpecializedField({
     renderConfig: resolved.config,

@@ -39,6 +39,8 @@ export {
   ArrayItemPresentationContext,
   resolveErrorPlacement,
   useFieldErrorPresentation,
+  resolvePresentedFieldValidation,
+  type FieldValidationPresentationState,
   type ArrayItemPresentationContextValue,
   type ErrorPlacement,
 } from './context/array-item-presentation.context'
@@ -443,3 +445,7 @@ export {
   type FieldSeparator,
   type FieldRhythm,
 } from '../components/ui/field.variants'
+export {
+  FieldRowAnatomyProvider,
+  useFieldRowParticipation,
+} from '../components/ui/field-row-anatomy.context'

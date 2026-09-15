@@ -17,6 +17,7 @@ import {
   FormSectionProvider,
   FormUiProvider,
   makeResolver,
+  useFieldRowParticipation,
   type FormDensity,
 } from '@rpg/ui/form'
 
@@ -315,26 +316,32 @@ export function CampaignAvailabilityField({
     return () => subscription.unsubscribe()
   }, [form, onDraftChange])
 
+  const inAnatomyRow = useFieldRowParticipation()
+
   if (capability.mode === 'unsupported') {
     return null
   }
+
+  const formBody = (
+    <FormProvider {...form}>
+      <FormUiProvider fields={renderedFields}>
+        <FormSectionProvider density={resolvedDensity} inRhythmStack>
+          {persistError ? (
+            <Text variant="destructive" role="alert" className="mb-4">
+              {persistError}
+            </Text>
+          ) : null}
+          <FormItems key={groupId} items={renderedFields} idPrefix={sectionId} />
+        </FormSectionProvider>
+      </FormUiProvider>
+    </FormProvider>
+  )
 
   return (
     <CampaignAccessAvailabilityProvider
       value={{ pending, onAvailableChange: handleAvailableChange }}
     >
-      <FormProvider {...form}>
-        <FormUiProvider fields={renderedFields}>
-          <FormSectionProvider density={resolvedDensity} inRhythmStack>
-            {persistError ? (
-              <Text variant="destructive" role="alert" className="mb-4">
-                {persistError}
-              </Text>
-            ) : null}
-            <FormItems key={groupId} items={renderedFields} idPrefix={sectionId} />
-          </FormSectionProvider>
-        </FormUiProvider>
-      </FormProvider>
+      {inAnatomyRow ? <div className="contents">{formBody}</div> : formBody}
 
       <CampaignAccessBlockedDialog
         open={blockedOpen}

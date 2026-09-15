@@ -37,6 +37,7 @@ import {
   type FieldVisibility,
   type FormItem,
   type InlineSentenceFieldConfig,
+  type JoinedPairFieldConfig,
   type SelectFieldOptionListItem,
   flattenSelectFieldOptions,
 } from '@rpg/ui/form'
@@ -67,6 +68,7 @@ import {
   type EquipmentGrantItemForm,
 } from './equipment/equipment-grant-form-fields'
 import { equipmentGrantSummary, equipmentGrantTitle } from './equipment/equipment-grant-form-values'
+import { GrantTypePersistField } from './grant-type-persist-field'
 import {
   proficiencyGrantItemFields,
   type ArmorTrainingItemForm,
@@ -355,30 +357,31 @@ function formatSpellsGrantRowSummary(values: GrantRowValues, ctx: GrantRowHeader
   return ''
 }
 
-const senseRangeOptions: FieldOption[] = SENSE_RANGES.map((range) => ({
-  value: String(range),
+const senseRangeOptions = SENSE_RANGES.map((range) => ({
+  value: range,
   label: String(range),
 }))
 
-function senseRangeInlineSentenceField(
-  overrides?: Partial<InlineSentenceFieldConfig>,
-): InlineSentenceFieldConfig {
+function senseRangeJoinedPairField(
+  overrides?: Partial<JoinedPairFieldConfig>,
+): JoinedPairFieldConfig {
   return {
-    type: 'inlineSentence',
-    name: 'senseRange',
+    type: 'joinedPair',
     label: 'Range',
     width: '1/3',
-    segments: [
-      {
-        kind: 'select',
-        name: 'senseRange',
-        options: senseRangeOptions,
-        digits: 3,
-        defaultValue: '60',
-        ariaLabel: 'Range',
-      },
-      { kind: 'text', value: 'ft.', tone: 'label' },
-    ],
+    start: {
+      kind: 'select',
+      name: 'senseRange',
+      options: senseRangeOptions,
+      digits: 3,
+      defaultValue: 60,
+      ariaLabel: 'Range',
+    },
+    end: {
+      kind: 'label',
+      text: 'ft.',
+      ariaLabel: 'Range unit',
+    },
     ...overrides,
   }
 }
@@ -460,6 +463,16 @@ function visibleWhenGrantTypeMissing(): FieldVisibility {
       return typeof grantType !== 'string' || grantType.length === 0
     },
   }
+}
+
+function grantTypePersistFields(): FormItem[] {
+  return [
+    {
+      kind: 'slot',
+      name: '_grantTypePersist',
+      render: () => createElement(GrantTypePersistField),
+    },
+  ]
 }
 
 function grantTypeMissingRepairFields(): FormItem[] {
@@ -627,6 +640,7 @@ export function grantItemFields<T extends string>(
   const inheritUnlockFromParent = options?.inheritUnlockFromParentField === 'level'
 
   return [
+    ...grantTypePersistFields(),
     ...grantTypeMissingRepairFields(),
     {
       type: 'inlineSentence',
@@ -658,6 +672,7 @@ export function grantItemFields<T extends string>(
       type: 'chips',
       name: 'resistances',
       label: vocabularyFieldLabel(DAMAGE_TYPE_TERM, { plural: true }),
+      required: true,
       options: damageTypeOptions,
       visibility: visibleFor('resistances'),
     },
@@ -665,6 +680,7 @@ export function grantItemFields<T extends string>(
       type: 'chips',
       name: 'damageType',
       label: vocabularyFieldLabel(DAMAGE_TYPE_TERM, { plural: true }),
+      required: true,
       options: damageTypeOptions,
       visibility: visibleFor('damageType'),
     },
@@ -676,10 +692,11 @@ export function grantItemFields<T extends string>(
           type: 'select',
           name: 'senseType',
           label: 'Sense type',
+          required: true,
           options: senseTypeOptions,
           width: '2/3',
         },
-        senseRangeInlineSentenceField(),
+        senseRangeJoinedPairField(),
       ],
     },
     movementInlineSentenceField({
@@ -689,6 +706,7 @@ export function grantItemFields<T extends string>(
       type: 'select',
       name: 'language',
       label: 'Language',
+      required: true,
       options: languageOptions,
       visibility: visibleFor('languages'),
     },

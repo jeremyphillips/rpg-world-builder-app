@@ -106,12 +106,21 @@ export function ArrayFieldRendererFieldset({
             />
           </div>
         ) : (
-          <ArrayFieldItemList
-            fields={fields}
-            sortableEnabled={state.sortableEnabled}
-            itemProps={state.itemProps}
-            onMove={onMove}
-          />
+          <>
+            <ArrayFieldItemList
+              fields={fields}
+              sortableEnabled={state.sortableEnabled}
+              itemProps={state.itemProps}
+              onMove={onMove}
+            />
+            {state.hasContainerIssue ? (
+              <ArrayFieldContainerError
+                fullName={state.fullName}
+                errorId={containerErrorId}
+                size={state.legendFieldSize}
+              />
+            ) : null}
+          </>
         )}
         {!inlineAddInLegend ? addControl : null}
       </div>

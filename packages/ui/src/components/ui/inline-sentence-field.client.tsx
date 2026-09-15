@@ -8,15 +8,26 @@ import { ChipsFieldOptions } from './chips-field.client'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { CompactLabelSize } from './compact-label.lib'
 import { cn } from '../../lib/utils'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
+import { Field, type FieldSize } from './field.client'
+import { fieldHasValidationError } from './field-validation-props'
 import { FieldLabelContent } from './field-label-content'
-import { fieldLabelVariants } from './field.variants'
+import { FieldLayout } from './field-layout'
+import { useFieldRowParticipation } from './field-row-anatomy.context'
+import {
+  fieldInlineSentenceClasses,
+  fieldInlineSentenceRowClasses,
+  fieldLabelVariants,
+} from './field.variants'
 import { parseChooseCount } from './choose-count-field.lib'
-import type { FieldSize } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
-import type { FieldChrome } from './field-chrome.variants'
-import { fieldInlineSentenceClasses } from './field.variants'
+import {
+  pickFieldChromeProps,
+  resolveFieldAnatomyWidth,
+  type FieldChrome,
+} from './field-chrome.variants'
 import { JoinedPair } from './joined-pair-field.client'
 import {
   indexInlineSentenceControls,
@@ -132,7 +143,7 @@ function InlineSentenceNumberControl({
         min={control.min}
         max={control.max}
         disabled={disabled}
-        aria-invalid={error ? true : undefined}
+        aria-invalid={fieldHasValidationError(error, control.hasError) ? true : undefined}
         value={control.value ?? ''}
         onChange={(event) => control.onChange?.(parseChooseCount(event.target.value))}
         onBlur={control.onBlur}
@@ -178,17 +189,85 @@ function InlineSentenceJoinedPairControl({
   labelVisibility = 'srOnly',
   size,
   disabled,
+  inAnatomyRow = false,
 }: {
   control: InlineSentenceBoundJoinedPair
   label?: string
   labelVisibility?: FieldLabelVisibility
   size: FieldSize
   disabled?: boolean
+  inAnatomyRow?: boolean
 }) {
   const { start, end } = control
   const startHasError = control.hasError
   const endHasError = control.hasError
   const resolvedLabel = label ?? control.ariaLabel
+
+  const joinedPair = (
+    <JoinedPair.Root
+      layout="intrinsic"
+      invalid={control.hasError}
+      disabled={disabled}
+      aria-label={control.ariaLabel}
+    >
+      {start.kind === 'number' ? (
+        <JoinedPair.NumberOccupant
+          id={start.id}
+          ariaLabel={start.ariaLabel ?? start.name}
+          value={start.value}
+          size={size}
+          disabled={disabled}
+          min={start.min}
+          max={start.max}
+          digits={start.digits}
+          hasError={startHasError}
+          describedBy={control.describedBy}
+          onValueChange={(next) => start.onChange?.(next)}
+          onBlur={start.onBlur}
+        />
+      ) : (
+        <JoinedPair.SelectOccupant
+          id={start.id}
+          ariaLabel={start.ariaLabel ?? start.name}
+          value={start.value}
+          options={start.options}
+          size={size}
+          position="start"
+          disabled={disabled}
+          digits={start.digits}
+          placeholder={start.placeholder}
+          hasError={startHasError}
+          describedBy={control.describedBy}
+          onValueChange={(next) => start.onChange?.(next)}
+          onBlur={start.onBlur}
+        />
+      )}
+
+      <JoinedPair.Divider />
+
+      {end.kind === 'label' ? (
+        <JoinedPair.LabelOccupant text={end.text} ariaLabel={end.ariaLabel} size={size} />
+      ) : (
+        <JoinedPair.SelectOccupant
+          id={end.id}
+          ariaLabel={end.ariaLabel ?? end.name}
+          value={end.value}
+          options={end.options}
+          size={size}
+          position="end"
+          disabled={disabled}
+          digits={end.digits}
+          placeholder={end.placeholder}
+          hasError={endHasError}
+          describedBy={control.describedBy}
+          onValueChange={(next) => end.onChange?.(next)}
+          onBlur={end.onBlur}
+        />
+      )}
+    </JoinedPair.Root>
+  )
+
+  if (inAnatomyRow) return joinedPair
 
   return (
     <InlineSentenceStackedSegment
@@ -196,67 +275,7 @@ function InlineSentenceJoinedPairControl({
       labelVisibility={labelVisibility}
       size={size}
     >
-      <JoinedPair.Root
-        layout="intrinsic"
-        invalid={control.hasError}
-        disabled={disabled}
-        aria-label={control.ariaLabel}
-      >
-        {start.kind === 'number' ? (
-          <JoinedPair.NumberOccupant
-            id={start.id}
-            ariaLabel={start.ariaLabel ?? start.name}
-            value={start.value}
-            size={size}
-            disabled={disabled}
-            min={start.min}
-            max={start.max}
-            digits={start.digits}
-            hasError={startHasError}
-            describedBy={control.describedBy}
-            onValueChange={(next) => start.onChange?.(next)}
-            onBlur={start.onBlur}
-          />
-        ) : (
-          <JoinedPair.SelectOccupant
-            id={start.id}
-            ariaLabel={start.ariaLabel ?? start.name}
-            value={start.value}
-            options={start.options}
-            size={size}
-            position="start"
-            disabled={disabled}
-            digits={start.digits}
-            placeholder={start.placeholder}
-            hasError={startHasError}
-            describedBy={control.describedBy}
-            onValueChange={(next) => start.onChange?.(next)}
-            onBlur={start.onBlur}
-          />
-        )}
-
-        <JoinedPair.Divider />
-
-        {end.kind === 'label' ? (
-          <JoinedPair.LabelOccupant text={end.text} ariaLabel={end.ariaLabel} size={size} />
-        ) : (
-          <JoinedPair.SelectOccupant
-            id={end.id}
-            ariaLabel={end.ariaLabel ?? end.name}
-            value={end.value}
-            options={end.options}
-            size={size}
-            position="end"
-            disabled={disabled}
-            digits={end.digits}
-            placeholder={end.placeholder}
-            hasError={endHasError}
-            describedBy={control.describedBy}
-            onValueChange={(next) => end.onChange?.(next)}
-            onBlur={end.onBlur}
-          />
-        )}
-      </JoinedPair.Root>
+      {joinedPair}
     </InlineSentenceStackedSegment>
   )
 }
@@ -268,6 +287,7 @@ function InlineSentenceSelectControl({
   error,
   size,
   disabled,
+  inAnatomyRow = false,
 }: {
   control: InlineSentenceBoundSelect
   label?: string
@@ -275,6 +295,7 @@ function InlineSentenceSelectControl({
   error?: string
   size: FieldSize
   disabled?: boolean
+  inAnatomyRow?: boolean
 }) {
   const optionNodes = useMemo(() => renderSelectContent(control.options), [control.options])
   const triggerWidthClassName =
@@ -288,7 +309,7 @@ function InlineSentenceSelectControl({
         size={size}
         digits={control.digits}
         className={triggerWidthClassName}
-        aria-invalid={error ? true : undefined}
+        aria-invalid={fieldHasValidationError(error, control.hasError) ? true : undefined}
         onBlur={control.onBlur}
       >
         <SelectValue placeholder={control.placeholder} />
@@ -297,7 +318,7 @@ function InlineSentenceSelectControl({
     </Select>
   )
 
-  if (labelVisibility === 'visible' || label != null) {
+  if (!inAnatomyRow && (labelVisibility === 'visible' || label != null)) {
     return (
       <InlineSentenceStackedSegment
         label={resolvedLabel}
@@ -327,8 +348,9 @@ function renderInlineSentenceBoundControl(options: {
   size: FieldSize
   disabled?: boolean
   control: InlineSentenceBoundControl
+  inAnatomyRow?: boolean
 }): React.ReactNode {
-  const { segment, fieldLabel, error, size, disabled, control } = options
+  const { segment, fieldLabel, error, size, disabled, control, inAnatomyRow } = options
 
   if (control.kind === 'number') {
     const numberSegment = segment.kind === 'number' ? segment : undefined
@@ -354,6 +376,7 @@ function renderInlineSentenceBoundControl(options: {
         error={error}
         size={size}
         disabled={disabled}
+        inAnatomyRow={inAnatomyRow}
       />
     )
   }
@@ -370,8 +393,19 @@ function renderInlineSentenceSegment(options: {
   size: FieldSize
   disabled?: boolean
   controlByName: ReturnType<typeof indexInlineSentenceControls>
+  inAnatomyRow?: boolean
 }): React.ReactNode {
-  const { segment, index, fieldName, fieldLabel, error, size, disabled, controlByName } = options
+  const {
+    segment,
+    index,
+    fieldName,
+    fieldLabel,
+    error,
+    size,
+    disabled,
+    controlByName,
+    inAnatomyRow,
+  } = options
 
   if (segment.kind === 'text') {
     if (!segment.value) return null
@@ -398,6 +432,7 @@ function renderInlineSentenceSegment(options: {
         labelVisibility={segment.labelVisibility}
         size={size}
         disabled={disabled}
+        inAnatomyRow={inAnatomyRow}
       />
     )
   }
@@ -414,10 +449,157 @@ function renderInlineSentenceSegment(options: {
     size,
     disabled,
     control,
+    inAnatomyRow,
   })
   if (!boundControl) return null
 
   return <React.Fragment key={segment.name}>{boundControl}</React.Fragment>
+}
+
+function InlineSentenceFieldBody({
+  id,
+  label,
+  fieldName,
+  segments,
+  error,
+  size,
+  disabled,
+  controlByName,
+  inAnatomyRow,
+  sentenceClassName,
+  below,
+  belowControl,
+  resolvedChipSize,
+  labelledBy,
+}: {
+  id: string
+  label: string
+  fieldName: string
+  segments: InlineSentenceFieldProps['segments']
+  error?: string
+  size: FieldSize
+  disabled?: boolean
+  controlByName: ReturnType<typeof indexInlineSentenceControls>
+  inAnatomyRow: boolean
+  sentenceClassName: string
+  below: InlineSentenceFieldProps['below']
+  belowControl: InlineSentenceFieldProps['belowControl']
+  resolvedChipSize: CompactLabelSize
+  labelledBy?: string
+}) {
+  return (
+    <>
+      <InlineSentenceRow className={sentenceClassName}>
+        {segments.map((segment, index) =>
+          renderInlineSentenceSegment({
+            segment,
+            index,
+            fieldName,
+            fieldLabel: label,
+            error,
+            size,
+            disabled,
+            controlByName,
+            inAnatomyRow,
+          }),
+        )}
+      </InlineSentenceRow>
+
+      {below && belowControl ? (
+        <ChipsFieldOptions
+          id={belowControl.id}
+          options={belowControl.options}
+          labelledBy={labelledBy ?? id}
+          value={belowControl.value}
+          onChange={(next) =>
+            belowControl.onChange?.(Array.isArray(next) ? next : next ? [next] : [])
+          }
+          onBlur={belowControl.onBlur}
+          disabled={disabled}
+          chipSize={resolvedChipSize}
+          multiple={belowControl.multiple}
+          max={belowControl.max}
+        />
+      ) : null}
+    </>
+  )
+}
+
+function InlineSentenceAnatomyField({
+  id,
+  label,
+  error,
+  hint,
+  hintPosition,
+  info,
+  required,
+  size,
+  width,
+  chrome,
+  labelVisibility,
+  body,
+}: Pick<
+  InlineSentenceFieldProps,
+  | 'id'
+  | 'label'
+  | 'error'
+  | 'hint'
+  | 'hintPosition'
+  | 'info'
+  | 'required'
+  | 'size'
+  | 'width'
+  | 'chrome'
+  | 'labelVisibility'
+> & {
+  body: (labelledBy?: string) => React.ReactNode
+}) {
+  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
+  const labelId = `${id}-label`
+  const showFieldLabel = labelVisibility !== 'srOnly' && label.trim().length > 0
+
+  return (
+    <Field.Root
+      id={id}
+      error={error}
+      hint={hint}
+      hintPosition={hintPosition}
+      required={required}
+      width={rootWidth}
+      size={size}
+      {...pickFieldChromeProps({ chrome })}
+      anatomy
+    >
+      <FieldLayout
+        hintPosition={hintPosition}
+        wrapControl={false}
+        chrome={chrome}
+        size={size}
+        controlBand="content-sized"
+        label={
+          showFieldLabel ? (
+            <span id={labelId}>
+              <FormFieldLabel
+                label={label}
+                labelVisibility={labelVisibility}
+                required={required}
+                info={info}
+              />
+            </span>
+          ) : null
+        }
+        control={
+          <div
+            role="group"
+            aria-labelledby={showFieldLabel ? labelId : undefined}
+            aria-label={showFieldLabel ? undefined : label}
+          >
+            {body(showFieldLabel ? labelId : undefined)}
+          </div>
+        }
+      />
+    </Field.Root>
+  )
 }
 
 /** Composable inline prose + bound controls (number, select) with optional chips below. */
@@ -441,9 +623,51 @@ export function InlineSentenceField({
   labelVisibility = 'visible',
   chipSize,
 }: InlineSentenceFieldProps) {
+  const inAnatomyRow = useFieldRowParticipation()
   const fieldName = fieldNameProp ?? id
   const controlByName = useMemo(() => indexInlineSentenceControls(controls), [controls])
   const resolvedChipSize = chipSize ?? below?.chipSize ?? size
+  const sentenceClassName = inAnatomyRow
+    ? fieldInlineSentenceRowClasses
+    : fieldInlineSentenceClasses
+
+  const renderSentenceBody = (labelledBy?: string) => (
+    <InlineSentenceFieldBody
+      id={id}
+      label={label}
+      fieldName={fieldName}
+      segments={segments}
+      error={error}
+      size={size}
+      disabled={disabled}
+      controlByName={controlByName}
+      inAnatomyRow={inAnatomyRow}
+      sentenceClassName={sentenceClassName}
+      below={below}
+      belowControl={belowControl}
+      resolvedChipSize={resolvedChipSize}
+      labelledBy={labelledBy}
+    />
+  )
+
+  if (inAnatomyRow) {
+    return (
+      <InlineSentenceAnatomyField
+        id={id}
+        label={label}
+        error={error}
+        hint={hint}
+        hintPosition={hintPosition}
+        info={info}
+        required={required}
+        size={size}
+        width={width}
+        chrome={chrome}
+        labelVisibility={labelVisibility}
+        body={renderSentenceBody}
+      />
+    )
+  }
 
   return (
     <ChooseCountFieldShell
@@ -460,41 +684,7 @@ export function InlineSentenceField({
       chrome={chrome}
       labelVisibility={labelVisibility}
     >
-      {({ legendId }) => (
-        <>
-          <InlineSentenceRow className={fieldInlineSentenceClasses}>
-            {segments.map((segment, index) =>
-              renderInlineSentenceSegment({
-                segment,
-                index,
-                fieldName,
-                fieldLabel: label,
-                error,
-                size,
-                disabled,
-                controlByName,
-              }),
-            )}
-          </InlineSentenceRow>
-
-          {below && belowControl ? (
-            <ChipsFieldOptions
-              id={belowControl.id}
-              options={belowControl.options}
-              labelledBy={legendId}
-              value={belowControl.value}
-              onChange={(next) =>
-                belowControl.onChange?.(Array.isArray(next) ? next : next ? [next] : [])
-              }
-              onBlur={belowControl.onBlur}
-              disabled={disabled}
-              chipSize={resolvedChipSize}
-              multiple={belowControl.multiple}
-              max={belowControl.max}
-            />
-          ) : null}
-        </>
-      )}
+      {({ legendId }) => renderSentenceBody(legendId)}
     </ChooseCountFieldShell>
   )
 }

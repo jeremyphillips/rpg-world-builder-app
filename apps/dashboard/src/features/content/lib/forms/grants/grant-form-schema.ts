@@ -6,6 +6,7 @@ import {
   damageTypeIdSchema,
   equipmentKindSchema,
   featCategorySchema,
+  fieldValidationMessages,
   gearKindSchema,
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeTerm,
@@ -153,12 +154,20 @@ function applyFormSchemaIssues(
   }
 }
 
+function shouldSkipProficiencySchemaForEmptySpecific(
+  row: { proficiencySource?: string },
+  specificSlugs: string[] | undefined,
+): boolean {
+  return row.proficiencySource === 'specific' && !specificSlugs?.length
+}
+
 function validateSpellsGrantRow(
   row: {
     spellAvailability?: boolean
     spellCastingEnabled?: boolean
     spellCastingFrequency?: string
     spellAllowsSlotCasting?: boolean
+    spellIds?: string[]
   },
   ctx: z.RefinementCtx,
 ): void {
@@ -188,34 +197,199 @@ function validateSpellsGrantRow(
       path: ['spellAllowsSlotCasting'],
     })
   }
+
+  if (!row.spellIds?.length) {
+    ctx.addIssue({
+      code: 'custom',
+      message: fieldValidationMessages.requiredSelect({
+        label: getContentTypeCapitalizedSentenceLabel('spells', { plural: true }),
+      }),
+      path: ['spellIds'],
+    })
+  }
+}
+
+const SPECIFIC_PROFICIENCY_REQUIRED_SELECTIONS = [
+  {
+    grantType: 'skillProficiency',
+    path: 'skillProficiencyIds',
+    label: 'Skills',
+    hasSelection: (row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>) =>
+      Boolean(row.skillProficiencyIds?.length),
+  },
+  {
+    grantType: 'toolProficiency',
+    path: 'toolProficiencySlugs',
+    label: 'Tools',
+    hasSelection: (row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>) =>
+      Boolean(row.toolProficiencySlugs?.length),
+  },
+  {
+    grantType: 'weaponProficiency',
+    path: 'weaponProficiencySlugs',
+    label: 'Weapons',
+    hasSelection: (row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>) =>
+      Boolean(row.weaponProficiencySlugs?.length),
+  },
+  {
+    grantType: 'armorTraining',
+    path: 'armorTrainingSlugs',
+    label: 'Armor',
+    hasSelection: (row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>) =>
+      Boolean(row.armorTrainingSlugs?.length),
+  },
+] as const
+
+function validateProficiencySpecificGrantRow(
+  row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>,
+  ctx: z.RefinementCtx,
+): void {
+  if (row.proficiencySource !== 'specific') return
+
+  for (const selection of SPECIFIC_PROFICIENCY_REQUIRED_SELECTIONS) {
+    if (row.grantType !== selection.grantType || selection.hasSelection(row)) continue
+    ctx.addIssue({
+      code: 'custom',
+      message: fieldValidationMessages.requiredSelect({ label: selection.label }),
+      path: [selection.path],
+    })
+  }
+}
+
+function validateMovementGrantRow(
+  row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>,
+  ctx: z.RefinementCtx,
+): void {
+  if (!row.movementMode) {
+    ctx.addIssue({
+      code: 'custom',
+      message: fieldValidationMessages.requiredSelect({ label: 'Movement mode' }),
+      path: ['movementMode'],
+    })
+  }
+
+  if (!row.movementOperation) {
+    ctx.addIssue({
+      code: 'custom',
+      message: fieldValidationMessages.requiredSelect({ label: 'Movement operation' }),
+      path: ['movementOperation'],
+    })
+  }
+
+  if (row.movementOperation === 'match') {
+    if (!row.movementMatchMode || row.movementMatchMode === row.movementMode) {
+      ctx.addIssue({
+        code: 'custom',
+        message: fieldValidationMessages.requiredSelect({ label: 'Movement mode to match' }),
+        path: ['movementMatchMode'],
+      })
+    }
+    return
+  }
+
+  if (row.movementFeet === undefined || String(row.movementFeet) === '') {
+    ctx.addIssue({
+      code: 'custom',
+      message: fieldValidationMessages.requiredSelect({ label: 'Movement speed' }),
+      path: ['movementFeet'],
+    })
+  }
+}
+
+function addRequiredSelectIssue(ctx: z.RefinementCtx, label: string, path: string): void {
+  ctx.addIssue({
+    code: 'custom',
+    message: fieldValidationMessages.requiredSelect({ label }),
+    path: [path],
+  })
+}
+
+type GrantRowValues = z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>
+
+const ATOMIC_GRANT_REQUIRED_SELECTIONS = [
+  {
+    grantType: 'senses',
+    path: 'senseType',
+    label: 'Sense type',
+    isMissing: (row: GrantRowValues) => !row.senseType,
+  },
+  {
+    grantType: 'resistances',
+    path: 'resistances',
+    label: 'Damage types',
+    isMissing: (row: GrantRowValues) => !row.resistances?.length,
+  },
+  {
+    grantType: 'damageType',
+    path: 'damageType',
+    label: 'Damage types',
+    isMissing: (row: GrantRowValues) => !row.damageType?.length,
+  },
+  {
+    grantType: 'languages',
+    path: 'language',
+    label: 'Language',
+    isMissing: (row: GrantRowValues) => !row.language,
+  },
+  {
+    grantType: 'featChoice',
+    path: 'featCategory',
+    label: 'Feat category',
+    isMissing: (row: GrantRowValues) => !row.featCategory,
+  },
+] as const
+
+function validateAtomicGrantRow(row: GrantRowValues, ctx: z.RefinementCtx): void {
+  for (const selection of ATOMIC_GRANT_REQUIRED_SELECTIONS) {
+    if (row.grantType !== selection.grantType || !selection.isMissing(row)) continue
+    addRequiredSelectIssue(ctx, selection.label, selection.path)
+  }
+
+  if (row.grantType === 'movement') {
+    validateMovementGrantRow(row, ctx)
+  }
 }
 
 function validateGrantRow(
   row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>,
   ctx: z.RefinementCtx,
 ): void {
+  validateAtomicGrantRow(row, ctx)
+
   if (row.grantType === 'equipment') {
     applyFormSchemaIssues(ctx, equipmentGrantItemFormSchema.safeParse(row))
     return
   }
 
   if (row.grantType === 'weaponProficiency') {
-    applyFormSchemaIssues(ctx, weaponProficiencyItemFormSchema.safeParse(row))
+    validateProficiencySpecificGrantRow(row, ctx)
+    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.weaponProficiencySlugs)) {
+      applyFormSchemaIssues(ctx, weaponProficiencyItemFormSchema.safeParse(row))
+    }
     return
   }
 
   if (row.grantType === 'toolProficiency') {
-    applyFormSchemaIssues(ctx, toolProficiencyItemFormSchema.safeParse(row))
+    validateProficiencySpecificGrantRow(row, ctx)
+    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.toolProficiencySlugs)) {
+      applyFormSchemaIssues(ctx, toolProficiencyItemFormSchema.safeParse(row))
+    }
     return
   }
 
   if (row.grantType === 'skillProficiency') {
-    applyFormSchemaIssues(ctx, skillProficiencyItemFormSchema.safeParse(row))
+    validateProficiencySpecificGrantRow(row, ctx)
+    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.skillProficiencyIds)) {
+      applyFormSchemaIssues(ctx, skillProficiencyItemFormSchema.safeParse(row))
+    }
     return
   }
 
   if (row.grantType === 'armorTraining') {
-    applyFormSchemaIssues(ctx, armorTrainingItemFormSchema.safeParse(row))
+    validateProficiencySpecificGrantRow(row, ctx)
+    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.armorTrainingSlugs)) {
+      applyFormSchemaIssues(ctx, armorTrainingItemFormSchema.safeParse(row))
+    }
     return
   }
 
