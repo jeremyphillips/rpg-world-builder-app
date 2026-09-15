@@ -24,7 +24,10 @@ import type { FieldChrome } from '../components/ui/field-chrome.variants'
 import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldRowAlignment } from '../components/ui/field-control-band.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
-import { isInlineSentenceBoundSegment } from '../components/ui/inline-sentence-field.lib'
+import {
+  isInlineSentenceBoundSegment,
+  isInlineSentenceJoinedPairSegment,
+} from '../components/ui/inline-sentence-field.lib'
 import type {
   InlineSentenceBelowChips,
   InlineSentenceSegment,
@@ -577,6 +580,7 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
 
 export type {
   InlineSentenceBelowChips,
+  InlineSentenceJoinedPairSegment,
   InlineSentenceNumberSegment,
   InlineSentenceSegment,
   InlineSentenceSelectSegment,
@@ -610,7 +614,9 @@ export interface InlineSentenceFieldConfig extends BaseFieldConfig {
    *
    * - `text` — static fragment (`value`, optional `tone`: `label` | `prose` | `mono`)
    * - `number` — bound numeric input (`name`, `digits`, `min`/`max`, optional `visibility`)
-   * - `select` — bound dropdown (`name`, `options`, `width`, optional `visibility`)
+   * - `select` — bound dropdown (`name`, `options`, `width`, optional `label` / `labelVisibility`)
+   * - `joinedPair` — two-segment joined control (`start`, `end` occupants; optional visible
+   *   `label` / `labelVisibility` above the pair; see field-types.md)
    *
    * Optional `below: { kind: 'chips', … }` for chip pickers under the sentence.
    *
@@ -1172,7 +1178,7 @@ export interface ColumnsConfig {
 export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
 
 /** Vertical alignment for compact inline rows (grip, fields, embedded actions). */
-export type ArrayCompactInlineAlign = 'start' | 'center'
+export type ArrayCompactInlineAlign = 'start' | 'center' | 'control-edge'
 
 /** How array items may be reordered. Defaults to `dragHandle`. */
 export type ArrayItemReorder = false | 'dragHandle'
@@ -1485,11 +1491,30 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   rollValue: undefined,
 }
 
+function assignInlineSentenceJoinedPairDefaults(
+  segment: Extract<InlineSentenceSegment, { kind: 'joinedPair' }>,
+  values: Record<string, unknown>,
+): void {
+  const { start, end } = segment
+  if (start.kind === 'number') {
+    values[start.name] = start.defaultValue ?? TYPE_DEFAULTS.number
+  } else if (start.kind === 'select') {
+    values[start.name] = start.defaultValue ?? TYPE_DEFAULTS.select
+  }
+  if (end.kind === 'select') {
+    values[end.name] = end.defaultValue ?? TYPE_DEFAULTS.select
+  }
+}
+
 function assignInlineSentenceDefaults(
   field: InlineSentenceFieldConfig,
   values: Record<string, unknown>,
 ): void {
   for (const segment of field.segments) {
+    if (isInlineSentenceJoinedPairSegment(segment)) {
+      assignInlineSentenceJoinedPairDefaults(segment, values)
+      continue
+    }
     if (!isInlineSentenceBoundSegment(segment)) continue
     const explicit = segment.defaultValue
     if (segment.kind === 'number') {

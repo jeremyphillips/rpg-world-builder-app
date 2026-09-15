@@ -175,15 +175,17 @@ shell. Do not invent fake entity summaries for those rows.
 
 ## `min` / `max` and add/remove
 
-| Prop                                | Behavior                                         |
-| ----------------------------------- | ------------------------------------------------ |
-| `min`                               | Hides remove at floor; Zod `.min()` should match |
-| `max`                               | Hides add when at ceiling                        |
-| `hideAddAction`                     | Omit default add — use external slot             |
-| `hideItemRemove` + `itemRemoveSlot` | Custom remove in header rail                     |
+| Prop                                | Behavior                                                                              |
+| ----------------------------------- | ------------------------------------------------------------------------------------- |
+| `min`                               | Empty-state required hint after deleting below floor; Zod `.min()` enforces on submit |
+| `max`                               | Hides add when at ceiling                                                             |
+| `hideAddAction`                     | Omit default add — use external slot                                                  |
+| `hideItemRemove` + `itemRemoveSlot` | Custom remove in header rail                                                          |
 
 Pair `min`/`max` with matching Zod array constraints so submit validation and chrome
-stay aligned.
+stay aligned. When the list is empty, the renderer shows a `bg-background` panel:
+`No {itemLabel} added.` — plus `At least one {itemLabel} is required.` after the user
+deletes below `min` or on failed submit.
 
 ## `addActionMenu`
 

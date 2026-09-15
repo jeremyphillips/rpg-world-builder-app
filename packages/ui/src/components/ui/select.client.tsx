@@ -8,15 +8,18 @@ import { cn } from '../../lib/utils'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import { SelectLayerPortal } from './layer-portal-container.client'
 import { fieldControlVariants, type FieldControlVariantProps } from './field-control.variants'
+import { fieldDigitWidthVariants, type FieldDigits } from './field-digit-metrics'
 import {
-  fieldDigitSizeVariants,
-  fieldDigitWidthVariants,
-  type FieldDigits,
-} from './field-digit-metrics'
-import { selectDigitTrailingColumnVariants } from './select-digit.variants'
+  fieldSelectInlineCaretIconClasses,
+  selectDigitTrailingColumnVariants,
+} from './select-caret.variants'
 import {
-  fieldDigitTrailingPaddingClasses,
+  fieldGroupedSegmentEndClasses,
+  fieldGroupedSegmentStartClasses,
+} from './field-input-chrome.variants'
+import {
   fieldGroupedControlSizeClasses,
+  fieldGroupedControlStartPaddingClasses,
 } from './field-sizing.variants'
 
 const Select = SelectPrimitive.Root
@@ -29,6 +32,8 @@ const SelectTrigger = React.forwardRef<
     Pick<FieldControlVariantProps, 'size'> & {
       /** When true, styles for embedding inside a grouped control such as InputSelectField. */
       grouped?: boolean
+      /** Corner rounding when `grouped` — defaults to `end` (unit column). */
+      groupedPosition?: 'start' | 'end'
       /**
        * Maximum digit count the trigger should visually accommodate. Uses the same
        * width formula as NumberInput `digits`; the caret sits in a trailing column
@@ -36,56 +41,78 @@ const SelectTrigger = React.forwardRef<
        */
       digits?: FieldDigits
     }
->(({ className, size: sizeProp = 'md', grouped = false, digits, children, ...props }, ref) => {
-  const size = sizeProp ?? 'md'
+>(
+  (
+    {
+      className,
+      size: sizeProp = 'md',
+      grouped = false,
+      groupedPosition = 'end',
+      digits,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const size = sizeProp ?? 'md'
+    const groupedCornerClasses =
+      groupedPosition === 'start' ? fieldGroupedSegmentStartClasses : fieldGroupedSegmentEndClasses
 
-  if (digits != null) {
+    if (digits != null) {
+      return (
+        <SelectPrimitive.Trigger
+          ref={ref}
+          className={cn(
+            grouped
+              ? cn(
+                  fieldGroupedControlSizeClasses[size],
+                  groupedCornerClasses,
+                  'border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
+                )
+              : cn(fieldControlVariants({ size }), fieldGroupedControlStartPaddingClasses[size]),
+            fieldDigitWidthVariants[size][digits],
+            'inline-flex shrink-0 items-center gap-0 tabular-nums data-[placeholder]:text-muted-foreground [&>span:not([aria-hidden])]:line-clamp-1 [&>span:not([aria-hidden])]:min-w-0 [&>span:not([aria-hidden])]:flex-1 [&>span:not([aria-hidden])]:text-center',
+            className,
+          )}
+          {...props}
+        >
+          {children}
+          <span aria-hidden className={selectDigitTrailingColumnVariants({ size })}>
+            <ChevronDown
+              className={cn(fieldSelectInlineCaretIconClasses(size), 'block shrink-0 opacity-50')}
+            />
+          </span>
+        </SelectPrimitive.Trigger>
+      )
+    }
+
     return (
       <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
           grouped
             ? cn(
-                fieldGroupedControlSizeClasses[size],
-                fieldDigitTrailingPaddingClasses[size],
-                'border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
+                groupedCornerClasses,
+                'inline-flex items-center justify-between gap-1.5 text-left data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1 [&>span]:min-w-0',
               )
-            : cn(fieldControlVariants({ size }), fieldDigitSizeVariants[size]),
-          fieldDigitWidthVariants[size][digits],
-          'relative shrink-0 items-center gap-0 tabular-nums data-[placeholder]:text-muted-foreground [&>span:not([aria-hidden])]:line-clamp-1 [&>span:not([aria-hidden])]:min-w-0 [&>span:not([aria-hidden])]:flex-1 [&>span:not([aria-hidden])]:text-center',
+            : cn(
+                fieldControlVariants({ size }),
+                'items-center justify-between gap-2 text-left data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1 [&>span]:min-w-0',
+              ),
           className,
         )}
         {...props}
       >
         {children}
-        <span aria-hidden className={selectDigitTrailingColumnVariants({ size })}>
-          <ChevronDown className="opacity-50" />
-        </span>
+        <SelectPrimitive.Icon asChild>
+          <ChevronDown
+            className={cn(fieldSelectInlineCaretIconClasses(size), 'shrink-0 opacity-50')}
+          />
+        </SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
     )
-  }
-
-  return (
-    <SelectPrimitive.Trigger
-      ref={ref}
-      className={cn(
-        grouped
-          ? 'inline-flex items-center justify-between gap-1.5 text-left data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1 [&>span]:min-w-0'
-          : cn(
-              fieldControlVariants({ size }),
-              'items-center justify-between gap-2 text-left data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1 [&>span]:min-w-0',
-            ),
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDown className="size-4 opacity-50" />
-      </SelectPrimitive.Icon>
-    </SelectPrimitive.Trigger>
-  )
-})
+  },
+)
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
 const SelectScrollUpButton = React.forwardRef<

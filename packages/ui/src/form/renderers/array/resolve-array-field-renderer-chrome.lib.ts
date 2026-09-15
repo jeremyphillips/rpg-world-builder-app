@@ -13,6 +13,7 @@ import {
 import { resolveArrayItemPresentation } from '../../config/array/array-item-presentation.lib'
 import type { ArrayConfig } from '../../field-config'
 import { resolveFormDensity } from '../../form-density'
+import { resolveArrayEmptyItemLabel } from './array-field-empty-state.lib'
 import { resolveArrayHeading } from '../../resolve-container-heading.lib'
 
 type ResolveArrayFieldRendererChromeInput = {
@@ -73,6 +74,7 @@ export function resolveArrayFieldRendererChrome({
   const sortableEnabled = presentation.sortableEnabled
 
   return {
+    emptyItemLabel: resolveArrayEmptyItemLabel(config),
     addAction,
     addActionLabel,
     addActionVariant,

@@ -456,10 +456,10 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 Optional hooks:
 
-| Property             | Purpose                                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------------------------- |
-| `itemVariant`        | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                   |
-| `compactInlineAlign` | `'start'` \| `'center'` — compact inline rows only; center grip/actions with label-less single controls. |
+| Property             | Purpose                                                                                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `itemVariant`        | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                                                                                                     |
+| `compactInlineAlign` | `'start'` \| `'center'` \| `'control-edge'` — compact inline rows only; default unlabeled rows use `center`; opt into `control-edge` when grip/actions should sit on the control baseline. |
 
 **Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render that row
 inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,

@@ -57,6 +57,32 @@ function registerInlineChooseCountField(
   })
 }
 
+function registerJoinedPairSegment(
+  registry: Map<string, RegistryEntry>,
+  key: RegistryKey,
+  fieldLabel: string,
+  segment: Extract<InlineSentenceFieldConfig['segments'][number], { kind: 'joinedPair' }>,
+): void {
+  if (segment.start.kind === 'number') {
+    registry.set(key(segment.start.name), {
+      label: segment.start.ariaLabel ?? fieldLabel,
+      category: 'number',
+    })
+  } else {
+    registry.set(key(segment.start.name), {
+      label: segment.start.ariaLabel ?? fieldLabel,
+      category: 'choice',
+    })
+  }
+
+  if (segment.end.kind === 'select') {
+    registry.set(key(segment.end.name), {
+      label: segment.end.ariaLabel ?? fieldLabel,
+      category: 'choice',
+    })
+  }
+}
+
 function registerInlineSentenceField(
   registry: Map<string, RegistryEntry>,
   key: RegistryKey,
@@ -71,6 +97,9 @@ function registerInlineSentenceField(
         label: segment.ariaLabel ?? field.label,
         category: 'choice',
       })
+    }
+    if (segment.kind === 'joinedPair') {
+      registerJoinedPairSegment(registry, key, field.label, segment)
     }
   }
 

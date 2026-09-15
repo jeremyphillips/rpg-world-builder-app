@@ -6,9 +6,11 @@ import {
 import { cn } from '../../lib/utils'
 import { fieldWidthVariants, type FieldWidth } from './field-control.variants'
 
+import { joinedPairBoundNames } from './joined-pair-field.lib'
 import type {
   InlineSentenceBelowChips,
   InlineSentenceBoundControl,
+  InlineSentenceJoinedPairSegment,
   InlineSentenceNumberSegment,
   InlineSentenceSegment,
   InlineSentenceSelectSegment,
@@ -18,6 +20,20 @@ export function isInlineSentenceBoundSegment(
   segment: InlineSentenceSegment,
 ): segment is InlineSentenceNumberSegment | InlineSentenceSelectSegment {
   return segment.kind === 'number' || segment.kind === 'select'
+}
+
+export function isInlineSentenceJoinedPairSegment(
+  segment: InlineSentenceSegment,
+): segment is InlineSentenceJoinedPairSegment {
+  return segment.kind === 'joinedPair'
+}
+
+/** Stable key linking a joined-pair segment to its bound control. */
+export function inlineSentenceJoinedPairSegmentKey(
+  fieldName: string,
+  segmentIndex: number,
+): string {
+  return `${fieldName}-joined-${segmentIndex}`
 }
 
 /** Max distinct bound paths per inline sentence (one controller each). */
@@ -37,7 +53,7 @@ export function inlineSentenceSegmentVisibilityDeps(
 ): string[] {
   const deps = new Set<string>()
   for (const segment of segments) {
-    if (!isInlineSentenceBoundSegment(segment) || !segment.visibility) continue
+    if (segment.kind === 'text' || !segment.visibility) continue
     for (const dep of segment.visibility.dependsOn) deps.add(dep)
   }
   return [...deps]
@@ -49,7 +65,7 @@ export function filterVisibleInlineSentenceSegments(
   watched: Record<string, unknown>,
 ): InlineSentenceSegment[] {
   return segments.filter((segment) => {
-    if (!isInlineSentenceBoundSegment(segment)) return true
+    if (segment.kind === 'text') return true
     if (!segment.visibility) return true
     return segment.visibility.visibleWhen(watched)
   })
@@ -60,9 +76,13 @@ export function inlineSentenceBoundNames(
   segments: readonly InlineSentenceSegment[],
   below?: InlineSentenceBelowChips,
 ): string[] {
-  const names = segments.flatMap((segment) =>
-    isInlineSentenceBoundSegment(segment) ? [segment.name] : [],
-  )
+  const names = segments.flatMap((segment) => {
+    if (isInlineSentenceBoundSegment(segment)) return [segment.name]
+    if (isInlineSentenceJoinedPairSegment(segment)) {
+      return joinedPairBoundNames({ start: segment.start, end: segment.end })
+    }
+    return []
+  })
   if (below) names.push(below.name)
   return names
 }
@@ -109,7 +129,15 @@ export function resolveInlineSentenceSelectChange(
 export function indexInlineSentenceControls(
   controls: readonly InlineSentenceBoundControl[],
 ): Map<string, InlineSentenceBoundControl> {
-  return new Map(controls.map((control) => [control.name, control]))
+  const entries: Array<[string, InlineSentenceBoundControl]> = []
+  for (const control of controls) {
+    if (control.kind === 'joinedPair') {
+      entries.push([control.segmentKey, control])
+      continue
+    }
+    entries.push([control.name, control])
+  }
+  return new Map(entries)
 }
 
 const INLINE_SELECT_INTRINSIC_WIDTH_CLASSES = {

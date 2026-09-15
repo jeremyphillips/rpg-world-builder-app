@@ -5,20 +5,26 @@ import { useController, type UseControllerReturn } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
+import { assertAllowedJoinedPairComposition } from '../../../components/ui/joined-pair-field.lib'
 import {
   coerceInlineSentenceSelectValue,
   filterVisibleInlineSentenceSegments,
+  inlineSentenceJoinedPairSegmentKey,
   inlineSentenceSegmentVisibilityDeps,
   inlineSentenceUniqueBoundNames,
   isInlineSentenceBoundSegment,
+  isInlineSentenceJoinedPairSegment,
   MAX_INLINE_SENTENCE_BOUND_CONTROLLERS,
   resolveInlineSentenceSelectChange,
 } from '../../../components/ui/inline-sentence-field.lib'
 import type {
   InlineSentenceBoundChips,
   InlineSentenceBoundControl,
+  InlineSentenceBoundJoinedPair,
+  InlineSentenceBoundJoinedPairSelect,
   InlineSentenceBoundNumber,
   InlineSentenceBoundSelect,
+  InlineSentenceJoinedPairSegment,
   InlineSentenceSelectSegment,
 } from '../../../components/ui/inline-sentence-field.types'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
@@ -175,6 +181,103 @@ function useInlineSentenceControllers(uniqueBoundNames: readonly string[], nameP
   )
 }
 
+function buildInlineSentenceJoinedPairSelectControl(options: {
+  occupant:
+    | Extract<InlineSentenceJoinedPairSegment['start'], { kind: 'select' }>
+    | Extract<InlineSentenceJoinedPairSegment['end'], { kind: 'select' }>
+  position: 'start' | 'end'
+  id: string
+  controllerByName: ReadonlyMap<string, InlineSentenceController>
+}): InlineSentenceBoundJoinedPairSelect {
+  const { occupant, position, id, controllerByName } = options
+  const controller = controllerByName.get(occupant.name)
+  const field = controller?.field
+
+  return {
+    kind: 'select',
+    id,
+    name: occupant.name,
+    position,
+    value:
+      field?.value === undefined || field?.value === null || field?.value === ''
+        ? undefined
+        : (field.value as string | number),
+    options: [...occupant.options],
+    digits: occupant.digits,
+    placeholder: occupant.placeholder,
+    ariaLabel: occupant.ariaLabel,
+    onChange: field?.onChange,
+    onBlur: field?.onBlur,
+  }
+}
+
+function buildInlineSentenceJoinedPairControl(options: {
+  segment: InlineSentenceJoinedPairSegment
+  segmentIndex: number
+  configName: string
+  id: string
+  controllerByName: ReadonlyMap<string, InlineSentenceController>
+  fieldErrors: Array<string | undefined>
+}): InlineSentenceBoundJoinedPair {
+  const { segment, segmentIndex, configName, id, controllerByName, fieldErrors } = options
+  assertAllowedJoinedPairComposition({ start: segment.start, end: segment.end })
+
+  const segmentKey = inlineSentenceJoinedPairSegmentKey(configName, segmentIndex)
+  const hasError = fieldErrors.some(Boolean)
+  const startId = `${id}-${segment.start.name.replaceAll('.', '-')}`
+  const endId =
+    segment.end.kind === 'select' ? `${id}-${segment.end.name.replaceAll('.', '-')}` : `${id}-label`
+
+  const start =
+    segment.start.kind === 'number'
+      ? (() => {
+          const controller = controllerByName.get(segment.start.name)
+          const field = controller?.field
+          const numberStart: InlineSentenceBoundNumber = {
+            kind: 'number',
+            id: startId,
+            name: segment.start.name,
+            value: typeof field?.value === 'number' ? field.value : undefined,
+            min: segment.start.min,
+            max: segment.start.max,
+            digits: segment.start.digits,
+            ariaLabel: segment.start.ariaLabel,
+            onChange: field?.onChange,
+            onBlur: field?.onBlur,
+          }
+          return numberStart
+        })()
+      : buildInlineSentenceJoinedPairSelectControl({
+          occupant: segment.start,
+          position: 'start',
+          id: startId,
+          controllerByName,
+        })
+
+  const end =
+    segment.end.kind === 'label'
+      ? {
+          kind: 'label' as const,
+          text: segment.end.text,
+          ariaLabel: segment.end.ariaLabel,
+        }
+      : buildInlineSentenceJoinedPairSelectControl({
+          occupant: segment.end,
+          position: 'end',
+          id: endId,
+          controllerByName,
+        })
+
+  return {
+    kind: 'joinedPair',
+    segmentKey,
+    ariaLabel: segment.ariaLabel,
+    start,
+    end,
+    hasError,
+  }
+}
+
 /** RHF adapter for `InlineSentenceField` — one controller per distinct bound segment. */
 export function InlineSentenceFieldRenderer({
   config,
@@ -258,11 +361,25 @@ export function InlineSentenceFieldRenderer({
   const controls = useMemo(() => {
     const result: InlineSentenceBoundControl[] = []
 
-    for (const segment of visibleSegments) {
-      if (!isInlineSentenceBoundSegment(segment)) continue
+    visibleSegments.forEach((segment, segmentIndex) => {
+      if (isInlineSentenceJoinedPairSegment(segment)) {
+        result.push(
+          buildInlineSentenceJoinedPairControl({
+            segment,
+            segmentIndex,
+            configName: config.name,
+            id,
+            controllerByName,
+            fieldErrors: controllers.map(({ fieldState }) => fieldState.error?.message),
+          }),
+        )
+        return
+      }
+
+      if (!isInlineSentenceBoundSegment(segment)) return
 
       const controller = controllerByName.get(segment.name)
-      if (!controller) continue
+      if (!controller) return
 
       const { field } = controller
       const controlId = `${id}-${segment.name.replaceAll('.', '-')}`
@@ -276,11 +393,12 @@ export function InlineSentenceFieldRenderer({
           min: segment.min,
           max: segment.max,
           digits: segment.digits,
+          ariaLabel: segment.ariaLabel,
           onChange: field.onChange,
           onBlur: field.onBlur,
         }
         result.push(numberControl)
-        continue
+        return
       }
 
       const selectSegment = segment as InlineSentenceSelectSegment
@@ -302,10 +420,18 @@ export function InlineSentenceFieldRenderer({
         onBlur: field.onBlur,
       }
       result.push(selectControl)
-    }
+    })
 
     return result
-  }, [config.label, controllerByName, id, resolvedSelectOptionsBySegment, visibleSegments])
+  }, [
+    config.label,
+    config.name,
+    controllerByName,
+    controllers,
+    id,
+    resolvedSelectOptionsBySegment,
+    visibleSegments,
+  ])
 
   const belowControl = useMemo((): InlineSentenceBoundChips | undefined => {
     if (!config.below) return undefined
@@ -337,6 +463,7 @@ export function InlineSentenceFieldRenderer({
       id={id}
       {...pickFieldChromeProps(config)}
       label={config.label}
+      fieldName={config.name}
       segments={visibleSegments}
       controls={controls}
       below={config.below}

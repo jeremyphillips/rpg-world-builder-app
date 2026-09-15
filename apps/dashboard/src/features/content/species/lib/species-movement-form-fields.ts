@@ -4,7 +4,9 @@ import {
   defineMessage,
   getMovementModeLabel,
   movementModeSchema,
+  movementSpeedFeetSchema,
   type MovementMode,
+  type MovementSpeedFeet,
   type MovementSpeeds,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
@@ -19,7 +21,7 @@ export const speciesMovementValidationMessages = {
 
 export const movementRowFormSchema = z.object({
   mode: movementModeSchema,
-  feet: z.coerce.number().int().min(1),
+  feet: movementSpeedFeetSchema,
 })
 
 export type MovementRowFormValues = z.infer<typeof movementRowFormSchema>
@@ -35,7 +37,7 @@ const movementModeOptions = MOVEMENT_MODES.map((mode) => ({
 }))
 
 const movementFeetOptions = MOVEMENT_SPEED_FEET.map((feet) => ({
-  value: String(feet),
+  value: feet,
   label: String(feet),
 }))
 
@@ -44,7 +46,7 @@ export function movementArrayField(): FormItem {
     kind: 'array',
     name: 'movement',
     legend: 'Movement',
-    addAction: { label: 'Add speed', layout: 'inline', size: 'sm' },
+    addAction: { label: 'Add movement', layout: 'inline', size: 'sm' },
     min: 1,
     density: 'comfortable',
     item: {
@@ -66,27 +68,38 @@ export function movementArrayField(): FormItem {
       {
         type: 'inlineSentence',
         name: 'movementRow',
-        label: 'Mode',
+        label: 'Movement',
         labelVisibility: 'srOnly',
         segments: [
           {
             kind: 'select',
             name: 'mode',
+            label: 'Mode',
+            labelVisibility: 'visible',
             options: movementModeOptions,
             defaultValue: 'walk',
             width: 'md',
             ariaLabel: 'Mode',
           },
           {
-            kind: 'select',
-            name: 'feet',
-            options: movementFeetOptions,
-            defaultValue: '30',
-            digits: 3,
-            width: 'sm',
+            kind: 'joinedPair',
+            label: 'Speed',
+            labelVisibility: 'visible',
             ariaLabel: 'Speed',
+            start: {
+              kind: 'select',
+              name: 'feet',
+              options: movementFeetOptions,
+              defaultValue: 30,
+              digits: 3,
+              ariaLabel: 'Speed value',
+            },
+            end: {
+              kind: 'label',
+              text: 'ft.',
+              ariaLabel: 'Speed unit',
+            },
           },
-          { kind: 'text', value: 'ft', tone: 'label' },
         ],
       },
     ],
@@ -96,15 +109,14 @@ export function movementArrayField(): FormItem {
 export function movementRecordToRows(movement: MovementSpeeds): MovementRowFormValues[] {
   return MOVEMENT_MODES.filter((mode) => movement[mode] !== undefined).map((mode) => ({
     mode,
-    feet: movement[mode]!,
+    feet: movement[mode]! as MovementSpeedFeet,
   }))
 }
 
 export function movementRowsToRecord(rows: MovementRowFormValues[]): MovementSpeeds {
   const record: Partial<Record<MovementMode, number>> = {}
   for (const row of rows) {
-    const feet = typeof row.feet === 'number' ? row.feet : Number(row.feet)
-    record[row.mode] = feet
+    record[row.mode] = row.feet
   }
   return record as MovementSpeeds
 }

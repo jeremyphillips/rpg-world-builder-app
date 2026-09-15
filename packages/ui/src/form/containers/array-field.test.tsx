@@ -144,7 +144,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
   })
 
-  it('renders the add button and legend for an empty array', () => {
+  it('renders the add button, legend, and empty state for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
     expect(screen.getByText('Traits')).toHaveClass('text-xs', 'font-field-label')
@@ -155,6 +155,7 @@ describe('ArrayFieldRenderer', () => {
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
+    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Traits/ })).not.toHaveClass('mb-8')
   })
@@ -538,7 +539,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.queryByRole('button', { name: 'Add trait' })).not.toBeInTheDocument()
   })
 
-  it('disables the remove button when at min count', async () => {
+  it('allows removing the last item and shows empty-state min guidance', async () => {
     const user = userEvent.setup()
     const minFields: FormItem[] = [
       {
@@ -550,7 +551,7 @@ describe('ArrayFieldRenderer', () => {
         min: 1,
       },
     ]
-    const minSchema = z.object({ traits: z.array(traitSchema) })
+    const minSchema = z.object({ traits: z.array(traitSchema).min(1) })
     render(
       <Form
         schema={minSchema}
@@ -560,7 +561,37 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    expect(screen.getByRole('button', { name: 'Remove Traits · Trait #1' })).toBeDisabled()
+    const removeButton = screen.getByRole('button', { name: 'Remove Traits · Trait #1' })
+    expect(removeButton).toBeEnabled()
+    await user.click(removeButton)
+
+    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('At least one trait is required.')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
+  })
+
+  it('shows empty-state primary copy without min guidance on initial empty arrays', () => {
+    render(
+      <Form
+        schema={z.object({ traits: z.array(traitSchema) })}
+        fields={[
+          {
+            kind: 'array',
+            name: 'traits',
+            legend: 'Traits',
+            fields: traitFields,
+            addAction: { label: 'Add trait' },
+            min: 1,
+          },
+        ]}
+        defaultValues={{ traits: [] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.queryByText('At least one trait is required.')).not.toBeInTheDocument()
   })
 
   it('omits the default remove button when hideItemRemove is true', async () => {

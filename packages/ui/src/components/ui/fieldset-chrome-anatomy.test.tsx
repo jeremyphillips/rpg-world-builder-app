@@ -111,6 +111,31 @@ describe('FieldsetChromeFrame', () => {
     expect(fieldset).toHaveClass('gap-y-1.5')
   })
 
+  it('keeps sr-only legends out of the fieldset flex flow', () => {
+    const { container } = render(
+      <FieldsetChromeFrame errorId="movement-error" fieldsetProps={{ id: 'movement-fieldset' }}>
+        <FieldsetChromeAnatomy
+          hintId="movement-hint"
+          legend={
+            <legend id="movement-legend" className="sr-only">
+              <FieldLabelContent label="Movement" />
+            </legend>
+          }
+        >
+          <div data-testid="movement-row">row</div>
+        </FieldsetChromeAnatomy>
+      </FieldsetChromeFrame>,
+    )
+
+    const fieldset = container.querySelector('fieldset')
+    const legend = screen.getByText('Movement').closest('legend')
+
+    expect(legend).toHaveClass('sr-only')
+    expect(legend).not.toHaveClass('contents')
+    expect(fieldset?.querySelector(':scope > div.font-field-label')).toBeNull()
+    expect(screen.getByTestId('movement-row')).toBeVisible()
+  })
+
   it('uses contents on the legend so fieldset gap applies to the label cluster', () => {
     render(
       <FieldsetChromeFrame errorId="scores-error" fieldsetProps={{ id: 'scores-fieldset' }}>

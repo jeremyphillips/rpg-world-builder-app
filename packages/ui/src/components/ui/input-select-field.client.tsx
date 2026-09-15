@@ -19,24 +19,18 @@ import { ListResultEmpty, ListResultList } from './list-result-list.client'
 import { ListResultItem } from './list-result-item.client'
 import { ListResultViewport } from './list-result-viewport.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
+import { JoinedPair } from './joined-pair-field.client'
 import { PopoverLayerPortal } from './layer-portal-container.client'
-import { Input } from './input.client'
 import {
   filterInputSelectOptions,
   resolveInputSelectOption,
   type InputSelectOption,
 } from './input-select-field.lib'
 import {
-  inputSelectDividerVariants,
-  inputSelectGroupVariants,
   inputSelectSearchablePanelVariants,
-  inputSelectUnitLabelSegmentVariants,
   inputSelectUnitSegmentVariants,
-  inputSelectValueSegmentVariants,
-  inputSelectValueWrapperVariants,
-  segmentSizeVariants,
 } from './input-select-field.variants'
-import { NumberInput, type NumberInputDigits } from './number-input.client'
+import { type NumberInputDigits } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { FieldLabelContent } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
@@ -120,6 +114,7 @@ function RadixUnitSelect({
         id={id}
         size={size}
         grouped
+        groupedPosition="end"
         onBlur={onBlur}
         className={inputSelectUnitSegmentVariants({ size, searchable: false })}
       >
@@ -264,129 +259,8 @@ function UnitSelectSegment({ searchable, hasError: _hasError, ...rest }: UnitSel
   return <RadixUnitSelect {...radixProps} />
 }
 
-interface UnitLabelSegmentProps {
-  label: string
-  fixedUnit: string
-  size: FieldSize
-}
-
-function UnitLabelSegment({ label, fixedUnit, size }: UnitLabelSegmentProps) {
-  return (
-    <>
-      <span className="sr-only">
-        {label} unit: {fixedUnit}
-      </span>
-      <span aria-hidden className={inputSelectUnitLabelSegmentVariants({ size })}>
-        {fixedUnit}
-      </span>
-    </>
-  )
-}
-
-function parseNumberValue(raw: string): number | undefined {
-  if (raw.trim() === '') return undefined
-  const parsed = Number(raw)
-  return Number.isNaN(parsed) ? undefined : parsed
-}
-
-interface ValueSegmentProps {
-  id: string
-  inputType: 'text' | 'number'
-  value: string | number | undefined
-  size: FieldSize
-  disabled?: boolean
-  placeholder?: string
-  min?: number
-  max?: number
-  step?: number
-  hasError: boolean
-  describedBy?: string
-  valueDigits?: NumberInputDigits
-  formatGrouped?: boolean
-  required?: boolean
-  onValueChange: (value: string | number | undefined) => void
-  onBlur?: () => void
-}
-
-function ValueSegment({
-  id,
-  inputType,
-  value,
-  size,
-  disabled,
-  placeholder,
-  min,
-  max,
-  step,
-  hasError,
-  describedBy,
-  valueDigits,
-  formatGrouped,
-  required,
-  onValueChange,
-  onBlur,
-}: ValueSegmentProps) {
-  const displayValue = value ?? ''
-  const segmentClassName = inputSelectValueSegmentVariants({ size })
-
-  function handleValueChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const raw = event.target.value
-    if (inputType === 'number') {
-      onValueChange(parseNumberValue(raw))
-      return
-    }
-    onValueChange(raw)
-  }
-
-  if (inputType === 'number') {
-    return (
-      <div data-input-select-value className={inputSelectValueWrapperVariants()}>
-        <NumberInput
-          id={id}
-          grouped
-          size={size}
-          digits={valueDigits}
-          formatGrouped={formatGrouped}
-          disabled={disabled}
-          placeholder={placeholder}
-          min={min}
-          max={max}
-          step={step}
-          value={displayValue}
-          required={required}
-          aria-invalid={hasError || undefined}
-          aria-describedby={describedBy}
-          onChange={handleValueChange}
-          onBlur={onBlur}
-          className={cn(
-            segmentSizeVariants[size],
-            'bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-md rounded-r-none',
-          )}
-        />
-      </div>
-    )
-  }
-
-  return (
-    <Input
-      id={id}
-      data-input-select-value
-      type="text"
-      size={size}
-      disabled={disabled}
-      placeholder={placeholder}
-      value={displayValue}
-      required={required}
-      aria-invalid={hasError || undefined}
-      aria-describedby={describedBy}
-      onChange={handleValueChange}
-      onBlur={onBlur}
-      className={segmentClassName}
-    />
-  )
-}
-
 /** Labelled field combining a value input (text or number) with a unit select in one control. */
+// fallow-ignore-next-line complexity
 export function InputSelectField({
   id,
   label,
@@ -448,37 +322,51 @@ export function InputSelectField({
           </Field.Label>
         }
         control={
-          <div
-            role="group"
+          <JoinedPair.Root
+            layout={layout}
+            invalid={hasError}
+            disabled={disabled}
             aria-labelledby={`${id}-label`}
-            className={inputSelectGroupVariants({ layout, invalid: hasError, disabled })}
           >
-            <label htmlFor={valueId} className="sr-only">
-              {label} value
-            </label>
-            <ValueSegment
-              id={valueId}
-              inputType={inputType}
-              value={value}
-              size={size}
-              disabled={disabled}
-              placeholder={placeholder}
-              min={min}
-              max={max}
-              step={step}
-              hasError={hasError}
-              describedBy={describedBy}
-              valueDigits={valueDigits}
-              formatGrouped={formatGrouped}
-              required={required}
-              onValueChange={onValueChange}
-              onBlur={onBlur}
-            />
+            {inputType === 'number' ? (
+              <JoinedPair.NumberOccupant
+                id={valueId}
+                ariaLabel={`${label} value`}
+                value={typeof value === 'number' ? value : undefined}
+                size={size}
+                disabled={disabled}
+                placeholder={placeholder}
+                min={min}
+                max={max}
+                step={step}
+                digits={valueDigits}
+                formatGrouped={formatGrouped}
+                required={required}
+                hasError={hasError}
+                describedBy={describedBy}
+                onValueChange={onValueChange}
+                onBlur={onBlur}
+              />
+            ) : (
+              <JoinedPair.TextStartOccupant
+                id={valueId}
+                ariaLabel={`${label} value`}
+                value={value != null ? String(value) : undefined}
+                size={size}
+                disabled={disabled}
+                placeholder={placeholder}
+                required={required}
+                hasError={hasError}
+                describedBy={describedBy}
+                onValueChange={onValueChange}
+                onBlur={onBlur}
+              />
+            )}
 
-            <div aria-hidden className={inputSelectDividerVariants()} />
+            <JoinedPair.Divider />
 
             {isLabelUnit ? (
-              <UnitLabelSegment label={label} fixedUnit={fixedUnit!} size={size} />
+              <JoinedPair.LabelOccupant text={fixedUnit!} ariaLabel={`${label} unit`} size={size} />
             ) : (
               <>
                 <label htmlFor={unitId} className="sr-only">
@@ -500,7 +388,7 @@ export function InputSelectField({
                 />
               </>
             )}
-          </div>
+          </JoinedPair.Root>
         }
       />
     </Field.Root>

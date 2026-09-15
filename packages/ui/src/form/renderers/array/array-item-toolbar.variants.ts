@@ -104,6 +104,12 @@ export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'
 
 import type { ArrayCompactInlineAlign } from '../../field-config'
 
+function arrayItemCompactInlineSelfAlign(align: ArrayCompactInlineAlign): string {
+  if (align === 'center') return 'self-center'
+  if (align === 'control-edge') return 'self-end'
+  return 'self-start'
+}
+
 /** Unlabeled inline rows center grip/actions with the field row unless explicitly overridden. */
 export function resolveArrayItemCompactInlineAlign(
   align: ArrayCompactInlineAlign | undefined,
@@ -116,27 +122,27 @@ export function resolveArrayItemCompactInlineAlign(
 
 /** Compact inline row — grip, fields, and actions share one grid row. */
 export function arrayItemCompactRowClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn('grid w-full min-w-0 gap-x-2', align === 'center' ? 'items-center' : 'items-start')
+  return cn(
+    'grid w-full min-w-0 gap-x-2',
+    align === 'center' ? 'items-center' : align === 'control-edge' ? 'items-end' : 'items-start',
+  )
 }
 
 /** Grip column in the compact row grid. */
 export function arrayItemCompactGripClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn(
-    collapsibleListItemChromeColumnClasses,
-    align === 'center' ? 'self-center' : 'self-start',
-  )
+  return cn(collapsibleListItemChromeColumnClasses, arrayItemCompactInlineSelfAlign(align))
 }
 
 /** Per-field cell in the compact row grid. */
 export function arrayItemCompactFieldCellClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn('min-w-0', align === 'center' && 'self-center')
+  return cn('min-w-0', arrayItemCompactInlineSelfAlign(align))
 }
 
 /** Actions column in the compact row grid — content-sized, never steals field space. */
 export function arrayItemCompactActionsClasses(align: ArrayCompactInlineAlign = 'start'): string {
   return cn(
     'flex w-max shrink-0 items-center justify-self-end',
-    align === 'center' ? 'self-center' : 'self-start',
+    arrayItemCompactInlineSelfAlign(align),
   )
 }
 

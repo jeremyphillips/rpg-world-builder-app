@@ -9,6 +9,7 @@ import {
 import { cn } from '../../../lib/utils'
 import type { ArrayConfig } from '../../field-config'
 import { ArrayFieldAddControl } from './array-field-add-control.client'
+import { ArrayFieldEmptyState } from './array-field-empty-state.client'
 import { ArrayFieldLegend } from './array-field-legend.client'
 import { ArrayFieldItemList } from './array-field-item-list.client'
 import type { ArrayFieldSectionLayout } from './array-field-renderer.client'
@@ -89,12 +90,19 @@ export function ArrayFieldRendererFieldset({
         />
       ) : null}
       <div className={state.itemListClasses}>
-        <ArrayFieldItemList
-          fields={fields}
-          sortableEnabled={state.sortableEnabled}
-          itemProps={state.itemProps}
-          onMove={onMove}
-        />
+        {fields.length === 0 ? (
+          <ArrayFieldEmptyState
+            itemLabel={state.emptyItemLabel}
+            showMinRequired={state.emptyMinRequiredVisible}
+          />
+        ) : (
+          <ArrayFieldItemList
+            fields={fields}
+            sortableEnabled={state.sortableEnabled}
+            itemProps={state.itemProps}
+            onMove={onMove}
+          />
+        )}
         {!inlineAddInLegend ? addControl : null}
       </div>
     </fieldset>

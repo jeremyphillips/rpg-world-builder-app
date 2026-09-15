@@ -188,7 +188,7 @@ export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldSetChromeContainClasses = 'flex flex-col'
 /** `contents` so legend children participate in fieldset flex gap. */
 export const fieldSetInFlowLegendClasses = 'contents min-w-0 p-0'
-export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
+export const fieldInlineSentenceClasses = 'flex flex-wrap items-end gap-x-2 gap-y-2'
 export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
 /**
  * Inline checkbox/switch row — control beside label, hint stacked under the label.

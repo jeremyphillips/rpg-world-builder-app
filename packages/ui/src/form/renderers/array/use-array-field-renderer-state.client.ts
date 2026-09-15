@@ -63,6 +63,7 @@ export function useArrayFieldRendererState({
     showAddIcon,
     addActionMenu,
     collapsible,
+    emptyItemLabel,
     itemCollapseKey,
     itemConfig,
     itemListClasses,
@@ -91,8 +92,16 @@ export function useArrayFieldRendererState({
     getItemValues,
   })
 
-  const canRemove = fields.length > min
   const showDefaultItemRemove = itemConfig.removable && !itemConfig.removeSlot
+  const canRemove = showDefaultItemRemove
+  const [showEmptyMinRequired, setShowEmptyMinRequired] = React.useState(false)
+
+  React.useEffect(() => {
+    if (fields.length > 0) {
+      setShowEmptyMinRequired(false)
+    }
+  }, [fields.length])
+
   const canAdd = max === undefined || fields.length < max
   const invalidRowCount = validation.hasAttemptedSubmit
     ? countInvalidArrayItems(validation.issues, fullName)
@@ -100,6 +109,16 @@ export function useArrayFieldRendererState({
   const arrayIssueCount = validation.hasAttemptedSubmit
     ? countIssuesForArrayPath(validation.issues, fullName)
     : 0
+  const emptyMinRequiredVisible =
+    fields.length === 0 &&
+    min >= 1 &&
+    (showEmptyMinRequired || (validation.hasAttemptedSubmit && arrayIssueCount > 0))
+
+  const markEmptyMinRequired = React.useCallback(() => {
+    if (min >= 1) {
+      setShowEmptyMinRequired(true)
+    }
+  }, [min])
 
   const focusFirstArrayIssue = useFocusFirstArrayIssue({
     fullName,
@@ -142,7 +161,12 @@ export function useArrayFieldRendererState({
       variant,
       collapsedIds,
       onToggleCollapse: toggleCollapse,
-      onRemove: () => remove(index),
+      onRemove: () => {
+        if (fields.length - 1 < min) {
+          markEmptyMinRequired()
+        }
+        remove(index)
+      },
     }),
     [
       canRemove,
@@ -155,6 +179,8 @@ export function useArrayFieldRendererState({
       idPrefix,
       itemBodyStackClasses,
       legend,
+      markEmptyMinRequired,
+      min,
       remove,
       reorderConfigured,
       toggleCollapse,
@@ -163,6 +189,8 @@ export function useArrayFieldRendererState({
   )
 
   return {
+    emptyItemLabel,
+    emptyMinRequiredVisible,
     addAction,
     addActionLabel,
     addActionVariant,

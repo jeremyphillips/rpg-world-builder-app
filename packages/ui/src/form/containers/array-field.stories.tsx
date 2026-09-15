@@ -180,8 +180,9 @@ const boundedFields: FormItem[] = [
 ]
 
 /**
- * Demonstrates `min` and `max` constraints. The Remove button is disabled while
- * at the minimum (1); the Add button disappears once the maximum (3) is reached.
+ * Demonstrates `min` and `max` constraints. Removing the last item shows empty-state
+ * guidance while schema validation enforces `min`; the Add button disappears at `max`.
+ * Grip/actions stay vertically centered unless `item.inlineAlign: 'control-edge'`.
  */
 export const BoundedArray: StoryObj<Meta<object>> = {
   render: () => (
