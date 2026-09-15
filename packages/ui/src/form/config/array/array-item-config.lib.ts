@@ -10,6 +10,7 @@ import type {
   FormItem,
   RowConfig,
 } from '../../field-config'
+import { normalizeArrayItemContent } from './array-item-content-normalizer.lib'
 import {
   DEFAULT_ARRAY_ITEM_SURFACE,
   type SemanticSurfaceTone,
@@ -22,21 +23,16 @@ export function isNestedArraySection(sectionDepth: number): boolean {
   return sectionDepth >= NESTED_ARRAY_SECTION_DEPTH
 }
 
-function isLeafField(item: FormItem | RowConfig): boolean {
-  return !('kind' in item)
-}
-
 function isCompactEligible(fields: FormItem[]): boolean {
-  return resolveCompactInlineRow(fields) !== undefined
+  return normalizeArrayItemContent(fields).contentLayout === 'inline'
 }
 
-/** Single leaf `row` container used by compact inline array items. */
+/**
+ * @deprecated Prefer {@link normalizeArrayItemContent}. Returns the source row when authors
+ * wrapped inline fields in `kind: 'row'`.
+ */
 export function resolveCompactInlineRow(fields: FormItem[]): RowConfig | undefined {
-  if (fields.length !== 1) return undefined
-  const only = fields[0]
-  if (only === undefined || !('kind' in only) || only.kind !== 'row') return undefined
-  if (!only.fields.every(isLeafField)) return undefined
-  return only
+  return normalizeArrayItemContent(fields).inlineRow
 }
 
 export function resolveArrayItemConfig(

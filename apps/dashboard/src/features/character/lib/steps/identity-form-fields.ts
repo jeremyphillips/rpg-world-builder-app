@@ -50,16 +50,11 @@ function narrativeArrayField(
     density: 'comfortable',
     fields: [
       {
-        kind: 'row',
-        fields: [
-          {
-            type: 'text',
-            name: 'value',
-            label: hideItemLabel ? '' : legend,
-            placeholder,
-            width: 'full',
-          },
-        ],
+        type: 'text',
+        name: 'value',
+        label: hideItemLabel ? '' : legend,
+        placeholder,
+        width: 'full',
       },
     ],
     item: {

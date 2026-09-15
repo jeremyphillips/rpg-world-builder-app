@@ -31,6 +31,24 @@ describe('resolveArrayFieldRendererChrome', () => {
     expect(chrome.collapsible).toBe(true)
   })
 
+  it('enables collapse for compact arrays when collapsible is true', () => {
+    const chrome = resolveArrayFieldRendererChrome({
+      config: {
+        kind: 'array',
+        name: 'examples',
+        legend: 'Examples',
+        item: { collapsible: true, variant: 'compact' },
+        fields: [{ type: 'text', name: 'value', label: 'Value' }],
+      },
+      density: 'comfortable',
+      depth: 0,
+      inRhythmStack: undefined,
+      fieldsLength: 1,
+    })
+
+    expect(chrome.collapsible).toBe(true)
+  })
+
   it('does not enable collapse for compact nested arrays without renderShell', () => {
     const chrome = resolveArrayFieldRendererChrome({
       config: {

@@ -22,11 +22,11 @@ export const movementRowFormSchema = z.object({
   feet: z.coerce.number().int().min(1),
 })
 
-export type MovementRowFormValues = z.input<typeof movementRowFormSchema>
+export type MovementRowFormValues = z.infer<typeof movementRowFormSchema>
 
 export const DEFAULT_MOVEMENT_ROW: MovementRowFormValues = {
   mode: 'walk',
-  feet: '30',
+  feet: 30,
 }
 
 const movementModeOptions = MOVEMENT_MODES.map((mode) => ({
@@ -49,7 +49,6 @@ export function movementArrayField(): FormItem {
     density: 'comfortable',
     item: {
       variant: 'compact',
-      inlineAlign: 'center',
       headerVisibility: 'hidden',
       reorder: 'dragHandle',
       header: {
@@ -67,7 +66,7 @@ export function movementArrayField(): FormItem {
       {
         type: 'inlineSentence',
         name: 'movementRow',
-        label: 'Movement',
+        label: 'Mode',
         labelVisibility: 'srOnly',
         segments: [
           {
@@ -75,16 +74,17 @@ export function movementArrayField(): FormItem {
             name: 'mode',
             options: movementModeOptions,
             defaultValue: 'walk',
-            width: 'lg',
-            ariaLabel: 'Movement mode',
+            width: 'md',
+            ariaLabel: 'Mode',
           },
           {
             kind: 'select',
             name: 'feet',
             options: movementFeetOptions,
             defaultValue: '30',
+            digits: 3,
             width: 'sm',
-            ariaLabel: 'Movement speed in feet',
+            ariaLabel: 'Speed',
           },
           { kind: 'text', value: 'ft', tone: 'label' },
         ],
@@ -93,9 +93,7 @@ export function movementArrayField(): FormItem {
   }
 }
 
-export function movementRecordToRows(
-  movement: MovementSpeeds,
-): Array<{ mode: MovementMode; feet: number }> {
+export function movementRecordToRows(movement: MovementSpeeds): MovementRowFormValues[] {
   return MOVEMENT_MODES.filter((mode) => movement[mode] !== undefined).map((mode) => ({
     mode,
     feet: movement[mode]!,

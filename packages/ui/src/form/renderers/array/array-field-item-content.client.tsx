@@ -1,41 +1,22 @@
 'use client'
 
 import * as React from 'react'
-import type { CSSProperties } from 'react'
 import type { useSortable } from '@dnd-kit/sortable'
 
 import { ArrayFieldContext } from '../../context/array-field.context'
-import {
-  ArrayItemPresentationContext,
-  resolveErrorPlacement,
-} from '../../context/array-item-presentation.context'
+import { ArrayItemPresentationContext } from '../../context/array-item-presentation.context'
 import type { ArrayItemPresentationAnatomy } from '../../config/array/array-item-presentation.lib'
 import type { ResolvedArrayItemHeader } from '../../config/array/array-item-config.lib'
-import type { ArrayConfig, ArrayItemConfig, RowConfig } from '../../field-config'
-import { isRowSlotItem } from '../../field-config'
+import type { ArrayConfig, ArrayItemConfig } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
 import { NestedFormItems } from '../../containers/form-item-node.client'
-import { FieldNode } from '../../containers/form-conditional.client'
-import { SlotFormItemSection } from '../fields/slot-field-renderer.client'
 import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 import { CollapsibleListItem } from '../../../components/ui/collapsible-list-item'
 import { resolveArrayItemShellSurface } from '../../config/array/resolve-array-item-shell-surface.lib'
-import { FieldRow } from '../../../components/ui/field-row'
 import { ArrayItemHeaderContent, ArrayItemHeaderSummary } from './array-item-header.client'
-import { ArrayItemCompactRow } from './array-item-compact-row.client'
-import { ArrayItemDragHandleSlot } from './array-item-drag-handle-slot.client'
-import {
-  ArrayItemActionsContent,
-  ArrayItemActionsRail,
-  ArrayItemShell,
-} from './array-item-shell.client'
+import { ArrayItemActionsContent, ArrayItemActionsRail } from './array-item-shell.client'
 import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
-import { ArrayItemIssueSummary } from './array-item-issue.client'
-import {
-  arrayItemUnlabeledStackedGridTemplate,
-  arrayItemUnlabeledStackedRowClasses,
-  resolveArrayItemCompactInlineAlign,
-} from './array-item-toolbar.variants'
+import { FlatNoHeaderArrayFieldItem } from './flat-no-header-array-field-item.client'
 import { useArrayFieldItemContentState } from './use-array-field-item-content-state.client'
 
 export interface ArrayFieldItemContentProps {
@@ -120,188 +101,6 @@ function ArrayFieldItemActionsRailSlot({
   }
 
   return <ArrayItemActionsRail {...contentProps} embedded={embedded} />
-}
-
-interface CompactInlineArrayFieldItemProps extends ArrayFieldItemChromeProps {
-  idPrefix: string
-  itemPrefix: string
-  compactInlineRow: RowConfig
-  compactInlineAlign?: ArrayItemConfig['inlineAlign']
-  header: ResolvedArrayItemHeader
-  sortableEnabled: boolean
-  suppressFieldErrorText: boolean
-  rowSummaryId: string
-  arrayContext: React.ComponentProps<typeof ArrayFieldContext.Provider>['value']
-  dragHandleProps?: ArrayFieldItemContentProps['dragHandleProps']
-  actionsRail: React.ReactNode
-  issueSummary?: ArrayItemIssueSummaryProps
-}
-
-function CompactInlineArrayFieldItem({
-  titleId,
-  itemPrefix,
-  reserveDragHandleSlot,
-  collapsible,
-  dragging,
-  shellClassName,
-  idPrefix,
-  itemPrefix: namePrefix,
-  compactInlineRow,
-  compactInlineAlign,
-  header,
-  sortableEnabled,
-  suppressFieldErrorText,
-  rowSummaryId,
-  arrayContext,
-  dragHandleProps,
-  actionsRail,
-  issueSummary,
-}: CompactInlineArrayFieldItemProps) {
-  const parentContext = useFormSectionContext()
-  const rowPresentation = React.useContext(ArrayItemPresentationContext)
-  const suppressRowFieldErrorText = resolveErrorPlacement(
-    compactInlineRow.errorPlacement,
-    'compact',
-    true,
-  )
-  const rowPresentationValue = suppressRowFieldErrorText
-    ? { ...rowPresentation, suppressFieldErrorText: true }
-    : rowPresentation
-
-  return (
-    <ArrayItemShell
-      titleId={titleId}
-      itemPrefix={itemPrefix}
-      showDragHandle={reserveDragHandleSlot}
-      collapsible={collapsible}
-      dragging={dragging}
-      layout="compactRow"
-      className={shellClassName}
-      main={
-        <ArrayItemPresentationContext.Provider value={{ suppressFieldErrorText, rowSummaryId }}>
-          <ArrayFieldContext.Provider value={arrayContext}>
-            <ArrayItemCompactRow
-              titleId={titleId}
-              ariaLabel={header.ariaLabel}
-              showGrip={reserveDragHandleSlot}
-              align={compactInlineAlign}
-              unlabeled
-              grip={
-                <ArrayItemDragHandleSlot
-                  reserveSlot={reserveDragHandleSlot}
-                  sortableEnabled={sortableEnabled}
-                  ariaLabel={`Drag to reorder ${header.ariaLabel}`}
-                  attributes={dragHandleProps?.attributes}
-                  listeners={dragHandleProps?.listeners}
-                  compact
-                />
-              }
-              fields={
-                <ArrayItemPresentationContext.Provider value={rowPresentationValue}>
-                  <FieldRow className={compactInlineRow.className}>
-                    {compactInlineRow.fields.map((field) =>
-                      isRowSlotItem(field) ? (
-                        <SlotFormItemSection
-                          key={field.name}
-                          item={field}
-                          parentContext={parentContext}
-                          depth={1}
-                          namePrefix={namePrefix}
-                        />
-                      ) : (
-                        <FieldNode
-                          key={field.name}
-                          config={field}
-                          idPrefix={idPrefix}
-                          namePrefix={namePrefix}
-                        />
-                      ),
-                    )}
-                  </FieldRow>
-                </ArrayItemPresentationContext.Provider>
-              }
-              actions={actionsRail}
-              summary={
-                issueSummary?.placement === 'compactSummary' ? (
-                  <ArrayItemIssueSummary {...issueSummary} />
-                ) : undefined
-              }
-            />
-          </ArrayFieldContext.Provider>
-        </ArrayItemPresentationContext.Provider>
-      }
-    />
-  )
-}
-
-interface UnlabeledStackedArrayFieldItemProps extends ArrayFieldItemChromeProps {
-  header: ResolvedArrayItemHeader
-  sortableEnabled: boolean
-  compactInlineAlign?: ArrayItemConfig['inlineAlign']
-  dragHandleProps?: ArrayFieldItemContentProps['dragHandleProps']
-  issueSummary?: ArrayItemIssueSummaryProps
-  fieldsNode: React.ReactNode
-  actionsRail: React.ReactNode
-}
-
-function UnlabeledStackedArrayFieldItem({
-  titleId,
-  itemPrefix,
-  reserveDragHandleSlot,
-  collapsible,
-  dragging,
-  shellClassName,
-  header,
-  sortableEnabled,
-  compactInlineAlign,
-  dragHandleProps,
-  issueSummary,
-  fieldsNode,
-  actionsRail,
-}: UnlabeledStackedArrayFieldItemProps) {
-  const gridStyle = {
-    gridTemplateColumns: arrayItemUnlabeledStackedGridTemplate(reserveDragHandleSlot),
-  } as CSSProperties
-
-  return (
-    <ArrayItemShell
-      titleId={titleId}
-      itemPrefix={itemPrefix}
-      showDragHandle={false}
-      collapsible={collapsible}
-      dragging={dragging}
-      className={shellClassName}
-      main={
-        <div
-          className={arrayItemUnlabeledStackedRowClasses(compactInlineAlign)}
-          style={gridStyle}
-          data-array-item-unlabeled-stacked=""
-        >
-          <span id={titleId} className="sr-only">
-            {header.ariaLabel}
-          </span>
-          {reserveDragHandleSlot ? (
-            <div className="flex justify-center self-start">
-              <ArrayItemDragHandleSlot
-                reserveSlot={reserveDragHandleSlot}
-                sortableEnabled={sortableEnabled}
-                ariaLabel={`Drag to reorder ${header.ariaLabel}`}
-                attributes={dragHandleProps?.attributes}
-                listeners={dragHandleProps?.listeners}
-              />
-            </div>
-          ) : null}
-          <div className="min-w-0">
-            {fieldsNode}
-            {issueSummary?.placement === 'compactSummary' ? (
-              <ArrayItemIssueSummary {...issueSummary} />
-            ) : null}
-          </div>
-        </div>
-      }
-      actions={actionsRail}
-    />
-  )
 }
 
 interface FlatLabeledArrayFieldItemProps extends ArrayFieldItemChromeProps {
@@ -476,21 +275,18 @@ function DetailedArrayFieldItem({
 function renderArrayFieldItemByAnatomy(
   anatomy: ArrayItemPresentationAnatomy,
   props: {
-    compactInline: CompactInlineArrayFieldItemProps | null
-    unlabeledStacked: UnlabeledStackedArrayFieldItemProps
-    flatLabeled: FlatLabeledArrayFieldItemProps
-    detailed: DetailedArrayFieldItemProps
+    flatNoHeader: React.ComponentProps<typeof FlatNoHeaderArrayFieldItem>
+    flatWithHeader: FlatLabeledArrayFieldItemProps
+    disclosure: DetailedArrayFieldItemProps
   },
 ) {
   switch (anatomy) {
-    case 'lightShellInline':
-      return props.compactInline ? <CompactInlineArrayFieldItem {...props.compactInline} /> : null
-    case 'lightShellStacked':
-      return <UnlabeledStackedArrayFieldItem {...props.unlabeledStacked} />
-    case 'collapsibleListItemFlat':
-      return <FlatLabeledArrayFieldItem {...props.flatLabeled} />
-    case 'collapsibleListItemDisclosure':
-      return <DetailedArrayFieldItem {...props.detailed} />
+    case 'flatNoHeader':
+      return <FlatNoHeaderArrayFieldItem {...props.flatNoHeader} />
+    case 'flatWithHeader':
+      return <FlatLabeledArrayFieldItem {...props.flatWithHeader} />
+    case 'disclosure':
+      return <DetailedArrayFieldItem {...props.disclosure} />
     default:
       return null
   }
@@ -530,7 +326,7 @@ export function ArrayFieldItemContent({
     focusIssue,
     badgeProminence,
     issueSummary,
-    compactInlineRow,
+    normalizedContent,
     chromeProps,
     showIssueChrome,
     issueGroup,
@@ -574,9 +370,8 @@ export function ArrayFieldItemContent({
     </ArrayFieldContext.Provider>
   ) : undefined
 
-  const isUnlabeled = presentation.itemLabel === 'none'
-  const compactInlineAlign = resolveArrayItemCompactInlineAlign(itemConfig.inlineAlign, isUnlabeled)
-  const actionsEmbedded = anatomy === 'lightShellInline' || Boolean(itemConfig.renderShell)
+  const compactInlineAlign = itemConfig.inlineAlign
+  const actionsEmbedded = anatomy === 'flatNoHeader' || Boolean(itemConfig.renderShell)
   const actionsRail = (
     <ArrayFieldItemActionsRailSlot
       header={header}
@@ -591,10 +386,7 @@ export function ArrayFieldItemContent({
       badgeProminence={badgeProminence}
       variant={variant}
       embedded={actionsEmbedded}
-      bare={
-        (anatomy === 'collapsibleListItemDisclosure' || anatomy === 'collapsibleListItemFlat') &&
-        !itemConfig.renderShell
-      }
+      bare={(anatomy === 'disclosure' || anatomy === 'flatWithHeader') && !itemConfig.renderShell}
     />
   )
 
@@ -617,34 +409,25 @@ export function ArrayFieldItemContent({
   }
 
   return renderArrayFieldItemByAnatomy(anatomy, {
-    compactInline: compactInlineRow
-      ? {
-          ...chromeProps,
-          idPrefix,
-          itemPrefix,
-          compactInlineRow,
-          compactInlineAlign,
-          header,
-          sortableEnabled,
-          suppressFieldErrorText,
-          rowSummaryId,
-          arrayContext,
-          dragHandleProps,
-          actionsRail,
-          issueSummary,
-        }
-      : null,
-    unlabeledStacked: {
+    flatNoHeader: {
       ...chromeProps,
+      idPrefix,
+      itemPrefix,
+      contentLayout: presentation.contentLayout,
+      inlineFields: normalizedContent?.inlineFields,
+      inlineRow: normalizedContent?.inlineRow,
+      compactInlineAlign,
       header,
       sortableEnabled,
-      compactInlineAlign,
+      suppressFieldErrorText,
+      rowSummaryId,
+      arrayContext,
       dragHandleProps,
       issueSummary,
       fieldsNode,
       actionsRail,
     },
-    flatLabeled: {
+    flatWithHeader: {
       ...chromeProps,
       itemId,
       header,
@@ -658,7 +441,7 @@ export function ArrayFieldItemContent({
       fieldsNode,
       actionsRail,
     },
-    detailed: {
+    disclosure: {
       ...chromeProps,
       itemId,
       header,

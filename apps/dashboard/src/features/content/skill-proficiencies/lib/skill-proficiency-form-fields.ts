@@ -67,11 +67,6 @@ export function buildSkillProficiencyFields(ctx: ContentFormCtx): FormItem[] {
           density: 'comfortable',
           item: {
             reorder: 'dragHandle',
-            surface: { emphasis: 'subtle' },
-            collapsible: true,
-            collapseKey: 'example',
-            variant: 'compact',
-            inlineAlign: 'center',
             header: {
               fallback: (index) => `Example ${index + 1}`,
               primaryField: 'value',
@@ -79,17 +74,13 @@ export function buildSkillProficiencyFields(ctx: ContentFormCtx): FormItem[] {
           },
           fields: [
             {
-              kind: 'row',
-              fields: [
-                {
-                  type: 'text',
-                  name: 'value',
-                  label: 'Example',
-                  placeholder: 'Example…',
-                  required: true,
-                  width: 'full',
-                },
-              ],
+              type: 'text',
+              name: 'value',
+              label: 'Example',
+              labelVisibility: 'srOnly',
+              placeholder: 'Example…',
+              required: true,
+              width: 'full',
             },
           ],
         },

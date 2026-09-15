@@ -1081,7 +1081,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveValue('Darkvision')
   })
 
-  it('pins compact item remove control in the top-right actions rail', async () => {
+  it('embeds compact stacked item actions in the flatNoHeader row grid', async () => {
     const user = userEvent.setup()
     const compactFields: FormItem[] = [
       {
@@ -1114,7 +1114,13 @@ describe('ArrayFieldRenderer', () => {
 
     expect(item).toContainElement(actionsRail)
     expect(actionsRail).toContainElement(removeButton)
-    expect(actionsRail).toHaveClass('self-start', 'mt-1')
+    expect(document.querySelector('[data-array-item-flat-no-header]')).toHaveAttribute(
+      'data-array-item-content-layout',
+      'stacked',
+    )
+    expect(document.querySelector('[data-compact-inline-row]')).toBeInTheDocument()
+    expect(actionsRail).toHaveClass('self-center')
+    expect(actionsRail).not.toHaveClass('mt-1')
   })
 
   it('lays out compact inline rows on a dedicated grid with embedded actions', async () => {
@@ -1598,7 +1604,10 @@ describe('ArrayFieldRenderer', () => {
 
       await user.click(screen.getByRole('button', { name: 'Add speed' }))
 
-      expect(document.querySelector('[data-array-item-unlabeled-stacked]')).toBeInTheDocument()
+      expect(document.querySelector('[data-array-item-flat-no-header]')).toBeInTheDocument()
+      expect(
+        document.querySelector('[data-array-item-content-layout="stacked"]'),
+      ).toBeInTheDocument()
       expect(screen.queryByText('Movement 1')).not.toBeInTheDocument()
       expect(screen.getByRole('group', { name: 'Movement · Movement 1' })).toBeInTheDocument()
     })
@@ -1630,6 +1639,72 @@ describe('ArrayFieldRenderer', () => {
       expect(screen.getByRole('button', { name: /Collapse .*Darkvision/ })).toBeInTheDocument()
     })
 
+    it('renders equivalent flatNoHeader chrome for bare text, row wrap, and inlineSentence', async () => {
+      const user = userEvent.setup()
+      const baseItem = {
+        variant: 'compact' as const,
+        headerVisibility: 'hidden' as const,
+        header: { fallback: (index: number) => `Row ${index + 1}` },
+      }
+
+      const cases: FormItem[][] = [
+        [{ type: 'text', name: 'value', label: 'Value', required: true }],
+        [
+          {
+            kind: 'row',
+            fields: [{ type: 'text', name: 'value', label: 'Value', required: true }],
+          },
+        ],
+        [
+          {
+            type: 'inlineSentence',
+            name: 'sentence',
+            label: 'Value',
+            labelVisibility: 'srOnly',
+            segments: [
+              {
+                kind: 'select',
+                name: 'value',
+                options: [{ value: 'sample', label: 'Sample' }],
+                defaultValue: 'sample',
+                width: 'full',
+              },
+            ],
+          },
+        ],
+      ]
+
+      for (const fields of cases) {
+        const { unmount } = render(
+          <Form<{ rows: Array<{ value: string }> }>
+            schema={z.object({ rows: z.array(z.object({ value: z.string() })) })}
+            fields={[
+              {
+                kind: 'array',
+                name: 'rows',
+                legend: 'Rows',
+                item: baseItem,
+                fields,
+                addAction: { label: 'Add row' },
+              },
+            ]}
+            onSubmit={vi.fn()}
+            footer={<button type="submit">Save</button>}
+          />,
+        )
+
+        await user.click(screen.getByRole('button', { name: 'Add row' }))
+
+        const flatShell = document.querySelector('[data-array-item-flat-no-header]')
+        expect(flatShell).toBeInTheDocument()
+        expect(flatShell).toHaveAttribute('data-array-item-content-layout', 'inline')
+        expect(document.querySelector('[data-compact-inline-row]')).toBeInTheDocument()
+        expect(document.querySelector('[data-compact-inline-align="center"]')).toBeInTheDocument()
+
+        unmount()
+      }
+    })
+
     it('reserves drag-handle geometry when reorder is configured but only one item exists', async () => {
       const user = userEvent.setup()
       const fields: FormItem[] = [
@@ -1657,18 +1732,16 @@ describe('ArrayFieldRenderer', () => {
       )
 
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
-      const stackedRow = document.querySelector('[data-array-item-unlabeled-stacked]')
-      expect(stackedRow).toHaveStyle({ gridTemplateColumns: 'auto minmax(0, 1fr)' })
-      expect(
-        stackedRow?.querySelector('[aria-hidden="true"][class*="opacity-0"]'),
-      ).toBeInTheDocument()
+      const flatRow = document.querySelector('[data-compact-inline-row]')
+      expect(flatRow).toHaveStyle({ gridTemplateColumns: 'auto minmax(0, 1fr) max-content' })
+      expect(flatRow?.querySelector('[aria-hidden="true"][class*="opacity-0"]')).toBeInTheDocument()
 
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
       expect(screen.getAllByLabelText(/Drag to reorder/i)).toHaveLength(2)
 
       await user.click(screen.getAllByRole('button', { name: /Remove/i })[1]!)
-      expect(document.querySelector('[data-array-item-unlabeled-stacked]')).toHaveStyle({
-        gridTemplateColumns: 'auto minmax(0, 1fr)',
+      expect(document.querySelector('[data-compact-inline-row]')).toHaveStyle({
+        gridTemplateColumns: 'auto minmax(0, 1fr) max-content',
       })
     })
   })

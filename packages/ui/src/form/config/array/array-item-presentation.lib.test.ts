@@ -21,6 +21,17 @@ describe('resolveArrayItemPresentation', () => {
     },
   ]
 
+  const bareInlineTextFields = [{ type: 'text' as const, name: 'value', label: 'Example' }]
+
+  const inlineSentenceFields = [
+    {
+      type: 'inlineSentence' as const,
+      name: 'movementRow',
+      label: 'Movement',
+      segments: [{ kind: 'text' as const, value: 'ft', tone: 'label' as const }],
+    },
+  ]
+
   it('does not infer a visible header from stacked field layout alone', () => {
     const presentation = resolveArrayItemPresentation({
       config: {
@@ -41,7 +52,7 @@ describe('resolveArrayItemPresentation', () => {
     expect(presentation.contentLayout).toBe('stacked')
     expect(presentation.itemLabel).toBe('none')
     expect(presentation.headerAnatomy).toBe('none')
-    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('lightShellStacked')
+    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('flatNoHeader')
   })
 
   it('supports explicit unlabeled stacked items via headerVisibility hidden', () => {
@@ -65,9 +76,10 @@ describe('resolveArrayItemPresentation', () => {
       fieldsLength: 1,
     })
 
+    expect(presentation.contentLayout).toBe('inline')
     expect(presentation.itemLabel).toBe('none')
     expect(presentation.headerAnatomy).toBe('none')
-    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('lightShellStacked')
+    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('flatNoHeader')
   })
 
   it('preserves labeled compact stacked items under auto when identity is visible', () => {
@@ -92,7 +104,7 @@ describe('resolveArrayItemPresentation', () => {
 
     expect(presentation.itemLabel).toBe('visible')
     expect(presentation.headerAnatomy).toBe('present')
-    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('collapsibleListItemFlat')
+    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('flatWithHeader')
   })
 
   it('normalizes headerVisibility hidden for collapsible items', () => {
@@ -111,12 +123,36 @@ describe('resolveArrayItemPresentation', () => {
       variant: 'detailed',
       reorder: 'dragHandle',
       fieldsLength: 1,
+      collapsible: true,
     })
 
     expect(presentation.disclosure).toBe('collapsible')
     expect(presentation.itemLabel).toBe('visible')
     expect(presentation.headerAnatomy).toBe('present')
-    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('collapsibleListItemDisclosure')
+    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('disclosure')
+  })
+
+  it('honors collapsible on compact variant when renderer passes collapsible override', () => {
+    const presentation = resolveArrayItemPresentation({
+      config: {
+        kind: 'array',
+        name: 'examples',
+        legend: 'Examples',
+        item: {
+          variant: 'compact',
+          collapsible: true,
+          header: { fallback: (index) => `Example ${index + 1}`, primaryField: 'value' },
+        },
+        fields: bareInlineTextFields,
+      },
+      variant: 'compact',
+      reorder: 'dragHandle',
+      fieldsLength: 1,
+      collapsible: true,
+    })
+
+    expect(presentation.disclosure).toBe('collapsible')
+    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('disclosure')
   })
 
   it('keeps inline content layout independent from header visibility', () => {
@@ -141,7 +177,48 @@ describe('resolveArrayItemPresentation', () => {
 
     expect(presentation.contentLayout).toBe('inline')
     expect(presentation.itemLabel).toBe('none')
-    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('lightShellInline')
+    expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('flatNoHeader')
+  })
+
+  it('produces equivalent inline presentation for bare text, row wrap, and inlineSentence', () => {
+    const baseConfig = {
+      kind: 'array' as const,
+      name: 'rows',
+      legend: 'Rows',
+      item: {
+        variant: 'compact' as const,
+        headerVisibility: 'hidden' as const,
+        header: { fallback: (index: number) => `Row ${index + 1}` },
+      },
+    }
+
+    const bareText = resolveArrayItemPresentation({
+      config: { ...baseConfig, fields: bareInlineTextFields },
+      variant: 'compact',
+      reorder: 'dragHandle',
+      fieldsLength: 1,
+    })
+    const rowWrap = resolveArrayItemPresentation({
+      config: {
+        ...baseConfig,
+        fields: [{ kind: 'row' as const, fields: bareInlineTextFields }],
+      },
+      variant: 'compact',
+      reorder: 'dragHandle',
+      fieldsLength: 1,
+    })
+    const inlineSentence = resolveArrayItemPresentation({
+      config: { ...baseConfig, fields: inlineSentenceFields },
+      variant: 'compact',
+      reorder: 'dragHandle',
+      fieldsLength: 1,
+    })
+
+    for (const presentation of [bareText, rowWrap, inlineSentence]) {
+      expect(presentation.contentLayout).toBe('inline')
+      expect(presentation.headerAnatomy).toBe('none')
+      expect(resolveArrayItemPresentationAnatomy(presentation)).toBe('flatNoHeader')
+    }
   })
 
   it('reserves drag handle geometry before sortable is active', () => {

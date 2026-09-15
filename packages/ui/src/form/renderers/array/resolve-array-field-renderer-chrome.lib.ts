@@ -2,6 +2,7 @@ import {
   fieldArrayItemListClasses,
   fieldStackRhythmVariants,
 } from '../../../components/ui/field.variants'
+import { assertArrayItemConfig } from '../../config/array/assert-array-item-config.lib'
 import {
   isNestedArraySection,
   resolveArrayAddAction,
@@ -54,9 +55,8 @@ export function resolveArrayFieldRendererChrome({
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
   const reorderConfigured = reorder === 'dragHandle'
-  // Entity-backed `renderShell` rows (DEC grants, etc.) keep collapse wiring even when
-  // nested sections auto-resolve to compact — the shell always renders disclosure chrome.
-  const collapsible = itemCollapsible && (variant === 'detailed' || Boolean(itemConfig.renderShell))
+  assertArrayItemConfig(config, legend)
+  const collapsible = itemCollapsible
   const presentation = resolveArrayItemPresentation({
     config,
     variant,

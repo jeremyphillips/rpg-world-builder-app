@@ -4,12 +4,12 @@ import { useWatch } from 'react-hook-form'
 import type { useSortable } from '@dnd-kit/sortable'
 
 import { useDependsOnValues } from '../../config/form-depends-on.client'
+import { normalizeArrayItemContent } from '../../config/array/array-item-content-normalizer.lib'
 import {
   resolveArrayItemConfig,
   resolveArrayItemHeader,
   resolveArrayItemHeaderLabels,
   resolveArrayItemReorder,
-  resolveCompactInlineRow,
 } from '../../config/array/array-item-config.lib'
 import {
   resolveArrayItemFlatShellClassName,
@@ -108,8 +108,8 @@ export function useArrayFieldItemContentState({
     collapsible,
   }
   const rowLabel = header.ariaLabel
-  const compactInlineRow =
-    presentation.contentLayout === 'inline' ? resolveCompactInlineRow(config.fields) : undefined
+  const normalizedContent =
+    presentation.contentLayout === 'inline' ? normalizeArrayItemContent(config.fields) : undefined
   const stackPosition = resolveArrayItemFlatStackPosition(index, fieldsLength)
   const shellClassName = resolveArrayItemFlatShellClassName(presentation, stackPosition)
 
@@ -141,7 +141,7 @@ export function useArrayFieldItemContentState({
     focusIssue: rowState.focusIssue,
     badgeProminence: rowState.badgeProminence,
     issueSummary: rowState.issueSummary,
-    compactInlineRow,
+    normalizedContent,
     chromeProps,
     showIssueChrome: rowState.showIssueChrome,
     issueGroup: rowState.issueGroup,

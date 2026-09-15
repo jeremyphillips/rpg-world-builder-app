@@ -1,9 +1,6 @@
 import type { ArrayConfig, ArrayItemHeaderConfig, ArrayItemReorder } from '../../field-config'
-import {
-  resolveArrayItemConfig,
-  resolveArrayItemHeader,
-  resolveCompactInlineRow,
-} from './array-item-config.lib'
+import { normalizeArrayItemContent } from './array-item-content-normalizer.lib'
+import { resolveArrayItemConfig, resolveArrayItemHeader } from './array-item-config.lib'
 
 export type ArrayItemHeaderVisibility = 'auto' | 'hidden'
 
@@ -19,11 +16,15 @@ export type ArrayItemResolvedPresentation = {
   sortableEnabled: boolean
 }
 
-export type ArrayItemPresentationAnatomy =
-  | 'lightShellInline'
-  | 'lightShellStacked'
-  | 'collapsibleListItemFlat'
-  | 'collapsibleListItemDisclosure'
+export type ArrayItemPresentationAnatomy = 'flatNoHeader' | 'flatWithHeader' | 'disclosure'
+
+export type ArrayItemActionsLocation = 'itemRow' | 'header'
+
+export function resolveArrayItemActionsLocation(
+  presentation: Pick<ArrayItemResolvedPresentation, 'headerAnatomy'>,
+): ArrayItemActionsLocation {
+  return presentation.headerAnatomy === 'present' ? 'header' : 'itemRow'
+}
 
 type ResolveArrayItemPresentationInput = {
   config: ArrayConfig
@@ -109,11 +110,9 @@ function resolveListGap(
 export function resolveArrayItemPresentationAnatomy(
   presentation: ArrayItemResolvedPresentation,
 ): ArrayItemPresentationAnatomy {
-  if (presentation.disclosure === 'collapsible') return 'collapsibleListItemDisclosure'
-  if (presentation.headerAnatomy === 'none') {
-    return presentation.contentLayout === 'inline' ? 'lightShellInline' : 'lightShellStacked'
-  }
-  return 'collapsibleListItemFlat'
+  if (presentation.disclosure === 'collapsible') return 'disclosure'
+  if (presentation.headerAnatomy === 'none') return 'flatNoHeader'
+  return 'flatWithHeader'
 }
 
 export function resolveArrayItemPresentation({
@@ -129,9 +128,9 @@ export function resolveArrayItemPresentation({
   const collapsible = collapsibleOverride ?? itemConfig.collapsible
   const disclosure = collapsible ? 'collapsible' : 'none'
   const headerVisibility = normalizeHeaderVisibility(itemConfig.headerVisibility, collapsible)
-  const compactInlineRow =
-    variant === 'compact' ? resolveCompactInlineRow(config.fields) : undefined
-  const contentLayout = compactInlineRow ? 'inline' : 'stacked'
+  const normalized = normalizeArrayItemContent(config.fields)
+  const contentLayout =
+    variant === 'compact' && normalized.contentLayout === 'inline' ? 'inline' : 'stacked'
   const itemLabel = resolveItemLabel(
     headerVisibility,
     headerConfig,
