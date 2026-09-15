@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   DEFAULT_ARRAY_ITEM_SURFACE,
+  DEFAULT_FLAT_ARRAY_ITEM_SURFACE,
   DEFAULT_DEPENDENT_SURFACE,
   DEFAULT_PANEL_SURFACE,
   resolveSurfaceClasses,
@@ -57,6 +58,13 @@ describe('resolveSurfaceClasses', () => {
     const classes = resolveSurfaceClasses(DEFAULT_ARRAY_ITEM_SURFACE)
     expect(classes).toContain('bg-surface-subtle')
     expect(classes).toContain('[--surface-current:var(--surface-subtle)]')
+    expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
+  })
+
+  it('uses approved tokens for flat non-collapsible array item surface', () => {
+    const classes = resolveSurfaceClasses(DEFAULT_FLAT_ARRAY_ITEM_SURFACE)
+    expect(classes).toContain('bg-background')
+    expect(classes).toContain('[--surface-current:var(--background)]')
     expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })
 

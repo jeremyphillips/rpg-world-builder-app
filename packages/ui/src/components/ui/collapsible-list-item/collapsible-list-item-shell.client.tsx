@@ -13,15 +13,13 @@ import {
   buildCollapsibleListItemGeometryStyle,
   buildCollapsibleListItemLeadingChromeStyle,
 } from './collapsible-list-item-leading-chrome.lib'
-import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
+import { CollapsibleListItemShellContent } from './collapsible-list-item-shell-content.client'
+import {
+  resolveCollapsibleListItemHeaderActionsPaddingClasses,
+  resolveCollapsibleListItemShellLayout,
+} from './collapsible-list-item-shell-layout.lib'
 import {
   collapsibleListItemDraggingClasses,
-  collapsibleListItemHeaderRowClassesForRowLayout,
-  collapsibleListItemHeaderStackClasses,
-  collapsibleListItemHeaderStackSummaryGapClasses,
-  collapsibleListItemHeaderSummaryClasses,
-  collapsibleListItemHeaderVerticalPaddingVariants,
-  collapsibleListItemMainClasses,
   collapsibleListItemShellVariants,
   type CollapsibleListItemDensity,
   type CollapsibleListItemLeadingChromeOptions,
@@ -75,67 +73,6 @@ function resolveShellChromeClasses({
   )
 }
 
-function resolveCollapsibleListItemShellLayout({
-  layout,
-  actionsAlign,
-  rowLayout,
-}: {
-  layout: NonNullable<CollapsibleListItemShellProps['layout']>
-  actionsAlign: CollapsibleListItemActionsAlign
-  rowLayout: CollapsibleListItemRowLayout
-}): 'default' | 'compactRow' | 'headerActions' | 'entityCardHeaderActions' {
-  if (layout === 'compactRow') {
-    return 'compactRow'
-  }
-  if (actionsAlign !== 'center') {
-    return 'default'
-  }
-  return rowLayout === 'entity-card' ? 'entityCardHeaderActions' : 'headerActions'
-}
-
-interface CollapsibleListItemCenterActionsContentProps {
-  headerRowClasses: string
-  density: CollapsibleListItemDensity
-  leadingChrome: CollapsibleListItemLeadingChromeOptions
-  toolbar: React.ReactNode
-  summary?: React.ReactNode
-  actions?: React.ReactNode
-  body?: React.ReactNode
-}
-
-function CollapsibleListItemCenterActionsContent({
-  headerRowClasses,
-  density,
-  leadingChrome,
-  toolbar,
-  summary,
-  actions,
-  body,
-}: CollapsibleListItemCenterActionsContentProps) {
-  const headerRowPadding = collapsibleListItemHeaderVerticalPaddingVariants({ density })
-
-  return (
-    <>
-      <div className={cn(headerRowClasses, headerRowPadding)}>
-        <div
-          className={cn(
-            collapsibleListItemHeaderStackClasses,
-            summary && collapsibleListItemHeaderStackSummaryGapClasses,
-            'min-w-0 flex-1',
-          )}
-        >
-          {toolbar}
-          {summary ? (
-            <div className={collapsibleListItemHeaderSummaryClasses(leadingChrome)}>{summary}</div>
-          ) : null}
-        </div>
-        {actions}
-      </div>
-      {body}
-    </>
-  )
-}
-
 /** Grid shell — toolbar row + optional body + trailing actions rail. */
 export function CollapsibleListItemShell({
   titleId,
@@ -172,16 +109,14 @@ export function CollapsibleListItemShell({
     actionsAlign,
     rowLayout,
   })
-  const headerRowClasses = collapsibleListItemHeaderRowClassesForRowLayout(rowLayout)
   const resolvedToolbar = toolbar ?? main
   const resolvedBody = toolbar !== undefined ? body : undefined
-  const resolvedActions =
-    actions && actionsAlign === 'center' ? (
-      <CollapsibleListItemActions centered>{actions}</CollapsibleListItemActions>
-    ) : (
-      actions
-    )
   const chromeClasses = resolveShellChromeClasses({ preset, surface, tone })
+  const headerActionsPaddingClasses = resolveCollapsibleListItemHeaderActionsPaddingClasses(
+    shellLayout,
+    collapsible,
+    preset,
+  )
 
   return (
     <div
@@ -190,33 +125,24 @@ export function CollapsibleListItemShell({
       data-array-item-prefix={itemPrefix}
       className={cn(
         collapsibleListItemShellVariants({ layout: shellLayout, preset }),
+        headerActionsPaddingClasses,
         chromeClasses,
         dragging && collapsibleListItemDraggingClasses,
         className,
       )}
       style={leadingChromeStyle}
     >
-      {layout === 'compactRow' ? (
-        resolvedToolbar
-      ) : actionsAlign === 'center' ? (
-        <CollapsibleListItemCenterActionsContent
-          headerRowClasses={headerRowClasses}
-          density={density}
-          leadingChrome={leadingChrome}
-          toolbar={resolvedToolbar}
-          summary={summary}
-          actions={resolvedActions}
-          body={resolvedBody}
-        />
-      ) : (
-        <>
-          <div className={collapsibleListItemMainClasses}>
-            {resolvedToolbar}
-            {resolvedBody}
-          </div>
-          {actions}
-        </>
-      )}
+      <CollapsibleListItemShellContent
+        layout={layout}
+        actionsAlign={actionsAlign}
+        rowLayout={rowLayout}
+        density={density}
+        leadingChrome={leadingChrome}
+        toolbar={resolvedToolbar}
+        body={resolvedBody}
+        summary={summary}
+        actions={actions}
+      />
     </div>
   )
 }

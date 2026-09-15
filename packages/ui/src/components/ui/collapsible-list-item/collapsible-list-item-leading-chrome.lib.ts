@@ -29,8 +29,17 @@ export const collapsibleListItemLeadingChromeGapValue = 'calc(var(--spacing)*1)'
 export const collapsibleListItemShellInlineStartValue = 'calc(var(--spacing)*2)'
 
 export interface CollapsibleListItemLeadingChromeOptions {
+  /** When true, reserves leading grip column geometry in the shell. */
+  reserveDragHandleSlot?: boolean
+  /** @deprecated Prefer {@link reserveDragHandleSlot}. */
   showDragHandle: boolean
   collapsible: boolean
+}
+
+export function resolveCollapsibleListItemReserveDragHandleSlot(
+  options: CollapsibleListItemLeadingChromeOptions,
+): boolean {
+  return options.reserveDragHandleSlot ?? options.showDragHandle
 }
 
 export interface ResolvedCollapsibleListItemLeadingChrome {
@@ -57,8 +66,9 @@ export const collapsibleListItemContentInlineStartClasses = 'pl-[var(--content-i
 export function resolveCollapsibleListItemLeadingChrome(
   options: CollapsibleListItemLeadingChromeOptions,
 ): ResolvedCollapsibleListItemLeadingChrome {
-  const { showDragHandle, collapsible } = options
-  const chromeCount = (showDragHandle ? 1 : 0) + (collapsible ? 1 : 0)
+  const { collapsible } = options
+  const reserveDragHandleSlot = resolveCollapsibleListItemReserveDragHandleSlot(options)
+  const chromeCount = (reserveDragHandleSlot ? 1 : 0) + (collapsible ? 1 : 0)
 
   const toolbarContentGapClasses = chromeCount > 0 ? `pl-[var(${LEADING_CHROME_GAP_VAR})]` : ''
 

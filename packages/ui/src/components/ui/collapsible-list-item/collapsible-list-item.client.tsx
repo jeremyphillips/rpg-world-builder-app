@@ -158,9 +158,14 @@ function CollapsibleListItemRoot({
     onToggleCollapse,
     defaultCollapsed,
   )
-  const gripVisible = showDragHandle && Boolean(dragHandleProps)
-  const actionsAlign = resolveCollapsibleListItemActionsAlign(actionsAlignProp, gripVisible, layout)
-  const leadingChrome = buildCollapsibleListItemLeadingChrome(gripVisible, collapsible)
+  const reserveDragHandleSlot = showDragHandle
+  const gripVisible = Boolean(dragHandleProps)
+  const actionsAlign = resolveCollapsibleListItemActionsAlign(
+    actionsAlignProp,
+    reserveDragHandleSlot,
+    layout,
+  )
+  const leadingChrome = buildCollapsibleListItemLeadingChrome(reserveDragHandleSlot, collapsible)
   const resolvedDragHandleProps = resolveCollapsibleListItemDragHandleProps(
     toolbarAriaLabel,
     dragHandleProps,
@@ -215,7 +220,7 @@ function CollapsibleListItemRoot({
       <CollapsibleListItemShell
         titleId={titleId}
         itemPrefix={itemPrefix}
-        showDragHandle={gripVisible}
+        showDragHandle={reserveDragHandleSlot}
         collapsible={collapsible}
         dragging={contextValue.dragging}
         layout={layout}
@@ -231,7 +236,7 @@ function CollapsibleListItemRoot({
             titleId={titleId}
             toolbarAriaLabel={toolbarAriaLabel}
             leadingChrome={leadingChrome}
-            gripVisible={gripVisible}
+            gripVisible={gripVisible && reserveDragHandleSlot}
             dragHandleProps={resolvedDragHandleProps}
             collapsible={collapsible}
             collapsed={collapsed}
@@ -274,7 +279,8 @@ function CollapsibleListItemCompoundRoot({
   const domIds = resolveCollapsibleListItemDomIds(props.itemId)
   const titleId = props.titleId ?? domIds.titleId
   const resolvedBodyId = props.bodyId ?? domIds.bodyId
-  const gripVisible = (props.showDragHandle ?? false) && Boolean(props.dragHandleProps)
+  const reserveDragHandleSlot = props.showDragHandle ?? false
+  const gripVisible = Boolean(props.dragHandleProps)
   const collapsible = props.collapsible ?? false
   const [collapsed, handleToggleCollapse] = useCollapseState(
     props.collapsed,
@@ -288,7 +294,7 @@ function CollapsibleListItemCompoundRoot({
       titleId,
       bodyId: resolvedBodyId,
       toolbarAriaLabel: props.toolbarAriaLabel,
-      leadingChrome: { showDragHandle: gripVisible, collapsible },
+      leadingChrome: buildCollapsibleListItemLeadingChrome(reserveDragHandleSlot, collapsible),
       collapsible,
       collapsed,
       onToggleCollapse: handleToggleCollapse,
@@ -306,7 +312,16 @@ function CollapsibleListItemCompoundRoot({
       itemPrefix: props.itemPrefix,
       className: props.className,
     }),
-    [props, titleId, resolvedBodyId, gripVisible, collapsible, collapsed, handleToggleCollapse],
+    [
+      props,
+      titleId,
+      resolvedBodyId,
+      reserveDragHandleSlot,
+      gripVisible,
+      collapsible,
+      collapsed,
+      handleToggleCollapse,
+    ],
   )
 
   return (
@@ -314,7 +329,7 @@ function CollapsibleListItemCompoundRoot({
       <CollapsibleListItemShell
         titleId={titleId}
         itemPrefix={props.itemPrefix}
-        showDragHandle={gripVisible}
+        showDragHandle={reserveDragHandleSlot}
         collapsible={collapsible}
         dragging={contextValue.dragging}
         layout={contextValue.layout}

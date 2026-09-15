@@ -14,12 +14,14 @@ import {
   collapsibleListItemToolbarRowClasses,
   type CollapsibleListItemLeadingChromeOptions,
 } from './collapsible-list-item.variants'
+import { resolveCollapsibleListItemReserveDragHandleSlot } from './collapsible-list-item-leading-chrome.lib'
 
 export interface CollapsibleListItemDragHandleProps {
   ariaLabel: string
   attributes: DraggableAttributes
   listeners: SyntheticListenerMap | undefined
   compact?: boolean
+  className?: string
 }
 
 export function CollapsibleListItemDragHandle({
@@ -27,11 +29,12 @@ export function CollapsibleListItemDragHandle({
   attributes,
   listeners,
   compact = false,
+  className,
 }: CollapsibleListItemDragHandleProps) {
   return (
     <button
       type="button"
-      className={collapsibleListItemDragHandleClasses({ compact })}
+      className={cn(collapsibleListItemDragHandleClasses({ compact }), className)}
       aria-label={ariaLabel}
       onClick={(event) => event.stopPropagation()}
       {...attributes}
@@ -74,10 +77,26 @@ export function CollapsibleListItemCollapseButton({
 
 export type CollapsibleListItemToolbarLeadingChromePlacement = 'toolbar' | 'none'
 
+function CollapsibleListItemDragHandlePlaceholder({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={collapsibleListItemChromeColumnClasses} aria-hidden>
+      <span
+        className={cn(
+          collapsibleListItemDragHandleClasses({ compact }),
+          'pointer-events-none opacity-0',
+        )}
+      >
+        <GripVertical aria-hidden />
+      </span>
+    </div>
+  )
+}
+
 export interface CollapsibleListItemToolbarProps {
   titleId: string
   toolbarAriaLabel: string
   leadingChrome: CollapsibleListItemLeadingChromeOptions
+  /** When true, an interactive drag handle is available. */
   gripVisible: boolean
   dragHandleProps?: CollapsibleListItemDragHandleProps
   collapsible: boolean
@@ -107,6 +126,7 @@ export function CollapsibleListItemToolbar({
   header,
   summary,
 }: CollapsibleListItemToolbarProps) {
+  const reserveDragHandleSlot = resolveCollapsibleListItemReserveDragHandleSlot(leadingChrome)
   const renderLeadingChromeInToolbar = leadingChromePlacement === 'toolbar'
   const headerContentClasses = cn(
     'flex min-w-0 flex-1',
@@ -118,14 +138,18 @@ export function CollapsibleListItemToolbar({
 
   const titleRow = (
     <div className={collapsibleListItemToolbarRowClasses({ ...leadingChrome, compact })}>
-      {renderLeadingChromeInToolbar && gripVisible && dragHandleProps ? (
-        <div className={collapsibleListItemChromeColumnClasses}>
-          <CollapsibleListItemDragHandle
-            {...dragHandleProps}
-            compact={compact}
-            ariaLabel={`Drag to reorder ${toolbarAriaLabel}`}
-          />
-        </div>
+      {renderLeadingChromeInToolbar && reserveDragHandleSlot ? (
+        gripVisible && dragHandleProps ? (
+          <div className={collapsibleListItemChromeColumnClasses}>
+            <CollapsibleListItemDragHandle
+              {...dragHandleProps}
+              compact={compact}
+              ariaLabel={`Drag to reorder ${toolbarAriaLabel}`}
+            />
+          </div>
+        ) : (
+          <CollapsibleListItemDragHandlePlaceholder compact={compact} />
+        )
       ) : null}
       {renderLeadingChromeInToolbar && collapsible ? (
         <div className={collapsibleListItemChromeColumnClasses}>

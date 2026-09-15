@@ -4,6 +4,7 @@ import {
   arrayItemActionsRailClasses,
   arrayItemBodyClasses,
   arrayItemCompactRowClasses,
+  arrayItemCompactActionsClasses,
   arrayItemCompactGripClasses,
   arrayItemDragHandleClasses,
   arrayItemHeaderSummaryClasses,
@@ -15,8 +16,19 @@ import {
   arrayItemToolbarContentClasses,
   arrayItemToolbarRowClasses,
   buildArrayItemCompactRowGridTemplate,
+  resolveArrayItemCompactInlineAlign,
 } from './array-item-toolbar.variants'
 import { resolveFieldContainerChromeClasses } from '../../../components/ui/field-surface.variants'
+
+describe('resolveArrayItemCompactInlineAlign', () => {
+  it('defaults unlabeled inline rows to center alignment', () => {
+    expect(resolveArrayItemCompactInlineAlign(undefined, true)).toBe('center')
+  })
+
+  it('honors explicit inlineAlign overrides on unlabeled rows', () => {
+    expect(resolveArrayItemCompactInlineAlign('start', true)).toBe('start')
+  })
+})
 
 describe('array item shell variants', () => {
   it('uses leading-snug on truncated header copy so descenders are not clipped', () => {
@@ -30,13 +42,13 @@ describe('array item shell variants', () => {
     expect(arrayItemShellClasses).toContain('grid-cols-[minmax(0,1fr)_auto]')
     expect(arrayItemShellClasses).toContain('items-start')
     expect(arrayItemShellClasses).toContain('pr-3')
-    expect(arrayItemShellClasses).toContain('pb-3')
-    expect(arrayItemMainClasses).toContain('pt-[calc(var(--spacing)*2)]')
+    expect(arrayItemShellClasses).toContain('py-2')
+    expect(arrayItemMainClasses).not.toContain('pt-[calc(var(--spacing)*2)]')
     expect(arrayItemActionsRailClasses()).toContain('self-start')
     expect(arrayItemActionsRailClasses()).toContain('mt-2')
     expect(arrayItemActionsRailClasses()).not.toContain('mr-1')
     expect(arrayItemActionsRailClasses({ compact: true })).toContain('mt-1')
-    expect(arrayItemDragHandleClasses({ compact: true })).toContain('-mt-1')
+    expect(arrayItemDragHandleClasses({ compact: true })).not.toContain('-mt-1')
   })
 
   it('keeps remove on the shared chrome hit target', () => {
@@ -111,7 +123,7 @@ describe('array item shell variants', () => {
 
   it('uses a single-column shell for compact inline rows', () => {
     expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('pr-3')
-    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('pb-3')
+    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('py-2')
     expect(arrayItemShellVariants({ layout: 'compactRow' })).not.toContain('grid-cols-')
   })
 
@@ -121,8 +133,13 @@ describe('array item shell variants', () => {
     expect(arrayItemCompactRowClasses()).toContain('grid')
     expect(arrayItemCompactRowClasses()).toContain('items-start')
     expect(arrayItemCompactRowClasses('center')).toContain('items-center')
-    expect(arrayItemCompactGripClasses('center')).toContain('items-center')
+    expect(arrayItemCompactGripClasses('center')).toContain('self-center')
+    expect(arrayItemCompactGripClasses('start')).toContain('self-start')
+    expect(arrayItemCompactActionsClasses('center')).toContain('self-center')
+    expect(arrayItemCompactActionsClasses('center')).toContain('items-center')
     expect(arrayItemActionsRailClasses({ embedded: true })).toContain('justify-self-end')
     expect(arrayItemActionsRailClasses({ embedded: true })).not.toContain('mt-1')
+    expect(arrayItemActionsRailClasses({ embedded: true })).toContain('items-center')
+    expect(arrayItemActionsRailClasses({ embedded: true })).toContain('self-center')
   })
 })

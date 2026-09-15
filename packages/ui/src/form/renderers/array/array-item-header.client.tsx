@@ -36,6 +36,7 @@ export interface ArrayItemDragHandleProps {
   attributes: DraggableAttributes
   listeners: SyntheticListenerMap | undefined
   compact?: boolean
+  className?: string
 }
 
 export function ArrayItemDragHandle(props: ArrayItemDragHandleProps) {

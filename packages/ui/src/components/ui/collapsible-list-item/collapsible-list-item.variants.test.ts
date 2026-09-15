@@ -16,8 +16,8 @@ import {
 } from './collapsible-list-item.variants'
 
 describe('collapsibleListItemShellVariants', () => {
-  it('drops shell bottom padding on disclosure headerActions rows', () => {
-    expect(collapsibleListItemShellVariants({ layout: 'headerActions' })).toContain('pb-0')
+  it('keeps headerActions layout padding in dedicated shell padding tokens', () => {
+    expect(collapsibleListItemShellVariants({ layout: 'headerActions' })).toContain('flex-col')
     expect(collapsibleListItemDisclosureShellPaddingClasses).toContain('pb-0')
   })
 })

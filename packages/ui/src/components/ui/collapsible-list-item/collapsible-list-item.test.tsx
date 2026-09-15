@@ -8,6 +8,7 @@ import { Text } from '../text'
 import { CollapsibleListItem } from './collapsible-list-item.client'
 import {
   collapsibleListItemDisclosureShellPaddingClasses,
+  collapsibleListItemFlatShellPaddingClasses,
   collapsibleListItemHeaderStackSummaryGapClasses,
   collapsibleListItemHeaderVerticalPaddingVariants,
 } from './collapsible-list-item.variants'
@@ -29,10 +30,7 @@ describe('CollapsibleListItem', () => {
 
     expect(screen.getByText('Alpha header')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
-    expect(container.firstChild).toHaveClass(
-      'flex-col',
-      collapsibleListItemDisclosureShellPaddingClasses,
-    )
+    expect(container.firstChild).toHaveClass('flex-col', collapsibleListItemFlatShellPaddingClasses)
   })
 
   it('wires collapse button aria attributes and toggles expanded body', async () => {

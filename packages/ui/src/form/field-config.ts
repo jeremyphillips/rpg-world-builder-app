@@ -1258,12 +1258,28 @@ export interface ArrayAddActionConfig {
   menu?: ArrayAddMenuConfig
 }
 
+/** Item-level header chrome visibility — mirrors {@link FieldLabelVisibility} naming. */
+export type ArrayItemHeaderVisibility = 'auto' | 'hidden'
+
 export interface ArrayItemConfig {
   variant?: ArrayItemVariant
   /** @default raised */
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
   header?: ArrayItemHeaderConfig
+  /**
+   * Controls whether non-collapsible items render item-level header chrome.
+   *
+   * - `'auto'` — show a visible header when semantic identity requires one; field
+   *   layout alone never implies a header.
+   * - `'hidden'` — suppress item-level header chrome for anonymous stacked / unlabeled rows.
+   *
+   * Ignored (normalized to `'auto'`) when `collapsible` is true — disclosure requires
+   * header anatomy.
+   *
+   * @default 'auto'
+   */
+  headerVisibility?: ArrayItemHeaderVisibility
   collapsible?: boolean
   collapseKey?: string
   inlineAlign?: ArrayCompactInlineAlign

@@ -110,6 +110,30 @@ Uses `SurfaceConfig` (`emphasis`, `elevation`). Optional `item.tone` applies a s
 When spreading an array builder, **merge** `item` — `item: { surface: … }` replaces the
 whole config and drops `collapsible`, `variant`, `header`, and `reorder`.
 
+## `item.headerVisibility`
+
+Controls whether **item-level header chrome** renders for non-collapsible rows. Field
+layout (inline vs stacked) never implies a header by itself.
+
+| Value              | Meaning                                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `'auto'` (default) | Show a visible item header when semantic identity requires one (`primaryField`, `primary`, or detailed variant title). |
+| `'hidden'`         | Suppress item-level header chrome — use for anonymous stacked rows (e.g. movement speeds).                             |
+
+`item.header` remains the identity config (`fallback`, `primaryField`, `summary`, …) and
+still drives aria labels and remove-button copy when the header row is hidden.
+
+`header.srOnly` hides title **text** while header anatomy may still exist; `headerVisibility:
+'hidden'` removes the item header row entirely (non-collapsible only). Collapsible items
+ignore `'hidden'` — disclosure requires header anatomy.
+
+```ts
+item: {
+  headerVisibility: 'hidden',
+  header: { fallback: (i) => `Movement ${i + 1}`, primaryField: 'mode' },
+},
+```
+
 ## `itemHeader` patterns
 
 | Pattern                 | When                              | Config                              |

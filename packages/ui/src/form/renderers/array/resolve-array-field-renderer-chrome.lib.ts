@@ -9,6 +9,7 @@ import {
   resolveArrayItemReorder,
   resolveArrayItemVariant,
 } from '../../config/array/array-item-config.lib'
+import { resolveArrayItemPresentation } from '../../config/array/array-item-presentation.lib'
 import type { ArrayConfig } from '../../field-config'
 import { resolveFormDensity } from '../../form-density'
 import { resolveArrayHeading } from '../../resolve-container-heading.lib'
@@ -47,16 +48,29 @@ export function resolveArrayFieldRendererChrome({
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
   const itemCollapseKey = itemConfig.collapseKey
-  const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
   const itemBodyStackClasses = fieldStackRhythmVariants({ rhythm })
   const nested = isNestedArraySection(depth)
   const omitSectionBottomMargin = nested || inRhythmStack || wrapSectionChrome
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
-  const sortableEnabled = reorder === 'dragHandle' && fieldsLength > 1
+  const reorderConfigured = reorder === 'dragHandle'
   // Entity-backed `renderShell` rows (DEC grants, etc.) keep collapse wiring even when
   // nested sections auto-resolve to compact — the shell always renders disclosure chrome.
   const collapsible = itemCollapsible && (variant === 'detailed' || Boolean(itemConfig.renderShell))
+  const presentation = resolveArrayItemPresentation({
+    config,
+    variant,
+    reorder,
+    fieldsLength,
+    legend,
+    collapsible,
+  })
+  const itemListClasses = fieldArrayItemListClasses(
+    { rhythm, size },
+    presentation.stackTreatment,
+    presentation.listGap,
+  )
+  const sortableEnabled = presentation.sortableEnabled
 
   return {
     addAction,
@@ -77,7 +91,9 @@ export function resolveArrayFieldRendererChrome({
     min,
     nested,
     omitSectionBottomMargin,
+    reorderConfigured,
     sortableEnabled,
+    stackTreatment: presentation.stackTreatment,
     variant,
   }
 }

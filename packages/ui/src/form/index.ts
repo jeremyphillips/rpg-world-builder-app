@@ -257,6 +257,7 @@ export {
   type DependentDependentsConfig,
   type ArrayAddActionConfig,
   type ArrayItemConfig,
+  type ArrayItemHeaderVisibility,
   type ArrayFilterSelectConfig,
   type ArrayFilterSelectFn,
   type ArrayConfig,

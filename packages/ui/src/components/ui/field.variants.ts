@@ -317,10 +317,22 @@ export const formDependentInsetOffsetClasses = 'left-2'
  * Vertical gap between sibling array items (list + Add button).
  * Item body field stacks use {@link fieldStackRhythmVariants} instead.
  */
-export function fieldArrayItemListClasses(options: {
-  rhythm: FieldRhythm
-  size: FieldSizeToken
-}): string {
+export function fieldArrayItemListClasses(
+  options: {
+    rhythm: FieldRhythm
+    size: FieldSizeToken
+  },
+  stackTreatment: 'merged' | 'separated' = 'separated',
+  listGap: 'rhythm' | 'tight' | 'merged' = 'rhythm',
+): string {
+  if (stackTreatment === 'merged' || listGap === 'merged') {
+    return cn('flex flex-col', 'gap-0')
+  }
+
+  if (listGap === 'tight') {
+    return cn('flex flex-col', 'gap-2')
+  }
+
   if (options.rhythm === 'comfortable') {
     return cn('flex flex-col', options.size === 'md' ? 'gap-6' : 'gap-3')
   }

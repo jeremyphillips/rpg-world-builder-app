@@ -66,7 +66,8 @@ describe('CatalogEntityRow', () => {
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
 
     const headerRow = screen.getByRole('group').firstElementChild as HTMLElement
-    expect(headerRow).toHaveClass('py-2')
+    expect(headerRow).toHaveClass('flex', 'items-center')
+    expect(headerRow).not.toHaveClass('py-2')
   })
 
   it('aligns expanded body with entity inline start and end inset', () => {
