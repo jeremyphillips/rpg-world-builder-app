@@ -171,26 +171,30 @@ function ClassSubclassesTabBody({
     [editor.listItems, editor.selectedId],
   )
 
-  const selectedIdentity = useMemo(
-    () =>
-      buildSubclassSelectedIdentity({
-        selectedId: editor.selectedId,
-        selectedValues: editor.selectedValues,
-        selectedListItem,
-        selectedEntity: editor.selectedEntity,
-        selectedAvailability,
-        modifiedIds: editor.modifiedIds,
-        onAvailabilityChange: () => openCampaignAvailabilityDialog(campaignAccessDialogRef.current),
-      }),
-    [
-      editor.modifiedIds,
-      editor.selectedEntity,
-      editor.selectedId,
-      editor.selectedValues,
-      selectedAvailability,
+  const handleSelectedAvailabilityChange = useCallback(() => {
+    openCampaignAvailabilityDialog(campaignAccessDialogRef.current)
+  }, [])
+
+  const selectedIdentity = useMemo(() => {
+    const identity = buildSubclassSelectedIdentity({
+      selectedId: editor.selectedId,
+      selectedValues: editor.selectedValues,
       selectedListItem,
-    ],
-  )
+      selectedEntity: editor.selectedEntity,
+      selectedAvailability,
+      modifiedIds: editor.modifiedIds,
+    })
+    if (!identity) return undefined
+    return { ...identity, onAvailabilityChange: handleSelectedAvailabilityChange }
+  }, [
+    editor.modifiedIds,
+    editor.selectedEntity,
+    editor.selectedId,
+    editor.selectedValues,
+    handleSelectedAvailabilityChange,
+    selectedAvailability,
+    selectedListItem,
+  ])
 
   const handleAvailabilityChange = useCallback((subclassId: string, isAvailable: boolean) => {
     setAccessOverrides((current) => ({ ...current, [subclassId]: isAvailable }))

@@ -2,7 +2,7 @@ import { sortFormIssues } from './group-form-issues'
 import { collectArraySections } from './resolve-field-order'
 import type { FormIssue } from './form-issue.types'
 import type { FormItem } from '../field-config'
-import { isContainer } from '../field-config'
+import { isContainer, resolveFieldConfigPrimaryName } from '../field-config'
 import { resolveColumnsCollapseSequence } from '../config/form-columns-collapse.lib'
 
 /** Minimal tab shape for path ownership — avoids shell import cycles. */
@@ -27,7 +27,7 @@ export function pathOwnsIssue(prefix: string, path: string): boolean {
 function collectPrefixesFromItems(items: readonly FormItem[], prefixes: string[]): void {
   for (const item of items) {
     if (!isContainer(item)) {
-      prefixes.push(item.name)
+      prefixes.push(resolveFieldConfigPrimaryName(item))
       continue
     }
 
@@ -37,7 +37,7 @@ function collectPrefixesFromItems(items: readonly FormItem[], prefixes: string[]
     }
 
     if (item.kind === 'dependent') {
-      prefixes.push(item.controller.name)
+      prefixes.push(resolveFieldConfigPrimaryName(item.controller))
       collectPrefixesFromItems(item.dependents.fields, prefixes)
       continue
     }

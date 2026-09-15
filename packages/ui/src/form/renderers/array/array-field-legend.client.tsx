@@ -3,6 +3,8 @@
 import type { ReactNode } from 'react'
 
 import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
+import { FieldLabelContent } from '../../../components/ui/field-label-content'
+import { shouldShowVisibleRequiredMarker } from '../../../components/ui/field-required.lib'
 import {
   arrayFieldLegendInlineLabelClasses,
   arrayFieldLegendInlineLayoutClasses,
@@ -16,8 +18,10 @@ export interface ArrayFieldLegendProps {
   legend: string
   legendFieldSize: FieldSizeToken
   addActionLayout: ArrayAddActionLayout
+  required?: boolean
   arrayIssueCount: number
   invalidRowCount: number
+  hasContainerIssue?: boolean
   onFocusFirstArrayIssue: () => void
   addControl?: ReactNode
 }
@@ -27,21 +31,31 @@ export function ArrayFieldLegend({
   legend,
   legendFieldSize,
   addActionLayout,
+  required = false,
   arrayIssueCount,
   invalidRowCount,
+  hasContainerIssue = false,
   onFocusFirstArrayIssue,
   addControl,
 }: ArrayFieldLegendProps) {
   const legendClassName = resolveArrayLegendClassName(legendFieldSize)
+  const legendLabel = (
+    <FieldLabelContent
+      label={legend}
+      required={required}
+      showRequiredMarker={shouldShowVisibleRequiredMarker(required, 'visible')}
+    />
+  )
 
   if (addActionLayout === 'inline') {
     return (
       <legend className={cn(legendClassName, arrayFieldLegendInlineLayoutClasses)}>
         <span className={arrayFieldLegendInlineLabelClasses}>
-          <span>{legend}</span>
+          <span>{legendLabel}</span>
           <ArrayLegendIssueLink
             issueCount={arrayIssueCount}
             invalidRowCount={invalidRowCount}
+            hasContainerIssue={hasContainerIssue}
             sectionLabel={legend}
             onPress={onFocusFirstArrayIssue}
           />
@@ -53,10 +67,11 @@ export function ArrayFieldLegend({
 
   return (
     <legend className={legendClassName}>
-      {legend}
+      {legendLabel}
       <ArrayLegendIssueLink
         issueCount={arrayIssueCount}
         invalidRowCount={invalidRowCount}
+        hasContainerIssue={hasContainerIssue}
         sectionLabel={legend}
         onPress={onFocusFirstArrayIssue}
       />

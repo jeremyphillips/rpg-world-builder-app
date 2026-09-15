@@ -6,7 +6,7 @@ import { defineMessage } from './define-message'
 // ---------------------------------------------------------------------------
 
 /**
- * Lowercases a label for mid-sentence use ("Choose a valid rarity.") while
+ * Lowercases a label for mid-sentence use ("Select a valid rarity.") while
  * preserving acronyms and initialisms ("XP", "AC bonus").
  */
 export function midSentenceLabel(label: string): string {
@@ -60,15 +60,17 @@ export const fieldValidationMessages = {
   /** Empty required choice-like field (select, radio, chips single, combobox). */
   requiredSelect: defineMessage<{ label: string }>(
     'validation.field.requiredSelect',
-    ({ label }) => `Choose ${withArticle(midSentenceLabel(label))}.`,
+    ({ label }) => `Select ${withArticle(midSentenceLabel(label))}.`,
     ({ label }) => `Missing ${label}`,
   ),
   /** Value not among the allowed options. */
   invalidSelect: defineMessage<{ label: string }>(
     'validation.field.invalidSelect',
-    ({ label }) => `Choose a valid ${midSentenceLabel(label)}.`,
+    ({ label }) => `Select a valid ${midSentenceLabel(label)}.`,
     ({ label }) => `Invalid ${label}`,
   ),
+  /** Unregistered field path with no configured label. */
+  requiredUnlabeled: defineMessage('validation.field.requiredUnlabeled', () => 'Required.'),
   /** Non-numeric input in a number-like field. */
   invalidNumber: defineMessage('validation.field.invalidNumber', () => 'Enter a valid number.'),
   minNumber: defineMessage<{ label: string; min: number }>(

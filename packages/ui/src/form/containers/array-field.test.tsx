@@ -147,9 +147,10 @@ describe('ArrayFieldRenderer', () => {
   it('renders the add button, legend, and empty state for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
-    expect(screen.getByText('Traits')).toHaveClass('text-xs', 'font-field-label')
-    expect(screen.getByText('Traits')).not.toHaveClass('text-field-array-legend')
-    expect(screen.getByText('Traits')).not.toHaveClass('text-field-group-legend')
+    const legend = screen.getByRole('group', { name: /Traits/ }).querySelector('legend')
+    expect(legend).toHaveClass('text-xs', 'font-field-label')
+    expect(legend).not.toHaveClass('text-field-array-legend')
+    expect(legend).not.toHaveClass('text-field-group-legend')
     expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(
       'gap-3',
     )
@@ -539,7 +540,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.queryByRole('button', { name: 'Add trait' })).not.toBeInTheDocument()
   })
 
-  it('allows removing the last item and shows empty-state min guidance', async () => {
+  it('allows removing the last item and shows neutral empty-state copy only', async () => {
     const user = userEvent.setup()
     const minFields: FormItem[] = [
       {
@@ -566,11 +567,63 @@ describe('ArrayFieldRenderer', () => {
     await user.click(removeButton)
 
     expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
-    expect(screen.getByText('At least one trait is required.')).toBeInTheDocument()
+    expect(screen.queryByText(/Add at least one trait/i)).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
   })
 
-  it('shows empty-state primary copy without min guidance on initial empty arrays', () => {
+  it('shows container validation error and legend issue link after failed submit on empty min arrays', async () => {
+    const user = userEvent.setup()
+    const minFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addAction: { label: 'Add trait' },
+        min: 1,
+      },
+    ]
+    const minSchema = z.object({ traits: z.array(traitSchema).min(1) })
+    render(
+      <Form
+        schema={minSchema}
+        fields={minFields}
+        defaultValues={{ traits: [] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('Add at least one trait.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Review 1 issue in Traits/i })).toBeInTheDocument()
+  })
+
+  it('shows required marker on array legend when min is at least one', async () => {
+    render(
+      <Form
+        schema={z.object({ traits: z.array(traitSchema).min(1) })}
+        fields={[
+          {
+            kind: 'array',
+            name: 'traits',
+            legend: 'Traits',
+            fields: traitFields,
+            addAction: { label: 'Add trait' },
+            min: 1,
+          },
+        ]}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByText('*', { selector: 'legend *' })).toBeInTheDocument()
+  })
+
+  it('shows empty-state primary copy without validation error on initial empty arrays', () => {
     render(
       <Form
         schema={z.object({ traits: z.array(traitSchema) })}
@@ -591,7 +644,7 @@ describe('ArrayFieldRenderer', () => {
     )
 
     expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
-    expect(screen.queryByText('At least one trait is required.')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Add at least one trait/i)).not.toBeInTheDocument()
   })
 
   it('omits the default remove button when hideItemRemove is true', async () => {
@@ -1333,8 +1386,8 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     expect(
-      await screen.findByRole('button', { name: '1 issue in Traits · Darkvision' }),
-    ).toBeInTheDocument()
+      screen.queryByRole('button', { name: '1 issue in Traits · Darkvision' }),
+    ).not.toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Review 1 issue in 1 row in Traits' }),
     ).toBeInTheDocument()
@@ -1408,13 +1461,13 @@ describe('ArrayFieldRenderer', () => {
     expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({ 'index:0': 'closed' })
   })
 
-  it('suppresses per-field error text on compact rows and surfaces a row summary', async () => {
+  it('shows per-field error text inline on compact rows', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({
       grants: z.array(
         z.object({
-          rarity: z.string().min(1, 'Choose a rarity.'),
-          quantity: z.string().min(1, 'Quantity is required.'),
+          rarity: z.string().min(1),
+          quantity: z.string().min(1),
         }),
       ),
     })
@@ -1429,7 +1482,7 @@ describe('ArrayFieldRenderer', () => {
           header: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
         },
         fields: [
-          { type: 'text', name: 'rarity', label: 'Rarity', required: true },
+          { type: 'select', name: 'rarity', label: 'Rarity', options: [], required: true },
           { type: 'text', name: 'quantity', label: 'Quantity', required: true },
         ],
         addAction: { label: 'Add grant' },
@@ -1450,7 +1503,7 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(screen.getByRole('textbox', { name: 'Rarity' })).toHaveAttribute(
+      expect(screen.getByRole('combobox', { name: 'Rarity' })).toHaveAttribute(
         'aria-invalid',
         'true',
       )
@@ -1460,9 +1513,67 @@ describe('ArrayFieldRenderer', () => {
       )
     })
 
-    expect(screen.queryByText('Choose a rarity.')).not.toBeInTheDocument()
+    expect(screen.getByText('Select a rarity.')).toBeInTheDocument()
+    expect(screen.getByText('Quantity is required.')).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('group', { name: 'Item actions' })).queryByRole('button', {
+        name: /issues/i,
+      }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('surfaces a joined row summary on compact rows when errorPlacement is row', async () => {
+    const user = userEvent.setup()
+    const grantSchema = z.object({
+      grants: z.array(
+        z.object({
+          rarity: z.string().min(1),
+          quantity: z.string().min(1),
+        }),
+      ),
+    })
+
+    const compactGrantFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        errorPlacement: 'row',
+        item: {
+          variant: 'compact',
+          header: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
+        },
+        fields: [
+          { type: 'select', name: 'rarity', label: 'Rarity', options: [], required: true },
+          { type: 'text', name: 'quantity', label: 'Quantity', required: true },
+        ],
+        addAction: { label: 'Add grant' },
+        min: 1,
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof grantSchema>>
+        schema={grantSchema}
+        fields={compactGrantFields}
+        defaultValues={{ grants: [{ rarity: '', quantity: '' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('combobox', { name: 'Rarity' })).toHaveAttribute(
+        'aria-invalid',
+        'true',
+      )
+    })
+
+    expect(screen.queryByText('Select a rarity.')).not.toBeInTheDocument()
     expect(screen.queryByText('Quantity is required.')).not.toBeInTheDocument()
-    expect(screen.getByRole('alert')).toHaveTextContent('Choose a rarity. · Quantity is required.')
+    expect(screen.getByRole('alert')).toHaveTextContent('Select a rarity. · Quantity is required.')
   })
 
   it('appends defaults from addActionMenu selections', async () => {

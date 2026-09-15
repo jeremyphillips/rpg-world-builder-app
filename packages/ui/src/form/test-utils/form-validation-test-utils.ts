@@ -2,7 +2,13 @@ import { expect } from 'vitest'
 import type { ZodType } from 'zod'
 import { formatFieldMessage, fieldValidationMessages } from '@rpg/contracts'
 
-import { buildDefaultValues, flattenFields, type FormItem } from '../field-config'
+import {
+  buildDefaultValues,
+  flattenFields,
+  resolveFieldConfigBoundNames,
+  resolveFieldConfigPrimaryName,
+  type FormItem,
+} from '../field-config'
 import { buildFieldRegistry, makeFieldErrorMap } from '../config/field-error-map'
 import { collectSchemaLeafPaths } from './collect-schema-paths.lib'
 
@@ -97,7 +103,7 @@ export function buildClearedRequiredDefaults(fields: FormItem[]): Record<string,
     if (!field.required) continue
 
     const clearedValue = CLEARED_VALUE_BY_TYPE[field.type]
-    if (clearedValue) setByPath(values, field.name, clearedValue(field))
+    if (clearedValue) setByPath(values, resolveFieldConfigPrimaryName(field), clearedValue(field))
   }
 
   return values
@@ -156,8 +162,10 @@ export function assertFieldPathsRegistered(items: FormItem[]): void {
   const missing: string[] = []
 
   for (const field of flattenFields(items)) {
-    if (!isPathRegistered(field.name, registry)) {
-      missing.push(field.name)
+    for (const path of resolveFieldConfigBoundNames(field)) {
+      if (!isPathRegistered(path, registry)) {
+        missing.push(path)
+      }
     }
   }
 

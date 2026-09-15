@@ -305,8 +305,9 @@ species movement Speed above `[30 ▾][ft.]` while the sentence legend stays sr-
 }
 ```
 
-A standalone `type: 'joinedPair'` field config is deferred until a consumer needs it outside
-`inlineSentence`. Arbitrary numeric authoring with optional unit select remains `inputSelect`.
+Standalone `type: 'joinedPair'` fields bind RHF paths through occupant `name` values only — no
+wrapper `name`. Optional `controlId` sets control id segments when they must differ from the
+primary bound path. Arbitrary numeric authoring with optional unit select remains `inputSelect`.
 
 ### Deprecated inline composites
 

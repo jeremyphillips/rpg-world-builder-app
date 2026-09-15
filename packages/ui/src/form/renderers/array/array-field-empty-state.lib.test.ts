@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  arrayEmptyStateMinRequiredMessage,
   arrayEmptyStatePrimaryMessage,
   resolveArrayEmptyItemLabel,
+  resolveArrayRequiredMarker,
 } from './array-field-empty-state.lib'
 
 describe('array-field-empty-state.lib', () => {
@@ -25,6 +25,25 @@ describe('array-field-empty-state.lib', () => {
 
   it('formats empty-state copy', () => {
     expect(arrayEmptyStatePrimaryMessage('movement')).toBe('No movement added.')
-    expect(arrayEmptyStateMinRequiredMessage('movement')).toBe('At least one movement is required.')
+  })
+
+  it('derives required marker from min', () => {
+    expect(
+      resolveArrayRequiredMarker({
+        kind: 'array',
+        name: 'movement',
+        legend: 'Movement',
+        fields: [],
+        min: 1,
+      }),
+    ).toBe(true)
+    expect(
+      resolveArrayRequiredMarker({
+        kind: 'array',
+        name: 'movement',
+        legend: 'Movement',
+        fields: [],
+      }),
+    ).toBe(false)
   })
 })

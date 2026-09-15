@@ -10,7 +10,7 @@ import {
 } from '../../context/array-item-presentation.context'
 import type { ResolvedArrayItemHeader } from '../../config/array/array-item-config.lib'
 import type { ArrayItemConfig, RowConfig, RowFieldItem } from '../../field-config'
-import { isRowSlotItem } from '../../field-config'
+import { isRowSlotItem, resolveFieldConfigPrimaryName } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
 import { FieldNode } from '../../containers/form-conditional.client'
 import { SlotFormItemSection } from '../fields/slot-field-renderer.client'
@@ -53,7 +53,7 @@ function FlatNoHeaderInlineFields({
             />
           ) : (
             <FieldNode
-              key={field.name}
+              key={resolveFieldConfigPrimaryName(field)}
               config={field}
               idPrefix={idPrefix}
               namePrefix={namePrefix}

@@ -12,6 +12,7 @@ import type {
   FieldConfig,
   InlineChooseCountFieldConfig,
   InlineSentenceFieldConfig,
+  JoinedPairFieldConfig,
   LevelRangeFieldConfig,
 } from '../field-config'
 import type { FieldMessageCategory } from './field-error-map-category.lib'
@@ -78,6 +79,31 @@ function registerJoinedPairSegment(
   if (segment.end.kind === 'select') {
     registry.set(key(segment.end.name), {
       label: segment.end.ariaLabel ?? fieldLabel,
+      category: 'choice',
+    })
+  }
+}
+
+function registerJoinedPairField(
+  registry: Map<string, RegistryEntry>,
+  key: RegistryKey,
+  field: JoinedPairFieldConfig,
+): void {
+  if (field.start.kind === 'number') {
+    registry.set(key(field.start.name), {
+      label: field.start.ariaLabel ?? field.label,
+      category: 'number',
+    })
+  } else {
+    registry.set(key(field.start.name), {
+      label: field.start.ariaLabel ?? field.label,
+      category: 'choice',
+    })
+  }
+
+  if (field.end.kind === 'select') {
+    registry.set(key(field.end.name), {
+      label: field.end.ariaLabel ?? field.label,
       category: 'choice',
     })
   }
@@ -166,6 +192,11 @@ export function registerFieldPaths(
 
   if (field.type === 'levelRange') {
     registerLevelRangeField(registry, key, field as LevelRangeFieldConfig)
+    return
+  }
+
+  if (field.type === 'joinedPair') {
+    registerJoinedPairField(registry, key, field as JoinedPairFieldConfig)
     return
   }
 

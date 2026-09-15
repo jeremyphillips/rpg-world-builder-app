@@ -43,8 +43,9 @@ describe('Form section rendering', () => {
     render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
 
     expect(screen.getByText('Identity').closest('legend')).toHaveClass('text-field-group-legend')
-    expect(screen.getByText('Tags')).toHaveClass('text-xs', 'font-field-label')
-    expect(screen.getByText('Tags')).not.toHaveClass('text-field-array-legend')
+    const tagsLegend = screen.getByRole('group', { name: /Tags/ }).querySelector('legend')
+    expect(tagsLegend).toHaveClass('text-xs', 'font-field-label')
+    expect(tagsLegend).not.toHaveClass('text-field-array-legend')
   })
 
   it('omits section bottom margin on nested groups and rhythm-stack siblings', () => {

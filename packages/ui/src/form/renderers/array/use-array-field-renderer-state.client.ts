@@ -12,6 +12,7 @@ import type { UseFieldArrayReturn } from 'react-hook-form'
 
 import type { ArrayConfig } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
+import type { FormIssue } from '../../errors/form-issue.types'
 import { countInvalidArrayItems, countIssuesForArrayPath } from '../../errors'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
@@ -19,6 +20,7 @@ import { useFormUiContext } from '../../context/form-ui.context'
 import { useFocusFirstArrayIssue } from './use-focus-first-array-issue.client'
 import { useArrayFieldAppend } from './use-array-field-append.client'
 import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-chrome.lib'
+import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
 
 type UseArrayFieldRendererStateOptions = {
   config: ArrayConfig
@@ -30,6 +32,13 @@ type UseArrayFieldRendererStateOptions = {
   getValues: (name: string) => unknown
   watchedItems: unknown[] | undefined
   wrapSectionChrome?: boolean
+}
+
+function resolveContainerIssue(
+  issues: readonly FormIssue[],
+  fullName: string,
+): FormIssue | undefined {
+  return issues.find((issue) => issue.path === fullName)
 }
 
 export function useArrayFieldRendererState({
@@ -71,7 +80,6 @@ export function useArrayFieldRendererState({
     legend,
     legendFieldSize,
     max,
-    min,
     nested,
     omitSectionBottomMargin,
     reorderConfigured,
@@ -94,31 +102,16 @@ export function useArrayFieldRendererState({
 
   const showDefaultItemRemove = itemConfig.removable && !itemConfig.removeSlot
   const canRemove = showDefaultItemRemove
-  const [showEmptyMinRequired, setShowEmptyMinRequired] = React.useState(false)
-
-  React.useEffect(() => {
-    if (fields.length > 0) {
-      setShowEmptyMinRequired(false)
-    }
-  }, [fields.length])
 
   const canAdd = max === undefined || fields.length < max
+  const containerIssue = resolveContainerIssue(validation.issues, fullName)
+  const hasContainerIssue = containerIssue !== undefined
   const invalidRowCount = validation.hasAttemptedSubmit
     ? countInvalidArrayItems(validation.issues, fullName)
     : 0
   const arrayIssueCount = validation.hasAttemptedSubmit
     ? countIssuesForArrayPath(validation.issues, fullName)
     : 0
-  const emptyMinRequiredVisible =
-    fields.length === 0 &&
-    min >= 1 &&
-    (showEmptyMinRequired || (validation.hasAttemptedSubmit && arrayIssueCount > 0))
-
-  const markEmptyMinRequired = React.useCallback(() => {
-    if (min >= 1) {
-      setShowEmptyMinRequired(true)
-    }
-  }, [min])
 
   const focusFirstArrayIssue = useFocusFirstArrayIssue({
     fullName,
@@ -162,9 +155,6 @@ export function useArrayFieldRendererState({
       collapsedIds,
       onToggleCollapse: toggleCollapse,
       onRemove: () => {
-        if (fields.length - 1 < min) {
-          markEmptyMinRequired()
-        }
         remove(index)
       },
     }),
@@ -179,8 +169,6 @@ export function useArrayFieldRendererState({
       idPrefix,
       itemBodyStackClasses,
       legend,
-      markEmptyMinRequired,
-      min,
       remove,
       reorderConfigured,
       toggleCollapse,
@@ -190,7 +178,9 @@ export function useArrayFieldRendererState({
 
   return {
     emptyItemLabel,
-    emptyMinRequiredVisible,
+    required: resolveArrayRequiredMarker(config),
+    containerIssue,
+    hasContainerIssue,
     addAction,
     addActionLabel,
     addActionVariant,
@@ -205,6 +195,8 @@ export function useArrayFieldRendererState({
     arrayIssueCount,
     canAdd,
     focusFirstArrayIssue,
+    fullName,
+    idPrefix,
     invalidRowCount,
     itemListClasses,
     itemProps,

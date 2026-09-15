@@ -540,11 +540,12 @@ Array item validation chrome is generic in `@rpg/ui/form` and is driven by RHF/Z
 - Before the first failed submit, progressive presentation shows row issue chrome only for
   touched rows.
 - After the first failed submit, all invalid rows in the form are flagged live.
-- Detailed rows show an issue badge in the actions rail. Collapsed rows also show the first
-  issue message in the header. Expanded rows show row/cross-row messages in the header; field
-  messages stay with their controls.
-- Compact nested rows get badge-only rollup in v1. Descendant errors still count toward the
-  nearest detailed ancestor row.
+- Detailed collapsed rows show an issue badge in the actions rail plus the first issue message
+  in the header. Expanded detailed rows omit the badge; row/cross-row messages stay in the
+  header and field messages stay with their controls.
+- Compact flat rows omit the badge and show per-field validation copy under each control
+  (same hint/error swap as standalone fields). Set `errorPlacement: 'row'` to opt into a joined
+  row summary instead. Descendant errors still count toward the nearest detailed ancestor row.
 - The array legend shows an invalid-row link after a failed submit. Clicking it jumps to the
   first invalid row in that array.
 

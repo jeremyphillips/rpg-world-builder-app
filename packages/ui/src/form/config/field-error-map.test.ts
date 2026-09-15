@@ -6,7 +6,6 @@ import { formatFieldMessage } from '@rpg/contracts'
 import {
   makeFieldErrorMap,
   safeParseWithFieldErrors,
-  UNLABELED_FIELD_LABEL,
   UNLABELED_ITEM_LABEL,
 } from './field-error-map'
 import type { FormItem } from '../field-config'
@@ -86,18 +85,18 @@ describe('makeFieldErrorMap', () => {
     expect(messageFor(schema, { quantity: 1.5 })).toBe('Quantity must be a whole number.')
   })
 
-  it('formats select issues as choose messages', () => {
+  it('formats select issues as select messages', () => {
     const schema = z.object({ rarity: z.enum(['common', 'rare']) })
 
-    expect(messageFor(schema, {})).toBe('Choose a rarity.')
-    expect(messageFor(schema, { rarity: '' })).toBe('Choose a rarity.')
-    expect(messageFor(schema, { rarity: 'bogus' })).toBe('Choose a valid rarity.')
+    expect(messageFor(schema, {})).toBe('Select a rarity.')
+    expect(messageFor(schema, { rarity: '' })).toBe('Select a rarity.')
+    expect(messageFor(schema, { rarity: 'bogus' })).toBe('Select a valid rarity.')
   })
 
   it('treats single-select chips as a choice field', () => {
     expect(
       messageFor(z.object({ category: z.enum(['martial', 'simple']) }), { category: 'x' }),
-    ).toBe('Choose a valid category.')
+    ).toBe('Select a valid category.')
   })
 
   it('formats multi-chips minimums as add-at-least messages', () => {
@@ -208,8 +207,8 @@ describe('makeFieldErrorMap', () => {
   it('formats unregistered paths with unlabeled catalog copy', () => {
     const schema = z.object({ unknownField: z.string().min(1) })
 
-    expect(messageFor(schema, {})).toBe(`${UNLABELED_FIELD_LABEL} is required.`)
-    expect(messageFor(schema, { unknownField: '' })).toBe(`${UNLABELED_FIELD_LABEL} is required.`)
+    expect(messageFor(schema, {})).toBe('Required.')
+    expect(messageFor(schema, { unknownField: '' })).toBe('Required.')
   })
 
   it('formats unregistered array minimums with a generic item label', () => {

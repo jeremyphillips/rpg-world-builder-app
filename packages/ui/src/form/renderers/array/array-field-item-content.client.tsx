@@ -59,7 +59,7 @@ interface ArrayFieldItemActionsRailProps {
   showDefaultItemRemove: boolean
   customRemove?: React.ReactNode
   onRemove: () => void
-  showIssueChrome: boolean
+  showIssueBadge: boolean
   issueCount: number
   rowLabel: string
   onFocusIssue: () => void
@@ -74,7 +74,7 @@ function ArrayFieldItemActionsRailSlot({
   showDefaultItemRemove,
   customRemove,
   onRemove,
-  showIssueChrome,
+  showIssueBadge,
   issueCount,
   rowLabel,
   onFocusIssue,
@@ -89,10 +89,10 @@ function ArrayFieldItemActionsRailSlot({
     showDefaultRemove: showDefaultItemRemove,
     customRemove,
     onRemove,
-    issueCount: showIssueChrome ? issueCount : 0,
+    issueCount: showIssueBadge ? issueCount : 0,
     issueRowLabel: rowLabel,
     onIssuePress: onFocusIssue,
-    badgeProminence: showIssueChrome ? badgeProminence : 'nav',
+    badgeProminence: showIssueBadge ? badgeProminence : 'nav',
     compact: variant === 'compact',
   }
 
@@ -328,7 +328,7 @@ export function ArrayFieldItemContent({
     issueSummary,
     normalizedContent,
     chromeProps,
-    showIssueChrome,
+    showIssueBadge,
     issueGroup,
     itemConfig,
     anatomy,
@@ -379,7 +379,7 @@ export function ArrayFieldItemContent({
       showDefaultItemRemove={showDefaultItemRemove}
       customRemove={customRemove}
       onRemove={onRemove}
-      showIssueChrome={showIssueChrome}
+      showIssueBadge={showIssueBadge}
       issueCount={issueGroup.totalCount}
       rowLabel={rowLabel}
       onFocusIssue={focusIssue}

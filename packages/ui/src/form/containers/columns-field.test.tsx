@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { FORM_COLUMNS_WIDE_MEDIA_QUERY } from './form-columns.variants'
 import { Form } from '../shells/form.client'
-import { flattenFields, type FormItem } from '../field-config'
+import { flattenFields, resolveFieldConfigPrimaryName, type FormItem } from '../field-config'
 
 const schema = z.object({
   description: z.string().optional(),
@@ -84,11 +84,9 @@ describe('columns field layout', () => {
   })
 
   it('flattens leaf fields in column-major collapse order and skips slots', () => {
-    expect(flattenFields(twoColumnFields).map((field) => field.name)).toEqual([
-      'description',
-      'primaryAbilities',
-      'hitDie',
-    ])
+    expect(
+      flattenFields(twoColumnFields).map((field) => resolveFieldConfigPrimaryName(field)),
+    ).toEqual(['description', 'primaryAbilities', 'hitDie'])
   })
 
   it('renders independent stacks without a shared field container on the wrapper', () => {
@@ -166,7 +164,7 @@ describe('columns field layout', () => {
     expect(scores.compareDocumentPosition(hitDie) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
-    expect(flattenFields(fields).map((field) => field.name)).toEqual([
+    expect(flattenFields(fields).map((field) => resolveFieldConfigPrimaryName(field))).toEqual([
       'description',
       'scores',
       'hitDie',

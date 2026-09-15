@@ -5,6 +5,7 @@ import {
   flattenFields,
   isContainer,
   resolveDependentsVisibility,
+  resolveFieldConfigPrimaryName,
   type DependentConfig,
 } from './field-config'
 
@@ -37,7 +38,9 @@ describe('DependentConfig helpers', () => {
   })
 
   it('flattens nested dependent fields', () => {
-    expect(flattenFields([dependent]).map((field) => field.name)).toEqual(['enabled', 'score'])
+    expect(flattenFields([dependent]).map((field) => resolveFieldConfigPrimaryName(field))).toEqual(
+      ['enabled', 'score'],
+    )
   })
 
   it('builds default values from nested dependent fields including arrays', () => {
@@ -83,7 +86,10 @@ describe('DependentConfig helpers', () => {
       },
     }
 
-    expect(flattenFields([nested]).map((field) => field.name)).toEqual(['inner', 'detail'])
+    expect(flattenFields([nested]).map((field) => resolveFieldConfigPrimaryName(field))).toEqual([
+      'inner',
+      'detail',
+    ])
   })
 })
 
@@ -143,6 +149,8 @@ describe('RowConfig visibility', () => {
       fields: [{ type: 'text' as const, name: 'detail', label: 'Detail' }],
     }
 
-    expect(flattenFields([row]).map((field) => field.name)).toEqual(['detail'])
+    expect(flattenFields([row]).map((field) => resolveFieldConfigPrimaryName(field))).toEqual([
+      'detail',
+    ])
   })
 })

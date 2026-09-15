@@ -144,6 +144,7 @@ export function useArrayFieldItemContentState({
     normalizedContent,
     chromeProps,
     showIssueChrome: rowState.showIssueChrome,
+    showIssueBadge: rowState.showIssueBadge,
     issueGroup: rowState.issueGroup,
     itemConfig,
     presentation,

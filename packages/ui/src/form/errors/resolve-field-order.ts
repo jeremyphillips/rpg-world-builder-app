@@ -2,12 +2,20 @@ import type { ArrayConfig, FieldConfig, FormItem, RowConfig } from '../field-con
 import { isContainer } from '../field-config'
 import { resolveColumnsCollapseSequence } from '../config/form-columns-collapse.lib'
 import { inlineSentenceBoundNames } from '../../components/ui/inline-sentence-field.lib'
+import { joinedPairBoundNames } from '../../components/ui/joined-pair-field.lib'
 
 type FieldOrderContainer = Extract<FormItem, { kind: string }>
 
 function appendFieldPath(field: FieldConfig, prefix: string, paths: string[]): void {
   if (field.type === 'inlineSentence') {
     for (const name of inlineSentenceBoundNames(field.segments, field.below)) {
+      paths.push(prefix ? `${prefix}.${name}` : name)
+    }
+    return
+  }
+
+  if (field.type === 'joinedPair') {
+    for (const name of joinedPairBoundNames(field)) {
       paths.push(prefix ? `${prefix}.${name}` : name)
     }
     return

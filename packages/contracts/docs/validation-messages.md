@@ -168,7 +168,7 @@ violations; the form-only “required when limit enabled” rule stays in
 
 - Full sentences, sentence case, trailing period.
 - Lead with the field label or the subject: `{label} must be at least {min}.`
-- Choice fields use "Choose …": `Choose a rarity.` / `Choose a valid rarity.`
+- Choice fields use "Select …": `Select a rarity.` / `Select a valid rarity.`
 - List fields use "Add …": `Add at least one wealth tier.`
 - Interpolate concrete values (levels, caps, labels) rather than restating the rule
   abstractly.
@@ -243,7 +243,7 @@ field category:
 | `too_small` / `too_big` number          | number                  | `{label} must be at least {min}.` / `{label} cannot exceed {max}.` |
 | `too_small` array                       | multi / array container | `Add at least one {item label}.` (label singularized)              |
 | `invalid_value` / `invalid_union` empty | choice / multi          | `Choose {a label}.`                                                |
-| `invalid_value` / `invalid_union` other | choice / multi          | `Choose a valid {label}.`                                          |
+| `invalid_value` / `invalid_union` other | choice / multi          | `Select a valid {label}.`                                          |
 | `invalid_value` other                   | text / number / boolean | `{label} has an invalid value.`                                    |
 | `invalid_union`                         | non-choice              | `Complete the required fields for this option.`                    |
 | `invalid_format` `email`                | any                     | `Enter a valid email address.`                                     |

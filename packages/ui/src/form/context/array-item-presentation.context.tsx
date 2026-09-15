@@ -22,12 +22,12 @@ export const ArrayItemPresentationContext = React.createContext<ArrayItemPresent
 /** Whether per-field error text should be suppressed for the current layout. */
 export function resolveErrorPlacement(
   errorPlacement: ErrorPlacement | undefined,
-  variant: 'compact' | 'detailed',
+  _variant: 'compact' | 'detailed',
   _isHorizontalRow: boolean,
 ): boolean {
   if (errorPlacement === 'field') return false
   if (errorPlacement === 'row') return true
-  return variant === 'compact'
+  return false
 }
 
 export interface FieldErrorPresentation {

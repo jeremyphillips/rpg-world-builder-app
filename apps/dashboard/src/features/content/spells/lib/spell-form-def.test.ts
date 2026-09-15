@@ -9,6 +9,7 @@ import {
 import {
   isContainer,
   resolveColumnsCollapseSequence,
+  resolveFieldConfigPrimaryName,
   type FormItem,
   type GroupConfig,
   type RowConfig,
@@ -77,19 +78,24 @@ function findRow(fields: GroupConfig['fields']): RowConfig | undefined {
 function collectFieldNames(fields: FormItem[]): string[] {
   const names: string[] = []
   for (const field of fields) {
-    if ('name' in field) {
-      names.push(field.name)
+    if (!('kind' in field)) {
+      names.push(resolveFieldConfigPrimaryName(field))
     } else if ('kind' in field && field.kind === 'row') {
       names.push(...collectFieldNames(field.fields))
     } else if ('kind' in field && field.kind === 'group') {
       names.push(...collectFieldNames(field.fields))
     } else if ('kind' in field && field.kind === 'dependent') {
-      names.push(field.controller.name)
+      names.push(resolveFieldConfigPrimaryName(field.controller))
       names.push(...collectFieldNames(field.dependents.fields))
     } else if ('kind' in field && field.kind === 'columns') {
       names.push(
         ...collectFieldNames(resolveColumnsCollapseSequence(field.columns, field.collapseOrder)),
       )
+    } else if ('kind' in field && field.kind === 'slot') {
+      names.push(field.name)
+    } else if ('kind' in field && field.kind === 'array') {
+      names.push(field.name)
+      names.push(...collectFieldNames(field.fields))
     }
   }
   return names
@@ -241,7 +247,9 @@ describe('spellFormDef component fields', () => {
     ])
 
     const descriptionField = componentsGroup?.fields.find(
-      (field) => !('kind' in field) && field.name === 'components.material.description',
+      (field) =>
+        !('kind' in field) &&
+        resolveFieldConfigPrimaryName(field) === 'components.material.description',
     )
     expect(descriptionField).toEqual(
       expect.objectContaining({
@@ -469,9 +477,9 @@ describe('spellFormDef basics tab', () => {
   }
 
   function basicsFieldKey(field: FormItem): string | undefined {
-    if ('name' in field && typeof field.name === 'string') return field.name
-    if (isContainer(field) && field.kind === 'dependent' && 'name' in field.controller) {
-      return field.controller.name
+    if (!('kind' in field)) return resolveFieldConfigPrimaryName(field)
+    if (isContainer(field) && field.kind === 'dependent') {
+      return resolveFieldConfigPrimaryName(field.controller)
     }
     return undefined
   }

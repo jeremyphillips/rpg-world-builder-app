@@ -66,26 +66,21 @@ export function movementArrayField(): FormItem {
     },
     fields: [
       {
-        type: 'inlineSentence',
-        name: 'movementRow',
-        label: 'Movement',
-        labelVisibility: 'srOnly',
-        segments: [
+        kind: 'row',
+        fields: [
           {
-            kind: 'select',
+            type: 'select',
             name: 'mode',
             label: 'Mode',
-            labelVisibility: 'visible',
+            required: true,
             options: movementModeOptions,
             defaultValue: 'walk',
             width: 'md',
-            ariaLabel: 'Mode',
           },
           {
-            kind: 'joinedPair',
+            type: 'joinedPair',
             label: 'Speed',
-            labelVisibility: 'visible',
-            ariaLabel: 'Speed',
+            required: true,
             start: {
               kind: 'select',
               name: 'feet',

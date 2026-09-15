@@ -5,14 +5,23 @@ export function resolveArrayItemIssueSummary(options: {
   showIssueChrome: boolean
   variant: 'compact' | 'detailed'
   collapsed: boolean
+  suppressFieldErrorText: boolean
   issueGroup: ArrayItemIssueGroup
   rowSummaryId: string
   onFocusIssue: () => void
 }): ArrayItemIssueSummaryProps | undefined {
-  const { showIssueChrome, variant, collapsed, issueGroup, rowSummaryId, onFocusIssue } = options
+  const {
+    showIssueChrome,
+    variant,
+    collapsed,
+    suppressFieldErrorText,
+    issueGroup,
+    rowSummaryId,
+    onFocusIssue,
+  } = options
   if (!showIssueChrome || issueGroup.totalCount <= 0) return undefined
 
-  if (variant === 'compact' && issueGroup.fieldSummary) {
+  if (variant === 'compact' && suppressFieldErrorText && issueGroup.fieldSummary) {
     return {
       group: issueGroup,
       placement: 'compactSummary',

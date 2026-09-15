@@ -94,7 +94,6 @@ export function ArrayItemIssueSummary({
         className={cn(arrayItemIssueSummaryClasses({ placement }), className)}
         data-array-item-issue-summary
       >
-        <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
         {group.fieldSummary}
       </p>
     )
@@ -131,21 +130,38 @@ export function ArrayItemIssueSummary({
 export interface ArrayLegendIssueLinkProps {
   issueCount: number
   invalidRowCount: number
+  hasContainerIssue?: boolean
   sectionLabel: string
   onPress?: () => void
   prominence?: Extract<ArrayItemIssueProminence, 'nav' | 'aggregate'>
 }
 
+function resolveArrayLegendIssueLabel(
+  issueCount: number,
+  invalidRowCount: number,
+  hasContainerIssue: boolean,
+): string {
+  if (invalidRowCount > 0) {
+    return arrayLegendIssueLabel(issueCount, invalidRowCount)
+  }
+  if (hasContainerIssue) {
+    return issueCountLabel(issueCount)
+  }
+  return issueCountLabel(issueCount)
+}
+
 export function ArrayLegendIssueLink({
   issueCount,
   invalidRowCount,
+  hasContainerIssue = false,
   sectionLabel,
   onPress,
   prominence = 'nav',
 }: ArrayLegendIssueLinkProps) {
-  if (issueCount <= 0 || invalidRowCount <= 0) return null
+  if (issueCount <= 0) return null
+  if (invalidRowCount <= 0 && !hasContainerIssue) return null
 
-  const label = arrayLegendIssueLabel(issueCount, invalidRowCount)
+  const label = resolveArrayLegendIssueLabel(issueCount, invalidRowCount, hasContainerIssue)
 
   return (
     <button

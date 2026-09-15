@@ -1,4 +1,4 @@
-import { flattenFields } from '@rpg/ui/form'
+import { flattenFields, resolveFieldConfigPrimaryName } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -12,7 +12,9 @@ import {
 } from './species-trait-form-fields'
 
 function userFacingKindSelects(fields: ReturnType<typeof flattenFields>) {
-  return fields.filter((field) => field.name === 'kind' && field.type === 'select')
+  return fields.filter(
+    (field) => resolveFieldConfigPrimaryName(field) === 'kind' && field.type === 'select',
+  )
 }
 
 describe('species trait field configuration', () => {

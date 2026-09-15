@@ -11,7 +11,6 @@ import {
   fieldGroupedShellIntrinsicLayoutClasses,
   fieldGroupedShellStretchLayoutClasses,
   fieldInputInvalidClasses,
-  fieldInputInvalidSegmentClasses,
 } from './field-input-chrome.variants'
 import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
 
@@ -22,7 +21,7 @@ export const joinedPairGroupVariants = cva(fieldGroupedShellClasses, {
       stretch: fieldGroupedShellStretchLayoutClasses,
     },
     invalid: {
-      true: cn(fieldInputInvalidClasses, fieldInputInvalidSegmentClasses),
+      true: fieldInputInvalidClasses,
       false: '',
     },
     disabled: {

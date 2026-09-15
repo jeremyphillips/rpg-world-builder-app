@@ -25,13 +25,19 @@ import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FieldRowAlignment } from '../components/ui/field-control-band.variants'
 import type { FieldDigits } from '../components/ui/field-digit-metrics'
 import {
+  inlineSentenceUniqueBoundNames,
   isInlineSentenceBoundSegment,
   isInlineSentenceJoinedPairSegment,
 } from '../components/ui/inline-sentence-field.lib'
+import { joinedPairBoundNames } from '../components/ui/joined-pair-field.lib'
 import type {
   InlineSentenceBelowChips,
   InlineSentenceSegment,
 } from '../components/ui/inline-sentence-field.types'
+import type {
+  JoinedPairEndOccupantConfig,
+  JoinedPairStartOccupantConfig,
+} from '../components/ui/joined-pair-field.types'
 import type {
   FieldDependentsScope,
   SemanticSurfaceTone,
@@ -114,6 +120,7 @@ export type FieldType =
   | 'chooseFromChips'
   | 'inlineChooseCount'
   | 'inlineSentence'
+  | 'joinedPair'
   | 'levelRange'
   | 'rollValue'
 
@@ -631,6 +638,22 @@ export interface InlineSentenceFieldConfig extends BaseFieldConfig {
 }
 
 /**
+ * Two-segment joined control (`type: 'joinedPair'`) — value + unit chrome.
+ *
+ * RHF paths come from occupant `name` values only (no wrapper `name`). Use `controlId`
+ * when control ids must differ from the primary bound path.
+ *
+ * @see [field-types.md](../../docs/forms/field-types.md#joined-pair-field-joinedpair)
+ */
+export interface JoinedPairFieldConfig extends Omit<BaseFieldConfig, 'name'> {
+  type: 'joinedPair'
+  /** Optional stable id segment for control ids; defaults to start occupant `name`. */
+  controlId?: string
+  start: JoinedPairStartOccupantConfig
+  end: JoinedPairEndOccupantConfig
+}
+
+/**
  * Inline “Choose [N] … from:” sentence plus chip options — e.g. class skill proficiencies.
  * `name` is the chip selection path; `chooseName` is the numeric count path.
  *
@@ -924,6 +947,7 @@ export type FieldConfig =
   | ChooseFromChipsFieldConfig
   | InlineChooseCountFieldConfig
   | InlineSentenceFieldConfig
+  | JoinedPairFieldConfig
   | LevelRangeFieldConfig
   | ComboboxFieldConfig
   | EditableGridFieldConfig
@@ -986,8 +1010,8 @@ export interface RowConfig {
   /** When hidden, the whole row unmounts. */
   visibility?: FieldVisibility
   /**
-   * Where visible field errors render — `auto` suppresses per-field text on
-   * horizontal rows; `row` always surfaces a joined row summary instead.
+   * Where visible field errors render — `auto` and `field` keep per-field copy
+   * under each control; `row` surfaces a joined row summary instead.
    */
   errorPlacement?: 'auto' | 'field' | 'row'
 }
@@ -1487,6 +1511,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   chooseFromChips: [],
   inlineChooseCount: undefined,
   inlineSentence: undefined,
+  joinedPair: undefined,
   levelRange: undefined,
   rollValue: undefined,
 }
@@ -1614,9 +1639,29 @@ function assignRollValueDefaults(
   values[`${base}.dice.faces`] = field.defaultFaces ?? 6
 }
 
+function assignJoinedPairDefaults(
+  field: JoinedPairFieldConfig,
+  values: Record<string, unknown>,
+): void {
+  const { start, end } = field
+  if (start.kind === 'number') {
+    values[start.name] = start.defaultValue ?? TYPE_DEFAULTS.number
+  } else {
+    values[start.name] = start.defaultValue ?? TYPE_DEFAULTS.select
+  }
+  if (end.kind === 'select') {
+    values[end.name] = end.defaultValue ?? TYPE_DEFAULTS.select
+  }
+}
+
 function assignFieldDefaultValues(field: FieldConfig, values: Record<string, unknown>): void {
   if (field.type === 'inlineSentence') {
     assignInlineSentenceDefaults(field, values)
+    return
+  }
+
+  if (field.type === 'joinedPair') {
+    assignJoinedPairDefaults(field, values)
     return
   }
 
@@ -1669,11 +1714,43 @@ export function isFieldVisible(field: FieldConfig, values: Record<string, unknow
   return field.visibility ? field.visibility.visibleWhen(values) : true
 }
 
+/** Applies a dotted path prefix to a leaf field config (occupant names for joinedPair). */
+export function prefixFieldConfig(field: FieldConfig, prefix: string): FieldConfig {
+  const join = (name: string) => (prefix ? `${prefix}.${name}` : name)
+
+  if (field.type === 'joinedPair') {
+    return {
+      ...field,
+      start: { ...field.start, name: join(field.start.name) },
+      end: field.end.kind === 'select' ? { ...field.end, name: join(field.end.name) } : field.end,
+    }
+  }
+
+  return { ...field, name: join(field.name) }
+}
+
+/** Primary RHF path for a field config — start occupant for standalone joinedPair. */
+export function resolveFieldConfigPrimaryName(field: FieldConfig): string {
+  if (field.type === 'joinedPair') return field.start.name
+  return field.name
+}
+
+/** All RHF paths owned by one field config (segments/occupants included). */
+export function resolveFieldConfigBoundNames(field: FieldConfig): string[] {
+  if (field.type === 'inlineSentence') {
+    return inlineSentenceUniqueBoundNames(field.segments, field.below)
+  }
+  if (field.type === 'joinedPair') {
+    return joinedPairBoundNames(field)
+  }
+  return [field.name]
+}
+
 /** Names of fields currently hidden by their `visibility` predicate. */
 export function hiddenFieldNames(items: FormItem[], values: Record<string, unknown>): string[] {
-  return flattenFields(items)
-    .filter((field) => !isFieldVisible(field, values))
-    .map((field) => field.name)
+  return flattenFields(items).flatMap((field) =>
+    isFieldVisible(field, values) ? [] : resolveFieldConfigBoundNames(field),
+  )
 }
 
 /** Normalizes static and dynamic hint configuration. */

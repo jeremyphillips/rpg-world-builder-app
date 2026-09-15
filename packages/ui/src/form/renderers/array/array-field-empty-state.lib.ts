@@ -13,6 +13,7 @@ export function arrayEmptyStatePrimaryMessage(itemLabel: string): string {
   return `No ${itemLabel} added.`
 }
 
-export function arrayEmptyStateMinRequiredMessage(itemLabel: string): string {
-  return `At least one ${itemLabel} is required.`
+/** Whether the array legend should show a required marker. */
+export function resolveArrayRequiredMarker(config: ArrayConfig): boolean {
+  return (config.min ?? 0) >= 1
 }

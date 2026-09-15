@@ -684,11 +684,9 @@ describe('TabbedForm', () => {
     )
     expect(screen.getByRole('textbox', { name: 'Label' })).toHaveFocus()
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /1 issue in Grants · Grant #1/i }),
-      ).toBeInTheDocument()
-    })
+    expect(
+      screen.queryByRole('button', { name: /1 issue in Grants · Grant #1/i }),
+    ).not.toBeInTheDocument()
 
     expect(
       screen.getByRole('button', { name: /Grants.*1 field needs attention/i }),

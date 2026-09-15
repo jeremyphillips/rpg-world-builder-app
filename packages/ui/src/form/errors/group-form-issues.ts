@@ -13,7 +13,7 @@ export function buildFieldSummaryText(
 ): string | undefined {
   if (fieldIssues.length === 0) return undefined
 
-  const parts = fieldIssues.map((issue) => issue.summaryMessage ?? issue.message)
+  const parts = fieldIssues.map((issue) => issue.message)
   if (parts.length <= maxNamed) return joinArrayItemSummaryParts(parts)
 
   const named = parts.slice(0, maxNamed)

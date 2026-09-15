@@ -12,9 +12,9 @@ describe('formIssuesFromZodIssues', () => {
     ])
 
     expect(issue?.path).toBe('spellcasting.progression')
-    expect(issue?.message).toBe('Choose a progression.')
+    expect(issue?.message).toBe('Select a progression.')
     expect(issue?.message).not.toContain('"f":')
     expect(issue?.summaryMessage).toBe('Missing Progression')
-    expect(formatFieldMessage(encoded)).toBe('Choose a progression.')
+    expect(formatFieldMessage(encoded)).toBe('Select a progression.')
   })
 })

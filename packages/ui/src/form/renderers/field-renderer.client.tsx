@@ -24,7 +24,11 @@ import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
-import { buildFieldRendererIds, resolveFieldRenderConfig } from './field-renderer-config.lib'
+import {
+  buildFieldRendererIds,
+  buildJoinedPairRendererIds,
+  resolveFieldRenderConfig,
+} from './field-renderer-config.lib'
 import {
   pickFieldChromeProps,
   resolveFieldChromeProps,
@@ -50,10 +54,11 @@ import type {
   InlineChooseCountFieldConfig,
   ChooseFromChipsFieldConfig,
   InputUnitFieldConfig,
+  JoinedPairFieldConfig,
   LevelRangeFieldConfig,
   RollValueFieldConfig,
 } from '../field-config'
-import { fieldDefaultValue } from '../field-config'
+import { fieldDefaultValue, resolveFieldConfigPrimaryName } from '../field-config'
 import { assertOptionalDisclosureFieldConfig } from '../config/optional-disclosure-config.lib'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useFormSectionContext } from '../context/form-section.context'
@@ -124,6 +129,7 @@ const fieldRenderers: {
     | 'select'
     | 'levelRange'
     | 'inlineSentence'
+    | 'joinedPair'
     | 'inlineChooseCount'
     | 'chooseFromChips'
     | 'inputUnit'
@@ -572,7 +578,10 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const { density } = sectionContext
   const chromeProps = resolveFieldChromeProps(config, sectionContext)
   const chromedConfig = { ...config, ...chromeProps } as FieldConfig
-  const { fullName, id } = buildFieldRendererIds(chromedConfig, idPrefix, namePrefix)
+  const { fullName, id } =
+    chromedConfig.type === 'joinedPair'
+      ? buildJoinedPairRendererIds(chromedConfig, idPrefix, namePrefix)
+      : buildFieldRendererIds(chromedConfig, idPrefix, namePrefix)
 
   const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(chromedConfig), namePrefix)
   const optionAvailability =
@@ -671,6 +680,7 @@ type StandardFieldConfig = Exclude<
   | InlineChooseCountFieldConfig
   | ChooseFromChipsFieldConfig
   | InputUnitFieldConfig
+  | JoinedPairFieldConfig
   | RollValueFieldConfig
 >
 
@@ -703,7 +713,7 @@ function StandardFieldRenderer({
   const formState = useFormState({ name: fullName, exact: true })
   const { errors } = useFormState()
   const liveError = getFieldState(fullName, formState).error
-  const remotePreview = useFileFieldRemotePreview(config.name)
+  const remotePreview = useFileFieldRemotePreview(resolveFieldConfigPrimaryName(config))
   const validation = useFieldErrorPresentation(
     liveError?.message ??
       fieldState.error?.message ??

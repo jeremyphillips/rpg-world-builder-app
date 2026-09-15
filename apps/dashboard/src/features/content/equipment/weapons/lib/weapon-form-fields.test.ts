@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { WeaponEquipment } from '@rpg/contracts'
-import type { FormItem, GroupConfig } from '@rpg/ui/form'
+import { resolveFieldConfigPrimaryName, type FormItem, type GroupConfig } from '@rpg/ui/form'
 
 import {
   expectComposedKindGroups,
@@ -61,7 +61,9 @@ describe('weapon kindFieldGroups', () => {
     const damageGroup = damageGroupFromWeaponGroup(weaponGroup)
 
     expect(
-      damageGroup.fields.find((field) => !('kind' in field) && field.name === 'hasDamage'),
+      damageGroup.fields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'hasDamage',
+      ),
     ).toMatchObject({
       type: 'switch',
       label: 'Deals damage',
@@ -72,7 +74,10 @@ describe('weapon kindFieldGroups', () => {
         'kind' in field &&
         field.kind === 'row' &&
         field.fields.some(
-          (child) => !('kind' in child) && child.type === 'rollValue' && child.name === 'damage',
+          (child) =>
+            !('kind' in child) &&
+            child.type === 'rollValue' &&
+            resolveFieldConfigPrimaryName(child) === 'damage',
         ),
     )
     if (!damageRow || !('fields' in damageRow)) {
@@ -80,7 +85,10 @@ describe('weapon kindFieldGroups', () => {
     }
 
     const rollValueField = damageRow.fields.find(
-      (field) => !('kind' in field) && field.type === 'rollValue' && field.name === 'damage',
+      (field) =>
+        !('kind' in field) &&
+        field.type === 'rollValue' &&
+        resolveFieldConfigPrimaryName(field) === 'damage',
     )
     if (!rollValueField) {
       throw new Error('expected damage roll value field')
@@ -94,20 +102,25 @@ describe('weapon kindFieldGroups', () => {
     })
 
     expect(
-      damageRow.fields.find((field) => !('kind' in field) && field.name === 'damage.flat'),
+      damageRow.fields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'damage.flat',
+      ),
     ).toBeUndefined()
     expect(
-      damageRow.fields.find((field) => !('kind' in field) && field.name === 'damage.flatAmount'),
+      damageRow.fields.find(
+        (field) =>
+          !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'damage.flatAmount',
+      ),
     ).toBeUndefined()
 
     const damageTypeFieldConfig = damageRow.fields.find(
-      (field) => !('kind' in field) && field.name === 'damageType',
+      (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'damageType',
     )
     const rollFieldIndex = damageRow.fields.findIndex(
       (field) => !('kind' in field) && field.type === 'rollValue',
     )
     const damageTypeIndex = damageRow.fields.findIndex(
-      (field) => !('kind' in field) && field.name === 'damageType',
+      (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'damageType',
     )
 
     expect(damageTypeIndex).toBeLessThan(rollFieldIndex)
@@ -129,14 +142,19 @@ describe('weapon kindFieldGroups', () => {
       (field): field is Extract<(typeof damageGroup.fields)[number], { kind: 'row' }> =>
         'kind' in field &&
         field.kind === 'row' &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'versatileDamage'),
+        field.fields.some(
+          (child) =>
+            !('kind' in child) && resolveFieldConfigPrimaryName(child) === 'versatileDamage',
+        ),
     )
     if (!versatileRow || !('fields' in versatileRow)) {
       throw new Error('expected versatile damage row')
     }
 
     expect(
-      versatileRow.fields.find((field) => !('kind' in field) && field.name === 'versatileDamage'),
+      versatileRow.fields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'versatileDamage',
+      ),
     ).toMatchObject({
       type: 'diceFormula',
       modifierMode: 'none',
@@ -150,7 +168,9 @@ describe('weapon kindFieldGroups', () => {
       (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
         'kind' in field &&
         field.kind === 'row' &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'category'),
+        field.fields.some(
+          (child) => !('kind' in child) && resolveFieldConfigPrimaryName(child) === 'category',
+        ),
     )
     if (!coreRow || !('fields' in coreRow)) {
       throw new Error('expected category/mode/mastery row')
@@ -158,7 +178,9 @@ describe('weapon kindFieldGroups', () => {
 
     for (const name of ['category', 'mode', 'mastery'] as const) {
       expect(
-        coreRow.fields.find((field) => !('kind' in field) && field.name === name),
+        coreRow.fields.find(
+          (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === name,
+        ),
       ).toMatchObject({ placeholder: 'Choose...' })
     }
   })
@@ -185,7 +207,7 @@ describe('weapon kindFieldGroups', () => {
   it('wires property and mastery conditional option availability and dynamic hints', () => {
     const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
     const propertiesField = weaponGroup.fields.find(
-      (field) => !('kind' in field) && field.name === 'properties',
+      (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'properties',
     )
     expect(propertiesField).toMatchObject({
       optionAvailability: { dependsOn: ['mode'] },

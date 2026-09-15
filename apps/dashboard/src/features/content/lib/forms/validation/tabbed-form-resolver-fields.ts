@@ -1,7 +1,22 @@
-import { isContainer, type ColumnsConfig, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import {
+  isContainer,
+  isRowSlotItem,
+  prefixFieldConfig,
+  type ColumnsConfig,
+  type FormItem,
+  type RowFieldItem,
+  type TabbedFormTab,
+} from '@rpg/ui/form'
 
 function joinFieldPath(prefix: string, name: string): string {
   return prefix ? `${prefix}.${name}` : name
+}
+
+function prefixRowFieldItem(field: RowFieldItem, prefix: string): RowFieldItem {
+  if (isRowSlotItem(field)) {
+    return { ...field, name: joinFieldPath(prefix, field.name) }
+  }
+  return prefixFieldConfig(field, prefix)
 }
 
 /** Prefixes leaf and array/slot names for resolver-only field trees (not rendered). */
@@ -11,7 +26,7 @@ export function prefixFormItems(items: readonly FormItem[], prefix: string): For
 
 function prefixFormItem(item: FormItem, prefix: string): FormItem {
   if (!isContainer(item)) {
-    return { ...item, name: joinFieldPath(prefix, item.name) }
+    return prefixFieldConfig(item, prefix)
   }
 
   if (item.kind === 'array') {
@@ -29,20 +44,14 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
   if (item.kind === 'row') {
     return {
       ...item,
-      fields: item.fields.map((field) => ({
-        ...field,
-        name: joinFieldPath(prefix, field.name),
-      })),
+      fields: item.fields.map((field) => prefixRowFieldItem(field, prefix)),
     }
   }
 
   if (item.kind === 'dependent') {
     return {
       ...item,
-      controller: {
-        ...item.controller,
-        name: joinFieldPath(prefix, item.controller.name),
-      },
+      controller: prefixFieldConfig(item.controller, prefix),
       dependents: {
         ...item.dependents,
         fields: prefixFormItems(item.dependents.fields, prefix),

@@ -2,6 +2,7 @@ import {
   OPTIONAL_DISCLOSURE_FIELD_KINDS,
   type FieldConfig,
   type OptionalDisclosureFieldKind,
+  resolveFieldConfigPrimaryName,
 } from '../field-config'
 
 export const OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS = [
@@ -25,7 +26,7 @@ function fieldKindImplementsOptionalDisclosure(
 }
 
 function optionalDisclosureFieldPath(field: FieldConfig): string {
-  return field.name
+  return resolveFieldConfigPrimaryName(field)
 }
 
 /** Dev-only guard for `optionalDisclosure` misuse at the form-library boundary. */

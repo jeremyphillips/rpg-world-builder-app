@@ -29,6 +29,7 @@ const TYPE_CATEGORIES: Record<FieldConfig['type'], FieldMessageCategory> = {
   inputUnit: 'number',
   inlineChooseCount: 'number',
   inlineSentence: 'number',
+  joinedPair: 'choice',
   editableGrid: 'number',
   diceFormula: 'number',
   rollValue: 'number',

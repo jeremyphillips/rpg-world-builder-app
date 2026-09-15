@@ -18,15 +18,10 @@ export const fieldInputFocusWithinClasses =
 
 /** Driven by `aria-invalid` on the control or shell. */
 export const fieldInputInvalidAriaClasses =
-  'aria-invalid:border-input-invalid aria-invalid:bg-input-invalid-subtle aria-invalid:focus-visible:ring-input-invalid'
+  'aria-invalid:border-input-invalid aria-invalid:focus-visible:ring-input-invalid'
 
 /** For CVA `invalid` variant on group shells. */
-export const fieldInputInvalidClasses =
-  'border-input-invalid bg-input-invalid-subtle focus-within:ring-input-invalid'
-
-/** Inner segment wash (input-select value cell, etc.). */
-export const fieldInputInvalidSegmentClasses =
-  '[&_[data-input-select-value]]:bg-input-invalid-subtle'
+export const fieldInputInvalidClasses = 'border-input-invalid focus-within:ring-input-invalid'
 
 export const fieldInputDisabledClasses =
   'disabled:cursor-not-allowed disabled:bg-input-disabled disabled:border-input-disabled disabled:text-input-disabled'

@@ -18,6 +18,7 @@ import {
   useFormSectionContext,
 } from '../context/form-section.context'
 import type { RowConfig } from '../field-config'
+import { resolveFieldConfigPrimaryName } from '../field-config'
 import { isRowSlotItem, resolveRowFieldAlign, resolveRowFieldGap } from '../field-config'
 import { CompositeGroup } from '../presentation/composite-group.client'
 import { resolveRowHeading } from '../resolve-container-heading.lib'
@@ -77,7 +78,11 @@ export function RowFieldSection({
 
           return (
             <FieldNode
-              key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
+              key={
+                namePrefix
+                  ? `${namePrefix}.${resolveFieldConfigPrimaryName(field)}`
+                  : resolveFieldConfigPrimaryName(field)
+              }
               config={field}
               idPrefix={idPrefix}
               namePrefix={namePrefix}

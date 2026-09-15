@@ -186,8 +186,12 @@ describe('startingEquipmentItemFields', () => {
       (field): field is Extract<typeof field, { kind: 'row' }> =>
         'kind' in field && field.kind === 'row',
     )
-    const equipmentField = equipmentRow?.fields.find((field) => field.name === 'equipmentSlug')
-    const quantityField = equipmentRow?.fields.find((field) => field.name === 'quantity')
+    const equipmentField = equipmentRow?.fields.find(
+      (field) => 'name' in field && field.name === 'equipmentSlug',
+    )
+    const quantityField = equipmentRow?.fields.find(
+      (field) => 'name' in field && field.name === 'quantity',
+    )
 
     expect(equipmentField).toMatchObject({
       type: 'combobox',

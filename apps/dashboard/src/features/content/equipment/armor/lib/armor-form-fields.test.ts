@@ -1,3 +1,4 @@
+import { resolveFieldConfigPrimaryName } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -22,7 +23,8 @@ describe('armor kindFieldGroups', () => {
     }
 
     const strengthField = armorGroup.fields.find(
-      (field) => !('kind' in field) && field.name === 'strengthRequirement',
+      (field) =>
+        !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'strengthRequirement',
     )
     expect(strengthField).toMatchObject({
       visibility: {

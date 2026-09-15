@@ -9,6 +9,7 @@ import {
 import { cn } from '../../../lib/utils'
 import type { ArrayConfig } from '../../field-config'
 import { ArrayFieldAddControl } from './array-field-add-control.client'
+import { ArrayFieldContainerError } from './array-field-container-error.client'
 import { ArrayFieldEmptyState } from './array-field-empty-state.client'
 import { ArrayFieldLegend } from './array-field-legend.client'
 import { ArrayFieldItemList } from './array-field-item-list.client'
@@ -53,6 +54,7 @@ export function ArrayFieldRendererFieldset({
   onMove,
 }: ArrayFieldRendererFieldsetProps) {
   const inlineAddInLegend = state.addActionLayout === 'inline' && state.showLegend
+  const containerErrorId = `${state.idPrefix}-${state.fullName.replaceAll('.', '-')}-error`
 
   const addControl = (
     <ArrayFieldAddControl
@@ -77,24 +79,32 @@ export function ArrayFieldRendererFieldset({
         sectionLayout,
         omitSectionBottomMargin: state.omitSectionBottomMargin,
       })}
+      aria-describedby={state.hasContainerIssue ? containerErrorId : undefined}
+      aria-invalid={state.hasContainerIssue ? true : undefined}
     >
       {state.showLegend ? (
         <ArrayFieldLegend
           legend={state.legend}
           legendFieldSize={state.legendFieldSize}
           addActionLayout={state.addActionLayout}
+          required={state.required}
           arrayIssueCount={state.arrayIssueCount}
           invalidRowCount={state.invalidRowCount}
+          hasContainerIssue={state.hasContainerIssue}
           onFocusFirstArrayIssue={state.focusFirstArrayIssue}
           addControl={inlineAddInLegend ? addControl : undefined}
         />
       ) : null}
       <div className={state.itemListClasses}>
         {fields.length === 0 ? (
-          <ArrayFieldEmptyState
-            itemLabel={state.emptyItemLabel}
-            showMinRequired={state.emptyMinRequiredVisible}
-          />
+          <div className="flex flex-col gap-1.5">
+            <ArrayFieldEmptyState itemLabel={state.emptyItemLabel} />
+            <ArrayFieldContainerError
+              fullName={state.fullName}
+              errorId={containerErrorId}
+              size={state.legendFieldSize}
+            />
+          </div>
         ) : (
           <ArrayFieldItemList
             fields={fields}
