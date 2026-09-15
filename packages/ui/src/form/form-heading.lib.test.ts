@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  resolveArrayLegendPresentation,
   resolveFieldLabelVisibility,
   resolveGroupHeadingTier,
   resolveGroupLegendSize,
@@ -35,26 +34,6 @@ describe('resolveFieldLabelVisibility', () => {
 
   it('defaults to visible', () => {
     expect(resolveFieldLabelVisibility({})).toBe('visible')
-  })
-})
-
-describe('resolveArrayLegendPresentation', () => {
-  it('uses array anatomy at top level with density scale', () => {
-    expect(resolveArrayLegendPresentation(0, 'md')).toEqual({
-      legendSize: 'array',
-      legendScale: 'default',
-    })
-    expect(resolveArrayLegendPresentation(0, 'sm')).toEqual({
-      legendSize: 'array',
-      legendScale: 'sm',
-    })
-  })
-
-  it('uses subsection typography when nested under a named group', () => {
-    expect(resolveArrayLegendPresentation(1, 'md')).toEqual({
-      legendSize: 'subsection',
-      legendScale: 'default',
-    })
   })
 })
 

@@ -301,12 +301,15 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 Every **top-level** `FormItem` in the schema `fields: []` gets one boxed field container —
 solid background + border + 16px padding (`{ variant: 'container' }`) — regardless of
-`kind` (`leaf`, `group`, `dependent`, `row`, `slot`). `kind: 'columns'` is layout-only:
+`kind` (`leaf`, `group`, `dependent`, `row`). `kind: 'slot'` opts out by default (custom
+`render()` owns layout); pass `chrome: { variant: 'container' }` when a slot needs the
+shared shell. `kind: 'columns'` is layout-only:
 the wrapper has no field container; **each column child** is treated as a top-level unit.
 **Nothing nested inside** a chromed unit (nested `fields`, dependent controller/dependents,
-nested groups, nested dependents, rows, slots) receives field-container treatment. Arrays
-keep the existing **item-shell** model (subtle header + canvas body), not a field-container wrap of the
-whole list.
+nested groups, nested dependents, rows, slots) receives field-container treatment. Top-level
+`kind: 'array'` sections receive the same default field-container wrap as groups and leaves;
+array **item rows** keep the existing item-shell model (subtle header + canvas body).
+Nested arrays inside an array item or a chromed parent do not receive a second section wrap.
 
 **Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
 borderless `<fieldset>` (legend, description, and field stack) in `FieldChromeShell`,
@@ -598,6 +601,10 @@ Slots inherit parent section `density`. Slot components should call
 `useFormSectionContext()` and resolve `resolveFormDensity(density)` when threading scale into
 hand-built controls. Inside a `kind: 'row'`, set `width` on the slot the same way as a leaf
 field so it participates in the flex split.
+
+Slots do **not** inherit the default leaf field container — including headless side-effect
+slots (`render: () => null` or components that return `null`). Opt in with
+`chrome: { variant: 'container' }` when the slot body should use the shared bordered shell.
 
 Optional `label` + `hint` wrap content in `FieldGroup`. `separator` adds a trailing
 divider after the slot (same as leaf fields and rows).

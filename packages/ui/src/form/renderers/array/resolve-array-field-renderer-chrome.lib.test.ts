@@ -24,7 +24,6 @@ describe('resolveArrayFieldRendererChrome', () => {
       density: 'comfortable',
       depth: 2,
       inRhythmStack: undefined,
-      namedGroupDepth: 1,
       fieldsLength: 2,
     })
 
@@ -43,7 +42,6 @@ describe('resolveArrayFieldRendererChrome', () => {
       density: 'comfortable',
       depth: 2,
       inRhythmStack: undefined,
-      namedGroupDepth: 1,
       fieldsLength: 1,
     })
 

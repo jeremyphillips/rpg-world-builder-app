@@ -1,7 +1,10 @@
 import * as React from 'react'
-import { Sheet, dialogPanelActionRowClasses } from '@rpg/ui'
+import { Sheet, dialogPanelActionRowClasses, type SheetSurface } from '@rpg/ui'
 
 import { drawerShellBodyVariants } from './drawer-shell.variants'
+
+/** Default application drawer plane — lifted canvas toward panel/white. */
+export const DRAWER_SHELL_DEFAULT_SURFACE: SheetSurface = 'surface-lift'
 
 export type DrawerShellBodyMode = 'scrolling' | 'managed' | 'composed'
 
@@ -18,6 +21,8 @@ export type DrawerShellProps = {
    * composed — children render under Content (no auto Body); Form supplies Body + Footer.
    */
   bodyMode?: DrawerShellBodyMode
+  /** Override the default lifted drawer plane when a feature needs a different shell fill. */
+  surface?: SheetSurface
 }
 
 /** Canonical application drawer chrome — fixed 550px background surface. */
@@ -29,11 +34,12 @@ export function DrawerShell({
   description,
   footer,
   bodyMode = 'scrolling',
+  surface = DRAWER_SHELL_DEFAULT_SURFACE,
 }: DrawerShellProps) {
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content
-        surface="background"
+        surface={surface}
         size="lg"
         {...(!description ? { 'aria-describedby': undefined } : {})}
       >

@@ -99,11 +99,11 @@ describe('columns field layout', () => {
     expect(layout).toHaveClass('grid', 'grid-cols-1', 'md:grid-cols-2')
     expect(layout).not.toHaveClass('bg-field-container')
 
-    expect(container.querySelectorAll('.bg-field-container')).toHaveLength(4)
+    expect(container.querySelectorAll('.bg-field-container')).toHaveLength(3)
     const shell = container.querySelector('.bg-field-container')
     expect(shell).toContainElement(screen.getByLabelText('Description'))
     expect(screen.getByText('Suggested ability scores')).toBeInTheDocument()
-    expect(shell).not.toContainElement(screen.getByText('Suggested ability scores'))
+    expect(screen.getByText('Suggested ability scores').closest('.bg-field-container')).toBeNull()
   })
 
   it('keeps column-major DOM order without matchMedia for the default collapse', () => {

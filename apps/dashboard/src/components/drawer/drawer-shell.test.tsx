@@ -67,4 +67,25 @@ describe('DrawerShell', () => {
 
     expect(screen.getByTestId('managed-scroll')).toBeInTheDocument()
   })
+
+  it('uses the lifted drawer plane by default', () => {
+    render(
+      <DrawerShell open onOpenChange={() => undefined} title="Add item">
+        <p>Drawer body</p>
+      </DrawerShell>,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass('bg-surface-lift')
+  })
+
+  it('allows surface override', () => {
+    render(
+      <DrawerShell open surface="background" onOpenChange={() => undefined} title="Add item">
+        <p>Drawer body</p>
+      </DrawerShell>,
+    )
+
+    expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass('bg-background')
+    expect(screen.getByRole('dialog', { name: 'Add item' })).not.toHaveClass('bg-surface-lift')
+  })
 })

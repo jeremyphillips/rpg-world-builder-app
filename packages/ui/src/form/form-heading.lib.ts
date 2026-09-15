@@ -1,6 +1,4 @@
-import type { FieldGroupLegendScale, FieldGroupLegendSize } from '../components/ui/field.variants'
-import { resolveArrayLegendScale } from '../components/ui/field.variants'
-import type { FieldSizeToken } from '../components/ui/field-sizing.variants'
+import type { FieldGroupLegendSize } from '../components/ui/field.variants'
 import type { FieldHintConfig } from './field-config'
 
 /** Resolved typography tier — label and hint always share this tier. */
@@ -39,17 +37,6 @@ export function resolveNamedGroupDepthAfterEntering(
 /** Bridges structural tier to existing group legend size tokens. */
 export function resolveGroupLegendSize(tier: 'section' | 'subsection'): FieldGroupLegendSize {
   return tier
-}
-
-/** Derives array legend presentation from structural depth and section density scale. */
-export function resolveArrayLegendPresentation(
-  namedGroupDepth: number,
-  fieldSize: FieldSizeToken,
-): { legendSize: FieldGroupLegendSize; legendScale: FieldGroupLegendScale } {
-  if (namedGroupDepth >= 1) {
-    return { legendSize: 'subsection', legendScale: 'default' }
-  }
-  return { legendSize: 'array', legendScale: resolveArrayLegendScale(fieldSize) }
 }
 
 export function isNonWhitespaceLabel(label: string | undefined): label is string {

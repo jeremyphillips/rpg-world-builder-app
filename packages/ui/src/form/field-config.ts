@@ -1335,7 +1335,10 @@ export interface ArrayConfig {
   id?: string
   className?: string
   separator?: FieldSeparator
-  /** Default leaf/row/slot container treatment for item fields. */
+  /**
+   * Shared field-container for the array fieldset (legend + list) and cascade for
+   * descendants. Use `{ variant: 'none' }` to opt out.
+   */
   fieldChrome?: FieldChrome
   errorPlacement?: 'auto' | 'field' | 'row'
 }

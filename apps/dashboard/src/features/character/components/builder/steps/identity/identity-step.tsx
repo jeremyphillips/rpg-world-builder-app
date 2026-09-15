@@ -35,6 +35,7 @@ export function IdentityStep({
       {
         kind: 'slot' as const,
         name: '_identityContinueRegistration',
+        chrome: { variant: 'none' as const },
         render: () => (
           <BuilderFormContinueRegistration<IdentityFormValues>
             stepId="identity"
@@ -47,6 +48,7 @@ export function IdentityStep({
       {
         kind: 'slot' as const,
         name: '_identityDraftSync',
+        chrome: { variant: 'none' as const },
         render: () => (
           <IdentityDraftSync draftIdentity={draft.identity} onDraftChange={onDraftChange} />
         ),

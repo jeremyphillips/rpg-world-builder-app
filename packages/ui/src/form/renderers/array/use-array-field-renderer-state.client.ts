@@ -29,6 +29,7 @@ type UseArrayFieldRendererStateOptions = {
   remove: UseFieldArrayReturn['remove']
   getValues: (name: string) => unknown
   watchedItems: unknown[] | undefined
+  wrapSectionChrome?: boolean
 }
 
 export function useArrayFieldRendererState({
@@ -40,17 +41,18 @@ export function useArrayFieldRendererState({
   remove,
   getValues,
   watchedItems,
+  wrapSectionChrome,
 }: UseArrayFieldRendererStateOptions) {
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const { density, depth, inRhythmStack, namedGroupDepth } = useFormSectionContext()
+  const { density, depth, inRhythmStack } = useFormSectionContext()
   const chrome = resolveArrayFieldRendererChrome({
     config,
     density,
     depth,
     inRhythmStack,
-    namedGroupDepth,
     fieldsLength: fields.length,
+    wrapSectionChrome,
   })
   const {
     addAction,
@@ -66,8 +68,7 @@ export function useArrayFieldRendererState({
     itemListClasses,
     itemBodyStackClasses,
     legend,
-    legendScale,
-    legendSize,
+    legendFieldSize,
     max,
     min,
     nested,
@@ -177,8 +178,7 @@ export function useArrayFieldRendererState({
     itemListClasses,
     itemProps,
     legend,
-    legendScale,
-    legendSize,
+    legendFieldSize,
     nested,
     omitSectionBottomMargin,
     showLegend: legend.trim().length > 0,

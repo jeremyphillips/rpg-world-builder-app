@@ -1,12 +1,9 @@
 'use client'
 
-import * as React from 'react'
-
-import { FormSectionContext, useFormSectionContext } from '../../context/form-section.context'
-import { buildArraySectionChildContext } from '../../containers/form-section-child-context.lib'
+import { useFormSectionContext } from '../../context/form-section.context'
 import { useVisibilityValues } from '../../containers/form-conditional.client'
 import type { ArrayConfig } from '../../field-config'
-import { ArrayFieldRenderer } from './array-field-renderer.client'
+import { ArrayFormItemSection } from './array-form-item-section.client'
 
 export interface ConditionalArrayFieldProps {
   config: ArrayConfig
@@ -24,18 +21,16 @@ export function ConditionalArrayField({
 }: ConditionalArrayFieldProps) {
   const values = useVisibilityValues(config.visibility!, namePrefix)
   const parentContext = useFormSectionContext()
-  const childContext = React.useMemo(
-    () => buildArraySectionChildContext(parentContext, depth, config),
-    [parentContext, depth, config],
-  )
 
   if (!config.visibility!.visibleWhen(values)) return null
 
-  const fullArrayName = namePrefix ? `${namePrefix}.${config.name}` : config.name
-
   return (
-    <FormSectionContext.Provider value={childContext}>
-      <ArrayFieldRenderer config={config} idPrefix={idPrefix} fullName={fullArrayName} />
-    </FormSectionContext.Provider>
+    <ArrayFormItemSection
+      item={config}
+      parentContext={parentContext}
+      idPrefix={idPrefix}
+      namePrefix={namePrefix}
+      depth={depth}
+    />
   )
 }

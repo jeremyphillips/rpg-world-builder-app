@@ -11,16 +11,15 @@ import {
 } from '../../config/array/array-item-config.lib'
 import type { ArrayConfig } from '../../field-config'
 import { resolveFormDensity } from '../../form-density'
-import { resolveArrayLegendPresentation } from '../../form-heading.lib'
-import { hasNamedArrayHeading, resolveArrayHeading } from '../../resolve-container-heading.lib'
+import { resolveArrayHeading } from '../../resolve-container-heading.lib'
 
 type ResolveArrayFieldRendererChromeInput = {
   config: ArrayConfig
   density: Parameters<typeof resolveFormDensity>[0]
   depth: number
   inRhythmStack: boolean | undefined
-  namedGroupDepth: number
   fieldsLength: number
+  wrapSectionChrome?: boolean
 }
 
 export function resolveArrayFieldRendererChrome({
@@ -28,8 +27,8 @@ export function resolveArrayFieldRendererChrome({
   density,
   depth,
   inRhythmStack,
-  namedGroupDepth,
   fieldsLength,
+  wrapSectionChrome = false,
 }: ResolveArrayFieldRendererChromeInput) {
   const { rhythm, size } = resolveFormDensity(density)
   const itemConfig = resolveArrayItemConfig(config)
@@ -44,16 +43,14 @@ export function resolveArrayFieldRendererChrome({
   } = addAction ?? {}
   const arrayHeading = resolveArrayHeading(config)
   const legend = arrayHeading?.label ?? config.legend ?? ''
-  const hasNamedHeading = hasNamedArrayHeading(config)
-  const legendNamedGroupDepth = hasNamedHeading ? Math.max(0, namedGroupDepth - 1) : namedGroupDepth
-  const { legendSize, legendScale } = resolveArrayLegendPresentation(legendNamedGroupDepth, size)
+  const legendFieldSize = size
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
   const itemCollapseKey = itemConfig.collapseKey
   const itemListClasses = fieldArrayItemListClasses({ rhythm, size })
   const itemBodyStackClasses = fieldStackRhythmVariants({ rhythm })
   const nested = isNestedArraySection(depth)
-  const omitSectionBottomMargin = nested || inRhythmStack
+  const omitSectionBottomMargin = nested || inRhythmStack || wrapSectionChrome
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
   const sortableEnabled = reorder === 'dragHandle' && fieldsLength > 1
@@ -75,8 +72,7 @@ export function resolveArrayFieldRendererChrome({
     itemListClasses,
     itemBodyStackClasses,
     legend,
-    legendScale,
-    legendSize,
+    legendFieldSize,
     max,
     min,
     nested,

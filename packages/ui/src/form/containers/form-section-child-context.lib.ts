@@ -12,6 +12,7 @@ export function buildArraySectionChildContext(
   parent: FormSectionContextValue,
   depth: number,
   config: ArrayConfig,
+  options?: { sectionChromeActive?: boolean },
 ): FormSectionContextValue {
   const chrome = resolveArrayItemChrome(config)
   const hasNamedHeading = hasNamedArrayHeading(config)
@@ -30,7 +31,7 @@ export function buildArraySectionChildContext(
     namedGroupDepth: childNamedGroupDepth,
     headingTier: hasNamedHeading ? 'leaf' : parent.headingTier,
     fieldChromeCascade: config.fieldChrome ?? parent.fieldChromeCascade,
-    fieldChromeSuppressed: true,
+    fieldChromeSuppressed: options?.sectionChromeActive || parent.fieldChromeSuppressed || true,
   })
 }
 
@@ -38,5 +39,8 @@ export function buildSlotSectionChildContext(
   parent: FormSectionContextValue,
   depth: number,
 ): FormSectionContextValue {
-  return buildFormSectionChildContext(parent, depth)
+  return buildFormSectionChildContext(parent, depth, {
+    // Slots bring their own layout; opt into `chrome` explicitly when a shell is needed.
+    fieldChromeSuppressed: true,
+  })
 }

@@ -43,7 +43,7 @@ describe('Form section rendering', () => {
     render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
 
     expect(screen.getByText('Identity').closest('legend')).toHaveClass('text-field-group-legend')
-    expect(screen.getByText('Tags')).toHaveClass('text-sm')
+    expect(screen.getByText('Tags')).toHaveClass('text-xs', 'font-field-label')
     expect(screen.getByText('Tags')).not.toHaveClass('text-field-array-legend')
   })
 

@@ -115,13 +115,43 @@ export const fieldGroupLegendTypographyClasses =
 /** Nested subgroup legend typography — smaller scale for groups inside another group. */
 export const fieldSubgroupLegendTypographyClasses =
   'text-field-subgroup-legend font-heading leading-none text-foreground'
-export const fieldArrayLegendSpacingClasses = 'mb-4'
-/** Repeatable array section legend — between subgroup and field labels. */
+/** Repeatable array section legend — matches leaf field label typography. */
+export const fieldLabelTypographyVariants = cva('font-field-label leading-none text-foreground', {
+  variants: {
+    size: fieldSizeTypographyClasses,
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Legend-to-list spacing — mirrors {@link fieldAnatomyStackVariants} label→control gap. */
+export const fieldArrayLegendSpacingVariants = cva('', {
+  variants: {
+    size: {
+      sm: 'mb-1',
+      md: 'mb-1.5',
+      lg: 'mb-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Typography + spacing for array section `<legend>` — SSOT with leaf field labels. */
+export function resolveArrayLegendClassName(size: FieldSizeToken = 'md'): string {
+  return cn(fieldLabelTypographyVariants({ size }), fieldArrayLegendSpacingVariants({ size }))
+}
+
+/** @deprecated Use {@link resolveArrayLegendClassName} — retained for class drift tests. */
+export const fieldArrayLegendSpacingClasses = 'mb-1.5'
+/** @deprecated Use {@link fieldLabelTypographyVariants}. */
 export const fieldArrayLegendTypographyClasses =
-  'text-field-array-legend font-heading leading-none text-foreground'
-/** Compact array section legend — follows section `size: 'sm'` (14px). */
+  'text-md font-field-label leading-none text-foreground'
+/** @deprecated Use {@link fieldLabelTypographyVariants}. */
 export const fieldArrayLegendSmTypographyClasses =
-  'text-sm font-heading leading-none text-foreground'
+  'text-xs font-field-label leading-none text-foreground'
 /** Legend row when the add action sits inline with the array heading. */
 export const arrayFieldLegendInlineLayoutClasses = 'flex w-full items-center justify-between gap-4'
 export const arrayFieldLegendInlineLabelClasses = 'flex min-w-0 items-center gap-2'
@@ -380,10 +410,10 @@ export type FieldStackLayout = 'default' | 'dependent'
 
 export type FieldGroupLegendSize = 'section' | 'subsection' | 'array'
 
-/** Legend type scale for array sections — `sm` when section field size is compact. */
+/** @deprecated Array legends use {@link resolveArrayLegendClassName} — scale is unused. */
 export type FieldGroupLegendScale = 'default' | 'sm'
 
-/** Maps array section field size to legend typography scale. */
+/** @deprecated Array legends use {@link resolveArrayLegendClassName}. */
 export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendScale {
   return size === 'sm' ? 'sm' : 'default'
 }
@@ -400,18 +430,6 @@ export const fieldGroupLegendVariants = cva('', {
       sm: '',
     },
   },
-  compoundVariants: [
-    {
-      size: 'array',
-      scale: 'default',
-      class: fieldArrayLegendTypographyClasses,
-    },
-    {
-      size: 'array',
-      scale: 'sm',
-      class: fieldArrayLegendSmTypographyClasses,
-    },
-  ],
   defaultVariants: {
     size: 'section',
     scale: 'default',
@@ -434,11 +452,14 @@ export const fieldGroupLegendHeaderMarginVariants = cva('', {
 
 export type FieldGroupLegendVariantProps = VariantProps<typeof fieldGroupLegendVariants>
 
-/** Typography + header margin for `<legend>` on groups, subgroups, and array sections. */
+/** Typography + header margin for `<legend>` on groups and subgroups. */
 export function resolveFieldGroupLegendClassName(
-  options: FieldGroupLegendVariantProps = {},
+  options: FieldGroupLegendVariantProps & { fieldSize?: FieldSizeToken } = {},
 ): string {
   const size = options.size ?? 'section'
+  if (size === 'array') {
+    return resolveArrayLegendClassName(options.fieldSize ?? 'sm')
+  }
   return cn(fieldGroupLegendVariants(options), fieldGroupLegendHeaderMarginVariants({ size }))
 }
 

@@ -106,10 +106,48 @@ describe('ArrayFieldRenderer', () => {
     localStorage.clear()
   })
 
+  it('wraps a top-level array fieldset in one shared field container', () => {
+    const { container } = renderForm()
+
+    const fieldset = screen.getByRole('group', { name: /Traits/ })
+    const shell = fieldset.closest('.bg-field-container')
+    expect(shell).toBeInstanceOf(HTMLElement)
+    expect(shell).toContainElement(fieldset)
+    expect(fieldset).toHaveClass('border-0', 'flex', 'flex-col')
+    expect(shell).toContainElement(screen.getByText('Traits'))
+    expect(shell).toContainElement(screen.getByRole('button', { name: 'Add trait' }))
+    expect(container.querySelectorAll('.bg-field-container')).toHaveLength(2)
+  })
+
+  it('opts out of the shared array container with fieldChrome none', () => {
+    const unboxedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fieldChrome: { variant: 'none' },
+        fields: traitFields,
+        addAction: { label: 'Add trait' },
+      },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={unboxedFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(container.querySelector('.bg-field-container')).toBeNull()
+    expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
+  })
+
   it('renders the add button and legend for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
-    expect(screen.getByText('Traits')).toHaveClass('text-sm')
+    expect(screen.getByText('Traits')).toHaveClass('text-xs', 'font-field-label')
     expect(screen.getByText('Traits')).not.toHaveClass('text-field-array-legend')
     expect(screen.getByText('Traits')).not.toHaveClass('text-field-group-legend')
     expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(

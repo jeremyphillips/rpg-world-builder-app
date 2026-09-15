@@ -2,11 +2,11 @@
 
 import type { ReactNode } from 'react'
 
+import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
 import {
   arrayFieldLegendInlineLabelClasses,
   arrayFieldLegendInlineLayoutClasses,
-  resolveFieldGroupLegendClassName,
-  type FieldGroupLegendSize,
+  resolveArrayLegendClassName,
 } from '../../../components/ui/field.variants'
 import { cn } from '../../../lib/utils'
 import type { ArrayAddActionLayout } from '../../field-config'
@@ -14,8 +14,7 @@ import { ArrayLegendIssueLink } from './array-item-issue.client'
 
 export interface ArrayFieldLegendProps {
   legend: string
-  legendSize: FieldGroupLegendSize
-  legendScale: 'default' | 'sm'
+  legendFieldSize: FieldSizeToken
   addActionLayout: ArrayAddActionLayout
   arrayIssueCount: number
   invalidRowCount: number
@@ -26,18 +25,14 @@ export interface ArrayFieldLegendProps {
 /** Array section `<legend>` — optional inline add action on the right. */
 export function ArrayFieldLegend({
   legend,
-  legendSize,
-  legendScale,
+  legendFieldSize,
   addActionLayout,
   arrayIssueCount,
   invalidRowCount,
   onFocusFirstArrayIssue,
   addControl,
 }: ArrayFieldLegendProps) {
-  const legendClassName = resolveFieldGroupLegendClassName({
-    size: legendSize,
-    scale: legendScale,
-  })
+  const legendClassName = resolveArrayLegendClassName(legendFieldSize)
 
   if (addActionLayout === 'inline') {
     return (
