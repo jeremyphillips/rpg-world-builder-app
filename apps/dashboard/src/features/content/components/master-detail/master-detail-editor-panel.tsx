@@ -75,7 +75,7 @@ function MasterDetailSelectedRowEditor({
         </div>
       ) : null}
       <FormItems
-        key={selectedFieldId}
+        key={`${selectedFieldId}:${selectedIndex}`}
         items={wrapMasterDetailDetailFields(itemFields)}
         idPrefix={`${idPrefix}-${selectedFieldId}`}
         namePrefix={`${fieldName}.${selectedIndex}`}

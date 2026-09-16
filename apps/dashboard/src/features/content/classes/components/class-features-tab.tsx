@@ -41,9 +41,11 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
   const editor = useMasterDetailArray(FEATURES_FIELD_NAME, makeItemDefaults)
 
   const previousFieldsLengthRef = useRef(editor.fields.length)
-  const previousSelectedLevelRef = useRef<number | string | undefined>(undefined)
+  /** Last seen level per stable RHF field id — avoids re-sorting on cross-level selection. */
+  const levelByFieldIdRef = useRef<Map<string, number | string>>(new Map())
 
   const selectedIndex = editor.selectedIndex
+  const selectedFieldId = editor.selectedFieldId
   const selectedLevel = useWatch({
     name: `${FEATURES_FIELD_NAME}.${selectedIndex ?? 0}.level`,
   }) as number | string | undefined
@@ -62,22 +64,15 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
   }, [editor, editor.fields])
 
   useEffect(() => {
-    if (selectedIndex === null) {
-      previousSelectedLevelRef.current = undefined
-      return
-    }
+    if (selectedIndex === null || !selectedFieldId || selectedLevel === undefined) return
 
-    const selectedFieldId = editor.selectedFieldId
-    if (
-      previousSelectedLevelRef.current !== undefined &&
-      selectedLevel !== previousSelectedLevelRef.current &&
-      selectedFieldId
-    ) {
+    const previousLevel = levelByFieldIdRef.current.get(selectedFieldId)
+    if (previousLevel !== undefined && selectedLevel !== previousLevel) {
       editor.normalizeOrder(compareFeaturesByLevel, { appendFieldId: selectedFieldId })
     }
 
-    previousSelectedLevelRef.current = selectedLevel
-  }, [editor, selectedIndex, selectedLevel])
+    levelByFieldIdRef.current.set(selectedFieldId, selectedLevel)
+  }, [editor, selectedFieldId, selectedIndex, selectedLevel])
 
   const resolveRowReasons = useCallback(
     ({ row }: { row: unknown }) => {

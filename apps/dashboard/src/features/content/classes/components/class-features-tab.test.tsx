@@ -1,5 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useEffect } from 'react'
+import { useFormContext, type UseFormReturn } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TestFormShell } from '@/test/form-shell'
@@ -22,22 +24,43 @@ type Feature = {
   available?: boolean
 }
 
+function FormApiCapture({ onReady }: { onReady: (form: UseFormReturn) => void }) {
+  const form = useFormContext()
+
+  useEffect(() => {
+    onReady(form)
+  }, [form, onReady])
+
+  return null
+}
+
 function TabShell({
   features = [] as Feature[],
   entitySource,
   embeddedSeedRowIds,
   formCtx = {},
+  onFormReady,
 }: {
   features?: Feature[]
   entitySource?: ContentFormCtx['entitySource']
   embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
   formCtx?: ContentFormCtx
+  onFormReady?: (form: UseFormReturn) => void
 }) {
   return (
     <TestFormShell defaultValues={{ features }}>
+      {onFormReady ? <FormApiCapture onReady={onFormReady} /> : null}
       <ClassFeaturesTab formCtx={{ entitySource, embeddedSeedRowIds, ...formCtx }} />
     </TestFormShell>
   )
+}
+
+function readListFeatureTitles(): string[] {
+  const list = within(screen.getByRole('navigation', { name: 'Features' }))
+  return list.getAllByRole('listitem').map((item) => {
+    const button = within(item).getByRole('button')
+    return button.textContent?.replace(/\s+/g, ' ').trim() ?? ''
+  })
 }
 
 const rage: Feature = { id: 'f1', name: 'Rage', level: 1, description: '', grants: [] }
@@ -141,6 +164,71 @@ describe('ClassFeaturesTab', () => {
 
     expect(screen.getAllByText('Available').length).toBeGreaterThan(0)
     expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
+  })
+
+  it('does not reorder level peers when selecting a feature at a different level', async () => {
+    const user = userEvent.setup()
+    const weaponMastery: Feature = {
+      id: 'f3',
+      name: 'Weapon Mastery',
+      level: 1,
+      description: '',
+      grants: [],
+    }
+    const dangerSense: Feature = {
+      id: 'f4',
+      name: 'Danger Sense',
+      level: 2,
+      description: '',
+      grants: [],
+    }
+    const recklessAttack: Feature = {
+      id: 'f5',
+      name: 'Reckless Attack',
+      level: 2,
+      description: '',
+      grants: [],
+    }
+
+    render(<TabShell features={[rage, unarmored, weaponMastery, dangerSense, recklessAttack]} />)
+
+    const list = within(screen.getByRole('navigation', { name: 'Features' }))
+
+    await user.click(list.getByRole('button', { name: /Weapon Mastery/i }))
+    await user.click(list.getByRole('button', { name: /Danger Sense/i }))
+
+    expect(readListFeatureTitles().join('|')).toMatch(/Danger Sense.*Reckless Attack/)
+  })
+
+  it('reorders the selected feature after its level is edited', async () => {
+    const user = userEvent.setup()
+    let formApi: UseFormReturn | undefined
+
+    render(
+      <TabShell
+        features={[
+          { id: 'f1', name: 'A', level: 1, description: '', grants: [] },
+          { id: 'f2', name: 'B', level: 12, description: '', grants: [] },
+          { id: 'f3', name: 'C', level: 1, description: '', grants: [] },
+        ]}
+        onFormReady={(form) => {
+          formApi = form
+        }}
+      />,
+    )
+
+    const list = within(screen.getByRole('navigation', { name: 'Features' }))
+
+    await user.click(list.getByRole('button', { name: /Level 12 B/i }))
+    formApi!.setValue('features.1.level', 1, { shouldDirty: true })
+
+    await waitFor(() => {
+      expect(formApi!.getValues('features').map((row: Feature) => row.name)).toEqual([
+        'A',
+        'C',
+        'B',
+      ])
+    })
   })
 
   it('shows availability alert for subclass-choice rows when subclassing is disabled', () => {
