@@ -1,4 +1,10 @@
-import { getContentTypeTerm, vocabularyTermLabel, type ContentTypeKey } from '@rpg/contracts'
+import {
+  getContentTypeTerm,
+  resolveChoicePlaceholder,
+  vocabularyTermLabel,
+  type ContentTypeKey,
+  type FieldNoun,
+} from '@rpg/contracts'
 
 /** Capitalizes the first letter of each word for hub and navigation surfaces. */
 function titleCaseWords(value: string): string {
@@ -119,7 +125,11 @@ export function formatChooseContentTypePlaceholder(
   key: ContentTypeKey,
   options?: { plural?: boolean },
 ): string {
-  return `Choose ${getContentTypeMidSentenceLabel(key, options)}…`
+  const singular = getContentTypeMidSentenceLabel(key)
+  const noun: FieldNoun = options?.plural
+    ? { singular, plural: getContentTypeMidSentenceLabel(key, { plural: true }) }
+    : { singular }
+  return resolveChoicePlaceholder(noun, options?.plural === true)
 }
 
 /** Action label — e.g. "Add equipment". */

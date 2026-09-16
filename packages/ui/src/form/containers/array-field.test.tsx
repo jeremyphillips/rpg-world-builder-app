@@ -1513,7 +1513,7 @@ describe('ArrayFieldRenderer', () => {
       )
     })
 
-    expect(screen.getByText('Select a rarity.')).toBeInTheDocument()
+    expect(screen.getByText('Choose a rarity.')).toBeInTheDocument()
     expect(screen.getByText('Quantity is required.')).toBeInTheDocument()
     expect(
       within(screen.getByRole('group', { name: 'Item actions' })).queryByRole('button', {
@@ -1571,9 +1571,9 @@ describe('ArrayFieldRenderer', () => {
       )
     })
 
-    expect(screen.queryByText('Select a rarity.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Choose a rarity.')).not.toBeInTheDocument()
     expect(screen.queryByText('Quantity is required.')).not.toBeInTheDocument()
-    expect(screen.getByRole('alert')).toHaveTextContent('Select a rarity. · Quantity is required.')
+    expect(screen.getByRole('alert')).toHaveTextContent('Choose a rarity. · Quantity is required.')
   })
 
   it('appends defaults from addActionMenu selections', async () => {

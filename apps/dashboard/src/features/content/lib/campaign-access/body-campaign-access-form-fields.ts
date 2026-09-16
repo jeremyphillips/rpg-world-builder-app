@@ -60,7 +60,6 @@ function buildBodyParticipantField(
     info: CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
     multiple: true,
     options: [...(participantOptions ?? [])],
-    placeholder: 'Choose players…',
     required: true,
   }
 }

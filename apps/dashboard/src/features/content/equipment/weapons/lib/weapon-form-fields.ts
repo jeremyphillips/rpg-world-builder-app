@@ -46,8 +46,6 @@ const weaponPropertyOptions = toOptions(
   labelsFromEntries(WEAPON_PROPERTY_ENTRIES),
 )
 
-const WEAPON_SELECT_PLACEHOLDER = 'Choose...'
-
 function visibleWhenVersatile(): FieldVisibility {
   return {
     dependsOn: ['properties', 'hasDamage'],
@@ -109,7 +107,6 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
             name: 'category',
             label: 'Category',
             options: weaponCategoryOptions,
-            placeholder: WEAPON_SELECT_PLACEHOLDER,
             required: true,
           },
           {
@@ -117,7 +114,6 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
             name: 'mode',
             label: 'Mode',
             options: weaponModeOptions,
-            placeholder: WEAPON_SELECT_PLACEHOLDER,
             required: true,
           },
           {
@@ -125,7 +121,6 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
             name: 'mastery',
             label: 'Mastery',
             options: weaponMasteryOptions,
-            placeholder: WEAPON_SELECT_PLACEHOLDER,
             required: true,
             optionAvailability: weaponMasteryOptionAvailability,
             hint: {

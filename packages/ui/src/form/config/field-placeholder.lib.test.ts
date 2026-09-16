@@ -1,13 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveSelectPlaceholder } from './field-placeholder.lib'
+import { resolveFieldPlaceholder } from './field-placeholder.lib'
 
-describe('resolveSelectPlaceholder', () => {
-  it('returns Select {label}… when placeholder is omitted', () => {
-    expect(resolveSelectPlaceholder('Spellcasting ability')).toBe('Select Spellcasting ability…')
+describe('resolveFieldPlaceholder', () => {
+  it('defaults single-select placeholders to Choose vocabulary', () => {
+    expect(resolveFieldPlaceholder({ label: 'Spellcasting ability', category: 'choice' })).toBe(
+      'Choose a spellcasting ability…',
+    )
   })
 
-  it('preserves an explicit placeholder', () => {
-    expect(resolveSelectPlaceholder('Spells', 'Choose spells…')).toBe('Choose spells…')
+  it('defaults multi-select placeholders to plural Choose vocabulary', () => {
+    expect(
+      resolveFieldPlaceholder({
+        label: 'Primary abilities',
+        category: 'multi',
+        noun: { singular: 'primary ability', plural: 'primary abilities' },
+      }),
+    ).toBe('Choose primary abilities…')
+  })
+
+  it('respects explicit placeholder overrides', () => {
+    expect(resolveFieldPlaceholder({ label: 'Spells', category: 'choice' }, 'Choose spells…')).toBe(
+      'Choose spells…',
+    )
+  })
+
+  it('returns undefined for text-like categories', () => {
+    expect(resolveFieldPlaceholder({ label: 'Name', category: 'text' })).toBeUndefined()
   })
 })

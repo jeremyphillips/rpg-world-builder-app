@@ -1,3 +1,4 @@
+import { fieldValidationMessages, formatFieldMessage } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { buildCreateCampaignInput } from '../settings/campaign-settings-form-values'
@@ -26,7 +27,9 @@ describe('inviteMembersSchema', () => {
 
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toBe('Enter a valid email address.')
+      expect(formatFieldMessage(result.error.issues[0]?.message ?? '')).toBe(
+        formatFieldMessage(fieldValidationMessages.invalidEmail()),
+      )
     }
   })
 

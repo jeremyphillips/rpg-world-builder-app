@@ -40,7 +40,7 @@ export const WithInfo: Story = {
 export const WithError: Story = {
   args: {
     chipsValue: [],
-    error: 'Select at least one skill option.',
+    error: 'Choose at least one skill option.',
     required: true,
   },
 }

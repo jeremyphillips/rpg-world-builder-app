@@ -21,7 +21,9 @@ shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: 
 | `select`          | `string`  | `labelPosition`: `inline`, `above`, `settings`                             |
 | `file`            | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                |
 
-`select` and `combobox` fields default to `Select {label}…` when `placeholder` is omitted.
+`select` and `combobox` fields default to `Choose {label}…` when `placeholder` is omitted.
+Multi-select chips/combobox fields with `min` / `max` also derive constraint hints from the
+shared copy resolver unless an explicit `hint` is provided.
 
 ### Text suggestions (`textSuggestions`)
 

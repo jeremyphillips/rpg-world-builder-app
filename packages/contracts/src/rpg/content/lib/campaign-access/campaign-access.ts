@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { fieldValidationMessages } from '../../../../validation/messages'
 import { contentVisibilityModeSchema } from '../../../vocab/content-visibility'
 import { contentUsageBlockerSchema } from '../content-usage-blocker'
 
@@ -17,7 +18,7 @@ export const contentCampaignAccessPatchSchema = contentCampaignAccessSchema
     if (data.visibilityMode === 'specific_players' && data.participantIds.length < 1) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Select at least one player.',
+        message: fieldValidationMessages.minSelections({ itemLabel: 'player' }),
         path: ['participantIds'],
       })
     }

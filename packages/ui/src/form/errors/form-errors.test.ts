@@ -89,7 +89,7 @@ describe('flattenFormIssues', () => {
 
   it('decodes structured field and summary messages with messageId and params', () => {
     const structured = encodeStructuredMessage(
-      'Select a rarity.',
+      'Choose a rarity.',
       'Missing Rarity',
       'validation.field.requiredSelect',
       { label: 'Rarity' },
@@ -100,7 +100,7 @@ describe('flattenFormIssues', () => {
 
     const issues = classifyFormIssues(flattenFormIssues(errors), {})
     expect(issues[0]).toMatchObject({
-      message: 'Select a rarity.',
+      message: 'Choose a rarity.',
       summaryMessage: 'Missing Rarity',
       messageId: 'validation.field.requiredSelect',
       messageParams: { label: 'Rarity' },
@@ -186,7 +186,7 @@ describe('groupIssuesForItemPrefix', () => {
       [
         {
           path: 'grants.0.rarity',
-          message: 'Select a rarity.',
+          message: 'Choose a rarity.',
           summaryMessage: 'Missing Rarity',
           severity: 'field',
           relativePath: 'rarity',
@@ -203,7 +203,7 @@ describe('groupIssuesForItemPrefix', () => {
     )
 
     const group = groupIssuesForItemPrefix(issues, 'grants.0', 'grants', 0, ['rarity', 'quantity'])
-    expect(group.fieldSummary).toBe('Select a rarity. · Quantity is required.')
+    expect(group.fieldSummary).toBe('Choose a rarity. · Quantity is required.')
   })
 })
 

@@ -170,12 +170,12 @@ describe('ChipsField', () => {
         options={playStyleOptions}
         multiple
         value={[]}
-        error="Select at least one."
+        error="Choose at least one."
       />,
     )
     const error = screen.getByRole('alert')
     const fieldset = error.previousElementSibling
-    expect(error).toHaveTextContent('Select at least one.')
+    expect(error).toHaveTextContent('Choose at least one.')
     expect(fieldset?.tagName).toBe('FIELDSET')
     expect(error.parentElement).toHaveClass('gap-y-1.5')
   })
@@ -188,7 +188,7 @@ describe('ChipsField', () => {
         options={playStyleOptions}
         multiple
         value={[]}
-        error="Select at least one."
+        error="Choose at least one."
         size="sm"
       />,
     )
@@ -441,7 +441,7 @@ describe('ChipsField', () => {
         multiple
         value={[]}
         required
-        error="Select at least one."
+        error="Choose at least one."
       />,
     )
     await expectNoAxeViolations(container)

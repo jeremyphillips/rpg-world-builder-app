@@ -110,7 +110,6 @@ function mechanicsKnobsGroup(attackResolutionModeOptions: FieldOption[]): FormIt
         label: vocabularyFieldLabel(ATTACK_RESOLUTION_MODE_TERM),
         required: true,
         options: attackResolutionModeOptions,
-        placeholder: 'Choose attack resolution…',
         hint: 'How attack rolls are compared to the target armor class.',
       },
     ],

@@ -4,6 +4,8 @@
  * composite-field path expansion (level range, inline sentence, etc.).
  */
 
+import type { FieldNoun } from '@rpg/contracts'
+
 import type {
   ChooseFromChipsFieldConfig,
   DiceFormulaFieldConfig,
@@ -22,6 +24,8 @@ export type RegistryEntry = {
   category: FieldMessageCategory
   /** Mid-sentence singular item label for array min/max copy (from `itemHeader`). */
   itemLabel?: string
+  /** Explicit singular/plural noun phrases for generated validation copy. */
+  noun?: FieldNoun
 }
 
 type RegistryKey = (name: string) => string
@@ -200,7 +204,7 @@ export function registerFieldPaths(
     return
   }
 
-  registry.set(key(field.name), { label: field.label, category })
+  registry.set(key(field.name), { label: field.label, category, noun: field.noun })
 
   if (field.type === 'chooseFromChips') {
     registerChooseFromChipsField(registry, key, field as ChooseFromChipsFieldConfig)

@@ -104,7 +104,7 @@ describe('validateContentPublishValues', () => {
     )
     expect(
       formatFieldMessage(result.current.getFieldState('primaryAbilities').error?.message ?? ''),
-    ).toBe('Select at least one primary ability.')
+    ).toBe('Choose at least one primary ability.')
     expect(formatFieldMessage(result.current.getFieldState('quantity').error?.message ?? '')).toBe(
       'Enter a valid number.',
     )

@@ -63,8 +63,6 @@ export const castingTimeUnitOptions = toOptions(
   ) as Record<(typeof CASTING_TIME_UNITS)[number], string>,
 )
 
-export const SPELL_CASTING_SELECT_PLACEHOLDER = 'Choose…'
-
 export const rangeKindOptions = toOptions(
   SPELL_RANGE_KINDS,
   Object.fromEntries(

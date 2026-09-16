@@ -1,6 +1,11 @@
 import { z } from 'zod'
 import type { ReactNode } from 'react'
-import { ABILITY_ENTRIES, ABILITY_IDS, type AbilityGenerationMethod } from '@rpg/contracts'
+import {
+  ABILITY_ENTRIES,
+  ABILITY_IDS,
+  fieldValidationMessages,
+  type AbilityGenerationMethod,
+} from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 const abilityScoreSchema = z.coerce.number().int().optional()
@@ -19,7 +24,9 @@ export const abilitiesFormSchema = z
       if (typeof values[ability] !== 'number') {
         ctx.addIssue({
           code: 'custom',
-          message: `${ABILITY_ENTRIES[ability].label} is required.`,
+          message: fieldValidationMessages.requiredText({
+            label: ABILITY_ENTRIES[ability].label,
+          }),
           path: [ability],
         })
       }

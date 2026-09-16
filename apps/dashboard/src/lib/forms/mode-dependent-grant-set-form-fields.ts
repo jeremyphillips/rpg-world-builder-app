@@ -104,7 +104,6 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
       ...(itemsHint ? { hint: itemsHint } : {}),
       multiple: true,
       options: itemOptions,
-      placeholder: 'Choose items…',
       width: 'full',
       ...(itemsRequired ? { required: true } : {}),
       visibility: visibleWhenGrantMode(modeFieldName, specificMode),

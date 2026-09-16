@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { campaignInviteRecipientInputSchema } from '@rpg/contracts'
+import { campaignInviteRecipientInputSchema, fieldValidationMessages } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 const inviteEmailEntrySchema = z.object({
@@ -29,7 +29,7 @@ export const inviteMembersSchema = z
       if (!parsed.success) {
         ctx.addIssue({
           code: 'custom',
-          message: 'Enter a valid email address.',
+          message: fieldValidationMessages.invalidEmail(),
           path: ['inviteEmails', entry.index, 'email'],
         })
       }
@@ -52,6 +52,7 @@ export const inviteMembersFields: FormItem[] = [
         autoComplete: 'email',
       },
     ],
+    max: 10,
     addAction: { label: 'Add another email' },
     item: {
       header: {

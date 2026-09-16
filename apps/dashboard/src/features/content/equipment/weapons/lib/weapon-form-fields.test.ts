@@ -162,7 +162,7 @@ describe('weapon kindFieldGroups', () => {
     })
   })
 
-  it('uses Choose... placeholders for required weapon selects', () => {
+  it('omits hardcoded placeholders on required weapon selects', () => {
     const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
     const coreRow = weaponGroup.fields.find(
       (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'row' }> =>
@@ -177,11 +177,11 @@ describe('weapon kindFieldGroups', () => {
     }
 
     for (const name of ['category', 'mode', 'mastery'] as const) {
-      expect(
-        coreRow.fields.find(
-          (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === name,
-        ),
-      ).toMatchObject({ placeholder: 'Choose...' })
+      const field = coreRow.fields.find(
+        (child) => !('kind' in child) && resolveFieldConfigPrimaryName(child) === name,
+      )
+      expect(field).toBeDefined()
+      expect(field && 'placeholder' in field ? field.placeholder : undefined).toBeUndefined()
     }
   })
 

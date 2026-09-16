@@ -6,7 +6,7 @@ import { defineMessage } from './define-message'
 // ---------------------------------------------------------------------------
 
 /**
- * Lowercases a label for mid-sentence use ("Select a valid rarity.") while
+ * Lowercases a label for mid-sentence use ("Choose a valid rarity.") while
  * preserving acronyms and initialisms ("XP", "AC bonus").
  */
 export function midSentenceLabel(label: string): string {
@@ -45,6 +45,70 @@ export const requiredWhenCopy = (subjectLabel: string, conditionClause: string) 
 export const betweenCopy = (subjectLabel: string, min: string | number, max: string | number) =>
   `${subjectLabel} must be between ${min} and ${max}.`
 
+/** Singular/plural noun phrases for generated field copy (validation, hints, placeholders). */
+export type FieldNoun = {
+  singular: string
+  plural?: string
+}
+
+/** Best-effort noun metadata from a field label when explicit `noun` is omitted. */
+export function nounFromLabel(label: string): FieldNoun {
+  return {
+    singular: midSentenceLabel(singularizeLabel(label)),
+    plural: midSentenceLabel(label),
+  }
+}
+
+function pluralNounPhrase(noun: FieldNoun): string {
+  return midSentenceLabel(noun.plural ?? noun.singular)
+}
+
+function singularNounPhrase(noun: FieldNoun): string {
+  return midSentenceLabel(noun.singular)
+}
+
+export type ChoiceCountConstraints = {
+  min?: number
+  max?: number
+}
+
+/**
+ * Shared choice-field count copy for validation messages and constraint hints.
+ * Uses "one" for a minimum of 1; numerals elsewhere (including ranges).
+ */
+export function choiceCountPhrase(noun: FieldNoun, constraints: ChoiceCountConstraints): string {
+  const { min, max } = constraints
+  const plural = pluralNounPhrase(noun)
+
+  if (min !== undefined && max !== undefined) {
+    if (min === max) {
+      if (min === 1) return `Choose one ${singularNounPhrase(noun)}.`
+      return `Choose ${min} ${plural}.`
+    }
+    return `Choose ${min}–${max} ${plural}.`
+  }
+
+  if (min !== undefined) {
+    if (min === 1) return `Choose at least one ${singularNounPhrase(noun)}.`
+    return `Choose at least ${min} ${plural}.`
+  }
+
+  if (max !== undefined) {
+    if (max === 1) return `Choose up to one ${singularNounPhrase(noun)}.`
+    return `Choose up to ${max} ${plural}.`
+  }
+
+  return `Choose ${plural}.`
+}
+
+/** Default closed-state placeholder for single- or multi-select choice fields. */
+export function resolveChoicePlaceholder(noun: FieldNoun, multiple: boolean): string {
+  if (multiple) {
+    return `Choose ${pluralNounPhrase(noun)}…`
+  }
+  return `Choose ${withArticle(singularNounPhrase(noun))}…`
+}
+
 // ---------------------------------------------------------------------------
 // Global field validation defaults (tier 1). Formatted by the form layer's
 // error map with the field's configured label — schemas stay message-free.
@@ -60,18 +124,18 @@ export const fieldValidationMessages = {
   /** Empty required choice-like field (select, radio, chips single, combobox). */
   requiredSelect: defineMessage<{ label: string }>(
     'validation.field.requiredSelect',
-    ({ label }) => `Select ${withArticle(midSentenceLabel(label))}.`,
+    ({ label }) => `Choose ${withArticle(midSentenceLabel(label))}.`,
     ({ label }) => `Missing ${label}`,
   ),
   /** Empty required choice-like field using a vocab sentence phrase (no article). */
   requiredSelectPhrase: defineMessage<{ phrase: string }>(
     'validation.field.requiredSelectPhrase',
-    ({ phrase }) => `Select ${phrase}.`,
+    ({ phrase }) => `Choose ${phrase}.`,
   ),
   /** Value not among the allowed options. */
   invalidSelect: defineMessage<{ label: string }>(
     'validation.field.invalidSelect',
-    ({ label }) => `Select a valid ${midSentenceLabel(label)}.`,
+    ({ label }) => `Choose a valid ${midSentenceLabel(label)}.`,
     ({ label }) => `Invalid ${label}`,
   ),
   /** Unregistered field path with no configured label. */
@@ -101,12 +165,31 @@ export const fieldValidationMessages = {
   /** Multi-select choice field (chips/combobox) needs at least one selection. */
   minSelections: defineMessage<{ itemLabel: string }>(
     'validation.field.minSelections',
-    ({ itemLabel }) => `Select at least one ${itemLabel}.`,
+    ({ itemLabel }) => choiceCountPhrase({ singular: itemLabel }, { min: 1 }),
   ),
   /** Multi-select choice field needs `min` (> 1) selections; `itemsLabel` is plural. */
   minSelectionsCount: defineMessage<{ itemsLabel: string; min: number }>(
     'validation.field.minSelectionsCount',
-    ({ itemsLabel, min }) => `Select at least ${min} ${itemsLabel}.`,
+    ({ itemsLabel, min }) =>
+      choiceCountPhrase({ singular: itemsLabel, plural: itemsLabel }, { min }),
+  ),
+  /** Multi-select choice field exceeds `max` selections; `itemsLabel` is plural. */
+  maxSelectionsCount: defineMessage<{ itemsLabel: string; max: number }>(
+    'validation.field.maxSelectionsCount',
+    ({ itemsLabel, max }) =>
+      choiceCountPhrase({ singular: itemsLabel, plural: itemsLabel }, { max }),
+  ),
+  /** Multi-select choice field must contain exactly `count` selections. */
+  exactSelectionsCount: defineMessage<{ itemsLabel: string; count: number }>(
+    'validation.field.exactSelectionsCount',
+    ({ itemsLabel, count }) =>
+      choiceCountPhrase({ singular: itemsLabel, plural: itemsLabel }, { min: count, max: count }),
+  ),
+  /** Multi-select choice field must contain between `min` and `max` selections. */
+  rangeSelectionsCount: defineMessage<{ itemsLabel: string; min: number; max: number }>(
+    'validation.field.rangeSelectionsCount',
+    ({ itemsLabel, min, max }) =>
+      choiceCountPhrase({ singular: itemsLabel, plural: itemsLabel }, { min, max }),
   ),
   /** Repeatable array container needs at least one entry. */
   minItems: defineMessage<{ itemLabel: string }>(

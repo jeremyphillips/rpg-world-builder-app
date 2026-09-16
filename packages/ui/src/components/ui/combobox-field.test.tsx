@@ -37,7 +37,7 @@ describe('ComboboxField', () => {
     )
   })
 
-  it('defaults the placeholder to Select {label}…', () => {
+  it('defaults the placeholder to Choose {label}…', () => {
     render(
       <ComboboxField
         id="weapons"
@@ -48,7 +48,7 @@ describe('ComboboxField', () => {
       />,
     )
     expect(screen.getByRole('combobox', { name: 'Specific weapons' })).toHaveTextContent(
-      'Select Specific weapons…',
+      'Choose specific weapons…',
     )
   })
 
@@ -448,7 +448,7 @@ describe('ComboboxField', () => {
         multiple
         value={[]}
         required
-        error="Select at least one."
+        error="Choose at least one."
       />,
     )
     await expectNoAxeViolations(container)

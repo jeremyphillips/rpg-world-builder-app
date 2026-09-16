@@ -35,9 +35,13 @@ export function coreAttributesFields(ctx?: ContentFormCtx): FormItem[] {
               name: 'primaryAbilities',
               label: 'Primary abilities',
               options: abilityOptions,
+              min: 1,
               max: 2,
               required: true,
-              hint: 'Select up to 2 abilities',
+              noun: {
+                singular: 'primary ability',
+                plural: 'primary abilities',
+              },
             },
             {
               type: 'chips',

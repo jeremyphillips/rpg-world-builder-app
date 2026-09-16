@@ -32,7 +32,7 @@ import {
   type FieldOption,
   type SelectFieldOptionListItem,
 } from '../../form/field-config'
-import { resolveSelectPlaceholder } from '../../form/config/field-placeholder.lib'
+import { resolveFieldPlaceholder } from '../../form/config/field-placeholder.lib'
 
 export type SelectFieldOption = FieldOption
 
@@ -123,7 +123,7 @@ export function SelectField({
   onBlur,
   chrome,
 }: SelectFieldProps) {
-  const resolvedPlaceholder = resolveSelectPlaceholder(label, placeholder)
+  const resolvedPlaceholder = resolveFieldPlaceholder({ label, category: 'choice' }, placeholder)
   const resolvedHintPosition = hintPosition ?? 'below-label'
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 

@@ -24,7 +24,7 @@ import type {
 import type { SelectFieldValueProps } from './select-field-value-props'
 import type { FieldChromeProps } from './field-chrome.variants'
 import { resolveFieldAnatomyWidth } from './field-chrome.variants'
-import { resolveSelectPlaceholder } from '../../form/config/field-placeholder.lib'
+import { resolveFieldPlaceholder } from '../../form/config/field-placeholder.lib'
 import { useComboboxControl } from './use-combobox-control.client'
 import type { FieldLabelPresentationProps } from './field-label-props'
 
@@ -166,7 +166,10 @@ export function ComboboxField({
   chrome,
 }: ComboboxFieldProps) {
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
-  const resolvedPlaceholder = resolveSelectPlaceholder(label, placeholder)
+  const resolvedPlaceholder = resolveFieldPlaceholder(
+    { label, category: multiple ? 'multi' : 'choice' },
+    placeholder,
+  )
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
@@ -204,7 +207,7 @@ export function ComboboxField({
             disabled={disabled}
             loading={loading}
             size={size}
-            placeholder={resolvedPlaceholder}
+            placeholder={resolvedPlaceholder ?? ''}
             emptyMessage={emptyMessage}
             enableSearch={enableSearch}
             renderSelectedItem={renderSelectedItem}

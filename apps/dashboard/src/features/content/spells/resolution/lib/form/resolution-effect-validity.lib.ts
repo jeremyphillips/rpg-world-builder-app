@@ -54,7 +54,7 @@ export function formatResolutionEffectCompletenessMessage(
       return 'Complete the damage roll.'
     }
     if (missing.includes('damageType')) {
-      return `Select ${withArticle(getTermSentenceForm(DAMAGE_TYPE_TERM, 1))}.`
+      return `Choose ${withArticle(getTermSentenceForm(DAMAGE_TYPE_TERM, 1))}.`
     }
   }
 

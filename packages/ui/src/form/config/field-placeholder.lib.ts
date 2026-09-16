@@ -1,6 +1,26 @@
-const SELECT_PLACEHOLDER_SUFFIX = '…'
+import { resolveChoicePlaceholder, type FieldNoun } from '@rpg/contracts'
 
-/** Default Radix select/combobox placeholder when a field config omits one. */
+import type { FieldMessageCategory } from './field-error-map-category.lib'
+
+export type FieldPlaceholderInput = {
+  label: string
+  noun?: FieldNoun
+  category: FieldMessageCategory
+}
+
+/** Default closed-state placeholder for choice fields when config omits one. */
+export function resolveFieldPlaceholder(
+  input: FieldPlaceholderInput,
+  placeholder?: string,
+): string | undefined {
+  if (placeholder !== undefined) return placeholder
+  if (input.category !== 'choice' && input.category !== 'multi') return undefined
+
+  const noun = input.noun ?? { singular: input.label, plural: input.label }
+  return resolveChoicePlaceholder(noun, input.category === 'multi')
+}
+
+/** @deprecated Use {@link resolveFieldPlaceholder} with a copy context instead. */
 export function resolveSelectPlaceholder(label: string, placeholder?: string): string {
-  return placeholder ?? `Select ${label}${SELECT_PLACEHOLDER_SUFFIX}`
+  return resolveFieldPlaceholder({ label, category: 'choice' }, placeholder) ?? `Choose ${label}…`
 }

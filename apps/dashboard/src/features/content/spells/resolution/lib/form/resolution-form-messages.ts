@@ -7,11 +7,11 @@ import { DAMAGE_TYPE_TERM, defineMessage, getTermSentenceForm, withArticle } fro
 export const resolutionFormValidationMessages = {
   attackTypeRequired: defineMessage(
     'validation.spellResolutionForm.attackTypeRequired',
-    () => 'Select a melee or ranged spell attack.',
+    () => 'Choose a melee or ranged spell attack.',
   ),
   saveAbilityRequired: defineMessage(
     'validation.spellResolutionForm.saveAbilityRequired',
-    () => 'Select a saving throw ability.',
+    () => 'Choose a saving throw ability.',
   ),
   proximityDistanceRequired: defineMessage(
     'validation.spellResolutionForm.proximityDistanceRequired',
@@ -32,7 +32,7 @@ export const resolutionFormValidationMessages = {
   ),
   damageTypeRequired: defineMessage(
     'validation.spellResolutionForm.damageTypeRequired',
-    () => `Select ${withArticle(getTermSentenceForm(DAMAGE_TYPE_TERM, 1))}.`,
+    () => `Choose ${withArticle(getTermSentenceForm(DAMAGE_TYPE_TERM, 1))}.`,
   ),
   projectileCountRequired: defineMessage(
     'validation.spellResolutionForm.projectileCountRequired',

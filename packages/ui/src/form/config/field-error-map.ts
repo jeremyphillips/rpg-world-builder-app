@@ -95,6 +95,11 @@ function formatRequired(entry: RegistryEntry): string {
 }
 
 function arrayItemsLabel(entry: RegistryEntry, form: 'singular' | 'plural'): string {
+  if (entry.noun) {
+    return form === 'plural'
+      ? midSentenceLabel(entry.noun.plural ?? entry.noun.singular)
+      : midSentenceLabel(entry.noun.singular)
+  }
   if (form === 'plural') return midSentenceLabel(entry.label)
   return entry.itemLabel ?? midSentenceLabel(singularizeLabel(entry.label))
 }
@@ -103,6 +108,12 @@ function formatArrayTooSmall(issue: RawZodIssueLike, entry: RegistryEntry): stri
   const min = Number(issue.minimum)
 
   if (issue.exact) {
+    if (isMultiCategory(entry.category)) {
+      return fieldValidationMessages.exactSelectionsCount({
+        itemsLabel: arrayItemsLabel(entry, 'plural'),
+        count: min,
+      })
+    }
     return fieldValidationMessages.exactItemsCount({
       itemsLabel: arrayItemsLabel(entry, 'plural'),
       count: min,
@@ -168,9 +179,21 @@ function formatTooBig(issue: RawZodIssueLike, entry: RegistryEntry): string {
 
   if (issue.origin === 'array') {
     if (issue.exact) {
+      if (isMultiCategory(entry.category)) {
+        return fieldValidationMessages.exactSelectionsCount({
+          itemsLabel: arrayItemsLabel(entry, 'plural'),
+          count: max,
+        })
+      }
       return fieldValidationMessages.exactItemsCount({
         itemsLabel: arrayItemsLabel(entry, 'plural'),
         count: max,
+      })
+    }
+    if (isMultiCategory(entry.category)) {
+      return fieldValidationMessages.maxSelectionsCount({
+        itemsLabel: arrayItemsLabel(entry, 'plural'),
+        max,
       })
     }
   }

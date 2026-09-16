@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getProficiencyDomainSentenceForm } from '@rpg/contracts'
+import { fieldValidationMessages, getProficiencyDomainSentenceForm } from '@rpg/contracts'
 import { isContainer, type FormItem } from '@rpg/ui/form'
 
 import { createClassFormSchema } from './class-form-fields'
@@ -118,7 +118,7 @@ describe('publish weapon proficiency validation', () => {
     expect(result.error.issues).toEqual([
       expect.objectContaining({
         path: ['proficiencies', 'weapons', 'categories'],
-        message: 'Add at least one weapon proficiency',
+        message: fieldValidationMessages.minSelections({ itemLabel: 'weapon proficiency' }),
       }),
     ])
   })
@@ -135,7 +135,7 @@ describe('publish weapon proficiency validation', () => {
     expect(result.error.issues).toEqual([
       expect.objectContaining({
         path: ['proficiencies', 'weapons', 'items'],
-        message: 'Add at least one weapon choice',
+        message: fieldValidationMessages.minSelections({ itemLabel: 'weapon choice' }),
       }),
     ])
   })

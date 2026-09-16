@@ -69,7 +69,7 @@ describe('prerequisiteEditorResolverFields', () => {
       formatFieldMessage(
         resolveNestedFieldErrorMessage(result.errors!, 'prerequisiteEditor.groups.0.kind') ?? '',
       ),
-    ).toBe('Select a valid match rule.')
+    ).toBe('Choose a valid match rule.')
   })
 
   it('resolves condition type message through the feat resolver', async () => {

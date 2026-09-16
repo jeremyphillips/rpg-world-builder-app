@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import type { FieldNoun } from '@rpg/contracts'
+
 import type { FormIssue, FormIssueScope, FormIssueSeverity } from './errors/form-issue.types'
 
 import type {
@@ -324,6 +326,11 @@ interface BaseFieldConfig {
    */
   width?: FieldWidth
   hint?: string | FieldHintConfig
+  /**
+   * Optional singular/plural noun phrases for generated placeholders, constraint
+   * hints, and validation copy when the visible label is not grammatical alone.
+   */
+  noun?: FieldNoun
   /** Informational metadata below the control — resolved from other field values. */
   derivedMeta?: FieldDerivedMetaConfig
   /** Renders the label `[i]` InfoTooltip. */
@@ -578,6 +585,8 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
    * Set to `false` for mutually-exclusive choices (e.g. Magic Level, Difficulty).
    */
   multiple?: boolean
+  /** Minimum selections when `multiple` is true. */
+  min?: number
   /** Maximum selections when `multiple` is true. */
   max?: number
   /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `size`. */
@@ -754,6 +763,8 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
    * Set `false` for a single `string` value (optional enums use `undefined`, not `''`).
    */
   multiple?: boolean
+  /** Minimum selections when `multiple` is true. */
+  min?: number
   /** Maximum selections when `multiple` is true. Omits the ceiling when unset. */
   max?: number
   placeholder?: string

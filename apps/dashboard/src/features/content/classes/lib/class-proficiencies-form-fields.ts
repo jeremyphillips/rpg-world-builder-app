@@ -1,6 +1,7 @@
 import { z, type RefinementCtx } from 'zod'
 import {
   ABILITY_ENTRIES,
+  fieldValidationMessages,
   ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
@@ -28,7 +29,6 @@ import {
 import { WEAPON_PROFICIENCY_MODES, type WeaponProficiencyMode } from './class-form-constants'
 import {
   INDIVIDUAL_WEAPONS_TOGGLE_HINT,
-  SAVING_THROWS_HINT,
   WEAPON_PROFICIENCIES_HINT,
   WEAPON_PROFICIENCY_MODE_LABELS,
 } from './class-form-labels'
@@ -100,7 +100,7 @@ export function refineClassWeaponProficiencies(
       ctx.addIssue({
         code: 'custom',
         path: ['proficiencies', 'weapons', 'categories'],
-        message: 'Add at least one weapon proficiency',
+        message: fieldValidationMessages.minSelections({ itemLabel: 'weapon proficiency' }),
       })
     }
     return
@@ -110,7 +110,7 @@ export function refineClassWeaponProficiencies(
     ctx.addIssue({
       code: 'custom',
       path: ['proficiencies', 'weapons', 'items'],
-      message: 'Add at least one weapon choice',
+      message: fieldValidationMessages.minSelections({ itemLabel: 'weapon choice' }),
     })
   }
 }
@@ -130,9 +130,13 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         name: 'proficiencies.savingThrows',
         label: 'Saving throws',
         options: abilityOptions,
+        min: 1,
         max: 2,
         required: true,
-        hint: SAVING_THROWS_HINT,
+        noun: {
+          singular: 'saving throw',
+          plural: 'saving throws',
+        },
         separator: 'subtle',
       },
       {
@@ -207,7 +211,6 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
             ...toolCategoryOptions,
           ],
         },
-        placeholder: 'Choose tools…',
         width: 'full',
       },
     ],

@@ -38,7 +38,7 @@ import {
 } from '../../errors/resolve-field-error-message'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
 import { resolveRowAwareFieldHintPresentation } from '../../config/resolve-row-field-hint.lib'
-import { resolveSelectPlaceholder } from '../../config/field-placeholder.lib'
+import { resolveFieldPlaceholder } from '../../config/field-placeholder.lib'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import type { InlineSentenceFieldConfig } from '../../field-config'
 import {
@@ -468,7 +468,10 @@ export function InlineSentenceFieldRenderer({
         options: resolvedOptions,
         digits: selectSegment.digits,
         width: selectSegment.width,
-        placeholder: resolveSelectPlaceholder(selectLabel, selectSegment.placeholder),
+        placeholder: resolveFieldPlaceholder(
+          { label: selectLabel, category: 'choice' },
+          selectSegment.placeholder,
+        ),
         ariaLabel: selectLabel,
         hasError: boundValidations.get(segment.name)?.invalid,
         onChange: (next) =>

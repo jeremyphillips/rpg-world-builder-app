@@ -1,4 +1,9 @@
-import { getTermSentenceForm, REQUIREMENT_CONDITION_TYPE_TERM } from '@rpg/contracts'
+import {
+  fieldValidationMessages,
+  formatFieldMessage,
+  getTermSentenceForm,
+  REQUIREMENT_CONDITION_TYPE_TERM,
+} from '@rpg/contracts'
 
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 
@@ -7,5 +12,9 @@ export const requirementConditionTypeLabel = vocabularyFieldLabel(REQUIREMENT_CO
 
 /** Tier-1 required single-select message for the condition type field. */
 export function requirementConditionTypeRequiredSelectMessage(): string {
-  return `Select ${getTermSentenceForm(REQUIREMENT_CONDITION_TYPE_TERM, 1)}.`
+  return formatFieldMessage(
+    fieldValidationMessages.requiredSelectPhrase({
+      phrase: getTermSentenceForm(REQUIREMENT_CONDITION_TYPE_TERM, 1),
+    }),
+  )
 }

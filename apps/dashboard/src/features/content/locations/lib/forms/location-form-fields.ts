@@ -37,8 +37,6 @@ import type { SettlementStructureAuthoringGuidance } from '../create/composition
 
 const locationAuthoringTypeSchema = z.enum(LOCATION_AUTHORING_TYPE_IDS)
 
-const LOCATION_SELECT_PLACEHOLDER = 'Select…'
-
 const classificationFormSchema = z
   .object({
     kind: z.string().optional(),
@@ -172,7 +170,6 @@ export function buildLocationFields(
           name: 'authoringType',
           label: 'Location type',
           options: buildLocationAuthoringTypeOptions(),
-          placeholder: LOCATION_SELECT_PLACEHOLDER,
           required: true,
           width: '1/3',
         },
@@ -191,7 +188,6 @@ export function buildLocationFields(
       name: 'parentLocationId',
       label: 'Parent location',
       options: buildParentLocationFieldOptions(ctx, ctx.locationParentLocationIdSeed),
-      placeholder: LOCATION_SELECT_PLACEHOLDER,
       visibility: parentLocationFieldVisibility(),
       optionAvailability: buildParentLocationOptionAvailability(
         referenceableLocations,

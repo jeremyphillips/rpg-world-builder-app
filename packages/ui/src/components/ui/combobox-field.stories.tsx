@@ -106,7 +106,7 @@ export const WithError: Story = {
     options: spellOptions,
     multiple: true,
     value: [],
-    error: 'Select at least one spell.',
+    error: 'Choose at least one spell.',
     required: true,
   },
 }

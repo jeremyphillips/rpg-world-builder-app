@@ -1,9 +1,6 @@
 import { vocabularyTermFieldCopy, type VocabularyTerm } from '@rpg/contracts'
 import type { ComboboxFieldConfig, FieldOption, SelectFieldConfig } from '@rpg/ui/form'
 
-/** Default combobox placeholder for vocabulary-backed multi-select fields. */
-export const VOCABULARY_COMBOBOX_PLACEHOLDER = 'Choose options…'
-
 type VocabularyMemberFieldBase = Pick<
   SelectFieldConfig,
   'name' | 'label' | 'required' | 'hint' | 'width' | 'disabled'
@@ -35,7 +32,6 @@ export function vocabularyComboboxField(
 ): ComboboxFieldConfig {
   return {
     type: 'combobox',
-    placeholder: config.placeholder ?? VOCABULARY_COMBOBOX_PLACEHOLDER,
     ...config,
   }
 }

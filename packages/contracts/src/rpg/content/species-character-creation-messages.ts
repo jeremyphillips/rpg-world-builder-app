@@ -7,7 +7,7 @@ import { defineMessage } from '../../validation/define-message'
 export const speciesCharacterCreationValidationMessages = {
   classPolicyRequiresClasses: defineMessage(
     'validation.speciesCharacterCreation.classPolicyRequiresClasses',
-    () => 'Select at least one class for this restriction mode.',
+    () => 'Choose at least one class for this restriction mode.',
   ),
   duplicateClassLevelCap: defineMessage(
     'validation.speciesCharacterCreation.duplicateClassLevelCap',

@@ -1,4 +1,4 @@
-import { midSentenceLabel, withArticle } from '../../validation/messages'
+import { resolveChoicePlaceholder, type FieldNoun } from '../../validation/messages'
 
 /** A value within a taxonomy — label, description, and optional prose forms. */
 export type GameTermEntry = {
@@ -67,6 +67,14 @@ export type VocabularyTermFieldCopyOptions = {
   multiple?: boolean
 }
 
+/** Noun metadata from a taxonomy term's curated sentence forms. */
+export function nounFromTerm(term: VocabularyTerm): FieldNoun {
+  return {
+    singular: getTermSentenceForm(term, 1),
+    plural: getTermSentenceForm(term, 2),
+  }
+}
+
 /** Default form field label and combobox placeholder from a taxonomy term. */
 export function vocabularyTermFieldCopy(
   term: VocabularyTerm,
@@ -80,9 +88,7 @@ export function vocabularyTermFieldCopy(
 
   return {
     label,
-    placeholder: options.multiple
-      ? `Choose ${midSentenceLabel(phrase)}…`
-      : `Choose ${withArticle(midSentenceLabel(phrase))}…`,
+    placeholder: resolveChoicePlaceholder(nounFromTerm(term), options.multiple === true),
   }
 }
 

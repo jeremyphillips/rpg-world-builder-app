@@ -58,14 +58,14 @@ describe('defineMessage', () => {
 
   it('round-trips messageId and params through encodeStructuredMessage', () => {
     const encoded = encodeStructuredMessage(
-      'Select a rarity.',
+      'Choose a rarity.',
       'Missing Rarity',
       'validation.field.requiredSelect',
       { label: 'Rarity' },
     )
 
     expect(decodeStructuredMessage(encoded)).toEqual({
-      field: 'Select a rarity.',
+      field: 'Choose a rarity.',
       summary: 'Missing Rarity',
       messageId: 'validation.field.requiredSelect',
       params: { label: 'Rarity' },
@@ -116,19 +116,19 @@ describe('fieldValidationMessages', () => {
     [
       'requiredSelect',
       formatFieldMessage(fieldValidationMessages.requiredSelect({ label: 'Rarity' })),
-      'Select a rarity.',
+      'Choose a rarity.',
     ],
     [
       'requiredSelectPhrase',
       formatFieldMessage(
         fieldValidationMessages.requiredSelectPhrase({ phrase: 'condition type' }),
       ),
-      'Select condition type.',
+      'Choose condition type.',
     ],
     [
       'invalidSelect',
       formatFieldMessage(fieldValidationMessages.invalidSelect({ label: 'Rarity' })),
-      'Select a valid rarity.',
+      'Choose a valid rarity.',
     ],
     [
       'invalidNumber',
@@ -163,14 +163,35 @@ describe('fieldValidationMessages', () => {
     [
       'minSelections',
       formatFieldMessage(fieldValidationMessages.minSelections({ itemLabel: 'tool' })),
-      'Select at least one tool.',
+      'Choose at least one tool.',
     ],
     [
       'minSelectionsCount',
       formatFieldMessage(
         fieldValidationMessages.minSelectionsCount({ itemsLabel: 'skills', min: 2 }),
       ),
-      'Select at least 2 skills.',
+      'Choose at least 2 skills.',
+    ],
+    [
+      'maxSelectionsCount',
+      formatFieldMessage(
+        fieldValidationMessages.maxSelectionsCount({ itemsLabel: 'skills', max: 3 }),
+      ),
+      'Choose up to 3 skills.',
+    ],
+    [
+      'exactSelectionsCount',
+      formatFieldMessage(
+        fieldValidationMessages.exactSelectionsCount({ itemsLabel: 'skills', count: 2 }),
+      ),
+      'Choose 2 skills.',
+    ],
+    [
+      'rangeSelectionsCount',
+      formatFieldMessage(
+        fieldValidationMessages.rangeSelectionsCount({ itemsLabel: 'skills', min: 1, max: 2 }),
+      ),
+      'Choose 1–2 skills.',
     ],
     [
       'minItems',
@@ -257,7 +278,7 @@ describe('fieldValidationMessages', () => {
     expect(
       decodeStructuredMessage(fieldValidationMessages.requiredSelect({ label: 'Rarity' })),
     ).toEqual({
-      field: 'Select a rarity.',
+      field: 'Choose a rarity.',
       summary: 'Missing Rarity',
       messageId: 'validation.field.requiredSelect',
       params: { label: 'Rarity' },
@@ -265,7 +286,7 @@ describe('fieldValidationMessages', () => {
     expect(
       decodeStructuredMessage(fieldValidationMessages.invalidSelect({ label: 'Rarity' })),
     ).toEqual({
-      field: 'Select a valid rarity.',
+      field: 'Choose a valid rarity.',
       summary: 'Invalid Rarity',
       messageId: 'validation.field.invalidSelect',
       params: { label: 'Rarity' },
