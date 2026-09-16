@@ -28,6 +28,7 @@ import {
 import { spellcastingSchema } from './spellcasting'
 import { classValidationMessages } from './class-messages'
 import { contentSummaryRefSchema } from '../lib/content-summary-ref'
+import { featureTableSchema, refineFeatureTablesOnFeature } from './feature-table'
 
 // ---------------------------------------------------------------------------
 // Class — SRD-faithful prose lives in rich-text HTML on `description` and
@@ -59,9 +60,14 @@ function refineClassFeatureGrantUnlockLevels(
   }
 }
 
+const classFeatureTablesField = {
+  tables: z.array(featureTableSchema).optional(),
+} as const
+
 export const customClassFeatureSchema = customContentTraitSchema
-  .extend({ level: absoluteLevelSchema })
+  .extend({ level: absoluteLevelSchema, ...classFeatureTablesField })
   .superRefine(refineClassFeatureGrantUnlockLevels)
+  .superRefine(refineFeatureTablesOnFeature)
 
 export const subclassChoiceClassFeatureSchema = customContentTraitSchema
   .extend({ kind: z.literal('subclass-choice'), level: absoluteLevelSchema })

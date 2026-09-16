@@ -3,13 +3,67 @@ import { describe, expect, it } from 'vitest'
 import {
   createFeatureRowFormSchema,
   featureFromFormRow,
+  featuresFromFormValues,
   featureToFormRow,
   subclassFeatureFromFormRow,
   formatFeatureRowSummary,
 } from './class-feature-form-fields'
 import { GRANT_DEFAULT_UNLOCK_LEVEL } from '../../lib/forms/grants/grant-form-schema'
 
+const rageProgressionTable = {
+  id: 'rage-progression',
+  name: 'Rage progression',
+  kind: 'levelProgression' as const,
+  columns: [
+    {
+      id: 'uses',
+      label: 'Rages',
+      valueType: 'number' as const,
+      entries: [{ level: 1, value: 2 }],
+    },
+  ],
+}
+
 describe('class feature form round-trip', () => {
+  it('preserves non-form feature tables through form conversion', () => {
+    const existing = {
+      kind: 'custom' as const,
+      id: 'rage',
+      name: 'Rage',
+      level: 1,
+      tables: [rageProgressionTable],
+    }
+    const row = featureToFormRow(existing)
+    const saved = featureFromFormRow({ ...row, id: existing.id }, existing)
+    expect(saved.kind).toBe('custom')
+    if (saved.kind === 'custom') {
+      expect(saved.tables).toEqual(existing.tables)
+    }
+  })
+
+  it('preserves tables when saving features from form values', () => {
+    const existing = [
+      {
+        kind: 'custom' as const,
+        id: 'rage',
+        name: 'Rage',
+        level: 1,
+        tables: [rageProgressionTable],
+      },
+    ]
+    const rows = existing.map(featureToFormRow).map((row) => ({
+      ...row,
+      name: 'Rage Updated',
+      description: '<p>Updated</p>',
+    }))
+
+    const saved = featuresFromFormValues(rows, existing)[0]
+    expect(saved?.kind).toBe('custom')
+    if (saved?.kind === 'custom') {
+      expect(saved.tables).toEqual(existing[0]?.tables)
+    }
+  })
+
   it('preserves subclass-choice kind through form conversion', () => {
     const feature = {
       kind: 'subclass-choice' as const,

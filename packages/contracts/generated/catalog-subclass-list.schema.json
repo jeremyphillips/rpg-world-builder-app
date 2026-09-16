@@ -100,6 +100,9 @@
                 },
                 "level": {
                   "$ref": "#/definitions/__schema8"
+                },
+                "tables": {
+                  "$ref": "#/definitions/__schema83"
                 }
               },
               "required": [
@@ -1894,6 +1897,181 @@
       "additionalProperties": false
     },
     "__schema83": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/definitions/__schema0"
+          },
+          "name": {
+            "$ref": "#/definitions/__schema84"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "levelProgression"
+            ],
+            "description": "levelProgression"
+          },
+          "columns": {
+            "$ref": "#/definitions/__schema86"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "columns"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "__schema84": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema85": {
+      "type": "string",
+      "enum": [
+        "levelProgression"
+      ],
+      "description": "levelProgression"
+    },
+    "__schema86": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema87"
+      }
+    },
+    "__schema87": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/__schema0"
+            },
+            "label": {
+              "$ref": "#/definitions/__schema88"
+            },
+            "valueType": {
+              "type": "string",
+              "const": "number",
+              "description": "number"
+            },
+            "entries": {
+              "$ref": "#/definitions/__schema90"
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "valueType",
+            "entries"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/__schema0"
+            },
+            "label": {
+              "$ref": "#/definitions/__schema93"
+            },
+            "valueType": {
+              "type": "string",
+              "const": "text",
+              "description": "text"
+            },
+            "entries": {
+              "$ref": "#/definitions/__schema95"
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "valueType",
+            "entries"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "__schema88": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema89": {
+      "type": "string",
+      "const": "number",
+      "description": "number"
+    },
+    "__schema90": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema91"
+      }
+    },
+    "__schema91": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "$ref": "#/definitions/__schema92"
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "level",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "__schema92": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20
+    },
+    "__schema93": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema94": {
+      "type": "string",
+      "const": "text",
+      "description": "text"
+    },
+    "__schema95": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema96"
+      }
+    },
+    "__schema96": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "$ref": "#/definitions/__schema92"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "level",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "__schema97": {
       "type": "string",
       "const": "subclass-choice",
       "description": "subclass-choice"

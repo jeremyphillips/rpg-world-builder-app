@@ -28,6 +28,7 @@ import {
   formRowsToGrantGroups,
 } from '../../lib/forms/grants/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
+import { preserveNonFormFeatureFields } from './preserve-non-form-feature-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
@@ -183,10 +184,28 @@ export function featureToFormRow(feature: ClassFeature | ClassBodyFeature): Feat
 
 const DEFAULT_CLASS_FEATURE_KIND = CLASS_FEATURE_KINDS[0] satisfies ClassFeatureKind
 
-export function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassBodyFeature {
+export function featureFromFormRow(
+  row: FeatureRowForm & { id: string },
+  existing?: ClassBodyFeature,
+): ClassBodyFeature {
   const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
+  const kind = row.kind ?? DEFAULT_CLASS_FEATURE_KIND
+
+  if (kind === 'subclass-choice') {
+    return {
+      kind: 'subclass-choice',
+      id: row.id,
+      name: row.name,
+      description: row.description || undefined,
+      level: row.level,
+      ...(grantGroups.length ? { grantGroups } : {}),
+      ...(row.available === false ? { available: false } : {}),
+    }
+  }
+
   return {
-    kind: row.kind ?? DEFAULT_CLASS_FEATURE_KIND,
+    ...preserveNonFormFeatureFields(existing),
+    kind: 'custom',
     id: row.id,
     name: row.name,
     description: row.description || undefined,
@@ -222,7 +241,10 @@ export function featuresFromFormValues(
   rows: FeatureRowForm[],
   existing?: readonly ClassBodyFeature[],
 ): ClassBodyFeature[] {
-  return applyStableIdsForUpdate(rows, existing).map(featureFromFormRow)
+  return applyStableIdsForUpdate(rows, existing).map((row) => {
+    const matchedExisting = existing?.find((feature) => feature.id === row.id)
+    return featureFromFormRow(row, matchedExisting)
+  })
 }
 export function maxLevelFromCtx(ctx: ContentFormCtx): number {
   return effectiveMaxFromCtx(ctx)

@@ -163,13 +163,73 @@
       "id": "second-wind",
       "name": "Second Wind",
       "level": 1,
-      "description": "<p>You have a limited well of physical and mental stamina that you can draw on. As a Bonus Action, you can use it to regain Hit Points equal to 1d10 plus your Fighter level.</p><p>You can use this feature twice. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest.</p><p>When you reach certain Fighter levels, you gain more uses of this feature, as shown in the Second Wind column of the Fighter Features table.</p>"
+      "description": "<p>You have a limited well of physical and mental stamina that you can draw on. As a Bonus Action, you can use it to regain Hit Points equal to 1d10 plus your Fighter level.</p><p>You can use this feature twice. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest.</p><p>When you reach certain Fighter levels, you gain more uses of this feature, as shown in the Second Wind column of the Fighter Features table.</p>",
+      "tables": [
+        {
+          "id": "second-wind-progression",
+          "name": "Second Wind progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "uses",
+              "label": "Second Wind",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 1,
+                  "value": 2
+                },
+                {
+                  "level": 4,
+                  "value": 3
+                },
+                {
+                  "level": 10,
+                  "value": 4
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "weapon-mastery",
       "name": "Weapon Mastery",
       "level": 1,
-      "description": "<p>Your training with weapons allows you to use the mastery properties of three kinds of Simple or Martial weapons of your choice. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices.</p><p>When you reach certain Fighter levels, you gain the ability to use the mastery properties of more kinds of weapons, as shown in the Weapon Mastery column of the Fighter Features table.</p>"
+      "description": "<p>Your training with weapons allows you to use the mastery properties of three kinds of Simple or Martial weapons of your choice. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices.</p><p>When you reach certain Fighter levels, you gain the ability to use the mastery properties of more kinds of weapons, as shown in the Weapon Mastery column of the Fighter Features table.</p>",
+      "tables": [
+        {
+          "id": "weapon-mastery-progression",
+          "name": "Weapon Mastery progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "masteries",
+              "label": "Weapon Mastery",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 1,
+                  "value": 3
+                },
+                {
+                  "level": 4,
+                  "value": 4
+                },
+                {
+                  "level": 10,
+                  "value": 5
+                },
+                {
+                  "level": 16,
+                  "value": 6
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "action-surge",
@@ -263,7 +323,35 @@
       "id": "indomitable",
       "name": "Indomitable",
       "level": 9,
-      "description": "<p>If you fail a saving throw, you can reroll it with a bonus equal to your Fighter level. You must use the new roll, and you can't use this feature again until you finish a Long Rest.</p><p>You can use this feature twice before a Long Rest starting at level 13 and three times before a Long Rest starting at level 17.</p>"
+      "description": "<p>If you fail a saving throw, you can reroll it with a bonus equal to your Fighter level. You must use the new roll, and you can't use this feature again until you finish a Long Rest.</p><p>You can use this feature twice before a Long Rest starting at level 13 and three times before a Long Rest starting at level 17.</p>",
+      "tables": [
+        {
+          "id": "indomitable-progression",
+          "name": "Indomitable progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "uses",
+              "label": "Indomitable",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 9,
+                  "value": 1
+                },
+                {
+                  "level": 13,
+                  "value": 2
+                },
+                {
+                  "level": 17,
+                  "value": 3
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "tactical-master",
@@ -364,63 +452,6 @@
       "name": "Three Extra Attacks",
       "level": 20,
       "description": "<p>You can attack four times instead of once whenever you take the Attack action on your turn.</p>"
-    }
-  ],
-  "resources": [
-    {
-      "name": "Second Wind",
-      "entries": [
-        {
-          "level": 1,
-          "value": 2
-        },
-        {
-          "level": 4,
-          "value": 3
-        },
-        {
-          "level": 10,
-          "value": 4
-        }
-      ]
-    },
-    {
-      "name": "Weapon Mastery",
-      "entries": [
-        {
-          "level": 1,
-          "value": 3
-        },
-        {
-          "level": 4,
-          "value": 4
-        },
-        {
-          "level": 10,
-          "value": 5
-        },
-        {
-          "level": 16,
-          "value": 6
-        }
-      ]
-    },
-    {
-      "name": "Indomitable",
-      "entries": [
-        {
-          "level": 9,
-          "value": 1
-        },
-        {
-          "level": 13,
-          "value": 2
-        },
-        {
-          "level": 17,
-          "value": 3
-        }
-      ]
     }
   ]
 }

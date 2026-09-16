@@ -179,7 +179,55 @@
       "id": "eldritch-invocations",
       "name": "Eldritch Invocations",
       "level": 1,
-      "description": "<p>You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. You gain one invocation of your choice, such as Pact of the Tome. Invocations are described in the \"Eldritch Invocation Options\" section later in this class's description.</p><p><strong>Prerequisites.</strong> If an invocation has a prerequisite, you must meet it to learn that invocation. For example, if an invocation requires you to be a level 5+ Warlock, you can select the invocation once you reach Warlock level 5.</p><p><strong>Replacing and Gaining Invocations.</strong> Whenever you gain a Warlock level, you can replace one of your invocations with another one for which you qualify. You can't replace an invocation if it's a prerequisite for another invocation that you have.</p><p>When you gain certain Warlock levels, you gain more invocations of your choice, as shown in the Invocations column of the Warlock Features table.</p><p>You can't pick the same invocation more than once unless its description says otherwise.</p>"
+      "description": "<p>You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. You gain one invocation of your choice, such as Pact of the Tome. Invocations are described in the \"Eldritch Invocation Options\" section later in this class's description.</p><p><strong>Prerequisites.</strong> If an invocation has a prerequisite, you must meet it to learn that invocation. For example, if an invocation requires you to be a level 5+ Warlock, you can select the invocation once you reach Warlock level 5.</p><p><strong>Replacing and Gaining Invocations.</strong> Whenever you gain a Warlock level, you can replace one of your invocations with another one for which you qualify. You can't replace an invocation if it's a prerequisite for another invocation that you have.</p><p>When you gain certain Warlock levels, you gain more invocations of your choice, as shown in the Invocations column of the Warlock Features table.</p><p>You can't pick the same invocation more than once unless its description says otherwise.</p>",
+      "tables": [
+        {
+          "id": "eldritch-invocations-progression",
+          "name": "Eldritch Invocations progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "count",
+              "label": "Eldritch Invocations",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 1,
+                  "value": 1
+                },
+                {
+                  "level": 2,
+                  "value": 3
+                },
+                {
+                  "level": 5,
+                  "value": 5
+                },
+                {
+                  "level": 7,
+                  "value": 6
+                },
+                {
+                  "level": 9,
+                  "value": 7
+                },
+                {
+                  "level": 12,
+                  "value": 8
+                },
+                {
+                  "level": 15,
+                  "value": 9
+                },
+                {
+                  "level": 18,
+                  "value": 10
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "magical-cunning",
@@ -322,45 +370,6 @@
       "name": "Eldritch Master",
       "level": 20,
       "description": "<p>When you use your Magical Cunning feature, you regain all your expended Pact Magic spell slots.</p>"
-    }
-  ],
-  "resources": [
-    {
-      "name": "Eldritch Invocations",
-      "entries": [
-        {
-          "level": 1,
-          "value": 1
-        },
-        {
-          "level": 2,
-          "value": 3
-        },
-        {
-          "level": 5,
-          "value": 5
-        },
-        {
-          "level": 7,
-          "value": 6
-        },
-        {
-          "level": 9,
-          "value": 7
-        },
-        {
-          "level": 12,
-          "value": 8
-        },
-        {
-          "level": 15,
-          "value": 9
-        },
-        {
-          "level": 18,
-          "value": 10
-        }
-      ]
     }
   ]
 }

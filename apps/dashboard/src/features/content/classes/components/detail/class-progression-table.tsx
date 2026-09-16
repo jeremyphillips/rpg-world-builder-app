@@ -11,6 +11,8 @@ import {
   isSpellcastingActiveAtLevel,
   spellcastingFeatureLabel,
   spellcastingUnlockLevel,
+  collectFeatureProgressionColumns,
+  resolveFeatureTableColumnValue,
   type ResolvedCampaignRules,
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
@@ -18,11 +20,13 @@ import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 import { projectVisibleClassFeatures } from '../../lib/class-display'
 import { isSubclassChoiceFeatureRow } from '../../lib/class-subclass-choice-features'
 
+type ProgressionColumn = ReturnType<typeof collectFeatureProgressionColumns>[number]
+
 type ProgressionRow = {
   level: number
   profBonus: number
   features: string[]
-  resources?: Record<string, number>
+  progressionValues?: Record<string, number | string | undefined>
   cantrips?: number
   spellsAvailable?: number
   slots?: number[]
@@ -72,12 +76,17 @@ function featuresAtLevel(
   return names
 }
 
-function buildResourceRow(
-  resources: CharacterClass['resources'],
+function buildProgressionValueRow(
+  columns: readonly ProgressionColumn[],
   level: number,
-): Record<string, number> | undefined {
-  if (!resources) return undefined
-  return Object.fromEntries(resources.map((r) => [r.name, fillForward(r.entries, level) ?? 0]))
+): Record<string, number | string | undefined> | undefined {
+  if (columns.length === 0) return undefined
+  return Object.fromEntries(
+    columns.map((column) => [
+      column.columnKey,
+      resolveFeatureTableColumnValue(column.column, level),
+    ]),
+  )
 }
 
 function buildRow(
@@ -85,6 +94,7 @@ function buildRow(
   characterClass: CharacterClass,
   slotTable: number[][] | undefined,
   subclassingEnabled: boolean,
+  progressionColumns: readonly ProgressionColumn[],
 ): ProgressionRow {
   const { features, spellcasting } = characterClass
   const castingActive = isSpellcastingActiveAtLevel(spellcasting, level)
@@ -97,16 +107,12 @@ function buildRow(
     level,
     profBonus: proficiencyBonus(level),
     features: featuresAtLevel(features, spellcasting, level, subclassingEnabled),
-    resources: buildResourceRow(characterClass.resources, level),
+    progressionValues: buildProgressionValueRow(progressionColumns, level),
     cantrips: castingActive && cantripsNorm ? fillForward(cantripsNorm, level) : undefined,
     spellsAvailable:
       castingActive && spellsAvailableNorm ? fillForward(spellsAvailableNorm, level) : undefined,
     slots: castingActive ? getSlotRow(slotTable ?? [], level) : undefined,
   }
-}
-
-function resourceNamesFrom(characterClass: CharacterClass): string[] {
-  return characterClass.resources?.map((r) => r.name) ?? []
 }
 
 function slotTableFor(characterClass: CharacterClass): number[][] | undefined {
@@ -119,6 +125,7 @@ function buildRows(
   characterClass: CharacterClass,
   maxCharacterLevel: number,
   subclassingEnabled: boolean,
+  progressionColumns: readonly ProgressionColumn[],
 ): ProgressionRow[] {
   const slotTable = slotTableFor(characterClass)
   const visibleFeatures = projectVisibleClassFeatures(characterClass.features, {
@@ -126,7 +133,7 @@ function buildRows(
   })
   const classForProgression = { ...characterClass, features: visibleFeatures }
   return Array.from({ length: maxCharacterLevel }, (_, i) =>
-    buildRow(i + 1, classForProgression, slotTable, subclassingEnabled),
+    buildRow(i + 1, classForProgression, slotTable, subclassingEnabled, progressionColumns),
   )
 }
 
@@ -152,18 +159,22 @@ function slotLevelRange(characterClass: CharacterClass): number[] {
 }
 
 type ColumnFlags = {
-  resourceNames: string[]
+  progressionColumns: ProgressionColumn[]
   showCantrips: boolean
   showSpellsAvailable: boolean
   spellsAvailableLabel: string
   slotLevels: number[]
 }
 
-function buildColumnFlags(characterClass: CharacterClass, rows: ProgressionRow[]): ColumnFlags {
+function buildColumnFlags(
+  progressionColumns: readonly ProgressionColumn[],
+  characterClass: CharacterClass,
+  rows: ProgressionRow[],
+): ColumnFlags {
   const preparation = characterClass.spellcasting?.preparation
 
   return {
-    resourceNames: resourceNamesFrom(characterClass),
+    progressionColumns: [...progressionColumns],
     showCantrips: hasCantripProgression(rows),
     showSpellsAvailable: hasSpellsAvailableProgression(preparation, rows),
     spellsAvailableLabel: preparation ? spellsAvailableColumnLabel(preparation) : 'Spells Prepared',
@@ -174,15 +185,21 @@ function buildColumnFlags(characterClass: CharacterClass, rows: ProgressionRow[]
 function columnCount(flags: ColumnFlags): number {
   return (
     3 +
-    flags.resourceNames.length +
+    flags.progressionColumns.length +
     (flags.showCantrips ? 1 : 0) +
     (flags.showSpellsAvailable ? 1 : 0) +
     flags.slotLevels.length
   )
 }
 
-function ResourceCell({ resources, name }: { resources?: Record<string, number>; name: string }) {
-  const value = resources?.[name]
+function ProgressionValueCell({
+  values,
+  columnKey,
+}: {
+  values?: Record<string, number | string | undefined>
+  columnKey: string
+}) {
+  const value = values?.[columnKey]
   return <TableCell className="text-center">{value !== undefined ? value : '—'}</TableCell>
 }
 
@@ -192,7 +209,7 @@ function SlotCell({ slots, slotIndex }: { slots?: number[]; slotIndex: number })
 }
 
 function ProgressionTableHeader({
-  resourceNames,
+  progressionColumns,
   showCantrips,
   showSpellsAvailable,
   spellsAvailableLabel,
@@ -204,9 +221,9 @@ function ProgressionTableHeader({
         <TableHead className="w-14">Level</TableHead>
         <TableHead className="w-20">Prof. Bonus</TableHead>
         <TableHead>Class Features</TableHead>
-        {resourceNames.map((name) => (
-          <TableHead key={name} className="w-24 text-center">
-            {name}
+        {progressionColumns.map((column) => (
+          <TableHead key={column.columnKey} className="w-24 text-center">
+            {column.label}
           </TableHead>
         ))}
         {showCantrips && <TableHead className="w-20 text-center">Cantrips</TableHead>}
@@ -230,13 +247,13 @@ function OptionalCell({ show, value }: { show: boolean; value: number | undefine
 
 function ProgressionBodyRow({
   row,
-  resourceNames,
+  progressionColumns,
   showCantrips,
   showSpellsAvailable,
   slotLevels,
 }: { row: ProgressionRow } & Pick<
   ColumnFlags,
-  'resourceNames' | 'showCantrips' | 'showSpellsAvailable' | 'slotLevels'
+  'progressionColumns' | 'showCantrips' | 'showSpellsAvailable' | 'slotLevels'
 >) {
   const featuresText = row.features.length > 0 ? row.features.join(', ') : '—'
   return (
@@ -244,8 +261,12 @@ function ProgressionBodyRow({
       <TableCell className="font-medium">{row.level}</TableCell>
       <TableCell>+{row.profBonus}</TableCell>
       <TableCell>{featuresText}</TableCell>
-      {resourceNames.map((name) => (
-        <ResourceCell key={name} resources={row.resources} name={name} />
+      {progressionColumns.map((column) => (
+        <ProgressionValueCell
+          key={column.columnKey}
+          values={row.progressionValues}
+          columnKey={column.columnKey}
+        />
       ))}
       <OptionalCell show={showCantrips} value={row.cantrips} />
       <OptionalCell show={showSpellsAvailable} value={row.spellsAvailable} />
@@ -294,8 +315,14 @@ export function ClassProgressionTable({
     ...DEFAULT_CAMPAIGN_RULES,
     maxCharacterLevel: maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
   }
-  const rows = buildRows(characterClass, rules.maxCharacterLevel, rules.subclassing.enabled)
-  const flags = buildColumnFlags(characterClass, rows)
+  const progressionColumns = collectFeatureProgressionColumns(characterClass.features)
+  const rows = buildRows(
+    characterClass,
+    rules.maxCharacterLevel,
+    rules.subclassing.enabled,
+    progressionColumns,
+  )
+  const flags = buildColumnFlags(progressionColumns, characterClass, rows)
   const colSpan = columnCount(flags)
   const extended = rules.extendedProgression
 

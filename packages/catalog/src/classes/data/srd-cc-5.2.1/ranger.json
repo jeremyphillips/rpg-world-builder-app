@@ -189,6 +189,42 @@
             }
           ]
         }
+      ],
+      "tables": [
+        {
+          "id": "favored-enemy-progression",
+          "name": "Favored Enemy progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "uses",
+              "label": "Favored Enemy",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 1,
+                  "value": 2
+                },
+                {
+                  "level": 5,
+                  "value": 3
+                },
+                {
+                  "level": 9,
+                  "value": 4
+                },
+                {
+                  "level": 13,
+                  "value": 5
+                },
+                {
+                  "level": 17,
+                  "value": 6
+                }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -387,33 +423,6 @@
       "name": "Foe Slayer",
       "level": 20,
       "description": "<p>The damage die of your <em>Hunter's Mark</em> is a d10 rather than a d6.</p>"
-    }
-  ],
-  "resources": [
-    {
-      "name": "Favored Enemy",
-      "entries": [
-        {
-          "level": 1,
-          "value": 2
-        },
-        {
-          "level": 5,
-          "value": 3
-        },
-        {
-          "level": 9,
-          "value": 4
-        },
-        {
-          "level": 13,
-          "value": 5
-        },
-        {
-          "level": 17,
-          "value": 6
-        }
-      ]
     }
   ]
 }

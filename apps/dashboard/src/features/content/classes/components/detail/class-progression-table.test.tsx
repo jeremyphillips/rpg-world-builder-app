@@ -8,6 +8,19 @@ import { pickClass } from '../../../lib/fixtures/pick'
 import { ClassProgressionTable } from './class-progression-table'
 
 describe('ClassProgressionTable', () => {
+  it('projects barbarian rage columns with independent carry-forward', () => {
+    render(<ClassProgressionTable characterClass={pickClass('barbarian')} />)
+
+    expect(screen.getByRole('columnheader', { name: 'Rages' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Rage Damage' })).toBeInTheDocument()
+
+    const rowText = (level: number) => screen.getAllByRole('row')[level]?.textContent ?? ''
+
+    expect(rowText(1)).toContain('2')
+    expect(rowText(6)).toMatch(/4.*2/)
+    expect(rowText(9)).toMatch(/4.*3/)
+  })
+
   it('renders the progression heading and level rows for a spellcaster', () => {
     render(<ClassProgressionTable characterClass={pickClass('bard')} />)
 
