@@ -1,8 +1,8 @@
-import type { ClassBodyFeature, FeatureTable } from '@rpg/contracts'
+import type { ClassBodyFeature, ProgressionTable } from '@rpg/contracts'
 
 /** Fields owned by structured feature data, not the feature form editor. */
 export type NonFormFeatureFields = {
-  tables?: FeatureTable[]
+  tables?: ProgressionTable[]
 }
 
 export function preserveNonFormFeatureFields(

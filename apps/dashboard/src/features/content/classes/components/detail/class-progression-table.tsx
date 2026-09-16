@@ -12,7 +12,8 @@ import {
   spellcastingFeatureLabel,
   spellcastingUnlockLevel,
   collectFeatureProgressionColumns,
-  resolveFeatureTableColumnValue,
+  formatProgressionTableValue,
+  resolveProgressionTableColumnValue,
   type ResolvedCampaignRules,
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
@@ -26,7 +27,7 @@ type ProgressionRow = {
   level: number
   profBonus: number
   features: string[]
-  progressionValues?: Record<string, number | string | undefined>
+  progressionValues?: Record<string, string | undefined>
   cantrips?: number
   spellsAvailable?: number
   slots?: number[]
@@ -79,13 +80,16 @@ function featuresAtLevel(
 function buildProgressionValueRow(
   columns: readonly ProgressionColumn[],
   level: number,
-): Record<string, number | string | undefined> | undefined {
+): Record<string, string | undefined> | undefined {
   if (columns.length === 0) return undefined
   return Object.fromEntries(
-    columns.map((column) => [
-      column.columnKey,
-      resolveFeatureTableColumnValue(column.column, level),
-    ]),
+    columns.map((column) => {
+      const value = resolveProgressionTableColumnValue(column.column, level)
+      return [
+        column.columnKey,
+        value === undefined ? undefined : formatProgressionTableValue(column.column, value),
+      ]
+    }),
   )
 }
 
@@ -196,7 +200,7 @@ function ProgressionValueCell({
   values,
   columnKey,
 }: {
-  values?: Record<string, number | string | undefined>
+  values?: Record<string, string | undefined>
   columnKey: string
 }) {
   const value = values?.[columnKey]

@@ -234,23 +234,23 @@
             {
               "id": "die",
               "label": "Bardic Die",
-              "valueType": "number",
+              "valueType": "dice",
               "entries": [
                 {
                   "level": 1,
-                  "value": 6
+                  "value": { "count": 1, "faces": 6 }
                 },
                 {
                   "level": 5,
-                  "value": 8
+                  "value": { "count": 1, "faces": 8 }
                 },
                 {
                   "level": 10,
-                  "value": 10
+                  "value": { "count": 1, "faces": 10 }
                 },
                 {
                   "level": 15,
-                  "value": 12
+                  "value": { "count": 1, "faces": 12 }
                 }
               ]
             }

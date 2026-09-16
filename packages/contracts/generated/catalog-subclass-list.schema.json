@@ -1961,8 +1961,16 @@
               "const": "number",
               "description": "number"
             },
+            "format": {
+              "type": "string",
+              "enum": [
+                "plain",
+                "signed"
+              ],
+              "description": "plain | signed"
+            },
             "entries": {
-              "$ref": "#/definitions/__schema90"
+              "$ref": "#/definitions/__schema91"
             }
           },
           "required": [
@@ -1984,11 +1992,37 @@
             },
             "valueType": {
               "type": "string",
+              "const": "dice",
+              "description": "dice"
+            },
+            "entries": {
+              "$ref": "#/definitions/__schema95"
+            }
+          },
+          "required": [
+            "id",
+            "label",
+            "valueType",
+            "entries"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/__schema0"
+            },
+            "label": {
+              "$ref": "#/definitions/__schema97"
+            },
+            "valueType": {
+              "type": "string",
               "const": "text",
               "description": "text"
             },
             "entries": {
-              "$ref": "#/definitions/__schema95"
+              "$ref": "#/definitions/__schema99"
             }
           },
           "required": [
@@ -2011,17 +2045,25 @@
       "description": "number"
     },
     "__schema90": {
+      "type": "string",
+      "enum": [
+        "plain",
+        "signed"
+      ],
+      "description": "plain | signed"
+    },
+    "__schema91": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema91"
+        "$ref": "#/definitions/__schema92"
       }
     },
-    "__schema91": {
+    "__schema92": {
       "type": "object",
       "properties": {
         "level": {
-          "$ref": "#/definitions/__schema92"
+          "$ref": "#/definitions/__schema8"
         },
         "value": {
           "type": "number"
@@ -2033,19 +2075,14 @@
       ],
       "additionalProperties": false
     },
-    "__schema92": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 20
-    },
     "__schema93": {
       "type": "string",
       "minLength": 1
     },
     "__schema94": {
       "type": "string",
-      "const": "text",
-      "description": "text"
+      "const": "dice",
+      "description": "dice"
     },
     "__schema95": {
       "minItems": 1,
@@ -2058,7 +2095,83 @@
       "type": "object",
       "properties": {
         "level": {
-          "$ref": "#/definitions/__schema92"
+          "$ref": "#/definitions/__schema8"
+        },
+        "value": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "faces": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "const": 4
+                },
+                {
+                  "type": "number",
+                  "const": 6
+                },
+                {
+                  "type": "number",
+                  "const": 8
+                },
+                {
+                  "type": "number",
+                  "const": 10
+                },
+                {
+                  "type": "number",
+                  "const": 12
+                },
+                {
+                  "type": "number",
+                  "const": 20
+                },
+                {
+                  "type": "number",
+                  "const": 100
+                }
+              ]
+            }
+          },
+          "required": [
+            "count",
+            "faces"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "level",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "__schema97": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema98": {
+      "type": "string",
+      "const": "text",
+      "description": "text"
+    },
+    "__schema99": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema100"
+      }
+    },
+    "__schema100": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "$ref": "#/definitions/__schema8"
         },
         "value": {
           "type": "string",
@@ -2071,7 +2184,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema97": {
+    "__schema101": {
       "type": "string",
       "const": "subclass-choice",
       "description": "subclass-choice"

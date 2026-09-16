@@ -17,8 +17,9 @@ describe('ClassProgressionTable', () => {
     const rowText = (level: number) => screen.getAllByRole('row')[level]?.textContent ?? ''
 
     expect(rowText(1)).toContain('2')
-    expect(rowText(6)).toMatch(/4.*2/)
-    expect(rowText(9)).toMatch(/4.*3/)
+    expect(rowText(1)).toContain('+2')
+    expect(rowText(6)).toMatch(/4.*\+2/)
+    expect(rowText(9)).toMatch(/4.*\+3/)
   })
 
   it('renders the progression heading and level rows for a spellcaster', () => {

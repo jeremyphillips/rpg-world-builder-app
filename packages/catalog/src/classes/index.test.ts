@@ -20,9 +20,9 @@ import {
   isStartingGoldOption,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
-  resolveFeatureTableColumnValue,
+  resolveProgressionTableColumnValue,
   type CharacterClass,
-  type FeatureTableColumn,
+  type ProgressionTableColumn,
 } from '@rpg/contracts'
 import { loadSeedEquipment } from '../equipment'
 
@@ -49,11 +49,11 @@ function featureTableColumn(
   featureId: string,
   tableId: string,
   columnId: string,
-): FeatureTableColumn | undefined {
+): ProgressionTableColumn | undefined {
   const feature = cls.features.find((entry) => entry.id === featureId)
   if (!feature || feature.kind === 'subclass-choice') return undefined
   const table = feature.tables?.find((entry) => entry.id === tableId)
-  return table?.columns.find((column: FeatureTableColumn) => column.id === columnId)
+  return table?.columns.find((column: ProgressionTableColumn) => column.id === columnId)
 }
 
 function expectNumberColumnEntries(
@@ -66,6 +66,20 @@ function expectNumberColumnEntries(
   const column = featureTableColumn(cls, featureId, tableId, columnId)
   expect(column?.valueType).toBe('number')
   if (column?.valueType === 'number') {
+    expect(column.entries).toEqual(entries)
+  }
+}
+
+function expectDiceColumnEntries(
+  cls: CharacterClass,
+  featureId: string,
+  tableId: string,
+  columnId: string,
+  entries: { level: number; value: { count: number; faces: number } }[],
+): void {
+  const column = featureTableColumn(cls, featureId, tableId, columnId)
+  expect(column?.valueType).toBe('dice')
+  if (column?.valueType === 'dice') {
     expect(column.entries).toEqual(entries)
   }
 }
@@ -168,11 +182,11 @@ describe('SRD 5.2.1 class seed', () => {
     expect(asiLevelsFromFeatures(bard)).toEqual([4, 8, 12, 16])
     expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
     expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
-    expectNumberColumnEntries(bard, 'bardic-inspiration', 'bardic-inspiration-progression', 'die', [
-      { level: 1, value: 6 },
-      { level: 5, value: 8 },
-      { level: 10, value: 10 },
-      { level: 15, value: 12 },
+    expectDiceColumnEntries(bard, 'bardic-inspiration', 'bardic-inspiration-progression', 'die', [
+      { level: 1, value: { count: 1, faces: 6 } },
+      { level: 5, value: { count: 1, faces: 8 } },
+      { level: 10, value: { count: 1, faces: 10 } },
+      { level: 15, value: { count: 1, faces: 12 } },
     ])
     const words = bard.features.find((f) => f.id === 'words-of-creation')
     const spellGrant = words?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
@@ -300,16 +314,17 @@ describe('SRD 5.2.1 class seed', () => {
     )
     const rageUses = featureTableColumn(barbarian, 'rage', 'rage-progression', 'uses')
     const rageDamage = featureTableColumn(barbarian, 'rage', 'rage-progression', 'damage-bonus')
-    expect(rageUses && resolveFeatureTableColumnValue(rageUses, 1)).toBe(2)
-    expect(rageUses && resolveFeatureTableColumnValue(rageUses, 12)).toBe(5)
-    expect(rageDamage && resolveFeatureTableColumnValue(rageDamage, 9)).toBe(3)
+    expect(rageUses && resolveProgressionTableColumnValue(rageUses, 1)).toBe(2)
+    expect(rageUses && resolveProgressionTableColumnValue(rageUses, 12)).toBe(5)
+    expect(rageDamage && resolveProgressionTableColumnValue(rageDamage, 9)).toBe(3)
+    expect(rageDamage?.valueType === 'number' && rageDamage.format).toBe('signed')
     const weaponMasteries = featureTableColumn(
       barbarian,
       'weapon-mastery',
       'weapon-mastery-progression',
       'masteries',
     )
-    expect(weaponMasteries && resolveFeatureTableColumnValue(weaponMasteries, 10)).toBe(4)
+    expect(weaponMasteries && resolveProgressionTableColumnValue(weaponMasteries, 10)).toBe(4)
   })
 
   it('Path of the Berserker ships four subclass features with rich-text HTML', () => {
@@ -534,11 +549,11 @@ describe('SRD 5.2.1 class seed', () => {
     expect(martialArts?.description).toContain('<strong>Martial Arts Die.</strong>')
     const monksFocus = monk.features.find((f) => f.id === 'monks-focus')
     expect(monksFocus?.description).toContain('<strong>Flurry of Blows.</strong>')
-    expectNumberColumnEntries(monk, 'martial-arts', 'martial-arts-progression', 'die', [
-      { level: 1, value: 6 },
-      { level: 5, value: 8 },
-      { level: 11, value: 10 },
-      { level: 17, value: 12 },
+    expectDiceColumnEntries(monk, 'martial-arts', 'martial-arts-progression', 'die', [
+      { level: 1, value: { count: 1, faces: 6 } },
+      { level: 5, value: { count: 1, faces: 8 } },
+      { level: 11, value: { count: 1, faces: 10 } },
+      { level: 17, value: { count: 1, faces: 12 } },
     ])
     const focusPoints = featureTableColumn(monk, 'monks-focus', 'monks-focus-progression', 'points')
     expect(focusPoints?.valueType).toBe('number')

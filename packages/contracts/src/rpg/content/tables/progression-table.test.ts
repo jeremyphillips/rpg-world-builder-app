@@ -1,16 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
-import { customClassFeatureSchema, classStoredSchema } from './class'
+import { customClassFeatureSchema, classStoredSchema } from '../classes/class'
+import { progressionTableSchema, normalizeProgressionTableColumnEntries } from './progression-table'
 import {
-  featureTableSchema,
-  normalizeFeatureTableColumnEntries,
-  numberFeatureTableColumnSchema,
-} from './feature-table'
+  diceProgressionTableColumnSchema,
+  numberProgressionTableColumnSchema,
+} from './table-column'
+import { formatProgressionTableValue } from './format'
 import {
-  collectFeatureTableBreakpoints,
-  projectFeatureTableRows,
-  resolveFeatureTableColumnValue,
-} from './feature-table-resolution'
+  collectProgressionTableBreakpoints,
+  projectProgressionTableRows,
+  resolveProgressionTableColumnValue,
+} from './resolution'
 
 const rageProgressionTable = {
   id: 'rage-progression',
@@ -33,6 +34,7 @@ const rageProgressionTable = {
       id: 'damage-bonus',
       label: 'Rage Damage',
       valueType: 'number' as const,
+      format: 'signed' as const,
       entries: [
         { level: 1, value: 2 },
         { level: 9, value: 3 },
@@ -42,14 +44,14 @@ const rageProgressionTable = {
   ],
 }
 
-describe('featureTableSchema', () => {
+describe('progressionTableSchema', () => {
   it('parses a valid multi-column level progression table', () => {
-    expect(featureTableSchema.parse(rageProgressionTable)).toEqual(rageProgressionTable)
+    expect(progressionTableSchema.parse(rageProgressionTable)).toEqual(rageProgressionTable)
   })
 
   it('parses a valid single-column text progression table', () => {
     expect(
-      featureTableSchema.parse({
+      progressionTableSchema.parse({
         id: 'notes-progression',
         name: 'Notes progression',
         kind: 'levelProgression',
@@ -65,9 +67,35 @@ describe('featureTableSchema', () => {
     ).toMatchObject({ columns: [{ valueType: 'text' }] })
   })
 
+  it('parses a valid dice progression column', () => {
+    const column = diceProgressionTableColumnSchema.parse({
+      id: 'die',
+      label: 'Martial Arts',
+      valueType: 'dice',
+      entries: [
+        { level: 1, value: { count: 1, faces: 6 } },
+        { level: 5, value: { count: 1, faces: 8 } },
+      ],
+    })
+
+    expect(column.entries[0]?.value).toEqual({ count: 1, faces: 6 })
+  })
+
+  it('accepts signed number format on number columns', () => {
+    const column = numberProgressionTableColumnSchema.parse({
+      id: 'bonus',
+      label: 'Bonus',
+      valueType: 'number',
+      format: 'signed',
+      entries: [{ level: 1, value: 2 }],
+    })
+
+    expect(column.format).toBe('signed')
+  })
+
   it('rejects duplicate column ids within a table', () => {
     expect(
-      featureTableSchema.safeParse({
+      progressionTableSchema.safeParse({
         ...rageProgressionTable,
         columns: [rageProgressionTable.columns[0], { ...rageProgressionTable.columns[0] }],
       }).success,
@@ -76,7 +104,7 @@ describe('featureTableSchema', () => {
 
   it('rejects duplicate entry levels within a column', () => {
     expect(
-      numberFeatureTableColumnSchema.safeParse({
+      numberProgressionTableColumnSchema.safeParse({
         id: 'uses',
         label: 'Rages',
         valueType: 'number',
@@ -90,7 +118,7 @@ describe('featureTableSchema', () => {
 
   it('rejects out-of-order entry levels', () => {
     expect(
-      numberFeatureTableColumnSchema.safeParse({
+      numberProgressionTableColumnSchema.safeParse({
         id: 'uses',
         label: 'Rages',
         valueType: 'number',
@@ -102,20 +130,31 @@ describe('featureTableSchema', () => {
     ).toBe(false)
   })
 
-  it('rejects invalid entry levels above 20', () => {
+  it('accepts entry levels above the standard 20-level cap', () => {
     expect(
-      numberFeatureTableColumnSchema.safeParse({
+      numberProgressionTableColumnSchema.safeParse({
         id: 'uses',
         label: 'Rages',
         valueType: 'number',
-        entries: [{ level: 21, value: 2 }],
+        entries: [{ level: 25, value: 2 }],
+      }).success,
+    ).toBe(true)
+  })
+
+  it('rejects entry levels above the absolute cap', () => {
+    expect(
+      numberProgressionTableColumnSchema.safeParse({
+        id: 'uses',
+        label: 'Rages',
+        valueType: 'number',
+        entries: [{ level: 101, value: 2 }],
       }).success,
     ).toBe(false)
   })
 
   it('rejects empty columns and tables', () => {
     expect(
-      featureTableSchema.safeParse({
+      progressionTableSchema.safeParse({
         id: 'empty',
         name: 'Empty',
         kind: 'levelProgression',
@@ -226,9 +265,9 @@ describe('customClassFeatureSchema feature tables', () => {
   })
 })
 
-describe('normalizeFeatureTableColumnEntries', () => {
+describe('normalizeProgressionTableColumnEntries', () => {
   it('sorts entries ascending without mutating parse behavior', () => {
-    const column = normalizeFeatureTableColumnEntries({
+    const column = normalizeProgressionTableColumnEntries({
       id: 'uses',
       label: 'Rages',
       valueType: 'number',
@@ -240,17 +279,17 @@ describe('normalizeFeatureTableColumnEntries', () => {
     })
 
     expect(column.entries.map((entry) => entry.level)).toEqual([1, 3, 6])
-    expect(numberFeatureTableColumnSchema.parse(column)).toEqual(column)
+    expect(numberProgressionTableColumnSchema.parse(column)).toEqual(column)
   })
 })
 
-describe('feature table resolution', () => {
+describe('progression table resolution', () => {
   const usesColumn = rageProgressionTable.columns[0]!
   const damageColumn = rageProgressionTable.columns[1]!
 
   it('carry-forwards between breakpoints', () => {
-    expect(resolveFeatureTableColumnValue(usesColumn, 2)).toBe(2)
-    expect(resolveFeatureTableColumnValue(usesColumn, 5)).toBe(3)
+    expect(resolveProgressionTableColumnValue(usesColumn, 2)).toBe(2)
+    expect(resolveProgressionTableColumnValue(usesColumn, 5)).toBe(3)
   })
 
   it('returns undefined before the first entry', () => {
@@ -260,20 +299,22 @@ describe('feature table resolution', () => {
       valueType: 'number' as const,
       entries: [{ level: 5, value: 1 }],
     }
-    expect(resolveFeatureTableColumnValue(lateColumn, 4)).toBeUndefined()
+    expect(resolveProgressionTableColumnValue(lateColumn, 4)).toBeUndefined()
   })
 
   it('returns the exact value at a breakpoint', () => {
-    expect(resolveFeatureTableColumnValue(usesColumn, 3)).toBe(3)
+    expect(resolveProgressionTableColumnValue(usesColumn, 3)).toBe(3)
   })
 
   it('holds the final breakpoint after the last entry', () => {
-    expect(resolveFeatureTableColumnValue(usesColumn, 20)).toBe(6)
+    expect(resolveProgressionTableColumnValue(usesColumn, 20)).toBe(6)
   })
 
   it('projects multi-column rows with independent carry-forward', () => {
-    const rows = projectFeatureTableRows(rageProgressionTable)
-    expect(collectFeatureTableBreakpoints(rageProgressionTable)).toEqual([1, 3, 6, 9, 12, 16, 17])
+    const rows = projectProgressionTableRows(rageProgressionTable)
+    expect(collectProgressionTableBreakpoints(rageProgressionTable)).toEqual([
+      1, 3, 6, 9, 12, 16, 17,
+    ])
 
     expect(rows.find((row) => row.level === 1)?.values).toEqual({
       uses: 2,
@@ -291,10 +332,43 @@ describe('feature table resolution', () => {
 
   it('narrows numeric column values in resolution', () => {
     if (usesColumn.valueType === 'number') {
-      expect(resolveFeatureTableColumnValue(usesColumn, 1)).toBe(2)
+      expect(resolveProgressionTableColumnValue(usesColumn, 1)).toBe(2)
     }
     if (damageColumn.valueType === 'number') {
-      expect(resolveFeatureTableColumnValue(damageColumn, 9)).toBe(3)
+      expect(resolveProgressionTableColumnValue(damageColumn, 9)).toBe(3)
     }
+  })
+})
+
+describe('formatProgressionTableValue', () => {
+  it('formats plain numbers as strings', () => {
+    const column = rageProgressionTable.columns[0]!
+    expect(formatProgressionTableValue(column, 4)).toBe('4')
+  })
+
+  it('formats signed numbers with a plus prefix', () => {
+    const column = rageProgressionTable.columns[1]!
+    expect(formatProgressionTableValue(column, 2)).toBe('+2')
+    expect(formatProgressionTableValue(column, -1)).toBe('-1')
+  })
+
+  it('formats dice expressions', () => {
+    const column = diceProgressionTableColumnSchema.parse({
+      id: 'die',
+      label: 'Martial Arts',
+      valueType: 'dice',
+      entries: [{ level: 1, value: { count: 1, faces: 8 } }],
+    })
+    expect(formatProgressionTableValue(column, { count: 1, faces: 8 })).toBe('1d8')
+  })
+
+  it('formats text values', () => {
+    const column = {
+      id: 'note',
+      label: 'Note',
+      valueType: 'text' as const,
+      entries: [{ level: 1, value: 'A' }],
+    }
+    expect(formatProgressionTableValue(column, 'A')).toBe('A')
   })
 })

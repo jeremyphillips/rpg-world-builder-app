@@ -123,6 +123,7 @@
               "id": "damage-bonus",
               "label": "Rage Damage",
               "valueType": "number",
+              "format": "signed",
               "entries": [
                 {
                   "level": 1,

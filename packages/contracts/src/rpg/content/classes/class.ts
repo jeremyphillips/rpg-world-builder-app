@@ -28,7 +28,8 @@ import {
 import { spellcastingSchema } from './spellcasting'
 import { classValidationMessages } from './class-messages'
 import { contentSummaryRefSchema } from '../lib/content-summary-ref'
-import { featureTableSchema, refineFeatureTablesOnFeature } from './feature-table'
+import { progressionTableSchema } from '../tables'
+import { refineFeatureTablesOnFeature } from './class-feature-table'
 
 // ---------------------------------------------------------------------------
 // Class — SRD-faithful prose lives in rich-text HTML on `description` and
@@ -61,7 +62,7 @@ function refineClassFeatureGrantUnlockLevels(
 }
 
 const classFeatureTablesField = {
-  tables: z.array(featureTableSchema).optional(),
+  tables: z.array(progressionTableSchema).optional(),
 } as const
 
 export const customClassFeatureSchema = customContentTraitSchema
