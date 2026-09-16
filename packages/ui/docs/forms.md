@@ -194,7 +194,8 @@ Slot `render()` components and hand-built editors should call `useFormSectionCon
 `density`, then `resolveFormDensity(density)` when threading `rhythm` / `size` into primitives
 (e.g. `RequirementEditor` → `FieldGroup`).
 
-**Array legends:** share leaf field label typography at the resolved section control scale
+**Array legends:** inherit parent section density unless the array sets `density` explicitly.
+Item bodies still default to `compact`. Legend typography follows the legend scale
 (`compact`/`sm` → `text-xs`; `comfortable`/`md` → `text-md`).
 
 Dense chip fields stack full-width — don't cram many options into a `FieldRow`.

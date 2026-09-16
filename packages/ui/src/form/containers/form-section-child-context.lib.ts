@@ -4,7 +4,11 @@ import {
   type FormSectionContextValue,
 } from '../context/form-section.context'
 import type { ArrayConfig } from '../field-config'
-import { DEFAULT_ARRAY_SECTION_DENSITY, resolveSectionDensity } from '../form-density'
+import {
+  DEFAULT_ARRAY_SECTION_DENSITY,
+  resolveArrayLegendDensity,
+  resolveSectionDensity,
+} from '../form-density'
 import { resolveNamedGroupDepthAfterEntering } from '../form-heading.lib'
 import { hasNamedArrayHeading } from '../resolve-container-heading.lib'
 
@@ -25,6 +29,10 @@ export function buildArraySectionChildContext(
       explicit: config.density,
       inherited: parent.density,
       sectionDefault: DEFAULT_ARRAY_SECTION_DENSITY,
+    }),
+    arrayLegendDensity: resolveArrayLegendDensity({
+      explicit: config.density,
+      inherited: parent.density,
     }),
     arrayItemSurface: chrome.surface ?? parent.arrayItemSurface,
     arrayItemTone: chrome.tone ?? parent.arrayItemTone,

@@ -19,6 +19,7 @@ import { resolveArrayHeading } from '../../resolve-container-heading.lib'
 type ResolveArrayFieldRendererChromeInput = {
   config: ArrayConfig
   density: Parameters<typeof resolveFormDensity>[0]
+  legendDensity?: Parameters<typeof resolveFormDensity>[0]
   depth: number
   inRhythmStack: boolean | undefined
   fieldsLength: number
@@ -28,12 +29,14 @@ type ResolveArrayFieldRendererChromeInput = {
 export function resolveArrayFieldRendererChrome({
   config,
   density,
+  legendDensity,
   depth,
   inRhythmStack,
   fieldsLength,
   wrapSectionChrome = false,
 }: ResolveArrayFieldRendererChromeInput) {
   const { rhythm, size } = resolveFormDensity(density)
+  const legendFieldSize = resolveFormDensity(legendDensity ?? density).size
   const itemConfig = resolveArrayItemConfig(config)
   const addAction = resolveArrayAddAction(config)
   const {
@@ -46,7 +49,6 @@ export function resolveArrayFieldRendererChrome({
   } = addAction ?? {}
   const arrayHeading = resolveArrayHeading(config)
   const legend = arrayHeading?.label ?? config.legend ?? ''
-  const legendFieldSize = size
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
   const itemCollapseKey = itemConfig.collapseKey

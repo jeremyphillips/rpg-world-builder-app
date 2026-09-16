@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_ARRAY_SECTION_DENSITY,
   DEFAULT_FORM_DENSITY,
+  resolveArrayLegendDensity,
   resolveFormDensity,
   resolveSectionDensity,
 } from './form-density'
@@ -43,5 +44,17 @@ describe('resolveSectionDensity', () => {
 
   it('inherits parent when no override', () => {
     expect(resolveSectionDensity({ inherited: 'comfortable' })).toBe('comfortable')
+  })
+})
+
+describe('resolveArrayLegendDensity', () => {
+  it('inherits parent density when the array omits density', () => {
+    expect(resolveArrayLegendDensity({ inherited: 'comfortable' })).toBe('comfortable')
+  })
+
+  it('uses explicit array density when set', () => {
+    expect(resolveArrayLegendDensity({ explicit: 'compact', inherited: 'comfortable' })).toBe(
+      'compact',
+    )
   })
 })

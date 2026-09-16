@@ -44,7 +44,7 @@ describe('Form section rendering', () => {
 
     expect(screen.getByText('Identity').closest('legend')).toHaveClass('text-field-group-legend')
     const tagsLegend = screen.getByRole('group', { name: /Tags/ }).querySelector('legend')
-    expect(tagsLegend).toHaveClass('text-xs', 'font-field-label')
+    expect(tagsLegend).toHaveClass('text-md', 'font-field-label')
     expect(tagsLegend).not.toHaveClass('text-field-array-legend')
   })
 

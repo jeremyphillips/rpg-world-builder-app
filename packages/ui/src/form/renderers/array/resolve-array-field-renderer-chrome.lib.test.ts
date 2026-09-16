@@ -49,6 +49,20 @@ describe('resolveArrayFieldRendererChrome', () => {
     expect(chrome.collapsible).toBe(true)
   })
 
+  it('uses legend density separately from compact item density', () => {
+    const chrome = resolveArrayFieldRendererChrome({
+      config: nestedGrantArray,
+      density: 'compact',
+      legendDensity: 'comfortable',
+      depth: 0,
+      inRhythmStack: undefined,
+      fieldsLength: 1,
+    })
+
+    expect(chrome.legendFieldSize).toBe('md')
+    expect(chrome.itemBodyStackClasses).toContain('gap-3')
+  })
+
   it('does not enable collapse for compact nested arrays without renderShell', () => {
     const chrome = resolveArrayFieldRendererChrome({
       config: {
