@@ -58,6 +58,7 @@ export function coreAttributesFields(ctx?: ContentFormCtx): FormItem[] {
             {
               kind: 'slot',
               name: 'characterCreation.abilityScoreOrder',
+              chrome: { variant: 'container' },
               heading: {
                 label: 'Suggested ability scores',
                 hint: "Reorder abilities to define how this class assigns the campaign's Standard Array.",
