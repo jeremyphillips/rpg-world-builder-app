@@ -291,7 +291,7 @@ function invalidValueFor(routeKey: string): unknown {
       return {
         name: '',
         category: 'origin',
-        prerequisiteEditor: { mode: 'all', requirements: [] },
+        prerequisiteEditor: { groups: [] },
         repeatableAllowed: false,
       }
     case 'skill-proficiencies':

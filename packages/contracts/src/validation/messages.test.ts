@@ -119,6 +119,13 @@ describe('fieldValidationMessages', () => {
       'Select a rarity.',
     ],
     [
+      'requiredSelectPhrase',
+      formatFieldMessage(
+        fieldValidationMessages.requiredSelectPhrase({ phrase: 'condition type' }),
+      ),
+      'Select condition type.',
+    ],
+    [
       'invalidSelect',
       formatFieldMessage(fieldValidationMessages.invalidSelect({ label: 'Rarity' })),
       'Select a valid rarity.',

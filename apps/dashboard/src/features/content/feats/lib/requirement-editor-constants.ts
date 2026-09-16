@@ -1,13 +1,17 @@
 import { ABILITY_ENTRIES, ABILITY_IDS } from '@rpg/contracts'
 
 import { REQUIREMENT_LEAF_TYPES, type RequirementLeafType } from './requirement-editor-form-schema'
+import { requirementConditionTypeLabel } from './requirement-editor-field-terms'
+
+/** RHF `useFieldArray` keyName — must not match domain row `id`. */
+export const REQUIREMENT_FIELD_ARRAY_KEY = 'fieldKey' as const
 
 export const ADD_CONDITION_SET_LABEL = 'Add condition set'
 export const ADD_CONDITION_LABEL = 'Add condition'
 export const PREVIEW_LABEL = 'Prerequisites preview'
 export const CONDITION_SETS_HEADING = 'Condition sets'
 export const MATCH_RULE_LABEL = 'Match rule'
-export const CONDITION_TYPE_LABEL = 'Condition type'
+export const CONDITION_TYPE_LABEL = requirementConditionTypeLabel
 export const CONDITION_TYPE_PLACEHOLDER = 'Choose condition'
 
 export const MATCH_RULE_OPTIONS = [

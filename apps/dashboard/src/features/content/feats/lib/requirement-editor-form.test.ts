@@ -2,11 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { loadSeedFeats } from '@rpg/catalog/feats'
 import { formatRequirementExpression, type RequirementExpression } from '@rpg/contracts'
 
-import { formatRequirementEditorPreview } from './requirement-editor-form'
+import {
+  formatRequirementEditorPreview,
+  createPrerequisiteEditorSchema,
+} from './requirement-editor-form'
 import {
   newRequirementGroup,
   newRequirementLeaf,
   prerequisiteEditorSchema,
+  requirementGroupFormSchema,
+  requirementLeafFormSchema,
   requirementEditorDefaultValue,
   type PrerequisiteEditorValue,
 } from './requirement-editor-form-schema'
@@ -254,11 +259,46 @@ describe('newRequirementLeaf and newRequirementGroup', () => {
 })
 
 describe('prerequisiteEditorSchema', () => {
-  it('parses valid editor state', () => {
+  it('parses structurally valid editor state', () => {
     const value: PrerequisiteEditorValue = {
       groups: [newRequirementGroup()],
     }
     expect(() => prerequisiteEditorSchema.parse(value)).not.toThrow()
+  })
+
+  it('requires condition type when a set has a draft leaf', () => {
+    const result = createPrerequisiteEditorSchema().safeParse({
+      groups: [newRequirementGroup()],
+    })
+    expect(result.success).toBe(false)
+    expect(
+      result.error?.issues.some((issue) => issue.path.join('.') === 'groups.0.requirements.0.type'),
+    ).toBe(true)
+  })
+
+  it('accepts a typed leaf through createPrerequisiteEditorSchema', () => {
+    const result = createPrerequisiteEditorSchema().safeParse({
+      groups: [
+        {
+          ...newRequirementGroup(),
+          requirements: [newRequirementLeaf('spellcasting')],
+        },
+      ],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('defaults missing group kind to all during parse', () => {
+    const parsed = requirementGroupFormSchema.parse({
+      id: 'g1',
+      requirements: [{ id: 'l1' }],
+    })
+    expect(parsed.kind).toBe('all')
+  })
+
+  it('treats undefined leaf type as a draft row', () => {
+    const parsed = requirementLeafFormSchema.parse({ id: 'l1', type: undefined })
+    expect(parsed).toEqual({ id: 'l1', type: undefined })
   })
 
   it('rejects groups with no requirements', () => {

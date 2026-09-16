@@ -63,6 +63,11 @@ export const fieldValidationMessages = {
     ({ label }) => `Select ${withArticle(midSentenceLabel(label))}.`,
     ({ label }) => `Missing ${label}`,
   ),
+  /** Empty required choice-like field using a vocab sentence phrase (no article). */
+  requiredSelectPhrase: defineMessage<{ phrase: string }>(
+    'validation.field.requiredSelectPhrase',
+    ({ phrase }) => `Select ${phrase}.`,
+  ),
   /** Value not among the allowed options. */
   invalidSelect: defineMessage<{ label: string }>(
     'validation.field.invalidSelect',

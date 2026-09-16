@@ -31,7 +31,7 @@ import { SERVICE_CATEGORY_TERM } from './equipment/service-category'
 import { SPELLCASTING_GEAR_KIND_TERM } from './equipment/spellcasting-gear-kind'
 import { TOOL_CATEGORY_TERM } from './equipment/tool-category'
 import { VEHICLE_CATEGORY_TERM } from './equipment/vehicle-category'
-import { FEAT_CATEGORY_TERM, FEAT_PART_TERM } from './feat'
+import { FEAT_CATEGORY_TERM, FEAT_PART_TERM, REQUIREMENT_CONDITION_TYPE_TERM } from './feat'
 import { LANGUAGE_CATEGORY_TERM, LANGUAGE_TERM } from './language'
 import { MAGIC_ITEM_CATEGORY_TERM } from './magic-item/category'
 import { MAGIC_ITEM_RARITY_TERM } from './magic-item/rarity'
@@ -78,6 +78,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   CREATURE_SIZE_TERM,
   CONDITION_TERM,
   FEAT_CATEGORY_TERM,
+  REQUIREMENT_CONDITION_TYPE_TERM,
   FEAT_PART_TERM,
   LANGUAGE_CATEGORY_TERM,
   MOVEMENT_MODE_TERM,
@@ -168,7 +169,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(49)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(50)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

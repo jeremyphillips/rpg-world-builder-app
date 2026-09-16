@@ -9,7 +9,9 @@ import {
 } from '@rpg/contracts'
 import type { RefinementCtx } from 'zod'
 
+import { requirementConditionTypeRequiredSelectMessage } from './requirement-editor-field-terms'
 import {
+  prerequisiteEditorSchema,
   type PrerequisiteEditorValue,
   type RequirementLeafForm,
 } from './requirement-editor-form-schema'
@@ -27,8 +29,8 @@ export const requirementEditorValidationMessages = {
   ),
   conditionTypeRequired: defineMessage(
     'validation.requirementEditor.conditionTypeRequired',
-    () => 'Condition type is required.',
-    () => 'Missing condition',
+    () => requirementConditionTypeRequiredSelectMessage(),
+    () => 'Missing condition type',
   ),
   minLevelRequired: defineMessage(
     'validation.requirementEditor.minLevelRequired',
@@ -53,7 +55,7 @@ function validateLeaf(
   ctx: RefinementCtx,
   maxLevel: number = MAX_CHARACTER_LEVEL,
 ): void {
-  const path = ['prerequisiteEditor', 'groups', groupIndex, 'requirements', leafIndex]
+  const path = ['groups', groupIndex, 'requirements', leafIndex]
 
   if (!isRequirementLeafForm(leaf)) {
     addCustomIssue(
@@ -101,7 +103,7 @@ export function refineRequirementEditor(
     if (group.requirements.length === 0) {
       addCustomIssue(
         ctx,
-        ['prerequisiteEditor', 'groups', groupIndex, 'requirements'],
+        ['groups', groupIndex, 'requirements'],
         requirementEditorValidationMessages.requirementRequired(),
       )
     }
@@ -109,6 +111,13 @@ export function refineRequirementEditor(
     group.requirements.forEach((leaf, leafIndex) => {
       validateLeaf(leaf, groupIndex, leafIndex, ctx, maxLevel)
     })
+  })
+}
+
+/** Validates prerequisite editor groups and leaf rows after structural parse. */
+export function createPrerequisiteEditorSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
+  return prerequisiteEditorSchema.superRefine((value, ctx) => {
+    refineRequirementEditor(value, ctx, maxLevel)
   })
 }
 

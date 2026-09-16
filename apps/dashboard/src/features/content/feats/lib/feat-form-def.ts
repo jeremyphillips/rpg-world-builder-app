@@ -1,6 +1,9 @@
 import { MAX_CHARACTER_LEVEL, type CreateFeatInput, type Feat } from '@rpg/contracts'
 
-import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormDef,
+} from '../../lib/forms/registry/content-form-registry'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { useFeats, featsQueryKey } from '../hooks/use-feats'
 import {
@@ -20,7 +23,7 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
   nameField,
   resolveSchema: (ctx, intent = 'publish') => {
     const maxLevel = ctx.campaignRules?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
-    return intent === 'draft' ? createFeatDraftFormSchema() : createFeatFormSchema(maxLevel)
+    return intent === 'draft' ? createFeatDraftFormSchema(maxLevel) : createFeatFormSchema(maxLevel)
   },
   coverage: 'structural',
   createDefaultValues: featCreateDefaultValues,
