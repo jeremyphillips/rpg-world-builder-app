@@ -12,7 +12,7 @@ import {
   isChromeAlignedToControlTrack,
   queryChromeCenterY,
   queryControlTopByFieldName,
-} from '../renderers/array/array-item-anatomy-grid-prototype.lib'
+} from '../renderers/array/array-item-anatomy-track-probe.lib'
 
 const movementModeOptions = [
   { value: 'walk', label: 'Walk' },

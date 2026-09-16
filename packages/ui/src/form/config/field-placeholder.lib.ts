@@ -40,8 +40,3 @@ export function resolveFieldPlaceholder(
 
   return resolveChoicePlaceholder(noun, input.category === 'multi')
 }
-
-/** @deprecated Use {@link resolveFieldPlaceholder} with a copy context instead. */
-export function resolveSelectPlaceholder(label: string, placeholder?: string): string {
-  return resolveFieldPlaceholder({ label, category: 'choice' }, placeholder) ?? `Choose ${label}…`
-}

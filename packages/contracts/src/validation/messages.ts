@@ -1,16 +1,5 @@
 import { choiceCountPhrase, midSentenceLabel, withArticle } from '../form-copy/messages'
 
-export {
-  choiceCountPhrase,
-  midSentenceLabel,
-  nounFromLabel,
-  resolveChoicePlaceholder,
-  singularizeLabel,
-  withArticle,
-  type ChoiceCountConstraints,
-  type FieldNoun,
-} from '../form-copy/messages'
-
 import { defineMessage } from './define-message'
 
 /**

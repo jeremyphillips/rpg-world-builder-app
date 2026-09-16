@@ -1,7 +1,10 @@
 'use client'
 
 import { SelectItem } from './select.client'
-import { selectOptionItemContentVariants } from './select-option-item.variants'
+import {
+  selectOptionItemContentVariants,
+  selectOptionItemReasonVariants,
+} from './select-option-item.variants'
 import type { FieldOption } from '../../form/field-config'
 
 export function SelectOptionItem({
@@ -18,7 +21,7 @@ export function SelectOptionItem({
       {reason ? (
         <span className={selectOptionItemContentVariants()}>
           <span>{option.label}</span>
-          <span className="text-muted-foreground text-xs">{reason}</span>
+          <span className={selectOptionItemReasonVariants()}>{reason}</span>
         </span>
       ) : (
         option.label

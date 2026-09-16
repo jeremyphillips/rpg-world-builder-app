@@ -98,17 +98,6 @@ export function resolveArrayItemAnatomyParentChromeColumn(options: {
   return (options.showGrip ? 2 : 1) + 1
 }
 
-/** @deprecated Flat-grid chrome placement — retained for spacing prototype flat candidates. */
-export function resolveArrayItemAnatomyGridChromeColumn(options: {
-  role: 'grip' | 'actions'
-  fieldCount: number
-  showGrip?: boolean
-}): number {
-  if (options.role === 'grip') return 1
-  const showGrip = options.showGrip ?? true
-  return options.fieldCount + (showGrip ? 2 : 1)
-}
-
 export function resolveArrayItemFieldGapClass(fieldGap: ArrayFieldGap = 'dense'): string {
   return fieldGap === 'dense'
     ? ARRAY_ITEM_FIELD_GAP_DENSE_CLASS

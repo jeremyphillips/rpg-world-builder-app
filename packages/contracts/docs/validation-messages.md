@@ -9,6 +9,9 @@ locale catalog keyed by id.
 in `@rpg/contracts/form-copy` — not in this file. Compact unset presentation
 (`—` for digit-sized selects) is owned by `@rpg/ui` (`resolveFieldPlaceholder`).
 See [packages/ui/docs/forms.md](../../ui/docs/forms.md#field-copy--placeholders-and-instructions).
+Import linguistic helpers from `@rpg/contracts` (root barrel) or
+`@rpg/contracts/form-copy`; `@rpg/contracts/validation` exports tier-1 message
+definitions only.
 
 ## The three tiers
 

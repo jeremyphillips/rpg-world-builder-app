@@ -1,4 +1,9 @@
-import { fieldValidationMessages, midSentenceLabel, singularizeLabel } from '@rpg/contracts'
+import {
+  fieldValidationMessages,
+  midSentenceLabel,
+  nounFromLabel,
+  singularizeLabel,
+} from '@rpg/contracts'
 import type { ZodType } from 'zod'
 
 import type { FormItem } from '../field-config'
@@ -79,6 +84,13 @@ function isMultiCategory(category: RegistryEntry['category']): boolean {
   return category === 'multi'
 }
 
+function choiceNounPhrase(entry: RegistryEntry): string {
+  if (entry.noun) {
+    return midSentenceLabel(entry.noun.singular)
+  }
+  return nounFromLabel(entry.label).singular
+}
+
 function formatRequired(entry: RegistryEntry): string {
   if (isUnlabeledEntry(entry)) {
     return fieldValidationMessages.requiredUnlabeled()
@@ -89,7 +101,7 @@ function formatRequired(entry: RegistryEntry): string {
     })
   }
   if (entry.category === 'choice') {
-    return fieldValidationMessages.requiredSelect({ label: entry.label })
+    return fieldValidationMessages.requiredSelect({ label: choiceNounPhrase(entry) })
   }
   return fieldValidationMessages.requiredText({ label: entry.label })
 }
@@ -210,7 +222,7 @@ function formatInvalidValue(issue: RawZodIssueLike, entry: RegistryEntry): strin
   if (isChoiceCategory(entry.category)) {
     return isEmptyInput(issue.input)
       ? formatRequired(entry)
-      : fieldValidationMessages.invalidSelect({ label: entry.label })
+      : fieldValidationMessages.invalidSelect({ label: choiceNounPhrase(entry) })
   }
 
   return isEmptyInput(issue.input)

@@ -9,6 +9,8 @@ import {
   movementArrayField,
   movementRowDraftFormSchema,
   movementRowFormSchema,
+  movementRowsToRecord,
+  movementRowsToRecordForPreview,
   refineSpeciesMovementRows,
 } from './species-movement-form-fields'
 
@@ -48,6 +50,22 @@ describe('species movement form fields', () => {
   it('requires mode and speed on publish rows', () => {
     const result = movementRowFormSchema.safeParse({ mode: '', feet: undefined })
     expect(result.success).toBe(false)
+  })
+
+  it('preview conversion omits incomplete rows', () => {
+    expect(
+      movementRowsToRecordForPreview([
+        { mode: 'walk', feet: 30 },
+        { mode: '', feet: undefined },
+      ]),
+    ).toEqual({ walk: 30 })
+    expect(movementRowsToRecordForPreview([{ mode: '', feet: undefined }])).toEqual({})
+  })
+
+  it('strict conversion throws on incomplete rows', () => {
+    expect(() => movementRowsToRecord([{ mode: '', feet: undefined }])).toThrow(
+      'movementRowsToRecord expects validated movement rows.',
+    )
   })
 
   it('reports duplicate modes on publish', () => {

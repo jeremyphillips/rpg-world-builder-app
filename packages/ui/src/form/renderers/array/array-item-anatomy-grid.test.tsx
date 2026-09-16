@@ -12,7 +12,7 @@ import { ArrayItemAnatomyGrid } from './array-item-anatomy-grid.client'
 import {
   queryControlTopByFieldName,
   readAnatomyTrackProbe,
-} from './array-item-anatomy-grid-prototype.lib'
+} from './array-item-anatomy-track-probe.lib'
 
 function stubRect(
   element: Element,
@@ -32,7 +32,7 @@ function stubRect(
     }) as DOMRect
 }
 
-function PrototypeParticipantField({
+function ParticipantField({
   id,
   label,
   error,
@@ -63,7 +63,7 @@ function PrototypeParticipantField({
   )
 }
 
-describe('ArrayItemAnatomyGrid prototype composition', () => {
+describe('ArrayItemAnatomyGrid', () => {
   it('renders one parent anatomy grid with direct field participants and control-track chrome', () => {
     render(
       <ArrayItemAnatomyGrid
@@ -79,8 +79,8 @@ describe('ArrayItemAnatomyGrid prototype composition', () => {
           </button>
         }
       >
-        <PrototypeParticipantField id="mode" label="Mode" />
-        <PrototypeParticipantField id="speed" label="Speed" />
+        <ParticipantField id="mode" label="Mode" />
+        <ParticipantField id="speed" label="Speed" />
       </ArrayItemAnatomyGrid>,
     )
 
@@ -138,8 +138,8 @@ describe('ArrayItemAnatomyGrid prototype composition', () => {
           </button>
         }
       >
-        <PrototypeParticipantField id="mode" label="Mode" />
-        <PrototypeParticipantField id="speed" label="Speed" />
+        <ParticipantField id="mode" label="Mode" />
+        <ParticipantField id="speed" label="Speed" />
       </ArrayItemAnatomyGrid>,
     )
 
@@ -204,8 +204,8 @@ describe('ArrayItemAnatomyGrid prototype composition', () => {
           </button>
         }
       >
-        <PrototypeParticipantField id="mode" label="Mode" />
-        <PrototypeParticipantField id="speed" label="Speed" />
+        <ParticipantField id="mode" label="Mode" />
+        <ParticipantField id="speed" label="Speed" />
       </ArrayItemAnatomyGrid>,
     )
 

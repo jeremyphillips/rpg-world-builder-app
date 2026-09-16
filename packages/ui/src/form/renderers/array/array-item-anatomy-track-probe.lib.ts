@@ -1,6 +1,5 @@
 /**
- * DOM probes for the Phase 0 shared-track prototype.
- * Used by Storybook harnesses and vitest mount tests.
+ * DOM probes for compact array anatomy grid alignment tests and Storybook harnesses.
  */
 
 export type AnatomyTrackProbe = {

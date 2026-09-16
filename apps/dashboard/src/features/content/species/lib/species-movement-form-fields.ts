@@ -3,7 +3,6 @@ import {
   MOVEMENT_SPEED_FEET,
   defineMessage,
   fieldValidationMessages,
-  formatFieldMessage,
   getMovementModeLabel,
   movementModeSchema,
   movementSpeedFeetSchema,
@@ -14,6 +13,9 @@ import {
 import type { FormItem } from '@rpg/ui/form'
 import { disableOptionsUsedInSiblingRows } from '@rpg/ui/form'
 import { z } from 'zod'
+
+export const MOVEMENT_MODE_FIELD_LABEL = 'Mode'
+export const MOVEMENT_SPEED_FIELD_LABEL = 'Speed'
 
 export const speciesMovementValidationMessages = {
   duplicateMode: defineMessage(
@@ -48,7 +50,7 @@ function refineMovementRowRequired(
   if (!row.mode) {
     ctx.addIssue({
       code: 'custom',
-      message: formatFieldMessage(fieldValidationMessages.requiredSelect({ label: 'Mode' })),
+      message: fieldValidationMessages.requiredSelect({ label: MOVEMENT_MODE_FIELD_LABEL }),
       path: [...pathPrefix, 'mode'],
     })
   }
@@ -56,7 +58,7 @@ function refineMovementRowRequired(
   if (row.feet === undefined || row.feet === '') {
     ctx.addIssue({
       code: 'custom',
-      message: formatFieldMessage(fieldValidationMessages.requiredSelect({ label: 'Speed' })),
+      message: fieldValidationMessages.requiredSelect({ label: MOVEMENT_SPEED_FIELD_LABEL }),
       path: [...pathPrefix, 'feet'],
     })
   }
@@ -119,14 +121,14 @@ export function movementArrayField(): FormItem {
           {
             type: 'select',
             name: 'mode',
-            label: 'Mode',
+            label: MOVEMENT_MODE_FIELD_LABEL,
             required: true,
             options: movementModeOptions,
             width: 'md',
           },
           {
             type: 'joinedPair',
-            label: 'Speed',
+            label: MOVEMENT_SPEED_FIELD_LABEL,
             width: 'auto',
             required: true,
             start: {

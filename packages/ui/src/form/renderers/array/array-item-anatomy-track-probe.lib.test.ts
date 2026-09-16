@@ -6,9 +6,9 @@ import {
   isChromeAlignedToContainerCenter,
   isChromeAlignedToControlTrack,
   type AnatomyTrackProbe,
-} from './array-item-anatomy-grid-prototype.lib'
+} from './array-item-anatomy-track-probe.lib'
 
-describe('array-item-anatomy-grid-prototype.lib', () => {
+describe('array-item-anatomy-track-probe.lib', () => {
   it('treats chrome as control-track aligned when centered on the md control band', () => {
     const probe: AnatomyTrackProbe = {
       controlTop: 100,

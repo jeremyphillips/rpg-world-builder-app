@@ -6,14 +6,7 @@ import {
   formatFieldMessage,
   encodeStructuredMessage,
 } from './define-message'
-import {
-  betweenCopy,
-  fieldValidationMessages,
-  midSentenceLabel,
-  requiredWhenCopy,
-  singularizeLabel,
-  withArticle,
-} from './messages'
+import { betweenCopy, fieldValidationMessages, requiredWhenCopy } from './messages'
 
 describe('defineMessage', () => {
   it('formats params and exposes a stable id', () => {
@@ -70,24 +63,6 @@ describe('defineMessage', () => {
       messageId: 'validation.field.requiredSelect',
       params: { label: 'Rarity' },
     })
-  })
-})
-
-describe('label helpers', () => {
-  it('lowercases labels mid-sentence but preserves initialisms', () => {
-    expect(midSentenceLabel('Damage type')).toBe('damage type')
-    expect(midSentenceLabel('XP progression')).toBe('XP progression')
-  })
-
-  it('picks the indefinite article by leading vowel', () => {
-    expect(withArticle('rarity')).toBe('a rarity')
-    expect(withArticle('ability')).toBe('an ability')
-  })
-
-  it('singularizes common plural labels', () => {
-    expect(singularizeLabel('Wealth tiers')).toBe('Wealth tier')
-    expect(singularizeLabel('Abilities')).toBe('Ability')
-    expect(singularizeLabel('Class')).toBe('Class')
   })
 })
 

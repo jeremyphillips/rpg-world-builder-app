@@ -119,6 +119,28 @@ describe('field copy resolver integration', () => {
     ).toBe('Custom placeholder…')
   })
 
+  it('uses explicit noun metadata for choice validation and placeholders', () => {
+    const field: FieldConfig = {
+      type: 'select',
+      name: 'mode',
+      label: 'Mode',
+      options: [],
+      required: true,
+      noun: { singular: 'movement mode' },
+    }
+
+    expect(
+      resolveFieldPlaceholder({
+        label: field.label,
+        category: 'choice',
+        noun: field.noun,
+      }),
+    ).toBe('Choose a movement mode…')
+    expect(messageFor(field, z.object({ mode: z.enum(['walk']) }), {})).toBe(
+      'Choose a movement mode.',
+    )
+  })
+
   it('flips placeholder vocabulary when field category changes', () => {
     const label = 'Score'
     expect(resolveFieldPlaceholder({ label, category: 'number' })).toBeUndefined()
