@@ -578,6 +578,55 @@ describe('TabbedForm', () => {
     })
   })
 
+  it('stays on the current tab when it has validation errors', async () => {
+    const user = userEvent.setup()
+    const validationSchema = z.object({
+      name: z.string().min(1, 'Name is required'),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        id="campaign-form"
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: '', notes: '' }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Notes' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('textbox', { name: 'Notes' })).toHaveFocus()
+    })
+    expect(within(getSectionsNav()).getByRole('button', { name: /Notes/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(within(getSectionsNav()).getByRole('button', { name: /Identity/i })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+  })
+
   it('auto-switches to the first invalid tab and focuses the tab-scoped control', async () => {
     const user = userEvent.setup()
     const validationSchema = z.object({

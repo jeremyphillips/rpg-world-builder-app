@@ -149,3 +149,27 @@ export function getFirstInvalidTabId(
   const tabPrefixes = buildTabPrefixesMap(tabs)
   return findOwningTabId(firstIssue.path, tabs, tabPrefixes)
 }
+
+/**
+ * Tab to activate after a failed submit. Keeps the current tab when it has
+ * issues; otherwise navigates to the first invalid tab in sort order.
+ */
+export function resolveInvalidSubmitTabId(
+  issues: readonly FormIssue[],
+  tabs: readonly TabValidationTab[],
+  fields: FormItem[],
+  activeTabId?: string,
+): string | undefined {
+  if (issues.length === 0) return undefined
+
+  if (activeTabId) {
+    const activeTabState = resolveTabValidationState(issues, tabs, fields).find(
+      (state) => state.tabId === activeTabId,
+    )
+    if (activeTabState && activeTabState.count > 0) {
+      return activeTabId
+    }
+  }
+
+  return getFirstInvalidTabId(issues, tabs, fields)
+}

@@ -8,7 +8,7 @@ import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
 import { findArraySectionForIssue } from '../errors/group-form-issues'
 import type { FormIssue } from '../errors/form-issue.types'
 import {
-  getFirstInvalidTabId,
+  resolveInvalidSubmitTabId,
   resolveTabValidationState,
 } from '../errors/resolve-tab-validation-state'
 import {
@@ -107,22 +107,32 @@ export function navigateTabbedFormInvalidSubmit<TFieldValues extends FieldValues
   ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'>,
   errors: FieldErrors<TFieldValues>,
   setActiveTabId: (tabId: string) => void,
+  activeTabId?: string,
 ): void {
-  const issues = prepareFormIssues(errors, fields)
-  const tabId = getFirstInvalidTabId(issues, tabs, fields)
-  const idPrefix = tabId ? getTabPanelIdPrefix(formId, tabId) : formId
+  ui.markSubmitAttempted()
 
-  navigateInvalidSubmit(form, fields, formId, ui, errors, {
+  const issues = prepareFormIssues(errors, fields)
+  const tabId = resolveInvalidSubmitTabId(issues, tabs, fields, activeTabId)
+
+  if (!tabId) {
+    navigateInvalidSubmit(form, fields, formId, ui, errors, { idPrefix: formId })
+    return
+  }
+
+  const tabState = resolveTabValidationState(issues, tabs, fields).find(
+    (state) => state.tabId === tabId,
+  )
+  const firstIssue = tabState?.issues[0]
+  if (!firstIssue) return
+
+  const idPrefix = getTabPanelIdPrefix(formId, tabId)
+  if (tabId !== activeTabId) {
+    flushSync(() => setActiveTabId(tabId))
+  }
+  focusTabbedFormNavigation(
+    buildNavigationForIssue(firstIssue, fields, form, idPrefix),
+    tabId,
     idPrefix,
-    onBeforeFocus: () => {
-      if (tabId) flushSync(() => setActiveTabId(tabId))
-    },
-    waitForLayout: Boolean(tabId),
-    focusFallbacks: tabId
-      ? {
-          tabPanelSelector: `[data-tab-panel="${tabId}"]`,
-          tabTriggerSelector: `[data-tab-trigger="${tabId}"]`,
-        }
-      : undefined,
-  })
+    ui,
+  )
 }

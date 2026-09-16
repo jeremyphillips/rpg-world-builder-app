@@ -204,9 +204,10 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         ui,
         errors,
         setActiveTabId,
+        activeTabId,
       )
     },
-    [tabs],
+    [activeTabId, tabs],
   )
 
   const validationSummary = (

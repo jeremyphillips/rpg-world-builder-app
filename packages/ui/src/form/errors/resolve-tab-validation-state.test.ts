@@ -12,6 +12,7 @@ import {
   collectTabPathPrefixes,
   getFirstInvalidTabId,
   pathOwnsIssue,
+  resolveInvalidSubmitTabId,
   resolveTabValidationState,
   type TabValidationTab,
 } from './resolve-tab-validation-state'
@@ -191,6 +192,39 @@ describe('resolveTabValidationState', () => {
     expect(states.find((state) => state.tabId === 'heritage')?.count).toBe(1)
     expect(states.find((state) => state.tabId === 'traits')?.count).toBe(1)
     expect(states.find((state) => state.tabId === 'rules')?.count).toBe(0)
+  })
+})
+
+describe('resolveInvalidSubmitTabId', () => {
+  it('keeps the active tab when it owns validation issues', () => {
+    const errors = {
+      name: { type: 'custom', message: 'Required' },
+      notes: { type: 'custom', message: 'Required' },
+    } as unknown as FieldErrors
+    const issues = issuesFromErrors(errors)
+    const notesTab: TabValidationTab = {
+      id: 'notes',
+      fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+    }
+    const tabList = [identityTab, notesTab]
+
+    expect(resolveInvalidSubmitTabId(issues, tabList, allFields, 'notes')).toBe('notes')
+    expect(resolveInvalidSubmitTabId(issues, tabList, allFields, 'identity')).toBe('identity')
+  })
+
+  it('navigates to the first invalid tab when the active tab is valid', () => {
+    const errors = {
+      name: { type: 'custom', message: 'Required' },
+      notes: { type: 'custom', message: 'Required' },
+    } as unknown as FieldErrors
+    const issues = issuesFromErrors(errors)
+    const notesTab: TabValidationTab = {
+      id: 'notes',
+      fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+    }
+    const tabList = [identityTab, notesTab]
+
+    expect(resolveInvalidSubmitTabId(issues, tabList, allFields, 'rules')).toBe('identity')
   })
 })
 

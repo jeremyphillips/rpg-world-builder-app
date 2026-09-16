@@ -57,6 +57,7 @@ export {
   collectTabPathPrefixes,
   resolveTabValidationState,
   getFirstInvalidTabId,
+  resolveInvalidSubmitTabId,
   type TabValidationState,
   type TabValidationTab,
 } from './resolve-tab-validation-state'
