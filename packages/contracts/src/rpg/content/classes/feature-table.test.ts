@@ -164,6 +164,33 @@ describe('customClassFeatureSchema feature tables', () => {
     ).toBe(false)
   })
 
+  it('does not persist legacy top-level resources on stored class body', () => {
+    const parsed = classStoredSchema.parse({
+      id: 'test:barbarian',
+      slug: 'barbarian',
+      rulesetId: 'srd-cc-5.2.1',
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Barbarian',
+      description: '<p>Test</p>',
+      primaryAbilities: ['str'],
+      hitDie: 12,
+      proficiencies: {
+        savingThrows: ['str', 'con'],
+        armor: { categories: ['light'], items: [] },
+        weapons: { categories: ['simple'], items: [] },
+        skills: { categories: [], items: [] },
+      },
+      features: [],
+      resources: [{ name: 'Rage', entries: [{ level: 1, value: 2 }] }],
+    })
+
+    expect(parsed).not.toHaveProperty('resources')
+  })
+
   it('accepts feature-owned tables on a stored class body', () => {
     expect(
       classStoredSchema.safeParse({

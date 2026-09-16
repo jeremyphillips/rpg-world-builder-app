@@ -26,7 +26,6 @@ import {
   buildClassCreateInput,
   classCreateDefaultValues,
   proficienciesToFormValues,
-  resourceToFormRow,
   spellcastingToFormValues,
 } from './class-form-values'
 import { featureToFormRow } from './class-feature-form-fields'
@@ -94,7 +93,6 @@ const classFormDef: ContentFormDef<
       ? proficienciesToFormValues(entity.proficiencies)
       : classCreateDefaultValues.proficiencies!,
     features: entity.features.map(featureToFormRow),
-    resources: entity.resources?.map(resourceToFormRow) ?? [],
     characterCreation: characterCreationToFormValues(entity),
   }),
 

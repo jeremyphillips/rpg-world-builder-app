@@ -1085,7 +1085,52 @@ Class create/edit registers `ContentFormDef.preview` (`class-preview-projection.
 
 ### Read-only detail view
 
-`ClassProgressionTable` on the class detail page fill-forwards `cantrips` and `spellsAvailable`, shows resource columns from `resources[]`, and spell-slot columns via `formatSpellLevel` from `@rpg/contracts`. Stories: `Content/Classes/ClassProgressionTable`.
+`ClassProgressionTable` on the class detail page fill-forwards `cantrips` and `spellsAvailable`, shows feature-table columns from `features[].tables[]`, and spell-slot columns via `formatSpellLevel` from `@rpg/contracts`. Stories: `Content/Classes/ClassProgressionTable`.
+
+---
+
+## Class feature tables (reference)
+
+Structured progression data lives on **features**, not on the class body. The legacy top-level `resources[]` field and its dashboard authoring UI were removed; feature tables are the replacement.
+
+### Ownership and shape
+
+| Field                 | Location                       | Role                                                                                                 |
+| --------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `tables[]`            | `features[]` (custom features) | Optional `levelProgression` tables owned by the feature that unlocks them                            |
+| `columns[]`           | each table                     | Discriminated by `valueType`: `number` or `text`; each column owns sparse `{ level, value }` entries |
+| `id` (table / column) | embedded subrecord             | Stable `slugSchema` key for references; `label` / `name` are editable display copy                   |
+
+Contracts: `packages/contracts/src/rpg/content/classes/feature-table.ts` and `feature-table-resolution.ts`.
+
+### Breakpoints and carry-forward
+
+- Entry levels use **`levelSchema` (1–20)**, not `absoluteLevelSchema`.
+- Entries must be in **strictly ascending** order by level in persisted JSON; out-of-order catalog data fails validation (no silent sort on parse).
+- Every entry level must be **≥ the owning feature's `level`** (feature-level refine).
+- **Carry-forward:** at character level _L_, a column resolves to the last entry where `entry.level ≤ L`; before the first entry → `undefined`. Each column carry-forwards independently.
+- **`projectFeatureTableRows`** derives dense rows for display — never persisted.
+
+Import-only helper: `normalizeFeatureTableColumnEntries()` sorts entries for migrations; it is not wired into Zod parse.
+
+### Progression table column order
+
+`collectFeatureProgressionColumns(features)` (contracts) determines read-only column order:
+
+1. `features[]` array order
+2. → `tables[]` order within each feature
+3. → `columns[]` order within each table
+
+Only `kind: 'levelProgression'` tables contribute columns. Stable React key: `` `${featureId}.${tableId}.${columnId}` ``.
+
+### Dashboard authoring
+
+- **No production feature-table editor** yet — `feature-tables-section*` components are Storybook-only.
+- On feature save, the class form **preserves non-form fields** (including `tables`) via `preserveNonFormFeatureFields()` in `class-feature-form-fields.ts`; the form updates only fields it owns (name, description, grants, level, availability).
+
+### Content enrichment vs migration
+
+Phase 2 migrated 16 legacy class `resources[]` rows onto their owning features (Barbarian Rage, Fighter Second Wind, etc.). **Weapon Mastery** on Ranger, Rogue, and Paladin was added separately as flat L1 `masteries: 2` tables — semantic enrichment from SRD prose ("two kinds of weapons"), not a legacy resource migration. Wizard remains the only SRD class with no feature tables.
 
 ---
 

@@ -103,18 +103,28 @@ describe('SRD 5.2.1 class seed', () => {
 
   it('does not ship legacy top-level resources', () => {
     for (const cls of classes) {
-      expect(cls.resources).toBeUndefined()
+      expect(Object.hasOwn(cls as Record<string, unknown>, 'resources')).toBe(false)
     }
   })
 
-  it('Rogue and Wizard have no feature tables after resource migration', () => {
-    for (const slug of ['rogue', 'wizard'] as const) {
-      const cls = getClassBySlug(RULESET, slug)
-      expect(
-        cls.features.every(
-          (feature) => feature.kind === 'subclass-choice' || !feature.tables?.length,
-        ),
-      ).toBe(true)
+  it('Wizard has no feature tables after resource migration', () => {
+    const wizard = getClassBySlug(RULESET, 'wizard')
+    expect(
+      wizard.features.every(
+        (feature) => feature.kind === 'subclass-choice' || !feature.tables?.length,
+      ),
+    ).toBe(true)
+  })
+
+  it('Ranger, Rogue, and Paladin ship flat Weapon Mastery progression tables', () => {
+    for (const slug of ['ranger', 'rogue', 'paladin'] as const) {
+      expectNumberColumnEntries(
+        getClassBySlug(RULESET, slug),
+        'weapon-mastery',
+        'weapon-mastery-progression',
+        'masteries',
+        [{ level: 1, value: 2 }],
+      )
     }
   })
 
