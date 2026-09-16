@@ -7,6 +7,10 @@ import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
 import { CardFooter } from '../../components/ui/card'
 import { SubmitButton } from '../../components/ui/submit-button'
+import {
+  ExamplesUnlabeledInlineHarness,
+  MovementChromeStabilityHarness,
+} from './array-field-chrome-stability.harness.client'
 
 // ── Flat array story ─────────────────────────────────────────────────────────
 
@@ -182,7 +186,7 @@ const boundedFields: FormItem[] = [
 /**
  * Demonstrates `min` and `max` constraints. Removing the last item shows empty-state
  * guidance while schema validation enforces `min`; the Add button disappears at `max`.
- * Grip/actions stay vertically centered unless `item.inlineAlign: 'control-edge'`.
+ * Grip/actions stay vertically centered in the shared anatomy grid cell.
  */
 export const BoundedArray: StoryObj<Meta<object>> = {
   render: () => (
@@ -607,6 +611,23 @@ export const PresentationMatrixDisclosureStacked: StoryObj<Meta<object>> = {
       className="max-w-lg"
     />
   ),
+}
+
+// ── Compact inline chrome regression stories ─────────────────────────────────
+
+/**
+ * Species movement shape — step through speed validation growth; grip/delete stay
+ * control-track anchored on the shared anatomy grid.
+ */
+export const MovementChromeStabilitySequence: StoryObj<Meta<object>> = {
+  name: 'Regression / Movement chrome stability',
+  render: () => <MovementChromeStabilityHarness />,
+}
+
+/** Examples-like unlabeled single-input compact inline row — valid baseline. */
+export const ExamplesUnlabeledInlineRow: StoryObj<Meta<object>> = {
+  name: 'Regression / Examples unlabeled inline row',
+  render: () => <ExamplesUnlabeledInlineHarness />,
 }
 
 // ── Array validation issue chrome stories ────────────────────────────────────

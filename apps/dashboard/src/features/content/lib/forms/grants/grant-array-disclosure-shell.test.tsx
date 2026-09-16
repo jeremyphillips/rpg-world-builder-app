@@ -5,20 +5,37 @@ import { z } from 'zod'
 
 import { Form, type FormItem } from '@rpg/ui/form'
 
-import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
+import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
+import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
+import { resolveGrantRowPresentation } from './grant-row-presentation.lib'
 import { disclosureEntityCardBodyInlineStartClasses } from '../../entity/surfaces/cards/disclosure/disclosure-entity-card.variants'
 import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/anatomy/entity-geometry.tokens'
 
 const grantRowSchema = z.object({
   grantType: z.literal('spells'),
-  spellTitle: z.string().min(1),
-  spellAbility: z.string().optional(),
+  spellIds: z.array(z.string().min(1)).min(1),
+  spellAbility: z.string().min(1),
   spellAvailability: z.boolean().optional(),
+  spellCastingEnabled: z.boolean().optional(),
+  spellCastingFrequency: z.string().optional(),
 })
 
 const formSchema = z.object({
   grants: z.array(grantRowSchema),
 })
+
+const grantHeaderContext = {
+  rowLabels: GRANT_ROW_TYPE_LABELS,
+  equipmentOptions: [],
+  weaponOptions: [],
+  toolOptions: [],
+  armorOptions: [],
+  skillOptions: [],
+  spellOptions: [
+    { value: 'speak-with-animals', label: 'Speak with Animals' },
+    { value: 'light', label: 'Light' },
+  ],
+}
 
 const grantFields: FormItem[] = [
   {
@@ -29,27 +46,44 @@ const grantFields: FormItem[] = [
       collapsible: true,
       header: {
         fallback: (index) => `Grant ${index + 1}`,
-        primaryField: 'spellTitle',
-        summary: () => 'Character has Speak with Animals always prepared.',
+        primary: (values) => resolveGrantRowPresentation(values, grantHeaderContext)?.heading,
+        summary: (values) =>
+          resolveGrantRowPresentation(values, grantHeaderContext)?.description ?? '',
       },
-      renderShell: renderGrantArrayItemShell,
+      renderShell: createGrantArrayItemShell(grantHeaderContext),
     },
     fields: [
       {
         type: 'text',
-        name: 'spellTitle',
-        label: 'Spell',
+        name: 'grantType',
+        label: 'Grant type',
         required: true,
+      },
+      {
+        kind: 'slot',
+        name: 'spellIds',
+        render: () => null,
       },
       {
         type: 'text',
         name: 'spellAbility',
         label: 'Spellcasting ability',
+        required: true,
       },
       {
         type: 'checkbox',
         name: 'spellAvailability',
         label: 'Always prepared',
+      },
+      {
+        type: 'checkbox',
+        name: 'spellCastingEnabled',
+        label: 'Free cast',
+      },
+      {
+        type: 'text',
+        name: 'spellCastingFrequency',
+        label: 'Cast frequency',
       },
     ],
     addAction: { label: 'Add grant' },
@@ -60,17 +94,23 @@ const twoGrantDefaults = {
   grants: [
     {
       grantType: 'spells' as const,
-      spellTitle: 'Speak with Animals',
+      spellIds: ['speak-with-animals'],
       spellAbility: 'wis',
       spellAvailability: true,
+      spellCastingEnabled: false,
     },
     {
       grantType: 'spells' as const,
-      spellTitle: 'Light',
+      spellIds: ['light'],
       spellAbility: 'cha',
       spellAvailability: true,
+      spellCastingEnabled: false,
     },
   ],
+}
+
+function getGrantRow(prefix: string): HTMLElement {
+  return document.querySelector(`[data-array-item-prefix="${prefix}"]`) as HTMLElement
 }
 
 describe('grant array DisclosureEntityCard shell', () => {
@@ -87,42 +127,42 @@ describe('grant array DisclosureEntityCard shell', () => {
       />,
     )
 
+    const firstRow = getGrantRow('grants.0')
     expect(
-      screen.getByText('Speak with Animals', { selector: '.font-body-emphasis' }),
+      within(firstRow).getByText('Spells', { selector: '.font-body-emphasis' }),
     ).toBeInTheDocument()
-    expect(screen.getAllByText('Spells').length).toBeGreaterThan(0)
     expect(
-      screen.getAllByText('Character has Speak with Animals always prepared.').length,
-    ).toBeGreaterThan(0)
+      within(firstRow).getByText('Speak with Animals', { selector: '.text-muted-foreground' }),
+    ).toBeInTheDocument()
+    expect(
+      within(firstRow).getByText('Character has Speak with Animals always prepared.'),
+    ).toBeInTheDocument()
 
-    const expand = screen.getByRole('button', { name: /Expand Grants · Speak with Animals/i })
+    const expand = within(firstRow).getByRole('button', {
+      name: 'Expand Spells, Speak with Animals',
+    })
+    expect(expand).toHaveAttribute('aria-expanded', 'false')
     expect(expand.parentElement).toHaveClass('w-[var(--leading-chrome-size)]')
     expect(
-      screen.getByRole('button', { name: /Drag to reorder Grants · Speak with Animals/i })
+      within(firstRow).getByRole('button', { name: 'Drag to reorder Spells, Speak with Animals' })
         .parentElement,
     ).toHaveClass('w-[var(--leading-chrome-size)]')
     expect(
-      screen.getByRole('button', { name: /Remove Grants · Speak with Animals/i }),
+      within(firstRow).getByRole('button', { name: 'Remove Grants · Spells' }),
     ).toBeInTheDocument()
-    expect(
-      screen.queryAllByRole('button', { name: /Remove Grants · Speak with Animals/i }),
-    ).toHaveLength(1)
 
-    const firstRow = screen
-      .getByText('Speak with Animals', { selector: '.font-body-emphasis' })
-      .closest('[data-array-item-prefix]') as HTMLElement
     const trailingSlot = firstRow.querySelector('[data-entity-item-slot="trailing"]')
     expect(trailingSlot).toBeTruthy()
     expect(
       within(trailingSlot as HTMLElement).getByRole('button', {
-        name: /Remove Grants · Speak with Animals/i,
+        name: 'Remove Grants · Spells',
       }),
     ).toBeInTheDocument()
-    const ability = within(firstRow).getByLabelText('Spellcasting ability')
-    expect(ability.closest('[hidden]')).toBeTruthy()
 
     await user.click(expand)
 
+    expect(expand).toHaveAttribute('aria-expanded', 'true')
+    const ability = within(firstRow).getByRole('textbox', { name: 'Spellcasting ability' })
     expect(ability.closest('[hidden]')).toBeNull()
     const body = ability.closest('[class*="border-t"]')
     expect(body?.className).toContain(disclosureEntityCardBodyInlineStartClasses)
@@ -142,8 +182,8 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
     expect(shell.className).not.toContain('--entity-surface-inline-start')
 
-    const headerWrap = screen
-      .getByText('Speak with Animals', { selector: '.font-body-emphasis' })
+    const headerWrap = within(firstRow)
+      .getByText('Spells', { selector: '.font-body-emphasis' })
       .closest('[class*="pl-[var(--entity-surface-inline-start)]"]') as HTMLElement
     expect(headerWrap?.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
     expect(headerWrap?.className).toMatch(/pr-\[var\(--entity-surface-inline-end\)\]/)
@@ -172,18 +212,19 @@ describe('grant array DisclosureEntityCard shell', () => {
       />,
     )
 
-    const expand = screen.getByRole('button', { name: /Expand Grants · Speak with Animals/i })
+    const firstRow = getGrantRow('grants.0')
+    const expand = within(firstRow).getByRole('button', {
+      name: 'Expand Spells, Speak with Animals',
+    })
     expect(expand).toHaveClass('cursor-pointer')
-
-    const firstRow = screen
-      .getByText('Speak with Animals', { selector: '.font-body-emphasis' })
-      .closest('[data-array-item-prefix]') as HTMLElement
-    const ability = within(firstRow).getByLabelText('Spellcasting ability')
-    expect(ability.closest('[hidden]')).toBeTruthy()
+    expect(expand).toHaveAttribute('aria-expanded', 'false')
 
     await user.click(expand)
 
-    expect(ability.closest('[hidden]')).toBeNull()
+    expect(expand).toHaveAttribute('aria-expanded', 'true')
+    expect(
+      within(firstRow).getByRole('textbox', { name: 'Spellcasting ability' }).closest('[hidden]'),
+    ).toBeNull()
   })
 
   it('removes the row without leaving a disclosure toggle conflict', async () => {
@@ -200,17 +241,19 @@ describe('grant array DisclosureEntityCard shell', () => {
     )
 
     await user.click(
-      screen.getByRole('button', {
-        name: /Remove Grants · Speak with Animals/i,
+      within(getGrantRow('grants.0')).getByRole('button', {
+        name: 'Remove Grants · Spells',
       }),
     )
 
+    expect(document.querySelectorAll('[data-array-item-prefix]')).toHaveLength(1)
     expect(
-      screen.queryByText('Speak with Animals', { selector: '.font-body-emphasis' }),
+      screen.queryByText('Speak with Animals', { selector: '.text-muted-foreground' }),
     ).not.toBeInTheDocument()
-    expect(screen.getByText('Light', { selector: '.font-body-emphasis' })).toBeInTheDocument()
     // Sole remaining item auto-expands (array collapse contract).
-    expect(screen.getByRole('button', { name: /Collapse Grants · Light/i })).toBeInTheDocument()
+    expect(
+      within(getGrantRow('grants.0')).getByRole('button', { name: /^Collapse Spells/ }),
+    ).toBeInTheDocument()
   })
 
   it('keeps peer disclosure state independent per item', async () => {
@@ -226,16 +269,18 @@ describe('grant array DisclosureEntityCard shell', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /Expand Grants · Speak with Animals/i }))
+    const firstRow = getGrantRow('grants.0')
+    const lightRow = getGrantRow('grants.1')
 
-    const firstRow = screen
-      .getByText('Speak with Animals', { selector: '.font-body-emphasis' })
-      .closest('[data-array-item-prefix]') as HTMLElement
-    const lightRow = screen
-      .getByText('Light', { selector: '.font-body-emphasis' })
-      .closest('[data-array-item-prefix]') as HTMLElement
+    await user.click(
+      within(firstRow).getByRole('button', { name: 'Expand Spells, Speak with Animals' }),
+    )
 
-    expect(within(firstRow).getByLabelText('Spellcasting ability').closest('[hidden]')).toBeNull()
-    expect(within(lightRow).getByLabelText('Spellcasting ability').closest('[hidden]')).toBeTruthy()
+    expect(
+      within(firstRow).getByRole('button', { name: 'Collapse Spells, Speak with Animals' }),
+    ).toBeInTheDocument()
+    expect(
+      within(lightRow).getByRole('button', { name: 'Expand Spells, Light' }),
+    ).toBeInTheDocument()
   })
 })

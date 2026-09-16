@@ -36,7 +36,7 @@ describe('resolveFieldWidthClassName', () => {
       fieldWidthVariants({ width: 'lg' }),
     )
     expect(resolveFieldWidthClassName('auto', { rowParticipation: true })).toBe(
-      fieldWidthVariants({ width: 'auto' }),
+      'w-fit min-w-min flex-none',
     )
   })
 })

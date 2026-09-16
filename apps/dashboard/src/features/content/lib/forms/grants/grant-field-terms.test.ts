@@ -15,12 +15,12 @@ describe('grant field terms', () => {
   })
 
   it('builds tier-1 validation messages from vocab nouns', () => {
-    expect(formatFieldMessage(grantFieldRequiredSelectMessage('senseType'))).toBe('Select a sense.')
+    expect(formatFieldMessage(grantFieldRequiredSelectMessage('senseType'))).toBe('Choose a sense.')
     expect(formatFieldMessage(grantFieldMinSelectionsMessage('toolProficiencySlugs'))).toBe(
-      'Select at least one tool.',
+      'Choose at least one tool.',
     )
     expect(formatFieldMessage(grantFieldMinSelectionsMessage('armorTrainingSlugs'))).toBe(
-      'Select at least one piece of armor.',
+      'Choose at least one piece of armor.',
     )
   })
 })

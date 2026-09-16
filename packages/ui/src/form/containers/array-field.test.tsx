@@ -1,6 +1,8 @@
+import * as React from 'react'
 import { describe, expect, it, vi, afterEach } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { UseFormReturn } from 'react-hook-form'
 import axe from 'axe-core'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
@@ -10,6 +12,11 @@ import type { FormItem } from '../field-config'
 import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
 import { submitAndExpectPayload } from '../test-utils'
 import { collapsibleListItemHeaderVerticalPaddingVariants } from '../../components/ui/collapsible-list-item/collapsible-list-item.variants'
+import {
+  movementChromeStabilityFields,
+  movementChromeStabilitySchema,
+  type MovementChromeStabilityValues,
+} from './array-field-chrome-stability.harness.client'
 
 // ── Schema ──────────────────────────────────────────────────────────────────
 
@@ -515,7 +522,38 @@ describe('ArrayFieldRenderer', () => {
     expect(await screen.findByText('Trait name is required')).toBeInTheDocument()
   })
 
-  it('hides the add button when max is reached', async () => {
+  it('keeps the add button visible and disabled when resolveCanAppend reports saturation', async () => {
+    const saturatedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'modes',
+        legend: 'Modes',
+        fields: [{ type: 'select', name: 'mode', label: 'Mode', options: [] }],
+        addAction: { label: 'Add mode' },
+        resolveCanAppend: (items) =>
+          (items as { mode: string }[]).filter((row) => row.mode).length >= 2
+            ? { enabled: false, reason: 'All modes have been added.' }
+            : { enabled: true },
+      },
+    ]
+    const saturatedSchema = z.object({ modes: z.array(z.object({ mode: z.string() })) })
+
+    render(
+      <Form
+        schema={saturatedSchema}
+        fields={saturatedFields}
+        defaultValues={{ modes: [{ mode: 'walk' }, { mode: 'fly' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add mode' })
+    expect(addButton).toBeDisabled()
+    expect(addButton).toHaveAttribute('title', 'All modes have been added.')
+  })
+
+  it('keeps the add button visible and disabled when max is reached', async () => {
     const user = userEvent.setup()
     const maxFields: FormItem[] = [
       {
@@ -537,7 +575,9 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    expect(screen.queryByRole('button', { name: 'Add trait' })).not.toBeInTheDocument()
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    expect(addButton).toBeDisabled()
+    expect(addButton).toHaveAttribute('title', 'Add up to 1 items.')
   })
 
   it('allows removing the last item and shows neutral empty-state copy only', async () => {
@@ -1207,7 +1247,7 @@ describe('ArrayFieldRenderer', () => {
     expect(actionsRail).not.toHaveClass('mt-1')
   })
 
-  it('lays out compact inline rows on a dedicated grid with embedded actions', async () => {
+  it('lays out compact inline rows on the shared anatomy grid with embedded actions', async () => {
     const compactRowFields: FormItem[] = [
       {
         kind: 'array',
@@ -1244,14 +1284,16 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-inline-row]')
-    expect(compactRow).toBeInTheDocument()
-    expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
+    const inlineRow = document.querySelector('[data-array-item-anatomy-inline-row]')
+    expect(inlineRow).toBeInTheDocument()
+    const anatomyGrid = document.querySelector('[data-array-item-anatomy-grid]')
+    expect(anatomyGrid).toBeInTheDocument()
+    expect(anatomyGrid?.querySelector('[data-field-row-anatomy]')).toBeNull()
 
-    const actionsRail = compactRow!.querySelector('[aria-label="Item actions"]')
+    const actionsRail = anatomyGrid!.querySelector('[aria-label="Item actions"]')
     expect(actionsRail).toBeInTheDocument()
     expect(actionsRail).not.toHaveClass('mt-1')
-    expect(actionsRail).toHaveClass('justify-self-end')
+    expect(actionsRail?.closest('[data-array-item-anatomy-actions]')).toBeInTheDocument()
   })
 
   it('honors FieldRow width tokens inside compact inline rows', async () => {
@@ -1304,8 +1346,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-inline-row]')
-    expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
+    expect(document.querySelector('[data-array-item-anatomy-grid]')).toBeInTheDocument()
 
     expect(
       screen.getByRole('textbox', { name: 'Description' }).closest('[data-field-row-participant]'),
@@ -1315,7 +1356,7 @@ describe('ArrayFieldRenderer', () => {
     ).toHaveClass('w-fit')
   })
 
-  it('top-aligns unlabeled compact inline grip and actions with the anatomy field row by default', () => {
+  it('centers unlabeled compact inline grip and actions in the shared anatomy grid cell', () => {
     const centeredCompactRowFields: FormItem[] = [
       {
         kind: 'array',
@@ -1351,15 +1392,74 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-inline-row]')
-    expect(compactRow).toHaveAttribute('data-compact-inline-align', 'start')
-    expect(compactRow).toHaveClass('items-start')
+    expect(document.querySelector('[data-array-item-anatomy-inline-row]')).toBeInTheDocument()
+    expect(document.querySelector('[data-array-item-anatomy-grid]')).toBeInTheDocument()
+    expect(document.querySelector('[data-field-row-anatomy]')).toBeNull()
 
-    const gripColumn = compactRow?.firstElementChild?.nextElementSibling
-    expect(gripColumn).toHaveClass('self-start')
+    expect(document.querySelector('[data-array-item-anatomy-grip]')).toHaveClass('items-center')
+    expect(document.querySelector('[data-array-item-anatomy-actions]')).toHaveClass('items-center')
+  })
 
-    const actionsColumn = compactRow?.querySelector('[aria-label="Item actions"]')?.parentElement
-    expect(actionsColumn).toHaveClass('self-start')
+  it('keeps movement-shaped inline chrome on the anatomy grid when the message track grows', async () => {
+    function MovementFeetErrorEffect({
+      form,
+      message,
+    }: {
+      form: UseFormReturn<MovementChromeStabilityValues>
+      message?: string
+    }) {
+      React.useEffect(() => {
+        form.clearErrors('movement.0.feet')
+        if (message) {
+          form.setError('movement.0.feet', { type: 'manual', message })
+        }
+      }, [form, message])
+      return null
+    }
+
+    function MovementChromeFixture({ errorMessage }: { errorMessage?: string }) {
+      return (
+        <Form<MovementChromeStabilityValues>
+          id="movement-chrome-test"
+          schema={movementChromeStabilitySchema}
+          fields={movementChromeStabilityFields}
+          defaultValues={{ movement: [{ mode: 'walk', feet: 30 }] }}
+          onSubmit={vi.fn()}
+          header={(form) => <MovementFeetErrorEffect form={form} message={errorMessage} />}
+          footer={<button type="submit">Save</button>}
+        />
+      )
+    }
+
+    const assertAnatomyGridChrome = () => {
+      const anatomyGrid = document.querySelector('[data-array-item-anatomy-grid]')
+      expect(anatomyGrid).toBeInTheDocument()
+      expect(anatomyGrid?.querySelector('[data-field-row-anatomy]')).toBeNull()
+
+      const grip = document.querySelector('[data-array-item-anatomy-grip]') as HTMLElement | null
+      const actions = document.querySelector(
+        '[data-array-item-anatomy-actions]',
+      ) as HTMLElement | null
+
+      expect(grip).toHaveStyle({ gridRow: '1 / -1' })
+      expect(actions).toHaveStyle({ gridRow: '1 / -1' })
+      expect(grip).toHaveClass('items-center')
+      expect(actions).toHaveClass('items-center')
+      expect(anatomyGrid).toContainElement(grip)
+      expect(anatomyGrid).toContainElement(actions)
+    }
+
+    const { rerender } = render(<MovementChromeFixture />)
+    assertAnatomyGridChrome()
+
+    rerender(
+      <MovementChromeFixture errorMessage="Speed must be a positive whole number and cannot exceed the species movement cap for this mode." />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText(/species movement cap/i)).toBeInTheDocument()
+    })
+    assertAnatomyGridChrome()
   })
 
   it('shows issue badge, row summary, and legend link after failed submit', async () => {
@@ -1513,7 +1613,7 @@ describe('ArrayFieldRenderer', () => {
       )
     })
 
-    expect(screen.getByText('Select a rarity.')).toBeInTheDocument()
+    expect(screen.getByText('Choose a rarity.')).toBeInTheDocument()
     expect(screen.getByText('Quantity is required.')).toBeInTheDocument()
     expect(
       within(screen.getByRole('group', { name: 'Item actions' })).queryByRole('button', {
@@ -1571,9 +1671,9 @@ describe('ArrayFieldRenderer', () => {
       )
     })
 
-    expect(screen.queryByText('Select a rarity.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Choose a rarity.')).not.toBeInTheDocument()
     expect(screen.queryByText('Quantity is required.')).not.toBeInTheDocument()
-    expect(screen.getByRole('alert')).toHaveTextContent('Select a rarity. · Quantity is required.')
+    expect(screen.getByRole('alert')).toHaveTextContent('Choose a rarity. · Quantity is required.')
   })
 
   it('appends defaults from addActionMenu selections', async () => {
@@ -1840,8 +1940,8 @@ describe('ArrayFieldRenderer', () => {
         const flatShell = document.querySelector('[data-array-item-flat-no-header]')
         expect(flatShell).toBeInTheDocument()
         expect(flatShell).toHaveAttribute('data-array-item-content-layout', 'inline')
-        expect(document.querySelector('[data-compact-inline-row]')).toBeInTheDocument()
-        expect(document.querySelector('[data-compact-inline-align="start"]')).toBeInTheDocument()
+        expect(document.querySelector('[data-array-item-anatomy-inline-row]')).toBeInTheDocument()
+        expect(document.querySelector('[data-array-item-anatomy-grid]')).toBeInTheDocument()
 
         unmount()
       }
@@ -1874,17 +1974,21 @@ describe('ArrayFieldRenderer', () => {
       )
 
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
-      const flatRow = document.querySelector('[data-compact-inline-row]')
-      expect(flatRow).toHaveStyle({ gridTemplateColumns: 'auto minmax(0, 1fr) max-content' })
-      expect(flatRow?.querySelector('[aria-hidden="true"][class*="opacity-0"]')).toBeInTheDocument()
+      const anatomyGrid = document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement
+      expect(anatomyGrid).toBeInTheDocument()
+      expect(anatomyGrid.style.gridTemplateColumns).toContain('var(--leading-chrome-size)')
+      expect(
+        anatomyGrid.querySelector('[aria-hidden="true"][class*="opacity-0"]'),
+      ).toBeInTheDocument()
 
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
       expect(screen.getAllByLabelText(/Drag to reorder/i)).toHaveLength(2)
 
       await user.click(screen.getAllByRole('button', { name: /Remove/i })[1]!)
-      expect(document.querySelector('[data-compact-inline-row]')).toHaveStyle({
-        gridTemplateColumns: 'auto minmax(0, 1fr) max-content',
-      })
+      expect(
+        (document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement).style
+          .gridTemplateColumns,
+      ).toContain('var(--leading-chrome-size)')
     })
   })
 })

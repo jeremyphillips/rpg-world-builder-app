@@ -86,43 +86,61 @@ export const fieldAnatomyAlignVariants = cva('flex flex-col', {
   },
 })
 
+/** Subgrid row track for label regions inside {@link fieldRowParticipationClasses} columns. */
+export const fieldAnatomyLabelRegionRowTrackClasses =
+  'in-data-[field-row-participant]:row-start-1 in-data-[field-row-participant]:row-end-2'
+
+/** Subgrid row track for control regions inside row participants. */
+export const fieldAnatomyControlRegionRowTrackClasses =
+  'in-data-[field-row-participant]:row-start-2 in-data-[field-row-participant]:row-end-3'
+
+/** Subgrid row track for message regions inside row participants. */
+export const fieldAnatomyMessageRegionRowTrackClasses =
+  'in-data-[field-row-participant]:row-start-3 in-data-[field-row-participant]:row-end-4'
+
 /**
  * Label-region → control spacing for flat three-region anatomy.
  * Padding applies via `has-[*]` so empty regions (null children / whitespace only)
  * contribute no height. Lockstep with {@link fieldAnatomyStackVariants}.
  */
-export const fieldLabelRegionVariants = cva('min-w-0 in-data-[field-row-participant]:self-end', {
-  variants: {
-    size: {
-      sm: 'has-[*]:pb-1',
-      md: 'has-[*]:pb-1.5',
-      lg: 'has-[*]:pb-1.5',
+export const fieldLabelRegionVariants = cva(
+  cn('min-w-0 in-data-[field-row-participant]:self-end', fieldAnatomyLabelRegionRowTrackClasses),
+  {
+    variants: {
+      size: {
+        sm: 'has-[*]:pb-1',
+        md: 'has-[*]:pb-1.5',
+        lg: 'has-[*]:pb-1.5',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
     },
   },
-  defaultVariants: {
-    size: 'md',
-  },
-})
+)
 
 /**
  * Control → message-region spacing for flat three-region anatomy.
  * Padding applies via `has-[*]` so empty regions contribute no height.
  */
-export const fieldMessageRegionVariants = cva('min-w-0', {
-  variants: {
-    size: {
-      sm: 'has-[*]:pt-1',
-      md: 'has-[*]:pt-1.5',
-      lg: 'has-[*]:pt-1.5',
+export const fieldMessageRegionVariants = cva(
+  cn('min-w-0', fieldAnatomyMessageRegionRowTrackClasses),
+  {
+    variants: {
+      size: {
+        sm: 'has-[*]:pt-1',
+        md: 'has-[*]:pt-1.5',
+        lg: 'has-[*]:pt-1.5',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
     },
   },
-  defaultVariants: {
-    size: 'md',
-  },
-})
+)
 
 /** Control region — no intrinsic spacing; band sizing lives on the control band. */
-export const fieldControlRegionClasses = 'min-w-0'
+export const fieldControlRegionClasses = cn('min-w-0', fieldAnatomyControlRegionRowTrackClasses)
 
 /** Comfortable default — prefer {@link fieldAnatomyStackVariants} when `size` is known. */
 export const fieldAnatomyStackClasses = fieldAnatomyStackVariants({ size: 'md' })

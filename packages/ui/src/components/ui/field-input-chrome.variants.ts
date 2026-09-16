@@ -46,11 +46,17 @@ export const fieldGroupedShellClasses = cn(
 /** Stretch layout: input grows, trailing segment stays intrinsic width. */
 export const fieldGroupedShellStretchLayoutClasses = 'w-full grid-cols-[1fr_1px_auto]'
 
-/** Intrinsic layout: shell width follows segment content. */
-export const fieldGroupedShellIntrinsicLayoutClasses = 'w-fit max-w-full grid-cols-[auto_1px_auto]'
+/**
+ * Intrinsic layout: shell width follows segment content.
+ * `min-w-max` keeps the outer border wrapped around the full composite when the parent
+ * track constricts — overflow moves to the row instead of mangling the grouped shell.
+ */
+export const fieldGroupedShellIntrinsicLayoutClasses =
+  'w-fit min-w-max max-w-full grid-cols-[auto_minmax(1px,1px)_auto]'
 
 /** Vertical divider between grouped segments. */
-export const fieldGroupedDividerClasses = 'w-px shrink-0 self-stretch bg-border'
+export const fieldGroupedDividerClasses =
+  'relative z-[1] w-px min-w-px shrink-0 self-stretch bg-border'
 
 /**
  * Suppresses standalone field chrome and per-segment focus rings so the group

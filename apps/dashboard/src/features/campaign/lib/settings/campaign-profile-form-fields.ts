@@ -65,7 +65,6 @@ export const flavorFields: FormItem[] = [
     name: 'playStyle',
     label: 'Play Style',
     multiple: true,
-    hint: 'Pick as many as apply.',
     options: toOptions(PLAY_STYLES, PLAY_STYLE_LABELS),
   },
   {
@@ -73,7 +72,6 @@ export const flavorFields: FormItem[] = [
     name: 'mood',
     label: 'Mood',
     multiple: true,
-    hint: 'Pick as many as apply.',
     options: toOptions(MOODS, MOOD_LABELS),
   },
   {

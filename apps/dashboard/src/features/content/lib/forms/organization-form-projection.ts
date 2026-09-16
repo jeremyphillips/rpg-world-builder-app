@@ -202,7 +202,6 @@ export function buildOrganizationFields(
       name: fieldPath(prefix, 'organizationForm'),
       label: 'Form',
       options: organizationFormOptions,
-      placeholder: 'Select form…',
       optionalDisclosure: {
         addLabel: 'Add form',
         removeLabel: 'Remove form',

@@ -104,7 +104,18 @@ export function useArrayFieldRendererState({
   const showDefaultItemRemove = itemConfig.removable && !itemConfig.removeSlot
   const canRemove = showDefaultItemRemove
 
-  const canAdd = max === undefined || fields.length < max
+  const underMax = max === undefined || fields.length < max
+  const canAppend = config.resolveCanAppend?.(
+    watchedItems ?? fields.map((_, index) => getItemValues(index)),
+  ) ?? {
+    enabled: true,
+  }
+  const addEnabled = underMax && canAppend.enabled
+  const addDisabledReason = !canAppend.enabled
+    ? canAppend.reason
+    : !underMax
+      ? `Add up to ${max} items.`
+      : undefined
   const containerIssue = resolveContainerIssue(validation.issues, fullName)
   const hasContainerIssue = containerIssue !== undefined
   const invalidRowCount = validation.hasAttemptedSubmit
@@ -194,7 +205,10 @@ export function useArrayFieldRendererState({
     appendItem,
     appendItemWithDefaults,
     arrayIssueCount,
-    canAdd,
+    showAddControl: addAction !== null,
+    addEnabled,
+    addDisabledReason,
+    canAdd: addEnabled,
     focusFirstArrayIssue,
     fullName,
     idPrefix,

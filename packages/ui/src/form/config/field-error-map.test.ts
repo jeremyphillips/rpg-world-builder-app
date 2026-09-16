@@ -85,28 +85,57 @@ describe('makeFieldErrorMap', () => {
     expect(messageFor(schema, { quantity: 1.5 })).toBe('Quantity must be a whole number.')
   })
 
-  it('formats select issues as select messages', () => {
+  it('formats select issues as choose messages', () => {
     const schema = z.object({ rarity: z.enum(['common', 'rare']) })
 
-    expect(messageFor(schema, {})).toBe('Select a rarity.')
-    expect(messageFor(schema, { rarity: '' })).toBe('Select a rarity.')
-    expect(messageFor(schema, { rarity: 'bogus' })).toBe('Select a valid rarity.')
+    expect(messageFor(schema, {})).toBe('Choose a rarity.')
+    expect(messageFor(schema, { rarity: '' })).toBe('Choose a rarity.')
+    expect(messageFor(schema, { rarity: 'bogus' })).toBe('Choose a valid rarity.')
   })
 
   it('treats single-select chips as a choice field', () => {
     expect(
       messageFor(z.object({ category: z.enum(['martial', 'simple']) }), { category: 'x' }),
-    ).toBe('Select a valid category.')
+    ).toBe('Choose a valid category.')
   })
 
-  it('formats multi-chips minimums as select-at-least messages', () => {
+  it('formats multi-chips minimums as choose-at-least messages', () => {
     const schema = z.object({ damageTypes: z.array(z.string()).min(1) })
     const countSchema = z.object({ damageTypes: z.array(z.string()).min(2) })
 
-    expect(messageFor(schema, { damageTypes: [] })).toBe('Select at least one damage type.')
+    expect(messageFor(schema, { damageTypes: [] })).toBe('Choose at least one damage type.')
     expect(messageFor(countSchema, { damageTypes: ['fire'] })).toBe(
-      'Select at least 2 damage types.',
+      'Choose at least 2 damage types.',
     )
+  })
+
+  it('formats multi-chips maximums and exact counts', () => {
+    const maxFields: FormItem[] = [
+      {
+        type: 'chips',
+        name: 'primaryAbilities',
+        label: 'Primary abilities',
+        options: [],
+        noun: { singular: 'primary ability', plural: 'primary abilities' },
+      },
+    ]
+    const maxSchema = z.object({ primaryAbilities: z.array(z.string()).max(2) })
+    const exactSchema = z.object({ primaryAbilities: z.array(z.string()).length(2) })
+
+    expect(
+      messageFor(
+        maxSchema,
+        { primaryAbilities: ['str', 'dex', 'con'] },
+        { fields: maxFields, path: ['primaryAbilities'] },
+      ),
+    ).toBe('Choose up to 2 primary abilities.')
+    expect(
+      messageFor(
+        exactSchema,
+        { primaryAbilities: ['str'] },
+        { fields: maxFields, path: ['primaryAbilities'] },
+      ),
+    ).toBe('Choose 2 primary abilities.')
   })
 
   it('formats array container minimums from the legend', () => {

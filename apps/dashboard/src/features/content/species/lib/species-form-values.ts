@@ -19,7 +19,11 @@ import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-
 import { cultureToFormValues } from './species-culture-form-fields'
 import { cultureFromFormValues } from './species-culture-form-values'
 import { heritageFromFormValues, heritageToFormRow } from './species-heritage-form-values'
-import { movementRecordToRows, movementRowsToRecord } from './species-movement-form-fields'
+import {
+  movementRecordToRows,
+  movementRowsToRecord,
+  movementRowsToRecordForPreview,
+} from './species-movement-form-fields'
 import {
   characterCreationFromFormValues,
   characterCreationToFormValues,
@@ -124,7 +128,10 @@ function speciesWirePayload(
     description: values.description || undefined,
     creatureType: values.creatureType,
     sizes: values.sizes,
-    movement: movementRowsToRecord(values.movement),
+    movement:
+      validationIntent === 'draft'
+        ? movementRowsToRecordForPreview(values.movement)
+        : movementRowsToRecord(values.movement),
     ...optionalLanguageAffinities(values.languageAffinities),
     ...optionalCulture(culture),
     traits: traitsForInput(values, ctx, validationIntent),

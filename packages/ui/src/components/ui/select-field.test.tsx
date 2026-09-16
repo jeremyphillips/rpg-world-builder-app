@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { COMPACT_UNSET_PLACEHOLDER } from '../../form/config/field-placeholder.lib'
 import { SelectField } from './select-field'
 
 const options = [
@@ -32,9 +33,9 @@ describe('SelectField', () => {
     expect(trigger).toHaveTextContent('Choose…')
   })
 
-  it('defaults the placeholder to Select {label}…', () => {
+  it('defaults the placeholder to Choose {label}…', () => {
     render(<SelectField id="alignment" label="Alignment" options={options} />)
-    expect(screen.getByLabelText('Alignment')).toHaveTextContent('Select Alignment…')
+    expect(screen.getByLabelText('Alignment')).toHaveTextContent('Choose an alignment…')
   })
 
   it('renders the error and marks the trigger invalid while keeping below-label hint visible', () => {
@@ -62,6 +63,39 @@ describe('SelectField', () => {
   it('renders grouped options with section labels', () => {
     render(<SelectField id="level" label="Level" placeholder="Choose…" options={groupedOptions} />)
     expect(screen.getByLabelText('Level')).toBeInTheDocument()
+  })
+
+  it('uses compact unset placeholder for digit-sized unset selects', () => {
+    render(
+      <SelectField
+        id="speed"
+        label="Speed value"
+        digits={3}
+        options={[
+          { label: '30', value: '30' },
+          { label: '60', value: '60' },
+        ]}
+      />,
+    )
+
+    expect(screen.getByLabelText('Speed value')).toHaveTextContent(COMPACT_UNSET_PLACEHOLDER)
+  })
+
+  it('keeps full Choose placeholder when presentation overrides digit inference', () => {
+    render(
+      <SelectField
+        id="speed"
+        label="Speed value"
+        digits={3}
+        presentation="default"
+        options={[
+          { label: '30', value: '30' },
+          { label: '60', value: '60' },
+        ]}
+      />,
+    )
+
+    expect(screen.getByLabelText('Speed value')).toHaveTextContent('Choose a speed value…')
   })
 
   it('applies digit width to the trigger while keeping the field container full width', () => {

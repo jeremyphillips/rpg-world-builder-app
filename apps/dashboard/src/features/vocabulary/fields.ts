@@ -1,5 +1,4 @@
 export {
-  VOCABULARY_COMBOBOX_PLACEHOLDER,
   vocabularyComboboxField,
   vocabularyComboboxFieldForTerm,
   vocabularySelectField,

@@ -4,6 +4,8 @@
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldConfig, FieldDerivedMeta, JoinedPairFieldConfig } from '../field-config'
 import { resolveFieldConfigPrimaryName } from '../field-config'
+import { resolveFieldCopyContext } from '../config/field-copy-context.lib'
+import { resolveFieldInstruction } from '../config/field-instruction.lib'
 import { resolveRowAwareFieldHintPresentation } from '../config/resolve-row-field-hint.lib'
 import {
   applyOptionAvailabilityToFieldOptions,
@@ -87,10 +89,12 @@ export function resolveFieldRenderConfig(
     ? resolveRowAwareFieldHintPresentation(config, dynamicValues, true)
     : resolveFieldHintPresentation(config, dynamicValues)
   const derivedMetaPresentation = resolveDerivedMetaPresentation(config, dynamicValues)
+  const resolvedHint =
+    hintPresentation.text ?? resolveFieldInstruction(resolveFieldCopyContext(config))
 
   const basePresentation = {
     controlSize,
-    hint: hintPresentation.text,
+    hint: resolvedHint,
     hintPosition: hintPresentation.position,
     ...derivedMetaPresentation,
   }

@@ -48,7 +48,6 @@ function buildParticipantField(ctx: CampaignAccessFormCtx): FieldConfig {
     info: CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
     multiple: true,
     options: [...(ctx.participantOptions ?? [])],
-    placeholder: 'Choose players…',
     required: true,
     disabled: !ctx.available || ctx.pending,
   }

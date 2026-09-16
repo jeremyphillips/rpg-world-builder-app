@@ -150,7 +150,7 @@ describe('startingEquipmentItemTitle', () => {
         0,
         equipmentOptions,
       ),
-    ).toBe('4 × Javelin')
+    ).toBe('Javelin')
   })
 
   it('omits quantity suffix for a single granted item', () => {
@@ -165,7 +165,7 @@ describe('startingEquipmentItemTitle', () => {
         0,
         equipmentOptions,
       ),
-    ).toBe('1 × Greataxe')
+    ).toBe('Greataxe')
   })
 
   it('formats linked proficiency grants with the choice label', () => {
@@ -181,7 +181,7 @@ describe('startingEquipmentItemTitle', () => {
         equipmentOptions,
         proficiencyChoiceOptions,
       ),
-    ).toBe(`1 × Tool selected in "Artisan's Tools or Musical Instrument"`)
+    ).toBe(`Tool from "Artisan's Tools or Musical Instrument"`)
   })
 
   it('uses linked summary without choice ids', () => {

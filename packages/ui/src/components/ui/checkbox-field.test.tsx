@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { CheckboxField } from './checkbox-field'
 
 describe('CheckboxField', () => {
@@ -44,6 +45,27 @@ describe('CheckboxField', () => {
 
     expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-0.5')
     expect(textColumn).toContainElement(hint)
+  })
+
+  it('uses a single-line control band with hints in the message region inside anatomy rows', () => {
+    const { container } = render(
+      <FieldRowAnatomyProvider>
+        <CheckboxField
+          id="prepared"
+          label="Always prepared"
+          hint="Prepared spells do not count against slots."
+        />
+      </FieldRowAnatomyProvider>,
+    )
+
+    const band = container.querySelector('[data-field-control-region] > div')
+    expect(band).toHaveClass('min-h-9')
+    expect(band).not.toHaveClass('items-start')
+    expect(
+      screen
+        .getByText('Prepared spells do not count against slots.')
+        .closest('[data-field-message-region]'),
+    ).toBeTruthy()
   })
 
   it('keeps first-line checkbox column alignment inside the content-sized band', () => {

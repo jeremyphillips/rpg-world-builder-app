@@ -4,6 +4,7 @@ import {
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   defineMessage,
+  fieldValidationMessages,
   EQUIPMENT_KIND_LABELS,
   EQUIPMENT_KINDS,
   GEAR_KIND_ENTRIES,
@@ -63,7 +64,7 @@ export const equipmentGrantValidationMessages = {
   ),
   proficiencyChoiceRequired: defineMessage(
     'validation.equipmentGrant.proficiencyChoiceRequired',
-    () => 'Select a proficiency choice for this grant.',
+    () => 'Choose a proficiency choice for this grant.',
     () => 'Missing proficiency choice',
   ),
   missingProficiencyChoice: defineMessage<{ choiceId: string }>(
@@ -152,7 +153,7 @@ export const grantedEquipmentItemFormSchema = z
     if (row.grantTargetSource === 'equipment' && !row.equipmentSlug?.trim()) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Equipment is required.',
+        message: fieldValidationMessages.requiredSelect({ label: 'Equipment' }),
         path: ['equipmentSlug'],
       })
     }

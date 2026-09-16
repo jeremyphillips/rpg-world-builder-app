@@ -154,6 +154,10 @@ export function resolveFieldWidthClassName(
     return 'min-w-0 w-full'
   }
 
-  // Fixed / auto — same classes; flex grow tokens are inert on grid items.
+  if (width === 'auto') {
+    return 'w-fit min-w-min flex-none'
+  }
+
+  // Fixed intrinsic tokens — flex grow tokens are inert on grid items.
   return fieldWidthVariants({ width })
 }

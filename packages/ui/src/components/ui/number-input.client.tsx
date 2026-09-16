@@ -5,8 +5,8 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { NumberInputSteppers } from './number-input-steppers.client'
 import { useNumberInput } from './number-input.use.client'
+import { resolveDigitInlineSizeClasses } from './field-digit-metrics'
 import {
-  numberInputDigitsVariants,
   numberInputFieldVariants,
   numberInputRootVariants,
   type NumberInputDigits,
@@ -84,7 +84,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       <div
         className={cn(
           numberInputRootVariants(),
-          digits ? numberInputDigitsVariants[resolvedSize][digits] : 'w-full',
+          digits ? resolveDigitInlineSizeClasses(digits, resolvedSize) : 'w-full',
           rootClassName,
         )}
       >

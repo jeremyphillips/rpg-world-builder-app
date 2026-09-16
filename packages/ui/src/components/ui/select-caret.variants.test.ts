@@ -36,4 +36,11 @@ describe('select-caret variants', () => {
     expect(mdColumn).toContain('items-center')
     expect(mdColumn).not.toContain('absolute')
   })
+
+  it('adds grouped-start trailing inset after the chevron only', () => {
+    expect(selectDigitTrailingColumnVariants({ size: 'md', groupedStart: true })).toContain('pr-1')
+    expect(selectDigitTrailingColumnVariants({ size: 'md', groupedStart: false })).not.toContain(
+      'pr-1',
+    )
+  })
 })

@@ -108,7 +108,7 @@ describe('RequirementEditor', () => {
     await triggerValidation()
 
     await waitFor(() => {
-      expect(screen.getByText('Select condition type.')).toBeInTheDocument()
+      expect(screen.getByText('Choose condition type.')).toBeInTheDocument()
     })
   })
 

@@ -102,48 +102,24 @@ export function arrayItemBodyClasses(options: CollapsibleListItemLeadingChromeOp
 /** Inline field region for compact items (same row as toolbar). */
 export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'
 
-import type { ArrayCompactInlineAlign } from '../../field-config'
-
-function arrayItemCompactInlineSelfAlign(align: ArrayCompactInlineAlign): string {
-  if (align === 'center') return 'self-center'
-  if (align === 'control-edge') return 'self-end'
-  return 'self-start'
+/** Stacked compact row — grip, fields, and actions share one outer grid row. */
+export function arrayItemCompactRowClasses(): string {
+  return cn('grid w-full min-w-0 items-start gap-x-2')
 }
 
-/** Unlabeled inline rows top-align grip/actions with the anatomy field row unless overridden. */
-export function resolveArrayItemCompactInlineAlign(
-  align: ArrayCompactInlineAlign | undefined,
-  unlabeled: boolean,
-): ArrayCompactInlineAlign {
-  if (align !== undefined) return align
-  if (unlabeled) return 'start'
-  return 'start'
+/** Grip column in the stacked compact row grid. */
+export function arrayItemCompactGripClasses(): string {
+  return cn(collapsibleListItemChromeColumnClasses, 'self-start')
 }
 
-/** Compact inline row — grip, fields, and actions share one grid row. */
-export function arrayItemCompactRowClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn(
-    'grid w-full min-w-0 gap-x-2',
-    align === 'center' ? 'items-center' : align === 'control-edge' ? 'items-end' : 'items-start',
-  )
+/** Field stack cell in the stacked compact row grid. */
+export function arrayItemCompactFieldCellClasses(): string {
+  return cn('min-w-0 self-start')
 }
 
-/** Grip column in the compact row grid. */
-export function arrayItemCompactGripClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn(collapsibleListItemChromeColumnClasses, arrayItemCompactInlineSelfAlign(align))
-}
-
-/** Per-field cell in the compact row grid. */
-export function arrayItemCompactFieldCellClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn('min-w-0', arrayItemCompactInlineSelfAlign(align))
-}
-
-/** Actions column in the compact row grid — content-sized, never steals field space. */
-export function arrayItemCompactActionsClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn(
-    'flex w-max shrink-0 items-center justify-self-end',
-    arrayItemCompactInlineSelfAlign(align),
-  )
+/** Actions column in the stacked compact row grid — content-sized, never steals field space. */
+export function arrayItemCompactActionsClasses(): string {
+  return cn('flex w-max shrink-0 items-center justify-self-end self-start')
 }
 
 /** Full-width row summary below the compact inline field row. */
@@ -172,10 +148,8 @@ export function arrayItemFlatMergedShellClasses(
 }
 
 /** Unlabeled stacked body — grip column beside a field stack. */
-export function arrayItemUnlabeledStackedRowClasses(
-  align: ArrayCompactInlineAlign = 'start',
-): string {
-  return cn('grid w-full min-w-0 gap-x-2', align === 'center' ? 'items-center' : 'items-start')
+export function arrayItemUnlabeledStackedRowClasses(): string {
+  return cn('grid w-full min-w-0 items-start gap-x-2')
 }
 
 export function arrayItemUnlabeledStackedGridTemplate(reserveDragHandleSlot: boolean): string {

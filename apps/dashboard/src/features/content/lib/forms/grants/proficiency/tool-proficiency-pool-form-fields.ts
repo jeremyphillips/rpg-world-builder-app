@@ -143,7 +143,6 @@ export function toolProficiencyPoolFormFields(
       label: 'Tools',
       multiple: true,
       options: toolOptions,
-      placeholder: 'Choose tools…',
       required: true,
       visibility: visibleForPoolSource(names, 'explicit', guard, proficiencySourceGuard),
     },

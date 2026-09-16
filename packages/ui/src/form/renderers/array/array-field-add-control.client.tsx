@@ -1,11 +1,13 @@
 'use client'
 
+import * as React from 'react'
+
 /**
  * Renders the array section add action below the item list or inline with the legend.
  *
  * Chooses between a plain button and `ButtonDropdown` when
- * `ArrayConfig.addActionMenu` is configured; hides entirely when `canAdd` is false.
- * `addActionVariant` controls the trigger style (defaults to `outline`).
+ * `ArrayConfig.addActionMenu` is configured. When append is blocked, the control
+ * stays visible and disabled with an accessible explanation.
  */
 import { Plus } from 'lucide-react'
 
@@ -23,7 +25,9 @@ import { useFormSectionContext } from '../../context/form-section.context'
 import type { ArrayAddActionConfig, ArrayAddActionLayout } from '../../field-config'
 
 type ArrayFieldAddControlProps = {
-  canAdd: boolean
+  showAddControl: boolean
+  addEnabled: boolean
+  addDisabledReason?: string
   addActionLabel: string
   addActionVariant: NonNullable<ButtonVariantProps['variant']>
   addActionLayout?: ArrayAddActionLayout
@@ -50,7 +54,9 @@ function ArrayFieldAddTriggerLabel({
 }
 
 export function ArrayFieldAddControl({
-  canAdd,
+  showAddControl,
+  addEnabled,
+  addDisabledReason,
   addActionLabel,
   addActionVariant,
   addActionLayout = 'stacked',
@@ -66,10 +72,42 @@ export function ArrayFieldAddControl({
   const buttonSize = resolveArrayAddButtonSize(size, addActionSize)
   const triggerClassName = cn(addActionLayout === 'inline' && 'shrink-0')
   const leadingIcon = showAddIcon ? <Plus aria-hidden /> : undefined
+  const disabledReasonId = React.useId()
+  const disabledProps = addEnabled
+    ? {}
+    : {
+        disabled: true,
+        title: addDisabledReason,
+        'aria-disabled': true as const,
+        'aria-describedby': addDisabledReason ? disabledReasonId : undefined,
+      }
 
-  if (!canAdd) return null
+  if (!showAddControl) return null
+
+  const disabledReason = addDisabledReason ? (
+    <span id={disabledReasonId} className="sr-only">
+      {addDisabledReason}
+    </span>
+  ) : null
 
   if (addActionMenu) {
+    if (!addEnabled) {
+      return (
+        <>
+          <Button
+            variant={addActionVariant}
+            size={buttonSize}
+            className={triggerClassName}
+            aria-label={addActionLabel}
+            {...disabledProps}
+          >
+            <ArrayFieldAddTriggerLabel addActionLabel={addActionLabel} showAddIcon={showAddIcon} />
+          </Button>
+          {disabledReason}
+        </>
+      )
+    }
+
     return (
       <ButtonDropdown
         label={addActionLabel}
@@ -87,14 +125,18 @@ export function ArrayFieldAddControl({
   }
 
   return (
-    <Button
-      variant={addActionVariant}
-      size={buttonSize}
-      className={triggerClassName}
-      onClick={onAppendItem}
-      aria-label={addActionLabel}
-    >
-      <ArrayFieldAddTriggerLabel addActionLabel={addActionLabel} showAddIcon={showAddIcon} />
-    </Button>
+    <>
+      <Button
+        variant={addActionVariant}
+        size={buttonSize}
+        className={triggerClassName}
+        onClick={addEnabled ? onAppendItem : undefined}
+        aria-label={addActionLabel}
+        {...disabledProps}
+      >
+        <ArrayFieldAddTriggerLabel addActionLabel={addActionLabel} showAddIcon={showAddIcon} />
+      </Button>
+      {disabledReason}
+    </>
   )
 }

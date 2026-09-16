@@ -15,9 +15,10 @@ future marketing/CMS contracts — import `@rpg/contracts/public` when added.
 
 ```text
 packages/contracts/src/
-  index.ts              # flat re-export of validation + shared + rpg (not dev-bench, not public)
+  index.ts              # flat re-export of validation + form-copy + shared + rpg (not dev-bench, not public)
 
-  validation/           # defineMessage primitive + global validation message catalog
+  validation/           # defineMessage primitive + tier-1 fieldValidationMessages
+  form-copy/            # linguistic field copy (Choose placeholders, choice-count hints)
   shared/               # auth, user, roles, routes, errors, csrf, upload, assets
   rpg/
     vocab/              # closed-set game terms + open vocabulary set ids

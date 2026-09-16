@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import type { FieldNoun } from '@rpg/contracts'
+
 import type { FormIssue, FormIssueScope, FormIssueSeverity } from './errors/form-issue.types'
 
 import type {
@@ -129,6 +131,8 @@ export interface FieldOption {
   label: string
   value: string
   disabled?: boolean
+  /** Shown in select panels when the option is disabled (e.g. "Already used"). */
+  disabledReason?: string
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   description?: string
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
@@ -324,6 +328,11 @@ interface BaseFieldConfig {
    */
   width?: FieldWidth
   hint?: string | FieldHintConfig
+  /**
+   * Optional singular/plural noun phrases for generated placeholders, constraint
+   * hints, and validation copy when the visible label is not grammatical alone.
+   */
+  noun?: FieldNoun
   /** Informational metadata below the control — resolved from other field values. */
   derivedMeta?: FieldDerivedMetaConfig
   /** Renders the label `[i]` InfoTooltip. */
@@ -578,6 +587,8 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
    * Set to `false` for mutually-exclusive choices (e.g. Magic Level, Difficulty).
    */
   multiple?: boolean
+  /** Minimum selections when `multiple` is true. */
+  min?: number
   /** Maximum selections when `multiple` is true. */
   max?: number
   /** Pill padding/type scale. Label uses `size` (default field scale). Defaults to `size`. */
@@ -754,6 +765,8 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
    * Set `false` for a single `string` value (optional enums use `undefined`, not `''`).
    */
   multiple?: boolean
+  /** Minimum selections when `multiple` is true. */
+  min?: number
   /** Maximum selections when `multiple` is true. Omits the ceiling when unset. */
   max?: number
   placeholder?: string
@@ -1201,9 +1214,6 @@ export interface ColumnsConfig {
 /** Layout profile for repeatable array item chrome. */
 export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
 
-/** Vertical alignment for compact inline rows (grip, fields, embedded actions). */
-export type ArrayCompactInlineAlign = 'start' | 'center' | 'control-edge'
-
 /** How array items may be reordered. Defaults to `dragHandle`. */
 export type ArrayItemReorder = false | 'dragHandle'
 
@@ -1312,7 +1322,6 @@ export interface ArrayItemConfig {
   headerVisibility?: ArrayItemHeaderVisibility
   collapsible?: boolean
   collapseKey?: string
-  inlineAlign?: ArrayCompactInlineAlign
   /** @default dragHandle */
   reorder?: ArrayItemReorder
   /** @default true */
@@ -1339,6 +1348,11 @@ export type ArrayFilterSelectFn = (ctx: {
 export interface ArrayFilterSelectConfig {
   dependsOn?: string[]
   filter: ArrayFilterSelectFn
+}
+
+export type ArrayCanAppendResult = {
+  enabled: boolean
+  reason?: string
 }
 
 /**
@@ -1378,6 +1392,8 @@ export interface ArrayConfig {
   arrayPattern?: ArrayPatternConfig
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
   filterSelect?: ArrayFilterSelectConfig
+  /** When append should stay visible but disabled (e.g. finite enum saturation). */
+  resolveCanAppend?: (items: unknown[]) => ArrayCanAppendResult
   id?: string
   className?: string
   separator?: FieldSeparator

@@ -8,7 +8,7 @@ import { requiredWhenCopy } from '../../../validation/messages'
 export const spellValidationMessages = {
   componentRequired: defineMessage(
     'validation.spell.componentRequired',
-    () => 'Select at least one spell component (verbal, somatic, or material).',
+    () => 'Choose at least one spell component (verbal, somatic, or material).',
   ),
   materialDescriptionRequired: defineMessage('validation.spell.materialDescriptionRequired', () =>
     requiredWhenCopy('Material description', 'the material component is selected'),

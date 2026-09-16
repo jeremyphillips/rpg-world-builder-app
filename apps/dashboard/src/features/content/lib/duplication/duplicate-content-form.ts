@@ -3,7 +3,7 @@ import { z } from 'zod'
 import type { FormItem } from '@rpg/ui/form'
 
 export const duplicateContentFormSchema = z.object({
-  name: z.string().trim().min(1, 'Name is required'),
+  name: z.string().trim().min(1),
 })
 
 export type DuplicateContentFormValues = z.infer<typeof duplicateContentFormSchema>

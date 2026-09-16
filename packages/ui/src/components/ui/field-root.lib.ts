@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils'
 export type FieldSize = NonNullable<FieldControlVariantProps['size']>
 
 /** Classes for a field that participates in a parent three-row anatomy grid. */
-export const fieldRowParticipationClasses = 'row-span-3 grid min-w-0 grid-rows-subgrid'
+export const fieldRowParticipationClasses = 'row-span-3 grid grid-rows-subgrid'
 
 export type FieldRootContextInput = {
   controlId: string

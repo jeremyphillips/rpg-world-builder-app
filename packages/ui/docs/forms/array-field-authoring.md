@@ -195,7 +195,9 @@ Replace the plain add button with a searchable template dropdown. Each item supp
 `block`).
 
 Use for grant type pickers, preset rows, or any typed append where authors should not
-start from an empty object.
+start from an empty object. Prefer explicit `appendDefaults` over per-field
+`defaultValue` when only the first row should be pre-filled — see
+**`appendDefaults` vs form `defaultValues`** above.
 
 ## Nested arrays
 
@@ -203,14 +205,64 @@ start from an empty object.
 `root.0.sub.1.field`. Prefer at most two levels for UX; nested arrays default to
 compact unless `itemVariant: 'detailed'` is set on the inner array.
 
-## `filterSelectOptions`
+## `filterSelect` — cross-row select options
 
-Cross-row deduplication inside an array (e.g. "each skill picked once"):
+Disable (or transform) options based on sibling row values. Wired through
+`ArrayFieldContext` into select renderers inside array items.
 
 ```ts
-filterSelectDependsOn: ['rulesetId'],
-filterSelectOptions: ({ arrayItems, rowIndex, fieldName, options, watchedValues }) =>
-  options.filter(/* remove values selected in other rows */),
+import { disableOptionsUsedInSiblingRows } from '@rpg/ui/form'
+
+filterSelect: {
+  dependsOn: ['rulesetId'], // optional — when filter reads watched form values
+  filter: disableOptionsUsedInSiblingRows({ fieldName: 'mode' }),
+},
+```
+
+`disableOptionsUsedInSiblingRows` composes with upstream `option.disabled` /
+`disabledReason` — it never re-enables an option disabled for another reason.
+Disabled options show a panel reason (default: `Already used`). The current row's
+selected value stays enabled even when duplicated elsewhere (schema validation
+is still the backstop).
+
+For custom logic, pass a raw `ArrayFilterSelectFn` instead of the helper.
+
+## `resolveCanAppend` vs `max`
+
+| Knob               | Role                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| `max`              | Hard safety cap on row count (dirty/legacy duplicate rows can hit max before every enum value is used). |
+| `resolveCanAppend` | Domain saturation — e.g. every movement mode already has a row with a selected value.                   |
+
+When append is blocked, the add control stays **visible and disabled** with an
+accessible reason (`title` + sr-only description) — it is not hidden.
+
+```ts
+resolveCanAppend: (items) => {
+  const used = new Set(items.map((row) => row.mode).filter(Boolean))
+  return used.size >= ALL_MODES.length
+    ? { enabled: false, reason: 'All movement modes have been added.' }
+    : { enabled: true }
+},
+```
+
+## `appendDefaults` vs form `defaultValues`
+
+| Source               | When it applies                                   |
+| -------------------- | ------------------------------------------------- |
+| Form `defaultValues` | Initial row(s) on create/edit load only.          |
+| `appendDefaults`     | Every **Add** action — typically empty sentinels. |
+
+Unset select state follows `fieldDefaultValue` / `TYPE_DEFAULTS` (required
+select → `''`; optional single-select → `undefined`). Do not hand-author
+feature-specific empty strings when the form layer already defines the sentinel.
+
+Example — first create row Walk 30 via form defaults; appended rows start empty:
+
+```ts
+defaultValues: { movement: [{ mode: 'walk', feet: 30 }] },
+appendDefaults: () => ({ mode: '', feet: undefined }),
+// omit defaultValue on array item field configs
 ```
 
 `dependsOn` / `visibleWhen` on **item** fields use item-relative names. Prefix with `../`
@@ -250,6 +302,10 @@ derived from normalized field groups — not from whether authors wrapped a leaf
 | Single `kind: 'row'` of leaf fields             | `inline`        |
 | Multiple top-level fields                       | `stacked`       |
 
+**Compact inline chrome:** when `contentLayout` resolves to `inline`, field participants and
+grip/actions share one `ArrayItemAnatomyGrid` — label and validation may grow in their tracks
+without moving drag/remove chrome off the control track. No author alignment knob is required.
+
 **Field label vs item label:** per-field `label` on `text`, `inlineSentence`, etc. controls field
 chrome only. Item headers come from `item.header`, `headerVisibility`, and disclosure — not from
 field declaration shape.
@@ -262,7 +318,6 @@ The form library logs dev warnings for:
 | ------------------------------------------------------------------- | ------------------------------------------------------ |
 | `collapsible: true` + `variant: 'compact'`                          | Collapsible items render as disclosure — omit compact. |
 | `headerVisibility: 'hidden'` + `collapsible: true`                  | Disclosure requires header anatomy (auto-normalized).  |
-| `inlineAlign` on stacked content                                    | Alignment applies to inline rows only.                 |
 | `header.primaryField` + `headerVisibility: 'hidden'` on inline rows | primaryField does not show a header on inline items.   |
 
 Do **not** wrap fields in `kind: 'row'` solely to get inline item chrome — normalization already

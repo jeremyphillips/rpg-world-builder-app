@@ -5,13 +5,9 @@ import {
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
   formatMovementGrantAuthoringSummary,
-  formatMovementGrantCompact,
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
-  formatSpellsGrantSentence,
   getMovementModeGrantLabel,
-  getSpellGrantAvailabilityLabel,
-  getUsageFrequencyLabel,
   MOVEMENT_BONUS_FEET,
   MOVEMENT_MODES,
   MOVEMENT_OPERATION_ENTRIES,
@@ -21,8 +17,6 @@ import {
   USAGE_FREQUENCIES,
   USAGE_FREQUENCY_ENTRIES,
   type FeatCategory,
-  type MovementGrantPayload,
-  type MovementMode,
   type MovementOperation,
   type SenseId,
   type UsageFrequency,
@@ -48,6 +42,7 @@ import {
   buildActiveSenseFieldOptions,
 } from '@/features/vocabulary'
 
+import { GrantTypePersistField } from './grant-type-persist-field'
 import {
   formatChooseContentTypePlaceholder,
   getContentTypeCollectionLabel,
@@ -61,33 +56,22 @@ import {
   toSortedContentFieldOptions,
 } from '../../form-options/content-field-option.lib'
 import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
-import {
-  equipmentGrantItemFields,
-  type EquipmentGrantItemForm,
-} from './equipment/equipment-grant-form-fields'
-import { equipmentGrantSummary, equipmentGrantTitle } from './equipment/equipment-grant-form-values'
-import { GrantTypePersistField } from './grant-type-persist-field'
+import { equipmentGrantItemFields } from './equipment/equipment-grant-form-fields'
 import {
   proficiencyGrantItemFields,
-  type ArmorTrainingItemForm,
   type ProficiencyGrantType,
-  type SkillProficiencyItemForm,
-  type ToolProficiencyItemForm,
-  type WeaponProficiencyItemForm,
 } from './proficiency/proficiency-grant-form-fields'
-import {
-  armorTrainingGrantSummary,
-  armorTrainingGrantTitle,
-  skillProficiencyGrantSummary,
-  skillProficiencyGrantTitle,
-  toolProficiencyGrantSummary,
-  toolProficiencyGrantTitle,
-  weaponProficiencyGrantSummary,
-  weaponProficiencyGrantTitle,
-} from './proficiency/proficiency-grant-form-values'
 import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
 import { grantFieldLabel } from './grant-field-terms'
-import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
+import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
+import {
+  movementFormValuesToGrantPayload,
+  resolveGrantRowPresentation,
+  resolveSpellGrantName,
+  GRANT_TYPE_MISSING_PRIMARY,
+  type GrantRowHeaderContext,
+  type GrantRowValues,
+} from './grant-row-presentation.lib'
 import {
   formatGrantUnlockLevelLabel,
   GRANT_DEFAULT_UNLOCK_LABEL,
@@ -165,33 +149,6 @@ function visibleWhenMovementOperation(operation: MovementOperation): FieldVisibi
   }
 }
 
-function movementFormValuesToGrantPayload(values: {
-  movementMode?: string
-  movementOperation?: string
-  movementFeet?: number | string
-  movementMatchMode?: string
-}): MovementGrantPayload | undefined {
-  if (!values.movementMode || !values.movementOperation) return undefined
-  const mode = values.movementMode as MovementMode
-  const operation = values.movementOperation as MovementOperation
-
-  if (operation === 'match') {
-    if (!values.movementMatchMode || values.movementMatchMode === mode) return undefined
-    return { mode, operation, matchMode: values.movementMatchMode as MovementMode }
-  }
-
-  const feetRaw = values.movementFeet
-  if (feetRaw === undefined || feetRaw === '') return undefined
-  const feet = typeof feetRaw === 'number' ? feetRaw : Number(feetRaw)
-  if (!Number.isFinite(feet)) return undefined
-
-  if (operation === 'increase') {
-    return { mode, operation, feet: feet as (typeof MOVEMENT_BONUS_FEET)[number] }
-  }
-
-  return { mode, operation, feet: feet as (typeof MOVEMENT_SPEED_FEET)[number] }
-}
-
 function movementInlineSentenceField(
   overrides?: Partial<InlineSentenceFieldConfig>,
 ): InlineSentenceFieldConfig {
@@ -248,18 +205,6 @@ function movementInlineSentenceField(
   }
 }
 
-/** Formats a concise title for a movement grant row header. */
-export function formatMovementRowTitle(values: {
-  movementMode?: string
-  movementOperation?: string
-  movementFeet?: number | string
-  movementMatchMode?: string
-}): string {
-  const grant = movementFormValuesToGrantPayload(values)
-  if (!grant) return 'Movement'
-  return `Movement — ${formatMovementGrantCompact(grant)}`
-}
-
 /** Formats the authoring summary for a movement grant row header. */
 export function formatMovementRowSummary(values: {
   movementMode?: string
@@ -310,50 +255,8 @@ export function formatFeatChoiceRowSummary(
   })
 }
 
-export function formatSpellRowSummary(values: GrantRowValues): string {
-  const ability = values['spellAbility']
-  const spellIds = values['spellIds'] as string[] | undefined
-  if (!ability || !spellIds?.length) return ''
-
-  const hasAvailability = values['spellAvailability'] === true
-  const hasCasting = values['spellCastingEnabled'] === true
-  if (!hasAvailability && !hasCasting) return ''
-
-  return formatSpellsGrantSentence({
-    kind: 'spells',
-    ability: ability as never,
-    spellIds,
-    ...(hasAvailability ? { availability: 'always_prepared' as const } : {}),
-    ...(hasCasting && values['spellCastingFrequency']
-      ? {
-          casting: {
-            mode: 'free_cast' as const,
-            frequency: values['spellCastingFrequency'] as UsageFrequency,
-            ...(values['spellAllowsSlotCasting'] === true ? { allowsSlotCasting: true } : {}),
-          },
-        }
-      : {}),
-  })
-}
-
-function formatSpellsGrantRowSummary(values: GrantRowValues, ctx: GrantRowHeaderContext): string {
-  const summary = formatSpellRowSummary(values)
-  if (summary) return summary
-
-  const parts: string[] = []
-  if (values['spellAvailability'] === true) {
-    parts.push(getSpellGrantAvailabilityLabel('always_prepared'))
-  }
-  if (values['spellCastingEnabled'] === true && values['spellCastingFrequency']) {
-    parts.push(`${getUsageFrequencyLabel(values['spellCastingFrequency'] as string)} free cast`)
-  }
-
-  const spellTitle = formatSpellRowTitle(
-    values['spellIds'] as string[] | undefined,
-    ctx.spellOptions,
-  )
-  if (parts.length) return `${parts.join(' · ')} · ${spellTitle}`
-  return ''
+export function formatSpellRowSummary(values: GrantRowValues, ctx: GrantRowHeaderContext): string {
+  return resolveGrantRowPresentation(values, ctx)?.description ?? ''
 }
 
 const senseRangeOptions = SENSE_RANGES.map((range) => ({
@@ -432,7 +335,7 @@ function featChoiceInlineSentenceField(
   }
 }
 
-export const GRANT_TYPE_MISSING_PRIMARY = 'Grant type missing'
+export { GRANT_TYPE_MISSING_PRIMARY }
 
 const GRANT_TYPE_MISSING_MESSAGE =
   'This grant row is missing its type. Remove it and add a new grant from the menu.'
@@ -527,100 +430,23 @@ function proficiencyGrantFieldsForTypes(
   )
 }
 
-/** Formats a concise title for a spells row header. */
-export function formatSpellRowTitle(
-  spellIds: string[] | undefined,
-  spellOptions: FieldOption[],
-): string {
-  if (!spellIds?.length) return 'Spells'
-  const labels = spellIds.map(
-    (id) => spellOptions.find((option) => option.value === id)?.label ?? id,
-  )
-  return labels.length <= 2 ? labels.join(', ') : `${labels.length} spells`
-}
-
-type GrantRowValues = Record<string, unknown>
-
-export type GrantRowHeaderContext = {
-  rowLabels: Record<string, string>
-  equipmentOptions: FieldOption[]
-  weaponOptions: FieldOption[]
-  toolOptions: FieldOption[]
-  armorOptions: FieldOption[]
-  skillOptions: FieldOption[]
-  spellOptions: FieldOption[]
-}
-
-type GrantRowSummaryFormatter = (values: GrantRowValues, ctx: GrantRowHeaderContext) => string
-
-const GRANT_ROW_SUMMARY_BY_TYPE: Partial<Record<string, GrantRowSummaryFormatter>> = {
-  resistances: (values) =>
-    formatResistanceRowSummary(values['resistances'] as string[] | undefined),
-  damageType: (values) => formatDamageTypeRowSummary(values['damageType'] as string[] | undefined),
-  senses: (values) =>
-    formatSenseRowSummary(
-      values['senseType'] as string | undefined,
-      values['senseRange'] as number | string | undefined,
-    ),
-  movement: (values) => formatMovementRowSummary(values),
-  languages: (values) => formatLanguageRowSummary(values['language'] as string | undefined),
-  featChoice: (values) =>
-    formatFeatChoiceRowSummary(
-      values['featCategory'] as string | undefined,
-      values['featChoose'] as number | string | undefined,
-    ),
-  equipment: (values, ctx) =>
-    equipmentGrantSummary(values as EquipmentGrantItemForm, ctx.equipmentOptions),
-  weaponProficiency: (values, ctx) =>
-    weaponProficiencyGrantSummary(values as WeaponProficiencyItemForm, ctx.weaponOptions),
-  toolProficiency: (values, ctx) =>
-    toolProficiencyGrantSummary(values as ToolProficiencyItemForm, ctx.toolOptions),
-  skillProficiency: (values, ctx) =>
-    skillProficiencyGrantSummary(values as SkillProficiencyItemForm, ctx.skillOptions),
-  armorTraining: (values, ctx) =>
-    armorTrainingGrantSummary(values as ArmorTrainingItemForm, ctx.armorOptions),
-  spells: (values, ctx) => formatSpellsGrantRowSummary(values, ctx),
-}
+export type { GrantRowHeaderContext, GrantRowValues }
 
 /** Collapsed-row summary for a grant array item. */
 export function formatGrantRowSummary(values: GrantRowValues, ctx: GrantRowHeaderContext): string {
-  const type = values['grantType']
-  if (typeof type !== 'string') return ''
-  return GRANT_ROW_SUMMARY_BY_TYPE[type]?.(values, ctx) ?? ''
+  return resolveGrantRowPresentation(values, ctx)?.description ?? ''
 }
 
-type GrantRowPrimaryFormatter = (
-  values: GrantRowValues,
-  index: number,
-  ctx: GrantRowHeaderContext,
-) => string | undefined
-
-const GRANT_ROW_PRIMARY_BY_TYPE: Partial<Record<string, GrantRowPrimaryFormatter>> = {
-  equipment: (values, index, ctx) =>
-    equipmentGrantTitle(values as EquipmentGrantItemForm, index, ctx.equipmentOptions),
-  weaponProficiency: (values, index, ctx) =>
-    weaponProficiencyGrantTitle(values as WeaponProficiencyItemForm, index, ctx.weaponOptions),
-  toolProficiency: (values, index, ctx) =>
-    toolProficiencyGrantTitle(values as ToolProficiencyItemForm, index, ctx.toolOptions),
-  skillProficiency: (values, index, ctx) =>
-    skillProficiencyGrantTitle(values as SkillProficiencyItemForm, index, ctx.skillOptions),
-  armorTraining: (values, index, ctx) =>
-    armorTrainingGrantTitle(values as ArmorTrainingItemForm, index, ctx.armorOptions),
-  movement: (values) => formatMovementRowTitle(values),
-  spells: (values, _index, ctx) =>
-    formatSpellRowTitle(values['spellIds'] as string[] | undefined, ctx.spellOptions),
-}
-
-/** Primary title for a grant array item header. */
+/** Primary heading for a grant array item header. */
 export function formatGrantRowPrimary(
   values: GrantRowValues,
-  index: number,
+  _index: number,
   ctx: GrantRowHeaderContext,
 ): string | undefined {
-  const type = values['grantType']
-  if (typeof type !== 'string' || type.length === 0) return GRANT_TYPE_MISSING_PRIMARY
-  return GRANT_ROW_PRIMARY_BY_TYPE[type]?.(values, index, ctx) ?? ctx.rowLabels[type]
+  return resolveGrantRowPresentation(values, ctx)?.heading
 }
+
+export { resolveGrantRowPresentation, resolveSpellGrantName }
 
 export function grantItemFields<T extends string>(
   grantTypes: readonly T[],
@@ -867,10 +693,10 @@ export function grantArrayFields<T extends string>(
         collapsible: true,
         header: {
           fallback: (index) => `Grant ${index + 1}`,
-          primary: (values, index) => formatGrantRowPrimary(values, index, headerContext),
+          primary: (values) => resolveGrantRowPresentation(values, headerContext)?.heading,
           summary: (values) => formatGrantRowSummary(values, headerContext),
         },
-        renderShell: renderGrantArrayItemShell,
+        renderShell: createGrantArrayItemShell(headerContext),
       },
       fields: grantItemFields(grantTypes, labels, ctx, options),
     },

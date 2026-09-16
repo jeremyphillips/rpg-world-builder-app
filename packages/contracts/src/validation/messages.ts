@@ -1,31 +1,6 @@
+import { choiceCountPhrase, midSentenceLabel, withArticle } from '../form-copy/messages'
+
 import { defineMessage } from './define-message'
-
-// ---------------------------------------------------------------------------
-// Label helpers — presentation-safe transforms for interpolating field labels
-// into sentence templates. See docs/validation-messages.md for the copy style.
-// ---------------------------------------------------------------------------
-
-/**
- * Lowercases a label for mid-sentence use ("Select a valid rarity.") while
- * preserving acronyms and initialisms ("XP", "AC bonus").
- */
-export function midSentenceLabel(label: string): string {
-  if (/^[A-Z]{2}/.test(label)) return label
-  return label.charAt(0).toLowerCase() + label.slice(1)
-}
-
-/** Prefixes a mid-sentence label with its indefinite article ("a rarity", "an ability"). */
-export function withArticle(label: string): string {
-  const article = /^[aeiou]/i.test(label) ? 'an' : 'a'
-  return `${article} ${label}`
-}
-
-/** Naive singular form of a plural label ("Wealth tiers" → "Wealth tier"). */
-export function singularizeLabel(label: string): string {
-  if (/ies$/.test(label)) return `${label.slice(0, -3)}y`
-  if (/[^su]s$/.test(label)) return label.slice(0, -1)
-  return label
-}
 
 /**
  * `{subjectLabel} is required when {conditionClause}.`
@@ -60,18 +35,18 @@ export const fieldValidationMessages = {
   /** Empty required choice-like field (select, radio, chips single, combobox). */
   requiredSelect: defineMessage<{ label: string }>(
     'validation.field.requiredSelect',
-    ({ label }) => `Select ${withArticle(midSentenceLabel(label))}.`,
+    ({ label }) => `Choose ${withArticle(midSentenceLabel(label))}.`,
     ({ label }) => `Missing ${label}`,
   ),
   /** Empty required choice-like field using a vocab sentence phrase (no article). */
   requiredSelectPhrase: defineMessage<{ phrase: string }>(
     'validation.field.requiredSelectPhrase',
-    ({ phrase }) => `Select ${phrase}.`,
+    ({ phrase }) => `Choose ${phrase}.`,
   ),
   /** Value not among the allowed options. */
   invalidSelect: defineMessage<{ label: string }>(
     'validation.field.invalidSelect',
-    ({ label }) => `Select a valid ${midSentenceLabel(label)}.`,
+    ({ label }) => `Choose a valid ${midSentenceLabel(label)}.`,
     ({ label }) => `Invalid ${label}`,
   ),
   /** Unregistered field path with no configured label. */
@@ -101,12 +76,31 @@ export const fieldValidationMessages = {
   /** Multi-select choice field (chips/combobox) needs at least one selection. */
   minSelections: defineMessage<{ itemLabel: string }>(
     'validation.field.minSelections',
-    ({ itemLabel }) => `Select at least one ${itemLabel}.`,
+    ({ itemLabel }) => choiceCountPhrase({ singular: itemLabel }, { min: 1 }),
   ),
   /** Multi-select choice field needs `min` (> 1) selections; `itemsLabel` is plural. */
   minSelectionsCount: defineMessage<{ itemsLabel: string; min: number }>(
     'validation.field.minSelectionsCount',
-    ({ itemsLabel, min }) => `Select at least ${min} ${itemsLabel}.`,
+    ({ itemsLabel, min }) =>
+      choiceCountPhrase({ singular: itemsLabel, plural: itemsLabel }, { min }),
+  ),
+  /** Multi-select choice field exceeds `max` selections; `itemsLabel` is plural. */
+  maxSelectionsCount: defineMessage<{ itemsLabel: string; max: number }>(
+    'validation.field.maxSelectionsCount',
+    ({ itemsLabel, max }) =>
+      choiceCountPhrase({ singular: itemsLabel, plural: itemsLabel }, { max }),
+  ),
+  /** Multi-select choice field must contain exactly `count` selections. */
+  exactSelectionsCount: defineMessage<{ itemsLabel: string; count: number }>(
+    'validation.field.exactSelectionsCount',
+    ({ itemsLabel, count }) =>
+      choiceCountPhrase({ singular: itemsLabel, plural: itemsLabel }, { min: count, max: count }),
+  ),
+  /** Multi-select choice field must contain between `min` and `max` selections. */
+  rangeSelectionsCount: defineMessage<{ itemsLabel: string; min: number; max: number }>(
+    'validation.field.rangeSelectionsCount',
+    ({ itemsLabel, min, max }) =>
+      choiceCountPhrase({ singular: itemsLabel, plural: itemsLabel }, { min, max }),
   ),
   /** Repeatable array container needs at least one entry. */
   minItems: defineMessage<{ itemLabel: string }>(

@@ -1,7 +1,5 @@
 import type { WeaponProficiencyMode } from './class-form-constants'
 
-export const SAVING_THROWS_HINT = 'Select up to 2 abilities.'
-
 export const CLASS_SKILL_OPTIONS_INFO =
   'Skill options are shared with each skill’s suggested classes. Changes here update those skill records.'
 

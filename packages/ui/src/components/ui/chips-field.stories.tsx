@@ -61,7 +61,7 @@ export const WithError: Story = {
     options: playStyleOptions,
     multiple: true,
     value: [],
-    error: 'Select at least one play style.',
+    error: 'Choose at least one play style.',
     required: true,
   },
 }

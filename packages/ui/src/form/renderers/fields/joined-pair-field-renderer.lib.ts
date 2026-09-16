@@ -9,6 +9,7 @@ import type {
 type BoundControllerField = UseControllerReturn<Record<string, unknown>>['field']
 import type { FieldErrorPresentation } from '../../context/array-item-presentation.context'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
+import { resolveFieldPlaceholder } from '../../config/field-placeholder.lib'
 
 function resolveSelectControlValue(value: unknown): string | number | undefined {
   if (value === undefined || value === null || value === '') return undefined
@@ -48,7 +49,10 @@ function buildStartControl(
     value: resolveSelectControlValue(field.value),
     options: config.options,
     digits: config.digits,
-    placeholder: config.placeholder,
+    placeholder: resolveFieldPlaceholder(
+      { label: config.ariaLabel, category: 'choice', digits: config.digits },
+      config.placeholder,
+    ),
     ariaLabel: config.ariaLabel,
   }
 }
@@ -74,7 +78,10 @@ function buildEndControl(
     value: resolveSelectControlValue(field.value),
     options: config.options,
     digits: config.digits,
-    placeholder: config.placeholder,
+    placeholder: resolveFieldPlaceholder(
+      { label: config.ariaLabel, category: 'choice', digits: config.digits },
+      config.placeholder,
+    ),
     ariaLabel: config.ariaLabel,
     hasError: hasOccupantError || Boolean(validation.error),
     describedBy: validation.describedBy,

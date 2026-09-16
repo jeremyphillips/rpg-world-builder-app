@@ -32,7 +32,8 @@ import {
   encodeStoredSelectOptionValue,
   resolveSelectOptionChange,
 } from './select-option-value.lib'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
+import { Select, SelectContent, SelectTrigger, SelectValue } from './select.client'
+import { SelectOptionItem } from './select-option-item.client'
 
 function parseNumberValue(raw: string): number | undefined {
   if (raw.trim() === '') return undefined
@@ -229,13 +230,16 @@ export function JoinedPairSelectOccupant({
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
-            <SelectItem
+            <SelectOptionItem
               key={encodeSelectOptionValue(option.value)}
-              value={encodeSelectOptionValue(option.value)}
-              disabled={option.disabled}
-            >
-              {option.label}
-            </SelectItem>
+              option={{
+                label: option.label,
+                value: String(option.value),
+                disabled: option.disabled,
+                disabledReason: option.disabledReason,
+              }}
+              itemValue={encodeSelectOptionValue(option.value)}
+            />
           ))}
         </SelectContent>
       </Select>

@@ -57,3 +57,15 @@ export const InlineWithChrome: Story = {
     defaultValue: 'n',
   },
 }
+
+export const DisabledOptionReason: Story = {
+  args: {
+    id: 'movement-mode',
+    label: 'Mode',
+    defaultValue: 'walk',
+    options: [
+      { label: 'Walk', value: 'walk' },
+      { label: 'Fly', value: 'fly', disabled: true, disabledReason: 'Already used' },
+    ],
+  },
+}

@@ -6,6 +6,7 @@ import {
   extraMovementModeSchema,
   formatMovementGrantAuthoringSummary,
   formatMovementGrantCompact,
+  formatMovementGrantMetadataDetail,
   formatMovementGrantSentence,
   formatMovementDisplay,
   getMovementModeEntry,
@@ -147,6 +148,7 @@ describe('movement grant vocabulary', () => {
     expect(getMovementModeGrantLabel('walk')).toBe('Walking speed')
     expect(getMovementModeGrantLabel('fly')).toBe('Flying speed')
     expect(getMovementOperationAuthoringLabel('increase')).toBe('increases by')
+    expect(formatMovementGrantMetadataDetail(increaseGrant)).toBe('Walk +5 ft')
     expect(formatMovementGrantCompact(increaseGrant)).toBe('Walk speed +5 ft')
     expect(formatMovementGrantSentence(increaseGrant)).toBe('Your walking speed increases by 5 ft.')
     expect(formatMovementGrantAuthoringSummary(increaseGrant)).toBe(

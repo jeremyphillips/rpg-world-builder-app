@@ -35,9 +35,13 @@ export function coreAttributesFields(ctx?: ContentFormCtx): FormItem[] {
               name: 'primaryAbilities',
               label: 'Primary abilities',
               options: abilityOptions,
+              min: 1,
               max: 2,
               required: true,
-              hint: 'Select up to 2 abilities',
+              noun: {
+                singular: 'primary ability',
+                plural: 'primary abilities',
+              },
             },
             {
               type: 'chips',
@@ -54,6 +58,7 @@ export function coreAttributesFields(ctx?: ContentFormCtx): FormItem[] {
             {
               kind: 'slot',
               name: 'characterCreation.abilityScoreOrder',
+              chrome: { variant: 'container' },
               heading: {
                 label: 'Suggested ability scores',
                 hint: "Reorder abilities to define how this class assigns the campaign's Standard Array.",

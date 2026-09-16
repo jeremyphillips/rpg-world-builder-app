@@ -40,8 +40,6 @@ import {
   visibleForAuthoringType,
 } from '../location-authoring-type'
 
-const SELECT_PLACEHOLDER = 'Select…'
-
 function entriesToFieldOptions<T extends string>(
   ids: readonly T[],
   entries: Record<T, { label: string }>,
@@ -201,7 +199,6 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       name: 'planeType',
       label: 'Plane type',
       options: entriesToFieldOptions(PLANE_TYPE_IDS, PLANE_TYPE_ENTRIES),
-      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleForAuthoringType('plane'),
     },
     {
@@ -209,7 +206,6 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       name: 'classification.kind',
       label: 'Classification',
       options: regionClassificationKindOptions,
-      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleForAuthoringType('region'),
     },
     {
@@ -217,7 +213,6 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       name: 'settlementType',
       label: 'Settlement type',
       options: entriesToFieldOptions(SETTLEMENT_TYPE_IDS, SETTLEMENT_TYPE_ENTRIES),
-      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleForAuthoringType('settlement'),
     },
     {
@@ -225,7 +220,6 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       name: 'siteType',
       label: 'Site type',
       options: entriesToFieldOptions(SITE_TYPE_IDS, SITE_TYPE_ENTRIES),
-      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleForAuthoringType('site'),
     },
     {
@@ -233,7 +227,6 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       name: 'classification.form',
       label: 'Form',
       options: buildingFormOptions,
-      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleForAuthoringType('building'),
     },
     {
@@ -241,7 +234,6 @@ export function buildLocationPrimaryClassificationFields(): RowFieldItem[] {
       name: 'interiorType',
       label: 'Interior type',
       options: entriesToFieldOptions(INTERIOR_TYPE_IDS, INTERIOR_TYPE_ENTRIES),
-      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleForAuthoringType('interior'),
     },
   ]
@@ -258,7 +250,6 @@ export function buildLocationClassificationFields(options?: {
       name: 'classification.type',
       label: 'Region type',
       options: allRegionTypeOptions,
-      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleWhenRegionClassificationKindSet(),
       optionAvailability: regionClassificationTypeAvailability(),
     },
@@ -268,7 +259,6 @@ export function buildLocationClassificationFields(options?: {
       name: 'classification.type',
       label: 'Interior space type',
       options: allInteriorClassificationTypeOptions,
-      placeholder: SELECT_PLACEHOLDER,
       visibility: visibleWhenInteriorTypeSet(),
       optionAvailability: interiorClassificationTypeAvailability(),
     },

@@ -1,4 +1,9 @@
-import { fieldValidationMessages, midSentenceLabel, singularizeLabel } from '@rpg/contracts'
+import {
+  fieldValidationMessages,
+  midSentenceLabel,
+  nounFromLabel,
+  singularizeLabel,
+} from '@rpg/contracts'
 import type { ZodType } from 'zod'
 
 import type { FormItem } from '../field-config'
@@ -79,6 +84,13 @@ function isMultiCategory(category: RegistryEntry['category']): boolean {
   return category === 'multi'
 }
 
+function choiceNounPhrase(entry: RegistryEntry): string {
+  if (entry.noun) {
+    return midSentenceLabel(entry.noun.singular)
+  }
+  return nounFromLabel(entry.label).singular
+}
+
 function formatRequired(entry: RegistryEntry): string {
   if (isUnlabeledEntry(entry)) {
     return fieldValidationMessages.requiredUnlabeled()
@@ -89,12 +101,17 @@ function formatRequired(entry: RegistryEntry): string {
     })
   }
   if (entry.category === 'choice') {
-    return fieldValidationMessages.requiredSelect({ label: entry.label })
+    return fieldValidationMessages.requiredSelect({ label: choiceNounPhrase(entry) })
   }
   return fieldValidationMessages.requiredText({ label: entry.label })
 }
 
 function arrayItemsLabel(entry: RegistryEntry, form: 'singular' | 'plural'): string {
+  if (entry.noun) {
+    return form === 'plural'
+      ? midSentenceLabel(entry.noun.plural ?? entry.noun.singular)
+      : midSentenceLabel(entry.noun.singular)
+  }
   if (form === 'plural') return midSentenceLabel(entry.label)
   return entry.itemLabel ?? midSentenceLabel(singularizeLabel(entry.label))
 }
@@ -103,6 +120,12 @@ function formatArrayTooSmall(issue: RawZodIssueLike, entry: RegistryEntry): stri
   const min = Number(issue.minimum)
 
   if (issue.exact) {
+    if (isMultiCategory(entry.category)) {
+      return fieldValidationMessages.exactSelectionsCount({
+        itemsLabel: arrayItemsLabel(entry, 'plural'),
+        count: min,
+      })
+    }
     return fieldValidationMessages.exactItemsCount({
       itemsLabel: arrayItemsLabel(entry, 'plural'),
       count: min,
@@ -168,9 +191,21 @@ function formatTooBig(issue: RawZodIssueLike, entry: RegistryEntry): string {
 
   if (issue.origin === 'array') {
     if (issue.exact) {
+      if (isMultiCategory(entry.category)) {
+        return fieldValidationMessages.exactSelectionsCount({
+          itemsLabel: arrayItemsLabel(entry, 'plural'),
+          count: max,
+        })
+      }
       return fieldValidationMessages.exactItemsCount({
         itemsLabel: arrayItemsLabel(entry, 'plural'),
         count: max,
+      })
+    }
+    if (isMultiCategory(entry.category)) {
+      return fieldValidationMessages.maxSelectionsCount({
+        itemsLabel: arrayItemsLabel(entry, 'plural'),
+        max,
       })
     }
   }
@@ -187,7 +222,7 @@ function formatInvalidValue(issue: RawZodIssueLike, entry: RegistryEntry): strin
   if (isChoiceCategory(entry.category)) {
     return isEmptyInput(issue.input)
       ? formatRequired(entry)
-      : fieldValidationMessages.invalidSelect({ label: entry.label })
+      : fieldValidationMessages.invalidSelect({ label: choiceNounPhrase(entry) })
   }
 
   return isEmptyInput(issue.input)

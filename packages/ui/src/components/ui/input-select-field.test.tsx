@@ -125,7 +125,7 @@ describe('InputSelectField', () => {
     const { container } = render(<ControlledField valueDigits={2} width="auto" />)
     const group = container.querySelector('[role="group"]')
     expect(group).toHaveClass('w-fit')
-    expect(group).toHaveClass('grid-cols-[auto_1px_auto]')
+    expect(group).toHaveClass('grid-cols-[auto_minmax(1px,1px)_auto]')
     expect(group).toHaveClass('items-center')
 
     const numberInputRoot = screen.getByLabelText('Cost value').parentElement
@@ -221,7 +221,7 @@ describe('InputSelectField', () => {
       <ControlledField unitMode="label" fixedUnit="ft." valueDigits={2} width="auto" />,
     )
     const group = container.querySelector('[role="group"]')
-    expect(group).toHaveClass('w-fit', 'items-center', 'grid-cols-[auto_1px_auto]')
+    expect(group).toHaveClass('w-fit', 'items-center', 'grid-cols-[auto_minmax(1px,1px)_auto]')
     expect(screen.getByLabelText('Cost value')).toHaveClass('h-9')
   })
 })

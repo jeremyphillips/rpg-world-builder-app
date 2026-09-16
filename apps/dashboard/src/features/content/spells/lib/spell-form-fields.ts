@@ -47,7 +47,6 @@ import {
   areaGeometryShapeOptions,
   rangeKindOptions,
   roleTagOptions,
-  SPELL_CASTING_SELECT_PLACEHOLDER,
   SPELL_DURATION_KINDS,
   spellLevelOptions,
 } from './spell-form-labels'
@@ -396,7 +395,6 @@ function castingFields(): FormItem[] {
               name: 'range.kind',
               label: 'Kind',
               options: rangeKindOptions,
-              placeholder: SPELL_CASTING_SELECT_PLACEHOLDER,
               required: true,
               width: 'lg',
             },
@@ -429,7 +427,6 @@ function castingFields(): FormItem[] {
               name: 'duration.kind',
               label: 'Duration kind',
               options: durationKindOptions,
-              placeholder: SPELL_CASTING_SELECT_PLACEHOLDER,
               required: true,
               width: 'lg',
             },

@@ -19,17 +19,6 @@ function warnCollapsibleHiddenHeader(path: string, item: ArrayItemConfig): void 
   )
 }
 
-function warnInlineAlignOnStacked(
-  path: string,
-  item: ArrayItemConfig,
-  normalized: NormalizedArrayItemContent,
-): void {
-  if (item.inlineAlign === undefined || normalized.contentLayout !== 'stacked') return
-  console.warn(
-    `[Form] "${path}" sets item.inlineAlign but item fields resolve to stacked content layout. inlineAlign applies to inline rows only.`,
-  )
-}
-
 function warnPrimaryFieldOnHiddenInlineRow(
   path: string,
   item: ArrayItemConfig,
@@ -52,6 +41,5 @@ export function assertArrayItemConfig(config: ArrayConfig, legend: string): void
 
   warnCollapsibleCompact(path, item)
   warnCollapsibleHiddenHeader(path, item)
-  warnInlineAlignOnStacked(path, item, normalized)
   warnPrimaryFieldOnHiddenInlineRow(path, item, normalized)
 }

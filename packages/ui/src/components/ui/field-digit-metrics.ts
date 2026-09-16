@@ -1,3 +1,5 @@
+import { cn } from '../../lib/utils'
+import type { FieldSize } from './field-root.lib'
 import type { FieldSizeToken } from './field-sizing.variants'
 import { fieldDigitSizeClasses } from './field-sizing.variants'
 
@@ -41,6 +43,16 @@ export const fieldDigitWidthVariants = {
 } as const satisfies Record<FieldSizeToken, Record<1 | 2 | 3 | 4 | 5, string>>
 
 export type FieldDigits = keyof (typeof fieldDigitWidthVariants)['md']
+
+/**
+ * Preferred and minimum inline size from one formula.
+ * `digits` describes the minimum usable inline size of the control.
+ */
+export function resolveDigitInlineSizeClasses(digits: FieldDigits, size: FieldSize = 'md'): string {
+  const widthClass = fieldDigitWidthVariants[size][digits]
+  const minWidthClass = widthClass.replace(/^w-/, 'min-w-')
+  return cn(widthClass, minWidthClass)
+}
 
 /** Maps a numeric maximum (e.g. countMax, largest die face) to a digit slot count. */
 export function fieldDigitsForMax(max: number): FieldDigits {

@@ -63,8 +63,8 @@ export function buildParentLocationOptionAvailability(
 }
 
 export function parentLocationPlaceholder(kind: LocationKind | undefined): string {
-  if (!kind) return 'Select a parent location'
+  if (!kind) return 'Choose a parent location…'
   const requirement = getParentRequirement(kind)
-  if (requirement === 'optional') return 'Select a parent location (optional)'
-  return 'Select a parent location'
+  if (requirement === 'optional') return 'Choose a parent location (optional)…'
+  return 'Choose a parent location…'
 }

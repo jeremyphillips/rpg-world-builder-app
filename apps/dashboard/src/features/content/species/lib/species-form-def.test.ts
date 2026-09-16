@@ -280,6 +280,39 @@ describe('speciesFormDef create vs update modes', () => {
     expect(input.traits).toEqual([])
   })
 
+  it('draft: omits in-progress movement rows on persist', () => {
+    const input = speciesFormDef.toInput(
+      {
+        name: 'Draft Species',
+        creatureType: 'humanoid',
+        sizes: [],
+        movement: [{ mode: '', feet: undefined }],
+        traits: [],
+      } as SpeciesFormValues,
+      undefined,
+      'draft',
+    )
+    expect(input.movement).toEqual({})
+  })
+
+  it('draft: persists complete movement rows and omits empty appended rows', () => {
+    const input = speciesFormDef.toInput(
+      {
+        name: 'Draft Species',
+        creatureType: 'humanoid',
+        sizes: [],
+        movement: [
+          { mode: 'walk', feet: 30 },
+          { mode: '', feet: undefined },
+        ],
+        traits: [],
+      } as SpeciesFormValues,
+      undefined,
+      'draft',
+    )
+    expect(input.movement).toEqual({ walk: 30 })
+  })
+
   it('draft form schema: allows heritage options with empty grant rows', () => {
     expect(() =>
       speciesDraftFormSchema.parse({

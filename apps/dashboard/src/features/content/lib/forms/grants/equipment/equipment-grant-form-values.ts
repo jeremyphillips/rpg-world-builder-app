@@ -7,6 +7,7 @@ import type {
 import { formatEquipmentGrantSentence, formatEquipmentPoolLabel } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
+import { formatCompactMetadataList } from '../grant-compact-metadata.lib'
 import { PROFICIENCY_LINK_SUMMARY } from './equipment-grant-form-labels'
 import { EQUIPMENT_POOL_CATEGORY_ANY } from './equipment-grant-form-fields'
 import type {
@@ -251,6 +252,62 @@ export function equipmentGrantTitle(
   }
 
   return equipmentGrantTitleForChoice(row, index, equipmentOptions)
+}
+
+function equipmentGrantDetailForProficiencyChoice(
+  row: GrantedEquipmentItemForm,
+  proficiencyChoiceOptions: FieldOption[],
+): string | undefined {
+  if (!row.proficiencyChoiceId) return undefined
+  const matchedOption = proficiencyChoiceOptions.find(
+    (option) => option.value === row.proficiencyChoiceId,
+  )
+  const choiceLabel = matchedOption?.label ?? row.proficiencyChoiceId
+  return `Tool from "${choiceLabel}"`
+}
+
+function equipmentGrantDetailForEquipmentGrant(
+  row: GrantedEquipmentItemForm,
+  equipmentOptions: FieldOption[],
+): string | undefined {
+  if (!row.equipmentSlug) return undefined
+  const label = equipmentOptions.find((option) => option.value === row.equipmentSlug)?.label
+  return label ?? row.equipmentSlug
+}
+
+function equipmentGrantDetailForChoice(
+  row: EquipmentGrantChoiceItemForm,
+  equipmentOptions: FieldOption[],
+): string | undefined {
+  const choose = row.choose ?? 1
+  if (row.poolSource === 'explicit') {
+    const labels = (row.poolEquipmentSlugs ?? []).map(
+      (slug) => equipmentOptions.find((option) => option.value === slug)?.label ?? slug,
+    )
+    const compact = formatCompactMetadataList(labels)
+    return compact ? `${choose} from ${compact}` : undefined
+  }
+
+  const poolLabel = resolveChoicePoolLabel(row, equipmentOptions)
+  if (!poolLabel) return undefined
+  return `${choose} from ${poolLabel}`
+}
+
+export function equipmentGrantDetail(
+  row: EquipmentGrantItemForm | undefined,
+  equipmentOptions: FieldOption[] = [],
+  proficiencyChoiceOptions: FieldOption[] = [],
+): string | undefined {
+  if (!row?.itemKind) return undefined
+
+  if (row.itemKind === 'grant') {
+    if (row.grantTargetSource === 'proficiency_choice') {
+      return equipmentGrantDetailForProficiencyChoice(row, proficiencyChoiceOptions)
+    }
+    return equipmentGrantDetailForEquipmentGrant(row, equipmentOptions)
+  }
+
+  return equipmentGrantDetailForChoice(row, equipmentOptions)
 }
 
 function isEquipmentGrantSummaryComplete(row: EquipmentGrantItemForm): boolean {

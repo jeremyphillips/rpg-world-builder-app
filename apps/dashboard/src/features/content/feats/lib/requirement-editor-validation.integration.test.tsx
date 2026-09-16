@@ -63,8 +63,8 @@ describe('feat prerequisite editor validation integration', () => {
     await user.click(screen.getByTestId('submit'))
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-probe').textContent).toBe('Select condition type.')
-      expect(screen.getAllByText('Select condition type.')).toHaveLength(2)
+      expect(screen.getByTestId('error-probe').textContent).toBe('Choose condition type.')
+      expect(screen.getAllByText('Choose condition type.')).toHaveLength(2)
     })
   })
 })

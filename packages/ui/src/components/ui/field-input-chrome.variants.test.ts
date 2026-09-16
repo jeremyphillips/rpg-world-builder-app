@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  fieldGroupedDividerClasses,
+  fieldGroupedShellIntrinsicLayoutClasses,
   fieldInputAutofillClasses,
   fieldInputDisabledClasses,
   fieldInputFocusClasses,
@@ -58,6 +60,12 @@ function expectOnlyApprovedTokens(classes: string) {
 describe('field-input-chrome.variants', () => {
   it('uses approved input tokens for shell chrome', () => {
     expectOnlyApprovedTokens(fieldInputShellClasses)
+  })
+
+  it('hardens intrinsic grouped shell divider track against crush', () => {
+    expect(fieldGroupedShellIntrinsicLayoutClasses).toContain('minmax(1px,1px)')
+    expect(fieldGroupedShellIntrinsicLayoutClasses).toContain('min-w-max')
+    expect(fieldGroupedDividerClasses).toContain('min-w-px')
   })
 
   it('uses approved input tokens for focus, invalid, disabled, readonly, and autofill', () => {

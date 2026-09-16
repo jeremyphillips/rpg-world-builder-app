@@ -456,14 +456,20 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 Optional hooks:
 
-| Property             | Purpose                                                                                                                                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `itemVariant`        | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                                                                                                     |
-| `compactInlineAlign` | `'start'` \| `'center'` \| `'control-edge'` — compact inline rows only; default unlabeled rows use `center`; opt into `control-edge` when grip/actions should sit on the control baseline. |
+| Property      | Purpose                                                                |
+| ------------- | ---------------------------------------------------------------------- |
+| `itemVariant` | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`). |
 
-**Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render that row
-inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,
-`digits`, …) compose the same way as schema `kind: 'row'` fields.
+**Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render field
+participants on the shared `ArrayItemAnatomyGrid` shell — one label / control / message track grid
+with subgrid field columns. Grip and actions span all three tracks and stay vertically centered in
+the shared cell; label wrap and validation growth must not pin chrome to the label track or shift
+it when the message track grows. Leaf `width` tokens (`full`, `auto`, fractions, `digits`, …)
+compose the same way as schema `kind: 'row'` fields.
+
+Regression fixtures: `Forms/ArrayField` → **Movement chrome stability** / **Examples unlabeled
+inline row**; `Internal/Forms/Layout/AnatomyRowToggleMatrix` for stacked select + inline checkbox
+rows.
 
 | `item.surface` / `item.tone` | Item header — defaults to `{ emphasis: 'subtle' }`; override with raised elevation or semantic tone |
 | `itemHeader` | Primary/fallback labels; optional `summary` on a second row below the title (detailed). |

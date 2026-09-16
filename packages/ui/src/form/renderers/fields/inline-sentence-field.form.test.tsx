@@ -103,7 +103,7 @@ describe('InlineSentenceField form integration', () => {
       />,
     )
 
-    expect(screen.getByRole('combobox')).toHaveTextContent('Select Granted at…')
+    expect(screen.getByRole('combobox')).toHaveTextContent('Choose a granted at…')
   })
 
   it('keeps prose-length select triggers on the inline row', () => {

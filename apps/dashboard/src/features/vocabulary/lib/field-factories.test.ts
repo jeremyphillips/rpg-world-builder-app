@@ -2,7 +2,6 @@ import { CREATURE_TYPE_TERM } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
-  VOCABULARY_COMBOBOX_PLACEHOLDER,
   vocabularyComboboxField,
   vocabularyComboboxFieldForTerm,
   vocabularySelectField,
@@ -34,7 +33,7 @@ describe('vocabulary field factories', () => {
     })
   })
 
-  it('builds a combobox field with default placeholder', () => {
+  it('builds a combobox field without a hardcoded placeholder', () => {
     expect(
       vocabularyComboboxField({
         name: 'allowedCharacterCreatureTypes',
@@ -50,7 +49,6 @@ describe('vocabulary field factories', () => {
       options,
       multiple: true,
       required: true,
-      placeholder: VOCABULARY_COMBOBOX_PLACEHOLDER,
     })
   })
 
