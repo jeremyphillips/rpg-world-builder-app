@@ -17,6 +17,7 @@ export {
   sortFormIssues,
   countInvalidArrayItems,
   countIssuesForArrayPath,
+  resolveDirectArrayItemIndex,
   indexArrayItemIssues,
   findArraySectionForIssue,
   buildFieldSummaryText,
@@ -36,7 +37,12 @@ export {
 export {
   resolveFieldErrorMessage,
   resolveFirstFieldErrorMessage,
+  resolveNestedFieldErrorMessage,
 } from './resolve-field-error-message'
+export {
+  enrichFormIssuesWithPresentationPaths,
+  resolveFormIssuePresentationPath,
+} from './resolve-form-issue-presentation-path.lib'
 export {
   buildValidationSessionExpandKey,
   resolveValidationExpandKeys,
@@ -51,6 +57,7 @@ export {
   collectTabPathPrefixes,
   resolveTabValidationState,
   getFirstInvalidTabId,
+  resolveInvalidSubmitTabId,
   type TabValidationState,
   type TabValidationTab,
 } from './resolve-tab-validation-state'

@@ -15,6 +15,7 @@ export type {
 } from './field-surface.variants'
 export {
   DEFAULT_ARRAY_ITEM_SURFACE,
+  DEFAULT_FLAT_ARRAY_ITEM_SURFACE,
   DEFAULT_DEPENDENT_SURFACE,
   DEFAULT_PANEL_SURFACE,
   fieldGroupBodyShellLayoutClasses,

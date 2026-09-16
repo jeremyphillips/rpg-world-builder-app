@@ -2,16 +2,17 @@
 
 import * as React from 'react'
 
+import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { cn } from '../../lib/utils'
+import type { FieldWidth } from './field-control.variants'
 import {
-  fieldWidthVariants,
-  type FieldControlVariantProps,
-  type FieldWidth,
-} from './field-control.variants'
+  buildFieldRootContextValue,
+  resolveFieldRootClassName,
+  type FieldSize,
+} from './field-root.lib'
 import { FieldDerivedMeta } from './field-derived-meta.client'
 import { useFieldDerivedMetaContext } from './field-derived-meta-context.client'
 import {
-  fieldAnatomyStackVariants,
   fieldErrorTextVariants,
   fieldLabelVariants,
   type FieldHintPosition,
@@ -19,8 +20,6 @@ import {
 } from './field.variants'
 import { resolveControlRequiredProps } from './field-required.lib'
 import { Text } from './text'
-
-type FieldSize = NonNullable<FieldControlVariantProps['size']>
 
 interface FieldContextValue {
   controlId: string
@@ -69,7 +68,19 @@ export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
   hint?: string
   /** Where helper text renders — drives hint visibility and `aria-describedby`. */
   hintPosition?: FieldHintPosition
+  /**
+   * Flat three-region layout (`FieldLayout` / toggle adapters). Root uses no
+   * stack gap — spacing is owned by label/message region padding.
+   */
+  anatomy?: boolean
+  /**
+   * Participate in a parent anatomy-grid row via CSS subgrid (`row-span-3` +
+   * `grid-rows-subgrid`). Implies {@link anatomy}. Prototype / schema-row use.
+   */
+  rowParticipation?: boolean
 }
+
+export { fieldRowParticipationClasses } from './field-root.lib'
 
 const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
   (
@@ -84,6 +95,8 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
       describedBy: describedByOverride,
       hint,
       hintPosition = 'below-label',
+      anatomy = false,
+      rowParticipation = false,
       className,
       children,
       ...props
@@ -92,51 +105,35 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
   ) => {
     const generatedId = React.useId()
     const controlId = id ?? generatedId
-    const hintId = `${controlId}-hint`
-    const errorId = `${controlId}-error`
-    const derivedMetaId = `${controlId}-derived-meta`
     const { meta: derivedMeta } = useFieldDerivedMetaContext()
-    const hasError = invalid ?? Boolean(error)
-    const hasHint = Boolean(hint)
     const hasDerivedMeta = Boolean(derivedMeta?.rows.length)
-    const describedByParts = [
-      hasHint && (!hasError || hintPosition === 'below-label') && hintId,
-      hasError && errorId,
-      hasDerivedMeta && derivedMetaId,
-    ].filter(Boolean)
-    const autoDescribedBy = describedByParts.length > 0 ? describedByParts.join(' ') : undefined
-    const describedBy = describedByOverride ?? autoDescribedBy
+    const inAnatomyRow = useFieldRowParticipation()
+    const effectiveRowParticipation = rowParticipation || inAnatomyRow
+    const useAnatomy = anatomy || effectiveRowParticipation
 
     const value = React.useMemo<FieldContextValue>(
-      () => ({
-        controlId,
-        hintId,
-        errorId,
-        derivedMetaId,
-        hasError,
-        hasHint,
-        hasDerivedMeta,
-        describedBy,
-        hintPosition,
-        size,
-        required,
-        error,
-        hint,
-      }),
+      () =>
+        buildFieldRootContextValue({
+          controlId,
+          error,
+          invalid,
+          describedByOverride,
+          hint,
+          hintPosition,
+          size,
+          required,
+          hasDerivedMeta,
+        }),
       [
         controlId,
-        hintId,
-        errorId,
-        derivedMetaId,
-        hasError,
-        hasHint,
-        hasDerivedMeta,
-        describedBy,
+        error,
+        invalid,
+        describedByOverride,
+        hint,
         hintPosition,
         size,
         required,
-        error,
-        hint,
+        hasDerivedMeta,
       ],
     )
 
@@ -145,11 +142,15 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         <div
           ref={ref}
           data-field={name}
-          className={cn(
-            fieldAnatomyStackVariants({ size }),
-            fieldWidthVariants({ width }),
+          data-field-anatomy={useAnatomy ? '' : undefined}
+          data-field-row-participant={effectiveRowParticipation ? '' : undefined}
+          className={resolveFieldRootClassName({
+            size,
+            width,
+            anatomy,
+            rowParticipation: effectiveRowParticipation,
             className,
-          )}
+          })}
           {...props}
         >
           {children}

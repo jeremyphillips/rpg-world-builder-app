@@ -456,4 +456,127 @@ describe('InlineSentenceField form integration', () => {
       expect.anything(),
     )
   })
+
+  it('surfaces bound select validation from submit errors', async () => {
+    const user = userEvent.setup()
+
+    const schema = z
+      .object({
+        movementOperation: z.string(),
+        movementFeet: z.string().optional(),
+      })
+      .superRefine((row, ctx) => {
+        if (row.movementFeet === undefined || row.movementFeet === '') {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Movement speed is required.',
+            path: ['movementFeet'],
+          })
+        }
+      })
+
+    const fields: FormItem[] = [
+      {
+        type: 'inlineSentence',
+        name: 'movement',
+        label: 'Movement',
+        labelVisibility: 'srOnly',
+        segments: [
+          {
+            kind: 'select',
+            name: 'movementOperation',
+            options: [{ value: 'increase', label: 'increases by' }],
+            defaultValue: 'increase',
+          },
+          {
+            kind: 'select',
+            name: 'movementFeet',
+            options: [{ value: '5', label: '+5 ft' }],
+            ariaLabel: 'Movement speed',
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        defaultValues={{ movementOperation: 'increase' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Movement speed is required.')).toBeInTheDocument()
+    })
+    expect(screen.getByRole('combobox', { name: 'Movement speed' })).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    )
+  })
+
+  it('submits joined-pair select + label segments with numeric select values', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+
+    const schema = z.object({
+      feet: z.number(),
+    })
+
+    const fields: FormItem[] = [
+      {
+        type: 'inlineSentence',
+        name: 'speed',
+        label: 'Speed',
+        labelVisibility: 'srOnly',
+        segments: [
+          {
+            kind: 'joinedPair',
+            label: 'Speed',
+            labelVisibility: 'visible',
+            ariaLabel: 'Speed',
+            start: {
+              kind: 'select',
+              name: 'feet',
+              options: [
+                { value: 30, label: '30' },
+                { value: 40, label: '40' },
+              ],
+              defaultValue: 30,
+              digits: 3,
+              ariaLabel: 'Speed value',
+            },
+            end: {
+              kind: 'label',
+              text: 'ft.',
+              ariaLabel: 'Speed unit',
+            },
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        defaultValues={{ feet: 30 }}
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const speedLabels = screen.getAllByText('Speed')
+    expect(speedLabels.some((node) => node.closest('legend') == null)).toBe(true)
+    expect(screen.getByRole('combobox', { name: 'Speed value' })).toHaveTextContent('30')
+    expect(screen.getByText('ft.')).toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Speed unit' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    expect(onSubmit).toHaveBeenCalledWith({ feet: 30 }, expect.anything())
+  })
 })

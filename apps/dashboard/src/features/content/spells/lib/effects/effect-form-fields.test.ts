@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ArrayConfig, FormItem } from '@rpg/ui/form'
+import { resolveFieldConfigPrimaryName, type ArrayConfig, type FormItem } from '@rpg/ui/form'
 
 import { effectArrayFields } from './effect-form-fields'
 import { formatEffectRowPrimary, formatEffectRowSummary } from './effect-display'
@@ -31,7 +31,11 @@ describe('effectArrayFields', () => {
     const arrayField = findEffectsArray(effectArrayFields({}))
     const itemFields = arrayField?.fields ?? []
 
-    expect(itemFields.find((field) => !('kind' in field) && field.name === 'kind')).toBeUndefined()
+    expect(
+      itemFields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'kind',
+      ),
+    ).toBeUndefined()
 
     const damageRow = itemFields.find(
       (field): field is Extract<(typeof itemFields)[number], { kind: 'row' }> =>
@@ -45,12 +49,18 @@ describe('effectArrayFields', () => {
   it('shows effect label only for roll-bearing kinds and projectile label for projectile count', () => {
     const itemFields = findEffectsArray(effectArrayFields({}))?.fields ?? []
 
-    expect(itemFields.find((field) => !('kind' in field) && field.name === 'label')).toMatchObject({
+    expect(
+      itemFields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'label',
+      ),
+    ).toMatchObject({
       label: 'Effect label',
       width: 'full',
     })
     expect(
-      itemFields.find((field) => !('kind' in field) && field.name === 'unitLabel'),
+      itemFields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'unitLabel',
+      ),
     ).toMatchObject({
       label: 'Projectile label',
     })
@@ -64,12 +74,17 @@ describe('effectArrayFields', () => {
         'kind' in field &&
         field.kind === 'row' &&
         field.visibility?.visibleWhen != null &&
-        field.fields.some((child) => !('kind' in child) && child.name === 'damageType'),
+        field.fields.some(
+          (child) => !('kind' in child) && resolveFieldConfigPrimaryName(child) === 'damageType',
+        ),
     )
     expect(damageRow).toBeDefined()
 
     const rollFields = itemFields.filter(
-      (field) => !('kind' in field) && field.type === 'rollValue' && field.name === 'roll',
+      (field) =>
+        !('kind' in field) &&
+        field.type === 'rollValue' &&
+        resolveFieldConfigPrimaryName(field) === 'roll',
     )
     expect(rollFields).toHaveLength(1)
     expect(rollFields[0]).toMatchObject({ label: 'Roll' })

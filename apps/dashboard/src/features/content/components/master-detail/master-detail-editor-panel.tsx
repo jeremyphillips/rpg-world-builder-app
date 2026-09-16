@@ -19,7 +19,6 @@ export interface MasterDetailEditorPanelProps {
   fieldName: string
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
-  showValidationBanner: boolean
   /** Singular noun vocabulary for delete overflow copy and empty-selection messaging. */
   itemNoun: MasterDetailItemNounTerm
   /** When false, renders the shared empty detail state even if the editor has a selection. */
@@ -76,7 +75,7 @@ function MasterDetailSelectedRowEditor({
         </div>
       ) : null}
       <FormItems
-        key={selectedFieldId}
+        key={`${selectedFieldId}:${selectedIndex}`}
         items={wrapMasterDetailDetailFields(itemFields)}
         idPrefix={`${idPrefix}-${selectedFieldId}`}
         namePrefix={`${fieldName}.${selectedIndex}`}
@@ -87,14 +86,13 @@ function MasterDetailSelectedRowEditor({
 
 /**
  * Detail column for a form-embedded master-detail editor: one bordered surface
- * with compact identity, overflow delete, validation banner, and selected row form.
+ * with compact identity, overflow delete, and selected row form.
  */
 export function MasterDetailEditorPanel({
   editor,
   itemFields,
   fieldName,
   idPrefix,
-  showValidationBanner,
   itemNoun,
   showSelectedDetail = true,
   selectedIdentity,
@@ -127,7 +125,6 @@ export function MasterDetailEditorPanel({
       onDelete={() => {
         if (selectedIndex !== null) editor.requestRemove(selectedIndex)
       }}
-      showValidationBanner={showValidationBanner}
       bodyRef={bodyRef}
     >
       {hasSelectedRow && selectedFieldId && selectedIndex !== null ? (

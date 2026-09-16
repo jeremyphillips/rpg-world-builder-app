@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+import { AlertTriangle } from 'lucide-react'
+
 import {
   Badge,
   Modal,
@@ -8,6 +10,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
+  ValidationIssueCountBadge,
   type ModalContentProps,
 } from '@rpg/ui'
 
@@ -106,9 +109,21 @@ function CreateModalShellIssueBadge({ count }: { count: number | undefined }) {
       <span aria-hidden className={createModalShellIssueSeparatorClasses}>
         {' · '}
       </span>
-      <Badge appearance="soft" tone="destructive" size="sm" layout="counter" aria-hidden>
-        {count ?? '!'}
-      </Badge>
+      {count == null ? (
+        <Badge
+          appearance="soft"
+          tone="destructive"
+          size="sm"
+          layout="counter"
+          aria-hidden
+          leadingIcon={<AlertTriangle aria-hidden />}
+          className="gap-1"
+        >
+          !
+        </Badge>
+      ) : (
+        <ValidationIssueCountBadge count={count} />
+      )}
       <span className="sr-only">, {formatIssueAttentionLabel(count)}</span>
     </>
   )

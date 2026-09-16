@@ -114,7 +114,9 @@ export function requirementExpressionToEditor(
 
 export function isRequirementLeafDraft(leaf: unknown): leaf is RequirementLeafDraftForm {
   if (!leaf || typeof leaf !== 'object') return false
-  return !('type' in leaf)
+  if (!('type' in leaf)) return true
+  const type = (leaf as { type?: unknown }).type
+  return type === undefined || type === null || type === ''
 }
 
 export function isRequirementLeafForm(leaf: unknown): leaf is RequirementLeafTypedForm {

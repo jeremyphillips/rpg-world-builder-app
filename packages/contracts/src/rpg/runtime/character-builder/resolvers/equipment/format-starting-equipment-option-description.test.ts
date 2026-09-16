@@ -6,6 +6,7 @@ import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import {
   DEFAULT_STANDARD_EQUIPMENT_LABEL,
+  formatStartingEquipmentOptionCompactSummary,
   formatStartingEquipmentPackageDescription,
   formatStartingGoldOptionDescription,
 } from './format-starting-equipment-option-description'
@@ -138,6 +139,34 @@ const storedFighter: ClassStored = {
     },
   },
 }
+
+describe('formatStartingEquipmentOptionCompactSummary', () => {
+  it('formats item count and baseline wealth', () => {
+    expect(
+      formatStartingEquipmentOptionCompactSummary({
+        itemCount: 3,
+        wealth: { gp: 11 },
+      }),
+    ).toBe('3 items · 11 GP')
+  })
+
+  it('formats wealth-only packages without item segment', () => {
+    expect(
+      formatStartingEquipmentOptionCompactSummary({
+        itemCount: 0,
+        wealth: { gp: 50 },
+      }),
+    ).toBe('50 GP')
+  })
+
+  it('omits wealth when no baseline grant is configured', () => {
+    expect(
+      formatStartingEquipmentOptionCompactSummary({
+        itemCount: 1,
+      }),
+    ).toBe('1 item')
+  })
+})
 
 describe('formatStartingGoldOptionDescription', () => {
   it('formats gold copy with default standard-equipment label', () => {

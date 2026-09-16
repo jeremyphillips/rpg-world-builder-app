@@ -1,6 +1,12 @@
 import { expect } from 'vitest'
 import type { TabbedFormTab } from '@rpg/ui/form'
-import { isContainer, resolveColumnsCollapseSequence, type FormItem } from '@rpg/ui/form'
+import {
+  isContainer,
+  resolveColumnsCollapseSequence,
+  resolveFieldConfigBoundNames,
+  resolveFieldConfigPrimaryName,
+  type FormItem,
+} from '@rpg/ui/form'
 
 export type AssertHeaderOnlyTabsOptions = {
   /** Tab ids that intentionally omit validation wiring (non-form chrome). */
@@ -24,7 +30,7 @@ function collectLeafFieldNames(items: readonly FormItem[]): string[] {
 
   for (const item of items) {
     if (!isContainer(item)) {
-      names.push(item.name)
+      names.push(...resolveFieldConfigBoundNames(item))
       continue
     }
 
@@ -34,7 +40,7 @@ function collectLeafFieldNames(items: readonly FormItem[]): string[] {
     }
 
     if (item.kind === 'dependent') {
-      names.push(item.controller.name)
+      names.push(resolveFieldConfigPrimaryName(item.controller))
       names.push(...collectLeafFieldNames(item.dependents.fields))
       continue
     }

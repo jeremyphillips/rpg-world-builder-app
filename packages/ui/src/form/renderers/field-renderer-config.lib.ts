@@ -2,7 +2,9 @@
  * Pure helpers that prepare a `FieldConfig` for `FieldRenderer`.
  */
 import type { FieldSize } from '../../components/ui/field.client'
-import type { FieldConfig, FieldDerivedMeta } from '../field-config'
+import type { FieldConfig, FieldDerivedMeta, JoinedPairFieldConfig } from '../field-config'
+import { resolveFieldConfigPrimaryName } from '../field-config'
+import { resolveRowAwareFieldHintPresentation } from '../config/resolve-row-field-hint.lib'
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
@@ -17,11 +19,30 @@ export function buildFieldRendererIds(
   idPrefix: string,
   namePrefix?: string,
 ): { fullName: string; id: string } {
-  const fullName = namePrefix ? `${namePrefix}.${config.name}` : config.name
+  const primaryName = resolveFieldConfigPrimaryName(config)
+  const fullName = namePrefix ? `${namePrefix}.${primaryName}` : primaryName
   return {
     fullName,
     id: `${idPrefix}-${fullName.replaceAll('.', '-')}`,
   }
+}
+
+/** Primary bound path and control ids for standalone joinedPair fields (no wrapper `name`). */
+export function buildJoinedPairRendererIds(
+  config: JoinedPairFieldConfig,
+  idPrefix: string,
+  namePrefix?: string,
+): { fullName: string; id: string; boundNames: string[] } {
+  const idSegment = config.controlId ?? config.start.name
+  const boundNames =
+    config.end.kind === 'select' ? [config.start.name, config.end.name] : [config.start.name]
+  const primaryName = config.start.name
+  const fullName = namePrefix ? `${namePrefix}.${primaryName}` : primaryName
+  const id = namePrefix
+    ? `${idPrefix}-${namePrefix.replaceAll('.', '-')}-${idSegment}`
+    : `${idPrefix}-${idSegment}`
+
+  return { fullName, id, boundNames }
 }
 
 export interface ResolvedFieldRenderConfig {
@@ -46,18 +67,25 @@ function resolveDerivedMetaPresentation(
   }
 }
 
+export type ResolveFieldRenderConfigOptions = {
+  inAnatomyRow?: boolean
+}
+
 /** Applies inherited density, dynamic hints, derived metadata, and option availability to a field config. */
 export function resolveFieldRenderConfig(
   config: FieldConfig,
   density: FormDensity,
   dynamicValues: Record<string, unknown>,
   optionValues: Record<string, unknown>,
+  options: ResolveFieldRenderConfigOptions = {},
 ): ResolvedFieldRenderConfig {
   const controlSize = resolveFieldControlSize({
     density,
     override: config.controlSizeOverride,
   })
-  const hintPresentation = resolveFieldHintPresentation(config, dynamicValues)
+  const hintPresentation = options.inAnatomyRow
+    ? resolveRowAwareFieldHintPresentation(config, dynamicValues, true)
+    : resolveFieldHintPresentation(config, dynamicValues)
   const derivedMetaPresentation = resolveDerivedMetaPresentation(config, dynamicValues)
 
   const basePresentation = {

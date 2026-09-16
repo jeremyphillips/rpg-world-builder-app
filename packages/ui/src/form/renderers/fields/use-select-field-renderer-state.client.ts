@@ -8,6 +8,7 @@ import {
   useArrayFieldContext,
 } from '../../context/array-field.context'
 import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
+import { useFieldRowParticipation } from '../../../components/ui/field-row-anatomy.context'
 import { useFormSectionContext } from '../../context/form-section.context'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
@@ -28,10 +29,13 @@ export function useSelectFieldRendererState(
   namePrefix?: string,
 ) {
   const { density } = useFormSectionContext()
+  const inAnatomyRow = useFieldRowParticipation()
   const arrayContext = useArrayFieldContext()
   const optionValues = useDependsOnValues(config.optionAvailability?.dependsOn ?? [], namePrefix)
   const dynamicValues = useDependsOnValues(collectFieldDynamicDependsOn(config), namePrefix)
-  const resolved = resolveFieldRenderConfig(config, density, dynamicValues, optionValues)
+  const resolved = resolveFieldRenderConfig(config, density, dynamicValues, optionValues, {
+    inAnatomyRow,
+  })
   const renderConfig = resolved.config as SelectFieldConfig
 
   const { field, fieldState } = useController({

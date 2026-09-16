@@ -252,13 +252,62 @@ feetInputUnitField('speed.walk', 'Walk speed')
 
 Segment kinds:
 
-| Kind     | RHF value | Notes                                                  |
-| -------- | --------- | ------------------------------------------------------ |
-| `text`   | —         | Prose fragment; `tone`: `label` / `prose`              |
-| `number` | `number`  | `min`, `max`, `digits`, `defaultValue`                 |
-| `select` | `string`  | Flat or grouped `options`; `digits` or segment `width` |
+| Kind         | RHF value | Notes                                                  |
+| ------------ | --------- | ------------------------------------------------------ |
+| `text`       | —         | Prose fragment; `tone`: `label` / `prose`              |
+| `number`     | `number`  | `min`, `max`, `digits`, `defaultValue`                 |
+| `select`     | `string`  | Flat or grouped `options`; `digits` or segment `width` |
+| `joinedPair` | varies    | Two-segment joined chrome — see below                  |
 
 Optional `below.kind: 'chips'` renders a chip row under the sentence (same fieldset).
+
+### Joined pair segment (`joinedPair`)
+
+Two-segment joined chrome for value + unit controls. Uses **start / end occupants** — not
+`value` / `suffix`. Allowed compositions:
+
+- `select` + `label` — enumerated value, fixed unit (species movement: `[30 ▾][ft.]`)
+- `select` + `select` — both value and unit are choices (`[30 ▾][ft. ▾]`)
+- `number` + `select` — arbitrary numeric value with unit select
+
+Select occupants may use homogeneous numeric or string option values. Numeric options persist
+as numbers via the shared typed select adapter (`n:` / `s:` Radix keys) — not string coercion.
+
+State ownership:
+
+- Group label / `required` / `disabled` → parent `inlineSentence` field
+- Validation → occupant Zod paths (`start.name`, optional `end.name` when end is `select`)
+- `aria-invalid` → failing occupant; error message → shared sentence error slot
+- `label` end occupants have no RHF path
+
+Optional `label` + `labelVisibility: 'visible'` stack a field label above the pair (e.g.
+species movement Speed above `[30 ▾][ft.]` while the sentence legend stays sr-only).
+
+```ts
+{
+  kind: 'joinedPair',
+  label: 'Speed',
+  labelVisibility: 'visible',
+  ariaLabel: 'Speed',
+  start: {
+    kind: 'select',
+    name: 'feet',
+    options: MOVEMENT_SPEED_FEET.map((feet) => ({ value: feet, label: String(feet) })),
+    defaultValue: 30,
+    digits: 3,
+    ariaLabel: 'Speed value',
+  },
+  end: {
+    kind: 'label',
+    text: 'ft.',
+    ariaLabel: 'Speed unit',
+  },
+}
+```
+
+Standalone `type: 'joinedPair'` fields bind RHF paths through occupant `name` values only — no
+wrapper `name`. Optional `controlId` sets control id segments when they must differ from the
+primary bound path. Arbitrary numeric authoring with optional unit select remains `inputSelect`.
 
 ### Deprecated inline composites
 

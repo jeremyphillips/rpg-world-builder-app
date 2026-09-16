@@ -190,6 +190,13 @@ const formStickyScrollBodyScrollSurfaceClasses = cn(
  */
 export const formStickyScrollBodyUnboundedClasses = 'min-h-0 flex-1'
 
+/** Viewport extras for bounded scroll bodies composed with {@link ScrollBoundaryRegion}. */
+export const formStickyScrollBodyScrollViewportClasses = cn(
+  'h-full min-h-0',
+  dialogPanelScrollRegionBottomInsetClasses,
+  dialogPanelScrollRegionFocusClearanceClasses,
+)
+
 /** Inner scroller inside the viewport-bound clip slot. */
 export const formStickyScrollBodyScrollerClasses = cn(
   'h-full min-h-0',

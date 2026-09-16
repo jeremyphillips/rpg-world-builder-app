@@ -194,8 +194,9 @@ Slot `render()` components and hand-built editors should call `useFormSectionCon
 `density`, then `resolveFormDensity(density)` when threading `rhythm` / `size` into primitives
 (e.g. `RequirementEditor` → `FieldGroup`).
 
-**Array legends:** default `legendSize: 'array'`. Legend typography follows resolved section
-control scale (`compact` → `text-sm`; `comfortable` → `text-field-array-legend`).
+**Array legends:** inherit parent section density unless the array sets `density` explicitly.
+Item bodies still default to `compact`. Legend typography follows the legend scale
+(`compact`/`sm` → `text-xs`; `comfortable`/`md` → `text-md`).
 
 Dense chip fields stack full-width — don't cram many options into a `FieldRow`.
 
@@ -288,8 +289,9 @@ Schemas stay message-free. `makeResolver` builds a field-aware error map
 `invalid_format`, `invalid_value`, `invalid_union`, …) into shared boilerplate
 copy from `@rpg/contracts` (`fieldValidationMessages`), interpolating the field's
 configured `label` — e.g. `z.number().min(1)` on a field labeled `Level` renders
-`Level must be at least 1.` Array containers use their `legend` (or `itemHeader`
-for singular item copy: `Add at least one grant.`). Registered paths always
+`Level must be at least 1.` Multi-select chips/combobox fields use
+`Select at least one {item}.`; repeatable array containers use their `legend`
+(or `itemHeader` for singular item copy: `Add at least one grant.`). Registered paths always
 receive catalog copy; a last-resort `{label} is invalid.` catch-all covers
 unhandled issue codes. Custom `.refine` / `superRefine` messages always win.
 **Unregistered** paths use unlabeled catalog fallbacks (`This field`, `item`) —

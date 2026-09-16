@@ -15,7 +15,9 @@ describe('PreviewRail', () => {
         <PreviewRail.Identity
           media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
           name="Fighter"
-          availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+          status={
+            <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+          }
         />
         <PreviewRail.ScrollRegion data-testid="preview-rail-scroll">
           <PreviewRail.Sections defaultValue="basics">
@@ -98,7 +100,9 @@ describe('PreviewRail', () => {
         <PreviewRail.Identity
           media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
           name="Fighter"
-          availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+          status={
+            <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+          }
         />
       </PreviewRail>,
     )
@@ -111,7 +115,7 @@ describe('PreviewRail', () => {
       <PreviewRail>
         <PreviewRail.Identity
           name="Fighter"
-          availability={{ available: true, statusLabel: 'Available' }}
+          status={<PreviewRail.AvailabilityLine available statusLabel="Available" />}
           facts={[{ label: 'Hit die', value: 'd8' }]}
         />
       </PreviewRail>,

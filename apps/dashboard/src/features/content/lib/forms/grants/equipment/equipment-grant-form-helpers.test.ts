@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildContentPurposeSelectors } from '@rpg/contracts'
+import { resolveFieldConfigPrimaryName } from '@rpg/ui/form'
 
 import { pickClass, pickEquipment } from '../../../fixtures/pick'
 import {
@@ -204,10 +205,16 @@ describe('equipmentGrantItemFields', () => {
       (field): field is Extract<typeof field, { kind: 'row' }> =>
         'kind' in field &&
         field.kind === 'row' &&
-        field.fields.some((f) => f.name === 'equipmentSlug'),
+        field.fields.some(
+          (f) => !('kind' in f) && resolveFieldConfigPrimaryName(f) === 'equipmentSlug',
+        ),
     )
-    const equipmentField = equipmentRow?.fields.find((field) => field.name === 'equipmentSlug')
-    const quantityField = equipmentRow?.fields.find((field) => field.name === 'quantity')
+    const equipmentField = equipmentRow?.fields.find(
+      (field) => 'name' in field && field.name === 'equipmentSlug',
+    )
+    const quantityField = equipmentRow?.fields.find(
+      (field) => 'name' in field && field.name === 'quantity',
+    )
 
     expect(equipmentField).toMatchObject({
       type: 'combobox',
@@ -261,10 +268,16 @@ describe('equipmentGrantItemFields', () => {
       (field): field is Extract<typeof field, { kind: 'row' }> =>
         'kind' in field &&
         field.kind === 'row' &&
-        field.fields.some((f) => f.name === 'poolEquipmentKind'),
+        field.fields.some(
+          (f) => !('kind' in f) && resolveFieldConfigPrimaryName(f) === 'poolEquipmentKind',
+        ),
     )
-    const toolCategory = filteredRow?.fields.find((field) => field.name === 'poolToolCategory')
-    const weaponCategory = filteredRow?.fields.find((field) => field.name === 'poolWeaponCategory')
+    const toolCategory = filteredRow?.fields.find(
+      (field) => 'name' in field && field.name === 'poolToolCategory',
+    )
+    const weaponCategory = filteredRow?.fields.find(
+      (field) => 'name' in field && field.name === 'poolWeaponCategory',
+    )
 
     expect(toolCategory).toMatchObject({
       type: 'select',

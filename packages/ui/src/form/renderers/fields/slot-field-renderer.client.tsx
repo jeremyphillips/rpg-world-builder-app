@@ -7,7 +7,12 @@ import {
   useFormSectionContext,
   type FormSectionContextValue,
 } from '../../context/form-section.context'
-import { resolveFieldChromeProps } from '../../../components/ui/field-chrome.variants'
+import { useFieldRowParticipation } from '../../../components/ui/field-row-anatomy.context'
+import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
+import {
+  hasActiveFieldChrome,
+  resolveFieldChromeProps,
+} from '../../../components/ui/field-chrome.variants'
 import { resolveFormDensity } from '../../form-density'
 import type { SlotConfig } from '../../field-config'
 import {
@@ -24,10 +29,27 @@ export interface SlotFieldRendererProps {
 /** Renders custom form UI supplied by the field config inside `FormProvider`. */
 export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
   const sectionContext = useFormSectionContext()
+  const inAnatomyRow = useFieldRowParticipation()
   const { density } = sectionContext
   const { rhythm, size } = resolveFormDensity(density)
   const { chrome: resolvedChrome } = resolveFieldChromeProps(config, sectionContext)
   const content = config.render()
+
+  if (inAnatomyRow) {
+    if (content == null) return null
+    const body = hasActiveFieldChrome(resolvedChrome) ? (
+      <FieldChromeShell chrome={resolvedChrome} size={size}>
+        {content}
+      </FieldChromeShell>
+    ) : (
+      content
+    )
+    return (
+      <FieldSeparatorWrapper separator={config.separator}>
+        <div className="contents">{body}</div>
+      </FieldSeparatorWrapper>
+    )
+  }
 
   const body = buildSlotFieldBody(config, content, rhythm, size)
   if (body == null) return null

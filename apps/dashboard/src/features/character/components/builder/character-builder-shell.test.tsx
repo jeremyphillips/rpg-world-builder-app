@@ -1,4 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import * as builderFormContinueRegistry from '../../lib/builder/builder-form-continue-registry'
 import type { ReactElement } from 'react'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -163,8 +164,11 @@ describe('CharacterBuilderShell', () => {
     await screen.findByRole('heading', { name: 'Abilities', level: 2 })
     await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Assign a score to every ability.')
-    expect(screen.getByRole('alert')).toHaveTextContent(
+    const stepAlerts = screen
+      .getAllByRole('alert')
+      .filter((alert) => alert.textContent?.includes('Assign a score to every ability.'))
+    expect(stepAlerts.length).toBeGreaterThan(0)
+    expect(stepAlerts[0]).toHaveTextContent(
       formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
     )
     expect(screen.getByRole('heading', { name: 'Abilities', level: 2 })).toBeInTheDocument()
@@ -198,6 +202,36 @@ describe('CharacterBuilderShell', () => {
     })
   })
 
+  it('docks the footer inside the middle form column only', async () => {
+    const context = createStandaloneBuilderContextFixture()
+    const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+
+    renderShell(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+
+    await screen.findByRole('button', { name: 'Continue' })
+
+    const footer = screen.getByRole('toolbar', { name: 'Form actions' })
+    expect(footer.closest('[class*="overflow-hidden"]')).toBeTruthy()
+    expect(
+      screen.getByRole('navigation', { name: 'Character builder steps' }),
+    ).not.toContainElement(footer)
+    expect(screen.getByRole('complementary')).not.toContainElement(footer)
+  })
+
+  it('routes Continue through the registered identity form handler', async () => {
+    const context = createStandaloneBuilderContextFixture()
+    const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
+    const runHandlerSpy = vi.spyOn(builderFormContinueRegistry, 'runBuilderFormContinueHandler')
+
+    renderShell(<CharacterBuilderShell context={context} catalogIndex={catalogIndex} />)
+
+    await screen.findByRole('button', { name: 'Continue' })
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(runHandlerSpy).toHaveBeenCalledWith('identity')
+    runHandlerSpy.mockRestore()
+  })
+
   it('clears the step alert and rail error when a failed step becomes valid', async () => {
     const context = createStandaloneBuilderContextFixture()
     const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
@@ -224,7 +258,11 @@ describe('CharacterBuilderShell', () => {
     await userEvent.type(screen.getByLabelText(/Character name/i), 'Verna')
 
     await waitFor(() => {
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(
+        screen
+          .queryAllByRole('alert')
+          .some((alert) => alert.textContent?.includes(nameRequiredMessage)),
+      ).toBe(false)
     })
     expect(
       within(stepRail).queryByRole('button', { name: /Identity, has blocking validation issues/i }),

@@ -13,10 +13,10 @@ export type CollapsibleListItemDragHandleConfig = {
 
 export function resolveCollapsibleListItemActionsAlign(
   actionsAlign: CollapsibleListItemActionsAlign | undefined,
-  gripVisible: boolean,
+  reserveDragHandleSlot: boolean,
   layout: 'default' | 'compactRow',
 ): CollapsibleListItemActionsAlign {
-  return actionsAlign ?? (gripVisible || layout === 'compactRow' ? 'start' : 'center')
+  return actionsAlign ?? (reserveDragHandleSlot || layout === 'compactRow' ? 'start' : 'center')
 }
 
 export function resolveCollapsibleListItemDragHandleProps(
@@ -33,11 +33,12 @@ export function resolveCollapsibleListItemDragHandleProps(
 }
 
 export function buildCollapsibleListItemLeadingChrome(
-  gripVisible: boolean,
+  reserveDragHandleSlot: boolean,
   collapsible: boolean,
 ): CollapsibleListItemLeadingChromeOptions {
   return {
-    showDragHandle: gripVisible,
+    reserveDragHandleSlot,
+    showDragHandle: reserveDragHandleSlot,
     collapsible,
   }
 }

@@ -291,6 +291,17 @@ describe('resolveGoldStartingEquipmentAlternative', () => {
       option: monkClass.characterCreation!.startingEquipment!.options[1],
     })
   })
+
+  it('treats campaign-unavailable gold options as unavailable', () => {
+    const options = monkClass.characterCreation!.startingEquipment!.options.map((option) =>
+      isStartingGoldOption(option) ? { ...option, available: false } : option,
+    )
+
+    expect(resolveGoldStartingEquipmentAlternative(options)).toEqual({
+      status: 'unavailable',
+      reason: 'No starting-gold alternative is configured for this package.',
+    })
+  })
 })
 
 describe('buildStartingPackageConversionPreview', () => {

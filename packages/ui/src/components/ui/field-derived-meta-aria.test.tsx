@@ -9,7 +9,7 @@ describe('Field aria-describedby with derived metadata', () => {
   it('combines below-label hint and error ids when invalid', () => {
     render(
       <FieldDerivedMetaProvider meta={{ rows: [{ label: 'Typical uses', value: 'Care' }] }}>
-        <Field.Root id="archetype" error="Required" hint="Choose an archetype.">
+        <Field.Root id="archetype" error="Required" hint="Choose an archetype." anatomy>
           <FieldLayout
             label={<Field.Label>Archetype</Field.Label>}
             control={<input aria-label="Archetype" />}
@@ -27,7 +27,11 @@ describe('Field aria-describedby with derived metadata', () => {
 
   it('uses hint id when only hint is present', () => {
     render(
-      <Field.Root id="override" hint="Replaces the archetype's typical uses for this building.">
+      <Field.Root
+        id="override"
+        hint="Replaces the archetype's typical uses for this building."
+        anatomy
+      >
         <FieldLayout
           label={<Field.Label>Function override</Field.Label>}
           control={<input aria-label="Function override" />}
@@ -42,7 +46,7 @@ describe('Field aria-describedby with derived metadata', () => {
   it('uses derived metadata id when only metadata is present', () => {
     render(
       <FieldDerivedMetaProvider meta={{ rows: [{ label: 'Typical uses', value: 'Care' }] }}>
-        <Field.Root id="archetype">
+        <Field.Root id="archetype" anatomy>
           <FieldLayout
             label={<Field.Label>Archetype</Field.Label>}
             control={<input aria-label="Archetype" />}
@@ -58,7 +62,7 @@ describe('Field aria-describedby with derived metadata', () => {
   it('combines hint and derived metadata ids when both are present', () => {
     render(
       <FieldDerivedMetaProvider meta={{ rows: [{ label: 'Typical uses', value: 'Care' }] }}>
-        <Field.Root id="archetype" hint="Optional guidance.">
+        <Field.Root id="archetype" hint="Optional guidance." anatomy>
           <FieldLayout
             label={<Field.Label>Archetype</Field.Label>}
             control={<input aria-label="Archetype" />}
@@ -73,10 +77,10 @@ describe('Field aria-describedby with derived metadata', () => {
 })
 
 describe('FieldLayout derived metadata placement', () => {
-  it('renders derived metadata outside the alignment anchor', () => {
+  it('renders derived metadata in the message region, outside the control region', () => {
     const { container } = render(
       <FieldDerivedMetaProvider meta={{ rows: [{ label: 'Typical uses', value: 'Care' }] }}>
-        <Field.Root id="archetype">
+        <Field.Root id="archetype" anatomy>
           <FieldLayout
             label={<Field.Label>Archetype</Field.Label>}
             control={<input aria-label="Archetype" />}
@@ -85,9 +89,10 @@ describe('FieldLayout derived metadata placement', () => {
       </FieldDerivedMetaProvider>,
     )
 
-    const anchor = container.querySelector('[data-field-align]')
-    expect(anchor).not.toBeNull()
-    expect(anchor).not.toHaveTextContent('Typical uses')
-    expect(screen.getByText('Typical uses')).toBeInTheDocument()
+    const controlRegion = container.querySelector('[data-field-control-region]')
+    const messageRegion = container.querySelector('[data-field-message-region]')
+    expect(controlRegion).not.toBeNull()
+    expect(controlRegion).not.toHaveTextContent('Typical uses')
+    expect(messageRegion).toContainElement(screen.getByText('Typical uses'))
   })
 })

@@ -16,6 +16,16 @@ export const FEAT_CATEGORY_TERM = {
   },
 } as const satisfies VocabularyTerm
 
+/** Prerequisite editor condition row discriminator (level, ability score, spellcasting). */
+export const REQUIREMENT_CONDITION_TYPE_TERM = {
+  label: 'Condition type',
+  description: 'The kind of prerequisite checked within a condition set.',
+  sentence: {
+    singular: 'condition type',
+    plural: 'condition types',
+  },
+} as const satisfies VocabularyTerm
+
 export const FEAT_CATEGORY_ENTRIES = {
   origin: {
     label: 'Origin',

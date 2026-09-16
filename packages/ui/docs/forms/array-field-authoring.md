@@ -99,9 +99,9 @@ field content aligned via `--content-inline-start`.
 - **Invariant:** text anatomy never owns external vertical spacing (`pb-*` on summary/issue
   lines is forbidden); header rhythm does not change between collapsed and expanded state
 
-`itemCollapsible: true` implies `itemVariant: 'detailed'` unless the author **explicitly**
-sets `itemVariant: 'compact'` (collapsible is ignored on compact rows). Nested arrays with
-`itemCollapsible: true` therefore keep disclosure chrome instead of silently auto-compacting.
+`itemCollapsible: true` always renders disclosure anatomy. Omit `itemVariant: 'compact'` on
+collapsible arrays — the dev validator warns when both are set. Nested arrays with
+`itemCollapsible: true` keep disclosure chrome instead of silently auto-compacting.
 
 `item.surface` is an **override** — default subtle header + canvas body need no `item.surface`.
 Uses `SurfaceConfig` (`emphasis`, `elevation`). Optional `item.tone` applies a semantic wash
@@ -109,6 +109,30 @@ Uses `SurfaceConfig` (`emphasis`, `elevation`). Optional `item.tone` applies a s
 
 When spreading an array builder, **merge** `item` — `item: { surface: … }` replaces the
 whole config and drops `collapsible`, `variant`, `header`, and `reorder`.
+
+## `item.headerVisibility`
+
+Controls whether **item-level header chrome** renders for non-collapsible rows. Field
+layout (inline vs stacked) never implies a header by itself.
+
+| Value              | Meaning                                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `'auto'` (default) | Show a visible item header when semantic identity requires one (`primaryField`, `primary`, or detailed variant title). |
+| `'hidden'`         | Suppress item-level header chrome — use for anonymous stacked rows (e.g. movement speeds).                             |
+
+`item.header` remains the identity config (`fallback`, `primaryField`, `summary`, …) and
+still drives aria labels and remove-button copy when the header row is hidden.
+
+`header.srOnly` hides title **text** while header anatomy may still exist; `headerVisibility:
+'hidden'` removes the item header row entirely (non-collapsible only). Collapsible items
+ignore `'hidden'` — disclosure requires header anatomy.
+
+```ts
+item: {
+  headerVisibility: 'hidden',
+  header: { fallback: (i) => `Movement ${i + 1}`, primaryField: 'mode' },
+},
+```
 
 ## `itemHeader` patterns
 
@@ -151,15 +175,18 @@ shell. Do not invent fake entity summaries for those rows.
 
 ## `min` / `max` and add/remove
 
-| Prop                                | Behavior                                         |
-| ----------------------------------- | ------------------------------------------------ |
-| `min`                               | Hides remove at floor; Zod `.min()` should match |
-| `max`                               | Hides add when at ceiling                        |
-| `hideAddAction`                     | Omit default add — use external slot             |
-| `hideItemRemove` + `itemRemoveSlot` | Custom remove in header rail                     |
+| Prop                                | Behavior                                                                |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| `min`                               | Legend required marker when `min >= 1`; Zod `.min()` enforces on submit |
+| `max`                               | Hides add when at ceiling                                               |
+| `hideAddAction`                     | Omit default add — use external slot                                    |
+| `hideItemRemove` + `itemRemoveSlot` | Custom remove in header rail                                            |
 
 Pair `min`/`max` with matching Zod array constraints so submit validation and chrome
-stay aligned.
+stay aligned. When the list is empty, the renderer shows a neutral panel:
+`No {itemLabel} added.` Container min violations surface through the normal field-error
+path (e.g. `Add at least one {itemLabel}.`) below the panel on failed submit — not
+inside the empty-state panel.
 
 ## `addActionMenu`
 
@@ -204,17 +231,62 @@ arrayPattern: {
 },
 ```
 
+## Presentation model
+
+Array items resolve to **three structural anatomies**:
+
+| Anatomy          | Meaning                                                          |
+| ---------------- | ---------------------------------------------------------------- |
+| `flatNoHeader`   | No item header. Outer geometry is `grip \| content \| actions`.  |
+| `flatWithHeader` | Visible item header, non-collapsible.                            |
+| `disclosure`     | Collapsible disclosure. `collapsible: true` always selects this. |
+
+`contentLayout: 'inline' \| 'stacked'` is a **body-layout** detail inside the content column,
+derived from normalized field groups — not from whether authors wrapped a leaf in `kind: 'row'`.
+
+| Normalized shape                                | `contentLayout` |
+| ----------------------------------------------- | --------------- |
+| Single leaf field (`text`, `inlineSentence`, …) | `inline`        |
+| Single `kind: 'row'` of leaf fields             | `inline`        |
+| Multiple top-level fields                       | `stacked`       |
+
+**Field label vs item label:** per-field `label` on `text`, `inlineSentence`, etc. controls field
+chrome only. Item headers come from `item.header`, `headerVisibility`, and disclosure — not from
+field declaration shape.
+
+## Invalid combinations (dev-validated)
+
+The form library logs dev warnings for:
+
+| Config                                                              | Why                                                    |
+| ------------------------------------------------------------------- | ------------------------------------------------------ |
+| `collapsible: true` + `variant: 'compact'`                          | Collapsible items render as disclosure — omit compact. |
+| `headerVisibility: 'hidden'` + `collapsible: true`                  | Disclosure requires header anatomy (auto-normalized).  |
+| `inlineAlign` on stacked content                                    | Alignment applies to inline rows only.                 |
+| `header.primaryField` + `headerVisibility: 'hidden'` on inline rows | primaryField does not show a header on inline items.   |
+
+Do **not** wrap fields in `kind: 'row'` solely to get inline item chrome — normalization already
+treats bare leaves and row wraps equivalently.
+
+## Observed misconfigurations (dashboard audit)
+
+| Location                          | Issue                                                                                                                     |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `species-movement-form-fields.ts` | `primaryField` with `headerVisibility: 'hidden'` — primaryField is inert for inline rows; keep for aria/remove copy only. |
+
 ## Common mistakes
 
 1. **Absolute names in item `fields`** — use `name: 'label'`, not `traits.0.label`.
 2. **Missing `fallback`** — required on every `itemHeader`.
-3. **`itemCollapsible` on compact rows** — has no effect when `itemVariant: 'compact'` is explicit.
+3. **`itemCollapsible` + explicit `itemVariant: 'compact'`** — dev warning; collapsible wins as disclosure.
 4. **Replacing `item` when spreading builders** — merge (`item: { ...built.item, … }`) instead of
    overwriting; a bare `item: { surface: … }` drops collapsible/header config.
 5. **Zod mismatch** — hidden item fields need `z.optional()`; `min`/`max` should mirror schema.
 6. **Empty `legend` without parent label** — omit legend only when a parent stack/group
    already labels the block (see [containers.md](./containers.md#array-fields)).
 7. **Resolver `.omit` in nested items** — works on top-level keys only, not inside array items.
+8. **Row wrapper for chrome** — use `kind: 'row'` only when fields should share a horizontal row,
+   not to pass inline-eligibility gates.
 
 ## Related
 

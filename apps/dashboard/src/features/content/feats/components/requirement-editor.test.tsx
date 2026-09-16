@@ -1,10 +1,13 @@
+import { useEffect } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
+import { makeResolver } from '@rpg/ui/form'
 
 import { GRAPPLER } from '../fixtures'
+import { createFeatFormSchema } from '../lib/feat-form-fields'
 import {
   ADD_CONDITION_LABEL,
   ADD_CONDITION_SET_LABEL,
@@ -14,19 +17,41 @@ import {
 } from '../lib/requirement-editor-constants'
 import { formatRequirementEditorPreview } from '../lib/requirement-editor-form'
 import {
+  newRequirementGroup,
   requirementEditorDefaultValue,
   type PrerequisiteEditorValue,
 } from '../lib/requirement-editor-form-schema'
+import { prerequisiteEditorResolverFields } from '../lib/requirement-editor-resolver-fields'
 import { requirementExpressionToEditor } from '../lib/requirement-editor-form-values'
 import { FormSectionProvider } from '@rpg/ui/form'
 import { RequirementEditor } from './requirement-editor'
 
 function EditorShell({
   prerequisiteEditor = requirementEditorDefaultValue(),
+  onReady,
 }: {
   prerequisiteEditor?: PrerequisiteEditorValue
+  onReady?: (trigger: () => Promise<boolean>) => void
 }) {
-  const form = useForm({ defaultValues: { prerequisiteEditor } })
+  const form = useForm({
+    defaultValues: {
+      name: 'Test Feat',
+      category: 'general',
+      prerequisiteEditor,
+      repeatableAllowed: false,
+    },
+    resolver: makeResolver(createFeatFormSchema(), [
+      { type: 'text', name: 'name', label: 'Name', required: true },
+      { type: 'select', name: 'category', label: 'Category', options: [], required: true },
+      ...prerequisiteEditorResolverFields(),
+      { type: 'switch', name: 'repeatableAllowed', label: 'Repeatable' },
+    ]),
+  })
+
+  useEffect(() => {
+    onReady?.(() => form.trigger())
+  }, [form, onReady])
+
   return (
     <FormProvider {...form}>
       <FormSectionProvider density="compact">
@@ -67,6 +92,24 @@ describe('RequirementEditor', () => {
       CONDITION_TYPE_PLACEHOLDER,
     )
     expect(screen.queryByLabelText(/Minimum level/i)).not.toBeInTheDocument()
+  })
+
+  it('shows condition type validation after submit when type is missing', async () => {
+    let triggerValidation!: () => Promise<boolean>
+    render(
+      <EditorShell
+        prerequisiteEditor={{ groups: [newRequirementGroup()] }}
+        onReady={(trigger) => {
+          triggerValidation = trigger
+        }}
+      />,
+    )
+
+    await triggerValidation()
+
+    await waitFor(() => {
+      expect(screen.getByText('Select condition type.')).toBeInTheDocument()
+    })
   })
 
   it('adds another condition within a set', async () => {

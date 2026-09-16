@@ -85,7 +85,8 @@ describe('SwitchField', () => {
     const row = textColumn?.parentElement
     expect(row).toHaveClass('flex', 'gap-2')
     expect(row?.firstElementChild).toHaveClass('flex', 'h-5', 'shrink-0', 'items-center')
-    expect(container.querySelector('[data-field-align]')).not.toBeNull()
+    expect(container.querySelector('[data-field-control-region]')).not.toBeNull()
+    expect(container.querySelector('[data-field-anatomy]')).not.toBeNull()
   })
 
   it('renders label and hint in the left column when labelPosition is settings', () => {

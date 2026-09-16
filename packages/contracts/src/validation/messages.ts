@@ -6,7 +6,7 @@ import { defineMessage } from './define-message'
 // ---------------------------------------------------------------------------
 
 /**
- * Lowercases a label for mid-sentence use ("Choose a valid rarity.") while
+ * Lowercases a label for mid-sentence use ("Select a valid rarity.") while
  * preserving acronyms and initialisms ("XP", "AC bonus").
  */
 export function midSentenceLabel(label: string): string {
@@ -60,15 +60,22 @@ export const fieldValidationMessages = {
   /** Empty required choice-like field (select, radio, chips single, combobox). */
   requiredSelect: defineMessage<{ label: string }>(
     'validation.field.requiredSelect',
-    ({ label }) => `Choose ${withArticle(midSentenceLabel(label))}.`,
+    ({ label }) => `Select ${withArticle(midSentenceLabel(label))}.`,
     ({ label }) => `Missing ${label}`,
+  ),
+  /** Empty required choice-like field using a vocab sentence phrase (no article). */
+  requiredSelectPhrase: defineMessage<{ phrase: string }>(
+    'validation.field.requiredSelectPhrase',
+    ({ phrase }) => `Select ${phrase}.`,
   ),
   /** Value not among the allowed options. */
   invalidSelect: defineMessage<{ label: string }>(
     'validation.field.invalidSelect',
-    ({ label }) => `Choose a valid ${midSentenceLabel(label)}.`,
+    ({ label }) => `Select a valid ${midSentenceLabel(label)}.`,
     ({ label }) => `Invalid ${label}`,
   ),
+  /** Unregistered field path with no configured label. */
+  requiredUnlabeled: defineMessage('validation.field.requiredUnlabeled', () => 'Required.'),
   /** Non-numeric input in a number-like field. */
   invalidNumber: defineMessage('validation.field.invalidNumber', () => 'Enter a valid number.'),
   minNumber: defineMessage<{ label: string; min: number }>(
@@ -91,12 +98,22 @@ export const fieldValidationMessages = {
     'validation.field.maxLength',
     ({ label, max }) => `${label} cannot exceed ${max} characters.`,
   ),
-  /** Multi-select / repeatable list needs at least one entry. */
+  /** Multi-select choice field (chips/combobox) needs at least one selection. */
+  minSelections: defineMessage<{ itemLabel: string }>(
+    'validation.field.minSelections',
+    ({ itemLabel }) => `Select at least one ${itemLabel}.`,
+  ),
+  /** Multi-select choice field needs `min` (> 1) selections; `itemsLabel` is plural. */
+  minSelectionsCount: defineMessage<{ itemsLabel: string; min: number }>(
+    'validation.field.minSelectionsCount',
+    ({ itemsLabel, min }) => `Select at least ${min} ${itemsLabel}.`,
+  ),
+  /** Repeatable array container needs at least one entry. */
   minItems: defineMessage<{ itemLabel: string }>(
     'validation.field.minItems',
     ({ itemLabel }) => `Add at least one ${itemLabel}.`,
   ),
-  /** Multi-select / repeatable list needs `min` (> 1) entries; `itemsLabel` is plural. */
+  /** Repeatable array container needs `min` (> 1) entries; `itemsLabel` is plural. */
   minItemsCount: defineMessage<{ itemsLabel: string; min: number }>(
     'validation.field.minItemsCount',
     ({ itemsLabel, min }) => `Add at least ${min} ${itemsLabel}.`,

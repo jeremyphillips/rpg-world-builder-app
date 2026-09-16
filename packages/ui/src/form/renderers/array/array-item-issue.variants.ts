@@ -27,7 +27,7 @@ export const arrayItemIssueSummaryClasses = cva(
 
 export const arrayLegendIssueLinkClasses = cva(
   cn(
-    'ml-2 inline-flex items-center gap-1 rounded-sm align-baseline',
+    'inline-flex items-center gap-1 rounded-sm',
     'text-xs font-medium underline-offset-2 hover:underline',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
   ),

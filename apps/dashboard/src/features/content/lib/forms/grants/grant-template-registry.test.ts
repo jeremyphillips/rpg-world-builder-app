@@ -19,7 +19,16 @@ const PROFICIENCY_GRANT_TYPES = new Set([
   'armorTraining',
 ])
 
-const AUTHORING_SHAPE_GRANT_TYPES = new Set([...PROFICIENCY_GRANT_TYPES, 'movement'])
+const AUTHORING_SHAPE_GRANT_TYPES = new Set([
+  ...PROFICIENCY_GRANT_TYPES,
+  'movement',
+  'senses',
+  'languages',
+  'resistances',
+  'damageType',
+  'featChoice',
+  'spells',
+])
 
 describe('grant template registry', () => {
   it('defines one template per consumer grant type', () => {

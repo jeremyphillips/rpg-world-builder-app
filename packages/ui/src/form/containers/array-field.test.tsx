@@ -106,17 +106,57 @@ describe('ArrayFieldRenderer', () => {
     localStorage.clear()
   })
 
-  it('renders the add button and legend for an empty array', () => {
+  it('wraps a top-level array fieldset in one shared field container', () => {
+    const { container } = renderForm()
+
+    const fieldset = screen.getByRole('group', { name: /Traits/ })
+    const shell = fieldset.closest('.bg-field-container')
+    expect(shell).toBeInstanceOf(HTMLElement)
+    expect(shell).toContainElement(fieldset)
+    expect(fieldset).toHaveClass('border-0', 'flex', 'flex-col')
+    expect(shell).toContainElement(screen.getByText('Traits'))
+    expect(shell).toContainElement(screen.getByRole('button', { name: 'Add trait' }))
+    expect(container.querySelectorAll('.bg-field-container')).toHaveLength(2)
+  })
+
+  it('opts out of the shared array container with fieldChrome none', () => {
+    const unboxedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fieldChrome: { variant: 'none' },
+        fields: traitFields,
+        addAction: { label: 'Add trait' },
+      },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={unboxedFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(container.querySelector('.bg-field-container')).toBeNull()
+    expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
+  })
+
+  it('renders the add button, legend, and empty state for an empty array', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
-    expect(screen.getByText('Traits')).toHaveClass('text-sm')
-    expect(screen.getByText('Traits')).not.toHaveClass('text-field-array-legend')
-    expect(screen.getByText('Traits')).not.toHaveClass('text-field-group-legend')
+    const legend = screen.getByRole('group', { name: /Traits/ }).querySelector('legend')
+    expect(legend).toHaveClass('text-md', 'font-field-label')
+    expect(legend).not.toHaveClass('text-field-array-legend')
+    expect(legend).not.toHaveClass('text-field-group-legend')
     expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(
       'gap-3',
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
+    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Traits/ })).not.toHaveClass('mb-8')
   })
@@ -172,11 +212,11 @@ describe('ArrayFieldRenderer', () => {
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
-    expect(itemShell).toHaveClass('bg-surface-subtle')
+    expect(itemShell).toHaveClass('bg-background')
     expect(itemShell).not.toHaveClass('bg-card')
     const dependentsRegion = addButton.closest('[data-field-dependent-fields]')
     expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
-    expect(dependentsRegion?.querySelector('.bg-surface-subtle')).toBe(itemShell)
+    expect(dependentsRegion?.querySelector('.bg-background')).toBe(itemShell)
   })
 
   it('applies item surface override on array item shells', async () => {
@@ -380,13 +420,13 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('option', { name: 'Movement bonus' })).toBeInTheDocument()
   })
 
-  it('defaults array item shells to a subtle header and canvas body', async () => {
+  it('defaults flat array item shells to the canvas background plane', async () => {
     const user = userEvent.setup()
     renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait #1' })
-    expect(itemShell).toHaveClass('bg-surface-subtle')
+    expect(itemShell).toHaveClass('bg-background')
     expect(itemShell).toHaveClass('border-border')
     expect(itemShell).not.toHaveClass('bg-card')
     expect(itemShell).not.toHaveClass('shadow-surface-raised')
@@ -435,11 +475,12 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('h-8')
     expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass(
-      'rounded-md',
+      'rounded-sm',
       'border',
       'border-border',
-      'bg-surface-subtle',
+      'bg-background',
       'pl-2',
+      'py-2',
     )
   })
 
@@ -499,7 +540,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.queryByRole('button', { name: 'Add trait' })).not.toBeInTheDocument()
   })
 
-  it('disables the remove button when at min count', async () => {
+  it('allows removing the last item and shows neutral empty-state copy only', async () => {
     const user = userEvent.setup()
     const minFields: FormItem[] = [
       {
@@ -511,7 +552,7 @@ describe('ArrayFieldRenderer', () => {
         min: 1,
       },
     ]
-    const minSchema = z.object({ traits: z.array(traitSchema) })
+    const minSchema = z.object({ traits: z.array(traitSchema).min(1) })
     render(
       <Form
         schema={minSchema}
@@ -521,7 +562,89 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    expect(screen.getByRole('button', { name: 'Remove Traits · Trait #1' })).toBeDisabled()
+    const removeButton = screen.getByRole('button', { name: 'Remove Traits · Trait #1' })
+    expect(removeButton).toBeEnabled()
+    await user.click(removeButton)
+
+    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.queryByText(/Add at least one trait/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
+  })
+
+  it('shows container validation error and legend issue link after failed submit on empty min arrays', async () => {
+    const user = userEvent.setup()
+    const minFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: traitFields,
+        addAction: { label: 'Add trait' },
+        min: 1,
+      },
+    ]
+    const minSchema = z.object({ traits: z.array(traitSchema).min(1) })
+    render(
+      <Form
+        schema={minSchema}
+        fields={minFields}
+        defaultValues={{ traits: [] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('Add at least one trait.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Review 1 issue in Traits/i })).toBeInTheDocument()
+  })
+
+  it('shows required marker on array legend when min is at least one', async () => {
+    render(
+      <Form
+        schema={z.object({ traits: z.array(traitSchema).min(1) })}
+        fields={[
+          {
+            kind: 'array',
+            name: 'traits',
+            legend: 'Traits',
+            fields: traitFields,
+            addAction: { label: 'Add trait' },
+            min: 1,
+          },
+        ]}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByText('*', { selector: 'legend *' })).toBeInTheDocument()
+  })
+
+  it('shows empty-state primary copy without validation error on initial empty arrays', () => {
+    render(
+      <Form
+        schema={z.object({ traits: z.array(traitSchema) })}
+        fields={[
+          {
+            kind: 'array',
+            name: 'traits',
+            legend: 'Traits',
+            fields: traitFields,
+            addAction: { label: 'Add trait' },
+            min: 1,
+          },
+        ]}
+        defaultValues={{ traits: [] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.queryByText(/Add at least one trait/i)).not.toBeInTheDocument()
   })
 
   it('omits the default remove button when hideItemRemove is true', async () => {
@@ -1042,7 +1165,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveValue('Darkvision')
   })
 
-  it('pins compact item remove control in the top-right actions rail', async () => {
+  it('embeds compact stacked item actions in the flatNoHeader row grid', async () => {
     const user = userEvent.setup()
     const compactFields: FormItem[] = [
       {
@@ -1069,13 +1192,19 @@ describe('ArrayFieldRenderer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
-    const item = screen.getByRole('group', { name: 'Traits · Trait 1 Trait name Description' })
-    const actionsRail = screen.getByRole('group', { name: 'Item actions' })
+    const item = screen.getByRole('group', { name: 'Traits · Trait 1' })
+    const actionsRail = within(item).getByRole('group', { name: 'Item actions' })
     const removeButton = screen.getByRole('button', { name: 'Remove Traits · Trait 1' })
 
     expect(item).toContainElement(actionsRail)
     expect(actionsRail).toContainElement(removeButton)
-    expect(actionsRail).toHaveClass('self-start', 'mt-1')
+    expect(document.querySelector('[data-array-item-flat-no-header]')).toHaveAttribute(
+      'data-array-item-content-layout',
+      'stacked',
+    )
+    expect(document.querySelector('[data-compact-inline-row]')).toBeInTheDocument()
+    expect(actionsRail).toHaveClass('self-center')
+    expect(actionsRail).not.toHaveClass('mt-1')
   })
 
   it('lays out compact inline rows on a dedicated grid with embedded actions', async () => {
@@ -1178,15 +1307,15 @@ describe('ArrayFieldRenderer', () => {
     const compactRow = document.querySelector('[data-compact-inline-row]')
     expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
 
-    expect(screen.getByRole('textbox', { name: 'Description' }).closest('.flex-1')).toHaveClass(
-      'w-full',
-    )
-    expect(screen.getByRole('spinbutton', { name: 'DC' }).closest('.flex-none')).toHaveClass(
-      'w-fit',
-    )
+    expect(
+      screen.getByRole('textbox', { name: 'Description' }).closest('[data-field-row-participant]'),
+    ).toHaveClass('min-w-0', 'w-full')
+    expect(
+      screen.getByRole('spinbutton', { name: 'DC' }).closest('[data-field-row-participant]'),
+    ).toHaveClass('w-fit')
   })
 
-  it('centers compact inline grip and actions when compactInlineAlign is center', () => {
+  it('top-aligns unlabeled compact inline grip and actions with the anatomy field row by default', () => {
     const centeredCompactRowFields: FormItem[] = [
       {
         kind: 'array',
@@ -1194,7 +1323,7 @@ describe('ArrayFieldRenderer', () => {
         legend: 'Examples',
         item: {
           variant: 'compact',
-          inlineAlign: 'center',
+          headerVisibility: 'hidden',
           reorder: 'dragHandle',
           header: { fallback: (index) => `Example ${index + 1}`, primaryField: 'value' },
         },
@@ -1223,8 +1352,14 @@ describe('ArrayFieldRenderer', () => {
     )
 
     const compactRow = document.querySelector('[data-compact-inline-row]')
-    expect(compactRow).toHaveAttribute('data-compact-inline-align', 'center')
-    expect(compactRow).toHaveClass('items-center')
+    expect(compactRow).toHaveAttribute('data-compact-inline-align', 'start')
+    expect(compactRow).toHaveClass('items-start')
+
+    const gripColumn = compactRow?.firstElementChild?.nextElementSibling
+    expect(gripColumn).toHaveClass('self-start')
+
+    const actionsColumn = compactRow?.querySelector('[aria-label="Item actions"]')?.parentElement
+    expect(actionsColumn).toHaveClass('self-start')
   })
 
   it('shows issue badge, row summary, and legend link after failed submit', async () => {
@@ -1251,8 +1386,8 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     expect(
-      await screen.findByRole('button', { name: '1 issue in Traits · Darkvision' }),
-    ).toBeInTheDocument()
+      screen.queryByRole('button', { name: '1 issue in Traits · Darkvision' }),
+    ).not.toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Review 1 issue in 1 row in Traits' }),
     ).toBeInTheDocument()
@@ -1326,13 +1461,13 @@ describe('ArrayFieldRenderer', () => {
     expect(readArrayItemCollapseOverrides(uiStateKey, 'traits')).toEqual({ 'index:0': 'closed' })
   })
 
-  it('suppresses per-field error text on compact rows and surfaces a row summary', async () => {
+  it('shows per-field error text inline on compact rows', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({
       grants: z.array(
         z.object({
-          rarity: z.string().min(1, 'Choose a rarity.'),
-          quantity: z.string().min(1, 'Quantity is required.'),
+          rarity: z.string().min(1),
+          quantity: z.string().min(1),
         }),
       ),
     })
@@ -1347,7 +1482,7 @@ describe('ArrayFieldRenderer', () => {
           header: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
         },
         fields: [
-          { type: 'text', name: 'rarity', label: 'Rarity', required: true },
+          { type: 'select', name: 'rarity', label: 'Rarity', options: [], required: true },
           { type: 'text', name: 'quantity', label: 'Quantity', required: true },
         ],
         addAction: { label: 'Add grant' },
@@ -1368,7 +1503,7 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
-      expect(screen.getByRole('textbox', { name: 'Rarity' })).toHaveAttribute(
+      expect(screen.getByRole('combobox', { name: 'Rarity' })).toHaveAttribute(
         'aria-invalid',
         'true',
       )
@@ -1378,9 +1513,67 @@ describe('ArrayFieldRenderer', () => {
       )
     })
 
-    expect(screen.queryByText('Choose a rarity.')).not.toBeInTheDocument()
+    expect(screen.getByText('Select a rarity.')).toBeInTheDocument()
+    expect(screen.getByText('Quantity is required.')).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('group', { name: 'Item actions' })).queryByRole('button', {
+        name: /issues/i,
+      }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('surfaces a joined row summary on compact rows when errorPlacement is row', async () => {
+    const user = userEvent.setup()
+    const grantSchema = z.object({
+      grants: z.array(
+        z.object({
+          rarity: z.string().min(1),
+          quantity: z.string().min(1),
+        }),
+      ),
+    })
+
+    const compactGrantFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        legend: 'Grants',
+        errorPlacement: 'row',
+        item: {
+          variant: 'compact',
+          header: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
+        },
+        fields: [
+          { type: 'select', name: 'rarity', label: 'Rarity', options: [], required: true },
+          { type: 'text', name: 'quantity', label: 'Quantity', required: true },
+        ],
+        addAction: { label: 'Add grant' },
+        min: 1,
+      },
+    ]
+
+    render(
+      <Form<z.infer<typeof grantSchema>>
+        schema={grantSchema}
+        fields={compactGrantFields}
+        defaultValues={{ grants: [{ rarity: '', quantity: '' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('combobox', { name: 'Rarity' })).toHaveAttribute(
+        'aria-invalid',
+        'true',
+      )
+    })
+
+    expect(screen.queryByText('Select a rarity.')).not.toBeInTheDocument()
     expect(screen.queryByText('Quantity is required.')).not.toBeInTheDocument()
-    expect(screen.getByRole('alert')).toHaveTextContent('Choose a rarity. · Quantity is required.')
+    expect(screen.getByRole('alert')).toHaveTextContent('Select a rarity. · Quantity is required.')
   })
 
   it('appends defaults from addActionMenu selections', async () => {
@@ -1514,5 +1707,184 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getAllByText('Already added')).toHaveLength(2)
     expect(screen.queryByRole('option', { name: /Movement bonus/i })).not.toBeInTheDocument()
     expect(screen.getByRole('option', { name: /Language/i })).toBeInTheDocument()
+  })
+
+  describe('item presentation matrix', () => {
+    it('renders unlabeled stacked rows without visible item headers when headerVisibility is hidden', async () => {
+      const user = userEvent.setup()
+      const fields: FormItem[] = [
+        {
+          kind: 'array',
+          name: 'movement',
+          legend: 'Movement',
+          item: {
+            variant: 'compact',
+            headerVisibility: 'hidden',
+            header: {
+              fallback: (index) => `Movement ${index + 1}`,
+              primaryField: 'mode',
+            },
+          },
+          fields: [
+            { type: 'text', name: 'mode', label: 'Mode', required: true },
+            { type: 'text', name: 'feet', label: 'Feet', required: true },
+          ],
+          addAction: { label: 'Add speed' },
+        },
+      ]
+
+      render(
+        <Form<{ movement: Array<{ mode: string; feet: string }> }>
+          schema={z.object({
+            movement: z.array(z.object({ mode: z.string(), feet: z.string() })),
+          })}
+          fields={fields}
+          onSubmit={vi.fn()}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Add speed' }))
+
+      expect(document.querySelector('[data-array-item-flat-no-header]')).toBeInTheDocument()
+      expect(
+        document.querySelector('[data-array-item-content-layout="stacked"]'),
+      ).toBeInTheDocument()
+      expect(screen.queryByText('Movement 1')).not.toBeInTheDocument()
+      expect(screen.getByRole('group', { name: 'Movement · Movement 1' })).toBeInTheDocument()
+    })
+
+    it('keeps collapsible header anatomy when headerVisibility hidden is normalized', async () => {
+      render(
+        <Form<{ traits: Array<{ name: string }> }>
+          schema={z.object({ traits: z.array(z.object({ name: z.string() })) })}
+          fields={[
+            {
+              kind: 'array',
+              name: 'traits',
+              legend: 'Traits',
+              item: {
+                collapsible: true,
+                headerVisibility: 'hidden',
+                header: { fallback: (index) => `Trait ${index + 1}`, primaryField: 'name' },
+              },
+              fields: [{ type: 'text', name: 'name', label: 'Trait name' }],
+              addAction: { label: 'Add trait' },
+            },
+          ]}
+          defaultValues={{ traits: [{ name: 'Darkvision' }] }}
+          onSubmit={vi.fn()}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      expect(screen.getByRole('button', { name: /Collapse .*Darkvision/ })).toBeInTheDocument()
+    })
+
+    it('renders equivalent flatNoHeader chrome for bare text, row wrap, and inlineSentence', async () => {
+      const user = userEvent.setup()
+      const baseItem = {
+        variant: 'compact' as const,
+        headerVisibility: 'hidden' as const,
+        header: { fallback: (index: number) => `Row ${index + 1}` },
+      }
+
+      const cases: FormItem[][] = [
+        [{ type: 'text', name: 'value', label: 'Value', required: true }],
+        [
+          {
+            kind: 'row',
+            fields: [{ type: 'text', name: 'value', label: 'Value', required: true }],
+          },
+        ],
+        [
+          {
+            type: 'inlineSentence',
+            name: 'sentence',
+            label: 'Value',
+            labelVisibility: 'srOnly',
+            segments: [
+              {
+                kind: 'select',
+                name: 'value',
+                options: [{ value: 'sample', label: 'Sample' }],
+                defaultValue: 'sample',
+                width: 'full',
+              },
+            ],
+          },
+        ],
+      ]
+
+      for (const fields of cases) {
+        const { unmount } = render(
+          <Form<{ rows: Array<{ value: string }> }>
+            schema={z.object({ rows: z.array(z.object({ value: z.string() })) })}
+            fields={[
+              {
+                kind: 'array',
+                name: 'rows',
+                legend: 'Rows',
+                item: baseItem,
+                fields,
+                addAction: { label: 'Add row' },
+              },
+            ]}
+            onSubmit={vi.fn()}
+            footer={<button type="submit">Save</button>}
+          />,
+        )
+
+        await user.click(screen.getByRole('button', { name: 'Add row' }))
+
+        const flatShell = document.querySelector('[data-array-item-flat-no-header]')
+        expect(flatShell).toBeInTheDocument()
+        expect(flatShell).toHaveAttribute('data-array-item-content-layout', 'inline')
+        expect(document.querySelector('[data-compact-inline-row]')).toBeInTheDocument()
+        expect(document.querySelector('[data-compact-inline-align="start"]')).toBeInTheDocument()
+
+        unmount()
+      }
+    })
+
+    it('reserves drag-handle geometry when reorder is configured but only one item exists', async () => {
+      const user = userEvent.setup()
+      const fields: FormItem[] = [
+        {
+          kind: 'array',
+          name: 'tags',
+          legend: 'Tags',
+          item: {
+            variant: 'compact',
+            headerVisibility: 'hidden',
+            header: { fallback: (index) => `Tag ${index + 1}`, srOnly: true },
+          },
+          fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
+          addAction: { label: 'Add tag' },
+        },
+      ]
+
+      render(
+        <Form<{ tags: Array<{ label: string }> }>
+          schema={z.object({ tags: z.array(z.object({ label: z.string() })) })}
+          fields={fields}
+          onSubmit={vi.fn()}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Add tag' }))
+      const flatRow = document.querySelector('[data-compact-inline-row]')
+      expect(flatRow).toHaveStyle({ gridTemplateColumns: 'auto minmax(0, 1fr) max-content' })
+      expect(flatRow?.querySelector('[aria-hidden="true"][class*="opacity-0"]')).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: 'Add tag' }))
+      expect(screen.getAllByLabelText(/Drag to reorder/i)).toHaveLength(2)
+
+      await user.click(screen.getAllByRole('button', { name: /Remove/i })[1]!)
+      expect(document.querySelector('[data-compact-inline-row]')).toHaveStyle({
+        gridTemplateColumns: 'auto minmax(0, 1fr) max-content',
+      })
+    })
   })
 })

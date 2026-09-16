@@ -301,6 +301,41 @@ describe('resolveAutomaticNpcBuild constraints', () => {
     expect(first).toEqual(second)
   })
 
+  it('excludes weapons from campaign-unavailable starting packages', () => {
+    const context = weaponConstraintContext()
+    const unavailablePackages: ClassStored = {
+      ...weaponConstraintFighter,
+      characterCreation: {
+        ...weaponConstraintFighter.characterCreation!,
+        startingEquipment: {
+          ...weaponConstraintFighter.characterCreation!.startingEquipment!,
+          options: weaponConstraintFighter.characterCreation!.startingEquipment!.options.map(
+            (option) =>
+              option.id === 'sword-kit' || option.id === 'pool-kit'
+                ? { ...option, available: false }
+                : option,
+          ),
+        },
+      },
+    }
+    const constrainedContext: CharacterBuildContext = {
+      ...context,
+      catalog: {
+        ...context.catalog,
+        classes: [unavailablePackages],
+      },
+    }
+
+    const weapons = listReachableStartingWeapons({
+      seed: { classId: unavailablePackages.id },
+      context: constrainedContext,
+    })
+
+    expect(weapons.map((weapon) => weapon.id)).not.toContain(longsword.id)
+    expect(weapons.map((weapon) => weapon.id)).not.toContain(greataxe.id)
+    expect(weapons.map((weapon) => weapon.id)).toEqual([dagger.id])
+  })
+
   it('satisfies jointly required weapons via package bias plus domain grants', () => {
     const context = weaponConstraintContext()
     const weapons = listReachableStartingWeapons({

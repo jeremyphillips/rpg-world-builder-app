@@ -91,6 +91,7 @@ export function MarkdownField({
       required={required}
       width={width}
       size={size}
+      anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}

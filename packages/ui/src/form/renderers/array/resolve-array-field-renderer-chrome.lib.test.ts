@@ -24,12 +24,43 @@ describe('resolveArrayFieldRendererChrome', () => {
       density: 'comfortable',
       depth: 2,
       inRhythmStack: undefined,
-      namedGroupDepth: 1,
       fieldsLength: 2,
     })
 
     expect(chrome.variant).toBe('detailed')
     expect(chrome.collapsible).toBe(true)
+  })
+
+  it('enables collapse for compact arrays when collapsible is true', () => {
+    const chrome = resolveArrayFieldRendererChrome({
+      config: {
+        kind: 'array',
+        name: 'examples',
+        legend: 'Examples',
+        item: { collapsible: true, variant: 'compact' },
+        fields: [{ type: 'text', name: 'value', label: 'Value' }],
+      },
+      density: 'comfortable',
+      depth: 0,
+      inRhythmStack: undefined,
+      fieldsLength: 1,
+    })
+
+    expect(chrome.collapsible).toBe(true)
+  })
+
+  it('uses legend density separately from compact item density', () => {
+    const chrome = resolveArrayFieldRendererChrome({
+      config: nestedGrantArray,
+      density: 'compact',
+      legendDensity: 'comfortable',
+      depth: 0,
+      inRhythmStack: undefined,
+      fieldsLength: 1,
+    })
+
+    expect(chrome.legendFieldSize).toBe('md')
+    expect(chrome.itemBodyStackClasses).toContain('gap-3')
   })
 
   it('does not enable collapse for compact nested arrays without renderShell', () => {
@@ -43,7 +74,6 @@ describe('resolveArrayFieldRendererChrome', () => {
       density: 'comfortable',
       depth: 2,
       inRhythmStack: undefined,
-      namedGroupDepth: 1,
       fieldsLength: 1,
     })
 

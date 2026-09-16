@@ -21,6 +21,8 @@ export interface FormSectionContextValue {
   headingTier: FormHeadingTier
   /** Section density — rhythm and control scale resolve via {@link resolveFormDensity}. */
   density: FormDensity
+  /** Array section legend scale — inherits parent unless the array sets `density`. */
+  arrayLegendDensity?: FormDensity
   /** Surface config for array item shells — defaults to subtle when unset. */
   arrayItemSurface?: SurfaceConfig
   /** Optional semantic wash for array item shells. */
@@ -48,6 +50,7 @@ export function useFormSectionContext(): FormSectionContextValue {
 
 export interface FormSectionContextOverrides {
   density?: FormDensity
+  arrayLegendDensity?: FormDensity
   namedGroupDepth?: number
   headingTier?: FormHeadingTier
   arrayItemSurface?: SurfaceConfig
@@ -70,6 +73,7 @@ function inheritSectionContextFields(
 ): Omit<FormSectionContextValue, 'depth'> {
   const inherited = {
     density: parent.density,
+    arrayLegendDensity: parent.arrayLegendDensity,
     namedGroupDepth: parent.namedGroupDepth,
     headingTier: parent.headingTier,
     arrayItemSurface: parent.arrayItemSurface,

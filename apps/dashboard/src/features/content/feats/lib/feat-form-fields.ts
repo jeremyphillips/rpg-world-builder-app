@@ -14,8 +14,8 @@ import { RequirementEditor } from '../components/requirement-editor'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
-import { refineRequirementEditor } from './requirement-editor-form'
-import { prerequisiteEditorSchema } from './requirement-editor-form-schema'
+import { createPrerequisiteEditorSchema } from './requirement-editor-form'
+import { prerequisiteEditorResolverFields } from './requirement-editor-resolver-fields'
 
 const featCategoryOptions = toOptions(
   FEAT_CATEGORY_IDS,
@@ -31,12 +31,11 @@ export function createFeatFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
       slug: slugSchema.optional(),
       description: z.string().optional(),
       category: z.enum(FEAT_CATEGORY_IDS),
-      prerequisiteEditor: prerequisiteEditorSchema,
+      prerequisiteEditor: createPrerequisiteEditorSchema(maxLevel),
       repeatableAllowed: z.boolean(),
       repeatableNotes: z.string().optional(),
     })
     .superRefine((values, ctx) => {
-      refineRequirementEditor(values.prerequisiteEditor, ctx, maxLevel)
       if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
         ctx.addIssue({
           code: 'custom',
@@ -47,14 +46,14 @@ export function createFeatFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
     })
 }
 
-export function createFeatDraftFormSchema() {
+export function createFeatDraftFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return z
     .object({
       name: z.string(),
       slug: slugSchema.optional(),
       description: z.string().optional(),
       category: draftOptionalSelect(z.enum(FEAT_CATEGORY_IDS)),
-      prerequisiteEditor: prerequisiteEditorSchema,
+      prerequisiteEditor: createPrerequisiteEditorSchema(maxLevel),
       repeatableAllowed: z.boolean(),
       repeatableNotes: z.string().optional(),
     })
@@ -99,6 +98,7 @@ export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'slot',
           name: 'prerequisiteEditor',
+          label: 'Prerequisites',
           render: () =>
             createElement(RequirementEditor, {
               name: 'prerequisiteEditor',
@@ -106,6 +106,14 @@ export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
             }),
         },
       ],
+    },
+    {
+      kind: 'group',
+      visibility: {
+        dependsOn: [],
+        visibleWhen: () => false,
+      },
+      fields: prerequisiteEditorResolverFields(),
     },
     {
       kind: 'group',

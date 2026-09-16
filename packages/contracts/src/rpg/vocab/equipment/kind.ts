@@ -22,6 +22,10 @@ export const EQUIPMENT_KIND_ENTRIES = {
   armor: {
     label: 'Armor',
     description: 'Armor or a shield used for protection.',
+    sentence: {
+      singular: 'piece of armor',
+      plural: 'pieces of armor',
+    },
   },
   adventuring_gear: {
     label: 'Adventuring Gear',

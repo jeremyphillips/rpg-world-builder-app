@@ -16,7 +16,10 @@ import {
   GRANT_TYPE_LABELS,
   grantRowFormSchema,
 } from '../../lib/forms/grants/grant-form-schema'
-import { formRowsToGrantGroups } from '../../lib/forms/grants/grant-form-values'
+import {
+  formRowToContentGrant,
+  formRowsToGrantGroups,
+} from '../../lib/forms/grants/grant-form-values'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   TRAIT_DERIVED_DISPLAY_DESCRIPTION,
@@ -77,8 +80,20 @@ export function refinePublishedTraitRow(
     })
   }
   if (row.kind === 'grant') {
+    if (row.grants.length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: speciesTraitValidationMessages.grantRowRequired(),
+        path: ['grants'],
+      })
+      return
+    }
+
     const grantGroups = formRowsToGrantGroups(row.grants)
     if (!isGrantGroupsEligible(grantGroups)) {
+      const hasCompleteGrantRow = row.grants.some((grantRow) => formRowToContentGrant(grantRow))
+      if (!hasCompleteGrantRow) return
+
       ctx.addIssue({
         code: 'custom',
         message: speciesTraitValidationMessages.grantRowRequired(),

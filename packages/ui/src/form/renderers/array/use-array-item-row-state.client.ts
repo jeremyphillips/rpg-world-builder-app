@@ -13,6 +13,7 @@ import {
 import { resolveIssueProminence } from '../../errors/resolve-issue-prominence'
 import type { FormIssueScope } from '../../errors/form-issue.types'
 import { resolveArrayItemIssueSummary } from './array-field-item-issue-summary.lib'
+import { resolveShowArrayItemIssueBadge } from './resolve-show-array-item-issue-badge.lib'
 import { useArrayItemFocusIssue } from './use-array-item-focus-issue.client'
 import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
 import { useFormUiContext } from '../../context/form-ui.context'
@@ -93,9 +94,16 @@ export function useArrayItemRowState({
     showIssueChrome,
     variant,
     collapsed,
+    suppressFieldErrorText,
     issueGroup,
     rowSummaryId,
     onFocusIssue: focusIssue,
+  })
+  const showIssueBadge = resolveShowArrayItemIssueBadge({
+    showIssueChrome,
+    variant,
+    collapsed,
+    issueGroup,
   })
 
   return {
@@ -110,6 +118,7 @@ export function useArrayItemRowState({
     badgeProminence,
     issueSummary: issueSummary as ArrayItemIssueSummaryProps | undefined,
     showIssueChrome,
+    showIssueBadge,
     issueGroup,
     rowLabel: titleId,
   }

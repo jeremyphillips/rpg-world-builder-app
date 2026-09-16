@@ -301,12 +301,15 @@ Dependent stack with an array dependent — use `arrayItems` scope:
 
 Every **top-level** `FormItem` in the schema `fields: []` gets one boxed field container —
 solid background + border + 16px padding (`{ variant: 'container' }`) — regardless of
-`kind` (`leaf`, `group`, `dependent`, `row`, `slot`). `kind: 'columns'` is layout-only:
+`kind` (`leaf`, `group`, `dependent`, `row`). `kind: 'slot'` opts out by default (custom
+`render()` owns layout); pass `chrome: { variant: 'container' }` when a slot needs the
+shared shell. `kind: 'columns'` is layout-only:
 the wrapper has no field container; **each column child** is treated as a top-level unit.
 **Nothing nested inside** a chromed unit (nested `fields`, dependent controller/dependents,
-nested groups, nested dependents, rows, slots) receives field-container treatment. Arrays
-keep the existing **item-shell** model (subtle header + canvas body), not a field-container wrap of the
-whole list.
+nested groups, nested dependents, rows, slots) receives field-container treatment. Top-level
+`kind: 'array'` sections receive the same default field-container wrap as groups and leaves;
+array **item rows** keep the existing item-shell model (subtle header + canvas body).
+Nested arrays inside an array item or a chromed parent do not receive a second section wrap.
 
 **Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
 borderless `<fieldset>` (legend, description, and field stack) in `FieldChromeShell`,
@@ -419,9 +422,9 @@ pick compact but disclosure chrome is still required without `itemCollapsible`.
 }
 ```
 
-**Legend scale:** Array legend typography derives from parent named-group depth and section
-`density` (compact → smaller legend). Prefer `heading.label` when authoring new arrays;
-`legend` remains supported via `resolveArrayHeading`.
+**Legend scale:** Array legend typography inherits parent section density unless the array
+sets `density` explicitly; item bodies still default to `compact`. Prefer `heading.label`
+when authoring new arrays; `legend` remains supported via `resolveArrayHeading`.
 
 ### Collapse defaults and persistence
 
@@ -453,10 +456,10 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 Optional hooks:
 
-| Property             | Purpose                                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------------------------- |
-| `itemVariant`        | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                   |
-| `compactInlineAlign` | `'start'` \| `'center'` — compact inline rows only; center grip/actions with label-less single controls. |
+| Property             | Purpose                                                                                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `itemVariant`        | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                                                                                                     |
+| `compactInlineAlign` | `'start'` \| `'center'` \| `'control-edge'` — compact inline rows only; default unlabeled rows use `center`; opt into `control-edge` when grip/actions should sit on the control baseline. |
 
 **Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render that row
 inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,
@@ -537,11 +540,12 @@ Array item validation chrome is generic in `@rpg/ui/form` and is driven by RHF/Z
 - Before the first failed submit, progressive presentation shows row issue chrome only for
   touched rows.
 - After the first failed submit, all invalid rows in the form are flagged live.
-- Detailed rows show an issue badge in the actions rail. Collapsed rows also show the first
-  issue message in the header. Expanded rows show row/cross-row messages in the header; field
-  messages stay with their controls.
-- Compact nested rows get badge-only rollup in v1. Descendant errors still count toward the
-  nearest detailed ancestor row.
+- Detailed collapsed rows show an issue badge in the actions rail plus the first issue message
+  in the header. Expanded detailed rows omit the badge; row/cross-row messages stay in the
+  header and field messages stay with their controls.
+- Compact flat rows omit the badge and show per-field validation copy under each control
+  (same hint/error swap as standalone fields). Set `errorPlacement: 'row'` to opt into a joined
+  row summary instead. Descendant errors still count toward the nearest detailed ancestor row.
 - The array legend shows an invalid-row link after a failed submit. Clicking it jumps to the
   first invalid row in that array.
 
@@ -598,6 +602,10 @@ Slots inherit parent section `density`. Slot components should call
 `useFormSectionContext()` and resolve `resolveFormDensity(density)` when threading scale into
 hand-built controls. Inside a `kind: 'row'`, set `width` on the slot the same way as a leaf
 field so it participates in the flex split.
+
+Slots do **not** inherit the default leaf field container — including headless side-effect
+slots (`render: () => null` or components that return `null`). Opt in with
+`chrome: { variant: 'container' }` when the slot body should use the shared bordered shell.
 
 Optional `label` + `hint` wrap content in `FieldGroup`. `separator` adds a trailing
 divider after the slot (same as leaf fields and rows).

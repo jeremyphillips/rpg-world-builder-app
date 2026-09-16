@@ -1,5 +1,11 @@
-import { Fragment, useCallback } from 'react'
-import { useController, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
+import { Fragment, useCallback, useEffect } from 'react'
+import {
+  useController,
+  useFieldArray,
+  useFormContext,
+  useFormState,
+  useWatch,
+} from 'react-hook-form'
 import {
   Badge,
   Button,
@@ -20,7 +26,14 @@ import {
   fieldWidthVariants,
   type FieldSize,
 } from '@rpg/ui'
-import { useFormSectionContext, resolveFormDensity } from '@rpg/ui/form'
+import {
+  useFieldErrorPresentation,
+  useFormSectionContext,
+  resolveFieldErrorMessage,
+  resolveFirstFieldErrorMessage,
+  resolveFormDensity,
+  resolveNestedFieldErrorMessage,
+} from '@rpg/ui/form'
 import { ABILITY_SCORE_MAX, ABILITY_SCORE_MIN, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 import { Trash2 } from 'lucide-react'
 
@@ -29,6 +42,7 @@ import {
   ABILITY_MINIMUM_OF_CONNECTOR,
   ADD_CONDITION_LABEL,
   ADD_CONDITION_SET_LABEL,
+  REQUIREMENT_FIELD_ARRAY_KEY,
   CONDITION_SETS_HEADING,
   CONDITION_TYPE_LABEL,
   CONDITION_TYPE_PLACEHOLDER,
@@ -51,7 +65,9 @@ import { formatRequirementEditorPreview } from '../lib/requirement-editor-form'
 import {
   newRequirementDraftLeaf,
   newRequirementGroup,
+  newRequirementGroupId,
   newRequirementLeaf,
+  newRequirementLeafId,
   type PrerequisiteEditorValue,
   type RequirementLeafForm,
   type RequirementLeafType,
@@ -68,6 +84,22 @@ export interface RequirementEditorProps {
 /** Flat field stack keeps sentence operands on one baseline inside the inline row. */
 const SENTENCE_FIELD_STACK = 'space-y-0'
 const SENTENCE_OPERATOR_CLASS = 'text-sm text-muted-foreground'
+
+function useRequirementFieldValidation(fieldPath: string, fieldStateMessage?: string) {
+  const { errors } = useFormState()
+  const message = resolveFirstFieldErrorMessage(
+    fieldStateMessage,
+    resolveNestedFieldErrorMessage(errors, fieldPath),
+  )
+  const resolved = resolveFieldErrorMessage(message)
+  const presentation = useFieldErrorPresentation(message, fieldPath)
+
+  if (resolved) {
+    return { ...presentation, error: resolved, invalid: true as const }
+  }
+
+  return presentation
+}
 
 function parseNumberInput(raw: string): number | '' {
   if (raw === '') return ''
@@ -107,9 +139,11 @@ interface MinLevelSegmentsProps {
 }
 
 function MinLevelSegments({ idPrefix, leafPath, maxCharacterLevel, size }: MinLevelSegmentsProps) {
+  const levelPath = `${leafPath}.level`
   const { field: levelField, fieldState: levelFieldState } = useController({
-    name: `${leafPath}.level`,
+    name: levelPath,
   })
+  const levelValidation = useRequirementFieldValidation(levelPath, levelFieldState.error?.message)
 
   return (
     <>
@@ -122,7 +156,7 @@ function MinLevelSegments({ idPrefix, leafPath, maxCharacterLevel, size }: MinLe
         size={size}
         required
         className={SENTENCE_FIELD_STACK}
-        error={levelFieldState.error?.message}
+        error={levelValidation.error}
       >
         <Field.Label className="sr-only">{MIN_LEVEL_FIELD_LABEL}</Field.Label>
         <Field.Control>
@@ -151,12 +185,22 @@ interface AbilityMinimumSegmentsProps {
 }
 
 function AbilityMinimumSegments({ idPrefix, leafPath, size }: AbilityMinimumSegmentsProps) {
+  const abilityPath = `${leafPath}.ability`
+  const minimumPath = `${leafPath}.minimum`
   const { field: abilityField, fieldState: abilityFieldState } = useController({
-    name: `${leafPath}.ability`,
+    name: abilityPath,
   })
   const { field: minimumField, fieldState: minimumFieldState } = useController({
-    name: `${leafPath}.minimum`,
+    name: minimumPath,
   })
+  const abilityValidation = useRequirementFieldValidation(
+    abilityPath,
+    abilityFieldState.error?.message,
+  )
+  const minimumValidation = useRequirementFieldValidation(
+    minimumPath,
+    minimumFieldState.error?.message,
+  )
 
   return (
     <>
@@ -169,7 +213,7 @@ function AbilityMinimumSegments({ idPrefix, leafPath, size }: AbilityMinimumSegm
         size={size}
         required
         className={SENTENCE_FIELD_STACK}
-        error={abilityFieldState.error?.message}
+        error={abilityValidation.error}
       >
         <Field.Label className="sr-only">{ABILITY_FIELD_LABEL}</Field.Label>
         <Select
@@ -201,7 +245,7 @@ function AbilityMinimumSegments({ idPrefix, leafPath, size }: AbilityMinimumSegm
         size={size}
         required
         className={SENTENCE_FIELD_STACK}
-        error={minimumFieldState.error?.message}
+        error={minimumValidation.error}
       >
         <Field.Label className="sr-only">{MINIMUM_SCORE_FIELD_LABEL}</Field.Label>
         <Field.Control>
@@ -245,10 +289,21 @@ function ConditionSentenceRow({
   onRemove,
 }: ConditionSentenceRowProps) {
   const { setValue, getValues } = useFormContext()
+  const typePath = `${leafPath}.type`
+  const idPath = `${leafPath}.id`
+  useController({ name: idPath })
   const { field: typeField, fieldState: typeFieldState } = useController({
-    name: `${leafPath}.type`,
+    name: typePath,
   })
+  const typeValidation = useRequirementFieldValidation(typePath, typeFieldState.error?.message)
   const leafType = typeField.value as RequirementLeafType | undefined
+
+  useEffect(() => {
+    const currentId = getValues(idPath)
+    if (typeof currentId !== 'string' || currentId.length === 0) {
+      setValue(idPath, newRequirementLeafId(), { shouldDirty: false, shouldValidate: false })
+    }
+  }, [getValues, idPath, setValue])
 
   const handleTypeChange = useCallback(
     (nextType: string) => {
@@ -281,7 +336,7 @@ function ConditionSentenceRow({
           size={size}
           required
           className={SENTENCE_FIELD_STACK}
-          error={typeFieldState.error?.message}
+          error={typeValidation.error}
         >
           <Field.Label className="sr-only">{CONDITION_TYPE_LABEL}</Field.Label>
           <Select value={leafType} onValueChange={handleTypeChange} name={typeField.name}>
@@ -354,11 +409,35 @@ function ConditionSetEditor({
   size,
   onRemove,
 }: ConditionSetEditorProps) {
-  const { fields, append, remove } = useFieldArray({ name: `${setPath}.requirements` })
-  const { field: kindField, fieldState: kindFieldState } = useController({
-    name: `${setPath}.kind`,
+  const { setValue, getValues } = useFormContext()
+  const requirementsPath = `${setPath}.requirements`
+  const idPath = `${setPath}.id`
+  useController({ name: idPath })
+  const { fields, append, remove } = useFieldArray({
+    name: requirementsPath,
+    keyName: REQUIREMENT_FIELD_ARRAY_KEY,
   })
+  const kindPath = `${setPath}.kind`
+  const { field: kindField, fieldState: kindFieldState } = useController({
+    name: kindPath,
+    defaultValue: 'all',
+  })
+  const kindValidation = useRequirementFieldValidation(kindPath, kindFieldState.error?.message)
   const groupKind = kindField.value as 'all' | 'any' | undefined
+
+  useEffect(() => {
+    const currentId = getValues(idPath)
+    if (typeof currentId !== 'string' || currentId.length === 0) {
+      setValue(idPath, newRequirementGroupId(), { shouldDirty: false, shouldValidate: false })
+    }
+  }, [getValues, idPath, setValue])
+
+  useEffect(() => {
+    const storedKind = getValues(`${setPath}.kind`)
+    if (storedKind !== 'all' && storedKind !== 'any') {
+      setValue(`${setPath}.kind`, 'all', { shouldDirty: false, shouldValidate: false })
+    }
+  }, [getValues, setPath, setValue])
 
   return (
     <fieldset
@@ -369,12 +448,13 @@ function ConditionSetEditor({
         <div className="min-w-0 flex-1">
           <RadioGroupField
             id={`${idPrefix}-match-rule`}
+            name={kindField.name}
             label={MATCH_RULE_LABEL}
             options={[...MATCH_RULE_OPTIONS]}
-            value={kindField.value ?? 'all'}
+            value={kindField.value}
             onValueChange={kindField.onChange}
             onBlur={kindField.onBlur}
-            error={kindFieldState.error?.message}
+            error={kindValidation.error}
             size={size}
           />
         </div>
@@ -392,7 +472,7 @@ function ConditionSetEditor({
 
       <div className="space-y-2">
         {fields.map((field, conditionIndex) => (
-          <Fragment key={field.id}>
+          <Fragment key={field[REQUIREMENT_FIELD_ARRAY_KEY]}>
             {conditionIndex > 0 ? (
               <LogicConnectorChip operator={groupKind === 'any' ? 'OR' : 'AND'} align="start" />
             ) : null}
@@ -433,7 +513,10 @@ export function RequirementEditor({
   const { density } = useFormSectionContext()
   const { size, rhythm } = resolveFormDensity(density)
   const groupsPath = `${name}.groups`
-  const { fields, append, remove } = useFieldArray({ name: groupsPath })
+  const { fields, append, remove } = useFieldArray({
+    name: groupsPath,
+    keyName: REQUIREMENT_FIELD_ARRAY_KEY,
+  })
   const editorValue = useWatch({ name }) as PrerequisiteEditorValue | undefined
   const preview = formatRequirementEditorPreview(editorValue ?? { groups: [] }, maxCharacterLevel)
 
@@ -452,7 +535,7 @@ export function RequirementEditor({
         ) : (
           <div className="space-y-2">
             {fields.map((field, setIndex) => (
-              <Fragment key={field.id}>
+              <Fragment key={field[REQUIREMENT_FIELD_ARRAY_KEY]}>
                 {setIndex > 0 ? <LogicConnectorChip operator="AND" /> : null}
                 <ConditionSetEditor
                   idPrefix={`requirement-editor-set-${setIndex}`}

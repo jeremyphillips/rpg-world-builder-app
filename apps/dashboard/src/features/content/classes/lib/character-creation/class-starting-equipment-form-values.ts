@@ -90,11 +90,14 @@ function startingEquipmentItemFromFormRow(row: StartingEquipmentItemForm): Start
 export function startingEquipmentOptionToFormRow(
   option: StartingEquipmentOption,
 ): StartingEquipmentOptionForm {
+  const available = option.available === false ? false : true
   return {
     id: option.id,
     label: option.label,
+    description: option.description,
     wealth: wealthGrantMoneyToForm(option.wealth),
     items: option.items.map(startingEquipmentItemToFormRow),
+    available,
   }
 }
 
@@ -106,9 +109,16 @@ export function startingEquipmentOptionFromFormRow(
     label: row.label,
     items: row.items.map(startingEquipmentItemFromFormRow),
   }
+  const description = row.description?.trim()
+  if (description) {
+    option.description = description
+  }
   const wealth = wealthGrantMoneyFromForm(row.wealth)
   if (wealth) {
     option.wealth = wealth
+  }
+  if (row.available === false) {
+    option.available = false
   }
   return option
 }

@@ -73,6 +73,7 @@ export function RichTextField({
       required={required}
       width={width}
       size={size}
+      anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}

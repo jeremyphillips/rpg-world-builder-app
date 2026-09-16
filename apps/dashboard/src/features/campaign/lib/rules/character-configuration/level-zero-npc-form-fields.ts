@@ -146,7 +146,10 @@ export function levelZeroNpcsFields({
                     type: 'select',
                     name: 'levelZeroBaseHitDie',
                     label: 'Base hit die',
-                    hint: 'Hit die used for level 0 NPC hit points.',
+                    hint: {
+                      text: 'Hit die used for level 0 NPC hit points.',
+                      position: 'below-control',
+                    },
                     options: hitDieOptions,
                     width: '1/2',
                     digits: 4,
@@ -155,7 +158,10 @@ export function levelZeroNpcsFields({
                     type: 'select',
                     name: 'levelZeroProficiencyBonus',
                     label: 'Proficiency bonus',
-                    hint: 'Proficiency bonus applied to level 0 NPCs.',
+                    hint: {
+                      text: 'Proficiency bonus applied to level 0 NPCs.',
+                      position: 'below-control',
+                    },
                     options: PROFICIENCY_BONUS_OPTIONS,
                     width: '1/2',
                     digits: 4,

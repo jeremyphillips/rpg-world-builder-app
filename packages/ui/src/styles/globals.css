@@ -6,6 +6,7 @@
 @import './tokens/semantic-dark.css';
 @import './surface-relative-chrome.utilities.css';
 @import './form-scroll-body.utilities.css';
+@import './field-row-anatomy.utilities.css';
 
 @plugin '@tailwindcss/typography';
 

@@ -17,6 +17,8 @@ import {
   type CollapsibleListItemLeadingChromeOptions,
 } from '../../../components/ui/collapsible-list-item/collapsible-list-item.variants'
 
+import { collapsibleListItemChromeColumnClasses } from '../../../components/ui/collapsible-list-item/collapsible-list-item-leading-chrome.lib'
+
 export {
   collapsibleListItemChromeColumnClasses as arrayItemChromeColumnClasses,
   resolveCollapsibleListItemLeadingChrome as resolveArrayItemLeadingChrome,
@@ -102,25 +104,47 @@ export const arrayItemCompactFieldsClasses = 'min-w-0 flex-1'
 
 import type { ArrayCompactInlineAlign } from '../../field-config'
 
+function arrayItemCompactInlineSelfAlign(align: ArrayCompactInlineAlign): string {
+  if (align === 'center') return 'self-center'
+  if (align === 'control-edge') return 'self-end'
+  return 'self-start'
+}
+
+/** Unlabeled inline rows top-align grip/actions with the anatomy field row unless overridden. */
+export function resolveArrayItemCompactInlineAlign(
+  align: ArrayCompactInlineAlign | undefined,
+  unlabeled: boolean,
+): ArrayCompactInlineAlign {
+  if (align !== undefined) return align
+  if (unlabeled) return 'start'
+  return 'start'
+}
+
 /** Compact inline row — grip, fields, and actions share one grid row. */
 export function arrayItemCompactRowClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn('grid w-full min-w-0 gap-x-2', align === 'center' ? 'items-center' : 'items-start')
+  return cn(
+    'grid w-full min-w-0 gap-x-2',
+    align === 'center' ? 'items-center' : align === 'control-edge' ? 'items-end' : 'items-start',
+  )
 }
 
 /** Grip column in the compact row grid. */
 export function arrayItemCompactGripClasses(align: ArrayCompactInlineAlign = 'start'): string {
-  return cn('flex justify-center', align === 'center' ? 'items-center' : 'items-start')
+  return cn(collapsibleListItemChromeColumnClasses, arrayItemCompactInlineSelfAlign(align))
 }
 
 /** Per-field cell in the compact row grid. */
-export const arrayItemCompactFieldCellClasses = 'min-w-0'
+export function arrayItemCompactFieldCellClasses(align: ArrayCompactInlineAlign = 'start'): string {
+  return cn('min-w-0', arrayItemCompactInlineSelfAlign(align))
+}
 
-/**
- * Actions column in the compact row grid — max-content width, never steals field space.
- * Minimum width fits icon+count badge and remove control.
- */
-export const arrayItemCompactActionsClasses =
-  'w-max min-w-[calc(var(--spacing)*14)] shrink-0 justify-self-end'
+/** Actions column in the compact row grid — content-sized, never steals field space. */
+export function arrayItemCompactActionsClasses(align: ArrayCompactInlineAlign = 'start'): string {
+  return cn(
+    'flex w-max shrink-0 items-center justify-self-end',
+    arrayItemCompactInlineSelfAlign(align),
+  )
+}
 
 /** Full-width row summary below the compact inline field row. */
 export const arrayItemCompactSummaryClasses = 'col-span-full min-w-0'
@@ -133,3 +157,27 @@ export function buildArrayItemCompactRowGridTemplate(showGrip: boolean): string 
 
 /** Applied to the item wrapper while it is being dragged. */
 export const arrayItemDraggingClasses = collapsibleListItemDraggingClasses
+
+/** Flat non-collapsible shells — canvas plane with tighter corner radius. */
+export const arrayItemFlatShellRadiusClasses = 'rounded-sm'
+
+/** Merged flat list — collapse adjacent borders between siblings. */
+export function arrayItemFlatMergedShellClasses(
+  position: 'only' | 'first' | 'middle' | 'last',
+): string {
+  if (position === 'only') return arrayItemFlatShellRadiusClasses
+  if (position === 'first') return cn(arrayItemFlatShellRadiusClasses, 'rounded-b-none')
+  if (position === 'last') return cn(arrayItemFlatShellRadiusClasses, '-mt-px rounded-t-none')
+  return cn(arrayItemFlatShellRadiusClasses, '-mt-px rounded-none')
+}
+
+/** Unlabeled stacked body — grip column beside a field stack. */
+export function arrayItemUnlabeledStackedRowClasses(
+  align: ArrayCompactInlineAlign = 'start',
+): string {
+  return cn('grid w-full min-w-0 gap-x-2', align === 'center' ? 'items-center' : 'items-start')
+}
+
+export function arrayItemUnlabeledStackedGridTemplate(reserveDragHandleSlot: boolean): string {
+  return reserveDragHandleSlot ? 'auto minmax(0, 1fr)' : 'minmax(0, 1fr)'
+}

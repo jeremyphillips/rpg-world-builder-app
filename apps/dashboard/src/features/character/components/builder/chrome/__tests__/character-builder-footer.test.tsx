@@ -22,6 +22,7 @@ describe('CharacterBuilderFooter', () => {
       />,
     )
 
+    expect(screen.getByRole('toolbar', { name: 'Form actions' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: pcChrome.createLabel })).toBeDisabled()
     expect(screen.getByText(pcChrome.reviewFooterHint)).toBeInTheDocument()
   })

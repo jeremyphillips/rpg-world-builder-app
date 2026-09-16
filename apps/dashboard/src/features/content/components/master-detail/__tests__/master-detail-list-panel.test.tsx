@@ -68,11 +68,12 @@ describe('MasterDetailListPanel', () => {
     expect(props.onSelect).toHaveBeenCalledWith(1)
   })
 
-  it('joins structured meta for the row subtitle', () => {
+  it('renders structured meta in separate eyebrow and source regions', () => {
     render(<MasterDetailListPanel {...baseProps()} />)
 
-    expect(screen.getByText('Level 1 · System')).toBeInTheDocument()
-    expect(screen.getByText('Level 1 · Homebrew')).toBeInTheDocument()
+    expect(screen.getAllByText('Level 1')).toHaveLength(2)
+    expect(screen.getByText('System')).toBeInTheDocument()
+    expect(screen.getByText('Homebrew')).toBeInTheDocument()
   })
 
   it('renders campaign-unavailable metadata below the title', () => {
@@ -103,19 +104,29 @@ describe('MasterDetailListPanel', () => {
     expect(document.querySelector('[data-master-detail-list-scroll]')).toBeNull()
   })
 
-  it('marks rows with validation errors', () => {
+  it('marks rows with validation errors and shows a metadata badge', () => {
     const errorItems: MasterDetailListItem[] = [
       {
         id: 'a',
         title: 'Rage',
         meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+        issueCount: 2,
         hasError: true,
       },
     ]
     render(<MasterDetailListPanel {...baseProps()} items={errorItems} />)
 
-    expect(screen.getByText('Has validation errors')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Rage/i })).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByRole('button', { name: /Rage.*2 validation issues/i })).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    )
+    expect(screen.getByText('2', { selector: '[aria-hidden="true"]' })).toBeInTheDocument()
+  })
+
+  it('renders a decorative chevron in each row end region', () => {
+    render(<MasterDetailListPanel {...baseProps()} />)
+
+    expect(document.querySelectorAll('[aria-hidden] svg.lucide-chevron-right')).toHaveLength(2)
   })
 
   it('does not render row delete or drag controls', () => {
@@ -137,7 +148,21 @@ describe('MasterDetailListPanel', () => {
     expect(listShell).toHaveClass('master-detail-list-shell-viewport-cap')
     expect(scrollRegion).not.toContainElement(screen.getByRole('button', { name: /Add feature/i }))
     expect(scrollRegion).not.toContainElement(screen.getByText('2 available'))
-    expect(screen.getByText('2 available').parentElement).toHaveClass('border-b')
+    expect(screen.getByText('2 available').closest('.border-b')).toBeInTheDocument()
+  })
+
+  it('renders invalid item count aligned right in the count supplement row', () => {
+    render(
+      <MasterDetailListPanel
+        {...baseProps()}
+        countSupplement={<span>22 available · 1 unavailable · Show</span>}
+        invalidItemCount={3}
+      />,
+    )
+
+    const supplementRow = screen.getByText(/22 available/i).closest('.border-b')
+    expect(supplementRow).toHaveClass('justify-between')
+    expect(screen.getByText('3', { selector: '[aria-hidden="true"]' })).toBeInTheDocument()
   })
 
   it('does not scroll into view on initial mount', () => {

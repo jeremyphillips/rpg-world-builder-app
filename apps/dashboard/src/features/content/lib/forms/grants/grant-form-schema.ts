@@ -6,6 +6,7 @@ import {
   damageTypeIdSchema,
   equipmentKindSchema,
   featCategorySchema,
+  fieldValidationMessages,
   gearKindSchema,
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeTerm,
@@ -21,6 +22,15 @@ import {
   usageFrequencySchema,
   weaponCategorySchema,
 } from '@rpg/contracts'
+
+import { draftOptionalSelect } from '../validation/draft-form-schema-helpers'
+import {
+  GRANT_MOVEMENT_MATCH_MODE_LABEL,
+  GRANT_MOVEMENT_SPEED_LABEL,
+  grantFieldMinSelectionsMessage,
+  grantFieldRequiredSelectMessage,
+  type GrantFieldTermKey,
+} from './grant-field-terms'
 
 import {
   EQUIPMENT_GRANT_ITEM_KINDS,
@@ -153,12 +163,20 @@ function applyFormSchemaIssues(
   }
 }
 
+function shouldSkipProficiencySchemaForEmptySpecific(
+  row: { proficiencySource?: string },
+  specificSlugs: string[] | undefined,
+): boolean {
+  return row.proficiencySource === 'specific' && !specificSlugs?.length
+}
+
 function validateSpellsGrantRow(
   row: {
     spellAvailability?: boolean
     spellCastingEnabled?: boolean
     spellCastingFrequency?: string
     spellAllowsSlotCasting?: boolean
+    spellIds?: string[]
   },
   ctx: z.RefinementCtx,
 ): void {
@@ -188,34 +206,214 @@ function validateSpellsGrantRow(
       path: ['spellAllowsSlotCasting'],
     })
   }
+
+  if (!row.spellIds?.length) {
+    ctx.addIssue({
+      code: 'custom',
+      message: grantFieldMinSelectionsMessage('spellIds'),
+      path: ['spellIds'],
+    })
+  }
+}
+
+const SPECIFIC_PROFICIENCY_REQUIRED_SELECTIONS: ReadonlyArray<{
+  grantType: string
+  path: GrantFieldTermKey
+  hasSelection: (row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>) => boolean
+}> = [
+  {
+    grantType: 'skillProficiency',
+    path: 'skillProficiencyIds',
+    hasSelection: (row) => Boolean(row.skillProficiencyIds?.length),
+  },
+  {
+    grantType: 'toolProficiency',
+    path: 'toolProficiencySlugs',
+    hasSelection: (row) => Boolean(row.toolProficiencySlugs?.length),
+  },
+  {
+    grantType: 'weaponProficiency',
+    path: 'weaponProficiencySlugs',
+    hasSelection: (row) => Boolean(row.weaponProficiencySlugs?.length),
+  },
+  {
+    grantType: 'armorTraining',
+    path: 'armorTrainingSlugs',
+    hasSelection: (row) => Boolean(row.armorTrainingSlugs?.length),
+  },
+]
+
+function validateProficiencySpecificGrantRow(
+  row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>,
+  ctx: z.RefinementCtx,
+): void {
+  if (row.proficiencySource !== 'specific') return
+
+  for (const selection of SPECIFIC_PROFICIENCY_REQUIRED_SELECTIONS) {
+    if (row.grantType !== selection.grantType || selection.hasSelection(row)) continue
+    ctx.addIssue({
+      code: 'custom',
+      message: grantFieldMinSelectionsMessage(selection.path),
+      path: [selection.path],
+    })
+  }
+}
+
+function validateMovementGrantRow(
+  row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>,
+  ctx: z.RefinementCtx,
+): void {
+  if (!row.movementMode) {
+    ctx.addIssue({
+      code: 'custom',
+      message: grantFieldRequiredSelectMessage('movementMode'),
+      path: ['movementMode'],
+    })
+  }
+
+  if (!row.movementOperation) {
+    ctx.addIssue({
+      code: 'custom',
+      message: grantFieldRequiredSelectMessage('movementOperation'),
+      path: ['movementOperation'],
+    })
+  }
+
+  if (row.movementOperation === 'match') {
+    if (!row.movementMatchMode || row.movementMatchMode === row.movementMode) {
+      ctx.addIssue({
+        code: 'custom',
+        message: fieldValidationMessages.requiredSelect({ label: GRANT_MOVEMENT_MATCH_MODE_LABEL }),
+        path: ['movementMatchMode'],
+      })
+    }
+    return
+  }
+
+  if (row.movementFeet === undefined || String(row.movementFeet) === '') {
+    ctx.addIssue({
+      code: 'custom',
+      message: fieldValidationMessages.requiredSelect({ label: GRANT_MOVEMENT_SPEED_LABEL }),
+      path: ['movementFeet'],
+    })
+  }
+}
+
+function addValidationIssue(ctx: z.RefinementCtx, message: string, path: string): void {
+  ctx.addIssue({
+    code: 'custom',
+    message,
+    path: [path],
+  })
+}
+
+type GrantRowValues = z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>
+
+const ATOMIC_GRANT_REQUIRED_SELECTIONS: ReadonlyArray<{
+  grantType: string
+  path: string
+  termKey: GrantFieldTermKey
+  multiple: boolean
+  isMissing: (row: GrantRowValues) => boolean
+}> = [
+  {
+    grantType: 'senses',
+    path: 'senseType',
+    termKey: 'senseType',
+    multiple: false,
+    isMissing: (row) => !row.senseType,
+  },
+  {
+    grantType: 'resistances',
+    path: 'resistances',
+    termKey: 'resistances',
+    multiple: true,
+    isMissing: (row) => !row.resistances?.length,
+  },
+  {
+    grantType: 'damageType',
+    path: 'damageType',
+    termKey: 'damageType',
+    multiple: true,
+    isMissing: (row) => !row.damageType?.length,
+  },
+  {
+    grantType: 'languages',
+    path: 'language',
+    termKey: 'language',
+    multiple: false,
+    isMissing: (row) => !row.language,
+  },
+  {
+    grantType: 'featChoice',
+    path: 'featCategory',
+    termKey: 'featCategory',
+    multiple: false,
+    isMissing: (row) => !row.featCategory,
+  },
+]
+
+function grantSelectionValidationMessage(termKey: GrantFieldTermKey, multiple: boolean): string {
+  return multiple
+    ? grantFieldMinSelectionsMessage(termKey)
+    : grantFieldRequiredSelectMessage(termKey)
+}
+
+function validateAtomicGrantRow(row: GrantRowValues, ctx: z.RefinementCtx): void {
+  for (const selection of ATOMIC_GRANT_REQUIRED_SELECTIONS) {
+    if (row.grantType !== selection.grantType || !selection.isMissing(row)) continue
+    addValidationIssue(
+      ctx,
+      grantSelectionValidationMessage(selection.termKey, selection.multiple),
+      selection.path,
+    )
+  }
+
+  if (row.grantType === 'movement') {
+    validateMovementGrantRow(row, ctx)
+  }
 }
 
 function validateGrantRow(
   row: z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>,
   ctx: z.RefinementCtx,
 ): void {
+  validateAtomicGrantRow(row, ctx)
+
   if (row.grantType === 'equipment') {
     applyFormSchemaIssues(ctx, equipmentGrantItemFormSchema.safeParse(row))
     return
   }
 
   if (row.grantType === 'weaponProficiency') {
-    applyFormSchemaIssues(ctx, weaponProficiencyItemFormSchema.safeParse(row))
+    validateProficiencySpecificGrantRow(row, ctx)
+    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.weaponProficiencySlugs)) {
+      applyFormSchemaIssues(ctx, weaponProficiencyItemFormSchema.safeParse(row))
+    }
     return
   }
 
   if (row.grantType === 'toolProficiency') {
-    applyFormSchemaIssues(ctx, toolProficiencyItemFormSchema.safeParse(row))
+    validateProficiencySpecificGrantRow(row, ctx)
+    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.toolProficiencySlugs)) {
+      applyFormSchemaIssues(ctx, toolProficiencyItemFormSchema.safeParse(row))
+    }
     return
   }
 
   if (row.grantType === 'skillProficiency') {
-    applyFormSchemaIssues(ctx, skillProficiencyItemFormSchema.safeParse(row))
+    validateProficiencySpecificGrantRow(row, ctx)
+    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.skillProficiencyIds)) {
+      applyFormSchemaIssues(ctx, skillProficiencyItemFormSchema.safeParse(row))
+    }
     return
   }
 
   if (row.grantType === 'armorTraining') {
-    applyFormSchemaIssues(ctx, armorTrainingItemFormSchema.safeParse(row))
+    validateProficiencySpecificGrantRow(row, ctx)
+    if (!shouldSkipProficiencySchemaForEmptySpecific(row, row.armorTrainingSlugs)) {
+      applyFormSchemaIssues(ctx, armorTrainingItemFormSchema.safeParse(row))
+    }
     return
   }
 
@@ -242,13 +440,13 @@ function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
         .optional(),
       resistances: z.array(damageTypeIdSchema).optional(),
       damageType: z.array(damageTypeIdSchema).optional(),
-      senseType: senseIdSchema.optional(),
+      senseType: draftOptionalSelect(senseIdSchema),
       senseRange: z.coerce.number().int().min(0).optional(),
-      movementMode: movementModeSchema.optional(),
-      movementOperation: movementOperationSchema.optional(),
+      movementMode: draftOptionalSelect(movementModeSchema),
+      movementOperation: draftOptionalSelect(movementOperationSchema),
       movementFeet: z.coerce.number().optional(),
-      movementMatchMode: movementModeSchema.optional(),
-      language: languageIdSchema.optional(),
+      movementMatchMode: draftOptionalSelect(movementModeSchema),
+      language: draftOptionalSelect(languageIdSchema),
       /** Spellcasting ability for a `spells` row. */
       spellAbility: abilitySchema.optional(),
       /** When true, grants `availability: always_prepared`. */
@@ -261,7 +459,7 @@ function createGrantRowFormSchemaBase(maxLevel: number = MAX_CHARACTER_LEVEL) {
       spellAllowsSlotCasting: z.boolean().optional(),
       /** Spell slugs granted by this row. */
       spellIds: z.array(z.string()).optional(),
-      featCategory: featCategorySchema.optional(),
+      featCategory: draftOptionalSelect(featCategorySchema),
       featChoose: z.coerce.number().int().min(1).optional(),
       featAllowAnyQualifying: z.boolean().optional(),
       featReplaceable: z.boolean().optional(),

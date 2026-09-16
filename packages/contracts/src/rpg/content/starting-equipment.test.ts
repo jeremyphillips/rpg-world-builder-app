@@ -95,6 +95,22 @@ describe('startingEquipmentGrantedItemSchema', () => {
 })
 
 describe('startingEquipmentChoiceSchema', () => {
+  it('accepts campaign availability on options', () => {
+    const parsed = startingEquipmentChoiceSchema.parse({
+      choose: 1,
+      options: [
+        {
+          id: 'standard-equipment',
+          label: 'Standard Equipment',
+          items: [{ kind: 'grant', equipmentSlug: 'spear', quantity: 1 }],
+          available: false,
+        },
+      ],
+    })
+
+    expect(parsed.options[0]?.available).toBe(false)
+  })
+
   it('accepts granted items, modifiers, and wealth on options', () => {
     const parsed = startingEquipmentChoiceSchema.parse(DRUID_STARTING_EQUIPMENT)
     expect(parsed.choose).toBe(1)

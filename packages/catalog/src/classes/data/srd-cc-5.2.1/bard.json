@@ -164,7 +164,8 @@
           ],
           "wealth": {
             "gp": 19
-          }
+          },
+          "description": "Class equipment and baseline wealth"
         },
         {
           "id": "starting-gold",
@@ -172,7 +173,8 @@
           "items": [],
           "wealth": {
             "gp": 90
-          }
+          },
+          "description": "Baseline wealth instead of class equipment"
         }
       ]
     },

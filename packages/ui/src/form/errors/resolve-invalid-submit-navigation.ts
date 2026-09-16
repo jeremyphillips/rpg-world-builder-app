@@ -1,5 +1,6 @@
 import { classifyFormIssues } from './classify-form-issue'
 import { flattenFormIssues } from './flatten-form-issues'
+import { enrichFormIssuesWithPresentationPaths } from './resolve-form-issue-presentation-path.lib'
 import { sortFormIssues } from './group-form-issues'
 import { collectArraySections } from './resolve-field-order'
 import { resolveIssueFocusControlId } from './resolve-issue-focus-target'
@@ -121,7 +122,7 @@ export function prepareFormIssues(
   fields: FormItem[],
 ): FormIssue[] {
   const sections = collectArraySections(fields)
-  const flatIssues = flattenFormIssues(errors)
+  const flatIssues = enrichFormIssuesWithPresentationPaths(flattenFormIssues(errors), fields)
 
   return flatIssues.map((issue) => {
     const section = sections

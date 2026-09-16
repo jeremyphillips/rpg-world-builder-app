@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { ABILITY_SCORE_MIN, abilitySchema } from '@rpg/contracts'
+import { z } from 'zod'
 
 export const REQUIREMENT_LEAF_TYPES = ['minLevel', 'abilityMinimum', 'spellcasting'] as const
 
@@ -26,40 +26,26 @@ export type PrerequisiteEditorValue = {
   groups: RequirementGroupForm[]
 }
 
-const requirementMinLevelLeafSchema = z.object({
-  id: z.string().min(1),
-  type: z.literal('minLevel'),
-  level: z.coerce.number().int(),
-})
+function normalizeOptionalLeafType(value: unknown): unknown {
+  if (value === undefined || value === null || value === '') return undefined
+  return value
+}
 
-const requirementAbilityMinimumLeafSchema = z.object({
+/** Editor leaf rows accept partial typed fields; refine validates publish-ready shape. */
+export const requirementLeafFormSchema = z.object({
   id: z.string().min(1),
-  type: z.literal('abilityMinimum'),
-  ability: abilitySchema,
-  minimum: z.coerce.number().int(),
+  type: z.preprocess(normalizeOptionalLeafType, z.enum(REQUIREMENT_LEAF_TYPES).optional()),
+  level: z.unknown().optional(),
+  ability: z.unknown().optional(),
+  minimum: z.unknown().optional(),
 })
-
-const requirementSpellcastingLeafSchema = z.object({
-  id: z.string().min(1),
-  type: z.literal('spellcasting'),
-})
-
-const requirementDraftLeafSchema = z.object({
-  id: z.string().min(1),
-})
-
-export const requirementLeafFormSchema = z.union([
-  requirementDraftLeafSchema,
-  z.discriminatedUnion('type', [
-    requirementMinLevelLeafSchema,
-    requirementAbilityMinimumLeafSchema,
-    requirementSpellcastingLeafSchema,
-  ]),
-])
 
 export const requirementGroupFormSchema = z.object({
   id: z.string().min(1),
-  kind: z.enum(['all', 'any']),
+  kind: z.preprocess(
+    (value) => (value === undefined || value === null || value === '' ? 'all' : value),
+    z.enum(['all', 'any']),
+  ),
   requirements: z.array(requirementLeafFormSchema).min(1),
 })
 

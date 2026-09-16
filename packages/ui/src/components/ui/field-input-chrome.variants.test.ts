@@ -7,7 +7,6 @@ import {
   fieldInputFocusWithinClasses,
   fieldInputInvalidAriaClasses,
   fieldInputInvalidClasses,
-  fieldInputInvalidSegmentClasses,
   fieldInputPlaceholderClasses,
   fieldInputReadonlyClasses,
   fieldInputShellClasses,
@@ -34,12 +33,9 @@ const APPROVED_INPUT_CHROME_TOKENS = [
   'focus-within:ring-offset-2',
   'focus-within:ring-offset-background',
   'aria-invalid:border-input-invalid',
-  'aria-invalid:bg-input-invalid-subtle',
   'aria-invalid:focus-visible:ring-input-invalid',
   'border-input-invalid',
-  'bg-input-invalid-subtle',
   'focus-within:ring-input-invalid',
-  '[&_[data-input-select-value]]:bg-input-invalid-subtle',
   'disabled:cursor-not-allowed',
   'disabled:bg-input-disabled',
   'disabled:border-input-disabled',
@@ -69,7 +65,6 @@ describe('field-input-chrome.variants', () => {
     expectOnlyApprovedTokens(fieldInputFocusWithinClasses)
     expectOnlyApprovedTokens(fieldInputInvalidAriaClasses)
     expectOnlyApprovedTokens(fieldInputInvalidClasses)
-    expectOnlyApprovedTokens(fieldInputInvalidSegmentClasses)
     expectOnlyApprovedTokens(fieldInputDisabledClasses)
     expectOnlyApprovedTokens(fieldInputPlaceholderClasses)
     expectOnlyApprovedTokens(fieldInputReadonlyClasses)

@@ -11,20 +11,17 @@ import {
 import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
-import { MasterDetailAvailabilityHeaderLine } from './master-detail-availability-header-line'
 import { MasterDetailEditorEmptyState } from './master-detail-editor-empty-state'
+import { MasterDetailEditorStatusRow } from './master-detail-editor-status-row'
 import {
   masterDetailEditorBodyClasses,
   masterDetailEditorEmptyShellClasses,
   masterDetailEditorIdentityClasses,
-  masterDetailEditorAvailabilityClasses,
   masterDetailEditorIdentityCopyClasses,
   masterDetailEditorMetaClasses,
   masterDetailEditorShellClassName,
   masterDetailEditorTitleClasses,
-  masterDetailEditorValidationBannerClasses,
 } from './master-detail-editor-panel.variants'
-import { MasterDetailValidationBanner } from './master-detail-validation-banner'
 
 export interface MasterDetailEditorIdentity {
   title: string
@@ -32,13 +29,14 @@ export interface MasterDetailEditorIdentity {
   deletable?: boolean
   availability?: MasterDetailAvailabilityPresentation
   onAvailabilityChange?: () => void
+  /** Unique presentation-path issue count for the selected row. */
+  issueCount?: number
 }
 
 export interface MasterDetailEditorShellProps {
   itemNoun: MasterDetailItemNounTerm
   selectedIdentity?: MasterDetailEditorIdentity
   onDelete?: () => void
-  showValidationBanner?: boolean
   bodyRef?: RefObject<HTMLDivElement | null>
   children?: ReactNode
 }
@@ -61,14 +59,11 @@ function MasterDetailEditorIdentityHeader({
       <div className={masterDetailEditorIdentityCopyClasses}>
         <div className={masterDetailEditorTitleClasses}>{identity.title}</div>
         {metaLine ? <div className={masterDetailEditorMetaClasses}>{metaLine}</div> : null}
-        {identity.availability && identity.onAvailabilityChange ? (
-          <div className={masterDetailEditorAvailabilityClasses}>
-            <MasterDetailAvailabilityHeaderLine
-              availability={identity.availability}
-              onAvailabilityChange={identity.onAvailabilityChange}
-            />
-          </div>
-        ) : null}
+        <MasterDetailEditorStatusRow
+          availability={identity.availability}
+          onAvailabilityChange={identity.onAvailabilityChange}
+          issueCount={identity.issueCount}
+        />
       </div>
       {deletable && onDelete ? (
         <DetailOverflowMenu
@@ -81,32 +76,24 @@ function MasterDetailEditorIdentityHeader({
 }
 
 /**
- * Bordered detail rail shell: validation banner, identity header with overflow
- * delete, and a body slot. Renders the shared empty state when nothing is selected.
+ * Bordered detail rail shell: identity header with overflow delete, and a body slot.
+ * Renders the shared empty state when nothing is selected.
  */
 export function MasterDetailEditorShell({
   itemNoun,
   selectedIdentity,
   onDelete,
-  showValidationBanner = false,
   bodyRef,
   children,
 }: MasterDetailEditorShellProps) {
   const hasSelectedRow = Boolean(selectedIdentity)
-  const useEmptyShell = !hasSelectedRow && !showValidationBanner
 
   return (
     <div
       className={
-        useEmptyShell ? masterDetailEditorEmptyShellClasses : masterDetailEditorShellClassName()
+        hasSelectedRow ? masterDetailEditorShellClassName() : masterDetailEditorEmptyShellClasses
       }
     >
-      {showValidationBanner ? (
-        <div className={masterDetailEditorValidationBannerClasses}>
-          <MasterDetailValidationBanner visible />
-        </div>
-      ) : null}
-
       {hasSelectedRow && selectedIdentity ? (
         <>
           <MasterDetailEditorIdentityHeader
@@ -118,9 +105,9 @@ export function MasterDetailEditorShell({
             {children}
           </div>
         </>
-      ) : useEmptyShell ? (
+      ) : (
         <MasterDetailEditorEmptyState itemNoun={itemNoun} />
-      ) : null}
+      )}
     </div>
   )
 }

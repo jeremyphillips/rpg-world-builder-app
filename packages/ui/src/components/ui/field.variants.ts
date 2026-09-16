@@ -15,7 +15,9 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `field-row-presentation.lib.ts` — `resolveFieldPresentation`, `resolveFieldRowClasses`
  *
  * Spacing tokens below:
- * - `fieldAnatomyStackVariants` — label / control / hint inside one field (by control scale)
+ * - `fieldAnatomyStackVariants` — legacy Root stack gap (non-anatomy compositions)
+ * - `fieldLabelRegionVariants` / `fieldMessageRegionVariants` — region-owned padding for flat three-region anatomy
+ * - `fieldControlRegionClasses` — control region shell (no intrinsic spacing)
  * - `fieldLabelContentClusterClasses` — label + required marker + info on one line
  * - `fieldLabelHintStackClasses` — label cluster + hint when hint sits below the label (2px)
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
@@ -84,6 +86,44 @@ export const fieldAnatomyAlignVariants = cva('flex flex-col', {
   },
 })
 
+/**
+ * Label-region → control spacing for flat three-region anatomy.
+ * Padding applies via `has-[*]` so empty regions (null children / whitespace only)
+ * contribute no height. Lockstep with {@link fieldAnatomyStackVariants}.
+ */
+export const fieldLabelRegionVariants = cva('min-w-0 in-data-[field-row-participant]:self-end', {
+  variants: {
+    size: {
+      sm: 'has-[*]:pb-1',
+      md: 'has-[*]:pb-1.5',
+      lg: 'has-[*]:pb-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/**
+ * Control → message-region spacing for flat three-region anatomy.
+ * Padding applies via `has-[*]` so empty regions contribute no height.
+ */
+export const fieldMessageRegionVariants = cva('min-w-0', {
+  variants: {
+    size: {
+      sm: 'has-[*]:pt-1',
+      md: 'has-[*]:pt-1.5',
+      lg: 'has-[*]:pt-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Control region — no intrinsic spacing; band sizing lives on the control band. */
+export const fieldControlRegionClasses = 'min-w-0'
+
 /** Comfortable default — prefer {@link fieldAnatomyStackVariants} when `size` is known. */
 export const fieldAnatomyStackClasses = fieldAnatomyStackVariants({ size: 'md' })
 /** Label + required marker + info — one inline cluster so hint stacks cannot split the asterisk. */
@@ -115,13 +155,43 @@ export const fieldGroupLegendTypographyClasses =
 /** Nested subgroup legend typography — smaller scale for groups inside another group. */
 export const fieldSubgroupLegendTypographyClasses =
   'text-field-subgroup-legend font-heading leading-none text-foreground'
-export const fieldArrayLegendSpacingClasses = 'mb-4'
-/** Repeatable array section legend — between subgroup and field labels. */
+/** Repeatable array section legend — matches leaf field label typography. */
+export const fieldLabelTypographyVariants = cva('font-field-label leading-none text-foreground', {
+  variants: {
+    size: fieldSizeTypographyClasses,
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Legend-to-list spacing — mirrors {@link fieldAnatomyStackVariants} label→control gap. */
+export const fieldArrayLegendSpacingVariants = cva('', {
+  variants: {
+    size: {
+      sm: 'mb-1',
+      md: 'mb-1.5',
+      lg: 'mb-1.5',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Typography + spacing for array section `<legend>` — SSOT with leaf field labels. */
+export function resolveArrayLegendClassName(size: FieldSizeToken = 'md'): string {
+  return cn(fieldLabelTypographyVariants({ size }), fieldArrayLegendSpacingVariants({ size }))
+}
+
+/** @deprecated Use {@link resolveArrayLegendClassName} — retained for class drift tests. */
+export const fieldArrayLegendSpacingClasses = 'mb-1.5'
+/** @deprecated Use {@link fieldLabelTypographyVariants}. */
 export const fieldArrayLegendTypographyClasses =
-  'text-field-array-legend font-heading leading-none text-foreground'
-/** Compact array section legend — follows section `size: 'sm'` (14px). */
+  'text-md font-field-label leading-none text-foreground'
+/** @deprecated Use {@link fieldLabelTypographyVariants}. */
 export const fieldArrayLegendSmTypographyClasses =
-  'text-sm font-heading leading-none text-foreground'
+  'text-xs font-field-label leading-none text-foreground'
 /** Legend row when the add action sits inline with the array heading. */
 export const arrayFieldLegendInlineLayoutClasses = 'flex w-full items-center justify-between gap-4'
 export const arrayFieldLegendInlineLabelClasses = 'flex min-w-0 items-center gap-2'
@@ -158,7 +228,10 @@ export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldSetChromeContainClasses = 'flex flex-col'
 /** `contents` so legend children participate in fieldset flex gap. */
 export const fieldSetInFlowLegendClasses = 'contents min-w-0 p-0'
+/** Prose connectors share a row with compact controls — center on the control band, not the box bottom. */
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
+/** Inline sentence inside an anatomy row — same cross-axis alignment with row min-width guard. */
+export const fieldInlineSentenceRowClasses = 'flex min-w-0 flex-wrap items-center gap-x-2 gap-y-2'
 export const fieldInlineControlRowClasses = 'flex flex-wrap items-center gap-3'
 /**
  * Inline checkbox/switch row — control beside label, hint stacked under the label.
@@ -287,10 +360,22 @@ export const formDependentInsetOffsetClasses = 'left-2'
  * Vertical gap between sibling array items (list + Add button).
  * Item body field stacks use {@link fieldStackRhythmVariants} instead.
  */
-export function fieldArrayItemListClasses(options: {
-  rhythm: FieldRhythm
-  size: FieldSizeToken
-}): string {
+export function fieldArrayItemListClasses(
+  options: {
+    rhythm: FieldRhythm
+    size: FieldSizeToken
+  },
+  stackTreatment: 'merged' | 'separated' = 'separated',
+  listGap: 'rhythm' | 'tight' | 'merged' = 'rhythm',
+): string {
+  if (stackTreatment === 'merged' || listGap === 'merged') {
+    return cn('flex flex-col', 'gap-0')
+  }
+
+  if (listGap === 'tight') {
+    return cn('flex flex-col', 'gap-2')
+  }
+
   if (options.rhythm === 'comfortable') {
     return cn('flex flex-col', options.size === 'md' ? 'gap-6' : 'gap-3')
   }
@@ -380,10 +465,10 @@ export type FieldStackLayout = 'default' | 'dependent'
 
 export type FieldGroupLegendSize = 'section' | 'subsection' | 'array'
 
-/** Legend type scale for array sections — `sm` when section field size is compact. */
+/** @deprecated Array legends use {@link resolveArrayLegendClassName} — scale is unused. */
 export type FieldGroupLegendScale = 'default' | 'sm'
 
-/** Maps array section field size to legend typography scale. */
+/** @deprecated Array legends use {@link resolveArrayLegendClassName}. */
 export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendScale {
   return size === 'sm' ? 'sm' : 'default'
 }
@@ -400,18 +485,6 @@ export const fieldGroupLegendVariants = cva('', {
       sm: '',
     },
   },
-  compoundVariants: [
-    {
-      size: 'array',
-      scale: 'default',
-      class: fieldArrayLegendTypographyClasses,
-    },
-    {
-      size: 'array',
-      scale: 'sm',
-      class: fieldArrayLegendSmTypographyClasses,
-    },
-  ],
   defaultVariants: {
     size: 'section',
     scale: 'default',
@@ -434,11 +507,14 @@ export const fieldGroupLegendHeaderMarginVariants = cva('', {
 
 export type FieldGroupLegendVariantProps = VariantProps<typeof fieldGroupLegendVariants>
 
-/** Typography + header margin for `<legend>` on groups, subgroups, and array sections. */
+/** Typography + header margin for `<legend>` on groups and subgroups. */
 export function resolveFieldGroupLegendClassName(
-  options: FieldGroupLegendVariantProps = {},
+  options: FieldGroupLegendVariantProps & { fieldSize?: FieldSizeToken } = {},
 ): string {
   const size = options.size ?? 'section'
+  if (size === 'array') {
+    return resolveArrayLegendClassName(options.fieldSize ?? 'sm')
+  }
   return cn(fieldGroupLegendVariants(options), fieldGroupLegendHeaderMarginVariants({ size }))
 }
 

@@ -7,6 +7,7 @@ import {
   isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
 } from '../../../../content/starting-equipment'
+import { availableStartingEquipmentOptions } from '../../../../content/starting-equipment-availability'
 import {
   isSpellcastingFocusGearKind,
   type SpellcastingGearKind,
@@ -58,7 +59,7 @@ function listFallbackStartingEquipmentGrantIds(
   if (!startingEquipment) return []
 
   const ids: string[] = []
-  for (const option of startingEquipment.options) {
+  for (const option of availableStartingEquipmentOptions(startingEquipment.options)) {
     if (isWealthOnlyStartingEquipmentOption(option)) continue
 
     for (const item of option.items) {

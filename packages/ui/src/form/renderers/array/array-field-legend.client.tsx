@@ -2,11 +2,13 @@
 
 import type { ReactNode } from 'react'
 
+import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
+import { FieldLabelContent } from '../../../components/ui/field-label-content'
+import { shouldShowVisibleRequiredMarker } from '../../../components/ui/field-required.lib'
 import {
   arrayFieldLegendInlineLabelClasses,
   arrayFieldLegendInlineLayoutClasses,
-  resolveFieldGroupLegendClassName,
-  type FieldGroupLegendSize,
+  resolveArrayLegendClassName,
 } from '../../../components/ui/field.variants'
 import { cn } from '../../../lib/utils'
 import type { ArrayAddActionLayout } from '../../field-config'
@@ -14,11 +16,12 @@ import { ArrayLegendIssueLink } from './array-item-issue.client'
 
 export interface ArrayFieldLegendProps {
   legend: string
-  legendSize: FieldGroupLegendSize
-  legendScale: 'default' | 'sm'
+  legendFieldSize: FieldSizeToken
   addActionLayout: ArrayAddActionLayout
+  required?: boolean
   arrayIssueCount: number
   invalidRowCount: number
+  hasContainerIssue?: boolean
   onFocusFirstArrayIssue: () => void
   addControl?: ReactNode
 }
@@ -26,27 +29,33 @@ export interface ArrayFieldLegendProps {
 /** Array section `<legend>` — optional inline add action on the right. */
 export function ArrayFieldLegend({
   legend,
-  legendSize,
-  legendScale,
+  legendFieldSize,
   addActionLayout,
+  required = false,
   arrayIssueCount,
   invalidRowCount,
+  hasContainerIssue = false,
   onFocusFirstArrayIssue,
   addControl,
 }: ArrayFieldLegendProps) {
-  const legendClassName = resolveFieldGroupLegendClassName({
-    size: legendSize,
-    scale: legendScale,
-  })
+  const legendClassName = resolveArrayLegendClassName(legendFieldSize)
+  const legendLabel = (
+    <FieldLabelContent
+      label={legend}
+      required={required}
+      showRequiredMarker={shouldShowVisibleRequiredMarker(required, 'visible')}
+    />
+  )
 
   if (addActionLayout === 'inline') {
     return (
       <legend className={cn(legendClassName, arrayFieldLegendInlineLayoutClasses)}>
         <span className={arrayFieldLegendInlineLabelClasses}>
-          <span>{legend}</span>
+          <span>{legendLabel}</span>
           <ArrayLegendIssueLink
             issueCount={arrayIssueCount}
             invalidRowCount={invalidRowCount}
+            hasContainerIssue={hasContainerIssue}
             sectionLabel={legend}
             onPress={onFocusFirstArrayIssue}
           />
@@ -58,13 +67,16 @@ export function ArrayFieldLegend({
 
   return (
     <legend className={legendClassName}>
-      {legend}
-      <ArrayLegendIssueLink
-        issueCount={arrayIssueCount}
-        invalidRowCount={invalidRowCount}
-        sectionLabel={legend}
-        onPress={onFocusFirstArrayIssue}
-      />
+      <span className={arrayFieldLegendInlineLabelClasses}>
+        {legendLabel}
+        <ArrayLegendIssueLink
+          issueCount={arrayIssueCount}
+          invalidRowCount={invalidRowCount}
+          hasContainerIssue={hasContainerIssue}
+          sectionLabel={legend}
+          onPress={onFocusFirstArrayIssue}
+        />
+      </span>
     </legend>
   )
 }

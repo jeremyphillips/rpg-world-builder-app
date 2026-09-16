@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   render: () => (
-    <Field.Root id="name">
+    <Field.Root id="name" anatomy>
       <FieldLayout
         label={<Field.Label>Character name</Field.Label>}
         control={<Input placeholder="Tasha" />}
@@ -27,7 +27,7 @@ export const Default: Story = {
 
 export const WithHint: Story = {
   render: () => (
-    <Field.Root id="name" hint="Shown to other players.">
+    <Field.Root id="name" hint="Shown to other players." anatomy>
       <FieldLayout
         label={<Field.Label>Character name</Field.Label>}
         control={<Input placeholder="Tasha" />}
@@ -38,7 +38,7 @@ export const WithHint: Story = {
 
 export const HintBelowControl: Story = {
   render: () => (
-    <Field.Root id="name" hint="Legacy placement under the control.">
+    <Field.Root id="name" hint="Legacy placement under the control." anatomy>
       <FieldLayout
         hintPosition="below-control"
         label={<Field.Label>Character name</Field.Label>}
@@ -50,7 +50,7 @@ export const HintBelowControl: Story = {
 
 export const Required: Story = {
   render: () => (
-    <Field.Root id="name" required>
+    <Field.Root id="name" required anatomy>
       <FieldLayout
         label={<Field.Label>Character name</Field.Label>}
         control={<Input placeholder="Tasha" />}
@@ -61,7 +61,7 @@ export const Required: Story = {
 
 export const WithError: Story = {
   render: () => (
-    <Field.Root id="name" hint="Shown to other players." error="Name is required.">
+    <Field.Root id="name" hint="Shown to other players." error="Name is required." anatomy>
       <FieldLayout
         label={<Field.Label>Character name</Field.Label>}
         control={<Input defaultValue="" />}
@@ -72,7 +72,7 @@ export const WithError: Story = {
 
 export const WithInfo: Story = {
   render: () => (
-    <Field.Root id="alignment">
+    <Field.Root id="alignment" anatomy>
       <FieldLayout
         label={
           <Field.Label>

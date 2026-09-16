@@ -155,6 +155,7 @@ export {
   fieldControlVariants,
   textareaVariants,
   fieldWidthVariants,
+  resolveFieldWidthClassName,
   type FieldControlVariantProps,
   type TextareaVariantProps,
   type FieldWidthVariantProps,
@@ -190,6 +191,7 @@ export {
   type FieldControlProps,
   type FieldHintProps,
   type FieldErrorProps,
+  fieldRowParticipationClasses,
 } from './components/ui/field.client'
 
 export {
@@ -200,6 +202,12 @@ export {
 } from './components/ui/field-label-content'
 export { FormField } from './components/ui/form-field'
 export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
+export {
+  FieldControlRegion,
+  FieldLabelRegion,
+  FieldMessageRegion,
+  type FieldAnatomyRegionProps,
+} from './components/ui/field-anatomy-regions'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
 export { SearchBar, type SearchBarProps } from './components/ui/search-bar.client'
 export {
@@ -379,7 +387,10 @@ export {
   fieldInlineToggleRowClasses,
   fieldLabelContentClusterClasses,
   fieldLabelHintStackClasses,
+  fieldLabelRegionVariants,
   fieldLabelVariants,
+  fieldMessageRegionVariants,
+  fieldControlRegionClasses,
   fieldRowLayoutClasses,
   fieldSeparatorVariants,
   fieldStackRhythmVariants,
@@ -415,6 +426,14 @@ export {
   type FieldRowConfig,
   type FieldRowPresentation,
 } from './components/ui/field-row-presentation.lib'
+export {
+  FIELD_WIDTH_FIXED_TRACKS,
+  FIELD_WIDTH_FRACTION_MAX_PERCENT,
+  FIELD_WIDTH_FRACTION_WEIGHTS,
+  resolveFieldRowColumnTracks,
+  type FieldRowColumnTrackStrategy,
+  type ResolveFieldRowColumnTracksResult,
+} from './components/ui/field-row-column-tracks.lib'
 export {
   resolveFieldDependentsChromeClasses,
   resolveFieldRailClasses,
@@ -790,6 +809,7 @@ export {
   type SheetSurface,
 } from './components/ui/sheet.variants'
 export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'
+export { useMediaMinWidth, VIEWPORT_MD_MIN_QUERY } from './hooks/use-media-min-width.client'
 export {
   usePendingAwareOpenChange,
   type UsePendingAwareOpenChangeOptions,
@@ -869,6 +889,10 @@ export {
   type BadgeSize,
   type BadgeTone,
 } from './components/ui/badge'
+export {
+  ValidationIssueCountBadge,
+  type ValidationIssueCountBadgeProps,
+} from './components/ui/validation-issue-count-badge.client'
 export {
   Chip,
   type ChipProps,

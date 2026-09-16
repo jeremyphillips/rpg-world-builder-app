@@ -43,6 +43,7 @@ function presentPublishValidationErrors<TFieldValues extends FieldValues>(
       ui,
       errors,
       tabbedChrome.setActiveTabId,
+      tabbedChrome.activeTabId,
     )
     return
   }

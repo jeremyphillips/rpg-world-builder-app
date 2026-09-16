@@ -51,6 +51,22 @@ function wrapLegendCluster(
   }
 
   const { className: legendClassName, children: labelContent, ...legendRest } = legend.props
+  const isSrOnly =
+    typeof legendClassName === 'string' &&
+    legendClassName.split(/\s+/).some((token) => token === 'sr-only')
+
+  if (isSrOnly) {
+    return (
+      <>
+        {cloneElement(legend, {
+          ...legendRest,
+          className: cn('sr-only', legendClassName),
+          children: labelContent,
+        })}
+        {options.belowLabelHint}
+      </>
+    )
+  }
 
   const labelLine = <div className={fieldLabelVariants({ size: options.size })}>{labelContent}</div>
 

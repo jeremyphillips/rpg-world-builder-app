@@ -233,6 +233,7 @@ export function SelectField({
       required={required}
       width={rootWidth}
       size={size}
+      anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}

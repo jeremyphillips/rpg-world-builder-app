@@ -71,9 +71,58 @@ function isChoiceCategory(category: RegistryEntry['category']): boolean {
   return category === 'choice' || category === 'multi'
 }
 
+function isUnlabeledEntry(entry: RegistryEntry): boolean {
+  return entry.label === UNLABELED_FIELD_LABEL
+}
+
+function isMultiCategory(category: RegistryEntry['category']): boolean {
+  return category === 'multi'
+}
+
+function formatRequired(entry: RegistryEntry): string {
+  if (isUnlabeledEntry(entry)) {
+    return fieldValidationMessages.requiredUnlabeled()
+  }
+  if (isMultiCategory(entry.category)) {
+    return fieldValidationMessages.minSelections({
+      itemLabel: arrayItemsLabel(entry, 'singular'),
+    })
+  }
+  if (entry.category === 'choice') {
+    return fieldValidationMessages.requiredSelect({ label: entry.label })
+  }
+  return fieldValidationMessages.requiredText({ label: entry.label })
+}
+
 function arrayItemsLabel(entry: RegistryEntry, form: 'singular' | 'plural'): string {
   if (form === 'plural') return midSentenceLabel(entry.label)
   return entry.itemLabel ?? midSentenceLabel(singularizeLabel(entry.label))
+}
+
+function formatArrayTooSmall(issue: RawZodIssueLike, entry: RegistryEntry): string {
+  const min = Number(issue.minimum)
+
+  if (issue.exact) {
+    return fieldValidationMessages.exactItemsCount({
+      itemsLabel: arrayItemsLabel(entry, 'plural'),
+      count: min,
+    })
+  }
+
+  if (min > 1) {
+    const countMessage = isMultiCategory(entry.category)
+      ? fieldValidationMessages.minSelectionsCount
+      : fieldValidationMessages.minItemsCount
+    return countMessage({
+      itemsLabel: arrayItemsLabel(entry, 'plural'),
+      min,
+    })
+  }
+
+  const singleMessage = isMultiCategory(entry.category)
+    ? fieldValidationMessages.minSelections
+    : fieldValidationMessages.minItems
+  return singleMessage({ itemLabel: arrayItemsLabel(entry, 'singular') })
 }
 
 function formatTooSmall(issue: RawZodIssueLike, entry: RegistryEntry): string {
@@ -81,26 +130,12 @@ function formatTooSmall(issue: RawZodIssueLike, entry: RegistryEntry): string {
   const { label } = entry
 
   if (issue.origin === 'array') {
-    if (issue.exact) {
-      return fieldValidationMessages.exactItemsCount({
-        itemsLabel: arrayItemsLabel(entry, 'plural'),
-        count: min,
-      })
-    }
-    if (min > 1) {
-      return fieldValidationMessages.minItemsCount({
-        itemsLabel: arrayItemsLabel(entry, 'plural'),
-        min,
-      })
-    }
-    return fieldValidationMessages.minItems({ itemLabel: arrayItemsLabel(entry, 'singular') })
+    return formatArrayTooSmall(issue, entry)
   }
 
   if (issue.origin === 'string') {
     if (min > 1) return fieldValidationMessages.minLength({ label, min })
-    return entry.category === 'choice'
-      ? fieldValidationMessages.requiredSelect({ label })
-      : fieldValidationMessages.requiredText({ label })
+    return formatRequired(entry)
   }
 
   if (issue.origin === 'number' || issue.origin === 'int') {
@@ -116,17 +151,15 @@ function formatInvalidType(issue: RawZodIssueLike, entry: RegistryEntry): string
   if (entry.category === 'number') {
     if (issue.expected === 'int') return fieldValidationMessages.integer({ label })
     return isEmptyInput(issue.input)
-      ? fieldValidationMessages.requiredText({ label })
+      ? formatRequired(entry)
       : fieldValidationMessages.invalidNumber()
   }
 
   if (entry.category === 'boolean') {
-    return fieldValidationMessages.requiredSelect({ label })
+    return formatRequired(entry)
   }
 
-  return entry.category === 'choice'
-    ? fieldValidationMessages.requiredSelect({ label })
-    : fieldValidationMessages.requiredText({ label })
+  return formatRequired(entry)
 }
 
 function formatTooBig(issue: RawZodIssueLike, entry: RegistryEntry): string {
@@ -153,7 +186,7 @@ function formatTooBig(issue: RawZodIssueLike, entry: RegistryEntry): string {
 function formatInvalidValue(issue: RawZodIssueLike, entry: RegistryEntry): string {
   if (isChoiceCategory(entry.category)) {
     return isEmptyInput(issue.input)
-      ? fieldValidationMessages.requiredSelect({ label: entry.label })
+      ? formatRequired(entry)
       : fieldValidationMessages.invalidSelect({ label: entry.label })
   }
 
@@ -206,7 +239,7 @@ export const UNLABELED_FIELD_LABEL = 'This field'
 export const UNLABELED_ITEM_LABEL = 'item'
 
 function inferUnlabeledCategory(issue: RawZodIssueLike): FieldMessageCategory {
-  if (issue.origin === 'array') return 'multi'
+  if (issue.origin === 'array') return 'array'
   if (
     issue.origin === 'number' ||
     issue.origin === 'int' ||

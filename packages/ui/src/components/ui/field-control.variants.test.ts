@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { fieldWidthVariants } from './field-control.variants'
+import { fieldWidthVariants, resolveFieldWidthClassName } from './field-control.variants'
 
 describe('fieldWidthVariants', () => {
   it('adds explicit row widths for intrinsic xs–xl tokens', () => {
@@ -15,5 +15,28 @@ describe('fieldWidthVariants', () => {
     expect(fieldWidthVariants({ width: 'auto' })).toBe('w-fit flex-none')
     expect(fieldWidthVariants({ width: 'full' })).toBe('w-full flex-1')
     expect(fieldWidthVariants({ width: '1/2' })).not.toContain('in-data-[field-row]')
+  })
+})
+
+describe('resolveFieldWidthClassName', () => {
+  it('keeps flex fraction caps when not participating in an anatomy grid', () => {
+    expect(resolveFieldWidthClassName('1/2')).toContain('max-w-1/2')
+    expect(resolveFieldWidthClassName('1/3')).toContain('max-w-1/3')
+    expect(resolveFieldWidthClassName('full')).toBe('w-full flex-1')
+  })
+
+  it('drops fraction max-width when participating so the grid track owns sizing', () => {
+    expect(resolveFieldWidthClassName('1/2', { rowParticipation: true })).toBe('min-w-0 w-full')
+    expect(resolveFieldWidthClassName('1/3', { rowParticipation: true })).toBe('min-w-0 w-full')
+    expect(resolveFieldWidthClassName('full', { rowParticipation: true })).toBe('min-w-0 w-full')
+  })
+
+  it('keeps fixed and auto classes under row participation', () => {
+    expect(resolveFieldWidthClassName('lg', { rowParticipation: true })).toBe(
+      fieldWidthVariants({ width: 'lg' }),
+    )
+    expect(resolveFieldWidthClassName('auto', { rowParticipation: true })).toBe(
+      fieldWidthVariants({ width: 'auto' }),
+    )
   })
 })

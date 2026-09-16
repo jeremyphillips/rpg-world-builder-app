@@ -43,11 +43,7 @@ export function ArrayItemInlineRow({
       {showLeading && leading ? <div className="flex justify-center">{leading}</div> : null}
       <div className="min-w-0">{content}</div>
       {controls ? <div className="w-max shrink-0 justify-self-end">{controls}</div> : null}
-      {actions ? (
-        <div className="w-max min-w-[calc(var(--spacing)*14)] shrink-0 justify-self-end">
-          {actions}
-        </div>
-      ) : null}
+      {actions ? <div className="w-max shrink-0 justify-self-end">{actions}</div> : null}
       {summary ? <div className="col-span-full min-w-0">{summary}</div> : null}
     </div>
   )

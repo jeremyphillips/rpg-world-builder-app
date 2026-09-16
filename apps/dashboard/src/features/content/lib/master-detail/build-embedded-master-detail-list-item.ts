@@ -9,7 +9,7 @@ export interface BuildEmbeddedMasterDetailListItemParams {
   row: { id?: string } | undefined
   entitySource: ContentFormCtx['entitySource']
   seedRowIds?: ReadonlySet<string>
-  hasRowError: (index: number) => boolean
+  getRowIssueCount: (index: number) => number
   title: string
   eyebrow?: string
   showDelete?: boolean
@@ -23,7 +23,7 @@ export function buildEmbeddedMasterDetailListItem({
   row,
   entitySource,
   seedRowIds,
-  hasRowError,
+  getRowIssueCount,
   title,
   eyebrow,
   showDelete = true,
@@ -35,6 +35,7 @@ export function buildEmbeddedMasterDetailListItem({
     seedRowIds,
     extraReasons,
   })
+  const issueCount = getRowIssueCount(index)
 
   return {
     id: field.id,
@@ -44,7 +45,8 @@ export function buildEmbeddedMasterDetailListItem({
       sourceLabel: rowMeta.sourceLabel,
     },
     deletable: showDelete && rowMeta.deletable,
-    hasError: hasRowError(index),
+    issueCount,
+    hasError: issueCount > 0,
     active: rowMeta.availability.status === 'active',
   }
 }

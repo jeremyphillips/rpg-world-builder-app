@@ -70,7 +70,7 @@ export function buildSubclassSelectedIdentity({
   selectedEntity: ResolvedSubclass | undefined
   selectedAvailability: MasterDetailAvailabilityPresentation | undefined
   modifiedIds: ReadonlySet<string>
-  onAvailabilityChange: () => void
+  onAvailabilityChange?: () => void
 }): MasterDetailEditorIdentity | undefined {
   if (!selectedId || !selectedValues || !selectedAvailability || !selectedListItem) {
     return undefined

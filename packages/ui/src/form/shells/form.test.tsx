@@ -137,7 +137,60 @@ describe('Form', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-11')
   })
 
-  it('renders schema rows as flex rows', () => {
+  it('renders inlineSentence fields in schema rows with field anatomy regions', () => {
+    const rowSchema = z.object({
+      senseType: z.string(),
+      senseRange: z.string(),
+    })
+    const rowFields: FormItem[] = [
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'senseType',
+            label: 'Sense type',
+            options: [{ value: 'darkvision', label: 'Darkvision' }],
+            width: '2/3',
+          },
+          {
+            type: 'inlineSentence',
+            name: 'senseRange',
+            label: 'Range',
+            width: '1/3',
+            segments: [
+              {
+                kind: 'select',
+                name: 'senseRange',
+                options: [{ value: '60', label: '60' }],
+                defaultValue: '60',
+                ariaLabel: 'Range',
+              },
+              { kind: 'text', value: 'ft.', tone: 'label' },
+            ],
+          },
+        ],
+      },
+    ]
+    const { container } = render(
+      <Form
+        schema={rowSchema}
+        fields={rowFields}
+        defaultValues={{ senseType: 'darkvision', senseRange: '60' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const row = container.querySelector('[data-field-row]')
+    expect(row).toBeTruthy()
+    expect(row?.querySelectorAll('[data-field-label-region]')).toHaveLength(2)
+    expect(row?.querySelector('fieldset')).toBeNull()
+    expect(row?.querySelector('[data-field-label-region]')?.textContent).toContain('Sense type')
+    expect(row?.querySelectorAll('[data-field-label-region]')[1]?.textContent).toContain('Range')
+    expect(row?.textContent).toContain('ft.')
+  })
+
+  it('renders schema rows as anatomy-grid rows', () => {
     const rowSchema = z.object({
       first: z.string(),
       second: z.string(),
@@ -155,9 +208,17 @@ describe('Form', () => {
 
     const row = container.querySelector('[data-field-row]')
     expect(row).toBeTruthy()
-    expect(row).toHaveClass('flex')
-    expect(row).toHaveClass('flex-wrap')
-    expect(row).not.toHaveClass('grid')
+    expect(row).toHaveAttribute('data-field-row-anatomy', '')
+    expect(row).toHaveClass('grid')
+    expect(row).toHaveClass('field-row-anatomy-grid')
+    expect(row).not.toHaveClass('flex')
+
+    const participants = container.querySelectorAll('[data-field-row-participant]')
+    expect(participants).toHaveLength(2)
+    expect(participants[0]).toHaveAttribute('data-field-anatomy', '')
+    expect(participants[0]?.querySelector('[data-field-label-region]')).not.toBeNull()
+    expect(participants[0]?.querySelector('[data-field-control-region]')).not.toBeNull()
+    expect(participants[0]?.querySelector('[data-field-message-region]')).not.toBeNull()
   })
 
   it('submits when hidden fields use a refined object schema', async () => {

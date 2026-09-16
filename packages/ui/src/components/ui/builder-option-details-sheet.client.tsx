@@ -6,6 +6,7 @@ import { Eyebrow } from './eyebrow'
 import { Heading } from './heading'
 import { RichTextContent } from './rich-text-content'
 import { Sheet } from './sheet.client'
+import { type SheetSurface } from './sheet.variants'
 import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import { dialogPanelActionRowClasses } from './dialog-panel.variants'
@@ -50,6 +51,8 @@ export type BuilderOptionDetailsSheetProps = {
   primaryAction?: React.ReactNode
   /** Where to render `primaryAction`. Defaults to `header`. */
   primaryActionPlacement?: BuilderOptionPrimaryActionPlacement
+  /** Override the default lifted drawer plane when a feature needs a different shell fill. */
+  surface?: SheetSurface
 }
 
 function MetadataRow({ label, value }: BuilderOptionDetailsMetadata) {
@@ -146,6 +149,7 @@ export function BuilderOptionDetailsSheet({
   sections,
   primaryAction,
   primaryActionPlacement = 'header',
+  surface = 'surface-lift',
 }: BuilderOptionDetailsSheetProps) {
   const visibleMetadata = metadata?.filter((row) => row.value != null && row.value !== '')
   const visibleSections = sections?.filter(
@@ -156,6 +160,7 @@ export function BuilderOptionDetailsSheet({
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content
+        surface={surface}
         aria-describedby={descriptionHtml ? 'builder-option-details-description' : undefined}
       >
         <Sheet.Header

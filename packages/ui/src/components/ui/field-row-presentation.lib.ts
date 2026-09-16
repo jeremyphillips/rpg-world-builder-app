@@ -77,9 +77,9 @@ function resolveAlignmentAnchorClassName(
 /**
  * Resolves shared field presentation classes for a single field.
  *
- * Core invariant: fields in a row align by a shared control band. Labels render
- * above or within that band; helper/validation content renders below the
- * alignment anchor (`data-field-align`).
+ * Stacked fields emit flat three-region anatomy (label / control / message).
+ * Helper/validation content lives in the message region; below-label hints stay
+ * in the label region. Row subgrid (prototype / schema) aligns sibling regions.
  */
 export function resolveFieldPresentation(config: FieldPresentationConfig): FieldRowPresentation {
   const { size, labelLayout } = config
@@ -90,6 +90,7 @@ export function resolveFieldPresentation(config: FieldPresentationConfig): Field
     controlBandClassName: fieldControlBandVariants({ size, band: controlBand }),
     labelClassName: fieldLabelVariants({ size }),
     controlSize: size,
+    /** @deprecated Prefer three-region anatomy; retained for settings / legacy anchors. */
     alignmentAnchorClassName: resolveAlignmentAnchorClassName(labelLayout, size),
   }
 }

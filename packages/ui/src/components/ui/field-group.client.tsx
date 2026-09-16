@@ -14,7 +14,7 @@ import { FieldGroupSummaryRoute } from './field-group-summary-route.client'
 import { StandardFieldGroupBody } from './field-group-standard-body.client'
 import {
   fieldGroupLegendVariants,
-  resolveArrayLegendScale,
+  resolveArrayLegendClassName,
   type FieldGroupLegendSize,
   type FieldRhythm,
 } from './field.variants'
@@ -29,7 +29,7 @@ export interface FieldGroupProps {
   legendSize?: FieldGroupLegendSize
   /**
    * Control + label scale — when `legendSize="array"`, also drives array legend
-   * typography (`sm` → `text-sm`; `md`/`lg` → `text-field-array-legend`).
+   * typography (same tokens as leaf field labels).
    */
   size?: FieldSize
   /** Vertical gap between sibling fields — defaults to `comfortable` (`gap-6`). */
@@ -81,11 +81,11 @@ export function FieldGroup({
   namePrefix,
   children,
 }: FieldGroupProps) {
-  const legendScale =
+  const resolvedFieldSize = size ?? resolveFormDensity('compact').size
+  const legendTypography =
     legendSize === 'array'
-      ? resolveArrayLegendScale(size ?? resolveFormDensity('compact').size)
-      : 'default'
-  const legendTypography = fieldGroupLegendVariants({ size: legendSize, scale: legendScale })
+      ? resolveArrayLegendClassName(resolvedFieldSize)
+      : fieldGroupLegendVariants({ size: legendSize })
   const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })
   const resolvedCollapseKey = resolveFieldGroupCollapseKey({
     disclosure,

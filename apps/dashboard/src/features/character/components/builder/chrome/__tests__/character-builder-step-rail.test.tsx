@@ -46,6 +46,23 @@ describe('CharacterBuilderStepRail', () => {
     )
   })
 
+  it('maps step statuses to shared StatusIcon variants', () => {
+    const { container } = render(
+      <CharacterBuilderStepRail
+        draft={{
+          ...createEmptyCharacterBuilderDraft(),
+          identity: { name: 'Tarin', alignment: 'lg' },
+          currentStepId: 'identity',
+        }}
+        currentStepId="identity"
+        {...railProps}
+      />,
+    )
+
+    expect(container.querySelector('.rounded-full.bg-semantic-success-strong')).toBeInTheDocument()
+    expect(container.querySelector('.rounded-full.bg-status-icon-incomplete')).toBeInTheDocument()
+  })
+
   it('keeps the complete icon when revisiting a finished step', () => {
     render(
       <CharacterBuilderStepRail

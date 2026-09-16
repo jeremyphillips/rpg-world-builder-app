@@ -18,15 +18,10 @@ export const fieldInputFocusWithinClasses =
 
 /** Driven by `aria-invalid` on the control or shell. */
 export const fieldInputInvalidAriaClasses =
-  'aria-invalid:border-input-invalid aria-invalid:bg-input-invalid-subtle aria-invalid:focus-visible:ring-input-invalid'
+  'aria-invalid:border-input-invalid aria-invalid:focus-visible:ring-input-invalid'
 
 /** For CVA `invalid` variant on group shells. */
-export const fieldInputInvalidClasses =
-  'border-input-invalid bg-input-invalid-subtle focus-within:ring-input-invalid'
-
-/** Inner segment wash (input-select value cell, etc.). */
-export const fieldInputInvalidSegmentClasses =
-  '[&_[data-input-select-value]]:bg-input-invalid-subtle'
+export const fieldInputInvalidClasses = 'border-input-invalid focus-within:ring-input-invalid'
 
 export const fieldInputDisabledClasses =
   'disabled:cursor-not-allowed disabled:bg-input-disabled disabled:border-input-disabled disabled:text-input-disabled'
@@ -69,6 +64,16 @@ export const fieldGroupedSegmentStartClasses = 'rounded-l-md rounded-r-none'
 
 /** Right segment corner radii (unit/action column). */
 export const fieldGroupedSegmentEndClasses = 'rounded-l-none rounded-r-md'
+
+/** Right-hand segment wash — distinguishes unit/action columns from the value column. */
+export const fieldGroupedEndSegmentSurfaceClasses = 'bg-surface-faint'
+
+/** Reset + faint wash + end radii — shared by JoinedPair and InputSelect trailing segments. */
+export const fieldGroupedEndSegmentBaseClasses = cn(
+  fieldGroupedSegmentResetClasses,
+  fieldGroupedEndSegmentSurfaceClasses,
+  fieldGroupedSegmentEndClasses,
+)
 
 /** Clip overflow on the left segment column (e.g. nested stepper chrome). */
 export const fieldGroupedInputColumnClasses = 'min-w-0 overflow-hidden rounded-l-md'

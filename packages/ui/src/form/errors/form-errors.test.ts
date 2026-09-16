@@ -89,7 +89,7 @@ describe('flattenFormIssues', () => {
 
   it('decodes structured field and summary messages with messageId and params', () => {
     const structured = encodeStructuredMessage(
-      'Choose a rarity.',
+      'Select a rarity.',
       'Missing Rarity',
       'validation.field.requiredSelect',
       { label: 'Rarity' },
@@ -100,7 +100,7 @@ describe('flattenFormIssues', () => {
 
     const issues = classifyFormIssues(flattenFormIssues(errors), {})
     expect(issues[0]).toMatchObject({
-      message: 'Choose a rarity.',
+      message: 'Select a rarity.',
       summaryMessage: 'Missing Rarity',
       messageId: 'validation.field.requiredSelect',
       messageParams: { label: 'Rarity' },
@@ -186,7 +186,7 @@ describe('groupIssuesForItemPrefix', () => {
       [
         {
           path: 'grants.0.rarity',
-          message: 'Choose a rarity.',
+          message: 'Select a rarity.',
           summaryMessage: 'Missing Rarity',
           severity: 'field',
           relativePath: 'rarity',
@@ -203,7 +203,7 @@ describe('groupIssuesForItemPrefix', () => {
     )
 
     const group = groupIssuesForItemPrefix(issues, 'grants.0', 'grants', 0, ['rarity', 'quantity'])
-    expect(group.fieldSummary).toBe('Missing Rarity · Missing Quantity')
+    expect(group.fieldSummary).toBe('Select a rarity. · Quantity is required.')
   })
 })
 
@@ -277,6 +277,22 @@ describe('countInvalidArrayItems', () => {
     } as unknown as FieldErrors)
 
     expect(countInvalidArrayItems(issues, 'startingWealth.tiers')).toBe(2)
+  })
+
+  it('counts nested grant rows relative to the inner array path', () => {
+    const issues = flattenFormIssues({
+      traits: [
+        {
+          grants: [
+            { weaponProficiencySlugs: { type: 'custom', message: 'Required' } },
+            { movementFeet: { type: 'custom', message: 'Required' } },
+          ],
+        },
+      ],
+    } as unknown as FieldErrors)
+
+    expect(countInvalidArrayItems(issues, 'traits.0.grants')).toBe(2)
+    expect(countInvalidArrayItems(issues, 'traits')).toBe(1)
   })
 })
 

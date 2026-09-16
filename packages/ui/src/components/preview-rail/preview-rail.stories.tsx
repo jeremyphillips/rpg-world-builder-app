@@ -25,7 +25,9 @@ export const MockComposition: Story = {
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Fighter"
-        availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+        status={
+          <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+        }
       />
       <PreviewRail.ScrollRegion>
         <PreviewRail.Sections
@@ -103,7 +105,9 @@ export const FreshCreate: Story = {
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Unnamed Class"
-        availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+        status={
+          <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+        }
       />
       <PreviewRail.ScrollRegion>
         <PreviewRail.Sections
@@ -154,7 +158,9 @@ export const PostSubmitAttention: Story = {
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Unnamed Class"
-        availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+        status={
+          <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+        }
       />
       <PreviewRail.ScrollRegion>
         <PreviewRail.Sections defaultValue="basics">
@@ -195,7 +201,13 @@ export const ViewportAsideFill: Story = {
             <PreviewRail.Identity
               media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
               name="Fighter"
-              availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+              status={
+                <PreviewRail.AvailabilityLine
+                  available
+                  statusLabel="Available"
+                  detail="All players"
+                />
+              }
             />
             <PreviewRail.ScrollRegion>
               <PreviewRail.Sections defaultValue="basics">
@@ -261,7 +273,9 @@ export const LongNameTruncation: Story = {
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="The Order of the Radiant Banner and Eternal Vigil"
-        availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+        status={
+          <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+        }
       />
     </PreviewRail>
   ),
@@ -275,7 +289,9 @@ export const SheetHost: Story = {
         <PreviewRail.Identity
           media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
           name="Fighter"
-          availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+          status={
+            <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+          }
         />
         <PreviewRail.StatusPanel
           variant="success"
@@ -294,7 +310,13 @@ export const UnavailableIdentity: Story = {
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Fighter"
-        availability={{ available: false, statusLabel: 'Unavailable', detail: 'All players' }}
+        status={
+          <PreviewRail.AvailabilityLine
+            available={false}
+            statusLabel="Unavailable"
+            detail="All players"
+          />
+        }
       />
     </PreviewRail>
   ),
@@ -306,7 +328,9 @@ export const PlainChrome: Story = {
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Fighter"
-        availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+        status={
+          <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+        }
       />
     </PreviewRail>
   ),
@@ -320,7 +344,9 @@ export const WithIdentityMetadata: Story = {
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<BookOpen />} />}
         name="Fighter"
-        availability={{ available: true, statusLabel: 'Available', detail: 'All players' }}
+        status={
+          <PreviewRail.AvailabilityLine available statusLabel="Available" detail="All players" />
+        }
         facts={identityFacts}
       />
     </PreviewRail>

@@ -1,8 +1,8 @@
 /**
  * Shared control-band sizing for field rows.
  *
- * Fields in a row align by this band. Labels render above or within the band;
- * helper/validation content renders below the alignment anchor (`data-field-align`).
+ * Stacked fields emit flat three-region anatomy (label / control / message).
+ * The control band sizes the control region; row subgrid aligns sibling regions.
  *
  * Reuses {@link FieldSizeToken} — do not introduce a parallel control-size vocabulary.
  * Heights match `fieldControlSizeClasses` (`sm` 32px / `md` 36px / `lg` 44px).

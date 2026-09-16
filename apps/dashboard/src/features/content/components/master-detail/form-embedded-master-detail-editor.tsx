@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useCallback, useMemo, useRef } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useWatch } from 'react-hook-form'
 import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
@@ -9,6 +9,7 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import { buildAvailabilityCountSupplement } from '../../lib/campaign-access/availability-count-supplement'
 import { openCampaignAvailabilityDialog } from '../../lib/campaign-access/open-campaign-availability-dialog.lib'
 import { buildEmbeddedMasterDetailListItem } from '../../lib/master-detail/build-embedded-master-detail-list-item'
+import { useMasterDetailRowValidation } from '../../lib/master-detail/master-detail-row-validation'
 import {
   buildEmbeddedMasterDetailRows,
   findEmbeddedMasterDetailRowByFieldId,
@@ -25,7 +26,6 @@ import {
   masterDetailItemTitle,
 } from '../../lib/master-detail/master-detail-constants'
 import { buildMasterDetailAvailabilityFormFields } from '../../lib/master-detail/master-detail-availability-form-fields'
-import { showMasterDetailUnselectedRowErrors } from '../../lib/master-detail/master-detail-validation'
 import { MasterDetailBodyCampaignAccessDialogFields } from './master-detail-body-campaign-access-dialog-fields'
 import { useMasterDetailAvailabilityFilter } from '../../lib/master-detail/use-master-detail-availability-filter'
 import {
@@ -42,7 +42,7 @@ export interface FormEmbeddedMasterDetailMapListItemContext {
   index: number
   row: unknown
   entitySource: ContentFormCtx['entitySource']
-  hasRowError: (index: number) => boolean
+  getRowIssueCount: (index: number) => number
 }
 
 export interface FormEmbeddedMasterDetailEditorProps {
@@ -118,10 +118,6 @@ function FormEmbeddedMasterDetailEditorBody({
   access: accessProp,
   availability,
 }: FormEmbeddedMasterDetailEditorBodyProps) {
-  const {
-    formState: { submitCount },
-  } = useFormContext()
-
   const access = normalizeFormEmbeddedMasterDetailAccess(accessProp, availability)
   const watched = useWatch({ name: fieldName }) as unknown[] | undefined
   const availabilityDialogRef = useRef<HTMLDivElement>(null)
@@ -129,6 +125,8 @@ function FormEmbeddedMasterDetailEditorBody({
     const ids = formCtx.embeddedSeedRowIds?.[fieldName]
     return ids?.length ? new Set(ids) : undefined
   }, [formCtx.embeddedSeedRowIds, fieldName])
+
+  const { getRowIssueCount, showRowBadges } = useMasterDetailRowValidation(fieldName, itemFields)
 
   const allRows = useMemo((): EmbeddedMasterDetailRow[] => {
     if (access) {
@@ -140,7 +138,7 @@ function FormEmbeddedMasterDetailEditorBody({
         showDelete,
         access,
         mapListItem,
-        hasRowError: editor.hasRowError,
+        getRowIssueCount,
         seedRowIds,
         resolveRowReasons,
       })
@@ -153,7 +151,7 @@ function FormEmbeddedMasterDetailEditorBody({
         index: formIndex,
         row,
         entitySource: formCtx.entitySource,
-        hasRowError: editor.hasRowError,
+        getRowIssueCount,
       })
       const item = buildEmbeddedMasterDetailListItem({
         field,
@@ -161,7 +159,7 @@ function FormEmbeddedMasterDetailEditorBody({
         row: row as { id?: string } | undefined,
         entitySource: formCtx.entitySource,
         seedRowIds,
-        hasRowError: editor.hasRowError,
+        getRowIssueCount,
         title: masterDetailItemTitle(listDisplay.title, itemNoun),
         eyebrow: listDisplay.eyebrow,
         showDelete,
@@ -186,8 +184,8 @@ function FormEmbeddedMasterDetailEditorBody({
   }, [
     access,
     editor.fields,
-    editor.hasRowError,
     formCtx,
+    getRowIssueCount,
     itemNoun,
     mapListItem,
     resolveRowReasons,
@@ -250,10 +248,12 @@ function FormEmbeddedMasterDetailEditorBody({
 
   const selectedIdentity = useMemo(() => {
     if (!selectedRow) return undefined
+    const issueCount = showRowBadges ? (selectedRow.item.issueCount ?? 0) : 0
     return {
       title: selectedRow.item.title,
       meta: selectedRow.item.meta,
       deletable: selectedRow.item.deletable,
+      ...(issueCount > 0 ? { issueCount } : {}),
       ...(access && selectedRow.availability
         ? {
             availability: selectedRow.availability,
@@ -262,7 +262,7 @@ function FormEmbeddedMasterDetailEditorBody({
           }
         : {}),
     }
-  }, [access, selectedRow])
+  }, [access, selectedRow, showRowBadges])
 
   const availabilityFormItems = useMemo((): FormItem[] | undefined => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined
@@ -286,7 +286,10 @@ function FormEmbeddedMasterDetailEditorBody({
       />
     ) : null
 
-  const showValidationBanner = showMasterDetailUnselectedRowErrors(editor, submitCount)
+  const invalidItemCount = useMemo(() => {
+    if (!showRowBadges) return 0
+    return listItems.filter((item) => (item.issueCount ?? 0) > 0).length
+  }, [listItems, showRowBadges])
 
   const deleteName =
     editor.deleteIndex !== null
@@ -296,7 +299,7 @@ function FormEmbeddedMasterDetailEditorBody({
             index: editor.deleteIndex,
             row: watched?.[editor.deleteIndex],
             entitySource: formCtx.entitySource,
-            hasRowError: editor.hasRowError,
+            getRowIssueCount,
           }).title,
           itemNoun,
         )
@@ -343,6 +346,7 @@ function FormEmbeddedMasterDetailEditorBody({
         addLabel={addLabel}
         itemNoun={itemNoun}
         countSupplement={countSupplement}
+        invalidItemCount={invalidItemCount}
         onAdd={editor.handleAdd}
         onSelect={handleSelect}
       />
@@ -355,7 +359,6 @@ function FormEmbeddedMasterDetailEditorBody({
         itemNoun={itemNoun}
         showSelectedDetail={isSelectedRowVisible}
         selectedIdentity={selectedIdentity}
-        showValidationBanner={showValidationBanner}
         campaignId={formCtx.campaignId}
         rowAvailability={selectedRowAvailability}
         availabilityFormItems={availabilityFormItems}

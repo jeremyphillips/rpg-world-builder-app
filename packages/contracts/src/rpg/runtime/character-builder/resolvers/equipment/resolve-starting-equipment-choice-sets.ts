@@ -2,6 +2,10 @@ import type { CharacterClass } from '../../../../content/classes/class'
 import { getContentTypeCapitalizedSentenceLabel } from '../../../../content/lib/content-type-terms'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/grants/equipment-grant'
 import type { StartingEquipmentItem } from '../../../../content/starting-equipment'
+import {
+  availableStartingEquipmentOptions,
+  findAvailableStartingEquipmentOption,
+} from '../../../../content/starting-equipment-availability'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
@@ -65,7 +69,7 @@ export function resolveStartingEquipmentChoiceSets(
       label: `Choose Starting ${getContentTypeCapitalizedSentenceLabel('equipment')}`,
       min: startingEquipment.choose,
       max: startingEquipment.choose,
-      options: startingEquipment.options.map((option) => ({
+      options: availableStartingEquipmentOptions(startingEquipment.options).map((option) => ({
         id: option.id,
         label: option.label,
       })),
@@ -76,7 +80,10 @@ export function resolveStartingEquipmentChoiceSets(
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, characterClass.id)
   if (!selectedOptionId) return choiceSets
 
-  const selectedOption = startingEquipment.options.find((option) => option.id === selectedOptionId)
+  const selectedOption = findAvailableStartingEquipmentOption(
+    startingEquipment.options,
+    selectedOptionId,
+  )
   if (!selectedOption) return choiceSets
 
   for (const [itemIndex, item] of selectedOption.items.entries()) {

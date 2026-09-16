@@ -180,8 +180,9 @@ const boundedFields: FormItem[] = [
 ]
 
 /**
- * Demonstrates `min` and `max` constraints. The Remove button is disabled while
- * at the minimum (1); the Add button disappears once the maximum (3) is reached.
+ * Demonstrates `min` and `max` constraints. Removing the last item shows empty-state
+ * guidance while schema validation enforces `min`; the Add button disappears at `max`.
+ * Grip/actions stay vertically centered unless `item.inlineAlign: 'control-edge'`.
  */
 export const BoundedArray: StoryObj<Meta<object>> = {
   render: () => (
@@ -405,6 +406,205 @@ export const DragReorder: StoryObj<Meta<object>> = {
           <SubmitButton>Save</SubmitButton>
         </CardFooter>
       }
+    />
+  ),
+}
+
+// ── Presentation matrix (semantic rows) ─────────────────────────────────────
+
+const presentationRowSchema = z.object({
+  rows: z.array(z.object({ value: z.string(), detail: z.string().optional() })),
+})
+
+type PresentationRowValues = z.infer<typeof presentationRowSchema>
+
+const presentationMatrixBaseItem = {
+  variant: 'compact' as const,
+  headerVisibility: 'hidden' as const,
+  reorder: 'dragHandle' as const,
+  header: { fallback: (index: number) => `Row ${index + 1}` },
+}
+
+function presentationMatrixFields(name: string, fields: FormItem[], legend = 'Rows'): FormItem[] {
+  return [
+    {
+      kind: 'array',
+      name,
+      legend,
+      min: 1,
+      addAction: { label: 'Add row', layout: 'inline', size: 'sm' },
+      item: presentationMatrixBaseItem,
+      fields,
+    },
+  ]
+}
+
+const presentationMatrixDefaultValues: PresentationRowValues = {
+  rows: [{ value: 'Sample', detail: 'Detail' }],
+}
+
+/** Semantic matrix — flat / no header / inline / bare text. */
+export const PresentationMatrixFlatInlineBareText: StoryObj<Meta<object>> = {
+  name: 'Presentation Matrix / Flat inline bare text',
+  render: () => (
+    <Form<PresentationRowValues>
+      schema={presentationRowSchema}
+      fields={presentationMatrixFields('rows', [
+        { type: 'text', name: 'value', label: 'Value', required: true, width: 'full' },
+      ])}
+      defaultValues={presentationMatrixDefaultValues}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
+}
+
+/** Semantic matrix — flat / no header / inline / row → text. */
+export const PresentationMatrixFlatInlineRowWrap: StoryObj<Meta<object>> = {
+  name: 'Presentation Matrix / Flat inline row wrap',
+  render: () => (
+    <Form<PresentationRowValues>
+      schema={presentationRowSchema}
+      fields={presentationMatrixFields('rows', [
+        {
+          kind: 'row',
+          fields: [{ type: 'text', name: 'value', label: 'Value', required: true, width: 'full' }],
+        },
+      ])}
+      defaultValues={presentationMatrixDefaultValues}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
+}
+
+const presentationMovementSchema = z.object({
+  rows: z.array(z.object({ mode: z.string(), feet: z.coerce.number() })),
+})
+
+type PresentationMovementValues = z.infer<typeof presentationMovementSchema>
+
+/** Semantic matrix — flat / no header / inline / inlineSentence. */
+export const PresentationMatrixFlatInlineSentence: StoryObj<Meta<object>> = {
+  name: 'Presentation Matrix / Flat inline sentence',
+  render: () => (
+    <Form<PresentationMovementValues>
+      schema={presentationMovementSchema}
+      fields={presentationMatrixFields('rows', [
+        {
+          type: 'inlineSentence',
+          name: 'movementRow',
+          label: 'Movement',
+          labelVisibility: 'srOnly',
+          segments: [
+            {
+              kind: 'select',
+              name: 'mode',
+              options: [
+                { value: 'walk', label: 'Walk' },
+                { value: 'fly', label: 'Fly' },
+              ],
+              defaultValue: 'walk',
+              width: 'lg',
+            },
+            {
+              kind: 'select',
+              name: 'feet',
+              options: [
+                { value: '30', label: '30' },
+                { value: '60', label: '60' },
+              ],
+              defaultValue: '30',
+              width: 'sm',
+            },
+            { kind: 'text', value: 'ft', tone: 'label' },
+          ],
+        },
+      ])}
+      defaultValues={{ rows: [{ mode: 'walk', feet: 30 }] }}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
+}
+
+/** Semantic matrix — flat / no header / stacked / two top-level fields. */
+export const PresentationMatrixFlatStackedTwoFields: StoryObj<Meta<object>> = {
+  name: 'Presentation Matrix / Flat stacked two fields',
+  render: () => (
+    <Form<PresentationRowValues>
+      schema={presentationRowSchema}
+      fields={presentationMatrixFields('rows', [
+        { type: 'text', name: 'value', label: 'Value', required: true },
+        { type: 'text', name: 'detail', label: 'Detail' },
+      ])}
+      defaultValues={presentationMatrixDefaultValues}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
+}
+
+/** Semantic matrix — flat / visible header / stacked / primaryField. */
+export const PresentationMatrixFlatWithHeader: StoryObj<Meta<object>> = {
+  name: 'Presentation Matrix / Flat with header',
+  render: () => (
+    <Form<PresentationRowValues>
+      schema={presentationRowSchema}
+      fields={[
+        {
+          kind: 'array',
+          name: 'rows',
+          legend: 'Entries',
+          addAction: { label: 'Add entry' },
+          item: {
+            variant: 'compact',
+            header: {
+              fallback: (index) => `Entry ${index + 1}`,
+              primaryField: 'value',
+            },
+          },
+          fields: [
+            { type: 'text', name: 'value', label: 'Value', required: true },
+            { type: 'text', name: 'detail', label: 'Detail' },
+          ],
+        },
+      ]}
+      defaultValues={presentationMatrixDefaultValues}
+      onSubmit={action('submit')}
+      className="max-w-lg"
+    />
+  ),
+}
+
+/** Semantic matrix — collapsible / stacked / detailed disclosure. */
+export const PresentationMatrixDisclosureStacked: StoryObj<Meta<object>> = {
+  name: 'Presentation Matrix / Disclosure stacked',
+  render: () => (
+    <Form<PresentationRowValues>
+      schema={presentationRowSchema}
+      fields={[
+        {
+          kind: 'array',
+          name: 'rows',
+          legend: 'Traits',
+          addAction: { label: 'Add trait' },
+          item: {
+            collapsible: true,
+            header: {
+              fallback: (index) => `Trait ${index + 1}`,
+              primaryField: 'value',
+            },
+          },
+          fields: [
+            { type: 'text', name: 'value', label: 'Trait name', required: true },
+            { type: 'textarea', name: 'detail', label: 'Description', rows: 2 },
+          ],
+        },
+      ]}
+      defaultValues={presentationMatrixDefaultValues}
+      onSubmit={action('submit')}
+      className="max-w-lg"
     />
   ),
 }

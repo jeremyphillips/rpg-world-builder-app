@@ -25,3 +25,11 @@ export function resolveSectionDensity(options: {
 }): FormDensity {
   return options.explicit ?? options.sectionDefault ?? options.inherited
 }
+
+/** Array legend density — explicit config or inherit parent; item bodies stay compact by default. */
+export function resolveArrayLegendDensity(options: {
+  explicit?: FormDensity | undefined
+  inherited: FormDensity
+}): FormDensity {
+  return resolveSectionDensity(options)
+}

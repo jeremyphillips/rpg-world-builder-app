@@ -2,9 +2,6 @@ import { getTermSentenceForm, withArticle } from '@rpg/contracts'
 
 import type { MasterDetailItemNounTerm } from './master-detail-item-noun'
 
-export const MASTER_DETAIL_UNSELECTED_ROW_ERROR_MESSAGE =
-  'Some items have validation errors. Select the marked rows in the list to fix them.'
-
 export function masterDetailItemNounLabel(itemNoun: MasterDetailItemNounTerm): string {
   return getTermSentenceForm(itemNoun, 1)
 }

@@ -7,6 +7,7 @@ import type {
   StartingEquipmentGrantedItem,
   StartingEquipmentOption,
 } from '../../../content/starting-equipment'
+import { findAvailableStartingEquipmentOption } from '../../../content/starting-equipment-availability'
 import {
   isProficiencyLinkedStartingEquipmentGrant,
   startingEquipmentGrantEquipmentSlug,
@@ -304,7 +305,7 @@ function assembleFromSelectedPackage(
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
   if (!selectedOptionId) return emptyStartingEquipmentResult()
 
-  const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
+  const option = findAvailableStartingEquipmentOption(startingEquipment.options, selectedOptionId)
   if (!option) return emptyStartingEquipmentResult()
 
   const resolved = resolveStartingEquipmentOption(characterClass, option, draft, catalogIndex)

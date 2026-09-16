@@ -28,4 +28,11 @@ describe('sheetContentVariants', () => {
       '[--surface-current:var(--field-container)]',
     )
   })
+
+  it('supports surface-lift for application drawers', () => {
+    expect(sheetContentVariants({ surface: 'surface-lift' })).toContain('bg-surface-lift')
+    expect(sheetContentVariants({ surface: 'surface-lift' })).toContain(
+      '[--surface-current:var(--surface-lift)]',
+    )
+  })
 })

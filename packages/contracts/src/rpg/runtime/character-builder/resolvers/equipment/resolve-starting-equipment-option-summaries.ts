@@ -10,6 +10,7 @@ import {
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
 } from '../../../../content/starting-equipment'
+import { availableStartingEquipmentOptions } from '../../../../content/starting-equipment-availability'
 import { eligibleProficiencyChoiceTargetIds } from '../../validation/resolve-eligible-proficiency-choice-targets'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/grants/equipment-grant'
 import {
@@ -419,7 +420,7 @@ export function resolveStartingEquipmentOptionSummaries(
   const startingEquipment = characterClass.characterCreation?.startingEquipment
   if (!startingEquipment) return []
 
-  return startingEquipment.options.map((option) =>
+  return availableStartingEquipmentOptions(startingEquipment.options).map((option) =>
     summarizeOption(characterClass, option, catalogIndex, draft, context),
   )
 }

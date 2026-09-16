@@ -4,7 +4,7 @@ import { buildEmbeddedMasterDetailListItem } from './build-embedded-master-detai
 
 describe('buildEmbeddedMasterDetailListItem', () => {
   const field = { id: 'rhf-1' }
-  const hasRowError = vi.fn(() => false)
+  const getRowIssueCount = vi.fn(() => 0)
 
   it('marks system seed rows as non-deletable with structured meta', () => {
     const item = buildEmbeddedMasterDetailListItem({
@@ -13,7 +13,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       row: { id: 'rage' },
       entitySource: 'system',
       seedRowIds: new Set(['rage']),
-      hasRowError,
+      getRowIssueCount,
       title: 'Rage',
       eyebrow: 'Level 1',
     })
@@ -35,7 +35,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
       row: { id: 'custom-feature' },
       entitySource: 'system',
       seedRowIds: new Set(['rage']),
-      hasRowError,
+      getRowIssueCount,
       title: 'Custom Feature',
     })
 
@@ -48,21 +48,22 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     })
   })
 
-  it('surfaces row validation errors from hasRowError', () => {
-    hasRowError.mockReturnValueOnce(true)
+  it('surfaces row validation counts from getRowIssueCount', () => {
+    getRowIssueCount.mockReturnValueOnce(2)
 
     const item = buildEmbeddedMasterDetailListItem({
       field,
       index: 0,
       row: {},
       entitySource: 'homebrew',
-      hasRowError,
+      getRowIssueCount,
       title: 'Untitled',
     })
 
+    expect(item.issueCount).toBe(2)
     expect(item.hasError).toBe(true)
     expect(item.active).toBe(true)
     expect(item.meta).toEqual({ sourceLabel: 'Homebrew' })
-    expect(hasRowError).toHaveBeenCalledWith(0)
+    expect(getRowIssueCount).toHaveBeenCalledWith(0)
   })
 })

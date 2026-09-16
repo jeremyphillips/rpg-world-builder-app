@@ -15,12 +15,13 @@ const issueGroup = {
 } satisfies ArrayItemIssueGroup
 
 describe('resolveArrayItemIssueSummary', () => {
-  it('returns compact row summary props', () => {
+  it('returns compact row summary props when field errors are suppressed', () => {
     expect(
       resolveArrayItemIssueSummary({
         showIssueChrome: true,
         variant: 'compact',
         collapsed: false,
+        suppressFieldErrorText: true,
         issueGroup,
         rowSummaryId: 'grant-summary',
         onFocusIssue: () => undefined,
@@ -32,12 +33,27 @@ describe('resolveArrayItemIssueSummary', () => {
     })
   })
 
+  it('returns undefined for compact rows when field errors are inline', () => {
+    expect(
+      resolveArrayItemIssueSummary({
+        showIssueChrome: true,
+        variant: 'compact',
+        collapsed: false,
+        suppressFieldErrorText: false,
+        issueGroup,
+        rowSummaryId: 'grant-summary',
+        onFocusIssue: () => undefined,
+      }),
+    ).toBeUndefined()
+  })
+
   it('returns undefined when issue chrome is hidden', () => {
     expect(
       resolveArrayItemIssueSummary({
         showIssueChrome: false,
         variant: 'compact',
         collapsed: false,
+        suppressFieldErrorText: true,
         issueGroup,
         rowSummaryId: 'grant-summary',
         onFocusIssue: () => undefined,

@@ -11,7 +11,6 @@ import {
   toolCategorySchema,
   weaponCategorySchema,
   skillSchema,
-  getProficiencyDomainCompactLabel,
 } from '@rpg/contracts'
 import {
   combineFieldVisibilityAll,
@@ -21,6 +20,7 @@ import {
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../registry/content-form-registry'
+import { grantFieldLabel } from '../grant-field-terms'
 import {
   referenceArmorFieldOptions,
   referenceSkillFieldOptions,
@@ -239,7 +239,7 @@ function weaponProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibilit
     {
       type: 'combobox',
       name: 'weaponProficiencyPoolSlugs',
-      label: 'Weapons',
+      label: grantFieldLabel('weaponProficiencySlugs', { plural: true }),
       multiple: true,
       options: weaponOptions,
       placeholder: 'Choose weapons…',
@@ -270,7 +270,7 @@ export function weaponProficiencyGrantItemFields(
     {
       type: 'combobox',
       name: 'weaponProficiencySlugs',
-      label: 'Weapons',
+      label: grantFieldLabel('weaponProficiencySlugs', { plural: true }),
       multiple: true,
       options: weaponOptions,
       placeholder: 'Choose weapons…',
@@ -348,7 +348,7 @@ export function toolProficiencyGrantItemFields(
     {
       type: 'combobox',
       name: 'toolProficiencySlugs',
-      label: 'Tools',
+      label: grantFieldLabel('toolProficiencySlugs', { plural: true }),
       multiple: true,
       options: toolOptions,
       placeholder: 'Choose tools…',
@@ -432,7 +432,7 @@ function skillProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility
     {
       type: 'chips',
       name: 'skillProficiencyPoolIds',
-      label: getProficiencyDomainCompactLabel('skill'),
+      label: grantFieldLabel('skillProficiencyIds', { plural: true }),
       options: skillOptions,
       required: true,
       visibility: visibleForPoolSource('explicit', guard),
@@ -452,7 +452,7 @@ export function skillProficiencyGrantItemFields(
     {
       type: 'chips',
       name: 'skillProficiencyIds',
-      label: getProficiencyDomainCompactLabel('skill'),
+      label: grantFieldLabel('skillProficiencyIds', { plural: true }),
       options: skillOptions,
       required: true,
       visibility: visibleForProficiencySource('specific', guard),
@@ -534,7 +534,7 @@ function armorTrainingPoolFields(ctx: ContentFormCtx, guard?: FieldVisibility): 
     {
       type: 'combobox',
       name: 'armorTrainingPoolSlugs',
-      label: 'Armor',
+      label: grantFieldLabel('armorTrainingSlugs'),
       multiple: true,
       options: armorOptions,
       placeholder: 'Choose armor…',
@@ -565,7 +565,7 @@ export function armorTrainingGrantItemFields(
     {
       type: 'combobox',
       name: 'armorTrainingSlugs',
-      label: 'Armor',
+      label: grantFieldLabel('armorTrainingSlugs'),
       multiple: true,
       options: armorOptions,
       placeholder: 'Choose armor…',

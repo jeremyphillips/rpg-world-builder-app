@@ -4,12 +4,21 @@ import { useWatch } from 'react-hook-form'
 import type { useSortable } from '@dnd-kit/sortable'
 
 import { useDependsOnValues } from '../../config/form-depends-on.client'
+import { normalizeArrayItemContent } from '../../config/array/array-item-content-normalizer.lib'
 import {
   resolveArrayItemConfig,
   resolveArrayItemHeader,
   resolveArrayItemHeaderLabels,
-  resolveCompactInlineRow,
+  resolveArrayItemReorder,
 } from '../../config/array/array-item-config.lib'
+import {
+  resolveArrayItemFlatShellClassName,
+  resolveArrayItemFlatStackPosition,
+} from '../../config/array/array-item-flat-shell.lib'
+import {
+  resolveArrayItemPresentation,
+  resolveArrayItemPresentationAnatomy,
+} from '../../config/array/array-item-presentation.lib'
 import type { ArrayConfig } from '../../field-config'
 import { useArrayItemRowState } from './use-array-item-row-state.client'
 
@@ -22,7 +31,7 @@ interface UseArrayFieldItemContentStateArgs {
   legend: string
   variant: 'compact' | 'detailed'
   collapsed: boolean
-  showDragHandle: boolean
+  fieldsLength: number
   collapsible: boolean
   dragHandleProps?: {
     attributes: ReturnType<typeof useSortable>['attributes']
@@ -41,7 +50,7 @@ export function useArrayFieldItemContentState({
   legend,
   variant,
   collapsed,
-  showDragHandle,
+  fieldsLength,
   collapsible,
   dragHandleProps,
   onRemoveItem,
@@ -80,18 +89,38 @@ export function useArrayFieldItemContentState({
     watchedPrimary,
     legend,
   )
-  const gripVisible = showDragHandle && Boolean(dragHandleProps)
-  const leadingChrome = { showDragHandle: gripVisible, collapsible }
+  const reorder = resolveArrayItemReorder(config)
+  const presentation = resolveArrayItemPresentation({
+    config,
+    variant,
+    reorder,
+    fieldsLength,
+    legend,
+    collapsible,
+  })
+  const anatomy = resolveArrayItemPresentationAnatomy(presentation)
+  const reserveDragHandleSlot = presentation.reserveDragHandleSlot
+  const sortableEnabled = presentation.sortableEnabled
+  const gripVisible = reserveDragHandleSlot && sortableEnabled && Boolean(dragHandleProps)
+  const leadingChrome = {
+    reserveDragHandleSlot,
+    showDragHandle: reserveDragHandleSlot,
+    collapsible,
+  }
   const rowLabel = header.ariaLabel
-  const compactInlineRow =
-    variant === 'compact' ? resolveCompactInlineRow(config.fields) : undefined
+  const normalizedContent =
+    presentation.contentLayout === 'inline' ? normalizeArrayItemContent(config.fields) : undefined
+  const stackPosition = resolveArrayItemFlatStackPosition(index, fieldsLength)
+  const shellClassName = resolveArrayItemFlatShellClassName(presentation, stackPosition)
 
   const chromeProps = {
     titleId: rowState.titleId,
     itemPrefix: rowState.itemPrefix,
+    reserveDragHandleSlot,
     gripVisible,
     collapsible,
     dragging: dragHandleProps?.isDragging,
+    shellClassName,
   }
 
   return {
@@ -112,10 +141,16 @@ export function useArrayFieldItemContentState({
     focusIssue: rowState.focusIssue,
     badgeProminence: rowState.badgeProminence,
     issueSummary: rowState.issueSummary,
-    compactInlineRow,
+    normalizedContent,
     chromeProps,
     showIssueChrome: rowState.showIssueChrome,
+    showIssueBadge: rowState.showIssueBadge,
     issueGroup: rowState.issueGroup,
     itemConfig,
+    presentation,
+    anatomy,
+    reserveDragHandleSlot,
+    sortableEnabled,
+    shellClassName,
   }
 }

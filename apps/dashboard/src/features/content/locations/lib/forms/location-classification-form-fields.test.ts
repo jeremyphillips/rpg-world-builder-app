@@ -7,6 +7,8 @@ import {
   BUILDING_FORM_IDS,
 } from '@rpg/contracts'
 
+import { resolveFieldConfigPrimaryName } from '@rpg/ui/form'
+
 import {
   buildLocationClassificationFields,
   buildLocationPrimaryClassificationFields,
@@ -15,7 +17,9 @@ import {
 type FormItemLike = ReturnType<typeof buildLocationClassificationFields>[number]
 
 function fieldByName(items: FormItemLike[], name: string) {
-  const field = items.find((item) => !('kind' in item) && item.name === name)
+  const field = items.find(
+    (item) => !('kind' in item) && resolveFieldConfigPrimaryName(item) === name,
+  )
   if (!field) throw new Error(`expected field ${name}`)
   return field
 }
@@ -23,10 +27,10 @@ function fieldByName(items: FormItemLike[], name: string) {
 describe('Building classification fields', () => {
   it('projects Form first and Facility as the optional searchable secondary axis', () => {
     const primaryNames = buildLocationPrimaryClassificationFields().flatMap((item) =>
-      'kind' in item ? [] : [item.name],
+      'kind' in item ? [] : [resolveFieldConfigPrimaryName(item)],
     )
     const secondaryNames = buildLocationClassificationFields().flatMap((item) =>
-      'kind' in item ? [] : [item.name],
+      'kind' in item ? [] : [resolveFieldConfigPrimaryName(item)],
     )
 
     expect(primaryNames).toEqual([

@@ -7,7 +7,14 @@ import {
   type ContentTypeKey,
   type VocabularyTerm,
 } from '@rpg/contracts'
-import { Button, PreviewRail, Sheet, type PreviewRailLayout } from '@rpg/ui'
+import {
+  Button,
+  PreviewRail,
+  Sheet,
+  useMediaMinWidth,
+  VIEWPORT_MD_MIN_QUERY,
+  type PreviewRailLayout,
+} from '@rpg/ui'
 import {
   useTabbedFormChrome,
   useTabbedFormTabValidationState,
@@ -42,7 +49,6 @@ import {
 import { contentPreviewCompactTriggerClasses } from './content-preview-rail.variants'
 import { useContentPreviewUi } from './content-preview-ui-context'
 import { useContentPublishReadiness } from './use-content-publish-readiness'
-import { useMediaMinWidth, VIEWPORT_MD_MIN_QUERY } from './use-media-min-width'
 import type { ContentPreviewIdentity, ContentPreviewSection } from './content-form-preview.types'
 
 export function ContentPreviewCompactTrigger() {
@@ -206,7 +212,11 @@ function ContentPreviewRailView({
       <PreviewRail.Identity
         media={<PreviewRail.Media imageSrc={identity.imageSrc} fallbackIcon={<FallbackIcon />} />}
         name={identity.name}
-        availability={resolveContentPreviewAvailability(access, accessSummary)}
+        status={
+          <PreviewRail.AvailabilityLine
+            {...resolveContentPreviewAvailability(access, accessSummary)}
+          />
+        }
         {...(identity.facts && identity.facts.length > 0 ? { facts: identity.facts } : {})}
       />
       <PreviewRail.ScrollRegion>

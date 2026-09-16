@@ -40,6 +40,7 @@ export {
 export { charactersQueryKey, useCharacters } from './hooks/use-characters'
 export { useCreateCharacter } from './hooks/use-create-character'
 export { useDeleteCharacter } from './hooks/use-delete-character'
+export { CharacterBuilderPageShell } from './components/builder/character-builder-page-shell'
 export { CharacterBuilderShell } from './components/builder/character-builder-shell'
 export { CampaignCharacterStatusSummary } from './components/detail/status/campaign-character-status-summary'
 export { CharacterDetailContent } from './components/detail/character-detail-content'

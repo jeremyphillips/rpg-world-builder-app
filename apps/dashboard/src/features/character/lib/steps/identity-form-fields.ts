@@ -50,22 +50,16 @@ function narrativeArrayField(
     density: 'comfortable',
     fields: [
       {
-        kind: 'row',
-        fields: [
-          {
-            type: 'text',
-            name: 'value',
-            label: hideItemLabel ? '' : legend,
-            placeholder,
-            width: 'full',
-          },
-        ],
+        type: 'text',
+        name: 'value',
+        label: hideItemLabel ? '' : legend,
+        placeholder,
+        width: 'full',
       },
     ],
     item: {
       variant: 'compact',
-      surface: { emphasis: 'subtle' },
-      reorder: false,
+      headerVisibility: 'hidden',
       header: {
         fallback: (index) => `${legend} ${index + 1}`,
       },
@@ -81,29 +75,36 @@ function narrativeArrayField(
 
 export const identityFormFields: FormItem[] = [
   {
-    kind: 'row',
+    kind: 'group',
+    fieldChrome: { variant: 'none' },
     fields: [
       {
-        type: 'text',
-        name: 'name',
-        label: 'Character name',
-        placeholder: 'Enter a name',
-        required: true,
+        kind: 'row',
+        fields: [
+          {
+            type: 'text',
+            name: 'name',
+            label: 'Character name',
+            placeholder: 'Enter a name',
+            required: true,
+            width: 'full',
+          },
+        ],
+      },
+      {
+        type: 'chips',
+        name: 'alignment',
+        label: 'Alignment',
+        multiple: false,
+        options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
         width: 'full',
       },
     ],
   },
   {
-    type: 'chips',
-    name: 'alignment',
-    label: 'Alignment',
-    multiple: false,
-    options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
-    width: 'full',
-  },
-  {
     kind: 'group',
     legend: 'Narrative',
+    fieldChrome: { variant: 'none' },
     fields: [
       narrativeArrayField(
         'personalityTraits',

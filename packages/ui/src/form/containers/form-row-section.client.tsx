@@ -2,7 +2,8 @@
 
 import * as React from 'react'
 
-import { FieldRow } from '../../components/ui/field-row'
+import { assertRowFieldConfig } from '../config/assert-row-field-config.lib'
+import { AnatomyFieldRow } from '../presentation/anatomy-field-row.client'
 import { FieldChromeShell } from '../../components/ui/field-chrome-shell'
 import {
   hasActiveFieldChrome,
@@ -18,11 +19,10 @@ import {
   useFormSectionContext,
 } from '../context/form-section.context'
 import type { RowConfig } from '../field-config'
-import { isRowSlotItem, resolveRowFieldAlign, resolveRowFieldGap } from '../field-config'
+import { resolveRowFieldGap } from '../field-config'
 import { CompositeGroup } from '../presentation/composite-group.client'
 import { resolveRowHeading } from '../resolve-container-heading.lib'
-import { FieldNode, FieldSeparatorWrapper, useVisibilityValues } from './form-conditional.client'
-import { SlotFormItemSection } from '../renderers/fields/slot-field-renderer.client'
+import { FieldSeparatorWrapper, useVisibilityValues } from './form-conditional.client'
 import { resolveFormDensity } from '../form-density'
 
 interface RowFieldSectionProps {
@@ -54,37 +54,21 @@ export function RowFieldSection({
   const suppress = resolveErrorPlacement(item.errorPlacement, 'detailed', true)
   const value = suppress ? { ...parent, suppressFieldErrorText: true } : parent
   const heading = resolveRowHeading(item)
+  const rowGap = resolveRowFieldGap(item.spacing)
+
+  assertRowFieldConfig(item, heading?.label)
 
   const row = (
     <FormSectionContext.Provider value={rowChildContext}>
-      <FieldRow
-        align={resolveRowFieldAlign(item)}
-        gap={resolveRowFieldGap(item.spacing)}
+      <AnatomyFieldRow
+        fields={item.fields}
+        gap={rowGap}
         className={item.className}
-      >
-        {item.fields.map((field) => {
-          if (isRowSlotItem(field)) {
-            return (
-              <SlotFormItemSection
-                key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-                item={field}
-                parentContext={rowChildContext}
-                depth={depth}
-                namePrefix={namePrefix}
-              />
-            )
-          }
-
-          return (
-            <FieldNode
-              key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-              config={field}
-              idPrefix={idPrefix}
-              namePrefix={namePrefix}
-            />
-          )
-        })}
-      </FieldRow>
+        idPrefix={idPrefix}
+        namePrefix={namePrefix}
+        parentContext={rowChildContext}
+        depth={depth}
+      />
     </FormSectionContext.Provider>
   )
 

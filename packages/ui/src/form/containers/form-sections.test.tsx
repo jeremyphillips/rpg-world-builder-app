@@ -43,8 +43,9 @@ describe('Form section rendering', () => {
     render(<Form schema={schema} fields={fields} onSubmit={vi.fn()} />)
 
     expect(screen.getByText('Identity').closest('legend')).toHaveClass('text-field-group-legend')
-    expect(screen.getByText('Tags')).toHaveClass('text-sm')
-    expect(screen.getByText('Tags')).not.toHaveClass('text-field-array-legend')
+    const tagsLegend = screen.getByRole('group', { name: /Tags/ }).querySelector('legend')
+    expect(tagsLegend).toHaveClass('text-md', 'font-field-label')
+    expect(tagsLegend).not.toHaveClass('text-field-array-legend')
   })
 
   it('omits section bottom margin on nested groups and rhythm-stack siblings', () => {
@@ -159,8 +160,10 @@ describe('Form section rendering', () => {
     )
 
     const row = container.querySelector('[data-field-row]')
-    expect(row).toHaveClass('gap-4')
-    expect(row).not.toHaveClass('gap-6')
+    expect(row).toHaveAttribute('data-field-row-anatomy', '')
+    expect(row).toHaveClass('gap-x-4')
+    expect(row).not.toHaveClass('gap-x-6')
+    expect(row).not.toHaveClass('flex')
   })
 
   it('renders default row spacing as gap-6 on FieldRow', () => {
@@ -179,7 +182,9 @@ describe('Form section rendering', () => {
     )
 
     const row = container.querySelector('[data-field-row]')
-    expect(row).toHaveClass('gap-6')
-    expect(row).not.toHaveClass('gap-4')
+    expect(row).toHaveAttribute('data-field-row-anatomy', '')
+    expect(row).toHaveClass('gap-x-6')
+    expect(row).not.toHaveClass('gap-x-4')
+    expect(row).not.toHaveClass('flex')
   })
 })

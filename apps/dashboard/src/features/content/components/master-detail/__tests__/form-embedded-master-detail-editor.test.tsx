@@ -96,7 +96,7 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     })
   })
 
-  it('joins structured meta in the list and hides overflow delete for system seed rows', () => {
+  it('renders structured meta in the list and hides overflow delete for system seed rows', () => {
     render(
       <EditorShell
         entitySource="system"
@@ -105,7 +105,8 @@ describe('FormEmbeddedMasterDetailEditor', () => {
       />,
     )
 
-    expect(screen.getAllByText('Custom · System').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Custom').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('System').length).toBeGreaterThan(0)
     expect(
       screen.queryByRole('button', { name: /Actions for Darkvision/i }),
     ).not.toBeInTheDocument()

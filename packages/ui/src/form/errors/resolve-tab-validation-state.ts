@@ -2,7 +2,7 @@ import { sortFormIssues } from './group-form-issues'
 import { collectArraySections } from './resolve-field-order'
 import type { FormIssue } from './form-issue.types'
 import type { FormItem } from '../field-config'
-import { isContainer } from '../field-config'
+import { isContainer, resolveFieldConfigPrimaryName } from '../field-config'
 import { resolveColumnsCollapseSequence } from '../config/form-columns-collapse.lib'
 
 /** Minimal tab shape for path ownership — avoids shell import cycles. */
@@ -27,7 +27,7 @@ export function pathOwnsIssue(prefix: string, path: string): boolean {
 function collectPrefixesFromItems(items: readonly FormItem[], prefixes: string[]): void {
   for (const item of items) {
     if (!isContainer(item)) {
-      prefixes.push(item.name)
+      prefixes.push(resolveFieldConfigPrimaryName(item))
       continue
     }
 
@@ -37,7 +37,7 @@ function collectPrefixesFromItems(items: readonly FormItem[], prefixes: string[]
     }
 
     if (item.kind === 'dependent') {
-      prefixes.push(item.controller.name)
+      prefixes.push(resolveFieldConfigPrimaryName(item.controller))
       collectPrefixesFromItems(item.dependents.fields, prefixes)
       continue
     }
@@ -148,4 +148,28 @@ export function getFirstInvalidTabId(
 
   const tabPrefixes = buildTabPrefixesMap(tabs)
   return findOwningTabId(firstIssue.path, tabs, tabPrefixes)
+}
+
+/**
+ * Tab to activate after a failed submit. Keeps the current tab when it has
+ * issues; otherwise navigates to the first invalid tab in sort order.
+ */
+export function resolveInvalidSubmitTabId(
+  issues: readonly FormIssue[],
+  tabs: readonly TabValidationTab[],
+  fields: FormItem[],
+  activeTabId?: string,
+): string | undefined {
+  if (issues.length === 0) return undefined
+
+  if (activeTabId) {
+    const activeTabState = resolveTabValidationState(issues, tabs, fields).find(
+      (state) => state.tabId === activeTabId,
+    )
+    if (activeTabState && activeTabState.count > 0) {
+      return activeTabId
+    }
+  }
+
+  return getFirstInvalidTabId(issues, tabs, fields)
 }

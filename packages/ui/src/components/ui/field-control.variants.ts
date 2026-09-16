@@ -121,3 +121,39 @@ export const fieldWidthVariants = cva('', {
 })
 
 export type FieldWidthVariantProps = VariantProps<typeof fieldWidthVariants>
+
+const FIELD_WIDTH_FRACTIONS = [
+  '1/2',
+  '1/3',
+  '2/3',
+  '1/4',
+  '3/4',
+] as const satisfies readonly FieldWidth[]
+
+/**
+ * Resolves width classes for a field wrapper.
+ *
+ * When `rowParticipation` is true (anatomy-grid column), fraction tokens omit
+ * `max-w-*` / flex grow — the grid track already owns sizing. Keeping flex
+ * `max-w-*` would resolve percentages against the grid *cell* and double-cap
+ * (e.g. half of a half-width track).
+ */
+export function resolveFieldWidthClassName(
+  width: FieldWidth = 'full',
+  options: { rowParticipation?: boolean } = {},
+): string {
+  if (!options.rowParticipation) {
+    return fieldWidthVariants({ width })
+  }
+
+  if ((FIELD_WIDTH_FRACTIONS as readonly string[]).includes(width)) {
+    return 'min-w-0 w-full'
+  }
+
+  if (width === 'full') {
+    return 'min-w-0 w-full'
+  }
+
+  // Fixed / auto — same classes; flex grow tokens are inert on grid items.
+  return fieldWidthVariants({ width })
+}

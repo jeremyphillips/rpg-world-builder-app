@@ -13,7 +13,7 @@ export function buildFieldSummaryText(
 ): string | undefined {
   if (fieldIssues.length === 0) return undefined
 
-  const parts = fieldIssues.map((issue) => issue.summaryMessage ?? issue.message)
+  const parts = fieldIssues.map((issue) => issue.message)
   if (parts.length <= maxNamed) return joinArrayItemSummaryParts(parts)
 
   const named = parts.slice(0, maxNamed)
@@ -37,6 +37,32 @@ function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly s
   return left.path.localeCompare(right.path)
 }
 
+function countUniquePresentationPaths(issues: readonly FormIssue[]): number {
+  const paths = new Set<string>()
+  for (const issue of issues) {
+    paths.add(issue.presentationPath ?? issue.path)
+  }
+  return paths.size
+}
+
+function issueBelongsToArrayPath(issue: FormIssue, arrayPath: string): boolean {
+  return issue.path === arrayPath || issue.path.startsWith(`${arrayPath}.`)
+}
+
+/** Direct child row index for an issue relative to a specific array path. */
+export function resolveDirectArrayItemIndex(
+  issue: FormIssue,
+  arrayPath: string,
+): number | undefined {
+  if (!issueBelongsToArrayPath(issue, arrayPath) || issue.path === arrayPath) return undefined
+
+  const suffix = issue.path.slice(arrayPath.length + 1)
+  const firstSegment = suffix.split('.')[0]
+  if (firstSegment && /^\d+$/.test(firstSegment)) return Number(firstSegment)
+
+  return undefined
+}
+
 function buildIssueGroup(
   itemPrefix: string,
   arrayPath: string,
@@ -52,7 +78,7 @@ function buildIssueGroup(
     itemPrefix,
     arrayPath,
     itemIndex,
-    totalCount: sortedIssues.length,
+    totalCount: countUniquePresentationPaths(sortedIssues),
     sortedIssues,
     headerIssues: sortedIssues.filter((issue) => issue.severity !== 'field'),
     fieldIssues,
@@ -128,17 +154,17 @@ export function sortFormIssues(
 export function countInvalidArrayItems(issues: readonly FormIssue[], arrayPath: string): number {
   const indices = new Set<number>()
   for (const issue of issues) {
-    if (issue.arrayPath !== arrayPath && !issue.path.startsWith(`${arrayPath}.`)) continue
-    if (issue.itemIndex !== undefined) indices.add(issue.itemIndex)
+    const directIndex = resolveDirectArrayItemIndex(issue, arrayPath)
+    if (directIndex !== undefined) indices.add(directIndex)
   }
   return indices.size
 }
 
-/** Count all error paths under an array path (including nested descendants). */
+/** Count unique presentation paths under an array path (including nested descendants). */
 export function countIssuesForArrayPath(issues: readonly FormIssue[], arrayPath: string): number {
-  return issues.filter(
-    (issue) => issue.path === arrayPath || issue.path.startsWith(`${arrayPath}.`),
-  ).length
+  return countUniquePresentationPaths(
+    issues.filter((issue) => issueBelongsToArrayPath(issue, arrayPath)),
+  )
 }
 
 export type ArrayIssueIndex = Map<string, ArrayItemIssueGroup>
@@ -153,8 +179,8 @@ export function indexArrayItemIssues(
   const itemIndices = new Set<number>()
 
   for (const issue of issues) {
-    if (issue.arrayPath !== arrayPath && !issue.path.startsWith(`${arrayPath}.`)) continue
-    if (issue.itemIndex !== undefined) itemIndices.add(issue.itemIndex)
+    const directIndex = resolveDirectArrayItemIndex(issue, arrayPath)
+    if (directIndex !== undefined) itemIndices.add(directIndex)
   }
 
   for (const itemIndex of itemIndices) {

@@ -67,33 +67,35 @@ export function FieldGroupDialogDisclosure<TFieldValues extends FieldValues = Fi
   const headline = disclosure.dialogHeadline ?? legend
 
   return (
-    <Field.Root hint={disclosure.hint} className={className}>
-      <FieldLayout
-        hintPosition="below-control"
-        wrapControl={false}
-        size={size}
-        label={
-          <Field.Label associate={false} id={legendId}>
-            {legend}
-          </Field.Label>
-        }
-        control={
-          <Field.Control>
-            <FieldGroupSummaryTrigger
-              size={size}
-              summary={summary}
-              openLabel={openLabel}
-              unsavedSuffix={unsavedSuffix}
-              showDirtySuffix={showDirtySuffix}
-              disabled={disabled}
-              labelledBy={legendId}
-              expanded={open}
-              hasPopup="dialog"
-              onOpen={() => setOpen(true)}
-            />
-          </Field.Control>
-        }
-      />
+    <>
+      <Field.Root hint={disclosure.hint} className={className} anatomy>
+        <FieldLayout
+          hintPosition="below-control"
+          wrapControl={false}
+          size={size}
+          label={
+            <Field.Label associate={false} id={legendId}>
+              {legend}
+            </Field.Label>
+          }
+          control={
+            <Field.Control>
+              <FieldGroupSummaryTrigger
+                size={size}
+                summary={summary}
+                openLabel={openLabel}
+                unsavedSuffix={unsavedSuffix}
+                showDirtySuffix={showDirtySuffix}
+                disabled={disabled}
+                labelledBy={legendId}
+                expanded={open}
+                hasPopup="dialog"
+                onOpen={() => setOpen(true)}
+              />
+            </Field.Control>
+          }
+        />
+      </Field.Root>
 
       <Modal.Root open={open} onOpenChange={setOpen}>
         <Modal.Content size={disclosure.dialogSize ?? 'md'}>
@@ -117,6 +119,6 @@ export function FieldGroupDialogDisclosure<TFieldValues extends FieldValues = Fi
           </Modal.Footer>
         </Modal.Content>
       </Modal.Root>
-    </Field.Root>
+    </>
   )
 }

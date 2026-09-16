@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 
+import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
@@ -18,12 +19,12 @@ import {
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 import { resolveFieldPresentation } from './field-row-presentation.lib'
-
-export type SwitchLabelPosition = FieldLabelPosition | 'inline'
-
+import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
 import type { FieldValidationProps } from './field-validation-props'
 import type { FieldLabelPresentationProps } from './field-label-props'
 import { cn } from '../../lib/utils'
+
+export type SwitchLabelPosition = FieldLabelPosition | 'inline'
 
 export interface SwitchFieldProps
   extends
@@ -64,7 +65,8 @@ export function SwitchField({
   chrome,
   ...switchProps
 }: SwitchFieldProps) {
-  const resolvedHintPosition = hintPosition ?? 'below-label'
+  const inAnatomyRow = useFieldRowParticipation()
+  const resolvedHintPosition = inAnatomyRow ? 'below-control' : (hintPosition ?? 'below-label')
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const labelNode = (
@@ -115,6 +117,7 @@ export function SwitchField({
         required={required}
         width={rootWidth}
         size={size}
+        anatomy
       >
         <FieldLayout
           hintPosition={resolvedHintPosition}
@@ -134,6 +137,32 @@ export function SwitchField({
     controlBand: 'content-sized',
   })
 
+  const regions = (
+    <>
+      {/* Inline toggles keep the label beside the control; label region stays empty. */}
+      <FieldLabelRegion size={size} />
+      <FieldControlRegion>
+        <div className={presentation.controlBandClassName}>
+          <div className={fieldInlineToggleRowClasses}>
+            <div className={fieldInlineSwitchControlColumnClasses}>
+              <Field.Control>
+                <Switch {...switchProps} />
+              </Field.Control>
+            </div>
+            <div className={fieldLabelHintStackClasses}>
+              {labelNode}
+              {!inAnatomyRow && <Field.Hint />}
+            </div>
+          </div>
+        </div>
+      </FieldControlRegion>
+      <FieldMessageRegion size={size}>
+        {inAnatomyRow && <Field.Hint />}
+        <Field.Error />
+      </FieldMessageRegion>
+    </>
+  )
+
   return (
     <Field.Root
       id={id}
@@ -141,28 +170,15 @@ export function SwitchField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={resolvedHintPosition}
       required={required}
       width={rootWidth}
       size={size}
+      anatomy
     >
-      <FieldChromeShell chrome={chrome} size={size}>
-        <div data-field-align="" className={presentation.alignmentAnchorClassName}>
-          <div className={presentation.controlBandClassName}>
-            <div className={fieldInlineToggleRowClasses}>
-              <div className={fieldInlineSwitchControlColumnClasses}>
-                <Field.Control>
-                  <Switch {...switchProps} />
-                </Field.Control>
-              </div>
-              <div className={fieldLabelHintStackClasses}>
-                {labelNode}
-                <Field.Hint />
-              </div>
-            </div>
-          </div>
-        </div>
+      <FieldChromeShell chrome={chrome} size={size} className={cn('flex flex-col')}>
+        {regions}
       </FieldChromeShell>
-      <Field.Error />
     </Field.Root>
   )
 }

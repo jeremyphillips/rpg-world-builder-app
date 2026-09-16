@@ -2,12 +2,12 @@ import type { CampaignOnboardingIncompleteContext } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { ViewportWorkspace } from '@/components/layout/page/viewport-workspace'
-import { viewportWorkspacePaneClasses } from '@/components/layout/page/viewport-workspace.variants'
-import { WidePage } from '@/components/layout/page/wide-page'
 import { useSession } from '@/features/auth'
-import { CharacterBuilderShell } from '@/features/character'
-import { useCampaignPcOnboardingBuildContext } from '@/features/character'
+import {
+  CharacterBuilderPageShell,
+  CharacterBuilderShell,
+  useCampaignPcOnboardingBuildContext,
+} from '@/features/character'
 
 export function CampaignOnboardingNewCharacterPanel({
   context,
@@ -28,15 +28,15 @@ export function CampaignOnboardingNewCharacterPanel({
   } = useCampaignPcOnboardingBuildContext(campaignId, session?.user.id)
 
   return (
-    <ViewportWorkspace>
-      <WidePage spacing="none" rhythm="relaxed" className={viewportWorkspacePaneClasses}>
-        <div className="mb-4 flex shrink-0 flex-col gap-1">
-          <Heading variant="section" as="h2">
-            {context.campaign.name}
-          </Heading>
-          <Text variant="muted">Campaign starting level: {context.startingLevel}</Text>
-        </div>
+    <>
+      <div className="mb-4 flex shrink-0 flex-col gap-1">
+        <Heading variant="section" as="h2">
+          {context.campaign.name}
+        </Heading>
+        <Text variant="muted">Campaign starting level: {context.startingLevel}</Text>
+      </div>
 
+      <CharacterBuilderPageShell className="h-dvh">
         <PageLoadState
           isPending={isPending}
           isError={isError}
@@ -51,7 +51,7 @@ export function CampaignOnboardingNewCharacterPanel({
             />
           ) : null}
         </PageLoadState>
-      </WidePage>
-    </ViewportWorkspace>
+      </CharacterBuilderPageShell>
+    </>
   )
 }

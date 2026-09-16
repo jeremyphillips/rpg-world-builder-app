@@ -12,6 +12,7 @@ import type { UseFieldArrayReturn } from 'react-hook-form'
 
 import type { ArrayConfig } from '../../field-config'
 import { useFormSectionContext } from '../../context/form-section.context'
+import type { FormIssue } from '../../errors/form-issue.types'
 import { countInvalidArrayItems, countIssuesForArrayPath } from '../../errors'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
@@ -19,6 +20,7 @@ import { useFormUiContext } from '../../context/form-ui.context'
 import { useFocusFirstArrayIssue } from './use-focus-first-array-issue.client'
 import { useArrayFieldAppend } from './use-array-field-append.client'
 import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-chrome.lib'
+import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
 
 type UseArrayFieldRendererStateOptions = {
   config: ArrayConfig
@@ -29,6 +31,14 @@ type UseArrayFieldRendererStateOptions = {
   remove: UseFieldArrayReturn['remove']
   getValues: (name: string) => unknown
   watchedItems: unknown[] | undefined
+  wrapSectionChrome?: boolean
+}
+
+function resolveContainerIssue(
+  issues: readonly FormIssue[],
+  fullName: string,
+): FormIssue | undefined {
+  return issues.find((issue) => issue.path === fullName)
 }
 
 export function useArrayFieldRendererState({
@@ -40,17 +50,19 @@ export function useArrayFieldRendererState({
   remove,
   getValues,
   watchedItems,
+  wrapSectionChrome,
 }: UseArrayFieldRendererStateOptions) {
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const { density, depth, inRhythmStack, namedGroupDepth } = useFormSectionContext()
+  const { density, arrayLegendDensity, depth, inRhythmStack } = useFormSectionContext()
   const chrome = resolveArrayFieldRendererChrome({
     config,
     density,
+    legendDensity: arrayLegendDensity,
     depth,
     inRhythmStack,
-    namedGroupDepth,
     fieldsLength: fields.length,
+    wrapSectionChrome,
   })
   const {
     addAction,
@@ -61,17 +73,17 @@ export function useArrayFieldRendererState({
     showAddIcon,
     addActionMenu,
     collapsible,
+    emptyItemLabel,
     itemCollapseKey,
     itemConfig,
     itemListClasses,
     itemBodyStackClasses,
     legend,
-    legendScale,
-    legendSize,
+    legendFieldSize,
     max,
-    min,
     nested,
     omitSectionBottomMargin,
+    reorderConfigured,
     sortableEnabled,
     variant,
   } = chrome
@@ -89,9 +101,12 @@ export function useArrayFieldRendererState({
     getItemValues,
   })
 
-  const canRemove = fields.length > min
   const showDefaultItemRemove = itemConfig.removable && !itemConfig.removeSlot
+  const canRemove = showDefaultItemRemove
+
   const canAdd = max === undefined || fields.length < max
+  const containerIssue = resolveContainerIssue(validation.issues, fullName)
+  const hasContainerIssue = containerIssue !== undefined
   const invalidRowCount = validation.hasAttemptedSubmit
     ? countInvalidArrayItems(validation.issues, fullName)
     : 0
@@ -110,7 +125,7 @@ export function useArrayFieldRendererState({
     addValidationSessionExpandKeys,
   })
 
-  const { appendItem, appendFromAddMenu, appendWithDefaults, addActionMenuItems } =
+  const { appendItem, appendFromAddMenu, appendItemWithDefaults, addActionMenuItems } =
     useArrayFieldAppend({
       config,
       fullName,
@@ -134,12 +149,15 @@ export function useArrayFieldRendererState({
       itemBodyStackClasses,
       canRemove,
       showDefaultItemRemove,
-      showDragHandle: sortableEnabled,
+      showDragHandle: reorderConfigured,
+      fieldsLength: fields.length,
       collapsible,
       variant,
       collapsedIds,
       onToggleCollapse: toggleCollapse,
-      onRemove: () => remove(index),
+      onRemove: () => {
+        remove(index)
+      },
     }),
     [
       canRemove,
@@ -147,18 +165,23 @@ export function useArrayFieldRendererState({
       collapsedIds,
       collapsible,
       config,
+      fields.length,
       fullName,
       idPrefix,
       itemBodyStackClasses,
       legend,
       remove,
-      sortableEnabled,
+      reorderConfigured,
       toggleCollapse,
       variant,
     ],
   )
 
   return {
+    emptyItemLabel,
+    required: resolveArrayRequiredMarker(config),
+    containerIssue,
+    hasContainerIssue,
     addAction,
     addActionLabel,
     addActionVariant,
@@ -169,16 +192,17 @@ export function useArrayFieldRendererState({
     addActionMenuItems,
     appendFromAddMenu,
     appendItem,
-    appendWithDefaults,
+    appendItemWithDefaults,
     arrayIssueCount,
     canAdd,
     focusFirstArrayIssue,
+    fullName,
+    idPrefix,
     invalidRowCount,
     itemListClasses,
     itemProps,
     legend,
-    legendScale,
-    legendSize,
+    legendFieldSize,
     nested,
     omitSectionBottomMargin,
     showLegend: legend.trim().length > 0,

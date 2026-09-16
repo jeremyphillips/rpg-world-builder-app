@@ -154,6 +154,7 @@ export const TextFieldTrailingAction = React.forwardRef<
         required={required}
         size={size}
         width={width}
+        anatomy
       >
         <FieldLayout
           hintPosition={hintPosition}

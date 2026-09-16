@@ -37,8 +37,11 @@ export {
  */
 export const collapsibleListItemShellInsetClasses = 'calc(var(--spacing) * 2)'
 
-/** Fixed shell padding — inline-start matches legacy inset; inline-end/block-end use spacing 3. */
-export const collapsibleListItemShellPaddingClasses = cn('pl-2 pr-3 pb-3 pt-0')
+/** Flat array item shell padding — 8px block axis (`py-2`). */
+export const collapsibleListItemFlatShellPaddingClasses = cn('pl-2 pr-3 py-2')
+
+/** @deprecated Use {@link collapsibleListItemFlatShellPaddingClasses}. */
+export const collapsibleListItemShellPaddingClasses = collapsibleListItemFlatShellPaddingClasses
 
 /**
  * Disclosure shell padding — inline inset only; bottom pad is owned by the body wash
@@ -115,8 +118,8 @@ export const collapsibleListItemShellVariants = cva(
           'grid grid-cols-[minmax(0,1fr)_auto] items-start',
           collapsibleListItemShellPaddingClasses,
         ),
-        headerActions: cn('flex flex-col', collapsibleListItemDisclosureShellPaddingClasses),
-        compactRow: cn(collapsibleListItemShellPaddingClasses, 'pt-[calc(var(--spacing)*2)]'),
+        headerActions: 'flex flex-col',
+        compactRow: collapsibleListItemFlatShellPaddingClasses,
         entityCardHeaderActions: cn(
           'flex flex-col',
           collapsibleListItemEntityCardShellPaddingClasses,
@@ -150,8 +153,8 @@ export const collapsibleListItemShellClasses = cn(
   'border-border',
 )
 
-/** Main content column — top inset matches shell vertical rhythm. */
-export const collapsibleListItemMainClasses = 'min-w-0 pt-[calc(var(--spacing)*2)]'
+/** Main content column — vertical rhythm owned by shell padding. */
+export const collapsibleListItemMainClasses = 'min-w-0'
 
 /** Toolbar + actions on one row when actions center on the title row only. */
 export const collapsibleListItemHeaderRowClasses = 'flex w-full min-w-0 items-center gap-2'
@@ -193,12 +196,16 @@ export function collapsibleListItemHeaderSummaryClasses(
  * When `centered`, the rail vertically centers against the toolbar row only.
  */
 export function collapsibleListItemActionsRailClasses(
-  options: { compact?: boolean; embedded?: boolean; centered?: boolean } = {},
+  options: {
+    compact?: boolean
+    embedded?: boolean
+    centered?: boolean
+  } = {},
 ): string {
   return cn(
     'flex shrink-0 items-center gap-1',
     options.embedded
-      ? 'justify-self-end'
+      ? 'justify-self-end self-center'
       : options.centered
         ? 'shrink-0'
         : cn('self-start', options.compact ? 'mt-1' : 'mt-2'),
@@ -206,8 +213,8 @@ export function collapsibleListItemActionsRailClasses(
 }
 
 /** Inline drag handle — first leading chrome column when sortable. */
-export function collapsibleListItemDragHandleClasses(options: { compact?: boolean } = {}): string {
-  return cn(dragHandleVariants({ visibility: 'always' }), options.compact && '-mt-1')
+export function collapsibleListItemDragHandleClasses(_options: { compact?: boolean } = {}): string {
+  return dragHandleVariants({ visibility: 'always' })
 }
 
 /** Collapse caret in detailed item headers. */

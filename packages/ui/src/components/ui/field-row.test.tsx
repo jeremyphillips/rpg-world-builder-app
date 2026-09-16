@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -37,6 +38,24 @@ describe('FieldRow', () => {
     expect(fieldRoot).toHaveClass('in-data-[field-row]:w-64')
   })
 
+  it('renders anatomy-grid layout for schema rows', () => {
+    const { container } = render(
+      <FieldRow
+        layout="anatomy-grid"
+        className="field-row-anatomy-grid"
+        style={{ '--row-cols': '1fr 1fr' } as CSSProperties}
+        data-field-row-anatomy=""
+      >
+        <TextField id="first" label="First name" />
+        <TextField id="last" label="Last name" />
+      </FieldRow>,
+    )
+
+    expect(container.firstChild).toHaveAttribute('data-field-row-anatomy', '')
+    expect(container.firstChild).toHaveClass('field-row-anatomy-grid')
+    expect(container.firstChild).not.toHaveClass('flex')
+  })
+
   it('renders its child fields side by side with control-edge alignment', () => {
     const { container } = render(
       <FieldRow>
@@ -63,17 +82,21 @@ describe('FieldRow', () => {
     expect(container.firstChild).not.toHaveClass('items-end')
   })
 
-  it('wraps each field’s label + control band in a data-field-align anchor', () => {
+  it('wraps each field’s label + control in three-region anatomy', () => {
     const { container } = render(
       <FieldRow>
         <TextField id="first" label="First name" />
       </FieldRow>,
     )
 
-    const anchor = container.querySelector('[data-field-align]')
-    expect(anchor).not.toBeNull()
-    expect(anchor).toContainElement(screen.getByText('First name'))
-    expect(anchor).toContainElement(screen.getByLabelText('First name'))
+    const root = container.querySelector('[data-field-anatomy]')
+    expect(root).not.toBeNull()
+    expect(root?.querySelector('[data-field-label-region]')).toContainElement(
+      screen.getByText('First name'),
+    )
+    expect(root?.querySelector('[data-field-control-region]')).toContainElement(
+      screen.getByLabelText('First name'),
+    )
   })
 
   itAxe('has no axe accessibility violations', async () => {

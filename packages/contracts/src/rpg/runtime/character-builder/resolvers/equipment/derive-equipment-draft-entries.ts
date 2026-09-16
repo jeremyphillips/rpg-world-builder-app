@@ -18,6 +18,7 @@ import {
   resolveStartingEquipmentOption,
   type ResolvedStartingEquipmentItem,
 } from '../../assembly/assemble-starting-equipment'
+import { findAvailableStartingEquipmentOption } from '../../../../content/starting-equipment-availability'
 import {
   isStartingGoldOption,
   type StartingEquipmentOption,
@@ -153,7 +154,7 @@ function resolveEquipmentDraftContext(
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
   if (!selectedOptionId) return null
 
-  const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
+  const option = findAvailableStartingEquipmentOption(startingEquipment.options, selectedOptionId)
   if (!option) return null
 
   return { classId, characterClass, option, selectedOptionId }

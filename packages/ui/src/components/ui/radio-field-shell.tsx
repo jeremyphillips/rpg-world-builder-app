@@ -62,6 +62,7 @@ export function RadioFieldShell({
       required={required}
       size={size}
       width={resolveFieldAnatomyWidth(width, chrome)}
+      anatomy
     >
       <FieldLayout
         hintPosition={hintPosition}

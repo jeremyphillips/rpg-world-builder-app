@@ -178,7 +178,31 @@ describe('SlotFieldRenderer', () => {
     )
 
     expect(container.querySelectorAll('.flex.flex-col.gap-3')).toHaveLength(1)
+    expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
+  })
+
+  it('wraps a slot in container chrome only when explicitly configured', () => {
+    const containerSlotFields: FormItem[] = [
+      {
+        kind: 'slot',
+        name: 'notes',
+        chrome: { variant: 'container' },
+        render: () => <NotesSlot />,
+      },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={containerSlotFields}
+        defaultValues={{ notes: '' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(container.querySelector('.bg-field-container')).toBeInTheDocument()
   })
 
   it('wraps a slot with a trailing separator when configured', () => {
@@ -300,8 +324,10 @@ describe('SlotFieldRenderer', () => {
     )
 
     const notes = screen.getByRole('textbox', { name: 'Notes' })
-    expect(notes.parentElement).toHaveClass('min-w-0', 'max-w-1/3', 'basis-0', 'grow-[4]')
-    expect(container.querySelector('[data-field-row]')).toContainElement(notes)
+    expect(container.querySelector('[data-field-row-anatomy]')).toContainElement(notes)
+    expect(
+      screen.getByRole('textbox', { name: 'Name' }).closest('[data-field-row-participant]'),
+    ).toHaveClass('grid-rows-subgrid')
   })
 
   it('hides a slot when its visibility predicate is false', () => {

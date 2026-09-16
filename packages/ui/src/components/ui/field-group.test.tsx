@@ -78,22 +78,22 @@ describe('FieldGroup', () => {
     expect(screen.getByText('Damage').closest('legend')).toHaveClass('text-field-subgroup-legend')
   })
 
-  it('renders an array legend at the repeatable-list type scale when size is md', () => {
+  it('renders an array legend with field label typography when size is md', () => {
     render(
       <FieldGroup legend="Grants" legendSize="array" size="md">
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-field-array-legend')
+    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-md', 'font-field-label')
   })
 
-  it('defaults array legend to sm scale when size is omitted', () => {
+  it('defaults array legend to sm field label typography when size is omitted', () => {
     render(
       <FieldGroup legend="Grants" legendSize="array">
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-sm')
+    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-xs', 'font-field-label')
   })
 
   it('applies panel chrome on the field body', () => {

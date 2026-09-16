@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ArrayConfig, FormItem } from '@rpg/ui/form'
+import { resolveFieldConfigPrimaryName, type ArrayConfig, type FormItem } from '@rpg/ui/form'
 
 import {
   outcomeApplicationsReferenceEffect,
@@ -68,7 +68,11 @@ describe('resolutionFields effects array', () => {
 
   it('does not expose a kind selector; kind is fixed at add time via templates', () => {
     const itemFields = findResolutionEffectsArray(resolutionFields({}))?.fields ?? []
-    expect(itemFields.find((field) => !('kind' in field) && field.name === 'kind')).toBeUndefined()
+    expect(
+      itemFields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'kind',
+      ),
+    ).toBeUndefined()
   })
 
   it('opts into detailed item chrome when nested inside resolution groups', () => {

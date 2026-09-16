@@ -117,7 +117,7 @@ sibling folders (`equipment/`, `spells/`, `proficiencies/`, `connections/`,
 | ------------ | --------------------------------------------------------------------------------- |
 | _(root)_     | Shell orchestration — `character-builder-shell`, step router, form↔footer glue    |
 | `chrome/`    | Persistent builder chrome — rail, panel frame, footer, validation, level, restore |
-| `preview/`   | Live preview sidebar — panel, accordion, section content                          |
+| `preview/`   | Live preview rail — shared projection, section bodies, compact sheet              |
 | `fields/`    | Builder choice rendering — `ChoiceSetField`, dependent choice sections            |
 | `inventory/` | Builder row remove affordance (reused by steps and domain pickers)                |
 | `steps/`     | One folder per canonical step; shared chrome in `steps/shared/`                   |
@@ -132,6 +132,63 @@ Shared step wrappers (`builder-step-frame`, `builder-step-readiness-panel`) live
 
 Step orchestration hooks stay in `hooks/` (`use-*-step.ts`); view models
 stay in `lib/builder/`, `lib/steps/`, and per-concern `lib/<step>/`.
+
+### Builder anatomy (three columns)
+
+`CharacterBuilderPageShell` owns `ViewportWorkspace` + `WidePage` exactly once.
+Route hosts (`character-create`, `npc-create`, onboarding panel) must not wrap another
+width/workspace shell.
+
+| Column        | Component                     | Notes                                                             |
+| ------------- | ----------------------------- | ----------------------------------------------------------------- |
+| Left          | `CharacterBuilderStepRail`    | Flat step list; `StatusIcon` markers shared with preview sections |
+| Middle        | `CharacterBuilderFormColumn`  | `FormStickyScrollBody` + docked `FormActionsBar` footer           |
+| Right (`xl+`) | `CharacterBuilderPreviewRail` | `PreviewRail` fill; accordions live here only                     |
+
+Below `xl`, the persistent rail hides; `CharacterBuilderPreviewSheet` exposes a compact
+**Preview** trigger in the form column. Builder starting-equipment option cards use
+generated package summaries from `@rpg/contracts` and ignore authored option
+`description` for now (description remains on the class authoring form).
+
+**Primary step → preview section open mapping** (first match wins for navigation):
+
+| Wizard step               | Preview section                                          |
+| ------------------------- | -------------------------------------------------------- |
+| `identity`, `connections` | `narrative`                                              |
+| `species`, `class`        | `combat`                                                 |
+| `abilities`               | `abilities`                                              |
+| `proficiencies`           | `proficiencies`                                          |
+| `equipment`               | `equipment`                                              |
+| `spells`                  | `spells`                                                 |
+| `review`                  | Last incomplete section, or the last manual/open section |
+
+Manual accordion expand in the preview rail persists until `currentStepId` changes.
+
+**Step rail icon mapping** (`StepStatus` → `StatusIcon`):
+
+| Step status      | Icon variant     |
+| ---------------- | ---------------- |
+| `complete`       | `ready`          |
+| `error`          | `needsAttention` |
+| `locked`         | `off`            |
+| `idle`, `active` | `incomplete`     |
+
+Active step row chrome (`bg-row-selected` + left bar) stays on the rail row — not a
+unique icon variant.
+
+**Footer submit seam:** docked Continue calls `runBuilderFormContinueHandler(currentStepId)`
+so mounted step forms (`Identity`, `Abilities`, …) run `form.trigger()` via
+`BuilderFormContinueRegistration`. Steps without a registered handler fall back to
+`attemptStepAdvance()`. Create uses `handleCreateCharacter` — not the continue registry.
+
+**Preview rail footer status** (first match wins):
+
+1. `canCreateCharacter` → success “Ready to create”
+2. Visible validation after failed Continue/Create → warning “Needs attention”
+3. Otherwise → default “Builder incomplete” (not warning)
+
+Projection SSOT: `lib/builder-preview/builder-preview-projection.lib.ts` feeds both the
+desktop rail and compact sheet (`CharacterBuilderPreviewRailView`).
 
 ## `npc/` sub-feature
 

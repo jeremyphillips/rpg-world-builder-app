@@ -1,4 +1,5 @@
 import type { FieldConfig, FormItem, GroupFieldItem, RowConfig } from './field-config'
+import { resolveFieldConfigPrimaryName } from './field-config'
 import { resolveColumnsCollapseSequence } from './config/form-columns-collapse.lib'
 import { isNonWhitespaceLabel } from './form-heading.lib'
 
@@ -13,7 +14,9 @@ function assertLeafFieldLabels(
   for (const item of items) {
     if (isLeafField(item)) {
       if (!isNonWhitespaceLabel(item.label)) {
-        throw new Error(`Form field at ${path}.${item.name} requires a non-whitespace label`)
+        throw new Error(
+          `Form field at ${path}.${resolveFieldConfigPrimaryName(item)} requires a non-whitespace label`,
+        )
       }
       continue
     }

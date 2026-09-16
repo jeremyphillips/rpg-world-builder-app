@@ -55,7 +55,7 @@ describe('campaign availability overlay presentation drift guard', () => {
       'MasterDetailEditorShell',
     )
     expect(readFileSync(masterDetailEditorShellPath, 'utf8')).toContain(
-      'MasterDetailAvailabilityHeaderLine',
+      'MasterDetailEditorStatusRow',
     )
     expect(readFileSync(classSubclassesTabPath, 'utf8')).toContain(
       'NestedResourceMasterDetailEditor',

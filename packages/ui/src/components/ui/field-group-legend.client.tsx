@@ -33,7 +33,8 @@ export function FieldGroupLegend({
   open,
   onToggle,
 }: FieldGroupLegendProps) {
-  const headerMargin = fieldGroupLegendHeaderMarginVariants({ size: legendSize })
+  const headerMargin =
+    legendSize === 'array' ? '' : fieldGroupLegendHeaderMarginVariants({ size: legendSize })
   const legendContent = description ? (
     <span className={cn(fieldGroupLegendHeaderStackClasses, headerMargin)}>
       <span>{legend}</span>

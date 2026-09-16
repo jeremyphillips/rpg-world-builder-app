@@ -8,6 +8,10 @@ import {
   isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
 } from '../../../../content/starting-equipment'
+import {
+  availableStartingEquipmentOptions,
+  findAvailableStartingEquipmentOption,
+} from '../../../../content/starting-equipment-availability'
 import type { EquipmentRecommendationTier } from '../../../../content/equipment-recommendation'
 import { toEquipmentContentId } from '../../../creature/equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
@@ -146,7 +150,9 @@ function listGoldAlternativeStartingOptions(
 ): StartingEquipmentOption[] {
   if (!startingEquipment) return []
 
-  return startingEquipment.options.filter((option) => !isWealthOnlyStartingEquipmentOption(option))
+  return availableStartingEquipmentOptions(startingEquipment.options).filter(
+    (option) => !isWealthOnlyStartingEquipmentOption(option),
+  )
 }
 
 function dedupeContributionsBySourceKey(
@@ -202,7 +208,7 @@ export function deriveStartingEquipmentRecommendationContributions(args: {
   const contributions: EquipmentRecommendationContribution[] = []
 
   if (!selectedOptionId) {
-    for (const option of startingEquipment.options) {
+    for (const option of availableStartingEquipmentOptions(startingEquipment.options)) {
       if (isWealthOnlyStartingEquipmentOption(option)) continue
 
       contributions.push(
@@ -219,7 +225,10 @@ export function deriveStartingEquipmentRecommendationContributions(args: {
     return contributions
   }
 
-  const selectedOption = startingEquipment.options.find((option) => option.id === selectedOptionId)
+  const selectedOption = findAvailableStartingEquipmentOption(
+    startingEquipment.options,
+    selectedOptionId,
+  )
   if (!selectedOption) return []
 
   if (isWealthOnlyStartingEquipmentOption(selectedOption)) {
@@ -273,7 +282,10 @@ export function listSelectedStartingEquipmentGrantIds(args: {
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, characterClass.id)
   if (!selectedOptionId) return []
 
-  const selectedOption = startingEquipment.options.find((option) => option.id === selectedOptionId)
+  const selectedOption = findAvailableStartingEquipmentOption(
+    startingEquipment.options,
+    selectedOptionId,
+  )
   if (!selectedOption) return []
 
   const ids: string[] = []

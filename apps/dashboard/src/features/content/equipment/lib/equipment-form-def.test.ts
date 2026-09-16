@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest'
-import type { DependentConfig } from '@rpg/ui/form'
+import { resolveFieldConfigPrimaryName, type DependentConfig } from '@rpg/ui/form'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { deriveContentKey, type CreateEquipmentInput } from '@rpg/contracts'
 
@@ -62,7 +62,7 @@ describe('equipmentFormDef kind-scoped fields', () => {
         (field) =>
           'kind' in field &&
           field.kind === 'dependent' &&
-          (field as DependentConfig).controller.name === 'hasMarketPrice',
+          resolveFieldConfigPrimaryName((field as DependentConfig).controller) === 'hasMarketPrice',
       ),
     ).toBe(true)
   })

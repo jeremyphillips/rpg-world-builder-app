@@ -480,13 +480,13 @@
           "$ref": "#/definitions/__schema90"
         },
         "proficiencies": {
-          "$ref": "#/definitions/__schema103"
+          "$ref": "#/definitions/__schema105"
         },
         "equipmentRecommendations": {
-          "$ref": "#/definitions/__schema111"
+          "$ref": "#/definitions/__schema113"
         },
         "abilityScoreOrder": {
-          "$ref": "#/definitions/__schema113"
+          "$ref": "#/definitions/__schema115"
         }
       },
       "additionalProperties": false
@@ -2326,11 +2326,17 @@
         "label": {
           "$ref": "#/definitions/__schema95"
         },
-        "items": {
+        "description": {
           "$ref": "#/definitions/__schema96"
         },
+        "items": {
+          "$ref": "#/definitions/__schema97"
+        },
         "wealth": {
-          "$ref": "#/definitions/__schema102"
+          "$ref": "#/definitions/__schema103"
+        },
+        "available": {
+          "$ref": "#/definitions/__schema104"
         }
       },
       "required": [
@@ -2349,6 +2355,9 @@
       "minLength": 1
     },
     "__schema96": {
+      "type": "string"
+    },
+    "__schema97": {
       "type": "array",
       "items": {
         "oneOf": [
@@ -2361,16 +2370,16 @@
                 "description": "grant"
               },
               "target": {
-                "$ref": "#/definitions/__schema98"
-              },
-              "quantity": {
                 "$ref": "#/definitions/__schema99"
               },
-              "equipped": {
+              "quantity": {
                 "$ref": "#/definitions/__schema100"
               },
-              "modifiers": {
+              "equipped": {
                 "$ref": "#/definitions/__schema101"
+              },
+              "modifiers": {
+                "$ref": "#/definitions/__schema102"
               }
             },
             "required": [
@@ -2386,12 +2395,12 @@
         ]
       }
     },
-    "__schema97": {
+    "__schema98": {
       "type": "string",
       "const": "grant",
       "description": "grant"
     },
-    "__schema98": {
+    "__schema99": {
       "oneOf": [
         {
           "type": "object",
@@ -2433,22 +2442,22 @@
         }
       ]
     },
-    "__schema99": {
+    "__schema100": {
       "default": 1,
       "type": "integer",
       "minimum": 1,
       "maximum": 9007199254740991
     },
-    "__schema100": {
+    "__schema101": {
       "type": "boolean"
     },
-    "__schema101": {
+    "__schema102": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/__schema66"
       }
     },
-    "__schema102": {
+    "__schema103": {
       "type": "object",
       "properties": {
         "cp": {
@@ -2474,14 +2483,17 @@
       },
       "additionalProperties": false
     },
-    "__schema103": {
+    "__schema104": {
+      "type": "boolean"
+    },
+    "__schema105": {
       "type": "object",
       "properties": {
         "skills": {
           "type": "object",
           "properties": {
             "choices": {
-              "$ref": "#/definitions/__schema104"
+              "$ref": "#/definitions/__schema106"
             }
           },
           "required": [
@@ -2493,7 +2505,7 @@
           "type": "object",
           "properties": {
             "choices": {
-              "$ref": "#/definitions/__schema109"
+              "$ref": "#/definitions/__schema111"
             }
           },
           "required": [
@@ -2504,24 +2516,24 @@
       },
       "additionalProperties": false
     },
-    "__schema104": {
+    "__schema106": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema105"
+        "$ref": "#/definitions/__schema107"
       }
     },
-    "__schema105": {
+    "__schema107": {
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/__schema106"
+          "$ref": "#/definitions/__schema108"
         },
         "label": {
-          "$ref": "#/definitions/__schema107"
+          "$ref": "#/definitions/__schema109"
         },
         "choose": {
-          "$ref": "#/definitions/__schema108"
+          "$ref": "#/definitions/__schema110"
         },
         "from": {
           "default": [],
@@ -2538,36 +2550,36 @@
       ],
       "additionalProperties": false
     },
-    "__schema106": {
+    "__schema108": {
       "type": "string",
       "minLength": 1
     },
-    "__schema107": {
+    "__schema109": {
       "type": "string"
     },
-    "__schema108": {
+    "__schema110": {
       "type": "integer",
       "minimum": 0,
       "maximum": 9007199254740991
     },
-    "__schema109": {
+    "__schema111": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema110"
+        "$ref": "#/definitions/__schema112"
       }
     },
-    "__schema110": {
+    "__schema112": {
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/__schema106"
+          "$ref": "#/definitions/__schema108"
         },
         "label": {
-          "$ref": "#/definitions/__schema107"
+          "$ref": "#/definitions/__schema109"
         },
         "choose": {
-          "$ref": "#/definitions/__schema108"
+          "$ref": "#/definitions/__schema110"
         },
         "pool": {
           "allOf": [
@@ -2589,25 +2601,25 @@
       ],
       "additionalProperties": false
     },
-    "__schema111": {
+    "__schema113": {
       "type": "object",
       "properties": {
         "essential": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema112"
+            "$ref": "#/definitions/__schema114"
           }
         },
         "strong": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema112"
+            "$ref": "#/definitions/__schema114"
           }
         }
       },
       "additionalProperties": false
     },
-    "__schema112": {
+    "__schema114": {
       "type": "object",
       "properties": {
         "match": {
@@ -2634,7 +2646,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema113": {
+    "__schema115": {
       "minItems": 6,
       "maxItems": 6,
       "type": "array",

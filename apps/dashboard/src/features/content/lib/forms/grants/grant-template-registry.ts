@@ -214,7 +214,7 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     description: 'Grant a special sense such as darkvision with a range in feet.',
     groupId: 'combat-traits',
     grantType: 'senses',
-    createDefault: () => ({ grantType: 'senses', senseRange: '60' }),
+    createDefault: () => ({ grantType: 'senses', senseRange: 60 }),
     search: {
       aliases: ['darkvision', 'blindsight', 'tremorsense', 'truesight'],
       keywords: ['sense', 'vision'],
