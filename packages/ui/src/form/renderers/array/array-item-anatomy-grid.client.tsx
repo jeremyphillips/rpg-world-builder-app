@@ -2,13 +2,15 @@
 
 import * as React from 'react'
 
-import { FieldRowAnatomyProvider } from '../../../components/ui/field-row-anatomy.context'
+import {
+  FieldAnatomyGridPlacementProvider,
+  FieldRowAnatomyProvider,
+} from '../../../components/ui/field-row-anatomy.context'
 import { cn } from '../../../lib/utils'
 import type { FieldWidth } from '../../../components/ui/field-control.variants'
 
 import { ArrayItemAnatomyChromeColumn } from './array-item-anatomy-chrome-column.client'
 import {
-  ARRAY_ITEM_ANATOMY_FIELD_GRID_ROW,
   resolveArrayItemAnatomyFieldGridColumn,
   resolveArrayItemAnatomyGridChromeColumn,
   resolveArrayItemAnatomyGridPresentation,
@@ -30,25 +32,18 @@ export interface ArrayItemAnatomyGridProps extends React.HTMLAttributes<HTMLDivE
   children: React.ReactNode
 }
 
-function assignFieldGridPlacement(
+function wrapFieldGridPlacement(
   child: React.ReactNode,
   fieldIndex: number,
   showGrip: boolean,
 ): React.ReactNode {
-  if (!React.isValidElement<{ style?: React.CSSProperties; className?: string }>(child)) {
-    return child
-  }
-
   const gridColumn = resolveArrayItemAnatomyFieldGridColumn(fieldIndex, showGrip)
 
-  return React.cloneElement(child, {
-    style: {
-      ...child.props.style,
-      gridColumn,
-      gridRow: ARRAY_ITEM_ANATOMY_FIELD_GRID_ROW,
-    },
-    className: cn('min-w-0', child.props.className),
-  })
+  return (
+    <FieldAnatomyGridPlacementProvider gridColumn={gridColumn}>
+      {child}
+    </FieldAnatomyGridPlacementProvider>
+  )
 }
 
 /**
@@ -92,7 +87,7 @@ export function ArrayItemAnatomyGrid({
             {grip}
           </ArrayItemAnatomyChromeColumn>
         ) : null}
-        {fieldChildren.map((child, index) => assignFieldGridPlacement(child, index, showGrip))}
+        {fieldChildren.map((child, index) => wrapFieldGridPlacement(child, index, showGrip))}
         <ArrayItemAnatomyChromeColumn
           slot="actions"
           gridColumn={resolveArrayItemAnatomyGridChromeColumn({

@@ -16,19 +16,8 @@ import {
   arrayItemToolbarContentClasses,
   arrayItemToolbarRowClasses,
   buildArrayItemCompactRowGridTemplate,
-  resolveArrayItemCompactInlineAlign,
 } from './array-item-toolbar.variants'
 import { resolveFieldContainerChromeClasses } from '../../../components/ui/field-surface.variants'
-
-describe('resolveArrayItemCompactInlineAlign', () => {
-  it('defaults unlabeled inline rows to start alignment', () => {
-    expect(resolveArrayItemCompactInlineAlign(undefined, true)).toBe('start')
-  })
-
-  it('honors explicit inlineAlign overrides on unlabeled rows', () => {
-    expect(resolveArrayItemCompactInlineAlign('start', true)).toBe('start')
-  })
-})
 
 describe('array item shell variants', () => {
   it('uses leading-snug on truncated header copy so descenders are not clipped', () => {
@@ -127,16 +116,14 @@ describe('array item shell variants', () => {
     expect(arrayItemShellVariants({ layout: 'compactRow' })).not.toContain('grid-cols-')
   })
 
-  it('builds compact row grid templates with a reserved actions column', () => {
+  it('builds stacked compact row grid templates with a reserved actions column', () => {
     expect(buildArrayItemCompactRowGridTemplate(true)).toBe('auto minmax(0, 1fr) max-content')
     expect(buildArrayItemCompactRowGridTemplate(false)).toBe('minmax(0, 1fr) max-content')
     expect(arrayItemCompactRowClasses()).toContain('grid')
     expect(arrayItemCompactRowClasses()).toContain('items-start')
-    expect(arrayItemCompactRowClasses('center')).toContain('items-center')
-    expect(arrayItemCompactGripClasses('center')).toContain('self-center')
-    expect(arrayItemCompactGripClasses('start')).toContain('self-start')
-    expect(arrayItemCompactActionsClasses('center')).toContain('self-center')
-    expect(arrayItemCompactActionsClasses('center')).toContain('items-center')
+    expect(arrayItemCompactGripClasses()).toContain('self-start')
+    expect(arrayItemCompactActionsClasses()).toContain('self-start')
+    expect(arrayItemCompactActionsClasses()).toContain('items-center')
     expect(arrayItemActionsRailClasses({ embedded: true })).toContain('justify-self-end')
     expect(arrayItemActionsRailClasses({ embedded: true })).not.toContain('mt-1')
     expect(arrayItemActionsRailClasses({ embedded: true })).toContain('items-center')

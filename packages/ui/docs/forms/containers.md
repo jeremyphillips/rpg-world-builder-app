@@ -456,14 +456,14 @@ traits: z.array(z.object({ name: z.string().min(1), description: z.string() })),
 
 Optional hooks:
 
-| Property             | Purpose                                                                                                                                                                                    |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `itemVariant`        | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`).                                                                                                                     |
-| `compactInlineAlign` | `'start'` \| `'center'` \| `'control-edge'` — compact inline rows only; default unlabeled rows use `center`; opt into `control-edge` when grip/actions should sit on the control baseline. |
+| Property      | Purpose                                                                |
+| ------------- | ---------------------------------------------------------------------- |
+| `itemVariant` | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`). |
 
-**Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render that row
-inside a `FieldRow` within the grip/actions grid — leaf `width` tokens (`full`, `auto`, fractions,
-`digits`, …) compose the same way as schema `kind: 'row'` fields.
+**Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render field
+participants on the shared `ArrayItemAnatomyGrid` shell — grip/actions vertically center in the row
+cell; leaf `width` tokens (`full`, `auto`, fractions, `digits`, …) compose the same way as schema
+`kind: 'row'` fields.
 
 | `item.surface` / `item.tone` | Item header — defaults to `{ emphasis: 'subtle' }`; override with raised elevation or semantic tone |
 | `itemHeader` | Primary/fallback labels; optional `summary` on a second row below the title (detailed). |

@@ -271,7 +271,6 @@ export {
   type ArrayItemReorder,
   type ArrayAddActionLayout,
   type ArrayItemVariant,
-  type ArrayCompactInlineAlign,
   type SlotConfig,
   type FormItem,
   type FormIssue,

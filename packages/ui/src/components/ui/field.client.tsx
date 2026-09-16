@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { useFieldRowParticipation } from './field-row-anatomy.context'
+import { useFieldAnatomyGridPlacement, useFieldRowParticipation } from './field-row-anatomy.context'
 import { cn } from '../../lib/utils'
 import type { FieldWidth } from './field-control.variants'
 import {
@@ -98,6 +98,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
       anatomy = false,
       rowParticipation = false,
       className,
+      style,
       children,
       ...props
     },
@@ -108,6 +109,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
     const { meta: derivedMeta } = useFieldDerivedMetaContext()
     const hasDerivedMeta = Boolean(derivedMeta?.rows.length)
     const inAnatomyRow = useFieldRowParticipation()
+    const anatomyGridPlacement = useFieldAnatomyGridPlacement()
     const effectiveRowParticipation = rowParticipation || inAnatomyRow
     const useAnatomy = anatomy || effectiveRowParticipation
 
@@ -149,8 +151,17 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
             width,
             anatomy,
             rowParticipation: effectiveRowParticipation,
-            className,
+            className: cn(anatomyGridPlacement ? 'min-w-0' : undefined, className),
           })}
+          style={{
+            ...(anatomyGridPlacement
+              ? {
+                  gridColumn: anatomyGridPlacement.gridColumn,
+                  gridRow: anatomyGridPlacement.gridRow,
+                }
+              : undefined),
+            ...style,
+          }}
           {...props}
         >
           {children}

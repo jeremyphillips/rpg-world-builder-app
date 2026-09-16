@@ -370,7 +370,6 @@ export function ArrayFieldItemContent({
     </ArrayFieldContext.Provider>
   ) : undefined
 
-  const compactInlineAlign = itemConfig.inlineAlign
   const actionsEmbedded = anatomy === 'flatNoHeader' || Boolean(itemConfig.renderShell)
   const actionsRail = (
     <ArrayFieldItemActionsRailSlot
@@ -416,7 +415,6 @@ export function ArrayFieldItemContent({
       contentLayout: presentation.contentLayout,
       inlineFields: normalizedContent?.inlineFields,
       inlineRow: normalizedContent?.inlineRow,
-      compactInlineAlign,
       header,
       sortableEnabled,
       suppressFieldErrorText,

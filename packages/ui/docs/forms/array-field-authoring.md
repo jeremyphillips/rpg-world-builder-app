@@ -262,7 +262,6 @@ The form library logs dev warnings for:
 | ------------------------------------------------------------------- | ------------------------------------------------------ |
 | `collapsible: true` + `variant: 'compact'`                          | Collapsible items render as disclosure — omit compact. |
 | `headerVisibility: 'hidden'` + `collapsible: true`                  | Disclosure requires header anatomy (auto-normalized).  |
-| `inlineAlign` on stacked content                                    | Alignment applies to inline rows only.                 |
 | `header.primaryField` + `headerVisibility: 'hidden'` on inline rows | primaryField does not show a header on inline items.   |
 
 Do **not** wrap fields in `kind: 'row'` solely to get inline item chrome — normalization already

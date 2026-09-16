@@ -274,12 +274,12 @@ function BrokenParallelGridRow({
     <div
       data-array-item-broken-parallel-grid=""
       className={cn(
-        arrayItemCompactRowClasses('start'),
+        arrayItemCompactRowClasses(),
         'rounded-md border border-dashed border-destructive/40 p-3',
       )}
       style={{ gridTemplateColumns: buildArrayItemCompactRowGridTemplate(true) }}
     >
-      <div className={arrayItemCompactGripClasses('start')}>
+      <div className={arrayItemCompactGripClasses()}>
         <PrototypeChromeGrip />
       </div>
       <div className="min-w-0">
@@ -295,7 +295,7 @@ function BrokenParallelGridRow({
           </div>
         </FieldRowAnatomyProvider>
       </div>
-      <div className={arrayItemCompactGripClasses('start')}>
+      <div className={arrayItemCompactGripClasses()}>
         <PrototypeChromeRemove />
       </div>
     </div>

@@ -182,7 +182,7 @@ const boundedFields: FormItem[] = [
 /**
  * Demonstrates `min` and `max` constraints. Removing the last item shows empty-state
  * guidance while schema validation enforces `min`; the Add button disappears at `max`.
- * Grip/actions stay vertically centered unless `item.inlineAlign: 'control-edge'`.
+ * Grip/actions stay vertically centered in the shared anatomy grid cell.
  */
 export const BoundedArray: StoryObj<Meta<object>> = {
   render: () => (

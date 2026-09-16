@@ -8,6 +8,7 @@ import {
   LEADING_CHROME_SIZE_VAR,
 } from '../../../components/ui/collapsible-list-item/collapsible-list-item-leading-chrome.lib'
 import { collapsibleListItemChromeColumnClasses } from '../../../components/ui/collapsible-list-item/collapsible-list-item-leading-chrome.lib'
+import { FIELD_ANATOMY_GRID_ROW_SPAN } from '../../../components/ui/field-row-anatomy.context'
 import { cn } from '../../../lib/utils'
 
 /** Shared anatomy row index for the control track (1-based grid row). */
@@ -17,7 +18,7 @@ export const ARRAY_ITEM_ANATOMY_CONTROL_TRACK_ROW = 2 as const
 export const ARRAY_ITEM_ANATOMY_GRIP_COLUMN_TRACK = `var(${LEADING_CHROME_SIZE_VAR})`
 
 /** Field columns span all three anatomy tracks via subgrid. */
-export const ARRAY_ITEM_ANATOMY_FIELD_GRID_ROW = '1 / -1' as const
+export const ARRAY_ITEM_ANATOMY_FIELD_GRID_ROW = FIELD_ANATOMY_GRID_ROW_SPAN
 
 /**
  * Chrome column — spans all anatomy rows and vertically centers grip/actions in the

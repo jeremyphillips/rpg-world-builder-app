@@ -56,8 +56,7 @@ export function CheckboxField({
   const presentation = resolveFieldPresentation({
     size,
     labelLayout: 'inline',
-    // Hint-bearing toggles keep first-line alignment — not a fixed single-line band.
-    controlBand: 'content-sized',
+    controlBand: inAnatomyRow ? 'single-line' : 'content-sized',
   })
 
   const labelNode = (

@@ -1207,7 +1207,7 @@ describe('ArrayFieldRenderer', () => {
     expect(actionsRail).not.toHaveClass('mt-1')
   })
 
-  it('lays out compact inline rows on a dedicated grid with embedded actions', async () => {
+  it('lays out compact inline rows on the shared anatomy grid with embedded actions', async () => {
     const compactRowFields: FormItem[] = [
       {
         kind: 'array',
@@ -1244,14 +1244,16 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-inline-row]')
-    expect(compactRow).toBeInTheDocument()
-    expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
+    const inlineRow = document.querySelector('[data-array-item-anatomy-inline-row]')
+    expect(inlineRow).toBeInTheDocument()
+    const anatomyGrid = document.querySelector('[data-array-item-anatomy-grid]')
+    expect(anatomyGrid).toBeInTheDocument()
+    expect(anatomyGrid?.querySelector('[data-field-row-anatomy]')).toBeNull()
 
-    const actionsRail = compactRow!.querySelector('[aria-label="Item actions"]')
+    const actionsRail = anatomyGrid!.querySelector('[aria-label="Item actions"]')
     expect(actionsRail).toBeInTheDocument()
     expect(actionsRail).not.toHaveClass('mt-1')
-    expect(actionsRail).toHaveClass('justify-self-end')
+    expect(actionsRail?.closest('[data-array-item-anatomy-actions]')).toBeInTheDocument()
   })
 
   it('honors FieldRow width tokens inside compact inline rows', async () => {
@@ -1304,8 +1306,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-inline-row]')
-    expect(compactRow?.querySelector('[data-field-row]')).toBeInTheDocument()
+    expect(document.querySelector('[data-array-item-anatomy-grid]')).toBeInTheDocument()
 
     expect(
       screen.getByRole('textbox', { name: 'Description' }).closest('[data-field-row-participant]'),
@@ -1315,7 +1316,7 @@ describe('ArrayFieldRenderer', () => {
     ).toHaveClass('w-fit')
   })
 
-  it('top-aligns unlabeled compact inline grip and actions with the anatomy field row by default', () => {
+  it('centers unlabeled compact inline grip and actions in the shared anatomy grid cell', () => {
     const centeredCompactRowFields: FormItem[] = [
       {
         kind: 'array',
@@ -1351,15 +1352,12 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    const compactRow = document.querySelector('[data-compact-inline-row]')
-    expect(compactRow).toHaveAttribute('data-compact-inline-align', 'start')
-    expect(compactRow).toHaveClass('items-start')
+    expect(document.querySelector('[data-array-item-anatomy-inline-row]')).toBeInTheDocument()
+    expect(document.querySelector('[data-array-item-anatomy-grid]')).toBeInTheDocument()
+    expect(document.querySelector('[data-field-row-anatomy]')).toBeNull()
 
-    const gripColumn = compactRow?.firstElementChild?.nextElementSibling
-    expect(gripColumn).toHaveClass('self-start')
-
-    const actionsColumn = compactRow?.querySelector('[aria-label="Item actions"]')?.parentElement
-    expect(actionsColumn).toHaveClass('self-start')
+    expect(document.querySelector('[data-array-item-anatomy-grip]')).toHaveClass('items-center')
+    expect(document.querySelector('[data-array-item-anatomy-actions]')).toHaveClass('items-center')
   })
 
   it('shows issue badge, row summary, and legend link after failed submit', async () => {
@@ -1840,8 +1838,8 @@ describe('ArrayFieldRenderer', () => {
         const flatShell = document.querySelector('[data-array-item-flat-no-header]')
         expect(flatShell).toBeInTheDocument()
         expect(flatShell).toHaveAttribute('data-array-item-content-layout', 'inline')
-        expect(document.querySelector('[data-compact-inline-row]')).toBeInTheDocument()
-        expect(document.querySelector('[data-compact-inline-align="start"]')).toBeInTheDocument()
+        expect(document.querySelector('[data-array-item-anatomy-inline-row]')).toBeInTheDocument()
+        expect(document.querySelector('[data-array-item-anatomy-grid]')).toBeInTheDocument()
 
         unmount()
       }
@@ -1874,17 +1872,21 @@ describe('ArrayFieldRenderer', () => {
       )
 
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
-      const flatRow = document.querySelector('[data-compact-inline-row]')
-      expect(flatRow).toHaveStyle({ gridTemplateColumns: 'auto minmax(0, 1fr) max-content' })
-      expect(flatRow?.querySelector('[aria-hidden="true"][class*="opacity-0"]')).toBeInTheDocument()
+      const anatomyGrid = document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement
+      expect(anatomyGrid).toBeInTheDocument()
+      expect(anatomyGrid.style.gridTemplateColumns).toContain('var(--leading-chrome-size)')
+      expect(
+        anatomyGrid.querySelector('[aria-hidden="true"][class*="opacity-0"]'),
+      ).toBeInTheDocument()
 
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
       expect(screen.getAllByLabelText(/Drag to reorder/i)).toHaveLength(2)
 
       await user.click(screen.getAllByRole('button', { name: /Remove/i })[1]!)
-      expect(document.querySelector('[data-compact-inline-row]')).toHaveStyle({
-        gridTemplateColumns: 'auto minmax(0, 1fr) max-content',
-      })
+      expect(
+        (document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement).style
+          .gridTemplateColumns,
+      ).toContain('var(--leading-chrome-size)')
     })
   })
 })

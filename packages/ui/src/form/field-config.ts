@@ -1212,9 +1212,6 @@ export interface ColumnsConfig {
 /** Layout profile for repeatable array item chrome. */
 export type ArrayItemVariant = 'auto' | 'compact' | 'detailed'
 
-/** Vertical alignment for compact inline rows (grip, fields, embedded actions). */
-export type ArrayCompactInlineAlign = 'start' | 'center' | 'control-edge'
-
 /** How array items may be reordered. Defaults to `dragHandle`. */
 export type ArrayItemReorder = false | 'dragHandle'
 
@@ -1323,7 +1320,6 @@ export interface ArrayItemConfig {
   headerVisibility?: ArrayItemHeaderVisibility
   collapsible?: boolean
   collapseKey?: string
-  inlineAlign?: ArrayCompactInlineAlign
   /** @default dragHandle */
   reorder?: ArrayItemReorder
   /** @default true */
