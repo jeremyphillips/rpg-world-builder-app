@@ -77,9 +77,9 @@ describe('ClassFeaturesTab', () => {
 
   it('renders structured meta for each row', () => {
     render(<TabShell features={[rage]} />)
-    expect(
-      within(screen.getByRole('navigation', { name: 'Features' })).getByText('Level 1 · Homebrew'),
-    ).toBeInTheDocument()
+    const list = within(screen.getByRole('navigation', { name: 'Features' }))
+    expect(list.getByText('Level 1')).toBeInTheDocument()
+    expect(list.getByText('Homebrew')).toBeInTheDocument()
   })
 
   it('selects another feature when its row is clicked', async () => {

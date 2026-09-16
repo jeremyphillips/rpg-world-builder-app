@@ -14,19 +14,18 @@ export const masterDetailEditorIdentityClasses = cn(
   masterDetailRailBorderClasses,
 )
 
-/** Validation banner inset above the identity header. */
-export const masterDetailEditorValidationBannerClasses = cn(
-  'border-b px-4 py-3',
-  masterDetailRailBorderClasses,
-)
-
 export const masterDetailEditorIdentityCopyClasses = 'min-w-0 space-y-0.5'
 
 export const masterDetailEditorTitleClasses = 'truncate text-lg font-medium text-foreground'
 
 export const masterDetailEditorMetaClasses = 'truncate text-xs text-muted-foreground'
 
-export const masterDetailEditorAvailabilityClasses = 'pt-0.5'
+/** Availability and selected-row issue summary share one header row (~24px gap). */
+export const masterDetailEditorStatusRowClasses =
+  'flex flex-wrap items-center gap-x-6 pt-0.5 text-xs'
+
+export const masterDetailEditorIssueSummaryClasses =
+  'inline-flex min-w-0 items-center gap-1 font-medium text-destructive-muted'
 
 export const masterDetailEditorBodyClasses = 'px-4 py-4'
 

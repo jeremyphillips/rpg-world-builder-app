@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '../../components/ui/badge'
+import { ValidationIssueCountBadge } from '../../components/ui/validation-issue-count-badge.client'
 
 function tabIssueAttentionLabel(count: number): string {
   return `${count} ${count === 1 ? 'field needs' : 'fields need'} attention`
@@ -16,15 +16,7 @@ export function TabbedFormTabIssueBadge({ count }: TabbedFormTabIssueBadgeProps)
 
   return (
     <>
-      <Badge
-        appearance="soft"
-        tone="destructive"
-        size="sm"
-        aria-hidden
-        className="min-w-5 justify-center px-1 tabular-nums leading-none"
-      >
-        {count}
-      </Badge>
+      <ValidationIssueCountBadge count={count} />
       <span className="sr-only">, {tabIssueAttentionLabel(count)}</span>
     </>
   )

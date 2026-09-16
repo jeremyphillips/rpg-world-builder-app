@@ -1,25 +1,38 @@
 import { Form, makeResolver, prepareFormIssues } from '@rpg/ui/form'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
+import {
+  startingEquipmentOptionFormSchema,
+  startingEquipmentOptionItemFields,
+} from '@/features/content/classes/lib/character-creation/class-starting-equipment-form-fields'
 import { classFeatureItemFields } from '@/features/content/classes/lib/class-feature-form-fields'
 import {
   buildSubclassFields,
   subclassFormSchema,
 } from '@/features/content/classes/lib/subclasses/subclass-form-fields'
 import { makeContentFormCtx } from '@/features/content/lib/fixtures/content-form-ctx'
+import { heritageOptionItemFields } from '@/features/content/species/lib/species-trait-form-fields'
+import { heritageDraftFormSchema } from '@/features/content/species/lib/species-heritage-form-fields'
 import { traitItemFields } from '@/features/content/species/lib/species-trait-form-fields'
 
 import { GRANT_TYPE_LABELS, grantRowFormSchema } from './grant-form-schema'
 
-let readFormValues: (() => unknown) | undefined
+const formValuesCapture = vi.hoisted(() => ({
+  read: undefined as (() => unknown) | undefined,
+}))
 
 function CaptureFormValues() {
   const { getValues } = useFormContext()
-  readFormValues = getValues
+
+  useEffect(() => {
+    formValuesCapture.read = getValues
+  }, [getValues])
+
   return null
 }
 
@@ -43,6 +56,12 @@ const classFeatureGrantSchema = z.object({
       grants: z.array(grantRowFormSchema),
     }),
   ),
+})
+
+const heritageGrantSchema = heritageDraftFormSchema
+
+const startingEquipmentGrantSchema = z.object({
+  options: z.array(startingEquipmentOptionFormSchema),
 })
 
 const weaponGrantDefaults = {
@@ -181,6 +200,99 @@ describe('nested grant validation integration', () => {
     )
   })
 
+  it('heritage option grants surface validation without hidden enum noise', async () => {
+    const heritageFields = [
+      {
+        kind: 'array' as const,
+        name: 'options',
+        fields: heritageOptionItemFields(ctx),
+      },
+    ]
+
+    const issues = prepareFormIssues(
+      (
+        await makeResolver(heritageGrantSchema, heritageFields)(
+          {
+            name: 'Elf',
+            options: [
+              {
+                kind: 'custom',
+                name: 'High Elf',
+                grants: [weaponGrantDefaults, movementGrantDefaults],
+              },
+            ],
+          },
+          undefined,
+          { fields: {}, shouldUseNativeValidation: false },
+        )
+      ).errors,
+      heritageFields,
+    )
+
+    const presentationPaths = issues.map((issue) => issue.presentationPath ?? issue.path)
+    expect(presentationPaths).toContain('options.0.grants.0.weaponProficiencySlugs')
+    expect(presentationPaths).toContain('options.0.grants.1.movementFeet')
+    expect(presentationPaths.some((path) => path.includes('language'))).toBe(false)
+    expect(presentationPaths.some((path) => path.includes('senseType'))).toBe(false)
+    expect(presentationPaths.some((path) => path.includes('spellAbility'))).toBe(false)
+  })
+
+  it('starting equipment item grants surface combobox validation on presentation paths', async () => {
+    const user = userEvent.setup()
+    const optionFields = [
+      {
+        kind: 'array' as const,
+        name: 'options',
+        fields: startingEquipmentOptionItemFields(ctx),
+      },
+    ]
+    const invalidOption = {
+      label: 'Standard',
+      items: [
+        {
+          itemKind: 'choice',
+          choose: 1,
+          poolSource: 'explicit',
+          poolEquipmentSlugs: [],
+        },
+      ],
+    }
+
+    render(
+      <Form
+        schema={startingEquipmentGrantSchema}
+        fields={optionFields}
+        defaultValues={{ options: [invalidOption] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('combobox', { name: /equipment/i })).toHaveAttribute(
+        'aria-invalid',
+        'true',
+      )
+    })
+
+    const issues = prepareFormIssues(
+      (
+        await makeResolver(startingEquipmentGrantSchema, optionFields)(
+          { options: [invalidOption] },
+          undefined,
+          { fields: {}, shouldUseNativeValidation: false },
+        )
+      ).errors,
+      optionFields,
+    )
+
+    expect(issues.map((issue) => issue.presentationPath ?? issue.path)).toContain(
+      'options.0.items.0.poolEquipmentSlugs',
+    )
+  })
+
   it('subclass add feature then add grant keeps JSON-serializable schema-shaped values', async () => {
     const user = userEvent.setup()
 
@@ -208,10 +320,10 @@ describe('nested grant validation integration', () => {
     await user.click(screen.getByRole('option', { name: GRANT_TYPE_LABELS.weaponProficiency }))
 
     await waitFor(() => {
-      expect(readFormValues?.()).toBeDefined()
+      expect(formValuesCapture.read?.()).toBeDefined()
     })
 
-    const latestValues = readFormValues?.()
+    const latestValues = formValuesCapture.read?.()
     expect(() => JSON.stringify(latestValues)).not.toThrow()
 
     const values = latestValues as {

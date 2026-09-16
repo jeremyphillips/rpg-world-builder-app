@@ -28,7 +28,7 @@ export interface NestedResourceMasterDetailEditorProps {
   countSupplement?: ReactNode
   selectedIdentity?: MasterDetailEditorIdentity
   onDelete?: () => void
-  showValidationBanner?: boolean
+  invalidItemCount?: number
   renderDetail: (ctx: { rowId: string }) => ReactNode
   leadingContent?: ReactNode
   deleteDialog?: ReactNode
@@ -51,7 +51,7 @@ export function NestedResourceMasterDetailEditor({
   countSupplement,
   selectedIdentity,
   onDelete,
-  showValidationBanner = false,
+  invalidItemCount,
   renderDetail,
   leadingContent,
   deleteDialog,
@@ -72,7 +72,6 @@ export function NestedResourceMasterDetailEditor({
         itemNoun={itemNoun}
         selectedIdentity={selectedIdentity}
         onDelete={onDelete}
-        showValidationBanner={showValidationBanner}
       >
         {renderDetail({ rowId: selectedRowId })}
       </MasterDetailEditorShell>
@@ -92,6 +91,7 @@ export function NestedResourceMasterDetailEditor({
         onAdd={onAdd}
         onSelect={handleSelect}
         countSupplement={countSupplement}
+        invalidItemCount={invalidItemCount}
       />
       {detailColumn}
     </MasterDetailGrid>

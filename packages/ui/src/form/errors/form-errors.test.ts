@@ -278,6 +278,22 @@ describe('countInvalidArrayItems', () => {
 
     expect(countInvalidArrayItems(issues, 'startingWealth.tiers')).toBe(2)
   })
+
+  it('counts nested grant rows relative to the inner array path', () => {
+    const issues = flattenFormIssues({
+      traits: [
+        {
+          grants: [
+            { weaponProficiencySlugs: { type: 'custom', message: 'Required' } },
+            { movementFeet: { type: 'custom', message: 'Required' } },
+          ],
+        },
+      ],
+    } as unknown as FieldErrors)
+
+    expect(countInvalidArrayItems(issues, 'traits.0.grants')).toBe(2)
+    expect(countInvalidArrayItems(issues, 'traits')).toBe(1)
+  })
 })
 
 describe('countIssuesForArrayPath', () => {

@@ -42,7 +42,7 @@ export function masterDetailListRowClasses(options: {
   const active = options.active !== false
 
   return cn(
-    'relative flex w-full flex-col items-start gap-0.5 border-0 py-2.5 pl-5 pr-3 text-left transition-colors',
+    'relative flex w-full items-center gap-2 border-0 py-2.5 pl-5 pr-3 text-left transition-colors',
     interactiveFocusVariants({ context: 'standalone' }),
     interactiveRowVariants({
       interaction: 'hoverable',
@@ -58,9 +58,21 @@ export function masterDetailListRowClasses(options: {
   )
 }
 
+export const masterDetailListRowContentClasses =
+  'flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left'
+
+export const masterDetailListRowEyebrowClasses = 'min-w-0 truncate text-xs text-muted-foreground'
+
 export const masterDetailListRowTitleClasses =
   'min-w-0 truncate text-sm font-medium text-foreground'
 
+export const masterDetailListRowSourceClasses = 'min-w-0 truncate text-xs text-muted-foreground'
+
+export const masterDetailListRowMetadataClasses = 'flex min-w-0 items-center'
+
+export const masterDetailListRowEndClasses = 'flex shrink-0 self-center text-muted-foreground'
+
+/** @deprecated List rows render structured meta; detail identity still joins for subtitles. */
 export const masterDetailListRowMetaClasses = 'min-w-0 truncate text-xs text-muted-foreground'
 
 export const masterDetailListRowAvailabilityClasses = 'min-w-0'
@@ -69,9 +81,12 @@ export const masterDetailListEmptyClasses = 'px-3 py-4 text-sm text-muted-foregr
 
 /** Stable availability count row below the list header. */
 export const masterDetailListCountSupplementClasses = cn(
-  'flex shrink-0 flex-wrap items-center gap-x-1 border-b px-3 py-1.5 text-xs text-muted-foreground',
+  'flex shrink-0 items-center justify-between gap-2 border-b px-3 py-1.5 text-xs text-muted-foreground',
   masterDetailRailBorderClasses,
 )
+
+export const masterDetailListCountSupplementCopyClasses =
+  'min-w-0 flex flex-wrap items-center gap-x-1'
 
 /** Scroll boundary shell for the item list — pairs with {@link masterDetailListScrollViewportClasses}. */
 export const masterDetailListScrollRegionClasses = scrollBoundaryRegionRootClasses

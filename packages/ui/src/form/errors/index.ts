@@ -17,6 +17,7 @@ export {
   sortFormIssues,
   countInvalidArrayItems,
   countIssuesForArrayPath,
+  resolveDirectArrayItemIndex,
   indexArrayItemIssues,
   findArraySectionForIssue,
   buildFieldSummaryText,

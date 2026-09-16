@@ -889,6 +889,10 @@ export {
   type BadgeTone,
 } from './components/ui/badge'
 export {
+  ValidationIssueCountBadge,
+  type ValidationIssueCountBadgeProps,
+} from './components/ui/validation-issue-count-badge.client'
+export {
   Chip,
   type ChipProps,
   type ChipSelectableProps,

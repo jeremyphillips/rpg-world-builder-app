@@ -3,7 +3,10 @@ import { FormProvider, useForm } from 'react-hook-form'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import type { UseMasterDetailArrayResult } from '../../../lib/master-detail/use-master-detail-array'
-import { MasterDetailEditorPanel } from '../master-detail-editor-panel'
+import {
+  MasterDetailEditorPanel,
+  type MasterDetailEditorIdentity,
+} from '../master-detail-editor-panel'
 
 const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name', required: true }]
 
@@ -35,10 +38,10 @@ const unselectedEditor: UseMasterDetailArrayResult = {
 
 function PanelStory({
   editor,
-  showValidationBanner,
+  selectedIdentity,
 }: {
   editor: UseMasterDetailArrayResult
-  showValidationBanner: boolean
+  selectedIdentity?: MasterDetailEditorIdentity
 }) {
   const form = useForm({
     defaultValues: { traits: [{ name: 'Rage' }, { name: 'Reckless Attack' }] },
@@ -51,12 +54,13 @@ function PanelStory({
         fieldName="traits"
         idPrefix="class-feature"
         itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
-        selectedIdentity={{
-          title: 'Rage',
-          meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
-          deletable: true,
-        }}
-        showValidationBanner={showValidationBanner}
+        selectedIdentity={
+          selectedIdentity ?? {
+            title: 'Rage',
+            meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+            deletable: true,
+          }
+        }
       />
     </FormProvider>
   )
@@ -71,13 +75,23 @@ export default meta
 type Story = StoryObj
 
 export const SelectedRow: Story = {
-  render: () => <PanelStory editor={selectedEditor} showValidationBanner={false} />,
+  render: () => <PanelStory editor={selectedEditor} />,
+}
+
+export const SelectedRowWithIssues: Story = {
+  render: () => (
+    <PanelStory
+      editor={selectedEditor}
+      selectedIdentity={{
+        title: 'Rage',
+        meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+        deletable: true,
+        issueCount: 2,
+      }}
+    />
+  ),
 }
 
 export const EmptySelection: Story = {
-  render: () => <PanelStory editor={unselectedEditor} showValidationBanner={false} />,
-}
-
-export const ValidationBanner: Story = {
-  render: () => <PanelStory editor={unselectedEditor} showValidationBanner />,
+  render: () => <PanelStory editor={unselectedEditor} selectedIdentity={undefined} />,
 }

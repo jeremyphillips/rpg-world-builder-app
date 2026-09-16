@@ -175,3 +175,29 @@ export const Empty: Story = {
     onSelect: () => {},
   },
 }
+
+export const WithValidationIssues: Story = {
+  args: {
+    items: [
+      {
+        id: 'a',
+        title: 'Unnamed Trait',
+        meta: { eyebrow: 'Grant', sourceLabel: 'Homebrew' },
+        issueCount: 2,
+        hasError: true,
+      },
+      {
+        id: 'b',
+        title: 'Darkvision',
+        meta: { eyebrow: 'Grant', sourceLabel: 'System' },
+      },
+    ],
+    selectedIndex: 0,
+    listTitle: 'Traits',
+    ariaLabel: 'Traits',
+    addLabel: 'Add trait',
+    itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
+    onAdd: () => {},
+    onSelect: () => {},
+  },
+}

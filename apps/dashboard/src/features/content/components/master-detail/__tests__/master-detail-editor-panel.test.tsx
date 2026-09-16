@@ -68,13 +68,27 @@ describe('MasterDetailEditorPanel', () => {
         idPrefix="species-trait"
         itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={selectedIdentity}
-        showValidationBanner={false}
       />,
     )
 
     expect(screen.getByText('Rage')).toBeInTheDocument()
     expect(screen.getByText('Level 1 · System')).toBeInTheDocument()
     expect(screen.getByTestId('detail-form')).toHaveTextContent('traits.0')
+  })
+
+  it('renders selected-row issue count inline in the identity header', () => {
+    render(
+      <PanelShell
+        editor={makeEditor()}
+        itemFields={itemFields}
+        fieldName="traits"
+        idPrefix="species-trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
+        selectedIdentity={{ ...selectedIdentity, issueCount: 2 }}
+      />,
+    )
+
+    expect(screen.getByText('2 issues')).toBeInTheDocument()
   })
 
   it('opens delete through the overflow menu', async () => {
@@ -89,7 +103,6 @@ describe('MasterDetailEditorPanel', () => {
         idPrefix="species-trait"
         itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={selectedIdentity}
-        showValidationBanner={false}
       />,
     )
 
@@ -108,7 +121,6 @@ describe('MasterDetailEditorPanel', () => {
         idPrefix="species-trait"
         itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={{ ...selectedIdentity, deletable: false }}
-        showValidationBanner={false}
       />,
     )
 
@@ -123,7 +135,6 @@ describe('MasterDetailEditorPanel', () => {
         fieldName="traits"
         idPrefix="species-trait"
         itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
-        showValidationBanner={false}
       />,
     )
 
@@ -136,24 +147,6 @@ describe('MasterDetailEditorPanel', () => {
     expect(screen.queryByTestId('detail-form')).not.toBeInTheDocument()
   })
 
-  it('hides the empty-selection state when the validation banner is visible', () => {
-    render(
-      <PanelShell
-        editor={makeEditor({ selectedIndex: null, selectedFieldId: null })}
-        itemFields={itemFields}
-        fieldName="traits"
-        idPrefix="species-trait"
-        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
-        showValidationBanner
-      />,
-    )
-
-    expect(screen.getByRole('alert')).toBeInTheDocument()
-    expect(
-      screen.queryByText(masterDetailEmptySelectionHeading(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
-    ).not.toBeInTheDocument()
-  })
-
   itAxe('has no axe accessibility violations when a row is selected', async () => {
     const { container } = render(
       <PanelShell
@@ -163,7 +156,6 @@ describe('MasterDetailEditorPanel', () => {
         idPrefix="species-trait"
         itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
         selectedIdentity={selectedIdentity}
-        showValidationBanner={false}
       />,
     )
 

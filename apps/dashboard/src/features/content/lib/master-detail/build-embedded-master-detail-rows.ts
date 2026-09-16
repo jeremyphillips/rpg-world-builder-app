@@ -33,9 +33,9 @@ export type BuildEmbeddedMasterDetailRowsParams = {
     index: number
     row: unknown
     entitySource: ContentFormCtx['entitySource']
-    hasRowError: (index: number) => boolean
+    getRowIssueCount: (index: number) => number
   }) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
-  hasRowError: (index: number) => boolean
+  getRowIssueCount: (index: number) => number
   seedRowIds?: ReadonlySet<string>
   resolveRowReasons?: (ctx: {
     row: unknown
@@ -74,7 +74,7 @@ export function buildEmbeddedMasterDetailRows({
   showDelete,
   access,
   mapListItem,
-  hasRowError,
+  getRowIssueCount,
   seedRowIds,
   resolveRowReasons,
 }: BuildEmbeddedMasterDetailRowsParams): EmbeddedMasterDetailRow[] {
@@ -85,7 +85,7 @@ export function buildEmbeddedMasterDetailRows({
       index: formIndex,
       row,
       entitySource: formCtx.entitySource,
-      hasRowError,
+      getRowIssueCount,
     })
     const extraReasons =
       resolveRowReasons?.({
@@ -99,7 +99,7 @@ export function buildEmbeddedMasterDetailRows({
       row: row as { id?: string } | undefined,
       entitySource: formCtx.entitySource,
       seedRowIds,
-      hasRowError,
+      getRowIssueCount,
       title: masterDetailItemTitle(listDisplay.title, itemNoun),
       eyebrow: listDisplay.eyebrow,
       showDelete,

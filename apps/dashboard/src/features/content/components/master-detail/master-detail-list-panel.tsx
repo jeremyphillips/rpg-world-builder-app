@@ -1,23 +1,18 @@
-import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { Plus } from 'lucide-react'
-import { Button, InlineInactiveStatus, ScrollBoundaryRegion, Text } from '@rpg/ui'
+import { Button, ScrollBoundaryRegion, Text, ValidationIssueCountBadge } from '@rpg/ui'
 
 import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
-import {
-  joinMasterDetailItemMeta,
-  type MasterDetailItemMeta,
-} from '../../lib/master-detail/master-detail-item-meta'
+import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
+import { MasterDetailListRow } from './master-detail-list-row'
 import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
   masterDetailListCountSupplementClasses,
+  masterDetailListCountSupplementCopyClasses,
   masterDetailListEmptyClasses,
   masterDetailListHeaderClasses,
   masterDetailListItemsClasses,
-  masterDetailListRowClasses,
-  masterDetailListRowAvailabilityClasses,
-  masterDetailListRowMetaClasses,
-  masterDetailListRowTitleClasses,
   masterDetailListScrollRegionClasses,
   masterDetailListScrollViewportClasses,
   masterDetailListShellClasses,
@@ -31,8 +26,10 @@ export interface MasterDetailListItem {
   id: string
   /** Display label for the row. */
   title: string
-  /** Structured subtitle parts joined with ` · ` for display. */
+  /** Structured subtitle parts for list row content and detail identity. */
   meta?: MasterDetailItemMeta
+  /** Unique presentation-path issue count for the row; badge omitted when zero. */
+  issueCount?: number
   /** When true, surfaces a validation error indicator on the row. */
   hasError?: boolean
   /** When false, row uses inactive styling. Defaults to `true`. */
@@ -56,48 +53,8 @@ export interface MasterDetailListPanelProps {
   onSelect: (index: number) => void
   /** Optional stable availability count row rendered below the list header. */
   countSupplement?: ReactNode
-}
-
-interface MasterDetailListRowProps {
-  item: MasterDetailListItem
-  index: number
-  isSelected: boolean
-  onSelect: (index: number) => void
-  selectedRowRef?: RefObject<HTMLButtonElement | null>
-}
-
-function MasterDetailListRow({
-  item,
-  index,
-  isSelected,
-  onSelect,
-  selectedRowRef,
-}: MasterDetailListRowProps) {
-  const active = item.active !== false
-  const metaLine = item.meta ? joinMasterDetailItemMeta(item.meta) : undefined
-
-  return (
-    <li>
-      <button
-        ref={isSelected ? selectedRowRef : undefined}
-        type="button"
-        aria-current={isSelected ? 'true' : undefined}
-        aria-invalid={item.hasError ? true : undefined}
-        onClick={() => onSelect(index)}
-        className={masterDetailListRowClasses({ active, isSelected })}
-      >
-        {metaLine ? <span className={masterDetailListRowMetaClasses}>{metaLine}</span> : null}
-        <span className={masterDetailListRowTitleClasses}>{item.title}</span>
-        {item.availabilityStatusLabel ? (
-          <InlineInactiveStatus
-            label={item.availabilityStatusLabel}
-            className={masterDetailListRowAvailabilityClasses}
-          />
-        ) : null}
-        {item.hasError ? <span className="sr-only">Has validation errors</span> : null}
-      </button>
-    </li>
-  )
+  /** Count of visible list rows with validation issues (not total issue count). */
+  invalidItemCount?: number
 }
 
 function resolveSelectedItemId(
@@ -129,6 +86,7 @@ export function MasterDetailListPanel({
   onAdd,
   onSelect,
   countSupplement,
+  invalidItemCount = 0,
 }: MasterDetailListPanelProps) {
   const emptyLabel = masterDetailEmptyListLabel(itemNoun)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -176,8 +134,15 @@ export function MasterDetailListPanel({
         </Button>
       </div>
 
-      {countSupplement ? (
-        <div className={masterDetailListCountSupplementClasses}>{countSupplement}</div>
+      {countSupplement || invalidItemCount > 0 ? (
+        <div className={masterDetailListCountSupplementClasses}>
+          {countSupplement ? (
+            <div className={masterDetailListCountSupplementCopyClasses}>{countSupplement}</div>
+          ) : (
+            <span aria-hidden />
+          )}
+          {invalidItemCount > 0 ? <ValidationIssueCountBadge count={invalidItemCount} /> : null}
+        </div>
       ) : null}
 
       {items.length === 0 ? (

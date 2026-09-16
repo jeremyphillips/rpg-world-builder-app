@@ -67,14 +67,16 @@ export function ArrayFieldLegend({
 
   return (
     <legend className={legendClassName}>
-      {legendLabel}
-      <ArrayLegendIssueLink
-        issueCount={arrayIssueCount}
-        invalidRowCount={invalidRowCount}
-        hasContainerIssue={hasContainerIssue}
-        sectionLabel={legend}
-        onPress={onFocusFirstArrayIssue}
-      />
+      <span className={arrayFieldLegendInlineLabelClasses}>
+        {legendLabel}
+        <ArrayLegendIssueLink
+          issueCount={arrayIssueCount}
+          invalidRowCount={invalidRowCount}
+          hasContainerIssue={hasContainerIssue}
+          sectionLabel={legend}
+          onPress={onFocusFirstArrayIssue}
+        />
+      </span>
     </legend>
   )
 }
