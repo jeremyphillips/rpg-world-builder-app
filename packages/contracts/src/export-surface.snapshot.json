@@ -1321,6 +1321,7 @@
     "formatMovementDisplay",
     "formatMovementGrantAuthoringSummary",
     "formatMovementGrantCompact",
+    "formatMovementGrantMetadataDetail",
     "formatMovementGrantSentence",
     "formatPerProjectileDamageLine",
     "formatProficiencyChoiceEmptyMessage",

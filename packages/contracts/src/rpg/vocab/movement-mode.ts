@@ -315,6 +315,19 @@ function formatMovementGrantModeCompactLabel(mode: MovementMode): string {
   return `${getMovementModeLabel(mode)} speed`
 }
 
+/** Metadata detail for grant row headers: "Walk +5 ft", "Burrow 20 ft", "Climb = walk". */
+export function formatMovementGrantMetadataDetail(grant: MovementGrantPayload): string {
+  const modeLabel = getMovementModeLabel(grant.mode)
+  switch (grant.operation) {
+    case 'set':
+      return `${modeLabel} ${grant.feet} ft`
+    case 'increase':
+      return `${modeLabel} +${grant.feet} ft`
+    case 'match':
+      return `${modeLabel} = ${getMovementModeLabel(grant.matchMode).toLowerCase()}`
+  }
+}
+
 /** Compact summary label: "Walk speed +5 ft", "Burrow speed 20 ft", etc. */
 export function formatMovementGrantCompact(grant: MovementGrantPayload): string {
   const modeLabel = formatMovementGrantModeCompactLabel(grant.mode)

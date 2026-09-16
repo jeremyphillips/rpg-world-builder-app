@@ -19,22 +19,22 @@ import {
 } from './proficiency-grant-form-fields'
 import {
   armorTrainingGrantFromFormRow,
+  armorTrainingGrantDetail,
   armorTrainingGrantSummary,
-  armorTrainingGrantTitle,
   armorTrainingGrantToFormRow,
   armorTrainingPoolFromFormRow,
   armorTrainingPoolToFormRow,
   skillProficiencyGrantFromFormRow,
-  skillProficiencyGrantTitle,
+  skillProficiencyGrantDetail,
   skillProficiencyGrantToFormRow,
+  toolProficiencyGrantDetail,
   toolProficiencyGrantFromFormRow,
-  toolProficiencyGrantTitle,
   toolProficiencyGrantToFormRow,
   toolProficiencyPoolFromFormRow,
   toolProficiencyPoolToFormRow,
   weaponProficiencyGrantFromFormRow,
+  weaponProficiencyGrantDetail,
   weaponProficiencyGrantSummary,
-  weaponProficiencyGrantTitle,
   weaponProficiencyGrantToFormRow,
   weaponProficiencyPoolFromFormRow,
   weaponProficiencyPoolToFormRow,
@@ -192,65 +192,60 @@ describe('armorTrainingPoolToFormRow / armorTrainingPoolFromFormRow', () => {
   })
 })
 
-describe('proficiency grant titles and summaries', () => {
+describe('proficiency grant details and summaries', () => {
   const weaponOptions = [
     { value: 'longsword', label: 'Longsword' },
     { value: 'shortbow', label: 'Shortbow' },
     { value: 'rapier', label: 'Rapier' },
   ]
 
-  it('formats specific weapon titles and summaries from mocks', () => {
+  it('formats specific weapon details and summaries from mocks', () => {
     const row: WeaponProficiencyItemForm = {
       proficiencySource: 'specific',
       weaponProficiencySlugs: ['longsword', 'shortbow'],
     }
-    expect(weaponProficiencyGrantTitle(row, 0, weaponOptions)).toBe(
-      'Weapon proficiency — Longsword and Shortbow',
-    )
+    expect(weaponProficiencyGrantDetail(row, weaponOptions)).toBe('Longsword, Shortbow')
     expect(weaponProficiencyGrantSummary(row, weaponOptions)).toBe(
       'Character gains proficiency with Longsword and Shortbow.',
     )
   })
 
-  it('formats category weapon titles and summaries from mocks', () => {
+  it('formats category weapon details and summaries from mocks', () => {
     const row: WeaponProficiencyItemForm = {
       proficiencySource: 'category',
       weaponProficiencyCategories: ['simple'],
     }
-    expect(weaponProficiencyGrantTitle(row, 0)).toBe('Weapon proficiency — Simple Weapon')
+    expect(weaponProficiencyGrantDetail(row)).toBe('Simple weapons')
     expect(weaponProficiencyGrantSummary(row)).toBe(
       'Character gains proficiency with all simple weapons.',
     )
   })
 
-  it('formats pool weapon titles and summaries from mocks', () => {
+  it('formats pool weapon details and summaries from mocks', () => {
     const row: WeaponProficiencyItemForm = {
       proficiencySource: 'pool',
       choose: 2,
       poolSource: 'filtered',
       weaponProficiencyPoolCategory: 'simple',
     }
-    expect(weaponProficiencyGrantTitle(row, 0)).toBe(
-      'Weapon proficiency — choose 2 weapon proficiencies from simple weapons',
-    )
+    expect(weaponProficiencyGrantDetail(row)).toBe('2 from simple weapons')
     expect(weaponProficiencyGrantSummary(row)).toBe(
       'Character chooses 2 weapon proficiencies from simple weapons.',
     )
   })
 
-  it('truncates explicit pool titles when more than two items are listed', () => {
+  it('formats explicit pool details when more than two items are listed', () => {
     expect(
-      weaponProficiencyGrantTitle(
+      weaponProficiencyGrantDetail(
         {
           proficiencySource: 'pool',
           choose: 1,
           poolSource: 'explicit',
           weaponProficiencyPoolSlugs: ['longsword', 'rapier', 'shortbow'],
         },
-        0,
         weaponOptions,
       ),
-    ).toBe('Weapon proficiency — choose 1 from selected weapons')
+    ).toBe('1 from selected weapons')
   })
 
   it('returns an empty summary for incomplete specific rows', () => {
@@ -262,19 +257,22 @@ describe('proficiency grant titles and summaries', () => {
     ).toBe('')
   })
 
-  it('formats tool pool titles', () => {
+  it('formats tool pool details', () => {
     expect(
-      toolProficiencyGrantTitle({ proficiencySource: 'pool', choose: 3, poolSource: 'any' }, 0),
-    ).toBe('Tool proficiency — choose 3 from any tools')
+      toolProficiencyGrantDetail({ proficiencySource: 'pool', choose: 3, poolSource: 'any' }),
+    ).toBe('3 from any tool')
   })
 
-  it('formats skill specific titles from skill labels', () => {
+  it('formats skill specific details from skill labels', () => {
     expect(
-      skillProficiencyGrantTitle(
+      skillProficiencyGrantDetail(
         { proficiencySource: 'specific', skillProficiencyIds: ['athletics', 'stealth'] },
-        0,
+        [
+          { value: 'athletics', label: 'Athletics' },
+          { value: 'stealth', label: 'Stealth' },
+        ],
       ),
-    ).toBe('Skill proficiency — Athletics and Stealth')
+    ).toBe('Athletics, Stealth')
   })
 
   it('formats armor training pool summaries', () => {
@@ -291,18 +289,15 @@ describe('proficiency grant titles and summaries', () => {
     ).toBe('Character chooses 1 armor training from heavy armor.')
   })
 
-  it('formats armor training pool titles', () => {
+  it('formats armor training pool details', () => {
     expect(
-      armorTrainingGrantTitle(
-        {
-          proficiencySource: 'pool',
-          choose: 1,
-          poolSource: 'filtered',
-          armorTrainingPoolCategory: 'heavy',
-        },
-        0,
-      ),
-    ).toBe('Armor training — choose 1 armor training from heavy armor')
+      armorTrainingGrantDetail({
+        proficiencySource: 'pool',
+        choose: 1,
+        poolSource: 'filtered',
+        armorTrainingPoolCategory: 'heavy',
+      }),
+    ).toBe('1 from heavy armor')
   })
 })
 

@@ -18,8 +18,8 @@ import {
   formatResistanceRowSummary,
   formatSenseRowSummary,
   formatSpellRowSummary,
-  formatSpellRowTitle,
   grantItemFields,
+  resolveGrantRowPresentation,
   GRANT_TYPE_MISSING_PRIMARY,
   type GrantRowHeaderContext,
 } from './grant-form-fields'
@@ -396,29 +396,6 @@ describe('grant row type exports', () => {
   })
 })
 
-describe('formatSpellRowTitle', () => {
-  it('shows spell labels when one or two spells are selected', () => {
-    expect(
-      formatSpellRowTitle(
-        ['power-word-heal', 'power-word-kill'],
-        [
-          { value: 'power-word-heal', label: 'Power Word Heal' },
-          { value: 'power-word-kill', label: 'Power Word Kill' },
-        ],
-      ),
-    ).toBe('Power Word Heal, Power Word Kill')
-  })
-
-  it('shows a count when more than two spells are selected', () => {
-    expect(formatSpellRowTitle(['a', 'b', 'c'], [])).toBe('3 spells')
-  })
-
-  it('returns Spells when no spells are selected', () => {
-    expect(formatSpellRowTitle([], [])).toBe('Spells')
-    expect(formatSpellRowTitle(undefined, [])).toBe('Spells')
-  })
-})
-
 describe('grant row summaries', () => {
   it('formats damage, sense, language, and feat rows with shared sentence helpers', () => {
     expect(formatResistanceRowSummary(['poison'])).toBe(
@@ -436,13 +413,25 @@ describe('grant row summaries', () => {
 
   it('formats spell grant summaries from availability and casting toggles', () => {
     expect(
-      formatSpellRowSummary({
-        spellAbility: 'cha',
-        spellCastingEnabled: true,
-        spellCastingFrequency: 'at_will',
-        spellIds: ['dancing-lights'],
-      }),
-    ).toBe('Character can cast dancing-lights at will.')
+      formatSpellRowSummary(
+        {
+          grantType: 'spells',
+          spellAbility: 'cha',
+          spellCastingEnabled: true,
+          spellCastingFrequency: 'at_will',
+          spellIds: ['dancing-lights'],
+        },
+        {
+          rowLabels: GRANT_ROW_TYPE_LABELS,
+          equipmentOptions: [],
+          weaponOptions: [],
+          toolOptions: [],
+          armorOptions: [],
+          skillOptions: [],
+          spellOptions: [{ value: 'dancing-lights', label: 'Dancing Lights' }],
+        },
+      ),
+    ).toBe('Character can cast Dancing Lights at will.')
   })
 })
 
@@ -484,14 +473,14 @@ describe('formatGrantRowSummary', () => {
         },
         grantRowHeaderContext,
       ),
-    ).toBe('Character can cast power-word-heal at will.')
+    ).toBe('Character can cast Power Word Heal at will.')
     expect(formatGrantRowSummary({ grantType: 'spells' }, grantRowHeaderContext)).toBe('')
     expect(formatGrantRowSummary({}, grantRowHeaderContext)).toBe('')
   })
 })
 
 describe('formatGrantRowPrimary', () => {
-  it('dispatches grant types to the matching row title formatter', () => {
+  it('returns grant type headings from presentation', () => {
     expect(
       formatGrantRowPrimary(
         {
@@ -501,7 +490,7 @@ describe('formatGrantRowPrimary', () => {
         0,
         grantRowHeaderContext,
       ),
-    ).toBe('Power Word Heal, Power Word Kill')
+    ).toBe('Spells')
     expect(formatGrantRowPrimary({ grantType: 'movement' }, 0, grantRowHeaderContext)).toBe(
       'Movement',
     )
@@ -515,5 +504,24 @@ describe('formatGrantRowPrimary', () => {
     expect(formatGrantRowPrimary({ grantType: '' }, 0, grantRowHeaderContext)).toBe(
       GRANT_TYPE_MISSING_PRIMARY,
     )
+  })
+})
+
+describe('resolveGrantRowPresentation integration', () => {
+  it('separates heading, detail, and description for spells', () => {
+    const presentation = resolveGrantRowPresentation(
+      {
+        grantType: 'spells',
+        spellAbility: 'cha',
+        spellCastingEnabled: true,
+        spellCastingFrequency: 'at_will',
+        spellIds: ['power-word-heal', 'power-word-kill'],
+      },
+      grantRowHeaderContext,
+    )
+    expect(presentation?.heading).toBe('Spells')
+    expect(presentation?.detail).toBe('Power Word Heal, Power Word Kill')
+    expect(presentation?.description).toContain('Power Word Heal')
+    expect(presentation?.description).not.toContain('power-word-heal')
   })
 })

@@ -7,19 +7,19 @@ describe('projectArrayItemEntitySummary', () => {
     expect(
       projectArrayItemEntitySummary({
         header: {
-          primary: 'Speak with Animals',
+          primary: 'Spells',
           fallback: 'Grant 1',
-          ariaLabel: 'Grants · Speak with Animals',
+          ariaLabel: 'Grants · Spells',
           showDivider: false,
           showFallbackInTitle: false,
           srOnly: false,
         },
         summary: 'Character has Speak with Animals always prepared.',
-        classification: 'Spells',
+        classification: 'Speak with Animals',
       }),
     ).toEqual({
-      heading: 'Speak with Animals',
-      classification: 'Spells',
+      heading: 'Spells',
+      classification: 'Speak with Animals',
       description: 'Character has Speak with Animals always prepared.',
     })
   })
@@ -52,5 +52,21 @@ describe('projectArrayItemEntitySummary', () => {
         classification: 'Movement',
       }),
     ).toEqual({ heading: 'Movement' })
+  })
+
+  it('omits composed classification remnants that repeat the heading', () => {
+    expect(
+      projectArrayItemEntitySummary({
+        header: {
+          primary: 'Armor training',
+          fallback: 'Grant 1',
+          ariaLabel: 'Grants · Armor training',
+          showDivider: false,
+          showFallbackInTitle: false,
+          srOnly: false,
+        },
+        classification: 'Armor training — Medium armor',
+      }),
+    ).toEqual({ heading: 'Armor training' })
   })
 })

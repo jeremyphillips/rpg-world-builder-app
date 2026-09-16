@@ -8,12 +8,7 @@ import {
   SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
-import {
-  toOptions,
-  type ArrayItemShellRenderProps,
-  type FieldVisibility,
-  type FormItem,
-} from '@rpg/ui/form'
+import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import {
   wealthGrantMoneyField,
@@ -21,7 +16,6 @@ import {
 } from '../../../lib/forms/fields/content-economy-form-fields'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { referenceEquipmentFieldOptions } from '../../../lib/form-options/content-field-option.lib'
-import { EntityDisclosureArrayItemShell } from '../../../lib/entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell'
 import {
   equipmentGrantChoiceItemFormSchema,
   equipmentGrantItemFields,
@@ -41,9 +35,9 @@ import {
 } from './class-starting-equipment-form-labels'
 import { ProficiencyLinkedGrantRowCue } from '../../components/character-creation/proficiency-linked-grant-row-cue'
 import {
-  equipmentGrantTitle,
-  equipmentGrantSummary,
-} from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
+  createStartingEquipmentItemShell,
+  resolveStartingEquipmentRowPresentation,
+} from './starting-equipment-row-presentation.lib'
 
 /** Starting equipment validation messages (tier 3 form overrides). */
 export const startingEquipmentValidationMessages = {
@@ -190,13 +184,17 @@ export function startingEquipmentOptionCompactSummary(
   })
 }
 
+/** Compact row detail for starting-equipment items (legacy helper name retained for callers). */
 export function startingEquipmentItemTitle(
   row: StartingEquipmentItemForm | undefined,
-  index: number,
-  equipmentOptions: Parameters<typeof equipmentGrantTitle>[2] = [],
-  proficiencyChoiceOptions: Parameters<typeof equipmentGrantTitle>[3] = [],
-): string {
-  return equipmentGrantTitle(row, index, equipmentOptions, proficiencyChoiceOptions)
+  _index: number,
+  equipmentOptions: FieldOption[] = [],
+  proficiencyChoiceOptions: FieldOption[] = [],
+): string | undefined {
+  return (
+    resolveStartingEquipmentRowPresentation(row, equipmentOptions, proficiencyChoiceOptions)
+      ?.detail ?? undefined
+  )
 }
 
 function visibleForEquipmentGrantTarget(): FieldVisibility {
@@ -310,21 +308,20 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
         collapsible: true,
         header: {
           fallback: (index) => `Item ${index + 1}`,
-          primary: (values, index) =>
-            startingEquipmentItemTitle(
+          primary: (values) =>
+            resolveStartingEquipmentRowPresentation(
               values as StartingEquipmentItemForm | undefined,
-              index,
               equipmentOptions,
               proficiencyChoiceOptions,
-            ),
+            )?.heading,
           summary: (values) =>
-            equipmentGrantSummary(
+            resolveStartingEquipmentRowPresentation(
               values as StartingEquipmentItemForm | undefined,
               equipmentOptions,
-            ),
+              proficiencyChoiceOptions,
+            )?.description ?? '',
         },
-        renderShell: (props: ArrayItemShellRenderProps) =>
-          createElement(EntityDisclosureArrayItemShell, props),
+        renderShell: createStartingEquipmentItemShell(equipmentOptions, proficiencyChoiceOptions),
       },
       fields: startingEquipmentItemFields(ctx),
     },

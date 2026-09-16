@@ -69,7 +69,7 @@ describe('ClassCharacterCreationTab live label sync', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('linked-title')).toHaveTextContent(
-        'Tool selected in "Artisan\'s Tools or Musical Instrument"',
+        'Tool from "Artisan\'s Tools or Musical Instrument"',
       )
     })
     expect(screen.getByTestId('linked-option-label')).toHaveTextContent(
@@ -80,7 +80,7 @@ describe('ClassCharacterCreationTab live label sync', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('linked-title')).toHaveTextContent(
-        'Tool selected in "Renamed Tool Choice"',
+        'Tool from "Renamed Tool Choice"',
       )
     })
     expect(screen.getByTestId('linked-option-label')).toHaveTextContent('Renamed Tool Choice')

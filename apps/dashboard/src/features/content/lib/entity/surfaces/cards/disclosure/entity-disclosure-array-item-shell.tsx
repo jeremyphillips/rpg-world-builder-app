@@ -6,8 +6,10 @@ import { DisclosureEntityCard } from './disclosure-entity-card'
 import { projectArrayItemEntitySummary } from './array-item-entity-summary.lib'
 
 export type EntityDisclosureArrayItemShellProps = ArrayItemShellRenderProps & {
-  /** Optional kind/type label when distinct from the primary heading. */
+  /** Optional metadata label mapped to EntitySummary.classification (muted · suffix). */
   classification?: string
+  /** Overrides default header.ariaLabel for disclosure controls. */
+  toolbarAriaLabel?: string
   density?: 'compact' | 'comfortable'
 }
 
@@ -22,6 +24,7 @@ export function EntityDisclosureArrayItemShell({
   header,
   summary,
   classification,
+  toolbarAriaLabel,
   collapsed,
   onToggleCollapse,
   dragHandleProps,
@@ -39,7 +42,7 @@ export function EntityDisclosureArrayItemShell({
     <div data-array-item-prefix={itemPrefix}>
       <DisclosureEntityCard
         itemId={itemId}
-        toolbarAriaLabel={header.ariaLabel}
+        toolbarAriaLabel={toolbarAriaLabel ?? header.ariaLabel}
         entity={entity}
         trailing={action ? { kind: 'action', content: action as ReactElement } : undefined}
         collapsed={collapsed}

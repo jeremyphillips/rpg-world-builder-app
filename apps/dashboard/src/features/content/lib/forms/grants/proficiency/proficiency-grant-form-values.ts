@@ -10,22 +10,23 @@ import type {
 } from '@rpg/contracts'
 import {
   formatArmorTrainingGrantSentence,
-  formatProficiencyGrantChooseFromAnyScopePhrase,
-  formatProficiencyGrantChooseFromSelectedPhrase,
-  formatProficiencyGrantChoosePhrase,
   formatSkillProficiencyGrantSentence,
   formatToolProficiencyGrantSentence,
   formatWeaponProficiencyGrantSentence,
-  getArmorCategoryLabel,
-  getProficiencyDomainLabel,
+  getArmorCategoryCompactLabel,
+  getArmorCategoryScopeForm,
   getSkillName,
   getToolCategoryLabel,
-  getWeaponCategoryLabel,
+  getWeaponCategoryCompactLabel,
+  getWeaponCategorySentenceForm,
   isMeaningfulToolProficiencyPool,
-  joinNaturalList,
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
+import {
+  formatCompactMetadataList,
+  toSentenceCaseCategoryLabel,
+} from '../grant-compact-metadata.lib'
 import { PROFICIENCY_POOL_CATEGORY_ANY } from './proficiency-grant-form-fields'
 import type {
   ArmorTrainingItemForm,
@@ -37,14 +38,6 @@ import type {
 function categoryFormValueToDomain(value: string | undefined): string | undefined {
   if (!value || value === PROFICIENCY_POOL_CATEGORY_ANY) return undefined
   return value
-}
-
-function grantTypePrefix(grantLabel: string, detail: string): string {
-  return `${grantLabel} — ${detail}`
-}
-
-function choiceSentenceTitleDetail(sentence: string): string {
-  return sentence.replace(/^Character chooses /, 'choose ').replace(/\.$/, '')
 }
 
 type WeaponProficiencyPoolItemForm = Extract<
@@ -186,59 +179,44 @@ export function weaponProficiencyGrantFromFormRow(
   }
 }
 
-function weaponPoolTitleDetail(row: WeaponProficiencyPoolItemForm): string {
+function weaponPoolMetadataDetail(row: WeaponProficiencyPoolItemForm): string | undefined {
   const choose = row.choose ?? 1
   if (row.poolSource === 'filtered') {
     const category = categoryFormValueToDomain(row.weaponProficiencyPoolCategory)
     if (category) {
-      return choiceSentenceTitleDetail(
-        formatWeaponProficiencyGrantSentence({
-          kind: 'choice',
-          choose,
-          pool: {
-            source: 'filtered',
-            weaponCategory: category as Extract<
-              WeaponProficiencyPool,
-              { source: 'filtered' }
-            >['weaponCategory'],
-          },
-        }),
-      )
+      return `${choose} from ${getWeaponCategorySentenceForm(category, 2)}`
     }
-    return formatProficiencyGrantChoosePhrase('weapon', choose)
+    return `${choose} from any weapon`
   }
   if (row.poolSource === 'explicit') {
-    return formatProficiencyGrantChooseFromSelectedPhrase('weapon', choose)
+    return `${choose} from selected weapons`
   }
-  return formatProficiencyGrantChoosePhrase('weapon', choose)
+  return `${choose} from any weapon`
 }
 
-export function weaponProficiencyGrantTitle(
+export function weaponProficiencyGrantDetail(
   row: WeaponProficiencyItemForm | undefined,
-  index: number,
   weaponOptions: FieldOption[] = [],
-): string {
-  if (!row?.proficiencySource) return `${getProficiencyDomainLabel('weapon')} ${index + 1}`
+): string | undefined {
+  if (!row?.proficiencySource) return undefined
 
   if (row.proficiencySource === 'specific') {
     const labels = (row.weaponProficiencySlugs ?? []).map(
       (slug) => weaponOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    if (!labels.length) return `${getProficiencyDomainLabel('weapon')} ${index + 1}`
-    const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} weapons`
-    return grantTypePrefix(getProficiencyDomainLabel('weapon'), detail)
+    if (!labels.length) return undefined
+    return formatCompactMetadataList(labels)
   }
 
   if (row.proficiencySource === 'category') {
     const labels = (row.weaponProficiencyCategories ?? []).map((category) =>
-      getWeaponCategoryLabel(category),
+      getWeaponCategoryCompactLabel(category),
     )
-    if (!labels.length) return `${getProficiencyDomainLabel('weapon')} ${index + 1}`
-    const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} categories`
-    return grantTypePrefix(getProficiencyDomainLabel('weapon'), detail)
+    if (!labels.length) return undefined
+    return formatCompactMetadataList(labels)
   }
 
-  return grantTypePrefix(getProficiencyDomainLabel('weapon'), weaponPoolTitleDetail(row))
+  return weaponPoolMetadataDetail(row)
 }
 
 export function weaponProficiencyGrantSummary(
@@ -369,52 +347,57 @@ export function toolProficiencyGrantFromFormRow(
   }
 }
 
-function toolPoolTitleDetail(row: ToolProficiencyPoolItemForm): string {
-  const choose = row.choose ?? 1
-  if (row.poolSource === 'any')
-    return formatProficiencyGrantChooseFromAnyScopePhrase('tool', choose)
-  if (row.poolSource === 'filtered') {
-    const pool = toolProficiencyPoolFromFormRow(row)
-    if (isMeaningfulToolProficiencyPool(pool)) {
-      return choiceSentenceTitleDetail(
-        formatToolProficiencyGrantSentence({
-          kind: 'choice',
-          choose,
-          pool,
-        }),
-      )
-    }
-    return formatProficiencyGrantChoosePhrase('tool', choose)
+function filteredToolPoolMetadataDetail(row: ToolProficiencyPoolItemForm, choose: number): string {
+  const pool = toolProficiencyPoolFromFormRow(row)
+  if (pool.source !== 'filtered' || !isMeaningfulToolProficiencyPool(pool)) {
+    return `${choose} from any tool`
   }
-  return formatProficiencyGrantChooseFromSelectedPhrase('tool', choose)
+
+  const categories = pool.toolCategories ?? []
+  if (categories.length === 1 && !(pool.toolSlugs?.length ?? 0)) {
+    const categoryLabel = toSentenceCaseCategoryLabel(
+      getToolCategoryLabel(categories[0]!),
+    ).toLowerCase()
+    return `${choose} from ${categoryLabel}`
+  }
+
+  const categoryLabels = categories.map((category) =>
+    toSentenceCaseCategoryLabel(getToolCategoryLabel(category)),
+  )
+  const compact = formatCompactMetadataList(categoryLabels)
+  return compact ? `${choose} from ${compact}` : `${choose} from any tool`
 }
 
-export function toolProficiencyGrantTitle(
+function toolPoolMetadataDetail(row: ToolProficiencyPoolItemForm): string | undefined {
+  const choose = row.choose ?? 1
+  if (row.poolSource === 'any') return `${choose} from any tool`
+  if (row.poolSource === 'filtered') return filteredToolPoolMetadataDetail(row, choose)
+  return `${choose} from selected tools`
+}
+
+export function toolProficiencyGrantDetail(
   row: ToolProficiencyItemForm | undefined,
-  index: number,
   toolOptions: FieldOption[] = [],
-): string {
-  if (!row?.proficiencySource) return `${getProficiencyDomainLabel('tool')} ${index + 1}`
+): string | undefined {
+  if (!row?.proficiencySource) return undefined
 
   if (row.proficiencySource === 'specific') {
     const labels = (row.toolProficiencySlugs ?? []).map(
       (slug) => toolOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    if (!labels.length) return `${getProficiencyDomainLabel('tool')} ${index + 1}`
-    const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} tools`
-    return grantTypePrefix(getProficiencyDomainLabel('tool'), detail)
+    if (!labels.length) return undefined
+    return formatCompactMetadataList(labels)
   }
 
   if (row.proficiencySource === 'category') {
     const labels = (row.toolProficiencyCategories ?? []).map((category) =>
-      getToolCategoryLabel(category),
+      toSentenceCaseCategoryLabel(getToolCategoryLabel(category)),
     )
-    if (!labels.length) return `${getProficiencyDomainLabel('tool')} ${index + 1}`
-    const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} categories`
-    return grantTypePrefix(getProficiencyDomainLabel('tool'), detail)
+    if (!labels.length) return undefined
+    return formatCompactMetadataList(labels)
   }
 
-  return grantTypePrefix(getProficiencyDomainLabel('tool'), toolPoolTitleDetail(row))
+  return toolPoolMetadataDetail(row)
 }
 
 export function toolProficiencyGrantSummary(
@@ -502,45 +485,37 @@ export function skillProficiencyGrantFromFormRow(
   }
 }
 
-function formatSkillPoolTitle(skillIds: string[], skillOptions: FieldOption[] = []): string {
-  const labels = skillIds.map(
-    (id) => skillOptions.find((option) => option.value === id)?.label ?? getSkillName(id),
-  )
-  return labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} skills`
-}
-
-function skillPoolTitleDetail(
+function skillPoolMetadataDetail(
   row: SkillProficiencyPoolItemForm,
   skillOptions: FieldOption[],
-): string {
+): string | undefined {
   const choose = row.choose ?? 1
-  if (row.poolSource === 'any')
-    return formatProficiencyGrantChooseFromAnyScopePhrase('skill', choose)
+  if (row.poolSource === 'any') return `${choose} from any skill`
   const ids = row.skillProficiencyPoolIds ?? []
-  if (!ids.length) return formatProficiencyGrantChoosePhrase('skill', choose)
-  return `choose ${choose} from ${formatSkillPoolTitle(ids, skillOptions)}`
+  if (!ids.length) return `${choose} from selected skills`
+  const labels = ids.map(
+    (id) => skillOptions.find((option) => option.value === id)?.label ?? getSkillName(id),
+  )
+  const compact = formatCompactMetadataList(labels)
+  return compact ? `${choose} from ${compact}` : undefined
 }
 
-export function skillProficiencyGrantTitle(
+export function skillProficiencyGrantDetail(
   row: SkillProficiencyItemForm | undefined,
-  index: number,
   skillOptions: FieldOption[] = [],
-): string {
-  if (!row?.proficiencySource) return `${getProficiencyDomainLabel('skill')} ${index + 1}`
+): string | undefined {
+  if (!row?.proficiencySource) return undefined
 
   if (row.proficiencySource === 'specific') {
     const ids = row.skillProficiencyIds ?? []
-    if (!ids.length) return `${getProficiencyDomainLabel('skill')} ${index + 1}`
-    return grantTypePrefix(
-      getProficiencyDomainLabel('skill'),
-      formatSkillPoolTitle(ids, skillOptions),
+    if (!ids.length) return undefined
+    const labels = ids.map(
+      (id) => skillOptions.find((option) => option.value === id)?.label ?? getSkillName(id),
     )
+    return formatCompactMetadataList(labels)
   }
 
-  return grantTypePrefix(
-    getProficiencyDomainLabel('skill'),
-    skillPoolTitleDetail(row, skillOptions),
-  )
+  return skillPoolMetadataDetail(row, skillOptions)
 }
 
 export function skillProficiencyGrantSummary(
@@ -652,56 +627,41 @@ export function armorTrainingGrantFromFormRow(row: ArmorTrainingItemForm): Armor
   }
 }
 
-function armorPoolTitleDetail(row: ArmorTrainingPoolItemForm): string {
+function armorPoolMetadataDetail(row: ArmorTrainingPoolItemForm): string | undefined {
   const choose = row.choose ?? 1
   if (row.poolSource === 'filtered') {
     const category = categoryFormValueToDomain(row.armorTrainingPoolCategory)
     if (category) {
-      return choiceSentenceTitleDetail(
-        formatArmorTrainingGrantSentence({
-          kind: 'choice',
-          choose,
-          pool: {
-            source: 'filtered',
-            armorCategory: category as Extract<
-              ArmorTrainingPool,
-              { source: 'filtered' }
-            >['armorCategory'],
-          },
-        }),
-      )
+      return `${choose} from ${getArmorCategoryScopeForm(category)}`
     }
-    return formatProficiencyGrantChoosePhrase('armor', choose)
+    return `${choose} from any armor`
   }
-  return formatProficiencyGrantChooseFromSelectedPhrase('armor', choose)
+  return `${choose} from selected armor`
 }
 
-export function armorTrainingGrantTitle(
+export function armorTrainingGrantDetail(
   row: ArmorTrainingItemForm | undefined,
-  index: number,
   armorOptions: FieldOption[] = [],
-): string {
-  if (!row?.proficiencySource) return `${getProficiencyDomainLabel('armor')} ${index + 1}`
+): string | undefined {
+  if (!row?.proficiencySource) return undefined
 
   if (row.proficiencySource === 'specific') {
     const labels = (row.armorTrainingSlugs ?? []).map(
       (slug) => armorOptions.find((option) => option.value === slug)?.label ?? slug,
     )
-    if (!labels.length) return `${getProficiencyDomainLabel('armor')} ${index + 1}`
-    const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} armor`
-    return grantTypePrefix(getProficiencyDomainLabel('armor'), detail)
+    if (!labels.length) return undefined
+    return formatCompactMetadataList(labels)
   }
 
   if (row.proficiencySource === 'category') {
     const labels = (row.armorTrainingCategories ?? []).map((category) =>
-      getArmorCategoryLabel(category),
+      getArmorCategoryCompactLabel(category),
     )
-    if (!labels.length) return `${getProficiencyDomainLabel('armor')} ${index + 1}`
-    const detail = labels.length <= 2 ? joinNaturalList(labels) : `${labels.length} categories`
-    return grantTypePrefix(getProficiencyDomainLabel('armor'), detail)
+    if (!labels.length) return undefined
+    return formatCompactMetadataList(labels)
   }
 
-  return grantTypePrefix(getProficiencyDomainLabel('armor'), armorPoolTitleDetail(row))
+  return armorPoolMetadataDetail(row)
 }
 
 export function armorTrainingGrantSummary(
