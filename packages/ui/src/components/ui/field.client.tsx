@@ -151,7 +151,10 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
             width,
             anatomy,
             rowParticipation: effectiveRowParticipation,
-            className: cn(anatomyGridPlacement ? 'min-w-0' : undefined, className),
+            className: cn(
+              anatomyGridPlacement && width !== 'auto' ? 'min-w-0' : undefined,
+              className,
+            ),
           })}
           style={{
             ...(anatomyGridPlacement

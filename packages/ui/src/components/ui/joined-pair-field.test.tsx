@@ -25,6 +25,7 @@ describe('JoinedPair', () => {
       </JoinedPair.Root>,
     )
 
+    expect(screen.getByRole('group', { name: 'Speed' })).toHaveClass('min-w-max')
     expect(screen.getByRole('group', { name: 'Speed' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Speed value' })).toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Speed unit' })).not.toBeInTheDocument()
@@ -89,7 +90,7 @@ describe('JoinedPair', () => {
     const trigger = screen.getByRole('combobox', { name: 'Speed value' })
     expect(trigger).toHaveTextContent('30')
     expect(trigger).not.toHaveClass('pr-3.5')
-    expect(trigger.querySelector('[aria-hidden]')).toHaveClass('self-stretch')
+    expect(trigger.querySelector('[aria-hidden]')).toHaveClass('self-stretch', 'pr-1')
     onValueChange(40)
     expect(onValueChange).toHaveBeenCalledWith(40)
   })

@@ -37,9 +37,15 @@ export const selectDigitTrailingColumnVariants = cva(
         md: fieldDigitTrailingColumnClasses.md,
         lg: fieldDigitTrailingColumnClasses.lg,
       },
+      /** Start segment in a grouped shell — inset after the chevron before the divider. */
+      groupedStart: {
+        true: 'pr-1',
+        false: '',
+      },
     },
     defaultVariants: {
       size: 'md',
+      groupedStart: false,
     },
   },
 )

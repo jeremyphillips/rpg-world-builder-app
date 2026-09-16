@@ -20,6 +20,7 @@ import { resolveRowFieldGap } from '../../field-config'
 import { SlotFormItemSection } from '../fields/slot-field-renderer.client'
 
 import { ArrayItemAnatomyGrid } from './array-item-anatomy-grid.client'
+import type { ArrayFieldGap } from './array-item-anatomy-grid.variants'
 import { arrayItemCompactSummaryClasses } from './array-item-toolbar.variants'
 
 export interface ArrayItemAnatomyInlineRowProps {
@@ -88,7 +89,8 @@ export function ArrayItemAnatomyInlineRow({
 }: ArrayItemAnatomyInlineRowProps) {
   const parentContext = useFormSectionContext()
   const fieldWidths: readonly FieldWidth[] = resolveRowFieldWidths(inlineFields)
-  const gap = resolveRowFieldGap(inlineRow?.spacing) === 'compact' ? 'compact' : 'form'
+  const fieldGap: ArrayFieldGap =
+    resolveRowFieldGap(inlineRow?.spacing) === 'compact' ? 'default' : 'dense'
 
   return (
     <div
@@ -104,7 +106,7 @@ export function ArrayItemAnatomyInlineRow({
         <ArrayItemAnatomyGrid
           fieldWidths={fieldWidths}
           showGrip={showGrip}
-          gap={gap}
+          fieldGap={fieldGap}
           className={inlineRow?.className}
           grip={grip}
           actions={actions}

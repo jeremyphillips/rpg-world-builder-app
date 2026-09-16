@@ -11,17 +11,19 @@ import type { FieldWidth } from '../../../components/ui/field-control.variants'
 
 import { ArrayItemAnatomyChromeColumn } from './array-item-anatomy-chrome-column.client'
 import {
+  buildArrayItemAnatomyFieldsClusterTemplateColumns,
   resolveArrayItemAnatomyFieldGridColumn,
-  resolveArrayItemAnatomyGridChromeColumn,
   resolveArrayItemAnatomyGridPresentation,
-  type ArrayItemAnatomyGridVariantProps,
+  resolveArrayItemAnatomyParentChromeColumn,
+  type ArrayFieldGap,
 } from './array-item-anatomy-grid.variants'
 
 export interface ArrayItemAnatomyGridProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Width tokens for field columns — same order as `children`. */
   fieldWidths: readonly FieldWidth[]
   showGrip?: boolean
-  gap?: NonNullable<ArrayItemAnatomyGridVariantProps['gap']>
+  /** Inter-field column gap inside the fields cluster — default `dense` (12px). */
+  fieldGap?: ArrayFieldGap
   grip?: React.ReactNode
   actions: React.ReactNode
   /**
@@ -47,15 +49,15 @@ function wrapFieldGridPlacement(
 }
 
 /**
- * Phase 0 / Phase 1 compact array shell — one shared anatomy grid for fields + chrome.
+ * Compact array shell — shared anatomy grid with two-tier spacing (chrome gap + fields cluster).
  *
- * Composition model: outer grid owns tracks; field columns use subgrid; grip/actions span all
- * row tracks and vertically center within the shared anatomy grid cell.
+ * Composition model: outer grid owns tracks; fields cluster uses subgrid for field columns;
+ * grip/actions span all row tracks and vertically center within the shared anatomy grid cell.
  */
 export function ArrayItemAnatomyGrid({
   fieldWidths,
   showGrip = true,
-  gap = 'compact',
+  fieldGap = 'dense',
   grip,
   actions,
   children,
@@ -63,9 +65,8 @@ export function ArrayItemAnatomyGrid({
   style,
   ...props
 }: ArrayItemAnatomyGridProps) {
-  const presentation = resolveArrayItemAnatomyGridPresentation(fieldWidths, { showGrip, gap })
+  const presentation = resolveArrayItemAnatomyGridPresentation(fieldWidths, { showGrip, fieldGap })
   const fieldChildren = React.Children.toArray(children)
-  const fieldCount = fieldChildren.length
 
   return (
     <FieldRowAnatomyProvider>
@@ -78,21 +79,34 @@ export function ArrayItemAnatomyGrid({
         {showGrip ? (
           <ArrayItemAnatomyChromeColumn
             slot="grip"
-            gridColumn={resolveArrayItemAnatomyGridChromeColumn({
+            gridColumn={resolveArrayItemAnatomyParentChromeColumn({
               role: 'grip',
-              fieldCount,
               showGrip,
             })}
           >
             {grip}
           </ArrayItemAnatomyChromeColumn>
         ) : null}
-        {fieldChildren.map((child, index) => wrapFieldGridPlacement(child, index, showGrip))}
+
+        <div
+          data-array-item-fields-cluster=""
+          className={cn('col-span-1 grid min-w-0 grid-rows-subgrid', presentation.fieldGapClass)}
+          style={{
+            gridRow: '1 / -1',
+            gridColumn: resolveArrayItemAnatomyParentChromeColumn({
+              role: 'cluster',
+              showGrip,
+            }),
+            gridTemplateColumns: buildArrayItemAnatomyFieldsClusterTemplateColumns(fieldWidths),
+          }}
+        >
+          {fieldChildren.map((child, index) => wrapFieldGridPlacement(child, index, showGrip))}
+        </div>
+
         <ArrayItemAnatomyChromeColumn
           slot="actions"
-          gridColumn={resolveArrayItemAnatomyGridChromeColumn({
+          gridColumn={resolveArrayItemAnatomyParentChromeColumn({
             role: 'actions',
-            fieldCount,
             showGrip,
           })}
         >

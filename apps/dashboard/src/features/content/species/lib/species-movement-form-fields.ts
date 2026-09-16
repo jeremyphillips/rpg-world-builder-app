@@ -127,6 +127,7 @@ export function movementArrayField(): FormItem {
           {
             type: 'joinedPair',
             label: 'Speed',
+            width: 'auto',
             required: true,
             start: {
               kind: 'select',

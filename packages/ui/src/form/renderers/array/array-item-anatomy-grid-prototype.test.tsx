@@ -96,8 +96,12 @@ describe('ArrayItemAnatomyGrid prototype composition', () => {
 
     expect(grip?.style.gridColumn).toBe('1')
     expect(grip?.style.gridRow).toBe('1 / -1')
-    expect(actions?.style.gridColumn).toBe('4')
+    expect(actions?.style.gridColumn).toBe('3')
     expect(actions?.style.gridRow).toBe('1 / -1')
+
+    const fieldsCluster = document.querySelector('[data-array-item-fields-cluster]')
+    expect(fieldsCluster).toBeTruthy()
+    expect(fieldsCluster).toHaveClass('gap-x-3')
     expect(grip).toHaveClass('items-center')
     expect(actions).toHaveClass('items-center')
     expect(grip?.querySelector('button')).toBeTruthy()
@@ -109,11 +113,12 @@ describe('ArrayItemAnatomyGrid prototype composition', () => {
     const fields = grid?.querySelectorAll('[data-field-anatomy][data-field-row-participant]')
     expect(fields).toHaveLength(2)
     expect(fields?.[0]).toHaveClass(...fieldRowParticipationClasses.split(' '))
-    expect((fields?.[0] as HTMLElement).style.gridColumn).toBe('2')
+    expect((fields?.[0] as HTMLElement).style.gridColumn).toBe('1')
     expect((fields?.[0] as HTMLElement).style.gridRow).toBe('1 / -1')
-    expect((fields?.[1] as HTMLElement).style.gridColumn).toBe('3')
+    expect((fields?.[1] as HTMLElement).style.gridColumn).toBe('2')
 
     expect((grid as HTMLElement).style.gridTemplateColumns).toContain('var(--leading-chrome-size)')
+    expect((grid as HTMLElement).style.gridTemplateColumns).not.toContain('9rem')
     expect(screen.getByText('Mode')).toBeVisible()
     expect(screen.getByText('Speed')).toBeVisible()
   })

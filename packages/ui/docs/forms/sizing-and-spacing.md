@@ -99,14 +99,24 @@ A plain `FieldRow` with two inputs and no `width` splits 50/50 and wraps on narr
 
 ### `digits` — ch-based control width
 
-`number` and `select` fields accept optional `digits` on the control via `fieldDigitWidthVariants`.
+`number` and `select` fields accept optional `digits` on the control via
+`resolveDigitInlineSizeClasses` (preferred + minimum from one formula in
+`fieldDigitWidthVariants`).
+
+> **Digit invariant:** `digits` describes the minimum usable inline size of the control.
 
 - Standalone fields: keep `width: 'full'` so label/hint span the column; control stays narrow.
-- Row fields: use `width: 'auto'` or fractions when sharing a row.
+- Row fields: use `width: 'auto'` or fractions when sharing a row — especially digit
+  selects in joined pairs (e.g. species Movement Speed).
 - `number` may use `inputWidth` for a non-digit cap on the input element.
+- Overflow: truncate on the trigger **value/text slot**, not the whole `SelectTrigger`.
 
 **Select + `digits`:** trigger shows the option **label**. Use short labels (`"1"`, `"d8"`).
 Verbose labels need wider triggers — omit `digits` or use compact labels.
+
+Grouped **start** digit selects (`JoinedPair`, …) add `pr-1` on the trailing chevron column
+so 4px of inset lives inside the left segment — not as shell column gap (which exposes a
+background slice between segments).
 
 Dashboard: [`getLevelFieldOptions`](../../../../apps/dashboard/src/features/content/lib/level-field-options.ts)
 
@@ -197,3 +207,37 @@ Compose sibling widths with leaf `width` tokens — intrinsic (`xs`–`xl`, `aut
 `Recipes/DiceNotation`.
 
 Reserve row `className` for one-offs; prefer `width` tokens when a layout recurs.
+
+## Array inline row spacing (chrome shells)
+
+Compact array inline rows (`ArrayItemAnatomyGrid`) use **two-tier** horizontal spacing —
+not the open-page `FieldRow` gap scale:
+
+| Token                 | Tailwind  | px   | Role                                                                |
+| --------------------- | --------- | ---- | ------------------------------------------------------------------- |
+| Chrome adjacency      | `gap-x-2` | 8px  | Grip/actions ↔ fields cluster (only when that chrome column exists) |
+| `fieldGap: 'dense'`   | `gap-x-3` | 12px | **Default** inter-field gap inside the fields cluster               |
+| `fieldGap: 'default'` | `gap-x-4` | 16px | Roomier cluster gap — opt in via row `spacing: 'compact'`           |
+
+Open-page `AnatomyFieldRow` / `resolveRowFieldGap` (`gap-6` / `gap-4`) is unchanged.
+
+### Grid track semantics (array anatomy)
+
+| Width               | Track                              | Rule                                                          |
+| ------------------- | ---------------------------------- | ------------------------------------------------------------- |
+| Fixed (`sm`/`md`/…) | existing fixed tracks              | unchanged                                                     |
+| `full` / fraction   | `minmax(0, Nfr)`                   | Responsive shrink — long text may compress with the container |
+| `auto`              | `minmax(min-content, max-content)` | Intrinsic floor — grid does not encode digit knowledge        |
+| Digit controls      | control-owned min via `digits`     | `resolveDigitInlineSizeClasses`                               |
+
+Do **not** remap global `full` tracks to `minmax(min-content, 1fr)`.
+
+### JoinedPair divider stability
+
+Intrinsic grouped shells (`JoinedPair`, `InputSelectField`, …) use a hardened 1px divider
+track (`grid-cols-[auto_minmax(1px,1px)_auto]`; divider `min-w-px`) and `min-w-max` so the
+outer border stays wrapped around the full composite when a parent track constricts. Anatomy
+row fields with `width: 'auto'` use `min-w-min` so grid columns honor child minimums. Below
+the composite minimum usable width, the **row** collapses or reflows — controls are not
+crushed below their declared minimum just to preserve multi-column layout. `max-w-full` on
+the intrinsic shell is not the responsiveness mechanism for digit+label pairs.

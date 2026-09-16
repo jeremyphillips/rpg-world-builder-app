@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import { SelectLayerPortal } from './layer-portal-container.client'
 import { fieldControlVariants, type FieldControlVariantProps } from './field-control.variants'
-import { fieldDigitWidthVariants, type FieldDigits } from './field-digit-metrics'
+import { resolveDigitInlineSizeClasses, type FieldDigits } from './field-digit-metrics'
 import {
   fieldSelectInlineCaretIconClasses,
   selectDigitTrailingColumnVariants,
@@ -70,14 +70,20 @@ const SelectTrigger = React.forwardRef<
                   'border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
                 )
               : cn(fieldControlVariants({ size }), fieldGroupedControlStartPaddingClasses[size]),
-            fieldDigitWidthVariants[size][digits],
+            resolveDigitInlineSizeClasses(digits, size),
             'inline-flex shrink-0 items-center gap-0 tabular-nums data-[placeholder]:text-muted-foreground [&>span:not([aria-hidden])]:line-clamp-1 [&>span:not([aria-hidden])]:min-w-0 [&>span:not([aria-hidden])]:flex-1 [&>span:not([aria-hidden])]:text-center',
             className,
           )}
           {...props}
         >
           {children}
-          <span aria-hidden className={selectDigitTrailingColumnVariants({ size })}>
+          <span
+            aria-hidden
+            className={selectDigitTrailingColumnVariants({
+              size,
+              groupedStart: grouped && groupedPosition === 'start',
+            })}
+          >
             <ChevronDown
               className={cn(fieldSelectInlineCaretIconClasses(size), 'block shrink-0 opacity-50')}
             />
