@@ -2,8 +2,15 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { Field } from './field.client'
+import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { FieldLayout } from './field-layout'
-import { fieldLabelRegionVariants, fieldMessageRegionVariants } from './field.variants'
+import {
+  fieldAnatomyControlRegionRowTrackClasses,
+  fieldAnatomyLabelRegionRowTrackClasses,
+  fieldAnatomyMessageRegionRowTrackClasses,
+  fieldLabelRegionVariants,
+  fieldMessageRegionVariants,
+} from './field.variants'
 
 describe('FieldLayout three-region anatomy', () => {
   it('emits label, control, and message regions as Field.Root children', () => {
@@ -66,6 +73,31 @@ describe('FieldLayout three-region anatomy', () => {
     const labelRegion = container.querySelector('[data-field-label-region]')
     expect(labelRegion).not.toBeNull()
     expect(labelRegion?.childElementCount).toBe(0)
+  })
+})
+
+describe('field anatomy region row tracks', () => {
+  it('assigns explicit subgrid rows when nested in a row participant', () => {
+    const { container } = render(
+      <FieldRowAnatomyProvider>
+        <Field.Root id="mode" anatomy rowParticipation>
+          <FieldLayout
+            label={<Field.Label>Mode</Field.Label>}
+            control={<input id="mode" aria-label="Mode" />}
+          />
+        </Field.Root>
+      </FieldRowAnatomyProvider>,
+    )
+
+    expect(container.querySelector('[data-field-label-region]')).toHaveClass(
+      ...fieldAnatomyLabelRegionRowTrackClasses.split(' '),
+    )
+    expect(container.querySelector('[data-field-control-region]')).toHaveClass(
+      ...fieldAnatomyControlRegionRowTrackClasses.split(' '),
+    )
+    expect(container.querySelector('[data-field-message-region]')).toHaveClass(
+      ...fieldAnatomyMessageRegionRowTrackClasses.split(' '),
+    )
   })
 })
 
