@@ -1,12 +1,11 @@
-'use client'
-
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
 
-import { DetailOverflowMenu } from '../../../lib/detail/detail-overflow-menu'
-import { FeatureTableModal, type FeatureTableModalMode } from './feature-table-modal'
-import { FeatureTableRow } from './feature-table-row'
+import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
+import { MasterDetailRowPrefixProvider } from '../../../lib/master-detail/master-detail-row-prefix.context'
+import { FeatureTablesField } from './feature-tables-field'
 import { FeatureTablesSection } from './feature-tables-section'
+import { FeatureTableRow } from './feature-table-row'
 
 const meta = {
   title: 'Content/Classes/FeatureTablesSection',
@@ -17,69 +16,51 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-function FeatureTablesSectionDemo({
-  tables,
-}: {
-  tables: readonly {
-    title: string
-    metadata: string
-    typeLabel?: string
-  }[]
-}) {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [modalMode, setModalMode] = useState<FeatureTableModalMode>('create')
-
-  const openModal = (mode: FeatureTableModalMode) => {
-    setModalMode(mode)
-    setModalOpen(true)
-  }
-
-  return (
-    <>
-      <FeatureTablesSection
-        onAddTable={() => openModal('create')}
-        tables={tables.map((table) => (
-          <FeatureTableRow
-            key={table.title}
-            title={table.title}
-            metadata={table.metadata}
-            typeLabel={table.typeLabel}
-            onEdit={() => openModal('edit')}
-            overflowActions={
-              <DetailOverflowMenu
-                triggerLabel={`Actions for ${table.title}`}
-                actions={[
-                  {
-                    id: 'delete',
-                    label: 'Delete table',
-                    destructive: true,
-                    onSelect: () => undefined,
-                  },
-                ]}
-              />
-            }
-          />
-        ))}
-      />
-      <FeatureTableModal open={modalOpen} mode={modalMode} onOpenChange={setModalOpen} />
-    </>
-  )
-}
-
 export const Empty: Story = {
-  render: () => <FeatureTablesSectionDemo tables={[]} />,
+  render: () => <FeatureTablesSection onAddTable={() => undefined} />,
 }
 
-export const Populated: Story = {
+export const PopulatedRows: Story = {
   render: () => (
-    <FeatureTablesSectionDemo
+    <FeatureTablesSection
+      onAddTable={() => undefined}
       tables={[
-        {
-          title: 'Rage',
-          metadata: '2 columns · 5 level breakpoints',
-          typeLabel: 'Level progression',
-        },
+        <FeatureTableRow
+          key="rage"
+          title="Rage progression"
+          metadata="2 columns · 5 breakpoints"
+          typeLabel="Level progression"
+          onEdit={() => undefined}
+        />,
       ]}
     />
   ),
+}
+
+function FeatureTablesFieldHarness() {
+  const form = useForm({
+    defaultValues: {
+      features: [
+        {
+          name: 'Rage',
+          level: 1,
+          grants: [],
+          tables: [],
+          available: true,
+        },
+      ],
+    },
+  })
+
+  return (
+    <FormProvider {...form}>
+      <MasterDetailRowPrefixProvider value="features.0">
+        <FeatureTablesField formCtx={makeContentFormCtx()} />
+      </MasterDetailRowPrefixProvider>
+    </FormProvider>
+  )
+}
+
+export const WiredField: Story = {
+  render: () => <FeatureTablesFieldHarness />,
 }

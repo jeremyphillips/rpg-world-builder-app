@@ -25,7 +25,7 @@ const rageProgressionTable = {
 }
 
 describe('class feature form round-trip', () => {
-  it('preserves non-form feature tables through form conversion', () => {
+  it('maps feature tables into the form row and back on save', () => {
     const existing = {
       kind: 'custom' as const,
       id: 'rage',
@@ -34,14 +34,16 @@ describe('class feature form round-trip', () => {
       tables: [rageProgressionTable],
     }
     const row = featureToFormRow(existing)
-    const saved = featureFromFormRow({ ...row, id: existing.id }, existing)
+    expect(row.tables).toEqual(existing.tables)
+
+    const saved = featureFromFormRow({ ...row, id: existing.id })
     expect(saved.kind).toBe('custom')
     if (saved.kind === 'custom') {
       expect(saved.tables).toEqual(existing.tables)
     }
   })
 
-  it('preserves tables when saving features from form values', () => {
+  it('round-trips edited tables through featuresFromFormValues', () => {
     const existing = [
       {
         kind: 'custom' as const,
@@ -51,17 +53,34 @@ describe('class feature form round-trip', () => {
         tables: [rageProgressionTable],
       },
     ]
+    const editedTable = {
+      ...rageProgressionTable,
+      name: 'Updated rage progression',
+    }
     const rows = existing.map(featureToFormRow).map((row) => ({
       ...row,
       name: 'Rage Updated',
       description: '<p>Updated</p>',
+      tables: [editedTable],
     }))
 
     const saved = featuresFromFormValues(rows, existing)[0]
     expect(saved?.kind).toBe('custom')
     if (saved?.kind === 'custom') {
-      expect(saved.tables).toEqual(existing[0]?.tables)
+      expect(saved.tables).toEqual([editedTable])
     }
+  })
+
+  it('omits tables when the form row has none', () => {
+    const row = {
+      id: 'second-wind',
+      name: 'Second Wind',
+      level: 1,
+      grants: [],
+      tables: [],
+      available: true,
+    }
+    expect(featureFromFormRow(row)).not.toHaveProperty('tables')
   })
 
   it('preserves subclass-choice kind through form conversion', () => {
@@ -82,6 +101,7 @@ describe('class feature form round-trip', () => {
       name: 'Improved Critical',
       level: 3,
       grants: [],
+      tables: [],
       available: false,
     }
     expect(subclassFeatureFromFormRow(row)).not.toHaveProperty('available')
@@ -93,6 +113,7 @@ describe('class feature form round-trip', () => {
       name: 'Second Wind',
       level: 1,
       grants: [],
+      tables: [],
       available: false,
     }
     expect(featureFromFormRow(row).available).toBe(false)
@@ -107,6 +128,7 @@ describe('class feature form round-trip', () => {
       name: 'Second Wind',
       level: 1,
       grants: [],
+      tables: [],
       available: true,
     }
     expect(featureFromFormRow(row).kind).toBe('custom')

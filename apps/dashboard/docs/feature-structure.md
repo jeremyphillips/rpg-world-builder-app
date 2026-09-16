@@ -118,7 +118,10 @@ config; parent `lib/` is the shared layer only.
 | `utils/`                                         | Small shared helpers (e.g. `title-case`, `sortable-array-move`)                                                                                                                                                                                                                                                    |
 
 Interactive widgets (master-detail panels) stay in `content/components/`; feat
-prerequisite editing lives under `feats/components/`.
+prerequisite editing lives under `feats/components/`. Reusable progression-table
+authoring and read-only rendering live in `content/components/table-builder/`
+(modal, draft form) and `content/components/tables/` (`ProgressionTableView`,
+`ProgressionTableGrid`), with draft/validation logic in `content/lib/table-builder/`.
 
 ## Nested sub-features
 

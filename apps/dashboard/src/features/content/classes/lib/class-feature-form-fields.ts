@@ -1,9 +1,11 @@
+import { createElement } from 'react'
 import { z } from 'zod'
 import {
   CLASS_FEATURE_KINDS,
   campaignLevelSchema,
   classValidationMessages,
   MAX_CHARACTER_LEVEL,
+  progressionTableSchema,
   resolveGrantGroupsFromContent,
   type ClassBodyFeature,
   type ClassFeature,
@@ -28,8 +30,8 @@ import {
   formRowsToGrantGroups,
 } from '../../lib/forms/grants/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
-import { preserveNonFormFeatureFields } from './preserve-non-form-feature-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { FeatureTablesField } from '../components/features/feature-tables-field'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 
@@ -75,6 +77,7 @@ function createFeatureRowBaseFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) 
 export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return createFeatureRowBaseFormSchema(maxLevel).extend({
     available: z.boolean().default(true),
+    tables: z.array(progressionTableSchema).default([]),
   })
 }
 
@@ -126,7 +129,7 @@ export function formatFeatureRowSummary(
   return joinFormArrayItemSummaryParts(parts)
 }
 
-export function classFeatureItemFields(
+function sharedFeatureItemFields(
   ctx: ContentFormCtx,
   options?: { defaultFeatureLevel?: number },
 ): FormItem[] {
@@ -166,11 +169,39 @@ export function classFeatureItemFields(
   ]
 }
 
+/** Class and subclass feature rows share grants and prose; tables are class-only. */
+export function subclassFeatureItemFields(
+  ctx: ContentFormCtx,
+  options?: { defaultFeatureLevel?: number },
+): FormItem[] {
+  return sharedFeatureItemFields(ctx, options)
+}
+
+export function classFeatureItemFields(
+  ctx: ContentFormCtx,
+  options?: { defaultFeatureLevel?: number },
+): FormItem[] {
+  return [
+    ...sharedFeatureItemFields(ctx, options),
+    {
+      kind: 'slot',
+      name: 'tables',
+      visibility: {
+        dependsOn: ['kind'],
+        visibleWhen: (values) => values.kind !== 'subclass-choice',
+      },
+      render: () => createElement(FeatureTablesField, { formCtx: ctx }),
+    },
+  ]
+}
+
 export function featureToFormRow(feature: ClassFeature | ClassBodyFeature): FeatureRowForm {
   const grants = grantGroupsToFormRows(
     resolveGrantGroupsFromContent(feature, { level: feature.level }),
   )
   const available = 'available' in feature && feature.available === false ? false : true
+  const tables = feature.kind === 'custom' && feature.tables?.length ? [...feature.tables] : []
+
   return {
     id: feature.id,
     kind: feature.kind,
@@ -178,34 +209,19 @@ export function featureToFormRow(feature: ClassFeature | ClassBodyFeature): Feat
     description: feature.description,
     level: feature.level,
     grants,
+    tables,
     available,
   }
 }
 
 const DEFAULT_CLASS_FEATURE_KIND = CLASS_FEATURE_KINDS[0] satisfies ClassFeatureKind
 
-export function featureFromFormRow(
+function subclassChoiceFeatureFromFormRow(
   row: FeatureRowForm & { id: string },
-  existing?: ClassBodyFeature,
+  grantGroups: ReturnType<typeof formRowsToGrantGroups>,
 ): ClassBodyFeature {
-  const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
-  const kind = row.kind ?? DEFAULT_CLASS_FEATURE_KIND
-
-  if (kind === 'subclass-choice') {
-    return {
-      kind: 'subclass-choice',
-      id: row.id,
-      name: row.name,
-      description: row.description || undefined,
-      level: row.level,
-      ...(grantGroups.length ? { grantGroups } : {}),
-      ...(row.available === false ? { available: false } : {}),
-    }
-  }
-
   return {
-    ...preserveNonFormFeatureFields(existing),
-    kind: 'custom',
+    kind: 'subclass-choice',
     id: row.id,
     name: row.name,
     description: row.description || undefined,
@@ -213,6 +229,33 @@ export function featureFromFormRow(
     ...(grantGroups.length ? { grantGroups } : {}),
     ...(row.available === false ? { available: false } : {}),
   }
+}
+
+function customFeatureFromFormRow(
+  row: FeatureRowForm & { id: string },
+  grantGroups: ReturnType<typeof formRowsToGrantGroups>,
+): ClassBodyFeature {
+  const tables = row.tables?.length ? row.tables : undefined
+
+  return {
+    kind: 'custom',
+    id: row.id,
+    name: row.name,
+    description: row.description || undefined,
+    level: row.level,
+    ...(grantGroups.length ? { grantGroups } : {}),
+    ...(tables ? { tables } : {}),
+    ...(row.available === false ? { available: false } : {}),
+  }
+}
+
+export function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassBodyFeature {
+  const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
+  const kind = row.kind ?? DEFAULT_CLASS_FEATURE_KIND
+
+  return kind === 'subclass-choice'
+    ? subclassChoiceFeatureFromFormRow(row, grantGroups)
+    : customFeatureFromFormRow(row, grantGroups)
 }
 
 /** Subclass feature rows omit campaign availability — use for subclass form save. */
@@ -241,10 +284,7 @@ export function featuresFromFormValues(
   rows: FeatureRowForm[],
   existing?: readonly ClassBodyFeature[],
 ): ClassBodyFeature[] {
-  return applyStableIdsForUpdate(rows, existing).map((row) => {
-    const matchedExisting = existing?.find((feature) => feature.id === row.id)
-    return featureFromFormRow(row, matchedExisting)
-  })
+  return applyStableIdsForUpdate(rows, existing).map((row) => featureFromFormRow(row))
 }
 export function maxLevelFromCtx(ctx: ContentFormCtx): number {
   return effectiveMaxFromCtx(ctx)

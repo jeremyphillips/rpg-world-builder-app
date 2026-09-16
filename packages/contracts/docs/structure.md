@@ -25,6 +25,7 @@ packages/contracts/src/
     primitives/         # shared value types; semantic mini-packages; primitives/content/ admission boundary
     content/            # catalog content types (species, weapons, classes, …)
       lib/              # envelope, grants, content-key, cross-type policy, …
+      tables/           # generic progression tables (number/dice/text columns, resolution, format)
       classes/          # class body, spellcasting, subclasses
         spellcasting/   # spellcasting schema + slot progression tables
     runtime/            # stored character sheets + builder runtime (not catalog content)

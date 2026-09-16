@@ -216,6 +216,42 @@ describe('TableBuilderModal', () => {
     expect(screen.queryByRole('button', { name: 'Delete table' })).not.toBeInTheDocument()
   })
 
+  it('shows create anatomy with an add-table submit action', () => {
+    renderModal({ mode: 'create', value: undefined })
+    expect(screen.getByRole('dialog', { name: 'Add table' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add table' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Save table' })).not.toBeInTheDocument()
+  })
+
+  it('adds and removes columns from the authoring pane', async () => {
+    const user = userEvent.setup()
+    renderModal({ mode: 'create', value: undefined })
+
+    await user.click(screen.getByRole('button', { name: 'Add column' }))
+    expect(screen.getByLabelText('Column name 1')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Delete column 1' }))
+    expect(screen.queryByLabelText('Column name 1')).not.toBeInTheDocument()
+  })
+
+  it('renders signed rage damage values in the live preview', () => {
+    renderModal()
+    const preview = screen.getByRole('region', { name: 'Preview' })
+    expect(within(preview).getAllByRole('cell', { name: '+2' }).length).toBeGreaterThan(0)
+    expect(within(preview).getByRole('cell', { name: '+3' })).toBeInTheDocument()
+  })
+
+  it('does not persist carry-forward blanks in the saved table', async () => {
+    const user = userEvent.setup()
+    const { onSave } = renderModal()
+
+    await user.click(screen.getByRole('button', { name: 'Save table' }))
+
+    const saved = onSave.mock.calls[0]?.[0] as ProgressionTable
+    const damage = saved.columns.find((column) => column.id === 'damage-bonus')
+    expect(damage?.entries.map((entry) => entry.level)).toEqual([1, 9])
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     renderModal()
     await expectNoAxeViolations(screen.getByRole('dialog'))

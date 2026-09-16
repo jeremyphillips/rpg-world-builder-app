@@ -10,6 +10,7 @@ import {
 } from '../../lib/table-builder/table-builder-draft'
 import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
 import {
+  martialArtsProgressionTableFixture,
   mixedProgressionTableFixture,
   rageProgressionTableFixture,
 } from '../tables/progression-table-fixtures'
@@ -51,6 +52,14 @@ export const RageProgression: Story = {
   args: { table: rageProgressionTableFixture },
 }
 
+export const MartialArtsDice: Story = {
+  args: { table: martialArtsProgressionTableFixture },
+}
+
 export const MixedColumnTypes: Story = {
   args: { table: mixedProgressionTableFixture },
+}
+
+export const SignedFormatting: Story = {
+  args: { table: rageProgressionTableFixture },
 }

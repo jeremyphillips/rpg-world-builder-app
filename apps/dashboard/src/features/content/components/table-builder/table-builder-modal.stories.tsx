@@ -114,3 +114,81 @@ export const ConstrainedLevels: Story = {
   },
   render: (args) => <RelaunchableModal {...args} />,
 }
+
+const longLabelTableFixture: ProgressionTable = {
+  id: 'long-labels',
+  name: 'Very long progression table name that should wrap in the authoring pane',
+  kind: 'levelProgression',
+  columns: [
+    {
+      id: 'uses',
+      label: 'Extremely long column label for resource uses that should wrap cleanly',
+      valueType: 'number',
+      entries: [{ level: 1, value: 2 }],
+    },
+  ],
+}
+
+export const LongWrappedLabels: Story = {
+  args: {
+    mode: 'edit',
+    value: longLabelTableFixture,
+  },
+  render: (args) => <RelaunchableModal {...args} />,
+}
+
+const manyColumnsFixture: ProgressionTable = {
+  id: 'many-columns',
+  name: 'Many columns',
+  kind: 'levelProgression',
+  columns: Array.from({ length: 8 }, (_, index) => ({
+    id: `column-${index + 1}`,
+    label: `Column ${index + 1}`,
+    valueType: 'number' as const,
+    entries: [{ level: 1, value: index + 1 }],
+  })),
+}
+
+export const ManyColumns: Story = {
+  args: {
+    mode: 'edit',
+    value: manyColumnsFixture,
+  },
+  render: (args) => <RelaunchableModal {...args} />,
+}
+
+const manyRowsFixture: ProgressionTable = {
+  id: 'many-rows',
+  name: 'Many rows',
+  kind: 'levelProgression',
+  columns: [
+    {
+      id: 'uses',
+      label: 'Uses',
+      valueType: 'number',
+      entries: Array.from({ length: 12 }, (_, index) => ({
+        level: index * 2 + 1,
+        value: index + 1,
+      })),
+    },
+  ],
+}
+
+export const ManyRows: Story = {
+  args: {
+    mode: 'edit',
+    value: manyRowsFixture,
+  },
+  render: (args) => <RelaunchableModal {...args} />,
+}
+
+export const NarrowViewport: Story = {
+  args: {
+    mode: 'edit',
+    value: manyColumnsFixture,
+  },
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+  },
+  render: (args) => <RelaunchableModal {...args} />,
+}

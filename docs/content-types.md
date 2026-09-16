@@ -1095,23 +1095,24 @@ Structured progression data lives on **features**, not on the class body. The le
 
 ### Ownership and shape
 
-| Field                 | Location                       | Role                                                                                                 |
-| --------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| `tables[]`            | `features[]` (custom features) | Optional `levelProgression` tables owned by the feature that unlocks them                            |
-| `columns[]`           | each table                     | Discriminated by `valueType`: `number` or `text`; each column owns sparse `{ level, value }` entries |
-| `id` (table / column) | embedded subrecord             | Stable `slugSchema` key for references; `label` / `name` are editable display copy                   |
+| Field                 | Location                       | Role                                                                                                            |
+| --------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `tables[]`            | `features[]` (custom features) | Optional `levelProgression` tables owned by the feature that unlocks them                                       |
+| `columns[]`           | each table                     | Discriminated by `valueType`: `number`, `dice`, or `text`; number columns may set `format: 'plain' \| 'signed'` |
+| `id` (table / column) | embedded subrecord             | Stable `slugSchema` key for references; `label` / `name` are editable display copy                              |
 
-Contracts: `packages/contracts/src/rpg/content/classes/feature-table.ts` and `feature-table-resolution.ts`.
+Contracts: `packages/contracts/src/rpg/content/tables/` (generic progression tables) and `packages/contracts/src/rpg/content/classes/class-feature-table.ts` (feature-level refinements and `collectFeatureProgressionColumns`).
 
 ### Breakpoints and carry-forward
 
-- Entry levels use **`levelSchema` (1–20)**, not `absoluteLevelSchema`.
+- Entry levels use **`absoluteLevelSchema` (1–100)**; effective max is enforced at authoring via campaign rules (`allowedLevels`), not in the generic schema.
 - Entries must be in **strictly ascending** order by level in persisted JSON; out-of-order catalog data fails validation (no silent sort on parse).
 - Every entry level must be **≥ the owning feature's `level`** (feature-level refine).
 - **Carry-forward:** at character level _L_, a column resolves to the last entry where `entry.level ≤ L`; before the first entry → `undefined`. Each column carry-forwards independently.
-- **`projectFeatureTableRows`** derives dense rows for display — never persisted.
+- **`projectProgressionTableRows`** derives dense rows for display — never persisted.
+- **`formatProgressionTableValue`** is the display SSOT for table cells (signed numbers, dice, plain text).
 
-Import-only helper: `normalizeFeatureTableColumnEntries()` sorts entries for migrations; it is not wired into Zod parse.
+Import-only helper: `normalizeProgressionTableColumnEntries()` sorts entries for migrations; it is not wired into Zod parse.
 
 ### Progression table column order
 
@@ -1125,8 +1126,9 @@ Only `kind: 'levelProgression'` tables contribute columns. Stable React key: `` 
 
 ### Dashboard authoring
 
-- **No production feature-table editor** yet — `feature-tables-section*` components are Storybook-only.
-- On feature save, the class form **preserves non-form fields** (including `tables`) via `preserveNonFormFeatureFields()` in `class-feature-form-fields.ts`; the form updates only fields it owns (name, description, grants, level, availability).
+- Feature `tables[]` is an **atomic form value** on each feature row (`class-feature-form-fields.ts`). The shared `TableBuilderModal` owns an isolated draft form; Save returns one valid `ProgressionTable` and the parent replaces `tables[index]` via `setValue`.
+- `FeatureTablesSection` lists tables with metadata `N columns · M breakpoints` (persisted breakpoint union, not a level range) and opens `TableBuilderModal` with `allowedLevels` from the feature level through `effectiveMaxFromCtx`.
+- Read-only single-table rendering: `features/content/components/tables/ProgressionTableView`; builder preview uses the tolerant `ProgressionTablePresentation` model.
 
 ### Content enrichment vs migration
 

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
+import { tableToDraft, draftToPresentation } from '../../lib/table-builder/table-builder-draft'
 import { ProgressionTableGrid } from './progression-table-grid'
 import { ProgressionTableView } from './progression-table-view'
 import {
@@ -34,6 +35,21 @@ describe('ProgressionTableView', () => {
     expect(screen.getByRole('cell', { name: '2' })).toBeInTheDocument()
     expect(screen.getByRole('cell', { name: '1d6' })).toBeInTheDocument()
     expect(screen.getByRole('cell', { name: 'Special' })).toBeInTheDocument()
+  })
+
+  it('matches draftToPresentation parity for a valid persisted table', () => {
+    const draft = tableToDraft(rageProgressionTableFixture)
+    const draftPresentation = draftToPresentation(draft)
+
+    render(<ProgressionTableView table={rageProgressionTableFixture} />)
+
+    for (const row of draftPresentation.rows) {
+      for (const column of draftPresentation.columns) {
+        const value = row.values[column.key]
+        if (value === undefined) continue
+        expect(screen.getAllByRole('cell', { name: value }).length).toBeGreaterThan(0)
+      }
+    }
   })
 
   itAxe('has no axe accessibility violations', async () => {
