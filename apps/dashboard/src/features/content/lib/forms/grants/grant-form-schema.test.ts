@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  grantFieldMinSelectionsMessage,
+  grantFieldRequiredSelectMessage,
+} from './grant-field-terms'
 import { grantRowFormSchema } from './grant-form-schema'
 
 describe('grantRowFormSchema', () => {
@@ -12,6 +16,24 @@ describe('grantRowFormSchema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.some((issue) => issue.path.join('.') === 'senseType')).toBe(true)
+      expect(
+        result.error.issues.find((issue) => issue.path.join('.') === 'senseType')?.message,
+      ).toBe(grantFieldRequiredSelectMessage('senseType'))
+    }
+  })
+
+  it('treats blank sense type as missing, not invalid format', () => {
+    const result = grantRowFormSchema.safeParse({
+      grantType: 'senses',
+      senseType: '',
+      senseRange: 60,
+    })
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(
+        result.error.issues.find((issue) => issue.path.join('.') === 'senseType')?.message,
+      ).toBe(grantFieldRequiredSelectMessage('senseType'))
     }
   })
 
@@ -35,6 +57,9 @@ describe('grantRowFormSchema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.some((issue) => issue.path.join('.') === 'resistances')).toBe(true)
+      expect(
+        result.error.issues.find((issue) => issue.path.join('.') === 'resistances')?.message,
+      ).toBe(grantFieldMinSelectionsMessage('resistances'))
     }
   })
 
@@ -50,6 +75,10 @@ describe('grantRowFormSchema', () => {
       expect(
         result.error.issues.some((issue) => issue.path.join('.') === 'skillProficiencyIds'),
       ).toBe(true)
+      expect(
+        result.error.issues.find((issue) => issue.path.join('.') === 'skillProficiencyIds')
+          ?.message,
+      ).toBe(grantFieldMinSelectionsMessage('skillProficiencyIds'))
     }
   })
 
@@ -65,6 +94,10 @@ describe('grantRowFormSchema', () => {
       expect(
         result.error.issues.some((issue) => issue.path.join('.') === 'toolProficiencySlugs'),
       ).toBe(true)
+      expect(
+        result.error.issues.find((issue) => issue.path.join('.') === 'toolProficiencySlugs')
+          ?.message,
+      ).toBe(grantFieldMinSelectionsMessage('toolProficiencySlugs'))
     }
   })
 
@@ -80,6 +113,10 @@ describe('grantRowFormSchema', () => {
       expect(
         result.error.issues.some((issue) => issue.path.join('.') === 'weaponProficiencySlugs'),
       ).toBe(true)
+      expect(
+        result.error.issues.find((issue) => issue.path.join('.') === 'weaponProficiencySlugs')
+          ?.message,
+      ).toBe(grantFieldMinSelectionsMessage('weaponProficiencySlugs'))
     }
   })
 
@@ -95,6 +132,9 @@ describe('grantRowFormSchema', () => {
       expect(
         result.error.issues.some((issue) => issue.path.join('.') === 'armorTrainingSlugs'),
       ).toBe(true)
+      expect(
+        result.error.issues.find((issue) => issue.path.join('.') === 'armorTrainingSlugs')?.message,
+      ).toBe(grantFieldMinSelectionsMessage('armorTrainingSlugs'))
     }
   })
 
@@ -109,6 +149,9 @@ describe('grantRowFormSchema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.some((issue) => issue.path.join('.') === 'spellIds')).toBe(true)
+      expect(
+        result.error.issues.find((issue) => issue.path.join('.') === 'spellIds')?.message,
+      ).toBe(grantFieldMinSelectionsMessage('spellIds'))
     }
   })
 

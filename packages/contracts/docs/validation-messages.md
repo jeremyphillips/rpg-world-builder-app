@@ -169,7 +169,8 @@ violations; the form-only “required when limit enabled” rule stays in
 - Full sentences, sentence case, trailing period.
 - Lead with the field label or the subject: `{label} must be at least {min}.`
 - Choice fields use "Select …": `Select a rarity.` / `Select a valid rarity.`
-- List fields use "Add …": `Add at least one wealth tier.`
+- Multi-select choice fields (chips/combobox) use "Select at least …": `Select at least one tool.`
+- Repeatable array containers use "Add …": `Add at least one wealth tier.`
 - Interpolate concrete values (levels, caps, labels) rather than restating the rule
   abstractly.
 - **Stand alone outside tab/panel context** — messages must make sense on a tab
@@ -199,12 +200,12 @@ source kind to manual.`), keep the message domain-specific.
 **Non-recommendations** (from BENCH-067 analysis — one helper per shape, no
 shared primitive ids):
 
-| Shape                                | Why not                                                                                                                          |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| Exclusivity (`Choose either A or B`) | Only character proficiencies today; keep `exclusiveEitherCopy` private in `character-messages.ts` until a second domain needs it |
-| Duplicate / already used             | Tier-1 `duplicateItem` covers the common case; domain rules need specific subjects                                               |
-| At-least-one / add-one               | Tier-1 `minItems` and action-led "Add …" copy fit list fields better                                                             |
-| Only-applies-to / unless             | Condition clauses vary too much (`for`, `when`, `unless`) for a single template                                                  |
+| Shape                                | Why not                                                                                                                                |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Exclusivity (`Choose either A or B`) | Only character proficiencies today; keep `exclusiveEitherCopy` private in `character-messages.ts` until a second domain needs it       |
+| Duplicate / already used             | Tier-1 `duplicateItem` covers the common case; domain rules need specific subjects                                                     |
+| At-least-one / add-one               | Tier-1 `minItems` and action-led "Add …" copy fit repeatable array containers; multi-select uses `minSelections` ("Select at least …") |
+| Only-applies-to / unless             | Condition clauses vary too much (`for`, `when`, `unless`) for a single template                                                        |
 
 Example adoption (ids unchanged):
 
@@ -236,13 +237,17 @@ field category:
 | Issue                                   | Field category          | Message                                                            |
 | --------------------------------------- | ----------------------- | ------------------------------------------------------------------ |
 | `invalid_type` (missing)                | text / boolean / number | `{label} is required.`                                             |
-| `invalid_type` (missing)                | choice                  | `Choose {a label}.`                                                |
+| `invalid_type` (missing)                | choice                  | `Select {a label}.`                                                |
+| `invalid_type` (missing)                | multi                   | `Select at least one {item label}.`                                |
 | `invalid_type` expected `int`           | number                  | `{label} must be a whole number.`                                  |
 | `too_small` string min 1                | text                    | `{label} is required.`                                             |
 | `too_small` string min > 1              | text                    | `{label} must be at least {min} characters.`                       |
 | `too_small` / `too_big` number          | number                  | `{label} must be at least {min}.` / `{label} cannot exceed {max}.` |
-| `too_small` array                       | multi / array container | `Add at least one {item label}.` (label singularized)              |
-| `invalid_value` / `invalid_union` empty | choice / multi          | `Choose {a label}.`                                                |
+| `too_small` array                       | multi                   | `Select at least one {item label}.` (label singularized)           |
+| `too_small` array min > 1               | multi                   | `Select at least {min} {items label}.`                             |
+| `too_small` array                       | array container         | `Add at least one {item label}.` (label singularized)              |
+| `invalid_value` / `invalid_union` empty | choice                  | `Select {a label}.`                                                |
+| `invalid_value` / `invalid_union` empty | multi                   | `Select at least one {item label}.`                                |
 | `invalid_value` / `invalid_union` other | choice / multi          | `Select a valid {label}.`                                          |
 | `invalid_value` other                   | text / number / boolean | `{label} has an invalid value.`                                    |
 | `invalid_union`                         | non-choice              | `Complete the required fields for this option.`                    |
@@ -251,7 +256,7 @@ field category:
 | `invalid_format` `regex` on `slug`      | text                    | `Use lowercase letters, numbers, and hyphens only.`                |
 | `invalid_format` other                  | any                     | `{label} has an invalid format.`                                   |
 | `too_small` / `too_big` other origins   | any                     | `{label} is too small.` / `{label} is too large.`                  |
-| `too_small` / `too_big` array `exact`   | array / multi           | `Add exactly {n} {items label}.`                                   |
+| `too_small` / `too_big` array `exact`   | array                   | `Add exactly {n} {items label}.`                                   |
 | registered path, unhandled code         | any                     | `{label} is invalid.` (catch-all safety net)                       |
 
 Unregistered paths use the same formatters with unlabeled fallbacks

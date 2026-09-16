@@ -93,12 +93,22 @@ export const fieldValidationMessages = {
     'validation.field.maxLength',
     ({ label, max }) => `${label} cannot exceed ${max} characters.`,
   ),
-  /** Multi-select / repeatable list needs at least one entry. */
+  /** Multi-select choice field (chips/combobox) needs at least one selection. */
+  minSelections: defineMessage<{ itemLabel: string }>(
+    'validation.field.minSelections',
+    ({ itemLabel }) => `Select at least one ${itemLabel}.`,
+  ),
+  /** Multi-select choice field needs `min` (> 1) selections; `itemsLabel` is plural. */
+  minSelectionsCount: defineMessage<{ itemsLabel: string; min: number }>(
+    'validation.field.minSelectionsCount',
+    ({ itemsLabel, min }) => `Select at least ${min} ${itemsLabel}.`,
+  ),
+  /** Repeatable array container needs at least one entry. */
   minItems: defineMessage<{ itemLabel: string }>(
     'validation.field.minItems',
     ({ itemLabel }) => `Add at least one ${itemLabel}.`,
   ),
-  /** Multi-select / repeatable list needs `min` (> 1) entries; `itemsLabel` is plural. */
+  /** Repeatable array container needs `min` (> 1) entries; `itemsLabel` is plural. */
   minItemsCount: defineMessage<{ itemsLabel: string; min: number }>(
     'validation.field.minItemsCount',
     ({ itemsLabel, min }) => `Add at least ${min} ${itemsLabel}.`,

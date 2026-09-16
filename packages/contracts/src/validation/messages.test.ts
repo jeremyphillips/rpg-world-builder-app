@@ -154,6 +154,18 @@ describe('fieldValidationMessages', () => {
       'Slug cannot exceed 64 characters.',
     ],
     [
+      'minSelections',
+      formatFieldMessage(fieldValidationMessages.minSelections({ itemLabel: 'tool' })),
+      'Select at least one tool.',
+    ],
+    [
+      'minSelectionsCount',
+      formatFieldMessage(
+        fieldValidationMessages.minSelectionsCount({ itemsLabel: 'skills', min: 2 }),
+      ),
+      'Select at least 2 skills.',
+    ],
+    [
       'minItems',
       formatFieldMessage(fieldValidationMessages.minItems({ itemLabel: 'wealth tier' })),
       'Add at least one wealth tier.',

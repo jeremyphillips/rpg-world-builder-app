@@ -1,7 +1,6 @@
 import {
   FEAT_CATEGORY_IDS,
   FEAT_CATEGORY_ENTRIES,
-  DAMAGE_TYPE_TERM,
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
@@ -47,7 +46,6 @@ import {
   buildActiveDamageTypeFieldOptions,
   buildActiveLanguageFieldOptions,
   buildActiveSenseFieldOptions,
-  vocabularyFieldLabel,
 } from '@/features/vocabulary'
 
 import {
@@ -88,6 +86,7 @@ import {
   weaponProficiencyGrantTitle,
 } from './proficiency/proficiency-grant-form-values'
 import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
+import { grantFieldLabel } from './grant-field-terms'
 import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
 import {
   formatGrantUnlockLevelLabel,
@@ -671,7 +670,7 @@ export function grantItemFields<T extends string>(
     {
       type: 'chips',
       name: 'resistances',
-      label: vocabularyFieldLabel(DAMAGE_TYPE_TERM, { plural: true }),
+      label: grantFieldLabel('resistances', { plural: true }),
       required: true,
       options: damageTypeOptions,
       visibility: visibleFor('resistances'),
@@ -679,7 +678,7 @@ export function grantItemFields<T extends string>(
     {
       type: 'chips',
       name: 'damageType',
-      label: vocabularyFieldLabel(DAMAGE_TYPE_TERM, { plural: true }),
+      label: grantFieldLabel('damageType', { plural: true }),
       required: true,
       options: damageTypeOptions,
       visibility: visibleFor('damageType'),
@@ -691,7 +690,7 @@ export function grantItemFields<T extends string>(
         {
           type: 'select',
           name: 'senseType',
-          label: 'Sense type',
+          label: grantFieldLabel('senseType'),
           required: true,
           options: senseTypeOptions,
           width: '2/3',
@@ -705,7 +704,7 @@ export function grantItemFields<T extends string>(
     {
       type: 'select',
       name: 'language',
-      label: 'Language',
+      label: grantFieldLabel('language'),
       required: true,
       options: languageOptions,
       visibility: visibleFor('languages'),

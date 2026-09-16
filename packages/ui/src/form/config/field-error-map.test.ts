@@ -99,12 +99,14 @@ describe('makeFieldErrorMap', () => {
     ).toBe('Select a valid category.')
   })
 
-  it('formats multi-chips minimums as add-at-least messages', () => {
+  it('formats multi-chips minimums as select-at-least messages', () => {
     const schema = z.object({ damageTypes: z.array(z.string()).min(1) })
     const countSchema = z.object({ damageTypes: z.array(z.string()).min(2) })
 
-    expect(messageFor(schema, { damageTypes: [] })).toBe('Add at least one damage type.')
-    expect(messageFor(countSchema, { damageTypes: ['fire'] })).toBe('Add at least 2 damage types.')
+    expect(messageFor(schema, { damageTypes: [] })).toBe('Select at least one damage type.')
+    expect(messageFor(countSchema, { damageTypes: ['fire'] })).toBe(
+      'Select at least 2 damage types.',
+    )
   })
 
   it('formats array container minimums from the legend', () => {

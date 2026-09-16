@@ -289,8 +289,9 @@ Schemas stay message-free. `makeResolver` builds a field-aware error map
 `invalid_format`, `invalid_value`, `invalid_union`, …) into shared boilerplate
 copy from `@rpg/contracts` (`fieldValidationMessages`), interpolating the field's
 configured `label` — e.g. `z.number().min(1)` on a field labeled `Level` renders
-`Level must be at least 1.` Array containers use their `legend` (or `itemHeader`
-for singular item copy: `Add at least one grant.`). Registered paths always
+`Level must be at least 1.` Multi-select chips/combobox fields use
+`Select at least one {item}.`; repeatable array containers use their `legend`
+(or `itemHeader` for singular item copy: `Add at least one grant.`). Registered paths always
 receive catalog copy; a last-resort `{label} is invalid.` catch-all covers
 unhandled issue codes. Custom `.refine` / `superRefine` messages always win.
 **Unregistered** paths use unlabeled catalog fallbacks (`This field`, `item`) —
