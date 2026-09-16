@@ -81,7 +81,7 @@ function AnatomyPrototypeRow({
 }
 
 const meta = {
-  title: 'Forms/Layout/FieldRowAnatomyPrototype',
+  title: 'Internal/Forms/Layout/FieldRowAnatomyPrototype',
   parameters: {
     layout: 'padded',
     docs: {

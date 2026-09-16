@@ -7,6 +7,7 @@ import {
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
 } from '../../../content/starting-equipment'
+import { availableStartingEquipmentOptions } from '../../../content/starting-equipment-availability'
 import { toEquipmentContentId } from '../../creature/equipment'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import { indexCharacterBuildCatalog } from '../context'
@@ -122,7 +123,7 @@ export function listReachableStartingWeapons(args: {
   const weapons: ReachableStartingWeaponOption[] = []
   const seen = new Set<string>()
 
-  for (const option of startingEquipment.options) {
+  for (const option of availableStartingEquipmentOptions(startingEquipment.options)) {
     if (isStartingGoldOption(option)) continue
     for (const weapon of collectWeaponsFromStartingEquipmentOption({
       option,

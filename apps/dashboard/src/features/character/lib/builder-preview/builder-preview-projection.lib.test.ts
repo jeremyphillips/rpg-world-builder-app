@@ -11,6 +11,7 @@ import {
   createStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../fixtures/character-builder-fixtures'
+import { makeClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import {
   BUILDER_PREVIEW_INCOMPLETE_TITLE,
   BUILDER_PREVIEW_READY_TITLE,
@@ -40,8 +41,12 @@ describe('builder-preview-projection.lib', () => {
       ),
     ).toBe('combat')
     expect(
-      resolveBuilderPreviewOpenSection('species', { forStepId: 'abilities', value: 'combat' }, []),
-    ).toBe('combat')
+      resolveBuilderPreviewOpenSection(
+        'equipment',
+        { forStepId: 'abilities', value: 'combat' },
+        [],
+      ),
+    ).toBe('equipment')
   })
 
   it('prefers create-ready footer over incomplete default', () => {
@@ -101,5 +106,100 @@ describe('builder-preview-projection.lib', () => {
       'spells',
     ])
     expect(projection?.openSectionId).toBe('narrative')
+  })
+
+  it('keeps spells sections expandable for inactive and active casters', () => {
+    const wizardStored = makeClassStored({
+      slug: 'fixture-wizard',
+      name: 'Wizard',
+      primaryAbilities: ['int'],
+      hitDie: 6,
+      proficiencies: {
+        savingThrows: ['int', 'wis'],
+        armor: { categories: [], items: [] },
+        weapons: { categories: ['simple'], items: [] },
+        skills: { categories: [], items: [] },
+      },
+      characterCreation: {
+        proficiencies: {
+          skills: { choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }] },
+        },
+      },
+      spellcasting: {
+        level: 1,
+        progression: 'full',
+        ability: 'int',
+        preparation: 'prepared',
+        cantrips: [{ level: 1, known: 3 }],
+        spellsAvailable: [{ level: 1, count: 4 }],
+      },
+    })
+    const inactiveDraft = createEmptyCharacterBuilderDraft()
+    const inactiveChoiceSets = resolveAvailableChoices(inactiveDraft, context)
+    const inactivePreview = buildCharacterPreview(
+      inactiveDraft,
+      catalogIndex,
+      context.characterCreationRules,
+      context.rulesetId,
+      { resolvedChoiceSets: inactiveChoiceSets },
+    )
+    const casterContext = createStandaloneBuilderContextFixture({
+      catalog: {
+        species: [],
+        classes: [wizardStored],
+        spells: [],
+        equipment: [],
+        skillProficiencies: [],
+        organizations: [],
+        languages: [],
+      },
+    })
+    const casterCatalogIndex = createStandaloneBuilderCatalogIndexFixture(casterContext)
+    const casterDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: wizardStored.id, level: 1 as const },
+    }
+    const casterChoiceSets = resolveAvailableChoices(casterDraft, casterContext)
+    const casterPreview = buildCharacterPreview(
+      casterDraft,
+      casterCatalogIndex,
+      casterContext.characterCreationRules,
+      casterContext.rulesetId,
+      { resolvedChoiceSets: casterChoiceSets },
+    )
+
+    const inactiveProjection = projectBuilderPreviewRail({
+      draft: inactiveDraft,
+      context,
+      catalogIndex,
+      preview: inactivePreview,
+      resolvedChoiceSets: inactiveChoiceSets,
+      currentStepId: 'identity',
+      manualOpenSection: null,
+      canCreateCharacter: false,
+      validationVisibleStepIds: [],
+      validationIssues: [],
+    })
+    const activeProjection = projectBuilderPreviewRail({
+      draft: casterDraft,
+      context: casterContext,
+      catalogIndex: casterCatalogIndex,
+      preview: casterPreview,
+      resolvedChoiceSets: casterChoiceSets,
+      currentStepId: 'spells',
+      manualOpenSection: null,
+      canCreateCharacter: false,
+      validationVisibleStepIds: [],
+      validationIssues: [],
+    })
+
+    expect(inactiveProjection?.sections.find((section) => section.id === 'spells')).toMatchObject({
+      marker: 'off',
+      status: 'Off',
+      expandable: true,
+    })
+    expect(activeProjection?.sections.find((section) => section.id === 'spells')).toMatchObject({
+      expandable: true,
+    })
   })
 })

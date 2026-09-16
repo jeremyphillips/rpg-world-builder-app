@@ -132,3 +132,9 @@ export const characterBuilderPreviewCombatStackClasses = 'flex flex-col gap-3'
 export const characterBuilderPreviewStatGridClasses = 'grid grid-cols-3 gap-3'
 
 export const characterBuilderPreviewAbilityGridClasses = 'grid grid-cols-2 gap-2 sm:grid-cols-3'
+
+export const characterBuilderPreviewStatClasses = 'rounded-md border border-border px-2 py-1.5'
+
+export const characterBuilderPreviewStatLabelClasses = 'text-xs text-muted-foreground'
+
+export const characterBuilderPreviewStatValueClasses = 'text-sm font-medium'

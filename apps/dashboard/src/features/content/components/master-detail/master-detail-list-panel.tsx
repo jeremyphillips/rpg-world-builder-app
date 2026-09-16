@@ -135,12 +135,10 @@ export function MasterDetailListPanel({
       </div>
 
       {countSupplement || invalidItemCount > 0 ? (
-        <div className={masterDetailListCountSupplementClasses}>
+        <div className={masterDetailListCountSupplementClasses({ hasCopy: !!countSupplement })}>
           {countSupplement ? (
             <div className={masterDetailListCountSupplementCopyClasses}>{countSupplement}</div>
-          ) : (
-            <span aria-hidden />
-          )}
+          ) : null}
           {invalidItemCount > 0 ? <ValidationIssueCountBadge count={invalidItemCount} /> : null}
         </div>
       ) : null}

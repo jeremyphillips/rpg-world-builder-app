@@ -80,10 +80,13 @@ export const masterDetailListRowAvailabilityClasses = 'min-w-0'
 export const masterDetailListEmptyClasses = 'px-3 py-4 text-sm text-muted-foreground'
 
 /** Stable availability count row below the list header. */
-export const masterDetailListCountSupplementClasses = cn(
-  'flex shrink-0 items-center justify-between gap-2 border-b px-3 py-1.5 text-xs text-muted-foreground',
-  masterDetailRailBorderClasses,
-)
+export function masterDetailListCountSupplementClasses(options: { hasCopy: boolean }): string {
+  return cn(
+    'flex shrink-0 items-center gap-2 border-b px-3 py-1.5 text-xs text-muted-foreground',
+    masterDetailRailBorderClasses,
+    options.hasCopy ? 'justify-between' : 'justify-end',
+  )
+}
 
 export const masterDetailListCountSupplementCopyClasses =
   'min-w-0 flex flex-wrap items-center gap-x-1'

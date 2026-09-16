@@ -31,6 +31,7 @@ import {
   type CharacterBuilderPreviewSectionId,
 } from './character-builder-preview-panel.lib'
 import { getNarrativePreviewStatusLabel, narrativeFieldCount } from './narrative-preview'
+import { countProficiencyChoicesRemaining } from './format-preview-proficiency-subsection.lib'
 import {
   getPreviewAlignmentLine,
   getPreviewIdentityName,
@@ -173,6 +174,8 @@ function resolveAbilitiesPresentation(
 
 function resolveProficienciesPresentation(
   hasCharacterClass: boolean,
+  draft: CharacterBuilderDraft,
+  resolvedChoiceSets: readonly ChoiceSet[] | null,
 ): BuilderPreviewSectionPresentation {
   if (!hasCharacterClass) {
     return {
@@ -184,10 +187,17 @@ function resolveProficienciesPresentation(
     }
   }
 
+  const ready =
+    resolvedChoiceSets !== null &&
+    countProficiencyChoicesRemaining(resolvedChoiceSets, draft, 'skillProficiency') === 0 &&
+    countProficiencyChoicesRemaining(resolvedChoiceSets, draft, 'language') === 0 &&
+    countProficiencyChoicesRemaining(resolvedChoiceSets, draft, 'toolProficiency') === 0
+
   return {
     id: 'proficiencies',
     label: PREVIEW_SECTION_LABELS.proficiencies,
-    marker: 'incomplete',
+    marker: ready ? 'ready' : 'incomplete',
+    ...(ready ? { status: 'Ready', statusTone: 'success' as const } : {}),
     expandable: true,
   }
 }
@@ -233,7 +243,7 @@ function resolveSpellsPresentation(spellcastingActive: boolean): BuilderPreviewS
       label: PREVIEW_SECTION_LABELS.spells,
       marker: 'off',
       status: 'Off',
-      expandable: false,
+      expandable: true,
     }
   }
 
@@ -241,7 +251,7 @@ function resolveSpellsPresentation(spellcastingActive: boolean): BuilderPreviewS
     id: 'spells',
     label: PREVIEW_SECTION_LABELS.spells,
     marker: 'incomplete',
-    expandable: false,
+    expandable: true,
   }
 }
 
@@ -281,12 +291,14 @@ function resolveBuilderPreviewSections(
   narrativeCount: number,
   hasCharacterClass: boolean,
   spellcastingActive: boolean,
+  draft: CharacterBuilderDraft,
+  resolvedChoiceSets: readonly ChoiceSet[] | null,
 ): BuilderPreviewSectionPresentation[] {
   return [
     resolveNarrativePresentation(narrativeCount),
     resolveCombatPresentation(preview),
     resolveAbilitiesPresentation(preview),
-    resolveProficienciesPresentation(hasCharacterClass),
+    resolveProficienciesPresentation(hasCharacterClass, draft, resolvedChoiceSets),
     resolveEquipmentPresentation(preview, hasCharacterClass),
     resolveSpellsPresentation(spellcastingActive),
   ]
@@ -312,6 +324,7 @@ export function projectBuilderPreviewRail({
   draft,
   catalogIndex,
   preview,
+  resolvedChoiceSets,
   currentStepId,
   manualOpenSection,
   canCreateCharacter,
@@ -337,6 +350,8 @@ export function projectBuilderPreviewRail({
     narrativeCount,
     hasCharacterClass,
     spellcastingActive,
+    draft,
+    resolvedChoiceSets,
   )
 
   return {

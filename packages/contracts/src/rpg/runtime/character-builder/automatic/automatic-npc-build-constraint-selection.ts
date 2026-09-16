@@ -1,5 +1,6 @@
 import type { CharacterClass } from '../../../content/classes/class'
 import type { StartingEquipmentOption } from '../../../content/starting-equipment'
+import { availableStartingEquipmentOptions } from '../../../content/starting-equipment-availability'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
@@ -187,13 +188,14 @@ function weaponConstraintFailureIssue(
   const startingEquipment = characterClass.characterCreation?.startingEquipment
   if (!startingEquipment) return undefined
 
-  const hasEligiblePackage = startingEquipment.options.some((option) =>
-    startingPackageProvidesAllRequiredWeapons({
-      option,
-      requiredWeaponIds: constraints.requiredWeaponIds,
-      characterClass,
-      catalogIndex,
-    }),
+  const hasEligiblePackage = availableStartingEquipmentOptions(startingEquipment.options).some(
+    (option) =>
+      startingPackageProvidesAllRequiredWeapons({
+        option,
+        requiredWeaponIds: constraints.requiredWeaponIds,
+        characterClass,
+        catalogIndex,
+      }),
   )
   if (hasEligiblePackage) return undefined
 

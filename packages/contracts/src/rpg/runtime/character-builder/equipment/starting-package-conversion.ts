@@ -4,6 +4,7 @@ import {
   isStartingGoldOption,
   type StartingEquipmentOption,
 } from '../../../content/starting-equipment'
+import { availableStartingEquipmentOptions } from '../../../content/starting-equipment-availability'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type {
   CharacterBuilderDraft,
@@ -164,7 +165,7 @@ function blockingIssueForResolvedItem(item: ResolvedStartingEquipmentItem): stri
 export function resolveGoldStartingEquipmentAlternative(
   options: readonly StartingEquipmentOption[],
 ): GoldStartingEquipmentAlternative {
-  const option = options.find(isStartingGoldOption)
+  const option = availableStartingEquipmentOptions(options).find(isStartingGoldOption)
   if (!option) {
     return {
       status: 'unavailable',

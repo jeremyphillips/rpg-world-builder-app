@@ -60,7 +60,7 @@ function ParticipantField({
 }
 
 const meta = {
-  title: 'Forms/Layout/FieldRowAnatomyCollapse',
+  title: 'Internal/Forms/Layout/FieldRowAnatomyCollapse',
   parameters: {
     layout: 'padded',
     docs: {

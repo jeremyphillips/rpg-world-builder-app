@@ -32,13 +32,16 @@ import {
   characterBuilderPreviewAbilityGridClasses,
   characterBuilderPreviewCombatGridClasses,
   characterBuilderPreviewCombatStackClasses,
+  characterBuilderPreviewStatClasses,
+  characterBuilderPreviewStatLabelClasses,
+  characterBuilderPreviewStatValueClasses,
 } from '../character-builder-shell.variants'
 
 function PreviewStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-border px-2 py-1.5">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium">{value}</dd>
+    <div className={characterBuilderPreviewStatClasses}>
+      <dt className={characterBuilderPreviewStatLabelClasses}>{label}</dt>
+      <dd className={characterBuilderPreviewStatValueClasses}>{value}</dd>
     </div>
   )
 }

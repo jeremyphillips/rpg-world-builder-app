@@ -11,7 +11,7 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import { Button, PreviewRail, Sheet } from '@rpg/ui'
+import { Button, PreviewRail, Sheet, useMediaMinWidth, VIEWPORT_MD_MIN_QUERY } from '@rpg/ui'
 import { Eye } from 'lucide-react'
 
 import type { CharacterBuilderPreviewSectionId } from '../../../lib/builder-preview/character-builder-preview-panel.lib'
@@ -20,10 +20,6 @@ import {
   BUILDER_PREVIEW_COMPACT_LABEL,
   BUILDER_PREVIEW_HEADER_TITLE,
 } from '../../../lib/builder-preview/builder-preview-rail-copy'
-import {
-  useMediaMinWidth,
-  VIEWPORT_MD_MIN_QUERY,
-} from '../../../lib/builder-preview/use-media-min-width'
 import { CharacterBuilderPreviewRailPlaceholder } from './character-builder-preview-rail-section-bodies'
 import { CharacterBuilderPreviewRailView } from './character-builder-preview-rail-view'
 import { characterBuilderPreviewCompactTriggerClasses } from '../character-builder-shell.variants'

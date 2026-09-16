@@ -14,7 +14,11 @@ export function formatStartingEquipmentOptionCompactSummary(args: {
   itemCount: number
   wealth?: CharacterWealthGrant
 }): string {
-  const parts = [`${args.itemCount} ${args.itemCount === 1 ? 'item' : 'items'}`]
+  const parts: string[] = []
+
+  if (args.itemCount > 0) {
+    parts.push(`${args.itemCount} ${args.itemCount === 1 ? 'item' : 'items'}`)
+  }
 
   if (args.wealth) {
     parts.push(formatWealth(characterWealthFromGrant(args.wealth)))

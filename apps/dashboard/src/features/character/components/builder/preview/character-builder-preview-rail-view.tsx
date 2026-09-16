@@ -113,7 +113,7 @@ export function CharacterBuilderPreviewRailView({
         media={<PreviewRail.Media fallbackIcon={<User />} />}
         name={projection.identity.name}
         status={
-          <Text as="p" variant="muted" className="text-sm">
+          <Text as="p" variant="muted">
             {projection.identity.statusLine}
           </Text>
         }

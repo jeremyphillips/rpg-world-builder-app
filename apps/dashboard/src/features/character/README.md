@@ -146,7 +146,9 @@ width/workspace shell.
 | Right (`xl+`) | `CharacterBuilderPreviewRail` | `PreviewRail` fill; accordions live here only                     |
 
 Below `xl`, the persistent rail hides; `CharacterBuilderPreviewSheet` exposes a compact
-**Preview** trigger in the form column.
+**Preview** trigger in the form column. Builder starting-equipment option cards use
+generated package summaries from `@rpg/contracts` and ignore authored option
+`description` for now (description remains on the class authoring form).
 
 **Primary step → preview section open mapping** (first match wins for navigation):
 

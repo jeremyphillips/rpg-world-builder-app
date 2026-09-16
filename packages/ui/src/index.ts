@@ -809,6 +809,7 @@ export {
   type SheetSurface,
 } from './components/ui/sheet.variants'
 export { useModal, type UseModalOptions, type UseModalReturn } from './hooks/use-modal'
+export { useMediaMinWidth, VIEWPORT_MD_MIN_QUERY } from './hooks/use-media-min-width.client'
 export {
   usePendingAwareOpenChange,
   type UsePendingAwareOpenChangeOptions,

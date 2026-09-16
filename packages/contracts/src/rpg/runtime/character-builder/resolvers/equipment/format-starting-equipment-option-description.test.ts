@@ -150,13 +150,13 @@ describe('formatStartingEquipmentOptionCompactSummary', () => {
     ).toBe('3 items · 11 GP')
   })
 
-  it('formats wealth-only packages with zero items', () => {
+  it('formats wealth-only packages without item segment', () => {
     expect(
       formatStartingEquipmentOptionCompactSummary({
         itemCount: 0,
         wealth: { gp: 50 },
       }),
-    ).toBe('0 items · 50 GP')
+    ).toBe('50 GP')
   })
 
   it('omits wealth when no baseline grant is configured', () => {

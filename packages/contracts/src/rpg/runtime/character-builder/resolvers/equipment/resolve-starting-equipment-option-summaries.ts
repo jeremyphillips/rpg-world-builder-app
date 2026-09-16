@@ -359,8 +359,6 @@ function startingEquipmentOptionDescription(args: {
   orderedItems: readonly StartingEquipmentOptionSummaryItem[]
 }): string | undefined {
   const { option, orderedItems } = args
-  const authoredDescription = option.description?.trim()
-  if (authoredDescription) return authoredDescription
 
   if (isWealthOnlyStartingEquipmentOption(option)) {
     return formatStartingGoldOptionDescription({

@@ -4,7 +4,6 @@ import { cn } from '../../lib/utils'
 import {
   fieldGroupedDividerClasses,
   fieldGroupedEndSegmentBaseClasses,
-  fieldGroupedEndSegmentSurfaceClasses,
   fieldGroupedInputColumnClasses,
   fieldGroupedSegmentResetClasses,
   fieldGroupedSegmentStartClasses,
@@ -67,12 +66,6 @@ export const joinedPairStartTextSegmentVariants = cva('min-w-0', {
 export const joinedPairStartNumberWrapperVariants = cva(fieldGroupedInputColumnClasses)
 
 export const joinedPairDividerVariants = cva(fieldGroupedDividerClasses)
-
-/** @deprecated Prefer `fieldGroupedEndSegmentSurfaceClasses`. */
-export const joinedPairEndSegmentSurfaceClasses = fieldGroupedEndSegmentSurfaceClasses
-
-/** @deprecated Prefer `fieldGroupedEndSegmentBaseClasses`. */
-export const joinedPairEndSegmentBaseClasses = fieldGroupedEndSegmentBaseClasses
 
 export const joinedPairEndSelectSegmentVariants = cva(
   'inline-flex shrink-0 items-center justify-between gap-1.5 text-left [&>span]:line-clamp-1 [&_svg]:shrink-0',

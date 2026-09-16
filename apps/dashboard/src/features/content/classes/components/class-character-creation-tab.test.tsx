@@ -144,7 +144,7 @@ describe('ClassCharacterCreationTab', () => {
     )
 
     expect(packageListRow(/4 items · 11 GP/)).toBeInTheDocument()
-    expect(packageListRow(/0 items · 50 GP/)).toBeInTheDocument()
+    expect(packageListRow(/50 GP/)).toBeInTheDocument()
     expect(packageList.queryByText(/Class equipment and baseline wealth/i)).not.toBeInTheDocument()
 
     await user.click(packageListRow(/Standard Equipment/))
