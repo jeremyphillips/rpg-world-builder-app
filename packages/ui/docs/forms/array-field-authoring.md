@@ -250,6 +250,10 @@ derived from normalized field groups — not from whether authors wrapped a leaf
 | Single `kind: 'row'` of leaf fields             | `inline`        |
 | Multiple top-level fields                       | `stacked`       |
 
+**Compact inline chrome:** when `contentLayout` resolves to `inline`, field participants and
+grip/actions share one `ArrayItemAnatomyGrid` — label and validation may grow in their tracks
+without moving drag/remove chrome off the control track. No author alignment knob is required.
+
 **Field label vs item label:** per-field `label` on `text`, `inlineSentence`, etc. controls field
 chrome only. Item headers come from `item.header`, `headerVisibility`, and disclosure — not from
 field declaration shape.

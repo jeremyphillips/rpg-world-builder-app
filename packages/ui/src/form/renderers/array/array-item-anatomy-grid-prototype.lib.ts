@@ -11,11 +11,22 @@ export type AnatomyTrackProbe = {
 
 export function queryControlRegionTop(fieldId: string): number | null {
   const input = document.getElementById(fieldId)
-  const control = input
+  return queryControlRegionTopFromNode(input)
+}
+
+/** Resolves the control-region top edge from any descendant of a field anatomy root. */
+export function queryControlRegionTopFromNode(node: Element | null | undefined): number | null {
+  const control = node
     ?.closest('[data-field-anatomy]')
     ?.querySelector('[data-field-control-region]')
   if (!control) return null
   return Math.round(control.getBoundingClientRect().top)
+}
+
+/** Resolves control-region top via a registered RHF control `name` attribute. */
+export function queryControlTopByFieldName(name: string): number | null {
+  const named = document.querySelector(`[name="${name}"]`)
+  return queryControlRegionTopFromNode(named)
 }
 
 export function queryChromeCenterY(selector: string): number | null {

@@ -9,7 +9,10 @@ import { Input } from '../../../components/ui/input.client'
 import { fieldRowParticipationClasses } from '../../../components/ui/field-root.lib'
 
 import { ArrayItemAnatomyGrid } from './array-item-anatomy-grid.client'
-import { readAnatomyTrackProbe } from './array-item-anatomy-grid-prototype.lib'
+import {
+  queryControlTopByFieldName,
+  readAnatomyTrackProbe,
+} from './array-item-anatomy-grid-prototype.lib'
 
 function stubRect(
   element: Element,
@@ -150,6 +153,35 @@ describe('ArrayItemAnatomyGrid prototype composition', () => {
 
     expect(probe.gripCenterY).toBe(94)
     expect(probe.actionsCenterY).toBe(94)
+  })
+
+  it('resolves control top from a registered field name', () => {
+    render(
+      <Field.Root id="spell-ability" anatomy rowParticipation width="full">
+        <FieldLayout
+          label={<Field.Label>Spellcasting ability</Field.Label>}
+          control={
+            <Input id="spell-ability" name="spellAbility" aria-label="Spellcasting ability" />
+          }
+        />
+      </Field.Root>,
+    )
+
+    const control = document.querySelector('[data-field-control-region]') as HTMLElement
+    control.getBoundingClientRect = () =>
+      ({
+        top: 120,
+        height: 36,
+        left: 0,
+        width: 100,
+        right: 100,
+        bottom: 156,
+        x: 0,
+        y: 120,
+        toJSON: () => ({}),
+      }) as DOMRect
+
+    expect(queryControlTopByFieldName('spellAbility')).toBe(120)
   })
 
   it('does not nest a second anatomy row grid inside the fields region', () => {

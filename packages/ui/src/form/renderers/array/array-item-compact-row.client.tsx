@@ -24,8 +24,12 @@ export interface ArrayItemCompactRowProps {
 }
 
 /**
- * Compact array item layout — `[grip?] [field row] [actions]` on one grid row,
- * with an optional full-width summary below.
+ * Compact array item layout for **stacked** flat-no-header content — `[grip?] [fields] [actions]`
+ * on one outer grid row, with an optional full-width summary below.
+ *
+ * Inline compact rows (`contentLayout: 'inline'`) use {@link ArrayItemAnatomyInlineRow} instead —
+ * one shared label / control / message track grid with subgrid field participants and
+ * vertically centered grip/actions.
  */
 export function ArrayItemCompactRow({
   titleId,

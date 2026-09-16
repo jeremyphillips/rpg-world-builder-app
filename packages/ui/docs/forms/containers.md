@@ -461,9 +461,15 @@ Optional hooks:
 | `itemVariant` | `'auto'` \| `'compact'` \| `'detailed'` — row layout (default `auto`). |
 
 **Compact inline rows** (`itemVariant: 'auto'` \| `'compact'` with a single leaf `row`) render field
-participants on the shared `ArrayItemAnatomyGrid` shell — grip/actions vertically center in the row
-cell; leaf `width` tokens (`full`, `auto`, fractions, `digits`, …) compose the same way as schema
-`kind: 'row'` fields.
+participants on the shared `ArrayItemAnatomyGrid` shell — one label / control / message track grid
+with subgrid field columns. Grip and actions span all three tracks and stay vertically centered in
+the shared cell; label wrap and validation growth must not pin chrome to the label track or shift
+it when the message track grows. Leaf `width` tokens (`full`, `auto`, fractions, `digits`, …)
+compose the same way as schema `kind: 'row'` fields.
+
+Regression fixtures: `Forms/ArrayField` → **Movement chrome stability** / **Examples unlabeled
+inline row**; `Internal/Forms/Layout/AnatomyRowToggleMatrix` for stacked select + inline checkbox
+rows.
 
 | `item.surface` / `item.tone` | Item header — defaults to `{ emphasis: 'subtle' }`; override with raised elevation or semantic tone |
 | `itemHeader` | Primary/fallback labels; optional `summary` on a second row below the title (detailed). |

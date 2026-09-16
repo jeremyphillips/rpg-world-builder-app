@@ -116,6 +116,41 @@ describe('grant field validation presentation', () => {
     })
   })
 
+  it('renders spellcasting row toggles on the anatomy grid with single-line control bands', () => {
+    render(
+      <Form
+        schema={grantsOnlySchema}
+        fields={buildGrantArrayFields()}
+        defaultValues={{
+          grants: [
+            {
+              grantType: 'spells',
+              spellAbility: 'int',
+              spellAvailability: false,
+              spellCastingEnabled: true,
+            },
+          ],
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(document.querySelector('[data-field-row-anatomy]')).toBeInTheDocument()
+
+    const abilityTrigger = screen.getByRole('combobox', { name: 'Spellcasting ability' })
+    const alwaysPrepared = screen.getByRole('checkbox', { name: 'Always prepared' })
+
+    expect(abilityTrigger.closest('[data-field-row-participant]')).toBeTruthy()
+    expect(alwaysPrepared.closest('[data-field-row-participant]')).toBeTruthy()
+
+    const checkboxControlBand = alwaysPrepared
+      .closest('[data-field-control-region]')
+      ?.querySelector('.items-center')
+    expect(checkboxControlBand).toBeTruthy()
+    expect(checkboxControlBand).not.toHaveClass('min-h-0', 'h-auto', 'items-start')
+  })
+
   it('renders nested trait grant validation on canonical presentation paths', async () => {
     const user = userEvent.setup()
     const fields = buildGrantArrayFields({ renderShell: true, nestedInTraits: true })

@@ -1,6 +1,8 @@
+import * as React from 'react'
 import { describe, expect, it, vi, afterEach } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { UseFormReturn } from 'react-hook-form'
 import axe from 'axe-core'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
@@ -10,6 +12,11 @@ import type { FormItem } from '../field-config'
 import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
 import { submitAndExpectPayload } from '../test-utils'
 import { collapsibleListItemHeaderVerticalPaddingVariants } from '../../components/ui/collapsible-list-item/collapsible-list-item.variants'
+import {
+  movementChromeStabilityFields,
+  movementChromeStabilitySchema,
+  type MovementChromeStabilityValues,
+} from './array-field-chrome-stability.harness.client'
 
 // ── Schema ──────────────────────────────────────────────────────────────────
 
@@ -1358,6 +1365,68 @@ describe('ArrayFieldRenderer', () => {
 
     expect(document.querySelector('[data-array-item-anatomy-grip]')).toHaveClass('items-center')
     expect(document.querySelector('[data-array-item-anatomy-actions]')).toHaveClass('items-center')
+  })
+
+  it('keeps movement-shaped inline chrome on the anatomy grid when the message track grows', async () => {
+    function MovementFeetErrorEffect({
+      form,
+      message,
+    }: {
+      form: UseFormReturn<MovementChromeStabilityValues>
+      message?: string
+    }) {
+      React.useEffect(() => {
+        form.clearErrors('movement.0.feet')
+        if (message) {
+          form.setError('movement.0.feet', { type: 'manual', message })
+        }
+      }, [form, message])
+      return null
+    }
+
+    function MovementChromeFixture({ errorMessage }: { errorMessage?: string }) {
+      return (
+        <Form<MovementChromeStabilityValues>
+          id="movement-chrome-test"
+          schema={movementChromeStabilitySchema}
+          fields={movementChromeStabilityFields}
+          defaultValues={{ movement: [{ mode: 'walk', feet: 30 }] }}
+          onSubmit={vi.fn()}
+          header={(form) => <MovementFeetErrorEffect form={form} message={errorMessage} />}
+          footer={<button type="submit">Save</button>}
+        />
+      )
+    }
+
+    const assertAnatomyGridChrome = () => {
+      const anatomyGrid = document.querySelector('[data-array-item-anatomy-grid]')
+      expect(anatomyGrid).toBeInTheDocument()
+      expect(anatomyGrid?.querySelector('[data-field-row-anatomy]')).toBeNull()
+
+      const grip = document.querySelector('[data-array-item-anatomy-grip]') as HTMLElement | null
+      const actions = document.querySelector(
+        '[data-array-item-anatomy-actions]',
+      ) as HTMLElement | null
+
+      expect(grip).toHaveStyle({ gridRow: '1 / -1' })
+      expect(actions).toHaveStyle({ gridRow: '1 / -1' })
+      expect(grip).toHaveClass('items-center')
+      expect(actions).toHaveClass('items-center')
+      expect(anatomyGrid).toContainElement(grip)
+      expect(anatomyGrid).toContainElement(actions)
+    }
+
+    const { rerender } = render(<MovementChromeFixture />)
+    assertAnatomyGridChrome()
+
+    rerender(
+      <MovementChromeFixture errorMessage="Speed must be a positive whole number and cannot exceed the species movement cap for this mode." />,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText(/species movement cap/i)).toBeInTheDocument()
+    })
+    assertAnatomyGridChrome()
   })
 
   it('shows issue badge, row summary, and legend link after failed submit', async () => {
