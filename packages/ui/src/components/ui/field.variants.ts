@@ -210,7 +210,10 @@ export const fieldArrayLegendTypographyClasses =
 /** @deprecated Use {@link fieldLabelTypographyVariants}. */
 export const fieldArrayLegendSmTypographyClasses =
   'text-xs font-field-label leading-none text-foreground'
-/** Legend row when the add action sits inline with the array heading. */
+/**
+ * @deprecated Prefer {@link formSectionHeaderActionLayoutClasses} from form presentation.
+ * Retained for class drift tests only.
+ */
 export const arrayFieldLegendInlineLayoutClasses = 'flex w-full items-center justify-between gap-4'
 export const arrayFieldLegendInlineLabelClasses = 'flex min-w-0 items-center gap-2'
 

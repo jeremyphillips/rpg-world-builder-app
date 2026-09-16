@@ -265,6 +265,42 @@ describe('ArrayFieldRenderer', () => {
     expect(addButton).not.toHaveClass('bg-secondary')
   })
 
+  it('renders array heading hints beside inline add actions', () => {
+    const inlineFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        heading: {
+          label: 'Grants',
+          hint: 'Add the mechanical effects this feature provides.',
+        },
+        fields: traitFields,
+        addAction: { label: 'Add grant', layout: 'inline' },
+      },
+    ]
+
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={inlineFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const fieldset = container.querySelector('fieldset')!
+    const legend = fieldset.querySelector('legend')
+    const addButton = screen.getByRole('button', { name: 'Add grant' })
+
+    expect(legend).toHaveTextContent('Grants')
+    expect(
+      screen.getByText('Add the mechanical effects this feature provides.'),
+    ).toBeInTheDocument()
+    expect(legend).toContainElement(addButton)
+    expect(legend).toHaveClass('w-full')
+    expect(document.querySelector('.grid.items-start')).toBeTruthy()
+  })
+
   it('renders inline add actions in the legend row with a leading plus icon', () => {
     const inlineFields: FormItem[] = [
       {
@@ -291,6 +327,7 @@ describe('ArrayFieldRenderer', () => {
 
     expect(legend).toHaveTextContent('Movement')
     expect(legend).toContainElement(addButton)
+    expect(legend).toHaveClass('w-full')
     expect(addButton.querySelector('svg')).toBeTruthy()
     expect(screen.getAllByRole('button', { name: 'Add speed' })).toHaveLength(1)
   })

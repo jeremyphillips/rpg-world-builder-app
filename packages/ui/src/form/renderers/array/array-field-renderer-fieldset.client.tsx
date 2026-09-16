@@ -87,6 +87,7 @@ export function ArrayFieldRendererFieldset({
       {state.showLegend ? (
         <ArrayFieldLegend
           legend={state.legend}
+          headingHint={state.headingHint}
           legendFieldSize={state.legendFieldSize}
           addActionLayout={state.addActionLayout}
           required={state.required}

@@ -253,6 +253,7 @@ export {
   type FieldChrome,
   type FieldHintConfig,
   type FormHeading,
+  type FormHeadingContent,
   type FormHeadingTier,
   type FieldLabelVisibility,
   type FormNavigationAnchor,
@@ -443,6 +444,15 @@ export {
   type ArrayItemIssueSummaryProps,
 } from './renderers/array/array-item-issue.client'
 export { buildFieldRendererIds } from './renderers/field-renderer-config.lib'
+export {
+  FormSectionHeader,
+  type FormSectionHeaderLabelPresentation,
+  type FormSectionHeaderProps,
+} from './presentation/form-section-header.client'
+export {
+  HeadingPresentation,
+  type HeadingPresentationProps,
+} from './presentation/heading-presentation.client'
 export {
   fieldArrayItemListClasses,
   type FieldGroupLegendSize,

@@ -92,6 +92,10 @@ export {
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
+export { IconBox, type IconBoxProps } from './components/ui/icon-box.client'
+export { iconBoxVariants, iconBoxGlyphClasses } from './components/ui/icon-box.variants'
+export { EmptyPanel, type EmptyPanelProps } from './components/ui/empty-panel.client'
+export { emptyPanelVariants } from './components/ui/empty-panel.variants'
 export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export {
   sidebarNavItemVariants,

@@ -3,19 +3,15 @@
 import type { ReactNode } from 'react'
 
 import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
-import { FieldLabelContent } from '../../../components/ui/field-label-content'
-import { shouldShowVisibleRequiredMarker } from '../../../components/ui/field-required.lib'
-import {
-  arrayFieldLegendInlineLabelClasses,
-  arrayFieldLegendInlineLayoutClasses,
-  resolveArrayLegendClassName,
-} from '../../../components/ui/field.variants'
 import { cn } from '../../../lib/utils'
-import type { ArrayAddActionLayout } from '../../field-config'
+import { resolveArrayLegendClassName } from '../../../components/ui/field.variants'
+import type { ArrayAddActionLayout, FieldHintConfig } from '../../field-config'
+import { FormSectionHeader } from '../../presentation/form-section-header.client'
 import { ArrayLegendIssueLink } from './array-item-issue.client'
 
 export interface ArrayFieldLegendProps {
   legend: string
+  headingHint?: string | FieldHintConfig
   legendFieldSize: FieldSizeToken
   addActionLayout: ArrayAddActionLayout
   required?: boolean
@@ -29,6 +25,7 @@ export interface ArrayFieldLegendProps {
 /** Array section `<legend>` — optional inline add action on the right. */
 export function ArrayFieldLegend({
   legend,
+  headingHint,
   legendFieldSize,
   addActionLayout,
   required = false,
@@ -39,19 +36,17 @@ export function ArrayFieldLegend({
   addControl,
 }: ArrayFieldLegendProps) {
   const legendClassName = resolveArrayLegendClassName(legendFieldSize)
-  const legendLabel = (
-    <FieldLabelContent
-      label={legend}
-      required={required}
-      showRequiredMarker={shouldShowVisibleRequiredMarker(required, 'visible')}
-    />
-  )
+  const inlineAction = addActionLayout === 'inline' ? addControl : undefined
 
-  if (addActionLayout === 'inline') {
-    return (
-      <legend className={cn(legendClassName, arrayFieldLegendInlineLayoutClasses)}>
-        <span className={arrayFieldLegendInlineLabelClasses}>
-          <span>{legendLabel}</span>
+  return (
+    <legend className={cn(legendClassName, 'w-full min-w-0')}>
+      <FormSectionHeader
+        label={legend}
+        hint={headingHint}
+        labelPresentation="field-label"
+        required={required}
+        action={inlineAction}
+        labelAccessory={
           <ArrayLegendIssueLink
             issueCount={arrayIssueCount}
             invalidRowCount={invalidRowCount}
@@ -59,24 +54,8 @@ export function ArrayFieldLegend({
             sectionLabel={legend}
             onPress={onFocusFirstArrayIssue}
           />
-        </span>
-        {addControl}
-      </legend>
-    )
-  }
-
-  return (
-    <legend className={legendClassName}>
-      <span className={arrayFieldLegendInlineLabelClasses}>
-        {legendLabel}
-        <ArrayLegendIssueLink
-          issueCount={arrayIssueCount}
-          invalidRowCount={invalidRowCount}
-          hasContainerIssue={hasContainerIssue}
-          sectionLabel={legend}
-          onPress={onFocusFirstArrayIssue}
-        />
-      </span>
+        }
+      />
     </legend>
   )
 }

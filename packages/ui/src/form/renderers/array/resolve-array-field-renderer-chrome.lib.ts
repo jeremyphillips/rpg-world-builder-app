@@ -49,6 +49,7 @@ export function resolveArrayFieldRendererChrome({
   } = addAction ?? {}
   const arrayHeading = resolveArrayHeading(config)
   const legend = arrayHeading?.label ?? config.legend ?? ''
+  const headingHint = arrayHeading?.hint
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
   const itemCollapseKey = itemConfig.collapseKey
@@ -90,6 +91,7 @@ export function resolveArrayFieldRendererChrome({
     itemListClasses,
     itemBodyStackClasses,
     legend,
+    headingHint,
     legendFieldSize,
     max,
     min,

@@ -62,9 +62,14 @@ import type {
   FieldSeparator,
 } from '../components/ui/field.variants'
 import type { FormDensity } from './form-density'
-import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
+import type { FieldLabelVisibility, FormHeading, FormHeadingContent } from './form-heading.lib'
 
-export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
+export type {
+  FieldLabelVisibility,
+  FormHeading,
+  FormHeadingContent,
+  FormHeadingTier,
+} from './form-heading.lib'
 export {
   DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
   columnsNeedBreakpointReorder,
@@ -1376,7 +1381,7 @@ export interface ArrayConfig {
   kind: 'array'
   name: string
   /** Preferred heading API — typography derives from nesting depth and density. */
-  heading?: Pick<FormHeading, 'label'>
+  heading?: FormHeadingContent
   /** Required when `heading.label` is omitted — see `resolveArrayHeading`. */
   legend?: string
   /**

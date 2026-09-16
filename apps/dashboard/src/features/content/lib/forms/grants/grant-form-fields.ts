@@ -684,9 +684,13 @@ export function grantArrayFields<T extends string>(
     {
       kind: 'array',
       name: 'grants',
-      legend: 'Grants',
+      heading: {
+        label: 'Grants',
+        hint: 'Add the mechanical effects this feature provides.',
+      },
       addAction: {
         label: 'Add grant',
+        layout: 'inline',
         menu: buildGrantArrayAddMenu(grantTypes as readonly GrantType[]),
       },
       item: {
