@@ -30,7 +30,7 @@ import {
   type SpeciesDetailViewModel,
   type SpeciesDisplayVocabulary,
 } from './species-display'
-import { movementRowsToRecord } from './species-movement-form-fields'
+import { movementRowsToRecordForPreview } from './species-movement-form-fields'
 import {
   SPECIES_CLASS_POLICY_MODE_LABELS,
   SPECIES_MULTICLASS_POLICY_LABELS,
@@ -129,7 +129,7 @@ function buildBasicsSection(values: SpeciesFormValues, ctx: ContentFormCtx): Con
   > = {
     creatureType: values.creatureType,
     sizes: values.sizes,
-    movement: movementRowsToRecord(values.movement),
+    movement: movementRowsToRecordForPreview(values.movement),
     languageAffinities: values.languageAffinities,
     traits,
   }
@@ -287,7 +287,9 @@ export function speciesDetailSourceFromFormValues(values: SpeciesFormValues): Sp
     description: values.description,
     creatureType: values.creatureType ?? speciesCreateDefaultValues.creatureType!,
     sizes: values.sizes ?? speciesCreateDefaultValues.sizes!,
-    movement: movementRowsToRecord(values.movement ?? speciesCreateDefaultValues.movement!),
+    movement: movementRowsToRecordForPreview(
+      values.movement ?? speciesCreateDefaultValues.movement!,
+    ),
     languageAffinities: values.languageAffinities,
     traits: traitsFromFormValues(values.traits ?? []),
     heritage: heritageFromFormValues(values.heritage),

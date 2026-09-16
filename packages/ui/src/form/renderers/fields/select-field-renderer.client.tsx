@@ -3,6 +3,7 @@
 import { FieldReadOnlyValueField } from '../../../components/ui/field-read-only-value.client'
 import { SelectField } from '../../../components/ui/select-field'
 import type { SelectFieldConfig } from '../../field-config'
+import { resolveFieldCopyContext } from '../../config/field-copy-context.lib'
 import { normalizedSelectFieldValue, pickSelectFieldChromeProps } from './select-field-renderer.lib'
 import { useSelectFieldRendererState } from './use-select-field-renderer-state.client'
 
@@ -21,6 +22,7 @@ export function SelectFieldRenderer({
   namePrefix,
 }: SelectFieldRendererProps) {
   const state = useSelectFieldRendererState(config, fullName, namePrefix)
+  const copyContext = resolveFieldCopyContext(state.renderConfig)
   const chrome = pickSelectFieldChromeProps(state.renderConfig, {
     hint: state.hint,
     hintPosition: state.hintPosition,
@@ -43,6 +45,8 @@ export function SelectFieldRenderer({
       id={id}
       options={state.resolvedOptions}
       placeholder={state.renderConfig.placeholder}
+      noun={copyContext.noun}
+      digits={state.renderConfig.digits}
       name={state.field.name}
       disabled={state.renderConfig.disabled}
       value={normalizedSelectFieldValue(state.field.value)}

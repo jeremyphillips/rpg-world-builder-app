@@ -6,6 +6,7 @@ export type TypedSelectOption<T extends TypedSelectOptionValue = TypedSelectOpti
   value: T
   label: string
   disabled?: boolean
+  disabledReason?: string
 }
 
 const NUMBER_PREFIX = 'n:'

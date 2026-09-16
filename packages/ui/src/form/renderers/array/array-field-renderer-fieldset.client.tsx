@@ -58,7 +58,9 @@ export function ArrayFieldRendererFieldset({
 
   const addControl = (
     <ArrayFieldAddControl
-      canAdd={state.canAdd && state.addAction !== null}
+      showAddControl={state.showAddControl}
+      addEnabled={state.addEnabled}
+      addDisabledReason={state.addDisabledReason}
       addActionLabel={state.addActionLabel}
       addActionVariant={state.addActionVariant}
       addActionLayout={state.addActionLayout}

@@ -131,6 +131,8 @@ export interface FieldOption {
   label: string
   value: string
   disabled?: boolean
+  /** Shown in select panels when the option is disabled (e.g. "Already used"). */
+  disabledReason?: string
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   description?: string
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
@@ -1348,6 +1350,11 @@ export interface ArrayFilterSelectConfig {
   filter: ArrayFilterSelectFn
 }
 
+export type ArrayCanAppendResult = {
+  enabled: boolean
+  reason?: string
+}
+
 /**
  * Repeatable list section (`kind: 'array'`).
  *
@@ -1385,6 +1392,8 @@ export interface ArrayConfig {
   arrayPattern?: ArrayPatternConfig
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
   filterSelect?: ArrayFilterSelectConfig
+  /** When append should stay visible but disabled (e.g. finite enum saturation). */
+  resolveCanAppend?: (items: unknown[]) => ArrayCanAppendResult
   id?: string
   className?: string
   separator?: FieldSeparator

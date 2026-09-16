@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveFieldPlaceholder } from './field-placeholder.lib'
+import { COMPACT_UNSET_PLACEHOLDER, resolveFieldPlaceholder } from './field-placeholder.lib'
 
 describe('resolveFieldPlaceholder', () => {
   it('defaults single-select placeholders to Choose vocabulary', () => {
@@ -17,6 +17,33 @@ describe('resolveFieldPlaceholder', () => {
         noun: { singular: 'primary ability', plural: 'primary abilities' },
       }),
     ).toBe('Choose primary abilities…')
+  })
+
+  it('uses compact unset placeholder when digits are set', () => {
+    expect(resolveFieldPlaceholder({ label: 'Speed value', category: 'choice', digits: 3 })).toBe(
+      COMPACT_UNSET_PLACEHOLDER,
+    )
+  })
+
+  it('honors presentation default override even when digits are set', () => {
+    expect(
+      resolveFieldPlaceholder({
+        label: 'Score',
+        category: 'choice',
+        digits: 3,
+        presentation: 'default',
+      }),
+    ).toBe('Choose a score…')
+  })
+
+  it('uses compact unset placeholder when presentation is compact without digits', () => {
+    expect(
+      resolveFieldPlaceholder({
+        label: 'Speed value',
+        category: 'choice',
+        presentation: 'compact',
+      }),
+    ).toBe(COMPACT_UNSET_PLACEHOLDER)
   })
 
   it('respects explicit placeholder overrides', () => {

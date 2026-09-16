@@ -5,6 +5,11 @@ the frontend. Every message is a `defineMessage` definition — a stable id plus
 an English formatter — so copy is testable, greppable, and ready for a future
 locale catalog keyed by id.
 
+**Form placeholders and constraint hints** (`Choose …`, choice-count phrases) live
+in `@rpg/contracts/form-copy` — not in this file. Compact unset presentation
+(`—` for digit-sized selects) is owned by `@rpg/ui` (`resolveFieldPlaceholder`).
+See [packages/ui/docs/forms.md](../../ui/docs/forms.md#field-copy--placeholders-and-instructions).
+
 ## The three tiers
 
 ```mermaid

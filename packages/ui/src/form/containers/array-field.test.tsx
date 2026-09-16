@@ -522,7 +522,38 @@ describe('ArrayFieldRenderer', () => {
     expect(await screen.findByText('Trait name is required')).toBeInTheDocument()
   })
 
-  it('hides the add button when max is reached', async () => {
+  it('keeps the add button visible and disabled when resolveCanAppend reports saturation', async () => {
+    const saturatedFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'modes',
+        legend: 'Modes',
+        fields: [{ type: 'select', name: 'mode', label: 'Mode', options: [] }],
+        addAction: { label: 'Add mode' },
+        resolveCanAppend: (items) =>
+          (items as { mode: string }[]).filter((row) => row.mode).length >= 2
+            ? { enabled: false, reason: 'All modes have been added.' }
+            : { enabled: true },
+      },
+    ]
+    const saturatedSchema = z.object({ modes: z.array(z.object({ mode: z.string() })) })
+
+    render(
+      <Form
+        schema={saturatedSchema}
+        fields={saturatedFields}
+        defaultValues={{ modes: [{ mode: 'walk' }, { mode: 'fly' }] }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const addButton = screen.getByRole('button', { name: 'Add mode' })
+    expect(addButton).toBeDisabled()
+    expect(addButton).toHaveAttribute('title', 'All modes have been added.')
+  })
+
+  it('keeps the add button visible and disabled when max is reached', async () => {
     const user = userEvent.setup()
     const maxFields: FormItem[] = [
       {
@@ -544,7 +575,9 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
-    expect(screen.queryByRole('button', { name: 'Add trait' })).not.toBeInTheDocument()
+    const addButton = screen.getByRole('button', { name: 'Add trait' })
+    expect(addButton).toBeDisabled()
+    expect(addButton).toHaveAttribute('title', 'Add up to 1 items.')
   })
 
   it('allows removing the last item and shows neutral empty-state copy only', async () => {

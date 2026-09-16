@@ -46,6 +46,7 @@ import { speciesCharacterCreationFormSchema } from './species-rules-form-fields'
 import { refineSpeciesCharacterCreationForm } from './species-rules-form-values'
 import {
   movementArrayField,
+  movementRowDraftFormSchema,
   movementRowFormSchema,
   refineSpeciesMovementRows,
 } from './species-movement-form-fields'
@@ -133,7 +134,7 @@ export function createSpeciesDraftFormSchema() {
     description: z.string().optional(),
     creatureType: creatureTypeSchema,
     sizes: z.array(creatureSizeSchema).default([]),
-    movement: z.array(movementRowFormSchema).default([]),
+    movement: z.array(movementRowDraftFormSchema).default([]),
     languageAffinities: z.array(z.string()).optional(),
     traits: z.array(traitRowDraftFormSchema).default([]),
     heritage: heritageDraftFormSchema.optional(),

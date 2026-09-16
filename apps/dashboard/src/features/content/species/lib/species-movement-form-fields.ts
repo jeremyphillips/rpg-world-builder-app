@@ -2,6 +2,8 @@ import {
   MOVEMENT_MODES,
   MOVEMENT_SPEED_FEET,
   defineMessage,
+  fieldValidationMessages,
+  formatFieldMessage,
   getMovementModeLabel,
   movementModeSchema,
   movementSpeedFeetSchema,
@@ -10,6 +12,7 @@ import {
   type MovementSpeeds,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
+import { disableOptionsUsedInSiblingRows } from '@rpg/ui/form'
 import { z } from 'zod'
 
 export const speciesMovementValidationMessages = {
@@ -19,16 +22,44 @@ export const speciesMovementValidationMessages = {
   ),
 }
 
-export const movementRowFormSchema = z.object({
-  mode: movementModeSchema,
-  feet: movementSpeedFeetSchema,
+const movementModeDraftSchema = z.union([movementModeSchema, z.literal('')])
+const movementFeetDraftSchema = z.union([movementSpeedFeetSchema, z.literal(''), z.undefined()])
+
+export const movementRowDraftFormSchema = z.object({
+  mode: movementModeDraftSchema,
+  feet: movementFeetDraftSchema,
 })
 
-export type MovementRowFormValues = z.infer<typeof movementRowFormSchema>
+export type MovementRowDraftFormValues = z.infer<typeof movementRowDraftFormSchema>
+export type MovementRowFormValues = {
+  mode: MovementMode
+  feet: MovementSpeedFeet
+}
 
-export const DEFAULT_MOVEMENT_ROW: MovementRowFormValues = {
-  mode: 'walk',
-  feet: 30,
+export const movementRowFormSchema = movementRowDraftFormSchema.superRefine((row, ctx) => {
+  refineMovementRowRequired(row, ctx)
+})
+
+function refineMovementRowRequired(
+  row: MovementRowDraftFormValues,
+  ctx: z.RefinementCtx,
+  pathPrefix: (string | number)[] = [],
+): void {
+  if (!row.mode) {
+    ctx.addIssue({
+      code: 'custom',
+      message: formatFieldMessage(fieldValidationMessages.requiredSelect({ label: 'Mode' })),
+      path: [...pathPrefix, 'mode'],
+    })
+  }
+
+  if (row.feet === undefined || row.feet === '') {
+    ctx.addIssue({
+      code: 'custom',
+      message: formatFieldMessage(fieldValidationMessages.requiredSelect({ label: 'Speed' })),
+      path: [...pathPrefix, 'feet'],
+    })
+  }
 }
 
 const movementModeOptions = MOVEMENT_MODES.map((mode) => ({
@@ -41,6 +72,8 @@ const movementFeetOptions = MOVEMENT_SPEED_FEET.map((feet) => ({
   label: String(feet),
 }))
 
+const ALL_MOVEMENT_MODES_ADDED_REASON = 'All movement modes have been added.'
+
 export function movementArrayField(): FormItem {
   return {
     kind: 'array',
@@ -48,7 +81,22 @@ export function movementArrayField(): FormItem {
     legend: 'Movement',
     addAction: { label: 'Add movement', layout: 'inline', size: 'sm' },
     min: 1,
+    max: MOVEMENT_MODES.length,
     density: 'comfortable',
+    appendDefaults: () => ({ mode: '', feet: undefined }),
+    resolveCanAppend: (items) => {
+      const used = new Set(
+        (items as MovementRowDraftFormValues[])
+          .map((row) => row.mode)
+          .filter((mode): mode is MovementMode => Boolean(mode)),
+      )
+      return used.size >= MOVEMENT_MODES.length
+        ? { enabled: false, reason: ALL_MOVEMENT_MODES_ADDED_REASON }
+        : { enabled: true }
+    },
+    filterSelect: {
+      filter: disableOptionsUsedInSiblingRows({ fieldName: 'mode' }),
+    },
     item: {
       variant: 'compact',
       headerVisibility: 'hidden',
@@ -57,10 +105,10 @@ export function movementArrayField(): FormItem {
         fallback: (index) => `Movement ${index + 1}`,
         primaryField: 'mode',
         formatPrimary: (value, values) => {
-          if (typeof value !== 'string') return undefined
+          if (typeof value !== 'string' || value === '') return undefined
           const feet = values?.feet
-          if (feet === undefined || feet === '') return getMovementModeLabel(value)
-          return `${getMovementModeLabel(value)} ${feet} ft`
+          if (feet === undefined || feet === '') return getMovementModeLabel(value as MovementMode)
+          return `${getMovementModeLabel(value as MovementMode)} ${feet} ft`
         },
       },
     },
@@ -74,7 +122,6 @@ export function movementArrayField(): FormItem {
             label: 'Mode',
             required: true,
             options: movementModeOptions,
-            defaultValue: 'walk',
             width: 'md',
           },
           {
@@ -85,7 +132,6 @@ export function movementArrayField(): FormItem {
               kind: 'select',
               name: 'feet',
               options: movementFeetOptions,
-              defaultValue: 30,
               digits: 3,
               ariaLabel: 'Speed value',
             },
@@ -108,28 +154,56 @@ export function movementRecordToRows(movement: MovementSpeeds): MovementRowFormV
   }))
 }
 
-export function movementRowsToRecord(rows: MovementRowFormValues[]): MovementSpeeds {
+/** Preview-only conversion — omits rows without a selected mode. */
+export function movementRowsToRecordForPreview(rows: MovementRowDraftFormValues[]): MovementSpeeds {
   const record: Partial<Record<MovementMode, number>> = {}
   for (const row of rows) {
+    if (!row.mode || row.feet === undefined || row.feet === '') continue
+    record[row.mode] = row.feet
+  }
+  return record as MovementSpeeds
+}
+
+function isCompleteMovementRow(row: MovementRowDraftFormValues): row is MovementRowFormValues {
+  return (
+    Boolean(row.mode) &&
+    movementModeSchema.safeParse(row.mode).success &&
+    row.feet !== undefined &&
+    row.feet !== '' &&
+    movementSpeedFeetSchema.safeParse(row.feet).success
+  )
+}
+
+/** Publish conversion — expects validated rows from the publish schema. */
+export function movementRowsToRecord(rows: MovementRowDraftFormValues[]): MovementSpeeds {
+  const record: Partial<Record<MovementMode, number>> = {}
+  for (const row of rows) {
+    if (!isCompleteMovementRow(row)) {
+      throw new Error('movementRowsToRecord expects validated movement rows.')
+    }
     record[row.mode] = row.feet
   }
   return record as MovementSpeeds
 }
 
 export function refineSpeciesMovementRows(
-  rows: MovementRowFormValues[],
+  rows: MovementRowDraftFormValues[],
   ctx: z.RefinementCtx,
   pathPrefix: (string | number)[] = ['movement'],
 ): void {
   const seen = new Set<MovementMode>()
   for (const [index, row] of rows.entries()) {
-    if (seen.has(row.mode)) {
+    if (!row.mode) continue
+    if (!movementModeSchema.safeParse(row.mode).success) continue
+
+    const mode = row.mode as MovementMode
+    if (seen.has(mode)) {
       ctx.addIssue({
         code: 'custom',
         message: speciesMovementValidationMessages.duplicateMode(),
         path: [...pathPrefix, index, 'mode'],
       })
     }
-    seen.add(row.mode)
+    seen.add(mode)
   }
 }

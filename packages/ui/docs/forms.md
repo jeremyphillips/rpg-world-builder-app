@@ -300,6 +300,30 @@ English defaults. See `field-error-map-fixture.stories.tsx` for a synthetic form
 covering each edge case. Tiers, naming, and copy style →
 [packages/contracts/docs/validation-messages.md](../../contracts/docs/validation-messages.md).
 
+### Field copy — placeholders and instructions
+
+Linguistic templates (`Choose …`, choice-count hints) live in
+`@rpg/contracts/form-copy`. Presentation orchestration lives in `@rpg/ui/form`:
+
+| Layer                               | Owns                                                         |
+| ----------------------------------- | ------------------------------------------------------------ |
+| `@rpg/contracts/form-copy`          | `FieldNoun`, `resolveChoicePlaceholder`, `choiceCountPhrase` |
+| `@rpg/ui` `resolveFieldPlaceholder` | Compact unset (`—`), presentation/digits inference           |
+
+**Placeholder precedence** (when config omits an explicit `placeholder`):
+
+```text
+presentation ?? (digits != null ? 'compact' : 'default')
+```
+
+- **Default** single-select → `Choose a {noun}…` from contracts.
+- **Compact** single-select → `—` (visual unset only; labels / `ariaLabel` name the control).
+- **`presentation: 'default'` + `digits`** → full Choose copy (escape hatch for digit-sized controls that need it).
+- **Text / number** → no auto placeholder (digit-sized number inputs stay empty when labeled).
+
+Explicit `placeholder` on field config always wins. Do not hand-author `—` in
+dashboard form modules — set `digits` on narrow selects or `presentation: 'compact'`.
+
 ### Verifying validation messages in tests
 
 Co-located form tests import helpers from `@rpg/ui/form/test-utils`:

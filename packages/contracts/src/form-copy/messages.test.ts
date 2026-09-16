@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { choiceCountPhrase, nounFromLabel, resolveChoicePlaceholder } from './messages'
 
-describe('field copy helpers', () => {
+describe('form copy helpers', () => {
   const primaryAbilities = {
     singular: 'primary ability',
     plural: 'primary abilities',

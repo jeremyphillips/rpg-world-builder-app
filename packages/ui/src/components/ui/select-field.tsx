@@ -14,7 +14,6 @@ import {
   Select,
   SelectContent,
   SelectGroup,
-  SelectItem,
   SelectLabel,
   SelectTrigger,
   SelectValue,
@@ -32,7 +31,12 @@ import {
   type FieldOption,
   type SelectFieldOptionListItem,
 } from '../../form/field-config'
-import { resolveFieldPlaceholder } from '../../form/config/field-placeholder.lib'
+import {
+  resolveFieldPlaceholder,
+  type FieldPlaceholderPresentation,
+} from '../../form/config/field-placeholder.lib'
+import type { FieldNoun } from '@rpg/contracts'
+import { SelectOptionItem } from './select-option-item.client'
 
 export type SelectFieldOption = FieldOption
 
@@ -63,6 +67,8 @@ export interface SelectFieldProps extends FieldValidationProps, FieldChromeProps
    */
   labelPosition?: SelectLabelPosition
   placeholder?: string
+  noun?: FieldNoun
+  presentation?: FieldPlaceholderPresentation
   name?: string
   disabled?: boolean
   value?: string
@@ -73,11 +79,7 @@ export interface SelectFieldProps extends FieldValidationProps, FieldChromeProps
 }
 
 function renderSelectOption(option: FieldOption) {
-  return (
-    <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
-      {option.label}
-    </SelectItem>
-  )
+  return <SelectOptionItem key={option.value} option={option} />
 }
 
 function renderSelectContent(options: SelectFieldOptionListItem[]) {
@@ -115,6 +117,8 @@ export function SelectField({
   digits,
   labelPosition,
   placeholder,
+  noun,
+  presentation,
   name,
   disabled,
   value,
@@ -123,7 +127,10 @@ export function SelectField({
   onBlur,
   chrome,
 }: SelectFieldProps) {
-  const resolvedPlaceholder = resolveFieldPlaceholder({ label, category: 'choice' }, placeholder)
+  const resolvedPlaceholder = resolveFieldPlaceholder(
+    { label, category: 'choice', noun, digits, presentation },
+    placeholder,
+  )
   const resolvedHintPosition = hintPosition ?? 'below-label'
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 

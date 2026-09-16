@@ -1,4 +1,4 @@
-import { resolveChoicePlaceholder, type FieldNoun } from '../../validation/messages'
+import { resolveChoicePlaceholder, type FieldNoun } from '../../form-copy/messages'
 
 /** A value within a taxonomy — label, description, and optional prose forms. */
 export type GameTermEntry = {

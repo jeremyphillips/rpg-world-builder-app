@@ -43,6 +43,7 @@ export const movementChromeStabilityFields: FormItem[] = [
     legend: 'Movement',
     addAction: { label: 'Add movement', layout: 'inline', size: 'sm' },
     min: 1,
+    appendDefaults: () => ({ mode: '', feet: undefined }),
     item: {
       variant: 'compact',
       headerVisibility: 'hidden',
@@ -62,7 +63,6 @@ export const movementChromeStabilityFields: FormItem[] = [
             label: 'Mode',
             required: true,
             options: movementModeOptions,
-            defaultValue: 'walk',
             width: 'md',
           },
           {
@@ -73,7 +73,6 @@ export const movementChromeStabilityFields: FormItem[] = [
               kind: 'select',
               name: 'feet',
               options: movementFeetOptions,
-              defaultValue: 30,
               digits: 3,
               ariaLabel: 'Speed value',
             },

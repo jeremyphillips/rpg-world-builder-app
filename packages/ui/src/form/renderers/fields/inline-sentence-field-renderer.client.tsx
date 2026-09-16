@@ -469,7 +469,7 @@ export function InlineSentenceFieldRenderer({
         digits: selectSegment.digits,
         width: selectSegment.width,
         placeholder: resolveFieldPlaceholder(
-          { label: selectLabel, category: 'choice' },
+          { label: selectLabel, category: 'choice', digits: selectSegment.digits },
           selectSegment.placeholder,
         ),
         ariaLabel: selectLabel,

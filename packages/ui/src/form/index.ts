@@ -266,6 +266,7 @@ export {
   type ArrayItemHeaderVisibility,
   type ArrayFilterSelectConfig,
   type ArrayFilterSelectFn,
+  type ArrayCanAppendResult,
   type ArrayConfig,
   type ArrayItemHeaderConfig,
   type ArrayItemReorder,
@@ -331,6 +332,7 @@ export {
   createValidateSilently,
   type SilentValidationResult,
 } from './config/form-resolver'
+export { disableOptionsUsedInSiblingRows } from './config/array-unique-select.lib'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
 export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-invalid-submit.client'
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
