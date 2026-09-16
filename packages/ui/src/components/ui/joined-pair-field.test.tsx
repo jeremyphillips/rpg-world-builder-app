@@ -29,6 +29,7 @@ describe('JoinedPair', () => {
     expect(screen.getByRole('combobox', { name: 'Speed value' })).toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Speed unit' })).not.toBeInTheDocument()
     expect(screen.getByText('ft.')).toBeInTheDocument()
+    expect(screen.getByText('ft.')).toHaveClass('bg-surface-faint')
   })
 
   it('renders select + select with chevrons on both segments', () => {
@@ -59,6 +60,7 @@ describe('JoinedPair', () => {
 
     expect(screen.getByRole('combobox', { name: 'Speed value' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Speed unit' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Speed unit' })).toHaveClass('bg-surface-faint')
   })
 
   it('invokes change handlers with numeric option values', () => {

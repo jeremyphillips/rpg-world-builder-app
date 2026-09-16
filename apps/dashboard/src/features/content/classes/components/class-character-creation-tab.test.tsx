@@ -104,6 +104,56 @@ describe('ClassCharacterCreationTab', () => {
     expect(packageListRow(/Starting Gold/)).toBeInTheDocument()
   })
 
+  it('shows campaign availability counts for packages', () => {
+    render(
+      <TabShell
+        startingEquipment={{
+          ...monkStartingEquipment,
+          options: monkStartingEquipment.options.map((option, index) =>
+            index === 1 ? { ...option, available: false } : option,
+          ),
+        }}
+        formCtx={{
+          entitySource: 'system',
+          embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+        }}
+      />,
+    )
+
+    expect(screen.getByText('1 available · 1 unavailable')).toBeInTheDocument()
+  })
+
+  it('shows compact package stats in list and detail headers instead of prose descriptions', async () => {
+    const user = userEvent.setup()
+    render(
+      <TabShell
+        startingEquipment={monkStartingEquipment}
+        formCtx={{
+          entitySource: 'system',
+          embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+        }}
+      />,
+    )
+
+    const packageList = within(
+      screen.getByRole('navigation', { name: 'Starting equipment packages' }),
+    )
+
+    expect(packageListRow(/4 items · 11 GP/)).toBeInTheDocument()
+    expect(packageListRow(/0 items · 50 GP/)).toBeInTheDocument()
+    expect(packageList.queryByText(/Class equipment and baseline wealth/i)).not.toBeInTheDocument()
+
+    await user.click(packageListRow(/Standard Equipment/))
+    expect(screen.getByText('4 items · 11 GP · System')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: /Description/i })).toHaveValue(
+      'Class equipment and baseline wealth',
+    )
+  })
+
   it('renders bard pool choice packages when pre-filled', async () => {
     const user = userEvent.setup()
     render(

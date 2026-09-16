@@ -158,6 +158,49 @@ describe('resolveStartingEquipmentOptionSummaries', () => {
     })
   })
 
+  it('prefers authored option descriptions over auto-generated package copy', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [
+        {
+          ...storedBard,
+          characterCreation: {
+            startingEquipment: {
+              choose: 1,
+              options: [
+                {
+                  id: 'standard-equipment',
+                  label: 'Standard Equipment',
+                  description: 'Class equipment and baseline wealth',
+                  items: [
+                    {
+                      kind: 'grant',
+                      target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+                      quantity: 1,
+                    },
+                  ],
+                  wealth: { gp: 19 },
+                },
+              ],
+            },
+          },
+        },
+      ],
+      spells: [],
+      equipment: [leatherArmor, lute],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    })
+
+    const [summary] = resolveStartingEquipmentOptionSummaries(
+      catalogIndex.classes.values().next().value!,
+      catalogIndex,
+    )
+
+    expect(summary?.description).toBe('Class equipment and baseline wealth')
+  })
+
   it('disables packages only for missing grants or empty pools', () => {
     const catalogIndex = indexCharacterBuildCatalog({
       species: [],

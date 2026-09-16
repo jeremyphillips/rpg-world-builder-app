@@ -1,10 +1,9 @@
 import { z } from 'zod'
 import { createElement } from 'react'
 import {
-  characterWealthFromGrant,
   choiceOptionTitle,
   defineMessage,
-  formatWealth,
+  formatStartingEquipmentOptionCompactSummary,
   SPELLCASTING_FOCUS_GEAR_KINDS,
   SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
@@ -37,10 +36,8 @@ import {
 } from '../../../lib/forms/grants/equipment/equipment-grant-form-labels'
 import { STARTING_EQUIPMENT_ITEM_TYPE_LABEL } from './class-character-creation-link-labels'
 import {
-  STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX,
   STARTING_EQUIPMENT_GROUP_DESCRIPTION,
   STARTING_EQUIPMENT_GROUP_LEGEND,
-  STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX,
 } from './class-starting-equipment-form-labels'
 import { ProficiencyLinkedGrantRowCue } from '../../components/character-creation/proficiency-linked-grant-row-cue'
 import {
@@ -143,8 +140,10 @@ export const startingEquipmentOptionFormSchema = z
   .object({
     id: z.string().min(1).optional(),
     label: z.string().min(1),
+    description: z.string().optional(),
     wealth: wealthGrantMoneyFormSchema.optional(),
     items: z.array(startingEquipmentItemFormSchema),
+    available: z.boolean().default(true),
   })
   .superRefine((row, ctx) => {
     if (!row.items.length && !wealthGrantMoneyFromForm(row.wealth)) {
@@ -179,21 +178,16 @@ export function startingEquipmentOptionTitle(
   return choiceOptionTitle({ id: row.id ?? '', label: row.label })
 }
 
-/** Master-detail eyebrow describing baseline wealth composition for an option. */
-export function startingEquipmentOptionWealthHint(
+/** Master-detail eyebrow — compact item count and baseline wealth for list and detail headers. */
+export function startingEquipmentOptionCompactSummary(
   row: StartingEquipmentOptionForm | undefined,
 ): string | undefined {
   if (!row) return undefined
 
-  const wealth = wealthGrantMoneyFromForm(row.wealth)
-  if (!wealth) return undefined
-
-  const amount = formatWealth(characterWealthFromGrant(wealth))
-  const isWealthOnly = (row.items?.length ?? 0) === 0
-  const prefix = isWealthOnly
-    ? STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX
-    : STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX
-  return `${prefix}: ${amount}`
+  return formatStartingEquipmentOptionCompactSummary({
+    itemCount: row.items?.length ?? 0,
+    wealth: wealthGrantMoneyFromForm(row.wealth),
+  })
 }
 
 export function startingEquipmentItemTitle(
@@ -299,6 +293,11 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       name: 'label',
       label: 'Label',
       required: true,
+    },
+    {
+      type: 'textarea',
+      name: 'description',
+      label: 'Description',
     },
     ...wealthGrantMoneyField('wealth'),
     {

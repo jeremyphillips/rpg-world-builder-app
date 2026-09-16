@@ -1,10 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import {
-  fieldGroupedSegmentEndClasses,
-  fieldGroupedSegmentResetClasses,
-} from './field-input-chrome.variants'
+import { fieldGroupedEndSegmentBaseClasses } from './field-input-chrome.variants'
 import {
   joinedPairDividerVariants,
   joinedPairEndLabelSegmentVariants,
@@ -34,24 +31,9 @@ export const inputSelectUnitSegmentVariants = cva(
   {
     variants: {
       size: {
-        sm: cn(
-          segmentSizeVariants.sm,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
-          'pl-2 pr-2.5',
-        ),
-        md: cn(
-          segmentSizeVariants.md,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
-          'pl-2.5 pr-3.5',
-        ),
-        lg: cn(
-          segmentSizeVariants.lg,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
-          'pl-3 pr-4',
-        ),
+        sm: cn(segmentSizeVariants.sm, fieldGroupedEndSegmentBaseClasses, 'pl-2 pr-2.5'),
+        md: cn(segmentSizeVariants.md, fieldGroupedEndSegmentBaseClasses, 'pl-2.5 pr-3.5'),
+        lg: cn(segmentSizeVariants.lg, fieldGroupedEndSegmentBaseClasses, 'pl-3 pr-4'),
       },
       searchable: {
         true: '',

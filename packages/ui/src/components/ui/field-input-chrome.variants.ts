@@ -65,5 +65,15 @@ export const fieldGroupedSegmentStartClasses = 'rounded-l-md rounded-r-none'
 /** Right segment corner radii (unit/action column). */
 export const fieldGroupedSegmentEndClasses = 'rounded-l-none rounded-r-md'
 
+/** Right-hand segment wash — distinguishes unit/action columns from the value column. */
+export const fieldGroupedEndSegmentSurfaceClasses = 'bg-surface-faint'
+
+/** Reset + faint wash + end radii — shared by JoinedPair and InputSelect trailing segments. */
+export const fieldGroupedEndSegmentBaseClasses = cn(
+  fieldGroupedSegmentResetClasses,
+  fieldGroupedEndSegmentSurfaceClasses,
+  fieldGroupedSegmentEndClasses,
+)
+
 /** Clip overflow on the left segment column (e.g. nested stepper chrome). */
 export const fieldGroupedInputColumnClasses = 'min-w-0 overflow-hidden rounded-l-md'

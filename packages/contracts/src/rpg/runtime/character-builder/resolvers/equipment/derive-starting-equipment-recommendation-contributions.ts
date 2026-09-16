@@ -8,6 +8,7 @@ import {
   isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
 } from '../../../../content/starting-equipment'
+import { availableStartingEquipmentOptions } from '../../../../content/starting-equipment-availability'
 import type { EquipmentRecommendationTier } from '../../../../content/equipment-recommendation'
 import { toEquipmentContentId } from '../../../creature/equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
@@ -146,7 +147,9 @@ function listGoldAlternativeStartingOptions(
 ): StartingEquipmentOption[] {
   if (!startingEquipment) return []
 
-  return startingEquipment.options.filter((option) => !isWealthOnlyStartingEquipmentOption(option))
+  return availableStartingEquipmentOptions(startingEquipment.options).filter(
+    (option) => !isWealthOnlyStartingEquipmentOption(option),
+  )
 }
 
 function dedupeContributionsBySourceKey(

@@ -63,7 +63,8 @@
           ],
           "wealth": {
             "gp": 4
-          }
+          },
+          "description": "Class equipment and baseline wealth"
         },
         {
           "id": "skirmisher",
@@ -110,7 +111,8 @@
           ],
           "wealth": {
             "gp": 11
-          }
+          },
+          "description": "Class equipment and baseline wealth"
         },
         {
           "id": "starting-gold",
@@ -118,7 +120,8 @@
           "items": [],
           "wealth": {
             "gp": 155
-          }
+          },
+          "description": "Baseline wealth instead of class equipment"
         }
       ]
     },

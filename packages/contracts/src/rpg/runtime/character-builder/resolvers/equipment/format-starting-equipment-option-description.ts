@@ -7,6 +7,22 @@ import {
 } from '../../../character/sheet/equipment-inventory'
 import type { StartingEquipmentOptionSummaryItem } from './resolve-starting-equipment-option-summaries'
 
+const STARTING_EQUIPMENT_COMPACT_SUMMARY_SEPARATOR = ' · '
+
+/** Compact package stats for authoring previews — item count plus formatted baseline wealth. */
+export function formatStartingEquipmentOptionCompactSummary(args: {
+  itemCount: number
+  wealth?: CharacterWealthGrant
+}): string {
+  const parts = [`${args.itemCount} ${args.itemCount === 1 ? 'item' : 'items'}`]
+
+  if (args.wealth) {
+    parts.push(formatWealth(characterWealthFromGrant(args.wealth)))
+  }
+
+  return parts.join(STARTING_EQUIPMENT_COMPACT_SUMMARY_SEPARATOR)
+}
+
 export const DEFAULT_STANDARD_EQUIPMENT_LABEL = 'standard equipment'
 
 function formatGrantPhrase(quantity: number, name: string): string {

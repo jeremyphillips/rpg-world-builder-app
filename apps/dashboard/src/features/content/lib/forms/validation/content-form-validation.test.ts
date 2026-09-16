@@ -361,7 +361,7 @@ describe('embedded content sub-forms validation', () => {
     const fields = startingEquipmentOptionItemFields(ctx)
     assertFieldPathsRegistered(fields)
     assertRegistryCoverage(startingEquipmentOptionFormSchema, fields, {
-      exemptPaths: [...SERVER_ROW_EXEMPT, ...GRANT_NESTED_EXEMPT],
+      exemptPaths: [...SERVER_ROW_EXEMPT, ...GRANT_NESTED_EXEMPT, 'available'],
     })
     assertInvalidSubmitUsesRefinedMessages(startingEquipmentOptionFormSchema, fields, {
       invalidValue: { label: '', items: [] },

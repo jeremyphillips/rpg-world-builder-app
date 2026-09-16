@@ -5,6 +5,7 @@ import {
   isStartingGoldOption,
   type StartingEquipmentOption,
 } from '../../../../content/starting-equipment'
+import { availableStartingEquipmentOptions } from '../../../../content/starting-equipment-availability'
 import { averageTierBonusGold } from '../../../../primitives/currency-formula'
 import {
   copperToWealth,
@@ -134,7 +135,7 @@ export function resolveStartingEquipmentFundingOptions(args: {
   const tier = resolveTierFunding(args.startingWealth, startingLevel)
   const result = new Map<string, ResolvedStartingEquipmentFunding>()
 
-  for (const option of startingEquipment.options) {
+  for (const option of availableStartingEquipmentOptions(startingEquipment.options)) {
     result.set(option.id, resolveFundingForOption(option, tier))
   }
 

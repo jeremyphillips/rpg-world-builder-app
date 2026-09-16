@@ -9,6 +9,7 @@ import {
   startingEquipmentFormSchema,
   startingEquipmentItemFields,
   startingEquipmentItemTitle,
+  startingEquipmentOptionCompactSummary,
   startingEquipmentOptionFormSchema,
 } from './class-starting-equipment-form-fields'
 import {
@@ -100,6 +101,27 @@ describe('startingEquipment round-trip', () => {
 
     const roundTripped = startingEquipmentFromFormValues(formValues, startingEquipment)
     expect(roundTripped).toEqual(startingEquipment)
+  })
+})
+
+describe('startingEquipmentOptionCompactSummary', () => {
+  it('formats package item count and wealth for master-detail previews', () => {
+    expect(
+      startingEquipmentOptionCompactSummary({
+        id: 'standard-equipment',
+        label: 'Standard Equipment',
+        items: [
+          {
+            itemKind: 'grant',
+            grantTargetSource: 'equipment',
+            equipmentSlug: 'spear',
+            quantity: 1,
+          },
+        ],
+        wealth: { amount: 11, currency: 'gp' },
+        available: true,
+      }),
+    ).toBe('1 item · 11 GP')
   })
 })
 
@@ -264,6 +286,55 @@ describe('startingEquipmentFormSchema validation', () => {
     )
   })
 
+  it('persists available false on package save and omits when true', () => {
+    const roundTripped = startingEquipmentFromFormValues({
+      choose: 1,
+      options: [
+        {
+          label: 'Starting Gold',
+          description: 'Baseline wealth instead of class equipment',
+          items: [],
+          wealth: { amount: 50, currency: 'gp' },
+          available: false,
+        },
+      ],
+    })
+
+    expect(roundTripped?.options[0]?.available).toBe(false)
+
+    const availableRoundTripped = startingEquipmentFromFormValues({
+      choose: 1,
+      options: [
+        {
+          label: 'Standard Equipment',
+          description: 'Class equipment and baseline wealth',
+          items: [],
+          wealth: { amount: 10, currency: 'gp' },
+          available: true,
+        },
+      ],
+    })
+
+    expect(availableRoundTripped?.options[0]).not.toHaveProperty('available')
+  })
+
+  it('round-trips authored package descriptions', () => {
+    const roundTripped = startingEquipmentFromFormValues({
+      choose: 1,
+      options: [
+        {
+          label: 'Starting Gold',
+          description: 'Baseline wealth instead of class equipment',
+          items: [],
+          wealth: { amount: 50, currency: 'gp' },
+          available: true,
+        },
+      ],
+    })
+
+    expect(roundTripped?.options[0]?.description).toBe('Baseline wealth instead of class equipment')
+  })
+
   it('assigns ids to new options from labels', () => {
     const input = startingEquipmentFromFormValues({
       choose: 1,
@@ -272,6 +343,7 @@ describe('startingEquipmentFormSchema validation', () => {
           label: 'Heavy Armor',
           items: [],
           wealth: { amount: 10, currency: 'gp' },
+          available: true,
         },
       ],
     })

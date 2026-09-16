@@ -5,7 +5,7 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
 import {
-  fieldGroupedSegmentEndClasses,
+  fieldGroupedEndSegmentBaseClasses,
   fieldGroupedSegmentResetClasses,
   fieldGroupedSegmentStartClasses,
 } from './field-input-chrome.variants'
@@ -194,8 +194,9 @@ export function JoinedPairSelectOccupant({
   const segmentClassName =
     digits != null
       ? cn(
-          fieldGroupedSegmentResetClasses,
-          position === 'start' ? fieldGroupedSegmentStartClasses : fieldGroupedSegmentEndClasses,
+          position === 'start'
+            ? cn(fieldGroupedSegmentResetClasses, fieldGroupedSegmentStartClasses)
+            : fieldGroupedEndSegmentBaseClasses,
           'inline-flex shrink-0 items-center',
         )
       : position === 'start'

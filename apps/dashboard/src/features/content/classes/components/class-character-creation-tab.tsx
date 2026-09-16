@@ -13,8 +13,8 @@ import {
   STARTING_EQUIPMENT_FIELD_NAME,
   STARTING_EQUIPMENT_OPTIONS_FIELD_NAME,
   startingEquipmentOptionItemFields,
+  startingEquipmentOptionCompactSummary,
   startingEquipmentOptionTitle,
-  startingEquipmentOptionWealthHint,
   startingEquipmentSectionIntroFields,
   type StartingEquipmentForm,
   type StartingEquipmentOptionForm,
@@ -59,7 +59,10 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
     () => startingEquipmentOptionItemFields(enrichedFormCtx),
     [enrichedFormCtx],
   )
-  const makeOptionDefaults = useCallback(() => buildItemDefaultValues(optionFields), [optionFields])
+  const makeOptionDefaults = useCallback(
+    () => ({ ...buildItemDefaultValues(optionFields), available: true }),
+    [optionFields],
+  )
   const editor = useMasterDetailArray(STARTING_EQUIPMENT_OPTIONS_FIELD_NAME, makeOptionDefaults)
 
   return (
@@ -77,9 +80,10 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
         const option = row as StartingEquipmentOptionForm | undefined
         return {
           title: startingEquipmentOptionTitle(option),
-          eyebrow: startingEquipmentOptionWealthHint(option),
+          eyebrow: startingEquipmentOptionCompactSummary(option),
         }
       }}
+      access={{ kind: 'availability', fieldName: 'available' }}
     />
   )
 }

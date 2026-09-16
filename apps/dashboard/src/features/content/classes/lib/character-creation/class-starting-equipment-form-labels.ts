@@ -10,6 +10,3 @@ export const STARTING_EQUIPMENT_OPTION_MASTER_DETAIL_ITEM_NOUN = defineMasterDet
 })
 export const ADD_STARTING_EQUIPMENT_OPTION_LABEL = 'Add package'
 export const REMOVE_STARTING_EQUIPMENT_LABEL = 'Remove starting equipment'
-export const STARTING_EQUIPMENT_PACKAGE_WEALTH_HINT_PREFIX = 'Class equipment and baseline wealth'
-export const STARTING_EQUIPMENT_GOLD_WEALTH_HINT_PREFIX =
-  'Baseline wealth instead of class equipment'

@@ -10,6 +10,7 @@ import {
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
 } from '../../../../content/starting-equipment'
+import { availableStartingEquipmentOptions } from '../../../../content/starting-equipment-availability'
 import { eligibleProficiencyChoiceTargetIds } from '../../validation/resolve-eligible-proficiency-choice-targets'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/grants/equipment-grant'
 import {
@@ -358,6 +359,8 @@ function startingEquipmentOptionDescription(args: {
   orderedItems: readonly StartingEquipmentOptionSummaryItem[]
 }): string | undefined {
   const { option, orderedItems } = args
+  const authoredDescription = option.description?.trim()
+  if (authoredDescription) return authoredDescription
 
   if (isWealthOnlyStartingEquipmentOption(option)) {
     return formatStartingGoldOptionDescription({
@@ -419,7 +422,7 @@ export function resolveStartingEquipmentOptionSummaries(
   const startingEquipment = characterClass.characterCreation?.startingEquipment
   if (!startingEquipment) return []
 
-  return startingEquipment.options.map((option) =>
+  return availableStartingEquipmentOptions(startingEquipment.options).map((option) =>
     summarizeOption(characterClass, option, catalogIndex, draft, context),
   )
 }

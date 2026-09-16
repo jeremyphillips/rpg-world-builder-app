@@ -49,6 +49,11 @@ describe('InputSelectField', () => {
     expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveTextContent('SP')
   })
 
+  it('applies faint surface wash to the unit segment', () => {
+    render(<ControlledField />)
+    expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass('bg-surface-faint')
+  })
+
   it('calls onValueChange when the value input changes', async () => {
     const onValueChange = vi.fn()
     render(<ControlledField onValueChange={onValueChange} />)
@@ -207,6 +212,7 @@ describe('InputSelectField', () => {
 
     const unitLabel = container.querySelector('[aria-hidden].rounded-r-md')
     expect(unitLabel).toHaveTextContent('ft.')
+    expect(unitLabel).toHaveClass('bg-surface-faint')
     expect(unitLabel).not.toHaveClass('min-w-[5rem]')
   })
 

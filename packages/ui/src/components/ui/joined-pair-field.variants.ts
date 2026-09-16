@@ -3,8 +3,9 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import {
   fieldGroupedDividerClasses,
+  fieldGroupedEndSegmentBaseClasses,
+  fieldGroupedEndSegmentSurfaceClasses,
   fieldGroupedInputColumnClasses,
-  fieldGroupedSegmentEndClasses,
   fieldGroupedSegmentResetClasses,
   fieldGroupedSegmentStartClasses,
   fieldGroupedShellClasses,
@@ -67,29 +68,24 @@ export const joinedPairStartNumberWrapperVariants = cva(fieldGroupedInputColumnC
 
 export const joinedPairDividerVariants = cva(fieldGroupedDividerClasses)
 
+/** @deprecated Prefer `fieldGroupedEndSegmentSurfaceClasses`. */
+export const joinedPairEndSegmentSurfaceClasses = fieldGroupedEndSegmentSurfaceClasses
+
+/** @deprecated Prefer `fieldGroupedEndSegmentBaseClasses`. */
+export const joinedPairEndSegmentBaseClasses = fieldGroupedEndSegmentBaseClasses
+
 export const joinedPairEndSelectSegmentVariants = cva(
   'inline-flex shrink-0 items-center justify-between gap-1.5 text-left [&>span]:line-clamp-1 [&_svg]:shrink-0',
   {
     variants: {
       size: {
-        sm: cn(
-          joinedPairSegmentSizeVariants.sm,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
-          'pl-2 pr-2.5',
-        ),
+        sm: cn(joinedPairSegmentSizeVariants.sm, fieldGroupedEndSegmentBaseClasses, 'pl-2 pr-2.5'),
         md: cn(
           joinedPairSegmentSizeVariants.md,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
+          fieldGroupedEndSegmentBaseClasses,
           'pl-2.5 pr-3.5',
         ),
-        lg: cn(
-          joinedPairSegmentSizeVariants.lg,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
-          'pl-3 pr-4',
-        ),
+        lg: cn(joinedPairSegmentSizeVariants.lg, fieldGroupedEndSegmentBaseClasses, 'pl-3 pr-4'),
       },
     },
     defaultVariants: {
@@ -140,24 +136,13 @@ export const joinedPairEndLabelSegmentVariants = cva(
   {
     variants: {
       size: {
-        sm: cn(
-          joinedPairSegmentSizeVariants.sm,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
-          'pl-2 pr-2',
-        ),
+        sm: cn(joinedPairSegmentSizeVariants.sm, fieldGroupedEndSegmentBaseClasses, 'pl-2 pr-2'),
         md: cn(
           joinedPairSegmentSizeVariants.md,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
+          fieldGroupedEndSegmentBaseClasses,
           'pl-2.5 pr-2.5',
         ),
-        lg: cn(
-          joinedPairSegmentSizeVariants.lg,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentEndClasses,
-          'pl-3 pr-3',
-        ),
+        lg: cn(joinedPairSegmentSizeVariants.lg, fieldGroupedEndSegmentBaseClasses, 'pl-3 pr-3'),
       },
     },
     defaultVariants: {
