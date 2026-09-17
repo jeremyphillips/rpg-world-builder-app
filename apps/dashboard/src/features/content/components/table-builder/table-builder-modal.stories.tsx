@@ -5,6 +5,7 @@ import { Button } from '@rpg/ui'
 import type { ProgressionTable } from '@rpg/contracts'
 
 import type { TableBuilderSavedTable } from '../../lib/table-builder/table-builder-kind'
+import type { TableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-config'
 
 import {
   martialArtsProgressionTableFixture,
@@ -15,14 +16,24 @@ import { TableBuilderModal, type TableBuilderModalProps } from './table-builder-
 
 const ALLOWED_LEVELS = Array.from({ length: 20 }, (_, index) => index + 1)
 
+const PROGRESSION_CONFIG: TableBuilderHostConfig = {
+  allowedKinds: ['levelProgression'],
+  allowedLevels: ALLOWED_LEVELS,
+}
+
+const CLASS_FEATURE_CONFIG: TableBuilderHostConfig = {
+  allowedKinds: ['levelProgression', 'general'],
+  recommendedKind: 'levelProgression',
+  allowedLevels: ALLOWED_LEVELS,
+}
+
 const meta = {
   title: 'Content/TableBuilder/TableBuilderModal',
   component: TableBuilderModal,
   parameters: { layout: 'fullscreen' },
   args: {
     open: true,
-    kind: 'levelProgression',
-    allowedLevels: ALLOWED_LEVELS,
+    config: PROGRESSION_CONFIG,
     onSave: fn(),
     onOpenChange: fn(),
   },
@@ -61,6 +72,11 @@ function RelaunchableModal(props: TableBuilderModalProps) {
 
 export const CreateEmpty: Story = {
   args: { mode: 'create' },
+  render: (args) => <RelaunchableModal {...args} />,
+}
+
+export const CreateWithKindSelection: Story = {
+  args: { mode: 'create', config: CLASS_FEATURE_CONFIG },
   render: (args) => <RelaunchableModal {...args} />,
 }
 
@@ -113,7 +129,10 @@ export const ConstrainedLevels: Story = {
   args: {
     mode: 'edit',
     value: highLevelTableFixture,
-    allowedLevels: [6, 7, 8, 9, 10],
+    config: {
+      ...PROGRESSION_CONFIG,
+      allowedLevels: [6, 7, 8, 9, 10],
+    },
   },
   render: (args) => <RelaunchableModal {...args} />,
 }

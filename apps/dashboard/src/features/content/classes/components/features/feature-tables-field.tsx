@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useFormContext, useWatch, type FieldPath } from 'react-hook-form'
-import type { ProgressionTable } from '@rpg/contracts'
+import type { ContentTable } from '@rpg/contracts'
 
 import { TableBuilderModal } from '../../../components/table-builder/table-builder-modal'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { useMasterDetailRowPrefix } from '../../../lib/master-detail/master-detail-row-prefix.context'
+import type { TableBuilderSavedTable } from '../../../lib/table-builder/table-builder-kind'
 import {
   buildFeatureTableAllowedLevels,
   featureTableKindLabel,
@@ -19,14 +20,14 @@ type FeatureTablesFieldProps = {
   formCtx: ContentFormCtx
 }
 
-type TableModalState = { mode: 'create' } | { mode: 'edit'; index: number; value: ProgressionTable }
+type TableModalState = { mode: 'create' } | { mode: 'edit'; index: number; value: ContentTable }
 
 export function FeatureTablesField({ formCtx }: FeatureTablesFieldProps) {
   const rowPrefix = useMasterDetailRowPrefix()
   const form = useFormContext<FeatureRowForm>()
   const tablesPath = `${rowPrefix}.tables` as FieldPath<FeatureRowForm>
   const levelPath = `${rowPrefix}.level` as FieldPath<FeatureRowForm>
-  const tables = (useWatch({ control: form.control, name: tablesPath }) ?? []) as ProgressionTable[]
+  const tables = (useWatch({ control: form.control, name: tablesPath }) ?? []) as ContentTable[]
   const featureLevel = useWatch({ control: form.control, name: levelPath }) as
     | number
     | string
@@ -38,11 +39,20 @@ export function FeatureTablesField({ formCtx }: FeatureTablesFieldProps) {
     [featureLevel, formCtx],
   )
 
-  const setTables = (next: ProgressionTable[]) => {
+  const tableBuilderConfig = useMemo(
+    () => ({
+      allowedKinds: ['levelProgression', 'general'] as const,
+      recommendedKind: 'levelProgression' as const,
+      allowedLevels,
+    }),
+    [allowedLevels],
+  )
+
+  const setTables = (next: ContentTable[]) => {
     form.setValue(tablesPath, next, { shouldDirty: true, shouldValidate: true })
   }
 
-  const handleSave = (table: ProgressionTable) => {
+  const handleSave = (table: TableBuilderSavedTable) => {
     if (!modalState) return
 
     if (modalState.mode === 'create') {
@@ -90,14 +100,13 @@ export function FeatureTablesField({ formCtx }: FeatureTablesFieldProps) {
         ))}
       />
 
-      {modalState && allowedLevels.length > 0 ? (
+      {modalState ? (
         <TableBuilderModal
           open
-          kind="levelProgression"
+          config={tableBuilderConfig}
           mode={modalState.mode}
           value={modalState.mode === 'edit' ? modalState.value : undefined}
-          allowedLevels={allowedLevels}
-          onSave={(table) => handleSave(table as ProgressionTable)}
+          onSave={handleSave}
           onOpenChange={(open) => {
             if (!open) setModalState(null)
           }}

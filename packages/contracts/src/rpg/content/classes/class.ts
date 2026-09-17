@@ -28,7 +28,7 @@ import {
 import { spellcastingSchema } from './spellcasting'
 import { classValidationMessages } from './class-messages'
 import { contentSummaryRefSchema } from '../lib/content-summary-ref'
-import { progressionTableSchema } from '../tables'
+import { contentTableSchema } from '../tables'
 import { refineFeatureTablesOnFeature } from './class-feature-table'
 
 // ---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ function refineClassFeatureGrantUnlockLevels(
 }
 
 const classFeatureTablesField = {
-  tables: z.array(progressionTableSchema).optional(),
+  tables: z.array(contentTableSchema).optional(),
 } as const
 
 export const customClassFeatureSchema = customContentTraitSchema

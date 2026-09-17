@@ -4,10 +4,22 @@ import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import type { ProgressionTable } from '@rpg/contracts'
 
+import type { TableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-config'
 import { rageProgressionTableFixture } from '../tables/progression-table-fixtures'
 import { TableBuilderModal, type TableBuilderModalProps } from './table-builder-modal'
 
 const ALLOWED_LEVELS = Array.from({ length: 20 }, (_, index) => index + 1)
+
+const PROGRESSION_CONFIG: TableBuilderHostConfig = {
+  allowedKinds: ['levelProgression'],
+  allowedLevels: ALLOWED_LEVELS,
+}
+
+const CLASS_FEATURE_CONFIG: TableBuilderHostConfig = {
+  allowedKinds: ['levelProgression', 'general'],
+  recommendedKind: 'levelProgression',
+  allowedLevels: ALLOWED_LEVELS,
+}
 
 // jsdom lacks the pointer-capture and scroll APIs Radix Select relies on.
 beforeAll(() => {
@@ -30,10 +42,9 @@ function renderModal(overrides: Partial<TableBuilderModalProps> = {}) {
   render(
     <TableBuilderModal
       open
-      kind="levelProgression"
+      config={PROGRESSION_CONFIG}
       mode="edit"
       value={rageProgressionTableFixture}
-      allowedLevels={ALLOWED_LEVELS}
       onSave={onSave}
       onOpenChange={onOpenChange}
       onDelete={onDelete}
@@ -240,6 +251,37 @@ describe('TableBuilderModal', () => {
     const preview = screen.getByRole('region', { name: 'Preview' })
     expect(within(preview).getAllByRole('cell', { name: '+2' }).length).toBeGreaterThan(0)
     expect(within(preview).getByRole('cell', { name: '+3' })).toBeInTheDocument()
+  })
+
+  it('shows selectable kind cards when creating with multiple allowed kinds', () => {
+    renderModal({ mode: 'create', value: undefined, config: CLASS_FEATURE_CONFIG })
+
+    expect(screen.getByRole('radiogroup', { name: 'Table type' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Level progression/i })).toBeChecked()
+    expect(screen.getByRole('radio', { name: /General table/i })).toBeInTheDocument()
+  })
+
+  it('shows compact type metadata when editing an existing table', () => {
+    renderModal({ mode: 'edit', config: CLASS_FEATURE_CONFIG })
+
+    const dialog = within(screen.getByRole('dialog'))
+    expect(dialog.queryByRole('radiogroup', { name: 'Table type' })).not.toBeInTheDocument()
+    expect(dialog.getByText('Table type')).toBeInTheDocument()
+    const typeValue = dialog.getByText('Level progression', {
+      selector: '[aria-labelledby]',
+    })
+    expect(typeValue.className).not.toMatch(/min-h-9/)
+  })
+
+  it('shows compact type metadata for single-kind hosts even on create', () => {
+    renderModal({ mode: 'create', value: undefined, config: PROGRESSION_CONFIG })
+
+    const dialog = within(screen.getByRole('dialog'))
+    expect(dialog.queryByRole('radiogroup', { name: 'Table type' })).not.toBeInTheDocument()
+    expect(dialog.getByText('Table type')).toBeInTheDocument()
+    expect(
+      dialog.getByText('Level progression', { selector: '[aria-labelledby]' }),
+    ).toBeInTheDocument()
   })
 
   it('does not persist carry-forward blanks in the saved table', async () => {

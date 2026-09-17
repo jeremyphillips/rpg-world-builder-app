@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ProgressionTableGrid } from './progression-table-grid'
+import { TableGrid } from './table-grid'
 import { ProgressionTableView } from './progression-table-view'
 import {
   martialArtsProgressionTableFixture,
@@ -40,7 +40,8 @@ export const IncompletePresentation: Story = {
     table: rageProgressionTableFixture,
   },
   render: () => (
-    <ProgressionTableGrid
+    <TableGrid
+      rowHeaderLabel="Level"
       presentation={{
         name: 'Draft preview',
         columns: [
@@ -48,8 +49,8 @@ export const IncompletePresentation: Story = {
           { key: 'damage-bonus', label: 'Rage Damage' },
         ],
         rows: [
-          { level: 1, values: { uses: '2', 'damage-bonus': '+2' } },
-          { level: 6, values: { uses: '4' } },
+          { rowHeader: 1, cells: { uses: '2', 'damage-bonus': '+2' } },
+          { rowHeader: 6, cells: { uses: '4' } },
         ],
       }}
     />

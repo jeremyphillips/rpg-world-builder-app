@@ -80,10 +80,9 @@ export function SpellDescriptionTablesField() {
       {modalState ? (
         <TableBuilderModal
           open
-          kind="general"
+          config={{ allowedKinds: ['general'] }}
           mode={modalState.mode}
           value={modalState.mode === 'edit' ? modalState.value : undefined}
-          allowedLevels={[]}
           onSave={(table) => handleSave(table as GeneralTable)}
           onOpenChange={(open) => {
             if (!open) closeModal()

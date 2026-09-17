@@ -2,8 +2,10 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
-import { tableToDraft, draftToPresentation } from '../../lib/table-builder/table-builder-draft'
-import { ProgressionTableGrid } from './progression-table-grid'
+import {
+  progressionDraftToGridPresentation,
+  tableToDraft,
+} from '../../lib/table-builder/table-builder-draft'
 import { ProgressionTableView } from './progression-table-view'
 import {
   martialArtsProgressionTableFixture,
@@ -12,6 +14,12 @@ import {
 } from './progression-table-fixtures'
 
 describe('ProgressionTableView', () => {
+  it('renders a Level row-header axis', () => {
+    render(<ProgressionTableView table={rageProgressionTableFixture} />)
+
+    expect(screen.getByRole('columnheader', { name: 'Level' })).toBeInTheDocument()
+  })
+
   it('renders formatted rage progression values', () => {
     render(<ProgressionTableView table={rageProgressionTableFixture} />)
 
@@ -37,17 +45,17 @@ describe('ProgressionTableView', () => {
     expect(screen.getByRole('cell', { name: 'Special' })).toBeInTheDocument()
   })
 
-  it('matches draftToPresentation parity for a valid persisted table', () => {
+  it('matches progressionDraftToGridPresentation parity for a valid persisted table', () => {
     const draft = tableToDraft(rageProgressionTableFixture)
-    const draftPresentation = draftToPresentation(draft)
+    const draftPresentation = progressionDraftToGridPresentation(draft)
 
     render(<ProgressionTableView table={rageProgressionTableFixture} />)
 
     for (const row of draftPresentation.rows) {
       for (const column of draftPresentation.columns) {
-        const value = row.values[column.key]
+        const value = row.cells[column.key]
         if (value === undefined) continue
-        expect(screen.getAllByRole('cell', { name: value }).length).toBeGreaterThan(0)
+        expect(screen.getAllByRole('cell', { name: String(value) }).length).toBeGreaterThan(0)
       }
     }
   })
@@ -55,34 +63,5 @@ describe('ProgressionTableView', () => {
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<ProgressionTableView table={rageProgressionTableFixture} />)
     await expectNoAxeViolations(container)
-  })
-})
-
-describe('ProgressionTableGrid', () => {
-  it('renders em dashes for missing values without throwing', () => {
-    render(
-      <ProgressionTableGrid
-        presentation={{
-          columns: [{ key: 'uses', label: 'Uses' }],
-          rows: [{ level: 1, values: {} }],
-        }}
-      />,
-    )
-
-    expect(screen.getByRole('cell', { name: '—' })).toBeInTheDocument()
-  })
-
-  it('renders partial presentation data without throwing', () => {
-    render(
-      <ProgressionTableGrid
-        presentation={{
-          columns: [{ key: 'uses' }],
-          rows: [{ values: { uses: '2' } }],
-        }}
-      />,
-    )
-
-    expect(screen.getByRole('cell', { name: '2' })).toBeInTheDocument()
-    expect(screen.getAllByRole('cell', { name: '—' })).toHaveLength(1)
   })
 })

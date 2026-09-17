@@ -3,37 +3,43 @@ import { useWatch } from 'react-hook-form'
 import { EmptyPanel } from '@rpg/ui'
 import { FormSectionHeader } from '@rpg/ui/form'
 
+import { TableGrid } from '../tables/table-grid'
 import {
   TABLE_BUILDER_PREVIEW_DESCRIPTION,
   TABLE_BUILDER_PREVIEW_EMPTY,
   TABLE_BUILDER_PREVIEW_TITLE,
 } from '../../lib/table-builder/table-builder-copy'
 import {
-  draftToPresentation,
+  progressionDraftToGridPresentation,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
-import { generalDraftToPresentation } from '../../lib/table-builder/table-builder-general-draft'
-import { ProgressionTableGrid } from '../tables/progression-table-grid'
+import { generalDraftToGridPresentation } from '../../lib/table-builder/table-builder-general-draft'
 import { tableBuilderSectionClasses } from './table-builder.variants'
 import { tableBuilderPreviewTableWrapClasses } from './table-builder-preview.variants'
 
 /**
  * Live resolved preview of the authoring draft. Renders the tolerant
  * presentation model — unresolved cells show as em dashes; the preview never
- * claims the draft is a valid `ProgressionTable`.
+ * claims the draft is a valid persisted table.
  */
 export function TableBuilderPreview() {
   const values = useWatch<TableBuilderFormValues>() as TableBuilderFormValues
 
+  const kind = values.kind ?? 'levelProgression'
+
   const presentation = useMemo(() => {
     const draft: TableBuilderFormValues = {
-      kind: values.kind ?? 'levelProgression',
+      kind,
       name: values.name ?? '',
       columns: values.columns ?? [],
       rows: values.rows ?? [],
     }
-    return draft.kind === 'general' ? generalDraftToPresentation(draft) : draftToPresentation(draft)
-  }, [values])
+    return kind === 'general'
+      ? generalDraftToGridPresentation(draft)
+      : progressionDraftToGridPresentation(draft)
+  }, [kind, values])
+
+  const rowHeaderLabel = kind === 'levelProgression' ? 'Level' : undefined
 
   return (
     <section className={tableBuilderSectionClasses} aria-label={TABLE_BUILDER_PREVIEW_TITLE}>
@@ -46,10 +52,10 @@ export function TableBuilderPreview() {
         <EmptyPanel>{TABLE_BUILDER_PREVIEW_EMPTY}</EmptyPanel>
       ) : (
         <div className={tableBuilderPreviewTableWrapClasses}>
-          <ProgressionTableGrid
+          <TableGrid
             presentation={presentation}
             caption={TABLE_BUILDER_PREVIEW_TITLE}
-            rowHeaderLabel={values.kind === 'general' ? undefined : 'Level'}
+            {...(rowHeaderLabel === undefined ? {} : { rowHeaderLabel })}
           />
         </div>
       )}

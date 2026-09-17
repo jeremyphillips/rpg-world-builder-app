@@ -3,12 +3,14 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createEmptyTableBuilderDraft,
-  draftToPresentation,
+  progressionDraftToGridPresentation,
   draftToTable,
+  hasMeaningfulTableBuilderDraftContent,
   isTableBuilderCellBlank,
   parseDiceCellDraft,
   parseLevelDraft,
   parseNumberCellDraft,
+  resetTableBuilderDraftForKindChange,
   resolveRowSortMove,
   tableToDraft,
   type TableBuilderFormValues,
@@ -156,29 +158,29 @@ describe('draftToTable', () => {
   })
 })
 
-describe('draftToPresentation', () => {
+describe('progressionDraftToGridPresentation', () => {
   it('resolves carry-forward values for the preview', () => {
     const draft = tableToDraft(rageTable)
-    const presentation = draftToPresentation(draft)
+    const presentation = progressionDraftToGridPresentation(draft)
 
     const damageKey = draft.columns[1]!.key
     const usesKey = draft.columns[0]!.key
 
     // Author: level 9 | blank | +3 — preview resolves the blank to the carried 4.
-    const rowAt9 = presentation.rows.find((row) => row.level === 9)
-    expect(rowAt9?.values[usesKey]).toBe('4')
-    expect(rowAt9?.values[damageKey]).toBe('+3')
+    const rowAt9 = presentation.rows.find((row) => row.rowHeader === 9)
+    expect(rowAt9?.cells[usesKey]).toBe('4')
+    expect(rowAt9?.cells[damageKey]).toBe('+3')
   })
 
   it('formats dice and signed values through the display SSOT', () => {
     const draft = tableToDraft(martialArtsTable)
-    const presentation = draftToPresentation(draft)
+    const presentation = progressionDraftToGridPresentation(draft)
 
-    expect(presentation.rows[1]?.values[draft.columns[0]!.key]).toBe('1d8')
+    expect(presentation.rows[1]?.cells[draft.columns[0]!.key]).toBe('1d8')
   })
 
   it('tolerates incomplete drafts without claiming validity', () => {
-    const presentation = draftToPresentation({
+    const presentation = progressionDraftToGridPresentation({
       kind: 'levelProgression',
       name: '',
       columns: [
@@ -195,15 +197,15 @@ describe('draftToPresentation', () => {
     // Unnamed columns fall back to a positional label — never the ephemeral key.
     expect(presentation.columns[0]?.label).toBe('Column 1')
 
-    const leveled = presentation.rows.find((row) => row.level === 3)
-    expect(leveled?.values.a).toBeUndefined()
+    const leveled = presentation.rows.find((row) => row.rowHeader === 3)
+    expect(leveled?.cells.a).toBeUndefined()
 
-    const unleveled = presentation.rows.find((row) => row.level === undefined)
-    expect(unleveled?.values.b).toBe('2')
+    const unleveled = presentation.rows.find((row) => row.rowHeader === undefined)
+    expect(unleveled?.cells.b).toBe('2')
   })
 
   it('sorts leveled rows ascending and appends unleveled rows', () => {
-    const presentation = draftToPresentation({
+    const presentation = progressionDraftToGridPresentation({
       kind: 'levelProgression',
       name: 'Sorting',
       columns: [{ key: 'a', label: 'Uses', valueType: 'number', format: 'plain' }],
@@ -214,11 +216,11 @@ describe('draftToPresentation', () => {
       ],
     })
 
-    expect(presentation.rows.map((row) => row.level)).toEqual([1, 9, undefined])
+    expect(presentation.rows.map((row) => row.rowHeader)).toEqual([1, 9, undefined])
   })
 
   it('returns empty presentation for the empty draft', () => {
-    const presentation = draftToPresentation(createEmptyTableBuilderDraft())
+    const presentation = progressionDraftToGridPresentation(createEmptyTableBuilderDraft())
     expect(presentation.columns).toEqual([])
     expect(presentation.rows).toEqual([])
   })
@@ -277,6 +279,66 @@ describe('resolveNextUnusedLevel', () => {
   it('supports non-contiguous allowed sets', () => {
     expect(resolveNextUnusedLevel([5], [5, 10, 15])).toBe(10)
     expect(resolveNextUnusedLevel([10, 15], [5, 10, 15])).toBe(5)
+  })
+})
+
+describe('resetTableBuilderDraftForKindChange', () => {
+  it('preserves the name and resets kind-specific structure', () => {
+    const draft: TableBuilderFormValues = {
+      kind: 'levelProgression',
+      name: 'Rage',
+      columns: [{ key: 'c1', label: 'Uses', valueType: 'number', format: 'plain' }],
+      rows: [{ level: '1', cells: { c1: '2' } }],
+    }
+
+    expect(resetTableBuilderDraftForKindChange(draft, 'general')).toEqual({
+      kind: 'general',
+      name: 'Rage',
+      columns: [],
+      rows: [],
+    })
+  })
+})
+
+describe('hasMeaningfulTableBuilderDraftContent', () => {
+  it('returns false for an empty draft', () => {
+    expect(hasMeaningfulTableBuilderDraftContent(createEmptyTableBuilderDraft())).toBe(false)
+  })
+
+  it('returns true when columns or rows exist', () => {
+    expect(
+      hasMeaningfulTableBuilderDraftContent({
+        ...createEmptyTableBuilderDraft(),
+        columns: [{ key: 'c1', label: '', valueType: 'number', format: 'plain' }],
+      }),
+    ).toBe(true)
+
+    expect(
+      hasMeaningfulTableBuilderDraftContent({
+        ...createEmptyTableBuilderDraft('general'),
+        rows: [{ key: 'r1', cells: {} }],
+      }),
+    ).toBe(true)
+  })
+
+  it('returns true when a column label or cell value is authored', () => {
+    expect(
+      hasMeaningfulTableBuilderDraftContent({
+        kind: 'levelProgression',
+        name: '',
+        columns: [{ key: 'c1', label: 'Uses', valueType: 'number', format: 'plain' }],
+        rows: [],
+      }),
+    ).toBe(true)
+
+    expect(
+      hasMeaningfulTableBuilderDraftContent({
+        kind: 'general',
+        name: '',
+        columns: [{ key: 'c1', label: '', valueType: 'text', format: 'plain' }],
+        rows: [{ key: 'r1', cells: { c1: 'Elf' } }],
+      }),
+    ).toBe(true)
   })
 })
 

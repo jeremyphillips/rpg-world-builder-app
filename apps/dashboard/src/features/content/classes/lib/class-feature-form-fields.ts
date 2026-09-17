@@ -5,7 +5,7 @@ import {
   campaignLevelSchema,
   classValidationMessages,
   MAX_CHARACTER_LEVEL,
-  progressionTableSchema,
+  contentTableSchema,
   resolveGrantGroupsFromContent,
   type ClassBodyFeature,
   type ClassFeature,
@@ -77,7 +77,7 @@ function createFeatureRowBaseFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) 
 export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
   return createFeatureRowBaseFormSchema(maxLevel).extend({
     available: z.boolean().default(true),
-    tables: z.array(progressionTableSchema).default([]),
+    tables: z.array(contentTableSchema).default([]),
   })
 }
 

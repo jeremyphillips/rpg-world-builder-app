@@ -6,7 +6,7 @@ import {
   type TableColumnValueType,
 } from '@rpg/contracts'
 
-import type { ProgressionTablePresentation } from '../../components/tables/progression-table-presentation'
+import type { TableGridPresentation } from '../../components/tables/table-grid-presentation'
 import {
   createTableBuilderColumnKey,
   createTableBuilderRowKey,
@@ -161,9 +161,9 @@ export function draftToGeneralTable(
   }
 }
 
-export function generalDraftToPresentation(
+export function generalDraftToGridPresentation(
   values: TableBuilderFormValues,
-): ProgressionTablePresentation {
+): TableGridPresentation {
   const trimmedName = values.name.trim()
 
   return {
@@ -176,7 +176,7 @@ export function generalDraftToPresentation(
       }
     }),
     rows: values.rows.map((row) => ({
-      values: Object.fromEntries(
+      cells: Object.fromEntries(
         values.columns.map((column) => {
           const direct = parseCellDraft(column, row.cells[column.key])
           if (direct === undefined || isTableBuilderCellBlank(row.cells[column.key])) {

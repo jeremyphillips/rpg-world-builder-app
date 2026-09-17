@@ -38,8 +38,20 @@ const rageTable = {
 }
 
 describe('formatFeatureTableMetadata', () => {
-  it('reports column and breakpoint counts', () => {
+  it('reports column and breakpoint counts for progression tables', () => {
     expect(formatFeatureTableMetadata(rageTable)).toBe('2 columns · 7 breakpoints')
+  })
+
+  it('reports column and row counts for general tables', () => {
+    expect(
+      formatFeatureTableMetadata({
+        id: 'effects',
+        name: 'Effects',
+        kind: 'general',
+        columns: [{ id: 'effect', label: 'Effect', valueType: 'text' }],
+        rows: [{ id: 'row-1', cells: { effect: 'Blinded' } }],
+      }),
+    ).toBe('1 column · 1 row')
   })
 
   it('singularizes single column and breakpoint labels', () => {

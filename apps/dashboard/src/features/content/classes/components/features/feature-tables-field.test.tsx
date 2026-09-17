@@ -4,6 +4,7 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { rageProgressionTableFixture } from '../../../components/tables/progression-table-fixtures'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { MasterDetailRowPrefixProvider } from '../../../lib/master-detail/master-detail-row-prefix.context'
 import { FeatureTablesField } from './feature-tables-field'
@@ -33,9 +34,11 @@ type FeatureFormValues = {
 function Harness({
   initialTables = [] as (typeof rageProgressionTableFixture)[],
   onTablesChange,
+  formCtx = makeContentFormCtx(),
 }: {
   initialTables?: (typeof rageProgressionTableFixture)[]
   onTablesChange?: (tables: unknown) => void
+  formCtx?: ContentFormCtx
 }) {
   const form = useForm<FeatureFormValues>({
     defaultValues: {
@@ -57,7 +60,7 @@ function Harness({
   return (
     <FormProvider {...form}>
       <MasterDetailRowPrefixProvider value="features.0">
-        <FeatureTablesField formCtx={makeContentFormCtx()} />
+        <FeatureTablesField formCtx={formCtx} />
       </MasterDetailRowPrefixProvider>
     </FormProvider>
   )
@@ -121,6 +124,30 @@ describe('FeatureTablesField', () => {
 
     const saved = onTablesChange.mock.calls.at(-1)?.[0] as { name: string }[]
     expect(saved[0]?.name).toBe('Updated rage progression')
+  })
+
+  it('shows kind selection when adding a new table regardless of parent publish intent', async () => {
+    const user = userEvent.setup()
+    render(<Harness formCtx={makeContentFormCtx({ validationIntent: 'publish' })} />)
+
+    await user.click(screen.getByRole('button', { name: 'Add table' }))
+
+    expect(screen.getByRole('radiogroup', { name: 'Table type' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /General table/i })).toBeInTheDocument()
+  })
+
+  it('shows read-only table type metadata when editing an existing table on a draft parent', async () => {
+    const user = userEvent.setup()
+    render(<Harness initialTables={[rageProgressionTableFixture]} />)
+
+    await user.click(screen.getByRole('button', { name: 'Edit' }))
+
+    const dialog = within(screen.getByRole('dialog'))
+    expect(dialog.queryByRole('radiogroup', { name: 'Table type' })).not.toBeInTheDocument()
+    expect(dialog.getByText('Table type')).toBeInTheDocument()
+    expect(
+      dialog.getByText('Level progression', { selector: '[aria-labelledby]' }),
+    ).toBeInTheDocument()
   })
 
   it('confirms modal delete and removes the table', async () => {

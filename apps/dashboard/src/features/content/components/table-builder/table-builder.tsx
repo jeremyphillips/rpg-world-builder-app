@@ -8,22 +8,25 @@ import {
   TABLE_BUILDER_NAME_LABEL,
 } from '../../lib/table-builder/table-builder-copy'
 import type { TableBuilderFormValues } from '../../lib/table-builder/table-builder-draft'
-import type { TableBuilderKind } from '../../lib/table-builder/table-builder-kind'
+import type {
+  TableBuilderHostConfig,
+  TableBuilderMode,
+} from '../../lib/table-builder/table-builder-host-config'
 import {
   tableBuilderAuthoringPaneClasses,
   tableBuilderLayoutClasses,
   tableBuilderPreviewPaneClasses,
 } from './table-builder.variants'
 import { TableBuilderColumns } from './table-builder-columns'
+import { TableBuilderKindField } from './table-builder-kind-field'
 import { TableBuilderPreview } from './table-builder-preview'
 import { TableBuilderValues } from './table-builder-values'
 
 export type TableBuilderProps = {
   /** Isolated draft form owned by the hosting surface (modal or story harness). */
   form: UseFormReturn<TableBuilderFormValues>
-  kind: TableBuilderKind
-  /** Semantic level set the structural axis may use — progression tables only. */
-  allowedLevels: readonly number[]
+  config: TableBuilderHostConfig
+  mode: TableBuilderMode
 }
 
 /**
@@ -31,9 +34,10 @@ export type TableBuilderProps = {
  * grid, and live preview. Renders no chrome of its own — the host provides the
  * modal (or page) shell, the `<form>` element, and footer actions.
  */
-export function TableBuilder({ form, kind, allowedLevels }: TableBuilderProps) {
+export function TableBuilder({ form, config, mode }: TableBuilderProps) {
   const nameId = useId()
   const nameError = form.getFieldState('name', form.formState).error
+  const allowedLevels = config.allowedLevels ?? []
 
   return (
     <FormProvider {...form}>
@@ -48,8 +52,9 @@ export function TableBuilder({ form, kind, allowedLevels }: TableBuilderProps) {
             invalid={Boolean(nameError)}
             {...form.register('name')}
           />
-          <TableBuilderColumns kind={kind} />
-          <TableBuilderValues kind={kind} allowedLevels={allowedLevels} />
+          <TableBuilderKindField config={config} mode={mode} />
+          <TableBuilderColumns />
+          <TableBuilderValues allowedLevels={allowedLevels} />
         </div>
         <div className={tableBuilderPreviewPaneClasses}>
           <TableBuilderPreview />

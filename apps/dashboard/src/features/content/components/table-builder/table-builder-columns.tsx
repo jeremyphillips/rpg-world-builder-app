@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { Plus } from 'lucide-react'
-import { useFieldArray, useFormContext } from 'react-hook-form'
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { formatFieldMessage, type TableColumnValueType } from '@rpg/contracts'
 import { ConfirmDialog } from '@rpg/ui'
 import { FormSectionHeader } from '@rpg/ui/form'
@@ -37,7 +37,6 @@ import {
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
 import { createGeneralTableBuilderColumnDraft } from '../../lib/table-builder/table-builder-general-draft'
-import type { TableBuilderKind } from '../../lib/table-builder/table-builder-kind'
 import {
   tableBuilderAddActionClasses,
   tableBuilderAddActionWrapClasses,
@@ -56,12 +55,9 @@ type PendingTypeChange = {
   valueType: TableColumnValueType
 }
 
-export type TableBuilderColumnsProps = {
-  kind: TableBuilderKind
-}
-
-export function TableBuilderColumns({ kind }: TableBuilderColumnsProps) {
+export function TableBuilderColumns() {
   const form = useFormContext<TableBuilderFormValues>()
+  const kind = useWatch({ control: form.control, name: 'kind' }) ?? 'levelProgression'
   const fieldArray = useFieldArray({ control: form.control, name: 'columns' })
   const [pendingTypeChange, setPendingTypeChange] = useState<PendingTypeChange | null>(null)
 

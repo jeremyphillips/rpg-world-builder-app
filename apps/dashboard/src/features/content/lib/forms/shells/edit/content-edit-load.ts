@@ -90,7 +90,7 @@ export function loadContentEditFormState({
   const validationIntent = validationIntentForEditEntity(entity.status)
 
   return {
-    layoutCtx: layoutCtxWithSeeds,
+    layoutCtx: { ...layoutCtxWithSeeds, validationIntent },
     schema: resolveContentFormSchema(def, layoutCtx, validationIntent),
     validationIntent,
     defaultValues: stripEditEnvelopeFromFormDefaults(def.toFormValues(entity), {

@@ -28,7 +28,7 @@ export const GENERAL_TABLE_KIND_TERM = {
 
 export const GENERAL_TABLE_KIND_ENTRIES = {
   general: {
-    label: 'General',
+    label: 'General table',
     description: 'Authored-order rows with optional blank cells.',
   },
 } as const satisfies Record<GeneralTableKind, { label: string; description: string }>

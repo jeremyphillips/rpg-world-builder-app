@@ -1,13 +1,13 @@
 import type { z } from 'zod'
 
-import type { ProgressionTable, ProgressionTableColumn } from '../tables'
+import type { ContentTable, ProgressionTableColumn } from '../tables'
 import { classFeatureTableValidationMessages } from './class-feature-table-messages'
 
-export type ClassFeatureTable = ProgressionTable
+export type ClassFeatureTable = ContentTable
 
 type FeatureProgressionSource = {
   id: string
-  tables?: readonly ProgressionTable[]
+  tables?: readonly ContentTable[]
 }
 
 export type FeatureProgressionColumn = {
@@ -20,7 +20,7 @@ export type FeatureProgressionColumn = {
 }
 
 export function refineFeatureTablesOnFeature(
-  feature: { level: number; tables?: ProgressionTable[] },
+  feature: { level: number; tables?: ContentTable[] },
   ctx: z.RefinementCtx,
 ): void {
   const tables = feature.tables
@@ -37,6 +37,8 @@ export function refineFeatureTablesOnFeature(
       })
     }
     seenTableIds.add(table.id)
+
+    if (table.kind !== 'levelProgression') continue
 
     for (const [columnIndex, column] of table.columns.entries()) {
       for (const [entryIndex, entry] of column.entries.entries()) {

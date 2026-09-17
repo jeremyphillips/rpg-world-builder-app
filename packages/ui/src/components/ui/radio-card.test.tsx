@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { ChartNoAxesColumn, Grid3x3 } from 'lucide-react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { RadioCard } from './radio-card.client'
@@ -234,6 +235,95 @@ describe('RadioCard', () => {
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<RadioCard aria-label="Edition preset" options={options} />)
     await expectNoAxeViolations(container)
+  })
+
+  it('renders leading icons instead of radio circles when visualControl is icon', () => {
+    const { container } = render(
+      <RadioCard
+        aria-label="Table type"
+        visualControl="icon"
+        density="compact"
+        value="levelProgression"
+        options={[
+          {
+            label: 'Level progression',
+            value: 'levelProgression',
+            description: 'Values by character level',
+            icon: <ChartNoAxesColumn data-testid="level-progression-icon" aria-hidden />,
+          },
+          {
+            label: 'General table',
+            value: 'general',
+            description: 'Custom rows and columns',
+            icon: <Grid3x3 data-testid="general-table-icon" aria-hidden />,
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByTestId('level-progression-icon')).toBeInTheDocument()
+    expect(screen.getByTestId('general-table-icon')).toBeInTheDocument()
+    expect(container.querySelector('[class*="rounded-full"]')).toBeNull()
+  })
+
+  it('selects an icon-control option on click and via keyboard', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+    render(
+      <RadioCard
+        aria-label="Table type"
+        visualControl="icon"
+        density="compact"
+        options={[
+          {
+            label: 'Level progression',
+            value: 'levelProgression',
+            icon: <ChartNoAxesColumn aria-hidden />,
+          },
+          {
+            label: 'General table',
+            value: 'general',
+            icon: <Grid3x3 aria-hidden />,
+          },
+        ]}
+        onValueChange={onValueChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /General table/i }))
+    expect(onValueChange).toHaveBeenCalledWith('general')
+
+    const general = screen.getByRole('radio', { name: /General table/i })
+    general.focus()
+    await user.keyboard('{Space}')
+    expect(onValueChange).toHaveBeenLastCalledWith('general')
+  })
+
+  it('applies selected card styling in icon mode', () => {
+    render(
+      <RadioCard
+        aria-label="Table type"
+        visualControl="icon"
+        density="compact"
+        value="general"
+        options={[
+          {
+            label: 'Level progression',
+            value: 'levelProgression',
+            icon: <ChartNoAxesColumn aria-hidden />,
+          },
+          {
+            label: 'General table',
+            value: 'general',
+            icon: <Grid3x3 aria-hidden />,
+          },
+        ]}
+      />,
+    )
+
+    const selected = screen.getByRole('radio', { name: /General table/i })
+    expect(selected).toHaveClass('data-[state=checked]:border-primary')
+    expect(selected).toHaveClass('data-[state=checked]:bg-control-selected')
   })
 
   it('selects an option when controlPosition is right', async () => {

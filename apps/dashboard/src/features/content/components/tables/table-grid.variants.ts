@@ -1,0 +1,4 @@
+export const tableGridHeaderCellClasses = 'text-center font-medium'
+export const tableGridRowHeaderCellClasses = 'font-medium'
+export const tableGridRowHeaderHeaderClasses = 'w-20'
+export const tableGridValueCellClasses = 'text-center'

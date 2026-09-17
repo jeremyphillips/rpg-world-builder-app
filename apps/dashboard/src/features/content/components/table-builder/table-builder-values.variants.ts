@@ -33,6 +33,12 @@ export const TABLE_BUILDER_LEVEL_TRACK = '5.5rem'
 export const TABLE_BUILDER_VALUE_TRACK = 'minmax(7rem, 1fr)'
 export const TABLE_BUILDER_ACTION_TRACK = '2.25rem'
 
+/** Pre-column empty state for general tables — no header row or add-row affordance. */
+export const tableBuilderValuesNeedsColumnsClasses =
+  'flex flex-col gap-1 px-3 py-4 text-sm text-foreground'
+
+export const tableBuilderValuesNeedsColumnsHintClasses = 'text-muted-foreground'
+
 export function tableBuilderValuesGridTemplate(columnCount: number, includeLevel = true): string {
   const valueTracks = `repeat(${Math.max(columnCount, 1)}, ${TABLE_BUILDER_VALUE_TRACK})`
   return includeLevel

@@ -31,3 +31,11 @@ export const tableBuilderGroupEmptyClasses = 'px-3 py-4 text-sm text-muted-foreg
 export const tableBuilderSectionErrorClasses = 'text-sm text-destructive'
 
 export const tableBuilderSectionClasses = 'flex flex-col gap-2'
+
+/** Compact type metadata — label/value stack without select-style control dimensions. */
+export const tableBuilderKindMetadataClasses = 'flex flex-col gap-1.5'
+
+export const tableBuilderKindMetadataLabelClasses =
+  'font-field-label text-md leading-none text-foreground'
+
+export const tableBuilderKindMetadataValueClasses = 'text-md text-foreground'

@@ -300,6 +300,7 @@ export {
   RADIO_CARD_DEFAULT_DETAILS_LABEL,
   RADIO_CARD_SUMMARY_SEPARATOR,
   type RadioCardDensity,
+  type RadioCardVisualControl,
   type RadioCardVariant,
   type RadioCardEmbeddedSlotTone,
   type RadioCardOption,

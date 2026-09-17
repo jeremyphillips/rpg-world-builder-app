@@ -10,7 +10,7 @@ import {
   type TableNumberFormat,
 } from '@rpg/contracts'
 
-import type { ProgressionTablePresentation } from '../../components/tables/progression-table-presentation'
+import type { TableGridPresentation } from '../../components/tables/table-grid-presentation'
 import type { TableBuilderKind } from './table-builder-kind'
 
 // ---------------------------------------------------------------------------
@@ -91,6 +91,36 @@ export function createEmptyTableBuilderDraft(
   kind: TableBuilderKind = 'levelProgression',
 ): TableBuilderFormValues {
   return { kind, name: '', columns: [], rows: [] }
+}
+
+/**
+ * Resets kind-specific draft structure when switching table type while the parent
+ * content is still a draft. Preserves the table name; does not convert data
+ * between progression and general shapes.
+ */
+export function resetTableBuilderDraftForKindChange(
+  draft: TableBuilderFormValues,
+  nextKind: TableBuilderKind,
+): TableBuilderFormValues {
+  return {
+    kind: nextKind,
+    name: draft.name,
+    columns: [],
+    rows: [],
+  }
+}
+
+/** True when the draft has authored columns, rows, or non-blank cell values. */
+export function hasMeaningfulTableBuilderDraftContent(draft: TableBuilderFormValues): boolean {
+  if (draft.columns.some((column) => column.label.trim() !== '')) return true
+  if (
+    draft.rows.some((row) =>
+      Object.values(row.cells).some((cell) => !isTableBuilderCellBlank(cell)),
+    )
+  ) {
+    return true
+  }
+  return draft.columns.length > 0 || draft.rows.length > 0
 }
 
 export function emptyCellDraftForValueType(valueType: TableColumnValueType): TableBuilderCellDraft {
@@ -311,7 +341,9 @@ function formatParsedCellValue(
  * Best-effort preview of the authoring draft: resolved carry-forward output for
  * parseable cells, `undefined` (em dash) for unresolved ones.
  */
-export function draftToPresentation(values: TableBuilderFormValues): ProgressionTablePresentation {
+export function progressionDraftToGridPresentation(
+  values: TableBuilderFormValues,
+): TableGridPresentation {
   const trimmedName = values.name.trim()
 
   const parsedEntriesByColumnKey = new Map<
@@ -342,8 +374,8 @@ export function draftToPresentation(values: TableBuilderFormValues): Progression
       }
     }),
     rows: [...sortedRows, ...unleveledRows].map(({ row, level }) => ({
-      ...(level === undefined ? {} : { level }),
-      values: Object.fromEntries(
+      ...(level === undefined ? {} : { rowHeader: level }),
+      cells: Object.fromEntries(
         values.columns.map((column) => {
           if (level === undefined) {
             const direct = parseCellDraft(column, row.cells[column.key])

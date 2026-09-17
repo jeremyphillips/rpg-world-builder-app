@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { action } from 'storybook/actions'
+import { ChartNoAxesColumn, Grid3x3 } from 'lucide-react'
 
 import { RadioCard } from './radio-card.client'
 
@@ -95,6 +96,32 @@ export const RadioOnRightTwoColumnGrid: Story = {
     className: 'grid-cols-1 sm:grid-cols-2',
     options: gridOptions,
     defaultValue: '5e',
+  },
+}
+
+const iconControlTableTypeOptions = [
+  {
+    label: 'Level progression',
+    value: 'levelProgression',
+    description: 'Values by character level',
+    icon: <ChartNoAxesColumn aria-hidden />,
+  },
+  {
+    label: 'General table',
+    value: 'general',
+    description: 'Custom rows and columns',
+    icon: <Grid3x3 aria-hidden />,
+  },
+]
+
+export const IconControlTwoColumnGrid: Story = {
+  args: {
+    'aria-label': 'Table type',
+    visualControl: 'icon',
+    density: 'compact',
+    className: 'grid-cols-1 sm:grid-cols-2',
+    options: iconControlTableTypeOptions,
+    defaultValue: 'levelProgression',
   },
 }
 

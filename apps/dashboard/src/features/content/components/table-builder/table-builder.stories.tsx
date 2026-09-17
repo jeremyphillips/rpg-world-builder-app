@@ -8,6 +8,10 @@ import {
   tableToDraft,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
+import type {
+  TableBuilderHostConfig,
+  TableBuilderMode,
+} from '../../lib/table-builder/table-builder-host-config'
 import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
 import {
   martialArtsProgressionTableFixture,
@@ -18,13 +22,24 @@ import { TableBuilder } from './table-builder'
 
 const ALLOWED_LEVELS = Array.from({ length: 20 }, (_, index) => index + 1)
 
+const CLASS_FEATURE_CONFIG: TableBuilderHostConfig = {
+  allowedKinds: ['levelProgression', 'general'],
+  recommendedKind: 'levelProgression',
+  allowedLevels: ALLOWED_LEVELS,
+}
+
 type HarnessProps = {
   table?: ProgressionTable
-  allowedLevels?: readonly number[]
+  config?: TableBuilderHostConfig
+  mode?: TableBuilderMode
 }
 
 /** Standalone harness — the modal normally owns this isolated draft form. */
-function TableBuilderHarness({ table, allowedLevels = ALLOWED_LEVELS }: HarnessProps) {
+function TableBuilderHarness({
+  table,
+  config = CLASS_FEATURE_CONFIG,
+  mode = table === undefined ? 'create' : 'edit',
+}: HarnessProps) {
   const form = useForm<TableBuilderFormValues>({
     resolver: zodResolver(tableBuilderFormSchema),
     defaultValues: table !== undefined ? tableToDraft(table) : createEmptyTableBuilderDraft(),
@@ -32,7 +47,7 @@ function TableBuilderHarness({ table, allowedLevels = ALLOWED_LEVELS }: HarnessP
 
   return (
     <form noValidate onSubmit={form.handleSubmit(() => undefined)}>
-      <TableBuilder form={form} kind="levelProgression" allowedLevels={allowedLevels} />
+      <TableBuilder form={form} config={config} mode={mode} />
     </form>
   )
 }
@@ -62,4 +77,16 @@ export const MixedColumnTypes: Story = {
 
 export const SignedFormatting: Story = {
   args: { table: rageProgressionTableFixture },
+}
+
+export const KindSelectionCreate: Story = {
+  args: { mode: 'create', config: CLASS_FEATURE_CONFIG },
+}
+
+export const KindReadOnlyEdit: Story = {
+  args: {
+    table: rageProgressionTableFixture,
+    mode: 'edit',
+    config: CLASS_FEATURE_CONFIG,
+  },
 }

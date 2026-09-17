@@ -1,13 +1,22 @@
 import {
   collectProgressionTableBreakpoints,
+  GENERAL_TABLE_KIND_ENTRIES,
   PROGRESSION_TABLE_KIND_ENTRIES,
-  type ProgressionTable,
+  type ContentTable,
 } from '@rpg/contracts'
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
-export function formatFeatureTableMetadata(table: ProgressionTable): string {
+export function formatFeatureTableMetadata(table: ContentTable): string {
+  if (table.kind === 'general') {
+    const columnCount = table.columns.length
+    const rowCount = table.rows.length
+    const columnLabel = columnCount === 1 ? 'column' : 'columns'
+    const rowLabel = rowCount === 1 ? 'row' : 'rows'
+    return `${columnCount} ${columnLabel} · ${rowCount} ${rowLabel}`
+  }
+
   const columnCount = table.columns.length
   const breakpointCount = collectProgressionTableBreakpoints(table).length
   const columnLabel = columnCount === 1 ? 'column' : 'columns'
@@ -15,7 +24,10 @@ export function formatFeatureTableMetadata(table: ProgressionTable): string {
   return `${columnCount} ${columnLabel} · ${breakpointCount} ${breakpointLabel}`
 }
 
-export function featureTableKindLabel(table: ProgressionTable): string {
+export function featureTableKindLabel(table: ContentTable): string {
+  if (table.kind === 'general') {
+    return GENERAL_TABLE_KIND_ENTRIES.general.label
+  }
   return PROGRESSION_TABLE_KIND_ENTRIES[table.kind].label
 }
 

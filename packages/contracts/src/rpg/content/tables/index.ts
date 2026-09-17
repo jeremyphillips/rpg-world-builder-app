@@ -1,4 +1,5 @@
 export * from './table-column'
+export * from './content-table'
 export * from './progression-table'
 export * from './progression-table-messages'
 export * from './general-table'

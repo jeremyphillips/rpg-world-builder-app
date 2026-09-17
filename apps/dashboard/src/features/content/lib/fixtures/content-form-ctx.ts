@@ -21,6 +21,7 @@ export function makeContentFormCtx(
   return {
     campaignId: TEST_CAMPAIGN_ID,
     campaignRules: { ...defaultCampaignRules(), ...campaignRules },
+    validationIntent: 'draft',
     ...rest,
   }
 }

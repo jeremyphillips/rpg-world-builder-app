@@ -11,6 +11,23 @@ export const TABLE_BUILDER_MODAL_DESCRIPTION = 'Define the structure and values 
 export const TABLE_BUILDER_NAME_LABEL = 'Table name'
 export const TABLE_BUILDER_NAME_HINT = 'Used as the table heading.'
 
+export const TABLE_BUILDER_KIND_LABEL = 'Table type'
+
+export const TABLE_BUILDER_KIND_LABELS = {
+  levelProgression: 'Level progression',
+  general: 'General table',
+} as const
+
+export const TABLE_BUILDER_KIND_CARD_DESCRIPTIONS = {
+  levelProgression: 'Values by character level',
+  general: 'Custom rows and columns',
+} as const
+
+export const TABLE_BUILDER_KIND_CHANGE_CONFIRM_HEADLINE = 'Change table type?'
+export const TABLE_BUILDER_KIND_CHANGE_CONFIRM_DESCRIPTION =
+  "Changing the type will reset this table's columns and values."
+export const TABLE_BUILDER_KIND_CHANGE_CONFIRM_LABEL = 'Change type'
+
 export const TABLE_BUILDER_COLUMNS_LABEL = 'Columns'
 export const TABLE_BUILDER_COLUMNS_HINT =
   'Add the value columns for this table. Level is included automatically.'
@@ -25,6 +42,9 @@ export const TABLE_BUILDER_VALUES_HINT =
   'Add a row when values change. Blank cells keep the previous value.'
 export const TABLE_BUILDER_GENERAL_VALUES_HINT =
   'Add rows in the order they should appear. Blank cells stay empty.'
+export const TABLE_BUILDER_GENERAL_VALUES_NEEDS_COLUMNS_HEADLINE =
+  'Add a column before adding rows.'
+export const TABLE_BUILDER_GENERAL_VALUES_NEEDS_COLUMNS_HINT = 'Rows use the columns defined above.'
 export const TABLE_BUILDER_LEVEL_HEADER = 'Level'
 export const TABLE_BUILDER_ADD_ROW_LABEL = 'Add row'
 export const TABLE_BUILDER_ALL_LEVELS_USED_REASON = 'All levels have been added.'

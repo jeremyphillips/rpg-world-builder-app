@@ -29,10 +29,12 @@ import {
   draftToGeneralTable,
   generalTableToDraft,
 } from '../../lib/table-builder/table-builder-general-draft'
-import type {
-  TableBuilderKind,
-  TableBuilderSavedTable,
-} from '../../lib/table-builder/table-builder-kind'
+import type { TableBuilderSavedTable } from '../../lib/table-builder/table-builder-kind'
+import {
+  assertTableBuilderHostConfig,
+  resolveTableBuilderRecommendedKind,
+  type TableBuilderHostConfig,
+} from '../../lib/table-builder/table-builder-host-config'
 import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
 import { TableBuilder } from './table-builder'
 import { tableBuilderModalDeleteButtonClasses } from './table-builder-modal.variants'
@@ -42,11 +44,9 @@ export type TableBuilderModalMode = 'create' | 'edit'
 export type TableBuilderModalProps = {
   open: boolean
   mode: TableBuilderModalMode
-  kind: TableBuilderKind
+  config: TableBuilderHostConfig
   /** Existing table when editing; ignored for `create`. */
   value?: TableBuilderSavedTable
-  /** Semantic level set for the structural axis — required for `levelProgression`. */
-  allowedLevels?: readonly number[]
   /** Receives one schema-valid table; the parent owns persistence. */
   onSave: (table: TableBuilderSavedTable) => void
   onOpenChange: (open: boolean) => void
@@ -55,11 +55,13 @@ export type TableBuilderModalProps = {
 }
 
 function tableToDraftValues(
-  kind: TableBuilderKind,
+  config: TableBuilderHostConfig,
   value: TableBuilderSavedTable | undefined,
 ): TableBuilderFormValues {
-  if (value === undefined) return createEmptyTableBuilderDraft(kind)
-  return kind === 'general'
+  if (value === undefined) {
+    return createEmptyTableBuilderDraft(resolveTableBuilderRecommendedKind(config))
+  }
+  return value.kind === 'general'
     ? generalTableToDraft(value as GeneralTable)
     : tableToDraft(value as ProgressionTable)
 }
@@ -87,19 +89,20 @@ export function TableBuilderModal(props: TableBuilderModalProps) {
 
 function TableBuilderModalContent({
   mode,
-  kind,
+  config,
   value,
-  allowedLevels = [],
   onSave,
   onOpenChange,
   onDelete,
 }: TableBuilderModalProps) {
+  assertTableBuilderHostConfig(config)
+
   const formId = useId()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const form = useForm<TableBuilderFormValues>({
     resolver: zodResolver(tableBuilderFormSchema),
-    defaultValues: tableToDraftValues(kind, value),
+    defaultValues: tableToDraftValues(config, value),
     mode: 'onSubmit',
   })
 
@@ -110,6 +113,7 @@ function TableBuilderModalContent({
   }
 
   const handleSubmit = form.handleSubmit((values) => {
+    if (!config.allowedKinds.includes(values.kind)) return
     onSave(draftToSavedTable(values, value))
     onOpenChange(false)
   })
@@ -131,7 +135,7 @@ function TableBuilderModalContent({
           />
           <Modal.Body>
             <form id={formId} onSubmit={handleSubmit} noValidate>
-              <TableBuilder form={form} kind={kind} allowedLevels={allowedLevels} />
+              <TableBuilder form={form} config={config} mode={mode} />
             </form>
           </Modal.Body>
           <Modal.Footer>
