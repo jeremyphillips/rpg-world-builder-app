@@ -1,18 +1,23 @@
-import { cn, establishSurfaceCurrent } from '@rpg/ui'
+import {
+  cn,
+  emptyStateWellSupportingClasses,
+  emptyStateWellSurfaceClasses,
+  emptyStateWellTitleLgClasses,
+} from '@rpg/ui'
 
 import { masterDetailRailBorderClasses } from '../../components/master-detail/master-detail-rail.variants'
 
 export const speciesHeritageEmptyStateShellClasses = cn(
-  'flex flex-col items-center justify-center rounded-lg border bg-field-container px-6 py-10 text-center text-foreground',
+  'flex flex-col items-center justify-center rounded-lg border px-6 py-10 text-center',
   masterDetailRailBorderClasses,
-  establishSurfaceCurrent('field-container'),
+  emptyStateWellSurfaceClasses,
 )
 
 export const speciesHeritageEmptyStateContentClasses = 'flex max-w-md flex-col items-center gap-3'
 
-export const speciesHeritageEmptyStateTitleClasses = 'text-lg font-medium text-foreground'
+export const speciesHeritageEmptyStateTitleClasses = emptyStateWellTitleLgClasses
 
-export const speciesHeritageEmptyStateDescriptionClasses = 'text-sm text-muted-foreground'
+export const speciesHeritageEmptyStateDescriptionClasses = emptyStateWellSupportingClasses
 
 export const speciesHeritageGroupShellClasses = 'relative'
 

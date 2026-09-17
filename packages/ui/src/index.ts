@@ -115,6 +115,18 @@ export { IconBox, type IconBoxProps } from './components/ui/icon-box.client'
 export { iconBoxVariants, iconBoxGlyphClasses } from './components/ui/icon-box.variants'
 export { EmptyPanel, type EmptyPanelProps } from './components/ui/empty-panel.client'
 export { emptyPanelVariants } from './components/ui/empty-panel.variants'
+export {
+  emptyStateWellBodyClasses,
+  emptyStateWellIconInkClasses,
+  emptyStateWellIconLgClasses,
+  emptyStateWellIconMdClasses,
+  emptyStateWellSupportingClasses,
+  emptyStateWellSupportingLgClasses,
+  emptyStateWellSurfaceClasses,
+  emptyStateWellTitleClasses,
+  emptyStateWellTitleLgClasses,
+  resolveEmptyStateWellIconClasses,
+} from './components/ui/empty-state-well.variants'
 export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export {
   sidebarNavItemVariants,

@@ -80,8 +80,21 @@ function insetPanelGateStoryProps() {
 function insetPanelEmptyStoryProps() {
   return {
     borderStyle: 'dashed' as const,
-    surface: {} as const,
     size: 'md' as const,
     align: 'center' as const,
   }
+}
+
+export const OnFieldContainer: Story = {
+  args: {
+    ...insetPanelEmptyStoryProps(),
+    children: <InsetPanel.Text>No items are available.</InsetPanel.Text>,
+  },
+  decorators: [
+    (Story) => (
+      <div className="rounded-lg border border-border-subtle bg-field-container p-4 [--surface-current:var(--field-container)]">
+        <Story />
+      </div>
+    ),
+  ],
 }

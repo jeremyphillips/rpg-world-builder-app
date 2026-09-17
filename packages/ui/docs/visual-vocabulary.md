@@ -78,6 +78,8 @@ Namespace: `bg-warning-faint` (wash) vs `text-semantic-warning` (label) vs
 | `strong`             | `{ emphasis: 'strong', elevation: 'flat' }`  |
 | `sunken` (inset)     | `{ elevation: 'sunken' }`                    |
 
+Empty-state container policy and call-site inventory: [empty-state-containers.md](./empty-state-containers.md).
+
 `resolveSurfaceClasses` in [`surface.variants.ts`](../src/components/ui/surface.variants.ts) resolves neutral and semantic washes.
 
 Group `chrome` panel / outline / callout variants use `ChromeConfig` (`tone`, `emphasis`, `elevation`, `borderAccent`) and delegate to [`chrome.variants.ts`](../src/components/ui/chrome.variants.ts). Inset, divider, and legend-rail accent remain field-group-specific.

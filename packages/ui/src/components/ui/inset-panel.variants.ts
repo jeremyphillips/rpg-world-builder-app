@@ -97,7 +97,7 @@ export function insetPanelClassNames({
 /** Dashed placeholder chrome shared by catalog pickers and similar empty views. */
 export const insetPanelEmptyStateClasses = insetPanelClassNames({
   borderStyle: 'dashed',
-  surface: {},
+  surface: DEFAULT_INSET_PANEL_SURFACE,
   size: 'md',
   align: 'center',
 })

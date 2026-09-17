@@ -101,7 +101,6 @@ export function ConnectionsStep({
       {memberships.length === 0 ? (
         <InsetPanel
           borderStyle="dashed"
-          surface={{}}
           size="md"
           align="center"
           className={connectionsStepEmptyClasses}

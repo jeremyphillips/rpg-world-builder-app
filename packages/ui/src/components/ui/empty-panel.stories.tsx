@@ -16,3 +16,16 @@ export const Default: Story = {
     children: 'No tables added.',
   },
 }
+
+export const OnFieldContainer: Story = {
+  args: {
+    children: 'No grants added.',
+  },
+  decorators: [
+    (Story) => (
+      <div className="rounded-lg border border-border-subtle bg-field-container p-4 [--surface-current:var(--field-container)]">
+        <Story />
+      </div>
+    ),
+  ],
+}

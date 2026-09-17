@@ -75,14 +75,7 @@ function CatalogPickerSheetEmpty({
   if (emptyState) return <>{emptyState}</>
 
   return (
-    <InsetPanel
-      borderStyle="dashed"
-      surface={{}}
-      size="md"
-      align="center"
-      className="py-8"
-      role="status"
-    >
+    <InsetPanel borderStyle="dashed" size="md" align="center" className="py-8" role="status">
       <InsetPanel.Text>{message}</InsetPanel.Text>
     </InsetPanel>
   )

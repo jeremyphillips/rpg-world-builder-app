@@ -10,6 +10,7 @@ import {
   masterDetailEditorEmptyStateContentClasses,
   masterDetailEditorEmptyStateHeadingClasses,
   masterDetailEditorEmptyStateIconClasses,
+  masterDetailEditorEmptyStateShellClasses,
   masterDetailEditorEmptyStateSubheadClasses,
 } from './master-detail-editor-empty-state.variants'
 
@@ -19,14 +20,16 @@ export interface MasterDetailEditorEmptyStateProps {
 
 export function MasterDetailEditorEmptyState({ itemNoun }: MasterDetailEditorEmptyStateProps) {
   return (
-    <div className={masterDetailEditorEmptyStateContentClasses} role="status">
-      <Sparkles aria-hidden className={masterDetailEditorEmptyStateIconClasses} />
-      <Text as="p" className={masterDetailEditorEmptyStateHeadingClasses}>
-        {masterDetailEmptySelectionHeading(itemNoun)}
-      </Text>
-      <Text as="p" className={masterDetailEditorEmptyStateSubheadClasses}>
-        {masterDetailEmptySelectionSubhead(itemNoun)}
-      </Text>
+    <div className={masterDetailEditorEmptyStateShellClasses} role="status">
+      <div className={masterDetailEditorEmptyStateContentClasses}>
+        <Sparkles aria-hidden className={masterDetailEditorEmptyStateIconClasses} />
+        <Text as="p" className={masterDetailEditorEmptyStateHeadingClasses}>
+          {masterDetailEmptySelectionHeading(itemNoun)}
+        </Text>
+        <Text as="p" className={masterDetailEditorEmptyStateSubheadClasses}>
+          {masterDetailEmptySelectionSubhead(itemNoun)}
+        </Text>
+      </div>
     </div>
   )
 }

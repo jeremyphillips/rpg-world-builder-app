@@ -1,5 +1,11 @@
 import { cva } from 'class-variance-authority'
 
+import { cn } from '../../lib/utils'
+import {
+  emptyStateWellBodyClasses,
+  emptyStateWellSurfaceClasses,
+} from './empty-state-well.variants'
+
 export const emptyPanelVariants = cva(
-  'rounded-md border border-border-subtle bg-background px-3 py-2.5 text-xs text-muted-foreground',
+  cn('rounded-md border px-3 py-2.5', emptyStateWellBodyClasses, emptyStateWellSurfaceClasses),
 )

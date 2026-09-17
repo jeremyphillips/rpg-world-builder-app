@@ -27,7 +27,7 @@ export function TableBuilderInsetGate({
   return (
     <InsetPanel
       borderStyle="dashed"
-      surface={{ emphasis: 'subtle' }}
+      surface={{ elevation: 'sunken' }}
       size="md"
       align="center"
       className={tableBuilderInsetGatePanelClasses}
