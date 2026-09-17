@@ -21,6 +21,8 @@ export const richTextTableEmbedCardClasses = cva(
 export const richTextTableEmbedCardContentClasses =
   'flex flex-wrap items-center justify-between gap-3'
 
+export const richTextTableEmbedCardTitleStackClasses = 'min-w-0'
+
 export const richTextTableEmbedCardHeaderClasses = 'flex min-w-0 items-start gap-2'
 
 export const richTextTableEmbedCardTitleClasses = 'truncate font-medium'

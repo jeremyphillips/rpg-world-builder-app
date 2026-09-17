@@ -17,6 +17,7 @@ import {
   TABLE_BUILDER_DELETE_LABEL,
   TABLE_BUILDER_EDIT_SUBMIT_LABEL,
   TABLE_BUILDER_EDIT_TITLE,
+  TABLE_BUILDER_KIND_NOT_ALLOWED,
   TABLE_BUILDER_MODAL_DESCRIPTION,
 } from '../../lib/table-builder/table-builder-copy'
 import {
@@ -113,7 +114,10 @@ function TableBuilderModalContent({
   }
 
   const handleSubmit = form.handleSubmit((values) => {
-    if (!config.allowedKinds.includes(values.kind)) return
+    if (!config.allowedKinds.includes(values.kind)) {
+      form.setError('kind', { type: 'manual', message: TABLE_BUILDER_KIND_NOT_ALLOWED })
+      return
+    }
     onSave(draftToSavedTable(values, value))
     onOpenChange(false)
   })

@@ -1,20 +1,16 @@
 import {
   collectProgressionTableBreakpoints,
-  GENERAL_TABLE_KIND_ENTRIES,
-  PROGRESSION_TABLE_KIND_ENTRIES,
+  formatGeneralTableMetadata,
   type ContentTable,
 } from '@rpg/contracts'
 
+import { tableBuilderKindLabel } from '../../lib/table-builder/table-builder-kind-options.lib'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
 export function formatFeatureTableMetadata(table: ContentTable): string {
   if (table.kind === 'general') {
-    const columnCount = table.columns.length
-    const rowCount = table.rows.length
-    const columnLabel = columnCount === 1 ? 'column' : 'columns'
-    const rowLabel = rowCount === 1 ? 'row' : 'rows'
-    return `${columnCount} ${columnLabel} · ${rowCount} ${rowLabel}`
+    return formatGeneralTableMetadata(table)
   }
 
   const columnCount = table.columns.length
@@ -25,10 +21,7 @@ export function formatFeatureTableMetadata(table: ContentTable): string {
 }
 
 export function featureTableKindLabel(table: ContentTable): string {
-  if (table.kind === 'general') {
-    return GENERAL_TABLE_KIND_ENTRIES.general.label
-  }
-  return PROGRESSION_TABLE_KIND_ENTRIES[table.kind].label
+  return tableBuilderKindLabel(table.kind)
 }
 
 export function buildFeatureTableAllowedLevels(

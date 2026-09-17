@@ -1,7 +1,11 @@
 import { z } from 'zod'
 
-import { generalTableSchema, type GeneralTable } from './general-table'
-import { progressionTableSchema, type ProgressionTable } from './progression-table'
+import { GENERAL_TABLE_KINDS, generalTableSchema, type GeneralTable } from './general-table'
+import {
+  PROGRESSION_TABLE_KINDS,
+  progressionTableSchema,
+  type ProgressionTable,
+} from './progression-table'
 
 // ---------------------------------------------------------------------------
 // Content tables — discriminated union for hosts that accept both progression
@@ -16,6 +20,9 @@ export const contentTableSchema = z.discriminatedUnion('kind', [
 export type ContentTable = z.infer<typeof contentTableSchema>
 
 export type ContentTableKind = ContentTable['kind']
+
+/** All table kinds accepted by content-table hosts (progression + general). */
+export const CONTENT_TABLE_KINDS = [...PROGRESSION_TABLE_KINDS, ...GENERAL_TABLE_KINDS] as const
 
 export function isProgressionContentTable(table: ContentTable): table is ProgressionTable {
   return table.kind === 'levelProgression'

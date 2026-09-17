@@ -1,4 +1,9 @@
-import { TABLE_COLUMN_VALUE_TYPES, TABLE_NUMBER_FORMATS, defineMessage } from '@rpg/contracts'
+import {
+  CONTENT_TABLE_KINDS,
+  TABLE_COLUMN_VALUE_TYPES,
+  TABLE_NUMBER_FORMATS,
+  defineMessage,
+} from '@rpg/contracts'
 import { z } from 'zod'
 
 import {
@@ -9,8 +14,6 @@ import {
   type TableBuilderColumnDraft,
   type TableBuilderFormValues,
 } from './table-builder-draft'
-import type { TableBuilderKind } from './table-builder-kind'
-
 export const tableBuilderValidationMessages = {
   tableName: defineMessage('validation.tableBuilder.tableName', () => 'Enter a table name.'),
   columnName: defineMessage('validation.tableBuilder.columnName', () => 'Enter a column name.'),
@@ -189,13 +192,9 @@ function refineTableBuilderForm(values: TableBuilderFormValues, ctx: z.Refinemen
 /** Validates the authoring draft on save; blank cells are legitimate carry-forward gaps. */
 export const tableBuilderFormSchema = z
   .object({
-    kind: z.enum(['levelProgression', 'general']),
+    kind: z.enum(CONTENT_TABLE_KINDS),
     name: z.string(),
     columns: z.array(columnDraftSchema),
     rows: z.array(rowDraftSchema),
   })
   .superRefine(refineTableBuilderForm)
-
-export function tableBuilderFormSchemaForKind(kind: TableBuilderKind) {
-  return tableBuilderFormSchema.transform((values) => ({ ...values, kind }))
-}

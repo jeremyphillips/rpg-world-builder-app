@@ -3,10 +3,7 @@ import { GENERAL_TABLE_KIND_ENTRIES, PROGRESSION_TABLE_KIND_ENTRIES } from '@rpg
 import { ChartNoAxesColumn, Grid3x3, type LucideIcon } from 'lucide-react'
 import type { RadioCardOption } from '@rpg/ui'
 
-import {
-  TABLE_BUILDER_KIND_CARD_DESCRIPTIONS,
-  TABLE_BUILDER_KIND_LABELS,
-} from './table-builder-copy'
+import { TABLE_BUILDER_KIND_CARD_DESCRIPTIONS } from './table-builder-copy'
 import type { TableBuilderKind } from './table-builder-kind'
 
 export const TABLE_BUILDER_KIND_ICONS: Record<TableBuilderKind, LucideIcon> = {
@@ -30,7 +27,7 @@ export function buildTableBuilderKindRadioOptions(
     const Icon = TABLE_BUILDER_KIND_ICONS[kind]
     return {
       value: kind,
-      label: TABLE_BUILDER_KIND_LABELS[kind],
+      label: tableBuilderKindLabel(kind),
       description: TABLE_BUILDER_KIND_CARD_DESCRIPTIONS[kind],
       icon: createElement(Icon, { className: 'size-4', 'aria-hidden': true }),
     }

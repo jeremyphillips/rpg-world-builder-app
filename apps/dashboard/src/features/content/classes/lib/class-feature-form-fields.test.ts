@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
   featureFromFormRow,
   featuresFromFormValues,
@@ -25,6 +26,19 @@ const rageProgressionTable = {
 }
 
 describe('class feature form round-trip', () => {
+  it('createFeatureRowDraftFormSchema keeps tables on parse', () => {
+    const rowWithTables = {
+      name: 'Rage',
+      level: 1,
+      grants: [],
+      tables: [rageProgressionTable],
+    }
+
+    expect(createFeatureRowDraftFormSchema().parse(rowWithTables).tables).toEqual([
+      rageProgressionTable,
+    ])
+  })
+
   it('maps feature tables into the form row and back on save', () => {
     const existing = {
       kind: 'custom' as const,

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import { reincarnateSpeciesTableFixture } from '@rpg/contracts'
+import { RICH_TEXT_TABLE_EMBED_ATTR } from '@rpg/ui'
+
 import { makeSpell } from '@/test/fixtures/factories/spell'
 
 import {
@@ -93,6 +96,56 @@ describe('spellToFormValues scaling toggles', () => {
       hasHigherLevelSlotEffect: false,
       cantripScaling: '<p>At 5th level, the range increases.</p>',
     })
+  })
+})
+
+const reincarnateEmbedHtml = `<div ${RICH_TEXT_TABLE_EMBED_ATTR}="reincarnate-species"></div>`
+
+describe('buildSpellCreateInput description tables', () => {
+  it('omits tables when description embed was removed but form tables[] still has the row', () => {
+    const input = buildSpellCreateInput(
+      publishReadySpellFormValues({
+        description: '<p>Embed removed by undo.</p>',
+        tables: [reincarnateSpeciesTableFixture],
+      }),
+    )
+
+    expect(input).not.toHaveProperty('tables')
+  })
+
+  it('prunes orphan tables when the embed was deleted from description', () => {
+    const input = buildSpellCreateInput(
+      publishReadySpellFormValues({
+        description: '<p>Table deleted from prose.</p>',
+        tables: [reincarnateSpeciesTableFixture],
+      }),
+    )
+
+    expect(input.tables).toBeUndefined()
+  })
+
+  it('keeps only referenced tables when multiple rows exist but one embed remains', () => {
+    const tableB = { ...reincarnateSpeciesTableFixture, id: 'table-b', name: 'Table B' }
+
+    const input = buildSpellCreateInput(
+      publishReadySpellFormValues({
+        description: `<div ${RICH_TEXT_TABLE_EMBED_ATTR}="table-b"></div>`,
+        tables: [reincarnateSpeciesTableFixture, tableB],
+      }),
+    )
+
+    expect(input.tables?.map((table) => table.id)).toEqual(['table-b'])
+  })
+
+  it('persists tables again after embed redo when form tables[] was kept in session', () => {
+    const input = buildSpellCreateInput(
+      publishReadySpellFormValues({
+        description: reincarnateEmbedHtml,
+        tables: [reincarnateSpeciesTableFixture],
+      }),
+    )
+
+    expect(input.tables).toEqual([reincarnateSpeciesTableFixture])
   })
 })
 

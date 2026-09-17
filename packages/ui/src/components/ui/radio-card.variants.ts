@@ -343,6 +343,10 @@ export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
       default: '',
       compact: '',
     },
+    columns: {
+      one: 'grid-cols-1',
+      two: 'grid-cols-1 sm:grid-cols-2',
+    },
   },
   compoundVariants: [
     { variant: 'card', density: 'default', class: 'gap-3' },
@@ -351,5 +355,6 @@ export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
   defaultVariants: {
     variant: 'card',
     density: 'default',
+    columns: 'one',
   },
 })

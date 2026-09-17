@@ -13,10 +13,8 @@ export const TABLE_BUILDER_NAME_HINT = 'Used as the table heading.'
 
 export const TABLE_BUILDER_KIND_LABEL = 'Table type'
 
-export const TABLE_BUILDER_KIND_LABELS = {
-  levelProgression: 'Level progression',
-  general: 'General table',
-} as const
+export const TABLE_BUILDER_KIND_NOT_ALLOWED =
+  'This table type is not allowed for the current context.'
 
 export const TABLE_BUILDER_KIND_CARD_DESCRIPTIONS = {
   levelProgression: 'Values by character level',

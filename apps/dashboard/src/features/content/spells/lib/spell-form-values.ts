@@ -24,7 +24,7 @@ import {
   type SpellTags,
 } from '@rpg/contracts'
 
-import { extractTableEmbedIds, normalizeRichTextHtml } from '@rpg/ui'
+import { normalizeRichTextHtml } from '@rpg/ui'
 
 import {
   finalizeContentInput,
@@ -638,12 +638,7 @@ function spellIdentityWireFields(
   const school = spellSchoolForWire(persistedValues.school, validationIntent)
 
   const description = persistedValues.description || undefined
-  const referencedTableIds = extractTableEmbedIds(description ?? '')
-  const tables = pruneSpellTablesToDescriptionEmbeds(
-    description,
-    persistedValues.tables ?? [],
-    referencedTableIds,
-  )
+  const tables = pruneSpellTablesToDescriptionEmbeds(description, persistedValues.tables ?? [])
 
   return {
     slug: slugForInputParse(persistedValues.name, ctx),

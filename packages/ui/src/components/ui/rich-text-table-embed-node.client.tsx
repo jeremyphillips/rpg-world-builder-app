@@ -11,6 +11,7 @@ import {
   richTextTableEmbedCardContentClasses,
   richTextTableEmbedCardHeaderClasses,
   richTextTableEmbedCardMetadataClasses,
+  richTextTableEmbedCardTitleStackClasses,
   richTextTableEmbedCardTitleClasses,
   richTextTableEmbedCardActionsClasses,
   richTextTableEmbedCardIconClasses,
@@ -35,7 +36,7 @@ export function RichTextTableEmbedNode({ node, deleteNode, selected }: NodeViewP
         <div className={richTextTableEmbedCardContentClasses}>
           <div className={richTextTableEmbedCardHeaderClasses}>
             <Table2 className={richTextTableEmbedCardIconClasses} aria-hidden />
-            <div className="min-w-0">
+            <div className={richTextTableEmbedCardTitleStackClasses}>
               <Text as="p" className={richTextTableEmbedCardTitleClasses}>
                 {title}
               </Text>

@@ -1,5 +1,6 @@
 import { formatDice, type Dice } from '../../primitives/dice'
 
+import type { GeneralTable } from './general-table'
 import type { ProgressionTableColumn } from './table-column'
 import type { TableCellValue, TableColumnDef } from './table-column'
 import type { ProgressionTableColumnValue } from './resolution'
@@ -18,6 +19,13 @@ export function formatTableValue(column: TableColumnDef, value: TableCellValue):
     case 'text':
       return String(value)
   }
+}
+
+/** Display SSOT for general-table row/column counts (e.g. spell embed metadata). */
+export function formatGeneralTableMetadata(table: Pick<GeneralTable, 'columns' | 'rows'>): string {
+  const columnCount = table.columns.length
+  const rowCount = table.rows.length
+  return `${columnCount} column${columnCount === 1 ? '' : 's'} · ${rowCount} row${rowCount === 1 ? '' : 's'}`
 }
 
 /** Display SSOT for progression table cell values. */

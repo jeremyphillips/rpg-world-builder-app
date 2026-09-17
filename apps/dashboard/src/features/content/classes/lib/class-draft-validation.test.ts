@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createClassDraftInputSchema } from '@rpg/contracts'
 
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
+import { rageProgressionTableFixture } from '../../components/tables/progression-table-fixtures'
 import { classFormDef, type ClassFormValues } from './class-form-def'
 import { createClassDraftFormSchema } from './class-form-fields'
 
@@ -24,6 +25,32 @@ describe('class create defaults draft persist path', () => {
     expect(input).not.toHaveProperty('primaryAbilities')
     expect(input).not.toHaveProperty('proficiencies')
     expect(input.spellcasting).toBeUndefined()
+  })
+
+  it('toInput(draft) keeps feature tables after draft schema parse', () => {
+    const formValues = {
+      ...createDefaults,
+      features: [
+        {
+          kind: 'custom' as const,
+          name: 'Rage',
+          level: 1,
+          grants: [],
+          tables: [rageProgressionTableFixture],
+          available: true,
+        },
+      ],
+    } satisfies ClassFormValues
+
+    const parsed = createClassDraftFormSchema().parse(formValues)
+    expect(parsed.features[0]?.tables).toEqual([rageProgressionTableFixture])
+
+    const input = classFormDef.toInput(parsed as ClassFormValues, undefined, 'draft')
+
+    expect(input.features?.[0]?.kind).toBe('custom')
+    if (input.features?.[0]?.kind === 'custom') {
+      expect(input.features[0].tables).toEqual([rageProgressionTableFixture])
+    }
   })
 
   it('reload hydrates incomplete stored body back into form values', () => {

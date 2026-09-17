@@ -80,4 +80,11 @@ describe('radioCard group layout', () => {
     expect(radioCardGroupGapVariants({ variant: 'card', density: 'compact' })).toContain('gap-2')
     expect(radioCardGroupGapVariants({ variant: 'card', density: 'default' })).toContain('gap-3')
   })
+
+  it('uses a responsive two-column grid when columns is two', () => {
+    expect(radioCardGroupGapVariants({ columns: 'two' })).toContain('grid-cols-1')
+    expect(radioCardGroupGapVariants({ columns: 'two' })).toContain('sm:grid-cols-2')
+    expect(radioCardGroupGapVariants({ columns: 'one' })).toContain('grid-cols-1')
+    expect(radioCardGroupGapVariants({ columns: 'one' })).not.toContain('sm:grid-cols-2')
+  })
 })

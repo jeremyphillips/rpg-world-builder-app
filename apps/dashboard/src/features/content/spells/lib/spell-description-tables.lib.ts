@@ -1,17 +1,15 @@
-import type { GeneralTable } from '@rpg/contracts'
+import { formatGeneralTableMetadata, type GeneralTable } from '@rpg/contracts'
+import { extractTableEmbedIds } from '@rpg/ui'
 
 export function formatSpellTableMetadata(table: GeneralTable): string {
-  const columnCount = table.columns.length
-  const rowCount = table.rows.length
-  return `${columnCount} column${columnCount === 1 ? '' : 's'} · ${rowCount} row${rowCount === 1 ? '' : 's'}`
+  return formatGeneralTableMetadata(table)
 }
 
 /** Prune spell tables[] to ids still referenced in description HTML embeds. */
 export function pruneSpellTablesToDescriptionEmbeds(
-  _description: string | undefined,
+  description: string | undefined,
   tables: GeneralTable[],
-  referencedIds: readonly string[],
 ): GeneralTable[] {
-  const referenced = new Set(referencedIds)
+  const referenced = new Set(extractTableEmbedIds(description ?? ''))
   return tables.filter((table) => referenced.has(table.id))
 }

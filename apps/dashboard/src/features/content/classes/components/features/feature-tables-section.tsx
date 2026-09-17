@@ -10,7 +10,10 @@ import {
   FEATURE_TABLES_SECTION_HINT,
   FEATURE_TABLES_SECTION_LABEL,
 } from './feature-tables-section-copy'
-import { featureTablesSectionBodyClasses } from './feature-tables-section.variants'
+import {
+  featureTablesSectionBodyClasses,
+  featureTablesSectionClasses,
+} from './feature-tables-section.variants'
 
 export type FeatureTablesSectionProps = {
   tables?: readonly ReactNode[]
@@ -29,7 +32,10 @@ export function FeatureTablesSection({ tables = [], onAddTable }: FeatureTablesS
   ) : undefined
 
   return (
-    <section className="flex flex-col gap-2" aria-labelledby="feature-tables-section-heading">
+    <section
+      className={featureTablesSectionClasses}
+      aria-labelledby="feature-tables-section-heading"
+    >
       <ArrayLikeSectionHeader
         id="feature-tables-section-heading"
         label={FEATURE_TABLES_SECTION_LABEL}

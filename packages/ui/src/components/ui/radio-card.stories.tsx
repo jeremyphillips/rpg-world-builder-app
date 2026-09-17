@@ -93,7 +93,7 @@ const gridOptions = [
 export const RadioOnRightTwoColumnGrid: Story = {
   args: {
     controlPosition: 'right',
-    className: 'grid-cols-1 sm:grid-cols-2',
+    columns: 'two',
     options: gridOptions,
     defaultValue: '5e',
   },
@@ -119,7 +119,7 @@ export const IconControlTwoColumnGrid: Story = {
     'aria-label': 'Table type',
     visualControl: 'icon',
     density: 'compact',
-    className: 'grid-cols-1 sm:grid-cols-2',
+    columns: 'two',
     options: iconControlTableTypeOptions,
     defaultValue: 'levelProgression',
   },

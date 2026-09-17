@@ -21,6 +21,11 @@ const CLASS_FEATURE_CONFIG: TableBuilderHostConfig = {
   allowedLevels: ALLOWED_LEVELS,
 }
 
+const GENERAL_ONLY_CONFIG: TableBuilderHostConfig = {
+  allowedKinds: ['general'],
+  allowedLevels: ALLOWED_LEVELS,
+}
+
 // jsdom lacks the pointer-capture and scroll APIs Radix Select relies on.
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -293,6 +298,18 @@ describe('TableBuilderModal', () => {
     expect(dialog.getByText('Table type')).toBeInTheDocument()
     expect(
       dialog.getByText('Level progression', { selector: '[aria-labelledby]' }),
+    ).toBeInTheDocument()
+  })
+
+  it('surfaces a kind error and skips save when the draft kind is not allowed', async () => {
+    const user = userEvent.setup()
+    const { onSave } = renderModal({ config: GENERAL_ONLY_CONFIG })
+
+    await user.click(screen.getByRole('button', { name: 'Save table' }))
+
+    expect(onSave).not.toHaveBeenCalled()
+    expect(
+      screen.getByText('This table type is not allowed for the current context.'),
     ).toBeInTheDocument()
   })
 

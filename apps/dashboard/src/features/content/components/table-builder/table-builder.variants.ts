@@ -39,3 +39,5 @@ export const tableBuilderKindMetadataLabelClasses =
   'font-field-label text-md leading-none text-foreground'
 
 export const tableBuilderKindMetadataValueClasses = 'text-md text-foreground'
+
+export const tableBuilderKindMetadataErrorClasses = 'text-sm text-destructive'

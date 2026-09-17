@@ -1141,9 +1141,10 @@ Phase 2 migrated 16 legacy class `resources[]` rows onto their owning features (
 
 Spells may embed structured tables in `description` HTML via `<div data-rpg-table-id="…"></div>`.
 Table data lives in sibling `tables[]` (`GeneralTable`, `kind: 'general'`) — contracts never parse
-description HTML. The spell form prunes unreferenced `tables[]` rows on save via
-`extractTableEmbedIds`. Authoring: Description field with `tables: true` + `SpellDescriptionTablesField`
-host; read-only: `RichTextWithTables`. v1 does not sync editor undo with `tables[]` dirty state.
+description HTML. Save always prunes `tables[]` to embed ids via `extractTableEmbedIds`
+(`pruneSpellTablesToDescriptionEmbeds`); read-only `RichTextWithTables` never renders unreferenced
+tables. Authoring: Description field with `tables: true` + `SpellDescriptionTablesField` host.
+v1 does not sync editor undo with `tables[]` dirty state.
 
 ---
 

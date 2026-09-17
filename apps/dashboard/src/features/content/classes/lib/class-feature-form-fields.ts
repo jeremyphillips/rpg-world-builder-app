@@ -97,6 +97,7 @@ export function createFeatureRowDraftFormSchema(maxLevel: number = MAX_CHARACTER
     level: levelField,
     grants: z.array(createGrantRowFormSchema(maxLevel)),
     available: z.boolean().default(true),
+    tables: z.array(contentTableSchema).default([]),
   })
 }
 

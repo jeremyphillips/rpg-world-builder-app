@@ -62,6 +62,8 @@ export type RadioCardVisualControl = 'radio' | 'icon'
 
 export type RadioCardEmbeddedSlotTone = 'divider' | 'panel'
 
+export type RadioCardColumns = 'one' | 'two'
+
 export interface RadioCardOption {
   label: string
   value: string
@@ -475,6 +477,8 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<
   controlPosition?: 'left' | 'right'
   /** Leading control presentation. Default 'radio' preserves existing consumers. */
   visualControl?: RadioCardVisualControl
+  /** Responsive column count for card-variant groups. Default 'one'. */
+  columns?: RadioCardColumns
 }
 
 /**
@@ -489,6 +493,7 @@ function RadioCard({
   density = 'default',
   controlPosition = 'left',
   visualControl = 'radio',
+  columns = 'one',
   value,
   onValueChange,
   ...props
@@ -497,7 +502,7 @@ function RadioCard({
 
   return (
     <RadioGroup
-      className={cn(radioCardGroupGapVariants({ variant, density }), className)}
+      className={cn(radioCardGroupGapVariants({ variant, density, columns }), className)}
       value={value}
       onValueChange={onValueChange}
       {...props}

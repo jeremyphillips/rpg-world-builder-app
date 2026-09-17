@@ -1,7 +1,12 @@
-import type { GeneralTable, ProgressionTable } from '@rpg/contracts'
+import {
+  CONTENT_TABLE_KINDS,
+  type ContentTableKind,
+  type GeneralTable,
+  type ProgressionTable,
+} from '@rpg/contracts'
 
-export const TABLE_BUILDER_KINDS = ['levelProgression', 'general'] as const
-export type TableBuilderKind = (typeof TABLE_BUILDER_KINDS)[number]
+export const TABLE_BUILDER_KINDS = CONTENT_TABLE_KINDS
+export type TableBuilderKind = ContentTableKind
 
 export type TableBuilderSavedTable = ProgressionTable | GeneralTable
 

@@ -25,6 +25,7 @@ import { resolveTableKindPresentation } from '../../lib/table-builder/table-buil
 import type { TableBuilderKind } from '../../lib/table-builder/table-builder-kind'
 import {
   tableBuilderKindMetadataClasses,
+  tableBuilderKindMetadataErrorClasses,
   tableBuilderKindMetadataLabelClasses,
   tableBuilderKindMetadataValueClasses,
 } from './table-builder.variants'
@@ -38,20 +39,34 @@ function TableBuilderKindMetadata({
   id,
   label,
   value,
+  error,
 }: {
   id: string
   label: string
   value: string
+  error?: string
 }) {
   const labelId = `${id}-label`
+  const errorId = error ? `${id}-error` : undefined
   return (
     <div className={tableBuilderKindMetadataClasses}>
       <div id={labelId} className={tableBuilderKindMetadataLabelClasses}>
         {label}
       </div>
-      <div id={id} className={tableBuilderKindMetadataValueClasses} aria-labelledby={labelId}>
+      <div
+        id={id}
+        className={tableBuilderKindMetadataValueClasses}
+        aria-labelledby={labelId}
+        aria-describedby={errorId}
+        aria-invalid={error ? true : undefined}
+      >
         {value}
       </div>
+      {error ? (
+        <p id={errorId} className={tableBuilderKindMetadataErrorClasses}>
+          {error}
+        </p>
+      ) : null}
     </div>
   )
 }
@@ -85,11 +100,13 @@ export function TableBuilderKindField({ config, mode }: TableBuilderKindFieldPro
   }
 
   if (presentation.mode === 'metadata') {
+    const kindError = form.formState.errors.kind?.message
     return (
       <TableBuilderKindMetadata
         id={fieldId}
         label={TABLE_BUILDER_KIND_LABEL}
         value={tableBuilderKindLabel(presentation.kind)}
+        error={typeof kindError === 'string' ? kindError : undefined}
       />
     )
   }
@@ -102,7 +119,7 @@ export function TableBuilderKindField({ config, mode }: TableBuilderKindFieldPro
         aria-label={TABLE_BUILDER_KIND_LABEL}
         visualControl="icon"
         density="compact"
-        className="grid-cols-1 sm:grid-cols-2"
+        columns="two"
         options={orderedKindOptions}
         value={currentKind}
         onValueChange={handleKindChangeRequest}

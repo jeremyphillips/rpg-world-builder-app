@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useFormContext, useWatch, type FieldPath } from 'react-hook-form'
-import type { ContentTable } from '@rpg/contracts'
+import { CONTENT_TABLE_KINDS, type ContentTable } from '@rpg/contracts'
 
 import { TableBuilderModal } from '../../../components/table-builder/table-builder-modal'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -41,7 +41,7 @@ export function FeatureTablesField({ formCtx }: FeatureTablesFieldProps) {
 
   const tableBuilderConfig = useMemo(
     () => ({
-      allowedKinds: ['levelProgression', 'general'] as const,
+      allowedKinds: CONTENT_TABLE_KINDS,
       recommendedKind: 'levelProgression' as const,
       allowedLevels,
     }),
