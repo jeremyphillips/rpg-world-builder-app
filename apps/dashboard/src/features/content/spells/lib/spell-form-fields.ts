@@ -276,6 +276,7 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'row',
+      fieldDivider: { variant: 'pipe' },
       fields: [
         {
           type: 'select',

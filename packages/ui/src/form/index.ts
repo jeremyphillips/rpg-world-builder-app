@@ -228,6 +228,7 @@ export {
   type InputUnitFieldConfig,
   type FieldConfig,
   type RowConfig,
+  type FieldRowDivider,
   type RowSpacing,
   type RowFieldItem,
   type GroupConfig,

@@ -496,6 +496,7 @@ describe('spellFormDef basics tab', () => {
       throw new Error('Expected School + Level row')
     }
 
+    expect(schoolLevelRow.fieldDivider).toEqual({ variant: 'pipe' })
     expect(schoolLevelRow.fields).toEqual([
       expect.objectContaining({ type: 'select', name: 'school', width: '1/2' }),
       expect.objectContaining({ type: 'chips', name: 'level', width: '1/2', multiple: false }),

@@ -243,6 +243,7 @@ function SelectChipsMatrixHarness() {
   const fields: FormItem[] = [
     {
       kind: 'row',
+      fieldDivider: { variant: 'pipe' },
       fields: [
         {
           type: 'select',

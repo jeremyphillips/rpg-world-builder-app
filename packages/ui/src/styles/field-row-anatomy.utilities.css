@@ -7,5 +7,9 @@
     .field-row-anatomy-grid {
       grid-template-columns: minmax(0, 1fr);
     }
+
+    [data-field-row-divider] {
+      display: none;
+    }
   }
 }

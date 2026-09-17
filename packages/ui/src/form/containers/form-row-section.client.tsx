@@ -63,6 +63,7 @@ export function RowFieldSection({
       <AnatomyFieldRow
         fields={item.fields}
         gap={rowGap}
+        fieldDivider={item.fieldDivider}
         className={item.className}
         idPrefix={idPrefix}
         namePrefix={namePrefix}

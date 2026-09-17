@@ -198,6 +198,7 @@ describe('Form', () => {
     const rowFields: FormItem[] = [
       {
         kind: 'row',
+        fieldDivider: { variant: 'pipe' },
         fields: [
           {
             type: 'select',
@@ -237,6 +238,7 @@ describe('Form', () => {
     expect(row?.querySelector('fieldset')).toBeNull()
     expect(row?.querySelectorAll('[data-field-row-participant]')).toHaveLength(2)
     expect(row?.querySelectorAll('[data-field-label-region]')).toHaveLength(2)
+    expect(row?.querySelector('[data-field-row-divider]')).toHaveClass('border-l', 'mx-8')
     expect(row?.textContent).toContain('School')
     expect(row?.textContent).toContain('Level')
 

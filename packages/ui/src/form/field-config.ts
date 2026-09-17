@@ -996,6 +996,12 @@ export function resolveRowFieldAlign(item: Pick<RowConfig, 'align' | 'fields'>):
   return item.fields.some(rowFieldReservesDerivedMeta) ? 'start' : 'control-edge'
 }
 
+/** Vertical pipe divider between siblings inside a schema row. */
+export type FieldRowDivider = {
+  variant: 'pipe'
+  tone?: FieldSeparator
+}
+
 /** Inter-control spacing within a schema row. */
 export type RowSpacing = 'default' | 'compact'
 
@@ -1015,6 +1021,8 @@ export interface RowConfig {
   fields: RowFieldItem[]
   /** Inter-control spacing within the row. @default 'default' */
   spacing?: RowSpacing
+  /** Vertical pipe between row siblings — suppresses gap-x; gutter follows form rhythm. */
+  fieldDivider?: FieldRowDivider
   className?: string
   /**
    * Flex cross-axis alignment for row siblings. When omitted, defaults to

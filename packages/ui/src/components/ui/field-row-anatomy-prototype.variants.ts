@@ -13,7 +13,7 @@ export type FieldRowAnatomyPrototypeVariantProps = FieldRowAnatomyVariantProps
 /** @deprecated Use {@link resolveFieldRowAnatomyPresentation}. */
 export function resolveFieldRowAnatomyPrototypePresentation(
   widths: readonly FieldWidth[],
-  gap: NonNullable<FieldRowAnatomyPrototypeVariantProps['gap']> = 'form',
+  gap: Exclude<NonNullable<FieldRowAnatomyPrototypeVariantProps['gap']>, 'none'> = 'form',
 ) {
   return resolveFieldRowAnatomyPresentation(widths, gap)
 }

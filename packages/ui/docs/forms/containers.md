@@ -169,6 +169,31 @@ anatomy-grid schema rows.
 Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md). Regression stories:
 `Internal/Forms/Layout/AnatomyRowToggleMatrix` (select + checkbox, select + chips).
 
+### Row field dividers
+
+`fieldDivider: { variant: 'pipe', tone? }` on `RowConfig` inserts a vertical pipe between row
+siblings inside a shared row container. Divider spacing replaces `gap-x-*`:
+
+| Rhythm      | Gutter each side of pipe |
+| ----------- | ------------------------ |
+| comfortable | `mx-8` (32px)            |
+| compact     | `mx-6` (24px)            |
+
+`tone` follows the border ladder (`faint` | `subtle` | `default` | `strong`; default `subtle`).
+Dividers hide when the anatomy row collapses to a single column. Distinct from horizontal
+`separator` (trailing `border-b` between stack siblings).
+
+```ts
+{
+  kind: 'row',
+  fieldDivider: { variant: 'pipe' },
+  fields: [
+    { type: 'select', name: 'school', width: '1/2', /* … */ },
+    { type: 'chips', name: 'level', width: '1/2', /* … */ },
+  ],
+}
+```
+
 ## Columns
 
 Side-by-side **vertical stacks** of mixed form items (`kind: 'columns'`). Not a `row` — rows
