@@ -1,6 +1,5 @@
 import { Plus } from 'lucide-react'
-import { Button, ButtonDropdown, fieldSizeToArrayAddButtonSize } from '@rpg/ui'
-import type { FieldSize } from '@rpg/ui'
+import { Button, ButtonDropdown, INLINE_HEADER_ACTION_BUTTON_SIZE } from '@rpg/ui'
 
 import {
   OUTCOME_APPLICATION_MENU_GROUPS,
@@ -11,19 +10,17 @@ import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels
 export function SpellResolutionOutcomeApplicationAddTrigger({
   addState,
   hintId,
-  size,
   onSelectItem,
 }: {
   addState: OutcomeApplicationAddState
   hintId: string
-  size: FieldSize
   onSelectItem: (effectId: string) => void
 }) {
   if (addState.kind === 'no-authored-effects' || addState.kind === 'all-applied') {
     return null
   }
 
-  const buttonSize = fieldSizeToArrayAddButtonSize[size]
+  const buttonSize = INLINE_HEADER_ACTION_BUTTON_SIZE
   const label = RESOLUTION_SECTION_LABELS.addAppliedEffect
 
   if (addState.kind === 'all-incomplete') {

@@ -1,6 +1,5 @@
 import { useId } from 'react'
 import { Eyebrow, Text } from '@rpg/ui'
-import { useFormSectionContext, resolveFormDensity } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { resolveOutcomeApplicationAddState } from '../../lib/form/resolution-outcome-effect-availability.lib'
@@ -27,8 +26,6 @@ export function SpellResolutionOutcomeApplicationSection({
 }: SpellResolutionOutcomeApplicationSectionProps) {
   const hintId = useId()
   const { control, getValues, setValue } = useFormContext()
-  const { density } = useFormSectionContext()
-  const { size } = resolveFormDensity(density)
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const outcome = resolution?.outcomes?.[outcomeIndex]
   const effects = resolution?.effects ?? []
@@ -84,7 +81,6 @@ export function SpellResolutionOutcomeApplicationSection({
           <SpellResolutionOutcomeApplicationAddTrigger
             addState={addState}
             hintId={hintId}
-            size={size}
             onSelectItem={appendApplication}
           />
         </div>

@@ -328,6 +328,7 @@ describe('ArrayFieldRenderer', () => {
     expect(legend).toHaveTextContent('Movement')
     expect(legend).toContainElement(addButton)
     expect(legend).toHaveClass('w-full')
+    expect(addButton).toHaveClass('h-8')
     expect(addButton.querySelector('svg')).toBeTruthy()
     expect(screen.getAllByRole('button', { name: 'Add speed' })).toHaveLength(1)
   })

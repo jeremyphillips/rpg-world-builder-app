@@ -447,6 +447,11 @@ export {
 } from './renderers/array/array-item-issue.client'
 export { buildFieldRendererIds } from './renderers/field-renderer-config.lib'
 export {
+  ArrayLikeSectionHeader,
+  type ArrayLikeSectionHeaderProps,
+  type ArrayLikeSectionHeaderWrapper,
+} from './presentation/array-like-section-header.client'
+export {
   FormSectionHeader,
   type FormSectionHeaderLabelPresentation,
   type FormSectionHeaderProps,

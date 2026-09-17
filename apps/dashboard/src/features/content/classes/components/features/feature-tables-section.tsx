@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { Button, EmptyPanel } from '@rpg/ui'
-import { FormSectionHeader } from '@rpg/ui/form'
+import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 import { Plus } from 'lucide-react'
 
 import {
@@ -18,6 +18,9 @@ export type FeatureTablesSectionProps = {
 }
 
 export function FeatureTablesSection({ tables = [], onAddTable }: FeatureTablesSectionProps) {
+  const { density } = useFormSectionContext()
+  const { size } = resolveFormDensity(density)
+
   const addAction = onAddTable ? (
     <Button type="button" variant="outline" size="sm" onClick={onAddTable}>
       <Plus aria-hidden />
@@ -27,12 +30,13 @@ export function FeatureTablesSection({ tables = [], onAddTable }: FeatureTablesS
 
   return (
     <section className="flex flex-col gap-2" aria-labelledby="feature-tables-section-heading">
-      <FormSectionHeader
+      <ArrayLikeSectionHeader
         id="feature-tables-section-heading"
         label={FEATURE_TABLES_SECTION_LABEL}
         hint={FEATURE_TABLES_SECTION_HINT}
-        tier="subsection"
+        size={size}
         action={addAction}
+        wrapper="none"
       />
       <div className={featureTablesSectionBodyClasses}>
         {tables.length === 0 ? <EmptyPanel>{FEATURE_TABLES_EMPTY_MESSAGE}</EmptyPanel> : tables}

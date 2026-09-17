@@ -34,5 +34,6 @@ describe('FormSectionHeader', () => {
     const label = screen.getByText('Columns')
     expect(label.parentElement).toHaveClass('text-md')
     expect(label.parentElement).toHaveClass('font-field-label')
+    expect(screen.getByText('Add the columns for this table.')).toHaveClass('font-normal')
   })
 })

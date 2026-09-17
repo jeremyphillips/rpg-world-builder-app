@@ -50,7 +50,11 @@ function renderFieldLabelHint(hint: string | FieldHintConfig | undefined): React
   if (!hint) return null
   const normalized = normalizeFieldHint(hint)
   if (!normalized.text) return null
-  return <Text variant="caption">{normalized.text}</Text>
+  return (
+    <Text variant="caption" className={fieldGroupDescriptionTypographyClasses}>
+      {normalized.text}
+    </Text>
+  )
 }
 
 function renderSectionHint(
@@ -61,7 +65,11 @@ function renderSectionHint(
   const normalized = normalizeFieldHint(hint)
   if (!normalized.text) return null
   if (tier === 'leaf') {
-    return <Text variant="caption">{normalized.text}</Text>
+    return (
+      <Text variant="caption" className={fieldGroupDescriptionTypographyClasses}>
+        {normalized.text}
+      </Text>
+    )
   }
   return (
     <Text as="span" variant="small" className={fieldGroupDescriptionTypographyClasses}>

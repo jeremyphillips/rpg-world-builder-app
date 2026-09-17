@@ -198,6 +198,7 @@ export {
   buttonSizeToComboboxFieldSize,
   fieldSizeToArrayAddButtonSize,
   fieldSizeToAttachedButtonSize,
+  INLINE_HEADER_ACTION_BUTTON_SIZE,
   resolveArrayAddButtonSize,
   resolveAttachedButtonSize,
   fieldSizeToBadgeSize,
