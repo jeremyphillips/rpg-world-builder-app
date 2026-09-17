@@ -10,7 +10,9 @@ import {
   parseDiceCellDraft,
   parseLevelDraft,
   parseNumberCellDraft,
+  removeTableBuilderColumnAt,
   resetTableBuilderDraftForKindChange,
+  resolveTableBuilderColumnDeleteIntent,
   resolveRowSortMove,
   tableToDraft,
   type TableBuilderFormValues,
@@ -296,6 +298,90 @@ describe('resetTableBuilderDraftForKindChange', () => {
       name: 'Rage',
       columns: [],
       rows: [],
+    })
+  })
+})
+
+describe('resolveTableBuilderColumnDeleteIntent', () => {
+  it('requires confirmation for populated columns', () => {
+    const draft: TableBuilderFormValues = {
+      kind: 'general',
+      name: 'Test',
+      columns: [
+        { key: 'c1', label: 'A', valueType: 'text', format: 'plain' },
+        { key: 'c2', label: 'B', valueType: 'text', format: 'plain' },
+      ],
+      rows: [{ key: 'r1', cells: { c1: 'Elf', c2: '' } }],
+    }
+
+    expect(resolveTableBuilderColumnDeleteIntent(draft, 0)).toEqual({
+      action: 'confirm',
+      reason: 'populated',
+    })
+  })
+
+  it('requires confirmation when deleting the last column with rows', () => {
+    const draft: TableBuilderFormValues = {
+      kind: 'levelProgression',
+      name: 'Test',
+      columns: [{ key: 'c1', label: 'Uses', valueType: 'number', format: 'plain' }],
+      rows: [{ level: '1', cells: {} }],
+    }
+
+    expect(resolveTableBuilderColumnDeleteIntent(draft, 0)).toEqual({
+      action: 'confirm',
+      reason: 'lastColumnWithRows',
+    })
+  })
+
+  it('deletes empty non-final columns immediately', () => {
+    const draft: TableBuilderFormValues = {
+      kind: 'general',
+      name: 'Test',
+      columns: [
+        { key: 'c1', label: 'A', valueType: 'text', format: 'plain' },
+        { key: 'c2', label: 'B', valueType: 'text', format: 'plain' },
+      ],
+      rows: [],
+    }
+
+    expect(resolveTableBuilderColumnDeleteIntent(draft, 0)).toEqual({ action: 'immediate' })
+  })
+})
+
+describe('removeTableBuilderColumnAt', () => {
+  it('scrubs cells and clears rows when removing the last column', () => {
+    const draft: TableBuilderFormValues = {
+      kind: 'levelProgression',
+      name: 'Test',
+      columns: [{ key: 'c1', label: 'Uses', valueType: 'number', format: 'plain' }],
+      rows: [{ level: '1', cells: { c1: '2' } }],
+    }
+
+    expect(removeTableBuilderColumnAt(draft, 0)).toEqual({
+      kind: 'levelProgression',
+      name: 'Test',
+      columns: [],
+      rows: [],
+    })
+  })
+
+  it('preserves unrelated column values when removing a populated column', () => {
+    const draft: TableBuilderFormValues = {
+      kind: 'general',
+      name: 'Test',
+      columns: [
+        { key: 'c1', label: 'A', valueType: 'text', format: 'plain' },
+        { key: 'c2', label: 'B', valueType: 'text', format: 'plain' },
+      ],
+      rows: [{ key: 'r1', cells: { c1: 'Elf', c2: 'Dwarf' } }],
+    }
+
+    expect(removeTableBuilderColumnAt(draft, 0)).toEqual({
+      kind: 'general',
+      name: 'Test',
+      columns: [{ key: 'c2', label: 'B', valueType: 'text', format: 'plain' }],
+      rows: [{ key: 'r1', cells: { c2: 'Dwarf' } }],
     })
   })
 })

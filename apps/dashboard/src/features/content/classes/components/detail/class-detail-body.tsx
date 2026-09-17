@@ -76,6 +76,7 @@ function ClassFeatureDetailRow({ item }: { item: ClassFeatureDetailItem }) {
         level: item.level,
         name: item.title,
         description: item.bodyHtml,
+        tables: item.tables,
       }}
     />
   )

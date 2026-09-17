@@ -70,3 +70,12 @@ export const TABLE_BUILDER_TYPE_CHANGE_CONFIRM_HEADLINE = 'Change column type?'
 export const TABLE_BUILDER_TYPE_CHANGE_CONFIRM_DESCRIPTION =
   'Changing the column type will clear its existing values.'
 export const TABLE_BUILDER_TYPE_CHANGE_CONFIRM_LABEL = 'Change type'
+
+export const TABLE_BUILDER_COLUMN_DELETE_CONFIRM_HEADLINE = 'Delete column?'
+export const TABLE_BUILDER_COLUMN_DELETE_CONFIRM_DESCRIPTION =
+  'This removes the column and its values from the table.'
+export const TABLE_BUILDER_COLUMN_DELETE_CONFIRM_LABEL = 'Delete column'
+
+export const TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_HEADLINE = 'Delete last column?'
+export const TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_DESCRIPTION =
+  'Removing the last column will also clear all rows in this table.'

@@ -25,7 +25,12 @@ import {
   TABLE_BUILDER_ADD_COLUMN_LABEL,
   TABLE_BUILDER_COLUMNS_HINT,
   TABLE_BUILDER_COLUMNS_LABEL,
+  TABLE_BUILDER_COLUMN_DELETE_CONFIRM_DESCRIPTION,
+  TABLE_BUILDER_COLUMN_DELETE_CONFIRM_HEADLINE,
+  TABLE_BUILDER_COLUMN_DELETE_CONFIRM_LABEL,
   TABLE_BUILDER_GENERAL_COLUMNS_HINT,
+  TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_DESCRIPTION,
+  TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_HEADLINE,
   TABLE_BUILDER_TYPE_CHANGE_CONFIRM_DESCRIPTION,
   TABLE_BUILDER_TYPE_CHANGE_CONFIRM_HEADLINE,
   TABLE_BUILDER_TYPE_CHANGE_CONFIRM_LABEL,
@@ -34,6 +39,9 @@ import {
   createTableBuilderColumnDraft,
   emptyCellDraftForValueType,
   isTableBuilderCellBlank,
+  removeTableBuilderColumnAt,
+  resolveTableBuilderColumnDeleteIntent,
+  type TableBuilderColumnDeleteIntent,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
 import { createGeneralTableBuilderColumnDraft } from '../../lib/table-builder/table-builder-general-draft'
@@ -54,11 +62,17 @@ type PendingTypeChange = {
   valueType: TableColumnValueType
 }
 
+type PendingColumnDelete = {
+  index: number
+  reason: Extract<TableBuilderColumnDeleteIntent, { action: 'confirm' }>['reason']
+}
+
 export function TableBuilderColumns() {
   const form = useFormContext<TableBuilderFormValues>()
   const kind = useWatch({ control: form.control, name: 'kind' }) ?? 'levelProgression'
   const fieldArray = useFieldArray({ control: form.control, name: 'columns' })
   const [pendingTypeChange, setPendingTypeChange] = useState<PendingTypeChange | null>(null)
+  const [pendingColumnDelete, setPendingColumnDelete] = useState<PendingColumnDelete | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -109,6 +123,29 @@ export function TableBuilderColumns() {
     setPendingTypeChange(null)
   }
 
+  function applyColumnRemoval(index: number) {
+    const next = removeTableBuilderColumnAt(form.getValues(), index)
+    form.setValue('columns', next.columns, { shouldDirty: true })
+    form.setValue('rows', next.rows, { shouldDirty: true })
+  }
+
+  function handleRequestColumnRemove(index: number) {
+    const intent = resolveTableBuilderColumnDeleteIntent(form.getValues(), index)
+    if (intent.action === 'immediate') {
+      applyColumnRemoval(index)
+      return
+    }
+
+    setPendingColumnDelete({ index, reason: intent.reason })
+  }
+
+  function handleConfirmColumnDelete() {
+    if (pendingColumnDelete) {
+      applyColumnRemoval(pendingColumnDelete.index)
+    }
+    setPendingColumnDelete(null)
+  }
+
   function handleAddColumn() {
     const index = fieldArray.fields.length
     fieldArray.append(
@@ -136,7 +173,7 @@ export function TableBuilderColumns() {
             columnKey={columnKey}
             sortable={sortable}
             onRequestTypeChange={handleRequestTypeChange}
-            onRemove={fieldArray.remove}
+            onRemove={handleRequestColumnRemove}
           />
         )
       })}
@@ -195,6 +232,26 @@ export function TableBuilderColumns() {
         confirmLabel={TABLE_BUILDER_TYPE_CHANGE_CONFIRM_LABEL}
         confirmVariant="destructive"
         onConfirm={handleConfirmTypeChange}
+      />
+
+      <ConfirmDialog
+        open={pendingColumnDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingColumnDelete(null)
+        }}
+        headline={
+          pendingColumnDelete?.reason === 'lastColumnWithRows'
+            ? TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_HEADLINE
+            : TABLE_BUILDER_COLUMN_DELETE_CONFIRM_HEADLINE
+        }
+        description={
+          pendingColumnDelete?.reason === 'lastColumnWithRows'
+            ? TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_DESCRIPTION
+            : TABLE_BUILDER_COLUMN_DELETE_CONFIRM_DESCRIPTION
+        }
+        confirmLabel={TABLE_BUILDER_COLUMN_DELETE_CONFIRM_LABEL}
+        confirmVariant="destructive"
+        onConfirm={handleConfirmColumnDelete}
       />
     </section>
   )

@@ -138,6 +138,57 @@ export function isTableBuilderCellBlank(cell: TableBuilderCellDraft | undefined)
   return (cell.count ?? '').trim() === '' && (cell.faces ?? '').trim() === ''
 }
 
+export function columnHasTableBuilderCellValues(
+  draft: TableBuilderFormValues,
+  columnKey: string,
+): boolean {
+  return draft.rows.some((row) => !isTableBuilderCellBlank(row.cells[columnKey]))
+}
+
+export type TableBuilderColumnDeleteIntent =
+  | { action: 'immediate' }
+  | { action: 'confirm'; reason: 'populated' | 'lastColumnWithRows' }
+
+export function resolveTableBuilderColumnDeleteIntent(
+  draft: TableBuilderFormValues,
+  columnIndex: number,
+): TableBuilderColumnDeleteIntent {
+  const column = draft.columns[columnIndex]
+  if (column === undefined) return { action: 'immediate' }
+
+  const isLastColumn = draft.columns.length === 1
+  if (isLastColumn && draft.rows.length > 0) {
+    return { action: 'confirm', reason: 'lastColumnWithRows' }
+  }
+
+  if (columnHasTableBuilderCellValues(draft, column.key)) {
+    return { action: 'confirm', reason: 'populated' }
+  }
+
+  return { action: 'immediate' }
+}
+
+/** Removes a column and scrubs its cell keys; clears rows when no columns remain. */
+export function removeTableBuilderColumnAt(
+  draft: TableBuilderFormValues,
+  columnIndex: number,
+): TableBuilderFormValues {
+  const column = draft.columns[columnIndex]
+  if (column === undefined) return draft
+
+  const columns = draft.columns.filter((_, index) => index !== columnIndex)
+  if (columns.length === 0) {
+    return { ...draft, columns: [], rows: [] }
+  }
+
+  const rows = draft.rows.map((row) => {
+    const { [column.key]: _removed, ...cells } = row.cells
+    return { ...row, cells }
+  })
+
+  return { ...draft, columns, rows }
+}
+
 // ---------------------------------------------------------------------------
 // Cell parsing — draft strings to persisted values. Blank cells return
 // undefined (carry-forward); unparseable cells also return undefined and are

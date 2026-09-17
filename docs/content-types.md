@@ -1097,7 +1097,7 @@ Structured progression data lives on **features**, not on the class body. The le
 
 | Field                 | Location                       | Role                                                                                                            |
 | --------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| `tables[]`            | `features[]` (custom features) | Optional `levelProgression` tables owned by the feature that unlocks them                                       |
+| `tables[]`            | `features[]` (custom features) | Optional `ContentTable` union (`levelProgression` \| `general`) owned by the feature that unlocks them          |
 | `columns[]`           | each table                     | Discriminated by `valueType`: `number`, `dice`, or `text`; number columns may set `format: 'plain' \| 'signed'` |
 | `id` (table / column) | embedded subrecord             | Stable `slugSchema` key for references; `label` / `name` are editable display copy                              |
 
@@ -1126,9 +1126,10 @@ Only `kind: 'levelProgression'` tables contribute columns. Stable React key: `` 
 
 ### Dashboard authoring
 
-- Feature `tables[]` is an **atomic form value** on each feature row (`class-feature-form-fields.ts`). The shared `TableBuilderModal` owns an isolated draft form; Save returns one valid `ProgressionTable` and the parent replaces `tables[index]` via `setValue`.
-- `FeatureTablesSection` lists tables with metadata `N columns · M breakpoints` (persisted breakpoint union, not a level range) and opens `TableBuilderModal` with `allowedLevels` from the feature level through `effectiveMaxFromCtx`.
-- Read-only single-table rendering: `features/content/components/tables/ProgressionTableView`; builder preview uses the tolerant `ProgressionTablePresentation` model.
+- Feature `tables[]` is an **atomic form value** on each feature row (`class-feature-form-fields.ts`). The shared `TableBuilderModal` owns an isolated draft form; Save returns one valid `ContentTable` and the parent replaces `tables[index]` via `setValue`.
+- `FeatureTablesSection` lists tables with metadata `N columns · M breakpoints` (progression) or row/column counts (general) and opens `TableBuilderModal` with host config: `allowedKinds`, `recommendedKind`, and `allowedLevels`.
+- Table kind is selectable when creating a new table (`mode: 'create'`) and multiple kinds are allowed; editing an existing table locks kind as read-only metadata regardless of parent content status.
+- Read-only rendering: `ContentTableView` dispatches to `ProgressionTableView` or `GeneralTableView`. Class feature detail renders **general** `feature.tables[]` inline below description via `ClassFeatureItem`; progression tables remain on `ClassProgressionTable` only. Builder preview uses the tolerant `ProgressionTablePresentation` model.
 
 ### Content enrichment vs migration
 

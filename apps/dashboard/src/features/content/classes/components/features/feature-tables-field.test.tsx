@@ -150,6 +150,28 @@ describe('FeatureTablesField', () => {
     ).toBeInTheDocument()
   })
 
+  it('creates and persists a general table when General table is selected', async () => {
+    const user = userEvent.setup()
+    const onTablesChange = vi.fn()
+    render(<Harness onTablesChange={onTablesChange} />)
+
+    await user.click(screen.getByRole('button', { name: 'Add table' }))
+    await user.type(screen.getByLabelText(/^table name/i), 'Reincarnate options')
+    await user.click(screen.getByRole('radio', { name: /General table/i }))
+    await user.click(screen.getByRole('button', { name: 'Add column' }))
+    await user.type(screen.getByLabelText('Column name 1'), 'Species')
+    await user.click(screen.getByRole('combobox', { name: 'Column type for Species' }))
+    await user.click(await screen.findByRole('option', { name: 'Text' }))
+    await user.click(screen.getByRole('button', { name: 'Add row' }))
+    await user.type(screen.getByLabelText('Species, level unset'), 'Dragonborn')
+    await user.click(screen.getByRole('button', { name: 'Add table' }))
+
+    const saved = onTablesChange.mock.calls.at(-1)?.[0] as Array<{ kind: string; name: string }>
+    expect(saved).toHaveLength(1)
+    expect(saved[0]?.kind).toBe('general')
+    expect(saved[0]?.name).toBe('Reincarnate options')
+  })
+
   it('confirms modal delete and removes the table', async () => {
     const user = userEvent.setup()
     const onTablesChange = vi.fn()
