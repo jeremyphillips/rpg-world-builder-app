@@ -47,6 +47,7 @@ export function TableBuilder({ form, config, mode }: TableBuilderProps) {
             id={nameId}
             label={TABLE_BUILDER_NAME_LABEL}
             hint={TABLE_BUILDER_NAME_HINT}
+            size="md"
             required
             error={nameError?.message ? formatFieldMessage(nameError.message) : undefined}
             invalid={Boolean(nameError)}

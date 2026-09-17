@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
-import { EmptyPanel } from '@rpg/ui'
 import { FormSectionHeader } from '@rpg/ui/form'
 
 import { TableGrid } from '../tables/table-grid'
 import {
   TABLE_BUILDER_PREVIEW_DESCRIPTION,
-  TABLE_BUILDER_PREVIEW_EMPTY,
+  TABLE_BUILDER_PREVIEW_NO_COLUMNS_DESCRIPTION,
+  TABLE_BUILDER_PREVIEW_NO_ROWS,
   TABLE_BUILDER_PREVIEW_TITLE,
 } from '../../lib/table-builder/table-builder-copy'
 import {
@@ -15,6 +15,7 @@ import {
 } from '../../lib/table-builder/table-builder-draft'
 import { generalDraftToGridPresentation } from '../../lib/table-builder/table-builder-general-draft'
 import { tableBuilderSectionClasses } from './table-builder.variants'
+import { TableBuilderInsetGate } from './table-builder-inset-gate'
 import { tableBuilderPreviewTableWrapClasses } from './table-builder-preview.variants'
 
 /**
@@ -40,6 +41,7 @@ export function TableBuilderPreview() {
   }, [kind, values])
 
   const rowHeaderLabel = kind === 'levelProgression' ? 'Level' : undefined
+  const hasColumns = presentation.columns.length > 0
 
   return (
     <section className={tableBuilderSectionClasses} aria-label={TABLE_BUILDER_PREVIEW_TITLE}>
@@ -48,13 +50,16 @@ export function TableBuilderPreview() {
         hint={TABLE_BUILDER_PREVIEW_DESCRIPTION}
         tier="subsection"
       />
-      {presentation.columns.length === 0 ? (
-        <EmptyPanel>{TABLE_BUILDER_PREVIEW_EMPTY}</EmptyPanel>
+      {!hasColumns ? (
+        <TableBuilderInsetGate description={TABLE_BUILDER_PREVIEW_NO_COLUMNS_DESCRIPTION} />
       ) : (
         <div className={tableBuilderPreviewTableWrapClasses}>
           <TableGrid
             presentation={presentation}
             caption={TABLE_BUILDER_PREVIEW_TITLE}
+            emptyBodyMessage={
+              presentation.rows.length === 0 ? TABLE_BUILDER_PREVIEW_NO_ROWS : undefined
+            }
             {...(rowHeaderLabel === undefined ? {} : { rowHeaderLabel })}
           />
         </div>

@@ -56,6 +56,18 @@ function renderModal(overrides: Partial<TableBuilderModalProps> = {}) {
 }
 
 describe('TableBuilderModal', () => {
+  it('uses stableBody so the footer stays docked to the modal shell', () => {
+    renderModal()
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit table' })
+    const body = dialog.querySelector('[class*="overflow-hidden"][class*="flex-1"]')
+    const scrollRegion = dialog.querySelector('[class*="overflow-y-auto"]')
+
+    expect(body).toBeTruthy()
+    expect(scrollRegion).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Save table' })).toBeInTheDocument()
+  })
+
   it('renders the persisted draft: name, columns, and sparse rows', () => {
     renderModal()
 

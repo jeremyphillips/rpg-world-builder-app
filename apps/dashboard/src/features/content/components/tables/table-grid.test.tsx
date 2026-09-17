@@ -40,6 +40,23 @@ describe('TableGrid', () => {
     expect(screen.getAllByRole('columnheader')).toHaveLength(3)
   })
 
+  it('renders a centered empty-body message when rows are absent', () => {
+    render(
+      <TableGrid
+        presentation={{
+          columns: [{ key: 'effect', label: 'Column 1' }],
+          rows: [],
+        }}
+        rowHeaderLabel="Level"
+        emptyBodyMessage="No rows yet."
+      />,
+    )
+
+    expect(screen.getByRole('columnheader', { name: 'Level' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Column 1' })).toBeInTheDocument()
+    expect(screen.getByRole('cell', { name: 'No rows yet.' })).toBeInTheDocument()
+  })
+
   it('renders em dashes for missing cell values', () => {
     render(
       <TableGrid

@@ -39,16 +39,15 @@ import {
 import { createGeneralTableBuilderColumnDraft } from '../../lib/table-builder/table-builder-general-draft'
 import {
   tableBuilderAddActionClasses,
-  tableBuilderAddActionWrapClasses,
-  tableBuilderGroupClasses,
-  tableBuilderGroupEmptyClasses,
-  tableBuilderGroupListClasses,
   tableBuilderSectionClasses,
   tableBuilderSectionErrorClasses,
 } from './table-builder.variants'
 import { TableBuilderColumnRow } from './table-builder-column-row'
-
-const COLUMNS_EMPTY_MESSAGE = 'No columns added.'
+import { TableBuilderColumnsEmpty } from './table-builder-columns-empty'
+import {
+  tableBuilderColumnsBodyClasses,
+  tableBuilderColumnsListClasses,
+} from './table-builder-columns.variants'
 
 type PendingTypeChange = {
   index: number
@@ -124,25 +123,23 @@ export function TableBuilderColumns() {
     fieldArray.move(resolved.from, resolved.to)
   }
 
-  const list = (
-    <div className={tableBuilderGroupListClasses}>
-      {fieldArray.fields.length === 0 ? (
-        <div className={tableBuilderGroupEmptyClasses}>{COLUMNS_EMPTY_MESSAGE}</div>
-      ) : (
-        fieldArray.fields.map((field, index) => {
-          const columnKey = columns[index]?.key ?? field.id
-          return (
-            <TableBuilderColumnRow
-              key={field.id}
-              index={index}
-              columnKey={columnKey}
-              sortable={sortable}
-              onRequestTypeChange={handleRequestTypeChange}
-              onRemove={fieldArray.remove}
-            />
-          )
-        })
-      )}
+  const hasColumns = fieldArray.fields.length > 0
+
+  const columnList = (
+    <div className={tableBuilderColumnsListClasses}>
+      {fieldArray.fields.map((field, index) => {
+        const columnKey = columns[index]?.key ?? field.id
+        return (
+          <TableBuilderColumnRow
+            key={field.id}
+            index={index}
+            columnKey={columnKey}
+            sortable={sortable}
+            onRequestTypeChange={handleRequestTypeChange}
+            onRemove={fieldArray.remove}
+          />
+        )
+      })}
     </div>
   )
 
@@ -151,34 +148,37 @@ export function TableBuilderColumns() {
       <FormSectionHeader
         label={TABLE_BUILDER_COLUMNS_LABEL}
         hint={kind === 'general' ? TABLE_BUILDER_GENERAL_COLUMNS_HINT : TABLE_BUILDER_COLUMNS_HINT}
-        tier="subsection"
+        labelPresentation="field-label"
+        size="md"
         required
       />
-      <div className={tableBuilderGroupClasses}>
-        {sortable ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={sortableItems.map((item) => item.id)}
-              strategy={verticalListSortingStrategy}
+      {hasColumns ? (
+        <div className={tableBuilderColumnsBodyClasses}>
+          {sortable ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              modifiers={[restrictToVerticalAxis]}
+              onDragEnd={handleDragEnd}
             >
-              {list}
-            </SortableContext>
-          </DndContext>
-        ) : (
-          list
-        )}
-        <div className={tableBuilderAddActionWrapClasses}>
+              <SortableContext
+                items={sortableItems.map((item) => item.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {columnList}
+              </SortableContext>
+            </DndContext>
+          ) : (
+            columnList
+          )}
           <button type="button" className={tableBuilderAddActionClasses} onClick={handleAddColumn}>
             <Plus className="size-4" aria-hidden />
             {TABLE_BUILDER_ADD_COLUMN_LABEL}
           </button>
         </div>
-      </div>
+      ) : (
+        <TableBuilderColumnsEmpty onAddColumn={handleAddColumn} />
+      )}
       {columnsError?.message ? (
         <p className={tableBuilderSectionErrorClasses}>
           {formatFieldMessage(columnsError.message)}

@@ -124,11 +124,13 @@ function renderHeadingBlock({
     const hintNode = renderFieldLabelHint(hint)
     const labelLine = (
       <div className={formSectionHeaderLabelRowClasses}>
-        <FieldLabelContent
-          label={label}
-          required={required}
-          showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
-        />
+        <span className={fieldLabelVariants({ size: size ?? 'md' })}>
+          <FieldLabelContent
+            label={label}
+            required={required}
+            showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
+          />
+        </span>
         {labelAccessory}
       </div>
     )
@@ -144,11 +146,13 @@ function renderHeadingBlock({
 
     return (
       <div id={id} className={formSectionHeaderLabelRowClasses}>
-        <FieldLabelContent
-          label={label}
-          required={required}
-          showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
-        />
+        <span className={fieldLabelVariants({ size: size ?? 'md' })}>
+          <FieldLabelContent
+            label={label}
+            required={required}
+            showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
+          />
+        </span>
         {labelAccessory}
       </div>
     )

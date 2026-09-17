@@ -60,11 +60,31 @@ export const dialogPanelScrollRegionClasses = cn(
 )
 
 /**
+ * Faint separator color shared by overlay panel header and footer section borders.
+ * Pair with `border-t` on footers and `border-b` on headers.
+ */
+export const dialogPanelSectionSeparatorBorderClasses = 'border-border-faint'
+
+/**
+ * Overlay header section chrome — bottom separator, section inset, title stack rhythm.
+ * Title typography stays on {@link DialogPanelHeader}; this token owns layout + border only.
+ */
+/** Header vertical inset — top matches section padding; bottom is tighter above the body. */
+export const dialogPanelHeaderPaddingClasses = cn(dialogPanelSectionInsetXClasses, 'pt-6 pb-4')
+
+export const dialogPanelHeaderClasses = cn(
+  'flex shrink-0 flex-col space-y-1.5 border-b',
+  dialogPanelSectionSeparatorBorderClasses,
+  dialogPanelHeaderPaddingClasses,
+)
+
+/**
  * Canonical overlay footer section chrome — separator, horizontal inset, vertical rhythm.
  * Inherits panel surface fill; compose with {@link dialogPanelActionRowClasses} for actions.
  */
 export const dialogPanelFooterClasses = cn(
-  'flex flex-col border-t border-border-faint',
+  'flex flex-col border-t',
+  dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   'py-4',
 )

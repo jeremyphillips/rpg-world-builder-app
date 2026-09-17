@@ -20,15 +20,17 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 
 ## Shared tokens (`dialog-panel.variants.ts`)
 
-| Token                              | Role                                                                                                                      |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `dialogPanelSectionPaddingClasses` | Canonical `p-6` section inset                                                                                             |
-| `dialogPanelSectionInsetXClasses`  | Horizontal slice (`px-6`) for managed Form content                                                                        |
-| `dialogPanelBodyVariants`          | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)                                                         |
-| `dialogPanelStableBodyVariants`    | Stable shell (`px-6`, `pb-0`) — child owns scroll                                                                         |
-| `dialogPanelScrollRegionClasses`   | Inner scroll region above docked footer (`overflow-y-auto` + `pb-6`)                                                      |
-| `dialogPanelFooterClasses`         | Overlay footer section chrome (`border-t border-border-faint` + `px-6` + `py-4`; no fill)                                 |
-| `dialogPanelActionRowClasses`      | Action row flex helper — prefer `Modal.FooterActions` under Modal.Footer; `DialogPanelActionRow` for Sheet / form publish |
+| Token                                      | Role                                                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `dialogPanelSectionPaddingClasses`         | Canonical `p-6` section inset                                                                                             |
+| `dialogPanelSectionInsetXClasses`          | Horizontal slice (`px-6`) for managed Form content                                                                        |
+| `dialogPanelBodyVariants`                  | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)                                                         |
+| `dialogPanelStableBodyVariants`            | Stable shell (`px-6`, `pb-0`) — child owns scroll                                                                         |
+| `dialogPanelScrollRegionClasses`           | Inner scroll region above docked footer (`overflow-y-auto` + `pb-6`)                                                      |
+| `dialogPanelSectionSeparatorBorderClasses` | Shared faint separator color for header/footer section borders (`border-border-faint`)                                    |
+| `dialogPanelHeaderClasses`                 | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)  |
+| `dialogPanelFooterClasses`                 | Overlay footer section chrome (`border-t` + separator token + `px-6` + `py-4`; no fill)                                   |
+| `dialogPanelActionRowClasses`              | Action row flex helper — prefer `Modal.FooterActions` under Modal.Footer; `DialogPanelActionRow` for Sheet / form publish |
 
 **Do not** extract header padding into dialog-panel — `DialogPanelHeader` already owns it.
 **Do not** add Form-specific horizontal padding SSOTs; managed Form inset derives from
@@ -37,7 +39,8 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 ### Footer composition
 
 ```text
-dialogPanelFooterClasses     border-t border-border-faint + px-6 + py-4 column root; inherits panel surface
+dialogPanelHeaderClasses     border-b + dialogPanelSectionSeparatorBorderClasses + px-6 pt-6 pb-4; DialogPanelHeader root
+dialogPanelFooterClasses     border-t + dialogPanelSectionSeparatorBorderClasses + px-6 + py-4 column root; inherits panel surface
 dialogPanelActionRowClasses  child helper for button groups (implementation detail)
 Modal.FooterActions          preferred action row under Modal.Footer
 DialogPanelActionRow         shared action row for Sheet.Footer and form publish paths

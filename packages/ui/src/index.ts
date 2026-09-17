@@ -728,6 +728,9 @@ export {
   dialogPanelScrollRegionClasses,
   dialogContentFocusShellClasses,
   dialogPanelFooterClasses,
+  dialogPanelHeaderClasses,
+  dialogPanelHeaderPaddingClasses,
+  dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
 } from './components/ui/dialog-panel.variants'
@@ -905,6 +908,7 @@ export {
   TableCell,
   TableCaption,
 } from './components/ui/table'
+export { tableHeaderRowClasses, tableHeaderRowVariants } from './components/ui/table.variants'
 export {
   Badge,
   badgeVariants,

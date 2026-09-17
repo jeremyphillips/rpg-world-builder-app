@@ -19,4 +19,20 @@ describe('FormSectionHeader', () => {
     expect(screen.getByRole('button', { name: 'Add table' })).toBeInTheDocument()
     expect(document.querySelector('.grid')).toHaveClass('items-start')
   })
+
+  it('applies comfortable field-label typography when labelPresentation is field-label', () => {
+    render(
+      <FormSectionHeader
+        label="Columns"
+        hint="Add the columns for this table."
+        labelPresentation="field-label"
+        size="md"
+        required
+      />,
+    )
+
+    const label = screen.getByText('Columns')
+    expect(label.parentElement).toHaveClass('text-md')
+    expect(label.parentElement).toHaveClass('font-field-label')
+  })
 })

@@ -1,4 +1,19 @@
-export const tableBuilderColumnRowClasses = 'flex items-start gap-2 px-2.5 py-2'
+import {
+  tableBuilderAddActionClasses,
+  tableBuilderAddActionIconClasses,
+} from './table-builder.variants'
+
+/** 20px between inset-gate copy and add-column action. */
+export const tableBuilderColumnsEmptyAddActionClasses = `${tableBuilderAddActionClasses} mt-5 w-auto shrink-0 px-4`
+
+export const tableBuilderColumnsEmptyAddActionIconClasses = tableBuilderAddActionIconClasses
+
+/** Populated columns — list + add action without bordered group chrome. */
+export const tableBuilderColumnsBodyClasses = 'flex flex-col gap-4'
+
+export const tableBuilderColumnsListClasses = 'flex flex-col gap-2.5'
+
+export const tableBuilderColumnRowClasses = 'flex items-start gap-2'
 
 export const tableBuilderColumnNameCellClasses = 'flex min-w-0 flex-1 flex-col gap-1'
 

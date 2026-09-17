@@ -37,7 +37,10 @@ import {
 } from '../../lib/table-builder/table-builder-host-config'
 import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
 import { TableBuilder } from './table-builder'
-import { tableBuilderModalDeleteButtonClasses } from './table-builder-modal.variants'
+import {
+  tableBuilderModalDeleteButtonClasses,
+  tableBuilderModalScrollRegionClasses,
+} from './table-builder-modal.variants'
 
 export type TableBuilderModalMode = 'create' | 'edit'
 
@@ -133,10 +136,12 @@ function TableBuilderModalContent({
             headline={mode === 'create' ? TABLE_BUILDER_CREATE_TITLE : TABLE_BUILDER_EDIT_TITLE}
             description={TABLE_BUILDER_MODAL_DESCRIPTION}
           />
-          <Modal.Body>
-            <form id={formId} onSubmit={handleSubmit} noValidate>
-              <TableBuilder form={form} config={config} mode={mode} />
-            </form>
+          <Modal.Body stableBody>
+            <div className={tableBuilderModalScrollRegionClasses}>
+              <form id={formId} onSubmit={handleSubmit} noValidate>
+                <TableBuilder form={form} config={config} mode={mode} />
+              </form>
+            </div>
           </Modal.Body>
           <Modal.Footer>
             <Modal.FooterActions>

@@ -30,28 +30,31 @@ export const TABLE_BUILDER_KIND_CHANGE_CONFIRM_LABEL = 'Change type'
 
 export const TABLE_BUILDER_COLUMNS_LABEL = 'Columns'
 export const TABLE_BUILDER_COLUMNS_HINT =
-  'Add the value columns for this table. Level is included automatically.'
+  'Add the value columns for this table. "Level" is included automatically.'
 export const TABLE_BUILDER_GENERAL_COLUMNS_HINT = 'Add the columns for this table.'
 export const TABLE_BUILDER_COLUMN_NAME_LABEL = 'Column name'
 export const TABLE_BUILDER_COLUMN_TYPE_LABEL = 'Column type'
 export const TABLE_BUILDER_NUMBER_FORMAT_LABEL = 'Number format'
 export const TABLE_BUILDER_ADD_COLUMN_LABEL = 'Add column'
+export const TABLE_BUILDER_COLUMNS_EMPTY_HEADLINE = 'No columns yet'
+export const TABLE_BUILDER_COLUMNS_EMPTY_DESCRIPTION =
+  'Add your first column to define the table structure.'
 
 export const TABLE_BUILDER_VALUES_LABEL = 'Values'
+export const TABLE_BUILDER_VALUES_NO_COLUMNS_HINT = 'Add a column to start adding rows.'
 export const TABLE_BUILDER_VALUES_HINT =
   'Add a row when values change. Blank cells keep the previous value.'
 export const TABLE_BUILDER_GENERAL_VALUES_HINT =
-  'Add rows in the order they should appear. Blank cells stay empty.'
-export const TABLE_BUILDER_GENERAL_VALUES_NEEDS_COLUMNS_HEADLINE =
-  'Add a column before adding rows.'
-export const TABLE_BUILDER_GENERAL_VALUES_NEEDS_COLUMNS_HINT = 'Rows use the columns defined above.'
+  'Add rows in display order. Blank cells stay empty.'
 export const TABLE_BUILDER_LEVEL_HEADER = 'Level'
 export const TABLE_BUILDER_ADD_ROW_LABEL = 'Add row'
 export const TABLE_BUILDER_ALL_LEVELS_USED_REASON = 'All levels have been added.'
 
 export const TABLE_BUILDER_PREVIEW_TITLE = 'Preview'
 export const TABLE_BUILDER_PREVIEW_DESCRIPTION = 'This is how the table will appear.'
-export const TABLE_BUILDER_PREVIEW_EMPTY = 'Add a column to preview this table.'
+export const TABLE_BUILDER_PREVIEW_NO_COLUMNS_DESCRIPTION =
+  'Preview appears after you add a column.'
+export const TABLE_BUILDER_PREVIEW_NO_ROWS = 'No rows yet.'
 
 export const TABLE_BUILDER_CANCEL_LABEL = 'Cancel'
 export const TABLE_BUILDER_CREATE_SUBMIT_LABEL = 'Add table'

@@ -6,6 +6,9 @@ import {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
   dialogPanelFooterClasses,
+  dialogPanelHeaderClasses,
+  dialogPanelHeaderPaddingClasses,
+  dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
   dialogPanelStableBodyVariants,
@@ -72,10 +75,27 @@ describe('dialog-panel variants', () => {
   })
 })
 
+describe('overlay section separator borders', () => {
+  it('syncs header and footer separator color via one token', () => {
+    expect(dialogPanelSectionSeparatorBorderClasses).toBe('border-border-faint')
+    expect(dialogPanelHeaderClasses).toContain('border-b')
+    expect(dialogPanelHeaderClasses).toContain(dialogPanelSectionSeparatorBorderClasses)
+    expect(dialogPanelFooterClasses).toContain('border-t')
+    expect(dialogPanelFooterClasses).toContain(dialogPanelSectionSeparatorBorderClasses)
+  })
+
+  it('keeps header chrome on section inset with 16px bottom padding', () => {
+    expect(dialogPanelHeaderPaddingClasses).toContain(dialogPanelSectionInsetXClasses)
+    expect(dialogPanelHeaderPaddingClasses).toContain('pt-6')
+    expect(dialogPanelHeaderPaddingClasses).toContain('pb-4')
+    expect(dialogPanelHeaderClasses).not.toMatch(/\bjustify-end\b/)
+  })
+})
+
 describe('overlay footer ownership boundaries', () => {
   it('keeps shared footer chrome free of fill, dock, and action-row concerns', () => {
     expect(dialogPanelFooterClasses).toContain('border-t')
-    expect(dialogPanelFooterClasses).toContain('border-border-faint')
+    expect(dialogPanelFooterClasses).toContain(dialogPanelSectionSeparatorBorderClasses)
     expect(dialogPanelFooterClasses).toContain('px-6')
     expect(dialogPanelFooterClasses).toContain('py-4')
     expect(dialogPanelFooterClasses).toContain('flex-col')

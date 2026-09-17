@@ -1,18 +1,23 @@
+import { cn } from '@rpg/ui'
+import { tableHeaderRowClasses } from '@rpg/ui'
+
 // ---------------------------------------------------------------------------
 // Values grid — a bordered group that reads as a real table. The outer
-// container owns border and radius; the header row uses a subtle surface with
-// a bottom border; body rows stay compact with restrained separators. Wide
-// tables scroll horizontally inside the container instead of widening the
-// modal or crushing cell controls.
+// container owns border and radius; the header row uses the shared table header
+// band token; body rows stay compact with restrained separators. Wide tables
+// scroll horizontally inside the container instead of widening the modal or
+// crushing cell controls.
 // ---------------------------------------------------------------------------
 
 export const tableBuilderValuesScrollClasses = 'overflow-x-auto'
 
 export const tableBuilderValuesGridClasses = 'min-w-fit'
 
-/** Subtle table-header surface: light tint, bottom border, slightly stronger text. */
-export const tableBuilderValuesHeaderRowClasses =
-  'grid items-center gap-2 border-b border-border bg-surface-muted px-2.5 py-2 text-xs font-medium text-muted-foreground'
+/** Authoring header row — matches {@link tableHeaderRowClasses} from `@rpg/ui`. */
+export const tableBuilderValuesHeaderRowClasses = cn(
+  tableHeaderRowClasses,
+  'grid items-center gap-2 px-2.5 py-2 text-xs font-medium text-muted-foreground',
+)
 
 export const tableBuilderValuesHeaderCellClasses = 'truncate'
 
@@ -32,12 +37,6 @@ export const tableBuilderValuesActionCellClasses = 'flex justify-end'
 export const TABLE_BUILDER_LEVEL_TRACK = '5.5rem'
 export const TABLE_BUILDER_VALUE_TRACK = 'minmax(7rem, 1fr)'
 export const TABLE_BUILDER_ACTION_TRACK = '2.25rem'
-
-/** Pre-column empty state for general tables — no header row or add-row affordance. */
-export const tableBuilderValuesNeedsColumnsClasses =
-  'flex flex-col gap-1 px-3 py-4 text-sm text-foreground'
-
-export const tableBuilderValuesNeedsColumnsHintClasses = 'text-muted-foreground'
 
 export function tableBuilderValuesGridTemplate(columnCount: number, includeLevel = true): string {
   const valueTracks = `repeat(${Math.max(columnCount, 1)}, ${TABLE_BUILDER_VALUE_TRACK})`

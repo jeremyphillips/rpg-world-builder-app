@@ -23,22 +23,22 @@ function ValuesHarness({ kind }: { kind: 'levelProgression' | 'general' }) {
 }
 
 describe('TableBuilderValues', () => {
-  it('shows a pre-column empty state for general tables without columns', () => {
+  it('shows only the section label and hint when no columns exist yet', () => {
     render(<ValuesHarness kind="general" />)
 
-    expect(screen.getByText('Add a column before adding rows.')).toBeInTheDocument()
-    expect(screen.getByText('Rows use the columns defined above.')).toBeInTheDocument()
+    expect(screen.getByText('Values')).toBeInTheDocument()
+    expect(screen.getByText('Add a column to start adding rows.')).toBeInTheDocument()
+    expect(screen.queryByText('No columns yet')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add row' })).not.toBeInTheDocument()
     expect(screen.queryByText('No rows added.')).not.toBeInTheDocument()
   })
 
-  it('keeps the level-progression values grid when no columns exist yet', () => {
+  it('keeps values header-only for level progression tables without columns', () => {
     render(<ValuesHarness kind="levelProgression" />)
 
-    expect(screen.queryByText('Add a column before adding rows.')).not.toBeInTheDocument()
-    expect(screen.getByText('Level')).toBeInTheDocument()
-    expect(screen.getByText('No rows added.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add row' })).toBeInTheDocument()
+    expect(screen.getByText('Add a column to start adding rows.')).toBeInTheDocument()
+    expect(screen.queryByText('Level')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add row' })).not.toBeInTheDocument()
   })
 
   it('shows the normal general table UI after the first column is added', async () => {
@@ -70,7 +70,9 @@ describe('TableBuilderValues', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add test column' }))
 
-    expect(screen.queryByText('Add a column before adding rows.')).not.toBeInTheDocument()
+    expect(
+      screen.getByText('Add rows in display order. Blank cells stay empty.'),
+    ).toBeInTheDocument()
     expect(screen.getByText('1d10')).toBeInTheDocument()
     expect(screen.getByText('No rows added.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add row' })).toBeInTheDocument()

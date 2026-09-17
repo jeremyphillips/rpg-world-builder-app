@@ -66,6 +66,36 @@ describe('TableBuilderPreview', () => {
     await user.click(within(confirm).getByRole('button', { name: 'Change type' }))
 
     expect(screen.queryByRole('columnheader', { name: 'Level' })).not.toBeInTheDocument()
-    expect(screen.getByText('Add a column to preview this table.')).toBeInTheDocument()
+    expect(screen.getByText('Preview appears after you add a column.')).toBeInTheDocument()
+  })
+
+  it('shows the inset gate when no columns exist yet', () => {
+    render(
+      <PreviewHarness
+        values={{
+          columns: [],
+          rows: [],
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Preview appears after you add a column.')).toBeInTheDocument()
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+  })
+
+  it('shows headers and a no-rows placeholder when columns exist without rows', () => {
+    render(
+      <PreviewHarness
+        initialKind="levelProgression"
+        values={{
+          columns: [{ ...createTableBuilderColumnDraft(), label: '' }],
+          rows: [],
+        }}
+      />,
+    )
+
+    expect(screen.getByRole('columnheader', { name: 'Level' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Column 1' })).toBeInTheDocument()
+    expect(screen.getByRole('cell', { name: 'No rows yet.' })).toBeInTheDocument()
   })
 })
