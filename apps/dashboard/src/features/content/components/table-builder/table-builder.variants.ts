@@ -24,6 +24,8 @@ export const tableBuilderAddActionWrapClasses = 'p-2'
 export const tableBuilderAddActionClasses =
   'flex w-full items-center justify-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50'
 
+export const tableBuilderAddActionIconClasses = 'size-4'
+
 export const tableBuilderGroupEmptyClasses = 'px-3 py-4 text-sm text-muted-foreground'
 
 export const tableBuilderSectionErrorClasses = 'text-sm text-destructive'

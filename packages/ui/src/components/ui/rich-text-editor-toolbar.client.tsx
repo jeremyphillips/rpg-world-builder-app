@@ -2,7 +2,16 @@
 
 import type { Editor } from '@tiptap/react'
 import type { LucideIcon } from 'lucide-react'
-import { Bold, Code, Italic, Link as LinkIcon, List, ListOrdered, SquareCode } from 'lucide-react'
+import {
+  Bold,
+  Code,
+  Italic,
+  Link as LinkIcon,
+  List,
+  ListOrdered,
+  SquareCode,
+  Table2,
+} from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
@@ -107,6 +116,7 @@ export interface RichTextEditorToolbarProps {
   disabled: boolean
   linkable: boolean
   codeBlocks: boolean
+  tables: boolean
   isLinkPickerOpen: boolean
   editingLinkContext: RichTextLinkContext | null
   internalLinkOptions: RichTextLinkPickerInternalOption[]
@@ -123,6 +133,7 @@ export function RichTextEditorToolbar({
   disabled,
   linkable,
   codeBlocks,
+  tables,
   isLinkPickerOpen,
   editingLinkContext,
   internalLinkOptions,
@@ -136,6 +147,18 @@ export function RichTextEditorToolbar({
   return (
     <div className="flex items-center gap-1 border-b border-border p-1">
       <RichTextFormatButtons editor={editor} disabled={disabled} codeBlocks={codeBlocks} />
+      {tables ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7"
+          aria-label="Table"
+          disabled={disabled || !editor}
+          onClick={() => editor?.commands.beginTableEmbedCreate()}
+        >
+          <Table2 className="size-4" />
+        </Button>
+      ) : null}
       {linkable ? (
         <RichTextLinkPicker
           open={isLinkPickerOpen}

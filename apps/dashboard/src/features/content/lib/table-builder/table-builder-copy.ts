@@ -14,6 +14,7 @@ export const TABLE_BUILDER_NAME_HINT = 'Used as the table heading.'
 export const TABLE_BUILDER_COLUMNS_LABEL = 'Columns'
 export const TABLE_BUILDER_COLUMNS_HINT =
   'Add the value columns for this table. Level is included automatically.'
+export const TABLE_BUILDER_GENERAL_COLUMNS_HINT = 'Add the columns for this table.'
 export const TABLE_BUILDER_COLUMN_NAME_LABEL = 'Column name'
 export const TABLE_BUILDER_COLUMN_TYPE_LABEL = 'Column type'
 export const TABLE_BUILDER_NUMBER_FORMAT_LABEL = 'Number format'
@@ -22,6 +23,8 @@ export const TABLE_BUILDER_ADD_COLUMN_LABEL = 'Add column'
 export const TABLE_BUILDER_VALUES_LABEL = 'Values'
 export const TABLE_BUILDER_VALUES_HINT =
   'Add a row when values change. Blank cells keep the previous value.'
+export const TABLE_BUILDER_GENERAL_VALUES_HINT =
+  'Add rows in the order they should appear. Blank cells stay empty.'
 export const TABLE_BUILDER_LEVEL_HEADER = 'Level'
 export const TABLE_BUILDER_ADD_ROW_LABEL = 'Add row'
 export const TABLE_BUILDER_ALL_LEVELS_USED_REASON = 'All levels have been added.'

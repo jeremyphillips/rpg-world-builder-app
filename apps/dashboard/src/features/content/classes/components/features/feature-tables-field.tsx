@@ -93,10 +93,11 @@ export function FeatureTablesField({ formCtx }: FeatureTablesFieldProps) {
       {modalState && allowedLevels.length > 0 ? (
         <TableBuilderModal
           open
+          kind="levelProgression"
           mode={modalState.mode}
           value={modalState.mode === 'edit' ? modalState.value : undefined}
           allowedLevels={allowedLevels}
-          onSave={handleSave}
+          onSave={(table) => handleSave(table as ProgressionTable)}
           onOpenChange={(open) => {
             if (!open) setModalState(null)
           }}

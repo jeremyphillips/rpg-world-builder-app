@@ -12,6 +12,7 @@ import {
   isEditorEligible,
   meetsConsumerThreshold,
   MODELING_STATUS_LADDER,
+  type GeneralTable,
   type ModelingStatus,
   type Spell,
   type SpellTags,
@@ -96,6 +97,7 @@ export type SpellDetailResolutionSubsection = {
 export type SpellDetailViewModel = {
   statRows: ContentStatRowData[]
   descriptionHtml?: string
+  descriptionTables?: GeneralTable[]
   proseSections: SpellDetailProseSections
   tagLabels: string[]
   classLabels: string[]
@@ -221,6 +223,7 @@ export function buildSpellDetailViewModel(
       resolveSpellSchoolDescription: vocabulary.resolveSpellSchoolDescription,
     }),
     descriptionHtml: spell.description || undefined,
+    descriptionTables: spell.tables?.length ? [...spell.tables] : undefined,
     proseSections,
     tagLabels,
     classLabels,

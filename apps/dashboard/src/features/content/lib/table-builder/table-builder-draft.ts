@@ -11,18 +11,19 @@ import {
 } from '@rpg/contracts'
 
 import type { ProgressionTablePresentation } from '../../components/tables/progression-table-presentation'
+import type { TableBuilderKind } from './table-builder-kind'
 
 // ---------------------------------------------------------------------------
 // Row-major authoring draft for the table builder, mapped to and from the
-// column-owned sparse persistence shape (`ProgressionTable`).
+// column-owned sparse persistence shape (`ProgressionTable`) or dense
+// general-table rows.
 //
 // Identity rule: `key` is an ephemeral authoring identity (React lists, cell
-// addressing, drag reorder) and is NEVER persisted. The persisted `id` is
-// derived from the label once when a new column is first saved, stays stable
-// across label renames, and is never editable in the UI.
+// addressing, drag reorder) and is NEVER persisted. Progression column ids are
+// derived from the label once when first saved; general ids are opaque UUIDs.
 // ---------------------------------------------------------------------------
 
-/** Builder capabilities for the one supported kind. Extract a registry only when a second kind exists. */
+/** @deprecated Use `tableBuilderCapabilities.levelProgression` from `table-builder-kind`. */
 export const progressionTableBuilderCapabilities = {
   axis: 'level',
   rowReorder: false,
@@ -49,11 +50,17 @@ export type TableBuilderColumnDraft = {
 }
 
 export type TableBuilderRowDraft = {
-  level: string
+  /** Ephemeral authoring identity for general rows. */
+  key?: string
+  /** Stable persisted id for general rows. */
+  id?: string
+  /** Level axis for progression tables. */
+  level?: string
   cells: Record<string, TableBuilderCellDraft | undefined>
 }
 
 export type TableBuilderFormValues = {
+  kind: TableBuilderKind
   name: string
   columns: TableBuilderColumnDraft[]
   rows: TableBuilderRowDraft[]
@@ -65,6 +72,12 @@ export function createTableBuilderColumnKey(): string {
     : `column-${Math.random().toString(36).slice(2)}`
 }
 
+export function createTableBuilderRowKey(): string {
+  return typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `row-${Math.random().toString(36).slice(2)}`
+}
+
 export function createTableBuilderColumnDraft(): TableBuilderColumnDraft {
   return {
     key: createTableBuilderColumnKey(),
@@ -74,8 +87,10 @@ export function createTableBuilderColumnDraft(): TableBuilderColumnDraft {
   }
 }
 
-export function createEmptyTableBuilderDraft(): TableBuilderFormValues {
-  return { name: '', columns: [], rows: [] }
+export function createEmptyTableBuilderDraft(
+  kind: TableBuilderKind = 'levelProgression',
+): TableBuilderFormValues {
+  return { kind, name: '', columns: [], rows: [] }
 }
 
 export function emptyCellDraftForValueType(valueType: TableColumnValueType): TableBuilderCellDraft {
@@ -123,7 +138,7 @@ export function parseDiceCellDraft(cell: TableBuilderDiceCellDraft): Dice | unde
 
 type ParsedCellValue = number | string | Dice
 
-function parseCellDraft(
+export function parseCellDraft(
   column: Pick<TableBuilderColumnDraft, 'valueType'>,
   cell: TableBuilderCellDraft | undefined,
 ): ParsedCellValue | undefined {
@@ -191,7 +206,7 @@ export function tableToDraft(table: ProgressionTable): TableBuilderFormValues {
       return { level: String(level), cells }
     })
 
-  return { name: table.name, columns, rows }
+  return { kind: 'levelProgression', name: table.name, columns, rows }
 }
 
 type DraftToTableOptions = {
@@ -212,7 +227,7 @@ function buildColumnEntries(
   const entries: Array<{ level: number; value: ParsedCellValue }> = []
 
   for (const row of rows) {
-    const level = parseLevelDraft(row.level)
+    const level = parseLevelDraft(row.level ?? '')
     if (level === undefined) continue
     const value = parseCellDraft(column, row.cells[column.key])
     if (value === undefined) continue
@@ -268,7 +283,7 @@ export function draftToTable(
   return {
     id: options.existingTable?.id ?? deriveContentKey(values.name),
     name: values.name.trim(),
-    kind: 'levelProgression',
+    kind: 'levelProgression' as const,
     columns,
   }
 }
@@ -309,7 +324,7 @@ export function draftToPresentation(values: TableBuilderFormValues): Progression
 
   const rowsWithLevels = values.rows.map((row) => ({
     row,
-    level: parseLevelDraft(row.level),
+    level: parseLevelDraft(row.level ?? ''),
   }))
 
   const sortedRows = [...rowsWithLevels.filter((entry) => entry.level !== undefined)].sort(

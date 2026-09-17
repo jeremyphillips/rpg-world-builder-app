@@ -1,4 +1,6 @@
+import { createElement } from 'react'
 import { z } from 'zod'
+import { generalTableSchema } from '@rpg/contracts'
 import {
   type AREA_GEOMETRY_SHAPES,
   DAMAGE_TYPE_TERM,
@@ -67,6 +69,7 @@ import { resolutionFields } from '../resolution/lib/form/resolution-form-fields'
 import { resolutionOutcomeApplicationsResolverFields } from '../resolution/lib/form/resolution-outcome-form-fields'
 import { RESOLUTION_FIELD_NAME } from '../resolution/lib/form/resolution-form-values'
 import { spellEffectsFormSchema } from './effects/effect-form-schema'
+import { SpellDescriptionTablesField } from '../components/spell-description-tables-field'
 
 function visibleWhenRangeDistance(): FieldVisibility {
   return {
@@ -147,6 +150,7 @@ const spellFormObjectSchema = z.object({
   name: z.string().min(1),
   slug: slugSchema.optional(),
   description: z.string().optional(),
+  tables: z.array(generalTableSchema).optional(),
   hasCantripScaling: z.boolean().optional(),
   cantripScaling: z.string().optional(),
   hasHigherLevelSlotEffect: z.boolean().optional(),
@@ -328,7 +332,13 @@ function spellDescriptionSection(ctx: ContentFormCtx): FormItem {
     kind: 'group',
     fields: [
       {
+        kind: 'slot',
+        name: 'descriptionTablesHost',
+        render: () => createElement(SpellDescriptionTablesField),
+      },
+      {
         ...descriptionField(ctx),
+        tables: true,
         chrome: { variant: 'none' },
         separator: 'subtle',
       },
@@ -673,7 +683,12 @@ function resolutionTabFields(ctx: ContentFormCtx): FormItem[] {
 
 export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
-    { id: 'basics', label: 'Basics', fields: basicsFields(ctx) },
+    {
+      id: 'basics',
+      label: 'Basics',
+      fields: basicsFields(ctx),
+      errorPaths: ['tables'],
+    },
     { id: 'casting', label: 'Casting', fields: castingFields() },
     {
       id: 'resolution',

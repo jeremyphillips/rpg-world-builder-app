@@ -5,6 +5,7 @@ import type { TableBuilderFormValues } from './table-builder-draft'
 
 function validDraft(): TableBuilderFormValues {
   return {
+    kind: 'levelProgression',
     name: 'Rage progression',
     columns: [
       { key: 'a', id: 'uses', label: 'Rages', valueType: 'number', format: 'plain' },

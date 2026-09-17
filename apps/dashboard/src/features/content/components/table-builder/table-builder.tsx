@@ -8,6 +8,7 @@ import {
   TABLE_BUILDER_NAME_LABEL,
 } from '../../lib/table-builder/table-builder-copy'
 import type { TableBuilderFormValues } from '../../lib/table-builder/table-builder-draft'
+import type { TableBuilderKind } from '../../lib/table-builder/table-builder-kind'
 import {
   tableBuilderAuthoringPaneClasses,
   tableBuilderLayoutClasses,
@@ -20,7 +21,8 @@ import { TableBuilderValues } from './table-builder-values'
 export type TableBuilderProps = {
   /** Isolated draft form owned by the hosting surface (modal or story harness). */
   form: UseFormReturn<TableBuilderFormValues>
-  /** Semantic level set the structural axis may use — the builder knows nothing about consumers. */
+  kind: TableBuilderKind
+  /** Semantic level set the structural axis may use — progression tables only. */
   allowedLevels: readonly number[]
 }
 
@@ -29,7 +31,7 @@ export type TableBuilderProps = {
  * grid, and live preview. Renders no chrome of its own — the host provides the
  * modal (or page) shell, the `<form>` element, and footer actions.
  */
-export function TableBuilder({ form, allowedLevels }: TableBuilderProps) {
+export function TableBuilder({ form, kind, allowedLevels }: TableBuilderProps) {
   const nameId = useId()
   const nameError = form.getFieldState('name', form.formState).error
 
@@ -46,8 +48,8 @@ export function TableBuilder({ form, allowedLevels }: TableBuilderProps) {
             invalid={Boolean(nameError)}
             {...form.register('name')}
           />
-          <TableBuilderColumns />
-          <TableBuilderValues allowedLevels={allowedLevels} />
+          <TableBuilderColumns kind={kind} />
+          <TableBuilderValues kind={kind} allowedLevels={allowedLevels} />
         </div>
         <div className={tableBuilderPreviewPaneClasses}>
           <TableBuilderPreview />

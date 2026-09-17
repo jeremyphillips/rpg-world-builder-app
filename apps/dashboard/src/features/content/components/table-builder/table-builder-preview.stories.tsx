@@ -37,6 +37,7 @@ export const ResolvedDraft: Story = {
 export const IncompleteDraft: Story = {
   args: {
     values: {
+      kind: 'levelProgression',
       name: '',
       columns: [
         { key: 'a', label: 'Uses', valueType: 'number', format: 'plain' },
@@ -51,5 +52,5 @@ export const IncompleteDraft: Story = {
 }
 
 export const EmptyDraft: Story = {
-  args: { values: { name: '', columns: [], rows: [] } },
+  args: { values: { kind: 'levelProgression', name: '', columns: [], rows: [] } },
 }

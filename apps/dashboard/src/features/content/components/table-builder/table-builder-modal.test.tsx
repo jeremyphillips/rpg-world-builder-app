@@ -30,6 +30,7 @@ function renderModal(overrides: Partial<TableBuilderModalProps> = {}) {
   render(
     <TableBuilderModal
       open
+      kind="levelProgression"
       mode="edit"
       value={rageProgressionTableFixture}
       allowedLevels={ALLOWED_LEVELS}

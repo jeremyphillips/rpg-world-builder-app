@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
 
+import { RichTextWithTables } from '../../components/rich-text/rich-text-with-tables'
+
 import { ROUTES } from '@/app/routes'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
@@ -193,7 +195,16 @@ export function SpellDetailBody({
       statRows={viewModel.statRows}
       descriptionContent={
         viewModel.descriptionHtml ? (
-          <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
+          viewModel.descriptionTables?.length ? (
+            <RichTextWithTables
+              html={viewModel.descriptionHtml}
+              tables={viewModel.descriptionTables}
+              size="md"
+              tone="muted"
+            />
+          ) : (
+            <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
+          )
         ) : undefined
       }
     >

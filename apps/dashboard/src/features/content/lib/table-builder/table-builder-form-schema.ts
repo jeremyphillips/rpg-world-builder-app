@@ -9,6 +9,7 @@ import {
   type TableBuilderColumnDraft,
   type TableBuilderFormValues,
 } from './table-builder-draft'
+import type { TableBuilderKind } from './table-builder-kind'
 
 export const tableBuilderValidationMessages = {
   tableName: defineMessage('validation.tableBuilder.tableName', () => 'Enter a table name.'),
@@ -47,7 +48,9 @@ const columnDraftSchema = z.object({
 })
 
 const rowDraftSchema = z.object({
-  level: z.string(),
+  key: z.string().optional(),
+  id: z.string().optional(),
+  level: z.string().optional(),
   cells: z.record(z.string(), cellDraftSchema.optional()),
 })
 
@@ -128,7 +131,7 @@ function refineRowLevels(values: TableBuilderFormValues, ctx: z.RefinementCtx): 
   const seenLevels = new Set<number>()
 
   for (const [rowIndex, row] of values.rows.entries()) {
-    const level = parseLevelDraft(row.level)
+    const level = parseLevelDraft(row.level ?? '')
 
     if (level === undefined) {
       ctx.addIssue({
@@ -177,15 +180,22 @@ function refineColumnCells(values: TableBuilderFormValues, ctx: z.RefinementCtx)
 function refineTableBuilderForm(values: TableBuilderFormValues, ctx: z.RefinementCtx): void {
   refineStructure(values, ctx)
   refineColumnLabels(values, ctx)
-  refineRowLevels(values, ctx)
+  if (values.kind === 'levelProgression') {
+    refineRowLevels(values, ctx)
+  }
   refineColumnCells(values, ctx)
 }
 
 /** Validates the authoring draft on save; blank cells are legitimate carry-forward gaps. */
 export const tableBuilderFormSchema = z
   .object({
+    kind: z.enum(['levelProgression', 'general']),
     name: z.string(),
     columns: z.array(columnDraftSchema),
     rows: z.array(rowDraftSchema),
   })
   .superRefine(refineTableBuilderForm)
+
+export function tableBuilderFormSchemaForKind(kind: TableBuilderKind) {
+  return tableBuilderFormSchema.transform((values) => ({ ...values, kind }))
+}

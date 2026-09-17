@@ -25,6 +25,7 @@ import {
   TABLE_BUILDER_ADD_COLUMN_LABEL,
   TABLE_BUILDER_COLUMNS_HINT,
   TABLE_BUILDER_COLUMNS_LABEL,
+  TABLE_BUILDER_GENERAL_COLUMNS_HINT,
   TABLE_BUILDER_TYPE_CHANGE_CONFIRM_DESCRIPTION,
   TABLE_BUILDER_TYPE_CHANGE_CONFIRM_HEADLINE,
   TABLE_BUILDER_TYPE_CHANGE_CONFIRM_LABEL,
@@ -35,6 +36,8 @@ import {
   isTableBuilderCellBlank,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
+import { createGeneralTableBuilderColumnDraft } from '../../lib/table-builder/table-builder-general-draft'
+import type { TableBuilderKind } from '../../lib/table-builder/table-builder-kind'
 import {
   tableBuilderAddActionClasses,
   tableBuilderAddActionWrapClasses,
@@ -53,7 +56,11 @@ type PendingTypeChange = {
   valueType: TableColumnValueType
 }
 
-export function TableBuilderColumns() {
+export type TableBuilderColumnsProps = {
+  kind: TableBuilderKind
+}
+
+export function TableBuilderColumns({ kind }: TableBuilderColumnsProps) {
   const form = useFormContext<TableBuilderFormValues>()
   const fieldArray = useFieldArray({ control: form.control, name: 'columns' })
   const [pendingTypeChange, setPendingTypeChange] = useState<PendingTypeChange | null>(null)
@@ -109,7 +116,9 @@ export function TableBuilderColumns() {
 
   function handleAddColumn() {
     const index = fieldArray.fields.length
-    fieldArray.append(createTableBuilderColumnDraft())
+    fieldArray.append(
+      kind === 'general' ? createGeneralTableBuilderColumnDraft() : createTableBuilderColumnDraft(),
+    )
     setTimeout(() => form.setFocus(`columns.${index}.label`), 0)
   }
 
@@ -145,7 +154,7 @@ export function TableBuilderColumns() {
     <section className={tableBuilderSectionClasses} aria-label={TABLE_BUILDER_COLUMNS_LABEL}>
       <FormSectionHeader
         label={TABLE_BUILDER_COLUMNS_LABEL}
-        hint={TABLE_BUILDER_COLUMNS_HINT}
+        hint={kind === 'general' ? TABLE_BUILDER_GENERAL_COLUMNS_HINT : TABLE_BUILDER_COLUMNS_HINT}
         tier="subsection"
         required
       />

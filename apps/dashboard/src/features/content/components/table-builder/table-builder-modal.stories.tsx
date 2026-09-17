@@ -4,6 +4,8 @@ import { fn } from 'storybook/test'
 import { Button } from '@rpg/ui'
 import type { ProgressionTable } from '@rpg/contracts'
 
+import type { TableBuilderSavedTable } from '../../lib/table-builder/table-builder-kind'
+
 import {
   martialArtsProgressionTableFixture,
   mixedProgressionTableFixture,
@@ -19,6 +21,7 @@ const meta = {
   parameters: { layout: 'fullscreen' },
   args: {
     open: true,
+    kind: 'levelProgression',
     allowedLevels: ALLOWED_LEVELS,
     onSave: fn(),
     onOpenChange: fn(),
@@ -31,7 +34,7 @@ type Story = StoryObj<typeof meta>
 /** Relaunchable harness so closing the modal in the story is recoverable. */
 function RelaunchableModal(props: TableBuilderModalProps) {
   const [open, setOpen] = useState(true)
-  const [lastSaved, setLastSaved] = useState<ProgressionTable | null>(null)
+  const [lastSaved, setLastSaved] = useState<TableBuilderSavedTable | null>(null)
 
   return (
     <div className="p-6">

@@ -515,7 +515,6 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     },
     [
       gap('transformation-model-missing', 'Species and form change stay prose'),
-      gap('catalog-data-incomplete', 'Species roll table placeholder in prose'),
       gap('choice-model-missing', 'Species outcome choice stays prose'),
     ],
   ),

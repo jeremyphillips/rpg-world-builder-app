@@ -1136,6 +1136,16 @@ Phase 2 migrated 16 legacy class `resources[]` rows onto their owning features (
 
 ---
 
+## Spell description tables (reference)
+
+Spells may embed structured tables in `description` HTML via `<div data-rpg-table-id="…"></div>`.
+Table data lives in sibling `tables[]` (`GeneralTable`, `kind: 'general'`) — contracts never parse
+description HTML. The spell form prunes unreferenced `tables[]` rows on save via
+`extractTableEmbedIds`. Authoring: Description field with `tables: true` + `SpellDescriptionTablesField`
+host; read-only: `RichTextWithTables`. v1 does not sync editor undo with `tables[]` dirty state.
+
+---
+
 ## Skill ↔ class association
 
 Class is the **single writer** for starting skill proficiency choices:

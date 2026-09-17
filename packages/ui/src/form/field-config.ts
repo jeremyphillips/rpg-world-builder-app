@@ -551,6 +551,8 @@ export interface RichTextFieldConfig extends BaseFieldConfig {
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
   codeBlocks?: boolean
+  /** Opt in to structured table embed blocks and the Table toolbar button (off by default). */
+  tables?: boolean
   /** Internal link targets shown in the rich-text link picker. */
   internalLinkOptions?: RichTextLinkPickerInternalOption[]
   /** Content type filter options for the rich-text link picker. */

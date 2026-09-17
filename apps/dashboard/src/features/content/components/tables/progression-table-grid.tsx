@@ -13,17 +13,28 @@ const MISSING_VALUE = '—'
 export type ProgressionTableGridProps = {
   presentation: ProgressionTablePresentation
   caption?: string
+  /** When set, renders a leading row-header column (e.g. "Level"). Omit for general tables. */
+  rowHeaderLabel?: string
 }
 
-export function ProgressionTableGrid({ presentation, caption }: ProgressionTableGridProps) {
+export function ProgressionTableGrid({
+  presentation,
+  caption,
+  rowHeaderLabel = 'Level',
+}: ProgressionTableGridProps) {
   const heading = caption ?? presentation.name
+  const showRowHeader = rowHeaderLabel !== undefined
 
   return (
     <Table>
       {heading ? <caption className="sr-only">{heading}</caption> : null}
       <TableHeader>
         <TableRow>
-          <TableHead className={progressionTableGridLevelHeaderClasses}>Level</TableHead>
+          {showRowHeader ? (
+            <TableHead className={progressionTableGridLevelHeaderClasses}>
+              {rowHeaderLabel}
+            </TableHead>
+          ) : null}
           {presentation.columns.map((column) => (
             <TableHead key={column.key} className={progressionTableGridHeaderCellClasses}>
               {column.label ?? column.key}
@@ -34,9 +45,11 @@ export function ProgressionTableGrid({ presentation, caption }: ProgressionTable
       <TableBody>
         {presentation.rows.map((row, index) => (
           <TableRow key={row.level ?? `row-${index}`}>
-            <TableCell className={progressionTableGridLevelCellClasses}>
-              {row.level ?? MISSING_VALUE}
-            </TableCell>
+            {showRowHeader ? (
+              <TableCell className={progressionTableGridLevelCellClasses}>
+                {row.level ?? MISSING_VALUE}
+              </TableCell>
+            ) : null}
             {presentation.columns.map((column) => (
               <TableCell key={column.key} className={progressionTableGridValueCellClasses}>
                 {row.values[column.key] ?? MISSING_VALUE}

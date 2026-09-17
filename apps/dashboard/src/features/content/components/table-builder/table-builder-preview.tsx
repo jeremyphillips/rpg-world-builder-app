@@ -12,6 +12,7 @@ import {
   draftToPresentation,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
+import { generalDraftToPresentation } from '../../lib/table-builder/table-builder-general-draft'
 import { ProgressionTableGrid } from '../tables/progression-table-grid'
 import { tableBuilderSectionClasses } from './table-builder.variants'
 import { tableBuilderPreviewTableWrapClasses } from './table-builder-preview.variants'
@@ -24,15 +25,15 @@ import { tableBuilderPreviewTableWrapClasses } from './table-builder-preview.var
 export function TableBuilderPreview() {
   const values = useWatch<TableBuilderFormValues>() as TableBuilderFormValues
 
-  const presentation = useMemo(
-    () =>
-      draftToPresentation({
-        name: values.name ?? '',
-        columns: values.columns ?? [],
-        rows: values.rows ?? [],
-      }),
-    [values],
-  )
+  const presentation = useMemo(() => {
+    const draft: TableBuilderFormValues = {
+      kind: values.kind ?? 'levelProgression',
+      name: values.name ?? '',
+      columns: values.columns ?? [],
+      rows: values.rows ?? [],
+    }
+    return draft.kind === 'general' ? generalDraftToPresentation(draft) : draftToPresentation(draft)
+  }, [values])
 
   return (
     <section className={tableBuilderSectionClasses} aria-label={TABLE_BUILDER_PREVIEW_TITLE}>
@@ -45,7 +46,11 @@ export function TableBuilderPreview() {
         <EmptyPanel>{TABLE_BUILDER_PREVIEW_EMPTY}</EmptyPanel>
       ) : (
         <div className={tableBuilderPreviewTableWrapClasses}>
-          <ProgressionTableGrid presentation={presentation} caption={TABLE_BUILDER_PREVIEW_TITLE} />
+          <ProgressionTableGrid
+            presentation={presentation}
+            caption={TABLE_BUILDER_PREVIEW_TITLE}
+            rowHeaderLabel={values.kind === 'general' ? undefined : 'Level'}
+          />
         </div>
       )}
     </section>

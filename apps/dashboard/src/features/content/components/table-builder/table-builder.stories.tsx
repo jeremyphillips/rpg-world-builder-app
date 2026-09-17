@@ -32,7 +32,7 @@ function TableBuilderHarness({ table, allowedLevels = ALLOWED_LEVELS }: HarnessP
 
   return (
     <form noValidate onSubmit={form.handleSubmit(() => undefined)}>
-      <TableBuilder form={form} allowedLevels={allowedLevels} />
+      <TableBuilder form={form} kind="levelProgression" allowedLevels={allowedLevels} />
     </form>
   )
 }

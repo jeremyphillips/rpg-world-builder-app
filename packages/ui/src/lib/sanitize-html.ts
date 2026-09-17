@@ -1,9 +1,15 @@
 import DOMPurify, { type Config } from 'dompurify'
 
 import { RICH_TEXT_LINK_SANITIZE_ATTRS } from './rich-text-link-attrs'
+import { RICH_TEXT_TABLE_EMBED_SANITIZE_ATTRS } from './rich-text-table-embed-attrs'
 
 const SANITIZE_CONFIG: Config = {
-  ADD_ATTR: [...RICH_TEXT_LINK_SANITIZE_ATTRS, 'target', 'rel'],
+  ADD_ATTR: [
+    ...RICH_TEXT_LINK_SANITIZE_ATTRS,
+    ...RICH_TEXT_TABLE_EMBED_SANITIZE_ATTRS,
+    'target',
+    'rel',
+  ],
   ALLOW_DATA_ATTR: false,
 }
 

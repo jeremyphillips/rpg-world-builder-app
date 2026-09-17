@@ -107,6 +107,7 @@ describe('draftToTable', () => {
 
   it('derives stable ids for new columns and dedupes within the table', () => {
     const draft: TableBuilderFormValues = {
+      kind: 'levelProgression',
       name: 'New table',
       columns: [
         { key: 'a', label: 'Uses', valueType: 'number', format: 'plain' },
@@ -141,6 +142,7 @@ describe('draftToTable', () => {
 
   it('sorts entries ascending regardless of row order', () => {
     const draft: TableBuilderFormValues = {
+      kind: 'levelProgression',
       name: 'Out of order',
       columns: [{ key: 'a', label: 'Uses', valueType: 'number', format: 'plain' }],
       rows: [
@@ -177,6 +179,7 @@ describe('draftToPresentation', () => {
 
   it('tolerates incomplete drafts without claiming validity', () => {
     const presentation = draftToPresentation({
+      kind: 'levelProgression',
       name: '',
       columns: [
         { key: 'a', label: '', valueType: 'number', format: 'plain' },
@@ -201,6 +204,7 @@ describe('draftToPresentation', () => {
 
   it('sorts leveled rows ascending and appends unleveled rows', () => {
     const presentation = draftToPresentation({
+      kind: 'levelProgression',
       name: 'Sorting',
       columns: [{ key: 'a', label: 'Uses', valueType: 'number', format: 'plain' }],
       rows: [

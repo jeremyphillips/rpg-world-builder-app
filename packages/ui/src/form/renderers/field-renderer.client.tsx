@@ -390,6 +390,7 @@ const fieldRenderers: {
         size={controlSize}
         linkable={config.linkable}
         codeBlocks={config.codeBlocks}
+        tables={config.tables}
         internalLinkOptions={config.internalLinkOptions}
         contentTypeOptions={config.contentTypeOptions}
         disabled={config.disabled}

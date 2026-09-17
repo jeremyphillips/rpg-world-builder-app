@@ -16,6 +16,11 @@ describe('normalizeRichTextHtml', () => {
   it('preserves non-empty content', () => {
     expect(normalizeRichTextHtml('<p>Hello</p>')).toBe('<p>Hello</p>')
   })
+
+  it('preserves embed-only markup as content', () => {
+    const html = '<div data-rpg-table-id="table-1"></div>'
+    expect(normalizeRichTextHtml(html)).toBe(html)
+  })
 })
 
 describe('extractRichTextContent', () => {

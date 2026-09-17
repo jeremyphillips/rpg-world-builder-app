@@ -27,6 +27,8 @@ export interface RichTextFieldProps
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
   codeBlocks?: boolean
+  /** Opt in to structured table embed blocks and the Table toolbar button (off by default). */
+  tables?: boolean
   internalLinkOptions?: RichTextLinkPickerInternalOption[]
   contentTypeOptions?: RichTextLinkPickerContentTypeOption[]
   disabled?: boolean
@@ -55,6 +57,7 @@ export function RichTextField({
   size = 'md',
   linkable,
   codeBlocks,
+  tables,
   internalLinkOptions,
   contentTypeOptions,
   disabled,
@@ -91,6 +94,7 @@ export function RichTextField({
             size={size}
             linkable={linkable}
             codeBlocks={codeBlocks}
+            tables={tables}
             internalLinkOptions={internalLinkOptions}
             contentTypeOptions={contentTypeOptions}
             disabled={disabled}

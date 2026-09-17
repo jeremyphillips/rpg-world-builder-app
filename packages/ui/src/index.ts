@@ -89,6 +89,25 @@ export {
   normalizeRichTextHtml,
   richTextHtmlEquals,
 } from './components/ui/rich-text-html'
+export {
+  extractTableEmbedIds,
+  richTextHtmlHasTableEmbeds,
+} from './components/ui/rich-text-table-embed.lib'
+export {
+  RICH_TEXT_TABLE_EMBED_ATTR,
+  RICH_TEXT_TABLE_EMBED_SANITIZE_ATTRS,
+} from './lib/rich-text-table-embed-attrs'
+export type {
+  RichTextTableEmbedHost,
+  RichTextTableEmbedCreateSession,
+  RichTextTableEmbedResolved,
+} from './components/ui/rich-text-table-embed.types'
+export {
+  registerRichTextTableEmbedHost,
+  getRichTextTableEmbedHost,
+  useRichTextTableEmbedHost,
+  RichTextTableEmbedHostRegistrar,
+} from './components/ui/rich-text-table-embed-host.client'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'

@@ -29,6 +29,7 @@ import {
 export type TableBuilderValuesRowProps = {
   index: number
   columns: readonly TableBuilderColumnDraft[]
+  includeLevel: boolean
   allowedLevels: readonly number[]
   /** Levels used by other rows — disabled in this row's level select. */
   usedLevels: ReadonlySet<number>
@@ -57,6 +58,7 @@ function cellAriaLabel(
 export function TableBuilderValuesRow({
   index,
   columns,
+  includeLevel,
   allowedLevels,
   usedLevels,
   onLevelChange,
@@ -71,28 +73,30 @@ export function TableBuilderValuesRow({
   return (
     <div
       className={tableBuilderValuesRowClasses}
-      style={{ gridTemplateColumns: tableBuilderValuesGridTemplate(columns.length) }}
+      style={{ gridTemplateColumns: tableBuilderValuesGridTemplate(columns.length, includeLevel) }}
     >
-      <Select value={level} onValueChange={(next) => onLevelChange(index, next)}>
-        <SelectTrigger
-          size="sm"
-          aria-label={`Level, row ${index + 1}`}
-          aria-invalid={levelError ? true : undefined}
-        >
-          <SelectValue placeholder="Level" />
-        </SelectTrigger>
-        <SelectContent>
-          {allowedLevels.map((allowedLevel) => (
-            <SelectItem
-              key={allowedLevel}
-              value={String(allowedLevel)}
-              disabled={usedLevels.has(allowedLevel) && allowedLevel !== parsedLevel}
-            >
-              {allowedLevel}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {includeLevel ? (
+        <Select value={level} onValueChange={(next) => onLevelChange(index, next)}>
+          <SelectTrigger
+            size="sm"
+            aria-label={`Level, row ${index + 1}`}
+            aria-invalid={levelError ? true : undefined}
+          >
+            <SelectValue placeholder="Level" />
+          </SelectTrigger>
+          <SelectContent>
+            {allowedLevels.map((allowedLevel) => (
+              <SelectItem
+                key={allowedLevel}
+                value={String(allowedLevel)}
+                disabled={usedLevels.has(allowedLevel) && allowedLevel !== parsedLevel}
+              >
+                {allowedLevel}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : null}
 
       {columns.map((column, columnIndex) => (
         <TableBuilderValueCell

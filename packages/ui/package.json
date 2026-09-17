@@ -78,6 +78,7 @@
     "@rpg/contracts": "workspace:*",
     "@rpg/search": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
+    "@tiptap/core": "^3.26.0",
     "@tiptap/extension-link": "^3.26.0",
     "@tiptap/pm": "^3.26.0",
     "@tiptap/react": "^3.26.0",

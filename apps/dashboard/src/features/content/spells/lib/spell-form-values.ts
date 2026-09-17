@@ -24,7 +24,7 @@ import {
   type SpellTags,
 } from '@rpg/contracts'
 
-import { normalizeRichTextHtml } from '@rpg/ui'
+import { extractTableEmbedIds, normalizeRichTextHtml } from '@rpg/ui'
 
 import {
   finalizeContentInput,
@@ -37,6 +37,7 @@ import { resolutionToForm, resolutionToStored } from '../resolution/lib/form/res
 import { isResolutionFormConfigured } from '../resolution/lib/form/resolution-form-visibility'
 import { isSpellResolutionEditorEligible } from './spell-display'
 import type { ResolutionFormValues } from '../resolution/lib/form/resolution-form-schema'
+import { pruneSpellTablesToDescriptionEmbeds } from './spell-description-tables.lib'
 
 export type SpellFormCastingTime = {
   normal: {
@@ -130,6 +131,7 @@ export function spellScalingProseFromForm(prose: {
 /** Create defaults intentionally omit `resolution` — authors enable via Add resolution. */
 export const spellCreateDefaultValues: Partial<SpellFormValues> = {
   ...SPELL_SCALING_FORM_DEFAULTS,
+  tables: [],
   classIds: [],
   tags: { ...EMPTY_SPELL_TAGS },
   castingTime: {
@@ -583,6 +585,7 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     name: entity.name,
     slug: entity.slug,
     description: entity.description,
+    tables: entity.tables ?? [],
     ...spellScalingTogglesFromStored(entity),
     cantripScaling: entity.cantripScaling,
     higherLevelSlotEffect: entity.higherLevelSlotEffect,
@@ -634,10 +637,19 @@ function spellIdentityWireFields(
 ) {
   const school = spellSchoolForWire(persistedValues.school, validationIntent)
 
+  const description = persistedValues.description || undefined
+  const referencedTableIds = extractTableEmbedIds(description ?? '')
+  const tables = pruneSpellTablesToDescriptionEmbeds(
+    description,
+    persistedValues.tables ?? [],
+    referencedTableIds,
+  )
+
   return {
     slug: slugForInputParse(persistedValues.name, ctx),
     name: persistedValues.name,
-    description: persistedValues.description || undefined,
+    description,
+    ...(tables.length > 0 ? { tables } : {}),
     ...spellScalingProseFromForm(persistedValues),
     ...(school !== undefined ? { school } : {}),
   }

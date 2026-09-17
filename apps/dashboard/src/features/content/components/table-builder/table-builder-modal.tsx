@@ -2,7 +2,7 @@ import { useId, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import type { ProgressionTable } from '@rpg/contracts'
+import type { GeneralTable, ProgressionTable } from '@rpg/contracts'
 import { Button, ConfirmDialog, Modal } from '@rpg/ui'
 
 import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
@@ -25,6 +25,14 @@ import {
   tableToDraft,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
+import {
+  draftToGeneralTable,
+  generalTableToDraft,
+} from '../../lib/table-builder/table-builder-general-draft'
+import type {
+  TableBuilderKind,
+  TableBuilderSavedTable,
+} from '../../lib/table-builder/table-builder-kind'
 import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
 import { TableBuilder } from './table-builder'
 import { tableBuilderModalDeleteButtonClasses } from './table-builder-modal.variants'
@@ -34,33 +42,54 @@ export type TableBuilderModalMode = 'create' | 'edit'
 export type TableBuilderModalProps = {
   open: boolean
   mode: TableBuilderModalMode
+  kind: TableBuilderKind
   /** Existing table when editing; ignored for `create`. */
-  value?: ProgressionTable
-  /** Semantic level set for the structural axis — derived by the consumer. */
-  allowedLevels: readonly number[]
-  /** Receives one schema-valid `ProgressionTable`; the parent owns persistence. */
-  onSave: (table: ProgressionTable) => void
+  value?: TableBuilderSavedTable
+  /** Semantic level set for the structural axis — required for `levelProgression`. */
+  allowedLevels?: readonly number[]
+  /** Receives one schema-valid table; the parent owns persistence. */
+  onSave: (table: TableBuilderSavedTable) => void
   onOpenChange: (open: boolean) => void
   /** When provided in edit mode, surfaces a confirmed destructive delete action. */
   onDelete?: () => void
 }
 
+function tableToDraftValues(
+  kind: TableBuilderKind,
+  value: TableBuilderSavedTable | undefined,
+): TableBuilderFormValues {
+  if (value === undefined) return createEmptyTableBuilderDraft(kind)
+  return kind === 'general'
+    ? generalTableToDraft(value as GeneralTable)
+    : tableToDraft(value as ProgressionTable)
+}
+
+function draftToSavedTable(
+  values: TableBuilderFormValues,
+  existing: TableBuilderSavedTable | undefined,
+): TableBuilderSavedTable {
+  if (values.kind === 'general') {
+    return draftToGeneralTable(values, existing ? { existingTable: existing as GeneralTable } : {})
+  }
+  return draftToTable(values, existing ? { existingTable: existing as ProgressionTable } : {})
+}
+
 /**
  * Focused authoring modal for structured tables. Owns an isolated draft form —
  * parent form state is never registered or mutated while editing; Save returns
- * a single validated `ProgressionTable` and Cancel discards the draft (with an
+ * a single validated table and Cancel discards the draft (with an
  * unsaved-changes guard).
  */
 export function TableBuilderModal(props: TableBuilderModalProps) {
-  // Remount the content per open so each session starts from a fresh draft.
   if (!props.open) return null
   return <TableBuilderModalContent {...props} />
 }
 
 function TableBuilderModalContent({
   mode,
+  kind,
   value,
-  allowedLevels,
+  allowedLevels = [],
   onSave,
   onOpenChange,
   onDelete,
@@ -70,7 +99,7 @@ function TableBuilderModalContent({
 
   const form = useForm<TableBuilderFormValues>({
     resolver: zodResolver(tableBuilderFormSchema),
-    defaultValues: value !== undefined ? tableToDraft(value) : createEmptyTableBuilderDraft(),
+    defaultValues: tableToDraftValues(kind, value),
     mode: 'onSubmit',
   })
 
@@ -81,7 +110,7 @@ function TableBuilderModalContent({
   }
 
   const handleSubmit = form.handleSubmit((values) => {
-    onSave(draftToTable(values, value !== undefined ? { existingTable: value } : {}))
+    onSave(draftToSavedTable(values, value))
     onOpenChange(false)
   })
 
@@ -102,7 +131,7 @@ function TableBuilderModalContent({
           />
           <Modal.Body>
             <form id={formId} onSubmit={handleSubmit} noValidate>
-              <TableBuilder form={form} allowedLevels={allowedLevels} />
+              <TableBuilder form={form} kind={kind} allowedLevels={allowedLevels} />
             </form>
           </Modal.Body>
           <Modal.Footer>

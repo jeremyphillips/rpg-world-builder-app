@@ -402,7 +402,30 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Reincarnate",
-    "description": "<p>You touch a dead Humanoid or a piece of one. If the creature has been dead no longer than 10 days, the spell forms a new body for it and calls the soul to enter that body. Roll 1d10 and consult the table below to determine the body's species, or the GM chooses another playable species.</p><p>[species roll table]</p><p>The reincarnated creature makes any choices that a species' description offers, and the creature recalls its former life. It retains the capabilities it had in its original form, except it loses the traits of its previous species and gains the traits of its new one.</p>",
+    "description": "<p>You touch a dead Humanoid or a piece of one. If the creature has been dead no longer than 10 days, the spell forms a new body for it and calls the soul to enter that body. Roll 1d10 and consult the table below to determine the body's species, or the GM chooses another playable species.</p><div data-rpg-table-id=\"reincarnate-species\"></div><p>The reincarnated creature makes any choices that a species' description offers, and the creature recalls its former life. It retains the capabilities it had in its original form, except it loses the traits of its previous species and gains the traits of its new one.</p>",
+    "tables": [
+      {
+        "id": "reincarnate-species",
+        "name": "Reincarnation",
+        "kind": "general",
+        "columns": [
+          { "id": "roll", "label": "1d10", "valueType": "number" },
+          { "id": "species", "label": "Species", "valueType": "text" }
+        ],
+        "rows": [
+          { "id": "row-1", "cells": { "roll": 1, "species": "Roll again." } },
+          { "id": "row-2", "cells": { "roll": 2, "species": "Dragonborn" } },
+          { "id": "row-3", "cells": { "roll": 3, "species": "Dwarf" } },
+          { "id": "row-4", "cells": { "roll": 4, "species": "Elf" } },
+          { "id": "row-5", "cells": { "roll": 5, "species": "Gnome" } },
+          { "id": "row-6", "cells": { "roll": 6, "species": "Goliath" } },
+          { "id": "row-7", "cells": { "roll": 7, "species": "Halfling" } },
+          { "id": "row-8", "cells": { "roll": 8, "species": "Human" } },
+          { "id": "row-9", "cells": { "roll": 9, "species": "Orc" } },
+          { "id": "row-10", "cells": { "roll": 10, "species": "Tiefling" } }
+        ]
+      }
+    ],
     "school": "necromancy",
     "level": 5,
     "classIds": ["druid"],
@@ -438,10 +461,6 @@
         {
           "code": "transformation-model-missing",
           "note": "Species and form change stay prose"
-        },
-        {
-          "code": "catalog-data-incomplete",
-          "note": "Species roll table placeholder in prose"
         },
         {
           "code": "choice-model-missing",

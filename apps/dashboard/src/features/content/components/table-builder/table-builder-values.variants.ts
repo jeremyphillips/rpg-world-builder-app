@@ -33,6 +33,9 @@ export const TABLE_BUILDER_LEVEL_TRACK = '5.5rem'
 export const TABLE_BUILDER_VALUE_TRACK = 'minmax(7rem, 1fr)'
 export const TABLE_BUILDER_ACTION_TRACK = '2.25rem'
 
-export function tableBuilderValuesGridTemplate(columnCount: number): string {
-  return `${TABLE_BUILDER_LEVEL_TRACK} repeat(${Math.max(columnCount, 1)}, ${TABLE_BUILDER_VALUE_TRACK}) ${TABLE_BUILDER_ACTION_TRACK}`
+export function tableBuilderValuesGridTemplate(columnCount: number, includeLevel = true): string {
+  const valueTracks = `repeat(${Math.max(columnCount, 1)}, ${TABLE_BUILDER_VALUE_TRACK})`
+  return includeLevel
+    ? `${TABLE_BUILDER_LEVEL_TRACK} ${valueTracks} ${TABLE_BUILDER_ACTION_TRACK}`
+    : `${valueTracks} ${TABLE_BUILDER_ACTION_TRACK}`
 }
