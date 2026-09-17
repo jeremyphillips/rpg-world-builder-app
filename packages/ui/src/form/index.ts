@@ -198,6 +198,7 @@ export {
   type TextSuggestionsFieldConfig,
   type NumberFieldConfig,
   type TextareaFieldConfig,
+  type ConfirmBeforeClearConfig,
   type OptionalDisclosureConfig,
   type OptionalDisclosureFieldKind,
   OPTIONAL_DISCLOSURE_FIELD_KINDS,

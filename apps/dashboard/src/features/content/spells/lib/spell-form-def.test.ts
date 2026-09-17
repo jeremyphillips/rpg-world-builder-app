@@ -10,15 +10,21 @@ import {
   isContainer,
   resolveColumnsCollapseSequence,
   resolveFieldConfigPrimaryName,
+  type ArrayConfig,
+  type DependentConfig,
   type FormItem,
   type GroupConfig,
   type RowConfig,
-  type ArrayConfig,
 } from '@rpg/ui/form'
 
 import { makeSpell } from '@/test/fixtures/factories/spell'
 import { RESOLUTION_FORM_FIXTURES } from '../resolution/fixtures'
 import { spellFormDef, spellFormSchema, type SpellFormValues } from './spell-form-def'
+import {
+  SPELL_SCALING_CONFIRM_COPY,
+  SPELL_SCALING_HINTS,
+  SPELL_SECTION_LABELS,
+} from './spell-display'
 import { RESOLUTION_SECTION_LABELS } from '../resolution/lib/form/resolution-form-labels'
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')
@@ -49,6 +55,24 @@ function walkNestedFormItems(fields: FormItem[], visit: (field: FormItem) => voi
       walkNestedFormItems(resolveColumnsCollapseSequence(field.columns, field.collapseOrder), visit)
     }
   }
+}
+
+function findDependentBySwitch(
+  fields: FormItem[],
+  switchName: string,
+): DependentConfig | undefined {
+  let found: DependentConfig | undefined
+  walkNestedFormItems(fields, (field) => {
+    if (
+      !found &&
+      'kind' in field &&
+      field.kind === 'dependent' &&
+      resolveFieldConfigPrimaryName(field.controller) === switchName
+    ) {
+      found = field
+    }
+  })
+  return found
 }
 
 function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined {
@@ -481,13 +505,7 @@ describe('spellFormDef basics tab', () => {
   }
 
   it('uses one top-level container per basics section', () => {
-    expect(basicsFields().map(basicsFieldKey)).toEqual([
-      'school+level',
-      'classIds',
-      'description',
-      'cantripScaling',
-      'higherLevelSlotEffect',
-    ])
+    expect(basicsFields().map(basicsFieldKey)).toEqual(['school+level', 'classIds', undefined])
   })
 
   it('authors School and Level in a 50/50 row', () => {
@@ -503,19 +521,46 @@ describe('spellFormDef basics tab', () => {
     ])
   })
 
-  it('uses level-gated top-level scaling fields', () => {
-    const scalingFields = basicsFields().slice(3)
-    expect(scalingFields).toEqual([
-      expect.objectContaining({
-        type: 'richtext',
-        name: 'cantripScaling',
-        visibility: expect.objectContaining({ dependsOn: ['level'] }),
-      }),
-      expect.objectContaining({
-        type: 'richtext',
-        name: 'higherLevelSlotEffect',
-        visibility: expect.objectContaining({ dependsOn: ['level'] }),
-      }),
+  it('registers scaling prose behind level-gated switches on the basics tab', () => {
+    const fields = basicsFields()
+
+    expect(collectFieldNames(fields)).toEqual(
+      expect.arrayContaining([
+        'description',
+        'hasCantripScaling',
+        'cantripScaling',
+        'hasHigherLevelSlotEffect',
+        'higherLevelSlotEffect',
+      ]),
+    )
+
+    const cantripDependent = findDependentBySwitch(fields, 'hasCantripScaling')
+    const leveledDependent = findDependentBySwitch(fields, 'hasHigherLevelSlotEffect')
+
+    expect(cantripDependent?.visibility?.dependsOn).toContain('level')
+    expect(leveledDependent?.visibility?.dependsOn).toContain('level')
+
+    expect(cantripDependent?.controller).toMatchObject({
+      type: 'switch',
+      label: SPELL_SECTION_LABELS.cantripScaling,
+      hint: SPELL_SCALING_HINTS.cantripScaling,
+    })
+    expect(leveledDependent?.controller).toMatchObject({
+      type: 'switch',
+      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+      hint: SPELL_SCALING_HINTS.higherLevelSlotEffect,
+    })
+
+    expect(cantripDependent?.confirmBeforeClear).toMatchObject(
+      SPELL_SCALING_CONFIRM_COPY.cantripScaling,
+    )
+    expect(leveledDependent?.confirmBeforeClear).toMatchObject(
+      SPELL_SCALING_CONFIRM_COPY.higherLevelSlotEffect,
+    )
+
+    expect(collectFieldNames(cantripDependent?.dependents.fields ?? [])).toEqual(['cantripScaling'])
+    expect(collectFieldNames(leveledDependent?.dependents.fields ?? [])).toEqual([
+      'higherLevelSlotEffect',
     ])
   })
 })

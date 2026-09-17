@@ -24,6 +24,8 @@ import {
   type SpellTags,
 } from '@rpg/contracts'
 
+import { normalizeRichTextHtml } from '@rpg/ui'
+
 import {
   finalizeContentInput,
   slugForInputParse,
@@ -99,8 +101,35 @@ export const EMPTY_SPELL_TAGS: SpellFormTags = {
   conditions: [],
 }
 
+/** Form-only toggle defaults for optional cantrip/upcast scaling prose. */
+export const SPELL_SCALING_FORM_DEFAULTS = {
+  hasCantripScaling: false,
+  hasHigherLevelSlotEffect: false,
+} as const satisfies Pick<SpellFormValues, 'hasCantripScaling' | 'hasHigherLevelSlotEffect'>
+
+export function spellScalingTogglesFromStored(prose: {
+  cantripScaling?: string
+  higherLevelSlotEffect?: string
+}) {
+  return {
+    hasCantripScaling: Boolean(normalizeRichTextHtml(prose.cantripScaling)),
+    hasHigherLevelSlotEffect: Boolean(normalizeRichTextHtml(prose.higherLevelSlotEffect)),
+  }
+}
+
+export function spellScalingProseFromForm(prose: {
+  cantripScaling?: string
+  higherLevelSlotEffect?: string
+}) {
+  return {
+    cantripScaling: normalizeRichTextHtml(prose.cantripScaling) || undefined,
+    higherLevelSlotEffect: normalizeRichTextHtml(prose.higherLevelSlotEffect) || undefined,
+  }
+}
+
 /** Create defaults intentionally omit `resolution` — authors enable via Add resolution. */
 export const spellCreateDefaultValues: Partial<SpellFormValues> = {
+  ...SPELL_SCALING_FORM_DEFAULTS,
   classIds: [],
   tags: { ...EMPTY_SPELL_TAGS },
   castingTime: {
@@ -554,6 +583,7 @@ export function spellToFormValues(entity: Spell): SpellFormValues {
     name: entity.name,
     slug: entity.slug,
     description: entity.description,
+    ...spellScalingTogglesFromStored(entity),
     cantripScaling: entity.cantripScaling,
     higherLevelSlotEffect: entity.higherLevelSlotEffect,
     school: entity.school,
@@ -608,8 +638,7 @@ function spellIdentityWireFields(
     slug: slugForInputParse(persistedValues.name, ctx),
     name: persistedValues.name,
     description: persistedValues.description || undefined,
-    cantripScaling: persistedValues.cantripScaling || undefined,
-    higherLevelSlotEffect: persistedValues.higherLevelSlotEffect || undefined,
+    ...spellScalingProseFromForm(persistedValues),
     ...(school !== undefined ? { school } : {}),
   }
 }

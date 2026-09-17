@@ -107,4 +107,45 @@ describe('FormItems select optionalDisclosure', () => {
 
     expect(screen.getByLabelText('Function override')).toBeInTheDocument()
   })
+
+  it('prompts before removing populated select values when confirmBeforeClear is set', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <SelectDisclosureHarness
+        defaultValues={{ functionOverride: 'care' }}
+        items={[
+          {
+            type: 'select',
+            name: 'functionOverride',
+            label: 'Function override',
+            options: [
+              { value: 'care', label: 'Care' },
+              { value: 'lodging', label: 'Lodging' },
+            ],
+            optionalDisclosure: {
+              addLabel: 'Add function override',
+              removeLabel: 'Remove function override',
+              confirmBeforeClear: {
+                headline: 'Remove function override?',
+                description: 'This will clear the selected override.',
+                confirmLabel: 'Remove',
+              },
+            },
+          },
+        ]}
+      />,
+    )
+
+    await user.click(
+      screen.getByRole('button', { name: 'Remove function override Function override' }),
+    )
+
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+    expect(screen.getByLabelText('Function override')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Remove' }))
+
+    expect(screen.getByRole('button', { name: 'Add function override' })).toBeInTheDocument()
+  })
 })

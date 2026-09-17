@@ -384,12 +384,28 @@ export const OPTIONAL_DISCLOSURE_FIELD_KINDS = [
 ] as const
 export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
 
+/** Prompt before clearing optional dependent or disclosure field content. */
+export type ConfirmBeforeClearConfig = {
+  headline: string
+  description?: string
+  confirmLabel?: string
+  cancelLabel?: string
+  confirmVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'text'
+  /** When omitted, confirm if any cleared leaf field has meaningful content. */
+  shouldConfirm?: (
+    values: Record<string, unknown>,
+    context: { namePrefix?: string; clearingFieldNames: readonly string[] },
+  ) => boolean
+}
+
 /** Collapse empty optional fields behind an add control (textarea and select). */
 export type OptionalDisclosureConfig = {
   addLabel: string
   removeLabel?: string
   /** When true (default), populated values keep the field expanded. */
   expandWhenPopulated?: boolean
+  /** When set, removing populated content prompts before clearing. */
+  confirmBeforeClear?: ConfirmBeforeClearConfig
 }
 
 /** Attached trailing action on a text-like field — operation failure stays outside RHF validation. */
@@ -1105,6 +1121,8 @@ export interface DependentConfig {
   kind: 'dependent'
   controller: FieldConfig
   dependents: DependentDependentsConfig
+  /** When set on a switch controller, turning off prompts before clearing dependents. */
+  confirmBeforeClear?: ConfirmBeforeClearConfig
   visibility?: FieldVisibility
   /** Trailing divider after this dependent section within parent rhythm. */
   separator?: FieldSeparator

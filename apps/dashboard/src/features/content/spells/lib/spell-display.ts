@@ -48,6 +48,22 @@ export const SPELL_SECTION_LABELS = {
   resolution: 'Resolution',
 } as const
 
+export const SPELL_SCALING_HINTS = {
+  cantripScaling: 'Add rules for how this cantrip improves at higher character levels.',
+  higherLevelSlotEffect: 'Add rules for casting this spell with a higher-level slot.',
+} as const
+
+export const SPELL_SCALING_CONFIRM_COPY = {
+  cantripScaling: {
+    headline: 'Remove cantrip upgrade?',
+    description: 'This will remove the cantrip upgrade text you entered.',
+  },
+  higherLevelSlotEffect: {
+    headline: 'Remove higher-level slot effect?',
+    description: 'This will remove the higher-level slot effect text you entered.',
+  },
+} as const
+
 export const SPELL_DETAIL_SECTION_LABELS = {
   tags: 'Tags',
   classes: 'Classes',

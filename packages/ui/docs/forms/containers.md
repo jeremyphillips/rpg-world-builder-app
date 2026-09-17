@@ -262,6 +262,9 @@ controller field gates indented dependents:
   - `arrayItems` — chrome on array item shells only; avoids double borders when dependents include arrays.
   - Mixed dependents: only array item shells receive tone; scalars render without wash.
 - Dependents inherit parent `density` — no `density` knob on `DependentConfig`.
+- Optional `confirmBeforeClear` on `DependentConfig` — when the controller is a **switch**,
+  turning it off prompts before clearing populated dependent values. Absent by default.
+  Select/other controllers are unchanged in this pass.
 
 Pair dependent scalars with `labelPosition: 'settings'`.
 
@@ -280,6 +283,38 @@ Pair dependent scalars with `labelPosition: 'settings'`.
   ],
   // on `kind: 'dependent'` — same keys under `dependents`:
   // dependents: { surface: { emphasis: 'subtle' }, fields: [...] }
+}
+```
+
+Switch controller with confirm-before-clear (optional populated prose):
+
+```ts
+{
+  kind: 'dependent',
+  confirmBeforeClear: {
+    headline: 'Remove cantrip upgrade?',
+    description: 'This will remove the cantrip upgrade text you entered.',
+    confirmLabel: 'Remove',
+  },
+  controller: {
+    type: 'switch',
+    name: 'hasCantripScaling',
+    label: 'Cantrip Upgrade',
+    labelPosition: 'settings',
+    hint: 'Add rules for how this cantrip improves at higher character levels.',
+  },
+  dependents: {
+    inset: false,
+    chrome: 'none',
+    fields: [
+      {
+        type: 'richtext',
+        name: 'cantripScaling',
+        label: 'Cantrip Upgrade',
+        labelVisibility: 'srOnly',
+      },
+    ],
+  },
 }
 ```
 

@@ -134,10 +134,18 @@ with a **Remove** action that clears the value and collapses back to the add con
     addLabel: 'Add additional behavior',
     removeLabel: 'Remove',
     expandWhenPopulated: true,
+    confirmBeforeClear: {
+      headline: 'Remove additional behavior?',
+      description: 'This will clear the note you entered.',
+      confirmLabel: 'Remove',
+    },
   },
 }
 ```
 
+- **`confirmBeforeClear`** (optional) — when removing populated content via the disclosure
+  **Remove** action, prompts before clearing. Same config shape as
+  `DependentConfig.confirmBeforeClear`. Absent by default.
 - **Incompatible with `required: true`** — optional disclosure is for schema-optional
   fields only; dev builds log when both are set.
 - **Collapsed fields unmount** — empty values take no vertical space; populated values stay

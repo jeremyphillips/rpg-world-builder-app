@@ -590,3 +590,104 @@ describe('dependent field', () => {
     expect(queryDependentsRegion(container)).toBeNull()
   })
 })
+
+describe('dependent confirmBeforeClear', () => {
+  const confirmSchema = z.object({
+    featureEnabled: z.boolean(),
+    featureNote: z.string().optional(),
+  })
+
+  const confirmFields: FormItem[] = [
+    {
+      kind: 'dependent',
+      confirmBeforeClear: {
+        headline: 'Remove feature note?',
+        description: 'This will remove the note you entered.',
+        confirmLabel: 'Remove',
+      },
+      controller: {
+        type: 'switch',
+        name: 'featureEnabled',
+        label: 'Enable feature',
+        defaultValue: true,
+      },
+      dependents: {
+        inset: false,
+        chrome: 'none',
+        fields: [
+          {
+            type: 'text',
+            name: 'featureNote',
+            label: 'Feature note',
+            labelVisibility: 'srOnly',
+          },
+        ],
+      },
+    },
+  ]
+
+  it('clears immediately when dependent content is empty', async () => {
+    const user = userEvent.setup()
+    render(
+      <Form<z.infer<typeof confirmSchema>>
+        schema={confirmSchema}
+        fields={confirmFields}
+        defaultValues={{ featureEnabled: true, featureNote: '' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('switch', { name: 'Enable feature' })).not.toBeChecked()
+      expect(screen.queryByLabelText('Feature note')).not.toBeInTheDocument()
+    })
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('prompts before clearing populated dependent content', async () => {
+    const user = userEvent.setup()
+    render(
+      <Form<z.infer<typeof confirmSchema>>
+        schema={confirmSchema}
+        fields={confirmFields}
+        defaultValues={{ featureEnabled: true, featureNote: 'Keep me' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      expect(screen.getByRole('switch', { name: 'Enable feature' })).toBeChecked()
+      expect(screen.getByLabelText('Feature note')).toHaveValue('Keep me')
+    })
+  })
+
+  it('clears dependent content after confirm', async () => {
+    const user = userEvent.setup()
+    render(
+      <Form<z.infer<typeof confirmSchema>>
+        schema={confirmSchema}
+        fields={confirmFields}
+        defaultValues={{ featureEnabled: true, featureNote: 'Remove me' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+    await user.click(screen.getByRole('button', { name: 'Remove' }))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      expect(screen.getByRole('switch', { name: 'Enable feature' })).not.toBeChecked()
+      expect(screen.queryByLabelText('Feature note')).not.toBeInTheDocument()
+    })
+  })
+})
