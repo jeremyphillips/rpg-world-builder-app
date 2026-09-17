@@ -39,6 +39,21 @@ describe('assertRowFieldConfig', () => {
     expect(warn).not.toHaveBeenCalled()
   })
 
+  it('does not warn for chips fields in rows', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const item: RowConfig = {
+      kind: 'row',
+      fields: [
+        { type: 'select', name: 'school', label: 'School', options: [] },
+        { type: 'chips', name: 'level', label: 'Level', options: [], multiple: false },
+      ],
+    }
+
+    assertRowFieldConfig(item)
+
+    expect(warn).not.toHaveBeenCalled()
+  })
+
   it('warns for unsupported field types in rows', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const item: RowConfig = {

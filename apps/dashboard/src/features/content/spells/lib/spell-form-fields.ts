@@ -120,13 +120,6 @@ function visibleWhenLeveledSpell(): FieldVisibility {
   }
 }
 
-function visibleWhenSpellLevelSelected(): FieldVisibility {
-  return {
-    dependsOn: ['level'],
-    visibleWhen: (v) => spellFormLevelValue(v.level) !== undefined,
-  }
-}
-
 function visibleWhenAreaShape(shapes: (typeof AREA_GEOMETRY_SHAPES)[number][]): FieldVisibility {
   return {
     dependsOn: ['areaOfEffect.shape'],
@@ -280,63 +273,52 @@ function basicsFields(ctx: ContentFormCtx): FormItem[] {
     contentTypeOptions: ctx.options?.richTextContentTypeOptions,
   }
 
-  const schoolField: FormItem = {
-    type: 'select',
-    name: 'school',
-    label: 'School',
-    options: schoolOptions,
-    required: true,
-  }
-
-  const levelField: FormItem = {
-    kind: 'dependent',
-    controller: {
-      type: 'chips',
-      name: 'level',
-      label: 'Level',
-      options: spellLevelOptions,
-      multiple: false,
-      required: true,
-    },
-    dependents: {
-      visibility: visibleWhenSpellLevelSelected(),
-      fields: [
-        {
-          type: 'richtext',
-          name: 'cantripScaling',
-          label: SPELL_SECTION_LABELS.cantripScaling,
-          ...richTextLinks,
-          visibility: visibleWhenCantripLevel(),
-        },
-        {
-          type: 'richtext',
-          name: 'higherLevelSlotEffect',
-          label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
-          ...richTextLinks,
-          visibility: visibleWhenLeveledSpell(),
-        },
-      ],
-    },
-  }
-
-  const classesField: FormItem = {
-    type: 'combobox',
-    name: 'classIds',
-    label: getContentTypeCollectionLabel('classes'),
-    multiple: true,
-    options: referenceSpellcastingClassFieldOptions(ctx.options?.classes),
-    placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
-    required: true,
-  }
-
   return [
     {
-      kind: 'columns',
-      collapseOrder: 'interleave',
-      columns: [
-        { fields: [schoolField, classesField, descriptionField(ctx)] },
-        { fields: [levelField] },
+      kind: 'row',
+      fields: [
+        {
+          type: 'select',
+          name: 'school',
+          label: 'School',
+          options: schoolOptions,
+          required: true,
+          width: '1/2',
+        },
+        {
+          type: 'chips',
+          name: 'level',
+          label: 'Level',
+          options: spellLevelOptions,
+          multiple: false,
+          required: true,
+          width: '1/2',
+        },
       ],
+    },
+    {
+      type: 'combobox',
+      name: 'classIds',
+      label: getContentTypeCollectionLabel('classes'),
+      multiple: true,
+      options: referenceSpellcastingClassFieldOptions(ctx.options?.classes),
+      placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
+      required: true,
+    },
+    descriptionField(ctx),
+    {
+      type: 'richtext',
+      name: 'cantripScaling',
+      label: SPELL_SECTION_LABELS.cantripScaling,
+      ...richTextLinks,
+      visibility: visibleWhenCantripLevel(),
+    },
+    {
+      type: 'richtext',
+      name: 'higherLevelSlotEffect',
+      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+      ...richTextLinks,
+      visibility: visibleWhenLeveledSpell(),
     },
   ]
 }

@@ -190,6 +190,68 @@ describe('Form', () => {
     expect(row?.textContent).toContain('ft.')
   })
 
+  it('aligns select and chips siblings in schema rows on shared anatomy tracks', () => {
+    const rowSchema = z.object({
+      school: z.string(),
+      level: z.string(),
+    })
+    const rowFields: FormItem[] = [
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'school',
+            label: 'School',
+            options: [
+              { value: 'evocation', label: 'Evocation' },
+              { value: 'abjuration', label: 'Abjuration' },
+            ],
+            width: '1/2',
+          },
+          {
+            type: 'chips',
+            name: 'level',
+            label: 'Level',
+            options: [
+              { value: '0', label: 'Cantrip' },
+              { value: '1', label: '1st' },
+            ],
+            multiple: false,
+            width: '1/2',
+          },
+        ],
+      },
+    ]
+    const { container } = render(
+      <Form
+        schema={rowSchema}
+        fields={rowFields}
+        defaultValues={{ school: 'evocation', level: '0' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const row = container.querySelector('[data-field-row]')
+    expect(row).toBeTruthy()
+    expect(row?.querySelector('fieldset')).toBeNull()
+    expect(row?.querySelectorAll('[data-field-row-participant]')).toHaveLength(2)
+    expect(row?.querySelectorAll('[data-field-label-region]')).toHaveLength(2)
+    expect(row?.textContent).toContain('School')
+    expect(row?.textContent).toContain('Level')
+
+    function controlTopForLabel(label: string): number | null {
+      const labelNode = screen.getByText(label)
+      const control = labelNode
+        .closest('[data-field-row-participant]')
+        ?.querySelector('[data-field-control-region]')
+      if (!control) return null
+      return Math.round(control.getBoundingClientRect().top)
+    }
+
+    expect(controlTopForLabel('School')).toBe(controlTopForLabel('Level'))
+  })
+
   it('renders schema rows as anatomy-grid rows', () => {
     const rowSchema = z.object({
       first: z.string(),

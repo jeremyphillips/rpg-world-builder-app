@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 
+import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { ChipsField } from './chips-field.client'
 
 const playStyleOptions = [
@@ -430,6 +431,28 @@ describe('ChipsField', () => {
     expect(error).toHaveTextContent('Select an alignment.')
     expect(fieldset?.contains(error)).toBe(false)
     expect(shell?.contains(error)).toBe(true)
+  })
+
+  it('participates in anatomy rows with three-region layout and no fieldset', () => {
+    const { container } = render(
+      <FieldRowAnatomyProvider>
+        <ChipsField
+          id="level"
+          label="Level"
+          options={difficultyOptions}
+          multiple={false}
+          hint="Cantrips use level 0."
+        />
+      </FieldRowAnatomyProvider>,
+    )
+
+    expect(container.querySelector('[data-field-row-participant]')).toBeTruthy()
+    expect(container.querySelector('fieldset')).toBeNull()
+    expect(container.querySelector('[data-field-label-region]')).toHaveTextContent('Level')
+    expect(container.querySelector('[role="radiogroup"]')).toBeTruthy()
+    expect(
+      screen.getByText('Cantrips use level 0.').closest('[data-field-message-region]'),
+    ).toBeTruthy()
   })
 
   it('has no accessibility violations when required and in error state', async () => {

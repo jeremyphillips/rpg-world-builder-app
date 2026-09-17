@@ -154,10 +154,20 @@ apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 
 ## Rows
 
-Side-by-side leaf fields and slots in a wrapping flex row. Row-level `visibility`, `separator`,
-and `className`. A top-level row is **one** field container — unlike `columns`, siblings share
-the box. Slots accept the same `width` tokens as leaf fields (`full`, fractions, `auto`, …).
-Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
+Side-by-side leaf fields and slots in a shared **anatomy-grid** row (CSS subgrid with three
+tracks: label / control / message). Row-level `visibility`, `separator`, and `className`. A
+top-level row is **one** field container — unlike `columns`, siblings share the box. Slots
+accept the same `width` tokens as leaf fields (`full`, fractions, `auto`, …).
+
+Participating field types emit `Field.Root` three-region anatomy (`select`, `text`, `chips`,
+`inlineSentence`, inline toggles, …). Fieldset-path renderers (`chips` outside rows) switch to
+anatomy participation inside rows so mixed siblings align on shared tracks — e.g. stacked
+`select` beside single-select `chips`. Hints in rows normalize to `below-control` (message
+track). `RowConfig.align` applies only to legacy flex `FieldRow` (`layout="flow"`), not
+anatomy-grid schema rows.
+
+Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md). Regression stories:
+`Internal/Forms/Layout/AnatomyRowToggleMatrix` (select + checkbox, select + chips).
 
 ## Columns
 

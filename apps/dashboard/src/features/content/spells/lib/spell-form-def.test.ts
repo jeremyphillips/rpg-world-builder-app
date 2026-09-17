@@ -467,57 +467,54 @@ describe('spellFormDef create vs update modes', () => {
 })
 
 describe('spellFormDef basics tab', () => {
-  function basicsColumns() {
+  function basicsFields() {
     const basics = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'basics')
-    const [columns] = basics?.fields ?? []
-    if (!columns || !isContainer(columns) || columns.kind !== 'columns') {
-      throw new Error('Expected spell Basics columns layout')
-    }
-    return columns
+    return basics?.fields ?? []
   }
 
   function basicsFieldKey(field: FormItem): string | undefined {
     if (!('kind' in field)) return resolveFieldConfigPrimaryName(field)
-    if (isContainer(field) && field.kind === 'dependent') {
-      return resolveFieldConfigPrimaryName(field.controller)
+    if (isContainer(field) && field.kind === 'row') {
+      return field.fields.map(basicsFieldKey).join('+')
     }
     return undefined
   }
 
-  it('authors School, Classes, and Description on the left and Level on the right', () => {
-    const columns = basicsColumns()
-    expect(columns.collapseOrder).toBe('interleave')
-
-    const [left, right] = columns.columns
-    expect(left?.fields.map(basicsFieldKey)).toEqual(['school', 'classIds', 'description'])
-    expect(right?.fields.map(basicsFieldKey)).toEqual(['level'])
+  it('uses one top-level container per basics section', () => {
+    expect(basicsFields().map(basicsFieldKey)).toEqual([
+      'school+level',
+      'classIds',
+      'description',
+      'cantripScaling',
+      'higherLevelSlotEffect',
+    ])
   })
 
-  it('stacks School, Level, Classes, then Description', () => {
-    const columns = basicsColumns()
-    expect(
-      resolveColumnsCollapseSequence(columns.columns, columns.collapseOrder).map(basicsFieldKey),
-    ).toEqual(['school', 'level', 'classIds', 'description'])
-  })
-
-  it('uses a single-select level chip with nested scaling dependents', () => {
-    const levelDependent = basicsColumns().columns[1]?.fields[0]
-    if (!levelDependent || !isContainer(levelDependent) || levelDependent.kind !== 'dependent') {
-      throw new Error('Expected Level dependent')
+  it('authors School and Level in a 50/50 row', () => {
+    const [schoolLevelRow] = basicsFields()
+    if (!schoolLevelRow || !isContainer(schoolLevelRow) || schoolLevelRow.kind !== 'row') {
+      throw new Error('Expected School + Level row')
     }
 
-    expect(levelDependent.controller).toMatchObject({
-      type: 'chips',
-      name: 'level',
-      label: 'Level',
-      multiple: false,
-    })
-    expect(levelDependent.controller).not.toHaveProperty('defaultValue')
-    expect(levelDependent.dependents.visibility).toEqual(
-      expect.objectContaining({ dependsOn: ['level'] }),
-    )
-    expect(
-      levelDependent.dependents.fields.map((field) => ('name' in field ? field.name : undefined)),
-    ).toEqual(['cantripScaling', 'higherLevelSlotEffect'])
+    expect(schoolLevelRow.fields).toEqual([
+      expect.objectContaining({ type: 'select', name: 'school', width: '1/2' }),
+      expect.objectContaining({ type: 'chips', name: 'level', width: '1/2', multiple: false }),
+    ])
+  })
+
+  it('uses level-gated top-level scaling fields', () => {
+    const scalingFields = basicsFields().slice(3)
+    expect(scalingFields).toEqual([
+      expect.objectContaining({
+        type: 'richtext',
+        name: 'cantripScaling',
+        visibility: expect.objectContaining({ dependsOn: ['level'] }),
+      }),
+      expect.objectContaining({
+        type: 'richtext',
+        name: 'higherLevelSlotEffect',
+        visibility: expect.objectContaining({ dependsOn: ['level'] }),
+      }),
+    ])
   })
 })
