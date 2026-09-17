@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { boundedScrollRegionClasses } from './bounded-scroll-region.variants'
+import { boundedScrollRegionEndInsetClasses } from './bounded-scroll-region.variants'
 import {
   dialogContentFocusShellClasses,
   dialogPanelActionRowClasses,
@@ -8,12 +8,19 @@ import {
   dialogPanelFooterClasses,
   dialogPanelHeaderClasses,
   dialogPanelHeaderPaddingClasses,
+  dialogPanelInnerLeadingScrollViewportClasses,
+  dialogPanelInnerScrollViewportClasses,
+  dialogPanelManagedBodyVariants,
+  dialogPanelSectionScrollViewportClasses,
   dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
   dialogPanelStableBodyVariants,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionClasses,
+  dialogPanelScrollRegionFocusClearanceClasses,
+  dialogPanelScrollRegionTopInsetClasses,
+  dialogPanelScrollRegionViewportClasses,
 } from './dialog-panel.variants'
 import { sheetBodyVariants, sheetFooterDockClasses } from './sheet.variants'
 
@@ -35,31 +42,77 @@ describe('dialog-panel variants', () => {
     )
   })
 
-  it('composes body from section padding (not a parallel p-6 string)', () => {
+  it('composes default body as a clip shell without self overflow', () => {
     const bodyClasses = dialogPanelBodyVariants()
-    expect(bodyClasses).toContain(dialogPanelSectionPaddingClasses)
-    expect(bodyClasses).toContain('overflow-y-auto')
-    expect(bodyClasses).toContain('pt-0')
-    expect(bodyClasses).not.toContain('flex-1')
+    expect(bodyClasses).toContain('overflow-hidden')
+    expect(bodyClasses).toContain('flex-1')
+    expect(bodyClasses).not.toContain('overflow-y-auto')
+    expect(bodyClasses).not.toContain('p-6')
   })
 
-  it('uses horizontal inset only on stable body without bottom padding', () => {
+  it('restores section horizontal inset on stable body shell', () => {
     const stableBodyClasses = dialogPanelStableBodyVariants()
-    expect(stableBodyClasses).toContain(dialogPanelSectionInsetXClasses)
     expect(stableBodyClasses).toContain('pb-0')
     expect(stableBodyClasses).toContain('overflow-hidden')
     expect(stableBodyClasses).toContain('flex-1')
-    expect(stableBodyClasses).not.toContain(dialogPanelSectionPaddingClasses)
+    expect(stableBodyClasses).toContain(dialogPanelSectionInsetXClasses)
     expect(stableBodyClasses).not.toContain('overflow-y-auto')
   })
 
-  it('applies bottom inset on inner scroll regions above docked footers', () => {
-    expect(dialogPanelScrollRegionClasses).toContain(boundedScrollRegionClasses)
+  it('uses managed body clip shell with p-0', () => {
+    const managedBodyClasses = dialogPanelManagedBodyVariants()
+    expect(managedBodyClasses).toContain('p-0')
+    expect(managedBodyClasses).toContain('overflow-hidden')
+    expect(managedBodyClasses).not.toContain('overflow-y-auto')
+  })
+
+  it('keeps section scrollport free of inner scroll chrome', () => {
+    expect(dialogPanelSectionScrollViewportClasses).toContain(dialogPanelSectionInsetXClasses)
+    expect(dialogPanelSectionScrollViewportClasses).toContain(
+      dialogPanelScrollRegionTopInsetClasses,
+    )
+    expect(dialogPanelSectionScrollViewportClasses).toContain(
+      dialogPanelScrollRegionBottomInsetClasses,
+    )
+    expect(dialogPanelSectionScrollViewportClasses).toContain('overflow-y-auto')
+    expect(dialogPanelSectionScrollViewportClasses).not.toContain('p-6')
+    expect(dialogPanelSectionScrollViewportClasses).toContain('pe-6')
+    expect(dialogPanelSectionScrollViewportClasses).not.toContain('ps-1')
+    expect(dialogPanelSectionScrollViewportClasses).not.toContain('pe-2.5')
+  })
+
+  it('keeps inner scrollport free of section horizontal inset and top inset', () => {
+    expect(dialogPanelInnerScrollViewportClasses).toContain(
+      dialogPanelScrollRegionBottomInsetClasses,
+    )
+    expect(dialogPanelInnerScrollViewportClasses).toContain(
+      dialogPanelScrollRegionFocusClearanceClasses,
+    )
+    expect(dialogPanelInnerScrollViewportClasses).toContain(boundedScrollRegionEndInsetClasses)
+    expect(dialogPanelInnerScrollViewportClasses).toContain('overflow-y-auto')
+    expect(dialogPanelInnerScrollViewportClasses).not.toContain(dialogPanelSectionInsetXClasses)
+    expect(dialogPanelInnerScrollViewportClasses).not.toContain('px-6')
+    expect(dialogPanelInnerScrollViewportClasses).not.toContain('pt-5')
+  })
+
+  it('adds top inset to leading inner scrollport below the header border', () => {
+    expect(dialogPanelInnerLeadingScrollViewportClasses).toContain(
+      dialogPanelInnerScrollViewportClasses,
+    )
+    expect(dialogPanelInnerLeadingScrollViewportClasses).toContain(
+      dialogPanelScrollRegionTopInsetClasses,
+    )
+  })
+
+  it('aliases deprecated viewport token to section preset', () => {
+    expect(dialogPanelScrollRegionViewportClasses).toBe(dialogPanelSectionScrollViewportClasses)
+  })
+
+  it('applies inner preset on deprecated inner scroll region alias', () => {
     expect(dialogPanelScrollRegionClasses).toContain('min-h-0')
     expect(dialogPanelScrollRegionClasses).toContain('flex-1')
-    expect(dialogPanelScrollRegionClasses).toContain(dialogPanelScrollRegionBottomInsetClasses)
-    expect(dialogPanelScrollRegionClasses).toContain('ps-1')
-    expect(dialogPanelScrollRegionClasses).toContain('pe-2.5')
+    expect(dialogPanelScrollRegionClasses).toContain(dialogPanelInnerScrollViewportClasses)
+    expect(dialogPanelScrollRegionClasses).not.toContain(dialogPanelSectionInsetXClasses)
     expect(dialogPanelScrollRegionBottomInsetClasses).toBe('pb-6')
   })
 
@@ -68,10 +121,10 @@ describe('dialog-panel variants', () => {
     expect(dialogContentFocusShellClasses).toContain('focus-visible:outline-none')
   })
 
-  it('shares body padding with Sheet adding flex-1', () => {
+  it('keeps sheet body variants aligned with dialog clip shell', () => {
+    expect(sheetBodyVariants()).toContain('overflow-hidden')
     expect(sheetBodyVariants()).toContain('flex-1')
-    expect(sheetBodyVariants()).toContain(dialogPanelSectionPaddingClasses)
-    expect(sheetBodyVariants()).toContain('overflow-y-auto')
+    expect(sheetBodyVariants()).not.toContain('overflow-y-auto')
   })
 })
 

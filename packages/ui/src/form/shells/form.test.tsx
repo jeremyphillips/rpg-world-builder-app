@@ -8,8 +8,6 @@ import { Form } from './form.client'
 import { FormShellFooterScope, FormShellFooterSlot } from '../chrome/form-shell-footer.context'
 import type { FormItem } from '../field-config'
 import { submitAndExpectPayload } from '../test-utils'
-import { dialogPanelSectionInsetXClasses } from '../../components/ui/dialog-panel.variants'
-import { cn } from '../../lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -341,7 +339,6 @@ describe('Form', () => {
           fields={[{ type: 'text', name: 'name', label: 'Name' }]}
           onSubmit={vi.fn()}
           externalFooter
-          contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
           footer={<button type="submit">Save</button>}
         />
         <div data-testid="overlay-footer">
@@ -354,13 +351,13 @@ describe('Form', () => {
     expect(form).toHaveClass('flex')
     expect(form).toHaveClass('flex-1')
 
-    const scrollRegion = form?.firstElementChild
-    expect(scrollRegion).toHaveClass('overflow-y-auto')
-    expect(scrollRegion).toHaveClass('flex-1')
-    expect(scrollRegion).toHaveClass('px-6')
-    expect(scrollRegion).not.toHaveClass('gap-6')
+    const scrollViewport = form?.querySelector('.overflow-y-auto')
+    expect(scrollViewport).toHaveClass('overflow-y-auto')
+    expect(scrollViewport).toHaveClass('px-6')
+    expect(scrollViewport).toHaveClass('pt-5')
+    expect(scrollViewport).not.toHaveClass('gap-6')
 
-    const rhythmStack = scrollRegion?.firstElementChild
+    const rhythmStack = scrollViewport?.firstElementChild
     expect(rhythmStack).toHaveClass('gap-6')
     expect(rhythmStack).not.toHaveClass('flex-1')
     expect(rhythmStack).not.toHaveClass('overflow-y-auto')

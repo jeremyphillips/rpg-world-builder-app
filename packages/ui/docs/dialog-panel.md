@@ -20,17 +20,21 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 
 ## Shared tokens (`dialog-panel.variants.ts`)
 
-| Token                                      | Role                                                                                                                      |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `dialogPanelSectionPaddingClasses`         | Canonical `p-6` section inset                                                                                             |
-| `dialogPanelSectionInsetXClasses`          | Horizontal slice (`px-6`) for managed Form content                                                                        |
-| `dialogPanelBodyVariants`                  | Scrollable body (`overflow-y-auto` + section padding with `pt-0`)                                                         |
-| `dialogPanelStableBodyVariants`            | Stable shell (`px-6`, `pb-0`) — child owns scroll                                                                         |
-| `dialogPanelScrollRegionClasses`           | Inner scroll region above docked footer (`overflow-y-auto` + `pb-6`)                                                      |
-| `dialogPanelSectionSeparatorBorderClasses` | Shared faint separator color for header/footer section borders (`border-border-faint`)                                    |
-| `dialogPanelHeaderClasses`                 | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)  |
-| `dialogPanelFooterClasses`                 | Overlay footer section chrome (`border-t` + separator token + `px-6` + `py-4`; no fill)                                   |
-| `dialogPanelActionRowClasses`              | Action row flex helper — prefer `Modal.FooterActions` under Modal.Footer; `DialogPanelActionRow` for Sheet / form publish |
+| Token                                          | Role                                                                                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `dialogPanelSectionPaddingClasses`             | Canonical `p-6` section inset                                                                                             |
+| `dialogPanelSectionInsetXClasses`              | Horizontal slice (`px-6`) for managed Form content                                                                        |
+| `dialogPanelBodyVariants`                      | Clip shell — inner `DialogPanelScrollRegion` owns scroll                                                                  |
+| `dialogPanelStableBodyVariants`                | Stable shell (`px-6`, clip) — child uses `inset="inner"` or `inset="innerLeading"`                                        |
+| `dialogPanelStableBodyClipVariants`            | Stable clip shell without `px-6` — section inset on child scrollports or pinned chrome wrappers (`CreateModalShell`)      |
+| `dialogPanelSectionScrollViewportClasses`      | Section scrollport preset (`px-6` + `pt-5` + `pb-6`) — default Body / `externalFooter`                                    |
+| `dialogPanelInnerScrollViewportClasses`        | Inner scrollport preset (`ps-1` + `pe-2.5` + `pb-6`) — below pinned chrome in section-inset shell                         |
+| `dialogPanelInnerLeadingScrollViewportClasses` | Leading inner preset — inner scroll chrome + `pt-5` as first content below header border                                  |
+| `dialogPanelScrollRegionClasses`               | Deprecated alias for inner scroll region layout + inner preset                                                            |
+| `dialogPanelSectionSeparatorBorderClasses`     | Shared faint separator color for header/footer section borders (`border-border-faint`)                                    |
+| `dialogPanelHeaderClasses`                     | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)  |
+| `dialogPanelFooterClasses`                     | Overlay footer section chrome (`border-t` + separator token + `px-6` + `py-4`; no fill)                                   |
+| `dialogPanelActionRowClasses`                  | Action row flex helper — prefer `Modal.FooterActions` under Modal.Footer; `DialogPanelActionRow` for Sheet / form publish |
 
 **Do not** extract header padding into dialog-panel — `DialogPanelHeader` already owns it.
 **Do not** add Form-specific horizontal padding SSOTs; managed Form inset derives from
@@ -137,20 +141,40 @@ Sheet exposes `surface: 'card' | 'background'` (default `card`). App drawers
 
 ## Body scroll ownership
 
+Default `Modal.Body` / `Sheet.Body` auto-wire [`DialogPanelScrollRegion`](../src/components/ui/dialog-panel-scroll-region.client.tsx) with `inset="section"`: a clip shell plus a single scroll viewport with boundary shadows and explicit `px-6` / `pt-5` / `pb-6` inset (never `p-6` + `pt-5` override; never `px-6` + `ps-1` / `pe-2.5` on the same node).
+
+**Body public contract (default scroll mode):** consumer `className`, `ref`, `style`, `id`, `data-*`, `aria-*`, events, and test ids land on the **scroll viewport** — not the clip shell or fade overlays. `stableBody` / `Sheet managed` keep a single clip `div` with all attributes on it.
+
+### Two-layer inset invariant
+
+Section horizontal inset (`px-6`) has **exactly one owner** per scroll column. Scroll chrome (`ps-1`, `pe-2.5`) lives on **inner** scrollports only.
+
+| Pattern                                 | Shell                 | `DialogPanelScrollRegion`                                                          | Fade width                         |
+| --------------------------------------- | --------------------- | ---------------------------------------------------------------------------------- | ---------------------------------- |
+| **A — default Body / `externalFooter`** | Clip only (no `px-6`) | `inset="section"` — viewport owns `px-6`                                           | Panel content width                |
+| **B — `stableBody` + pinned chrome**    | `px-6` on shell       | `inset="inner"` — viewport owns scroll chrome only                                 | Inset column (acceptable tradeoff) |
+| **C — `stableBody` leading scroll**     | `px-6` on shell       | `inset="innerLeading"` — scroll chrome + `pt-5`                                    | Inset column (acceptable tradeoff) |
+| **D — `stableBodyClip` mixed scroll**   | Clip only (no `px-6`) | `inset="section"` on setup / `externalFooter`; `inset="inner"` below pinned chrome | Panel content width                |
+
+**Pattern A (canonical `externalFooter`):** managed/unpadded `Sheet.Body` + `<DialogPanelScrollRegion inset="section">`. Never pass `px-6` via Form `contentClassName` — layout / vertical overrides only (`pt-0`, `space-y-*`).
+
+**Pattern B:** `Modal.Body stableBody` shell owns `px-6`; inner region uses `inset="inner"` when pinned chrome sits above the scroller (CreateModalShell tab panels). Pinned siblings inherit shell inset — do not duplicate `px-6` on wrappers.
+
+**Pattern C:** `stableBody` shell owns `px-6`; use `inset="innerLeading"` when the scroller is the first content below the header border (table builder).
+
+**Pattern D:** `Modal.Body stableBody stableBodyClip` — clip shell without horizontal inset. Pinned chrome (summary card, tabs list) wraps with `dialogPanelSectionInsetXClasses`; child scrollports use `inset="section"` (setup, default scroll) or `inset="inner"` (tab panels below tabs). Prevents double `px-6` when managed Form `externalFooter` also uses section inset (`CreateModalShell`).
+
+**Header-adjacent chrome** (`CatalogPickerSheet` `headerBelowDescription`, etc.) lives outside `Sheet.Body` — apply `dialogPanelScrollRegionTopInsetClasses` on that wrapper; it does not inherit Body viewport inset.
+
+`viewportClassName` may adjust layout and vertical inset, but must not supply horizontal padding or scroll-chrome classes owned by the selected `inset` preset.
+
 DrawerShell `bodyMode`:
 
-- `scrolling` (default) — `Sheet.Body` scrolls with dialog-panel body padding
-- `managed` — body becomes `p-0 overflow-hidden`; child owns scroll inside the body
+- `scrolling` (default) — `Sheet.Body` auto scrollport (Pattern A)
+- `managed` — `Sheet.Body managed` clip shell; caller supplies `DialogPanelScrollRegion inset="section"` (Form `externalFooter`)
 - `composed` — no auto `Sheet.Body`; Form/feature supplies Body + Footer via wrappers
 
-Modal `stableBody` + docked `Modal.Footer` (independent of `stableSize`):
-
-- Shell: `dialogPanelStableBodyVariants` (`px-6`, `pb-0`, `overflow-hidden`)
-- Inner scroll: `dialogPanelScrollRegionClasses` (`overflow-y-auto` + `pb-6` + `px-1` focus clearance)
-- Form flows alias the same token as `formSheetScrollRegionClasses`
-
-Default scrolling body (`dialogPanelBodyVariants`) keeps end inset via `p-6`; only the
-stable/inner-scroll split moves bottom padding onto the scroll region.
+**Overlay-only:** do not use `DialogPanelScrollRegion` for page `FormStickyScrollBody`, PreviewRail, or nested `max-h-*` lists. Page forms keep `pt-8` via `FormScrollBodyTopInset`.
 
 This is scroll ownership, not a second spacing axis. Modal does not need `bodyMode`
 today (no form-in-modal sticky sheet pattern).

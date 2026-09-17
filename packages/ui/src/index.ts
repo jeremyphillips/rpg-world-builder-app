@@ -723,9 +723,16 @@ export {
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
+  dialogPanelManagedBodyVariants,
   dialogPanelStableBodyVariants,
+  dialogPanelStableBodyClipVariants,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionClasses,
+  dialogPanelScrollRegionTopInsetClasses,
+  dialogPanelScrollRegionViewportClasses,
+  dialogPanelSectionScrollViewportClasses,
+  dialogPanelInnerScrollViewportClasses,
+  dialogPanelInnerLeadingScrollViewportClasses,
   dialogContentFocusShellClasses,
   dialogPanelFooterClasses,
   dialogPanelHeaderClasses,
@@ -734,6 +741,15 @@ export {
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
 } from './components/ui/dialog-panel.variants'
+export {
+  DialogPanelScrollRegion,
+  type DialogPanelScrollRegionProps,
+} from './components/ui/dialog-panel-scroll-region.client'
+export {
+  DialogPanelBody,
+  type DialogPanelBodyMode,
+  type DialogPanelBodyProps,
+} from './components/ui/dialog-panel-body.client'
 export {
   DialogPanelActionRow,
   type DialogPanelActionRowProps,

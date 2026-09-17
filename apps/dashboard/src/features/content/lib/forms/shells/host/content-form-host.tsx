@@ -43,6 +43,7 @@ export type ContentFormHostProps<TFormValues extends FieldValues> = {
   chrome: ContentFormHostChrome
   /** Optional class hooks matching drawer defaults when omitted. */
   formClassName?: string
+  /** Scroll viewport layout / vertical overrides when `externalFooter` — never pass horizontal inset (`px-6`). */
   contentClassName?: string
   /** Overrides create-flow density when inside {@link CreateModalShell}. */
   density?: FormDensity

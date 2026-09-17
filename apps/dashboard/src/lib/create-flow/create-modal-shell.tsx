@@ -4,6 +4,8 @@ import { AlertTriangle } from 'lucide-react'
 
 import {
   Badge,
+  cn,
+  DialogPanelScrollRegion,
   Modal,
   SelectionSummaryCard,
   Tabs,
@@ -11,6 +13,7 @@ import {
   TabsList,
   TabsTrigger,
   ValidationIssueCountBadge,
+  dialogPanelSectionInsetXClasses,
   type ModalContentProps,
 } from '@rpg/ui'
 
@@ -27,6 +30,7 @@ import {
   createModalShellContentVariants,
   createModalShellIssueSeparatorClasses,
   createModalShellTabContentVariants,
+  createModalShellTabContentViewportClasses,
   createModalShellTabsListRegionVariants,
   createModalShellTabsVisibilityVariants,
   createModalShellTabsVariants,
@@ -136,13 +140,29 @@ function CreateModalShellTabPanel({
   tab: CreateModalShellTab
   'data-create-tab-panel'?: string
 }) {
+  const panelId = dataCreateTabPanel ?? tab.id
+  const mode = tab.contentMode ?? 'scroll'
+
+  if (mode === 'managed') {
+    return (
+      <div
+        data-create-tab-panel={panelId}
+        className={createModalShellTabContentVariants({ mode: 'managed' })}
+      >
+        {tab.content}
+      </div>
+    )
+  }
+
   return (
-    <div
-      data-create-tab-panel={dataCreateTabPanel ?? tab.id}
-      className={createModalShellTabContentVariants({ mode: tab.contentMode })}
+    <DialogPanelScrollRegion
+      inset="inner"
+      regionClassName={createModalShellTabContentVariants({ mode: 'scroll' })}
+      data-create-tab-panel={panelId}
+      viewportClassName={createModalShellTabContentViewportClasses}
     >
       {tab.content}
-    </div>
+    </DialogPanelScrollRegion>
   )
 }
 
@@ -177,7 +197,9 @@ function CreateModalShellTabs({
       variant="line"
       className={createModalShellTabsVariants()}
     >
-      <div className={createModalShellTabsListRegionVariants()}>
+      <div
+        className={cn(createModalShellTabsListRegionVariants(), dialogPanelSectionInsetXClasses)}
+      >
         <TabsList aria-label="Create sections">
           {tabs.map((tab) => {
             return (
@@ -198,17 +220,40 @@ function CreateModalShellTabs({
         </TabsList>
       </div>
 
-      {tabs.map((tab) => (
-        <TabsContent
-          key={tab.id}
-          value={tab.id}
-          forceMount
-          data-create-tab-panel={tab.id}
-          className={createModalShellTabContentVariants({ mode: tab.contentMode })}
-        >
-          {tab.content}
-        </TabsContent>
-      ))}
+      {tabs.map((tab) => {
+        const mode = tab.contentMode ?? 'scroll'
+
+        if (mode === 'managed') {
+          return (
+            <TabsContent
+              key={tab.id}
+              value={tab.id}
+              forceMount
+              data-create-tab-panel={tab.id}
+              className={createModalShellTabContentVariants({ mode: 'managed' })}
+            >
+              {tab.content}
+            </TabsContent>
+          )
+        }
+
+        return (
+          <TabsContent
+            key={tab.id}
+            value={tab.id}
+            forceMount
+            data-create-tab-panel={tab.id}
+            className={createModalShellTabContentVariants({ mode: 'scroll' })}
+          >
+            <DialogPanelScrollRegion
+              inset="inner"
+              viewportClassName={createModalShellTabContentViewportClasses}
+            >
+              {tab.content}
+            </DialogPanelScrollRegion>
+          </TabsContent>
+        )
+      })}
     </Tabs>
   )
 }
@@ -248,17 +293,24 @@ export function CreateModalShell({
         {...(description == null ? { 'aria-describedby': undefined } : {})}
       >
         <Modal.Header headline={headline} description={description} />
-        <Modal.Body stableBody data-create-modal-body className={createModalShellBodyVariants()}>
+        <Modal.Body
+          stableBody
+          stableBodyClip
+          data-create-modal-body
+          className={createModalShellBodyVariants()}
+        >
           <CreateFlowFormDensityRoot>
             {setupSummary ? (
-              <SelectionSummaryCard
-                eyebrow={setupSummary.eyebrow}
-                rows={mapSetupSummaryRowModelsToProps({
-                  rows: setupSummary.rows,
-                  changeLabel: setupSummary.changeLabel ?? 'Change',
-                  onEdit: setupSummary.onRowEdit,
-                })}
-              />
+              <div className={dialogPanelSectionInsetXClasses}>
+                <SelectionSummaryCard
+                  eyebrow={setupSummary.eyebrow}
+                  rows={mapSetupSummaryRowModelsToProps({
+                    rows: setupSummary.rows,
+                    changeLabel: setupSummary.changeLabel ?? 'Change',
+                    onEdit: setupSummary.onRowEdit,
+                  })}
+                />
+              </div>
             ) : null}
             {tabs ? (
               <>
@@ -274,21 +326,39 @@ export function CreateModalShell({
                   />
                 </div>
                 {!tabsVisible ? (
-                  <div
-                    data-create-modal-content
-                    className={createModalShellContentVariants({ mode: contentMode })}
-                  >
-                    {children}
-                  </div>
+                  contentMode === 'managed' ? (
+                    <div
+                      data-create-modal-content
+                      className={createModalShellContentVariants({ mode: 'managed' })}
+                    >
+                      {children}
+                    </div>
+                  ) : (
+                    <DialogPanelScrollRegion
+                      inset="section"
+                      regionClassName={createModalShellContentVariants({ mode: 'scroll' })}
+                      data-create-modal-content
+                    >
+                      {children}
+                    </DialogPanelScrollRegion>
+                  )
                 ) : null}
               </>
-            ) : (
+            ) : contentMode === 'managed' ? (
               <div
                 data-create-modal-content
-                className={createModalShellContentVariants({ mode: contentMode })}
+                className={createModalShellContentVariants({ mode: 'managed' })}
               >
                 {children}
               </div>
+            ) : (
+              <DialogPanelScrollRegion
+                inset="section"
+                regionClassName={createModalShellContentVariants({ mode: 'scroll' })}
+                data-create-modal-content
+              >
+                {children}
+              </DialogPanelScrollRegion>
             )}
           </CreateFlowFormDensityRoot>
         </Modal.Body>

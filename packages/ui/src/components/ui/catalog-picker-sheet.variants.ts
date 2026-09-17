@@ -2,19 +2,9 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { dialogPanelSectionInsetXClasses } from './dialog-panel.variants'
-import { sheetBodyVariants } from './sheet.variants'
 
-export const catalogPickerSheetBodyVariants = cva(cn(sheetBodyVariants(), 'pt-0'), {
-  variants: {
-    hasFooter: {
-      true: 'pb-12',
-      false: '',
-    },
-  },
-  defaultVariants: {
-    hasFooter: false,
-  },
-})
+/** Catalog picker results body — default Sheet.Body scrollport; no extra top/bottom overrides. */
+export const catalogPickerSheetBodyVariants = cva('')
 
 export const catalogPickerSheetListVariants = cva('space-y-2')
 

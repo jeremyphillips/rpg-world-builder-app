@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Button, Modal, usePendingAwareOpenChange } from '@rpg/ui'
+import { Button, DialogPanelScrollRegion, Modal, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
 import {
@@ -671,7 +671,7 @@ function LocationCreateModalSession({
         })}
         description={setupHeader.description}
         setupSummary={setupSummary}
-        contentMode={showSetup ? 'scroll' : 'managed'}
+        contentMode="managed"
         activeTabId={useBuildingShellTabs ? activeTabId : undefined}
         onActiveTabChange={useBuildingShellTabs ? setRequestedTabId : undefined}
         tabsVisible={showDetails}
@@ -708,11 +708,13 @@ function LocationCreateModalSession({
         }
       >
         {showSetup ? (
-          <LocationCreateModalSetupPanel
-            sets={setupSets}
-            model={setupSequenceModel}
-            onSetupValueChange={handleSetupValueChange}
-          />
+          <DialogPanelScrollRegion inset="section">
+            <LocationCreateModalSetupPanel
+              sets={setupSets}
+              model={setupSequenceModel}
+              onSetupValueChange={handleSetupValueChange}
+            />
+          </DialogPanelScrollRegion>
         ) : null}
 
         {!useBuildingShellTabs && state.detailsMounted && state.fixedCreate ? (

@@ -4,8 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ComboboxField } from './combobox-field.client'
 import { Sheet } from './sheet.client'
 import { Button } from './button.client'
-import { cn } from '../../lib/utils'
-import { dialogPanelSectionInsetXClasses } from './dialog-panel.variants'
+import { DialogPanelScrollRegion } from './dialog-panel-scroll-region.client'
 
 const meta = {
   title: 'UI/ComboboxField',
@@ -183,12 +182,10 @@ export const InsideSheet: Story = {
       </Sheet.Trigger>
       <Sheet.Content size="lg">
         <Sheet.Header headline="Create contained location" />
-        <Sheet.Body className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
-          <div
-            className={cn('min-h-0 flex-1 overflow-y-auto pt-0', dialogPanelSectionInsetXClasses)}
-          >
+        <Sheet.Body managed>
+          <DialogPanelScrollRegion inset="section">
             <ComboboxField {...args} />
-          </div>
+          </DialogPanelScrollRegion>
         </Sheet.Body>
       </Sheet.Content>
     </Sheet.Root>

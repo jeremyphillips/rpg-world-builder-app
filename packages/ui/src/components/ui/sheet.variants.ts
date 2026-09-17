@@ -58,8 +58,8 @@ export const sheetContentVariants = cva(
   },
 )
 
-/** Sheet body — shared dialog-panel body + flex growth for edge panels. */
-export const sheetBodyVariants = cva(cn(dialogPanelBodyVariants(), 'flex-1'))
+/** @deprecated Sheet.Body owns layout via {@link DialogPanelBody}; kept for class assertions. */
+export const sheetBodyVariants = cva(dialogPanelBodyVariants())
 
 /** Sheet-owned dock placement — no border, padding, or fill (see dialog-panel footer chrome). */
 export const sheetFooterDockClasses = 'shrink-0 z-20'

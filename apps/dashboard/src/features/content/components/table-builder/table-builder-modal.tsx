@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import type { GeneralTable, ProgressionTable } from '@rpg/contracts'
-import { Button, ConfirmDialog, Modal } from '@rpg/ui'
+import { Button, ConfirmDialog, DialogPanelScrollRegion, Modal } from '@rpg/ui'
 
 import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
 
@@ -37,10 +37,7 @@ import {
 } from '../../lib/table-builder/table-builder-host-config'
 import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
 import { TableBuilder } from './table-builder'
-import {
-  tableBuilderModalDeleteButtonClasses,
-  tableBuilderModalScrollRegionClasses,
-} from './table-builder-modal.variants'
+import { tableBuilderModalDeleteButtonClasses } from './table-builder-modal.variants'
 
 export type TableBuilderModalMode = 'create' | 'edit'
 
@@ -137,11 +134,11 @@ function TableBuilderModalContent({
             description={TABLE_BUILDER_MODAL_DESCRIPTION}
           />
           <Modal.Body stableBody>
-            <div className={tableBuilderModalScrollRegionClasses}>
+            <DialogPanelScrollRegion inset="innerLeading">
               <form id={formId} onSubmit={handleSubmit} noValidate>
                 <TableBuilder form={form} config={config} mode={mode} />
               </form>
-            </div>
+            </DialogPanelScrollRegion>
           </Modal.Body>
           <Modal.Footer>
             <Modal.FooterActions>
