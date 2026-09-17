@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { type SystemRulesetId } from '@rpg/contracts'
-import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
+import { resolveCampaignXpProgressionForRules } from '../lib/campaign-xp-progression.lib'
 
 import { CharacterDetailContent } from '../components/detail/character-detail-content'
 import { CharacterSheetDetailShell } from '../components/detail/character-sheet-detail-shell'
@@ -35,7 +35,10 @@ function CharacterDetailBody() {
       character,
       catalogIndex,
       rules: context.characterCreationRules,
-      xpProgression: getStandardXpProgression(character.rulesetId as SystemRulesetId),
+      xpProgression: resolveCampaignXpProgressionForRules(
+        character.rulesetId as SystemRulesetId,
+        context.characterCreationRules.progression,
+      ),
     })
   }, [catalogIndex, character, context])
 

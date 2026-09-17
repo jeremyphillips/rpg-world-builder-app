@@ -28,6 +28,7 @@ describe('buildCharacterConfigurationNavigation', () => {
     expect(navigation[1]?.leaves?.map((leaf) => leaf.id)).toEqual([
       'progression-standard-max-level',
       'progression-extended',
+      'progression-experience-thresholds',
     ])
 
     expect(navigation[2]?.leaves).toBeUndefined()

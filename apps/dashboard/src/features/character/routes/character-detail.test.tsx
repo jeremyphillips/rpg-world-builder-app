@@ -19,6 +19,7 @@ vi.mock('../components/standalone-character-redirect-guard', () => ({
 }))
 vi.mock('@rpg/catalog/xp-progressions', () => ({
   getStandardXpProgression: () => ({ entries: [{ level: 1, xpRequired: 0 }] }),
+  resolveCampaignXpProgressionEntries: () => [{ level: 1, xpRequired: 0 }],
 }))
 
 import { useCharacter as useCharacterFn } from '../hooks/use-character'

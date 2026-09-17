@@ -36,6 +36,11 @@ import {
   mapStandardArrayToFormValues,
 } from '@/lib/forms/standard-array-form-values'
 
+import {
+  buildXpThresholdsProgressionPatchInput,
+  mapXpThresholdOverridesToFormValues,
+} from './xp-thresholds-form-values'
+
 const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
 type BuildCharacterCreationPatchInputOptions = {
@@ -178,6 +183,7 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
       resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID))
         .standardArray,
     ),
+    xpThresholdOverrides: [],
   }
 }
 
@@ -191,11 +197,18 @@ export function buildCharacterCreationPatchInput(
     importedCharacters: { policy: values.importedCharactersPolicy },
   }
 
-  const progression = pickDefined({
+  const progressionBase = pickDefined({
     maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
     extendedProgression: resolveExtendedProgressionOverride(values),
   })
-  if (progression) patch.progression = progression
+  const xpThresholds =
+    buildXpThresholdsProgressionPatchInput(values.xpThresholdOverrides) ??
+    ({ entries: [] } as const)
+  const progression = {
+    ...(progressionBase ?? {}),
+    xpThresholds,
+  }
+  if (Object.keys(progression).length > 0) patch.progression = progression
 
   const creatureTypePolicy = resolveCreatureTypePolicyOverride(values.allowedCharacterCreatureTypes)
   if (creatureTypePolicy) {
@@ -282,5 +295,8 @@ export function mapRulesetPatchToRulesValues(
     standardArray: mapStandardArrayToFormValues(characterCreation.standardArray),
     ...mapLanguageProficiencyRulesToFormValues(characterCreation),
     ...mapLevelZeroNpcsToFormValues(characterCreation.levelZeroNpcs),
+    xpThresholdOverrides: mapXpThresholdOverridesToFormValues(
+      characterCreation.progression.xpThresholds,
+    ),
   }
 }

@@ -44,12 +44,23 @@ const vocabularyOptionSetPatchSchema = new Schema(
   { _id: false },
 )
 
+const xpThresholdOverrideEntrySchema = new Schema(
+  {
+    level: { type: Number, required: true },
+    xpRequired: { type: Number, required: true },
+  },
+  { _id: false },
+)
+
 const characterCreationProgressionSchema = new Schema(
   {
     maxCharacterLevel: { type: Number },
     extendedProgression: {
       tierName: { type: String, trim: true },
       maxLevel: { type: Number },
+    },
+    xpThresholds: {
+      entries: { type: [xpThresholdOverrideEntrySchema], default: undefined },
     },
   },
   { _id: false },

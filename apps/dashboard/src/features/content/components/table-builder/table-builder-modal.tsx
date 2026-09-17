@@ -36,7 +36,7 @@ import {
   resolveTableBuilderRecommendedKind,
   type TableBuilderHostConfig,
 } from '../../lib/table-builder/table-builder-host-config'
-import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
+import { resolveTableBuilderFormSchema } from '../../lib/table-builder/resolve-table-builder-form-schema'
 import { TableBuilder } from './table-builder'
 import { tableBuilderModalDeleteButtonClasses } from './table-builder-modal.variants'
 
@@ -49,8 +49,12 @@ export type TableBuilderModalProps = {
   /** Existing table when editing; ignored for `create`. */
   value?: TableBuilderSavedTable
   /** Receives one schema-valid table; the parent owns persistence. */
-  onSave: (table: TableBuilderSavedTable) => void
+  onSave?: (table: TableBuilderSavedTable) => void
+  /** When set, receives the validated draft instead of a persisted table shape. */
+  onSaveDraft?: (draft: TableBuilderFormValues) => void
   onOpenChange: (open: boolean) => void
+  /** Optional initial draft — used by constrained hosts instead of `value`. */
+  initialDraft?: TableBuilderFormValues
   /** When provided in edit mode, surfaces a confirmed destructive delete action. */
   onDelete?: () => void
 }
@@ -92,7 +96,9 @@ function TableBuilderModalContent({
   mode,
   config,
   value,
+  initialDraft,
   onSave,
+  onSaveDraft,
   onOpenChange,
   onDelete,
 }: TableBuilderModalProps) {
@@ -102,8 +108,8 @@ function TableBuilderModalContent({
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const form = useForm<TableBuilderFormValues>({
-    resolver: zodResolver(tableBuilderFormSchema),
-    defaultValues: tableToDraftValues(config, value),
+    resolver: zodResolver(resolveTableBuilderFormSchema(config)),
+    defaultValues: initialDraft ?? tableToDraftValues(config, value),
     mode: 'onSubmit',
   })
 
@@ -118,7 +124,11 @@ function TableBuilderModalContent({
       form.setError('kind', { type: 'manual', message: TABLE_BUILDER_KIND_NOT_ALLOWED })
       return
     }
-    onSave(draftToSavedTable(values, value))
+    if (onSaveDraft) {
+      onSaveDraft(values)
+    } else if (onSave) {
+      onSave(draftToSavedTable(values, value))
+    }
     onOpenChange(false)
   })
 

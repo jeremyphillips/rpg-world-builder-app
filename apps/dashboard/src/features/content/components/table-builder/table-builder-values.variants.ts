@@ -38,9 +38,33 @@ export const TABLE_BUILDER_LEVEL_TRACK = '5.5rem'
 export const TABLE_BUILDER_VALUE_TRACK = 'minmax(7rem, 1fr)'
 export const TABLE_BUILDER_ACTION_TRACK = '2.25rem'
 
-export function tableBuilderValuesGridTemplate(columnCount: number, includeLevel = true): string {
+export function tableBuilderValuesGridTemplate(
+  columnCount: number,
+  includeLevel = true,
+  includeActions = true,
+): string {
   const valueTracks = `repeat(${Math.max(columnCount, 1)}, ${TABLE_BUILDER_VALUE_TRACK})`
+  const actionTrack = includeActions ? ` ${TABLE_BUILDER_ACTION_TRACK}` : ''
   return includeLevel
-    ? `${TABLE_BUILDER_LEVEL_TRACK} ${valueTracks} ${TABLE_BUILDER_ACTION_TRACK}`
-    : `${valueTracks} ${TABLE_BUILDER_ACTION_TRACK}`
+    ? `${TABLE_BUILDER_LEVEL_TRACK} ${valueTracks}${actionTrack}`
+    : `${valueTracks}${actionTrack}`
 }
+
+export const tableBuilderValuesLevelLabelClasses = 'text-sm text-muted-foreground tabular-nums'
+
+export const tableBuilderDerivedInputShellClasses = cn(
+  'grid w-full min-w-0 items-center grid-cols-[1fr_1px_auto]',
+  'rounded-md border border-input bg-input shadow-sm transition-colors hover:border-input-hover',
+  'focus-within:outline-none focus-within:border-input-focus focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background',
+)
+
+export const tableBuilderDerivedInputFieldClasses = cn(
+  'min-w-0 border-0 bg-transparent shadow-none rounded-l-md rounded-r-none',
+  'focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0',
+)
+
+export const tableBuilderDerivedBadgeDividerClasses =
+  'relative z-[1] w-px min-w-px shrink-0 self-stretch bg-border'
+
+export const tableBuilderDerivedBadgeSegmentClasses =
+  'inline-flex shrink-0 items-center rounded-l-none rounded-r-md bg-surface-faint px-2'

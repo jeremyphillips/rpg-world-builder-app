@@ -17,7 +17,6 @@ import {
 import { Plus } from 'lucide-react'
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { formatFieldMessage, type TableColumnValueType } from '@rpg/contracts'
-import { ConfirmDialog } from '@rpg/ui'
 import { FormSectionHeader } from '@rpg/ui/form'
 
 import { resolveSortableArrayMove } from '../../lib/utils/sortable-array-move.lib'
@@ -25,15 +24,7 @@ import {
   TABLE_BUILDER_ADD_COLUMN_LABEL,
   TABLE_BUILDER_COLUMNS_HINT,
   TABLE_BUILDER_COLUMNS_LABEL,
-  TABLE_BUILDER_COLUMN_DELETE_CONFIRM_DESCRIPTION,
-  TABLE_BUILDER_COLUMN_DELETE_CONFIRM_HEADLINE,
-  TABLE_BUILDER_COLUMN_DELETE_CONFIRM_LABEL,
   TABLE_BUILDER_GENERAL_COLUMNS_HINT,
-  TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_DESCRIPTION,
-  TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_HEADLINE,
-  TABLE_BUILDER_TYPE_CHANGE_CONFIRM_DESCRIPTION,
-  TABLE_BUILDER_TYPE_CHANGE_CONFIRM_HEADLINE,
-  TABLE_BUILDER_TYPE_CHANGE_CONFIRM_LABEL,
 } from '../../lib/table-builder/table-builder-copy'
 import {
   createTableBuilderColumnDraft,
@@ -44,6 +35,7 @@ import {
   type TableBuilderColumnDeleteIntent,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
 import { createGeneralTableBuilderColumnDraft } from '../../lib/table-builder/table-builder-general-draft'
 import {
   tableBuilderAddActionClasses,
@@ -51,6 +43,7 @@ import {
   tableBuilderSectionErrorClasses,
 } from './table-builder.variants'
 import { TableBuilderColumnRow } from './table-builder-column-row'
+import { TableBuilderColumnsConfirmDialogs } from './table-builder-columns-confirm-dialogs'
 import { TableBuilderColumnsEmpty } from './table-builder-columns-empty'
 import {
   tableBuilderColumnsBodyClasses,
@@ -68,6 +61,7 @@ type PendingColumnDelete = {
 }
 
 export function TableBuilderColumns() {
+  const config = useTableBuilderHostConfig()
   const form = useFormContext<TableBuilderFormValues>()
   const kind = useWatch({ control: form.control, name: 'kind' }) ?? 'levelProgression'
   const fieldArray = useFieldArray({ control: form.control, name: 'columns' })
@@ -162,6 +156,8 @@ export function TableBuilderColumns() {
 
   const hasColumns = fieldArray.fields.length > 0
 
+  if (config.columns === 'fixed') return null
+
   const columnList = (
     <div className={tableBuilderColumnsListClasses}>
       {fieldArray.fields.map((field, index) => {
@@ -222,36 +218,17 @@ export function TableBuilderColumns() {
         </p>
       ) : null}
 
-      <ConfirmDialog
-        open={pendingTypeChange !== null}
-        onOpenChange={(open) => {
+      <TableBuilderColumnsConfirmDialogs
+        pendingTypeChange={pendingTypeChange}
+        pendingColumnDelete={pendingColumnDelete}
+        onPendingTypeChangeOpenChange={(open) => {
           if (!open) setPendingTypeChange(null)
         }}
-        headline={TABLE_BUILDER_TYPE_CHANGE_CONFIRM_HEADLINE}
-        description={TABLE_BUILDER_TYPE_CHANGE_CONFIRM_DESCRIPTION}
-        confirmLabel={TABLE_BUILDER_TYPE_CHANGE_CONFIRM_LABEL}
-        confirmVariant="destructive"
-        onConfirm={handleConfirmTypeChange}
-      />
-
-      <ConfirmDialog
-        open={pendingColumnDelete !== null}
-        onOpenChange={(open) => {
+        onPendingColumnDeleteOpenChange={(open) => {
           if (!open) setPendingColumnDelete(null)
         }}
-        headline={
-          pendingColumnDelete?.reason === 'lastColumnWithRows'
-            ? TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_HEADLINE
-            : TABLE_BUILDER_COLUMN_DELETE_CONFIRM_HEADLINE
-        }
-        description={
-          pendingColumnDelete?.reason === 'lastColumnWithRows'
-            ? TABLE_BUILDER_LAST_COLUMN_DELETE_CONFIRM_DESCRIPTION
-            : TABLE_BUILDER_COLUMN_DELETE_CONFIRM_DESCRIPTION
-        }
-        confirmLabel={TABLE_BUILDER_COLUMN_DELETE_CONFIRM_LABEL}
-        confirmVariant="destructive"
-        onConfirm={handleConfirmColumnDelete}
+        onConfirmTypeChange={handleConfirmTypeChange}
+        onConfirmColumnDelete={handleConfirmColumnDelete}
       />
     </section>
   )

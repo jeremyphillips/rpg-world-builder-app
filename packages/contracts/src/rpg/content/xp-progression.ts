@@ -1,7 +1,13 @@
 import { z } from 'zod'
 
 import { defineMessage } from '../../validation/define-message'
-import { absoluteLevelSchema } from '../primitives/level'
+import {
+  xpProgressionEntrySchema,
+  type XpProgressionEntry,
+  xpRequiredForLevel,
+} from '../primitives/xp-progression'
+
+export { xpProgressionEntrySchema, type XpProgressionEntry, xpRequiredForLevel }
 import {
   contentBodyBaseSchema,
   contentMetaSchema,
@@ -58,13 +64,6 @@ export const xpProgressionValidationMessages = {
     () => 'XP required must increase with each level.',
   ),
 }
-
-export const xpProgressionEntrySchema = z.object({
-  level: absoluteLevelSchema,
-  xpRequired: z.number().int().min(0),
-})
-
-export type XpProgressionEntry = z.infer<typeof xpProgressionEntrySchema>
 
 export const xpProgressionEntriesSchema = z
   .array(xpProgressionEntrySchema)
@@ -124,10 +123,3 @@ export const xpProgressionPatchSchema = contentPatchBaseSchema.extend({
   patch: xpProgressionBodySchema.partial(),
 })
 export type XpProgressionPatch = z.infer<typeof xpProgressionPatchSchema>
-
-export function xpRequiredForLevel(
-  progression: Pick<XpProgressionBody, 'entries'>,
-  level: number,
-): number | undefined {
-  return progression.entries.find((entry) => entry.level === level)?.xpRequired
-}

@@ -37,10 +37,10 @@ describe('safeParseMergedCharacterCreationPatch', () => {
       expected: null,
     },
   ])('$name', ({ patch, expected }) => {
-    const result = safeParseMergedCharacterCreationPatch(
-      patch,
-      minimalStartingWealthSeedCoveringStandardMax,
-    )
+    const result = safeParseMergedCharacterCreationPatch(patch, {
+      startingWealth: minimalStartingWealthSeedCoveringStandardMax,
+      systemXpEntries: [{ level: 1, xpRequired: 0 }],
+    })
 
     if (expected === null) {
       expectParseSuccess(result)

@@ -7,6 +7,7 @@ import {
   type TableBuilderColumnDraft,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
 import {
   TABLE_BUILDER_GENERAL_VALUES_HINT,
   TABLE_BUILDER_VALUES_HINT,
@@ -40,8 +41,10 @@ export type TableBuilderValuesState = {
 }
 
 export function useTableBuilderValues(allowedLevels: readonly number[]): TableBuilderValuesState {
+  const config = useTableBuilderHostConfig()
   const form = useFormContext<TableBuilderFormValues>()
   const fieldArray = useFieldArray({ control: form.control, name: 'rows' })
+  const fixedLevels = config.rows === 'fixedLevels'
 
   const kind = useWatch({ control: form.control, name: 'kind' }) ?? 'levelProgression'
   const columns = useWatch({ control: form.control, name: 'columns' }) ?? []
@@ -80,7 +83,7 @@ export function useTableBuilderValues(allowedLevels: readonly number[]): TableBu
     rowsErrorMessage: rowsError?.message,
     includeLevel,
     hasNoColumns,
-    gridTemplate: tableBuilderValuesGridTemplate(columns.length, includeLevel),
+    gridTemplate: tableBuilderValuesGridTemplate(columns.length, includeLevel, !fixedLevels),
     fields: fieldArray.fields,
     rowLevels,
     usedLevels,

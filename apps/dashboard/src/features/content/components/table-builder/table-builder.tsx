@@ -8,10 +8,12 @@ import {
   TABLE_BUILDER_NAME_LABEL,
 } from '../../lib/table-builder/table-builder-copy'
 import type { TableBuilderFormValues } from '../../lib/table-builder/table-builder-draft'
-import type {
-  TableBuilderHostConfig,
-  TableBuilderMode,
+import {
+  isTableBuilderStructureConstrained,
+  type TableBuilderHostConfig,
+  type TableBuilderMode,
 } from '../../lib/table-builder/table-builder-host-config'
+import { TableBuilderHostConfigProvider } from '../../lib/table-builder/table-builder-host-context'
 import {
   tableBuilderAuthoringPaneClasses,
   tableBuilderLayoutClasses,
@@ -38,29 +40,36 @@ export function TableBuilder({ form, config, mode }: TableBuilderProps) {
   const nameId = useId()
   const nameError = form.getFieldState('name', form.formState).error
   const allowedLevels = config.allowedLevels ?? []
+  const hideStructureChrome = isTableBuilderStructureConstrained(config)
 
   return (
-    <FormProvider {...form}>
-      <div className={tableBuilderLayoutClasses}>
-        <div className={tableBuilderAuthoringPaneClasses}>
-          <TextField
-            id={nameId}
-            label={TABLE_BUILDER_NAME_LABEL}
-            hint={TABLE_BUILDER_NAME_HINT}
-            size="md"
-            required
-            error={nameError?.message ? formatFieldMessage(nameError.message) : undefined}
-            invalid={Boolean(nameError)}
-            {...form.register('name')}
-          />
-          <TableBuilderKindField config={config} mode={mode} />
-          <TableBuilderColumns />
-          <TableBuilderValues allowedLevels={allowedLevels} />
+    <TableBuilderHostConfigProvider config={config}>
+      <FormProvider {...form}>
+        <div className={tableBuilderLayoutClasses}>
+          <div className={tableBuilderAuthoringPaneClasses}>
+            {!hideStructureChrome ? (
+              <>
+                <TextField
+                  id={nameId}
+                  label={TABLE_BUILDER_NAME_LABEL}
+                  hint={TABLE_BUILDER_NAME_HINT}
+                  size="md"
+                  required
+                  error={nameError?.message ? formatFieldMessage(nameError.message) : undefined}
+                  invalid={Boolean(nameError)}
+                  {...form.register('name')}
+                />
+                <TableBuilderKindField config={config} mode={mode} />
+                <TableBuilderColumns />
+              </>
+            ) : null}
+            <TableBuilderValues allowedLevels={allowedLevels} />
+          </div>
+          <div className={tableBuilderPreviewPaneClasses}>
+            <TableBuilderPreview />
+          </div>
         </div>
-        <div className={tableBuilderPreviewPaneClasses}>
-          <TableBuilderPreview />
-        </div>
-      </div>
-    </FormProvider>
+      </FormProvider>
+    </TableBuilderHostConfigProvider>
   )
 }

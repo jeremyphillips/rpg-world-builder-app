@@ -1,6 +1,7 @@
 import { progressionTableSchema, type ProgressionTable } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { isTableGridDataRow } from '../../components/tables/table-grid-presentation'
 import {
   createEmptyTableBuilderDraft,
   progressionDraftToGridPresentation,
@@ -169,7 +170,7 @@ describe('progressionDraftToGridPresentation', () => {
     const usesKey = draft.columns[0]!.key
 
     // Author: level 9 | blank | +3 — preview resolves the blank to the carried 4.
-    const rowAt9 = presentation.rows.find((row) => row.rowHeader === 9)
+    const rowAt9 = presentation.rows.filter(isTableGridDataRow).find((row) => row.rowHeader === 9)
     expect(rowAt9?.cells[usesKey]).toBe('4')
     expect(rowAt9?.cells[damageKey]).toBe('+3')
   })
@@ -178,7 +179,8 @@ describe('progressionDraftToGridPresentation', () => {
     const draft = tableToDraft(martialArtsTable)
     const presentation = progressionDraftToGridPresentation(draft)
 
-    expect(presentation.rows[1]?.cells[draft.columns[0]!.key]).toBe('1d8')
+    const secondRow = presentation.rows.filter(isTableGridDataRow)[1]
+    expect(secondRow?.cells[draft.columns[0]!.key]).toBe('1d8')
   })
 
   it('tolerates incomplete drafts without claiming validity', () => {
@@ -199,10 +201,11 @@ describe('progressionDraftToGridPresentation', () => {
     // Unnamed columns fall back to a positional label — never the ephemeral key.
     expect(presentation.columns[0]?.label).toBe('Column 1')
 
-    const leveled = presentation.rows.find((row) => row.rowHeader === 3)
+    const dataRows = presentation.rows.filter(isTableGridDataRow)
+    const leveled = dataRows.find((row) => row.rowHeader === 3)
     expect(leveled?.cells.a).toBeUndefined()
 
-    const unleveled = presentation.rows.find((row) => row.rowHeader === undefined)
+    const unleveled = dataRows.find((row) => row.rowHeader === undefined)
     expect(unleveled?.cells.b).toBe('2')
   })
 
@@ -218,7 +221,9 @@ describe('progressionDraftToGridPresentation', () => {
       ],
     })
 
-    expect(presentation.rows.map((row) => row.rowHeader)).toEqual([1, 9, undefined])
+    expect(
+      presentation.rows.map((row) => (isTableGridDataRow(row) ? row.rowHeader : row.kind)),
+    ).toEqual([1, 9, undefined])
   })
 
   it('returns empty presentation for the empty draft', () => {
