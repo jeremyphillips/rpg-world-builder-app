@@ -1,5 +1,7 @@
 import type { FieldWidth } from './field-control.variants'
+import { FIELD_ROW_DIVIDER_GUTTER_PX } from './field-row-divider.variants'
 import { FIELD_WIDTH_FIXED_TRACKS, isFieldWidthFraction } from './field-row-column-tracks.lib'
+import type { FieldRhythm } from './field.variants'
 
 /** Horizontal gap between anatomy-row columns — matches Tailwind `gap-6` / `gap-4`. */
 export const FIELD_ROW_GAP_PX = {
@@ -21,10 +23,12 @@ export const FIELD_ROW_MIN_AUTO_TRACK_PX = 80
 export function resolveFieldRowCollapseMinWidth(
   widths: readonly FieldWidth[],
   gap: keyof typeof FIELD_ROW_GAP_PX = 'form',
+  options: { fieldDivider?: boolean; rhythm?: FieldRhythm } = {},
 ): number {
   if (widths.length <= 1) return 0
 
   const gapPx = FIELD_ROW_GAP_PX[gap]
+  const rhythm = options.rhythm ?? (gap === 'compact' ? 'compact' : 'comfortable')
   let fixedSum = 0
   let flexTracks = 0
 
@@ -45,6 +49,9 @@ export function resolveFieldRowCollapseMinWidth(
     }
   }
 
-  const totalGaps = (widths.length - 1) * gapPx
+  const separatorCount = widths.length - 1
+  const totalGaps = options.fieldDivider
+    ? separatorCount * FIELD_ROW_DIVIDER_GUTTER_PX[rhythm]
+    : separatorCount * gapPx
   return Math.ceil(fixedSum + totalGaps + flexTracks * FIELD_ROW_MIN_FLEX_TRACK_PX)
 }

@@ -62,9 +62,14 @@ import type {
   FieldSeparator,
 } from '../components/ui/field.variants'
 import type { FormDensity } from './form-density'
-import type { FieldLabelVisibility, FormHeading } from './form-heading.lib'
+import type { FieldLabelVisibility, FormHeading, FormHeadingContent } from './form-heading.lib'
 
-export type { FieldLabelVisibility, FormHeading, FormHeadingTier } from './form-heading.lib'
+export type {
+  FieldLabelVisibility,
+  FormHeading,
+  FormHeadingContent,
+  FormHeadingTier,
+} from './form-heading.lib'
 export {
   DEFAULT_FORM_COLUMNS_COLLAPSE_ORDER,
   columnsNeedBreakpointReorder,
@@ -379,12 +384,28 @@ export const OPTIONAL_DISCLOSURE_FIELD_KINDS = [
 ] as const
 export type OptionalDisclosureFieldKind = (typeof OPTIONAL_DISCLOSURE_FIELD_KINDS)[number]
 
+/** Prompt before clearing optional dependent or disclosure field content. */
+export type ConfirmBeforeClearConfig = {
+  headline: string
+  description?: string
+  confirmLabel?: string
+  cancelLabel?: string
+  confirmVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'text'
+  /** When omitted, confirm if any cleared leaf field has meaningful content. */
+  shouldConfirm?: (
+    values: Record<string, unknown>,
+    context: { namePrefix?: string; clearingFieldNames: readonly string[] },
+  ) => boolean
+}
+
 /** Collapse empty optional fields behind an add control (textarea and select). */
 export type OptionalDisclosureConfig = {
   addLabel: string
   removeLabel?: string
   /** When true (default), populated values keep the field expanded. */
   expandWhenPopulated?: boolean
+  /** When set, removing populated content prompts before clearing. */
+  confirmBeforeClear?: ConfirmBeforeClearConfig
 }
 
 /** Attached trailing action on a text-like field — operation failure stays outside RHF validation. */
@@ -530,6 +551,8 @@ export interface RichTextFieldConfig extends BaseFieldConfig {
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
   codeBlocks?: boolean
+  /** Opt in to structured table embed blocks and the Table toolbar button (off by default). */
+  tables?: boolean
   /** Internal link targets shown in the rich-text link picker. */
   internalLinkOptions?: RichTextLinkPickerInternalOption[]
   /** Content type filter options for the rich-text link picker. */
@@ -991,6 +1014,12 @@ export function resolveRowFieldAlign(item: Pick<RowConfig, 'align' | 'fields'>):
   return item.fields.some(rowFieldReservesDerivedMeta) ? 'start' : 'control-edge'
 }
 
+/** Vertical pipe divider between siblings inside a schema row. */
+export type FieldRowDivider = {
+  variant: 'pipe'
+  tone?: FieldSeparator
+}
+
 /** Inter-control spacing within a schema row. */
 export type RowSpacing = 'default' | 'compact'
 
@@ -1010,6 +1039,8 @@ export interface RowConfig {
   fields: RowFieldItem[]
   /** Inter-control spacing within the row. @default 'default' */
   spacing?: RowSpacing
+  /** Vertical pipe between row siblings — suppresses gap-x; gutter follows form rhythm. */
+  fieldDivider?: FieldRowDivider
   className?: string
   /**
    * Flex cross-axis alignment for row siblings. When omitted, defaults to
@@ -1092,6 +1123,8 @@ export interface DependentConfig {
   kind: 'dependent'
   controller: FieldConfig
   dependents: DependentDependentsConfig
+  /** When set on a switch controller, turning off prompts before clearing dependents. */
+  confirmBeforeClear?: ConfirmBeforeClearConfig
   visibility?: FieldVisibility
   /** Trailing divider after this dependent section within parent rhythm. */
   separator?: FieldSeparator
@@ -1376,7 +1409,7 @@ export interface ArrayConfig {
   kind: 'array'
   name: string
   /** Preferred heading API — typography derives from nesting depth and density. */
-  heading?: Pick<FormHeading, 'label'>
+  heading?: FormHeadingContent
   /** Required when `heading.label` is omitted — see `resolveArrayHeading`. */
   legend?: string
   /**

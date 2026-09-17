@@ -3,7 +3,9 @@
 import * as React from 'react'
 
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
+import { FieldAnatomyRowShell } from './field-anatomy-row-shell.client'
 import { Field, type FieldSize } from './field.client'
+import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
 import { fieldChipWrapGapClasses, type FieldHintPosition } from './field.variants'
 import { FieldLabelContent } from './field-label-content'
@@ -40,12 +42,15 @@ export interface ChipsFieldOptionsProps {
   chipSize: ChipSize
   /** When false, selected chips omit the leading check icon. Defaults to true. */
   showSelectedCheckmark?: boolean
+  /** Group role when the parent fieldset/legend is absent (anatomy-row participation). */
+  semanticRole?: 'group' | 'radiogroup'
 }
 
 /** Chip pill row only — for embedding inside a parent fieldset (e.g. `ChooseFromChipsField`). */
 export function ChipsFieldOptions({
   id,
   options,
+  labelledBy,
   multiple = true,
   max,
   value,
@@ -54,6 +59,7 @@ export function ChipsFieldOptions({
   disabled,
   chipSize,
   showSelectedCheckmark = true,
+  semanticRole,
 }: ChipsFieldOptionsProps) {
   const selected: string[] = React.useMemo(() => {
     if (multiple) {
@@ -79,7 +85,12 @@ export function ChipsFieldOptions({
   const atMax = max !== undefined && selected.length >= max
 
   return (
-    <ChipGroup className={fieldChipWrapGapClasses} onBlur={onBlur}>
+    <ChipGroup
+      className={fieldChipWrapGapClasses}
+      onBlur={onBlur}
+      semanticRole={semanticRole}
+      aria-labelledby={semanticRole ? labelledBy : undefined}
+    >
       {options.map((option) => {
         const isActive = selected.includes(option.value)
         const isDisabled = Boolean(option.disabled || disabled || (atMax && !isActive))
@@ -144,7 +155,9 @@ export function ChipsField({
   chrome,
   showSelectedCheckmark,
 }: ChipsFieldProps) {
+  const inAnatomyRow = useFieldRowParticipation()
   const resolvedChipSize = chipSize ?? size
+  const resolvedHintPosition = inAnatomyRow ? 'below-control' : hintPosition
   const legendId = `${id}-legend`
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
@@ -161,20 +174,49 @@ export function ChipsField({
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
   const outerWidthClass = rootWidth === 'auto' ? 'w-auto' : 'w-full'
 
-  const chipsOptions = (
+  const chipsOptions = (labelledBy: string, semanticRole?: 'group' | 'radiogroup') => (
     <ChipsFieldOptions
       id={id}
       options={options}
-      labelledBy={legendId}
+      labelledBy={labelledBy}
       multiple={multiple}
       max={max}
       value={value}
       onChange={onChange}
+      onBlur={onBlur}
       disabled={disabled}
       chipSize={resolvedChipSize}
       showSelectedCheckmark={showSelectedCheckmark}
+      semanticRole={semanticRole}
     />
   )
+
+  if (inAnatomyRow) {
+    return (
+      <FieldAnatomyRowShell
+        id={id}
+        label={label}
+        labelVisibility={labelVisibility}
+        error={error}
+        invalid={invalid}
+        describedBy={describedBy}
+        hint={hint}
+        hintPosition={resolvedHintPosition}
+        info={info}
+        required={required}
+        size={size}
+        width={width}
+        chrome={chrome}
+        controlBand="content-sized"
+      >
+        {({ labelId }) =>
+          labelId
+            ? chipsOptions(labelId, multiple ? 'group' : 'radiogroup')
+            : chipsOptions(`${id}-legend`, multiple ? 'group' : 'radiogroup')
+        }
+      </FieldAnatomyRowShell>
+    )
+  }
 
   return (
     <div className={outerWidthClass}>
@@ -208,7 +250,7 @@ export function ChipsField({
             </legend>
           }
         >
-          {chipsOptions}
+          {chipsOptions(legendId)}
         </FieldsetChromeAnatomy>
       </FieldsetChromeFrame>
     </div>

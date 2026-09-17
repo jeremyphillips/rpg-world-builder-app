@@ -11,12 +11,8 @@ import {
 } from './dialog-parts.client'
 import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
 import { DialogPanelActionRow } from './dialog-panel-action-row.client'
-import {
-  dialogContentFocusShellClasses,
-  dialogPanelBodyVariants,
-  dialogPanelFooterClasses,
-  dialogPanelStableBodyVariants,
-} from './dialog-panel.variants'
+import { DialogPanelBody } from './dialog-panel-body.client'
+import { dialogContentFocusShellClasses, dialogPanelFooterClasses } from './dialog-panel.variants'
 import {
   modalContentVariants,
   modalFooterDockClasses,
@@ -158,16 +154,19 @@ export interface ModalBodyProps extends React.HTMLAttributes<HTMLDivElement> {
    * pinned while inner content (e.g. TabbedForm with stickyChrome) owns scrolling.
    */
   stableBody?: boolean
+  /**
+   * When true with `stableBody`, the shell omits horizontal inset so child section
+   * scrollports or pinned chrome wrappers own `px-6` (`CreateModalShell`).
+   */
+  stableBodyClip?: boolean
 }
 
 const ModalBody = React.forwardRef<HTMLDivElement, ModalBodyProps>(
-  ({ className, stableBody, ...props }, ref) => (
-    <div
+  ({ className, stableBody, stableBodyClip, ...props }, ref) => (
+    <DialogPanelBody
       ref={ref}
-      className={cn(
-        stableBody ? dialogPanelStableBodyVariants() : dialogPanelBodyVariants(),
-        className,
-      )}
+      mode={stableBody ? (stableBodyClip ? 'stableClip' : 'stable') : 'scroll'}
+      className={className}
       {...props}
     />
   ),

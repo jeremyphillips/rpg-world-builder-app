@@ -11,6 +11,7 @@ import {
   type CharacterClass,
   type ClassBodyFeature,
   type ClassFeature,
+  type ContentTable,
   type ProficiencyChoice,
 } from '@rpg/contracts'
 
@@ -85,6 +86,7 @@ export type ClassFeatureDetailItem = {
   level: number
   title: string
   bodyHtml?: string
+  tables?: ContentTable[]
 }
 
 export type ClassCardViewModel = {
@@ -344,6 +346,7 @@ function mapFeatureToDetailItem(feature: ClassFeature): ClassFeatureDetailItem {
     level: feature.level,
     title: feature.name,
     bodyHtml: feature.description,
+    tables: feature.kind === 'custom' ? feature.tables : undefined,
   }
 }
 

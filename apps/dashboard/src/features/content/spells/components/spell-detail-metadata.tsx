@@ -1,5 +1,7 @@
 import { Heading, RichTextContent } from '@rpg/ui'
 
+import { RichTextWithTables } from '../../components/rich-text/rich-text-with-tables'
+
 import { ContentStaticBadge } from '../../lib/detail/metadata/content-link-badge'
 import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/metadata/content-stat-row'
 import { SPELL_DETAIL_SECTION_LABELS, type SpellDetailViewModel } from '../lib/spell-display'
@@ -41,7 +43,16 @@ export function SpellDetailMetadata({
       ) : null}
 
       {viewModel.descriptionHtml ? (
-        <RichTextContent html={viewModel.descriptionHtml} size="sm" tone="muted" />
+        viewModel.descriptionTables?.length ? (
+          <RichTextWithTables
+            html={viewModel.descriptionHtml}
+            tables={viewModel.descriptionTables}
+            size="sm"
+            tone="muted"
+          />
+        ) : (
+          <RichTextContent html={viewModel.descriptionHtml} size="sm" tone="muted" />
+        )
       ) : null}
 
       {viewModel.tagLabels.length > 0 ? (

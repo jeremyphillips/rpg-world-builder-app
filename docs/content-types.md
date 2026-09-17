@@ -1085,7 +1085,66 @@ Class create/edit registers `ContentFormDef.preview` (`class-preview-projection.
 
 ### Read-only detail view
 
-`ClassProgressionTable` on the class detail page fill-forwards `cantrips` and `spellsAvailable`, shows resource columns from `resources[]`, and spell-slot columns via `formatSpellLevel` from `@rpg/contracts`. Stories: `Content/Classes/ClassProgressionTable`.
+`ClassProgressionTable` on the class detail page fill-forwards `cantrips` and `spellsAvailable`, shows feature-table columns from `features[].tables[]`, and spell-slot columns via `formatSpellLevel` from `@rpg/contracts`. Stories: `Content/Classes/ClassProgressionTable`.
+
+---
+
+## Class feature tables (reference)
+
+Structured progression data lives on **features**, not on the class body. The legacy top-level `resources[]` field and its dashboard authoring UI were removed; feature tables are the replacement.
+
+### Ownership and shape
+
+| Field                 | Location                       | Role                                                                                                            |
+| --------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `tables[]`            | `features[]` (custom features) | Optional `ContentTable` union (`levelProgression` \| `general`) owned by the feature that unlocks them          |
+| `columns[]`           | each table                     | Discriminated by `valueType`: `number`, `dice`, or `text`; number columns may set `format: 'plain' \| 'signed'` |
+| `id` (table / column) | embedded subrecord             | Stable `slugSchema` key for references; `label` / `name` are editable display copy                              |
+
+Contracts: `packages/contracts/src/rpg/content/tables/` (generic progression tables) and `packages/contracts/src/rpg/content/classes/class-feature-table.ts` (feature-level refinements and `collectFeatureProgressionColumns`).
+
+### Breakpoints and carry-forward
+
+- Entry levels use **`absoluteLevelSchema` (1–100)**; effective max is enforced at authoring via campaign rules (`allowedLevels`), not in the generic schema.
+- Entries must be in **strictly ascending** order by level in persisted JSON; out-of-order catalog data fails validation (no silent sort on parse).
+- Every entry level must be **≥ the owning feature's `level`** (feature-level refine).
+- **Carry-forward:** at character level _L_, a column resolves to the last entry where `entry.level ≤ L`; before the first entry → `undefined`. Each column carry-forwards independently.
+- **`projectProgressionTableRows`** derives dense rows for display — never persisted.
+- **`formatProgressionTableValue`** is the display SSOT for table cells (signed numbers, dice, plain text).
+
+Import-only helper: `normalizeProgressionTableColumnEntries()` sorts entries for migrations; it is not wired into Zod parse.
+
+### Progression table column order
+
+`collectFeatureProgressionColumns(features)` (contracts) determines read-only column order:
+
+1. `features[]` array order
+2. → `tables[]` order within each feature
+3. → `columns[]` order within each table
+
+Only `kind: 'levelProgression'` tables contribute columns. Stable React key: `` `${featureId}.${tableId}.${columnId}` ``.
+
+### Dashboard authoring
+
+- Feature `tables[]` is an **atomic form value** on each feature row (`class-feature-form-fields.ts`). The shared `TableBuilderModal` owns an isolated draft form; Save returns one valid `ContentTable` and the parent replaces `tables[index]` via `setValue`.
+- `FeatureTablesSection` lists tables with metadata `N columns · M breakpoints` (progression) or row/column counts (general) and opens `TableBuilderModal` with host config: `allowedKinds`, `recommendedKind`, and `allowedLevels`.
+- Table kind is selectable when creating a new table (`mode: 'create'`) and multiple kinds are allowed; editing an existing table locks kind as read-only metadata regardless of parent content status.
+- Read-only rendering: `ContentTableView` dispatches to `ProgressionTableView` or `GeneralTableView`. Class feature detail renders **general** `feature.tables[]` inline below description via `ClassFeatureItem`; progression tables remain on `ClassProgressionTable` only. Builder preview uses the tolerant `ProgressionTablePresentation` model.
+
+### Content enrichment vs migration
+
+Phase 2 migrated 16 legacy class `resources[]` rows onto their owning features (Barbarian Rage, Fighter Second Wind, etc.). **Weapon Mastery** on Ranger, Rogue, and Paladin was added separately as flat L1 `masteries: 2` tables — semantic enrichment from SRD prose ("two kinds of weapons"), not a legacy resource migration. Wizard remains the only SRD class with no feature tables.
+
+---
+
+## Spell description tables (reference)
+
+Spells may embed structured tables in `description` HTML via `<div data-rpg-table-id="…"></div>`.
+Table data lives in sibling `tables[]` (`GeneralTable`, `kind: 'general'`) — contracts never parse
+description HTML. Save always prunes `tables[]` to embed ids via `extractTableEmbedIds`
+(`pruneSpellTablesToDescriptionEmbeds`); read-only `RichTextWithTables` never renders unreferenced
+tables. Authoring: Description field with `tables: true` + `SpellDescriptionTablesField` host.
+v1 does not sync editor undo with `tables[]` dirty state.
 
 ---
 

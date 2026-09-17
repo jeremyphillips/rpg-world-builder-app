@@ -134,10 +134,18 @@ with a **Remove** action that clears the value and collapses back to the add con
     addLabel: 'Add additional behavior',
     removeLabel: 'Remove',
     expandWhenPopulated: true,
+    confirmBeforeClear: {
+      headline: 'Remove additional behavior?',
+      description: 'This will clear the note you entered.',
+      confirmLabel: 'Remove',
+    },
   },
 }
 ```
 
+- **`confirmBeforeClear`** (optional) — when removing populated content via the disclosure
+  **Remove** action, prompts before clearing. Same config shape as
+  `DependentConfig.confirmBeforeClear`. Absent by default.
 - **Incompatible with `required: true`** — optional disclosure is for schema-optional
   fields only; dev builds log when both are set.
 - **Collapsed fields unmount** — empty values take no vertical space; populated values stay
@@ -149,7 +157,11 @@ with a **Remove** action that clears the value and collapses back to the add con
 
 - Value: **sanitized HTML string** (Tiptap).
 - Default marks: bold, italic, lists, hard breaks.
-- **Opt-in:** `linkable` (internal/external link picker), `codeBlocks` (inline + fenced code).
+- **Opt-in:** `linkable` (internal/external link picker), `codeBlocks` (inline + fenced code),
+  `tables` (structured table embed blocks + Table toolbar button; host registers via
+  `RichTextTableEmbedHostRegistrar`).
+- Table embed HTML: `<div data-rpg-table-id="{id}"></div>`. Referenced ids are extracted with
+  `extractTableEmbedIds(html)` (sanitized DOM walk — not regex).
 - Internal links: pass `internalLinkOptions`, optional `contentTypeOptions` from the app.
 - Storage: `href` + `data-content-type`, `data-content-id`, `data-content-title`, optional
   `data-link-kind` (`detail` | `overview` | `external`).

@@ -10,15 +10,21 @@ import {
   isContainer,
   resolveColumnsCollapseSequence,
   resolveFieldConfigPrimaryName,
+  type ArrayConfig,
+  type DependentConfig,
   type FormItem,
   type GroupConfig,
   type RowConfig,
-  type ArrayConfig,
 } from '@rpg/ui/form'
 
 import { makeSpell } from '@/test/fixtures/factories/spell'
 import { RESOLUTION_FORM_FIXTURES } from '../resolution/fixtures'
 import { spellFormDef, spellFormSchema, type SpellFormValues } from './spell-form-def'
+import {
+  SPELL_SCALING_CONFIRM_COPY,
+  SPELL_SCALING_HINTS,
+  SPELL_SECTION_LABELS,
+} from './spell-display'
 import { RESOLUTION_SECTION_LABELS } from '../resolution/lib/form/resolution-form-labels'
 
 const SRD_SPELLS = loadSeedSpells('srd-cc-5.2.1')
@@ -49,6 +55,24 @@ function walkNestedFormItems(fields: FormItem[], visit: (field: FormItem) => voi
       walkNestedFormItems(resolveColumnsCollapseSequence(field.columns, field.collapseOrder), visit)
     }
   }
+}
+
+function findDependentBySwitch(
+  fields: FormItem[],
+  switchName: string,
+): DependentConfig | undefined {
+  let found: DependentConfig | undefined
+  walkNestedFormItems(fields, (field) => {
+    if (
+      !found &&
+      'kind' in field &&
+      field.kind === 'dependent' &&
+      resolveFieldConfigPrimaryName(field.controller) === switchName
+    ) {
+      found = field
+    }
+  })
+  return found
 }
 
 function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined {
@@ -467,57 +491,76 @@ describe('spellFormDef create vs update modes', () => {
 })
 
 describe('spellFormDef basics tab', () => {
-  function basicsColumns() {
+  function basicsFields() {
     const basics = spellFormDef.buildTabs!({}).find((tab) => tab.id === 'basics')
-    const [columns] = basics?.fields ?? []
-    if (!columns || !isContainer(columns) || columns.kind !== 'columns') {
-      throw new Error('Expected spell Basics columns layout')
-    }
-    return columns
+    return basics?.fields ?? []
   }
 
   function basicsFieldKey(field: FormItem): string | undefined {
     if (!('kind' in field)) return resolveFieldConfigPrimaryName(field)
-    if (isContainer(field) && field.kind === 'dependent') {
-      return resolveFieldConfigPrimaryName(field.controller)
+    if (isContainer(field) && field.kind === 'row') {
+      return field.fields.map(basicsFieldKey).join('+')
     }
     return undefined
   }
 
-  it('authors School, Classes, and Description on the left and Level on the right', () => {
-    const columns = basicsColumns()
-    expect(columns.collapseOrder).toBe('interleave')
-
-    const [left, right] = columns.columns
-    expect(left?.fields.map(basicsFieldKey)).toEqual(['school', 'classIds', 'description'])
-    expect(right?.fields.map(basicsFieldKey)).toEqual(['level'])
+  it('uses one top-level container per basics section', () => {
+    expect(basicsFields().map(basicsFieldKey)).toEqual(['school+level', 'classIds', undefined])
   })
 
-  it('stacks School, Level, Classes, then Description', () => {
-    const columns = basicsColumns()
-    expect(
-      resolveColumnsCollapseSequence(columns.columns, columns.collapseOrder).map(basicsFieldKey),
-    ).toEqual(['school', 'level', 'classIds', 'description'])
-  })
-
-  it('uses a single-select level chip with nested scaling dependents', () => {
-    const levelDependent = basicsColumns().columns[1]?.fields[0]
-    if (!levelDependent || !isContainer(levelDependent) || levelDependent.kind !== 'dependent') {
-      throw new Error('Expected Level dependent')
+  it('authors School and Level in a 50/50 row', () => {
+    const [schoolLevelRow] = basicsFields()
+    if (!schoolLevelRow || !isContainer(schoolLevelRow) || schoolLevelRow.kind !== 'row') {
+      throw new Error('Expected School + Level row')
     }
 
-    expect(levelDependent.controller).toMatchObject({
-      type: 'chips',
-      name: 'level',
-      label: 'Level',
-      multiple: false,
-    })
-    expect(levelDependent.controller).not.toHaveProperty('defaultValue')
-    expect(levelDependent.dependents.visibility).toEqual(
-      expect.objectContaining({ dependsOn: ['level'] }),
+    expect(schoolLevelRow.fieldDivider).toEqual({ variant: 'pipe' })
+    expect(schoolLevelRow.fields).toEqual([
+      expect.objectContaining({ type: 'select', name: 'school', width: '1/2' }),
+      expect.objectContaining({ type: 'chips', name: 'level', width: '1/2', multiple: false }),
+    ])
+  })
+
+  it('registers scaling prose behind level-gated switches on the basics tab', () => {
+    const fields = basicsFields()
+
+    expect(collectFieldNames(fields)).toEqual(
+      expect.arrayContaining([
+        'description',
+        'hasCantripScaling',
+        'cantripScaling',
+        'hasHigherLevelSlotEffect',
+        'higherLevelSlotEffect',
+      ]),
     )
-    expect(
-      levelDependent.dependents.fields.map((field) => ('name' in field ? field.name : undefined)),
-    ).toEqual(['cantripScaling', 'higherLevelSlotEffect'])
+
+    const cantripDependent = findDependentBySwitch(fields, 'hasCantripScaling')
+    const leveledDependent = findDependentBySwitch(fields, 'hasHigherLevelSlotEffect')
+
+    expect(cantripDependent?.visibility?.dependsOn).toContain('level')
+    expect(leveledDependent?.visibility?.dependsOn).toContain('level')
+
+    expect(cantripDependent?.controller).toMatchObject({
+      type: 'switch',
+      label: SPELL_SECTION_LABELS.cantripScaling,
+      hint: SPELL_SCALING_HINTS.cantripScaling,
+    })
+    expect(leveledDependent?.controller).toMatchObject({
+      type: 'switch',
+      label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+      hint: SPELL_SCALING_HINTS.higherLevelSlotEffect,
+    })
+
+    expect(cantripDependent?.confirmBeforeClear).toMatchObject(
+      SPELL_SCALING_CONFIRM_COPY.cantripScaling,
+    )
+    expect(leveledDependent?.confirmBeforeClear).toMatchObject(
+      SPELL_SCALING_CONFIRM_COPY.higherLevelSlotEffect,
+    )
+
+    expect(collectFieldNames(cantripDependent?.dependents.fields ?? [])).toEqual(['cantripScaling'])
+    expect(collectFieldNames(leveledDependent?.dependents.fields ?? [])).toEqual([
+      'higherLevelSlotEffect',
+    ])
   })
 })

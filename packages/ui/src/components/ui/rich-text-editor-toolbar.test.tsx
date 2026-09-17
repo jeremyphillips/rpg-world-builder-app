@@ -39,6 +39,7 @@ describe('RichTextEditorToolbar', () => {
         disabled={false}
         linkable={false}
         codeBlocks={false}
+        tables={false}
         isLinkPickerOpen={false}
         editingLinkContext={null}
         internalLinkOptions={[]}
@@ -68,6 +69,7 @@ describe('RichTextEditorToolbar', () => {
         disabled={false}
         linkable={false}
         codeBlocks
+        tables={false}
         isLinkPickerOpen={false}
         editingLinkContext={null}
         internalLinkOptions={[]}

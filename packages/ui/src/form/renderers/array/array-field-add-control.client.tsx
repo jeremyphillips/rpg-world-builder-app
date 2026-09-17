@@ -69,7 +69,7 @@ export function ArrayFieldAddControl({
 }: ArrayFieldAddControlProps) {
   const { density } = useFormSectionContext()
   const { size } = resolveFormDensity(density)
-  const buttonSize = resolveArrayAddButtonSize(size, addActionSize)
+  const buttonSize = resolveArrayAddButtonSize(size, addActionSize, addActionLayout)
   const triggerClassName = cn(addActionLayout === 'inline' && 'shrink-0')
   const leadingIcon = showAddIcon ? <Plus aria-hidden /> : undefined
   const disabledReasonId = React.useId()

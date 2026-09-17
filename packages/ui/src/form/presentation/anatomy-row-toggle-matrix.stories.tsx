@@ -191,3 +191,105 @@ type Story = StoryObj
 export const SpellcastingToggleMatrix: Story = {
   render: () => <ToggleMatrixHarness />,
 }
+
+const spellBasicsRowSchema = z.object({
+  school: z.string(),
+  level: z.string(),
+})
+
+type SpellBasicsRowValues = z.infer<typeof spellBasicsRowSchema>
+
+function queryChipsControlTop(): number | null {
+  const control = document
+    .querySelector('[data-field-row-participant]:has([role="radiogroup"])')
+    ?.querySelector('[data-field-control-region]')
+  if (!control) return null
+  return Math.round(control.getBoundingClientRect().top)
+}
+
+function SelectChipsControlTopProbe() {
+  const [readout, setReadout] = React.useState<{
+    selectTop: number | null
+    chipsTop: number | null
+  }>(() => ({ selectTop: null, chipsTop: null }))
+
+  React.useLayoutEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setReadout({
+        selectTop: queryControlTopByFieldName('school'),
+        chipsTop: queryChipsControlTop(),
+      })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [])
+
+  const aligned =
+    readout.selectTop != null && readout.chipsTop != null && readout.selectTop === readout.chipsTop
+
+  return (
+    <div className="flex flex-col gap-1 font-mono text-xs text-muted-foreground">
+      <span>
+        select control top: {readout.selectTop ?? '—'}px · chips control top:{' '}
+        {readout.chipsTop ?? '—'}px
+      </span>
+      <span className={aligned ? 'text-success' : 'text-foreground/80'}>
+        Invariant: stacked select and chips share the control track.
+      </span>
+    </div>
+  )
+}
+
+function SelectChipsMatrixHarness() {
+  const fields: FormItem[] = [
+    {
+      kind: 'row',
+      fieldDivider: { variant: 'pipe' },
+      fields: [
+        {
+          type: 'select',
+          name: 'school',
+          label: 'School',
+          options: [
+            { value: 'evocation', label: 'Evocation' },
+            { value: 'abjuration', label: 'Abjuration' },
+          ],
+          defaultValue: 'evocation',
+          width: '1/2',
+        },
+        {
+          type: 'chips',
+          name: 'level',
+          label: 'Level',
+          options: [
+            { value: '0', label: 'Cantrip' },
+            { value: '1', label: '1st' },
+          ],
+          multiple: false,
+          width: '1/2',
+        },
+      ],
+    },
+  ]
+
+  return (
+    <div className="flex max-w-3xl flex-col gap-4">
+      <p className="text-sm text-muted-foreground">
+        Spell basics row shape — stacked select beside single-select chips on the anatomy grid.
+      </p>
+      <SelectChipsControlTopProbe />
+      <Form<SpellBasicsRowValues>
+        id="anatomy-row-select-chips-matrix"
+        schema={spellBasicsRowSchema}
+        fields={fields}
+        defaultValues={{ school: 'evocation', level: '0' }}
+        onSubmit={() => undefined}
+        className="max-w-3xl"
+      />
+    </div>
+  )
+}
+
+/** Spell School + Level row checkpoint — select + chips control-track alignment. */
+export const SelectChipsMatrix: Story = {
+  render: () => <SelectChipsMatrixHarness />,
+}

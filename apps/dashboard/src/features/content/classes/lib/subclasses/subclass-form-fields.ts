@@ -4,8 +4,8 @@ import { type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
-  classFeatureItemFields,
   formatFeatureRowSummary,
+  subclassFeatureItemFields,
   subclassFeatureRowFormSchema,
   type SubclassFeatureRowForm,
 } from '../class-feature-form-fields'
@@ -53,7 +53,7 @@ export function buildSubclassFields(
           summary: (values) => formatFeatureRowSummary(values as SubclassFeatureRowForm),
         },
       },
-      fields: classFeatureItemFields(ctx, options),
+      fields: subclassFeatureItemFields(ctx, options),
     },
   ]
 }

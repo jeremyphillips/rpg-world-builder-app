@@ -4,12 +4,6 @@ import { isRowSlotItem, normalizeFieldHint, resolveFieldConfigPrimaryName } from
 
 const UNSUPPORTED_ROW_FIELD_TYPES = new Set<FieldConfig['type']>(['editableGrid', 'json', 'file'])
 
-const FIELDSET_PATH_ROW_FIELD_TYPES = new Set<FieldConfig['type']>([
-  'chips',
-  'inlineChooseCount',
-  'chooseFromChips',
-])
-
 function rowFieldPath(rowPath: string, index: number, field: RowFieldItem): string {
   const name = isRowSlotItem(field) ? field.name : resolveFieldConfigPrimaryName(field)
   return `${rowPath}.fields[${index}] (${name})`
@@ -30,12 +24,6 @@ function warnUnsupportedRowField(path: string, field: FieldConfig): void {
       `[Form] "${path}" uses type: '${field.type}' inside a schema row. Rich editors and editable grids are unsupported in anatomy rows — alignment may degrade.`,
     )
     return
-  }
-
-  if (FIELDSET_PATH_ROW_FIELD_TYPES.has(field.type)) {
-    console.warn(
-      `[Form] "${path}" uses type: '${field.type}' inside a schema row. Fieldset-path fields are not verified for mixed-row anatomy alignment — alignment may degrade.`,
-    )
   }
 
   if (hasActiveFieldChrome(field.chrome)) {

@@ -154,10 +154,45 @@ apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.
 
 ## Rows
 
-Side-by-side leaf fields and slots in a wrapping flex row. Row-level `visibility`, `separator`,
-and `className`. A top-level row is **one** field container — unlike `columns`, siblings share
-the box. Slots accept the same `width` tokens as leaf fields (`full`, fractions, `auto`, …).
-Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md).
+Side-by-side leaf fields and slots in a shared **anatomy-grid** row (CSS subgrid with three
+tracks: label / control / message). Row-level `visibility`, `separator`, and `className`. A
+top-level row is **one** field container — unlike `columns`, siblings share the box. Slots
+accept the same `width` tokens as leaf fields (`full`, fractions, `auto`, …).
+
+Participating field types emit `Field.Root` three-region anatomy (`select`, `text`, `chips`,
+`inlineSentence`, inline toggles, …). Fieldset-path renderers (`chips` outside rows) switch to
+anatomy participation inside rows so mixed siblings align on shared tracks — e.g. stacked
+`select` beside single-select `chips`. Hints in rows normalize to `below-control` (message
+track). `RowConfig.align` applies only to legacy flex `FieldRow` (`layout="flow"`), not
+anatomy-grid schema rows.
+
+Layout detail: [sizing-and-spacing.md](./sizing-and-spacing.md). Regression stories:
+`Internal/Forms/Layout/AnatomyRowToggleMatrix` (select + checkbox, select + chips).
+
+### Row field dividers
+
+`fieldDivider: { variant: 'pipe', tone? }` on `RowConfig` inserts a vertical pipe between row
+siblings inside a shared row container. Divider spacing replaces `gap-x-*`:
+
+| Rhythm      | Gutter each side of pipe |
+| ----------- | ------------------------ |
+| comfortable | `mx-8` (32px)            |
+| compact     | `mx-6` (24px)            |
+
+`tone` follows the border ladder (`faint` | `subtle` | `default` | `strong`; default `subtle`).
+Dividers hide when the anatomy row collapses to a single column. Distinct from horizontal
+`separator` (trailing `border-b` between stack siblings).
+
+```ts
+{
+  kind: 'row',
+  fieldDivider: { variant: 'pipe' },
+  fields: [
+    { type: 'select', name: 'school', width: '1/2', /* … */ },
+    { type: 'chips', name: 'level', width: '1/2', /* … */ },
+  ],
+}
+```
 
 ## Columns
 
@@ -227,6 +262,9 @@ controller field gates indented dependents:
   - `arrayItems` — chrome on array item shells only; avoids double borders when dependents include arrays.
   - Mixed dependents: only array item shells receive tone; scalars render without wash.
 - Dependents inherit parent `density` — no `density` knob on `DependentConfig`.
+- Optional `confirmBeforeClear` on `DependentConfig` — when the controller is a **switch**,
+  turning it off prompts before clearing populated dependent values. Absent by default.
+  Select/other controllers are unchanged in this pass.
 
 Pair dependent scalars with `labelPosition: 'settings'`.
 
@@ -245,6 +283,38 @@ Pair dependent scalars with `labelPosition: 'settings'`.
   ],
   // on `kind: 'dependent'` — same keys under `dependents`:
   // dependents: { surface: { emphasis: 'subtle' }, fields: [...] }
+}
+```
+
+Switch controller with confirm-before-clear (optional populated prose):
+
+```ts
+{
+  kind: 'dependent',
+  confirmBeforeClear: {
+    headline: 'Remove cantrip upgrade?',
+    description: 'This will remove the cantrip upgrade text you entered.',
+    confirmLabel: 'Remove',
+  },
+  controller: {
+    type: 'switch',
+    name: 'hasCantripScaling',
+    label: 'Cantrip Upgrade',
+    labelPosition: 'settings',
+    hint: 'Add rules for how this cantrip improves at higher character levels.',
+  },
+  dependents: {
+    inset: false,
+    chrome: 'none',
+    fields: [
+      {
+        type: 'richtext',
+        name: 'cantripScaling',
+        label: 'Cantrip Upgrade',
+        labelVisibility: 'srOnly',
+      },
+    ],
+  },
 }
 ```
 

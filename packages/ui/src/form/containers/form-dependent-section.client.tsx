@@ -36,6 +36,7 @@ import {
   useVisibilityValues,
 } from './form-conditional.client'
 import { isLeafController } from './form-group-section.client'
+import { DependentSwitchController } from './dependent-switch-controller.client'
 
 export interface RenderNestedFormItemsProps {
   items: Array<FormItem | RowConfig>
@@ -93,7 +94,16 @@ export function DependentSection({
       className={cn(fieldStackRhythmVariants({ rhythm }), item.className)}
     >
       <FormSectionContext.Provider value={childContext}>
-        <FieldNode config={controller} idPrefix={idPrefix} namePrefix={namePrefix} />
+        {item.confirmBeforeClear && controller.type === 'switch' ? (
+          <DependentSwitchController
+            item={item}
+            controller={controller}
+            idPrefix={idPrefix}
+            namePrefix={namePrefix}
+          />
+        ) : (
+          <FieldNode config={controller} idPrefix={idPrefix} namePrefix={namePrefix} />
+        )}
         <DependentFieldsRegion
           dependentsVisibility={dependentsVisibility}
           dependentsChrome={item.dependents}

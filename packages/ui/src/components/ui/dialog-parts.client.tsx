@@ -4,6 +4,7 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 
+import { dialogPanelHeaderClasses } from './dialog-panel.variants'
 import { headingVariants } from './heading.variants'
 import { textVariants } from './text.variants'
 import { cn } from '../../lib/utils'
@@ -63,7 +64,7 @@ export const DialogPanelHeader = React.forwardRef<HTMLDivElement, DialogPanelHea
   ) => (
     <div
       ref={ref}
-      className={cn('flex shrink-0 flex-col space-y-1.5 p-6', endSlot && 'pr-12', className)}
+      className={cn(dialogPanelHeaderClasses, endSlot && 'pr-12', className)}
       {...props}
     >
       {kicker ? renderKicker(kicker) : null}

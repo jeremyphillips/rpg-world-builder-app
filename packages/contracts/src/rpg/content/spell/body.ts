@@ -23,6 +23,7 @@ import { contentModelingSchema } from '../../primitives/modeling/schema'
 import { SPELL_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
 import { createDraftInputSchema, draftStoredSchema } from '../lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'
+import { generalTableSchema } from '../tables/general-table'
 import { spellResolutionSchema } from './resolution'
 
 // ---------------------------------------------------------------------------
@@ -67,6 +68,8 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   cantripScaling: z.string().optional(),
   /** Rich-text HTML (TipTap). Upcast body prose — no "Using a Higher-Level Spell Slot" heading. */
   higherLevelSlotEffect: z.string().optional(),
+  /** Structured description tables referenced by rich-text embed ids. */
+  tables: z.array(generalTableSchema).optional(),
   /** Structured resolution envelope for spell execution modeling. */
   resolution: spellResolutionSchema.optional(),
   /** Human-reviewed modeling posture; absent until audited. */
@@ -98,6 +101,7 @@ export const spellBodyDraftSchema = draftAuthoredContentBodySchema(
   deliveryMethod: spellDeliveryMethodSchema.optional(),
   cantripScaling: z.string().optional(),
   higherLevelSlotEffect: z.string().optional(),
+  tables: z.array(generalTableSchema).optional(),
   resolution: spellResolutionSchema.optional(),
   modeling: contentModelingSchema.optional(),
 })

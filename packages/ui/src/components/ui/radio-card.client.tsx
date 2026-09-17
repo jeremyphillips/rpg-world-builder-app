@@ -17,6 +17,7 @@ import {
   radioCardDetailsLinkVariants,
   radioCardEmbeddedSlotVariants,
   radioCardGroupGapVariants,
+  radioCardIconControlVariants,
   radioCardIndicatorVariants,
   radioCardItemWithDetailsVariants,
   radioCardMetaListVariants,
@@ -57,12 +58,18 @@ export type RadioCardDensity = 'default' | 'compact'
 
 export type RadioCardVariant = 'card' | 'row'
 
+export type RadioCardVisualControl = 'radio' | 'icon'
+
 export type RadioCardEmbeddedSlotTone = 'divider' | 'panel'
+
+export type RadioCardColumns = 'one' | 'two'
 
 export interface RadioCardOption {
   label: string
   value: string
   disabled?: boolean
+  /** Leading visual when the group uses visualControl="icon". */
+  icon?: React.ReactNode
   description?: string
   /** Optional badge rendered inline with the title (e.g. "Recommended"). */
   badge?: string
@@ -95,8 +102,14 @@ export interface RadioCardItemProps extends React.ComponentPropsWithoutRef<
   variant?: RadioCardVariant
   /** Merged onto the option title label. */
   titleClassName?: string
-  /** Horizontal placement of the decorative radio control within the card. */
+  /**
+   * Horizontal placement of the decorative radio control within the card.
+   * Ignored when visualControl="icon" (icon is always leading).
+   */
   controlPosition?: 'left' | 'right'
+  /** Leading control presentation. Default 'radio' preserves existing consumers. */
+  visualControl?: RadioCardVisualControl
+  icon?: React.ReactNode
 }
 
 function RadioCardDetailsLink({ label, onDetails }: { label: string; onDetails: () => void }) {
@@ -120,6 +133,8 @@ type RadioCardItemContentProps = Pick<
   | 'variant'
   | 'titleClassName'
   | 'controlPosition'
+  | 'visualControl'
+  | 'icon'
 >
 
 function RadioCardTitleMeta({ titleMeta }: { titleMeta: string }) {
@@ -167,6 +182,25 @@ function RadioCardControl({
       <span className={radioCardIndicatorVariants()}>
         <Circle className={cn('fill-primary text-primary', indicatorSize)} />
       </span>
+    </span>
+  )
+}
+
+function RadioCardIconControl({
+  icon,
+  density = 'default',
+  className,
+}: {
+  icon: React.ReactNode
+  density?: RadioCardDensity
+  className?: string
+}) {
+  return (
+    <span
+      className={cn(radioCardIconControlVariants({ density }), 'mt-0.5', className)}
+      aria-hidden="true"
+    >
+      {icon}
     </span>
   )
 }
@@ -254,16 +288,30 @@ function RadioCardItemContent({
   variant = 'card',
   titleClassName,
   controlPosition = 'left',
+  visualControl = 'radio',
+  icon,
 }: RadioCardItemContentProps) {
   const isCompact = density === 'compact'
   const summaryText =
     summaryItems && summaryItems.length > 0
       ? summaryItems.join(RADIO_CARD_SUMMARY_SEPARATOR)
       : undefined
+  const effectiveControlPosition = visualControl === 'icon' ? 'left' : controlPosition
 
   return (
-    <div className={radioCardRootLayoutVariants({ controlPosition, density })}>
-      <RadioCardControl variant={variant} density={density} />
+    <div
+      className={radioCardRootLayoutVariants({
+        controlPosition: effectiveControlPosition,
+        density,
+      })}
+    >
+      {visualControl === 'icon' ? (
+        icon ? (
+          <RadioCardIconControl icon={icon} density={density} />
+        ) : null
+      ) : (
+        <RadioCardControl variant={variant} density={density} />
+      )}
       <div className={radioCardBodyVariants({ density })}>
         <RadioCardTitleRowContent
           label={label}
@@ -303,6 +351,8 @@ const RadioCardItem = React.forwardRef<
       variant = 'card',
       titleClassName,
       controlPosition = 'left',
+      visualControl = 'radio',
+      icon,
       disabled,
       onClick,
       value,
@@ -330,6 +380,8 @@ const RadioCardItem = React.forwardRef<
         variant={variant}
         titleClassName={titleClassName}
         controlPosition={controlPosition}
+        visualControl={visualControl}
+        icon={icon}
       />
     </RadioGroupPrimitive.Item>
   ),
@@ -418,8 +470,15 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<
   idPrefix?: string
   variant?: RadioCardVariant
   density?: RadioCardDensity
-  /** Horizontal placement of the decorative radio control within each card. */
+  /**
+   * Horizontal placement of the decorative radio control within each card.
+   * Ignored when visualControl="icon".
+   */
   controlPosition?: 'left' | 'right'
+  /** Leading control presentation. Default 'radio' preserves existing consumers. */
+  visualControl?: RadioCardVisualControl
+  /** Responsive column count for card-variant groups. Default 'one'. */
+  columns?: RadioCardColumns
 }
 
 /**
@@ -433,6 +492,8 @@ function RadioCard({
   variant = 'card',
   density = 'default',
   controlPosition = 'left',
+  visualControl = 'radio',
+  columns = 'one',
   value,
   onValueChange,
   ...props
@@ -441,7 +502,7 @@ function RadioCard({
 
   return (
     <RadioGroup
-      className={cn(radioCardGroupGapVariants({ variant, density }), className)}
+      className={cn(radioCardGroupGapVariants({ variant, density, columns }), className)}
       value={value}
       onValueChange={onValueChange}
       {...props}
@@ -477,6 +538,8 @@ function RadioCard({
             density={density}
             variant={variant}
             controlPosition={controlPosition}
+            visualControl={visualControl}
+            icon={option.icon}
             onClick={createRadioCardReselectClickHandler(
               option.value,
               selectedValue,

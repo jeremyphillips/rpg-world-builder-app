@@ -8,6 +8,8 @@ import type * as RpgUi from '@rpg/ui'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { dialogPanelSectionInsetXClasses } from '@rpg/ui'
+
 import { CreateModalShell } from './create-modal-shell'
 
 const modalContentSpy = vi.fn()
@@ -29,6 +31,25 @@ vi.mock('@rpg/ui', async (importOriginal) => {
 })
 
 describe('CreateModalShell', () => {
+  it('uses stableBodyClip so section scrollports own horizontal inset once', () => {
+    render(
+      <CreateModalShell
+        open
+        onOpenChange={vi.fn()}
+        headline="Create place"
+        footer={<button type="button">Create</button>}
+      >
+        <p>Details</p>
+      </CreateModalShell>,
+    )
+
+    const body = document.querySelector('[data-create-modal-body]')
+    const scrollRegion = document.querySelector('[data-create-modal-content]')
+
+    expect(body).not.toHaveClass(dialogPanelSectionInsetXClasses)
+    expect(scrollRegion).toHaveClass(dialogPanelSectionInsetXClasses)
+  })
+
   it('selects stable tall Modal layout and owns one body, scroll region, and footer', () => {
     modalContentSpy.mockClear()
 

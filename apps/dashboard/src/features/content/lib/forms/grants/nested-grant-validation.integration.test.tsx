@@ -10,7 +10,7 @@ import {
   startingEquipmentOptionFormSchema,
   startingEquipmentOptionItemFields,
 } from '@/features/content/classes/lib/character-creation/class-starting-equipment-form-fields'
-import { classFeatureItemFields } from '@/features/content/classes/lib/class-feature-form-fields'
+import { subclassFeatureItemFields } from '@/features/content/classes/lib/class-feature-form-fields'
 import {
   buildSubclassFields,
   subclassFormSchema,
@@ -154,7 +154,7 @@ describe('nested grant validation integration', () => {
           {
             kind: 'array',
             name: 'features',
-            fields: classFeatureItemFields(ctx),
+            fields: subclassFeatureItemFields(ctx),
           },
         ]}
         defaultValues={{
@@ -183,7 +183,7 @@ describe('nested grant validation integration', () => {
     const issues = prepareFormIssues(
       (
         await makeResolver(classFeatureGrantSchema, [
-          { kind: 'array', name: 'features', fields: classFeatureItemFields(ctx) },
+          { kind: 'array', name: 'features', fields: subclassFeatureItemFields(ctx) },
         ])(
           {
             features: [{ level: 1, name: 'Rage', grants: [weaponGrantDefaults] }],
@@ -192,7 +192,7 @@ describe('nested grant validation integration', () => {
           { fields: {}, shouldUseNativeValidation: false },
         )
       ).errors,
-      [{ kind: 'array', name: 'features', fields: classFeatureItemFields(ctx) }],
+      [{ kind: 'array', name: 'features', fields: subclassFeatureItemFields(ctx) }],
     )
 
     expect(issues.map((issue) => issue.presentationPath ?? issue.path)).toContain(

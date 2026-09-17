@@ -89,9 +89,44 @@ export {
   normalizeRichTextHtml,
   richTextHtmlEquals,
 } from './components/ui/rich-text-html'
+export {
+  extractTableEmbedIds,
+  richTextHtmlHasTableEmbeds,
+} from './components/ui/rich-text-table-embed.lib'
+export {
+  RICH_TEXT_TABLE_EMBED_ATTR,
+  RICH_TEXT_TABLE_EMBED_SANITIZE_ATTRS,
+} from './lib/rich-text-table-embed-attrs'
+export type {
+  RichTextTableEmbedHost,
+  RichTextTableEmbedCreateSession,
+  RichTextTableEmbedResolved,
+} from './components/ui/rich-text-table-embed.types'
+export {
+  registerRichTextTableEmbedHost,
+  getRichTextTableEmbedHost,
+  useRichTextTableEmbedHost,
+  RichTextTableEmbedHostRegistrar,
+} from './components/ui/rich-text-table-embed-host.client'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
+export { IconBox, type IconBoxProps } from './components/ui/icon-box.client'
+export { iconBoxVariants, iconBoxGlyphClasses } from './components/ui/icon-box.variants'
+export { EmptyPanel, type EmptyPanelProps } from './components/ui/empty-panel.client'
+export { emptyPanelVariants } from './components/ui/empty-panel.variants'
+export {
+  emptyStateWellBodyClasses,
+  emptyStateWellIconInkClasses,
+  emptyStateWellIconLgClasses,
+  emptyStateWellIconMdClasses,
+  emptyStateWellSupportingClasses,
+  emptyStateWellSupportingLgClasses,
+  emptyStateWellSurfaceClasses,
+  emptyStateWellTitleClasses,
+  emptyStateWellTitleLgClasses,
+  resolveEmptyStateWellIconClasses,
+} from './components/ui/empty-state-well.variants'
 export { NavSection, type NavSectionProps } from './components/ui/nav-section'
 export {
   sidebarNavItemVariants,
@@ -175,6 +210,7 @@ export {
   buttonSizeToComboboxFieldSize,
   fieldSizeToArrayAddButtonSize,
   fieldSizeToAttachedButtonSize,
+  INLINE_HEADER_ACTION_BUTTON_SIZE,
   resolveArrayAddButtonSize,
   resolveAttachedButtonSize,
   fieldSizeToBadgeSize,
@@ -277,6 +313,7 @@ export {
   RADIO_CARD_DEFAULT_DETAILS_LABEL,
   RADIO_CARD_SUMMARY_SEPARATOR,
   type RadioCardDensity,
+  type RadioCardVisualControl,
   type RadioCardVariant,
   type RadioCardEmbeddedSlotTone,
   type RadioCardOption,
@@ -699,14 +736,33 @@ export {
 export {
   dialogPanelActionRowClasses,
   dialogPanelBodyVariants,
+  dialogPanelManagedBodyVariants,
   dialogPanelStableBodyVariants,
+  dialogPanelStableBodyClipVariants,
   dialogPanelScrollRegionBottomInsetClasses,
   dialogPanelScrollRegionClasses,
+  dialogPanelScrollRegionTopInsetClasses,
+  dialogPanelScrollRegionViewportClasses,
+  dialogPanelSectionScrollViewportClasses,
+  dialogPanelInnerScrollViewportClasses,
+  dialogPanelInnerLeadingScrollViewportClasses,
   dialogContentFocusShellClasses,
   dialogPanelFooterClasses,
+  dialogPanelHeaderClasses,
+  dialogPanelHeaderPaddingClasses,
+  dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
 } from './components/ui/dialog-panel.variants'
+export {
+  DialogPanelScrollRegion,
+  type DialogPanelScrollRegionProps,
+} from './components/ui/dialog-panel-scroll-region.client'
+export {
+  DialogPanelBody,
+  type DialogPanelBodyMode,
+  type DialogPanelBodyProps,
+} from './components/ui/dialog-panel-body.client'
 export {
   DialogPanelActionRow,
   type DialogPanelActionRowProps,
@@ -881,6 +937,7 @@ export {
   TableCell,
   TableCaption,
 } from './components/ui/table'
+export { tableHeaderRowClasses, tableHeaderRowVariants } from './components/ui/table.variants'
 export {
   Badge,
   badgeVariants,

@@ -1,7 +1,11 @@
+import { richTextHtmlHasTableEmbeds } from './rich-text-table-embed.lib'
+
 /** Treat visually empty editor HTML as an empty string for form dirty checks. */
 export function normalizeRichTextHtml(html: string | undefined): string {
   const trimmed = (html ?? '').trim()
   if (trimmed === '') return ''
+
+  if (richTextHtmlHasTableEmbeds(trimmed)) return trimmed
 
   const textContent = extractRichTextContent(trimmed)
 

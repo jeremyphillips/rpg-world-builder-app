@@ -15,8 +15,8 @@ import { TabbedFormChromeContext } from './tabbed-form-chrome.context'
 import type { ValidateSilently } from '../context/form-ui.context'
 import { TabbedFormErrorSummary } from './tabbed-form-error-summary.client'
 import { FormRhythmStack } from '../context/form-section.context'
+import { DialogPanelScrollRegion } from '../../components/ui/dialog-panel-scroll-region.client'
 import {
-  formSheetScrollRegionClasses,
   formTabbedAsideBodyClasses,
   formTabbedAsideGridClasses,
   formTabbedAsideSlotClasses,
@@ -237,13 +237,13 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   )
 
   const externalFooterBody = (
-    <div className={formSheetScrollRegionClasses}>
+    <DialogPanelScrollRegion inset="section">
       <FormRhythmStack className={formTabbedChromeRhythmStackClasses}>
         {resolvedHeader}
         {panels}
         {validationSummary}
       </FormRhythmStack>
-    </div>
+    </DialogPanelScrollRegion>
   )
 
   const footerRegion = !externalFooter ? (

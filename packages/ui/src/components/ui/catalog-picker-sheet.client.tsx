@@ -23,6 +23,7 @@ import {
 import { cn } from '../../lib/utils'
 import {
   dialogPanelActionRowClasses,
+  dialogPanelScrollRegionTopInsetClasses,
   dialogPanelSectionInsetXClasses,
 } from './dialog-panel.variants'
 
@@ -74,14 +75,7 @@ function CatalogPickerSheetEmpty({
   if (emptyState) return <>{emptyState}</>
 
   return (
-    <InsetPanel
-      borderStyle="dashed"
-      surface={{}}
-      size="md"
-      align="center"
-      className="py-8"
-      role="status"
-    >
+    <InsetPanel borderStyle="dashed" size="md" align="center" className="py-8" role="status">
       <InsetPanel.Text>{message}</InsetPanel.Text>
     </InsetPanel>
   )
@@ -231,19 +225,19 @@ export function CatalogPickerSheet<TItem>({
         </Sheet.Header>
 
         {headerBelowDescription ? (
-          <div className={cn(dialogPanelSectionInsetXClasses, 'pb-4')}>
+          <div
+            className={cn(
+              dialogPanelSectionInsetXClasses,
+              dialogPanelScrollRegionTopInsetClasses,
+              'pb-4',
+            )}
+          >
             {headerBelowDescription}
           </div>
         ) : null}
 
         {bodyReplacement !== undefined ? (
-          <Sheet.Body
-            className={catalogPickerSheetBodyVariants({
-              hasFooter: Boolean(footer),
-            })}
-          >
-            {bodyReplacement}
-          </Sheet.Body>
+          <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyReplacement}</Sheet.Body>
         ) : pickerEnabled ? (
           <>
             <CatalogToolbar
@@ -265,13 +259,7 @@ export function CatalogPickerSheet<TItem>({
 
             {auxiliaryAction ? <CatalogPickerAuxiliaryActionSlot action={auxiliaryAction} /> : null}
 
-            <Sheet.Body
-              className={catalogPickerSheetBodyVariants({
-                hasFooter: Boolean(footer),
-              })}
-            >
-              {bodyContent}
-            </Sheet.Body>
+            <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyContent}</Sheet.Body>
           </>
         ) : null}
 

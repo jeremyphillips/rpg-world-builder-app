@@ -22,6 +22,7 @@ import type {
   TextSuggestionsFieldConfig,
 } from '../../field-config'
 import { fieldDefaultValue, resolveFieldHintPresentation } from '../../field-config'
+import { useConfirmBeforeClear } from '../../config/use-confirm-before-clear.client'
 import { normalizedSelectFieldValue, pickSelectFieldChromeProps } from './select-field-renderer.lib'
 import { useSelectFieldRendererState } from './use-select-field-renderer-state.client'
 
@@ -55,45 +56,53 @@ export function OptionalDisclosureTextareaFieldRenderer({
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const open = manualOpen || (expandWhenPopulated && hasValue)
 
-  const handleRemove = () => {
+  const clearValue = () => {
     onChange('')
     setManualOpen(false)
   }
+  const { attemptClear, confirmDialog } = useConfirmBeforeClear({
+    confirmBeforeClear: disclosure.confirmBeforeClear,
+    clearingFields: [config],
+    onClear: clearValue,
+  })
 
   return (
-    <OptionalFieldDisclosure
-      controlId={id}
-      fieldLabel={config.label}
-      addLabel={disclosure.addLabel}
-      removeLabel={disclosure.removeLabel}
-      open={open}
-      onOpenChange={setManualOpen}
-      onRemove={handleRemove}
-      size={controlSize}
-    >
-      <TextareaField
-        id={id}
-        {...pickFieldChromeProps(config)}
-        label=""
-        aria-label={config.label}
-        error={error}
-        invalid={invalid}
-        describedBy={describedBy}
-        hint={hint}
-        hintPosition={hintPosition}
-        info={config.info}
-        required={config.required}
-        width={config.width}
+    <>
+      <OptionalFieldDisclosure
+        controlId={id}
+        fieldLabel={config.label}
+        addLabel={disclosure.addLabel}
+        removeLabel={disclosure.removeLabel}
+        open={open}
+        onOpenChange={setManualOpen}
+        onRemove={attemptClear}
         size={controlSize}
-        placeholder={config.placeholder}
-        rows={config.rows}
-        disabled={config.disabled}
-        ref={registerRef}
-        value={value ?? ''}
-        onChange={onChange}
-        onBlur={onBlur}
-      />
-    </OptionalFieldDisclosure>
+      >
+        <TextareaField
+          id={id}
+          {...pickFieldChromeProps(config)}
+          label=""
+          aria-label={config.label}
+          error={error}
+          invalid={invalid}
+          describedBy={describedBy}
+          hint={hint}
+          hintPosition={hintPosition}
+          info={config.info}
+          required={config.required}
+          width={config.width}
+          size={controlSize}
+          placeholder={config.placeholder}
+          rows={config.rows}
+          disabled={config.disabled}
+          ref={registerRef}
+          value={value ?? ''}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+      </OptionalFieldDisclosure>
+      {confirmDialog}
+    </>
   )
 }
 
@@ -128,10 +137,15 @@ export function OptionalDisclosureSelectFieldRenderer({
     size: state.controlSize,
   })
 
-  const handleRemove = () => {
+  const clearValue = () => {
     state.field.onChange('')
     setManualOpen(false)
   }
+  const { attemptClear, confirmDialog } = useConfirmBeforeClear({
+    confirmBeforeClear: disclosure.confirmBeforeClear,
+    clearingFields: [config],
+    onClear: clearValue,
+  })
 
   if (state.isReadOnly) {
     return (
@@ -145,31 +159,34 @@ export function OptionalDisclosureSelectFieldRenderer({
   }
 
   return (
-    <OptionalFieldDisclosure
-      controlId={id}
-      fieldLabel={state.renderConfig.label}
-      addLabel={disclosure.addLabel}
-      removeLabel={disclosure.removeLabel}
-      open={open}
-      onOpenChange={setManualOpen}
-      onRemove={handleRemove}
-      size={state.controlSize}
-    >
-      <SelectField
-        id={id}
-        options={state.resolvedOptions}
-        placeholder={state.renderConfig.placeholder}
-        name={state.field.name}
-        disabled={state.renderConfig.disabled}
-        value={normalizedSelectFieldValue(state.field.value)}
-        onValueChange={state.field.onChange}
-        onBlur={state.field.onBlur}
-        {...chrome}
-        label=""
-        aria-label={state.renderConfig.label}
-        {...state.validation}
-      />
-    </OptionalFieldDisclosure>
+    <>
+      <OptionalFieldDisclosure
+        controlId={id}
+        fieldLabel={state.renderConfig.label}
+        addLabel={disclosure.addLabel}
+        removeLabel={disclosure.removeLabel}
+        open={open}
+        onOpenChange={setManualOpen}
+        onRemove={attemptClear}
+        size={state.controlSize}
+      >
+        <SelectField
+          id={id}
+          options={state.resolvedOptions}
+          placeholder={state.renderConfig.placeholder}
+          name={state.field.name}
+          disabled={state.renderConfig.disabled}
+          value={normalizedSelectFieldValue(state.field.value)}
+          onValueChange={state.field.onChange}
+          onBlur={state.field.onBlur}
+          {...chrome}
+          label=""
+          aria-label={state.renderConfig.label}
+          {...state.validation}
+        />
+      </OptionalFieldDisclosure>
+      {confirmDialog}
+    </>
   )
 }
 
@@ -236,42 +253,50 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
     }
   }
 
-  const handleRemove = () => {
+  const clearValue = () => {
     field.onChange('')
     setManualOpen(false)
     setDependencyCollapsed(false)
   }
+  const { attemptClear, confirmDialog } = useConfirmBeforeClear({
+    confirmBeforeClear: disclosure.confirmBeforeClear,
+    clearingFields: [config],
+    onClear: clearValue,
+  })
 
   return (
-    <OptionalFieldDisclosure
-      controlId={id}
-      fieldLabel={config.label}
-      addLabel={disclosure.addLabel}
-      removeLabel={disclosure.removeLabel}
-      open={open}
-      onOpenChange={handleOpenChange}
-      onRemove={handleRemove}
-      size={controlSize}
-    >
-      <TextSuggestionsField
-        id={id}
-        {...pickFieldChromeProps(config)}
-        label=""
-        ariaLabel={config.label}
-        suggestions={suggestions}
-        placeholder={config.placeholder}
-        hint={hintPresentation.text}
-        hintPosition={hintPresentation.position}
-        info={config.info}
-        required={config.required}
-        disabled={config.disabled}
+    <>
+      <OptionalFieldDisclosure
+        controlId={id}
+        fieldLabel={config.label}
+        addLabel={disclosure.addLabel}
+        removeLabel={disclosure.removeLabel}
+        open={open}
+        onOpenChange={handleOpenChange}
+        onRemove={attemptClear}
         size={controlSize}
-        width={config.width}
-        value={field.value ?? fieldDefaultValue(config)}
-        onValueChange={field.onChange}
-        onBlur={field.onBlur}
-        {...validation}
-      />
-    </OptionalFieldDisclosure>
+      >
+        <TextSuggestionsField
+          id={id}
+          {...pickFieldChromeProps(config)}
+          label=""
+          ariaLabel={config.label}
+          suggestions={suggestions}
+          placeholder={config.placeholder}
+          hint={hintPresentation.text}
+          hintPosition={hintPresentation.position}
+          info={config.info}
+          required={config.required}
+          disabled={config.disabled}
+          size={controlSize}
+          width={config.width}
+          value={field.value ?? fieldDefaultValue(config)}
+          onValueChange={field.onChange}
+          onBlur={field.onBlur}
+          {...validation}
+        />
+      </OptionalFieldDisclosure>
+      {confirmDialog}
+    </>
   )
 }

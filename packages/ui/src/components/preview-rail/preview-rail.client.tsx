@@ -17,6 +17,7 @@ import { Badge } from '../ui/badge'
 import { Button } from '../ui/button.client'
 import { ContentCardHeading } from '../ui/content-card-heading.client'
 import { ContentCardMedia } from '../ui/content-card-parts.client'
+import { IconBox } from '../ui/icon-box.client'
 import { contentCardMediaVariants } from '../ui/content-card.variants'
 import { Eyebrow } from '../ui/eyebrow'
 import { Heading } from '../ui/heading'
@@ -62,8 +63,6 @@ import {
   previewRailIdentityStackClasses,
   previewRailScrollRegionContentClasses,
   previewRailScrollRegionShellClasses,
-  previewRailMediaFallbackVariants,
-  previewRailMediaIconClasses,
   previewRailRootVariants,
   previewRailSectionBodyClasses,
   previewRailSectionBodyDescriptionClasses,
@@ -179,13 +178,7 @@ function PreviewRailMedia({ imageSrc, imageAlt = '', fallbackIcon }: PreviewRail
     )
   }
 
-  return (
-    <div className={previewRailMediaFallbackVariants()}>
-      <span className={previewRailMediaIconClasses} aria-hidden>
-        {fallbackIcon}
-      </span>
-    </div>
-  )
+  return <IconBox>{fallbackIcon}</IconBox>
 }
 
 export type PreviewRailAvailabilityLineProps = PreviewRailAvailability

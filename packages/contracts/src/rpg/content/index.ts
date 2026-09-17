@@ -1,4 +1,5 @@
 export * from './lib'
+export * from './tables'
 export * from './classes'
 export * from './species-character-creation-messages'
 export * from './species-character-creation'

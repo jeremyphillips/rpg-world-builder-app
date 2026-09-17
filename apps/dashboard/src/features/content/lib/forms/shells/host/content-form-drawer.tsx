@@ -1,10 +1,9 @@
 import * as React from 'react'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
-import { Button, cn, dialogPanelSectionInsetXClasses, usePendingAwareOpenChange } from '@rpg/ui'
+import { Button, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
-import { drawerShellBodyVariants } from '@/components/drawer/drawer-shell.variants'
 import {
   ContentFormHost,
   type ContentFormHostFormProps,
@@ -85,13 +84,8 @@ export function ContentFormDrawer<TFormValues extends FieldValues>({
           leaveBridgeRef={leaveBridgeRef}
           onSubmit={onSubmit}
           onTrustedClose={trustedClose}
-          contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
           chrome={{
-            contentWrapper: (content) => (
-              <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>
-                {content}
-              </DrawerShell.Body>
-            ),
+            contentWrapper: (content) => <DrawerShell.Body managed>{content}</DrawerShell.Body>,
             footer: () => (
               <>
                 <DrawerShell.Close asChild>

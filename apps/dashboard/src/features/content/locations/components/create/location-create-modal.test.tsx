@@ -621,7 +621,7 @@ describe('LocationCreateModal', () => {
     const form = screen.getAllByRole('textbox', { name: 'Name' })[0]?.closest('form')
     const visibilityWrapper = form?.parentElement
     const modalBody = document.querySelector('[data-create-modal-body]')
-    const formScrollRegion = form?.firstElementChild
+    const formScrollRegion = form?.querySelector('.overflow-y-auto')
     const footer = screen
       .getByRole('button', { name: 'Create building' })
       .closest('.border-border-faint')

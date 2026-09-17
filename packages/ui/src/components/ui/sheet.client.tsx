@@ -11,9 +11,9 @@ import {
 } from './dialog-parts.client'
 import { handleDialogOpenAutoFocus } from './dialog-focus.lib'
 import { modalOverlayVariants } from './modal.variants'
+import { DialogPanelBody } from './dialog-panel-body.client'
 import { dialogContentFocusShellClasses, dialogPanelFooterClasses } from './dialog-panel.variants'
 import {
-  sheetBodyVariants,
   sheetContentVariants,
   sheetFooterDockClasses,
   type SheetSide,
@@ -135,9 +135,22 @@ const SheetHeader = React.forwardRef<HTMLDivElement, SheetHeaderProps>(
 )
 SheetHeader.displayName = 'Sheet.Header'
 
-const SheetBody = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn(sheetBodyVariants(), className)} {...props} />
+export interface SheetBodyProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * When true, Body is a clip-only flex column — the caller supplies the overlay
+   * scrollport (DrawerShell `bodyMode="managed"`, Form `externalFooter`).
+   */
+  managed?: boolean
+}
+
+const SheetBody = React.forwardRef<HTMLDivElement, SheetBodyProps>(
+  ({ className, managed, ...props }, ref) => (
+    <DialogPanelBody
+      ref={ref}
+      mode={managed ? 'managed' : 'scroll'}
+      className={className}
+      {...props}
+    />
   ),
 )
 SheetBody.displayName = 'Sheet.Body'

@@ -92,6 +92,10 @@ rich-text body prose for cantrip upgrades and upcast effects. Section headings
 (`Cantrip Upgrade`, `Using a Higher-Level Spell Slot`) are display-owned in
 `lib/spell-display.ts` — do not embed them in stored HTML.
 
+Basics authoring gates each section behind form-only `hasCantripScaling` /
+`hasHigherLevelSlotEffect` switches (derived on load from stored prose in
+`spell-form-values.ts`). Only the prose fields persist on save.
+
 ## API
 
 - `GET /api/campaigns/:campaignId/content/spells` → `{ spells: Spell[] }`

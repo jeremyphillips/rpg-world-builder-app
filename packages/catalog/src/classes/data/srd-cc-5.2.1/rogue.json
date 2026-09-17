@@ -145,7 +145,27 @@
       "id": "weapon-mastery",
       "name": "Weapon Mastery",
       "level": 1,
-      "description": "<p>Your training with weapons allows you to use the mastery properties of two kinds of weapons of your choice with which you have proficiency, such as Daggers and Shortbow.</p><p>Whenever you finish a Long Rest, you can change the kinds of weapons you chose. For example, you could switch to using the mastery properties of Scimitars and Shortswords.</p>"
+      "description": "<p>Your training with weapons allows you to use the mastery properties of two kinds of weapons of your choice with which you have proficiency, such as Daggers and Shortbow.</p><p>Whenever you finish a Long Rest, you can change the kinds of weapons you chose. For example, you could switch to using the mastery properties of Scimitars and Shortswords.</p>",
+      "tables": [
+        {
+          "id": "weapon-mastery-progression",
+          "name": "Weapon Mastery progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "masteries",
+              "label": "Weapon Mastery",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 1,
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "cunning-action",

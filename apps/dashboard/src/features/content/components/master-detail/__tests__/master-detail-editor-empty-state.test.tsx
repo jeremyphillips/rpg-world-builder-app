@@ -18,5 +18,10 @@ describe('MasterDetailEditorEmptyState', () => {
     expect(
       screen.getByText(masterDetailEmptySelectionSubhead(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
     ).toBeInTheDocument()
+    const status = screen.getByRole('status')
+    expect(status).toHaveClass('bg-sunken')
+    expect(
+      screen.getByText(masterDetailEmptySelectionHeading(TRAIT_MASTER_DETAIL_ITEM_NOUN)),
+    ).toHaveClass('text-muted-foreground')
   })
 })

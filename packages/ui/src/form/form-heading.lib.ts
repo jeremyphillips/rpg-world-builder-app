@@ -10,6 +10,9 @@ export type FormHeading = {
   hint?: string | FieldHintConfig
 }
 
+/** Label + hint slice shared by arrays and other section headings. */
+export type FormHeadingContent = Pick<FormHeading, 'label' | 'hint'>
+
 export type FieldLabelVisibility = 'visible' | 'srOnly'
 
 type LabelVisibilitySource = {

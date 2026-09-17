@@ -41,11 +41,8 @@
     var(--palette-neutral-contrast) 32%,
     var(--palette-surface-base)
   );
-  --palette-surface-sunken: color-mix(
-    in oklch,
-    var(--palette-neutral-contrast) 32%,
-    var(--palette-surface-base)
-  );
+  /* Authored inset well — neutral gray-beige (#efede7), distinct from warm wash ladder */
+  --palette-surface-sunken: oklch(0.946 0.0083 91.48);
 
   --palette-primary: oklch(0.386 0.13 36.6);
   --palette-primary-foreground: var(--palette-fg-on-solid);

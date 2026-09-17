@@ -7,7 +7,6 @@ import {
   type CharacterClass,
   type ClassFeature,
   type ClassProficiencies,
-  type ClassResource,
   type ContentValidationIntent,
   type CreateClassInput,
   type Spellcasting,
@@ -34,11 +33,6 @@ import {
   startingEquipmentFromFormValues,
 } from './character-creation/class-starting-equipment-form-values'
 import { characterCreationProficienciesFromFormValues } from './character-creation/class-character-creation-proficiencies-form-values'
-
-type ResourceRowForm = {
-  name: string
-  entries: { level: number; value: number }[]
-}
 
 export function proficienciesToFormValues(proficiencies: ClassProficiencies) {
   return {
@@ -128,31 +122,6 @@ function classCharacterCreationInputFromForm(
   }
 }
 
-export function resourceToFormRow(resource: ClassResource): ResourceRowForm {
-  return {
-    name: resource.name,
-    entries: resource.entries,
-  }
-}
-
-function resourceFromFormRow(row: ResourceRowForm): ClassResource {
-  return {
-    name: row.name,
-    entries: row.entries,
-  }
-}
-
-function classResourcesInputFromForm(
-  resources: ClassFormValues['resources'],
-): ClassResource[] | undefined {
-  const rows =
-    resources
-      ?.filter((row) => row.name.trim().length > 0)
-      .map(resourceFromFormRow)
-      .filter((resource) => resource.entries.length > 0) ?? []
-  return rows.length ? rows : undefined
-}
-
 function featuresForInput(
   rows: ClassFormValues['features'],
   existing: readonly ClassFeature[] | undefined,
@@ -166,7 +135,6 @@ function featuresForInput(
 type ClassWirePayloadParts = {
   characterCreation: ReturnType<typeof classCharacterCreationInputFromForm>
   proficiencies: ClassProficiencies | undefined
-  resources: ClassResource[] | undefined
   features: ClassFeature[]
 }
 
@@ -195,7 +163,6 @@ function classDraftWirePayload(
     ...(values.primaryAbilities?.length ? { primaryAbilities: values.primaryAbilities } : {}),
     ...(values.hitDie !== undefined ? { hitDie: values.hitDie } : {}),
     ...(parts.proficiencies ? { proficiencies: parts.proficiencies } : {}),
-    ...(parts.resources ? { resources: parts.resources } : {}),
   }
 }
 
@@ -209,7 +176,6 @@ function classPublishWirePayload(
     primaryAbilities: values.primaryAbilities,
     hitDie: values.hitDie,
     proficiencies: parts.proficiencies!,
-    ...(parts.resources ? { resources: parts.resources } : {}),
   }
 }
 
@@ -225,7 +191,6 @@ function classWirePayloadParts(
       values.weaponProficiencyMode === 'individual',
       validationIntent,
     ),
-    resources: classResourcesInputFromForm(values.resources),
     features: featuresForInput(values.features, ctx?.entity?.features, validationIntent),
   }
 }
@@ -370,5 +335,4 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
     createSubclassChoiceFeature({ classSlug: 'new-class', className: 'New Class' }),
     ...[4, 8, 12, 16].map((level) => createAsiFeature(level)),
   ].map(featureToFormRow),
-  resources: [],
 }

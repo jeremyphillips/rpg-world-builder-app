@@ -26,4 +26,17 @@ describe('resolveFieldRowAnatomyPresentation', () => {
     expect(presentation.className).toContain('gap-x-4')
     expect(presentation.className).not.toContain('gap-x-6')
   })
+
+  it('interleaves divider tracks and suppresses gap-x when fieldDivider is enabled', () => {
+    const presentation = resolveFieldRowAnatomyPresentation(['1/2', '1/2'], 'form', {
+      fieldDivider: true,
+      rhythm: 'comfortable',
+    })
+
+    expect(presentation.className).toContain('gap-x-0')
+    expect(presentation.className).not.toContain('gap-x-6')
+    expect(String(presentation.style['--row-cols' as keyof typeof presentation.style])).toContain(
+      ' auto ',
+    )
+  })
 })

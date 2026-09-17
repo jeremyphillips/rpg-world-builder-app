@@ -8,12 +8,11 @@ import { ChipsFieldOptions } from './chips-field.client'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { CompactLabelSize } from './compact-label.lib'
 import { cn } from '../../lib/utils'
-import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
-import { Field, type FieldSize } from './field.client'
+import { FieldAnatomyRowShell } from './field-anatomy-row-shell.client'
+import type { FieldSize } from './field.client'
 import { fieldHasValidationError } from './field-validation-props'
 import { FieldLabelContent } from './field-label-content'
-import { FieldLayout } from './field-layout'
 import { useFieldRowParticipation } from './field-row-anatomy.context'
 import {
   fieldInlineSentenceClasses,
@@ -23,11 +22,7 @@ import {
 import { parseChooseCount } from './choose-count-field.lib'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
-import {
-  pickFieldChromeProps,
-  resolveFieldAnatomyWidth,
-  type FieldChrome,
-} from './field-chrome.variants'
+import type { FieldChrome } from './field-chrome.variants'
 import { JoinedPair } from './joined-pair-field.client'
 import {
   indexInlineSentenceControls,
@@ -554,51 +549,23 @@ function InlineSentenceAnatomyField({
 > & {
   body: (labelledBy?: string) => React.ReactNode
 }) {
-  const rootWidth = resolveFieldAnatomyWidth(width, chrome)
-  const labelId = `${id}-label`
-  const showFieldLabel = labelVisibility !== 'srOnly' && label.trim().length > 0
-
   return (
-    <Field.Root
+    <FieldAnatomyRowShell
       id={id}
+      label={label}
       error={error}
       hint={hint}
       hintPosition={hintPosition}
+      info={info}
       required={required}
-      width={rootWidth}
       size={size}
-      {...pickFieldChromeProps({ chrome })}
-      anatomy
+      width={width}
+      chrome={chrome}
+      labelVisibility={labelVisibility}
+      controlBand="content-sized"
     >
-      <FieldLayout
-        hintPosition={hintPosition}
-        wrapControl={false}
-        chrome={chrome}
-        size={size}
-        controlBand="content-sized"
-        label={
-          showFieldLabel ? (
-            <span id={labelId}>
-              <FormFieldLabel
-                label={label}
-                labelVisibility={labelVisibility}
-                required={required}
-                info={info}
-              />
-            </span>
-          ) : null
-        }
-        control={
-          <div
-            role="group"
-            aria-labelledby={showFieldLabel ? labelId : undefined}
-            aria-label={showFieldLabel ? undefined : label}
-          >
-            {body(showFieldLabel ? labelId : undefined)}
-          </div>
-        }
-      />
-    </Field.Root>
+      {({ labelId }) => body(labelId)}
+    </FieldAnatomyRowShell>
   )
 }
 

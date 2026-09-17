@@ -1,4 +1,4 @@
-import { ABILITY_SCORE_MIN, abilitySchema } from '@rpg/contracts'
+import { ABILITY_SCORE_MIN, type abilitySchema } from '@rpg/contracts'
 import { z } from 'zod'
 
 export const REQUIREMENT_LEAF_TYPES = ['minLevel', 'abilityMinimum', 'spellcasting'] as const

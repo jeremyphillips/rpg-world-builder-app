@@ -73,6 +73,9 @@ etc.) are custom `@utility` definitions in `surface-relative-chrome.utilities.cs
 `shadow-surface-raised` and `shadow-surface-sunken` are Layer 2 recipes (`--surface-raised-shadow`,
 `--surface-sunken-shadow`) — raised panels use the former; `InsetPanel` defaults to `surface="sunken"`
 (fill + sunken shadow). Use `surface="muted"` or `surface="subtle"` for flat wash panels.
+
+Empty-state wells (`EmptyPanel`, dashed `InsetPanel` gates) standardize on sunken — see
+[empty-state-containers.md](./empty-state-containers.md).
 | Secondary | `bg-secondary` | Alternate **interactive** surface (e.g. Button `secondary`) |
 | Lift plane | `bg-surface-lift` | Canvas lifted toward white (light) or panel (dark) — searchable list panels and field fills |
 | Field | `bg-input`, `border-input` | Editable control chrome — aliases the lift plane |
@@ -165,7 +168,7 @@ Switch unchecked track uses `--switch-track*` — separate from field border own
 
 Schema-driven form fields default to a boxed container shell (`{ variant: 'container' }`):
 
-- Layer 2 token: `--field-container` — lightest surface in light mode (`--palette-surface-lift`), darkest in dark mode (`--palette-surface-sunken`).
+- Layer 2 token: `--field-container` — lift plane in both themes (`--palette-surface-lift`); recessed wells use `--sunken` / `bg-sunken` instead.
 - Public utility: `bg-field-container` in `globals.css`.
 - Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
 - Padding: 16px (`p-4`).

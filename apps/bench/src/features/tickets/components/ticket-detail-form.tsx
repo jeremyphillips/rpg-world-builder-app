@@ -164,15 +164,9 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
       className={isSheetLayout ? 'flex min-h-0 flex-1 flex-col' : undefined}
       stickyTabsClassName={isSheetLayout ? formStickyTabsTransparentClasses : undefined}
       externalFooter={isSheetLayout}
+      header={isSheetLayout ? <TicketMetaTimestamps ticket={ticket} /> : undefined}
       contentWrapper={
-        isSheetLayout
-          ? (content) => (
-              <Sheet.Body className="space-y-4">
-                <TicketMetaTimestamps ticket={ticket} />
-                {content}
-              </Sheet.Body>
-            )
-          : undefined
+        isSheetLayout ? (content) => <Sheet.Body managed>{content}</Sheet.Body> : undefined
       }
       footer={footer}
     />

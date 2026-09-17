@@ -1,4 +1,7 @@
 export * from './class-feature-availability'
 export * from './class-messages'
+export * from '../tables'
+export * from './class-feature-table'
+export * from './class-feature-table-messages'
 export * from './spellcasting'
 export * from './class'

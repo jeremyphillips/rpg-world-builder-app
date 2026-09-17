@@ -1,4 +1,6 @@
+import { createElement } from 'react'
 import { z } from 'zod'
+import { generalTableSchema } from '@rpg/contracts'
 import {
   type AREA_GEOMETRY_SHAPES,
   DAMAGE_TYPE_TERM,
@@ -15,7 +17,14 @@ import {
   spellSchoolIdSchema,
   spellValidationMessages,
 } from '@rpg/contracts'
-import { type FieldVisibility, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import {
+  defineDependentField,
+  defineGroupField,
+  type DependentConfig,
+  type FieldVisibility,
+  type FormItem,
+  type TabbedFormTab,
+} from '@rpg/ui/form'
 
 import {
   buildActiveDamageTypeFieldOptions,
@@ -50,12 +59,17 @@ import {
   SPELL_DURATION_KINDS,
   spellLevelOptions,
 } from './spell-form-labels'
-import { SPELL_SECTION_LABELS } from './spell-display'
+import {
+  SPELL_SCALING_CONFIRM_COPY,
+  SPELL_SCALING_HINTS,
+  SPELL_SECTION_LABELS,
+} from './spell-display'
 import { optionalResolutionFormSchema } from '../resolution/lib/form/resolution-form-schema'
 import { resolutionFields } from '../resolution/lib/form/resolution-form-fields'
 import { resolutionOutcomeApplicationsResolverFields } from '../resolution/lib/form/resolution-outcome-form-fields'
 import { RESOLUTION_FIELD_NAME } from '../resolution/lib/form/resolution-form-values'
 import { spellEffectsFormSchema } from './effects/effect-form-schema'
+import { SpellDescriptionTablesField } from '../components/spell-description-tables-field'
 
 function visibleWhenRangeDistance(): FieldVisibility {
   return {
@@ -120,13 +134,6 @@ function visibleWhenLeveledSpell(): FieldVisibility {
   }
 }
 
-function visibleWhenSpellLevelSelected(): FieldVisibility {
-  return {
-    dependsOn: ['level'],
-    visibleWhen: (v) => spellFormLevelValue(v.level) !== undefined,
-  }
-}
-
 function visibleWhenAreaShape(shapes: (typeof AREA_GEOMETRY_SHAPES)[number][]): FieldVisibility {
   return {
     dependsOn: ['areaOfEffect.shape'],
@@ -143,7 +150,10 @@ const spellFormObjectSchema = z.object({
   name: z.string().min(1),
   slug: slugSchema.optional(),
   description: z.string().optional(),
+  tables: z.array(generalTableSchema).optional(),
+  hasCantripScaling: z.boolean().optional(),
   cantripScaling: z.string().optional(),
+  hasHigherLevelSlotEffect: z.boolean().optional(),
   higherLevelSlotEffect: z.string().optional(),
   school: spellSchoolIdSchema,
   level: spellFormLevelSchema,
@@ -272,72 +282,125 @@ export const spellDraftFormSchema = spellFormObjectSchema.extend({
 
 export type SpellFormValues = z.infer<typeof spellFormSchema>
 
-function basicsFields(ctx: ContentFormCtx): FormItem[] {
-  const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
-  const richTextLinks = {
-    linkable: true as const,
-    internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-    contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-  }
+function spellScalingDependent(input: {
+  ctx: ContentFormCtx
+  visibility: FieldVisibility
+  switchName: 'hasCantripScaling' | 'hasHigherLevelSlotEffect'
+  fieldName: 'cantripScaling' | 'higherLevelSlotEffect'
+  label: string
+  hint: string
+  confirmCopy: { headline: string; description: string }
+}): DependentConfig {
+  const { ctx, visibility, switchName, fieldName, label, hint, confirmCopy } = input
 
-  const schoolField: FormItem = {
-    type: 'select',
-    name: 'school',
-    label: 'School',
-    options: schoolOptions,
-    required: true,
-  }
-
-  const levelField: FormItem = {
+  return defineDependentField({
     kind: 'dependent',
+    visibility,
+    confirmBeforeClear: {
+      headline: confirmCopy.headline,
+      description: confirmCopy.description,
+      confirmLabel: 'Remove',
+    },
     controller: {
-      type: 'chips',
-      name: 'level',
-      label: 'Level',
-      options: spellLevelOptions,
-      multiple: false,
-      required: true,
+      type: 'switch',
+      name: switchName,
+      label,
+      labelPosition: 'settings',
+      hint,
+      defaultValue: false,
     },
     dependents: {
-      visibility: visibleWhenSpellLevelSelected(),
+      inset: false,
+      chrome: 'none',
       fields: [
         {
           type: 'richtext',
-          name: 'cantripScaling',
-          label: SPELL_SECTION_LABELS.cantripScaling,
-          ...richTextLinks,
-          visibility: visibleWhenCantripLevel(),
-        },
-        {
-          type: 'richtext',
-          name: 'higherLevelSlotEffect',
-          label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
-          ...richTextLinks,
-          visibility: visibleWhenLeveledSpell(),
+          name: fieldName,
+          label,
+          labelVisibility: 'srOnly',
+          linkable: true,
+          internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+          contentTypeOptions: ctx.options?.richTextContentTypeOptions,
         },
       ],
     },
-  }
+  })
+}
 
-  const classesField: FormItem = {
-    type: 'combobox',
-    name: 'classIds',
-    label: getContentTypeCollectionLabel('classes'),
-    multiple: true,
-    options: referenceSpellcastingClassFieldOptions(ctx.options?.classes),
-    placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
-    required: true,
-  }
+function spellDescriptionSection(ctx: ContentFormCtx): FormItem {
+  return defineGroupField({
+    kind: 'group',
+    fields: [
+      {
+        kind: 'slot',
+        name: 'descriptionTablesHost',
+        render: () => createElement(SpellDescriptionTablesField),
+      },
+      {
+        ...descriptionField(ctx),
+        tables: true,
+        chrome: { variant: 'none' },
+        separator: 'subtle',
+      },
+      spellScalingDependent({
+        ctx,
+        visibility: visibleWhenCantripLevel(),
+        switchName: 'hasCantripScaling',
+        fieldName: 'cantripScaling',
+        label: SPELL_SECTION_LABELS.cantripScaling,
+        hint: SPELL_SCALING_HINTS.cantripScaling,
+        confirmCopy: SPELL_SCALING_CONFIRM_COPY.cantripScaling,
+      }),
+      spellScalingDependent({
+        ctx,
+        visibility: visibleWhenLeveledSpell(),
+        switchName: 'hasHigherLevelSlotEffect',
+        fieldName: 'higherLevelSlotEffect',
+        label: SPELL_SECTION_LABELS.higherLevelSlotEffect,
+        hint: SPELL_SCALING_HINTS.higherLevelSlotEffect,
+        confirmCopy: SPELL_SCALING_CONFIRM_COPY.higherLevelSlotEffect,
+      }),
+    ],
+  })
+}
+
+function basicsFields(ctx: ContentFormCtx): FormItem[] {
+  const schoolOptions = buildActiveSpellSchoolFieldOptions(ctx.spellSchoolVocabulary)
 
   return [
     {
-      kind: 'columns',
-      collapseOrder: 'interleave',
-      columns: [
-        { fields: [schoolField, classesField, descriptionField(ctx)] },
-        { fields: [levelField] },
+      kind: 'row',
+      fieldDivider: { variant: 'pipe' },
+      fields: [
+        {
+          type: 'select',
+          name: 'school',
+          label: 'School',
+          options: schoolOptions,
+          required: true,
+          width: '1/2',
+        },
+        {
+          type: 'chips',
+          name: 'level',
+          label: 'Level',
+          options: spellLevelOptions,
+          multiple: false,
+          required: true,
+          width: '1/2',
+        },
       ],
     },
+    {
+      type: 'combobox',
+      name: 'classIds',
+      label: getContentTypeCollectionLabel('classes'),
+      multiple: true,
+      options: referenceSpellcastingClassFieldOptions(ctx.options?.classes),
+      placeholder: formatChooseContentTypePlaceholder('classes', { plural: true }),
+      required: true,
+    },
+    spellDescriptionSection(ctx),
   ]
 }
 
@@ -620,7 +683,12 @@ function resolutionTabFields(ctx: ContentFormCtx): FormItem[] {
 
 export function buildSpellTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
-    { id: 'basics', label: 'Basics', fields: basicsFields(ctx) },
+    {
+      id: 'basics',
+      label: 'Basics',
+      fields: basicsFields(ctx),
+      errorPaths: ['tables'],
+    },
     { id: 'casting', label: 'Casting', fields: castingFields() },
     {
       id: 'resolution',

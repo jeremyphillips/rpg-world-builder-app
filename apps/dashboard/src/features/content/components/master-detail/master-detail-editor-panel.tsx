@@ -5,6 +5,7 @@ import { AvailabilityAlert, type Availability } from '@/lib/availability'
 import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
+import { MasterDetailRowPrefixProvider } from '../../lib/master-detail/master-detail-row-prefix.context'
 import {
   MasterDetailEditorShell,
   type MasterDetailEditorIdentity,
@@ -60,8 +61,10 @@ function MasterDetailSelectedRowEditor({
 }: MasterDetailSelectedRowEditorProps) {
   const resolvedAvailabilityNamePrefix = availabilityNamePrefix ?? `${fieldName}.${selectedIndex}`
 
+  const rowPrefix = `${fieldName}.${selectedIndex}`
+
   return (
-    <>
+    <MasterDetailRowPrefixProvider value={rowPrefix}>
       {rowAvailability?.status === 'inactive' && campaignId ? (
         <AvailabilityAlert availability={rowAvailability} context={{ campaignId }} />
       ) : null}
@@ -78,9 +81,9 @@ function MasterDetailSelectedRowEditor({
         key={`${selectedFieldId}:${selectedIndex}`}
         items={wrapMasterDetailDetailFields(itemFields)}
         idPrefix={`${idPrefix}-${selectedFieldId}`}
-        namePrefix={`${fieldName}.${selectedIndex}`}
+        namePrefix={rowPrefix}
       />
-    </>
+    </MasterDetailRowPrefixProvider>
   )
 }
 

@@ -1,7 +1,10 @@
 'use client'
 
+import * as React from 'react'
+
 import { FieldRowAnatomyProvider } from '../../components/ui/field-row-anatomy.context'
 import { resolveFieldRowAnatomyPresentation } from '../../components/ui/field-row-anatomy.variants'
+import { FieldRowDivider } from '../../components/ui/field-row-divider.client'
 import { FieldRow } from '../../components/ui/field-row'
 import { cn } from '../../lib/utils'
 import { FieldNode } from '../containers/form-conditional.client'
@@ -10,13 +13,15 @@ import {
   useFormSectionContext,
   type FormSectionContextValue,
 } from '../context/form-section.context'
-import type { RowFieldItem } from '../field-config'
+import { resolveFormDensity } from '../form-density'
+import type { FieldRowDivider as FieldRowDividerConfig, RowFieldItem } from '../field-config'
 import { isRowSlotItem, resolveFieldConfigPrimaryName } from '../field-config'
 import { SlotFormItemSection } from '../renderers/fields/slot-field-renderer.client'
 
 export interface AnatomyFieldRowProps {
   fields: readonly RowFieldItem[]
   gap?: 'form' | 'compact'
+  fieldDivider?: FieldRowDividerConfig
   className?: string
   idPrefix: string
   namePrefix?: string
@@ -32,6 +37,7 @@ export interface AnatomyFieldRowProps {
 export function AnatomyFieldRow({
   fields,
   gap = 'form',
+  fieldDivider,
   className,
   idPrefix,
   namePrefix,
@@ -40,7 +46,12 @@ export function AnatomyFieldRow({
 }: AnatomyFieldRowProps) {
   const sectionContext = useFormSectionContext()
   const slotParentContext = parentContext ?? sectionContext
-  const presentation = resolveFieldRowAnatomyPresentation(resolveRowFieldWidths(fields), gap)
+  const { rhythm } = resolveFormDensity(sectionContext.density)
+  const useFieldDivider = fieldDivider?.variant === 'pipe'
+  const presentation = resolveFieldRowAnatomyPresentation(resolveRowFieldWidths(fields), gap, {
+    fieldDivider: useFieldDivider,
+    rhythm,
+  })
 
   return (
     <FieldRowAnatomyProvider>
@@ -50,30 +61,36 @@ export function AnatomyFieldRow({
         className={cn(presentation.className, className)}
         style={presentation.style}
       >
-        {fields.map((field) => {
-          if (isRowSlotItem(field)) {
-            return (
-              <SlotFormItemSection
-                key={namePrefix ? `${namePrefix}.${field.name}` : field.name}
-                item={field}
-                parentContext={slotParentContext}
-                depth={depth}
-                namePrefix={namePrefix}
-              />
-            )
+        {fields.map((field, index) => {
+          const fieldKey = isRowSlotItem(field)
+            ? namePrefix
+              ? `${namePrefix}.${field.name}`
+              : field.name
+            : namePrefix
+              ? `${namePrefix}.${resolveFieldConfigPrimaryName(field)}`
+              : resolveFieldConfigPrimaryName(field)
+
+          const fieldNode = isRowSlotItem(field) ? (
+            <SlotFormItemSection
+              key={fieldKey}
+              item={field}
+              parentContext={slotParentContext}
+              depth={depth}
+              namePrefix={namePrefix}
+            />
+          ) : (
+            <FieldNode key={fieldKey} config={field} idPrefix={idPrefix} namePrefix={namePrefix} />
+          )
+
+          if (index === 0 || !useFieldDivider) {
+            return fieldNode
           }
 
           return (
-            <FieldNode
-              key={
-                namePrefix
-                  ? `${namePrefix}.${resolveFieldConfigPrimaryName(field)}`
-                  : resolveFieldConfigPrimaryName(field)
-              }
-              config={field}
-              idPrefix={idPrefix}
-              namePrefix={namePrefix}
-            />
+            <React.Fragment key={`${fieldKey}-with-divider`}>
+              <FieldRowDivider tone={fieldDivider.tone} rhythm={rhythm} />
+              {fieldNode}
+            </React.Fragment>
           )
         })}
       </FieldRow>

@@ -198,7 +198,99 @@
       "id": "font-of-magic",
       "name": "Font of Magic",
       "level": 2,
-      "description": "<p>You can tap into the wellspring of magic within yourself. This wellspring is represented by Sorcery Points, which allow you to create a variety of magical effects.</p><p>You have 2 Sorcery Points, and you gain more as you reach higher levels, as shown in the Sorcery Points column of the Sorcerer Features table. You can't have more Sorcery Points than the number shown in the table for your level. You regain all expended Sorcery Points when you finish a Long Rest.</p><p>You can use your Sorcery Points to fuel the options below, along with other features, such as Metamagic, that use those points.</p><p><strong>Converting Spell Slots to Sorcery Points.</strong> You can expend a spell slot to gain a number of Sorcery Points equal to the slot's level (no action required).</p><p><strong>Creating Spell Slots.</strong> As a Bonus Action, you can transform unexpended Sorcery Points into one spell slot. The Creating Spell Slots table shows the cost of creating a spell slot of a given level, and it lists the minimum Sorcerer level you must be to create a slot. You can create a spell slot no higher than level 5.</p><p>Spell Slot Level 1: 2 Sorcery Points, Min. Sorcerer Level 2. Spell Slot Level 2: 3 Sorcery Points, Min. Sorcerer Level 3. Spell Slot Level 3: 5 Sorcery Points, Min. Sorcerer Level 5. Spell Slot Level 4: 6 Sorcery Points, Min. Sorcerer Level 7. Spell Slot Level 5: 7 Sorcery Points, Min. Sorcerer Level 9.</p><p>Any spell slot you create with this feature vanishes when you finish a Long Rest.</p>"
+      "description": "<p>You can tap into the wellspring of magic within yourself. This wellspring is represented by Sorcery Points, which allow you to create a variety of magical effects.</p><p>You have 2 Sorcery Points, and you gain more as you reach higher levels, as shown in the Sorcery Points column of the Sorcerer Features table. You can't have more Sorcery Points than the number shown in the table for your level. You regain all expended Sorcery Points when you finish a Long Rest.</p><p>You can use your Sorcery Points to fuel the options below, along with other features, such as Metamagic, that use those points.</p><p><strong>Converting Spell Slots to Sorcery Points.</strong> You can expend a spell slot to gain a number of Sorcery Points equal to the slot's level (no action required).</p><p><strong>Creating Spell Slots.</strong> As a Bonus Action, you can transform unexpended Sorcery Points into one spell slot. The Creating Spell Slots table shows the cost of creating a spell slot of a given level, and it lists the minimum Sorcerer level you must be to create a slot. You can create a spell slot no higher than level 5.</p><p>Spell Slot Level 1: 2 Sorcery Points, Min. Sorcerer Level 2. Spell Slot Level 2: 3 Sorcery Points, Min. Sorcerer Level 3. Spell Slot Level 3: 5 Sorcery Points, Min. Sorcerer Level 5. Spell Slot Level 4: 6 Sorcery Points, Min. Sorcerer Level 7. Spell Slot Level 5: 7 Sorcery Points, Min. Sorcerer Level 9.</p><p>Any spell slot you create with this feature vanishes when you finish a Long Rest.</p>",
+      "tables": [
+        {
+          "id": "font-of-magic-progression",
+          "name": "Font of Magic progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "points",
+              "label": "Sorcery Points",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 2,
+                  "value": 2
+                },
+                {
+                  "level": 3,
+                  "value": 3
+                },
+                {
+                  "level": 4,
+                  "value": 4
+                },
+                {
+                  "level": 5,
+                  "value": 5
+                },
+                {
+                  "level": 6,
+                  "value": 6
+                },
+                {
+                  "level": 7,
+                  "value": 7
+                },
+                {
+                  "level": 8,
+                  "value": 8
+                },
+                {
+                  "level": 9,
+                  "value": 9
+                },
+                {
+                  "level": 10,
+                  "value": 10
+                },
+                {
+                  "level": 11,
+                  "value": 11
+                },
+                {
+                  "level": 12,
+                  "value": 12
+                },
+                {
+                  "level": 13,
+                  "value": 13
+                },
+                {
+                  "level": 14,
+                  "value": 14
+                },
+                {
+                  "level": 15,
+                  "value": 15
+                },
+                {
+                  "level": 16,
+                  "value": 16
+                },
+                {
+                  "level": 17,
+                  "value": 17
+                },
+                {
+                  "level": 18,
+                  "value": 18
+                },
+                {
+                  "level": 19,
+                  "value": 19
+                },
+                {
+                  "level": 20,
+                  "value": 20
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "metamagic",
@@ -325,89 +417,6 @@
       "name": "Arcane Apotheosis",
       "level": 20,
       "description": "<p>While your Innate Sorcery feature is active, you can use one Metamagic option on each of your turns without spending Sorcery Points on it.</p>"
-    }
-  ],
-  "resources": [
-    {
-      "name": "Sorcery Points",
-      "entries": [
-        {
-          "level": 2,
-          "value": 2
-        },
-        {
-          "level": 3,
-          "value": 3
-        },
-        {
-          "level": 4,
-          "value": 4
-        },
-        {
-          "level": 5,
-          "value": 5
-        },
-        {
-          "level": 6,
-          "value": 6
-        },
-        {
-          "level": 7,
-          "value": 7
-        },
-        {
-          "level": 8,
-          "value": 8
-        },
-        {
-          "level": 9,
-          "value": 9
-        },
-        {
-          "level": 10,
-          "value": 10
-        },
-        {
-          "level": 11,
-          "value": 11
-        },
-        {
-          "level": 12,
-          "value": 12
-        },
-        {
-          "level": 13,
-          "value": 13
-        },
-        {
-          "level": 14,
-          "value": 14
-        },
-        {
-          "level": 15,
-          "value": 15
-        },
-        {
-          "level": 16,
-          "value": 16
-        },
-        {
-          "level": 17,
-          "value": 17
-        },
-        {
-          "level": 18,
-          "value": 18
-        },
-        {
-          "level": 19,
-          "value": 19
-        },
-        {
-          "level": 20,
-          "value": 20
-        }
-      ]
     }
   ]
 }

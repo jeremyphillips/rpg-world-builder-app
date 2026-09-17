@@ -6,7 +6,7 @@ import { Modal } from './modal.client'
 import { Button } from './button.client'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { Input } from './input.client'
-import { dialogPanelScrollRegionClasses } from './dialog-panel.variants'
+import { DialogPanelScrollRegion } from './dialog-panel-scroll-region.client'
 import { useModal } from '../../hooks/use-modal'
 
 const meta = {
@@ -224,14 +224,14 @@ function StableLayoutDemo({ stableSize }: { stableSize?: 'default' | 'tall' }) {
           description="Header and footer stay pinned; the inner region scrolls."
         />
         <Modal.Body stableBody>
-          <div className={dialogPanelScrollRegionClasses}>
+          <DialogPanelScrollRegion inset="innerLeading">
             {Array.from({ length: 24 }, (_, i) => (
               <p key={i} className="mb-3">
                 Section {i + 1}: form fields and relationship drafts scroll here without a second
                 scrollbar on the shell.
               </p>
             ))}
-          </div>
+          </DialogPanelScrollRegion>
         </Modal.Body>
         <Modal.Footer>
           <Modal.FooterActions>

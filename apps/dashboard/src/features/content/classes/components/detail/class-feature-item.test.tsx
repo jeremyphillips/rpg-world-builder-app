@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { reincarnateSpeciesTableFixture } from '@rpg/contracts'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
 
@@ -40,6 +41,18 @@ describe('ClassFeatureItem', () => {
     ).toBeInTheDocument()
     expect(screen.getByText(/Fighting Style feat/)).toBeInTheDocument()
     expect(screen.getByText(/Druidic Warrior/)).toBeInTheDocument()
+  })
+
+  it('renders inline general tables below the description', () => {
+    renderClassFeatureItem({
+      level: 3,
+      name: 'Reincarnate',
+      description: '<p>You return a creature to life.</p>',
+      tables: [reincarnateSpeciesTableFixture],
+    })
+
+    expect(screen.getByText(/return a creature to life/)).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Species' })).toBeInTheDocument()
   })
 
   it('renders heading-only features without a body', () => {

@@ -87,6 +87,7 @@ const EQUIPMENT_SCHEMA_EXEMPT = [...COMMON_SCHEMA_EXEMPT, ...EQUIPMENT_KIND_EXEM
 /** Spell root effects tab removed; atomic effects live under resolution. */
 const SPELLS_SCHEMA_EXEMPT = [
   ...COMMON_SCHEMA_EXEMPT,
+  /^tables\b/,
   /^effects\b/,
   'resolution.methodKind',
   'resolution.selectionMode',

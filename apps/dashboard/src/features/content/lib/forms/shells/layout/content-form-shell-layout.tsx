@@ -29,7 +29,7 @@ import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes
 
 export function ContentFormComingSoon() {
   return (
-    <InsetPanel borderStyle="dashed" surface={{}} size="lg" align="center">
+    <InsetPanel borderStyle="dashed" size="lg" align="center">
       <InsetPanel.Text>Form coming soon.</InsetPanel.Text>
     </InsetPanel>
   )

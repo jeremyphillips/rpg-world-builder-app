@@ -1,14 +1,11 @@
 import type { ReactNode } from 'react'
 
+import { DialogPanelScrollRegion } from '../../components/ui/dialog-panel-scroll-region.client'
 import { Text } from '../../components/ui/text'
-import { cn } from '../../lib/utils'
 import { FormItems } from '../containers/form-items.client'
 import { FormRhythmStack } from '../context/form-section.context'
 import { FormActionsBar, type FormActionsBarPlacement } from '../chrome/form-actions-bar'
-import {
-  formFooterSpacingClasses,
-  formSheetScrollRegionClasses,
-} from '../chrome/form-chrome.variants'
+import { formFooterSpacingClasses } from '../chrome/form-chrome.variants'
 import { FormStickyScrollBody } from '../chrome/form-sticky-scroll-body.client'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormItem, FormValueSync } from '../field-config'
@@ -16,6 +13,7 @@ import type { FormItem, FormValueSync } from '../field-config'
 export type FormShellFieldStackProps = {
   formId: string
   fields: FormItem[]
+  /** Layout / vertical overrides on the scroll viewport when `externalFooter` — never horizontal inset. */
   contentClassName?: string
   scrollBodyClassName?: string
   externalFooter: boolean
@@ -43,7 +41,11 @@ function wrapFormShellFieldStackScroll(
   }: FormShellFieldStackScrollWrapOptions,
 ): ReactNode {
   if (externalFooter) {
-    return <div className={cn(formSheetScrollRegionClasses, contentClassName)}>{stack}</div>
+    return (
+      <DialogPanelScrollRegion inset="section" viewportClassName={contentClassName}>
+        {stack}
+      </DialogPanelScrollRegion>
+    )
   }
 
   if (stickyFooter) {

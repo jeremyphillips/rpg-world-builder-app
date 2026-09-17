@@ -28,6 +28,8 @@ import {
 import { spellcastingSchema } from './spellcasting'
 import { classValidationMessages } from './class-messages'
 import { contentSummaryRefSchema } from '../lib/content-summary-ref'
+import { contentTableSchema } from '../tables'
+import { refineFeatureTablesOnFeature } from './class-feature-table'
 
 // ---------------------------------------------------------------------------
 // Class — SRD-faithful prose lives in rich-text HTML on `description` and
@@ -59,9 +61,14 @@ function refineClassFeatureGrantUnlockLevels(
   }
 }
 
+const classFeatureTablesField = {
+  tables: z.array(contentTableSchema).optional(),
+} as const
+
 export const customClassFeatureSchema = customContentTraitSchema
-  .extend({ level: absoluteLevelSchema })
+  .extend({ level: absoluteLevelSchema, ...classFeatureTablesField })
   .superRefine(refineClassFeatureGrantUnlockLevels)
+  .superRefine(refineFeatureTablesOnFeature)
 
 export const subclassChoiceClassFeatureSchema = customContentTraitSchema
   .extend({ kind: z.literal('subclass-choice'), level: absoluteLevelSchema })
@@ -124,24 +131,6 @@ export const classProficienciesDraftSchema = z.object({
 export type ClassProficienciesDraft = z.infer<typeof classProficienciesDraftSchema>
 
 // ---------------------------------------------------------------------------
-// Class resources — generic per-level numeric progression
-// (Sorcery Points, Rage count, Ki Points, Channel Divinity uses, etc.)
-// ---------------------------------------------------------------------------
-
-export const classResourceEntrySchema = z.object({
-  level: absoluteLevelSchema,
-  value: z.number().int().min(0),
-})
-
-export const classResourceSchema = z.object({
-  /** Display name shown as a column header: "Sorcery Points", "Rage", etc. */
-  name: z.string().min(1),
-  entries: z.array(classResourceEntrySchema).min(1),
-})
-
-export type ClassResource = z.infer<typeof classResourceSchema>
-
-// ---------------------------------------------------------------------------
 // Class — editable body + stored shape
 // ---------------------------------------------------------------------------
 
@@ -152,7 +141,6 @@ export const classStoredBodySchema = contentBodyBaseSchema.extend({
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesSchema,
   features: z.array(classBodyFeatureSchema),
-  resources: z.array(classResourceSchema).optional(),
   characterCreation: classCharacterCreationSchema.optional(),
 })
 
@@ -167,7 +155,6 @@ export const classBodyDraftSchema = draftAuthoredContentBodySchema(
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesDraftSchema.optional(),
   features: z.array(classBodyFeatureSchema).default([]),
-  resources: z.array(classResourceSchema).optional(),
   characterCreation: classCharacterCreationDraftSchema.optional(),
 })
 

@@ -354,15 +354,41 @@ describe('classFormDef round-trips', () => {
     expect(spellRow?.spellIds).toEqual(['power-word-heal', 'power-word-kill'])
   })
 
-  it('sorcerer: spellcasting and resources round-trip', () => {
+  it('preserves feature tables through toFormValues → edit → toInput', () => {
+    const barbarian = SRD_CLASSES.find((characterClass) => characterClass.slug === 'barbarian')!
+    const rageFeature = barbarian.features.find((feature) => feature.id === 'rage')
+    expect(rageFeature?.kind).toBe('custom')
+    if (rageFeature?.kind !== 'custom') throw new Error('expected custom rage feature')
+    const originalTables = rageFeature.tables
+
+    const formValues = classFormDef.toFormValues(barbarian) as ClassFormValues
+    const rageRow = formValues.features.find((feature) => feature.id === 'rage')
+    if (!rageRow) throw new Error('missing rage feature row')
+
+    rageRow.name = 'Rage Updated'
+    rageRow.description = '<p>Updated description</p>'
+
+    const input = classFormDef.toInput(formValues, { entity: barbarian })
+    const savedRage = input.features.find((feature) => feature.id === 'rage')
+    expect(savedRage?.kind).toBe('custom')
+    if (savedRage?.kind === 'custom') {
+      expect(savedRage.tables).toEqual(originalTables)
+    }
+  })
+
+  it('sorcerer: spellcasting and font-of-magic tables round-trip', () => {
     const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
-    const input = classFormDef.toInput(formValues)
+    const input = classFormDef.toInput(formValues, { entity: sorcerer })
     expect(input.spellcasting?.progression).toBe('full')
     expect(
       cantripProgressionsEquivalent(input.spellcasting?.cantrips, sorcerer.spellcasting?.cantrips),
     ).toBe(true)
-    expect(input.resources?.[0]?.name).toBe('Sorcery Points')
+    const fontOfMagic = input.features.find((feature) => feature.id === 'font-of-magic')
+    expect(fontOfMagic?.kind).toBe('custom')
+    if (fontOfMagic?.kind === 'custom') {
+      expect(fontOfMagic.tables?.[0]?.columns[0]?.label).toBe('Sorcery Points')
+    }
   })
 
   it('bard: spellcasting description and cantrips round-trip through progressionTable', () => {
@@ -417,7 +443,7 @@ describe('classFormDef round-trips', () => {
 describe('classFormDef create vs update modes', () => {
   it('create: derives slug and assigns feature ids for new rows', () => {
     const formValues = publishReadyClassValues({
-      features: [{ name: 'Second Wind', level: 1, grants: [], available: true }],
+      features: [{ name: 'Second Wind', level: 1, grants: [], tables: [], available: true }],
     })
     const input = classFormDef.toInput(formValues)
     expect(input.slug).toBe(deriveContentKey('Custom Class'))

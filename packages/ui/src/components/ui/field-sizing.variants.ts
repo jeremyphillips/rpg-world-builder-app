@@ -130,9 +130,14 @@ export function resolveAttachedButtonSize(
   return fieldSizeToAttachedButtonSize[fieldSize]
 }
 
+/** Default button size for inline section header actions (legend-row add controls). */
+export const INLINE_HEADER_ACTION_BUTTON_SIZE = 'sm' as const satisfies NonNullable<
+  ButtonVariantProps['size']
+>
+
 /**
- * Maps array section field size to the paired add-button size. Array item fields
- * default to `sm`, but the add action uses the next visual step (`default` / md).
+ * Maps array section field size to the paired stacked add-button size. Stacked
+ * add actions use the next visual step (`default` / md) above item field scale.
  */
 export const fieldSizeToArrayAddButtonSize = {
   sm: 'default',
@@ -146,8 +151,11 @@ type ArrayAddButtonSize = NonNullable<ButtonVariantProps['size']>
 export function resolveArrayAddButtonSize(
   sectionSize: FieldSizeToken,
   override?: ArrayAddButtonSize,
+  layout: 'inline' | 'stacked' = 'stacked',
 ): ArrayAddButtonSize {
-  return override ?? fieldSizeToArrayAddButtonSize[sectionSize]
+  if (override) return override
+  if (layout === 'inline') return INLINE_HEADER_ACTION_BUTTON_SIZE
+  return fieldSizeToArrayAddButtonSize[sectionSize]
 }
 
 /** Maps outline button size to combobox search row field size. */

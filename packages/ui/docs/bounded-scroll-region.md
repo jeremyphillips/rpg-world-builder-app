@@ -24,7 +24,8 @@ across overlay scrollbar platforms.
 
 | Consumer                                                                                         | Composition                                                                                           |
 | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)                | `min-h-0 flex-1` + primitive + `ps-1` + bottom inset                                                  |
+| [`DialogPanelScrollRegion`](../src/components/ui/dialog-panel-scroll-region.client.tsx)          | Overlay Modal/Sheet/Drawer column scrollport — SBR + `px-6` / `pt-5` / `pb-6` viewport inset          |
+| [`dialogPanelScrollRegionClasses`](../src/components/ui/dialog-panel.variants.ts)                | Deprecated class alias — prefer `DialogPanelScrollRegion`                                             |
 | [`previewRailScrollRegionShellClasses`](../src/components/preview-rail/preview-rail.variants.ts) | `min-h-0 flex-1` via [`ScrollBoundaryRegion`](../src/components/ui/scroll-boundary-region.client.tsx) |
 | [`FormStickyScrollBody`](../src/form/chrome/form-sticky-scroll-body.client.tsx)                  | clip slot (`form-scroll-body-container`, `overflow-hidden`) + inner scroller                          |
 | [`formStickyScrollBodyScrollerClasses`](../src/form/chrome/form-chrome.variants.ts)              | inner scroller — `overflow-y-auto`, end-of-scroll padding                                             |
@@ -65,6 +66,8 @@ shadows at the top and bottom edges:
 - at scroll end → no bottom shadow (adjacent footer owns the divider)
 
 Storybook: **Primitives/ScrollBoundaryRegion**.
+
+[`DialogPanelScrollRegion`](../src/components/ui/dialog-panel-scroll-region.client.tsx) is **overlay-only** — do not use it for page `FormStickyScrollBody` (`pt-8` spacer), PreviewRail, master-detail list rails, or nested `max-h-*` lists inside overlay bodies. Overlay top inset is `pt-5` on the scroll viewport; page shell inset stays `pt-8`.
 
 ## Follow-up adopters
 

@@ -20,7 +20,9 @@ import {
   isStartingGoldOption,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
+  resolveProgressionTableColumnValue,
   type CharacterClass,
+  type ProgressionTableColumn,
 } from '@rpg/contracts'
 import { loadSeedEquipment } from '../equipment'
 
@@ -40,6 +42,46 @@ function isSubclassChoiceFeature(cls: CharacterClass, feature: CharacterClass['f
 function expectSubclassChoiceKind(cls: CharacterClass): void {
   const feature = cls.features.find((f) => isSubclassChoiceFeature(cls, f))
   expect(feature?.kind).toBe('subclass-choice')
+}
+
+function featureTableColumn(
+  cls: CharacterClass,
+  featureId: string,
+  tableId: string,
+  columnId: string,
+): ProgressionTableColumn | undefined {
+  const feature = cls.features.find((entry) => entry.id === featureId)
+  if (!feature || feature.kind === 'subclass-choice') return undefined
+  const table = feature.tables?.find((entry) => entry.id === tableId)
+  return table?.columns.find((column: ProgressionTableColumn) => column.id === columnId)
+}
+
+function expectNumberColumnEntries(
+  cls: CharacterClass,
+  featureId: string,
+  tableId: string,
+  columnId: string,
+  entries: { level: number; value: number }[],
+): void {
+  const column = featureTableColumn(cls, featureId, tableId, columnId)
+  expect(column?.valueType).toBe('number')
+  if (column?.valueType === 'number') {
+    expect(column.entries).toEqual(entries)
+  }
+}
+
+function expectDiceColumnEntries(
+  cls: CharacterClass,
+  featureId: string,
+  tableId: string,
+  columnId: string,
+  entries: { level: number; value: { count: number; faces: number } }[],
+): void {
+  const column = featureTableColumn(cls, featureId, tableId, columnId)
+  expect(column?.valueType).toBe('dice')
+  if (column?.valueType === 'dice') {
+    expect(column.entries).toEqual(entries)
+  }
 }
 
 function expectClassFeatureDescriptions(cls: CharacterClass): void {
@@ -70,6 +112,33 @@ describe('SRD 5.2.1 class seed', () => {
       expect(cls.source).toBe('system')
       expect(cls.campaignId).toBeNull()
       expect(cls.rulesetId).toBe(RULESET)
+    }
+  })
+
+  it('does not ship legacy top-level resources', () => {
+    for (const cls of classes) {
+      expect(Object.hasOwn(cls as Record<string, unknown>, 'resources')).toBe(false)
+    }
+  })
+
+  it('Wizard has no feature tables after resource migration', () => {
+    const wizard = getClassBySlug(RULESET, 'wizard')
+    expect(
+      wizard.features.every(
+        (feature) => feature.kind === 'subclass-choice' || !feature.tables?.length,
+      ),
+    ).toBe(true)
+  })
+
+  it('Ranger, Rogue, and Paladin ship flat Weapon Mastery progression tables', () => {
+    for (const slug of ['ranger', 'rogue', 'paladin'] as const) {
+      expectNumberColumnEntries(
+        getClassBySlug(RULESET, slug),
+        'weapon-mastery',
+        'weapon-mastery-progression',
+        'masteries',
+        [{ level: 1, value: 2 }],
+      )
     }
   })
 
@@ -113,12 +182,11 @@ describe('SRD 5.2.1 class seed', () => {
     expect(asiLevelsFromFeatures(bard)).toEqual([4, 8, 12, 16])
     expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
     expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
-    const bardicDie = bard.resources?.find((r) => r.name === 'Bardic Die')
-    expect(bardicDie?.entries).toEqual([
-      { level: 1, value: 6 },
-      { level: 5, value: 8 },
-      { level: 10, value: 10 },
-      { level: 15, value: 12 },
+    expectDiceColumnEntries(bard, 'bardic-inspiration', 'bardic-inspiration-progression', 'die', [
+      { level: 1, value: { count: 1, faces: 6 } },
+      { level: 5, value: { count: 1, faces: 8 } },
+      { level: 10, value: { count: 1, faces: 10 } },
+      { level: 15, value: { count: 1, faces: 12 } },
     ])
     const words = bard.features.find((f) => f.id === 'words-of-creation')
     const spellGrant = words?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
@@ -156,7 +224,7 @@ describe('SRD 5.2.1 class seed', () => {
       availability: 'always_prepared',
       spellIds: ['hunters-mark'],
     })
-    expect(ranger.resources?.find((r) => r.name === 'Favored Enemy')?.entries).toEqual([
+    expectNumberColumnEntries(ranger, 'favored-enemy', 'favored-enemy-progression', 'uses', [
       { level: 1, value: 2 },
       { level: 5, value: 3 },
       { level: 9, value: 4 },
@@ -221,23 +289,42 @@ describe('SRD 5.2.1 class seed', () => {
     expect(rage?.description).toContain('<strong>Duration.</strong>')
     const brutalStrike = barbarian.features.find((f) => f.id === 'brutal-strike')
     expect(brutalStrike?.description).toContain('<strong>Forceful Blow.</strong>')
-    expect(barbarian.resources?.find((r) => r.name === 'Rages')?.entries).toEqual([
+    expectNumberColumnEntries(barbarian, 'rage', 'rage-progression', 'uses', [
       { level: 1, value: 2 },
       { level: 3, value: 3 },
       { level: 6, value: 4 },
       { level: 12, value: 5 },
       { level: 17, value: 6 },
     ])
-    expect(barbarian.resources?.find((r) => r.name === 'Rage Damage')?.entries).toEqual([
+    expectNumberColumnEntries(barbarian, 'rage', 'rage-progression', 'damage-bonus', [
       { level: 1, value: 2 },
       { level: 9, value: 3 },
       { level: 16, value: 4 },
     ])
-    expect(barbarian.resources?.find((r) => r.name === 'Weapon Mastery')?.entries).toEqual([
-      { level: 1, value: 2 },
-      { level: 4, value: 3 },
-      { level: 10, value: 4 },
-    ])
+    expectNumberColumnEntries(
+      barbarian,
+      'weapon-mastery',
+      'weapon-mastery-progression',
+      'masteries',
+      [
+        { level: 1, value: 2 },
+        { level: 4, value: 3 },
+        { level: 10, value: 4 },
+      ],
+    )
+    const rageUses = featureTableColumn(barbarian, 'rage', 'rage-progression', 'uses')
+    const rageDamage = featureTableColumn(barbarian, 'rage', 'rage-progression', 'damage-bonus')
+    expect(rageUses && resolveProgressionTableColumnValue(rageUses, 1)).toBe(2)
+    expect(rageUses && resolveProgressionTableColumnValue(rageUses, 12)).toBe(5)
+    expect(rageDamage && resolveProgressionTableColumnValue(rageDamage, 9)).toBe(3)
+    expect(rageDamage?.valueType === 'number' && rageDamage.format).toBe('signed')
+    const weaponMasteries = featureTableColumn(
+      barbarian,
+      'weapon-mastery',
+      'weapon-mastery-progression',
+      'masteries',
+    )
+    expect(weaponMasteries && resolveProgressionTableColumnValue(weaponMasteries, 10)).toBe(4)
   })
 
   it('Path of the Berserker ships four subclass features with rich-text HTML', () => {
@@ -264,7 +351,7 @@ describe('SRD 5.2.1 class seed', () => {
     const channelDivinity = cleric.features.find((f) => f.id === 'channel-divinity')
     expect(channelDivinity?.description).toContain('<strong>Divine Spark.</strong>')
     expect(channelDivinity?.description).toContain('<strong>Turn Undead.</strong>')
-    expect(cleric.resources?.find((r) => r.name === 'Channel Divinity')?.entries).toEqual([
+    expectNumberColumnEntries(cleric, 'channel-divinity', 'channel-divinity-progression', 'uses', [
       { level: 2, value: 2 },
       { level: 6, value: 3 },
       { level: 18, value: 4 },
@@ -327,7 +414,7 @@ describe('SRD 5.2.1 class seed', () => {
     const wildShape = druid.features.find((f) => f.id === 'wild-shape')
     expect(wildShape?.description).toContain('<strong>Beast Shapes.</strong>')
     expect(wildShape?.description).toContain('<strong>Game Statistics.</strong>')
-    expect(druid.resources?.find((r) => r.name === 'Wild Shape')?.entries).toEqual([
+    expectNumberColumnEntries(druid, 'wild-shape', 'wild-shape-progression', 'uses', [
       { level: 2, value: 2 },
       { level: 6, value: 3 },
       { level: 17, value: 4 },
@@ -380,18 +467,24 @@ describe('SRD 5.2.1 class seed', () => {
       'epic-boon',
       'three-extra-attacks',
     ])
-    expect(fighter.resources?.find((r) => r.name === 'Second Wind')?.entries).toEqual([
+    expectNumberColumnEntries(fighter, 'second-wind', 'second-wind-progression', 'uses', [
       { level: 1, value: 2 },
       { level: 4, value: 3 },
       { level: 10, value: 4 },
     ])
-    expect(fighter.resources?.find((r) => r.name === 'Weapon Mastery')?.entries).toEqual([
-      { level: 1, value: 3 },
-      { level: 4, value: 4 },
-      { level: 10, value: 5 },
-      { level: 16, value: 6 },
-    ])
-    expect(fighter.resources?.find((r) => r.name === 'Indomitable')?.entries).toEqual([
+    expectNumberColumnEntries(
+      fighter,
+      'weapon-mastery',
+      'weapon-mastery-progression',
+      'masteries',
+      [
+        { level: 1, value: 3 },
+        { level: 4, value: 4 },
+        { level: 10, value: 5 },
+        { level: 16, value: 6 },
+      ],
+    )
+    expectNumberColumnEntries(fighter, 'indomitable', 'indomitable-progression', 'uses', [
       { level: 9, value: 1 },
       { level: 13, value: 2 },
       { level: 17, value: 3 },
@@ -456,24 +549,31 @@ describe('SRD 5.2.1 class seed', () => {
     expect(martialArts?.description).toContain('<strong>Martial Arts Die.</strong>')
     const monksFocus = monk.features.find((f) => f.id === 'monks-focus')
     expect(monksFocus?.description).toContain('<strong>Flurry of Blows.</strong>')
-    expect(monk.resources?.find((r) => r.name === 'Martial Arts')?.entries).toEqual([
-      { level: 1, value: 6 },
-      { level: 5, value: 8 },
-      { level: 11, value: 10 },
-      { level: 17, value: 12 },
+    expectDiceColumnEntries(monk, 'martial-arts', 'martial-arts-progression', 'die', [
+      { level: 1, value: { count: 1, faces: 6 } },
+      { level: 5, value: { count: 1, faces: 8 } },
+      { level: 11, value: { count: 1, faces: 10 } },
+      { level: 17, value: { count: 1, faces: 12 } },
     ])
-    expect(monk.resources?.find((r) => r.name === 'Focus Points')?.entries).toHaveLength(19)
-    expect(monk.resources?.find((r) => r.name === 'Focus Points')?.entries.at(-1)).toEqual({
-      level: 20,
-      value: 20,
-    })
-    expect(monk.resources?.find((r) => r.name === 'Unarmored Movement')?.entries).toEqual([
-      { level: 2, value: 10 },
-      { level: 6, value: 15 },
-      { level: 10, value: 20 },
-      { level: 14, value: 25 },
-      { level: 18, value: 30 },
-    ])
+    const focusPoints = featureTableColumn(monk, 'monks-focus', 'monks-focus-progression', 'points')
+    expect(focusPoints?.valueType).toBe('number')
+    if (focusPoints?.valueType === 'number') {
+      expect(focusPoints.entries).toHaveLength(19)
+      expect(focusPoints.entries.at(-1)).toEqual({ level: 20, value: 20 })
+    }
+    expectNumberColumnEntries(
+      monk,
+      'unarmored-movement',
+      'unarmored-movement-progression',
+      'speed',
+      [
+        { level: 2, value: 10 },
+        { level: 6, value: 15 },
+        { level: 10, value: 20 },
+        { level: 14, value: 25 },
+        { level: 18, value: 30 },
+      ],
+    )
   })
 
   it('Warrior of the Open Hand ships four subclass features with rich-text HTML', () => {
@@ -509,7 +609,7 @@ describe('SRD 5.2.1 class seed', () => {
       availability: 'always_prepared',
       spellIds: ['divine-smite'],
     })
-    expect(paladin.resources?.find((r) => r.name === 'Channel Divinity')?.entries).toEqual([
+    expectNumberColumnEntries(paladin, 'channel-divinity', 'channel-divinity-progression', 'uses', [
       { level: 3, value: 2 },
       { level: 11, value: 3 },
     ])
@@ -562,7 +662,7 @@ describe('SRD 5.2.1 class seed', () => {
     expect(innateSorcery?.description).toContain(
       'spell save DC of your Sorcerer spells increases by 1',
     )
-    expect(sorcerer.resources?.find((r) => r.name === 'Sorcery Points')?.entries).toEqual([
+    expectNumberColumnEntries(sorcerer, 'font-of-magic', 'font-of-magic-progression', 'points', [
       { level: 2, value: 2 },
       { level: 3, value: 3 },
       { level: 4, value: 4 },
@@ -641,16 +741,22 @@ describe('SRD 5.2.1 class seed', () => {
       casting: { mode: 'free_cast', frequency: 'once_per_long_rest' },
       spellIds: ['contact-other-plane'],
     })
-    expect(warlock.resources?.find((r) => r.name === 'Eldritch Invocations')?.entries).toEqual([
-      { level: 1, value: 1 },
-      { level: 2, value: 3 },
-      { level: 5, value: 5 },
-      { level: 7, value: 6 },
-      { level: 9, value: 7 },
-      { level: 12, value: 8 },
-      { level: 15, value: 9 },
-      { level: 18, value: 10 },
-    ])
+    expectNumberColumnEntries(
+      warlock,
+      'eldritch-invocations',
+      'eldritch-invocations-progression',
+      'count',
+      [
+        { level: 1, value: 1 },
+        { level: 2, value: 3 },
+        { level: 5, value: 5 },
+        { level: 7, value: 6 },
+        { level: 9, value: 7 },
+        { level: 12, value: 8 },
+        { level: 15, value: 9 },
+        { level: 18, value: 10 },
+      ],
+    )
   })
 
   it('Fiend Patron ships five subclass features with fiend spell grants', () => {

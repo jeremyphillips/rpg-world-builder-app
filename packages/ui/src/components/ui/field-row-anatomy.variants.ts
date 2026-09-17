@@ -4,6 +4,8 @@ import type { CSSProperties } from 'react'
 import type { FieldWidth } from './field-control.variants'
 import { resolveFieldRowCollapseMinWidth } from './field-row-collapse.lib'
 import { resolveFieldRowColumnTracks } from './field-row-column-tracks.lib'
+import { interleaveFieldRowDividerTracks } from './field-row-divider.variants'
+import type { FieldRhythm } from './field.variants'
 
 /**
  * Anatomy-grid row shell for schema `kind: 'row'` sections.
@@ -16,6 +18,7 @@ export const fieldRowAnatomyVariants = cva(
       gap: {
         form: 'gap-x-6',
         compact: 'gap-x-4',
+        none: 'gap-x-0',
       },
     },
     defaultVariants: {
@@ -26,15 +29,31 @@ export const fieldRowAnatomyVariants = cva(
 
 export type FieldRowAnatomyVariantProps = VariantProps<typeof fieldRowAnatomyVariants>
 
+export type ResolveFieldRowAnatomyPresentationOptions = {
+  /** When true, interleaves pipe divider columns and suppresses row gap-x. */
+  fieldDivider?: boolean
+  /** Rhythm for divider gutter math when `fieldDivider` is set. */
+  rhythm?: FieldRhythm
+}
+
 /** Inline style + className for a schema anatomy row sized from width tokens. */
 export function resolveFieldRowAnatomyPresentation(
   widths: readonly FieldWidth[],
-  gap: NonNullable<FieldRowAnatomyVariantProps['gap']> = 'form',
+  gap: Exclude<NonNullable<FieldRowAnatomyVariantProps['gap']>, 'none'> = 'form',
+  options: ResolveFieldRowAnatomyPresentationOptions = {},
 ): { className: string; style: CSSProperties } {
-  const { gridTemplateColumns } = resolveFieldRowColumnTracks(widths)
-  const collapseMinWidth = resolveFieldRowCollapseMinWidth(widths, gap)
+  const { tracks, gridTemplateColumns: fieldGridTemplateColumns } =
+    resolveFieldRowColumnTracks(widths)
+  const gridTemplateColumns = options.fieldDivider
+    ? interleaveFieldRowDividerTracks(tracks).join(' ')
+    : fieldGridTemplateColumns
+  const resolvedGap = options.fieldDivider ? 'none' : gap
+  const collapseMinWidth = resolveFieldRowCollapseMinWidth(widths, gap, {
+    fieldDivider: options.fieldDivider,
+    rhythm: options.rhythm,
+  })
   return {
-    className: fieldRowAnatomyVariants({ gap }),
+    className: fieldRowAnatomyVariants({ gap: resolvedGap }),
     style: {
       '--row-cols': gridTemplateColumns,
       '--row-collapse-min': `${collapseMinWidth}px`,

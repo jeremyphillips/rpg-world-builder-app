@@ -60,6 +60,11 @@ export type ContentFormCtx = {
   locationParentLocationIdSeed?: string
   /** Live practice recommendations from preset bridge — authoring guidance only. */
   organizationPracticeRecommendationIds?: readonly OrganizationPractice[]
+  /**
+   * Parent content validation intent — `draft` when parent is unpublished/draft,
+   * `publish` when editing published content. Drives read-only vs mutable table kind UI.
+   */
+  validationIntent?: ContentValidationIntent
   /** Authoritative equipment kind on family create/edit routes (from route or entity). */
   equipmentKind?: EquipmentKind
   /** Equipment family URL segment for breadcrumbs and back links. */

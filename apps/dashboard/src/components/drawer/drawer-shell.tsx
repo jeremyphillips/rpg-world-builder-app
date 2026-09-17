@@ -48,7 +48,10 @@ export function DrawerShell({
           children
         ) : (
           <>
-            <Sheet.Body className={drawerShellBodyVariants({ mode: bodyMode })}>
+            <Sheet.Body
+              managed={bodyMode === 'managed'}
+              className={drawerShellBodyVariants({ mode: bodyMode })}
+            >
               {children}
             </Sheet.Body>
             {footer ? (

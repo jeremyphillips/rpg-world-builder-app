@@ -1,7 +1,7 @@
 import { Plus } from 'lucide-react'
-import { ButtonDropdown, fieldSizeToArrayAddButtonSize } from '@rpg/ui'
+import { ButtonDropdown, INLINE_HEADER_ACTION_BUTTON_SIZE } from '@rpg/ui'
 import type { ButtonDropdownItem } from '@rpg/ui'
-import { getArrayFieldMutators, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
+import { getArrayFieldMutators } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
@@ -19,8 +19,6 @@ const EFFECTS_FIELD = `${RESOLUTION_FIELD_NAME}.effects` as const
 /** Context-aware add control for resolution effects (replaces generic array add menu). */
 export function SpellResolutionEffectAddControl() {
   const { control } = useFormContext()
-  const { density } = useFormSectionContext()
-  const { size } = resolveFormDensity(density)
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const context = resolutionFormToSelectionContext(resolution)
 
@@ -41,7 +39,7 @@ export function SpellResolutionEffectAddControl() {
       width="fit"
       items={menuItems}
       groups={[{ id: 'effects', label: 'Effects' }]}
-      size={fieldSizeToArrayAddButtonSize[size]}
+      size={INLINE_HEADER_ACTION_BUTTON_SIZE}
       onSelectItem={(itemId) => {
         const mutators = getArrayFieldMutators(control, EFFECTS_FIELD)
         mutators?.append(createResolutionEffectAppendDefaults(itemId as ResolutionEffectKind))

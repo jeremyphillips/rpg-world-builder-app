@@ -174,6 +174,22 @@ export const radioCardIndicatorVariants = cva(
   'opacity-0 transition-opacity group-data-[state=checked]:opacity-100',
 )
 
+/** Leading icon column when visualControl="icon" — muted by default, primary when selected. */
+export const radioCardIconControlVariants = cva(
+  'flex shrink-0 items-center justify-center text-muted-foreground transition-colors group-data-[state=checked]:text-primary',
+  {
+    variants: {
+      density: {
+        default: 'size-5 [&_svg]:size-5',
+        compact: 'size-4 [&_svg]:size-4',
+      },
+    },
+    defaultVariants: {
+      density: 'default',
+    },
+  },
+)
+
 export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
   variants: {
     density: {
@@ -327,6 +343,10 @@ export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
       default: '',
       compact: '',
     },
+    columns: {
+      one: 'grid-cols-1',
+      two: 'grid-cols-1 sm:grid-cols-2',
+    },
   },
   compoundVariants: [
     { variant: 'card', density: 'default', class: 'gap-3' },
@@ -335,5 +355,6 @@ export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
   defaultVariants: {
     variant: 'card',
     density: 'default',
+    columns: 'one',
   },
 })

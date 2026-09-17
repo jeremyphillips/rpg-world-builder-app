@@ -85,7 +85,63 @@
       "id": "rage",
       "name": "Rage",
       "level": 1,
-      "description": "<p>You can imbue yourself with a primal power called Rage, a force that grants you extraordinary might and resilience. You can enter it as a Bonus Action if you aren't wearing Heavy armor.</p><p>You can enter your Rage the number of times shown for your Barbarian level in the Rages column of the Barbarian Features table. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest.</p><p>While active, your Rage follows the rules below.</p><p><strong>Damage Resistance.</strong> You have Resistance to Bludgeoning, Piercing, and Slashing damage.</p><p><strong>Rage Damage.</strong> When you make an attack using Strength—with either a weapon or an Unarmed Strike—and deal damage to the target, you gain a bonus to the damage that increases as you gain levels as a Barbarian, as shown in the Rage Damage column of the Barbarian Features table.</p><p><strong>Strength Advantage.</strong> You have Advantage on Strength checks and Strength saving throws.</p><p><strong>No Concentration or Spells.</strong> You can't maintain Concentration, and you can't cast spells.</p><p><strong>Duration.</strong> The Rage lasts until the end of your next turn, and it ends early if you don Heavy armor or have the Incapacitated condition. If your Rage is still active on your next turn, you can extend the Rage for another round by doing one of the following:</p><p>Make an attack roll against an enemy.</p><p>Force an enemy to make a saving throw.</p><p>Take a Bonus Action to extend your Rage.</p><p>Each time the Rage is extended, it lasts until the end of your next turn. You can maintain a Rage for up to 10 minutes.</p>"
+      "description": "<p>You can imbue yourself with a primal power called Rage, a force that grants you extraordinary might and resilience. You can enter it as a Bonus Action if you aren't wearing Heavy armor.</p><p>You can enter your Rage the number of times shown for your Barbarian level in the Rages column of the Barbarian Features table. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest.</p><p>While active, your Rage follows the rules below.</p><p><strong>Damage Resistance.</strong> You have Resistance to Bludgeoning, Piercing, and Slashing damage.</p><p><strong>Rage Damage.</strong> When you make an attack using Strength—with either a weapon or an Unarmed Strike—and deal damage to the target, you gain a bonus to the damage that increases as you gain levels as a Barbarian, as shown in the Rage Damage column of the Barbarian Features table.</p><p><strong>Strength Advantage.</strong> You have Advantage on Strength checks and Strength saving throws.</p><p><strong>No Concentration or Spells.</strong> You can't maintain Concentration, and you can't cast spells.</p><p><strong>Duration.</strong> The Rage lasts until the end of your next turn, and it ends early if you don Heavy armor or have the Incapacitated condition. If your Rage is still active on your next turn, you can extend the Rage for another round by doing one of the following:</p><p>Make an attack roll against an enemy.</p><p>Force an enemy to make a saving throw.</p><p>Take a Bonus Action to extend your Rage.</p><p>Each time the Rage is extended, it lasts until the end of your next turn. You can maintain a Rage for up to 10 minutes.</p>",
+      "tables": [
+        {
+          "id": "rage-progression",
+          "name": "Rage progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "uses",
+              "label": "Rages",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 1,
+                  "value": 2
+                },
+                {
+                  "level": 3,
+                  "value": 3
+                },
+                {
+                  "level": 6,
+                  "value": 4
+                },
+                {
+                  "level": 12,
+                  "value": 5
+                },
+                {
+                  "level": 17,
+                  "value": 6
+                }
+              ]
+            },
+            {
+              "id": "damage-bonus",
+              "label": "Rage Damage",
+              "valueType": "number",
+              "format": "signed",
+              "entries": [
+                {
+                  "level": 1,
+                  "value": 2
+                },
+                {
+                  "level": 9,
+                  "value": 3
+                },
+                {
+                  "level": 16,
+                  "value": 4
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "unarmored-defense",
@@ -97,7 +153,35 @@
       "id": "weapon-mastery",
       "name": "Weapon Mastery",
       "level": 1,
-      "description": "<p>Your training with weapons allows you to use the mastery properties of two kinds of Simple or Martial Melee weapons of your choice, such as Greataxes and Handaxes. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices.</p><p>When you reach certain Barbarian levels, you gain the ability to use the mastery properties of more kinds of weapons, as shown in the Weapon Mastery column of the Barbarian Features table.</p>"
+      "description": "<p>Your training with weapons allows you to use the mastery properties of two kinds of Simple or Martial Melee weapons of your choice, such as Greataxes and Handaxes. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices.</p><p>When you reach certain Barbarian levels, you gain the ability to use the mastery properties of more kinds of weapons, as shown in the Weapon Mastery column of the Barbarian Features table.</p>",
+      "tables": [
+        {
+          "id": "weapon-mastery-progression",
+          "name": "Weapon Mastery progression",
+          "kind": "levelProgression",
+          "columns": [
+            {
+              "id": "masteries",
+              "label": "Weapon Mastery",
+              "valueType": "number",
+              "entries": [
+                {
+                  "level": 1,
+                  "value": 2
+                },
+                {
+                  "level": 4,
+                  "value": 3
+                },
+                {
+                  "level": 10,
+                  "value": 4
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "danger-sense",
@@ -284,67 +368,6 @@
       "name": "Primal Champion",
       "level": 20,
       "description": "<p>You embody primal power. Your Strength and Constitution scores increase by 4, to a maximum of 25.</p>"
-    }
-  ],
-  "resources": [
-    {
-      "name": "Rages",
-      "entries": [
-        {
-          "level": 1,
-          "value": 2
-        },
-        {
-          "level": 3,
-          "value": 3
-        },
-        {
-          "level": 6,
-          "value": 4
-        },
-        {
-          "level": 12,
-          "value": 5
-        },
-        {
-          "level": 17,
-          "value": 6
-        }
-      ]
-    },
-    {
-      "name": "Rage Damage",
-      "entries": [
-        {
-          "level": 1,
-          "value": 2
-        },
-        {
-          "level": 9,
-          "value": 3
-        },
-        {
-          "level": 16,
-          "value": 4
-        }
-      ]
-    },
-    {
-      "name": "Weapon Mastery",
-      "entries": [
-        {
-          "level": 1,
-          "value": 2
-        },
-        {
-          "level": 4,
-          "value": 3
-        },
-        {
-          "level": 10,
-          "value": 4
-        }
-      ]
     }
   ]
 }

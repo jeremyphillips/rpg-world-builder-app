@@ -8,8 +8,6 @@ import { Form } from './form.client'
 import { FormShellFooterScope, FormShellFooterSlot } from '../chrome/form-shell-footer.context'
 import type { FormItem } from '../field-config'
 import { submitAndExpectPayload } from '../test-utils'
-import { dialogPanelSectionInsetXClasses } from '../../components/ui/dialog-panel.variants'
-import { cn } from '../../lib/utils'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -190,6 +188,70 @@ describe('Form', () => {
     expect(row?.textContent).toContain('ft.')
   })
 
+  it('aligns select and chips siblings in schema rows on shared anatomy tracks', () => {
+    const rowSchema = z.object({
+      school: z.string(),
+      level: z.string(),
+    })
+    const rowFields: FormItem[] = [
+      {
+        kind: 'row',
+        fieldDivider: { variant: 'pipe' },
+        fields: [
+          {
+            type: 'select',
+            name: 'school',
+            label: 'School',
+            options: [
+              { value: 'evocation', label: 'Evocation' },
+              { value: 'abjuration', label: 'Abjuration' },
+            ],
+            width: '1/2',
+          },
+          {
+            type: 'chips',
+            name: 'level',
+            label: 'Level',
+            options: [
+              { value: '0', label: 'Cantrip' },
+              { value: '1', label: '1st' },
+            ],
+            multiple: false,
+            width: '1/2',
+          },
+        ],
+      },
+    ]
+    const { container } = render(
+      <Form
+        schema={rowSchema}
+        fields={rowFields}
+        defaultValues={{ school: 'evocation', level: '0' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const row = container.querySelector('[data-field-row]')
+    expect(row).toBeTruthy()
+    expect(row?.querySelector('fieldset')).toBeNull()
+    expect(row?.querySelectorAll('[data-field-row-participant]')).toHaveLength(2)
+    expect(row?.querySelectorAll('[data-field-label-region]')).toHaveLength(2)
+    expect(row?.querySelector('[data-field-row-divider]')).toHaveClass('border-l', 'mx-8')
+    expect(row?.textContent).toContain('School')
+    expect(row?.textContent).toContain('Level')
+
+    function controlTopForLabel(label: string): number | null {
+      const labelNode = screen.getByText(label)
+      const control = labelNode
+        .closest('[data-field-row-participant]')
+        ?.querySelector('[data-field-control-region]')
+      if (!control) return null
+      return Math.round(control.getBoundingClientRect().top)
+    }
+
+    expect(controlTopForLabel('School')).toBe(controlTopForLabel('Level'))
+  })
+
   it('renders schema rows as anatomy-grid rows', () => {
     const rowSchema = z.object({
       first: z.string(),
@@ -277,7 +339,6 @@ describe('Form', () => {
           fields={[{ type: 'text', name: 'name', label: 'Name' }]}
           onSubmit={vi.fn()}
           externalFooter
-          contentClassName={cn(dialogPanelSectionInsetXClasses, 'pt-0')}
           footer={<button type="submit">Save</button>}
         />
         <div data-testid="overlay-footer">
@@ -290,13 +351,13 @@ describe('Form', () => {
     expect(form).toHaveClass('flex')
     expect(form).toHaveClass('flex-1')
 
-    const scrollRegion = form?.firstElementChild
-    expect(scrollRegion).toHaveClass('overflow-y-auto')
-    expect(scrollRegion).toHaveClass('flex-1')
-    expect(scrollRegion).toHaveClass('px-6')
-    expect(scrollRegion).not.toHaveClass('gap-6')
+    const scrollViewport = form?.querySelector('.overflow-y-auto')
+    expect(scrollViewport).toHaveClass('overflow-y-auto')
+    expect(scrollViewport).toHaveClass('px-6')
+    expect(scrollViewport).toHaveClass('pt-5')
+    expect(scrollViewport).not.toHaveClass('gap-6')
 
-    const rhythmStack = scrollRegion?.firstElementChild
+    const rhythmStack = scrollViewport?.firstElementChild
     expect(rhythmStack).toHaveClass('gap-6')
     expect(rhythmStack).not.toHaveClass('flex-1')
     expect(rhythmStack).not.toHaveClass('overflow-y-auto')

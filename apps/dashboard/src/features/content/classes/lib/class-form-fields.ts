@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { createElement } from 'react'
 import {
-  campaignLevelSchema,
   MAX_CHARACTER_LEVEL,
   abilitySchema,
   abilityScoreOrderSchema,
@@ -34,7 +33,6 @@ import {
   proficienciesFormSchema,
   refineClassWeaponProficiencies,
 } from './class-proficiencies-form-fields'
-import { resourcesArrayField } from './class-resources-form-fields'
 import {
   createSpellcastingDraftFormSchema,
   createSpellcastingFormSchema,
@@ -55,10 +53,6 @@ import {
   startingEquipmentOptionItemFields,
 } from './character-creation/class-starting-equipment-form-fields'
 
-function campaignLevelField(maxLevel: number) {
-  return z.coerce.number().pipe(campaignLevelSchema(maxLevel))
-}
-
 export function maxLevelFromCtx(ctx: ContentFormCtx): number {
   return effectiveMaxFromCtx(ctx)
 }
@@ -67,16 +61,6 @@ export function createClassFormSchema(
   maxLevel: number = MAX_CHARACTER_LEVEL,
   formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
 ) {
-  const levelField = campaignLevelField(maxLevel)
-  const resourceEntryFormSchema = z.object({
-    level: levelField,
-    value: z.coerce.number().int().min(0),
-  })
-  const resourceRowFormSchema = z.object({
-    name: z.string().min(1),
-    entries: z.array(resourceEntryFormSchema).min(1),
-  })
-
   return z
     .object({
       name: z.string().min(1),
@@ -89,7 +73,6 @@ export function createClassFormSchema(
       spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
       proficiencies: proficienciesFormSchema,
       features: z.array(createFeatureRowFormSchema(maxLevel)),
-      resources: z.array(resourceRowFormSchema).optional(),
       characterCreation: z
         .object({
           startingEquipment: startingEquipmentFormSchema.optional(),
@@ -110,16 +93,6 @@ export function createClassDraftFormSchema(
   maxLevel: number = MAX_CHARACTER_LEVEL,
   _formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
 ) {
-  const levelField = campaignLevelField(maxLevel)
-  const resourceEntryFormSchema = z.object({
-    level: levelField,
-    value: z.coerce.number().int().min(0),
-  })
-  const resourceRowDraftFormSchema = z.object({
-    name: z.string(),
-    entries: z.array(resourceEntryFormSchema).default([]),
-  })
-
   return z.object({
     name: z.string(),
     slug: slugSchema.optional(),
@@ -131,7 +104,6 @@ export function createClassDraftFormSchema(
     spellcasting: createSpellcastingDraftFormSchema(maxLevel).optional(),
     proficiencies: proficienciesDraftFormSchema,
     features: z.array(createFeatureRowDraftFormSchema(maxLevel)).default([]),
-    resources: z.array(resourceRowDraftFormSchema).optional(),
     characterCreation: z
       .object({
         startingEquipment: startingEquipmentDraftFormSchema.optional(),
@@ -170,7 +142,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     {
       id: 'features',
       label: 'Features',
-      fields: [resourcesArrayField(ctx)],
+      fields: [],
       ...embeddedMasterDetailTabValidation({
         path: 'features',
         legend: 'Features',
