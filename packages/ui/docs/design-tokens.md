@@ -165,7 +165,7 @@ Switch unchecked track uses `--switch-track*` — separate from field border own
 
 Schema-driven form fields default to a boxed container shell (`{ variant: 'container' }`):
 
-- Layer 2 token: `--field-container` — lightest surface in light mode (`--palette-surface-lift`), darkest in dark mode (`--palette-surface-sunken`).
+- Layer 2 token: `--field-container` — lift plane in both themes (`--palette-surface-lift`); recessed wells use `--sunken` / `bg-sunken` instead.
 - Public utility: `bg-field-container` in `globals.css`.
 - Shells rebind `--surface-current` via `establishSurfaceCurrent('field-container')` so borders compute on the container plane.
 - Padding: 16px (`p-4`).

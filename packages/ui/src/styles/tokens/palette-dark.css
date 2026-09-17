@@ -45,7 +45,8 @@
     var(--palette-neutral-contrast) 12%,
     var(--palette-surface-base)
   );
-  --palette-surface-sunken: oklch(0.12 0.004 var(--palette-neutral-hue));
+  /* Authored inset well — near-black, lower chroma than canvas/panel washes */
+  --palette-surface-sunken: oklch(0.085 0.002 var(--palette-neutral-hue));
 
   --palette-sidebar-shade: oklch(0.11 0.005 var(--palette-neutral-hue));
   --palette-sidebar-surface: color-mix(
