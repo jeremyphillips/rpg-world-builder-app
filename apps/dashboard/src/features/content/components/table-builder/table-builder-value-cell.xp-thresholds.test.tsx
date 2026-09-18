@@ -73,7 +73,7 @@ describe('TableBuilderValueCell XP thresholds', () => {
     const input = screen.getByRole('textbox', { name: 'XP required, level 25' })
     await user.type(input, '5')
 
-    expect(screen.queryByText('Enter 605,000 or more.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Enter 555,001 or more.')).not.toBeInTheDocument()
     expect(input).toHaveFocus()
   })
 

@@ -45,6 +45,7 @@ export function TableBuilderValuesGrid({
   const config = useTableBuilderHostConfig()
   const extendedProgression = config.extendedProgression
   const fixedLevels = config.rows === 'fixedLevels'
+  const includeRestoreActions = config.includeRowRestoreActions === true
 
   return (
     <>
@@ -55,6 +56,7 @@ export function TableBuilderValuesGrid({
             gridTemplate={gridTemplate}
             includeLevel={includeLevel}
             includeActions={includeActions}
+            includeRestoreActions={includeRestoreActions}
           />
 
           {fields.length === 0 ? (

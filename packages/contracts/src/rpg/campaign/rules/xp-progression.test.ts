@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { formatFieldMessage } from '../../../validation/define-message'
 import {
+  applyExtendedXpIncrement,
   computeXpThresholdsSparsePatch,
   formatXpThresholdDerivedCallout,
   formatXpThresholdsSummary,
@@ -10,8 +11,10 @@ import {
   refineEffectiveXpProgression,
   resolveDerivedMinimumXpThreshold,
   resolveEffectiveXpProgression,
+  resolveExtendedProgressionActionContext,
   resolveXpThresholdDerivedPresentation,
   resolveXpThresholdEditorState,
+  resolveXpThresholdRestoreAction,
   resolveXpThresholdsSummary,
   validateXpThresholdExplicitValue,
   xpThresholdOverrideEntriesSchema,
@@ -233,11 +236,9 @@ describe('resolveXpThresholdDerivedPresentation', () => {
       'Levels 21–25 continue the latest XP increase of 50,000 XP per level.',
     )
     expect(callout.description).toContain(
-      'Each derived value is also the minimum allowed threshold for that level.',
+      'Edit a derived value to make it explicit; later derived values recalculate from the updated progression.',
     )
-    expect(callout.description).toContain(
-      'Edit a value to make it explicit; later derived values recalculate from the new progression.',
-    )
+    expect(callout.description).not.toContain('minimum allowed threshold')
     expect(callout.description).not.toContain(' in Epic Destiny ')
   })
 
@@ -305,12 +306,12 @@ describe('refineEffectiveXpProgression', () => {
     expect(schema.safeParse({}).success).toBe(true)
   })
 
-  it('rejects extended overrides below the derived minimum', () => {
+  it('rejects extended overrides that do not exceed the preceding level', () => {
     const schema = z.object({}).superRefine((_value, ctx) => {
       refineEffectiveXpProgression(
         {
           systemEntries: SYSTEM_ENTRIES,
-          overrides: [{ level: 21, xpRequired: 380_000 }],
+          overrides: [{ level: 21, xpRequired: 355_000 }],
           effectiveMaxLevel: 25,
         },
         ctx,
@@ -319,8 +320,6 @@ describe('refineEffectiveXpProgression', () => {
 
     const result = schema.safeParse({})
     expect(result.success).toBe(false)
-    if (result.success) return
-    expect(formatFieldMessage(result.error.issues[0]!.message)).toBe('Enter 405,000 or more.')
   })
 
   it('allows standard overrides with decreasing deltas versus the source table', () => {
@@ -347,18 +346,28 @@ describe('resolveDerivedMinimumXpThreshold', () => {
 })
 
 describe('validateXpThresholdExplicitValue', () => {
-  it('requires extended explicit values to meet the derived minimum', () => {
+  it('requires level N XP to exceed level N-1 XP', () => {
     const preceding = resolve({ effectiveMaxLevel: 20 })
     const result = validateXpThresholdExplicitValue({
       level: 21,
-      xpRequired: 380_000,
+      xpRequired: 355_000,
       precedingEffective: preceding,
-      systemEntries: SYSTEM_ENTRIES,
     })
 
     expect(result.valid).toBe(false)
     if (result.valid) return
-    expect(formatFieldMessage(result.message)).toBe('Enter 405,000 or more.')
+    expect(formatFieldMessage(result.message)).toBe('Enter 355,001 or more.')
+  })
+
+  it('allows 14,000 followed by 14,001', () => {
+    const preceding = resolve({ effectiveMaxLevel: 6 })
+    const result = validateXpThresholdExplicitValue({
+      level: 7,
+      xpRequired: 14_001,
+      precedingEffective: preceding,
+    })
+
+    expect(result).toEqual({ valid: true })
   })
 
   it('allows standard overrides that remain strictly increasing', () => {
@@ -367,10 +376,72 @@ describe('validateXpThresholdExplicitValue', () => {
       level: 12,
       xpRequired: 95_000,
       precedingEffective: preceding,
-      systemEntries: SYSTEM_ENTRIES,
     })
 
     expect(result).toEqual({ valid: true })
+  })
+})
+
+describe('resolveXpThresholdRestoreAction', () => {
+  it('returns system restore when an override differs from the seed', () => {
+    expect(
+      resolveXpThresholdRestoreAction({
+        level: 6,
+        xpRequired: 25_000,
+        systemEntries: SYSTEM_ENTRIES,
+      }),
+    ).toBe('system')
+  })
+
+  it('returns derived restore for explicit extended levels', () => {
+    expect(
+      resolveXpThresholdRestoreAction({
+        level: 21,
+        xpRequired: 405_000,
+        systemEntries: SYSTEM_ENTRIES,
+      }),
+    ).toBe('derived')
+  })
+})
+
+describe('applyExtendedXpIncrement', () => {
+  it('writes explicit thresholds across the full extended range', () => {
+    const result = applyExtendedXpIncrement({
+      systemEntries: SYSTEM_ENTRIES,
+      effectiveMaxLevel: 25,
+      explicitDraftValuesByLevel: new Map([
+        [21, 420_000],
+        [22, 485_000],
+      ]),
+      increment: 65_000,
+    })
+
+    expect(result.anchorLevel).toBe(21)
+    expect(result.anchorXpRequired).toBe(420_000)
+    expect(result.explicitDraftValuesByLevel.get(21)).toBe(420_000)
+    expect(result.explicitDraftValuesByLevel.get(22)).toBe(485_000)
+    expect(result.explicitDraftValuesByLevel.get(23)).toBe(550_000)
+    expect(result.explicitDraftValuesByLevel.get(24)).toBe(615_000)
+    expect(result.explicitDraftValuesByLevel.get(25)).toBe(680_000)
+  })
+})
+
+describe('resolveExtendedProgressionActionContext', () => {
+  it('returns action metadata when extended levels are active', () => {
+    const context = resolveExtendedProgressionActionContext({
+      systemEntries: SYSTEM_ENTRIES,
+      effectiveMaxLevel: 25,
+      explicitDraftValuesByLevel: new Map(),
+    })
+
+    expect(context).toMatchObject({
+      label: 'Set extended progression',
+      extendedStartsAt: 21,
+      currentIncrement: 50_000,
+      anchorLevel: 20,
+      anchorXpRequired: 355_000,
+      extendedEndLevel: 25,
+    })
   })
 })
 
@@ -428,6 +499,26 @@ describe('resolveXpThresholdEditorState', () => {
       blockedByLevel: 25,
     })
     expect(level26?.progressionError).toBeUndefined()
+  })
+
+  it('marks blank system fallbacks invalid when an upstream override overtakes them', () => {
+    const rows = resolveXpThresholdEditorState({
+      systemEntries: SYSTEM_ENTRIES,
+      effectiveMaxLevel: 10,
+      explicitDraftValuesByLevel: new Map([[6, 25_000]]),
+    })
+
+    const level7 = rows.find((row) => row.level === 7)
+    const level8 = rows.find((row) => row.level === 8)
+
+    expect(level7?.progressionError).toBeDefined()
+    expect(formatFieldMessage(level7!.progressionError!)).toBe('Enter 25,001 or more.')
+    expect(level7?.displayPlaceholder).toBe('23,000')
+    expect(level8).toMatchObject({
+      readOnly: true,
+      blockedByLevel: 7,
+      displayPlaceholder: '—',
+    })
   })
 
   it('does not block downstream rows for uncommitted invalid explicit values', () => {

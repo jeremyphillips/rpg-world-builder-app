@@ -1,11 +1,15 @@
 import {
+  applyExtendedXpIncrement,
   computeXpThresholdsSparsePatch,
   formatXpThresholdDerivedCallout,
   formatXpThresholdValue,
   normalizeXpThresholdOverrides,
   resolveEffectiveXpProgression,
+  resolveExtendedProgressionActionContext,
+  resolveMaxSystemLevel,
   resolveXpThresholdDerivedPresentation,
   resolveXpThresholdEditorState,
+  XP_THRESHOLD_RESTORE_ACTION_LABELS,
   type XpProgressionEntry,
   type XpThresholdEditorRowState,
   type XpThresholdOverrideEntry,
@@ -25,9 +29,11 @@ import type {
   TableBuilderCellPresentationContext,
   TableBuilderDraftValidationResult,
   TableBuilderExtendedProgression,
+  TableBuilderExtendedProgressionAction,
   TableBuilderHostConfig,
   TableBuilderRowPresentation,
   TableBuilderRowPresentationContext,
+  TableBuilderRowRestoreAction,
 } from '@/features/content/lib/table-builder/table-builder-host-config'
 
 export const XP_THRESHOLDS_TABLE_NAME = 'Experience thresholds'
@@ -298,15 +304,16 @@ export function resolveXpThresholdCellPresentation(
     return { ...presentation, readOnly: true }
   }
 
+  if (editorRow.progressionError !== undefined) {
+    presentation.progressionError = editorRow.progressionError
+  }
+
   if (!isTableBuilderCellBlank(ctx.draftValue)) {
     if (typeof ctx.draftValue === 'string') {
       const xpRequired = parseXpThresholdCellDraft(ctx.draftValue)
       if (xpRequired !== undefined) {
         presentation.formattedValue = formatXpThresholdValue(xpRequired)
       }
-    }
-    if (editorRow.progressionError !== undefined) {
-      presentation.progressionError = editorRow.progressionError
     }
     return presentation
   }
@@ -320,6 +327,100 @@ export function resolveXpThresholdCellPresentation(
   }
 
   return presentation
+}
+
+export function resolveXpThresholdRowRestoreAction(
+  ctx: TableBuilderRowPresentationContext,
+  systemEntries: readonly XpProgressionEntry[],
+  dormantOverrides: readonly XpThresholdOverrideEntry[],
+  effectiveMaxLevel: number,
+): TableBuilderRowRestoreAction | undefined {
+  const level = ctx.level
+  if (level === undefined) return undefined
+
+  const editorRow = findEditorRowForLevel(
+    resolveXpThresholdEditorRows(
+      ctx.draft,
+      {
+        systemEntries,
+        dormantOverrides,
+        effectiveMaxLevel,
+      },
+      ctx.committedDraftLevels,
+    ),
+    level,
+  )
+  if (editorRow?.restoreAction === undefined) return undefined
+
+  const label = XP_THRESHOLD_RESTORE_ACTION_LABELS[editorRow.restoreAction]
+  return {
+    kind: editorRow.restoreAction,
+    ariaLabel: label,
+    tooltip: label,
+  }
+}
+
+export function resolveXpThresholdExtendedProgressionAction(
+  draft: TableBuilderFormValues,
+  systemEntries: readonly XpProgressionEntry[],
+  effectiveMaxLevel: number,
+): TableBuilderExtendedProgressionAction | undefined {
+  const columnKey = resolveColumnKey(draft)
+  if (columnKey === undefined) return undefined
+
+  return resolveExtendedProgressionActionContext({
+    systemEntries,
+    effectiveMaxLevel,
+    explicitDraftValuesByLevel: buildDraftExplicitValuesByLevel(draft, columnKey),
+  })
+}
+
+export function applyExtendedXpIncrementToDraft(
+  draft: TableBuilderFormValues,
+  systemEntries: readonly XpProgressionEntry[],
+  effectiveMaxLevel: number,
+  increment: number,
+): TableBuilderFormValues {
+  const columnKey = resolveColumnKey(draft)
+  if (columnKey === undefined) return draft
+
+  const result = applyExtendedXpIncrement({
+    systemEntries,
+    effectiveMaxLevel,
+    explicitDraftValuesByLevel: buildDraftExplicitValuesByLevel(draft, columnKey),
+    increment,
+  })
+
+  const extendedStartsAt = resolveMaxSystemLevel(systemEntries) + 1
+
+  const nextRows = draft.rows.map((row) => {
+    const level = parseLevelDraft(row.level ?? '')
+    if (level === undefined || level <= 1) return row
+
+    const nextValue = result.explicitDraftValuesByLevel.get(level)
+    if (nextValue !== undefined) {
+      return {
+        ...row,
+        cells: {
+          ...row.cells,
+          [columnKey]: String(nextValue),
+        },
+      }
+    }
+
+    if (
+      level >= extendedStartsAt &&
+      level <= effectiveMaxLevel &&
+      row.cells[columnKey] !== undefined
+    ) {
+      const { [columnKey]: _removed, ...remainingCells } = row.cells
+      return { ...row, cells: remainingCells }
+    }
+
+    return row
+  })
+
+  return { ...draft, rows: nextRows }
 }
 
 export function resolveXpThresholdsValuesNotice(
@@ -419,6 +520,27 @@ export function buildXpThresholdsHostConfig(input: {
         hostContext.dormantOverrides,
         hostContext.effectiveMaxLevel,
       ),
+    resolveRowRestoreAction: (ctx) =>
+      resolveXpThresholdRowRestoreAction(
+        ctx,
+        hostContext.systemEntries,
+        hostContext.dormantOverrides,
+        hostContext.effectiveMaxLevel,
+      ),
+    resolveExtendedProgressionAction: (ctx) =>
+      resolveXpThresholdExtendedProgressionAction(
+        ctx.draft,
+        hostContext.systemEntries,
+        hostContext.effectiveMaxLevel,
+      ),
+    applyExtendedProgressionIncrement: (ctx) =>
+      applyExtendedXpIncrementToDraft(
+        ctx.draft,
+        hostContext.systemEntries,
+        hostContext.effectiveMaxLevel,
+        ctx.increment,
+      ),
+    includeRowRestoreActions: true,
     resolveValuesNotice: (ctx) =>
       resolveXpThresholdsValuesNotice(
         ctx.draft,

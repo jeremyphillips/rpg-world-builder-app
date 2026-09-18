@@ -29,6 +29,8 @@ export type TableBuilderProps = {
   form: UseFormReturn<TableBuilderFormValues>
   config: TableBuilderHostConfig
   mode: TableBuilderMode
+  /** When false, the host wraps FormProvider and TableBuilderHostConfigProvider. */
+  withProviders?: boolean
 }
 
 /**
@@ -36,40 +38,44 @@ export type TableBuilderProps = {
  * grid, and live preview. Renders no chrome of its own — the host provides the
  * modal (or page) shell, the `<form>` element, and footer actions.
  */
-export function TableBuilder({ form, config, mode }: TableBuilderProps) {
+export function TableBuilder({ form, config, mode, withProviders = true }: TableBuilderProps) {
   const nameId = useId()
   const nameError = form.getFieldState('name', form.formState).error
   const allowedLevels = config.allowedLevels ?? []
   const hideStructureChrome = isTableBuilderStructureConstrained(config)
 
+  const content = (
+    <div className={tableBuilderLayoutClasses}>
+      <div className={tableBuilderAuthoringPaneClasses}>
+        {!hideStructureChrome ? (
+          <>
+            <TextField
+              id={nameId}
+              label={TABLE_BUILDER_NAME_LABEL}
+              hint={TABLE_BUILDER_NAME_HINT}
+              size="md"
+              required
+              error={nameError?.message ? formatFieldMessage(nameError.message) : undefined}
+              invalid={Boolean(nameError)}
+              {...form.register('name')}
+            />
+            <TableBuilderKindField config={config} mode={mode} />
+            <TableBuilderColumns />
+          </>
+        ) : null}
+        <TableBuilderValues allowedLevels={allowedLevels} />
+      </div>
+      <div className={tableBuilderPreviewPaneClasses}>
+        <TableBuilderPreview />
+      </div>
+    </div>
+  )
+
+  if (!withProviders) return content
+
   return (
     <TableBuilderHostConfigProvider config={config}>
-      <FormProvider {...form}>
-        <div className={tableBuilderLayoutClasses}>
-          <div className={tableBuilderAuthoringPaneClasses}>
-            {!hideStructureChrome ? (
-              <>
-                <TextField
-                  id={nameId}
-                  label={TABLE_BUILDER_NAME_LABEL}
-                  hint={TABLE_BUILDER_NAME_HINT}
-                  size="md"
-                  required
-                  error={nameError?.message ? formatFieldMessage(nameError.message) : undefined}
-                  invalid={Boolean(nameError)}
-                  {...form.register('name')}
-                />
-                <TableBuilderKindField config={config} mode={mode} />
-                <TableBuilderColumns />
-              </>
-            ) : null}
-            <TableBuilderValues allowedLevels={allowedLevels} />
-          </div>
-          <div className={tableBuilderPreviewPaneClasses}>
-            <TableBuilderPreview />
-          </div>
-        </div>
-      </FormProvider>
+      <FormProvider {...form}>{content}</FormProvider>
     </TableBuilderHostConfigProvider>
   )
 }

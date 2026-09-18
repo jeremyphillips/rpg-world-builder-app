@@ -83,7 +83,12 @@ export function useTableBuilderValues(allowedLevels: readonly number[]): TableBu
     rowsErrorMessage: rowsError?.message,
     includeLevel,
     hasNoColumns,
-    gridTemplate: tableBuilderValuesGridTemplate(columns.length, includeLevel, !fixedLevels),
+    gridTemplate: tableBuilderValuesGridTemplate(
+      columns.length,
+      includeLevel,
+      !fixedLevels,
+      config.includeRowRestoreActions === true,
+    ),
     fields: fieldArray.fields,
     rowLevels,
     usedLevels,

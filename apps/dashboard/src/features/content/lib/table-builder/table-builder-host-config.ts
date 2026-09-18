@@ -48,6 +48,21 @@ export type TableBuilderRowPresentation = {
   blockedHint?: string
 }
 
+export type TableBuilderRowRestoreAction = {
+  kind: 'system' | 'derived'
+  ariaLabel: string
+  tooltip: string
+}
+
+export type TableBuilderExtendedProgressionAction = {
+  label: 'Set extended progression'
+  extendedStartsAt: number
+  currentIncrement: number
+  anchorLevel: number
+  anchorXpRequired: number
+  extendedEndLevel: number
+}
+
 export type TableBuilderDraftValidationResult =
   | { valid: true }
   | { valid: false; errors: Array<{ path: string; message: string }> }
@@ -82,6 +97,18 @@ export type TableBuilderHostConfig = {
   resolveRowPresentation?: (
     ctx: TableBuilderRowPresentationContext,
   ) => TableBuilderRowPresentation | undefined
+  resolveRowRestoreAction?: (
+    ctx: TableBuilderRowPresentationContext,
+  ) => TableBuilderRowRestoreAction | undefined
+  resolveExtendedProgressionAction?: (ctx: {
+    draft: TableBuilderFormValues
+  }) => TableBuilderExtendedProgressionAction | undefined
+  applyExtendedProgressionIncrement?: (ctx: {
+    draft: TableBuilderFormValues
+    increment: number
+  }) => TableBuilderFormValues
+  /** When true, fixed-level grids include a slim trailing restore column. */
+  includeRowRestoreActions?: boolean
   resolveValuesNotice?: (ctx: {
     draft: TableBuilderFormValues
   }) => TableBuilderValuesNotice | undefined

@@ -8,8 +8,11 @@ import {
   mapXpThresholdsDraftToOverrides,
   parseXpThresholdCellDraft,
   resolveSystemXpEntries,
+  applyExtendedXpIncrementToDraft,
   resolveXpThresholdCellPresentation,
   resolveXpThresholdRowPresentation,
+  resolveXpThresholdExtendedProgressionAction,
+  resolveXpThresholdRowRestoreAction,
   resolveXpThresholdsValuesNotice,
   validateXpThresholdsDraft,
 } from './xp-thresholds-field.lib'
@@ -112,8 +115,9 @@ describe('xp thresholds field lib', () => {
       'Levels 21–25 in Epic Destiny continue the latest XP increase of 50,000 XP per level.',
     )
     expect(notice?.description).toContain(
-      'Each derived value is also the minimum allowed threshold for that level.',
+      'Edit a derived value to make it explicit; later derived values recalculate from the updated progression.',
     )
+    expect(notice?.description).not.toContain('minimum allowed threshold')
   })
 
   it('recomputes later derived placeholders after an explicit extended edit', () => {
@@ -150,7 +154,7 @@ describe('xp thresholds field lib', () => {
     const result = validateXpThresholdsDraft(draft, SYSTEM_ENTRIES, [], 25)
     expect(result.valid).toBe(false)
     if (result.valid) return
-    expect(formatFieldMessage(result.errors[0]!.message)).toBe('Enter 605,000 or more.')
+    expect(formatFieldMessage(result.errors[0]!.message)).toBe('Enter 555,001 or more.')
   })
 
   it('maps row blocking state from the editor resolver when the invalid level is committed', () => {
@@ -279,6 +283,105 @@ describe('xp thresholds field lib', () => {
     )
 
     expect(presentation?.progressionError).toBeDefined()
-    expect(formatFieldMessage(presentation!.progressionError!)).toBe('Enter 605,000 or more.')
+    expect(formatFieldMessage(presentation!.progressionError!)).toBe('Enter 555,001 or more.')
+  })
+})
+
+describe('extended progression action metadata', () => {
+  it('returns sticky action context when extended levels are active', () => {
+    const draft = buildXpThresholdsDraft({
+      effectiveMaxLevel: 25,
+      systemEntries: SYSTEM_ENTRIES,
+      overrides: [],
+      extendedProgressionEnabled: true,
+      maxCharacterLevel: 20,
+      extendedTierName: 'Epic Destiny',
+    })
+
+    expect(resolveXpThresholdExtendedProgressionAction(draft, SYSTEM_ENTRIES, 25)).toMatchObject({
+      label: 'Set extended progression',
+      currentIncrement: 50_000,
+      extendedStartsAt: 21,
+    })
+  })
+})
+
+describe('row restore action', () => {
+  it('returns restore metadata for explicit overrides only', () => {
+    const draft = buildXpThresholdsDraft({
+      effectiveMaxLevel: 25,
+      systemEntries: SYSTEM_ENTRIES,
+      overrides: [{ level: 21, xpRequired: 420_000 }],
+    })
+
+    expect(
+      resolveXpThresholdRowRestoreAction(
+        { draft, rowIndex: 19, level: 20 },
+        SYSTEM_ENTRIES,
+        [],
+        25,
+      ),
+    ).toBeUndefined()
+
+    expect(
+      resolveXpThresholdRowRestoreAction(
+        { draft, rowIndex: 20, level: 21 },
+        SYSTEM_ENTRIES,
+        [],
+        25,
+      ),
+    ).toMatchObject({
+      kind: 'derived',
+      ariaLabel: 'Use derived value',
+      tooltip: 'Use derived value',
+    })
+  })
+})
+
+describe('extended progression bulk apply', () => {
+  it('sets the anchor and clears higher extended overrides in the draft', () => {
+    const draft = buildXpThresholdsDraft({
+      effectiveMaxLevel: 25,
+      systemEntries: SYSTEM_ENTRIES,
+      overrides: [
+        { level: 21, xpRequired: 420_000 },
+        { level: 22, xpRequired: 485_000 },
+      ],
+    })
+
+    const nextDraft = applyExtendedXpIncrementToDraft(draft, SYSTEM_ENTRIES, 25, 65_000)
+    const columnKey = draft.columns[0]!.key
+
+    expect(nextDraft.rows[20]?.cells[columnKey]).toBe('420000')
+    expect(nextDraft.rows[21]?.cells[columnKey]).toBe('485000')
+    expect(nextDraft.rows[24]?.cells[columnKey]).toBe('680000')
+  })
+})
+
+describe('implicit fallback validation', () => {
+  it('surfaces progression errors on blank system rows invalidated by upstream overrides', () => {
+    const draft = buildXpThresholdsDraft({
+      effectiveMaxLevel: 10,
+      systemEntries: SYSTEM_ENTRIES,
+      overrides: [{ level: 6, xpRequired: 25_000 }],
+    })
+    const columnKey = draft.columns[0]!.key
+    delete draft.rows[6]!.cells[columnKey]
+
+    const presentation = resolveXpThresholdCellPresentation(
+      {
+        draft,
+        rowIndex: 6,
+        level: 7,
+        columnKey,
+        draftValue: undefined,
+      },
+      SYSTEM_ENTRIES,
+      [],
+      10,
+    )
+
+    expect(formatFieldMessage(presentation!.progressionError!)).toBe('Enter 25,001 or more.')
+    expect(presentation?.placeholder).toBe('23,000')
   })
 })

@@ -1,7 +1,7 @@
 import { useId, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2 } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import type { FieldPath } from 'react-hook-form'
 import type { GeneralTable, ProgressionTable } from '@rpg/contracts'
 import { Button, ConfirmDialog, DialogPanelScrollRegion, Modal } from '@rpg/ui'
@@ -39,7 +39,9 @@ import {
 } from '../../lib/table-builder/table-builder-host-config'
 import { resolveTableBuilderFormSchema } from '../../lib/table-builder/resolve-table-builder-form-schema'
 import { TableBuilder } from './table-builder'
+import { TableBuilderExtendedProgressionDock } from './table-builder-extended-progression-dock'
 import { tableBuilderModalDeleteButtonClasses } from './table-builder-modal.variants'
+import { TableBuilderHostConfigProvider } from '../../lib/table-builder/table-builder-host-context'
 
 export type TableBuilderModalMode = 'create' | 'edit'
 
@@ -161,11 +163,18 @@ function TableBuilderModalContent({
             description={TABLE_BUILDER_MODAL_DESCRIPTION}
           />
           <Modal.Body stableBody>
-            <DialogPanelScrollRegion inset="innerLeading">
-              <form id={formId} onSubmit={handleSubmit} noValidate>
-                <TableBuilder form={form} config={config} mode={mode} />
-              </form>
-            </DialogPanelScrollRegion>
+            <FormProvider {...form}>
+              <TableBuilderHostConfigProvider config={config}>
+                <div className="relative flex min-h-0 flex-1 flex-col">
+                  <DialogPanelScrollRegion inset="innerLeading" viewportClassName="pb-0">
+                    <form id={formId} onSubmit={handleSubmit} noValidate>
+                      <TableBuilder form={form} config={config} mode={mode} withProviders={false} />
+                    </form>
+                  </DialogPanelScrollRegion>
+                  <TableBuilderExtendedProgressionDock />
+                </div>
+              </TableBuilderHostConfigProvider>
+            </FormProvider>
           </Modal.Body>
           <Modal.Footer>
             <Modal.FooterActions>

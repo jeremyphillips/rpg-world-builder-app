@@ -11,6 +11,7 @@ export type TableBuilderValuesHeaderProps = {
   gridTemplate: string
   includeLevel: boolean
   includeActions?: boolean
+  includeRestoreActions?: boolean
 }
 
 export function TableBuilderValuesHeader({
@@ -18,6 +19,7 @@ export function TableBuilderValuesHeader({
   gridTemplate,
   includeLevel,
   includeActions = true,
+  includeRestoreActions = false,
 }: TableBuilderValuesHeaderProps) {
   return (
     <div
@@ -35,6 +37,7 @@ export function TableBuilderValuesHeader({
           </div>
         )
       })}
+      {includeRestoreActions ? <div aria-hidden /> : null}
       {includeActions ? <div aria-hidden /> : null}
     </div>
   )

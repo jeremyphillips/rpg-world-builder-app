@@ -10,8 +10,9 @@ import {
   tableBuilderSectionClasses,
   tableBuilderSectionErrorClasses,
 } from './table-builder.variants'
-import { TableBuilderValuesGrid } from './table-builder-values-grid'
+import { tableBuilderValuesStickyPaddingClasses } from './table-builder-values.variants'
 import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { TableBuilderValuesGrid } from './table-builder-values-grid'
 import { resolveTableBuilderValuesHint, useTableBuilderValues } from './table-builder-values.lib'
 
 export type TableBuilderValuesProps = {
@@ -32,8 +33,16 @@ export function TableBuilderValues({ allowedLevels }: TableBuilderValuesProps) {
     },
   })
 
+  const stickyPadding =
+    config.resolveExtendedProgressionAction !== undefined
+      ? tableBuilderValuesStickyPaddingClasses
+      : undefined
+
   return (
-    <section className={tableBuilderSectionClasses} aria-label={TABLE_BUILDER_VALUES_LABEL}>
+    <section
+      className={[tableBuilderSectionClasses, stickyPadding].filter(Boolean).join(' ')}
+      aria-label={TABLE_BUILDER_VALUES_LABEL}
+    >
       <FormSectionHeader
         label={TABLE_BUILDER_VALUES_LABEL}
         hint={resolveTableBuilderValuesHint(values.hasNoColumns, values.includeLevel)}

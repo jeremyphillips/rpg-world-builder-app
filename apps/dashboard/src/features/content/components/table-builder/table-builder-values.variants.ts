@@ -47,13 +47,52 @@ export function tableBuilderValuesGridTemplate(
   columnCount: number,
   includeLevel = true,
   includeActions = true,
+  includeRestoreActions = false,
 ): string {
   const valueTracks = `repeat(${Math.max(columnCount, 1)}, ${TABLE_BUILDER_VALUE_TRACK})`
+  const restoreTrack = includeRestoreActions ? ` ${TABLE_BUILDER_ACTION_TRACK}` : ''
   const actionTrack = includeActions ? ` ${TABLE_BUILDER_ACTION_TRACK}` : ''
   return includeLevel
-    ? `${TABLE_BUILDER_LEVEL_TRACK} ${valueTracks}${actionTrack}`
-    : `${valueTracks}${actionTrack}`
+    ? `${TABLE_BUILDER_LEVEL_TRACK} ${valueTracks}${restoreTrack}${actionTrack}`
+    : `${valueTracks}${restoreTrack}${actionTrack}`
 }
+
+export const tableBuilderValuesStickyPaddingClasses = 'pb-14'
+
+/** Pinned extended-progression chrome — lives outside the modal scrollport, above the footer. */
+export const tableBuilderAuthoringDockBarClasses = 'border-t border-border bg-background py-2'
+
+export const tableBuilderAuthoringDockPanelClasses = 'space-y-1.5'
+
+export const tableBuilderAuthoringDockWellClasses = 'w-full'
+
+export const tableBuilderAuthoringDockTriggerClasses = 'text-sm font-medium'
+
+export const tableBuilderAuthoringDockHeadingClasses = 'mb-1.5 text-base'
+
+export const tableBuilderAuthoringDockHeadingTitleClasses = 'font-semibold text-foreground'
+
+export const tableBuilderAuthoringDockHeadingMetaClasses = 'font-normal text-muted-foreground'
+
+export const tableBuilderAuthoringDockFootnoteTextClasses = 'mb-0 text-xs text-muted-foreground'
+
+export const tableBuilderAuthoringDockInputRowClasses =
+  'flex flex-wrap items-center gap-x-2 gap-y-1'
+
+export const tableBuilderAuthoringDockInputLabelClasses =
+  'shrink-0 text-sm font-medium text-foreground'
+
+export const tableBuilderAuthoringDockIncrementInputClasses = 'w-24'
+
+/** Overlays the modal body scrollport — must not participate in flex height allocation. */
+export const tableBuilderAuthoringDockShellClasses = 'absolute inset-x-0 bottom-0 z-10'
+
+/** Matches authoring/preview column tracks without scroll-end padding. */
+export const tableBuilderAuthoringDockLayoutClasses =
+  'grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]'
+
+/** Reserves the preview column track so dock chrome aligns with the values grid. */
+export const tableBuilderAuthoringDockPreviewSpacerClasses = 'hidden min-w-0 lg:block'
 
 export const tableBuilderValuesLevelLabelClasses = 'text-sm text-muted-foreground tabular-nums'
 

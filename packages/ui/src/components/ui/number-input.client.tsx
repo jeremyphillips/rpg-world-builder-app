@@ -6,12 +6,17 @@ import { cn } from '../../lib/utils'
 import { NumberInputSteppers } from './number-input-steppers.client'
 import { useNumberInput } from './number-input.use.client'
 import { resolveDigitInlineSizeClasses } from './field-digit-metrics'
+import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
+import { fieldControlVariants } from './field-control.variants'
 import {
   numberInputFieldVariants,
   numberInputRootVariants,
   type NumberInputDigits,
   type NumberInputVariantProps,
 } from './number-input.variants'
+
+const numberInputAppearanceClasses =
+  '[appearance:textfield] tabular-nums [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
 
 export interface NumberInputProps
   extends Omit<React.ComponentProps<'input'>, 'size' | 'type'>, NumberInputVariantProps {
@@ -32,6 +37,8 @@ export interface NumberInputProps
   digits?: NumberInputDigits
   /** When true, renders en-US thousand separators while storing plain numbers. */
   formatGrouped?: boolean
+  /** When true, omits stepper controls and trailing stepper padding. */
+  hideSteppers?: boolean
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
@@ -49,6 +56,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       rootClassName,
       digits,
       formatGrouped = false,
+      hideSteppers = false,
       value,
       defaultValue,
       onChange,
@@ -95,20 +103,29 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           disabled={disabled}
           onChange={handleChange}
           className={cn(
-            numberInputFieldVariants({ size, grouped }),
+            hideSteppers && grouped
+              ? cn(
+                  fieldGroupedControlSizeClasses[resolvedSize],
+                  'min-w-0 w-full border-0 bg-transparent shadow-none rounded-none focus-visible:ring-0 focus-visible:ring-offset-0',
+                )
+              : hideSteppers
+                ? cn(fieldControlVariants({ size: resolvedSize }), numberInputAppearanceClasses)
+                : numberInputFieldVariants({ size, grouped }),
             digits && 'min-w-0 w-full',
             className,
           )}
         />
 
-        <NumberInputSteppers
-          size={size}
-          grouped={grouped}
-          disabled={disabled}
-          incrementDisabled={incrementDisabled}
-          decrementDisabled={decrementDisabled}
-          onBump={bump}
-        />
+        {hideSteppers ? null : (
+          <NumberInputSteppers
+            size={size}
+            grouped={grouped}
+            disabled={disabled}
+            incrementDisabled={incrementDisabled}
+            decrementDisabled={decrementDisabled}
+            onBump={bump}
+          />
+        )}
       </div>
     )
   },

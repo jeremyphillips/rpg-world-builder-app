@@ -5,7 +5,7 @@
 
 /** Authoring ~60% / preview ~40%, collapsing to one column below `lg`. */
 export const tableBuilderLayoutClasses =
-  'grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]'
+  'grid grid-cols-1 gap-6 pb-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]'
 
 export const tableBuilderAuthoringPaneClasses = 'flex min-w-0 flex-col gap-6'
 

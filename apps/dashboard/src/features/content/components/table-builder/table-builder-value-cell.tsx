@@ -99,7 +99,7 @@ function TableBuilderPlainScalarValueInput({
       <div className={tableBuilderDerivedInputShellClasses}>
         <Input grouped className={tableBuilderDerivedInputFieldClasses} {...inputProps} />
         <div aria-hidden className={tableBuilderDerivedBadgeDividerClasses} />
-        <div className={tableBuilderDerivedBadgeSegmentClasses}>
+        <div className={tableBuilderDerivedBadgeSegmentClasses} data-slot="derived-badge">
           <DerivedBadge />
         </div>
       </div>
@@ -130,11 +130,22 @@ function TableBuilderGroupedScalarValueInput({
   onChange: React.ChangeEventHandler<HTMLInputElement>
   value: string | undefined
 }) {
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  function focusInputFromShell(event: React.MouseEvent<HTMLDivElement>) {
+    if (readOnly) return
+    const target = event.target as HTMLElement
+    if (target.closest('button') || target.closest('[data-slot="derived-badge"]')) return
+    inputRef.current?.focus()
+  }
+
   const input = (
     <NumberInput
+      ref={inputRef}
       size="sm"
       formatGrouped
       grouped
+      hideSteppers
       readOnly={readOnly}
       disabled={readOnly}
       aria-label={ariaLabel}
@@ -144,13 +155,13 @@ function TableBuilderGroupedScalarValueInput({
       onBlur={onBlur}
       onChange={onChange}
       value={value ?? ''}
-      rootClassName="min-w-0 border-0 bg-transparent shadow-none"
+      rootClassName="min-w-0 w-full flex-1 border-0 bg-transparent shadow-none"
       className={tableBuilderDerivedInputFieldClasses}
     />
   )
 
   return (
-    <div className={tableBuilderDerivedInputShellClasses}>
+    <div className={tableBuilderDerivedInputShellClasses} onMouseDown={focusInputFromShell}>
       {input}
       {showDerivedBadge ? (
         <>
@@ -160,6 +171,87 @@ function TableBuilderGroupedScalarValueInput({
           </div>
         </>
       ) : null}
+    </div>
+  )
+}
+
+function resolveGroupedScalarCellError(
+  presentation: TableBuilderCellPresentation,
+  fieldState: { isTouched: boolean },
+  cellError: { message?: string } | undefined,
+  fieldValue: unknown,
+): string | undefined {
+  const isBlankCell =
+    fieldValue === undefined || (typeof fieldValue === 'string' && fieldValue.trim() === '')
+  const showProgressionError =
+    presentation.progressionError !== undefined &&
+    (fieldState.isTouched || cellError !== undefined || isBlankCell)
+
+  if (showProgressionError) {
+    return formatFieldMessage(presentation.progressionError!)
+  }
+
+  if (cellError) {
+    return formatFieldMessage(cellError.message ?? '')
+  }
+
+  return undefined
+}
+
+function TableBuilderGroupedScalarValueField({
+  form,
+  cellPath,
+  cellError,
+  presentation,
+  showPlaceholder,
+  ariaLabel,
+  readOnly,
+}: {
+  form: UseFormReturn<TableBuilderFormValues>
+  cellPath: string
+  cellError: { message?: string } | undefined
+  presentation: TableBuilderCellPresentation
+  showPlaceholder: boolean
+  ariaLabel: string
+  readOnly: boolean
+}) {
+  return (
+    <div className={tableBuilderValuesCellClasses}>
+      <Controller
+        name={fieldPath(cellPath)}
+        render={({ field, fieldState }) => {
+          const resolvedError = resolveGroupedScalarCellError(
+            presentation,
+            fieldState,
+            cellError,
+            field.value,
+          )
+
+          return (
+            <>
+              <TableBuilderGroupedScalarValueInput
+                showDerivedBadge={presentation.provenanceBadge === 'derived'}
+                readOnly={readOnly}
+                ariaLabel={ariaLabel}
+                ariaInvalid={resolvedError ? true : undefined}
+                placeholder={showPlaceholder ? presentation.placeholder : undefined}
+                name={field.name}
+                onBlur={field.onBlur}
+                onChange={(event) => {
+                  field.onChange(event)
+                  if (cellError !== undefined) {
+                    form.clearErrors(fieldPath(cellPath))
+                  }
+                }}
+                value={typeof field.value === 'string' ? field.value : String(field.value ?? '')}
+              />
+              {resolvedError ? (
+                <p className={tableBuilderValuesCellErrorClasses}>{resolvedError}</p>
+              ) : null}
+            </>
+          )
+        }}
+      />
     </div>
   )
 }
@@ -233,45 +325,15 @@ function TableBuilderScalarValueCell({
 
   if (presentation?.formatGrouped) {
     return (
-      <div className={tableBuilderValuesCellClasses}>
-        <Controller
-          name={fieldPath(cellPath)}
-          render={({ field, fieldState }) => {
-            const showProgressionError =
-              presentation.progressionError !== undefined &&
-              (fieldState.isTouched || cellError !== undefined)
-            const resolvedError = showProgressionError
-              ? formatFieldMessage(presentation.progressionError!)
-              : cellError
-                ? formatFieldMessage(cellError.message ?? '')
-                : undefined
-
-            return (
-              <>
-                <TableBuilderGroupedScalarValueInput
-                  showDerivedBadge={presentation.provenanceBadge === 'derived'}
-                  readOnly={readOnly}
-                  ariaLabel={ariaLabel}
-                  ariaInvalid={resolvedError ? true : undefined}
-                  placeholder={showPlaceholder ? presentation.placeholder : undefined}
-                  name={field.name}
-                  onBlur={field.onBlur}
-                  onChange={(event) => {
-                    field.onChange(event)
-                    if (cellError !== undefined) {
-                      form.clearErrors(fieldPath(cellPath))
-                    }
-                  }}
-                  value={typeof field.value === 'string' ? field.value : String(field.value ?? '')}
-                />
-                {resolvedError ? (
-                  <p className={tableBuilderValuesCellErrorClasses}>{resolvedError}</p>
-                ) : null}
-              </>
-            )
-          }}
-        />
-      </div>
+      <TableBuilderGroupedScalarValueField
+        form={form}
+        cellPath={cellPath}
+        cellError={cellError}
+        presentation={presentation}
+        showPlaceholder={showPlaceholder}
+        ariaLabel={ariaLabel}
+        readOnly={readOnly}
+      />
     )
   }
 
