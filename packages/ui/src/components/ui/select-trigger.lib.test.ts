@@ -30,6 +30,12 @@ describe('assertSelectCompactSizing', () => {
       'SelectTrigger: `digits`, `sizingLabel`, and `sizingLabels` are mutually exclusive.',
     )
   })
+
+  it('rejects sizingLabel and sizingLabels together', () => {
+    expect(() => assertSelectCompactSizing({ sizingLabel: 'GP', sizingLabels: ['SP'] })).toThrow(
+      'SelectTrigger: `digits`, `sizingLabel`, and `sizingLabels` are mutually exclusive.',
+    )
+  })
 })
 
 describe('isSelectCompactTrigger', () => {

@@ -83,7 +83,9 @@ describe('DiceFormulaField', () => {
     expect(screen.getByLabelText('Modifier')).toHaveValue(1)
     expect(screen.queryByRole('button', { name: 'Add modifier' })).not.toBeInTheDocument()
 
-    const modifierGroups = container.querySelectorAll('.inline-flex.items-center.rounded-md.border')
+    const modifierGroups = container.querySelectorAll(
+      '.grid.w-fit.min-w-max.max-w-full.rounded-md.border',
+    )
     expect(modifierGroups.length).toBeGreaterThanOrEqual(2)
   })
 
@@ -106,11 +108,9 @@ describe('DiceFormulaField', () => {
       <DiceFormulaField id="roll" label="Roll" modifierMode="none" size="md" />,
     )
 
-    const coreGroup = container.querySelector(
-      '.inline-flex.w-fit.max-w-full.items-center.rounded-md.border',
-    )
+    const coreGroup = container.querySelector('.grid.w-fit.min-w-max.max-w-full.rounded-md.border')
     expect(coreGroup).toBeInTheDocument()
-    expect(coreGroup).toHaveClass('items-center')
+    expect(coreGroup).toHaveClass('grid-flow-col', 'auto-cols-max')
 
     expect(screen.getByLabelText('Count')).toHaveClass('h-9')
     expect(screen.getByLabelText('Die faces')).toHaveClass('h-9')
@@ -168,6 +168,31 @@ describe('DiceFormulaField', () => {
 
     const dividers = container.querySelectorAll('.bg-border, .bg-border-subtle')
     expect(dividers.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('uses sizingLabels ghosts for the currency unit select', () => {
+    render(
+      <DiceFormulaField
+        id="wealth"
+        label="Wealth roll"
+        modifierMode="required"
+        currencyUnit={{
+          value: 'gp',
+          options: [
+            { value: 'cp', label: 'CP' },
+            { value: 'gp', label: 'GP' },
+            { value: 'sp', label: 'SP' },
+          ],
+          onChange: vi.fn(),
+        }}
+        value={{ count: 1, faces: 6, modifier: { operator: '+', amount: 10 } }}
+      />,
+    )
+
+    const trigger = screen.getByLabelText('Currency')
+    expect(trigger.querySelectorAll('[data-select-sizing-label]')).toHaveLength(3)
+    expect(trigger.querySelector('[data-select-value-slot]')).not.toHaveClass('min-w-[calc(2*1ch)]')
+    expect(trigger).toHaveTextContent('GP')
   })
 
   it('renders the dice separator as a faint middle segment with subtle trailing divider', () => {

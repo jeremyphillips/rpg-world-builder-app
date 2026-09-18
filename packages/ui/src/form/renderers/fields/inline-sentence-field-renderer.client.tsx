@@ -215,6 +215,7 @@ function buildInlineSentenceJoinedPairSelectControl(options: {
     options: [...occupant.options],
     digits: occupant.digits,
     sizingLabel: occupant.sizingLabel,
+    sizingLabels: occupant.sizingLabels,
     placeholder: occupant.placeholder,
     ariaLabel: occupant.ariaLabel,
     hasError,
@@ -469,6 +470,7 @@ export function InlineSentenceFieldRenderer({
         options: resolvedOptions,
         digits: selectSegment.digits,
         sizingLabel: selectSegment.sizingLabel,
+        sizingLabels: selectSegment.sizingLabels,
         width: selectSegment.width,
         placeholder: resolveFieldPlaceholder(
           { label: selectLabel, category: 'choice', digits: selectSegment.digits },

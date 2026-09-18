@@ -254,6 +254,72 @@ describe('Select', () => {
     expect(trigger).toHaveTextContent('GP')
   })
 
+  it('sizes the trigger from the widest sizingLabels ghost', () => {
+    render(
+      <Select value="ww">
+        <SelectTrigger aria-label="Glyph width" size="md" sizingLabels={['WW', 'iiii']}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="ww">WW</SelectItem>
+          <SelectItem value="iiii">iiii</SelectItem>
+        </SelectContent>
+      </Select>,
+    )
+
+    const multiGhostTrigger = screen.getByLabelText('Glyph width')
+    const multiGhostWidth = multiGhostTrigger.getBoundingClientRect().width
+
+    const { unmount } = render(
+      <Select value="iiii">
+        <SelectTrigger aria-label="Baseline" size="md" sizingLabel="iiii">
+          <SelectValue />
+        </SelectTrigger>
+      </Select>,
+    )
+    const baselineWidth = screen.getByLabelText('Baseline').getBoundingClientRect().width
+    unmount()
+
+    expect(multiGhostWidth).toBeGreaterThanOrEqual(baselineWidth)
+  })
+
+  it('keeps trigger width and caret slot position stable when sizingLabels value changes', () => {
+    const { rerender } = render(
+      <Select value="cp">
+        <SelectTrigger aria-label="Currency" size="md" sizingLabels={['CP', 'GP', 'SP']}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="cp">CP</SelectItem>
+          <SelectItem value="gp">GP</SelectItem>
+          <SelectItem value="sp">SP</SelectItem>
+        </SelectContent>
+      </Select>,
+    )
+
+    const trigger = screen.getByLabelText('Currency')
+    const widthForCp = trigger.getBoundingClientRect().width
+    const columnLeftForCp = caretSlot(trigger)?.getBoundingClientRect().left
+
+    rerender(
+      <Select value="gp">
+        <SelectTrigger aria-label="Currency" size="md" sizingLabels={['CP', 'GP', 'SP']}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="cp">CP</SelectItem>
+          <SelectItem value="gp">GP</SelectItem>
+          <SelectItem value="sp">SP</SelectItem>
+        </SelectContent>
+      </Select>,
+    )
+
+    const nextTrigger = screen.getByLabelText('Currency')
+    expect(nextTrigger).toHaveTextContent('GP')
+    expect(nextTrigger.getBoundingClientRect().width).toBe(widthForCp)
+    expect(caretSlot(nextTrigger)?.getBoundingClientRect().left).toBe(columnLeftForCp)
+  })
+
   it('supports sizingLabel on grouped composite triggers', () => {
     renderSizingLabelSelect({ grouped: true, groupedPosition: 'end', sizingLabel: 'GP' })
 

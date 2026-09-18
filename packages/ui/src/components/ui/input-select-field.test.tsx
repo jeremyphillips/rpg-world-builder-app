@@ -121,6 +121,23 @@ describe('InputSelectField', () => {
     expect(screen.getByRole('combobox', { name: 'Cost unit' })).toHaveClass('min-w-44')
   })
 
+  it('renders sizingLabels ghosts on the default unit select', () => {
+    render(<ControlledField />)
+
+    const trigger = screen.getByRole('combobox', { name: 'Cost unit' })
+    expect(trigger.querySelectorAll('[data-select-sizing-label]')).toHaveLength(options.length)
+    expect(trigger).not.toHaveClass('min-w-[5rem]')
+  })
+
+  it('uses ValueSlot and CaretSlot anatomy on the searchable unit trigger', () => {
+    render(<ControlledField searchable />)
+
+    const trigger = screen.getByRole('combobox', { name: 'Cost unit' })
+    expect(trigger.querySelector('[data-select-value-slot]')).toBeInTheDocument()
+    expect(trigger.querySelector('[data-select-caret-slot]')).toBeInTheDocument()
+    expect(trigger).toHaveClass('min-w-44')
+  })
+
   it('uses intrinsic layout when valueDigits is set on a number field', () => {
     const { container } = render(<ControlledField valueDigits={2} width="auto" />)
     const group = container.querySelector('[role="group"]')

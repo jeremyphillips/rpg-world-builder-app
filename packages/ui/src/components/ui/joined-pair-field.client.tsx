@@ -4,10 +4,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
-import {
-  groupedEndLabelSegmentShellClasses,
-  groupedSelectSegmentShellClasses,
-} from './select-compact-trigger.variants'
+import { groupedEndLabelSegmentShellClasses } from './select-compact-trigger.variants'
 import { SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import {
   joinedPairDividerVariants,
@@ -187,9 +184,6 @@ export function JoinedPairSelectOccupant({
   onBlur,
 }: JoinedPairSelectOccupantProps) {
   const encodedValue = encodeStoredSelectOptionValue(value, options)
-  const segmentClassName = groupedSelectSegmentShellClasses(size, position, {
-    surfaceRole: position === 'end' ? 'unit' : 'value',
-  })
 
   function handleChange(nextEncoded: string) {
     const resolved = resolveSelectOptionChange(nextEncoded, options)
@@ -213,7 +207,6 @@ export function JoinedPairSelectOccupant({
           aria-invalid={hasError || undefined}
           aria-describedby={describedBy}
           onBlur={onBlur}
-          className={segmentClassName}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

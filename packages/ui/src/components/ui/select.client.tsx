@@ -9,10 +9,7 @@ import { establishSurfaceCurrent } from './surface-current.lib'
 import { SelectLayerPortal } from './layer-portal-container.client'
 import type { FieldControlVariantProps } from './field-control.variants'
 import type { FieldDigits } from './field-digit-metrics'
-import {
-  selectTriggerShellClasses,
-  selectValueSlotClasses,
-} from './select-compact-trigger.variants'
+import { selectTriggerShellClasses } from './select-compact-trigger.variants'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import {
   assertSelectCompactSizing,
@@ -94,30 +91,16 @@ const SelectTrigger = React.forwardRef<
         )}
         {...props}
       >
-        {ghostLabels.length > 0 ? (
-          <SelectLikeValueSlot
-            size={size}
-            position={valuePosition}
-            trailing={valueTrailing}
-            digits={digits}
-            sizingGhostLabels={ghostLabels}
-          >
-            {children}
-          </SelectLikeValueSlot>
-        ) : (
-          <span
-            {...{ [SELECT_VALUE_SLOT_DATA_ATTR]: '' }}
-            className={selectValueSlotClasses(size, {
-              digits,
-              prose: !compact,
-              grouped,
-              groupedPosition,
-              trailing: valueTrailing,
-            })}
-          >
-            {children}
-          </span>
-        )}
+        <SelectLikeValueSlot
+          size={size}
+          position={valuePosition}
+          trailing={valueTrailing}
+          digits={digits}
+          prose={!compact}
+          sizingGhostLabels={ghostLabels}
+        >
+          {children}
+        </SelectLikeValueSlot>
         <SelectLikeCaretSlot size={size} groupedStart={groupedStart} />
       </SelectPrimitive.Trigger>
     )

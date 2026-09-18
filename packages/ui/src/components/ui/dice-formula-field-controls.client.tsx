@@ -25,9 +25,7 @@ import {
   diceFormulaCoreGroupVariants,
   diceFormulaCountInputVariants,
   diceFormulaGroupedCountRootVariants,
-  diceFormulaGroupedFacesSegmentVariants,
   diceFormulaGroupedModifierRootVariants,
-  diceFormulaGroupedOperatorSegmentVariants,
   diceFormulaModifierGroupVariants,
   diceFormulaModifierInputVariants,
 } from './dice-formula-field.variants'
@@ -183,7 +181,6 @@ function DiceFormulaFacesControl({
           size={size}
           digits={digits}
           aria-invalid={hasError || undefined}
-          className={diceFormulaGroupedFacesSegmentVariants({ size })}
           onBlur={onBlur}
         >
           <SelectValue>{formatDieFaceLabel(resolved.faces, facesNotation)}</SelectValue>
@@ -347,7 +344,6 @@ function DiceFormulaOperatorSegment({
           size={size}
           digits={1}
           aria-invalid={hasError || undefined}
-          className={diceFormulaGroupedOperatorSegmentVariants({ size })}
           onBlur={onBlur}
         >
           <SelectValue />
@@ -452,7 +448,6 @@ function DiceFormulaCurrencySegment({
             size={size}
             sizingLabels={currencySizingLabels}
             aria-invalid={hasError || undefined}
-            className={diceFormulaGroupedFacesSegmentVariants({ size })}
             onBlur={onBlur}
           >
             <SelectValue />

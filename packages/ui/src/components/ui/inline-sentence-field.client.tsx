@@ -231,6 +231,7 @@ function InlineSentenceJoinedPairControl({
           disabled={disabled}
           digits={start.digits}
           sizingLabel={start.sizingLabel}
+          sizingLabels={start.sizingLabels}
           placeholder={start.placeholder}
           hasError={startHasError}
           describedBy={control.describedBy}
@@ -254,6 +255,7 @@ function InlineSentenceJoinedPairControl({
           disabled={disabled}
           digits={end.digits}
           sizingLabel={end.sizingLabel}
+          sizingLabels={end.sizingLabels}
           placeholder={end.placeholder}
           hasError={endHasError}
           describedBy={control.describedBy}
@@ -296,7 +298,7 @@ function InlineSentenceSelectControl({
 }) {
   const optionNodes = useMemo(() => renderSelectContent(control.options), [control.options])
   const triggerWidthClassName =
-    control.digits == null && control.sizingLabel == null
+    control.digits == null && control.sizingLabel == null && control.sizingLabels == null
       ? inlineSentenceSelectTriggerWidthClasses(control.width)
       : undefined
   const resolvedLabel = label ?? control.ariaLabel ?? 'Field'
@@ -308,6 +310,7 @@ function InlineSentenceSelectControl({
         size={size}
         digits={control.digits}
         sizingLabel={control.sizingLabel}
+        sizingLabels={control.sizingLabels}
         className={triggerWidthClassName}
         aria-invalid={fieldHasValidationError(error, control.hasError) ? true : undefined}
         onBlur={control.onBlur}

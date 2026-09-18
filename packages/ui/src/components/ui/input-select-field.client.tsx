@@ -121,7 +121,6 @@ function RadixUnitSelect({
         groupedPosition="end"
         sizingLabels={sizingLabels}
         onBlur={onBlur}
-        className={groupedSelectSegmentShellClasses(size, 'end', { surfaceRole: 'unit' })}
       >
         <SelectValue placeholder={unitPlaceholder} />
       </SelectTrigger>

@@ -80,7 +80,46 @@ const senseRangeFields: FormItem[] = [
   },
 ]
 
+const wealthFields: FormItem[] = [
+  {
+    type: 'joinedPair',
+    label: 'Currency',
+    start: {
+      kind: 'number',
+      name: 'amount',
+      digits: 2,
+      ariaLabel: 'Amount',
+    },
+    end: {
+      kind: 'select',
+      name: 'currency',
+      options: [
+        { value: 'cp', label: 'CP' },
+        { value: 'gp', label: 'GP' },
+        { value: 'sp', label: 'SP' },
+      ],
+      sizingLabels: ['CP', 'GP', 'SP'],
+      defaultValue: 'gp',
+      ariaLabel: 'Currency unit',
+    },
+  },
+]
+
 describe('JoinedPairFieldRenderer', () => {
+  it('passes sizingLabels through to the end select trigger', () => {
+    render(
+      <Form
+        schema={z.object({ amount: z.number(), currency: z.string() })}
+        fields={wealthFields}
+        defaultValues={{ amount: 10, currency: 'gp' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    const trigger = screen.getByRole('combobox', { name: 'Currency unit' })
+    expect(trigger.querySelectorAll('[data-select-sizing-label]')).toHaveLength(3)
+  })
+
   it('renders the stored numeric select value for grant-style range fields', () => {
     render(
       <Form
