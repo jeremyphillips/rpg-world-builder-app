@@ -404,6 +404,9 @@ export function fieldArrayItemListClasses(
   return cn('flex flex-col', 'gap-3')
 }
 
+/** Spacing above a stacked array add action — 16px (`mt-4`), owned by the action boundary. */
+export const arrayFieldStackedAddActionSpacingClasses = 'mt-4'
+
 /** Compact toggle-dependent stack rhythm — prefer `fieldStackRhythmVariants` for configurable stacks. */
 export const fieldToggleDependentStackClasses = fieldStackRhythmVariants({ rhythm: 'compact' })
 

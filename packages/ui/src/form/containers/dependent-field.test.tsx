@@ -5,9 +5,10 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
 import {
-  fieldStackRhythmVariants,
-  resolveDependentInsetClasses,
-} from '../../components/ui/field.variants'
+  dependentNestMarginClasses,
+  dependentSectionStackClasses,
+} from '../../components/ui/field-dependent.variants'
+import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
@@ -19,8 +20,6 @@ const schema = z.object({
 })
 
 type Values = z.infer<typeof schema>
-
-const dependentInsetClasses = resolveDependentInsetClasses(true, 'comfortable')
 
 const dependentField = (
   options: {
@@ -92,10 +91,7 @@ function queryDependentsRegion(container: HTMLElement) {
 }
 
 function queryChromeShell(container: HTMLElement) {
-  const region = queryDependentsRegion(container)
-  if (!region) return null
-  if (region.hasAttribute('data-field-dependent-rail')) return region
-  return region.querySelector(':scope > .p-3')
+  return container.querySelector('[data-field-dependent-nest]')
 }
 
 describe('dependent field', () => {
@@ -105,6 +101,7 @@ describe('dependent field', () => {
 
     const dependent = container.querySelector('[data-field-dependent]')
     expect(dependent).toBeInTheDocument()
+    expect(dependent).toHaveClass(dependentSectionStackClasses)
 
     const fieldContainer = container.querySelector('.bg-field-container')
     const switchControl = screen.getByRole('switch', { name: 'Enable feature' })
@@ -115,15 +112,16 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      expect(region).toHaveClass(dependentInsetClasses)
-      expect(region).toHaveAttribute('data-field-dependent-rail', '')
+      expect(region).toHaveClass(dependentNestMarginClasses)
+      expect(region).toHaveClass('bg-background')
+      expect(region).toHaveAttribute('data-field-dependent-nest', '')
       expect(region).not.toContainElement(switchControl)
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
       expect(fieldContainer).toContainElement(screen.getByLabelText('Feature value'))
     })
   })
 
-  it('applies subtle panel chrome classes when chrome is panel', async () => {
+  it('applies default nest fill when legacy panel chrome is configured', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([
       dependentField({
@@ -136,8 +134,9 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const shell = queryChromeShell(container)
-      expect(shell).toHaveClass('bg-surface-subtle')
-      expect(queryDependentsRegion(container)).toHaveClass(dependentInsetClasses)
+      expect(shell).toHaveClass('bg-background')
+      expect(shell).not.toHaveClass('border')
+      expect(queryDependentsRegion(container)).toHaveClass(dependentNestMarginClasses)
     })
   })
 
@@ -156,7 +155,7 @@ describe('dependent field', () => {
     expect(dependent).toHaveAttribute('aria-labelledby', expect.stringContaining('featureEnabled'))
   })
 
-  it('defaults to inset + rail when inset and chrome are omitted', async () => {
+  it('defaults to the dependent nest when inset and chrome are omitted', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([dependentField()])
 
@@ -164,45 +163,36 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      expect(region).toHaveClass(dependentInsetClasses)
-      expect(region).toHaveAttribute('data-field-dependent-rail', '')
+      expect(region).toHaveClass(dependentNestMarginClasses)
+      expect(region).toHaveAttribute('data-field-dependent-nest', '')
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
       expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     })
   })
 
   it.each([
-    { inset: true as const, chrome: 'none' as const, expectIndent: true, expectRail: false },
-    { inset: true as const, chrome: 'rail' as const, expectIndent: true, expectRail: true },
-    { inset: false as const, chrome: 'none' as const, expectIndent: false, expectRail: false },
-    { inset: false as const, chrome: 'rail' as const, expectIndent: false, expectRail: true },
-  ])(
-    'composes inset=$inset and chrome=$chrome independently',
-    async ({ inset, chrome, expectIndent, expectRail }) => {
-      const user = userEvent.setup()
-      const { container } = renderDependentForm([dependentField({ inset, chrome })])
+    { chrome: 'none' as const, expectNest: false },
+    { chrome: 'rail' as const, expectNest: true },
+  ])('chrome=$chrome controls nest rendering', async ({ chrome, expectNest }) => {
+    const user = userEvent.setup()
+    const { container } = renderDependentForm([
+      dependentField({ inset: chrome === 'none' ? false : undefined, chrome }),
+    ])
 
-      await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
+    await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
 
-      await waitFor(() => {
-        const region = queryDependentsRegion(container)
-        if (expectIndent) {
-          expect(region).toHaveClass(dependentInsetClasses)
-        } else {
-          expect(region).not.toHaveClass(dependentInsetClasses)
-        }
+    await waitFor(() => {
+      const shell = queryChromeShell(container)
+      if (expectNest) {
+        expect(shell).toHaveAttribute('data-field-dependent-nest', '')
+        expect(shell).toHaveClass(dependentNestMarginClasses)
+      } else {
+        expect(shell).toBeNull()
+      }
+    })
+  })
 
-        const shell = queryChromeShell(container)
-        if (expectRail) {
-          expect(shell).toHaveAttribute('data-field-dependent-rail', '')
-        } else {
-          expect(shell).toBeNull()
-        }
-      })
-    },
-  )
-
-  it('places rail decoration on the dependents region, not an inner rhythm wrapper', async () => {
+  it('places nest rail decoration on the dependents region', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([dependentField({ chrome: 'rail' })])
 
@@ -210,10 +200,10 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      expect(region).toHaveAttribute('data-field-dependent-rail', '')
-      expect(region).toHaveClass(dependentInsetClasses)
-      expect(region).toHaveClass('before:left-2')
-      expect(region?.querySelector(':scope > [data-field-dependent-rail]')).toBeNull()
+      expect(region).toHaveAttribute('data-field-dependent-nest', '')
+      expect(region).toHaveClass(dependentNestMarginClasses)
+      expect(region).toHaveClass('before:left-0')
+      expect(region?.querySelector(':scope > [data-field-dependent-nest]')).toBeNull()
     })
   })
 
@@ -277,20 +267,17 @@ describe('dependent field', () => {
       />,
     )
 
-    const regions = container.querySelectorAll('[data-field-dependent-fields]')
+    const regions = container.querySelectorAll('[data-field-dependent-nest]')
     expect(regions).toHaveLength(2)
-    expect(regions[0]).toHaveClass(dependentInsetClasses)
-    expect(regions[1]).toHaveClass(dependentInsetClasses)
-    expect(
-      container.querySelectorAll('[data-field-dependent-fields][data-field-dependent-rail]'),
-    ).toHaveLength(2)
+    expect(regions[0]).toHaveClass(dependentNestMarginClasses)
+    expect(regions[1]).toHaveClass(dependentNestMarginClasses)
     expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     const fieldContainer = container.querySelector('.bg-field-container')
     expect(fieldContainer).toContainElement(screen.getByRole('switch', { name: 'Allow' }))
     expect(fieldContainer).toContainElement(screen.getByLabelText('Categories'))
   })
 
-  it('inherits comfortable density on the outer dependent wrapper by default', async () => {
+  it('uses 16px stack rhythm on the outer dependent wrapper', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm()
 
@@ -298,11 +285,11 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const dependent = container.querySelector('[data-field-dependent]')
-      expect(dependent).toHaveClass(fieldStackRhythmVariants({ rhythm: 'comfortable' }))
+      expect(dependent).toHaveClass(dependentSectionStackClasses)
     })
   })
 
-  it('applies comfortable rhythm inside dependents chrome', async () => {
+  it('applies comfortable rhythm inside the dependent nest', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm([
       dependentField({
@@ -316,7 +303,9 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const shell = queryChromeShell(container)
-      expect(shell).toHaveClass(fieldStackRhythmVariants({ rhythm: 'comfortable' }))
+      expect(shell?.querySelector(':scope > div')).toHaveClass(
+        fieldStackRhythmVariants({ rhythm: 'comfortable' }),
+      )
       expect(screen.getByLabelText('Feature note')).toBeInTheDocument()
     })
   })
@@ -350,7 +339,7 @@ describe('dependent field', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('applies arrayItems scope tone on array shells without wrapper chrome', async () => {
+  it('renders array dependents inside the default nest wrapper', async () => {
     const user = userEvent.setup()
     const arraySchema = z.object({
       featureEnabled: z.boolean(),
@@ -395,13 +384,9 @@ describe('dependent field', () => {
     await user.click(screen.getByRole('button', { name: 'Add item' }))
 
     await waitFor(() => {
-      const region = queryDependentsRegion(container)
-      expect(region).toBeInTheDocument()
-      expect(queryChromeShell(container)).toBeNull()
-
-      const itemShell = screen.getByRole('group', { name: /Item #1/ })
-      expect(itemShell).toHaveClass('bg-surface-subtle')
-      expect(itemShell).toHaveClass('border-border')
+      const nest = queryChromeShell(container)
+      expect(nest).toHaveClass('bg-background')
+      expect(screen.getByRole('group', { name: /Item #1/ })).toBeInTheDocument()
     })
   })
 

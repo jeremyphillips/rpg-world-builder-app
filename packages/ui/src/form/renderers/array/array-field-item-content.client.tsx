@@ -8,7 +8,7 @@ import { ArrayItemPresentationContext } from '../../context/array-item-presentat
 import type { ArrayItemPresentationAnatomy } from '../../config/array/array-item-presentation.lib'
 import type { ResolvedArrayItemHeader } from '../../config/array/array-item-config.lib'
 import type { ArrayConfig, ArrayItemConfig } from '../../field-config'
-import { useFormSectionContext } from '../../context/form-section.context'
+import { FormSectionContext, useFormSectionContext } from '../../context/form-section.context'
 import { NestedFormItems } from '../../containers/form-item-node.client'
 import type { ArrayItemIssueProminence } from './array-item-issue.variants'
 import { CollapsibleListItem } from '../../../components/ui/collapsible-list-item'
@@ -311,6 +311,11 @@ export function ArrayFieldItemContent({
   onRemove,
   dragHandleProps,
 }: ArrayFieldItemContentProps) {
+  const parentContext = useFormSectionContext()
+  const arrayItemFieldContext = React.useMemo(
+    () => ({ ...parentContext, surfaceHost: 'array-item' as const }),
+    [parentContext],
+  )
   const {
     itemPrefix,
     headerConfig,
@@ -352,14 +357,16 @@ export function ArrayFieldItemContent({
   const fieldsNode = (
     <ArrayItemPresentationContext.Provider value={{ suppressFieldErrorText, rowSummaryId }}>
       <ArrayFieldContext.Provider value={arrayContext}>
-        <div className={itemBodyStackClasses}>
-          <NestedFormItems
-            items={config.fields}
-            idPrefix={idPrefix}
-            namePrefix={itemPrefix}
-            depth={1}
-          />
-        </div>
+        <FormSectionContext.Provider value={arrayItemFieldContext}>
+          <div className={itemBodyStackClasses}>
+            <NestedFormItems
+              items={config.fields}
+              idPrefix={idPrefix}
+              namePrefix={itemPrefix}
+              depth={1}
+            />
+          </div>
+        </FormSectionContext.Provider>
       </ArrayFieldContext.Provider>
     </ArrayItemPresentationContext.Provider>
   )

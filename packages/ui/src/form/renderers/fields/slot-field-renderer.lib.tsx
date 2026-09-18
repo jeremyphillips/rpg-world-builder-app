@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
+import { FormFieldChromeShell } from '../../context/form-field-chrome-shell.client'
 import {
   hasActiveFieldChrome,
   type FieldChrome,
@@ -65,13 +65,13 @@ export function wrapSlotFieldBody(
 
   if (hasActiveFieldChrome(chrome)) {
     return withSlotWidth(
-      <FieldChromeShell
+      <FormFieldChromeShell
         chrome={chrome}
         size={chromeSize}
         className={!heading && !config.hint ? config.className : undefined}
       >
         {body}
-      </FieldChromeShell>,
+      </FormFieldChromeShell>,
       config.width,
     )
   }

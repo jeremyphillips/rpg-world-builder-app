@@ -134,7 +134,7 @@ export function buildArrayItemCompactRowGridTemplate(showGrip: boolean): string 
 /** Applied to the item wrapper while it is being dragged. */
 export const arrayItemDraggingClasses = collapsibleListItemDraggingClasses
 
-/** Flat non-collapsible shells — canvas plane with tighter corner radius. */
+/** Flat non-collapsible shells — subtle wash with tighter corner radius. */
 export const arrayItemFlatShellRadiusClasses = 'rounded-sm'
 
 /** Merged flat list — collapse adjacent borders between siblings. */

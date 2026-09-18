@@ -9,7 +9,7 @@ import {
   hitDieSchema,
   levelZeroProficiencyBonusSchema,
 } from '@rpg/contracts'
-import { DEFAULT_DEPENDENT_CHROME, toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
 import {
   wealthGrantMoneyField,
@@ -132,7 +132,6 @@ export function levelZeroNpcsFields({
             defaultValue: true,
           },
           dependents: {
-            chrome: DEFAULT_DEPENDENT_CHROME,
             fields: [
               standardArrayFormFields({
                 name: 'levelZeroStandardArray',
@@ -203,10 +202,8 @@ export function levelZeroNpcsFields({
               languageGrantItemsField({
                 path: LEVEL_ZERO_LANGUAGE_ITEMS_PATH,
                 label: 'Shared languages',
-                hint: '',
                 introText: 'Every level 0 NPC receives these languages:',
                 languageOptions,
-                separator: 'subtle',
               }),
               {
                 type: 'switch',

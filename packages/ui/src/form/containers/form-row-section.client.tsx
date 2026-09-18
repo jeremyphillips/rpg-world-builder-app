@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { assertRowFieldConfig } from '../config/assert-row-field-config.lib'
 import { AnatomyFieldRow } from '../presentation/anatomy-field-row.client'
-import { FieldChromeShell } from '../../components/ui/field-chrome-shell'
+import { FormFieldChromeShell } from '../context/form-field-chrome-shell.client'
 import {
   hasActiveFieldChrome,
   resolveEffectiveFieldChrome,
@@ -74,9 +74,9 @@ export function RowFieldSection({
   )
 
   const rowBody = hasActiveFieldChrome(rowChrome) ? (
-    <FieldChromeShell chrome={rowChrome} size={size}>
+    <FormFieldChromeShell chrome={rowChrome} size={size}>
       {row}
-    </FieldChromeShell>
+    </FormFieldChromeShell>
   ) : (
     row
   )

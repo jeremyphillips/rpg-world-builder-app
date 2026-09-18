@@ -10,7 +10,7 @@ export type LanguageGrantItemsFieldOptions = {
   separator?: 'subtle'
 }
 
-/** Shared granted-languages chips composition for campaign language grant fields. */
+/** Shared granted-languages chips field for campaign language grant authoring. */
 export function languageGrantItemsField(options: LanguageGrantItemsFieldOptions): FormItem {
   const {
     path,
@@ -19,21 +19,17 @@ export function languageGrantItemsField(options: LanguageGrantItemsFieldOptions)
     introText = 'Characters receive these languages:',
     languageOptions,
     labelVisibility = 'srOnly',
-    separator,
+    separator = 'subtle',
   } = options
 
   return {
-    type: 'inlineSentence',
+    type: 'chips',
     name: path,
     label,
-    hint,
-    ...(labelVisibility === 'srOnly' ? { labelVisibility: 'srOnly' } : {}),
-    segments: [{ kind: 'text', value: introText, tone: 'label' }],
-    below: {
-      kind: 'chips',
-      name: path,
-      options: languageOptions,
-    },
-    ...(separator ? { separator } : {}),
+    labelVisibility,
+    introText,
+    ...(hint ? { hint } : {}),
+    options: languageOptions,
+    separator,
   }
 }

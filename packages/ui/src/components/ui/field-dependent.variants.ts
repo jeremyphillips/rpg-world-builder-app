@@ -1,8 +1,13 @@
 import { cn } from '../../lib/utils'
 import type { DependentChrome, DependentDependentsConfig } from '../../form/field-config'
-import { DEFAULT_DEPENDENT_CHROME, DEFAULT_DEPENDENT_INSET } from '../../form/field-config'
-import { resolveDependentInsetClasses, type FieldRhythm } from './field.variants'
-import { resolveFieldRailClasses, type FieldRailTone } from './field-rail.variants'
+import { DEFAULT_DEPENDENT_CHROME } from '../../form/field-config'
+import type { FieldRhythm } from './field.variants'
+import {
+  resolveDependentNestRailClasses,
+  resolveFieldRailClasses,
+  type FieldRailTone,
+} from './field-rail.variants'
+import { establishSurfaceCurrent } from './surface-current.lib'
 import {
   resolveFieldContainerChromeClasses,
   type FieldContainerChromeOptions,
@@ -27,22 +32,35 @@ export {
 } from './field-surface.variants'
 export {
   resolveFieldRailClasses,
+  resolveDependentNestRailClasses,
   fieldRailOffsetClasses,
   type FieldRailTone,
 } from './field-rail.variants'
 
-/** Where dependent chrome applies on toggle-dependent sections. */
+/** @deprecated Use {@link FieldDependentsScope}. */
 export type FieldDependentsScope = 'wrapper' | 'arrayItems'
+
+/** Internal form nesting plane — not author-facing. */
+export type FormSurfaceHost = 'field-container' | 'array-item'
 
 /** @deprecated Use {@link FieldRailTone}. */
 export type FieldGroupRailTone = FieldRailTone
 
-/** Border/bg panel around dependent fields with optional padding shell. */
+/** Nest horizontal offset from controller — 44px (`ml-11`). */
+export const dependentNestMarginClasses = 'ml-11'
+
+/** Nest inner padding — 12px top/right/bottom, 16px left (`pt-3 pr-3 pb-3 pl-4`). */
+export const dependentNestPaddingClasses = 'pt-3 pr-3 pb-3 pl-4'
+
+/** Vertical gap between controller and dependents region — 16px (`gap-4`). */
+export const dependentSectionStackClasses = 'flex flex-col gap-4'
+
+/** @deprecated Panel chrome removed — retained for legacy call sites mapping to nest. */
 export function resolveFieldDependentsChromeClasses(options: FieldContainerChromeOptions): string {
   return cn('rounded-md border p-3', resolveFieldContainerChromeClasses(options))
 }
 
-/** @deprecated Use {@link resolveFieldRailClasses}. */
+/** @deprecated Use {@link resolveDependentNestRailClasses}. */
 export function resolveDependentRailChromeClasses(
   _rhythm: FieldRhythm = 'comfortable',
   tone: FieldRailTone = 'border',
@@ -50,48 +68,56 @@ export function resolveDependentRailChromeClasses(
   return resolveFieldRailClasses(tone)
 }
 
-export type ResolvedDependentPresentation = {
-  inset: boolean
-  insetClassName: string
-  chrome: DependentChrome
-  /** Decorative rail wrapper — does not add content indentation. */
-  railClassName?: string
-  /** Panel/chrome shell — owns its own internal padding. */
-  chromeWrapperClassName?: string
-  arrayItemSurface?: FieldContainerChromeOptions['surface']
-  arrayItemTone?: FieldContainerChromeOptions['tone']
-}
-
-/** Resolves dependent inset (content position) and chrome (decoration) independently. */
-export function resolveDependentPresentation(
-  dependents: DependentDependentsConfig & { inset: boolean },
-  rhythm: FieldRhythm,
-): ResolvedDependentPresentation {
-  const { inset, chrome = DEFAULT_DEPENDENT_CHROME } = dependents
-  const insetClassName = resolveDependentInsetClasses(inset, rhythm)
-
-  if (chrome === 'none') {
-    return { inset, insetClassName, chrome }
+/** Host-aware wash for default dependent nests — no border or extra radius. */
+export function resolveDependentNestFillClasses(
+  surfaceHost: FormSurfaceHost = 'field-container',
+): string {
+  if (surfaceHost === 'array-item') {
+    return cn('bg-surface-faint', establishSurfaceCurrent('surface-faint'))
   }
 
-  if (chrome === 'panel') {
-    const surface = dependents.panel?.surface
-    const tone = dependents.panel?.tone
-    return {
-      inset,
-      insetClassName,
-      chrome,
-      chromeWrapperClassName: resolveFieldDependentsChromeClasses({ surface, tone }),
-      arrayItemSurface: surface,
-      arrayItemTone: tone,
-    }
+  return cn('bg-background', establishSurfaceCurrent('background'))
+}
+
+/** Default dependent nest shell — margin, padding, and host-aware fill only. */
+export function resolveDependentNestShellClasses(
+  surfaceHost: FormSurfaceHost = 'field-container',
+): string {
+  return cn(
+    dependentNestMarginClasses,
+    dependentNestPaddingClasses,
+    resolveDependentNestFillClasses(surfaceHost),
+  )
+}
+
+export type ResolvedDependentPresentation = {
+  chrome: DependentChrome
+  /** When true, renders the default dependent nest (rail + fill + inset). */
+  showNest: boolean
+  /** Decorative rail on the nest wrapper. */
+  railClassName?: string
+  /** Nest shell — margin, padding, host-aware fill. */
+  nestShellClassName?: string
+}
+
+/** Resolves default dependent nest vs flush opt-out. */
+export function resolveDependentPresentation(
+  dependents: Pick<DependentDependentsConfig, 'chrome' | 'inset'>,
+  _rhythm: FieldRhythm,
+  options?: { surfaceHost?: FormSurfaceHost },
+): ResolvedDependentPresentation {
+  const { chrome = DEFAULT_DEPENDENT_CHROME } = dependents
+  const surfaceHost = options?.surfaceHost ?? 'field-container'
+
+  if (chrome === 'none') {
+    return { chrome, showNest: false }
   }
 
   return {
-    inset,
-    insetClassName,
     chrome,
-    railClassName: resolveFieldRailClasses(),
+    showNest: true,
+    railClassName: resolveDependentNestRailClasses(),
+    nestShellClassName: resolveDependentNestShellClasses(surfaceHost),
   }
 }
 
@@ -102,9 +128,7 @@ export type ResolvedDependentChromePresentation = ResolvedDependentPresentation
 export function resolveDependentChromePresentation(
   dependents: DependentDependentsConfig,
   rhythm: FieldRhythm,
+  options?: { surfaceHost?: FormSurfaceHost },
 ): ResolvedDependentPresentation {
-  return resolveDependentPresentation(
-    { ...dependents, inset: dependents.inset ?? DEFAULT_DEPENDENT_INSET },
-    rhythm,
-  )
+  return resolveDependentPresentation(dependents, rhythm, options)
 }

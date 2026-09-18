@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
+import { FormFieldChromeShell } from '../../context/form-field-chrome-shell.client'
 import {
   hasActiveFieldChrome,
   resolveEffectiveFieldChrome,
@@ -68,12 +68,12 @@ export function ArrayFormItemSection({
   if (!wrapSectionChrome) return renderer
 
   return (
-    <FieldChromeShell
+    <FormFieldChromeShell
       chrome={arrayFieldChrome}
       size={arraySize}
       className={inParentRhythm ? undefined : fieldGroupBottomMarginClasses}
     >
       {renderer}
-    </FieldChromeShell>
+    </FormFieldChromeShell>
   )
 }

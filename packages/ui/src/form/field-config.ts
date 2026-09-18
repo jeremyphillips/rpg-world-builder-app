@@ -612,6 +612,11 @@ export interface FileFieldConfig extends BaseFieldConfig {
  */
 export interface ChipsFieldConfig extends BaseFieldConfig {
   type: 'chips'
+  /**
+   * Visible lead-in above the chip row when `label` stays sr-only or concise.
+   * Does not replace the field legend / accessible name.
+   */
+  introText?: ReactNode
   options: FieldOption[]
   /** Disables individual options when `enabledWhen` is false for the current values. */
   optionAvailability?: FieldOptionAvailability

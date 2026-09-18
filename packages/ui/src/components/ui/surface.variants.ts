@@ -76,8 +76,8 @@ export const DEFAULT_PANEL_SURFACE: SurfaceConfig = { emphasis: 'subtle', elevat
 /** Collapsible array item header — subtle wash; disclosure body uses the canvas plane. */
 export const DEFAULT_ARRAY_ITEM_SURFACE: SurfaceConfig = { emphasis: 'subtle', elevation: 'flat' }
 
-/** Flat non-collapsible array item shell — canvas plane (`bg-background`). */
-export const DEFAULT_FLAT_ARRAY_ITEM_SURFACE: SurfaceConfig = { elevation: 'flat' }
+/** Flat non-collapsible array item shell — subtle wash (same as disclosure header). */
+export const DEFAULT_FLAT_ARRAY_ITEM_SURFACE: SurfaceConfig = DEFAULT_ARRAY_ITEM_SURFACE
 
 /** Default dependent container wash. */
 export const DEFAULT_DEPENDENT_SURFACE: SurfaceConfig = { emphasis: 'subtle', elevation: 'flat' }

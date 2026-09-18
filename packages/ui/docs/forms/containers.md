@@ -236,35 +236,24 @@ Prefer `defineColumnsField()` for completion.
 Layout-only — one slot in outer rhythm, no fieldset. Use `kind: 'dependent'` when a
 controller field gates indented dependents:
 
-> **Inset positions dependent content. Rail offset positions the decorative boundary. Chrome must not determine content indentation.**
+> **Default dependent nest:** weaker flush-left rail + 44px inset + host-aware fill. Opt out with `dependents.chrome: 'none'` for flush alignment (e.g. spell cantrip richtext).
 
-| Concept         | Meaning                                                                                                     |
-| --------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Inset**       | Total horizontal offset where dependent content begins (`pl-8` / `pl-9` = 8px rail gutter + content offset) |
-| **Rail**        | Decorative vertical boundary (`before:left-2` pseudo-element)                                               |
-| **Rail offset** | Small positioning adjustment for the rail within the inset gutter (8px)                                     |
+| Concept            | Meaning                                                                                                                                                                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Dependent nest** | Default when `dependents.chrome` is omitted or `'rail'` / legacy `'panel'` — `ml-11`, padding `12/12/12/16`, weaker `before:left-0` rail, host-aware fill (`bg-background` on field containers, `bg-surface-faint` inside array items). No border or extra radius. |
+| **Opt out**        | `dependents.chrome: 'none'` — no rail, fill, or nest inset. Pair with `inset: false` when the dependent body is the section itself.                                                                                                                                |
 
 - Field `[0]` (controller) — switch, select, etc. — always visible.
-- Fields `[1..]` (dependents) use rhythm-derived `pl-8` / `pl-9` when `dependents.inset` is `true` (default).
-- **`dependents.inset`**: `boolean` — controller-relative positioning. Default `true`. Set `false` for no dependent indentation.
-- **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` — decorative boundary only. Default `'rail'`. Does not enable or disable inset.
-- **`inset: false` + `chrome: 'rail'`** — rail decoration without controller-relative indentation. No runtime ancestor inspection.
-- Nested dependent regions may independently use inset and/or rails/panels when they represent genuine nested dependencies — nested rails are supported and intentional.
-- Shared factories (e.g. mode-dependent grant sets) inherit inset + rail; pass `dependents: { inset?, chrome? }` to override.
-- A top-level `kind: 'dependent'` stack (controller + dependents) gets one shared field container (`chrome?: FieldChrome` on `DependentConfig`). Nested dependents keep inset/rail decoration but do **not** get additional field containers. Array item shells suppress the wrapper. Child leaves/rows/slots inside an active container are unboxed.
-- Dependents hidden when the gate predicate is false — no empty inset.
-- `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults
-  to "switch is true". For select/other controllers, pass an explicit predicate for hide
-  behavior; omit for indent/chrome only (dependents always shown).
-- Optional `dependents.surface` / `dependents.tone` — neutral wash or semantic callout on dependents.
-- Optional `dependents.scope`: `wrapper` (default) | `arrayItems`.
-  - `wrapper` — chrome on the dependents container; use for scalar dependents (selects, numbers).
-  - `arrayItems` — chrome on array item shells only; avoids double borders when dependents include arrays.
-  - Mixed dependents: only array item shells receive tone; scalars render without wash.
+- Fields `[1..]` (dependents) render inside the nest when chrome is not `'none'`.
+- **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` (legacy `'panel'` maps to the nest). Default `'rail'`.
+- **`dependents.inset`**: deprecated for layout — nest geometry is owned by the default recipe; `'none'` + `inset: false` opts out entirely.
+- A top-level `kind: 'dependent'` stack gets one shared field container (`chrome?: FieldChrome` on `DependentConfig`). Nested dependents keep nest decoration but do **not** get additional field containers.
+- Toggle → nest gap is **16px** (`gap-4` via `dependentSectionStackClasses`) on the dependent stack only — not margin on the nest wrapper.
+- Dependents hidden when the gate predicate is false — no empty nest.
+- `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults to "switch is true".
+- **`dependents.panel`** / **`dependents.scope`** — deprecated; legacy `'panel'` maps to the nest.
 - Dependents inherit parent `density` — no `density` knob on `DependentConfig`.
-- Optional `confirmBeforeClear` on `DependentConfig` — when the controller is a **switch**,
-  turning it off prompts before clearing populated dependent values. Absent by default.
-  Select/other controllers are unchanged in this pass.
+- Optional `confirmBeforeClear` on `DependentConfig` — when the controller is a **switch**, turning it off prompts before clearing populated dependent values. Absent by default.
 
 Pair dependent scalars with `labelPosition: 'settings'`.
 

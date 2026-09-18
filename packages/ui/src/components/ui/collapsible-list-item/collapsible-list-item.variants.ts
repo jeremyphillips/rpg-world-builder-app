@@ -83,7 +83,7 @@ export const collapsibleListItemCatalogBodyClasses = cn(
 )
 
 /**
- * Expanded array-item body — canvas plane under a subtle header.
+ * Expanded array-item body — canvas content plane under a subtle header.
  */
 export const collapsibleListItemBackgroundBodyClasses = cn(
   collapsibleListItemBodyFrameClasses,

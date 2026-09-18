@@ -63,8 +63,8 @@ describe('resolveSurfaceClasses', () => {
 
   it('uses approved tokens for flat non-collapsible array item surface', () => {
     const classes = resolveSurfaceClasses(DEFAULT_FLAT_ARRAY_ITEM_SURFACE)
-    expect(classes).toContain('bg-background')
-    expect(classes).toContain('[--surface-current:var(--background)]')
+    expect(classes).toContain('bg-surface-subtle')
+    expect(classes).toContain('[--surface-current:var(--surface-subtle)]')
     expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })
 

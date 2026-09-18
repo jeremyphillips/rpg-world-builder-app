@@ -128,10 +128,10 @@ describe('CampaignAvailabilityField', () => {
 
     await userEvent.setup().click(screen.getByRole('button', { name: /Available/ }))
 
-    const rail = container.querySelector('[data-field-dependent-rail]')
-    expect(rail).toBeInTheDocument()
-    expect(rail).toContainElement(screen.getByRole('combobox', { name: 'Selected players' }))
-    expect(rail).not.toContainElement(screen.getByRole('combobox', { name: 'Player access' }))
+    const nest = container.querySelector('[data-field-dependent-nest]')
+    expect(nest).toBeInTheDocument()
+    expect(nest).toContainElement(screen.getByRole('combobox', { name: 'Selected players' }))
+    expect(nest).not.toContainElement(screen.getByRole('combobox', { name: 'Player access' }))
   })
 
   it('hides the participant rail while player access is not specific players', async () => {
@@ -146,7 +146,7 @@ describe('CampaignAvailabilityField', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: /Available/ }))
 
     expect(screen.getByRole('combobox', { name: 'Player access' })).toBeInTheDocument()
-    expect(container.querySelector('[data-field-dependent-rail]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-field-dependent-nest]')).not.toBeInTheDocument()
   })
 
   it('marks availability dirty without PATCH on edit toggle', async () => {
