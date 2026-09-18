@@ -1,23 +1,18 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_DEPENDENT_INSET } from '../../form/field-config'
+import { DEFAULT_DEPENDENT_CHROME } from '../../form/field-config'
+import {
+  dependentNestMarginClasses,
+  dependentSectionStackClasses,
+  dependentNestPaddingClasses,
+  resolveDependentNestRailClasses,
+  resolveDependentNestShellClasses,
+  resolveDependentPresentation,
+} from './field-dependent.variants'
 import { fieldRailOffsetClasses, resolveFieldRailClasses } from './field-rail.variants'
-import { resolveDependentInsetClasses, resolveFormInsetPaddingClasses } from './field.variants'
-import { resolveDependentPresentation } from './field-dependent.variants'
-
-describe('resolveDependentInsetClasses', () => {
-  it('maps inset true to rhythm-derived content padding', () => {
-    expect(resolveDependentInsetClasses(true, 'comfortable')).toBe('pl-9')
-    expect(resolveDependentInsetClasses(true, 'compact')).toBe('pl-8')
-  })
-
-  it('maps inset false to no content offset', () => {
-    expect(resolveDependentInsetClasses(false, 'comfortable')).toBe('')
-  })
-})
 
 describe('resolveFieldRailClasses', () => {
-  it('positions a pseudo rail without content padding', () => {
+  it('positions a group rail without content padding', () => {
     const classes = resolveFieldRailClasses()
     expect(classes).toContain('relative')
     expect(classes).toContain('before:left-2')
@@ -27,107 +22,47 @@ describe('resolveFieldRailClasses', () => {
   })
 })
 
+describe('resolveDependentNestRailClasses', () => {
+  it('uses a weaker flush-left rail for default dependent nests', () => {
+    const classes = resolveDependentNestRailClasses()
+    expect(classes).toContain('before:left-0')
+    expect(classes).toContain('before:w-px')
+    expect(classes).toContain('before:bg-border-faint')
+  })
+})
+
 describe('resolveDependentPresentation', () => {
-  it('defaults omitted chrome to rail', () => {
-    const presentation = resolveDependentPresentation(
-      { fields: [], inset: DEFAULT_DEPENDENT_INSET },
-      'comfortable',
-    )
-    expect(presentation.chrome).toBe('rail')
-    expect(presentation.railClassName).toContain('before:left-2')
+  it('defaults omitted chrome to the dependent nest', () => {
+    const presentation = resolveDependentPresentation({}, 'comfortable')
+    expect(presentation.chrome).toBe(DEFAULT_DEPENDENT_CHROME)
+    expect(presentation.showNest).toBe(true)
+    expect(presentation.railClassName).toContain('before:left-0')
+    expect(presentation.nestShellClassName).toContain(dependentNestMarginClasses)
   })
 
-  it('applies content inset when inset is true', () => {
-    const presentation = resolveDependentPresentation(
-      { fields: [], inset: DEFAULT_DEPENDENT_INSET, chrome: 'none' },
-      'comfortable',
-    )
-    expect(presentation.insetClassName).toBe('pl-9')
+  it('opts out of nest chrome when chrome is none', () => {
+    const presentation = resolveDependentPresentation({ chrome: 'none' }, 'comfortable')
+    expect(presentation.showNest).toBe(false)
     expect(presentation.railClassName).toBeUndefined()
+    expect(presentation.nestShellClassName).toBeUndefined()
   })
 
-  it('applies no content inset when inset is false', () => {
-    const presentation = resolveDependentPresentation(
-      { fields: [], inset: false, chrome: 'none' },
-      'comfortable',
-    )
-    expect(presentation.insetClassName).toBe('')
+  it('maps legacy panel chrome to the dependent nest', () => {
+    const presentation = resolveDependentPresentation({ chrome: 'panel' }, 'comfortable')
+    expect(presentation.showNest).toBe(true)
+    expect(presentation.nestShellClassName).toContain(dependentNestPaddingClasses)
+    expect(presentation.nestShellClassName).not.toContain('border')
   })
 
-  it.each([
-    {
-      label: 'inset + none',
-      config: { inset: true as const, chrome: 'none' as const },
-      insetClass: 'pl-9',
-      hasRail: false,
-    },
-    {
-      label: 'inset + rail',
-      config: { inset: true as const, chrome: 'rail' as const },
-      insetClass: 'pl-9',
-      hasRail: true,
-    },
-    {
-      label: 'no inset + none',
-      config: { inset: false as const, chrome: 'none' as const },
-      insetClass: '',
-      hasRail: false,
-    },
-    {
-      label: 'no inset + rail',
-      config: { inset: false as const, chrome: 'rail' as const },
-      insetClass: '',
-      hasRail: true,
-    },
-    {
-      label: 'inset + panel',
-      config: { inset: true as const, chrome: 'panel' as const },
-      insetClass: 'pl-9',
-      hasRail: false,
-      hasPanel: true,
-    },
-    {
-      label: 'no inset + panel',
-      config: { inset: false as const, chrome: 'panel' as const },
-      insetClass: '',
-      hasRail: false,
-      hasPanel: true,
-    },
-  ])(
-    '$label composes inset and chrome independently',
-    ({ config, insetClass, hasRail, hasPanel }) => {
-      const presentation = resolveDependentPresentation({ fields: [], ...config }, 'comfortable')
-      expect(presentation.insetClassName).toBe(insetClass)
-      if (hasRail) {
-        expect(presentation.railClassName).toContain('before:left-2')
-        expect(presentation.railClassName).not.toContain('pl-9')
-        expect(presentation.chromeWrapperClassName).toBeUndefined()
-      } else if (hasPanel) {
-        expect(presentation.chromeWrapperClassName).toContain('rounded-md')
-        expect(presentation.railClassName).toBeUndefined()
-      } else {
-        expect(presentation.railClassName).toBeUndefined()
-        expect(presentation.chromeWrapperClassName).toBeUndefined()
-      }
-    },
-  )
-
-  it('does not add rail padding on top of content inset', () => {
-    const presentation = resolveDependentPresentation(
-      { fields: [], inset: true, chrome: 'rail' },
-      'comfortable',
-    )
-    expect(presentation.insetClassName).toBe('pl-9')
-    expect(presentation.railClassName).not.toContain('pl-9')
-    expect(presentation.railClassName).not.toContain('pl-8')
+  it('uses background fill on field-container hosts', () => {
+    expect(resolveDependentNestShellClasses('field-container')).toContain('bg-background')
   })
 
-  it('uses compact content inset with rail decoration', () => {
-    const presentation = resolveDependentPresentation(
-      { fields: [], inset: DEFAULT_DEPENDENT_INSET, chrome: 'rail' },
-      'compact',
-    )
-    expect(presentation.insetClassName).toBe(resolveFormInsetPaddingClasses('compact', 'left'))
-    expect(presentation.railClassName).toContain('before:left-2')
+  it('uses faint fill on array-item hosts', () => {
+    expect(resolveDependentNestShellClasses('array-item')).toContain('bg-surface-faint')
+  })
+
+  it('exposes 16px stack rhythm between controller and dependents', () => {
+    expect(dependentSectionStackClasses).toContain('gap-4')
   })
 })

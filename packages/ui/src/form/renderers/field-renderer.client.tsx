@@ -480,6 +480,7 @@ const fieldRenderers: {
       {...pickFieldChromeProps(config)}
       label={config.label}
       labelVisibility={labelVisibility}
+      introText={config.introText}
       options={config.options}
       multiple={config.multiple}
       max={config.max}

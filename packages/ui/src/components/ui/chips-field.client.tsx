@@ -7,7 +7,12 @@ import { FieldAnatomyRowShell } from './field-anatomy-row-shell.client'
 import { Field, type FieldSize } from './field.client'
 import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
-import { fieldChipWrapGapClasses, type FieldHintPosition } from './field.variants'
+import {
+  fieldAnatomyStackVariants,
+  fieldChipWrapGapClasses,
+  fieldLabelVariants,
+  type FieldHintPosition,
+} from './field.variants'
 import { FieldLabelContent } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldOption } from '../../form/field-config'
@@ -117,6 +122,8 @@ export function ChipsFieldOptions({
 export interface ChipsFieldProps extends SelectFieldValueProps, FieldLabelPresentationProps {
   id: string
   options: FieldOption[]
+  /** Visible lead-in copy — does not replace the field legend / accessible name. */
+  introText?: React.ReactNode
   /** Label type scale — matches other field wrappers (default `md`). */
   size?: FieldSize
   /** Pill padding/type scale — defaults to `size` when omitted. */
@@ -131,10 +138,30 @@ export interface ChipsFieldProps extends SelectFieldValueProps, FieldLabelPresen
  * Pill-shaped toggle-button group. Renders as a `<fieldset>` with a `<legend>`
  * so screen readers announce the group label before each option.
  */
+function ChipsFieldIntroText({
+  introText,
+  size,
+  hideFromAccessibility,
+}: {
+  introText: React.ReactNode
+  size: FieldSize
+  hideFromAccessibility: boolean
+}) {
+  return (
+    <div
+      className={fieldLabelVariants({ size })}
+      {...(hideFromAccessibility ? { 'aria-hidden': true } : {})}
+    >
+      {introText}
+    </div>
+  )
+}
+
 export function ChipsField({
   id,
   label,
   labelVisibility = 'visible',
+  introText,
   options,
   multiple = true,
   max,
@@ -190,6 +217,20 @@ export function ChipsField({
       semanticRole={semanticRole}
     />
   )
+
+  const chipsControl =
+    introText != null && introText !== '' ? (
+      <div className={fieldAnatomyStackVariants({ size })}>
+        <ChipsFieldIntroText
+          introText={introText}
+          size={size}
+          hideFromAccessibility={labelVisibility === 'srOnly'}
+        />
+        {chipsOptions(legendId)}
+      </div>
+    ) : (
+      chipsOptions(legendId)
+    )
 
   if (inAnatomyRow) {
     return (
@@ -250,7 +291,7 @@ export function ChipsField({
             </legend>
           }
         >
-          {chipsOptions(legendId)}
+          {chipsControl}
         </FieldsetChromeAnatomy>
       </FieldsetChromeFrame>
     </div>

@@ -5,6 +5,7 @@ import { describe, it, expect, vi } from 'vitest'
 
 import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { ChipsField } from './chips-field.client'
+import { fieldLabelVariants } from './field.variants'
 
 const playStyleOptions = [
   { value: 'dungeon_crawl', label: 'Dungeon Crawl' },
@@ -32,6 +33,50 @@ describe('ChipsField', () => {
     expect(screen.getByText('Dungeon Crawl')).toBeInTheDocument()
     expect(screen.getByText('Exploration')).toBeInTheDocument()
     expect(screen.getByText('Mystery')).toBeInTheDocument()
+  })
+
+  describe('introText lead-in', () => {
+    it('keeps the concise label in an sr-only legend while introText is visible', () => {
+      const { container } = render(
+        <ChipsField
+          id="granted-languages"
+          label="Granted languages"
+          labelVisibility="srOnly"
+          introText="Characters receive these languages:"
+          options={playStyleOptions}
+          multiple
+          value={[]}
+        />,
+      )
+
+      const legend = container.querySelector('legend')
+      expect(legend).toHaveClass('sr-only')
+      expect(legend).toHaveTextContent('Granted languages')
+
+      const intro = screen.getByText('Characters receive these languages:')
+      expect(intro).toBeVisible()
+      expect(intro).toHaveAttribute('aria-hidden', 'true')
+      expect(intro).toHaveClass(...fieldLabelVariants({ size: 'md' }).split(/\s+/))
+    })
+
+    it('keeps below-label hint anatomy when introText is present', () => {
+      const { container } = render(
+        <ChipsField
+          id="granted-languages"
+          label="Granted languages"
+          labelVisibility="srOnly"
+          introText="Characters receive these languages:"
+          hint="Pick all starting languages."
+          options={playStyleOptions}
+          multiple
+          value={[]}
+        />,
+      )
+
+      expect(screen.getByText('Pick all starting languages.')).toBeInTheDocument()
+      expect(screen.getByText('Characters receive these languages:')).toBeInTheDocument()
+      expect(container.querySelector('legend')).toHaveClass('sr-only')
+    })
   })
 
   it('marks selected options as checked', () => {

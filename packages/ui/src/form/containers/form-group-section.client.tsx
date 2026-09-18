@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { FieldGroup } from '../../components/ui/field-group'
-import { FieldChromeShell } from '../../components/ui/field-chrome-shell'
+import { FormFieldChromeShell } from '../context/form-field-chrome-shell.client'
 import {
   hasActiveFieldChrome,
   resolveEffectiveFieldChrome,
@@ -96,13 +96,13 @@ function GroupFieldStackBody({
   if (!chromeActive || wrapEntireGroup || skipNestedFieldChrome) return nestedFields
 
   return (
-    <FieldChromeShell
+    <FormFieldChromeShell
       chrome={groupFieldChrome}
       size={groupSize}
       className={fieldStackRhythmVariants({ rhythm: groupRhythm })}
     >
       {nestedFields}
-    </FieldChromeShell>
+    </FormFieldChromeShell>
   )
 }
 
@@ -122,13 +122,13 @@ function GroupFieldOuterChrome({
   if (!wrapEntireGroup) return children
 
   return (
-    <FieldChromeShell
+    <FormFieldChromeShell
       chrome={groupFieldChrome}
       size={groupSize}
       className={inParentRhythm ? undefined : fieldGroupBottomMarginClasses}
     >
       {children}
-    </FieldChromeShell>
+    </FormFieldChromeShell>
   )
 }
 

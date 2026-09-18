@@ -93,7 +93,7 @@ describe('array item shell variants', () => {
     )
   })
 
-  it('paints the collapsible body on the canvas plane', () => {
+  it('paints the collapsible body on the canvas content plane', () => {
     const classes = arrayItemBodyClasses({ showDragHandle: true, collapsible: true })
     expect(classes).toContain('bg-background')
     expect(classes).toContain('border-t')

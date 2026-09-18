@@ -192,6 +192,10 @@ Pill toggles from a fixed option set.
 { type: 'chips', name: 'difficulty', label: 'Difficulty', multiple: false, options: [...] }
 ```
 
+Optional `introText` renders visible lead-in copy above the chip row when the field
+`label` stays sr-only or concise — it does not replace the legend accessible name.
+Hint copy remains supporting description via `hint`.
+
 - `multiple: true` (default) → `string[]`, `role="checkbox"`.
 - `multiple: false` → `string`, `role="radio"`.
 - `chipSize` defaults to field `size`.

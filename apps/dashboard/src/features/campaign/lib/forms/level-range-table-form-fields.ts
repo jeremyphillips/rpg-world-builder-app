@@ -45,7 +45,6 @@ export type BuildLevelRangeTiersArrayFieldOptions = {
   density?: LevelRangeArrayConfig['density']
   itemHeader?: ArrayItemHeaderConfig
   itemVariant?: ArrayItemConfig['variant']
-  itemSurface?: ArrayItemConfig['surface']
   itemCollapsible?: ArrayItemConfig['collapsible']
   addActionLabel?: string
   /** Row fields after the level range control. */
@@ -72,7 +71,6 @@ export function buildLevelRangeTiersArrayField(
     item: {
       header: options.itemHeader,
       variant: options.itemVariant,
-      surface: options.itemSurface,
       collapsible: options.itemCollapsible ?? true,
       reorder: false,
     },

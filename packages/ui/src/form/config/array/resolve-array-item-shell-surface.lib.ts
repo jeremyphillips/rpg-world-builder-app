@@ -4,7 +4,7 @@ import {
 } from '../../../components/ui/field-dependent.variants'
 import type { SurfaceConfig } from '../../../components/ui/visual-vocabulary.types'
 
-/** Resolves shell surface — flat canvas for non-collapsible rows; subtle header for disclosure. */
+/** Resolves shell surface — subtle wash for all default array items; disclosure body stays canvas. */
 export function resolveArrayItemShellSurface(options: {
   explicit?: SurfaceConfig
   collapsible: boolean

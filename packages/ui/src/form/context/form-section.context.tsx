@@ -2,7 +2,10 @@
 
 import * as React from 'react'
 
-import type { SemanticSurfaceTone } from '../../components/ui/field-dependent.variants'
+import type {
+  FormSurfaceHost,
+  SemanticSurfaceTone,
+} from '../../components/ui/field-dependent.variants'
 import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
 import type { FieldSize } from '../../components/ui/field.client'
@@ -35,6 +38,8 @@ export interface FormSectionContextValue {
   fieldChromeCascade?: FieldChrome
   /** When true, leaf fields default to no container unless explicitly configured. */
   fieldChromeSuppressed?: boolean
+  /** Internal nesting plane for dependent nest fill — not author-facing. */
+  surfaceHost?: FormSurfaceHost
 }
 
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
@@ -59,6 +64,7 @@ export interface FormSectionContextOverrides {
   inRhythmStack?: boolean
   fieldChromeCascade?: FieldChrome
   fieldChromeSuppressed?: boolean
+  surfaceHost?: FormSurfaceHost
 }
 
 function filterUndefined<T extends object>(value: T): Partial<T> {
@@ -82,6 +88,7 @@ function inheritSectionContextFields(
     inRhythmStack: parent.inRhythmStack,
     fieldChromeCascade: parent.fieldChromeCascade,
     fieldChromeSuppressed: parent.fieldChromeSuppressed,
+    surfaceHost: parent.surfaceHost,
   }
 
   return overrides ? { ...inherited, ...filterUndefined(overrides) } : inherited

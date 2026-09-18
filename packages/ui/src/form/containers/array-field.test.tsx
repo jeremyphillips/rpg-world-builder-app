@@ -219,11 +219,10 @@ describe('ArrayFieldRenderer', () => {
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
-    expect(itemShell).toHaveClass('bg-background')
-    expect(itemShell).not.toHaveClass('bg-card')
-    const dependentsRegion = addButton.closest('[data-field-dependent-fields]')
-    expect(dependentsRegion?.querySelector(':scope > .p-3')).toBeNull()
-    expect(dependentsRegion?.querySelector('.bg-background')).toBe(itemShell)
+    expect(itemShell).toHaveClass('bg-surface-subtle')
+    const nest = addButton.closest('[data-field-dependent-nest]')
+    expect(nest).toHaveClass('bg-background')
+    expect(nest).toContainElement(itemShell)
   })
 
   it('applies item surface override on array item shells', async () => {
@@ -333,7 +332,7 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getAllByRole('button', { name: 'Add speed' })).toHaveLength(1)
   })
 
-  it('keeps stacked add actions below the item list', () => {
+  it('keeps stacked add actions below the item list with action-owned spacing', () => {
     renderForm()
 
     const fieldset = screen.getByRole('group', { name: /Traits/i })
@@ -341,6 +340,7 @@ describe('ArrayFieldRenderer', () => {
     const legend = fieldset.querySelector('legend')
 
     expect(legend).not.toContainElement(addButton)
+    expect(addButton.closest('.mt-4')).toBeTruthy()
     expect(addButton.querySelector('svg')).toBeTruthy()
   })
 
@@ -465,13 +465,13 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('option', { name: 'Movement bonus' })).toBeInTheDocument()
   })
 
-  it('defaults flat array item shells to the canvas background plane', async () => {
+  it('defaults flat array item shells to the subtle content plane', async () => {
     const user = userEvent.setup()
     renderForm()
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait #1' })
-    expect(itemShell).toHaveClass('bg-background')
+    expect(itemShell).toHaveClass('bg-surface-subtle')
     expect(itemShell).toHaveClass('border-border')
     expect(itemShell).not.toHaveClass('bg-card')
     expect(itemShell).not.toHaveClass('shadow-surface-raised')
@@ -479,6 +479,63 @@ describe('ArrayFieldRenderer', () => {
     const body = itemShell.querySelector('[id$="-body"]')
     expect(body).toHaveClass('bg-background')
     expect(body).toHaveClass('border-t')
+  })
+
+  it('uses tighter disclosure gaps between collapsible array items', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const list = screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')
+    expect(list).toHaveClass('gap-2')
+  })
+
+  it('uses 12px disclosure gaps for comfortable collapsible arrays', async () => {
+    const user = userEvent.setup()
+    const comfortableCollapsibleFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        density: 'comfortable',
+        item: {
+          variant: 'detailed',
+          collapsible: true,
+          header: {
+            fallback: (index) => `Trait ${index + 1}`,
+            primaryField: 'name',
+          },
+        },
+        fields: traitFields,
+        addAction: { label: 'Add trait' },
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={comfortableCollapsibleFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const list = screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')
+    expect(list).toHaveClass('gap-3')
+    expect(list).not.toHaveClass('gap-6')
   })
 
   it('uses gap-6 between comfortable-density array items while keeping gap-6 inside item bodies', async () => {
@@ -523,7 +580,7 @@ describe('ArrayFieldRenderer', () => {
       'rounded-sm',
       'border',
       'border-border',
-      'bg-background',
+      'bg-surface-subtle',
       'pl-2',
       'py-2',
     )

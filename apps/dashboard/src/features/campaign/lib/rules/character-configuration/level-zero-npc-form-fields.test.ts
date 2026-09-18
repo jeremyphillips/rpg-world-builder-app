@@ -18,7 +18,7 @@ function expectAllowDependent(fields: ReturnType<typeof levelZeroNpcsFields>): D
 }
 
 describe('levelZeroNpcsFields', () => {
-  it('keeps Allow dependents inset by default at the group and dependent layers', () => {
+  it('keeps Allow dependents on the default nest at the group and dependent layers', () => {
     const allow = expectAllowDependent(
       levelZeroNpcsFields({ languageOptions: [], armorOptions: [], weaponOptions: [] }),
     )
@@ -28,7 +28,7 @@ describe('levelZeroNpcsFields', () => {
       name: LEVEL_ZERO_NPCS_ENABLED,
       label: 'Allow',
     })
-    expect(allow.dependents).toMatchObject({ chrome: DEFAULT_DEPENDENT_CHROME })
+    expect(allow.dependents.chrome).toBeUndefined()
     expect(allow.dependents.inset).not.toBe(false)
     expect(
       allow.dependents.fields.some(
@@ -52,7 +52,7 @@ describe('levelZeroNpcsFields', () => {
     ).toBe(true)
   })
 
-  it('keeps nested grant-set dependents inset with rail chrome and without panel chrome', () => {
+  it('keeps nested grant-set dependents on the default nest without panel chrome', () => {
     const allow = expectAllowDependent(
       levelZeroNpcsFields({ languageOptions: [], armorOptions: [], weaponOptions: [] }),
     )

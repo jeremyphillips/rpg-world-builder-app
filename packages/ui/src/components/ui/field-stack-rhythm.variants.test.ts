@@ -67,6 +67,18 @@ describe('fieldStackRhythmVariants', () => {
 })
 
 describe('fieldArrayItemListClasses', () => {
+  it('uses disclosure gaps for collapsible array items', () => {
+    expect(
+      fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'md' }, 'separated', 'disclosure'),
+    ).toContain('gap-3')
+    expect(
+      fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'md' }, 'separated', 'disclosure'),
+    ).not.toContain('gap-6')
+    expect(
+      fieldArrayItemListClasses({ rhythm: 'compact', size: 'md' }, 'separated', 'disclosure'),
+    ).toContain('gap-2')
+  })
+
   it('uses tighter gaps for compact sm sections', () => {
     expect(fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'sm' })).toContain('gap-3')
     expect(fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'sm' })).not.toContain('gap-6')

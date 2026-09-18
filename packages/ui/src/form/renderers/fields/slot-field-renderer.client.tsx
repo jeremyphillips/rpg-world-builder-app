@@ -8,7 +8,7 @@ import {
   type FormSectionContextValue,
 } from '../../context/form-section.context'
 import { useFieldRowParticipation } from '../../../components/ui/field-row-anatomy.context'
-import { FieldChromeShell } from '../../../components/ui/field-chrome-shell'
+import { FormFieldChromeShell } from '../../context/form-field-chrome-shell.client'
 import {
   hasActiveFieldChrome,
   resolveFieldChromeProps,
@@ -38,9 +38,9 @@ export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
   if (inAnatomyRow) {
     if (content == null) return null
     const body = hasActiveFieldChrome(resolvedChrome) ? (
-      <FieldChromeShell chrome={resolvedChrome} size={size}>
+      <FormFieldChromeShell chrome={resolvedChrome} size={size}>
         {content}
-      </FieldChromeShell>
+      </FormFieldChromeShell>
     ) : (
       content
     )
