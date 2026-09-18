@@ -1,12 +1,17 @@
+import { useWatch } from 'react-hook-form'
 import { formatFieldMessage } from '@rpg/contracts'
+import { Alert } from '@rpg/ui'
 import { FormSectionHeader } from '@rpg/ui/form'
 
 import { TABLE_BUILDER_VALUES_LABEL } from '../../lib/table-builder/table-builder-copy'
+import type { TableBuilderFormValues } from '../../lib/table-builder/table-builder-draft'
 import {
   tableBuilderGroupClasses,
   tableBuilderSectionClasses,
   tableBuilderSectionErrorClasses,
 } from './table-builder.variants'
+import { tableBuilderValuesStickyPaddingClasses } from './table-builder-values.variants'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
 import { TableBuilderValuesGrid } from './table-builder-values-grid'
 import { resolveTableBuilderValuesHint, useTableBuilderValues } from './table-builder-values.lib'
 
@@ -15,10 +20,29 @@ export type TableBuilderValuesProps = {
 }
 
 export function TableBuilderValues({ allowedLevels }: TableBuilderValuesProps) {
+  const config = useTableBuilderHostConfig()
   const values = useTableBuilderValues(allowedLevels)
+  const fixedLevels = config.rows === 'fixedLevels'
+  const draft = useWatch<TableBuilderFormValues>() as TableBuilderFormValues
+  const valuesNotice = config.resolveValuesNotice?.({
+    draft: {
+      kind: draft.kind ?? 'levelProgression',
+      name: draft.name ?? '',
+      columns: draft.columns ?? [],
+      rows: draft.rows ?? [],
+    },
+  })
+
+  const stickyPadding =
+    config.resolveExtendedProgressionAction !== undefined
+      ? tableBuilderValuesStickyPaddingClasses
+      : undefined
 
   return (
-    <section className={tableBuilderSectionClasses} aria-label={TABLE_BUILDER_VALUES_LABEL}>
+    <section
+      className={[tableBuilderSectionClasses, stickyPadding].filter(Boolean).join(' ')}
+      aria-label={TABLE_BUILDER_VALUES_LABEL}
+    >
       <FormSectionHeader
         label={TABLE_BUILDER_VALUES_LABEL}
         hint={resolveTableBuilderValuesHint(values.hasNoColumns, values.includeLevel)}
@@ -26,6 +50,14 @@ export function TableBuilderValues({ allowedLevels }: TableBuilderValuesProps) {
         size="md"
         required
       />
+      {valuesNotice ? (
+        <Alert
+          variant="info"
+          density="compact"
+          title={valuesNotice.title}
+          description={valuesNotice.description}
+        />
+      ) : null}
       {!values.hasNoColumns ? (
         <div className={tableBuilderGroupClasses}>
           <TableBuilderValuesGrid
@@ -36,6 +68,7 @@ export function TableBuilderValues({ allowedLevels }: TableBuilderValuesProps) {
             usedLevels={values.usedLevels}
             includeLevel={values.includeLevel}
             gridTemplate={values.gridTemplate}
+            includeActions={!fixedLevels}
             addRowDisabled={values.addRowDisabled}
             onLevelChange={values.handleLevelChange}
             onAddRow={values.handleAddRow}

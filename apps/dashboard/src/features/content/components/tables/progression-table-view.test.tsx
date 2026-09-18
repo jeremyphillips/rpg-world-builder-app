@@ -52,6 +52,7 @@ describe('ProgressionTableView', () => {
     render(<ProgressionTableView table={rageProgressionTableFixture} />)
 
     for (const row of draftPresentation.rows) {
+      if (row.kind === 'tierSeparator') continue
       for (const column of draftPresentation.columns) {
         const value = row.cells[column.key]
         if (value === undefined) continue

@@ -11,6 +11,7 @@ import {
   featureTableKindLabel,
   formatFeatureTableMetadata,
 } from '../../lib/feature-tables-field.lib'
+import { campaignRulesFromCtx } from '../../../lib/form-options/content-campaign-rules'
 import type { FeatureRowForm } from '../../lib/class-feature-form-fields'
 import { DetailOverflowMenu } from '../../../lib/detail/detail-overflow-menu'
 import { FeatureTableRow } from './feature-table-row'
@@ -39,14 +40,24 @@ export function FeatureTablesField({ formCtx }: FeatureTablesFieldProps) {
     [featureLevel, formCtx],
   )
 
-  const tableBuilderConfig = useMemo(
-    () => ({
+  const tableBuilderConfig = useMemo(() => {
+    const campaignRules = campaignRulesFromCtx(formCtx)
+    const extended = campaignRules.extendedProgression
+
+    return {
       allowedKinds: CONTENT_TABLE_KINDS,
       recommendedKind: 'levelProgression' as const,
       allowedLevels,
-    }),
-    [allowedLevels],
-  )
+      ...(extended
+        ? {
+            extendedProgression: {
+              standardMaxLevel: campaignRules.standardMaxCharacterLevel,
+              tierName: extended.tierName,
+            },
+          }
+        : {}),
+    }
+  }, [allowedLevels, formCtx])
 
   const setTables = (next: ContentTable[]) => {
     form.setValue(tablesPath, next, { shouldDirty: true, shouldValidate: true })

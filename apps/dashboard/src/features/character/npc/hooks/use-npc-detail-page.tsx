@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { type SystemRulesetId } from '@rpg/contracts'
-import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
+import { resolveCampaignXpProgressionForRules } from '@/lib/campaign-xp-progression.lib'
 
 import { useCanManageCampaign } from '@/features/campaign'
 
@@ -30,7 +30,10 @@ export function useNpcDetailPage() {
       character: npcQuery.data.character,
       catalogIndex: buildContextQuery.catalogIndex,
       rules: buildContextQuery.context.characterCreationRules,
-      xpProgression: getStandardXpProgression(npcQuery.data.character.rulesetId as SystemRulesetId),
+      xpProgression: resolveCampaignXpProgressionForRules(
+        npcQuery.data.character.rulesetId as SystemRulesetId,
+        buildContextQuery.context.characterCreationRules.progression,
+      ),
       organizationReferences: organizationReferencesQuery.data,
       locationReferences: locationReferencesQuery.data,
     })

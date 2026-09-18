@@ -189,12 +189,38 @@ function refineTableBuilderForm(values: TableBuilderFormValues, ctx: z.Refinemen
   refineColumnCells(values, ctx)
 }
 
+function refineFixedLevelsFilledCells(values: TableBuilderFormValues, ctx: z.RefinementCtx): void {
+  for (const [rowIndex, row] of values.rows.entries()) {
+    for (const column of values.columns) {
+      refineCell(column, row.cells[column.key], ['rows', rowIndex, 'cells', column.key], ctx)
+    }
+  }
+}
+
+function refineFixedLevelsTableBuilderForm(
+  values: TableBuilderFormValues,
+  ctx: z.RefinementCtx,
+): void {
+  refineStructure(values, ctx)
+  refineColumnLabels(values, ctx)
+  if (values.kind === 'levelProgression') {
+    refineRowLevels(values, ctx)
+  }
+  refineFixedLevelsFilledCells(values, ctx)
+}
+
+const tableBuilderFormObjectSchema = z.object({
+  kind: z.enum(CONTENT_TABLE_KINDS),
+  name: z.string(),
+  columns: z.array(columnDraftSchema),
+  rows: z.array(rowDraftSchema),
+})
+
 /** Validates the authoring draft on save; blank cells are legitimate carry-forward gaps. */
-export const tableBuilderFormSchema = z
-  .object({
-    kind: z.enum(CONTENT_TABLE_KINDS),
-    name: z.string(),
-    columns: z.array(columnDraftSchema),
-    rows: z.array(rowDraftSchema),
-  })
-  .superRefine(refineTableBuilderForm)
+export const tableBuilderFormSchema =
+  tableBuilderFormObjectSchema.superRefine(refineTableBuilderForm)
+
+/** Fixed-level hosts allow blank cells; only filled cells are validated. */
+export const fixedLevelsTableBuilderFormSchema = tableBuilderFormObjectSchema.superRefine(
+  refineFixedLevelsTableBuilderForm,
+)

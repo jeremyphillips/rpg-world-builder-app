@@ -27,9 +27,12 @@ import {
   creatureTypeSchema,
   hitDieSchema,
   levelZeroProficiencyBonusSchema,
+  refineEffectiveXpProgression,
   refineLevelRangeTable,
   validateExtendedMaxLevel,
+  xpThresholdOverrideEntriesSchema,
 } from '@rpg/contracts'
+import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 import {
   toOptions,
   type ArrayConfig,
@@ -44,6 +47,7 @@ import {
 import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects'
+import { XpThresholdsField } from '../../../components/xp-thresholds-field'
 import {
   ExtendedLevelRangeSummary,
   StandardLevelRangeSummary,
@@ -156,6 +160,7 @@ const configRulesObjectSchema = z.object({
   levelZeroRetainSpeciesLanguages: z.boolean().default(DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES),
   levelZeroStartingWealth: levelZeroNpcsFormSchema.shape.levelZeroStartingWealth.optional(),
   levelZeroStandardArray: standardArrayFormSchema.default(standardArrayDefaultFormValues),
+  xpThresholdOverrides: xpThresholdOverrideEntriesSchema.default([]),
 })
 
 type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
@@ -236,6 +241,17 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
     requireStartAt: 1,
     requireEndAt: effectiveMax,
   })
+
+  const systemXpEntries = getStandardXpProgression('srd-cc-5.2.1').entries
+  refineEffectiveXpProgression(
+    {
+      systemEntries: systemXpEntries,
+      overrides: values.xpThresholdOverrides,
+      effectiveMaxLevel: effectiveMax,
+    },
+    ctx,
+    ['xpThresholdOverrides'],
+  )
 
   if (!values.extendedProgressionEnabled) return
 
@@ -410,6 +426,21 @@ function progressionGroup(): FormItem {
           },
         },
         { id: 'progression-extended', label: 'Extended progression' },
+      ),
+      withNavigationAnchor(
+        {
+          kind: 'group',
+          legend: 'Experience thresholds',
+          description: 'Experience required to reach each character level.',
+          fields: [
+            {
+              kind: 'slot',
+              name: '_xpThresholdsField',
+              render: () => createElement(XpThresholdsField),
+            },
+          ],
+        },
+        { id: 'progression-experience-thresholds', label: 'Experience thresholds' },
       ),
     ],
   }

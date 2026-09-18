@@ -11,6 +11,8 @@ import {
   startingWealthRulesSchema,
   type StartingWealthRules,
 } from '../rules/starting-wealth'
+import { refineEffectiveXpProgression, xpThresholdsPatchSchema } from '../rules/xp-progression'
+import type { XpProgressionEntry } from '../../primitives/xp-progression'
 import {
   campaignMulticlassingPatchSchema,
   resolveMulticlassingRules,
@@ -85,7 +87,9 @@ export const DEFAULT_CREATURE_TYPE_POLICY = {
 const campaignCharacterCreationProgressionPatchSchema = z
   .object({
     maxCharacterLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL).optional(),
-    extendedProgression: extendedProgressionSchema.optional(),
+    /** Null clears extended progression on PATCH; omit to leave the stored value unchanged. */
+    extendedProgression: extendedProgressionSchema.nullable().optional(),
+    xpThresholds: xpThresholdsPatchSchema.optional(),
   })
   .strict()
 
@@ -119,6 +123,7 @@ export type CampaignCharacterCreationPatch = z.infer<typeof campaignCharacterCre
 export const resolvedCampaignCharacterCreationProgressionSchema = z.object({
   maxCharacterLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
   extendedProgression: extendedProgressionSchema.optional(),
+  xpThresholds: xpThresholdsPatchSchema.optional(),
 })
 
 export type ResolvedCampaignCharacterCreationProgression = z.infer<
@@ -219,11 +224,30 @@ function validateStartingWealthTiersInPatchInput({
   })
 }
 
+function validateXpThresholdsInPatchInput(
+  { patch, ctx, pathPrefix }: CharacterCreationPatchValidationContext,
+  systemEntries: readonly XpProgressionEntry[],
+  effectiveMax: number,
+): void {
+  const overrides = patch.progression?.xpThresholds?.entries
+  if (overrides === undefined) return
+
+  refineEffectiveXpProgression({ systemEntries, overrides, effectiveMaxLevel: effectiveMax }, ctx, [
+    ...pathPrefix,
+    'progression',
+    'xpThresholds',
+    'entries',
+  ])
+}
+
 function validateCharacterCreationPatchInput(
   patch: CampaignCharacterCreationPatch,
   ctx: z.RefinementCtx,
   pathPrefix: (string | number)[] = [],
-  options: { skipStartingWealthTiers?: boolean } = {},
+  options: {
+    skipStartingWealthTiers?: boolean
+    systemXpEntries?: readonly XpProgressionEntry[]
+  } = {},
 ): void {
   const validationContext: CharacterCreationPatchValidationContext = { patch, ctx, pathPrefix }
   const standardMaxCharacterLevel = patch.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
@@ -234,6 +258,10 @@ function validateCharacterCreationPatchInput(
   validateExtendedProgressionMaxLevel(validationContext, standardMaxCharacterLevel)
   validateSubclassChoicesPatchInput(validationContext)
 
+  if (options.systemXpEntries) {
+    validateXpThresholdsInPatchInput(validationContext, options.systemXpEntries, effectiveMax)
+  }
+
   if (!options.skipStartingWealthTiers) {
     validateStartingWealthTiersInPatchInput(validationContext)
   }
@@ -243,16 +271,24 @@ function validateCharacterCreationPatchInput(
  * Validates a merged character-creation patch before API persist.
  * Always checks resolved starting wealth tiers against the campaign effective max.
  */
+export type CharacterCreationPatchValidationSeeds = {
+  startingWealth: StartingWealthRules
+  systemXpEntries: readonly XpProgressionEntry[]
+}
+
 export function refineMergedCharacterCreationPatch(
   merged: CampaignCharacterCreationPatch,
   ctx: z.RefinementCtx,
-  startingWealthSeed: StartingWealthRules,
+  seeds: CharacterCreationPatchValidationSeeds,
   pathPrefix: (string | number)[] = [],
 ): void {
-  validateCharacterCreationPatchInput(merged, ctx, pathPrefix, { skipStartingWealthTiers: true })
+  validateCharacterCreationPatchInput(merged, ctx, pathPrefix, {
+    skipStartingWealthTiers: true,
+    systemXpEntries: seeds.systemXpEntries,
+  })
 
   const effectiveMax = resolveMaxCharacterLevel(merged)
-  const tiers = resolveStartingWealthRules(startingWealthSeed, merged.startingWealth).tiers
+  const tiers = resolveStartingWealthRules(seeds.startingWealth, merged.startingWealth).tiers
 
   refineLevelRangeTable(tiers, ctx, {
     pathPrefix: [...pathPrefix, 'startingWealth', 'tiers'],
@@ -264,11 +300,11 @@ export function refineMergedCharacterCreationPatch(
 
 export function safeParseMergedCharacterCreationPatch(
   merged: CampaignCharacterCreationPatch,
-  startingWealthSeed: StartingWealthRules,
+  seeds: CharacterCreationPatchValidationSeeds,
 ) {
   return campaignCharacterCreationPatchSchema
     .superRefine((patch, ctx) => {
-      refineMergedCharacterCreationPatch(patch, ctx, startingWealthSeed)
+      refineMergedCharacterCreationPatch(patch, ctx, seeds)
     })
     .safeParse(merged)
 }
@@ -290,10 +326,13 @@ function resolveCharacterCreationProgression(
 ): ResolvedCampaignCharacterCreationProgression {
   const standardMaxCharacterLevel = patch?.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
   const extendedProgression = patch?.progression?.extendedProgression
+  const xpThresholds = patch?.progression?.xpThresholds
 
-  return extendedProgression === undefined
-    ? { maxCharacterLevel: standardMaxCharacterLevel }
-    : { maxCharacterLevel: standardMaxCharacterLevel, extendedProgression }
+  return {
+    maxCharacterLevel: standardMaxCharacterLevel,
+    ...(extendedProgression != null ? { extendedProgression } : {}),
+    ...(xpThresholds !== undefined ? { xpThresholds } : {}),
+  }
 }
 
 function resolveCharacterCreationSpecies(

@@ -57,6 +57,24 @@ describe('TableGrid', () => {
     expect(screen.getByRole('cell', { name: 'No rows yet.' })).toBeInTheDocument()
   })
 
+  it('renders tier separator rows in progression previews', () => {
+    render(
+      <TableGrid
+        presentation={{
+          columns: [{ key: 'xp', label: 'XP required' }],
+          rows: [
+            { rowHeader: 20, cells: { xp: '355,000' } },
+            { kind: 'tierSeparator', label: 'Epic Destiny Tier' },
+            { rowHeader: 21, cells: { xp: '405,000' } },
+          ],
+        }}
+        rowHeaderLabel="Level"
+      />,
+    )
+
+    expect(screen.getByText('Epic Destiny Tier')).toBeInTheDocument()
+  })
+
   it('renders em dashes for missing cell values', () => {
     render(
       <TableGrid

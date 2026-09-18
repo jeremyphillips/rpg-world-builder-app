@@ -1,7 +1,8 @@
 import { useId, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2 } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
+import type { FieldPath } from 'react-hook-form'
 import type { GeneralTable, ProgressionTable } from '@rpg/contracts'
 import { Button, ConfirmDialog, DialogPanelScrollRegion, Modal } from '@rpg/ui'
 
@@ -36,9 +37,11 @@ import {
   resolveTableBuilderRecommendedKind,
   type TableBuilderHostConfig,
 } from '../../lib/table-builder/table-builder-host-config'
-import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
+import { resolveTableBuilderFormSchema } from '../../lib/table-builder/resolve-table-builder-form-schema'
 import { TableBuilder } from './table-builder'
+import { TableBuilderExtendedProgressionDock } from './table-builder-extended-progression-dock'
 import { tableBuilderModalDeleteButtonClasses } from './table-builder-modal.variants'
+import { TableBuilderHostConfigProvider } from '../../lib/table-builder/table-builder-host-context'
 
 export type TableBuilderModalMode = 'create' | 'edit'
 
@@ -49,8 +52,12 @@ export type TableBuilderModalProps = {
   /** Existing table when editing; ignored for `create`. */
   value?: TableBuilderSavedTable
   /** Receives one schema-valid table; the parent owns persistence. */
-  onSave: (table: TableBuilderSavedTable) => void
+  onSave?: (table: TableBuilderSavedTable) => void
+  /** When set, receives the validated draft instead of a persisted table shape. */
+  onSaveDraft?: (draft: TableBuilderFormValues) => void
   onOpenChange: (open: boolean) => void
+  /** Optional initial draft — used by constrained hosts instead of `value`. */
+  initialDraft?: TableBuilderFormValues
   /** When provided in edit mode, surfaces a confirmed destructive delete action. */
   onDelete?: () => void
 }
@@ -92,7 +99,9 @@ function TableBuilderModalContent({
   mode,
   config,
   value,
+  initialDraft,
   onSave,
+  onSaveDraft,
   onOpenChange,
   onDelete,
 }: TableBuilderModalProps) {
@@ -102,8 +111,8 @@ function TableBuilderModalContent({
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const form = useForm<TableBuilderFormValues>({
-    resolver: zodResolver(tableBuilderFormSchema),
-    defaultValues: tableToDraftValues(config, value),
+    resolver: zodResolver(resolveTableBuilderFormSchema(config)),
+    defaultValues: initialDraft ?? tableToDraftValues(config, value),
     mode: 'onSubmit',
   })
 
@@ -118,7 +127,23 @@ function TableBuilderModalContent({
       form.setError('kind', { type: 'manual', message: TABLE_BUILDER_KIND_NOT_ALLOWED })
       return
     }
-    onSave(draftToSavedTable(values, value))
+
+    const draftValidation = config.validateDraftBeforeSave?.({ draft: values })
+    if (draftValidation !== undefined && !draftValidation.valid) {
+      draftValidation.errors.forEach(({ path, message }) => {
+        form.setError(path as FieldPath<TableBuilderFormValues>, {
+          type: 'manual',
+          message,
+        })
+      })
+      return
+    }
+
+    if (onSaveDraft) {
+      onSaveDraft(values)
+    } else if (onSave) {
+      onSave(draftToSavedTable(values, value))
+    }
     onOpenChange(false)
   })
 
@@ -138,11 +163,18 @@ function TableBuilderModalContent({
             description={TABLE_BUILDER_MODAL_DESCRIPTION}
           />
           <Modal.Body stableBody>
-            <DialogPanelScrollRegion inset="innerLeading">
-              <form id={formId} onSubmit={handleSubmit} noValidate>
-                <TableBuilder form={form} config={config} mode={mode} />
-              </form>
-            </DialogPanelScrollRegion>
+            <FormProvider {...form}>
+              <TableBuilderHostConfigProvider config={config}>
+                <div className="relative flex min-h-0 flex-1 flex-col">
+                  <DialogPanelScrollRegion inset="innerLeading" viewportClassName="pb-0">
+                    <form id={formId} onSubmit={handleSubmit} noValidate>
+                      <TableBuilder form={form} config={config} mode={mode} withProviders={false} />
+                    </form>
+                  </DialogPanelScrollRegion>
+                  <TableBuilderExtendedProgressionDock />
+                </div>
+              </TableBuilderHostConfigProvider>
+            </FormProvider>
           </Modal.Body>
           <Modal.Footer>
             <Modal.FooterActions>

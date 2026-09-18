@@ -8,7 +8,12 @@ import {
   tableHeaderRowClasses,
 } from '@rpg/ui'
 
-import type { TableGridPresentation } from './table-grid-presentation'
+import {
+  isTableGridDataRow,
+  isTableGridTierSeparatorRow,
+  type TableGridPresentation,
+} from './table-grid-presentation'
+import { ProgressionTierSeparatorTableRow } from './progression-tier-separator'
 import {
   tableGridEmptyBodyCellClasses,
   tableGridHeaderCellClasses,
@@ -64,20 +69,35 @@ export function TableGrid({
             </TableCell>
           </TableRow>
         ) : (
-          presentation.rows.map((row, index) => (
-            <TableRow key={row.rowHeader ?? `row-${index}`}>
-              {showRowHeader ? (
-                <TableCell className={tableGridRowHeaderCellClasses}>
-                  {row.rowHeader ?? MISSING_VALUE}
-                </TableCell>
-              ) : null}
-              {presentation.columns.map((column) => (
-                <TableCell key={column.key} className={tableGridValueCellClasses}>
-                  {row.cells[column.key] ?? MISSING_VALUE}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))
+          presentation.rows.map((row, index) => {
+            if (isTableGridTierSeparatorRow(row)) {
+              return (
+                <ProgressionTierSeparatorTableRow
+                  key={`tier-separator-${index}`}
+                  colSpan={columnCount}
+                  label={row.label}
+                  variant="preview"
+                />
+              )
+            }
+
+            if (!isTableGridDataRow(row)) return null
+
+            return (
+              <TableRow key={row.rowHeader ?? `row-${index}`}>
+                {showRowHeader ? (
+                  <TableCell className={tableGridRowHeaderCellClasses}>
+                    {row.rowHeader ?? MISSING_VALUE}
+                  </TableCell>
+                ) : null}
+                {presentation.columns.map((column) => (
+                  <TableCell key={column.key} className={tableGridValueCellClasses}>
+                    {row.cells[column.key] ?? MISSING_VALUE}
+                  </TableCell>
+                ))}
+              </TableRow>
+            )
+          })
         )}
       </TableBody>
     </Table>

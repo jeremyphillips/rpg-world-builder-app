@@ -67,11 +67,38 @@ describe('NumberInput', () => {
     expect(screen.getByLabelText('Increment').closest('div')).toHaveClass('hidden')
   })
 
+  it('uses symmetric control padding when hideSteppers is set without grouped chrome', () => {
+    render(<NumberInput aria-label="Count" size="sm" hideSteppers defaultValue={3} />)
+    const input = screen.getByLabelText('Count')
+    expect(input).toHaveClass('px-2.5')
+    expect(input).not.toHaveClass('pr-6')
+    expect(screen.queryByLabelText('Increment')).not.toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <NumberInput aria-label="Count" defaultValue={3} min={1} max={10} />,
     )
     await expectNoAxeViolations(container)
+  })
+
+  it('applies composite shell classes when embedded in grouped chrome', () => {
+    render(
+      <NumberInput
+        aria-label="Threshold"
+        size="sm"
+        grouped
+        hideSteppers
+        compositeShell
+        formatGrouped
+        value={3000}
+        onChange={() => {}}
+      />,
+    )
+
+    const input = screen.getByLabelText('Threshold')
+    expect(input).toHaveClass('rounded-l-md', 'rounded-r-none')
+    expect(input.closest('.group')).toHaveClass('flex-1', 'border-0', 'bg-transparent')
   })
 
   describe('formatGrouped', () => {

@@ -18,6 +18,7 @@ import {
 } from '@rpg/contracts'
 import type { CharacterClass, Spellcasting } from '@rpg/contracts'
 
+import { ProgressionTierSeparatorTableRow } from '../../../components/tables/progression-tier-separator'
 import { projectVisibleClassFeatures } from '../../lib/class-display'
 import { isSubclassChoiceFeatureRow } from '../../lib/class-subclass-choice-features'
 
@@ -281,19 +282,6 @@ function ProgressionBodyRow({
   )
 }
 
-function TierSeparatorRow({ tierName, colSpan }: { tierName: string; colSpan: number }) {
-  return (
-    <TableRow>
-      <TableCell
-        colSpan={colSpan}
-        className="border-border border-y bg-surface-muted py-2 text-center text-sm font-medium"
-      >
-        {tierName}
-      </TableCell>
-    </TableRow>
-  )
-}
-
 type ClassProgressionTableProps = {
   characterClass: CharacterClass
   campaignRules?: ResolvedCampaignRules
@@ -343,10 +331,11 @@ export function ClassProgressionTable({
             if (extended && row.level === rules.standardMaxCharacterLevel) {
               return [
                 bodyRow,
-                <TierSeparatorRow
+                <ProgressionTierSeparatorTableRow
                   key={`tier-separator-${extended.tierName}`}
-                  tierName={`${extended.tierName} Tier`}
+                  label={`${extended.tierName} Tier`}
                   colSpan={colSpan}
+                  variant="preview"
                 />,
               ]
             }

@@ -41,7 +41,9 @@ import type {
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
+import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 
+import { mergeProgressionPatch } from './character-creation-patch.merge'
 import { assertCreatureTypesActiveInCampaign } from '../lib/assert-campaign-creature-types'
 import { HttpError } from '../../../lib/http-error'
 import {
@@ -103,21 +105,6 @@ function mergeMulticlassingPatch(
   }
 
   return merged
-}
-
-function mergeProgressionPatch(
-  existing: CampaignCharacterCreationPatch['progression'] | undefined,
-  input: NonNullable<UpdateCampaignCharacterCreationInput['progression']>,
-): NonNullable<CampaignCharacterCreationPatch['progression']> {
-  const merged = {
-    ...(existing ?? {}),
-    ...input,
-  }
-
-  if ('extendedProgression' in input) return merged
-
-  const { extendedProgression: _removed, ...withoutExtended } = merged
-  return withoutExtended
 }
 
 function applyStartingLevelMerge(
@@ -370,6 +357,14 @@ function buildProgressionUpdateSet(
     ops.$set[`${prefix}progression.extendedProgression.maxLevel`] = extended.maxLevel
   } else {
     ops.$unset[`${prefix}progression.extendedProgression`] = 1
+  }
+
+  if (progression.xpThresholds !== undefined) {
+    if (progression.xpThresholds.entries.length === 0) {
+      ops.$unset[`${prefix}progression.xpThresholds`] = 1
+    } else {
+      ops.$set[`${prefix}progression.xpThresholds`] = progression.xpThresholds
+    }
   }
 }
 
@@ -635,8 +630,10 @@ function assertMergedCharacterCreationPatch(
   merged: CampaignCharacterCreationPatch,
   rulesetId: SystemRulesetId,
 ): void {
-  const seed = getStandardStartingWealthRules(rulesetId)
-  const parsed = safeParseMergedCharacterCreationPatch(merged, seed)
+  const parsed = safeParseMergedCharacterCreationPatch(merged, {
+    startingWealth: getStandardStartingWealthRules(rulesetId),
+    systemXpEntries: getStandardXpProgression(rulesetId).entries,
+  })
 
   if (!parsed.success) {
     throw HttpError.badRequest('Invalid character creation patch.', parsed.error.flatten())

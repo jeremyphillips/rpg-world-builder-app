@@ -63,7 +63,7 @@ function RelaunchableModal(props: TableBuilderModalProps) {
         onOpenChange={setOpen}
         onSave={(table) => {
           setLastSaved(table)
-          props.onSave(table)
+          props.onSave?.(table)
         }}
       />
     </div>

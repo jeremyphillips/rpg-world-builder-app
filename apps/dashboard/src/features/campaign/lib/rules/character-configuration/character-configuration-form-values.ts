@@ -36,6 +36,11 @@ import {
   mapStandardArrayToFormValues,
 } from '@/lib/forms/standard-array-form-values'
 
+import {
+  buildXpThresholdsProgressionPatchInput,
+  mapXpThresholdOverridesToFormValues,
+} from './xp-thresholds-form-values'
+
 const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
 type BuildCharacterCreationPatchInputOptions = {
@@ -64,6 +69,75 @@ function resolveExtendedProgressionOverride(values: RulesValues) {
   return {
     tierName: values.extendedTierName?.trim() ?? '',
     maxLevel: values.extendedMaxLevel!,
+  }
+}
+
+function buildProgressionPatchInput(values: RulesValues) {
+  const xpThresholds =
+    buildXpThresholdsProgressionPatchInput(values.xpThresholdOverrides) ??
+    ({ entries: [] } as const)
+
+  return {
+    ...pickDefined({
+      maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
+    }),
+    xpThresholds,
+    extendedProgression: values.extendedProgressionEnabled
+      ? (resolveExtendedProgressionOverride(values) ?? null)
+      : null,
+  }
+}
+
+function assignOptionalCharacterCreationPatchFields(
+  patch: UpdateCampaignCharacterCreationInput,
+  values: RulesValues,
+  options: BuildCharacterCreationPatchInputOptions,
+): void {
+  const creatureTypePolicy = resolveCreatureTypePolicyOverride(values.allowedCharacterCreatureTypes)
+  if (creatureTypePolicy) {
+    patch.species = { creatureTypePolicy }
+  }
+
+  const multiclassing = resolveMulticlassingOverride(values, options)
+  if (multiclassing) {
+    patch.multiclassing = multiclassing
+  }
+
+  const subclassing = resolveSubclassingOverride(values, options)
+  if (subclassing) {
+    patch.subclasses = subclassing
+  }
+
+  const startingWealthSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
+  const startingWealthPatch = buildStartingWealthPatchInput(
+    values.startingWealth,
+    startingWealthSeed,
+  )
+  if (startingWealthPatch) {
+    patch.startingWealth = startingWealthPatch
+  }
+
+  if (options.includeDefaultLanguageProficiencies) {
+    Object.assign(
+      patch,
+      buildLanguageProficiencyPatchInput(
+        {
+          languageProficiencyGrants: values.languageProficiencyGrants,
+          languageProficiencyChoice: values.languageProficiencyChoice,
+        },
+        options.existingLanguageChoice,
+      ),
+    )
+  }
+
+  const levelZeroNpcs = buildLevelZeroNpcsPatchInput(values, options)
+  if (levelZeroNpcs) {
+    patch.levelZeroNpcs = levelZeroNpcs
+  }
+
+  const standardArray = buildStandardArrayPatchInput(values.standardArray)
+  if (standardArray) {
+    patch.standardArray = standardArray
   }
 }
 
@@ -178,6 +252,7 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
       resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID))
         .standardArray,
     ),
+    xpThresholdOverrides: [],
   }
 }
 
@@ -191,58 +266,8 @@ export function buildCharacterCreationPatchInput(
     importedCharacters: { policy: values.importedCharactersPolicy },
   }
 
-  const progression = pickDefined({
-    maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
-    extendedProgression: resolveExtendedProgressionOverride(values),
-  })
-  if (progression) patch.progression = progression
-
-  const creatureTypePolicy = resolveCreatureTypePolicyOverride(values.allowedCharacterCreatureTypes)
-  if (creatureTypePolicy) {
-    patch.species = { creatureTypePolicy }
-  }
-
-  const multiclassing = resolveMulticlassingOverride(values, options)
-  if (multiclassing) {
-    patch.multiclassing = multiclassing
-  }
-
-  const subclassing = resolveSubclassingOverride(values, options)
-  if (subclassing) {
-    patch.subclasses = subclassing
-  }
-
-  const startingWealthSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
-  const startingWealthPatch = buildStartingWealthPatchInput(
-    values.startingWealth,
-    startingWealthSeed,
-  )
-  if (startingWealthPatch) {
-    patch.startingWealth = startingWealthPatch
-  }
-
-  if (options.includeDefaultLanguageProficiencies) {
-    Object.assign(
-      patch,
-      buildLanguageProficiencyPatchInput(
-        {
-          languageProficiencyGrants: values.languageProficiencyGrants,
-          languageProficiencyChoice: values.languageProficiencyChoice,
-        },
-        options.existingLanguageChoice,
-      ),
-    )
-  }
-
-  const levelZeroNpcs = buildLevelZeroNpcsPatchInput(values, options)
-  if (levelZeroNpcs) {
-    patch.levelZeroNpcs = levelZeroNpcs
-  }
-
-  const standardArray = buildStandardArrayPatchInput(values.standardArray)
-  if (standardArray) {
-    patch.standardArray = standardArray
-  }
+  patch.progression = buildProgressionPatchInput(values)
+  assignOptionalCharacterCreationPatchFields(patch, values, options)
 
   return patch
 }
@@ -282,5 +307,8 @@ export function mapRulesetPatchToRulesValues(
     standardArray: mapStandardArrayToFormValues(characterCreation.standardArray),
     ...mapLanguageProficiencyRulesToFormValues(characterCreation),
     ...mapLevelZeroNpcsToFormValues(characterCreation.levelZeroNpcs),
+    xpThresholdOverrides: mapXpThresholdOverridesToFormValues(
+      characterCreation.progression.xpThresholds,
+    ),
   }
 }

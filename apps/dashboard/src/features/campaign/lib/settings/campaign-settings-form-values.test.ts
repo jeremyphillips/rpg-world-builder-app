@@ -75,6 +75,7 @@ const defaultMulticlassingFields = {
   subclassChoicesEnabled: DEFAULT_SUBCLASS_CHOICES_ENABLED,
   startingWealth: defaultStartingWealth,
   standardArray: standardArrayDefaultFormValues(),
+  xpThresholdOverrides: [] as { level: number; xpRequired: number }[],
   ...languageProficiencyRulesDefaultValues(),
   ...levelZeroNpcsDefaultFormValues(),
 } as const
@@ -126,6 +127,7 @@ describe('buildCharacterCreationPatchInput', () => {
     ).toEqual({
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
+      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
     })
   })
 
@@ -146,6 +148,7 @@ describe('buildCharacterCreationPatchInput', () => {
       importedCharacters: { policy: 'disabled' },
       progression: {
         extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
+        xpThresholds: { entries: [] },
       },
     })
   })
@@ -194,12 +197,14 @@ describe('buildCharacterCreationPatchInput', () => {
         subclassChoicesEnabled: true,
         startingWealth: defaultStartingWealth,
         standardArray: standardArrayDefaultFormValues(),
+        xpThresholdOverrides: [],
         ...languageProficiencyRulesDefaultValues(),
         ...levelZeroNpcsDefaultFormValues(),
       }),
     ).toEqual({
       startingLevel: 1,
       importedCharacters: { policy: 'disabled' },
+      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
       multiclassing: {
         enabled: false,
         requirements: {
@@ -240,6 +245,7 @@ describe('buildCharacterCreationPatchInput', () => {
           subclassChoicesEnabled: true,
           startingWealth: defaultStartingWealth,
           standardArray: standardArrayDefaultFormValues(),
+          xpThresholdOverrides: [],
           ...languageProficiencyRulesDefaultValues(),
           ...levelZeroNpcsDefaultFormValues(),
         },
@@ -302,6 +308,7 @@ describe('buildCharacterCreationPatchInputFromCreateWizard', () => {
     ).toEqual({
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
+      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
     })
   })
 })
@@ -322,6 +329,7 @@ describe('buildCreateCampaignInput', () => {
       characterCreation: {
         startingLevel: 3,
         importedCharacters: { policy: 'approval_required' },
+        progression: { xpThresholds: { entries: [] }, extendedProgression: null },
       },
       flavor: {
         playStyle: ['dungeon_crawl'],
@@ -372,6 +380,7 @@ describe('mapRulesetPatchToRulesValues', () => {
       subclassChoicesEnabled: true,
       startingWealth: defaultStartingWealth,
       standardArray: standardArrayDefaultFormValues(),
+      xpThresholdOverrides: [],
       ...languageProficiencyRulesDefaultValues(),
       ...levelZeroNpcsDefaultFormValues(),
     })

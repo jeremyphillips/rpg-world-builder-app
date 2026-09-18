@@ -1,4 +1,10 @@
-import type { SystemRulesetId, XpProgression } from '@rpg/contracts'
+import {
+  resolveEffectiveXpProgression,
+  type XpProgressionEntry,
+  type XpThresholdsPatch,
+  type SystemRulesetId,
+  type XpProgression,
+} from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
 import xpProgressionsRaw from './data/srd-cc-5.2.1/xp-progressions.json'
@@ -45,4 +51,20 @@ export function getStandardXpProgression(rulesetId: SystemRulesetId): XpProgress
   }
 
   return progression
+}
+
+/** Effective XP threshold entries for a campaign — system seed plus sparse overrides and derivation. */
+export function resolveCampaignXpProgressionEntries(
+  rulesetId: SystemRulesetId,
+  options: {
+    xpThresholds?: XpThresholdsPatch
+    effectiveMaxLevel: number
+  },
+): XpProgressionEntry[] {
+  const systemEntries = getStandardXpProgression(rulesetId).entries
+  return resolveEffectiveXpProgression({
+    systemEntries,
+    overrides: options.xpThresholds?.entries,
+    effectiveMaxLevel: options.effectiveMaxLevel,
+  })
 }

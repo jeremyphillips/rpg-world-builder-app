@@ -10,12 +10,16 @@ export type TableBuilderValuesHeaderProps = {
   columns: readonly TableBuilderColumnDraft[]
   gridTemplate: string
   includeLevel: boolean
+  includeActions?: boolean
+  includeRestoreActions?: boolean
 }
 
 export function TableBuilderValuesHeader({
   columns,
   gridTemplate,
   includeLevel,
+  includeActions = true,
+  includeRestoreActions = false,
 }: TableBuilderValuesHeaderProps) {
   return (
     <div
@@ -33,7 +37,8 @@ export function TableBuilderValuesHeader({
           </div>
         )
       })}
-      <div aria-hidden />
+      {includeRestoreActions ? <div aria-hidden /> : null}
+      {includeActions ? <div aria-hidden /> : null}
     </div>
   )
 }

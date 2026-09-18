@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { type SystemRulesetId } from '@rpg/contracts'
-import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
+import { resolveCampaignXpProgressionForRules } from '@/lib/campaign-xp-progression.lib'
 
 import { useBuildContext } from '@/features/character'
 import { useCharacterOrganizationReferences } from '@/features/character'
@@ -42,7 +42,10 @@ export function useCampaignCharacterDetail(
       character,
       catalogIndex,
       rules: context.characterCreationRules,
-      xpProgression: getStandardXpProgression(character.rulesetId as SystemRulesetId),
+      xpProgression: resolveCampaignXpProgressionForRules(
+        character.rulesetId as SystemRulesetId,
+        context.characterCreationRules.progression,
+      ),
       organizationReferences: organizationReferencesQuery.data,
       locationReferences: locationReferencesQuery.data,
     })

@@ -21,6 +21,7 @@ import {
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
   resolveProgressionTableColumnValue,
+  isProgressionContentTable,
   type CharacterClass,
   type ProgressionTableColumn,
 } from '@rpg/contracts'
@@ -53,7 +54,8 @@ function featureTableColumn(
   const feature = cls.features.find((entry) => entry.id === featureId)
   if (!feature || feature.kind === 'subclass-choice') return undefined
   const table = feature.tables?.find((entry) => entry.id === tableId)
-  return table?.columns.find((column: ProgressionTableColumn) => column.id === columnId)
+  if (!table || !isProgressionContentTable(table)) return undefined
+  return table.columns.find((column) => column.id === columnId)
 }
 
 function expectNumberColumnEntries(

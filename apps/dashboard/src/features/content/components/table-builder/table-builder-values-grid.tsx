@@ -1,4 +1,7 @@
 import type { TableBuilderColumnDraft } from '../../lib/table-builder/table-builder-draft'
+import { ProgressionTierSeparatorGridBand } from '../tables/progression-tier-separator'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { shouldRenderValuesTierSeparator } from '../../lib/table-builder/table-builder-tier-separator.lib'
 import { tableBuilderGroupEmptyClasses } from './table-builder.variants'
 import {
   tableBuilderValuesGridClasses,
@@ -18,6 +21,7 @@ export type TableBuilderValuesGridProps = {
   usedLevels: readonly number[]
   includeLevel: boolean
   gridTemplate: string
+  includeActions?: boolean
   addRowDisabled: boolean
   onLevelChange: (index: number, level: string) => void
   onAddRow: () => void
@@ -32,11 +36,17 @@ export function TableBuilderValuesGrid({
   usedLevels,
   includeLevel,
   gridTemplate,
+  includeActions = true,
   addRowDisabled,
   onLevelChange,
   onAddRow,
   onRemoveRow,
 }: TableBuilderValuesGridProps) {
+  const config = useTableBuilderHostConfig()
+  const extendedProgression = config.extendedProgression
+  const fixedLevels = config.rows === 'fixedLevels'
+  const includeRestoreActions = config.includeRowRestoreActions === true
+
   return (
     <>
       <div className={tableBuilderValuesScrollClasses}>
@@ -45,6 +55,8 @@ export function TableBuilderValuesGrid({
             columns={columns}
             gridTemplate={gridTemplate}
             includeLevel={includeLevel}
+            includeActions={includeActions}
+            includeRestoreActions={includeRestoreActions}
           />
 
           {fields.length === 0 ? (
@@ -52,18 +64,33 @@ export function TableBuilderValuesGrid({
           ) : (
             fields.map((field, index) => {
               const ownLevel = rowLevels[index]
+              const nextLevel = rowLevels[index + 1]
               const otherUsedLevels = new Set(usedLevels.filter((level) => level !== ownLevel))
+              const showTierSeparator =
+                fixedLevels &&
+                extendedProgression !== undefined &&
+                shouldRenderValuesTierSeparator(
+                  ownLevel,
+                  extendedProgression.standardMaxLevel,
+                  extendedProgression.tierName,
+                  nextLevel,
+                )
+
               return (
-                <TableBuilderValuesRow
-                  key={field.id}
-                  index={index}
-                  columns={columns}
-                  includeLevel={includeLevel}
-                  allowedLevels={allowedLevels}
-                  usedLevels={otherUsedLevels}
-                  onLevelChange={onLevelChange}
-                  onRemove={onRemoveRow}
-                />
+                <div key={field.id} className="contents">
+                  <TableBuilderValuesRow
+                    index={index}
+                    columns={columns}
+                    includeLevel={includeLevel}
+                    allowedLevels={allowedLevels}
+                    usedLevels={otherUsedLevels}
+                    onLevelChange={onLevelChange}
+                    onRemove={onRemoveRow}
+                  />
+                  {showTierSeparator ? (
+                    <ProgressionTierSeparatorGridBand tierName={extendedProgression.tierName} />
+                  ) : null}
+                </div>
               )
             })
           )}
