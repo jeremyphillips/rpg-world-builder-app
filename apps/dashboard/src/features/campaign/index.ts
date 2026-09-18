@@ -154,3 +154,9 @@ export {
   resolveCampaignTopbarTitleState,
   type CampaignTopbarTitleState,
 } from './lib/navigation/resolve-campaign-topbar-title-state'
+export {
+  applyExtendedXpIncrementToDraft,
+  buildXpThresholdsDraft,
+  buildXpThresholdsHostConfig,
+  resolveSystemXpEntries,
+} from './lib/rules/character-configuration/xp-thresholds-field.lib'
