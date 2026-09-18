@@ -127,7 +127,7 @@ describe('buildCharacterCreationPatchInput', () => {
     ).toEqual({
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
-      progression: { xpThresholds: { entries: [] } },
+      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
     })
   })
 
@@ -204,7 +204,7 @@ describe('buildCharacterCreationPatchInput', () => {
     ).toEqual({
       startingLevel: 1,
       importedCharacters: { policy: 'disabled' },
-      progression: { xpThresholds: { entries: [] } },
+      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
       multiclassing: {
         enabled: false,
         requirements: {
@@ -308,7 +308,7 @@ describe('buildCharacterCreationPatchInputFromCreateWizard', () => {
     ).toEqual({
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
-      progression: { xpThresholds: { entries: [] } },
+      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
     })
   })
 })
@@ -329,7 +329,7 @@ describe('buildCreateCampaignInput', () => {
       characterCreation: {
         startingLevel: 3,
         importedCharacters: { policy: 'approval_required' },
-        progression: { xpThresholds: { entries: [] } },
+        progression: { xpThresholds: { entries: [] }, extendedProgression: null },
       },
       flavor: {
         playStyle: ['dungeon_crawl'],

@@ -87,7 +87,8 @@ export const DEFAULT_CREATURE_TYPE_POLICY = {
 const campaignCharacterCreationProgressionPatchSchema = z
   .object({
     maxCharacterLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL).optional(),
-    extendedProgression: extendedProgressionSchema.optional(),
+    /** Null clears extended progression on PATCH; omit to leave the stored value unchanged. */
+    extendedProgression: extendedProgressionSchema.nullable().optional(),
     xpThresholds: xpThresholdsPatchSchema.optional(),
   })
   .strict()
@@ -329,7 +330,7 @@ function resolveCharacterCreationProgression(
 
   return {
     maxCharacterLevel: standardMaxCharacterLevel,
-    ...(extendedProgression !== undefined ? { extendedProgression } : {}),
+    ...(extendedProgression != null ? { extendedProgression } : {}),
     ...(xpThresholds !== undefined ? { xpThresholds } : {}),
   }
 }

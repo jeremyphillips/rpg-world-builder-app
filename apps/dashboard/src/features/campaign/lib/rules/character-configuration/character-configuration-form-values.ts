@@ -72,6 +72,75 @@ function resolveExtendedProgressionOverride(values: RulesValues) {
   }
 }
 
+function buildProgressionPatchInput(values: RulesValues) {
+  const xpThresholds =
+    buildXpThresholdsProgressionPatchInput(values.xpThresholdOverrides) ??
+    ({ entries: [] } as const)
+
+  return {
+    ...pickDefined({
+      maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
+    }),
+    xpThresholds,
+    extendedProgression: values.extendedProgressionEnabled
+      ? (resolveExtendedProgressionOverride(values) ?? null)
+      : null,
+  }
+}
+
+function assignOptionalCharacterCreationPatchFields(
+  patch: UpdateCampaignCharacterCreationInput,
+  values: RulesValues,
+  options: BuildCharacterCreationPatchInputOptions,
+): void {
+  const creatureTypePolicy = resolveCreatureTypePolicyOverride(values.allowedCharacterCreatureTypes)
+  if (creatureTypePolicy) {
+    patch.species = { creatureTypePolicy }
+  }
+
+  const multiclassing = resolveMulticlassingOverride(values, options)
+  if (multiclassing) {
+    patch.multiclassing = multiclassing
+  }
+
+  const subclassing = resolveSubclassingOverride(values, options)
+  if (subclassing) {
+    patch.subclasses = subclassing
+  }
+
+  const startingWealthSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
+  const startingWealthPatch = buildStartingWealthPatchInput(
+    values.startingWealth,
+    startingWealthSeed,
+  )
+  if (startingWealthPatch) {
+    patch.startingWealth = startingWealthPatch
+  }
+
+  if (options.includeDefaultLanguageProficiencies) {
+    Object.assign(
+      patch,
+      buildLanguageProficiencyPatchInput(
+        {
+          languageProficiencyGrants: values.languageProficiencyGrants,
+          languageProficiencyChoice: values.languageProficiencyChoice,
+        },
+        options.existingLanguageChoice,
+      ),
+    )
+  }
+
+  const levelZeroNpcs = buildLevelZeroNpcsPatchInput(values, options)
+  if (levelZeroNpcs) {
+    patch.levelZeroNpcs = levelZeroNpcs
+  }
+
+  const standardArray = buildStandardArrayPatchInput(values.standardArray)
+  if (standardArray) {
+    patch.standardArray = standardArray
+  }
+}
+
 function resolveCreatureTypePolicyOverride(
   allowedCharacterCreatureTypes: RulesValues['allowedCharacterCreatureTypes'],
 ) {
@@ -197,65 +266,8 @@ export function buildCharacterCreationPatchInput(
     importedCharacters: { policy: values.importedCharactersPolicy },
   }
 
-  const progressionBase = pickDefined({
-    maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
-    extendedProgression: resolveExtendedProgressionOverride(values),
-  })
-  const xpThresholds =
-    buildXpThresholdsProgressionPatchInput(values.xpThresholdOverrides) ??
-    ({ entries: [] } as const)
-  const progression = {
-    ...(progressionBase ?? {}),
-    xpThresholds,
-  }
-  if (Object.keys(progression).length > 0) patch.progression = progression
-
-  const creatureTypePolicy = resolveCreatureTypePolicyOverride(values.allowedCharacterCreatureTypes)
-  if (creatureTypePolicy) {
-    patch.species = { creatureTypePolicy }
-  }
-
-  const multiclassing = resolveMulticlassingOverride(values, options)
-  if (multiclassing) {
-    patch.multiclassing = multiclassing
-  }
-
-  const subclassing = resolveSubclassingOverride(values, options)
-  if (subclassing) {
-    patch.subclasses = subclassing
-  }
-
-  const startingWealthSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
-  const startingWealthPatch = buildStartingWealthPatchInput(
-    values.startingWealth,
-    startingWealthSeed,
-  )
-  if (startingWealthPatch) {
-    patch.startingWealth = startingWealthPatch
-  }
-
-  if (options.includeDefaultLanguageProficiencies) {
-    Object.assign(
-      patch,
-      buildLanguageProficiencyPatchInput(
-        {
-          languageProficiencyGrants: values.languageProficiencyGrants,
-          languageProficiencyChoice: values.languageProficiencyChoice,
-        },
-        options.existingLanguageChoice,
-      ),
-    )
-  }
-
-  const levelZeroNpcs = buildLevelZeroNpcsPatchInput(values, options)
-  if (levelZeroNpcs) {
-    patch.levelZeroNpcs = levelZeroNpcs
-  }
-
-  const standardArray = buildStandardArrayPatchInput(values.standardArray)
-  if (standardArray) {
-    patch.standardArray = standardArray
-  }
+  patch.progression = buildProgressionPatchInput(values)
+  assignOptionalCharacterCreationPatchFields(patch, values, options)
 
   return patch
 }

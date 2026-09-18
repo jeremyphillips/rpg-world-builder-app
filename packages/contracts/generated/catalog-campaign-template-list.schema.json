@@ -271,24 +271,31 @@
           "maximum": 100
         },
         "extendedProgression": {
-          "type": "object",
-          "properties": {
-            "tierName": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 50
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "tierName": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 50
+                },
+                "maxLevel": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 100
+                }
+              },
+              "required": [
+                "tierName",
+                "maxLevel"
+              ],
+              "additionalProperties": false
             },
-            "maxLevel": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100
+            {
+              "type": "null"
             }
-          },
-          "required": [
-            "tierName",
-            "maxLevel"
-          ],
-          "additionalProperties": false
+          ]
         },
         "xpThresholds": {
           "type": "object",

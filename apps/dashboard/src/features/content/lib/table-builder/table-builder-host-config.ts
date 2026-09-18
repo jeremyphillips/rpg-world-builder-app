@@ -19,6 +19,13 @@ export type TableBuilderCellPresentationContext = {
   draftValue: TableBuilderCellDraft | undefined
   /** Levels whose draft cells have been blurred — gates invalid/blocked editor state. */
   committedDraftLevels?: ReadonlySet<number>
+  editorRowStates?: readonly TableBuilderHostEditorRowState[]
+}
+
+export type TableBuilderCommittedDraftLevelsContext = {
+  draft: TableBuilderFormValues
+  columnKey: string
+  touchedFieldPaths: readonly string[]
 }
 
 export type TableBuilderCellPresentation = {
@@ -40,6 +47,22 @@ export type TableBuilderRowPresentationContext = {
   rowIndex: number
   level?: number
   committedDraftLevels?: ReadonlySet<number>
+  /** When provided, host resolvers skip recomputing editor row state per cell. */
+  editorRowStates?: readonly TableBuilderHostEditorRowState[]
+}
+
+export type TableBuilderRowRestoreActionKind = 'system' | 'derived'
+
+export type TableBuilderHostEditorRowState = {
+  level: number
+  readOnly?: boolean
+  blockedByLevel?: number
+  blockedHint?: string
+  restoreActionKind?: TableBuilderRowRestoreActionKind
+  progressionError?: string
+  displayPlaceholder?: string
+  provenanceBadge?: 'derived'
+  formatGrouped?: boolean
 }
 
 export type TableBuilderRowPresentation = {
@@ -49,7 +72,7 @@ export type TableBuilderRowPresentation = {
 }
 
 export type TableBuilderRowRestoreAction = {
-  kind: 'system' | 'derived'
+  kind: TableBuilderRowRestoreActionKind
   ariaLabel: string
   tooltip: string
 }
@@ -91,6 +114,13 @@ export type TableBuilderHostConfig = {
   columns?: TableBuilderColumnsMode
   rows?: TableBuilderRowsMode
   fixedColumns?: readonly Pick<TableBuilderColumnDraft, 'label' | 'valueType' | 'format'>[]
+  resolveCommittedDraftLevels?: (
+    ctx: TableBuilderCommittedDraftLevelsContext,
+  ) => ReadonlySet<number> | undefined
+  resolveEditorRowStates?: (ctx: {
+    draft: TableBuilderFormValues
+    committedDraftLevels?: ReadonlySet<number>
+  }) => readonly TableBuilderHostEditorRowState[] | undefined
   resolveCellPresentation?: (
     ctx: TableBuilderCellPresentationContext,
   ) => TableBuilderCellPresentation | undefined

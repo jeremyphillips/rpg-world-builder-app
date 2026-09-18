@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { type SystemRulesetId } from '@rpg/contracts'
-import { resolveCampaignXpProgressionForRules } from '../../lib/campaign-xp-progression.lib'
+import { resolveCampaignXpProgressionForRules } from '@/lib/campaign-xp-progression.lib'
 
 import { useCanManageCampaign } from '@/features/campaign'
 

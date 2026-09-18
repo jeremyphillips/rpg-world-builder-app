@@ -4,10 +4,6 @@ import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 import type { FieldPath } from 'react-hook-form'
 import { formatFieldMessage } from '@rpg/contracts'
 import {
-  buildCommittedDraftLevelsForXpColumn,
-  flattenFormTouchedPaths,
-} from '@/features/campaign/lib/rules/character-configuration/xp-thresholds-field.lib'
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -20,6 +16,7 @@ import {
   iconGhostControlVariants,
 } from '@rpg/ui'
 
+import { flattenFormTouchedPaths } from '../../lib/table-builder/table-builder-form-touched.lib'
 import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
 import type {
   TableBuilderColumnDraft,
@@ -169,26 +166,40 @@ function useTableBuilderValuesRowState(index: number, columns: readonly TableBui
   const parsedLevel = parseLevelDraft(level)
   const fixedLevels = config.rows === 'fixedLevels'
   const levelError = form.getFieldState(`rows.${index}.level`, form.formState).error
-  const committedDraftLevels = useMemo(() => {
-    const columnKey = draft.columns[0]?.key
-    if (columnKey === undefined) return undefined
-    return buildCommittedDraftLevelsForXpColumn(
-      draft,
-      columnKey,
-      flattenFormTouchedPaths(touchedFields),
-    )
-  }, [draft, touchedFields])
+  const touchedFieldPaths = useMemo(() => flattenFormTouchedPaths(touchedFields), [touchedFields])
+  const columnKey = draft.columns[0]?.key
+  const committedDraftLevels = useMemo(
+    () =>
+      columnKey === undefined
+        ? undefined
+        : config.resolveCommittedDraftLevels?.({
+            draft,
+            columnKey,
+            touchedFieldPaths,
+          }),
+    [config, columnKey, draft, touchedFieldPaths],
+  )
+  const editorRowStates = useMemo(
+    () =>
+      config.resolveEditorRowStates?.({
+        draft,
+        committedDraftLevels,
+      }),
+    [config, draft, committedDraftLevels],
+  )
   const rowPresentation = config.resolveRowPresentation?.({
     draft,
     rowIndex: index,
     level: parsedLevel,
     committedDraftLevels,
+    editorRowStates,
   })
   const restoreAction = config.resolveRowRestoreAction?.({
     draft,
     rowIndex: index,
     level: parsedLevel,
     committedDraftLevels,
+    editorRowStates,
   })
 
   function handleRestore() {
@@ -205,6 +216,8 @@ function useTableBuilderValuesRowState(index: number, columns: readonly TableBui
     parsedLevel,
     fixedLevels,
     levelError,
+    committedDraftLevels,
+    editorRowStates,
     rowPresentation,
     restoreAction,
     includeRestoreActions: config.includeRowRestoreActions === true,
@@ -227,6 +240,8 @@ export function TableBuilderValuesRow({
     parsedLevel,
     fixedLevels,
     levelError,
+    committedDraftLevels,
+    editorRowStates,
     rowPresentation,
     restoreAction,
     includeRestoreActions,
@@ -269,6 +284,8 @@ export function TableBuilderValuesRow({
           level={parsedLevel}
           ariaLabel={cellAriaLabel(column, columnIndex, parsedLevel)}
           rowReadOnly={rowPresentation?.readOnly === true}
+          committedDraftLevels={committedDraftLevels}
+          editorRowStates={editorRowStates}
         />
       ))}
 

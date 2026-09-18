@@ -82,6 +82,25 @@ describe('NumberInput', () => {
     await expectNoAxeViolations(container)
   })
 
+  it('applies composite shell classes when embedded in grouped chrome', () => {
+    render(
+      <NumberInput
+        aria-label="Threshold"
+        size="sm"
+        grouped
+        hideSteppers
+        compositeShell
+        formatGrouped
+        value={3000}
+        onChange={() => {}}
+      />,
+    )
+
+    const input = screen.getByLabelText('Threshold')
+    expect(input).toHaveClass('rounded-l-md', 'rounded-r-none')
+    expect(input.closest('.group')).toHaveClass('flex-1', 'border-0', 'bg-transparent')
+  })
+
   describe('formatGrouped', () => {
     it('renders a text input with decimal input mode', () => {
       render(<NumberInput aria-label="Cost" formatGrouped value={3000} onChange={() => {}} />)

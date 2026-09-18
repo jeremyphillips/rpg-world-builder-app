@@ -12,6 +12,13 @@ import {
 
 export const numberInputRootVariants = cva('group relative inline-flex')
 
+/** Root classes when embedded inside a composite input shell (e.g. table-builder derived badge). */
+export const numberInputCompositeShellRootClasses =
+  'min-w-0 w-full flex-1 border-0 bg-transparent shadow-none'
+
+/** Field classes when embedded inside a composite input shell. */
+export const numberInputCompositeShellFieldClasses = 'rounded-l-md rounded-r-none'
+
 const groupedNumberInputFieldSizeClasses = {
   sm: cn(fieldGroupedControlSizeClasses.sm, fieldDigitTrailingPaddingClasses.sm),
   md: cn(fieldGroupedControlSizeClasses.md, fieldDigitTrailingPaddingClasses.md),

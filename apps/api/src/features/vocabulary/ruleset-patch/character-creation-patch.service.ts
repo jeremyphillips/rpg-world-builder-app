@@ -43,6 +43,7 @@ import type {
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 
+import { mergeProgressionPatch } from './character-creation-patch.merge'
 import { assertCreatureTypesActiveInCampaign } from '../lib/assert-campaign-creature-types'
 import { HttpError } from '../../../lib/http-error'
 import {
@@ -104,29 +105,6 @@ function mergeMulticlassingPatch(
   }
 
   return merged
-}
-
-function mergeProgressionPatch(
-  existing: CampaignCharacterCreationPatch['progression'] | undefined,
-  input: NonNullable<UpdateCampaignCharacterCreationInput['progression']>,
-): NonNullable<CampaignCharacterCreationPatch['progression']> {
-  const merged = {
-    ...(existing ?? {}),
-    ...input,
-  }
-
-  if ('extendedProgression' in input && 'xpThresholds' in input) return merged
-
-  let result = merged
-  if (!('extendedProgression' in input)) {
-    const { extendedProgression: _removed, ...withoutExtended } = result
-    result = withoutExtended
-  }
-  if (!('xpThresholds' in input)) {
-    const { xpThresholds: _removed, ...withoutXpThresholds } = result
-    result = withoutXpThresholds
-  }
-  return result
 }
 
 function applyStartingLevelMerge(

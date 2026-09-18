@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { type SystemRulesetId } from '@rpg/contracts'
-import { resolveCampaignXpProgressionForRules } from '@/features/character/lib/campaign-xp-progression.lib'
+import { resolveCampaignXpProgressionForRules } from '@/lib/campaign-xp-progression.lib'
 
 import { useBuildContext } from '@/features/character'
 import { useCharacterOrganizationReferences } from '@/features/character'

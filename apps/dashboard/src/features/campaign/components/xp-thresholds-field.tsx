@@ -4,8 +4,7 @@ import { resolveXpThresholdsSummary, type SystemRulesetId } from '@rpg/contracts
 import { Pencil, Table2 } from 'lucide-react'
 import { Button, IconBox, SemanticText, Text } from '@rpg/ui'
 
-import { TableBuilderModal } from '@/features/content/components/table-builder/table-builder-modal'
-import type { TableBuilderFormValues } from '@/features/content/lib/table-builder/table-builder-draft'
+import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 
 import {
   buildEffectiveMaxLevel,

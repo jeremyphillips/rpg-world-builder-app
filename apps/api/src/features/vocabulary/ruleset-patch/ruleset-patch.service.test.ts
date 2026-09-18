@@ -95,7 +95,7 @@ describe('updateCharacterCreationPatch', () => {
       await expectHttpErrorAsync(
         () =>
           updateCharacterCreationPatch(campaignId, {
-            progression: { maxCharacterLevel: 20 },
+            progression: { maxCharacterLevel: 20, extendedProgression: null },
           }),
         { status: 400 },
       )
@@ -107,7 +107,7 @@ describe('updateCharacterCreationPatch', () => {
       await enableExtendedProgressionAt30(campaignId)
 
       const patch = await updateCharacterCreationPatch(campaignId, {
-        progression: { maxCharacterLevel: 20 },
+        progression: { maxCharacterLevel: 20, extendedProgression: null },
         startingWealth: { tiers: withLastTierMaxLevel(20) },
       })
 

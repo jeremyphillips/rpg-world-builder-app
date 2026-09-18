@@ -9,6 +9,8 @@ import { resolveDigitInlineSizeClasses } from './field-digit-metrics'
 import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
 import { fieldControlVariants } from './field-control.variants'
 import {
+  numberInputCompositeShellFieldClasses,
+  numberInputCompositeShellRootClasses,
   numberInputFieldVariants,
   numberInputRootVariants,
   type NumberInputDigits,
@@ -39,6 +41,8 @@ export interface NumberInputProps
   formatGrouped?: boolean
   /** When true, omits stepper controls and trailing stepper padding. */
   hideSteppers?: boolean
+  /** When true with grouped + hideSteppers, styles for embedding in a composite input shell. */
+  compositeShell?: boolean
 }
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
@@ -57,6 +61,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       digits,
       formatGrouped = false,
       hideSteppers = false,
+      compositeShell = false,
       value,
       defaultValue,
       onChange,
@@ -93,6 +98,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         className={cn(
           numberInputRootVariants(),
           digits ? resolveDigitInlineSizeClasses(digits, resolvedSize) : 'w-full',
+          compositeShell && numberInputCompositeShellRootClasses,
           rootClassName,
         )}
       >
@@ -106,7 +112,8 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             hideSteppers && grouped
               ? cn(
                   fieldGroupedControlSizeClasses[resolvedSize],
-                  'min-w-0 w-full border-0 bg-transparent shadow-none rounded-none focus-visible:ring-0 focus-visible:ring-offset-0',
+                  'min-w-0 w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
+                  compositeShell ? numberInputCompositeShellFieldClasses : 'rounded-none',
                 )
               : hideSteppers
                 ? cn(fieldControlVariants({ size: resolvedSize }), numberInputAppearanceClasses)

@@ -18,23 +18,22 @@ import {
 import { parseGroupedNumber } from '@rpg/contracts/primitives'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
 
-import { createFixedLevelsTableBuilderDraft } from '@/features/content/lib/table-builder/create-fixed-levels-table-builder-draft'
 import {
+  createFixedLevelsTableBuilderDraft,
+  type TableBuilderCellPresentation,
+  type TableBuilderCellPresentationContext,
+  type TableBuilderDraftValidationResult,
+  type TableBuilderExtendedProgression,
+  type TableBuilderExtendedProgressionAction,
+  type TableBuilderFormValues,
+  type TableBuilderHostConfig,
+  type TableBuilderHostEditorRowState,
+  type TableBuilderRowPresentation,
+  type TableBuilderRowPresentationContext,
+  type TableBuilderRowRestoreAction,
   isTableBuilderCellBlank,
   parseLevelDraft,
-  type TableBuilderFormValues,
-} from '@/features/content/lib/table-builder/table-builder-draft'
-import type {
-  TableBuilderCellPresentation,
-  TableBuilderCellPresentationContext,
-  TableBuilderDraftValidationResult,
-  TableBuilderExtendedProgression,
-  TableBuilderExtendedProgressionAction,
-  TableBuilderHostConfig,
-  TableBuilderRowPresentation,
-  TableBuilderRowPresentationContext,
-  TableBuilderRowRestoreAction,
-} from '@/features/content/lib/table-builder/table-builder-host-config'
+} from '@/lib/table-builder'
 
 export const XP_THRESHOLDS_TABLE_NAME = 'Experience thresholds'
 export const XP_REQUIRED_COLUMN_LABEL = 'XP required'
@@ -168,35 +167,6 @@ function resolveColumnKey(draft: TableBuilderFormValues): string | undefined {
   return draft.columns[0]?.key
 }
 
-function walkTouchedFormPaths(node: unknown, prefix: string, touchedPaths: string[]): void {
-  if (node === true) {
-    if (prefix) touchedPaths.push(prefix)
-    return
-  }
-
-  if (Array.isArray(node)) {
-    node.forEach((entry, index) => {
-      if (entry === undefined || entry === null) return
-      walkTouchedFormPaths(entry, `${prefix}.${index}`, touchedPaths)
-    })
-    return
-  }
-
-  if (typeof node !== 'object' || node === null) return
-
-  for (const [key, value] of Object.entries(node)) {
-    if (value === undefined || value === null) continue
-    const nextPath = prefix ? `${prefix}.${key}` : key
-    walkTouchedFormPaths(value, nextPath, touchedPaths)
-  }
-}
-
-export function flattenFormTouchedPaths(touchedFields: unknown): string[] {
-  const paths: string[] = []
-  walkTouchedFormPaths(touchedFields, '', paths)
-  return paths
-}
-
 /** Maps blurred XP threshold cells to their semantic levels. */
 export function buildCommittedDraftLevelsForXpColumn(
   draft: TableBuilderFormValues,
@@ -245,6 +215,44 @@ function findEditorRowForLevel(
   return rows.find((row) => row.level === level)
 }
 
+function toHostEditorRowState(row: XpThresholdEditorRowState): TableBuilderHostEditorRowState {
+  return {
+    level: row.level,
+    readOnly: row.readOnly,
+    blockedByLevel: row.blockedByLevel,
+    blockedHint: row.blockedHint,
+    restoreActionKind: row.restoreAction,
+    progressionError: row.progressionError,
+    displayPlaceholder: row.displayPlaceholder,
+    provenanceBadge:
+      row.provenance === 'derived' && row.displayPlaceholder !== '—' ? 'derived' : undefined,
+    formatGrouped: true,
+  }
+}
+
+function findHostEditorRowForLevel(
+  rows: readonly TableBuilderHostEditorRowState[] | undefined,
+  level: number | undefined,
+): TableBuilderHostEditorRowState | undefined {
+  if (level === undefined || rows === undefined) return undefined
+  return rows.find((row) => row.level === level)
+}
+
+function resolveHostEditorRowStates(
+  ctx: {
+    draft: TableBuilderFormValues
+    committedDraftLevels?: ReadonlySet<number>
+    editorRowStates?: readonly TableBuilderHostEditorRowState[]
+  },
+  hostContext: XpThresholdHostContext,
+): readonly TableBuilderHostEditorRowState[] {
+  if (ctx.editorRowStates !== undefined) return ctx.editorRowStates
+
+  return resolveXpThresholdEditorRows(ctx.draft, hostContext, ctx.committedDraftLevels).map(
+    toHostEditorRowState,
+  )
+}
+
 export function resolveXpThresholdRowPresentation(
   ctx: TableBuilderRowPresentationContext,
   systemEntries: readonly XpProgressionEntry[],
@@ -254,18 +262,12 @@ export function resolveXpThresholdRowPresentation(
   const level = ctx.level
   if (level === undefined) return undefined
 
-  const editorRow = findEditorRowForLevel(
-    resolveXpThresholdEditorRows(
-      ctx.draft,
-      {
-        systemEntries,
-        dormantOverrides,
-        effectiveMaxLevel,
-      },
-      ctx.committedDraftLevels,
-    ),
-    level,
-  )
+  const hostContext: XpThresholdHostContext = {
+    systemEntries,
+    dormantOverrides,
+    effectiveMaxLevel,
+  }
+  const editorRow = findHostEditorRowForLevel(resolveHostEditorRowStates(ctx, hostContext), level)
   if (editorRow === undefined) return undefined
 
   return {
@@ -284,18 +286,12 @@ export function resolveXpThresholdCellPresentation(
   const level = ctx.level
   if (level === undefined) return undefined
 
-  const editorRow = findEditorRowForLevel(
-    resolveXpThresholdEditorRows(
-      ctx.draft,
-      {
-        systemEntries,
-        dormantOverrides,
-        effectiveMaxLevel,
-      },
-      ctx.committedDraftLevels,
-    ),
-    level,
-  )
+  const hostContext: XpThresholdHostContext = {
+    systemEntries,
+    dormantOverrides,
+    effectiveMaxLevel,
+  }
+  const editorRow = findHostEditorRowForLevel(resolveHostEditorRowStates(ctx, hostContext), level)
   if (editorRow === undefined) return undefined
 
   const presentation: TableBuilderCellPresentation = { formatGrouped: true }
@@ -322,7 +318,7 @@ export function resolveXpThresholdCellPresentation(
     presentation.placeholder = editorRow.displayPlaceholder
   }
 
-  if (editorRow.provenance === 'derived' && editorRow.displayPlaceholder !== '—') {
+  if (editorRow.provenanceBadge === 'derived') {
     presentation.provenanceBadge = 'derived'
   }
 
@@ -338,23 +334,17 @@ export function resolveXpThresholdRowRestoreAction(
   const level = ctx.level
   if (level === undefined) return undefined
 
-  const editorRow = findEditorRowForLevel(
-    resolveXpThresholdEditorRows(
-      ctx.draft,
-      {
-        systemEntries,
-        dormantOverrides,
-        effectiveMaxLevel,
-      },
-      ctx.committedDraftLevels,
-    ),
-    level,
-  )
-  if (editorRow?.restoreAction === undefined) return undefined
+  const hostContext: XpThresholdHostContext = {
+    systemEntries,
+    dormantOverrides,
+    effectiveMaxLevel,
+  }
+  const editorRow = findHostEditorRowForLevel(resolveHostEditorRowStates(ctx, hostContext), level)
+  if (editorRow?.restoreActionKind === undefined) return undefined
 
-  const label = XP_THRESHOLD_RESTORE_ACTION_LABELS[editorRow.restoreAction]
+  const label = XP_THRESHOLD_RESTORE_ACTION_LABELS[editorRow.restoreActionKind]
   return {
-    kind: editorRow.restoreAction,
+    kind: editorRow.restoreActionKind,
     ariaLabel: label,
     tooltip: label,
   }
@@ -506,6 +496,12 @@ export function buildXpThresholdsHostConfig(input: {
     rows: 'fixedLevels',
     fixedColumns: [{ label: XP_REQUIRED_COLUMN_LABEL, valueType: 'number', format: 'plain' }],
     extendedProgression,
+    resolveCommittedDraftLevels: (ctx) =>
+      buildCommittedDraftLevelsForXpColumn(ctx.draft, ctx.columnKey, ctx.touchedFieldPaths),
+    resolveEditorRowStates: (ctx) =>
+      resolveXpThresholdEditorRows(ctx.draft, hostContext, ctx.committedDraftLevels).map(
+        toHostEditorRowState,
+      ),
     resolveCellPresentation: (ctx) =>
       resolveXpThresholdCellPresentation(
         ctx,

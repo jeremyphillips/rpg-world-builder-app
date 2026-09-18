@@ -5,6 +5,7 @@ import { absoluteLevelSchema } from '../../primitives/level'
 import { formatGroupedNumber } from '../../primitives/number-format'
 import type { XpProgressionEntry } from '../../primitives/xp-progression'
 import { xpRequiredForLevel } from '../../primitives/xp-progression'
+import { xpProgressionValidationMessages } from '../../content/xp-progression'
 
 // ---------------------------------------------------------------------------
 // XP thresholds — campaign rules overrides for character level advancement.
@@ -54,14 +55,8 @@ export const xpThresholdsValidationMessages = {
     'validation.xpThresholds.levelOneNotOverridable',
     () => 'Level 1 XP cannot be overridden.',
   ),
-  increasingXp: defineMessage(
-    'validation.xpThresholds.increasingXp',
-    () => 'XP required must increase with each level.',
-  ),
-  levelOneZeroXp: defineMessage(
-    'validation.xpThresholds.levelOneZeroXp',
-    () => 'Level 1 must require 0 XP.',
-  ),
+  increasingXp: xpProgressionValidationMessages.increasingXp,
+  levelOneZeroXp: xpProgressionValidationMessages.levelOneZeroXp,
   minimumThreshold: defineMessage<{ minimum: number }>(
     'validation.xpThresholds.minimumThreshold',
     ({ minimum }) => `Enter ${formatGroupedNumber(minimum)} or more.`,

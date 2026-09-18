@@ -9,10 +9,6 @@ import {
   type FieldPath,
   type UseFormReturn,
 } from 'react-hook-form'
-import {
-  buildCommittedDraftLevelsForXpColumn,
-  flattenFormTouchedPaths,
-} from '@/features/campaign/lib/rules/character-configuration/xp-thresholds-field.lib'
 import { DIE_FACES, formatFieldMessage } from '@rpg/contracts'
 import {
   Badge,
@@ -29,6 +25,7 @@ import {
   TooltipTrigger,
 } from '@rpg/ui'
 
+import { flattenFormTouchedPaths } from '../../lib/table-builder/table-builder-form-touched.lib'
 import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
 import type {
   TableBuilderCellDraft,
@@ -36,7 +33,10 @@ import type {
   TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
 import { isTableBuilderCellBlank } from '../../lib/table-builder/table-builder-draft'
-import type { TableBuilderCellPresentation } from '../../lib/table-builder/table-builder-host-config'
+import type {
+  TableBuilderCellPresentation,
+  TableBuilderHostEditorRowState,
+} from '../../lib/table-builder/table-builder-host-config'
 import {
   tableBuilderDerivedBadgeDividerClasses,
   tableBuilderDerivedBadgeSegmentClasses,
@@ -63,6 +63,8 @@ export type TableBuilderValueCellProps = {
   level: number | undefined
   ariaLabel: string
   rowReadOnly?: boolean
+  committedDraftLevels?: ReadonlySet<number>
+  editorRowStates?: readonly TableBuilderHostEditorRowState[]
 }
 
 function DerivedBadge() {
@@ -155,8 +157,7 @@ function TableBuilderGroupedScalarValueInput({
       onBlur={onBlur}
       onChange={onChange}
       value={value ?? ''}
-      rootClassName="min-w-0 w-full flex-1 border-0 bg-transparent shadow-none"
-      className={tableBuilderDerivedInputFieldClasses}
+      compositeShell
     />
   )
 
@@ -262,6 +263,8 @@ function useTableBuilderScalarValueCell(
   column: TableBuilderColumnDraft,
   level: number | undefined,
   ariaLabel: string,
+  committedDraftLevelsFromRow?: ReadonlySet<number>,
+  editorRowStatesFromRow?: readonly TableBuilderHostEditorRowState[],
 ) {
   const config = useTableBuilderHostConfig()
   const form = useFormContext<TableBuilderFormValues>()
@@ -279,14 +282,28 @@ function useTableBuilderScalarValueCell(
     columns: liveDraft.columns ?? draft.columns,
     rows: liveDraft.rows ?? draft.rows,
   }
+  const touchedFieldPaths = React.useMemo(
+    () => flattenFormTouchedPaths(touchedFields),
+    [touchedFields],
+  )
   const committedDraftLevels = React.useMemo(
     () =>
-      buildCommittedDraftLevelsForXpColumn(
-        presentationDraft,
-        column.key,
-        flattenFormTouchedPaths(touchedFields),
-      ),
-    [column.key, presentationDraft, touchedFields],
+      committedDraftLevelsFromRow ??
+      config.resolveCommittedDraftLevels?.({
+        draft: presentationDraft,
+        columnKey: column.key,
+        touchedFieldPaths,
+      }),
+    [committedDraftLevelsFromRow, config, column.key, presentationDraft, touchedFieldPaths],
+  )
+  const editorRowStates = React.useMemo(
+    () =>
+      editorRowStatesFromRow ??
+      config.resolveEditorRowStates?.({
+        draft: presentationDraft,
+        committedDraftLevels,
+      }),
+    [committedDraftLevels, config, editorRowStatesFromRow, presentationDraft],
   )
 
   const presentation: TableBuilderCellPresentation | undefined = config.resolveCellPresentation?.({
@@ -296,6 +313,7 @@ function useTableBuilderScalarValueCell(
     columnKey: column.key,
     draftValue: cellValue,
     committedDraftLevels,
+    editorRowStates,
   })
   const showPlaceholder =
     (cellValue === undefined || isTableBuilderCellBlank(cellValue)) &&
@@ -318,9 +336,19 @@ function TableBuilderScalarValueCell({
   level,
   ariaLabel,
   rowReadOnly = false,
+  committedDraftLevels,
+  editorRowStates,
 }: Omit<TableBuilderValueCellProps, 'columnIndex'>) {
   const { form, cellPath, cellError, presentation, showPlaceholder } =
-    useTableBuilderScalarValueCell(draft, rowIndex, column, level, ariaLabel)
+    useTableBuilderScalarValueCell(
+      draft,
+      rowIndex,
+      column,
+      level,
+      ariaLabel,
+      committedDraftLevels,
+      editorRowStates,
+    )
   const readOnly = rowReadOnly || presentation?.readOnly === true
 
   if (presentation?.formatGrouped) {
