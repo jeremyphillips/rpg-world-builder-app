@@ -1,17 +1,25 @@
 import { render, screen } from '@testing-library/react'
+import { collapsibleListItemHeaderVerticalPaddingVariants } from '@rpg/ui'
 import { describe, expect, it } from 'vitest'
 
 import { CatalogEntityRow } from '../catalog-entity-row'
-import {
-  catalogEntityRowBodyWashVariants,
-  catalogEntityRowInsetRootVariants,
-} from '../catalog-entity-row.variants'
+import { catalogEntityRowBodyWashVariants } from '../catalog-entity-row.variants'
+import { entityCardContentInsetVariants } from '../../cards/content/entity-card-content.variants'
 import { ENTITY_CONTENT_OFFSET_VAR } from '../../../anatomy/entity-leading-rail.lib'
 
 const domIds = {
   itemId: 'picker-item-rope',
   titleId: 'picker-item-rope-title',
   bodyId: 'picker-item-rope-body',
+}
+
+const compactContentInset = entityCardContentInsetVariants({ density: 'compact' })
+
+function entityCardContentFromShell(container: HTMLElement): HTMLElement {
+  const shell = container.querySelector('[role="group"]') as HTMLElement
+  const contentInset = shell.querySelector('.pl-\\[var\\(--entity-surface-inline-start\\)\\]')
+  expect(contentInset).toBeTruthy()
+  return contentInset as HTMLElement
 }
 
 describe('CatalogEntityRow', () => {
@@ -27,19 +35,25 @@ describe('CatalogEntityRow', () => {
       />,
     )
 
-    const insetRoot = container.firstElementChild as HTMLElement
-    expect(insetRoot).toHaveClass(catalogEntityRowInsetRootVariants({ leading: true }))
-    expect(insetRoot).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
-    expect(insetRoot.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
+    const frame = container.querySelector('article') as HTMLElement
+    expect(frame).toHaveClass('bg-catalog-picker-row-surface')
+    expect(frame).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
+    expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
       'calc(var(--spacing)*6)',
     )
 
     const shell = screen.getByRole('group')
     expect(shell).toHaveClass('p-0')
     expect(shell).not.toHaveClass('pl-2')
+    expect(shell).not.toHaveClass('bg-catalog-picker-row-surface')
 
     const headerRow = shell.firstElementChild as HTMLElement
-    expect(headerRow).toHaveClass('py-2')
+    expect(headerRow).not.toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
+
+    const contentInset = entityCardContentFromShell(container)
+    expect(contentInset).toHaveClass(compactContentInset)
 
     const leading = document.querySelector('[data-entity-item-slot="leading"]')
     expect(leading?.querySelector('button[aria-expanded]')).toBeTruthy()
@@ -47,7 +61,7 @@ describe('CatalogEntityRow', () => {
     expect(screen.queryByRole('button', { name: 'Rope' })).toBeNull()
   })
 
-  it('uses normal compact inset for flat rows without details', () => {
+  it('uses compact content inset for flat rows without details', () => {
     const { container } = render(
       <CatalogEntityRow
         toolbarLabel="The Foos"
@@ -57,17 +71,20 @@ describe('CatalogEntityRow', () => {
       />,
     )
 
-    const insetRoot = container.firstElementChild as HTMLElement
-    expect(insetRoot).toHaveClass(catalogEntityRowInsetRootVariants({ leading: false }))
-    expect(insetRoot).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*3)]')
-    expect(insetRoot.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toBe('')
+    const frame = container.querySelector('article') as HTMLElement
+    expect(frame).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*3)]')
+    expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toBe('')
+
+    const contentInset = entityCardContentFromShell(container)
+    expect(contentInset).toHaveClass(compactContentInset)
+
+    const headerRow = screen.getByRole('group').firstElementChild as HTMLElement
+    expect(headerRow).not.toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
 
     expect(screen.queryByRole('button', { name: 'The Foos' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
-
-    const headerRow = screen.getByRole('group').firstElementChild as HTMLElement
-    expect(headerRow).toHaveClass('flex', 'items-center')
-    expect(headerRow).not.toHaveClass('py-2')
   })
 
   it('aligns expanded body with entity inline start and end inset', () => {

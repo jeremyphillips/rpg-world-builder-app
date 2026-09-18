@@ -212,6 +212,32 @@ describe('CollapsibleListItem', () => {
     expect(collapsedHeaderRow.className).toBe(expandedHeaderRow.className)
   })
 
+  it('does not apply header vertical padding in entity-card row layout', () => {
+    const { container } = render(
+      <CollapsibleListItem
+        itemId="entity-card-row"
+        titleId="entity-card-row-title"
+        toolbarAriaLabel="Entity card row"
+        rowLayout="entity-card"
+        collapsible
+        collapsed={false}
+        onToggleCollapse={vi.fn()}
+        actionsAlign="center"
+        header={<span>Entity card header</span>}
+        body={<p>Entity card details</p>}
+      />,
+    )
+
+    const shell = container.firstChild as HTMLElement
+    const headerRow = shell.firstElementChild as HTMLElement
+    expect(headerRow).not.toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
+    expect(shell.className).not.toMatch(/\bpy-\d/)
+    expect(shell.className).not.toMatch(/\bpl-\d/)
+    expect(headerRow.className).not.toMatch(/\bpy-\d/)
+  })
+
   it('applies catalog picker row surface tone on the shell', () => {
     const { container } = render(
       <CollapsibleListItem

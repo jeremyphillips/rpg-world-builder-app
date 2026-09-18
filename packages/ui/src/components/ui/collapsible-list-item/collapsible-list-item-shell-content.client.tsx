@@ -31,6 +31,7 @@ interface CollapsibleListItemShellContentProps {
 
 function CollapsibleListItemCenterActionsContent({
   headerRowClasses,
+  rowLayout,
   density,
   leadingChrome,
   toolbar,
@@ -39,6 +40,7 @@ function CollapsibleListItemCenterActionsContent({
   body,
 }: {
   headerRowClasses: string
+  rowLayout: CollapsibleListItemRowLayout
   density: CollapsibleListItemDensity
   leadingChrome: CollapsibleListItemLeadingChromeOptions
   toolbar: React.ReactNode
@@ -46,9 +48,12 @@ function CollapsibleListItemCenterActionsContent({
   actions?: React.ReactNode
   body?: React.ReactNode
 }) {
-  const headerRowPadding = leadingChrome.collapsible
-    ? collapsibleListItemHeaderVerticalPaddingVariants({ density })
-    : undefined
+  const headerRowPadding =
+    rowLayout === 'entity-card'
+      ? undefined
+      : leadingChrome.collapsible
+        ? collapsibleListItemHeaderVerticalPaddingVariants({ density })
+        : undefined
 
   return (
     <>
@@ -99,6 +104,7 @@ export function CollapsibleListItemShellContent({
     return (
       <CollapsibleListItemCenterActionsContent
         headerRowClasses={headerRowClasses}
+        rowLayout={rowLayout}
         density={density}
         leadingChrome={leadingChrome}
         toolbar={toolbar}

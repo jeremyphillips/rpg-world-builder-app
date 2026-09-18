@@ -5,6 +5,7 @@ import { ContentCardHeadingAction, type ContentCardDensity } from '@rpg/ui'
 import { EntityAnatomy } from '../../../anatomy/entity-anatomy'
 import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
+import { EntityCardContent } from './entity-card-content'
 import { EntityCardFrame } from './entity-card-frame'
 
 export type ContentEntityCardProps = {
@@ -36,15 +37,18 @@ export function ContentEntityCard({
       density={resolvedDensity}
       disabled={disabled}
       leadingUtilityCount={leading ? 1 : 0}
+      surface="card"
     >
-      <EntityAnatomy
-        entity={entity}
-        headingHref={headingHref}
-        leadingUtilities={leading != null ? [leading] : undefined}
-        trailing={trailing}
-        density={resolvedDensity}
-        headingEndValue={headingEndValue}
-      />
+      <EntityCardContent density={resolvedDensity}>
+        <EntityAnatomy
+          entity={entity}
+          headingHref={headingHref}
+          leadingUtilities={leading != null ? [leading] : undefined}
+          trailing={trailing}
+          density={resolvedDensity}
+          headingEndValue={headingEndValue}
+        />
+      </EntityCardContent>
     </EntityCardFrame>
   )
 }

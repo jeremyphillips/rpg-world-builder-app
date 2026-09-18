@@ -11,11 +11,11 @@ import {
 } from '../../../anatomy/entity-leading-rail.lib'
 import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
+import { EntityCardContent } from '../content/entity-card-content'
+import { EntityCardFrame } from '../content/entity-card-frame'
 import { DisclosureEntityCardHeader } from './disclosure-entity-card-header'
 import {
-  disclosureEntityCardArticleVariants,
   disclosureEntityCardBodyWashVariants,
-  disclosureEntityCardHeaderPaddingVariants,
   disclosureEntityCardListItemVariants,
 } from './disclosure-entity-card.variants'
 
@@ -64,10 +64,12 @@ export function DisclosureEntityCard({
   })
 
   return (
-    <article
-      className={disclosureEntityCardArticleVariants({ density, disabled })}
+    <EntityCardFrame
+      density={density}
+      surface="subtle"
+      disabled={disabled}
+      leadingUtilityCount={leadingUtilityCount}
       style={leadingOffsetStyle}
-      data-disabled={disabled ? true : undefined}
     >
       <CollapsibleListItem
         itemId={itemId}
@@ -86,7 +88,7 @@ export function DisclosureEntityCard({
         className={disclosureEntityCardListItemVariants()}
         bodyClassName={disclosureEntityCardBodyWashVariants()}
         header={
-          <div className={disclosureEntityCardHeaderPaddingVariants()}>
+          <EntityCardContent density={density}>
             <DisclosureEntityCardHeader
               entity={entity}
               headingHref={headingHref}
@@ -95,10 +97,10 @@ export function DisclosureEntityCard({
               dragHandle={dragHandle}
               dragHandleProps={dragHandleProps}
             />
-          </div>
+          </EntityCardContent>
         }
         body={children}
       />
-    </article>
+    </EntityCardFrame>
   )
 }
