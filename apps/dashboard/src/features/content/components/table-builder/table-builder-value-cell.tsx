@@ -1,10 +1,23 @@
+import * as React from 'react'
 import type { ComponentProps } from 'react'
 import { Info } from 'lucide-react'
-import { useFormContext, useWatch, type FieldPath, type UseFormReturn } from 'react-hook-form'
-import { DIE_FACES } from '@rpg/contracts'
+import {
+  Controller,
+  useFormContext,
+  useFormState,
+  useWatch,
+  type FieldPath,
+  type UseFormReturn,
+} from 'react-hook-form'
+import {
+  buildCommittedDraftLevelsForXpColumn,
+  flattenFormTouchedPaths,
+} from '@/features/campaign/lib/rules/character-configuration/xp-thresholds-field.lib'
+import { DIE_FACES, formatFieldMessage } from '@rpg/contracts'
 import {
   Badge,
   Input,
+  NumberInput,
   Select,
   SelectContent,
   SelectItem,
@@ -30,6 +43,7 @@ import {
   tableBuilderDerivedInputFieldClasses,
   tableBuilderDerivedInputShellClasses,
   tableBuilderValuesCellClasses,
+  tableBuilderValuesCellErrorClasses,
   tableBuilderValuesDiceCellClasses,
   tableBuilderValuesDiceCountClasses,
   tableBuilderValuesDiceJoinerClasses,
@@ -48,6 +62,7 @@ export type TableBuilderValueCellProps = {
   columnIndex: number
   level: number | undefined
   ariaLabel: string
+  rowReadOnly?: boolean
 }
 
 function DerivedBadge() {
@@ -72,7 +87,7 @@ function DerivedBadge() {
 
 type ScalarInputProps = ComponentProps<typeof Input>
 
-function TableBuilderScalarValueInput({
+function TableBuilderPlainScalarValueInput({
   showDerivedBadge,
   inputProps,
 }: {
@@ -94,6 +109,61 @@ function TableBuilderScalarValueInput({
   return <Input className="min-w-0" {...inputProps} />
 }
 
+function TableBuilderGroupedScalarValueInput({
+  showDerivedBadge,
+  readOnly,
+  ariaLabel,
+  ariaInvalid,
+  placeholder,
+  name,
+  onBlur,
+  onChange,
+  value,
+}: {
+  showDerivedBadge: boolean
+  readOnly: boolean
+  ariaLabel: string
+  ariaInvalid?: boolean
+  placeholder?: string
+  name: string
+  onBlur: React.FocusEventHandler<HTMLInputElement>
+  onChange: React.ChangeEventHandler<HTMLInputElement>
+  value: string | undefined
+}) {
+  const input = (
+    <NumberInput
+      size="sm"
+      formatGrouped
+      grouped
+      readOnly={readOnly}
+      disabled={readOnly}
+      aria-label={ariaLabel}
+      aria-invalid={ariaInvalid}
+      placeholder={placeholder}
+      name={name}
+      onBlur={onBlur}
+      onChange={onChange}
+      value={value ?? ''}
+      rootClassName="min-w-0 border-0 bg-transparent shadow-none"
+      className={tableBuilderDerivedInputFieldClasses}
+    />
+  )
+
+  return (
+    <div className={tableBuilderDerivedInputShellClasses}>
+      {input}
+      {showDerivedBadge ? (
+        <>
+          <div aria-hidden className={tableBuilderDerivedBadgeDividerClasses} />
+          <div className={tableBuilderDerivedBadgeSegmentClasses}>
+            <DerivedBadge />
+          </div>
+        </>
+      ) : null}
+    </div>
+  )
+}
+
 function useTableBuilderScalarValueCell(
   draft: TableBuilderFormValues,
   rowIndex: number,
@@ -103,18 +173,37 @@ function useTableBuilderScalarValueCell(
 ) {
   const config = useTableBuilderHostConfig()
   const form = useFormContext<TableBuilderFormValues>()
+  const { touchedFields } = useFormState({ control: form.control })
+  const liveDraft = useWatch({ control: form.control }) as TableBuilderFormValues
   const cellPath = `rows.${rowIndex}.cells.${column.key}`
   const cellValue = useWatch({
     control: form.control,
     name: fieldPath(cellPath),
   }) as TableBuilderCellDraft | undefined
   const cellError = form.getFieldState(fieldPath(cellPath), form.formState).error
+  const presentationDraft: TableBuilderFormValues = {
+    kind: liveDraft.kind ?? draft.kind,
+    name: liveDraft.name ?? draft.name,
+    columns: liveDraft.columns ?? draft.columns,
+    rows: liveDraft.rows ?? draft.rows,
+  }
+  const committedDraftLevels = React.useMemo(
+    () =>
+      buildCommittedDraftLevelsForXpColumn(
+        presentationDraft,
+        column.key,
+        flattenFormTouchedPaths(touchedFields),
+      ),
+    [column.key, presentationDraft, touchedFields],
+  )
+
   const presentation: TableBuilderCellPresentation | undefined = config.resolveCellPresentation?.({
-    draft,
+    draft: presentationDraft,
     rowIndex,
     level,
     columnKey: column.key,
     draftValue: cellValue,
+    committedDraftLevels,
   })
   const showPlaceholder =
     (cellValue === undefined || isTableBuilderCellBlank(cellValue)) &&
@@ -136,13 +225,59 @@ function TableBuilderScalarValueCell({
   column,
   level,
   ariaLabel,
+  rowReadOnly = false,
 }: Omit<TableBuilderValueCellProps, 'columnIndex'>) {
   const { form, cellPath, cellError, presentation, showPlaceholder } =
     useTableBuilderScalarValueCell(draft, rowIndex, column, level, ariaLabel)
+  const readOnly = rowReadOnly || presentation?.readOnly === true
+
+  if (presentation?.formatGrouped) {
+    return (
+      <div className={tableBuilderValuesCellClasses}>
+        <Controller
+          name={fieldPath(cellPath)}
+          render={({ field, fieldState }) => {
+            const showProgressionError =
+              presentation.progressionError !== undefined &&
+              (fieldState.isTouched || cellError !== undefined)
+            const resolvedError = showProgressionError
+              ? formatFieldMessage(presentation.progressionError!)
+              : cellError
+                ? formatFieldMessage(cellError.message ?? '')
+                : undefined
+
+            return (
+              <>
+                <TableBuilderGroupedScalarValueInput
+                  showDerivedBadge={presentation.provenanceBadge === 'derived'}
+                  readOnly={readOnly}
+                  ariaLabel={ariaLabel}
+                  ariaInvalid={resolvedError ? true : undefined}
+                  placeholder={showPlaceholder ? presentation.placeholder : undefined}
+                  name={field.name}
+                  onBlur={field.onBlur}
+                  onChange={(event) => {
+                    field.onChange(event)
+                    if (cellError !== undefined) {
+                      form.clearErrors(fieldPath(cellPath))
+                    }
+                  }}
+                  value={typeof field.value === 'string' ? field.value : String(field.value ?? '')}
+                />
+                {resolvedError ? (
+                  <p className={tableBuilderValuesCellErrorClasses}>{resolvedError}</p>
+                ) : null}
+              </>
+            )
+          }}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className={tableBuilderValuesCellClasses}>
-      <TableBuilderScalarValueInput
+      <TableBuilderPlainScalarValueInput
         showDerivedBadge={presentation?.provenanceBadge === 'derived'}
         inputProps={{
           size: 'sm',
@@ -150,7 +285,7 @@ function TableBuilderScalarValueCell({
           'aria-label': ariaLabel,
           'aria-invalid': cellError ? true : undefined,
           placeholder: showPlaceholder ? presentation?.placeholder : undefined,
-          readOnly: presentation?.readOnly === true,
+          readOnly,
           ...form.register(fieldPath(cellPath)),
         }}
       />
@@ -229,6 +364,7 @@ function TableBuilderDiceValueCellContainer({
   column,
   level,
   ariaLabel,
+  rowReadOnly = false,
 }: Omit<TableBuilderValueCellProps, 'columnIndex'>) {
   const config = useTableBuilderHostConfig()
   const form = useFormContext<TableBuilderFormValues>()
@@ -253,7 +389,7 @@ function TableBuilderDiceValueCellContainer({
       ariaLabel={ariaLabel}
       cellValue={cellValue}
       cellError={Boolean(cellError)}
-      readOnly={presentation?.readOnly === true}
+      readOnly={rowReadOnly || presentation?.readOnly === true}
     />
   )
 }

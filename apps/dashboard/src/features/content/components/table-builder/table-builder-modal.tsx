@@ -2,6 +2,7 @@ import { useId, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import type { FieldPath } from 'react-hook-form'
 import type { GeneralTable, ProgressionTable } from '@rpg/contracts'
 import { Button, ConfirmDialog, DialogPanelScrollRegion, Modal } from '@rpg/ui'
 
@@ -124,6 +125,18 @@ function TableBuilderModalContent({
       form.setError('kind', { type: 'manual', message: TABLE_BUILDER_KIND_NOT_ALLOWED })
       return
     }
+
+    const draftValidation = config.validateDraftBeforeSave?.({ draft: values })
+    if (draftValidation !== undefined && !draftValidation.valid) {
+      draftValidation.errors.forEach(({ path, message }) => {
+        form.setError(path as FieldPath<TableBuilderFormValues>, {
+          type: 'manual',
+          message,
+        })
+      })
+      return
+    }
+
     if (onSaveDraft) {
       onSaveDraft(values)
     } else if (onSave) {

@@ -62,6 +62,14 @@ export const xpThresholdsValidationMessages = {
     'validation.xpThresholds.levelOneZeroXp',
     () => 'Level 1 must require 0 XP.',
   ),
+  minimumThreshold: defineMessage<{ minimum: number }>(
+    'validation.xpThresholds.minimumThreshold',
+    ({ minimum }) => `Enter ${formatGroupedNumber(minimum)} or more.`,
+  ),
+  resolveBlockedLevel: defineMessage<{ level: number }>(
+    'validation.xpThresholds.resolveBlockedLevel',
+    ({ level }) => `Resolve level ${level} to continue`,
+  ),
 }
 
 export type XpThresholdProvenance = 'system' | 'override' | 'derived'
@@ -168,6 +176,285 @@ export function resolveXpThresholdsSummary(
   }
 }
 
+export type XpThresholdValidationPolicy = 'standard' | 'extended'
+
+/** True when the catalog has no system seed for this level (extended progression). */
+export function isExtendedXpLevel(
+  level: number,
+  systemEntries: readonly XpProgressionEntry[],
+): boolean {
+  return systemValueForLevel(systemEntries, level) === undefined
+}
+
+export function resolveXpThresholdValidationPolicy(
+  level: number,
+  systemEntries: readonly XpProgressionEntry[],
+): XpThresholdValidationPolicy {
+  return isExtendedXpLevel(level, systemEntries) ? 'extended' : 'standard'
+}
+
+/** Delta-continued minimum for extended levels from a valid preceding chain. */
+export function resolveDerivedMinimumXpThreshold(
+  _level: number,
+  precedingEffective: readonly EffectiveXpThresholdEntry[],
+): number | undefined {
+  const previous = precedingEffective[precedingEffective.length - 1]
+  if (previous === undefined) return undefined
+
+  const previousPrevious = precedingEffective[precedingEffective.length - 2]
+  const increment =
+    previousPrevious !== undefined ? previous.xpRequired - previousPrevious.xpRequired : 0
+  return previous.xpRequired + increment
+}
+
+export type XpThresholdExplicitValidationResult =
+  | { valid: true }
+  | { valid: false; message: string; minimumXpRequired?: number }
+
+/** Validates an explicit XP threshold against the policy for its level context. */
+export function validateXpThresholdExplicitValue(input: {
+  level: number
+  xpRequired: number
+  precedingEffective: readonly EffectiveXpThresholdEntry[]
+  systemEntries: readonly XpProgressionEntry[]
+}): XpThresholdExplicitValidationResult {
+  const policy = resolveXpThresholdValidationPolicy(input.level, input.systemEntries)
+
+  if (policy === 'extended') {
+    const minimumXpRequired = resolveDerivedMinimumXpThreshold(
+      input.level,
+      input.precedingEffective,
+    )
+    if (minimumXpRequired === undefined) return { valid: true }
+    if (input.xpRequired < minimumXpRequired) {
+      return {
+        valid: false,
+        message: xpThresholdsValidationMessages.minimumThreshold({ minimum: minimumXpRequired }),
+        minimumXpRequired,
+      }
+    }
+    return { valid: true }
+  }
+
+  const previous = input.precedingEffective[input.precedingEffective.length - 1]
+  if (previous !== undefined && input.xpRequired <= previous.xpRequired) {
+    return {
+      valid: false,
+      message: xpThresholdsValidationMessages.increasingXp(),
+    }
+  }
+
+  return { valid: true }
+}
+
+export type XpThresholdEditorRowState = {
+  level: number
+  provenance: XpThresholdProvenance
+  readOnly: boolean
+  minimumXpRequired?: number
+  progressionError?: string
+  blockedByLevel?: number
+  blockedHint?: string
+  /** Placeholder for blank cells — derived value or em dash when blocked. */
+  displayPlaceholder?: string
+}
+
+export type ResolveXpThresholdEditorStateInput = ResolveEffectiveXpProgressionInput & {
+  /** Explicit draft values for filled cells only — blank levels are omitted. */
+  explicitDraftValuesByLevel?: ReadonlyMap<number, number> | Record<number, number>
+  /** When set, invalid explicit values apply only at these levels (e.g. blurred cells). */
+  committedDraftLevels?: ReadonlySet<number>
+}
+
+function explicitDraftValueForLevel(
+  explicitDraftValuesByLevel: ResolveXpThresholdEditorStateInput['explicitDraftValuesByLevel'],
+  level: number,
+): number | undefined {
+  if (explicitDraftValuesByLevel === undefined) return undefined
+  if (explicitDraftValuesByLevel instanceof Map) {
+    return explicitDraftValuesByLevel.get(level)
+  }
+  return Object.prototype.hasOwnProperty.call(explicitDraftValuesByLevel, level)
+    ? (explicitDraftValuesByLevel as Record<number, number>)[level]
+    : undefined
+}
+
+function deriveEffectiveEntry(
+  level: number,
+  precedingEffective: readonly EffectiveXpThresholdEntry[],
+): EffectiveXpThresholdEntry {
+  const previous = precedingEffective[precedingEffective.length - 1]
+  const previousPrevious = precedingEffective[precedingEffective.length - 2]
+  const increment =
+    previous !== undefined && previousPrevious !== undefined
+      ? previous.xpRequired - previousPrevious.xpRequired
+      : 0
+  const derivedXp = (previous?.xpRequired ?? 0) + increment
+  return { level, xpRequired: derivedXp, provenance: 'derived' }
+}
+
+function isCommittedDraftLevel(
+  level: number,
+  committedDraftLevels: ReadonlySet<number> | undefined,
+): boolean {
+  return committedDraftLevels === undefined || committedDraftLevels.has(level)
+}
+
+type XpThresholdEditorResolutionContext = {
+  systemEntries: readonly XpProgressionEntry[]
+  overrides: ReadonlyMap<number, number>
+  explicitDraftValuesByLevel: ResolveXpThresholdEditorStateInput['explicitDraftValuesByLevel']
+  committedDraftLevels: ReadonlySet<number> | undefined
+}
+
+function buildBlockedXpThresholdEditorRow(
+  level: number,
+  firstInvalidLevel: number,
+  ctx: XpThresholdEditorResolutionContext,
+): XpThresholdEditorRowState {
+  const explicitDraft = explicitDraftValueForLevel(ctx.explicitDraftValuesByLevel, level)
+  return {
+    level,
+    provenance: ctx.overrides.has(level) || explicitDraft !== undefined ? 'override' : 'derived',
+    readOnly: true,
+    blockedByLevel: firstInvalidLevel,
+    blockedHint:
+      level === firstInvalidLevel + 1
+        ? xpThresholdsValidationMessages.resolveBlockedLevel({ level: firstInvalidLevel })
+        : undefined,
+    displayPlaceholder: explicitDraft === undefined ? '—' : undefined,
+  }
+}
+
+function resolveExplicitDraftEditorRow(
+  level: number,
+  explicitDraft: number,
+  validChain: EffectiveXpThresholdEntry[],
+  ctx: XpThresholdEditorResolutionContext,
+):
+  | { kind: 'invalid'; row: XpThresholdEditorRowState; firstInvalidLevel: number }
+  | { kind: 'valid'; row: XpThresholdEditorRowState; entry: EffectiveXpThresholdEntry }
+  | { kind: 'uncommitted' } {
+  const validation = validateXpThresholdExplicitValue({
+    level,
+    xpRequired: explicitDraft,
+    precedingEffective: validChain,
+    systemEntries: ctx.systemEntries,
+  })
+
+  if (!validation.valid) {
+    if (isCommittedDraftLevel(level, ctx.committedDraftLevels)) {
+      return {
+        kind: 'invalid',
+        row: {
+          level,
+          provenance: 'override',
+          readOnly: false,
+          minimumXpRequired: validation.minimumXpRequired,
+          progressionError: validation.message,
+        },
+        firstInvalidLevel: level,
+      }
+    }
+    return { kind: 'uncommitted' }
+  }
+
+  return {
+    kind: 'valid',
+    row: { level, provenance: 'override', readOnly: false },
+    entry: { level, xpRequired: explicitDraft, provenance: 'override' },
+  }
+}
+
+function resolveKnownXpThresholdEditorRow(
+  level: number,
+  validChain: EffectiveXpThresholdEntry[],
+  ctx: XpThresholdEditorResolutionContext,
+): { row: XpThresholdEditorRowState; entry: EffectiveXpThresholdEntry } | undefined {
+  const overrideValue = ctx.overrides.get(level)
+  if (overrideValue !== undefined) {
+    return {
+      row: { level, provenance: 'override', readOnly: false },
+      entry: { level, xpRequired: overrideValue, provenance: 'override' },
+    }
+  }
+
+  const systemValue = systemValueForLevel(ctx.systemEntries, level)
+  if (systemValue !== undefined) {
+    return {
+      row: { level, provenance: 'system', readOnly: false },
+      entry: { level, xpRequired: systemValue, provenance: 'system' },
+    }
+  }
+
+  const derived = deriveEffectiveEntry(level, validChain)
+  return {
+    row: {
+      level,
+      provenance: 'derived',
+      readOnly: false,
+      displayPlaceholder: formatXpThresholdValue(derived.xpRequired),
+    },
+    entry: derived,
+  }
+}
+
+/**
+ * Resolves per-row editor state for the XP threshold table builder, including
+ * validation errors and downstream blocking after the first invalid explicit value.
+ */
+export function resolveXpThresholdEditorState(
+  input: ResolveXpThresholdEditorStateInput,
+): XpThresholdEditorRowState[] {
+  const { systemEntries, effectiveMaxLevel, explicitDraftValuesByLevel, committedDraftLevels } =
+    input
+  const ctx: XpThresholdEditorResolutionContext = {
+    systemEntries,
+    overrides: overrideMap(input.overrides),
+    explicitDraftValuesByLevel,
+    committedDraftLevels,
+  }
+  const validChain: EffectiveXpThresholdEntry[] = []
+  const rows: XpThresholdEditorRowState[] = []
+  let firstInvalidLevel: number | undefined
+
+  for (let level = 1; level <= effectiveMaxLevel; level += 1) {
+    if (level === 1) {
+      validChain.push({ level: 1, xpRequired: 0, provenance: 'system' })
+      rows.push({ level: 1, provenance: 'system', readOnly: true })
+      continue
+    }
+
+    if (firstInvalidLevel !== undefined && level > firstInvalidLevel) {
+      rows.push(buildBlockedXpThresholdEditorRow(level, firstInvalidLevel, ctx))
+      continue
+    }
+
+    const explicitDraft = explicitDraftValueForLevel(explicitDraftValuesByLevel, level)
+    if (explicitDraft !== undefined) {
+      const resolved = resolveExplicitDraftEditorRow(level, explicitDraft, validChain, ctx)
+      if (resolved.kind === 'invalid') {
+        firstInvalidLevel = resolved.firstInvalidLevel
+        rows.push(resolved.row)
+        continue
+      }
+      if (resolved.kind === 'valid') {
+        validChain.push(resolved.entry)
+        rows.push(resolved.row)
+        continue
+      }
+    }
+
+    const known = resolveKnownXpThresholdEditorRow(level, validChain, ctx)
+    if (known !== undefined) {
+      validChain.push(known.entry)
+      rows.push(known.row)
+    }
+  }
+
+  return rows
+}
+
 /** Validates the effective active XP table — domain boundary, not generic table contracts. */
 export function refineEffectiveXpProgression(
   input: ResolveEffectiveXpProgressionInput,
@@ -175,6 +462,7 @@ export function refineEffectiveXpProgression(
   pathPrefix: (string | number)[] = [],
 ): void {
   const effective = resolveEffectiveXpProgression(input)
+  const validChain: EffectiveXpThresholdEntry[] = []
 
   effective.forEach((entry, index) => {
     if (index === 0 && entry.level === 1 && entry.xpRequired !== 0) {
@@ -185,7 +473,7 @@ export function refineEffectiveXpProgression(
       })
     }
 
-    const previous = effective[index - 1]
+    const previous = validChain[validChain.length - 1]
     if (previous !== undefined && entry.xpRequired <= previous.xpRequired) {
       ctx.addIssue({
         code: 'custom',
@@ -193,6 +481,19 @@ export function refineEffectiveXpProgression(
         path: [...pathPrefix, index, 'xpRequired'],
       })
     }
+
+    if (entry.provenance === 'override' && isExtendedXpLevel(entry.level, input.systemEntries)) {
+      const minimumXpRequired = resolveDerivedMinimumXpThreshold(entry.level, validChain)
+      if (minimumXpRequired !== undefined && entry.xpRequired < minimumXpRequired) {
+        ctx.addIssue({
+          code: 'custom',
+          message: xpThresholdsValidationMessages.minimumThreshold({ minimum: minimumXpRequired }),
+          path: [...pathPrefix, index, 'xpRequired'],
+        })
+      }
+    }
+
+    validChain.push(entry)
   })
 }
 
@@ -264,8 +565,10 @@ export type XpThresholdDerivedCallout = {
   description: string
 }
 
+const XP_DERIVED_CALLOUT_MINIMUM =
+  'Each derived value is also the minimum allowed threshold for that level.'
 const XP_DERIVED_CALLOUT_CLOSING =
-  'Derived values recalculate when the progression changes. Edit a derived value to make it explicit.'
+  'Edit a value to make it explicit; later derived values recalculate from the new progression.'
 
 function effectiveIncrementAtLevel(
   effective: readonly EffectiveXpThresholdEntry[],
@@ -364,6 +667,6 @@ export function formatXpThresholdDerivedCallout(
   const segmentCopy = segments.map(formatDerivedSegmentSentence).join(' ')
   return {
     title,
-    description: `${segmentCopy} ${XP_DERIVED_CALLOUT_CLOSING}`,
+    description: `${segmentCopy} ${XP_DERIVED_CALLOUT_MINIMUM} ${XP_DERIVED_CALLOUT_CLOSING}`,
   }
 }

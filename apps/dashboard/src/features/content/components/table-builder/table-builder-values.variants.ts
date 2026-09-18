@@ -23,7 +23,12 @@ export const tableBuilderValuesHeaderCellClasses = 'truncate'
 
 export const tableBuilderValuesRowClasses = 'grid items-center gap-2 px-2.5 py-1.5'
 
-export const tableBuilderValuesCellClasses = 'min-w-0'
+export const tableBuilderValuesCellClasses = 'min-w-0 space-y-1'
+
+export const tableBuilderValuesCellErrorClasses = 'text-xs text-destructive'
+
+export const tableBuilderValuesRowBlockedHintClasses =
+  'col-span-full text-xs text-muted-foreground -mt-0.5'
 
 export const tableBuilderValuesDiceCellClasses = 'flex min-w-0 items-center gap-1'
 

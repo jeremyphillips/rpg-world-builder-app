@@ -70,9 +70,10 @@ function fixedLevelsDraftToGridPresentation(
           if (!isTableBuilderCellBlank(draftValue)) {
             return [
               column.key,
-              baseRow !== undefined && isTableGridDataRow(baseRow)
-                ? baseRow.cells[column.key]
-                : undefined,
+              presentation?.formattedValue ??
+                (baseRow !== undefined && isTableGridDataRow(baseRow)
+                  ? baseRow.cells[column.key]
+                  : undefined),
             ]
           }
           if (presentation?.placeholder !== undefined) {

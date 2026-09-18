@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 
+import { formatFieldMessage } from '../../../validation/define-message'
 import {
   computeXpThresholdsSparsePatch,
   formatXpThresholdDerivedCallout,
   formatXpThresholdsSummary,
   normalizeXpThresholdOverrides,
+  refineEffectiveXpProgression,
+  resolveDerivedMinimumXpThreshold,
   resolveEffectiveXpProgression,
   resolveXpThresholdDerivedPresentation,
+  resolveXpThresholdEditorState,
   resolveXpThresholdsSummary,
+  validateXpThresholdExplicitValue,
   xpThresholdOverrideEntriesSchema,
   xpThresholdsPatchSchema,
 } from './xp-progression'
@@ -226,6 +232,12 @@ describe('resolveXpThresholdDerivedPresentation', () => {
     expect(callout.description).toContain(
       'Levels 21–25 continue the latest XP increase of 50,000 XP per level.',
     )
+    expect(callout.description).toContain(
+      'Each derived value is also the minimum allowed threshold for that level.',
+    )
+    expect(callout.description).toContain(
+      'Edit a value to make it explicit; later derived values recalculate from the new progression.',
+    )
     expect(callout.description).not.toContain(' in Epic Destiny ')
   })
 
@@ -281,5 +293,156 @@ describe('resolveXpThresholdDerivedPresentation', () => {
         increment: 65_000,
       },
     ])
+  })
+})
+
+describe('refineEffectiveXpProgression', () => {
+  it('untouched SRD 1–20 progression passes validation with no issues', () => {
+    const schema = z.object({}).superRefine((_value, ctx) => {
+      refineEffectiveXpProgression({ systemEntries: SYSTEM_ENTRIES, effectiveMaxLevel: 20 }, ctx)
+    })
+
+    expect(schema.safeParse({}).success).toBe(true)
+  })
+
+  it('rejects extended overrides below the derived minimum', () => {
+    const schema = z.object({}).superRefine((_value, ctx) => {
+      refineEffectiveXpProgression(
+        {
+          systemEntries: SYSTEM_ENTRIES,
+          overrides: [{ level: 21, xpRequired: 380_000 }],
+          effectiveMaxLevel: 25,
+        },
+        ctx,
+      )
+    })
+
+    const result = schema.safeParse({})
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(formatFieldMessage(result.error.issues[0]!.message)).toBe('Enter 405,000 or more.')
+  })
+
+  it('allows standard overrides with decreasing deltas versus the source table', () => {
+    const schema = z.object({}).superRefine((_value, ctx) => {
+      refineEffectiveXpProgression(
+        {
+          systemEntries: SYSTEM_ENTRIES,
+          overrides: [{ level: 12, xpRequired: 95_000 }],
+          effectiveMaxLevel: 20,
+        },
+        ctx,
+      )
+    })
+
+    expect(schema.safeParse({}).success).toBe(true)
+  })
+})
+
+describe('resolveDerivedMinimumXpThreshold', () => {
+  it('continues the latest effective delta for extended levels', () => {
+    const preceding = resolve({ effectiveMaxLevel: 20 })
+    expect(resolveDerivedMinimumXpThreshold(21, preceding)).toBe(405_000)
+  })
+})
+
+describe('validateXpThresholdExplicitValue', () => {
+  it('requires extended explicit values to meet the derived minimum', () => {
+    const preceding = resolve({ effectiveMaxLevel: 20 })
+    const result = validateXpThresholdExplicitValue({
+      level: 21,
+      xpRequired: 380_000,
+      precedingEffective: preceding,
+      systemEntries: SYSTEM_ENTRIES,
+    })
+
+    expect(result.valid).toBe(false)
+    if (result.valid) return
+    expect(formatFieldMessage(result.message)).toBe('Enter 405,000 or more.')
+  })
+
+  it('allows standard overrides that remain strictly increasing', () => {
+    const preceding = resolve({ effectiveMaxLevel: 11 })
+    const result = validateXpThresholdExplicitValue({
+      level: 12,
+      xpRequired: 95_000,
+      precedingEffective: preceding,
+      systemEntries: SYSTEM_ENTRIES,
+    })
+
+    expect(result).toEqual({ valid: true })
+  })
+})
+
+describe('resolveXpThresholdEditorState', () => {
+  it('blocks downstream rows after the first invalid extended level', () => {
+    const rows = resolveXpThresholdEditorState({
+      systemEntries: SYSTEM_ENTRIES,
+      effectiveMaxLevel: 28,
+      explicitDraftValuesByLevel: new Map([[25, 500_000]]),
+    })
+
+    const level25 = rows.find((row) => row.level === 25)
+    const level26 = rows.find((row) => row.level === 26)
+    const level27 = rows.find((row) => row.level === 27)
+
+    expect(level25?.progressionError).toBeDefined()
+    expect(level26).toMatchObject({
+      readOnly: true,
+      blockedByLevel: 25,
+      displayPlaceholder: '—',
+    })
+    expect(formatFieldMessage(level26!.blockedHint!)).toBe('Resolve level 25 to continue')
+    expect(level27?.blockedHint).toBeUndefined()
+  })
+
+  it('restores downstream derived placeholders after upstream correction', () => {
+    const invalid = resolveXpThresholdEditorState({
+      systemEntries: SYSTEM_ENTRIES,
+      effectiveMaxLevel: 26,
+      explicitDraftValuesByLevel: new Map([[25, 500_000]]),
+    })
+    const valid = resolveXpThresholdEditorState({
+      systemEntries: SYSTEM_ENTRIES,
+      effectiveMaxLevel: 26,
+      explicitDraftValuesByLevel: new Map([[25, 605_000]]),
+    })
+
+    expect(invalid.find((row) => row.level === 26)?.displayPlaceholder).toBe('—')
+    expect(valid.find((row) => row.level === 26)?.displayPlaceholder).toBe('655,000')
+  })
+
+  it('preserves explicit downstream draft values while blocked without independent errors', () => {
+    const rows = resolveXpThresholdEditorState({
+      systemEntries: SYSTEM_ENTRIES,
+      effectiveMaxLevel: 27,
+      explicitDraftValuesByLevel: new Map([
+        [25, 500_000],
+        [26, 680_000],
+      ]),
+    })
+
+    const level26 = rows.find((row) => row.level === 26)
+    expect(level26).toMatchObject({
+      readOnly: true,
+      blockedByLevel: 25,
+    })
+    expect(level26?.progressionError).toBeUndefined()
+  })
+
+  it('does not block downstream rows for uncommitted invalid explicit values', () => {
+    const rows = resolveXpThresholdEditorState({
+      systemEntries: SYSTEM_ENTRIES,
+      effectiveMaxLevel: 28,
+      explicitDraftValuesByLevel: new Map([[25, 500_000]]),
+      committedDraftLevels: new Set<number>(),
+    })
+
+    const level25 = rows.find((row) => row.level === 25)
+    const level26 = rows.find((row) => row.level === 26)
+
+    expect(level25?.progressionError).toBeUndefined()
+    expect(level26?.blockedByLevel).toBeUndefined()
+    expect(level26?.displayPlaceholder).toBe('655,000')
   })
 })

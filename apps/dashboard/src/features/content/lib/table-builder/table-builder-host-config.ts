@@ -17,6 +17,8 @@ export type TableBuilderCellPresentationContext = {
   level?: number
   columnKey: string
   draftValue: TableBuilderCellDraft | undefined
+  /** Levels whose draft cells have been blurred — gates invalid/blocked editor state. */
+  committedDraftLevels?: ReadonlySet<number>
 }
 
 export type TableBuilderCellPresentation = {
@@ -25,7 +27,30 @@ export type TableBuilderCellPresentation = {
   readOnly?: boolean
   /** Host-owned provenance chip rendered inside input chrome. */
   provenanceBadge?: 'derived'
+  /** Potential validation message — generic cell decides visibility from RHF touch/submit. */
+  progressionError?: string
+  /** When true, scalar number cells use grouped thousand-separator formatting. */
+  formatGrouped?: boolean
+  /** Grouped display for filled draft values in preview surfaces. */
+  formattedValue?: string
 }
+
+export type TableBuilderRowPresentationContext = {
+  draft: TableBuilderFormValues
+  rowIndex: number
+  level?: number
+  committedDraftLevels?: ReadonlySet<number>
+}
+
+export type TableBuilderRowPresentation = {
+  readOnly?: boolean
+  blockedByLevel?: number
+  blockedHint?: string
+}
+
+export type TableBuilderDraftValidationResult =
+  | { valid: true }
+  | { valid: false; errors: Array<{ path: string; message: string }> }
 
 export type TableBuilderExtendedProgression = {
   standardMaxLevel: number
@@ -54,9 +79,15 @@ export type TableBuilderHostConfig = {
   resolveCellPresentation?: (
     ctx: TableBuilderCellPresentationContext,
   ) => TableBuilderCellPresentation | undefined
+  resolveRowPresentation?: (
+    ctx: TableBuilderRowPresentationContext,
+  ) => TableBuilderRowPresentation | undefined
   resolveValuesNotice?: (ctx: {
     draft: TableBuilderFormValues
   }) => TableBuilderValuesNotice | undefined
+  validateDraftBeforeSave?: (ctx: {
+    draft: TableBuilderFormValues
+  }) => TableBuilderDraftValidationResult
   /** When set on level-progression hosts, inserts a tier separator after standardMaxLevel. */
   extendedProgression?: TableBuilderExtendedProgression
 }

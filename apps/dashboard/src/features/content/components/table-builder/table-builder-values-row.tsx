@@ -1,5 +1,11 @@
 import { Trash2 } from 'lucide-react'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useMemo } from 'react'
+import { useFormContext, useFormState, useWatch } from 'react-hook-form'
+import { formatFieldMessage } from '@rpg/contracts'
+import {
+  buildCommittedDraftLevelsForXpColumn,
+  flattenFormTouchedPaths,
+} from '@/features/campaign/lib/rules/character-configuration/xp-thresholds-field.lib'
 import {
   Select,
   SelectContent,
@@ -20,6 +26,7 @@ import {
   tableBuilderValuesActionCellClasses,
   tableBuilderValuesGridTemplate,
   tableBuilderValuesLevelLabelClasses,
+  tableBuilderValuesRowBlockedHintClasses,
   tableBuilderValuesRowClasses,
 } from './table-builder-values.variants'
 
@@ -59,12 +66,28 @@ export function TableBuilderValuesRow({
 }: TableBuilderValuesRowProps) {
   const config = useTableBuilderHostConfig()
   const form = useFormContext<TableBuilderFormValues>()
+  const { touchedFields } = useFormState({ control: form.control })
   const draft = useWatch({ control: form.control }) as TableBuilderFormValues
   const level = useWatch({ control: form.control, name: `rows.${index}.level` }) ?? ''
   const parsedLevel = parseLevelDraft(level)
   const fixedLevels = config.rows === 'fixedLevels'
 
   const levelError = form.getFieldState(`rows.${index}.level`, form.formState).error
+  const committedDraftLevels = useMemo(() => {
+    const columnKey = draft.columns[0]?.key
+    if (columnKey === undefined) return undefined
+    return buildCommittedDraftLevelsForXpColumn(
+      draft,
+      columnKey,
+      flattenFormTouchedPaths(touchedFields),
+    )
+  }, [draft, touchedFields])
+  const rowPresentation = config.resolveRowPresentation?.({
+    draft,
+    rowIndex: index,
+    level: parsedLevel,
+    committedDraftLevels,
+  })
 
   return (
     <div
@@ -113,6 +136,7 @@ export function TableBuilderValuesRow({
           columnIndex={columnIndex}
           level={parsedLevel}
           ariaLabel={cellAriaLabel(column, columnIndex, parsedLevel)}
+          rowReadOnly={rowPresentation?.readOnly === true}
         />
       ))}
 
@@ -131,6 +155,11 @@ export function TableBuilderValuesRow({
             <Trash2 aria-hidden />
           </button>
         </div>
+      ) : null}
+      {rowPresentation?.blockedHint ? (
+        <p className={tableBuilderValuesRowBlockedHintClasses}>
+          {formatFieldMessage(rowPresentation.blockedHint)}
+        </p>
       ) : null}
     </div>
   )
