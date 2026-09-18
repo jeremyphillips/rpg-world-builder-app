@@ -2,10 +2,8 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import {
-  disclosureEntityCardBodyInlineStartClasses,
-  disclosureEntityCardHeaderPaddingVariants,
-} from '../disclosure-entity-card.variants'
+import { entityCardContentInsetVariants } from '../../content/entity-card-content.variants'
+import { disclosureEntityCardBodyInlineStartClasses } from '../disclosure-entity-card.variants'
 
 const VARIANTS_PATH = join(__dirname, '../disclosure-entity-card.variants.ts')
 
@@ -19,9 +17,10 @@ describe('disclosureEntityCardBodyInlineStartClasses', () => {
   })
 })
 
-describe('disclosureEntityCardHeaderPaddingVariants', () => {
+describe('entityCardContentInsetVariants', () => {
   it('fills the available header region for full-width entity anatomy', () => {
-    expect(disclosureEntityCardHeaderPaddingVariants()).toContain('w-full')
-    expect(disclosureEntityCardHeaderPaddingVariants()).toContain('min-w-0')
+    expect(entityCardContentInsetVariants({ density: 'compact' })).toContain('w-full')
+    expect(entityCardContentInsetVariants({ density: 'compact' })).toContain('min-w-0')
+    expect(entityCardContentInsetVariants({ density: 'compact' })).toContain('py-2')
   })
 })

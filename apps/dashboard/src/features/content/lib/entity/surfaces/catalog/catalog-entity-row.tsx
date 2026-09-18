@@ -2,15 +2,14 @@ import type { ReactNode } from 'react'
 import { CollapsibleListItem } from '@rpg/ui'
 
 import { EntityAnatomyHost } from '../../anatomy/entity-anatomy'
-import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailing.types'
 import { buildEntityContentOffsetStyle } from '../../anatomy/entity-leading-rail.lib'
+import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
+import { EntityCardContent } from '../cards/content/entity-card-content'
+import { EntityCardFrame } from '../cards/content/entity-card-frame'
 import { DisclosureEntityCardHeader } from '../cards/disclosure/disclosure-entity-card-header'
-import {
-  catalogEntityRowBodyWashVariants,
-  catalogEntityRowHeaderPaddingVariants,
-  catalogEntityRowInsetRootVariants,
-} from './catalog-entity-row.variants'
+import { disclosureEntityCardListItemVariants } from '../cards/disclosure/disclosure-entity-card.variants'
+import { catalogEntityRowBodyWashVariants } from './catalog-entity-row.variants'
 
 export type CatalogEntityRowProps = {
   toolbarLabel: string
@@ -27,7 +26,7 @@ export type CatalogEntityRowProps = {
 
 const CATALOG_ENTITY_ROW_DENSITY = 'compact' as const
 
-/** Entity-aware catalog picker row — owns inset tokens and header padding; CLI shell owns border/bg. */
+/** Entity-aware catalog picker row — EntityCardFrame owns perimeter; EntityCardContent owns inset. */
 export function CatalogEntityRow({
   toolbarLabel,
   domIds,
@@ -49,8 +48,10 @@ export function CatalogEntityRow({
     : undefined
 
   return (
-    <div
-      className={catalogEntityRowInsetRootVariants({ leading: isDisclosure })}
+    <EntityCardFrame
+      density={CATALOG_ENTITY_ROW_DENSITY}
+      surface="catalogRow"
+      leadingUtilityCount={isDisclosure ? 1 : 0}
       style={contentOffsetStyle}
     >
       <CollapsibleListItem
@@ -58,7 +59,6 @@ export function CatalogEntityRow({
         titleId={domIds.titleId}
         bodyId={domIds.bodyId}
         toolbarAriaLabel={toolbarLabel}
-        preset="catalog"
         rowLayout="entity-card"
         density={CATALOG_ENTITY_ROW_DENSITY}
         toolbarCompact
@@ -68,9 +68,10 @@ export function CatalogEntityRow({
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
         showDragHandle={false}
+        className={disclosureEntityCardListItemVariants()}
         bodyClassName={isDisclosure ? catalogEntityRowBodyWashVariants() : undefined}
         header={
-          <div className={catalogEntityRowHeaderPaddingVariants()}>
+          <EntityCardContent density={CATALOG_ENTITY_ROW_DENSITY}>
             {isDisclosure ? (
               <DisclosureEntityCardHeader
                 entity={entity}
@@ -86,11 +87,11 @@ export function CatalogEntityRow({
                 density={CATALOG_ENTITY_ROW_DENSITY}
               />
             )}
-          </div>
+          </EntityCardContent>
         }
         summary={summary}
         body={isDisclosure ? details : undefined}
       />
-    </div>
+    </EntityCardFrame>
   )
 }

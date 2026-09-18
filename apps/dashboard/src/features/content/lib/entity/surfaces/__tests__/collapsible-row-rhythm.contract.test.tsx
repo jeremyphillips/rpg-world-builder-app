@@ -9,11 +9,12 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { HARBOR_DISTRICT_ENTITY } from '../../__tests__/entity.fixture'
 import { CatalogEntityRow } from '../catalog/catalog-entity-row'
-import { catalogEntityRowHeaderPaddingVariants } from '../catalog/catalog-entity-row.variants'
+import { entityCardContentInsetVariants } from '../cards/content/entity-card-content.variants'
+import { ContentEntityCard } from '../cards/content/content-entity-card'
 import { DisclosureEntityCard } from '../cards/disclosure/disclosure-entity-card'
-import { disclosureEntityCardHeaderPaddingVariants } from '../cards/disclosure/disclosure-entity-card.variants'
 
 const compactHeaderRhythm = collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' })
+const compactContentInset = entityCardContentInsetVariants({ density: 'compact' })
 
 const catalogDomIds = {
   itemId: 'contract-catalog-item',
@@ -26,28 +27,31 @@ function headerRowFromGroup(label: RegExp | string): HTMLElement {
   return shell.firstElementChild as HTMLElement
 }
 
-describe('CollapsibleListItem-based row rhythm contract', () => {
-  it('keeps adapter header wrappers free of vertical padding literals', () => {
-    expect(disclosureEntityCardHeaderPaddingVariants()).not.toMatch(/\bpy-\d/)
-    expect(disclosureEntityCardHeaderPaddingVariants()).not.toMatch(/\bp[bt]-\d/)
-    expect(catalogEntityRowHeaderPaddingVariants()).not.toMatch(/\bpy-\d/)
-    expect(catalogEntityRowHeaderPaddingVariants()).not.toMatch(/\bp[bt]-\d/)
+function entityCardContentFromGroup(label: RegExp | string): HTMLElement {
+  const shell = screen.getByRole('group', { name: label })
+  const contentInset = shell.querySelector('.pl-\\[var\\(--entity-surface-inline-start\\)\\]')
+  expect(contentInset).toBeTruthy()
+  return contentInset as HTMLElement
+}
+
+describe('Entity card surface rhythm contract', () => {
+  it('keeps entity-card CLI header rows free of vertical padding', () => {
+    render(
+      <CatalogEntityRow
+        toolbarLabel="Dagger"
+        domIds={catalogDomIds}
+        entity={{ heading: 'Dagger', classification: 'Weapon' }}
+      />,
+    )
+
+    expect(headerRowFromGroup(/Dagger/)).not.toHaveClass(compactHeaderRhythm)
   })
 
-  it('applies shared compact header rhythm on form-array, DEC, and catalog rows', () => {
+  it('applies shared compact content inset on CEC, DEC, and catalog rows', () => {
     render(
-      <CollapsibleListItem
-        itemId="form-array-item"
-        titleId="form-array-item-title"
-        toolbarAriaLabel="Damage effect"
-        collapsible
-        collapsed={false}
-        onToggleCollapse={vi.fn()}
-        actionsAlign="center"
-        header={<span>Damage — 1d10 Fire damage</span>}
-        summary={<span>Inflicts 1d10 Fire damage.</span>}
-        body={<p>Effect fields</p>}
-      />,
+      <MemoryRouter>
+        <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} density="compact" />
+      </MemoryRouter>,
     )
 
     render(
@@ -75,25 +79,33 @@ describe('CollapsibleListItem-based row rhythm contract', () => {
       />,
     )
 
-    expect(headerRowFromGroup(/Damage/)).toHaveClass(compactHeaderRhythm)
-    expect(headerRowFromGroup(/Harbor District/)).toHaveClass(compactHeaderRhythm)
-    expect(headerRowFromGroup(/Dagger/)).toHaveClass(compactHeaderRhythm)
+    const cecContent = document.querySelector('article > div') as HTMLElement
+    expect(cecContent).toHaveClass(compactContentInset)
+
+    expect(entityCardContentFromGroup(/Harbor District/)).toHaveClass(compactContentInset)
+    expect(entityCardContentFromGroup(/Dagger/)).toHaveClass(compactContentInset)
   })
 
-  it('uses the shared body frame on all three adapters', () => {
+  it('keeps default CLI header rhythm on non-entity-card form-array rows', () => {
     render(
       <CollapsibleListItem
-        itemId="form-array-body"
+        itemId="form-array-item"
+        titleId="form-array-item-title"
         toolbarAriaLabel="Damage effect"
         collapsible
         collapsed={false}
         onToggleCollapse={vi.fn()}
         actionsAlign="center"
-        header={<span>Damage</span>}
+        header={<span>Damage — 1d10 Fire damage</span>}
+        summary={<span>Inflicts 1d10 Fire damage.</span>}
         body={<p>Effect fields</p>}
       />,
     )
 
+    expect(headerRowFromGroup(/Damage/)).toHaveClass(compactHeaderRhythm)
+  })
+
+  it('uses the shared body frame on DEC and catalog disclosure rows', () => {
     render(
       <MemoryRouter>
         <DisclosureEntityCard
@@ -123,9 +135,6 @@ describe('CollapsibleListItem-based row rhythm contract', () => {
       />,
     )
 
-    expect(screen.getByText('Effect fields').parentElement).toHaveClass(
-      collapsibleListItemBodyFrameClasses,
-    )
     expect(screen.getByText('Grant fields').parentElement).toHaveClass(
       collapsibleListItemBodyFrameClasses,
     )
@@ -134,27 +143,43 @@ describe('CollapsibleListItem-based row rhythm contract', () => {
     )
   })
 
-  it('keeps compact header rhythm identical collapsed and expanded', () => {
-    const sharedProps = {
-      itemId: 'form-array-toggle',
-      titleId: 'form-array-toggle-title',
-      toolbarAriaLabel: 'Damage effect',
-      collapsible: true as const,
-      onToggleCollapse: vi.fn(),
-      actionsAlign: 'center' as const,
-      header: <span>Damage — 1d10 Fire damage</span>,
-      summary: <span>Inflicts 1d10 Fire damage.</span>,
-      body: <p>Effect fields</p>,
+  it('renders exactly one EntityCardContent inset region per entity-card host header', () => {
+    const { container: decContainer } = render(
+      <MemoryRouter>
+        <DisclosureEntityCard
+          itemId="dec-single-inset"
+          toolbarAriaLabel="Harbor District"
+          entity={HARBOR_DISTRICT_ENTITY}
+          density="compact"
+          defaultCollapsed={false}
+        >
+          <p>Body</p>
+        </DisclosureEntityCard>
+      </MemoryRouter>,
+    )
+
+    const { container: catalogContainer } = render(
+      <CatalogEntityRow
+        toolbarLabel="Flat row"
+        domIds={{
+          itemId: 'flat-row',
+          titleId: 'flat-row-title',
+          bodyId: 'flat-row-body',
+        }}
+        entity={{ heading: 'Flat row' }}
+      />,
+    )
+
+    for (const container of [decContainer, catalogContainer]) {
+      const article = container.querySelector('article') as HTMLElement
+      const insetRegions = Array.from(article.querySelectorAll('*')).filter((element) => {
+        const className = element.getAttribute('class') ?? ''
+        return (
+          className.includes('pl-[var(--entity-surface-inline-start)]') &&
+          className.includes('py-2')
+        )
+      })
+      expect(insetRegions).toHaveLength(1)
     }
-
-    const { unmount: unmountCollapsed } = render(<CollapsibleListItem {...sharedProps} collapsed />)
-    const collapsedHeader = headerRowFromGroup(/Damage/)
-    unmountCollapsed()
-
-    render(<CollapsibleListItem {...sharedProps} collapsed={false} />)
-    const expandedHeader = headerRowFromGroup(/Damage/)
-
-    expect(collapsedHeader.className).toBe(expandedHeader.className)
-    expect(collapsedHeader).toHaveClass(compactHeaderRhythm)
   })
 })

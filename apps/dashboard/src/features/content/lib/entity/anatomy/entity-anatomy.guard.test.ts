@@ -67,6 +67,8 @@ describe('entity anatomy guard', () => {
 
     expect(decSource).toMatch(/rowLayout="entity-card"/)
     expect(decSource).toMatch(/toolbarLeadingChrome="none"/)
+    expect(decSource).toMatch(/EntityCardFrame/)
+    expect(decSource).toMatch(/EntityCardContent/)
     expect(decSource).toMatch(/DisclosureEntityCardHeader/)
     expect(decSource).not.toMatch(/\bEntityLeadingRail\b/)
     expect(decSource).not.toMatch(/\bclassName=\{[^}]*px-/)
@@ -87,7 +89,10 @@ describe('entity anatomy guard', () => {
 
     expect(catalogRowSource).toMatch(/rowLayout="entity-card"/)
     expect(catalogRowSource).toMatch(/toolbarLeadingChrome="none"/)
+    expect(catalogRowSource).toMatch(/EntityCardFrame/)
+    expect(catalogRowSource).toMatch(/EntityCardContent/)
     expect(catalogRowSource).toMatch(/DisclosureEntityCardHeader/)
+    expect(catalogRowSource).not.toMatch(/preset="catalog"/)
   })
 
   it('keeps entity-backed catalog pickers on CatalogEntityPickerSheet', () => {
