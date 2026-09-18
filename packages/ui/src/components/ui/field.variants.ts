@@ -387,10 +387,14 @@ export function fieldArrayItemListClasses(
     size: FieldSizeToken
   },
   stackTreatment: 'merged' | 'separated' = 'separated',
-  listGap: 'rhythm' | 'tight' | 'merged' = 'rhythm',
+  listGap: 'rhythm' | 'tight' | 'merged' | 'disclosure' = 'rhythm',
 ): string {
   if (stackTreatment === 'merged' || listGap === 'merged') {
     return cn('flex flex-col', 'gap-0')
+  }
+
+  if (listGap === 'disclosure') {
+    return cn('flex flex-col', options.rhythm === 'comfortable' ? 'gap-3' : 'gap-2')
   }
 
   if (listGap === 'tight') {

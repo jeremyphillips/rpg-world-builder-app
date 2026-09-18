@@ -11,7 +11,7 @@ export type ArrayItemResolvedPresentation = {
   disclosure: 'none' | 'collapsible'
   chrome: 'flat' | 'disclosure'
   stackTreatment: 'merged' | 'separated'
-  listGap: 'rhythm' | 'tight' | 'merged'
+  listGap: 'rhythm' | 'tight' | 'merged' | 'disclosure'
   reserveDragHandleSlot: boolean
   sortableEnabled: boolean
 }
@@ -101,8 +101,9 @@ function resolveListGap(
   stackTreatment: 'merged' | 'separated',
   chrome: 'flat' | 'disclosure',
   variant: 'compact' | 'detailed',
-): 'rhythm' | 'tight' | 'merged' {
+): 'rhythm' | 'tight' | 'merged' | 'disclosure' {
   if (stackTreatment === 'merged') return 'merged'
+  if (chrome === 'disclosure') return 'disclosure'
   if (chrome === 'flat' && variant === 'compact') return 'tight'
   return 'rhythm'
 }

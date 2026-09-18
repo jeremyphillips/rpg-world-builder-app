@@ -481,6 +481,63 @@ describe('ArrayFieldRenderer', () => {
     expect(body).toHaveClass('border-t')
   })
 
+  it('uses tighter disclosure gaps between collapsible array items', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={collapsibleTraitFieldsSimpleHeader}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const list = screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')
+    expect(list).toHaveClass('gap-2')
+  })
+
+  it('uses 12px disclosure gaps for comfortable collapsible arrays', async () => {
+    const user = userEvent.setup()
+    const comfortableCollapsibleFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        density: 'comfortable',
+        item: {
+          variant: 'detailed',
+          collapsible: true,
+          header: {
+            fallback: (index) => `Trait ${index + 1}`,
+            primaryField: 'name',
+          },
+        },
+        fields: traitFields,
+        addAction: { label: 'Add trait' },
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={comfortableCollapsibleFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const list = screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')
+    expect(list).toHaveClass('gap-3')
+    expect(list).not.toHaveClass('gap-6')
+  })
+
   it('uses gap-6 between comfortable-density array items while keeping gap-6 inside item bodies', async () => {
     const user = userEvent.setup()
     const comfortableFields: FormItem[] = [

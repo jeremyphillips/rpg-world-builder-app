@@ -283,4 +283,25 @@ describe('resolveArrayItemPresentation', () => {
     expect(merged.stackTreatment).toBe('merged')
     expect(separated.stackTreatment).toBe('separated')
   })
+
+  it('uses disclosure list gap for collapsible arrays', () => {
+    const presentation = resolveArrayItemPresentation({
+      config: {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        item: {
+          collapsible: true,
+          header: { fallback: (index) => `Trait ${index + 1}`, primaryField: 'name' },
+        },
+        fields: [{ type: 'text' as const, name: 'name', label: 'Name' }],
+      },
+      variant: 'detailed',
+      reorder: 'dragHandle',
+      fieldsLength: 2,
+    })
+
+    expect(presentation.chrome).toBe('disclosure')
+    expect(presentation.listGap).toBe('disclosure')
+  })
 })
