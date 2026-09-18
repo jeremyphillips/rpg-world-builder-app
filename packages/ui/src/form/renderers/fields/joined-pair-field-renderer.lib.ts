@@ -49,6 +49,8 @@ function buildStartControl(
     value: resolveSelectControlValue(field.value),
     options: config.options,
     digits: config.digits,
+    sizingLabel: config.sizingLabel,
+    sizingLabels: config.sizingLabels,
     placeholder: resolveFieldPlaceholder(
       { label: config.ariaLabel, category: 'choice', digits: config.digits },
       config.placeholder,
@@ -78,6 +80,8 @@ function buildEndControl(
     value: resolveSelectControlValue(field.value),
     options: config.options,
     digits: config.digits,
+    sizingLabel: config.sizingLabel,
+    sizingLabels: config.sizingLabels,
     placeholder: resolveFieldPlaceholder(
       { label: config.ariaLabel, category: 'choice', digits: config.digits },
       config.placeholder,

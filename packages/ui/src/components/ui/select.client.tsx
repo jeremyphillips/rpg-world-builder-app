@@ -7,24 +7,39 @@ import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import { SelectLayerPortal } from './layer-portal-container.client'
-import { fieldControlVariants, type FieldControlVariantProps } from './field-control.variants'
-import { resolveDigitInlineSizeClasses, type FieldDigits } from './field-digit-metrics'
+import type { FieldControlVariantProps } from './field-control.variants'
+import type { FieldDigits } from './field-digit-metrics'
 import {
-  fieldSelectInlineCaretIconClasses,
-  selectDigitTrailingColumnVariants,
-} from './select-caret.variants'
+  selectTriggerShellClasses,
+  selectValueSlotClasses,
+} from './select-compact-trigger.variants'
+import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import {
-  fieldGroupedSegmentEndClasses,
-  fieldGroupedSegmentStartClasses,
-} from './field-input-chrome.variants'
-import {
-  fieldGroupedControlSizeClasses,
-  fieldGroupedControlStartPaddingClasses,
-} from './field-sizing.variants'
+  assertSelectCompactSizing,
+  isSelectCompactTrigger,
+  resolveSelectSizingGhostLabels,
+  SELECT_CARET_SLOT_DATA_ATTR,
+  SELECT_SIZING_LABEL_DATA_ATTR,
+  SELECT_VALUE_SLOT_DATA_ATTR,
+} from './select-trigger.lib'
 
 const Select = SelectPrimitive.Root
 const SelectGroup = SelectPrimitive.Group
 const SelectValue = SelectPrimitive.Value
+
+export { SELECT_CARET_SLOT_DATA_ATTR, SELECT_SIZING_LABEL_DATA_ATTR, SELECT_VALUE_SLOT_DATA_ATTR }
+
+function selectTriggerWidthClasses(isCompact: boolean, grouped: boolean): string {
+  if (isCompact) {
+    return 'w-auto shrink-0'
+  }
+
+  if (grouped) {
+    return 'shrink-0'
+  }
+
+  return 'w-full'
+}
 
 const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Trigger>,
@@ -34,12 +49,12 @@ const SelectTrigger = React.forwardRef<
       grouped?: boolean
       /** Corner rounding when `grouped` — defaults to `end` (unit column). */
       groupedPosition?: 'start' | 'end'
-      /**
-       * Maximum digit count the trigger should visually accommodate. Uses the same
-       * width formula as NumberInput `digits`; the caret sits in a trailing column
-       * matching the number-input stepper width.
-       */
+      /** Compact numeric sizing — N×ch in the value slot. Mutually exclusive with text sizing props. */
       digits?: FieldDigits
+      /** Compact text sizing — single reserve label (grid ghost). Mutually exclusive with `digits` / `sizingLabels`. */
+      sizingLabel?: string
+      /** Compact text sizing — all option labels as overlapping grid ghosts. Mutually exclusive with `digits` / `sizingLabel`. */
+      sizingLabels?: readonly string[]
     }
 >(
   (
@@ -49,72 +64,61 @@ const SelectTrigger = React.forwardRef<
       grouped = false,
       groupedPosition = 'end',
       digits,
+      sizingLabel,
+      sizingLabels,
       children,
       ...props
     },
     ref,
   ) => {
-    const size = sizeProp ?? 'md'
-    const groupedCornerClasses =
-      groupedPosition === 'start' ? fieldGroupedSegmentStartClasses : fieldGroupedSegmentEndClasses
+    assertSelectCompactSizing({ digits, sizingLabel, sizingLabels })
 
-    if (digits != null) {
-      return (
-        <SelectPrimitive.Trigger
-          ref={ref}
-          className={cn(
-            grouped
-              ? cn(
-                  fieldGroupedControlSizeClasses[size],
-                  groupedCornerClasses,
-                  'border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
-                )
-              : cn(fieldControlVariants({ size }), fieldGroupedControlStartPaddingClasses[size]),
-            resolveDigitInlineSizeClasses(digits, size),
-            'inline-flex shrink-0 items-center gap-0 tabular-nums data-[placeholder]:text-muted-foreground [&>span:not([aria-hidden])]:line-clamp-1 [&>span:not([aria-hidden])]:min-w-0 [&>span:not([aria-hidden])]:flex-1 [&>span:not([aria-hidden])]:text-center',
-            className,
-          )}
-          {...props}
-        >
-          {children}
-          <span
-            aria-hidden
-            className={selectDigitTrailingColumnVariants({
-              size,
-              groupedStart: grouped && groupedPosition === 'start',
-            })}
-          >
-            <ChevronDown
-              className={cn(fieldSelectInlineCaretIconClasses(size), 'block shrink-0 opacity-50')}
-            />
-          </span>
-        </SelectPrimitive.Trigger>
-      )
-    }
+    const size = sizeProp ?? 'md'
+    const groupedStart = grouped && groupedPosition === 'start'
+    const compact = isSelectCompactTrigger({ digits, sizingLabel, sizingLabels })
+    const ghostLabels = resolveSelectSizingGhostLabels({ sizingLabel, sizingLabels })
+    const valuePosition = grouped ? (groupedPosition === 'end' ? 'end' : 'start') : 'standalone'
+    const valueTrailing =
+      valuePosition === 'end' || valuePosition === 'standalone'
+        ? ('slot' as const)
+        : ('content' as const)
 
     return (
       <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-          grouped
-            ? cn(
-                groupedCornerClasses,
-                'inline-flex items-center justify-between gap-1.5 text-left data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1 [&>span]:min-w-0',
-              )
-            : cn(
-                fieldControlVariants({ size }),
-                'items-center justify-between gap-2 text-left data-[placeholder]:text-muted-foreground [&>span]:line-clamp-1 [&>span]:min-w-0',
-              ),
+          selectTriggerShellClasses(size, { grouped, groupedPosition }),
+          selectTriggerWidthClasses(compact, grouped),
+          'gap-0 text-left data-[placeholder]:text-muted-foreground',
           className,
         )}
         {...props}
       >
-        {children}
-        <SelectPrimitive.Icon asChild>
-          <ChevronDown
-            className={cn(fieldSelectInlineCaretIconClasses(size), 'shrink-0 opacity-50')}
-          />
-        </SelectPrimitive.Icon>
+        {ghostLabels.length > 0 ? (
+          <SelectLikeValueSlot
+            size={size}
+            position={valuePosition}
+            trailing={valueTrailing}
+            digits={digits}
+            sizingGhostLabels={ghostLabels}
+          >
+            {children}
+          </SelectLikeValueSlot>
+        ) : (
+          <span
+            {...{ [SELECT_VALUE_SLOT_DATA_ATTR]: '' }}
+            className={selectValueSlotClasses(size, {
+              digits,
+              prose: !compact,
+              grouped,
+              groupedPosition,
+              trailing: valueTrailing,
+            })}
+          >
+            {children}
+          </span>
+        )}
+        <SelectLikeCaretSlot size={size} groupedStart={groupedStart} />
       </SelectPrimitive.Trigger>
     )
   },

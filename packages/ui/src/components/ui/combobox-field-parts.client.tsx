@@ -8,6 +8,7 @@ import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
 import { Field, type FieldSize } from './field.client'
 import { fieldControlVariants } from './field-control.variants'
+import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { fieldSizeToChipSize } from './field-sizing.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
@@ -69,17 +70,21 @@ export function ComboboxTrigger({
           onBlur={onBlur}
           className={cn(
             fieldControlVariants({ size }),
-            'items-center justify-between gap-2 text-left [&>span]:line-clamp-1',
+            'inline-flex shrink-0 items-stretch gap-0 px-0 py-0 text-left',
             muted && 'text-muted-foreground',
             open && hideWhenOpen && comboboxTriggerOpenVariants(),
           )}
         >
-          <span className="truncate">{triggerText}</span>
-          {loading ? (
-            <Spinner size="sm" variant="muted" />
-          ) : (
-            <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
-          )}
+          <SelectLikeValueSlot size={size} position="standalone" trailingSlot prose>
+            <span className="truncate">{triggerText}</span>
+          </SelectLikeValueSlot>
+          <SelectLikeCaretSlot size={size}>
+            {loading ? (
+              <Spinner size="sm" variant="muted" />
+            ) : (
+              <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+            )}
+          </SelectLikeCaretSlot>
         </button>
       </PopoverPrimitive.Trigger>
     </Field.Control>

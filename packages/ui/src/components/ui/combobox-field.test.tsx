@@ -68,7 +68,7 @@ describe('ComboboxField', () => {
     expect(trigger).toHaveTextContent('Choose weapons…')
     expect(trigger).toHaveAttribute('aria-busy', 'true')
     expect(trigger).toBeDisabled()
-    expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument()
+    expect(trigger.querySelector('[role="status"]')).toBeInTheDocument()
   })
 
   it('shows selected count in multi mode', () => {

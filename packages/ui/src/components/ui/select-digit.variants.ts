@@ -1,2 +1,7 @@
-/** @deprecated Import from `select-caret.variants` — re-export for existing call sites. */
-export { selectDigitTrailingColumnVariants } from './select-caret.variants'
+/**
+ * @deprecated Prefer `select-compact-trigger.variants` — retained for legacy imports.
+ */
+export {
+  selectCaretSlotWidthClasses as fieldSelectDigitTrailingColumnClasses,
+  selectDigitValueMinWidthVariants,
+} from './select-compact-trigger.variants'

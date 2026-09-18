@@ -102,6 +102,22 @@
   );
 }
 
+@utility bg-border-faint {
+  background-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-faint),
+    var(--surface-current)
+  );
+}
+
+@utility bg-border-subtle {
+  background-color: color-mix(
+    in oklch,
+    var(--foreground) var(--mix-border-subtle),
+    var(--surface-current)
+  );
+}
+
 @utility bg-interactive-outline-hover {
   background-color: color-mix(
     in oklch,

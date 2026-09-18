@@ -99,24 +99,59 @@ A plain `FieldRow` with two inputs and no `width` splits 50/50 and wraps on narr
 
 ### `digits` — ch-based control width
 
-`number` and `select` fields accept optional `digits` on the control via
-`resolveDigitInlineSizeClasses` (preferred + minimum from one formula in
-`fieldDigitWidthVariants`).
-
 > **Digit invariant:** `digits` describes the minimum usable inline size of the control.
 
-- Standalone fields: keep `width: 'full'` so label/hint span the column; control stays narrow.
-- Row fields: use `width: 'auto'` or fractions when sharing a row — especially digit
-  selects in joined pairs (e.g. species Movement Speed).
-- `number` may use `inputWidth` for a non-digit cap on the input element.
-- Overflow: truncate on the trigger **value/text slot**, not the whole `SelectTrigger`.
+**NumberInput** uses `resolveDigitInlineSizeClasses` / `fieldDigitWidthVariants` (stepper
+reserve via `pr-6` + absolute stepper column).
 
-**Select + `digits`:** trigger shows the option **label**. Use short labels (`"1"`, `"d8"`).
-Verbose labels need wider triggers — omit `digits` or use compact labels.
+**Select** uses a shared trigger anatomy in
+[`select-compact-trigger.variants.ts`](../../src/components/ui/select-compact-trigger.variants.ts):
 
-Grouped **start** digit selects (`JoinedPair`, …) add `pr-1` on the trailing chevron column
-so 4px of inset lives inside the left segment — not as shell column gap (which exposes a
-background slice between segments).
+```text
+SelectTrigger          // border, radius, bg, focus; px-0 (no horizontal padding)
+├── ValueSlot          // ps/pe padding + compact or prose sizing
+│   └── value
+└── CaretSlot          // fixed w-8/w-9 column + chevron
+```
+
+Compact sizing modes on `SelectTrigger` (mutually exclusive):
+
+| Prop           | Use                                  | Value slot width                                 |
+| -------------- | ------------------------------------ | ------------------------------------------------ |
+| `digits`       | Numeric labels (`"30"`, `"d8"`)      | `min-w-[calc(N*1ch)]` + `tabular-nums`           |
+| `sizingLabel`  | Single known reserve label           | Grid ghost span + overlaid `SelectValue`         |
+| `sizingLabels` | Option set with varying glyph widths | Overlapping hidden ghosts for every option label |
+| neither        | Prose / enum selects                 | `flex-1 min-w-0` + truncate                      |
+
+Prefer `sizingLabels={options.map(o => o.label)}` when the option set is known (currency
+units, InputSelect units, etc.). Do **not** use `digits` for alpha labels — `N×ch` is
+digit-width only.
+
+- Standalone fields: keep `width: 'full'` so label/hint span the column; compact triggers use
+  intrinsic `w-auto`.
+- Row fields: use `width: 'auto'` or fractions when sharing a row.
+- Overflow: truncate on the value slot overlay, not the whole trigger.
+- Grouped **start** selects add `pe-1` on the caret slot (inset before the divider). **End**
+  segments omit that inset.
+
+### Grouped segment anatomy
+
+Positional SSOT lives in [`grouped-segment.variants.ts`](../../src/components/ui/grouped-segment.variants.ts):
+
+| Primitive             | Variants                                                             | Role                                                                                  |
+| --------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `GroupedSegmentShell` | `position: start \| middle \| end`, `surface: default \| faint`      | Geometry only (height, corners) + explicit wash — **position does not imply surface** |
+| `GroupedValueSlot`    | `position`; `trailing: content \| slot`; `inset: default \| compact` | md start: `ps-3` / compact `ps-2`; end+content: `ps-2 pe-2.5`; end+slot: `ps-2 pe-1`  |
+| `GroupedDivider`      | `strength: primary \| subtle`                                        | Control boundary strength — independent of surface role                               |
+
+Compose-time chromatic roles (`resolveGroupedSegmentSurface`): `value → default`, `unit | glue → faint`.
+Static prefix glyphs (`×`) use `inset: 'compact'` at start; selectable operators may use a **subtle** divider before the amount field.
+
+Grouped **NumberInput** remains the exception — editable cells keep their own padding via
+`fieldGroupedControlSizeClasses`.
+
+**InputSelect:** numeric value side = NumberInput steppers (number formula); unit side =
+grouped select — use `sizingLabel` or prose sizing, not fake `digits`.
 
 Dashboard: [`getLevelFieldOptions`](../../../../apps/dashboard/src/features/content/lib/level-field-options.ts)
 

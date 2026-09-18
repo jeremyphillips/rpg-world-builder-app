@@ -5,7 +5,8 @@ import {
   iconGlyphRootClasses,
   type IconGlyphStep,
 } from './icon-glyph.variants'
-import { fieldDigitTrailingColumnClasses, type FieldSizeToken } from './field-sizing.variants'
+import { selectCaretSlotWidthClasses } from './select-compact-trigger.variants'
+import type { FieldSizeToken } from './field-sizing.variants'
 
 /** Select caret glyph step per field size — inline and digit-column share this map. */
 const FIELD_SELECT_CARET_GLYPH: Record<FieldSizeToken, IconGlyphStep> = {
@@ -25,21 +26,21 @@ export function fieldSelectDigitColumnCaretDescendantClasses(size: FieldSizeToke
 }
 
 /**
- * In-flow trailing column for digit-sized Select triggers. Mirrors the number-input
- * stepper column width; shares the trigger flex row so the caret aligns with the value.
+ * In-flow trailing visual slot for digit-sized Select triggers. The entire trigger
+ * remains clickable — this column centers the chevron, not a separate hit target.
  */
 export const selectDigitTrailingColumnVariants = cva(
   'pointer-events-none flex shrink-0 items-center justify-center self-stretch leading-none text-muted-foreground',
   {
     variants: {
       size: {
-        sm: fieldDigitTrailingColumnClasses.sm,
-        md: fieldDigitTrailingColumnClasses.md,
-        lg: fieldDigitTrailingColumnClasses.lg,
+        sm: selectCaretSlotWidthClasses.sm,
+        md: selectCaretSlotWidthClasses.md,
+        lg: selectCaretSlotWidthClasses.lg,
       },
       /** Start segment in a grouped shell — inset after the chevron before the divider. */
       groupedStart: {
-        true: 'pr-1',
+        true: 'pe-1',
         false: '',
       },
     },

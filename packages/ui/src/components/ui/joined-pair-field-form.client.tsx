@@ -28,6 +28,7 @@ export interface JoinedPairFieldFormStartSelectControl {
   value: string | number | undefined
   options: readonly TypedSelectOption[]
   digits?: FieldDigits
+  sizingLabel?: string
   placeholder?: string
   ariaLabel: string
   hasError?: boolean
@@ -56,6 +57,7 @@ export interface JoinedPairFieldFormEndSelectControl {
   value: string | number | undefined
   options: readonly TypedSelectOption[]
   digits?: FieldDigits
+  sizingLabel?: string
   placeholder?: string
   ariaLabel: string
   hasError?: boolean
@@ -174,6 +176,7 @@ export function JoinedPairFieldForm({
                 position="start"
                 disabled={disabled}
                 digits={start.digits}
+                sizingLabel={start.sizingLabel}
                 placeholder={start.placeholder}
                 hasError={startHasError}
                 describedBy={start.describedBy}
@@ -196,6 +199,7 @@ export function JoinedPairFieldForm({
                 position="end"
                 disabled={disabled}
                 digits={end.digits}
+                sizingLabel={end.sizingLabel}
                 placeholder={end.placeholder}
                 hasError={endHasError}
                 describedBy={end.describedBy}

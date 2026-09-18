@@ -115,7 +115,8 @@ describe('SelectField', () => {
     )
 
     const trigger = screen.getByLabelText('Spellcasting level')
-    expect(trigger).toHaveClass('w-[calc(2*1ch+2.75rem)]')
+    expect(trigger).toHaveClass('w-auto', 'px-0', 'py-0')
+    expect(trigger.querySelector('[data-select-value-slot]')).toHaveClass('min-w-[calc(2*1ch)]')
     expect(container.firstChild).toHaveClass('w-full')
     expect(screen.getByText(hint)).toBeInTheDocument()
   })

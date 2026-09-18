@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { Check, ChevronDown } from 'lucide-react'
+import { Check } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
@@ -28,8 +28,10 @@ import {
 } from './input-select-field.lib'
 import {
   inputSelectSearchablePanelVariants,
-  inputSelectUnitSegmentVariants,
+  inputSelectSearchableUnitShellWidthVariants,
 } from './input-select-field.variants'
+import { groupedSelectSegmentShellClasses } from './select-compact-trigger.variants'
+import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { type NumberInputDigits } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { FieldLabelContent } from './field-label-content'
@@ -108,6 +110,8 @@ function RadixUnitSelect({
   onUnitChange,
   onBlur,
 }: Omit<UnitSelectSegmentProps, 'searchable' | 'label' | 'hasError' | 'describedBy'>) {
+  const sizingLabels = options.map((option) => option.label)
+
   return (
     <Select value={unit} onValueChange={onUnitChange} disabled={disabled}>
       <SelectTrigger
@@ -115,8 +119,9 @@ function RadixUnitSelect({
         size={size}
         grouped
         groupedPosition="end"
+        sizingLabels={sizingLabels}
         onBlur={onBlur}
-        className={inputSelectUnitSegmentVariants({ size, searchable: false })}
+        className={groupedSelectSegmentShellClasses(size, 'end', { surfaceRole: 'unit' })}
       >
         <SelectValue placeholder={unitPlaceholder} />
       </SelectTrigger>
@@ -152,6 +157,7 @@ function SearchableUnitSelect({
   const selectedOption = resolveInputSelectOption(unit, options)
   const filteredOptions = filterInputSelectOptions(options, query)
   const triggerText = unit ? selectedOption.label : (unitPlaceholder ?? 'Choose unit')
+  const sizingLabels = options.map((option) => option.label)
 
   function handleSelect(nextUnit: string) {
     onUnitChange(nextUnit)
@@ -179,13 +185,21 @@ function SearchableUnitSelect({
           disabled={disabled}
           onBlur={onBlur}
           className={cn(
-            inputSelectUnitSegmentVariants({ size, searchable: true }),
+            groupedSelectSegmentShellClasses(size, 'end', { surfaceRole: 'unit' }),
+            inputSelectSearchableUnitShellWidthVariants({ size }),
             !unit && 'text-muted-foreground',
             open && comboboxTriggerOpenVariants(),
           )}
         >
-          <span className="truncate">{triggerText}</span>
-          <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+          <SelectLikeValueSlot
+            size={size}
+            position="end"
+            trailingSlot
+            sizingGhostLabels={sizingLabels}
+          >
+            <span className="truncate">{triggerText}</span>
+          </SelectLikeValueSlot>
+          <SelectLikeCaretSlot size={size} />
         </button>
       </PopoverPrimitive.Trigger>
 

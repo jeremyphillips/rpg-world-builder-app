@@ -38,11 +38,77 @@ export const fieldGroupedControlGeometryClasses = {
   lg: cn(fieldGroupedControlHeightClasses.lg, 'py-2'),
 } as const satisfies Record<FieldSizeToken, string>
 
-/** Leading padding for grouped input/value segments. */
-export const fieldGroupedControlStartPaddingClasses = {
-  sm: 'pl-2.5',
-  md: 'pl-3',
-  lg: 'pl-4',
+/** Positional value-slot padding — outer-start content inset (`GroupedValueSlot position="start"`). */
+export const fieldGroupedValueSlotStartPaddingClasses = {
+  sm: 'ps-2.5',
+  md: 'ps-3',
+  lg: 'ps-4',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** Compact outer-start inset for static prefix glyphs (`×`, …) — not editable value cells. */
+export const fieldGroupedValueSlotStartCompactPaddingClasses = {
+  sm: 'ps-1.5',
+  md: 'ps-2',
+  lg: 'ps-2.5',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** Positional value-slot padding — middle segment content. */
+export const fieldGroupedValueSlotMiddlePaddingClasses = {
+  sm: 'ps-1.5 pe-1.5',
+  md: 'ps-2 pe-2',
+  lg: 'ps-2.5 pe-2.5',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** End value-slot padding when trailing content owns both edges (labels, static segments). */
+export const fieldGroupedValueSlotEndContentPaddingClasses = {
+  sm: 'ps-1.5 pe-2',
+  md: 'ps-2 pe-2.5',
+  lg: 'ps-2.5 pe-3',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** End value-slot padding when a sibling trailing slot follows (select, searchable unit). */
+export const fieldGroupedValueSlotEndTrailingSlotPaddingClasses = {
+  sm: 'ps-1.5 pe-1',
+  md: 'ps-2 pe-1',
+  lg: 'ps-2.5 pe-1',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** Trailing buffer on standalone value cells before a sibling trailing slot. */
+export const fieldGroupedValueSlotBeforeTrailingSlotPaddingClasses = {
+  sm: 'pe-1',
+  md: 'pe-1',
+  lg: 'pe-1',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** @deprecated Prefer `fieldGroupedValueSlotEndContentPaddingClasses`. */
+export const fieldGroupedValueSlotEndPaddingClasses = fieldGroupedValueSlotEndContentPaddingClasses
+
+/** @deprecated Prefer `fieldGroupedValueSlotStartPaddingClasses`. */
+export const fieldGroupedControlStartContentPaddingClasses =
+  fieldGroupedValueSlotStartPaddingClasses
+
+/** @deprecated Prefer `fieldGroupedValueSlotStartPaddingClasses`. */
+export const fieldGroupedControlStartPaddingClasses = fieldGroupedValueSlotStartPaddingClasses
+
+/** @deprecated Prefer `fieldGroupedValueSlotEndPaddingClasses` (leading `ps-*` only). */
+export const fieldGroupedControlEndContentPaddingClasses = {
+  sm: 'ps-1.5',
+  md: 'ps-2',
+  lg: 'ps-2.5',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** @deprecated Prefer `fieldGroupedValueSlotEndPaddingClasses` (trailing `pe-*` only). */
+export const fieldGroupedLabelValueSlotPaddingClasses = {
+  sm: 'pe-2',
+  md: 'pe-2.5',
+  lg: 'pe-3',
+} as const satisfies Record<FieldSizeToken, string>
+
+/** @deprecated Caret column owns trailing inset — not part of value-slot padding. */
+export const fieldGroupedValueSlotBeforeCaretPaddingClasses = {
+  sm: 'pe-1',
+  md: 'pe-1',
+  lg: 'pe-1',
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Horizontal padding for grouped trailing action segments. */
@@ -82,18 +148,18 @@ export const fieldTextareaSizeClasses = {
   lg: 'min-h-28 px-4 py-3 text-base',
 } as const satisfies Record<FieldSizeToken, string>
 
-/** Right-side reserve for digit controls with a trailing stepper/caret column. */
+/** Trailing reserve for digit controls with a stepper/caret column (logical). */
 export const fieldDigitTrailingPaddingClasses = {
-  sm: 'pr-6',
-  md: 'pr-6',
-  lg: 'pr-8',
+  sm: 'pe-6',
+  md: 'pe-6',
+  lg: 'pe-8',
 } as const satisfies Record<FieldSizeToken, string>
 
-/** Left + right padding for digit-sized controls. */
+/** Start + trailing padding for digit-sized controls (logical). */
 export const fieldDigitSizeClasses = {
-  sm: 'pl-2.5 pr-6',
-  md: 'pl-3 pr-6',
-  lg: 'pl-4 pr-8',
+  sm: 'ps-2.5 pe-6',
+  md: 'ps-3 pe-6',
+  lg: 'ps-4 pe-8',
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Width of the trailing stepper/caret column on digit-sized controls. */

@@ -2,9 +2,8 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import {
-  fieldGroupedDividerClasses,
-  fieldGroupedEndSegmentBaseClasses,
   fieldGroupedInputColumnClasses,
+  groupedDividerVariants,
   fieldGroupedSegmentResetClasses,
   fieldGroupedSegmentStartClasses,
   fieldGroupedShellClasses,
@@ -36,6 +35,7 @@ export const joinedPairGroupVariants = cva(fieldGroupedShellClasses, {
   },
 })
 
+/** Grouped editable start segments (NumberInput / Input value cells). */
 export const joinedPairSegmentSizeVariants = fieldGroupedControlSizeClasses
 
 export const joinedPairStartTextSegmentVariants = cva('min-w-0', {
@@ -65,83 +65,6 @@ export const joinedPairStartTextSegmentVariants = cva('min-w-0', {
 
 export const joinedPairStartNumberWrapperVariants = cva(fieldGroupedInputColumnClasses)
 
-export const joinedPairDividerVariants = cva(fieldGroupedDividerClasses)
-
-export const joinedPairEndSelectSegmentVariants = cva(
-  'inline-flex shrink-0 items-center justify-between gap-1.5 text-left [&>span]:line-clamp-1 [&_svg]:shrink-0',
-  {
-    variants: {
-      size: {
-        sm: cn(joinedPairSegmentSizeVariants.sm, fieldGroupedEndSegmentBaseClasses, 'pl-2 pr-2.5'),
-        md: cn(
-          joinedPairSegmentSizeVariants.md,
-          fieldGroupedEndSegmentBaseClasses,
-          'pl-2.5 pr-3.5',
-        ),
-        lg: cn(joinedPairSegmentSizeVariants.lg, fieldGroupedEndSegmentBaseClasses, 'pl-3 pr-4'),
-      },
-    },
-    defaultVariants: {
-      size: 'md',
-    },
-    compoundVariants: [
-      { size: 'sm', class: 'min-w-[4.75rem]' },
-      { size: 'md', class: 'min-w-[5rem]' },
-      { size: 'lg', class: 'min-w-[5.75rem]' },
-    ],
-  },
-)
-
-export const joinedPairStartSelectSegmentVariants = cva(
-  'inline-flex shrink-0 items-center justify-between gap-1.5 text-left [&>span]:line-clamp-1 [&_svg]:shrink-0',
-  {
-    variants: {
-      size: {
-        sm: cn(
-          joinedPairSegmentSizeVariants.sm,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentStartClasses,
-          'pl-2 pr-2.5',
-        ),
-        md: cn(
-          joinedPairSegmentSizeVariants.md,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentStartClasses,
-          'pl-2.5 pr-3.5',
-        ),
-        lg: cn(
-          joinedPairSegmentSizeVariants.lg,
-          fieldGroupedSegmentResetClasses,
-          fieldGroupedSegmentStartClasses,
-          'pl-3 pr-4',
-        ),
-      },
-    },
-    defaultVariants: {
-      size: 'md',
-    },
-  },
-)
-
-/** Fixed end label — no caret, intrinsic width. */
-export const joinedPairEndLabelSegmentVariants = cva(
-  'inline-flex w-fit shrink-0 select-none items-center text-foreground',
-  {
-    variants: {
-      size: {
-        sm: cn(joinedPairSegmentSizeVariants.sm, fieldGroupedEndSegmentBaseClasses, 'pl-2 pr-2'),
-        md: cn(
-          joinedPairSegmentSizeVariants.md,
-          fieldGroupedEndSegmentBaseClasses,
-          'pl-2.5 pr-2.5',
-        ),
-        lg: cn(joinedPairSegmentSizeVariants.lg, fieldGroupedEndSegmentBaseClasses, 'pl-3 pr-3'),
-      },
-    },
-    defaultVariants: {
-      size: 'md',
-    },
-  },
-)
+export const joinedPairDividerVariants = groupedDividerVariants
 
 export type JoinedPairGroupVariantProps = VariantProps<typeof joinedPairGroupVariants>

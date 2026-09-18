@@ -60,6 +60,10 @@ export interface SelectFieldProps extends FieldValidationProps, FieldChromeProps
    * the form column unless the field shares a `FieldRow`.
    */
   digits?: FieldDigits
+  /** Compact text trigger width from label string (mutually exclusive with `digits` / `sizingLabels`). */
+  sizingLabel?: string
+  /** Compact text trigger width from overlapping option-label ghosts. */
+  sizingLabels?: readonly string[]
   /**
    * `above` (default) — label over control.
    * `inline` — label left, compact control right (`items-center`).
@@ -115,6 +119,8 @@ export function SelectField({
   width,
   size = 'md',
   digits,
+  sizingLabel,
+  sizingLabels,
   labelPosition,
   placeholder,
   noun,
@@ -136,12 +142,25 @@ export function SelectField({
 
   const selectTrigger =
     labelPosition === 'settings' ? (
-      <SelectTrigger id={id} size={size} digits={digits} onBlur={onBlur}>
+      <SelectTrigger
+        id={id}
+        size={size}
+        digits={digits}
+        sizingLabel={sizingLabel}
+        sizingLabels={sizingLabels}
+        onBlur={onBlur}
+      >
         <SelectValue placeholder={resolvedPlaceholder} />
       </SelectTrigger>
     ) : (
       <Field.Control>
-        <SelectTrigger size={size} digits={digits} onBlur={onBlur}>
+        <SelectTrigger
+          size={size}
+          digits={digits}
+          sizingLabel={sizingLabel}
+          sizingLabels={sizingLabels}
+          onBlur={onBlur}
+        >
           <SelectValue placeholder={resolvedPlaceholder} />
         </SelectTrigger>
       </Field.Control>

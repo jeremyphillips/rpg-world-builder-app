@@ -47,6 +47,8 @@ export function SelectFieldRenderer({
       placeholder={state.renderConfig.placeholder}
       noun={copyContext.noun}
       digits={state.renderConfig.digits}
+      sizingLabel={state.renderConfig.sizingLabel}
+      sizingLabels={state.renderConfig.sizingLabels}
       name={state.field.name}
       disabled={state.renderConfig.disabled}
       value={normalizedSelectFieldValue(state.field.value)}

@@ -131,16 +131,24 @@ describe('DiceFormulaField', () => {
     )
 
     const sharedTwoDigitWidth = 'w-[calc(2*1ch+2.75rem)]'
-    const facesThreeDigitWidth = 'w-[calc(3*1ch+2.75rem)]'
 
     expect(screen.getByLabelText('Count').parentElement).toHaveClass(sharedTwoDigitWidth)
     expect(screen.getByLabelText('Modifier').parentElement).toHaveClass(sharedTwoDigitWidth)
-    expect(screen.getByLabelText('Die faces')).toHaveClass(facesThreeDigitWidth)
-    expect(screen.getByLabelText('Operator')).toHaveClass('w-[calc(1*1ch+2.75rem)]')
+
+    const facesTrigger = screen.getByLabelText('Die faces')
+    expect(facesTrigger).toHaveClass('w-auto')
+    expect(facesTrigger.querySelector('[data-select-value-slot]')).toHaveClass(
+      'min-w-[calc(3*1ch)]',
+    )
+
+    const operatorTrigger = screen.getByLabelText('Operator')
+    expect(operatorTrigger.querySelector('[data-select-value-slot]')).toHaveClass(
+      'min-w-[calc(1*1ch)]',
+    )
   })
 
   it('shows a static multiply glyph when only one operator is allowed', () => {
-    render(
+    const { container } = render(
       <DiceFormulaField
         id="wealth-roll"
         label="Bonus roll"
@@ -153,6 +161,24 @@ describe('DiceFormulaField', () => {
 
     expect(screen.queryByLabelText('Operator')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Multiplier')).toHaveValue(250)
+
+    const multiplyGlyph = screen.getByText('×')
+    expect(multiplyGlyph).toHaveClass('ps-2')
+    expect(multiplyGlyph.closest('[aria-hidden]')).not.toHaveClass('bg-surface-faint')
+
+    const dividers = container.querySelectorAll('.bg-border, .bg-border-subtle')
+    expect(dividers.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('renders the dice separator as a faint middle segment with subtle trailing divider', () => {
+    const { container } = render(
+      <DiceFormulaField id="roll" label="Roll" modifierMode="none" size="md" />,
+    )
+
+    const diceSeparator = screen.getByText('d')
+    expect(diceSeparator).toHaveClass('ps-2', 'pe-2', 'font-mono')
+    expect(diceSeparator.closest('[aria-hidden]')).toHaveClass('bg-surface-faint')
+    expect(container.querySelector('.bg-border-subtle')).toBeInTheDocument()
   })
 
   itAxe('has no axe violations with multiply-only mode', async () => {

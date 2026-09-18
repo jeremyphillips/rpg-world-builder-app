@@ -498,6 +498,16 @@ export interface SelectFieldConfig extends BaseFieldConfig {
    * compressed; use row `width` tokens only when sharing a `FieldRow`.
    */
   digits?: FieldDigits
+  /**
+   * Compact text trigger width from this label string (grid ghost). Mutually exclusive
+   * with `digits` / `sizingLabels`. Prefer `sizingLabels` from option labels when the set is known.
+   */
+  sizingLabel?: string
+  /**
+   * Compact text trigger width from overlapping CSS ghosts for every option label. Mutually
+   * exclusive with `digits` / `sizingLabel`.
+   */
+  sizingLabels?: readonly string[]
   /** `above` (default) — label over control. `settings` — label + hint left, control right. */
   labelPosition?: FieldLabelPosition
 }
