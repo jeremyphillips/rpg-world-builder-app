@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  DEFAULT_DEPENDENT_CHROME,
-  DEFAULT_DEPENDENT_INSET,
-  isContainer,
-  type DependentConfig,
-} from '@rpg/ui/form'
+import { isContainer, type DependentConfig } from '@rpg/ui/form'
 
 import {
   modeDependentGrantSetField,
@@ -43,11 +38,9 @@ describe('modeDependentGrantSetField', () => {
         type: 'radio',
         name: 'weaponProficiencyMode',
       },
-      dependents: {
-        inset: DEFAULT_DEPENDENT_INSET,
-        chrome: DEFAULT_DEPENDENT_CHROME,
-      },
     })
+    expect(item.dependents).not.toHaveProperty('inset')
+    expect(item.dependents).not.toHaveProperty('chrome')
     expect(item.dependents).not.toHaveProperty('panel')
 
     const chips = item.dependents.fields[0]

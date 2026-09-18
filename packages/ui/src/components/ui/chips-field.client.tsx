@@ -218,7 +218,7 @@ export function ChipsField({
     />
   )
 
-  const chipsControl =
+  const chipsControl = (labelledBy: string, semanticRole?: 'group' | 'radiogroup') =>
     introText != null && introText !== '' ? (
       <div className={fieldAnatomyStackVariants({ size })}>
         <ChipsFieldIntroText
@@ -226,10 +226,10 @@ export function ChipsField({
           size={size}
           hideFromAccessibility={labelVisibility === 'srOnly'}
         />
-        {chipsOptions(legendId)}
+        {chipsOptions(labelledBy, semanticRole)}
       </div>
     ) : (
-      chipsOptions(legendId)
+      chipsOptions(labelledBy, semanticRole)
     )
 
   if (inAnatomyRow) {
@@ -252,8 +252,8 @@ export function ChipsField({
       >
         {({ labelId }) =>
           labelId
-            ? chipsOptions(labelId, multiple ? 'group' : 'radiogroup')
-            : chipsOptions(`${id}-legend`, multiple ? 'group' : 'radiogroup')
+            ? chipsControl(labelId, multiple ? 'group' : 'radiogroup')
+            : chipsControl(`${id}-legend`, multiple ? 'group' : 'radiogroup')
         }
       </FieldAnatomyRowShell>
     )
@@ -291,7 +291,7 @@ export function ChipsField({
             </legend>
           }
         >
-          {chipsControl}
+          {chipsControl(legendId)}
         </FieldsetChromeAnatomy>
       </FieldsetChromeFrame>
     </div>

@@ -106,8 +106,12 @@ export function resolveDependentPresentation(
   _rhythm: FieldRhythm,
   options?: { surfaceHost?: FormSurfaceHost },
 ): ResolvedDependentPresentation {
-  const { chrome = DEFAULT_DEPENDENT_CHROME } = dependents
+  let { chrome = DEFAULT_DEPENDENT_CHROME } = dependents
   const surfaceHost = options?.surfaceHost ?? 'field-container'
+
+  if (dependents.inset === false) {
+    chrome = 'none'
+  }
 
   if (chrome === 'none') {
     return { chrome, showNest: false }

@@ -53,29 +53,21 @@ All standard field renderers route through `FormFieldLabel` or `FieldRadiogroupL
 
 **Audit verdict:** Proposed API (`FormHeading`, `labelVisibility`, row/slot `heading`) covers all sampled outliers. No blocking API gaps.
 
-## Dependent inset and chrome
+## Dependent nest chrome
 
-> **Inset positions dependent content. Rail offset positions the decorative boundary. Chrome must not determine content indentation.**
+> **Default dependent nest:** weaker flush-left rail + 44px inset + host-aware fill. Opt out with `dependents.chrome: 'none'` for flush alignment.
 
-| Concept         | Meaning                                                                                                     |
-| --------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Inset**       | Total horizontal offset where dependent content begins (`pl-8` / `pl-9` = 8px rail gutter + content offset) |
-| **Rail**        | Decorative vertical boundary (`before:left-2` pseudo-element)                                               |
-| **Rail offset** | Small positioning adjustment for the rail within the inset gutter (8px)                                     |
+| Concept            | Meaning                                                                                                                                                                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Dependent nest** | Default when `dependents.chrome` is omitted or `'rail'` / legacy `'panel'` — `ml-11`, padding `12/12/12/16`, weaker `before:left-0` rail, host-aware fill (`bg-background` on field containers, `bg-surface-faint` inside array items). No border or extra radius. |
+| **Opt out**        | `dependents.chrome: 'none'` — no rail, fill, or nest inset. Legacy `inset: false` maps to flush layout at render time.                                                                                                                                             |
 
-Dependent regions split two orthogonal concerns:
+- Toggle → nest gap is **16px** (`gap-4` via `dependentSectionStackClasses`) on the dependent stack only.
+- Nested dependent regions keep nest decoration but do **not** get additional field containers.
+- Shared factories inherit the default nest; pass `dependents: { chrome: 'none' }` to override.
+- **`dependents.inset`**, **`dependents.panel`**, and **`dependents.scope`** are deprecated — ignored except `inset: false`, which opts out.
 
-| Key      | Role                                                                | Default  |
-| -------- | ------------------------------------------------------------------- | -------- |
-| `inset`  | Controller-relative **content** positioning (`pl-8` / `pl-9`)       | `true`   |
-| `chrome` | Decorative grouping (`rail`, `panel`, or none) — does not add inset | `'none'` |
-
-- **`inset: true` + `chrome: 'none'`** — subordinate positioning without a boundary.
-- **Nested inset and chrome** are valid — each dependent region independently owns its inset and chrome. Nested rails are supported when nested dependency hierarchy benefits from explicit visual boundaries.
-- Shared factories (e.g. mode-dependent grant sets) default to `inset: true`, `chrome: 'none'` but accept `dependents: { inset?, chrome? }` overrides.
-- **`inset: false` + `chrome: 'rail'`** — explicit opt-out of positioning when a rail alone is enough. Callers choose this; the renderer does not inspect ancestors or infer depth.
-
-Legacy `dependents.surface` maps to `chrome: 'panel'`. Chrome does not affect tier resolution, label visibility, or grouping.
+Chrome does not affect tier resolution, label visibility, or grouping. Detail → [containers.md](./containers.md#stacks).
 
 ## Migration guide (summary)
 
@@ -86,9 +78,11 @@ Legacy `dependents.surface` maps to `chrome: 'panel'`. Chrome does not affect ti
 | `label` / `hint` on slots          | `heading: { label, hint }`                                                 |
 | `hideLabel` / `labelHidden`        | `labelVisibility: 'srOnly'`                                                |
 | `label: ''`                        | Non-whitespace `label` + `labelVisibility: 'srOnly'` or structural heading |
-| `dependents.surface`               | `dependents.chrome: 'panel'` with `panel.surface`                          |
-| `dependents.chrome: 'inset'`       | `inset: true` (rail is the default decorative chrome)                      |
-| `dependents.layout: 'inset'`       | `inset: true` (default)                                                    |
-| `dependents.layout: 'flush'`       | `inset: false`                                                             |
+| `dependents.surface`               | Default nest (omit `chrome` or use `'rail'`)                               |
+| `dependents.chrome: 'panel'`       | Default nest (legacy `'panel'` maps to nest)                               |
+| `dependents.panel` / `scope`       | Deprecated — default nest wraps all dependents                             |
+| `dependents.chrome: 'inset'`       | Default nest                                                               |
+| `dependents.layout: 'inset'`       | Default nest (omit `chrome`)                                               |
+| `dependents.layout: 'flush'`       | `chrome: 'none'` (legacy `inset: false` also opts out)                     |
 
 See also [containers.md](./containers.md).
