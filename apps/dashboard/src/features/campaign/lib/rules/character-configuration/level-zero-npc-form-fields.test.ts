@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_DEPENDENT_CHROME, isContainer, type DependentConfig } from '@rpg/ui/form'
+import { isContainer, type DependentConfig } from '@rpg/ui/form'
 
 import { LEVEL_ZERO_NPCS_ENABLED, levelZeroNpcsFields } from './level-zero-npc-form-fields'
 
@@ -63,7 +63,7 @@ describe('levelZeroNpcsFields', () => {
 
     expect(nestedDependents.length).toBeGreaterThanOrEqual(2)
     for (const nested of nestedDependents) {
-      expect(nested.dependents).toMatchObject({ chrome: DEFAULT_DEPENDENT_CHROME })
+      expect(nested.dependents.chrome).toBeUndefined()
       expect(nested.dependents.inset).not.toBe(false)
       expect(nested.dependents).not.toHaveProperty('panel')
     }

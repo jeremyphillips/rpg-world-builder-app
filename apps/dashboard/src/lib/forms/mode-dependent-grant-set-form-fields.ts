@@ -1,7 +1,5 @@
 import {
   type DependentChrome,
-  DEFAULT_DEPENDENT_CHROME,
-  DEFAULT_DEPENDENT_INSET,
   type FieldConfig,
   type FieldOption,
   type FieldVisibility,
@@ -20,6 +18,7 @@ const XOR_GRANT_SET_MODE_LABELS: Record<XorGrantSetMode, string> = {
 }
 
 export type DependentPresentationOptions = {
+  /** @deprecated Use `chrome: 'none'` for flush dependents. */
   inset?: boolean
   chrome?: DependentChrome
 }
@@ -140,8 +139,12 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
     },
     dependents: {
       ...(visibility ? { visibility } : {}),
-      inset: dependentsPresentation?.inset ?? DEFAULT_DEPENDENT_INSET,
-      chrome: dependentsPresentation?.chrome ?? DEFAULT_DEPENDENT_CHROME,
+      ...(dependentsPresentation?.inset !== undefined
+        ? { inset: dependentsPresentation.inset }
+        : {}),
+      ...(dependentsPresentation?.chrome !== undefined
+        ? { chrome: dependentsPresentation.chrome }
+        : {}),
       fields: grantSetDependentFields(options),
     },
   }

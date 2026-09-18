@@ -77,6 +77,28 @@ describe('ChipsField', () => {
       expect(screen.getByText('Characters receive these languages:')).toBeInTheDocument()
       expect(container.querySelector('legend')).toHaveClass('sr-only')
     })
+
+    it('renders introText inside anatomy rows', () => {
+      render(
+        <FieldRowAnatomyProvider>
+          <ChipsField
+            id="granted-languages"
+            label="Granted languages"
+            labelVisibility="srOnly"
+            introText="Characters receive these languages:"
+            options={playStyleOptions}
+            multiple
+            value={[]}
+          />
+        </FieldRowAnatomyProvider>,
+      )
+
+      expect(screen.getByText('Characters receive these languages:')).toBeVisible()
+      expect(screen.getByText('Characters receive these languages:')).toHaveAttribute(
+        'aria-hidden',
+        'true',
+      )
+    })
   })
 
   it('marks selected options as checked', () => {

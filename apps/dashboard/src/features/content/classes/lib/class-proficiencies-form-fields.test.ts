@@ -45,7 +45,7 @@ describe('proficienciesFields', () => {
     expect(armorChips).not.toHaveProperty('chrome')
   })
 
-  it('uses rail chrome on the weapon proficiency grant-set dependents', () => {
+  it('relies on default nest chrome for weapon proficiency grant-set dependents', () => {
     const weaponsGroup = proficienciesColumns().columns[1]?.fields[0]
     if (!weaponsGroup || !isContainer(weaponsGroup) || weaponsGroup.kind !== 'group') {
       throw new Error('Expected Weapons group')
@@ -56,7 +56,8 @@ describe('proficienciesFields', () => {
       throw new Error('Expected weapon proficiency dependent')
     }
 
-    expect(weaponGrantSet.dependents).toMatchObject({ chrome: 'rail' })
+    expect(weaponGrantSet.dependents.chrome).toBeUndefined()
+    expect(weaponGrantSet.dependents).not.toHaveProperty('panel')
   })
 
   it('marks weapon proficiency grant-set editors as required', () => {

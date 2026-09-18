@@ -198,11 +198,7 @@ function DependentFieldsRegionContent({
   )
 
   if (!presentation.showNest) {
-    return (
-      <div className="" data-field-dependent-fields="">
-        {fieldsStack}
-      </div>
-    )
+    return <div data-field-dependent-fields="">{fieldsStack}</div>
   }
 
   return (

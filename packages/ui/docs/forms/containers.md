@@ -246,7 +246,7 @@ controller field gates indented dependents:
 - Field `[0]` (controller) — switch, select, etc. — always visible.
 - Fields `[1..]` (dependents) render inside the nest when chrome is not `'none'`.
 - **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` (legacy `'panel'` maps to the nest). Default `'rail'`.
-- **`dependents.inset`**: deprecated for layout — nest geometry is owned by the default recipe; `'none'` + `inset: false` opts out entirely.
+- **`dependents.inset`**: deprecated — use `chrome: 'none'`. Legacy `inset: false` maps to flush layout at render time.
 - A top-level `kind: 'dependent'` stack gets one shared field container (`chrome?: FieldChrome` on `DependentConfig`). Nested dependents keep nest decoration but do **not** get additional field containers.
 - Toggle → nest gap is **16px** (`gap-4` via `dependentSectionStackClasses`) on the dependent stack only — not margin on the nest wrapper.
 - Dependents hidden when the gate predicate is false — no empty nest.
@@ -271,7 +271,7 @@ Pair dependent scalars with `labelPosition: 'settings'`.
     },
   ],
   // on `kind: 'dependent'` — same keys under `dependents`:
-  // dependents: { surface: { emphasis: 'subtle' }, fields: [...] }
+  // dependents: { chrome: 'none', fields: [...] }  // flush opt-out
 }
 ```
 

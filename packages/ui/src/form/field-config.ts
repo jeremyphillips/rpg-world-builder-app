@@ -1085,10 +1085,13 @@ export type GroupFieldItem =
   | DependentConfig
   | ArrayConfig
 
-/** Decorative boundary for the dependents region — orthogonal to {@link DependentDependentsConfig.inset}. */
+/** Decorative boundary for the dependents region. Legacy `'panel'` maps to the default nest. */
 export type DependentChrome = 'none' | 'rail' | 'panel'
 
-/** Default controller-relative positioning for dependent regions. */
+/**
+ * Default controller-relative positioning for dependent regions.
+ * @deprecated Nest geometry is owned by the default recipe — use `chrome: 'none'` to opt out.
+ */
 export const DEFAULT_DEPENDENT_INSET = true
 
 /** Default decorative boundary for dependent regions. */
@@ -1101,21 +1104,23 @@ export interface DependentDependentsConfig {
    * When omitted and the controller is a switch, defaults to "switch is true".
    */
   visibility?: FieldVisibility
-  /** Controller-relative indentation. @default {@link DEFAULT_DEPENDENT_INSET} */
+  /**
+   * Legacy flush opt-out — maps to `chrome: 'none'` at render time.
+   * @deprecated Use `chrome: 'none'` instead.
+   */
   inset?: boolean
-  /** Decorative treatment only. @default {@link DEFAULT_DEPENDENT_CHROME} */
+  /** Default dependent nest when omitted or `'rail'` / legacy `'panel'`. @default {@link DEFAULT_DEPENDENT_CHROME} */
   chrome?: DependentChrome
   /** Default leaf/row container treatment for nested fields. */
   fieldChrome?: FieldChrome
-  /** Panel wash options — only when `chrome === 'panel'`. */
+  /**
+   * Legacy panel wash — ignored; `'panel'` maps to the default nest.
+   * @deprecated
+   */
   panel?: { surface?: SurfaceConfig; tone?: SemanticSurfaceTone }
   /**
-   * Where dependent chrome applies.
-   *
-   * - `wrapper` (default) — chrome on the dependents container.
-   * - `arrayItems` — chrome on nested array item shells only.
-   *
-   * @default wrapper
+   * Legacy scope split — ignored; the default nest always wraps dependents.
+   * @deprecated
    */
   scope?: FieldDependentsScope
 }
