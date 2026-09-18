@@ -21,6 +21,8 @@ export type JoinedPairSelectOccupantConfig = {
   options: readonly TypedSelectOption[]
   defaultValue?: string | number
   digits?: FieldDigits
+  sizingLabel?: string
+  sizingLabels?: readonly string[]
   placeholder?: string
   ariaLabel: string
 }

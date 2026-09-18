@@ -9,7 +9,7 @@ import {
   buildXpThresholdsDraft,
   buildXpThresholdsHostConfig,
   resolveSystemXpEntries,
-} from '@/features/campaign/lib/rules/character-configuration/xp-thresholds-field.lib'
+} from '@/features/campaign'
 import type { TableBuilderFormValues } from '@/features/content/lib/table-builder/table-builder-draft'
 
 import { TableBuilderExtendedProgressionDock } from './table-builder-extended-progression-dock'

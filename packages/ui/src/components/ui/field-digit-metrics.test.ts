@@ -27,10 +27,10 @@ describe('fieldDigitWidthVariants', () => {
   it('centralizes md control, grouped segment, and digit sizing classes', () => {
     expect(fieldControlSizeClasses.md).toBe('h-9 px-3 py-1.5 text-md')
     expect(fieldGroupedControlSizeClasses.md).toContain('h-9')
-    expect(fieldGroupedControlSizeClasses.md).toContain('pl-3')
+    expect(fieldGroupedControlSizeClasses.md).toContain('ps-3')
     expect(fieldGroupedControlSizeClasses.md).toContain('text-md')
-    expect(fieldDigitTrailingPaddingClasses.md).toBe('pr-6')
-    expect(fieldDigitSizeClasses.md).toBe('pl-3 pr-6')
+    expect(fieldDigitTrailingPaddingClasses.md).toBe('pe-6')
+    expect(fieldDigitSizeClasses.md).toBe('ps-3 pe-6')
     expect(fieldDigitTrailingColumnClasses.md).toBe('w-5')
     expect(fieldDigitTrailingIconClasses.md).toBe('[&_svg]:size-icon-glyph-xs')
   })

@@ -1,9 +1,10 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-const DASHBOARD_SRC = join(process.cwd(), 'src')
+const DASHBOARD_SRC = fileURLToPath(new URL('../../../../../', import.meta.url))
 
 const FORM_CONFIG_GLOBS = ['form-fields.ts', 'form-labels.ts', 'form-constants.ts'] as const
 

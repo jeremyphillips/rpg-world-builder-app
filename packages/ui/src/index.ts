@@ -659,6 +659,11 @@ export {
   SelectItem,
   SelectSeparator,
 } from './components/ui/select.client'
+export {
+  assertSelectCompactSizing,
+  isSelectCompactTrigger,
+  resolveSelectSizingGhostLabels,
+} from './components/ui/select-trigger.lib'
 export { Checkbox } from './components/ui/checkbox.client'
 export { RadioGroup, RadioGroupItem } from './components/ui/radio-group.client'
 export { Switch } from './components/ui/switch.client'

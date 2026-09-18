@@ -2,7 +2,6 @@
 
 import type { ComponentProps, ReactNode } from 'react'
 
-import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import type { FieldSize } from './field.client'
 import { fieldDigitsForMax } from './field-digit-metrics'
@@ -19,19 +18,17 @@ import {
   type DiceFormulaTailOperator,
   type DiceFormulaValue,
 } from './dice-formula-field.lib'
-import { InlineSentenceConnector, InlineSentenceRow } from './inline-sentence-row'
+import { GroupedDivider, GroupedStaticSegment } from './grouped-segment.client'
+import { InlineSentenceRow } from './inline-sentence-row'
 import {
   diceFormulaControlCellVariants,
   diceFormulaCoreGroupVariants,
   diceFormulaCountInputVariants,
   diceFormulaGroupedCountRootVariants,
-  diceFormulaGroupedFacesSegmentVariants,
   diceFormulaGroupedModifierRootVariants,
-  diceFormulaGroupedOperatorSegmentVariants,
   diceFormulaModifierGroupVariants,
   diceFormulaModifierInputVariants,
 } from './dice-formula-field.variants'
-import { inputSelectDividerVariants } from './input-select-field.variants'
 
 export const ADD_MODIFIER_LABEL = 'Add modifier'
 export const REMOVE_MODIFIER_LABEL = 'Remove modifier'
@@ -184,7 +181,6 @@ function DiceFormulaFacesControl({
           size={size}
           digits={digits}
           aria-invalid={hasError || undefined}
-          className={diceFormulaGroupedFacesSegmentVariants({ size })}
           onBlur={onBlur}
         >
           <SelectValue>{formatDieFaceLabel(resolved.faces, facesNotation)}</SelectValue>
@@ -249,16 +245,16 @@ function DiceFormulaCoreControls({
 
       {!facesNotation ? (
         <>
-          <div aria-hidden className={inputSelectDividerVariants()} />
+          <GroupedDivider strength="primary" />
 
-          <InlineSentenceConnector size={size} tone="mono" aria-hidden>
+          <GroupedStaticSegment size={size} position="middle" surfaceRole="glue" mono>
             d
-          </InlineSentenceConnector>
+          </GroupedStaticSegment>
 
-          <div aria-hidden className={inputSelectDividerVariants()} />
+          <GroupedDivider strength="subtle" />
         </>
       ) : (
-        <div aria-hidden className={inputSelectDividerVariants()} />
+        <GroupedDivider strength="primary" />
       )}
 
       <DiceFormulaFacesControl
@@ -274,26 +270,6 @@ function DiceFormulaCoreControls({
         onUpdate={onUpdate}
       />
     </div>
-  )
-}
-
-function DiceFormulaStaticOperator({
-  operator,
-  size,
-}: {
-  operator: DiceFormulaTailOperator
-  size: FieldSize
-}) {
-  return (
-    <span
-      aria-hidden
-      className={cn(
-        diceFormulaGroupedOperatorSegmentVariants({ size }),
-        'flex items-center justify-center tabular-nums',
-      )}
-    >
-      {operator}
-    </span>
   )
 }
 
@@ -341,7 +317,11 @@ function DiceFormulaOperatorSegment({
   const resolvedOperator = resolved.modifier?.operator ?? modifierOperators[0] ?? '+'
 
   if (singleOperator) {
-    return <DiceFormulaStaticOperator operator={resolvedOperator} size={size} />
+    return (
+      <GroupedStaticSegment size={size} position="start" surfaceRole="value" inset="compact" mono>
+        {resolvedOperator}
+      </GroupedStaticSegment>
+    )
   }
 
   return (
@@ -364,7 +344,6 @@ function DiceFormulaOperatorSegment({
           size={size}
           digits={1}
           aria-invalid={hasError || undefined}
-          className={diceFormulaGroupedOperatorSegmentVariants({ size })}
           onBlur={onBlur}
         >
           <SelectValue />
@@ -452,9 +431,11 @@ function DiceFormulaCurrencySegment({
 >) {
   if (!currencyUnit) return null
 
+  const currencySizingLabels = currencyUnit.options.map((option) => option.label)
+
   return (
     <>
-      <div aria-hidden className={inputSelectDividerVariants()} />
+      <GroupedDivider strength="primary" />
       <DiceFormulaControlCell id={currencyId} label="Currency">
         <Select
           value={currencyUnit.value}
@@ -465,9 +446,8 @@ function DiceFormulaCurrencySegment({
             id={currencyId}
             grouped
             size={size}
-            digits={2}
+            sizingLabels={currencySizingLabels}
             aria-invalid={hasError || undefined}
-            className={diceFormulaGroupedFacesSegmentVariants({ size })}
             onBlur={onBlur}
           >
             <SelectValue />
@@ -526,7 +506,7 @@ function DiceFormulaModifierControls({
           onUpdate={onUpdate}
         />
 
-        {!singleOperator ? <div aria-hidden className={inputSelectDividerVariants()} /> : null}
+        {!singleOperator ? <GroupedDivider strength="subtle" /> : null}
 
         <DiceFormulaModifierAmountSegment
           modifierId={modifierId}

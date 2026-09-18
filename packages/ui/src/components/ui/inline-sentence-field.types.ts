@@ -38,6 +38,10 @@ export type InlineSentenceSelectSegment = {
   name: string
   options: SelectFieldOptionListItem[]
   digits?: FieldDigits
+  /** Compact text trigger width (mutually exclusive with `digits`). */
+  sizingLabel?: string
+  /** All option labels as overlapping grid ghosts — mutually exclusive with `digits` / `sizingLabel`. */
+  sizingLabels?: readonly string[]
   /**
    * Trigger width when `digits` is omitted. Intrinsic tokens (`xs`–`xl`, `auto`)
    * keep the control on the inline row; defaults to `auto` (`w-fit`).
@@ -104,6 +108,8 @@ export type InlineSentenceBoundSelect = {
   value?: string
   options: SelectFieldOptionListItem[]
   digits?: FieldDigits
+  sizingLabel?: string
+  sizingLabels?: readonly string[]
   width?: FieldWidth
   placeholder?: string
   ariaLabel?: string

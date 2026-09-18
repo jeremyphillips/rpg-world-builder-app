@@ -1,19 +1,13 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import {
-  fieldInputFocusWithinClasses,
-  fieldInputInvalidClasses,
-  fieldInputShellClasses,
-} from './field-input-chrome.variants'
-import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
+import { fieldGroupedShellClasses, fieldInputInvalidClasses } from './field-input-chrome.variants'
 import { fieldInlineSentenceClasses } from './field.variants'
 
-/** Shared bordered shell for grouped dice segments (mirrors InputSelectField group). */
+/** Shared bordered shell for grouped dice segments (mirrors JoinedPair group). */
 const diceFormulaGroupShellClasses = cn(
-  'inline-flex w-fit max-w-full items-center',
-  fieldInputShellClasses,
-  fieldInputFocusWithinClasses,
+  fieldGroupedShellClasses,
+  'w-fit min-w-max max-w-full grid-flow-col auto-cols-max',
 )
 
 /** Core cluster shell — count + d + faces. */
@@ -59,44 +53,11 @@ export { diceFormulaSeparatorVariants } from './inline-sentence-row.variants'
 
 export const diceFormulaControlCellVariants = cva('flex shrink-0 items-center')
 
-/**
- * Size-only tokens for grouped segments. Suppresses standalone field chrome so
- * the group shell owns border and focus.
- */
-const groupedSegmentReset =
-  'border-0 bg-transparent shadow-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0'
-
 /** Wrapper for the count NumberInput — clips the trailing stepper column. */
 export const diceFormulaGroupedCountRootVariants = cva('overflow-hidden rounded-l-md')
 
 /** Wrapper for the modifier NumberInput — clips the trailing stepper column. */
 export const diceFormulaGroupedModifierRootVariants = cva('overflow-hidden rounded-r-md')
-
-export const diceFormulaGroupedFacesSegmentVariants = cva('shrink-0 tabular-nums', {
-  variants: {
-    size: {
-      sm: cn(fieldGroupedControlSizeClasses.sm, groupedSegmentReset, 'rounded-l-none rounded-r-md'),
-      md: cn(fieldGroupedControlSizeClasses.md, groupedSegmentReset, 'rounded-l-none rounded-r-md'),
-      lg: cn(fieldGroupedControlSizeClasses.lg, groupedSegmentReset, 'rounded-l-none rounded-r-md'),
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-})
-
-export const diceFormulaGroupedOperatorSegmentVariants = cva('shrink-0 tabular-nums', {
-  variants: {
-    size: {
-      sm: cn(fieldGroupedControlSizeClasses.sm, groupedSegmentReset, 'rounded-l-md rounded-r-none'),
-      md: cn(fieldGroupedControlSizeClasses.md, groupedSegmentReset, 'rounded-l-md rounded-r-none'),
-      lg: cn(fieldGroupedControlSizeClasses.lg, groupedSegmentReset, 'rounded-l-md rounded-r-none'),
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-})
 
 /**
  * Applied to NumberInput `className` (the `<input>` element). Width is

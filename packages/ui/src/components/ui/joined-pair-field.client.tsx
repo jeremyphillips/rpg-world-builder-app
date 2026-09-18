@@ -4,19 +4,12 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from './field.client'
-import {
-  fieldGroupedEndSegmentBaseClasses,
-  fieldGroupedSegmentResetClasses,
-  fieldGroupedSegmentStartClasses,
-} from './field-input-chrome.variants'
+import { groupedEndLabelSegmentShellClasses } from './select-compact-trigger.variants'
+import { SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import {
   joinedPairDividerVariants,
-  joinedPairEndLabelSegmentVariants,
-  joinedPairEndSelectSegmentVariants,
   joinedPairGroupVariants,
-  joinedPairSegmentSizeVariants,
   joinedPairStartNumberWrapperVariants,
-  joinedPairStartSelectSegmentVariants,
   joinedPairStartTextSegmentVariants,
   type JoinedPairGroupVariantProps,
 } from './joined-pair-field.variants'
@@ -71,7 +64,7 @@ function JoinedPairRoot({
 }
 
 function JoinedPairDivider() {
-  return <div aria-hidden className={joinedPairDividerVariants()} />
+  return <div aria-hidden className={joinedPairDividerVariants({ strength: 'primary' })} />
 }
 
 export function JoinedPairNumberOccupant({
@@ -117,10 +110,7 @@ export function JoinedPairNumberOccupant({
           aria-describedby={describedBy}
           onChange={(event) => onValueChange(parseNumberValue(event.target.value))}
           onBlur={onBlur}
-          className={cn(
-            joinedPairSegmentSizeVariants[size],
-            'bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-md rounded-r-none',
-          )}
+          className="rounded-l-md rounded-r-none"
         />
       </div>
     </>
@@ -184,6 +174,8 @@ export function JoinedPairSelectOccupant({
   position,
   disabled,
   digits,
+  sizingLabel,
+  sizingLabels,
   placeholder,
   hasError,
   describedBy,
@@ -192,17 +184,6 @@ export function JoinedPairSelectOccupant({
   onBlur,
 }: JoinedPairSelectOccupantProps) {
   const encodedValue = encodeStoredSelectOptionValue(value, options)
-  const segmentClassName =
-    digits != null
-      ? cn(
-          position === 'start'
-            ? cn(fieldGroupedSegmentResetClasses, fieldGroupedSegmentStartClasses)
-            : fieldGroupedEndSegmentBaseClasses,
-          'inline-flex shrink-0 items-center',
-        )
-      : position === 'start'
-        ? joinedPairStartSelectSegmentVariants({ size })
-        : joinedPairEndSelectSegmentVariants({ size })
 
   function handleChange(nextEncoded: string) {
     const resolved = resolveSelectOptionChange(nextEncoded, options)
@@ -221,10 +202,11 @@ export function JoinedPairSelectOccupant({
           grouped
           groupedPosition={position}
           digits={digits}
+          sizingLabel={sizingLabel}
+          sizingLabels={sizingLabels}
           aria-invalid={hasError || undefined}
           aria-describedby={describedBy}
           onBlur={onBlur}
-          className={segmentClassName}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -253,8 +235,10 @@ export function JoinedPairLabelOccupant({ text, ariaLabel, size }: JoinedPairLab
       <span className="sr-only">
         {ariaLabel}: {text}
       </span>
-      <span aria-hidden className={joinedPairEndLabelSegmentVariants({ size })}>
-        {text}
+      <span aria-hidden className={groupedEndLabelSegmentShellClasses(size)}>
+        <SelectLikeValueSlot size={size} position="end">
+          {text}
+        </SelectLikeValueSlot>
       </span>
     </>
   )

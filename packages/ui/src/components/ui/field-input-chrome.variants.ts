@@ -1,3 +1,5 @@
+import { cva, type VariantProps } from 'class-variance-authority'
+
 import { cn } from '../../lib/utils'
 
 /**
@@ -54,9 +56,29 @@ export const fieldGroupedShellStretchLayoutClasses = 'w-full grid-cols-[1fr_1px_
 export const fieldGroupedShellIntrinsicLayoutClasses =
   'w-fit min-w-max max-w-full grid-cols-[auto_minmax(1px,1px)_auto]'
 
-/** Vertical divider between grouped segments. */
-export const fieldGroupedDividerClasses =
-  'relative z-[1] w-px min-w-px shrink-0 self-stretch bg-border'
+/** Shared geometry for vertical dividers between grouped segments. */
+export const fieldGroupedDividerBaseClasses = 'relative z-[1] w-px min-w-px shrink-0 self-stretch'
+
+/**
+ * Grouped segment divider — `primary` separates major sub-controls; `subtle` separates
+ * tightly related sub-segments within one logical control.
+ */
+export const groupedDividerVariants = cva(fieldGroupedDividerBaseClasses, {
+  variants: {
+    strength: {
+      primary: 'bg-border',
+      subtle: 'bg-border-subtle',
+    },
+  },
+  defaultVariants: {
+    strength: 'primary',
+  },
+})
+
+/** @deprecated Prefer `groupedDividerVariants({ strength: 'primary' })`. */
+export const fieldGroupedDividerClasses = groupedDividerVariants({ strength: 'primary' })
+
+export type GroupedDividerVariantProps = VariantProps<typeof groupedDividerVariants>
 
 /**
  * Suppresses standalone field chrome and per-segment focus rings so the group
