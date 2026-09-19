@@ -18,4 +18,4 @@ export const builderStepChooseClassPromptHeadingClasses = 'text-base font-semibo
 
 export const builderStepChooseClassPromptSubheadingClasses = 'text-sm text-muted-foreground'
 
-export const builderStepChooseClassPromptActionClasses = 'h-auto w-fit shrink-0 self-start px-0'
+export const builderStepChooseClassPromptActionClasses = 'h-auto w-fit shrink-0 self-start'

@@ -40,7 +40,7 @@ export function BuilderStepChooseClassPrompt({
           </div>
           <Button
             type="button"
-            variant="ghost"
+            variant="link"
             className={builderStepChooseClassPromptActionClasses}
             onClick={() => onNavigateToStep('class')}
           >
