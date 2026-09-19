@@ -1,7 +1,8 @@
 import type {
   BuilderStepReadinessState,
   CharacterBuilderDraft,
-  ProficiencyStepSection,
+  ProficiencyInteractiveSection,
+  ProficiencyStepModel,
 } from '@rpg/contracts'
 
 export function isBuilderStepBlockedNoClass(
@@ -26,9 +27,27 @@ export function showsBuilderStepReviewMessage(state: BuilderStepReadinessState):
 }
 
 export function visibleProficiencySections(
-  sections: readonly ProficiencyStepSection[],
+  sections: readonly ProficiencyInteractiveSection[],
   classDependentBlocked: boolean | undefined,
-): ProficiencyStepSection[] {
+): ProficiencyInteractiveSection[] {
   if (!classDependentBlocked) return [...sections]
   return sections.filter((section) => section.kind === 'languages')
+}
+
+export function visibleProficiencyFixedGrants(
+  fixedGrants: ProficiencyStepModel['fixedGrants'],
+  classDependentBlocked: boolean | undefined,
+): ProficiencyStepModel['fixedGrants'] {
+  if (!classDependentBlocked) return [...fixedGrants]
+  return fixedGrants.filter((row) => row.kind === 'languages')
+}
+
+export function resolveVisibleProficiencyStepContent(
+  model: Pick<ProficiencyStepModel, 'fixedGrants' | 'sections'>,
+  classDependentBlocked: boolean | undefined,
+): Pick<ProficiencyStepModel, 'fixedGrants' | 'sections'> {
+  return {
+    fixedGrants: visibleProficiencyFixedGrants(model.fixedGrants, classDependentBlocked),
+    sections: visibleProficiencySections(model.sections, classDependentBlocked),
+  }
 }

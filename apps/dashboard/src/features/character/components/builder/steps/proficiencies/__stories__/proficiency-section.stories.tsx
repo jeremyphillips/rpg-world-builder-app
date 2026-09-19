@@ -4,8 +4,36 @@ import { createProficienciesStepRogueFixture } from '../../../../../lib/proficie
 import { ProficiencySection } from '../proficiency-section'
 
 const { model } = createProficienciesStepRogueFixture()
-const savingThrows = model.sections.find((section) => section.kind === 'savingThrows')!
 const skills = model.sections.find((section) => section.kind === 'skills')!
+
+const multiChoiceSkills = {
+  ...skills,
+  subhead: 'Choose additional skills from the options below.',
+  aggregateCount: {
+    selected: 1,
+    max: 3,
+    label: '1 / 3 chosen',
+  },
+  selectedRows: skills.selectedRows,
+  choiceBlocks: [
+    skills.choiceBlocks[0]!,
+    {
+      ...skills.choiceBlocks[0]!,
+      choiceSet: {
+        ...skills.choiceBlocks[0]!.choiceSet,
+        id: 'species:srd-cc-5.2.1:elf:keen-senses',
+        label: 'Keen Senses',
+        max: 1,
+      },
+      selectedCount: 0,
+      max: 1,
+      poolDescription: 'Choose from Perception, Investigation, Survival.',
+      addLabel: 'Add skill proficiency',
+      isFull: false,
+      isOverSelected: false,
+    },
+  ],
+}
 
 const meta = {
   title: 'Character Builder/ProficiencySection',
@@ -16,17 +44,17 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof ProficiencySection>
 
-export const SavingThrows: Story = {
+export const Skills: Story = {
   args: {
-    section: savingThrows,
+    section: skills,
     onOpenChoiceSet: () => undefined,
     onRemoveChoice: () => undefined,
   },
 }
 
-export const Skills: Story = {
+export const MultiChoiceSets: Story = {
   args: {
-    section: skills,
+    section: multiChoiceSkills,
     onOpenChoiceSet: () => undefined,
     onRemoveChoice: () => undefined,
   },

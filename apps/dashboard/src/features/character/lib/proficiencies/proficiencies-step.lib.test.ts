@@ -6,6 +6,8 @@ import { createPopulatedStandaloneBuilderContextFixture } from '../fixtures/char
 import {
   choiceSetsForProficienciesStep,
   formatProficiencyChoiceAddLabel,
+  formatProficiencyChosenCounter,
+  reconcileProficiencyStepReadiness,
 } from './proficiencies-step.lib'
 import { createProficienciesStepRogueContextFixture } from './proficiencies-step.fixtures'
 
@@ -32,5 +34,46 @@ describe('formatProficiencyChoiceAddLabel', () => {
     )!
 
     expect(formatProficiencyChoiceAddLabel(choiceSet)).toBe('Add skill proficiency')
+  })
+})
+
+describe('formatProficiencyChosenCounter', () => {
+  it('formats chosen counts for section and block labels', () => {
+    expect(formatProficiencyChosenCounter(1, 2)).toBe('1 / 2 chosen')
+  })
+})
+
+describe('reconcileProficiencyStepReadiness', () => {
+  it('downgrades complete and readyEmpty when class prerequisites are unresolved', () => {
+    expect(
+      reconcileProficiencyStepReadiness(
+        { readiness: 'complete', message: 'Done' },
+        { hasUnresolvedPrerequisites: true },
+      ),
+    ).toEqual({ readiness: 'readyWithChoices' })
+
+    expect(
+      reconcileProficiencyStepReadiness(
+        { readiness: 'readyEmpty', message: 'Nothing to choose' },
+        { hasUnresolvedPrerequisites: true },
+      ),
+    ).toEqual({ readiness: 'readyWithChoices' })
+  })
+
+  it('preserves blocked readiness while class prerequisites are unresolved', () => {
+    expect(
+      reconcileProficiencyStepReadiness(
+        {
+          readiness: 'blocked',
+          classDependentBlocked: true,
+          message: 'Choose a class',
+        },
+        { hasUnresolvedPrerequisites: true },
+      ),
+    ).toEqual({
+      readiness: 'blocked',
+      classDependentBlocked: true,
+      message: 'Choose a class',
+    })
   })
 })

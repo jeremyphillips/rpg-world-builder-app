@@ -17,10 +17,10 @@ const { model } = createProficienciesStepRogueFixture({
 })
 const selectedRow = model.sections
   .find((section) => section.kind === 'skills')!
-  .choices[0]!.selectedRows.find((row) => row.optionId === proficienciesStepStealthSkill.id)!
+  .selectedRows.find((row) => row.optionId === proficienciesStepStealthSkill.id)!
 const staleRow = model.sections
   .find((section) => section.kind === 'skills')!
-  .choices[0]!.selectedRows.find((row) => row.optionId === 'removed-skill')!
+  .selectedRows.find((row) => row.optionId === 'removed-skill')!
 
 const meta = {
   title: 'Character Builder/ProficiencySelectedRow',

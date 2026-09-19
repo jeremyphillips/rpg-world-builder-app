@@ -6,18 +6,27 @@ import { getToolCategoryLabel } from '../../../../vocab/equipment/tool-category'
 import { getWeaponCategoryLabel } from '../../../../vocab/weapon/category'
 import { getProficiencyDomainCompactLabel } from '../../../../vocab/proficiency'
 import type { CharacterBuildPreview } from '../../preview/preview'
-import { isChoiceSetSatisfied } from '../../choice-set'
-import type { ChoiceSet } from '../../choice-set'
+import { isChoiceSetSatisfied, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildContext } from '../../context'
 import { indexCharacterBuildCatalog } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import { getChoiceSetStepId } from '../../steps'
 import type { Ability } from '../../../../vocab/ability'
+import { isClassProgressionApplicable } from '../../progression/character-level-policy'
 import {
   formatProficiencyChoiceSourceLabel,
   formatProficiencySourceLabel,
 } from './format-proficiency-source-label'
 import { formatSavingThrowProficiencyLabel } from './format-saving-throw-proficiency-label'
+import { isFixedProficiencyGrant } from './proficiency-grant-classification'
+import {
+  formatProficiencyCategorySubhead,
+  formatProficiencyChoiceBlockAddLabel,
+  formatProficiencyPoolDescription,
+  formatProficiencySectionEmptyMessage,
+  resolveProficiencyAggregateCount,
+  type ProficiencyAggregateCount,
+} from './format-proficiency-step-copy'
 
 export const PROFICIENCY_STEP_SECTION_KINDS = [
   'savingThrows',
@@ -38,36 +47,54 @@ export type ProficiencyGrantedRow = {
   sublabel?: string
 }
 
+export type GrantedProficiencySourceGroup = {
+  sourceLabel: string
+  valueLabels: string[]
+}
+
+export type GrantedProficiencySummaryRow = {
+  kind: ProficiencyStepSectionKind
+  label: string
+  sourceGroups: GrantedProficiencySourceGroup[]
+}
+
 export type ProficiencyChoiceSelectedRow = {
   optionId: string
   label: string
   sourceLabel: string
+  choiceSetId: string
   isStale: boolean
   staleReason?: string
   isRemovable: true
 }
 
-export type ProficiencyChoiceSummary = {
+export type ProficiencyChoiceBlock = {
   choiceSet: ChoiceSet
-  selectedRows: ProficiencyChoiceSelectedRow[]
-  grantedRows: ProficiencyGrantedRow[]
   selectedCount: number
+  min: number
   max: number
+  poolDescription: string
+  addLabel: string
   isFull: boolean
   isOverSelected: boolean
 }
 
-export type ProficiencyStepSection = {
+export type ProficiencyInteractiveSection = {
   kind: ProficiencyStepSectionKind
   heading: string
-  intro?: string
-  grantedRows: ProficiencyGrantedRow[]
-  choices: ProficiencyChoiceSummary[]
+  subhead: string
+  aggregateCount: ProficiencyAggregateCount | null
+  selectedRows: ProficiencyChoiceSelectedRow[]
+  choiceBlocks: ProficiencyChoiceBlock[]
+  emptyMessage: string
+  isOverSelected: boolean
 }
 
 export type ProficiencyStepModel = {
-  sections: ProficiencyStepSection[]
+  fixedGrants: GrantedProficiencySummaryRow[]
+  sections: ProficiencyInteractiveSection[]
   hasPendingChoices: boolean
+  hasUnresolvedPrerequisites: boolean
 }
 
 export const PROFICIENCY_STALE_REASON = 'This proficiency is no longer available.' as const
@@ -98,15 +125,6 @@ export type ResolveProficiencyStepModelArgs = {
   choiceSets: readonly ChoiceSet[]
 }
 
-function emptySection(kind: ProficiencyStepSectionKind): ProficiencyStepSection {
-  return {
-    kind,
-    heading: PROFICIENCY_SECTION_HEADINGS[kind],
-    grantedRows: [],
-    choices: [],
-  }
-}
-
 function buildSavingThrowRows(
   preview: Pick<CharacterBuildPreview, 'savingThrows'>,
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
@@ -130,9 +148,10 @@ function buildSavingThrowRows(
 function skillGrantedRows(
   preview: Pick<CharacterBuildPreview, 'proficiencies'>,
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  choiceSetIds: ReadonlySet<string>,
 ): ProficiencyGrantedRow[] {
   return preview.proficiencies.skills
-    .filter((entry) => entry.sources?.some((source) => source.grantId === 'skill-proficiencies'))
+    .filter((entry) => isFixedProficiencyGrant(entry.sources, choiceSetIds))
     .map((entry) => ({
       id: `skill:${entry.skill}`,
       kind: 'skills' as const,
@@ -144,52 +163,68 @@ function skillGrantedRows(
 function weaponGrantedRows(
   preview: Pick<CharacterBuildPreview, 'proficiencies'>,
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  choiceSetIds: ReadonlySet<string>,
 ): ProficiencyGrantedRow[] {
   return preview.proficiencies.weapons
-    .filter((entry) => entry.weaponCategory !== undefined)
-    .map((entry) => ({
-      id: `weapon-category:${entry.weaponCategory}`,
-      kind: 'weapons' as const,
-      label: getWeaponCategoryLabel(entry.weaponCategory!),
-      sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
-        rowKind: 'weaponCategory',
-      }),
-    }))
+    .filter((entry) => isFixedProficiencyGrant(entry.sources, choiceSetIds))
+    .map((entry) => {
+      const id = entry.weaponId
+        ? `weapon:${entry.weaponId}`
+        : `weapon-category:${entry.weaponCategory}`
+      const label = entry.weaponId
+        ? formatVocabularySlugLabel(entry.weaponId)
+        : getWeaponCategoryLabel(entry.weaponCategory!)
+
+      return {
+        id,
+        kind: 'weapons' as const,
+        label,
+        sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
+          rowKind: entry.weaponCategory ? 'weaponCategory' : 'default',
+        }),
+      }
+    })
 }
 
 function armorGrantedRows(
   preview: Pick<CharacterBuildPreview, 'proficiencies'>,
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  choiceSetIds: ReadonlySet<string>,
 ): ProficiencyGrantedRow[] {
-  return preview.proficiencies.armor.map((entry) => ({
-    id: `armor-category:${entry.armorCategory}`,
-    kind: 'armor' as const,
-    label: getArmorCategoryLabel(entry.armorCategory),
-    sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
-      rowKind: 'armorCategory',
-    }),
-  }))
+  return preview.proficiencies.armor
+    .filter((entry) => isFixedProficiencyGrant(entry.sources, choiceSetIds))
+    .map((entry) => ({
+      id: `armor-category:${entry.armorCategory}`,
+      kind: 'armor' as const,
+      label: getArmorCategoryLabel(entry.armorCategory),
+      sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
+        rowKind: 'armorCategory',
+      }),
+    }))
 }
 
 function toolGrantedRows(
   preview: Pick<CharacterBuildPreview, 'proficiencies'>,
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  choiceSetIds: ReadonlySet<string>,
 ): ProficiencyGrantedRow[] {
-  return preview.proficiencies.tools.map((entry) => {
-    const id = entry.toolId ? `tool:${entry.toolId}` : `tool-category:${entry.toolCategory}`
-    const label = entry.toolId
-      ? formatVocabularySlugLabel(entry.toolId)
-      : getToolCategoryLabel(entry.toolCategory!)
+  return preview.proficiencies.tools
+    .filter((entry) => isFixedProficiencyGrant(entry.sources, choiceSetIds))
+    .map((entry) => {
+      const id = entry.toolId ? `tool:${entry.toolId}` : `tool-category:${entry.toolCategory}`
+      const label = entry.toolId
+        ? formatVocabularySlugLabel(entry.toolId)
+        : getToolCategoryLabel(entry.toolCategory!)
 
-    return {
-      id,
-      kind: 'tools' as const,
-      label,
-      sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
-        rowKind: entry.toolCategory ? 'toolCategory' : 'default',
-      }),
-    }
-  })
+      return {
+        id,
+        kind: 'tools' as const,
+        label,
+        sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
+          rowKind: entry.toolCategory ? 'toolCategory' : 'default',
+        }),
+      }
+    })
 }
 
 function languageGrantedRows(
@@ -198,11 +233,7 @@ function languageGrantedRows(
   choiceSetIds: ReadonlySet<string>,
 ): ProficiencyGrantedRow[] {
   return preview.proficiencies.languages
-    .filter((entry) =>
-      entry.sources?.every(
-        (source) => source.grantId === undefined || !choiceSetIds.has(source.grantId),
-      ),
-    )
+    .filter((entry) => isFixedProficiencyGrant(entry.sources, choiceSetIds))
     .map((entry) => ({
       id: `language:${entry.language}`,
       kind: 'languages' as const,
@@ -211,14 +242,60 @@ function languageGrantedRows(
     }))
 }
 
-function buildChoiceSummary(
+function collectFixedGrantedRows(
+  preview: Pick<CharacterBuildPreview, 'savingThrows' | 'proficiencies'>,
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  classId: string | undefined,
+  choiceSetIds: ReadonlySet<string>,
+): ProficiencyGrantedRow[] {
+  return [
+    ...buildSavingThrowRows(preview, catalogIndex, classId),
+    ...skillGrantedRows(preview, catalogIndex, choiceSetIds),
+    ...weaponGrantedRows(preview, catalogIndex, choiceSetIds),
+    ...armorGrantedRows(preview, catalogIndex, choiceSetIds),
+    ...toolGrantedRows(preview, catalogIndex, choiceSetIds),
+    ...languageGrantedRows(preview, catalogIndex, choiceSetIds),
+  ]
+}
+
+function groupGrantedRowsIntoSummary(
+  rows: readonly ProficiencyGrantedRow[],
+): GrantedProficiencySummaryRow[] {
+  const rowsByKind = new Map<ProficiencyStepSectionKind, Map<string, string[]>>()
+
+  for (const row of rows) {
+    const bySource = rowsByKind.get(row.kind) ?? new Map<string, string[]>()
+    const valueLabels = bySource.get(row.sourceLabel) ?? []
+    valueLabels.push(row.label)
+    bySource.set(row.sourceLabel, valueLabels)
+    rowsByKind.set(row.kind, bySource)
+  }
+
+  return PROFICIENCY_STEP_SECTION_KINDS.flatMap((kind) => {
+    const bySource = rowsByKind.get(kind)
+    if (!bySource || bySource.size === 0) return []
+
+    return [
+      {
+        kind,
+        label: PROFICIENCY_SECTION_HEADINGS[kind],
+        sourceGroups: [...bySource.entries()].map(([sourceLabel, valueLabels]) => ({
+          sourceLabel,
+          valueLabels,
+        })),
+      },
+    ]
+  })
+}
+
+function buildSelectedRows(
   choiceSet: ChoiceSet,
   draft: CharacterBuilderDraft,
-): ProficiencyChoiceSummary {
+): ProficiencyChoiceSelectedRow[] {
   const selections = draft.choiceSelections[choiceSet.id] ?? []
   const optionIds = new Set(choiceSet.options.map((option) => option.id))
 
-  const selectedRows: ProficiencyChoiceSelectedRow[] = selections.map((optionId) => {
+  return selections.map((optionId) => {
     const option = choiceSet.options.find((entry) => entry.id === optionId)
     const isStale = !optionIds.has(optionId)
 
@@ -226,34 +303,52 @@ function buildChoiceSummary(
       optionId,
       label: option?.label ?? optionId,
       sourceLabel: formatProficiencyChoiceSourceLabel(choiceSet.label),
+      choiceSetId: choiceSet.id,
       isStale,
       staleReason: isStale ? PROFICIENCY_STALE_REASON : undefined,
       isRemovable: true,
     }
   })
+}
+
+function buildChoiceBlock(
+  choiceSet: ChoiceSet,
+  draft: CharacterBuilderDraft,
+): ProficiencyChoiceBlock {
+  const selections = draft.choiceSelections[choiceSet.id] ?? []
+  const selectedCount = selections.length
 
   return {
     choiceSet,
-    selectedRows,
-    grantedRows: [],
-    selectedCount: selections.length,
+    selectedCount,
+    min: choiceSet.min,
     max: choiceSet.max,
-    isFull: selections.length >= choiceSet.max,
-    isOverSelected: selections.length > choiceSet.max,
+    poolDescription: formatProficiencyPoolDescription(choiceSet),
+    addLabel: formatProficiencyChoiceBlockAddLabel(choiceSet, selectedCount),
+    isFull: selectedCount >= choiceSet.max,
+    isOverSelected: selectedCount > choiceSet.max,
   }
 }
 
-function appendChoice(
-  sections: Map<ProficiencyStepSectionKind, ProficiencyStepSection>,
-  choiceSet: ChoiceSet,
+function buildInteractiveSection(
+  kind: ProficiencyStepSectionKind,
+  choiceSets: readonly ChoiceSet[],
   draft: CharacterBuilderDraft,
-): void {
-  const sectionKind = PROFICIENCY_CHOICE_TYPE_SECTION[choiceSet.choiceType]
-  if (!sectionKind) return
+  hasFixedGrantsInCategory: boolean,
+): ProficiencyInteractiveSection {
+  const choiceBlocks = choiceSets.map((choiceSet) => buildChoiceBlock(choiceSet, draft))
+  const selectedRows = choiceSets.flatMap((choiceSet) => buildSelectedRows(choiceSet, draft))
 
-  const section = sections.get(sectionKind) ?? emptySection(sectionKind)
-  section.choices.push(buildChoiceSummary(choiceSet, draft))
-  sections.set(sectionKind, section)
+  return {
+    kind,
+    heading: PROFICIENCY_SECTION_HEADINGS[kind],
+    subhead: formatProficiencyCategorySubhead(kind, choiceSets),
+    aggregateCount: resolveProficiencyAggregateCount(choiceBlocks),
+    selectedRows,
+    choiceBlocks,
+    emptyMessage: formatProficiencySectionEmptyMessage(kind, hasFixedGrantsInCategory),
+    isOverSelected: choiceBlocks.some((block) => block.isOverSelected),
+  }
 }
 
 /** Builds the proficiencies step view model for dashboard rendering. */
@@ -270,50 +365,25 @@ export function resolveProficiencyStepModel({
   )
   const choiceSetIds = new Set(proficiencyChoiceSets.map((choiceSet) => choiceSet.id))
 
-  const sections = new Map<ProficiencyStepSectionKind, ProficiencyStepSection>()
+  const grantedRows = collectFixedGrantedRows(preview, catalogIndex, classId, choiceSetIds)
+  const fixedGrants = groupGrantedRowsIntoSummary(grantedRows)
+  const fixedGrantKinds = new Set(fixedGrants.map((row) => row.kind))
 
-  const savingThrowRows = buildSavingThrowRows(preview, catalogIndex, classId)
-  if (savingThrowRows.length > 0) {
-    sections.set('savingThrows', {
-      ...emptySection('savingThrows'),
-      grantedRows: savingThrowRows,
-    })
-  }
-
-  const skillRows = skillGrantedRows(preview, catalogIndex)
-  if (skillRows.length > 0) {
-    sections.set('skills', { ...emptySection('skills'), grantedRows: skillRows })
-  }
-
-  const weaponRows = weaponGrantedRows(preview, catalogIndex)
-  if (weaponRows.length > 0) {
-    sections.set('weapons', { ...emptySection('weapons'), grantedRows: weaponRows })
-  }
-
-  const armorRows = armorGrantedRows(preview, catalogIndex)
-  if (armorRows.length > 0) {
-    sections.set('armor', { ...emptySection('armor'), grantedRows: armorRows })
-  }
-
-  const toolRows = toolGrantedRows(preview, catalogIndex)
-  if (toolRows.length > 0) {
-    sections.set('tools', { ...emptySection('tools'), grantedRows: toolRows })
-  }
-
-  const languageRows = languageGrantedRows(preview, catalogIndex, choiceSetIds)
-  if (languageRows.length > 0) {
-    sections.set('languages', { ...emptySection('languages'), grantedRows: languageRows })
-  }
-
+  const choiceSetsByKind = new Map<ProficiencyStepSectionKind, ChoiceSet[]>()
   for (const choiceSet of proficiencyChoiceSets) {
-    appendChoice(sections, choiceSet, draft)
+    const sectionKind = PROFICIENCY_CHOICE_TYPE_SECTION[choiceSet.choiceType]
+    if (!sectionKind) continue
+
+    const existing = choiceSetsByKind.get(sectionKind) ?? []
+    existing.push(choiceSet)
+    choiceSetsByKind.set(sectionKind, existing)
   }
 
-  const visibleSections = PROFICIENCY_STEP_SECTION_KINDS.flatMap((kind) => {
-    const section = sections.get(kind)
-    if (!section) return []
-    if (section.grantedRows.length === 0 && section.choices.length === 0) return []
-    return [section]
+  const sections = PROFICIENCY_STEP_SECTION_KINDS.flatMap((kind) => {
+    const categoryChoiceSets = choiceSetsByKind.get(kind)
+    if (!categoryChoiceSets || categoryChoiceSets.length === 0) return []
+
+    return [buildInteractiveSection(kind, categoryChoiceSets, draft, fixedGrantKinds.has(kind))]
   })
 
   const hasPendingChoices = proficiencyChoiceSets.some(
@@ -322,8 +392,12 @@ export function resolveProficiencyStepModel({
       !isChoiceSetSatisfied(choiceSet, draft.choiceSelections[choiceSet.id] ?? []),
   )
 
+  const hasUnresolvedPrerequisites = !classId && isClassProgressionApplicable(draft.class.level)
+
   return {
-    sections: visibleSections,
+    fixedGrants,
+    sections,
     hasPendingChoices,
+    hasUnresolvedPrerequisites,
   }
 }

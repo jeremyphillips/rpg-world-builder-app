@@ -23,7 +23,9 @@ import { CHOICE_TYPES } from './choice-set'
 import { createEmptyCharacterBuilderDraft } from './draft/draft'
 import type { CharacterBuilderDraft } from './draft/draft'
 import type { ChoiceSet } from './choice-set'
+import { DEFAULT_SYSTEM_RULESET_ID } from '../../primitives/ruleset'
 import type { Organization } from '../../content/organization/organization'
+import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../primitives/proficiency/character-creation-proficiency-rules'
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -60,6 +62,24 @@ function makeSkillChoiceSet(overrides: Partial<ChoiceSet> = {}): ChoiceSet {
     options: [
       { id: 'srd-cc-5.2.1:athletics', label: 'Athletics' },
       { id: 'srd-cc-5.2.1:perception', label: 'Perception' },
+    ],
+    required: true,
+    ...overrides,
+  }
+}
+
+function makeLanguageChoiceSet(overrides: Partial<ChoiceSet> = {}): ChoiceSet {
+  return {
+    id: `ruleset:${DEFAULT_SYSTEM_RULESET_ID}:${ORIGIN_LANGUAGES_CHOICE_ID}`,
+    sourceType: 'ruleset',
+    sourceId: DEFAULT_SYSTEM_RULESET_ID,
+    choiceType: 'language',
+    label: 'Origin Languages',
+    min: 2,
+    max: 2,
+    options: [
+      { id: 'common', label: 'Common' },
+      { id: 'elvish', label: 'Elvish' },
     ],
     required: true,
     ...overrides,
@@ -398,7 +418,13 @@ describe('getBuilderStepStatus — proficiencies', () => {
   })
 
   it('returns complete when resolver ran and no ChoiceSets for this step', () => {
-    expect(getBuilderStepStatus('proficiencies', makeDraft(), [])).toBe('complete')
+    expect(
+      getBuilderStepStatus(
+        'proficiencies',
+        makeDraft({ class: { classId: 'srd-cc-5.2.1:fighter', level: 1 } }),
+        [],
+      ),
+    ).toBe('complete')
   })
 
   it('returns incomplete when required ChoiceSet is unsatisfied', () => {
@@ -408,6 +434,7 @@ describe('getBuilderStepStatus — proficiencies', () => {
 
   it('returns complete when all required ChoiceSets are satisfied', () => {
     const draft = makeDraft({
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
       choiceSelections: {
         'class:srd-cc-5.2.1:fighter:class-skills': [
           'srd-cc-5.2.1:athletics',
@@ -416,6 +443,18 @@ describe('getBuilderStepStatus — proficiencies', () => {
       },
     })
     expect(getBuilderStepStatus('proficiencies', draft, [makeSkillChoiceSet()])).toBe('complete')
+  })
+
+  it('stays incomplete without a class even when visible language choices are satisfied', () => {
+    const draft = makeDraft({
+      choiceSelections: {
+        [`ruleset:${DEFAULT_SYSTEM_RULESET_ID}:origin-languages`]: ['common', 'elvish'],
+      },
+    })
+
+    expect(getBuilderStepStatus('proficiencies', draft, [makeLanguageChoiceSet()])).toBe(
+      'incomplete',
+    )
   })
 })
 

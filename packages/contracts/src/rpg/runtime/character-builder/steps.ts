@@ -347,7 +347,12 @@ const STEP_COMPLETION_CHECKS: Record<
   class: (draft) => isClassComplete(draft),
   abilities: (draft, _stepChoiceSets, _resolvedChoiceSets, standardArray) =>
     isAbilitiesComplete(draft, standardArray),
-  proficiencies: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
+  proficiencies: (draft, stepChoiceSets) => {
+    if (!draft.class.classId && isClassProgressionApplicable(draft.class.level)) {
+      return false
+    }
+    return isChoiceStepComplete(draft, stepChoiceSets)
+  },
   equipment: (draft, stepChoiceSets) =>
     draft.equipment?.skipped === true || isChoiceStepComplete(draft, stepChoiceSets),
   spells: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),

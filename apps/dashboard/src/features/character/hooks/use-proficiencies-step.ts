@@ -9,6 +9,7 @@ import {
 } from '@rpg/contracts'
 
 import { withChoiceSetSelections } from '../lib/choice-sets/choice-set-selections'
+import { reconcileProficiencyStepReadiness } from '../lib/proficiencies/proficiencies-step.lib'
 import type { ProficienciesStepProps } from '../components/builder/steps/proficiencies/proficiencies-step.types'
 
 export function useProficienciesStep({
@@ -46,10 +47,15 @@ export function useProficienciesStep({
     [context, draft, effectivePreview, resolvedChoiceSets],
   )
 
-  const readiness = useMemo(
-    () => resolveBuilderStepReadiness('proficiencies', draft, context, resolvedChoiceSets),
-    [context, draft, resolvedChoiceSets],
-  )
+  const readiness = useMemo(() => {
+    const resolved = resolveBuilderStepReadiness(
+      'proficiencies',
+      draft,
+      context,
+      resolvedChoiceSets,
+    )
+    return reconcileProficiencyStepReadiness(resolved, model)
+  }, [context, draft, model, resolvedChoiceSets])
 
   const activeChoiceSet = useMemo(
     () => resolvedChoiceSets.find((choiceSet) => choiceSet.id === openChoiceSetId),

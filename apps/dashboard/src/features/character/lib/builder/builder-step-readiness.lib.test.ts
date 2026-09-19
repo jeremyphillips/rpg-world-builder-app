@@ -7,6 +7,7 @@ import {
   isBuilderStepReadinessMessageOnly,
   showsBuilderStepReviewMessage,
   visibleProficiencySections,
+  resolveVisibleProficiencyStepContent,
 } from './builder-step-readiness.lib'
 
 describe('builder-step-readiness.lib', () => {
@@ -50,11 +51,73 @@ describe('builder-step-readiness.lib', () => {
     expect(
       visibleProficiencySections(
         [
-          { kind: 'savingThrows', heading: 'Saving Throws', grantedRows: [], choices: [] },
-          { kind: 'languages', heading: 'Languages', grantedRows: [], choices: [] },
+          {
+            kind: 'savingThrows',
+            heading: 'Saving Throws',
+            subhead: '',
+            aggregateCount: null,
+            selectedRows: [],
+            choiceBlocks: [],
+            emptyMessage: '',
+            isOverSelected: false,
+          },
+          {
+            kind: 'languages',
+            heading: 'Languages',
+            subhead: '',
+            aggregateCount: null,
+            selectedRows: [],
+            choiceBlocks: [],
+            emptyMessage: '',
+            isOverSelected: false,
+          },
         ],
         true,
       ).map((section) => section.kind),
     ).toEqual(['languages'])
+  })
+
+  it('resolves visible summary and section content from the step model', () => {
+    const model = {
+      fixedGrants: [
+        {
+          kind: 'savingThrows' as const,
+          label: 'Saving Throws',
+          sourceGroups: [{ sourceLabel: 'Granted by Rogue', valueLabels: ['DEX · Dexterity'] }],
+        },
+        {
+          kind: 'languages' as const,
+          label: 'Languages',
+          sourceGroups: [{ sourceLabel: 'Granted by Origin Languages', valueLabels: ['Common'] }],
+        },
+      ],
+      sections: [
+        {
+          kind: 'skills' as const,
+          heading: 'Skills',
+          subhead: '',
+          aggregateCount: null,
+          selectedRows: [],
+          choiceBlocks: [],
+          emptyMessage: '',
+          isOverSelected: false,
+        },
+        {
+          kind: 'languages' as const,
+          heading: 'Languages',
+          subhead: '',
+          aggregateCount: null,
+          selectedRows: [],
+          choiceBlocks: [],
+          emptyMessage: '',
+          isOverSelected: false,
+        },
+      ],
+    }
+
+    expect(resolveVisibleProficiencyStepContent(model, true)).toEqual({
+      fixedGrants: [model.fixedGrants[1]],
+      sections: [model.sections[1]],
+    })
   })
 })

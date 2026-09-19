@@ -1,10 +1,14 @@
-import { STEP_CHOICE_TYPES_BY_STEP, type ChoiceSet } from '@rpg/contracts'
+import {
+  STEP_CHOICE_TYPES_BY_STEP,
+  type BuilderStepReadinessState,
+  type ChoiceSet,
+  type ProficiencyStepModel,
+} from '@rpg/contracts'
 import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
 
 import {
   BUILDER_SELECTION_FULL_NOTICE,
   formatChoiceSetDrawerTriggerLabel,
-  formatSelectionCounter,
   isChoiceSetSelectionFull,
   isChoiceSetSelectionOverSelected,
 } from '../choice-sets/selection-counter.lib'
@@ -40,7 +44,25 @@ export function formatProficiencyChoiceAddLabel(choiceSet: ChoiceSet): string {
   })
 }
 
-export const formatProficiencySelectionCounter = formatSelectionCounter
+export function formatProficiencyChosenCounter(selectedCount: number, max: number): string {
+  return `${selectedCount} / ${max} chosen`
+}
+
+/** @deprecated Prefer aggregateCount.label from resolveProficiencyStepModel or formatProficiencyChosenCounter. */
+export const formatProficiencySelectionCounter = formatProficiencyChosenCounter
+
+export function reconcileProficiencyStepReadiness(
+  readiness: BuilderStepReadinessState,
+  model: Pick<ProficiencyStepModel, 'hasUnresolvedPrerequisites'>,
+): BuilderStepReadinessState {
+  if (!model.hasUnresolvedPrerequisites) return readiness
+
+  if (readiness.readiness === 'complete' || readiness.readiness === 'readyEmpty') {
+    return { readiness: 'readyWithChoices' }
+  }
+
+  return readiness
+}
 
 export const isProficiencyChoiceSetFull = isChoiceSetSelectionFull
 

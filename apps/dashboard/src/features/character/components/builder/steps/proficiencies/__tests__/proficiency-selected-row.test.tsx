@@ -30,8 +30,7 @@ describe('ProficiencySelectedRow', () => {
       },
     })
 
-    const row = model.sections.find((section) => section.kind === 'skills')!.choices[0]!
-      .selectedRows[0]!
+    const row = model.sections.find((section) => section.kind === 'skills')!.selectedRows[0]!
 
     render(<ProficiencySelectedRow row={row} onRemove={onRemove} />)
 
@@ -47,9 +46,7 @@ describe('ProficiencySelectedRow', () => {
 
     const staleRow = model.sections
       .find((section) => section.kind === 'skills')!
-      .choices[0]!.selectedRows.find(
-        (row) => row.optionId === PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID,
-      )!
+      .selectedRows.find((row) => row.optionId === PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID)!
 
     render(<ProficiencySelectedRow row={staleRow} onRemove={() => undefined} />)
 
@@ -70,8 +67,7 @@ describe('ProficiencySelectedRow', () => {
         [skillChoiceSetId]: [proficienciesStepStealthSkill.id],
       },
     })
-    const row = model.sections.find((section) => section.kind === 'skills')!.choices[0]!
-      .selectedRows[0]!
+    const row = model.sections.find((section) => section.kind === 'skills')!.selectedRows[0]!
 
     const { container } = render(<ProficiencySelectedRow row={row} onRemove={() => undefined} />)
 

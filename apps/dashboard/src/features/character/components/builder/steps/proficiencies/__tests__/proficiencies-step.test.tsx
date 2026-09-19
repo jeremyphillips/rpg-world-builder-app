@@ -20,6 +20,7 @@ import {
   proficienciesStepAcrobaticsSkill,
   proficienciesStepStealthSkill,
 } from '../../../../../lib/proficiencies/proficiencies-step.fixtures'
+import { PROFICIENCY_GRANTED_SUMMARY_HEADING } from '../proficiency-granted-summary'
 import { PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL } from '../proficiency-selected-row'
 import { ProficienciesStep } from '../proficiencies-step'
 
@@ -57,7 +58,7 @@ describe('ProficienciesStep', () => {
     expect(onNavigateToStep).toHaveBeenCalledWith('class')
   })
 
-  it('renders Rogue grant rows and the skill choice counter', () => {
+  it('renders the granted summary and skills choice section for Rogue', () => {
     const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
 
     render(
@@ -72,20 +73,20 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    expect(screen.getByText('DEX · Dexterity')).toBeInTheDocument()
-    expect(screen.getByText('INT · Intelligence')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('DEX · Dexterity · INT · Intelligence')).toBeInTheDocument()
     expect(screen.getByText('Thieves Tools')).toBeInTheDocument()
-    expect(screen.getByText('Simple Weapon')).toBeInTheDocument()
-    expect(screen.getByText('Martial Weapon')).toBeInTheDocument()
-    expect(screen.getByText('Light Armor')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Rogue Skills' })).toBeInTheDocument()
-    const skillsChoiceSection = screen
-      .getByRole('heading', { name: 'Rogue Skills' })
-      .closest('section')!
-    expect(within(skillsChoiceSection).getByText('Selected: 0 / 2')).toBeInTheDocument()
+    expect(screen.getByText(/Simple Weapon/i)).toBeInTheDocument()
+    expect(screen.getByText(/Martial Weapon/i)).toBeInTheDocument()
+    expect(screen.getByText(/Light Armor/i)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
+    const skillsSection = screen.getByRole('heading', { name: 'Skills' }).closest('section')!
+    expect(within(skillsSection).getByText('0 / 2 chosen')).toBeInTheDocument()
   })
 
-  it('shows only sections with grants or choices', () => {
+  it('shows the granted summary and interactive sections', () => {
     const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
 
     render(
@@ -100,12 +101,15 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Saving Throws' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
+    ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Tools' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Tools' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Weapons' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Armor' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Saving Throws' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Weapons' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Armor' })).not.toBeInTheDocument()
   })
 
   it('renders the origin language choice section without class grants', () => {
@@ -126,9 +130,12 @@ describe('ProficienciesStep', () => {
 
     expect(screen.getByText(PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Origin Languages' })).toBeInTheDocument()
+    expect(screen.getByText(/Choose 2 languages from Origin Languages\./)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add language' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Saving Throws' })).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('No additional languages chosen yet.')).toBeInTheDocument()
   })
 
   it('shows a stale badge for invalid skill selections', () => {
@@ -308,7 +315,9 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Saving Throws' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
+    ).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

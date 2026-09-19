@@ -372,7 +372,24 @@
         "kind": "custom",
         "id": "keen-senses",
         "name": "Keen Senses",
-        "description": "<p>You have proficiency in the Insight, Perception, or Survival skill (choose one).</p>"
+        "description": "<p>You have proficiency in the Insight, Perception, or Survival skill (choose one).</p>",
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "skillProficiency",
+                "grant": {
+                  "kind": "choice",
+                  "choose": 1,
+                  "pool": {
+                    "source": "explicit",
+                    "skillIds": ["insight", "perception", "survival"]
+                  }
+                }
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",

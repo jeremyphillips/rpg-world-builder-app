@@ -81,9 +81,9 @@ describe('resolveAvailableChoices against srd-cc-5.2.1 seeds', () => {
 
       expect(heritage, species.slug).toMatchObject({
         choiceType: 'trait',
-        min: 1,
+        min: 0,
         max: 1,
-        required: true,
+        required: false,
         options: species.heritage.options.map((option) => ({ id: option.id })),
       })
     }

@@ -19,6 +19,7 @@ describe('grant coverage inventory (srd-cc-5.2.1)', () => {
       'featChoice:fighting-style',
       'featChoice:origin',
       'heritage',
+      'skillProficiency:pool:explicit',
       'starting-equipment',
     ])
   })
