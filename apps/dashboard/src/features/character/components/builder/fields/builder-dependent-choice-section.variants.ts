@@ -1,4 +1,4 @@
-import { radioCardCompactPanelPaddingClasses } from '@rpg/ui'
+import { optionCardCompactPanelPaddingClasses } from '@rpg/ui'
 
 export const builderDependentChoiceSectionClasses = 'space-y-3'
 
@@ -7,7 +7,7 @@ export const builderDependentChoiceSectionCopyClasses = 'space-y-1'
 export const builderDependentChoiceSectionEmbeddedClasses = 'space-y-2 border-0'
 
 export const builderDependentChoiceSectionEmbeddedPaddingClasses =
-  radioCardCompactPanelPaddingClasses
+  optionCardCompactPanelPaddingClasses
 
 export const builderDependentChoiceSectionHeaderClasses =
   'flex items-start justify-between gap-3 border-0'

@@ -146,8 +146,6 @@ export interface FieldOption {
   classification?: string
   /** Category slug matched by combobox `filterSelect` (e.g. tool category id). */
   filterCategory?: string
-  /** Feature chips rendered by `radioCard` fields; ignored by other option controls. */
-  meta?: string[]
   /** Inline title badge rendered by `radioCard` fields; ignored by other option controls. */
   badge?: string
 }

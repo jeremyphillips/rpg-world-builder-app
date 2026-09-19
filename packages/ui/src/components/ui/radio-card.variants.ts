@@ -10,46 +10,16 @@ import {
 } from './choice-control-chrome.variants'
 import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
+import {
+  optionCardDensityBodyLayoutVariants,
+  optionCardDensityContentGapVariants,
+  optionCardSelectedChromeClasses,
+} from './selection-option-card.variants'
 
 const radioCardCardBase = cn(
-  `group relative flex w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-card text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary/50 hover:bg-control-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-control-selected data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
-  establishSurfaceCurrent('card'),
+  `group relative flex w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-surface-subtle text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary/50 hover:bg-control-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-card-selected-border data-[state=checked]:bg-surface-strong data-[state=checked]:[--surface-current:var(--surface-strong)] data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
+  establishSurfaceCurrent('surface-subtle'),
 )
-
-/** Compact option shell — 12px left when decorative control is present, 16px right, 8px vertical. */
-export const radioCardCompactOptionBodyLayoutClasses = 'pl-3 pr-4 py-2'
-
-/** Compact chooser summary — full 16px horizontal inset, 8px vertical (no control column). */
-export const radioCardCompactSummaryBodyLayoutClasses = 'px-4 py-2'
-
-/** Density-owned card body padding — compact option cards only; summaries use {@link radioCardCompactSummaryBodyLayoutClasses}. */
-export const radioCardDensityBodyLayoutVariants = cva('', {
-  variants: {
-    density: {
-      default: 'p-4 sm:p-6',
-      compact: radioCardCompactOptionBodyLayoutClasses,
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
-
-/** Density-owned vertical gap between card content blocks. */
-export const radioCardDensityContentGapVariants = cva('', {
-  variants: {
-    density: {
-      default: 'gap-2',
-      compact: 'gap-1',
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
-
-/** Compact chooser summary — flush eyebrow→title (tighter than option-card content gap). */
-export const radioCardCompactSummaryContentGapClasses = 'gap-0'
 
 const radioCardRowBase = cn(
   'group relative flex w-full cursor-pointer flex-col rounded-md border-0 bg-transparent text-left text-card-foreground',
@@ -61,6 +31,10 @@ const radioCardRowBase = cn(
   interactiveFocusVariants({ context: 'standalone' }),
   'disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border aria-invalid:border-destructive',
 )
+
+export type RadioCardVariant = 'card' | 'row'
+
+export type RadioCardVisualControl = 'radio' | 'icon'
 
 /** Card-style radio option: selected, hover, and focus states use design tokens only. */
 export const radioCardVariants = cva('', {
@@ -79,16 +53,16 @@ export const radioCardVariants = cva('', {
       variant: 'card',
       density: 'default',
       class: cn(
-        radioCardDensityContentGapVariants({ density: 'default' }),
-        radioCardDensityBodyLayoutVariants({ density: 'default' }),
+        optionCardDensityContentGapVariants({ density: 'default' }),
+        optionCardDensityBodyLayoutVariants({ density: 'default' }),
       ),
     },
     {
       variant: 'card',
       density: 'compact',
       class: cn(
-        radioCardDensityContentGapVariants({ density: 'compact' }),
-        radioCardDensityBodyLayoutVariants({ density: 'compact' }),
+        optionCardDensityContentGapVariants({ density: 'compact' }),
+        optionCardDensityBodyLayoutVariants({ density: 'compact' }),
       ),
     },
     { variant: 'row', density: 'default', class: 'gap-1 px-0 py-2' },
@@ -103,17 +77,17 @@ export const radioCardVariants = cva('', {
 /** Outer shell when a details action sits beside the radio item (avoids nested interactives). */
 export const radioCardShellVariants = cva(
   cn(
-    `relative overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-card text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
-    establishSurfaceCurrent('card'),
+    `relative overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-surface-subtle text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
+    establishSurfaceCurrent('surface-subtle'),
   ),
   {
     variants: {
       density: {
-        default: radioCardDensityBodyLayoutVariants({ density: 'default' }),
-        compact: radioCardDensityBodyLayoutVariants({ density: 'compact' }),
+        default: optionCardDensityBodyLayoutVariants({ density: 'default' }),
+        compact: optionCardDensityBodyLayoutVariants({ density: 'compact' }),
       },
       selected: {
-        true: 'border-card-selected-border bg-control-selected',
+        true: optionCardSelectedChromeClasses,
         false: 'hover:border-primary/50 hover:bg-control-hover',
       },
     },
@@ -145,8 +119,15 @@ export const radioCardItemWithDetailsVariants = cva(
   'contents cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
 )
 
-/** Right-aligned details link aligned with the title row. */
-export const radioCardDetailsInlineSlotVariants = cva('col-start-3 row-start-1 shrink-0 self-start')
+/** Transparent radio row inside an outer shell (embedded/footer slots below). */
+export const radioCardShellItemVariants = cva(
+  'flex w-full cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
+)
+
+/** Right-aligned details action aligned with the title row. */
+export const radioCardDetailsInlineSlotVariants = cva(
+  'col-start-3 row-start-1 shrink-0 self-center',
+)
 
 /** Decorative radio circle shown inside the card, synced to the parent item state. */
 export const radioCardControlVariants = cva(
@@ -190,147 +171,7 @@ export const radioCardIconControlVariants = cva(
   },
 )
 
-export const radioCardBodyVariants = cva('flex min-w-0 flex-1 flex-col', {
-  variants: {
-    density: {
-      default: 'gap-2',
-      compact: 'gap-0',
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
-
-/** Shared vertical gap between option/summary title and description — one token for both surfaces. */
-export const radioCardPrimaryCopyStackVariants = cva('flex flex-col', {
-  variants: {
-    density: {
-      default: 'gap-2',
-      compact: 'gap-0',
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
-
-export const radioCardRootLayoutVariants = cva('flex items-start', {
-  variants: {
-    controlPosition: {
-      left: '',
-      right: 'flex-row-reverse',
-    },
-    density: {
-      default: 'gap-4',
-      compact: 'gap-3',
-    },
-  },
-  defaultVariants: {
-    controlPosition: 'left',
-    density: 'default',
-  },
-})
-
-export const radioCardMetaListVariants = cva('flex flex-wrap gap-1.5')
-
-export const radioCardTitleVariants = cva('font-bold', {
-  variants: {
-    density: {
-      default: 'text-md',
-      compact: 'text-sm',
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
-
-/** Selected chooser summary title — compact steps up to 16px while option labels stay 14px. */
-export const radioCardSummaryTitleVariants = cva('font-bold', {
-  variants: {
-    density: {
-      default: 'text-md',
-      compact: 'text-base',
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
-
-export const radioCardTitleRowVariants = cva('flex min-w-0 flex-wrap items-center gap-2')
-
-/** Inline muted copy immediately after the card title (e.g. dependent-choice status). */
-export const radioCardTitleMetaVariants = cva('text-muted-foreground')
-
-export const radioCardSummaryLinesVariants = cva('flex flex-col gap-0.5')
-
-/** Muted secondary copy under the card title (descriptions, summaries). */
-export const radioCardDescriptionVariants = cva('text-muted-foreground', {
-  variants: {
-    density: {
-      default: 'text-sm',
-      compact: 'text-xs',
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
-
-export const radioCardSummaryVariants = radioCardDescriptionVariants
-
-export const radioCardDetailsLinkVariants = cva('h-auto shrink-0 px-0 py-0 text-muted-foreground')
-
-/** Horizontal padding for compact chooser summaries and symmetric breakout contexts. */
-export const radioCardCompactPaddingXClasses = 'px-4'
-
-export const radioCardCompactPaddingRightClasses = 'pr-4'
-
-/**
- * Left inset aligning panel copy with the compact card body column
- * (option shell padding + radio control + column gap).
- */
-export const radioCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.75rem)]'
-
-/** Panel horizontal padding: body-column inset left, shell padding right. */
-export const radioCardCompactPanelPaddingClasses = `${radioCardCompactBodyInsetClasses} ${radioCardCompactPaddingRightClasses}`
-
-/** Slot below the primary card row when a selected option reveals nested content. */
-export const radioCardEmbeddedSlotVariants = cva('', {
-  variants: {
-    tone: {
-      divider: 'border-t border-border',
-      panel: cn(
-        'border-t border-border bg-surface-muted',
-        establishSurfaceCurrent('surface-muted'),
-      ),
-    },
-    density: {
-      default: '',
-      compact: '',
-    },
-  },
-  compoundVariants: [
-    { tone: 'divider', density: 'default', class: 'mt-4 pt-4' },
-    { tone: 'divider', density: 'compact', class: 'mt-2 pt-2' },
-    {
-      tone: 'panel',
-      density: 'default',
-      class: '-mx-4 -mb-4 mt-4 rounded-b-card pb-4 pt-4 sm:-mx-6',
-    },
-    {
-      tone: 'panel',
-      density: 'compact',
-      class: '-mb-2 -ml-3 -mr-4 mt-2 rounded-b-card pb-2 pt-2',
-    },
-  ],
-  defaultVariants: {
-    tone: 'divider',
-    density: 'default',
-  },
-})
+export const radioCardDetailsActionVariants = cva('shrink-0 text-muted-foreground')
 
 /** Vertical gap between sibling radio options in a group. */
 export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {

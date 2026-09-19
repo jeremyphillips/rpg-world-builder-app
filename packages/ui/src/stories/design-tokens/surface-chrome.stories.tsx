@@ -41,7 +41,11 @@ const OWNERSHIP_ROWS = [
     plane: '--surface-subtle',
   },
   { shell: 'Advanced filter panel', ownership: 'establishes', plane: '--surface-muted' },
-  { shell: 'RadioCard outer card / shell', ownership: 'establishes', plane: '--card' },
+  {
+    shell: 'RadioCard outer card / shell',
+    ownership: 'establishes',
+    plane: '--surface-subtle',
+  },
   {
     shell: 'RadioCard embedded muted panel',
     ownership: 'establishes',
