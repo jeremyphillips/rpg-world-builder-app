@@ -2,11 +2,11 @@ import { cn } from '../../lib/utils'
 import { Eyebrow } from './eyebrow'
 import {
   RadioCard,
-  RadioCardItem,
   createRadioCardReselectClickHandler,
   type RadioCardDensity,
   type RadioCardOption,
 } from './radio-card.client'
+import { RadioOptionCard, RadioOptionCardTitleAdornment } from './radio-option-card.client'
 import { radioCardGroupGapVariants } from './radio-card.variants'
 import { RadioGroup } from './radio-group.client'
 import { RadioFieldShell, type BaseRadioFieldProps } from './radio-field-shell'
@@ -71,18 +71,21 @@ function GroupedRadioCardOptions({
           <Eyebrow size="xs">{group.eyebrow}</Eyebrow>
           <div className={radioCardGroupGapVariants({ variant: 'card', density })}>
             {group.options.map((option) => (
-              <RadioCardItem
+              <RadioOptionCard
                 key={option.value}
                 id={`${idPrefix}-${option.value}`}
                 value={option.value}
                 disabled={option.disabled}
                 label={option.label}
                 description={option.description}
-                badge={option.badge}
-                titleMeta={option.titleMeta}
-                meta={option.meta}
                 summaryItems={option.summaryItems}
                 summaryLines={option.summaryLines}
+                titleAdornment={
+                  <RadioOptionCardTitleAdornment
+                    badge={option.badge}
+                    titleMeta={option.titleMeta}
+                  />
+                }
                 density={density}
                 onClick={createRadioCardReselectClickHandler(
                   option.value,

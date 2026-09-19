@@ -1,40 +1,17 @@
 'use client'
 
 import * as React from 'react'
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
-import { Circle } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { Badge } from './badge'
-import { Button } from './button.client'
 import { RadioGroup } from './radio-group.client'
 import {
-  radioCardBodyVariants,
-  radioCardControlVariants,
-  radioCardDescriptionVariants,
-  radioCardDetailsGridVariants,
-  radioCardDetailsInlineSlotVariants,
-  radioCardDetailsLinkVariants,
-  radioCardEmbeddedSlotVariants,
-  radioCardGroupGapVariants,
-  radioCardIconControlVariants,
-  radioCardIndicatorVariants,
-  radioCardItemWithDetailsVariants,
-  radioCardMetaListVariants,
-  radioCardRootLayoutVariants,
-  radioCardShellVariants,
-  radioCardSummaryLinesVariants,
-  radioCardSummaryVariants,
-  radioCardTitleMetaVariants,
-  radioCardTitleRowVariants,
-  radioCardTitleVariants,
-  radioCardVariants,
-} from './radio-card.variants'
-import { textVariants } from './text.variants'
+  RadioOptionCard,
+  RadioOptionCardDetailsAction,
+  RadioOptionCardTitleAdornment,
+} from './radio-option-card.client'
+import { radioCardGroupGapVariants } from './radio-card.variants'
 
 export const RADIO_CARD_DEFAULT_DETAILS_LABEL = 'Details'
-
-export const RADIO_CARD_SUMMARY_SEPARATOR = ' · '
 
 /** Radix RadioGroup skips onValueChange when the current option is clicked again. */
 export function createRadioCardReselectClickHandler(
@@ -75,7 +52,6 @@ export interface RadioCardOption {
   badge?: string
   /** Inline muted text immediately after the title (e.g. "Heritage required"). */
   titleMeta?: string
-  meta?: string[]
   /** Compact density: trait names or other summary chips rendered inline. */
   summaryItems?: string[]
   /** Stacked muted lines below the title row (e.g. level-grouped grant summaries). */
@@ -84,387 +60,13 @@ export interface RadioCardOption {
   embeddedContent?: React.ReactNode
   /** Visual treatment for the embedded region below the primary card row. */
   embeddedSlotTone?: RadioCardEmbeddedSlotTone
+  /** Always-visible region below the primary row inside the shell (e.g. validation reasons). */
+  footerContent?: React.ReactNode
   onDetails?: () => void
   detailsLabel?: string
 }
 
-export interface RadioCardItemProps extends React.ComponentPropsWithoutRef<
-  typeof RadioGroupPrimitive.Item
-> {
-  label: string
-  description?: string
-  badge?: string
-  titleMeta?: string
-  meta?: string[]
-  summaryItems?: string[]
-  summaryLines?: string[]
-  density?: RadioCardDensity
-  variant?: RadioCardVariant
-  /** Merged onto the option title label. */
-  titleClassName?: string
-  /**
-   * Horizontal placement of the decorative radio control within the card.
-   * Ignored when visualControl="icon" (icon is always leading).
-   */
-  controlPosition?: 'left' | 'right'
-  /** Leading control presentation. Default 'radio' preserves existing consumers. */
-  visualControl?: RadioCardVisualControl
-  icon?: React.ReactNode
-}
-
-function RadioCardDetailsLink({ label, onDetails }: { label: string; onDetails: () => void }) {
-  return (
-    <Button variant="link" size="sm" className={radioCardDetailsLinkVariants()} onClick={onDetails}>
-      {label}
-    </Button>
-  )
-}
-
-type RadioCardItemContentProps = Pick<
-  RadioCardItemProps,
-  | 'label'
-  | 'description'
-  | 'badge'
-  | 'titleMeta'
-  | 'meta'
-  | 'summaryItems'
-  | 'summaryLines'
-  | 'density'
-  | 'variant'
-  | 'titleClassName'
-  | 'controlPosition'
-  | 'visualControl'
-  | 'icon'
->
-
-function RadioCardTitleMeta({ titleMeta }: { titleMeta: string }) {
-  return (
-    <span className={cn(textVariants({ variant: 'small' }), radioCardTitleMetaVariants())}>
-      {titleMeta}
-    </span>
-  )
-}
-
-function RadioCardSummaryLines({
-  summaryLines,
-  density = 'default',
-}: {
-  summaryLines: string[]
-  density?: RadioCardDensity
-}) {
-  return (
-    <div className={radioCardSummaryLinesVariants()}>
-      {summaryLines.map((line) => (
-        <span key={line} className={radioCardSummaryVariants({ density })}>
-          {line}
-        </span>
-      ))}
-    </div>
-  )
-}
-
-function RadioCardControl({
-  className,
-  variant = 'card',
-  density = 'default',
-}: {
-  className?: string
-  variant?: RadioCardVariant
-  density?: RadioCardDensity
-}) {
-  const indicatorSize = variant === 'row' ? 'size-2.5' : density === 'compact' ? 'size-2' : 'size-3'
-
-  return (
-    <span
-      className={cn(radioCardControlVariants({ variant, density }), 'mt-0.5', className)}
-      aria-hidden="true"
-    >
-      <span className={radioCardIndicatorVariants()}>
-        <Circle className={cn('fill-primary text-primary', indicatorSize)} />
-      </span>
-    </span>
-  )
-}
-
-function RadioCardIconControl({
-  icon,
-  density = 'default',
-  className,
-}: {
-  icon: React.ReactNode
-  density?: RadioCardDensity
-  className?: string
-}) {
-  return (
-    <span
-      className={cn(radioCardIconControlVariants({ density }), 'mt-0.5', className)}
-      aria-hidden="true"
-    >
-      {icon}
-    </span>
-  )
-}
-
-type RadioCardTitleRowContentProps = {
-  label: string
-  titleMeta?: string
-  badge?: string
-  titleClassName?: string
-  density?: RadioCardDensity
-}
-
-function RadioCardTitleRowContent({
-  label,
-  titleMeta,
-  badge,
-  titleClassName,
-  density = 'default',
-}: RadioCardTitleRowContentProps) {
-  return (
-    <div className={radioCardTitleRowVariants()}>
-      <span className={cn(radioCardTitleVariants({ density }), titleClassName)}>{label}</span>
-      {titleMeta ? <RadioCardTitleMeta titleMeta={titleMeta} /> : null}
-      {badge ? (
-        <Badge appearance="soft" tone="info" size="sm">
-          {badge}
-        </Badge>
-      ) : null}
-    </div>
-  )
-}
-
-type RadioCardSecondaryContentProps = {
-  description?: string
-  summaryText?: string
-  summaryLines?: string[]
-  meta?: string[]
-  showMeta?: boolean
-  density?: RadioCardDensity
-}
-
-function RadioCardSecondaryContent({
-  description,
-  summaryText,
-  summaryLines,
-  meta,
-  showMeta = false,
-  density = 'default',
-}: RadioCardSecondaryContentProps) {
-  return (
-    <>
-      {description ? (
-        <span className={radioCardDescriptionVariants({ density })}>{description}</span>
-      ) : null}
-      {summaryText ? (
-        <span className={radioCardSummaryVariants({ density })}>{summaryText}</span>
-      ) : null}
-      {summaryLines && summaryLines.length > 0 ? (
-        <RadioCardSummaryLines summaryLines={summaryLines} density={density} />
-      ) : null}
-      {showMeta && meta && meta.length > 0 ? (
-        <ul className={radioCardMetaListVariants()} aria-hidden="true">
-          {meta.map((chip) => (
-            <li key={chip}>
-              <Badge appearance="soft" tone="neutral" size="sm">
-                {chip}
-              </Badge>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </>
-  )
-}
-
-function RadioCardItemContent({
-  label,
-  description,
-  badge,
-  titleMeta,
-  meta,
-  summaryItems,
-  summaryLines,
-  density = 'default',
-  variant = 'card',
-  titleClassName,
-  controlPosition = 'left',
-  visualControl = 'radio',
-  icon,
-}: RadioCardItemContentProps) {
-  const isCompact = density === 'compact'
-  const summaryText =
-    summaryItems && summaryItems.length > 0
-      ? summaryItems.join(RADIO_CARD_SUMMARY_SEPARATOR)
-      : undefined
-  const effectiveControlPosition = visualControl === 'icon' ? 'left' : controlPosition
-
-  return (
-    <div
-      className={radioCardRootLayoutVariants({
-        controlPosition: effectiveControlPosition,
-        density,
-      })}
-    >
-      {visualControl === 'icon' ? (
-        icon ? (
-          <RadioCardIconControl icon={icon} density={density} />
-        ) : null
-      ) : (
-        <RadioCardControl variant={variant} density={density} />
-      )}
-      <div className={radioCardBodyVariants({ density })}>
-        <RadioCardTitleRowContent
-          label={label}
-          titleMeta={titleMeta}
-          badge={badge}
-          titleClassName={titleClassName}
-          density={density}
-        />
-        <RadioCardSecondaryContent
-          description={description}
-          summaryText={summaryText}
-          summaryLines={summaryLines}
-          meta={meta}
-          showMeta={!isCompact}
-          density={density}
-        />
-      </div>
-    </div>
-  )
-}
-
-const RadioCardItem = React.forwardRef<
-  React.ComponentRef<typeof RadioGroupPrimitive.Item>,
-  RadioCardItemProps
->(
-  (
-    {
-      className,
-      label,
-      description,
-      badge,
-      titleMeta,
-      meta,
-      summaryItems,
-      summaryLines,
-      density = 'default',
-      variant = 'card',
-      titleClassName,
-      controlPosition = 'left',
-      visualControl = 'radio',
-      icon,
-      disabled,
-      onClick,
-      value,
-      ...props
-    },
-    ref,
-  ) => (
-    <RadioGroupPrimitive.Item
-      ref={ref}
-      disabled={disabled}
-      value={value}
-      className={cn(radioCardVariants({ density, variant }), className)}
-      onClick={onClick}
-      {...props}
-    >
-      <RadioCardItemContent
-        label={label}
-        description={description}
-        badge={badge}
-        titleMeta={titleMeta}
-        meta={meta}
-        summaryItems={summaryItems}
-        summaryLines={summaryLines}
-        density={density}
-        variant={variant}
-        titleClassName={titleClassName}
-        controlPosition={controlPosition}
-        visualControl={visualControl}
-        icon={icon}
-      />
-    </RadioGroupPrimitive.Item>
-  ),
-)
-RadioCardItem.displayName = 'RadioCardItem'
-
-type RadioCardOptionWithDetailsProps = {
-  option: RadioCardOption
-  density: RadioCardDensity
-  idPrefix: string
-  selected: boolean
-  selectedValue?: string
-  onValueChange?: (value: string) => void
-}
-
-function RadioCardOptionWithDetails({
-  option,
-  density,
-  idPrefix,
-  selected,
-  selectedValue,
-  onValueChange,
-}: RadioCardOptionWithDetailsProps) {
-  const summaryText =
-    option.summaryItems && option.summaryItems.length > 0
-      ? option.summaryItems.join(RADIO_CARD_SUMMARY_SEPARATOR)
-      : undefined
-  const detailsLabel = option.detailsLabel ?? RADIO_CARD_DEFAULT_DETAILS_LABEL
-
-  return (
-    <div className={radioCardShellVariants({ density, selected })}>
-      <div className={radioCardDetailsGridVariants({ density })}>
-        <RadioGroupPrimitive.Item
-          id={`${idPrefix}-${option.value}`}
-          value={option.value}
-          disabled={option.disabled}
-          className={cn(radioCardItemWithDetailsVariants(), 'group')}
-          onClick={createRadioCardReselectClickHandler(
-            option.value,
-            selectedValue,
-            onValueChange,
-            option.disabled,
-          )}
-        >
-          <RadioCardControl variant="card" density={density} className="col-start-1 row-start-1" />
-          <div
-            className={cn(radioCardBodyVariants({ density }), 'col-start-2 row-start-1 min-w-0')}
-          >
-            <RadioCardTitleRowContent
-              label={option.label}
-              titleMeta={option.titleMeta}
-              badge={option.badge}
-              density={density}
-            />
-            <RadioCardSecondaryContent
-              description={option.description}
-              summaryText={summaryText}
-              summaryLines={option.summaryLines}
-              density={density}
-            />
-          </div>
-        </RadioGroupPrimitive.Item>
-        <div className={radioCardDetailsInlineSlotVariants()}>
-          <RadioCardDetailsLink label={detailsLabel} onDetails={option.onDetails!} />
-        </div>
-      </div>
-      {selected && option.embeddedContent ? (
-        <div
-          className={radioCardEmbeddedSlotVariants({
-            density,
-            tone: option.embeddedSlotTone ?? 'divider',
-          })}
-        >
-          {option.embeddedContent}
-        </div>
-      ) : null}
-    </div>
-  )
-}
-
-export interface RadioCardProps extends React.ComponentPropsWithoutRef<
-  typeof RadioGroupPrimitive.Root
-> {
+export interface RadioCardProps extends React.ComponentPropsWithoutRef<typeof RadioGroup> {
   options: RadioCardOption[]
   /** Prefix for generated option ids (used with `htmlFor` when embedding items separately). */
   idPrefix?: string
@@ -483,7 +85,7 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<
 
 /**
  * Card-style single-select built on Radix `RadioGroup`. Each option renders a
- * label, optional description, and optional meta chip list.
+ * label, optional description, and optional summary content.
  */
 function RadioCard({
   className,
@@ -508,31 +110,23 @@ function RadioCard({
       {...props}
     >
       {options.map((option) => {
-        if (option.onDetails) {
-          return (
-            <RadioCardOptionWithDetails
-              key={option.value}
-              option={option}
-              density={density}
-              idPrefix={idPrefix}
-              selected={selectedValue === option.value}
-              selectedValue={selectedValue}
-              onValueChange={onValueChange}
-            />
-          )
-        }
+        const selected = selectedValue === option.value
+        const detailsLabel = option.detailsLabel ?? RADIO_CARD_DEFAULT_DETAILS_LABEL
+        const titleAdornment = (
+          <RadioOptionCardTitleAdornment badge={option.badge} titleMeta={option.titleMeta} />
+        )
+        const titleEndSlot = option.onDetails ? (
+          <RadioOptionCardDetailsAction label={detailsLabel} onDetails={option.onDetails} />
+        ) : undefined
 
         return (
-          <RadioCardItem
+          <RadioOptionCard
             key={option.value}
             id={`${idPrefix}-${option.value}`}
             value={option.value}
             disabled={option.disabled}
             label={option.label}
             description={option.description}
-            badge={option.badge}
-            titleMeta={option.titleMeta}
-            meta={option.meta}
             summaryItems={option.summaryItems}
             summaryLines={option.summaryLines}
             density={density}
@@ -540,6 +134,13 @@ function RadioCard({
             controlPosition={controlPosition}
             visualControl={visualControl}
             icon={option.icon}
+            titleAdornment={titleAdornment}
+            titleEndSlot={titleEndSlot}
+            embedded={option.embeddedContent}
+            footer={option.footerContent}
+            embeddedTone={option.embeddedSlotTone}
+            shellSelected={selected}
+            showEmbedded={selected}
             onClick={createRadioCardReselectClickHandler(
               option.value,
               selectedValue,
@@ -553,4 +154,5 @@ function RadioCard({
   )
 }
 
-export { RadioCard, RadioCardItem, radioCardVariants }
+export { RadioCard }
+export { radioCardVariants } from './radio-card.variants'

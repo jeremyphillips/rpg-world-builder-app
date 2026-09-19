@@ -11,13 +11,13 @@ const options = [
     label: 'Modern 5e',
     value: '5e',
     description: 'A familiar modern fantasy rules framework.',
-    meta: ['Ascending AC', 'Proficiency bonus'],
+    summaryItems: ['Ascending AC', 'Proficiency bonus'],
   },
   {
     label: 'Modern 3e',
     value: '3e',
     description: 'A detailed d20 framework with ascending armor class.',
-    meta: ['Ascending AC', 'Attack bonuses'],
+    summaryItems: ['Ascending AC', 'Attack bonuses'],
   },
 ]
 
@@ -53,12 +53,6 @@ describe('RadioCard', () => {
   it('marks the selected option as checked', () => {
     render(<RadioCard aria-label="Edition preset" options={options} value="5e" />)
     expect(screen.getByRole('radio', { name: /Modern 5e/i })).toBeChecked()
-  })
-
-  it('renders meta chips for each option', () => {
-    render(<RadioCard aria-label="Edition preset" options={options} />)
-    expect(screen.getByText('Proficiency bonus')).toBeInTheDocument()
-    expect(screen.getByText('Attack bonuses')).toBeInTheDocument()
   })
 
   it('renders compact summary items as an inline line', () => {
@@ -130,6 +124,47 @@ describe('RadioCard', () => {
       />,
     )
     expect(screen.getByText('Recommended')).toBeInTheDocument()
+  })
+
+  it('renders embedded content inside a shell without a details action', () => {
+    render(
+      <RadioCard
+        aria-label="Species"
+        value="elf"
+        options={[
+          {
+            label: 'Elf',
+            value: 'elf',
+            description: 'Humanoid',
+            embeddedContent: <p>Lineage picker</p>,
+          },
+        ]}
+      />,
+    )
+
+    const shell = screen.getByRole('radio', { name: /Elf/i }).closest('[class*="rounded-card"]')
+    expect(shell).toHaveClass('bg-surface-strong')
+    expect(shell).toHaveTextContent('Lineage picker')
+  })
+
+  it('renders footer content inside the shell when the option is not selected', () => {
+    render(
+      <RadioCard
+        aria-label="Species"
+        value=""
+        options={[
+          {
+            label: 'Dwarf',
+            value: 'dwarf',
+            footerContent: <p>Requires strength 13</p>,
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('Requires strength 13')).toBeInTheDocument()
+    const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('[class*="rounded-card"]')
+    expect(shell).toHaveClass('bg-surface-subtle')
   })
 
   it('renders embedded content inside the selected card shell', () => {
@@ -322,8 +357,8 @@ describe('RadioCard', () => {
     )
 
     const selected = screen.getByRole('radio', { name: /General table/i })
-    expect(selected).toHaveClass('data-[state=checked]:border-primary')
-    expect(selected).toHaveClass('data-[state=checked]:bg-control-selected')
+    expect(selected).toHaveClass('data-[state=checked]:border-card-selected-border')
+    expect(selected).toHaveClass('data-[state=checked]:bg-surface-strong')
   })
 
   it('selects an option when controlPosition is right', async () => {

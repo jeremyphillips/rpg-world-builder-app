@@ -298,27 +298,39 @@ export {
   type RadioGroupFieldOption,
 } from './components/ui/radio-group-field'
 export {
-  radioCardCompactBodyInsetClasses,
-  radioCardCompactOptionBodyLayoutClasses,
-  radioCardCompactPanelPaddingClasses,
-  radioCardCompactPaddingRightClasses,
-  radioCardCompactPaddingXClasses,
-  radioCardCompactSummaryBodyLayoutClasses,
-  radioCardCompactSummaryContentGapClasses,
-} from './components/ui/radio-card.variants'
+  optionCardCompactBodyInsetClasses,
+  optionCardCompactOptionBodyLayoutClasses,
+  optionCardCompactPanelPaddingClasses,
+  optionCardCompactPaddingRightClasses,
+  optionCardCompactPaddingXClasses,
+  optionCardCompactSummaryBodyLayoutClasses,
+  optionCardCompactSummaryContentGapClasses,
+  optionCardSelectedChromeClasses,
+} from './components/ui/selection-option-card.variants'
+export {
+  SelectionOptionCard,
+  SelectionOptionCardHeaderAction,
+  type SelectionOptionCardHeaderActionProps,
+  type SelectionOptionCardProps,
+} from './components/ui/selection-option-card.client'
+export {
+  RadioOptionCard,
+  RadioOptionCardDetailsAction,
+  RadioOptionCardTitleAdornment,
+  type RadioOptionCardProps,
+  type RadioOptionCardEmbeddedSlotTone,
+} from './components/ui/radio-option-card.client'
 export {
   RadioCard,
-  RadioCardItem,
   radioCardVariants,
   RADIO_CARD_DEFAULT_DETAILS_LABEL,
-  RADIO_CARD_SUMMARY_SEPARATOR,
   type RadioCardDensity,
   type RadioCardVisualControl,
   type RadioCardVariant,
   type RadioCardEmbeddedSlotTone,
   type RadioCardOption,
   type RadioCardProps,
-  type RadioCardItemProps,
+  createRadioCardReselectClickHandler,
 } from './components/ui/radio-card.client'
 export {
   AttentionFrame,

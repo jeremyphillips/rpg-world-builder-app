@@ -10,13 +10,13 @@ const options = [
     label: 'Modern 5e',
     value: '5e',
     description: 'A familiar modern fantasy rules framework.',
-    meta: ['Ascending AC', 'Proficiency bonus'],
+    summaryItems: ['Ascending AC', 'Proficiency bonus'],
   },
   {
     label: 'Modern 3e',
     value: '3e',
     description: 'A detailed d20 framework with ascending armor class.',
-    meta: ['Ascending AC', 'Attack bonuses'],
+    summaryItems: ['Ascending AC', 'Attack bonuses'],
   },
 ]
 
