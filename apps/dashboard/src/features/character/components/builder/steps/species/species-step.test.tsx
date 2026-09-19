@@ -195,7 +195,7 @@ describe('SpeciesStep', () => {
     expect(screen.queryByRole('heading', { name: 'Traits' })).not.toBeInTheDocument()
   })
 
-  it('shows heritage required on the selected Elf card with inline heritage section', async () => {
+  it('shows optional heritage picker on the selected Elf card without required chrome', async () => {
     const user = userEvent.setup()
     const context = createElfContext()
 
@@ -204,7 +204,7 @@ describe('SpeciesStep', () => {
     await user.click(screen.getByRole('radio', { name: /Elf/i }))
 
     const elfCard = speciesCard(elf.id)
-    expect(elfCard).toHaveTextContent(
+    expect(elfCard).not.toHaveTextContent(
       formatFieldMessage(
         characterBuilderDependentChoiceMessages.parentChoiceRequired({
           kind: DEPENDENT_CHOICE_KINDS.heritage,
@@ -216,10 +216,10 @@ describe('SpeciesStep', () => {
     })
     expect(heritageRegion).toBeInTheDocument()
     expect(
-      within(heritageRegion).getByText(
+      within(heritageRegion).queryByText(
         formatFieldMessage(characterBuilderDependentChoiceMessages.requiredStatus()),
       ),
-    ).toBeInTheDocument()
+    ).not.toBeInTheDocument()
     expect(
       within(heritageRegion).getByText(
         formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),

@@ -6,5 +6,12 @@ export type { ProficienciesStepProps } from './proficiencies-step.types'
 
 export function ProficienciesStep(props: ProficienciesStepProps) {
   const step = useProficienciesStep(props)
-  return <ProficienciesStepView validationIssues={props.validationIssues} step={step} />
+  return (
+    <ProficienciesStepView
+      draft={props.draft}
+      validationIssues={props.validationIssues}
+      onNavigateToStep={props.onNavigateToStep}
+      step={step}
+    />
+  )
 }

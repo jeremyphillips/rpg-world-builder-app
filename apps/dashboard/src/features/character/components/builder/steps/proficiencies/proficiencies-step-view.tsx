@@ -3,17 +3,24 @@ import {
   showsBuilderStepReviewMessage,
   visibleProficiencySections,
 } from '../../../../lib/builder/builder-step-readiness.lib'
+import {
+  PROFICIENCIES_CHOOSE_CLASS_PROMPT_DESCRIPTION,
+  PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING,
+} from '../../../../lib/proficiencies/proficiencies-step.lib'
 import { ProficiencyPickerDrawer } from '../../../proficiencies/picker/proficiency-picker-drawer'
 import { ProficiencySection } from './proficiency-section'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
+import { BuilderStepChooseClassPrompt } from '../shared/builder-step-choose-class-prompt'
 import { BuilderStepReadinessPanel } from '../shared/builder-step-readiness-panel'
 import type { ProficienciesStepProps } from './proficiencies-step.types'
 import type { useProficienciesStep } from '../../../../hooks/use-proficiencies-step'
 
 export function ProficienciesStepView({
+  draft,
   validationIssues,
+  onNavigateToStep,
   step,
-}: Pick<ProficienciesStepProps, 'validationIssues'> & {
+}: Pick<ProficienciesStepProps, 'draft' | 'validationIssues' | 'onNavigateToStep'> & {
   step: ReturnType<typeof useProficienciesStep>
 }) {
   const {
@@ -22,17 +29,34 @@ export function ProficienciesStepView({
     activeChoiceSet,
     pickerItems,
     catalogIndex,
-    draft,
     openChoiceSet,
     closeChoiceSet,
     addChoiceSelection,
     removeChoiceSelection,
   } = step
 
+  const showsChooseClassPrompt = readiness.classDependentBlocked === true && !draft.class.classId
+
   const visibleSections = visibleProficiencySections(
     model.sections,
     readiness.classDependentBlocked,
   )
+
+  const chooseClassPrompt = showsChooseClassPrompt ? (
+    <BuilderStepChooseClassPrompt
+      heading={PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING}
+      description={PROFICIENCIES_CHOOSE_CLASS_PROMPT_DESCRIPTION}
+      onNavigateToStep={onNavigateToStep}
+    />
+  ) : null
+
+  if (showsChooseClassPrompt && visibleSections.length === 0) {
+    return (
+      <BuilderStepFrame stepId="proficiencies" validationIssues={validationIssues}>
+        {chooseClassPrompt}
+      </BuilderStepFrame>
+    )
+  }
 
   if (isBuilderStepReadinessMessageOnly(readiness)) {
     return (
@@ -45,7 +69,8 @@ export function ProficienciesStepView({
   return (
     <BuilderStepFrame stepId="proficiencies" validationIssues={validationIssues}>
       <div className="space-y-8">
-        {readiness.classDependentBlocked || showsBuilderStepReviewMessage(readiness) ? (
+        {chooseClassPrompt}
+        {showsBuilderStepReviewMessage(readiness) ? (
           <BuilderStepReadinessPanel state={readiness} />
         ) : null}
 

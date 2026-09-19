@@ -248,7 +248,23 @@ describe('getBuilderStepStatus — species', () => {
     expect(getBuilderStepStatus('species', draft, null)).toBe('complete')
   })
 
-  it('returns incomplete when heritage ChoiceSet is unsatisfied', () => {
+  it('returns complete when optional heritage ChoiceSet is unsatisfied', () => {
+    const draft = makeDraft({ species: { speciesId: 'srd-cc-5.2.1:elf' } })
+    const heritageCs: ChoiceSet = {
+      id: 'species:srd-cc-5.2.1:elf:heritage',
+      sourceType: 'species',
+      sourceId: 'srd-cc-5.2.1:elf',
+      choiceType: 'trait',
+      label: 'Choose Heritage',
+      min: 0,
+      max: 1,
+      options: [{ id: 'high-elf', label: 'High Elf' }],
+      required: false,
+    }
+    expect(getBuilderStepStatus('species', draft, [heritageCs])).toBe('complete')
+  })
+
+  it('returns incomplete when required heritage ChoiceSet is unsatisfied', () => {
     const draft = makeDraft({ species: { speciesId: 'srd-cc-5.2.1:elf' } })
     const heritageCs: ChoiceSet = {
       id: 'species:srd-cc-5.2.1:elf:heritage',

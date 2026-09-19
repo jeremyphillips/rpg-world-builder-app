@@ -18,7 +18,7 @@ export function TicketDetailDrawer({ ticketId, open, onOpenChange }: TicketDetai
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
-      <Sheet.Content side="right" className="w-full max-w-2xl">
+      <Sheet.Content side="right" surface="background" className="w-full max-w-2xl">
         {ticket ? (
           <Sheet.Header
             kicker={<TicketMetaKicker ticket={ticket} detailHref={benchTicketPath(ticket.id)} />}

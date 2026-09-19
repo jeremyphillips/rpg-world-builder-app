@@ -177,7 +177,7 @@ describe('grant array DisclosureEntityCard shell', () => {
       'calc(2 * calc(var(--spacing)*6)',
     )
     expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
-    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*4)]')
     const shell = firstRow.querySelector('[role="group"]') as HTMLElement
     expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
     expect(shell.className).not.toContain('--entity-surface-inline-start')

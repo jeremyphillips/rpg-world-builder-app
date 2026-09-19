@@ -47,9 +47,9 @@ const OWNERSHIP_ROWS = [
     plane: '--surface-subtle',
   },
   {
-    shell: 'RadioCard embedded muted panel',
+    shell: 'RadioCard embedded panel',
     ownership: 'establishes',
-    plane: '--surface-muted',
+    plane: '--background',
   },
   { shell: 'Neutral Alert (default variant)', ownership: 'establishes', plane: '--surface-muted' },
   { shell: 'DataTable utility bar rows', ownership: 'establishes', plane: '--surface-subtle' },

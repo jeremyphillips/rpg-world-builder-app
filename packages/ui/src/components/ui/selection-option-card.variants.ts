@@ -184,39 +184,39 @@ export const optionCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.75rem)
 export const optionCardCompactPanelPaddingClasses = `${optionCardCompactBodyInsetClasses} ${optionCardCompactPaddingRightClasses}`
 
 /** Slot below the primary card row when a selected option reveals nested content. */
-export const optionCardEmbeddedSlotVariants = cva('', {
-  variants: {
-    tone: {
-      divider: 'border-t border-border',
-      panel: cn(
-        'border-t border-border bg-surface-muted',
-        establishSurfaceCurrent('surface-muted'),
-      ),
+export const optionCardEmbeddedSlotVariants = cva(
+  cn('bg-background', establishSurfaceCurrent('background')),
+  {
+    variants: {
+      tone: {
+        divider: 'border-t border-border',
+        panel: 'border-t border-border',
+      },
+      density: {
+        default: '',
+        compact: '',
+      },
     },
-    density: {
-      default: '',
-      compact: '',
-    },
-  },
-  compoundVariants: [
-    { tone: 'divider', density: 'default', class: 'mt-4 pt-4' },
-    { tone: 'divider', density: 'compact', class: 'mt-2 pt-2' },
-    {
-      tone: 'panel',
+    compoundVariants: [
+      { tone: 'divider', density: 'default', class: 'mt-4 pt-4' },
+      { tone: 'divider', density: 'compact', class: 'mt-2 pt-2' },
+      {
+        tone: 'panel',
+        density: 'default',
+        class: '-mx-4 -mb-3 mt-4 rounded-b-card pb-3 pt-4',
+      },
+      {
+        tone: 'panel',
+        density: 'compact',
+        class: '-mb-2 -ml-3 -mr-4 mt-2 rounded-b-card pb-2 pt-2',
+      },
+    ],
+    defaultVariants: {
+      tone: 'divider',
       density: 'default',
-      class: '-mx-4 -mb-3 mt-4 rounded-b-card pb-3 pt-4',
     },
-    {
-      tone: 'panel',
-      density: 'compact',
-      class: '-mb-2 -ml-3 -mr-4 mt-2 rounded-b-card pb-2 pt-2',
-    },
-  ],
-  defaultVariants: {
-    tone: 'divider',
-    density: 'default',
   },
-})
+)
 
 /** Always-visible region below the primary shell row (e.g. validation reasons). */
 export const optionCardFooterSlotVariants = cva('min-w-0', {

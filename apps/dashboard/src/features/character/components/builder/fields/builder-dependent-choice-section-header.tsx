@@ -31,15 +31,17 @@ export function BuilderDependentChoiceSectionHeader({
           {title}
         </Heading>
       )}
-      <Text
-        variant="muted"
-        className={cn(
-          'shrink-0 text-right',
-          embedded ? builderDependentChoiceSectionPanelStatusClasses : undefined,
-        )}
-      >
-        {sectionCopy.statusText}
-      </Text>
+      {sectionCopy.statusText ? (
+        <Text
+          variant="muted"
+          className={cn(
+            'shrink-0 text-right',
+            embedded ? builderDependentChoiceSectionPanelStatusClasses : undefined,
+          )}
+        >
+          {sectionCopy.statusText}
+        </Text>
+      ) : null}
     </div>
   )
 }

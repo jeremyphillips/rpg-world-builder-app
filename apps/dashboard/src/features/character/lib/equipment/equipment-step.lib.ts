@@ -74,6 +74,36 @@ export const EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE =
 
 export const EQUIPMENT_ADDED_INVENTORY_EMPTY_MESSAGE = 'No additional equipment yet.'
 
+export const EQUIPMENT_INVENTORY_EMPTY_MESSAGE = 'No equipment selected yet.'
+
+export const EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE =
+  'Choose a starting equipment option above to populate your inventory.'
+
+export const EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING = 'Choose a class to set your starting equipment'
+
+export const EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION =
+  'Your class determines standard equipment and starting-gold options.'
+
+export function resolveEquipmentInventoryEmptyMessage(args: {
+  classOptionsReplaced: boolean
+  showFallback: boolean
+  equipmentChoiceSetCount: number
+  summaryCount: number
+  selectedOptionId: string | undefined
+}): string {
+  const showOptionChooser =
+    !args.classOptionsReplaced &&
+    !args.showFallback &&
+    args.equipmentChoiceSetCount > 0 &&
+    args.summaryCount > 0
+
+  if (showOptionChooser && args.selectedOptionId === undefined) {
+    return EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE
+  }
+
+  return EQUIPMENT_INVENTORY_EMPTY_MESSAGE
+}
+
 export const EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL = 'Starting Equipment'
 
 export const EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL = 'Added Equipment'

@@ -90,7 +90,7 @@ export function SpeciesStep({
     return heritageChoiceSet.options.find((option) => option.id === selectedHeritageOptionId)?.label
   }, [heritageChoiceSet, selectedHeritageOptionId])
 
-  const heritageUnresolved = heritageChoiceSet != null && !selectedHeritageOptionId
+  const heritageRequired = heritageChoiceSet?.required === true
 
   const handleSpeciesSelect = useCallback(
     (speciesId: string) => {
@@ -103,10 +103,10 @@ export function SpeciesStep({
   const heritageSectionCopy = useMemo(
     () =>
       resolveDependentChoiceSectionCopy({
-        required: heritageUnresolved,
+        required: heritageRequired,
         selectedOptionLabel: selectedHeritageOptionLabel,
       }),
-    [heritageUnresolved, selectedHeritageOptionLabel],
+    [heritageRequired, selectedHeritageOptionLabel],
   )
 
   const heritageEmbeddedContent = useMemo(() => {
@@ -150,14 +150,14 @@ export function SpeciesStep({
         const card = formatSpeciesCardOption(entry)
         const isSelected = selectedSpeciesId === entry.id
 
-        let titleMeta: string | undefined
-        if (isSelected && entry.heritage) {
-          titleMeta = formatParentChoiceTitleMeta({
-            dependentKindLabel: DEPENDENT_KIND_HERITAGE,
-            required: !selectedHeritageOptionId,
-            selectedOptionLabel: selectedHeritageOptionLabel,
-          })
-        }
+        const titleMeta =
+          isSelected && entry.heritage
+            ? formatParentChoiceTitleMeta({
+                dependentKindLabel: DEPENDENT_KIND_HERITAGE,
+                required: heritageRequired,
+                selectedOptionLabel: selectedHeritageOptionLabel,
+              })
+            : undefined
 
         return {
           value: entry.id,
@@ -174,7 +174,7 @@ export function SpeciesStep({
       }),
     [
       heritageEmbeddedContent,
-      selectedHeritageOptionId,
+      heritageRequired,
       selectedHeritageOptionLabel,
       selectedSpeciesId,
       species,

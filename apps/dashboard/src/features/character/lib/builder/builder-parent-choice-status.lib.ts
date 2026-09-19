@@ -29,17 +29,21 @@ export function formatParentChoiceTitleMeta({
   dependentKindLabel,
   required,
   selectedOptionLabel,
-}: ParentChoiceTitleMetaInput): string {
-  if (required || !selectedOptionLabel) {
+}: ParentChoiceTitleMetaInput): string | undefined {
+  if (selectedOptionLabel) {
+    return formatFieldMessage(
+      characterBuilderDependentChoiceMessages.parentChoiceSelected({
+        selectedOptionLabel,
+        kind: dependentKindLabel,
+      }),
+    )
+  }
+
+  if (required) {
     return formatFieldMessage(
       characterBuilderDependentChoiceMessages.parentChoiceRequired({ kind: dependentKindLabel }),
     )
   }
 
-  return formatFieldMessage(
-    characterBuilderDependentChoiceMessages.parentChoiceSelected({
-      selectedOptionLabel,
-      kind: dependentKindLabel,
-    }),
-  )
+  return undefined
 }

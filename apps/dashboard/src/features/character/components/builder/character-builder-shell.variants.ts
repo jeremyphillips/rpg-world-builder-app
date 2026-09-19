@@ -120,7 +120,7 @@ export const characterBuilderStepRailItemLabelActiveClasses = 'font-semibold tex
 export const characterBuilderStepRailIconClasses = 'mt-0.5 shrink-0'
 
 export const characterBuilderStepPanelClasses = cn(
-  'min-w-0 space-y-4 rounded-lg border border-border bg-surface-lift p-6',
+  'min-h-full min-w-0 space-y-4 rounded-lg border border-border bg-surface-lift p-6',
   establishSurfaceCurrent('surface-lift'),
   characterBuilderStepPanelBelowHeaderOffsetClasses,
 )

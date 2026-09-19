@@ -88,8 +88,8 @@ export const previewRailIdentityContentClasses = 'min-w-0 flex-1'
 
 export const previewRailDividerClasses = 'border-t border-border-subtle'
 
-export { iconBoxVariants as previewRailMediaFallbackVariants } from '../ui/icon-box.variants'
-export { iconBoxGlyphClasses as previewRailMediaIconClasses } from '../ui/icon-box.variants'
+export { iconContainerVariants as previewRailMediaFallbackVariants } from '../ui/icon-container.variants'
+export { iconContainerGlyphClasses as previewRailMediaIconClasses } from '../ui/icon-container.variants'
 
 export const previewRailAvailabilityRowClasses = cn(
   'mt-1 flex min-w-0 items-center gap-1.5',

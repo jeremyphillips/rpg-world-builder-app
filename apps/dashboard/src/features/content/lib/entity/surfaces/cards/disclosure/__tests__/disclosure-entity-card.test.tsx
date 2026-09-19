@@ -151,7 +151,7 @@ describe('DisclosureEntityCard', () => {
     const shell = container.querySelector('[role="group"]') as HTMLElement
     const article = container.querySelector('article') as HTMLElement
     expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
-    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*4)]')
     expect(shell.className).not.toContain('--entity-surface-inline-start')
     expect(bodyFor('Compact body')).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
   })

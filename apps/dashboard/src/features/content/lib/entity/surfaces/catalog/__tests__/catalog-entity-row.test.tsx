@@ -72,7 +72,7 @@ describe('CatalogEntityRow', () => {
     )
 
     const frame = container.querySelector('article') as HTMLElement
-    expect(frame).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*3)]')
+    expect(frame).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*4)]')
     expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toBe('')
 
     const contentInset = entityCardContentFromShell(container)

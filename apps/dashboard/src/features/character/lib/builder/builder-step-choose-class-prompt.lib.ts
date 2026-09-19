@@ -1,0 +1,1 @@
+export const BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL = 'Choose class →'

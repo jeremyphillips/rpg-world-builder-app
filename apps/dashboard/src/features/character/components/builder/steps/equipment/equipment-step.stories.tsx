@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 
 import {
   buildChoiceSetId,
@@ -24,6 +25,9 @@ const meta = {
   title: 'Character Builder/EquipmentStep',
   component: EquipmentStep,
   parameters: { layout: 'padded' },
+  args: {
+    onNavigateToStep: fn(),
+  },
 } satisfies Meta<typeof EquipmentStep>
 
 export default meta
@@ -37,6 +41,7 @@ export const NoClass: Story = {
       resolvedChoiceSets={[]}
       validationIssues={[]}
       onDraftChange={() => undefined}
+      onNavigateToStep={fn()}
     />
   ),
 }
@@ -55,6 +60,7 @@ export const BardStartingEquipment: Story = {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -83,6 +89,7 @@ export const GoldShopping: Story = {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -111,6 +118,7 @@ export const MonkLinkedGrantPending: Story = {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -134,6 +142,7 @@ export const MonkLinkedGrantResolved: Story = {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -163,6 +172,7 @@ export const MagicItemGrants: Story = {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },

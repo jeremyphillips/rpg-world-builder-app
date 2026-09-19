@@ -28,6 +28,15 @@ describe('builder-parent-choice-status.lib', () => {
     )
   })
 
+  it('omits parent title meta when optional and unresolved', () => {
+    expect(
+      formatParentChoiceTitleMeta({
+        dependentKindLabel: DEPENDENT_KIND_HERITAGE,
+        required: false,
+      }),
+    ).toBeUndefined()
+  })
+
   it('formats resolved parent title meta', () => {
     expect(
       formatParentChoiceTitleMeta({

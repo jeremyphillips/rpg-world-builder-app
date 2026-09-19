@@ -17,6 +17,11 @@ import {
 
 const SPELLS_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.spells
 
+export const SPELLS_CHOOSE_CLASS_PROMPT_HEADING = 'Choose a class to configure starting spells'
+
+export const SPELLS_CHOOSE_CLASS_PROMPT_DESCRIPTION =
+  'Your class determines whether you can cast spells and which spells are available.'
+
 export const SPELLS_STEP_PENDING_ABILITY_LABEL = 'Pending ability scores'
 
 export const SPELLS_STEP_SELECTION_FULL_REASON = BUILDER_SELECTION_FULL_NOTICE

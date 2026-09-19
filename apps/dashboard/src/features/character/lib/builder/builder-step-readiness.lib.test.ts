@@ -3,12 +3,28 @@ import { describe, expect, it } from 'vitest'
 import type { BuilderStepReadinessState } from '@rpg/contracts'
 
 import {
+  isBuilderStepBlockedNoClass,
   isBuilderStepReadinessMessageOnly,
   showsBuilderStepReviewMessage,
   visibleProficiencySections,
 } from './builder-step-readiness.lib'
 
 describe('builder-step-readiness.lib', () => {
+  it('detects blocked builder steps without a class', () => {
+    expect(
+      isBuilderStepBlockedNoClass(
+        { readiness: 'blocked' },
+        { class: { classId: undefined, level: 1 } },
+      ),
+    ).toBe(true)
+    expect(
+      isBuilderStepBlockedNoClass(
+        { readiness: 'blocked' },
+        { class: { classId: 'fighter', level: 1 } },
+      ),
+    ).toBe(false)
+  })
+
   it('treats partial proficiencies blocks as interactive', () => {
     const state: BuilderStepReadinessState = {
       readiness: 'blocked',

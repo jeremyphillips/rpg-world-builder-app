@@ -58,9 +58,7 @@ function mapSpeciesDetailItemToSheetItem(item: SpeciesDetailItem) {
 }
 
 export function formatSpeciesCardOption(species: Species) {
-  return buildSpeciesCardViewModel(species, {
-    resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(creatureTypeVocabulary, id),
-  })
+  return buildSpeciesCardViewModel(species)
 }
 
 export type SpeciesDetailsSheetContent = {

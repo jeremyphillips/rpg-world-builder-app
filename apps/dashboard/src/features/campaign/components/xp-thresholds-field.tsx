@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { resolveXpThresholdsSummary, type SystemRulesetId } from '@rpg/contracts'
 import { Pencil, Table2 } from 'lucide-react'
-import { Button, IconBox, SemanticText, Text } from '@rpg/ui'
+import { Button, IconContainer, SemanticText, Text } from '@rpg/ui'
 
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 
@@ -116,9 +116,9 @@ export function XpThresholdsField() {
     <>
       <div className={xpThresholdsFieldShellClasses}>
         <div className={xpThresholdsFieldLayoutClasses}>
-          <IconBox>
+          <IconContainer>
             <Table2 />
-          </IconBox>
+          </IconContainer>
           <div className={xpThresholdsFieldCopyClasses}>
             <div className={xpThresholdsFieldTitleClasses}>Experience thresholds</div>
             <div className={xpThresholdsFieldMetadataClasses}>

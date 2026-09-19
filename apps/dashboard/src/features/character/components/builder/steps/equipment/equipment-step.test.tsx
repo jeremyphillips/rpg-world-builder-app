@@ -12,8 +12,7 @@ import {
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
 
-import { characterBuilderStepReadinessMessages, formatFieldMessage } from '@rpg/contracts'
-
+import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import { createStandaloneBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
 import {
   equipmentStepBardClassFixture,
@@ -32,7 +31,10 @@ import {
   EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL,
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
   EQUIPMENT_STEP_BROWSE_LABEL,
+  EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION,
+  EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING,
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
+  EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE,
 } from '../../../../lib/equipment/equipment-step.lib'
 import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../../../equipment/picker/purchase/equipment-picker-purchase.lib'
@@ -42,21 +44,19 @@ const context = createStandaloneBuilderContextFixture({
   catalog: equipmentStepCatalogFixture,
 })
 
-const equipmentBlockedNoClassMessage = formatFieldMessage(
-  characterBuilderStepReadinessMessages.equipmentBlockedNoClass(),
-)
-
 function renderEquipmentStep(
   draft: CharacterBuilderDraft = {
     ...createEmptyCharacterBuilderDraft(),
     class: { classId: equipmentStepBardClassFixture.id, level: 1 },
   },
   onDraftChange = vi.fn(),
+  onNavigateToStep = vi.fn(),
 ) {
   const resolvedChoiceSets = resolveAvailableChoices(draft, context)
 
   return {
     onDraftChange,
+    onNavigateToStep,
     ...render(
       <EquipmentStep
         context={context}
@@ -64,6 +64,7 @@ function renderEquipmentStep(
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={onDraftChange}
+        onNavigateToStep={onNavigateToStep}
       />,
     ),
   }
@@ -75,7 +76,11 @@ const monkToolChoiceSetId = buildChoiceSetId(
   'class-tools',
 )
 
-function renderMonkEquipmentStep(draft: CharacterBuilderDraft, onDraftChange = vi.fn()) {
+function renderMonkEquipmentStep(
+  draft: CharacterBuilderDraft,
+  onDraftChange = vi.fn(),
+  onNavigateToStep = vi.fn(),
+) {
   const monkContext = createStandaloneBuilderContextFixture({
     catalog: equipmentStepCatalogFixture,
   })
@@ -83,6 +88,7 @@ function renderMonkEquipmentStep(draft: CharacterBuilderDraft, onDraftChange = v
 
   return {
     onDraftChange,
+    onNavigateToStep,
     ...render(
       <EquipmentStep
         context={monkContext}
@@ -90,16 +96,25 @@ function renderMonkEquipmentStep(draft: CharacterBuilderDraft, onDraftChange = v
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={onDraftChange}
+        onNavigateToStep={onNavigateToStep}
       />,
     ),
   }
 }
 
 describe('EquipmentStep', () => {
-  it('prompts for a class before showing equipment options', () => {
-    renderEquipmentStep(createEmptyCharacterBuilderDraft())
+  it('prompts for a class before showing equipment options', async () => {
+    const user = userEvent.setup()
+    const { onNavigateToStep } = renderEquipmentStep(createEmptyCharacterBuilderDraft())
 
-    expect(screen.getByText(equipmentBlockedNoClassMessage)).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING)).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION)).toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL }),
+    )
+
+    expect(onNavigateToStep).toHaveBeenCalledWith('class')
   })
 
   it('renders package and gold starting equipment options', () => {
@@ -108,6 +123,7 @@ describe('EquipmentStep', () => {
     expect(screen.getByText('Standard Equipment')).toBeInTheDocument()
     expect(screen.getByText('Starting Gold')).toBeInTheDocument()
     expect(screen.getByText('Inventory')).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE)).toBeInTheDocument()
   })
 
   it('selects gold and updates draft equipment mode', async () => {
@@ -744,6 +760,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
         resolvedChoiceSets={resolveAvailableChoices(draft, monkContext)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -771,6 +788,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
         resolvedChoiceSets={resolveAvailableChoices(draft, monkContext)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -838,6 +856,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
         resolvedChoiceSets={resolveAvailableChoices(draft, monkContext)}
         validationIssues={[]}
         onDraftChange={onDraftChange}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -873,6 +892,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
         resolvedChoiceSets={resolveAvailableChoices(draft, monkContext)}
         validationIssues={[]}
         onDraftChange={onDraftChange}
+        onNavigateToStep={vi.fn()}
       />,
     )
 

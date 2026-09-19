@@ -68,8 +68,8 @@ describe('ContentEntityCard', () => {
     const article = container.querySelector('article') as HTMLElement
     const content = article.firstElementChild as HTMLElement
     expect(article).toHaveClass('bg-card')
-    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*3)]')
-    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*4)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*4)]')
     expect(article).not.toHaveClass('py-2')
     expect(content).toHaveClass('py-2')
     expect(content).toHaveClass('pl-[var(--entity-surface-inline-start)]')
@@ -88,7 +88,7 @@ describe('ContentEntityCard', () => {
 
     const article = container.querySelector('article') as HTMLElement
     expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
-    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*4)]')
   })
 
   it('applies presentational disabled treatment only', () => {

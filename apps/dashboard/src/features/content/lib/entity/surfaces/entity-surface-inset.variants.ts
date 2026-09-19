@@ -15,9 +15,9 @@ export const entitySurfaceHorizontalInsetClasses =
  * Publishes surface inset tokens on card shells (CEC, DEC article).
  *
  * |              | no leading | leading present |
- * | compact      | 12px start | 4px start       |
+ * | compact      | 16px start | 4px start       |
  * | comfortable  | 20px start | 8px start       |
- * | end (both)   | 12px / 20px unchanged       |
+ * | end (both)   | 16px / 20px unchanged       |
  */
 export const entitySurfaceInsetVariants = cva('', {
   variants: {
@@ -35,13 +35,13 @@ export const entitySurfaceInsetVariants = cva('', {
       density: 'compact',
       leading: false,
       class:
-        '[--entity-surface-inline-start:calc(var(--spacing)*3)] [--entity-surface-inline-end:calc(var(--spacing)*3)]',
+        '[--entity-surface-inline-start:calc(var(--spacing)*4)] [--entity-surface-inline-end:calc(var(--spacing)*4)]',
     },
     {
       density: 'compact',
       leading: true,
       class:
-        '[--entity-surface-inline-start:calc(var(--spacing)*1)] [--entity-surface-inline-end:calc(var(--spacing)*3)]',
+        '[--entity-surface-inline-start:calc(var(--spacing)*1)] [--entity-surface-inline-end:calc(var(--spacing)*4)]',
     },
     {
       density: 'comfortable',
