@@ -12,4 +12,4 @@ export const abilityRecommendationCalloutTitleClasses = 'font-medium text-foregr
 
 export const abilityRecommendationCalloutBodyClasses = 'text-muted-foreground'
 
-export const abilityRecommendationCalloutActionClasses = 'h-auto p-0 text-sm font-normal'
+export const abilityRecommendationCalloutActionClasses = 'font-normal'

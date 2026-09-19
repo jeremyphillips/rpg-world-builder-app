@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Alert, Button, Text, buttonVariants } from '@rpg/ui'
+import { Alert, Button, Text } from '@rpg/ui'
 import type { FilterSchema } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
@@ -47,13 +47,9 @@ function MessagesCampaignScopeUtility({
   return (
     <div className={messagesCampaignScopeUtilityClasses}>
       <Text variant="small">{formatMessagesScopeSummary(scopedCount ?? 0, hiddenCount)}</Text>
-      <button
-        type="button"
-        className={buttonVariants({ variant: 'link', size: 'sm' })}
-        onClick={onShowAll}
-      >
+      <Button type="button" variant="text" size="sm" onClick={onShowAll}>
         {MESSAGES_SCOPE_COPY.showAllLabel}
-      </button>
+      </Button>
     </div>
   )
 }

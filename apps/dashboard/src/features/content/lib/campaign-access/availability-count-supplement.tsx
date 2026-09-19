@@ -54,9 +54,8 @@ function AvailabilityCountSupplementActions({
         <OverviewResultSummaryDotSeparator />
         <Button
           type="button"
-          variant="link"
+          variant="text"
           size="sm"
-          className="h-auto px-0 text-xs"
           aria-label={formatHideUnavailableAriaLabel()}
           onClick={onHide}
         >
@@ -75,9 +74,8 @@ function AvailabilityCountSupplementActions({
       <OverviewResultSummaryDotSeparator />
       <Button
         type="button"
-        variant="link"
+        variant="text"
         size="sm"
-        className="h-auto px-0 text-xs"
         aria-label={
           actionVariant === 'overview' && pluralNoun
             ? formatShowUnavailableAriaLabel(pluralNoun)

@@ -42,7 +42,8 @@ describe('SelectionOptionCard', () => {
 
     const action = screen.getByRole('button', { name: 'Change package' })
     expect(action.className).toContain(selectionOptionCardHeaderActionClasses)
-    expect(action.className).toContain('h-control-action-compact')
+    expect(action.className).toContain('h-6')
+    expect(action.className).toContain('text-action-standalone')
     expect(action.className).not.toContain('h-auto')
   })
 

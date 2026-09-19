@@ -1,8 +1,16 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { MarkdownContent } from './markdown-content'
+
+const globalsCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), '../../styles/globals.css'),
+  'utf8',
+)
 
 describe('MarkdownContent', () => {
   it('renders markdown with prose classes', () => {
@@ -37,6 +45,17 @@ Hello **world**.`}
     expect(link).toHaveAttribute('href', 'https://example.com/docs')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('wires prose anchors to the shared inline text-action CSS rule', () => {
+    expect(globalsCss).toMatch(/:where\(a\) \{[\s\S]*@apply text-action-inline text-primary/)
+
+    const { container } = render(
+      <MarkdownContent markdown="See [Rules](/docs) for details." size="md" />,
+    )
+
+    expect(container.firstChild).toHaveClass('prose')
+    expect(screen.getByRole('link', { name: 'Rules' })).toBeInTheDocument()
   })
 
   it('does not render script elements from markdown source', () => {

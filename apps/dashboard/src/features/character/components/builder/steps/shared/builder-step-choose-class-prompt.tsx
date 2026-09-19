@@ -5,7 +5,6 @@ import { Button, IconContainer } from '@rpg/ui'
 import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import type { CharacterBuilderNavigateToStep } from '../../../../lib/builder/character-builder-navigation-options'
 import {
-  builderStepChooseClassPromptActionClasses,
   builderStepChooseClassPromptBodyClasses,
   builderStepChooseClassPromptCardClasses,
   builderStepChooseClassPromptContentClasses,
@@ -40,8 +39,8 @@ export function BuilderStepChooseClassPrompt({
           </div>
           <Button
             type="button"
-            variant="link"
-            className={builderStepChooseClassPromptActionClasses}
+            variant="text"
+            tone="accent"
             onClick={() => onNavigateToStep('class')}
           >
             {actionLabel}

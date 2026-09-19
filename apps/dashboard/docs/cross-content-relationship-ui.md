@@ -235,8 +235,8 @@ Rules:
   section into the labeled layout.
 - **`RelationshipList` owns empty copy, footer add, and slot-empty placement** — features pass
   `itemCount`, `emptyLabel`, and typed `action` / `headerAction` only.
-- One Add chrome everywhere: `Button variant="ghost" size="sm" density="compact"` + Lucide `Plus`
-  - feature-owned label. No literal `+ ` text prefixes.
+- One Add chrome everywhere: `Button variant="text" size="sm" density="compact"` + Lucide `Plus`
+  - feature-owned label (neutral tone — omit `tone`). No literal `+ ` text prefixes.
 - Horizontal inset/measure is owned by the detail primitives (`DetailCollectionGroup` `px-4`, page
   `max-w-narrow-content`). Features must not position actions with local `max-w-*`, margins, or
   padding wrappers.
@@ -249,12 +249,12 @@ When a detail section explicitly partitions children into structural groups, cre
 
 City structure uses two subgroup header actions from one canonical eligibility pass (`childAuthoringTypesForParentKind` → `resolveStructureChildAuthoringOptions`):
 
-| Group                | Action                                                                                               | Chrome                                     |
-| -------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **Districts**        | compact ghost `Button` → launch District create                                                      | `ghost` + `sm` + `compact` + Lucide `Plus` |
-| **Direct locations** | `LocationAddChildMenu` `appearance="group"` with `allowedAuthoringTypes` = non-District eligible set | same compact ghost labeled chrome          |
+| Group                | Action                                                                                               | Chrome                                    |
+| -------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| **Districts**        | compact text `Button` → launch District create                                                       | `text` + `sm` + `compact` + Lucide `Plus` |
+| **Direct locations** | `LocationAddChildMenu` `appearance="group"` with `allowedAuthoringTypes` = non-District eligible set | same compact text labeled chrome          |
 
-Both actions remain in the subgroup header for empty and populated states. Direct-location choices are a projection of canonical parent-child eligibility with District removed — not a separate hierarchy list. District row icon `+` remains a different scope (create under that District). Flat Contained locations (non-settlement) still use panel `action` with the same compact ghost labeled menu (`Plus` from `lucide-react`).
+Both actions remain in the subgroup header for empty and populated states. Direct-location choices are a projection of canonical parent-child eligibility with District removed — not a separate hierarchy list. District row icon `+` remains a different scope (create under that District) and keeps compact ghost icon chrome. Flat Contained locations (non-settlement) still use panel `action` with the same compact text labeled menu (`Plus` from `lucide-react`).
 
 ## Populated row vs empty container
 

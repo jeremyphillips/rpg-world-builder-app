@@ -4,10 +4,10 @@ import { Bell } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Button, type ButtonProps } from './button.client'
+import { Button, type ButtonForwardingProps } from './button.client'
 import { NotificationUnreadBadge } from './notification-unread-badge'
 
-export type NotificationBellProps = Omit<ButtonProps, 'children' | 'size' | 'variant'> & {
+export type NotificationBellProps = Omit<ButtonForwardingProps, 'children' | 'size' | 'variant'> & {
   unreadCount?: number
   ariaLabel?: string
 }

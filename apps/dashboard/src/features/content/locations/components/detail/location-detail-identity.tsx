@@ -63,13 +63,7 @@ export function LocationDetailIdentity({
           {parentReplacementAction && onParentReplacementAction ? (
             <>
               {' '}
-              <Button
-                type="button"
-                variant="link"
-                size="sm"
-                className="h-auto px-0 text-xs"
-                onClick={onParentReplacementAction}
-              >
+              <Button type="button" variant="text" size="sm" onClick={onParentReplacementAction}>
                 {LOCATION_PARENT_REPLACEMENT_ACTION_LABELS[parentReplacementAction]}
               </Button>
             </>

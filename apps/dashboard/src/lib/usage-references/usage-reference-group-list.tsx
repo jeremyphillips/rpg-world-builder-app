@@ -42,9 +42,8 @@ function UsageReferenceGroupItems({
         <li className="list-none">
           <Button
             type="button"
-            variant="link"
+            variant="text"
             size="sm"
-            className="h-auto px-0"
             onClick={() => setShowAll((current) => !current)}
           >
             {showAll ? 'Show fewer' : `Show remaining ${remainingCount}`}

@@ -416,7 +416,7 @@ function LocationStructureGroups({
       return (
         <Button
           type="button"
-          variant="ghost"
+          variant="text"
           size="sm"
           density="compact"
           onClick={() => onSelectAuthoringType(group.structuralAuthoringType!)}

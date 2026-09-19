@@ -59,7 +59,7 @@ export function SelectionOptionCardHeaderAction({
   return (
     <Button
       type="button"
-      variant="link"
+      variant="text"
       size="sm"
       density="compact"
       className={selectionOptionCardHeaderActionClasses}

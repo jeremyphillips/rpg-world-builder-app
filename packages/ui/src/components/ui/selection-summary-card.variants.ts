@@ -32,4 +32,4 @@ export const selectionSummaryCardRowValueButtonClasses =
 
 export const selectionSummaryCardRowHelperVariants = cva('w-full text-xs text-muted-foreground')
 
-export const selectionSummaryCardChangeActionClasses = 'shrink-0 px-0'
+export const selectionSummaryCardChangeActionClasses = 'shrink-0'

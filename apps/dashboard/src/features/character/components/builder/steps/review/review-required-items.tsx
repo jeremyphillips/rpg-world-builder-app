@@ -57,9 +57,9 @@ export function ReviewRequiredItems({ requiredItems, onNavigateToStep }: ReviewR
                 </div>
                 <Button
                   type="button"
-                  variant="link"
+                  variant="text"
+                  tone="accent"
                   size="sm"
-                  className="h-auto shrink-0 px-0"
                   onClick={() => handleNavigate(item)}
                 >
                   Go to {item.stepLabel}

@@ -143,8 +143,17 @@ export {
   SidebarNavSectionDisclosure,
   type SidebarNavSectionDisclosureProps,
 } from './components/ui/sidebar-nav-section-disclosure.client'
-export { Button, type ButtonProps } from './components/ui/button.client'
+export { Button, type ButtonForwardingProps, type ButtonProps } from './components/ui/button.client'
 export { buttonVariants } from './components/ui/button.variants'
+export { Link, type LinkProps } from './components/ui/link'
+export {
+  resolveTextActionTone,
+  standaloneTextActionClasses,
+  textActionVariants,
+  type TextActionContext,
+  type TextActionTone,
+  type TextActionVariantProps,
+} from './components/ui/text-action.variants'
 export {
   interactiveFocusVariants,
   type InteractiveFocusVariantProps,

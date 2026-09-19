@@ -127,12 +127,7 @@ export function TicketDetailForm({ ticket, layout = 'page' }: TicketDetailFormPr
   const footer = (form: UseFormReturn<TicketDetailFormValues>) => (
     <FormFooterActions
       secondary={
-        <Button
-          type="button"
-          variant="link"
-          className="text-foreground hover:text-foreground"
-          onClick={() => form.reset()}
-        >
+        <Button type="button" variant="text" onClick={() => form.reset()}>
           Cancel
         </Button>
       }

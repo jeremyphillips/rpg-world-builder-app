@@ -12,7 +12,7 @@ export function AutoFillRemainingAction({ label, onAutoFill }: AutoFillRemaining
   return (
     <Button
       type="button"
-      variant="link"
+      variant="text"
       size="sm"
       className={abilityRecommendationCalloutActionClasses}
       onClick={onAutoFill}

@@ -17,7 +17,7 @@ import type { LocationAuthoringType } from '../../lib/location-authoring-type'
 
 type LocationAddChildMenuTriggerProps =
   | {
-      /** Compact ghost labeled trigger (panel or subgroup header). */
+      /** Compact text labeled trigger (panel or subgroup header). */
       appearance?: 'labeled' | 'group'
       triggerLabel?: string
     }
@@ -71,7 +71,7 @@ export function LocationAddChildMenu({
         <Plus aria-hidden />
       </Button>
     ) : (
-      <Button type="button" variant="ghost" size="sm" density="compact">
+      <Button type="button" variant="text" size="sm" density="compact">
         <Plus aria-hidden />
         {labeledText}
       </Button>

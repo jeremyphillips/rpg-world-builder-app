@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 
-import { Button, type ButtonProps } from '@rpg/ui'
+import { Button, type ButtonForwardingProps } from '@rpg/ui'
 
-export type EquipmentInventorySourceActionButtonProps = ButtonProps & {
+export type EquipmentInventorySourceActionButtonProps = ButtonForwardingProps & {
   children: ReactNode
 }
 

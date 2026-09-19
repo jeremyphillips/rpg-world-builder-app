@@ -193,7 +193,7 @@ function BuildingOrganizationDiscoveryBody({
         <div className={buildingOrganizationsDiscoveryCreateActionClasses}>
           <Button
             type="button"
-            variant="ghost"
+            variant="text"
             size="sm"
             density="compact"
             onClick={enterNewOrganizationBranch}
@@ -300,7 +300,7 @@ export function BuildingOrganizationRelationshipReview({
           action={
             <Button
               type="button"
-              variant="ghost"
+              variant="text"
               size="sm"
               density="compact"
               onClick={returnToDiscovery}

@@ -16,7 +16,10 @@ describe('LocationAddChildMenu', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: /add location/i }))
+    const addButton = screen.getByRole('button', { name: /add location/i })
+    expect(addButton).toHaveClass('text-action-standalone', 'text-foreground')
+
+    await user.click(addButton)
     await user.click(screen.getByRole('menuitem', { name: 'Building' }))
 
     expect(onSelectAuthoringType).toHaveBeenCalledWith('building')

@@ -11,8 +11,10 @@ describe('MessagesStartConversationLink', () => {
   it('links to the new-message route as a mobile fallback action', () => {
     renderWithProviders(<MessagesStartConversationLink campaignId="camp_1" />)
 
-    expect(
-      screen.getByRole('link', { name: MESSAGES_ACTION_COPY.startConversation }),
-    ).toHaveAttribute('href', ROUTES.messages.new({ campaignId: 'camp_1' }))
+    const link = screen.getByRole('link', { name: MESSAGES_ACTION_COPY.startConversation })
+
+    expect(link).toHaveAttribute('href', ROUTES.messages.new({ campaignId: 'camp_1' }))
+    expect(link).toHaveClass('text-action-standalone', 'text-foreground', 'md:hidden')
+    expect(link).not.toHaveClass('text-primary')
   })
 })

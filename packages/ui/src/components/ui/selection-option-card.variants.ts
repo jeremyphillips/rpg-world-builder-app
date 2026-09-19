@@ -162,8 +162,8 @@ export const selectionOptionCardHeaderRowVariants = cva(
 /** Summary anatomy body — flush header row to title; title→description gap stays on primary copy stack. */
 export const selectionOptionCardAnatomyBodyVariants = cva('flex min-w-0 flex-1 flex-col gap-0')
 
-/** Compact header action — pairs with Button link + sm + compact density. */
-export const selectionOptionCardHeaderActionClasses = 'shrink-0 px-0'
+/** Compact header action — pairs with Button text + sm + compact density. */
+export const selectionOptionCardHeaderActionClasses = 'shrink-0'
 
 export const selectionOptionCardHeaderActionSlotVariants = cva(
   'flex shrink-0 items-center min-h-control-action-compact',

@@ -6,7 +6,6 @@ import type { MasterDetailAvailabilityPresentation } from '../../lib/master-deta
 import {
   masterDetailAvailabilityAvailableDotClasses,
   masterDetailAvailabilityAvailableStatusClasses,
-  masterDetailAvailabilityHeaderChangeClasses,
   masterDetailAvailabilityHeaderLineClasses,
   masterDetailAvailabilityHeaderStatusClasses,
 } from './master-detail-availability-header-line.variants'
@@ -43,9 +42,8 @@ export function MasterDetailAvailabilityHeaderLine({
       <OverviewResultSummaryDotSeparator />
       <Button
         type="button"
-        variant="link"
+        variant="text"
         size="sm"
-        className={masterDetailAvailabilityHeaderChangeClasses}
         disabled={disabled}
         onClick={onAvailabilityChange}
       >

@@ -110,10 +110,9 @@ export function BuilderDependentChoiceSection({
       {isResolved && !expanded ? (
         <Button
           type="button"
-          variant="link"
+          variant="text"
           size="sm"
           id={changeButtonId}
-          className="h-auto px-0 py-0"
           onClick={() => setExpanded(true)}
         >
           {changeLabel}

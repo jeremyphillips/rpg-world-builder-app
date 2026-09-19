@@ -58,9 +58,8 @@ function ActionBlockerReferenceLinks({
       {references.length > disclosureLimit ? (
         <Button
           type="button"
-          variant="link"
+          variant="text"
           size="sm"
-          className="h-auto px-0 text-xs"
           onClick={() => setShowAll((current) => !current)}
         >
           {showAll ? 'Show fewer' : `Show remaining ${remainingCount}`}

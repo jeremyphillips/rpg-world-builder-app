@@ -2,9 +2,9 @@
 
 import { Menu, X } from 'lucide-react'
 
-import { Button, type ButtonProps } from './button.client'
+import { Button, type ButtonForwardingProps } from './button.client'
 
-export interface SidebarTriggerProps extends Omit<ButtonProps, 'size' | 'variant'> {
+export interface SidebarTriggerProps extends Omit<ButtonForwardingProps, 'size' | 'variant'> {
   isOpen?: boolean
 }
 
