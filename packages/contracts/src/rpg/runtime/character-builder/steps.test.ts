@@ -11,6 +11,8 @@ import {
   isChoiceStep,
   resolveEffectiveBuilderSteps,
   isEffectiveBuilderStep,
+  getBuilderStepCompactDescription,
+  getBuilderStepDescription,
   resolveBuilderStepDescription,
   STEP_CHOICE_TYPES_BY_STEP,
 } from './steps'
@@ -123,6 +125,30 @@ describe('BUILDER_STEPS', () => {
     expect(typeof step.id).toBe('string')
     expect(typeof step.label).toBe('string')
     expect(typeof step.description).toBe('string')
+  })
+
+  it('exposes compactDescription only when tighter rail copy is authored', () => {
+    const connections = BUILDER_STEPS.find((step) => step.id === 'connections')
+    expect(connections?.compactDescription).toBe('Connect your character to organizations')
+    expect(connections?.description).toBe(
+      'Connect your character to organizations that shape their loyalties, obligations, or history.',
+    )
+    expect(BUILDER_STEPS.find((step) => step.id === 'identity')?.compactDescription).toBeUndefined()
+  })
+})
+
+describe('getBuilderStepCompactDescription', () => {
+  it('falls back to the full step subhead when compact copy is absent', () => {
+    expect(getBuilderStepCompactDescription('identity')).toBe('Name, appearance, and alignment')
+  })
+
+  it('returns tighter rail copy when authored', () => {
+    expect(getBuilderStepCompactDescription('connections')).toBe(
+      'Connect your character to organizations',
+    )
+    expect(getBuilderStepDescription('connections')).toBe(
+      'Connect your character to organizations that shape their loyalties, obligations, or history.',
+    )
   })
 })
 
@@ -469,11 +495,22 @@ describe('getBuilderStepStatus — review', () => {
 describe('resolveBuilderStepDescription', () => {
   const TEST_CAMPAIGN_ID = 'camp_1'
 
-  it('returns static metadata for non-review steps', () => {
+  it('returns static compact metadata for non-review steps', () => {
     const context = createCharacterBuildContext()
 
     expect(resolveBuilderStepDescription(context, 'identity')).toBe(
       'Name, appearance, and alignment',
+    )
+  })
+
+  it('returns compact rail copy when authored separately from the step subhead', () => {
+    const context = createCharacterBuildContext()
+
+    expect(resolveBuilderStepDescription(context, 'connections')).toBe(
+      'Connect your character to organizations',
+    )
+    expect(getBuilderStepDescription('connections')).toBe(
+      'Connect your character to organizations that shape their loyalties, obligations, or history.',
     )
   })
 

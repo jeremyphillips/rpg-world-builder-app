@@ -46,13 +46,18 @@ export type BuilderStep = {
   id: CharacterBuilderStepId
   /** Short label shown in the step rail. */
   label: string
-  /** One-line description shown under the label or in tooltips. */
+  /** Step subhead shown under the title in the main panel (`BuilderStepFrame`). */
   description: string
+  /** Optional tighter copy for the step rail; omitted when identical to `description`. */
+  compactDescription?: string
 }
 
 type BuilderStepMeta = {
   readonly label: string
+  /** Step subhead in the main panel. */
   readonly description: string
+  /** Optional tighter copy for the step rail; defaults to `description`. */
+  readonly compactDescription?: string
   /**
    * When true, the step stays `deferred` until resolvers supply ChoiceSets.
    * Species is excluded — primary species selection is always available in the shell.
@@ -68,7 +73,9 @@ const BUILDER_STEP_METADATA = {
   },
   connections: {
     label: 'Connections',
-    description: 'Choose an organization connected to your character',
+    description:
+      'Connect your character to organizations that shape their loyalties, obligations, or history.',
+    compactDescription: 'Connect your character to organizations',
     isApplicable: (context, draft) =>
       draft.connections.organizations.length > 0 ||
       resolvePlayableBuilderContent(context).organizations.length > 0,
@@ -107,12 +114,23 @@ const BUILDER_STEP_METADATA = {
   },
 } as const satisfies Record<CharacterBuilderStepId, BuilderStepMeta>
 
+function toBuilderStep(id: CharacterBuilderStepId): BuilderStep {
+  const meta = BUILDER_STEP_METADATA[id]
+  const step: BuilderStep = {
+    id,
+    label: meta.label,
+    description: meta.description,
+  }
+
+  if ('compactDescription' in meta && meta.compactDescription) {
+    step.compactDescription = meta.compactDescription
+  }
+
+  return step
+}
+
 /** Ordered wizard steps — ids and order come from {@link CHARACTER_BUILDER_STEP_IDS}. */
-export const BUILDER_STEPS: readonly BuilderStep[] = CHARACTER_BUILDER_STEP_IDS.map((id) => ({
-  id,
-  label: BUILDER_STEP_METADATA[id].label,
-  description: BUILDER_STEP_METADATA[id].description,
-}))
+export const BUILDER_STEPS: readonly BuilderStep[] = CHARACTER_BUILDER_STEP_IDS.map(toBuilderStep)
 
 /** Registered steps filtered to those applicable to the current build and draft. */
 export function resolveEffectiveBuilderSteps(
@@ -140,14 +158,24 @@ export function getBuilderStepLabel(stepId: CharacterBuilderStepId): string {
   return BUILDER_STEP_METADATA[stepId].label
 }
 
-/** Default step description from static metadata (context-agnostic). */
+/** Full step subhead from static metadata (context-agnostic). */
 export function getBuilderStepDescription(stepId: CharacterBuilderStepId): string {
   return BUILDER_STEP_METADATA[stepId].description
 }
 
+/** Tighter step rail copy; falls back to {@link getBuilderStepDescription}. */
+export function getBuilderStepCompactDescription(stepId: CharacterBuilderStepId): string {
+  const meta = BUILDER_STEP_METADATA[stepId]
+  if ('compactDescription' in meta && meta.compactDescription) {
+    return meta.compactDescription
+  }
+
+  return meta.description
+}
+
 /**
  * Context-aware step description for the builder rail.
- * Review step copy varies by chrome variant; other steps use static metadata.
+ * Review step copy varies by chrome variant; other steps use compact metadata when set.
  */
 export function resolveBuilderStepDescription(
   context: CharacterBuildContext,
@@ -158,7 +186,7 @@ export function resolveBuilderStepDescription(
     return getCharacterBuilderChromeMessages(variant).reviewStepDescription
   }
 
-  return BUILDER_STEP_METADATA[stepId].description
+  return getBuilderStepCompactDescription(stepId)
 }
 
 // ---------------------------------------------------------------------------

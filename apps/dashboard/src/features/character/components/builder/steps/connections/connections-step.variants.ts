@@ -1,5 +1,4 @@
-export const connectionsStepHeaderClasses =
-  'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'
+export const connectionsStepHeaderClasses = 'flex justify-end'
 
 export const connectionsStepListClasses = 'space-y-2'
 

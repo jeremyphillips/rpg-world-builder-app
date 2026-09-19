@@ -36,7 +36,9 @@ export function EquipmentPurchasedInventorySection({
   if (!hasPurchases) {
     return (
       <InsetPanel size="sm" align="center" className="rounded-lg">
-        <InsetPanel.Text>{EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE}</InsetPanel.Text>
+        <InsetPanel.PassiveMessage>
+          {EQUIPMENT_PURCHASED_INVENTORY_EMPTY_MESSAGE}
+        </InsetPanel.PassiveMessage>
       </InsetPanel>
     )
   }

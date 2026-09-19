@@ -1477,6 +1477,7 @@
     "getBestEquipmentRecommendationSpecificity",
     "getBlockedActionTargets",
     "getBuilderSelectedStartingLevel",
+    "getBuilderStepCompactDescription",
     "getBuilderStepDescription",
     "getBuilderStepLabel",
     "getBuilderStepStatus",

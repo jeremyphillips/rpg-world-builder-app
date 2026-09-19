@@ -164,7 +164,7 @@ describe('ArrayFieldRenderer', () => {
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
-    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Traits/ })).not.toHaveClass('mb-8')
   })
@@ -732,7 +732,7 @@ describe('ArrayFieldRenderer', () => {
     expect(removeButton).toBeEnabled()
     await user.click(removeButton)
 
-    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.queryByText(/Add at least one trait/i)).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
   })
@@ -762,7 +762,7 @@ describe('ArrayFieldRenderer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
-    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.getByText('Add at least one trait.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Review 1 issue in Traits/i })).toBeInTheDocument()
   })
@@ -809,7 +809,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.queryByText(/Add at least one trait/i)).not.toBeInTheDocument()
   })
 

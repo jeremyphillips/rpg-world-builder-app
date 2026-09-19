@@ -41,6 +41,7 @@ describe('InsetPanel', () => {
     const copy = screen.getByText('Scaled copy')
     const expectedVariant = insetPanelTextVariantBySize[size]
     expect(copy).toHaveClass(textVariants({ variant: expectedVariant }))
+    expect(copy).not.toHaveClass('italic')
   })
 
   it('allows InsetPanel.Text variant override', () => {
@@ -51,12 +52,36 @@ describe('InsetPanel', () => {
     )
 
     expect(screen.getByText('Override copy')).toHaveClass(textVariants({ variant: 'caption' }))
+    expect(screen.getByText('Override copy')).not.toHaveClass('italic')
   })
+
+  it.each(['sm', 'md', 'lg'] as const)(
+    'passes size %s to InsetPanel.PassiveMessage typography with italic emphasis',
+    (size) => {
+      render(
+        <InsetPanel size={size}>
+          <InsetPanel.PassiveMessage>No organizations connected yet.</InsetPanel.PassiveMessage>
+        </InsetPanel>,
+      )
+
+      const copy = screen.getByText('No organizations connected yet.')
+      const expectedVariant = insetPanelTextVariantBySize[size]
+      expect(copy).toHaveClass(textVariants({ variant: expectedVariant }))
+      expect(copy).toHaveClass('italic')
+      expect(copy).not.toHaveAttribute('role', 'status')
+    },
+  )
 
   it('throws when InsetPanel.Text is used outside InsetPanel', () => {
     expect(() => render(<InsetPanel.Text>Orphan copy</InsetPanel.Text>)).toThrow(
       'InsetPanel.Text must be used within <InsetPanel>',
     )
+  })
+
+  it('throws when InsetPanel.PassiveMessage is used outside InsetPanel', () => {
+    expect(() =>
+      render(<InsetPanel.PassiveMessage>Orphan passive copy</InsetPanel.PassiveMessage>),
+    ).toThrow('InsetPanel.PassiveMessage must be used within <InsetPanel>')
   })
 
   itAxe('has no axe accessibility violations', async () => {

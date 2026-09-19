@@ -7,8 +7,8 @@ export type CatalogPickerResultsStateProps = {
 /** Dashed empty-state panel for catalog pickers when there are no selectable rows. */
 export function CatalogPickerResultsState({ message }: CatalogPickerResultsStateProps) {
   return (
-    <InsetPanel borderStyle="dashed" size="md" align="center" className="py-8" role="status">
-      <InsetPanel.Text>{message}</InsetPanel.Text>
+    <InsetPanel borderStyle="dashed" size="md" align="center" className="py-8">
+      <InsetPanel.PassiveMessage>{message}</InsetPanel.PassiveMessage>
     </InsetPanel>
   )
 }

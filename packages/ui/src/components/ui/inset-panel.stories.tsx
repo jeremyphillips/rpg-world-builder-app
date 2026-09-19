@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Table2 } from 'lucide-react'
 
+import {
+  emptyStateWellSupportingClasses,
+  emptyStateWellTitleClasses,
+} from './empty-state-well.variants'
 import { InsetPanel } from './inset-panel.client'
 
 const meta = {
@@ -33,22 +38,40 @@ export const SolidSunkenDefault: Story = {
   },
 }
 
-export const DashedGate: Story = {
+/** Instructional gate — roman supporting copy via `InsetPanel.Text`. */
+export const InstructionalGate: Story = {
+  name: 'Instructional gate',
   args: {
     ...insetPanelGateStoryProps(),
+    children: <InsetPanel.Text>Save this class first to add subclasses.</InsetPanel.Text>,
+  },
+}
+
+/** Passive single-message empty — canonical italic passive role. */
+export const PassiveMessageEmpty: Story = {
+  name: 'Passive message empty',
+  args: {
+    ...insetPanelEmptyStoryProps(),
     children: (
-      <InsetPanel.Text>
-        Add a subclass choice feature on the <strong>Features</strong> tab before authoring
-        subclasses.
-      </InsetPanel.Text>
+      <InsetPanel.PassiveMessage>No organizations connected yet.</InsetPanel.PassiveMessage>
     ),
   },
 }
 
-export const DashedEmpty: Story = {
+/** Structured empty — title + supporting (roman); wording alone does not pick typography. */
+export const StructuredTitleSupporting: Story = {
+  name: 'Structured title + supporting',
   args: {
-    ...insetPanelEmptyStoryProps(),
-    children: <InsetPanel.Text>No items are available.</InsetPanel.Text>,
+    ...insetPanelGateStoryProps(),
+    children: (
+      <div className="flex flex-col items-center gap-2">
+        <Table2 className="size-8 shrink-0 text-muted-foreground opacity-50" aria-hidden />
+        <p className={emptyStateWellTitleClasses}>No heritage group yet</p>
+        <p className={emptyStateWellSupportingClasses}>
+          Create a set of heritage choices players can select during character creation.
+        </p>
+      </div>
+    ),
   },
 }
 
@@ -88,7 +111,9 @@ function insetPanelEmptyStoryProps() {
 export const OnFieldContainer: Story = {
   args: {
     ...insetPanelEmptyStoryProps(),
-    children: <InsetPanel.Text>No items are available.</InsetPanel.Text>,
+    children: (
+      <InsetPanel.PassiveMessage>No organizations connected yet.</InsetPanel.PassiveMessage>
+    ),
   },
   decorators: [
     (Story) => (
@@ -98,3 +123,9 @@ export const OnFieldContainer: Story = {
     ),
   ],
 }
+
+/** @deprecated Story alias — use InstructionalGate */
+export const DashedGate = InstructionalGate
+
+/** @deprecated Story alias — use PassiveMessageEmpty */
+export const DashedEmpty = PassiveMessageEmpty
