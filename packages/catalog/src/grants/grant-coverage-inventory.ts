@@ -77,6 +77,11 @@ function proficiencyChoiceShapeKey(grant: ContentGrant): string | undefined {
 function grantChoiceShapeKey(grant: ContentGrant): string | undefined {
   if (grant.kind === 'damageType') return 'damageType:heritage'
   if (grant.kind === 'featChoice') return `featChoice:${grant.category}`
+  if (grant.kind === 'languageChoice') {
+    if (grant.categories?.length) return 'languageChoice:categories'
+    if (grant.from?.length) return 'languageChoice:from'
+    return 'languageChoice'
+  }
 
   return equipmentChoiceShapeKey(grant) ?? proficiencyChoiceShapeKey(grant)
 }

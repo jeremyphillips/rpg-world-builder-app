@@ -468,6 +468,19 @@
           "description": "<p>You know the Prestidigitation cantrip. Whenever you finish a Long Rest, you can replace that cantrip with a different cantrip from the Wizard spell list. At character level 3 you gain Detect Magic; at level 5 you gain Misty Step (each castable once per Long Rest without a spell slot).</p>",
           "grantGroups": [
             {
+              "grants": [
+                {
+                  "kind": "spells",
+                  "ability": "int",
+                  "spellIds": ["prestidigitation"],
+                  "casting": {
+                    "mode": "free_cast",
+                    "frequency": "at_will"
+                  }
+                }
+              ]
+            },
+            {
               "unlock": {
                 "level": 3
               },
@@ -858,7 +871,23 @@
         "kind": "custom",
         "id": "skillful",
         "name": "Skillful",
-        "description": "<p>You gain proficiency in one skill of your choice.</p>"
+        "description": "<p>You gain proficiency in one skill of your choice.</p>",
+        "grantGroups": [
+          {
+            "grants": [
+              {
+                "kind": "skillProficiency",
+                "grant": {
+                  "kind": "choice",
+                  "choose": 1,
+                  "pool": {
+                    "source": "any"
+                  }
+                }
+              }
+            ]
+          }
+        ]
       },
       {
         "kind": "custom",

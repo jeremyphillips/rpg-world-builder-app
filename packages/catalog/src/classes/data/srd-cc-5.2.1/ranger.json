@@ -185,7 +185,11 @@
               "kind": "spells",
               "ability": "wis",
               "spellIds": ["hunters-mark"],
-              "availability": "always_prepared"
+              "availability": "always_prepared",
+              "casting": {
+                "mode": "free_cast",
+                "frequency": "prof_bonus_per_long_rest"
+              }
             }
           ]
         }
