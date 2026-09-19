@@ -179,7 +179,7 @@ describe('resolveAutomaticNpcBuild', () => {
     expect(second).toEqual(first)
   })
 
-  it('resolves species heritage and syncs species.heritageId', () => {
+  it('leaves optional species heritage unset for NPC automatic builds', () => {
     const context = automaticTestContext()
     const result = resolveAutomaticNpcBuild({
       seed: fighterSeed({ speciesId: elfSpecies.id }),
@@ -191,8 +191,8 @@ describe('resolveAutomaticNpcBuild', () => {
 
     expect(
       result.draft.choiceSelections[buildChoiceSetId('species', elfSpecies.id, 'heritage')],
-    ).toEqual(['high-elf'])
-    expect(result.draft.species).toEqual({ speciesId: elfSpecies.id, heritageId: 'high-elf' })
+    ).toBeUndefined()
+    expect(result.draft.species).toEqual({ speciesId: elfSpecies.id, heritageId: undefined })
   })
 
   it('never selects optional choice sets', () => {

@@ -65,11 +65,28 @@ describe('species-display', () => {
   const dwarvishLabel =
     languages.find((language) => language.id === 'dwarvish')?.label ?? 'dwarvish'
 
-  it('builds card view model with resolved creature type and trait names', () => {
-    expect(buildSpeciesCardViewModel(dwarfWithTraits, vocabulary)).toEqual({
+  it('builds card view model with trait names', () => {
+    expect(buildSpeciesCardViewModel(dwarfWithTraits)).toEqual({
       label: 'Dwarf',
-      description: 'Humanoid',
       summaryItems: ['Darkvision', 'Dwarven Resilience'],
+    })
+  })
+
+  it('truncates card trait summary to three items with +N more overflow', () => {
+    const speciesWithManyTraits = makeSpecies({
+      ...dwarfWithTraits,
+      traits: [
+        { kind: 'custom', id: 'trait-a', name: 'Trait A', description: '<p>A</p>' },
+        { kind: 'custom', id: 'trait-b', name: 'Trait B', description: '<p>B</p>' },
+        { kind: 'custom', id: 'trait-c', name: 'Trait C', description: '<p>C</p>' },
+        { kind: 'custom', id: 'trait-d', name: 'Trait D', description: '<p>D</p>' },
+        { kind: 'custom', id: 'trait-e', name: 'Trait E', description: '<p>E</p>' },
+      ],
+    })
+
+    expect(buildSpeciesCardViewModel(speciesWithManyTraits)).toEqual({
+      label: 'Dwarf',
+      summaryItems: ['Trait A', 'Trait B', 'Trait C', '+2 more'],
     })
   })
 

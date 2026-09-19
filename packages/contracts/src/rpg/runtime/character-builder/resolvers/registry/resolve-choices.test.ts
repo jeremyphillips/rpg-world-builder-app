@@ -82,9 +82,9 @@ describe('resolveAvailableChoices', () => {
       id: 'species:srd-cc-5.2.1:elf:heritage',
       sourceType: 'species',
       choiceType: 'trait',
-      min: 1,
+      min: 0,
       max: 1,
-      required: true,
+      required: false,
       options: [
         { id: 'high-elf', label: 'High Elf' },
         { id: 'wood-elf', label: 'Wood Elf' },

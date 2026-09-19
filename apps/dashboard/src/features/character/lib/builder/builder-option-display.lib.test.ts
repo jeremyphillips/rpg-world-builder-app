@@ -38,10 +38,9 @@ const dwarfWithTraits = makeSpecies({
 })
 
 describe('builder-option-display.lib', () => {
-  it('formats species card rows with creature type label and trait names', () => {
+  it('formats species card rows with trait names', () => {
     expect(formatSpeciesCardOption(dwarfWithTraits)).toEqual({
       label: 'Dwarf',
-      description: 'Humanoid',
       summaryItems: ['Darkvision', 'Dwarven Resilience'],
     })
   })

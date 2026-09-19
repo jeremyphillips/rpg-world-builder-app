@@ -149,7 +149,7 @@ export function BuilderOptionDetailsSheet({
   sections,
   primaryAction,
   primaryActionPlacement = 'header',
-  surface = 'surface-lift',
+  surface = 'background',
 }: BuilderOptionDetailsSheetProps) {
   const visibleMetadata = metadata?.filter((row) => row.value != null && row.value !== '')
   const visibleSections = sections?.filter(

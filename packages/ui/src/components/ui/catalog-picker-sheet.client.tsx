@@ -215,7 +215,7 @@ export function CatalogPickerSheet<TItem>({
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
-      <Sheet.Content surface="surface-lift" size="lg">
+      <Sheet.Content surface="background" size="lg">
         <Sheet.Header
           headline={title}
           description={description}

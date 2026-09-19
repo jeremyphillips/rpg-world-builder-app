@@ -60,13 +60,13 @@ export function resolveSpeciesHeritageChoiceSets(
       sourceId: species.id,
       choiceType: 'trait',
       label: species.heritage.name,
-      min: species.heritage.choose,
+      min: 0,
       max: species.heritage.choose,
       options: visibleOptions.map((option) => ({
         id: option.id,
         label: resolveTraitName(option),
       })),
-      required: true,
+      required: false,
     },
   ]
 }

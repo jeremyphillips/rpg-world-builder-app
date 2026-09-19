@@ -3,8 +3,8 @@ import { Sheet, dialogPanelActionRowClasses, type SheetSurface } from '@rpg/ui'
 
 import { drawerShellBodyVariants } from './drawer-shell.variants'
 
-/** Default application drawer plane — lifted canvas toward panel/white. */
-export const DRAWER_SHELL_DEFAULT_SURFACE: SheetSurface = 'surface-lift'
+/** Default application drawer plane — page canvas background. */
+export const DRAWER_SHELL_DEFAULT_SURFACE: SheetSurface = 'background'
 
 export type DrawerShellBodyMode = 'scrolling' | 'managed' | 'composed'
 

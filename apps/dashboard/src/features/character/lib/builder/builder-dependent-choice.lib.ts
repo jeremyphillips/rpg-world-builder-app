@@ -33,7 +33,16 @@ export function resolveDependentChoiceSectionCopy({
   required,
   selectedOptionLabel,
 }: ResolveDependentChoiceSectionCopyInput): DependentChoiceSectionCopy {
-  if (required || !selectedOptionLabel) {
+  if (selectedOptionLabel) {
+    return {
+      statusText: formatFieldMessage(
+        characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel }),
+      ),
+      helperText: undefined,
+    }
+  }
+
+  if (required) {
     return {
       statusText: formatFieldMessage(characterBuilderDependentChoiceMessages.requiredStatus()),
       helperText: formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
@@ -41,10 +50,8 @@ export function resolveDependentChoiceSectionCopy({
   }
 
   return {
-    statusText: formatFieldMessage(
-      characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel }),
-    ),
-    helperText: undefined,
+    statusText: '',
+    helperText: formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
   }
 }
 

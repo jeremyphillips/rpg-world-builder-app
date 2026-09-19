@@ -53,8 +53,18 @@ export type SpeciesDetailItem = {
 
 export type SpeciesCardViewModel = {
   label: string
-  description: string
   summaryItems: string[]
+}
+
+const SPECIES_CARD_SUMMARY_MAX_ITEMS = 3
+
+function truncateSpeciesCardSummaryItems(items: readonly string[]): string[] {
+  if (items.length <= SPECIES_CARD_SUMMARY_MAX_ITEMS) {
+    return [...items]
+  }
+
+  const overflowCount = items.length - SPECIES_CARD_SUMMARY_MAX_ITEMS
+  return [...items.slice(0, SPECIES_CARD_SUMMARY_MAX_ITEMS), `+${overflowCount} more`]
 }
 
 export type SpeciesDetailViewModel = {
@@ -158,14 +168,12 @@ function mapHeritageOptionToDetailItem(
   }
 }
 
-export function buildSpeciesCardViewModel(
-  species: Species,
-  vocabulary: Pick<SpeciesDisplayVocabulary, 'resolveCreatureTypeLabel'>,
-): SpeciesCardViewModel {
+export function buildSpeciesCardViewModel(species: Species): SpeciesCardViewModel {
   return {
     label: species.name,
-    description: vocabulary.resolveCreatureTypeLabel(species.creatureType),
-    summaryItems: species.traits.map((trait) => resolveTraitDisplay(trait).name),
+    summaryItems: truncateSpeciesCardSummaryItems(
+      species.traits.map((trait) => resolveTraitDisplay(trait).name),
+    ),
   }
 }
 

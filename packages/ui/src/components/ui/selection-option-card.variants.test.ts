@@ -39,10 +39,13 @@ describe('optionCard surface establishment', () => {
     expect(radioCardShellVariants()).toContain('[--surface-current:var(--surface-subtle)]')
   })
 
-  it('establishes surface-muted independently on embedded panel slots', () => {
+  it('establishes background independently on embedded slots', () => {
     const panel = optionCardEmbeddedSlotVariants({ tone: 'panel' })
-    expect(panel).toContain('[--surface-current:var(--surface-muted)]')
-    expect(panel).toContain('bg-surface-muted')
+    const divider = optionCardEmbeddedSlotVariants({ tone: 'divider' })
+    expect(panel).toContain('[--surface-current:var(--background)]')
+    expect(panel).toContain('bg-background')
+    expect(divider).toContain('[--surface-current:var(--background)]')
+    expect(divider).toContain('bg-background')
   })
 
   it('uses compact option padding with control and density-owned typography', () => {

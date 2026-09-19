@@ -29,6 +29,17 @@ describe('builder-dependent-choice.lib', () => {
     })
   })
 
+  it('resolves optional unresolved section copy without required status', () => {
+    expect(
+      resolveDependentChoiceSectionCopy({
+        required: false,
+      }),
+    ).toEqual({
+      statusText: '',
+      helperText: formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
+    })
+  })
+
   it('resolves selected section copy without helper text', () => {
     expect(
       resolveDependentChoiceSectionCopy({
