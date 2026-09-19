@@ -83,12 +83,12 @@ describe('builder-step-readiness.lib', () => {
         {
           kind: 'savingThrows' as const,
           label: 'Saving Throws',
-          sourceGroups: [{ sourceLabel: 'Granted by Rogue', valueLabels: ['DEX · Dexterity'] }],
+          sourceGroups: [{ sourceLabel: 'Rogue', valueLabels: ['Dexterity'] }],
         },
         {
           kind: 'languages' as const,
           label: 'Languages',
-          sourceGroups: [{ sourceLabel: 'Granted by Origin Languages', valueLabels: ['Common'] }],
+          sourceGroups: [{ sourceLabel: 'Origin', valueLabels: ['Common'] }],
         },
       ],
       sections: [

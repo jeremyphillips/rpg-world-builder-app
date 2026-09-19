@@ -9,6 +9,7 @@ import {
   getArmorCategoryPreviewLabel,
   getArmorCategoryScopeForm,
   getArmorCategorySentenceForm,
+  getArmorCategorySummaryLabel,
 } from './category'
 
 describe('armorCategorySchema', () => {
@@ -46,5 +47,7 @@ describe('armor category vocabulary', () => {
     expect(getArmorCategoryPreviewLabel('light')).toBe('light')
     expect(getArmorCategoryPreviewLabel('medium')).toBe('medium')
     expect(getArmorCategoryPreviewLabel('shields')).toBe('shields')
+    expect(getArmorCategorySummaryLabel('light')).toBe('Light')
+    expect(getArmorCategorySummaryLabel('shields')).toBe('Shields')
   })
 })

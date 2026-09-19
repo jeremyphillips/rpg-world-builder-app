@@ -76,11 +76,10 @@ describe('ProficienciesStep', () => {
     expect(
       screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
     ).toBeInTheDocument()
-    expect(screen.getByText('DEX · Dexterity · INT · Intelligence')).toBeInTheDocument()
+    expect(screen.getByText('Dexterity · Intelligence')).toBeInTheDocument()
     expect(screen.getByText('Thieves Tools')).toBeInTheDocument()
-    expect(screen.getByText(/Simple Weapon/i)).toBeInTheDocument()
-    expect(screen.getByText(/Martial Weapon/i)).toBeInTheDocument()
-    expect(screen.getByText(/Light Armor/i)).toBeInTheDocument()
+    expect(screen.getByText('Simple · Martial')).toBeInTheDocument()
+    expect(screen.getByText('Light')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
     const skillsSection = screen.getByRole('heading', { name: 'Skills' }).closest('section')!
     expect(within(skillsSection).getByText('0 / 2 chosen')).toBeInTheDocument()

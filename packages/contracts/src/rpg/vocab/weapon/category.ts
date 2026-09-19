@@ -82,3 +82,9 @@ export function getWeaponCategoryPreviewLabel(category: string): string {
   const entry = getWeaponCategoryEntry(category)
   return entry ? getTermCompactLabel(entry) : formatVocabularySlugLabel(category)
 }
+
+/** Title-case summary chip for proficiency rows (e.g. "Simple", "Martial"). */
+export function getWeaponCategorySummaryLabel(category: string): string {
+  const preview = getWeaponCategoryPreviewLabel(category)
+  return `${preview.charAt(0).toUpperCase()}${preview.slice(1)}`
+}

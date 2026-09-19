@@ -48,8 +48,8 @@ describe('resolveProficiencyStepModel', () => {
     const savingThrows = model.fixedGrants.find((row) => row.kind === 'savingThrows')
     expect(savingThrows?.sourceGroups).toEqual([
       expect.objectContaining({
-        sourceLabel: 'Granted by Rogue',
-        valueLabels: expect.arrayContaining(['DEX · Dexterity', 'INT · Intelligence']),
+        sourceLabel: 'Rogue',
+        valueLabels: expect.arrayContaining(['Dexterity', 'Intelligence']),
       }),
     ])
 
@@ -57,7 +57,7 @@ describe('resolveProficiencyStepModel', () => {
     expect(tools?.sourceGroups).toEqual([
       expect.objectContaining({
         valueLabels: ['Thieves Tools'],
-        sourceLabel: 'Granted by Rogue',
+        sourceLabel: 'Rogue',
       }),
     ])
 

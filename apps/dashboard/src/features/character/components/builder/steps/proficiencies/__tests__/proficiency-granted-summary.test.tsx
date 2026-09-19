@@ -18,8 +18,9 @@ describe('ProficiencyGrantedSummary', () => {
       screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
     ).toBeInTheDocument()
     expect(screen.getByText('Saving Throws')).toBeInTheDocument()
-    expect(screen.getByText('DEX · Dexterity · INT · Intelligence')).toBeInTheDocument()
-    expect(screen.getAllByText('Granted by Rogue').length).toBeGreaterThan(0)
+    expect(screen.getByText('Dexterity · Intelligence')).toBeInTheDocument()
+    expect(screen.getAllByText('Rogue').length).toBeGreaterThan(0)
+    expect(screen.queryByText('Granted by Rogue')).not.toBeInTheDocument()
     expect(screen.getByText('Thieves Tools')).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Skills' })).not.toBeInTheDocument()
   })

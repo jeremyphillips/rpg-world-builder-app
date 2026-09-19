@@ -1,10 +1,11 @@
 import { getSkillName } from '../../../../content/skill-proficiency'
 import { getLanguageLabel } from '../../../../vocab/language'
 import { formatVocabularySlugLabel } from '../../../../vocab/format-slug-label'
-import { getArmorCategoryLabel } from '../../../../vocab/armor/category'
+import { getArmorCategorySummaryLabel } from '../../../../vocab/armor/category'
 import { getToolCategoryLabel } from '../../../../vocab/equipment/tool-category'
-import { getWeaponCategoryLabel } from '../../../../vocab/weapon/category'
+import { getWeaponCategorySummaryLabel } from '../../../../vocab/weapon/category'
 import { getProficiencyDomainCompactLabel } from '../../../../vocab/proficiency'
+import { getAbilityLabel } from '../../../../vocab/ability'
 import type { CharacterBuildPreview } from '../../preview/preview'
 import { isChoiceSetSatisfied, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildContext } from '../../context'
@@ -14,10 +15,9 @@ import { getChoiceSetStepId } from '../../steps'
 import type { Ability } from '../../../../vocab/ability'
 import { isClassProgressionApplicable } from '../../progression/character-level-policy'
 import {
+  formatCompactProficiencySourceLabel,
   formatProficiencyChoiceSourceLabel,
-  formatProficiencySourceLabel,
 } from './format-proficiency-source-label'
-import { formatSavingThrowProficiencyLabel } from './format-saving-throw-proficiency-label'
 import { isFixedProficiencyGrant } from './proficiency-grant-classification'
 import {
   formatProficiencyCategorySubhead,
@@ -137,8 +137,8 @@ function buildSavingThrowRows(
     .map((save) => ({
       id: `saving-throw:${save.ability}`,
       kind: 'savingThrows' as const,
-      label: formatSavingThrowProficiencyLabel(save.ability as Ability),
-      sourceLabel: formatProficiencySourceLabel(
+      label: getAbilityLabel(save.ability as Ability),
+      sourceLabel: formatCompactProficiencySourceLabel(
         [{ kind: 'classFeature', sourceId: classId, grantId: 'saving-throws' }],
         catalogIndex,
       ),
@@ -156,7 +156,7 @@ function skillGrantedRows(
       id: `skill:${entry.skill}`,
       kind: 'skills' as const,
       label: getSkillName(entry.skill),
-      sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex),
+      sourceLabel: formatCompactProficiencySourceLabel(entry.sources, catalogIndex),
     }))
 }
 
@@ -173,15 +173,13 @@ function weaponGrantedRows(
         : `weapon-category:${entry.weaponCategory}`
       const label = entry.weaponId
         ? formatVocabularySlugLabel(entry.weaponId)
-        : getWeaponCategoryLabel(entry.weaponCategory!)
+        : getWeaponCategorySummaryLabel(entry.weaponCategory!)
 
       return {
         id,
         kind: 'weapons' as const,
         label,
-        sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
-          rowKind: entry.weaponCategory ? 'weaponCategory' : 'default',
-        }),
+        sourceLabel: formatCompactProficiencySourceLabel(entry.sources, catalogIndex),
       }
     })
 }
@@ -196,10 +194,8 @@ function armorGrantedRows(
     .map((entry) => ({
       id: `armor-category:${entry.armorCategory}`,
       kind: 'armor' as const,
-      label: getArmorCategoryLabel(entry.armorCategory),
-      sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
-        rowKind: 'armorCategory',
-      }),
+      label: getArmorCategorySummaryLabel(entry.armorCategory),
+      sourceLabel: formatCompactProficiencySourceLabel(entry.sources, catalogIndex),
     }))
 }
 
@@ -220,9 +216,7 @@ function toolGrantedRows(
         id,
         kind: 'tools' as const,
         label,
-        sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex, {
-          rowKind: entry.toolCategory ? 'toolCategory' : 'default',
-        }),
+        sourceLabel: formatCompactProficiencySourceLabel(entry.sources, catalogIndex),
       }
     })
 }
@@ -238,7 +232,7 @@ function languageGrantedRows(
       id: `language:${entry.language}`,
       kind: 'languages' as const,
       label: getLanguageLabel(entry.language),
-      sourceLabel: formatProficiencySourceLabel(entry.sources, catalogIndex),
+      sourceLabel: formatCompactProficiencySourceLabel(entry.sources, catalogIndex),
     }))
 }
 

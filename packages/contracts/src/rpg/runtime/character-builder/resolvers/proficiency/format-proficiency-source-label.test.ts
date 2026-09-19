@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { indexCharacterBuildCatalog } from '../../context'
 import {
+  formatCompactProficiencySourceLabel,
   formatProficiencyChoiceSourceLabel,
   formatProficiencySourceLabel,
 } from './format-proficiency-source-label'
@@ -39,5 +40,18 @@ describe('formatProficiencySourceLabel', () => {
 
   it('formats choice provenance labels', () => {
     expect(formatProficiencyChoiceSourceLabel('Rogue Skills')).toBe('Chosen from Rogue Skills')
+  })
+})
+
+describe('formatCompactProficiencySourceLabel', () => {
+  const catalogIndex = indexCharacterBuildCatalog(proficiencyTestCatalog)
+
+  it('returns compact class provenance without granted-by prose', () => {
+    expect(
+      formatCompactProficiencySourceLabel(
+        [{ kind: 'classFeature', sourceId: rogueClass.id, grantId: 'saving-throws' }],
+        catalogIndex,
+      ),
+    ).toBe('Rogue')
   })
 })

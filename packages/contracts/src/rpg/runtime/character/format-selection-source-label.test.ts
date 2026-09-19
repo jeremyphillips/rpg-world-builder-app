@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatSelectionSourceLabel } from './format-selection-source-label'
+import {
+  ORIGIN_PROVENANCE_LABEL,
+  formatCompactSelectionSourceLabel,
+  formatSelectionSourceLabel,
+} from './format-selection-source-label'
 
 const catalogIndex = {
   classes: new Map([
@@ -91,5 +95,37 @@ describe('formatSelectionSourceLabel', () => {
   it('returns unknown source when provenance is missing', () => {
     expect(formatSelectionSourceLabel(undefined, catalogIndex)).toBe('Unknown source')
     expect(formatSelectionSourceLabel([], catalogIndex)).toBe('Unknown source')
+  })
+})
+
+describe('formatCompactSelectionSourceLabel', () => {
+  it('returns class names without granted-by prose', () => {
+    expect(
+      formatCompactSelectionSourceLabel(
+        [{ kind: 'classFeature', sourceId: 'srd-cc-5.2.1:rogue', grantId: 'saving-throws' }],
+        catalogIndex,
+      ),
+    ).toBe('Rogue')
+  })
+
+  it('maps character creation sources to Origin', () => {
+    expect(
+      formatCompactSelectionSourceLabel(
+        [{ kind: 'characterCreation', sourceId: 'srd-cc-5.2.1', grantId: 'language-grants' }],
+        catalogIndex,
+      ),
+    ).toBe(ORIGIN_PROVENANCE_LABEL)
+  })
+
+  it('dedupes repeated compact labels', () => {
+    expect(
+      formatCompactSelectionSourceLabel(
+        [
+          { kind: 'classFeature', sourceId: 'srd-cc-5.2.1:rogue', grantId: 'skill-proficiencies' },
+          { kind: 'classFeature', sourceId: 'srd-cc-5.2.1:rogue', grantId: 'class-skills' },
+        ],
+        catalogIndex,
+      ),
+    ).toBe('Rogue')
   })
 })
