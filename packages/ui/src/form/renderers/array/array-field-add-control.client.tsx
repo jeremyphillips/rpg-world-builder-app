@@ -23,6 +23,10 @@ import { cn } from '../../../lib/utils'
 import { resolveFormDensity } from '../../form-density'
 import { useFormSectionContext } from '../../context/form-section.context'
 import type { ArrayAddActionConfig, ArrayAddActionLayout } from '../../field-config'
+import {
+  resolveArrayAddButtonDensity,
+  resolveArrayAddDisabledProps,
+} from './array-field-add-control.lib'
 
 type ArrayFieldAddControlProps = {
   showAddControl: boolean
@@ -39,10 +43,21 @@ type ArrayFieldAddControlProps = {
   onAppendFromMenu: (itemId: string) => void
 }
 
+type ArrayFieldAddButtonProps = {
+  addActionLabel: string
+  addActionVariant: NonNullable<ButtonVariantProps['variant']>
+  buttonSize: NonNullable<ButtonVariantProps['size']>
+  buttonDensity?: ButtonVariantProps['density']
+  triggerClassName?: string
+  showAddIcon?: boolean
+  onClick?: () => void
+  disabledProps: ReturnType<typeof resolveArrayAddDisabledProps>
+}
+
 function ArrayFieldAddTriggerLabel({
   addActionLabel,
   showAddIcon = true,
-}: Pick<ArrayFieldAddControlProps, 'addActionLabel' | 'showAddIcon'>) {
+}: Pick<ArrayFieldAddButtonProps, 'addActionLabel' | 'showAddIcon'>) {
   if (!showAddIcon) return addActionLabel
 
   return (
@@ -50,6 +65,123 @@ function ArrayFieldAddTriggerLabel({
       <Plus aria-hidden />
       {addActionLabel}
     </>
+  )
+}
+
+function ArrayFieldAddButton({
+  addActionLabel,
+  addActionVariant,
+  buttonSize,
+  buttonDensity,
+  triggerClassName,
+  showAddIcon = true,
+  onClick,
+  disabledProps,
+}: ArrayFieldAddButtonProps) {
+  return (
+    <Button
+      variant={addActionVariant}
+      size={buttonSize}
+      density={buttonDensity}
+      className={triggerClassName}
+      onClick={onClick}
+      aria-label={addActionLabel}
+      {...disabledProps}
+    >
+      <ArrayFieldAddTriggerLabel addActionLabel={addActionLabel} showAddIcon={showAddIcon} />
+    </Button>
+  )
+}
+
+function ArrayFieldAddDisabledReason({
+  addDisabledReason,
+  disabledReasonId,
+}: {
+  addDisabledReason?: string
+  disabledReasonId: string
+}) {
+  if (!addDisabledReason) return null
+
+  return (
+    <span id={disabledReasonId} className="sr-only">
+      {addDisabledReason}
+    </span>
+  )
+}
+
+type ArrayFieldAddMenuControlProps = Pick<
+  ArrayFieldAddControlProps,
+  | 'addEnabled'
+  | 'addDisabledReason'
+  | 'addActionLabel'
+  | 'addActionVariant'
+  | 'addActionLayout'
+  | 'showAddIcon'
+  | 'addActionMenu'
+  | 'addActionMenuItems'
+  | 'onAppendFromMenu'
+> &
+  Pick<ArrayFieldAddButtonProps, 'buttonSize' | 'buttonDensity' | 'triggerClassName'> & {
+    disabledReasonId: string
+    leadingIcon?: React.ReactNode
+  }
+
+function ArrayFieldAddMenuControl({
+  addEnabled,
+  addDisabledReason,
+  addActionLabel,
+  addActionVariant,
+  addActionLayout = 'stacked',
+  showAddIcon = true,
+  addActionMenu,
+  addActionMenuItems,
+  onAppendFromMenu,
+  buttonSize,
+  buttonDensity,
+  triggerClassName,
+  disabledReasonId,
+  leadingIcon,
+}: ArrayFieldAddMenuControlProps) {
+  const disabledProps = resolveArrayAddDisabledProps(
+    addEnabled,
+    addDisabledReason,
+    disabledReasonId,
+  )
+
+  if (!addEnabled) {
+    return (
+      <>
+        <ArrayFieldAddButton
+          addActionLabel={addActionLabel}
+          addActionVariant={addActionVariant}
+          buttonSize={buttonSize}
+          buttonDensity={buttonDensity}
+          triggerClassName={triggerClassName}
+          showAddIcon={showAddIcon}
+          disabledProps={disabledProps}
+        />
+        <ArrayFieldAddDisabledReason
+          addDisabledReason={addDisabledReason}
+          disabledReasonId={disabledReasonId}
+        />
+      </>
+    )
+  }
+
+  return (
+    <ButtonDropdown
+      label={addActionLabel}
+      leadingIcon={leadingIcon}
+      groups={addActionMenu!.groups as ButtonDropdownGroup[]}
+      items={addActionMenuItems}
+      enableSearch={addActionMenu!.enableSearch}
+      variant={addActionVariant}
+      size={buttonSize}
+      density={buttonDensity}
+      width={addActionLayout === 'inline' ? 'fit' : 'full'}
+      className={triggerClassName}
+      onSelectItem={onAppendFromMenu}
+    />
   )
 }
 
@@ -70,73 +202,55 @@ export function ArrayFieldAddControl({
   const { density } = useFormSectionContext()
   const { size } = resolveFormDensity(density)
   const buttonSize = resolveArrayAddButtonSize(size, addActionSize, addActionLayout)
+  const buttonDensity = resolveArrayAddButtonDensity(addActionLayout, addActionVariant)
   const triggerClassName = cn(addActionLayout === 'inline' && 'shrink-0')
   const leadingIcon = showAddIcon ? <Plus aria-hidden /> : undefined
   const disabledReasonId = React.useId()
-  const disabledProps = addEnabled
-    ? {}
-    : {
-        disabled: true,
-        title: addDisabledReason,
-        'aria-disabled': true as const,
-        'aria-describedby': addDisabledReason ? disabledReasonId : undefined,
-      }
+  const disabledProps = resolveArrayAddDisabledProps(
+    addEnabled,
+    addDisabledReason,
+    disabledReasonId,
+  )
 
   if (!showAddControl) return null
 
-  const disabledReason = addDisabledReason ? (
-    <span id={disabledReasonId} className="sr-only">
-      {addDisabledReason}
-    </span>
-  ) : null
-
   if (addActionMenu) {
-    if (!addEnabled) {
-      return (
-        <>
-          <Button
-            variant={addActionVariant}
-            size={buttonSize}
-            className={triggerClassName}
-            aria-label={addActionLabel}
-            {...disabledProps}
-          >
-            <ArrayFieldAddTriggerLabel addActionLabel={addActionLabel} showAddIcon={showAddIcon} />
-          </Button>
-          {disabledReason}
-        </>
-      )
-    }
-
     return (
-      <ButtonDropdown
-        label={addActionLabel}
+      <ArrayFieldAddMenuControl
+        addEnabled={addEnabled}
+        addDisabledReason={addDisabledReason}
+        addActionLabel={addActionLabel}
+        addActionVariant={addActionVariant}
+        addActionLayout={addActionLayout}
+        showAddIcon={showAddIcon}
+        addActionMenu={addActionMenu}
+        addActionMenuItems={addActionMenuItems}
+        onAppendFromMenu={onAppendFromMenu}
+        buttonSize={buttonSize}
+        buttonDensity={buttonDensity}
+        triggerClassName={triggerClassName}
+        disabledReasonId={disabledReasonId}
         leadingIcon={leadingIcon}
-        groups={addActionMenu.groups as ButtonDropdownGroup[]}
-        items={addActionMenuItems}
-        enableSearch={addActionMenu.enableSearch}
-        variant={addActionVariant}
-        size={buttonSize}
-        width={addActionLayout === 'inline' ? 'fit' : 'full'}
-        className={triggerClassName}
-        onSelectItem={onAppendFromMenu}
       />
     )
   }
 
   return (
     <>
-      <Button
-        variant={addActionVariant}
-        size={buttonSize}
-        className={triggerClassName}
+      <ArrayFieldAddButton
+        addActionLabel={addActionLabel}
+        addActionVariant={addActionVariant}
+        buttonSize={buttonSize}
+        buttonDensity={buttonDensity}
+        triggerClassName={triggerClassName}
+        showAddIcon={showAddIcon}
         onClick={addEnabled ? onAppendItem : undefined}
-        aria-label={addActionLabel}
-        {...disabledProps}
-      >
-        <ArrayFieldAddTriggerLabel addActionLabel={addActionLabel} showAddIcon={showAddIcon} />
-      </Button>
-      {disabledReason}
+        disabledProps={disabledProps}
+      />
+      <ArrayFieldAddDisabledReason
+        addDisabledReason={addDisabledReason}
+        disabledReasonId={disabledReasonId}
+      />
     </>
   )
 }

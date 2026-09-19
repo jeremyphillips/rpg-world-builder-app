@@ -308,6 +308,7 @@ export {
 } from './form-navigation.lib'
 export { FIELD_WIDTHS, type FieldWidth } from '../components/ui/field-control.variants'
 export {
+  CANVAS_SURFACE,
   DEFAULT_ARRAY_ITEM_SURFACE,
   DEFAULT_DEPENDENT_SURFACE,
   DEFAULT_PANEL_SURFACE,

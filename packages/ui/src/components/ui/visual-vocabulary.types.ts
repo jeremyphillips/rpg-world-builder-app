@@ -20,7 +20,7 @@ export type ChromeConfig = {
 }
 
 /** Documented + exported for future subsystem migrations; not on ChromeConfig yet. */
-export type SurfaceElevation = 'flat' | 'raised' | 'sunken'
+export type SurfaceElevation = 'flat' | 'canvas' | 'raised' | 'sunken'
 
 export type SurfaceConfig = {
   emphasis?: VisualEmphasis

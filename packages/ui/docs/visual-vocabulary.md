@@ -71,7 +71,7 @@ Namespace: `bg-warning-faint` (wash) vs `text-semantic-warning` (label) vs
 
 | Legacy               | `SurfaceConfig`                              |
 | -------------------- | -------------------------------------------- |
-| `base` / flat canvas | `{ elevation: 'flat' }` or `{}`              |
+| `base` / flat canvas | `CANVAS_SURFACE` (`{ elevation: 'canvas' }`) |
 | `raised`             | `{ elevation: 'raised' }`                    |
 | `subtle`             | `{ emphasis: 'subtle', elevation: 'flat' }`  |
 | `muted`              | `{ emphasis: 'default', elevation: 'flat' }` |

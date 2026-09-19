@@ -1343,6 +1343,7 @@ export interface ArrayAddActionConfig {
   label?: string
   /** @default true */
   icon?: boolean
+  /** @default `text` when `layout` is `inline`; otherwise `outline`. Legacy `ghost` inline maps to `text`. */
   variant?: NonNullable<ButtonVariantProps['variant']>
   layout?: ArrayAddActionLayout
   size?: NonNullable<ButtonVariantProps['size']>

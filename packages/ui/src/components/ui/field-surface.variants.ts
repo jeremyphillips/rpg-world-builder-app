@@ -12,6 +12,7 @@ import type { SemanticTone, SurfaceConfig, VisualEmphasis } from './visual-vocab
 
 export { fieldSurfaceRaisedShadowClasses, insetPanelSunkenShadowClasses } from './field-surface.lib'
 export {
+  CANVAS_SURFACE,
   DEFAULT_ARRAY_ITEM_SURFACE,
   DEFAULT_FLAT_ARRAY_ITEM_SURFACE,
   DEFAULT_DEPENDENT_SURFACE,

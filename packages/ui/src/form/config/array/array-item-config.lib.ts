@@ -1,7 +1,9 @@
 import { singularizeLabel } from '@rpg/contracts'
 
+import type { ButtonVariantProps } from '../../../components/ui/button.variants'
 import type {
   ArrayAddActionConfig,
+  ArrayAddActionLayout,
   ArrayConfig,
   ArrayItemConfig,
   ArrayItemHeaderConfig,
@@ -63,14 +65,29 @@ export function resolveArrayItemChrome(config: ArrayConfig): {
   }
 }
 
+/** Inline legend add actions default to compact neutral text; legacy `ghost` maps to `text`. */
+export function resolveArrayAddActionVariant(
+  layout: ArrayAddActionLayout,
+  variant?: NonNullable<ButtonVariantProps['variant']>,
+): NonNullable<ButtonVariantProps['variant']> {
+  if (layout === 'inline') {
+    if (!variant || variant === 'ghost') return 'text'
+    return variant
+  }
+
+  return variant ?? 'outline'
+}
+
 export function resolveArrayAddAction(config: ArrayConfig): ArrayAddActionConfig | null {
   if (config.addAction === false) return null
   const action = config.addAction ?? {}
+  const layout = action.layout ?? 'stacked'
+
   return {
     label: action.label ?? 'Add item',
     icon: action.icon ?? true,
-    variant: action.variant ?? 'outline',
-    layout: action.layout ?? 'stacked',
+    variant: resolveArrayAddActionVariant(layout, action.variant),
+    layout,
     size: action.size,
     menu: action.menu,
   }

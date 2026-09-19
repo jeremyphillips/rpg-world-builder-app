@@ -19,6 +19,7 @@ export type {
   SurfaceChromeConfig,
 } from './field-surface.variants'
 export {
+  CANVAS_SURFACE,
   DEFAULT_ARRAY_ITEM_SURFACE,
   DEFAULT_FLAT_ARRAY_ITEM_SURFACE,
   DEFAULT_DEPENDENT_SURFACE,
