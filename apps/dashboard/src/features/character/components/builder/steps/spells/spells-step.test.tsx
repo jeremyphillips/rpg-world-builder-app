@@ -12,18 +12,20 @@ import {
   resolveAvailableChoices,
 } from '@rpg/contracts'
 
+import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import {
   createSpellsStepContextFixture,
   spellsStepWizardCantrips,
   spellsStepWizardClass,
 } from '../../../../lib/spells/spells-step.fixtures'
+import {
+  SPELLS_CHOOSE_CLASS_PROMPT_DESCRIPTION,
+  SPELLS_CHOOSE_CLASS_PROMPT_HEADING,
+} from '../../../../lib/spells/spells-step.lib'
 import { SpellsStep } from './spells-step'
 
 const context = createSpellsStepContextFixture()
 
-const spellsBlockedNoClassMessage = formatFieldMessage(
-  characterBuilderStepReadinessMessages.spellsBlockedNoClass(),
-)
 const fighterNonCasterMessage = formatFieldMessage(
   characterBuilderStepReadinessMessages.spellsNotApplicableNoSpellcasting({
     className: 'Fighter',
@@ -31,7 +33,9 @@ const fighterNonCasterMessage = formatFieldMessage(
 )
 
 describe('SpellsStep', () => {
-  it('shows blocked copy before a class is selected', () => {
+  it('shows the choose-class prompt before a class is selected', async () => {
+    const user = userEvent.setup()
+    const onNavigateToStep = vi.fn()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
     }
@@ -44,11 +48,19 @@ describe('SpellsStep', () => {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={onNavigateToStep}
       />,
     )
 
-    expect(screen.getByText(spellsBlockedNoClassMessage)).toBeInTheDocument()
+    expect(screen.getByText(SPELLS_CHOOSE_CLASS_PROMPT_HEADING)).toBeInTheDocument()
+    expect(screen.getByText(SPELLS_CHOOSE_CLASS_PROMPT_DESCRIPTION)).toBeInTheDocument()
     expect(screen.queryByText(fighterNonCasterMessage)).not.toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL }),
+    )
+
+    expect(onNavigateToStep).toHaveBeenCalledWith('class')
   })
 
   it('shows not-applicable copy for non-caster classes', () => {
@@ -65,6 +77,7 @@ describe('SpellsStep', () => {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -98,6 +111,7 @@ describe('SpellsStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -129,6 +143,7 @@ describe('SpellsStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={onDraftChange}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -165,6 +180,7 @@ describe('SpellsStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -187,6 +203,7 @@ describe('SpellsStep', () => {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 

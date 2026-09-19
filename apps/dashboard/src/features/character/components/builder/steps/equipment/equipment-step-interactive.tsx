@@ -5,6 +5,7 @@ import type { BuilderStepReadinessState } from '@rpg/contracts'
 import {
   EQUIPMENT_STEP_SWITCH_CONFIRM_DESCRIPTION,
   EQUIPMENT_STEP_SWITCH_CONFIRM_HEADLINE,
+  resolveEquipmentInventoryEmptyMessage,
 } from '../../../../lib/equipment/equipment-step.lib'
 import { showsBuilderStepReviewMessage } from '../../../../lib/builder/builder-step-readiness.lib'
 import { EquipmentAcquisitionGuidance } from '../../../equipment/acquisition/equipment-acquisition-guidance'
@@ -123,6 +124,14 @@ export function EquipmentStepInteractive({
     !showFallback &&
     (step.showPurchaseWorkflow || step.showMagicItemGrants)
 
+  const inventoryEmptyMessage = resolveEquipmentInventoryEmptyMessage({
+    classOptionsReplaced: step.classOptionsReplaced,
+    showFallback,
+    equipmentChoiceSetCount: step.equipmentChoiceSets.length,
+    summaryCount: step.summaries.length,
+    selectedOptionId,
+  })
+
   return (
     <>
       <div className="space-y-8">
@@ -153,6 +162,7 @@ export function EquipmentStepInteractive({
           conversionEditorOpen={step.conversionEditorOpen}
           selectedPackageItemKeys={step.selectedPackageItemKeys}
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}
+          emptyMessage={inventoryEmptyMessage}
           onRemoveItem={onRemoveItem}
           onSetPurchaseQuantity={handleSetPurchaseQuantity}
           onReleaseGrant={pickerAcquisition.handleReleaseGrant}

@@ -11,12 +11,19 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 
 import {
+  isBuilderStepBlockedNoClass,
   isBuilderStepReadinessMessageOnly,
   showsBuilderStepReviewMessage,
 } from '../../../../lib/builder/builder-step-readiness.lib'
-import { choiceSetsForSpellsStep } from '../../../../lib/spells/spells-step.lib'
+import type { CharacterBuilderNavigateToStep } from '../../../../lib/builder/character-builder-navigation-options'
+import {
+  choiceSetsForSpellsStep,
+  SPELLS_CHOOSE_CLASS_PROMPT_DESCRIPTION,
+  SPELLS_CHOOSE_CLASS_PROMPT_HEADING,
+} from '../../../../lib/spells/spells-step.lib'
 import { withChoiceSetSelections } from '../../../../lib/choice-sets/choice-set-selections'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
+import { BuilderStepChooseClassPrompt } from '../shared/builder-step-choose-class-prompt'
 import { BuilderStepReadinessPanel } from '../shared/builder-step-readiness-panel'
 import { SpellChoiceSection } from './spell-choice-section'
 import { SpellcastingSummaryCard } from './spellcasting-summary-card'
@@ -33,6 +40,7 @@ export type SpellsStepProps = {
   resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
+  onNavigateToStep: CharacterBuilderNavigateToStep
 }
 
 export function SpellsStep({
@@ -42,6 +50,7 @@ export function SpellsStep({
   resolvedChoiceSets,
   validationIssues,
   onDraftChange,
+  onNavigateToStep,
 }: SpellsStepProps) {
   const readiness = useMemo(
     () => resolveBuilderStepReadiness('spells', draft, context, resolvedChoiceSets),
@@ -59,6 +68,18 @@ export function SpellsStep({
 
   const cantripChoiceSet = choiceSets.find((choiceSet) => choiceSet.choiceType === 'cantrip')
   const preparedChoiceSet = choiceSets.find((choiceSet) => choiceSet.choiceType === 'spell')
+
+  if (isBuilderStepBlockedNoClass(readiness, draft)) {
+    return (
+      <BuilderStepFrame stepId="spells" validationIssues={validationIssues}>
+        <BuilderStepChooseClassPrompt
+          heading={SPELLS_CHOOSE_CLASS_PROMPT_HEADING}
+          description={SPELLS_CHOOSE_CLASS_PROMPT_DESCRIPTION}
+          onNavigateToStep={onNavigateToStep}
+        />
+      </BuilderStepFrame>
+    )
+  }
 
   if (isBuilderStepReadinessMessageOnly(readiness)) {
     return (

@@ -122,6 +122,7 @@ export function CharacterBuilderStepContent({
           resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
+          onNavigateToStep={onNavigateToStep}
         />
       )
     case 'equipment':
@@ -132,6 +133,7 @@ export function CharacterBuilderStepContent({
           resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
+          onNavigateToStep={onNavigateToStep}
           equipmentPickerFocus={equipmentPickerFocus}
           onEquipmentPickerFocusConsumed={onEquipmentPickerFocusConsumed}
         />
@@ -145,6 +147,7 @@ export function CharacterBuilderStepContent({
           resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}
+          onNavigateToStep={onNavigateToStep}
         />
       )
     default:

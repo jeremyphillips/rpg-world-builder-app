@@ -11,6 +11,12 @@ import {
 
 const PROFICIENCIES_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.proficiencies
 
+export const PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING =
+  'Choose a class to configure class proficiencies'
+
+export const PROFICIENCIES_CHOOSE_CLASS_PROMPT_DESCRIPTION =
+  'Your class determines saving throws, skill choices, armor, weapon, and tool proficiencies.'
+
 export const PROFICIENCIES_STEP_SELECTION_FULL_REASON = BUILDER_SELECTION_FULL_NOTICE
 
 export const PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE =

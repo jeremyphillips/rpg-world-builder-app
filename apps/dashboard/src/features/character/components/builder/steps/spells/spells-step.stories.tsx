@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 
 import {
   buildCharacterPreview,
@@ -19,6 +20,9 @@ const meta = {
   title: 'Character Builder/SpellsStep',
   component: SpellsStep,
   parameters: { layout: 'padded' },
+  args: {
+    onNavigateToStep: fn(),
+  },
 } satisfies Meta<typeof SpellsStep>
 
 export default meta
@@ -39,6 +43,7 @@ export const NonCaster: Story = {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -56,6 +61,7 @@ export const NoClass: Story = {
         resolvedChoiceSets={resolveAvailableChoices(draft, context)}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -89,6 +95,7 @@ export const Wizard: Story = {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },

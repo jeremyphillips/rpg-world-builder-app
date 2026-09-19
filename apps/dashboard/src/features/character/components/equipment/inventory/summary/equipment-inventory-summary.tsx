@@ -12,6 +12,7 @@ import type {
 import { Heading, Text } from '@rpg/ui'
 
 import {
+  EQUIPMENT_INVENTORY_EMPTY_MESSAGE,
   EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
@@ -48,6 +49,67 @@ export type EquipmentInventorySummaryProps = {
   onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
   onCancelConversion?: () => void
   onCommitConversion?: (preview: StartingPackageConversionPreview) => void
+  emptyMessage?: string
+}
+
+function EquipmentInventoryStartingSection({
+  viewModel,
+  draft,
+  catalogIndex,
+  goldOptionFunding,
+  conversionEditorOpen,
+  selectedPackageItemKeys,
+  conversionCommitStatusMessage,
+  onCustomizePackage,
+  onChangeEquipmentOption,
+  onSelectedPackageItemKeysChange,
+  onCancelConversion,
+  onCommitConversion,
+}: {
+  viewModel: NonNullable<ReturnType<typeof buildEquipmentInventoryViewModel>>
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  goldOptionFunding?: ResolvedStartingEquipmentFunding
+  conversionEditorOpen: boolean
+  selectedPackageItemKeys: ReadonlySet<string>
+  conversionCommitStatusMessage?: string
+  onCustomizePackage?: () => void
+  onChangeEquipmentOption?: () => void
+  onSelectedPackageItemKeysChange?: (keys: ReadonlySet<string>) => void
+  onCancelConversion?: () => void
+  onCommitConversion?: (preview: StartingPackageConversionPreview) => void
+}) {
+  if (viewModel.startingEquipment.kind === 'package') {
+    return (
+      <EquipmentStartingPackageSection
+        packageGroup={viewModel.startingEquipment.group}
+        draft={draft}
+        catalogIndex={catalogIndex}
+        goldOptionFunding={goldOptionFunding}
+        conversionEditorOpen={conversionEditorOpen}
+        selectedPackageItemKeys={selectedPackageItemKeys}
+        commitStatusMessage={conversionCommitStatusMessage}
+        onCustomize={onCustomizePackage ?? (() => undefined)}
+        onChangeEquipmentOption={onChangeEquipmentOption ?? (() => undefined)}
+        onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange ?? (() => undefined)}
+        onCancelConversion={onCancelConversion ?? (() => undefined)}
+        onCommitConversion={onCommitConversion ?? (() => undefined)}
+      />
+    )
+  }
+
+  return (
+    <EquipmentInventoryColumn title={EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}>
+      <div className={equipmentGoldOptionPanelClasses}>
+        <Heading variant="group" as="h4">
+          {viewModel.startingEquipment.message}
+        </Heading>
+        <Text as="p" className="text-sm text-muted-foreground">
+          {viewModel.startingEquipment.description}
+        </Text>
+      </div>
+    </EquipmentInventoryColumn>
+  )
 }
 
 export function EquipmentInventorySummary({
@@ -70,6 +132,7 @@ export function EquipmentInventorySummary({
   onSelectedPackageItemKeysChange,
   onCancelConversion,
   onCommitConversion,
+  emptyMessage = EQUIPMENT_INVENTORY_EMPTY_MESSAGE,
 }: EquipmentInventorySummaryProps) {
   const viewModel = useMemo(
     () => buildEquipmentInventoryViewModel(draft, catalogIndex, budget, classOptionPolicy, context),
@@ -77,38 +140,25 @@ export function EquipmentInventorySummary({
   )
 
   if (!viewModel) {
-    return <Text variant="muted">No equipment selected yet.</Text>
+    return <Text variant="muted">{emptyMessage}</Text>
   }
 
   return (
     <div className={equipmentInventorySummaryGridClasses}>
-      {viewModel.startingEquipment.kind === 'package' ? (
-        <EquipmentStartingPackageSection
-          packageGroup={viewModel.startingEquipment.group}
-          draft={draft}
-          catalogIndex={catalogIndex}
-          goldOptionFunding={goldOptionFunding}
-          conversionEditorOpen={conversionEditorOpen}
-          selectedPackageItemKeys={selectedPackageItemKeys}
-          commitStatusMessage={conversionCommitStatusMessage}
-          onCustomize={onCustomizePackage ?? (() => undefined)}
-          onChangeEquipmentOption={onChangeEquipmentOption ?? (() => undefined)}
-          onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange ?? (() => undefined)}
-          onCancelConversion={onCancelConversion ?? (() => undefined)}
-          onCommitConversion={onCommitConversion ?? (() => undefined)}
-        />
-      ) : (
-        <EquipmentInventoryColumn title={EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}>
-          <div className={equipmentGoldOptionPanelClasses}>
-            <Heading variant="group" as="h4">
-              {viewModel.startingEquipment.message}
-            </Heading>
-            <Text as="p" className="text-sm text-muted-foreground">
-              {viewModel.startingEquipment.description}
-            </Text>
-          </div>
-        </EquipmentInventoryColumn>
-      )}
+      <EquipmentInventoryStartingSection
+        viewModel={viewModel}
+        draft={draft}
+        catalogIndex={catalogIndex}
+        goldOptionFunding={goldOptionFunding}
+        conversionEditorOpen={conversionEditorOpen}
+        selectedPackageItemKeys={selectedPackageItemKeys}
+        conversionCommitStatusMessage={conversionCommitStatusMessage}
+        onCustomizePackage={onCustomizePackage}
+        onChangeEquipmentOption={onChangeEquipmentOption}
+        onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange}
+        onCancelConversion={onCancelConversion}
+        onCommitConversion={onCommitConversion}
+      />
 
       <EquipmentAddedInventoryColumn
         addedEquipment={viewModel.addedEquipment}

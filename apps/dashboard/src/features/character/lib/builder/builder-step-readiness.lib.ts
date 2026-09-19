@@ -1,4 +1,15 @@
-import type { BuilderStepReadinessState, ProficiencyStepSection } from '@rpg/contracts'
+import type {
+  BuilderStepReadinessState,
+  CharacterBuilderDraft,
+  ProficiencyStepSection,
+} from '@rpg/contracts'
+
+export function isBuilderStepBlockedNoClass(
+  readiness: Pick<BuilderStepReadinessState, 'readiness'>,
+  draft: Pick<CharacterBuilderDraft, 'class'>,
+): boolean {
+  return readiness.readiness === 'blocked' && !draft.class.classId
+}
 
 export function isBuilderStepReadinessMessageOnly(
   state: BuilderStepReadinessState,

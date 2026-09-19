@@ -1,7 +1,7 @@
 import { Pencil, Table2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import { Badge, Button, IconBox } from '@rpg/ui'
+import { Badge, Button, IconContainer } from '@rpg/ui'
 
 import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions'
 import {
@@ -35,9 +35,9 @@ export function FeatureTableRow({
   return (
     <div className={featureTableRowShellClasses}>
       <div className={featureTableRowLayoutClasses}>
-        <IconBox>
+        <IconContainer>
           <Table2 />
-        </IconBox>
+        </IconContainer>
         <div className={featureTableRowCopyClasses}>
           <div className={featureTableRowTitleClasses}>{title}</div>
           <div className={featureTableRowMetadataClasses}>{metadata}</div>

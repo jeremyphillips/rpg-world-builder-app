@@ -168,7 +168,7 @@ describe('DetailEntityRow', () => {
 
     const disclosureRoot = screen.getByRole('link', { name: 'Dock Ward' }).closest('[style]')
     expect(disclosureRoot).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
-    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*3)]')
+    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*4)]')
 
     const headerRow = disclosureRoot?.firstElementChild as HTMLElement
     expect(headerRow.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)

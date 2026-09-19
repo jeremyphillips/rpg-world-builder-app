@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { fn } from 'storybook/test'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
@@ -18,6 +19,9 @@ const meta = {
   title: 'Character Builder/ProficienciesStep',
   component: ProficienciesStep,
   parameters: { layout: 'padded' },
+  args: {
+    onNavigateToStep: fn(),
+  },
 } satisfies Meta<typeof ProficienciesStep>
 
 export default meta
@@ -32,6 +36,7 @@ export const Empty: Story = {
       resolvedChoiceSets={[]}
       validationIssues={[]}
       onDraftChange={() => undefined}
+      onNavigateToStep={fn()}
     />
   ),
 }
@@ -49,6 +54,7 @@ export const OriginLanguages: Story = {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -66,6 +72,7 @@ export const Rogue: Story = {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -84,6 +91,7 @@ export const RogueWithSelections: Story = {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },
@@ -102,6 +110,7 @@ export const RogueStaleSelection: Story = {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={fn()}
       />
     )
   },

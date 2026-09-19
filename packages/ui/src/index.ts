@@ -111,8 +111,15 @@ export {
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
-export { IconBox, type IconBoxProps } from './components/ui/icon-box.client'
-export { iconBoxVariants, iconBoxGlyphClasses } from './components/ui/icon-box.variants'
+export {
+  IconContainer,
+  type IconContainerProps,
+  type IconContainerShape,
+} from './components/ui/icon-container.client'
+export {
+  iconContainerVariants,
+  iconContainerGlyphClasses,
+} from './components/ui/icon-container.variants'
 export { EmptyPanel, type EmptyPanelProps } from './components/ui/empty-panel.client'
 export { emptyPanelVariants } from './components/ui/empty-panel.variants'
 export {

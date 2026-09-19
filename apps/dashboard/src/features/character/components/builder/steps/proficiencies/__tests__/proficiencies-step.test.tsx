@@ -1,15 +1,17 @@
+import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import {
-  characterBuilderStepReadinessMessages,
-  createEmptyCharacterBuilderDraft,
-  formatFieldMessage,
-} from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
+import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import { createStandaloneBuilderContextFixture } from '../../../../../lib/fixtures/character-builder-fixtures'
+import {
+  PROFICIENCIES_CHOOSE_CLASS_PROMPT_DESCRIPTION,
+  PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING,
+} from '../../../../../lib/proficiencies/proficiencies-step.lib'
 import {
   createEmptyProficienciesStepPreviewFixture,
   createProficienciesStepOriginLanguagesFixture,
@@ -23,28 +25,36 @@ import { ProficienciesStep } from '../proficiencies-step'
 
 const emptyContext = createStandaloneBuilderContextFixture()
 
-const proficienciesBlockedNoClassMessage = formatFieldMessage(
-  characterBuilderStepReadinessMessages.proficienciesBlockedNoClass(),
-)
-const proficienciesBlockedHelperMessage = formatFieldMessage(
-  characterBuilderStepReadinessMessages.proficienciesBlockedNoClassHelper(),
-)
+function renderProficienciesStep(
+  props: Omit<ComponentProps<typeof ProficienciesStep>, 'onNavigateToStep'>,
+  onNavigateToStep = vi.fn(),
+) {
+  return {
+    onNavigateToStep,
+    ...render(<ProficienciesStep {...props} onNavigateToStep={onNavigateToStep} />),
+  }
+}
 
 describe('ProficienciesStep', () => {
-  it('renders blocked copy when no class is selected and no sections are visible', () => {
-    render(
-      <ProficienciesStep
-        context={emptyContext}
-        draft={createEmptyCharacterBuilderDraft()}
-        preview={createEmptyProficienciesStepPreviewFixture()}
-        resolvedChoiceSets={[]}
-        validationIssues={[]}
-        onDraftChange={() => undefined}
-      />,
+  it('renders the choose-class prompt when no class is selected and no sections are visible', async () => {
+    const user = userEvent.setup()
+    const { onNavigateToStep } = renderProficienciesStep({
+      context: emptyContext,
+      draft: createEmptyCharacterBuilderDraft(),
+      preview: createEmptyProficienciesStepPreviewFixture(),
+      resolvedChoiceSets: [],
+      validationIssues: [],
+      onDraftChange: () => undefined,
+    })
+
+    expect(screen.getByText(PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING)).toBeInTheDocument()
+    expect(screen.getByText(PROFICIENCIES_CHOOSE_CLASS_PROMPT_DESCRIPTION)).toBeInTheDocument()
+
+    await user.click(
+      screen.getByRole('button', { name: BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL }),
     )
 
-    expect(screen.getByText(proficienciesBlockedNoClassMessage)).toBeInTheDocument()
-    expect(screen.getByText(proficienciesBlockedHelperMessage)).toBeInTheDocument()
+    expect(onNavigateToStep).toHaveBeenCalledWith('class')
   })
 
   it('renders Rogue grant rows and the skill choice counter', () => {
@@ -58,6 +68,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -85,6 +96,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -108,10 +120,11 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
-    expect(screen.getByText(proficienciesBlockedNoClassMessage)).toBeInTheDocument()
+    expect(screen.getByText(PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Origin Languages' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add language' })).toBeInTheDocument()
@@ -130,6 +143,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -154,6 +168,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={onDraftChange}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -196,6 +211,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={onDraftChange}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -223,6 +239,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={onDraftChange}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -263,6 +280,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={vi.fn()}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -286,6 +304,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={vi.fn()}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
@@ -303,6 +322,7 @@ describe('ProficienciesStep', () => {
         resolvedChoiceSets={resolvedChoiceSets}
         validationIssues={[]}
         onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
       />,
     )
 
