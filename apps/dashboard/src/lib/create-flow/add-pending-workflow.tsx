@@ -76,7 +76,7 @@ export function AddPendingWorkflow({
               {pendingItems}
             </div>
             <div>
-              <Button type="button" variant="ghost" onClick={handleAddAnother}>
+              <Button type="button" variant="text" size="sm" onClick={handleAddAnother}>
                 {addAnotherLabel}
               </Button>
             </div>
@@ -85,7 +85,7 @@ export function AddPendingWorkflow({
           <>
             {emptyState}
             <div>
-              <Button type="button" variant="ghost" onClick={handleAddAnother}>
+              <Button type="button" variant="text" size="sm" onClick={handleAddAnother}>
                 {addLabel}
               </Button>
             </div>

@@ -56,7 +56,8 @@ export function AbilityRecommendationPanel({
             {' '}
             <Button
               type="button"
-              variant="link"
+              variant="text"
+              tone="accent"
               size="sm"
               className={abilityRecommendationCalloutActionClasses}
               onClick={() => onApplySuggestions(model.suggestedAssignment!)}
@@ -70,7 +71,7 @@ export function AbilityRecommendationPanel({
             {' '}
             <Button
               type="button"
-              variant="link"
+              variant="text"
               size="sm"
               className={abilityRecommendationCalloutActionClasses}
               disabled

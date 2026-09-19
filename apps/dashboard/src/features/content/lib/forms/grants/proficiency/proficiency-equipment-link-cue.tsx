@@ -22,13 +22,7 @@ export function ProficiencyEquipmentLinkCue({
           {message}
         </Text>
         {onNavigate ? (
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            className="h-auto p-0"
-            onClick={onNavigate}
-          >
+          <Button type="button" variant="text" tone="accent" size="sm" onClick={onNavigate}>
             {navigateLabel}
           </Button>
         ) : null}

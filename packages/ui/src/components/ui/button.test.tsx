@@ -96,6 +96,32 @@ describe('Button', () => {
     expect(button).toHaveClass('aria-expanded:bg-interactive-outline-active')
   })
 
+  it('applies text variant geometry and standalone neutral recipe', () => {
+    render(<Button variant="text">Add relationship</Button>)
+    const button = screen.getByRole('button', { name: 'Add relationship' })
+    expect(button).toHaveClass('h-8', 'px-0', 'w-fit')
+    expect(button).toHaveClass('text-action-standalone', 'text-foreground')
+    expect(button).not.toHaveClass('h-9', 'text-primary')
+  })
+
+  it('applies compact text variant height', () => {
+    render(
+      <Button variant="text" density="compact">
+        Compact text
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Compact text' })).toHaveClass('h-6', 'px-0')
+  })
+
+  it('applies accent tone on text variant when requested', () => {
+    render(
+      <Button variant="text" tone="accent">
+        Choose class
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Choose class' })).toHaveClass('text-primary')
+  })
+
   it('fires onClick when pressed', async () => {
     const onClick = vi.fn()
     render(<Button onClick={onClick}>Click</Button>)

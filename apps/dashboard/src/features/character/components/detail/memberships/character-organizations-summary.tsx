@@ -117,13 +117,7 @@ export function CharacterOrganizationsSummary({
         </ul>
       )}
       {canEdit && onAddOrganization ? (
-        <Button
-          type="button"
-          variant="text"
-          size="sm"
-          className="h-auto px-0"
-          onClick={onAddOrganization}
-        >
+        <Button type="button" variant="text" size="sm" onClick={onAddOrganization}>
           + Add organization
         </Button>
       ) : null}

@@ -68,15 +68,13 @@ import { Heading } from '@rpg/ui'
 Polymorphic via `as`. All Tailwind lives in `text.variants.ts`.
 
 ```tsx
-import { Text } from '@rpg/ui'
+import { Link, RichTextContent, Text } from '@rpg/ui'
 
 <RichTextContent html={species.description} size="md" tone="muted" />
 <Text variant="destructive" role="alert">
   Could not load species.
 </Text>
-<Text as="a" variant="small" href="/classes" className="hover:underline">
-  ← Classes
-</Text>
+<Link href="/classes">← Classes</Link>
 ```
 
 Form hints and errors inside `Field.*`, `Form`, and field wrappers already compose

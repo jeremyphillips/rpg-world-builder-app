@@ -1,8 +1,16 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { RichTextContent } from './rich-text-content'
+
+const globalsCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), '../../styles/globals.css'),
+  'utf8',
+)
 
 describe('RichTextContent', () => {
   it('renders sanitized HTML with prose classes', () => {
@@ -53,6 +61,17 @@ describe('RichTextContent', () => {
 
     expect(screen.getByText('pnpm bench')).toBeInTheDocument()
     expect(screen.getByText('pnpm bench list-tickets')).toBeInTheDocument()
+  })
+
+  it('wires prose anchors to the shared inline text-action CSS rule', () => {
+    expect(globalsCss).toMatch(/:where\(a\) \{[\s\S]*@apply text-action-inline text-primary/)
+
+    const { container } = render(
+      <RichTextContent html={'<p>See <a href="/docs">Rules</a> for details.</p>'} size="md" />,
+    )
+
+    expect(container.firstChild).toHaveClass('prose')
+    expect(screen.getByRole('link', { name: 'Rules' })).toBeInTheDocument()
   })
 
   it('renders internal links with preserved metadata attributes', () => {

@@ -39,7 +39,11 @@ describe('RelationshipList layout mechanics', () => {
     expect(container.querySelector('[data-slot="relationship-list-footer"]')).toBeInTheDocument()
     expect(screen.queryByText('No members linked.')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Add member' }))
+    const addButton = screen.getByRole('button', { name: 'Add member' })
+    expect(addButton).toHaveClass('text-action-standalone', 'text-foreground')
+    expect(addButton).not.toHaveClass('hover:bg-accent')
+
+    await user.click(addButton)
     expect(onAdd).toHaveBeenCalledOnce()
   })
 

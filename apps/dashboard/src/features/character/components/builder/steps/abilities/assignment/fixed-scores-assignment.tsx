@@ -152,7 +152,8 @@ function ChooseScoreMenu({
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
-          variant="link"
+          variant="text"
+          tone={typeof assignedScore === 'number' ? undefined : 'accent'}
           size="sm"
           className={abilityScoreCardChooseScoreClasses}
           aria-label={`${actionLabel} for ${entry.label}`}

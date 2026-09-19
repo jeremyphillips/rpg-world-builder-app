@@ -23,6 +23,8 @@ const EYEBROW_STYLE_UTILITIES = [
   'eyebrow-style-md',
 ] as const
 
+const TEXT_ACTION_UTILITIES = ['text-action-inline', 'text-action-standalone'] as const
+
 const EYEBROW_STYLE_CONFLICT_GROUPS = [
   'font-size',
   'font-weight',
@@ -40,7 +42,7 @@ const TYPOGRAPHY_CONFLICT_GROUPS = [
   'text-transform',
 ] as const
 
-type TypographyClassGroupIds = 'heading-style' | 'eyebrow-style'
+type TypographyClassGroupIds = 'heading-style' | 'eyebrow-style' | 'text-action'
 
 /**
  * Custom `text-*` font-size and `font-*` weight utilities from `@theme` in
@@ -101,10 +103,12 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
     classGroups: {
       'heading-style': [...HEADING_STYLE_UTILITIES],
       'eyebrow-style': [...EYEBROW_STYLE_UTILITIES],
+      'text-action': [...TEXT_ACTION_UTILITIES],
     },
     conflictingClassGroups: {
       'heading-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
       'eyebrow-style': [...EYEBROW_STYLE_CONFLICT_GROUPS],
+      'text-action': ['text-action'],
       'font-size': ['heading-style', 'eyebrow-style'],
       'font-weight': ['heading-style', 'eyebrow-style'],
       tracking: ['heading-style', 'eyebrow-style'],

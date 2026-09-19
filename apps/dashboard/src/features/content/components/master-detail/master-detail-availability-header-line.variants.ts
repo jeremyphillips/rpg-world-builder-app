@@ -6,8 +6,6 @@ export const masterDetailAvailabilityHeaderLineClasses =
 
 export const masterDetailAvailabilityHeaderStatusClasses = 'min-w-0 flex items-center gap-1.5'
 
-export const masterDetailAvailabilityHeaderChangeClasses = 'h-auto shrink-0 px-0 text-xs'
-
 export const masterDetailAvailabilityAvailableStatusClasses = cn(
   'inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-foreground',
 )

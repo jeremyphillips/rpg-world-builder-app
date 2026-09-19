@@ -82,7 +82,7 @@ function renderActiveChoiceSet(set: CreateSetupChoiceSet, input: BuildCreateSetu
       {showSkip ? (
         <Button
           type="button"
-          variant="link"
+          variant="text"
           size="sm"
           className="self-start"
           onClick={() => {

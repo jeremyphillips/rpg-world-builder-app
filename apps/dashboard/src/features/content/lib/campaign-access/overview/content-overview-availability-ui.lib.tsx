@@ -68,9 +68,8 @@ export function buildContentOverviewEmptyState<TFilters>({
           {copy.unavailableLine}{' '}
           <Button
             type="button"
-            variant="link"
+            variant="text"
             size="sm"
-            className="h-auto px-0 text-xs"
             aria-label={formatShowUnavailableAriaLabel(pluralNoun)}
             onClick={() =>
               actions.setFilterValue(

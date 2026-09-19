@@ -154,7 +154,7 @@ export function ButtonDropdown({
       <PopoverPrimitive.Trigger asChild>
         <Button
           type="button"
-          variant={variant}
+          variant={variant ?? 'default'}
           size={size}
           className={cn(width === 'fit' && 'w-fit shrink-0', className)}
           aria-haspopup="listbox"

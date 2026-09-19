@@ -51,7 +51,7 @@ describe('OptionalFieldDisclosure', () => {
 
     const addButton = screen.getByRole('button', { name: 'Add additional behavior' })
     expect(addButton).toBeInTheDocument()
-    expect(addButton).toHaveClass('text-primary')
+    expect(addButton).toHaveClass('text-foreground', 'text-action-standalone')
     expect(addButton).not.toHaveClass('hover:bg-accent')
     expect(screen.queryByRole('textbox', { name: 'Additional behavior' })).not.toBeInTheDocument()
   })
@@ -75,7 +75,7 @@ describe('OptionalFieldDisclosure', () => {
     expect(screen.getByRole('textbox', { name: 'Additional behavior' })).toBeInTheDocument()
 
     const removeButton = screen.getByRole('button', { name: 'Remove Additional behavior' })
-    expect(removeButton).toHaveClass('text-primary')
+    expect(removeButton).toHaveClass('text-foreground', 'text-action-standalone')
     expect(container.querySelector('.flex.flex-col.gap-1')).toBeNull()
 
     await user.click(removeButton)

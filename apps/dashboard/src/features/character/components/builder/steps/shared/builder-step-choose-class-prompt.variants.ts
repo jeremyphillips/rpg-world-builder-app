@@ -17,5 +17,3 @@ export const builderStepChooseClassPromptTextStackClasses = 'flex flex-col gap-1
 export const builderStepChooseClassPromptHeadingClasses = 'text-base font-semibold text-foreground'
 
 export const builderStepChooseClassPromptSubheadingClasses = 'text-sm text-muted-foreground'
-
-export const builderStepChooseClassPromptActionClasses = 'h-auto w-fit shrink-0 self-start'

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { ArrowRight, Plus } from 'lucide-react'
 
 import { Button } from './button.client'
 
@@ -11,7 +12,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'text'],
+      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'text'],
     },
     size: {
       control: 'select',
@@ -20,6 +21,11 @@ const meta = {
     density: {
       control: 'select',
       options: ['default', 'compact'],
+    },
+    tone: {
+      control: 'select',
+      options: ['accent', 'neutral', 'danger'],
+      if: { arg: 'variant', eq: 'text' },
     },
   },
 } satisfies Meta<typeof Button>
@@ -45,12 +51,34 @@ export const Ghost: Story = {
   args: { variant: 'ghost' },
 }
 
-export const Link: Story = {
-  args: { variant: 'link' },
+export const TextNeutral: Story = {
+  args: { variant: 'text', children: 'Change package' },
 }
 
-export const Text: Story = {
-  args: { variant: 'text' },
+export const TextAccent: Story = {
+  args: { variant: 'text', tone: 'accent', children: 'Choose class →' },
+}
+
+export const TextDanger: Story = {
+  args: { variant: 'text', tone: 'danger', children: 'Delete draft' },
+}
+
+export const TextCompactAdd: Story = {
+  render: () => (
+    <Button variant="text" density="compact">
+      <Plus aria-hidden />
+      Add relationship
+    </Button>
+  ),
+}
+
+export const TextAccentWithIcon: Story = {
+  render: () => (
+    <Button variant="text" tone="accent">
+      Choose class
+      <ArrowRight aria-hidden />
+    </Button>
+  ),
 }
 
 export const Small: Story = {

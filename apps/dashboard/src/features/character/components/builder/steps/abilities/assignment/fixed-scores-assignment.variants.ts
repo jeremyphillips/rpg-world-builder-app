@@ -50,5 +50,4 @@ export const abilityScoreCardChooseScoreSectionClasses = 'flex w-full justify-ce
 export const abilityScoreCardModifierClasses =
   'text-sm font-medium tabular-nums text-muted-foreground'
 
-export const abilityScoreCardChooseScoreClasses =
-  'h-auto p-0 text-xs font-normal text-muted-foreground'
+export const abilityScoreCardChooseScoreClasses = 'font-normal'

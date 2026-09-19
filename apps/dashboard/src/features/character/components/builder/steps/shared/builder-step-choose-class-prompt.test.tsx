@@ -9,7 +9,6 @@ import {
 } from '../../../../lib/equipment/equipment-step.lib'
 import { BuilderStepChooseClassPrompt } from './builder-step-choose-class-prompt'
 import {
-  builderStepChooseClassPromptActionClasses,
   builderStepChooseClassPromptContentClasses,
   builderStepChooseClassPromptHeadingClasses,
   builderStepChooseClassPromptSubheadingClasses,
@@ -45,7 +44,7 @@ describe('BuilderStepChooseClassPrompt', () => {
     const action = screen.getByRole('button', {
       name: BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL,
     })
-    expect(action).toHaveClass(builderStepChooseClassPromptActionClasses)
+    expect(action).toHaveClass('text-action-standalone', 'text-primary', 'h-8', 'px-0', 'w-fit')
 
     await user.click(action)
 

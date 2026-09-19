@@ -57,7 +57,7 @@ function RelationshipListHeaderAction({ action }: { action: RelationshipListActi
   return (
     <Button
       type="button"
-      variant="ghost"
+      variant="text"
       size="sm"
       density="compact"
       disabled={action.disabled}

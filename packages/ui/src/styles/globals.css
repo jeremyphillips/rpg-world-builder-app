@@ -545,6 +545,10 @@
   );
   --tw-prose-links: var(--color-primary);
 
+  :where(a) {
+    @apply text-action-inline text-primary;
+  }
+
   :where(h1, h2, h3, h4) {
     font-family: var(--font-display);
   }
@@ -561,6 +565,16 @@
   :where(p:last-child) {
     margin-bottom: 0;
   }
+}
+
+/** Inline text links — SSOT for prose, Markdown, and `<Link context="inline">`. */
+@utility text-action-inline {
+  @apply underline decoration-from-font underline-offset-2 hover:decoration-2;
+}
+
+/** Standalone text actions — underline appears on hover. */
+@utility text-action-standalone {
+  @apply no-underline underline-offset-4 hover:underline;
 }
 
 /* Compact prose — aligns with compact UI (`text-sm`, 14px). */

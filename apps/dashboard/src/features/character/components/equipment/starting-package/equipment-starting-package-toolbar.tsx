@@ -6,7 +6,6 @@ import {
 } from '../../../lib/equipment/equipment-step.lib'
 import {
   equipmentInventoryColumnToolbarClasses,
-  equipmentInventoryColumnToolbarLinkClasses,
   equipmentInventoryColumnToolbarSeparatorClasses,
 } from '../inventory/equipment-inventory.variants'
 
@@ -29,9 +28,8 @@ export function EquipmentStartingPackageToolbar({
     <div className={equipmentInventoryColumnToolbarClasses}>
       <Button
         type="button"
-        variant="link"
+        variant="text"
         size="sm"
-        className={equipmentInventoryColumnToolbarLinkClasses}
         disabled={customizeDisabled}
         aria-expanded={conversionEditorOpen}
         aria-controls={customizeControlsId}
@@ -42,13 +40,7 @@ export function EquipmentStartingPackageToolbar({
       <span aria-hidden className={equipmentInventoryColumnToolbarSeparatorClasses}>
         ·
       </span>
-      <Button
-        type="button"
-        variant="link"
-        size="sm"
-        className={equipmentInventoryColumnToolbarLinkClasses}
-        onClick={onChangeEquipmentOption}
-      >
+      <Button type="button" variant="text" size="sm" onClick={onChangeEquipmentOption}>
         {EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL}
       </Button>
     </div>

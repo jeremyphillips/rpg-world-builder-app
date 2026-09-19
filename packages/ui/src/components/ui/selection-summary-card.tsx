@@ -129,7 +129,7 @@ export function SelectionSummaryChangeAction({
   return (
     <Button
       type="button"
-      variant="link"
+      variant="text"
       size="sm"
       density="compact"
       className={selectionSummaryCardChangeActionClasses}

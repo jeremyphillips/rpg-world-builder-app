@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { buttonVariants } from '@rpg/ui'
+import { cn, textActionVariants } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
@@ -10,7 +10,7 @@ export function MessagesStartConversationLink({ campaignId }: { campaignId?: str
   return (
     <Link
       to={ROUTES.messages.new({ campaignId })}
-      className={`${buttonVariants({ variant: 'link', size: 'sm' })} md:hidden`}
+      className={cn(textActionVariants({ context: 'standalone' }), 'md:hidden')}
     >
       {MESSAGES_ACTION_COPY.startConversation}
     </Link>

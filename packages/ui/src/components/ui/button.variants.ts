@@ -16,9 +16,15 @@ import {
   outlineControlShellClasses,
 } from './outline-control.variants'
 
-const standaloneButtonVariants: Array<
-  'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'text'
-> = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link', 'text']
+const chromeButtonVariants: Array<'default' | 'destructive' | 'outline' | 'secondary' | 'ghost'> = [
+  'default',
+  'destructive',
+  'outline',
+  'secondary',
+  'ghost',
+]
+
+const textButtonTransparentClasses = 'bg-transparent hover:bg-transparent active:bg-transparent'
 
 /**
  * Button class variants. Kept in a non-client module so server components (e.g.
@@ -45,8 +51,7 @@ export const buttonVariants = cva(
         secondary:
           'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 active:bg-secondary/60',
         ghost: 'hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
-        link: 'text-primary underline-offset-4 hover:underline',
-        text: 'bg-transparent text-primary hover:bg-transparent hover:text-primary/90 active:bg-transparent active:text-primary/80',
+        text: textButtonTransparentClasses,
       },
       size: {
         default: '',
@@ -62,19 +67,19 @@ export const buttonVariants = cva(
     },
     compoundVariants: [
       {
-        variant: standaloneButtonVariants,
+        variant: chromeButtonVariants,
         size: 'default',
         density: 'default',
         class: 'h-9 px-4 py-2',
       },
       {
-        variant: standaloneButtonVariants,
+        variant: chromeButtonVariants,
         size: 'sm',
         density: 'default',
         class: 'h-8 rounded-md px-3',
       },
       {
-        variant: standaloneButtonVariants,
+        variant: chromeButtonVariants,
         size: 'lg',
         density: 'default',
         class: 'h-10 rounded-md px-6',
@@ -82,19 +87,19 @@ export const buttonVariants = cva(
       { size: 'icon', density: 'default', class: controlActionDefaultIconClasses },
       { size: 'icon-lg', density: 'default', class: controlActionLgIconClasses },
       {
-        variant: standaloneButtonVariants,
+        variant: chromeButtonVariants,
         size: 'default',
         density: 'compact',
         class: 'h-8 px-3 py-1',
       },
       {
-        variant: standaloneButtonVariants,
+        variant: chromeButtonVariants,
         size: 'sm',
         density: 'compact',
         class: cn(controlActionCompactTextWithIconClasses, 'px-2 py-0'),
       },
       {
-        variant: standaloneButtonVariants,
+        variant: chromeButtonVariants,
         size: 'lg',
         density: 'compact',
         class: 'h-9 px-5 py-1.5',
@@ -103,6 +108,16 @@ export const buttonVariants = cva(
         size: 'icon',
         density: 'compact',
         class: controlActionCompactIconClasses,
+      },
+      {
+        variant: 'text',
+        density: 'default',
+        class: cn('h-8 px-0 w-fit', textButtonTransparentClasses),
+      },
+      {
+        variant: 'text',
+        density: 'compact',
+        class: cn('h-6 px-0 w-fit', textButtonTransparentClasses),
       },
       {
         variant: 'attached',

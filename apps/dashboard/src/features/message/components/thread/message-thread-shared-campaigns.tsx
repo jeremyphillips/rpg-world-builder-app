@@ -1,5 +1,5 @@
 import type { ConversationSharedCampaign } from '@rpg/contracts'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, buttonVariants } from '@rpg/ui'
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { CampaignDisplayNameList } from '@/features/campaign'
@@ -35,17 +35,15 @@ export function MessageThreadSharedCampaigns({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
+              <Button
                 type="button"
-                className={buttonVariants({
-                  variant: 'link',
-                  size: 'sm',
-                  className: 'inline h-auto p-0',
-                })}
+                variant="text"
+                size="sm"
+                className="inline"
                 aria-label={MESSAGES_A11Y_COPY.showMoreSharedCampaigns(overflowCount)}
               >
                 {formatMessageThreadSharedCampaignOverflowTriggerLabel(overflowCount)}
-              </button>
+              </Button>
             </TooltipTrigger>
             <TooltipContent>
               {formatMessageThreadSharedCampaignOverflowTooltip(overflow)}

@@ -14,7 +14,6 @@ import {
   QUICK_NPC_BUILD_RECOMMENDED_BADGE_LABEL,
 } from '../../lib/quick-npc/quick-npc-build-card.lib'
 import {
-  quickNpcBuildCardActionLinkClasses,
   quickNpcBuildCardAttributeHeaderClasses,
   quickNpcBuildCardAttributeHelperClasses,
   quickNpcBuildCardAttributeRowClasses,
@@ -65,13 +64,7 @@ export function BuildAttributeRow({
       <div className={quickNpcBuildCardAttributeHeaderClasses}>
         <Eyebrow size="sm">{eyebrow}</Eyebrow>
         {actionLabel != null && onAction != null ? (
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            className={quickNpcBuildCardActionLinkClasses}
-            onClick={onAction}
-          >
+          <Button type="button" variant="text" size="sm" onClick={onAction}>
             {actionLabel}
           </Button>
         ) : null}
