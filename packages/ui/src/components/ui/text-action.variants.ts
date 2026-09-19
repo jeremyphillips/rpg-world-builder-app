@@ -1,4 +1,4 @@
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 
 /**
  * Shared presentation for textual interactive controls — inline links, standalone
@@ -7,7 +7,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
  * Decoration + ink only. Geometry, focus rings, and disabled behavior stay on
  * the semantic wrapper (`Button`, `Link`, …).
  */
-export const textActionVariants = cva('font-body-emphasis transition-colors', {
+const textActionVariantsCva = cva('font-body-emphasis transition-colors', {
   variants: {
     context: {
       inline: 'text-action-inline',
@@ -19,15 +19,15 @@ export const textActionVariants = cva('font-body-emphasis transition-colors', {
       danger: 'text-destructive',
     },
   },
-  defaultVariants: {
-    context: 'inline',
-    tone: 'accent',
-  },
 })
 
-export type TextActionVariantProps = VariantProps<typeof textActionVariants>
-export type TextActionTone = NonNullable<TextActionVariantProps['tone']>
-export type TextActionContext = NonNullable<TextActionVariantProps['context']>
+export type TextActionTone = 'accent' | 'neutral' | 'danger'
+export type TextActionContext = 'inline' | 'standalone'
+
+export type TextActionVariantProps = {
+  context?: TextActionContext
+  tone?: TextActionTone
+}
 
 /** Resolves tone when callers omit it — inline accent, standalone neutral. */
 export function resolveTextActionTone(
@@ -35,4 +35,14 @@ export function resolveTextActionTone(
   tone?: TextActionTone,
 ): TextActionTone {
   return tone ?? (context === 'inline' ? 'accent' : 'neutral')
+}
+
+/** Context-aware text-action classes — always resolves omitted tone from context. */
+export function textActionVariants({ context = 'inline', tone }: TextActionVariantProps = {}) {
+  return textActionVariantsCva({ context, tone: resolveTextActionTone(context, tone) })
+}
+
+/** Router-link helper — standalone text actions without Button geometry. */
+export function standaloneTextActionClasses(tone?: TextActionTone) {
+  return textActionVariants({ context: 'standalone', tone })
 }

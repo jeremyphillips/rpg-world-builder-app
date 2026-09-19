@@ -3,7 +3,6 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import {
-  resolveTextActionTone,
   textActionVariants,
   type TextActionContext,
   type TextActionTone,
@@ -19,12 +18,10 @@ export type LinkProps = React.ComponentPropsWithoutRef<'a'> & {
  * Use `context="standalone"` for hover-underline text actions outside prose.
  */
 export function Link({ context = 'inline', tone, className, ...props }: LinkProps) {
-  const resolvedTone = resolveTextActionTone(context, tone)
-
   return (
     <a
       className={cn(
-        textActionVariants({ context, tone: resolvedTone }),
+        textActionVariants({ context, tone }),
         interactiveFocusVariants({ context: context === 'inline' ? 'embedded' : 'standalone' }),
         className,
       )}

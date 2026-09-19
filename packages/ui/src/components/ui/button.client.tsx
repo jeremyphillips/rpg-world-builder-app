@@ -6,13 +6,23 @@ import { cn } from '../../lib/utils'
 import { buttonVariants, type ButtonVariantProps } from './button.variants'
 import { textActionVariants, type TextActionTone } from './text-action.variants'
 
-export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: ButtonVariantProps['variant']
+type ButtonSharedProps = {
   size?: ButtonVariantProps['size']
   density?: ButtonVariantProps['density']
-  /** Standalone text-action tone — only applies when `variant="text"`. */
-  tone?: TextActionTone
 }
+
+/** Props for wrappers that forward `variant` without exposing `tone`. */
+export type ButtonForwardingProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  ButtonSharedProps & {
+    variant?: ButtonVariantProps['variant']
+  }
+
+export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  ButtonSharedProps &
+  (
+    | { variant?: Exclude<ButtonVariantProps['variant'], 'text'>; tone?: never }
+    | { variant: 'text'; tone?: TextActionTone }
+  )
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, density, type = 'button', tone, ...props }, ref) => {
@@ -24,9 +34,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         type={type}
         className={cn(
           buttonVariants({ variant: resolvedVariant, size, density }),
-          resolvedVariant === 'text'
-            ? textActionVariants({ context: 'standalone', tone: tone ?? 'neutral' })
-            : null,
+          resolvedVariant === 'text' ? textActionVariants({ context: 'standalone', tone }) : null,
           className,
         )}
         {...props}

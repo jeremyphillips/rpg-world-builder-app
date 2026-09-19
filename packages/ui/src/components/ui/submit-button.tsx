@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 
-import { Button, type ButtonProps } from './button.client'
+import { Button, type ButtonForwardingProps } from './button.client'
 
-export interface SubmitButtonProps extends Omit<ButtonProps, 'type'> {
+export interface SubmitButtonProps extends Omit<ButtonForwardingProps, 'type'> {
   /** When true, the button is disabled and (if provided) shows `pendingLabel`. */
   pending?: boolean
   pendingLabel?: string
