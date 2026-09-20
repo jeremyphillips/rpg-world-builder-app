@@ -115,7 +115,7 @@ export function ProficiencyGrantedSummary({ rows }: ProficiencyGrantedSummaryPro
   return (
     <section
       aria-labelledby="proficiency-granted-summary-heading"
-      className={cn(proficiencyGrantedSummaryClasses, 'relative')}
+      className={proficiencyGrantedSummaryClasses}
       style={sourceWidthStyle}
     >
       <ProficiencyGrantedSummarySourceWidthMeasure
@@ -126,7 +126,7 @@ export function ProficiencyGrantedSummary({ rows }: ProficiencyGrantedSummaryPro
         <Heading variant="subsection" as="h3" id="proficiency-granted-summary-heading">
           {PROFICIENCY_GRANTED_SUMMARY_HEADING}
         </Heading>
-        <Text as="p" variant="muted" className="text-sm">
+        <Text as="p" variant="muted">
           {PROFICIENCY_GRANTED_SUMMARY_SUBHEAD}
         </Text>
       </div>

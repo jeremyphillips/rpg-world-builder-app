@@ -16,9 +16,7 @@ export function ProficiencySectionValidationMessages({
     <ul className={proficiencySectionValidationListClasses} role="alert">
       {issues.map((issue) => (
         <li key={`${issue.code}-${issue.choiceSetId ?? issue.path ?? issue.message}`}>
-          <Text variant="destructive" className="text-sm">
-            {issue.message}
-          </Text>
+          <Text variant="destructive">{issue.message}</Text>
         </li>
       ))}
     </ul>

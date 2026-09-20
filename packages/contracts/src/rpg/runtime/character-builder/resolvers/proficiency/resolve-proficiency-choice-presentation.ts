@@ -28,7 +28,7 @@ export const PROFICIENCY_CHOICE_SOURCE_PRIORITY = {
 
 const UNKNOWN_PROFICIENCY_CHOICE_SOURCE_PRIORITY = 999 as const
 
-const CHOICE_TYPE_DOMAIN = {
+export const PROFICIENCY_CHOICE_TYPE_DOMAIN = {
   skillProficiency: 'skill',
   toolProficiency: 'tool',
   weaponProficiency: 'weapon',
@@ -38,7 +38,8 @@ const CHOICE_TYPE_DOMAIN = {
   Record<ChoiceSet['choiceType'], 'skill' | 'tool' | 'weapon' | 'armor' | 'language'>
 >
 
-type ProficiencyChoiceDomain = (typeof CHOICE_TYPE_DOMAIN)[keyof typeof CHOICE_TYPE_DOMAIN]
+type ProficiencyChoiceDomain =
+  (typeof PROFICIENCY_CHOICE_TYPE_DOMAIN)[keyof typeof PROFICIENCY_CHOICE_TYPE_DOMAIN]
 
 export type ProficiencyHeadingSourceCoverage = 'owner' | 'feature' | 'generic'
 
@@ -49,7 +50,7 @@ export type ProficiencyChoicePresentation = {
 }
 
 function choiceDomainFor(choiceType: ChoiceSet['choiceType']): ProficiencyChoiceDomain | undefined {
-  return CHOICE_TYPE_DOMAIN[choiceType as keyof typeof CHOICE_TYPE_DOMAIN]
+  return PROFICIENCY_CHOICE_TYPE_DOMAIN[choiceType as keyof typeof PROFICIENCY_CHOICE_TYPE_DOMAIN]
 }
 
 function genericHeadingForDomain(domain: ProficiencyChoiceDomain): string {

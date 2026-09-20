@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import type { ChoiceSet } from '../../choice-set'
 import {
   formatProficiencyCategorySubhead,
-  formatProficiencyChoiceBlockAddLabel,
   formatProficiencyChoiceBlockCompactAddLabel,
   formatProficiencyPoolDescription,
   formatProficiencySectionEmptyMessage,
@@ -192,16 +191,6 @@ describe('resolveProficiencyAggregateCount', () => {
         { choiceSet: optionalChoiceSet, selectedCount: 0, max: 1 },
       ]),
     ).toBeNull()
-  })
-})
-
-describe('formatProficiencyChoiceBlockAddLabel', () => {
-  it('returns add copy when the block is not full', () => {
-    expect(formatProficiencyChoiceBlockAddLabel(skillChoiceSet, 0)).toBe('Add skill proficiency')
-  })
-
-  it('returns manage copy when the block is full', () => {
-    expect(formatProficiencyChoiceBlockAddLabel(skillChoiceSet, 2)).toBe('Edit')
   })
 })
 

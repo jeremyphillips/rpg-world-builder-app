@@ -17,7 +17,7 @@ import {
 } from '../proficiency-selected-row'
 
 describe('ProficiencySelectedRow', () => {
-  it('renders source and remove action for a selected row', async () => {
+  it('renders label and remove action for a selected row', async () => {
     const user = userEvent.setup()
     const onRemove = vi.fn()
     const base = createProficienciesStepRogueFixture()

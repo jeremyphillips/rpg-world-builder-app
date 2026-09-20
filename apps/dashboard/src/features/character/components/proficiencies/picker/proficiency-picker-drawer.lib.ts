@@ -1,3 +1,4 @@
+import { formatChoiceSetDrawerHeading } from '@rpg/contracts'
 import type { ChoiceSet, ProficiencyPickerItem } from '@rpg/contracts'
 import {
   compareProficiencyPickerItemsByRecommendation,
@@ -7,7 +8,6 @@ import {
 import { normalizeSearchQuery } from '@rpg/ui'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
-import { formatChoiceSetDrawerTriggerLabel } from '../../../lib/choice-sets/selection-counter.lib'
 import {
   resolveCatalogPickerEmptyStateKind,
   resolveCatalogPickerEmptyStateMessage,
@@ -43,14 +43,8 @@ type ProficiencyPickerScoredItem = {
   searchScore: number
 }
 
-export function formatProficiencyPickerDrawerTitle(
-  choiceSet: ChoiceSet,
-  selectedIds: readonly string[],
-): string {
-  return formatChoiceSetDrawerTriggerLabel(choiceSet, {
-    selectedCount: selectedIds.length,
-    max: choiceSet.max,
-  })
+export function formatProficiencyPickerDrawerTitle(choiceSet: ChoiceSet): string {
+  return formatChoiceSetDrawerHeading(choiceSet.choiceType)
 }
 
 export function formatProficiencyPickerDrawerDescription(

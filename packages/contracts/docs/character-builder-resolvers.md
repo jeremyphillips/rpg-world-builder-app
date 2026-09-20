@@ -206,8 +206,10 @@ Delegates to `resolveEquipmentStepReadiness`, `resolveSpellsStepReadiness`
 User-facing copy lives in `characterBuilderStepReadinessMessages`
 (`messages/character-builder-messages.ts`) under `validation.characterBuilder.readiness.*`.
 Section-level proficiency choice empty copy uses
-`characterBuilderProficiencyChoiceEmptyMessages` and
-`formatProficiencyChoiceEmptyMessage(choiceType)`.
+`characterBuilderProficiencyChoiceEmptyMessages` (base and `*Additional` variants) via
+`formatProficiencyChoiceEmptyMessage(choiceType, { additional? })` and
+`formatProficiencySectionEmptyMessage`. Builder choice drawer headings use
+`formatChoiceSetDrawerHeading(choiceType)`.
 
 ### Dashboard rail mapping
 

@@ -1,7 +1,7 @@
+import { formatProficiencyChosenCounter } from '@rpg/contracts'
 import { SemanticText, StatusIcon, Text } from '@rpg/ui'
 
 import { isChoiceSetAtCapacity } from '../../../../lib/choice-sets/selection-counter.lib'
-import { formatProficiencyChosenCounter } from '../../../../lib/proficiencies/proficiencies-step.lib'
 import {
   proficiencySelectionCounterClasses,
   proficiencySelectionCounterLabelClasses,

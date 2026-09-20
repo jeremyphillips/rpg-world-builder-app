@@ -45,13 +45,6 @@ function rulesetIdFromContentId(contentId: string): string {
   return colonIndex >= 0 ? contentId.slice(0, colonIndex) : contentId
 }
 
-function resolveSkillOptionLabel(
-  skillId: string,
-  catalogIndex: CharacterBuildCatalogIndex,
-): string {
-  return catalogIndex.skillProficiencies.get(skillId)?.name ?? skillId
-}
-
 function resolveEquipmentOptionLabel(
   equipmentId: string,
   catalogIndex: CharacterBuildCatalogIndex,
@@ -167,12 +160,9 @@ function skillProficiencyChoiceSet(
   if (grant.grant.kind !== 'choice') return undefined
 
   const pool = grant.grant.pool
-  const options =
-    pool.source === 'explicit'
-      ? pool.skillIds.map((id) => ({ id, label: resolveSkillOptionLabel(id, catalogIndex) }))
-      : skillPoolChoiceOptions(
-          listSkillsMatchingPool({ pool, skills: catalogIndex.skillProficiencies }),
-        )
+  const options = skillPoolChoiceOptions(
+    listSkillsMatchingPool({ pool, skills: catalogIndex.skillProficiencies }),
+  )
 
   return buildGrantChoiceSet(
     ctx,

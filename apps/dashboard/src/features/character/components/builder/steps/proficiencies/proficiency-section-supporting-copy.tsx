@@ -1,5 +1,5 @@
 import type { ProficiencyChoiceBlock, ProficiencyInteractiveSection } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 
 import {
   proficiencySectionIdentityLineClasses,
@@ -20,7 +20,9 @@ export function ProficiencySectionSupportingCopy({
     return (
       <>
         {section.identityLine ? (
-          <p className={proficiencySectionIdentityLineClasses}>{section.identityLine}</p>
+          <Heading variant="group" as="p" className={proficiencySectionIdentityLineClasses}>
+            {section.identityLine}
+          </Heading>
         ) : null}
         {section.subhead ? (
           <p className={proficiencySectionSubheadClasses}>{section.subhead}</p>

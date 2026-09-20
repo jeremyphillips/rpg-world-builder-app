@@ -108,7 +108,7 @@ export function ProficiencyPickerDrawer({
     <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
-      title={formatProficiencyPickerDrawerTitle(choiceSet, selectedIds)}
+      title={formatProficiencyPickerDrawerTitle(choiceSet)}
       description={formatProficiencyPickerDrawerDescription(choiceSet, selectedIds)}
       items={items}
       getItemKey={(item) => item.optionId}

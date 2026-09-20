@@ -1,10 +1,10 @@
 import { formatProficiencyChoiceEmptyMessage } from '@rpg/contracts'
 import type { ProficiencyChoiceBlock, ProficiencyChoiceSelectedRow } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Button, EmptyPanel, Text } from '@rpg/ui'
-import { Pencil, Plus } from 'lucide-react'
+import { EmptyPanel, Heading, Text } from '@rpg/ui'
 
 import { PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE } from '../../../../lib/proficiencies/proficiencies-step.lib'
+import { ProficiencyChoiceAddAction } from './proficiency-choice-add-action'
 import { ProficiencySectionValidationMessages } from './proficiency-section-validation-messages'
 import { ProficiencySelectedRow } from './proficiency-selected-row'
 import { ProficiencySelectionCounter } from './proficiency-selection-counter'
@@ -15,7 +15,6 @@ import {
   proficiencyChoiceBlockRowDividerClasses,
   proficiencyChoiceBlockRowHeaderClasses,
   proficiencyChoiceBlockRowHeadingGroupClasses,
-  proficiencyChoiceBlockRowLabelClasses,
   proficiencyChoiceBlockRowOverSelectionClasses,
   proficiencyChoiceBlockRowPoolDescriptionClasses,
   proficiencyChoiceBlockRowSelectedListClasses,
@@ -46,19 +45,16 @@ export function ProficiencyChoiceBlockRow({
       <div className={proficiencyChoiceBlockRowContentClasses}>
         <div className={proficiencyChoiceBlockRowHeaderClasses}>
           <div className={proficiencyChoiceBlockRowHeadingGroupClasses}>
-            <p className={proficiencyChoiceBlockRowLabelClasses}>{block.heading}</p>
+            <Heading variant="group" as="p">
+              {block.heading}
+            </Heading>
             <ProficiencySelectionCounter selectedCount={selectedRows.length} max={block.max} />
           </div>
-          <Button
-            type="button"
-            variant="text"
-            tone="accent"
-            density="compact"
+          <ProficiencyChoiceAddAction
+            compactAddLabel={block.compactAddLabel}
+            isFull={block.isFull}
             onClick={onOpenDrawer}
-          >
-            {block.isFull ? <Pencil aria-hidden /> : <Plus aria-hidden />}
-            {block.compactAddLabel}
-          </Button>
+          />
         </div>
         <div className={proficiencyChoiceBlockRowDetailsClasses}>
           {block.sourceLine ? (

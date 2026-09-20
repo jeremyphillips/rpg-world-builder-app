@@ -217,10 +217,10 @@ describe('ProficienciesStep', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add language' }))
-    expect(screen.getByRole('heading', { name: 'Add language' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Choose language' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Search languages' })).toBeInTheDocument()
 
-    const dialog = screen.getByRole('dialog', { name: 'Add language' })
+    const dialog = screen.getByRole('dialog', { name: 'Choose language' })
     const elvishRow = within(dialog)
       .getByText('Elvish')
       .closest('[data-picker-item-key]') as HTMLElement
@@ -288,7 +288,7 @@ describe('ProficienciesStep', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add skill' }))
-    expect(screen.getByRole('heading', { name: 'Add skill proficiency' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Choose skill proficiency' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Search skills' })).toBeInTheDocument()
 
     const acrobaticsRow = screen
@@ -332,7 +332,7 @@ describe('ProficienciesStep', () => {
     expect(manageButton).toBeEnabled()
 
     await user.click(manageButton)
-    expect(screen.getByRole('heading', { name: 'Edit' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Choose skill proficiency' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
     expect(screen.getAllByRole('button', { name: 'Remove' }).length).toBeGreaterThan(0)
   })

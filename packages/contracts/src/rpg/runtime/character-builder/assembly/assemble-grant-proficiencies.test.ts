@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import type { SkillProficiency } from '../../../content/skill-proficiency'
 import type { Species } from '../../../content/species'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
-import { indexCharacterBuildCatalog } from '../context'
+import { indexCharacterBuildCatalog, type CharacterBuildCatalog } from '../context'
 import { assembleGrantSkillProficiencyEntries } from './assemble-grant-proficiencies'
 import { resolveSpeciesTraitGrantChoiceSets } from '../resolvers/species/resolve-species-trait-grant-choice-sets'
 import { createCharacterBuildContext } from '../test-fixtures'
 import { assembleSkillProficiencyEntries } from './assemble-skill-proficiencies'
-import { proficiencyTestCatalog } from '../proficiency-test-fixtures'
+import { proficiencyTestCatalog, perceptionSkill } from '../proficiency-test-fixtures'
 
 const speciesWithSkillGrant = {
   id: 'srd-cc-5.2.1:elf',
@@ -50,11 +51,45 @@ const speciesWithSkillGrant = {
       ],
     },
   ],
-} as const satisfies Species
+} satisfies Species
 
-const catalog = {
+const insightSkill = {
+  id: 'srd-cc-5.2.1:insight',
+  slug: 'insight',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  status: 'published',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Insight',
+  ability: 'wis',
+  examples: ['Discern intent and emotions'],
+} as const satisfies SkillProficiency
+
+const survivalSkill = {
+  id: 'srd-cc-5.2.1:survival',
+  slug: 'survival',
+  rulesetId: 'srd-cc-5.2.1',
+  source: 'system',
+  status: 'published',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Survival',
+  ability: 'wis',
+  examples: ['Follow tracks and forage'],
+} as const satisfies SkillProficiency
+
+const catalog: CharacterBuildCatalog = {
   ...proficiencyTestCatalog,
   species: [speciesWithSkillGrant],
+  skillProficiencies: [
+    ...proficiencyTestCatalog.skillProficiencies,
+    insightSkill,
+    perceptionSkill,
+    survivalSkill,
+  ],
 }
 
 describe('assembleGrantSkillProficiencyEntries', () => {
@@ -95,16 +130,16 @@ describe('assembleGrantSkillProficiencyEntries', () => {
       max: 1,
       required: true,
       options: [
-        { id: 'insight', label: 'insight' },
-        { id: 'perception', label: 'perception' },
-        { id: 'survival', label: 'survival' },
+        { id: 'srd-cc-5.2.1:insight', label: 'Insight' },
+        { id: 'srd-cc-5.2.1:perception', label: 'Perception' },
+        { id: 'srd-cc-5.2.1:survival', label: 'Survival' },
       ],
     })
 
     const draftWithSelection = {
       ...draft,
       choiceSelections: {
-        [keenSensesChoiceSet!.id]: ['perception'],
+        [keenSensesChoiceSet!.id]: ['srd-cc-5.2.1:perception'],
       },
     }
 

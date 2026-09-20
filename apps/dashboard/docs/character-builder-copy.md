@@ -87,11 +87,19 @@ ruleset → campaign (stable within kind).
 
 ## Adjacent builder copy patterns
 
-### ChoiceSet drawer Add/Edit pairs
+### ChoiceSet drawer headings and Add/Edit actions
 
-`CHOICE_SET_DRAWER_LABELS` in `lib/selection-counter.lib.ts` keys explicit Add/Edit
-pairs by `choiceType` — the preferred pattern for proficiency, spell, and equipment drawers.
-Proficiency and language grants use `BUILDER_GRANT_EDIT_ACTION_LABEL` (`Edit`) when full.
+Drawer **headings** stay stable and resolve from `formatChoiceSetDrawerHeading(choiceType)`
+in `@rpg/contracts` (e.g. `Choose skill proficiency`, `Choose cantrip`, `Choose equipment`).
+They do not flip to Add/Edit when a choice set is full.
+
+Inline step actions and drawer **triggers** use `CHOICE_SET_DRAWER_LABELS` in
+`lib/choice-sets/selection-counter.lib.ts` — Add vs Edit (proficiencies/languages) or Add vs
+Manage (spells). Proficiency and language grants use `BUILDER_GRANT_EDIT_ACTION_LABEL` (`Edit`)
+when full.
+
+Per-card “Chosen from …” provenance on selected rows is intentionally omitted — section
+headers and supporting copy provide enough context.
 
 The `drawerLabelsForChoiceSet` fallback (`Manage ${choiceSet.label.toLowerCase()}`) is a
 **legacy escape hatch only**. Add explicit map entries for new choice types instead of

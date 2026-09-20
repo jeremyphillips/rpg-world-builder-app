@@ -3,10 +3,8 @@ import { CircleAlert } from 'lucide-react'
 
 import { EmphasisDetailLine, SegmentedControl, Text } from '@rpg/ui'
 
-import { CatalogEntityPickerSheet } from '@/features/content'
-import { formatMoney, formatWealthAsGold } from '@rpg/contracts'
-
-import { formatAddContentTypeLabel, getContentTypeItemLabel } from '@/features/content'
+import { CatalogEntityPickerSheet, getContentTypeItemLabel } from '@/features/content'
+import { formatChoiceSetDrawerHeading, formatMoney, formatWealthAsGold } from '@rpg/contracts'
 import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../../picker/catalog-toolbar-reset-action'
@@ -211,7 +209,7 @@ export function EquipmentPickerDrawer({
     <CatalogEntityPickerSheet
       open={open}
       onOpenChange={onOpenChange}
-      title={formatAddContentTypeLabel('equipment')}
+      title={formatChoiceSetDrawerHeading('equipment')}
       description="Search the catalog and add items to your loadout."
       items={picker.filteredItems}
       getItemKey={(item) => item.equipment.id}

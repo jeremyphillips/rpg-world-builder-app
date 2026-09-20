@@ -1,7 +1,7 @@
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
 export const proficiencyGrantedSummaryClasses = cn(
-  'rounded-md border border-border bg-surface-faint p-4',
+  'relative rounded-md border border-border bg-surface-faint p-4',
   establishSurfaceCurrent('surface-faint'),
 )
 

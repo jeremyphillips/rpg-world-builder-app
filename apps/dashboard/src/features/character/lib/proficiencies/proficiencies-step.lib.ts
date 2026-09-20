@@ -45,12 +45,7 @@ export function formatProficiencyChoiceAddLabel(choiceSet: ChoiceSet): string {
   })
 }
 
-export function formatProficiencyChosenCounter(selectedCount: number, max: number): string {
-  return `${selectedCount} / ${max} chosen`
-}
-
-/** @deprecated Prefer aggregateCount.label from resolveProficiencyStepModel or formatProficiencyChosenCounter. */
-export const formatProficiencySelectionCounter = formatProficiencyChosenCounter
+export { formatProficiencyChosenCounter } from '@rpg/contracts'
 
 export function reconcileProficiencyStepReadiness(
   readiness: BuilderStepReadinessState,
@@ -86,5 +81,3 @@ export function validationIssuesForProficiencySection(
 
   return validationIssuesForProficiencyChoiceSet(issues, section.choiceBlocks[0]!.choiceSet.id)
 }
-
-export { formatChoiceSetDrawerTriggerLabel }

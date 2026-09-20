@@ -13,7 +13,7 @@ export const proficiencySectionHeadingRowClasses =
 
 export const proficiencySectionSubheadClasses = 'text-sm text-muted-foreground'
 
-export const proficiencySectionIdentityLineClasses = 'heading-style-group text-foreground'
+export const proficiencySectionIdentityLineClasses = 'text-foreground'
 
 export const proficiencySectionSourceLineClasses = 'text-sm text-foreground'
 

@@ -1,4 +1,5 @@
 import {
+  formatChoiceSetDrawerHeading,
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
   formatSpellLevel,
@@ -167,7 +168,7 @@ export function sanitizeSpellPickerBrowseState(
 }
 
 export function formatSpellPickerDrawerTitle(mode: SpellPickerMode): string {
-  return mode === SPELL_PICKER_MODE_CANTRIPS ? 'Add cantrip' : 'Add prepared spell'
+  return formatChoiceSetDrawerHeading(mode === SPELL_PICKER_MODE_CANTRIPS ? 'cantrip' : 'spell')
 }
 
 export function formatSpellPickerSelectionCountText(selectedCount: number, max: number): string {

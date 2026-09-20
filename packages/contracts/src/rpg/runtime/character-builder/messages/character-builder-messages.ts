@@ -234,21 +234,41 @@ export const characterBuilderProficiencyChoiceEmptyMessages = {
     'validation.characterBuilder.proficiencyChoiceEmpty.language',
     () => 'No languages chosen yet.',
   ),
+  languageAdditional: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.languageAdditional',
+    () => 'No additional languages chosen yet.',
+  ),
   skillProficiency: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.skillProficiency',
     () => `No ${getProficiencyDomainCompactLabel('skill').toLowerCase()} chosen yet.`,
+  ),
+  skillProficiencyAdditional: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.skillProficiencyAdditional',
+    () => `No additional ${getProficiencyDomainCompactLabel('skill').toLowerCase()} chosen yet.`,
   ),
   toolProficiency: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.toolProficiency',
     () => 'No tools chosen yet.',
   ),
+  toolProficiencyAdditional: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.toolProficiencyAdditional',
+    () => 'No additional tools chosen yet.',
+  ),
   weaponProficiency: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.weaponProficiency',
     () => 'No weapons chosen yet.',
   ),
+  weaponProficiencyAdditional: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.weaponProficiencyAdditional',
+    () => 'No additional weapons chosen yet.',
+  ),
   armorTraining: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.armorTraining',
     () => 'No armor chosen yet.',
+  ),
+  armorTrainingAdditional: defineMessage(
+    'validation.characterBuilder.proficiencyChoiceEmpty.armorTrainingAdditional',
+    () => 'No additional armor chosen yet.',
   ),
   fallback: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.fallback',

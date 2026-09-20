@@ -1,8 +1,8 @@
 import type { ProficiencyChoiceBlock, ProficiencyInteractiveSection } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Button, Heading } from '@rpg/ui'
-import { Pencil, Plus } from 'lucide-react'
+import { Heading } from '@rpg/ui'
 
+import { ProficiencyChoiceAddAction } from './proficiency-choice-add-action'
 import { ProficiencySectionValidationMessages } from './proficiency-section-validation-messages'
 import { ProficiencySelectionCounter } from './proficiency-selection-counter'
 import { ProficiencySectionSupportingCopy } from './proficiency-section-supporting-copy'
@@ -55,16 +55,11 @@ export function ProficiencySectionHeader({
       </div>
 
       {singleChoiceBlock ? (
-        <Button
-          type="button"
-          variant="text"
-          tone="accent"
-          density="compact"
+        <ProficiencyChoiceAddAction
+          compactAddLabel={singleChoiceBlock.compactAddLabel}
+          isFull={singleChoiceBlock.isFull}
           onClick={() => onOpenChoiceSet(singleChoiceBlock.choiceSet.id)}
-        >
-          {singleChoiceBlock.isFull ? <Pencil aria-hidden /> : <Plus aria-hidden />}
-          {singleChoiceBlock.compactAddLabel}
-        </Button>
+        />
       ) : null}
     </div>
   )

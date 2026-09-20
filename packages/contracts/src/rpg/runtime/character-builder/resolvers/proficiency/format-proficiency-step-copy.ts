@@ -16,12 +16,14 @@ import {
   getProficiencyGrantManageLabel,
 } from '../../../../vocab/proficiency'
 import type { ProficiencyHeadingSourceCoverage } from './resolve-proficiency-choice-presentation'
-import type { ProficiencyStepSectionKind } from './resolve-proficiency-step-model'
-
 import {
+  PROFICIENCY_CHOICE_TYPE_DOMAIN,
   formatProficiencyPoolDescription,
   PROFICIENCY_POOL_ENUMERATION_THRESHOLD,
 } from './resolve-proficiency-choice-presentation'
+import type { ProficiencyStepSectionKind } from './resolve-proficiency-step-model'
+import { formatProficiencyChoiceEmptyMessage } from '../../readiness/step-readiness-helpers'
+import { formatProficiencyChosenCounter } from '../../format-choice-set-drawer-copy'
 
 export { formatProficiencyPoolDescription, PROFICIENCY_POOL_ENUMERATION_THRESHOLD }
 
@@ -34,17 +36,18 @@ const CATEGORY_PLURAL_NOUNS: Record<ProficiencyStepSectionKind, string> = {
   armor: getProficiencyDomainCompactActionNoun('armor', 2),
 }
 
-const CHOICE_TYPE_DOMAIN = {
-  skillProficiency: 'skill',
-  toolProficiency: 'tool',
-  weaponProficiency: 'weapon',
-  armorTraining: 'armor',
-  language: 'language',
-} as const satisfies Partial<
-  Record<ChoiceSet['choiceType'], 'skill' | 'tool' | 'weapon' | 'armor' | 'language'>
->
+const SECTION_KIND_CHOICE_TYPE: Partial<
+  Record<ProficiencyStepSectionKind, ChoiceSet['choiceType']>
+> = {
+  skills: 'skillProficiency',
+  tools: 'toolProficiency',
+  languages: 'language',
+  weapons: 'weaponProficiency',
+  armor: 'armorTraining',
+}
 
-type ProficiencyChoiceDomain = (typeof CHOICE_TYPE_DOMAIN)[keyof typeof CHOICE_TYPE_DOMAIN]
+type ProficiencyChoiceDomain =
+  (typeof PROFICIENCY_CHOICE_TYPE_DOMAIN)[keyof typeof PROFICIENCY_CHOICE_TYPE_DOMAIN]
 
 function isChoiceSetFull(selectedCount: number, max: number): boolean {
   return selectedCount >= max
@@ -59,7 +62,9 @@ function categoryPluralNoun(kind: ProficiencyStepSectionKind): string {
 }
 
 function choiceDomainFor(choiceSet: ChoiceSet): ProficiencyChoiceDomain | undefined {
-  return CHOICE_TYPE_DOMAIN[choiceSet.choiceType as keyof typeof CHOICE_TYPE_DOMAIN]
+  return PROFICIENCY_CHOICE_TYPE_DOMAIN[
+    choiceSet.choiceType as keyof typeof PROFICIENCY_CHOICE_TYPE_DOMAIN
+  ]
 }
 
 function choiceBlockAddLabelFor(choiceSet: ChoiceSet, compact: boolean): string {
@@ -177,11 +182,18 @@ export function formatProficiencySectionEmptyMessage(
   kind: ProficiencyStepSectionKind,
   hasFixedGrantsInCategory: boolean,
 ): string {
-  const plural = categoryPluralNoun(kind)
-  if (hasFixedGrantsInCategory) {
-    return `No additional ${plural} chosen yet.`
+  const choiceType = SECTION_KIND_CHOICE_TYPE[kind]
+  if (!choiceType) {
+    const plural = categoryPluralNoun(kind)
+    if (hasFixedGrantsInCategory) {
+      return `No additional ${plural} chosen yet.`
+    }
+    return `No ${plural} chosen yet.`
   }
-  return `No ${plural} chosen yet.`
+
+  return formatProficiencyChoiceEmptyMessage(choiceType, {
+    additional: hasFixedGrantsInCategory,
+  })
 }
 
 export type ProficiencyAggregateCount = {
@@ -213,7 +225,7 @@ export function resolveProficiencyAggregateCount(
   return {
     selected,
     max,
-    label: `${selected} / ${max} chosen`,
+    label: formatProficiencyChosenCounter(selected, max),
   }
 }
 
@@ -227,14 +239,6 @@ function choiceBlockActionLabel(
     : choiceBlockAddLabelFor(choiceSet, compact)
 }
 
-/** Add vs Manage drawer trigger copy for a proficiency choice block. */
-export function formatProficiencyChoiceBlockAddLabel(
-  choiceSet: ChoiceSet,
-  selectedCount: number,
-): string {
-  return choiceBlockActionLabel(choiceSet, selectedCount, false)
-}
-
 /** Compact inline add action copy for multi-set proficiency subsections. */
 export function formatProficiencyChoiceBlockCompactAddLabel(
   choiceSet: ChoiceSet,
@@ -242,3 +246,5 @@ export function formatProficiencyChoiceBlockCompactAddLabel(
 ): string {
   return choiceBlockActionLabel(choiceSet, selectedCount, true)
 }
+
+export { formatProficiencyChosenCounter } from '../../format-choice-set-drawer-copy'

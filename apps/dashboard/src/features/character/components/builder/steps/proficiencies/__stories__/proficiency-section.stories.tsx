@@ -30,7 +30,7 @@ const multiChoiceSkills = {
       selectedCount: 0,
       max: 1,
       poolDescription: 'Choose from Perception, Investigation, and Survival.',
-      addLabel: 'Add skill proficiency',
+      compactAddLabel: 'Add skill',
       isFull: false,
       isOverSelected: false,
     },
