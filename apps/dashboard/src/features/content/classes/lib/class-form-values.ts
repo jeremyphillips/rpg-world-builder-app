@@ -219,6 +219,7 @@ export function spellcastingToFormValues(
   return {
     level: spellcasting.level,
     description: spellcasting.description,
+    slotProgressionId: spellcasting.slotProgressionId,
     profileId: spellcasting.profileId,
     ability: spellcasting.ability,
     requiredGear: spellcasting.requiredGear,
@@ -231,7 +232,12 @@ function hasCompleteSpellcastingCore(
   hasSpellcasting: boolean,
   spellcasting: ClassFormValues['spellcasting'],
 ): boolean {
-  return Boolean(hasSpellcasting && spellcasting?.profileId && spellcasting?.ability)
+  return Boolean(
+    hasSpellcasting &&
+    spellcasting?.slotProgressionId &&
+    spellcasting?.profileId &&
+    spellcasting?.ability,
+  )
 }
 
 function spellcastingFromFormValues(
@@ -244,6 +250,7 @@ function spellcastingFromFormValues(
 
   const result: Spellcasting = {
     level: spellcasting.level ?? 1,
+    slotProgressionId: spellcasting.slotProgressionId!,
     profileId: spellcasting.profileId!,
     ability: spellcasting.ability!,
   }

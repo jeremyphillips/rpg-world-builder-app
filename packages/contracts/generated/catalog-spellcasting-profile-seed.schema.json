@@ -15,17 +15,13 @@
         "label": {
           "$ref": "#/definitions/__schema2"
         },
-        "slotProgressionId": {
-          "$ref": "#/definitions/__schema3"
-        },
         "choiceProgressions": {
-          "$ref": "#/definitions/__schema4"
+          "$ref": "#/definitions/__schema3"
         }
       },
       "required": [
         "id",
         "label",
-        "slotProgressionId",
         "choiceProgressions"
       ],
       "additionalProperties": false
@@ -39,10 +35,6 @@
       "minLength": 1
     },
     "__schema3": {
-      "type": "string",
-      "minLength": 1
-    },
-    "__schema4": {
       "default": [],
       "type": "array",
       "items": {
@@ -64,7 +56,7 @@
             "type": "object",
             "properties": {
               "rows": {
-                "$ref": "#/definitions/__schema5"
+                "$ref": "#/definitions/__schema4"
               }
             },
             "required": [
@@ -226,7 +218,7 @@
         "additionalProperties": false
       }
     },
-    "__schema5": {
+    "__schema4": {
       "default": [],
       "type": "array",
       "items": {
@@ -250,7 +242,7 @@
         "additionalProperties": false
       }
     },
-    "__schema6": {
+    "__schema5": {
       "type": "string",
       "enum": [
         "cantrips",

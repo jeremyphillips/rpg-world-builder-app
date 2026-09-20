@@ -16,7 +16,7 @@ import type { SpellChoiceProgression } from './spell-choice-progression'
 import type { SpellcastingProfile } from './spellcasting-profile'
 
 // ---------------------------------------------------------------------------
-// Profile resolution — single entry point for class → profile → slot progression.
+// Profile resolution — class references slot progression + profile independently.
 // ---------------------------------------------------------------------------
 
 export type ResolvedSpellcastingProfileBundle = {
@@ -34,20 +34,48 @@ export function resolveSpellcastingProgressionConfig(
   return indexSpellcastingProgressionRecords(seed)
 }
 
-/** Resolves a class spellcasting block to its profile and slot progression records. */
+/** Resolves a class spellcasting block to its slot progression record. */
+export function resolveSlotProgressionForClass(
+  characterClass: Pick<CharacterClass, 'spellcasting'>,
+  config: ResolvedSpellcastingProgressionConfig,
+): SlotProgression | null {
+  const slotProgressionId = characterClass.spellcasting?.slotProgressionId
+  if (!slotProgressionId) return null
+  return config.slotProgressions.get(slotProgressionId) ?? null
+}
+
+export function resolveSlotProgressionForSpellcasting(
+  spellcasting: Spellcasting,
+  config: ResolvedSpellcastingProgressionConfig,
+): SlotProgression | null {
+  return config.slotProgressions.get(spellcasting.slotProgressionId) ?? null
+}
+
+/** Resolves a class spellcasting block to its spell selection profile record. */
+export function resolveSpellcastingProfileRecordForClass(
+  characterClass: Pick<CharacterClass, 'spellcasting'>,
+  config: ResolvedSpellcastingProgressionConfig,
+): SpellcastingProfile | null {
+  const profileId = characterClass.spellcasting?.profileId
+  if (!profileId) return null
+  return config.profiles.get(profileId) ?? null
+}
+
+export function resolveSpellcastingProfileRecordForSpellcasting(
+  spellcasting: Spellcasting,
+  config: ResolvedSpellcastingProgressionConfig,
+): SpellcastingProfile | null {
+  return config.profiles.get(spellcasting.profileId) ?? null
+}
+
+/** Resolves profile + slot progression independently from class spellcasting references. */
 export function resolveSpellcastingProfileForClass(
   characterClass: Pick<CharacterClass, 'spellcasting'>,
   config: ResolvedSpellcastingProgressionConfig,
 ): ResolvedSpellcastingProfileBundle | null {
-  const profileId = characterClass.spellcasting?.profileId
-  if (!profileId) return null
-
-  const profile = config.profiles.get(profileId)
-  if (!profile) return null
-
-  const slotProgression = config.slotProgressions.get(profile.slotProgressionId)
-  if (!slotProgression) return null
-
+  const profile = resolveSpellcastingProfileRecordForClass(characterClass, config)
+  const slotProgression = resolveSlotProgressionForClass(characterClass, config)
+  if (!profile || !slotProgression) return null
   return { profile, slotProgression }
 }
 
@@ -55,10 +83,9 @@ export function resolveSpellcastingProfileForSpellcasting(
   spellcasting: Spellcasting,
   config: ResolvedSpellcastingProgressionConfig,
 ): ResolvedSpellcastingProfileBundle | null {
-  const profile = config.profiles.get(spellcasting.profileId)
-  if (!profile) return null
-  const slotProgression = config.slotProgressions.get(profile.slotProgressionId)
-  if (!slotProgression) return null
+  const profile = resolveSpellcastingProfileRecordForSpellcasting(spellcasting, config)
+  const slotProgression = resolveSlotProgressionForSpellcasting(spellcasting, config)
+  if (!profile || !slotProgression) return null
   return { profile, slotProgression }
 }
 

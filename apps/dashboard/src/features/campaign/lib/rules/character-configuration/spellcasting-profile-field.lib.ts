@@ -1,4 +1,4 @@
-import type { SlotProgression, SpellcastingProfile, SpellChoiceProgression } from '@rpg/contracts'
+import type { SpellcastingProfile, SpellChoiceProgression } from '@rpg/contracts'
 
 /** Maps vocabulary entry records to option label maps for `toOptions`. */
 export function labelsFromGameTermEntries<const T extends string>(
@@ -103,16 +103,12 @@ export function mapChoiceProgressionCurveDraftToRows(
     .sort((left, right) => left.level - right.level)
 }
 
-export function formatSpellcastingProfileMetadata(
-  profile: SpellcastingProfile,
-  slotProgressions: readonly SlotProgression[],
-): string {
-  const slotProgression = slotProgressions.find((entry) => entry.id === profile.slotProgressionId)
+export function formatSpellcastingProfileMetadata(profile: SpellcastingProfile): string {
   const enabledColumns = profile.choiceProgressions.filter(
     (progression) => progression.presentation?.column?.enabled,
   ).length
-  const slotLabel = slotProgression?.label ?? profile.slotProgressionId
-  return `${slotLabel} · ${enabledColumns} table column${enabledColumns === 1 ? '' : 's'}`
+  const progressionCount = profile.choiceProgressions.length
+  return `${progressionCount} choice progression${progressionCount === 1 ? '' : 's'} · ${enabledColumns} table column${enabledColumns === 1 ? '' : 's'}`
 }
 
 export function createDefaultChoiceProgression(id: string): SpellChoiceProgression {
@@ -131,12 +127,10 @@ export function createDefaultChoiceProgression(id: string): SpellChoiceProgressi
 export function createDefaultSpellcastingProfile(input: {
   id: string
   label: string
-  slotProgressionId: string
 }): SpellcastingProfile {
   return {
     id: input.id,
     label: input.label,
-    slotProgressionId: input.slotProgressionId,
     choiceProgressions: [],
   }
 }

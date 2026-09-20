@@ -127,6 +127,7 @@ describe('builder-preview-projection.lib', () => {
       },
       spellcasting: {
         level: 1,
+        slotProgressionId: 'full-caster',
         profileId: 'fixture:wizard',
         ability: 'int',
       },

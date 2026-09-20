@@ -1,9 +1,9 @@
 import { useId, useState } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useController, useFormContext, useWatch } from 'react-hook-form'
 import { Plus } from 'lucide-react'
 import { Button, ConfirmDialog, TextField } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
-import type { SlotProgression, SpellcastingProfile } from '@rpg/contracts'
+import type { SpellcastingProfile } from '@rpg/contracts'
 
 import {
   DetailOverflowMenu,
@@ -22,7 +22,7 @@ import {
 import { SpellcastingProfileEditorModal } from './spellcasting-profile-editor-modal'
 import { spellcastingSubsectionClasses } from './spellcasting-progression-field.variants'
 
-type ProfileModalState = { mode: 'edit'; index: number } | { mode: 'create'; label: string }
+type ProfileModalState = { mode: 'edit'; id: string } | { mode: 'create'; label: string }
 
 type SpellcastingRulesFormSlice = SpellcastingProgressionFormState & {
   maxCharacterLevel: number
@@ -47,10 +47,13 @@ export function SpellcastingProfilesField() {
   const { density } = useFormSectionContext()
   const { size } = resolveFormDensity(density)
 
-  const profiles =
-    useWatch({ control: form.control, name: 'profiles' }) ?? ([] as SpellcastingProfile[])
-  const slotProgressions =
-    useWatch({ control: form.control, name: 'slotProgressions' }) ?? ([] as SlotProgression[])
+  // useController (not useWatch) so the path registers with react-hook-form:
+  // the schema Form shell mounts with `shouldUnregister: true`, and unregistered
+  // paths are dropped from live form values — seeded records would never render.
+  const {
+    field: { value: profilesValue },
+  } = useController({ control: form.control, name: 'profiles' })
+  const profiles = profilesValue ?? ([] as SpellcastingProfile[])
   const maxCharacterLevel = useWatch({ control: form.control, name: 'maxCharacterLevel' }) ?? 20
   const extendedProgressionEnabled =
     useWatch({ control: form.control, name: 'extendedProgressionEnabled' }) ?? false
@@ -60,9 +63,7 @@ export function SpellcastingProfilesField() {
   const [modalState, setModalState] = useState<ProfileModalState | null>(null)
   const [createLabelDraft, setCreateLabelDraft] = useState('')
   const [showCreateForm, setShowCreateForm] = useState(false)
-  const [confirmDeleteIndex, setConfirmDeleteIndex] = useState<number | null>(null)
-
-  const defaultSlotProgressionId = slotProgressions[0]?.id ?? 'full-caster'
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   function setProfiles(next: SpellcastingProfile[]) {
     form.setValue('profiles', next, { shouldDirty: true })
@@ -78,7 +79,7 @@ export function SpellcastingProfilesField() {
 
   function handleSaveProfile(profile: SpellcastingProfile) {
     if (modalState?.mode === 'edit') {
-      setProfiles(profiles.map((entry, index) => (index === modalState.index ? profile : entry)))
+      setProfiles(profiles.map((entry) => (entry.id === modalState.id ? profile : entry)))
     } else if (modalState?.mode === 'create') {
       setProfiles([
         ...profiles,
@@ -94,19 +95,18 @@ export function SpellcastingProfilesField() {
     setModalState(null)
   }
 
-  function handleDelete(index: number) {
-    setProfiles(profiles.filter((_, entryIndex) => entryIndex !== index))
-    setConfirmDeleteIndex(null)
+  function handleDelete(id: string) {
+    setProfiles(profiles.filter((entry) => entry.id !== id))
+    setConfirmDeleteId(null)
   }
 
   const editingProfile =
     modalState?.mode === 'edit'
-      ? profiles[modalState.index]
+      ? profiles.find((entry) => entry.id === modalState.id)
       : modalState?.mode === 'create'
         ? createDefaultSpellcastingProfile({
             id: `custom:${slugifyId(modalState.label)}`,
             label: modalState.label,
-            slotProgressionId: defaultSlotProgressionId,
           })
         : undefined
 
@@ -118,8 +118,8 @@ export function SpellcastingProfilesField() {
       >
         <ArrayLikeSectionHeader
           id="spellcasting-profiles-heading"
-          label="Spellcasting profiles"
-          hint="Composable spell slot and choice progression profiles referenced by classes."
+          label="Spell selection profiles"
+          hint="Cantrips, known/prepared collections, spellbook gains, and selection behavior referenced by classes."
           size={size}
           action={
             <Button
@@ -135,12 +135,13 @@ export function SpellcastingProfilesField() {
           wrapper="none"
         />
         <div className={featureTablesSectionBodyClasses}>
-          {profiles.map((profile, index) => (
+          {profiles.map((profile) => (
             <FeatureTableRow
               key={profile.id}
               title={profile.label}
-              metadata={formatSpellcastingProfileMetadata(profile, slotProgressions)}
-              onEdit={() => setModalState({ mode: 'edit', index })}
+              metadata={formatSpellcastingProfileMetadata(profile)}
+              editLabel="Edit table"
+              onEdit={() => setModalState({ mode: 'edit', id: profile.id })}
               overflowActions={
                 isSeedSpellcastingProfileId(profile.id) ? undefined : (
                   <DetailOverflowMenu
@@ -150,7 +151,7 @@ export function SpellcastingProfilesField() {
                         id: 'delete',
                         label: 'Delete profile',
                         destructive: true,
-                        onSelect: () => setConfirmDeleteIndex(index),
+                        onSelect: () => setConfirmDeleteId(profile.id),
                       },
                     ]}
                   />
@@ -191,7 +192,6 @@ export function SpellcastingProfilesField() {
         <SpellcastingProfileEditorModal
           open
           profile={editingProfile}
-          slotProgressions={slotProgressions}
           maxCharacterLevel={maxCharacterLevel}
           extendedProgressionEnabled={extendedProgressionEnabled}
           extendedMaxLevel={extendedMaxLevel}
@@ -204,16 +204,16 @@ export function SpellcastingProfilesField() {
       ) : null}
 
       <ConfirmDialog
-        open={confirmDeleteIndex !== null}
+        open={confirmDeleteId !== null}
         onOpenChange={(open) => {
-          if (!open) setConfirmDeleteIndex(null)
+          if (!open) setConfirmDeleteId(null)
         }}
-        headline="Delete spellcasting profile?"
+        headline="Delete spell selection profile?"
         description="Classes referencing this profile will need a new profile assignment."
         confirmLabel="Delete"
         confirmVariant="destructive"
         onConfirm={() => {
-          if (confirmDeleteIndex !== null) handleDelete(confirmDeleteIndex)
+          if (confirmDeleteId !== null) handleDelete(confirmDeleteId)
         }}
       />
     </>

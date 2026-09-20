@@ -78,6 +78,7 @@ describe('buildContentFormOptionSets', () => {
       ...pickClass('barbarian'),
       spellcasting: {
         level: 1,
+        slotProgressionId: 'full-caster',
         profileId: 'srd:barbarian',
         ability: 'wis' as const,
       },

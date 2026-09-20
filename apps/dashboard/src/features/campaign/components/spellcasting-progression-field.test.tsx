@@ -17,7 +17,10 @@ function SpellcastingProgressionFieldHarness({
     profiles: ReturnType<typeof resolveSpellcastingProgressionFormState>['profiles']
   }
 }) {
-  const form = useForm({ defaultValues })
+  // `shouldUnregister: true` mirrors the production schema Form shell — the
+  // seeded-record regression (unregistered paths dropped from live values)
+  // only reproduces with it enabled.
+  const form = useForm({ defaultValues, shouldUnregister: true })
 
   return (
     <FormProvider {...form}>

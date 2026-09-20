@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { isSpellcastingActiveAtLevel, spellcastingSchema } from './spellcasting'
 
 describe('spellcastingSchema', () => {
-  it('parses profileId and ability', () => {
+  it('parses slotProgressionId, profileId, and ability', () => {
     const parsed = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
       profileId: 'srd:wizard',
       ability: 'int',
     })
+    expect(parsed.slotProgressionId).toBe('full-caster')
     expect(parsed.profileId).toBe('srd:wizard')
     expect(parsed.ability).toBe('int')
     expect(parsed.level).toBe(1)
@@ -15,6 +17,7 @@ describe('spellcastingSchema', () => {
 
   it('parses optional level and description', () => {
     const withLevel = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
       profileId: 'srd:bard',
       level: 2,
       ability: 'cha',
@@ -26,6 +29,7 @@ describe('spellcastingSchema', () => {
 
   it('parses optional focus kinds and rejects non-focus kinds', () => {
     const spellcasting = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
       profileId: 'srd:wizard',
       ability: 'int',
       focusKinds: ['arcane_focus'],
@@ -34,6 +38,7 @@ describe('spellcastingSchema', () => {
 
     expect(
       spellcastingSchema.safeParse({
+        slotProgressionId: 'full-caster',
         profileId: 'srd:wizard',
         ability: 'int',
         focusKinds: ['spellbook'],
@@ -43,6 +48,7 @@ describe('spellcastingSchema', () => {
 
   it('parses required and recommended spellcasting gear', () => {
     const spellcasting = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
       profileId: 'srd:wizard',
       ability: 'int',
       requiredGear: ['spellbook'],
@@ -56,6 +62,7 @@ describe('spellcastingSchema', () => {
 
   it('strips legacy progression and preparation fields on parse', () => {
     const result = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
       profileId: 'srd:wizard',
       ability: 'int',
       progression: 'full',
@@ -71,6 +78,7 @@ describe('spellcastingSchema', () => {
 describe('isSpellcastingActiveAtLevel', () => {
   it('respects unlock level', () => {
     const delayed = spellcastingSchema.parse({
+      slotProgressionId: 'half-caster',
       profileId: 'srd:paladin',
       level: 2,
       ability: 'cha',

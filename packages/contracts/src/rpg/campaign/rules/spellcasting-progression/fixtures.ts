@@ -41,7 +41,6 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
     {
       id: 'fixture:wizard',
       label: 'Fixture wizard',
-      slotProgressionId: 'full-caster',
       choiceProgressions: [
         {
           id: 'cantrips',
@@ -78,7 +77,6 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
     {
       id: 'fixture:paladin',
       label: 'Fixture paladin',
-      slotProgressionId: 'half-caster',
       choiceProgressions: [
         {
           id: 'prepared',
@@ -95,7 +93,6 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
     {
       id: 'fixture:warlock',
       label: 'Fixture warlock',
-      slotProgressionId: 'pact-magic',
       choiceProgressions: [
         {
           id: 'cantrips',

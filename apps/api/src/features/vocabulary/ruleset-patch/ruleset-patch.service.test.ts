@@ -118,6 +118,36 @@ describe('updateCharacterCreationPatch', () => {
     })
   })
 
+  it('persists spellcasting progression overrides on the ruleset patch', async () => {
+    const { id: campaignId } = await makeTestCampaign({ name: 'Spellcasting' })
+
+    const patch = await updateCharacterCreationPatch(campaignId, {
+      progression: {
+        spellcasting: {
+          slotProgressions: [
+            {
+              id: 'full-caster',
+              label: 'Full caster',
+              kind: 'leveled',
+              extension: 'carryForward',
+              rows: [{ level: 1, slots: [3] }],
+            },
+          ],
+        },
+      },
+    })
+
+    expect(patch?.characterCreation.progression.spellcasting?.slotProgressions).toHaveLength(1)
+    expect(
+      patch?.characterCreation.progression.spellcasting?.slotProgressions?.[0]?.rows[0],
+    ).toEqual({ level: 1, slots: [3] })
+
+    const stored = await storedRulesetPatchDoc(campaignId)
+    expect(
+      stored?.characterCreation?.progression?.spellcasting?.slotProgressions?.[0]?.rows[0],
+    ).toEqual({ level: 1, slots: [3] })
+  })
+
   it('persists creature type policy on the ruleset patch', async () => {
     const { id: campaignId } = await makeTestCampaign({ name: 'Types' })
 

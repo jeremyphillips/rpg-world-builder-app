@@ -207,6 +207,7 @@ const storedWizard: ClassStored = {
   hitDie: 6,
   spellcasting: {
     level: 1,
+    slotProgressionId: 'full-caster',
     profileId: 'fixture:wizard',
     ability: 'int',
     requiredGear: ['spellbook'],
@@ -377,7 +378,12 @@ describe('deriveEquipmentRecommendations', () => {
       id: `${RULESET}:cleric`,
       slug: 'cleric',
       name: 'Cleric',
-      spellcasting: { level: 1, profileId: 'fixture:paladin', ability: 'wis' },
+      spellcasting: {
+        level: 1,
+        slotProgressionId: 'half-caster',
+        profileId: 'fixture:paladin',
+        ability: 'wis',
+      },
       characterCreation: {
         startingEquipment: {
           choose: 1,

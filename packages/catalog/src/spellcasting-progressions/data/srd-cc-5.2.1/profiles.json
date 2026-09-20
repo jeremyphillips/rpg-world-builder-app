@@ -2,7 +2,6 @@
   {
     "id": "srd:bard",
     "label": "Bard spellcasting",
-    "slotProgressionId": "full-caster",
     "choiceProgressions": [
       {
         "id": "bard-cantrips",
@@ -149,7 +148,6 @@
   {
     "id": "srd:cleric",
     "label": "Cleric spellcasting",
-    "slotProgressionId": "full-caster",
     "choiceProgressions": [
       {
         "id": "cleric-cantrips",
@@ -296,7 +294,6 @@
   {
     "id": "srd:druid",
     "label": "Druid spellcasting",
-    "slotProgressionId": "full-caster",
     "choiceProgressions": [
       {
         "id": "druid-cantrips",
@@ -443,7 +440,6 @@
   {
     "id": "srd:paladin",
     "label": "Paladin spellcasting",
-    "slotProgressionId": "half-caster",
     "choiceProgressions": [
       {
         "id": "paladin-prepared",
@@ -522,7 +518,6 @@
   {
     "id": "srd:ranger",
     "label": "Ranger spellcasting",
-    "slotProgressionId": "half-caster",
     "choiceProgressions": [
       {
         "id": "ranger-repertoire",
@@ -601,7 +596,6 @@
   {
     "id": "srd:sorcerer",
     "label": "Sorcerer spellcasting",
-    "slotProgressionId": "full-caster",
     "choiceProgressions": [
       {
         "id": "sorcerer-cantrips",
@@ -748,7 +742,6 @@
   {
     "id": "srd:warlock",
     "label": "Warlock spellcasting",
-    "slotProgressionId": "pact-magic",
     "choiceProgressions": [
       {
         "id": "warlock-cantrips",
@@ -871,7 +864,6 @@
   {
     "id": "srd:wizard",
     "label": "Wizard spellcasting",
-    "slotProgressionId": "full-caster",
     "choiceProgressions": [
       {
         "id": "wizard-cantrips",

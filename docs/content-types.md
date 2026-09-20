@@ -1040,46 +1040,41 @@ Delete is blocked with `409` when campaign characters reference the subclass (`c
 
 ## Class spellcasting (reference)
 
-The `classes` type embeds an optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`). Spell slot columns on the read-only progression table are derived from `SLOT_TABLES` in `content/classes/spellcasting/slots.ts` by progression (`full` / `half` / `pact`); they are not stored on the class record.
+The `classes` type embeds an optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`). Slot tables and spell-selection curves live in **ruleset spellcasting progression** records (catalog seed + campaign patch), not on the class body.
 
-### Unlock level and feature label
+### Class record shape
 
-| Field         | Role                                                                                                                                 |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `level`       | First class level at which spellcasting is active (defaults to **1**). Gates slot/cantrip columns and character-builder eligibility. |
-| `description` | Optional rich-text HTML for SRD spellcasting rules prose (formerly duplicated on a `spellcasting` feature row).                      |
+| Field               | Role                                                                                                                    |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `slotProgressionId` | Ruleset slot progression id (Full / Half / Pact / custom). Drives spell-slot columns only.                              |
+| `profileId`         | Ruleset spell selection profile id. Drives cantrip/repertoire/prepared/spellbook quotas and mutation policy.            |
+| `level`             | First class level at which spellcasting is active (defaults to **1**). Gates columns and character-builder eligibility. |
+| `ability`           | Spellcasting ability for this class.                                                                                    |
+| `description`       | Optional rich-text HTML for SRD spellcasting rules prose (formerly duplicated on a `spellcasting` feature row).         |
+| `requiredGear`      | Optional class-critical spellcasting gear (e.g. Wizard spellbook).                                                      |
+| `focusKinds`        | Optional spellcasting focus kinds this class can use.                                                                   |
+| `recommendedGear`   | Optional strong-tier spellcasting gear suggestions.                                                                     |
 
-The progression table injects **Spellcasting** (or **Pact Magic** for `progression: pact`) at `spellcasting.level` — do not duplicate those rows in `features[]`.
+Slot progression and spell selection profile are **independent** — a class may combine any compatible pair (e.g. Full caster slots + Wizard-style spellbook/prepared profile).
 
-### Preparation modes
+### Ruleset progression records
 
-`preparation` is a closed enum (`SPELL_PREPARATION_MODES`):
+Authoring lives under **Character Configuration → Progression → Spellcasting**:
 
-| Mode              | Meaning                                     | Spells-available column            |
-| ----------------- | ------------------------------------------- | ---------------------------------- |
-| `prepared`        | Caster prepares a subset each day           | Shown — header **Spells Prepared** |
-| `known`           | Caster knows a fixed spell list             | Shown — header **Spells Known**    |
-| `always_prepared` | Domain/oath/etc. spells are always prepared | Hidden                             |
+- **Slot progressions** — shared spell slot tables (`full-caster`, `half-caster`, `pact-magic`, or custom). Leveled hosts use 1st–9th columns; pact hosts use slot count + slot level.
+- **Spell selection profiles** — choice progressions (`capacity` / `gain`) with source, destination, mutation policy, and optional combined-table column labels.
 
-### Progression tables (contract storage)
-
-Both optional tables use **sparse fill-forward** storage: an array of `{ level, value }` rows where each row applies from that character level onward until superseded.
-
-| Field             | Entry shape        | Value field                                                                  |
-| ----------------- | ------------------ | ---------------------------------------------------------------------------- |
-| `cantrips`        | `{ level, known }` | Cantrips known at that level                                                 |
-| `spellsAvailable` | `{ level, count }` | Spells prepared or known (renamed from legacy `spellsPrepared` / `prepared`) |
-
-Authoring expands sparse rows to a dense level 1–20 grid for editing, then compresses on save (emit only when a level's value changes from the prior emitted value). Helpers live in `apps/dashboard/.../classes/lib/progression-table-helpers.ts`.
+Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`. Catalog seed: `packages/catalog/src/spellcasting-progressions/data/<ruleset>/`.
 
 ### Dashboard authoring UI
 
-The class form (`class-form-def.ts`) binds a form-only composite `spellcasting.progressionTable` to the schema-driven `editableGrid` field type (`@rpg/ui/form`). Columns:
+The class form Spellcasting tab (`class-spellcasting-form-fields.ts`) exposes:
 
-- **Cantrips known** — select (blank or 1–6); optional **Load template** presets from `cantrips-profiles.ts` (`CANTRIPS_KNOWN_PROFILES`, seed-only, not in the contract).
-- **Spells available** — number input; visible when `preparation` is `prepared` or `known`; dynamic column label.
+- **Slot progression** — combobox of resolved ruleset slot progressions.
+- **Spell selection profile** — combobox of resolved ruleset profiles.
+- **Combined preview** — composes the selected slot progression + profile (same component as rules-config preview).
 
-See [packages/ui/docs/forms/field-types.md](../packages/ui/docs/forms/field-types.md#editable-grid-editablegrid) for the `editableGrid` field config shape.
+The read-only class detail **progression table** (`ClassProgressionTable`) resolves campaign spellcasting config and injects **Spellcasting** or **Pact Magic** at `spellcasting.level` from the class's slot progression kind — do not duplicate those rows in `features[]`.
 
 ### Class preview rail
 

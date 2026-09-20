@@ -404,8 +404,12 @@ export function formatSlotProgressionMetadata(
   progression: SlotProgression,
   effectiveMaxLevel: number,
 ): string {
+  const authoredMaxLevel = progression.rows.reduce((max, row) => Math.max(max, row.level), 0)
+  const derivedCount = Math.max(0, effectiveMaxLevel - authoredMaxLevel)
   const kindLabel = progression.kind === 'pact' ? 'Pact' : 'Leveled'
-  return `${effectiveMaxLevel} levels · ${kindLabel}`
+  const derivedSuffix =
+    derivedCount > 0 ? ` · ${derivedCount} level${derivedCount === 1 ? '' : 's'} derived` : ''
+  return `${effectiveMaxLevel} levels${derivedSuffix} · ${kindLabel}`
 }
 
 export function buildSlotProgressionDraft(

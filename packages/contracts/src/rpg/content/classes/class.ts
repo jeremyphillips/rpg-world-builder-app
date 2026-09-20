@@ -313,6 +313,4 @@ export function classHasSpellcasting(cls: CharacterClass): boolean {
 // - Merge granularity for overlay patches: the read-time merge deep-merges
 //   objects but replaces arrays wholesale (override `features` entirely, not
 //   element-wise). Per-element array patching is deferred.
-// - CANTRIPS_KNOWN_PROFILES: a seed-only authoring helper (NOT in the contract)
-//   that expands shared SRD cantrip curves into the inline `cantrips` table.
 // ---------------------------------------------------------------------------

@@ -10,7 +10,6 @@ import type { SpellMutationPolicy } from '../../../vocab/spell/spell-mutation-po
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
-import { spellcastingChoiceSetId } from '../resolvers/spellcasting/resolve-spellcasting-choice-sets'
 import { resolveSpellcastingProfile } from '../resolvers/spellcasting/spellcasting-profile'
 
 // ---------------------------------------------------------------------------
@@ -110,11 +109,6 @@ export function assembleClassSpellcasting(
   }
 
   return Array.from(entries.values())
-}
-
-/** @deprecated Use progression id via {@link spellcastingChoiceSetId}. */
-export function spellcastingGrantId(choiceSet: ChoiceSet): string | undefined {
-  return progressionIdFromChoiceSet(choiceSet)
 }
 
 /** Whether a progression's mutation policy allows post-builder changes. */

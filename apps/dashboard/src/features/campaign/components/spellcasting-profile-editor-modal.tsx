@@ -11,7 +11,6 @@ import {
   SPELL_COLLECTION_KINDS,
   SPELL_MUTATION_TRIGGER_ENTRIES,
   SPELL_MUTATION_TRIGGERS,
-  type SlotProgression,
   type SpellcastingProfile,
   type SpellChoiceProgression,
   type SpellCollectionKind,
@@ -28,12 +27,10 @@ import {
   mapChoiceProgressionCurveDraftToRows,
 } from '../lib/rules/character-configuration/spellcasting-profile-field.lib'
 import { buildEffectiveMaxLevel } from '../lib/rules/character-configuration/xp-thresholds-field.lib'
-import { SpellcastingCombinedPreview } from './spellcasting-combined-preview'
 
 export type SpellcastingProfileEditorModalProps = {
   open: boolean
   profile: SpellcastingProfile
-  slotProgressions: readonly SlotProgression[]
   maxCharacterLevel: number
   extendedProgressionEnabled: boolean
   extendedMaxLevel?: number
@@ -45,7 +42,7 @@ export type SpellcastingProfileEditorModalProps = {
 type ProfileEditorValues = SpellcastingProfile
 
 type CurveModalState = {
-  choiceIndex: number
+  choiceId: string
 }
 
 function replaceLimitOptions() {
@@ -59,7 +56,6 @@ function replaceLimitOptions() {
 export function SpellcastingProfileEditorModal({
   open,
   profile,
-  slotProgressions,
   maxCharacterLevel,
   extendedProgressionEnabled,
   extendedMaxLevel,
@@ -68,7 +64,6 @@ export function SpellcastingProfileEditorModal({
   onSave,
 }: SpellcastingProfileEditorModalProps) {
   const labelId = useId()
-  const slotProgressionId = useId()
   const form = useForm<ProfileEditorValues>({ defaultValues: profile })
   const values = useWatch({ control: form.control }) as ProfileEditorValues
   const [curveModal, setCurveModal] = useState<CurveModalState | null>(null)
@@ -80,19 +75,6 @@ export function SpellcastingProfileEditorModal({
   })
   const extendedTierNameValue = typeof extendedTierName === 'string' ? extendedTierName : undefined
 
-  const slotProgressionOptions = useMemo(
-    () =>
-      slotProgressions.map((entry) => ({
-        value: entry.id,
-        label: entry.label,
-      })),
-    [slotProgressions],
-  )
-
-  const selectedSlotProgression = slotProgressions.find(
-    (entry) => entry.id === values.slotProgressionId,
-  )
-
   const curveHostConfig = useMemo(
     () =>
       buildChoiceProgressionCurveHostConfig({
@@ -103,8 +85,12 @@ export function SpellcastingProfileEditorModal({
     [effectiveMaxLevel, maxCharacterLevel, extendedTierNameValue],
   )
 
+  const activeChoiceIndex =
+    curveModal !== null
+      ? values.choiceProgressions.findIndex((progression) => progression.id === curveModal.choiceId)
+      : -1
   const activeChoiceProgression =
-    curveModal !== null ? values.choiceProgressions[curveModal.choiceIndex] : undefined
+    activeChoiceIndex >= 0 ? values.choiceProgressions[activeChoiceIndex] : undefined
 
   const curveInitialDraft = useMemo(() => {
     if (activeChoiceProgression === undefined) return undefined
@@ -140,10 +126,10 @@ export function SpellcastingProfileEditorModal({
   }
 
   function handleSaveCurveDraft(draft: TableBuilderFormValues) {
-    if (curveModal === null) return
-    const current = values.choiceProgressions[curveModal.choiceIndex]
+    if (curveModal === null || activeChoiceIndex < 0) return
+    const current = values.choiceProgressions[activeChoiceIndex]
     if (current === undefined) return
-    updateChoiceProgression(curveModal.choiceIndex, {
+    updateChoiceProgression(activeChoiceIndex, {
       ...current,
       curve: { rows: mapChoiceProgressionCurveDraftToRows(draft) },
     })
@@ -156,7 +142,7 @@ export function SpellcastingProfileEditorModal({
     <>
       <Modal.Root open onOpenChange={onOpenChange}>
         <Modal.Content size="xl" layout="stable" stableSize="tall">
-          <Modal.Header headline="Edit spellcasting profile" />
+          <Modal.Header headline="Edit spell selection profile" />
           <Modal.Body>
             <div className="space-y-6">
               <TextField
@@ -165,17 +151,6 @@ export function SpellcastingProfileEditorModal({
                 size="md"
                 required
                 {...form.register('label')}
-              />
-              <SelectField
-                id={slotProgressionId}
-                label="Slot progression"
-                size="md"
-                required
-                options={slotProgressionOptions}
-                value={values.slotProgressionId}
-                onValueChange={(next) =>
-                  form.setValue('slotProgressionId', next, { shouldDirty: true })
-                }
               />
 
               <section className="space-y-3" aria-label="Choice progressions">
@@ -407,24 +382,13 @@ export function SpellcastingProfileEditorModal({
                         type="button"
                         size="sm"
                         variant="outline"
-                        onClick={() => setCurveModal({ choiceIndex: index })}
+                        onClick={() => setCurveModal({ choiceId: progression.id })}
                       >
                         Edit curve table
                       </Button>
                     </div>
                   )
                 })}
-              </section>
-
-              <section className="space-y-2" aria-label="Combined preview">
-                <h3 className="text-sm font-medium text-foreground">Combined preview</h3>
-                <SpellcastingCombinedPreview
-                  profile={values}
-                  slotProgression={selectedSlotProgression}
-                  effectiveMaxLevel={effectiveMaxLevel}
-                  standardMaxLevel={maxCharacterLevel}
-                  extendedTierName={extendedTierNameValue}
-                />
               </section>
             </div>
           </Modal.Body>

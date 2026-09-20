@@ -54,6 +54,7 @@ export const wizardStored: ClassStored = {
   features: [],
   spellcasting: {
     level: 1,
+    slotProgressionId: 'full-caster',
     profileId: 'fixture:wizard',
     ability: 'int',
   },
@@ -79,6 +80,7 @@ export const paladinStored: ClassStored = {
   features: [],
   spellcasting: {
     level: 1,
+    slotProgressionId: 'half-caster',
     profileId: 'fixture:paladin',
     ability: 'cha',
   },
@@ -104,6 +106,7 @@ export const warlockStored: ClassStored = {
   features: [],
   spellcasting: {
     level: 1,
+    slotProgressionId: 'pact-magic',
     profileId: 'fixture:warlock',
     ability: 'cha',
   },

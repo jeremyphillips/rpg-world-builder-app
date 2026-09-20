@@ -15,7 +15,9 @@ import {
 export const DEFAULT_SPELLCASTING_LEVEL = 1 as const
 
 export const spellcastingSchema = z.object({
-  /** Ruleset spellcasting profile id (see spellcasting progression seed). */
+  /** Ruleset slot progression id (Full / Half / Pact / custom). */
+  slotProgressionId: z.string().min(1),
+  /** Ruleset spell selection profile id (cantrips, prepared, spellbook, etc.). */
   profileId: z.string().min(1),
   /** First class level at which this class's spellcasting block is active. Defaults to 1. */
   level: absoluteLevelSchema.default(DEFAULT_SPELLCASTING_LEVEL),

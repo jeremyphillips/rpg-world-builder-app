@@ -57,6 +57,7 @@ export const spellsStepWizardClass = makeClassStored({
   features: [],
   spellcasting: {
     level: 1,
+    slotProgressionId: 'full-caster',
     profileId: 'srd:wizard',
     ability: 'int',
   },

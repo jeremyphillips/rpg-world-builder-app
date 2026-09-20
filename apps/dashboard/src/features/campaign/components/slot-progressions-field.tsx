@@ -1,5 +1,5 @@
 import { useId, useMemo, useState } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useController, useFormContext, useWatch } from 'react-hook-form'
 import { Plus } from 'lucide-react'
 import { Button, ConfirmDialog, TextField } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
@@ -28,7 +28,7 @@ import {
 } from '../lib/rules/character-configuration/spellcasting-progression-form-values'
 import { spellcastingSubsectionClasses } from './spellcasting-progression-field.variants'
 type SlotModalState =
-  | { mode: 'edit'; index: number }
+  | { mode: 'edit'; id: string }
   | { mode: 'create'; label: string; kind: SlotProgressionTableKind }
 
 type SpellcastingRulesFormSlice = SpellcastingProgressionFormState & {
@@ -54,8 +54,13 @@ export function SlotProgressionsField() {
   const { density } = useFormSectionContext()
   const { size } = resolveFormDensity(density)
 
-  const slotProgressions =
-    useWatch({ control: form.control, name: 'slotProgressions' }) ?? ([] as SlotProgression[])
+  // useController (not useWatch) so the path registers with react-hook-form:
+  // the schema Form shell mounts with `shouldUnregister: true`, and unregistered
+  // paths are dropped from live form values — seeded records would never render.
+  const {
+    field: { value: slotProgressionsValue },
+  } = useController({ control: form.control, name: 'slotProgressions' })
+  const slotProgressions = slotProgressionsValue ?? ([] as SlotProgression[])
   const maxCharacterLevel = useWatch({ control: form.control, name: 'maxCharacterLevel' }) ?? 20
   const extendedProgressionEnabled =
     useWatch({ control: form.control, name: 'extendedProgressionEnabled' }) ?? false
@@ -66,7 +71,7 @@ export function SlotProgressionsField() {
   const [createLabelDraft, setCreateLabelDraft] = useState('')
   const [createKindDraft, setCreateKindDraft] = useState<SlotProgressionTableKind>('leveled')
   const [showCreateForm, setShowCreateForm] = useState(false)
-  const [confirmDeleteIndex, setConfirmDeleteIndex] = useState<number | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const effectiveMaxLevel = buildEffectiveMaxLevel({
     maxCharacterLevel,
@@ -78,7 +83,7 @@ export function SlotProgressionsField() {
 
   const activeProgression =
     modalState?.mode === 'edit'
-      ? slotProgressions[modalState.index]
+      ? slotProgressions.find((entry) => entry.id === modalState.id)
       : modalState?.mode === 'create'
         ? createCustomSlotProgression({
             id: 'draft',
@@ -114,10 +119,10 @@ export function SlotProgressionsField() {
 
   function handleSaveDraft(draft: TableBuilderFormValues) {
     if (modalState?.mode === 'edit') {
-      const current = slotProgressions[modalState.index]
+      const current = slotProgressions.find((entry) => entry.id === modalState.id)
       if (current === undefined) return
-      const next = slotProgressions.map((entry, index) =>
-        index === modalState.index ? applySlotProgressionDraft(current, draft) : entry,
+      const next = slotProgressions.map((entry) =>
+        entry.id === modalState.id ? applySlotProgressionDraft(current, draft) : entry,
       )
       setSlotProgressions(next)
       return
@@ -141,9 +146,9 @@ export function SlotProgressionsField() {
     setCreateLabelDraft('')
   }
 
-  function handleDelete(index: number) {
-    setSlotProgressions(slotProgressions.filter((_, entryIndex) => entryIndex !== index))
-    setConfirmDeleteIndex(null)
+  function handleDelete(id: string) {
+    setSlotProgressions(slotProgressions.filter((entry) => entry.id !== id))
+    setConfirmDeleteId(null)
   }
 
   return (
@@ -155,7 +160,7 @@ export function SlotProgressionsField() {
         <ArrayLikeSectionHeader
           id="slot-progressions-heading"
           label="Slot progressions"
-          hint="Spell slot tables referenced by spellcasting profiles."
+          hint="Spell slot tables shared by spellcasting classes."
           size={size}
           action={
             <Button
@@ -171,13 +176,14 @@ export function SlotProgressionsField() {
           wrapper="none"
         />
         <div className={featureTablesSectionBodyClasses}>
-          {slotProgressions.map((progression, index) => (
+          {slotProgressions.map((progression) => (
             <FeatureTableRow
               key={progression.id}
               title={progression.label}
               metadata={formatSlotProgressionMetadata(progression, effectiveMaxLevel)}
               typeLabel={progression.kind === 'pact' ? 'Pact' : 'Leveled'}
-              onEdit={() => setModalState({ mode: 'edit', index })}
+              editLabel="Edit table"
+              onEdit={() => setModalState({ mode: 'edit', id: progression.id })}
               overflowActions={
                 isSeedSlotProgressionId(progression.id) ? undefined : (
                   <DetailOverflowMenu
@@ -187,7 +193,7 @@ export function SlotProgressionsField() {
                         id: 'delete',
                         label: 'Delete progression',
                         destructive: true,
-                        onSelect: () => setConfirmDeleteIndex(index),
+                        onSelect: () => setConfirmDeleteId(progression.id),
                       },
                     ]}
                   />
@@ -256,16 +262,16 @@ export function SlotProgressionsField() {
       ) : null}
 
       <ConfirmDialog
-        open={confirmDeleteIndex !== null}
+        open={confirmDeleteId !== null}
         onOpenChange={(open) => {
-          if (!open) setConfirmDeleteIndex(null)
+          if (!open) setConfirmDeleteId(null)
         }}
         headline="Delete slot progression?"
-        description="Profiles referencing this progression will need a new slot progression assignment."
+        description="Classes referencing this progression will need a new slot progression assignment."
         confirmLabel="Delete"
         confirmVariant="destructive"
         onConfirm={() => {
-          if (confirmDeleteIndex !== null) handleDelete(confirmDeleteIndex)
+          if (confirmDeleteId !== null) handleDelete(confirmDeleteId)
         }}
       />
     </>

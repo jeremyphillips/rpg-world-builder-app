@@ -1,4 +1,3 @@
-import { createElement } from 'react'
 import { z } from 'zod'
 import {
   ABILITY_ENTRIES,
@@ -16,7 +15,6 @@ import { toOptions, type FieldVisibility, type FormItem, type DependentConfig } 
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
-import { ClassSpellcastingProfilePreview } from '../components/class-spellcasting-profile-preview'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,
@@ -47,6 +45,7 @@ function campaignLevelField(maxLevel: number) {
 export function createSpellcastingFormSchema(maxLevel: number) {
   const levelField = campaignLevelField(maxLevel)
   return z.object({
+    slotProgressionId: z.string().min(1),
     profileId: z.string().min(1),
     level: levelField.optional(),
     description: z.string().optional(),
@@ -60,6 +59,7 @@ export function createSpellcastingFormSchema(maxLevel: number) {
 export function createSpellcastingDraftFormSchema(maxLevel: number) {
   const levelField = campaignLevelField(maxLevel)
   return z.object({
+    slotProgressionId: draftOptionalSelect(z.string().min(1)),
     profileId: draftOptionalSelect(z.string().min(1)),
     level: draftOptionalSelect(levelField),
     description: z.string().optional(),
@@ -75,6 +75,10 @@ function visibleWhenSpellcasting(): FieldVisibility {
     dependsOn: ['hasSpellcasting'],
     visibleWhen: (watched) => watched['hasSpellcasting'] === true,
   }
+}
+
+function spellcastingSlotProgressionOptions(ctx: ContentFormCtx) {
+  return ctx.options?.spellcastingSlotProgressions ?? []
 }
 
 function spellcastingProfileOptions(ctx: ContentFormCtx) {
@@ -95,19 +99,23 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
       fields: [
         {
           type: 'combobox',
+          name: 'spellcasting.slotProgressionId',
+          label: 'Slot progression',
+          options: spellcastingSlotProgressionOptions(ctx),
+          multiple: false,
+          required: true,
+          visibility: visibleWhenSpellcasting(),
+          hint: 'Spell slot table (Full / Half / Pact / custom) for this class.',
+        },
+        {
+          type: 'combobox',
           name: 'spellcasting.profileId',
-          label: 'Spellcasting profile',
+          label: 'Spell selection profile',
           options: spellcastingProfileOptions(ctx),
           multiple: false,
           required: true,
           visibility: visibleWhenSpellcasting(),
-          hint: 'Ruleset spellcasting progression profile referenced by this class.',
-        },
-        {
-          kind: 'slot',
-          name: '_spellcastingProfilePreview',
-          visibility: visibleWhenSpellcasting(),
-          render: () => createElement(ClassSpellcastingProfilePreview, { formCtx: ctx }),
+          hint: 'Cantrips, prepared/repertoire capacity, spellbook gains, and selection behavior.',
         },
         {
           type: 'select',

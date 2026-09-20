@@ -163,9 +163,4 @@ export function spellcastingFeatureLabelForSlotProgression(progression: SlotProg
   return progression.kind === 'pact' ? 'Pact Magic' : 'Spellcasting'
 }
 
-/** @deprecated Prefer spellcastingFeatureLabelForSlotProgression — kept for pact legacy feature filter. */
-export function isPactSlotProgression(progression: SlotProgression): boolean {
-  return progression.kind === 'pact'
-}
-
 export type { ProgressionExtension }

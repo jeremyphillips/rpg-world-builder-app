@@ -84,7 +84,6 @@ function buildProgressionPatchInput(values: RulesValues) {
     slotProgressions: values.slotProgressions,
     profiles: values.profiles,
   })
-
   return {
     ...pickDefined({
       maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),

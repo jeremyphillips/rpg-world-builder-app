@@ -38,30 +38,26 @@ enforced by `vocab-term-coverage.test.ts`. Detail:
 
 ## Phase 0 promotions (completed)
 
-| Concept                                                   | Module                                    | Catalog JSON                        | Hover tier   |
-| --------------------------------------------------------- | ----------------------------------------- | ----------------------------------- | ------------ |
-| Spell grant availability (`always_prepared`)              | `vocab/spell/grant-availability.ts`       | yes (`spells` grant `availability`) | vocab-backed |
-| Spell grant casting (`free_cast` + frequency)             | `vocab/spell/grant-casting.ts`            | yes (`spells` grant `casting`)      | local-exempt |
-| Spell preparation mode (`prepared`, `known`, `full_list`) | `vocab/spell/preparation-mode.ts`         | yes (class `spellcasting`)          | vocab-backed |
-| Equipment kind                                            | `vocab/equipment/kind.ts`                 | yes                                 | vocab-backed |
-| Spellcasting progression (`full`/`half`/`pact`)           | `vocab/spell/spellcasting-progression.ts` | yes                                 | vocab-backed |
+| Concept                                       | Module                              | Catalog JSON                        | Hover tier   |
+| --------------------------------------------- | ----------------------------------- | ----------------------------------- | ------------ |
+| Spell grant availability (`always_prepared`)  | `vocab/spell/grant-availability.ts` | yes (`spells` grant `availability`) | vocab-backed |
+| Spell grant casting (`free_cast` + frequency) | `vocab/spell/grant-casting.ts`      | yes (`spells` grant `casting`)      | local-exempt |
+| Equipment kind                                | `vocab/equipment/kind.ts`           | yes                                 | vocab-backed |
 
 ---
 
 ## Vocab-backed — wired with `vocabEnumFromEntries` (catalog paths)
 
-| Schema                          | Module                                    | Entries | Catalog JSON |
-| ------------------------------- | ----------------------------------------- | ------- | ------------ |
-| `abilitySchema`                 | `vocab/ability.ts`                        | full    | yes          |
-| `usageFrequencySchema`          | `vocab/usage-frequency.ts`                | full    | yes          |
-| `movementModeSchema`            | `vocab/movement-mode.ts`                  | full    | yes          |
-| `extraMovementModeSchema`       | `vocab/movement-mode.ts`                  | full    | yes          |
-| `movementOperationSchema`       | `vocab/movement-mode.ts`                  | full    | yes          |
-| `featCategorySchema`            | `vocab/feat.ts`                           | full    | yes          |
-| `equipmentKindSchema`           | `vocab/equipment/kind.ts`                 | full    | yes          |
-| `spellGrantAvailabilitySchema`  | `vocab/spell/grant-availability.ts`       | full    | yes          |
-| `spellPreparationModeSchema`    | `vocab/spell/preparation-mode.ts`         | full    | yes          |
-| `spellcastingProgressionSchema` | `vocab/spell/spellcasting-progression.ts` | full    | yes          |
+| Schema                         | Module                              | Entries | Catalog JSON |
+| ------------------------------ | ----------------------------------- | ------- | ------------ |
+| `abilitySchema`                | `vocab/ability.ts`                  | full    | yes          |
+| `usageFrequencySchema`         | `vocab/usage-frequency.ts`          | full    | yes          |
+| `movementModeSchema`           | `vocab/movement-mode.ts`            | full    | yes          |
+| `extraMovementModeSchema`      | `vocab/movement-mode.ts`            | full    | yes          |
+| `movementOperationSchema`      | `vocab/movement-mode.ts`            | full    | yes          |
+| `featCategorySchema`           | `vocab/feat.ts`                     | full    | yes          |
+| `equipmentKindSchema`          | `vocab/equipment/kind.ts`           | full    | yes          |
+| `spellGrantAvailabilitySchema` | `vocab/spell/grant-availability.ts` | full    | yes          |
 
 ## Vocab-backed — existing `*_ENTRIES`, wire in follow-up phases
 

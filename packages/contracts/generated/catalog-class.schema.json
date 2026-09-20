@@ -103,6 +103,10 @@
     "spellcasting": {
       "type": "object",
       "properties": {
+        "slotProgressionId": {
+          "type": "string",
+          "minLength": 1
+        },
         "profileId": {
           "type": "string",
           "minLength": 1
@@ -175,6 +179,7 @@
         }
       },
       "required": [
+        "slotProgressionId",
         "profileId",
         "level",
         "ability"

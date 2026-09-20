@@ -48,7 +48,6 @@ describe('computeSpellcastingProgressionSparsePatch', () => {
     const customProfile = {
       id: 'custom:test',
       label: 'Custom profile',
-      slotProgressionId: 'full-caster',
       choiceProgressions: [],
     }
     const resolved = resolveSpellcastingProgressionRecords(spellcastingProgressionTestSeed, {

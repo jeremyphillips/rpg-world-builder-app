@@ -54,11 +54,9 @@ import { SPELL_DELIVERY_METHOD_TERM } from './spell/delivery-method'
 import { DURATION_UNIT_TERM } from './spell/duration'
 import { SPELL_FUNCTION_TAG_TERM } from './spell/function-tag'
 import { SPELL_GRANT_AVAILABILITY_TERM } from './spell/grant-availability'
-import { SPELL_PREPARATION_MODE_TERM } from './spell/preparation-mode'
 import { SPELL_RANGE_KIND_TERM } from './spell/range'
 import { SPELL_ROLE_TAG_TERM } from './spell/role-tag'
 import { SPELL_SCHOOL_TERM } from './spell/school'
-import { SPELLCASTING_PROGRESSION_TERM } from './spell/spellcasting-progression'
 import { getTermSentenceForm, type VocabularyTerm } from './types'
 import { USAGE_FREQUENCY_TERM } from './usage-frequency'
 import { WEAPON_CATEGORY_TERM } from './weapon/category'
@@ -110,10 +108,8 @@ const RPG_VOCAB_CLOSED_TERMS = [
   DURATION_UNIT_TERM,
   SPELL_FUNCTION_TAG_TERM,
   SPELL_GRANT_AVAILABILITY_TERM,
-  SPELL_PREPARATION_MODE_TERM,
   SPELL_RANGE_KIND_TERM,
   SPELL_ROLE_TAG_TERM,
-  SPELLCASTING_PROGRESSION_TERM,
   WEAPON_CATEGORY_TERM,
   WEAPON_MASTERY_TERM,
   WEAPON_MODE_TERM,
@@ -169,7 +165,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(50)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(48)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

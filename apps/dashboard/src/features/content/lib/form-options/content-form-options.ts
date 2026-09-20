@@ -70,7 +70,9 @@ export interface ContentFormOptionSets {
   richTextInternalLinkOptions: RichTextLinkPickerInternalOption[]
   /** Content type filters shown in rich-text link pickers. */
   richTextContentTypeOptions: RichTextLinkPickerContentTypeOption[]
-  /** Ruleset spellcasting profile options for class spellcasting.profileId. */
+  /** Ruleset slot progression options for class spellcasting.slotProgressionId. */
+  spellcastingSlotProgressions?: FieldOption[]
+  /** Ruleset spell selection profile options for class spellcasting.profileId. */
   spellcastingProfiles?: FieldOption[]
 }
 
@@ -166,6 +168,16 @@ function buildRichTextLinkOptionSets(input: {
   }
 }
 
+function buildSpellcastingSlotProgressionOptions(
+  spellcastingProgression?: ReturnType<typeof resolveCampaignSpellcastingProgression>,
+): FieldOption[] {
+  if (!spellcastingProgression) return []
+
+  return [...spellcastingProgression.slotProgressions.values()]
+    .sort((left, right) => left.label.localeCompare(right.label))
+    .map((progression) => ({ value: progression.id, label: progression.label }))
+}
+
 function buildSpellcastingProfileOptions(
   spellcastingProgression?: ReturnType<typeof resolveCampaignSpellcastingProgression>,
 ): FieldOption[] {
@@ -200,6 +212,9 @@ export function buildContentFormOptionSets(input: {
     equipment: buildContentPurposeSelectors(input.equipment ?? []),
     locations: buildContentPurposeSelectors(input.locations ?? []),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
+    spellcastingSlotProgressions: buildSpellcastingSlotProgressionOptions(
+      input.spellcastingProgression,
+    ),
     spellcastingProfiles: buildSpellcastingProfileOptions(input.spellcastingProgression),
     ...buildRichTextLinkOptionSets({
       campaignId: input.campaignId,
