@@ -10,5 +10,5 @@ export const resolveSpellcastingChoices: ChoiceSourceResolver = (draft, context,
   const characterClass = catalogIndex.classes.get(profile.classId)
   if (!characterClass) return []
 
-  return resolveSpellcastingChoiceSets(profile, characterClass.slug, catalogIndex)
+  return resolveSpellcastingChoiceSets(profile, characterClass.slug, catalogIndex, draft)
 }

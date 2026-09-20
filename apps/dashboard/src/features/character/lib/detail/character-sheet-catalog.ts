@@ -9,6 +9,7 @@ import {
   type CharacterEquipmentEntry,
   type CharacterEquipmentInventoryBucket,
   type CharacterSelectionSource,
+  characterSpellIsPrepared,
   type CharacterSpellEntry,
   type Equipment,
   type Character,
@@ -185,7 +186,7 @@ function buildSpellCards(
     const base = {
       displayName,
       referenceId: entry.spellId,
-      prepared: entry.selection?.prepared ?? false,
+      prepared: characterSpellIsPrepared(entry),
       sources,
     }
 

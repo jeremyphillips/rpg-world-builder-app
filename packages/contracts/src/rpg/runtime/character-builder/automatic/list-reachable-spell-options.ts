@@ -33,7 +33,7 @@ export function listReachableSpellOptions(args: {
   const profile = resolveSpellcastingProfile(draft, args.context)
   if (!profile) return []
 
-  return resolveSpellcastingChoiceSets(profile, characterClass.slug, catalogIndex).flatMap(
+  return resolveSpellcastingChoiceSets(profile, characterClass.slug, catalogIndex, draft).flatMap(
     (choiceSet) =>
       choiceSet.options.map((option) => ({
         id: option.id,

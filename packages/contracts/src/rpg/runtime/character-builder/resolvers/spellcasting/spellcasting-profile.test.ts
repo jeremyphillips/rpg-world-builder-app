@@ -57,22 +57,22 @@ describe('spellcasting-profile', () => {
       class: { classId: wizardClass.id, level: 1 },
     })
 
-    expect(resolveSpellcastingProfile(draft, spellcastingTestContext)).toEqual({
+    const profile = resolveSpellcastingProfile(draft, spellcastingTestContext)
+
+    expect(profile).toMatchObject({
       classId: wizardClass.id,
       className: 'Wizard',
       ability: 'int',
+      classLevel: 1,
       usesPreparedLoadout: true,
       cantripsKnown: 3,
       spellsAvailable: 4,
       maxSelectableSpellLevel: 1,
-      choiceSetIds: {
-        cantrips: `spellcasting:${wizardClass.id}:cantrips`,
-        spells: `spellcasting:${wizardClass.id}:spells`,
-      },
     })
+    expect(profile?.profileBundle.profile.id).toBe('fixture:wizard')
   })
 
-  it('omits cantrip choice set ids for paladin and ranger-style zero-cantrip casters', () => {
+  it('omits cantrip quota for paladin-style zero-cantrip casters', () => {
     const draft = draftWith({
       class: { classId: paladinClass.id, level: 1 },
     })
@@ -80,8 +80,6 @@ describe('spellcasting-profile', () => {
     const profile = resolveSpellcastingProfile(draft, spellcastingTestContext)
 
     expect(profile?.cantripsKnown).toBe(0)
-    expect(profile?.choiceSetIds.cantrips).toBeUndefined()
-    expect(profile?.choiceSetIds.spells).toBe(`spellcasting:${paladinClass.id}:spells`)
   })
 
   it('produces a pact-slot level-1 profile for warlock', () => {

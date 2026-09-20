@@ -1,6 +1,10 @@
 import type { CharacterClass } from '../../../content/classes/class'
 import type { SpellsContentGrant } from '../../../content/lib/grants'
-import type { CharacterSpellAccess, CharacterSpellEntry } from '../../character/sheet/spells'
+import {
+  mergeCharacterSpellCollections,
+  type CharacterSpellAccess,
+  type CharacterSpellEntry,
+} from '../../character/sheet/spells'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 import type { CharacterBuildCatalogIndex } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
@@ -146,6 +150,7 @@ export function mergeCharacterSpellEntries(
       spellId: granted.spellId,
       sources: mergeSources(existing.sources, granted.sources ?? []),
       access: { ...existing.access, ...granted.access },
+      collections: mergeCharacterSpellCollections(existing.collections, granted.collections ?? []),
       selection: existing.selection ?? granted.selection,
       castingEntitlements: granted.castingEntitlements?.length
         ? granted.castingEntitlements.reduce(

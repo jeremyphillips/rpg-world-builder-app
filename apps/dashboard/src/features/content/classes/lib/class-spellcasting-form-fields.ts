@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import { z } from 'zod'
 import {
   ABILITY_ENTRIES,
@@ -15,6 +16,7 @@ import { toOptions, type FieldVisibility, type FormItem, type DependentConfig } 
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
+import { ClassSpellcastingProfilePreview } from '../components/class-spellcasting-profile-preview'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,
@@ -100,6 +102,12 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
           required: true,
           visibility: visibleWhenSpellcasting(),
           hint: 'Ruleset spellcasting progression profile referenced by this class.',
+        },
+        {
+          kind: 'slot',
+          name: '_spellcastingProfilePreview',
+          visibility: visibleWhenSpellcasting(),
+          render: () => createElement(ClassSpellcastingProfilePreview, { formCtx: ctx }),
         },
         {
           type: 'select',

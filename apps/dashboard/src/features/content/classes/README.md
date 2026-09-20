@@ -16,24 +16,22 @@ The **Subclasses** tab uses the shared [`NestedResourceMasterDetailEditor`](../c
 
 ## Key files
 
-| Area                                 | Path                                                                                                                                                             |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Class form def                       | `lib/class-form-def.ts`                                                                                                                                          |
-| Class form hub / values / labels     | `lib/class-form-fields.ts`, `class-form-values.ts`, `class-form-labels.ts`                                                                                       |
-| Class form tab field modules         | `lib/class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`                                                     |
-| Subclass form fields / values        | `lib/subclasses/subclass-form-fields.ts`, `subclass-form-values.ts`                                                                                              |
-| Shared feature row fields            | `lib/class-feature-form-fields.ts`, `lib/class-subclass-choice-features.ts`                                                                                      |
-| Features tab (master-detail)         | `components/class-features-tab.tsx`                                                                                                                              |
-| Character creation tab               | `components/class-character-creation-tab.tsx`                                                                                                                    |
-| Starting equipment form              | `lib/character-creation/class-starting-equipment-form-*.ts`                                                                                                      |
-| Subclasses tab                       | `components/class-subclasses-tab.tsx`                                                                                                                            |
-| Subclass tab state / save            | `lib/subclasses/subclass-tab-state.lib.ts`, `subclass-tab-save.lib.ts`                                                                                           |
-| Subclass tab hook                    | `hooks/use-class-subclasses-tab.ts`                                                                                                                              |
-| Spell progression grid helpers       | `lib/progression-table-helpers.ts`                                                                                                                               |
-| Cantrip template presets (seed-only) | `lib/cantrips-profiles.ts`                                                                                                                                       |
-| Read-only progression table          | `components/detail/class-progression-table.tsx`                                                                                                                  |
-| Detail feature list item             | `components/detail/class-feature-item.tsx`                                                                                                                       |
-| Display registry (detail + builder)  | `lib/class-display.ts` — labels and view models for detail route and builder sheet; join-dependent rendering (skill links, subclasses) stays in route components |
+| Area                                | Path                                                                                                                                                             |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Class form def                      | `lib/class-form-def.ts`                                                                                                                                          |
+| Class form hub / values / labels    | `lib/class-form-fields.ts`, `class-form-values.ts`, `class-form-labels.ts`                                                                                       |
+| Class form tab field modules        | `lib/class-basics-form-fields.ts`, `class-proficiencies-form-fields.ts`, `class-spellcasting-form-fields.ts`                                                     |
+| Subclass form fields / values       | `lib/subclasses/subclass-form-fields.ts`, `subclass-form-values.ts`                                                                                              |
+| Shared feature row fields           | `lib/class-feature-form-fields.ts`, `lib/class-subclass-choice-features.ts`                                                                                      |
+| Features tab (master-detail)        | `components/class-features-tab.tsx`                                                                                                                              |
+| Character creation tab              | `components/class-character-creation-tab.tsx`                                                                                                                    |
+| Starting equipment form             | `lib/character-creation/class-starting-equipment-form-*.ts`                                                                                                      |
+| Subclasses tab                      | `components/class-subclasses-tab.tsx`                                                                                                                            |
+| Subclass tab state / save           | `lib/subclasses/subclass-tab-state.lib.ts`, `subclass-tab-save.lib.ts`                                                                                           |
+| Subclass tab hook                   | `hooks/use-class-subclasses-tab.ts`                                                                                                                              |
+| Read-only progression table         | `components/detail/class-progression-table.tsx`                                                                                                                  |
+| Detail feature list item            | `components/detail/class-feature-item.tsx`                                                                                                                       |
+| Display registry (detail + builder) | `lib/class-display.ts` — labels and view models for detail route and builder sheet; join-dependent rendering (skill links, subclasses) stays in route components |
 
 ## Components layout
 

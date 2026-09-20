@@ -8,9 +8,11 @@ import {
   spellcastingTestContext,
   warlockClass,
   wizardClass,
+  wizardLevelOneSpells,
 } from '../../spellcasting-test-fixtures'
 import { indexCharacterBuildCatalog } from '../../context'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
+import { spellcastingChoiceSetId } from './resolve-spellcasting-choice-sets'
 import { resolveSpellcastingChoices } from './resolve-spellcasting-choices'
 
 function draftWith(overrides: Partial<CharacterBuilderDraft>): CharacterBuilderDraft {
@@ -28,16 +30,21 @@ describe('resolveSpellcastingChoices', () => {
     expect(resolveSpellcastingChoices(draft, spellcastingTestContext, catalogIndex)).toEqual([])
   })
 
-  it('emits cantrip and spell ChoiceSets with class-specific counts', () => {
+  it('emits cantrip, spellbook, and prepared ChoiceSets for wizard', () => {
     const draft = draftWith({
       class: { classId: wizardClass.id, level: 1 },
+      choiceSelections: {
+        [spellcastingChoiceSetId(wizardClass.id, 'spellbook-gain')]: wizardLevelOneSpells.map(
+          (spell) => spell.id,
+        ),
+      },
     })
 
     const choiceSets = resolveSpellcastingChoices(draft, spellcastingTestContext, catalogIndex)
 
-    expect(choiceSets).toHaveLength(2)
+    expect(choiceSets).toHaveLength(3)
     expect(choiceSets[0]).toMatchObject({
-      id: `spellcasting:${wizardClass.id}:cantrips`,
+      id: spellcastingChoiceSetId(wizardClass.id, 'cantrips'),
       sourceType: 'spellcasting',
       choiceType: 'cantrip',
       min: 3,
@@ -45,20 +52,28 @@ describe('resolveSpellcastingChoices', () => {
       required: true,
     })
     expect(choiceSets[1]).toMatchObject({
-      id: `spellcasting:${wizardClass.id}:spells`,
+      id: spellcastingChoiceSetId(wizardClass.id, 'spellbook-gain'),
+      choiceType: 'spell',
+      min: 6,
+      max: 6,
+      required: true,
+    })
+    expect(choiceSets[2]).toMatchObject({
+      id: spellcastingChoiceSetId(wizardClass.id, 'prepared'),
       choiceType: 'spell',
       min: 4,
       max: 4,
       required: true,
     })
+    expect(choiceSets[2]?.options).toHaveLength(6)
   })
 
-  it('filters options by class spell list and spell level', () => {
+  it('filters class-list options by class spell list and spell level', () => {
     const draft = draftWith({
       class: { classId: wizardClass.id, level: 1 },
     })
 
-    const [cantrips, spells] = resolveSpellcastingChoices(
+    const [cantrips, spellbook] = resolveSpellcastingChoices(
       draft,
       spellcastingTestContext,
       catalogIndex,
@@ -66,11 +81,11 @@ describe('resolveSpellcastingChoices', () => {
 
     expect(cantrips?.options.every((option) => option.id.includes(':'))).toBe(true)
     expect(cantrips?.options).toHaveLength(5)
-    expect(spells?.options).toHaveLength(6)
-    expect(spells?.options.some((option) => option.label === 'Fireball')).toBe(false)
+    expect(spellbook?.options).toHaveLength(6)
+    expect(spellbook?.options.some((option) => option.label === 'Fireball')).toBe(false)
   })
 
-  it('emits only spell ChoiceSets for paladin', () => {
+  it('emits only prepared ChoiceSets for paladin', () => {
     const draft = draftWith({
       class: { classId: paladinClass.id, level: 1 },
     })
@@ -103,6 +118,14 @@ describe('resolveSpellcastingChoices', () => {
     for (const characterClass of [wizardClass, paladinClass, warlockClass]) {
       const draft = draftWith({
         class: { classId: characterClass.id, level: 1 },
+        ...(characterClass.id === wizardClass.id
+          ? {
+              choiceSelections: {
+                [spellcastingChoiceSetId(wizardClass.id, 'spellbook-gain')]:
+                  wizardLevelOneSpells.map((spell) => spell.id),
+              },
+            }
+          : {}),
       })
 
       const choiceSets = resolveSpellcastingChoices(draft, spellcastingTestContext, catalogIndex)
@@ -110,7 +133,7 @@ describe('resolveSpellcastingChoices', () => {
       for (const choiceSet of choiceSets) {
         expect(
           choiceSet.options.length,
-          `${characterClass.slug}:${choiceSet.choiceType}`,
+          `${characterClass.slug}:${choiceSet.id}`,
         ).toBeGreaterThanOrEqual(choiceSet.min)
       }
     }

@@ -161,8 +161,8 @@ function assembleImportedSpells(spells: RecognizedSpellPreview[]): CharacterSpel
     .map((entry) => ({
       spellId: entry.localValue!,
       sources: [IMPORT_SELECTION_SOURCE],
-      access: { classKnown: true },
-      selection: entry.prepared ? { prepared: true } : undefined,
+      access: {},
+      collections: entry.prepared ? [{ kind: 'prepared' }] : [{ kind: 'repertoire' }],
     }))
 }
 

@@ -7,8 +7,8 @@ import {
   resolveMaxSelectableSpellLevelFromProfile,
   resolveSpellcastingProfileForClass,
   resolveSpellsAvailableFromProfile,
+  type ResolvedSpellcastingProfileBundle,
 } from '../../../../campaign/rules/spellcasting-progression'
-import { buildChoiceSetId } from '../../choice-set'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 
@@ -21,6 +21,8 @@ export type BuilderSpellcastingProfile = {
   classId: string
   className: string
   ability: Ability
+  classLevel: number
+  profileBundle: ResolvedSpellcastingProfileBundle
   /** True when the profile includes a prepared loadout capacity progression. */
   usesPreparedLoadout: boolean
   /** 0 → no cantrip ChoiceSet (paladin, ranger). */
@@ -28,7 +30,6 @@ export type BuilderSpellcastingProfile = {
   spellsAvailable: number
   /** Highest spell level selectable at the current class level (from slot progression). */
   maxSelectableSpellLevel: number
-  choiceSetIds: { cantrips?: string; spells?: string }
 }
 
 function buildProfile(
@@ -37,34 +38,27 @@ function buildProfile(
   context: CharacterBuildContext,
 ): BuilderSpellcastingProfile {
   const spellcasting = characterClass.spellcasting!
-  const bundle = resolveSpellcastingProfileForClass(
+  const profileBundle = resolveSpellcastingProfileForClass(
     characterClass,
     context.spellcastingProgression,
   )!
 
-  const cantripsKnown = resolveCantripsKnownFromProfile(bundle.profile, classLevel)
-  const spellsAvailable = resolveSpellsAvailableFromProfile(bundle.profile, classLevel)
+  const cantripsKnown = resolveCantripsKnownFromProfile(profileBundle.profile, classLevel)
+  const spellsAvailable = resolveSpellsAvailableFromProfile(profileBundle.profile, classLevel)
   const usesPreparedLoadout = Boolean(
-    findChoiceProgressionByDestination(bundle.profile, 'prepared', 'capacity'),
+    findChoiceProgressionByDestination(profileBundle.profile, 'prepared', 'capacity'),
   )
-
-  const choiceSetIds: BuilderSpellcastingProfile['choiceSetIds'] = {}
-  if (cantripsKnown > 0) {
-    choiceSetIds.cantrips = buildChoiceSetId('spellcasting', characterClass.id, 'cantrips')
-  }
-  if (spellsAvailable > 0) {
-    choiceSetIds.spells = buildChoiceSetId('spellcasting', characterClass.id, 'spells')
-  }
 
   return {
     classId: characterClass.id,
     className: characterClass.name,
     ability: spellcasting.ability,
+    classLevel,
+    profileBundle,
     usesPreparedLoadout,
     cantripsKnown,
     spellsAvailable,
-    maxSelectableSpellLevel: resolveMaxSelectableSpellLevelFromProfile(bundle, classLevel),
-    choiceSetIds,
+    maxSelectableSpellLevel: resolveMaxSelectableSpellLevelFromProfile(profileBundle, classLevel),
   }
 }
 

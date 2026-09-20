@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
-import {
-  spellcastingCantripsChoiceSetId,
-  spellcastingSpellsChoiceSetId,
-} from './resolve-spellcasting-choice-sets'
+import { spellcastingChoiceSetId } from './resolve-spellcasting-choice-sets'
 import { PICKER_DISABLED_REASON_SELECTION_FULL } from '../picker/picker-item-state'
 import {
   spellcastingTestContext,
@@ -15,8 +12,8 @@ import {
 import { resolveSpellPickerItems } from './resolve-spell-picker-items'
 
 describe('resolveSpellPickerItems', () => {
-  const cantripChoiceSetId = spellcastingCantripsChoiceSetId(wizardClass.id)
-  const spellChoiceSetId = spellcastingSpellsChoiceSetId(wizardClass.id)
+  const cantripChoiceSetId = spellcastingChoiceSetId(wizardClass.id, 'cantrips')
+  const preparedChoiceSetId = spellcastingChoiceSetId(wizardClass.id, 'prepared')
 
   it('returns enriched rows for each ChoiceSet option', () => {
     const draft = createEmptyCharacterBuilderDraft()
@@ -64,14 +61,16 @@ describe('resolveSpellPickerItems', () => {
   it('never disables already-selected rows when the ChoiceSet is full', () => {
     const draft = createEmptyCharacterBuilderDraft()
     draft.class = { classId: wizardClass.id, level: 1 }
-    draft.choiceSelections[spellChoiceSetId] = wizardLevelOneSpells
+    draft.choiceSelections[spellcastingChoiceSetId(wizardClass.id, 'spellbook-gain')] =
+      wizardLevelOneSpells.map((spell) => spell.id)
+    draft.choiceSelections[preparedChoiceSetId] = wizardLevelOneSpells
       .slice(0, 4)
       .map((spell) => spell.id)
 
     const items = resolveSpellPickerItems({
       draft,
       context: spellcastingTestContext,
-      choiceSetId: spellChoiceSetId,
+      choiceSetId: preparedChoiceSetId,
     })
 
     const selected = items.filter((item) => item.state.isAlreadySelected)

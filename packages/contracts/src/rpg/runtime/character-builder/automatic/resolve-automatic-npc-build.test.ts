@@ -233,7 +233,19 @@ describe('resolveAutomaticNpcBuild', () => {
       result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'cantrips')],
     ).toEqual([`${RULESET}:arcane-bolt`, `${RULESET}:mage-hand`, `${RULESET}:prestidigitation`])
     expect(
-      result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'spells')],
+      result.draft.choiceSelections[
+        buildChoiceSetId('spellcasting', wizardClass.id, 'spellbook-gain')
+      ],
+    ).toEqual([
+      `${RULESET}:burning-hands`,
+      `${RULESET}:charm-person`,
+      `${RULESET}:detect-magic`,
+      `${RULESET}:magic-missile`,
+      `${RULESET}:shield`,
+      `${RULESET}:sleep`,
+    ])
+    expect(
+      result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'prepared')],
     ).toEqual([
       `${RULESET}:burning-hands`,
       `${RULESET}:charm-person`,
@@ -356,7 +368,7 @@ describe('resolveAutomaticNpcBuild', () => {
 
     // At level 5, third-level spells become selectable and precede later names alphabetically.
     expect(
-      result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'spells')],
+      result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'prepared')],
     ).toContain(`${RULESET}:fireball`)
 
     const input = finalizeNpcCharacterBuild(result.draft, context, {

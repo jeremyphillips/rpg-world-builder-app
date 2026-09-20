@@ -257,9 +257,15 @@ describe('resolveAutomaticNpcBuild constraints', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    expect(
-      result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'spells')],
-    ).toContain(requiredSpellId)
+    const spellSelections = [
+      ...(result.draft.choiceSelections[
+        buildChoiceSetId('spellcasting', wizardClass.id, 'spellbook-gain')
+      ] ?? []),
+      ...(result.draft.choiceSelections[
+        buildChoiceSetId('spellcasting', wizardClass.id, 'prepared')
+      ] ?? []),
+    ]
+    expect(spellSelections).toContain(requiredSpellId)
   })
 
   it('is deterministic with the same seed, constraints, and catalog', () => {
