@@ -1,3 +1,9 @@
+/** Bottom margin for subsection hint copy above the selection body. */
+export const proficiencySubsectionHintMarginClasses = 'mb-1'
+
+/** Top margin for empty wells and selected card lists within a subsection. */
+export const proficiencySubsectionBodyMarginClasses = 'mt-2'
+
 export const proficiencySectionClasses = 'space-y-4 rounded-md border border-border p-4'
 
 export const proficiencySectionHeaderClasses = 'flex flex-wrap items-start justify-between gap-3'
@@ -7,11 +13,15 @@ export const proficiencySectionHeadingRowClasses =
 
 export const proficiencySectionSubheadClasses = 'text-sm text-muted-foreground'
 
+export const proficiencySectionIdentityLineClasses = 'heading-style-group text-foreground'
+
+export const proficiencySectionSourceLineClasses = 'text-sm text-foreground'
+
 export const proficiencySectionHeaderDetailsClasses = 'space-y-1'
 
 export const proficiencySectionDividerClasses = 'border-t border-border'
 
-export const proficiencySectionSelectedListClasses = 'space-y-2'
+export const proficiencySectionSelectedListClasses = `space-y-2 ${proficiencySubsectionBodyMarginClasses}`
 
 export const proficiencySectionChoiceBlocksClasses = 'space-y-4'
 

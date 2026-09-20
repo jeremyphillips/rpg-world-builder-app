@@ -35,7 +35,6 @@ describe('ProficiencySelectedRow', () => {
     render(<ProficiencySelectedRow row={row} onRemove={onRemove} />)
 
     expect(screen.getByText(row.label)).toBeInTheDocument()
-    expect(screen.getByText(row.sourceLabel)).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: `Remove ${row.label}` }))
     expect(onRemove).toHaveBeenCalledTimes(1)

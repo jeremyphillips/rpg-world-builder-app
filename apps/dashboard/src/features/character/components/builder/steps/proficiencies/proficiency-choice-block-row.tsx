@@ -2,7 +2,7 @@ import { formatProficiencyChoiceEmptyMessage } from '@rpg/contracts'
 import type { ProficiencyChoiceBlock, ProficiencyChoiceSelectedRow } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Button, EmptyPanel, Text } from '@rpg/ui'
-import { Plus } from 'lucide-react'
+import { Pencil, Plus } from 'lucide-react'
 
 import { PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE } from '../../../../lib/proficiencies/proficiencies-step.lib'
 import { ProficiencySectionValidationMessages } from './proficiency-section-validation-messages'
@@ -21,6 +21,7 @@ import {
   proficiencyChoiceBlockRowSelectedListClasses,
   proficiencyChoiceBlockRowSourceLineClasses,
 } from './proficiency-choice-block-row.variants'
+import { proficiencySubsectionBodyMarginClasses } from './proficiency-section.variants'
 
 export type ProficiencyChoiceBlockRowProps = {
   block: ProficiencyChoiceBlock
@@ -55,7 +56,7 @@ export function ProficiencyChoiceBlockRow({
             density="compact"
             onClick={onOpenDrawer}
           >
-            <Plus aria-hidden />
+            {block.isFull ? <Pencil aria-hidden /> : <Plus aria-hidden />}
             {block.compactAddLabel}
           </Button>
         </div>
@@ -84,7 +85,9 @@ export function ProficiencyChoiceBlockRow({
               ))}
             </ul>
           ) : (
-            <EmptyPanel>{emptyMessage}</EmptyPanel>
+            <EmptyPanel className={proficiencySubsectionBodyMarginClasses}>
+              {emptyMessage}
+            </EmptyPanel>
           )}
         </div>
       </div>

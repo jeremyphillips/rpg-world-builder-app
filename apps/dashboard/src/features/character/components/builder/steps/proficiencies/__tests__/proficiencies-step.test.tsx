@@ -161,14 +161,18 @@ describe('ProficienciesStep', () => {
     expect(screen.getByText(PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING)).toBeInTheDocument()
     const languagesSection = screen.getByRole('heading', { name: 'Languages' }).closest('section')!
     expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
-    expect(within(languagesSection).getByText('Choose 2 additional languages.')).toBeInTheDocument()
+    expect(
+      within(languagesSection).getByText('Choose 2 additional languages from Origin Languages.'),
+    ).toBeInTheDocument()
     expect(
       within(languagesSection).getByRole('button', { name: 'Add language' }),
     ).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
     ).toBeInTheDocument()
-    expect(within(languagesSection).getByText('No languages chosen yet.')).toBeInTheDocument()
+    expect(
+      within(languagesSection).getByText('No additional languages chosen yet.'),
+    ).toBeInTheDocument()
   })
 
   it('shows a stale badge for invalid skill selections', () => {
@@ -324,11 +328,11 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    const manageButton = screen.getByRole('button', { name: 'Manage skills' })
+    const manageButton = screen.getByRole('button', { name: 'Edit' })
     expect(manageButton).toBeEnabled()
 
     await user.click(manageButton)
-    expect(screen.getByRole('heading', { name: 'Manage skill choices' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Edit' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
     expect(screen.getAllByRole('button', { name: 'Remove' }).length).toBeGreaterThan(0)
   })

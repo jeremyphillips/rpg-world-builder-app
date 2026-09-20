@@ -36,7 +36,7 @@ describe('proficiency-picker-drawer.lib', () => {
         proficiencyPickerStealthOptionId,
         proficiencyPickerAcrobaticsOptionId,
       ]),
-    ).toBe('Manage skill choices')
+    ).toBe('Edit')
     expect(
       formatProficiencyPickerDrawerDescription(proficiencyPickerSkillChoiceSetFixture, [
         proficiencyPickerStealthOptionId,

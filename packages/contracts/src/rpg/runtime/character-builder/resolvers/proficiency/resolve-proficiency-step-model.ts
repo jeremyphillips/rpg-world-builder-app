@@ -14,10 +14,7 @@ import type { CharacterBuilderDraft } from '../../draft/draft'
 import { getChoiceSetStepId } from '../../steps'
 import type { Ability } from '../../../../vocab/ability'
 import { isClassProgressionApplicable } from '../../progression/character-level-policy'
-import {
-  formatCompactProficiencySourceLabel,
-  formatProficiencyChoiceSourceLabel,
-} from './format-proficiency-source-label'
+import { formatCompactProficiencySourceLabel } from './format-proficiency-source-label'
 import { isFixedProficiencyGrant } from './proficiency-grant-classification'
 import {
   formatProficiencyCategorySubhead,
@@ -25,11 +22,11 @@ import {
   formatProficiencyChoiceBlockCompactAddLabel,
   formatProficiencyPoolDescription,
   formatProficiencySectionEmptyMessage,
+  formatProficiencySingleSetSupportingCopy,
   resolveProficiencyAggregateCount,
   type ProficiencyAggregateCount,
 } from './format-proficiency-step-copy'
 import {
-  resolveProficiencyChoiceDisambiguationSourceLine,
   resolveProficiencyChoicePresentation,
   sortProficiencyChoiceSets,
 } from './resolve-proficiency-choice-presentation'
@@ -67,7 +64,6 @@ export type GrantedProficiencySummaryRow = {
 export type ProficiencyChoiceSelectedRow = {
   optionId: string
   label: string
-  sourceLabel: string
   choiceSetId: string
   isStale: boolean
   staleReason?: string
@@ -92,6 +88,8 @@ export type ProficiencyInteractiveSection = {
   kind: ProficiencyStepSectionKind
   heading: string
   subhead: string
+  /** Single-set only — shown when choice-set identity is not absorbed into subhead. */
+  identityLine?: string
   aggregateCount: ProficiencyAggregateCount | null
   selectedRows: ProficiencyChoiceSelectedRow[]
   choiceBlocks: ProficiencyChoiceBlock[]
@@ -291,27 +289,9 @@ function groupGrantedRowsIntoSummary(
   })
 }
 
-function resolveHeadingCollisions(choiceSets: readonly ChoiceSet[]): Map<string, boolean> {
-  const headingCounts = new Map<string, number>()
-
-  for (const choiceSet of choiceSets) {
-    const { heading } = resolveProficiencyChoicePresentation(choiceSet)
-    headingCounts.set(heading, (headingCounts.get(heading) ?? 0) + 1)
-  }
-
-  const collides = new Map<string, boolean>()
-  for (const [heading, count] of headingCounts) {
-    collides.set(heading, count > 1)
-  }
-
-  return collides
-}
-
 function buildSelectedRows(
   choiceSet: ChoiceSet,
   draft: CharacterBuilderDraft,
-  presentation: ReturnType<typeof resolveProficiencyChoicePresentation>,
-  headingCollides: boolean,
 ): ProficiencyChoiceSelectedRow[] {
   const selections = draft.choiceSelections[choiceSet.id] ?? []
   const optionIds = new Set(choiceSet.options.map((option) => option.id))
@@ -319,18 +299,10 @@ function buildSelectedRows(
   return selections.map((optionId) => {
     const option = choiceSet.options.find((entry) => entry.id === optionId)
     const isStale = !optionIds.has(optionId)
-    const disambiguationSourceLine = headingCollides
-      ? resolveProficiencyChoiceDisambiguationSourceLine(presentation, choiceSet.provenance)
-      : undefined
 
     return {
       optionId,
       label: option?.label ?? optionId,
-      sourceLabel: formatProficiencyChoiceSourceLabel(
-        presentation.heading,
-        disambiguationSourceLine,
-        headingCollides,
-      ),
       choiceSetId: choiceSet.id,
       isStale,
       staleReason: isStale ? PROFICIENCY_STALE_REASON : undefined,
@@ -369,21 +341,32 @@ function buildInteractiveSection(
   hasFixedGrantsInCategory: boolean,
 ): ProficiencyInteractiveSection {
   const sortedChoiceSets = sortProficiencyChoiceSets(choiceSets)
-  const headingCollisions = resolveHeadingCollisions(sortedChoiceSets)
-  const choiceBlocks = sortedChoiceSets.map((choiceSet) => {
-    const presentation = resolveProficiencyChoicePresentation(choiceSet)
-    return buildChoiceBlock(choiceSet, draft, presentation)
-  })
-  const selectedRows = sortedChoiceSets.flatMap((choiceSet) => {
-    const presentation = resolveProficiencyChoicePresentation(choiceSet)
-    const headingCollides = headingCollisions.get(presentation.heading) ?? false
-    return buildSelectedRows(choiceSet, draft, presentation, headingCollides)
-  })
+  const presentations = sortedChoiceSets.map((choiceSet) => ({
+    choiceSet,
+    presentation: resolveProficiencyChoicePresentation(choiceSet),
+  }))
+  const choiceBlocks = presentations.map(({ choiceSet, presentation }) =>
+    buildChoiceBlock(choiceSet, draft, presentation),
+  )
+  const selectedRows = presentations.flatMap(({ choiceSet }) => buildSelectedRows(choiceSet, draft))
+
+  const singleSetSupportingCopy =
+    presentations.length === 1
+      ? formatProficiencySingleSetSupportingCopy({
+          choiceSet: presentations[0]!.choiceSet,
+          heading: presentations[0]!.presentation.heading,
+          headingSourceCoverage: presentations[0]!.presentation.headingSourceCoverage,
+          hasFixedGrantsInCategory,
+        })
+      : undefined
 
   return {
     kind,
     heading: PROFICIENCY_SECTION_HEADINGS[kind],
-    subhead: formatProficiencyCategorySubhead(kind, sortedChoiceSets, hasFixedGrantsInCategory),
+    subhead:
+      singleSetSupportingCopy?.instruction ??
+      formatProficiencyCategorySubhead(kind, sortedChoiceSets, hasFixedGrantsInCategory),
+    identityLine: singleSetSupportingCopy?.identityLine,
     aggregateCount: resolveProficiencyAggregateCount(choiceBlocks),
     selectedRows,
     choiceBlocks,

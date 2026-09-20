@@ -69,8 +69,8 @@ describe('proficiency grant vocabulary', () => {
   it('returns builder add and manage labels', () => {
     expect(getProficiencyGrantAddLabel('weapon')).toBe('Add weapon proficiency')
     expect(getProficiencyGrantAddLabel('armor')).toBe('Add armor training')
-    expect(getProficiencyGrantManageLabel('skill')).toBe('Manage skill choices')
+    expect(getProficiencyGrantManageLabel('skill')).toBe('Edit')
     expect(getProficiencyGrantCompactAddLabel('tool')).toBe('Add tool')
-    expect(getProficiencyGrantCompactManageLabel('weapon')).toBe('Manage weapons')
+    expect(getProficiencyGrantCompactManageLabel('weapon')).toBe('Edit')
   })
 })

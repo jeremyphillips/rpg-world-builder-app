@@ -48,15 +48,14 @@ export function formatSelectionCounter(selectedCount: number, max: number): stri
 const SPELL_SELECTION_CHOICE_TYPES = new Set<ChoiceType>(['cantrip', 'spell'])
 
 /**
- * "Selection full" complements proficiencies when the drawer is in Manage mode.
- * Hide for spells/cantrips — Manage remains the primary swap action there.
+ * "Selection full" complements proficiencies when the choice set is at capacity.
+ * Hide for spells/cantrips — manage/edit remains the primary swap action there.
  */
 export function shouldShowSelectionFullNotice(
   choiceSet: Pick<ChoiceSet, 'choiceType'>,
   isFull: boolean,
-  drawerTriggerLabel: string,
 ): boolean {
-  if (!isFull || !drawerTriggerLabel.startsWith('Manage')) return false
+  if (!isFull) return false
   return !SPELL_SELECTION_CHOICE_TYPES.has(choiceSet.choiceType)
 }
 

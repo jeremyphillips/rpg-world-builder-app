@@ -66,24 +66,32 @@ heading, optional source line, and `headingSourceCoverage` (`owner` | `feature` 
 | `feature` | `Skillful`, `Primal Aptitude`            | `Human species trait`, subclass |
 | `generic` | `Skill Proficiency`, unlabeled languages | shown when provenance is known  |
 
-Category subheads stay topology/count-only (no heading injection).
+**Single choice set** — category owns progress, action, supporting copy, optional
+provenance, and the selected collection. `formatProficiencySingleSetSupportingCopy()` folds
+choice-set identity and meaningful pool constraint into the category subhead (and optional
+`identityLine` when the heading does not describe eligibility).
 
-| Surface           | Layer               | Example                              |
-| ----------------- | ------------------- | ------------------------------------ |
-| Block heading     | 2 — authored name   | `Skillful`, `Rogue Skills`           |
-| Block source line | 3 — workflow chrome | `Human species trait` (feature only) |
-| Category subhead  | 3 — count/topology  | `Choose 2 skills.`                   |
-| Pool description  | 3 — pool topology   | `Choose any 1 skill proficiency.`    |
+**Multiple choice sets** — category owns aggregate progress and generic instruction; each
+block owns heading, progress, action, provenance, pool eligibility, and its selected
+collection.
+
+| Surface           | Single set                           | Multi set                               |
+| ----------------- | ------------------------------------ | --------------------------------------- |
+| Category subhead  | `Choose 2 skills from Rogue Skills.` | `Choose skills from the options below.` |
+| Identity line     | `Keen Senses` (constrained feature)  | per block heading                       |
+| Block source line | `Human species trait` (feature)      | per block                               |
+| Pool description  | absorbed into subhead when relevant  | `Choose from Perception, …` per block   |
 
 Block order within a category: class → subclass → species → heritage → origin → feat →
 ruleset → campaign (stable within kind).
 
 ## Adjacent builder copy patterns
 
-### ChoiceSet drawer Add/Manage pairs
+### ChoiceSet drawer Add/Edit pairs
 
-`CHOICE_SET_DRAWER_LABELS` in `lib/selection-counter.lib.ts` keys explicit Add/Manage
+`CHOICE_SET_DRAWER_LABELS` in `lib/selection-counter.lib.ts` keys explicit Add/Edit
 pairs by `choiceType` — the preferred pattern for proficiency, spell, and equipment drawers.
+Proficiency and language grants use `BUILDER_GRANT_EDIT_ACTION_LABEL` (`Edit`) when full.
 
 The `drawerLabelsForChoiceSet` fallback (`Manage ${choiceSet.label.toLowerCase()}`) is a
 **legacy escape hatch only**. Add explicit map entries for new choice types instead of

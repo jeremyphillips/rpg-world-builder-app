@@ -39,7 +39,7 @@ export function SpellChoiceSection({
     selectedCount,
     max: choiceSet.max,
   })
-  const showSelectionFull = shouldShowSelectionFullNotice(choiceSet, isFull, drawerTriggerLabel)
+  const showSelectionFull = shouldShowSelectionFullNotice(choiceSet, isFull)
 
   return (
     <section className={spellChoiceSectionClasses} aria-labelledby={`${choiceSet.id}-heading`}>

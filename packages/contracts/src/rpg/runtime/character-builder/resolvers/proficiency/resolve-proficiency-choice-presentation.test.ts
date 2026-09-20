@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import type { ChoiceSet } from '../../choice-set'
 import {
-  resolveProficiencyChoiceDisambiguationSourceLine,
   resolveProficiencyChoicePresentation,
   sortProficiencyChoiceSets,
 } from './resolve-proficiency-choice-presentation'
@@ -130,25 +129,6 @@ describe('resolveProficiencyChoicePresentation', () => {
       heading: 'Skill Proficiency',
       headingSourceCoverage: 'generic',
     })
-  })
-})
-
-describe('resolveProficiencyChoiceDisambiguationSourceLine', () => {
-  it('falls back to provenance source when block source line is omitted', () => {
-    const presentation = resolveProficiencyChoicePresentation({
-      choiceType: 'skillProficiency',
-      provenance: {
-        ownerKind: 'class',
-        ownerLabel: 'Druid',
-      },
-    })
-
-    expect(
-      resolveProficiencyChoiceDisambiguationSourceLine(presentation, {
-        ownerKind: 'class',
-        ownerLabel: 'Druid',
-      }),
-    ).toBe('Druid class')
   })
 })
 

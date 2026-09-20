@@ -66,7 +66,8 @@ describe('resolveProficiencyStepModel', () => {
     expect(skills?.choiceBlocks[0]?.heading).toBe('Rogue Skills')
     expect(skills?.choiceBlocks[0]?.sourceLine).toBeUndefined()
     expect(skills?.choiceBlocks[0]?.choiceSet.label).toBe('Rogue Skills')
-    expect(skills?.subhead).toBe('Choose 2 skills.')
+    expect(skills?.subhead).toBe('Choose 2 skills from Rogue Skills.')
+    expect(skills?.identityLine).toBeUndefined()
     expect(skills?.aggregateCount).toEqual({
       selected: 0,
       max: 2,
@@ -145,7 +146,6 @@ describe('resolveProficiencyStepModel', () => {
       expect.objectContaining({
         optionId: acrobaticsSkill.id,
         label: 'Acrobatics',
-        sourceLabel: 'Chosen from Rogue Skills',
         isRemovable: true,
       }),
     ])

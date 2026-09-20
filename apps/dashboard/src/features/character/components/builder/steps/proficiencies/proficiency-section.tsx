@@ -1,17 +1,17 @@
 import type { ProficiencyInteractiveSection } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Heading } from '@rpg/ui'
 
-import { validationIssuesForProficiencyChoiceSet } from '../../../../lib/proficiencies/proficiencies-step.lib'
+import {
+  validationIssuesForProficiencyChoiceSet,
+  validationIssuesForProficiencySection,
+} from '../../../../lib/proficiencies/proficiencies-step.lib'
 import { ProficiencyChoiceBlockRow } from './proficiency-choice-block-row'
-import { ProficiencySelectionCounter } from './proficiency-selection-counter'
+import { ProficiencySectionFlatBody } from './proficiency-section-flat-body'
+import { ProficiencySectionHeader } from './proficiency-section-header'
 import {
   proficiencySectionChoiceBlocksClasses,
   proficiencySectionClasses,
-  proficiencySectionHeaderClasses,
-  proficiencySectionHeadingRowClasses,
-  proficiencySectionHeaderDetailsClasses,
-  proficiencySectionSubheadClasses,
+  proficiencySectionDividerClasses,
 } from './proficiency-section.variants'
 
 export type ProficiencySectionProps = {
@@ -35,45 +35,43 @@ export function ProficiencySection({
   onRemoveChoice,
 }: ProficiencySectionProps) {
   const headingId = `proficiency-section-${section.kind}-heading`
+  const isMultiBlockSection = section.choiceBlocks.length > 1
+  const singleChoiceBlock = isMultiBlockSection ? undefined : section.choiceBlocks[0]
+  const sectionValidationIssues = validationIssuesForProficiencySection(validationIssues, section)
 
   return (
     <section aria-labelledby={headingId} className={proficiencySectionClasses}>
-      <div className={proficiencySectionHeaderClasses}>
-        <div>
-          <div className={proficiencySectionHeadingRowClasses}>
-            <Heading variant="subsection" as="h3" id={headingId}>
-              {section.heading}
-            </Heading>
-            {section.aggregateCount ? (
-              <ProficiencySelectionCounter
-                selectedCount={section.aggregateCount.selected}
-                max={section.aggregateCount.max}
-              />
-            ) : null}
-          </div>
-          <div className={proficiencySectionHeaderDetailsClasses}>
-            {section.subhead ? (
-              <p className={proficiencySectionSubheadClasses}>{section.subhead}</p>
-            ) : null}
-          </div>
-        </div>
-      </div>
+      <ProficiencySectionHeader
+        section={section}
+        headingId={headingId}
+        singleChoiceBlock={singleChoiceBlock}
+        sectionValidationIssues={sectionValidationIssues}
+        onOpenChoiceSet={onOpenChoiceSet}
+      />
 
-      <div className={proficiencySectionChoiceBlocksClasses}>
-        {section.choiceBlocks.map((block) => (
-          <ProficiencyChoiceBlockRow
-            key={block.choiceSet.id}
-            block={block}
-            selectedRows={selectedRowsForBlock(section, block)}
-            validationIssues={validationIssuesForProficiencyChoiceSet(
-              validationIssues,
-              block.choiceSet.id,
-            )}
-            onOpenDrawer={() => onOpenChoiceSet(block.choiceSet.id)}
-            onRemoveChoice={onRemoveChoice}
-          />
-        ))}
-      </div>
+      {!isMultiBlockSection ? (
+        <div className={proficiencySectionDividerClasses} role="presentation" aria-hidden />
+      ) : null}
+
+      {isMultiBlockSection ? (
+        <div className={proficiencySectionChoiceBlocksClasses}>
+          {section.choiceBlocks.map((block) => (
+            <ProficiencyChoiceBlockRow
+              key={block.choiceSet.id}
+              block={block}
+              selectedRows={selectedRowsForBlock(section, block)}
+              validationIssues={validationIssuesForProficiencyChoiceSet(
+                validationIssues,
+                block.choiceSet.id,
+              )}
+              onOpenDrawer={() => onOpenChoiceSet(block.choiceSet.id)}
+              onRemoveChoice={onRemoveChoice}
+            />
+          ))}
+        </div>
+      ) : (
+        <ProficiencySectionFlatBody section={section} onRemoveChoice={onRemoveChoice} />
+      )}
     </section>
   )
 }

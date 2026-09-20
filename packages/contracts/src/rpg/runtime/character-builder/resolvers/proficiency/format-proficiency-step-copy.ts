@@ -1,3 +1,4 @@
+import { joinNaturalList } from '../../../../primitives/prose'
 import type { ChoiceSet } from '../../choice-set'
 import {
   getLanguageGrantAddLabel,
@@ -7,18 +8,22 @@ import {
   getLanguageProficiencySentenceForm,
 } from '../../../../vocab/language'
 import {
+  BUILDER_GRANT_EDIT_ACTION_LABEL,
   getProficiencyDomainCompactActionNoun,
   getProficiencyGrantAddLabel,
   getProficiencyGrantCompactAddLabel,
   getProficiencyGrantCompactManageLabel,
   getProficiencyGrantManageLabel,
 } from '../../../../vocab/proficiency'
+import type { ProficiencyHeadingSourceCoverage } from './resolve-proficiency-choice-presentation'
 import type { ProficiencyStepSectionKind } from './resolve-proficiency-step-model'
 
-export {
+import {
   formatProficiencyPoolDescription,
   PROFICIENCY_POOL_ENUMERATION_THRESHOLD,
 } from './resolve-proficiency-choice-presentation'
+
+export { formatProficiencyPoolDescription, PROFICIENCY_POOL_ENUMERATION_THRESHOLD }
 
 const CATEGORY_PLURAL_NOUNS: Record<ProficiencyStepSectionKind, string> = {
   savingThrows: 'saving throws',
@@ -80,7 +85,7 @@ function choiceBlockManageLabelFor(choiceSet: ChoiceSet, compact: boolean): stri
       ? getProficiencyGrantCompactManageLabel(domain)
       : getProficiencyGrantManageLabel(domain)
   }
-  return `Manage ${choiceSet.label.toLowerCase()}`
+  return BUILDER_GRANT_EDIT_ACTION_LABEL
 }
 
 function singleChoiceSetNoun(choiceSet: ChoiceSet, count: number): string {
@@ -92,6 +97,66 @@ function singleChoiceSetNoun(choiceSet: ChoiceSet, count: number): string {
   return getProficiencyDomainCompactActionNoun(domain, count)
 }
 
+export type ProficiencySingleSetSupportingCopy = {
+  instruction: string
+  identityLine?: string
+}
+
+type SingleSetSupportingCopyInput = {
+  choiceSet: ChoiceSet
+  heading: string
+  headingSourceCoverage: ProficiencyHeadingSourceCoverage
+  hasFixedGrantsInCategory: boolean
+}
+
+function additionalQualifier(hasFixedGrantsInCategory: boolean): string {
+  return hasFixedGrantsInCategory ? 'additional ' : ''
+}
+
+function formatConstrainedPoolInstruction(
+  choiceSet: ChoiceSet,
+  hasFixedGrantsInCategory: boolean,
+): string {
+  const noun = singleChoiceSetNoun(choiceSet, choiceSet.max)
+  const prefix = `Choose ${choiceSet.max} ${additionalQualifier(hasFixedGrantsInCategory)}${noun}`
+  const { options } = choiceSet
+
+  if (options.length <= PROFICIENCY_POOL_ENUMERATION_THRESHOLD) {
+    const labels = options.map((option) => option.label)
+    return `${prefix} from ${joinNaturalList(labels)}.`
+  }
+
+  return `${prefix} from ${options.length} available ${singleChoiceSetNoun(choiceSet, options.length)}.`
+}
+
+/** Single-set category supporting copy — folds identity and meaningful pool constraint. */
+export function formatProficiencySingleSetSupportingCopy({
+  choiceSet,
+  heading,
+  headingSourceCoverage,
+  hasFixedGrantsInCategory,
+}: SingleSetSupportingCopyInput): ProficiencySingleSetSupportingCopy {
+  const noun = singleChoiceSetNoun(choiceSet, choiceSet.max)
+  const additional = additionalQualifier(hasFixedGrantsInCategory)
+
+  if (headingSourceCoverage === 'owner') {
+    return {
+      instruction: `Choose ${choiceSet.max} ${additional}${noun} from ${heading}.`,
+    }
+  }
+
+  if (choiceSet.poolSource === 'any') {
+    return {
+      instruction: `Choose any ${choiceSet.max} ${additional}${noun} for ${heading}.`,
+    }
+  }
+
+  return {
+    identityLine: heading,
+    instruction: formatConstrainedPoolInstruction(choiceSet, hasFixedGrantsInCategory),
+  }
+}
+
 /** Category subhead driven by choice-set topology and fixed-grant presence. */
 export function formatProficiencyCategorySubhead(
   kind: ProficiencyStepSectionKind,
@@ -99,15 +164,6 @@ export function formatProficiencyCategorySubhead(
   hasFixedGrantsInCategory: boolean,
 ): string {
   if (choiceSets.length === 0) return ''
-
-  if (choiceSets.length === 1) {
-    const choiceSet = choiceSets[0]!
-    const noun = singleChoiceSetNoun(choiceSet, choiceSet.max)
-    if (hasFixedGrantsInCategory) {
-      return `Choose ${choiceSet.max} additional ${noun}.`
-    }
-    return `Choose ${choiceSet.max} ${noun}.`
-  }
 
   const plural = categoryPluralNoun(kind)
   if (hasFixedGrantsInCategory) {

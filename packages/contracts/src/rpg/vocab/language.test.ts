@@ -62,7 +62,7 @@ describe('language vocabulary', () => {
 
   it('returns builder grant labels', () => {
     expect(getLanguageGrantAddLabel()).toBe('Add language')
-    expect(getLanguageGrantManageLabel()).toBe('Manage language choices')
-    expect(getLanguageGrantCompactManageLabel()).toBe('Manage languages')
+    expect(getLanguageGrantManageLabel()).toBe('Edit')
+    expect(getLanguageGrantCompactManageLabel()).toBe('Edit')
   })
 })

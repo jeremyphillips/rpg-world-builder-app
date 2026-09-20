@@ -143,9 +143,11 @@ export function getProficiencyGrantAddLabel(domain: ProficiencyDomain): string {
   return `Add ${getProficiencyDomainSentenceForm(domain, 1)}`
 }
 
-/** Character builder manage action label (e.g. "Manage skill choices"). */
-export function getProficiencyGrantManageLabel(domain: ProficiencyDomain): string {
-  return `Manage ${getProficiencyDomainCompactActionNoun(domain, 1)} choices`
+export const BUILDER_GRANT_EDIT_ACTION_LABEL = 'Edit' as const
+
+/** Character builder edit action label when a grant choice set is full. */
+export function getProficiencyGrantManageLabel(_domain: ProficiencyDomain): string {
+  return BUILDER_GRANT_EDIT_ACTION_LABEL
 }
 
 /** Compact inline add action label (e.g. "Add skill"). */
@@ -153,9 +155,9 @@ export function getProficiencyGrantCompactAddLabel(domain: ProficiencyDomain): s
   return `Add ${getProficiencyDomainCompactActionNoun(domain, 1)}`
 }
 
-/** Compact inline manage action label (e.g. "Manage skills"). */
-export function getProficiencyGrantCompactManageLabel(domain: ProficiencyDomain): string {
-  return `Manage ${getProficiencyDomainCompactActionNoun(domain, 2)}`
+/** Compact inline edit action label when a grant choice set is full. */
+export function getProficiencyGrantCompactManageLabel(_domain: ProficiencyDomain): string {
+  return BUILDER_GRANT_EDIT_ACTION_LABEL
 }
 
 /** Authoring fallback when a pool category is unset: "choose N weapon proficiency". */

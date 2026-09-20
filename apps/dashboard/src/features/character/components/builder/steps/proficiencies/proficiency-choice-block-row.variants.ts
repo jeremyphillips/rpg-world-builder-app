@@ -1,3 +1,8 @@
+import {
+  proficiencySubsectionBodyMarginClasses,
+  proficiencySubsectionHintMarginClasses,
+} from './proficiency-section.variants'
+
 export const proficiencyChoiceBlockRowClasses = 'space-y-3'
 
 export const proficiencyChoiceBlockRowDividerClasses = 'border-t border-border'
@@ -16,8 +21,9 @@ export const proficiencyChoiceBlockRowLabelClasses = 'heading-style-group text-f
 
 export const proficiencyChoiceBlockRowSourceLineClasses = 'text-sm text-foreground'
 
-export const proficiencyChoiceBlockRowPoolDescriptionClasses = 'mb-3'
+export const proficiencyChoiceBlockRowPoolDescriptionClasses =
+  proficiencySubsectionHintMarginClasses
 
 export const proficiencyChoiceBlockRowOverSelectionClasses = 'text-sm text-destructive'
 
-export const proficiencyChoiceBlockRowSelectedListClasses = 'space-y-2'
+export const proficiencyChoiceBlockRowSelectedListClasses = `space-y-2 ${proficiencySubsectionBodyMarginClasses}`

@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import { indexCharacterBuildCatalog } from '../../context'
 import {
   formatCompactProficiencySourceLabel,
-  formatProficiencyChoiceSourceLabel,
   formatProficiencySourceLabel,
 } from './format-proficiency-source-label'
 import { proficiencyTestCatalog, rogueClass } from '../../proficiency-test-fixtures'
@@ -49,17 +48,5 @@ describe('formatCompactProficiencySourceLabel', () => {
         catalogIndex,
       ),
     ).toBe('Rogue')
-  })
-})
-
-describe('formatProficiencyChoiceSourceLabel', () => {
-  it('formats choice provenance labels', () => {
-    expect(formatProficiencyChoiceSourceLabel('Rogue Skills')).toBe('Chosen from Rogue Skills')
-  })
-
-  it('appends source line when headings collide', () => {
-    expect(
-      formatProficiencyChoiceSourceLabel('Skill Proficiency', 'Human species trait', true),
-    ).toBe('Chosen from Skill Proficiency (Human species trait)')
   })
 })

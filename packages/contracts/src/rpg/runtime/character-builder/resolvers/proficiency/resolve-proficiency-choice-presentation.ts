@@ -139,14 +139,6 @@ export function resolveProficiencyChoicePresentation(
     : { heading, headingSourceCoverage }
 }
 
-/** Source line for selected-row disambiguation when block headings collide. */
-export function resolveProficiencyChoiceDisambiguationSourceLine(
-  presentation: ProficiencyChoicePresentation,
-  provenance: ChoiceSetProvenance | undefined,
-): string | undefined {
-  return presentation.sourceLine ?? resolveSourceLine(provenance)
-}
-
 function proficiencyChoiceSourcePriority(choiceSet: ChoiceSet): number {
   const ownerKind = choiceSet.provenance?.ownerKind
   if (!ownerKind) return UNKNOWN_PROFICIENCY_CHOICE_SOURCE_PRIORITY

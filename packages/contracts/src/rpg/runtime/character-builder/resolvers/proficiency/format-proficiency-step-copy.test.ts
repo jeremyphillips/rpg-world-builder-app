@@ -7,6 +7,7 @@ import {
   formatProficiencyChoiceBlockCompactAddLabel,
   formatProficiencyPoolDescription,
   formatProficiencySectionEmptyMessage,
+  formatProficiencySingleSetSupportingCopy,
   resolveProficiencyAggregateCount,
 } from './format-proficiency-step-copy'
 
@@ -41,19 +42,75 @@ const traitSkillChoiceSet = {
   ],
 } as const satisfies ChoiceSet
 
+const skillfulChoiceSet = {
+  id: 'species:srd-cc-5.2.1:human:trait:skillful',
+  sourceType: 'species',
+  sourceId: 'srd-cc-5.2.1:human',
+  choiceType: 'skillProficiency',
+  label: 'Skillful',
+  min: 1,
+  max: 1,
+  required: true,
+  poolSource: 'any',
+  options: [],
+} as const satisfies ChoiceSet
+
+describe('formatProficiencySingleSetSupportingCopy', () => {
+  it('absorbs owner headings into from-copy for class skill packages', () => {
+    expect(
+      formatProficiencySingleSetSupportingCopy({
+        choiceSet: skillChoiceSet,
+        heading: 'Rogue Skills',
+        headingSourceCoverage: 'owner',
+        hasFixedGrantsInCategory: false,
+      }),
+    ).toEqual({
+      instruction: 'Choose 2 skills from Rogue Skills.',
+    })
+  })
+
+  it('uses additional owner copy when fixed grants exist in the category', () => {
+    expect(
+      formatProficiencySingleSetSupportingCopy({
+        choiceSet: skillChoiceSet,
+        heading: 'Rogue Skills',
+        headingSourceCoverage: 'owner',
+        hasFixedGrantsInCategory: true,
+      }),
+    ).toEqual({
+      instruction: 'Choose 2 additional skills from Rogue Skills.',
+    })
+  })
+
+  it('absorbs any-pool feature headings into for-copy', () => {
+    expect(
+      formatProficiencySingleSetSupportingCopy({
+        choiceSet: skillfulChoiceSet,
+        heading: 'Skillful',
+        headingSourceCoverage: 'feature',
+        hasFixedGrantsInCategory: false,
+      }),
+    ).toEqual({
+      instruction: 'Choose any 1 skill for Skillful.',
+    })
+  })
+
+  it('keeps constrained feature headings separate from enumerated pool copy', () => {
+    expect(
+      formatProficiencySingleSetSupportingCopy({
+        choiceSet: traitSkillChoiceSet,
+        heading: 'Keen Senses',
+        headingSourceCoverage: 'feature',
+        hasFixedGrantsInCategory: false,
+      }),
+    ).toEqual({
+      identityLine: 'Keen Senses',
+      instruction: 'Choose 1 skill from Perception and Investigation.',
+    })
+  })
+})
+
 describe('formatProficiencyCategorySubhead', () => {
-  it('uses count-only copy for a single choice set without fixed grants', () => {
-    expect(formatProficiencyCategorySubhead('skills', [skillChoiceSet], false)).toBe(
-      'Choose 2 skills.',
-    )
-  })
-
-  it('uses additional copy for a single choice set with fixed grants', () => {
-    expect(formatProficiencyCategorySubhead('languages', [skillChoiceSet], true)).toBe(
-      'Choose 2 additional skills.',
-    )
-  })
-
   it('uses generic copy for multiple choice sets without fixed grants', () => {
     expect(
       formatProficiencyCategorySubhead('skills', [skillChoiceSet, traitSkillChoiceSet], false),
@@ -144,7 +201,7 @@ describe('formatProficiencyChoiceBlockAddLabel', () => {
   })
 
   it('returns manage copy when the block is full', () => {
-    expect(formatProficiencyChoiceBlockAddLabel(skillChoiceSet, 2)).toBe('Manage skill choices')
+    expect(formatProficiencyChoiceBlockAddLabel(skillChoiceSet, 2)).toBe('Edit')
   })
 })
 
@@ -154,6 +211,6 @@ describe('formatProficiencyChoiceBlockCompactAddLabel', () => {
   })
 
   it('returns compact manage copy when the block is full', () => {
-    expect(formatProficiencyChoiceBlockCompactAddLabel(skillChoiceSet, 2)).toBe('Manage skills')
+    expect(formatProficiencyChoiceBlockCompactAddLabel(skillChoiceSet, 2)).toBe('Edit')
   })
 })
