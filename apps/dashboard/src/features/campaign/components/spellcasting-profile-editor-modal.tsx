@@ -53,6 +53,8 @@ function replaceLimitOptions() {
   ]
 }
 
+const PROFILE_SPELL_COLLECTION_KINDS = SPELL_COLLECTION_KINDS.filter((kind) => kind !== 'cantrips')
+
 export function SpellcastingProfileEditorModal({
   open,
   profile,
@@ -158,7 +160,8 @@ export function SpellcastingProfileEditorModal({
                   <div>
                     <h3 className="text-sm font-medium text-foreground">Choice progressions</h3>
                     <p className="text-sm text-muted-foreground">
-                      Capacity and gain curves that drive spell selection quotas.
+                      Prepared, repertoire, and spellbook curves. Cantrip capacity is authored on
+                      each class.
                     </p>
                   </div>
                   <Button
@@ -171,224 +174,227 @@ export function SpellcastingProfileEditorModal({
                   </Button>
                 </div>
 
-                {(values.choiceProgressions ?? []).map((progression, index) => {
-                  const choiceId = `${progression.id}-${index}`
-                  return (
-                    <div
-                      key={progression.id}
-                      className="space-y-3 rounded-lg border border-border bg-card p-3"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <TextField
-                          id={`${choiceId}-id`}
-                          label="Progression id"
-                          size="sm"
-                          {...form.register(`choiceProgressions.${index}.id`)}
-                        />
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleRemoveChoiceProgression(index)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
+                {(values.choiceProgressions ?? [])
+                  .map((progression, index) => ({ progression, index }))
+                  .filter(({ progression }) => progression.destination !== 'cantrips')
+                  .map(({ progression, index }) => {
+                    const choiceId = `${progression.id}-${index}`
+                    return (
+                      <div
+                        key={progression.id}
+                        className="space-y-3 rounded-lg border border-border bg-card p-3"
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <TextField
+                            id={`${choiceId}-id`}
+                            label="Progression id"
+                            size="sm"
+                            {...form.register(`choiceProgressions.${index}.id`)}
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleRemoveChoiceProgression(index)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
 
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <SelectField
-                          id={`${choiceId}-kind`}
-                          label="Kind"
-                          size="sm"
-                          options={toOptions(
-                            SPELL_CHOICE_PROGRESSION_KINDS,
-                            labelsFromGameTermEntries(SPELL_CHOICE_PROGRESSION_KIND_ENTRIES),
-                          )}
-                          value={progression.kind}
-                          onValueChange={(next) =>
-                            updateChoiceProgression(index, {
-                              ...progression,
-                              kind: next as SpellChoiceProgression['kind'],
-                            })
-                          }
-                        />
-                        <SelectField
-                          id={`${choiceId}-extension`}
-                          label="Extension"
-                          size="sm"
-                          options={toOptions(
-                            PROGRESSION_EXTENSIONS,
-                            labelsFromGameTermEntries(PROGRESSION_EXTENSION_ENTRIES),
-                          )}
-                          value={progression.extension}
-                          onValueChange={(next) =>
-                            updateChoiceProgression(index, {
-                              ...progression,
-                              extension: next as SpellChoiceProgression['extension'],
-                            })
-                          }
-                        />
-                        <SelectField
-                          id={`${choiceId}-source`}
-                          label="Source"
-                          size="sm"
-                          options={toOptions(
-                            SPELL_CHOICE_SOURCE_KINDS,
-                            labelsFromGameTermEntries(SPELL_CHOICE_SOURCE_KIND_ENTRIES),
-                          )}
-                          value={progression.source.kind}
-                          onValueChange={(next) => {
-                            if (next === 'collection') {
-                              updateChoiceProgression(index, {
-                                ...progression,
-                                source: { kind: 'collection', collection: 'spellbook' },
-                              })
-                              return
-                            }
-                            updateChoiceProgression(index, {
-                              ...progression,
-                              source: { kind: 'classList' },
-                            })
-                          }}
-                        />
-                        {progression.source.kind === 'collection' ? (
+                        <div className="grid gap-3 md:grid-cols-2">
                           <SelectField
-                            id={`${choiceId}-source-collection`}
-                            label="Source collection"
+                            id={`${choiceId}-kind`}
+                            label="Kind"
                             size="sm"
                             options={toOptions(
-                              SPELL_COLLECTION_KINDS,
-                              labelsFromGameTermEntries(SPELL_COLLECTION_KIND_ENTRIES),
+                              SPELL_CHOICE_PROGRESSION_KINDS,
+                              labelsFromGameTermEntries(SPELL_CHOICE_PROGRESSION_KIND_ENTRIES),
                             )}
-                            value={progression.source.collection}
+                            value={progression.kind}
                             onValueChange={(next) =>
                               updateChoiceProgression(index, {
                                 ...progression,
-                                source: {
-                                  kind: 'collection',
-                                  collection: next as SpellCollectionKind,
+                                kind: next as SpellChoiceProgression['kind'],
+                              })
+                            }
+                          />
+                          <SelectField
+                            id={`${choiceId}-extension`}
+                            label="Extension"
+                            size="sm"
+                            options={toOptions(
+                              PROGRESSION_EXTENSIONS,
+                              labelsFromGameTermEntries(PROGRESSION_EXTENSION_ENTRIES),
+                            )}
+                            value={progression.extension}
+                            onValueChange={(next) =>
+                              updateChoiceProgression(index, {
+                                ...progression,
+                                extension: next as SpellChoiceProgression['extension'],
+                              })
+                            }
+                          />
+                          <SelectField
+                            id={`${choiceId}-source`}
+                            label="Source"
+                            size="sm"
+                            options={toOptions(
+                              SPELL_CHOICE_SOURCE_KINDS,
+                              labelsFromGameTermEntries(SPELL_CHOICE_SOURCE_KIND_ENTRIES),
+                            )}
+                            value={progression.source.kind}
+                            onValueChange={(next) => {
+                              if (next === 'collection') {
+                                updateChoiceProgression(index, {
+                                  ...progression,
+                                  source: { kind: 'collection', collection: 'spellbook' },
+                                })
+                                return
+                              }
+                              updateChoiceProgression(index, {
+                                ...progression,
+                                source: { kind: 'classList' },
+                              })
+                            }}
+                          />
+                          {progression.source.kind === 'collection' ? (
+                            <SelectField
+                              id={`${choiceId}-source-collection`}
+                              label="Source collection"
+                              size="sm"
+                              options={toOptions(
+                                PROFILE_SPELL_COLLECTION_KINDS,
+                                labelsFromGameTermEntries(SPELL_COLLECTION_KIND_ENTRIES),
+                              )}
+                              value={progression.source.collection}
+                              onValueChange={(next) =>
+                                updateChoiceProgression(index, {
+                                  ...progression,
+                                  source: {
+                                    kind: 'collection',
+                                    collection: next as SpellCollectionKind,
+                                  },
+                                })
+                              }
+                            />
+                          ) : null}
+                          <SelectField
+                            id={`${choiceId}-destination`}
+                            label="Destination"
+                            size="sm"
+                            options={toOptions(
+                              PROFILE_SPELL_COLLECTION_KINDS,
+                              labelsFromGameTermEntries(SPELL_COLLECTION_KIND_ENTRIES),
+                            )}
+                            value={progression.destination}
+                            onValueChange={(next) =>
+                              updateChoiceProgression(index, {
+                                ...progression,
+                                destination: next as SpellChoiceProgression['destination'],
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <SelectField
+                            id={`${choiceId}-mutation-trigger`}
+                            label="Mutation trigger"
+                            size="sm"
+                            options={toOptions(
+                              SPELL_MUTATION_TRIGGERS,
+                              labelsFromGameTermEntries(SPELL_MUTATION_TRIGGER_ENTRIES),
+                            )}
+                            value={
+                              progression.mutation.kind === 'replace'
+                                ? progression.mutation.trigger
+                                : 'longRest'
+                            }
+                            onValueChange={(next) =>
+                              updateChoiceProgression(index, {
+                                ...progression,
+                                mutation: {
+                                  kind: 'replace',
+                                  trigger: next as 'levelUp' | 'longRest',
+                                  limit:
+                                    progression.mutation.kind === 'replace'
+                                      ? progression.mutation.limit
+                                      : 1,
                                 },
                               })
                             }
                           />
-                        ) : null}
-                        <SelectField
-                          id={`${choiceId}-destination`}
-                          label="Destination"
-                          size="sm"
-                          options={toOptions(
-                            SPELL_COLLECTION_KINDS,
-                            labelsFromGameTermEntries(SPELL_COLLECTION_KIND_ENTRIES),
-                          )}
-                          value={progression.destination}
-                          onValueChange={(next) =>
+                          <SelectField
+                            id={`${choiceId}-mutation-limit`}
+                            label="Mutation limit"
+                            size="sm"
+                            options={replaceLimitOptions()}
+                            value={
+                              progression.mutation.kind === 'replace'
+                                ? String(progression.mutation.limit)
+                                : '1'
+                            }
+                            onValueChange={(next) =>
+                              updateChoiceProgression(index, {
+                                ...progression,
+                                mutation: {
+                                  kind: 'replace',
+                                  trigger:
+                                    progression.mutation.kind === 'replace'
+                                      ? progression.mutation.trigger
+                                      : 'longRest',
+                                  limit: next === 'all' ? 'all' : Number(next),
+                                },
+                              })
+                            }
+                          />
+                        </div>
+
+                        <SwitchField
+                          id={`${choiceId}-column-enabled`}
+                          label="Show in combined table"
+                          checked={progression.presentation?.column?.enabled ?? false}
+                          onCheckedChange={(checked) =>
                             updateChoiceProgression(index, {
                               ...progression,
-                              destination: next as SpellChoiceProgression['destination'],
+                              presentation: {
+                                column: {
+                                  enabled: checked,
+                                  label: progression.presentation?.column?.label ?? 'Spells',
+                                },
+                              },
                             })
                           }
                         />
+                        <TextField
+                          id={`${choiceId}-column-label`}
+                          label="Table column label"
+                          size="sm"
+                          value={progression.presentation?.column?.label ?? ''}
+                          onChange={(event) =>
+                            updateChoiceProgression(index, {
+                              ...progression,
+                              presentation: {
+                                column: {
+                                  enabled: progression.presentation?.column?.enabled ?? false,
+                                  label: event.target.value,
+                                },
+                              },
+                            })
+                          }
+                        />
+
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setCurveModal({ choiceId: progression.id })}
+                        >
+                          Edit curve table
+                        </Button>
                       </div>
-
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <SelectField
-                          id={`${choiceId}-mutation-trigger`}
-                          label="Mutation trigger"
-                          size="sm"
-                          options={toOptions(
-                            SPELL_MUTATION_TRIGGERS,
-                            labelsFromGameTermEntries(SPELL_MUTATION_TRIGGER_ENTRIES),
-                          )}
-                          value={
-                            progression.mutation.kind === 'replace'
-                              ? progression.mutation.trigger
-                              : 'longRest'
-                          }
-                          onValueChange={(next) =>
-                            updateChoiceProgression(index, {
-                              ...progression,
-                              mutation: {
-                                kind: 'replace',
-                                trigger: next as 'levelUp' | 'longRest',
-                                limit:
-                                  progression.mutation.kind === 'replace'
-                                    ? progression.mutation.limit
-                                    : 1,
-                              },
-                            })
-                          }
-                        />
-                        <SelectField
-                          id={`${choiceId}-mutation-limit`}
-                          label="Mutation limit"
-                          size="sm"
-                          options={replaceLimitOptions()}
-                          value={
-                            progression.mutation.kind === 'replace'
-                              ? String(progression.mutation.limit)
-                              : '1'
-                          }
-                          onValueChange={(next) =>
-                            updateChoiceProgression(index, {
-                              ...progression,
-                              mutation: {
-                                kind: 'replace',
-                                trigger:
-                                  progression.mutation.kind === 'replace'
-                                    ? progression.mutation.trigger
-                                    : 'longRest',
-                                limit: next === 'all' ? 'all' : Number(next),
-                              },
-                            })
-                          }
-                        />
-                      </div>
-
-                      <SwitchField
-                        id={`${choiceId}-column-enabled`}
-                        label="Show in combined table"
-                        checked={progression.presentation?.column?.enabled ?? false}
-                        onCheckedChange={(checked) =>
-                          updateChoiceProgression(index, {
-                            ...progression,
-                            presentation: {
-                              column: {
-                                enabled: checked,
-                                label: progression.presentation?.column?.label ?? 'Spells',
-                              },
-                            },
-                          })
-                        }
-                      />
-                      <TextField
-                        id={`${choiceId}-column-label`}
-                        label="Table column label"
-                        size="sm"
-                        value={progression.presentation?.column?.label ?? ''}
-                        onChange={(event) =>
-                          updateChoiceProgression(index, {
-                            ...progression,
-                            presentation: {
-                              column: {
-                                enabled: progression.presentation?.column?.enabled ?? false,
-                                label: event.target.value,
-                              },
-                            },
-                          })
-                        }
-                      />
-
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setCurveModal({ choiceId: progression.id })}
-                      >
-                        Edit curve table
-                      </Button>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
               </section>
             </div>
           </Modal.Body>
@@ -397,7 +403,18 @@ export function SpellcastingProfileEditorModal({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="button" onClick={() => onSave(form.getValues())}>
+              <Button
+                type="button"
+                onClick={() => {
+                  const next = form.getValues()
+                  onSave({
+                    ...next,
+                    choiceProgressions: next.choiceProgressions.filter(
+                      (progression) => progression.destination !== 'cantrips',
+                    ),
+                  })
+                }}
+              >
                 Save profile
               </Button>
             </Modal.FooterActions>

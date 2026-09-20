@@ -43,16 +43,6 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
       label: 'Fixture wizard',
       choiceProgressions: [
         {
-          id: 'cantrips',
-          kind: 'capacity',
-          extension: 'carryForward',
-          source: { kind: 'classList' },
-          destination: 'cantrips',
-          mutation: { kind: 'replace', trigger: 'longRest', limit: 1 },
-          curve: { rows: [{ level: 1, count: 3 }] },
-          presentation: { column: { enabled: true, label: 'Cantrips' } },
-        },
-        {
           id: 'spellbook-gain',
           kind: 'gain',
           extension: 'zero',
@@ -94,16 +84,6 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
       id: 'fixture:warlock',
       label: 'Fixture warlock',
       choiceProgressions: [
-        {
-          id: 'cantrips',
-          kind: 'capacity',
-          extension: 'carryForward',
-          source: { kind: 'classList' },
-          destination: 'cantrips',
-          mutation: { kind: 'replace', trigger: 'longRest', limit: 1 },
-          curve: { rows: [{ level: 1, count: 2 }] },
-          presentation: { column: { enabled: true, label: 'Cantrips' } },
-        },
         {
           id: 'repertoire',
           kind: 'capacity',

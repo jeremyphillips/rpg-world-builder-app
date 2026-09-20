@@ -120,16 +120,6 @@ export function findChoiceProgressionByDestination(
   )
 }
 
-/** Builder-facing cantrip quota from profile (0 when no cantrip capacity progression). */
-export function resolveCantripsKnownFromProfile(
-  profile: SpellcastingProfile,
-  level: number,
-): number {
-  const cantripProgression = findChoiceProgressionByDestination(profile, 'cantrips', 'capacity')
-  if (!cantripProgression) return 0
-  return resolveChoiceProgressionQuotaAtLevel(cantripProgression, level)
-}
-
 /**
  * Builder-facing spell quota — prepared capacity first, else repertoire capacity.
  * Matches prior behavior where a single spells choice set covered loadout/repertoire.
@@ -190,6 +180,7 @@ export function resolveDisplayChoiceColumns(
   profile: SpellcastingProfile,
 ): SpellChoiceProgression[] {
   return profile.choiceProgressions.filter(
-    (progression) => progression.presentation?.column?.enabled,
+    (progression) =>
+      progression.destination !== 'cantrips' && progression.presentation?.column?.enabled,
   )
 }

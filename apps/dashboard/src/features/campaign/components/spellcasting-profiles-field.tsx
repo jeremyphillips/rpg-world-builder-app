@@ -119,7 +119,7 @@ export function SpellcastingProfilesField() {
         <ArrayLikeSectionHeader
           id="spellcasting-profiles-heading"
           label="Spell selection profiles"
-          hint="Cantrips, known/prepared collections, spellbook gains, and selection behavior referenced by classes."
+          hint="Known/prepared collections, spellbook gains, and remaining selection behavior referenced by classes. Cantrip capacity is authored on each class."
           size={size}
           action={
             <Button

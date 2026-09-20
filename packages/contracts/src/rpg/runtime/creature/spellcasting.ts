@@ -1,7 +1,7 @@
-import type { Spellcasting } from '../../content/classes/spellcasting'
+import { isSpellcastingActiveAtLevel, type Spellcasting } from '../../content/classes/spellcasting'
 import type { ResolvedSpellcastingProgressionConfig } from '../../campaign/rules/spellcasting-progression'
+import { resolveProgressionValueAtLevel } from '../../campaign/rules/spellcasting-progression/lookup'
 import {
-  resolveCantripsKnownFromProfile,
   resolveMaxSelectableSpellLevelFromProfile,
   resolveSpellcastingProfileForSpellcasting,
   resolveSpellsAvailableFromProfile,
@@ -18,14 +18,26 @@ export type CreatureSpellcastingFacts = {
   maxSelectableSpellLevel: number
 }
 
-export function cantripsKnownAtLevel(
-  spellcasting: Spellcasting,
-  classLevel: number,
-  config: ResolvedSpellcastingProgressionConfig,
-): number {
-  const bundle = resolveSpellcastingProfileForSpellcasting(spellcasting, config)
-  if (!bundle) return 0
-  return resolveCantripsKnownFromProfile(bundle.profile, classLevel)
+/** Builder-facing cantrip quota from the class spellcasting record (0 when absent or inactive). */
+export function resolveClassCantripCount(input: {
+  spellcasting: Spellcasting | undefined
+  classLevel: number
+}): number {
+  const { spellcasting, classLevel } = input
+  if (!spellcasting?.cantrips || !isSpellcastingActiveAtLevel(spellcasting, classLevel)) {
+    return 0
+  }
+
+  return resolveProgressionValueAtLevel({
+    kind: 'capacity',
+    rows: spellcasting.cantrips.curve.rows,
+    level: classLevel,
+    extension: spellcasting.cantrips.extension,
+  }).count
+}
+
+export function cantripsKnownAtLevel(spellcasting: Spellcasting, classLevel: number): number {
+  return resolveClassCantripCount({ spellcasting, classLevel })
 }
 
 export function spellsAvailableAtLevel(
@@ -56,7 +68,7 @@ export function resolveSpellcastingFactsAtLevel(
   config: ResolvedSpellcastingProgressionConfig,
 ): CreatureSpellcastingFacts {
   return {
-    cantripsKnown: cantripsKnownAtLevel(spellcasting, classLevel, config),
+    cantripsKnown: cantripsKnownAtLevel(spellcasting, classLevel),
     spellsAvailable: spellsAvailableAtLevel(spellcasting, classLevel, config),
     maxSelectableSpellLevel: maxSelectableSpellLevel(spellcasting, classLevel, config),
   }

@@ -60,6 +60,7 @@ it('draft: accepts incomplete publish fields', () => {
       name: '',
       hitDie: 8,
       hasSpellcasting: false,
+      grantsCantrips: false,
       weaponProficiencyMode: 'categories',
       proficiencies: {
         savingThrows: [],

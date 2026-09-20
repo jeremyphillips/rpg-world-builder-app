@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
 import { warlockClass, wizardClass } from '../character-builder/spellcasting-test-fixtures'
+// spellcastingProgressionTestConfig still used by maxSelectableSpellLevel / spellsAvailableAtLevel
 import {
   cantripsKnownAtLevel,
   maxSelectableSpellLevel,
@@ -11,9 +12,7 @@ import {
 
 describe('cantripsKnownAtLevel', () => {
   it('reads the best known count at or below the class level', () => {
-    expect(
-      cantripsKnownAtLevel(wizardClass.spellcasting!, 1, spellcastingProgressionTestConfig),
-    ).toBe(3)
+    expect(cantripsKnownAtLevel(wizardClass.spellcasting!, 1)).toBe(3)
   })
 })
 

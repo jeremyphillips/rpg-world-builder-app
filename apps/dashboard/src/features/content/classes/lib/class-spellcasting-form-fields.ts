@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { createElement } from 'react'
 import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
@@ -7,10 +8,13 @@ import {
   SPELLCASTING_GEAR_KIND_ENTRIES,
   abilitySchema,
   campaignLevelSchema,
+  classCapacityProgressionSchema,
   spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem, type DependentConfig } from '@rpg/ui/form'
+
+import { ClassCantripProgressionField } from '../components/class-cantrip-progression-field'
 
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -53,6 +57,7 @@ export function createSpellcastingFormSchema(maxLevel: number) {
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
     focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
+    cantrips: classCapacityProgressionSchema.optional(),
   })
 }
 
@@ -67,6 +72,7 @@ export function createSpellcastingDraftFormSchema(maxLevel: number) {
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
     focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
+    cantrips: classCapacityProgressionSchema.optional(),
   })
 }
 
@@ -115,7 +121,26 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
           multiple: false,
           required: true,
           visibility: visibleWhenSpellcasting(),
-          hint: 'Cantrips, prepared/repertoire capacity, spellbook gains, and selection behavior.',
+          hint: 'Prepared/repertoire capacity, spellbook gains, and remaining selection behavior.',
+        },
+        {
+          kind: 'dependent',
+          visibility: visibleWhenSpellcasting(),
+          controller: {
+            type: 'switch',
+            name: 'grantsCantrips',
+            label: 'Grants cantrips',
+            hint: 'When enabled, this class selects cantrips from its spell list using the breakpoint table below.',
+          },
+          dependents: {
+            fields: [
+              {
+                kind: 'slot',
+                name: 'spellcasting.cantripsEditor',
+                render: () => createElement(ClassCantripProgressionField, { formCtx: ctx }),
+              },
+            ],
+          },
         },
         {
           type: 'select',

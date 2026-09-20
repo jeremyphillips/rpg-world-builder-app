@@ -69,6 +69,7 @@ export function createClassFormSchema(
       primaryAbilities: z.array(abilitySchema).min(1).max(2),
       hitDie: z.coerce.number().pipe(hitDieSchema),
       hasSpellcasting: z.boolean(),
+      grantsCantrips: z.boolean(),
       weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
       spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
       proficiencies: proficienciesFormSchema,
@@ -86,6 +87,17 @@ export function createClassFormSchema(
     })
     .superRefine((values, ctx) => {
       refineClassWeaponProficiencies(values, ctx)
+      if (
+        values.hasSpellcasting &&
+        values.grantsCantrips &&
+        (values.spellcasting?.cantrips?.curve.rows.length ?? 0) === 0
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Cantrip progression must include at least one level breakpoint.',
+          path: ['spellcasting', 'cantrips', 'curve', 'rows'],
+        })
+      }
     })
 }
 
@@ -100,6 +112,7 @@ export function createClassDraftFormSchema(
     primaryAbilities: z.array(abilitySchema).max(2).default([]),
     hitDie: draftOptionalSelect(z.coerce.number().pipe(hitDieSchema)),
     hasSpellcasting: z.boolean(),
+    grantsCantrips: z.boolean(),
     weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
     spellcasting: createSpellcastingDraftFormSchema(maxLevel).optional(),
     proficiencies: proficienciesDraftFormSchema,
@@ -137,7 +150,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'spellcasting',
       label: 'Spellcasting',
       fields: spellcastingFields(ctx),
-      errorPaths: ['hasSpellcasting', 'spellcasting'],
+      errorPaths: ['hasSpellcasting', 'grantsCantrips', 'spellcasting', 'spellcasting.cantrips'],
     },
     {
       id: 'features',

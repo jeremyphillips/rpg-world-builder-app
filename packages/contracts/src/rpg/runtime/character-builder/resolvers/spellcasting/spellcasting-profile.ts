@@ -1,9 +1,12 @@
 import type { CharacterClass } from '../../../../content/classes/class'
-import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting'
+import {
+  isSpellcastingActiveAtLevel,
+  type Spellcasting,
+} from '../../../../content/classes/spellcasting'
+import { resolveClassCantripCount } from '../../../creature/spellcasting'
 import type { Ability } from '../../../../vocab/ability'
 import {
   findChoiceProgressionByDestination,
-  resolveCantripsKnownFromProfile,
   resolveMaxSelectableSpellLevelFromProfile,
   resolveSpellcastingProfileForClass,
   resolveSpellsAvailableFromProfile,
@@ -22,6 +25,7 @@ export type BuilderSpellcastingProfile = {
   className: string
   ability: Ability
   classLevel: number
+  spellcasting: Spellcasting
   profileBundle: ResolvedSpellcastingProfileBundle
   /** True when the profile includes a prepared loadout capacity progression. */
   usesPreparedLoadout: boolean
@@ -43,7 +47,7 @@ function buildProfile(
     context.spellcastingProgression,
   )!
 
-  const cantripsKnown = resolveCantripsKnownFromProfile(profileBundle.profile, classLevel)
+  const cantripsKnown = resolveClassCantripCount({ spellcasting, classLevel })
   const spellsAvailable = resolveSpellsAvailableFromProfile(profileBundle.profile, classLevel)
   const usesPreparedLoadout = Boolean(
     findChoiceProgressionByDestination(profileBundle.profile, 'prepared', 'capacity'),
@@ -54,6 +58,7 @@ function buildProfile(
     className: characterClass.name,
     ability: spellcasting.ability,
     classLevel,
+    spellcasting,
     profileBundle,
     usesPreparedLoadout,
     cantripsKnown,

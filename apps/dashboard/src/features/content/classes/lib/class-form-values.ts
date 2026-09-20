@@ -140,7 +140,11 @@ function classWirePayloadBase(
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
-    spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
+    spellcasting: spellcastingFromFormValues(
+      values.hasSpellcasting,
+      values.grantsCantrips,
+      values.spellcasting,
+    ),
     features: parts.features,
     ...(parts.characterCreation ? { characterCreation: parts.characterCreation } : {}),
   }
@@ -225,6 +229,7 @@ export function spellcastingToFormValues(
     requiredGear: spellcasting.requiredGear,
     focusKinds: spellcasting.focusKinds,
     recommendedGear: spellcasting.recommendedGear,
+    cantrips: spellcasting.cantrips,
   }
 }
 
@@ -240,19 +245,13 @@ function hasCompleteSpellcastingCore(
   )
 }
 
-function spellcastingFromFormValues(
-  hasSpellcasting: boolean,
-  spellcasting: ClassFormValues['spellcasting'],
-): Spellcasting | undefined {
-  if (!hasCompleteSpellcastingCore(hasSpellcasting, spellcasting) || !spellcasting) {
-    return undefined
-  }
-
-  const result: Spellcasting = {
-    level: spellcasting.level ?? 1,
-    slotProgressionId: spellcasting.slotProgressionId!,
-    profileId: spellcasting.profileId!,
-    ability: spellcasting.ability!,
+function applyOptionalSpellcastingFields(
+  result: Spellcasting,
+  spellcasting: NonNullable<ClassFormValues['spellcasting']>,
+  grantsCantrips: boolean,
+): void {
+  if (grantsCantrips && spellcasting.cantrips) {
+    result.cantrips = spellcasting.cantrips
   }
   if (spellcasting.description?.trim()) {
     result.description = spellcasting.description.trim()
@@ -266,11 +265,30 @@ function spellcastingFromFormValues(
   if (spellcasting.recommendedGear?.length) {
     result.recommendedGear = spellcasting.recommendedGear
   }
+}
+
+function spellcastingFromFormValues(
+  hasSpellcasting: boolean,
+  grantsCantrips: boolean,
+  spellcasting: ClassFormValues['spellcasting'],
+): Spellcasting | undefined {
+  if (!hasCompleteSpellcastingCore(hasSpellcasting, spellcasting) || !spellcasting) {
+    return undefined
+  }
+
+  const result: Spellcasting = {
+    level: spellcasting.level ?? 1,
+    slotProgressionId: spellcasting.slotProgressionId!,
+    profileId: spellcasting.profileId!,
+    ability: spellcasting.ability!,
+  }
+  applyOptionalSpellcastingFields(result, spellcasting, grantsCantrips)
   return result
 }
 
 export const classCreateDefaultValues: Partial<ClassFormValues> = {
   hasSpellcasting: false,
+  grantsCantrips: false,
   weaponProficiencyMode: 'categories',
   proficiencies: {
     savingThrows: [],

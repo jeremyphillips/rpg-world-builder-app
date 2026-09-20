@@ -84,6 +84,7 @@ const classFormDef: ContentFormDef<
     primaryAbilities: entity.primaryAbilities ?? [],
     hitDie: (entity.hitDie ?? '') as ClassFormValues['hitDie'],
     hasSpellcasting: entity.spellcasting !== undefined,
+    grantsCantrips: entity.spellcasting?.cantrips !== undefined,
     weaponProficiencyMode:
       entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0
         ? 'individual'

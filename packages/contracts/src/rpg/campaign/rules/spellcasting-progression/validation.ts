@@ -156,6 +156,14 @@ export function refineSpellChoiceProgressions(
   pathPrefix: (string | number)[] = [],
 ): void {
   progressions.forEach((progression, index) => {
+    if (progression.destination === 'cantrips') {
+      ctx.addIssue({
+        code: 'custom',
+        message: spellcastingProgressionValidationMessages.cantripDestinationNotAllowedOnProfile(),
+        path: [...pathPrefix, index, 'destination'],
+      })
+    }
+
     if (progression.kind === 'gain' && !isPersistentSpellCollectionKind(progression.destination)) {
       ctx.addIssue({
         code: 'custom',

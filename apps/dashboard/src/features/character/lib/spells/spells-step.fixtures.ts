@@ -60,6 +60,10 @@ export const spellsStepWizardClass = makeClassStored({
     slotProgressionId: 'full-caster',
     profileId: 'srd:wizard',
     ability: 'int',
+    cantrips: {
+      curve: { rows: [{ level: 1, count: 3 }] },
+      extension: 'carryForward',
+    },
   },
 })
 

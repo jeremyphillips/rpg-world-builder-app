@@ -1,4 +1,5 @@
 import type { Spell } from '../../../../content/spell'
+import { CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID } from '../../../../content/classes/spellcasting'
 import type { SpellChoiceProgression } from '../../../../campaign/rules/spellcasting-progression'
 import {
   resolveChoiceProgressionQuotaAtLevel,
@@ -97,7 +98,32 @@ function choiceTypeForProgression(progression: SpellChoiceProgression): ChoiceSe
   return progression.destination === 'cantrips' ? 'cantrip' : 'spell'
 }
 
-/** Builds one ChoiceSet per applicable spellcasting choice progression on the profile. */
+function resolveClassCantripChoiceSet(
+  profile: BuilderSpellcastingProfile,
+  characterClassSlug: string,
+  catalogIndex: CharacterBuildCatalogIndex,
+): ChoiceSet | null {
+  const quota = profile.cantripsKnown
+  if (quota <= 0) return null
+
+  return {
+    id: spellcastingChoiceSetId(profile.classId, CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID),
+    sourceType: 'spellcasting',
+    sourceId: profile.classId,
+    choiceType: 'cantrip',
+    label: 'Cantrips',
+    min: quota,
+    max: quota,
+    options: spellOptionsFromClassList(
+      catalogIndex,
+      characterClassSlug,
+      (spell) => spell.level === 0,
+    ),
+    required: true,
+  }
+}
+
+/** Builds class cantrip capacity plus one ChoiceSet per applicable profile progression. */
 export function resolveSpellcastingChoiceSets(
   profile: BuilderSpellcastingProfile,
   characterClassSlug: string,
@@ -106,7 +132,14 @@ export function resolveSpellcastingChoiceSets(
 ): ChoiceSet[] {
   const choiceSets: ChoiceSet[] = []
 
+  const cantripChoiceSet = resolveClassCantripChoiceSet(profile, characterClassSlug, catalogIndex)
+  if (cantripChoiceSet) {
+    choiceSets.push(cantripChoiceSet)
+  }
+
   for (const progression of profile.profileBundle.profile.choiceProgressions) {
+    if (progression.destination === 'cantrips') continue
+
     const quota = resolveChoiceProgressionQuotaAtLevel(progression, profile.classLevel)
     if (quota <= 0) continue
 

@@ -130,6 +130,10 @@ describe('builder-preview-projection.lib', () => {
         slotProgressionId: 'full-caster',
         profileId: 'fixture:wizard',
         ability: 'int',
+        cantrips: {
+          curve: { rows: [{ level: 1, count: 3 }] },
+          extension: 'carryForward',
+        },
       },
     })
     const inactiveDraft = createEmptyCharacterBuilderDraft()

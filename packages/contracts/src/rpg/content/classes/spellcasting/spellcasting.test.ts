@@ -3,6 +3,26 @@ import { describe, expect, it } from 'vitest'
 import { isSpellcastingActiveAtLevel, spellcastingSchema } from './spellcasting'
 
 describe('spellcastingSchema', () => {
+  it('parses optional class-owned cantrip progression', () => {
+    const parsed = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
+      profileId: 'srd:wizard',
+      ability: 'int',
+      cantrips: {
+        curve: {
+          rows: [
+            { level: 1, count: 3 },
+            { level: 4, count: 4 },
+          ],
+        },
+      },
+    })
+    expect(parsed.cantrips?.curve.rows).toEqual([
+      { level: 1, count: 3 },
+      { level: 4, count: 4 },
+    ])
+  })
+
   it('parses slotProgressionId, profileId, and ability', () => {
     const parsed = spellcastingSchema.parse({
       slotProgressionId: 'full-caster',

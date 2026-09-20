@@ -4,42 +4,6 @@
     "label": "Bard spellcasting",
     "choiceProgressions": [
       {
-        "id": "bard-cantrips",
-        "kind": "capacity",
-        "extension": "carryForward",
-        "source": {
-          "kind": "classList"
-        },
-        "destination": "cantrips",
-        "mutation": {
-          "kind": "replace",
-          "trigger": "longRest",
-          "limit": 1
-        },
-        "curve": {
-          "rows": [
-            {
-              "level": 1,
-              "count": 2
-            },
-            {
-              "level": 4,
-              "count": 3
-            },
-            {
-              "level": 10,
-              "count": 4
-            }
-          ]
-        },
-        "presentation": {
-          "column": {
-            "enabled": true,
-            "label": "Cantrips"
-          }
-        }
-      },
-      {
         "id": "bard-repertoire",
         "kind": "capacity",
         "extension": "carryForward",
@@ -150,42 +114,6 @@
     "label": "Cleric spellcasting",
     "choiceProgressions": [
       {
-        "id": "cleric-cantrips",
-        "kind": "capacity",
-        "extension": "carryForward",
-        "source": {
-          "kind": "classList"
-        },
-        "destination": "cantrips",
-        "mutation": {
-          "kind": "replace",
-          "trigger": "longRest",
-          "limit": 1
-        },
-        "curve": {
-          "rows": [
-            {
-              "level": 1,
-              "count": 3
-            },
-            {
-              "level": 4,
-              "count": 4
-            },
-            {
-              "level": 10,
-              "count": 5
-            }
-          ]
-        },
-        "presentation": {
-          "column": {
-            "enabled": true,
-            "label": "Cantrips"
-          }
-        }
-      },
-      {
         "id": "cleric-prepared",
         "kind": "capacity",
         "extension": "carryForward",
@@ -295,42 +223,6 @@
     "id": "srd:druid",
     "label": "Druid spellcasting",
     "choiceProgressions": [
-      {
-        "id": "druid-cantrips",
-        "kind": "capacity",
-        "extension": "carryForward",
-        "source": {
-          "kind": "classList"
-        },
-        "destination": "cantrips",
-        "mutation": {
-          "kind": "replace",
-          "trigger": "longRest",
-          "limit": 1
-        },
-        "curve": {
-          "rows": [
-            {
-              "level": 1,
-              "count": 2
-            },
-            {
-              "level": 4,
-              "count": 3
-            },
-            {
-              "level": 10,
-              "count": 4
-            }
-          ]
-        },
-        "presentation": {
-          "column": {
-            "enabled": true,
-            "label": "Cantrips"
-          }
-        }
-      },
       {
         "id": "druid-prepared",
         "kind": "capacity",
@@ -598,42 +490,6 @@
     "label": "Sorcerer spellcasting",
     "choiceProgressions": [
       {
-        "id": "sorcerer-cantrips",
-        "kind": "capacity",
-        "extension": "carryForward",
-        "source": {
-          "kind": "classList"
-        },
-        "destination": "cantrips",
-        "mutation": {
-          "kind": "replace",
-          "trigger": "longRest",
-          "limit": 1
-        },
-        "curve": {
-          "rows": [
-            {
-              "level": 1,
-              "count": 4
-            },
-            {
-              "level": 4,
-              "count": 5
-            },
-            {
-              "level": 10,
-              "count": 6
-            }
-          ]
-        },
-        "presentation": {
-          "column": {
-            "enabled": true,
-            "label": "Cantrips"
-          }
-        }
-      },
-      {
         "id": "sorcerer-repertoire",
         "kind": "capacity",
         "extension": "carryForward",
@@ -744,42 +600,6 @@
     "label": "Warlock spellcasting",
     "choiceProgressions": [
       {
-        "id": "warlock-cantrips",
-        "kind": "capacity",
-        "extension": "carryForward",
-        "source": {
-          "kind": "classList"
-        },
-        "destination": "cantrips",
-        "mutation": {
-          "kind": "replace",
-          "trigger": "longRest",
-          "limit": 1
-        },
-        "curve": {
-          "rows": [
-            {
-              "level": 1,
-              "count": 2
-            },
-            {
-              "level": 4,
-              "count": 3
-            },
-            {
-              "level": 10,
-              "count": 4
-            }
-          ]
-        },
-        "presentation": {
-          "column": {
-            "enabled": true,
-            "label": "Cantrips"
-          }
-        }
-      },
-      {
         "id": "warlock-repertoire",
         "kind": "capacity",
         "extension": "carryForward",
@@ -865,42 +685,6 @@
     "id": "srd:wizard",
     "label": "Wizard spellcasting",
     "choiceProgressions": [
-      {
-        "id": "wizard-cantrips",
-        "kind": "capacity",
-        "extension": "carryForward",
-        "source": {
-          "kind": "classList"
-        },
-        "destination": "cantrips",
-        "mutation": {
-          "kind": "replace",
-          "trigger": "longRest",
-          "limit": 1
-        },
-        "curve": {
-          "rows": [
-            {
-              "level": 1,
-              "count": 3
-            },
-            {
-              "level": 4,
-              "count": 4
-            },
-            {
-              "level": 10,
-              "count": 5
-            }
-          ]
-        },
-        "presentation": {
-          "column": {
-            "enabled": true,
-            "label": "Cantrips"
-          }
-        }
-      },
       {
         "id": "wizard-spellbook-gain",
         "kind": "gain",

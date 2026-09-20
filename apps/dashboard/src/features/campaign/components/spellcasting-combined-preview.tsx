@@ -19,7 +19,7 @@ export function SpellcastingCombinedPreview({
   effectiveMaxLevel,
   standardMaxLevel,
   extendedTierName,
-  caption = 'Combined progression preview',
+  caption = 'Spell selection profile + slot preview',
 }: SpellcastingCombinedPreviewProps) {
   const presentation = buildCombinedSpellcastingPreviewPresentation({
     profile,

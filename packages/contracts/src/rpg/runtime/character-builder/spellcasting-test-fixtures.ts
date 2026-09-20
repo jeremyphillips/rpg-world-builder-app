@@ -57,6 +57,10 @@ export const wizardStored: ClassStored = {
     slotProgressionId: 'full-caster',
     profileId: 'fixture:wizard',
     ability: 'int',
+    cantrips: {
+      curve: { rows: [{ level: 1, count: 3 }] },
+      extension: 'carryForward',
+    },
   },
 }
 
@@ -109,6 +113,10 @@ export const warlockStored: ClassStored = {
     slotProgressionId: 'pact-magic',
     profileId: 'fixture:warlock',
     ability: 'cha',
+    cantrips: {
+      curve: { rows: [{ level: 1, count: 2 }] },
+      extension: 'carryForward',
+    },
   },
 }
 

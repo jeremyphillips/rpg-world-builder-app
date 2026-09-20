@@ -456,7 +456,8 @@ function progressionGroup(): FormItem {
         {
           kind: 'group',
           legend: 'Spellcasting',
-          description: 'Spell slot tables and spellcasting profiles for class progression.',
+          description:
+            'Spell slot tables and spell selection profiles. Cantrip capacity is authored on each class.',
           fields: [
             {
               kind: 'slot',

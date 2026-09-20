@@ -5,6 +5,7 @@ import {
   type CharacterSpellEntry,
 } from '../../character/sheet/spells'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
+import { CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID } from '../../../content/classes/spellcasting'
 import type { SpellChoiceProgression } from '../../../campaign/rules/spellcasting-progression'
 import type { SpellMutationPolicy } from '../../../vocab/spell/spell-mutation-policy'
 import type { ChoiceSet } from '../choice-set'
@@ -39,6 +40,16 @@ function membershipForProgression(
   return membership
 }
 
+function membershipForChoiceSet(
+  progressionId: string,
+  progression: SpellChoiceProgression | undefined,
+): CharacterSpellCollectionMembership | undefined {
+  if (progressionId === CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID) {
+    return { kind: 'cantrips' }
+  }
+  return progression ? membershipForProgression(progression) : undefined
+}
+
 function mergeSources(
   existing: CharacterSelectionSource[] | undefined,
   incoming: CharacterSelectionSource[],
@@ -54,6 +65,32 @@ function mergeSources(
     if (!duplicate) merged.push(source)
   }
   return merged
+}
+
+function mergeSelectionIntoEntries(
+  entries: Map<string, CharacterSpellEntry>,
+  spellIds: readonly string[],
+  sources: CharacterSelectionSource[],
+  membership: CharacterSpellCollectionMembership,
+): void {
+  for (const spellId of spellIds) {
+    const existing = entries.get(spellId)
+    if (!existing) {
+      entries.set(spellId, {
+        spellId,
+        access: {},
+        sources,
+        collections: [membership],
+      })
+      continue
+    }
+
+    entries.set(spellId, {
+      ...existing,
+      sources: mergeSources(existing.sources, sources),
+      collections: mergeCharacterSpellCollections(existing.collections, [membership]),
+    })
+  }
 }
 
 /** Assembles finalized spell rows from spellcasting ChoiceSet selections. */
@@ -82,30 +119,18 @@ export function assembleClassSpellcasting(
     if (!progressionId) continue
 
     const progression = progressionsById.get(progressionId)
-    if (!progression) continue
+    const membership = membershipForChoiceSet(progressionId, progression)
+    if (!membership) continue
 
-    const selections = draft.choiceSelections[choiceSet.id] ?? []
-    const membership = membershipForProgression(progression)
-    const sources = classSpellcastingSource(profile.classId, progression.id)
-
-    for (const spellId of selections) {
-      const existing = entries.get(spellId)
-      if (!existing) {
-        entries.set(spellId, {
-          spellId,
-          access: {},
-          sources,
-          collections: [membership],
-        })
-        continue
-      }
-
-      entries.set(spellId, {
-        ...existing,
-        sources: mergeSources(existing.sources, sources),
-        collections: mergeCharacterSpellCollections(existing.collections, [membership]),
-      })
-    }
+    mergeSelectionIntoEntries(
+      entries,
+      draft.choiceSelections[choiceSet.id] ?? [],
+      classSpellcastingSource(
+        profile.classId,
+        progression?.id ?? CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID,
+      ),
+      membership,
+    )
   }
 
   return Array.from(entries.values())

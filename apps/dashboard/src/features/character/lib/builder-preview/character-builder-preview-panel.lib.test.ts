@@ -20,7 +20,7 @@ describe('character-builder-preview-panel.lib', () => {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: spellsStepWizardClass.id, level: 1 as const },
       choiceSelections: {
-        [`spellcasting:${spellsStepWizardClass.id}:wizard-cantrips`]: [
+        [`spellcasting:${spellsStepWizardClass.id}:cantrips`]: [
           spellsStepWizardCantrips[0]!.id,
           spellsStepWizardCantrips[1]!.id,
         ],

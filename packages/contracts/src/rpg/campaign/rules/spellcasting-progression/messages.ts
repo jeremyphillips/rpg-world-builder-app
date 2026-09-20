@@ -46,4 +46,9 @@ export const spellcastingProgressionValidationMessages = {
     ({ destination }) =>
       `Gain progressions require a persistent destination (got "${destination}").`,
   ),
+  cantripDestinationNotAllowedOnProfile: defineMessage(
+    'validation.spellcastingProgression.cantripDestinationNotAllowedOnProfile',
+    () =>
+      'Cantrip capacity belongs on the class spellcasting record, not on spell selection profiles.',
+  ),
 }
