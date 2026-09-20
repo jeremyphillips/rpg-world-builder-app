@@ -4,6 +4,7 @@ import type { ChoiceSet } from '../../choice-set'
 import {
   formatProficiencyCategorySubhead,
   formatProficiencyChoiceBlockAddLabel,
+  formatProficiencyChoiceBlockCompactAddLabel,
   formatProficiencyPoolDescription,
   formatProficiencySectionEmptyMessage,
   resolveProficiencyAggregateCount,
@@ -123,5 +124,15 @@ describe('formatProficiencyChoiceBlockAddLabel', () => {
 
   it('returns manage copy when the block is full', () => {
     expect(formatProficiencyChoiceBlockAddLabel(skillChoiceSet, 2)).toBe('Manage skill choices')
+  })
+})
+
+describe('formatProficiencyChoiceBlockCompactAddLabel', () => {
+  it('returns compact add copy when the block is not full', () => {
+    expect(formatProficiencyChoiceBlockCompactAddLabel(skillChoiceSet, 0)).toBe('Add skill')
+  })
+
+  it('returns compact manage copy when the block is full', () => {
+    expect(formatProficiencyChoiceBlockCompactAddLabel(skillChoiceSet, 2)).toBe('Manage skills')
   })
 })

@@ -81,6 +81,7 @@ export function ProficienciesStepView({
           <ProficiencySection
             key={section.kind}
             section={section}
+            validationIssues={validationIssues}
             onOpenChoiceSet={openChoiceSet}
             onRemoveChoice={removeChoiceSelection}
           />

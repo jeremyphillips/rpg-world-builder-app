@@ -59,3 +59,41 @@ export const MultiChoiceSets: Story = {
     onRemoveChoice: () => undefined,
   },
 }
+
+export const SkillsWithValidation: Story = {
+  args: {
+    section: skills,
+    validationIssues: [
+      {
+        code: 'choice_set_unsatisfied',
+        message: 'Choose at least 2 options for Rogue Skills.',
+        stepId: 'proficiencies',
+        choiceSetId: skills.choiceBlocks[0]!.choiceSet.id,
+      },
+    ],
+    onOpenChoiceSet: () => undefined,
+    onRemoveChoice: () => undefined,
+  },
+}
+
+export const MultiChoiceSetsWithValidation: Story = {
+  args: {
+    section: multiChoiceSkills,
+    validationIssues: [
+      {
+        code: 'choice_set_unsatisfied',
+        message: 'Choose at least 2 options for Rogue Skills.',
+        stepId: 'proficiencies',
+        choiceSetId: skills.choiceBlocks[0]!.choiceSet.id,
+      },
+      {
+        code: 'choice_set_unsatisfied',
+        message: 'Choose an option for Keen Senses.',
+        stepId: 'proficiencies',
+        choiceSetId: 'species:srd-cc-5.2.1:elf:keen-senses',
+      },
+    ],
+    onOpenChoiceSet: () => undefined,
+    onRemoveChoice: () => undefined,
+  },
+}

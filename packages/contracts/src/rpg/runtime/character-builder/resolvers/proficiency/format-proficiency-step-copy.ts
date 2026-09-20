@@ -1,7 +1,17 @@
 import type { ChoiceSet } from '../../choice-set'
 import {
-  getProficiencyDomainCompactLabel,
+  getLanguageGrantAddLabel,
+  getLanguageGrantCompactAddLabel,
+  getLanguageGrantCompactManageLabel,
+  getLanguageGrantManageLabel,
+  getLanguageProficiencySentenceForm,
+} from '../../../../vocab/language'
+import {
+  getProficiencyDomainCompactActionNoun,
   getProficiencyGrantAddLabel,
+  getProficiencyGrantCompactAddLabel,
+  getProficiencyGrantCompactManageLabel,
+  getProficiencyGrantManageLabel,
 } from '../../../../vocab/proficiency'
 import type { ProficiencyStepSectionKind } from './resolve-proficiency-step-model'
 
@@ -9,11 +19,11 @@ export const PROFICIENCY_POOL_ENUMERATION_THRESHOLD = 5 as const
 
 const CATEGORY_PLURAL_NOUNS: Record<ProficiencyStepSectionKind, string> = {
   savingThrows: 'saving throws',
-  skills: getProficiencyDomainCompactLabel('skill').toLowerCase(),
-  tools: 'tools',
-  languages: 'languages',
-  weapons: 'weapons',
-  armor: 'armor',
+  skills: getProficiencyDomainCompactActionNoun('skill', 2),
+  tools: getProficiencyDomainCompactActionNoun('tool', 2),
+  languages: getLanguageProficiencySentenceForm(2),
+  weapons: getProficiencyDomainCompactActionNoun('weapon', 2),
+  armor: getProficiencyDomainCompactActionNoun('armor', 2),
 }
 
 const CHOICE_TYPE_DOMAIN = {
@@ -26,21 +36,7 @@ const CHOICE_TYPE_DOMAIN = {
   Record<ChoiceSet['choiceType'], 'skill' | 'tool' | 'weapon' | 'armor' | 'language'>
 >
 
-const CHOICE_BLOCK_ADD_LABELS: Partial<Record<ChoiceSet['choiceType'], string>> = {
-  language: 'Add language',
-  skillProficiency: getProficiencyGrantAddLabel('skill'),
-  toolProficiency: getProficiencyGrantAddLabel('tool'),
-  weaponProficiency: getProficiencyGrantAddLabel('weapon'),
-  armorTraining: getProficiencyGrantAddLabel('armor'),
-}
-
-const CHOICE_BLOCK_MANAGE_LABELS: Partial<Record<ChoiceSet['choiceType'], string>> = {
-  skillProficiency: 'Manage skill choices',
-  language: 'Manage language choices',
-  toolProficiency: 'Manage tool choices',
-  weaponProficiency: 'Manage weapon choices',
-  armorTraining: 'Manage armor choices',
-}
+type ProficiencyChoiceDomain = (typeof CHOICE_TYPE_DOMAIN)[keyof typeof CHOICE_TYPE_DOMAIN]
 
 function isChoiceSetFull(selectedCount: number, max: number): boolean {
   return selectedCount >= max
@@ -54,26 +50,50 @@ function categoryPluralNoun(kind: ProficiencyStepSectionKind): string {
   return CATEGORY_PLURAL_NOUNS[kind]
 }
 
+function choiceDomainFor(choiceSet: ChoiceSet): ProficiencyChoiceDomain | undefined {
+  return CHOICE_TYPE_DOMAIN[choiceSet.choiceType as keyof typeof CHOICE_TYPE_DOMAIN]
+}
+
+function choiceBlockAddLabelFor(choiceSet: ChoiceSet, compact: boolean): string {
+  const domain = choiceDomainFor(choiceSet)
+  if (domain === 'language') {
+    return compact ? getLanguageGrantCompactAddLabel() : getLanguageGrantAddLabel()
+  }
+  if (domain) {
+    return compact
+      ? getProficiencyGrantCompactAddLabel(domain)
+      : getProficiencyGrantAddLabel(domain)
+  }
+  return `Add ${choiceSet.label.toLowerCase()}`
+}
+
+function choiceBlockManageLabelFor(choiceSet: ChoiceSet, compact: boolean): string {
+  const domain = choiceDomainFor(choiceSet)
+  if (domain === 'language') {
+    return compact ? getLanguageGrantCompactManageLabel() : getLanguageGrantManageLabel()
+  }
+  if (domain) {
+    return compact
+      ? getProficiencyGrantCompactManageLabel(domain)
+      : getProficiencyGrantManageLabel(domain)
+  }
+  return `Manage ${choiceSet.label.toLowerCase()}`
+}
+
 function poolOptionNoun(choiceSet: ChoiceSet): string {
-  const domain = CHOICE_TYPE_DOMAIN[choiceSet.choiceType as keyof typeof CHOICE_TYPE_DOMAIN]
+  const domain = choiceDomainFor(choiceSet)
   if (!domain) return 'options'
-  if (domain === 'language') return formatCountableNoun(choiceSet.max, 'language', 'languages')
-  if (domain === 'skill') return formatCountableNoun(choiceSet.max, 'skill', 'skills')
-  if (domain === 'tool') return formatCountableNoun(choiceSet.max, 'tool', 'tools')
-  if (domain === 'weapon') return formatCountableNoun(choiceSet.max, 'weapon', 'weapons')
-  return 'armor'
+  if (domain === 'language') return getLanguageProficiencySentenceForm(choiceSet.max)
+  return getProficiencyDomainCompactActionNoun(domain, choiceSet.max)
 }
 
 function singleChoiceSetNoun(choiceSet: ChoiceSet, count: number): string {
-  const domain = CHOICE_TYPE_DOMAIN[choiceSet.choiceType as keyof typeof CHOICE_TYPE_DOMAIN]
+  const domain = choiceDomainFor(choiceSet)
   if (!domain) {
     return formatCountableNoun(count, 'option', 'options')
   }
-  if (domain === 'language') return formatCountableNoun(count, 'language', 'languages')
-  if (domain === 'skill') return formatCountableNoun(count, 'skill', 'skills')
-  if (domain === 'tool') return formatCountableNoun(count, 'tool', 'tools')
-  if (domain === 'weapon') return formatCountableNoun(count, 'weapon', 'weapons')
-  return 'armor'
+  if (domain === 'language') return getLanguageProficiencySentenceForm(count)
+  return getProficiencyDomainCompactActionNoun(domain, count)
 }
 
 /** Category subhead driven by choice-set topology, not source ownership. */
@@ -149,15 +169,28 @@ export function resolveProficiencyAggregateCount(
   }
 }
 
+function choiceBlockActionLabel(
+  choiceSet: ChoiceSet,
+  selectedCount: number,
+  compact: boolean,
+): string {
+  return isChoiceSetFull(selectedCount, choiceSet.max)
+    ? choiceBlockManageLabelFor(choiceSet, compact)
+    : choiceBlockAddLabelFor(choiceSet, compact)
+}
+
 /** Add vs Manage drawer trigger copy for a proficiency choice block. */
 export function formatProficiencyChoiceBlockAddLabel(
   choiceSet: ChoiceSet,
   selectedCount: number,
 ): string {
-  const addLabel =
-    CHOICE_BLOCK_ADD_LABELS[choiceSet.choiceType] ?? `Add ${choiceSet.label.toLowerCase()}`
-  const manageLabel =
-    CHOICE_BLOCK_MANAGE_LABELS[choiceSet.choiceType] ?? `Manage ${choiceSet.label.toLowerCase()}`
+  return choiceBlockActionLabel(choiceSet, selectedCount, false)
+}
 
-  return isChoiceSetFull(selectedCount, choiceSet.max) ? manageLabel : addLabel
+/** Compact inline add action copy for multi-set proficiency subsections. */
+export function formatProficiencyChoiceBlockCompactAddLabel(
+  choiceSet: ChoiceSet,
+  selectedCount: number,
+): string {
+  return choiceBlockActionLabel(choiceSet, selectedCount, true)
 }

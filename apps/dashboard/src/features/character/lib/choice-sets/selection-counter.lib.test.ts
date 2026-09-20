@@ -5,6 +5,7 @@ import type { ChoiceSet } from '@rpg/contracts'
 import {
   formatChoiceSetDrawerTriggerLabel,
   formatSelectionCounter,
+  isChoiceSetAtCapacity,
   isChoiceSetFull,
   isChoiceSetOverSelected,
   shouldShowSelectionFullNotice,
@@ -22,6 +23,8 @@ describe('selection-counter.lib', () => {
     expect(isChoiceSetFull(2, 3)).toBe(false)
     expect(isChoiceSetFull(3, 3)).toBe(true)
     expect(isChoiceSetOverSelected(4, 3)).toBe(true)
+    expect(isChoiceSetAtCapacity(2, 2)).toBe(true)
+    expect(isChoiceSetAtCapacity(3, 2)).toBe(false)
   })
 
   it('returns Add labels before the ChoiceSet is full', () => {

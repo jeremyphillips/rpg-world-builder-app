@@ -22,6 +22,7 @@ import { isFixedProficiencyGrant } from './proficiency-grant-classification'
 import {
   formatProficiencyCategorySubhead,
   formatProficiencyChoiceBlockAddLabel,
+  formatProficiencyChoiceBlockCompactAddLabel,
   formatProficiencyPoolDescription,
   formatProficiencySectionEmptyMessage,
   resolveProficiencyAggregateCount,
@@ -75,6 +76,7 @@ export type ProficiencyChoiceBlock = {
   max: number
   poolDescription: string
   addLabel: string
+  compactAddLabel: string
   isFull: boolean
   isOverSelected: boolean
 }
@@ -319,6 +321,7 @@ function buildChoiceBlock(
     max: choiceSet.max,
     poolDescription: formatProficiencyPoolDescription(choiceSet),
     addLabel: formatProficiencyChoiceBlockAddLabel(choiceSet, selectedCount),
+    compactAddLabel: formatProficiencyChoiceBlockCompactAddLabel(choiceSet, selectedCount),
     isFull: selectedCount >= choiceSet.max,
     isOverSelected: selectedCount > choiceSet.max,
   }

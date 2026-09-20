@@ -85,6 +85,37 @@ describe('ProficienciesStep', () => {
     expect(within(skillsSection).getByText('0 / 2 chosen')).toBeInTheDocument()
   })
 
+  it('shows inline validation on the skills section when ChoiceSets are unsatisfied', () => {
+    const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
+    const skillChoiceSetId = resolvedChoiceSets.find(
+      (choiceSet) => choiceSet.choiceType === 'skillProficiency',
+    )!.id
+
+    render(
+      <ProficienciesStep
+        context={context}
+        draft={draft}
+        preview={preview}
+        resolvedChoiceSets={resolvedChoiceSets}
+        validationIssues={[
+          {
+            code: 'choice_set_unsatisfied',
+            message: 'Choose at least 2 options for Rogue Skills.',
+            stepId: 'proficiencies',
+            choiceSetId: skillChoiceSetId,
+          },
+        ]}
+        onDraftChange={() => undefined}
+        onNavigateToStep={vi.fn()}
+      />,
+    )
+
+    const skillsSection = screen.getByRole('heading', { name: 'Skills' }).closest('section')!
+    expect(within(skillsSection).getByRole('alert')).toHaveTextContent(
+      'Choose at least 2 options for Rogue Skills.',
+    )
+  })
+
   it('shows the granted summary and interactive sections', () => {
     const { context, draft, preview, resolvedChoiceSets } = createProficienciesStepRogueFixture()
 

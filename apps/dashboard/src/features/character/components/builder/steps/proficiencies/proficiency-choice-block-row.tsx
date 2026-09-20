@@ -1,65 +1,52 @@
+import { formatProficiencyChoiceEmptyMessage } from '@rpg/contracts'
 import type { ProficiencyChoiceBlock, ProficiencyChoiceSelectedRow } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
+import { Button, EmptyPanel, Text } from '@rpg/ui'
 import { Plus } from 'lucide-react'
 
-import { shouldShowSelectionFullNotice } from '../../../../lib/choice-sets/selection-counter.lib'
-import {
-  formatProficiencyChosenCounter,
-  PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE,
-  PROFICIENCIES_STEP_SELECTION_FULL_REASON,
-} from '../../../../lib/proficiencies/proficiencies-step.lib'
+import { PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE } from '../../../../lib/proficiencies/proficiencies-step.lib'
+import { ProficiencySectionValidationMessages } from './proficiency-section-validation-messages'
+import { ProficiencySelectedRow } from './proficiency-selected-row'
+import { ProficiencySelectionCounter } from './proficiency-selection-counter'
 import {
   proficiencyChoiceBlockRowClasses,
   proficiencyChoiceBlockRowContentClasses,
-  proficiencyChoiceBlockRowCountClasses,
+  proficiencyChoiceBlockRowDetailsClasses,
   proficiencyChoiceBlockRowDividerClasses,
   proficiencyChoiceBlockRowHeaderClasses,
+  proficiencyChoiceBlockRowHeadingGroupClasses,
   proficiencyChoiceBlockRowLabelClasses,
   proficiencyChoiceBlockRowOverSelectionClasses,
-  proficiencyChoiceBlockRowSelectionFullClasses,
+  proficiencyChoiceBlockRowPoolDescriptionClasses,
+  proficiencyChoiceBlockRowSelectedListClasses,
 } from './proficiency-choice-block-row.variants'
 
 export type ProficiencyChoiceBlockRowProps = {
   block: ProficiencyChoiceBlock
   selectedRows: readonly ProficiencyChoiceSelectedRow[]
+  validationIssues?: readonly CharacterBuildValidationIssue[]
   onOpenDrawer: () => void
+  onRemoveChoice: (choiceSetId: string, optionId: string) => void
 }
 
 export function ProficiencyChoiceBlockRow({
   block,
   selectedRows,
+  validationIssues = [],
   onOpenDrawer,
+  onRemoveChoice,
 }: ProficiencyChoiceBlockRowProps) {
-  const showSelectionFull = shouldShowSelectionFullNotice(
-    block.choiceSet,
-    block.isFull,
-    block.addLabel,
-  )
+  const emptyMessage = formatProficiencyChoiceEmptyMessage(block.choiceSet.choiceType)
 
   return (
     <div className={proficiencyChoiceBlockRowClasses}>
       <div className={proficiencyChoiceBlockRowDividerClasses} role="presentation" aria-hidden />
       <div className={proficiencyChoiceBlockRowContentClasses}>
         <div className={proficiencyChoiceBlockRowHeaderClasses}>
-          <p className={proficiencyChoiceBlockRowLabelClasses}>{block.choiceSet.label}</p>
-          <Text variant="muted" className={proficiencyChoiceBlockRowCountClasses}>
-            {formatProficiencyChosenCounter(selectedRows.length, block.max)}
-          </Text>
-        </div>
-        <Text variant="muted" className="text-sm">
-          {block.poolDescription}
-        </Text>
-        {showSelectionFull ? (
-          <p className={proficiencyChoiceBlockRowSelectionFullClasses}>
-            {PROFICIENCIES_STEP_SELECTION_FULL_REASON}
-          </p>
-        ) : null}
-        {block.isOverSelected ? (
-          <p className={proficiencyChoiceBlockRowOverSelectionClasses} role="status">
-            {PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE}
-          </p>
-        ) : null}
-        <div className="flex justify-end">
+          <div className={proficiencyChoiceBlockRowHeadingGroupClasses}>
+            <p className={proficiencyChoiceBlockRowLabelClasses}>{block.choiceSet.label}</p>
+            <ProficiencySelectionCounter selectedCount={selectedRows.length} max={block.max} />
+          </div>
           <Button
             type="button"
             variant="text"
@@ -68,8 +55,33 @@ export function ProficiencyChoiceBlockRow({
             onClick={onOpenDrawer}
           >
             <Plus aria-hidden />
-            {block.addLabel}
+            {block.compactAddLabel}
           </Button>
+        </div>
+        <div className={proficiencyChoiceBlockRowDetailsClasses}>
+          <Text variant="muted" className={proficiencyChoiceBlockRowPoolDescriptionClasses}>
+            {block.poolDescription}
+          </Text>
+          {block.isOverSelected ? (
+            <p className={proficiencyChoiceBlockRowOverSelectionClasses} role="status">
+              {PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE}
+            </p>
+          ) : null}
+          <ProficiencySectionValidationMessages issues={validationIssues} />
+          {selectedRows.length > 0 ? (
+            <ul className={proficiencyChoiceBlockRowSelectedListClasses}>
+              {selectedRows.map((row) => (
+                <li key={`${row.choiceSetId}:${row.optionId}`}>
+                  <ProficiencySelectedRow
+                    row={row}
+                    onRemove={() => onRemoveChoice(row.choiceSetId, row.optionId)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyPanel>{emptyMessage}</EmptyPanel>
+          )}
         </div>
       </div>
     </div>

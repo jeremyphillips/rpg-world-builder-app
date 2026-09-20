@@ -1,5 +1,10 @@
 import type { ChoiceSet, ChoiceType } from '@rpg/contracts'
-import { getProficiencyGrantAddLabel } from '@rpg/contracts'
+import {
+  getLanguageGrantAddLabel,
+  getLanguageGrantManageLabel,
+  getProficiencyGrantAddLabel,
+  getProficiencyGrantManageLabel,
+} from '@rpg/contracts'
 
 export const BUILDER_SELECTION_FULL_NOTICE = 'Selection full' as const
 
@@ -13,15 +18,21 @@ const CHOICE_SET_DRAWER_LABELS: Partial<Record<ChoiceType, ChoiceSetDrawerLabelP
   spell: { add: 'Add spell', manage: 'Manage spells' },
   skillProficiency: {
     add: getProficiencyGrantAddLabel('skill'),
-    manage: 'Manage skill choices',
+    manage: getProficiencyGrantManageLabel('skill'),
   },
-  language: { add: 'Add language', manage: 'Manage language choices' },
-  toolProficiency: { add: getProficiencyGrantAddLabel('tool'), manage: 'Manage tool choices' },
+  language: { add: getLanguageGrantAddLabel(), manage: getLanguageGrantManageLabel() },
+  toolProficiency: {
+    add: getProficiencyGrantAddLabel('tool'),
+    manage: getProficiencyGrantManageLabel('tool'),
+  },
   weaponProficiency: {
     add: getProficiencyGrantAddLabel('weapon'),
-    manage: 'Manage weapon choices',
+    manage: getProficiencyGrantManageLabel('weapon'),
   },
-  armorTraining: { add: getProficiencyGrantAddLabel('armor'), manage: 'Manage armor choices' },
+  armorTraining: {
+    add: getProficiencyGrantAddLabel('armor'),
+    manage: getProficiencyGrantManageLabel('armor'),
+  },
   feat: { add: 'Add feat', manage: 'Manage feat choices' },
 }
 
@@ -51,6 +62,11 @@ export function shouldShowSelectionFullNotice(
 
 export function isChoiceSetFull(selectedCount: number, max: number): boolean {
   return selectedCount >= max
+}
+
+/** True when the selection exactly meets the required count (not over-selected). */
+export function isChoiceSetAtCapacity(selectedCount: number, max: number): boolean {
+  return max > 0 && selectedCount === max
 }
 
 export function isChoiceSetOverSelected(selectedCount: number, max: number): boolean {

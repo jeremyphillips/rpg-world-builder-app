@@ -2,12 +2,15 @@ import {
   STEP_CHOICE_TYPES_BY_STEP,
   type BuilderStepReadinessState,
   type ChoiceSet,
+  type ProficiencyInteractiveSection,
   type ProficiencyStepModel,
 } from '@rpg/contracts'
-import type { CharacterBuilderStepId } from '@rpg/contracts/rpg/character-builder'
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
+} from '@rpg/contracts/rpg/character-builder'
 
 import {
-  BUILDER_SELECTION_FULL_NOTICE,
   formatChoiceSetDrawerTriggerLabel,
   isChoiceSetSelectionFull,
   isChoiceSetSelectionOverSelected,
@@ -20,8 +23,6 @@ export const PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING =
 
 export const PROFICIENCIES_CHOOSE_CLASS_PROMPT_DESCRIPTION =
   'Your class determines saving throws, skill choices, armor, weapon, and tool proficiencies.'
-
-export const PROFICIENCIES_STEP_SELECTION_FULL_REASON = BUILDER_SELECTION_FULL_NOTICE
 
 export const PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE =
   'You selected more proficiencies than allowed. Remove extras to continue.' as const
@@ -67,5 +68,23 @@ export function reconcileProficiencyStepReadiness(
 export const isProficiencyChoiceSetFull = isChoiceSetSelectionFull
 
 export const isProficiencyChoiceSetOverSelected = isChoiceSetSelectionOverSelected
+
+/** Validation issues targeted at a single proficiency ChoiceSet. */
+export function validationIssuesForProficiencyChoiceSet(
+  issues: readonly CharacterBuildValidationIssue[],
+  choiceSetId: string,
+): CharacterBuildValidationIssue[] {
+  return issues.filter((issue) => issue.choiceSetId === choiceSetId)
+}
+
+/** Section-level issues when the category owns one ChoiceSet block. */
+export function validationIssuesForProficiencySection(
+  issues: readonly CharacterBuildValidationIssue[],
+  section: Pick<ProficiencyInteractiveSection, 'choiceBlocks'>,
+): CharacterBuildValidationIssue[] {
+  if (section.choiceBlocks.length !== 1) return []
+
+  return validationIssuesForProficiencyChoiceSet(issues, section.choiceBlocks[0]!.choiceSet.id)
+}
 
 export { formatChoiceSetDrawerTriggerLabel }

@@ -119,3 +119,23 @@ export function getLanguageCategorySentenceForm(category: string, count = 1): st
 export function getLanguageProficiencySentenceForm(count = 1): string {
   return count === 1 ? 'language' : 'languages'
 }
+
+/** Character builder add action label (e.g. "Add language"). */
+export function getLanguageGrantAddLabel(): string {
+  return `Add ${getLanguageProficiencySentenceForm(1)}`
+}
+
+/** Character builder manage action label (e.g. "Manage language choices"). */
+export function getLanguageGrantManageLabel(): string {
+  return `Manage ${getLanguageProficiencySentenceForm(1)} choices`
+}
+
+/** Compact inline add action label (e.g. "Add language"). */
+export function getLanguageGrantCompactAddLabel(): string {
+  return getLanguageGrantAddLabel()
+}
+
+/** Compact inline manage action label (e.g. "Manage languages"). */
+export function getLanguageGrantCompactManageLabel(): string {
+  return `Manage ${getLanguageProficiencySentenceForm(2)}`
+}
