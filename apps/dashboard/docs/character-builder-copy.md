@@ -57,12 +57,21 @@ Domain kinds: `DEPENDENT_CHOICE_KINDS` (`heritage`, `subclass`).
 
 Proficiency ChoiceSets carry generic `ChoiceSetProvenance` (`ownerKind`, `ownerLabel`,
 `featureLabel`, `choiceLabel`). `resolveProficiencyChoicePresentation()` resolves block
-heading + source line; category subheads stay topology/count-only (no heading injection).
+heading, optional source line, and `headingSourceCoverage` (`owner` | `feature` |
+`generic`). Show the source line only when the heading does not already encode the owner.
+
+| Coverage  | Heading examples                         | Source line                     |
+| --------- | ---------------------------------------- | ------------------------------- |
+| `owner`   | `Rogue Skills`, `Origin Languages`       | omitted                         |
+| `feature` | `Skillful`, `Primal Aptitude`            | `Human species trait`, subclass |
+| `generic` | `Skill Proficiency`, unlabeled languages | shown when provenance is known  |
+
+Category subheads stay topology/count-only (no heading injection).
 
 | Surface           | Layer               | Example                              |
 | ----------------- | ------------------- | ------------------------------------ |
 | Block heading     | 2 — authored name   | `Skillful`, `Rogue Skills`           |
-| Block source line | 3 — workflow chrome | `Human species trait`, `Rogue class` |
+| Block source line | 3 — workflow chrome | `Human species trait` (feature only) |
 | Category subhead  | 3 — count/topology  | `Choose 2 skills.`                   |
 | Pool description  | 3 — pool topology   | `Choose any 1 skill proficiency.`    |
 

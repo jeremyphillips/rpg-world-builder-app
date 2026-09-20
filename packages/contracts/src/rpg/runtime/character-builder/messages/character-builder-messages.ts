@@ -227,10 +227,6 @@ export const characterBuilderStepReadinessMessages = {
     'validation.characterBuilder.readiness.proficienciesNoChoicesRequired',
     () => 'No proficiency choices are required for this character.',
   ),
-  proficienciesReviewComplete: defineMessage(
-    'validation.characterBuilder.readiness.proficienciesReviewComplete',
-    () => 'Review your starting proficiencies.',
-  ),
 }
 
 export const characterBuilderProficiencyChoiceEmptyMessages = {

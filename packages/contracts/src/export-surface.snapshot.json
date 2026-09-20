@@ -2331,6 +2331,7 @@
     "resolvePlayableBuilderContent",
     "resolveProficienciesStepReadiness",
     "resolveProficiencyAggregateCount",
+    "resolveProficiencyChoiceDisambiguationSourceLine",
     "resolveProficiencyChoicePresentation",
     "resolveProficiencyLinkedEquipmentGrant",
     "resolveProficiencyPickerItems",

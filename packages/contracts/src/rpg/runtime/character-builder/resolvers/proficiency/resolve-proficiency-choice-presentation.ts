@@ -40,9 +40,12 @@ const CHOICE_TYPE_DOMAIN = {
 
 type ProficiencyChoiceDomain = (typeof CHOICE_TYPE_DOMAIN)[keyof typeof CHOICE_TYPE_DOMAIN]
 
+export type ProficiencyHeadingSourceCoverage = 'owner' | 'feature' | 'generic'
+
 export type ProficiencyChoicePresentation = {
   heading: string
   sourceLine?: string
+  headingSourceCoverage: ProficiencyHeadingSourceCoverage
 }
 
 function choiceDomainFor(choiceType: ChoiceSet['choiceType']): ProficiencyChoiceDomain | undefined {
@@ -90,17 +93,33 @@ function resolveSourceLine(provenance: ChoiceSetProvenance | undefined): string 
 function resolveHeading(
   provenance: ChoiceSetProvenance | undefined,
   domain: ProficiencyChoiceDomain | undefined,
-): string {
-  if (provenance?.choiceLabel) return provenance.choiceLabel
-  if (provenance?.featureLabel) return provenance.featureLabel
+): { heading: string; headingSourceCoverage: ProficiencyHeadingSourceCoverage } {
+  if (provenance?.choiceLabel) {
+    return { heading: provenance.choiceLabel, headingSourceCoverage: 'owner' }
+  }
+  if (provenance?.featureLabel) {
+    return { heading: provenance.featureLabel, headingSourceCoverage: 'feature' }
+  }
   if (provenance?.ownerLabel && domain) {
     if (domain === 'language') {
-      return `${provenance.ownerLabel} ${getLanguageProficiencySentenceForm(1)}`
+      return {
+        heading: `${provenance.ownerLabel} ${getLanguageProficiencySentenceForm(1)}`,
+        headingSourceCoverage: 'owner',
+      }
     }
-    return `${provenance.ownerLabel} ${getProficiencyDomainCompactLabel(domain)}`
+    return {
+      heading: `${provenance.ownerLabel} ${getProficiencyDomainCompactLabel(domain)}`,
+      headingSourceCoverage: 'owner',
+    }
   }
-  if (domain) return genericHeadingForDomain(domain)
-  return 'Choose'
+  if (domain) {
+    return { heading: genericHeadingForDomain(domain), headingSourceCoverage: 'generic' }
+  }
+  return { heading: 'Choose', headingSourceCoverage: 'generic' }
+}
+
+function shouldShowSourceLine(coverage: ProficiencyHeadingSourceCoverage): boolean {
+  return coverage === 'feature' || coverage === 'generic'
 }
 
 /** Resolves proficiency choice block heading and source line from ChoiceSet provenance. */
@@ -108,10 +127,24 @@ export function resolveProficiencyChoicePresentation(
   choiceSet: Pick<ChoiceSet, 'choiceType' | 'provenance'>,
 ): ProficiencyChoicePresentation {
   const domain = choiceDomainFor(choiceSet.choiceType)
-  const heading = resolveHeading(choiceSet.provenance, domain)
-  const sourceLine = resolveSourceLine(choiceSet.provenance)
+  const { heading, headingSourceCoverage } = resolveHeading(choiceSet.provenance, domain)
+  const resolvedSourceLine = resolveSourceLine(choiceSet.provenance)
+  const sourceLine =
+    shouldShowSourceLine(headingSourceCoverage) && resolvedSourceLine
+      ? resolvedSourceLine
+      : undefined
 
-  return sourceLine ? { heading, sourceLine } : { heading }
+  return sourceLine
+    ? { heading, headingSourceCoverage, sourceLine }
+    : { heading, headingSourceCoverage }
+}
+
+/** Source line for selected-row disambiguation when block headings collide. */
+export function resolveProficiencyChoiceDisambiguationSourceLine(
+  presentation: ProficiencyChoicePresentation,
+  provenance: ChoiceSetProvenance | undefined,
+): string | undefined {
+  return presentation.sourceLine ?? resolveSourceLine(provenance)
 }
 
 function proficiencyChoiceSourcePriority(choiceSet: ChoiceSet): number {

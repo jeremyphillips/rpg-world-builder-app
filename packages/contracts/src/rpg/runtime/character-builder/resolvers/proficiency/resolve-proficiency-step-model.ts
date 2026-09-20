@@ -29,6 +29,7 @@ import {
   type ProficiencyAggregateCount,
 } from './format-proficiency-step-copy'
 import {
+  resolveProficiencyChoiceDisambiguationSourceLine,
   resolveProficiencyChoicePresentation,
   sortProficiencyChoiceSets,
 } from './resolve-proficiency-choice-presentation'
@@ -318,13 +319,16 @@ function buildSelectedRows(
   return selections.map((optionId) => {
     const option = choiceSet.options.find((entry) => entry.id === optionId)
     const isStale = !optionIds.has(optionId)
+    const disambiguationSourceLine = headingCollides
+      ? resolveProficiencyChoiceDisambiguationSourceLine(presentation, choiceSet.provenance)
+      : undefined
 
     return {
       optionId,
       label: option?.label ?? optionId,
       sourceLabel: formatProficiencyChoiceSourceLabel(
         presentation.heading,
-        presentation.sourceLine,
+        disambiguationSourceLine,
         headingCollides,
       ),
       choiceSetId: choiceSet.id,

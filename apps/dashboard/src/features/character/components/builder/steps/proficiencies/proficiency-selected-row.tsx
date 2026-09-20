@@ -17,7 +17,7 @@ export function ProficiencySelectedRow({ row, onRemove }: ProficiencySelectedRow
       entity={{
         heading: row.label,
         description: row.sourceLabel ? (
-          <Text as="span" variant="muted">
+          <Text as="span" variant="caption">
             {row.sourceLabel}
           </Text>
         ) : undefined,

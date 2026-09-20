@@ -61,11 +61,9 @@ export function ProficiencyChoiceBlockRow({
         </div>
         <div className={proficiencyChoiceBlockRowDetailsClasses}>
           {block.sourceLine ? (
-            <Text variant="muted" className={proficiencyChoiceBlockRowSourceLineClasses}>
-              {block.sourceLine}
-            </Text>
+            <Text className={proficiencyChoiceBlockRowSourceLineClasses}>{block.sourceLine}</Text>
           ) : null}
-          <Text variant="muted" className={proficiencyChoiceBlockRowPoolDescriptionClasses}>
+          <Text variant="caption" className={proficiencyChoiceBlockRowPoolDescriptionClasses}>
             {block.poolDescription}
           </Text>
           {block.isOverSelected ? (

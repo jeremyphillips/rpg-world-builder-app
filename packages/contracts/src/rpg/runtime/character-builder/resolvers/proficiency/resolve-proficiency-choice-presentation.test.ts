@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import type { ChoiceSet } from '../../choice-set'
 import {
+  resolveProficiencyChoiceDisambiguationSourceLine,
   resolveProficiencyChoicePresentation,
   sortProficiencyChoiceSets,
 } from './resolve-proficiency-choice-presentation'
 
 describe('resolveProficiencyChoicePresentation', () => {
-  it('prefers choiceLabel for class skill packages', () => {
+  it('omits source line for class skill packages with authored choice labels', () => {
     const choiceSet = {
       choiceType: 'skillProficiency',
       provenance: {
@@ -19,11 +20,11 @@ describe('resolveProficiencyChoicePresentation', () => {
 
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Rogue Skills',
-      sourceLine: 'Rogue class',
+      headingSourceCoverage: 'owner',
     })
   })
 
-  it('uses featureLabel for species trait grants', () => {
+  it('shows source line for species trait feature headings', () => {
     const choiceSet = {
       choiceType: 'skillProficiency',
       provenance: {
@@ -35,7 +36,25 @@ describe('resolveProficiencyChoicePresentation', () => {
 
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Skillful',
+      headingSourceCoverage: 'feature',
       sourceLine: 'Human species trait',
+    })
+  })
+
+  it('shows subclass source line for subclass feature headings', () => {
+    const choiceSet = {
+      choiceType: 'skillProficiency',
+      provenance: {
+        ownerKind: 'subclass',
+        ownerLabel: 'Circle of the Moon',
+        featureLabel: 'Primal Aptitude',
+      },
+    } as const satisfies Pick<ChoiceSet, 'choiceType' | 'provenance'>
+
+    expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
+      heading: 'Primal Aptitude',
+      headingSourceCoverage: 'feature',
+      sourceLine: 'Circle of the Moon subclass',
     })
   })
 
@@ -51,11 +70,12 @@ describe('resolveProficiencyChoicePresentation', () => {
 
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'High Elf',
+      headingSourceCoverage: 'feature',
       sourceLine: 'High Elf heritage',
     })
   })
 
-  it('falls back to owner plus domain when no authored labels exist', () => {
+  it('omits source line for owner-derived headings like Druid Skills', () => {
     const choiceSet = {
       choiceType: 'skillProficiency',
       provenance: {
@@ -66,7 +86,37 @@ describe('resolveProficiencyChoicePresentation', () => {
 
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Druid Skills',
-      sourceLine: 'Druid class',
+      headingSourceCoverage: 'owner',
+    })
+  })
+
+  it('omits source line for origin language choice labels', () => {
+    const choiceSet = {
+      choiceType: 'language',
+      provenance: {
+        ownerKind: 'origin',
+        choiceLabel: 'Origin Languages',
+      },
+    } as const satisfies Pick<ChoiceSet, 'choiceType' | 'provenance'>
+
+    expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
+      heading: 'Origin Languages',
+      headingSourceCoverage: 'owner',
+    })
+  })
+
+  it('shows source line for generic headings when provenance is known', () => {
+    const choiceSet = {
+      choiceType: 'language',
+      provenance: {
+        ownerKind: 'origin',
+      },
+    } as const satisfies Pick<ChoiceSet, 'choiceType' | 'provenance'>
+
+    expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
+      heading: 'Language',
+      headingSourceCoverage: 'generic',
+      sourceLine: 'Origin',
     })
   })
 
@@ -78,7 +128,27 @@ describe('resolveProficiencyChoicePresentation', () => {
 
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Skill Proficiency',
+      headingSourceCoverage: 'generic',
     })
+  })
+})
+
+describe('resolveProficiencyChoiceDisambiguationSourceLine', () => {
+  it('falls back to provenance source when block source line is omitted', () => {
+    const presentation = resolveProficiencyChoicePresentation({
+      choiceType: 'skillProficiency',
+      provenance: {
+        ownerKind: 'class',
+        ownerLabel: 'Druid',
+      },
+    })
+
+    expect(
+      resolveProficiencyChoiceDisambiguationSourceLine(presentation, {
+        ownerKind: 'class',
+        ownerLabel: 'Druid',
+      }),
+    ).toBe('Druid class')
   })
 })
 

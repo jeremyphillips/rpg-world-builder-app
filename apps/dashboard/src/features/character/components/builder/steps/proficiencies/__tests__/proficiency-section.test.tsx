@@ -29,7 +29,7 @@ describe('ProficiencySection', () => {
     expect(within(skillsSection).getAllByText('0 / 2 chosen')).toHaveLength(2)
     expect(within(skillsSection).getByText('Choose 2 skills.')).toBeInTheDocument()
     expect(within(skillsSection).getByText('Rogue Skills')).toBeInTheDocument()
-    expect(within(skillsSection).getByText('Rogue class')).toBeInTheDocument()
+    expect(within(skillsSection).queryByText('Rogue class')).not.toBeInTheDocument()
     expect(within(skillsSection).getByRole('button', { name: 'Add skill' })).toBeInTheDocument()
     expect(within(skillsSection).getByText('No skills chosen yet.')).toBeInTheDocument()
   })
