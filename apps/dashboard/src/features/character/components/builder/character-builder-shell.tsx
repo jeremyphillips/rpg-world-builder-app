@@ -207,6 +207,7 @@ export function CharacterBuilderShell({
     context.characterCreationRules,
     context.rulesetId,
     resolvedChoiceSets,
+    context.spellcastingProgression,
   )
 
   const applyDraftPatch = useCallback(

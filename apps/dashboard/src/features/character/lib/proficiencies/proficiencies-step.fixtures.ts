@@ -13,6 +13,7 @@ import {
   type CharacterBuilderDraft,
   type CharacterBuildPreview,
 } from '@rpg/contracts'
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '@rpg/catalog/spellcasting-progressions'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
@@ -140,6 +141,10 @@ export function createProficienciesStepRogueContextFixture(
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: resolveIndexedCampaignSpellcastingProgressionConfig(
+      rulesetId,
+      undefined,
+    ),
     permissions: { canCreateCharacter: true },
     playActor: { kind: 'new_pc' },
     ...overrides,

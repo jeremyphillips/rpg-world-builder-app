@@ -2,9 +2,11 @@ import type { ArmorEquipment } from '../../../content/equipment'
 import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { CharacterClass } from '../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../content/classes/spellcasting'
+import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/rules/spellcasting-progression'
+import { resolveSpellcastingProfileForClass } from '../../../campaign/rules/spellcasting-progression'
+import { resolveLeveledSlotCountsAtLevel } from '../../../campaign/rules/spellcasting-progression'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
 import { getSkillName } from '../../../content/skill-proficiency'
-import { getSlotRow, SLOT_TABLES } from '../../../content/classes/spellcasting/slots'
 import { proficiencyBonus } from '../../../primitives/level'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
 import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
@@ -41,6 +43,8 @@ export type CharacterDerivationInput = {
   skillProficiencies: readonly SkillProficiency[]
   /** Equipped armor variants for equipment-based AC; omit for unarmored preview. */
   equippedArmor?: readonly ArmorEquipment[]
+  /** Resolved spellcasting progression config; required when deriving spell slots. */
+  spellcastingProgression?: ResolvedSpellcastingProgressionConfig
 }
 
 export type CharacterDerivedAbilityScore = {
@@ -156,7 +160,12 @@ export function deriveSpellcastingStats(
   }
 
   const abilityScore = input.abilityScores?.[spellcasting.ability]
-  const slots = getSlotRow(SLOT_TABLES[spellcasting.progression], input.level) ?? []
+  const bundle = input.spellcastingProgression
+    ? resolveSpellcastingProfileForClass({ spellcasting }, input.spellcastingProgression)
+    : null
+  const slots = bundle
+    ? resolveLeveledSlotCountsAtLevel(bundle.slotProgression, input.level).slots
+    : []
 
   return {
     ability: spellcasting.ability,

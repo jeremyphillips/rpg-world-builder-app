@@ -1,6 +1,7 @@
 import { classSchema, type ClassStored } from '../../content/classes/class'
 import type { Spell } from '../../content/spell'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
+import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { Species } from '../../content/species'
 import type { SkillProficiency } from '../../content/skill-proficiency'
@@ -53,11 +54,8 @@ export const wizardStored: ClassStored = {
   features: [],
   spellcasting: {
     level: 1,
-    progression: 'full',
+    profileId: 'fixture:wizard',
     ability: 'int',
-    preparation: 'prepared',
-    cantrips: [{ level: 1, known: 3 }],
-    spellsAvailable: [{ level: 1, count: 4 }],
   },
 }
 
@@ -81,10 +79,8 @@ export const paladinStored: ClassStored = {
   features: [],
   spellcasting: {
     level: 1,
-    progression: 'half',
+    profileId: 'fixture:paladin',
     ability: 'cha',
-    preparation: 'prepared',
-    spellsAvailable: [{ level: 1, count: 2 }],
   },
 }
 
@@ -108,11 +104,8 @@ export const warlockStored: ClassStored = {
   features: [],
   spellcasting: {
     level: 1,
-    progression: 'pact',
+    profileId: 'fixture:warlock',
     ability: 'cha',
-    preparation: 'prepared',
-    cantrips: [{ level: 1, known: 2 }],
-    spellsAvailable: [{ level: 1, count: 2 }],
   },
 }
 
@@ -226,6 +219,7 @@ export const spellcastingTestContext: CharacterBuildContext = {
     abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
     armorClass: defaultCampaignMechanicsPatch().armorClass,
   },
+  spellcastingProgression: spellcastingProgressionTestConfig,
   permissions: { canCreateCharacter: true },
   playActor: { kind: 'new_pc' },
 }

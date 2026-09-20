@@ -68,6 +68,8 @@ export interface ContentFormOptionSets {
   richTextInternalLinkOptions: RichTextLinkPickerInternalOption[]
   /** Content type filters shown in rich-text link pickers. */
   richTextContentTypeOptions: RichTextLinkPickerContentTypeOption[]
+  /** Ruleset spellcasting profile options for class spellcasting.profileId. */
+  spellcastingProfiles?: FieldOption[]
 }
 
 interface QueryState {
@@ -185,6 +187,7 @@ export function buildContentFormOptionSets(input: {
     equipment: buildContentPurposeSelectors(input.equipment ?? []),
     locations: buildContentPurposeSelectors(input.locations ?? []),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
+    spellcastingProfiles: [],
     ...buildRichTextLinkOptionSets({
       campaignId: input.campaignId,
       spells: referenceSpells,

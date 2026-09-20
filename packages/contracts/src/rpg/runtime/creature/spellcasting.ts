@@ -1,10 +1,15 @@
 import type { Spellcasting } from '../../content/classes/spellcasting'
-import { getSlotRow, SLOT_TABLES } from '../../content/classes/spellcasting/slots'
+import type { ResolvedSpellcastingProgressionConfig } from '../../campaign/rules/spellcasting-progression'
+import {
+  resolveCantripsKnownFromProfile,
+  resolveMaxSelectableSpellLevelFromProfile,
+  resolveSpellcastingProfileForSpellcasting,
+  resolveSpellsAvailableFromProfile,
+} from '../../campaign/rules/spellcasting-progression'
 
 // ---------------------------------------------------------------------------
-// Creature spellcasting primitives — level progression math from class
-// spellcasting blocks. Reusable across character, NPC, and monster surfaces;
-// no builder or character-sheet dependencies.
+// Creature spellcasting primitives — level progression math from resolved
+// spellcasting profiles. Reusable across character, NPC, and monster surfaces.
 // ---------------------------------------------------------------------------
 
 export type CreatureSpellcastingFacts = {
@@ -13,48 +18,46 @@ export type CreatureSpellcastingFacts = {
   maxSelectableSpellLevel: number
 }
 
-function progressionValueAtLevel<T extends { level: number }>(
-  entries: readonly T[] | undefined,
+export function cantripsKnownAtLevel(
+  spellcasting: Spellcasting,
   classLevel: number,
-  getValue: (entry: T) => number,
+  config: ResolvedSpellcastingProgressionConfig,
 ): number {
-  if (!entries?.length) return 0
-
-  return entries
-    .filter((entry) => entry.level <= classLevel)
-    .reduce((best, entry) => Math.max(best, getValue(entry)), 0)
+  const bundle = resolveSpellcastingProfileForSpellcasting(spellcasting, config)
+  if (!bundle) return 0
+  return resolveCantripsKnownFromProfile(bundle.profile, classLevel)
 }
 
-export function cantripsKnownAtLevel(spellcasting: Spellcasting, classLevel: number): number {
-  return progressionValueAtLevel(spellcasting.cantrips, classLevel, (entry) => entry.known)
-}
-
-export function spellsAvailableAtLevel(spellcasting: Spellcasting, classLevel: number): number {
-  return progressionValueAtLevel(spellcasting.spellsAvailable, classLevel, (entry) => entry.count)
+export function spellsAvailableAtLevel(
+  spellcasting: Spellcasting,
+  classLevel: number,
+  config: ResolvedSpellcastingProgressionConfig,
+): number {
+  const bundle = resolveSpellcastingProfileForSpellcasting(spellcasting, config)
+  if (!bundle) return 0
+  return resolveSpellsAvailableFromProfile(bundle.profile, classLevel)
 }
 
 /** Highest spell level with at least one slot at the given character level. */
-export function maxSelectableSpellLevel(spellcasting: Spellcasting, classLevel: number): number {
-  const row = getSlotRow(SLOT_TABLES[spellcasting.progression], classLevel) ?? []
-  let maxLevel = 0
-
-  for (let index = 0; index < row.length; index++) {
-    if ((row[index] ?? 0) > 0) {
-      maxLevel = index + 1
-    }
-  }
-
-  return maxLevel
+export function maxSelectableSpellLevel(
+  spellcasting: Spellcasting,
+  classLevel: number,
+  config: ResolvedSpellcastingProgressionConfig,
+): number {
+  const bundle = resolveSpellcastingProfileForSpellcasting(spellcasting, config)
+  if (!bundle) return 0
+  return resolveMaxSelectableSpellLevelFromProfile(bundle, classLevel)
 }
 
 /** Resolves cantrip, spell, and slot-cap facts for a class level. */
 export function resolveSpellcastingFactsAtLevel(
   spellcasting: Spellcasting,
   classLevel: number,
+  config: ResolvedSpellcastingProgressionConfig,
 ): CreatureSpellcastingFacts {
   return {
-    cantripsKnown: cantripsKnownAtLevel(spellcasting, classLevel),
-    spellsAvailable: spellsAvailableAtLevel(spellcasting, classLevel),
-    maxSelectableSpellLevel: maxSelectableSpellLevel(spellcasting, classLevel),
+    cantripsKnown: cantripsKnownAtLevel(spellcasting, classLevel, config),
+    spellsAvailable: spellsAvailableAtLevel(spellcasting, classLevel, config),
+    maxSelectableSpellLevel: maxSelectableSpellLevel(spellcasting, classLevel, config),
   }
 }

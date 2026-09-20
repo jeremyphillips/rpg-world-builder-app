@@ -10,6 +10,7 @@ import type { Spell } from '../../content/spell'
 import type { Organization } from '../../content/organization/organization'
 import type { LanguageSeedOption } from '../../vocab/language'
 import { resolvedCampaignCharacterCreationPatchSchema } from '../../campaign/patches/campaign-character-creation-patch'
+import type { ResolvedSpellcastingProgressionConfig } from '../../campaign/rules/spellcasting-progression'
 import { resolvedArmorClassSchema } from '../../campaign/patches/campaign-mechanics-patch'
 import { abilityGenerationRulesSchema } from './ability/ability-generation'
 import type {
@@ -112,6 +113,8 @@ export type CharacterBuildContext = {
   rulesetId: SystemRulesetId
   catalog: CharacterBuildCatalog
   characterCreationRules: ResolvedCharacterCreationRules
+  /** Resolved ruleset spellcasting progression records (seed + campaign patch). */
+  spellcastingProgression: ResolvedSpellcastingProgressionConfig
   permissions: CharacterBuilderPermissions
   /** Play-visibility subject for every character-play consumption surface. */
   playActor: ContentPlayActor

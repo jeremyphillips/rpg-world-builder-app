@@ -2,7 +2,7 @@ import type { Spell } from '../../../../content/spell'
 import { getContentTypeCapitalizedSentenceLabel } from '../../../../content/lib/content-type-terms'
 import { buildChoiceSetId, type ChoiceSet, type ChoiceSetOption } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { SpellcastingProfile } from './spellcasting-profile'
+import type { BuilderSpellcastingProfile } from './spellcasting-profile'
 
 export function spellcastingCantripsChoiceSetId(classId: string): string {
   return buildChoiceSetId('spellcasting', classId, 'cantrips')
@@ -25,7 +25,7 @@ function spellOptionsForClass(
 
 /** Builds cantrip and prepared-spell ChoiceSets from a spellcasting profile. */
 export function resolveSpellcastingChoiceSets(
-  profile: SpellcastingProfile,
+  profile: BuilderSpellcastingProfile,
   characterClassSlug: string,
   catalogIndex: CharacterBuildCatalogIndex,
 ): ChoiceSet[] {

@@ -1,3 +1,4 @@
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '@rpg/catalog/spellcasting-progressions'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 import {
   DEFAULT_ABILITY_GENERATION_RULES,
@@ -208,6 +209,10 @@ export function createEquipmentStepContextFixture(
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: resolveIndexedCampaignSpellcastingProgressionConfig(
+      rulesetId,
+      undefined,
+    ),
     permissions: { canCreateCharacter: true },
     playActor: { kind: 'new_pc' },
     ...overrides,

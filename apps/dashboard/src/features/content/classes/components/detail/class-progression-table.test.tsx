@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -5,11 +6,22 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { defaultCampaignRules } from '../../../lib/form-options/content-campaign-rules'
 import { pickClass } from '../../../lib/fixtures/pick'
+import { srdSpellcastingProgressionFixture } from '../../lib/fixtures/spellcasting-progression-fixture'
 import { ClassProgressionTable } from './class-progression-table'
+
+const SPELLCASTING_PROGRESSION = srdSpellcastingProgressionFixture()
+
+function renderProgressionTable(
+  props: Omit<ComponentProps<typeof ClassProgressionTable>, 'spellcastingProgression'>,
+) {
+  return render(
+    <ClassProgressionTable spellcastingProgression={SPELLCASTING_PROGRESSION} {...props} />,
+  )
+}
 
 describe('ClassProgressionTable', () => {
   it('projects barbarian rage columns with independent carry-forward', () => {
-    render(<ClassProgressionTable characterClass={pickClass('barbarian')} />)
+    renderProgressionTable({ characterClass: pickClass('barbarian') })
 
     expect(screen.getByRole('columnheader', { name: 'Rages' })).toBeInTheDocument()
     expect(screen.getByRole('columnheader', { name: 'Rage Damage' })).toBeInTheDocument()
@@ -23,7 +35,7 @@ describe('ClassProgressionTable', () => {
   })
 
   it('renders the progression heading and level rows for a spellcaster', () => {
-    render(<ClassProgressionTable characterClass={pickClass('bard')} />)
+    renderProgressionTable({ characterClass: pickClass('bard') })
 
     expect(screen.getByRole('heading', { name: 'Class Progression' })).toBeInTheDocument()
     expect(screen.getByRole('columnheader', { name: 'Level' })).toBeInTheDocument()
@@ -34,67 +46,46 @@ describe('ClassProgressionTable', () => {
     expect(rows[20]?.textContent).toMatch(/^20\+6/)
   })
 
-  it('shows Spells Prepared for a prepared caster', () => {
-    render(<ClassProgressionTable characterClass={pickClass('sorcerer')} />)
+  it('shows prepared spell counts for a prepared caster profile', () => {
+    renderProgressionTable({ characterClass: pickClass('sorcerer') })
 
-    expect(screen.getByRole('columnheader', { name: 'Spells Prepared' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Prepared Spells' })).toBeInTheDocument()
   })
 
-  it('shows Spells Known for a known caster with a spells-available table', () => {
-    const bard = pickClass('bard')
-    const knownCaster = makeCharacterClass({
-      ...bard,
-      spellcasting: bard.spellcasting ? { ...bard.spellcasting, preparation: 'known' } : undefined,
-    })
+  it('shows repertoire spell counts for a known-style caster profile', () => {
+    renderProgressionTable({ characterClass: pickClass('bard') })
 
-    render(<ClassProgressionTable characterClass={knownCaster} />)
-
-    expect(screen.getByRole('columnheader', { name: 'Spells Known' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Prepared Spells' })).toBeInTheDocument()
   })
 
-  it('hides the spells-available column for full_list mode', () => {
-    const cleric = pickClass('cleric')
-    const alwaysPrepared = makeCharacterClass({
-      ...cleric,
-      spellcasting: cleric.spellcasting
-        ? {
-            ...cleric.spellcasting,
-            preparation: 'full_list',
-            spellsAvailable: undefined,
-          }
-        : undefined,
-    })
+  it('hides spellbook gain columns when profile presentation disables them', () => {
+    renderProgressionTable({ characterClass: pickClass('wizard') })
 
-    render(<ClassProgressionTable characterClass={alwaysPrepared} />)
-
-    expect(screen.queryByRole('columnheader', { name: 'Spells Prepared' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('columnheader', { name: 'Spells Known' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: 'Spellbook Spells' })).not.toBeInTheDocument()
   })
 
   it('uses ordinal spell-level slot headers', () => {
-    render(<ClassProgressionTable characterClass={pickClass('wizard')} />)
+    renderProgressionTable({ characterClass: pickClass('wizard') })
 
     expect(screen.getByRole('columnheader', { name: '1st-level Slots' })).toBeInTheDocument()
     expect(screen.getByRole('columnheader', { name: '9th-level Slots' })).toBeInTheDocument()
   })
 
   it('shows the explicit subclass choice feature row', () => {
-    render(<ClassProgressionTable characterClass={pickClass('bard')} />)
+    renderProgressionTable({ characterClass: pickClass('bard') })
 
     const level3Row = screen.getAllByRole('row')[3]
     expect(level3Row?.textContent).toContain('Bard Subclass')
   })
 
   it('hides subclass-choice features when subclassing is disabled', () => {
-    render(
-      <ClassProgressionTable
-        characterClass={pickClass('bard')}
-        campaignRules={{
-          ...defaultCampaignRules(),
-          subclassing: { enabled: false },
-        }}
-      />,
-    )
+    renderProgressionTable({
+      characterClass: pickClass('bard'),
+      campaignRules: {
+        ...defaultCampaignRules(),
+        subclassing: { enabled: false },
+      },
+    })
 
     const level3Row = screen.getAllByRole('row')[3]
     expect(level3Row?.textContent).toMatch(/^3\+2/)
@@ -102,7 +93,7 @@ describe('ClassProgressionTable', () => {
   })
 
   it('derives Spellcasting in the features column from the spellcasting block', () => {
-    render(<ClassProgressionTable characterClass={pickClass('paladin')} />)
+    renderProgressionTable({ characterClass: pickClass('paladin') })
 
     const level1Row = screen.getAllByRole('row')[1]
     expect(level1Row?.textContent).toContain('Spellcasting')
@@ -110,7 +101,7 @@ describe('ClassProgressionTable', () => {
   })
 
   it('derives Pact Magic for warlock pact progression', () => {
-    render(<ClassProgressionTable characterClass={pickClass('warlock')} />)
+    renderProgressionTable({ characterClass: pickClass('warlock') })
 
     const level1Row = screen.getAllByRole('row')[1]
     expect(level1Row?.textContent).toContain('Pact Magic')
@@ -123,7 +114,7 @@ describe('ClassProgressionTable', () => {
       spellcasting: paladin.spellcasting ? { ...paladin.spellcasting, level: 2 } : undefined,
     })
 
-    render(<ClassProgressionTable characterClass={delayed} />)
+    renderProgressionTable({ characterClass: delayed })
 
     const level1Row = screen.getAllByRole('row')[1]
     expect(level1Row?.textContent).not.toContain('Spellcasting')
@@ -132,25 +123,23 @@ describe('ClassProgressionTable', () => {
   })
 
   itAxe('has no axe accessibility violations', async () => {
-    const { container } = render(<ClassProgressionTable characterClass={pickClass('bard')} />)
+    const { container } = renderProgressionTable({ characterClass: pickClass('bard') })
     await expectNoAxeViolations(container)
   })
 
   it('inserts a tier separator when extended progression is active', () => {
-    render(
-      <ClassProgressionTable
-        characterClass={pickClass('bard')}
-        campaignRules={{
-          ...defaultCampaignRules(),
-          maxCharacterLevel: 30,
-          extendedProgression: {
-            tierName: 'Epic Destiny',
-            startsAt: 21,
-            maxLevel: 30,
-          },
-        }}
-      />,
-    )
+    renderProgressionTable({
+      characterClass: pickClass('bard'),
+      campaignRules: {
+        ...defaultCampaignRules(),
+        maxCharacterLevel: 30,
+        extendedProgression: {
+          tierName: 'Epic Destiny',
+          startsAt: 21,
+          maxLevel: 30,
+        },
+      },
+    })
 
     expect(screen.getByText('Epic Destiny Tier')).toBeInTheDocument()
     const rows = screen.getAllByRole('row')
@@ -158,16 +147,14 @@ describe('ClassProgressionTable', () => {
   })
 
   it('does not insert a separator for a flat cap above 20 without extended progression', () => {
-    render(
-      <ClassProgressionTable
-        characterClass={pickClass('bard')}
-        campaignRules={{
-          ...defaultCampaignRules(),
-          maxCharacterLevel: 25,
-          standardMaxCharacterLevel: 25,
-        }}
-      />,
-    )
+    renderProgressionTable({
+      characterClass: pickClass('bard'),
+      campaignRules: {
+        ...defaultCampaignRules(),
+        maxCharacterLevel: 25,
+        standardMaxCharacterLevel: 25,
+      },
+    })
 
     expect(screen.queryByText(/Tier$/)).not.toBeInTheDocument()
     expect(screen.getAllByRole('row')).toHaveLength(26)

@@ -6,11 +6,6 @@ import { loadSeedClasses } from '@rpg/catalog/classes'
 import { createClassInputSchema, deriveContentKey } from '@rpg/contracts'
 
 import { classFormDef, type ClassFormValues } from './class-form-def'
-import {
-  cantripProgressionsEquivalent,
-  spellsAvailableProgressionsEquivalent,
-} from './progression-table-helpers'
-
 const SRD_CLASSES = loadSeedClasses('srd-cc-5.2.1')
 
 function roundTripFormInput(slug: string) {
@@ -45,13 +40,11 @@ function expectBardSpellcastingRoundTrip(): void {
 
   expect(fromForm.description).toContain('cast spells through your bardic arts')
   expect(fromForm.level).toBe(1)
-  expect(fromForm.progressionTable!.cantrips![0]).toBe(2)
+  expect(fromForm.profileId).toBe(expected.profileId)
   expect(fromInput.description).toContain('cast spells through your bardic arts')
   expect(fromInput.level).toBe(1)
-  expect(cantripProgressionsEquivalent(fromInput.cantrips, expected.cantrips)).toBe(true)
-  expect(
-    spellsAvailableProgressionsEquivalent(fromInput.spellsAvailable, expected.spellsAvailable),
-  ).toBe(true)
+  expect(fromInput.profileId).toBe(expected.profileId)
+  expect(fromInput.ability).toBe(expected.ability)
 }
 
 it('type: toInput validates as CreateClassInput', () => {
@@ -380,10 +373,8 @@ describe('classFormDef round-trips', () => {
     const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
     const input = classFormDef.toInput(formValues, { entity: sorcerer })
-    expect(input.spellcasting?.progression).toBe('full')
-    expect(
-      cantripProgressionsEquivalent(input.spellcasting?.cantrips, sorcerer.spellcasting?.cantrips),
-    ).toBe(true)
+    expect(input.spellcasting?.profileId).toBe(sorcerer.spellcasting?.profileId)
+    expect(input.spellcasting?.ability).toBe('cha')
     const fontOfMagic = input.features.find((feature) => feature.id === 'font-of-magic')
     expect(fontOfMagic?.kind).toBe('custom')
     if (fontOfMagic?.kind === 'custom') {

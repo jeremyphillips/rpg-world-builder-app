@@ -1,48 +1,23 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  SPELL_PREPARATION_MODE_LABELS,
-  SPELL_PREPARATION_MODES,
-  isSpellcastingActiveAtLevel,
-  spellcastingFeatureLabel,
-  spellcastingSchema,
-  spellsAvailableEntrySchema,
-} from './spellcasting'
-
-describe('SPELL_PREPARATION_MODES', () => {
-  it('derives mode ids from the label map', () => {
-    expect([...SPELL_PREPARATION_MODES].sort()).toEqual(
-      Object.keys(SPELL_PREPARATION_MODE_LABELS).sort(),
-    )
-  })
-})
+import { isSpellcastingActiveAtLevel, spellcastingSchema } from './spellcasting'
 
 describe('spellcastingSchema', () => {
-  it('parses all preparation modes including full_list', () => {
-    for (const preparation of SPELL_PREPARATION_MODES) {
-      expect(
-        spellcastingSchema.safeParse({
-          progression: 'full',
-          ability: 'int',
-          preparation,
-        }).success,
-      ).toBe(true)
-    }
+  it('parses profileId and ability', () => {
+    const parsed = spellcastingSchema.parse({
+      profileId: 'srd:wizard',
+      ability: 'int',
+    })
+    expect(parsed.profileId).toBe('srd:wizard')
+    expect(parsed.ability).toBe('int')
+    expect(parsed.level).toBe(1)
   })
 
   it('parses optional level and description', () => {
-    const withDefaults = spellcastingSchema.parse({
-      progression: 'half',
-      ability: 'cha',
-      preparation: 'prepared',
-    })
-    expect(withDefaults.level).toBe(1)
-
     const withLevel = spellcastingSchema.parse({
+      profileId: 'srd:bard',
       level: 2,
-      progression: 'half',
       ability: 'cha',
-      preparation: 'prepared',
       description: '<p>Delayed caster.</p>',
     })
     expect(withLevel.level).toBe(2)
@@ -51,18 +26,16 @@ describe('spellcastingSchema', () => {
 
   it('parses optional focus kinds and rejects non-focus kinds', () => {
     const spellcasting = spellcastingSchema.parse({
-      progression: 'full',
+      profileId: 'srd:wizard',
       ability: 'int',
-      preparation: 'prepared',
       focusKinds: ['arcane_focus'],
     })
     expect(spellcasting.focusKinds).toEqual(['arcane_focus'])
 
     expect(
       spellcastingSchema.safeParse({
-        progression: 'full',
+        profileId: 'srd:wizard',
         ability: 'int',
-        preparation: 'prepared',
         focusKinds: ['spellbook'],
       }).success,
     ).toBe(false)
@@ -70,9 +43,8 @@ describe('spellcastingSchema', () => {
 
   it('parses required and recommended spellcasting gear', () => {
     const spellcasting = spellcastingSchema.parse({
-      progression: 'full',
+      profileId: 'srd:wizard',
       ability: 'int',
-      preparation: 'prepared',
       requiredGear: ['spellbook'],
       focusKinds: ['arcane_focus'],
       recommendedGear: ['spellbook'],
@@ -82,53 +54,28 @@ describe('spellcastingSchema', () => {
     expect(spellcasting.recommendedGear).toEqual(['spellbook'])
   })
 
-  it('parses spellsAvailable with count instead of prepared', () => {
-    const spellcasting = spellcastingSchema.parse({
-      progression: 'full',
-      ability: 'int',
-      preparation: 'prepared',
-      spellsAvailable: [{ level: 1, count: 4 }],
-    })
-
-    expect(spellcasting.spellsAvailable).toEqual([{ level: 1, count: 4 }])
-  })
-
-  it('strips legacy spellsPrepared field on parse', () => {
+  it('strips legacy progression and preparation fields on parse', () => {
     const result = spellcastingSchema.parse({
-      progression: 'full',
+      profileId: 'srd:wizard',
       ability: 'int',
+      progression: 'full',
       preparation: 'prepared',
-      spellsPrepared: [{ level: 1, prepared: 4 }],
     })
 
-    expect(result.spellsAvailable).toBeUndefined()
-    expect('spellsPrepared' in result).toBe(false)
-  })
-})
-
-describe('spellcastingFeatureLabel', () => {
-  it('returns Pact Magic for pact progression', () => {
-    expect(spellcastingFeatureLabel('pact')).toBe('Pact Magic')
-    expect(spellcastingFeatureLabel('full')).toBe('Spellcasting')
+    expect(result.profileId).toBe('srd:wizard')
+    expect('progression' in result).toBe(false)
+    expect('preparation' in result).toBe(false)
   })
 })
 
 describe('isSpellcastingActiveAtLevel', () => {
   it('respects unlock level', () => {
-    const half = spellcastingSchema.parse({
+    const delayed = spellcastingSchema.parse({
+      profileId: 'srd:paladin',
       level: 2,
-      progression: 'half',
       ability: 'cha',
-      preparation: 'prepared',
     })
-    expect(isSpellcastingActiveAtLevel(half, 1)).toBe(false)
-    expect(isSpellcastingActiveAtLevel(half, 2)).toBe(true)
-  })
-})
-
-describe('spellsAvailableEntrySchema', () => {
-  it('requires count, not prepared', () => {
-    expect(spellsAvailableEntrySchema.safeParse({ level: 1, count: 2 }).success).toBe(true)
-    expect(spellsAvailableEntrySchema.safeParse({ level: 1, prepared: 2 }).success).toBe(false)
+    expect(isSpellcastingActiveAtLevel(delayed, 1)).toBe(false)
+    expect(isSpellcastingActiveAtLevel(delayed, 2)).toBe(true)
   })
 })

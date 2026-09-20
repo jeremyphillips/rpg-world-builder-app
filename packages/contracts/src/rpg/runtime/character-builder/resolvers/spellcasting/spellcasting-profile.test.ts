@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { spellcastingProgressionTestConfig } from '../../../../campaign/rules/spellcasting-progression/fixtures'
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
@@ -60,7 +61,7 @@ describe('spellcasting-profile', () => {
       classId: wizardClass.id,
       className: 'Wizard',
       ability: 'int',
-      preparation: 'prepared',
+      usesPreparedLoadout: true,
       cantripsKnown: 3,
       spellsAvailable: 4,
       maxSelectableSpellLevel: 1,
@@ -95,14 +96,16 @@ describe('spellcasting-profile', () => {
       spellsAvailable: 2,
       maxSelectableSpellLevel: 1,
     })
-    expect(maxSelectableSpellLevel(warlockClass.spellcasting!, 1)).toBe(1)
+    expect(
+      maxSelectableSpellLevel(warlockClass.spellcasting!, 1, spellcastingProgressionTestConfig),
+    ).toBe(1)
   })
 
   it('reads progression tables at the requested class level', () => {
     const spellcasting = wizardClass.spellcasting!
 
-    expect(cantripsKnownAtLevel(spellcasting, 1)).toBe(3)
-    expect(spellsAvailableAtLevel(spellcasting, 1)).toBe(4)
-    expect(maxSelectableSpellLevel(spellcasting, 1)).toBe(1)
+    expect(cantripsKnownAtLevel(spellcasting, 1, spellcastingProgressionTestConfig)).toBe(3)
+    expect(spellsAvailableAtLevel(spellcasting, 1, spellcastingProgressionTestConfig)).toBe(4)
+    expect(maxSelectableSpellLevel(spellcasting, 1, spellcastingProgressionTestConfig)).toBe(1)
   })
 })

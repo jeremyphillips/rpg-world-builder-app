@@ -1,7 +1,7 @@
-import { MAX_CHARACTER_LEVEL, type Spellcasting } from '@rpg/contracts'
+import { MAX_CHARACTER_LEVEL } from '@rpg/contracts'
 
-type CantripsKnownEntry = NonNullable<Spellcasting['cantrips']>[number]
-type SpellsAvailableEntry = NonNullable<Spellcasting['spellsAvailable']>[number]
+type CantripsKnownEntry = { level: number; known: number }
+type SpellsAvailableEntry = { level: number; count: number }
 
 export type ProgressionTableFormValue = {
   cantrips: (number | null)[]

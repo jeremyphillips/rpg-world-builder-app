@@ -7,6 +7,7 @@ import type { Spell } from '../../../content/spell'
 import type { Organization } from '../../../content/organization/organization'
 import type { ResolvedContentCampaignAccess } from '../../../content/lib/campaign-access'
 import { resolveCharacterCreationPatch } from '../../../campaign/patches/campaign-character-creation-patch'
+import { spellcastingProgressionTestConfig } from '../../../campaign/rules/spellcasting-progression/fixtures'
 import { defaultCampaignMechanicsPatch } from '../../../campaign/patches/campaign-mechanics-patch'
 import { resolveCharacterOwnershipTarget } from '../../character-acquisition'
 import type { CharacterBuildContext } from '../context'
@@ -152,6 +153,7 @@ function makeContext(
         creatureTypePolicy: creatureTypePolicy ?? baseRules.species.creatureTypePolicy,
       },
     },
+    spellcastingProgression: spellcastingProgressionTestConfig,
     permissions: { canCreateCharacter: true },
     playActor: { kind: 'new_pc' },
     ...rest,

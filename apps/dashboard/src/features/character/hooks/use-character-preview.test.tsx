@@ -20,7 +20,14 @@ describe('useCharacterPreview', () => {
     }
 
     const { result } = renderHook(() =>
-      useCharacterPreview(draft, catalogIndex, context.characterCreationRules, context.rulesetId),
+      useCharacterPreview(
+        draft,
+        catalogIndex,
+        context.characterCreationRules,
+        context.rulesetId,
+        [],
+        context.spellcastingProgression,
+      ),
     )
 
     expect(result.current).toEqual(
@@ -32,6 +39,7 @@ describe('useCharacterPreview', () => {
         {
           resolvedChoiceSets: [],
         },
+        context.spellcastingProgression,
       ),
     )
   })

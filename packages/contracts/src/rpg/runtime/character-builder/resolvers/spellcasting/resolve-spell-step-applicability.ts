@@ -1,7 +1,7 @@
 import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
-import { resolveSpellcastingProfile, type SpellcastingProfile } from './spellcasting-profile'
+import { resolveSpellcastingProfile, type BuilderSpellcastingProfile } from './spellcasting-profile'
 
 export type SpellStepNotApplicableReason = 'noSpellcasting' | 'inactiveAtLevel'
 
@@ -13,7 +13,7 @@ export type SpellStepApplicability =
       className: string
       level: number
     }
-  | { kind: 'applicable'; profile: SpellcastingProfile }
+  | { kind: 'applicable'; profile: BuilderSpellcastingProfile }
 
 /**
  * Distinguishes spells-step blocked (no class), not applicable (non-caster or

@@ -9,6 +9,7 @@ import {
   type CharacterBuildCatalogIndex,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '@rpg/catalog/spellcasting-progressions'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
@@ -45,6 +46,10 @@ export const homebrewSpeciesFixture = makeSpecies({
 
 export { populatedBuilderCatalog }
 
+function defaultSpellcastingProgression(rulesetId: StandaloneBuildContext['rulesetId']) {
+  return resolveIndexedCampaignSpellcastingProgressionConfig(rulesetId, undefined)
+}
+
 export function createStandaloneBuilderContextFixture(
   overrides: Partial<StandaloneBuildContext> = {},
 ): StandaloneBuildContext {
@@ -65,6 +70,7 @@ export function createStandaloneBuilderContextFixture(
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: defaultSpellcastingProgression(rulesetId),
     permissions: { canCreateCharacter: true },
     playActor: { kind: 'new_pc' },
     ...overrides,
@@ -109,6 +115,7 @@ export function createCampaignNpcBuilderContextFixture(
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: defaultSpellcastingProgression(rulesetId),
     permissions: { canCreateCharacter: true },
     ...overrides,
   }
@@ -142,6 +149,7 @@ export function createCampaignPcBuilderContextFixture(
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: defaultSpellcastingProgression(rulesetId),
     permissions: { canCreateCharacter: true },
     ...overrides,
   }

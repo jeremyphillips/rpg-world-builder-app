@@ -1,8 +1,7 @@
 import {
   getAbilityLabel,
-  SPELL_PREPARATION_MODE_LABELS,
+  type BuilderSpellcastingProfile,
   type CharacterBuildPreview,
-  type SpellcastingProfile,
 } from '@rpg/contracts'
 
 import {
@@ -19,7 +18,7 @@ import {
 } from './spellcasting-summary-card.variants'
 
 export type SpellcastingSummaryCardProps = {
-  profile: SpellcastingProfile
+  profile: BuilderSpellcastingProfile
   preview: CharacterBuildPreview | null
 }
 
@@ -42,7 +41,7 @@ export function SpellcastingSummaryCard({ profile, preview }: SpellcastingSummar
         <SummaryField label="Spellcasting ability" value={getAbilityLabel(profile.ability)} />
         <SummaryField
           label="Preparation"
-          value={SPELL_PREPARATION_MODE_LABELS[profile.preparation]}
+          value={profile.usesPreparedLoadout ? 'Prepared' : 'Known'}
         />
         <SummaryField label="Choices" value={formatSpellcastingCountSummary(profile)} />
         <SummaryField label="Spell save DC" value={formatSpellSaveDc(spellcasting)} />

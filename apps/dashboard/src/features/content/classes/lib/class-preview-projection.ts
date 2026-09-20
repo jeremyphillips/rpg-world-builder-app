@@ -3,8 +3,6 @@ import {
   CLASS_CONTENT_TYPE_TERM,
   getAbilityCompactLabel,
   getArmorCategoryPreviewLabel,
-  getSpellPreparationModeLabel,
-  getSpellcastingProgressionLabel,
   getWeaponCategoryPreviewLabel,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
@@ -218,9 +216,7 @@ function spellcastingFacts(
   })
   facts.push({
     label: CLASS_PREVIEW_FACT_LABELS.progression,
-    value: spellcasting.progression
-      ? getSpellcastingProgressionLabel(spellcasting.progression)
-      : CONTENT_PREVIEW_NOT_SET,
+    value: spellcasting.profileId ?? CONTENT_PREVIEW_NOT_SET,
   })
 
   return facts
@@ -235,11 +231,10 @@ function buildSpellcastingSection(values: ClassFormValues): ContentPreviewSectio
   }
 
   const spellcasting = values.spellcasting
-  const preparation = spellcasting?.preparation
 
   return {
     derivedKind: 'ready',
-    status: preparation ? getSpellPreparationModeLabel(preparation) : CONTENT_PREVIEW_STATUS_READY,
+    status: spellcasting?.profileId ? spellcasting.profileId : CONTENT_PREVIEW_STATUS_READY,
     facts: spellcastingFacts(spellcasting),
   }
 }

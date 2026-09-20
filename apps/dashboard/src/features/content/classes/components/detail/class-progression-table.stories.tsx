@@ -2,7 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 import { pickClass } from '../../../lib/fixtures/pick'
+import { srdSpellcastingProgressionFixture } from '../../lib/fixtures/spellcasting-progression-fixture'
 import { ClassProgressionTable } from './class-progression-table'
+
+const SPELLCASTING_PROGRESSION = srdSpellcastingProgressionFixture()
 
 const meta = {
   title: 'Content/Classes/ClassProgressionTable',
@@ -21,36 +24,30 @@ const BARBARIAN = makeCharacterClass({
   ],
 })
 
-const ALWAYS_PREPARED_CLERIC = makeCharacterClass({
-  ...pickClass('cleric'),
-  spellcasting: {
-    ...pickClass('cleric').spellcasting!,
-    preparation: 'full_list',
-    spellsAvailable: undefined,
-  },
-})
-
 export const NonSpellcaster: Story = {
   name: 'Barbarian (non-spellcaster)',
-  args: { characterClass: BARBARIAN },
+  args: { characterClass: BARBARIAN, spellcastingProgression: SPELLCASTING_PROGRESSION },
 }
 
 export const FullCaster: Story = {
   name: 'Bard (full caster)',
-  args: { characterClass: pickClass('bard') },
+  args: { characterClass: pickClass('bard'), spellcastingProgression: SPELLCASTING_PROGRESSION },
 }
 
 export const PreparedSpells: Story = {
   name: 'Sorcerer (prepared spells table)',
-  args: { characterClass: pickClass('sorcerer') },
+  args: {
+    characterClass: pickClass('sorcerer'),
+    spellcastingProgression: SPELLCASTING_PROGRESSION,
+  },
 }
 
 export const KnownSpells: Story = {
   name: 'Warlock (known preparation, cantrips only)',
-  args: { characterClass: pickClass('warlock') },
+  args: { characterClass: pickClass('warlock'), spellcastingProgression: SPELLCASTING_PROGRESSION },
 }
 
 export const AlwaysPrepared: Story = {
-  name: 'Cleric (always prepared — no count column)',
-  args: { characterClass: ALWAYS_PREPARED_CLERIC },
+  name: 'Cleric (prepared loadout profile)',
+  args: { characterClass: pickClass('cleric'), spellcastingProgression: SPELLCASTING_PROGRESSION },
 }

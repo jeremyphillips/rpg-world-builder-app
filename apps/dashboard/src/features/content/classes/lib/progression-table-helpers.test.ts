@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { loadSeedClasses } from '@rpg/catalog/classes'
 
 import {
   progressionTableFromFormValues,
@@ -8,43 +7,42 @@ import {
   spellsAvailableProgressionsEquivalent,
 } from './progression-table-helpers'
 
-const SRD_CLASSES = loadSeedClasses('srd-cc-5.2.1')
-
 describe('progressionTableToFormValues / progressionTableFromFormValues', () => {
-  it('round-trips bard cantrips and spells available', () => {
-    const bard = SRD_CLASSES.find((c) => c.slug === 'bard')!
-    const table = progressionTableToFormValues(
-      bard.spellcasting?.cantrips,
-      bard.spellcasting?.spellsAvailable,
-    )
+  it('round-trips bard-like cantrips and spells available curves', () => {
+    const cantrips = [
+      { level: 1, known: 2 },
+      { level: 4, known: 3 },
+      { level: 10, known: 4 },
+    ]
+    const spellsAvailable = [
+      { level: 1, count: 4 },
+      { level: 20, count: 22 },
+    ]
+    const table = progressionTableToFormValues(cantrips, spellsAvailable)
     const restored = progressionTableFromFormValues(table)
 
-    expect(cantripProgressionsEquivalent(restored.cantrips, bard.spellcasting?.cantrips)).toBe(true)
-    expect(
-      spellsAvailableProgressionsEquivalent(
-        restored.spellsAvailable,
-        bard.spellcasting?.spellsAvailable,
-      ),
-    ).toBe(true)
-  })
-
-  it('round-trips sorcerer cantrips and spells available', () => {
-    const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
-    const table = progressionTableToFormValues(
-      sorcerer.spellcasting?.cantrips,
-      sorcerer.spellcasting?.spellsAvailable,
-    )
-    const restored = progressionTableFromFormValues(table)
-
-    expect(cantripProgressionsEquivalent(restored.cantrips, sorcerer.spellcasting?.cantrips)).toBe(
+    expect(cantripProgressionsEquivalent(restored.cantrips, cantrips)).toBe(true)
+    expect(spellsAvailableProgressionsEquivalent(restored.spellsAvailable, spellsAvailable)).toBe(
       true,
     )
-    expect(
-      spellsAvailableProgressionsEquivalent(
-        restored.spellsAvailable,
-        sorcerer.spellcasting?.spellsAvailable,
-      ),
-    ).toBe(true)
+  })
+
+  it('round-trips sorcerer-like cantrips and spells available curves', () => {
+    const cantrips = [
+      { level: 1, known: 4 },
+      { level: 4, known: 5 },
+    ]
+    const spellsAvailable = [
+      { level: 1, count: 2 },
+      { level: 20, count: 22 },
+    ]
+    const table = progressionTableToFormValues(cantrips, spellsAvailable)
+    const restored = progressionTableFromFormValues(table)
+
+    expect(cantripProgressionsEquivalent(restored.cantrips, cantrips)).toBe(true)
+    expect(spellsAvailableProgressionsEquivalent(restored.spellsAvailable, spellsAvailable)).toBe(
+      true,
+    )
   })
 
   it('compresses a flat dense column into a single entry', () => {

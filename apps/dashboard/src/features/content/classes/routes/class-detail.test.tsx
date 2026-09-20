@@ -18,6 +18,14 @@ vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
 vi.mock('../../lib/usage/content-usage-references-section', () => ({
   ContentUsageReferencesSection: () => null,
 }))
+vi.mock('@/features/homebrew', () => ({
+  useRulesetPatch: vi.fn(() => ({
+    data: undefined,
+    isPending: false,
+    isError: false,
+  })),
+}))
+
 vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
   useCampaignRules: vi.fn(() => ({

@@ -2,7 +2,6 @@ import {
   classFeatureSchema,
   createClassDraftInputSchema,
   createClassInputSchema,
-  MAX_CHARACTER_LEVEL,
   resolveClassAbilityScoreOrder,
   type CharacterClass,
   type ClassFeature,
@@ -22,12 +21,6 @@ import { createAsiFeature } from './class-asi-features'
 import { createSubclassChoiceFeature } from './class-subclass-choice-features'
 import { featuresFromFormValues, featureToFormRow } from './class-feature-form-fields'
 import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
-import {
-  emptyProgressionTable,
-  progressionTableFromFormValues,
-  progressionTableToFormValues,
-  type ProgressionTableFormValue,
-} from './progression-table-helpers'
 import {
   startingEquipmentEmptyFormValues,
   startingEquipmentFromFormValues,
@@ -216,42 +209,21 @@ export function buildClassCreateInput(
   return finalizeContentInput(input, ctx) as CreateClassInput
 }
 
-function progressionRowCount(spellcasting?: Spellcasting): number {
-  const levels = [
-    ...(spellcasting?.cantrips?.map((entry) => entry.level) ?? []),
-    ...(spellcasting?.spellsAvailable?.map((entry) => entry.level) ?? []),
-  ]
-  const maxInData = levels.length > 0 ? Math.max(...levels) : 0
-  return Math.max(MAX_CHARACTER_LEVEL, maxInData)
-}
-
-export function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
-  const rowCount = progressionRowCount(spellcasting)
+export function spellcastingToFormValues(
+  spellcasting: Spellcasting | undefined,
+): ClassFormValues['spellcasting'] {
   if (!spellcasting) {
-    return {
-      level: 1,
-      description: undefined,
-      progression: undefined,
-      ability: undefined,
-      preparation: undefined,
-      progressionTable: emptyProgressionTable(rowCount),
-    }
+    return undefined
   }
 
   return {
     level: spellcasting.level,
     description: spellcasting.description,
-    progression: spellcasting.progression,
+    profileId: spellcasting.profileId,
     ability: spellcasting.ability,
-    preparation: spellcasting.preparation,
     requiredGear: spellcasting.requiredGear,
     focusKinds: spellcasting.focusKinds,
     recommendedGear: spellcasting.recommendedGear,
-    progressionTable: progressionTableToFormValues(
-      spellcasting.cantrips,
-      spellcasting.spellsAvailable,
-      rowCount,
-    ),
   }
 }
 
@@ -259,21 +231,7 @@ function hasCompleteSpellcastingCore(
   hasSpellcasting: boolean,
   spellcasting: ClassFormValues['spellcasting'],
 ): boolean {
-  return Boolean(
-    hasSpellcasting &&
-    spellcasting?.progression &&
-    spellcasting?.ability &&
-    spellcasting?.preparation,
-  )
-}
-
-function appendOptionalProgressionTables(
-  result: Spellcasting,
-  progressionTable: ProgressionTableFormValue | undefined,
-): void {
-  const { cantrips, spellsAvailable } = progressionTableFromFormValues(progressionTable)
-  if (cantrips) result.cantrips = cantrips
-  if (spellsAvailable) result.spellsAvailable = spellsAvailable
+  return Boolean(hasSpellcasting && spellcasting?.profileId && spellcasting?.ability)
 }
 
 function spellcastingFromFormValues(
@@ -286,9 +244,8 @@ function spellcastingFromFormValues(
 
   const result: Spellcasting = {
     level: spellcasting.level ?? 1,
-    progression: spellcasting.progression!,
+    profileId: spellcasting.profileId!,
     ability: spellcasting.ability!,
-    preparation: spellcasting.preparation!,
   }
   if (spellcasting.description?.trim()) {
     result.description = spellcasting.description.trim()
@@ -302,18 +259,12 @@ function spellcastingFromFormValues(
   if (spellcasting.recommendedGear?.length) {
     result.recommendedGear = spellcasting.recommendedGear
   }
-  appendOptionalProgressionTables(result, spellcasting.progressionTable)
   return result
 }
 
 export const classCreateDefaultValues: Partial<ClassFormValues> = {
   hasSpellcasting: false,
   weaponProficiencyMode: 'categories',
-  spellcasting: {
-    level: 1,
-    preparation: 'prepared',
-    progressionTable: emptyProgressionTable(),
-  },
   proficiencies: {
     savingThrows: [],
     armor: [],

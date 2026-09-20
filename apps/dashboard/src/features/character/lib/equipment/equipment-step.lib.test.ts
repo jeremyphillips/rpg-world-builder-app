@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '@rpg/catalog/spellcasting-progressions'
 
 import {
   applyEquipmentStepAction,
@@ -95,6 +96,10 @@ function createEquipmentStepContextWithStartingWealth(
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: resolveIndexedCampaignSpellcastingProgressionConfig(
+      equipmentStepBardClassFixture.rulesetId,
+      undefined,
+    ),
     permissions: { canCreateCharacter: true },
     playActor: { kind: 'new_pc' },
   }

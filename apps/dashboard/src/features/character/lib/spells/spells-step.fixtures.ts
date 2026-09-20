@@ -6,6 +6,7 @@ import {
   type CharacterBuildContext,
   type Spell,
 } from '@rpg/contracts'
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '@rpg/catalog/spellcasting-progressions'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
@@ -56,11 +57,8 @@ export const spellsStepWizardClass = makeClassStored({
   features: [],
   spellcasting: {
     level: 1,
-    progression: 'full',
+    profileId: 'srd:wizard',
     ability: 'int',
-    preparation: 'prepared',
-    cantrips: [{ level: 1, known: 3 }],
-    spellsAvailable: [{ level: 1, count: 4 }],
   },
 })
 
@@ -120,6 +118,10 @@ export function createSpellsStepContextFixture(
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: resolveIndexedCampaignSpellcastingProgressionConfig(
+      rulesetId,
+      undefined,
+    ),
     permissions: { canCreateCharacter: true },
     playActor: { kind: 'new_pc' },
     ...overrides,

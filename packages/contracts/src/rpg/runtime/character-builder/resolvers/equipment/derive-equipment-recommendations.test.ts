@@ -207,9 +207,8 @@ const storedWizard: ClassStored = {
   hitDie: 6,
   spellcasting: {
     level: 1,
-    progression: 'full',
+    profileId: 'fixture:wizard',
     ability: 'int',
-    preparation: 'prepared',
     requiredGear: ['spellbook'],
     focusKinds: ['arcane_focus'],
   },
@@ -378,7 +377,7 @@ describe('deriveEquipmentRecommendations', () => {
       id: `${RULESET}:cleric`,
       slug: 'cleric',
       name: 'Cleric',
-      spellcasting: { level: 1, progression: 'full', ability: 'wis', preparation: 'prepared' },
+      spellcasting: { level: 1, profileId: 'fixture:paladin', ability: 'wis' },
       characterCreation: {
         startingEquipment: {
           choose: 1,

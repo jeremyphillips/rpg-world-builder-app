@@ -2,6 +2,7 @@ import type { CharacterDerivationInput } from '../../character/derive/profile'
 import { assembleCharacterProficiencies } from '../assembly/assemble-proficiencies'
 import { getCharacterBuilderTotalLevel } from '../progression/builder-level'
 import type { ChoiceSet } from '../choice-set'
+import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/rules/spellcasting-progression'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from '../context'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { CharacterBuilderDraft } from '../draft/draft'
@@ -18,6 +19,7 @@ export function toCharacterDerivationInput(
   rules: ResolvedCharacterCreationRules,
   choiceSets: readonly ChoiceSet[],
   rulesetId: SystemRulesetId,
+  spellcastingProgression?: ResolvedSpellcastingProgressionConfig,
 ): CharacterDerivationInput {
   const classId = draft.class.classId
   const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
@@ -47,5 +49,6 @@ export function toCharacterDerivationInput(
     }),
     skillProficiencies: Array.from(catalogIndex.skillProficiencies.values()),
     equippedArmor: equippedArmor.length > 0 ? equippedArmor : undefined,
+    spellcastingProgression,
   }
 }

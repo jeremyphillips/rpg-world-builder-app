@@ -80,9 +80,8 @@ describe('classHasSpellcasting', () => {
           ...fighter,
           spellcasting: {
             level: 1,
-            progression: 'full',
+            profileId: 'srd:wizard',
             ability: 'int',
-            preparation: 'prepared',
           },
         }),
       ),

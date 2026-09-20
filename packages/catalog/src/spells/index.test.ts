@@ -1,11 +1,21 @@
 import { loadSeedClasses, seedClassSlugs } from '@rpg/catalog/classes'
-import { isSpellcastingActiveAtLevel } from '@rpg/contracts'
+import {
+  isSpellcastingActiveAtLevel,
+  resolveCantripsKnownFromProfile,
+  resolveSpellcastingProfileForClass,
+  resolveSpellsAvailableFromProfile,
+} from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '../spellcasting-progressions'
 import { loadSeedSpells, loadSeedSpellsByLevel, seedSpellSlugs, SPELL_LEVEL_FILES } from './index'
 
 const RULESET = 'srd-cc-5.2.1' as const
+const SPELLCASTING_PROGRESSION = resolveIndexedCampaignSpellcastingProgressionConfig(
+  RULESET,
+  undefined,
+)
 const SRD_CLASS_SLUGS = seedClassSlugs(RULESET)
 const SPELL_OPTION_HEADROOM = 2
 
@@ -105,7 +115,12 @@ describe('SRD 5.2.1 spell seed', () => {
     for (const cls of classes) {
       if (!isSpellcastingActiveAtLevel(cls.spellcasting, 1)) continue
 
-      const cantripsRequired = cls.spellcasting?.cantrips?.find((e) => e.level === 1)?.known ?? 0
+      const profileBundle = cls.spellcasting
+        ? resolveSpellcastingProfileForClass(cls, SPELLCASTING_PROGRESSION)
+        : null
+      const cantripsRequired = profileBundle
+        ? resolveCantripsKnownFromProfile(profileBundle.profile, 1)
+        : 0
       if (cantripsRequired > 0) {
         const cantripOptions = spells.filter(
           (s) => s.level === 0 && s.classIds.includes(cls.slug),
@@ -116,8 +131,9 @@ describe('SRD 5.2.1 spell seed', () => {
         ).toBeGreaterThanOrEqual(cantripsRequired + SPELL_OPTION_HEADROOM)
       }
 
-      const spellsRequired =
-        cls.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count ?? 0
+      const spellsRequired = profileBundle
+        ? resolveSpellsAvailableFromProfile(profileBundle.profile, 1)
+        : 0
       if (spellsRequired > 0) {
         const spellOptions = spells.filter(
           (s) => s.level === 1 && s.classIds.includes(cls.slug),

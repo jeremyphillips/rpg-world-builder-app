@@ -127,11 +127,8 @@ describe('builder-preview-projection.lib', () => {
       },
       spellcasting: {
         level: 1,
-        progression: 'full',
+        profileId: 'fixture:wizard',
         ability: 'int',
-        preparation: 'prepared',
-        cantrips: [{ level: 1, known: 3 }],
-        spellsAvailable: [{ level: 1, count: 4 }],
       },
     })
     const inactiveDraft = createEmptyCharacterBuilderDraft()

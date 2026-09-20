@@ -103,6 +103,10 @@
     "spellcasting": {
       "type": "object",
       "properties": {
+        "profileId": {
+          "type": "string",
+          "minLength": 1
+        },
         "level": {
           "default": 1,
           "allOf": [
@@ -113,15 +117,6 @@
         },
         "description": {
           "type": "string"
-        },
-        "progression": {
-          "type": "string",
-          "enum": [
-            "full",
-            "half",
-            "pact"
-          ],
-          "description": "full | half | pact"
         },
         "ability": {
           "type": "string",
@@ -134,15 +129,6 @@
             "cha"
           ],
           "description": "str | dex | con | int | wis | cha"
-        },
-        "preparation": {
-          "type": "string",
-          "enum": [
-            "prepared",
-            "known",
-            "full_list"
-          ],
-          "description": "prepared | known | full_list"
         },
         "requiredGear": {
           "minItems": 1,
@@ -186,55 +172,12 @@
             ],
             "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
           }
-        },
-        "cantrips": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "level": {
-                "$ref": "#/definitions/__schema2"
-              },
-              "known": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 9007199254740991
-              }
-            },
-            "required": [
-              "level",
-              "known"
-            ],
-            "additionalProperties": false
-          }
-        },
-        "spellsAvailable": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "level": {
-                "$ref": "#/definitions/__schema2"
-              },
-              "count": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 9007199254740991
-              }
-            },
-            "required": [
-              "level",
-              "count"
-            ],
-            "additionalProperties": false
-          }
         }
       },
       "required": [
+        "profileId",
         "level",
-        "progression",
-        "ability",
-        "preparation"
+        "ability"
       ],
       "additionalProperties": false
     },

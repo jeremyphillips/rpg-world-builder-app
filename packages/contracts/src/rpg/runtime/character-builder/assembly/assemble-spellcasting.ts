@@ -56,7 +56,7 @@ export function assembleClassSpellcasting(
         sources: classSpellcastingSource(profile.classId, grantId),
       }
 
-      if (profile.preparation === 'prepared' || profile.preparation === 'full_list') {
+      if (profile.usesPreparedLoadout) {
         entry.selection = { prepared: true }
       }
 

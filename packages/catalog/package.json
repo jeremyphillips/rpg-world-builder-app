@@ -32,6 +32,10 @@
       "types": "./src/xp-progressions/index.ts",
       "default": "./src/xp-progressions/index.ts"
     },
+    "./spellcasting-progressions": {
+      "types": "./src/spellcasting-progressions/index.ts",
+      "default": "./src/spellcasting-progressions/index.ts"
+    },
     "./starting-wealth": {
       "types": "./src/starting-wealth/index.ts",
       "default": "./src/starting-wealth/index.ts"

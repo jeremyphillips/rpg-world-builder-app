@@ -31,6 +31,7 @@ export function useProficienciesStep({
       context.characterCreationRules,
       context.rulesetId,
       { resolvedChoiceSets },
+      context.spellcastingProgression,
     )
   }, [context, draft, preview, resolvedChoiceSets])
 

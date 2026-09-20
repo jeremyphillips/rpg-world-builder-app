@@ -15,6 +15,7 @@ import {
   type CharacterBuildCatalog,
 } from './context'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
+import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
 import { builderTestCatalog, builderTestRules } from './test-fixtures'
 
 const emptyCatalog: CharacterBuildCatalog = {
@@ -44,6 +45,7 @@ function createCampaignNpcContext(): CampaignNpcBuildContext {
     rulesetId: TEST_RULESET_ID,
     catalog: builderTestCatalog,
     characterCreationRules: builderTestRules,
+    spellcastingProgression: spellcastingProgressionTestConfig,
     permissions: { canCreateCharacter: true },
   }
 }
@@ -65,6 +67,7 @@ function createCampaignPcContext(): CampaignPcBuildContext {
     rulesetId: TEST_RULESET_ID,
     catalog: builderTestCatalog,
     characterCreationRules: { ...builderTestRules, startingLevel: 3 },
+    spellcastingProgression: spellcastingProgressionTestConfig,
     permissions: { canCreateCharacter: true },
   }
 }
@@ -174,6 +177,7 @@ describe('character build context helpers', () => {
         rulesetId: TEST_RULESET_ID,
         catalog: emptyCatalog,
         characterCreationRules: builderTestRules,
+        spellcastingProgression: spellcastingProgressionTestConfig,
         permissions: { canCreateCharacter: true },
         playActor: { kind: 'new_pc' },
       }),
