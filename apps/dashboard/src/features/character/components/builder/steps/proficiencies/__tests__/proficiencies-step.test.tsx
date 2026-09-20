@@ -82,7 +82,7 @@ describe('ProficienciesStep', () => {
     expect(screen.getByText('Light')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
     const skillsSection = screen.getByRole('heading', { name: 'Skills' }).closest('section')!
-    expect(within(skillsSection).getByText('0 / 2 chosen')).toBeInTheDocument()
+    expect(within(skillsSection).getAllByText('0 / 2 chosen').length).toBeGreaterThan(0)
   })
 
   it('shows inline validation on the skills section when ChoiceSets are unsatisfied', () => {
@@ -159,13 +159,16 @@ describe('ProficienciesStep', () => {
     )
 
     expect(screen.getByText(PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING)).toBeInTheDocument()
+    const languagesSection = screen.getByRole('heading', { name: 'Languages' }).closest('section')!
     expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
-    expect(screen.getByText(/Choose 2 languages from Origin Languages\./)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add language' })).toBeInTheDocument()
+    expect(within(languagesSection).getByText('Choose 2 additional languages.')).toBeInTheDocument()
+    expect(
+      within(languagesSection).getByRole('button', { name: 'Add language' }),
+    ).toBeInTheDocument()
     expect(
       screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
     ).toBeInTheDocument()
-    expect(screen.getByText('No additional languages chosen yet.')).toBeInTheDocument()
+    expect(within(languagesSection).getByText('No languages chosen yet.')).toBeInTheDocument()
   })
 
   it('shows a stale badge for invalid skill selections', () => {
@@ -280,7 +283,7 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Add skill proficiency' }))
+    await user.click(screen.getByRole('button', { name: 'Add skill' }))
     expect(screen.getByRole('heading', { name: 'Add skill proficiency' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Search skills' })).toBeInTheDocument()
 
@@ -321,7 +324,7 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    const manageButton = screen.getByRole('button', { name: 'Manage skill choices' })
+    const manageButton = screen.getByRole('button', { name: 'Manage skills' })
     expect(manageButton).toBeEnabled()
 
     await user.click(manageButton)

@@ -37,10 +37,6 @@ describe('formatProficiencySourceLabel', () => {
       ),
     ).toBe('Armor training · Granted by Rogue')
   })
-
-  it('formats choice provenance labels', () => {
-    expect(formatProficiencyChoiceSourceLabel('Rogue Skills')).toBe('Chosen from Rogue Skills')
-  })
 })
 
 describe('formatCompactProficiencySourceLabel', () => {
@@ -53,5 +49,17 @@ describe('formatCompactProficiencySourceLabel', () => {
         catalogIndex,
       ),
     ).toBe('Rogue')
+  })
+})
+
+describe('formatProficiencyChoiceSourceLabel', () => {
+  it('formats choice provenance labels', () => {
+    expect(formatProficiencyChoiceSourceLabel('Rogue Skills')).toBe('Chosen from Rogue Skills')
+  })
+
+  it('appends source line when headings collide', () => {
+    expect(
+      formatProficiencyChoiceSourceLabel('Skill Proficiency', 'Human species trait', true),
+    ).toBe('Chosen from Skill Proficiency (Human species trait)')
   })
 })

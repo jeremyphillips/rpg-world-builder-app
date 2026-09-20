@@ -1,8 +1,8 @@
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import { isMeaningfulProficiencyChoice } from '../../../../content/lib/grants/proficiency-grant-set'
-import { getProficiencyDomainCompactLabel } from '../../../../vocab/proficiency'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
+import { resolveProficiencyChoicePresentation } from '../proficiency/resolve-proficiency-choice-presentation'
 
 function skillOptionForSlug(
   skillSlug: string,
@@ -39,19 +39,29 @@ export function resolveClassSkillChoiceSets(
 
   const { choose, from, id: choiceId } = choice
 
+  const choiceSet: ChoiceSet = {
+    id: buildChoiceSetId('class', characterClass.id, choiceId),
+    sourceType: 'class',
+    sourceId: characterClass.id,
+    choiceType: 'skillProficiency',
+    min: choose,
+    max: choose,
+    options: from.map((skillSlug) =>
+      skillOptionForSlug(skillSlug, catalogIndex, characterClass.rulesetId),
+    ),
+    required: true,
+    provenance: {
+      ownerKind: 'class',
+      ownerLabel: characterClass.name,
+      ...(choice.label ? { choiceLabel: choice.label } : {}),
+    },
+    label: '',
+  }
+
   return [
     {
-      id: buildChoiceSetId('class', characterClass.id, choiceId),
-      sourceType: 'class',
-      sourceId: characterClass.id,
-      choiceType: 'skillProficiency',
-      label: choice.label ?? `Choose ${getProficiencyDomainCompactLabel('skill')}`,
-      min: choose,
-      max: choose,
-      options: from.map((skillSlug) =>
-        skillOptionForSlug(skillSlug, catalogIndex, characterClass.rulesetId),
-      ),
-      required: true,
+      ...choiceSet,
+      label: resolveProficiencyChoicePresentation(choiceSet).heading,
     },
   ]
 }

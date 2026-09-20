@@ -53,6 +53,22 @@ they do not own raw English strings.
 
 Domain kinds: `DEPENDENT_CHOICE_KINDS` (`heritage`, `subclass`).
 
+## Proficiency choice presentation (reference)
+
+Proficiency ChoiceSets carry generic `ChoiceSetProvenance` (`ownerKind`, `ownerLabel`,
+`featureLabel`, `choiceLabel`). `resolveProficiencyChoicePresentation()` resolves block
+heading + source line; category subheads stay topology/count-only (no heading injection).
+
+| Surface           | Layer               | Example                              |
+| ----------------- | ------------------- | ------------------------------------ |
+| Block heading     | 2 — authored name   | `Skillful`, `Rogue Skills`           |
+| Block source line | 3 — workflow chrome | `Human species trait`, `Rogue class` |
+| Category subhead  | 3 — count/topology  | `Choose 2 skills.`                   |
+| Pool description  | 3 — pool topology   | `Choose any 1 skill proficiency.`    |
+
+Block order within a category: class → subclass → species → heritage → origin → feat →
+ruleset → campaign (stable within kind).
+
 ## Adjacent builder copy patterns
 
 ### ChoiceSet drawer Add/Manage pairs

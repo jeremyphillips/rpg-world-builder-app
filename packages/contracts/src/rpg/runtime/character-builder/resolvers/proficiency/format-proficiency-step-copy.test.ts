@@ -42,27 +42,39 @@ const traitSkillChoiceSet = {
 } as const satisfies ChoiceSet
 
 describe('formatProficiencyCategorySubhead', () => {
-  it('uses source-specific copy for a single choice set', () => {
-    expect(formatProficiencyCategorySubhead('skills', [skillChoiceSet])).toBe(
-      'Choose 2 skills from Rogue Skills.',
+  it('uses count-only copy for a single choice set without fixed grants', () => {
+    expect(formatProficiencyCategorySubhead('skills', [skillChoiceSet], false)).toBe(
+      'Choose 2 skills.',
     )
   })
 
-  it('uses generic copy for multiple choice sets', () => {
-    expect(formatProficiencyCategorySubhead('skills', [skillChoiceSet, traitSkillChoiceSet])).toBe(
-      'Choose additional skills from the options below.',
+  it('uses additional copy for a single choice set with fixed grants', () => {
+    expect(formatProficiencyCategorySubhead('languages', [skillChoiceSet], true)).toBe(
+      'Choose 2 additional skills.',
     )
+  })
+
+  it('uses generic copy for multiple choice sets without fixed grants', () => {
+    expect(
+      formatProficiencyCategorySubhead('skills', [skillChoiceSet, traitSkillChoiceSet], false),
+    ).toBe('Choose skills from the options below.')
+  })
+
+  it('uses additional generic copy for multiple choice sets with fixed grants', () => {
+    expect(
+      formatProficiencyCategorySubhead('skills', [skillChoiceSet, traitSkillChoiceSet], true),
+    ).toBe('Choose additional skills from the options below.')
   })
 })
 
 describe('formatProficiencyPoolDescription', () => {
-  it('enumerates small pools', () => {
+  it('enumerates small pools with natural-list grammar', () => {
     expect(formatProficiencyPoolDescription(skillChoiceSet)).toBe(
-      'Choose from Acrobatics, Stealth, Perception.',
+      'Choose from Acrobatics, Stealth, and Perception.',
     )
   })
 
-  it('summarizes large pools', () => {
+  it('summarizes large pools with plural nouns from option count', () => {
     const largePool: ChoiceSet = {
       ...skillChoiceSet,
       options: Array.from({ length: 12 }, (_, index) => ({
@@ -72,6 +84,15 @@ describe('formatProficiencyPoolDescription', () => {
     }
 
     expect(formatProficiencyPoolDescription(largePool)).toBe('Choose from 12 available skills.')
+  })
+
+  it('uses any-pool copy for unconstrained grants', () => {
+    const anyPool: ChoiceSet = {
+      ...traitSkillChoiceSet,
+      poolSource: 'any',
+    }
+
+    expect(formatProficiencyPoolDescription(anyPool)).toBe('Choose any 1 skill proficiency.')
   })
 })
 

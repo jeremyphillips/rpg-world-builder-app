@@ -29,6 +29,13 @@ export function formatCompactProficiencySourceLabel(
 }
 
 /** ChoiceSet selection provenance for proficiency step selected rows. */
-export function formatProficiencyChoiceSourceLabel(choiceSetLabel: string): string {
-  return `Chosen from ${choiceSetLabel}`
+export function formatProficiencyChoiceSourceLabel(
+  heading: string,
+  sourceLine?: string,
+  headingCollides = false,
+): string {
+  if (headingCollides && sourceLine) {
+    return `Chosen from ${heading} (${sourceLine})`
+  }
+  return `Chosen from ${heading}`
 }

@@ -85,7 +85,12 @@ describe('assembleGrantSkillProficiencyEntries', () => {
 
     expect(keenSensesChoiceSet).toMatchObject({
       choiceType: 'skillProficiency',
-      label: 'Choose Skill proficiency',
+      label: 'Keen Senses',
+      provenance: {
+        ownerKind: 'species',
+        ownerLabel: 'Elf',
+        featureLabel: 'Keen Senses',
+      },
       min: 1,
       max: 1,
       required: true,

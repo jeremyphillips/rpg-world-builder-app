@@ -63,8 +63,10 @@ describe('resolveProficiencyStepModel', () => {
 
     const skills = model.sections.find((section) => section.kind === 'skills')
     expect(skills?.choiceBlocks).toHaveLength(1)
+    expect(skills?.choiceBlocks[0]?.heading).toBe('Rogue Skills')
+    expect(skills?.choiceBlocks[0]?.sourceLine).toBe('Rogue class')
     expect(skills?.choiceBlocks[0]?.choiceSet.label).toBe('Rogue Skills')
-    expect(skills?.subhead).toBe('Choose 2 skills from Rogue Skills.')
+    expect(skills?.subhead).toBe('Choose 2 skills.')
     expect(skills?.aggregateCount).toEqual({
       selected: 0,
       max: 2,

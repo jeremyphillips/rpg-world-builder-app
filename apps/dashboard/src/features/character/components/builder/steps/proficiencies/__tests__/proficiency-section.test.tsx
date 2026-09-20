@@ -11,7 +11,7 @@ import {
 import { ProficiencySection } from '../proficiency-section'
 
 describe('ProficiencySection', () => {
-  it('renders the interactive skills section with aggregate count and add action', () => {
+  it('renders the interactive skills section with aggregate count and block chrome', () => {
     const { model } = createProficienciesStepRogueFixture()
     const skills = model.sections.find((section) => section.kind === 'skills')!
 
@@ -23,11 +23,15 @@ describe('ProficiencySection', () => {
       />,
     )
 
+    const skillsSection = screen.getByRole('heading', { name: 'Skills' }).closest('section')!
+
     expect(screen.getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
-    expect(screen.getByText('0 / 2 chosen')).toBeInTheDocument()
-    expect(screen.getByText('Choose 2 skills from Rogue Skills.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add skill proficiency' })).toBeInTheDocument()
-    expect(screen.getByText('No skills chosen yet.')).toBeInTheDocument()
+    expect(within(skillsSection).getAllByText('0 / 2 chosen')).toHaveLength(2)
+    expect(within(skillsSection).getByText('Choose 2 skills.')).toBeInTheDocument()
+    expect(within(skillsSection).getByText('Rogue Skills')).toBeInTheDocument()
+    expect(within(skillsSection).getByText('Rogue class')).toBeInTheDocument()
+    expect(within(skillsSection).getByRole('button', { name: 'Add skill' })).toBeInTheDocument()
+    expect(within(skillsSection).getByText('No skills chosen yet.')).toBeInTheDocument()
   })
 
   it('forwards remove actions from selected rows', async () => {
@@ -76,13 +80,17 @@ describe('ProficiencySection', () => {
       />,
     )
 
+    const skillsSection = screen.getByRole('heading', { name: 'Skills' }).closest('section')!
+
     expect(screen.queryByText('Selection full')).not.toBeInTheDocument()
-    expect(screen.getByText('2 / 2 chosen')).toHaveClass('text-semantic-success')
+    expect(within(skillsSection).getAllByText('2 / 2 chosen')[0]).toHaveClass(
+      'text-semantic-success',
+    )
     expect(container.querySelector('.rounded-full.bg-semantic-success-strong')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Manage skill choices' })).toBeInTheDocument()
+    expect(within(skillsSection).getByRole('button', { name: 'Manage skills' })).toBeInTheDocument()
   })
 
-  it('shows section-level validation for a single ChoiceSet block', () => {
+  it('shows block-level validation for a single ChoiceSet block', () => {
     const { model } = createProficienciesStepRogueFixture()
     const skills = model.sections.find((section) => section.kind === 'skills')!
     const choiceSetId = skills.choiceBlocks[0]!.choiceSet.id
@@ -113,12 +121,14 @@ describe('ProficiencySection', () => {
     const skills = model.sections.find((section) => section.kind === 'skills')!
     const section = {
       ...skills,
-      subhead: 'Choose additional skills from the options below.',
+      subhead: 'Choose skills from the options below.',
       aggregateCount: { selected: 0, max: 3, label: '0 / 3 chosen' },
       choiceBlocks: [
         skills.choiceBlocks[0]!,
         {
           ...skills.choiceBlocks[0]!,
+          heading: 'Keen Senses',
+          sourceLine: 'Elf species trait',
           choiceSet: {
             ...skills.choiceBlocks[0]!.choiceSet,
             id: 'species:srd-cc-5.2.1:elf:keen-senses',
@@ -127,7 +137,7 @@ describe('ProficiencySection', () => {
           },
           selectedCount: 0,
           max: 1,
-          poolDescription: 'Choose from Perception, Investigation, Survival.',
+          poolDescription: 'Choose from Perception, Investigation, and Survival.',
           addLabel: 'Add skill proficiency',
           isFull: false,
           isOverSelected: false,
@@ -163,17 +173,19 @@ describe('ProficiencySection', () => {
     expect(alerts[1]).toHaveTextContent('Choose an option for Keen Senses.')
   })
 
-  it('renders light choice-set blocks for multi-set categories', () => {
+  it('renders choice blocks for multi-set categories', () => {
     const { model } = createProficienciesStepRogueFixture()
     const skills = model.sections.find((section) => section.kind === 'skills')!
     const section = {
       ...skills,
-      subhead: 'Choose additional skills from the options below.',
+      subhead: 'Choose skills from the options below.',
       aggregateCount: { selected: 0, max: 3, label: '0 / 3 chosen' },
       choiceBlocks: [
         skills.choiceBlocks[0]!,
         {
           ...skills.choiceBlocks[0]!,
+          heading: 'Keen Senses',
+          sourceLine: 'Elf species trait',
           choiceSet: {
             ...skills.choiceBlocks[0]!.choiceSet,
             id: 'species:srd-cc-5.2.1:elf:keen-senses',
@@ -182,7 +194,7 @@ describe('ProficiencySection', () => {
           },
           selectedCount: 0,
           max: 1,
-          poolDescription: 'Choose from Perception, Investigation, Survival.',
+          poolDescription: 'Choose from Perception, Investigation, and Survival.',
           addLabel: 'Add skill proficiency',
           isFull: false,
           isOverSelected: false,
@@ -200,7 +212,9 @@ describe('ProficiencySection', () => {
 
     expect(screen.getByText('Rogue Skills')).toBeInTheDocument()
     expect(screen.getByText('Keen Senses')).toBeInTheDocument()
-    expect(screen.getByText('Choose from Perception, Investigation, Survival.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Choose from Perception, Investigation, and Survival.'),
+    ).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Add skill' })).toHaveLength(2)
     expect(screen.getAllByText('No skills chosen yet.')).toHaveLength(2)
   })
@@ -218,13 +232,15 @@ describe('ProficiencySection', () => {
     const skills = model.sections.find((section) => section.kind === 'skills')!
     const section = {
       ...skills,
-      subhead: 'Choose additional skills from the options below.',
+      subhead: 'Choose skills from the options below.',
       aggregateCount: { selected: 1, max: 3, label: '1 / 3 chosen' },
       selectedRows: skills.selectedRows,
       choiceBlocks: [
         { ...skills.choiceBlocks[0]!, selectedCount: 1 },
         {
           ...skills.choiceBlocks[0]!,
+          heading: 'Keen Senses',
+          sourceLine: 'Elf species trait',
           choiceSet: {
             ...skills.choiceBlocks[0]!.choiceSet,
             id: 'species:srd-cc-5.2.1:elf:keen-senses',
@@ -233,7 +249,7 @@ describe('ProficiencySection', () => {
           },
           selectedCount: 0,
           max: 1,
-          poolDescription: 'Choose from Perception, Investigation, Survival.',
+          poolDescription: 'Choose from Perception, Investigation, and Survival.',
           addLabel: 'Add skill proficiency',
           isFull: false,
           isOverSelected: false,

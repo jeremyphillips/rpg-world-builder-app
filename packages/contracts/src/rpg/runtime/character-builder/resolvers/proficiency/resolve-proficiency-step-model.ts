@@ -28,6 +28,10 @@ import {
   resolveProficiencyAggregateCount,
   type ProficiencyAggregateCount,
 } from './format-proficiency-step-copy'
+import {
+  resolveProficiencyChoicePresentation,
+  sortProficiencyChoiceSets,
+} from './resolve-proficiency-choice-presentation'
 
 export const PROFICIENCY_STEP_SECTION_KINDS = [
   'savingThrows',
@@ -71,6 +75,8 @@ export type ProficiencyChoiceSelectedRow = {
 
 export type ProficiencyChoiceBlock = {
   choiceSet: ChoiceSet
+  heading: string
+  sourceLine?: string
   selectedCount: number
   min: number
   max: number
@@ -284,9 +290,27 @@ function groupGrantedRowsIntoSummary(
   })
 }
 
+function resolveHeadingCollisions(choiceSets: readonly ChoiceSet[]): Map<string, boolean> {
+  const headingCounts = new Map<string, number>()
+
+  for (const choiceSet of choiceSets) {
+    const { heading } = resolveProficiencyChoicePresentation(choiceSet)
+    headingCounts.set(heading, (headingCounts.get(heading) ?? 0) + 1)
+  }
+
+  const collides = new Map<string, boolean>()
+  for (const [heading, count] of headingCounts) {
+    collides.set(heading, count > 1)
+  }
+
+  return collides
+}
+
 function buildSelectedRows(
   choiceSet: ChoiceSet,
   draft: CharacterBuilderDraft,
+  presentation: ReturnType<typeof resolveProficiencyChoicePresentation>,
+  headingCollides: boolean,
 ): ProficiencyChoiceSelectedRow[] {
   const selections = draft.choiceSelections[choiceSet.id] ?? []
   const optionIds = new Set(choiceSet.options.map((option) => option.id))
@@ -298,7 +322,11 @@ function buildSelectedRows(
     return {
       optionId,
       label: option?.label ?? optionId,
-      sourceLabel: formatProficiencyChoiceSourceLabel(choiceSet.label),
+      sourceLabel: formatProficiencyChoiceSourceLabel(
+        presentation.heading,
+        presentation.sourceLine,
+        headingCollides,
+      ),
       choiceSetId: choiceSet.id,
       isStale,
       staleReason: isStale ? PROFICIENCY_STALE_REASON : undefined,
@@ -310,12 +338,15 @@ function buildSelectedRows(
 function buildChoiceBlock(
   choiceSet: ChoiceSet,
   draft: CharacterBuilderDraft,
+  presentation: ReturnType<typeof resolveProficiencyChoicePresentation>,
 ): ProficiencyChoiceBlock {
   const selections = draft.choiceSelections[choiceSet.id] ?? []
   const selectedCount = selections.length
 
   return {
     choiceSet,
+    heading: presentation.heading,
+    sourceLine: presentation.sourceLine,
     selectedCount,
     min: choiceSet.min,
     max: choiceSet.max,
@@ -333,13 +364,22 @@ function buildInteractiveSection(
   draft: CharacterBuilderDraft,
   hasFixedGrantsInCategory: boolean,
 ): ProficiencyInteractiveSection {
-  const choiceBlocks = choiceSets.map((choiceSet) => buildChoiceBlock(choiceSet, draft))
-  const selectedRows = choiceSets.flatMap((choiceSet) => buildSelectedRows(choiceSet, draft))
+  const sortedChoiceSets = sortProficiencyChoiceSets(choiceSets)
+  const headingCollisions = resolveHeadingCollisions(sortedChoiceSets)
+  const choiceBlocks = sortedChoiceSets.map((choiceSet) => {
+    const presentation = resolveProficiencyChoicePresentation(choiceSet)
+    return buildChoiceBlock(choiceSet, draft, presentation)
+  })
+  const selectedRows = sortedChoiceSets.flatMap((choiceSet) => {
+    const presentation = resolveProficiencyChoicePresentation(choiceSet)
+    const headingCollides = headingCollisions.get(presentation.heading) ?? false
+    return buildSelectedRows(choiceSet, draft, presentation, headingCollides)
+  })
 
   return {
     kind,
     heading: PROFICIENCY_SECTION_HEADINGS[kind],
-    subhead: formatProficiencyCategorySubhead(kind, choiceSets),
+    subhead: formatProficiencyCategorySubhead(kind, sortedChoiceSets, hasFixedGrantsInCategory),
     aggregateCount: resolveProficiencyAggregateCount(choiceBlocks),
     selectedRows,
     choiceBlocks,

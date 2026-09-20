@@ -15,7 +15,10 @@ import {
 } from '../../../../vocab/proficiency'
 import type { ProficiencyStepSectionKind } from './resolve-proficiency-step-model'
 
-export const PROFICIENCY_POOL_ENUMERATION_THRESHOLD = 5 as const
+export {
+  formatProficiencyPoolDescription,
+  PROFICIENCY_POOL_ENUMERATION_THRESHOLD,
+} from './resolve-proficiency-choice-presentation'
 
 const CATEGORY_PLURAL_NOUNS: Record<ProficiencyStepSectionKind, string> = {
   savingThrows: 'saving throws',
@@ -80,13 +83,6 @@ function choiceBlockManageLabelFor(choiceSet: ChoiceSet, compact: boolean): stri
   return `Manage ${choiceSet.label.toLowerCase()}`
 }
 
-function poolOptionNoun(choiceSet: ChoiceSet): string {
-  const domain = choiceDomainFor(choiceSet)
-  if (!domain) return 'options'
-  if (domain === 'language') return getLanguageProficiencySentenceForm(choiceSet.max)
-  return getProficiencyDomainCompactActionNoun(domain, choiceSet.max)
-}
-
 function singleChoiceSetNoun(choiceSet: ChoiceSet, count: number): string {
   const domain = choiceDomainFor(choiceSet)
   if (!domain) {
@@ -96,32 +92,28 @@ function singleChoiceSetNoun(choiceSet: ChoiceSet, count: number): string {
   return getProficiencyDomainCompactActionNoun(domain, count)
 }
 
-/** Category subhead driven by choice-set topology, not source ownership. */
+/** Category subhead driven by choice-set topology and fixed-grant presence. */
 export function formatProficiencyCategorySubhead(
   kind: ProficiencyStepSectionKind,
   choiceSets: readonly ChoiceSet[],
+  hasFixedGrantsInCategory: boolean,
 ): string {
   if (choiceSets.length === 0) return ''
 
   if (choiceSets.length === 1) {
     const choiceSet = choiceSets[0]!
     const noun = singleChoiceSetNoun(choiceSet, choiceSet.max)
-    return `Choose ${choiceSet.max} ${noun} from ${choiceSet.label}.`
+    if (hasFixedGrantsInCategory) {
+      return `Choose ${choiceSet.max} additional ${noun}.`
+    }
+    return `Choose ${choiceSet.max} ${noun}.`
   }
 
-  return `Choose additional ${categoryPluralNoun(kind)} from the options below.`
-}
-
-/** Compact pool copy for a single choice block. */
-export function formatProficiencyPoolDescription(choiceSet: ChoiceSet): string {
-  const { options } = choiceSet
-
-  if (options.length <= PROFICIENCY_POOL_ENUMERATION_THRESHOLD) {
-    const labels = options.map((option) => option.label).join(', ')
-    return `Choose from ${labels}.`
+  const plural = categoryPluralNoun(kind)
+  if (hasFixedGrantsInCategory) {
+    return `Choose additional ${plural} from the options below.`
   }
-
-  return `Choose from ${options.length} available ${poolOptionNoun(choiceSet)}.`
+  return `Choose ${plural} from the options below.`
 }
 
 /** Empty-well copy for an interactive category section. */

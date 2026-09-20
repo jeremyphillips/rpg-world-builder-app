@@ -14,6 +14,8 @@ export const proficiencyChoiceBlockRowHeadingGroupClasses =
 
 export const proficiencyChoiceBlockRowLabelClasses = 'heading-style-group text-foreground'
 
+export const proficiencyChoiceBlockRowSourceLineClasses = 'text-sm'
+
 export const proficiencyChoiceBlockRowPoolDescriptionClasses = 'mb-2 text-sm'
 
 export const proficiencyChoiceBlockRowOverSelectionClasses = 'text-sm text-destructive'

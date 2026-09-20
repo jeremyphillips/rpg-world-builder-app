@@ -49,6 +49,11 @@ describe('resolveClassToolChoiceSets', () => {
           { id: luteTool.id, label: 'Lute' },
         ],
         required: true,
+        provenance: {
+          ownerKind: 'class',
+          ownerLabel: bardClass.name,
+          choiceLabel: 'Bard Tools',
+        },
       },
     ])
   })

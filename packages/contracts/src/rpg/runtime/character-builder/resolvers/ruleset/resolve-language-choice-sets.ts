@@ -4,6 +4,7 @@ import { resolveLanguagesFromChoiceSource } from '../../../creature/languages'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
+import { resolveProficiencyChoicePresentation } from '../proficiency/resolve-proficiency-choice-presentation'
 
 // ---------------------------------------------------------------------------
 // Character Builder language ChoiceSets — resolves ruleset origin language
@@ -55,17 +56,26 @@ export function resolveLanguageChoiceSets(
   const options = resolveLanguageChoiceOptions(choice, context.catalog.languages)
   if (options.length === 0) return []
 
+  const choiceSet: ChoiceSet = {
+    id: buildChoiceSetId('ruleset', context.rulesetId, choice.id),
+    sourceType: 'ruleset',
+    sourceId: context.rulesetId,
+    choiceType: 'language',
+    min: choice.choose,
+    max: choice.choose,
+    options,
+    required: true,
+    provenance: {
+      ownerKind: 'origin',
+      ...(choice.label ? { choiceLabel: choice.label } : {}),
+    },
+    label: '',
+  }
+
   return [
     {
-      id: buildChoiceSetId('ruleset', context.rulesetId, choice.id),
-      sourceType: 'ruleset',
-      sourceId: context.rulesetId,
-      choiceType: 'language',
-      label: choice.label ?? 'Choose Languages',
-      min: choice.choose,
-      max: choice.choose,
-      options,
-      required: true,
+      ...choiceSet,
+      label: resolveProficiencyChoicePresentation(choiceSet).heading,
     },
   ]
 }

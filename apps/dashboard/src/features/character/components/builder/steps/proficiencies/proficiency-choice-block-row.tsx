@@ -19,6 +19,7 @@ import {
   proficiencyChoiceBlockRowOverSelectionClasses,
   proficiencyChoiceBlockRowPoolDescriptionClasses,
   proficiencyChoiceBlockRowSelectedListClasses,
+  proficiencyChoiceBlockRowSourceLineClasses,
 } from './proficiency-choice-block-row.variants'
 
 export type ProficiencyChoiceBlockRowProps = {
@@ -44,7 +45,7 @@ export function ProficiencyChoiceBlockRow({
       <div className={proficiencyChoiceBlockRowContentClasses}>
         <div className={proficiencyChoiceBlockRowHeaderClasses}>
           <div className={proficiencyChoiceBlockRowHeadingGroupClasses}>
-            <p className={proficiencyChoiceBlockRowLabelClasses}>{block.choiceSet.label}</p>
+            <p className={proficiencyChoiceBlockRowLabelClasses}>{block.heading}</p>
             <ProficiencySelectionCounter selectedCount={selectedRows.length} max={block.max} />
           </div>
           <Button
@@ -59,6 +60,11 @@ export function ProficiencyChoiceBlockRow({
           </Button>
         </div>
         <div className={proficiencyChoiceBlockRowDetailsClasses}>
+          {block.sourceLine ? (
+            <Text variant="muted" className={proficiencyChoiceBlockRowSourceLineClasses}>
+              {block.sourceLine}
+            </Text>
+          ) : null}
           <Text variant="muted" className={proficiencyChoiceBlockRowPoolDescriptionClasses}>
             {block.poolDescription}
           </Text>

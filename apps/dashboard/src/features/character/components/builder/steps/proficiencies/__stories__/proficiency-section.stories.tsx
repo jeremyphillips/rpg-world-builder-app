@@ -8,7 +8,7 @@ const skills = model.sections.find((section) => section.kind === 'skills')!
 
 const multiChoiceSkills = {
   ...skills,
-  subhead: 'Choose additional skills from the options below.',
+  subhead: 'Choose skills from the options below.',
   aggregateCount: {
     selected: 1,
     max: 3,
@@ -19,6 +19,8 @@ const multiChoiceSkills = {
     skills.choiceBlocks[0]!,
     {
       ...skills.choiceBlocks[0]!,
+      heading: 'Keen Senses',
+      sourceLine: 'Elf species trait',
       choiceSet: {
         ...skills.choiceBlocks[0]!.choiceSet,
         id: 'species:srd-cc-5.2.1:elf:keen-senses',
@@ -27,7 +29,7 @@ const multiChoiceSkills = {
       },
       selectedCount: 0,
       max: 1,
-      poolDescription: 'Choose from Perception, Investigation, Survival.',
+      poolDescription: 'Choose from Perception, Investigation, and Survival.',
       addLabel: 'Add skill proficiency',
       isFull: false,
       isOverSelected: false,
