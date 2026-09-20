@@ -2,8 +2,8 @@ import { loadSeedClasses, seedClassSlugs } from '@rpg/catalog/classes'
 import {
   isSpellcastingActiveAtLevel,
   resolveClassCantripCount,
-  resolveSpellcastingProfileForClass,
-  resolveSpellsAvailableFromProfile,
+  resolveClassSpellcasting,
+  resolveSpellsAvailableFromClass,
 } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
@@ -115,8 +115,8 @@ describe('SRD 5.2.1 spell seed', () => {
     for (const cls of classes) {
       if (!isSpellcastingActiveAtLevel(cls.spellcasting, 1)) continue
 
-      const profileBundle = cls.spellcasting
-        ? resolveSpellcastingProfileForClass(cls, SPELLCASTING_PROGRESSION)
+      const resolved = cls.spellcasting
+        ? resolveClassSpellcasting(cls, SPELLCASTING_PROGRESSION)
         : null
       const cantripsRequired = cls.spellcasting
         ? resolveClassCantripCount({ spellcasting: cls.spellcasting, classLevel: 1 })
@@ -131,9 +131,7 @@ describe('SRD 5.2.1 spell seed', () => {
         ).toBeGreaterThanOrEqual(cantripsRequired + SPELL_OPTION_HEADROOM)
       }
 
-      const spellsRequired = profileBundle
-        ? resolveSpellsAvailableFromProfile(profileBundle.profile, 1)
-        : 0
+      const spellsRequired = resolved ? resolveSpellsAvailableFromClass(resolved, 1) : 0
       if (spellsRequired > 0) {
         const spellOptions = spells.filter(
           (s) => s.level === 1 && s.classIds.includes(cls.slug),

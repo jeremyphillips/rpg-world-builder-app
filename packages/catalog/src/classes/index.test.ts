@@ -22,8 +22,8 @@ import {
   startingEquipmentGrantProficiencyChoiceId,
   resolveProgressionTableColumnValue,
   isProgressionContentTable,
-  resolveSpellcastingProfileForClass,
-  resolveSpellsAvailableFromProfile,
+  resolveClassSpellcasting,
+  resolveSpellsAvailableFromClass,
   type CharacterClass,
   type ProgressionTableColumn,
 } from '@rpg/contracts'
@@ -38,9 +38,9 @@ const SPELLCASTING_PROGRESSION = resolveIndexedCampaignSpellcastingProgressionCo
 
 function spellsAvailableAtClassLevel(cls: CharacterClass, level: number): number {
   if (!cls.spellcasting) return 0
-  const bundle = resolveSpellcastingProfileForClass(cls, SPELLCASTING_PROGRESSION)
-  if (!bundle) return 0
-  return resolveSpellsAvailableFromProfile(bundle.profile, level)
+  const resolved = resolveClassSpellcasting(cls, SPELLCASTING_PROGRESSION)
+  if (!resolved) return 0
+  return resolveSpellsAvailableFromClass(resolved, level)
 }
 
 function asiLevelsFromFeatures(cls: CharacterClass): number[] {
@@ -743,9 +743,9 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(warlock)
     expect(asiLevelsFromFeatures(warlock)).toEqual([4, 8, 12, 16])
     expect(warlock.features.map((f) => f.id)).toContain('warlock-subclass')
-    const warlockProfile = resolveSpellcastingProfileForClass(warlock, SPELLCASTING_PROGRESSION)
+    const warlockResolved = resolveClassSpellcasting(warlock, SPELLCASTING_PROGRESSION)
     expect(
-      warlockProfile?.profile.choiceProgressions.some(
+      warlockResolved?.choiceProgressions.some(
         (progression) => progression.destination === 'repertoire',
       ),
     ).toBe(true)

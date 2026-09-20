@@ -56,15 +56,23 @@ describe('classCapacityProgressionSchema', () => {
 describe('resolveClassCantripCount', () => {
   const bardSpellcasting = spellcastingSchema.parse({
     slotProgressionId: 'full-caster',
-    profileId: 'srd:bard',
     ability: 'cha',
-    cantrips: {
-      curve: {
-        rows: [
-          { level: 1, count: 2 },
-          { level: 4, count: 3 },
-          { level: 10, count: 4 },
-        ],
+    spellSelection: {
+      model: 'limitedRepertoire',
+      change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+    },
+    progression: {
+      cantrips: {
+        curve: {
+          rows: [
+            { level: 1, count: 2 },
+            { level: 4, count: 3 },
+            { level: 10, count: 4 },
+          ],
+        },
+      },
+      repertoire: {
+        curve: { rows: [{ level: 1, count: 4 }] },
       },
     },
   })
@@ -81,11 +89,19 @@ describe('resolveClassCantripCount', () => {
   it('returns 0 before spellcasting unlock or when cantrips are absent', () => {
     const delayed = spellcastingSchema.parse({
       slotProgressionId: 'full-caster',
-      profileId: 'srd:bard',
       ability: 'cha',
       level: 2,
-      cantrips: {
-        curve: { rows: [{ level: 2, count: 2 }] },
+      spellSelection: {
+        model: 'limitedRepertoire',
+        change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+      },
+      progression: {
+        cantrips: {
+          curve: { rows: [{ level: 2, count: 2 }] },
+        },
+        repertoire: {
+          curve: { rows: [{ level: 2, count: 4 }] },
+        },
       },
     })
 
@@ -93,8 +109,16 @@ describe('resolveClassCantripCount', () => {
 
     const withoutCantrips = spellcastingSchema.parse({
       slotProgressionId: 'half-caster',
-      profileId: 'srd:paladin',
       ability: 'cha',
+      spellSelection: {
+        model: 'prepareFromClassList',
+        change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+      },
+      progression: {
+        preparedSpells: {
+          curve: { rows: [{ level: 1, count: 2 }] },
+        },
+      },
     })
     expect(resolveClassCantripCount({ spellcasting: withoutCantrips, classLevel: 5 })).toBe(0)
   })

@@ -37,10 +37,15 @@ export const classCapacityProgressionValidationMessages = {
     'validation.classCapacityProgression.emptyCurve',
     () => 'Capacity progression must include at least one level breakpoint.',
   ),
-  countMustIncrease: defineMessage<{ level: number; previous: number; next: number }>(
+  countMustIncrease: defineMessage<{
+    level: number
+    previous: number
+    next: number
+    columnLabel?: string
+  }>(
     'validation.classCapacityProgression.countMustIncrease',
-    ({ level, previous, next }) =>
-      `Level ${level} · Cantrips — count must be greater than the previous breakpoint (${previous}); got ${next}.`,
+    ({ level, previous, next, columnLabel = 'Capacity' }) =>
+      `Level ${level} · ${columnLabel} — count must be greater than the previous breakpoint (${previous}); got ${next}.`,
   ),
 }
 

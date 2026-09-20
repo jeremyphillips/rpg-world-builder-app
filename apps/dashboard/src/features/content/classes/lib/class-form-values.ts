@@ -17,6 +17,11 @@ import {
 } from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import type { ClassFormValues } from './class-form-fields'
+import {
+  spellSelectionChangePackageFromPolicy,
+  spellSelectionChangePolicyFromPackage,
+  type SpellSelectionChangePackage,
+} from './class-spell-selection-form.lib'
 import { createAsiFeature } from './class-asi-features'
 import { createSubclassChoiceFeature } from './class-subclass-choice-features'
 import { featuresFromFormValues, featureToFormRow } from './class-feature-form-fields'
@@ -144,6 +149,7 @@ function classWirePayloadBase(
       values.hasSpellcasting,
       values.grantsCantrips,
       values.spellcasting,
+      values.spellSelectionChangePackage,
     ),
     features: parts.features,
     ...(parts.characterCreation ? { characterCreation: parts.characterCreation } : {}),
@@ -224,13 +230,20 @@ export function spellcastingToFormValues(
     level: spellcasting.level,
     description: spellcasting.description,
     slotProgressionId: spellcasting.slotProgressionId,
-    profileId: spellcasting.profileId,
+    spellSelection: spellcasting.spellSelection,
+    progression: spellcasting.progression,
     ability: spellcasting.ability,
     requiredGear: spellcasting.requiredGear,
     focusKinds: spellcasting.focusKinds,
     recommendedGear: spellcasting.recommendedGear,
-    cantrips: spellcasting.cantrips,
   }
+}
+
+export function spellSelectionChangePackageToFormValues(
+  spellcasting: Spellcasting | undefined,
+): SpellSelectionChangePackage | undefined {
+  if (!spellcasting?.spellSelection) return undefined
+  return spellSelectionChangePackageFromPolicy(spellcasting.spellSelection.change)
 }
 
 function hasCompleteSpellcastingCore(
@@ -240,8 +253,8 @@ function hasCompleteSpellcastingCore(
   return Boolean(
     hasSpellcasting &&
     spellcasting?.slotProgressionId &&
-    spellcasting?.profileId &&
-    spellcasting?.ability,
+    spellcasting?.ability &&
+    spellcasting?.spellSelection?.model,
   )
 }
 
@@ -250,8 +263,12 @@ function applyOptionalSpellcastingFields(
   spellcasting: NonNullable<ClassFormValues['spellcasting']>,
   grantsCantrips: boolean,
 ): void {
-  if (grantsCantrips && spellcasting.cantrips) {
-    result.cantrips = spellcasting.cantrips
+  const progression = { ...(spellcasting.progression ?? {}) }
+  if (!grantsCantrips) {
+    delete progression.cantrips
+  }
+  if (Object.keys(progression).length > 0) {
+    result.progression = progression
   }
   if (spellcasting.description?.trim()) {
     result.description = spellcasting.description.trim()
@@ -267,20 +284,44 @@ function applyOptionalSpellcastingFields(
   }
 }
 
+// fallow-ignore-next-line complexity
 function spellcastingFromFormValues(
   hasSpellcasting: boolean,
   grantsCantrips: boolean,
   spellcasting: ClassFormValues['spellcasting'],
+  changePackage: SpellSelectionChangePackage | undefined,
 ): Spellcasting | undefined {
   if (!hasCompleteSpellcastingCore(hasSpellcasting, spellcasting) || !spellcasting) {
     return undefined
   }
 
+  const selectionModel = spellcasting.spellSelection?.model
+  const change = changePackage
+    ? spellSelectionChangePolicyFromPackage(changePackage)
+    : spellcasting.spellSelection?.change
+
+  let spellSelection = spellcasting.spellSelection
+  if (selectionModel && change) {
+    if (selectionModel === 'prepareFromLearnedCollection') {
+      spellSelection = {
+        model: selectionModel,
+        collection: 'spellbook',
+        acquisition: spellcasting.spellSelection?.acquisition ?? {
+          curve: { rows: [] },
+          extension: 'zero',
+        },
+        change,
+      }
+    } else {
+      spellSelection = { model: selectionModel, change }
+    }
+  }
+
   const result: Spellcasting = {
     level: spellcasting.level ?? 1,
     slotProgressionId: spellcasting.slotProgressionId!,
-    profileId: spellcasting.profileId!,
     ability: spellcasting.ability!,
+    ...(spellSelection ? { spellSelection } : {}),
   }
   applyOptionalSpellcastingFields(result, spellcasting, grantsCantrips)
   return result

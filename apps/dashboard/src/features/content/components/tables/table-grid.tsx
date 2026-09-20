@@ -19,6 +19,7 @@ import {
   tableGridHeaderCellClasses,
   tableGridRowHeaderCellClasses,
   tableGridRowHeaderHeaderClasses,
+  tableGridEmbeddedTableClasses,
   tableGridTableClasses,
   tableGridValueCellClasses,
 } from './table-grid.variants'
@@ -113,7 +114,7 @@ export function TableGrid({
   )
 
   if (scrollMode === 'embedded') {
-    return <table className={tableGridTableClasses}>{tableBody}</table>
+    return <table className={tableGridEmbeddedTableClasses}>{tableBody}</table>
   }
 
   return <Table className={tableGridTableClasses}>{tableBody}</Table>

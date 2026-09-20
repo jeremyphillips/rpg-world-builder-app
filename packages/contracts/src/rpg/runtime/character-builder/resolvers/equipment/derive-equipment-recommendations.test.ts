@@ -208,8 +208,16 @@ const storedWizard: ClassStored = {
   spellcasting: {
     level: 1,
     slotProgressionId: 'full-caster',
-    profileId: 'fixture:wizard',
     ability: 'int',
+    spellSelection: {
+      model: 'prepareFromLearnedCollection',
+      collection: 'spellbook',
+      acquisition: { curve: { rows: [{ level: 1, count: 6 }] }, extension: 'zero' },
+      change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+    },
+    progression: {
+      preparedSpells: { curve: { rows: [{ level: 1, count: 4 }] }, extension: 'carryForward' },
+    },
     requiredGear: ['spellbook'],
     focusKinds: ['arcane_focus'],
   },
@@ -381,8 +389,14 @@ describe('deriveEquipmentRecommendations', () => {
       spellcasting: {
         level: 1,
         slotProgressionId: 'half-caster',
-        profileId: 'fixture:paladin',
         ability: 'wis',
+        spellSelection: {
+          model: 'prepareFromClassList',
+          change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+        },
+        progression: {
+          preparedSpells: { curve: { rows: [{ level: 1, count: 2 }] }, extension: 'carryForward' },
+        },
       },
       characterCreation: {
         startingEquipment: {

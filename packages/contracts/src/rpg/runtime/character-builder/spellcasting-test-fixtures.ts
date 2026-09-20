@@ -55,11 +55,25 @@ export const wizardStored: ClassStored = {
   spellcasting: {
     level: 1,
     slotProgressionId: 'full-caster',
-    profileId: 'fixture:wizard',
     ability: 'int',
-    cantrips: {
-      curve: { rows: [{ level: 1, count: 3 }] },
-      extension: 'carryForward',
+    spellSelection: {
+      model: 'prepareFromLearnedCollection',
+      collection: 'spellbook',
+      acquisition: {
+        curve: { rows: [{ level: 1, count: 6 }] },
+        extension: 'zero',
+      },
+      change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+    },
+    progression: {
+      cantrips: {
+        curve: { rows: [{ level: 1, count: 3 }] },
+        extension: 'carryForward',
+      },
+      preparedSpells: {
+        curve: { rows: [{ level: 1, count: 4 }] },
+        extension: 'carryForward',
+      },
     },
   },
 }
@@ -85,8 +99,17 @@ export const paladinStored: ClassStored = {
   spellcasting: {
     level: 1,
     slotProgressionId: 'half-caster',
-    profileId: 'fixture:paladin',
     ability: 'cha',
+    spellSelection: {
+      model: 'prepareFromClassList',
+      change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+    },
+    progression: {
+      preparedSpells: {
+        curve: { rows: [{ level: 1, count: 2 }] },
+        extension: 'carryForward',
+      },
+    },
   },
 }
 
@@ -111,11 +134,20 @@ export const warlockStored: ClassStored = {
   spellcasting: {
     level: 1,
     slotProgressionId: 'pact-magic',
-    profileId: 'fixture:warlock',
     ability: 'cha',
-    cantrips: {
-      curve: { rows: [{ level: 1, count: 2 }] },
-      extension: 'carryForward',
+    spellSelection: {
+      model: 'limitedRepertoire',
+      change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+    },
+    progression: {
+      cantrips: {
+        curve: { rows: [{ level: 1, count: 2 }] },
+        extension: 'carryForward',
+      },
+      repertoire: {
+        curve: { rows: [{ level: 1, count: 2 }] },
+        extension: 'carryForward',
+      },
     },
   },
 }

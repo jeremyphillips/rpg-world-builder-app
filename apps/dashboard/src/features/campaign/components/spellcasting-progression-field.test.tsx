@@ -14,12 +14,8 @@ function SpellcastingProgressionFieldHarness({
     extendedMaxLevel?: number
     extendedTierName?: string
     slotProgressions: ReturnType<typeof resolveSpellcastingProgressionFormState>['slotProgressions']
-    profiles: ReturnType<typeof resolveSpellcastingProgressionFormState>['profiles']
   }
 }) {
-  // `shouldUnregister: true` mirrors the production schema Form shell — the
-  // seeded-record regression (unregistered paths dropped from live values)
-  // only reproduces with it enabled.
   const form = useForm({ defaultValues, shouldUnregister: true })
 
   return (
@@ -30,7 +26,7 @@ function SpellcastingProgressionFieldHarness({
 }
 
 describe('SpellcastingProgressionField', () => {
-  it('lists seeded slot progressions and profiles', () => {
+  it('lists seeded slot progressions only', () => {
     const spellcasting = resolveSpellcastingProgressionFormState(undefined)
 
     render(
@@ -43,10 +39,10 @@ describe('SpellcastingProgressionField', () => {
       />,
     )
 
-    expect(screen.getAllByRole('button', { name: 'Add custom' })).toHaveLength(2)
+    expect(screen.getAllByRole('button', { name: 'Add custom' })).toHaveLength(1)
     expect(screen.getByText('Full caster')).toBeInTheDocument()
     expect(screen.getByText('Half caster')).toBeInTheDocument()
     expect(screen.getByText('Pact Magic')).toBeInTheDocument()
-    expect(screen.getByText('Bard spellcasting')).toBeInTheDocument()
+    expect(screen.queryByText('Bard spellcasting')).not.toBeInTheDocument()
   })
 })

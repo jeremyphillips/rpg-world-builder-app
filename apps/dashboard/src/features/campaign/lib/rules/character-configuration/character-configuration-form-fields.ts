@@ -30,7 +30,6 @@ import {
   refineEffectiveXpProgression,
   refineLevelRangeTable,
   slotProgressionSchema,
-  spellcastingProfileSchema,
   validateExtendedMaxLevel,
   xpThresholdOverrideEntriesSchema,
 } from '@rpg/contracts'
@@ -168,9 +167,6 @@ const configRulesObjectSchema = z.object({
   slotProgressions: z
     .array(slotProgressionSchema)
     .default(() => [...loadSpellcastingProgressionSeed('srd-cc-5.2.1').slotProgressions]),
-  profiles: z
-    .array(spellcastingProfileSchema)
-    .default(() => [...loadSpellcastingProgressionSeed('srd-cc-5.2.1').profiles]),
 })
 
 type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
@@ -457,7 +453,7 @@ function progressionGroup(): FormItem {
           kind: 'group',
           legend: 'Spellcasting',
           description:
-            'Spell slot tables and spell selection profiles. Cantrip capacity is authored on each class.',
+            'Spell slot tables shared by spellcasting classes. Selection rules and capacity curves are authored on each class.',
           fields: [
             {
               kind: 'slot',

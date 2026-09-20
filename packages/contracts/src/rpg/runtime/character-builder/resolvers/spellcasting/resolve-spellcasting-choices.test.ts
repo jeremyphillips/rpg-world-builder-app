@@ -34,7 +34,7 @@ describe('resolveSpellcastingChoices', () => {
     const draft = draftWith({
       class: { classId: wizardClass.id, level: 1 },
       choiceSelections: {
-        [spellcastingChoiceSetId(wizardClass.id, 'spellbook-gain')]: wizardLevelOneSpells.map(
+        [spellcastingChoiceSetId(wizardClass.id, 'spellbook')]: wizardLevelOneSpells.map(
           (spell) => spell.id,
         ),
       },
@@ -52,7 +52,7 @@ describe('resolveSpellcastingChoices', () => {
       required: true,
     })
     expect(choiceSets[1]).toMatchObject({
-      id: spellcastingChoiceSetId(wizardClass.id, 'spellbook-gain'),
+      id: spellcastingChoiceSetId(wizardClass.id, 'spellbook'),
       choiceType: 'spell',
       min: 6,
       max: 6,
@@ -121,8 +121,9 @@ describe('resolveSpellcastingChoices', () => {
         ...(characterClass.id === wizardClass.id
           ? {
               choiceSelections: {
-                [spellcastingChoiceSetId(wizardClass.id, 'spellbook-gain')]:
-                  wizardLevelOneSpells.map((spell) => spell.id),
+                [spellcastingChoiceSetId(wizardClass.id, 'spellbook')]: wizardLevelOneSpells.map(
+                  (spell) => spell.id,
+                ),
               },
             }
           : {}),

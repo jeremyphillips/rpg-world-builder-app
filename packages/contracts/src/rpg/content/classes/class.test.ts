@@ -81,8 +81,18 @@ describe('classHasSpellcasting', () => {
           spellcasting: {
             level: 1,
             slotProgressionId: 'full-caster',
-            profileId: 'srd:wizard',
             ability: 'int',
+            spellSelection: {
+              model: 'prepareFromLearnedCollection',
+              collection: 'spellbook',
+              acquisition: { curve: { rows: [{ level: 1, count: 6 }] }, extension: 'zero' },
+              change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+            },
+            progression: {
+              preparedSpells: {
+                curve: { rows: [{ level: 1, count: 4 }] },
+              },
+            },
           },
         }),
       ),

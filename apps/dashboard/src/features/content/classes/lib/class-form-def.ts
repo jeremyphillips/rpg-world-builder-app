@@ -27,6 +27,7 @@ import {
   classCreateDefaultValues,
   proficienciesToFormValues,
   spellcastingToFormValues,
+  spellSelectionChangePackageToFormValues,
 } from './class-form-values'
 import { featureToFormRow } from './class-feature-form-fields'
 import {
@@ -84,7 +85,8 @@ const classFormDef: ContentFormDef<
     primaryAbilities: entity.primaryAbilities ?? [],
     hitDie: (entity.hitDie ?? '') as ClassFormValues['hitDie'],
     hasSpellcasting: entity.spellcasting !== undefined,
-    grantsCantrips: entity.spellcasting?.cantrips !== undefined,
+    grantsCantrips: entity.spellcasting?.progression?.cantrips !== undefined,
+    spellSelectionChangePackage: spellSelectionChangePackageToFormValues(entity.spellcasting),
     weaponProficiencyMode:
       entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0
         ? 'individual'

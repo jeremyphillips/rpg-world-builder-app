@@ -8,17 +8,30 @@ import {
   SPELLCASTING_GEAR_KIND_ENTRIES,
   abilitySchema,
   campaignLevelSchema,
-  classCapacityProgressionSchema,
+  classGainProgressionSchema,
+  classSpellSelectionSchema,
+  classSpellcastingProgressionSchema,
   spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
 } from '@rpg/contracts'
-import { toOptions, type FieldVisibility, type FormItem, type DependentConfig } from '@rpg/ui/form'
+import {
+  defineDependentField,
+  toOptions,
+  type FieldVisibility,
+  type FormItem,
+  type DependentConfig,
+} from '@rpg/ui/form'
 
-import { ClassCantripProgressionField } from '../components/class-cantrip-progression-field'
+import { ClassSpellbookAcquisitionField } from '../components/class-spellbook-acquisition-field'
+import { ClassSpellcastingProgressionField } from '../components/class-spellcasting-progression-field'
 
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
+import {
+  SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS,
+  SPELL_SELECTION_MODEL_OPTIONS,
+} from './class-spell-selection-form.lib'
 
 const abilityOptions = toOptions(
   ABILITY_IDS,
@@ -42,6 +55,20 @@ const spellcastingFocusKindOptions = toOptions(
   ) as Record<(typeof SPELLCASTING_FOCUS_GEAR_KINDS)[number], string>,
 )
 
+const spellSelectionModelOptions = toOptions(
+  SPELL_SELECTION_MODEL_OPTIONS.map((option) => option.value),
+  Object.fromEntries(
+    SPELL_SELECTION_MODEL_OPTIONS.map((option) => [option.value, option.label]),
+  ) as Record<(typeof SPELL_SELECTION_MODEL_OPTIONS)[number]['value'], string>,
+)
+
+const spellSelectionChangePackageOptions = toOptions(
+  SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS.map((option) => option.value),
+  Object.fromEntries(
+    SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS.map((option) => [option.value, option.label]),
+  ) as Record<(typeof SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS)[number]['value'], string>,
+)
+
 function campaignLevelField(maxLevel: number) {
   return z.coerce.number().pipe(campaignLevelSchema(maxLevel))
 }
@@ -50,14 +77,14 @@ export function createSpellcastingFormSchema(maxLevel: number) {
   const levelField = campaignLevelField(maxLevel)
   return z.object({
     slotProgressionId: z.string().min(1),
-    profileId: z.string().min(1),
+    spellSelection: classSpellSelectionSchema.optional(),
+    progression: classSpellcastingProgressionSchema.optional(),
     level: levelField.optional(),
     description: z.string().optional(),
     ability: abilitySchema,
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
     focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
-    cantrips: classCapacityProgressionSchema.optional(),
   })
 }
 
@@ -65,14 +92,14 @@ export function createSpellcastingDraftFormSchema(maxLevel: number) {
   const levelField = campaignLevelField(maxLevel)
   return z.object({
     slotProgressionId: draftOptionalSelect(z.string().min(1)),
-    profileId: draftOptionalSelect(z.string().min(1)),
+    spellSelection: classSpellSelectionSchema.optional(),
+    progression: classSpellcastingProgressionSchema.optional(),
     level: draftOptionalSelect(levelField),
     description: z.string().optional(),
     ability: draftOptionalSelect(abilitySchema),
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
     focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
-    cantrips: classCapacityProgressionSchema.optional(),
   })
 }
 
@@ -83,12 +110,43 @@ function visibleWhenSpellcasting(): FieldVisibility {
   }
 }
 
-function spellcastingSlotProgressionOptions(ctx: ContentFormCtx) {
-  return ctx.options?.spellcastingSlotProgressions ?? []
+function spellSelectionLearnedCollectionDependent(ctx: ContentFormCtx) {
+  return defineDependentField({
+    kind: 'dependent',
+    controller: {
+      type: 'select',
+      name: 'spellcasting.spellSelection.model',
+      label: 'Spell selection',
+      options: spellSelectionModelOptions,
+      required: true,
+      hint: 'How this class chooses level 1+ spells.',
+    },
+    dependents: {
+      visibility: {
+        dependsOn: ['spellcasting.spellSelection.model'],
+        visibleWhen: (watched) =>
+          watched['spellcasting.spellSelection.model'] === 'prepareFromLearnedCollection',
+      },
+      fields: [
+        {
+          type: 'select',
+          name: 'spellcasting.spellSelection.collection',
+          label: 'Learned collection',
+          options: [{ value: 'spellbook', label: 'Spellbook' }],
+          required: true,
+        },
+        {
+          kind: 'slot',
+          name: 'spellcasting.spellbookAcquisition',
+          render: () => createElement(ClassSpellbookAcquisitionField, { formCtx: ctx }),
+        },
+      ],
+    },
+  })
 }
 
-function spellcastingProfileOptions(ctx: ContentFormCtx) {
-  return ctx.options?.spellcastingProfiles ?? []
+function spellcastingSlotProgressionOptions(ctx: ContentFormCtx) {
+  return ctx.options?.spellcastingSlotProgressions ?? []
 }
 
 export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
@@ -114,35 +172,6 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
           hint: 'Spell slot table (Full / Half / Pact / custom) for this class.',
         },
         {
-          type: 'combobox',
-          name: 'spellcasting.profileId',
-          label: 'Spell selection profile',
-          options: spellcastingProfileOptions(ctx),
-          multiple: false,
-          required: true,
-          visibility: visibleWhenSpellcasting(),
-          hint: 'Prepared/repertoire capacity, spellbook gains, and remaining selection behavior.',
-        },
-        {
-          kind: 'dependent',
-          visibility: visibleWhenSpellcasting(),
-          controller: {
-            type: 'switch',
-            name: 'grantsCantrips',
-            label: 'Grants cantrips',
-            hint: 'When enabled, this class selects cantrips from its spell list using the breakpoint table below.',
-          },
-          dependents: {
-            fields: [
-              {
-                kind: 'slot',
-                name: 'spellcasting.cantripsEditor',
-                render: () => createElement(ClassCantripProgressionField, { formCtx: ctx }),
-              },
-            ],
-          },
-        },
-        {
           type: 'select',
           name: 'spellcasting.level',
           label: 'Spellcasting level',
@@ -162,6 +191,41 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
           multiple: false,
           required: true,
           visibility: visibleWhenSpellcasting(),
+        },
+        {
+          kind: 'group',
+          label: 'Cantrips',
+          visibility: visibleWhenSpellcasting(),
+          fields: [
+            {
+              type: 'switch',
+              name: 'grantsCantrips',
+              label: 'Grants cantrips',
+              hint: 'When enabled, the Spellcasting progression table includes a Cantrips column.',
+            },
+          ],
+        },
+        {
+          kind: 'group',
+          label: 'Level 1+ spells',
+          visibility: visibleWhenSpellcasting(),
+          fields: [
+            spellSelectionLearnedCollectionDependent(ctx),
+            {
+              type: 'select',
+              name: 'spellSelectionChangePackage',
+              label: 'Change prepared spells',
+              options: spellSelectionChangePackageOptions,
+              required: true,
+              hint: 'When selections may change after character creation.',
+            },
+          ],
+        },
+        {
+          kind: 'slot',
+          name: 'spellcasting.progressionEditor',
+          visibility: visibleWhenSpellcasting(),
+          render: () => createElement(ClassSpellcastingProgressionField, { formCtx: ctx }),
         },
         {
           type: 'combobox',
@@ -205,3 +269,6 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
   }
   return [stack]
 }
+
+// Re-export for form schema composition — acquisition lives on spellSelection
+export { classGainProgressionSchema }

@@ -61,7 +61,7 @@ describe('resolveSpellPickerItems', () => {
   it('never disables already-selected rows when the ChoiceSet is full', () => {
     const draft = createEmptyCharacterBuilderDraft()
     draft.class = { classId: wizardClass.id, level: 1 }
-    draft.choiceSelections[spellcastingChoiceSetId(wizardClass.id, 'spellbook-gain')] =
+    draft.choiceSelections[spellcastingChoiceSetId(wizardClass.id, 'spellbook')] =
       wizardLevelOneSpells.map((spell) => spell.id)
     draft.choiceSelections[preparedChoiceSetId] = wizardLevelOneSpells
       .slice(0, 4)

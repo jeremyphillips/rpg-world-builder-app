@@ -83,12 +83,6 @@
     },
     {
       "fileMatch": [
-        "packages/catalog/src/spellcasting-progressions/data/**/profiles.json"
-      ],
-      "url": "./packages/contracts/generated/catalog-spellcasting-profile-seed.schema.json"
-    },
-    {
-      "fileMatch": [
         "packages/catalog/src/presets/campaign-templates/data/campaign-templates.json"
       ],
       "url": "./packages/contracts/generated/catalog-campaign-template-list.schema.json"

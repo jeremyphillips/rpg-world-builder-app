@@ -85,10 +85,6 @@ export const CATALOG_SCHEMA_MANIFEST = [
     fileMatch: ['packages/catalog/src/spellcasting-progressions/data/**/slot-progressions.json'],
   },
   {
-    file: 'catalog-spellcasting-profile-seed.schema.json',
-    fileMatch: ['packages/catalog/src/spellcasting-progressions/data/**/profiles.json'],
-  },
-  {
     file: 'catalog-campaign-template-list.schema.json',
     fileMatch: ['packages/catalog/src/presets/campaign-templates/data/campaign-templates.json'],
   },

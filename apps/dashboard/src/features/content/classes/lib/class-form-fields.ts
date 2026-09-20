@@ -70,6 +70,9 @@ export function createClassFormSchema(
       hitDie: z.coerce.number().pipe(hitDieSchema),
       hasSpellcasting: z.boolean(),
       grantsCantrips: z.boolean(),
+      spellSelectionChangePackage: z
+        .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
+        .optional(),
       weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
       spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
       proficiencies: proficienciesFormSchema,
@@ -90,12 +93,12 @@ export function createClassFormSchema(
       if (
         values.hasSpellcasting &&
         values.grantsCantrips &&
-        (values.spellcasting?.cantrips?.curve.rows.length ?? 0) === 0
+        (values.spellcasting?.progression?.cantrips?.curve.rows.length ?? 0) === 0
       ) {
         ctx.addIssue({
           code: 'custom',
           message: 'Cantrip progression must include at least one level breakpoint.',
-          path: ['spellcasting', 'cantrips', 'curve', 'rows'],
+          path: ['spellcasting', 'progression', 'cantrips', 'curve', 'rows'],
         })
       }
     })
@@ -113,6 +116,9 @@ export function createClassDraftFormSchema(
     hitDie: draftOptionalSelect(z.coerce.number().pipe(hitDieSchema)),
     hasSpellcasting: z.boolean(),
     grantsCantrips: z.boolean(),
+    spellSelectionChangePackage: z
+      .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
+      .optional(),
     weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
     spellcasting: createSpellcastingDraftFormSchema(maxLevel).optional(),
     proficiencies: proficienciesDraftFormSchema,
@@ -150,7 +156,13 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'spellcasting',
       label: 'Spellcasting',
       fields: spellcastingFields(ctx),
-      errorPaths: ['hasSpellcasting', 'grantsCantrips', 'spellcasting', 'spellcasting.cantrips'],
+      errorPaths: [
+        'hasSpellcasting',
+        'grantsCantrips',
+        'spellSelectionChangePackage',
+        'spellcasting',
+        'spellcasting.progression',
+      ],
     },
     {
       id: 'features',

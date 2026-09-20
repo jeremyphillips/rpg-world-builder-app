@@ -1,2 +1,6 @@
 export * from './class-capacity-progression'
+export * from './class-gain-progression'
+export * from './class-spell-selection'
+export * from './class-spellcasting-progression'
 export * from './spellcasting'
+export * from './spellcasting-validation'

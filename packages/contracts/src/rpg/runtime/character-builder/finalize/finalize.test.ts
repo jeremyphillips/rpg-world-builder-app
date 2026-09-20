@@ -465,7 +465,7 @@ describe('finalizePcCharacterBuild', () => {
       choiceSelections: {
         'class:srd-cc-5.2.1:fixture-wizard:class-skills': [`${wizardClass.rulesetId}:athletics`],
         [`spellcasting:${wizardClass.id}:cantrips`]: cantripIds,
-        [`spellcasting:${wizardClass.id}:spellbook-gain`]: spellbookIds,
+        [`spellcasting:${wizardClass.id}:spellbook`]: spellbookIds,
         [`spellcasting:${wizardClass.id}:prepared`]: preparedIds,
       },
     }

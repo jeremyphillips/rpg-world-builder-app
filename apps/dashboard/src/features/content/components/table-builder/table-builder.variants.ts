@@ -10,7 +10,7 @@ export const tableBuilderLayoutClasses =
 export const tableBuilderAuthoringPaneClasses = 'flex min-w-0 flex-col gap-6'
 
 /** Preview stays visible while the authoring pane scrolls the modal body. */
-export const tableBuilderPreviewPaneClasses = 'min-w-0 lg:sticky lg:top-0 lg:self-start'
+export const tableBuilderPreviewPaneClasses = 'min-w-0 w-full lg:sticky lg:top-0 lg:self-start'
 
 /** Neutral bordered editor group — the container owns border and radius. */
 export const tableBuilderGroupClasses = 'overflow-hidden rounded-md border border-border'

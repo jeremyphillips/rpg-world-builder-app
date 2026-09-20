@@ -1,10 +1,10 @@
 import type { Spell } from '../../../../content/spell'
-import { CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID } from '../../../../content/classes/spellcasting'
-import type { SpellChoiceProgression } from '../../../../campaign/rules/spellcasting-progression'
+import { CLASS_SPELLCASTING_CHOICE_SUFFIXES } from '../../../../content/classes/spellcasting'
 import {
-  resolveChoiceProgressionQuotaAtLevel,
-  type ResolvedSpellcastingProfileBundle,
-} from '../../../../campaign/rules/spellcasting-progression'
+  resolveCompiledChoiceProgressionQuotaAtLevel,
+  type CompiledSpellcastingChoiceProgression,
+  type ResolvedClassSpellcasting,
+} from '../../../creature/resolve-class-spellcasting'
 import { getSpellCollectionKindLabel } from '../../../../vocab/spell/spell-collection-kind'
 import type { SpellChoiceSource } from '../../../../vocab/spell/spell-choice-source'
 import { buildChoiceSetId, type ChoiceSet, type ChoiceSetOption } from '../../choice-set'
@@ -12,18 +12,16 @@ import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { BuilderSpellcastingProfile } from './spellcasting-profile'
 
-export function spellcastingChoiceSetId(classId: string, progressionId: string): string {
-  return buildChoiceSetId('spellcasting', classId, progressionId)
+export function spellcastingChoiceSetId(classId: string, suffix: string): string {
+  return buildChoiceSetId('spellcasting', classId, suffix)
 }
 
-function labelForProgression(progression: SpellChoiceProgression): string {
-  return (
-    progression.presentation?.column?.label ?? getSpellCollectionKindLabel(progression.destination)
-  )
+function labelForProgression(progression: CompiledSpellcastingChoiceProgression): string {
+  return progression.label || getSpellCollectionKindLabel(progression.destination)
 }
 
 function spellLevelPredicate(
-  progression: SpellChoiceProgression,
+  progression: CompiledSpellcastingChoiceProgression,
   maxSelectableSpellLevel: number,
 ): (spell: Spell) => boolean {
   if (progression.destination === 'cantrips') {
@@ -43,21 +41,26 @@ function spellOptionsFromClassList(
     .map((spell) => ({ id: spell.id, label: spell.name }))
 }
 
+function writerProgressionsForCollection(
+  resolved: ResolvedClassSpellcasting,
+  collection: Extract<SpellChoiceSource, { kind: 'collection' }>['collection'],
+): CompiledSpellcastingChoiceProgression[] {
+  return resolved.choiceProgressions.filter((progression) => progression.destination === collection)
+}
+
 function spellOptionsFromCollectionSource(
   draft: CharacterBuilderDraft,
   classId: string,
   source: Extract<SpellChoiceSource, { kind: 'collection' }>,
-  profileBundle: ResolvedSpellcastingProfileBundle,
+  resolved: ResolvedClassSpellcasting,
   catalogIndex: CharacterBuildCatalogIndex,
   maxSelectableSpellLevel: number,
 ): ChoiceSetOption[] {
-  const writerProgressions = profileBundle.profile.choiceProgressions.filter(
-    (progression) => progression.destination === source.collection,
-  )
+  const writerProgressions = writerProgressionsForCollection(resolved, source.collection)
 
   const spellIds = new Set<string>()
   for (const progression of writerProgressions) {
-    const choiceSetId = spellcastingChoiceSetId(classId, progression.id)
+    const choiceSetId = spellcastingChoiceSetId(classId, progression.suffix)
     for (const spellId of draft.choiceSelections[choiceSetId] ?? []) {
       spellIds.add(spellId)
     }
@@ -74,7 +77,7 @@ function spellOptionsFromCollectionSource(
 function resolveSpellOptions(
   draft: CharacterBuilderDraft,
   profile: BuilderSpellcastingProfile,
-  progression: SpellChoiceProgression,
+  progression: CompiledSpellcastingChoiceProgression,
   characterClassSlug: string,
   catalogIndex: CharacterBuildCatalogIndex,
 ): ChoiceSetOption[] {
@@ -88,13 +91,15 @@ function resolveSpellOptions(
     draft,
     profile.classId,
     progression.source,
-    profile.profileBundle,
+    profile.resolved,
     catalogIndex,
     profile.maxSelectableSpellLevel,
   )
 }
 
-function choiceTypeForProgression(progression: SpellChoiceProgression): ChoiceSet['choiceType'] {
+function choiceTypeForProgression(
+  progression: CompiledSpellcastingChoiceProgression,
+): ChoiceSet['choiceType'] {
   return progression.destination === 'cantrips' ? 'cantrip' : 'spell'
 }
 
@@ -107,7 +112,7 @@ function resolveClassCantripChoiceSet(
   if (quota <= 0) return null
 
   return {
-    id: spellcastingChoiceSetId(profile.classId, CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID),
+    id: spellcastingChoiceSetId(profile.classId, CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips),
     sourceType: 'spellcasting',
     sourceId: profile.classId,
     choiceType: 'cantrip',
@@ -123,7 +128,7 @@ function resolveClassCantripChoiceSet(
   }
 }
 
-/** Builds class cantrip capacity plus one ChoiceSet per applicable profile progression. */
+/** Builds class cantrip capacity plus one ChoiceSet per applicable compiled progression. */
 export function resolveSpellcastingChoiceSets(
   profile: BuilderSpellcastingProfile,
   characterClassSlug: string,
@@ -137,14 +142,14 @@ export function resolveSpellcastingChoiceSets(
     choiceSets.push(cantripChoiceSet)
   }
 
-  for (const progression of profile.profileBundle.profile.choiceProgressions) {
-    if (progression.destination === 'cantrips') continue
+  for (const progression of profile.resolved.choiceProgressions) {
+    if (progression.suffix === CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips) continue
 
-    const quota = resolveChoiceProgressionQuotaAtLevel(progression, profile.classLevel)
+    const quota = resolveCompiledChoiceProgressionQuotaAtLevel(progression, profile.classLevel)
     if (quota <= 0) continue
 
     choiceSets.push({
-      id: spellcastingChoiceSetId(profile.classId, progression.id),
+      id: spellcastingChoiceSetId(profile.classId, progression.suffix),
       sourceType: 'spellcasting',
       sourceId: profile.classId,
       choiceType: choiceTypeForProgression(progression),

@@ -82,7 +82,6 @@ function buildProgressionPatchInput(values: RulesValues) {
     ({ entries: [] } as const)
   const spellcasting = buildSpellcastingProgressionPatchInput({
     slotProgressions: values.slotProgressions,
-    profiles: values.profiles,
   })
   return {
     ...pickDefined({

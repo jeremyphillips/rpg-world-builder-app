@@ -5,8 +5,11 @@ import {
   type CharacterSpellEntry,
 } from '../../character/sheet/spells'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
-import { CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID } from '../../../content/classes/spellcasting'
-import type { SpellChoiceProgression } from '../../../campaign/rules/spellcasting-progression'
+import {
+  CLASS_SPELLCASTING_CHOICE_SUFFIXES,
+  type ClassSpellcastingChoiceSuffix,
+} from '../../../content/classes/spellcasting'
+import type { CompiledSpellcastingChoiceProgression } from '../../creature/resolve-class-spellcasting'
 import type { SpellMutationPolicy } from '../../../vocab/spell/spell-mutation-policy'
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
@@ -25,13 +28,17 @@ export function classSpellcastingSource(
   return [{ kind: 'classSpellcasting', sourceId: classId, grantId: progressionId }]
 }
 
-function progressionIdFromChoiceSet(choiceSet: ChoiceSet): string | undefined {
+function progressionSuffixFromChoiceSet(
+  choiceSet: ChoiceSet,
+): ClassSpellcastingChoiceSuffix | undefined {
   if (choiceSet.sourceType !== 'spellcasting') return undefined
-  return choiceSet.id.slice(`${choiceSet.sourceType}:${choiceSet.sourceId}:`.length)
+  return choiceSet.id.slice(
+    `${choiceSet.sourceType}:${choiceSet.sourceId}:`.length,
+  ) as ClassSpellcastingChoiceSuffix
 }
 
 function membershipForProgression(
-  progression: SpellChoiceProgression,
+  progression: CompiledSpellcastingChoiceProgression,
 ): CharacterSpellCollectionMembership {
   const membership: CharacterSpellCollectionMembership = { kind: progression.destination }
   if (progression.destination === 'prepared' && progression.mutation.kind === 'replace') {
@@ -41,10 +48,10 @@ function membershipForProgression(
 }
 
 function membershipForChoiceSet(
-  progressionId: string,
-  progression: SpellChoiceProgression | undefined,
+  suffix: ClassSpellcastingChoiceSuffix,
+  progression: CompiledSpellcastingChoiceProgression | undefined,
 ): CharacterSpellCollectionMembership | undefined {
-  if (progressionId === CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID) {
+  if (suffix === CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips) {
     return { kind: 'cantrips' }
   }
   return progression ? membershipForProgression(progression) : undefined
@@ -102,11 +109,8 @@ export function assembleClassSpellcasting(
   const profile = resolveSpellcastingProfile(draft, context)
   if (!profile) return []
 
-  const progressionsById = new Map(
-    profile.profileBundle.profile.choiceProgressions.map((progression) => [
-      progression.id,
-      progression,
-    ]),
+  const progressionsBySuffix = new Map(
+    profile.resolved.choiceProgressions.map((progression) => [progression.suffix, progression]),
   )
   const entries = new Map<string, CharacterSpellEntry>()
 
@@ -115,20 +119,17 @@ export function assembleClassSpellcasting(
       continue
     }
 
-    const progressionId = progressionIdFromChoiceSet(choiceSet)
-    if (!progressionId) continue
+    const suffix = progressionSuffixFromChoiceSet(choiceSet)
+    if (!suffix) continue
 
-    const progression = progressionsById.get(progressionId)
-    const membership = membershipForChoiceSet(progressionId, progression)
+    const progression = progressionsBySuffix.get(suffix)
+    const membership = membershipForChoiceSet(suffix, progression)
     if (!membership) continue
 
     mergeSelectionIntoEntries(
       entries,
       draft.choiceSelections[choiceSet.id] ?? [],
-      classSpellcastingSource(
-        profile.classId,
-        progression?.id ?? CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID,
-      ),
+      classSpellcastingSource(profile.classId, progression?.suffix ?? suffix),
       membership,
     )
   }

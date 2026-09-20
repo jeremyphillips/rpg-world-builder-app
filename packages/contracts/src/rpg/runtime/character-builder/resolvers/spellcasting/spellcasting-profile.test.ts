@@ -69,7 +69,11 @@ describe('spellcasting-profile', () => {
       spellsAvailable: 4,
       maxSelectableSpellLevel: 1,
     })
-    expect(profile?.profileBundle.profile.id).toBe('fixture:wizard')
+    expect(profile?.resolved.choiceProgressions.map((entry) => entry.suffix)).toEqual([
+      'cantrips',
+      'spellbook',
+      'prepared',
+    ])
   })
 
   it('omits cantrip quota for paladin-style zero-cantrip casters', () => {

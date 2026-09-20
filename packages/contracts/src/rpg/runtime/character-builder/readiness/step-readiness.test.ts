@@ -236,7 +236,7 @@ describe('resolveBuilderStepReadiness', () => {
           [`spellcasting:${wizardClass.id}:cantrips`]: wizardCantrips
             .slice(0, 3)
             .map((spell) => spell.id),
-          [`spellcasting:${wizardClass.id}:spellbook-gain`]: wizardLevelOneSpells.map(
+          [`spellcasting:${wizardClass.id}:spellbook`]: wizardLevelOneSpells.map(
             (spell) => spell.id,
           ),
           [`spellcasting:${wizardClass.id}:prepared`]: wizardLevelOneSpells

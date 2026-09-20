@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import {
   slotProgressionSchema,
-  spellcastingProfileSchema,
   startingWealthRulesSchema,
   xpProgressionSchema,
 } from '@rpg/contracts'
@@ -18,6 +17,3 @@ export const xpProgressionSeedFileSchema = z
 
 /** On-disk shape for spellcasting slot progression seed JSON. */
 export const slotProgressionSeedFileSchema = z.array(slotProgressionSchema).min(1)
-
-/** On-disk shape for spellcasting profile seed JSON. */
-export const spellcastingProfileSeedFileSchema = z.array(spellcastingProfileSchema).min(1)

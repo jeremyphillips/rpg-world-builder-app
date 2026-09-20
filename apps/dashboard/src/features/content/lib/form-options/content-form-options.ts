@@ -72,8 +72,6 @@ export interface ContentFormOptionSets {
   richTextContentTypeOptions: RichTextLinkPickerContentTypeOption[]
   /** Ruleset slot progression options for class spellcasting.slotProgressionId. */
   spellcastingSlotProgressions?: FieldOption[]
-  /** Ruleset spell selection profile options for class spellcasting.profileId. */
-  spellcastingProfiles?: FieldOption[]
 }
 
 interface QueryState {
@@ -178,16 +176,6 @@ function buildSpellcastingSlotProgressionOptions(
     .map((progression) => ({ value: progression.id, label: progression.label }))
 }
 
-function buildSpellcastingProfileOptions(
-  spellcastingProgression?: ReturnType<typeof resolveCampaignSpellcastingProgression>,
-): FieldOption[] {
-  if (!spellcastingProgression) return []
-
-  return [...spellcastingProgression.profiles.values()]
-    .sort((left, right) => left.label.localeCompare(right.label))
-    .map((profile) => ({ value: profile.id, label: profile.label }))
-}
-
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
   campaignId?: string
@@ -215,7 +203,6 @@ export function buildContentFormOptionSets(input: {
     spellcastingSlotProgressions: buildSpellcastingSlotProgressionOptions(
       input.spellcastingProgression,
     ),
-    spellcastingProfiles: buildSpellcastingProfileOptions(input.spellcastingProgression),
     ...buildRichTextLinkOptionSets({
       campaignId: input.campaignId,
       spells: referenceSpells,

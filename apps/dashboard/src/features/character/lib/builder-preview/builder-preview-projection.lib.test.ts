@@ -128,11 +128,22 @@ describe('builder-preview-projection.lib', () => {
       spellcasting: {
         level: 1,
         slotProgressionId: 'full-caster',
-        profileId: 'fixture:wizard',
         ability: 'int',
-        cantrips: {
-          curve: { rows: [{ level: 1, count: 3 }] },
-          extension: 'carryForward',
+        spellSelection: {
+          model: 'prepareFromLearnedCollection',
+          collection: 'spellbook',
+          acquisition: { curve: { rows: [{ level: 1, count: 6 }] }, extension: 'zero' },
+          change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+        },
+        progression: {
+          cantrips: {
+            curve: { rows: [{ level: 1, count: 3 }] },
+            extension: 'carryForward',
+          },
+          preparedSpells: {
+            curve: { rows: [{ level: 1, count: 4 }] },
+            extension: 'carryForward',
+          },
         },
       },
     })

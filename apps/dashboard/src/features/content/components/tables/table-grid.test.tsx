@@ -47,7 +47,9 @@ describe('TableGrid', () => {
       <TableGrid presentation={samplePresentation} rowHeaderLabel="Level" scrollMode="embedded" />,
     )
 
-    expect(container.querySelector('table')).toBeTruthy()
+    const table = container.querySelector('table')
+    expect(table).toBeTruthy()
+    expect(table?.className).toMatch(/w-full/)
     expect(container.querySelector('[class*="overflow-auto"] table')).toBeNull()
   })
 

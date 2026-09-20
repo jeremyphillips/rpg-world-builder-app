@@ -13,7 +13,6 @@ function SpellcastingProgressionFieldStory({
     extendedMaxLevel?: number
     extendedTierName?: string
     slotProgressions: ReturnType<typeof resolveSpellcastingProgressionFormState>['slotProgressions']
-    profiles: ReturnType<typeof resolveSpellcastingProgressionFormState>['profiles']
   }
 }) {
   const form = useForm({ defaultValues })

@@ -259,7 +259,7 @@ describe('resolveAutomaticNpcBuild constraints', () => {
 
     const spellSelections = [
       ...(result.draft.choiceSelections[
-        buildChoiceSetId('spellcasting', wizardClass.id, 'spellbook-gain')
+        buildChoiceSetId('spellcasting', wizardClass.id, 'spellbook')
       ] ?? []),
       ...(result.draft.choiceSelections[
         buildChoiceSetId('spellcasting', wizardClass.id, 'prepared')

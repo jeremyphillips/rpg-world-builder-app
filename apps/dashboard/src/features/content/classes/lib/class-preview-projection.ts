@@ -51,7 +51,7 @@ export const CLASS_PREVIEW_FACT_LABELS = {
   spellcastingAbility: 'Spellcasting ability',
   spellcastingLevel: 'Spellcasting level',
   slotProgression: 'Slot progression',
-  spellSelectionProfile: 'Spell selection profile',
+  spellSelection: 'Spell selection',
   skillChoices: 'Skill choices',
   startingEquipment: 'Starting equipment',
 } as const
@@ -220,8 +220,8 @@ function spellcastingFacts(
     value: spellcasting.slotProgressionId ?? CONTENT_PREVIEW_NOT_SET,
   })
   facts.push({
-    label: CLASS_PREVIEW_FACT_LABELS.spellSelectionProfile,
-    value: spellcasting.profileId ?? CONTENT_PREVIEW_NOT_SET,
+    label: CLASS_PREVIEW_FACT_LABELS.spellSelection,
+    value: spellcasting.spellSelection?.model ?? CONTENT_PREVIEW_NOT_SET,
   })
 
   return facts
@@ -240,8 +240,8 @@ function buildSpellcastingSection(values: ClassFormValues): ContentPreviewSectio
   return {
     derivedKind: 'ready',
     status:
-      spellcasting?.slotProgressionId && spellcasting?.profileId
-        ? `${spellcasting.slotProgressionId} · ${spellcasting.profileId}`
+      spellcasting?.slotProgressionId && spellcasting?.spellSelection?.model
+        ? `${spellcasting.slotProgressionId} · ${spellcasting.spellSelection.model}`
         : CONTENT_PREVIEW_STATUS_READY,
     facts: spellcastingFacts(spellcasting),
   }

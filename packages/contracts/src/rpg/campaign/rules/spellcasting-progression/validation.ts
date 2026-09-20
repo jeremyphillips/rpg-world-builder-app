@@ -1,12 +1,8 @@
 import type { z } from 'zod'
 
-import { isPersistentSpellCollectionKind } from '../../../vocab/spell/spell-collection-kind'
-
 import { spellcastingProgressionValidationMessages } from './messages'
 import type { LeveledSlotRow, PactSlotRow } from './slot-progression'
 import { MAX_SPELL_SLOT_LEVEL } from './slot-progression'
-import type { SpellChoiceProgression } from './spell-choice-progression'
-import type { SpellcastingProfile } from './spellcasting-profile'
 import { normalizeSlotCounts } from './lookup'
 
 function highestUnlockedSlotLevel(slots: readonly number[]): number {
@@ -148,41 +144,4 @@ export function refinePactSlotRows(
 
     previousRow = row
   })
-}
-
-export function refineSpellChoiceProgressions(
-  progressions: readonly SpellChoiceProgression[],
-  ctx: z.RefinementCtx,
-  pathPrefix: (string | number)[] = [],
-): void {
-  progressions.forEach((progression, index) => {
-    if (progression.destination === 'cantrips') {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellcastingProgressionValidationMessages.cantripDestinationNotAllowedOnProfile(),
-        path: [...pathPrefix, index, 'destination'],
-      })
-    }
-
-    if (progression.kind === 'gain' && !isPersistentSpellCollectionKind(progression.destination)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellcastingProgressionValidationMessages.gainRequiresPersistentDestination({
-          destination: progression.destination,
-        }),
-        path: [...pathPrefix, index, 'destination'],
-      })
-    }
-  })
-}
-
-export function refineSpellcastingProfile(
-  profile: SpellcastingProfile,
-  ctx: z.RefinementCtx,
-  pathPrefix: (string | number)[] = [],
-): void {
-  refineSpellChoiceProgressions(profile.choiceProgressions, ctx, [
-    ...pathPrefix,
-    'choiceProgressions',
-  ])
 }

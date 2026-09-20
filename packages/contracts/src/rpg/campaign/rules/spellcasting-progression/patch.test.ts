@@ -41,24 +41,5 @@ describe('computeSpellcastingProgressionSparsePatch', () => {
 
     expect(patch?.slotProgressions).toHaveLength(1)
     expect(patch?.slotProgressions?.[0]?.id).toBe('full-caster')
-    expect(patch?.profiles).toBeUndefined()
-  })
-
-  it('includes custom records not present in seed', () => {
-    const customProfile = {
-      id: 'custom:test',
-      label: 'Custom profile',
-      choiceProgressions: [],
-    }
-    const resolved = resolveSpellcastingProgressionRecords(spellcastingProgressionTestSeed, {
-      profiles: [customProfile],
-    })
-
-    const patch = computeSpellcastingProgressionSparsePatch(
-      resolved,
-      spellcastingProgressionTestSeed,
-    )
-
-    expect(patch?.profiles).toEqual([customProfile])
   })
 })

@@ -3,7 +3,7 @@ import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mec
 import type { CharacterClass } from '../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../content/classes/spellcasting'
 import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/rules/spellcasting-progression'
-import { resolveSpellcastingProfileForClass } from '../../../campaign/rules/spellcasting-progression'
+import { resolveSlotProgressionForClass } from '../../../campaign/rules/spellcasting-progression'
 import { resolveLeveledSlotCountsAtLevel } from '../../../campaign/rules/spellcasting-progression'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
 import { getSkillName } from '../../../content/skill-proficiency'
@@ -160,11 +160,11 @@ export function deriveSpellcastingStats(
   }
 
   const abilityScore = input.abilityScores?.[spellcasting.ability]
-  const bundle = input.spellcastingProgression
-    ? resolveSpellcastingProfileForClass({ spellcasting }, input.spellcastingProgression)
+  const slotProgression = input.spellcastingProgression
+    ? resolveSlotProgressionForClass({ spellcasting }, input.spellcastingProgression)
     : null
-  const slots = bundle
-    ? resolveLeveledSlotCountsAtLevel(bundle.slotProgression, input.level).slots
+  const slots = slotProgression
+    ? resolveLeveledSlotCountsAtLevel(slotProgression, input.level).slots
     : []
 
   return {

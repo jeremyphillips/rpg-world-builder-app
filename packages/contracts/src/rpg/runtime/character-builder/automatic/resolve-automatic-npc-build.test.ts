@@ -233,9 +233,7 @@ describe('resolveAutomaticNpcBuild', () => {
       result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'cantrips')],
     ).toEqual([`${RULESET}:arcane-bolt`, `${RULESET}:mage-hand`, `${RULESET}:prestidigitation`])
     expect(
-      result.draft.choiceSelections[
-        buildChoiceSetId('spellcasting', wizardClass.id, 'spellbook-gain')
-      ],
+      result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'spellbook')],
     ).toEqual([
       `${RULESET}:burning-hands`,
       `${RULESET}:charm-person`,

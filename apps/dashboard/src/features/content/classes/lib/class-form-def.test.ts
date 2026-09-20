@@ -40,10 +40,10 @@ function expectBardSpellcastingRoundTrip(): void {
 
   expect(fromForm.description).toContain('cast spells through your bardic arts')
   expect(fromForm.level).toBe(1)
-  expect(fromForm.profileId).toBe(expected.profileId)
+  expect(fromForm.spellSelection?.model).toBe(expected.spellSelection?.model)
   expect(fromInput.description).toContain('cast spells through your bardic arts')
   expect(fromInput.level).toBe(1)
-  expect(fromInput.profileId).toBe(expected.profileId)
+  expect(fromInput.spellSelection?.model).toBe(expected.spellSelection?.model)
   expect(fromInput.ability).toBe(expected.ability)
 }
 
@@ -374,7 +374,9 @@ describe('classFormDef round-trips', () => {
     const sorcerer = SRD_CLASSES.find((c) => c.slug === 'sorcerer')!
     const formValues = classFormDef.toFormValues(sorcerer) as ClassFormValues
     const input = classFormDef.toInput(formValues, { entity: sorcerer })
-    expect(input.spellcasting?.profileId).toBe(sorcerer.spellcasting?.profileId)
+    expect(input.spellcasting?.spellSelection?.model).toBe(
+      sorcerer.spellcasting?.spellSelection?.model,
+    )
     expect(input.spellcasting?.ability).toBe('cha')
     const fontOfMagic = input.features.find((feature) => feature.id === 'font-of-magic')
     expect(fontOfMagic?.kind).toBe('custom')
