@@ -1,8 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { loadSpellcastingProgressionSeed } from '@rpg/catalog/spellcasting-progressions'
 import { useForm } from 'react-hook-form'
 import type { ProgressionTable } from '@rpg/contracts'
 
+import {
+  buildLeveledSlotProgressionDraft,
+  buildLeveledSlotProgressionHostConfig,
+} from '@/features/campaign'
 import {
   createEmptyTableBuilderDraft,
   tableToDraft,
@@ -12,7 +17,7 @@ import type {
   TableBuilderHostConfig,
   TableBuilderMode,
 } from '../../lib/table-builder/table-builder-host-config'
-import { tableBuilderFormSchema } from '../../lib/table-builder/table-builder-form-schema'
+import { resolveTableBuilderFormSchema } from '../../lib/table-builder/resolve-table-builder-form-schema'
 import {
   martialArtsProgressionTableFixture,
   mixedProgressionTableFixture,
@@ -21,6 +26,12 @@ import {
 import { TableBuilder } from './table-builder'
 
 const ALLOWED_LEVELS = Array.from({ length: 20 }, (_, index) => index + 1)
+
+const FULL_CASTER = loadSpellcastingProgressionSeed('srd-cc-5.2.1').slotProgressions.find(
+  (entry) => entry.id === 'full-caster',
+)!
+
+const LEVELED_SLOT_CONFIG = buildLeveledSlotProgressionHostConfig({ effectiveMaxLevel: 20 })
 
 const CLASS_FEATURE_CONFIG: TableBuilderHostConfig = {
   allowedKinds: ['levelProgression', 'general'],
@@ -32,6 +43,7 @@ type HarnessProps = {
   table?: ProgressionTable
   config?: TableBuilderHostConfig
   mode?: TableBuilderMode
+  initialDraft?: TableBuilderFormValues
 }
 
 /** Standalone harness — the modal normally owns this isolated draft form. */
@@ -39,10 +51,12 @@ function TableBuilderHarness({
   table,
   config = CLASS_FEATURE_CONFIG,
   mode = table === undefined ? 'create' : 'edit',
+  initialDraft,
 }: HarnessProps) {
   const form = useForm<TableBuilderFormValues>({
-    resolver: zodResolver(tableBuilderFormSchema),
-    defaultValues: table !== undefined ? tableToDraft(table) : createEmptyTableBuilderDraft(),
+    resolver: zodResolver(resolveTableBuilderFormSchema(config)),
+    defaultValues:
+      initialDraft ?? (table !== undefined ? tableToDraft(table) : createEmptyTableBuilderDraft()),
   })
 
   return (
@@ -88,5 +102,17 @@ export const KindReadOnlyEdit: Story = {
     table: rageProgressionTableFixture,
     mode: 'edit',
     config: CLASS_FEATURE_CONFIG,
+  },
+}
+
+export const WideLeveledSlotProgression: Story = {
+  args: {
+    config: LEVELED_SLOT_CONFIG,
+    mode: 'edit',
+    initialDraft: buildLeveledSlotProgressionDraft({
+      label: 'Full caster',
+      effectiveMaxLevel: 20,
+      seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
+    }),
   },
 }

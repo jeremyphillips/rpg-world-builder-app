@@ -21,6 +21,13 @@ export const tableBuilderValuesHeaderRowClasses = cn(
 
 export const tableBuilderValuesHeaderCellClasses = 'truncate'
 
+/** Sticky level column — matches editable-grid sticky row-header pattern. */
+export const tableBuilderValuesStickyLevelHeaderClasses =
+  'sticky left-0 z-20 truncate bg-background shadow-[1px_0_0_0_var(--border)]'
+
+export const tableBuilderValuesStickyLevelCellClasses =
+  'sticky left-0 z-10 bg-background shadow-[1px_0_0_0_var(--border)]'
+
 export const tableBuilderValuesRowClasses = 'grid items-center gap-2 px-2.5 py-1.5'
 
 export const tableBuilderValuesCellClasses = 'min-w-0 space-y-1'

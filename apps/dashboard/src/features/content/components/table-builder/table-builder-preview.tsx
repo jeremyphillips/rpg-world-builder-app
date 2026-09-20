@@ -137,6 +137,7 @@ export function TableBuilderPreview() {
           <TableGrid
             presentation={presentation}
             caption={TABLE_BUILDER_PREVIEW_TITLE}
+            scrollMode="embedded"
             emptyBodyMessage={
               presentation.rows.length === 0 ? TABLE_BUILDER_PREVIEW_NO_ROWS : undefined
             }

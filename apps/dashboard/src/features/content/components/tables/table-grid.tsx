@@ -19,6 +19,7 @@ import {
   tableGridHeaderCellClasses,
   tableGridRowHeaderCellClasses,
   tableGridRowHeaderHeaderClasses,
+  tableGridTableClasses,
   tableGridValueCellClasses,
 } from './table-grid.variants'
 
@@ -34,6 +35,11 @@ export type TableGridProps = {
   rowHeaderLabel?: string
   /** Centered body placeholder when the presentation has columns but no rows. */
   emptyBodyMessage?: string
+  /**
+   * `embedded` renders a bare `<table>` so a parent owns horizontal scroll (table
+   * builder preview). Default `table-shell` keeps the `@rpg/ui` Table scroll wrapper.
+   */
+  scrollMode?: 'table-shell' | 'embedded'
 }
 
 export function TableGrid({
@@ -41,21 +47,24 @@ export function TableGrid({
   caption,
   rowHeaderLabel,
   emptyBodyMessage,
+  scrollMode = 'table-shell',
 }: TableGridProps) {
   const heading = caption ?? presentation.name
   const showRowHeader = rowHeaderLabel !== undefined
   const columnCount = presentation.columns.length + (showRowHeader ? 1 : 0)
 
-  return (
-    <Table>
+  const tableBody = (
+    <>
       {heading ? <caption className="sr-only">{heading}</caption> : null}
       <TableHeader>
         <TableRow className={tableHeaderRowClasses}>
           {showRowHeader ? (
-            <TableHead className={tableGridRowHeaderHeaderClasses}>{rowHeaderLabel}</TableHead>
+            <TableHead scope="col" className={tableGridRowHeaderHeaderClasses}>
+              {rowHeaderLabel}
+            </TableHead>
           ) : null}
           {presentation.columns.map((column) => (
-            <TableHead key={column.key} className={tableGridHeaderCellClasses}>
+            <TableHead key={column.key} scope="col" className={tableGridHeaderCellClasses}>
               {column.label ?? column.key}
             </TableHead>
           ))}
@@ -86,9 +95,9 @@ export function TableGrid({
             return (
               <TableRow key={row.rowHeader ?? `row-${index}`}>
                 {showRowHeader ? (
-                  <TableCell className={tableGridRowHeaderCellClasses}>
+                  <TableHead scope="row" className={tableGridRowHeaderCellClasses}>
                     {row.rowHeader ?? MISSING_VALUE}
-                  </TableCell>
+                  </TableHead>
                 ) : null}
                 {presentation.columns.map((column) => (
                   <TableCell key={column.key} className={tableGridValueCellClasses}>
@@ -100,6 +109,12 @@ export function TableGrid({
           })
         )}
       </TableBody>
-    </Table>
+    </>
   )
+
+  if (scrollMode === 'embedded') {
+    return <table className={tableGridTableClasses}>{tableBody}</table>
+  }
+
+  return <Table className={tableGridTableClasses}>{tableBody}</Table>
 }

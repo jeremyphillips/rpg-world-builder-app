@@ -3,6 +3,7 @@ import type { TableBuilderColumnDraft } from '../../lib/table-builder/table-buil
 import {
   tableBuilderValuesHeaderCellClasses,
   tableBuilderValuesHeaderRowClasses,
+  tableBuilderValuesStickyLevelHeaderClasses,
 } from './table-builder-values.variants'
 import { TABLE_BUILDER_LEVEL_HEADER } from '../../lib/table-builder/table-builder-copy'
 
@@ -27,7 +28,11 @@ export function TableBuilderValuesHeader({
       style={{ gridTemplateColumns: gridTemplate }}
     >
       {includeLevel ? (
-        <div className={tableBuilderValuesHeaderCellClasses}>{TABLE_BUILDER_LEVEL_HEADER}</div>
+        <div
+          className={`${tableBuilderValuesHeaderCellClasses} ${tableBuilderValuesStickyLevelHeaderClasses}`}
+        >
+          {TABLE_BUILDER_LEVEL_HEADER}
+        </div>
       ) : null}
       {columns.map((column, index) => {
         const label = column.label.trim()

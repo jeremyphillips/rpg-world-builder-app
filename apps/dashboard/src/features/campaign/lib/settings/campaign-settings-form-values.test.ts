@@ -9,6 +9,7 @@ import {
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
+  EMPTY_SPELLCASTING_PROGRESSION_PATCH,
   resolveCharacterCreationPatch,
   type CreatureTypeId,
 } from '@rpg/contracts'
@@ -32,6 +33,7 @@ import { languageProficiencyRulesDefaultValues } from '../rules/character-config
 import { levelZeroNpcsDefaultFormValues } from '../rules/character-configuration/level-zero-npc-form-values'
 import { mapStartingWealthToFormValues } from '../rules/character-configuration/starting-wealth-form-values'
 import { standardArrayDefaultFormValues } from '@/lib/forms/standard-array-form-values'
+import { resolveSpellcastingProgressionFormState } from '../rules/character-configuration/spellcasting-progression-form-values'
 
 const defaultStartingWealth = mapStartingWealthToFormValues(
   getStandardStartingWealthRules('srd-cc-5.2.1'),
@@ -66,6 +68,14 @@ const defaultRules: CampaignCreateValues = {
   difficulty: 'dangerous',
 }
 
+const defaultSpellcastingFields = resolveSpellcastingProgressionFormState(undefined)
+
+const defaultProgressionPatch = {
+  xpThresholds: { entries: [] },
+  spellcasting: EMPTY_SPELLCASTING_PROGRESSION_PATCH,
+  extendedProgression: null,
+} as const
+
 const defaultMulticlassingFields = {
   multiclassingEnabled: DEFAULT_MULTICLASSING_ENABLED,
   primaryAbilityMinimumEnabled: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
@@ -78,6 +88,7 @@ const defaultMulticlassingFields = {
   xpThresholdOverrides: [] as { level: number; xpRequired: number }[],
   ...languageProficiencyRulesDefaultValues(),
   ...levelZeroNpcsDefaultFormValues(),
+  ...defaultSpellcastingFields,
 } as const
 
 describe('mapCampaignToSettingsValues', () => {
@@ -127,7 +138,7 @@ describe('buildCharacterCreationPatchInput', () => {
     ).toEqual({
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
-      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
+      progression: defaultProgressionPatch,
     })
   })
 
@@ -147,8 +158,8 @@ describe('buildCharacterCreationPatchInput', () => {
       startingLevel: 1,
       importedCharacters: { policy: 'disabled' },
       progression: {
+        ...defaultProgressionPatch,
         extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
-        xpThresholds: { entries: [] },
       },
     })
   })
@@ -200,11 +211,12 @@ describe('buildCharacterCreationPatchInput', () => {
         xpThresholdOverrides: [],
         ...languageProficiencyRulesDefaultValues(),
         ...levelZeroNpcsDefaultFormValues(),
+        ...defaultSpellcastingFields,
       }),
     ).toEqual({
       startingLevel: 1,
       importedCharacters: { policy: 'disabled' },
-      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
+      progression: defaultProgressionPatch,
       multiclassing: {
         enabled: false,
         requirements: {
@@ -248,6 +260,7 @@ describe('buildCharacterCreationPatchInput', () => {
           xpThresholdOverrides: [],
           ...languageProficiencyRulesDefaultValues(),
           ...levelZeroNpcsDefaultFormValues(),
+          ...defaultSpellcastingFields,
         },
         { includeDefaultMulticlassing: true },
       ),
@@ -308,7 +321,7 @@ describe('buildCharacterCreationPatchInputFromCreateWizard', () => {
     ).toEqual({
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
-      progression: { xpThresholds: { entries: [] }, extendedProgression: null },
+      progression: defaultProgressionPatch,
     })
   })
 })
@@ -329,7 +342,7 @@ describe('buildCreateCampaignInput', () => {
       characterCreation: {
         startingLevel: 3,
         importedCharacters: { policy: 'approval_required' },
-        progression: { xpThresholds: { entries: [] }, extendedProgression: null },
+        progression: defaultProgressionPatch,
       },
       flavor: {
         playStyle: ['dungeon_crawl'],
@@ -383,6 +396,7 @@ describe('mapRulesetPatchToRulesValues', () => {
       xpThresholdOverrides: [],
       ...languageProficiencyRulesDefaultValues(),
       ...levelZeroNpcsDefaultFormValues(),
+      ...defaultSpellcastingFields,
     })
   })
 })

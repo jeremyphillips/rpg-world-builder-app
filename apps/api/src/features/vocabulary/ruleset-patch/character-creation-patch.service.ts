@@ -366,6 +366,16 @@ function buildProgressionUpdateSet(
       ops.$set[`${prefix}progression.xpThresholds`] = progression.xpThresholds
     }
   }
+
+  if (progression.spellcasting !== undefined) {
+    const slotProgressions = progression.spellcasting.slotProgressions ?? []
+    const profiles = progression.spellcasting.profiles ?? []
+    if (slotProgressions.length === 0 && profiles.length === 0) {
+      ops.$unset[`${prefix}progression.spellcasting`] = 1
+    } else {
+      ops.$set[`${prefix}progression.spellcasting`] = progression.spellcasting
+    }
+  }
 }
 
 function buildSpeciesCreatureTypePolicyUpdateSet(

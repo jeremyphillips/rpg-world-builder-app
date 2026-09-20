@@ -18,6 +18,7 @@ export type {
   TableBuilderDraftValidationResult,
   TableBuilderExtendedProgression,
   TableBuilderExtendedProgressionAction,
+  TableBuilderFixedColumnDefinition,
   TableBuilderHostConfig,
   TableBuilderHostEditorRowState,
   TableBuilderRowPresentation,
@@ -25,3 +26,4 @@ export type {
   TableBuilderRowRestoreAction,
   TableBuilderValuesNotice,
 } from '@/features/content/lib/table-builder/table-builder-host-config'
+export { resolveTableBuilderFixedColumns } from '@/features/content/lib/table-builder/table-builder-host-config'

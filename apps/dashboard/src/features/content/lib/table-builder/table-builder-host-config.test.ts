@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   assertTableBuilderHostConfig,
+  resolveTableBuilderFixedColumns,
   resolveTableBuilderRecommendedKind,
   type TableBuilderHostConfig,
 } from './table-builder-host-config'
@@ -29,5 +30,20 @@ describe('resolveTableBuilderRecommendedKind', () => {
         allowedKinds: ['general', 'levelProgression'],
       }),
     ).toBe('general')
+  })
+})
+
+describe('resolveTableBuilderFixedColumns', () => {
+  it('prefers resolveFixedColumns over static fixedColumns', () => {
+    expect(
+      resolveTableBuilderFixedColumns({
+        allowedKinds: ['levelProgression'],
+        columns: 'fixed',
+        fixedColumns: [{ label: 'Static', valueType: 'number', format: 'plain' }],
+        resolveFixedColumns: () => [
+          { semanticKey: 'derived', label: 'Derived', valueType: 'number', format: 'plain' },
+        ],
+      }),
+    ).toEqual([{ semanticKey: 'derived', label: 'Derived', valueType: 'number', format: 'plain' }])
   })
 })

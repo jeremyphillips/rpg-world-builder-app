@@ -160,3 +160,20 @@ export {
   buildXpThresholdsHostConfig,
   resolveSystemXpEntries,
 } from './lib/rules/character-configuration/xp-thresholds-field.lib'
+export {
+  buildLeveledSlotProgressionDraft,
+  buildLeveledSlotProgressionHostConfig,
+  buildPactSlotProgressionDraft,
+  buildPactSlotProgressionHostConfig,
+  mapLeveledSlotProgressionDraftToRows,
+  mapPactSlotProgressionDraftToRows,
+  resolveLeveledSlotFixedColumns,
+  resolvePactSlotFixedColumns,
+  validateLeveledSlotProgressionDraft,
+  validatePactSlotProgressionDraft,
+} from './lib/rules/character-configuration/slot-progression-field.lib'
+export {
+  buildSpellcastingProgressionPatchInput,
+  resolveSpellcastingProgressionFormState,
+} from './lib/rules/character-configuration/spellcasting-progression-form-values'
+export { SpellcastingProgressionField } from './components/spellcasting-progression-field'

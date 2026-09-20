@@ -30,6 +30,7 @@ import {
   tableBuilderValuesLevelLabelClasses,
   tableBuilderValuesRowBlockedHintClasses,
   tableBuilderValuesRowClasses,
+  tableBuilderValuesStickyLevelCellClasses,
 } from './table-builder-values.variants'
 
 export type TableBuilderValuesRowProps = {
@@ -77,7 +78,13 @@ function TableBuilderValuesRowLevelField({
   onLevelChange: (index: number, level: string) => void
 }) {
   if (fixedLevels) {
-    return <div className={tableBuilderValuesLevelLabelClasses}>{parsedLevel ?? '—'}</div>
+    return (
+      <div
+        className={`${tableBuilderValuesLevelLabelClasses} ${tableBuilderValuesStickyLevelCellClasses}`}
+      >
+        {parsedLevel ?? '—'}
+      </div>
+    )
   }
 
   return (
