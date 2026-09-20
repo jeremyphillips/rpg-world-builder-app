@@ -3,6 +3,7 @@ import { type z } from 'zod'
 import { keysFromEntries, vocabEnumFromEntries } from './enum-schema'
 
 import { formatVocabularySlugLabel } from './format-slug-label'
+import { BUILDER_GRANT_EDIT_ACTION_LABEL } from './proficiency'
 import { getTermSentenceForm, type GameTermEntry, type VocabularyTerm } from './types'
 import {
   vocabularyOptionIdSchema,
@@ -118,4 +119,24 @@ export function getLanguageCategorySentenceForm(category: string, count = 1): st
 /** Counted noun phrase for language proficiency grants (e.g. "language" / "languages"). */
 export function getLanguageProficiencySentenceForm(count = 1): string {
   return count === 1 ? 'language' : 'languages'
+}
+
+/** Character builder add action label (e.g. "Add language"). */
+export function getLanguageGrantAddLabel(): string {
+  return `Add ${getLanguageProficiencySentenceForm(1)}`
+}
+
+/** Character builder edit action label when a language grant choice set is full. */
+export function getLanguageGrantManageLabel(): string {
+  return BUILDER_GRANT_EDIT_ACTION_LABEL
+}
+
+/** Compact inline add action label (e.g. "Add language"). */
+export function getLanguageGrantCompactAddLabel(): string {
+  return getLanguageGrantAddLabel()
+}
+
+/** Compact inline edit action label when a language grant choice set is full. */
+export function getLanguageGrantCompactManageLabel(): string {
+  return BUILDER_GRANT_EDIT_ACTION_LABEL
 }

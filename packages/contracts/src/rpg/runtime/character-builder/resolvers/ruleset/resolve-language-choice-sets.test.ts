@@ -28,6 +28,10 @@ describe('resolveLanguageChoiceSets', () => {
         { id: 'draconic', label: 'Draconic' },
       ],
       required: true,
+      provenance: {
+        ownerKind: 'origin',
+        choiceLabel: 'Origin Languages',
+      },
     })
   })
 

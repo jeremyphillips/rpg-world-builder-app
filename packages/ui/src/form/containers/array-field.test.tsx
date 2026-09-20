@@ -7,6 +7,7 @@ import axe from 'axe-core'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
+import { CANVAS_SURFACE } from '../../components/ui/surface.variants'
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
 import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
@@ -163,7 +164,7 @@ describe('ArrayFieldRenderer', () => {
     )
     expect(screen.getByRole('button', { name: 'Add trait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('h-9')
-    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
     expect(screen.getByRole('group', { name: /Traits/ })).not.toHaveClass('mb-8')
   })
@@ -255,6 +256,35 @@ describe('ArrayFieldRenderer', () => {
     expect(itemShell).not.toHaveClass('bg-surface-subtle')
   })
 
+  it('applies canvas surface override on flat array item shells', async () => {
+    const user = userEvent.setup()
+    const canvasFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        item: { surface: CANVAS_SURFACE, variant: 'compact', headerVisibility: 'hidden' },
+        fields: traitFields,
+        addAction: { label: 'Add trait', layout: 'inline' },
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={canvasFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add trait' }))
+
+    const itemShell = screen.getByRole('group', { name: 'Traits · Trait #1' })
+    expect(itemShell).toHaveClass('bg-background')
+    expect(itemShell).not.toHaveClass('bg-surface-subtle')
+  })
+
   it('defaults the add control to the outline button variant', () => {
     renderForm()
 
@@ -327,7 +357,8 @@ describe('ArrayFieldRenderer', () => {
     expect(legend).toHaveTextContent('Movement')
     expect(legend).toContainElement(addButton)
     expect(legend).toHaveClass('w-full')
-    expect(addButton).toHaveClass('h-8')
+    expect(addButton).toHaveClass('h-6', 'text-action-standalone', 'text-foreground', 'px-0')
+    expect(addButton).not.toHaveClass('border-interactive-outline', 'hover:bg-accent')
     expect(addButton.querySelector('svg')).toBeTruthy()
     expect(screen.getAllByRole('button', { name: 'Add speed' })).toHaveLength(1)
   })
@@ -701,7 +732,7 @@ describe('ArrayFieldRenderer', () => {
     expect(removeButton).toBeEnabled()
     await user.click(removeButton)
 
-    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.queryByText(/Add at least one trait/i)).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Trait name')).not.toBeInTheDocument()
   })
@@ -731,7 +762,7 @@ describe('ArrayFieldRenderer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
-    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.getByText('Add at least one trait.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Review 1 issue in Traits/i })).toBeInTheDocument()
   })
@@ -778,7 +809,7 @@ describe('ArrayFieldRenderer', () => {
       />,
     )
 
-    expect(screen.getByRole('status')).toHaveTextContent('No trait added.')
+    expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.queryByText(/Add at least one trait/i)).not.toBeInTheDocument()
   })
 

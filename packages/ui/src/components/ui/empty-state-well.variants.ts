@@ -10,19 +10,28 @@ export const emptyStateWellSurfaceClasses = cn(
   insetPanelSunkenShadowClasses,
 )
 
-/** Single-line compact copy — pairs with `EmptyPanel`. */
-export const emptyStateWellBodyClasses = 'text-xs text-muted-foreground'
+/** Passive single-message copy in compact wells (`EmptyPanel`). */
+export const emptyStateWellPassiveMessageClasses = 'text-xs text-muted-foreground italic'
 
-/** Gate / picker supporting copy. */
+/**
+ * Italic emphasis for passive copy that scales with inset panel size
+ * (`InsetPanel.PassiveMessage`). Pairs with `Text` size variants — not a standalone recipe.
+ */
+export const emptyStateWellPassiveMessageEmphasisClasses = 'italic'
+
+/** @deprecated Use `emptyStateWellPassiveMessageClasses`. */
+export const emptyStateWellBodyClasses = emptyStateWellPassiveMessageClasses
+
+/** Instructional or explanatory copy under a structured title — roman. */
 export const emptyStateWellSupportingClasses = 'text-sm text-muted-foreground'
 
 /** Larger supporting copy for master-detail placeholders. */
 export const emptyStateWellSupportingLgClasses = 'text-base text-muted-foreground'
 
-/** Gate title — muted with medium weight for slight hierarchy. */
+/** Structured empty-state title — emphasized, roman (may precede supporting copy). */
 export const emptyStateWellTitleClasses = 'text-base font-medium text-muted-foreground'
 
-/** Master-detail / heritage placeholder title. */
+/** Larger structured empty-state title (master-detail, heritage, …). */
 export const emptyStateWellTitleLgClasses = 'text-lg font-medium text-muted-foreground'
 
 /** Decorative empty-state icons — muted ink at half strength for hierarchy below copy. */

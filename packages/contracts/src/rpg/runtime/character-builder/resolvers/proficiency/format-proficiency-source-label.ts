@@ -1,5 +1,6 @@
 import type { CharacterBuildCatalogIndex } from '../../context'
 import {
+  formatCompactSelectionSourceLabel,
   formatSelectionSourceLabel,
   type FormatSelectionSourceLabelOptions,
   type SelectionSourceRowKind,
@@ -19,7 +20,10 @@ export function formatProficiencySourceLabel(
   return formatSelectionSourceLabel(sources, catalogIndex, options)
 }
 
-/** ChoiceSet selection provenance for proficiency step selected rows. */
-export function formatProficiencyChoiceSourceLabel(choiceSetLabel: string): string {
-  return `Chosen from ${choiceSetLabel}`
+/** Compact provenance labels for granted proficiency summary rows. */
+export function formatCompactProficiencySourceLabel(
+  sources: CharacterSelectionSource[] | undefined,
+  catalogIndex: CharacterBuildCatalogIndex,
+): string {
+  return formatCompactSelectionSourceLabel(sources, catalogIndex)
 }

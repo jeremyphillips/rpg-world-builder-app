@@ -46,7 +46,7 @@ describe('ConnectionsStep', () => {
       connections: { organizations: [], locations: [] },
     })
 
-    await user.click(screen.getByRole('button', { name: '+ Add organization' }))
+    await user.click(screen.getByRole('button', { name: 'Add organization' }))
     await user.click(screen.getByRole('button', { name: 'Add' }))
     expect(onDraftChange).not.toHaveBeenCalledWith(
       expect.objectContaining({
@@ -99,7 +99,7 @@ describe('ConnectionsStep', () => {
       />,
     )
 
-    expect(screen.getByText('No organizations selected yet.')).toBeInTheDocument()
+    expect(screen.getByText('No organizations connected yet.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add organization' })).toBeInTheDocument()
   })
 })

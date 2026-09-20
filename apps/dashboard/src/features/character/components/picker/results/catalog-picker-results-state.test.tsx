@@ -5,10 +5,10 @@ import { describe, expect, it } from 'vitest'
 import { CatalogPickerResultsState } from './catalog-picker-results-state'
 
 describe('CatalogPickerResultsState', () => {
-  it('renders the message in a status region', () => {
+  it('renders passive empty-state copy', () => {
     render(<CatalogPickerResultsState message="No options available." />)
 
-    expect(screen.getByRole('status')).toHaveTextContent('No options available.')
+    expect(screen.getByText('No options available.')).toBeInTheDocument()
   })
 
   itAxe('has no axe violations', async () => {

@@ -30,6 +30,7 @@ export type ButtonDropdownProps = {
   onSelectItem: (id: string) => void
   variant?: ButtonVariantProps['variant']
   size?: ButtonVariantProps['size']
+  density?: ButtonVariantProps['density']
   /** Optional icon before the trigger label — callers supply add semantics explicitly. */
   leadingIcon?: ReactNode
   /** Trigger width — `fit` sizes to content; defaults to `full` (no width override). */

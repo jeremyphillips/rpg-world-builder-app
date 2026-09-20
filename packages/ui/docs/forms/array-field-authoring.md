@@ -82,6 +82,7 @@ defineArrayField({
 | Goal                                              | `itemVariant`       | `item.surface` / `item.tone`                           | `itemCollapsible`     |
 | ------------------------------------------------- | ------------------- | ------------------------------------------------------ | --------------------- |
 | Single inline control per row (tags, simple refs) | `auto` or `compact` | default subtle header (omit `item.surface`)            | omit / `false`        |
+| Flat inline rows on page canvas (no beige wash)   | `compact`           | `CANVAS_SURFACE` from `@rpg/ui/form`                   | omit / `false`        |
 | Multi-field block with header toolbar             | `detailed` or omit  | override only — default is subtle header + canvas body | `true` for long forms |
 | Nested array inside another item                  | `auto` → compact    | match parent or omit                                   | `true` → detailed     |
 | Grant-style entity rows                           | `detailed`          | use `item.renderShell` — not `item.surface` alone      | `true`                |
@@ -107,7 +108,9 @@ collapsible arrays — the dev validator warns when both are set. Nested arrays 
 `itemCollapsible: true` keep disclosure chrome instead of silently auto-compacting.
 
 `item.surface` is an **override** — default subtle header + canvas body need no `item.surface`.
-Uses `SurfaceConfig` (`emphasis`, `elevation`). Optional `item.tone` applies a semantic wash
+Uses `SurfaceConfig` (`emphasis`, `elevation`). For flat non-collapsible rows that should sit
+on the page canvas instead of the default subtle wash, set `surface: CANVAS_SURFACE`
+(`{ elevation: 'canvas' }`). Optional `item.tone` applies a semantic wash
 (`info` | `success` | `warning` | `destructive`).
 
 When spreading an array builder, **merge** `item` — `item: { surface: … }` replaces the

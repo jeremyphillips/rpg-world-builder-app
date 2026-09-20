@@ -7,10 +7,23 @@ import type {
   CharacterSelectionSource,
   CharacterSelectionSourceKind,
 } from './sheet/selection-sources'
+import type { VocabularyTerm } from '../../vocab/types'
 
 // ---------------------------------------------------------------------------
 // Shared provenance labels for character rows (equipment, proficiencies, …).
 // ---------------------------------------------------------------------------
+
+/** Rules-configuration and character-creation defaults scoped to all characters. */
+export const ORIGIN_PROVENANCE_TERM = {
+  label: 'Origin',
+  description: 'Character creation and rules-configuration defaults applied to every character.',
+  sentence: {
+    singular: 'origin',
+    plural: 'origins',
+  },
+} as const satisfies VocabularyTerm
+
+export const ORIGIN_PROVENANCE_LABEL = ORIGIN_PROVENANCE_TERM.label
 
 export type SelectionSourceLabelCatalogIndex = {
   classes: ReadonlyMap<string, { name: string }>
@@ -101,6 +114,34 @@ function prefixForRowKind(rowKind: SelectionSourceRowKind | undefined): string {
   }
 }
 
+function formatCompactSingleSelectionSourceLabel(
+  source: CharacterSelectionSource,
+  catalogIndex: SelectionSourceLabelCatalogIndex,
+): string {
+  if (CLASS_GRANT_SOURCE_KINDS.has(source.kind)) {
+    return classNameForSource(source, catalogIndex)
+  }
+
+  if (source.kind === 'characterCreation') {
+    return ORIGIN_PROVENANCE_LABEL
+  }
+
+  if (source.kind === 'speciesTrait') {
+    return getContentTypeTerm('species').label
+  }
+
+  if (source.kind === 'heritageOption') {
+    return 'Heritage'
+  }
+
+  const staticLabel = STATIC_SELECTION_SOURCE_LABELS[source.kind]
+  if (staticLabel) {
+    return staticLabel.replace(/^Granted by /, '').replace(/^From /, '')
+  }
+
+  return 'Unknown source'
+}
+
 /** Formats deduped provenance labels for one or more selection sources. */
 export function formatSelectionSourceLabel(
   sources: CharacterSelectionSource[] | undefined,
@@ -121,4 +162,17 @@ export function formatSelectionSourceLabel(
   }
 
   return `${prefix}${combined}`
+}
+
+/** Compact provenance labels for tight summary rows (class name, Origin, …). */
+export function formatCompactSelectionSourceLabel(
+  sources: CharacterSelectionSource[] | undefined,
+  catalogIndex: SelectionSourceLabelCatalogIndex,
+): string {
+  if (!sources?.length) return 'Unknown source'
+
+  const labels = sources.map((source) =>
+    formatCompactSingleSelectionSourceLabel(source, catalogIndex),
+  )
+  return [...new Set(labels)].join(', ')
 }

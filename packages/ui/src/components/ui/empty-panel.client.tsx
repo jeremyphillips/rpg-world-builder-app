@@ -10,11 +10,11 @@ export type EmptyPanelProps = {
   className?: string
 }
 
-/** Muted empty-state panel — presentation only; callers own copy and semantics. */
+/**
+ * Compact recessed well for a single passive empty message (muted + italic).
+ * Presentation only — callers own copy. No default live-region semantics; pass
+ * `role="status"` or `aria-live` on a wrapper when announcement is intentional.
+ */
 export function EmptyPanel({ children, className }: EmptyPanelProps) {
-  return (
-    <div role="status" className={cn(emptyPanelVariants(), className)}>
-      {children}
-    </div>
-  )
+  return <div className={cn(emptyPanelVariants(), className)}>{children}</div>
 }

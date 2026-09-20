@@ -1,13 +1,14 @@
 import {
   isBuilderStepReadinessMessageOnly,
+  resolveVisibleProficiencyStepContent,
   showsBuilderStepReviewMessage,
-  visibleProficiencySections,
 } from '../../../../lib/builder/builder-step-readiness.lib'
 import {
   PROFICIENCIES_CHOOSE_CLASS_PROMPT_DESCRIPTION,
   PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING,
 } from '../../../../lib/proficiencies/proficiencies-step.lib'
 import { ProficiencyPickerDrawer } from '../../../proficiencies/picker/proficiency-picker-drawer'
+import { ProficiencyGrantedSummary } from './proficiency-granted-summary'
 import { ProficiencySection } from './proficiency-section'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 import { BuilderStepChooseClassPrompt } from '../shared/builder-step-choose-class-prompt'
@@ -37,10 +38,8 @@ export function ProficienciesStepView({
 
   const showsChooseClassPrompt = readiness.classDependentBlocked === true && !draft.class.classId
 
-  const visibleSections = visibleProficiencySections(
-    model.sections,
-    readiness.classDependentBlocked,
-  )
+  const { sections: visibleSections, fixedGrants: visibleFixedGrants } =
+    resolveVisibleProficiencyStepContent(model, readiness.classDependentBlocked)
 
   const chooseClassPrompt = showsChooseClassPrompt ? (
     <BuilderStepChooseClassPrompt
@@ -50,7 +49,7 @@ export function ProficienciesStepView({
     />
   ) : null
 
-  if (showsChooseClassPrompt && visibleSections.length === 0) {
+  if (showsChooseClassPrompt && visibleSections.length === 0 && visibleFixedGrants.length === 0) {
     return (
       <BuilderStepFrame stepId="proficiencies" validationIssues={validationIssues}>
         {chooseClassPrompt}
@@ -74,10 +73,15 @@ export function ProficienciesStepView({
           <BuilderStepReadinessPanel state={readiness} />
         ) : null}
 
+        {visibleFixedGrants.length > 0 ? (
+          <ProficiencyGrantedSummary rows={visibleFixedGrants} />
+        ) : null}
+
         {visibleSections.map((section) => (
           <ProficiencySection
             key={section.kind}
             section={section}
+            validationIssues={validationIssues}
             onOpenChoiceSet={openChoiceSet}
             onRemoveChoice={removeChoiceSelection}
           />

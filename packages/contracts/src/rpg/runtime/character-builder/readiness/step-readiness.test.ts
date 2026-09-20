@@ -507,9 +507,6 @@ describe('resolveBuilderStepReadiness', () => {
         resolveBuilderStepReadiness('proficiencies', draft, proficiencyTestContext, choiceSets),
       ).toEqual({
         readiness: 'complete',
-        message: formatFieldMessage(
-          characterBuilderStepReadinessMessages.proficienciesReviewComplete(),
-        ),
       })
     })
 

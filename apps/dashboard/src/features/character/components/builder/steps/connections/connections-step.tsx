@@ -8,7 +8,9 @@ import {
   type CharacterOrganizationConnection,
 } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Button, InsetPanel, Text } from '@rpg/ui'
+import { Plus } from 'lucide-react'
+
+import { Button, InsetPanel } from '@rpg/ui'
 
 import { ContentEntityCard } from '@/features/content'
 import { BuilderInventoryRemoveAction } from '../../inventory/builder-inventory-remove-action'
@@ -90,11 +92,9 @@ export function ConnectionsStep({
   return (
     <BuilderStepFrame stepId="connections" validationIssues={validationIssues}>
       <div className={connectionsStepHeaderClasses}>
-        <Text variant="muted">
-          Add organizations that shape this character’s loyalties, obligations, or history.
-        </Text>
-        <Button type="button" onClick={() => setPickerOpen(true)}>
-          {memberships.length === 0 ? 'Add organization' : '+ Add organization'}
+        <Button type="button" variant="outline" onClick={() => setPickerOpen(true)}>
+          <Plus aria-hidden />
+          Add organization
         </Button>
       </div>
 
@@ -105,7 +105,7 @@ export function ConnectionsStep({
           align="center"
           className={connectionsStepEmptyClasses}
         >
-          <InsetPanel.Text>No organizations selected yet.</InsetPanel.Text>
+          <InsetPanel.PassiveMessage>No organizations connected yet.</InsetPanel.PassiveMessage>
         </InsetPanel>
       ) : (
         <div className={connectionsStepListClasses} aria-label="Selected organizations">

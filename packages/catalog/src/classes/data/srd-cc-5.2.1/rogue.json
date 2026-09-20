@@ -139,7 +139,22 @@
       "id": "thieves-cant",
       "name": "Thieves' Cant",
       "level": 1,
-      "description": "<p>You picked up various languages in the communities where you plied your roguish talents. You know Thieves' Cant and one other language of your choice, which you choose from the language tables in \"Character Creation.\"</p>"
+      "description": "<p>You picked up various languages in the communities where you plied your roguish talents. You know Thieves' Cant and one other language of your choice, which you choose from the language tables in \"Character Creation.\"</p>",
+      "grantGroups": [
+        {
+          "grants": [
+            {
+              "kind": "languages",
+              "languageIds": ["thieves-cant"]
+            },
+            {
+              "kind": "languageChoice",
+              "choose": 1,
+              "categories": ["standard"]
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "weapon-mastery",

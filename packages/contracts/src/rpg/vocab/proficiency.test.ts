@@ -6,8 +6,12 @@ import {
   formatProficiencyGrantChooseFromSelectedPhrase,
   formatProficiencyGrantChoosePhrase,
   getArmorTrainingCompactSuffix,
+  getProficiencyDomainCompactActionNoun,
   getProficiencyGrantAddLabel,
+  getProficiencyGrantCompactAddLabel,
+  getProficiencyGrantCompactManageLabel,
   getProficiencyGrantCompactSuffix,
+  getProficiencyGrantManageLabel,
   getProficiencyDomainCompactLabel,
   getProficiencyDomainLabel,
   getProficiencyDomainSentenceForm,
@@ -56,8 +60,17 @@ describe('proficiency grant vocabulary', () => {
     )
   })
 
-  it('returns builder add labels', () => {
+  it('returns compact action nouns', () => {
+    expect(getProficiencyDomainCompactActionNoun('skill', 1)).toBe('skill')
+    expect(getProficiencyDomainCompactActionNoun('skill', 2)).toBe('skills')
+    expect(getProficiencyDomainCompactActionNoun('armor', 2)).toBe('armor')
+  })
+
+  it('returns builder add and manage labels', () => {
     expect(getProficiencyGrantAddLabel('weapon')).toBe('Add weapon proficiency')
     expect(getProficiencyGrantAddLabel('armor')).toBe('Add armor training')
+    expect(getProficiencyGrantManageLabel('skill')).toBe('Edit')
+    expect(getProficiencyGrantCompactAddLabel('tool')).toBe('Add tool')
+    expect(getProficiencyGrantCompactManageLabel('weapon')).toBe('Edit')
   })
 })

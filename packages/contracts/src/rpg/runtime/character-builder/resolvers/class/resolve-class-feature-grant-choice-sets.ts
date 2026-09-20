@@ -24,6 +24,11 @@ export function resolveClassFeatureGrantChoiceSets(
           sourceType: 'class',
           sourceId: characterClass.id,
           slot: `feature:${feature.id}`,
+          provenance: {
+            ownerKind: 'class',
+            ownerLabel: characterClass.name,
+            featureLabel: feature.name,
+          },
         },
         {
           parentLevel: feature.level,

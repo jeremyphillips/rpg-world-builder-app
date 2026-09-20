@@ -14,4 +14,10 @@ describe('formatProficiencyChoiceEmptyMessage', () => {
   it('falls back for unknown choice types', () => {
     expect(formatProficiencyChoiceEmptyMessage('equipment')).toBe('No choices chosen yet.')
   })
+
+  it('returns additional empty copy when requested', () => {
+    expect(formatProficiencyChoiceEmptyMessage('skillProficiency', { additional: true })).toBe(
+      'No additional skills chosen yet.',
+    )
+  })
 })

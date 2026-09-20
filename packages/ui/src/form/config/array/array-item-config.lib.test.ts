@@ -5,6 +5,8 @@ import {
   defaultArrayItemHeader,
   isNestedArraySection,
   joinArrayItemSummaryParts,
+  resolveArrayAddAction,
+  resolveArrayAddActionVariant,
   resolveArrayItemHeaderLabels,
   resolveArrayItemVariant,
   resolveCompactInlineRow,
@@ -155,5 +157,25 @@ describe('array-item-config.lib', () => {
   it('uses singularized legend in the default fallback title', () => {
     const header = defaultArrayItemHeader('Magic item grants')
     expect(header.fallback(2)).toBe('Magic item grant #3')
+  })
+
+  it('defaults inline add actions to text and maps legacy ghost to text', () => {
+    expect(resolveArrayAddActionVariant('inline')).toBe('text')
+    expect(resolveArrayAddActionVariant('inline', 'ghost')).toBe('text')
+    expect(resolveArrayAddActionVariant('inline', 'default')).toBe('default')
+    expect(resolveArrayAddActionVariant('stacked')).toBe('outline')
+    expect(resolveArrayAddActionVariant('stacked', 'secondary')).toBe('secondary')
+  })
+
+  it('resolves inline add actions through resolveArrayAddAction', () => {
+    expect(
+      resolveArrayAddAction({
+        kind: 'array',
+        name: 'traits',
+        legend: 'Traits',
+        fields: [],
+        addAction: { label: 'Add trait', layout: 'inline' },
+      }),
+    ).toMatchObject({ variant: 'text', layout: 'inline' })
   })
 })

@@ -32,11 +32,6 @@ export const WithMetaAndRemove: Story = {
   args: {
     entity: {
       heading: 'Stealth',
-      description: (
-        <Text as="span" variant="muted">
-          Chosen from Rogue Skills
-        </Text>
-      ),
       status: [{ kind: 'badge', label: 'Stale', appearance: 'soft', tone: 'neutral' }],
     },
     trailing: {

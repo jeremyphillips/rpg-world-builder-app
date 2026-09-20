@@ -17,7 +17,7 @@ import {
 } from '../proficiency-selected-row'
 
 describe('ProficiencySelectedRow', () => {
-  it('renders source and remove action for a selected row', async () => {
+  it('renders label and remove action for a selected row', async () => {
     const user = userEvent.setup()
     const onRemove = vi.fn()
     const base = createProficienciesStepRogueFixture()
@@ -30,13 +30,11 @@ describe('ProficiencySelectedRow', () => {
       },
     })
 
-    const row = model.sections.find((section) => section.kind === 'skills')!.choices[0]!
-      .selectedRows[0]!
+    const row = model.sections.find((section) => section.kind === 'skills')!.selectedRows[0]!
 
     render(<ProficiencySelectedRow row={row} onRemove={onRemove} />)
 
     expect(screen.getByText(row.label)).toBeInTheDocument()
-    expect(screen.getByText(row.sourceLabel)).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: `Remove ${row.label}` }))
     expect(onRemove).toHaveBeenCalledTimes(1)
@@ -47,9 +45,7 @@ describe('ProficiencySelectedRow', () => {
 
     const staleRow = model.sections
       .find((section) => section.kind === 'skills')!
-      .choices[0]!.selectedRows.find(
-        (row) => row.optionId === PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID,
-      )!
+      .selectedRows.find((row) => row.optionId === PROFICIENCIES_STEP_STALE_SKILL_OPTION_ID)!
 
     render(<ProficiencySelectedRow row={staleRow} onRemove={() => undefined} />)
 
@@ -70,8 +66,7 @@ describe('ProficiencySelectedRow', () => {
         [skillChoiceSetId]: [proficienciesStepStealthSkill.id],
       },
     })
-    const row = model.sections.find((section) => section.kind === 'skills')!.choices[0]!
-      .selectedRows[0]!
+    const row = model.sections.find((section) => section.kind === 'skills')!.selectedRows[0]!
 
     const { container } = render(<ProficiencySelectedRow row={row} onRemove={() => undefined} />)
 

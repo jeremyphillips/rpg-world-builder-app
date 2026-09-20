@@ -4,9 +4,20 @@ import { createProficienciesStepRogueFixture } from '../../../../../lib/proficie
 import { ProficiencyGrantedRow } from '../proficiency-granted-row'
 
 const { model } = createProficienciesStepRogueFixture()
-const savingThrowRow = model.sections.find((section) => section.kind === 'savingThrows')!
-  .grantedRows[0]!
-const toolRow = model.sections.find((section) => section.kind === 'tools')!.grantedRows[0]!
+const savingThrows = model.fixedGrants.find((row) => row.kind === 'savingThrows')!
+const tools = model.fixedGrants.find((row) => row.kind === 'tools')!
+const savingThrowRow = {
+  id: 'saving-throw:example',
+  kind: savingThrows.kind,
+  label: savingThrows.sourceGroups[0]!.valueLabels[0]!,
+  sourceLabel: savingThrows.sourceGroups[0]!.sourceLabel,
+}
+const toolRow = {
+  id: 'tool:example',
+  kind: tools.kind,
+  label: tools.sourceGroups[0]!.valueLabels[0]!,
+  sourceLabel: tools.sourceGroups[0]!.sourceLabel,
+}
 
 const meta = {
   title: 'Character Builder/ProficiencyGrantedRow',

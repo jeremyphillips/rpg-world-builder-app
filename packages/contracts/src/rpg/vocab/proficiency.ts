@@ -125,9 +125,39 @@ export function getProficiencyPoolSelectedPhrase(domain: ProficiencyDomain): str
   return PROFICIENCY_POOL_SELECTED_PHRASES[domain]
 }
 
+/** Head noun for compact builder actions (e.g. "skill", "skills", "armor"). */
+export function getProficiencyDomainCompactActionNoun(
+  domain: ProficiencyDomain,
+  count = 1,
+): string {
+  const sentence = getProficiencyDomainSentenceForm(domain, count)
+  if (domain === 'armor') return 'armor'
+  if (count === 1) {
+    return sentence.replace(/ (proficiency|training)$/, '')
+  }
+  return sentence.replace(/ proficiencies$/, 's')
+}
+
 /** Character builder add action label (e.g. "Add weapon proficiency"). */
 export function getProficiencyGrantAddLabel(domain: ProficiencyDomain): string {
   return `Add ${getProficiencyDomainSentenceForm(domain, 1)}`
+}
+
+export const BUILDER_GRANT_EDIT_ACTION_LABEL = 'Edit' as const
+
+/** Character builder edit action label when a grant choice set is full. */
+export function getProficiencyGrantManageLabel(_domain: ProficiencyDomain): string {
+  return BUILDER_GRANT_EDIT_ACTION_LABEL
+}
+
+/** Compact inline add action label (e.g. "Add skill"). */
+export function getProficiencyGrantCompactAddLabel(domain: ProficiencyDomain): string {
+  return `Add ${getProficiencyDomainCompactActionNoun(domain, 1)}`
+}
+
+/** Compact inline edit action label when a grant choice set is full. */
+export function getProficiencyGrantCompactManageLabel(_domain: ProficiencyDomain): string {
+  return BUILDER_GRANT_EDIT_ACTION_LABEL
 }
 
 /** Authoring fallback when a pool category is unset: "choose N weapon proficiency". */

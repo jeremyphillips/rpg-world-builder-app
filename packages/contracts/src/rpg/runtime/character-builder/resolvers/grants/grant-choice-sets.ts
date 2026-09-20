@@ -1,7 +1,6 @@
 import type { ContentGrant } from '../../../../content/lib/grants'
 import { getFeatCategoryLabel } from '../../../../vocab/feat'
 import { getLanguageLabel } from '../../../../vocab/language'
-import { getProficiencyDomainLabel } from '../../../../vocab/proficiency'
 import { formatEquipmentPoolLabel } from '../../../../content/lib/grants/equipment-grant'
 import type { EquipmentGrant } from '../../../../content/lib/grants/equipment-grant'
 import { resolveLanguagesFromChoiceSource } from '../../../creature/languages'
@@ -14,7 +13,14 @@ import {
   weaponPoolChoiceOptions,
 } from '../../../creature/proficiencies'
 import { resolveToolPoolChoiceOptions } from '../proficiency/resolve-tool-pool-choice-options'
-import type { ChoiceSet, ChoiceSourceType, ChoiceType } from '../../choice-set'
+import { resolveProficiencyChoicePresentation } from '../proficiency/resolve-proficiency-choice-presentation'
+import type {
+  ChoiceSet,
+  ChoiceSetPoolSource,
+  ChoiceSetProvenance,
+  ChoiceSourceType,
+  ChoiceType,
+} from '../../choice-set'
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 
@@ -23,18 +29,20 @@ export type GrantChoiceSetContext = {
   sourceId: string
   slot: string
   label?: string
+  provenance?: ChoiceSetProvenance
 }
+
+const PROFICIENCY_CHOICE_TYPES = new Set<ChoiceType>([
+  'skillProficiency',
+  'weaponProficiency',
+  'toolProficiency',
+  'armorTraining',
+  'language',
+])
 
 function rulesetIdFromContentId(contentId: string): string {
   const colonIndex = contentId.indexOf(':')
   return colonIndex >= 0 ? contentId.slice(0, colonIndex) : contentId
-}
-
-function resolveSkillOptionLabel(
-  skillId: string,
-  catalogIndex: CharacterBuildCatalogIndex,
-): string {
-  return catalogIndex.skillProficiencies.get(skillId)?.name ?? skillId
 }
 
 function resolveEquipmentOptionLabel(
@@ -52,18 +60,31 @@ function buildGrantChoiceSet(
   options: ChoiceSet['options'],
   required: boolean,
   label?: string,
+  poolSource?: ChoiceSetPoolSource,
 ): ChoiceSet {
-  return {
+  const provenance = ctx.provenance
+  const base: ChoiceSet = {
     id: buildChoiceSetId(ctx.sourceType, ctx.sourceId, ctx.slot),
     sourceType: ctx.sourceType,
     sourceId: ctx.sourceId,
     choiceType,
-    label: label ?? ctx.label ?? 'Choose',
     min,
     max,
     options,
     required,
+    provenance,
+    ...(poolSource ? { poolSource } : {}),
+    label: label ?? ctx.label ?? 'Choose',
   }
+
+  if (PROFICIENCY_CHOICE_TYPES.has(choiceType)) {
+    return {
+      ...base,
+      label: resolveProficiencyChoicePresentation(base).heading,
+    }
+  }
+
+  return base
 }
 
 function equipmentPoolOptions(
@@ -128,7 +149,6 @@ function languageChoiceSet(
     grant.choose,
     options,
     options.length > 0,
-    'Choose Language',
   )
 }
 
@@ -140,12 +160,9 @@ function skillProficiencyChoiceSet(
   if (grant.grant.kind !== 'choice') return undefined
 
   const pool = grant.grant.pool
-  const options =
-    pool.source === 'explicit'
-      ? pool.skillIds.map((id) => ({ id, label: resolveSkillOptionLabel(id, catalogIndex) }))
-      : skillPoolChoiceOptions(
-          listSkillsMatchingPool({ pool, skills: catalogIndex.skillProficiencies }),
-        )
+  const options = skillPoolChoiceOptions(
+    listSkillsMatchingPool({ pool, skills: catalogIndex.skillProficiencies }),
+  )
 
   return buildGrantChoiceSet(
     ctx,
@@ -154,7 +171,8 @@ function skillProficiencyChoiceSet(
     grant.grant.choose,
     options,
     true,
-    `Choose ${getProficiencyDomainLabel('skill')}`,
+    undefined,
+    pool.source === 'any' ? 'any' : undefined,
   )
 }
 
@@ -185,7 +203,6 @@ function weaponProficiencyChoiceSet(
     grant.grant.choose,
     options,
     true,
-    'Choose Weapon Proficiency',
   )
 }
 
@@ -207,7 +224,8 @@ function toolProficiencyChoiceSet(
     grant.grant.choose,
     options,
     options.length > 0,
-    'Choose Tool Proficiency',
+    undefined,
+    pool.source === 'any' ? 'any' : undefined,
   )
 }
 
@@ -238,7 +256,6 @@ function armorTrainingChoiceSet(
     grant.grant.choose,
     options,
     true,
-    'Choose Armor Training',
   )
 }
 

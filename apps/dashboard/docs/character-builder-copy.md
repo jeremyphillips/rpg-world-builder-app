@@ -53,12 +53,53 @@ they do not own raw English strings.
 
 Domain kinds: `DEPENDENT_CHOICE_KINDS` (`heritage`, `subclass`).
 
+## Proficiency choice presentation (reference)
+
+Proficiency ChoiceSets carry generic `ChoiceSetProvenance` (`ownerKind`, `ownerLabel`,
+`featureLabel`, `choiceLabel`). `resolveProficiencyChoicePresentation()` resolves block
+heading, optional source line, and `headingSourceCoverage` (`owner` | `feature` |
+`generic`). Show the source line only when the heading does not already encode the owner.
+
+| Coverage  | Heading examples                         | Source line                     |
+| --------- | ---------------------------------------- | ------------------------------- |
+| `owner`   | `Rogue Skills`, `Origin Languages`       | omitted                         |
+| `feature` | `Skillful`, `Primal Aptitude`            | `Human species trait`, subclass |
+| `generic` | `Skill Proficiency`, unlabeled languages | shown when provenance is known  |
+
+**Single choice set** — category owns progress, action, supporting copy, optional
+provenance, and the selected collection. `formatProficiencySingleSetSupportingCopy()` folds
+choice-set identity and meaningful pool constraint into the category subhead (and optional
+`identityLine` when the heading does not describe eligibility).
+
+**Multiple choice sets** — category owns aggregate progress and generic instruction; each
+block owns heading, progress, action, provenance, pool eligibility, and its selected
+collection.
+
+| Surface           | Single set                           | Multi set                               |
+| ----------------- | ------------------------------------ | --------------------------------------- |
+| Category subhead  | `Choose 2 skills from Rogue Skills.` | `Choose skills from the options below.` |
+| Identity line     | `Keen Senses` (constrained feature)  | per block heading                       |
+| Block source line | `Human species trait` (feature)      | per block                               |
+| Pool description  | absorbed into subhead when relevant  | `Choose from Perception, …` per block   |
+
+Block order within a category: class → subclass → species → heritage → origin → feat →
+ruleset → campaign (stable within kind).
+
 ## Adjacent builder copy patterns
 
-### ChoiceSet drawer Add/Manage pairs
+### ChoiceSet drawer headings and Add/Edit actions
 
-`CHOICE_SET_DRAWER_LABELS` in `lib/selection-counter.lib.ts` keys explicit Add/Manage
-pairs by `choiceType` — the preferred pattern for proficiency, spell, and equipment drawers.
+Drawer **headings** stay stable and resolve from `formatChoiceSetDrawerHeading(choiceType)`
+in `@rpg/contracts` (e.g. `Choose skill proficiency`, `Choose cantrip`, `Choose equipment`).
+They do not flip to Add/Edit when a choice set is full.
+
+Inline step actions and drawer **triggers** use `CHOICE_SET_DRAWER_LABELS` in
+`lib/choice-sets/selection-counter.lib.ts` — Add vs Edit (proficiencies/languages) or Add vs
+Manage (spells). Proficiency and language grants use `BUILDER_GRANT_EDIT_ACTION_LABEL` (`Edit`)
+when full.
+
+Per-card “Chosen from …” provenance on selected rows is intentionally omitted — section
+headers and supporting copy provide enough context.
 
 The `drawerLabelsForChoiceSet` fallback (`Manage ${choiceSet.label.toLowerCase()}`) is a
 **legacy escape hatch only**. Add explicit map entries for new choice types instead of

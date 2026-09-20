@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import { cn } from '../../lib/utils'
+import { emptyStateWellPassiveMessageEmphasisClasses } from './empty-state-well.variants'
 import { Text, type TextProps } from './text'
 import {
   insetPanelClassNames,
@@ -60,12 +62,28 @@ function InsetPanelText({ variant, className, ...props }: InsetPanelTextProps) {
 }
 InsetPanelText.displayName = 'InsetPanel.Text'
 
+function InsetPanelPassiveMessage({ variant, className, ...props }: InsetPanelPassiveMessageProps) {
+  const { size } = useInsetPanelContext('InsetPanel.PassiveMessage')
+
+  return (
+    <Text
+      variant={resolveInsetPanelTextVariant(size, variant)}
+      className={cn(emptyStateWellPassiveMessageEmphasisClasses, className)}
+      {...props}
+    />
+  )
+}
+InsetPanelPassiveMessage.displayName = 'InsetPanel.PassiveMessage'
+
 export type InsetPanelTextProps = React.ComponentPropsWithoutRef<typeof Text> & {
   variant?: TextProps['variant']
 }
 
-export { InsetPanelText }
+export type InsetPanelPassiveMessageProps = InsetPanelTextProps
+
+export { InsetPanelPassiveMessage, InsetPanelText }
 
 export const InsetPanel = Object.assign(InsetPanelRoot, {
   Text: InsetPanelText,
+  PassiveMessage: InsetPanelPassiveMessage,
 })

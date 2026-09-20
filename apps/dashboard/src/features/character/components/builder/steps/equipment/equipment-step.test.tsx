@@ -220,7 +220,7 @@ describe('EquipmentStep', () => {
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
 
-    expect(screen.getByRole('dialog', { name: 'Add equipment' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Choose equipment' })).toBeInTheDocument()
   })
 
   it('reveals the option list when changing the selected package', async () => {
@@ -501,7 +501,7 @@ describe('EquipmentStep', () => {
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
-    expect(screen.getByRole('dialog', { name: 'Add equipment' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Choose equipment' })).toBeInTheDocument()
 
     await user.keyboard('{Escape}')
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }))

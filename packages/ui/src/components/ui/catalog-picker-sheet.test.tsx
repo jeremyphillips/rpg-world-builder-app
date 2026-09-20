@@ -264,7 +264,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    expect(screen.getByRole('status')).toHaveTextContent('No featured items.')
+    expect(screen.getByText('No featured items.')).toBeInTheDocument()
   })
 
   it('shows no-results copy when structured filters are active', () => {
@@ -283,7 +283,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    expect(screen.getByRole('status')).toHaveTextContent('No items match your search.')
+    expect(screen.getByText('No items match your search.')).toBeInTheDocument()
   })
 
   it('supports exclusive controlled row expansion', async () => {

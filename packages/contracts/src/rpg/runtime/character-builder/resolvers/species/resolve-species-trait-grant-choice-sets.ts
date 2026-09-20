@@ -4,10 +4,11 @@ import {
   resolveEffectiveCampaignAccess,
   resolveEffectiveSpeciesTraitAccess,
 } from '../../../../content/lib/campaign-access'
+import { resolveTraitName } from '../../../../content/lib/grants/trait-display'
 import type { ContentTrait } from '../../../../content/lib/grants'
 import type { Species } from '../../../../content/species'
 import { isContentPlayableFor } from '../../../campaign/content-resolution-policy'
-import type { ChoiceSet } from '../../choice-set'
+import type { ChoiceSet, ChoiceSetOwnerKind } from '../../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import { resolveSelectedHeritageOptionId } from './resolve-species-heritage-choice-sets'
@@ -15,17 +16,25 @@ import { unlockedGrantChoiceSets } from '../grants/unlocked-grant-choice-sets'
 
 function traitGrantChoiceSets(
   trait: ContentTrait,
-  speciesId: string,
+  species: Species,
   catalogIndex: CharacterBuildCatalogIndex,
   traitKey: string,
+  ownerKind: Extract<ChoiceSetOwnerKind, 'species' | 'heritage'>,
 ): ChoiceSet[] {
+  const traitName = resolveTraitName(trait)
+
   return unlockedGrantChoiceSets(
     trait,
     catalogIndex,
     {
       sourceType: 'species',
-      sourceId: speciesId,
+      sourceId: species.id,
       slot: `trait:${traitKey}`,
+      provenance: {
+        ownerKind,
+        ownerLabel: ownerKind === 'heritage' ? traitName : species.name,
+        featureLabel: traitName,
+      },
     },
     {
       parentLevel: 1,
@@ -56,7 +65,7 @@ export function resolveSpeciesTraitGrantChoiceSets(
     const effective = resolveEffectiveSpeciesTraitAccess(speciesAccess, trait)
     if (!isEffectiveAvailable(effective)) return []
     if (!isContentPlayableFor({ campaignAccess: effective }, context.playActor)) return []
-    return traitGrantChoiceSets(trait, species.id, catalogIndex, trait.id)
+    return traitGrantChoiceSets(trait, species, catalogIndex, trait.id, 'species')
   })
 
   const heritageOptionId = resolveSelectedHeritageOptionId(draft, species)
@@ -71,9 +80,10 @@ export function resolveSpeciesTraitGrantChoiceSets(
         choiceSets.push(
           ...traitGrantChoiceSets(
             heritageOption,
-            species.id,
+            species,
             catalogIndex,
             `heritage:${heritageOptionId}`,
+            'heritage',
           ),
         )
       }

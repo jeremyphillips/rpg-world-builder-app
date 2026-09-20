@@ -42,7 +42,8 @@ without creation rules. Do **not** validate play-scoped selections against raw
 | `formatSelectionSourceLabel`                 | `runtime/character/format-selection-source-label.ts`                    | Shared provenance labels for equipment and proficiency rows (BENCH-118).                                                                                                                                                                                                                                                                    |
 | `formatProficiencySourceLabel`               | `resolvers/proficiency/format-proficiency-source-label.ts`              | Thin wrapper over `formatSelectionSourceLabel` with proficiency `rowKind`.                                                                                                                                                                                                                                                                  |
 | `formatSavingThrowProficiencyLabel`          | `resolvers/proficiency/format-saving-throw-proficiency-label.ts`        | Saving throw row label (`DEX · Dexterity`).                                                                                                                                                                                                                                                                                                 |
-| `resolveProficiencyStepModel`                | `resolvers/proficiency/resolve-proficiency-step-model.ts`               | Sectioned grants + ChoiceSet summaries for the Proficiencies step.                                                                                                                                                                                                                                                                          |
+| `resolveProficiencyStepModel`                | `resolvers/proficiency/resolve-proficiency-step-model.ts`               | Proficiencies step view model: `fixedGrants` summary rows, interactive `sections`, `hasPendingChoices`, `hasUnresolvedPrerequisites`. Copy helpers live in `format-proficiency-step-copy.ts` and `resolve-proficiency-choice-presentation.ts`.                                                                                              |
+| `resolveProficiencyChoicePresentation`       | `resolvers/proficiency/resolve-proficiency-choice-presentation.ts`      | Resolves proficiency block heading, optional source line, and `headingSourceCoverage` from `ChoiceSet.provenance`; also owns pool-description copy and class-first block sort.                                                                                                                                                              |
 | `resolveProficiencyPickerItems`              | `resolvers/proficiency/resolve-proficiency-picker-items.ts`             | Proficiency picker row state (granted overlap + selection full); optional `compactSummary` for `skillProficiency` rows.                                                                                                                                                                                                                     |
 | `validateProficiencyChoiceSets`              | `validate/validate-choice-sets.ts`                                      | Stale proficiency selections (`proficiency_no_longer_available`).                                                                                                                                                                                                                                                                           |
 | `evaluateEquipmentPackageSwitch`             | `equipment/equipment-package-switch.ts`                                 | Shared evaluator for package-switch preview, draft validation, and commit readiness (`noConflict` / `resolvable` / `blocked`).                                                                                                                                                                                                              |
@@ -205,8 +206,10 @@ Delegates to `resolveEquipmentStepReadiness`, `resolveSpellsStepReadiness`
 User-facing copy lives in `characterBuilderStepReadinessMessages`
 (`messages/character-builder-messages.ts`) under `validation.characterBuilder.readiness.*`.
 Section-level proficiency choice empty copy uses
-`characterBuilderProficiencyChoiceEmptyMessages` and
-`formatProficiencyChoiceEmptyMessage(choiceType)`.
+`characterBuilderProficiencyChoiceEmptyMessages` (base and `*Additional` variants) via
+`formatProficiencyChoiceEmptyMessage(choiceType, { additional? })` and
+`formatProficiencySectionEmptyMessage`. Builder choice drawer headings use
+`formatChoiceSetDrawerHeading(choiceType)`.
 
 ### Dashboard rail mapping
 
@@ -349,7 +352,7 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 | Resolver                                  | Disposition                                                                     |
 | ----------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `resolveSpellPickerItems`                 | `resolvers/spellcasting/resolve-spell-picker-items.ts`                          | **Implemented** (BENCH-105) — spell picker row state + `compactSummary` (built once in resolver)                                                                                      |
-| `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`                       | **Implemented** (BENCH-115) — proficiencies step view model                                                                                                                           |
+| `resolveProficiencyStepModel`             | `resolvers/proficiency/resolve-proficiency-step-model.ts`                       | **Implemented** — proficiencies step view model (`fixedGrants`, interactive `sections`, prerequisite flags)                                                                           |
 | `resolveProficiencyPickerItems`           | `resolvers/proficiency/resolve-proficiency-picker-items.ts`                     | **Implemented** (BENCH-115) — proficiency picker row state; skill rows include `compactSummary`                                                                                       |
 | `deriveEquipmentRecommendations`          | `resolvers/equipment/derive-equipment-recommendations.ts`                       | **Implemented** — tiered recommendations; supersedes BENCH-095 boolean recommendation                                                                                                 |
 | `isToolProficient`                        | `runtime/creature/proficiencies.ts`                                             | Creature-level tool proficiency predicate (`toolId` slug/id or `toolCategory` match)                                                                                                  |
@@ -358,6 +361,17 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 | `resolveStartingEquipmentOptionSummaries` | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts`            | **Implemented** (BENCH-095) — starting package card summaries                                                                                                                         |
 | `resolveAvailableFeats`                   | Deferred — no full feat catalog in `CharacterBuildCatalog` yet                  |
 | Campaign allow/deny filtering             | **`resolvePlayableBuilderContent`** — playable(playActor) over campaign catalog |
+
+### Proficiencies step model
+
+`resolveProficiencyStepModel` separates **fixed grants** from **interactive choice sections**:
+
+- `fixedGrants`: one row per category with `sourceGroups[]` for the read-only “Granted proficiencies” summary.
+- `sections`: categories with one or more ChoiceSets — merged `selectedRows`, per-set `choiceBlocks`, topology-driven `subhead` / `emptyMessage`, optional aggregate `{n} / {N} chosen`.
+- `hasUnresolvedPrerequisites`: true when class progression applies but no class is chosen (prevents treating origin-language satisfaction as step completion).
+- Fixed vs choice-derived preview rows share `isFixedProficiencyGrant` / `isChoiceDerivedProficiencyGrant` in `proficiency-grant-classification.ts`.
+
+Dashboard merges readiness via `reconcileProficiencyStepReadiness` and filters visible content with `resolveVisibleProficiencyStepContent`.
 
 ## Related helpers
 

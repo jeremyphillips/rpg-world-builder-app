@@ -46,7 +46,12 @@ export function resolveArrayFieldRendererChrome({
     size: addActionSize,
     icon: showAddIcon = true,
     menu: addActionMenu,
-  } = addAction ?? {}
+  } = addAction ?? {
+    label: 'Add item',
+    icon: true,
+    variant: 'outline' as const,
+    layout: 'stacked' as const,
+  }
   const arrayHeading = resolveArrayHeading(config)
   const legend = arrayHeading?.label ?? config.legend ?? ''
   const headingHint = arrayHeading?.hint

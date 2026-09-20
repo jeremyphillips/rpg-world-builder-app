@@ -48,6 +48,10 @@ function resolveNeutralSurfaceClasses(config: SurfaceConfig): string {
     )
   }
 
+  if (elevation === 'canvas') {
+    return cn('border-border bg-background', establishSurfaceCurrent('background'))
+  }
+
   if (emphasis && emphasis !== 'faint') {
     return NEUTRAL_EMPHASIS_CLASSES[emphasis]
   }
@@ -81,3 +85,6 @@ export const DEFAULT_FLAT_ARRAY_ITEM_SURFACE: SurfaceConfig = DEFAULT_ARRAY_ITEM
 
 /** Default dependent container wash. */
 export const DEFAULT_DEPENDENT_SURFACE: SurfaceConfig = { emphasis: 'subtle', elevation: 'flat' }
+
+/** Untreated page canvas — no neutral emphasis wash. */
+export const CANVAS_SURFACE: SurfaceConfig = { elevation: 'canvas' }

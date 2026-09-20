@@ -6,7 +6,7 @@ import {
   getAlignmentLabel,
   optionalAlignmentSchema,
 } from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { CANVAS_SURFACE, toOptions, type FormItem } from '@rpg/ui/form'
 
 const narrativeFormItemSchema = z.object({
   value: z.string(),
@@ -60,6 +60,7 @@ function narrativeArrayField(
     item: {
       variant: 'compact',
       headerVisibility: 'hidden',
+      surface: CANVAS_SURFACE,
       header: {
         fallback: (index) => `${legend} ${index + 1}`,
       },
@@ -67,8 +68,6 @@ function narrativeArrayField(
     addAction: {
       label: addActionLabel,
       layout: 'inline',
-      variant: 'ghost',
-      size: 'sm',
     },
   }
 }

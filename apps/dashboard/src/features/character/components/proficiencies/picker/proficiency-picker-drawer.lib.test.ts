@@ -28,15 +28,9 @@ import type { ProficiencyPickerItem } from '@rpg/contracts'
 
 describe('proficiency-picker-drawer.lib', () => {
   it('formats drawer title, description, and search placeholder from the ChoiceSet', () => {
-    expect(formatProficiencyPickerDrawerTitle(proficiencyPickerSkillChoiceSetFixture, [])).toBe(
-      'Add skill proficiency',
+    expect(formatProficiencyPickerDrawerTitle(proficiencyPickerSkillChoiceSetFixture)).toBe(
+      'Choose skill proficiency',
     )
-    expect(
-      formatProficiencyPickerDrawerTitle(proficiencyPickerSkillChoiceSetFixture, [
-        proficiencyPickerStealthOptionId,
-        proficiencyPickerAcrobaticsOptionId,
-      ]),
-    ).toBe('Manage skill choices')
     expect(
       formatProficiencyPickerDrawerDescription(proficiencyPickerSkillChoiceSetFixture, [
         proficiencyPickerStealthOptionId,

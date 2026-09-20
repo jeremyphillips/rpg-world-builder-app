@@ -225,6 +225,10 @@ describe('SRD 5.2.1 class seed', () => {
       kind: 'spells',
       availability: 'always_prepared',
       spellIds: ['hunters-mark'],
+      casting: {
+        mode: 'free_cast',
+        frequency: 'prof_bonus_per_long_rest',
+      },
     })
     expectNumberColumnEntries(ranger, 'favored-enemy', 'favored-enemy-progression', 'uses', [
       { level: 1, value: 2 },

@@ -1,5 +1,4 @@
 import type { ProficiencyChoiceSelectedRow } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
 
 import { ContentEntityCard } from '@/features/content'
 import { BuilderInventoryRemoveAction } from '../../inventory/builder-inventory-remove-action'
@@ -16,11 +15,6 @@ export function ProficiencySelectedRow({ row, onRemove }: ProficiencySelectedRow
     <ContentEntityCard
       entity={{
         heading: row.label,
-        description: row.sourceLabel ? (
-          <Text as="span" variant="muted">
-            {row.sourceLabel}
-          </Text>
-        ) : undefined,
         status: row.isStale
           ? [
               {

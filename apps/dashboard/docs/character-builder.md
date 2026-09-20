@@ -43,9 +43,10 @@ hidden until a class is chosen.
 
 ### Copy hierarchy
 
-1. `BUILDER_STEPS` title + description (`BuilderStepFrame`)
-2. Readiness `message` / `helperText` (`BuilderStepReadinessPanel`)
-3. Validation issues (`CharacterBuilderValidationAlert`)
+1. `BUILDER_STEPS` title + full `description` (`BuilderStepFrame` subhead)
+2. Step rail secondary line via `resolveBuilderStepDescription` (uses optional `compactDescription`)
+3. Readiness `message` / `helperText` (`BuilderStepReadinessPanel`)
+4. Validation issues (`CharacterBuilderValidationAlert`)
 
 Readiness does not replace `validateCharacterBuild` on Continue / Create.
 

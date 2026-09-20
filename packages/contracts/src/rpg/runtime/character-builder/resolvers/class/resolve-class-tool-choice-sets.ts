@@ -2,6 +2,7 @@ import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import { isMeaningfulToolProficiencyChoice } from '../../../../content/lib/grants/proficiency-grant-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
+import { resolveProficiencyChoicePresentation } from '../proficiency/resolve-proficiency-choice-presentation'
 import { resolveToolPoolChoiceOptions } from '../proficiency/resolve-tool-pool-choice-options'
 
 /** Builds class tool proficiency ChoiceSets from character-creation proficiency choices. */
@@ -29,17 +30,27 @@ export function resolveClassToolChoiceSets(
 
   const { choose, id: choiceId } = choice
 
+  const choiceSet: ChoiceSet = {
+    id: buildChoiceSetId('class', characterClass.id, choiceId),
+    sourceType: 'class',
+    sourceId: characterClass.id,
+    choiceType: 'toolProficiency',
+    min: choose,
+    max: choose,
+    options,
+    required: options.length > 0,
+    provenance: {
+      ownerKind: 'class',
+      ownerLabel: characterClass.name,
+      ...(choice.label ? { choiceLabel: choice.label } : {}),
+    },
+    label: '',
+  }
+
   return [
     {
-      id: buildChoiceSetId('class', characterClass.id, choiceId),
-      sourceType: 'class',
-      sourceId: characterClass.id,
-      choiceType: 'toolProficiency',
-      label: choice.label ?? 'Choose Tools',
-      min: choose,
-      max: choose,
-      options,
-      required: options.length > 0,
+      ...choiceSet,
+      label: resolveProficiencyChoicePresentation(choiceSet).heading,
     },
   ]
 }

@@ -17,9 +17,28 @@ const PROFICIENCY_CHOICE_EMPTY_BY_TYPE = {
   armorTraining: characterBuilderProficiencyChoiceEmptyMessages.armorTraining,
 } as const satisfies Partial<Record<ChoiceSet['choiceType'], MessageDef<void>>>
 
-export function formatProficiencyChoiceEmptyMessage(choiceType: ChoiceSet['choiceType']): string {
+const PROFICIENCY_CHOICE_EMPTY_ADDITIONAL_BY_TYPE = {
+  language: characterBuilderProficiencyChoiceEmptyMessages.languageAdditional,
+  skillProficiency: characterBuilderProficiencyChoiceEmptyMessages.skillProficiencyAdditional,
+  toolProficiency: characterBuilderProficiencyChoiceEmptyMessages.toolProficiencyAdditional,
+  weaponProficiency: characterBuilderProficiencyChoiceEmptyMessages.weaponProficiencyAdditional,
+  armorTraining: characterBuilderProficiencyChoiceEmptyMessages.armorTrainingAdditional,
+} as const satisfies Partial<Record<ChoiceSet['choiceType'], MessageDef<void>>>
+
+export type FormatProficiencyChoiceEmptyMessageOptions = {
+  additional?: boolean
+}
+
+export function formatProficiencyChoiceEmptyMessage(
+  choiceType: ChoiceSet['choiceType'],
+  options: FormatProficiencyChoiceEmptyMessageOptions = {},
+): string {
+  const { additional = false } = options
+  const byType = additional
+    ? PROFICIENCY_CHOICE_EMPTY_ADDITIONAL_BY_TYPE
+    : PROFICIENCY_CHOICE_EMPTY_BY_TYPE
   const message =
-    PROFICIENCY_CHOICE_EMPTY_BY_TYPE[choiceType as keyof typeof PROFICIENCY_CHOICE_EMPTY_BY_TYPE] ??
+    byType[choiceType as keyof typeof byType] ??
     characterBuilderProficiencyChoiceEmptyMessages.fallback
   return formatStepReadinessMessage(message)
 }

@@ -127,6 +127,8 @@ export {
   emptyStateWellIconInkClasses,
   emptyStateWellIconLgClasses,
   emptyStateWellIconMdClasses,
+  emptyStateWellPassiveMessageClasses,
+  emptyStateWellPassiveMessageEmphasisClasses,
   emptyStateWellSupportingClasses,
   emptyStateWellSupportingLgClasses,
   emptyStateWellSurfaceClasses,
@@ -357,7 +359,9 @@ export {
 export { attentionFrameVariants } from './components/ui/attention-frame.variants'
 export {
   InsetPanel,
+  InsetPanelPassiveMessage,
   InsetPanelText,
+  type InsetPanelPassiveMessageProps,
   type InsetPanelProps,
   type InsetPanelTextProps,
 } from './components/ui/inset-panel.client'

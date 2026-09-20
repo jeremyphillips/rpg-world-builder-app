@@ -7,6 +7,7 @@ import {
   getWeaponCategoryLabel,
   getWeaponCategoryPreviewLabel,
   getWeaponCategorySentenceForm,
+  getWeaponCategorySummaryLabel,
   weaponCategorySchema,
 } from './category'
 
@@ -43,5 +44,7 @@ describe('weapon category vocabulary', () => {
     expect(getWeaponCategoryCompactLabel('martial')).toBe('Martial weapons')
     expect(getWeaponCategoryPreviewLabel('simple')).toBe('simple')
     expect(getWeaponCategoryPreviewLabel('martial')).toBe('martial')
+    expect(getWeaponCategorySummaryLabel('simple')).toBe('Simple')
+    expect(getWeaponCategorySummaryLabel('martial')).toBe('Martial')
   })
 })

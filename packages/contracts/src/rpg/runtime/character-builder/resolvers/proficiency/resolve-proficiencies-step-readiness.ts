@@ -38,12 +38,7 @@ export function resolveProficienciesStepReadiness(
   }
 
   if (isStepChoiceWorkComplete(stepChoiceSets, draft)) {
-    return {
-      readiness: 'complete',
-      message: formatStepReadinessMessage(
-        characterBuilderStepReadinessMessages.proficienciesReviewComplete,
-      ),
-    }
+    return { readiness: 'complete' }
   }
 
   return { readiness: 'readyWithChoices' }

@@ -105,3 +105,9 @@ export function getArmorCategoryPreviewLabel(category: string): string {
   const entry = getArmorCategoryEntry(category)
   return entry ? getTermCompactLabel(entry) : formatVocabularySlugLabel(category)
 }
+
+/** Title-case summary chip for proficiency rows (e.g. "Light", "Shields"). */
+export function getArmorCategorySummaryLabel(category: string): string {
+  const preview = getArmorCategoryPreviewLabel(category)
+  return `${preview.charAt(0).toUpperCase()}${preview.slice(1)}`
+}

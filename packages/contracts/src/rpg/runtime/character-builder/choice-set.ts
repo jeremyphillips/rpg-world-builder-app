@@ -36,6 +36,31 @@ export const CHOICE_TYPES = [
 
 export type ChoiceType = (typeof CHOICE_TYPES)[number]
 
+export const CHOICE_SET_OWNER_KINDS = [
+  'class',
+  'subclass',
+  'species',
+  'heritage',
+  'origin',
+  'feat',
+  'ruleset',
+  'campaign',
+] as const
+
+export type ChoiceSetOwnerKind = (typeof CHOICE_SET_OWNER_KINDS)[number]
+
+/** Generic grant ownership metadata for builder ChoiceSets. */
+export type ChoiceSetProvenance = {
+  ownerKind?: ChoiceSetOwnerKind
+  ownerLabel?: string
+  featureLabel?: string
+  choiceLabel?: string
+}
+
+export const CHOICE_SET_POOL_SOURCES = ['any'] as const
+
+export type ChoiceSetPoolSource = (typeof CHOICE_SET_POOL_SOURCES)[number]
+
 /** A single selectable option in a ChoiceSet, carrying display metadata resolved from catalog. */
 export type ChoiceSetOption = {
   id: string
@@ -80,6 +105,10 @@ export type ChoiceSet = {
    * passes. When false, the choice is optional / advisory.
    */
   required: boolean
+  /** Structured ownership for presentation and sorting. */
+  provenance?: ChoiceSetProvenance
+  /** When set, the option pool is unconstrained (e.g. any skill). */
+  poolSource?: ChoiceSetPoolSource
 }
 
 // ---------------------------------------------------------------------------

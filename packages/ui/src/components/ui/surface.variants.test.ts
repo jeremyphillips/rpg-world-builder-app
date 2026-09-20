@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  CANVAS_SURFACE,
   DEFAULT_ARRAY_ITEM_SURFACE,
   DEFAULT_FLAT_ARRAY_ITEM_SURFACE,
   DEFAULT_DEPENDENT_SURFACE,
@@ -97,5 +98,13 @@ describe('resolveSurfaceClasses', () => {
   it('maps emphasis default to muted wash', () => {
     const classes = resolveSurfaceClasses({ emphasis: 'default', elevation: 'flat' })
     expect(classes).toContain('bg-surface-muted')
+  })
+
+  it('uses approved tokens for canvas surface', () => {
+    const classes = resolveSurfaceClasses(CANVAS_SURFACE)
+    expect(classes).toContain('bg-background')
+    expect(classes).toContain('[--surface-current:var(--background)]')
+    expect(classes).not.toContain('bg-surface-subtle')
+    expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })
 })

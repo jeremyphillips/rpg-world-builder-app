@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   LANGUAGE_SET_ID,
   getLanguageCategorySentenceForm,
+  getLanguageGrantAddLabel,
+  getLanguageGrantCompactManageLabel,
+  getLanguageGrantManageLabel,
   getLanguageLabel,
   getLanguageProficiencySentenceForm,
   getLanguageSentenceForm,
@@ -55,5 +58,11 @@ describe('language vocabulary', () => {
     expect(getLanguageCategorySentenceForm('standard', 2)).toBe('standard languages')
     expect(getLanguageProficiencySentenceForm(1)).toBe('language')
     expect(getLanguageProficiencySentenceForm(2)).toBe('languages')
+  })
+
+  it('returns builder grant labels', () => {
+    expect(getLanguageGrantAddLabel()).toBe('Add language')
+    expect(getLanguageGrantManageLabel()).toBe('Edit')
+    expect(getLanguageGrantCompactManageLabel()).toBe('Edit')
   })
 })
