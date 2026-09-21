@@ -54,9 +54,16 @@ export const spellsStepWizardClass = makeClassStored({
       },
     },
   },
-  features: [],
+  features: [
+    {
+      kind: 'custom',
+      id: 'spellcasting',
+      name: 'Spellcasting',
+      level: 1,
+      grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+    },
+  ],
   spellcasting: {
-    level: 1,
     slotProgressionId: 'full-caster',
     ability: 'int',
     spellSelection: {

@@ -22,8 +22,8 @@ const SPELL_OPTION_HEADROOM = 2
 describe('SRD 5.2.1 spell seed', () => {
   const spells = loadSeedSpells(RULESET)
 
-  it('ships 92 curated spells (validated against the schema at load)', () => {
-    expect(spells).toHaveLength(92)
+  it('ships 97 curated spells (validated against the schema at load)', () => {
+    expect(spells).toHaveLength(97)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
@@ -38,7 +38,7 @@ describe('SRD 5.2.1 spell seed', () => {
   it('has globally unique slugs', () => {
     const slugs = spells.map((s) => s.slug)
     expect(new Set(slugs).size).toBe(slugs.length)
-    expect(seedSpellSlugs(RULESET).size).toBe(92)
+    expect(seedSpellSlugs(RULESET).size).toBe(97)
   })
 
   it('stores each spell in the level file matching its level field', () => {
@@ -113,13 +113,13 @@ describe('SRD 5.2.1 spell seed', () => {
     const classes = loadSeedClasses(RULESET)
 
     for (const cls of classes) {
-      if (!isSpellcastingActiveAtLevel(cls.spellcasting, 1)) continue
+      if (!isSpellcastingActiveAtLevel(cls, 1)) continue
 
       const resolved = cls.spellcasting
         ? resolveClassSpellcasting(cls, SPELLCASTING_PROGRESSION)
         : null
       const cantripsRequired = cls.spellcasting
-        ? resolveClassCantripCount({ spellcasting: cls.spellcasting, classLevel: 1 })
+        ? resolveClassCantripCount({ source: cls, classLevel: 1 })
         : 0
       if (cantripsRequired > 0) {
         const cantripOptions = spells.filter(

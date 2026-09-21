@@ -23,6 +23,7 @@ import {
   type ClassFormValues,
 } from './class-form-fields'
 import { buildClassSpellSelectionValueSyncs } from './class-spell-selection-form.lib'
+import { buildClassSpellcastingValueSyncs } from './class-spellcasting-value-syncs'
 import {
   buildClassCreateInput,
   classCreateDefaultValues,
@@ -80,7 +81,10 @@ const classFormDef: ContentFormDef<
 
   buildTabs: buildClassTabs,
   buildFields: (ctx) => contentFormFields(classFormDef, ctx),
-  valueSyncs: () => buildClassSpellSelectionValueSyncs(),
+  valueSyncs: () => [
+    ...buildClassSpellSelectionValueSyncs(),
+    ...buildClassSpellcastingValueSyncs(),
+  ],
 
   toFormValues: (entity) => ({
     name: entity.name,

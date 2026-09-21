@@ -26,6 +26,7 @@ import {
   classCharacterCreationSchema,
 } from '../starting-equipment'
 import { spellcastingDraftSchema, spellcastingSchema } from './spellcasting'
+import { isClassSpellcastingGrantingFeature } from './spellcasting/class-spellcasting-ownership'
 import { classValidationMessages } from './class-messages'
 import { contentSummaryRefSchema } from '../lib/content-summary-ref'
 import { contentTableSchema } from '../tables'
@@ -212,6 +213,45 @@ export function subclassChoiceFeatureLevel(
   return subclassChoiceFeature(characterClass)?.level
 }
 
+function refineClassSpellcastingOwnership(
+  value: Pick<ClassStoredBody, 'spellcasting' | 'features'>,
+  ctx: z.RefinementCtx,
+): void {
+  const grantingFeatures = value.features.filter(isClassSpellcastingGrantingFeature)
+  const hasConfig = value.spellcasting !== undefined
+  const hasGrant = grantingFeatures.length > 0
+
+  if (!hasConfig && !hasGrant) return
+
+  if (hasConfig && grantingFeatures.length === 1) return
+
+  if (hasConfig && !hasGrant) {
+    ctx.addIssue({
+      code: 'custom',
+      message: classValidationMessages.spellcastingConfigRequiresGrant(),
+      path: ['spellcasting'],
+    })
+    return
+  }
+
+  if (!hasConfig && hasGrant) {
+    ctx.addIssue({
+      code: 'custom',
+      message: classValidationMessages.spellcastingGrantRequiresConfig(),
+      path: ['features'],
+    })
+    return
+  }
+
+  if (grantingFeatures.length > 1) {
+    ctx.addIssue({
+      code: 'custom',
+      message: classValidationMessages.spellcastingGrantingFeatureDuplicate(),
+      path: ['features'],
+    })
+  }
+}
+
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.
 const createClassInputBaseSchema = classStoredBodySchema.extend({ slug: slugSchema })
 
@@ -223,6 +263,8 @@ export const createClassInputSchema = createClassInputBaseSchema.superRefine((va
       path: ['characterCreation', 'abilityScoreOrder'],
     })
   }
+
+  refineClassSpellcastingOwnership(value, ctx)
 })
 export type CreateClassInput = z.infer<typeof createClassInputBaseSchema>
 

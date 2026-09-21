@@ -1,4 +1,4 @@
-import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting'
+import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting/class-spellcasting-ownership'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import { resolveSpellcastingProfile, type BuilderSpellcastingProfile } from './builder-spellcasting'
@@ -37,7 +37,7 @@ export function resolveSpellStepApplicability(
     return { kind: 'notApplicable', reason: 'noSpellcasting', className, level }
   }
 
-  if (!isSpellcastingActiveAtLevel(characterClass.spellcasting, level)) {
+  if (!isSpellcastingActiveAtLevel(characterClass, level, { runtime: true })) {
     return { kind: 'notApplicable', reason: 'inactiveAtLevel', className, level }
   }
 

@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { useWatch } from 'react-hook-form'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useFormContext, useWatch } from 'react-hook-form'
+import { ConfirmDialog } from '@rpg/ui'
 import { buildItemDefaultValues } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
@@ -14,6 +15,12 @@ import {
   type FeatureRowForm,
 } from '../lib/class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
+import type { ClassFormValues } from '../lib/class-form-fields'
+import {
+  isSpellcastingGrantingFeatureRow,
+  removeSpellcastingFromFormValues,
+} from '../lib/class-spellcasting-lifecycle'
+import { buildSpellcastingFeatureAvailabilityFormFields } from '../lib/class-spellcasting-feature-availability-form-fields'
 
 const FEATURES_FIELD_NAME = 'features'
 
@@ -32,16 +39,39 @@ export interface ClassFeaturesTabProps {
 
 /** Master-detail editor for the class `features` field array. */
 export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
+  const { getValues, setValue } = useFormContext<ClassFormValues>()
   const fields = useMemo(() => classFeatureItemFields(formCtx), [formCtx])
   const campaignRules = campaignRulesFromCtx(formCtx)
   const makeItemDefaults = useCallback(
     () => ({ ...buildItemDefaultValues(fields), available: true }),
     [fields],
   )
-  const editor = useMasterDetailArray(FEATURES_FIELD_NAME, makeItemDefaults)
+  const baseEditor = useMasterDetailArray(FEATURES_FIELD_NAME, makeItemDefaults)
+  const [spellcastingRemoveOpen, setSpellcastingRemoveOpen] = useState(false)
+
+  const features = useWatch({ name: FEATURES_FIELD_NAME }) as FeatureRowForm[] | undefined
+
+  const handleRequestRemove = useCallback(
+    (index: number) => {
+      const row = (features ?? getValues(FEATURES_FIELD_NAME))?.[index]
+      if (isSpellcastingGrantingFeatureRow(row)) {
+        setSpellcastingRemoveOpen(true)
+        return
+      }
+      baseEditor.requestRemove(index)
+    },
+    [baseEditor, features, getValues],
+  )
+
+  const editor = useMemo(
+    () => ({
+      ...baseEditor,
+      requestRemove: handleRequestRemove,
+    }),
+    [baseEditor, handleRequestRemove],
+  )
 
   const previousFieldsLengthRef = useRef(editor.fields.length)
-  /** Last seen level per stable RHF field id — avoids re-sorting on cross-level selection. */
   const levelByFieldIdRef = useRef<Map<string, number | string>>(new Map())
 
   const selectedIndex = editor.selectedIndex
@@ -92,23 +122,54 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
     [campaignRules.subclassing.enabled],
   )
 
+  const resolveAvailabilityFormItems = useCallback(
+    ({ row, fieldId, namePrefix }: { row: unknown; fieldId: string; namePrefix: string }) => {
+      if (!isSpellcastingGrantingFeatureRow(row as FeatureRowForm | undefined)) return undefined
+      return buildSpellcastingFeatureAvailabilityFormFields(fieldId, namePrefix)
+    },
+    [],
+  )
+
+  const handleConfirmSpellcastingRemove = useCallback(() => {
+    const patch = removeSpellcastingFromFormValues(getValues())
+    for (const [key, value] of Object.entries(patch)) {
+      setValue(key as keyof ClassFormValues, value as ClassFormValues[keyof ClassFormValues], {
+        shouldDirty: true,
+      })
+    }
+    baseEditor.cancelRemove()
+    setSpellcastingRemoveOpen(false)
+  }, [baseEditor, getValues, setValue])
+
   return (
-    <FormEmbeddedMasterDetailEditor
-      formCtx={formCtx}
-      fieldName={FEATURES_FIELD_NAME}
-      itemFields={fields}
-      itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
-      listTitle="Features"
-      ariaLabel="Features"
-      addLabel="Add feature"
-      idPrefix="class-feature"
-      editor={editor}
-      mapListItem={({ row }) => ({
-        title: featureItemTitle(row as FeatureRowForm | undefined),
-        eyebrow: featureItemEyebrow(row as FeatureRowForm | undefined),
-      })}
-      resolveRowReasons={resolveRowReasons}
-      access={{ kind: 'availability', fieldName: 'available' }}
-    />
+    <>
+      <FormEmbeddedMasterDetailEditor
+        formCtx={formCtx}
+        fieldName={FEATURES_FIELD_NAME}
+        itemFields={fields}
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
+        listTitle="Features"
+        ariaLabel="Features"
+        addLabel="Add feature"
+        idPrefix="class-feature"
+        editor={editor}
+        mapListItem={({ row }) => ({
+          title: featureItemTitle(row as FeatureRowForm | undefined),
+          eyebrow: featureItemEyebrow(row as FeatureRowForm | undefined),
+        })}
+        resolveRowReasons={resolveRowReasons}
+        resolveAvailabilityFormItems={resolveAvailabilityFormItems}
+        access={{ kind: 'availability', fieldName: 'available' }}
+      />
+      <ConfirmDialog
+        open={spellcastingRemoveOpen}
+        onOpenChange={setSpellcastingRemoveOpen}
+        headline="Remove spellcasting?"
+        description="This will remove the Spellcasting feature and this class's spellcasting configuration, including spell progression, spell selection rules, recommendations, and related settings. This action will take effect when you save the class."
+        confirmLabel="Remove spellcasting"
+        confirmVariant="destructive"
+        onConfirm={handleConfirmSpellcastingRemove}
+      />
+    </>
   )
 }

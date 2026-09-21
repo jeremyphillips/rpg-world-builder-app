@@ -206,7 +206,6 @@ const storedWizard: ClassStored = {
   primaryAbilities: ['int'],
   hitDie: 6,
   spellcasting: {
-    level: 1,
     slotProgressionId: 'full-caster',
     ability: 'int',
     spellSelection: {
@@ -227,7 +226,15 @@ const storedWizard: ClassStored = {
     weapons: { categories: ['simple'], items: [] },
     skills: { categories: [], items: [] },
   },
-  features: [],
+  features: [
+    {
+      kind: 'custom',
+      id: 'spellcasting',
+      name: 'Spellcasting',
+      level: 1,
+      grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+    },
+  ],
   characterCreation: {
     startingEquipment: {
       choose: 1,
@@ -366,7 +373,9 @@ describe('deriveEquipmentRecommendations', () => {
   it('demotes focus gear to strong while spellcasting is not yet active', () => {
     const laterCaster: ClassStored = {
       ...storedWizard,
-      spellcasting: { ...storedWizard.spellcasting!, level: 2 },
+      features: storedWizard.features.map((feature) =>
+        feature.id === 'spellcasting' ? { ...feature, level: 2 } : feature,
+      ),
     }
     const { catalogIndex, proficiencies } = buildContext(laterCaster, [arcaneCrystal])
 
@@ -386,8 +395,16 @@ describe('deriveEquipmentRecommendations', () => {
       id: `${RULESET}:cleric`,
       slug: 'cleric',
       name: 'Cleric',
+      features: [
+        {
+          kind: 'custom',
+          id: 'spellcasting',
+          name: 'Spellcasting',
+          level: 1,
+          grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+        },
+      ],
       spellcasting: {
-        level: 1,
         slotProgressionId: 'half-caster',
         ability: 'wis',
         spellSelection: {

@@ -33,10 +33,9 @@ describe('spellcasting-profile', () => {
   it('returns null when spellcasting unlocks above the draft level', () => {
     const delayedCaster = {
       ...wizardClass,
-      spellcasting: {
-        ...wizardClass.spellcasting!,
-        level: 2,
-      },
+      features: wizardClass.features.map((feature) =>
+        feature.id === 'spellcasting' ? { ...feature, level: 2 } : feature,
+      ),
     }
     const context = {
       ...spellcastingTestContext,
@@ -106,7 +105,7 @@ describe('spellcasting-profile', () => {
   it('reads progression tables at the requested class level', () => {
     const spellcasting = wizardClass.spellcasting!
 
-    expect(cantripsKnownAtLevel(spellcasting, 1)).toBe(3)
+    expect(cantripsKnownAtLevel(wizardClass, 1)).toBe(3)
     expect(spellsAvailableAtLevel(spellcasting, 1, spellcastingProgressionTestConfig)).toBe(4)
     expect(maxSelectableSpellLevel(spellcasting, 1, spellcastingProgressionTestConfig)).toBe(1)
   })

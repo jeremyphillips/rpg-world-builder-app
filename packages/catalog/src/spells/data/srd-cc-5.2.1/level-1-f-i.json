@@ -182,6 +182,59 @@
     }
   },
   {
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "id": "srd-cc-5.2.1:healing-word",
+    "slug": "healing-word",
+    "name": "Healing Word",
+    "description": "<p>A creature of your choice that you can see within range regains Hit Points equal to 2d4 plus your spellcasting ability modifier.</p>",
+    "school": "abjuration",
+    "level": 1,
+    "classIds": ["bard", "cleric", "druid"],
+    "tags": {
+      "roles": ["healing"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    },
+    "higherLevelSlotEffect": "<p>The healing increases by 2d4 for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "modifier-model-missing",
+          "note": "Spellcasting ability modifier on healing stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +2d4 healing scaling stays prose"
+        }
+      ]
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:hellish-rebuke",
     "slug": "hellish-rebuke",
     "rulesetId": "srd-cc-5.2.1",

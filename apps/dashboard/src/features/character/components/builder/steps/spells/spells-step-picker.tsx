@@ -51,6 +51,10 @@ export function SpellsStepPicker({
     [choiceSet.id, context, draft],
   )
   const selectedIds = draft.choiceSelections[choiceSet.id] ?? []
+  const recommendationsEnabled = useMemo(
+    () => items.some((item) => item.state.isRecommended),
+    [items],
+  )
   const cantripChoiceSet = mode === SPELL_PICKER_MODE_CANTRIPS ? choiceSet : undefined
   const preparedChoiceSet = mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? choiceSet : undefined
 
@@ -69,6 +73,7 @@ export function SpellsStepPicker({
       preparedItems={mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? items : []}
       initialMode={mode}
       initialSpellLevel={initialSpellLevel}
+      recommendationsEnabled={recommendationsEnabled}
       onSelectSpell={(_, spellId) => {
         if (selectedIds.includes(spellId)) return
         onDraftChange({

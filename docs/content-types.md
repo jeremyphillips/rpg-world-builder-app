@@ -1040,7 +1040,17 @@ Delete is blocked with `409` when campaign characters reference the subclass (`c
 
 ## Class spellcasting (reference)
 
-The `classes` type embeds an optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`). The class owns **slot reference**, **spell selection semantics**, and **capacity/gain curves**. Rules Config owns **slot tables only**.
+Class spellcasting splits **activation**, **configuration**, and **starting recommendations**:
+
+```text
+features[] → managed Spellcasting / Pact Magic feature (level, name, description, available)
+           → grantGroups: [{ grants: [{ kind: 'spellcasting' }] }]
+spellcasting → slot reference, selection semantics, capacity curves, gear, recommendations[]
+```
+
+The optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`) owns **how** casting works. The dedicated granting feature in `features[]` owns **when** it unlocks. Rules Config owns **slot tables only**.
+
+Publish requires config and exactly one spellcasting grant to coexist (see `refineClassSpellcastingOwnership` in `class.ts`).
 
 ### Class record shape
 
@@ -1048,13 +1058,14 @@ The `classes` type embeds an optional `spellcasting` block (`content/classes/spe
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `slotProgressionId` | Ruleset slot progression id (Full / Half / Pact / custom). Drives spell-slot columns only.                                                                   |
 | `spellSelection`    | L1+ selection semantics (`limitedRepertoire`, `prepareFromClassList`, `prepareFromLearnedCollection`) plus change policy and optional spellbook acquisition. |
-| `progression`       | Independent sparse capacity curves: `cantrips`, `repertoire`, `preparedSpells`.                                                                              |
-| `level`             | First class level at which spellcasting is active (defaults to **1**). Gates columns and character-builder eligibility.                                      |
+| `progression`       | Independent sparse capacity curves: `cantrips`, `repertoire`, `preparedSpells`. Absolute class levels — not rebased when the granting feature level changes. |
 | `ability`           | Spellcasting ability for this class.                                                                                                                         |
-| `description`       | Optional rich-text HTML for SRD spellcasting rules prose (formerly duplicated on a `spellcasting` feature row).                                              |
 | `requiredGear`      | Optional class-critical spellcasting gear (e.g. Wizard spellbook).                                                                                           |
 | `focusKinds`        | Optional spellcasting focus kinds this class can use.                                                                                                        |
 | `recommendedGear`   | Optional strong-tier spellcasting gear suggestions.                                                                                                          |
+| `recommendations`   | Optional advisory starting spell lists keyed by semantic target (`cantrips` \| `level1Plus`). Never grants spells or changes quotas.                         |
+
+SRD rules prose lives on the managed granting feature (`id: spellcasting` or `pact-magic`), not on `Class.spellcasting`. Do **not** persist `spellcasting.level` or `spellcasting.featureId`.
 
 `slotProgressionId`, `spellSelection`, and `progression` are **independent** — a class may combine any compatible set (e.g. Full caster slots + Wizard-style spellbook/prepared selection + cantrip/prepared curves).
 
@@ -1070,13 +1081,18 @@ Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`
 
 The class form Spellcasting tab (`class-spellcasting-form-fields.ts`) exposes:
 
+- **Has spellcasting** — form-only toggle; turning on reconciles config + managed granting feature; turning off confirms before removing both.
+- **Spellcasting feature summary** — links authors to the Features tab for level, name, description, and campaign availability.
 - **Slot progression** — combobox of resolved ruleset slot progressions.
 - **Spell selection model** — semantic L1+ selection (`limitedRepertoire`, prepare-from-list, prepare-from-learned-collection) plus change policy.
 - **Grants cantrips** — toggles the Cantrips column in the spellcasting progression table.
 - **Spellcasting progression table** — merged cantrip / repertoire / prepared capacity curves (TableBuilder).
+- **Recommended starting spells** — cantrip and level-1 comboboxes authoring `recommendations[]`.
 - **Spellbook acquisition shorthand** — for learned-collection classes, regular mode uses Starting / per-level / through-level numbers that materialize to a gain curve on save; irregular curves use the table editor escape hatch.
 
-The read-only class detail **progression table** (`ClassProgressionTable`) composes class-owned capacity columns from `progression` with the referenced slot table and injects **Spellcasting** or **Pact Magic** at `spellcasting.level` — do not duplicate those rows in `features[]`.
+The managed granting feature carries a read-only `{ kind: 'spellcasting' }` grant (not an Add Grant menu item). Delete or make-unavailable on that feature confirms before suppressing spellcasting.
+
+The read-only class detail **progression table** (`ClassProgressionTable`) composes class-owned capacity columns from `progression` with the referenced slot table and lists **Spellcasting** / **Pact Magic** from the managed feature at `feature.level`.
 
 ### Class preview rail
 

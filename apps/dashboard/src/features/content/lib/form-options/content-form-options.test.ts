@@ -76,8 +76,17 @@ describe('buildContentFormOptionSets', () => {
     const wizard = pickClass('wizard')
     const patchedBarbarian = {
       ...pickClass('barbarian'),
+      features: [
+        ...(pickClass('barbarian').features ?? []),
+        {
+          kind: 'custom' as const,
+          id: 'spellcasting',
+          name: 'Spellcasting',
+          level: 1,
+          grantGroups: [{ grants: [{ kind: 'spellcasting' as const }] }],
+        },
+      ],
       spellcasting: {
-        level: 1,
         slotProgressionId: 'full-caster',
         ability: 'wis' as const,
         spellSelection: {

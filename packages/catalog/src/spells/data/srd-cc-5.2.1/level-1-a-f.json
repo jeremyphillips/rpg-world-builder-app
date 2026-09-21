@@ -166,6 +166,108 @@
     }
   },
   {
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "id": "srd-cc-5.2.1:charm-person",
+    "slug": "charm-person",
+    "name": "Charm Person",
+    "description": "<p>One Humanoid you can see within range makes a Wisdom saving throw. It does so with Advantage if you or your allies are fighting it. On a failed save, the target has the Charmed condition until the spell ends or until you or your allies damage it. The Charmed creature is Friendly to you. When the spell ends, the target knows it was Charmed by you.</p>",
+    "school": "enchantment",
+    "level": 1,
+    "classIds": ["bard", "druid", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "conditions": ["charmed"],
+      "roles": ["control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "hour"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional creature for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "dynamic-target-count",
+          "note": "Slot +1 target per level above 1"
+        },
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Advantage when fighting the target and post-charm awareness stay prose"
+        }
+      ]
+    }
+  },
+  {
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "id": "srd-cc-5.2.1:color-spray",
+    "slug": "color-spray",
+    "name": "Color Spray",
+    "description": "<p>You launch a dazzling array of flashing, colorful light. Each creature in a 15-foot Cone originating from you must succeed on a Constitution saving throw or have the Blinded condition until the end of your next turn.</p>",
+    "school": "illusion",
+    "level": 1,
+    "classIds": ["bard", "sorcerer", "wizard"],
+    "tags": {
+      "conditions": ["blinded"],
+      "roles": ["control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a pinch of colorful sand"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      }
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:create-or-destroy-water",
     "slug": "create-or-destroy-water",
     "rulesetId": "srd-cc-5.2.1",
@@ -433,6 +535,60 @@
         "code": "effect-schema-missing",
         "capabilityId": "detection"
       }
+    }
+  },
+  {
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "id": "srd-cc-5.2.1:dissonant-whispers",
+    "slug": "dissonant-whispers",
+    "name": "Dissonant Whispers",
+    "description": "<p>One creature of your choice that you can see within range hears a discordant melody in its mind. The target makes a Wisdom saving throw. On a failed save, it takes 3d6 Psychic damage and must immediately use its Reaction, if available, to move as far away from you as it can, using the safest route. On a successful save, the target takes half as much damage only.</p>",
+    "school": "enchantment",
+    "level": 1,
+    "classIds": ["bard"],
+    "tags": {
+      "damageTypes": ["psychic"],
+      "roles": ["damage", "control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      },
+      "gaps": [
+        {
+          "code": "reaction-trigger",
+          "note": "Forced reaction movement on failed save stays prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot +1d6 damage scaling stays prose"
+        }
+      ]
     }
   },
   {

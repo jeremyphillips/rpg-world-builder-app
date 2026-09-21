@@ -1,5 +1,5 @@
 import type { Spell } from '../../../../content/spell'
-import type { CharacterBuildContext } from '../../context'
+import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   PICKER_DISABLED_REASON_SELECTION_FULL,
@@ -10,6 +10,7 @@ import {
   buildSpellPickerCompactSummary,
   buildSpellPickerSearchText,
 } from './format-spell-picker-metadata'
+import { resolveRecommendedSpellIdsForChoiceSet } from './resolve-spell-recommendations'
 
 export type SpellPickerItemState = PickerItemStateBase & {
   isAlreadySelected: boolean
@@ -34,6 +35,7 @@ function resolveSpellPickerItemState(
   spellId: string,
   selectedIds: readonly string[],
   choiceSetMax: number,
+  recommendedSpellIds: ReadonlySet<string>,
 ): SpellPickerItemState {
   const isAlreadySelected = selectedIds.includes(spellId)
   const isSelectionFull = selectedIds.length >= choiceSetMax
@@ -45,7 +47,7 @@ function resolveSpellPickerItemState(
 
   return {
     isAvailable: true,
-    isRecommended: false,
+    isRecommended: recommendedSpellIds.has(spellId),
     isAlreadySelected,
     isSelectionFull,
     canSelect: !isAlreadySelected && !isSelectionFull,
@@ -69,6 +71,18 @@ export function resolveSpellPickerItems({
 
   const selectedIds = draft.choiceSelections[choiceSetId] ?? []
   const spellsById = new Map(context.catalog.spells.map((spell) => [spell.id, spell]))
+  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  const characterClass = draft.class.classId
+    ? catalogIndex.classes.get(draft.class.classId)
+    : undefined
+  const recommendedSpellIds = resolveRecommendedSpellIdsForChoiceSet({
+    spellcasting: characterClass?.spellcasting,
+    choiceSetId,
+    classId: characterClass?.id ?? '',
+    classLevel: draft.class.level,
+    choiceSetOptionIds: choiceSet.options.map((option) => option.id),
+    catalogSpellsById: spellsById,
+  })
 
   return choiceSet.options.flatMap((option) => {
     const spell = spellsById.get(option.id)
@@ -77,7 +91,12 @@ export function resolveSpellPickerItems({
     return [
       {
         spell,
-        state: resolveSpellPickerItemState(spell.id, selectedIds, choiceSet.max),
+        state: resolveSpellPickerItemState(
+          spell.id,
+          selectedIds,
+          choiceSet.max,
+          recommendedSpellIds,
+        ),
         searchText: buildSpellPickerSearchText(spell),
         compactSummary: buildSpellPickerCompactSummary(spell),
       },

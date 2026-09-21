@@ -343,7 +343,7 @@ export function projectBuilderPreviewRail({
   const hasCharacterClass = characterClass !== undefined
   const spellcastingActive =
     characterClass !== undefined &&
-    isSpellcastingActiveAtLevel(characterClass.spellcasting, draft.class.level)
+    isSpellcastingActiveAtLevel(characterClass, draft.class.level, { runtime: true })
 
   const sections = resolveBuilderPreviewSections(
     preview,

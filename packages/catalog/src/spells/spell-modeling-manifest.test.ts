@@ -21,7 +21,7 @@ describe('SRD 5.2.1 spell modeling manifest', () => {
     const manifestSlugs = [...SRD_521_SPELL_MODELING_MANIFEST_SLUGS].sort()
 
     expect(manifestSlugs).toEqual(seedSlugs)
-    expect(manifestSlugs).toHaveLength(92)
+    expect(manifestSlugs).toHaveLength(97)
   })
 
   it('promotes every resolution seed to meaningful-partial or higher', () => {

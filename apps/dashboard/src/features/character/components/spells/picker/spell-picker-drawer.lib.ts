@@ -2,6 +2,7 @@ import {
   formatChoiceSetDrawerHeading,
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
+  compareSpellPickerItemsByRecommendation,
   formatSpellLevel,
   getCastingTimeUnitLabel,
   getSpellSchoolLabel,
@@ -485,8 +486,11 @@ function compareSpellPickerScoredItems(
 
   const compareAfterPrimary = (primaryCmp: number): number => {
     if (primaryCmp !== 0) return primaryCmp
-    if (hasQuery) return right.searchScore - left.searchScore
-    return spellNameCollator.compare(left.item.spell.name, right.item.spell.name)
+    if (hasQuery) {
+      const scoreDiff = right.searchScore - left.searchScore
+      if (scoreDiff !== 0) return scoreDiff
+    }
+    return compareSpellPickerItemsByRecommendation(left.item, right.item)
   }
 
   switch (options.sortMode) {
@@ -495,7 +499,7 @@ function compareSpellPickerScoredItems(
         const scoreDiff = right.searchScore - left.searchScore
         if (scoreDiff !== 0) return scoreDiff
       }
-      return spellNameCollator.compare(left.item.spell.name, right.item.spell.name)
+      return compareSpellPickerItemsByRecommendation(left.item, right.item)
     case SPELL_PICKER_SORT_NAME_ASC:
       return compareAfterPrimary(
         spellNameCollator.compare(left.item.spell.name, right.item.spell.name),

@@ -70,6 +70,27 @@ describe('SpellPickerDrawer', () => {
     expect(screen.getByRole('combobox', { name: 'Spell sort order' })).toHaveTextContent('A–Z')
   })
 
+  it('shows a Recommended badge when recommendations are enabled', () => {
+    const recommendedItem = {
+      ...spellPickerOpenItemsFixture[0]!,
+      state: {
+        ...spellPickerOpenItemsFixture[0]!.state,
+        isRecommended: true,
+      },
+    }
+
+    renderCantripDrawer({
+      recommendationsEnabled: true,
+      cantripSelectedIds: [],
+      cantripItems: [recommendedItem, ...spellPickerOpenItemsFixture.slice(1)],
+    })
+
+    const mageHandRow = screen
+      .getByText('Mage Hand')
+      .closest('[data-picker-item-key]') as HTMLElement
+    expect(within(mageHandRow).getByText('Recommended')).toBeInTheDocument()
+  })
+
   it('disables Add when canSelect is false and keeps selected rows removable', () => {
     renderCantripDrawer({
       cantripSelectedIds: [spellPickerMageHandFixture.id, spellPickerDetectMagicFixture.id],

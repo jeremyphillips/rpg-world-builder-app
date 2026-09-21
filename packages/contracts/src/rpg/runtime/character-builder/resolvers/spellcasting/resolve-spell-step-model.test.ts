@@ -339,6 +339,13 @@ describe('resolveSpellStepModel', () => {
       features: [
         {
           kind: 'custom',
+          id: 'spellcasting',
+          name: 'Spellcasting',
+          level: 1,
+          grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+        },
+        {
+          kind: 'custom',
           id: 'favored-enemy',
           name: 'Favored Enemy',
           level: 1,
@@ -361,7 +368,6 @@ describe('resolveSpellStepModel', () => {
         },
       ],
       spellcasting: {
-        level: 1,
         slotProgressionId: 'half-caster',
         ability: 'wis',
         spellSelection: {

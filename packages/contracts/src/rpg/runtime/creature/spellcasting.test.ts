@@ -12,7 +12,7 @@ import {
 
 describe('cantripsKnownAtLevel', () => {
   it('reads the best known count at or below the class level', () => {
-    expect(cantripsKnownAtLevel(wizardClass.spellcasting!, 1)).toBe(3)
+    expect(cantripsKnownAtLevel(wizardClass, 1)).toBe(3)
   })
 })
 
@@ -38,11 +38,7 @@ describe('maxSelectableSpellLevel', () => {
 describe('resolveSpellcastingFactsAtLevel', () => {
   it('combines progression facts for a class level', () => {
     expect(
-      resolveSpellcastingFactsAtLevel(
-        wizardClass.spellcasting!,
-        1,
-        spellcastingProgressionTestConfig,
-      ),
+      resolveSpellcastingFactsAtLevel(wizardClass, 1, spellcastingProgressionTestConfig),
     ).toEqual({
       cantripsKnown: 3,
       spellsAvailable: 4,

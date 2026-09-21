@@ -1,7 +1,7 @@
 import type { ArmorEquipment } from '../../../content/equipment'
 import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { CharacterClass } from '../../../content/classes/class'
-import { isSpellcastingActiveAtLevel } from '../../../content/classes/spellcasting'
+import { isSpellcastingActiveAtLevel } from '../../../content/classes/spellcasting/class-spellcasting-ownership'
 import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/rules/spellcasting-progression'
 import { resolveSlotProgressionForClass } from '../../../campaign/rules/spellcasting-progression'
 import { resolveLeveledSlotCountsAtLevel } from '../../../campaign/rules/spellcasting-progression'
@@ -149,13 +149,19 @@ export function deriveSkillModifiers(
   })
 }
 
+// fallow-ignore-next-line complexity
 export function deriveSpellcastingStats(
   input: CharacterDerivationInput,
   profBonus: number | undefined,
 ): CharacterDerivedSpellcasting | null {
-  const spellcasting = input.characterClass?.spellcasting
+  const characterClass = input.characterClass
+  const spellcasting = characterClass?.spellcasting
 
-  if (!spellcasting || !isSpellcastingActiveAtLevel(spellcasting, input.level)) {
+  if (
+    !characterClass ||
+    !spellcasting ||
+    !isSpellcastingActiveAtLevel(characterClass, input.level, { runtime: true })
+  ) {
     return null
   }
 

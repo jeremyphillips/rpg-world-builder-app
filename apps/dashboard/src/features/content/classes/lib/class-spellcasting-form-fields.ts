@@ -7,10 +7,10 @@ import {
   SPELLCASTING_GEAR_KINDS,
   SPELLCASTING_GEAR_KIND_ENTRIES,
   abilitySchema,
-  campaignLevelSchema,
   classGainProgressionSchema,
   classSpellcastingProgressionDraftSchema,
   classSpellcastingProgressionSchema,
+  spellRecommendationSchema,
   spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
 } from '@rpg/contracts'
@@ -23,10 +23,12 @@ import {
 } from '@rpg/ui/form'
 
 import { ClassSpellbookAcquisitionField } from '../components/class-spellbook-acquisition-field'
+import { ClassSpellcastingFeatureField } from '../components/class-spellcasting-feature-field'
 import { ClassSpellcastingProgressionField } from '../components/class-spellcasting-progression-field'
-
-import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
+import { ClassSpellcastingRecommendationsField } from '../components/class-spellcasting-recommendations-field'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import type { ClassFormValues } from './class-form-fields'
+import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import {
   SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS,
@@ -69,35 +71,27 @@ const spellSelectionChangePackageOptions = toOptions(
   ) as Record<(typeof SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS)[number]['value'], string>,
 )
 
-function campaignLevelField(maxLevel: number) {
-  return z.coerce.number().pipe(campaignLevelSchema(maxLevel))
-}
-
-export function createSpellcastingFormSchema(maxLevel: number) {
-  const levelField = campaignLevelField(maxLevel)
+export function createSpellcastingFormSchema(_maxLevel: number) {
   return z.object({
     slotProgressionId: z.string().min(1),
     progression: classSpellcastingProgressionSchema.optional(),
-    level: levelField.optional(),
-    description: z.string().optional(),
     ability: abilitySchema,
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
     focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
+    recommendations: z.array(spellRecommendationSchema).optional(),
   })
 }
 
-export function createSpellcastingDraftFormSchema(maxLevel: number) {
-  const levelField = campaignLevelField(maxLevel)
+export function createSpellcastingDraftFormSchema(_maxLevel: number) {
   return z.object({
     slotProgressionId: draftOptionalSelect(z.string().min(1)),
     progression: classSpellcastingProgressionDraftSchema.optional(),
-    level: draftOptionalSelect(levelField),
-    description: z.string().optional(),
     ability: draftOptionalSelect(abilitySchema),
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
     focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
+    recommendations: z.array(spellRecommendationSchema).optional(),
   })
 }
 
@@ -140,8 +134,6 @@ function spellcastingSlotProgressionOptions(ctx: ContentFormCtx) {
 }
 
 export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
-  const levelOptions = getLevelFieldOptions(ctx)
-  const levelDigits = levelSelectDigits(ctx)
   const stack: DependentConfig = {
     kind: 'dependent',
     controller: {
@@ -149,8 +141,27 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
       name: 'hasSpellcasting',
       label: 'Has spellcasting',
     },
+    confirmBeforeClear: {
+      headline: 'Remove spellcasting?',
+      description:
+        "This will remove the Spellcasting feature and this class's spellcasting configuration, including spell progression, spell selection rules, recommendations, and related settings. This action will take effect when you save the class.",
+      confirmLabel: 'Remove spellcasting',
+      shouldConfirm: (values) => {
+        const features = values.features as ClassFormValues['features'] | undefined
+        const hasGrantFeature = Array.isArray(features)
+          ? features.some((row) => isSpellcastingGrantingFeatureRow(row))
+          : false
+        return Boolean(values.spellcasting) || hasGrantFeature
+      },
+    },
     dependents: {
       fields: [
+        {
+          kind: 'slot',
+          name: 'spellcastingFeatureSummary',
+          visibility: visibleWhenSpellcasting(),
+          render: () => createElement(ClassSpellcastingFeatureField),
+        },
         {
           type: 'combobox',
           name: 'spellcasting.slotProgressionId',
@@ -160,18 +171,6 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
           required: true,
           visibility: visibleWhenSpellcasting(),
           hint: 'Spell slot table (Full / Half / Pact / custom) for this class.',
-        },
-        {
-          type: 'select',
-          name: 'spellcasting.level',
-          label: 'Spellcasting level',
-          labelPosition: 'settings',
-          separator: 'subtle',
-          options: levelOptions,
-          required: true,
-          digits: levelDigits,
-          hint: 'First class level at which this class gains spellcasting',
-          visibility: visibleWhenSpellcasting(),
         },
         {
           type: 'chips',
@@ -245,14 +244,16 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
           hint: 'Strong-tier spellcasting gear suggestions.',
         },
         {
-          type: 'richtext',
-          name: 'spellcasting.description',
-          label: 'Rules description',
-          linkable: true,
-          internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-          contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+          kind: 'group',
+          label: 'Recommended starting spells',
           visibility: visibleWhenSpellcasting(),
-          hint: 'SRD spellcasting feature prose (shown on the class detail view)',
+          fields: [
+            {
+              kind: 'slot',
+              name: 'spellcastingRecommendationsEditor',
+              render: () => createElement(ClassSpellcastingRecommendationsField, { formCtx: ctx }),
+            },
+          ],
         },
       ],
     },

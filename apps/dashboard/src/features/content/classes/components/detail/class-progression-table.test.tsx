@@ -129,7 +129,9 @@ describe('ClassProgressionTable', () => {
     const paladin = pickClass('paladin')
     const delayed = makeCharacterClass({
       ...paladin,
-      spellcasting: paladin.spellcasting ? { ...paladin.spellcasting, level: 2 } : undefined,
+      features: paladin.features.map((feature) =>
+        feature.id === 'spellcasting' ? { ...feature, level: 2 } : feature,
+      ),
     })
 
     renderProgressionTable({ characterClass: delayed })
