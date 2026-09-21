@@ -7,9 +7,11 @@ import { ChoiceSectionValidationMessages } from './choice-section-validation-mes
 import { ChoiceSectionSupportingCopy } from './choice-section-supporting-copy'
 import { ChoiceSelectionCounter } from './choice-selection-counter'
 import {
+  choiceSectionHeaderActionClasses,
   choiceSectionHeaderClasses,
-  choiceSectionHeadingRowClasses,
   choiceSectionHeaderDetailsClasses,
+  choiceSectionHeaderMainClasses,
+  choiceSectionHeadingRowClasses,
 } from './choice-section.variants'
 
 type ChoiceSectionHeaderProps = {
@@ -31,7 +33,7 @@ export function ChoiceSectionHeader({
 
   return (
     <div className={choiceSectionHeaderClasses}>
-      <div>
+      <div className={choiceSectionHeaderMainClasses}>
         <div className={choiceSectionHeadingRowClasses}>
           <Heading variant="subsection" as="h3" id={headingId}>
             {section.heading}
@@ -43,21 +45,24 @@ export function ChoiceSectionHeader({
             />
           ) : null}
         </div>
-        <div className={choiceSectionHeaderDetailsClasses}>
-          <ChoiceSectionSupportingCopy section={section} singleChoiceBlock={singleChoiceBlock} />
-          {!isMultiBlockSection ? (
-            <ChoiceSectionValidationMessages issues={sectionValidationIssues} />
-          ) : null}
-        </div>
       </div>
 
       {singleChoiceBlock ? (
-        <ChoiceAddAction
-          compactAddLabel={singleChoiceBlock.compactAddLabel}
-          isFull={singleChoiceBlock.isFull}
-          onClick={() => onOpenChoiceSet(singleChoiceBlock.choiceSet.id)}
-        />
+        <div className={choiceSectionHeaderActionClasses}>
+          <ChoiceAddAction
+            compactAddLabel={singleChoiceBlock.compactAddLabel}
+            isFull={singleChoiceBlock.isFull}
+            onClick={() => onOpenChoiceSet(singleChoiceBlock.choiceSet.id)}
+          />
+        </div>
       ) : null}
+
+      <div className={choiceSectionHeaderDetailsClasses}>
+        <ChoiceSectionSupportingCopy section={section} singleChoiceBlock={singleChoiceBlock} />
+        {!isMultiBlockSection ? (
+          <ChoiceSectionValidationMessages issues={sectionValidationIssues} />
+        ) : null}
+      </div>
     </div>
   )
 }

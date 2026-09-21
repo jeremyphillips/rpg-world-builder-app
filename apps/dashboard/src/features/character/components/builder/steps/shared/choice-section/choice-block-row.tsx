@@ -1,5 +1,9 @@
 import { formatProficiencyChoiceEmptyMessage, formatSpellChoiceEmptyMessage } from '@rpg/contracts'
-import type { BuilderChoiceBlock, BuilderChoiceSelectedRow } from '@rpg/contracts'
+import {
+  resolveChoiceBlockCounterValues,
+  type BuilderChoiceBlock,
+  type BuilderChoiceSelectedRow,
+} from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { EmptyPanel, Heading, Text } from '@rpg/ui'
 
@@ -11,8 +15,11 @@ import {
   choiceBlockRowClasses,
   choiceBlockRowContentClasses,
   choiceBlockRowDetailsClasses,
+  choiceBlockRowDetailsGridClasses,
   choiceBlockRowDividerClasses,
+  choiceBlockRowHeaderActionClasses,
   choiceBlockRowHeaderClasses,
+  choiceBlockRowHeaderMainClasses,
   choiceBlockRowHeadingGroupClasses,
   choiceBlockRowOverSelectionClasses,
   choiceBlockRowPoolDescriptionClasses,
@@ -47,37 +54,44 @@ export function ChoiceBlockRow({
   onRemoveChoice,
 }: ChoiceBlockRowProps) {
   const emptyMessage = emptyMessageForBlock(block)
+  const counter = resolveChoiceBlockCounterValues(block)
 
   return (
     <div className={choiceBlockRowClasses}>
       <div className={choiceBlockRowDividerClasses} role="presentation" aria-hidden />
       <div className={choiceBlockRowContentClasses}>
         <div className={choiceBlockRowHeaderClasses}>
-          <div className={choiceBlockRowHeadingGroupClasses}>
-            <Heading variant="group" as="p">
-              {block.heading}
-            </Heading>
-            <ChoiceSelectionCounter selectedCount={block.selectedCount} max={block.max} />
+          <div className={choiceBlockRowHeaderMainClasses}>
+            <div className={choiceBlockRowHeadingGroupClasses}>
+              <Heading variant="group" as="p">
+                {block.heading}
+              </Heading>
+              <ChoiceSelectionCounter selectedCount={counter.selected} max={counter.max} />
+            </div>
           </div>
-          <ChoiceAddAction
-            compactAddLabel={block.compactAddLabel}
-            isFull={block.isFull}
-            onClick={onOpenDrawer}
-          />
+          <div className={choiceBlockRowHeaderActionClasses}>
+            <ChoiceAddAction
+              compactAddLabel={block.compactAddLabel}
+              isFull={block.isFull}
+              onClick={onOpenDrawer}
+            />
+          </div>
+          <div className={choiceBlockRowDetailsGridClasses}>
+            {block.sourceLine ? (
+              <Text className={choiceBlockRowSourceLineClasses}>{block.sourceLine}</Text>
+            ) : null}
+            <Text variant="caption" className={choiceBlockRowPoolDescriptionClasses}>
+              {block.poolDescription}
+            </Text>
+            {block.isOverSelected ? (
+              <p className={choiceBlockRowOverSelectionClasses} role="status">
+                {overSelectionMessage}
+              </p>
+            ) : null}
+            <ChoiceSectionValidationMessages issues={validationIssues} />
+          </div>
         </div>
         <div className={choiceBlockRowDetailsClasses}>
-          {block.sourceLine ? (
-            <Text className={choiceBlockRowSourceLineClasses}>{block.sourceLine}</Text>
-          ) : null}
-          <Text variant="caption" className={choiceBlockRowPoolDescriptionClasses}>
-            {block.poolDescription}
-          </Text>
-          {block.isOverSelected ? (
-            <p className={choiceBlockRowOverSelectionClasses} role="status">
-              {overSelectionMessage}
-            </p>
-          ) : null}
-          <ChoiceSectionValidationMessages issues={validationIssues} />
           {selectedRows.length > 0 ? (
             <ul className={choiceBlockRowSelectedListClasses}>
               {selectedRows.map((row) => (

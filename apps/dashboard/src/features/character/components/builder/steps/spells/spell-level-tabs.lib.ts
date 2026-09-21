@@ -68,7 +68,7 @@ export const SPELL_LEVEL_TABS_SUBHEAD =
 
 export function formatSpellLevelTabsRangeHeading(minLevel: number, maxLevel: number): string {
   if (minLevel === maxLevel) {
-    return `Level ${formatSpellLevel(minLevel)} Spells`
+    return `${formatSpellLevel(minLevel)}-Level Spells`
   }
-  return `Level ${formatSpellLevel(minLevel)}–${formatSpellLevel(maxLevel)} Spells`
+  return `${formatSpellLevel(minLevel)}–${formatSpellLevel(maxLevel)}-Level Spells`
 }

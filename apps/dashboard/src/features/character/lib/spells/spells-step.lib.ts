@@ -33,6 +33,9 @@ export const SPELLS_STEP_OVER_SELECTION_MESSAGE =
 
 export const SPELLCASTING_FACT_SUMMARY_HEADING = 'Spellcasting' as const
 
+export const SPELLCASTING_FACT_SUMMARY_SUBHEAD =
+  'Your class determines your spellcasting ability and how these values are calculated.' as const
+
 /** ChoiceSets owned by the spells builder step. */
 export function choiceSetsForSpellsStep(choiceSets: readonly ChoiceSet[]): ChoiceSet[] {
   if (!SPELLS_CHOICE_TYPES) return []

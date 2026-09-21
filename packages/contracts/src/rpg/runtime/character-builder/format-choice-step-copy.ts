@@ -149,30 +149,30 @@ type SingleSetSupportingCopyInput = {
   hasFixedGrantsInCategory: boolean
   subheadStyle: ChoiceSubheadStyle
   spellLevel?: number
-  filteredOptionCount?: number
 }
 
 function formatConstrainedSpellPoolInstruction(
   choiceSet: ChoiceSet,
   spellLevel: number | undefined,
-  filteredOptionCount: number,
 ): string {
   const choiceType = choiceSet.choiceType === 'cantrip' ? 'cantrip' : 'spell'
+  const { options } = choiceSet
+  const optionCount = options.length
 
-  if (filteredOptionCount <= CHOICE_POOL_ENUMERATION_THRESHOLD) {
-    const labels = choiceSet.options.map((option) => option.label)
+  if (optionCount <= CHOICE_POOL_ENUMERATION_THRESHOLD) {
+    const labels = options.map((option) => option.label)
     return `Choose from ${joinNaturalList(labels)}.`
   }
 
   if (choiceType === 'cantrip') {
-    return `Choose from ${filteredOptionCount} available cantrips.`
+    return `Choose from ${optionCount} available cantrips.`
   }
 
   if (spellLevel !== undefined && spellLevel >= 1) {
-    return `Choose from ${filteredOptionCount} available ${formatSpellLevel(spellLevel).toLowerCase()}-level spells.`
+    return `Choose from ${optionCount} available ${formatSpellLevel(spellLevel).toLowerCase()}-level spells.`
   }
 
-  return `Choose from ${filteredOptionCount} available ${spellNounFor('spell', filteredOptionCount)}.`
+  return `Choose from ${optionCount} available ${spellNounFor('spell', optionCount)}.`
 }
 
 /** Single-set supporting copy — folds identity and meaningful pool constraint. */
@@ -183,12 +183,10 @@ export function formatChoiceSingleSetSupportingCopy({
   hasFixedGrantsInCategory,
   subheadStyle,
   spellLevel,
-  filteredOptionCount,
 }: SingleSetSupportingCopyInput): ChoiceSingleSetSupportingCopy {
   if (subheadStyle === 'spell') {
-    const optionCount = filteredOptionCount ?? choiceSet.options.length
     return {
-      instruction: formatConstrainedSpellPoolInstruction(choiceSet, spellLevel, optionCount),
+      instruction: formatConstrainedSpellPoolInstruction(choiceSet, spellLevel),
     }
   }
 
@@ -328,18 +326,15 @@ function anyPoolSentenceForm(choiceSet: ChoiceSet): string {
 export type FormatChoicePoolDescriptionInput = {
   choiceSet: ChoiceSet
   spellLevel?: number
-  filteredOptionCount?: number
 }
 
 /** Compact pool copy for a single choice block. */
 export function formatChoicePoolDescription({
   choiceSet,
   spellLevel,
-  filteredOptionCount,
 }: FormatChoicePoolDescriptionInput): string {
   if (choiceSet.choiceType === 'cantrip' || choiceSet.choiceType === 'spell') {
-    const optionCount = filteredOptionCount ?? choiceSet.options.length
-    return formatConstrainedSpellPoolInstruction(choiceSet, spellLevel, optionCount)
+    return formatConstrainedSpellPoolInstruction(choiceSet, spellLevel)
   }
 
   if (choiceSet.poolSource === 'any') {
@@ -356,4 +351,7 @@ export function formatChoicePoolDescription({
   return `Choose from ${options.length} available ${poolOptionNoun(choiceSet, options.length)}.`
 }
 
-export { formatChoiceChosenCounter }
+export {
+  formatChoiceChosenCounter,
+  formatChoiceProgressCounter,
+} from './format-choice-set-drawer-copy'

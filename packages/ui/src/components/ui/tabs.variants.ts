@@ -5,6 +5,7 @@ export const tabsListVariants = cva('inline-flex items-center', {
     variant: {
       line: 'w-full border-b border-border gap-0 text-muted-foreground',
       pill: 'h-9 rounded-lg bg-segmented-track p-1 gap-1',
+      plain: 'flex h-auto w-full flex-col gap-0 bg-transparent p-0 text-muted-foreground',
     },
   },
   defaultVariants: {
@@ -19,6 +20,8 @@ export const tabsTriggerVariants = cva(
       variant: {
         line: 'relative h-9 px-4 pb-2 pt-1 text-muted-foreground hover:text-foreground data-[state=active]:text-foreground data-[state=active]:after:absolute data-[state=active]:after:inset-x-0 data-[state=active]:after:-bottom-px data-[state=active]:after:h-0.5 data-[state=active]:after:rounded-full data-[state=active]:after:bg-primary',
         pill: 'h-7 rounded-md px-3 text-foreground data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+        plain:
+          'relative inline-flex h-auto whitespace-normal p-0 text-muted-foreground hover:text-foreground data-[state=active]:text-foreground',
       },
     },
     defaultVariants: {
@@ -27,7 +30,7 @@ export const tabsTriggerVariants = cva(
   },
 )
 
-export type TabsVariant = 'line' | 'pill'
+export type TabsVariant = 'line' | 'pill' | 'plain'
 
 /** Space between the tab list and panel content. */
 export const tabsContentSpacingClasses = 'mt-6'

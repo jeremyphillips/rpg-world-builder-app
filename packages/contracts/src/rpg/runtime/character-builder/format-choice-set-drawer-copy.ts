@@ -34,5 +34,10 @@ export function formatChoiceChosenCounter(selectedCount: number, max: number): s
   return `${selectedCount} / ${max} chosen`
 }
 
+/** Compact progress label without the chosen suffix (e.g. spell level tabs). */
+export function formatChoiceProgressCounter(selectedCount: number, max: number): string {
+  return `${selectedCount} / ${max}`
+}
+
 /** @deprecated Use {@link formatChoiceChosenCounter}. */
 export const formatProficiencyChosenCounter = formatChoiceChosenCounter

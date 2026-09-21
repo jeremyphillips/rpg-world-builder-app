@@ -67,6 +67,7 @@ export function SpellLevelTabs({
 
   return (
     <Tabs
+      variant="plain"
       value={String(activeLevel)}
       onValueChange={(value: string) => onActiveLevelChange(Number(value))}
     >

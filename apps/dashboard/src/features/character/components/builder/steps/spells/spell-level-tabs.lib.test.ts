@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  formatSpellLevelTabsRangeHeading,
   resolveNarrowSpellLevelTabLayout,
   resolveSpellLevelTabLayout,
 } from './spell-level-tabs.lib'
@@ -23,5 +24,13 @@ describe('resolveSpellLevelTabLayout', () => {
       { levels: [1, 2, 3], columns: 3 },
       { levels: [4, 5], columns: 2 },
     ])
+  })
+})
+
+describe('formatSpellLevelTabsRangeHeading', () => {
+  it('uses ordinal-level spell headings without a leading Level prefix', () => {
+    expect(formatSpellLevelTabsRangeHeading(1, 1)).toBe('1st-Level Spells')
+    expect(formatSpellLevelTabsRangeHeading(1, 3)).toBe('1st–3rd-Level Spells')
+    expect(formatSpellLevelTabsRangeHeading(1, 9)).toBe('1st–9th-Level Spells')
   })
 })

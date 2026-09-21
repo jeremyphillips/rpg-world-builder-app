@@ -24,7 +24,6 @@ describe('formatChoicePoolDescription', () => {
       formatChoicePoolDescription({
         choiceSet: spellChoiceSet,
         spellLevel: 3,
-        filteredOptionCount: 12,
       }),
     ).toBe('Choose from 12 available 3rd-level spells.')
   })
@@ -38,9 +37,38 @@ describe('formatChoicePoolDescription', () => {
 
     expect(
       formatChoicePoolDescription({
-        choiceSet: cantripChoiceSet,
-        filteredOptionCount: 16,
+        choiceSet: {
+          ...cantripChoiceSet,
+          options: Array.from({ length: 16 }, (_, index) => ({
+            id: `cantrip-${index}`,
+            label: `Cantrip ${index}`,
+          })),
+        },
       }),
     ).toBe('Choose from 16 available cantrips.')
+  })
+
+  it('enumerates up to five filtered spell options then falls back to a count', () => {
+    const filteredOptions = Array.from({ length: 6 }, (_, index) => ({
+      id: `spell-${index}`,
+      label: `Spell ${index}`,
+    }))
+
+    expect(
+      formatChoicePoolDescription({
+        choiceSet: { ...spellChoiceSet, options: filteredOptions },
+        spellLevel: 1,
+      }),
+    ).toBe('Choose from 6 available 1st-level spells.')
+
+    expect(
+      formatChoicePoolDescription({
+        choiceSet: {
+          ...spellChoiceSet,
+          options: filteredOptions.slice(0, 3),
+        },
+        spellLevel: 1,
+      }),
+    ).toBe('Choose from Spell 0, Spell 1, and Spell 2.')
   })
 })

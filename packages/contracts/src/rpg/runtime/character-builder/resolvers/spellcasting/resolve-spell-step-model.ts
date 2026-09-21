@@ -32,6 +32,7 @@ import {
   resolveSpellChoicePresentation,
   sortSpellChoiceSets,
 } from './resolve-spell-choice-presentation'
+import { lookupSpellInCatalogIndex } from './lookup-spell-in-catalog-index'
 
 export const SPELLS_STALE_REASON = 'This spell is no longer available.' as const
 
@@ -168,6 +169,11 @@ function buildChoiceBlock(
   const filteredOptions =
     level === undefined ? choiceSet.options : optionsAtLevel(choiceSet, level, catalogIndex)
 
+  const selectedAtLevel =
+    level === undefined
+      ? undefined
+      : selectedIdsAtLevel(choiceSet, draft, level, catalogIndex).length
+
   return {
     choiceSet,
     heading: presentation.heading,
@@ -175,10 +181,16 @@ function buildChoiceBlock(
     selectedCount,
     min: choiceSet.min,
     max: choiceSet.max,
+    displayCount:
+      selectedAtLevel === undefined
+        ? undefined
+        : {
+            selected: selectedAtLevel,
+            max: choiceSet.max,
+          },
     poolDescription: formatChoicePoolDescription({
       choiceSet: { ...choiceSet, options: filteredOptions },
       spellLevel: level,
-      filteredOptionCount: filteredOptions.length,
     }),
     compactAddLabel: formatChoiceBlockCompactAddLabel(choiceSet, selectedCount),
     isFull: selectedCount >= choiceSet.max,
@@ -186,21 +198,32 @@ function buildChoiceBlock(
   }
 }
 
+function buildGrantedSpellRows(
+  draft: CharacterBuilderDraft,
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  characterClass: CharacterClass | undefined,
+  spellLevel: number,
+): BuilderChoiceGrantedRow[] {
+  return assembleGrantedSpells(draft, catalogIndex, characterClass).flatMap((entry) => {
+    const spell = lookupSpellInCatalogIndex(entry.spellId, catalogIndex)
+    if (!spell || spell.level !== spellLevel) return []
+
+    return [
+      {
+        id: `granted-spell:${spell.id}`,
+        label: spell.name,
+        sourceLabel: formatCompactSelectionSourceLabel(entry.sources ?? [], catalogIndex),
+      },
+    ]
+  })
+}
+
 function buildGrantedCantripRows(
   draft: CharacterBuilderDraft,
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
   characterClass: CharacterClass | undefined,
 ): BuilderChoiceGrantedRow[] {
-  return assembleGrantedSpells(draft, catalogIndex, characterClass)
-    .filter((entry) => {
-      const spell = catalogIndex.spells.get(entry.spellId)
-      return spell?.level === 0
-    })
-    .map((entry) => ({
-      id: `granted-spell:${entry.spellId}`,
-      label: catalogIndex.spells.get(entry.spellId)?.name ?? entry.spellId,
-      sourceLabel: formatCompactSelectionSourceLabel(entry.sources ?? [], catalogIndex),
-    }))
+  return buildGrantedSpellRows(draft, catalogIndex, characterClass, 0)
 }
 
 function spellLevelHeading(level: number): string {
@@ -238,7 +261,6 @@ function buildCantripsSection(
           headingSourceCoverage: presentations[0]!.presentation.headingSourceCoverage,
           hasFixedGrantsInCategory: grantedRows.length > 0,
           subheadStyle: 'spell',
-          filteredOptionCount: presentations[0]!.choiceSet.options.length,
         })
       : undefined
 
@@ -279,6 +301,7 @@ function buildSpellLevelSection(
   draft: CharacterBuilderDraft,
   profile: BuilderSpellcastingProfile,
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  grantedRows: BuilderChoiceGrantedRow[],
 ): SpellInteractiveSection {
   const visibleChoiceSets = sortSpellChoiceSets(
     choiceSets.filter((choiceSet) =>
@@ -299,16 +322,18 @@ function buildSpellLevelSection(
 
   const singleSetSupportingCopy =
     presentations.length === 1
-      ? formatChoiceSingleSetSupportingCopy({
-          choiceSet: presentations[0]!.choiceSet,
-          heading: presentations[0]!.presentation.heading,
-          headingSourceCoverage: presentations[0]!.presentation.headingSourceCoverage,
-          hasFixedGrantsInCategory: false,
-          subheadStyle: 'spell',
-          spellLevel: level,
-          filteredOptionCount: optionsAtLevel(presentations[0]!.choiceSet, level, catalogIndex)
-            .length,
-        })
+      ? (() => {
+          const choiceSet = presentations[0]!.choiceSet
+          const filteredOptions = optionsAtLevel(choiceSet, level, catalogIndex)
+          return formatChoiceSingleSetSupportingCopy({
+            choiceSet: { ...choiceSet, options: filteredOptions },
+            heading: presentations[0]!.presentation.heading,
+            headingSourceCoverage: presentations[0]!.presentation.headingSourceCoverage,
+            hasFixedGrantsInCategory: grantedRows.length > 0,
+            subheadStyle: 'spell',
+            spellLevel: level,
+          })
+        })()
       : undefined
 
   const singleIdentityLine =
@@ -316,11 +341,18 @@ function buildSpellLevelSection(
 
   const aggregateCount =
     choiceBlocks.length === 1
-      ? {
-          selected: choiceBlocks[0]!.selectedCount,
-          max: choiceBlocks[0]!.max,
-          label: formatChoiceChosenCounter(choiceBlocks[0]!.selectedCount, choiceBlocks[0]!.max),
-        }
+      ? (() => {
+          const block = choiceBlocks[0]!
+          const counter = block.displayCount ?? {
+            selected: block.selectedCount,
+            max: block.max,
+          }
+          return {
+            selected: counter.selected,
+            max: counter.max,
+            label: formatChoiceChosenCounter(counter.selected, counter.max),
+          }
+        })()
       : null
 
   return {
@@ -330,13 +362,18 @@ function buildSpellLevelSection(
     heading: spellLevelHeading(level),
     subhead:
       singleSetSupportingCopy?.instruction ??
-      formatChoiceCategorySubhead('spells', visibleChoiceSets, false, 'spell'),
+      formatChoiceCategorySubhead('spells', visibleChoiceSets, grantedRows.length > 0, 'spell'),
     identityLine: singleSetSupportingCopy?.identityLine ?? singleIdentityLine,
     aggregateCount,
     selectedRows,
-    grantedRows: [],
+    grantedRows,
     choiceBlocks,
-    emptyMessage: formatChoiceSectionEmptyMessage('spell', 'spells', false, 'spell'),
+    emptyMessage: formatChoiceSectionEmptyMessage(
+      'spell',
+      'spells',
+      grantedRows.length > 0,
+      'spell',
+    ),
     isOverSelected: choiceBlocks.some((block) => block.isOverSelected),
   }
 }
@@ -356,7 +393,6 @@ function buildDeferredPreparedSection(
     headingSourceCoverage: presentation.headingSourceCoverage,
     hasFixedGrantsInCategory: false,
     subheadStyle: 'spell',
-    filteredOptionCount: choiceSet.options.length,
   })
 
   return {
@@ -386,16 +422,17 @@ function buildSummaryRows(
   const pending = 'Pending ability scores'
 
   return [
-    { id: 'ability', label: 'Spellcasting ability', value: getAbilityLabel(profile.ability) },
     {
-      id: 'preparation',
-      label: 'Preparation',
-      value: profile.usesPreparedLoadout ? 'Prepared' : 'Known',
+      id: 'ability',
+      label: 'Spellcasting ability',
+      value: getAbilityLabel(profile.ability),
+      icon: 'spellcasting-ability',
     },
     {
       id: 'save-dc',
       label: 'Spell save DC',
       value: spellcasting?.saveDc !== undefined ? String(spellcasting.saveDc) : pending,
+      icon: 'spell-save-dc',
     },
     {
       id: 'attack',
@@ -406,6 +443,7 @@ function buildSummaryRows(
             ? `+${spellcasting.attackBonus}`
             : String(spellcasting.attackBonus)
           : pending,
+      icon: 'spell-attack',
     },
   ]
 }
@@ -421,6 +459,10 @@ function countSelectedAtLevel(
   }, 0)
 }
 
+function formatSpellLevelTabActivityLabel(selectedAtLevel: number): string {
+  return selectedAtLevel > 0 ? `${selectedAtLevel} selected` : '—'
+}
+
 function buildLevelTabs(
   maxLevel: number,
   acquisitionChoiceSets: readonly ChoiceSet[],
@@ -433,7 +475,7 @@ function buildLevelTabs(
     return {
       level,
       selectedAtLevel,
-      activityLabel: selectedAtLevel > 0 ? `${selectedAtLevel} selected` : '—',
+      activityLabel: formatSpellLevelTabActivityLabel(selectedAtLevel),
     }
   })
 }
@@ -469,9 +511,18 @@ export function resolveSpellStepModel({
   )
 
   const maxSelectableSpellLevel = profile.maxSelectableSpellLevel
-  const spellLevelSections = Array.from({ length: maxSelectableSpellLevel }, (_, index) =>
-    buildSpellLevelSection(index + 1, acquisitionChoiceSets, draft, profile, catalogIndex),
-  )
+  const spellLevelSections = Array.from({ length: maxSelectableSpellLevel }, (_, index) => {
+    const level = index + 1
+    const grantedRows = buildGrantedSpellRows(draft, catalogIndex, characterClass, level)
+    return buildSpellLevelSection(
+      level,
+      acquisitionChoiceSets,
+      draft,
+      profile,
+      catalogIndex,
+      grantedRows,
+    )
+  })
 
   const levelTabs = buildLevelTabs(
     maxSelectableSpellLevel,
