@@ -27,6 +27,7 @@ import { featuresFromFormValues } from './class-feature-form-fields'
 import type { ClassFormValues } from './class-form-fields'
 import { classCreateDefaultValues, proficienciesFromFormValues } from './class-form-values'
 import { SPELL_SELECTION_MODEL_OPTIONS } from './class-spell-selection-form.lib'
+import { spellcastingFeatureSummaryFromRows } from './class-spellcasting-lifecycle'
 import {
   buildClassDetailViewModel,
   type ClassDetailViewModel,
@@ -221,12 +222,10 @@ function spellcastingFacts(
       ? getAbilityCompactLabel(spellcasting.ability)
       : CONTENT_PREVIEW_NOT_SET,
   })
-  const grantingFeature = features.find((row) =>
-    row.grants?.some((grant) => grant.grantType === 'spellcasting'),
-  )
+  const grantingFeature = spellcastingFeatureSummaryFromRows(features ?? [])
   facts.push({
     label: CLASS_PREVIEW_FACT_LABELS.spellcastingLevel,
-    value: grantingFeature?.level != null ? String(grantingFeature.level) : CONTENT_PREVIEW_NOT_SET,
+    value: grantingFeature ? String(grantingFeature.level) : CONTENT_PREVIEW_NOT_SET,
   })
   facts.push({
     label: CLASS_PREVIEW_FACT_LABELS.slotProgression,

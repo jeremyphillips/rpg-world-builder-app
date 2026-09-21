@@ -1,10 +1,4 @@
-import {
-  type Ability,
-  type ClassBodyFeature,
-  type Spellcasting,
-  isClassSpellcastingGrantingFeature,
-  resolveClassSpellcastingFeature,
-} from '@rpg/contracts'
+import { type Ability, type Spellcasting, isClassSpellcastingGrantingFeature } from '@rpg/contracts'
 
 import type { ClassFormValues } from './class-form-fields'
 import {
@@ -133,10 +127,4 @@ export function spellcastingFeatureSummaryFromRows(
     level,
     index,
   }
-}
-
-export function resolveManagedSpellcastingGrantingFeature(
-  features: readonly ClassBodyFeature[],
-): ClassBodyFeature | undefined {
-  return resolveClassSpellcastingFeature({ features })
 }

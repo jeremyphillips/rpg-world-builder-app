@@ -16,6 +16,7 @@ import {
 } from '../lib/class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 import type { ClassFormValues } from '../lib/class-form-fields'
+import { CLASS_SPELLCASTING_REMOVE_CONFIRM } from '../lib/class-spellcasting-confirm-copy'
 import {
   isSpellcastingGrantingFeatureRow,
   removeSpellcastingFromFormValues,
@@ -164,10 +165,10 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
       <ConfirmDialog
         open={spellcastingRemoveOpen}
         onOpenChange={setSpellcastingRemoveOpen}
-        headline="Remove spellcasting?"
-        description="This will remove the Spellcasting feature and this class's spellcasting configuration, including spell progression, spell selection rules, recommendations, and related settings. This action will take effect when you save the class."
-        confirmLabel="Remove spellcasting"
-        confirmVariant="destructive"
+        headline={CLASS_SPELLCASTING_REMOVE_CONFIRM.headline}
+        description={CLASS_SPELLCASTING_REMOVE_CONFIRM.description}
+        confirmLabel={CLASS_SPELLCASTING_REMOVE_CONFIRM.confirmLabel}
+        confirmVariant={CLASS_SPELLCASTING_REMOVE_CONFIRM.confirmVariant}
         onConfirm={handleConfirmSpellcastingRemove}
       />
     </>

@@ -28,6 +28,7 @@ import { ClassSpellcastingProgressionField } from '../components/class-spellcast
 import { ClassSpellcastingRecommendationsField } from '../components/class-spellcasting-recommendations-field'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { ClassFormValues } from './class-form-fields'
+import { CLASS_SPELLCASTING_REMOVE_CONFIRM } from './class-spellcasting-confirm-copy'
 import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import {
@@ -142,10 +143,7 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
       label: 'Has spellcasting',
     },
     confirmBeforeClear: {
-      headline: 'Remove spellcasting?',
-      description:
-        "This will remove the Spellcasting feature and this class's spellcasting configuration, including spell progression, spell selection rules, recommendations, and related settings. This action will take effect when you save the class.",
-      confirmLabel: 'Remove spellcasting',
+      ...CLASS_SPELLCASTING_REMOVE_CONFIRM,
       shouldConfirm: (values) => {
         const features = values.features as ClassFormValues['features'] | undefined
         const hasGrantFeature = Array.isArray(features)

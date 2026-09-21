@@ -132,14 +132,3 @@ export function resolveRecommendedSpellIdsForChoiceSet(args: {
 
   return recommended
 }
-
-export function sortSpellPickerItemsRecommendedFirst<
-  T extends { state: { isRecommended: boolean } },
->(items: readonly T[]): T[] {
-  const hasRecommendations = items.some((item) => item.state.isRecommended)
-  if (!hasRecommendations) return [...items]
-  return [...items].sort((left, right) => {
-    if (left.state.isRecommended === right.state.isRecommended) return 0
-    return left.state.isRecommended ? -1 : 1
-  })
-}
