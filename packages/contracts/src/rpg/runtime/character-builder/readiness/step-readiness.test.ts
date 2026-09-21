@@ -192,10 +192,9 @@ describe('resolveBuilderStepReadiness', () => {
     it('marks inactive spellcasting notApplicable at the draft level', () => {
       const delayedCaster = {
         ...wizardClass,
-        spellcasting: {
-          ...wizardClass.spellcasting!,
-          level: 2,
-        },
+        features: wizardClass.features.map((feature) =>
+          feature.id === 'spellcasting' ? { ...feature, level: 2 } : feature,
+        ),
       }
       const context = {
         ...spellcastingTestContext,

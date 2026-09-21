@@ -29,6 +29,16 @@ const defaultSkillChoices = {
   },
 }
 
+function spellcastingGrantFeature(usesPactMagic = false) {
+  return {
+    kind: 'custom' as const,
+    id: usesPactMagic ? 'pact-magic' : 'spellcasting',
+    name: usesPactMagic ? 'Pact Magic' : 'Spellcasting',
+    level: 1,
+    grantGroups: [{ grants: [{ kind: 'spellcasting' as const }] }],
+  }
+}
+
 export const nonCasterClass = {
   ...storedFighter,
   id: `${RULESET}:fixture-fighter`,
@@ -51,9 +61,8 @@ export const wizardStored: ClassStored = {
     skills: { categories: [], items: [] },
   },
   characterCreation: defaultSkillChoices,
-  features: [],
+  features: [spellcastingGrantFeature()],
   spellcasting: {
-    level: 1,
     slotProgressionId: 'full-caster',
     ability: 'int',
     spellSelection: {
@@ -95,9 +104,8 @@ export const paladinStored: ClassStored = {
     skills: { categories: [], items: [] },
   },
   characterCreation: defaultSkillChoices,
-  features: [],
+  features: [spellcastingGrantFeature()],
   spellcasting: {
-    level: 1,
     slotProgressionId: 'half-caster',
     ability: 'cha',
     spellSelection: {
@@ -130,9 +138,8 @@ export const warlockStored: ClassStored = {
     skills: { categories: [], items: [] },
   },
   characterCreation: defaultSkillChoices,
-  features: [],
+  features: [spellcastingGrantFeature(true)],
   spellcasting: {
-    level: 1,
     slotProgressionId: 'pact-magic',
     ability: 'cha',
     spellSelection: {

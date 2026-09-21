@@ -1,5 +1,5 @@
 import type { CharacterClass } from '../../../../content/classes/class'
-import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting'
+import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting/class-spellcasting-ownership'
 import type { Equipment } from '../../../../content/equipment'
 import { getEquipmentSpellcastingGearKind } from '../../../../content/equipment/adventuring-gear-variant'
 import type { SpellcastingFocusGearKind } from '../../../../content/equipment/modifier'
@@ -233,8 +233,9 @@ function applySpellcastingFocusContributions(args: {
   if (focusKinds.length === 0) return
 
   const focusTier: EquipmentRecommendationTier = isSpellcastingActiveAtLevel(
-    spellcasting,
+    characterClass,
     classLevel,
+    { runtime: true },
   )
     ? 'essential'
     : 'strong'

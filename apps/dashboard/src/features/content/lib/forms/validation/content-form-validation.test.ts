@@ -77,6 +77,7 @@ const ORGANIZATION_SCHEMA_EXEMPT = ['sourcePresetId'] as const
 /** Cantrip capacity is authored in TableBuilder — not inline scalar form fields. */
 const CLASS_SCHEMA_EXEMPT = [
   /^spellcasting\.progression\b/,
+  /^spellcasting\.recommendations\b/,
   /^spellSelectionModel$/,
   /^spellSelectionChangePackage$/,
   /^spellbookAcquisition/,

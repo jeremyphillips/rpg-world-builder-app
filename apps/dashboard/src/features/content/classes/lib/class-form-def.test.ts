@@ -35,14 +35,13 @@ function publishReadyClassValues(overrides: Partial<ClassFormValues> = {}): Clas
 function expectBardSpellcastingRoundTrip(): void {
   const { characterClass, formValues, input } = roundTripFormInput('bard')
   const expected = characterClass.spellcasting!
-  const fromForm = formValues.spellcasting!
   const fromInput = input.spellcasting!
+  const spellcastingFeature = formValues.features.find((row) => row.id === 'spellcasting')
 
-  expect(fromForm.description).toContain('cast spells through your bardic arts')
-  expect(fromForm.level).toBe(1)
+  expect(spellcastingFeature?.description).toContain('cast spells through your bardic arts')
+  expect(spellcastingFeature?.level).toBe(1)
   expect(formValues.spellSelectionModel).toBe(expected.spellSelection?.model)
-  expect(fromInput.description).toContain('cast spells through your bardic arts')
-  expect(fromInput.level).toBe(1)
+  expect(fromInput.recommendations).toEqual(expected.recommendations)
   expect(fromInput.spellSelection?.model).toBe(expected.spellSelection?.model)
   expect(fromInput.ability).toBe(expected.ability)
 }
@@ -385,7 +384,7 @@ describe('classFormDef round-trips', () => {
     }
   })
 
-  it('bard: spellcasting description and cantrips round-trip through progressionTable', () => {
+  it('bard: spellcasting feature prose and recommendations round-trip', () => {
     expectBardSpellcastingRoundTrip()
   })
 

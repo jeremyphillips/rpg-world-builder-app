@@ -88,6 +88,12 @@ export interface FormEmbeddedMasterDetailEditorProps {
     rowKey: string
     index: number
   }) => readonly AvailabilityReason[]
+  /** Override availability dialog fields for a selected row. */
+  resolveAvailabilityFormItems?: (ctx: {
+    row: unknown
+    fieldId: string
+    namePrefix: string
+  }) => FormItem[] | undefined
   /** Mutually exclusive row access presentation and filtering. */
   access?: FormEmbeddedMasterDetailAccessConfig
   /** @deprecated Use `access={{ kind: 'availability', fieldName: 'available' }}`. */
@@ -115,6 +121,7 @@ function FormEmbeddedMasterDetailEditorBody({
   showDelete = true,
   leadingContent,
   resolveRowReasons,
+  resolveAvailabilityFormItems,
   access: accessProp,
   availability,
 }: FormEmbeddedMasterDetailEditorBodyProps) {
@@ -266,8 +273,16 @@ function FormEmbeddedMasterDetailEditorBody({
 
   const availabilityFormItems = useMemo((): FormItem[] | undefined => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined
+    const namePrefix = `${fieldName}.${selectedRow.formIndex}`
+    const row = watched?.[selectedRow.formIndex]
+    const custom = resolveAvailabilityFormItems?.({
+      row,
+      fieldId: selectedRow.fieldId,
+      namePrefix,
+    })
+    if (custom) return custom
     return buildMasterDetailAvailabilityFormFields(selectedRow.fieldId)
-  }, [access, selectedRow])
+  }, [access, fieldName, resolveAvailabilityFormItems, selectedRow, watched])
 
   const availabilityNamePrefix = useMemo(() => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined

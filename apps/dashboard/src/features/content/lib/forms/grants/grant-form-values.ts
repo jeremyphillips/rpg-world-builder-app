@@ -18,7 +18,10 @@ import {
   GRANT_DEFAULT_UNLOCK_LEVEL,
 } from './grant-form-schema'
 import type { EquipmentGrantItemForm } from './equipment/equipment-grant-form-fields'
-import { equipmentGrantFromFormRow, equipmentGrantToFormRow } from './equipment/equipment-grant-form-values'
+import {
+  equipmentGrantFromFormRow,
+  equipmentGrantToFormRow,
+} from './equipment/equipment-grant-form-values'
 import type {
   ArmorTrainingItemForm,
   SkillProficiencyItemForm,
@@ -177,6 +180,7 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
       spellIds: grant.spellIds,
     }),
   languageChoice: () => [],
+  spellcasting: (_grant, unlockLevel) => grantRows('spellcasting', unlockLevel, {}),
 } satisfies { [K in ContentGrant['kind']]: ContentGrantRowsConverter<K> }
 
 /**
@@ -327,6 +331,10 @@ function spellsToGrant(row: GrantRowForm): ContentGrant | undefined {
 
 type GrantRowContentConverter = (row: GrantRowForm) => ContentGrant | undefined
 
+function spellcastingToGrant(_row: GrantRowForm): ContentGrant {
+  return { kind: 'spellcasting' }
+}
+
 const FORM_ROW_TO_CONTENT_GRANT: Partial<Record<GrantRowType, GrantRowContentConverter>> = {
   senses: sensesToGrant,
   resistances: resistancesToGrant,
@@ -340,6 +348,7 @@ const FORM_ROW_TO_CONTENT_GRANT: Partial<Record<GrantRowType, GrantRowContentCon
   featChoice: featChoiceToGrant,
   equipment: equipmentToGrant,
   spells: spellsToGrant,
+  spellcasting: spellcastingToGrant,
 }
 
 /**

@@ -7,6 +7,7 @@ import {
 } from './spell-picker-drawer.fixtures'
 import {
   collectSpellPickerMarkers,
+  filterAndSortSpellPickerItems,
   formatSpellPickerDrawerTitle,
   formatSpellPickerSelectionCountText,
   formatSpellPickerSelectionMetadata,
@@ -26,9 +27,11 @@ import {
   SPELL_PICKER_MODE_PREPARED_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
+  SPELL_PICKER_SORT_BEST_MATCH,
   SPELL_PICKER_SORT_LEVEL_ASC,
   SPELL_PICKER_SORT_NAME_ASC,
 } from './spell-picker-drawer.types'
+import { spellPickerOpenItemsFixture } from './spell-picker-drawer.fixtures'
 
 describe('spell-picker-drawer.lib', () => {
   it('omits the concentration marker when casting summary already includes concentration phrasing', () => {
@@ -63,6 +66,24 @@ describe('spell-picker-drawer.lib', () => {
     expect(resolveSpellPickerEmptyStateMessage('selection-full')).toBe(
       SPELL_PICKER_SELECTION_FULL_MESSAGE,
     )
+  })
+
+  it('sorts best_match by recommendation instead of name only', () => {
+    const recommended = {
+      ...spellPickerOpenItemsFixture[0]!,
+      state: {
+        ...spellPickerOpenItemsFixture[0]!.state,
+        isRecommended: true,
+      },
+    }
+    const peer = spellPickerOpenItemsFixture[1]!
+
+    expect(
+      filterAndSortSpellPickerItems([peer, recommended], {
+        searchQuery: '',
+        sortMode: SPELL_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.spell.name),
+    ).toEqual(['Mage Hand', 'Detect Magic'])
   })
 
   it('resets invalid sort modes after mode changes', () => {

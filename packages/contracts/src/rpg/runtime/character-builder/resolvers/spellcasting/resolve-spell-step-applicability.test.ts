@@ -37,10 +37,9 @@ describe('resolveSpellStepApplicability', () => {
   it('returns notApplicable when spellcasting unlocks above the draft level', () => {
     const delayedCaster = {
       ...wizardClass,
-      spellcasting: {
-        ...wizardClass.spellcasting!,
-        level: 2,
-      },
+      features: wizardClass.features.map((feature) =>
+        feature.id === 'spellcasting' ? { ...feature, level: 2 } : feature,
+      ),
     }
     const context = {
       ...spellcastingTestContext,

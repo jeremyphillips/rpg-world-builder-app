@@ -55,6 +55,7 @@ export function CharacterBuilderStepContent({
     case 'identity':
       return (
         <IdentityStep
+          context={context}
           draft={draft}
           validationIssues={validationIssues}
           onDraftChange={onDraftChange}

@@ -7,7 +7,6 @@ import {
   defaultSubclassingRules,
   MAX_CHARACTER_LEVEL,
   isSpellcastingActiveAtLevel,
-  spellcastingUnlockLevel,
   collectFeatureProgressionColumns,
   formatProgressionTableValue,
   resolveProgressionTableColumnValue,
@@ -16,8 +15,6 @@ import {
   resolveCompiledChoiceProgressionQuotaAtLevel,
   findCompiledChoiceProgressionBySuffix,
   resolveDisplaySlotRowAtLevel,
-  spellcastingFeatureLabelFromClass,
-  isPactClassSpellcasting,
   type ResolvedCampaignRules,
   type ResolvedClassSpellcasting,
   type ResolvedClassSpellcastingDisplayColumn,
@@ -40,24 +37,14 @@ type ProgressionRow = {
   slots?: readonly number[]
 }
 
-function isLegacySpellcastingFeature(
-  feature: CharacterClass['features'][number],
-  usesPactMagic: boolean,
-): boolean {
-  if (feature.id === 'spellcasting') return true
-  return feature.id === 'pact-magic' && usesPactMagic
-}
-
 function featuresAtLevel(
   features: CharacterClass['features'],
-  usesPactMagic: boolean,
   level: number,
   subclassingEnabled: boolean,
 ): string[] {
   return features
     .filter((feature) => {
       if (feature.level !== level) return false
-      if (isLegacySpellcastingFeature(feature, usesPactMagic)) return false
       if (!subclassingEnabled && isSubclassChoiceFeatureRow(feature)) return false
       return true
     })
@@ -98,11 +85,11 @@ function resolveChoiceColumnValues(
 
 function resolveRowChoiceColumns(input: {
   level: number
-  spellcasting: CharacterClass['spellcasting']
+  characterClass: CharacterClass
   resolved: ResolvedClassSpellcasting | null
   displayChoiceColumns: readonly ResolvedClassSpellcastingDisplayColumn[]
 }): Record<string, number | undefined> {
-  if (!isSpellcastingActiveAtLevel(input.spellcasting, input.level) || !input.resolved) {
+  if (!isSpellcastingActiveAtLevel(input.characterClass, input.level) || !input.resolved) {
     return {}
   }
 
@@ -117,17 +104,9 @@ function buildRow(
   progressionColumns: readonly ProgressionColumn[],
   displayChoiceColumns: readonly ResolvedClassSpellcastingDisplayColumn[],
 ): ProgressionRow {
-  const { features, spellcasting } = characterClass
-  const castingActive = isSpellcastingActiveAtLevel(spellcasting, level)
-  const usesPactMagic = resolved ? isPactClassSpellcasting(resolved) : false
+  const castingActive = isSpellcastingActiveAtLevel(characterClass, level)
 
-  const featureNames = featuresAtLevel(features, usesPactMagic, level, subclassingEnabled)
-
-  const unlockLevel = spellcastingUnlockLevel(spellcasting)
-  if (resolved && spellcasting && unlockLevel === level) {
-    const label = spellcastingFeatureLabelFromClass(resolved)
-    if (!featureNames.includes(label)) featureNames.push(label)
-  }
+  const featureNames = featuresAtLevel(characterClass.features, level, subclassingEnabled)
 
   return {
     level,
@@ -136,7 +115,7 @@ function buildRow(
     progressionValues: buildProgressionValueRow(progressionColumns, level),
     choiceColumns: resolveRowChoiceColumns({
       level,
-      spellcasting,
+      characterClass,
       resolved,
       displayChoiceColumns,
     }),

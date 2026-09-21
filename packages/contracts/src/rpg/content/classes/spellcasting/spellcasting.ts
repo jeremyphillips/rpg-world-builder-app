@@ -1,7 +1,6 @@
 import { z } from 'zod'
 
 import { abilitySchema } from '../../../vocab/ability'
-import { absoluteLevelSchema } from '../../../primitives/level'
 import {
   spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
@@ -12,13 +11,13 @@ import {
   classSpellcastingProgressionDraftSchema,
   classSpellcastingProgressionSchema,
 } from './class-spellcasting-progression'
+import { spellRecommendationSchema } from './spell-recommendation'
 import { refinePublishedSpellcasting } from './spellcasting-validation'
 
 // ---------------------------------------------------------------------------
 // Spellcasting — class-owned slot reference, selection rules, and progression.
+// Activation level lives on the managed Spellcasting / Pact Magic feature grant.
 // ---------------------------------------------------------------------------
-
-export const DEFAULT_SPELLCASTING_LEVEL = 1 as const
 
 /** Stable progression id for the class-owned cantrip ChoiceSet. */
 export const CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID = 'cantrips' as const
@@ -42,10 +41,6 @@ export const spellcastingSchema = z
     spellSelection: classSpellSelectionSchema.optional(),
     /** Independent sparse capacity curves (cantrips, repertoire, prepared spells). */
     progression: classSpellcastingProgressionSchema.optional(),
-    /** First class level at which this class's spellcasting block is active. Defaults to 1. */
-    level: absoluteLevelSchema.default(DEFAULT_SPELLCASTING_LEVEL),
-    /** SRD rules prose for the class's spellcasting feature (body HTML only). */
-    description: z.string().optional(),
     ability: abilitySchema,
     /**
      * Class-critical spellcasting gear (e.g. Wizard spellbook). Drives essential
@@ -60,6 +55,8 @@ export const spellcastingSchema = z
     focusKinds: z.array(spellcastingFocusGearKindSchema).min(1).optional(),
     /** Strong-tier spellcasting gear suggestions beyond required gear and foci. */
     recommendedGear: z.array(spellcastingGearKindSchema).min(1).optional(),
+    /** Advisory starting spell suggestions keyed by semantic target, not selection model. */
+    recommendations: z.array(spellRecommendationSchema).optional(),
   })
   .superRefine((spellcasting, ctx) => {
     refinePublishedSpellcasting(spellcasting, ctx)
@@ -72,27 +69,11 @@ export const spellcastingDraftSchema = z.object({
   slotProgressionId: z.string().min(1),
   spellSelection: classSpellSelectionSchema.optional(),
   progression: classSpellcastingProgressionDraftSchema.optional(),
-  level: absoluteLevelSchema.default(DEFAULT_SPELLCASTING_LEVEL),
-  description: z.string().optional(),
   ability: abilitySchema,
   requiredGear: z.array(spellcastingGearKindSchema).min(1).optional(),
   focusKinds: z.array(spellcastingFocusGearKindSchema).min(1).optional(),
   recommendedGear: z.array(spellcastingGearKindSchema).min(1).optional(),
+  recommendations: z.array(spellRecommendationSchema).optional(),
 })
 
 export type SpellcastingDraft = z.infer<typeof spellcastingDraftSchema>
-
-/** Class level at which spellcasting unlocks; undefined when the class is not a caster. */
-export function spellcastingUnlockLevel(
-  spellcasting: Spellcasting | undefined,
-): number | undefined {
-  return spellcasting?.level
-}
-
-export function isSpellcastingActiveAtLevel(
-  spellcasting: Spellcasting | undefined,
-  classLevel: number,
-): boolean {
-  const unlock = spellcastingUnlockLevel(spellcasting)
-  return unlock !== undefined && classLevel >= unlock
-}

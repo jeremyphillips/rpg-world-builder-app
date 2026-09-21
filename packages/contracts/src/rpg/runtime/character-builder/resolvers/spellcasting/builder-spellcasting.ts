@@ -1,8 +1,6 @@
 import type { CharacterClass } from '../../../../content/classes/class'
-import {
-  isSpellcastingActiveAtLevel,
-  type Spellcasting,
-} from '../../../../content/classes/spellcasting'
+import type { Spellcasting } from '../../../../content/classes/spellcasting'
+import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting/class-spellcasting-ownership'
 import { resolveClassCantripCount } from '../../../creature/spellcasting'
 import type { Ability } from '../../../../vocab/ability'
 import { CLASS_SPELLCASTING_CHOICE_SUFFIXES } from '../../../../content/classes/spellcasting'
@@ -45,7 +43,11 @@ function buildProfile(
   const spellcasting = characterClass.spellcasting!
   const resolved = resolveClassSpellcasting(characterClass, context.spellcastingProgression)!
 
-  const cantripsKnown = resolveClassCantripCount({ spellcasting, classLevel })
+  const cantripsKnown = resolveClassCantripCount({
+    source: characterClass,
+    classLevel,
+    runtime: true,
+  })
   const spellsAvailable = resolveSpellsAvailableFromClass(resolved, classLevel)
   const usesPreparedLoadout = Boolean(
     findCompiledChoiceProgressionBySuffix(
@@ -85,7 +87,7 @@ export function resolveSpellcastingProfile(
   if (!characterClass?.spellcasting) return null
 
   const classLevel = draft.class.level
-  if (!isSpellcastingActiveAtLevel(characterClass.spellcasting, classLevel)) return null
+  if (!isSpellcastingActiveAtLevel(characterClass, classLevel, { runtime: true })) return null
 
   if (!resolveClassSpellcasting(characterClass, context.spellcastingProgression)) {
     return null

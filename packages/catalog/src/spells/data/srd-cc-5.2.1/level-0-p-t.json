@@ -513,5 +513,56 @@
         }
       ]
     }
+  },
+  {
+    "rulesetId": "srd-cc-5.2.1",
+    "source": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "id": "srd-cc-5.2.1:vicious-mockery",
+    "slug": "vicious-mockery",
+    "name": "Vicious Mockery",
+    "description": "<p>You unleash a string of insults laced with subtle enchantments at one creature you can see or hear within range. The target must succeed on a Wisdom saving throw or take 1d6 Psychic damage and have Disadvantage on the next attack roll it makes before the end of its next turn.</p>",
+    "school": "enchantment",
+    "level": 0,
+    "classIds": ["bard"],
+    "tags": {
+      "damageTypes": ["psychic"],
+      "roles": ["damage", "debuff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true
+    },
+    "cantripScaling": "<p>The damage increases by 1d6 when you reach levels 5 (2d6), 11 (3d6), and 17 (4d6).</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "stat-modifier"
+      },
+      "gaps": [
+        {
+          "code": "progression-schema-missing",
+          "note": "Cantrip scaling stays prose until structured progression is authored"
+        }
+      ]
+    }
   }
 ]

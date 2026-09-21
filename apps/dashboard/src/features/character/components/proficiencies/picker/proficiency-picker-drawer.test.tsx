@@ -156,6 +156,34 @@ describe('ProficiencyPickerDrawer', () => {
     expect(screen.queryByRole('button', { name: /^Expand / })).not.toBeInTheDocument()
   })
 
+  it('shows a Recommended badge for recommended language rows', () => {
+    const recommendedItem = {
+      ...proficiencyPickerLanguageItemsFixture[0]!,
+      state: {
+        ...proficiencyPickerLanguageItemsFixture[0]!.state,
+        isRecommended: true,
+      },
+    }
+
+    render(
+      <ProficiencyPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        choiceSet={proficiencyPickerLanguageChoiceSetFixture}
+        selectedIds={[]}
+        items={[recommendedItem, ...proficiencyPickerLanguageItemsFixture.slice(1)]}
+        catalogIndex={proficiencyPickerLanguageCatalogIndexFixture}
+        onSelectOption={vi.fn()}
+        onRemoveOption={vi.fn()}
+      />,
+    )
+
+    const recommendedRow = screen
+      .getByText(recommendedItem.label)
+      .closest('[data-picker-item-key]') as HTMLElement
+    expect(within(recommendedRow).getByText('Recommended')).toBeInTheDocument()
+  })
+
   it('shows distinct empty states for no options, no search results, and selection full', async () => {
     const user = userEvent.setup()
 

@@ -103,7 +103,17 @@ function TextFieldTrailingActionControl({
             type="button"
             onClick={() => void trailingAction.onAction()}
           >
-            {trailingAction.label}
+            <span className="inline-flex items-center gap-1.5">
+              {trailingAction.icon ? (
+                <span
+                  className="inline-flex shrink-0 [&_svg]:size-icon-glyph-lg"
+                  aria-hidden="true"
+                >
+                  {trailingAction.icon}
+                </span>
+              ) : null}
+              {trailingAction.label}
+            </span>
           </Button>
         </InputActionGroup.Action>
       </InputActionGroup>

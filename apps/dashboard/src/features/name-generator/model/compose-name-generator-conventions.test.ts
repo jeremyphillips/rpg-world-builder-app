@@ -7,8 +7,8 @@ import { deriveFilterOptions } from './derive-filter-options'
 import {
   buildCultureFilterContexts,
   composeNameGeneratorConventions,
-  toSpeciesCultureInput,
 } from './compose-name-generator-conventions'
+import { toSpeciesCultureInput } from '@rpg/name-generator-integrations'
 import type { NameGeneratorFilters } from './name-generator-filters'
 
 const ELF_SPECIES = makeSpecies({

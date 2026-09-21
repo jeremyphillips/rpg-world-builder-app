@@ -24,4 +24,13 @@ export type { SpeciesCultureInput } from './resolve-campaign-conventions'
 export { resolveNamingConvention } from './resolve-naming-convention'
 export { resolveSpeciesPersonNaming } from './resolve-species-person-naming'
 export type { SpeciesPersonNamingResolution } from './resolve-species-person-naming'
+export {
+  resolveSpeciesPersonNameGenerationSupport,
+  type SpeciesPersonNameGenerationSupport,
+} from './resolve-species-person-name-generation-support'
+export {
+  generateSpeciesPersonName,
+  type SpeciesPersonNameGenerationResult,
+} from './generate-species-person-name'
+export { toSpeciesCultureInput } from './to-species-culture-input'
 export { resolveStandaloneConventions } from './resolve-standalone-conventions'

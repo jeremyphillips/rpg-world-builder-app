@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Wand2 } from 'lucide-react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TextField } from './text-field'
@@ -19,6 +20,23 @@ describe('TextField trailingAction', () => {
 
     expect(screen.getByRole('group')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Generate' })).toBeInTheDocument()
+  })
+
+  it('renders an optional trailing action icon before the label', () => {
+    render(
+      <TextField
+        id="npc-name"
+        label="Name"
+        trailingAction={{
+          label: 'Generate',
+          icon: <Wand2 aria-hidden data-testid="generate-icon" />,
+          onAction: vi.fn(),
+        }}
+      />,
+    )
+
+    const button = screen.getByRole('button', { name: 'Generate' })
+    expect(button.querySelector('[data-testid="generate-icon"]')).toBeInTheDocument()
   })
 
   it('fires the trailing action callback', async () => {

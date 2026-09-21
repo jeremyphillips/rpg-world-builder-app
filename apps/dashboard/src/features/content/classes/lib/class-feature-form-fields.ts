@@ -31,7 +31,9 @@ import {
 } from '../../lib/forms/grants/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { ClassFeatureManagedSpellcastingGrantField } from '../components/class-feature-managed-spellcasting-grant-field'
 import { FeatureTablesField } from '../components/features/feature-tables-field'
+import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 
@@ -164,9 +166,35 @@ function sharedFeatureItemFields(
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
     },
+    {
+      kind: 'slot',
+      name: 'managedSpellcastingGrant',
+      visibility: {
+        dependsOn: ['grants'],
+        visibleWhen: (watched) =>
+          isSpellcastingGrantingFeatureRow({
+            grants: watched.grants as FeatureRowForm['grants'],
+          }),
+      },
+      render: () => createElement(ClassFeatureManagedSpellcastingGrantField),
+    },
     ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx, {
       inheritUnlockFromParentField: 'level',
-    }),
+    }).map(
+      (field): FormItem =>
+        'kind' in field && field.kind === 'array'
+          ? {
+              ...field,
+              visibility: {
+                dependsOn: ['grants'],
+                visibleWhen: (watched: Record<string, unknown>) =>
+                  !isSpellcastingGrantingFeatureRow({
+                    grants: watched.grants as FeatureRowForm['grants'],
+                  }),
+              },
+            }
+          : field,
+    ),
   ]
 }
 

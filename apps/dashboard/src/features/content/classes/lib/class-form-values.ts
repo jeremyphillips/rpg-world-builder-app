@@ -226,14 +226,13 @@ export function spellcastingToFormValues(
   }
 
   return {
-    level: spellcasting.level,
-    description: spellcasting.description,
     slotProgressionId: spellcasting.slotProgressionId,
     progression: spellcasting.progression,
     ability: spellcasting.ability,
     requiredGear: spellcasting.requiredGear,
     focusKinds: spellcasting.focusKinds,
     recommendedGear: spellcasting.recommendedGear,
+    recommendations: spellcasting.recommendations,
   }
 }
 
@@ -333,8 +332,8 @@ function applyOptionalSpellcastingFields(
   if (Object.keys(progression).length > 0) {
     result.progression = progression
   }
-  if (spellcasting.description?.trim()) {
-    result.description = spellcasting.description.trim()
+  if (spellcasting.recommendations?.length) {
+    result.recommendations = spellcasting.recommendations
   }
   if (spellcasting.requiredGear?.length) {
     result.requiredGear = spellcasting.requiredGear
@@ -362,7 +361,6 @@ export function spellcastingFromFormValues(values: ClassFormValues): Spellcastin
   })
 
   const result: Spellcasting = {
-    level: spellcasting.level ?? 1,
     slotProgressionId: spellcasting.slotProgressionId!,
     ability: spellcasting.ability!,
     ...(spellSelection ? { spellSelection } : {}),

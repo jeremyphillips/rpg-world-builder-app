@@ -125,8 +125,16 @@ describe('builder-preview-projection.lib', () => {
           skills: { choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }] },
         },
       },
+      features: [
+        {
+          kind: 'custom',
+          id: 'spellcasting',
+          name: 'Spellcasting',
+          level: 1,
+          grantGroups: [{ grants: [{ kind: 'spellcasting' }] }],
+        },
+      ],
       spellcasting: {
-        level: 1,
         slotProgressionId: 'full-caster',
         ability: 'int',
         spellSelection: {

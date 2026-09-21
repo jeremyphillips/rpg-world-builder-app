@@ -151,6 +151,21 @@ export function ProficiencyPickerDrawer({
       renderEntityRow={createCatalogEntityRowRenderer({
         buildEntity: (item) => {
           const disabledNote = getProficiencyPickerDisabledNote(item)
+          const status = [
+            ...(item.state.isRecommended
+              ? [
+                  {
+                    kind: 'badge' as const,
+                    label: 'Recommended',
+                    appearance: 'outline' as const,
+                    tone: 'info' as const,
+                  },
+                ]
+              : []),
+            ...(disabledNote
+              ? [{ kind: 'text' as const, label: disabledNote, variant: 'muted' as const }]
+              : []),
+          ]
 
           return {
             heading: item.label,
@@ -159,9 +174,7 @@ export function ProficiencyPickerDrawer({
                 lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ) : undefined,
-            status: disabledNote
-              ? [{ kind: 'text', label: disabledNote, variant: 'muted' }]
-              : undefined,
+            status: status.length > 0 ? status : undefined,
           }
         },
         buildTrailing: (item) => ({

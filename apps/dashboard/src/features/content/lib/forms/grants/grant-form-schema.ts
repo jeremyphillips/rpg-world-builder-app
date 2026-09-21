@@ -60,8 +60,15 @@ const BASE_GRANT_TYPES = [
 /** Grant types exposed in species traits and class-feature grant pickers. */
 export const GRANT_TYPES = [...BASE_GRANT_TYPES, 'spells', 'featChoice'] as const
 
+/** Managed class spellcasting activation — not in Add Grant menus. */
+export const MANAGED_SPELLCASTING_GRANT_TYPE = 'spellcasting' as const
+
 /** All grant row discriminators, including types not yet wired into consumer forms. */
-export const GRANT_ROW_TYPES = [...GRANT_TYPES, 'equipment'] as const
+export const GRANT_ROW_TYPES = [
+  ...GRANT_TYPES,
+  'equipment',
+  MANAGED_SPELLCASTING_GRANT_TYPE,
+] as const
 
 type BaseGrantType = (typeof BASE_GRANT_TYPES)[number]
 export type GrantType = (typeof GRANT_TYPES)[number]
@@ -88,6 +95,7 @@ export const GRANT_TYPE_LABELS: Record<GrantType, string> = {
 export const GRANT_ROW_TYPE_LABELS: Record<GrantRowType, string> = {
   ...GRANT_TYPE_LABELS,
   equipment: getContentTypeTerm('equipment').label,
+  spellcasting: 'Spellcasting',
 }
 
 /** Label shown in the "Granted at" select when the row has no explicit unlock level. */

@@ -14,8 +14,8 @@ import {
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 
+import { useSpeciesNameTrailingAction } from '../../../hooks/use-species-name-trailing-action'
 import { useCreateNpc } from '../../hooks/use-create-npc'
-import { useQuickNpcNameTrailingAction } from '../../hooks/use-quick-npc-name-trailing-action'
 import { isQuickNpcSetupStillValid } from '../../lib/quick-npc/quick-npc-authoring-validation.lib'
 import { buildQuickNpcAuthoringCreateInput } from '../../lib/quick-npc/quick-npc-authoring-submit.lib'
 import { formatQuickNpcCreationError } from '../../lib/quick-npc/quick-npc-create'
@@ -35,10 +35,9 @@ import {
   QUICK_NPC_SETUP_SUMMARY_EYEBROW,
   resolveQuickNpcSetupSummaryRows,
 } from '../../lib/quick-npc/quick-npc-create-modal-setup.lib'
-import {
-  QUICK_NPC_GENERATE_NAME_LABEL,
-  resolveQuickNpcNameGenerationSupport,
-} from '../../lib/quick-npc/quick-npc-name-generation'
+import { resolveCharacterSpeciesNameGenerationSupport } from '../../../lib/naming/character-species-name-generation.lib'
+import { generateNameActionIcon } from '../../../lib/naming/species-name-generation-action-icon'
+import { GENERATE_NAME_ACTION_LABEL } from '../../../lib/naming/species-name-generation-labels'
 import { buildQuickNpcRequirementOptionSets } from '../../lib/quick-npc/quick-npc-requirement-options.lib'
 import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields'
 import {
@@ -76,7 +75,7 @@ function buildQuickNpcAuthoringTabs(args: {
     context: args.buildContext,
   })
   const hasRequirements = optionSets.weapons.length > 0 || optionSets.spells.length > 0
-  const generationSupport = resolveQuickNpcNameGenerationSupport({
+  const generationSupport = resolveCharacterSpeciesNameGenerationSupport({
     speciesId: args.setup.speciesId,
     context: args.buildContext,
   })
@@ -84,7 +83,8 @@ function buildQuickNpcAuthoringTabs(args: {
   const nameTrailingAction =
     args.nameTrailingAction ??
     ({
-      label: QUICK_NPC_GENERATE_NAME_LABEL,
+      label: GENERATE_NAME_ACTION_LABEL,
+      icon: generateNameActionIcon,
       onAction: () => {},
       disabled: !args.setup.speciesId || !generationSupport.enabled,
     } satisfies TrailingFieldActionConfig)
@@ -121,7 +121,7 @@ function QuickNpcAuthoringTabsSync({
   configuredCount: number
   onTabsChange: (tabs: TabbedFormTab[]) => void
 }) {
-  const { trailingAction, nameHint } = useQuickNpcNameTrailingAction({
+  const { trailingAction, nameHint } = useSpeciesNameTrailingAction({
     speciesId: setup.speciesId,
     buildContext,
     form,

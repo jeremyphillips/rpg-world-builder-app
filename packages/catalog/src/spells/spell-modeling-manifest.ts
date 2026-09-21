@@ -224,6 +224,14 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
   bless: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'stat-modifier' }, [
     gap('dynamic-target-count', 'Slot +1 target per level above 1'),
   ]),
+  'charm-person': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'condition' }, [
+    gap('dynamic-target-count', 'Slot +1 target per level above 1'),
+    gap(
+      'conditional-effect-model-missing',
+      'Advantage when fighting the target and post-charm awareness stay prose',
+    ),
+  ]),
+  'color-spray': blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'condition' }),
   contingency: blockedProseOnly(
     {
       code: 'effect-schema-missing',
@@ -265,6 +273,10 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('multi-mode-choice', 'Point sphere vs object emanation stays prose'),
     gap('object-state-awareness', 'Object not worn or carried stays prose'),
     gap('conditional-effect-model-missing', 'Dispel lower-level light overlap stays prose'),
+  ]),
+  'dissonant-whispers': blockedProseOnly({ code: 'effect-schema-missing' }, [
+    gap('reaction-trigger', 'Forced reaction movement on failed save stays prose'),
+    gap('progression-schema-missing', 'Slot +1d6 damage scaling stays prose'),
   ]),
   'death-ward': blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap(
@@ -319,6 +331,10 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     code: 'effect-schema-missing',
     capabilityId: 'persistent-zone',
   }),
+  'healing-word': blockedProseOnly({ code: 'effect-schema-missing' }, [
+    gap('modifier-model-missing', 'Spellcasting ability modifier on healing stays prose'),
+    gap('progression-schema-missing', 'Slot +2d4 healing scaling stays prose'),
+  ]),
   'glyph-of-warding': blockedProseOnly(
     { code: 'effect-schema-missing', capabilityId: 'persistent-zone' },
     [
@@ -603,6 +619,15 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('summoning-model-missing', 'Object→creature branch creates friendly creature'),
     gap('object-state-awareness', 'Object must be nonmagical and not worn or carried'),
   ]),
+  'vicious-mockery': blockedProseOnly(
+    { code: 'effect-schema-missing', capabilityId: 'stat-modifier' },
+    [
+      gap(
+        'progression-schema-missing',
+        'Cantrip scaling stays prose until structured progression is authored',
+      ),
+    ],
+  ),
   'true-strike': blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap('choice-model-missing', 'Radiant vs weapon damage type choice stays prose'),
     gap('object-state-awareness', 'Proficient weapon material component stays prose'),

@@ -27,6 +27,7 @@ import { featuresFromFormValues } from './class-feature-form-fields'
 import type { ClassFormValues } from './class-form-fields'
 import { classCreateDefaultValues, proficienciesFromFormValues } from './class-form-values'
 import { SPELL_SELECTION_MODEL_OPTIONS } from './class-spell-selection-form.lib'
+import { spellcastingFeatureSummaryFromRows } from './class-spellcasting-lifecycle'
 import {
   buildClassDetailViewModel,
   type ClassDetailViewModel,
@@ -210,6 +211,7 @@ function spellSelectionModelLabel(
 function spellcastingFacts(
   spellcasting: ClassFormValues['spellcasting'] | undefined,
   spellSelectionModel: ClassFormValues['spellSelectionModel'] | undefined,
+  features: ClassFormValues['features'],
 ): PreviewRailFact[] {
   const facts: PreviewRailFact[] = []
   if (!spellcasting) return facts
@@ -220,9 +222,10 @@ function spellcastingFacts(
       ? getAbilityCompactLabel(spellcasting.ability)
       : CONTENT_PREVIEW_NOT_SET,
   })
+  const grantingFeature = spellcastingFeatureSummaryFromRows(features ?? [])
   facts.push({
     label: CLASS_PREVIEW_FACT_LABELS.spellcastingLevel,
-    value: spellcasting.level != null ? String(spellcasting.level) : CONTENT_PREVIEW_NOT_SET,
+    value: grantingFeature ? String(grantingFeature.level) : CONTENT_PREVIEW_NOT_SET,
   })
   facts.push({
     label: CLASS_PREVIEW_FACT_LABELS.slotProgression,
@@ -253,7 +256,7 @@ function buildSpellcastingSection(values: ClassFormValues): ContentPreviewSectio
       spellcasting?.slotProgressionId && values.spellSelectionModel
         ? `${spellcasting.slotProgressionId} · ${selectionLabel}`
         : CONTENT_PREVIEW_STATUS_READY,
-    facts: spellcastingFacts(spellcasting, values.spellSelectionModel),
+    facts: spellcastingFacts(spellcasting, values.spellSelectionModel, values.features),
   }
 }
 

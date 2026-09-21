@@ -267,6 +267,11 @@ const equipmentContentGrantSchema = z.object({
   grant: equipmentGrantSchema,
 })
 
+/** Class spellcasting activation — payload-less; authored only on the managed Spellcasting feature. */
+const spellcastingContentGrantSchema = z.object({
+  kind: z.literal('spellcasting'),
+})
+
 /**
  * Spells granted by a trait or feature at a given unlock level.
  *
@@ -349,6 +354,7 @@ export const contentGrantSchema = z.discriminatedUnion('kind', [
   featChoiceContentGrantSchema,
   equipmentContentGrantSchema,
   spellsContentGrantSchema,
+  spellcastingContentGrantSchema,
 ])
 
 export type ContentGrant = z.infer<typeof contentGrantSchema>

@@ -1,4 +1,8 @@
-import { isSpellcastingActiveAtLevel, type Spellcasting } from '../../content/classes/spellcasting'
+import {
+  isSpellcastingActiveAtLevel,
+  type ClassSpellcastingActivationSource,
+  type Spellcasting,
+} from '../../content/classes/spellcasting'
 import type { ResolvedSpellcastingProgressionConfig } from '../../campaign/rules/spellcasting-progression'
 import { resolveProgressionValueAtLevel } from '../../campaign/rules/spellcasting-progression/lookup'
 import {
@@ -20,12 +24,13 @@ export type CreatureSpellcastingFacts = {
 
 /** Builder-facing cantrip quota from the class spellcasting record (0 when absent or inactive). */
 export function resolveClassCantripCount(input: {
-  spellcasting: Spellcasting | undefined
+  source: ClassSpellcastingActivationSource
   classLevel: number
+  runtime?: boolean
 }): number {
-  const { spellcasting, classLevel } = input
-  const cantrips = spellcasting?.progression?.cantrips
-  if (!cantrips || !isSpellcastingActiveAtLevel(spellcasting, classLevel)) {
+  const { source, classLevel, runtime } = input
+  const cantrips = source.spellcasting?.progression?.cantrips
+  if (!cantrips || !isSpellcastingActiveAtLevel(source, classLevel, { runtime })) {
     return 0
   }
 
@@ -37,8 +42,11 @@ export function resolveClassCantripCount(input: {
   }).count
 }
 
-export function cantripsKnownAtLevel(spellcasting: Spellcasting, classLevel: number): number {
-  return resolveClassCantripCount({ spellcasting, classLevel })
+export function cantripsKnownAtLevel(
+  source: ClassSpellcastingActivationSource,
+  classLevel: number,
+): number {
+  return resolveClassCantripCount({ source, classLevel })
 }
 
 export function spellsAvailableAtLevel(
@@ -64,12 +72,17 @@ export function maxSelectableSpellLevel(
 
 /** Resolves cantrip, spell, and slot-cap facts for a class level. */
 export function resolveSpellcastingFactsAtLevel(
-  spellcasting: Spellcasting,
+  source: ClassSpellcastingActivationSource,
   classLevel: number,
   config: ResolvedSpellcastingProgressionConfig,
 ): CreatureSpellcastingFacts {
+  const spellcasting = source.spellcasting
+  if (!spellcasting) {
+    return { cantripsKnown: 0, spellsAvailable: 0, maxSelectableSpellLevel: 0 }
+  }
+
   return {
-    cantripsKnown: cantripsKnownAtLevel(spellcasting, classLevel),
+    cantripsKnown: cantripsKnownAtLevel(source, classLevel),
     spellsAvailable: spellsAvailableAtLevel(spellcasting, classLevel, config),
     maxSelectableSpellLevel: maxSelectableSpellLevel(spellcasting, classLevel, config),
   }

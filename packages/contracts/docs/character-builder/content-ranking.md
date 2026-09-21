@@ -39,7 +39,11 @@ The equipment picker owns search inclusion and ordering through
 `filterAndSortEquipmentPickerItems` in the dashboard
 (`equipment-picker-drawer.lib.ts`). Proficiency picker sorting uses the same
 score-once pipeline via `filterAndSortProficiencyPickerItems`. Spell picker
-sorting remains in spell drawer lib with snake_case shared mode values.
+sorting uses `filterAndSortSpellPickerItems` in `spell-picker-drawer.lib.ts`;
+domain rank comes from `compareSpellPickerItemsByRecommendation` in
+[`spell-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/spell-picker-item.ts).
+Recommended spell ids are resolved in
+[`resolve-spell-recommendations.ts`](../src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spell-recommendations.ts).
 
 ### Magic-items workflow action rank
 
@@ -128,6 +132,24 @@ implements the canonical pipeline. Domain rank comes from
 | ------------ | --------------- | ------------------------- | ----------------- |
 | `best_match` | search score    | —                         | domain comparator |
 | `name_*`     | `Intl.Collator` | search score              | domain comparator |
+
+Empty-query best match uses domain rank only — not name-only fallback.
+
+## Spell picker browse order
+
+`filterAndSortSpellPickerItems` in `spell-picker-drawer.lib.ts` implements the
+canonical pipeline. Domain rank comes from `compareSpellPickerItemsByRecommendation`
+in [`spell-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/spell-picker-item.ts):
+
+1. **Recommended** — `state.isRecommended` (`true` before `false`)
+2. **Selectable** — `state.canSelect` (`true` before `false`)
+3. **Label** — `localeCompare` (base sensitivity)
+
+| Mode         | Primary         | Tiebreaker 1 (query only) | Tiebreaker 2      |
+| ------------ | --------------- | ------------------------- | ----------------- |
+| `best_match` | search score    | —                         | domain comparator |
+| `name_*`     | `Intl.Collator` | search score              | domain comparator |
+| `level_*`    | spell level     | search score              | domain comparator |
 
 Empty-query best match uses domain rank only — not name-only fallback.
 

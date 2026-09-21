@@ -1,4 +1,3 @@
-import type { Species } from '@rpg/contracts'
 import type { NamingConvention } from '@rpg/contracts/name-generator'
 import { getSpeciesCultureDisplayName } from '@rpg/contracts/rpg/content'
 import {
@@ -18,26 +17,7 @@ import {
 } from '@rpg/name-generator-integrations'
 
 export type { SpeciesCultureInput } from '@rpg/name-generator-integrations'
-
-export function toSpeciesCultureInput(species: Species): SpeciesCultureInput {
-  return {
-    id: species.id,
-    slug: species.slug,
-    name: species.name,
-    source: species.source,
-    languageAffinities: species.languageAffinities,
-    culture: species.culture,
-    heritage:
-      species.heritage === undefined
-        ? undefined
-        : {
-            options: species.heritage.options.map((option) => ({
-              id: option.id,
-              name: 'name' in option ? option.name : undefined,
-            })),
-          },
-  }
-}
+export { toSpeciesCultureInput } from '@rpg/name-generator-integrations'
 
 export type ComposedNameGeneratorConventions = {
   conventions: readonly NamingConvention[]
