@@ -21,21 +21,11 @@ function spellPickerModeForChoiceSet(choiceSet: ChoiceSet): SpellPickerMode {
     : SPELL_PICKER_MODE_PREPARED_SPELLS
 }
 
-function resolvePickerChoiceSet(
-  mode: SpellPickerMode,
-  cantripChoiceSet: ChoiceSet | undefined,
-  preparedChoiceSet: ChoiceSet | undefined,
-): ChoiceSet | undefined {
-  return mode === SPELL_PICKER_MODE_CANTRIPS ? cantripChoiceSet : preparedChoiceSet
-}
-
 export type SpellsStepPickerProps = {
   className: string
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
-  cantripChoiceSet?: ChoiceSet
-  preparedChoiceSet?: ChoiceSet
-  initialMode: SpellPickerMode
+  choiceSet: ChoiceSet
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onClose: () => void
 }
@@ -44,29 +34,23 @@ export function SpellsStepPicker({
   className,
   draft,
   context,
-  cantripChoiceSet,
-  preparedChoiceSet,
-  initialMode,
+  choiceSet,
   onDraftChange,
   onClose,
 }: SpellsStepPickerProps) {
-  const cantripItems = useMemo(() => {
-    if (!cantripChoiceSet) return []
-    return resolveSpellPickerItems({
-      draft,
-      context,
-      choiceSetId: cantripChoiceSet.id,
-    })
-  }, [cantripChoiceSet, context, draft])
-
-  const preparedItems = useMemo(() => {
-    if (!preparedChoiceSet) return []
-    return resolveSpellPickerItems({
-      draft,
-      context,
-      choiceSetId: preparedChoiceSet.id,
-    })
-  }, [context, draft, preparedChoiceSet])
+  const mode = spellPickerModeForChoiceSet(choiceSet)
+  const items = useMemo(
+    () =>
+      resolveSpellPickerItems({
+        draft,
+        context,
+        choiceSetId: choiceSet.id,
+      }),
+    [choiceSet.id, context, draft],
+  )
+  const selectedIds = draft.choiceSelections[choiceSet.id] ?? []
+  const cantripChoiceSet = mode === SPELL_PICKER_MODE_CANTRIPS ? choiceSet : undefined
+  const preparedChoiceSet = mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? choiceSet : undefined
 
   return (
     <SpellPickerDrawer
@@ -77,29 +61,23 @@ export function SpellsStepPicker({
       characterClassName={className}
       cantripChoiceSet={cantripChoiceSet}
       preparedChoiceSet={preparedChoiceSet}
-      cantripSelectedIds={draft.choiceSelections[cantripChoiceSet?.id ?? ''] ?? []}
-      preparedSelectedIds={draft.choiceSelections[preparedChoiceSet?.id ?? ''] ?? []}
-      cantripItems={cantripItems}
-      preparedItems={preparedItems}
-      initialMode={initialMode}
-      onSelectSpell={(mode, spellId) => {
-        const choiceSet = resolvePickerChoiceSet(mode, cantripChoiceSet, preparedChoiceSet)
-        if (!choiceSet) return
-        const current = draft.choiceSelections[choiceSet.id] ?? []
-        if (current.includes(spellId)) return
+      cantripSelectedIds={mode === SPELL_PICKER_MODE_CANTRIPS ? selectedIds : []}
+      preparedSelectedIds={mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? selectedIds : []}
+      cantripItems={mode === SPELL_PICKER_MODE_CANTRIPS ? items : []}
+      preparedItems={mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? items : []}
+      initialMode={mode}
+      onSelectSpell={(_, spellId) => {
+        if (selectedIds.includes(spellId)) return
         onDraftChange({
-          choiceSelections: withChoiceSetSelections(draft, choiceSet.id, [...current, spellId]),
+          choiceSelections: withChoiceSetSelections(draft, choiceSet.id, [...selectedIds, spellId]),
         })
       }}
-      onRemoveSpell={(mode, spellId) => {
-        const choiceSet = resolvePickerChoiceSet(mode, cantripChoiceSet, preparedChoiceSet)
-        if (!choiceSet) return
-        const current = draft.choiceSelections[choiceSet.id] ?? []
+      onRemoveSpell={(_, spellId) => {
         onDraftChange({
           choiceSelections: withChoiceSetSelections(
             draft,
             choiceSet.id,
-            current.filter((id) => id !== spellId),
+            selectedIds.filter((id) => id !== spellId),
           ),
         })
       }}

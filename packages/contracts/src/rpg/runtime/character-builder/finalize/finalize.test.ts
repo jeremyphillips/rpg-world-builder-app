@@ -457,26 +457,33 @@ describe('finalizePcCharacterBuild', () => {
       species: { speciesId: 'srd-cc-5.2.1:fixture-dwarf' },
       class: { classId: wizardClass.id, level: 1 },
     })
-    const choiceSets = resolveAvailableChoices(draft, spellcastingTestContext)
     const cantripIds = wizardCantrips.slice(0, 3).map((spell) => spell.id)
-    const spellIds = wizardLevelOneSpells.slice(0, 4).map((spell) => spell.id)
-
-    const input = finalizePcCharacterBuild(
-      {
-        ...draft,
-        choiceSelections: {
-          'class:srd-cc-5.2.1:fixture-wizard:class-skills': [`${wizardClass.rulesetId}:athletics`],
-          [`spellcasting:${wizardClass.id}:cantrips`]: cantripIds,
-          [`spellcasting:${wizardClass.id}:spells`]: spellIds,
-        },
+    const spellbookIds = wizardLevelOneSpells.map((spell) => spell.id)
+    const preparedIds = wizardLevelOneSpells.slice(0, 4).map((spell) => spell.id)
+    const draftWithSpells = {
+      ...draft,
+      choiceSelections: {
+        'class:srd-cc-5.2.1:fixture-wizard:class-skills': [`${wizardClass.rulesetId}:athletics`],
+        [`spellcasting:${wizardClass.id}:cantrips`]: cantripIds,
+        [`spellcasting:${wizardClass.id}:spellbook`]: spellbookIds,
+        [`spellcasting:${wizardClass.id}:prepared`]: preparedIds,
       },
-      spellcastingTestContext,
-      { resolvedChoiceSets: choiceSets },
-    )
+    }
+    const choiceSets = resolveAvailableChoices(draftWithSpells, spellcastingTestContext)
 
-    expect(input.spells).toHaveLength(7)
-    expect(input.spells?.filter((entry) => entry.selection === undefined)).toHaveLength(3)
-    expect(input.spells?.filter((entry) => entry.selection?.prepared === true)).toHaveLength(4)
+    const input = finalizePcCharacterBuild(draftWithSpells, spellcastingTestContext, {
+      resolvedChoiceSets: choiceSets,
+    })
+
+    expect(input.spells).toHaveLength(9)
+    expect(input.spells?.filter((entry) => entry.collections?.length === 1)).toHaveLength(5)
+    expect(
+      input.spells?.filter((entry) =>
+        entry.collections?.some(
+          (membership) => membership.kind === 'prepared' && membership.mutable === true,
+        ),
+      ),
+    ).toHaveLength(4)
     expect(input.spells?.[0]?.sources).toEqual([
       {
         kind: 'classSpellcasting',
@@ -484,12 +491,11 @@ describe('finalizePcCharacterBuild', () => {
         grantId: 'cantrips',
       },
     ])
-    expect(input.spells?.[3]?.sources).toEqual([
-      {
-        kind: 'classSpellcasting',
-        sourceId: wizardClass.id,
-        grantId: 'spells',
-      },
-    ])
+    const preparedOverlap = input.spells?.find((entry) =>
+      entry.collections?.some((membership) => membership.kind === 'prepared'),
+    )
+    expect(preparedOverlap?.collections).toEqual(
+      expect.arrayContaining([{ kind: 'spellbook' }, { kind: 'prepared', mutable: true }]),
+    )
   })
 })

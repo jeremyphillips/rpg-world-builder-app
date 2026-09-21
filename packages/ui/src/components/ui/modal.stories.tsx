@@ -4,6 +4,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { Modal } from './modal.client'
 import { Button } from './button.client'
+import { IconContainer } from './icon-container.client'
+import { BookOpen } from 'lucide-react'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { Input } from './input.client'
 import { DialogPanelScrollRegion } from './dialog-panel-scroll-region.client'
@@ -39,6 +41,37 @@ export const Basic: Story = {
             <Modal.Close asChild>
               <Button>Send invite</Button>
             </Modal.Close>
+          </Modal.FooterActions>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Root>
+  ),
+}
+
+/** Header with a decorative lead icon beside the title stack. */
+export const LeadIcon: Story = {
+  render: () => (
+    <Modal.Root>
+      <Modal.Trigger asChild>
+        <Button>Open modal</Button>
+      </Modal.Trigger>
+      <Modal.Content size="lg">
+        <Modal.Header
+          leadIcon={
+            <IconContainer size="md">
+              <BookOpen aria-hidden />
+            </IconContainer>
+          }
+          headline="Edit spellbook acquisition"
+          description="Define how this class adds spells to its spellbook."
+        />
+        <Modal.Body>Lead icon ownership lives on DialogPanelHeader.</Modal.Body>
+        <Modal.Footer>
+          <Modal.FooterActions>
+            <Modal.Close asChild>
+              <Button variant="outline">Cancel</Button>
+            </Modal.Close>
+            <Button>Save</Button>
           </Modal.FooterActions>
         </Modal.Footer>
       </Modal.Content>

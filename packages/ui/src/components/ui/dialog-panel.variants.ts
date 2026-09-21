@@ -139,6 +139,15 @@ export const dialogPanelHeaderClasses = cn(
   dialogPanelHeaderPaddingClasses,
 )
 
+/** Leading icon + title stack row when {@link DialogPanelHeader} receives `leadIcon`. */
+export const dialogPanelHeaderLeadRowClasses = 'flex items-start gap-4'
+
+/** Title, description, and optional kicker stack beside a header lead icon. */
+export const dialogPanelHeaderCopyStackClasses = 'min-w-0 flex-1 space-y-1.5'
+
+/** Headline row → supporting description — 2px below the title line. */
+export const dialogPanelHeaderHeadlineStackClasses = 'flex flex-col gap-0.5'
+
 /**
  * Canonical overlay footer section chrome — separator, horizontal inset, vertical rhythm.
  * Inherits panel surface fill; compose with {@link dialogPanelActionRowClasses} for actions.

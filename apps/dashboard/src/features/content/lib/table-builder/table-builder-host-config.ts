@@ -104,6 +104,14 @@ export type TableBuilderValuesNotice = {
  * Host-owned table builder policy: which kinds are valid and which is recommended.
  * Whether kind can still change is owned by {@link TableBuilderMode}, not parent content status.
  */
+export type TableBuilderFixedColumnDefinition = Pick<
+  TableBuilderColumnDraft,
+  'label' | 'valueType' | 'format'
+> & {
+  /** Stable semantic key reused when materializing draft columns (e.g. slot-level-3). */
+  semanticKey?: string
+}
+
 export type TableBuilderHostConfig = {
   /** Non-empty — at least one kind must be allowed. */
   allowedKinds: readonly [TableBuilderKind, ...TableBuilderKind[]]
@@ -113,7 +121,9 @@ export type TableBuilderHostConfig = {
   allowedLevels?: readonly number[]
   columns?: TableBuilderColumnsMode
   rows?: TableBuilderRowsMode
-  fixedColumns?: readonly Pick<TableBuilderColumnDraft, 'label' | 'valueType' | 'format'>[]
+  fixedColumns?: readonly TableBuilderFixedColumnDefinition[]
+  /** Data-derived fixed columns — takes precedence over {@link fixedColumns} when set. */
+  resolveFixedColumns?: () => readonly TableBuilderFixedColumnDefinition[]
   resolveCommittedDraftLevels?: (
     ctx: TableBuilderCommittedDraftLevelsContext,
   ) => ReadonlySet<number> | undefined
@@ -147,6 +157,8 @@ export type TableBuilderHostConfig = {
   }) => TableBuilderDraftValidationResult
   /** When set on level-progression hosts, inserts a tier separator after standardMaxLevel. */
   extendedProgression?: TableBuilderExtendedProgression
+  /** Host-owned add-row label — defaults to generic table-builder copy. */
+  addRowLabel?: string
 }
 
 export function resolveTableBuilderRecommendedKind(
@@ -176,9 +188,17 @@ function assertTableBuilderRecommendedKind(config: TableBuilderHostConfig): void
   }
 }
 
+export function resolveTableBuilderFixedColumns(
+  config: TableBuilderHostConfig,
+): readonly TableBuilderFixedColumnDefinition[] {
+  return config.resolveFixedColumns?.() ?? config.fixedColumns ?? []
+}
+
 function assertTableBuilderFixedStructure(config: TableBuilderHostConfig): void {
-  if (config.columns === 'fixed' && (config.fixedColumns?.length ?? 0) === 0) {
-    throw new Error('TableBuilderHostConfig.fixedColumns is required when columns is "fixed"')
+  if (config.columns === 'fixed' && resolveTableBuilderFixedColumns(config).length === 0) {
+    throw new Error(
+      'TableBuilderHostConfig.fixedColumns or resolveFixedColumns is required when columns is "fixed"',
+    )
   }
   if (config.rows === 'fixedLevels' && (config.allowedLevels?.length ?? 0) === 0) {
     throw new Error('TableBuilderHostConfig.allowedLevels is required when rows is "fixedLevels"')

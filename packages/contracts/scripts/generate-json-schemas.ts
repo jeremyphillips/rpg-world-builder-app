@@ -19,6 +19,7 @@ import { spellSchema } from '../src/rpg/content/spell/body.ts'
 import { speciesSchema } from '../src/rpg/content/species.ts'
 import { xpProgressionSchema } from '../src/rpg/content/xp-progression.ts'
 import { startingWealthRulesSchema } from '../src/rpg/campaign/rules/starting-wealth.ts'
+import { slotProgressionSchema } from '../src/rpg/campaign/rules/spellcasting-progression/index.ts'
 import {
   campaignTemplateSchema,
   worldSeedPackSchema,
@@ -38,6 +39,8 @@ const startingWealthSeedFileSchema = z
 const xpProgressionSeedFileSchema = z
   .array(xpProgressionSchema)
   .length(1, 'Each SRD ruleset must ship exactly one XP progression')
+
+const slotProgressionSeedFileSchema = z.array(slotProgressionSchema).min(1)
 
 const ROOT = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = join(ROOT, '../../..')
@@ -97,6 +100,10 @@ const SCHEMAS: GeneratedSchema[] = [
   {
     file: 'catalog-xp-progression-seed.schema.json',
     schema: xpProgressionSeedFileSchema,
+  },
+  {
+    file: 'catalog-slot-progression-seed.schema.json',
+    schema: slotProgressionSeedFileSchema,
   },
   {
     file: 'catalog-campaign-template-list.schema.json',

@@ -74,6 +74,14 @@ const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
 /** Set by preset value sync — not a visible form control. */
 const ORGANIZATION_SCHEMA_EXEMPT = ['sourcePresetId'] as const
 
+/** Cantrip capacity is authored in TableBuilder — not inline scalar form fields. */
+const CLASS_SCHEMA_EXEMPT = [
+  /^spellcasting\.progression\b/,
+  /^spellSelectionModel$/,
+  /^spellSelectionChangePackage$/,
+  /^spellbookAcquisition/,
+] as const
+
 const COMMON_SCHEMA_EXEMPT = [
   ...SLOT_IGNORE,
   ...SLUG_EXEMPT,
@@ -115,9 +123,11 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
         ? EQUIPMENT_SCHEMA_EXEMPT
         : routeKey === 'organizations'
           ? [...COMMON_SCHEMA_EXEMPT, ...ORGANIZATION_SCHEMA_EXEMPT]
-          : routeKey === 'spells'
-            ? SPELLS_SCHEMA_EXEMPT
-            : COMMON_SCHEMA_EXEMPT
+          : routeKey === 'classes'
+            ? [...COMMON_SCHEMA_EXEMPT, ...CLASS_SCHEMA_EXEMPT]
+            : routeKey === 'spells'
+              ? SPELLS_SCHEMA_EXEMPT
+              : COMMON_SCHEMA_EXEMPT
 
     assertRegistryCoverage(schema, fields, { exemptPaths: exempt })
   })
@@ -263,6 +273,7 @@ function invalidValueFor(routeKey: string): unknown {
         primaryAbilities: [],
         hitDie: 8,
         hasSpellcasting: false,
+        grantsCantrips: false,
         weaponProficiencyMode: 'categories',
         proficiencies: {
           savingThrows: [],

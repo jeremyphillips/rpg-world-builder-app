@@ -34,10 +34,23 @@ describe('TableGrid', () => {
   it('renders a leading row-header column when rowHeaderLabel is set', () => {
     render(<TableGrid presentation={samplePresentation} rowHeaderLabel="Level" />)
 
-    expect(screen.getByRole('columnheader', { name: 'Level' })).toBeInTheDocument()
-    expect(screen.getByRole('cell', { name: '1' })).toBeInTheDocument()
-    expect(screen.getByRole('cell', { name: '9' })).toBeInTheDocument()
+    const levelHeader = screen.getByRole('columnheader', { name: 'Level' })
+    expect(levelHeader).toBeInTheDocument()
+    expect(levelHeader.className).toMatch(/sticky/)
+    expect(screen.getByRole('rowheader', { name: '1' })).toBeInTheDocument()
+    expect(screen.getByRole('rowheader', { name: '9' })).toBeInTheDocument()
     expect(screen.getAllByRole('columnheader')).toHaveLength(3)
+  })
+
+  it('renders an embedded table without the Table scroll wrapper', () => {
+    const { container } = render(
+      <TableGrid presentation={samplePresentation} rowHeaderLabel="Level" scrollMode="embedded" />,
+    )
+
+    const table = container.querySelector('table')
+    expect(table).toBeTruthy()
+    expect(table?.className).toMatch(/w-full/)
+    expect(container.querySelector('[class*="overflow-auto"] table')).toBeNull()
   })
 
   it('renders a centered empty-body message when rows are absent', () => {

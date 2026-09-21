@@ -80,9 +80,19 @@ describe('classHasSpellcasting', () => {
           ...fighter,
           spellcasting: {
             level: 1,
-            progression: 'full',
+            slotProgressionId: 'full-caster',
             ability: 'int',
-            preparation: 'prepared',
+            spellSelection: {
+              model: 'prepareFromLearnedCollection',
+              collection: 'spellbook',
+              acquisition: { curve: { rows: [{ level: 1, count: 6 }] }, extension: 'zero' },
+              change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+            },
+            progression: {
+              preparedSpells: {
+                curve: { rows: [{ level: 1, count: 4 }] },
+              },
+            },
           },
         }),
       ),

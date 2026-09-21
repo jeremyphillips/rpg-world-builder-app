@@ -3,8 +3,6 @@ import {
   CLASS_CONTENT_TYPE_TERM,
   getAbilityCompactLabel,
   getArmorCategoryPreviewLabel,
-  getSpellPreparationModeLabel,
-  getSpellcastingProgressionLabel,
   getWeaponCategoryPreviewLabel,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
@@ -28,6 +26,7 @@ import type { ClassPreviewResources } from './class-preview-resources'
 import { featuresFromFormValues } from './class-feature-form-fields'
 import type { ClassFormValues } from './class-form-fields'
 import { classCreateDefaultValues, proficienciesFromFormValues } from './class-form-values'
+import { SPELL_SELECTION_MODEL_OPTIONS } from './class-spell-selection-form.lib'
 import {
   buildClassDetailViewModel,
   type ClassDetailViewModel,
@@ -52,7 +51,8 @@ export const CLASS_PREVIEW_FACT_LABELS = {
   skills: 'Skills',
   spellcastingAbility: 'Spellcasting ability',
   spellcastingLevel: 'Spellcasting level',
-  progression: 'Progression',
+  slotProgression: 'Slot progression',
+  spellSelection: 'Spell selection',
   skillChoices: 'Skill choices',
   startingEquipment: 'Starting equipment',
 } as const
@@ -200,8 +200,16 @@ function buildProficienciesSection(
   }
 }
 
+function spellSelectionModelLabel(
+  model: ClassFormValues['spellSelectionModel'] | undefined,
+): string {
+  if (!model) return CONTENT_PREVIEW_NOT_SET
+  return SPELL_SELECTION_MODEL_OPTIONS.find((option) => option.value === model)?.label ?? model
+}
+
 function spellcastingFacts(
   spellcasting: ClassFormValues['spellcasting'] | undefined,
+  spellSelectionModel: ClassFormValues['spellSelectionModel'] | undefined,
 ): PreviewRailFact[] {
   const facts: PreviewRailFact[] = []
   if (!spellcasting) return facts
@@ -217,10 +225,12 @@ function spellcastingFacts(
     value: spellcasting.level != null ? String(spellcasting.level) : CONTENT_PREVIEW_NOT_SET,
   })
   facts.push({
-    label: CLASS_PREVIEW_FACT_LABELS.progression,
-    value: spellcasting.progression
-      ? getSpellcastingProgressionLabel(spellcasting.progression)
-      : CONTENT_PREVIEW_NOT_SET,
+    label: CLASS_PREVIEW_FACT_LABELS.slotProgression,
+    value: spellcasting.slotProgressionId ?? CONTENT_PREVIEW_NOT_SET,
+  })
+  facts.push({
+    label: CLASS_PREVIEW_FACT_LABELS.spellSelection,
+    value: spellSelectionModelLabel(spellSelectionModel),
   })
 
   return facts
@@ -235,12 +245,15 @@ function buildSpellcastingSection(values: ClassFormValues): ContentPreviewSectio
   }
 
   const spellcasting = values.spellcasting
-  const preparation = spellcasting?.preparation
+  const selectionLabel = spellSelectionModelLabel(values.spellSelectionModel)
 
   return {
     derivedKind: 'ready',
-    status: preparation ? getSpellPreparationModeLabel(preparation) : CONTENT_PREVIEW_STATUS_READY,
-    facts: spellcastingFacts(spellcasting),
+    status:
+      spellcasting?.slotProgressionId && values.spellSelectionModel
+        ? `${spellcasting.slotProgressionId} · ${selectionLabel}`
+        : CONTENT_PREVIEW_STATUS_READY,
+    facts: spellcastingFacts(spellcasting, values.spellSelectionModel),
   }
 }
 

@@ -4,7 +4,7 @@ import {
   type CharacterBuildPreview,
   type CharacterDerivedSpellcasting,
   type ChoiceSet,
-  type SpellcastingProfile,
+  type BuilderSpellcastingProfile,
 } from '@rpg/contracts'
 
 import {
@@ -89,7 +89,7 @@ export function formatSpellSlotSummary(
   return parts.length > 0 ? parts.join(', ') : 'None'
 }
 
-export function formatSpellcastingCountSummary(profile: SpellcastingProfile): string {
+export function formatSpellcastingCountSummary(profile: BuilderSpellcastingProfile): string {
   const parts: string[] = []
   if (profile.cantripsKnown > 0) {
     parts.push(`${profile.cantripsKnown} cantrip${profile.cantripsKnown === 1 ? '' : 's'}`)

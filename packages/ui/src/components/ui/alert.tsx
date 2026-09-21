@@ -39,7 +39,7 @@ export function Alert({
   return (
     <div role="alert" className={cn(alertVariants({ variant, density }), className)} {...props}>
       {hasCopy ? (
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
           {title ? (
             <p className={alertTitleVariants({ variant, density })} data-slot="alert-title">
               {title}

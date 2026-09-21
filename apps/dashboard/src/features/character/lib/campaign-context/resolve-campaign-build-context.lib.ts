@@ -11,6 +11,8 @@ import {
 } from '@rpg/contracts'
 import type { CharacterBuildAcquisition } from '@rpg/contracts/rpg/character-builder'
 
+import { resolveCampaignSpellcastingProgression } from '@/lib/campaign-spellcasting-progression.lib'
+
 type CampaignBuildContextSource = {
   campaignId: string
   rulesetId: SystemRulesetId
@@ -63,6 +65,10 @@ export function resolveCampaignBuildContext(
       },
       armorClass: patch.mechanics.armorClass,
     },
+    spellcastingProgression: resolveCampaignSpellcastingProgression(
+      rulesetId,
+      patch.characterCreation.progression.spellcasting,
+    ),
     permissions: { canCreateCharacter: true },
   }
 

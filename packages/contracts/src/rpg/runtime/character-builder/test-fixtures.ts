@@ -5,6 +5,7 @@ import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-c
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { StartingWealthRules } from '../../campaign/rules/starting-wealth'
 import { resolveCharacterOwnershipTarget } from '../character-acquisition'
+import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability/ability-generation'
 import type {
   CharacterBuildCatalog,
@@ -156,6 +157,7 @@ export function createCharacterBuildContext(
     rulesetId,
     catalog: builderTestCatalog,
     characterCreationRules: builderTestRules,
+    spellcastingProgression: spellcastingProgressionTestConfig,
     permissions: { canCreateCharacter: true },
     playActor: { kind: 'new_pc' },
     ...overrides,

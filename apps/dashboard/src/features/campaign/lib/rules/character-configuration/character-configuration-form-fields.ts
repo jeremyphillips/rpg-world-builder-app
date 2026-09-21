@@ -29,10 +29,12 @@ import {
   levelZeroProficiencyBonusSchema,
   refineEffectiveXpProgression,
   refineLevelRangeTable,
+  slotProgressionSchema,
   validateExtendedMaxLevel,
   xpThresholdOverrideEntriesSchema,
 } from '@rpg/contracts'
 import { getStandardXpProgression } from '@rpg/catalog/xp-progressions'
+import { loadSpellcastingProgressionSeed } from '@rpg/catalog/spellcasting-progressions'
 import {
   toOptions,
   type ArrayConfig,
@@ -47,6 +49,7 @@ import {
 import { vocabularyComboboxFieldForTerm, vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { ExtendedProgressionEffects } from '../../../components/extended-progression-effects'
+import { SpellcastingProgressionField } from '../../../components/spellcasting-progression-field'
 import { XpThresholdsField } from '../../../components/xp-thresholds-field'
 import {
   ExtendedLevelRangeSummary,
@@ -161,6 +164,9 @@ const configRulesObjectSchema = z.object({
   levelZeroStartingWealth: levelZeroNpcsFormSchema.shape.levelZeroStartingWealth.optional(),
   levelZeroStandardArray: standardArrayFormSchema.default(standardArrayDefaultFormValues),
   xpThresholdOverrides: xpThresholdOverrideEntriesSchema.default([]),
+  slotProgressions: z
+    .array(slotProgressionSchema)
+    .default(() => [...loadSpellcastingProgressionSeed('srd-cc-5.2.1').slotProgressions]),
 })
 
 type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
@@ -441,6 +447,22 @@ function progressionGroup(): FormItem {
           ],
         },
         { id: 'progression-experience-thresholds', label: 'Experience thresholds' },
+      ),
+      withNavigationAnchor(
+        {
+          kind: 'group',
+          legend: 'Spellcasting',
+          description:
+            'Spell slot tables shared by spellcasting classes. Selection rules and capacity curves are authored on each class.',
+          fields: [
+            {
+              kind: 'slot',
+              name: '_spellcastingProgressionField',
+              render: () => createElement(SpellcastingProgressionField),
+            },
+          ],
+        },
+        { id: 'progression-spellcasting', label: 'Spellcasting' },
       ),
     ],
   }

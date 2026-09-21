@@ -78,11 +78,20 @@ describe('buildContentFormOptionSets', () => {
       ...pickClass('barbarian'),
       spellcasting: {
         level: 1,
-        progression: 'full' as const,
+        slotProgressionId: 'full-caster',
         ability: 'wis' as const,
-        preparation: 'known' as const,
+        spellSelection: {
+          model: 'prepareFromClassList' as const,
+          change: { kind: 'replace' as const, trigger: 'longRest' as const, limit: 1 },
+        },
+        progression: {
+          preparedSpells: {
+            curve: { rows: [{ level: 1, count: 2 }] },
+            extension: 'carryForward' as const,
+          },
+        },
       },
-    }
+    } satisfies typeof fighter
 
     const options = buildContentFormOptionSets({
       classes: [fighter, wizard, patchedBarbarian],

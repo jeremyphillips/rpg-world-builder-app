@@ -4,7 +4,12 @@ import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 
-import { dialogPanelHeaderClasses } from './dialog-panel.variants'
+import {
+  dialogPanelHeaderClasses,
+  dialogPanelHeaderCopyStackClasses,
+  dialogPanelHeaderHeadlineStackClasses,
+  dialogPanelHeaderLeadRowClasses,
+} from './dialog-panel.variants'
 import { headingVariants } from './heading.variants'
 import { textVariants } from './text.variants'
 import { cn } from '../../lib/utils'
@@ -43,6 +48,8 @@ export interface DialogPanelHeaderProps extends React.HTMLAttributes<HTMLDivElem
   kicker?: React.ReactNode
   headline: React.ReactNode
   description?: React.ReactNode
+  /** Decorative leading icon slot — caller supplies {@link IconContainer} or similar. */
+  leadIcon?: React.ReactNode
   /** Merged onto the dialog title element (overrides the shared dialogTitle default). */
   headlineClassName?: string
   /** Right-aligned slot on the title row (e.g. primary action). */
@@ -57,9 +64,54 @@ function renderKicker(kicker: React.ReactNode) {
   return kicker
 }
 
+function DialogPanelHeaderTitleStack({
+  kicker,
+  headline,
+  description,
+  headlineClassName,
+  endSlot,
+}: Pick<
+  DialogPanelHeaderProps,
+  'kicker' | 'headline' | 'description' | 'headlineClassName' | 'endSlot'
+>) {
+  return (
+    <>
+      {kicker ? renderKicker(kicker) : null}
+      <div className={dialogPanelHeaderHeadlineStackClasses}>
+        <div className="flex items-start justify-between gap-4">
+          <DialogPrimitive.Title
+            className={cn(
+              headlineClassName ?? headingVariants({ variant: 'dialogTitle' }),
+              'min-w-0 flex-1',
+            )}
+          >
+            {headline}
+          </DialogPrimitive.Title>
+          {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
+        </div>
+        {description ? (
+          <DialogPrimitive.Description className={textVariants({ variant: 'small' })}>
+            {description}
+          </DialogPrimitive.Description>
+        ) : null}
+      </div>
+    </>
+  )
+}
+
 export const DialogPanelHeader = React.forwardRef<HTMLDivElement, DialogPanelHeaderProps>(
   (
-    { className, kicker, headline, description, headlineClassName, endSlot, children, ...props },
+    {
+      className,
+      kicker,
+      headline,
+      description,
+      leadIcon,
+      headlineClassName,
+      endSlot,
+      children,
+      ...props
+    },
     ref,
   ) => (
     <div
@@ -67,23 +119,28 @@ export const DialogPanelHeader = React.forwardRef<HTMLDivElement, DialogPanelHea
       className={cn(dialogPanelHeaderClasses, endSlot && 'pr-12', className)}
       {...props}
     >
-      {kicker ? renderKicker(kicker) : null}
-      <div className="flex items-start justify-between gap-4">
-        <DialogPrimitive.Title
-          className={cn(
-            headlineClassName ?? headingVariants({ variant: 'dialogTitle' }),
-            'min-w-0 flex-1',
-          )}
-        >
-          {headline}
-        </DialogPrimitive.Title>
-        {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
-      </div>
-      {description ? (
-        <DialogPrimitive.Description className={textVariants({ variant: 'small' })}>
-          {description}
-        </DialogPrimitive.Description>
-      ) : null}
+      {leadIcon ? (
+        <div className={dialogPanelHeaderLeadRowClasses}>
+          <div className="shrink-0">{leadIcon}</div>
+          <div className={dialogPanelHeaderCopyStackClasses}>
+            <DialogPanelHeaderTitleStack
+              kicker={kicker}
+              headline={headline}
+              description={description}
+              headlineClassName={headlineClassName}
+              endSlot={endSlot}
+            />
+          </div>
+        </div>
+      ) : (
+        <DialogPanelHeaderTitleStack
+          kicker={kicker}
+          headline={headline}
+          description={description}
+          headlineClassName={headlineClassName}
+          endSlot={endSlot}
+        />
+      )}
       {children}
     </div>
   ),

@@ -15,6 +15,8 @@ import {
 } from '@rpg/contracts'
 
 import { useCampaignRules } from '@/features/campaign'
+import { useRulesetPatch } from '@/features/homebrew'
+import { resolveCampaignSpellcastingProgression } from '@/lib/campaign-spellcasting-progression.lib'
 import {
   useCreatureTypeVocabulary,
   useDamageTypeVocabulary,
@@ -68,6 +70,8 @@ export interface ContentFormOptionSets {
   richTextInternalLinkOptions: RichTextLinkPickerInternalOption[]
   /** Content type filters shown in rich-text link pickers. */
   richTextContentTypeOptions: RichTextLinkPickerContentTypeOption[]
+  /** Ruleset slot progression options for class spellcasting.slotProgressionId. */
+  spellcastingSlotProgressions?: FieldOption[]
 }
 
 interface QueryState {
@@ -162,6 +166,16 @@ function buildRichTextLinkOptionSets(input: {
   }
 }
 
+function buildSpellcastingSlotProgressionOptions(
+  spellcastingProgression?: ReturnType<typeof resolveCampaignSpellcastingProgression>,
+): FieldOption[] {
+  if (!spellcastingProgression) return []
+
+  return [...spellcastingProgression.slotProgressions.values()]
+    .sort((left, right) => left.label.localeCompare(right.label))
+    .map((progression) => ({ value: progression.id, label: progression.label }))
+}
+
 /** Builds campaign-scoped combobox option sets from list query results. */
 export function buildContentFormOptionSets(input: {
   campaignId?: string
@@ -172,6 +186,7 @@ export function buildContentFormOptionSets(input: {
   skills?: SkillProficiency[]
   equipment?: Equipment[]
   locations?: Location[]
+  spellcastingProgression?: ReturnType<typeof resolveCampaignSpellcastingProgression>
 }): ContentFormOptionSets {
   const referenceSpells = (input.spells ?? []).filter(isContentReferenceable)
   const referenceFeats = (input.feats ?? []).filter(isContentReferenceable)
@@ -185,6 +200,9 @@ export function buildContentFormOptionSets(input: {
     equipment: buildContentPurposeSelectors(input.equipment ?? []),
     locations: buildContentPurposeSelectors(input.locations ?? []),
     weaponCategoryBySlug: buildWeaponCategoryBySlug(input.equipment),
+    spellcastingSlotProgressions: buildSpellcastingSlotProgressionOptions(
+      input.spellcastingProgression,
+    ),
     ...buildRichTextLinkOptionSets({
       campaignId: input.campaignId,
       spells: referenceSpells,
@@ -201,6 +219,17 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const catalog = useContentCatalogLists(campaignId)
   const vocabulary = useContentFormVocabulary(campaignId)
   const campaignRules = useCampaignRules(campaignId)
+  const { data: rulesetPatch } = useRulesetPatch(campaignId)
+  const rulesetId = catalog.classes?.[0]?.rulesetId ?? 'srd-cc-5.2.1'
+
+  const spellcastingProgression = useMemo(
+    () =>
+      resolveCampaignSpellcastingProgression(
+        rulesetId,
+        rulesetPatch?.characterCreation.progression.spellcasting,
+      ),
+    [rulesetId, rulesetPatch?.characterCreation.progression.spellcasting],
+  )
 
   const options = useMemo(
     () =>
@@ -213,6 +242,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
         skills: catalog.skills,
         equipment: catalog.equipment,
         locations: catalog.locations,
+        spellcastingProgression,
       }),
     [
       campaignId,
@@ -223,6 +253,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
       catalog.skills,
       catalog.equipment,
       catalog.locations,
+      spellcastingProgression,
     ],
   )
 
@@ -230,6 +261,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
     (): ContentFormCtx => ({
       campaignId,
       campaignRules,
+      spellcastingProgression,
       creatureTypeVocabulary: vocabulary.creatureTypeVocabulary,
       damageTypeVocabulary: vocabulary.damageTypeVocabulary,
       senseVocabulary: vocabulary.senseVocabulary,
@@ -237,7 +269,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
       spellSchoolVocabulary: vocabulary.spellSchoolVocabulary,
       options,
     }),
-    [campaignId, campaignRules, vocabulary, options],
+    [campaignId, campaignRules, spellcastingProgression, vocabulary, options],
   )
 
   return {

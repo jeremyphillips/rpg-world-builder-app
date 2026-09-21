@@ -2,10 +2,10 @@ import {
   classFeatureSchema,
   createClassDraftInputSchema,
   createClassInputSchema,
-  MAX_CHARACTER_LEVEL,
   resolveClassAbilityScoreOrder,
   type CharacterClass,
   type ClassFeature,
+  type ClassGainProgression,
   type ClassProficiencies,
   type ContentValidationIntent,
   type CreateClassInput,
@@ -18,16 +18,18 @@ import {
 } from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import type { ClassFormValues } from './class-form-fields'
+import {
+  alignProgressionToModel,
+  detectRegularGain,
+  materializeRegularGain,
+  spellSelectionChangePackageFromPolicy,
+  spellSelectionFromForm,
+  type SpellSelectionChangePackage,
+} from './class-spell-selection-form.lib'
 import { createAsiFeature } from './class-asi-features'
 import { createSubclassChoiceFeature } from './class-subclass-choice-features'
 import { featuresFromFormValues, featureToFormRow } from './class-feature-form-fields'
 import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
-import {
-  emptyProgressionTable,
-  progressionTableFromFormValues,
-  progressionTableToFormValues,
-  type ProgressionTableFormValue,
-} from './progression-table-helpers'
 import {
   startingEquipmentEmptyFormValues,
   startingEquipmentFromFormValues,
@@ -147,7 +149,7 @@ function classWirePayloadBase(
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
-    spellcasting: spellcastingFromFormValues(values.hasSpellcasting, values.spellcasting),
+    spellcasting: spellcastingFromFormValues(values),
     features: parts.features,
     ...(parts.characterCreation ? { characterCreation: parts.characterCreation } : {}),
   }
@@ -216,79 +218,120 @@ export function buildClassCreateInput(
   return finalizeContentInput(input, ctx) as CreateClassInput
 }
 
-function progressionRowCount(spellcasting?: Spellcasting): number {
-  const levels = [
-    ...(spellcasting?.cantrips?.map((entry) => entry.level) ?? []),
-    ...(spellcasting?.spellsAvailable?.map((entry) => entry.level) ?? []),
-  ]
-  const maxInData = levels.length > 0 ? Math.max(...levels) : 0
-  return Math.max(MAX_CHARACTER_LEVEL, maxInData)
-}
-
-export function spellcastingToFormValues(spellcasting: Spellcasting | undefined) {
-  const rowCount = progressionRowCount(spellcasting)
+export function spellcastingToFormValues(
+  spellcasting: Spellcasting | undefined,
+): ClassFormValues['spellcasting'] {
   if (!spellcasting) {
-    return {
-      level: 1,
-      description: undefined,
-      progression: undefined,
-      ability: undefined,
-      preparation: undefined,
-      progressionTable: emptyProgressionTable(rowCount),
-    }
+    return undefined
   }
 
   return {
     level: spellcasting.level,
     description: spellcasting.description,
+    slotProgressionId: spellcasting.slotProgressionId,
     progression: spellcasting.progression,
     ability: spellcasting.ability,
-    preparation: spellcasting.preparation,
     requiredGear: spellcasting.requiredGear,
     focusKinds: spellcasting.focusKinds,
     recommendedGear: spellcasting.recommendedGear,
-    progressionTable: progressionTableToFormValues(
-      spellcasting.cantrips,
-      spellcasting.spellsAvailable,
-      rowCount,
-    ),
   }
 }
 
-function hasCompleteSpellcastingCore(
-  hasSpellcasting: boolean,
-  spellcasting: ClassFormValues['spellcasting'],
-): boolean {
+export function spellSelectionModelToFormValues(
+  spellcasting: Spellcasting | undefined,
+): ClassFormValues['spellSelectionModel'] {
+  return spellcasting?.spellSelection?.model
+}
+
+export function spellSelectionChangePackageToFormValues(
+  spellcasting: Spellcasting | undefined,
+): SpellSelectionChangePackage | undefined {
+  if (!spellcasting?.spellSelection) return undefined
+  return spellSelectionChangePackageFromPolicy(spellcasting.spellSelection.change)
+}
+
+export function spellbookAcquisitionToFormValues(spellcasting: Spellcasting | undefined): {
+  irregular: boolean
+  starting?: number
+  perLevel?: number
+  throughLevel?: number
+  curve?: ClassGainProgression
+} {
+  if (spellcasting?.spellSelection?.model !== 'prepareFromLearnedCollection') {
+    return { irregular: false }
+  }
+
+  const acquisition = spellcasting.spellSelection.acquisition
+  const regular = detectRegularGain(acquisition)
+  if (regular) {
+    return {
+      irregular: false,
+      starting: regular.starting,
+      perLevel: regular.perLevel,
+      throughLevel: regular.throughLevel,
+    }
+  }
+
+  return {
+    irregular: true,
+    curve: acquisition,
+  }
+}
+
+function resolveSpellbookAcquisitionFromFormValues(
+  values: ClassFormValues,
+): ClassGainProgression | undefined {
+  if (values.spellSelectionModel !== 'prepareFromLearnedCollection') return undefined
+
+  if (values.spellbookAcquisitionIrregular) {
+    return values.spellbookAcquisitionCurve ?? { curve: { rows: [] }, extension: 'zero' }
+  }
+
+  const {
+    spellbookAcquisitionStarting,
+    spellbookAcquisitionPerLevel,
+    spellbookAcquisitionThroughLevel,
+  } = values
+  if (
+    spellbookAcquisitionStarting === undefined ||
+    spellbookAcquisitionPerLevel === undefined ||
+    spellbookAcquisitionThroughLevel === undefined
+  ) {
+    return { curve: { rows: [] }, extension: 'zero' }
+  }
+
+  return materializeRegularGain({
+    starting: spellbookAcquisitionStarting,
+    perLevel: spellbookAcquisitionPerLevel,
+    throughLevel: spellbookAcquisitionThroughLevel,
+  })
+}
+
+function hasCompleteSpellcastingCore(values: ClassFormValues): boolean {
   return Boolean(
-    hasSpellcasting &&
-    spellcasting?.progression &&
-    spellcasting?.ability &&
-    spellcasting?.preparation,
+    values.hasSpellcasting &&
+    values.spellcasting?.slotProgressionId &&
+    values.spellcasting?.ability &&
+    values.spellSelectionModel,
   )
 }
 
-function appendOptionalProgressionTables(
+// fallow-ignore-next-line complexity
+function applyOptionalSpellcastingFields(
   result: Spellcasting,
-  progressionTable: ProgressionTableFormValue | undefined,
+  spellcasting: NonNullable<ClassFormValues['spellcasting']>,
+  grantsCantrips: boolean,
 ): void {
-  const { cantrips, spellsAvailable } = progressionTableFromFormValues(progressionTable)
-  if (cantrips) result.cantrips = cantrips
-  if (spellsAvailable) result.spellsAvailable = spellsAvailable
-}
-
-function spellcastingFromFormValues(
-  hasSpellcasting: boolean,
-  spellcasting: ClassFormValues['spellcasting'],
-): Spellcasting | undefined {
-  if (!hasCompleteSpellcastingCore(hasSpellcasting, spellcasting) || !spellcasting) {
-    return undefined
+  const alignedProgression = alignProgressionToModel(
+    result.spellSelection?.model,
+    spellcasting.progression,
+  )
+  const progression = { ...(alignedProgression ?? {}) }
+  if (!grantsCantrips) {
+    delete progression.cantrips
   }
-
-  const result: Spellcasting = {
-    level: spellcasting.level ?? 1,
-    progression: spellcasting.progression!,
-    ability: spellcasting.ability!,
-    preparation: spellcasting.preparation!,
+  if (Object.keys(progression).length > 0) {
+    result.progression = progression
   }
   if (spellcasting.description?.trim()) {
     result.description = spellcasting.description.trim()
@@ -302,18 +345,37 @@ function spellcastingFromFormValues(
   if (spellcasting.recommendedGear?.length) {
     result.recommendedGear = spellcasting.recommendedGear
   }
-  appendOptionalProgressionTables(result, spellcasting.progressionTable)
+}
+
+export function spellcastingFromFormValues(values: ClassFormValues): Spellcasting | undefined {
+  const { grantsCantrips, spellcasting, spellSelectionChangePackage } = values
+  if (!hasCompleteSpellcastingCore(values) || !spellcasting) {
+    return undefined
+  }
+
+  const changePackage = spellSelectionChangePackage ?? 'none'
+  const acquisition = resolveSpellbookAcquisitionFromFormValues(values)
+  const spellSelection = spellSelectionFromForm({
+    model: values.spellSelectionModel,
+    changePackage,
+    acquisition,
+  })
+
+  const result: Spellcasting = {
+    level: spellcasting.level ?? 1,
+    slotProgressionId: spellcasting.slotProgressionId!,
+    ability: spellcasting.ability!,
+    ...(spellSelection ? { spellSelection } : {}),
+  }
+  applyOptionalSpellcastingFields(result, spellcasting, grantsCantrips)
   return result
 }
 
 export const classCreateDefaultValues: Partial<ClassFormValues> = {
   hasSpellcasting: false,
+  grantsCantrips: false,
+  spellbookAcquisitionIrregular: false,
   weaponProficiencyMode: 'categories',
-  spellcasting: {
-    level: 1,
-    preparation: 'prepared',
-    progressionTable: emptyProgressionTable(),
-  },
   proficiencies: {
     savingThrows: [],
     armor: [],

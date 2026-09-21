@@ -4,8 +4,10 @@ import {
   MAX_CHARACTER_LEVEL,
   abilitySchema,
   abilityScoreOrderSchema,
+  classGainProgressionSchema,
   hitDieSchema,
   slugSchema,
+  spellcastingSchema,
 } from '@rpg/contracts'
 import { type TabbedFormTab } from '@rpg/ui/form'
 
@@ -38,6 +40,7 @@ import {
   createSpellcastingFormSchema,
   spellcastingFields,
 } from './class-spellcasting-form-fields'
+import { spellcastingFromFormValues } from './class-form-values'
 import {
   startingEquipmentDraftFormSchema,
   startingEquipmentFormSchema,
@@ -69,6 +72,18 @@ export function createClassFormSchema(
       primaryAbilities: z.array(abilitySchema).min(1).max(2),
       hitDie: z.coerce.number().pipe(hitDieSchema),
       hasSpellcasting: z.boolean(),
+      grantsCantrips: z.boolean(),
+      spellSelectionModel: z
+        .enum(['limitedRepertoire', 'prepareFromClassList', 'prepareFromLearnedCollection'])
+        .optional(),
+      spellSelectionChangePackage: z
+        .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
+        .optional(),
+      spellbookAcquisitionStarting: z.coerce.number().int().min(0).optional(),
+      spellbookAcquisitionPerLevel: z.coerce.number().int().min(0).optional(),
+      spellbookAcquisitionThroughLevel: z.coerce.number().int().min(2).optional(),
+      spellbookAcquisitionIrregular: z.boolean().optional(),
+      spellbookAcquisitionCurve: classGainProgressionSchema.optional(),
       weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
       spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
       proficiencies: proficienciesFormSchema,
@@ -86,6 +101,48 @@ export function createClassFormSchema(
     })
     .superRefine((values, ctx) => {
       refineClassWeaponProficiencies(values, ctx)
+      if (!values.hasSpellcasting) return
+
+      const spellcasting = spellcastingFromFormValues(values)
+      if (!spellcasting) return
+
+      const parsed = spellcastingSchema.safeParse(spellcasting)
+      if (!parsed.success) {
+        for (const issue of parsed.error.issues) {
+          ctx.addIssue({
+            code: 'custom',
+            message: issue.message,
+            path: ['spellcasting', ...issue.path],
+          })
+        }
+      }
+
+      if (
+        values.spellSelectionModel === 'prepareFromLearnedCollection' &&
+        !values.spellbookAcquisitionIrregular
+      ) {
+        if (values.spellbookAcquisitionStarting === undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Starting spells is required.',
+            path: ['spellbookAcquisitionStarting'],
+          })
+        }
+        if (values.spellbookAcquisitionPerLevel === undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Spells gained each later level is required.',
+            path: ['spellbookAcquisitionPerLevel'],
+          })
+        }
+        if (values.spellbookAcquisitionThroughLevel === undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            message: 'Through level is required.',
+            path: ['spellbookAcquisitionThroughLevel'],
+          })
+        }
+      }
     })
 }
 
@@ -100,6 +157,18 @@ export function createClassDraftFormSchema(
     primaryAbilities: z.array(abilitySchema).max(2).default([]),
     hitDie: draftOptionalSelect(z.coerce.number().pipe(hitDieSchema)),
     hasSpellcasting: z.boolean(),
+    grantsCantrips: z.boolean(),
+    spellSelectionModel: z
+      .enum(['limitedRepertoire', 'prepareFromClassList', 'prepareFromLearnedCollection'])
+      .optional(),
+    spellSelectionChangePackage: z
+      .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
+      .optional(),
+    spellbookAcquisitionStarting: z.coerce.number().int().min(0).optional(),
+    spellbookAcquisitionPerLevel: z.coerce.number().int().min(0).optional(),
+    spellbookAcquisitionThroughLevel: z.coerce.number().int().min(2).optional(),
+    spellbookAcquisitionIrregular: z.boolean().optional(),
+    spellbookAcquisitionCurve: classGainProgressionSchema.optional(),
     weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
     spellcasting: createSpellcastingDraftFormSchema(maxLevel).optional(),
     proficiencies: proficienciesDraftFormSchema,
@@ -137,7 +206,19 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'spellcasting',
       label: 'Spellcasting',
       fields: spellcastingFields(ctx),
-      errorPaths: ['hasSpellcasting', 'spellcasting'],
+      errorPaths: [
+        'hasSpellcasting',
+        'grantsCantrips',
+        'spellSelectionModel',
+        'spellSelectionChangePackage',
+        'spellbookAcquisitionStarting',
+        'spellbookAcquisitionPerLevel',
+        'spellbookAcquisitionThroughLevel',
+        'spellbookAcquisitionIrregular',
+        'spellbookAcquisitionCurve',
+        'spellcasting',
+        'spellcasting.progression',
+      ],
     },
     {
       id: 'features',

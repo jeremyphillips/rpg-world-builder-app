@@ -37,6 +37,10 @@ import {
 } from '@/lib/forms/standard-array-form-values'
 
 import {
+  buildSpellcastingProgressionPatchInput,
+  resolveSpellcastingProgressionFormState,
+} from './spellcasting-progression-form-values'
+import {
   buildXpThresholdsProgressionPatchInput,
   mapXpThresholdOverridesToFormValues,
 } from './xp-thresholds-form-values'
@@ -76,12 +80,15 @@ function buildProgressionPatchInput(values: RulesValues) {
   const xpThresholds =
     buildXpThresholdsProgressionPatchInput(values.xpThresholdOverrides) ??
     ({ entries: [] } as const)
-
+  const spellcasting = buildSpellcastingProgressionPatchInput({
+    slotProgressions: values.slotProgressions,
+  })
   return {
     ...pickDefined({
       maxCharacterLevel: resolveMaxCharacterLevelOverride(values.maxCharacterLevel),
     }),
     xpThresholds,
+    spellcasting,
     extendedProgression: values.extendedProgressionEnabled
       ? (resolveExtendedProgressionOverride(values) ?? null)
       : null,
@@ -253,6 +260,7 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
         .standardArray,
     ),
     xpThresholdOverrides: [],
+    ...resolveSpellcastingProgressionFormState(undefined),
   }
 }
 
@@ -310,5 +318,6 @@ export function mapRulesetPatchToRulesValues(
     xpThresholdOverrides: mapXpThresholdOverridesToFormValues(
       characterCreation.progression.xpThresholds,
     ),
+    ...resolveSpellcastingProgressionFormState(characterCreation.progression.spellcasting),
   }
 }

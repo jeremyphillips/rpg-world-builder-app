@@ -62,6 +62,7 @@ const characterCreationProgressionSchema = new Schema(
     xpThresholds: {
       entries: { type: [xpThresholdOverrideEntrySchema], default: undefined },
     },
+    spellcasting: { type: Schema.Types.Mixed, default: undefined },
   },
   { _id: false },
 )

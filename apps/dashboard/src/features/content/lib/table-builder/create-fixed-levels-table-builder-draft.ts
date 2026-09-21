@@ -4,14 +4,20 @@ import {
   type TableBuilderColumnDraft,
   type TableBuilderFormValues,
 } from './table-builder-draft'
-import type { TableBuilderHostConfig } from './table-builder-host-config'
-import { resolveTableBuilderRecommendedKind } from './table-builder-host-config'
+import type {
+  TableBuilderFixedColumnDefinition,
+  TableBuilderHostConfig,
+} from './table-builder-host-config'
+import {
+  resolveTableBuilderFixedColumns,
+  resolveTableBuilderRecommendedKind,
+} from './table-builder-host-config'
 
 export function createFixedColumnsDraft(
-  fixedColumns: readonly Pick<TableBuilderColumnDraft, 'label' | 'valueType' | 'format'>[],
+  fixedColumns: readonly TableBuilderFixedColumnDefinition[],
 ): TableBuilderColumnDraft[] {
   return fixedColumns.map((column) => ({
-    key: createTableBuilderColumnKey(),
+    key: column.semanticKey ?? createTableBuilderColumnKey(),
     label: column.label,
     valueType: column.valueType,
     format: column.format ?? 'plain',
@@ -26,7 +32,7 @@ export function createFixedLevelsTableBuilderDraft(
   },
 ): TableBuilderFormValues {
   const kind = resolveTableBuilderRecommendedKind(config)
-  const columns = createFixedColumnsDraft(config.fixedColumns ?? [])
+  const columns = createFixedColumnsDraft(resolveTableBuilderFixedColumns(config))
   const allowedLevels = config.allowedLevels ?? []
 
   return {

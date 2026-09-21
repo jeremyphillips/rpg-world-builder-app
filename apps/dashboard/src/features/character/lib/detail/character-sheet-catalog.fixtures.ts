@@ -54,8 +54,8 @@ export function resolvedSpellSheetCardFixture(
   const entry: CharacterSpellEntry = {
     spellId: spell.id,
     sources: [{ kind: 'classSpellcasting', sourceId: 'srd-cc-5.2.1:wizard', grantId: 'cantrips' }],
-    access: { classKnown: true },
-    selection: { prepared: options.prepared ?? true },
+    access: {},
+    collections: [{ kind: 'prepared' }],
     ...options.entry,
   }
 

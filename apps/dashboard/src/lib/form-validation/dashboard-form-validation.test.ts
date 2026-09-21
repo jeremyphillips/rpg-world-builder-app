@@ -58,6 +58,7 @@ const RULES_CONFIG_IGNORE = [
   /^standardArray(\.|$)/,
   /^levelZeroStandardArray(\.|$)/,
   /^xpThresholdOverrides(\.|$)/,
+  /^slotProgressions(\.|$)/,
 ] as const
 
 describe('dashboard form validation', () => {

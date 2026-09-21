@@ -6,6 +6,7 @@ import {
   type CharacterBuilderDraft,
   type CharacterBuildPreview,
   type ResolvedCharacterCreationRules,
+  type ResolvedSpellcastingProgressionConfig,
   type SystemRulesetId,
   type ChoiceSet,
 } from '@rpg/contracts'
@@ -17,10 +18,18 @@ export function useCharacterPreview(
   rules: ResolvedCharacterCreationRules | null,
   rulesetId: SystemRulesetId | null,
   resolvedChoiceSets: readonly ChoiceSet[] = [],
+  spellcastingProgression: ResolvedSpellcastingProgressionConfig | null = null,
 ): CharacterBuildPreview | null {
   return useMemo(() => {
-    if (!catalogIndex || !rules || !rulesetId) return null
+    if (!catalogIndex || !rules || !rulesetId || !spellcastingProgression) return null
 
-    return buildCharacterPreview(draft, catalogIndex, rules, rulesetId, { resolvedChoiceSets })
-  }, [catalogIndex, draft, resolvedChoiceSets, rules, rulesetId])
+    return buildCharacterPreview(
+      draft,
+      catalogIndex,
+      rules,
+      rulesetId,
+      { resolvedChoiceSets },
+      spellcastingProgression,
+    )
+  }, [catalogIndex, draft, resolvedChoiceSets, rules, rulesetId, spellcastingProgression])
 }

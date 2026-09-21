@@ -7,10 +7,9 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { MarkdownContent } from './markdown-content'
 
-const globalsCss = readFileSync(
-  join(dirname(fileURLToPath(import.meta.url)), '../../styles/globals.css'),
-  'utf8',
-)
+const stylesDir = join(dirname(fileURLToPath(import.meta.url)), '../../styles')
+const globalsCss = readFileSync(join(stylesDir, 'globals.css'), 'utf8')
+const textActionCss = readFileSync(join(stylesDir, 'text-action.utilities.css'), 'utf8')
 
 describe('MarkdownContent', () => {
   it('renders markdown with prose classes', () => {
@@ -48,7 +47,10 @@ Hello **world**.`}
   })
 
   it('wires prose anchors to the shared inline text-action CSS rule', () => {
-    expect(globalsCss).toMatch(/:where\(a\) \{[\s\S]*@apply text-action-inline text-primary/)
+    expect(textActionCss).toMatch(/@utility text-action-inline/)
+    expect(globalsCss).toMatch(
+      /:where\(a\) \{[\s\S]*@apply underline decoration-from-font underline-offset-2 hover:decoration-2 text-primary/,
+    )
 
     const { container } = render(
       <MarkdownContent markdown="See [Rules](/docs) for details." size="md" />,

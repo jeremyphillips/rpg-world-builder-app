@@ -6,6 +6,7 @@ import {
   type CharacterBuildContext,
   type Spell,
 } from '@rpg/contracts'
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '@rpg/catalog/spellcasting-progressions'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { pickSkillProficiency, pickSpecies } from '@/test/fixtures/pick'
@@ -56,11 +57,24 @@ export const spellsStepWizardClass = makeClassStored({
   features: [],
   spellcasting: {
     level: 1,
-    progression: 'full',
+    slotProgressionId: 'full-caster',
     ability: 'int',
-    preparation: 'prepared',
-    cantrips: [{ level: 1, known: 3 }],
-    spellsAvailable: [{ level: 1, count: 4 }],
+    spellSelection: {
+      model: 'prepareFromLearnedCollection',
+      collection: 'spellbook',
+      acquisition: { curve: { rows: [{ level: 1, count: 6 }] }, extension: 'zero' },
+      change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+    },
+    progression: {
+      cantrips: {
+        curve: { rows: [{ level: 1, count: 3 }] },
+        extension: 'carryForward',
+      },
+      preparedSpells: {
+        curve: { rows: [{ level: 1, count: 4 }] },
+        extension: 'carryForward',
+      },
+    },
   },
 })
 
@@ -120,6 +134,10 @@ export function createSpellsStepContextFixture(
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: resolveIndexedCampaignSpellcastingProgressionConfig(
+      rulesetId,
+      undefined,
+    ),
     permissions: { canCreateCharacter: true },
     playActor: { kind: 'new_pc' },
     ...overrides,

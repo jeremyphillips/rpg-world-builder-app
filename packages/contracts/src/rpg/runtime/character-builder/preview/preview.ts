@@ -6,6 +6,7 @@ import { formatFieldMessage } from '../../../../validation/define-message'
 import { resolveUnresolvedChoiceSetSummaries } from '../readiness/resolve-unresolved-choice-set-summaries'
 import type { ChoiceSet } from '../choice-set'
 import { characterBuilderPreviewMessages } from '../messages/character-builder-preview-messages'
+import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/rules/spellcasting-progression'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from '../context'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { CharacterBuilderDraft } from '../draft/draft'
@@ -116,6 +117,7 @@ export function buildCharacterPreview(
   rules: ResolvedCharacterCreationRules,
   rulesetId: SystemRulesetId,
   options: CharacterBuildEngineOptions = {},
+  spellcastingProgression?: ResolvedSpellcastingProgressionConfig,
 ): CharacterBuildPreview {
   const choiceSets = options.resolvedChoiceSets ?? []
   const derivationInput = toCharacterDerivationInput(
@@ -124,6 +126,7 @@ export function buildCharacterPreview(
     rules,
     choiceSets,
     rulesetId,
+    spellcastingProgression,
   )
   const derived = deriveCharacterProfile(derivationInput)
 

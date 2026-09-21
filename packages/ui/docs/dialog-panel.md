@@ -33,6 +33,9 @@ dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
 | `dialogPanelScrollRegionClasses`               | Deprecated alias for inner scroll region layout + inner preset                                                            |
 | `dialogPanelSectionSeparatorBorderClasses`     | Shared faint separator color for header/footer section borders (`border-border-faint`)                                    |
 | `dialogPanelHeaderClasses`                     | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)  |
+| `dialogPanelHeaderLeadRowClasses`              | Leading icon + copy row when `DialogPanelHeader.leadIcon` is set (`gap-4` / 16px)                                         |
+| `dialogPanelHeaderCopyStackClasses`            | Title/description stack beside a header lead icon                                                                         |
+| `dialogPanelHeaderHeadlineStackClasses`        | Headline row → supporting description (`gap-0.5` / 2px)                                                                   |
 | `dialogPanelFooterClasses`                     | Overlay footer section chrome (`border-t` + separator token + `px-6` + `py-4`; no fill)                                   |
 | `dialogPanelActionRowClasses`                  | Action row flex helper — prefer `Modal.FooterActions` under Modal.Footer; `DialogPanelActionRow` for Sheet / form publish |
 

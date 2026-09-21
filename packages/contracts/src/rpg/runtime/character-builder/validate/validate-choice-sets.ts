@@ -5,7 +5,7 @@ import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../conte
 import { indexCharacterBuildCatalog } from '../context'
 import { indexPlayableBuilderCatalog } from '../preview/index-playable-builder-catalog'
 import type { CharacterBuilderDraft } from '../draft/draft'
-import { resolveSpellcastingProfile } from '../resolvers/spellcasting/spellcasting-profile'
+import { resolveSpellcastingProfile } from '../resolvers/spellcasting/builder-spellcasting'
 import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
 import { getChoiceSetStepId } from '../steps'
 

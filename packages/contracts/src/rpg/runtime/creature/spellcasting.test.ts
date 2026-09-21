@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
 import { warlockClass, wizardClass } from '../character-builder/spellcasting-test-fixtures'
+// spellcastingProgressionTestConfig still used by maxSelectableSpellLevel / spellsAvailableAtLevel
 import {
   cantripsKnownAtLevel,
   maxSelectableSpellLevel,
@@ -16,20 +18,32 @@ describe('cantripsKnownAtLevel', () => {
 
 describe('spellsAvailableAtLevel', () => {
   it('reads the best available count at or below the class level', () => {
-    expect(spellsAvailableAtLevel(wizardClass.spellcasting!, 1)).toBe(4)
+    expect(
+      spellsAvailableAtLevel(wizardClass.spellcasting!, 1, spellcastingProgressionTestConfig),
+    ).toBe(4)
   })
 })
 
 describe('maxSelectableSpellLevel', () => {
   it('returns the highest spell level with at least one slot', () => {
-    expect(maxSelectableSpellLevel(wizardClass.spellcasting!, 1)).toBe(1)
-    expect(maxSelectableSpellLevel(warlockClass.spellcasting!, 1)).toBe(1)
+    expect(
+      maxSelectableSpellLevel(wizardClass.spellcasting!, 1, spellcastingProgressionTestConfig),
+    ).toBe(1)
+    expect(
+      maxSelectableSpellLevel(warlockClass.spellcasting!, 1, spellcastingProgressionTestConfig),
+    ).toBe(1)
   })
 })
 
 describe('resolveSpellcastingFactsAtLevel', () => {
   it('combines progression facts for a class level', () => {
-    expect(resolveSpellcastingFactsAtLevel(wizardClass.spellcasting!, 1)).toEqual({
+    expect(
+      resolveSpellcastingFactsAtLevel(
+        wizardClass.spellcasting!,
+        1,
+        spellcastingProgressionTestConfig,
+      ),
+    ).toEqual({
       cantripsKnown: 3,
       spellsAvailable: 4,
       maxSelectableSpellLevel: 1,

@@ -21,6 +21,7 @@ export type FeatureTableRowModel = {
 }
 
 export type FeatureTableRowProps = FeatureTableRowModel & {
+  editLabel?: string
   onEdit?: () => void
   overflowActions?: ReactNode
 }
@@ -29,6 +30,7 @@ export function FeatureTableRow({
   title,
   metadata,
   typeLabel,
+  editLabel = 'Edit',
   onEdit,
   overflowActions,
 }: FeatureTableRowProps) {
@@ -54,7 +56,7 @@ export function FeatureTableRow({
                 {onEdit ? (
                   <Button type="button" variant="outline" size="sm" onClick={onEdit}>
                     <Pencil aria-hidden />
-                    Edit
+                    {editLabel}
                   </Button>
                 ) : null}
                 {overflowActions}

@@ -22,12 +22,26 @@ import {
   startingEquipmentGrantProficiencyChoiceId,
   resolveProgressionTableColumnValue,
   isProgressionContentTable,
+  resolveClassSpellcasting,
+  resolveSpellsAvailableFromClass,
   type CharacterClass,
   type ProgressionTableColumn,
 } from '@rpg/contracts'
 import { loadSeedEquipment } from '../equipment'
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '../spellcasting-progressions'
 
 const RULESET = 'srd-cc-5.2.1'
+const SPELLCASTING_PROGRESSION = resolveIndexedCampaignSpellcastingProgressionConfig(
+  RULESET,
+  undefined,
+)
+
+function spellsAvailableAtClassLevel(cls: CharacterClass, level: number): number {
+  if (!cls.spellcasting) return 0
+  const resolved = resolveClassSpellcasting(cls, SPELLCASTING_PROGRESSION)
+  if (!resolved) return 0
+  return resolveSpellsAvailableFromClass(resolved, level)
+}
 
 function asiLevelsFromFeatures(cls: CharacterClass): number[] {
   return cls.features
@@ -182,8 +196,8 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(bard)
     expect(bard.spellcasting?.description).toContain('cast spells through your bardic arts')
     expect(asiLevelsFromFeatures(bard)).toEqual([4, 8, 12, 16])
-    expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
-    expect(bard.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
+    expect(spellsAvailableAtClassLevel(bard, 1)).toBe(4)
+    expect(spellsAvailableAtClassLevel(bard, 20)).toBe(22)
     expectDiceColumnEntries(bard, 'bardic-inspiration', 'bardic-inspiration-progression', 'die', [
       { level: 1, value: { count: 1, faces: 6 } },
       { level: 5, value: { count: 1, faces: 8 } },
@@ -217,8 +231,8 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(ranger)
     expect(asiLevelsFromFeatures(ranger)).toEqual([4, 8, 12, 16])
     expect(ranger.spellcasting?.description).toContain('channel the magical essence of nature')
-    expect(ranger.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
-    expect(ranger.spellcasting?.spellsAvailable?.find((e) => e.level === 19)?.count).toBe(15)
+    expect(spellsAvailableAtClassLevel(ranger, 1)).toBe(2)
+    expect(spellsAvailableAtClassLevel(ranger, 19)).toBe(15)
     const favoredEnemy = ranger.features.find((f) => f.id === 'favored-enemy')
     const spellGrant = favoredEnemy?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
     expect(spellGrant).toMatchObject({
@@ -352,8 +366,8 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(cleric)
     expect(asiLevelsFromFeatures(cleric)).toEqual([4, 8, 12, 16])
     expect(cleric.spellcasting?.description).toContain('cast spells through prayer and meditation')
-    expect(cleric.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
-    expect(cleric.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
+    expect(spellsAvailableAtClassLevel(cleric, 1)).toBe(4)
+    expect(spellsAvailableAtClassLevel(cleric, 20)).toBe(22)
     const channelDivinity = cleric.features.find((f) => f.id === 'channel-divinity')
     expect(channelDivinity?.description).toContain('<strong>Divine Spark.</strong>')
     expect(channelDivinity?.description).toContain('<strong>Turn Undead.</strong>')
@@ -405,8 +419,8 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(druid)
     expect(asiLevelsFromFeatures(druid)).toEqual([4, 8, 12, 16])
     expect(druid.spellcasting?.description).toContain('studying the mystical forces of nature')
-    expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
-    expect(druid.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
+    expect(spellsAvailableAtClassLevel(druid, 1)).toBe(4)
+    expect(spellsAvailableAtClassLevel(druid, 20)).toBe(22)
     const druidic = druid.features.find((f) => f.id === 'druidic')
     const druidicGrants = druidic?.grantGroups?.[0]?.grants ?? []
     const druidicSpell = druidicGrants.find((g) => g.kind === 'spells')
@@ -604,8 +618,8 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(paladin)
     expect(asiLevelsFromFeatures(paladin)).toEqual([4, 8, 12, 16])
     expect(paladin.spellcasting?.description).toContain('cast spells through prayer and meditation')
-    expect(paladin.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
-    expect(paladin.spellcasting?.spellsAvailable?.find((e) => e.level === 19)?.count).toBe(15)
+    expect(spellsAvailableAtClassLevel(paladin, 1)).toBe(2)
+    expect(spellsAvailableAtClassLevel(paladin, 19)).toBe(15)
     const channelDivinity = paladin.features.find((f) => f.id === 'channel-divinity')
     expect(channelDivinity?.description).toContain('<strong>Divine Sense.</strong>')
     const paladinsSmite = paladin.features.find((f) => f.id === 'paladins-smite')
@@ -659,8 +673,8 @@ describe('SRD 5.2.1 class seed', () => {
     expect(asiLevelsFromFeatures(sorcerer)).toEqual([4, 8, 12, 16])
     expect(sorcerer.features.map((f) => f.id)).toContain('sorcerer-subclass')
     expect(sorcerer.spellcasting?.description).toContain('Drawing from your innate magic')
-    expect(sorcerer.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
-    expect(sorcerer.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(22)
+    expect(spellsAvailableAtClassLevel(sorcerer, 1)).toBe(2)
+    expect(spellsAvailableAtClassLevel(sorcerer, 20)).toBe(22)
     const fontOfMagic = sorcerer.features.find((f) => f.id === 'font-of-magic')
     expect(fontOfMagic?.description).toContain('<strong>Creating Spell Slots.</strong>')
     expect(fontOfMagic?.description).toContain('Min. Sorcerer Level 9')
@@ -729,10 +743,15 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(warlock)
     expect(asiLevelsFromFeatures(warlock)).toEqual([4, 8, 12, 16])
     expect(warlock.features.map((f) => f.id)).toContain('warlock-subclass')
-    expect(warlock.spellcasting?.preparation).toBe('prepared')
+    const warlockResolved = resolveClassSpellcasting(warlock, SPELLCASTING_PROGRESSION)
+    expect(
+      warlockResolved?.choiceProgressions.some(
+        (progression) => progression.destination === 'repertoire',
+      ),
+    ).toBe(true)
     expect(warlock.spellcasting?.description).toContain('formed a pact with a mysterious entity')
-    expect(warlock.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(2)
-    expect(warlock.spellcasting?.spellsAvailable?.find((e) => e.level === 19)?.count).toBe(15)
+    expect(spellsAvailableAtClassLevel(warlock, 1)).toBe(2)
+    expect(spellsAvailableAtClassLevel(warlock, 19)).toBe(15)
     const invocations = warlock.features.find((f) => f.id === 'eldritch-invocations')
     expect(invocations?.description).toContain('<strong>Prerequisites.</strong>')
     expect(invocations?.description).toContain(
@@ -815,8 +834,8 @@ describe('SRD 5.2.1 class seed', () => {
     expect(wizard.features.map((f) => f.id)).toContain('wizard-subclass')
     expect(wizard.spellcasting?.description).toContain('student of arcane magic')
     expect(wizard.spellcasting?.description).toContain('<strong>Spellbook.</strong>')
-    expect(wizard.spellcasting?.spellsAvailable?.find((e) => e.level === 1)?.count).toBe(4)
-    expect(wizard.spellcasting?.spellsAvailable?.find((e) => e.level === 20)?.count).toBe(25)
+    expect(spellsAvailableAtClassLevel(wizard, 1)).toBe(4)
+    expect(spellsAvailableAtClassLevel(wizard, 20)).toBe(25)
     const arcaneRecovery = wizard.features.find((f) => f.id === 'arcane-recovery')
     expect(arcaneRecovery?.description).toContain('half your Wizard level')
     const signatureSpells = wizard.features.find((f) => f.id === 'signature-spells')

@@ -1,15 +1,18 @@
 import type { CharacterClass } from '../../../../content/classes/class'
 import {
   isSpellcastingActiveAtLevel,
-  type SpellPreparationMode,
+  type Spellcasting,
 } from '../../../../content/classes/spellcasting'
+import { resolveClassCantripCount } from '../../../creature/spellcasting'
 import type { Ability } from '../../../../vocab/ability'
+import { CLASS_SPELLCASTING_CHOICE_SUFFIXES } from '../../../../content/classes/spellcasting'
 import {
-  cantripsKnownAtLevel,
-  maxSelectableSpellLevel,
-  spellsAvailableAtLevel,
-} from '../../../creature/spellcasting'
-import { buildChoiceSetId } from '../../choice-set'
+  findCompiledChoiceProgressionBySuffix,
+  resolveClassSpellcasting,
+  resolveMaxSelectableSpellLevelFromClass,
+  resolveSpellsAvailableFromClass,
+  type ResolvedClassSpellcasting,
+} from '../../../creature/resolve-class-spellcasting'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 
@@ -18,41 +21,51 @@ import type { CharacterBuilderDraft } from '../../draft/draft'
 // DC/attack/slots stay in CharacterBuildPreview.spellcasting (deriveSpellcastingStats).
 // ---------------------------------------------------------------------------
 
-export type SpellcastingProfile = {
+export type BuilderSpellcastingProfile = {
   classId: string
   className: string
   ability: Ability
-  preparation: SpellPreparationMode
+  classLevel: number
+  spellcasting: Spellcasting
+  resolved: ResolvedClassSpellcasting
+  /** True when the class includes a prepared loadout capacity progression. */
+  usesPreparedLoadout: boolean
   /** 0 → no cantrip ChoiceSet (paladin, ranger). */
   cantripsKnown: number
   spellsAvailable: number
   /** Highest spell level selectable at the current class level (from slot progression). */
   maxSelectableSpellLevel: number
-  choiceSetIds: { cantrips?: string; spells?: string }
 }
 
-function buildProfile(characterClass: CharacterClass, classLevel: number): SpellcastingProfile {
+function buildProfile(
+  characterClass: CharacterClass,
+  classLevel: number,
+  context: CharacterBuildContext,
+): BuilderSpellcastingProfile {
   const spellcasting = characterClass.spellcasting!
-  const cantripsKnown = cantripsKnownAtLevel(spellcasting, classLevel)
-  const spellsAvailable = spellsAvailableAtLevel(spellcasting, classLevel)
+  const resolved = resolveClassSpellcasting(characterClass, context.spellcastingProgression)!
 
-  const choiceSetIds: SpellcastingProfile['choiceSetIds'] = {}
-  if (cantripsKnown > 0) {
-    choiceSetIds.cantrips = buildChoiceSetId('spellcasting', characterClass.id, 'cantrips')
-  }
-  if (spellsAvailable > 0) {
-    choiceSetIds.spells = buildChoiceSetId('spellcasting', characterClass.id, 'spells')
-  }
+  const cantripsKnown = resolveClassCantripCount({ spellcasting, classLevel })
+  const spellsAvailable = resolveSpellsAvailableFromClass(resolved, classLevel)
+  const usesPreparedLoadout = Boolean(
+    findCompiledChoiceProgressionBySuffix(
+      resolved,
+      CLASS_SPELLCASTING_CHOICE_SUFFIXES.prepared,
+      'capacity',
+    ),
+  )
 
   return {
     classId: characterClass.id,
     className: characterClass.name,
     ability: spellcasting.ability,
-    preparation: spellcasting.preparation,
+    classLevel,
+    spellcasting,
+    resolved,
+    usesPreparedLoadout,
     cantripsKnown,
     spellsAvailable,
-    maxSelectableSpellLevel: maxSelectableSpellLevel(spellcasting, classLevel),
-    choiceSetIds,
+    maxSelectableSpellLevel: resolveMaxSelectableSpellLevelFromClass(resolved, classLevel),
   }
 }
 
@@ -63,7 +76,7 @@ function buildProfile(characterClass: CharacterClass, classLevel: number): Spell
 export function resolveSpellcastingProfile(
   draft: CharacterBuilderDraft,
   context: CharacterBuildContext,
-): SpellcastingProfile | null {
+): BuilderSpellcastingProfile | null {
   const classId = draft.class.classId
   if (!classId) return null
 
@@ -74,5 +87,9 @@ export function resolveSpellcastingProfile(
   const classLevel = draft.class.level
   if (!isSpellcastingActiveAtLevel(characterClass.spellcasting, classLevel)) return null
 
-  return buildProfile(characterClass, classLevel)
+  if (!resolveClassSpellcasting(characterClass, context.spellcastingProgression)) {
+    return null
+  }
+
+  return buildProfile(characterClass, classLevel, context)
 }

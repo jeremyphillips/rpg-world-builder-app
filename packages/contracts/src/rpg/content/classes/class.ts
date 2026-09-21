@@ -25,7 +25,7 @@ import {
   classCharacterCreationDraftSchema,
   classCharacterCreationSchema,
 } from '../starting-equipment'
-import { spellcastingSchema } from './spellcasting'
+import { spellcastingDraftSchema, spellcastingSchema } from './spellcasting'
 import { classValidationMessages } from './class-messages'
 import { contentSummaryRefSchema } from '../lib/content-summary-ref'
 import { contentTableSchema } from '../tables'
@@ -152,7 +152,7 @@ export const classBodyDraftSchema = draftAuthoredContentBodySchema(
 ).extend({
   primaryAbilities: z.array(abilitySchema).max(2).optional(),
   hitDie: hitDieSchema.optional(),
-  spellcasting: spellcastingSchema.optional(),
+  spellcasting: spellcastingDraftSchema.optional(),
   proficiencies: classProficienciesDraftSchema.optional(),
   features: z.array(classBodyFeatureSchema).default([]),
   characterCreation: classCharacterCreationDraftSchema.optional(),
@@ -313,6 +313,4 @@ export function classHasSpellcasting(cls: CharacterClass): boolean {
 // - Merge granularity for overlay patches: the read-time merge deep-merges
 //   objects but replaces arrays wholesale (override `features` entirely, not
 //   element-wise). Per-element array patching is deferred.
-// - CANTRIPS_KNOWN_PROFILES: a seed-only authoring helper (NOT in the contract)
-//   that expands shared SRD cantrip curves into the inline `cantrips` table.
 // ---------------------------------------------------------------------------

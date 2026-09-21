@@ -186,8 +186,9 @@ describe('Modal', () => {
     const body = within(dialog).getByText('Body content')
     const footer = within(dialog).getByRole('button', { name: 'Cancel' }).parentElement
       ?.parentElement
-    const header = within(dialog).getByRole('heading', { name: 'Invite a player' }).parentElement
-      ?.parentElement
+    const header = within(dialog)
+      .getByRole('heading', { name: 'Invite a player' })
+      .closest('.shrink-0.border-b')
 
     expect(body).toHaveClass('min-h-0', 'overflow-y-auto')
     expect(header).toHaveClass('shrink-0')

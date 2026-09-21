@@ -12,6 +12,7 @@ import {
   type StartingWealthRules,
 } from '../rules/starting-wealth'
 import { refineEffectiveXpProgression, xpThresholdsPatchSchema } from '../rules/xp-progression'
+import { spellcastingProgressionPatchSchema } from '../rules/spellcasting-progression'
 import type { XpProgressionEntry } from '../../primitives/xp-progression'
 import {
   campaignMulticlassingPatchSchema,
@@ -90,6 +91,7 @@ const campaignCharacterCreationProgressionPatchSchema = z
     /** Null clears extended progression on PATCH; omit to leave the stored value unchanged. */
     extendedProgression: extendedProgressionSchema.nullable().optional(),
     xpThresholds: xpThresholdsPatchSchema.optional(),
+    spellcasting: spellcastingProgressionPatchSchema.optional(),
   })
   .strict()
 
@@ -124,6 +126,7 @@ export const resolvedCampaignCharacterCreationProgressionSchema = z.object({
   maxCharacterLevel: z.number().int().min(1).max(ABSOLUTE_MAX_CHARACTER_LEVEL),
   extendedProgression: extendedProgressionSchema.optional(),
   xpThresholds: xpThresholdsPatchSchema.optional(),
+  spellcasting: spellcastingProgressionPatchSchema.optional(),
 })
 
 export type ResolvedCampaignCharacterCreationProgression = z.infer<
@@ -327,11 +330,13 @@ function resolveCharacterCreationProgression(
   const standardMaxCharacterLevel = patch?.progression?.maxCharacterLevel ?? MAX_CHARACTER_LEVEL
   const extendedProgression = patch?.progression?.extendedProgression
   const xpThresholds = patch?.progression?.xpThresholds
+  const spellcasting = patch?.progression?.spellcasting
 
   return {
     maxCharacterLevel: standardMaxCharacterLevel,
     ...(extendedProgression != null ? { extendedProgression } : {}),
     ...(xpThresholds !== undefined ? { xpThresholds } : {}),
+    ...(spellcasting !== undefined ? { spellcasting } : {}),
   }
 }
 

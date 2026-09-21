@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { type CharacterClass, type SkillProficiency, type Subclass } from '@rpg/contracts'
 
@@ -7,6 +8,8 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { WidePage } from '@/components/layout/page/wide-page'
 import { useCampaignRules } from '@/features/campaign'
+import { useRulesetPatch } from '@/features/homebrew'
+import { resolveCampaignSpellcastingProgression } from '@/lib/campaign-spellcasting-progression.lib'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useClasses } from '../hooks/use-classes'
 import { useSubclasses } from '../hooks/use-subclasses'
@@ -41,6 +44,15 @@ export function ClassDetailContent({
 }: ClassDetailContentProps) {
   useSetBreadcrumbLabel(characterClass.name)
   const campaignRules = useCampaignRules(campaignId)
+  const { data: rulesetPatch } = useRulesetPatch(campaignId)
+  const spellcastingProgression = useMemo(
+    () =>
+      resolveCampaignSpellcastingProgression(
+        characterClass.rulesetId,
+        rulesetPatch?.characterCreation.progression.spellcasting,
+      ),
+    [characterClass.rulesetId, rulesetPatch?.characterCreation.progression.spellcasting],
+  )
   const subclassingEnabled = campaignRules.subclassing.enabled
   const visibleFeatures = projectVisibleClassFeatures(characterClass.features, {
     subclassingEnabled,
@@ -82,7 +94,11 @@ export function ClassDetailContent({
         />
       </ClassDetailBody>
       {showProgressionTable ? (
-        <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
+        <ClassProgressionTable
+          characterClass={characterClass}
+          spellcastingProgression={spellcastingProgression}
+          campaignRules={campaignRules}
+        />
       ) : null}
     </WidePage>
   )

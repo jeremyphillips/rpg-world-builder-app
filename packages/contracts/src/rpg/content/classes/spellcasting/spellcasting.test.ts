@@ -1,49 +1,75 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  SPELL_PREPARATION_MODE_LABELS,
-  SPELL_PREPARATION_MODES,
-  isSpellcastingActiveAtLevel,
-  spellcastingFeatureLabel,
-  spellcastingSchema,
-  spellsAvailableEntrySchema,
-} from './spellcasting'
+import { isSpellcastingActiveAtLevel, spellcastingSchema } from './spellcasting'
 
-describe('SPELL_PREPARATION_MODES', () => {
-  it('derives mode ids from the label map', () => {
-    expect([...SPELL_PREPARATION_MODES].sort()).toEqual(
-      Object.keys(SPELL_PREPARATION_MODE_LABELS).sort(),
-    )
-  })
-})
+const wizardSelection = {
+  model: 'prepareFromLearnedCollection' as const,
+  collection: 'spellbook' as const,
+  acquisition: {
+    curve: { rows: [{ level: 1, count: 6 }] },
+    extension: 'zero' as const,
+  },
+  change: { kind: 'replace' as const, trigger: 'longRest' as const, limit: 'all' as const },
+}
 
 describe('spellcastingSchema', () => {
-  it('parses all preparation modes including full_list', () => {
-    for (const preparation of SPELL_PREPARATION_MODES) {
-      expect(
-        spellcastingSchema.safeParse({
-          progression: 'full',
-          ability: 'int',
-          preparation,
-        }).success,
-      ).toBe(true)
-    }
+  it('parses class-owned cantrip progression under progression.cantrips', () => {
+    const parsed = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
+      ability: 'int',
+      spellSelection: wizardSelection,
+      progression: {
+        cantrips: {
+          curve: {
+            rows: [
+              { level: 1, count: 3 },
+              { level: 4, count: 4 },
+            ],
+          },
+        },
+        preparedSpells: {
+          curve: { rows: [{ level: 1, count: 4 }] },
+        },
+      },
+    })
+    expect(parsed.progression?.cantrips?.curve.rows).toEqual([
+      { level: 1, count: 3 },
+      { level: 4, count: 4 },
+    ])
+  })
+
+  it('parses slotProgressionId, spellSelection, and ability', () => {
+    const parsed = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
+      ability: 'int',
+      spellSelection: wizardSelection,
+      progression: {
+        preparedSpells: {
+          curve: { rows: [{ level: 1, count: 4 }] },
+        },
+      },
+    })
+    expect(parsed.slotProgressionId).toBe('full-caster')
+    expect(parsed.spellSelection?.model).toBe('prepareFromLearnedCollection')
+    expect(parsed.ability).toBe('int')
+    expect(parsed.level).toBe(1)
   })
 
   it('parses optional level and description', () => {
-    const withDefaults = spellcastingSchema.parse({
-      progression: 'half',
-      ability: 'cha',
-      preparation: 'prepared',
-    })
-    expect(withDefaults.level).toBe(1)
-
     const withLevel = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
       level: 2,
-      progression: 'half',
       ability: 'cha',
-      preparation: 'prepared',
       description: '<p>Delayed caster.</p>',
+      spellSelection: {
+        model: 'limitedRepertoire',
+        change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+      },
+      progression: {
+        repertoire: {
+          curve: { rows: [{ level: 1, count: 4 }] },
+        },
+      },
     })
     expect(withLevel.level).toBe(2)
     expect(withLevel.description).toBe('<p>Delayed caster.</p>')
@@ -51,84 +77,117 @@ describe('spellcastingSchema', () => {
 
   it('parses optional focus kinds and rejects non-focus kinds', () => {
     const spellcasting = spellcastingSchema.parse({
-      progression: 'full',
+      slotProgressionId: 'full-caster',
       ability: 'int',
-      preparation: 'prepared',
+      spellSelection: wizardSelection,
+      progression: {
+        preparedSpells: {
+          curve: { rows: [{ level: 1, count: 4 }] },
+        },
+      },
       focusKinds: ['arcane_focus'],
     })
     expect(spellcasting.focusKinds).toEqual(['arcane_focus'])
 
     expect(
       spellcastingSchema.safeParse({
-        progression: 'full',
+        slotProgressionId: 'full-caster',
         ability: 'int',
-        preparation: 'prepared',
+        spellSelection: wizardSelection,
+        progression: {
+          preparedSpells: {
+            curve: { rows: [{ level: 1, count: 4 }] },
+          },
+        },
         focusKinds: ['spellbook'],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects limited repertoire with prepared spells progression', () => {
+    expect(
+      spellcastingSchema.safeParse({
+        slotProgressionId: 'full-caster',
+        ability: 'cha',
+        spellSelection: {
+          model: 'limitedRepertoire',
+          change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+        },
+        progression: {
+          repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
+          preparedSpells: { curve: { rows: [{ level: 1, count: 4 }] } },
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects learned collection without acquisition or prepared progression', () => {
+    expect(
+      spellcastingSchema.safeParse({
+        slotProgressionId: 'full-caster',
+        ability: 'int',
+        spellSelection: {
+          model: 'prepareFromLearnedCollection',
+          collection: 'spellbook',
+          acquisition: { curve: { rows: [] }, extension: 'zero' },
+          change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+        },
+        progression: {
+          preparedSpells: { curve: { rows: [] } },
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects repertoire progression without a spell selection model', () => {
+    expect(
+      spellcastingSchema.safeParse({
+        slotProgressionId: 'full-caster',
+        ability: 'cha',
+        progression: {
+          repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
+        },
       }).success,
     ).toBe(false)
   })
 
   it('parses required and recommended spellcasting gear', () => {
     const spellcasting = spellcastingSchema.parse({
-      progression: 'full',
+      slotProgressionId: 'full-caster',
       ability: 'int',
-      preparation: 'prepared',
+      spellSelection: wizardSelection,
+      progression: {
+        preparedSpells: {
+          curve: { rows: [{ level: 1, count: 4 }] },
+        },
+      },
       requiredGear: ['spellbook'],
       focusKinds: ['arcane_focus'],
-      recommendedGear: ['spellbook'],
+      recommendedGear: ['component_pouch'],
     })
     expect(spellcasting.requiredGear).toEqual(['spellbook'])
     expect(spellcasting.focusKinds).toEqual(['arcane_focus'])
-    expect(spellcasting.recommendedGear).toEqual(['spellbook'])
-  })
-
-  it('parses spellsAvailable with count instead of prepared', () => {
-    const spellcasting = spellcastingSchema.parse({
-      progression: 'full',
-      ability: 'int',
-      preparation: 'prepared',
-      spellsAvailable: [{ level: 1, count: 4 }],
-    })
-
-    expect(spellcasting.spellsAvailable).toEqual([{ level: 1, count: 4 }])
-  })
-
-  it('strips legacy spellsPrepared field on parse', () => {
-    const result = spellcastingSchema.parse({
-      progression: 'full',
-      ability: 'int',
-      preparation: 'prepared',
-      spellsPrepared: [{ level: 1, prepared: 4 }],
-    })
-
-    expect(result.spellsAvailable).toBeUndefined()
-    expect('spellsPrepared' in result).toBe(false)
-  })
-})
-
-describe('spellcastingFeatureLabel', () => {
-  it('returns Pact Magic for pact progression', () => {
-    expect(spellcastingFeatureLabel('pact')).toBe('Pact Magic')
-    expect(spellcastingFeatureLabel('full')).toBe('Spellcasting')
+    expect(spellcasting.recommendedGear).toEqual(['component_pouch'])
   })
 })
 
 describe('isSpellcastingActiveAtLevel', () => {
   it('respects unlock level', () => {
-    const half = spellcastingSchema.parse({
+    const delayed = spellcastingSchema.parse({
+      slotProgressionId: 'half-caster',
       level: 2,
-      progression: 'half',
       ability: 'cha',
-      preparation: 'prepared',
+      spellSelection: {
+        model: 'prepareFromClassList',
+        change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+      },
+      progression: {
+        preparedSpells: {
+          curve: { rows: [{ level: 1, count: 2 }] },
+        },
+      },
     })
-    expect(isSpellcastingActiveAtLevel(half, 1)).toBe(false)
-    expect(isSpellcastingActiveAtLevel(half, 2)).toBe(true)
-  })
-})
-
-describe('spellsAvailableEntrySchema', () => {
-  it('requires count, not prepared', () => {
-    expect(spellsAvailableEntrySchema.safeParse({ level: 1, count: 2 }).success).toBe(true)
-    expect(spellsAvailableEntrySchema.safeParse({ level: 1, prepared: 2 }).success).toBe(false)
+    expect(isSpellcastingActiveAtLevel(delayed, 1)).toBe(false)
+    expect(isSpellcastingActiveAtLevel(delayed, 2)).toBe(true)
   })
 })

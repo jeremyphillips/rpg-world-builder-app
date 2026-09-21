@@ -14,6 +14,8 @@ import {
 
 import { useSession } from '@/features/auth'
 
+import { resolveCampaignSpellcastingProgression } from '@/lib/campaign-spellcasting-progression.lib'
+
 import {
   buildContextQueryKey,
   fetchBuilderCatalog,
@@ -52,6 +54,10 @@ export function useBuildContext(rulesetId: SystemRulesetId | undefined) {
         abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
         armorClass: query.data.patch.mechanics.armorClass,
       },
+      spellcastingProgression: resolveCampaignSpellcastingProgression(
+        rulesetId,
+        query.data.patch.characterCreation.progression.spellcasting,
+      ),
       permissions: { canCreateCharacter: true },
       playActor: { kind: 'new_pc' },
     }

@@ -9,7 +9,7 @@ import type {
   WeaponCategory,
   ContentValidationIntent,
 } from '@rpg/contracts'
-import type { ResolvedCampaignRules } from '@rpg/contracts'
+import type { ResolvedCampaignRules, ResolvedSpellcastingProgressionConfig } from '@rpg/contracts'
 
 import type {
   CreatureTypeVocabulary,
@@ -41,6 +41,8 @@ export type ContentFormCtx = {
   entitySource?: ContentSource
   /** Resolved campaign rule overrides (defaults when absent). */
   campaignRules?: ResolvedCampaignRules
+  /** Resolved spellcasting progression records (seed + campaign patch). */
+  spellcastingProgression?: ResolvedSpellcastingProgressionConfig
   /** Campaign-resolved creature type labels and active ids. */
   creatureTypeVocabulary?: CreatureTypeVocabulary
   /** Campaign-resolved damage type labels and active ids (elemental + planar). */

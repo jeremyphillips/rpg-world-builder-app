@@ -77,6 +77,12 @@
     },
     {
       "fileMatch": [
+        "packages/catalog/src/spellcasting-progressions/data/**/slot-progressions.json"
+      ],
+      "url": "./packages/contracts/generated/catalog-slot-progression-seed.schema.json"
+    },
+    {
+      "fileMatch": [
         "packages/catalog/src/presets/campaign-templates/data/campaign-templates.json"
       ],
       "url": "./packages/contracts/generated/catalog-campaign-template-list.schema.json"

@@ -2,6 +2,15 @@ export {
   TableBuilderModal,
   type TableBuilderModalProps,
 } from '@/features/content/components/table-builder/table-builder-modal'
+export {
+  TableBuilderValuesPane,
+  type TableBuilderValuesPaneProps,
+} from '@/features/content/components/table-builder/table-builder-values-pane'
+export {
+  TableBuilderValues,
+  type TableBuilderValuesChrome,
+  type TableBuilderValuesProps,
+} from '@/features/content/components/table-builder/table-builder-values'
 export { createFixedLevelsTableBuilderDraft } from '@/features/content/lib/table-builder/create-fixed-levels-table-builder-draft'
 export {
   isTableBuilderCellBlank,
@@ -18,6 +27,7 @@ export type {
   TableBuilderDraftValidationResult,
   TableBuilderExtendedProgression,
   TableBuilderExtendedProgressionAction,
+  TableBuilderFixedColumnDefinition,
   TableBuilderHostConfig,
   TableBuilderHostEditorRowState,
   TableBuilderRowPresentation,
@@ -25,3 +35,4 @@ export type {
   TableBuilderRowRestoreAction,
   TableBuilderValuesNotice,
 } from '@/features/content/lib/table-builder/table-builder-host-config'
+export { resolveTableBuilderFixedColumns } from '@/features/content/lib/table-builder/table-builder-host-config'

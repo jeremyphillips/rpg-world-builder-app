@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { spellcastingProgressionTestConfig } from '../../../../campaign/rules/spellcasting-progression/fixtures'
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
@@ -14,7 +15,7 @@ import {
   maxSelectableSpellLevel,
   spellsAvailableAtLevel,
 } from '../../../creature/spellcasting'
-import { resolveSpellcastingProfile } from './spellcasting-profile'
+import { resolveSpellcastingProfile } from './builder-spellcasting'
 
 function draftWith(overrides: Partial<CharacterBuilderDraft>): CharacterBuilderDraft {
   return { ...createEmptyCharacterBuilderDraft(), ...overrides }
@@ -56,22 +57,26 @@ describe('spellcasting-profile', () => {
       class: { classId: wizardClass.id, level: 1 },
     })
 
-    expect(resolveSpellcastingProfile(draft, spellcastingTestContext)).toEqual({
+    const profile = resolveSpellcastingProfile(draft, spellcastingTestContext)
+
+    expect(profile).toMatchObject({
       classId: wizardClass.id,
       className: 'Wizard',
       ability: 'int',
-      preparation: 'prepared',
+      classLevel: 1,
+      usesPreparedLoadout: true,
       cantripsKnown: 3,
       spellsAvailable: 4,
       maxSelectableSpellLevel: 1,
-      choiceSetIds: {
-        cantrips: `spellcasting:${wizardClass.id}:cantrips`,
-        spells: `spellcasting:${wizardClass.id}:spells`,
-      },
     })
+    expect(profile?.resolved.choiceProgressions.map((entry) => entry.suffix)).toEqual([
+      'cantrips',
+      'spellbook',
+      'prepared',
+    ])
   })
 
-  it('omits cantrip choice set ids for paladin and ranger-style zero-cantrip casters', () => {
+  it('omits cantrip quota for paladin-style zero-cantrip casters', () => {
     const draft = draftWith({
       class: { classId: paladinClass.id, level: 1 },
     })
@@ -79,8 +84,6 @@ describe('spellcasting-profile', () => {
     const profile = resolveSpellcastingProfile(draft, spellcastingTestContext)
 
     expect(profile?.cantripsKnown).toBe(0)
-    expect(profile?.choiceSetIds.cantrips).toBeUndefined()
-    expect(profile?.choiceSetIds.spells).toBe(`spellcasting:${paladinClass.id}:spells`)
   })
 
   it('produces a pact-slot level-1 profile for warlock', () => {
@@ -95,14 +98,16 @@ describe('spellcasting-profile', () => {
       spellsAvailable: 2,
       maxSelectableSpellLevel: 1,
     })
-    expect(maxSelectableSpellLevel(warlockClass.spellcasting!, 1)).toBe(1)
+    expect(
+      maxSelectableSpellLevel(warlockClass.spellcasting!, 1, spellcastingProgressionTestConfig),
+    ).toBe(1)
   })
 
   it('reads progression tables at the requested class level', () => {
     const spellcasting = wizardClass.spellcasting!
 
     expect(cantripsKnownAtLevel(spellcasting, 1)).toBe(3)
-    expect(spellsAvailableAtLevel(spellcasting, 1)).toBe(4)
-    expect(maxSelectableSpellLevel(spellcasting, 1)).toBe(1)
+    expect(spellsAvailableAtLevel(spellcasting, 1, spellcastingProgressionTestConfig)).toBe(4)
+    expect(maxSelectableSpellLevel(spellcasting, 1, spellcastingProgressionTestConfig)).toBe(1)
   })
 })

@@ -127,11 +127,24 @@ describe('builder-preview-projection.lib', () => {
       },
       spellcasting: {
         level: 1,
-        progression: 'full',
+        slotProgressionId: 'full-caster',
         ability: 'int',
-        preparation: 'prepared',
-        cantrips: [{ level: 1, known: 3 }],
-        spellsAvailable: [{ level: 1, count: 4 }],
+        spellSelection: {
+          model: 'prepareFromLearnedCollection',
+          collection: 'spellbook',
+          acquisition: { curve: { rows: [{ level: 1, count: 6 }] }, extension: 'zero' },
+          change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+        },
+        progression: {
+          cantrips: {
+            curve: { rows: [{ level: 1, count: 3 }] },
+            extension: 'carryForward',
+          },
+          preparedSpells: {
+            curve: { rows: [{ level: 1, count: 4 }] },
+            extension: 'carryForward',
+          },
+        },
       },
     })
     const inactiveDraft = createEmptyCharacterBuilderDraft()

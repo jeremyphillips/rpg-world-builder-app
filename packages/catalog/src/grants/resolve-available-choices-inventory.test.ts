@@ -13,6 +13,7 @@ import { loadSeedSpecies } from '../species'
 import { loadSeedSkillProficiencies } from '../skill-proficiencies'
 import { listLanguageSeedOptions } from '../vocabulary'
 import { standardStartingWealthSeed } from '../starting-wealth/test-fixtures'
+import { resolveIndexedCampaignSpellcastingProgressionConfig } from '../spellcasting-progressions'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -36,6 +37,10 @@ function seedBuildContext(): CharacterBuildContext {
       organizations: [],
       languages: [...listLanguageSeedOptions(RULESET)],
     },
+    spellcastingProgression: resolveIndexedCampaignSpellcastingProgressionConfig(
+      RULESET,
+      undefined,
+    ),
     characterCreationRules: {
       ...resolveCharacterCreationPatch(undefined, standardStartingWealthSeed()),
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,

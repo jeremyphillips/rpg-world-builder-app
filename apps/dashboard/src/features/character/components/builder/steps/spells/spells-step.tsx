@@ -27,11 +27,7 @@ import { BuilderStepChooseClassPrompt } from '../shared/builder-step-choose-clas
 import { BuilderStepReadinessPanel } from '../shared/builder-step-readiness-panel'
 import { SpellChoiceSection } from './spell-choice-section'
 import { SpellcastingSummaryCard } from './spellcasting-summary-card'
-import {
-  SPELL_PICKER_MODE_CANTRIPS,
-  type SpellPickerMode,
-} from '../../../spells/picker/spell-picker-drawer.types'
-import { spellPickerModeForChoiceSet, SpellsStepPicker } from './spells-step-picker'
+import { SpellsStepPicker } from './spells-step-picker'
 
 export type SpellsStepProps = {
   context: CharacterBuildContext
@@ -61,13 +57,7 @@ export function SpellsStep({
     () => choiceSetsForSpellsStep(resolvedChoiceSets),
     [resolvedChoiceSets],
   )
-  const [pickerOpen, setPickerOpen] = useState(false)
-  const [initialPickerMode, setInitialPickerMode] = useState<SpellPickerMode>(
-    SPELL_PICKER_MODE_CANTRIPS,
-  )
-
-  const cantripChoiceSet = choiceSets.find((choiceSet) => choiceSet.choiceType === 'cantrip')
-  const preparedChoiceSet = choiceSets.find((choiceSet) => choiceSet.choiceType === 'spell')
+  const [pickerChoiceSet, setPickerChoiceSet] = useState<ChoiceSet | null>(null)
 
   if (isBuilderStepBlockedNoClass(readiness, draft)) {
     return (
@@ -109,8 +99,7 @@ export function SpellsStep({
               choiceSet={choiceSet}
               selectedIds={selectedIds}
               onAdd={() => {
-                setInitialPickerMode(spellPickerModeForChoiceSet(choiceSet))
-                setPickerOpen(true)
+                setPickerChoiceSet(choiceSet)
               }}
               onRemove={(spellId) => {
                 onDraftChange({
@@ -126,16 +115,14 @@ export function SpellsStep({
         })}
       </div>
 
-      {pickerOpen ? (
+      {pickerChoiceSet ? (
         <SpellsStepPicker
           className={profile.className}
           draft={draft}
           context={context}
-          cantripChoiceSet={cantripChoiceSet}
-          preparedChoiceSet={preparedChoiceSet}
-          initialMode={initialPickerMode}
+          choiceSet={pickerChoiceSet}
           onDraftChange={onDraftChange}
-          onClose={() => setPickerOpen(false)}
+          onClose={() => setPickerChoiceSet(null)}
         />
       ) : null}
     </BuilderStepFrame>

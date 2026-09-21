@@ -1,0 +1,9 @@
+/** Inline text links — SSOT for prose, Markdown, and `<Link context="inline">`. */
+@utility text-action-inline {
+  @apply underline decoration-from-font underline-offset-2 hover:decoration-2;
+}
+
+/** Standalone text actions — underline appears on hover. */
+@utility text-action-standalone {
+  @apply no-underline underline-offset-4 hover:underline;
+}

@@ -99,6 +99,7 @@ describe('publish weapon proficiency validation', () => {
     primaryAbilities: ['str'] as const,
     hitDie: 8,
     hasSpellcasting: false,
+    grantsCantrips: false,
     weaponProficiencyMode: 'categories' as const,
     proficiencies: {
       savingThrows: ['str'],

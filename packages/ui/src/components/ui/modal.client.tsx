@@ -121,6 +121,8 @@ export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   headline: React.ReactNode
   /** Optional supporting copy — maps to `Dialog.Description`. */
   description?: React.ReactNode
+  /** Decorative leading icon slot — caller supplies {@link IconContainer} or similar. */
+  leadIcon?: React.ReactNode
   /** Escape hatch — overrides the shared dialogTitle default from DialogPanelHeader. */
   headlineClassName?: string
   /** Right-aligned slot on the title row (e.g. primary action). */
@@ -129,7 +131,17 @@ export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
   (
-    { className, kicker, headline, description, headlineClassName, endSlot, children, ...props },
+    {
+      className,
+      kicker,
+      headline,
+      description,
+      leadIcon,
+      headlineClassName,
+      endSlot,
+      children,
+      ...props
+    },
     ref,
   ) => (
     <ModalHeaderBase
@@ -138,6 +150,7 @@ const ModalHeader = React.forwardRef<HTMLDivElement, ModalHeaderProps>(
       kicker={kicker}
       headline={headline}
       description={description}
+      leadIcon={leadIcon}
       headlineClassName={headlineClassName}
       endSlot={endSlot}
       {...props}

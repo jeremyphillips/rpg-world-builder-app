@@ -4,6 +4,7 @@ import {
   TABLE_BUILDER_ADD_ROW_LABEL,
   TABLE_BUILDER_ALL_LEVELS_USED_REASON,
 } from '../../lib/table-builder/table-builder-copy'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
 import {
   tableBuilderAddActionClasses,
   tableBuilderAddActionIconClasses,
@@ -21,6 +22,9 @@ export function TableBuilderValuesAddRow({
   addRowDisabled,
   onAddRow,
 }: TableBuilderValuesAddRowProps) {
+  const config = useTableBuilderHostConfig()
+  const addRowLabel = config.addRowLabel ?? TABLE_BUILDER_ADD_ROW_LABEL
+
   return (
     <div className={tableBuilderAddActionWrapClasses}>
       <button
@@ -31,7 +35,7 @@ export function TableBuilderValuesAddRow({
         title={addRowDisabled ? TABLE_BUILDER_ALL_LEVELS_USED_REASON : undefined}
       >
         <Plus className={tableBuilderAddActionIconClasses} aria-hidden />
-        {TABLE_BUILDER_ADD_ROW_LABEL}
+        {addRowLabel}
         {includeLevel && addRowDisabled ? (
           <span className="sr-only">{TABLE_BUILDER_ALL_LEVELS_USED_REASON}</span>
         ) : null}

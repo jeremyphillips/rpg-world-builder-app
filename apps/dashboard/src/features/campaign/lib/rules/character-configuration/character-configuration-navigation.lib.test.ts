@@ -29,6 +29,7 @@ describe('buildCharacterConfigurationNavigation', () => {
       'progression-standard-max-level',
       'progression-extended',
       'progression-experience-thresholds',
+      'progression-spellcasting',
     ])
 
     expect(navigation[2]?.leaves).toBeUndefined()

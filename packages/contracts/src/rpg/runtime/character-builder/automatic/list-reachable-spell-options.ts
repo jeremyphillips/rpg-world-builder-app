@@ -2,7 +2,7 @@ import type { CharacterBuildContext } from '../context'
 import { indexCharacterBuildCatalog } from '../context'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { resolveSpellcastingChoiceSets } from '../resolvers/spellcasting/resolve-spellcasting-choice-sets'
-import { resolveSpellcastingProfile } from '../resolvers/spellcasting/spellcasting-profile'
+import { resolveSpellcastingProfile } from '../resolvers/spellcasting/builder-spellcasting'
 import type { AutomaticNpcBuildSeed } from './automatic-npc-build-seed'
 
 export type ReachableSpellOption = {
@@ -33,7 +33,7 @@ export function listReachableSpellOptions(args: {
   const profile = resolveSpellcastingProfile(draft, args.context)
   if (!profile) return []
 
-  return resolveSpellcastingChoiceSets(profile, characterClass.slug, catalogIndex).flatMap(
+  return resolveSpellcastingChoiceSets(profile, characterClass.slug, catalogIndex, draft).flatMap(
     (choiceSet) =>
       choiceSet.options.map((option) => ({
         id: option.id,

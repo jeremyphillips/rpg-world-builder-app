@@ -7,6 +7,7 @@ import type { ContentPlayActor } from '../campaign/content-play-actor'
 import type { CharacterBuildContext } from './context'
 import { DEFAULT_ABILITY_GENERATION_RULES } from './ability/ability-generation'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
+import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import { resolveCharacterOwnershipTarget } from '../character-acquisition'
 import { createEmptyCharacterBuilderDraft } from './draft/draft'
@@ -91,6 +92,7 @@ function makeContext(input: {
       abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
       armorClass: defaultCampaignMechanicsPatch().armorClass,
     },
+    spellcastingProgression: spellcastingProgressionTestConfig,
     permissions: { canCreateCharacter: true },
     playActor: input.playActor,
   }

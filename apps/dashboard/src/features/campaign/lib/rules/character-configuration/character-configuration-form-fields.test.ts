@@ -173,6 +173,7 @@ describe('character-configuration-form-fields', () => {
           'progression-standard-max-level',
           'progression-extended',
           'progression-experience-thresholds',
+          'progression-spellcasting',
           'multiclassing',
         ]),
       )

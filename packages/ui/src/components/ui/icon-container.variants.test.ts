@@ -17,4 +17,13 @@ describe('iconContainerVariants', () => {
     expect(iconContainerVariants()).toContain('bg-surface-strong')
     expect(iconContainerVariants()).toContain('[--surface-current:var(--surface-strong)]')
   })
+
+  it('defaults to the compact sm footprint', () => {
+    expect(iconContainerVariants()).toContain('size-10')
+  })
+
+  it('supports the larger md footprint', () => {
+    expect(iconContainerVariants({ size: 'md' })).toContain('size-[3.75rem]')
+    expect(iconContainerVariants({ size: 'md' })).toContain('[&>svg]:size-6')
+  })
 })
