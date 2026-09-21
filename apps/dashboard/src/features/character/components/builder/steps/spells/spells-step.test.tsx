@@ -157,7 +157,7 @@ describe('SpellsStep', () => {
     })
   })
 
-  it('shows Manage cantrips when the cantrip ChoiceSet is full and keeps the drawer trigger enabled', () => {
+  it('shows Edit when the cantrip ChoiceSet is full and keeps the drawer trigger enabled', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: spellsStepWizardClass.id, level: 1 as const },
@@ -184,8 +184,8 @@ describe('SpellsStep', () => {
       />,
     )
 
-    const manageButton = screen.getByRole('button', { name: 'Manage cantrips' })
-    expect(manageButton).toBeEnabled()
+    const editButton = screen.getByRole('button', { name: 'Edit' })
+    expect(editButton).toBeEnabled()
     expect(screen.queryByText('Selection full')).not.toBeInTheDocument()
   })
 

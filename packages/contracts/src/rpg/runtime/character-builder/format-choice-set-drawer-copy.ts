@@ -29,7 +29,10 @@ export function formatChoiceSetDrawerHeading(choiceType: ChoiceSet['choiceType']
   }
 }
 
-/** Progress label for proficiency choice-set counters (category aggregate and per-block). */
-export function formatProficiencyChosenCounter(selectedCount: number, max: number): string {
+/** Progress label for builder choice-set counters (category aggregate and per-block). */
+export function formatChoiceChosenCounter(selectedCount: number, max: number): string {
   return `${selectedCount} / ${max} chosen`
 }
+
+/** @deprecated Use {@link formatChoiceChosenCounter}. */
+export const formatProficiencyChosenCounter = formatChoiceChosenCounter

@@ -48,6 +48,7 @@ export function SpellPickerDrawer({
   cantripItems,
   preparedItems,
   initialMode,
+  initialSpellLevel,
   recommendationsEnabled = false,
   displayVocabulary,
   onSelectSpell,
@@ -76,6 +77,7 @@ export function SpellPickerDrawer({
   } = useSpellPickerController({
     open,
     initialMode,
+    initialSpellLevel,
     recommendationsEnabled,
     displayVocabulary,
     cantripChoiceSet,

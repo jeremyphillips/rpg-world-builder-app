@@ -23,8 +23,12 @@ import {
   formatProficiencySectionEmptyMessage,
   formatProficiencySingleSetSupportingCopy,
   resolveProficiencyAggregateCount,
-  type ProficiencyAggregateCount,
 } from './format-proficiency-step-copy'
+import type {
+  BuilderChoiceBlock,
+  BuilderChoiceSelectedRow,
+  BuilderChoiceSectionModel,
+} from '../../builder-choice-section-model'
 import {
   resolveProficiencyChoicePresentation,
   sortProficiencyChoiceSets,
@@ -60,40 +64,15 @@ export type GrantedProficiencySummaryRow = {
   sourceGroups: GrantedProficiencySourceGroup[]
 }
 
-export type ProficiencyChoiceSelectedRow = {
-  optionId: string
-  label: string
-  choiceSetId: string
-  isStale: boolean
-  staleReason?: string
-  isRemovable: true
-}
+export type ProficiencyChoiceSelectedRow = BuilderChoiceSelectedRow
 
-export type ProficiencyChoiceBlock = {
-  choiceSet: ChoiceSet
-  heading: string
-  sourceLine?: string
-  selectedCount: number
-  min: number
-  max: number
-  poolDescription: string
-  compactAddLabel: string
-  isFull: boolean
-  isOverSelected: boolean
-}
+export type ProficiencyChoiceBlock = BuilderChoiceBlock
 
-export type ProficiencyInteractiveSection = {
+export type ProficiencyInteractiveSection = BuilderChoiceSectionModel & {
   kind: ProficiencyStepSectionKind
-  heading: string
-  subhead: string
-  /** Single-set only — shown when choice-set identity is not absorbed into subhead. */
-  identityLine?: string
-  aggregateCount: ProficiencyAggregateCount | null
-  selectedRows: ProficiencyChoiceSelectedRow[]
-  choiceBlocks: ProficiencyChoiceBlock[]
-  emptyMessage: string
-  isOverSelected: boolean
 }
+
+export type { ProficiencyAggregateCount } from './format-proficiency-step-copy'
 
 export type ProficiencyStepModel = {
   fixedGrants: GrantedProficiencySummaryRow[]
@@ -358,6 +337,7 @@ function buildInteractiveSection(
       : undefined
 
   return {
+    id: kind,
     kind,
     heading: PROFICIENCY_SECTION_HEADINGS[kind],
     subhead:
@@ -366,6 +346,7 @@ function buildInteractiveSection(
     identityLine: singleSetSupportingCopy?.identityLine,
     aggregateCount: resolveProficiencyAggregateCount(choiceBlocks),
     selectedRows,
+    grantedRows: [],
     choiceBlocks,
     emptyMessage: formatProficiencySectionEmptyMessage(kind, hasFixedGrantsInCategory),
     isOverSelected: choiceBlocks.some((block) => block.isOverSelected),

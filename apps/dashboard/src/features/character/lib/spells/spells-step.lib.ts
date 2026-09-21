@@ -5,7 +5,9 @@ import {
   type CharacterDerivedSpellcasting,
   type ChoiceSet,
   type BuilderSpellcastingProfile,
+  type BuilderChoiceSectionModel,
 } from '@rpg/contracts'
+import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 
 import {
   BUILDER_SELECTION_FULL_NOTICE,
@@ -25,6 +27,11 @@ export const SPELLS_CHOOSE_CLASS_PROMPT_DESCRIPTION =
 export const SPELLS_STEP_PENDING_ABILITY_LABEL = 'Pending ability scores'
 
 export const SPELLS_STEP_SELECTION_FULL_REASON = BUILDER_SELECTION_FULL_NOTICE
+
+export const SPELLS_STEP_OVER_SELECTION_MESSAGE =
+  'You selected more spells than allowed. Remove extras to continue.' as const
+
+export const SPELLCASTING_FACT_SUMMARY_HEADING = 'Spellcasting' as const
 
 /** ChoiceSets owned by the spells builder step. */
 export function choiceSetsForSpellsStep(choiceSets: readonly ChoiceSet[]): ChoiceSet[] {
@@ -104,4 +111,21 @@ export function spellcastingPreviewStats(
   preview: CharacterBuildPreview | null,
 ): CharacterDerivedSpellcasting | null {
   return preview?.spellcasting ?? null
+}
+
+/** Validation issues targeted at a single spell ChoiceSet. */
+export function validationIssuesForSpellChoiceSet(
+  issues: readonly CharacterBuildValidationIssue[],
+  choiceSetId: string,
+): CharacterBuildValidationIssue[] {
+  return issues.filter((issue) => issue.choiceSetId === choiceSetId)
+}
+
+/** Section-level issues when the section owns one ChoiceSet block. */
+export function validationIssuesForSpellSection(
+  issues: readonly CharacterBuildValidationIssue[],
+  section: Pick<BuilderChoiceSectionModel, 'choiceBlocks'>,
+): CharacterBuildValidationIssue[] {
+  if (section.choiceBlocks.length !== 1) return []
+  return validationIssuesForSpellChoiceSet(issues, section.choiceBlocks[0]!.choiceSet.id)
 }

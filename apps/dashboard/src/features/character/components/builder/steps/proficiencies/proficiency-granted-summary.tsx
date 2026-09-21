@@ -1,27 +1,11 @@
 import type { RefObject } from 'react'
 
 import type { GrantedProficiencySummaryRow } from '@rpg/contracts'
-import { cn, Heading, IconContainer, Text } from '@rpg/ui'
 
+import { BuilderFactSummary } from '../shared/fact-summary/builder-fact-summary'
+import { sourceMeasureLabelClasses } from '../shared/fact-summary/use-builder-fact-summary-source-width'
 import { proficiencyCategoryIcons } from './proficiency-category-icons'
-import {
-  sourceMeasureLabelClasses,
-  useProficiencyGrantedSummarySourceWidth,
-} from './use-proficiency-granted-summary-source-width'
-import {
-  proficiencyGrantedSummaryCategoryLabelClasses,
-  proficiencyGrantedSummaryClasses,
-  proficiencyGrantedSummaryDividerClasses,
-  proficiencyGrantedSummaryHeaderClasses,
-  proficiencyGrantedSummaryRowClasses,
-  proficiencyGrantedSummaryRowDividerClasses,
-  proficiencyGrantedSummaryRowsClasses,
-  proficiencyGrantedSummarySourceGroupClasses,
-  proficiencyGrantedSummarySourceGroupsClasses,
-  proficiencyGrantedSummarySourceLabelClasses,
-  proficiencyGrantedSummaryStackedSourceGroupClasses,
-  proficiencyGrantedSummaryValueLabelsClasses,
-} from './proficiency-granted-summary.variants'
+import { useProficiencyGrantedSummarySourceWidth } from './use-proficiency-granted-summary-source-width'
 
 export const PROFICIENCY_GRANTED_SUMMARY_HEADING = 'Granted proficiencies' as const
 
@@ -30,56 +14,6 @@ export const PROFICIENCY_GRANTED_SUMMARY_SUBHEAD =
 
 export type ProficiencyGrantedSummaryProps = {
   rows: readonly GrantedProficiencySummaryRow[]
-}
-
-function ProficiencyGrantedSummaryRow({
-  row,
-  showDivider,
-}: {
-  row: GrantedProficiencySummaryRow
-  showDivider: boolean
-}) {
-  const Icon = proficiencyCategoryIcons[row.kind]
-  const hasMultipleSourceGroups = row.sourceGroups.length > 1
-
-  return (
-    <>
-      <div className={proficiencyGrantedSummaryRowClasses}>
-        <IconContainer shape="circle">
-          <Icon aria-hidden />
-        </IconContainer>
-
-        <p className={proficiencyGrantedSummaryCategoryLabelClasses}>{row.label}</p>
-
-        <div className={proficiencyGrantedSummarySourceGroupsClasses}>
-          {row.sourceGroups.map((sourceGroup) => (
-            <div
-              key={`${row.kind}:${sourceGroup.sourceLabel}`}
-              className={cn(
-                proficiencyGrantedSummarySourceGroupClasses,
-                hasMultipleSourceGroups && proficiencyGrantedSummaryStackedSourceGroupClasses,
-              )}
-            >
-              <p className={proficiencyGrantedSummaryValueLabelsClasses}>
-                {sourceGroup.valueLabels.join(' · ')}
-              </p>
-              <p className={proficiencyGrantedSummarySourceLabelClasses}>
-                {sourceGroup.sourceLabel}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {showDivider ? (
-        <div
-          className={proficiencyGrantedSummaryRowDividerClasses}
-          role="presentation"
-          aria-hidden
-        />
-      ) : null}
-    </>
-  )
 }
 
 function ProficiencyGrantedSummarySourceWidthMeasure({
@@ -110,38 +44,20 @@ export function ProficiencyGrantedSummary({ rows }: ProficiencyGrantedSummaryPro
   const { sourceWidthStyle, measureLabels, measureRef } =
     useProficiencyGrantedSummarySourceWidth(rows)
 
-  if (rows.length === 0) return null
-
   return (
-    <section
-      aria-labelledby="proficiency-granted-summary-heading"
-      className={proficiencyGrantedSummaryClasses}
-      style={sourceWidthStyle}
-    >
-      <ProficiencyGrantedSummarySourceWidthMeasure
-        measureRef={measureRef}
-        measureLabels={measureLabels}
-      />
-      <div className={proficiencyGrantedSummaryHeaderClasses}>
-        <Heading variant="subsection" as="h3" id="proficiency-granted-summary-heading">
-          {PROFICIENCY_GRANTED_SUMMARY_HEADING}
-        </Heading>
-        <Text as="p" variant="muted">
-          {PROFICIENCY_GRANTED_SUMMARY_SUBHEAD}
-        </Text>
-      </div>
-
-      <div className={proficiencyGrantedSummaryDividerClasses} role="presentation" aria-hidden />
-
-      <div className={proficiencyGrantedSummaryRowsClasses}>
-        {rows.map((row, index) => (
-          <ProficiencyGrantedSummaryRow
-            key={row.kind}
-            row={row}
-            showDivider={index < rows.length - 1}
-          />
-        ))}
-      </div>
-    </section>
+    <BuilderFactSummary
+      heading={PROFICIENCY_GRANTED_SUMMARY_HEADING}
+      subhead={PROFICIENCY_GRANTED_SUMMARY_SUBHEAD}
+      grantedRows={rows}
+      showSourceColumn
+      sourceWidthStyle={sourceWidthStyle}
+      categoryIcons={proficiencyCategoryIcons}
+      measureSlot={
+        <ProficiencyGrantedSummarySourceWidthMeasure
+          measureRef={measureRef}
+          measureLabels={measureLabels}
+        />
+      }
+    />
   )
 }

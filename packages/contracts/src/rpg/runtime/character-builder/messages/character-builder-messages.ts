@@ -275,3 +275,26 @@ export const characterBuilderProficiencyChoiceEmptyMessages = {
     () => 'No choices chosen yet.',
   ),
 }
+
+export const characterBuilderSpellChoiceEmptyMessages = {
+  cantrip: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.cantrip',
+    () => 'No cantrips chosen yet.',
+  ),
+  cantripAdditional: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.cantripAdditional',
+    () => 'No additional cantrips chosen yet.',
+  ),
+  spell: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.spell',
+    () => 'No spells chosen yet.',
+  ),
+  spellAdditional: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.spellAdditional',
+    () => 'No additional spells chosen yet.',
+  ),
+  fallback: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.fallback',
+    () => 'No spells chosen yet.',
+  ),
+}
