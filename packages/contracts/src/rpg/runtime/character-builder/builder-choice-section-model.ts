@@ -88,6 +88,9 @@ export type BuilderFactSummaryIconKey = 'spellcasting-ability' | 'spell-save-dc'
 export type BuilderFactSummaryRow = {
   id: string
   label: string
-  value: string
+  /** Present when the fact is resolved; omit when {@link unsetText} applies. */
+  value?: string
+  /** Placeholder copy when the fact is not yet resolved (styled italic + muted in UI). */
+  unsetText?: string
   icon?: BuilderFactSummaryIconKey
 }

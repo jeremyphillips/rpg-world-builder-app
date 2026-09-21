@@ -1,7 +1,7 @@
 import type { CharacterClass } from '../../../../content/classes/class'
 import { formatSpellLevel } from '../../../../content/spell/levels'
 import { CLASS_SPELLCASTING_CHOICE_SUFFIXES } from '../../../../content/classes/spellcasting'
-import { formatCompactSelectionSourceLabel } from '../../../character/format-selection-source-label'
+import { formatGrantCardSelectionSourceLabel } from '../../../character/format-selection-source-label'
 import type { CharacterBuildPreview } from '../../preview/preview'
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildContext } from '../../context'
@@ -103,7 +103,7 @@ function buildGrantedSpellRows(
       {
         id: `granted-spell:${spell.id}`,
         label: spell.name,
-        sourceLabel: formatCompactSelectionSourceLabel(entry.sources ?? [], catalogIndex),
+        sourceLabel: formatGrantCardSelectionSourceLabel(entry.sources ?? [], catalogIndex),
       },
     ]
   })
@@ -134,7 +134,8 @@ function buildSummaryRows(
     {
       id: 'save-dc',
       label: 'Spell save DC',
-      value: spellcasting?.saveDc !== undefined ? String(spellcasting.saveDc) : pending,
+      value: spellcasting?.saveDc !== undefined ? String(spellcasting.saveDc) : undefined,
+      unsetText: spellcasting?.saveDc === undefined ? pending : undefined,
       icon: 'spell-save-dc',
     },
     {
@@ -145,7 +146,8 @@ function buildSummaryRows(
           ? spellcasting.attackBonus >= 0
             ? `+${spellcasting.attackBonus}`
             : String(spellcasting.attackBonus)
-          : pending,
+          : undefined,
+      unsetText: spellcasting?.attackBonus === undefined ? pending : undefined,
       icon: 'spell-attack',
     },
   ]

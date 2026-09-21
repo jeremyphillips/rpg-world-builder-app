@@ -17,7 +17,11 @@ export const builderFactSummarySimpleRowClasses = 'space-y-0.5'
 
 export const builderFactSummarySimpleLabelClasses = 'text-xs text-muted-foreground'
 
-export const builderFactSummarySimpleValueClasses = 'text-sm font-medium text-foreground'
+export const builderFactSummarySetValueClasses = 'text-sm font-medium text-foreground'
+
+export const builderFactSummaryUnsetValueClasses = 'text-sm italic text-muted-foreground'
+
+export const builderFactSummarySimpleValueClasses = builderFactSummarySetValueClasses
 
 export const builderFactSummaryIconRowsClasses = 'space-y-0'
 
@@ -26,7 +30,9 @@ export const builderFactSummaryIconRowClasses =
 
 export const builderFactSummaryIconRowLabelClasses = 'text-sm font-medium text-foreground'
 
-export const builderFactSummaryIconRowValueClasses = 'text-sm text-foreground'
+export const builderFactSummaryIconRowSetValueClasses = 'text-sm font-medium text-foreground'
+
+export const builderFactSummaryIconRowUnsetValueClasses = builderFactSummaryUnsetValueClasses
 
 export const builderFactSummaryGrantedRowsClasses = 'space-y-0'
 
@@ -43,7 +49,7 @@ export const builderFactSummarySourceGroupClasses =
 export const builderFactSummaryStackedSourceGroupClasses =
   'border-b border-border-subtle pb-1.5 mb-1.5 last:border-b-0 last:pb-0 last:mb-0'
 
-export const builderFactSummaryValueLabelsClasses = 'min-w-0 text-sm text-foreground'
+export const builderFactSummaryValueLabelsClasses = 'min-w-0 text-sm font-medium text-foreground'
 
 export const builderFactSummarySourceLabelClasses = 'text-left text-xs text-muted-foreground'
 

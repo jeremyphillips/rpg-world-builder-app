@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { classSchema, type ClassStored } from '../../../../content/classes/class'
 import type { Spell } from '../../../../content/spell'
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import type { CharacterBuilderDraft } from '../../draft/draft'
@@ -213,7 +214,11 @@ describe('resolveSpellStepModel', () => {
     expect(model.summaryRows.find((row) => row.id === 'attack')?.label).toBe(
       'Spell attack modifier',
     )
-    expect(model.summaryRows.find((row) => row.id === 'save-dc')?.value).toBe(
+    expect(model.summaryRows.find((row) => row.id === 'save-dc')?.value).toBeUndefined()
+    expect(model.summaryRows.find((row) => row.id === 'save-dc')?.unsetText).toBe(
+      'Calculated after ability scores',
+    )
+    expect(model.summaryRows.find((row) => row.id === 'attack')?.unsetText).toBe(
       'Calculated after ability scores',
     )
   })
@@ -251,6 +256,9 @@ describe('resolveSpellStepModel', () => {
     expect(modelL1.cantripsSection?.grantedRows.map((row) => row.label)).toEqual([
       'Prestidigitation',
     ])
+    expect(modelL1.cantripsSection?.grantedRows[0]?.sourceLabel).toBe(
+      'Granted by High Elf · Elven Lineage',
+    )
     expect(modelL1.spellLevelSections[0]?.grantedRows).toEqual([])
 
     const draftL3 = draftWith({
@@ -270,6 +278,9 @@ describe('resolveSpellStepModel', () => {
     expect(modelL3.spellLevelSections[0]?.grantedRows.map((row) => row.label)).toEqual([
       'Detect Magic',
     ])
+    expect(modelL3.spellLevelSections[0]?.grantedRows[0]?.sourceLabel).toBe(
+      'Granted by High Elf · Elven Lineage',
+    )
 
     const draftL5 = draftWith({
       class: { classId: wizardClass.id, level: 5 },
@@ -287,6 +298,106 @@ describe('resolveSpellStepModel', () => {
 
     expect(modelL5.spellLevelSections[1]?.grantedRows.map((row) => row.label)).toEqual([
       'Misty Step',
+    ])
+  })
+
+  it('uses grant-card provenance labels for class feature spell grants', () => {
+    const rangerStored = {
+      id: `${RULESET}:fixture-ranger`,
+      slug: 'fixture-ranger',
+      rulesetId: RULESET,
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Ranger',
+      description: '<p>Wilderness warrior.</p>',
+      primaryAbilities: ['dex', 'wis'],
+      hitDie: 10,
+      proficiencies: {
+        savingThrows: ['str', 'dex'],
+        armor: { categories: ['light', 'medium', 'shields'], items: [] },
+        weapons: { categories: ['simple', 'martial'], items: [] },
+        skills: { categories: [], items: [] },
+      },
+      characterCreation: {
+        proficiencies: {
+          skills: {
+            choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }],
+          },
+        },
+      },
+      features: [
+        {
+          kind: 'custom',
+          id: 'favored-enemy',
+          name: 'Favored Enemy',
+          level: 1,
+          grantGroups: [
+            {
+              grants: [
+                {
+                  kind: 'spells',
+                  ability: 'wis',
+                  spellIds: ['hunters-mark'],
+                  availability: 'always_prepared',
+                  casting: {
+                    mode: 'free_cast',
+                    frequency: 'prof_bonus_per_long_rest',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      spellcasting: {
+        level: 1,
+        slotProgressionId: 'half-caster',
+        ability: 'wis',
+        spellSelection: {
+          model: 'limitedRepertoire',
+          change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+        },
+        progression: {
+          repertoire: {
+            curve: { rows: [{ level: 1, count: 2 }] },
+            extension: 'carryForward',
+          },
+        },
+      },
+    } satisfies ClassStored
+    const rangerClass = classSchema.parse(rangerStored)
+    const huntersMark = heritageSpell('hunters-mark', 1, "Hunter's Mark")
+    const context = {
+      ...spellcastingTestContext,
+      catalog: {
+        ...spellcastingTestContext.catalog,
+        classes: [...spellcastingTestContext.catalog.classes, rangerClass],
+        spells: [...spellcastingTestContext.catalog.spells, huntersMark],
+      },
+    }
+    const indexedCatalog = indexCharacterBuildCatalog(context.catalog)
+    const draft = draftWith({
+      class: { classId: rangerClass.id, level: 1 },
+    })
+    const profile = resolveSpellcastingProfile(draft, context)!
+    const choiceSets = resolveSpellcastingChoices(draft, context, indexedCatalog)
+    const model = resolveSpellStepModel({
+      draft,
+      context,
+      preview: null,
+      profile,
+      choiceSets,
+    })
+
+    expect(model.spellLevelSections[0]?.grantedRows).toEqual([
+      {
+        id: `granted-spell:${huntersMark.id}`,
+        label: "Hunter's Mark",
+        sourceLabel: 'Granted by Favored Enemy · Ranger feature',
+      },
     ])
   })
 })

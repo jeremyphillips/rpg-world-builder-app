@@ -56,6 +56,8 @@ export type ProficiencyGrantedRow = {
 export type GrantedProficiencySourceGroup = {
   sourceLabel: string
   valueLabels: string[]
+  /** Placeholder when no granted values exist yet (styled italic + muted in UI). */
+  unsetText?: string
 }
 
 export type GrantedProficiencySummaryRow = {

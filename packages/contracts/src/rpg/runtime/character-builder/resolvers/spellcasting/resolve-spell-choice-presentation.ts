@@ -1,10 +1,7 @@
-import {
-  getContentTypeSentenceForm,
-  getContentTypeTerm,
-} from '../../../../content/lib/content-type-terms'
+import { getContentTypeTerm } from '../../../../content/lib/content-type-terms'
 import { getSpellCollectionKindLabel } from '../../../../vocab/spell/spell-collection-kind'
-import { ORIGIN_PROVENANCE_TERM } from '../../../character/format-selection-source-label'
-import type { ChoiceSet, ChoiceSetOwnerKind, ChoiceSetProvenance } from '../../choice-set'
+import { formatChoiceSetProvenanceParentContext } from '../../../character/format-selection-source-label'
+import type { ChoiceSet, ChoiceSetProvenance } from '../../choice-set'
 
 export const SPELL_CHOICE_SOURCE_PRIORITY = {
   spellcasting: 10,
@@ -29,31 +26,9 @@ export type SpellChoicePresentation = {
   identityLine?: string
 }
 
-const SOURCE_LINE_FORMATTERS: Partial<
-  Record<ChoiceSetOwnerKind, (provenance: ChoiceSetProvenance) => string | undefined>
-> = {
-  species: (provenance) =>
-    provenance.ownerLabel
-      ? `${provenance.ownerLabel} ${getContentTypeSentenceForm('species')} trait`
-      : undefined,
-  heritage: (provenance) =>
-    provenance.ownerLabel ? `${provenance.ownerLabel} heritage` : undefined,
-  class: (provenance) =>
-    provenance.ownerLabel
-      ? `${provenance.ownerLabel} ${getContentTypeSentenceForm('classes')}`
-      : undefined,
-  subclass: (provenance) =>
-    provenance.ownerLabel ? `${provenance.ownerLabel} subclass` : undefined,
-  origin: () => ORIGIN_PROVENANCE_TERM.label,
-  feat: (provenance) =>
-    provenance.ownerLabel
-      ? `${provenance.ownerLabel} ${getContentTypeSentenceForm('feats')}`
-      : undefined,
-}
-
 function resolveSourceLine(provenance: ChoiceSetProvenance | undefined): string | undefined {
-  if (!provenance?.ownerKind) return undefined
-  return SOURCE_LINE_FORMATTERS[provenance.ownerKind]?.(provenance)
+  if (!provenance) return undefined
+  return formatChoiceSetProvenanceParentContext(provenance)
 }
 
 function genericHeadingForChoiceType(choiceType: ChoiceSet['choiceType']): string {

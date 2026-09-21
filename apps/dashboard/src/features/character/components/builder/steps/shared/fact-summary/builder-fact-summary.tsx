@@ -15,8 +15,10 @@ import {
   builderFactSummaryHeaderClasses,
   builderFactSummaryIconRowClasses,
   builderFactSummaryIconRowLabelClasses,
-  builderFactSummaryIconRowValueClasses,
+  builderFactSummaryIconRowSetValueClasses,
+  builderFactSummaryIconRowUnsetValueClasses,
   builderFactSummaryIconRowsClasses,
+  builderFactSummaryUnsetValueClasses,
   builderFactSummaryRowDividerClasses,
   builderFactSummaryRowsClasses,
   builderFactSummarySimpleLabelClasses,
@@ -50,6 +52,30 @@ export type BuilderFactSummaryGrantedProps = {
 
 export type BuilderFactSummaryProps = BuilderFactSummarySimpleProps | BuilderFactSummaryGrantedProps
 
+type FactSummaryValueProps = {
+  value?: string
+  unsetText?: string
+  setValueClassName: string
+  unsetValueClassName: string
+}
+
+function FactSummaryValue({
+  value,
+  unsetText,
+  setValueClassName,
+  unsetValueClassName,
+}: FactSummaryValueProps) {
+  if (value) {
+    return <p className={setValueClassName}>{value}</p>
+  }
+
+  if (unsetText) {
+    return <p className={unsetValueClassName}>{unsetText}</p>
+  }
+
+  return null
+}
+
 function SimpleFactSummary({ heading, subhead, rows, rowIcons }: BuilderFactSummarySimpleProps) {
   if (rows.length === 0) return null
 
@@ -79,7 +105,12 @@ function SimpleFactSummary({ heading, subhead, rows, rowIcons }: BuilderFactSumm
                     <Icon aria-hidden />
                   </IconContainer>
                   <p className={builderFactSummaryIconRowLabelClasses}>{row.label}</p>
-                  <p className={builderFactSummaryIconRowValueClasses}>{row.value}</p>
+                  <FactSummaryValue
+                    value={row.value}
+                    unsetText={row.unsetText}
+                    setValueClassName={builderFactSummaryIconRowSetValueClasses}
+                    unsetValueClassName={builderFactSummaryIconRowUnsetValueClasses}
+                  />
                 </div>
                 {index < rows.length - 1 ? (
                   <div
@@ -97,7 +128,14 @@ function SimpleFactSummary({ heading, subhead, rows, rowIcons }: BuilderFactSumm
           {rows.map((row) => (
             <div key={row.id} className={builderFactSummarySimpleRowClasses}>
               <dt className={builderFactSummarySimpleLabelClasses}>{row.label}</dt>
-              <dd className={builderFactSummarySimpleValueClasses}>{row.value}</dd>
+              <dd>
+                <FactSummaryValue
+                  value={row.value}
+                  unsetText={row.unsetText}
+                  setValueClassName={builderFactSummarySimpleValueClasses}
+                  unsetValueClassName={builderFactSummaryUnsetValueClasses}
+                />
+              </dd>
             </div>
           ))}
         </dl>
@@ -153,9 +191,16 @@ function GrantedFactSummary({
                         hasMultipleSourceGroups && builderFactSummaryStackedSourceGroupClasses,
                       )}
                     >
-                      <p className={builderFactSummaryValueLabelsClasses}>
-                        {sourceGroup.valueLabels.join(' · ')}
-                      </p>
+                      <FactSummaryValue
+                        value={
+                          sourceGroup.valueLabels.length > 0
+                            ? sourceGroup.valueLabels.join(' · ')
+                            : undefined
+                        }
+                        unsetText={sourceGroup.unsetText}
+                        setValueClassName={builderFactSummaryValueLabelsClasses}
+                        unsetValueClassName={builderFactSummaryUnsetValueClasses}
+                      />
                       <p className={builderFactSummarySourceLabelClasses}>
                         {sourceGroup.sourceLabel}
                       </p>
