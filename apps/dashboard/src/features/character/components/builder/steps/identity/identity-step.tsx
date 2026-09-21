@@ -1,9 +1,12 @@
 import { useMemo } from 'react'
-import type { CharacterBuilderDraft } from '@rpg/contracts'
+import type { CharacterBuildContext, CharacterBuilderDraft } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Form } from '@rpg/ui/form'
 
-import { identityFormFields, identityFormSchema } from '../../../../lib/steps/identity-form-fields'
+import {
+  buildIdentityStepFormFields,
+  identityFormSchema,
+} from '../../../../lib/steps/identity-form-fields'
 import type { IdentityFormValues } from '../../../../lib/steps/identity-form-fields'
 import {
   identityDraftToFormValues,
@@ -12,9 +15,11 @@ import {
 import { BUILDER_STEP_FORM_IDS } from '../../../../lib/steps/builder-step-form-ids'
 import { BuilderFormContinueRegistration } from '../../builder-form-continue-registration'
 import { IdentityDraftSync } from './identity-draft-sync'
+import { IdentityNameField } from './identity-name-field'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 
 export type IdentityStepProps = {
+  context: CharacterBuildContext
   draft: CharacterBuilderDraft
   validationIssues: CharacterBuildValidationIssue[]
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
@@ -23,6 +28,7 @@ export type IdentityStepProps = {
 }
 
 export function IdentityStep({
+  context,
   draft,
   validationIssues,
   onDraftChange,
@@ -30,13 +36,15 @@ export function IdentityStep({
   onFormContinueValidationFailed,
 }: IdentityStepProps) {
   const fields = useMemo(
-    () => [
-      ...identityFormFields,
-      {
-        kind: 'slot' as const,
-        name: '_identityContinueRegistration',
-        chrome: { variant: 'none' as const },
-        render: () => (
+    () =>
+      buildIdentityStepFormFields({
+        renderNameField: () => (
+          <IdentityNameField buildContext={context} draft={draft} onDraftChange={onDraftChange} />
+        ),
+        renderDraftSync: () => (
+          <IdentityDraftSync draftIdentity={draft.identity} onDraftChange={onDraftChange} />
+        ),
+        renderContinueRegistration: () => (
           <BuilderFormContinueRegistration<IdentityFormValues>
             stepId="identity"
             toDraftPatch={(values) => ({ identity: identityFormValuesToDraft(values) })}
@@ -44,17 +52,8 @@ export function IdentityStep({
             onContinueValidationFailed={onFormContinueValidationFailed}
           />
         ),
-      },
-      {
-        kind: 'slot' as const,
-        name: '_identityDraftSync',
-        chrome: { variant: 'none' as const },
-        render: () => (
-          <IdentityDraftSync draftIdentity={draft.identity} onDraftChange={onDraftChange} />
-        ),
-      },
-    ],
-    [draft.identity, onDraftChange, onFormContinueValidationFailed, onStepComplete],
+      }),
+    [context, draft, onDraftChange, onFormContinueValidationFailed, onStepComplete],
   )
 
   return (

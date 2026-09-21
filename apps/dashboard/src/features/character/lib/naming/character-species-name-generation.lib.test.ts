@@ -12,11 +12,11 @@ import {
   homebrewSpeciesFixture,
   populatedBuilderCatalog,
   unsupportedNamingDwarfSpecies,
-} from '../../../lib/fixtures/character-builder-fixtures'
+} from '../fixtures/character-builder-fixtures'
 import {
-  generateQuickNpcName,
-  resolveQuickNpcNameGenerationSupport,
-} from './quick-npc-name-generation'
+  generateCharacterSpeciesName,
+  resolveCharacterSpeciesNameGenerationSupport,
+} from './character-species-name-generation.lib'
 
 vi.mock('@rpg/name-generator-core', async (importOriginal) => {
   const actual = await importOriginal<typeof NameGeneratorCore>()
@@ -35,10 +35,10 @@ const namingContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
-describe('resolveQuickNpcNameGenerationSupport', () => {
+describe('resolveCharacterSpeciesNameGenerationSupport', () => {
   it('enables Generate for a naming-capable dwarf', () => {
     expect(
-      resolveQuickNpcNameGenerationSupport({
+      resolveCharacterSpeciesNameGenerationSupport({
         speciesId: 'srd-cc-5.2.1:dwarf',
         context: namingContext,
       }),
@@ -54,7 +54,7 @@ describe('resolveQuickNpcNameGenerationSupport', () => {
     })
 
     expect(
-      resolveQuickNpcNameGenerationSupport({
+      resolveCharacterSpeciesNameGenerationSupport({
         speciesId: unsupportedNamingDwarfSpecies.id,
         context,
       }),
@@ -64,7 +64,7 @@ describe('resolveQuickNpcNameGenerationSupport', () => {
     })
   })
 
-  it('inherits homebrew naming policy without a Quick-NPC-specific branch', () => {
+  it('inherits homebrew naming policy without a consumer-specific branch', () => {
     const context = createCampaignNpcBuilderContextFixture({
       catalog: {
         ...populatedBuilderCatalog,
@@ -73,7 +73,7 @@ describe('resolveQuickNpcNameGenerationSupport', () => {
     })
 
     expect(
-      resolveQuickNpcNameGenerationSupport({
+      resolveCharacterSpeciesNameGenerationSupport({
         speciesId: homebrewSpeciesFixture.id,
         context,
       }),
@@ -82,11 +82,20 @@ describe('resolveQuickNpcNameGenerationSupport', () => {
       disabledReason: HOMEBREW_SPECIES_NAMING_DISABLED_REASON,
     })
   })
+
+  it('disables generation when the species is missing from the catalog', () => {
+    expect(
+      resolveCharacterSpeciesNameGenerationSupport({
+        speciesId: 'missing-species',
+        context: namingContext,
+      }),
+    ).toEqual({ enabled: false })
+  })
 })
 
-describe('generateQuickNpcName', () => {
+describe('generateCharacterSpeciesName', () => {
   it('returns a non-empty name for a naming-capable dwarf', async () => {
-    const result = await generateQuickNpcName({
+    const result = await generateCharacterSpeciesName({
       speciesId: 'srd-cc-5.2.1:dwarf',
       context: namingContext,
     })
@@ -105,7 +114,7 @@ describe('generateQuickNpcName', () => {
       },
     })
 
-    const result = await generateQuickNpcName({
+    const result = await generateCharacterSpeciesName({
       speciesId: unsupportedNamingDwarfSpecies.id,
       context,
     })
@@ -122,7 +131,7 @@ describe('generateQuickNpcName', () => {
       throw new Error('generator exploded')
     })
 
-    const result = await generateQuickNpcName({
+    const result = await generateCharacterSpeciesName({
       speciesId: 'srd-cc-5.2.1:dwarf',
       context: namingContext,
     })

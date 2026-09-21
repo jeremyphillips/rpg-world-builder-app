@@ -409,6 +409,8 @@ export type OptionalDisclosureConfig = {
 /** Attached trailing action on a text-like field — operation failure stays outside RHF validation. */
 export type TrailingFieldActionConfig = {
   label: string
+  /** Optional decorative icon rendered before the label. */
+  icon?: ReactNode
   onAction: () => void | Promise<void>
   disabled?: boolean
   pending?: boolean

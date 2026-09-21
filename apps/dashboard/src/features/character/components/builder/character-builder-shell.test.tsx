@@ -255,7 +255,7 @@ describe('CharacterBuilderShell', () => {
       within(stepRail).getByRole('button', { name: /Identity, has blocking validation issues/i }),
     ).toBeInTheDocument()
 
-    await userEvent.type(screen.getByLabelText(/Character name/i), 'Verna')
+    await userEvent.type(screen.getByRole('textbox', { name: /Character name/i }), 'Verna')
 
     await waitFor(() => {
       expect(

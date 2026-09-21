@@ -46,13 +46,13 @@ vi.mock('../../../lib/quick-npc/quick-npc-requirement-options.lib', async (impor
 })
 
 const createNpcMock = vi.hoisted(() => vi.fn())
-const generateQuickNpcNameMock = vi.hoisted(() => vi.fn())
+const generateCharacterSpeciesNameMock = vi.hoisted(() => vi.fn())
 
-vi.mock('../../../lib/quick-npc/quick-npc-name-generation', async (importOriginal) => {
+vi.mock('../../../../lib/naming/character-species-name-generation.lib', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return {
     ...actual,
-    generateQuickNpcName: generateQuickNpcNameMock,
+    generateCharacterSpeciesName: generateCharacterSpeciesNameMock,
   }
 })
 
@@ -130,8 +130,8 @@ function renderAuthoringForm(
 describe('QuickNpcAuthoringForm', () => {
   beforeEach(() => {
     createNpcMock.mockReset()
-    generateQuickNpcNameMock.mockReset()
-    generateQuickNpcNameMock.mockResolvedValue({ ok: true, name: 'Thorin Stonehelm' })
+    generateCharacterSpeciesNameMock.mockReset()
+    generateCharacterSpeciesNameMock.mockResolvedValue({ ok: true, name: 'Thorin Stonehelm' })
   })
 
   it('populates the name field when Generate is clicked', async () => {
@@ -143,7 +143,7 @@ describe('QuickNpcAuthoringForm', () => {
     await waitFor(() => {
       expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('Thorin Stonehelm')
     })
-    expect(generateQuickNpcNameMock).toHaveBeenCalledWith({
+    expect(generateCharacterSpeciesNameMock).toHaveBeenCalledWith({
       speciesId: setup.speciesId,
       context: buildContext,
     })

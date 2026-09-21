@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { IdentityStep } from './identity-step'
+import { identityStepTestContext } from './identity-step.fixtures'
 
 const meta = {
   title: 'Character Builder/IdentityStep',
@@ -16,6 +17,7 @@ type Story = StoryObj<typeof IdentityStep>
 export const Empty: Story = {
   render: () => (
     <IdentityStep
+      context={identityStepTestContext}
       draft={createEmptyCharacterBuilderDraft()}
       validationIssues={[]}
       onDraftChange={() => undefined}
@@ -28,6 +30,7 @@ export const Empty: Story = {
 export const WithNarrative: Story = {
   render: () => (
     <IdentityStep
+      context={identityStepTestContext}
       draft={{
         ...createEmptyCharacterBuilderDraft(),
         identity: {
@@ -51,6 +54,7 @@ export const WithNarrative: Story = {
 export const WithValidationIssues: Story = {
   render: () => (
     <IdentityStep
+      context={identityStepTestContext}
       draft={createEmptyCharacterBuilderDraft()}
       validationIssues={[
         {
@@ -59,6 +63,22 @@ export const WithValidationIssues: Story = {
           stepId: 'identity',
         },
       ]}
+      onDraftChange={() => undefined}
+      onStepComplete={() => undefined}
+      onFormContinueValidationFailed={() => undefined}
+    />
+  ),
+}
+
+export const WithSpeciesNameGeneration: Story = {
+  render: () => (
+    <IdentityStep
+      context={identityStepTestContext}
+      draft={{
+        ...createEmptyCharacterBuilderDraft(),
+        species: { speciesId: 'srd-cc-5.2.1:dwarf' },
+      }}
+      validationIssues={[]}
       onDraftChange={() => undefined}
       onStepComplete={() => undefined}
       onFormContinueValidationFailed={() => undefined}

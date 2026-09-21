@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { IdentityStep } from './identity-step'
+import { identityStepTestContext } from './identity-step.fixtures'
 
 describe('IdentityDraftSync', () => {
   it('seeds the form from an externally restored draft without clobbering the store', async () => {
@@ -17,6 +18,7 @@ describe('IdentityDraftSync', () => {
 
     const { rerender } = render(
       <IdentityStep
+        context={identityStepTestContext}
         draft={emptyDraft}
         validationIssues={[]}
         onDraftChange={onDraftChange}
@@ -29,6 +31,7 @@ describe('IdentityDraftSync', () => {
 
     rerender(
       <IdentityStep
+        context={identityStepTestContext}
         draft={restoredDraft}
         validationIssues={[]}
         onDraftChange={onDraftChange}
@@ -53,6 +56,7 @@ describe('IdentityDraftSync', () => {
 
     render(
       <IdentityStep
+        context={identityStepTestContext}
         draft={draft}
         validationIssues={[]}
         onDraftChange={onDraftChange}
@@ -61,7 +65,7 @@ describe('IdentityDraftSync', () => {
       />,
     )
 
-    await userEvent.type(screen.getByLabelText(/Character name/i), 'Verna')
+    await userEvent.type(screen.getByRole('textbox', { name: /Character name/i }), 'Verna')
 
     await waitFor(() => {
       expect(onDraftChange).toHaveBeenCalledWith(
@@ -76,6 +80,7 @@ describe('IdentityDraftSync', () => {
 
     render(
       <IdentityStep
+        context={identityStepTestContext}
         draft={draft}
         validationIssues={[]}
         onDraftChange={onDraftChange}
