@@ -26,6 +26,7 @@ import type { ClassPreviewResources } from './class-preview-resources'
 import { featuresFromFormValues } from './class-feature-form-fields'
 import type { ClassFormValues } from './class-form-fields'
 import { classCreateDefaultValues, proficienciesFromFormValues } from './class-form-values'
+import { SPELL_SELECTION_MODEL_OPTIONS } from './class-spell-selection-form.lib'
 import {
   buildClassDetailViewModel,
   type ClassDetailViewModel,
@@ -199,8 +200,16 @@ function buildProficienciesSection(
   }
 }
 
+function spellSelectionModelLabel(
+  model: ClassFormValues['spellSelectionModel'] | undefined,
+): string {
+  if (!model) return CONTENT_PREVIEW_NOT_SET
+  return SPELL_SELECTION_MODEL_OPTIONS.find((option) => option.value === model)?.label ?? model
+}
+
 function spellcastingFacts(
   spellcasting: ClassFormValues['spellcasting'] | undefined,
+  spellSelectionModel: ClassFormValues['spellSelectionModel'] | undefined,
 ): PreviewRailFact[] {
   const facts: PreviewRailFact[] = []
   if (!spellcasting) return facts
@@ -221,7 +230,7 @@ function spellcastingFacts(
   })
   facts.push({
     label: CLASS_PREVIEW_FACT_LABELS.spellSelection,
-    value: spellcasting.spellSelection?.model ?? CONTENT_PREVIEW_NOT_SET,
+    value: spellSelectionModelLabel(spellSelectionModel),
   })
 
   return facts
@@ -236,14 +245,15 @@ function buildSpellcastingSection(values: ClassFormValues): ContentPreviewSectio
   }
 
   const spellcasting = values.spellcasting
+  const selectionLabel = spellSelectionModelLabel(values.spellSelectionModel)
 
   return {
     derivedKind: 'ready',
     status:
-      spellcasting?.slotProgressionId && spellcasting?.spellSelection?.model
-        ? `${spellcasting.slotProgressionId} · ${spellcasting.spellSelection.model}`
+      spellcasting?.slotProgressionId && values.spellSelectionModel
+        ? `${spellcasting.slotProgressionId} · ${selectionLabel}`
         : CONTENT_PREVIEW_STATUS_READY,
-    facts: spellcastingFacts(spellcasting),
+    facts: spellcastingFacts(spellcasting, values.spellSelectionModel),
   }
 }
 

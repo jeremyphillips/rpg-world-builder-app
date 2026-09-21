@@ -93,3 +93,11 @@ export const classCapacityProgressionSchema = z
   })
 
 export type ClassCapacityProgression = z.infer<typeof classCapacityProgressionSchema>
+
+/** Draft capacity progression — empty curves allowed while authoring. */
+export const classCapacityProgressionDraftSchema = z.object({
+  curve: classCapacityCurveSchema,
+  extension: progressionExtensionSchema.default('carryForward'),
+})
+
+export type ClassCapacityProgressionDraft = z.infer<typeof classCapacityProgressionDraftSchema>

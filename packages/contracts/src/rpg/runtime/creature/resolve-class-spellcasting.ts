@@ -18,14 +18,12 @@ import {
   resolveProgressionValueAtLevel,
 } from '../../campaign/rules/spellcasting-progression/lookup'
 import type { ProgressionCurve } from '../../campaign/rules/spellcasting-progression/progression-curve'
-import type { ResolvedSpellcastingProgressionConfig } from '../../campaign/rules/spellcasting-progression/resolve-profile'
-import { resolveSlotProgressionForClass } from '../../campaign/rules/spellcasting-progression/resolve-profile'
+import type { ResolvedSpellcastingProgressionConfig } from '../../campaign/rules/spellcasting-progression/resolve-config'
+import { resolveSlotProgressionForClass } from '../../campaign/rules/spellcasting-progression/resolve-config'
 import type { SlotProgression } from '../../campaign/rules/spellcasting-progression/slot-progression'
 import {
   maxSelectableSpellLevelFromSlotProgression,
-  resolveLeveledSlotCountsAtLevel,
   spellcastingFeatureLabelForSlotProgression,
-  type ResolvedSlotRow,
 } from '../../campaign/rules/spellcasting-progression/resolve-slots'
 import {
   IMMUTABLE_SPELL_MUTATION,
@@ -284,26 +282,6 @@ export function resolveMaxSelectableSpellLevelFromClass(
   level: number,
 ): number {
   return maxSelectableSpellLevelFromSlotProgression(resolved.slotProgression, level)
-}
-
-export function resolveSlotCountsFromClass(
-  resolved: ResolvedClassSpellcasting,
-  level: number,
-): { slots: number[]; row: ResolvedSlotRow } {
-  const { slots, provenance } = resolveLeveledSlotCountsAtLevel(resolved.slotProgression, level)
-  const row = resolveLeveledSlotCountsAtLevel(resolved.slotProgression, level)
-  return {
-    slots,
-    row:
-      resolved.slotProgression.kind === 'pact'
-        ? {
-            kind: 'pact',
-            slotCount: row.slots.find((count) => count > 0) ?? 0,
-            slotLevel: row.slots.findIndex((count) => count > 0) + 1,
-            provenance,
-          }
-        : { kind: 'leveled', slots, provenance },
-  }
 }
 
 export function spellcastingFeatureLabelFromClass(resolved: ResolvedClassSpellcasting): string {

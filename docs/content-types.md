@@ -1040,41 +1040,43 @@ Delete is blocked with `409` when campaign characters reference the subclass (`c
 
 ## Class spellcasting (reference)
 
-The `classes` type embeds an optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`). Slot tables and spell-selection curves live in **ruleset spellcasting progression** records (catalog seed + campaign patch), not on the class body.
+The `classes` type embeds an optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`). The class owns **slot reference**, **spell selection semantics**, and **capacity/gain curves**. Rules Config owns **slot tables only**.
 
 ### Class record shape
 
-| Field               | Role                                                                                                                    |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `slotProgressionId` | Ruleset slot progression id (Full / Half / Pact / custom). Drives spell-slot columns only.                              |
-| `profileId`         | Ruleset spell selection profile id. Drives cantrip/repertoire/prepared/spellbook quotas and mutation policy.            |
-| `level`             | First class level at which spellcasting is active (defaults to **1**). Gates columns and character-builder eligibility. |
-| `ability`           | Spellcasting ability for this class.                                                                                    |
-| `description`       | Optional rich-text HTML for SRD spellcasting rules prose (formerly duplicated on a `spellcasting` feature row).         |
-| `requiredGear`      | Optional class-critical spellcasting gear (e.g. Wizard spellbook).                                                      |
-| `focusKinds`        | Optional spellcasting focus kinds this class can use.                                                                   |
-| `recommendedGear`   | Optional strong-tier spellcasting gear suggestions.                                                                     |
+| Field               | Role                                                                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `slotProgressionId` | Ruleset slot progression id (Full / Half / Pact / custom). Drives spell-slot columns only.                                                                   |
+| `spellSelection`    | L1+ selection semantics (`limitedRepertoire`, `prepareFromClassList`, `prepareFromLearnedCollection`) plus change policy and optional spellbook acquisition. |
+| `progression`       | Independent sparse capacity curves: `cantrips`, `repertoire`, `preparedSpells`.                                                                              |
+| `level`             | First class level at which spellcasting is active (defaults to **1**). Gates columns and character-builder eligibility.                                      |
+| `ability`           | Spellcasting ability for this class.                                                                                                                         |
+| `description`       | Optional rich-text HTML for SRD spellcasting rules prose (formerly duplicated on a `spellcasting` feature row).                                              |
+| `requiredGear`      | Optional class-critical spellcasting gear (e.g. Wizard spellbook).                                                                                           |
+| `focusKinds`        | Optional spellcasting focus kinds this class can use.                                                                                                        |
+| `recommendedGear`   | Optional strong-tier spellcasting gear suggestions.                                                                                                          |
 
-Slot progression and spell selection profile are **independent** — a class may combine any compatible pair (e.g. Full caster slots + Wizard-style spellbook/prepared profile).
+`slotProgressionId`, `spellSelection`, and `progression` are **independent** — a class may combine any compatible set (e.g. Full caster slots + Wizard-style spellbook/prepared selection + cantrip/prepared curves).
 
-### Ruleset progression records
+### Rules Config slot progressions
 
 Authoring lives under **Character Configuration → Progression → Spellcasting**:
 
 - **Slot progressions** — shared spell slot tables (`full-caster`, `half-caster`, `pact-magic`, or custom). Leveled hosts use 1st–9th columns; pact hosts use slot count + slot level.
-- **Spell selection profiles** — choice progressions (`capacity` / `gain`) with source, destination, mutation policy, and optional combined-table column labels.
 
-Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`. Catalog seed: `packages/catalog/src/spellcasting-progressions/data/<ruleset>/`.
+Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`. Catalog seed: `packages/catalog/src/spellcasting-progressions/data/<ruleset>/slot-progressions.json`.
 
 ### Dashboard authoring UI
 
 The class form Spellcasting tab (`class-spellcasting-form-fields.ts`) exposes:
 
 - **Slot progression** — combobox of resolved ruleset slot progressions.
-- **Spell selection profile** — combobox of resolved ruleset profiles.
-- **Combined preview** — composes the selected slot progression + profile (same component as rules-config preview).
+- **Spell selection model** — semantic L1+ selection (`limitedRepertoire`, prepare-from-list, prepare-from-learned-collection) plus change policy.
+- **Grants cantrips** — toggles the Cantrips column in the spellcasting progression table.
+- **Spellcasting progression table** — merged cantrip / repertoire / prepared capacity curves (TableBuilder).
+- **Spellbook acquisition shorthand** — for learned-collection classes, regular mode uses Starting / per-level / through-level numbers that materialize to a gain curve on save; irregular curves use the table editor escape hatch.
 
-The read-only class detail **progression table** (`ClassProgressionTable`) resolves campaign spellcasting config and injects **Spellcasting** or **Pact Magic** at `spellcasting.level` from the class's slot progression kind — do not duplicate those rows in `features[]`.
+The read-only class detail **progression table** (`ClassProgressionTable`) composes class-owned capacity columns from `progression` with the referenced slot table and injects **Spellcasting** or **Pact Magic** at `spellcasting.level` — do not duplicate those rows in `features[]`.
 
 ### Class preview rail
 

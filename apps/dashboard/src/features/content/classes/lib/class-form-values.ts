@@ -5,6 +5,7 @@ import {
   resolveClassAbilityScoreOrder,
   type CharacterClass,
   type ClassFeature,
+  type ClassGainProgression,
   type ClassProficiencies,
   type ContentValidationIntent,
   type CreateClassInput,
@@ -18,8 +19,11 @@ import {
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import type { ClassFormValues } from './class-form-fields'
 import {
+  alignProgressionToModel,
+  detectRegularGain,
+  materializeRegularGain,
   spellSelectionChangePackageFromPolicy,
-  spellSelectionChangePolicyFromPackage,
+  spellSelectionFromForm,
   type SpellSelectionChangePackage,
 } from './class-spell-selection-form.lib'
 import { createAsiFeature } from './class-asi-features'
@@ -145,12 +149,7 @@ function classWirePayloadBase(
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
-    spellcasting: spellcastingFromFormValues(
-      values.hasSpellcasting,
-      values.grantsCantrips,
-      values.spellcasting,
-      values.spellSelectionChangePackage,
-    ),
+    spellcasting: spellcastingFromFormValues(values),
     features: parts.features,
     ...(parts.characterCreation ? { characterCreation: parts.characterCreation } : {}),
   }
@@ -230,13 +229,18 @@ export function spellcastingToFormValues(
     level: spellcasting.level,
     description: spellcasting.description,
     slotProgressionId: spellcasting.slotProgressionId,
-    spellSelection: spellcasting.spellSelection,
     progression: spellcasting.progression,
     ability: spellcasting.ability,
     requiredGear: spellcasting.requiredGear,
     focusKinds: spellcasting.focusKinds,
     recommendedGear: spellcasting.recommendedGear,
   }
+}
+
+export function spellSelectionModelToFormValues(
+  spellcasting: Spellcasting | undefined,
+): ClassFormValues['spellSelectionModel'] {
+  return spellcasting?.spellSelection?.model
 }
 
 export function spellSelectionChangePackageToFormValues(
@@ -246,24 +250,83 @@ export function spellSelectionChangePackageToFormValues(
   return spellSelectionChangePackageFromPolicy(spellcasting.spellSelection.change)
 }
 
-function hasCompleteSpellcastingCore(
-  hasSpellcasting: boolean,
-  spellcasting: ClassFormValues['spellcasting'],
-): boolean {
+export function spellbookAcquisitionToFormValues(spellcasting: Spellcasting | undefined): {
+  irregular: boolean
+  starting?: number
+  perLevel?: number
+  throughLevel?: number
+  curve?: ClassGainProgression
+} {
+  if (spellcasting?.spellSelection?.model !== 'prepareFromLearnedCollection') {
+    return { irregular: false }
+  }
+
+  const acquisition = spellcasting.spellSelection.acquisition
+  const regular = detectRegularGain(acquisition)
+  if (regular) {
+    return {
+      irregular: false,
+      starting: regular.starting,
+      perLevel: regular.perLevel,
+      throughLevel: regular.throughLevel,
+    }
+  }
+
+  return {
+    irregular: true,
+    curve: acquisition,
+  }
+}
+
+function resolveSpellbookAcquisitionFromFormValues(
+  values: ClassFormValues,
+): ClassGainProgression | undefined {
+  if (values.spellSelectionModel !== 'prepareFromLearnedCollection') return undefined
+
+  if (values.spellbookAcquisitionIrregular) {
+    return values.spellbookAcquisitionCurve ?? { curve: { rows: [] }, extension: 'zero' }
+  }
+
+  const {
+    spellbookAcquisitionStarting,
+    spellbookAcquisitionPerLevel,
+    spellbookAcquisitionThroughLevel,
+  } = values
+  if (
+    spellbookAcquisitionStarting === undefined ||
+    spellbookAcquisitionPerLevel === undefined ||
+    spellbookAcquisitionThroughLevel === undefined
+  ) {
+    return { curve: { rows: [] }, extension: 'zero' }
+  }
+
+  return materializeRegularGain({
+    starting: spellbookAcquisitionStarting,
+    perLevel: spellbookAcquisitionPerLevel,
+    throughLevel: spellbookAcquisitionThroughLevel,
+  })
+}
+
+function hasCompleteSpellcastingCore(values: ClassFormValues): boolean {
   return Boolean(
-    hasSpellcasting &&
-    spellcasting?.slotProgressionId &&
-    spellcasting?.ability &&
-    spellcasting?.spellSelection?.model,
+    values.hasSpellcasting &&
+    values.spellcasting?.slotProgressionId &&
+    values.spellcasting?.ability &&
+    values.spellSelectionModel,
   )
 }
 
+// fallow-ignore-next-line complexity
 function applyOptionalSpellcastingFields(
   result: Spellcasting,
   spellcasting: NonNullable<ClassFormValues['spellcasting']>,
   grantsCantrips: boolean,
 ): void {
-  const progression = { ...(spellcasting.progression ?? {}) }
+  const alignedProgression = alignProgressionToModel(
+    result.spellSelection?.model,
+    spellcasting.progression,
+  )
+  const progression = { ...(alignedProgression ?? {}) }
   if (!grantsCantrips) {
     delete progression.cantrips
   }
@@ -284,38 +347,19 @@ function applyOptionalSpellcastingFields(
   }
 }
 
-// fallow-ignore-next-line complexity
-function spellcastingFromFormValues(
-  hasSpellcasting: boolean,
-  grantsCantrips: boolean,
-  spellcasting: ClassFormValues['spellcasting'],
-  changePackage: SpellSelectionChangePackage | undefined,
-): Spellcasting | undefined {
-  if (!hasCompleteSpellcastingCore(hasSpellcasting, spellcasting) || !spellcasting) {
+export function spellcastingFromFormValues(values: ClassFormValues): Spellcasting | undefined {
+  const { grantsCantrips, spellcasting, spellSelectionChangePackage } = values
+  if (!hasCompleteSpellcastingCore(values) || !spellcasting) {
     return undefined
   }
 
-  const selectionModel = spellcasting.spellSelection?.model
-  const change = changePackage
-    ? spellSelectionChangePolicyFromPackage(changePackage)
-    : spellcasting.spellSelection?.change
-
-  let spellSelection = spellcasting.spellSelection
-  if (selectionModel && change) {
-    if (selectionModel === 'prepareFromLearnedCollection') {
-      spellSelection = {
-        model: selectionModel,
-        collection: 'spellbook',
-        acquisition: spellcasting.spellSelection?.acquisition ?? {
-          curve: { rows: [] },
-          extension: 'zero',
-        },
-        change,
-      }
-    } else {
-      spellSelection = { model: selectionModel, change }
-    }
-  }
+  const changePackage = spellSelectionChangePackage ?? 'none'
+  const acquisition = resolveSpellbookAcquisitionFromFormValues(values)
+  const spellSelection = spellSelectionFromForm({
+    model: values.spellSelectionModel,
+    changePackage,
+    acquisition,
+  })
 
   const result: Spellcasting = {
     level: spellcasting.level ?? 1,
@@ -330,6 +374,7 @@ function spellcastingFromFormValues(
 export const classCreateDefaultValues: Partial<ClassFormValues> = {
   hasSpellcasting: false,
   grantsCantrips: false,
+  spellbookAcquisitionIrregular: false,
   weaponProficiencyMode: 'categories',
   proficiencies: {
     savingThrows: [],

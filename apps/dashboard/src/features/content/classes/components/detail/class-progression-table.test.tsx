@@ -58,6 +58,24 @@ describe('ClassProgressionTable', () => {
     expect(screen.getByRole('columnheader', { name: 'Prepared Spells' })).toBeInTheDocument()
   })
 
+  it('shows exactly one Cantrips column for bard', () => {
+    renderProgressionTable({ characterClass: pickClass('bard') })
+
+    expect(screen.getAllByRole('columnheader', { name: 'Cantrips' })).toHaveLength(1)
+  })
+
+  it('shows exactly one Cantrips column for wizard', () => {
+    renderProgressionTable({ characterClass: pickClass('wizard') })
+
+    expect(screen.getAllByRole('columnheader', { name: 'Cantrips' })).toHaveLength(1)
+  })
+
+  it('shows no Cantrips column for paladin', () => {
+    renderProgressionTable({ characterClass: pickClass('paladin') })
+
+    expect(screen.queryByRole('columnheader', { name: 'Cantrips' })).not.toBeInTheDocument()
+  })
+
   it('hides spellbook gain columns when profile presentation disables them', () => {
     renderProgressionTable({ characterClass: pickClass('wizard') })
 

@@ -28,10 +28,10 @@ export function ClassSpellcastingProgressionField({
 }: ClassSpellcastingProgressionFieldProps) {
   const form = useFormContext<ClassFormValues>()
   const grantsCantrips = useWatch({ control: form.control, name: 'grantsCantrips' }) === true
-  const spellSelection = useWatch({
+  const spellSelectionModel = useWatch({
     control: form.control,
-    name: 'spellcasting.spellSelection',
-  }) as ClassSpellSelection | undefined
+    name: 'spellSelectionModel',
+  }) as ClassSpellSelection['model'] | undefined
   const progression = useWatch({ control: form.control, name: 'spellcasting.progression' }) as
     | ClassSpellcastingProgression
     | undefined
@@ -53,8 +53,8 @@ export function ClassSpellcastingProgressionField({
     : undefined
 
   const tableInput = useMemo(
-    () => ({ grantsCantrips, spellSelection }),
-    [grantsCantrips, spellSelection],
+    () => ({ grantsCantrips, spellSelectionModel }),
+    [grantsCantrips, spellSelectionModel],
   )
 
   const hostConfig = useMemo(
@@ -110,7 +110,7 @@ export function ClassSpellcastingProgressionField({
     }
   }, [form, grantsCantrips, progression])
 
-  if (!spellSelection && !grantsCantrips) return null
+  if (!spellSelectionModel && !grantsCantrips) return null
 
   return (
     <>
@@ -119,7 +119,7 @@ export function ClassSpellcastingProgressionField({
         metadata={formatClassSpellcastingProgressionMetadata({
           progression,
           grantsCantrips,
-          spellSelection,
+          spellSelectionModel,
         })}
         typeLabel="Level progression"
         onEdit={() => setModalOpen(true)}

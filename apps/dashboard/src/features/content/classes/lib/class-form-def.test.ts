@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { loadSeedClasses } from '@rpg/catalog/classes'
 import { createClassInputSchema, deriveContentKey } from '@rpg/contracts'
 
-import { classFormDef, type ClassFormValues } from './class-form-def'
+import { classDraftFormSchema, classFormDef, type ClassFormValues } from './class-form-def'
 const SRD_CLASSES = loadSeedClasses('srd-cc-5.2.1')
 
 function roundTripFormInput(slug: string) {
@@ -40,7 +40,7 @@ function expectBardSpellcastingRoundTrip(): void {
 
   expect(fromForm.description).toContain('cast spells through your bardic arts')
   expect(fromForm.level).toBe(1)
-  expect(fromForm.spellSelection?.model).toBe(expected.spellSelection?.model)
+  expect(formValues.spellSelectionModel).toBe(expected.spellSelection?.model)
   expect(fromInput.description).toContain('cast spells through your bardic arts')
   expect(fromInput.level).toBe(1)
   expect(fromInput.spellSelection?.model).toBe(expected.spellSelection?.model)
@@ -387,6 +387,59 @@ describe('classFormDef round-trips', () => {
 
   it('bard: spellcasting description and cantrips round-trip through progressionTable', () => {
     expectBardSpellcastingRoundTrip()
+  })
+
+  it('draft: accepts in-progress caster with model and empty progression', () => {
+    const parsed = classDraftFormSchema.safeParse({
+      name: 'Draft Caster',
+      hitDie: 8,
+      primaryAbilities: ['int'],
+      hasSpellcasting: true,
+      grantsCantrips: true,
+      spellSelectionModel: 'prepareFromClassList',
+      spellSelectionChangePackage: 'longRest:all',
+      weaponProficiencyMode: 'categories',
+      spellcasting: {
+        slotProgressionId: 'full-caster',
+        ability: 'int',
+        progression: {
+          cantrips: { curve: { rows: [] }, extension: 'carryForward' },
+        },
+      },
+      proficiencies: {
+        savingThrows: ['int'],
+        armor: [],
+        weapons: { categories: ['simple'], items: [] },
+        tools: { categories: [], items: [] },
+        skills: { items: [] },
+      },
+      features: [],
+    })
+
+    expect(parsed.success).toBe(true)
+    expect(
+      classFormDef.schema.safeParse({
+        ...(parsed.success ? parsed.data : {}),
+      }).success,
+    ).toBe(false)
+  })
+
+  it('wizard: regular acquisition round-trips via materialized gain curve', () => {
+    const wizard = SRD_CLASSES.find((characterClass) => characterClass.slug === 'wizard')!
+    const formValues = classFormDef.toFormValues(wizard) as ClassFormValues
+
+    expect(formValues.spellbookAcquisitionStarting).toBe(6)
+    expect(formValues.spellbookAcquisitionPerLevel).toBe(2)
+    expect(formValues.spellbookAcquisitionThroughLevel).toBe(20)
+    expect(formValues.spellbookAcquisitionIrregular).toBe(false)
+
+    const input = classFormDef.toInput(formValues, { entity: wizard })
+    const selection = input.spellcasting?.spellSelection
+    expect(selection?.model).toBe('prepareFromLearnedCollection')
+    if (selection?.model === 'prepareFromLearnedCollection') {
+      expect(selection.acquisition.extension).toBe('zero')
+      expect(selection.acquisition.curve.rows).toHaveLength(20)
+    }
   })
 
   it('fighter: ASI features are plain features in the form and round-trip through grantGroups', () => {

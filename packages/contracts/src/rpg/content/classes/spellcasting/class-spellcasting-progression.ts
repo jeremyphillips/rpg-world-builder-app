@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
-import { classCapacityProgressionSchema } from './class-capacity-progression'
+import {
+  classCapacityProgressionDraftSchema,
+  classCapacityProgressionSchema,
+} from './class-capacity-progression'
 
 // ---------------------------------------------------------------------------
 // Class spellcasting progression — independently stored sparse capacity curves.
@@ -16,3 +19,14 @@ export const classSpellcastingProgressionSchema = z.object({
 })
 
 export type ClassSpellcastingProgression = z.infer<typeof classSpellcastingProgressionSchema>
+
+/** Draft spellcasting progression — empty capacity curves allowed while authoring. */
+export const classSpellcastingProgressionDraftSchema = z.object({
+  cantrips: classCapacityProgressionDraftSchema.optional(),
+  repertoire: classCapacityProgressionDraftSchema.optional(),
+  preparedSpells: classCapacityProgressionDraftSchema.optional(),
+})
+
+export type ClassSpellcastingProgressionDraft = z.infer<
+  typeof classSpellcastingProgressionDraftSchema
+>

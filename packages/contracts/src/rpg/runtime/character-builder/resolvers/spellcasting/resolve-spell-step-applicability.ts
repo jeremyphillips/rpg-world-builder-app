@@ -1,7 +1,7 @@
 import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
-import { resolveSpellcastingProfile, type BuilderSpellcastingProfile } from './spellcasting-profile'
+import { resolveSpellcastingProfile, type BuilderSpellcastingProfile } from './builder-spellcasting'
 
 export type SpellStepNotApplicableReason = 'noSpellcasting' | 'inactiveAtLevel'
 

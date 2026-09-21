@@ -1,4 +1,11 @@
-import type { ClassGainProgression, ClassSpellSelection, SpellMutationPolicy } from '@rpg/contracts'
+import type { FormValueSync } from '@rpg/ui/form'
+
+import type {
+  ClassGainProgression,
+  ClassSpellcastingProgression,
+  ClassSpellSelection,
+  SpellMutationPolicy,
+} from '@rpg/contracts'
 
 export const SPELL_SELECTION_MODEL_OPTIONS = [
   {
@@ -74,13 +81,37 @@ export function detectRegularGain(acquisition: ClassGainProgression | undefined)
   return { starting, perLevel, throughLevel: maxLevel }
 }
 
-export function formatRegularGainSummary(acquisition: ClassGainProgression | undefined): string {
-  const regular = detectRegularGain(acquisition)
-  if (!regular) {
-    const count = acquisition?.curve.rows.length ?? 0
-    return `Spell acquisition varies by class level · ${count} change level${count === 1 ? '' : 's'}`
+export function materializeRegularGain(input: {
+  starting: number
+  perLevel: number
+  throughLevel: number
+}): ClassGainProgression {
+  const rows = [
+    { level: 1, count: input.starting },
+    ...Array.from({ length: Math.max(0, input.throughLevel - 1) }, (_, index) => ({
+      level: index + 2,
+      count: input.perLevel,
+    })),
+  ]
+  return { curve: { rows }, extension: 'zero' }
+}
+
+export function formatRegularGainSummary(input: {
+  starting?: number
+  perLevel?: number
+  throughLevel?: number
+  acquisition?: ClassGainProgression
+}): string {
+  const regular =
+    input.starting !== undefined && input.perLevel !== undefined && input.throughLevel !== undefined
+      ? { starting: input.starting, perLevel: input.perLevel, throughLevel: input.throughLevel }
+      : detectRegularGain(input.acquisition)
+  if (regular) {
+    return `Start with ${regular.starting} · Gain ${regular.perLevel} each level through level ${regular.throughLevel}`
   }
-  return `Start with ${regular.starting} · Gain ${regular.perLevel} each level through level ${regular.throughLevel}`
+  const acquisition = input.acquisition
+  const count = acquisition?.curve.rows.length ?? 0
+  return `Spell acquisition varies by class level · ${count} change level${count === 1 ? '' : 's'}`
 }
 
 export function spellSelectionFromForm(input: {
@@ -101,39 +132,44 @@ export function spellSelectionFromForm(input: {
   return { model: input.model, change }
 }
 
-export function remapProgressionOnModelSwitch(input: {
-  previousModel: ClassSpellSelection['model'] | undefined
-  nextModel: ClassSpellSelection['model']
-  progression: ClassSpellSelection extends never
-    ? never
-    : import('@rpg/contracts').ClassSpellcastingProgression | undefined
-}): import('@rpg/contracts').ClassSpellcastingProgression | undefined {
-  const progression = input.progression ?? {}
-  if (input.previousModel === input.nextModel) return progression
+export function alignProgressionToModel(
+  model: ClassSpellSelection['model'] | undefined,
+  progression: ClassSpellcastingProgression | undefined,
+): ClassSpellcastingProgression | undefined {
+  if (!model || !progression) return progression
 
   const next = { ...progression }
 
-  if (
-    input.previousModel === 'limitedRepertoire' &&
-    (input.nextModel === 'prepareFromClassList' ||
-      input.nextModel === 'prepareFromLearnedCollection')
-  ) {
-    if (next.repertoire) {
-      next.preparedSpells = next.repertoire
-      delete next.repertoire
-    }
+  if (model === 'limitedRepertoire' && next.preparedSpells) {
+    next.repertoire = next.repertoire ?? next.preparedSpells
+    delete next.preparedSpells
   }
 
   if (
-    (input.previousModel === 'prepareFromClassList' ||
-      input.previousModel === 'prepareFromLearnedCollection') &&
-    input.nextModel === 'limitedRepertoire'
+    (model === 'prepareFromClassList' || model === 'prepareFromLearnedCollection') &&
+    next.repertoire
   ) {
-    if (next.preparedSpells) {
-      next.repertoire = next.preparedSpells
-      delete next.preparedSpells
-    }
+    next.preparedSpells = next.preparedSpells ?? next.repertoire
+    delete next.repertoire
   }
 
   return next
+}
+
+export function buildClassSpellSelectionValueSyncs(): FormValueSync[] {
+  return [
+    {
+      dependsOn: ['spellSelectionModel', 'spellcasting.progression'],
+      apply: (values, changedKeys) => {
+        if (!changedKeys.includes('spellSelectionModel')) return undefined
+        const model = values.spellSelectionModel as ClassSpellSelection['model'] | undefined
+        const spellcasting = values.spellcasting as
+          | { progression?: ClassSpellcastingProgression }
+          | undefined
+        const aligned = alignProgressionToModel(model, spellcasting?.progression)
+        if (aligned === spellcasting?.progression) return undefined
+        return { 'spellcasting.progression': aligned }
+      },
+    },
+  ]
 }

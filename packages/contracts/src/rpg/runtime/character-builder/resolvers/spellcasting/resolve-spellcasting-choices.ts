@@ -1,6 +1,6 @@
 import type { ChoiceSourceResolver } from '../registry/choice-source-resolver'
 import { resolveSpellcastingChoiceSets } from './resolve-spellcasting-choice-sets'
-import { resolveSpellcastingProfile } from './spellcasting-profile'
+import { resolveSpellcastingProfile } from './builder-spellcasting'
 
 /** Exposes class spellcasting choices as builder ChoiceSets. */
 export const resolveSpellcastingChoices: ChoiceSourceResolver = (draft, context, catalogIndex) => {

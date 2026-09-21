@@ -11,15 +11,15 @@ import {
   collectFeatureProgressionColumns,
   formatProgressionTableValue,
   resolveProgressionTableColumnValue,
-  CLASS_SPELLCASTING_CHOICE_SUFFIXES,
   resolveClassSpellcasting,
   resolveClassDisplayChoiceColumns,
   resolveCompiledChoiceProgressionQuotaAtLevel,
-  resolveClassCantripCount,
+  findCompiledChoiceProgressionBySuffix,
   resolveDisplaySlotRowAtLevel,
   spellcastingFeatureLabelFromClass,
   isPactClassSpellcasting,
   type ResolvedCampaignRules,
+  type ResolvedClassSpellcasting,
   type ResolvedClassSpellcastingDisplayColumn,
   type ResolvedSpellcastingProgressionConfig,
 } from '@rpg/contracts'
@@ -30,11 +30,6 @@ import { projectVisibleClassFeatures } from '../../lib/class-display'
 import { isSubclassChoiceFeatureRow } from '../../lib/class-subclass-choice-features'
 
 type ProgressionColumn = ReturnType<typeof collectFeatureProgressionColumns>[number]
-
-type CantripDisplayColumn = {
-  id: typeof CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips
-  label: 'Cantrips'
-}
 
 type ProgressionRow = {
   level: number
@@ -85,77 +80,44 @@ function buildProgressionValueRow(
   )
 }
 
-function choiceColumnLabel(
-  column: ResolvedClassSpellcastingDisplayColumn | CantripDisplayColumn,
-): string {
-  return column.label
-}
-
 function resolveChoiceColumnValues(
+  resolved: ResolvedClassSpellcasting,
   columns: readonly ResolvedClassSpellcastingDisplayColumn[],
   level: number,
 ): Record<string, number | undefined> {
   return Object.fromEntries(
-    columns.map((column) => [
-      column.suffix,
-      resolveCompiledChoiceProgressionQuotaAtLevel(
-        {
-          suffix: column.suffix,
-          kind: column.kind,
-          extension: column.extension,
-          source: { kind: 'classList' },
-          destination:
-            column.suffix === CLASS_SPELLCASTING_CHOICE_SUFFIXES.repertoire
-              ? 'repertoire'
-              : column.suffix === CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips
-                ? 'cantrips'
-                : 'prepared',
-          mutation: { kind: 'none' },
-          label: column.label,
-          curve: column.curve,
-          showInTable: true,
-        },
-        level,
-      ),
-    ]),
+    columns.map((column) => {
+      const compiled = findCompiledChoiceProgressionBySuffix(resolved, column.suffix, column.kind)
+      return [
+        column.suffix,
+        compiled ? resolveCompiledChoiceProgressionQuotaAtLevel(compiled, level) : undefined,
+      ]
+    }),
   )
 }
 
 function resolveRowChoiceColumns(input: {
   level: number
-  characterClass: CharacterClass
-  resolved: ReturnType<typeof resolveClassSpellcasting>
+  spellcasting: CharacterClass['spellcasting']
+  resolved: ResolvedClassSpellcasting | null
   displayChoiceColumns: readonly ResolvedClassSpellcastingDisplayColumn[]
-  showCantripColumn: boolean
 }): Record<string, number | undefined> {
-  const { spellcasting } = input.characterClass
-  if (!isSpellcastingActiveAtLevel(spellcasting, input.level) || !input.resolved) {
+  if (!isSpellcastingActiveAtLevel(input.spellcasting, input.level) || !input.resolved) {
     return {}
   }
 
-  const choiceColumns = resolveChoiceColumnValues(input.displayChoiceColumns, input.level)
-  if (input.showCantripColumn && spellcasting) {
-    choiceColumns[CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips] = resolveClassCantripCount({
-      spellcasting,
-      classLevel: input.level,
-    })
-  }
-  return choiceColumns
+  return resolveChoiceColumnValues(input.resolved, input.displayChoiceColumns, input.level)
 }
 
 function buildRow(
   level: number,
   characterClass: CharacterClass,
-  spellcastingProgression: ResolvedSpellcastingProgressionConfig,
+  resolved: ResolvedClassSpellcasting | null,
   subclassingEnabled: boolean,
   progressionColumns: readonly ProgressionColumn[],
   displayChoiceColumns: readonly ResolvedClassSpellcastingDisplayColumn[],
-  showCantripColumn: boolean,
 ): ProgressionRow {
   const { features, spellcasting } = characterClass
-  const resolved = spellcasting
-    ? resolveClassSpellcasting(characterClass, spellcastingProgression)
-    : null
   const castingActive = isSpellcastingActiveAtLevel(spellcasting, level)
   const usesPactMagic = resolved ? isPactClassSpellcasting(resolved) : false
 
@@ -174,10 +136,9 @@ function buildRow(
     progressionValues: buildProgressionValueRow(progressionColumns, level),
     choiceColumns: resolveRowChoiceColumns({
       level,
-      characterClass,
+      spellcasting,
       resolved,
       displayChoiceColumns,
-      showCantripColumn,
     }),
     slots:
       castingActive && resolved
@@ -191,9 +152,8 @@ function buildRows(
   maxCharacterLevel: number,
   subclassingEnabled: boolean,
   progressionColumns: readonly ProgressionColumn[],
-  spellcastingProgression: ResolvedSpellcastingProgressionConfig,
+  resolved: ResolvedClassSpellcasting | null,
   displayChoiceColumns: readonly ResolvedClassSpellcastingDisplayColumn[],
-  showCantripColumn: boolean,
 ): ProgressionRow[] {
   const visibleFeatures = projectVisibleClassFeatures(characterClass.features, {
     subclassingEnabled,
@@ -203,11 +163,10 @@ function buildRows(
     buildRow(
       index + 1,
       classForProgression,
-      spellcastingProgression,
+      resolved,
       subclassingEnabled,
       progressionColumns,
       displayChoiceColumns,
-      showCantripColumn,
     ),
   )
 }
@@ -219,7 +178,7 @@ function slotLevelRange(rows: ProgressionRow[]): number[] {
 
 type ColumnFlags = {
   progressionColumns: ProgressionColumn[]
-  choiceColumns: Array<ResolvedClassSpellcastingDisplayColumn | CantripDisplayColumn>
+  choiceColumns: ResolvedClassSpellcastingDisplayColumn[]
   slotLevels: number[]
 }
 
@@ -227,20 +186,14 @@ function buildColumnFlags(
   progressionColumns: readonly ProgressionColumn[],
   displayChoiceColumns: readonly ResolvedClassSpellcastingDisplayColumn[],
   rows: ProgressionRow[],
-  cantripColumn: CantripDisplayColumn | null,
 ): ColumnFlags {
-  const profileChoiceColumns = displayChoiceColumns.filter((column) =>
+  const choiceColumns = displayChoiceColumns.filter((column) =>
     rows.some((row) => row.choiceColumns[column.suffix] !== undefined),
   )
 
   return {
     progressionColumns: [...progressionColumns],
-    choiceColumns: [
-      ...(cantripColumn && rows.some((row) => row.choiceColumns[cantripColumn.id] !== undefined)
-        ? [cantripColumn]
-        : []),
-      ...profileChoiceColumns,
-    ],
+    choiceColumns,
     slotLevels: slotLevelRange(rows),
   }
 }
@@ -265,12 +218,6 @@ function SlotCell({ slots, slotIndex }: { slots?: readonly number[]; slotIndex: 
   return <TableCell className="text-center">{count > 0 ? count : '—'}</TableCell>
 }
 
-function choiceColumnKey(
-  column: ResolvedClassSpellcastingDisplayColumn | CantripDisplayColumn,
-): string {
-  return 'suffix' in column ? column.suffix : column.id
-}
-
 function ProgressionTableHeader({ progressionColumns, choiceColumns, slotLevels }: ColumnFlags) {
   return (
     <TableHeader>
@@ -284,8 +231,8 @@ function ProgressionTableHeader({ progressionColumns, choiceColumns, slotLevels 
           </TableHead>
         ))}
         {choiceColumns.map((column) => (
-          <TableHead key={choiceColumnKey(column)} className="w-24 text-center">
-            {choiceColumnLabel(column)}
+          <TableHead key={column.suffix} className="w-24 text-center">
+            {column.label}
           </TableHead>
         ))}
         {slotLevels.map((slotLevel) => (
@@ -321,8 +268,8 @@ function ProgressionBodyRow({
         />
       ))}
       {choiceColumns.map((column) => (
-        <TableCell key={choiceColumnKey(column)} className="text-center">
-          {row.choiceColumns[choiceColumnKey(column)] ?? '—'}
+        <TableCell key={column.suffix} className="text-center">
+          {row.choiceColumns[column.suffix] ?? '—'}
         </TableCell>
       ))}
       {slotLevels.map((slotLevel) => (
@@ -364,23 +311,15 @@ export function ClassProgressionTable({
     ? resolveClassSpellcasting(characterClass, spellcastingProgression)
     : null
   const displayChoiceColumns = resolved ? resolveClassDisplayChoiceColumns(resolved) : []
-  const cantripColumn =
-    characterClass.spellcasting?.progression?.cantrips !== undefined
-      ? ({
-          id: CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips,
-          label: 'Cantrips',
-        } satisfies CantripDisplayColumn)
-      : null
   const rows = buildRows(
     characterClass,
     rules.maxCharacterLevel,
     rules.subclassing.enabled,
     progressionColumns,
-    spellcastingProgression,
+    resolved,
     displayChoiceColumns,
-    cantripColumn !== null,
   )
-  const flags = buildColumnFlags(progressionColumns, displayChoiceColumns, rows, cantripColumn)
+  const flags = buildColumnFlags(progressionColumns, displayChoiceColumns, rows)
   const colSpan = columnCount(flags)
   const extended = rules.extendedProgression
 

@@ -10,7 +10,7 @@ import type { SpellChoiceSource } from '../../../../vocab/spell/spell-choice-sou
 import { buildChoiceSetId, type ChoiceSet, type ChoiceSetOption } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
-import type { BuilderSpellcastingProfile } from './spellcasting-profile'
+import type { BuilderSpellcastingProfile } from './builder-spellcasting'
 
 export function spellcastingChoiceSetId(classId: string, suffix: string): string {
   return buildChoiceSetId('spellcasting', classId, suffix)

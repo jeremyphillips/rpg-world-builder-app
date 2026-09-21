@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
-import { resolveSlotProgressionForClass } from '../../campaign/rules/spellcasting-progression/resolve-profile'
+import { resolveSlotProgressionForClass } from '../../campaign/rules/spellcasting-progression/resolve-config'
 import { wizardClass } from '../character-builder/spellcasting-test-fixtures'
 
 import {

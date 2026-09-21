@@ -39,7 +39,7 @@ export type ClassSpellSelection = z.infer<typeof classSpellSelectionSchema>
 export const DEFAULT_SPELL_SELECTION_COLUMN_LABEL = 'Prepared Spells' as const
 
 export function resolveSpellSelectionColumnLabel(
-  spellSelection: ClassSpellSelection | undefined,
+  spellSelection: Pick<ClassSpellSelection, 'columnLabel'> | undefined,
 ): string {
   return spellSelection?.columnLabel ?? DEFAULT_SPELL_SELECTION_COLUMN_LABEL
 }

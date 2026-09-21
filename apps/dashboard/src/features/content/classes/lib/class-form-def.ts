@@ -22,12 +22,15 @@ import {
   maxLevelFromCtx,
   type ClassFormValues,
 } from './class-form-fields'
+import { buildClassSpellSelectionValueSyncs } from './class-spell-selection-form.lib'
 import {
   buildClassCreateInput,
   classCreateDefaultValues,
   proficienciesToFormValues,
+  spellbookAcquisitionToFormValues,
   spellcastingToFormValues,
   spellSelectionChangePackageToFormValues,
+  spellSelectionModelToFormValues,
 } from './class-form-values'
 import { featureToFormRow } from './class-feature-form-fields'
 import {
@@ -77,6 +80,7 @@ const classFormDef: ContentFormDef<
 
   buildTabs: buildClassTabs,
   buildFields: (ctx) => contentFormFields(classFormDef, ctx),
+  valueSyncs: () => buildClassSpellSelectionValueSyncs(),
 
   toFormValues: (entity) => ({
     name: entity.name,
@@ -86,7 +90,18 @@ const classFormDef: ContentFormDef<
     hitDie: (entity.hitDie ?? '') as ClassFormValues['hitDie'],
     hasSpellcasting: entity.spellcasting !== undefined,
     grantsCantrips: entity.spellcasting?.progression?.cantrips !== undefined,
+    spellSelectionModel: spellSelectionModelToFormValues(entity.spellcasting),
     spellSelectionChangePackage: spellSelectionChangePackageToFormValues(entity.spellcasting),
+    ...(() => {
+      const acquisition = spellbookAcquisitionToFormValues(entity.spellcasting)
+      return {
+        spellbookAcquisitionIrregular: acquisition.irregular,
+        spellbookAcquisitionStarting: acquisition.starting,
+        spellbookAcquisitionPerLevel: acquisition.perLevel,
+        spellbookAcquisitionThroughLevel: acquisition.throughLevel,
+        spellbookAcquisitionCurve: acquisition.curve,
+      }
+    })(),
     weaponProficiencyMode:
       entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0
         ? 'individual'

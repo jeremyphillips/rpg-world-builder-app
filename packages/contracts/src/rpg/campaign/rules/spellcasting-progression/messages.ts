@@ -37,18 +37,9 @@ export const spellcastingProgressionValidationMessages = {
     'validation.spellcastingProgression.unknownSlotProgression',
     ({ id }) => `Unknown slot progression "${id}".`,
   ),
-  unknownSpellcastingProfile: defineMessage<{ id: string }>(
-    'validation.spellcastingProgression.unknownSpellcastingProfile',
-    ({ id }) => `Unknown spellcasting profile "${id}".`,
-  ),
   gainRequiresPersistentDestination: defineMessage<{ destination: string }>(
     'validation.spellcastingProgression.gainRequiresPersistentDestination',
     ({ destination }) =>
       `Gain progressions require a persistent destination (got "${destination}").`,
-  ),
-  cantripDestinationNotAllowedOnProfile: defineMessage(
-    'validation.spellcastingProgression.cantripDestinationNotAllowedOnProfile',
-    () =>
-      'Cantrip capacity belongs on the class spellcasting record, not on spell selection profiles.',
   ),
 }

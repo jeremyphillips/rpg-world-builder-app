@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import type { ClassGainProgression, ClassSpellSelection } from '@rpg/contracts'
+import type { ClassGainProgression } from '@rpg/contracts'
+import { Button, SemanticText } from '@rpg/ui'
 
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 import { FeatureTableRow } from '@/lib/content-table-surface'
@@ -11,30 +12,34 @@ import {
 } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { ClassFormValues } from '../lib/class-form-fields'
-import { formatRegularGainSummary } from '../lib/class-spell-selection-form.lib'
+import {
+  detectRegularGain,
+  formatRegularGainSummary,
+  materializeRegularGain,
+} from '../lib/class-spell-selection-form.lib'
 import {
   buildClassSpellbookAcquisitionDraft,
   buildClassSpellbookAcquisitionHostConfig,
-  formatClassSpellbookAcquisitionMetadata,
-  mapClassSpellbookAcquisitionDraftToProgression,
 } from '../lib/class-spellbook-acquisition-field.lib'
+import { mapClassSpellbookAcquisitionDraftToProgression } from '../lib/class-spellbook-acquisition-field.lib'
 
 type ClassSpellbookAcquisitionFieldProps = {
   formCtx: ContentFormCtx
+  mode: 'regular' | 'irregular'
 }
 
-export function ClassSpellbookAcquisitionField({ formCtx }: ClassSpellbookAcquisitionFieldProps) {
+export function ClassSpellbookAcquisitionField({
+  formCtx,
+  mode,
+}: ClassSpellbookAcquisitionFieldProps) {
   const form = useFormContext<ClassFormValues>()
-  const spellSelection = useWatch({
-    control: form.control,
-    name: 'spellcasting.spellSelection',
-  }) as ClassSpellSelection | undefined
+  const starting = useWatch({ control: form.control, name: 'spellbookAcquisitionStarting' })
+  const perLevel = useWatch({ control: form.control, name: 'spellbookAcquisitionPerLevel' })
+  const throughLevel = useWatch({ control: form.control, name: 'spellbookAcquisitionThroughLevel' })
+  const curve = useWatch({ control: form.control, name: 'spellbookAcquisitionCurve' }) as
+    | ClassGainProgression
+    | undefined
   const [modalOpen, setModalOpen] = useState(false)
-
-  const acquisition =
-    spellSelection?.model === 'prepareFromLearnedCollection'
-      ? spellSelection.acquisition
-      : undefined
 
   const campaignRules = campaignRulesFromCtx(formCtx)
   const maxLevel = effectiveMaxFromCtx(formCtx)
@@ -58,36 +63,84 @@ export function ClassSpellbookAcquisitionField({ formCtx }: ClassSpellbookAcquis
     [allowedLevels, extendedProgression],
   )
 
+  const tableDraftSource =
+    mode === 'irregular'
+      ? curve
+      : starting !== undefined && perLevel !== undefined && throughLevel !== undefined
+        ? materializeRegularGain({ starting, perLevel, throughLevel })
+        : undefined
+
   const initialDraft = useMemo(
-    () => buildClassSpellbookAcquisitionDraft(acquisition),
-    [acquisition],
+    () => buildClassSpellbookAcquisitionDraft(tableDraftSource),
+    [tableDraftSource],
   )
 
-  if (spellSelection?.model !== 'prepareFromLearnedCollection') return null
-
-  function setAcquisition(next: ClassGainProgression) {
-    if (spellSelection?.model !== 'prepareFromLearnedCollection') return
-    form.setValue(
-      'spellcasting.spellSelection',
-      {
-        model: 'prepareFromLearnedCollection',
-        collection: 'spellbook',
-        acquisition: next,
-        change: spellSelection.change,
-      },
-      { shouldDirty: true, shouldValidate: true },
-    )
+  function handleSaveDraft(draft: TableBuilderFormValues) {
+    const next = mapClassSpellbookAcquisitionDraftToProgression(draft)
+    const regular = detectRegularGain(next)
+    if (regular) {
+      form.setValue('spellbookAcquisitionIrregular', false, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionStarting', regular.starting, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionPerLevel', regular.perLevel, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionThroughLevel', regular.throughLevel, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionCurve', undefined, { shouldDirty: true })
+    } else {
+      form.setValue('spellbookAcquisitionIrregular', true, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionCurve', next, { shouldDirty: true, shouldValidate: true })
+    }
+    setModalOpen(false)
   }
 
-  function handleSaveDraft(draft: TableBuilderFormValues) {
-    setAcquisition(mapClassSpellbookAcquisitionDraftToProgression(draft))
+  if (mode === 'regular') {
+    const summary = formatRegularGainSummary({ starting, perLevel, throughLevel })
+    return (
+      <div className="flex flex-col gap-2">
+        <SemanticText tone="neutral">{summary}</SemanticText>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="self-start"
+          onClick={() => {
+            if (starting !== undefined && perLevel !== undefined && throughLevel !== undefined) {
+              form.setValue(
+                'spellbookAcquisitionCurve',
+                materializeRegularGain({ starting, perLevel, throughLevel }),
+                { shouldDirty: true },
+              )
+            }
+            form.setValue('spellbookAcquisitionIrregular', true, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }}
+        >
+          Edit progression
+        </Button>
+      </div>
+    )
   }
 
   return (
     <>
       <FeatureTableRow
         title="Spellbook acquisition"
-        metadata={formatClassSpellbookAcquisitionMetadata(acquisition, formatRegularGainSummary)}
+        metadata={formatRegularGainSummary({ acquisition: curve })}
         typeLabel="Gain progression"
         onEdit={() => setModalOpen(true)}
       />

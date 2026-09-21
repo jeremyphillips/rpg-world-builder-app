@@ -8,7 +8,10 @@ import {
 } from '../../../vocab/equipment/spellcasting-gear-kind'
 
 import { classSpellSelectionSchema } from './class-spell-selection'
-import { classSpellcastingProgressionSchema } from './class-spellcasting-progression'
+import {
+  classSpellcastingProgressionDraftSchema,
+  classSpellcastingProgressionSchema,
+} from './class-spellcasting-progression'
 import { refinePublishedSpellcasting } from './spellcasting-validation'
 
 // ---------------------------------------------------------------------------
@@ -63,6 +66,21 @@ export const spellcastingSchema = z
   })
 
 export type Spellcasting = z.infer<typeof spellcastingSchema>
+
+/** Draft spellcasting — same keys as published, without publish-time cross-field refines. */
+export const spellcastingDraftSchema = z.object({
+  slotProgressionId: z.string().min(1),
+  spellSelection: classSpellSelectionSchema.optional(),
+  progression: classSpellcastingProgressionDraftSchema.optional(),
+  level: absoluteLevelSchema.default(DEFAULT_SPELLCASTING_LEVEL),
+  description: z.string().optional(),
+  ability: abilitySchema,
+  requiredGear: z.array(spellcastingGearKindSchema).min(1).optional(),
+  focusKinds: z.array(spellcastingFocusGearKindSchema).min(1).optional(),
+  recommendedGear: z.array(spellcastingGearKindSchema).min(1).optional(),
+})
+
+export type SpellcastingDraft = z.infer<typeof spellcastingDraftSchema>
 
 /** Class level at which spellcasting unlocks; undefined when the class is not a caster. */
 export function spellcastingUnlockLevel(

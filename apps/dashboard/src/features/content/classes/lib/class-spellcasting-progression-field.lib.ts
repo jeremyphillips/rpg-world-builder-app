@@ -1,5 +1,8 @@
 import type { ClassSpellcastingProgression, ClassSpellSelection } from '@rpg/contracts'
-import { classCapacityProgressionValidationMessages } from '@rpg/contracts'
+import {
+  classCapacityProgressionValidationMessages,
+  resolveSpellSelectionColumnLabel,
+} from '@rpg/contracts'
 
 import {
   isTableBuilderCellBlank,
@@ -18,27 +21,27 @@ export const SPELLCASTING_CANTIPS_COLUMN_KEY = 'cantrips'
 export const SPELLCASTING_REPERTOIRE_COLUMN_KEY = 'repertoire'
 export const SPELLCASTING_PREPARED_SPELLS_COLUMN_KEY = 'preparedSpells'
 
-const DEFAULT_L1_COLUMN_LABEL = 'Prepared Spells'
-
 export type SpellcastingProgressionColumnKey =
   | typeof SPELLCASTING_CANTIPS_COLUMN_KEY
   | typeof SPELLCASTING_REPERTOIRE_COLUMN_KEY
   | typeof SPELLCASTING_PREPARED_SPELLS_COLUMN_KEY
 
 function l1ColumnKey(
-  spellSelection: ClassSpellSelection | undefined,
+  spellSelectionModel: ClassSpellSelection['model'] | undefined,
 ): SpellcastingProgressionColumnKey {
-  if (spellSelection?.model === 'limitedRepertoire') return SPELLCASTING_REPERTOIRE_COLUMN_KEY
+  if (spellSelectionModel === 'limitedRepertoire') return SPELLCASTING_REPERTOIRE_COLUMN_KEY
   return SPELLCASTING_PREPARED_SPELLS_COLUMN_KEY
 }
 
-function l1ColumnLabel(spellSelection: ClassSpellSelection | undefined): string {
-  return spellSelection?.columnLabel ?? DEFAULT_L1_COLUMN_LABEL
+function l1ColumnLabel(spellSelectionModel: ClassSpellSelection['model'] | undefined): string {
+  return resolveSpellSelectionColumnLabel(
+    spellSelectionModel ? { columnLabel: undefined } : undefined,
+  )
 }
 
 export function resolveSpellcastingProgressionFixedColumns(input: {
   grantsCantrips: boolean
-  spellSelection: ClassSpellSelection | undefined
+  spellSelectionModel: ClassSpellSelection['model'] | undefined
 }): readonly TableBuilderFixedColumnDefinition[] {
   const columns: TableBuilderFixedColumnDefinition[] = []
   if (input.grantsCantrips) {
@@ -49,10 +52,10 @@ export function resolveSpellcastingProgressionFixedColumns(input: {
       format: 'plain',
     })
   }
-  if (input.spellSelection) {
+  if (input.spellSelectionModel) {
     columns.push({
-      semanticKey: l1ColumnKey(input.spellSelection),
-      label: l1ColumnLabel(input.spellSelection),
+      semanticKey: l1ColumnKey(input.spellSelectionModel),
+      label: l1ColumnLabel(input.spellSelectionModel),
       valueType: 'number',
       format: 'plain',
     })
@@ -94,10 +97,10 @@ function mergedRowsFromProgression(
 
 function columnLabelForKey(
   key: SpellcastingProgressionColumnKey,
-  spellSelection: ClassSpellSelection | undefined,
+  spellSelectionModel: ClassSpellSelection['model'] | undefined,
 ): string {
   if (key === SPELLCASTING_CANTIPS_COLUMN_KEY) return 'Cantrips'
-  return l1ColumnLabel(spellSelection)
+  return l1ColumnLabel(spellSelectionModel)
 }
 
 function collectIncrementIssues(
@@ -127,7 +130,7 @@ export function validateClassSpellcastingProgressionDraft(
   draft: TableBuilderFormValues,
   input: {
     grantsCantrips: boolean
-    spellSelection: ClassSpellSelection | undefined
+    spellSelectionModel: ClassSpellSelection['model'] | undefined
   },
 ): TableBuilderDraftValidationResult {
   const fixedColumns = resolveSpellcastingProgressionFixedColumns(input)
@@ -175,7 +178,7 @@ export function validateClassSpellcastingProgressionDraft(
 
     for (const issue of collectIncrementIssues(
       rows,
-      columnLabelForKey(semanticKey, input.spellSelection),
+      columnLabelForKey(semanticKey, input.spellSelectionModel),
     )) {
       errors.push({
         path: 'rows',
@@ -191,7 +194,7 @@ export function buildClassSpellcastingProgressionHostConfig(input: {
   allowedLevels: readonly number[]
   extendedProgression?: TableBuilderExtendedProgression
   grantsCantrips: boolean
-  spellSelection: ClassSpellSelection | undefined
+  spellSelectionModel: ClassSpellSelection['model'] | undefined
 }): TableBuilderHostConfig {
   return {
     allowedKinds: ['levelProgression'],
@@ -202,13 +205,13 @@ export function buildClassSpellcastingProgressionHostConfig(input: {
     resolveFixedColumns: () =>
       resolveSpellcastingProgressionFixedColumns({
         grantsCantrips: input.grantsCantrips,
-        spellSelection: input.spellSelection,
+        spellSelectionModel: input.spellSelectionModel,
       }),
     ...(input.extendedProgression ? { extendedProgression: input.extendedProgression } : {}),
     validateDraftBeforeSave: (ctx) =>
       validateClassSpellcastingProgressionDraft(ctx.draft, {
         grantsCantrips: input.grantsCantrips,
-        spellSelection: input.spellSelection,
+        spellSelectionModel: input.spellSelectionModel,
       }),
   }
 }
@@ -219,12 +222,12 @@ export function buildClassSpellcastingProgressionDraft(
     allowedLevels: readonly number[]
     extendedProgression?: TableBuilderExtendedProgression
     grantsCantrips: boolean
-    spellSelection: ClassSpellSelection | undefined
+    spellSelectionModel: ClassSpellSelection['model'] | undefined
   },
 ): TableBuilderFormValues {
   const fixedColumns = resolveSpellcastingProgressionFixedColumns({
     grantsCantrips: input.grantsCantrips,
-    spellSelection: input.spellSelection,
+    spellSelectionModel: input.spellSelectionModel,
   })
   const columnKeys = fixedColumns.map(
     (column) => column.semanticKey as SpellcastingProgressionColumnKey,
@@ -261,7 +264,7 @@ export function mapClassSpellcastingProgressionDraftToProgression(
   draft: TableBuilderFormValues,
   input: {
     grantsCantrips: boolean
-    spellSelection: ClassSpellSelection | undefined
+    spellSelectionModel: ClassSpellSelection['model'] | undefined
   },
 ): ClassSpellcastingProgression {
   const columnKeys = resolveSpellcastingProgressionFixedColumns(input).map(
@@ -304,7 +307,7 @@ export function mapClassSpellcastingProgressionDraftToProgression(
 export function formatClassSpellcastingProgressionMetadata(input: {
   progression: ClassSpellcastingProgression | undefined
   grantsCantrips: boolean
-  spellSelection: ClassSpellSelection | undefined
+  spellSelectionModel: ClassSpellSelection['model'] | undefined
 }): string {
   const columnCount = resolveSpellcastingProgressionFixedColumns(input).length
   const columnKeys = resolveSpellcastingProgressionFixedColumns(input).map(

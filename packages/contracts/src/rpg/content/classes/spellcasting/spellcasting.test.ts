@@ -104,6 +104,53 @@ describe('spellcastingSchema', () => {
     ).toBe(false)
   })
 
+  it('rejects limited repertoire with prepared spells progression', () => {
+    expect(
+      spellcastingSchema.safeParse({
+        slotProgressionId: 'full-caster',
+        ability: 'cha',
+        spellSelection: {
+          model: 'limitedRepertoire',
+          change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+        },
+        progression: {
+          repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
+          preparedSpells: { curve: { rows: [{ level: 1, count: 4 }] } },
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects learned collection without acquisition or prepared progression', () => {
+    expect(
+      spellcastingSchema.safeParse({
+        slotProgressionId: 'full-caster',
+        ability: 'int',
+        spellSelection: {
+          model: 'prepareFromLearnedCollection',
+          collection: 'spellbook',
+          acquisition: { curve: { rows: [] }, extension: 'zero' },
+          change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+        },
+        progression: {
+          preparedSpells: { curve: { rows: [] } },
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects repertoire progression without a spell selection model', () => {
+    expect(
+      spellcastingSchema.safeParse({
+        slotProgressionId: 'full-caster',
+        ability: 'cha',
+        progression: {
+          repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
+        },
+      }).success,
+    ).toBe(false)
+  })
+
   it('parses required and recommended spellcasting gear', () => {
     const spellcasting = spellcastingSchema.parse({
       slotProgressionId: 'full-caster',

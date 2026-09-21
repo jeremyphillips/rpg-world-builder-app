@@ -9,7 +9,7 @@ import {
   abilitySchema,
   campaignLevelSchema,
   classGainProgressionSchema,
-  classSpellSelectionSchema,
+  classSpellcastingProgressionDraftSchema,
   classSpellcastingProgressionSchema,
   spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
@@ -28,6 +28,7 @@ import { ClassSpellcastingProgressionField } from '../components/class-spellcast
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
+import { maxLevelFromCtx } from './class-form-fields'
 import {
   SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS,
   SPELL_SELECTION_MODEL_OPTIONS,
@@ -77,7 +78,6 @@ export function createSpellcastingFormSchema(maxLevel: number) {
   const levelField = campaignLevelField(maxLevel)
   return z.object({
     slotProgressionId: z.string().min(1),
-    spellSelection: classSpellSelectionSchema.optional(),
     progression: classSpellcastingProgressionSchema.optional(),
     level: levelField.optional(),
     description: z.string().optional(),
@@ -92,8 +92,7 @@ export function createSpellcastingDraftFormSchema(maxLevel: number) {
   const levelField = campaignLevelField(maxLevel)
   return z.object({
     slotProgressionId: draftOptionalSelect(z.string().min(1)),
-    spellSelection: classSpellSelectionSchema.optional(),
-    progression: classSpellcastingProgressionSchema.optional(),
+    progression: classSpellcastingProgressionDraftSchema.optional(),
     level: draftOptionalSelect(levelField),
     description: z.string().optional(),
     ability: draftOptionalSelect(abilitySchema),
@@ -110,12 +109,12 @@ function visibleWhenSpellcasting(): FieldVisibility {
   }
 }
 
-function spellSelectionLearnedCollectionDependent(ctx: ContentFormCtx) {
+function spellSelectionLearnedCollectionDependent(ctx: ContentFormCtx, maxLevel: number) {
   return defineDependentField({
     kind: 'dependent',
     controller: {
       type: 'select',
-      name: 'spellcasting.spellSelection.model',
+      name: 'spellSelectionModel',
       label: 'Spell selection',
       options: spellSelectionModelOptions,
       required: true,
@@ -123,22 +122,57 @@ function spellSelectionLearnedCollectionDependent(ctx: ContentFormCtx) {
     },
     dependents: {
       visibility: {
-        dependsOn: ['spellcasting.spellSelection.model'],
-        visibleWhen: (watched) =>
-          watched['spellcasting.spellSelection.model'] === 'prepareFromLearnedCollection',
+        dependsOn: ['spellSelectionModel'],
+        visibleWhen: (watched) => watched['spellSelectionModel'] === 'prepareFromLearnedCollection',
       },
       fields: [
         {
-          type: 'select',
-          name: 'spellcasting.spellSelection.collection',
-          label: 'Learned collection',
-          options: [{ value: 'spellbook', label: 'Spellbook' }],
-          required: true,
+          kind: 'group',
+          label: 'Spellbook acquisition',
+          visibility: {
+            dependsOn: ['spellbookAcquisitionIrregular'],
+            visibleWhen: (watched) => watched['spellbookAcquisitionIrregular'] !== true,
+          },
+          fields: [
+            {
+              type: 'number',
+              name: 'spellbookAcquisitionStarting',
+              label: 'Starting spells',
+              min: 0,
+              required: true,
+            },
+            {
+              type: 'number',
+              name: 'spellbookAcquisitionPerLevel',
+              label: 'Spells gained each later level',
+              min: 0,
+              required: true,
+            },
+            {
+              type: 'number',
+              name: 'spellbookAcquisitionThroughLevel',
+              label: 'Through level',
+              min: 2,
+              max: maxLevel,
+              required: true,
+            },
+            {
+              kind: 'slot',
+              name: 'spellbookAcquisitionSummary',
+              render: () =>
+                createElement(ClassSpellbookAcquisitionField, { formCtx: ctx, mode: 'regular' }),
+            },
+          ],
         },
         {
           kind: 'slot',
-          name: 'spellcasting.spellbookAcquisition',
-          render: () => createElement(ClassSpellbookAcquisitionField, { formCtx: ctx }),
+          name: 'spellbookAcquisitionIrregularEditor',
+          visibility: {
+            dependsOn: ['spellbookAcquisitionIrregular'],
+            visibleWhen: (watched) => watched['spellbookAcquisitionIrregular'] === true,
+          },
+          render: () =>
+            createElement(ClassSpellbookAcquisitionField, { formCtx: ctx, mode: 'irregular' }),
         },
       ],
     },
@@ -152,6 +186,7 @@ function spellcastingSlotProgressionOptions(ctx: ContentFormCtx) {
 export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
   const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
+  const maxLevel = maxLevelFromCtx(ctx)
   const stack: DependentConfig = {
     kind: 'dependent',
     controller: {
@@ -210,7 +245,7 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
           label: 'Level 1+ spells',
           visibility: visibleWhenSpellcasting(),
           fields: [
-            spellSelectionLearnedCollectionDependent(ctx),
+            spellSelectionLearnedCollectionDependent(ctx, maxLevel),
             {
               type: 'select',
               name: 'spellSelectionChangePackage',
@@ -270,5 +305,4 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
   return [stack]
 }
 
-// Re-export for form schema composition — acquisition lives on spellSelection
 export { classGainProgressionSchema }

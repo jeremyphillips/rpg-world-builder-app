@@ -14,7 +14,7 @@ import type { SpellMutationPolicy } from '../../../vocab/spell/spell-mutation-po
 import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
-import { resolveSpellcastingProfile } from '../resolvers/spellcasting/spellcasting-profile'
+import { resolveSpellcastingProfile } from '../resolvers/spellcasting/builder-spellcasting'
 
 // ---------------------------------------------------------------------------
 // Character Builder spellcasting finalization — orchestrates draft selections,

@@ -15,7 +15,7 @@ import {
   maxSelectableSpellLevel,
   spellsAvailableAtLevel,
 } from '../../../creature/spellcasting'
-import { resolveSpellcastingProfile } from './spellcasting-profile'
+import { resolveSpellcastingProfile } from './builder-spellcasting'
 
 function draftWith(overrides: Partial<CharacterBuilderDraft>): CharacterBuilderDraft {
   return { ...createEmptyCharacterBuilderDraft(), ...overrides }
