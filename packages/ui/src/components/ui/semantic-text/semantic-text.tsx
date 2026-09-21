@@ -23,7 +23,13 @@ export type SemanticTextProps = {
 /** Inline semantic copy — always renders a `span`. */
 export function SemanticText({ tone, emphasis, icon, children, className }: SemanticTextProps) {
   return (
-    <span className={cn(semanticTextVariants({ tone, emphasis }), className)}>
+    <span
+      className={cn(
+        semanticTextVariants({ tone, emphasis }),
+        icon ? 'items-start gap-2' : undefined,
+        className,
+      )}
+    >
       {icon ? (
         <span
           aria-hidden="true"

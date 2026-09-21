@@ -26,3 +26,9 @@ export const Circle: Story = {
     shape: 'circle',
   },
 }
+
+export const Medium: Story = {
+  args: {
+    size: 'md',
+  },
+}

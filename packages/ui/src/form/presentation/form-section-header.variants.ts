@@ -7,5 +7,5 @@ export const formSectionHeaderActionSlotClasses = 'shrink-0 justify-self-end'
 /** Label line accessories (required marker, issue links) sit beside the label text. */
 export const formSectionHeaderLabelRowClasses = 'flex min-w-0 items-center gap-2'
 
-/** Vertical gap between section heading label and hint — tighter than field-group legends. */
-export const formSectionHeaderHeadingStackClasses = 'flex flex-col gap-1'
+/** Vertical gap between section heading label and hint — 2px below the heading line. */
+export const formSectionHeaderHeadingStackClasses = 'flex flex-col gap-0.5'

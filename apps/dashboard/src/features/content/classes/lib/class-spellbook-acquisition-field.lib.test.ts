@@ -2,10 +2,19 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildClassSpellbookAcquisitionDraft,
+  buildClassSpellbookAcquisitionHostConfig,
   mapClassSpellbookAcquisitionDraftToProgression,
 } from './class-spellbook-acquisition-field.lib'
 
 describe('class-spellbook-acquisition-field.lib', () => {
+  it('uses acquisition-specific add-row copy on the host config', () => {
+    expect(
+      buildClassSpellbookAcquisitionHostConfig({
+        allowedLevels: [1, 2, 3],
+      }).addRowLabel,
+    ).toBe('Add level')
+  })
+
   it('round-trips sparse gain rows without fill-forward', () => {
     const acquisition = {
       curve: {

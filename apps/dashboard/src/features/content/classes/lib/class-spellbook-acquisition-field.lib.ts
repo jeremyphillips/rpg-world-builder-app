@@ -65,6 +65,7 @@ export function buildClassSpellbookAcquisitionHostConfig(input: {
     resolveFixedColumns: () => [GAIN_COLUMN],
     ...(input.extendedProgression ? { extendedProgression: input.extendedProgression } : {}),
     validateDraftBeforeSave: (ctx) => validateGainDraft(ctx.draft),
+    addRowLabel: 'Add level',
   }
 }
 

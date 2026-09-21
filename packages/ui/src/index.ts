@@ -115,6 +115,7 @@ export {
   IconContainer,
   type IconContainerProps,
   type IconContainerShape,
+  type IconContainerSize,
 } from './components/ui/icon-container.client'
 export {
   iconContainerVariants,

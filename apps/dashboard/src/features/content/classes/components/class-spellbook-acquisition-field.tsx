@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import type { ClassGainProgression } from '@rpg/contracts'
-import { Button, SemanticText } from '@rpg/ui'
 
-import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 import { FeatureTableRow } from '@/lib/content-table-surface'
 
 import {
@@ -16,23 +14,23 @@ import {
   detectRegularGain,
   formatRegularGainSummary,
   materializeRegularGain,
+  SPELLBOOK_GAIN_MODE_REGULAR,
+  SPELLBOOK_GAIN_MODE_VARIABLE,
 } from '../lib/class-spell-selection-form.lib'
+import { buildClassSpellbookAcquisitionDraft } from '../lib/class-spellbook-acquisition-field.lib'
 import {
-  buildClassSpellbookAcquisitionDraft,
-  buildClassSpellbookAcquisitionHostConfig,
-} from '../lib/class-spellbook-acquisition-field.lib'
-import { mapClassSpellbookAcquisitionDraftToProgression } from '../lib/class-spellbook-acquisition-field.lib'
+  ClassSpellbookAcquisitionModal,
+  type ClassSpellbookAcquisitionModalSavePayload,
+} from './class-spellbook-acquisition-modal'
 
 type ClassSpellbookAcquisitionFieldProps = {
   formCtx: ContentFormCtx
-  mode: 'regular' | 'irregular'
 }
 
-export function ClassSpellbookAcquisitionField({
-  formCtx,
-  mode,
-}: ClassSpellbookAcquisitionFieldProps) {
+export function ClassSpellbookAcquisitionField({ formCtx }: ClassSpellbookAcquisitionFieldProps) {
   const form = useFormContext<ClassFormValues>()
+  const irregular =
+    useWatch({ control: form.control, name: 'spellbookAcquisitionIrregular' }) === true
   const starting = useWatch({ control: form.control, name: 'spellbookAcquisitionStarting' })
   const perLevel = useWatch({ control: form.control, name: 'spellbookAcquisitionPerLevel' })
   const throughLevel = useWatch({ control: form.control, name: 'spellbookAcquisitionThroughLevel' })
@@ -54,30 +52,45 @@ export function ClassSpellbookAcquisitionField({
       }
     : undefined
 
-  const hostConfig = useMemo(
-    () =>
-      buildClassSpellbookAcquisitionHostConfig({
-        allowedLevels,
-        extendedProgression,
-      }),
-    [allowedLevels, extendedProgression],
-  )
+  const metadata = irregular
+    ? formatRegularGainSummary({ acquisition: curve })
+    : formatRegularGainSummary({ starting, perLevel, throughLevel })
 
-  const tableDraftSource =
-    mode === 'irregular'
-      ? curve
-      : starting !== undefined && perLevel !== undefined && throughLevel !== undefined
-        ? materializeRegularGain({ starting, perLevel, throughLevel })
-        : undefined
+  const initialTableDraft = useMemo(() => {
+    if (irregular) {
+      return buildClassSpellbookAcquisitionDraft(curve)
+    }
+    if (starting !== undefined && perLevel !== undefined && throughLevel !== undefined) {
+      return buildClassSpellbookAcquisitionDraft(
+        materializeRegularGain({ starting, perLevel, throughLevel }),
+      )
+    }
+    return buildClassSpellbookAcquisitionDraft(undefined)
+  }, [curve, irregular, perLevel, starting, throughLevel])
 
-  const initialDraft = useMemo(
-    () => buildClassSpellbookAcquisitionDraft(tableDraftSource),
-    [tableDraftSource],
-  )
+  function handleSave(payload: ClassSpellbookAcquisitionModalSavePayload) {
+    if (!payload.irregular) {
+      form.setValue('spellbookAcquisitionIrregular', false, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionStarting', payload.starting, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionPerLevel', payload.perLevel, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionThroughLevel', payload.throughLevel, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      form.setValue('spellbookAcquisitionCurve', undefined, { shouldDirty: true })
+      return
+    }
 
-  function handleSaveDraft(draft: TableBuilderFormValues) {
-    const next = mapClassSpellbookAcquisitionDraftToProgression(draft)
-    const regular = detectRegularGain(next)
+    const regular = detectRegularGain(payload.curve)
     if (regular) {
       form.setValue('spellbookAcquisitionIrregular', false, {
         shouldDirty: true,
@@ -96,62 +109,40 @@ export function ClassSpellbookAcquisitionField({
         shouldValidate: true,
       })
       form.setValue('spellbookAcquisitionCurve', undefined, { shouldDirty: true })
-    } else {
-      form.setValue('spellbookAcquisitionIrregular', true, {
-        shouldDirty: true,
-        shouldValidate: true,
-      })
-      form.setValue('spellbookAcquisitionCurve', next, { shouldDirty: true, shouldValidate: true })
+      return
     }
-    setModalOpen(false)
-  }
 
-  if (mode === 'regular') {
-    const summary = formatRegularGainSummary({ starting, perLevel, throughLevel })
-    return (
-      <div className="flex flex-col gap-2">
-        <SemanticText tone="neutral">{summary}</SemanticText>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="self-start"
-          onClick={() => {
-            if (starting !== undefined && perLevel !== undefined && throughLevel !== undefined) {
-              form.setValue(
-                'spellbookAcquisitionCurve',
-                materializeRegularGain({ starting, perLevel, throughLevel }),
-                { shouldDirty: true },
-              )
-            }
-            form.setValue('spellbookAcquisitionIrregular', true, {
-              shouldDirty: true,
-              shouldValidate: true,
-            })
-          }}
-        >
-          Edit progression
-        </Button>
-      </div>
-    )
+    form.setValue('spellbookAcquisitionIrregular', true, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    form.setValue('spellbookAcquisitionCurve', payload.curve, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
   }
 
   return (
     <>
       <FeatureTableRow
         title="Spellbook acquisition"
-        metadata={formatRegularGainSummary({ acquisition: curve })}
-        typeLabel="Gain progression"
+        metadata={metadata}
         onEdit={() => setModalOpen(true)}
       />
 
       {modalOpen ? (
-        <TableBuilderModal
+        <ClassSpellbookAcquisitionModal
           open
-          mode="edit"
-          config={hostConfig}
-          initialDraft={initialDraft}
-          onSaveDraft={handleSaveDraft}
+          formCtx={formCtx}
+          maxLevel={maxLevel}
+          allowedLevels={allowedLevels}
+          extendedProgression={extendedProgression}
+          initialGainMode={irregular ? SPELLBOOK_GAIN_MODE_VARIABLE : SPELLBOOK_GAIN_MODE_REGULAR}
+          initialStarting={starting}
+          initialPerLevel={perLevel}
+          initialThroughLevel={throughLevel}
+          initialTableDraft={initialTableDraft}
+          onSave={handleSave}
           onOpenChange={setModalOpen}
         />
       ) : null}

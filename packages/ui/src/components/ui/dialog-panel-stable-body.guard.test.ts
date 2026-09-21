@@ -8,6 +8,7 @@ const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..
 
 /** Production call sites allowed to use Modal.Body stableBody — review inset when adding entries. */
 const STABLE_BODY_ALLOWLIST = new Set([
+  'apps/dashboard/src/features/content/classes/components/class-spellbook-acquisition-modal.tsx',
   'apps/dashboard/src/features/content/components/table-builder/table-builder-modal.tsx',
   'apps/dashboard/src/lib/create-flow/create-modal-shell.tsx',
 ])

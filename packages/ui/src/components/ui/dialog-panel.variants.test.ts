@@ -7,6 +7,7 @@ import {
   dialogPanelBodyVariants,
   dialogPanelFooterClasses,
   dialogPanelHeaderClasses,
+  dialogPanelHeaderLeadRowClasses,
   dialogPanelHeaderPaddingClasses,
   dialogPanelInnerLeadingScrollViewportClasses,
   dialogPanelInnerScrollViewportClasses,
@@ -142,6 +143,10 @@ describe('overlay section separator borders', () => {
     expect(dialogPanelHeaderPaddingClasses).toContain('pt-6')
     expect(dialogPanelHeaderPaddingClasses).toContain('pb-4')
     expect(dialogPanelHeaderClasses).not.toMatch(/\bjustify-end\b/)
+  })
+
+  it('uses 16px gap between lead icon and copy stack', () => {
+    expect(dialogPanelHeaderLeadRowClasses).toContain('gap-4')
   })
 })
 

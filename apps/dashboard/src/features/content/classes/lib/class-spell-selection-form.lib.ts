@@ -114,6 +114,45 @@ export function formatRegularGainSummary(input: {
   return `Spell acquisition varies by class level · ${count} change level${count === 1 ? '' : 's'}`
 }
 
+export function formatRegularGainAlert(input: {
+  starting?: number
+  perLevel?: number
+  throughLevel?: number
+}): string | undefined {
+  if (
+    input.starting === undefined ||
+    input.perLevel === undefined ||
+    input.throughLevel === undefined
+  ) {
+    return undefined
+  }
+
+  const startingLabel = input.starting === 1 ? '1 spell' : `${input.starting} spells`
+  const perLevelLabel = input.perLevel === 1 ? '1 spell' : `${input.perLevel} spells`
+
+  return `Start with ${startingLabel}. Gain ${perLevelLabel} at each later level through level ${input.throughLevel}.`
+}
+
+export const SPELLBOOK_GAIN_MODE_REGULAR = 'regular' as const
+export const SPELLBOOK_GAIN_MODE_VARIABLE = 'variable' as const
+
+export type SpellbookGainMode =
+  | typeof SPELLBOOK_GAIN_MODE_REGULAR
+  | typeof SPELLBOOK_GAIN_MODE_VARIABLE
+
+export const SPELLBOOK_GAIN_MODE_OPTIONS = [
+  {
+    value: SPELLBOOK_GAIN_MODE_REGULAR,
+    label: 'Same amount each level',
+    description: 'Start with a number of spells, then gain the same number at each later level.',
+  },
+  {
+    value: SPELLBOOK_GAIN_MODE_VARIABLE,
+    label: 'Varies by level',
+    description: 'Specify exactly how many spells are gained at each level.',
+  },
+] as const
+
 export function spellSelectionFromForm(input: {
   model: ClassSpellSelection['model'] | undefined
   changePackage: SpellSelectionChangePackage

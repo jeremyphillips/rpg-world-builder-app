@@ -58,6 +58,9 @@ describe('SemanticText', () => {
       </SemanticText>,
     )
 
+    const root = screen.getByText('Warning')
+    expect(root).toHaveClass('items-start', 'gap-2')
+
     const iconWrapper = container.querySelector('[aria-hidden="true"]')
     expect(iconWrapper).toHaveClass('leading-none', '[&>svg]:size-icon-glyph-sm')
     expect(screen.getByTestId('icon')).toBeInTheDocument()

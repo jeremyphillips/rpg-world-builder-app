@@ -8,7 +8,12 @@ import userEvent from '@testing-library/user-event'
 import { Button } from './button.client'
 import { ConfirmDialog } from './confirm-dialog.client'
 import { DialogPanelHeader } from './dialog-parts.client'
+import {
+  dialogPanelHeaderHeadlineStackClasses,
+  dialogPanelHeaderLeadRowClasses,
+} from './dialog-panel.variants'
 import { headingVariants } from './heading.variants'
+import { IconContainer } from './icon-container.client'
 import { Modal } from './modal.client'
 import { Sheet } from './sheet.client'
 
@@ -103,6 +108,37 @@ describe('dialog title typography ownership', () => {
     const headline = await screen.findByText('Compact title')
     expect(headline).toHaveClass('heading-style-card')
     expect(headline).not.toHaveClass('heading-style-dialog-title')
+  })
+
+  it('renders Modal.Header leadIcon beside the title stack', async () => {
+    const user = userEvent.setup()
+    render(
+      <Modal.Root>
+        <Modal.Trigger asChild>
+          <Button>Open lead icon</Button>
+        </Modal.Trigger>
+        <Modal.Content>
+          <Modal.Header
+            leadIcon={
+              <IconContainer>
+                <span data-testid="lead-icon">★</span>
+              </IconContainer>
+            }
+            headline="Edit spellbook acquisition"
+            description="Define how this class adds spells to its spellbook."
+          />
+          <Modal.Body>Body</Modal.Body>
+        </Modal.Content>
+      </Modal.Root>,
+    )
+    await user.click(screen.getByRole('button', { name: 'Open lead icon' }))
+    const leadIcon = await screen.findByTestId('lead-icon')
+    expect(
+      leadIcon.closest(`.${dialogPanelHeaderLeadRowClasses.split(' ').join('.')}`),
+    ).toBeTruthy()
+    expect(
+      screen.getByText('Define how this class adds spells to its spellbook.').parentElement,
+    ).toHaveClass(...dialogPanelHeaderHeadlineStackClasses.split(/\s+/))
   })
 
   it('keeps ConfirmDialog on the compact confirmDialogTitle style', () => {

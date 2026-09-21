@@ -157,6 +157,8 @@ export type TableBuilderHostConfig = {
   }) => TableBuilderDraftValidationResult
   /** When set on level-progression hosts, inserts a tier separator after standardMaxLevel. */
   extendedProgression?: TableBuilderExtendedProgression
+  /** Host-owned add-row label — defaults to generic table-builder copy. */
+  addRowLabel?: string
 }
 
 export function resolveTableBuilderRecommendedKind(

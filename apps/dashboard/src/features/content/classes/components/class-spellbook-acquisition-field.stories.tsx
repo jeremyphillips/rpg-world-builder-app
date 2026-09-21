@@ -3,6 +3,13 @@ import { FormProvider, useForm } from 'react-hook-form'
 
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import { ClassSpellbookAcquisitionField } from './class-spellbook-acquisition-field'
+import { ClassSpellbookAcquisitionModal } from './class-spellbook-acquisition-modal'
+import { buildClassSpellbookAcquisitionDraft } from '../lib/class-spellbook-acquisition-field.lib'
+import {
+  materializeRegularGain,
+  SPELLBOOK_GAIN_MODE_REGULAR,
+  SPELLBOOK_GAIN_MODE_VARIABLE,
+} from '../lib/class-spell-selection-form.lib'
 
 const meta = {
   title: 'Content/Classes/ClassSpellbookAcquisitionField',
@@ -26,7 +33,7 @@ function RegularWizardHarness() {
 
   return (
     <FormProvider {...form}>
-      <ClassSpellbookAcquisitionField formCtx={makeContentFormCtx()} mode="regular" />
+      <ClassSpellbookAcquisitionField formCtx={makeContentFormCtx()} />
     </FormProvider>
   )
 }
@@ -51,17 +58,63 @@ function IrregularHarness() {
 
   return (
     <FormProvider {...form}>
-      <ClassSpellbookAcquisitionField formCtx={makeContentFormCtx()} mode="irregular" />
+      <ClassSpellbookAcquisitionField formCtx={makeContentFormCtx()} />
     </FormProvider>
   )
 }
 
 export const RegularWizard: Story = {
-  name: 'Regular (6 / 2 / 20)',
+  name: 'Regular summary (6 / 2 / 20)',
   render: () => <RegularWizardHarness />,
 }
 
 export const IrregularCurve: Story = {
-  name: 'Irregular table',
+  name: 'Irregular summary',
   render: () => <IrregularHarness />,
+}
+
+export const RegularModal: StoryObj<typeof ClassSpellbookAcquisitionModal> = {
+  name: 'Modal — regular acquisition',
+  render: () => (
+    <ClassSpellbookAcquisitionModal
+      open
+      formCtx={makeContentFormCtx()}
+      maxLevel={20}
+      allowedLevels={Array.from({ length: 20 }, (_, index) => index + 1)}
+      initialGainMode={SPELLBOOK_GAIN_MODE_REGULAR}
+      initialStarting={6}
+      initialPerLevel={2}
+      initialThroughLevel={20}
+      initialTableDraft={buildClassSpellbookAcquisitionDraft(
+        materializeRegularGain({ starting: 6, perLevel: 2, throughLevel: 20 }),
+      )}
+      onSave={() => undefined}
+      onOpenChange={() => undefined}
+    />
+  ),
+}
+
+export const VariableModal: StoryObj<typeof ClassSpellbookAcquisitionModal> = {
+  name: 'Modal — varies by level',
+  render: () => (
+    <ClassSpellbookAcquisitionModal
+      open
+      formCtx={makeContentFormCtx()}
+      maxLevel={20}
+      allowedLevels={Array.from({ length: 20 }, (_, index) => index + 1)}
+      initialGainMode={SPELLBOOK_GAIN_MODE_VARIABLE}
+      initialTableDraft={buildClassSpellbookAcquisitionDraft({
+        curve: {
+          rows: [
+            { level: 1, count: 6 },
+            { level: 2, count: 2 },
+            { level: 4, count: 3 },
+          ],
+        },
+        extension: 'zero',
+      })}
+      onSave={() => undefined}
+      onOpenChange={() => undefined}
+    />
+  ),
 }

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   alignProgressionToModel,
   detectRegularGain,
+  formatRegularGainAlert,
   formatRegularGainSummary,
   materializeRegularGain,
 } from './class-spell-selection-form.lib'
@@ -50,6 +51,12 @@ describe('class-spell-selection-form.lib', () => {
   it('formats regular gain with an explicit endpoint', () => {
     expect(formatRegularGainSummary({ starting: 6, perLevel: 2, throughLevel: 20 })).toBe(
       'Start with 6 · Gain 2 each level through level 20',
+    )
+  })
+
+  it('formats the regular acquisition alert sentence', () => {
+    expect(formatRegularGainAlert({ starting: 6, perLevel: 2, throughLevel: 20 })).toBe(
+      'Start with 6 spells. Gain 2 spells at each later level through level 20.',
     )
   })
 

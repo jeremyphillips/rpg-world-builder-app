@@ -108,6 +108,8 @@ export interface SheetHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   kicker?: React.ReactNode
   headline: React.ReactNode
   description?: React.ReactNode
+  /** Decorative leading icon slot — caller supplies {@link IconContainer} or similar. */
+  leadIcon?: React.ReactNode
   /** Escape hatch — overrides the shared dialogTitle default from DialogPanelHeader. */
   headlineClassName?: string
   /** Right-aligned slot on the title row (e.g. primary action). */
@@ -116,7 +118,17 @@ export interface SheetHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const SheetHeader = React.forwardRef<HTMLDivElement, SheetHeaderProps>(
   (
-    { className, kicker, headline, description, headlineClassName, endSlot, children, ...props },
+    {
+      className,
+      kicker,
+      headline,
+      description,
+      leadIcon,
+      headlineClassName,
+      endSlot,
+      children,
+      ...props
+    },
     ref,
   ) => (
     <SheetHeaderBase
@@ -125,6 +137,7 @@ const SheetHeader = React.forwardRef<HTMLDivElement, SheetHeaderProps>(
       kicker={kicker}
       headline={headline}
       description={description}
+      leadIcon={leadIcon}
       headlineClassName={headlineClassName}
       endSlot={endSlot}
       {...props}

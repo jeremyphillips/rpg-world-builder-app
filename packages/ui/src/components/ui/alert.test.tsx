@@ -56,6 +56,11 @@ describe('Alert', () => {
     expect(screen.getByText('Status')).toHaveClass('text-sm', 'font-body-emphasis')
   })
 
+  it('uses an 8px gap between title and description', () => {
+    render(<Alert title="Status" description="Details" />)
+    expect(screen.getByText('Status').parentElement).toHaveClass('gap-2')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <Alert
