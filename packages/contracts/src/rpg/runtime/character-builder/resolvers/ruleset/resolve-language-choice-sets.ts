@@ -1,4 +1,8 @@
-import { isMeaningfulLanguageProficiencyChoice } from '../../../../content/lib/grants/proficiency-grant-set'
+import type { LanguageProficiencyChoice } from '../../../../primitives/proficiency/proficiency-grant-set'
+import {
+  resolveOriginLanguageChoiceLabel,
+  resolvePrimaryOriginLanguageChoice,
+} from '../../../../primitives/proficiency/character-creation-proficiency-rules'
 import { getLanguageLabel } from '../../../../vocab/language'
 import { resolveLanguagesFromChoiceSource } from '../../../creature/languages'
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
@@ -19,7 +23,7 @@ function languageToChoiceSetOption(language: {
 }
 
 function resolveLanguageChoiceOptions(
-  choice: Parameters<typeof isMeaningfulLanguageProficiencyChoice>[0],
+  choice: LanguageProficiencyChoice,
   languages: CharacterBuildContext['catalog']['languages'],
 ): ChoiceSet['options'] {
   const resolved = resolveLanguagesFromChoiceSource({
@@ -50,7 +54,7 @@ export function resolveLanguageChoiceSets(
 
   // MVP authoring/rendering supports only the first choice package.
   // Additional packages are intentionally ignored until multi-package UI exists.
-  const choice = choices.find(isMeaningfulLanguageProficiencyChoice)
+  const choice = resolvePrimaryOriginLanguageChoice(choices)
   if (!choice || choice.choose <= 0) return []
 
   const options = resolveLanguageChoiceOptions(choice, context.catalog.languages)
@@ -67,7 +71,7 @@ export function resolveLanguageChoiceSets(
     required: true,
     provenance: {
       ownerKind: 'origin',
-      ...(choice.label ? { choiceLabel: choice.label } : {}),
+      choiceLabel: resolveOriginLanguageChoiceLabel(choices),
     },
     label: '',
   }

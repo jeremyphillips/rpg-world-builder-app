@@ -1,4 +1,6 @@
 import {
+  formatProficienciesChooseClassPromptDescription,
+  formatProficienciesChooseClassPromptHeading,
   STEP_CHOICE_TYPES_BY_STEP,
   type BuilderStepReadinessState,
   type ChoiceSet,
@@ -19,10 +21,10 @@ import {
 const PROFICIENCIES_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.proficiencies
 
 export const PROFICIENCIES_CHOOSE_CLASS_PROMPT_HEADING =
-  'Choose a class to configure class proficiencies'
+  formatProficienciesChooseClassPromptHeading()
 
 export const PROFICIENCIES_CHOOSE_CLASS_PROMPT_DESCRIPTION =
-  'Your class determines saving throws, skill choices, armor, weapon, and tool proficiencies.'
+  formatProficienciesChooseClassPromptDescription()
 
 export const PROFICIENCIES_STEP_OVER_SELECTION_MESSAGE =
   'You selected more proficiencies than allowed. Remove extras to continue.' as const

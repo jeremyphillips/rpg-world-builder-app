@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Species } from '../../content/species'
+import { LANGUAGE_GRANTS_SOURCE_ID } from './sheet/languages'
 import {
   ORIGIN_PROVENANCE_LABEL,
+  buildSelectionSourceLabelCatalogIndex,
   formatChoiceSetProvenanceParentContext,
   formatCompactSelectionSourceLabel,
   formatGrantCardSelectionSourceLabel,
@@ -195,6 +197,38 @@ describe('formatGrantCardSelectionSourceLabel', () => {
         catalogIndex,
       ),
     ).toBe('Granted by Keen Senses · Elf trait · Granted by Favored Enemy · Ranger feature')
+  })
+
+  it('formats automatic origin language grants from rules-config choice label', () => {
+    const originLanguageCatalogIndex = buildSelectionSourceLabelCatalogIndex({
+      catalogIndex,
+      characterCreationRules: {
+        proficiencyChoices: {
+          languages: [
+            {
+              id: 'origin-languages',
+              label: 'Origin Languages',
+              choose: 2,
+              categories: ['standard'],
+              from: [],
+            },
+          ],
+        },
+      },
+    })
+
+    expect(
+      formatGrantCardSelectionSourceLabel(
+        [
+          {
+            kind: 'characterCreation',
+            sourceId: 'srd-cc-5.2.1',
+            grantId: LANGUAGE_GRANTS_SOURCE_ID,
+          },
+        ],
+        originLanguageCatalogIndex,
+      ),
+    ).toBe('Granted by Origin Languages')
   })
 })
 

@@ -6,16 +6,10 @@ import { createProficienciesStepRogueFixture } from '../../../../../lib/proficie
 import { ProficiencyGrantedRow } from '../proficiency-granted-row'
 
 describe('ProficiencyGrantedRow', () => {
-  it('renders label and source without a remove action', () => {
+  it('renders label and grant-card source without a remove action', () => {
     const { model } = createProficienciesStepRogueFixture()
-    const savingThrows = model.fixedGrants.find((row) => row.kind === 'savingThrows')!
-    const sourceGroup = savingThrows.sourceGroups[0]!
-    const row = {
-      id: `saving-throw:${sourceGroup.valueLabels[0]}`,
-      kind: savingThrows.kind,
-      label: sourceGroup.valueLabels[0]!,
-      sourceLabel: sourceGroup.sourceLabel,
-    }
+    const toolsSection = model.sections.find((section) => section.kind === 'tools')!
+    const row = toolsSection.grantedRows[0]!
 
     render(<ProficiencyGrantedRow row={row} />)
 
@@ -26,14 +20,8 @@ describe('ProficiencyGrantedRow', () => {
 
   itAxe('has no axe accessibility violations', async () => {
     const { model } = createProficienciesStepRogueFixture()
-    const tools = model.fixedGrants.find((row) => row.kind === 'tools')!
-    const sourceGroup = tools.sourceGroups[0]!
-    const row = {
-      id: `tool:${sourceGroup.valueLabels[0]}`,
-      kind: tools.kind,
-      label: sourceGroup.valueLabels[0]!,
-      sourceLabel: sourceGroup.sourceLabel,
-    }
+    const toolsSection = model.sections.find((section) => section.kind === 'tools')!
+    const row = toolsSection.grantedRows[0]!
 
     const { container } = render(<ProficiencyGrantedRow row={row} />)
 

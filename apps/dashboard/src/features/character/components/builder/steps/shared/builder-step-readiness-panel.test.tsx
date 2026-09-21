@@ -23,10 +23,10 @@ describe('BuilderStepReadinessPanel', () => {
       />,
     )
 
-    expect(screen.getByText('Choose a class to see class proficiencies.')).toBeInTheDocument()
+    expect(screen.getByText('Choose a class to unlock class proficiencies.')).toBeInTheDocument()
     expect(
       screen.getByText(
-        'Class selection determines saving throws, skill choices, armor, weapons, and tools.',
+        'Your class determines saving throws, skill choices, armor, weapon, and tool proficiencies.',
       ),
     ).toBeInTheDocument()
   })

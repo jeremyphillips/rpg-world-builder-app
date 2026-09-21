@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import {
+  isMeaningfulLanguageProficiencyChoice,
   languageProficiencyChoiceSchema,
   languageProficiencyGrantSetSchema,
   type LanguageProficiencyChoice,
@@ -30,6 +31,23 @@ export const DEFAULT_LANGUAGE_PROFICIENCY_CHOICES = [
     from: [],
   },
 ] as const satisfies readonly LanguageProficiencyChoice[]
+
+/** Returns the first meaningful origin language choice package from rules config. */
+export function resolvePrimaryOriginLanguageChoice(
+  languages: readonly LanguageProficiencyChoice[],
+): LanguageProficiencyChoice | undefined {
+  return languages.find(isMeaningfulLanguageProficiencyChoice)
+}
+
+/** Shared origin language choice label for choice-set provenance and grant-card copy. */
+export function resolveOriginLanguageChoiceLabel(
+  languages: readonly LanguageProficiencyChoice[],
+): string {
+  return (
+    resolvePrimaryOriginLanguageChoice(languages)?.label ??
+    DEFAULT_LANGUAGE_PROFICIENCY_CHOICES[0].label
+  )
+}
 
 export const characterCreationProficiencyGrantsPatchSchema = z
   .object({

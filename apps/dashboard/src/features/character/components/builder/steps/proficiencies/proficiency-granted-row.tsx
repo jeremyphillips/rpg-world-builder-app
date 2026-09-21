@@ -1,24 +1,12 @@
-import type { ProficiencyGrantedRow as ProficiencyGrantedRowModel } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import type { BuilderChoiceGrantedRow } from '@rpg/contracts'
 
-import { ContentEntityCard } from '@/features/content'
+import { ChoiceGrantedRow } from '../shared/choice-section/choice-granted-row'
 
 export type ProficiencyGrantedRowProps = {
-  row: ProficiencyGrantedRowModel
+  row: BuilderChoiceGrantedRow
 }
 
+/** @deprecated Use {@link ChoiceGrantedRow} — fixed grants now render in section bodies. */
 export function ProficiencyGrantedRow({ row }: ProficiencyGrantedRowProps) {
-  return (
-    <ContentEntityCard
-      entity={{
-        heading: row.label,
-        description: row.sourceLabel ? (
-          <Text as="span" variant="muted">
-            {row.sourceLabel}
-          </Text>
-        ) : undefined,
-      }}
-      density="compact"
-    />
-  )
+  return <ChoiceGrantedRow row={row} />
 }

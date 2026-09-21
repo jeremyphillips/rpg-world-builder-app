@@ -124,7 +124,7 @@ describe('builder-step-readiness.lib', () => {
     }
 
     expect(resolveVisibleProficiencyStepContent(model, true)).toEqual({
-      fixedGrants: [model.fixedGrants[1]],
+      fixedGrants: [],
       sections: [model.sections[1]],
     })
   })

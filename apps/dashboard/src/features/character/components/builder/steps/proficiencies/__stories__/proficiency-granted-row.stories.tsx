@@ -5,18 +5,12 @@ import { ProficiencyGrantedRow } from '../proficiency-granted-row'
 
 const { model } = createProficienciesStepRogueFixture()
 const savingThrows = model.fixedGrants.find((row) => row.kind === 'savingThrows')!
-const tools = model.fixedGrants.find((row) => row.kind === 'tools')!
+const toolsSection = model.sections.find((section) => section.kind === 'tools')!
+const toolRow = toolsSection.grantedRows[0]!
 const savingThrowRow = {
   id: 'saving-throw:example',
-  kind: savingThrows.kind,
   label: savingThrows.sourceGroups[0]!.valueLabels[0]!,
-  sourceLabel: savingThrows.sourceGroups[0]!.sourceLabel,
-}
-const toolRow = {
-  id: 'tool:example',
-  kind: tools.kind,
-  label: tools.sourceGroups[0]!.valueLabels[0]!,
-  sourceLabel: tools.sourceGroups[0]!.sourceLabel,
+  sourceLabel: `Granted by ${savingThrows.sourceGroups[0]!.sourceLabel}`,
 }
 
 const meta = {

@@ -1,6 +1,10 @@
 import { defineMessage } from '../../../../validation/define-message'
 import { getContentTypeSentenceForm } from '../../../content/lib/content-type-terms'
 import { getProficiencyDomainCompactLabel } from '../../../vocab/proficiency'
+import {
+  formatProficienciesChooseClassPromptDescription,
+  formatProficienciesChooseClassPromptHeading,
+} from '../resolvers/proficiency/format-proficiencies-choose-class-prompt'
 
 // ---------------------------------------------------------------------------
 // Character builder validation messages (surface catalog).
@@ -217,11 +221,11 @@ export const characterBuilderStepReadinessMessages = {
   ),
   proficienciesBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.proficienciesBlockedNoClass',
-    () => `Choose a ${getContentTypeSentenceForm('classes')} to see class proficiencies.`,
+    () => formatProficienciesChooseClassPromptHeading(),
   ),
   proficienciesBlockedNoClassHelper: defineMessage(
     'validation.characterBuilder.readiness.proficienciesBlockedNoClassHelper',
-    () => 'Class selection determines saving throws, skill choices, armor, weapons, and tools.',
+    () => formatProficienciesChooseClassPromptDescription(),
   ),
   proficienciesNoChoicesRequired: defineMessage(
     'validation.characterBuilder.readiness.proficienciesNoChoicesRequired',

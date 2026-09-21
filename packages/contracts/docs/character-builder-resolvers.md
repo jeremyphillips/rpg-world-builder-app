@@ -371,7 +371,8 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 
 `resolveProficiencyStepModel` separates **fixed grants** from **interactive choice sections**:
 
-- `fixedGrants`: one row per category with `sourceGroups[]` for the read-only “Granted proficiencies” summary.
+- `fixedGrants`: compact summary rows for **Saving Throws**, **Weapons**, and **Armor** only (`sourceGroups[]` grouped by compact source label).
+- Fixed grants for **skills**, **tools**, and **languages** render as grant cards inside their interactive section bodies (`section.grantedRows` with grant-card provenance).
 - `sections`: categories with one or more ChoiceSets — merged `selectedRows`, per-set `choiceBlocks`, topology-driven `subhead` / `emptyMessage`, optional aggregate `{n} / {N} chosen`.
 - `hasUnresolvedPrerequisites`: true when class progression applies but no class is chosen (prevents treating origin-language satisfaction as step completion).
 - Fixed vs choice-derived preview rows share `isFixedProficiencyGrant` / `isChoiceDerivedProficiencyGrant` in `proficiency-grant-classification.ts`.

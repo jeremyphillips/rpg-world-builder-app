@@ -1,7 +1,14 @@
 import type { BuilderChoiceGrantedRow } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { BadgeCheck } from 'lucide-react'
 
-import { ContentEntityCard } from '@/features/content'
+import {
+  choiceGrantedRowBodyClasses,
+  choiceGrantedRowCopyClasses,
+  choiceGrantedRowDescriptionClasses,
+  choiceGrantedRowFrameClasses,
+  choiceGrantedRowHeadingClasses,
+  choiceGrantedRowIconClasses,
+} from './choice-granted-row.variants'
 
 export type ChoiceGrantedRowProps = {
   row: BuilderChoiceGrantedRow
@@ -9,16 +16,16 @@ export type ChoiceGrantedRowProps = {
 
 export function ChoiceGrantedRow({ row }: ChoiceGrantedRowProps) {
   return (
-    <ContentEntityCard
-      entity={{
-        heading: row.label,
-        description: row.sourceLabel ? (
-          <Text as="span" variant="muted">
-            {row.sourceLabel}
-          </Text>
-        ) : undefined,
-      }}
-      density="compact"
-    />
+    <article className={choiceGrantedRowFrameClasses}>
+      <div className={choiceGrantedRowBodyClasses}>
+        <BadgeCheck className={choiceGrantedRowIconClasses} aria-hidden />
+        <div className={choiceGrantedRowCopyClasses}>
+          <div className={choiceGrantedRowHeadingClasses}>{row.label}</div>
+          {row.sourceLabel ? (
+            <div className={choiceGrantedRowDescriptionClasses}>{row.sourceLabel}</div>
+          ) : null}
+        </div>
+      </div>
+    </article>
   )
 }

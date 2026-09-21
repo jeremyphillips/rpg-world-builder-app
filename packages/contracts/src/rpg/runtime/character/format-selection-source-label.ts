@@ -5,6 +5,11 @@ import {
 import { resolveTraitName } from '../../content/lib/grants/trait-display'
 import type { CharacterClass } from '../../content/classes/class'
 import type { Species } from '../../content/species'
+import {
+  DEFAULT_LANGUAGE_PROFICIENCY_CHOICES,
+  resolveOriginLanguageChoiceLabel,
+} from '../../primitives/proficiency/character-creation-proficiency-rules'
+import type { ResolvedCharacterCreationRules } from '../character-builder/context'
 import { LANGUAGE_GRANTS_SOURCE_ID } from './sheet/languages'
 import type {
   CharacterSelectionSource,
@@ -36,6 +41,22 @@ type SelectionSourceClassCatalogEntry = Pick<CharacterClass, 'name'> &
 export type SelectionSourceLabelCatalogIndex = {
   classes: ReadonlyMap<string, SelectionSourceClassCatalogEntry>
   species?: ReadonlyMap<string, Species>
+  /** Origin language choice label from character-creation rules. */
+  originLanguageChoiceLabel?: string
+}
+
+/** Builds the catalog index consumed by selection-source label formatters. */
+export function buildSelectionSourceLabelCatalogIndex(args: {
+  catalogIndex: Pick<SelectionSourceLabelCatalogIndex, 'classes' | 'species'>
+  characterCreationRules?: Pick<ResolvedCharacterCreationRules, 'proficiencyChoices'>
+}): SelectionSourceLabelCatalogIndex {
+  return {
+    classes: args.catalogIndex.classes,
+    species: args.catalogIndex.species,
+    originLanguageChoiceLabel: args.characterCreationRules
+      ? resolveOriginLanguageChoiceLabel(args.characterCreationRules.proficiencyChoices.languages)
+      : undefined,
+  }
 }
 
 export type SelectionSourceRowKind = 'default' | 'weaponCategory' | 'armorCategory' | 'toolCategory'
@@ -204,6 +225,34 @@ function resolveClassSpellcastingProvenance(
   }
 }
 
+function resolveOriginLanguageGrantLabel(catalogIndex: SelectionSourceLabelCatalogIndex): string {
+  return catalogIndex.originLanguageChoiceLabel ?? DEFAULT_LANGUAGE_PROFICIENCY_CHOICES[0].label
+}
+
+function resolveCharacterCreationProvenance(
+  source: CharacterSelectionSource,
+  catalogIndex: SelectionSourceLabelCatalogIndex,
+): SelectionSourceProvenance {
+  if (source.grantId === LANGUAGE_GRANTS_SOURCE_ID) {
+    const primaryLabel = resolveOriginLanguageGrantLabel(catalogIndex)
+
+    return {
+      sourceKind: 'characterCreation',
+      ownerKind: 'origin',
+      primaryLabel,
+      ownerLabel: primaryLabel,
+    }
+  }
+
+  return {
+    sourceKind: 'characterCreation',
+    ownerKind: 'origin',
+    primaryLabel: 'Character Creation',
+    ownerLabel: ORIGIN_PROVENANCE_LABEL,
+    parentContext: ORIGIN_PROVENANCE_LABEL,
+  }
+}
+
 function resolveDefaultProvenance(source: CharacterSelectionSource): SelectionSourceProvenance {
   const staticLabel = STATIC_SELECTION_SOURCE_LABELS[source.kind]
   const primaryLabel =
@@ -231,6 +280,8 @@ export function resolveSelectionSourceProvenance(
       return resolveHeritageOptionProvenance(source, catalogIndex)
     case 'classSpellcasting':
       return resolveClassSpellcastingProvenance(source, catalogIndex)
+    case 'characterCreation':
+      return resolveCharacterCreationProvenance(source, catalogIndex)
     default:
       return resolveDefaultProvenance(source)
   }
@@ -264,12 +315,6 @@ export function formatChoiceSetProvenanceParentContext(
   }
 }
 
-function formatCharacterCreationLabel(source: CharacterSelectionSource): string {
-  return source.grantId === LANGUAGE_GRANTS_SOURCE_ID
-    ? 'Granted by Origin Languages'
-    : 'Granted by Character Creation'
-}
-
 function formatClassStartingEquipmentLabel(
   source: CharacterSelectionSource,
   catalogIndex: SelectionSourceLabelCatalogIndex,
@@ -291,7 +336,8 @@ function formatSingleSelectionSourceLabel(
   }
 
   if (source.kind === 'characterCreation') {
-    return formatCharacterCreationLabel(source)
+    const provenance = resolveCharacterCreationProvenance(source, catalogIndex)
+    return `Granted by ${provenance.primaryLabel}`
   }
 
   if (source.kind === 'classStartingEquipment') {
