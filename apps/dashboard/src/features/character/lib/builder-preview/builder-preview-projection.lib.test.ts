@@ -94,8 +94,8 @@ describe('builder-preview-projection.lib', () => {
     })
 
     expect(projection?.identity.facts).toEqual([
-      { label: 'Species', value: 'Choose species' },
-      { label: 'Alignment', value: 'Choose alignment' },
+      { label: 'Species', value: 'Not set' },
+      { label: 'Alignment', value: 'Not set' },
     ])
     expect(projection?.sections.map((section) => section.id)).toEqual([
       'narrative',

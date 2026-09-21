@@ -79,7 +79,7 @@ export type BuildIdentityStepFormFieldsInput = {
   renderContinueRegistration: () => ReactNode
 }
 
-/** Composes the identity step field list, including optional species name generation chrome. */
+/** Composes the identity step field list, including optional name generation chrome. */
 export function buildIdentityStepFormFields({
   renderNameField,
   renderDraftSync,

@@ -57,6 +57,7 @@ import {
   previewRailHeaderSectionContentClasses,
   previewRailHeaderSectionShellClasses,
   previewRailIdentityContentClasses,
+  previewRailIdentitySubheadlineClasses,
   previewRailIdentityRowClasses,
   previewRailIdentitySectionContentClasses,
   previewRailIdentitySectionShellClasses,
@@ -232,7 +233,7 @@ function PreviewRailIdentity({ media, name, status, facts }: PreviewRailIdentity
           {media}
           <div className={previewRailIdentityContentClasses}>
             <ContentCardHeading heading={name} density="comfortable" />
-            {status}
+            {status ? <div className={previewRailIdentitySubheadlineClasses}>{status}</div> : null}
           </div>
         </div>
         {facts && facts.length > 0 ? (

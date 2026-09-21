@@ -10,7 +10,6 @@ import {
   clearBuilderFormContinueHandlersForTests,
   runBuilderFormContinueHandler,
 } from '../../../../lib/builder/builder-form-continue-registry'
-import { mergeCharacterBuilderDraft } from '../../../../lib/draft/merge-character-builder-draft'
 import { IdentityStep } from './identity-step'
 import { identityStepTestContext } from './identity-step.fixtures'
 
@@ -83,45 +82,11 @@ describe('IdentityStep', () => {
     expect(screen.getByRole('button', { name: /Add trait/i })).toBeInTheDocument()
   })
 
-  it('shows an inline species picker and naming hint before species is chosen', () => {
+  it('disables name generation until species is chosen elsewhere in the builder', () => {
     renderIdentityStep()
 
-    expect(screen.getByRole('combobox', { name: 'Species' })).toBeInTheDocument()
     expect(screen.getByText('Choose a species to generate a name.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Generate' })).toBeDisabled()
-  })
-
-  it('enables Generate after species is selected on the identity step', async () => {
-    const user = userEvent.setup()
-    let draft = createEmptyCharacterBuilderDraft()
-    const onDraftChange = vi.fn((patch) => {
-      draft = mergeCharacterBuilderDraft(draft, patch)
-    })
-
-    const { rerender } = renderIdentityStep({ draft, onDraftChange })
-
-    await user.click(screen.getByRole('combobox', { name: 'Species' }))
-    await user.click(screen.getByRole('option', { name: 'Dwarf' }))
-
-    expect(onDraftChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        species: expect.objectContaining({ speciesId: 'srd-cc-5.2.1:dwarf' }),
-      }),
-    )
-
-    rerender(
-      <IdentityStep
-        context={identityStepTestContext}
-        draft={draft}
-        validationIssues={[]}
-        onDraftChange={onDraftChange}
-        onStepComplete={vi.fn()}
-        onFormContinueValidationFailed={vi.fn()}
-      />,
-    )
-
-    expect(screen.queryByRole('combobox', { name: 'Species' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Generate' })).toBeEnabled()
   })
 
   it('populates the name field when Generate is clicked', async () => {
