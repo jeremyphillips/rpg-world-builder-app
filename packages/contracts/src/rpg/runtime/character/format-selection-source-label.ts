@@ -324,7 +324,8 @@ function formatClassStartingEquipmentLabel(
   return `From ${className} starting equipment`
 }
 
-function formatSingleSelectionSourceLabel(
+function formatLegacySingleSelectionSourceLabel(
+  provenance: SelectionSourceProvenance,
   source: CharacterSelectionSource,
   catalogIndex: SelectionSourceLabelCatalogIndex,
 ): string {
@@ -332,11 +333,10 @@ function formatSingleSelectionSourceLabel(
   if (staticLabel) return staticLabel
 
   if (CLASS_GRANT_SOURCE_KINDS.has(source.kind)) {
-    return `Granted by ${classNameForSource(source, catalogIndex)}`
+    return `Granted by ${provenance.ownerLabel ?? classNameForSource(source, catalogIndex)}`
   }
 
   if (source.kind === 'characterCreation') {
-    const provenance = resolveCharacterCreationProvenance(source, catalogIndex)
     return `Granted by ${provenance.primaryLabel}`
   }
 
@@ -345,6 +345,14 @@ function formatSingleSelectionSourceLabel(
   }
 
   return 'Granted'
+}
+
+function formatSingleSelectionSourceLabel(
+  source: CharacterSelectionSource,
+  catalogIndex: SelectionSourceLabelCatalogIndex,
+): string {
+  const provenance = resolveSelectionSourceProvenance(source, catalogIndex)
+  return formatLegacySingleSelectionSourceLabel(provenance, source, catalogIndex)
 }
 
 function prefixForRowKind(rowKind: SelectionSourceRowKind | undefined): string {
@@ -364,8 +372,10 @@ function formatCompactSingleSelectionSourceLabel(
   source: CharacterSelectionSource,
   catalogIndex: SelectionSourceLabelCatalogIndex,
 ): string {
+  const provenance = resolveSelectionSourceProvenance(source, catalogIndex)
+
   if (CLASS_GRANT_SOURCE_KINDS.has(source.kind)) {
-    return classNameForSource(source, catalogIndex)
+    return provenance.ownerLabel ?? classNameForSource(source, catalogIndex)
   }
 
   if (source.kind === 'characterCreation') {

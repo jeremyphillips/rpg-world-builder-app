@@ -5,6 +5,7 @@ import {
   formatProficienciesChooseClassPromptDescription,
   formatProficienciesChooseClassPromptHeading,
 } from '../resolvers/proficiency/format-proficiencies-choose-class-prompt'
+import { formatSpellsChooseClassPromptHeading } from '../resolvers/spellcasting/format-spells-choose-class-prompt'
 
 // ---------------------------------------------------------------------------
 // Character builder validation messages (surface catalog).
@@ -204,8 +205,7 @@ export const characterBuilderStepReadinessMessages = {
   ),
   spellsBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.spellsBlockedNoClass',
-    () =>
-      `Choose a ${getContentTypeSentenceForm('classes')} to see ${getContentTypeSentenceForm('spells')} options.`,
+    () => formatSpellsChooseClassPromptHeading(),
   ),
   spellsNotApplicableNoSpellcasting: defineMessage<{ className: string }>(
     'validation.characterBuilder.readiness.spellsNotApplicableNoSpellcasting',

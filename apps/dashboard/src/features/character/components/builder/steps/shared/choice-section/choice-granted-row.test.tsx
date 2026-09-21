@@ -20,6 +20,7 @@ describe('ChoiceGrantedRow', () => {
     const icon = document.querySelector('svg.lucide-badge-check')
     expect(icon).toBeTruthy()
     expect(icon).toHaveClass('size-6')
+    expect(icon?.closest('[data-entity-item-slot="leading"]')).toBeTruthy()
     expect(document.querySelector('[class*="size-10"]')).toBeNull()
   })
 })

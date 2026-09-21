@@ -3,10 +3,10 @@ import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { BuilderStepReadinessState } from '../../readiness/step-readiness'
+import { areRequiredChoiceSetsBuilderComplete } from '../../resolve-choice-set-availability'
 import {
   choiceSetsForStep,
   formatStepReadinessMessage,
-  isStepChoiceWorkComplete,
 } from '../../readiness/step-readiness-helpers'
 import { resolveSpellStepApplicability } from './resolve-spell-step-applicability'
 
@@ -50,7 +50,7 @@ export function resolveSpellsStepReadiness(
     return { readiness: 'readyEmpty' }
   }
 
-  if (isStepChoiceWorkComplete(stepChoiceSets, draft)) {
+  if (areRequiredChoiceSetsBuilderComplete(stepChoiceSets, draft.choiceSelections)) {
     return {
       readiness: 'complete',
       message: formatStepReadinessMessage(

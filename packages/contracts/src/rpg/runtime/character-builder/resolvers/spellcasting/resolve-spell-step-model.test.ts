@@ -191,7 +191,15 @@ describe('resolveSpellStepModel', () => {
       max: 6,
     })
     expect(model.spellLevelSections[0]?.choiceBlocks[0]?.selectedCount).toBe(3)
+    expect(model.spellLevelSections[0]?.choiceBlocks[0]?.isInteractive).toBe(true)
+    expect(model.spellLevelSections[1]?.levelSliceEmptyMessage).toBe(
+      'No 2nd-level spells are currently available for this class.',
+    )
+    expect(model.spellLevelSections[1]?.choiceBlocks).toEqual([])
+    expect(model.spellLevelSections[1]?.subhead).toBe('')
+    expect(model.spellLevelSections[1]?.identityLine).toBeUndefined()
     expect(model.spellLevelSections[2]?.aggregateCount).toBeNull()
+    expect(model.spellLevelSections[2]?.choiceBlocks[0]?.isInteractive).toBe(true)
   })
 
   it('emits icon-backed summary rows without preparation', () => {

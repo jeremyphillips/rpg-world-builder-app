@@ -10,3 +10,7 @@ export const spellLevelTabOrdinalClasses = 'text-sm font-semibold text-foregroun
 export const spellLevelTabActivityClasses = 'text-xs text-muted-foreground'
 
 export const spellLevelTabsSubheadClasses = 'text-sm'
+
+export const spellLevelTabsHeaderClasses = 'space-y-1'
+
+export const spellLevelTabsHeaderRowClasses = 'flex flex-wrap items-center justify-between gap-3'

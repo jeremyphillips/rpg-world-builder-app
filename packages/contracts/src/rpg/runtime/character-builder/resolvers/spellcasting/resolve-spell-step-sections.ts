@@ -169,7 +169,7 @@ export function buildChoiceBlock(
     compactAddLabel: formatChoiceBlockCompactAddLabel(choiceSet, selectedCount),
     isFull: selectedCount >= choiceSet.max,
     isOverSelected: selectedCount > choiceSet.max,
-    isInteractive: sliceHasOptions || selectedAtLevel !== undefined,
+    isInteractive: sliceHasOptions || (selectedAtLevel !== undefined && selectedAtLevel > 0),
   }
 }
 
@@ -527,6 +527,33 @@ function resolveVisibleLevelChoiceBlocks(
   )
 }
 
+function resolveLevelSectionSubheadPresentation(
+  levelSliceEmptyMessage: string | undefined,
+  state: LevelSectionBuildState,
+  subheadLines: string[] | undefined,
+  singleSetSupportingCopy: ReturnType<typeof formatChoiceSingleSetSupportingCopy> | undefined,
+): { subhead: string; subheadLines: string[] | undefined } {
+  if (levelSliceEmptyMessage !== undefined) {
+    return { subhead: '', subheadLines: undefined }
+  }
+
+  return {
+    subhead: resolveSpellLevelSubhead(state, subheadLines, singleSetSupportingCopy),
+    subheadLines,
+  }
+}
+
+function resolveLevelSectionIdentityLine(
+  levelSliceEmptyMessage: string | undefined,
+  foldClassAcquisitionIntoSection: boolean,
+  state: LevelSectionBuildState,
+  singleSetSupportingCopy: ReturnType<typeof formatChoiceSingleSetSupportingCopy> | undefined,
+): string | undefined {
+  if (levelSliceEmptyMessage !== undefined) return undefined
+  if (foldClassAcquisitionIntoSection && state.classBlockAtLevel) return undefined
+  return singleSetSupportingCopy?.identityLine
+}
+
 function resolveSpellLevelSubhead(
   state: LevelSectionBuildState,
   subheadLines: string[] | undefined,
@@ -685,18 +712,26 @@ export function buildSpellLevelSection(
     classAcquisitionChoiceSet,
     state.featureBlocks,
   )
+  const { subhead, subheadLines: resolvedSubheadLines } = resolveLevelSectionSubheadPresentation(
+    levelSliceEmptyMessage,
+    state,
+    subheadLines,
+    singleSetSupportingCopy,
+  )
 
   return {
     id: `spell-level-${level}`,
     kind: 'spellLevel',
     spellLevel: level,
     heading: `${formatSpellLevel(level)}-Level Spells`,
-    subhead: resolveSpellLevelSubhead(state, subheadLines, singleSetSupportingCopy),
-    subheadLines,
-    identityLine:
-      foldClassAcquisitionIntoSection && state.classBlockAtLevel
-        ? undefined
-        : singleSetSupportingCopy?.identityLine,
+    subhead,
+    subheadLines: resolvedSubheadLines,
+    identityLine: resolveLevelSectionIdentityLine(
+      levelSliceEmptyMessage,
+      foldClassAcquisitionIntoSection,
+      state,
+      singleSetSupportingCopy,
+    ),
     aggregateCount: resolveSpellLevelAggregateCount(state),
     levelSliceEmptyMessage,
     selectedRows:

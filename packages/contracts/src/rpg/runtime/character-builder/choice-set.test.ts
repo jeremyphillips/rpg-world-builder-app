@@ -138,6 +138,25 @@ describe('areRequiredChoiceSetsSatisfied', () => {
     expect(areRequiredChoiceSetsSatisfied([], {})).toBe(true)
   })
 
+  it('returns false when a required set has fewer options than min', () => {
+    const choiceSets = [
+      makeChoiceSet({
+        id: 'class:srd-cc-5.2.1:fighter:skills',
+        min: 2,
+        max: 2,
+        options: [{ id: 'srd-cc-5.2.1:athletics', label: 'Athletics' }],
+        required: true,
+      }),
+    ]
+
+    expect(areRequiredChoiceSetsSatisfied(choiceSets, {})).toBe(false)
+    expect(
+      areRequiredChoiceSetsSatisfied(choiceSets, {
+        'class:srd-cc-5.2.1:fighter:skills': ['srd-cc-5.2.1:athletics'],
+      }),
+    ).toBe(false)
+  })
+
   it('handles multiple choice sets — all must be satisfied', () => {
     const choiceSets = [
       makeChoiceSet({ id: 'class:srd-cc-5.2.1:fighter:skills', min: 2, required: true }),

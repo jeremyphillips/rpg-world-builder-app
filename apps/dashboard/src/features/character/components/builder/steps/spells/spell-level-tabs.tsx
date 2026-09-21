@@ -7,13 +7,15 @@ import {
   resolveNarrowSpellLevelTabLayout,
   resolveSpellLevelTabLayout,
 } from './spell-level-tabs.lib'
-import { spellLevelTabsSubheadClasses } from './spell-level-tabs.variants'
 import {
   spellLevelTabActivityClasses,
   spellLevelTabOrdinalClasses,
   spellLevelTabTriggerClasses,
+  spellLevelTabsHeaderClasses,
+  spellLevelTabsHeaderRowClasses,
   spellLevelTabsListClasses,
   spellLevelTabsRowClasses,
+  spellLevelTabsSubheadClasses,
 } from './spell-level-tabs.variants'
 
 export type SpellLevelTabsProps = {
@@ -38,8 +40,8 @@ export function SpellLevelTabsHeader({
   acquisitionHeader: SpellAcquisitionHeader
 }) {
   return (
-    <div className="space-y-1">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className={spellLevelTabsHeaderClasses}>
+      <div className={spellLevelTabsHeaderRowClasses}>
         <Heading variant="subsection" as="h3">
           {acquisitionHeader.heading}
         </Heading>

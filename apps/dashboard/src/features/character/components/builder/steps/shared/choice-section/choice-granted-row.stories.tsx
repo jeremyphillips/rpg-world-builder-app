@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { createProficienciesStepRogueFixture } from '../../../../../lib/proficiencies/proficiencies-step.fixtures'
-import { ProficiencyGrantedRow } from '../proficiency-granted-row'
+import { ChoiceGrantedRow } from './choice-granted-row'
 
 const { model } = createProficienciesStepRogueFixture()
 const savingThrows = model.fixedGrants.find((row) => row.kind === 'savingThrows')!
@@ -14,13 +14,13 @@ const savingThrowRow = {
 }
 
 const meta = {
-  title: 'Character Builder/ProficiencyGrantedRow',
-  component: ProficiencyGrantedRow,
+  title: 'Character Builder/ChoiceGrantedRow',
+  component: ChoiceGrantedRow,
   parameters: { layout: 'padded' },
-} satisfies Meta<typeof ProficiencyGrantedRow>
+} satisfies Meta<typeof ChoiceGrantedRow>
 
 export default meta
-type Story = StoryObj<typeof ProficiencyGrantedRow>
+type Story = StoryObj<typeof ChoiceGrantedRow>
 
 export const SavingThrow: Story = {
   args: {

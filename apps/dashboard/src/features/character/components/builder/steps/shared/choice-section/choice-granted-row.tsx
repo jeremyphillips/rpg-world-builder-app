@@ -1,14 +1,10 @@
 import type { BuilderChoiceGrantedRow } from '@rpg/contracts'
+import { Text } from '@rpg/ui'
 import { BadgeCheck } from 'lucide-react'
 
-import {
-  choiceGrantedRowBodyClasses,
-  choiceGrantedRowCopyClasses,
-  choiceGrantedRowDescriptionClasses,
-  choiceGrantedRowFrameClasses,
-  choiceGrantedRowHeadingClasses,
-  choiceGrantedRowIconClasses,
-} from './choice-granted-row.variants'
+import { ContentEntityCard } from '@/features/content'
+
+import { choiceGrantedRowIconClasses } from './choice-granted-row.variants'
 
 export type ChoiceGrantedRowProps = {
   row: BuilderChoiceGrantedRow
@@ -16,16 +12,17 @@ export type ChoiceGrantedRowProps = {
 
 export function ChoiceGrantedRow({ row }: ChoiceGrantedRowProps) {
   return (
-    <article className={choiceGrantedRowFrameClasses}>
-      <div className={choiceGrantedRowBodyClasses}>
-        <BadgeCheck className={choiceGrantedRowIconClasses} aria-hidden />
-        <div className={choiceGrantedRowCopyClasses}>
-          <div className={choiceGrantedRowHeadingClasses}>{row.label}</div>
-          {row.sourceLabel ? (
-            <div className={choiceGrantedRowDescriptionClasses}>{row.sourceLabel}</div>
-          ) : null}
-        </div>
-      </div>
-    </article>
+    <ContentEntityCard
+      entity={{
+        heading: row.label,
+        description: row.sourceLabel ? (
+          <Text variant="caption" className="text-muted-foreground">
+            {row.sourceLabel}
+          </Text>
+        ) : undefined,
+      }}
+      leading={<BadgeCheck className={choiceGrantedRowIconClasses} aria-hidden />}
+      density="compact"
+    />
   )
 }

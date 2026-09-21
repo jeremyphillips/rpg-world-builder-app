@@ -1,5 +1,3 @@
-import { isChoiceSetBuilderComplete } from './resolve-choice-set-availability'
-
 // ---------------------------------------------------------------------------
 // ChoiceSet — the builder's pending-choice model.
 //
@@ -167,6 +165,6 @@ export function areRequiredChoiceSetsSatisfied(
   selectionMap: Readonly<Record<string, string[] | readonly string[]>>,
 ): boolean {
   return choiceSets.every(
-    (cs) => !cs.required || isChoiceSetBuilderComplete(cs, selectionMap[cs.id] ?? []),
+    (cs) => !cs.required || isChoiceSetSatisfied(cs, selectionMap[cs.id] ?? []),
   )
 }

@@ -21,7 +21,7 @@ import {
   proficienciesStepStealthSkill,
 } from '../../../../../lib/proficiencies/proficiencies-step.fixtures'
 import { PROFICIENCY_GRANTED_SUMMARY_HEADING } from '../proficiency-granted-summary'
-import { PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL } from '../proficiency-selected-row'
+import { CHOICE_SELECTED_ROW_STALE_BADGE_LABEL } from '../../shared/choice-section/choice-selected-row'
 import { ProficienciesStep } from '../proficiencies-step'
 
 const emptyContext = createStandaloneBuilderContextFixture()
@@ -194,7 +194,7 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    expect(screen.getByText(PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL)).toBeInTheDocument()
+    expect(screen.getByText(CHOICE_SELECTED_ROW_STALE_BADGE_LABEL)).toBeInTheDocument()
     expect(screen.getByText('Stealth')).toBeInTheDocument()
   })
 

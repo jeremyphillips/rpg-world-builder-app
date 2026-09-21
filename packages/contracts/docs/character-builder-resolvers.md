@@ -385,13 +385,17 @@ Fixed grants and inventory rows carry `CharacterSelectionSource[]` provenance. C
 parallel facts in `ChoiceSet.provenance`. Both surfaces share one resolver and three presentation
 densities in `format-selection-source-label.ts`:
 
-| Density        | Example                                     | Use today                                                     |
-| -------------- | ------------------------------------------- | ------------------------------------------------------------- |
-| **compact**    | `Ranger`                                    | Proficiency granted-summary source column                     |
-| **standard**   | `Ranger · Favored Enemy`                    | Reserved for equipment/picker migration                       |
-| **grant-card** | `Granted by Favored Enemy · Ranger feature` | Spell step fixed-grant cards (`ChoiceGrantedRow.sourceLabel`) |
+| Density        | Example                                     | Use today                                                                                                   |
+| -------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **compact**    | `Ranger`                                    | Proficiency granted-summary source column                                                                   |
+| **standard**   | `Ranger · Favored Enemy`                    | Reserved for equipment/picker migration                                                                     |
+| **grant-card** | `Granted by Favored Enemy · Ranger feature` | Spell fixed grants and proficiency skill, tool, and language section cards (`ChoiceGrantedRow.sourceLabel`) |
 
 Flow: `CharacterSelectionSource` + catalog → `resolveSelectionSourceProvenance` → density formatter.
+Compact and legacy single-source labels delegate to the resolver; compact keeps class names for class
+grants, maps `characterCreation` to `Origin` (not the origin-language choice label), and uses coarse
+`Species` / `Heritage` tokens when catalog enrichment is unavailable. Legacy class grants stay
+`Granted by {class}`.
 Grant-card lines answer “why do I have this?” only — no casting frequency or slot language.
 Choice-block `sourceLine` copy delegates parent-context phrasing to
 `formatChoiceSetProvenanceParentContext` so hierarchy rules stay in one module.

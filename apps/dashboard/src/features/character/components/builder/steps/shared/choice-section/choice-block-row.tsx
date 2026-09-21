@@ -70,7 +70,7 @@ export function ChoiceBlockRow({
                 selectedCount={counter.selected}
                 max={counter.max}
                 verb={block.counterVerb}
-                requiredToComplete={block.requiredToComplete}
+                requiredToComplete={block.displayCount ? false : block.requiredToComplete}
                 effectiveRequiredCount={block.effectiveRequiredCount}
               />
             </div>

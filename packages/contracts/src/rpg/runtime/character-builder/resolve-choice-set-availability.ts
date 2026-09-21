@@ -59,6 +59,16 @@ export function isChoiceSetBuilderComplete(
   return selections.length >= effectiveRequiredCount
 }
 
+/** Returns true when every required ChoiceSet is builder-complete for the selection map. */
+export function areRequiredChoiceSetsBuilderComplete(
+  choiceSets: readonly ChoiceSet[],
+  selectionMap: Readonly<Record<string, string[] | readonly string[]>>,
+): boolean {
+  return choiceSets.every(
+    (cs) => !cs.required || isChoiceSetBuilderComplete(cs, selectionMap[cs.id] ?? []),
+  )
+}
+
 export function formatChoiceSetAvailabilityLead(choiceSet: ChoiceSet): string | undefined {
   const { availability, availableCount } = resolveChoiceSetAvailability(choiceSet)
 
