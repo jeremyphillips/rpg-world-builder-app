@@ -1,22 +1,7 @@
-import type { GrantedProficiencySummaryRow } from '@rpg/contracts'
-
-export const PROFICIENCY_GRANTED_SUMMARY_SOURCE_WIDTH_VAR =
-  '--proficiency-granted-summary-source-width' as const
-
-/** Unique source labels across all granted summary rows. */
-export function collectProficiencyGrantedSummarySourceLabels(
-  rows: readonly GrantedProficiencySummaryRow[],
-): string[] {
-  return [
-    ...new Set(
-      rows.flatMap((row) => row.sourceGroups.map((sourceGroup) => sourceGroup.sourceLabel)),
-    ),
-  ]
-}
-
-export function measureMaxElementWidth(elements: readonly HTMLElement[]): number {
-  return elements.reduce((maxWidth, element) => {
-    const width = element.getBoundingClientRect().width
-    return width > maxWidth ? width : maxWidth
-  }, 0)
-}
+export {
+  BUILDER_FACT_SUMMARY_SOURCE_WIDTH_VAR,
+  BUILDER_FACT_SUMMARY_SOURCE_WIDTH_VAR as PROFICIENCY_GRANTED_SUMMARY_SOURCE_WIDTH_VAR,
+  collectBuilderFactSummarySourceLabels,
+  collectBuilderFactSummarySourceLabels as collectProficiencyGrantedSummarySourceLabels,
+  measureMaxElementWidth,
+} from '../shared/fact-summary/builder-fact-summary-source-width.lib'

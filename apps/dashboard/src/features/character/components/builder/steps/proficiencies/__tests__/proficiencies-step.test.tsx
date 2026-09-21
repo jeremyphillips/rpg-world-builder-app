@@ -21,7 +21,7 @@ import {
   proficienciesStepStealthSkill,
 } from '../../../../../lib/proficiencies/proficiencies-step.fixtures'
 import { PROFICIENCY_GRANTED_SUMMARY_HEADING } from '../proficiency-granted-summary'
-import { PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL } from '../proficiency-selected-row'
+import { CHOICE_SELECTED_ROW_STALE_BADGE_LABEL } from '../../shared/choice-section/choice-selected-row'
 import { ProficienciesStep } from '../proficiencies-step'
 
 const emptyContext = createStandaloneBuilderContextFixture()
@@ -135,11 +135,12 @@ describe('ProficienciesStep', () => {
       screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
     ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Tools' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Tools' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Languages' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Saving Throws' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Weapons' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Armor' })).not.toBeInTheDocument()
+    expect(screen.getByText('Saving Throws')).toBeInTheDocument()
+    expect(screen.getByText('Weapons')).toBeInTheDocument()
+    expect(screen.getByText('Armor')).toBeInTheDocument()
+    expect(screen.getByText('Thieves Tools')).toBeInTheDocument()
   })
 
   it('renders the origin language choice section without class grants', () => {
@@ -168,8 +169,10 @@ describe('ProficienciesStep', () => {
       within(languagesSection).getByRole('button', { name: 'Add language' }),
     ).toBeInTheDocument()
     expect(
-      screen.getByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
-    ).toBeInTheDocument()
+      screen.queryByRole('heading', { name: PROFICIENCY_GRANTED_SUMMARY_HEADING }),
+    ).not.toBeInTheDocument()
+    expect(within(languagesSection).getByText('Common')).toBeInTheDocument()
+    expect(within(languagesSection).getByText('Granted by Origin Languages')).toBeInTheDocument()
     expect(
       within(languagesSection).getByText('No additional languages chosen yet.'),
     ).toBeInTheDocument()
@@ -191,7 +194,7 @@ describe('ProficienciesStep', () => {
       />,
     )
 
-    expect(screen.getByText(PROFICIENCY_SELECTED_ROW_STALE_BADGE_LABEL)).toBeInTheDocument()
+    expect(screen.getByText(CHOICE_SELECTED_ROW_STALE_BADGE_LABEL)).toBeInTheDocument()
     expect(screen.getByText('Stealth')).toBeInTheDocument()
   })
 

@@ -1,6 +1,11 @@
 import { defineMessage } from '../../../../validation/define-message'
 import { getContentTypeSentenceForm } from '../../../content/lib/content-type-terms'
 import { getProficiencyDomainCompactLabel } from '../../../vocab/proficiency'
+import {
+  formatProficienciesChooseClassPromptDescription,
+  formatProficienciesChooseClassPromptHeading,
+} from '../resolvers/proficiency/format-proficiencies-choose-class-prompt'
+import { formatSpellsChooseClassPromptHeading } from '../resolvers/spellcasting/format-spells-choose-class-prompt'
 
 // ---------------------------------------------------------------------------
 // Character builder validation messages (surface catalog).
@@ -200,8 +205,7 @@ export const characterBuilderStepReadinessMessages = {
   ),
   spellsBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.spellsBlockedNoClass',
-    () =>
-      `Choose a ${getContentTypeSentenceForm('classes')} to see ${getContentTypeSentenceForm('spells')} options.`,
+    () => formatSpellsChooseClassPromptHeading(),
   ),
   spellsNotApplicableNoSpellcasting: defineMessage<{ className: string }>(
     'validation.characterBuilder.readiness.spellsNotApplicableNoSpellcasting',
@@ -217,11 +221,11 @@ export const characterBuilderStepReadinessMessages = {
   ),
   proficienciesBlockedNoClass: defineMessage(
     'validation.characterBuilder.readiness.proficienciesBlockedNoClass',
-    () => `Choose a ${getContentTypeSentenceForm('classes')} to see class proficiencies.`,
+    () => formatProficienciesChooseClassPromptHeading(),
   ),
   proficienciesBlockedNoClassHelper: defineMessage(
     'validation.characterBuilder.readiness.proficienciesBlockedNoClassHelper',
-    () => 'Class selection determines saving throws, skill choices, armor, weapons, and tools.',
+    () => formatProficienciesChooseClassPromptDescription(),
   ),
   proficienciesNoChoicesRequired: defineMessage(
     'validation.characterBuilder.readiness.proficienciesNoChoicesRequired',
@@ -273,5 +277,28 @@ export const characterBuilderProficiencyChoiceEmptyMessages = {
   fallback: defineMessage(
     'validation.characterBuilder.proficiencyChoiceEmpty.fallback',
     () => 'No choices chosen yet.',
+  ),
+}
+
+export const characterBuilderSpellChoiceEmptyMessages = {
+  cantrip: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.cantrip',
+    () => 'No cantrips chosen yet.',
+  ),
+  cantripAdditional: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.cantripAdditional',
+    () => 'No additional cantrips chosen yet.',
+  ),
+  spell: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.spell',
+    () => 'No spells chosen yet.',
+  ),
+  spellAdditional: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.spellAdditional',
+    () => 'No additional spells chosen yet.',
+  ),
+  fallback: defineMessage(
+    'validation.characterBuilder.spellChoiceEmpty.fallback',
+    () => 'No spells chosen yet.',
   ),
 }

@@ -17,6 +17,7 @@ import {
 export { BUILDER_STEP_READINESS_STEP_IDS, type BuilderStepReadinessStepId }
 export {
   formatProficiencyChoiceEmptyMessage,
+  formatSpellChoiceEmptyMessage,
   formatStepReadinessMessage,
 } from './step-readiness-helpers'
 

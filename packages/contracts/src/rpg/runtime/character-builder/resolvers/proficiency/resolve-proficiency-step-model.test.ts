@@ -45,13 +45,7 @@ describe('resolveProficiencyStepModel', () => {
       choiceSets,
     })
 
-    expect(model.fixedGrants.map((row) => row.kind)).toEqual([
-      'savingThrows',
-      'tools',
-      'languages',
-      'weapons',
-      'armor',
-    ])
+    expect(model.fixedGrants.map((row) => row.kind)).toEqual(['savingThrows', 'weapons', 'armor'])
 
     const savingThrows = model.fixedGrants.find((row) => row.kind === 'savingThrows')
     expect(savingThrows?.sourceGroups).toEqual([
@@ -61,11 +55,19 @@ describe('resolveProficiencyStepModel', () => {
       }),
     ])
 
-    const tools = model.fixedGrants.find((row) => row.kind === 'tools')
-    expect(tools?.sourceGroups).toEqual([
+    const tools = model.sections.find((section) => section.kind === 'tools')
+    expect(tools?.grantedRows).toEqual([
       expect.objectContaining({
-        valueLabels: ['Thieves Tools'],
-        sourceLabel: 'Rogue',
+        label: 'Thieves Tools',
+        sourceLabel: 'Granted by Rogue',
+      }),
+    ])
+
+    const languages = model.sections.find((section) => section.kind === 'languages')
+    expect(languages?.grantedRows).toEqual([
+      expect.objectContaining({
+        label: 'Common',
+        sourceLabel: 'Granted by Origin Languages',
       }),
     ])
 
@@ -80,6 +82,8 @@ describe('resolveProficiencyStepModel', () => {
       selected: 0,
       max: 2,
       label: '0 / 2 chosen',
+      verb: 'chosen',
+      requiredToComplete: true,
     })
     expect(model.hasPendingChoices).toBe(true)
     expect(model.hasUnresolvedPrerequisites).toBe(false)

@@ -1,9 +1,6 @@
-import {
-  getContentTypeSentenceForm,
-  getContentTypeTerm,
-} from '../../../../content/lib/content-type-terms'
+import { getContentTypeTerm } from '../../../../content/lib/content-type-terms'
 import { joinNaturalList } from '../../../../primitives/prose'
-import { ORIGIN_PROVENANCE_TERM } from '../../../character/format-selection-source-label'
+import { formatChoiceSetProvenanceParentContext } from '../../../character/format-selection-source-label'
 import { getLanguageProficiencySentenceForm } from '../../../../vocab/language'
 import {
   getProficiencyDomainCompactActionNoun,
@@ -64,31 +61,11 @@ function genericHeadingForDomain(domain: ProficiencyChoiceDomain): string {
   return getProficiencyDomainLabel(domain)
 }
 
-const SOURCE_LINE_FORMATTERS: Partial<
-  Record<ChoiceSetOwnerKind, (provenance: ChoiceSetProvenance) => string | undefined>
-> = {
-  species: (provenance) =>
-    provenance.ownerLabel
-      ? `${provenance.ownerLabel} ${getContentTypeSentenceForm('species')} trait`
-      : undefined,
-  heritage: (provenance) =>
-    provenance.ownerLabel ? `${provenance.ownerLabel} heritage` : undefined,
-  class: (provenance) =>
-    provenance.ownerLabel
-      ? `${provenance.ownerLabel} ${getContentTypeSentenceForm('classes')}`
-      : undefined,
-  subclass: (provenance) =>
-    provenance.ownerLabel ? `${provenance.ownerLabel} subclass` : undefined,
-  origin: () => ORIGIN_PROVENANCE_TERM.label,
-  feat: (provenance) =>
-    provenance.ownerLabel
-      ? `${provenance.ownerLabel} ${getContentTypeSentenceForm('feats')}`
-      : undefined,
-}
-
-function resolveSourceLine(provenance: ChoiceSetProvenance | undefined): string | undefined {
-  if (!provenance?.ownerKind) return undefined
-  return SOURCE_LINE_FORMATTERS[provenance.ownerKind]?.(provenance)
+function resolveSourceLine(
+  provenance: Pick<ChoiceSet, 'provenance'>['provenance'],
+): string | undefined {
+  if (!provenance) return undefined
+  return formatChoiceSetProvenanceParentContext(provenance)
 }
 
 function resolveHeading(

@@ -103,6 +103,8 @@ export type SpellPickerDrawerProps = {
   cantripItems: readonly SpellPickerItem[]
   preparedItems: readonly SpellPickerItem[]
   initialMode?: SpellPickerMode
+  /** Pre-filter prepared-spell browse to a single spell level when opened from a level tab. */
+  initialSpellLevel?: number
   recommendationsEnabled?: boolean
   displayVocabulary?: SpellDisplayVocabulary
   onSelectSpell: (mode: SpellPickerMode, spellId: string) => void

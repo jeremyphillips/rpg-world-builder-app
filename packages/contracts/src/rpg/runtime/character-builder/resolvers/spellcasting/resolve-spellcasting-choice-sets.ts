@@ -125,6 +125,7 @@ function resolveClassCantripChoiceSet(
       (spell) => spell.level === 0,
     ),
     required: true,
+    requiredToComplete: true,
   }
 }
 
@@ -158,6 +159,7 @@ export function resolveSpellcastingChoiceSets(
       max: quota,
       options: resolveSpellOptions(draft, profile, progression, characterClassSlug, catalogIndex),
       required: true,
+      requiredToComplete: true,
     })
   }
 

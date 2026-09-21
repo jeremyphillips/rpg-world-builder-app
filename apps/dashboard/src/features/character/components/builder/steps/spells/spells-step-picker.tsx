@@ -26,6 +26,7 @@ export type SpellsStepPickerProps = {
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
   choiceSet: ChoiceSet
+  initialSpellLevel?: number
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
   onClose: () => void
 }
@@ -35,6 +36,7 @@ export function SpellsStepPicker({
   draft,
   context,
   choiceSet,
+  initialSpellLevel,
   onDraftChange,
   onClose,
 }: SpellsStepPickerProps) {
@@ -66,6 +68,7 @@ export function SpellsStepPicker({
       cantripItems={mode === SPELL_PICKER_MODE_CANTRIPS ? items : []}
       preparedItems={mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? items : []}
       initialMode={mode}
+      initialSpellLevel={initialSpellLevel}
       onSelectSpell={(_, spellId) => {
         if (selectedIds.includes(spellId)) return
         onDraftChange({

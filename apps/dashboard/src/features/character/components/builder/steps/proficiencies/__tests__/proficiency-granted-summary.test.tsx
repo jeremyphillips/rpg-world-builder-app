@@ -21,8 +21,10 @@ describe('ProficiencyGrantedSummary', () => {
     expect(screen.getByText('Dexterity · Intelligence')).toBeInTheDocument()
     expect(screen.getAllByText('Rogue').length).toBeGreaterThan(0)
     expect(screen.queryByText('Granted by Rogue')).not.toBeInTheDocument()
-    expect(screen.getByText('Thieves Tools')).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Skills' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Thieves Tools')).not.toBeInTheDocument()
+    expect(screen.getByText('Weapons')).toBeInTheDocument()
+    expect(screen.getByText('Armor')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Tools' })).not.toBeInTheDocument()
   })
 
   it('renders nothing when there are no fixed grants', () => {

@@ -52,21 +52,25 @@ describe('builder-step-readiness.lib', () => {
       visibleProficiencySections(
         [
           {
+            id: 'savingThrows',
             kind: 'savingThrows',
             heading: 'Saving Throws',
             subhead: '',
             aggregateCount: null,
             selectedRows: [],
+            grantedRows: [],
             choiceBlocks: [],
             emptyMessage: '',
             isOverSelected: false,
           },
           {
+            id: 'languages',
             kind: 'languages',
             heading: 'Languages',
             subhead: '',
             aggregateCount: null,
             selectedRows: [],
+            grantedRows: [],
             choiceBlocks: [],
             emptyMessage: '',
             isOverSelected: false,
@@ -93,21 +97,25 @@ describe('builder-step-readiness.lib', () => {
       ],
       sections: [
         {
+          id: 'skills',
           kind: 'skills' as const,
           heading: 'Skills',
           subhead: '',
           aggregateCount: null,
           selectedRows: [],
+          grantedRows: [],
           choiceBlocks: [],
           emptyMessage: '',
           isOverSelected: false,
         },
         {
+          id: 'languages',
           kind: 'languages' as const,
           heading: 'Languages',
           subhead: '',
           aggregateCount: null,
           selectedRows: [],
+          grantedRows: [],
           choiceBlocks: [],
           emptyMessage: '',
           isOverSelected: false,
@@ -116,7 +124,7 @@ describe('builder-step-readiness.lib', () => {
     }
 
     expect(resolveVisibleProficiencyStepContent(model, true)).toEqual({
-      fixedGrants: [model.fixedGrants[1]],
+      fixedGrants: [],
       sections: [model.sections[1]],
     })
   })

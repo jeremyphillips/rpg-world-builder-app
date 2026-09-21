@@ -39,7 +39,7 @@ export function visibleProficiencyFixedGrants(
   classDependentBlocked: boolean | undefined,
 ): ProficiencyStepModel['fixedGrants'] {
   if (!classDependentBlocked) return [...fixedGrants]
-  return fixedGrants.filter((row) => row.kind === 'languages')
+  return []
 }
 
 export function resolveVisibleProficiencyStepContent(

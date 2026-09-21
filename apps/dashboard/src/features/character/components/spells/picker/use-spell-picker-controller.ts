@@ -38,6 +38,7 @@ export type UseSpellPickerControllerArgs = Pick<
   SpellPickerDrawerProps,
   | 'open'
   | 'initialMode'
+  | 'initialSpellLevel'
   | 'recommendationsEnabled'
   | 'displayVocabulary'
   | 'cantripChoiceSet'
@@ -51,6 +52,7 @@ export type UseSpellPickerControllerArgs = Pick<
 export function useSpellPickerController({
   open,
   initialMode,
+  initialSpellLevel,
   recommendationsEnabled = false,
   displayVocabulary,
   cantripChoiceSet,
@@ -70,20 +72,27 @@ export function useSpellPickerController({
   )
   const [browseBuckets, setBrowseBuckets] = React.useState(() =>
     createBrowseStateByMode(modes, (entry) =>
-      createDefaultSpellPickerBrowseState(entry, recommendationsEnabled),
+      createDefaultSpellPickerBrowseState(
+        entry,
+        recommendationsEnabled,
+        'recommended',
+        initialSpellLevel,
+      ),
     ),
   )
   const [browseState, setBrowseState] = React.useState<SpellPickerBrowseState>(() =>
     createDefaultSpellPickerBrowseState(
       resolveInitialSpellPickerMode(modes, initialMode),
       recommendationsEnabled,
+      'recommended',
+      initialSpellLevel,
     ),
   )
   const [openSyncKey, setOpenSyncKey] = React.useState(0)
   const sheetStateRef = React.useRef({ searchQuery: '', activeTabId: '' })
 
   const openBrowseSyncKey = open
-    ? `${String(initialMode)}:${modes.join(',')}:${recommendationsEnabled}`
+    ? `${String(initialMode)}:${String(initialSpellLevel)}:${modes.join(',')}:${recommendationsEnabled}`
     : 'closed'
   const [trackedOpenBrowseSyncKey, setTrackedOpenBrowseSyncKey] = React.useState(openBrowseSyncKey)
 
@@ -92,7 +101,12 @@ export function useSpellPickerController({
     const nextMode = resolveInitialSpellPickerMode(modes, initialMode)
     setMode(nextMode)
     const resolved = resolveModeBrowseState(browseBuckets, nextMode, (entry) =>
-      createDefaultSpellPickerBrowseState(entry, recommendationsEnabled),
+      createDefaultSpellPickerBrowseState(
+        entry,
+        recommendationsEnabled,
+        'recommended',
+        initialSpellLevel,
+      ),
     )
     if (resolved.initialized) setBrowseBuckets(resolved.buckets)
     const sanitized = sanitizeSpellPickerBrowseState(

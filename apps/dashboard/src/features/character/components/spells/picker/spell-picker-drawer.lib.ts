@@ -124,12 +124,20 @@ export function createDefaultSpellPickerBrowseState(
   mode: SpellPickerMode,
   recommendationsEnabled: boolean,
   defaultTabId = 'recommended',
+  initialSpellLevel?: number,
 ): SpellPickerBrowseState {
+  const selectedLevels =
+    mode === SPELL_PICKER_MODE_CANTRIPS
+      ? []
+      : initialSpellLevel !== undefined
+        ? [initialSpellLevel]
+        : []
+
   return {
     ...SPELL_PICKER_VIEW_DEFAULTS,
     activeTabId: defaultTabId,
     sortMode: recommendationsEnabled ? SPELL_PICKER_SORT_BEST_MATCH : SPELL_PICKER_SORT_NAME_ASC,
-    selectedLevels: mode === SPELL_PICKER_MODE_CANTRIPS ? [] : [],
+    selectedLevels,
   }
 }
 

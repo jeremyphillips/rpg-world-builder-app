@@ -39,7 +39,12 @@ without creation rules. Do **not** validate play-scoped selections against raw
 | `resolveStartingEquipmentOptionSummaries`    | `resolvers/equipment/resolve-starting-equipment-option-summaries.ts`    | Package option card enrichment for the Equipment step.                                                                                                                                                                                                                                                                                      |
 | `resolveProficiencyLinkedEquipmentGrant`     | `resolvers/equipment/resolve-proficiency-linked-equipment-grant.ts`     | Resolves `target.proficiency_choice` grants from proficiency ChoiceSet answers (`pending` / `invalid` / `resolved`).                                                                                                                                                                                                                        |
 | `getUnresolvedStartingEquipmentDependencies` | `resolvers/equipment/get-unresolved-starting-equipment-dependencies.ts` | Lists upstream proficiency ChoiceSets blocking equipment-step completion.                                                                                                                                                                                                                                                                   |
-| `formatSelectionSourceLabel`                 | `runtime/character/format-selection-source-label.ts`                    | Shared provenance labels for equipment and proficiency rows (BENCH-118).                                                                                                                                                                                                                                                                    |
+| `resolveSelectionSourceProvenance`           | `runtime/character/format-selection-source-label.ts`                    | Resolves `CharacterSelectionSource` + catalog into structured provenance (`primaryLabel`, `ownerLabel`, `parentContext`). Single lookup model for all label densities.                                                                                                                                                                      |
+| `formatSelectionSourceLabel`                 | `runtime/character/format-selection-source-label.ts`                    | Legacy full-sentence provenance labels for equipment and proficiency rows (BENCH-118).                                                                                                                                                                                                                                                      |
+| `formatCompactSelectionSourceLabel`          | `runtime/character/format-selection-source-label.ts`                    | Compact density — class name, Origin, coarse content-type tokens. Used by proficiency granted-summary rows.                                                                                                                                                                                                                                 |
+| `formatStandardSelectionSourceLabel`         | `runtime/character/format-selection-source-label.ts`                    | Standard density — `{ownerLabel} · {primaryLabel}` when both are known. Equipment/picker can migrate here later.                                                                                                                                                                                                                            |
+| `formatGrantCardSelectionSourceLabel`        | `runtime/character/format-selection-source-label.ts`                    | Grant-card density — `Granted by {primaryLabel} · {parentContext}`. Used by spell fixed-grant cards; future fixed-grant surfaces should call this directly.                                                                                                                                                                                 |
+| `formatChoiceSetProvenanceParentContext`     | `runtime/character/format-selection-source-label.ts`                    | Shared parent-context phrasing for choice-block `sourceLine` copy (`resolve-*-choice-presentation`).                                                                                                                                                                                                                                        |
 | `formatProficiencySourceLabel`               | `resolvers/proficiency/format-proficiency-source-label.ts`              | Thin wrapper over `formatSelectionSourceLabel` with proficiency `rowKind`.                                                                                                                                                                                                                                                                  |
 | `formatSavingThrowProficiencyLabel`          | `resolvers/proficiency/format-saving-throw-proficiency-label.ts`        | Saving throw row label (`DEX · Dexterity`).                                                                                                                                                                                                                                                                                                 |
 | `resolveProficiencyStepModel`                | `resolvers/proficiency/resolve-proficiency-step-model.ts`               | Proficiencies step view model: `fixedGrants` summary rows, interactive `sections`, `hasPendingChoices`, `hasUnresolvedPrerequisites`. Copy helpers live in `format-proficiency-step-copy.ts` and `resolve-proficiency-choice-presentation.ts`.                                                                                              |
@@ -366,12 +371,34 @@ Import via `runtime/creature/` modules or the `creature/index.ts` barrel.
 
 `resolveProficiencyStepModel` separates **fixed grants** from **interactive choice sections**:
 
-- `fixedGrants`: one row per category with `sourceGroups[]` for the read-only “Granted proficiencies” summary.
+- `fixedGrants`: compact summary rows for **Saving Throws**, **Weapons**, and **Armor** only (`sourceGroups[]` grouped by compact source label).
+- Fixed grants for **skills**, **tools**, and **languages** render as grant cards inside their interactive section bodies (`section.grantedRows` with grant-card provenance).
 - `sections`: categories with one or more ChoiceSets — merged `selectedRows`, per-set `choiceBlocks`, topology-driven `subhead` / `emptyMessage`, optional aggregate `{n} / {N} chosen`.
 - `hasUnresolvedPrerequisites`: true when class progression applies but no class is chosen (prevents treating origin-language satisfaction as step completion).
 - Fixed vs choice-derived preview rows share `isFixedProficiencyGrant` / `isChoiceDerivedProficiencyGrant` in `proficiency-grant-classification.ts`.
 
 Dashboard merges readiness via `reconcileProficiencyStepReadiness` and filters visible content with `resolveVisibleProficiencyStepContent`.
+
+## Selection-source provenance
+
+Fixed grants and inventory rows carry `CharacterSelectionSource[]` provenance. Choice blocks carry
+parallel facts in `ChoiceSet.provenance`. Both surfaces share one resolver and three presentation
+densities in `format-selection-source-label.ts`:
+
+| Density        | Example                                     | Use today                                                                                                   |
+| -------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **compact**    | `Ranger`                                    | Proficiency granted-summary source column                                                                   |
+| **standard**   | `Ranger · Favored Enemy`                    | Reserved for equipment/picker migration                                                                     |
+| **grant-card** | `Granted by Favored Enemy · Ranger feature` | Spell fixed grants and proficiency skill, tool, and language section cards (`ChoiceGrantedRow.sourceLabel`) |
+
+Flow: `CharacterSelectionSource` + catalog → `resolveSelectionSourceProvenance` → density formatter.
+Compact and legacy single-source labels delegate to the resolver; compact keeps class names for class
+grants, maps `characterCreation` to `Origin` (not the origin-language choice label), and uses coarse
+`Species` / `Heritage` tokens when catalog enrichment is unavailable. Legacy class grants stay
+`Granted by {class}`.
+Grant-card lines answer “why do I have this?” only — no casting frequency or slot language.
+Choice-block `sourceLine` copy delegates parent-context phrasing to
+`formatChoiceSetProvenanceParentContext` so hierarchy rules stay in one module.
 
 ## Related helpers
 

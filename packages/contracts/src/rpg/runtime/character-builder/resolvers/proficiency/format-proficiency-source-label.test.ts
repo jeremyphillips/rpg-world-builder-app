@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { indexCharacterBuildCatalog } from '../../context'
 import {
   formatCompactProficiencySourceLabel,
+  formatGrantCardProficiencySourceLabel,
   formatProficiencySourceLabel,
 } from './format-proficiency-source-label'
 import { proficiencyTestCatalog, rogueClass } from '../../proficiency-test-fixtures'
@@ -35,6 +36,19 @@ describe('formatProficiencySourceLabel', () => {
         { rowKind: 'armorCategory' },
       ),
     ).toBe('Armor training · Granted by Rogue')
+  })
+})
+
+describe('formatGrantCardProficiencySourceLabel', () => {
+  const catalogIndex = indexCharacterBuildCatalog(proficiencyTestCatalog)
+
+  it('returns grant-card class provenance copy', () => {
+    expect(
+      formatGrantCardProficiencySourceLabel(
+        [{ kind: 'classFeature', sourceId: rogueClass.id, grantId: 'saving-throws' }],
+        catalogIndex,
+      ),
+    ).toBe('Granted by Rogue')
   })
 })
 

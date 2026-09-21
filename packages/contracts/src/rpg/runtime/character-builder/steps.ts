@@ -7,6 +7,7 @@ import {
 import { DEFAULT_STANDARD_ARRAY } from '../../primitives/standard-array'
 import { isStandardArrayAssignment } from './ability/ability-generation'
 import { areRequiredChoiceSetsSatisfied } from './choice-set'
+import { areRequiredChoiceSetsBuilderComplete } from './resolve-choice-set-availability'
 import type { ChoiceSet, ChoiceType } from './choice-set'
 import type { CharacterBuildContext } from './context'
 import { isClassProgressionApplicable } from './progression/character-level-policy'
@@ -355,7 +356,8 @@ const STEP_COMPLETION_CHECKS: Record<
   },
   equipment: (draft, stepChoiceSets) =>
     draft.equipment?.skipped === true || isChoiceStepComplete(draft, stepChoiceSets),
-  spells: (draft, stepChoiceSets) => isChoiceStepComplete(draft, stepChoiceSets),
+  spells: (draft, stepChoiceSets) =>
+    areRequiredChoiceSetsBuilderComplete(stepChoiceSets, draft.choiceSelections),
   review: (draft, _stepChoiceSets, resolvedChoiceSets) =>
     isReviewComplete(draft, resolvedChoiceSets),
 }

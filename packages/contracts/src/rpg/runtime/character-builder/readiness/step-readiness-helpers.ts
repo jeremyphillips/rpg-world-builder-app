@@ -1,6 +1,9 @@
 import { formatFieldMessage } from '../../../../validation/define-message'
 import type { MessageDef, MessageParams } from '../../../../validation/define-message'
-import { characterBuilderProficiencyChoiceEmptyMessages } from '../messages/character-builder-messages'
+import {
+  characterBuilderProficiencyChoiceEmptyMessages,
+  characterBuilderSpellChoiceEmptyMessages,
+} from '../messages/character-builder-messages'
 import { areRequiredChoiceSetsSatisfied, type ChoiceSet } from '../choice-set'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { STEP_CHOICE_TYPES_BY_STEP } from '../steps'
@@ -40,6 +43,30 @@ export function formatProficiencyChoiceEmptyMessage(
   const message =
     byType[choiceType as keyof typeof byType] ??
     characterBuilderProficiencyChoiceEmptyMessages.fallback
+  return formatStepReadinessMessage(message)
+}
+
+const SPELL_CHOICE_EMPTY_BY_TYPE = {
+  cantrip: characterBuilderSpellChoiceEmptyMessages.cantrip,
+  spell: characterBuilderSpellChoiceEmptyMessages.spell,
+} as const satisfies Partial<Record<ChoiceSet['choiceType'], MessageDef<void>>>
+
+const SPELL_CHOICE_EMPTY_ADDITIONAL_BY_TYPE = {
+  cantrip: characterBuilderSpellChoiceEmptyMessages.cantripAdditional,
+  spell: characterBuilderSpellChoiceEmptyMessages.spellAdditional,
+} as const satisfies Partial<Record<ChoiceSet['choiceType'], MessageDef<void>>>
+
+export type FormatSpellChoiceEmptyMessageOptions = {
+  additional?: boolean
+}
+
+export function formatSpellChoiceEmptyMessage(
+  choiceType: 'cantrip' | 'spell',
+  options: FormatSpellChoiceEmptyMessageOptions = {},
+): string {
+  const { additional = false } = options
+  const byType = additional ? SPELL_CHOICE_EMPTY_ADDITIONAL_BY_TYPE : SPELL_CHOICE_EMPTY_BY_TYPE
+  const message = byType[choiceType] ?? characterBuilderSpellChoiceEmptyMessages.fallback
   return formatStepReadinessMessage(message)
 }
 
