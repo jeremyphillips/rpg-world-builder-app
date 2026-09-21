@@ -1,7 +1,6 @@
-import { formatChoiceChosenCounter } from '@rpg/contracts'
+import { formatChoiceChosenCounter, type ChoiceCounterVerb } from '@rpg/contracts'
 import { SemanticText, StatusIcon, Text } from '@rpg/ui'
 
-import { isChoiceSetAtCapacity } from '../../../../../lib/choice-sets/selection-counter.lib'
 import {
   choiceSelectionCounterClasses,
   choiceSelectionCounterLabelClasses,
@@ -10,11 +9,28 @@ import {
 export type ChoiceSelectionCounterProps = {
   selectedCount: number
   max: number
+  verb?: ChoiceCounterVerb
+  requiredToComplete?: boolean
+  effectiveRequiredCount?: number
 }
 
-export function ChoiceSelectionCounter({ selectedCount, max }: ChoiceSelectionCounterProps) {
-  const label = formatChoiceChosenCounter(selectedCount, max)
-  const isComplete = isChoiceSetAtCapacity(selectedCount, max)
+function isRequirementStyleSuccess({
+  selectedCount,
+  max,
+  requiredToComplete = true,
+  effectiveRequiredCount,
+}: ChoiceSelectionCounterProps): boolean {
+  if (!requiredToComplete || max <= 0) return false
+  if (selectedCount > max) return false
+
+  const threshold = effectiveRequiredCount ?? max
+  return selectedCount >= threshold
+}
+
+export function ChoiceSelectionCounter(props: ChoiceSelectionCounterProps) {
+  const { selectedCount, max, verb = 'chosen' } = props
+  const label = formatChoiceChosenCounter(selectedCount, max, verb)
+  const isComplete = isRequirementStyleSuccess(props)
 
   if (!isComplete) {
     return (

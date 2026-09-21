@@ -175,6 +175,8 @@ describe('resolveProficiencyAggregateCount', () => {
       selected: 1,
       max: 3,
       label: '1 / 3 chosen',
+      verb: 'chosen',
+      requiredToComplete: true,
     })
   })
 

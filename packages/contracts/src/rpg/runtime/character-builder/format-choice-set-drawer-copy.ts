@@ -1,6 +1,7 @@
 import { getContentTypeSentenceForm } from '../../content/lib/content-type-terms'
 import { getLanguageProficiencySentenceForm } from '../../vocab/language'
 import { getProficiencyDomainSentenceForm } from '../../vocab/proficiency'
+import type { ChoiceCounterVerb } from './format-spell-acquisition-copy'
 import type { ChoiceSet } from './choice-set'
 
 /** Stable drawer heading for builder ChoiceSet pickers — does not change with selection state. */
@@ -30,8 +31,12 @@ export function formatChoiceSetDrawerHeading(choiceType: ChoiceSet['choiceType']
 }
 
 /** Progress label for builder choice-set counters (category aggregate and per-block). */
-export function formatChoiceChosenCounter(selectedCount: number, max: number): string {
-  return `${selectedCount} / ${max} chosen`
+export function formatChoiceChosenCounter(
+  selectedCount: number,
+  max: number,
+  verb: ChoiceCounterVerb = 'chosen',
+): string {
+  return `${selectedCount} / ${max} ${verb}`
 }
 
 /** Compact progress label without the chosen suffix (e.g. spell level tabs). */

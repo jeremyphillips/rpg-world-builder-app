@@ -66,16 +66,24 @@ export function ChoiceBlockRow({
               <Heading variant="group" as="p">
                 {block.heading}
               </Heading>
-              <ChoiceSelectionCounter selectedCount={counter.selected} max={counter.max} />
+              <ChoiceSelectionCounter
+                selectedCount={counter.selected}
+                max={counter.max}
+                verb={block.counterVerb}
+                requiredToComplete={block.requiredToComplete}
+                effectiveRequiredCount={block.effectiveRequiredCount}
+              />
             </div>
           </div>
-          <div className={choiceBlockRowHeaderActionClasses}>
-            <ChoiceAddAction
-              compactAddLabel={block.compactAddLabel}
-              isFull={block.isFull}
-              onClick={onOpenDrawer}
-            />
-          </div>
+          {block.isInteractive !== false ? (
+            <div className={choiceBlockRowHeaderActionClasses}>
+              <ChoiceAddAction
+                compactAddLabel={block.compactAddLabel}
+                isFull={block.isFull}
+                onClick={onOpenDrawer}
+              />
+            </div>
+          ) : null}
           <div className={choiceBlockRowDetailsGridClasses}>
             {block.sourceLine ? (
               <Text className={choiceBlockRowSourceLineClasses}>{block.sourceLine}</Text>
@@ -83,6 +91,11 @@ export function ChoiceBlockRow({
             <Text variant="caption" className={choiceBlockRowPoolDescriptionClasses}>
               {block.poolDescription}
             </Text>
+            {block.availabilityMessage ? (
+              <Text variant="caption" className={choiceBlockRowPoolDescriptionClasses}>
+                {block.availabilityMessage}
+              </Text>
+            ) : null}
             {block.isOverSelected ? (
               <p className={choiceBlockRowOverSelectionClasses} role="status">
                 {overSelectionMessage}
@@ -103,9 +116,9 @@ export function ChoiceBlockRow({
                 </li>
               ))}
             </ul>
-          ) : (
+          ) : block.isInteractive !== false ? (
             <EmptyPanel className={choiceSubsectionBodyMarginClasses}>{emptyMessage}</EmptyPanel>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

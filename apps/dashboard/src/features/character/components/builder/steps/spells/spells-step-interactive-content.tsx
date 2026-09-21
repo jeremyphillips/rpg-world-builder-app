@@ -50,9 +50,9 @@ export function SpellsStepInteractiveContent({
         />
       ) : null}
 
-      {model.maxSelectableSpellLevel >= 2 ? (
+      {model.maxSelectableSpellLevel >= 2 && model.acquisitionHeader ? (
         <div className="space-y-4">
-          <SpellLevelTabsHeader minLevel={1} maxLevel={model.maxSelectableSpellLevel} />
+          <SpellLevelTabsHeader acquisitionHeader={model.acquisitionHeader} />
           <SpellLevelTabs
             tabs={model.levelTabs}
             activeLevel={activeSpellLevel}

@@ -42,12 +42,15 @@ export function ChoiceSectionHeader({
             <ChoiceSelectionCounter
               selectedCount={section.aggregateCount.selected}
               max={section.aggregateCount.max}
+              verb={section.aggregateCount.verb}
+              requiredToComplete={section.aggregateCount.requiredToComplete}
+              effectiveRequiredCount={section.aggregateCount.effectiveRequiredCount}
             />
           ) : null}
         </div>
       </div>
 
-      {singleChoiceBlock ? (
+      {singleChoiceBlock && singleChoiceBlock.isInteractive !== false ? (
         <div className={choiceSectionHeaderActionClasses}>
           <ChoiceAddAction
             compactAddLabel={singleChoiceBlock.compactAddLabel}

@@ -19,13 +19,13 @@ const spellChoiceSet = {
 } as const satisfies ChoiceSet
 
 describe('formatChoicePoolDescription', () => {
-  it('uses level-filtered pool copy for spells', () => {
+  it('uses generic pool copy for spells without level wording', () => {
     expect(
       formatChoicePoolDescription({
         choiceSet: spellChoiceSet,
         spellLevel: 3,
       }),
-    ).toBe('Choose from 12 available 3rd-level spells.')
+    ).toBe('Choose from 12 available spells.')
   })
 
   it('uses cantrip pool copy', () => {
@@ -59,7 +59,7 @@ describe('formatChoicePoolDescription', () => {
         choiceSet: { ...spellChoiceSet, options: filteredOptions },
         spellLevel: 1,
       }),
-    ).toBe('Choose from 6 available 1st-level spells.')
+    ).toBe('Choose from 6 available spells.')
 
     expect(
       formatChoicePoolDescription({

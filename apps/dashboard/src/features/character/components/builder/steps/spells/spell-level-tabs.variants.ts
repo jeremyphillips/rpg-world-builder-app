@@ -8,3 +8,5 @@ export const spellLevelTabTriggerClasses =
 export const spellLevelTabOrdinalClasses = 'text-sm font-semibold text-foreground'
 
 export const spellLevelTabActivityClasses = 'text-xs text-muted-foreground'
+
+export const spellLevelTabsSubheadClasses = 'text-sm'

@@ -1,5 +1,5 @@
 import type { BuilderChoiceSectionModel } from '@rpg/contracts'
-import { EmptyPanel } from '@rpg/ui'
+import { EmptyPanel, Text } from '@rpg/ui'
 
 import { ChoiceGrantedRow } from './choice-granted-row'
 import { ChoiceSelectedRow } from './choice-selected-row'
@@ -23,7 +23,11 @@ export function ChoiceSectionFlatBody({
 }: ChoiceSectionFlatBodyProps) {
   const hasGrantedRows = section.grantedRows.length > 0
   const hasSelectedRows = section.selectedRows.length > 0
-  const showEmptyWell = !hasSelectedRows && section.choiceBlocks.length > 0
+  const showEmptyWell =
+    !hasSelectedRows &&
+    section.choiceBlocks.length > 0 &&
+    !section.levelSliceEmptyMessage &&
+    section.choiceBlocks.every((block) => block.isInteractive !== false)
 
   return (
     <>
@@ -31,6 +35,12 @@ export function ChoiceSectionFlatBody({
         <p className={choiceSectionOverSelectionClasses} role="status">
           {overSelectionMessage}
         </p>
+      ) : null}
+
+      {section.levelSliceEmptyMessage ? (
+        <Text variant="muted" className={choiceSubsectionBodyMarginClasses}>
+          {section.levelSliceEmptyMessage}
+        </Text>
       ) : null}
 
       {hasGrantedRows ? (

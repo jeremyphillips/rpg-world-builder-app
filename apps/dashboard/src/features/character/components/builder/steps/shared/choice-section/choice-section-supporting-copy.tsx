@@ -24,10 +24,28 @@ export function ChoiceSectionSupportingCopy({
             {section.identityLine}
           </Heading>
         ) : null}
+        {section.subheadLines?.map((line) => (
+          <p key={line} className={choiceSectionSubheadClasses}>
+            {line}
+          </p>
+        ))}
         {section.subhead ? <p className={choiceSectionSubheadClasses}>{section.subhead}</p> : null}
         {singleChoiceBlock.sourceLine ? (
           <Text className={choiceSectionSourceLineClasses}>{singleChoiceBlock.sourceLine}</Text>
         ) : null}
+      </>
+    )
+  }
+
+  if (section.subheadLines?.length) {
+    return (
+      <>
+        {section.subheadLines.map((line) => (
+          <p key={line} className={choiceSectionSubheadClasses}>
+            {line}
+          </p>
+        ))}
+        {section.subhead ? <p className={choiceSectionSubheadClasses}>{section.subhead}</p> : null}
       </>
     )
   }

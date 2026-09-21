@@ -1,13 +1,13 @@
-import type { SpellLevelTabModel } from '@rpg/contracts'
+import type { SpellAcquisitionHeader, SpellLevelTabModel } from '@rpg/contracts'
 import { Heading, Tabs, TabsList, TabsTrigger, Text } from '@rpg/ui'
 
+import { ChoiceSelectionCounter } from '../shared/choice-section/choice-selection-counter'
 import {
   formatSpellLevelTabOrdinal,
-  formatSpellLevelTabsRangeHeading,
   resolveNarrowSpellLevelTabLayout,
   resolveSpellLevelTabLayout,
-  SPELL_LEVEL_TABS_SUBHEAD,
 } from './spell-level-tabs.lib'
+import { spellLevelTabsSubheadClasses } from './spell-level-tabs.variants'
 import {
   spellLevelTabActivityClasses,
   spellLevelTabOrdinalClasses,
@@ -33,20 +33,29 @@ function SpellLevelTabTrigger({ tab }: { tab: SpellLevelTabModel }) {
 }
 
 export function SpellLevelTabsHeader({
-  minLevel,
-  maxLevel,
+  acquisitionHeader,
 }: {
-  minLevel: number
-  maxLevel: number
+  acquisitionHeader: SpellAcquisitionHeader
 }) {
   return (
     <div className="space-y-1">
-      <Heading variant="subsection" as="h3">
-        {formatSpellLevelTabsRangeHeading(minLevel, maxLevel)}
-      </Heading>
-      <Text as="p" variant="muted">
-        {SPELL_LEVEL_TABS_SUBHEAD}
-      </Text>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Heading variant="subsection" as="h3">
+          {acquisitionHeader.heading}
+        </Heading>
+        <ChoiceSelectionCounter
+          selectedCount={acquisitionHeader.aggregateCount.selected}
+          max={acquisitionHeader.aggregateCount.max}
+          verb={acquisitionHeader.aggregateCount.verb ?? acquisitionHeader.counterVerb}
+          requiredToComplete={acquisitionHeader.aggregateCount.requiredToComplete}
+          effectiveRequiredCount={acquisitionHeader.aggregateCount.effectiveRequiredCount}
+        />
+      </div>
+      {acquisitionHeader.subheadLines.map((line) => (
+        <Text key={line} as="p" variant="muted" className={spellLevelTabsSubheadClasses}>
+          {line}
+        </Text>
+      ))}
     </div>
   )
 }

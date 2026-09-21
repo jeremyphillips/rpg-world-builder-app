@@ -17,10 +17,10 @@ describe('spells-step.lib', () => {
   })
 
   it('shows pending ability labels when preview stats are incomplete', () => {
-    expect(formatSpellSaveDc(null)).toBe('Pending ability scores')
+    expect(formatSpellSaveDc(null)).toBe('Calculated after ability scores')
     expect(
       formatSpellAttackBonus({ ability: 'int', saveDc: 13, attackBonus: undefined, slots: [] }),
-    ).toBe('Pending ability scores')
+    ).toBe('Calculated after ability scores')
   })
 
   it('formats derived spellcasting stats when present', () => {

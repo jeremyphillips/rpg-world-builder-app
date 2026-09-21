@@ -22,7 +22,7 @@ export const builderFactSummarySimpleValueClasses = 'text-sm font-medium text-fo
 export const builderFactSummaryIconRowsClasses = 'space-y-0'
 
 export const builderFactSummaryIconRowClasses =
-  'grid grid-cols-[auto_minmax(6.75rem,8.25rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
+  'grid grid-cols-[auto_minmax(7.5rem,10rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
 
 export const builderFactSummaryIconRowLabelClasses = 'text-sm font-medium text-foreground'
 
@@ -31,7 +31,7 @@ export const builderFactSummaryIconRowValueClasses = 'text-sm text-foreground'
 export const builderFactSummaryGrantedRowsClasses = 'space-y-0'
 
 export const builderFactSummaryGrantedRowClasses =
-  'grid grid-cols-[auto_minmax(6.75rem,8.25rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
+  'grid grid-cols-[auto_minmax(7.5rem,10rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
 
 export const builderFactSummaryCategoryLabelClasses = 'text-sm font-medium text-foreground'
 

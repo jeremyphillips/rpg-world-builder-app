@@ -1,9 +1,14 @@
+import type { ChoiceCounterVerb } from './format-spell-acquisition-copy'
 import type { ChoiceSet } from './choice-set'
 
 export type BuilderChoiceAggregateCount = {
   selected: number
   max: number
   label: string
+  verb?: ChoiceCounterVerb
+  requiredToComplete?: boolean
+  /** Builder completion threshold — may be below authored max when the pool is limited. */
+  effectiveRequiredCount?: number
 }
 
 export type BuilderChoiceSelectedRow = {
@@ -39,9 +44,15 @@ export type BuilderChoiceBlock = {
   /** When set, UI counters show this level-scoped composition instead of selectedCount/max. */
   displayCount?: BuilderChoiceDisplayCount
   poolDescription: string
+  availabilityMessage?: string
+  counterVerb?: ChoiceCounterVerb
+  requiredToComplete?: boolean
+  effectiveRequiredCount?: number
   compactAddLabel: string
   isFull: boolean
   isOverSelected: boolean
+  /** When false, hide add/manage for slice-empty or unavailable pools. */
+  isInteractive?: boolean
 }
 
 export function resolveChoiceBlockCounterValues(block: BuilderChoiceBlock): {
@@ -59,8 +70,12 @@ export type BuilderChoiceSectionModel = {
   id: string
   heading: string
   subhead: string
+  /** Acquisition or explanatory lines below the section subhead. */
+  subheadLines?: string[]
   identityLine?: string
   aggregateCount: BuilderChoiceAggregateCount | null
+  /** When set, the level slice has no eligible spells across all blocks. */
+  levelSliceEmptyMessage?: string
   selectedRows: BuilderChoiceSelectedRow[]
   grantedRows: BuilderChoiceGrantedRow[]
   choiceBlocks: BuilderChoiceBlock[]

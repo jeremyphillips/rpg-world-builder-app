@@ -80,6 +80,8 @@ describe('resolveProficiencyStepModel', () => {
       selected: 0,
       max: 2,
       label: '0 / 2 chosen',
+      verb: 'chosen',
+      requiredToComplete: true,
     })
     expect(model.hasPendingChoices).toBe(true)
     expect(model.hasUnresolvedPrerequisites).toBe(false)

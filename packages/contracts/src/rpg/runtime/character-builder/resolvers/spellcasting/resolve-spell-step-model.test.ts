@@ -126,12 +126,18 @@ describe('resolveSpellStepModel', () => {
     })
 
     expect(model.deferredPreparedSection?.kind).toBe('deferredPrepared')
+    expect(model.acquisitionHeader).toBeNull()
     expect(model.spellLevelSections).toHaveLength(1)
     expect(model.spellLevelSections[0]?.aggregateCount).toEqual({
       selected: 6,
       max: 6,
-      label: '6 / 6 chosen',
+      label: '6 / 6 learned',
+      verb: 'learned',
+      requiredToComplete: true,
+      effectiveRequiredCount: 6,
     })
+    expect(model.spellLevelSections[0]?.subheadLines?.[0]).toMatch(/^Learn 6 spells/)
+    expect(model.spellLevelSections[0]?.identityLine).toBeUndefined()
     expect(model.levelTabs[0]).toEqual({
       level: 1,
       selectedAtLevel: 6,
@@ -162,49 +168,29 @@ describe('resolveSpellStepModel', () => {
     })
 
     expect(model.levelTabs).toHaveLength(profile.maxSelectableSpellLevel)
+    expect(model.acquisitionHeader).toEqual(
+      expect.objectContaining({
+        heading: '1st–3rd-Level Spells',
+        aggregateCount: expect.objectContaining({
+          selected: 3,
+          max: 6,
+          label: '3 / 6 learned',
+          verb: 'learned',
+        }),
+      }),
+    )
     expect(model.levelTabs).toEqual([
       { level: 1, selectedAtLevel: 2, activityLabel: '2 selected' },
-      { level: 2, selectedAtLevel: 0, activityLabel: '—' },
+      { level: 2, selectedAtLevel: 0, activityLabel: 'No options' },
       { level: 3, selectedAtLevel: 1, activityLabel: '1 selected' },
     ])
-    expect(model.spellLevelSections[0]?.aggregateCount).toEqual({
-      selected: 2,
-      max: 6,
-      label: '2 / 6 chosen',
-    })
+    expect(model.spellLevelSections[0]?.aggregateCount).toBeNull()
     expect(model.spellLevelSections[0]?.choiceBlocks[0]?.displayCount).toEqual({
       selected: 2,
       max: 6,
     })
     expect(model.spellLevelSections[0]?.choiceBlocks[0]?.selectedCount).toBe(3)
-    expect(model.spellLevelSections[2]?.aggregateCount).toEqual({
-      selected: 1,
-      max: 6,
-      label: '1 / 6 chosen',
-    })
-  })
-
-  it('exposes wizard spellbook identity on a single spell-level section', () => {
-    const draft = draftWith({
-      class: { classId: wizardClass.id, level: 1 },
-      choiceSelections: {
-        [spellcastingChoiceSetId(wizardClass.id, 'spellbook')]: wizardLevelOneSpells.map(
-          (spell) => spell.id,
-        ),
-      },
-    })
-    const profile = resolveSpellcastingProfile(draft, spellcastingTestContext)!
-    const choiceSets = resolveSpellcastingChoices(draft, spellcastingTestContext, catalogIndex)
-
-    const model = resolveSpellStepModel({
-      draft,
-      context: spellcastingTestContext,
-      preview: null,
-      profile,
-      choiceSets,
-    })
-
-    expect(model.spellLevelSections[0]?.identityLine).toMatch(/Wizard/i)
+    expect(model.spellLevelSections[2]?.aggregateCount).toBeNull()
   })
 
   it('emits icon-backed summary rows without preparation', () => {
@@ -224,8 +210,11 @@ describe('resolveSpellStepModel', () => {
 
     expect(model.summaryRows.map((row) => row.id)).toEqual(['ability', 'save-dc', 'attack'])
     expect(model.summaryRows.every((row) => row.icon)).toBe(true)
+    expect(model.summaryRows.find((row) => row.id === 'attack')?.label).toBe(
+      'Spell attack modifier',
+    )
     expect(model.summaryRows.find((row) => row.id === 'save-dc')?.value).toBe(
-      'Pending ability scores',
+      'Calculated after ability scores',
     )
   })
 

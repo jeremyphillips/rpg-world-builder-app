@@ -1,3 +1,5 @@
+import { isChoiceSetBuilderComplete } from './resolve-choice-set-availability'
+
 // ---------------------------------------------------------------------------
 // ChoiceSet — the builder's pending-choice model.
 //
@@ -105,6 +107,11 @@ export type ChoiceSet = {
    * passes. When false, the choice is optional / advisory.
    */
   required: boolean
+  /**
+   * When true, the builder must fill capacity (`max`) to complete. When false,
+   * copy uses "up to" and under-fill is valid. Defaults to {@link ChoiceSet.required}.
+   */
+  requiredToComplete?: boolean
   /** Structured ownership for presentation and sorting. */
   provenance?: ChoiceSetProvenance
   /** When set, the option pool is unconstrained (e.g. any skill). */
@@ -138,6 +145,11 @@ export function buildChoiceSetId(
 // Satisfaction helpers
 // ---------------------------------------------------------------------------
 
+/** Resolved builder completion policy for a ChoiceSet. */
+export function resolveChoiceSetRequiredToComplete(choiceSet: ChoiceSet): boolean {
+  return choiceSet.requiredToComplete ?? choiceSet.required
+}
+
 /**
  * Returns true when the selections for this ChoiceSet meet its `min`
  * constraint.
@@ -147,14 +159,14 @@ export function isChoiceSetSatisfied(choiceSet: ChoiceSet, selections: readonly 
 }
 
 /**
- * Returns true when every `required` ChoiceSet in the list is satisfied by
- * the given selection map (keyed by ChoiceSet id).
+ * Returns true when every `required` ChoiceSet in the list is builder-complete
+ * for the given selection map (keyed by ChoiceSet id).
  */
 export function areRequiredChoiceSetsSatisfied(
   choiceSets: readonly ChoiceSet[],
   selectionMap: Readonly<Record<string, string[] | readonly string[]>>,
 ): boolean {
   return choiceSets.every(
-    (cs) => !cs.required || isChoiceSetSatisfied(cs, selectionMap[cs.id] ?? []),
+    (cs) => !cs.required || isChoiceSetBuilderComplete(cs, selectionMap[cs.id] ?? []),
   )
 }

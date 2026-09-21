@@ -24,7 +24,7 @@ export const SPELLS_CHOOSE_CLASS_PROMPT_HEADING = 'Choose a class to configure s
 export const SPELLS_CHOOSE_CLASS_PROMPT_DESCRIPTION =
   'Your class determines whether you can cast spells and which spells are available.'
 
-export const SPELLS_STEP_PENDING_ABILITY_LABEL = 'Pending ability scores'
+export const SPELLS_STEP_PENDING_ABILITY_LABEL = 'Calculated after ability scores'
 
 export const SPELLS_STEP_SELECTION_FULL_REASON = BUILDER_SELECTION_FULL_NOTICE
 
@@ -34,7 +34,7 @@ export const SPELLS_STEP_OVER_SELECTION_MESSAGE =
 export const SPELLCASTING_FACT_SUMMARY_HEADING = 'Spellcasting' as const
 
 export const SPELLCASTING_FACT_SUMMARY_SUBHEAD =
-  'Your class determines your spellcasting ability and how these values are calculated.' as const
+  'Your class sets your spellcasting ability. Your spell save DC and spell attack modifier are calculated automatically.' as const
 
 /** ChoiceSets owned by the spells builder step. */
 export function choiceSetsForSpellsStep(choiceSets: readonly ChoiceSet[]): ChoiceSet[] {

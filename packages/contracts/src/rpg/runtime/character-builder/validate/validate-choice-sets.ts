@@ -1,6 +1,13 @@
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
-import { isChoiceSetSatisfied } from '../choice-set'
-import type { ChoiceSet } from '../choice-set'
+import {
+  isChoiceSetSatisfied,
+  resolveChoiceSetRequiredToComplete,
+  type ChoiceSet,
+} from '../choice-set'
+import {
+  isChoiceSetBuilderComplete,
+  resolveChoiceSetAvailability,
+} from '../resolve-choice-set-availability'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import { indexCharacterBuildCatalog } from '../context'
 import { indexPlayableBuilderCatalog } from '../preview/index-playable-builder-catalog'
@@ -32,16 +39,29 @@ function spellChoiceCountIssues(
 ): CharacterBuildValidationIssue[] {
   const issues: CharacterBuildValidationIssue[] = []
 
-  if (choiceSet.required && !isChoiceSetSatisfied(choiceSet, selections)) {
-    const remaining = choiceSet.min - selections.length
-    const message =
-      choiceSet.choiceType === 'cantrip'
-        ? characterBuilderValidationMessages.chooseCantrips({ count: remaining })
-        : characterBuilderValidationMessages.chooseSpells({ count: remaining })
+  if (
+    choiceSet.required &&
+    resolveChoiceSetRequiredToComplete(choiceSet) &&
+    !isChoiceSetBuilderComplete(choiceSet, selections)
+  ) {
+    const { effectiveRequiredCount, availability } = resolveChoiceSetAvailability(choiceSet)
 
-    issues.push(
-      validationIssue('choice_set_unsatisfied', message, { stepId, choiceSetId: choiceSet.id }),
-    )
+    if (availability !== 'none') {
+      const remaining = Math.max(0, effectiveRequiredCount - selections.length)
+      if (remaining > 0) {
+        const message =
+          choiceSet.choiceType === 'cantrip'
+            ? characterBuilderValidationMessages.chooseCantrips({ count: remaining })
+            : characterBuilderValidationMessages.chooseSpells({ count: remaining })
+
+        issues.push(
+          validationIssue('choice_set_unsatisfied', message, {
+            stepId,
+            choiceSetId: choiceSet.id,
+          }),
+        )
+      }
+    }
   }
 
   if (selections.length > choiceSet.max) {

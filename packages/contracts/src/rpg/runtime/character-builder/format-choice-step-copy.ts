@@ -1,7 +1,12 @@
-import { formatSpellLevel } from '../../content/spell/levels'
 import { joinNaturalList } from '../../primitives/prose'
+import type { ChoiceCounterVerb } from './format-spell-acquisition-copy'
 import type { ChoiceSet } from './choice-set'
 import { formatChoiceChosenCounter } from './format-choice-set-drawer-copy'
+import {
+  formatChoiceSetAvailabilityAfterSelection,
+  formatChoiceSetRequiredLead,
+} from './resolve-choice-set-availability'
+import { resolveChoiceSetRequiredToComplete } from './choice-set'
 import {
   getLanguageGrantAddLabel,
   getLanguageGrantCompactAddLabel,
@@ -35,6 +40,9 @@ export type ChoiceAggregateCount = {
   selected: number
   max: number
   label: string
+  verb?: ChoiceCounterVerb
+  requiredToComplete?: boolean
+  effectiveRequiredCount?: number
 }
 
 export type ChoiceSubheadStyle = 'proficiency' | 'spell'
@@ -151,10 +159,7 @@ type SingleSetSupportingCopyInput = {
   spellLevel?: number
 }
 
-function formatConstrainedSpellPoolInstruction(
-  choiceSet: ChoiceSet,
-  spellLevel: number | undefined,
-): string {
+function formatConstrainedSpellPoolInstruction(choiceSet: ChoiceSet): string {
   const choiceType = choiceSet.choiceType === 'cantrip' ? 'cantrip' : 'spell'
   const { options } = choiceSet
   const optionCount = options.length
@@ -168,11 +173,17 @@ function formatConstrainedSpellPoolInstruction(
     return `Choose from ${optionCount} available cantrips.`
   }
 
-  if (spellLevel !== undefined && spellLevel >= 1) {
-    return `Choose from ${optionCount} available ${formatSpellLevel(spellLevel).toLowerCase()}-level spells.`
-  }
-
   return `Choose from ${optionCount} available ${spellNounFor('spell', optionCount)}.`
+}
+
+export function resolveChoiceBlockAvailabilityMessage(
+  choiceSet: ChoiceSet,
+  selections: readonly string[],
+): string | undefined {
+  return (
+    formatChoiceSetRequiredLead(choiceSet) ??
+    formatChoiceSetAvailabilityAfterSelection(choiceSet, selections)
+  )
 }
 
 /** Single-set supporting copy — folds identity and meaningful pool constraint. */
@@ -182,11 +193,10 @@ export function formatChoiceSingleSetSupportingCopy({
   headingSourceCoverage,
   hasFixedGrantsInCategory,
   subheadStyle,
-  spellLevel,
 }: SingleSetSupportingCopyInput): ChoiceSingleSetSupportingCopy {
   if (subheadStyle === 'spell') {
     return {
-      instruction: formatConstrainedSpellPoolInstruction(choiceSet, spellLevel),
+      instruction: formatConstrainedSpellPoolInstruction(choiceSet),
     }
   }
 
@@ -262,11 +272,13 @@ type AggregateCountInput = {
   choiceSet: ChoiceSet
   selectedCount: number
   max: number
+  verb?: ChoiceCounterVerb
 }
 
 /** Aggregate count when every choice set is required with a fixed pick count. */
 export function resolveChoiceAggregateCount(
   choiceBlocks: readonly AggregateCountInput[],
+  verb: ChoiceCounterVerb = 'chosen',
 ): ChoiceAggregateCount | null {
   if (choiceBlocks.length === 0) return null
 
@@ -277,11 +289,16 @@ export function resolveChoiceAggregateCount(
 
   const selected = choiceBlocks.reduce((sum, block) => sum + block.selectedCount, 0)
   const max = choiceBlocks.reduce((sum, block) => sum + block.max, 0)
+  const requiredToComplete = choiceBlocks.every((block) =>
+    resolveChoiceSetRequiredToComplete(block.choiceSet),
+  )
 
   return {
     selected,
     max,
-    label: formatChoiceChosenCounter(selected, max),
+    label: formatChoiceChosenCounter(selected, max, verb),
+    verb,
+    requiredToComplete,
   }
 }
 
@@ -331,10 +348,9 @@ export type FormatChoicePoolDescriptionInput = {
 /** Compact pool copy for a single choice block. */
 export function formatChoicePoolDescription({
   choiceSet,
-  spellLevel,
 }: FormatChoicePoolDescriptionInput): string {
   if (choiceSet.choiceType === 'cantrip' || choiceSet.choiceType === 'spell') {
-    return formatConstrainedSpellPoolInstruction(choiceSet, spellLevel)
+    return formatConstrainedSpellPoolInstruction(choiceSet)
   }
 
   if (choiceSet.poolSource === 'any') {
