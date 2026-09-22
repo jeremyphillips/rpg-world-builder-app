@@ -44,6 +44,7 @@ const TYPE_CATEGORIES: Record<FieldConfig['type'], FieldMessageCategory> = {
   checkbox: 'boolean',
   switch: 'boolean',
   inputSelect: 'text',
+  relationship: 'array',
 }
 
 export function fieldCategory(field: FieldConfig): FieldMessageCategory {

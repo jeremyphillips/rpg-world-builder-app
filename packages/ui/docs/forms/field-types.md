@@ -358,6 +358,26 @@ Nested `{ valueKey, unitKey }` for multi-unit enums. Single unit: `fixedUnit` + 
 
 `valueDigitsDependsOn` + `valueDigitsLookup` when width tracks another field.
 
+## Relationship (`relationship`)
+
+Typed content-entity edge list with vocabulary-driven picker wiring.
+
+```ts
+{
+  type: 'relationship',
+  name: 'organizations',
+  label: 'Organizations',
+  vocabulary: 'character_organization_membership',
+  emptyLabel: 'No organizations connected yet.',
+  addActionLabel: 'Add organization',
+}
+```
+
+- Value is an RHF field array of edge objects.
+- Wrap the form in `RelationshipFieldProvider` with a `registry` mapping `vocabulary` ids to
+  `RelationshipFieldAdapter` implementations (row projection + picker drawer).
+- `cardinality: 'one'` replaces the array on add instead of appending.
+
 ## Combobox (`combobox`)
 
 Searchable dropdown for large lists (catalog refs).

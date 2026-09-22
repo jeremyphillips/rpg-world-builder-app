@@ -955,6 +955,11 @@ export {
   type ComboboxRenderSelectedItem,
   type ComboboxSelectedItemRenderContext,
 } from './components/ui/combobox-field.client'
+export {
+  RelationshipField,
+  type RelationshipFieldProps,
+  type RelationshipFieldAddAction,
+} from './components/ui/relationship-field.client'
 
 export {
   EditableGrid,

@@ -20,7 +20,7 @@ vi.mock('@/features/character', async (importOriginal) => {
   const actual = await importOriginal<typeof CharacterFeature>()
   return {
     ...actual,
-    CharacterOrganizationMembershipsContainer: () => null,
+    CharacterIdentityConnectionsSupplement: () => null,
   }
 })
 

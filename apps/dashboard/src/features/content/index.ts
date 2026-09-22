@@ -50,6 +50,8 @@ export type {
   EntityAnatomyTrailingSecondary,
 } from './lib/entity/anatomy/entity-anatomy-trailing.types'
 export { EntityAnatomyHost } from './lib/entity/anatomy/entity-anatomy'
+export { CrossContentRelationshipRow } from './lib/relationship/list/row/cross-content-relationship-row'
+export type { CrossContentRelationshipRowProps } from './lib/relationship/list/row/cross-content-relationship-row'
 export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row'
 export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row'
 export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
@@ -144,6 +146,7 @@ export {
   useOrganizationMembers,
 } from './organizations'
 export { useLocations, locationsQueryKey } from './locations'
+export { listLocations } from './locations/api/locations-api'
 export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'
 export { SpellCreate } from './spells/routes/spell-create'
 export { SpellEdit } from './spells/routes/spell-edit'

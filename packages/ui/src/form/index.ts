@@ -448,6 +448,17 @@ export {
 } from './renderers/array/array-item-issue.client'
 export { buildFieldRendererIds } from './renderers/field-renderer-config.lib'
 export {
+  RelationshipFieldProvider,
+  resolveRelationshipFieldAdapter,
+  useRelationshipFieldContext,
+  type RelationshipFieldAdapter,
+  type RelationshipFieldPickerProps,
+  type RelationshipFieldProviderProps,
+  type RelationshipFieldRegistry,
+  type RelationshipFieldRowActions,
+  type RelationshipFieldRowContent,
+} from './context/relationship-field.context'
+export {
   ArrayLikeSectionHeader,
   type ArrayLikeSectionHeaderProps,
   type ArrayLikeSectionHeaderWrapper,
