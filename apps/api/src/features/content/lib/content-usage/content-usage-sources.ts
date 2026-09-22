@@ -11,6 +11,11 @@ import {
 } from '@rpg/contracts'
 
 import {
+  indexCharacterRelationshipCharacterBlockersByContentId,
+  indexCharacterRelationshipLocationBlockersByContentId,
+  indexCharacterRelationshipOrganizationBlockersByContentId,
+} from '../../../character-relationships'
+import {
   indexCharacterBlockersByContentId,
   indexCharacterEquipmentBlockersByContentId,
 } from './reference-sources/characters'
@@ -79,4 +84,16 @@ export const locationParentReferenceSource: ContentUsageSource = {
 
 export const campaignPrimaryWorldReferenceSource: ContentUsageSource = {
   loadBlockerIndex: (ctx) => indexCampaignPrimaryWorldBlockersByContentId(ctx),
+}
+
+export const characterRelationshipOrganizationSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexCharacterRelationshipOrganizationBlockersByContentId(ctx),
+}
+
+export const characterRelationshipLocationSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexCharacterRelationshipLocationBlockersByContentId(ctx),
+}
+
+export const characterRelationshipCharacterSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexCharacterRelationshipCharacterBlockersByContentId(ctx),
 }

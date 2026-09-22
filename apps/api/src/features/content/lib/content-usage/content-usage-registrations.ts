@@ -8,6 +8,8 @@ import {
   characterEquipmentSource,
   characterFeatSource,
   characterOrganizationSource,
+  characterRelationshipLocationSource,
+  characterRelationshipOrganizationSource,
   characterLocationSource,
   characterSkillProficiencySource,
   characterSpeciesSource,
@@ -73,7 +75,10 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'organizations',
-    sources: [{ source: characterOrganizationSource, entry: true, batch: true }],
+    sources: [
+      { source: characterOrganizationSource, entry: true, batch: true },
+      { source: characterRelationshipOrganizationSource, entry: true, batch: true },
+    ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'fixed', kind: 'member' },
@@ -84,6 +89,7 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
       { source: locationParentReferenceSource, entry: true, batch: true },
       { source: campaignPrimaryWorldReferenceSource, entry: true, batch: true },
       { source: characterLocationSource, entry: true, batch: true },
+      { source: characterRelationshipLocationSource, entry: true, batch: true },
       { source: organizationLocationSource, entry: true, batch: true },
     ],
     summaryLabels: { singular: 'location', plural: 'locations' },
