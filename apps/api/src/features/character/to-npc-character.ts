@@ -1,4 +1,9 @@
-import { npcCharacterSchema, normalizeCharacterVital, type NpcCharacter } from '@rpg/contracts'
+import {
+  npcCharacterSchema,
+  normalizeCharacterVital,
+  normalizeStoredCharacterGender,
+  type NpcCharacter,
+} from '@rpg/contracts'
 
 import type { CharacterSchemaType } from './character.model'
 
@@ -22,7 +27,7 @@ export function toNpcCharacter(doc: CharacterRecord): NpcCharacter {
     classes: doc.classes,
     species: doc.species,
     alignment: doc.alignment,
-    gender: doc.gender,
+    gender: normalizeStoredCharacterGender(doc.gender),
     xp: doc.xp,
     abilityScores: doc.abilityScores,
     hitPoints: doc.hitPoints,

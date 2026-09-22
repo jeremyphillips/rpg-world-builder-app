@@ -30,9 +30,18 @@ export const CHARACTER_GENDER_ENTRIES = {
 
 export type CharacterGender = keyof typeof CHARACTER_GENDER_ENTRIES
 
+/** Default when legacy stored characters omit gender (pre–gender rollout). */
+export const DEFAULT_CHARACTER_GENDER: CharacterGender = 'male'
+
 export const CHARACTER_GENDERS = keysFromEntries(CHARACTER_GENDER_ENTRIES)
 
 export const genderSchema = vocabEnumFromEntries(CHARACTER_GENDER_ENTRIES)
+
+/** Read-path normalization for stored characters missing or invalid gender. */
+export function normalizeStoredCharacterGender(input?: unknown): CharacterGender {
+  const parsed = genderSchema.safeParse(input)
+  return parsed.success ? parsed.data : DEFAULT_CHARACTER_GENDER
+}
 
 /** Coerces blank select sentinels before enum validation (forms, persisted drafts). */
 export const optionalGenderSchema = z.preprocess(

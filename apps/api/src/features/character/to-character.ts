@@ -1,4 +1,9 @@
-import { pcCharacterSchema, normalizeCharacterVital, type PcCharacter } from '@rpg/contracts'
+import {
+  pcCharacterSchema,
+  normalizeCharacterVital,
+  normalizeStoredCharacterGender,
+  type PcCharacter,
+} from '@rpg/contracts'
 
 import type { CharacterSchemaType } from './character.model'
 
@@ -23,7 +28,7 @@ export function toCharacter(doc: CharacterRecord): PcCharacter {
     classes: doc.classes,
     species: doc.species,
     alignment: doc.alignment,
-    gender: doc.gender,
+    gender: normalizeStoredCharacterGender(doc.gender),
     xp: doc.xp,
     abilityScores: doc.abilityScores,
     hitPoints: doc.hitPoints,
