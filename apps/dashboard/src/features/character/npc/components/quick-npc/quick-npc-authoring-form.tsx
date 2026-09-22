@@ -27,7 +27,7 @@ import {
   countQuickNpcConfiguredRequirements,
   quickNpcAuthoringTabDefaultValues,
   quickNpcAuthoringTabSchema,
-  type QuickNpcAuthoringTabValues,
+  type QuickNpcAuthoringTabFormValues,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import {
@@ -55,7 +55,7 @@ export type QuickNpcAuthoringFormProps = {
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
   setup: QuickNpcSetupValues
-  initialValues?: Partial<QuickNpcAuthoringTabValues> | undefined
+  initialValues?: Partial<QuickNpcAuthoringTabFormValues> | undefined
   onCancel: () => void
   onChangeSetup: () => void
   onSetupSummaryEdit: (target: SetupSummaryEditTarget) => void
@@ -115,7 +115,7 @@ function QuickNpcAuthoringTabsSync({
   configuredCount,
   onTabsChange,
 }: {
-  form: UseFormReturn<QuickNpcAuthoringTabValues>
+  form: UseFormReturn<QuickNpcAuthoringTabFormValues>
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
   configuredCount: number
@@ -151,8 +151,8 @@ function RequirementCountWatcher({
   fallback,
   onConfiguredCountChange,
 }: {
-  form: UseFormReturn<QuickNpcAuthoringTabValues>
-  fallback: Pick<QuickNpcAuthoringTabValues, 'requiredWeaponIds' | 'requiredSpellIds'>
+  form: UseFormReturn<QuickNpcAuthoringTabFormValues>
+  fallback: Pick<QuickNpcAuthoringTabFormValues, 'requiredWeaponIds' | 'requiredSpellIds'>
   onConfiguredCountChange: (count: number) => void
 }) {
   const requiredWeaponIds = useWatch({
@@ -237,7 +237,7 @@ export function QuickNpcAuthoringForm({
     [buildContext, createContext, organization?.members?.titles, setup],
   )
 
-  const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabValues>({
+  const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabFormValues>({
     submit: async (tabValues) => {
       if (!isQuickNpcSetupStillValid(setup, buildContext)) {
         onChangeSetup()
@@ -247,7 +247,7 @@ export function QuickNpcAuthoringForm({
       const input = buildQuickNpcAuthoringCreateInput({
         createContext,
         setup,
-        tabValues,
+        tabValues: schema.parse(tabValues),
         buildContext,
       })
 
@@ -259,7 +259,7 @@ export function QuickNpcAuthoringForm({
   })
 
   return (
-    <TabbedForm<QuickNpcAuthoringTabValues>
+    <TabbedForm<QuickNpcAuthoringTabFormValues>
       key={`${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
       density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
       schema={schema}

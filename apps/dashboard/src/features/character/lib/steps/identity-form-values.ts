@@ -63,6 +63,7 @@ export function identityDraftToFormValues(
   identity: CharacterBuilderDraftIdentity,
 ): IdentityFormValues {
   return {
+    gender: identity.gender,
     name: identity.name ?? '',
     narrative: narrativeDraftToFormValues(identity.narrative),
     alignment: identity.alignment,
@@ -73,6 +74,7 @@ export function identityFormValuesToDraft(
   values: IdentityFormValues,
 ): CharacterBuilderDraftIdentity {
   return {
+    gender: values.gender || undefined,
     name: values.name.trim(),
     narrative: narrativeFormValuesToDraft(values.narrative),
     alignment: values.alignment || undefined,
@@ -95,7 +97,8 @@ function identityDraftFingerprint(identity: CharacterBuilderDraftIdentity): stri
   const name = identity.name ?? ''
   const imageKey = identity.imageKey ?? ''
   const alignment = identity.alignment ?? ''
-  return `${name}\0${narrativeFingerprint(identity.narrative)}\0${imageKey}\0${alignment}`
+  const gender = identity.gender ?? ''
+  return `${name}\0${narrativeFingerprint(identity.narrative)}\0${imageKey}\0${alignment}\0${gender}`
 }
 
 /** Compares normalized identity slices — avoids redundant draft writes during live sync. */

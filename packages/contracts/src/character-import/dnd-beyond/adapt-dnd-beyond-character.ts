@@ -1,6 +1,7 @@
 // fallow-ignore-file complexity
 import type { CoinWealth } from '../../rpg/primitives/wealth'
 import type { Alignment } from '../../rpg/vocab/alignment'
+import type { CharacterGender } from '../../rpg/vocab/character-gender'
 import type { CharacterAbilityScores } from '../../rpg/runtime/character/sheet/core'
 import type { DndBeyondCharacterPayload, DndBeyondModifier } from './dnd-beyond-character.schema'
 import {
@@ -70,6 +71,11 @@ const DND_BEYOND_ALIGNMENT_ID_TO_LOCAL: Record<number, Alignment> = {
   7: 'le',
   8: 'ne',
   9: 'ce',
+}
+
+const DND_BEYOND_GENDER_NAME_TO_LOCAL: Record<string, CharacterGender> = {
+  male: 'male',
+  female: 'female',
 }
 
 const DND_BEYOND_ALIGNMENT_NAME_TO_LOCAL: Record<string, Alignment> = {
@@ -324,6 +330,28 @@ function extractAbilityScores(
 
 function mapAlignmentName(value: string): Alignment | undefined {
   return DND_BEYOND_ALIGNMENT_NAME_TO_LOCAL[value.trim().toLowerCase()]
+}
+
+function extractGender(
+  payload: DndBeyondCharacterPayload,
+): CharacterImportFieldResult<CharacterGender> {
+  const sourcePaths = ['data.gender']
+  const genderValue = payload.gender?.trim()
+
+  if (!genderValue) {
+    return fieldResult('missing-source', sourcePaths, [
+      'Gender is not set on the source character.',
+    ])
+  }
+
+  const gender = DND_BEYOND_GENDER_NAME_TO_LOCAL[genderValue.toLowerCase()]
+  if (!gender) {
+    return fieldResult('invalid-value', sourcePaths, [
+      `Source gender "${genderValue}" is not recognized.`,
+    ])
+  }
+
+  return mappedFieldResult(gender, sourcePaths)
 }
 
 function extractAlignment(
@@ -935,6 +963,7 @@ export function adaptDndBeyondCharacter(
     classes: extractClasses(payload),
     abilityScores: extractAbilityScores(payload),
     alignment: extractAlignment(payload),
+    gender: extractGender(payload),
     xp: extractXp(payload),
     narrative: extractNarrative(payload),
     hitPoints: extractHitPoints(payload),

@@ -14,6 +14,7 @@ const emptyNarrative = emptyNarrativeFormValues()
 
 const fullIdentityDraft: CharacterBuilderDraftIdentity = {
   name: 'Verna',
+  gender: 'female',
   alignment: 'ng',
   narrative: {
     personalityTraits: ['Quiet and watchful.'],
@@ -27,6 +28,7 @@ const fullIdentityDraft: CharacterBuilderDraftIdentity = {
 describe('identityDraftToFormValues', () => {
   it('maps all narrative slots to form values', () => {
     expect(identityDraftToFormValues(fullIdentityDraft)).toEqual({
+      gender: 'female',
       name: 'Verna',
       alignment: 'ng',
       narrative: {

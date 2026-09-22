@@ -2,10 +2,13 @@ import { z } from 'zod'
 import type { ReactNode } from 'react'
 import {
   ALIGNMENTS,
+  CHARACTER_GENDERS,
   characterBuilderValidationMessages,
   formatFieldMessage,
   getAlignmentLabel,
+  getGenderLabel,
   optionalAlignmentSchema,
+  optionalGenderSchema,
 } from '@rpg/contracts'
 import { CANVAS_SURFACE, toOptions, type FormItem } from '@rpg/ui/form'
 
@@ -22,6 +25,7 @@ const narrativeFormSchema = z.object({
 })
 
 export const identityFormSchema = z.object({
+  gender: optionalGenderSchema,
   name: z
     .string()
     .trim()
@@ -35,6 +39,10 @@ export type IdentityFormValues = z.infer<typeof identityFormSchema>
 const ALIGNMENT_LABELS = Object.fromEntries(
   ALIGNMENTS.map((alignment) => [alignment, getAlignmentLabel(alignment)]),
 ) as Record<(typeof ALIGNMENTS)[number], string>
+
+const GENDER_LABELS = Object.fromEntries(
+  CHARACTER_GENDERS.map((gender) => [gender, getGenderLabel(gender)]),
+) as Record<(typeof CHARACTER_GENDERS)[number], string>
 
 function narrativeArrayField(
   name: 'personalityTraits' | 'ideals' | 'bonds' | 'flaws',
@@ -90,6 +98,14 @@ export function buildIdentityStepFormFields({
       kind: 'group',
       fieldChrome: { variant: 'none' },
       fields: [
+        {
+          type: 'chips',
+          name: 'gender',
+          label: 'Gender',
+          multiple: false,
+          options: toOptions(CHARACTER_GENDERS, GENDER_LABELS),
+          width: 'full',
+        },
         {
           kind: 'row',
           fields: [

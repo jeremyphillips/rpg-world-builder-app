@@ -14,6 +14,7 @@ const baseInput: CreateCharacterInput = {
   classes: [{ classId: 'srd-cc-5.2.1:fighter', subclassId: 'srd-cc-5.2.1:champion', level: 7 }],
   species: { id: 'srd-cc-5.2.1:elf', heritageId: 'high-elf' },
   alignment: 'ng',
+  gender: 'male',
   xp: 23000,
   abilityScores: { str: 16, dex: 14, con: 15, int: 10, wis: 12, cha: 8 },
   hitPoints: { base: 58, current: 58, temporary: 0 },

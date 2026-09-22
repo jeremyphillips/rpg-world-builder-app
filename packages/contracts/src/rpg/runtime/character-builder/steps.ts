@@ -70,7 +70,7 @@ type BuilderStepMeta = {
 const BUILDER_STEP_METADATA = {
   identity: {
     label: 'Identity',
-    description: 'Name, appearance, and alignment',
+    description: 'Gender, name, and alignment',
   },
   connections: {
     label: 'Connections',

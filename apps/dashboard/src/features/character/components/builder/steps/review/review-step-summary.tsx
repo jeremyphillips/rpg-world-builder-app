@@ -10,6 +10,8 @@ import { getContentTypeItemLabel } from '@/features/content'
 import { characterBuilderPreviewStatGridClasses } from '../../character-builder-shell.variants'
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../../../lib/display/character-display'
 import { resolveBuilderModelingAdvisories } from '../../../../lib/builder-preview/builder-review-advisories.lib'
+import { getGenderLabel } from '@rpg/contracts'
+
 import {
   formatAbilityMethodLabel,
   formatReviewAlignment,
@@ -44,6 +46,10 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
   return (
     <>
       <dl className="grid gap-3 sm:grid-cols-2">
+        <ReviewRow
+          label="Gender"
+          value={draft.identity.gender ? getGenderLabel(draft.identity.gender) : 'Not set'}
+        />
         <ReviewRow label="Name" value={draft.identity.name?.trim() || 'Not set'} />
         <ReviewRow label="Alignment" value={formatReviewAlignment(draft.identity.alignment)} />
         <ReviewRow label="Level" value={String(draft.class.level)} />

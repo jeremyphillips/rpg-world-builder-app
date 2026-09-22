@@ -16,6 +16,7 @@ import {
   deriveCharacterProfile,
   formatSignedModifier,
   formatWeaponDamageWithModifier,
+  getGenderLabel,
   getCharacterLocationConnectionDisplayLabel,
   getCharacterTotalLevel,
   getMovementModeLabel,
@@ -448,6 +449,7 @@ export function buildCharacterDetailViewModel({
     identity: {
       name: character.name,
       summary: formatCharacterSummaryFromCatalog(character, catalogIndex),
+      gender: getGenderLabel(character.gender),
       xp: buildIdentityXp(character, xpProgression),
       vital: character.vital,
       vitalLabel: resolveCharacterVitalStatusPresentation(character.vital.status).label,

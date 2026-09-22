@@ -15,6 +15,10 @@ const CREATE_INPUT_ZOD_PATH_MESSAGES: ReadonlyArray<{
     message: characterBuilderValidationMessages.alignmentRequired,
   },
   {
+    matches: (path) => path === 'gender',
+    message: characterBuilderValidationMessages.genderRequired,
+  },
+  {
     matches: (path) => path === 'species' || path === 'species.id',
     message: characterBuilderValidationMessages.speciesRequired,
   },

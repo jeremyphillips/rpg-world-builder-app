@@ -24,6 +24,7 @@ export function projectCharacterEligibilitySubjectFromCharacter(
     classes: character.classes,
     species: character.species,
     alignment: character.alignment,
+    gender: character.gender,
     xp: character.xp,
     abilityScores: character.abilityScores,
     hitPoints: character.hitPoints,

@@ -19,6 +19,7 @@ type IdentityDraftSyncProps = {
 /** Keeps identity form state and the persisted builder draft in sync (both directions). */
 export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraftSyncProps) {
   const { control, reset } = useFormContext<IdentityFormValues>()
+  const gender = useWatch({ control, name: 'gender' })
   const name = useWatch({ control, name: 'name' })
   const narrative = useWatch({ control, name: 'narrative' })
   const alignment = useWatch({ control, name: 'alignment' })
@@ -33,6 +34,7 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
     const previousDraft = priorDraftRef.current
     const draftChanged = !areIdentityDraftsEqual(previousDraft, draftIdentity)
     const formIdentity = identityFormValuesToDraft({
+      gender,
       name: name ?? '',
       narrative: narrative ?? emptyNarrativeFormValues(),
       alignment,
@@ -49,7 +51,7 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
     if (!areIdentityDraftsEqual(draftIdentity, formIdentity)) {
       onDraftChangeRef.current({ identity: formIdentity })
     }
-  }, [alignment, draftIdentity, name, narrative, reset])
+  }, [alignment, draftIdentity, gender, name, narrative, reset])
 
   return null
 }

@@ -138,6 +138,7 @@ function renderForm(overrides: Partial<React.ComponentProps<typeof QuickNpcAutho
 }
 
 async function fillAuthoringFields(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('radio', { name: 'Male' }))
   await user.type(screen.getByRole('textbox', { name: /name/i }), 'Guard Captain')
   await user.click(screen.getByRole('combobox', { name: /alignment/i }))
   await user.click(screen.getByRole('option', { name: /lawful neutral/i }))

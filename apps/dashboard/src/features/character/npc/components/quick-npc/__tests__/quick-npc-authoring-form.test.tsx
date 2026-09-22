@@ -158,7 +158,7 @@ describe('QuickNpcAuthoringForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /Details.*1 field needs attention/i }),
+        screen.getByRole('button', { name: /Details.*2 fields need attention/i }),
       ).toBeInTheDocument()
     })
   })
@@ -187,6 +187,7 @@ describe('QuickNpcAuthoringForm', () => {
       }),
     })
 
+    await user.click(screen.getByRole('radio', { name: 'Male' }))
     await user.type(screen.getByRole('textbox', { name: /name/i }), 'Guard Captain')
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 

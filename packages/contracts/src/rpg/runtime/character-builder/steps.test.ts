@@ -37,7 +37,7 @@ function makeDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBui
 
 function makeCompleteDraft(): CharacterBuilderDraft {
   return {
-    identity: { name: 'Verna', alignment: 'ng' },
+    identity: { name: 'Verna', alignment: 'ng', gender: 'female' },
     species: { speciesId: 'srd-cc-5.2.1:elf' },
     class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
     abilities: {
@@ -159,7 +159,7 @@ describe('BUILDER_STEPS', () => {
 
 describe('getBuilderStepCompactDescription', () => {
   it('falls back to the full step subhead when compact copy is absent', () => {
-    expect(getBuilderStepCompactDescription('identity')).toBe('Name, appearance, and alignment')
+    expect(getBuilderStepCompactDescription('identity')).toBe('Gender, name, and alignment')
   })
 
   it('returns tighter rail copy when authored', () => {
@@ -537,9 +537,7 @@ describe('resolveBuilderStepDescription', () => {
   it('returns static compact metadata for non-review steps', () => {
     const context = createCharacterBuildContext()
 
-    expect(resolveBuilderStepDescription(context, 'identity')).toBe(
-      'Name, appearance, and alignment',
-    )
+    expect(resolveBuilderStepDescription(context, 'identity')).toBe('Gender, name, and alignment')
   })
 
   it('returns compact rail copy when authored separately from the step subhead', () => {

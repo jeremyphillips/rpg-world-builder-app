@@ -29,6 +29,7 @@ const baseCharacter = {
     heritageId: 'high-elf',
   },
   alignment: 'ng',
+  gender: 'female',
   xp: 23000,
   abilityScores: {
     str: 16,

@@ -131,6 +131,24 @@ const buildAlignmentCoverage: CoverageBuilder = (extraction) => {
   }
 }
 
+const buildGenderCoverage: CoverageBuilder = (extraction) => {
+  if (extraction.gender.status === 'mapped') {
+    return {
+      targetPath: 'gender',
+      state: 'mapped',
+      reason: 'Gender mapped from source gender data.',
+      sourcePaths: extraction.gender.sourcePaths,
+    }
+  }
+
+  return {
+    targetPath: 'gender',
+    state: 'not-applicable',
+    reason: 'Gender was not set on the source character.',
+    sourcePaths: extraction.gender.sourcePaths,
+  }
+}
+
 const buildXpCoverage: CoverageBuilder = (extraction) =>
   coverageForExtractionField(
     'xp',
@@ -349,6 +367,7 @@ const CREATE_INPUT_COVERAGE_BUILDERS: CoverageBuilder[] = [
   buildNameCoverage,
   buildAbilityScoresCoverage,
   buildAlignmentCoverage,
+  buildGenderCoverage,
   buildXpCoverage,
   buildHitPointsCoverage,
   buildNarrativeCoverage,

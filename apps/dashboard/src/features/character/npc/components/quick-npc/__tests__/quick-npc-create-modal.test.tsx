@@ -105,6 +105,12 @@ async function selectOption(
   await user.click(screen.getByRole('option', { name: optionName }))
 }
 
+async function fillAuthoringDetails(user: ReturnType<typeof userEvent.setup>, name: string) {
+  await user.click(screen.getByRole('radio', { name: 'Male' }))
+  await user.type(screen.getByRole('textbox', { name: /name/i }), name)
+  await selectOption(user, /alignment/i, /lawful neutral/i)
+}
+
 async function setBuildCardLevel(user: ReturnType<typeof userEvent.setup>, level: string) {
   const changeLevelButton = screen.queryByRole('button', {
     name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
@@ -343,8 +349,7 @@ describe('QuickNpcCreateModal', () => {
     const { props } = renderModal()
 
     await completeSetup(user)
-    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Guard Captain')
-    await selectOption(user, /alignment/i, /lawful neutral/i)
+    await fillAuthoringDetails(user, 'Guard Captain')
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
     await waitFor(() =>
@@ -381,8 +386,7 @@ describe('QuickNpcCreateModal', () => {
 
     const { props } = renderModal()
     await completeSetup(user)
-    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Guard Captain')
-    await selectOption(user, /alignment/i, /lawful neutral/i)
+    await fillAuthoringDetails(user, 'Guard Captain')
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
@@ -664,8 +668,7 @@ describe('QuickNpcCreateModal standalone context', () => {
     const { props } = renderStandaloneModal({ buildContext: standaloneBuildContextMinLevelOne })
 
     await completeStandaloneSetup(user)
-    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Town Guard')
-    await selectOption(user, /alignment/i, /lawful neutral/i)
+    await fillAuthoringDetails(user, 'Town Guard')
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
     await waitFor(() => expect(createNpcMock).toHaveBeenCalled())

@@ -20,7 +20,7 @@ const pcScores = { str: 16, dex: 14, con: 13, int: 12, wis: 10, cha: 8 } as cons
 
 describe('validate-step-fields', () => {
   it('validateIdentity reports friendly name copy', () => {
-    const issues = validateIdentity(createEmptyCharacterBuilderDraft(), false)
+    const issues = validateIdentity(createEmptyCharacterBuilderDraft())
 
     expect(issues).toEqual([
       expect.objectContaining({
@@ -32,20 +32,39 @@ describe('validate-step-fields', () => {
   })
 
   it('validateIdentity requires alignment only when requested', () => {
-    const withoutAlignment = validateIdentity(
-      { ...createEmptyCharacterBuilderDraft(), identity: { name: 'Verna' } },
-      false,
-    )
+    const withoutAlignment = validateIdentity({
+      ...createEmptyCharacterBuilderDraft(),
+      identity: { name: 'Verna' },
+    })
     expect(withoutAlignment.some((issue) => issue.code === 'alignment_required')).toBe(false)
 
     const withAlignment = validateIdentity(
       { ...createEmptyCharacterBuilderDraft(), identity: { name: 'Verna' } },
-      true,
+      { requireAlignment: true },
     )
     expect(withAlignment).toEqual([
       expect.objectContaining({
         code: 'alignment_required',
         message: formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()),
+      }),
+    ])
+  })
+
+  it('validateIdentity requires gender only when requested', () => {
+    const withoutGender = validateIdentity({
+      ...createEmptyCharacterBuilderDraft(),
+      identity: { name: 'Verna', alignment: 'ng' },
+    })
+    expect(withoutGender.some((issue) => issue.code === 'gender_required')).toBe(false)
+
+    const withGender = validateIdentity(
+      { ...createEmptyCharacterBuilderDraft(), identity: { name: 'Verna', alignment: 'ng' } },
+      { requireGender: true },
+    )
+    expect(withGender).toEqual([
+      expect.objectContaining({
+        code: 'gender_required',
+        message: formatFieldMessage(characterBuilderValidationMessages.genderRequired()),
       }),
     ])
   })

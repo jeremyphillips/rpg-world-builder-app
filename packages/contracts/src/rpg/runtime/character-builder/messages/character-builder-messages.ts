@@ -28,6 +28,10 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.alignmentRequired',
     () => 'Choose an alignment.',
   ),
+  genderRequired: defineMessage(
+    'validation.characterBuilder.genderRequired',
+    () => 'Choose a gender.',
+  ),
   speciesRequired: defineMessage(
     'validation.characterBuilder.speciesRequired',
     () => `Choose a ${getContentTypeSentenceForm('species')}.`,

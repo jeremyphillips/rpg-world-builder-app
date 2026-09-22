@@ -17,7 +17,7 @@ describe('review-step-display', () => {
   it('returns a ready message when validation passes', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      identity: { name: 'Verna', alignment: 'ng' as const },
+      identity: { name: 'Verna', alignment: 'ng' as const, gender: 'female' as const },
       species: { speciesId: 'srd-cc-5.2.1:dwarf' },
       class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
       abilities: {

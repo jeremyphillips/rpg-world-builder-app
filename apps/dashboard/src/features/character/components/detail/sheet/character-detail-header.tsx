@@ -4,6 +4,7 @@ import { Button, Heading, Text } from '@rpg/ui'
 type CharacterDetailHeaderProps = {
   name: string
   summary: string
+  gender: string
   xp: string | null
   statusSummary?: ReactNode
   statusActions?: ReactNode
@@ -15,6 +16,7 @@ type CharacterDetailHeaderProps = {
 export function CharacterDetailHeader({
   name,
   summary,
+  gender,
   xp,
   statusSummary,
   statusActions,
@@ -29,6 +31,9 @@ export function CharacterDetailHeader({
           {name}
         </Heading>
         <Text variant="muted">{summary}</Text>
+        <Text variant="muted" className="text-sm">
+          Gender: {gender}
+        </Text>
         {xp !== null ? <Text variant="muted">{xp} XP</Text> : null}
         {statusSummary ? (
           <div className="flex flex-wrap items-center gap-3 pt-1">

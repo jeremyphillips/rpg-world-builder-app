@@ -12,6 +12,7 @@ function makeCompleteDraft() {
     identity: {
       name: 'Verna',
       alignment: 'ng' as const,
+      gender: 'female' as const,
       narrative: { backstory: 'A veteran soldier.' },
     },
     species: { speciesId: 'srd-cc-5.2.1:dwarf' },

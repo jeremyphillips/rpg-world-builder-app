@@ -58,6 +58,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
   const buildContext = quickNpcTestContext()
   const tabValues = {
     ...quickNpcAuthoringTabDefaultValues,
+    gender: 'male' as const,
     name: 'Guard Captain',
     alignment: 'ln' as const,
   }

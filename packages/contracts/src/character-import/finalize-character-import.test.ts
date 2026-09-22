@@ -88,6 +88,7 @@ describe('finalizeCharacterImport', () => {
       rulesetId: 'srd-cc-5.2.1',
       catalogIndex,
       defaultAlignment: 'n',
+      defaultGender: 'male',
     })
 
     expect(input.characterType).toBe('pc')
@@ -98,6 +99,7 @@ describe('finalizeCharacterImport', () => {
     ])
     expect(input.species).toEqual({ id: 'srd-cc-5.2.1:human' })
     expect(input.alignment).toBe('n')
+    expect(input.gender).toBe('male')
     expect(input.spells.length).toBeGreaterThan(0)
     expect(
       input.equipment.weapons.some((entry) => entry.equipmentId === 'srd-cc-5.2.1:dagger'),
@@ -109,6 +111,17 @@ describe('finalizeCharacterImport', () => {
       finalizeCharacterImport(fixtureResult, {
         rulesetId: 'srd-cc-5.2.1',
         catalogIndex,
+        defaultGender: 'male',
+      }),
+    ).toThrow(CharacterImportFinalizationError)
+  })
+
+  it('throws when gender is missing and no default is provided', () => {
+    expect(() =>
+      finalizeCharacterImport(fixtureResult, {
+        rulesetId: 'srd-cc-5.2.1',
+        catalogIndex,
+        defaultAlignment: 'n',
       }),
     ).toThrow(CharacterImportFinalizationError)
   })
@@ -120,6 +133,7 @@ describe('finalizeNpcCharacterImport', () => {
       rulesetId: 'srd-cc-5.2.1',
       catalogIndex,
       defaultAlignment: 'n',
+      defaultGender: 'male',
     })
 
     expect(input).not.toHaveProperty('characterType')

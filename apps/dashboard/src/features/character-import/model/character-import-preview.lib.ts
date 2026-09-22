@@ -1,5 +1,6 @@
 import {
   formatAlignmentLabel,
+  getGenderLabel,
   formatWealth,
   getSkillName,
   getToolCategoryLabel,
@@ -39,6 +40,7 @@ export const EXTRACTION_FIELD_LABELS = {
   classes: getContentTypeCollectionLabel('classes'),
   abilityScores: 'Abilities',
   alignment: 'Alignment',
+  gender: 'Gender',
   xp: 'XP',
   hitPoints: 'Hit points',
   languages: 'Languages',
@@ -346,6 +348,8 @@ const EXTRACTION_DISPLAY_FORMATTERS: {
     result.value ? formatAbilityScores(result.value) : EXTRACTION_UNSET_DISPLAY_VALUE,
   alignment: (result) =>
     result.value ? formatAlignmentValue(result.value) : EXTRACTION_UNSET_DISPLAY_VALUE,
+  gender: (result) =>
+    result.value ? getGenderLabel(result.value) : EXTRACTION_UNSET_DISPLAY_VALUE,
   xp: (result) => (result.value != null ? String(result.value) : EXTRACTION_UNSET_DISPLAY_VALUE),
   hitPoints: (result) =>
     result.value ? formatHitPointsValue(result.value) : EXTRACTION_UNSET_DISPLAY_VALUE,

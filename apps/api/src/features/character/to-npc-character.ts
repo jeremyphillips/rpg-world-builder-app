@@ -22,6 +22,7 @@ export function toNpcCharacter(doc: CharacterRecord): NpcCharacter {
     classes: doc.classes,
     species: doc.species,
     alignment: doc.alignment,
+    gender: doc.gender,
     xp: doc.xp,
     abilityScores: doc.abilityScores,
     hitPoints: doc.hitPoints,

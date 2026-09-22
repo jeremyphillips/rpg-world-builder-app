@@ -275,6 +275,44 @@ describe('adaptDndBeyondCharacter edge cases', () => {
     expect(adapted.extraction.alignment.status).toBe('missing-source')
   })
 
+  it('maps known gender strings', () => {
+    const adapted = adaptDndBeyondCharacter(
+      {
+        ...dndBeyondCharacter133058471Payload,
+        gender: 'Female',
+      },
+      fixtureSource,
+      fixtureAdaptOptions,
+    )
+    expect(adapted.extraction.gender).toEqual(
+      expect.objectContaining({ status: 'mapped', value: 'female' }),
+    )
+  })
+
+  it('treats null gender as missing', () => {
+    const adapted = adaptDndBeyondCharacter(
+      {
+        ...dndBeyondCharacter133058471Payload,
+        gender: null,
+      },
+      fixtureSource,
+      fixtureAdaptOptions,
+    )
+    expect(adapted.extraction.gender.status).toBe('missing-source')
+  })
+
+  it('rejects unrecognized gender strings', () => {
+    const adapted = adaptDndBeyondCharacter(
+      {
+        ...dndBeyondCharacter133058471Payload,
+        gender: 'Other',
+      },
+      fixtureSource,
+      fixtureAdaptOptions,
+    )
+    expect(adapted.extraction.gender.status).toBe('invalid-value')
+  })
+
   it('prefers override stats over computed totals', () => {
     const adapted = adaptDndBeyondCharacter(
       {
