@@ -11,6 +11,10 @@ import { useCharacterOrganizationMembershipsSheet } from '../../../hooks/use-cha
 import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
 import { resolveRelationshipPlayActor } from '../../../lib/relationship/character-relationship-play-actor.lib'
 import {
+  mergeOrganizationsById,
+  resolveAvailableOrganizationIdSet,
+} from '../../../lib/relationship/character-relationship-resolved-entities.lib'
+import {
   buildOrganizationMembershipsFormFields,
   organizationMembershipsFormSchema,
   organizationMembershipsToFormValues,
@@ -51,11 +55,9 @@ export function CharacterOrganizationMembershipsContainer({
   )
 
   const relationshipContext = useMemo(() => {
-    const availableOrganizations = (organizationsQuery.data ?? []).filter((organization) =>
+    const catalogOrganizations = organizationsQuery.data ?? []
+    const availableOrganizations = catalogOrganizations.filter((organization) =>
       isContentPlayableFor(organization, playActor),
-    )
-    const organizationsById = new Map(
-      (organizationsQuery.data ?? []).map((organization) => [organization.id, organization]),
     )
 
     return buildCharacterApiRelationshipFieldContext({
@@ -63,18 +65,24 @@ export function CharacterOrganizationMembershipsContainer({
       availableOrganizations,
       eligibleResidenceLocations: [],
       locationsQueryStatus: { status: 'idle' },
-      organizationsById,
+      organizationsById: mergeOrganizationsById(catalogOrganizations, sheet.memberships),
       locationsById: new Map(),
-      availableOrganizationIdSet: new Set(availableOrganizations.map(({ id }) => id)),
+      availableOrganizationIdSet: resolveAvailableOrganizationIdSet({
+        canEdit,
+        playableOrganizationIds: availableOrganizations.map(({ id }) => id),
+        memberships: sheet.memberships,
+      }),
       availableResidenceIdSet: new Set(),
       onEditMembership: canEdit ? sheet.setEditingMembership : undefined,
       onRemoveUnresolvedMembership: canEdit ? sheet.setUnresolvedToRemove : undefined,
+      resolvedMemberships: sheet.memberships,
     })
   }, [
     campaignId,
     canEdit,
     organizationsQuery.data,
     playActor,
+    sheet.memberships,
     sheet.setEditingMembership,
     sheet.setUnresolvedToRemove,
   ])

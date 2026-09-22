@@ -13,8 +13,6 @@ export const characterResidenceRelationshipAdapter: RelationshipFieldAdapter<
   ResidenceLocationSelection,
   CharacterRelationshipFieldContext
 > = {
-  getItemKey: (edge) => ('connection' in edge ? edge.connection.id : edge.id),
-  listAriaLabel: 'Selected residences',
   renderPicker: ({ open, onOpenChange, context, onAdd, items }) => {
     const selectedIds = new Set(
       items.map((item) => ('connection' in item ? item.connection.locationId : item.locationId)),

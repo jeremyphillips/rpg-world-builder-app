@@ -123,4 +123,95 @@ describe('CharacterResidenceContainer', () => {
     })
     expect(handleRemove).toHaveBeenCalledWith('conn-1', residence.id)
   })
+
+  it('shows catalog names on read-only sheets without a locations query', () => {
+    mockResidenceSheet({
+      locationReferences: [
+        {
+          connection: {
+            id: 'conn-1',
+            locationId: residence.id,
+            kind: RESIDENCE_CONNECTION_KIND,
+          },
+          location: residence,
+        },
+      ],
+      locations: [],
+      pickerItems: [],
+    })
+
+    render(
+      <MemoryRouter>
+        <CharacterResidenceContainer
+          campaignId="campaign-1"
+          characterId="character-1"
+          canEdit={false}
+          subjectKind="pc"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Harborford')).toBeInTheDocument()
+    expect(screen.queryByText('Unavailable location')).not.toBeInTheDocument()
+  })
+
+  it('removes the confirmed residence before adding the replacement', async () => {
+    const user = userEvent.setup()
+    const millbridge = makeLocation({
+      id: 'location-millbridge',
+      slug: 'millbridge',
+      name: 'Millbridge',
+      kind: 'settlement',
+      settlementType: 'city',
+    })
+    const order: string[] = []
+    const handleAdd = vi.fn(async () => {
+      order.push('add')
+    })
+    const handleRemove = vi.fn(async () => {
+      order.push('remove')
+    })
+
+    mockResidenceSheet({
+      locationReferences: [
+        {
+          connection: {
+            id: 'conn-1',
+            locationId: residence.id,
+            kind: RESIDENCE_CONNECTION_KIND,
+          },
+          location: residence,
+        },
+      ],
+      locations: [residence, millbridge],
+      pickerItems: [
+        { location: residence, selected: true },
+        { location: millbridge, selected: false },
+      ],
+      handleAdd,
+      handleRemove,
+    })
+
+    render(
+      <MemoryRouter>
+        <CharacterResidenceContainer
+          campaignId="campaign-1"
+          characterId="character-1"
+          canEdit
+          subjectKind="pc"
+        />
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add residence' }))
+    await user.click(screen.getAllByRole('button', { name: 'Add' }).at(-1)!)
+
+    await waitFor(() => {
+      expect(order).toEqual(['remove', 'add'])
+    })
+    expect(handleRemove).toHaveBeenCalledWith('conn-1', residence.id)
+    expect(handleAdd).toHaveBeenCalledWith({ locationId: millbridge.id })
+    expect(screen.getByText('Millbridge')).toBeInTheDocument()
+    expect(screen.queryByText('Harborford')).not.toBeInTheDocument()
+  })
 })

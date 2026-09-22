@@ -25,6 +25,8 @@ export type CharacterRelationshipFieldContext = {
   locationsQueryStatus: CharacterLocationsQueryStatus
   onEditMembership?: (membership: OrganizationReferenceResolution) => void
   onRemoveUnresolvedMembership?: (membership: OrganizationReferenceResolution) => void
+  /** Server-resolved memberships for API trailing actions (edit / unresolved remove). */
+  resolvedMemberships?: readonly OrganizationReferenceResolution[]
 }
 
 export type CharacterOrganizationMembershipEdge =

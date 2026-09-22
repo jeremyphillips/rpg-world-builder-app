@@ -17,8 +17,6 @@ type TestEdge = { id: string; label: string }
 type TestSelection = { label: string }
 
 const testAdapter: RelationshipFieldAdapter<TestEdge, TestSelection, { nextId: number }> = {
-  getItemKey: (edge) => edge.id,
-  listAriaLabel: 'Test relationships',
   renderPicker: ({ open, onOpenChange, onAdd }) =>
     open ? (
       <div>

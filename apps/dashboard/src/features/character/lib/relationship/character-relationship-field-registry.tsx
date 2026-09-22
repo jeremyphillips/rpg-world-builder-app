@@ -146,6 +146,7 @@ export type CharacterApiRelationshipFieldContextInput = {
   availableResidenceIdSet: Set<string>
   onEditMembership?: (membership: OrganizationReferenceResolution) => void
   onRemoveUnresolvedMembership?: (membership: OrganizationReferenceResolution) => void
+  resolvedMemberships?: readonly OrganizationReferenceResolution[]
 }
 
 export function buildCharacterApiRelationshipFieldContext(
@@ -163,6 +164,7 @@ export function buildCharacterApiRelationshipFieldContext(
     locationsQueryStatus: input.locationsQueryStatus,
     onEditMembership: input.onEditMembership,
     onRemoveUnresolvedMembership: input.onRemoveUnresolvedMembership,
+    resolvedMemberships: input.resolvedMemberships,
   }
 }
 

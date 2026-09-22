@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import { Text } from '@rpg/ui'
 import type { CharacterLocationReferenceResolution } from '@rpg/contracts'
 
 import type { ResidenceLocationSelection } from '../../connections/picker/residence-location-picker-drawer.types'
@@ -44,7 +45,10 @@ export function CharacterResidenceApiSync({
     [onRemove, serverByLocationId],
   )
 
-  return useRelationshipApiSemanticSync<ResidenceFormValues, CharacterLocationReferenceResolution>({
+  const syncError = useRelationshipApiSemanticSync<
+    ResidenceFormValues,
+    CharacterLocationReferenceResolution
+  >({
     serverSnapshot: serverResidences,
     areServerEqual: areResidenceListsEqual,
     toFormValues: residencesToFormValues,
@@ -56,4 +60,10 @@ export function CharacterResidenceApiSync({
     addErrorFallback: 'Could not add this residence.',
     removeErrorFallback: 'Could not remove this residence.',
   })
+
+  return syncError ? (
+    <Text variant="destructive" aria-live="polite">
+      {syncError}
+    </Text>
+  ) : null
 }

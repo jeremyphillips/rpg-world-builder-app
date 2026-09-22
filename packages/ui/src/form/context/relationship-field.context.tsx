@@ -12,13 +12,11 @@ export type RelationshipFieldPickerProps<TEdge, TSelection, TContext> = {
 }
 
 export type RelationshipFieldAdapter<TEdge = unknown, TSelection = unknown, TContext = unknown> = {
-  getItemKey: (edge: TEdge) => string
   renderPicker: (
     props: RelationshipFieldPickerProps<TEdge, TSelection, TContext>,
   ) => React.ReactNode
   createEdge: (selection: TSelection, items: readonly TEdge[], context: TContext) => TEdge
   canAdd?: (items: readonly TEdge[], context: TContext) => boolean
-  listAriaLabel?: string
 }
 
 export type RelationshipFieldRegistry = Record<

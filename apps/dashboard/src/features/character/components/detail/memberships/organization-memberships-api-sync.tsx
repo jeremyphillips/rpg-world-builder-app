@@ -1,3 +1,4 @@
+import { Text } from '@rpg/ui'
 import type { OrganizationReferenceResolution } from '@rpg/contracts'
 
 import type { OrganizationMembershipSelection } from '../../connections/picker/organization-picker-drawer.types'
@@ -18,7 +19,7 @@ export function OrganizationMembershipsApiSync({
   serverMemberships,
   onAdd,
 }: OrganizationMembershipsApiSyncProps) {
-  return useRelationshipApiSemanticSync<
+  const syncError = useRelationshipApiSemanticSync<
     OrganizationMembershipsFormValues,
     OrganizationReferenceResolution
   >({
@@ -31,4 +32,10 @@ export function OrganizationMembershipsApiSync({
     onAdd: (organizationId) => onAdd({ organizationId }),
     addErrorFallback: 'Could not add this organization membership.',
   })
+
+  return syncError ? (
+    <Text variant="destructive" aria-live="polite">
+      {syncError}
+    </Text>
+  ) : null
 }

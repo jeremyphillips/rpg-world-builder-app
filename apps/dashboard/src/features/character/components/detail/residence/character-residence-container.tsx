@@ -7,6 +7,10 @@ import { useCharacterResidenceSheet } from '../../../hooks/use-character-residen
 import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
 import { RESIDENCE_CONNECTION_KIND } from '../../../lib/connections/residence-location-connection.lib'
 import {
+  mergeLocationsById,
+  resolveAvailableResidenceIdSet,
+} from '../../../lib/relationship/character-relationship-resolved-entities.lib'
+import {
   buildCharacterApiRelationshipFieldContext,
   CharacterApiRelationshipFormProvider,
 } from '../../../lib/relationship/character-relationship-field-registry'
@@ -47,7 +51,6 @@ export function CharacterResidenceContainer({
 
   const relationshipContext = useMemo(() => {
     const eligibleResidenceLocations = sheet.pickerItems.map(({ location }) => location)
-    const locationsById = new Map(sheet.locations.map((location) => [location.id, location]))
 
     return buildCharacterApiRelationshipFieldContext({
       campaignId,
@@ -55,11 +58,22 @@ export function CharacterResidenceContainer({
       eligibleResidenceLocations,
       locationsQueryStatus: sheet.locationsQueryStatus,
       organizationsById: new Map(),
-      locationsById,
+      locationsById: mergeLocationsById(sheet.locations, residences),
       availableOrganizationIdSet: new Set(),
-      availableResidenceIdSet: new Set(eligibleResidenceLocations.map(({ id }) => id)),
+      availableResidenceIdSet: resolveAvailableResidenceIdSet({
+        canEdit,
+        eligibleLocationIds: eligibleResidenceLocations.map(({ id }) => id),
+        residences,
+      }),
     })
-  }, [campaignId, sheet.locations, sheet.locationsQueryStatus, sheet.pickerItems])
+  }, [
+    campaignId,
+    canEdit,
+    residences,
+    sheet.locations,
+    sheet.locationsQueryStatus,
+    sheet.pickerItems,
+  ])
 
   const renderApiSync = useCallback(
     () => (

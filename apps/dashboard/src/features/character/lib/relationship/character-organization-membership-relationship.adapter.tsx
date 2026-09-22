@@ -12,8 +12,6 @@ export const characterOrganizationMembershipRelationshipAdapter: RelationshipFie
   OrganizationMembershipSelection,
   CharacterRelationshipFieldContext
 > = {
-  getItemKey: (edge) => edge.organizationId,
-  listAriaLabel: 'Selected organizations',
   renderPicker: ({ open, onOpenChange, context, onAdd, items }) => {
     const selectedIds = new Set(items.map((item) => item.organizationId))
     const pickerItems = context.availableOrganizations.map((organization) => ({

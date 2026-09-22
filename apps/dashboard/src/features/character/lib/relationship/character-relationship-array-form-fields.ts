@@ -110,21 +110,3 @@ export function buildRelationshipArrayField({
     fields: [],
   }
 }
-
-export function buildCharacterOrganizationMembershipArrayField(
-  context: CharacterRelationshipFieldContext,
-): FormItem {
-  return buildRelationshipArrayField({
-    vocabulary: CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
-    context,
-  })
-}
-
-export function buildCharacterResidenceArrayField(
-  context: CharacterRelationshipFieldContext,
-): FormItem {
-  return buildRelationshipArrayField({
-    vocabulary: CHARACTER_RESIDENCE_VOCABULARY,
-    context,
-  })
-}
