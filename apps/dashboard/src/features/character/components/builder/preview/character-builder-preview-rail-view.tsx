@@ -4,7 +4,7 @@ import type {
   CharacterBuilderDraft,
   ChoiceSet,
 } from '@rpg/contracts'
-import { PreviewRail, Text, type PreviewRailLayout } from '@rpg/ui'
+import { PreviewRail, type PreviewRailLayout } from '@rpg/ui'
 import { User } from 'lucide-react'
 
 import { getBuilderDraftNarrative } from '../../../lib/builder-preview/character-builder-preview-panel.lib'
@@ -112,11 +112,7 @@ export function CharacterBuilderPreviewRailView({
       <PreviewRail.Identity
         media={<PreviewRail.Media fallbackIcon={<User />} />}
         name={projection.identity.name}
-        status={
-          <Text as="p" variant="muted">
-            {projection.identity.statusLine}
-          </Text>
-        }
+        status={projection.identity.statusLine}
         facts={projection.identity.facts}
       />
       <PreviewRail.ScrollRegion>

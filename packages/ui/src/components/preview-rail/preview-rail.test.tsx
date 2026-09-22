@@ -110,6 +110,20 @@ describe('PreviewRail', () => {
     expect(container.querySelector('[data-slot="preview-rail-identity"] .border-t')).toBeNull()
   })
 
+  it('renders identity subheadline copy with shared typography', () => {
+    const { container } = render(
+      <PreviewRail>
+        <PreviewRail.Identity name="Fighter" status="Level 1 Fighter" />
+      </PreviewRail>,
+    )
+
+    const subheadline = container.querySelector(
+      '[data-slot="preview-rail-identity"] .text-sm.text-muted-foreground',
+    )
+
+    expect(subheadline).toHaveTextContent('Level 1 Fighter')
+  })
+
   it('renders identity metadata with a divider when facts are provided', () => {
     const { container } = render(
       <PreviewRail>

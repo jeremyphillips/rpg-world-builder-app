@@ -8,14 +8,13 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../fixtures/character-builder-fixtures'
+import { PREVIEW_RAIL_EMPTY_TEXT } from '@rpg/ui'
+
 import {
   getPreviewAlignmentLine,
   getPreviewIdentityName,
   getPreviewLevelClassLine,
   getPreviewSpeciesLine,
-  PREVIEW_CHOOSE_ALIGNMENT,
-  PREVIEW_CHOOSE_CLASS,
-  PREVIEW_CHOOSE_SPECIES,
   PREVIEW_UNNAMED_CHARACTER,
 } from './preview-identity-summary'
 
@@ -28,9 +27,11 @@ describe('preview identity summary helpers', () => {
     const draft = createEmptyCharacterBuilderDraft()
 
     expect(getPreviewIdentityName(draft)).toBe(PREVIEW_UNNAMED_CHARACTER)
-    expect(getPreviewLevelClassLine(draft, catalogIndex)).toBe(`Level 1 · ${PREVIEW_CHOOSE_CLASS}`)
-    expect(getPreviewSpeciesLine(draft, catalogIndex)).toBe(PREVIEW_CHOOSE_SPECIES)
-    expect(getPreviewAlignmentLine(draft)).toBe(PREVIEW_CHOOSE_ALIGNMENT)
+    expect(getPreviewLevelClassLine(draft, catalogIndex)).toBe(
+      `Level 1 · ${PREVIEW_RAIL_EMPTY_TEXT}`,
+    )
+    expect(getPreviewSpeciesLine(draft, catalogIndex)).toBe(PREVIEW_RAIL_EMPTY_TEXT)
+    expect(getPreviewAlignmentLine(draft)).toBe(PREVIEW_RAIL_EMPTY_TEXT)
   })
 
   it('renders populated identity lines from draft and catalog', () => {

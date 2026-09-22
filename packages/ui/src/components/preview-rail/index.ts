@@ -27,6 +27,7 @@ export {
   type PreviewRailSectionsProps,
   type PreviewRailStatusPanelProps,
 } from './preview-rail.client'
+export { PREVIEW_RAIL_EMPTY_TEXT } from './preview-rail.constants'
 export { formatPreviewRailOverflowList } from './preview-rail-overflow.lib'
 export type {
   PreviewRailAvailability,

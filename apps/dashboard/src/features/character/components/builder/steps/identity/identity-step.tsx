@@ -38,9 +38,7 @@ export function IdentityStep({
   const fields = useMemo(
     () =>
       buildIdentityStepFormFields({
-        renderNameField: () => (
-          <IdentityNameField buildContext={context} draft={draft} onDraftChange={onDraftChange} />
-        ),
+        renderNameField: () => <IdentityNameField buildContext={context} draft={draft} />,
         renderDraftSync: () => (
           <IdentityDraftSync draftIdentity={draft.identity} onDraftChange={onDraftChange} />
         ),

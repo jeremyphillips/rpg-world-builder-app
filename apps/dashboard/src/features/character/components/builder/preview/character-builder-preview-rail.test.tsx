@@ -11,11 +11,9 @@ import {
   createStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import {
-  PREVIEW_CHOOSE_ALIGNMENT,
-  PREVIEW_CHOOSE_SPECIES,
-  PREVIEW_UNNAMED_CHARACTER,
-} from '../../../lib/builder-preview/preview-identity-summary'
+import { PREVIEW_RAIL_EMPTY_TEXT } from '@rpg/ui'
+
+import { PREVIEW_UNNAMED_CHARACTER } from '../../../lib/builder-preview/preview-identity-summary'
 import { CharacterBuilderPreviewRail } from './character-builder-preview-rail'
 import { CharacterBuilderPreviewRailView } from './character-builder-preview-rail-view'
 import { projectBuilderPreviewRail } from '../../../lib/builder-preview/builder-preview-projection.lib'
@@ -50,9 +48,10 @@ describe('CharacterBuilderPreviewRail', () => {
 
     expect(screen.getByRole('heading', { name: 'Character preview' })).toBeInTheDocument()
     expect(screen.getByText(PREVIEW_UNNAMED_CHARACTER)).toBeInTheDocument()
-    expect(screen.getByText('Level 1 · Choose class')).toBeInTheDocument()
-    expect(screen.getByText(PREVIEW_CHOOSE_SPECIES)).toBeInTheDocument()
-    expect(screen.getByText(PREVIEW_CHOOSE_ALIGNMENT)).toBeInTheDocument()
+    expect(screen.getByText(`Level 1 · ${PREVIEW_RAIL_EMPTY_TEXT}`)).toBeInTheDocument()
+    expect(screen.getByText('Species')).toBeInTheDocument()
+    expect(screen.getByText('Alignment')).toBeInTheDocument()
+    expect(screen.getAllByText(PREVIEW_RAIL_EMPTY_TEXT, { exact: true })).toHaveLength(2)
     expect(screen.getByRole('heading', { name: 'Sections' })).toBeInTheDocument()
     expect(screen.getByText('Narrative')).toBeInTheDocument()
     expect(screen.getByText('Builder incomplete')).toBeInTheDocument()

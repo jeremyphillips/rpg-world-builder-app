@@ -5,6 +5,7 @@ import {
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
+import { PREVIEW_RAIL_EMPTY_TEXT } from '@rpg/ui'
 
 import {
   formatCharacterSummaryFromCatalog,
@@ -13,9 +14,6 @@ import {
 import { resolveCatalogEntryName } from './review-step-display'
 
 export const PREVIEW_UNNAMED_CHARACTER = 'Unnamed character'
-export const PREVIEW_CHOOSE_CLASS = 'Choose class'
-export const PREVIEW_CHOOSE_SPECIES = 'Choose species'
-export const PREVIEW_CHOOSE_ALIGNMENT = 'Choose alignment'
 export const PREVIEW_LEVEL_CLASS_SEPARATOR = ' · '
 
 function catalogEntries<T extends { id: string; name: string }>(
@@ -55,7 +53,7 @@ export function getPreviewLevelClassLine(
   const level = draft.class.level
 
   if (!draft.class.classId) {
-    return `Level ${level}${PREVIEW_LEVEL_CLASS_SEPARATOR}${PREVIEW_CHOOSE_CLASS}`
+    return `Level ${level}${PREVIEW_LEVEL_CLASS_SEPARATOR}${PREVIEW_RAIL_EMPTY_TEXT}`
   }
 
   const parts = resolveBuilderCharacterSummaryParts(
@@ -71,7 +69,7 @@ export function getPreviewSpeciesLine(
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
   if (!draft.species.speciesId) {
-    return PREVIEW_CHOOSE_SPECIES
+    return PREVIEW_RAIL_EMPTY_TEXT
   }
 
   const parts = resolveBuilderCharacterSummaryParts(
@@ -80,7 +78,7 @@ export function getPreviewSpeciesLine(
   )
 
   if (!parts.species) {
-    return PREVIEW_CHOOSE_SPECIES
+    return PREVIEW_RAIL_EMPTY_TEXT
   }
 
   return formatCharacterSummary({ species: parts.species, classes: [] })
@@ -88,7 +86,7 @@ export function getPreviewSpeciesLine(
 
 export function getPreviewAlignmentLine(draft: CharacterBuilderDraft): string {
   const alignment = draft.identity.alignment
-  return alignment ? getAlignmentLabel(alignment) : PREVIEW_CHOOSE_ALIGNMENT
+  return alignment ? getAlignmentLabel(alignment) : PREVIEW_RAIL_EMPTY_TEXT
 }
 
 /** Canonical roster/card summary for a partial builder draft (species + class/level). */

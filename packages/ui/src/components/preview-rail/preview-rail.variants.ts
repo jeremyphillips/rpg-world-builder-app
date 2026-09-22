@@ -86,6 +86,8 @@ export const previewRailFooterClasses = 'flex flex-col gap-4 py-4'
 
 export const previewRailIdentityContentClasses = 'min-w-0 flex-1'
 
+export const previewRailIdentitySubheadlineClasses = 'text-sm text-muted-foreground'
+
 export const previewRailDividerClasses = 'border-t border-border-subtle'
 
 export { iconContainerVariants as previewRailMediaFallbackVariants } from '../ui/icon-container.variants'
