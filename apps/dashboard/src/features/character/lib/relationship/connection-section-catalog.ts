@@ -82,3 +82,10 @@ export function filterDraftEdgesBySection<T extends { kind: CharacterRelationshi
 ): T[] {
   return edges.filter((edge) => getConnectionTopLevelSectionForKind(edge.kind) === sectionId)
 }
+
+export function filterProjectionsBySection<T extends { kind: CharacterRelationshipEdgeKind }>(
+  rows: readonly T[],
+  sectionId: ConnectionTopLevelSectionId,
+): T[] {
+  return rows.filter((row) => getConnectionTopLevelSectionForKind(row.kind) === sectionId)
+}

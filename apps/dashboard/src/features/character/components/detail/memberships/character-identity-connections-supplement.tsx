@@ -1,5 +1,4 @@
-import { CharacterOrganizationMembershipsContainer } from './character-organization-memberships-container'
-import { CharacterResidenceContainer } from '../residence/character-residence-container'
+import { CharacterConnectionsSection } from '../connections/character-connections-section'
 import type { CharacterRelationshipSubjectKind } from '../../../lib/invalidate-character-relationship-queries'
 
 export type CharacterIdentityConnectionsSupplementProps = {
@@ -13,25 +12,15 @@ export type CharacterIdentityConnectionsSupplementProps = {
 export function CharacterIdentityConnectionsSupplement({
   campaignId,
   characterId,
-  characterName,
   canEdit,
   subjectKind,
 }: CharacterIdentityConnectionsSupplementProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <CharacterOrganizationMembershipsContainer
-        campaignId={campaignId}
-        characterId={characterId}
-        characterName={characterName}
-        canEdit={canEdit}
-        subjectKind={subjectKind}
-      />
-      <CharacterResidenceContainer
-        campaignId={campaignId}
-        characterId={characterId}
-        canEdit={canEdit}
-        subjectKind={subjectKind}
-      />
-    </div>
+    <CharacterConnectionsSection
+      campaignId={campaignId}
+      characterId={characterId}
+      canEdit={canEdit}
+      subjectKind={subjectKind}
+    />
   )
 }

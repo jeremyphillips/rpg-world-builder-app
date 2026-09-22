@@ -89,6 +89,21 @@ export const createCharacterRelationshipInputSchema = z.discriminatedUnion('kind
     relatedCharacterId: z.string().min(1),
     details: lifecyclePersonRelationshipDetailsSchema.optional(),
   }),
+  createRelationshipBaseSchema.extend({
+    kind: z.literal('friendOf'),
+    relatedCharacterId: z.string().min(1),
+    details: lifecyclePersonRelationshipDetailsSchema.optional(),
+  }),
+  createRelationshipBaseSchema.extend({
+    kind: z.literal('allyOf'),
+    relatedCharacterId: z.string().min(1),
+    details: lifecyclePersonRelationshipDetailsSchema.optional(),
+  }),
+  createRelationshipBaseSchema.extend({
+    kind: z.literal('enemyOf'),
+    relatedCharacterId: z.string().min(1),
+    details: lifecyclePersonRelationshipDetailsSchema.optional(),
+  }),
 ])
 
 export type CreateCharacterRelationshipInput = z.infer<
