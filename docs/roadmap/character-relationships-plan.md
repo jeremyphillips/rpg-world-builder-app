@@ -1,8 +1,8 @@
 # Character relationships and narrative context
 
-Status: Phases 1–4 implemented (contracts, API, dashboard reconciliation prep,
-existing-feature cutover). Phases 5–7 (new builder kinds, detail sections,
-narrative enrichment) pending.
+Status: Phases 1–5 implemented (contracts, API, dashboard reconciliation prep,
+existing-feature cutover, builder connections UI). Phase 6 sheet UI direction is
+confirmed below. Phases 6–7 pending.
 
 ## Recommendation
 
@@ -39,7 +39,7 @@ Given the requested breadth, central edge storage is the recommended destination
 | Usage/deletion          | **Done (Phase 4):** edge collection registered as usage source; character documents no longer embed connections    | Extend deletion/unlink workflows as new kinds ship                                                      |
 | Forms                   | Shared RelationshipFieldProvider and character adapter registry, with draft/API modes                              | Extend this foundation; a new generic picker framework is unnecessary                                   |
 | Reconciliation          | **Done (Phases 3–4):** edge ID + revision reconciliation via `useRelationshipEdgeApiSync`                          | Extend for new kinds and metadata-only edits in Phase 5+                                                |
-| Detail surface          | Identity connections supplement composes membership and residence containers                                       | Add People, Places, Property sections; keep domain containers behind those sections                     |
+| Detail surface          | Identity connections supplement composes membership and residence containers                                       | Phase 6: one compact Connections section, type-first Add menu, pencil edit modals                       |
 | Narrative input         | **Done (Phase 4):** builder reads `draft.relationshipEdges` for org/residence context                              | Introduce typed narrative facts, role binding, lifecycle and visibility filtering (Phase 7)             |
 | Narrative binding       | One selected organization and one residence per composition                                                        | Extend to a small role budget, not unrestricted graph traversal                                         |
 
@@ -50,7 +50,7 @@ Relevant sources:
 - [Location eligibility](../../packages/contracts/src/rpg/content/lib/relationship/location-connection-eligibility.ts)
 - [Projection policy](../cross-content-relationships.md)
 - [Form adapter registry](../../apps/dashboard/src/features/character/lib/relationship/character-relationship-field-registry.tsx)
-- [API semantic reconciliation](../../apps/dashboard/src/features/character/lib/relationship/relationship-api-semantic-sync.lib.ts)
+- [Edge-aware reconciliation](../../apps/dashboard/src/features/character/lib/relationship/relationship-edge-api-sync.lib.ts)
 - [Character relationship routes](../../apps/api/src/features/character-relationships/character-relationship.routes.ts)
 - [Create relationships from draft](../../apps/api/src/features/character-relationships/lib/create-character-relationships-from-draft.ts)
 - [Connected-parties resolver](../../apps/api/src/features/content/locations/resolve-location-connected-parties.ts)
@@ -293,22 +293,75 @@ require an explicit relationship-copy policy rather than copying incoming edges.
 
 ## UI evolution
 
-Build on the existing form adapter registry and draft/API modes:
+### Character builder (Phase 5)
+
+Confirmed builder connections chrome. Family / Social / Guidance are picker
+chip groups, not top-level step sections.
 
 ```text
 Connections
   People
-    Family
-    Social
   Organizations
   Places
   Property
 ```
 
-Category is presentation metadata. A property is still a location target. Keep the
-organization membership picker and its title editor; extend the place picker with
-kind eligibility; add a character picker for people. Share search/pagination,
-resolved rows, pending state, and error treatment. Metadata editing is per edge.
+Each section is a `DetailCollectionPanel`: square `IconContainer`, heading,
+header description, split Add control, border below, subtle header background,
+vertically centered contents. Rows are bordered list items with no card fill:
+name, metadata summary, reserved badge slot, vertical-ellipsis overflow
+(Edit relationship, View connected record, Remove connection).
+
+Add control is an outline split button (new `@rpg/ui` primitive — not
+`ButtonDropdown`):
+
+- Main `+ Add {type}` opens a guided picker and does not assume a kind.
+- After choosing a person, the drawer asks “How is X connected?” with Family /
+  Social / Guidance chips (Parent, Child, Sibling, Spouse/Partner, Friend, Ally,
+  Rival, Enemy, Mentor, Student).
+- Chevron shortcuts skip the chip step (`Add parent`, `Add friend`, …).
+
+Places own hometown, birthplace, and residence (`resides_at`). Property owns
+building association kinds (`owns`, `tenant`, `operator`, `works_at`). New
+person kinds in this phase: `friendOf`, `allyOf`, `enemyOf`. `partnerOf` is a
+family relationship.
+
+A property target is still a location. Keep the organization membership picker
+and title editor; extend the place picker with kind eligibility; add a character
+picker for people. Share search/pagination, resolved rows, pending state, and
+error treatment. Metadata editing is per edge. Badges are wired now but unused
+until a secondary qualifier is worth scanning independently of the relationship.
+
+### Character sheet (Phase 6)
+
+The sheet is one compact Connections section, not four builder panels.
+
+```text
+Connections                              + Add connection ▾
+
+People
+Seraphina Vale
+Spouse                                      [pencil]
+
+Places
+Waterdeep
+Hometown                                    [pencil]
+```
+
+- One header action: outline dropdown-menu button `+ Add connection ▾` with the
+  shared section icons (`Add person` / `Add organization` / `Add place` /
+  `Add property`). Not a per-subgroup Add, not the builder split button.
+- Flow: type → choose entity → choose relationship (select, not chips) →
+  details → Add. Host is a **modal**, not a drawer.
+- Rows: name + role metadata + one pencil icon button. No ellipsis. Name may
+  link to the record. Tooltips: Edit relationship / Edit membership /
+  Edit residence / Edit ownership.
+- Edit modal: read-only entity, relationship select, Since slot, footer
+  Remove + Cancel / Save. Changing kind is explicit replacement.
+
+Builder and sheet share icon map, role catalog, pickers, direction
+normalization, details fields, and row view-models. They do not share host
+chrome, Add controls, or edit surfaces.
 
 Replace semantic-set reconciliation with edge-aware reconciliation before adding
 details: identify by id, acknowledge by revision/request, and track add/update/remove.

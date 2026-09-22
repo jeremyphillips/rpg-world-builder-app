@@ -47,9 +47,14 @@ export const entityAnatomyTrailingSlotVariants = cva(
         compact: 'ml-2',
         comfortable: 'ml-3',
       },
+      align: {
+        start: '',
+        center: 'self-center',
+      },
     },
     defaultVariants: {
       density: 'comfortable',
+      align: 'start',
     },
   },
 )

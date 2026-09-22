@@ -95,6 +95,21 @@ export const characterRelationshipDraftEdgeSchema = z.discriminatedUnion('kind',
     relatedCharacterId: characterRelationshipDraftEndpointSchema,
     details: lifecyclePersonRelationshipDetailsSchema.optional(),
   }),
+  draftRelationshipBaseSchema.extend({
+    kind: z.literal('friendOf'),
+    relatedCharacterId: characterRelationshipDraftEndpointSchema,
+    details: lifecyclePersonRelationshipDetailsSchema.optional(),
+  }),
+  draftRelationshipBaseSchema.extend({
+    kind: z.literal('allyOf'),
+    relatedCharacterId: characterRelationshipDraftEndpointSchema,
+    details: lifecyclePersonRelationshipDetailsSchema.optional(),
+  }),
+  draftRelationshipBaseSchema.extend({
+    kind: z.literal('enemyOf'),
+    relatedCharacterId: characterRelationshipDraftEndpointSchema,
+    details: lifecyclePersonRelationshipDetailsSchema.optional(),
+  }),
 ])
 
 export type CharacterRelationshipDraftEdge = z.infer<typeof characterRelationshipDraftEdgeSchema>

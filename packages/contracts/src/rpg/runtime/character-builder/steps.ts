@@ -76,8 +76,9 @@ const BUILDER_STEP_METADATA = {
   connections: {
     label: 'Connections',
     description:
-      'Connect your character to organizations that shape their loyalties, obligations, or history.',
-    compactDescription: 'Connect your character to organizations',
+      'Define important people, organizations, places, and property connected to your character.',
+    compactDescription:
+      'Define important people, organizations, places, and property connected to your character.',
     isApplicable: (context) => isCharacterConnectionsStepApplicable(context),
   },
   species: {

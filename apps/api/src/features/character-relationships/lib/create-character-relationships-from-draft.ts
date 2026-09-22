@@ -46,7 +46,17 @@ function toLocationRelationshipInput(
 function toCharacterRelationshipInput(
   edge: Extract<
     CharacterRelationshipDraftEdge,
-    { kind: 'parentOf' | 'partnerOf' | 'siblingOf' | 'mentorOf' | 'rivalOf' }
+    {
+      kind:
+        | 'parentOf'
+        | 'partnerOf'
+        | 'siblingOf'
+        | 'mentorOf'
+        | 'rivalOf'
+        | 'friendOf'
+        | 'allyOf'
+        | 'enemyOf'
+    }
   >,
   characterId: string,
 ): CreateCharacterRelationshipInput {

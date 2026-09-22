@@ -148,9 +148,11 @@ describe('BUILDER_STEPS', () => {
 
   it('exposes compactDescription only when tighter rail copy is authored', () => {
     const connections = BUILDER_STEPS.find((step) => step.id === 'connections')
-    expect(connections?.compactDescription).toBe('Connect your character to organizations')
+    expect(connections?.compactDescription).toBe(
+      'Define important people, organizations, places, and property connected to your character.',
+    )
     expect(connections?.description).toBe(
-      'Connect your character to organizations that shape their loyalties, obligations, or history.',
+      'Define important people, organizations, places, and property connected to your character.',
     )
     expect(BUILDER_STEPS.find((step) => step.id === 'identity')?.compactDescription).toBeUndefined()
   })
@@ -163,10 +165,10 @@ describe('getBuilderStepCompactDescription', () => {
 
   it('returns tighter rail copy when authored', () => {
     expect(getBuilderStepCompactDescription('connections')).toBe(
-      'Connect your character to organizations',
+      'Define important people, organizations, places, and property connected to your character.',
     )
     expect(getBuilderStepDescription('connections')).toBe(
-      'Connect your character to organizations that shape their loyalties, obligations, or history.',
+      'Define important people, organizations, places, and property connected to your character.',
     )
   })
 })
@@ -543,10 +545,10 @@ describe('resolveBuilderStepDescription', () => {
     const context = createCharacterBuildContext()
 
     expect(resolveBuilderStepDescription(context, 'connections')).toBe(
-      'Connect your character to organizations',
+      'Define important people, organizations, places, and property connected to your character.',
     )
     expect(getBuilderStepDescription('connections')).toBe(
-      'Connect your character to organizations that shape their loyalties, obligations, or history.',
+      'Define important people, organizations, places, and property connected to your character.',
     )
   })
 

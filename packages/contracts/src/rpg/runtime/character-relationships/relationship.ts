@@ -120,6 +120,27 @@ const rivalOfRelationshipSchema = characterRelationshipEdgeEnvelopeSchema.extend
   details: lifecyclePersonRelationshipDetailsSchema,
 })
 
+const friendOfRelationshipSchema = characterRelationshipEdgeEnvelopeSchema.extend({
+  kind: z.literal('friendOf'),
+  characterId: z.string().min(1),
+  relatedCharacterId: z.string().min(1),
+  details: lifecyclePersonRelationshipDetailsSchema,
+})
+
+const allyOfRelationshipSchema = characterRelationshipEdgeEnvelopeSchema.extend({
+  kind: z.literal('allyOf'),
+  characterId: z.string().min(1),
+  relatedCharacterId: z.string().min(1),
+  details: lifecyclePersonRelationshipDetailsSchema,
+})
+
+const enemyOfRelationshipSchema = characterRelationshipEdgeEnvelopeSchema.extend({
+  kind: z.literal('enemyOf'),
+  characterId: z.string().min(1),
+  relatedCharacterId: z.string().min(1),
+  details: lifecyclePersonRelationshipDetailsSchema,
+})
+
 export const characterRelationshipEdgeSchema = z.discriminatedUnion('kind', [
   organizationMembershipRelationshipSchema,
   residesAtRelationshipSchema,
@@ -134,6 +155,9 @@ export const characterRelationshipEdgeSchema = z.discriminatedUnion('kind', [
   siblingOfRelationshipSchema,
   mentorOfRelationshipSchema,
   rivalOfRelationshipSchema,
+  friendOfRelationshipSchema,
+  allyOfRelationshipSchema,
+  enemyOfRelationshipSchema,
 ])
 
 export type CharacterRelationshipEdge = z.infer<typeof characterRelationshipEdgeSchema>
