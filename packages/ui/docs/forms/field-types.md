@@ -358,30 +358,6 @@ Nested `{ valueKey, unitKey }` for multi-unit enums. Single unit: `fixedUnit` + 
 
 `valueDigitsDependsOn` + `valueDigitsLookup` when width tracks another field.
 
-## Relationship (`relationship`)
-
-Legacy flat-list field type with vocabulary-driven picker wiring. For grant-style array
-cards, prefer `kind: 'array'` with `item.renderShell` and `addAction.relationship` — see
-[array field authoring](./array-field-authoring.md#addactionrelationship--picker-driven-collections).
-Character connections in the dashboard use that array path.
-
-```ts
-{
-  type: 'relationship',
-  name: 'organizations',
-  label: 'Organizations',
-  vocabulary: 'character_organization_membership',
-  emptyLabel: 'No organizations connected yet.',
-  addActionLabel: 'Add organization',
-}
-```
-
-- Value is an RHF field array of edge objects.
-- Wrap the form in `RelationshipFieldProvider` with a `registry` mapping `vocabulary` ids to
-  `RelationshipFieldAdapter` implementations (row projection + picker drawer).
-- `cardinality: 'one'` replaces the array on add instead of appending.
-- Empty state and add chrome align with array fields (`EmptyPanel` + shared `CollectionAddControl`).
-
 ## Combobox (`combobox`)
 
 Searchable dropdown for large lists (catalog refs).

@@ -45,6 +45,36 @@ export function CharacterRelationshipFormProvider({
   const context = useCharacterBuilderRelationshipFieldContext(buildContext)
 
   return (
+    <CharacterRelationshipFieldProvider context={context}>
+      {children}
+    </CharacterRelationshipFieldProvider>
+  )
+}
+
+export type CharacterApiRelationshipFormProviderProps = {
+  context: CharacterRelationshipFieldContext
+  children: ReactNode
+}
+
+export function CharacterApiRelationshipFormProvider({
+  context,
+  children,
+}: CharacterApiRelationshipFormProviderProps) {
+  return (
+    <CharacterRelationshipFieldProvider context={context}>
+      {children}
+    </CharacterRelationshipFieldProvider>
+  )
+}
+
+function CharacterRelationshipFieldProvider({
+  context,
+  children,
+}: {
+  context: CharacterRelationshipFieldContext
+  children: ReactNode
+}) {
+  return (
     <RelationshipFieldProvider context={context} registry={CHARACTER_RELATIONSHIP_FIELD_REGISTRY}>
       {children}
     </RelationshipFieldProvider>

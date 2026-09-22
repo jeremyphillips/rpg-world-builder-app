@@ -19,10 +19,6 @@ type TestSelection = { label: string }
 const testAdapter: RelationshipFieldAdapter<TestEdge, TestSelection, { nextId: number }> = {
   getItemKey: (edge) => edge.id,
   listAriaLabel: 'Test relationships',
-  projectRow: (edge) => ({
-    key: edge.id,
-    content: <span>{edge.label}</span>,
-  }),
   renderPicker: ({ open, onOpenChange, onAdd }) =>
     open ? (
       <div>

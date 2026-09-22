@@ -72,7 +72,6 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   )
 
   const memberships = React.useMemo(() => referencesQuery.data ?? [], [referencesQuery.data])
-  const [pickerOpen, setPickerOpen] = React.useState(false)
   const [editingMembership, setEditingMembership] =
     React.useState<OrganizationReferenceResolution | null>(null)
   const [unresolvedToRemove, setUnresolvedToRemove] =
@@ -147,8 +146,6 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   return {
     isBootstrapping: referencesQuery.isPending && referencesQuery.data === undefined,
     memberships,
-    pickerOpen,
-    setPickerOpen,
     pickerItems,
     editingMembership,
     setEditingMembership,

@@ -1,19 +1,22 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { isContentPlayableFor } from '@rpg/contracts'
-
-import type { OrganizationMembershipSelection } from '../../connections/picker/organization-picker-drawer.types'
+import { Form } from '@rpg/ui/form'
 
 import { useOrganizations } from '@/features/content'
 
-import { CharacterControlledRelationshipField } from '../../relationship/character-controlled-relationship-field'
 import { CharacterOrganizationMembershipDrawers } from './character-organization-membership-drawers'
+import { OrganizationMembershipsApiSync } from './organization-memberships-api-sync'
 import { useCharacterOrganizationMembershipsSheet } from '../../../hooks/use-character-organization-memberships-sheet'
 import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
 import {
+  buildOrganizationMembershipsFormFields,
+  organizationMembershipsFormSchema,
+  organizationMembershipsToFormValues,
+} from '../../../lib/relationship/character-organization-memberships-form-fields'
+import {
   buildCharacterApiRelationshipFieldContext,
-  CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
-  CHARACTER_RELATIONSHIP_FIELD_REGISTRY,
+  CharacterApiRelationshipFormProvider,
 } from '../../../lib/relationship/character-relationship-field-registry'
 
 export type CharacterOrganizationMembershipsContainerProps = {
@@ -70,22 +73,50 @@ export function CharacterOrganizationMembershipsContainer({
     sheet.setUnresolvedToRemove,
   ])
 
+  const renderApiSync = useCallback(
+    () => (
+      <OrganizationMembershipsApiSync
+        serverMemberships={sheet.memberships}
+        onAdd={sheet.handleAdd}
+      />
+    ),
+    [sheet.handleAdd, sheet.memberships],
+  )
+
+  const fields = useMemo(
+    () =>
+      buildOrganizationMembershipsFormFields({
+        relationshipContext,
+        disabled: !canEdit,
+        renderApiSync,
+      }),
+    [canEdit, relationshipContext, renderApiSync],
+  )
+
+  const defaultValues = useMemo(
+    () => organizationMembershipsToFormValues(sheet.memberships),
+    [sheet.memberships],
+  )
+
+  const formKey = useMemo(
+    () => sheet.memberships.map((membership) => membership.organizationId).join(','),
+    [sheet.memberships],
+  )
+
   if (sheet.isBootstrapping) return null
 
   return (
     <>
-      <CharacterControlledRelationshipField
-        vocabulary={CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY}
-        registry={CHARACTER_RELATIONSHIP_FIELD_REGISTRY}
-        context={relationshipContext}
-        label="Organizations"
-        emptyItemLabel="organization"
-        addActionLabel="Add organization"
-        items={sheet.memberships}
-        disabled={!canEdit}
-        onAdd={(selection) => sheet.handleAdd(selection as OrganizationMembershipSelection)}
-        onRemove={() => undefined}
-      />
+      <CharacterApiRelationshipFormProvider context={relationshipContext}>
+        <Form
+          key={formKey}
+          schema={organizationMembershipsFormSchema}
+          fields={fields}
+          defaultValues={defaultValues}
+          mode="onChange"
+          onSubmit={() => undefined}
+        />
+      </CharacterApiRelationshipFormProvider>
       {canEdit ? (
         <CharacterOrganizationMembershipDrawers
           characterName={characterName}

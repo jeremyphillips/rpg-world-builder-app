@@ -11,29 +11,14 @@ export type RelationshipFieldPickerProps<TEdge, TSelection, TContext> = {
   disabled?: boolean
 }
 
-export type RelationshipFieldRowContent = {
-  key: string
-  content: React.ReactNode
-}
-
-export type RelationshipFieldRowActions = {
-  onRemove?: () => void
-}
-
 export type RelationshipFieldAdapter<TEdge = unknown, TSelection = unknown, TContext = unknown> = {
   getItemKey: (edge: TEdge) => string
-  projectRow: (
-    edge: TEdge,
-    context: TContext,
-    actions: RelationshipFieldRowActions,
-  ) => RelationshipFieldRowContent
   renderPicker: (
     props: RelationshipFieldPickerProps<TEdge, TSelection, TContext>,
   ) => React.ReactNode
   createEdge: (selection: TSelection, items: readonly TEdge[], context: TContext) => TEdge
   canAdd?: (items: readonly TEdge[], context: TContext) => boolean
   listAriaLabel?: string
-  supplementary?: (context: TContext) => React.ReactNode
 }
 
 export type RelationshipFieldRegistry = Record<

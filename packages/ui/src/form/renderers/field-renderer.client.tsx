@@ -24,7 +24,6 @@ import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
-import { RelationshipFieldRenderer } from './fields/relationship-field-renderer.client'
 import {
   buildFieldRendererIds,
   buildJoinedPairRendererIds,
@@ -540,27 +539,6 @@ const fieldRenderers: {
       hintPosition={hintPosition}
       {...fieldValidationProps(validation)}
       namePrefix={namePrefix}
-    />
-  ),
-  relationship: ({
-    config,
-    controlSize,
-    id,
-    hint,
-    hintPosition,
-    labelVisibility,
-    namePrefix,
-    ...validation
-  }) => (
-    <RelationshipFieldRenderer
-      config={config}
-      controlSize={controlSize}
-      id={id}
-      hint={hint}
-      hintPosition={hintPosition}
-      labelVisibility={labelVisibility}
-      namePrefix={namePrefix}
-      {...fieldValidationProps(validation)}
     />
   ),
 }

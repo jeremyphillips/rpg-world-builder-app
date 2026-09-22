@@ -197,8 +197,7 @@ inside the empty-state panel.
 ## `addAction.relationship` — picker-driven collections
 
 Grant-style relationship authoring uses `kind: 'array'` with `addAction.relationship`
-instead of a separate `type: 'relationship'` field or dashboard-only intercept slots.
-`SchemaFormShell` scans the field tree, mounts `RelationshipArrayPickerHost`, and wires
+and `item.renderShell`. `SchemaFormShell` scans the field tree, mounts `RelationshipArrayPickerHost`, and wires
 add clicks to the vocabulary adapter registered on `RelationshipFieldProvider`.
 
 ```ts

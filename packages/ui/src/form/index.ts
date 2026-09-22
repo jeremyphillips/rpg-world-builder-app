@@ -473,8 +473,6 @@ export {
   type RelationshipFieldPickerProps,
   type RelationshipFieldProviderProps,
   type RelationshipFieldRegistry,
-  type RelationshipFieldRowActions,
-  type RelationshipFieldRowContent,
 } from './context/relationship-field.context'
 export {
   ArrayLikeSectionHeader,

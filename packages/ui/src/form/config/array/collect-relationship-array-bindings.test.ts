@@ -89,17 +89,14 @@ describe('collectRelationshipArrayBindings', () => {
     ])
   })
 
-  it('skips leaf relationship fields and nested array-item arrays', () => {
+  it('skips leaf fields and nested array-item arrays', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 
     const fields: FormItem[] = [
       {
-        type: 'relationship',
-        name: 'links',
-        label: 'Links',
-        vocabulary: TEST_VOCABULARY,
-        emptyLabel: 'No links yet.',
-        addActionLabel: 'Add link',
+        type: 'text',
+        name: 'notes',
+        label: 'Notes',
       },
       {
         kind: 'array',
