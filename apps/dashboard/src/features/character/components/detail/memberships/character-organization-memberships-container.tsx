@@ -8,7 +8,7 @@ import { useOrganizations } from '@/features/content'
 import { CharacterOrganizationMembershipDrawers } from './character-organization-membership-drawers'
 import { OrganizationMembershipsApiSync } from './organization-memberships-api-sync'
 import { useCharacterOrganizationMembershipsSheet } from '../../../hooks/use-character-organization-memberships-sheet'
-import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
+import type { CharacterRelationshipSubjectKind } from '../../../lib/invalidate-character-relationship-queries'
 import { resolveRelationshipPlayActor } from '../../../lib/relationship/character-relationship-play-actor.lib'
 import {
   mergeOrganizationsById,
@@ -29,7 +29,7 @@ export type CharacterOrganizationMembershipsContainerProps = {
   characterId: string
   characterName: string
   canEdit: boolean
-  subjectKind: CharacterOrganizationMembershipSubjectKind
+  subjectKind: CharacterRelationshipSubjectKind
 }
 
 /** Owns membership queries, mutations, and chooser/editor drawers for campaign sheets. */
@@ -90,11 +90,11 @@ export function CharacterOrganizationMembershipsContainer({
   const renderApiSync = useCallback(
     () => (
       <OrganizationMembershipsApiSync
-        serverMemberships={sheet.memberships}
+        serverMemberships={sheet.membershipProjections}
         onAdd={sheet.handleAdd}
       />
     ),
-    [sheet.handleAdd, sheet.memberships],
+    [sheet.handleAdd, sheet.membershipProjections],
   )
 
   const fields = useMemo(
@@ -108,8 +108,8 @@ export function CharacterOrganizationMembershipsContainer({
   )
 
   const defaultValues = useMemo(
-    () => organizationMembershipsToFormValues(sheet.memberships),
-    [sheet.memberships],
+    () => organizationMembershipsToFormValues(sheet.membershipProjections),
+    [sheet.membershipProjections],
   )
 
   const formKey = `${subjectKind}:${characterId}`

@@ -4,7 +4,6 @@ import {
   getOrganizationDomainLabel,
   resolveLocationClassificationDisplay,
   type Organization,
-  type OrganizationReferenceResolution,
 } from '@rpg/contracts'
 import type { EntitySummaryStatusItem } from '@/features/content'
 
@@ -17,6 +16,8 @@ import type {
   CharacterOrganizationMembershipEdge,
   CharacterRelationshipFieldContext,
   CharacterResidenceEdge,
+  OrganizationMembershipFormRow,
+  OrganizationMembershipSheetRow,
 } from './character-relationship-field-context.types'
 
 type BadgeStatusItem = Extract<EntitySummaryStatusItem, { kind: 'badge' }>
@@ -140,9 +141,12 @@ export function resolveOrganizationMembershipPresentationFromValues(
   const organizationId = values.organizationId
   if (typeof organizationId !== 'string' || organizationId.length === 0) return undefined
 
-  const membership: CharacterOrganizationMembershipEdge = {
+  const membership: OrganizationMembershipFormRow = {
+    relationshipId:
+      typeof values.relationshipId === 'string' ? values.relationshipId : organizationId,
     organizationId,
     ...(typeof values.title === 'string' ? { title: values.title } : {}),
+    ...(typeof values.priority === 'number' ? { priority: values.priority } : {}),
   }
 
   return resolveOrganizationMembershipPresentation(membership, context)
@@ -157,8 +161,9 @@ export function resolveResidencePresentationFromValues(
 
   return resolveResidencePresentation(
     {
+      relationshipId:
+        typeof values.relationshipId === 'string' ? values.relationshipId : String(locationId),
       locationId,
-      id: String(values.id ?? locationId),
       kind: 'resides_at',
     },
     context,
@@ -186,4 +191,4 @@ export function shouldOfferUnresolvedMembershipRemoval(
   return context.mode === 'api' && unavailable && Boolean(context.onRemoveUnresolvedMembership)
 }
 
-export type OrganizationMembershipEditTarget = OrganizationReferenceResolution
+export type OrganizationMembershipEditTarget = OrganizationMembershipSheetRow

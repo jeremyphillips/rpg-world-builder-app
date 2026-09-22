@@ -194,10 +194,12 @@ export function useRelationshipEdgeApiSync<
           await onUpdateRef.current(op, row)
         },
         onRemove: async (op) => {
-          const row = rowById.get(op.relationshipId)
-          if (!row) {
-            throw new Error(removeErrorFallback)
-          }
+          const row =
+            rowById.get(op.relationshipId) ??
+            ({
+              relationshipId: op.relationshipId,
+              revision: op.expectedRevision ?? 0,
+            } as TFormRow)
           await onRemoveRef.current(op, row)
         },
       })

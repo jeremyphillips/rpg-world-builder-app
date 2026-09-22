@@ -1,14 +1,10 @@
-import type {
-  CharacterOrganizationConnection,
-  Organization,
-  OrganizationMemberSummary,
-  PaginatedItems,
-} from '@rpg/contracts'
+import type { Organization, OrganizationMemberSummary, PaginatedItems } from '@rpg/contracts'
 import { resolveOrganizationMembershipPriority, sortOrganizationMembers } from '@rpg/contracts'
 
 import { buildCampaignContentEligibilityIndex } from '../../campaign-invite'
 import { CharacterModel } from '../../character'
 import { buildCharacterCardSummaryDto } from '../../character'
+import { CharacterRelationshipModel } from '../../character-relationships/character-relationship.model'
 import { resolveCatalogForCampaign } from '../content.service'
 import { resolveContentUsage } from '../lib/content-usage/content-usage-resolvers'
 import { organizationWriteConfig } from './organizations.config'
@@ -19,8 +15,13 @@ type CharacterMemberHit = {
   characterType: 'pc' | 'npc'
   classes: Array<{ classId: string; level: number; subclassId?: string }>
   species: { id: string }
-  connections?: {
-    organizations?: CharacterOrganizationConnection[]
+}
+
+type MembershipEdge = {
+  characterId: string
+  details?: {
+    title?: string
+    priority?: number
   }
 }
 
@@ -29,7 +30,7 @@ type MemberSortRow = {
   name: string
   priority?: number
   characterType: 'pc' | 'npc'
-  membership: CharacterOrganizationConnection | undefined
+  membership: MembershipEdge['details']
   hit: CharacterMemberHit
 }
 
@@ -39,22 +40,12 @@ const CHARACTER_MEMBER_PROJECTION = {
   characterType: 1,
   classes: 1,
   species: 1,
-  connections: 1,
 } as const
-
-function membershipForOrganization(
-  hit: CharacterMemberHit,
-  organizationId: string,
-): CharacterOrganizationConnection | undefined {
-  return (hit.connections?.organizations ?? []).find(
-    (membership) => membership.organizationId === organizationId,
-  )
-}
 
 /**
  * Paginated organization Members roster — discovers members via content-usage
  * registration (authoritative_guard), then projects membership title/priority
- * from character-owned `connections.organizations` and sorts canonically.
+ * from organizationMembership relationship edges and sorts canonically.
  */
 export async function resolveOrganizationMembers(input: {
   campaignId: string
@@ -87,20 +78,31 @@ export async function resolveOrganizationMembers(input: {
     return { items: [], total: 0 }
   }
 
-  const [hits, contentIndex] = await Promise.all([
+  const [hits, membershipEdges, contentIndex] = await Promise.all([
     CharacterModel.find({ _id: { $in: characterIds } })
       .select(CHARACTER_MEMBER_PROJECTION)
       .lean<CharacterMemberHit[]>(),
+    CharacterRelationshipModel.find({
+      campaignId,
+      organizationId,
+      kind: 'organizationMembership',
+      characterId: { $in: characterIds },
+    })
+      .select({ characterId: 1, details: 1 })
+      .lean<MembershipEdge[]>(),
     buildCampaignContentEligibilityIndex(campaignId),
   ])
 
   const hitById = new Map(hits.map((hit) => [String(hit._id), hit]))
+  const membershipByCharacterId = new Map(
+    membershipEdges.map((edge) => [edge.characterId, edge.details ?? {}]),
+  )
 
   const sortRows: MemberSortRow[] = characterIds.flatMap((characterId) => {
     const hit = hitById.get(characterId)
     if (!hit) return []
 
-    const membership = membershipForOrganization(hit, organizationId)
+    const membership = membershipByCharacterId.get(characterId)
     const priority = resolveOrganizationMembershipPriority({
       membership: membership ?? {},
       titles: organization.members.titles ?? [],

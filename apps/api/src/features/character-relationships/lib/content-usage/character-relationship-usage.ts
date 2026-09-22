@@ -1,8 +1,13 @@
-import type { ContentUsageBlocker } from '@rpg/contracts'
-import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
+import type { CharacterRelationship, ContentUsageBlocker } from '@rpg/contracts'
+import { isCampaignManager, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
+import { listOpenParticipationsForCampaign } from '../../../campaign/participation/campaign-character-participation.repository'
 import { findNpcById, findPcById } from '../../../character'
-import { indexRecordsByContentId, type ContentUsageResolverContext } from '../../../content'
+import {
+  resolveContentUsagePurpose,
+  type ContentUsageResolverContext,
+} from '../../../content/lib/content-usage/content-usage-context'
+import { indexRecordsByContentId } from '../../../content/lib/content-usage/reference-sources/index-by-content-id'
 import { CharacterRelationshipModel } from '../../character-relationship.model'
 
 type RelationshipUsageRecord = {
@@ -32,10 +37,40 @@ async function resolveCharacterSummary(characterId: string): Promise<{
   return null
 }
 
+async function loadAllowedCharacterIds(ctx: ContentUsageResolverContext): Promise<Set<string>> {
+  const purpose = resolveContentUsagePurpose(ctx)
+
+  if (purpose === 'authoritative_guard') {
+    const participations = await listOpenParticipationsForCampaign(ctx.campaignId)
+    return new Set(participations.map((participation) => participation.characterId))
+  }
+
+  if (!ctx.viewer) {
+    return new Set()
+  }
+
+  const participations = await listOpenParticipationsForCampaign(ctx.campaignId)
+  const viewerIsManager = isCampaignManager(ctx.viewer.role)
+
+  return new Set(
+    participations
+      .filter((participation) => {
+        if (viewerIsManager) return true
+        return ctx.viewer!.controlledCharacterIds.includes(participation.characterId)
+      })
+      .map((participation) => participation.characterId),
+  )
+}
+
 async function loadRelationshipUsageRecords(
-  campaignId: string,
+  ctx: ContentUsageResolverContext,
 ): Promise<RelationshipUsageRecord[]> {
-  const docs = await CharacterRelationshipModel.find({ campaignId })
+  const allowedCharacterIds = await loadAllowedCharacterIds(ctx)
+  if (allowedCharacterIds.size === 0) {
+    return []
+  }
+
+  const docs = await CharacterRelationshipModel.find({ campaignId: ctx.campaignId })
     .select('_id characterId organizationId locationId relatedCharacterId')
     .lean<
       Array<{
@@ -49,6 +84,8 @@ async function loadRelationshipUsageRecords(
 
   const records: RelationshipUsageRecord[] = []
   for (const doc of docs) {
+    if (!allowedCharacterIds.has(doc.characterId)) continue
+
     const summary = await resolveCharacterSummary(doc.characterId)
     if (!summary) continue
 
@@ -84,9 +121,9 @@ function relationshipRecordToBlocker(
 }
 
 export async function indexCharacterRelationshipOrganizationBlockersByContentId(
-  ctx: Pick<ContentUsageResolverContext, 'campaignId'>,
+  ctx: ContentUsageResolverContext,
 ): Promise<Map<string, ContentUsageBlocker[]>> {
-  const records = await loadRelationshipUsageRecords(ctx.campaignId)
+  const records = await loadRelationshipUsageRecords(ctx)
   return indexRecordsByContentId(
     records,
     (record) => (record.organizationId ? [record.organizationId] : []),
@@ -95,9 +132,9 @@ export async function indexCharacterRelationshipOrganizationBlockersByContentId(
 }
 
 export async function indexCharacterRelationshipLocationBlockersByContentId(
-  ctx: Pick<ContentUsageResolverContext, 'campaignId'>,
+  ctx: ContentUsageResolverContext,
 ): Promise<Map<string, ContentUsageBlocker[]>> {
-  const records = await loadRelationshipUsageRecords(ctx.campaignId)
+  const records = await loadRelationshipUsageRecords(ctx)
   return indexRecordsByContentId(
     records,
     (record) => (record.locationId ? [record.locationId] : []),
@@ -106,9 +143,9 @@ export async function indexCharacterRelationshipLocationBlockersByContentId(
 }
 
 export async function indexCharacterRelationshipCharacterBlockersByContentId(
-  ctx: Pick<ContentUsageResolverContext, 'campaignId'>,
+  ctx: ContentUsageResolverContext,
 ): Promise<Map<string, ContentUsageBlocker[]>> {
-  const records = await loadRelationshipUsageRecords(ctx.campaignId)
+  const records = await loadRelationshipUsageRecords(ctx)
   return indexRecordsByContentId(
     records,
     (record) =>
@@ -116,5 +153,40 @@ export async function indexCharacterRelationshipCharacterBlockersByContentId(
         (value): value is string => typeof value === 'string' && value.length > 0,
       ),
     (record) => relationshipRecordToBlocker(record, ctx.campaignId),
+  )
+}
+
+/** Viewer-controlled PC membership relationships keyed by organization id. */
+export async function indexOrganizationMembershipViewerRelationshipsByContentId(
+  ctx: ContentUsageResolverContext,
+): Promise<Map<string, CharacterRelationship[]>> {
+  const controlledCharacterIds = ctx.viewer?.controlledCharacterIds ?? []
+  if (controlledCharacterIds.length === 0) {
+    return new Map()
+  }
+
+  const records = await loadRelationshipUsageRecords(ctx)
+  const index = new Map<string, Map<string, CharacterRelationship>>()
+
+  for (const record of records) {
+    if (!record.organizationId) continue
+    if (!controlledCharacterIds.includes(record.characterId)) continue
+
+    const bucket = index.get(record.organizationId) ?? new Map<string, CharacterRelationship>()
+    if (!bucket.has(record.characterId)) {
+      bucket.set(record.characterId, {
+        kind: 'member',
+        characterId: record.characterId,
+        characterName: record.characterName,
+      })
+    }
+    index.set(record.organizationId, bucket)
+  }
+
+  return new Map(
+    [...index.entries()].map(([organizationId, relationships]) => [
+      organizationId,
+      [...relationships.values()],
+    ]),
   )
 }

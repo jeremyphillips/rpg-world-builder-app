@@ -13,12 +13,10 @@ import {
 } from '@rpg/contracts'
 
 import { findNpcById, findPcById } from '../../character'
-import {
-  HomebrewLocationModel,
-  HomebrewOrganizationModel,
-  toHomebrewLocation,
-  type HomebrewDoc,
-} from '../../content'
+import type { HomebrewDoc } from '../../content/lib/content-write-config'
+import { HomebrewLocationModel } from '../../content/locations/homebrew-location.model'
+import { toHomebrewLocation } from '../../content/locations/locations.config'
+import { HomebrewOrganizationModel } from '../../content/organizations/homebrew-organization.model'
 
 type ViewerContext = {
   viewerUserId: string

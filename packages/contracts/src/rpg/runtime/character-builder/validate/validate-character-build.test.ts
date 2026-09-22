@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import { formatFieldMessage } from '../../../../validation/define-message'
 import { abilityValidationMessages } from '../../../vocab/ability-messages'
+import type { CampaignNpcBuildContext } from '../context'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { builderTestContext } from '../test-fixtures'
@@ -133,35 +134,63 @@ describe('validateCharacterBuild', () => {
     expect(complete.ok).toBe(true)
   })
 
-  it('accepts no organization connections and targets stale references to Connections', () => {
+  it('accepts no relationship edges and rejects unauthorized standalone drafts with edges', () => {
     const empty = validateCharacterBuild(makeCompleteDraft(), builderTestContext, 'finalSubmit')
     expect(empty.issues.some((issue) => issue.stepId === 'connections')).toBe(false)
 
-    const stale = validateCharacterBuild(
+    const unauthorized = validateCharacterBuild(
       makeCompleteDraft({
-        connections: { organizations: [{ organizationId: 'removed-organization' }], locations: [] },
+        relationshipEdges: [
+          {
+            id: 'edge-removed-org',
+            kind: 'organizationMembership',
+            characterId: '__new_character__',
+            organizationId: 'removed-organization',
+          },
+        ],
       }),
       builderTestContext,
       'finalSubmit',
     )
 
-    expect(stale.issues).toContainEqual(
+    expect(unauthorized.issues).toContainEqual(
       expect.objectContaining({
-        code: 'organization_connection_unavailable',
+        code: 'connections_unauthorized',
         stepId: 'connections',
       }),
     )
   })
 
-  it('rejects duplicate or malformed organization connections', () => {
-    const invalidDraft = {
-      ...makeCompleteDraft(),
-      connections: {
-        organizations: [{ organizationId: 'organization-1' }, { organizationId: 'organization-1' }],
-      },
-    } as CharacterBuilderDraft
+  it('rejects duplicate organization membership edges', () => {
+    const invalidDraft = makeCompleteDraft({
+      relationshipEdges: [
+        {
+          id: 'edge-1',
+          kind: 'organizationMembership',
+          characterId: '__new_character__',
+          organizationId: 'organization-1',
+        },
+        {
+          id: 'edge-2',
+          kind: 'organizationMembership',
+          characterId: '__new_character__',
+          organizationId: 'organization-1',
+        },
+      ],
+    })
 
-    const result = validateCharacterBuild(invalidDraft, builderTestContext, 'finalSubmit')
+    const campaignNpcContext = {
+      ...builderTestContext,
+      characterKind: 'npc',
+      mode: 'dashboard',
+      scope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: 'srd-cc-5.2.1' },
+      rulesScope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: 'srd-cc-5.2.1' },
+      ownershipTarget: { type: 'campaign', campaignId: 'campaign-1' },
+      acquisition: { kind: 'campaign_npc', campaignId: 'campaign-1' },
+      playActor: { kind: 'npc' },
+    } satisfies CampaignNpcBuildContext
+
+    const result = validateCharacterBuild(invalidDraft, campaignNpcContext, 'finalSubmit')
 
     expect(result.issues).toContainEqual(
       expect.objectContaining({ code: 'connections_invalid', stepId: 'connections' }),

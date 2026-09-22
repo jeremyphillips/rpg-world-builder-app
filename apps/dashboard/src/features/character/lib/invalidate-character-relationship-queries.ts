@@ -4,12 +4,16 @@ import { campaignCharacterQueryKey } from '@/features/campaign'
 import { organizationMembersQueryKey } from '@/features/content'
 
 import { characterRelationshipsQueryKey } from '../hooks/use-character-relationships'
-import type { CharacterOrganizationMembershipSubjectKind } from './invalidate-character-organization-membership-queries'
 import { npcQueryKey } from '../npc/hooks/use-npcs'
+
+export type CharacterRelationshipSubjectKind = 'pc' | 'npc'
+
+/** @deprecated Use CharacterRelationshipSubjectKind */
+export type CharacterOrganizationMembershipSubjectKind = CharacterRelationshipSubjectKind
 
 export type CharacterRelationshipInvalidationTarget = {
   characterId: string
-  subjectKind?: CharacterOrganizationMembershipSubjectKind
+  subjectKind?: CharacterRelationshipSubjectKind
 }
 
 export async function invalidateCharacterRelationshipQueries(

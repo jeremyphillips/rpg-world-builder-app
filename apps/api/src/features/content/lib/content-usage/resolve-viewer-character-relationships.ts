@@ -16,6 +16,7 @@ import {
   indexSpellRelationshipsByContentId,
   relationshipsForContentEntry,
 } from './reference-sources/characters-extract'
+import { indexOrganizationMembershipViewerRelationshipsByContentId } from '../../../character-relationships/lib/content-usage/character-relationship-usage'
 import { loadControlledCharacterHits } from './reference-sources/characters'
 
 function sortRelationships(
@@ -94,6 +95,14 @@ async function buildRelationshipIndex(
 
   if (strategy.strategy === 'none' || controlledCharacterIds.length === 0) {
     return new Map()
+  }
+
+  if (
+    contentType === 'organizations' &&
+    strategy.strategy === 'fixed' &&
+    strategy.kind === 'member'
+  ) {
+    return indexOrganizationMembershipViewerRelationshipsByContentId(ctx)
   }
 
   const characterReference = batchCharacterReferenceFromRegistration(contentType)

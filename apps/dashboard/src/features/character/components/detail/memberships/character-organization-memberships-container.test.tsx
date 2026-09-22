@@ -31,6 +31,7 @@ function mockMembershipSheet(
   mockedUseCharacterOrganizationMembershipsSheet.mockReturnValue({
     isBootstrapping: false,
     memberships: [],
+    membershipProjections: [],
     pickerItems: [{ organization: lanternGuild, selected: false }],
     editingMembership: null,
     setEditingMembership: vi.fn(),
@@ -77,6 +78,7 @@ describe('CharacterOrganizationMembershipsContainer', () => {
 
     mockMembershipSheet({
       memberships: [],
+      membershipProjections: [],
       handleAdd,
     })
     mockedUseOrganizations.mockReturnValue({
@@ -100,7 +102,7 @@ describe('CharacterOrganizationMembershipsContainer', () => {
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
 
     await waitFor(() => {
-      expect(handleAdd).toHaveBeenCalledWith({ organizationId: lanternGuild.id })
+      expect(handleAdd).toHaveBeenCalledWith(lanternGuild.id, expect.any(String))
       expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
       expect(screen.queryByText('organization 1')).not.toBeInTheDocument()
     })
@@ -129,7 +131,33 @@ describe('CharacterOrganizationMembershipsContainer', () => {
 
   it('shows catalog names on read-only sheets without a catalog query', () => {
     mockMembershipSheet({
-      memberships: [{ organizationId: lanternGuild.id, organization: lanternGuild }],
+      memberships: [
+        {
+          relationshipId: 'edge-1',
+          revision: 1,
+          organizationId: lanternGuild.id,
+          organization: lanternGuild,
+        },
+      ],
+      membershipProjections: [
+        {
+          relationshipId: 'edge-1',
+          kind: 'organizationMembership',
+          section: 'organizations',
+          roleLabel: 'Member',
+          details: {},
+          visibility: 'dm_only',
+          referenceStatus: 'resolved',
+          target: {
+            type: 'organization',
+            id: lanternGuild.id,
+            name: lanternGuild.name,
+            slug: lanternGuild.slug,
+          },
+          revision: 1,
+          capabilities: { canUpdateDetails: true, canDelete: true },
+        },
+      ],
     })
     mockedUseOrganizations.mockReturnValue({
       data: undefined,
@@ -154,6 +182,8 @@ describe('CharacterOrganizationMembershipsContainer', () => {
   it('opens the membership editor with the server-resolved organization', async () => {
     const user = userEvent.setup()
     const membership = {
+      relationshipId: 'edge-1',
+      revision: 1,
       organizationId: lanternGuild.id,
       title: 'Member',
       organization: lanternGuild,
@@ -162,6 +192,25 @@ describe('CharacterOrganizationMembershipsContainer', () => {
 
     mockMembershipSheet({
       memberships: [membership],
+      membershipProjections: [
+        {
+          relationshipId: 'edge-1',
+          kind: 'organizationMembership',
+          section: 'organizations',
+          roleLabel: 'Member',
+          details: { title: 'Member' },
+          visibility: 'dm_only',
+          referenceStatus: 'resolved',
+          target: {
+            type: 'organization',
+            id: lanternGuild.id,
+            name: lanternGuild.name,
+            slug: lanternGuild.slug,
+          },
+          revision: 1,
+          capabilities: { canUpdateDetails: true, canDelete: true },
+        },
+      ],
       setEditingMembership,
     })
     mockedUseOrganizations.mockReturnValue({
@@ -185,6 +234,25 @@ describe('CharacterOrganizationMembershipsContainer', () => {
 
     mockMembershipSheet({
       memberships: [membership],
+      membershipProjections: [
+        {
+          relationshipId: 'edge-1',
+          kind: 'organizationMembership',
+          section: 'organizations',
+          roleLabel: 'Member',
+          details: { title: 'Member' },
+          visibility: 'dm_only',
+          referenceStatus: 'resolved',
+          target: {
+            type: 'organization',
+            id: lanternGuild.id,
+            name: lanternGuild.name,
+            slug: lanternGuild.slug,
+          },
+          revision: 1,
+          capabilities: { canUpdateDetails: true, canDelete: true },
+        },
+      ],
       setEditingMembership,
       editingMembership: membership,
       editingOrganization: {
@@ -213,11 +281,29 @@ describe('CharacterOrganizationMembershipsContainer', () => {
 
   it('offers unresolved membership removal from the trailing control', async () => {
     const user = userEvent.setup()
-    const membership = { organizationId: 'organization-missing', organization: null }
+    const membership = {
+      relationshipId: 'edge-missing',
+      revision: 1,
+      organizationId: 'organization-missing',
+      organization: null,
+    }
     const setUnresolvedToRemove = vi.fn()
 
     mockMembershipSheet({
       memberships: [membership],
+      membershipProjections: [
+        {
+          relationshipId: 'edge-missing',
+          kind: 'organizationMembership',
+          section: 'organizations',
+          roleLabel: 'Member',
+          details: {},
+          visibility: 'dm_only',
+          referenceStatus: 'unavailable',
+          revision: 1,
+          capabilities: { canUpdateDetails: false, canDelete: true },
+        },
+      ],
       setUnresolvedToRemove,
     })
     mockedUseOrganizations.mockReturnValue({
@@ -255,6 +341,7 @@ describe('CharacterOrganizationMembershipsContainer', () => {
 
     mockMembershipSheet({
       memberships: [],
+      membershipProjections: [],
       handleAdd,
     })
     mockedUseOrganizations.mockReturnValue({
@@ -291,7 +378,7 @@ describe('CharacterOrganizationMembershipsContainer', () => {
     await waitFor(() => {
       expect(handleAdd).toHaveBeenCalledTimes(2)
     })
-    expect(handleAdd).toHaveBeenCalledWith({ organizationId: lanternGuild.id })
-    expect(handleAdd).toHaveBeenCalledWith({ organizationId: cityCouncil.id })
+    expect(handleAdd).toHaveBeenCalledWith(lanternGuild.id, expect.any(String))
+    expect(handleAdd).toHaveBeenCalledWith(cityCouncil.id, expect.any(String))
   })
 })

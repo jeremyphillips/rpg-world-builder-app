@@ -112,7 +112,7 @@ describe('content status service', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
-    await createCampaignNpc(campaign.id, {
+    await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Blocking NPC',
       classes: [{ classId: created.id, level: 1 }],
@@ -138,7 +138,7 @@ describe('content status service', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
-    await createCampaignNpc(campaign.id, {
+    await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Race NPC',
       classes: [{ classId: created.id, level: 1 }],

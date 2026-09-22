@@ -3,7 +3,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import {
+  CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  createEmptyCharacterBuilderDraft,
+} from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
 import { getBuilderChromeCopy } from '../../../../lib/builder/builder-chrome-copy'
@@ -112,7 +115,14 @@ describe('ReviewStep', () => {
     }
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: lanternGuild.id }], locations: [] },
+      relationshipEdges: [
+        {
+          id: 'edge-org-1',
+          kind: 'organizationMembership' as const,
+          characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+          organizationId: lanternGuild.id,
+        },
+      ],
     }
 
     render(

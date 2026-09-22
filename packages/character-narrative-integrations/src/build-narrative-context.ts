@@ -12,8 +12,8 @@ import {
 
 function resolveResidences(draft: CharacterBuilderDraft, locations: readonly Location[]) {
   const byId = new Map(locations.map((location) => [location.id, location]))
-  return draft.connections.locations
-    .filter(({ kind }) => kind === 'resides_at')
+  return draft.relationshipEdges
+    .filter((edge) => edge.kind === 'resides_at')
     .flatMap(({ locationId }) => {
       const location = byId.get(locationId)
       if (!location || !('name' in location)) return []
@@ -76,9 +76,11 @@ function resolveOmittedReferenceIds(
 ) {
   const resolvedIds = new Set([...organizations, ...residences].map(({ id }) => id))
   const selectedIds = [
-    ...draft.connections.organizations.map(({ organizationId }) => organizationId),
-    ...draft.connections.locations
-      .filter(({ kind }) => kind === 'resides_at')
+    ...draft.relationshipEdges
+      .filter((edge) => edge.kind === 'organizationMembership')
+      .map(({ organizationId }) => organizationId),
+    ...draft.relationshipEdges
+      .filter((edge) => edge.kind === 'resides_at')
       .map(({ locationId }) => locationId),
   ]
   return selectedIds.filter((id) => !resolvedIds.has(id))
@@ -88,22 +90,25 @@ function resolveOrganizations(draft: CharacterBuilderDraft, context: CharacterBu
   const available = new Map(
     resolvePlayableBuilderContent(context).organizations.map((row) => [row.id, row]),
   )
-  return draft.connections.organizations.flatMap((connection) => {
-    const organization = available.get(connection.organizationId)
-    if (!organization) return []
-    return [
-      {
-        id: organization.id,
-        name: organization.name,
-        title: connection.title,
-        affinities: [
-          `organization:${organization.organizationDomain}`,
-          ...organization.functions.map((value) => `function:${value}`),
-          ...organization.practices.map((value) => `practice:${value}`),
-        ],
-      },
-    ]
-  })
+  return draft.relationshipEdges
+    .filter((edge) => edge.kind === 'organizationMembership')
+    .flatMap((edge) => {
+      const organization = available.get(edge.organizationId)
+      if (!organization) return []
+      const title = edge.details?.title
+      return [
+        {
+          id: organization.id,
+          name: organization.name,
+          ...(title !== undefined ? { title } : {}),
+          affinities: [
+            `organization:${organization.organizationDomain}`,
+            ...organization.functions.map((value) => `function:${value}`),
+            ...organization.practices.map((value) => `practice:${value}`),
+          ],
+        },
+      ]
+    })
 }
 
 /** Callers supply locations from the existing authorized campaign query. */

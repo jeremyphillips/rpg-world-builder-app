@@ -2,6 +2,10 @@ import type { RelationshipFieldAdapter } from '@rpg/ui/form'
 
 import { OrganizationPickerDrawer } from '../../components/connections/picker/organization-picker-drawer'
 import type { OrganizationMembershipSelection } from '../../components/connections/picker/organization-picker-drawer.types'
+import {
+  createApiOrganizationMembershipRow,
+  createDraftOrganizationMembershipRow,
+} from './character-relationship-form-rows.lib'
 import type {
   CharacterOrganizationMembershipEdge,
   CharacterRelationshipFieldContext,
@@ -28,7 +32,10 @@ export const characterOrganizationMembershipRelationshipAdapter: RelationshipFie
       />
     )
   },
-  createEdge: (selection) => selection,
+  createEdge: (selection, _items, context) =>
+    context.mode === 'api'
+      ? createApiOrganizationMembershipRow(selection.organizationId)
+      : createDraftOrganizationMembershipRow(selection.organizationId),
   canAdd: (items, context) => {
     const selectedIds = new Set(items.map((item) => item.organizationId))
     return context.availableOrganizations.some((organization) => !selectedIds.has(organization.id))

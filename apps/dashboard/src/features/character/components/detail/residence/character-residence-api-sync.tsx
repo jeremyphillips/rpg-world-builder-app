@@ -1,21 +1,27 @@
-import { useCallback } from 'react'
-
 import { Text } from '@rpg/ui'
-import type { CharacterLocationReferenceResolution } from '@rpg/contracts'
+import type { CharacterRelationshipProjectionRow } from '@rpg/contracts'
 
-import type { ResidenceLocationSelection } from '../../connections/picker/residence-location-picker-drawer.types'
 import {
-  areResidenceListsEqual,
-  residencesToFormValues,
-  type ResidenceFormValues,
-} from '../../../lib/relationship/character-residence-form-fields'
-import { useRelationshipApiSemanticSync } from '../../../lib/relationship/use-relationship-api-semantic-sync'
+  areResidenceProjectionsEqual,
+  residenceFormRowContentEqual,
+  residenceProjectionToFormRow,
+  residenceProjectionsToFormValues,
+  type ResidenceFormRow,
+} from '../../../lib/relationship/character-relationship-form-rows.lib'
+import type { ResidenceFormValues } from '../../../lib/relationship/character-residence-form-fields'
+import { useRelationshipEdgeApiSync } from '../../../lib/relationship/use-relationship-edge-api-sync'
 
 type CharacterResidenceApiSyncProps = {
-  serverResidences: readonly CharacterLocationReferenceResolution[]
-  onAdd: (selection: ResidenceLocationSelection) => void | Promise<void>
-  onRemove: (connectionId: string, locationId: string) => void | Promise<void>
+  serverResidences: readonly CharacterRelationshipProjectionRow[]
+  onAdd: (locationId: string, idempotencyKey: string) => Promise<{ relationshipId: string } | void>
+  onRemove: (
+    relationshipId: string,
+    expectedRevision: number,
+    locationId: string,
+  ) => void | Promise<void>
 }
+
+type ApiResidenceFormRow = ResidenceFormRow & { revision: number }
 
 /** Commits residence array edits from RHF to the API sheet handlers. */
 export function CharacterResidenceApiSync({
@@ -23,40 +29,46 @@ export function CharacterResidenceApiSync({
   onAdd,
   onRemove,
 }: CharacterResidenceApiSyncProps) {
-  const serverByLocationId = useCallback(
-    () =>
-      new Map(
-        serverResidences.map((reference) => [
-          reference.connection.locationId,
-          reference.connection,
-        ]),
-      ),
-    [serverResidences],
-  )
-
-  const handleRemove = useCallback(
-    (locationId: string) => {
-      const connection = serverByLocationId().get(locationId)
-      if (!connection) {
-        throw new Error('Could not remove this residence.')
-      }
-      return onRemove(connection.id, locationId)
-    },
-    [onRemove, serverByLocationId],
-  )
-
-  const syncError = useRelationshipApiSemanticSync<
+  const syncError = useRelationshipEdgeApiSync<
     ResidenceFormValues,
-    CharacterLocationReferenceResolution
+    CharacterRelationshipProjectionRow,
+    ApiResidenceFormRow
   >({
     serverSnapshot: serverResidences,
-    areServerEqual: areResidenceListsEqual,
-    toFormValues: residencesToFormValues,
+    areServerEqual: areResidenceProjectionsEqual,
+    toFormValues: residenceProjectionsToFormValues,
+    toSnapshotRows: (rows) => rows,
     formFieldName: 'locations',
-    semanticIdKey: 'locationId',
-    getConfirmedIds: (residences) => residences.map((reference) => reference.connection.locationId),
-    onAdd: (locationId) => onAdd({ locationId }),
-    onRemove: handleRemove,
+    getFormRows: (formValues) =>
+      (formValues.locations ?? []).map((row) => ({
+        ...row,
+        revision: row.revision ?? 0,
+      })),
+    isRowContentEqual: (confirmed, desired) =>
+      residenceFormRowContentEqual(residenceProjectionToFormRow(confirmed), desired),
+    onAdd: async (op, row) => {
+      if (!op.idempotencyKey) {
+        throw new Error('Could not add this residence.')
+      }
+      return onAdd(row.locationId, op.idempotencyKey)
+    },
+    onUpdate: async () => {
+      throw new Error('Could not update this residence.')
+    },
+    onRemove: async (op, row) => {
+      const serverRow = serverResidences.find((item) => item.relationshipId === op.relationshipId)
+      const locationId =
+        serverRow?.target?.type === 'location'
+          ? serverRow.target.id
+          : 'locationId' in row
+            ? row.locationId
+            : ''
+      const expectedRevision = op.expectedRevision ?? row.revision
+      if (!locationId || expectedRevision === undefined) {
+        throw new Error('Could not remove this residence.')
+      }
+      await onRemove(op.relationshipId, expectedRevision, locationId)
+    },
     addErrorFallback: 'Could not add this residence.',
     removeErrorFallback: 'Could not remove this residence.',
   })

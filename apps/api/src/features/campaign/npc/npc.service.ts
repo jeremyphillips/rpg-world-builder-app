@@ -17,7 +17,10 @@ import {
   toNpcListCharacterSummary,
   updateCharacterVital,
 } from '../../character'
+import { createCharacterRelationshipsFromDraftEdges } from '../../character-relationships/lib/create-character-relationships-from-draft'
 import { HttpError } from '../../../lib/http-error'
+import { areMongoTransactionsEnabled, runInTransaction } from '../../../lib/mongo-transaction'
+import type { WithMongoSession } from '../../../lib/mongo-session'
 import { assertNpcCreateRequestRestrictions } from './assert-npc-create'
 import { getRulesetPatchRead } from '../../vocabulary'
 import {
@@ -27,6 +30,7 @@ import {
   listOpenParticipationsForCampaign,
   updateCampaignCharacterRoster,
 } from '../participation/campaign-character-participation.repository'
+
 function assertNpcIntegrity(
   npcId: string,
   character: Awaited<ReturnType<typeof findNpcById>>,
@@ -59,8 +63,42 @@ async function assertLevelZeroNpcCreatePermitted(
   }
 }
 
+async function createNpcParticipationAndEdges(input: {
+  campaignId: string
+  actorUserId: string
+  characterInput: CreateNpcServiceInput
+  relationshipEdges: CreateNpcRequestInput['relationshipEdges']
+  joinedAt: string
+  options?: WithMongoSession
+}): Promise<CampaignNpcDetail> {
+  const character = await createNpcRecord(input.characterInput, input.options)
+  const participation = await createParticipation(
+    {
+      campaignId: input.campaignId,
+      characterId: character.id,
+      joinedAt: input.joinedAt,
+      roster: createDefaultCampaignRosterState(),
+    },
+    input.options,
+  )
+
+  const edges = input.relationshipEdges ?? []
+  if (edges.length > 0) {
+    await createCharacterRelationshipsFromDraftEdges({
+      campaignId: input.campaignId,
+      actorUserId: input.actorUserId,
+      characterId: character.id,
+      edges,
+      options: input.options,
+    })
+  }
+
+  return { character, participation }
+}
+
 export async function createCampaignNpc(
   campaignId: string,
+  actorUserId: string,
   input: CreateNpcRequestInput,
 ): Promise<CampaignNpcDetail> {
   const campaign = await findCampaignById(campaignId)
@@ -75,13 +113,28 @@ export async function createCampaignNpc(
   assertNpcCreateRequestRestrictions(input)
   await assertLevelZeroNpcCreatePermitted(campaignId, input)
 
-  const serviceInput: CreateNpcServiceInput = {
-    ...input,
+  const { relationshipEdges, ...characterFields } = input
+  const characterInput: CreateNpcServiceInput = {
+    ...characterFields,
     characterType: 'npc',
   }
 
   const joinedAt = new Date().toISOString()
-  const character = await createNpcRecord(serviceInput)
+
+  if (areMongoTransactionsEnabled()) {
+    return runInTransaction((session) =>
+      createNpcParticipationAndEdges({
+        campaignId,
+        actorUserId,
+        characterInput,
+        relationshipEdges,
+        joinedAt,
+        options: { session },
+      }),
+    )
+  }
+
+  const character = await createNpcRecord(characterInput)
 
   try {
     const participation = await createParticipation({
@@ -90,6 +143,16 @@ export async function createCampaignNpc(
       joinedAt,
       roster: createDefaultCampaignRosterState(),
     })
+
+    const edges = relationshipEdges ?? []
+    if (edges.length > 0) {
+      await createCharacterRelationshipsFromDraftEdges({
+        campaignId,
+        actorUserId,
+        characterId: character.id,
+        edges,
+      })
+    }
 
     return { character, participation }
   } catch (err) {

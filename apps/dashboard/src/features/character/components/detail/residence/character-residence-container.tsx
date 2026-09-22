@@ -4,8 +4,7 @@ import { Form } from '@rpg/ui/form'
 
 import { CharacterResidenceApiSync } from './character-residence-api-sync'
 import { useCharacterResidenceSheet } from '../../../hooks/use-character-residence-sheet'
-import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
-import { RESIDENCE_CONNECTION_KIND } from '../../../lib/connections/residence-location-connection.lib'
+import type { CharacterRelationshipSubjectKind } from '../../../lib/invalidate-character-relationship-queries'
 import {
   mergeLocationsById,
   resolveAvailableResidenceIdSet,
@@ -14,6 +13,7 @@ import {
   buildCharacterApiRelationshipFieldContext,
   CharacterApiRelationshipFormProvider,
 } from '../../../lib/relationship/character-relationship-field-registry'
+import { residenceProjectionToReferenceResolution } from '../../../lib/relationship/character-relationship-form-rows.lib'
 import {
   buildResidenceFormFields,
   residenceFormSchema,
@@ -24,7 +24,7 @@ export type CharacterResidenceContainerProps = {
   campaignId: string
   characterId: string
   canEdit: boolean
-  subjectKind: CharacterOrganizationMembershipSubjectKind
+  subjectKind: CharacterRelationshipSubjectKind
 }
 
 /** Owns residence queries, mutations, and picker drawer for campaign character sheets. */
@@ -42,11 +42,8 @@ export function CharacterResidenceContainer({
   })
 
   const residences = useMemo(
-    () =>
-      sheet.locationReferences.filter(
-        ({ connection }) => connection.kind === RESIDENCE_CONNECTION_KIND,
-      ),
-    [sheet.locationReferences],
+    () => sheet.residenceProjections.map(residenceProjectionToReferenceResolution),
+    [sheet.residenceProjections],
   )
 
   const relationshipContext = useMemo(() => {
@@ -78,12 +75,12 @@ export function CharacterResidenceContainer({
   const renderApiSync = useCallback(
     () => (
       <CharacterResidenceApiSync
-        serverResidences={residences}
+        serverResidences={sheet.residenceProjections}
         onAdd={sheet.handleAdd}
         onRemove={sheet.handleRemove}
       />
     ),
-    [residences, sheet.handleAdd, sheet.handleRemove],
+    [sheet.handleAdd, sheet.handleRemove, sheet.residenceProjections],
   )
 
   const fields = useMemo(
@@ -96,7 +93,10 @@ export function CharacterResidenceContainer({
     [canEdit, relationshipContext, renderApiSync],
   )
 
-  const defaultValues = useMemo(() => residencesToFormValues(residences), [residences])
+  const defaultValues = useMemo(
+    () => residencesToFormValues(sheet.residenceProjections),
+    [sheet.residenceProjections],
+  )
 
   const formKey = `${subjectKind}:${characterId}`
 

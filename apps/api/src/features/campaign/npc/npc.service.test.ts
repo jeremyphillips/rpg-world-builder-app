@@ -13,12 +13,13 @@ useIntegrationDb()
 
 describe('createCampaignNpc', () => {
   it('persists an NPC with open campaign participation', async () => {
+    const owner = await makeTestUser({ email: 'npc-service-owner@example.com' })
     const { id: campaignId } = await makeTestCampaign({
       name: 'NPC Service Campaign',
-      owner: await makeTestUser({ email: 'npc-service-owner@example.com' }),
+      owner,
     })
 
-    const detail = await createCampaignNpc(campaignId, minimalNpcRequestInput)
+    const detail = await createCampaignNpc(campaignId, owner.id, minimalNpcRequestInput)
 
     expect(detail.character).toMatchObject({
       characterType: 'npc',
@@ -38,12 +39,13 @@ describe('createCampaignNpc', () => {
 describe('listCampaignNpcs', () => {
   it('returns NPCs and ignores open PC participations in the same campaign', async () => {
     const player = await makeTestUser({ email: 'npc-list-player@example.com' })
+    const owner = await makeTestUser({ email: 'npc-list-owner@example.com' })
     const { id: campaignId } = await makeTestCampaign({
       name: 'NPC List Mixed Campaign',
-      owner: await makeTestUser({ email: 'npc-list-owner@example.com' }),
+      owner,
     })
 
-    const npcDetail = await createCampaignNpc(campaignId, minimalNpcRequestInput)
+    const npcDetail = await createCampaignNpc(campaignId, owner.id, minimalNpcRequestInput)
     const pc = await createPcRecord(minimalStandalonePcInput, player.id)
     await seedCharacterParticipation({ campaignId, characterId: pc.id })
 

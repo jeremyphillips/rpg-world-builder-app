@@ -15,6 +15,12 @@ import * as controller from './campaign.controller'
 import * as campaignCharacterController from './campaign-character.controller'
 import * as onboardingController from './campaign-onboarding.controller'
 import { getSearchCatalog } from '../global-search'
+import {
+  createCharacterRelationshipItem,
+  deleteCharacterRelationshipItem,
+  listCharacterRelationships,
+  updateCharacterRelationshipItem,
+} from '../character-relationships/character-relationship.handlers'
 
 export const campaignRouter: Router = Router()
 
@@ -70,6 +76,31 @@ campaignRouter.get(
   requireCampaignRole(...CAMPAIGN_ROLES),
   campaignCharacterController.getCampaignCharacter,
 )
+campaignRouter.get(
+  '/:campaignId/characters/:characterId/relationships',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  listCharacterRelationships,
+)
+campaignRouter.post(
+  '/:campaignId/character-relationships',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  createCharacterRelationshipItem,
+)
+campaignRouter.patch(
+  '/:campaignId/character-relationships/:relationshipId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  updateCharacterRelationshipItem,
+)
+campaignRouter.delete(
+  '/:campaignId/character-relationships/:relationshipId',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  deleteCharacterRelationshipItem,
+)
+
 campaignRouter.get(
   '/:campaignId/onboarding-context',
   requireAuth,

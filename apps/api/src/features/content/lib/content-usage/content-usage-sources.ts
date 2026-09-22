@@ -1,8 +1,6 @@
 import {
   CLASS_CHARACTER_REFERENCE,
   FEAT_CHARACTER_REFERENCE,
-  LOCATION_CHARACTER_REFERENCE,
-  ORGANIZATION_CHARACTER_REFERENCE,
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
   SPECIES_CHARACTER_REFERENCE,
   SPELL_CHARACTER_REFERENCE,
@@ -14,7 +12,7 @@ import {
   indexCharacterRelationshipCharacterBlockersByContentId,
   indexCharacterRelationshipLocationBlockersByContentId,
   indexCharacterRelationshipOrganizationBlockersByContentId,
-} from '../../../character-relationships'
+} from '../../../character-relationships/lib/content-usage/character-relationship-usage'
 import {
   indexCharacterBlockersByContentId,
   indexCharacterEquipmentBlockersByContentId,
@@ -48,10 +46,6 @@ export const characterSubclassSource = characterDescriptorSource(SUBCLASS_CHARAC
 export const characterSpeciesSource = characterDescriptorSource(SPECIES_CHARACTER_REFERENCE)
 export const characterSpellSource = characterDescriptorSource(SPELL_CHARACTER_REFERENCE)
 export const characterFeatSource = characterDescriptorSource(FEAT_CHARACTER_REFERENCE)
-export const characterOrganizationSource = characterDescriptorSource(
-  ORGANIZATION_CHARACTER_REFERENCE,
-)
-export const characterLocationSource = characterDescriptorSource(LOCATION_CHARACTER_REFERENCE)
 export const characterSkillProficiencySource = characterDescriptorSource(
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
 )

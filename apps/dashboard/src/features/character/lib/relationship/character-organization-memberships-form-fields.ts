@@ -1,38 +1,49 @@
-import { characterConnectionsSchema } from '@rpg/contracts'
-import type { OrganizationReferenceResolution } from '@rpg/contracts'
 import type { ReactNode } from 'react'
 import type { FormItem } from '@rpg/ui/form'
-import type { z } from 'zod'
+import { z } from 'zod'
 
 import type { CharacterRelationshipFieldContext } from './character-relationship-field-context.types'
 import { buildRelationshipArrayField } from './character-relationship-array-form-fields'
+import {
+  organizationMembershipFormRowSchema,
+  organizationMembershipProjectionsToFormValues,
+  type OrganizationMembershipSheetRow,
+} from './character-relationship-form-rows.lib'
+import type { CharacterRelationshipProjectionRow } from '@rpg/contracts'
 import { CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY } from './character-relationship-vocabulary'
 
-export const organizationMembershipsFormSchema = characterConnectionsSchema.pick({
-  organizations: true,
+export const organizationMembershipsFormSchema = z.object({
+  organizations: z.array(organizationMembershipFormRowSchema),
 })
 
 export type OrganizationMembershipsFormValues = z.infer<typeof organizationMembershipsFormSchema>
 
 export function organizationMembershipsToFormValues(
-  memberships: readonly OrganizationReferenceResolution[],
+  memberships:
+    | readonly CharacterRelationshipProjectionRow[]
+    | readonly OrganizationMembershipSheetRow[],
 ): OrganizationMembershipsFormValues {
-  return {
-    organizations: memberships.map(({ organizationId, title, priority }) => ({
-      organizationId,
-      ...(title !== undefined ? { title } : {}),
-      ...(priority !== undefined ? { priority } : {}),
-    })),
+  if (memberships.length === 0) {
+    return { organizations: [] }
   }
-}
 
-export function areOrganizationMembershipListsEqual(
-  left: readonly OrganizationReferenceResolution[],
-  right: readonly OrganizationReferenceResolution[],
-): boolean {
-  return (
-    JSON.stringify(organizationMembershipsToFormValues(left).organizations) ===
-    JSON.stringify(organizationMembershipsToFormValues(right).organizations)
+  const first = memberships[0]
+  if (first && 'relationshipId' in first && 'organizationId' in first && !('kind' in first)) {
+    return {
+      organizations: (memberships as readonly OrganizationMembershipSheetRow[]).map(
+        ({ relationshipId, revision, organizationId, title, priority }) => ({
+          relationshipId,
+          revision,
+          organizationId,
+          ...(title !== undefined ? { title } : {}),
+          ...(priority !== undefined ? { priority } : {}),
+        }),
+      ),
+    }
+  }
+
+  return organizationMembershipProjectionsToFormValues(
+    memberships as readonly CharacterRelationshipProjectionRow[],
   )
 }
 

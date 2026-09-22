@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import type { CharacterBuilderDraft, CharacterConnections } from '@rpg/contracts'
+import type { CharacterBuilderDraft, CharacterRelationshipDraftEdges } from '@rpg/contracts'
 
 import type { ConnectionsFormValues } from '../../../../lib/steps/connections-form-fields'
 import {
@@ -11,20 +11,20 @@ import {
 } from '../../../../lib/steps/connections-form-values'
 
 type ConnectionsDraftSyncProps = {
-  draftConnections: CharacterConnections
+  draftRelationshipEdges: CharacterRelationshipDraftEdges
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
 }
 
 /** Keeps connections form state and the persisted builder draft in sync (both directions). */
 export function ConnectionsDraftSync({
-  draftConnections,
+  draftRelationshipEdges,
   onDraftChange,
 }: ConnectionsDraftSyncProps) {
   const { control, reset } = useFormContext<ConnectionsFormValues>()
   const organizations = useWatch({ control, name: 'organizations' })
   const locations = useWatch({ control, name: 'locations' })
   const onDraftChangeRef = useRef(onDraftChange)
-  const priorDraftRef = useRef(draftConnections)
+  const priorDraftRef = useRef(draftRelationshipEdges)
 
   useEffect(() => {
     onDraftChangeRef.current = onDraftChange
@@ -32,27 +32,27 @@ export function ConnectionsDraftSync({
 
   useEffect(() => {
     const previousDraft = priorDraftRef.current
-    const draftChanged = !areConnectionsDraftsEqual(previousDraft, draftConnections)
-    const formConnections = connectionsFormValuesToDraft(
+    const draftChanged = !areConnectionsDraftsEqual(previousDraft, draftRelationshipEdges)
+    const formEdges = connectionsFormValuesToDraft(
       {
         organizations: organizations ?? [],
         locations: locations ?? [],
       },
-      draftConnections,
+      draftRelationshipEdges,
     )
 
     if (draftChanged) {
-      priorDraftRef.current = draftConnections
-      if (!areConnectionsDraftsEqual(draftConnections, formConnections)) {
-        reset(connectionsDraftToFormValues(draftConnections))
+      priorDraftRef.current = draftRelationshipEdges
+      if (!areConnectionsDraftsEqual(draftRelationshipEdges, formEdges)) {
+        reset(connectionsDraftToFormValues(draftRelationshipEdges))
       }
       return
     }
 
-    if (!areConnectionsDraftsEqual(draftConnections, formConnections)) {
-      onDraftChangeRef.current({ connections: formConnections })
+    if (!areConnectionsDraftsEqual(draftRelationshipEdges, formEdges)) {
+      onDraftChangeRef.current({ relationshipEdges: formEdges })
     }
-  }, [draftConnections, locations, organizations, reset])
+  }, [draftRelationshipEdges, locations, organizations, reset])
 
   return null
 }

@@ -21,10 +21,11 @@ import { filterReferenceableCatalogRows } from '../../lib/form-options/content-r
 import { buildLocationsById } from '../lib/location-display'
 import { useLocations } from './use-locations'
 import {
-  createCharacterLocationConnection,
-  deleteCharacterLocationConnection,
-  updateCharacterLocationConnection,
-} from '../api/character-location-connection-client'
+  createCharacterRelationship,
+  createCharacterRelationshipIdempotencyKey,
+  deleteCharacterRelationship,
+  listCharacterRelationships,
+} from '@/features/character'
 import {
   createOrganizationLocationConnection,
   deleteOrganizationLocationConnection,
@@ -132,6 +133,48 @@ async function upsertOrganizationInverseConnection(input: {
   return { organizationIds: [input.organizationId] }
 }
 
+async function resolveCharacterRelationshipRevision(
+  campaignId: string,
+  characterId: string,
+  relationshipId: string,
+): Promise<number> {
+  const response = await listCharacterRelationships(campaignId, characterId)
+  const row = response.items.find((item) => item.relationshipId === relationshipId)
+  if (!row) {
+    throw new Error('Could not find this relationship.')
+  }
+  return row.revision
+}
+
+async function deleteCharacterLocationEdge(
+  campaignId: string,
+  characterId: string,
+  relationshipId: string,
+): Promise<void> {
+  const expectedRevision = await resolveCharacterRelationshipRevision(
+    campaignId,
+    characterId,
+    relationshipId,
+  )
+  await deleteCharacterRelationship(campaignId, relationshipId, { expectedRevision })
+}
+
+async function createCharacterLocationEdge(
+  campaignId: string,
+  characterId: string,
+  locationId: string,
+  kind: CharacterLocationConnectionKind,
+): Promise<void> {
+  await createCharacterRelationship(campaignId, {
+    idempotencyKey: createCharacterRelationshipIdempotencyKey(),
+    relationship: {
+      kind,
+      characterId,
+      locationId,
+    },
+  })
+}
+
 async function upsertCharacterInverseConnection(input: {
   campaignId: string
   locationId: string
@@ -143,24 +186,32 @@ async function upsertCharacterInverseConnection(input: {
     const { relationshipId, characterId: previousCharacterId } = input.drawerState.connection
 
     if (previousCharacterId === input.characterId) {
-      await updateCharacterLocationConnection(input.campaignId, input.characterId, relationshipId, {
-        kind: input.kind,
-      })
+      await deleteCharacterLocationEdge(input.campaignId, input.characterId, relationshipId)
+      await createCharacterLocationEdge(
+        input.campaignId,
+        input.characterId,
+        input.locationId,
+        input.kind,
+      )
       return { characterIds: [input.characterId] }
     }
 
-    await deleteCharacterLocationConnection(input.campaignId, previousCharacterId, relationshipId)
-    await createCharacterLocationConnection(input.campaignId, input.characterId, {
-      locationId: input.locationId,
-      kind: input.kind,
-    })
+    await deleteCharacterLocationEdge(input.campaignId, previousCharacterId, relationshipId)
+    await createCharacterLocationEdge(
+      input.campaignId,
+      input.characterId,
+      input.locationId,
+      input.kind,
+    )
     return { characterIds: [input.characterId, previousCharacterId] }
   }
 
-  await createCharacterLocationConnection(input.campaignId, input.characterId, {
-    locationId: input.locationId,
-    kind: input.kind,
-  })
+  await createCharacterLocationEdge(
+    input.campaignId,
+    input.characterId,
+    input.locationId,
+    input.kind,
+  )
   return { characterIds: [input.characterId] }
 }
 
@@ -317,7 +368,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
       await runMutation(async () => {
         if (input.subjectType === 'character') {
           if (!canInverseWriteLocationConnectionForOwner('characters')) return
-          await deleteCharacterLocationConnection(campaignId, input.subjectId, input.relationshipId)
+          await deleteCharacterLocationEdge(campaignId, input.subjectId, input.relationshipId)
           await invalidate({ characterId: input.subjectId })
           return
         }

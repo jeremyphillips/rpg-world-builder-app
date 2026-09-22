@@ -43,20 +43,24 @@ export async function createPcRecord(
   return toCharacter(character.toObject() as CharacterRecord)
 }
 
-export async function createNpcRecord(input: CreateNpcServiceInput): Promise<NpcCharacter> {
+export async function createNpcRecord(
+  input: CreateNpcServiceInput,
+  options?: WithMongoSession,
+): Promise<NpcCharacter> {
   assertCharacterXpMutationAllowed(
     { classes: input.classes, xp: input.xp ?? null },
     input.xp ?? null,
   )
 
-  const doc = await CharacterModel.create({
+  const character = new CharacterModel({
     ...input,
     characterType: 'npc',
     rulesetId: input.rulesetId as SystemRulesetId,
     vital: createDefaultCharacterVitalState(),
   })
 
-  return toNpcCharacter(doc.toObject() as CharacterRecord)
+  await character.save({ session: options?.session })
+  return toNpcCharacter(character.toObject() as CharacterRecord)
 }
 
 export async function listPcsForUser(userId: string): Promise<PcCharacter[]> {

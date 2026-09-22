@@ -2,14 +2,13 @@ import type { CreateCharacterRelationshipInput } from '@rpg/contracts'
 import { isCharacterLocationConnectionEligible } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
-import { findOpenParticipationForCharacter } from '../../campaign'
+import type { WithMongoSession } from '../../../lib/mongo-session'
+import { findOpenParticipationForCharacter } from '../../campaign/participation/campaign-character-participation.repository'
 import { findNpcById, findPcById } from '../../character'
-import {
-  HomebrewLocationModel,
-  HomebrewOrganizationModel,
-  toHomebrewLocation,
-  type HomebrewDoc,
-} from '../../content'
+import type { HomebrewDoc } from '../../content/lib/content-write-config'
+import { HomebrewLocationModel } from '../../content/locations/homebrew-location.model'
+import { toHomebrewLocation } from '../../content/locations/locations.config'
+import { HomebrewOrganizationModel } from '../../content/organizations/homebrew-organization.model'
 
 const ELIGIBLE_LOCATION_CONNECTION_KINDS = new Set([
   'resides_at',
@@ -22,8 +21,9 @@ const ELIGIBLE_LOCATION_CONNECTION_KINDS = new Set([
 async function assertCharacterParticipatesInCampaign(
   campaignId: string,
   characterId: string,
+  options?: WithMongoSession,
 ): Promise<void> {
-  const participation = await findOpenParticipationForCharacter(characterId)
+  const participation = await findOpenParticipationForCharacter(characterId, options)
   if (!participation || participation.campaignId !== campaignId) {
     throw new HttpError(
       404,
@@ -36,8 +36,12 @@ async function assertCharacterParticipatesInCampaign(
 async function assertOrganizationExistsInCampaign(
   campaignId: string,
   organizationId: string,
+  options?: WithMongoSession,
 ): Promise<void> {
-  const exists = await HomebrewOrganizationModel.exists({ _id: organizationId, campaignId })
+  const exists = await HomebrewOrganizationModel.exists({
+    _id: organizationId,
+    campaignId,
+  }).session(options?.session ?? null)
   if (!exists) {
     throw new HttpError(
       404,
@@ -47,11 +51,17 @@ async function assertOrganizationExistsInCampaign(
   }
 }
 
-async function loadCampaignLocation(campaignId: string, locationId: string) {
+async function loadCampaignLocation(
+  campaignId: string,
+  locationId: string,
+  options?: WithMongoSession,
+) {
   const doc = await HomebrewLocationModel.findOne({
     _id: locationId,
     campaignId,
-  }).lean<HomebrewDoc>()
+  })
+    .lean<HomebrewDoc>()
+    .session(options?.session ?? null)
   if (!doc) {
     throw new HttpError(
       404,
@@ -75,8 +85,9 @@ async function assertEligibleLocationConnection(
     CreateCharacterRelationshipInput,
     { kind: 'resides_at' | 'owns' | 'tenant' | 'operator' | 'works_at' }
   >,
+  options?: WithMongoSession,
 ): Promise<void> {
-  const location = await loadCampaignLocation(campaignId, input.locationId)
+  const location = await loadCampaignLocation(campaignId, input.locationId, options)
   if (!isCharacterLocationConnectionEligible(toLocationEligibilityInput(location), input.kind)) {
     throw new HttpError(
       400,
@@ -90,28 +101,30 @@ async function assertRelatedCharacterEndpoints(
   campaignId: string,
   characterId: string,
   relatedCharacterId: string,
+  options?: WithMongoSession,
 ): Promise<void> {
   if (characterId === relatedCharacterId) {
     throw new HttpError(409, 'conflict', 'A character cannot have a relationship with itself.')
   }
 
-  const relatedPc = await findPcById(relatedCharacterId)
+  const relatedPc = await findPcById(relatedCharacterId, options)
   const relatedNpc = relatedPc ? null : await findNpcById(relatedCharacterId)
   if (!relatedPc && !relatedNpc) {
     throw new HttpError(404, 'not_found', `Character "${relatedCharacterId}" was not found.`)
   }
 
-  await assertCharacterParticipatesInCampaign(campaignId, relatedCharacterId)
+  await assertCharacterParticipatesInCampaign(campaignId, relatedCharacterId, options)
 }
 
 export async function assertCreateCharacterRelationshipEndpoints(
   campaignId: string,
   input: CreateCharacterRelationshipInput,
+  options?: WithMongoSession,
 ): Promise<void> {
-  await assertCharacterParticipatesInCampaign(campaignId, input.characterId)
+  await assertCharacterParticipatesInCampaign(campaignId, input.characterId, options)
 
   if (input.kind === 'organizationMembership') {
-    await assertOrganizationExistsInCampaign(campaignId, input.organizationId)
+    await assertOrganizationExistsInCampaign(campaignId, input.organizationId, options)
     return
   }
 
@@ -122,12 +135,13 @@ export async function assertCreateCharacterRelationshipEndpoints(
         CreateCharacterRelationshipInput,
         { kind: 'resides_at' | 'owns' | 'tenant' | 'operator' | 'works_at' }
       >,
+      options,
     )
     return
   }
 
   if (input.kind === 'hometown' || input.kind === 'birthplace') {
-    await loadCampaignLocation(campaignId, input.locationId)
+    await loadCampaignLocation(campaignId, input.locationId, options)
     return
   }
 
@@ -139,5 +153,10 @@ export async function assertCreateCharacterRelationshipEndpoints(
     )
   }
 
-  await assertRelatedCharacterEndpoints(campaignId, input.characterId, input.relatedCharacterId)
+  await assertRelatedCharacterEndpoints(
+    campaignId,
+    input.characterId,
+    input.relatedCharacterId,
+    options,
+  )
 }

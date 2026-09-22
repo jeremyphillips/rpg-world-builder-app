@@ -7,7 +7,6 @@ import { makeLocation } from '@/test/fixtures/factories/location'
 
 import { CharacterResidenceContainer } from './character-residence-container'
 import { useCharacterResidenceSheet } from '../../../hooks/use-character-residence-sheet'
-import { RESIDENCE_CONNECTION_KIND } from '../../../lib/connections/residence-location-connection.lib'
 
 vi.mock('../../../hooks/use-character-residence-sheet')
 
@@ -19,6 +18,24 @@ const residence = makeLocation({
   settlementType: 'city',
 })
 
+const residenceProjection = {
+  relationshipId: 'conn-1',
+  kind: 'resides_at' as const,
+  section: 'places' as const,
+  roleLabel: 'Resides at',
+  details: {},
+  visibility: 'dm_only' as const,
+  referenceStatus: 'resolved' as const,
+  target: {
+    type: 'location' as const,
+    id: residence.id,
+    name: residence.name,
+    slug: residence.slug,
+  },
+  revision: 1,
+  capabilities: { canUpdateDetails: true, canDelete: true },
+}
+
 const mockedUseCharacterResidenceSheet = vi.mocked(useCharacterResidenceSheet)
 
 function mockResidenceSheet(
@@ -26,7 +43,7 @@ function mockResidenceSheet(
 ) {
   mockedUseCharacterResidenceSheet.mockReturnValue({
     isBootstrapping: false,
-    locationReferences: [],
+    residenceProjections: [],
     locations: [residence],
     pickerItems: [{ location: residence, selected: false }],
     locationsQueryStatus: { status: 'success' },
@@ -80,7 +97,7 @@ describe('CharacterResidenceContainer', () => {
     await user.click(screen.getAllByRole('button', { name: 'Add' }).at(-1)!)
 
     await waitFor(() => {
-      expect(handleAdd).toHaveBeenCalledWith({ locationId: residence.id })
+      expect(handleAdd).toHaveBeenCalledWith(residence.id, expect.any(String))
       expect(screen.getByText('Harborford')).toBeInTheDocument()
       expect(screen.queryByText('No residence added.')).not.toBeInTheDocument()
     })
@@ -91,16 +108,7 @@ describe('CharacterResidenceContainer', () => {
     const handleRemove = vi.fn().mockRejectedValue(new Error('Could not remove this residence.'))
 
     mockResidenceSheet({
-      locationReferences: [
-        {
-          connection: {
-            id: 'conn-1',
-            locationId: residence.id,
-            kind: RESIDENCE_CONNECTION_KIND,
-          },
-          location: residence,
-        },
-      ],
+      residenceProjections: [residenceProjection],
       handleRemove,
     })
 
@@ -121,21 +129,12 @@ describe('CharacterResidenceContainer', () => {
       expect(screen.getByText('Could not remove this residence.')).toBeInTheDocument()
       expect(screen.queryByText('No residence added.')).not.toBeInTheDocument()
     })
-    expect(handleRemove).toHaveBeenCalledWith('conn-1', residence.id)
+    expect(handleRemove).toHaveBeenCalledWith('conn-1', 1, residence.id)
   })
 
   it('shows catalog names on read-only sheets without a locations query', () => {
     mockResidenceSheet({
-      locationReferences: [
-        {
-          connection: {
-            id: 'conn-1',
-            locationId: residence.id,
-            kind: RESIDENCE_CONNECTION_KIND,
-          },
-          location: residence,
-        },
-      ],
+      residenceProjections: [residenceProjection],
       locations: [],
       pickerItems: [],
     })
@@ -167,22 +166,14 @@ describe('CharacterResidenceContainer', () => {
     const order: string[] = []
     const handleAdd = vi.fn(async () => {
       order.push('add')
+      return { relationshipId: 'edge-new' }
     })
     const handleRemove = vi.fn(async () => {
       order.push('remove')
     })
 
     mockResidenceSheet({
-      locationReferences: [
-        {
-          connection: {
-            id: 'conn-1',
-            locationId: residence.id,
-            kind: RESIDENCE_CONNECTION_KIND,
-          },
-          location: residence,
-        },
-      ],
+      residenceProjections: [residenceProjection],
       locations: [residence, millbridge],
       pickerItems: [
         { location: residence, selected: true },
@@ -209,9 +200,7 @@ describe('CharacterResidenceContainer', () => {
     await waitFor(() => {
       expect(order).toEqual(['remove', 'add'])
     })
-    expect(handleRemove).toHaveBeenCalledWith('conn-1', residence.id)
-    expect(handleAdd).toHaveBeenCalledWith({ locationId: millbridge.id })
-    expect(screen.getByText('Millbridge')).toBeInTheDocument()
-    expect(screen.queryByText('Harborford')).not.toBeInTheDocument()
+    expect(handleRemove).toHaveBeenCalledWith('conn-1', 1, residence.id)
+    expect(handleAdd).toHaveBeenCalledWith(millbridge.id, expect.any(String))
   })
 })

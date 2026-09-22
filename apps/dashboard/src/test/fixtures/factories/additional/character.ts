@@ -45,7 +45,6 @@ export function makePcCharacter(overrides: Partial<PcCharacter> = {}): PcCharact
       mounts: [],
     },
     wealth: overrides.wealth ?? { cp: 0, sp: 0, gp: 0, pp: 0 },
-    connections: overrides.connections ?? { organizations: [], locations: [] },
     feats: overrides.feats ?? [],
     vital: overrides.vital ?? createDefaultCharacterVitalState(),
     narrative: overrides.narrative ?? {

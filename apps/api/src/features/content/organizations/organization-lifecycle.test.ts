@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { Types } from 'mongoose'
 
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { seedOrganizationMembershipEdge } from '../../../test/helpers/character-relationship-edges'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
-import { CharacterModel, createPcRecord } from '../../character'
+import { createPcRecord } from '../../character'
 import {
   deleteContentEntity,
   getContentDeletionAvailability,
@@ -23,17 +23,16 @@ const minimalOrganizationInput = {
   organizationDomain: 'military',
 } as const
 
-async function setOrganizationConnection(characterId: string, organizationId: string) {
-  await CharacterModel.collection.updateOne(
-    { _id: new Types.ObjectId(characterId) },
-    {
-      $set: {
-        connections: {
-          organizations: [{ organizationId }],
-        },
-      },
-    },
-  )
+async function setOrganizationConnection(
+  campaignId: string,
+  characterId: string,
+  organizationId: string,
+) {
+  await seedOrganizationMembershipEdge({
+    campaignId,
+    characterId,
+    organizationId,
+  })
 }
 
 describe('organization lifecycle references', () => {
@@ -50,14 +49,14 @@ describe('organization lifecycle references', () => {
       characterId: pc.id,
       joinedAt: new Date().toISOString(),
     })
-    const { character: npc } = await createCampaignNpc(campaign.id, {
+    const { character: npc } = await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Circle Envoy',
     })
 
     await Promise.all([
-      setOrganizationConnection(pc.id, organization.id),
-      setOrganizationConnection(npc.id, organization.id),
+      setOrganizationConnection(campaign.id, pc.id, organization.id),
+      setOrganizationConnection(campaign.id, npc.id, organization.id),
     ])
 
     const availability = await getContentDeletionAvailability(
@@ -86,11 +85,11 @@ describe('organization lifecycle references', () => {
       ...minimalOrganizationInput,
       slug: 'demotable-circle',
     })
-    const { character: npc } = await createCampaignNpc(campaign.id, {
+    const { character: npc } = await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Former Envoy',
     })
-    await setOrganizationConnection(npc.id, organization.id)
+    await setOrganizationConnection(campaign.id, npc.id, organization.id)
 
     await expect(
       getContentDemotionAvailability(organizationWriteConfig, campaign.id, organization.id),

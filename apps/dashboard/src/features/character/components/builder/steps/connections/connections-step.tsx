@@ -36,19 +36,19 @@ function ConnectionsStepForm({ draft, onDraftChange }: ConnectionsStepFormProps)
         relationshipContext,
         renderDraftSync: () => (
           <ConnectionsDraftSync
-            draftConnections={draft.connections}
+            draftRelationshipEdges={draft.relationshipEdges}
             onDraftChange={onDraftChange}
           />
         ),
       }),
-    [draft.connections, onDraftChange, relationshipContext],
+    [draft.relationshipEdges, onDraftChange, relationshipContext],
   )
 
   return (
     <Form
       schema={connectionsFormSchema}
       fields={fields}
-      defaultValues={connectionsDraftToFormValues(draft.connections)}
+      defaultValues={connectionsDraftToFormValues(draft.relationshipEdges)}
       mode="onChange"
       onSubmit={() => undefined}
     />

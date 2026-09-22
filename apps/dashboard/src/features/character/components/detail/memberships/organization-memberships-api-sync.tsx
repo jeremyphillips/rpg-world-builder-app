@@ -1,17 +1,24 @@
 import { Text } from '@rpg/ui'
-import type { OrganizationReferenceResolution } from '@rpg/contracts'
+import type { CharacterRelationshipProjectionRow } from '@rpg/contracts'
 
-import type { OrganizationMembershipSelection } from '../../connections/picker/organization-picker-drawer.types'
 import {
-  areOrganizationMembershipListsEqual,
-  organizationMembershipsToFormValues,
-  type OrganizationMembershipsFormValues,
-} from '../../../lib/relationship/character-organization-memberships-form-fields'
-import { useRelationshipApiSemanticSync } from '../../../lib/relationship/use-relationship-api-semantic-sync'
+  areOrganizationMembershipProjectionsEqual,
+  organizationMembershipFormRowContentEqual,
+  organizationMembershipProjectionToFormRow,
+  organizationMembershipProjectionsToFormValues,
+  type OrganizationMembershipFormRow,
+} from '../../../lib/relationship/character-relationship-form-rows.lib'
+import type { OrganizationMembershipsFormValues } from '../../../lib/relationship/character-organization-memberships-form-fields'
+import { useRelationshipEdgeApiSync } from '../../../lib/relationship/use-relationship-edge-api-sync'
+
+type ApiOrganizationMembershipFormRow = OrganizationMembershipFormRow & { revision: number }
 
 type OrganizationMembershipsApiSyncProps = {
-  serverMemberships: readonly OrganizationReferenceResolution[]
-  onAdd: (selection: OrganizationMembershipSelection) => void | Promise<void>
+  serverMemberships: readonly CharacterRelationshipProjectionRow[]
+  onAdd: (
+    organizationId: string,
+    idempotencyKey: string,
+  ) => Promise<{ relationshipId: string } | void>
 }
 
 /** Commits organization membership picker adds from RHF to the API sheet handlers. */
@@ -19,17 +26,39 @@ export function OrganizationMembershipsApiSync({
   serverMemberships,
   onAdd,
 }: OrganizationMembershipsApiSyncProps) {
-  const syncError = useRelationshipApiSemanticSync<
+  const syncError = useRelationshipEdgeApiSync<
     OrganizationMembershipsFormValues,
-    OrganizationReferenceResolution
+    CharacterRelationshipProjectionRow,
+    ApiOrganizationMembershipFormRow
   >({
     serverSnapshot: serverMemberships,
-    areServerEqual: areOrganizationMembershipListsEqual,
-    toFormValues: organizationMembershipsToFormValues,
+    areServerEqual: areOrganizationMembershipProjectionsEqual,
+    toFormValues: (rows) =>
+      organizationMembershipProjectionsToFormValues(rows) as OrganizationMembershipsFormValues,
+    toSnapshotRows: (rows) => rows,
     formFieldName: 'organizations',
-    semanticIdKey: 'organizationId',
-    getConfirmedIds: (memberships) => memberships.map((membership) => membership.organizationId),
-    onAdd: (organizationId) => onAdd({ organizationId }),
+    getFormRows: (formValues) =>
+      (formValues.organizations ?? []).map((row) => ({
+        ...row,
+        revision: row.revision ?? 0,
+      })),
+    isRowContentEqual: (confirmed, desired) =>
+      organizationMembershipFormRowContentEqual(
+        organizationMembershipProjectionToFormRow(confirmed),
+        desired,
+      ),
+    onAdd: async (op, row) => {
+      if (!op.idempotencyKey) {
+        throw new Error('Could not add this organization membership.')
+      }
+      return onAdd(row.organizationId, op.idempotencyKey)
+    },
+    onUpdate: async () => {
+      throw new Error('Could not update this organization membership.')
+    },
+    onRemove: async () => {
+      throw new Error('Could not remove this organization membership.')
+    },
     addErrorFallback: 'Could not add this organization membership.',
   })
 

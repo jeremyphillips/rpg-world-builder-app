@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
 
-import { characterLocationReferencesQueryKey } from '@/features/character'
+import { characterRelationshipsQueryKey } from '@/features/character'
 
 import { locationConnectedPartiesQueryKey } from '../../../locations/hooks/use-location-connected-parties'
 import { locationsQueryKey } from '../../../locations/hooks/use-locations'
@@ -34,7 +34,7 @@ export async function invalidateLocationConnectionQueries(
   if (input.characterId) {
     invalidations.push(
       queryClient.invalidateQueries({
-        queryKey: characterLocationReferencesQueryKey(input.campaignId, input.characterId),
+        queryKey: characterRelationshipsQueryKey(input.campaignId, input.characterId),
       }),
     )
   }

@@ -14,11 +14,12 @@ import { isClassProgressionApplicable } from './progression/character-level-poli
 import { getCharacterBuilderChromeMessages } from './messages/character-builder-chrome-messages'
 import { resolveCharacterBuilderChromeVariant } from './character-builder-chrome-variant'
 import type { CharacterBuilderDraft } from './draft/draft'
-import { resolvePlayableBuilderContent } from './preview/resolve-playable-builder-content'
 import {
   CHARACTER_BUILDER_STEP_IDS,
   type CharacterBuilderStepId,
 } from '../../character-builder/step-ids'
+import { characterRelationshipDraftEdgesSchema } from '../character-relationships/draft'
+import { isCharacterConnectionsStepApplicable } from './relationship-write'
 
 // ---------------------------------------------------------------------------
 // BuilderStepStatus — the computed display state of a wizard step.
@@ -77,9 +78,7 @@ const BUILDER_STEP_METADATA = {
     description:
       'Connect your character to organizations that shape their loyalties, obligations, or history.',
     compactDescription: 'Connect your character to organizations',
-    isApplicable: (context, draft) =>
-      draft.connections.organizations.length > 0 ||
-      resolvePlayableBuilderContent(context).organizations.length > 0,
+    isApplicable: (context) => isCharacterConnectionsStepApplicable(context),
   },
   species: {
     label: getContentTypeTerm('species').label,
@@ -284,8 +283,14 @@ function isClassComplete(draft: CharacterBuilderDraft): boolean {
 }
 
 function isConnectionsComplete(draft: CharacterBuilderDraft): boolean {
-  const selectedIds = draft.connections.organizations.map(({ organizationId }) => organizationId)
-  return new Set(selectedIds).size === selectedIds.length
+  const parsed = characterRelationshipDraftEdgesSchema.safeParse(draft.relationshipEdges)
+  if (!parsed.success) return false
+
+  const organizationIds = parsed.data
+    .filter((edge) => edge.kind === 'organizationMembership')
+    .map((edge) => edge.organizationId)
+
+  return new Set(organizationIds).size === organizationIds.length
 }
 
 function isAbilitiesComplete(

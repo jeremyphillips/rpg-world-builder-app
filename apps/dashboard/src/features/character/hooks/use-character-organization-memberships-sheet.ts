@@ -4,7 +4,7 @@ import {
   isContentPlayableFor,
   resolveOrganizationMembershipMetadata,
 } from '@rpg/contracts'
-import type { Organization, OrganizationReferenceResolution } from '@rpg/contracts'
+import type { Organization } from '@rpg/contracts'
 
 import { useOrganizations } from '@/features/content'
 
@@ -12,19 +12,20 @@ import {
   formatRemoveMembershipHeadline,
   type EditOrganizationMembershipOrganization,
 } from '../components/connections/edit-organization-membership-drawer.types'
-import type {
-  OrganizationMembershipSelection,
-  OrganizationPickerItem,
-} from '../components/connections/picker/organization-picker-drawer.types'
-import { useCharacterOrganizationMembershipMutations } from './use-character-organization-membership-mutations'
-import { useCharacterOrganizationReferences } from './use-character-organization-references'
-import type { CharacterOrganizationMembershipSubjectKind } from '../lib/invalidate-character-organization-membership-queries'
+import type { OrganizationPickerItem } from '../components/connections/picker/organization-picker-drawer.types'
+import { useCharacterRelationshipMutations } from './use-character-relationship-mutations'
+import { useCharacterRelationships } from './use-character-relationships'
+import type { CharacterRelationshipSubjectKind } from '../lib/invalidate-character-relationship-queries'
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../lib/display/character-display'
 import { resolveRelationshipPlayActor } from '../lib/relationship/character-relationship-play-actor.lib'
+import {
+  organizationMembershipProjectionToSheetRow,
+  type OrganizationMembershipSheetRow,
+} from '../lib/relationship/character-relationship-form-rows.lib'
 
 function toPickerItems(
   organizations: readonly Organization[],
-  memberships: readonly OrganizationReferenceResolution[],
+  memberships: readonly OrganizationMembershipSheetRow[],
   playActor: ReturnType<typeof resolveRelationshipPlayActor>,
 ): OrganizationPickerItem[] {
   const selectedIds = new Set(memberships.map((membership) => membership.organizationId))
@@ -37,7 +38,7 @@ function toPickerItems(
 }
 
 function toEditableOrganization(
-  membership: OrganizationReferenceResolution | null,
+  membership: OrganizationMembershipSheetRow | null,
 ): EditOrganizationMembershipOrganization | null {
   const organization = membership?.organization
   if (!organization || typeof organization.organizationDomain !== 'string') return null
@@ -61,22 +62,26 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   characterId: string
   characterName: string
   canEdit: boolean
-  subjectKind: CharacterOrganizationMembershipSubjectKind
+  subjectKind: CharacterRelationshipSubjectKind
 }) {
   const { campaignId, characterId, characterName, canEdit, subjectKind } = input
-  const referencesQuery = useCharacterOrganizationReferences(campaignId, characterId)
+  const relationshipsQuery = useCharacterRelationships(campaignId, characterId, {
+    kinds: ['organizationMembership'],
+    limit: 50,
+  })
   const organizationsQuery = useOrganizations(canEdit ? campaignId : undefined)
-  const mutations = useCharacterOrganizationMembershipMutations(
-    campaignId,
-    characterId,
-    subjectKind,
-  )
+  const mutations = useCharacterRelationshipMutations(campaignId, {
+    characters: [{ characterId, subjectKind }],
+  })
 
-  const memberships = React.useMemo(() => referencesQuery.data ?? [], [referencesQuery.data])
+  const memberships = React.useMemo(
+    () => (relationshipsQuery.data?.items ?? []).map(organizationMembershipProjectionToSheetRow),
+    [relationshipsQuery.data?.items],
+  )
   const [editingMembership, setEditingMembership] =
-    React.useState<OrganizationReferenceResolution | null>(null)
+    React.useState<OrganizationMembershipSheetRow | null>(null)
   const [unresolvedToRemove, setUnresolvedToRemove] =
-    React.useState<OrganizationReferenceResolution | null>(null)
+    React.useState<OrganizationMembershipSheetRow | null>(null)
 
   const pickerItems = React.useMemo(
     () =>
@@ -93,14 +98,22 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   )
 
   const handleAdd = React.useCallback(
-    async (membership: OrganizationMembershipSelection) => {
+    async (organizationId: string, idempotencyKey: string) => {
       try {
-        await mutations.addMembership(membership)
+        const { relationship } = await mutations.createRelationship({
+          idempotencyKey,
+          relationship: {
+            kind: 'organizationMembership',
+            characterId,
+            organizationId,
+          },
+        })
+        return { relationshipId: relationship.id }
       } catch (error) {
         rethrowCanonicalized(error, 'Could not add this organization membership.')
       }
     },
-    [mutations],
+    [characterId, mutations],
   )
 
   const handleSave = React.useCallback(
@@ -112,9 +125,12 @@ export function useCharacterOrganizationMembershipsSheet(input: {
         currentMembership: editingMembership,
       })
       try {
-        await mutations.updateMembership(editingMembership.organizationId, {
-          title: metadata.title ?? null,
-          priority: metadata.priority ?? null,
+        await mutations.updateRelationship(editingMembership.relationshipId, {
+          expectedRevision: editingMembership.revision,
+          details: {
+            title: metadata.title ?? null,
+            priority: metadata.priority ?? null,
+          },
         })
       } catch (error) {
         rethrowCanonicalized(error, 'Could not update this organization membership.')
@@ -126,7 +142,9 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   const handleRemove = React.useCallback(async () => {
     if (!editingMembership) return
     try {
-      await mutations.removeMembership(editingMembership.organizationId)
+      await mutations.deleteRelationship(editingMembership.relationshipId, {
+        expectedRevision: editingMembership.revision,
+      })
     } catch (error) {
       rethrowCanonicalized(error, 'Could not remove this organization membership.')
     }
@@ -135,7 +153,9 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   const handleRemoveUnresolved = React.useCallback(async () => {
     if (!unresolvedToRemove) return
     try {
-      await mutations.removeMembership(unresolvedToRemove.organizationId)
+      await mutations.deleteRelationship(unresolvedToRemove.relationshipId, {
+        expectedRevision: unresolvedToRemove.revision,
+      })
       setUnresolvedToRemove(null)
     } catch {
       // Keep confirm open for retry; ConfirmDialog has no inline error slot.
@@ -150,8 +170,9 @@ export function useCharacterOrganizationMembershipsSheet(input: {
     : ''
 
   return {
-    isBootstrapping: referencesQuery.isPending && referencesQuery.data === undefined,
+    isBootstrapping: relationshipsQuery.isPending && relationshipsQuery.data === undefined,
     memberships,
+    membershipProjections: relationshipsQuery.data?.items ?? [],
     pickerItems,
     editingMembership,
     setEditingMembership,

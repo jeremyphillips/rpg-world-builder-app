@@ -6,7 +6,6 @@ import {
   type CharacterBuildContext,
   type Location,
   type Organization,
-  type OrganizationReferenceResolution,
 } from '@rpg/contracts'
 import {
   RelationshipFieldProvider,
@@ -20,7 +19,10 @@ import { filterResidenceEligibleLocations } from '../connections/residence-locat
 import { resolveCharacterLocationsQueryStatus } from './character-locations-query-status.lib'
 import { characterOrganizationMembershipRelationshipAdapter } from './character-organization-membership-relationship.adapter'
 import { characterResidenceRelationshipAdapter } from './character-residence-relationship.adapter'
-import type { CharacterRelationshipFieldContext } from './character-relationship-field-context.types'
+import type {
+  CharacterRelationshipFieldContext,
+  OrganizationMembershipSheetRow,
+} from './character-relationship-field-context.types'
 import {
   CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
   CHARACTER_RESIDENCE_VOCABULARY,
@@ -144,9 +146,9 @@ export type CharacterApiRelationshipFieldContextInput = {
   locationsById: Map<string, Location>
   availableOrganizationIdSet: Set<string>
   availableResidenceIdSet: Set<string>
-  onEditMembership?: (membership: OrganizationReferenceResolution) => void
-  onRemoveUnresolvedMembership?: (membership: OrganizationReferenceResolution) => void
-  resolvedMemberships?: readonly OrganizationReferenceResolution[]
+  onEditMembership?: (membership: OrganizationMembershipSheetRow) => void
+  onRemoveUnresolvedMembership?: (membership: OrganizationMembershipSheetRow) => void
+  resolvedMemberships?: readonly OrganizationMembershipSheetRow[]
 }
 
 export function buildCharacterApiRelationshipFieldContext(

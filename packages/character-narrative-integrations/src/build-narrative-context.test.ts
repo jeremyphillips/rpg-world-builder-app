@@ -109,13 +109,21 @@ describe('buildNarrativeContext', () => {
     const context = createCampaignNpcContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: {
-        organizations: [
-          { organizationId: lanternGuild.id, title: 'Guildmaster' },
-          { organizationId: 'organization-missing' },
-        ],
-        locations: [],
-      },
+      relationshipEdges: [
+        {
+          id: 'edge-lantern-guild',
+          kind: 'organizationMembership' as const,
+          characterId: '__new_character__',
+          organizationId: lanternGuild.id,
+          details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+        },
+        {
+          id: 'edge-missing-org',
+          kind: 'organizationMembership' as const,
+          characterId: '__new_character__',
+          organizationId: 'organization-missing',
+        },
+      ],
     }
 
     const result = buildNarrativeContext({ draft, context, locations: [] })
@@ -130,15 +138,32 @@ describe('buildNarrativeContext', () => {
     const context = createCampaignNpcContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: {
-        organizations: [],
-        locations: [
-          { id: 'conn-1', locationId: harborfordSettlement.id, kind: 'resides_at' as const },
-          { id: 'conn-2', locationId: greyshoreRegion.id, kind: 'resides_at' as const },
-          { id: 'conn-3', locationId: 'location-missing', kind: 'resides_at' as const },
-          { id: 'conn-4', locationId: harborfordSettlement.id, kind: 'owns' as const },
-        ],
-      },
+      relationshipEdges: [
+        {
+          id: 'conn-1',
+          kind: 'resides_at' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+        {
+          id: 'conn-2',
+          kind: 'resides_at' as const,
+          characterId: '__new_character__',
+          locationId: greyshoreRegion.id,
+        },
+        {
+          id: 'conn-3',
+          kind: 'resides_at' as const,
+          characterId: '__new_character__',
+          locationId: 'location-missing',
+        },
+        {
+          id: 'conn-4',
+          kind: 'owns' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+      ],
     }
 
     const result = buildNarrativeContext({

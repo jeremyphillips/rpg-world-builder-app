@@ -24,7 +24,6 @@ import { createEmptyCharacterBuilderDraft } from './draft/draft'
 import type { CharacterBuilderDraft } from './draft/draft'
 import type { ChoiceSet } from './choice-set'
 import { DEFAULT_SYSTEM_RULESET_ID } from '../../primitives/ruleset'
-import type { Organization } from '../../content/organization/organization'
 import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../primitives/proficiency/character-creation-proficiency-rules'
 
 // ---------------------------------------------------------------------------
@@ -44,7 +43,7 @@ function makeCompleteDraft(): CharacterBuilderDraft {
       method: 'standard-array',
       scores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
     },
-    connections: { organizations: [], locations: [] },
+    relationshipEdges: [],
     choiceSelections: {},
     touchedStepIds: ['identity', 'species', 'class', 'abilities'],
   }
@@ -609,36 +608,28 @@ describe('isEffectiveBuilderStep', () => {
 })
 
 describe('resolveEffectiveBuilderSteps', () => {
-  const organization = {
-    id: 'organization-1',
-    slug: 'lantern-guild',
-    rulesetId: 'srd-cc-5.2.1',
-    source: 'system',
-    status: 'published',
-    campaignId: null,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    name: 'Lantern Guild',
-    organizationDomain: 'occupational',
-    functions: [],
-    practices: [],
-    members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
-    connections: { locations: [] },
-  } satisfies Organization
+  const TEST_CAMPAIGN_ID = 'camp_1'
 
-  it('omits Connections when no organizations are selectable or selected', () => {
+  it('omits Connections for standalone PC builds', () => {
     expect(
       resolveEffectiveBuilderSteps(createCharacterBuildContext(), makeDraft()).map(({ id }) => id),
     ).not.toContain('connections')
   })
 
-  it('inserts Connections after Identity when an organization is selectable', () => {
-    const context = createCharacterBuildContext({
-      catalog: {
-        ...createCharacterBuildContext().catalog,
-        organizations: [organization],
-      },
-    })
+  it('inserts Connections after Identity for campaign NPC authoring', () => {
+    const context = {
+      ...createCharacterBuildContext({
+        characterKind: 'npc',
+        rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      }),
+      characterKind: 'npc',
+      mode: 'dashboard',
+      scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
+      acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+      playActor: { kind: 'npc' },
+    } satisfies CampaignNpcBuildContext
 
     expect(
       resolveEffectiveBuilderSteps(context, makeDraft())
@@ -647,13 +638,33 @@ describe('resolveEffectiveBuilderSteps', () => {
     ).toEqual(['identity', 'connections', 'species'])
   })
 
-  it('keeps Connections visible for recovery when the draft contains a stale selection', () => {
+  it('keeps Connections visible for campaign NPC recovery drafts', () => {
+    const context = {
+      ...createCharacterBuildContext({
+        characterKind: 'npc',
+        rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      }),
+      characterKind: 'npc',
+      mode: 'dashboard',
+      scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
+      acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+      playActor: { kind: 'npc' },
+    } satisfies CampaignNpcBuildContext
     const draft = makeDraft({
-      connections: { organizations: [{ organizationId: 'removed-organization' }], locations: [] },
+      relationshipEdges: [
+        {
+          id: 'edge-removed-org',
+          kind: 'organizationMembership',
+          characterId: '__new_character__',
+          organizationId: 'removed-organization',
+        },
+      ],
     })
 
-    expect(
-      resolveEffectiveBuilderSteps(createCharacterBuildContext(), draft).map(({ id }) => id),
-    ).toContain('connections')
+    expect(resolveEffectiveBuilderSteps(context, draft).map(({ id }) => id)).toContain(
+      'connections',
+    )
   })
 })

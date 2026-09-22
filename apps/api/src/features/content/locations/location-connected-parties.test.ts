@@ -6,8 +6,8 @@ import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
+import { seedCharacterLocationEdge } from '../../../test/helpers/character-relationship-edges'
 import { createCampaignNpc } from '../../campaign'
-import { CharacterModel } from '../../character'
 import { createHomebrewContent } from '../lib/content-write.service'
 import { locationWriteConfig } from './locations.config'
 import { organizationWriteConfig } from '../organizations/organizations.config'
@@ -23,7 +23,7 @@ const connectedPartiesPath = (campaignId: string, locationId: string) =>
 
 describe('resolveLocationConnectedParties', () => {
   it('merges character and organization rows with deterministic ordering', async () => {
-    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const { agent, csrfToken, userId } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)
 
     const world = await createHomebrewContent(locationWriteConfig, campaignId, {
@@ -55,22 +55,19 @@ describe('resolveLocationConnectedParties', () => {
       },
     )
 
-    const { character: npc } = await createCampaignNpc(campaignId, {
+    const { character: npc } = await createCampaignNpc(campaignId, userId, {
       ...minimalNpcRequestInput,
       name: 'Beta NPC',
     })
 
-    await CharacterModel.collection.updateOne(
-      { _id: new Types.ObjectId(npc.id) },
-      {
-        $set: {
-          connections: {
-            organizations: [],
-            locations: [{ id: 'char-loc-1', locationId: region.id, kind: 'works_at' }],
-          },
-        },
-      },
-    )
+    await seedCharacterLocationEdge({
+      campaignId,
+      characterId: npc.id,
+      locationId: region.id,
+      kind: 'works_at',
+      relationshipId: 'char-loc-1',
+      actorUserId: userId,
+    })
 
     const result = await resolveLocationConnectedParties({
       campaignId,

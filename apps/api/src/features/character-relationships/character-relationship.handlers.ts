@@ -8,7 +8,7 @@ import {
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
-import { authorizeCampaignParticipantAccess } from '../campaign'
+import { authorizeCampaignParticipantAccess } from '../campaign/campaign-character-access.service'
 import {
   createCharacterRelationshipRecordCommand,
   deleteCharacterRelationshipRecordCommand,

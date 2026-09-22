@@ -82,7 +82,7 @@ describe('content deletion service', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
-    await createCampaignNpc(campaign.id, {
+    await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Blocked NPC',
       classes: [{ classId: created.id, level: 1 }],
@@ -145,7 +145,7 @@ describe('content deletion service', () => {
     )
     expect(availabilityBefore).toEqual({ status: 'allowed' })
 
-    await createCampaignNpc(campaign.id, {
+    await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Species NPC',
       species: { id: created.id },
@@ -159,7 +159,7 @@ describe('content deletion service', () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(classWriteConfig, campaign.id, minimalClassInput)
 
-    const { character: npc } = await createCampaignNpc(campaign.id, {
+    const { character: npc } = await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Temporary NPC',
       classes: [{ classId: created.id, level: 1 }],

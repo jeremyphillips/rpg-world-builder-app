@@ -59,50 +59,25 @@ describe('finalizePcCharacterBuild', () => {
     expect(input.narrative).toEqual({ backstory: 'A veteran soldier.' })
   })
 
-  it('copies normalized selectable organization memberships including titles', () => {
-    const organization = {
-      id: 'organization-lantern-guild',
-      slug: 'lantern-guild',
-      rulesetId: 'srd-cc-5.2.1' as const,
-      source: 'homebrew' as const,
-      status: 'published' as const,
-      campaignId: 'campaign-1',
-      createdAt: '2026-07-28T12:00:00.000Z',
-      updatedAt: '2026-07-28T12:00:00.000Z',
-      name: 'Lantern Guild',
-      organizationDomain: 'occupational' as const,
-      functions: [],
-      practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
-      connections: { locations: [] },
-    }
-    const input = finalizePcCharacterBuild(
-      makeCompleteDraft({
-        connections: {
-          organizations: [{ organizationId: organization.id, title: 'Guildmaster' }],
-          locations: [],
-        },
-      }),
-      {
-        ...builderTestContext,
-        catalog: { ...builderTestContext.catalog, organizations: [organization] },
-      },
-    )
+  it('does not embed relationship edges on standalone PC create input', () => {
+    const input = finalizePcCharacterBuild(makeCompleteDraft(), builderTestContext)
 
-    expect(input.connections).toEqual({
-      organizations: [{ organizationId: organization.id, title: 'Guildmaster' }],
-      locations: [],
-    })
+    expect(input).not.toHaveProperty('relationshipEdges')
+    expect(input).not.toHaveProperty('connections')
   })
 
-  it('blocks finalization when an organization connection is no longer selectable', () => {
+  it('blocks finalization when draft relationship edges are unauthorized for the build context', () => {
     expect(() =>
       finalizePcCharacterBuild(
         makeCompleteDraft({
-          connections: {
-            organizations: [{ organizationId: 'organization-removed' }],
-            locations: [],
-          },
+          relationshipEdges: [
+            {
+              id: 'edge-removed-org',
+              kind: 'organizationMembership',
+              characterId: '__new_character__',
+              organizationId: 'organization-removed',
+            },
+          ],
         }),
         builderTestContext,
       ),

@@ -73,11 +73,6 @@ export {
   titleFromMembershipRadioValue,
 } from './lib/organization-membership/organization-membership-title.lib'
 export {
-  createCharacterOrganizationMembership,
-  deleteCharacterOrganizationMembership,
-  updateCharacterOrganizationMembership,
-} from './api/organization-membership-client'
-export {
   createCharacterRelationship,
   createCharacterRelationshipIdempotencyKey,
   deleteCharacterRelationship,
@@ -92,11 +87,9 @@ export { useCharacterRelationshipMutations } from './hooks/use-character-relatio
 export {
   invalidateCharacterRelationshipQueries,
   type CharacterRelationshipInvalidationTarget,
-} from './lib/invalidate-character-relationship-queries'
-export {
-  invalidateCharacterOrganizationMembershipQueries,
+  type CharacterRelationshipSubjectKind,
   type CharacterOrganizationMembershipSubjectKind,
-} from './lib/invalidate-character-organization-membership-queries'
+} from './lib/invalidate-character-relationship-queries'
 export {
   characterLocationReferencesQueryKey,
   useCharacterLocationReferences,

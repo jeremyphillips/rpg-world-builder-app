@@ -327,7 +327,6 @@ export function assembleCharacterBuildSheet(
     equipment,
     wealth,
     narrative: effectiveDraft.identity.narrative,
-    connections: effectiveDraft.connections,
     feats: [],
   }
 }

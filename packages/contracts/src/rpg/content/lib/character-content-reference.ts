@@ -35,16 +35,6 @@ export const FEAT_CHARACTER_REFERENCE = createCharacterContentReferenceDescripto
   matchKey: 'id',
 })
 
-export const ORGANIZATION_CHARACTER_REFERENCE = createCharacterContentReferenceDescriptor({
-  path: 'connections.organizations.organizationId',
-  matchKey: 'id',
-})
-
-export const LOCATION_CHARACTER_REFERENCE = createCharacterContentReferenceDescriptor({
-  path: 'connections.locations.locationId',
-  matchKey: 'id',
-})
-
 export const SKILL_PROFICIENCY_CHARACTER_REFERENCE = createCharacterContentReferenceDescriptor({
   path: 'proficiencies.skills.skill',
   matchKey: 'slug',

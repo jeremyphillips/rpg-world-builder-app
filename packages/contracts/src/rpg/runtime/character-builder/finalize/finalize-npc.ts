@@ -17,5 +17,8 @@ export function finalizeNpcCharacterBuild(
   options: CharacterBuildEngineOptions = {},
 ): CreateNpcRequestInput {
   const sheet = assembleCharacterBuildSheet(draft, context, options)
-  return createNpcRequestInputSchema.parse(sheet)
+  return createNpcRequestInputSchema.parse({
+    ...sheet,
+    relationshipEdges: draft.relationshipEdges,
+  })
 }

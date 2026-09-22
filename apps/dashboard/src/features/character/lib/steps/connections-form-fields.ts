@@ -1,18 +1,21 @@
-import { characterConnectionsSchema } from '@rpg/contracts'
 import type { ReactNode } from 'react'
 import type { FormItem } from '@rpg/ui/form'
-import type { z } from 'zod'
+import { z } from 'zod'
 
 import type { CharacterRelationshipFieldContext } from '../relationship/character-relationship-field-context.types'
 import { buildRelationshipArrayField } from '../relationship/character-relationship-array-form-fields'
+import {
+  organizationMembershipFormRowSchema,
+  residenceFormRowSchema,
+} from '../relationship/character-relationship-form-rows.lib'
 import {
   CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
   CHARACTER_RESIDENCE_VOCABULARY,
 } from '../relationship/character-relationship-vocabulary'
 
-export const connectionsFormSchema = characterConnectionsSchema.pick({
-  organizations: true,
-  locations: true,
+export const connectionsFormSchema = z.object({
+  organizations: z.array(organizationMembershipFormRowSchema),
+  locations: z.array(residenceFormRowSchema),
 })
 
 export type ConnectionsFormValues = z.infer<typeof connectionsFormSchema>

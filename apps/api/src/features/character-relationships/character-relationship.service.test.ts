@@ -36,7 +36,7 @@ describe('character relationship services', () => {
       campaignId,
       minimalOrganizationInput,
     )
-    const { character: npc } = await createCampaignNpc(campaignId, {
+    const { character: npc } = await createCampaignNpc(campaignId, userId, {
       ...minimalNpcRequestInput,
       name: 'Aldric Vale',
     })
@@ -106,7 +106,7 @@ describe('character relationship services', () => {
       campaignId,
       minimalOrganizationInput,
     )
-    const { character: npc } = await createCampaignNpc(campaignId, {
+    const { character: npc } = await createCampaignNpc(campaignId, userId, {
       ...minimalNpcRequestInput,
       name: 'Duplicate Edge',
     })

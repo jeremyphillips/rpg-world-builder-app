@@ -1,37 +1,23 @@
 import * as React from 'react'
 
-import {
-  getErrorMessage,
-  type CharacterLocationReferenceResolution,
-  type Location,
-} from '@rpg/contracts'
+import { getErrorMessage, type Location } from '@rpg/contracts'
 
 import { useLocations } from '@/features/content'
 
 import type { ResidenceLocationPickerItem } from '../components/connections/picker/residence-location-picker-drawer.types'
-import type { ResidenceLocationSelection } from '../components/connections/picker/residence-location-picker-drawer.types'
-import {
-  filterResidenceEligibleLocations,
-  RESIDENCE_CONNECTION_KIND,
-} from '../lib/connections/residence-location-connection.lib'
+import { useCharacterRelationshipMutations } from './use-character-relationship-mutations'
+import { filterResidenceEligibleLocations } from '../lib/connections/residence-location-connection.lib'
 import { resolveCharacterLocationsQueryStatus } from '../lib/relationship/character-locations-query-status.lib'
-import type { CharacterOrganizationMembershipSubjectKind } from '../lib/invalidate-character-organization-membership-queries'
-import { useCharacterLocationReferences } from './use-character-location-references'
-import { useCharacterResidenceMutations } from './use-character-residence-mutations'
+import type { CharacterRelationshipSubjectKind } from '../lib/invalidate-character-relationship-queries'
+import { useCharacterRelationships } from './use-character-relationships'
 
 function toPickerItems(
   locations: readonly Location[],
-  references: readonly CharacterLocationReferenceResolution[],
+  selectedLocationIds: ReadonlySet<string>,
 ): ResidenceLocationPickerItem[] {
-  const selectedIds = new Set(
-    references
-      .filter(({ connection }) => connection.kind === RESIDENCE_CONNECTION_KIND)
-      .map(({ connection }) => connection.locationId),
-  )
-
   return filterResidenceEligibleLocations(locations).map((location) => ({
     location,
-    selected: selectedIds.has(location.id),
+    selected: selectedLocationIds.has(location.id),
   }))
 }
 
@@ -43,14 +29,32 @@ export function useCharacterResidenceSheet(input: {
   campaignId: string
   characterId: string
   canEdit: boolean
-  subjectKind: CharacterOrganizationMembershipSubjectKind
+  subjectKind: CharacterRelationshipSubjectKind
 }) {
   const { campaignId, characterId, canEdit, subjectKind } = input
-  const referencesQuery = useCharacterLocationReferences(campaignId, characterId)
+  const relationshipsQuery = useCharacterRelationships(campaignId, characterId, {
+    kinds: ['resides_at'],
+    limit: 50,
+  })
   const locationsQuery = useLocations(canEdit ? campaignId : undefined)
-  const mutations = useCharacterResidenceMutations(campaignId, characterId, subjectKind)
+  const mutations = useCharacterRelationshipMutations(campaignId, {
+    characters: [{ characterId, subjectKind }],
+  })
 
-  const locationReferences = React.useMemo(() => referencesQuery.data ?? [], [referencesQuery.data])
+  const residenceProjections = React.useMemo(
+    () => relationshipsQuery.data?.items ?? [],
+    [relationshipsQuery.data?.items],
+  )
+
+  const selectedLocationIds = React.useMemo(
+    () =>
+      new Set(
+        residenceProjections
+          .map((row) => (row.target?.type === 'location' ? row.target.id : undefined))
+          .filter((locationId): locationId is string => Boolean(locationId)),
+      ),
+    [residenceProjections],
+  )
 
   const locationsQueryStatus = React.useMemo(
     () =>
@@ -73,27 +77,32 @@ export function useCharacterResidenceSheet(input: {
 
   const pickerItems = React.useMemo(() => {
     if (locationsQueryStatus.status !== 'success') return []
-    return toPickerItems(locationsQuery.data ?? [], locationReferences)
-  }, [locationReferences, locationsQuery.data, locationsQueryStatus.status])
+    return toPickerItems(locationsQuery.data ?? [], selectedLocationIds)
+  }, [locationsQuery.data, locationsQueryStatus.status, selectedLocationIds])
 
   const handleAdd = React.useCallback(
-    async (selection: ResidenceLocationSelection) => {
+    async (locationId: string, idempotencyKey: string) => {
       try {
-        await mutations.addResidence({
-          locationId: selection.locationId,
-          kind: RESIDENCE_CONNECTION_KIND,
+        const { relationship } = await mutations.createRelationship({
+          idempotencyKey,
+          relationship: {
+            kind: 'resides_at',
+            characterId,
+            locationId,
+          },
         })
+        return { relationshipId: relationship.id }
       } catch (error) {
         rethrowCanonicalized(error, 'Could not add this residence.')
       }
     },
-    [mutations],
+    [characterId, mutations],
   )
 
   const handleRemove = React.useCallback(
-    async (connectionId: string, locationId: string) => {
+    async (relationshipId: string, expectedRevision: number, _locationId: string) => {
       try {
-        await mutations.removeResidence(connectionId, locationId)
+        await mutations.deleteRelationship(relationshipId, { expectedRevision })
       } catch (error) {
         rethrowCanonicalized(error, 'Could not remove this residence.')
       }
@@ -103,9 +112,9 @@ export function useCharacterResidenceSheet(input: {
 
   return {
     isBootstrapping:
-      (referencesQuery.isPending && referencesQuery.data === undefined) ||
+      (relationshipsQuery.isPending && relationshipsQuery.data === undefined) ||
       (canEdit && locationsQuery.isPending && locationsQuery.data === undefined),
-    locationReferences,
+    residenceProjections,
     locations: locationsQuery.data ?? [],
     pickerItems,
     locationsQueryStatus,

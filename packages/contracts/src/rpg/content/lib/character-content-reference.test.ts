@@ -4,7 +4,6 @@ import {
   characterContentReferenceMatch,
   CLASS_CHARACTER_REFERENCE,
   createCharacterContentReferenceDescriptor,
-  ORGANIZATION_CHARACTER_REFERENCE,
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
   SUBCLASS_CHARACTER_REFERENCE,
 } from './character-content-reference'
@@ -20,12 +19,6 @@ describe('character content reference descriptors', () => {
       owner: 'character',
       path: 'proficiencies.skills.skill',
       matchKey: 'slug',
-    })
-  })
-
-  it('builds organization saved-reference match fragments', () => {
-    expect(characterContentReferenceMatch(ORGANIZATION_CHARACTER_REFERENCE, 'org-1')).toEqual({
-      'connections.organizations.organizationId': 'org-1',
     })
   })
 

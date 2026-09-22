@@ -1,13 +1,13 @@
 import { CharacterOrganizationMembershipsContainer } from './character-organization-memberships-container'
 import { CharacterResidenceContainer } from '../residence/character-residence-container'
-import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
+import type { CharacterRelationshipSubjectKind } from '../../../lib/invalidate-character-relationship-queries'
 
 export type CharacterIdentityConnectionsSupplementProps = {
   campaignId: string
   characterId: string
   characterName: string
   canEdit: boolean
-  subjectKind: CharacterOrganizationMembershipSubjectKind
+  subjectKind: CharacterRelationshipSubjectKind
 }
 
 export function CharacterIdentityConnectionsSupplement({

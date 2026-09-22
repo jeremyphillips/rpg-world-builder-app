@@ -19,7 +19,7 @@ export async function list(req: Request, res: Response): Promise<void> {
 
 export async function create(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
-  const npc = await createCampaignNpc(campaignId, req.body as CreateNpcRequestInput)
+  const npc = await createCampaignNpc(campaignId, req.user!.id, req.body as CreateNpcRequestInput)
   res.status(201).json({ npc })
 }
 

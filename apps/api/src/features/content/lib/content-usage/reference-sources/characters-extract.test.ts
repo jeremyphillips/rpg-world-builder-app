@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   CLASS_CHARACTER_REFERENCE,
-  ORGANIZATION_CHARACTER_REFERENCE,
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
   SUBCLASS_CHARACTER_REFERENCE,
 } from '@rpg/contracts'
@@ -30,9 +29,6 @@ describe('characters-extract', () => {
       weapons: [{ equipmentId: 'eq-weapon' }],
       gear: [{ equipmentId: 'eq-gear' }],
     },
-    connections: {
-      organizations: [{ organizationId: 'org-1' }],
-    },
     proficiencies: {
       skills: [{ skill: 'athletics' }],
     },
@@ -41,9 +37,6 @@ describe('characters-extract', () => {
   it('extracts descriptor paths', () => {
     expect(extractIdsFromCharacterDescriptor(hit, CLASS_CHARACTER_REFERENCE)).toEqual(['class-1'])
     expect(extractIdsFromCharacterDescriptor(hit, SUBCLASS_CHARACTER_REFERENCE)).toEqual(['sc-1'])
-    expect(extractIdsFromCharacterDescriptor(hit, ORGANIZATION_CHARACTER_REFERENCE)).toEqual([
-      'org-1',
-    ])
     expect(extractIdsFromCharacterDescriptor(hit, SKILL_PROFICIENCY_CHARACTER_REFERENCE)).toEqual([
       'athletics',
     ])

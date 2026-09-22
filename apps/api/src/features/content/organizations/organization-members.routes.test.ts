@@ -1,10 +1,10 @@
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
-import { Types } from 'mongoose'
 
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { registerCampaignMember } from '../../../test/helpers/campaign-membership'
+import { seedOrganizationMembershipEdge } from '../../../test/helpers/character-relationship-edges'
 import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
@@ -12,7 +12,7 @@ import { useIntegrationApp } from '../../../test/setup/integration-app'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { attachCharacterToCampaign, createCampaignNpc } from '../../campaign'
 import { CampaignCharacterParticipationModel } from '../../campaign'
-import { CharacterModel, createPcRecord } from '../../character'
+import { createPcRecord } from '../../character'
 import { createHomebrewContent } from '../lib/content-write.service'
 import {
   assertContentUsageRegistrationCoverage,
@@ -34,17 +34,18 @@ const minimalOrganizationInput = {
 const membersPath = (campaignId: string, organizationId: string) =>
   `/api/campaigns/${campaignId}/content/organizations/${organizationId}/members?page=1&pageSize=4`
 
-async function setOrganizationConnection(characterId: string, organizationId: string) {
-  await CharacterModel.collection.updateOne(
-    { _id: new Types.ObjectId(characterId) },
-    {
-      $set: {
-        connections: {
-          organizations: [{ organizationId }],
-        },
-      },
-    },
-  )
+async function setOrganizationConnection(
+  campaignId: string,
+  characterId: string,
+  organizationId: string,
+  details?: { title?: string; priority?: number },
+) {
+  await seedOrganizationMembershipEdge({
+    campaignId,
+    characterId,
+    organizationId,
+    details,
+  })
 }
 
 describe('resolveOrganizationMembers', () => {
@@ -61,14 +62,14 @@ describe('resolveOrganizationMembers', () => {
       characterId: pc.id,
       joinedAt: new Date().toISOString(),
     })
-    const { character: npc } = await createCampaignNpc(campaign.id, {
+    const { character: npc } = await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Circle Envoy',
     })
 
     await Promise.all([
-      setOrganizationConnection(pc.id, organization.id),
-      setOrganizationConnection(npc.id, organization.id),
+      setOrganizationConnection(campaign.id, pc.id, organization.id),
+      setOrganizationConnection(campaign.id, npc.id, organization.id),
     ])
 
     const pageOne = await resolveOrganizationMembers({
@@ -145,7 +146,7 @@ describe('resolveOrganizationMembers', () => {
       characterId: pc.id,
       joinedAt: new Date().toISOString(),
     })
-    await setOrganizationConnection(pc.id, organization.id)
+    await setOrganizationConnection(campaign.id, pc.id, organization.id)
 
     await CampaignCharacterParticipationModel.updateOne(
       { campaignId: campaign.id, characterId: pc.id },
@@ -189,8 +190,8 @@ describe('resolveOrganizationMembers', () => {
         characterId: beta.id,
         joinedAt: new Date().toISOString(),
       }),
-      setOrganizationConnection(alpha.id, organization.id),
-      setOrganizationConnection(beta.id, organization.id),
+      setOrganizationConnection(campaign.id, alpha.id, organization.id),
+      setOrganizationConnection(campaign.id, beta.id, organization.id),
     ])
 
     const result = await resolveOrganizationMembers({
@@ -231,30 +232,14 @@ describe('resolveOrganizationMembers', () => {
         characterId: master.id,
         joinedAt: new Date().toISOString(),
       }),
-      CharacterModel.collection.updateOne(
-        { _id: new Types.ObjectId(recruit.id) },
-        {
-          $set: {
-            connections: {
-              organizations: [
-                { organizationId: organization.id, title: 'Apprentice', priority: 10 },
-              ],
-            },
-          },
-        },
-      ),
-      CharacterModel.collection.updateOne(
-        { _id: new Types.ObjectId(master.id) },
-        {
-          $set: {
-            connections: {
-              organizations: [
-                { organizationId: organization.id, title: 'Guildmaster', priority: 50 },
-              ],
-            },
-          },
-        },
-      ),
+      setOrganizationConnection(campaign.id, recruit.id, organization.id, {
+        title: 'Apprentice',
+        priority: 10,
+      }),
+      setOrganizationConnection(campaign.id, master.id, organization.id, {
+        title: 'Guildmaster',
+        priority: 50,
+      }),
     ])
 
     const result = await resolveOrganizationMembers({
@@ -286,11 +271,11 @@ describe('resolveOrganizationMembers', () => {
       },
       { status: 'draft' },
     )
-    const { character: npc } = await createCampaignNpc(campaign.id, {
+    const { character: npc } = await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Draft Ties',
     })
-    await setOrganizationConnection(npc.id, organization.id)
+    await setOrganizationConnection(campaign.id, npc.id, organization.id)
 
     await expect(
       resolveOrganizationMembers({
@@ -329,7 +314,7 @@ describe('organization members routes', () => {
   })
 
   it('returns members for authenticated campaign users', async () => {
-    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const { agent, csrfToken, userId } = await registerAndLoginTestUser(getApp())
     const campaignId = await createTestCampaign(agent, csrfToken)
 
     const createRes = await agent
@@ -339,11 +324,11 @@ describe('organization members routes', () => {
       .expect(201)
 
     const organizationId = createRes.body.organizations.id as string
-    const { character: npc } = await createCampaignNpc(campaignId, {
+    const { character: npc } = await createCampaignNpc(campaignId, userId, {
       ...minimalNpcRequestInput,
       name: 'Route Envoy',
     })
-    await setOrganizationConnection(npc.id, organizationId)
+    await setOrganizationConnection(campaignId, npc.id, organizationId)
 
     const res = await agent
       .get(membersPath(campaignId, organizationId))
@@ -374,17 +359,22 @@ describe('organization members routes', () => {
 
     const organizationId = createOrgRes.body.organizations.id as string
 
-    // One POST carries the membership in connections — no follow-up mutation.
+    // One POST carries membership edges atomically with NPC creation.
     await agent
       .post(`/api/campaigns/${campaignId}/npcs`)
       .set(CSRF_HEADER, csrfToken)
       .send({
         ...minimalNpcRequestInput,
         name: 'Quick Envoy',
-        connections: {
-          organizations: [{ organizationId, title: 'Guildmaster', priority: 50 }],
-          locations: [],
-        },
+        relationshipEdges: [
+          {
+            id: 'edge-quick-envoy',
+            kind: 'organizationMembership',
+            characterId: '__new_character__',
+            organizationId,
+            details: { title: 'Guildmaster', priority: 50 },
+          },
+        ],
       })
       .expect(201)
 

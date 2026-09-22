@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
+import { seedOrganizationMembershipEdge } from '../../../test/helpers/character-relationship-edges'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { createCampaignNpc } from '../../campaign'
-import { CharacterModel } from '../../character'
 import { createHomebrewContent } from '../lib/content-write.service'
 import { organizationWriteConfig } from './organizations.config'
 import {
@@ -85,15 +85,24 @@ describe('resolveOrganizationReference', () => {
       },
       { status: 'draft' },
     )
-    const { character } = await createCampaignNpc(campaign.id, minimalNpcRequestInput)
-    await CharacterModel.findByIdAndUpdate(character.id, {
-      connections: {
-        organizations: [
-          { organizationId: organization.id, title: 'Guildmaster' },
-          { organizationId: '000000000000000000000000' },
-        ],
-      },
-    })
+    const { character } = await createCampaignNpc(
+      campaign.id,
+      campaign.owner.id,
+      minimalNpcRequestInput,
+    )
+    await Promise.all([
+      seedOrganizationMembershipEdge({
+        campaignId: campaign.id,
+        characterId: character.id,
+        organizationId: organization.id,
+        details: { title: 'Guildmaster' },
+      }),
+      seedOrganizationMembershipEdge({
+        campaignId: campaign.id,
+        characterId: character.id,
+        organizationId: '000000000000000000000000',
+      }),
+    ])
 
     await expect(
       resolveCharacterOrganizationReferences({

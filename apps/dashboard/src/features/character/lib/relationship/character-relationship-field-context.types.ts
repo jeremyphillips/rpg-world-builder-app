@@ -1,14 +1,22 @@
 import type {
   CharacterBuildContext,
-  CharacterLocationConnection,
   CharacterLocationReferenceResolution,
-  CharacterOrganizationConnection,
   Location,
   Organization,
-  OrganizationReferenceResolution,
 } from '@rpg/contracts'
 
 import type { CharacterLocationsQueryStatus } from './character-locations-query-status.lib'
+import type {
+  OrganizationMembershipFormRow,
+  OrganizationMembershipSheetRow,
+  ResidenceFormRow,
+} from './character-relationship-form-rows.lib'
+
+export type {
+  OrganizationMembershipFormRow,
+  OrganizationMembershipSheetRow,
+  ResidenceFormRow,
+} from './character-relationship-form-rows.lib'
 
 export type CharacterRelationshipFieldMode = 'draft' | 'api'
 
@@ -23,16 +31,14 @@ export type CharacterRelationshipFieldContext = {
   availableOrganizations: readonly Organization[]
   eligibleResidenceLocations: readonly Location[]
   locationsQueryStatus: CharacterLocationsQueryStatus
-  onEditMembership?: (membership: OrganizationReferenceResolution) => void
-  onRemoveUnresolvedMembership?: (membership: OrganizationReferenceResolution) => void
+  onEditMembership?: (membership: OrganizationMembershipSheetRow) => void
+  onRemoveUnresolvedMembership?: (membership: OrganizationMembershipSheetRow) => void
   /** Server-resolved memberships for API trailing actions (edit / unresolved remove). */
-  resolvedMemberships?: readonly OrganizationReferenceResolution[]
+  resolvedMemberships?: readonly OrganizationMembershipSheetRow[]
 }
 
 export type CharacterOrganizationMembershipEdge =
-  | CharacterOrganizationConnection
-  | OrganizationReferenceResolution
+  | OrganizationMembershipFormRow
+  | OrganizationMembershipSheetRow
 
-export type CharacterResidenceEdge =
-  | CharacterLocationConnection
-  | CharacterLocationReferenceResolution
+export type CharacterResidenceEdge = ResidenceFormRow | CharacterLocationReferenceResolution

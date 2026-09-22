@@ -673,8 +673,7 @@ describe('QuickNpcCreateModal standalone context', () => {
 
     await waitFor(() => expect(createNpcMock).toHaveBeenCalled())
     const createInput = createNpcMock.mock.calls[0]?.[1]
-    expect(createInput?.connections?.organizations ?? []).toEqual([])
-    expect(createInput?.connections?.locations ?? []).toEqual([])
+    expect(createInput?.relationshipEdges ?? []).toEqual([])
     await waitFor(() =>
       expect(props.onCreated).toHaveBeenCalledWith({
         contentType: 'npcs',

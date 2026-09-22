@@ -92,8 +92,12 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
       buildContext,
     })
 
-    expect(input.connections.organizations).toEqual([
-      { organizationId: organization.id, title: 'Guildmaster', priority: 50 },
+    expect(input.relationshipEdges).toEqual([
+      expect.objectContaining({
+        kind: 'organizationMembership',
+        organizationId: organization.id,
+        details: { lifecycle: 'current', title: 'Guildmaster', priority: 50 },
+      }),
     ])
   })
 
@@ -109,7 +113,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
       buildContext,
     })
 
-    expect(input.connections.organizations).toEqual([])
+    expect(input.relationshipEdges).toEqual([])
   })
 
   it('omits title and priority for untitled member setup', () => {
@@ -132,6 +136,11 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
       buildContext,
     })
 
-    expect(input.connections.organizations).toEqual([{ organizationId: organization.id }])
+    expect(input.relationshipEdges).toEqual([
+      expect.objectContaining({
+        kind: 'organizationMembership',
+        organizationId: organization.id,
+      }),
+    ])
   })
 })

@@ -81,7 +81,7 @@ export const CROSS_CONTENT_RELATIONSHIP_PROJECTIONS: Record<
     id: 'character_location_connection',
     ownerContentType: 'characters',
     targetContentType: 'locations',
-    ownerField: 'connections.locations',
+    ownerField: 'character_relationships',
     capabilities: {
       forward: 'write',
       inverse: 'write',

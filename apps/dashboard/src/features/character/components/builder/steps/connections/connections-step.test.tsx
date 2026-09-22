@@ -1,6 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import {
+  CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  createEmptyCharacterBuilderDraft,
+} from '@rpg/contracts'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -54,10 +57,15 @@ describe('ConnectionsStep', () => {
     const onDraftChange = vi.fn()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: {
-        organizations: [{ organizationId: lanternGuild.id, title: 'Guildmaster' }],
-        locations: [],
-      },
+      relationshipEdges: [
+        {
+          id: 'edge-org-1',
+          kind: 'organizationMembership' as const,
+          characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+          organizationId: lanternGuild.id,
+          details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+        },
+      ],
     }
 
     render(
@@ -74,26 +82,29 @@ describe('ConnectionsStep', () => {
     expect(screen.getAllByText('Guildmaster').length).toBeGreaterThan(0)
     await user.click(screen.getByRole('button', { name: /Remove .*Lantern Guild/ }))
     expect(onDraftChange).toHaveBeenCalledWith({
-      connections: { organizations: [], locations: [] },
+      relationshipEdges: [],
     })
 
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
     expect(onDraftChange).not.toHaveBeenCalledWith(
       expect.objectContaining({
-        connections: expect.objectContaining({
-          organizations: expect.arrayContaining([
-            expect.objectContaining({ organizationId: cityCouncil.id }),
-          ]),
-        }),
+        relationshipEdges: expect.arrayContaining([
+          expect.objectContaining({
+            kind: 'organizationMembership',
+            organizationId: cityCouncil.id,
+          }),
+        ]),
       }),
     )
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
     expect(onDraftChange).toHaveBeenCalledWith({
-      connections: {
-        organizations: [{ organizationId: cityCouncil.id }],
-        locations: [],
-      },
+      relationshipEdges: [
+        expect.objectContaining({
+          kind: 'organizationMembership',
+          organizationId: cityCouncil.id,
+        }),
+      ],
     })
     expect(screen.getByRole('button', { name: 'Expand City Council' })).toHaveAttribute(
       'aria-expanded',
@@ -119,15 +130,12 @@ describe('ConnectionsStep', () => {
     await user.click(screen.getAllByRole('button', { name: 'Add' }).at(-1)!)
 
     expect(onDraftChange).toHaveBeenCalledWith({
-      connections: {
-        organizations: [],
-        locations: [
-          expect.objectContaining({
-            locationId: harborfordSettlement.id,
-            kind: 'resides_at',
-          }),
-        ],
-      },
+      relationshipEdges: [
+        expect.objectContaining({
+          kind: 'resides_at',
+          locationId: harborfordSettlement.id,
+        }),
+      ],
     })
     expect(screen.getByRole('button', { name: 'Expand Harborford' })).toHaveAttribute(
       'aria-expanded',
@@ -138,7 +146,14 @@ describe('ConnectionsStep', () => {
   it('shows stale selections as recoverable and has no axe violations', async () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: 'organization-missing' }], locations: [] },
+      relationshipEdges: [
+        {
+          id: 'edge-org-missing',
+          kind: 'organizationMembership' as const,
+          characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+          organizationId: 'organization-missing',
+        },
+      ],
     }
     const { container } = render(
       <ConnectionsStep
