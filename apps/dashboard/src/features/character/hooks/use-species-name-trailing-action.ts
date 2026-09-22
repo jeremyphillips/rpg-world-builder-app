@@ -1,7 +1,7 @@
 import * as React from 'react'
-import type { FieldPath, PathValue, UseFormReturn } from 'react-hook-form'
+import { useWatch, type FieldPath, type PathValue, type UseFormReturn } from 'react-hook-form'
 
-import type { CharacterBuildContext } from '@rpg/contracts'
+import type { CharacterBuildContext, CharacterGender } from '@rpg/contracts'
 import type { TrailingFieldActionConfig } from '@rpg/ui/form'
 
 import {
@@ -15,7 +15,14 @@ import {
   SPECIES_REQUIRED_FOR_NAME_GENERATION_HINT,
 } from '../lib/naming/species-name-generation-labels'
 
-export function useSpeciesNameTrailingAction<T extends { name: string }>({
+function resolveFormGender(gender: unknown): CharacterGender | undefined {
+  if (gender === 'male' || gender === 'female') {
+    return gender
+  }
+  return undefined
+}
+
+export function useSpeciesNameTrailingAction<T extends { name: string; gender?: string }>({
   speciesId,
   buildContext,
   form,
@@ -26,6 +33,8 @@ export function useSpeciesNameTrailingAction<T extends { name: string }>({
 }) {
   const [pending, setPending] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const genderValue = useWatch({ control: form.control, name: 'gender' as FieldPath<T> })
+  const gender = resolveFormGender(genderValue)
 
   const generationSupport = React.useMemo(
     () => resolveCharacterSpeciesNameGenerationSupport({ speciesId, context: buildContext }),
@@ -37,7 +46,11 @@ export function useSpeciesNameTrailingAction<T extends { name: string }>({
     setPending(true)
     setError(null)
     try {
-      const result = await generateCharacterSpeciesName({ speciesId, context: buildContext })
+      const result = await generateCharacterSpeciesName({
+        speciesId,
+        context: buildContext,
+        gender,
+      })
       if (!result.ok) {
         setError(result.kind === 'unsupported' ? result.reason : SPECIES_NAME_GENERATION_FAILED)
         return
@@ -49,7 +62,7 @@ export function useSpeciesNameTrailingAction<T extends { name: string }>({
     } finally {
       setPending(false)
     }
-  }, [buildContext, form, generationSupport.enabled, pending, speciesId])
+  }, [buildContext, form, gender, generationSupport.enabled, pending, speciesId])
 
   const trailingAction = React.useMemo(
     (): TrailingFieldActionConfig => ({

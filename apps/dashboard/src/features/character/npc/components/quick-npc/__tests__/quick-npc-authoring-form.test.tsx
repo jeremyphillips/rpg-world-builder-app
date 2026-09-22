@@ -146,6 +146,23 @@ describe('QuickNpcAuthoringForm', () => {
     expect(generateCharacterSpeciesNameMock).toHaveBeenCalledWith({
       speciesId: setup.speciesId,
       context: buildContext,
+      gender: undefined,
+    })
+  })
+
+  it('passes selected gender when Generate is clicked', async () => {
+    const user = userEvent.setup()
+    renderAuthoringForm()
+
+    await user.click(screen.getByRole('radio', { name: 'Male' }))
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+
+    await waitFor(() => {
+      expect(generateCharacterSpeciesNameMock).toHaveBeenCalledWith({
+        speciesId: setup.speciesId,
+        context: buildContext,
+        gender: 'male',
+      })
     })
   })
 

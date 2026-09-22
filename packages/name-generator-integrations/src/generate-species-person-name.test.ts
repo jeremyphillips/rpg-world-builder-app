@@ -93,4 +93,40 @@ describe('generateSpeciesPersonName', () => {
 
     expect(result).toEqual({ ok: false, kind: 'generation_failed' })
   })
+
+  it('passes masculine genderStyle when character gender is male', async () => {
+    await generateSpeciesPersonName(namingCapableDwarf, { gender: 'male' })
+
+    expect(generateName).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ genderStyle: 'masculine' }),
+      expect.anything(),
+      expect.anything(),
+    )
+  })
+
+  it('passes feminine genderStyle when character gender is female', async () => {
+    await generateSpeciesPersonName(namingCapableDwarf, { gender: 'female' })
+
+    expect(generateName).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ genderStyle: 'feminine' }),
+      expect.anything(),
+      expect.anything(),
+    )
+  })
+
+  it('passes neutral genderStyle when character gender is unset', async () => {
+    await generateSpeciesPersonName(namingCapableDwarf)
+
+    expect(generateName).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ genderStyle: 'neutral' }),
+      expect.anything(),
+      expect.anything(),
+    )
+  })
 })

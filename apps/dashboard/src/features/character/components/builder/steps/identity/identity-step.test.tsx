@@ -111,6 +111,30 @@ describe('IdentityStep', () => {
     expect(generateCharacterSpeciesNameMock).toHaveBeenCalledWith({
       speciesId: 'srd-cc-5.2.1:dwarf',
       context: identityStepTestContext,
+      gender: undefined,
+    })
+  })
+
+  it('passes selected gender when Generate is clicked', async () => {
+    const user = userEvent.setup()
+    generateCharacterSpeciesNameMock.mockResolvedValue({ ok: true, name: 'Astrid Ironfist' })
+
+    renderIdentityStep({
+      draft: {
+        ...createEmptyCharacterBuilderDraft(),
+        species: { speciesId: 'srd-cc-5.2.1:dwarf' },
+      },
+    })
+
+    await user.click(screen.getByRole('radio', { name: 'Female' }))
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+
+    await waitFor(() => {
+      expect(generateCharacterSpeciesNameMock).toHaveBeenCalledWith({
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        context: identityStepTestContext,
+        gender: 'female',
+      })
     })
   })
 
