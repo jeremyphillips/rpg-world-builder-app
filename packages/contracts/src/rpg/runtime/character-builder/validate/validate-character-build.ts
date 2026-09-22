@@ -33,7 +33,7 @@ const STEP_VALIDATORS: Record<
     choiceSets: readonly ChoiceSet[],
   ) => CharacterBuildValidationIssue[]
 > = {
-  identity: (draft, _context, _choiceSets) => validateIdentity(draft, false),
+  identity: (draft, _context, _choiceSets) => validateIdentity(draft),
   connections: (draft, context) => {
     const parsed = characterConnectionsSchema.safeParse(draft.connections)
     if (!parsed.success) {
@@ -93,7 +93,9 @@ function validateAllSteps(
   if (requireAlignment) {
     return [
       ...stepIssues,
-      ...validateIdentity(draft, true).filter((entry) => entry.code === 'alignment_required'),
+      ...validateIdentity(draft, { requireAlignment: true, requireGender: true }).filter(
+        (entry) => entry.code === 'alignment_required' || entry.code === 'gender_required',
+      ),
     ]
   }
 

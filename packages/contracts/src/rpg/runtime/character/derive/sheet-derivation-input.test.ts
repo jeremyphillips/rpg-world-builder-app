@@ -17,6 +17,7 @@ const samplePc = {
   classes: [{ classId: 'srd-cc-5.2.1:fighter', level: 1 }],
   species: { id: 'srd-cc-5.2.1:dwarf' },
   alignment: 'ng',
+  gender: 'female',
   xp: 0,
   abilityScores: { str: 15, dex: 14, con: 13, int: 12, wis: 10, cha: 8 },
   hitPoints: { base: 11, current: 11, temporary: 0 },

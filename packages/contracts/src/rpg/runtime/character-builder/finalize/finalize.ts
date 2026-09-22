@@ -76,6 +76,42 @@ function zodIssuesToFinalizationIssues(error: ZodError): CharacterBuildValidatio
   })
 }
 
+function resolveFinalizeIdentityIssues(
+  draft: CharacterBuilderDraft,
+): CharacterBuildValidationResult['issues'] {
+  const issues: CharacterBuildValidationResult['issues'] = []
+
+  if (!draft.identity.name?.trim()) {
+    issues.push(
+      validationIssue('name_required', characterBuilderValidationMessages.nameRequired(), {
+        path: 'identity.name',
+        stepId: 'identity',
+      }),
+    )
+  }
+
+  if (!draft.identity.alignment) {
+    issues.push(
+      validationIssue(
+        'alignment_required',
+        characterBuilderValidationMessages.alignmentRequired(),
+        { path: 'identity.alignment', stepId: 'identity' },
+      ),
+    )
+  }
+
+  if (!draft.identity.gender) {
+    issues.push(
+      validationIssue('gender_required', characterBuilderValidationMessages.genderRequired(), {
+        path: 'identity.gender',
+        stepId: 'identity',
+      }),
+    )
+  }
+
+  return issues
+}
+
 function resolveFinalizeCatalogIssues(
   draft: CharacterBuilderDraft,
   playableIndex: ReturnType<typeof indexPlayableBuilderCatalog>,
@@ -140,24 +176,7 @@ function resolveFinalizeCatalogIssues(
     )
   }
 
-  if (!draft.identity.name?.trim()) {
-    issues.push(
-      validationIssue('name_required', characterBuilderValidationMessages.nameRequired(), {
-        path: 'identity.name',
-        stepId: 'identity',
-      }),
-    )
-  }
-
-  if (!draft.identity.alignment) {
-    issues.push(
-      validationIssue(
-        'alignment_required',
-        characterBuilderValidationMessages.alignmentRequired(),
-        { path: 'identity.alignment', stepId: 'identity' },
-      ),
-    )
-  }
+  issues.push(...resolveFinalizeIdentityIssues(draft))
 
   return issues
 }
@@ -295,6 +314,7 @@ export function assembleCharacterBuildSheet(
       heritageId: effectiveDraft.species.heritageId,
     },
     alignment: effectiveDraft.identity.alignment!,
+    gender: effectiveDraft.identity.gender!,
     xp: null,
     abilityScores,
     hitPoints: {

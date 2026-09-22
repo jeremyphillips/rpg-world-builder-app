@@ -53,6 +53,7 @@ const seed = {
   classId: quickFighter.id,
   level: 1,
   alignment: 'ln',
+  gender: 'male',
 } as const
 
 describe('buildQuickNpcCreateInput', () => {

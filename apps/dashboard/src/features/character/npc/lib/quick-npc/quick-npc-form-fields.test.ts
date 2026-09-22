@@ -26,6 +26,7 @@ import {
 
 const validValues = {
   contextKind: 'organization-member' as const,
+  gender: 'male',
   name: 'Guard Captain',
   speciesId: 'srd-cc-5.2.1:dwarf',
   classId: 'srd-cc-5.2.1:fighter',
@@ -91,6 +92,7 @@ describe('quickNpcAuthoringSchema', () => {
       speciesId: '',
       classId: '',
       alignment: '',
+      gender: '',
     })
 
     expect(result.success).toBe(false)
@@ -100,6 +102,7 @@ describe('quickNpcAuthoringSchema', () => {
         'Enter a character name.',
         expect.stringMatching(/^Choose a /),
         'Choose an alignment.',
+        'Choose a gender.',
       ]),
     )
   })
@@ -123,6 +126,7 @@ describe('buildQuickNpcSeed', () => {
       classId: 'srd-cc-5.2.1:fighter',
       level: 3,
       alignment: 'ln',
+      gender: 'male',
     })
   })
 
@@ -140,6 +144,7 @@ describe('buildQuickNpcSeed', () => {
       speciesId: 'srd-cc-5.2.1:dwarf',
       level: 0,
       alignment: 'ln',
+      gender: 'male',
     })
   })
 })
@@ -173,10 +178,11 @@ describe('buildQuickNpcContentOptions', () => {
 })
 
 describe('buildQuickNpcDetailsFields', () => {
-  it('includes name and alignment only', () => {
+  it('includes gender, name, and alignment', () => {
     const fields = buildQuickNpcDetailsFields()
 
     expect(fields.map((field) => ('name' in field ? field.name : null))).toEqual([
+      'gender',
       'name',
       'alignment',
     ])
@@ -184,6 +190,7 @@ describe('buildQuickNpcDetailsFields', () => {
 
   it('has defaults for authoring tab schema keys', () => {
     expect(quickNpcAuthoringTabDefaultValues).toEqual({
+      gender: '',
       name: '',
       alignment: 'n',
       requiredWeaponIds: [],
@@ -214,8 +221,16 @@ describe('buildQuickNpcTabs validation wiring', () => {
     })
 
     const detailsTab = tabs.find((tab) => tab.id === QUICK_NPC_DETAILS_TAB_ID)
-    expect(detailsTab?.errorPaths).toEqual(['name'])
+    expect(detailsTab?.errorPaths).toEqual(['gender', 'name'])
     expect(detailsTab?.resolverFields).toEqual([
+      {
+        type: 'chips',
+        name: 'gender',
+        label: 'Gender',
+        multiple: false,
+        options: expect.any(Array),
+        required: true,
+      },
       { type: 'text', name: 'name', label: 'Name', required: true },
     ])
   })
@@ -229,6 +244,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
           level: 2,
         }),
         {
+          gender: 'male',
           name: 'Guard Captain',
           alignment: 'ln',
           requiredWeaponIds: [],

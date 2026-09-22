@@ -5,10 +5,13 @@ import { z } from 'zod'
 
 import {
   ALIGNMENTS,
+  CHARACTER_GENDERS,
   alignmentSchema,
   characterBuilderValidationMessages,
   formatFieldMessage,
+  genderSchema,
   getAlignmentLabel,
+  getGenderLabel,
   isClassProgressionApplicable,
   resolveCharacterLevelConstraints,
   resolvePlayableBuilderContent,
@@ -180,6 +183,10 @@ export const EMPTY_QUICK_NPC_ORGANIZATION_MEMBER_SETUP_VALUES: QuickNpcOrganizat
 
 export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
   const authoringFields = z.object({
+    gender: z
+      .string()
+      .min(1, formatFieldMessage(characterBuilderValidationMessages.genderRequired()))
+      .pipe(genderSchema),
     name: z
       .string()
       .trim()
@@ -198,6 +205,10 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
 /** TabbedForm schema — authoring tabs only; setup fields are validated separately. */
 export function quickNpcAuthoringTabSchema() {
   return z.object({
+    gender: z
+      .string()
+      .min(1, formatFieldMessage(characterBuilderValidationMessages.genderRequired()))
+      .pipe(genderSchema),
     name: z
       .string()
       .trim()
@@ -211,16 +222,18 @@ export function quickNpcAuthoringTabSchema() {
   })
 }
 
-export type QuickNpcAuthoringTabValues = z.infer<ReturnType<typeof quickNpcAuthoringTabSchema>>
+export type QuickNpcAuthoringTabValues = z.output<ReturnType<typeof quickNpcAuthoringTabSchema>>
+export type QuickNpcAuthoringTabFormValues = z.input<ReturnType<typeof quickNpcAuthoringTabSchema>>
 
 export type QuickNpcAuthoringValues = QuickNpcSetupValues & QuickNpcAuthoringTabValues
 
-export const quickNpcAuthoringTabDefaultValues: QuickNpcAuthoringTabValues = {
+export const quickNpcAuthoringTabDefaultValues = {
+  gender: '',
   name: '',
   alignment: 'n',
   requiredWeaponIds: [],
   requiredSpellIds: [],
-}
+} satisfies QuickNpcAuthoringTabFormValues
 
 /** Merges outer Setup values with TabbedForm authoring tab values for create/finalize. */
 export function mergeQuickNpcAuthoringValues(
@@ -240,6 +253,7 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
       : {}),
     level: values.level,
     alignment: values.alignment,
+    gender: values.gender,
   }
 }
 
@@ -290,6 +304,10 @@ const ALIGNMENT_LABELS = Object.fromEntries(
   ALIGNMENTS.map((alignment) => [alignment, getAlignmentLabel(alignment)]),
 ) as Record<(typeof ALIGNMENTS)[number], string>
 
+const GENDER_LABELS = Object.fromEntries(
+  CHARACTER_GENDERS.map((gender) => [gender, getGenderLabel(gender)]),
+) as Record<(typeof CHARACTER_GENDERS)[number], string>
+
 export type QuickNpcRequirementCategories = {
   weapons: FieldOption[]
   spells: FieldOption[]
@@ -319,6 +337,15 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs = {})
   }
 
   return [
+    {
+      type: 'chips',
+      name: 'gender',
+      label: 'Gender',
+      multiple: false,
+      options: toOptions(CHARACTER_GENDERS, GENDER_LABELS),
+      required: true,
+      width: 'full',
+    },
     nameField,
     {
       type: 'select',
@@ -347,8 +374,18 @@ export function buildQuickNpcTabs(args: {
       label: 'Details',
       leadingIcon: createElement(ClipboardList, { 'aria-hidden': true }),
       fields: args.detailsFields,
-      errorPaths: ['name'],
-      resolverFields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      errorPaths: ['gender', 'name'],
+      resolverFields: [
+        {
+          type: 'chips',
+          name: 'gender',
+          label: 'Gender',
+          multiple: false,
+          options: toOptions(CHARACTER_GENDERS, GENDER_LABELS),
+          required: true,
+        },
+        { type: 'text', name: 'name', label: 'Name', required: true },
+      ],
     },
   ]
 

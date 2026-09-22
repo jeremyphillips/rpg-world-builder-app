@@ -77,6 +77,7 @@ describe('IdentityStep', () => {
 
     expect(screen.getByRole('heading', { name: 'Identity' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: /Character name/i })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Gender' })).toBeInTheDocument()
     expect(screen.getByRole('group', { name: 'Alignment' })).toBeInTheDocument()
     expect(await screen.findByLabelText(/Backstory/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add trait/i })).toBeInTheDocument()
@@ -110,6 +111,47 @@ describe('IdentityStep', () => {
     expect(generateCharacterSpeciesNameMock).toHaveBeenCalledWith({
       speciesId: 'srd-cc-5.2.1:dwarf',
       context: identityStepTestContext,
+      gender: undefined,
+    })
+  })
+
+  it('passes selected gender when Generate is clicked', async () => {
+    const user = userEvent.setup()
+    generateCharacterSpeciesNameMock.mockResolvedValue({ ok: true, name: 'Astrid Ironfist' })
+
+    renderIdentityStep({
+      draft: {
+        ...createEmptyCharacterBuilderDraft(),
+        species: { speciesId: 'srd-cc-5.2.1:dwarf' },
+      },
+    })
+
+    await user.click(screen.getByRole('radio', { name: 'Female' }))
+    await user.click(screen.getByRole('button', { name: 'Generate' }))
+
+    await waitFor(() => {
+      expect(generateCharacterSpeciesNameMock).toHaveBeenCalledWith({
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        context: identityStepTestContext,
+        gender: 'female',
+      })
+    })
+  })
+
+  it('treats gender chips as single-select', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+
+    renderIdentityStep({ onDraftChange })
+
+    await user.click(screen.getByRole('radio', { name: 'Female' }))
+
+    await waitFor(() => {
+      expect(onDraftChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          identity: expect.objectContaining({ gender: 'female' }),
+        }),
+      )
     })
   })
 
@@ -152,6 +194,7 @@ describe('IdentityStep', () => {
         ...createEmptyCharacterBuilderDraft(),
         identity: {
           name: 'Verna',
+          gender: 'female',
           alignment: 'ng',
           narrative: { personalityTraits: ['Steady'] },
         },

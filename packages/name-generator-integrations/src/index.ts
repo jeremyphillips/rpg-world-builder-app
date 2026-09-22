@@ -32,5 +32,6 @@ export {
   generateSpeciesPersonName,
   type SpeciesPersonNameGenerationResult,
 } from './generate-species-person-name'
+export { resolveCharacterGenderNameStyle } from './resolve-character-gender-name-style'
 export { toSpeciesCultureInput } from './to-species-culture-input'
 export { resolveStandaloneConventions } from './resolve-standalone-conventions'

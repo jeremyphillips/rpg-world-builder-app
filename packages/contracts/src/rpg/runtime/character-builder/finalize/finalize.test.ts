@@ -22,7 +22,12 @@ import { ORIGIN_LANGUAGES_CHOICE_ID } from '../../../primitives/proficiency/char
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {
     ...createEmptyCharacterBuilderDraft(),
-    identity: { name: 'Verna', alignment: 'ng', narrative: { backstory: 'A veteran soldier.' } },
+    identity: {
+      name: 'Verna',
+      alignment: 'ng',
+      gender: 'female',
+      narrative: { backstory: 'A veteran soldier.' },
+    },
     species: { speciesId: 'srd-cc-5.2.1:dwarf' },
     class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
     abilities: {

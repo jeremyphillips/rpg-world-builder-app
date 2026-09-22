@@ -7,7 +7,7 @@ import type { ComboboxFieldOption } from '@rpg/ui'
 import {
   QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
   QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME,
-  type QuickNpcAuthoringTabValues,
+  type QuickNpcAuthoringTabFormValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import type {
   QuickNpcRequirementOptionSets,
@@ -43,7 +43,7 @@ function filterComboboxOptions(
 }
 
 function WeaponRequirementsField({ entries }: { entries: QuickNpcWeaponRequirementOption[] }) {
-  const form = useFormContext<QuickNpcAuthoringTabValues>()
+  const form = useFormContext<QuickNpcAuthoringTabFormValues>()
   const value = form.watch(QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME) ?? []
   const options = React.useMemo(() => entries.map((entry) => entry.option), [entries])
   const entryById = React.useMemo(
@@ -92,7 +92,7 @@ function WeaponRequirementsField({ entries }: { entries: QuickNpcWeaponRequireme
 }
 
 function SpellRequirementsField({ entries }: { entries: QuickNpcSpellRequirementOption[] }) {
-  const form = useFormContext<QuickNpcAuthoringTabValues>()
+  const form = useFormContext<QuickNpcAuthoringTabFormValues>()
   const value = form.watch(QUICK_NPC_REQUIRED_SPELL_FIELD_NAME) ?? []
   const options = React.useMemo(() => entries.map((entry) => entry.option), [entries])
   const entryById = React.useMemo(

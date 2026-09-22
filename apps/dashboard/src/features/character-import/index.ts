@@ -6,5 +6,6 @@ export {
 } from './hooks/use-character-import-preview'
 export {
   CHARACTER_IMPORT_DEFAULT_ALIGNMENT,
+  CHARACTER_IMPORT_DEFAULT_GENDER,
   type CharacterImportSaveTarget,
 } from './model/character-import-target.lib'

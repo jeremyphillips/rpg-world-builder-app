@@ -11,7 +11,7 @@ import {
 } from '../../../../lib/equipment/equipment-step.fixtures'
 import {
   quickNpcAuthoringTabDefaultValues,
-  type QuickNpcAuthoringTabValues,
+  type QuickNpcAuthoringTabFormValues,
 } from '../../../lib/quick-npc/quick-npc-form-fields'
 import { quickNpcMemberSetupWithNoTitle } from '../../../lib/quick-npc/quick-npc-test-fixtures'
 import { buildQuickNpcRequirementOptionSets } from '../../../lib/quick-npc/quick-npc-requirement-options.lib'
@@ -24,7 +24,7 @@ const setup = quickNpcMemberSetupWithNoTitle({
 })
 
 function RequirementsFieldsHarness() {
-  const form = useForm<QuickNpcAuthoringTabValues>({
+  const form = useForm<QuickNpcAuthoringTabFormValues>({
     defaultValues: quickNpcAuthoringTabDefaultValues,
   })
 

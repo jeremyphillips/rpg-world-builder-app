@@ -207,6 +207,7 @@ export const dndBeyondCharacterDataSchema = z
     name: nullableString,
     alignmentId: nullableNumber,
     alignment: nullableString.optional(),
+    gender: nullableString.optional(),
     currentXp: z.number().optional(),
     adjustmentXp: z.number().optional(),
     stats: z.array(dndBeyondStatRowSchema).optional(),

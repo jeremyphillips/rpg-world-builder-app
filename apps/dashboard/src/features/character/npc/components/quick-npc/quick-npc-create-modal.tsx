@@ -15,7 +15,7 @@ import { formatNestedCreateHandoffFailure, invokeOnContentCreated } from '@/lib/
 
 import {
   createQuickNpcSetupDefaultValues,
-  type QuickNpcAuthoringTabValues,
+  type QuickNpcAuthoringTabFormValues,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import {
@@ -59,7 +59,7 @@ type QuickNpcCreateModalPhase = 'setup' | 'authoring'
 type QuickNpcCreateModalState = {
   phase: QuickNpcCreateModalPhase
   setupValues: QuickNpcSetupValues
-  authoringValues?: Partial<QuickNpcAuthoringTabValues>
+  authoringValues?: Partial<QuickNpcAuthoringTabFormValues>
 }
 
 function createInitialState(

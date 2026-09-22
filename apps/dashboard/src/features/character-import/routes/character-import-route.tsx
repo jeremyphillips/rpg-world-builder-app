@@ -10,6 +10,7 @@ import { useBuildContext } from '@/features/character'
 import { CharacterImportForm } from '../components/character-import-form'
 import {
   CHARACTER_IMPORT_DEFAULT_ALIGNMENT,
+  CHARACTER_IMPORT_DEFAULT_GENDER,
   type CharacterImportSaveTarget,
 } from '../model/character-import-target.lib'
 
@@ -25,6 +26,7 @@ export function CharacterImportRoute() {
           rulesetId: context.rulesetId,
           catalogIndex,
           defaultAlignment: CHARACTER_IMPORT_DEFAULT_ALIGNMENT,
+          defaultGender: CHARACTER_IMPORT_DEFAULT_GENDER,
           saveLabel: 'Save character',
           savingLabel: 'Saving…',
           saveErrorDefault: 'Could not save the imported character.',

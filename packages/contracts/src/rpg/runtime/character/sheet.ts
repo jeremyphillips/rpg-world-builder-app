@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { alignmentSchema } from '../../vocab/alignment'
+import { genderSchema } from '../../vocab/character-gender'
 import {
   characterAbilityScoresSchema,
   characterClassesSchema,
@@ -32,6 +33,7 @@ const characterBaseFields = {
   rulesetId: z.string().min(1),
   species: characterSpeciesSchema,
   alignment: alignmentSchema,
+  gender: genderSchema,
   xp: z.number().int().min(0).nullable(),
   abilityScores: characterAbilityScoresSchema,
   hitPoints: characterHitPointsSchema,

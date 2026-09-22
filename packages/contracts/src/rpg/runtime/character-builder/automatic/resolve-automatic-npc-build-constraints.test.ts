@@ -178,6 +178,7 @@ function weaponFighterSeed(overrides: Partial<AutomaticNpcBuildSeed> = {}): Auto
     classId: weaponConstraintFighter.id,
     level: 1,
     alignment: 'ln',
+    gender: 'male',
     ...overrides,
   }
 }
@@ -245,6 +246,7 @@ describe('resolveAutomaticNpcBuild constraints', () => {
       classId: wizardClass.id,
       level: 1 as const,
       alignment: 'ln' as const,
+      gender: 'female' as const,
     }
     const requiredSpellId = `${RULESET}:magic-missile`
 
@@ -289,6 +291,7 @@ describe('resolveAutomaticNpcBuild constraints', () => {
       classId: wizardClass.id,
       level: 1 as const,
       alignment: 'ln' as const,
+      gender: 'female' as const,
     }
     const spellA = `${RULESET}:magic-missile`
     const spellB = `${RULESET}:shield`

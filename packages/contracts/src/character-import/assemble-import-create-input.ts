@@ -10,6 +10,7 @@ import type { CharacterProficiencies } from '../rpg/runtime/character/sheet/prof
 import type { CharacterSpellEntry } from '../rpg/runtime/character/sheet/spells'
 import type { CharacterSelectionSource } from '../rpg/runtime/character/sheet/selection-sources'
 import type { Alignment } from '../rpg/vocab/alignment'
+import type { CharacterGender } from '../rpg/vocab/character-gender'
 import type { SystemRulesetId } from '../rpg/primitives/ruleset'
 import type { CharacterImportResult } from './adapter/character-import-result.schema'
 import type {
@@ -34,6 +35,8 @@ export type CharacterImportFinalizeOptions = {
   catalogIndex: CharacterBuildCatalogIndex
   /** Used when the provider omits alignment (common for D&D Beyond). */
   defaultAlignment?: Alignment
+  /** Used when the provider omits gender (common for D&D Beyond). */
+  defaultGender?: CharacterGender
 }
 
 function issue(code: string, message: string, path?: string): CharacterImportFinalizationIssue {
@@ -187,6 +190,27 @@ function resolveImportedAlignment(
   ])
 }
 
+function resolveImportedGender(
+  extraction: CharacterImportResult['extraction'],
+  options: CharacterImportFinalizeOptions,
+): CharacterGender {
+  if (extraction.gender.status === 'mapped' && extraction.gender.value) {
+    return extraction.gender.value
+  }
+
+  if (options.defaultGender) {
+    return options.defaultGender
+  }
+
+  throw new CharacterImportFinalizationError([
+    issue(
+      'import_gender_unmapped',
+      'Gender must be mapped or a defaultGender option must be provided before import can be saved.',
+      'gender',
+    ),
+  ])
+}
+
 const EMPTY_IMPORTED_WEALTH = { cp: 0, sp: 0, gp: 0, pp: 0 } as const
 
 type CharacterImportExtraction = CharacterImportResult['extraction']
@@ -230,6 +254,7 @@ function buildImportCreateCharacterInput(
       },
     ),
     alignment: resolveImportedAlignment(extraction, options),
+    gender: resolveImportedGender(extraction, options),
     xp: resolveImportedXp(extraction),
     abilityScores: required.abilityScores,
     hitPoints: required.hitPoints,

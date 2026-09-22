@@ -2,6 +2,7 @@ import {
   indexCharacterBuildCatalog,
   indexPlayableBuilderCatalog,
   type CharacterBuildContext,
+  type CharacterGender,
 } from '@rpg/contracts'
 import {
   generateSpeciesPersonName as generateSpeciesPersonNameFromIntegrations,
@@ -39,6 +40,7 @@ export function resolveCharacterSpeciesNameGenerationSupport(args: {
 export async function generateCharacterSpeciesName(args: {
   speciesId: string
   context: CharacterBuildContext
+  gender?: CharacterGender
 }): Promise<SpeciesPersonNameGenerationResult> {
   const playableSpecies = indexPlayableBuilderCatalog(args.context).species.get(args.speciesId)
   if (!playableSpecies) {
@@ -49,8 +51,12 @@ export async function generateCharacterSpeciesName(args: {
       return { ok: false, kind: 'unsupported', reason: SPECIES_NAME_GENERATION_FAILED }
     }
 
-    return generateSpeciesPersonNameFromIntegrations(toSpeciesCultureInput(catalogSpecies))
+    return generateSpeciesPersonNameFromIntegrations(toSpeciesCultureInput(catalogSpecies), {
+      gender: args.gender,
+    })
   }
 
-  return generateSpeciesPersonNameFromIntegrations(toSpeciesCultureInput(playableSpecies))
+  return generateSpeciesPersonNameFromIntegrations(toSpeciesCultureInput(playableSpecies), {
+    gender: args.gender,
+  })
 }

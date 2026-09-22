@@ -8,7 +8,7 @@ import { builderTestContext, createCharacterBuildContext } from '../test-fixture
 function makeClassedNpcDraft() {
   return {
     ...createEmptyCharacterBuilderDraft(),
-    identity: { name: 'Test Character', alignment: 'ng' as const },
+    identity: { name: 'Test Character', alignment: 'ng' as const, gender: 'male' as const },
     species: { speciesId: 'srd-cc-5.2.1:dwarf' },
     class: { classId: 'srd-cc-5.2.1:fighter', level: 1 as const },
     abilities: {
@@ -79,7 +79,7 @@ describe('finalizeNpcCharacterBuild', () => {
     })
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      identity: { name: 'Commoner', alignment: 'n' as const },
+      identity: { name: 'Commoner', alignment: 'n' as const, gender: 'female' as const },
       species: { speciesId: 'srd-cc-5.2.1:dwarf' },
       class: { level: 0 as const },
       abilities: {

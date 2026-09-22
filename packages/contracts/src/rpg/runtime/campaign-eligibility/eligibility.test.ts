@@ -36,6 +36,7 @@ const basePc: Character = {
   ],
   species: { id: 'srd-cc-5.2.1:elf', heritageId: 'high-elf' },
   alignment: 'ng',
+  gender: 'female',
   xp: 900,
   abilityScores: { str: 8, dex: 14, con: 12, int: 16, wis: 10, cha: 10 },
   hitPoints: { base: 18, current: 18, temporary: 0 },

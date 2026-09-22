@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { builderLevelSchema } from '../../../primitives/level'
 import { alignmentSchema } from '../../../vocab/alignment'
+import { genderSchema } from '../../../vocab/character-gender'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { CharacterBuildContext } from '../context'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
@@ -23,6 +24,8 @@ export const automaticNpcBuildSeedSchema = z.object({
   level: builderLevelSchema,
   /** Required — finalSubmit validation requires an alignment. */
   alignment: alignmentSchema,
+  /** Required — finalSubmit validation requires a gender. */
+  gender: genderSchema,
 })
 
 export type AutomaticNpcBuildSeed = z.infer<typeof automaticNpcBuildSeedSchema>

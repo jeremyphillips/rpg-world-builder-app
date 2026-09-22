@@ -18,7 +18,7 @@ import { validateCharacterBuild } from './validate-character-build'
 function makeCompleteDraft(overrides: Partial<CharacterBuilderDraft> = {}): CharacterBuilderDraft {
   return {
     ...createEmptyCharacterBuilderDraft(),
-    identity: { name: 'Verna', alignment: 'ng' },
+    identity: { name: 'Verna', alignment: 'ng', gender: 'female' },
     species: { speciesId: 'srd-cc-5.2.1:dwarf' },
     class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
     abilities: {
@@ -119,7 +119,7 @@ describe('validateCharacterBuild', () => {
     expect(belowMin.issues[0]?.message).not.toContain('"f":')
   })
 
-  it('finalSubmit requires alignment and all core steps', () => {
+  it('finalSubmit requires alignment, gender, and all core steps', () => {
     const missingAlignment = validateCharacterBuild(
       makeCompleteDraft({ identity: { name: 'Verna' } }),
       builderTestContext,
@@ -127,6 +127,7 @@ describe('validateCharacterBuild', () => {
     )
     expect(missingAlignment.ok).toBe(false)
     expect(missingAlignment.issues.some((issue) => issue.code === 'alignment_required')).toBe(true)
+    expect(missingAlignment.issues.some((issue) => issue.code === 'gender_required')).toBe(true)
 
     const complete = validateCharacterBuild(makeCompleteDraft(), builderTestContext, 'finalSubmit')
     expect(complete.ok).toBe(true)

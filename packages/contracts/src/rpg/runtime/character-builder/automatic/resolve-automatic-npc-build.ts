@@ -123,7 +123,7 @@ function seedDraft(
   const empty = createEmptyCharacterBuilderDraft()
   return {
     ...empty,
-    identity: { name: seed.name.trim(), alignment: seed.alignment },
+    identity: { name: seed.name.trim(), alignment: seed.alignment, gender: seed.gender },
     species: { speciesId: seed.speciesId },
     class: {
       ...(seed.classId && isClassProgressionApplicable(seed.level)

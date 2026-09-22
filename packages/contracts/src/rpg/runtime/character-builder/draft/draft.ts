@@ -4,6 +4,7 @@ import { equipmentModifierSchema } from '../../../content/equipment/modifier'
 import { builderLevelSchema } from '../../../primitives/level'
 import { abilitySchema } from '../../../vocab/ability'
 import { optionalAlignmentSchema } from '../../../vocab/alignment'
+import { optionalGenderSchema } from '../../../vocab/character-gender'
 import { characterNarrativeSchema } from '../../character/sheet/narrative'
 import { abilityGenerationMethodSchema } from '../ability/ability-generation'
 import { characterBuilderStepIdSchema } from '../../../character-builder/step-ids'
@@ -25,6 +26,7 @@ export const characterBuilderDraftIdentitySchema = z.object({
   narrative: characterNarrativeSchema.optional(),
   imageKey: z.string().optional(),
   alignment: optionalAlignmentSchema,
+  gender: optionalGenderSchema,
 })
 
 export type CharacterBuilderDraftIdentity = z.infer<typeof characterBuilderDraftIdentitySchema>

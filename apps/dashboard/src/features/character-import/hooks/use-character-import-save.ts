@@ -17,6 +17,7 @@ function toFinalizeOptions(saveTarget: CharacterImportSaveTarget) {
     rulesetId: saveTarget.rulesetId,
     catalogIndex: saveTarget.catalogIndex,
     defaultAlignment: saveTarget.defaultAlignment,
+    defaultGender: saveTarget.defaultGender,
   }
 }
 

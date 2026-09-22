@@ -11,9 +11,14 @@ import type { CharacterBuilderDraft } from '../draft/draft'
 import { validationIssue } from './issue'
 import type { CharacterBuildValidationIssue } from './types'
 
+export type ValidateIdentityOptions = {
+  requireAlignment?: boolean
+  requireGender?: boolean
+}
+
 export function validateIdentity(
   draft: CharacterBuilderDraft,
-  requireAlignment: boolean,
+  options: ValidateIdentityOptions = {},
 ): CharacterBuildValidationIssue[] {
   const issues: CharacterBuildValidationIssue[] = []
 
@@ -26,7 +31,7 @@ export function validateIdentity(
     )
   }
 
-  if (requireAlignment && !draft.identity.alignment) {
+  if (options.requireAlignment && !draft.identity.alignment) {
     issues.push(
       validationIssue(
         'alignment_required',
@@ -36,6 +41,15 @@ export function validateIdentity(
           stepId: 'identity',
         },
       ),
+    )
+  }
+
+  if (options.requireGender && !draft.identity.gender) {
+    issues.push(
+      validationIssue('gender_required', characterBuilderValidationMessages.genderRequired(), {
+        path: 'identity.gender',
+        stepId: 'identity',
+      }),
     )
   }
 

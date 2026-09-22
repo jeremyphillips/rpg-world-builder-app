@@ -87,6 +87,7 @@ export type CharacterDetailViewModel = {
   identity: {
     name: string
     summary: string
+    gender: string
     xp: string | null
     vital: CharacterVitalState
     vitalLabel: string

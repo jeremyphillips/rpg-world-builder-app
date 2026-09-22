@@ -116,6 +116,7 @@ describe('character schema creature reuse', () => {
       classes: [{ classId: 'srd-cc-5.2.1:fighter', level: 1 }],
       species: { id: 'srd-cc-5.2.1:human' },
       alignment: 'ng',
+      gender: 'male',
       xp: 0,
       abilityScores: {
         str: 16,

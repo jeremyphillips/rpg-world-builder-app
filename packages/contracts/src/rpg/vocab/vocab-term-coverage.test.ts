@@ -16,6 +16,7 @@ import {
 import { AREA_GEOMETRY_SHAPE_TERM } from '../primitives/area-geometry'
 import { ABILITY_SCORE_TERM } from './ability'
 import { ALIGNMENT_TERM } from './alignment'
+import { CHARACTER_GENDER_TERM } from './character-gender'
 import { ARMOR_CATEGORY_TERM } from './armor/category'
 import { ARMOR_MATERIAL_TERM } from './armor/material'
 import { CREATURE_SIZE_TERM } from './creature-size'
@@ -73,6 +74,7 @@ import { NPC_AUTHORING_TEMPLATE_TERM } from './organization/npc-authoring-templa
 const RPG_VOCAB_CLOSED_TERMS = [
   ABILITY_SCORE_TERM,
   ALIGNMENT_TERM,
+  CHARACTER_GENDER_TERM,
   CREATURE_SIZE_TERM,
   CONDITION_TERM,
   FEAT_CATEGORY_TERM,
@@ -165,7 +167,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(48)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(49)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

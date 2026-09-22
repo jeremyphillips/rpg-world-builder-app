@@ -1,7 +1,9 @@
+import type { CharacterGender } from '@rpg/contracts/rpg/vocab'
 import { generateName } from '@rpg/name-generator-core'
 import { loadNameCollection } from '@rpg/name-generator-data'
 
 import { composeAvailableNamingConventions } from './compose-available-naming-conventions'
+import { resolveCharacterGenderNameStyle } from './resolve-character-gender-name-style'
 import { resolveSpeciesPersonNaming } from './resolve-species-person-naming'
 import type { SpeciesCultureInput } from './resolve-campaign-conventions'
 
@@ -31,6 +33,7 @@ export type SpeciesPersonNameGenerationResult =
  */
 export async function generateSpeciesPersonName(
   speciesInput: SpeciesCultureInput,
+  options?: { gender?: CharacterGender },
 ): Promise<SpeciesPersonNameGenerationResult> {
   const { conventions, getConvention } = composeAvailableNamingConventions([speciesInput])
   const resolution = resolveSpeciesPersonNaming({ species: speciesInput, conventions })
@@ -60,7 +63,7 @@ export async function generateSpeciesPersonName(
         conventionId: convention.id,
         count: 1,
         seed: createGenerationSeed(),
-        genderStyle: 'neutral',
+        genderStyle: resolveCharacterGenderNameStyle(options?.gender),
       },
       0,
       new Set<string>(),

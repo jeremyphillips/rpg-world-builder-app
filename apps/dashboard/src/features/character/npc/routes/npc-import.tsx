@@ -10,6 +10,7 @@ import { NpcAuthoringGate } from '@/features/character'
 import { CharacterImportForm } from '@/features/character-import'
 import {
   CHARACTER_IMPORT_DEFAULT_ALIGNMENT,
+  CHARACTER_IMPORT_DEFAULT_GENDER,
   type CharacterImportSaveTarget,
 } from '@/features/character-import'
 
@@ -26,6 +27,7 @@ export function NpcImportRoute() {
           catalogIndex,
           campaignId,
           defaultAlignment: CHARACTER_IMPORT_DEFAULT_ALIGNMENT,
+          defaultGender: CHARACTER_IMPORT_DEFAULT_GENDER,
           saveLabel: 'Save NPC',
           savingLabel: 'Saving…',
           saveErrorDefault: 'Could not save the imported NPC.',

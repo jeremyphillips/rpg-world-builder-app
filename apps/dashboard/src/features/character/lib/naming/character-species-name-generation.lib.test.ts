@@ -138,4 +138,20 @@ describe('generateCharacterSpeciesName', () => {
 
     expect(result).toEqual({ ok: false, kind: 'generation_failed' })
   })
+
+  it('forwards character gender into name generation', async () => {
+    await generateCharacterSpeciesName({
+      speciesId: 'srd-cc-5.2.1:dwarf',
+      context: namingContext,
+      gender: 'male',
+    })
+
+    expect(generateName).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ genderStyle: 'masculine' }),
+      expect.anything(),
+      expect.anything(),
+    )
+  })
 })

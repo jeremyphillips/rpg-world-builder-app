@@ -108,6 +108,7 @@ function fighterSeed(overrides: Partial<AutomaticNpcBuildSeed> = {}): AutomaticN
     classId: automaticFighter.id,
     level: 1,
     alignment: 'ln',
+    gender: 'male',
     ...overrides,
   }
 }
@@ -120,7 +121,11 @@ describe('resolveAutomaticNpcBuild', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    expect(result.draft.identity).toEqual({ name: 'Guard Captain', alignment: 'ln' })
+    expect(result.draft.identity).toEqual({
+      name: 'Guard Captain',
+      alignment: 'ln',
+      gender: 'male',
+    })
     expect(result.draft.species).toEqual({ speciesId: dwarfSpecies.id })
     expect(result.draft.class).toEqual({ classId: automaticFighter.id, level: 1 })
 

@@ -97,6 +97,7 @@ export function CharacterDetailContent({
       <CharacterDetailHeader
         name={viewModel.identity.name}
         summary={viewModel.identity.summary}
+        gender={viewModel.identity.gender}
         xp={viewModel.identity.xp}
         statusSummary={statusSummary}
         statusActions={statusActions}

@@ -16,6 +16,7 @@ export function makePcCharacter(overrides: Partial<PcCharacter> = {}): PcCharact
     classes: overrides.classes ?? [{ classId: `${STORY_RULESET_ID}:fighter`, level: 1 }],
     species: overrides.species ?? { id: `${STORY_RULESET_ID}:dwarf` },
     alignment: overrides.alignment ?? 'ng',
+    gender: overrides.gender ?? 'female',
     xp: overrides.xp ?? 0,
     abilityScores: overrides.abilityScores ?? {
       str: 15,
