@@ -106,6 +106,7 @@ export function useCharacterResidenceSheet(input: {
       (referencesQuery.isPending && referencesQuery.data === undefined) ||
       (canEdit && locationsQuery.isPending && locationsQuery.data === undefined),
     locationReferences,
+    locations: locationsQuery.data ?? [],
     pickerItems,
     locationsQueryStatus,
     handleAdd,

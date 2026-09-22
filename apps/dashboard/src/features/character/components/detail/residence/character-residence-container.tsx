@@ -47,9 +47,7 @@ export function CharacterResidenceContainer({
 
   const relationshipContext = useMemo(() => {
     const eligibleResidenceLocations = sheet.pickerItems.map(({ location }) => location)
-    const locationsById = new Map(
-      eligibleResidenceLocations.map((location) => [location.id, location]),
-    )
+    const locationsById = new Map(sheet.locations.map((location) => [location.id, location]))
 
     return buildCharacterApiRelationshipFieldContext({
       campaignId,
@@ -61,7 +59,7 @@ export function CharacterResidenceContainer({
       availableOrganizationIdSet: new Set(),
       availableResidenceIdSet: new Set(eligibleResidenceLocations.map(({ id }) => id)),
     })
-  }, [campaignId, sheet.locationsQueryStatus, sheet.pickerItems])
+  }, [campaignId, sheet.locations, sheet.locationsQueryStatus, sheet.pickerItems])
 
   const renderApiSync = useCallback(
     () => (
@@ -86,10 +84,7 @@ export function CharacterResidenceContainer({
 
   const defaultValues = useMemo(() => residencesToFormValues(residences), [residences])
 
-  const formKey = useMemo(
-    () => residences.map((reference) => reference.connection.id).join(','),
-    [residences],
-  )
+  const formKey = `${subjectKind}:${characterId}`
 
   if (sheet.isBootstrapping) return null
 

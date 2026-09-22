@@ -27,6 +27,7 @@ function mockResidenceSheet(
   mockedUseCharacterResidenceSheet.mockReturnValue({
     isBootstrapping: false,
     locationReferences: [],
+    locations: [residence],
     pickerItems: [{ location: residence, selected: false }],
     locationsQueryStatus: { status: 'success' },
     handleAdd: vi.fn(),
@@ -54,6 +55,35 @@ describe('CharacterResidenceContainer', () => {
     expect(screen.getByText('No residence added.')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Add residence' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('keeps an optimistic residence row while server data is still stale', async () => {
+    const user = userEvent.setup()
+    const handleAdd = vi.fn().mockResolvedValue(undefined)
+
+    mockResidenceSheet({
+      handleAdd,
+    })
+
+    render(
+      <MemoryRouter>
+        <CharacterResidenceContainer
+          campaignId="campaign-1"
+          characterId="character-1"
+          canEdit
+          subjectKind="npc"
+        />
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add residence' }))
+    await user.click(screen.getAllByRole('button', { name: 'Add' }).at(-1)!)
+
+    await waitFor(() => {
+      expect(handleAdd).toHaveBeenCalledWith({ locationId: residence.id })
+      expect(screen.getByText('Harborford')).toBeInTheDocument()
+      expect(screen.queryByText('No residence added.')).not.toBeInTheDocument()
+    })
   })
 
   it('shows remove failures without hiding the row', async () => {

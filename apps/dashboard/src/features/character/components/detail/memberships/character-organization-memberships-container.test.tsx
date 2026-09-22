@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
@@ -66,6 +66,41 @@ describe('CharacterOrganizationMembershipsContainer', () => {
     expect(screen.getByText('No organization added.')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('shows catalog organization names optimistically before server refetch', async () => {
+    const user = userEvent.setup()
+    const handleAdd = vi.fn().mockResolvedValue(undefined)
+
+    mockMembershipSheet({
+      memberships: [],
+      handleAdd,
+    })
+    mockedUseOrganizations.mockReturnValue({
+      data: [lanternGuild],
+    } as unknown as ReturnType<typeof useOrganizations>)
+
+    render(
+      <MemoryRouter>
+        <CharacterOrganizationMembershipsContainer
+          campaignId="campaign-1"
+          characterId="character-1"
+          characterName="Aldric"
+          canEdit
+          subjectKind="npc"
+        />
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add organization' }))
+    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
+    await user.click(screen.getByRole('button', { name: 'Add organization' }))
+
+    await waitFor(() => {
+      expect(handleAdd).toHaveBeenCalledWith({ organizationId: lanternGuild.id })
+      expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
+      expect(screen.queryByText('organization 1')).not.toBeInTheDocument()
+    })
   })
 
   it('disables add when canEdit is false', () => {

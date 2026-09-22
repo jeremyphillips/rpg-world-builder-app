@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useCallback } from 'react'
 
 import type { CharacterLocationReferenceResolution } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
 
 import type { ResidenceLocationSelection } from '../../connections/picker/residence-location-picker-drawer.types'
 import {
@@ -10,6 +8,7 @@ import {
   residencesToFormValues,
   type ResidenceFormValues,
 } from '../../../lib/relationship/character-residence-form-fields'
+import { useRelationshipApiSemanticSync } from '../../../lib/relationship/use-relationship-api-semantic-sync'
 
 type CharacterResidenceApiSyncProps = {
   serverResidences: readonly CharacterLocationReferenceResolution[]
@@ -23,82 +22,38 @@ export function CharacterResidenceApiSync({
   onAdd,
   onRemove,
 }: CharacterResidenceApiSyncProps) {
-  const { control, reset } = useFormContext<ResidenceFormValues>()
-  const formLocations = useWatch({ control, name: 'locations' })
-  const onAddRef = useRef(onAdd)
-  const onRemoveRef = useRef(onRemove)
-  const priorServerRef = useRef(serverResidences)
-  const syncInFlightRef = useRef(false)
-  const [removeError, setRemoveError] = useState<string>()
-
-  useEffect(() => {
-    onAddRef.current = onAdd
-    onRemoveRef.current = onRemove
-  })
-
-  useEffect(() => {
-    if (syncInFlightRef.current) return
-
-    const serverChanged = !areResidenceListsEqual(priorServerRef.current, serverResidences)
-    if (serverChanged) {
-      priorServerRef.current = serverResidences
-      reset(residencesToFormValues(serverResidences))
-      setRemoveError(undefined)
-      return
-    }
-
-    const formValues: ResidenceFormValues = { locations: formLocations ?? [] }
-    const serverSnapshot = residencesToFormValues(serverResidences)
-    if (JSON.stringify(formValues.locations) === JSON.stringify(serverSnapshot.locations)) {
-      return
-    }
-
-    const serverByLocationId = new Map(
-      serverResidences.map((reference) => [reference.connection.locationId, reference.connection]),
-    )
-    const formLocationIds = new Set(formValues.locations.map((connection) => connection.locationId))
-    const serverLocationIds = new Set(serverByLocationId.keys())
-
-    const toRemove = serverResidences.filter(
-      (reference) => !formLocationIds.has(reference.connection.locationId),
-    )
-    const toAdd = formValues.locations.filter(
-      (connection) => !serverLocationIds.has(connection.locationId),
-    )
-
-    if (toRemove.length === 0 && toAdd.length === 0) return
-
-    syncInFlightRef.current = true
-    setRemoveError(undefined)
-
-    void (async () => {
-      try {
-        for (const reference of toRemove) {
-          await onRemoveRef.current(reference.connection.id, reference.connection.locationId)
-        }
-        for (const connection of toAdd) {
-          await onAddRef.current({
-            locationId: connection.locationId,
-          })
-        }
-      } catch (error) {
-        const message =
-          error instanceof Error && error.message.trim().length > 0
-            ? error.message
-            : 'Could not update this residence.'
-        setRemoveError(message)
-        reset(residencesToFormValues(serverResidences))
-      } finally {
-        syncInFlightRef.current = false
-      }
-    })()
-  }, [formLocations, reset, serverResidences])
-
-  if (!removeError) return null
-
-  return (
-    <Text variant="destructive" className="text-sm" aria-live="polite">
-      {removeError}
-    </Text>
+  const serverByLocationId = useCallback(
+    () =>
+      new Map(
+        serverResidences.map((reference) => [
+          reference.connection.locationId,
+          reference.connection,
+        ]),
+      ),
+    [serverResidences],
   )
+
+  const handleRemove = useCallback(
+    (locationId: string) => {
+      const connection = serverByLocationId().get(locationId)
+      if (!connection) {
+        throw new Error('Could not remove this residence.')
+      }
+      return onRemove(connection.id, locationId)
+    },
+    [onRemove, serverByLocationId],
+  )
+
+  return useRelationshipApiSemanticSync<ResidenceFormValues, CharacterLocationReferenceResolution>({
+    serverSnapshot: serverResidences,
+    areServerEqual: areResidenceListsEqual,
+    toFormValues: residencesToFormValues,
+    formFieldName: 'locations',
+    semanticIdKey: 'locationId',
+    getConfirmedIds: (residences) => residences.map((reference) => reference.connection.locationId),
+    onAdd: (locationId) => onAdd({ locationId }),
+    onRemove: handleRemove,
+    addErrorFallback: 'Could not add this residence.',
+    removeErrorFallback: 'Could not remove this residence.',
+  })
 }

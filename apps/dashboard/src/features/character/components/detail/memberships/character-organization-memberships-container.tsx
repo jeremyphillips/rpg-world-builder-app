@@ -9,6 +9,7 @@ import { CharacterOrganizationMembershipDrawers } from './character-organization
 import { OrganizationMembershipsApiSync } from './organization-memberships-api-sync'
 import { useCharacterOrganizationMembershipsSheet } from '../../../hooks/use-character-organization-memberships-sheet'
 import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
+import { resolveRelationshipPlayActor } from '../../../lib/relationship/character-relationship-play-actor.lib'
 import {
   buildOrganizationMembershipsFormFields,
   organizationMembershipsFormSchema,
@@ -44,9 +45,14 @@ export function CharacterOrganizationMembershipsContainer({
   })
   const organizationsQuery = useOrganizations(canEdit ? campaignId : undefined)
 
+  const playActor = useMemo(
+    () => resolveRelationshipPlayActor(subjectKind, characterId),
+    [characterId, subjectKind],
+  )
+
   const relationshipContext = useMemo(() => {
     const availableOrganizations = (organizationsQuery.data ?? []).filter((organization) =>
-      isContentPlayableFor(organization, { kind: 'pc', characterId }),
+      isContentPlayableFor(organization, playActor),
     )
     const organizationsById = new Map(
       (organizationsQuery.data ?? []).map((organization) => [organization.id, organization]),
@@ -67,8 +73,8 @@ export function CharacterOrganizationMembershipsContainer({
   }, [
     campaignId,
     canEdit,
-    characterId,
     organizationsQuery.data,
+    playActor,
     sheet.setEditingMembership,
     sheet.setUnresolvedToRemove,
   ])
@@ -98,10 +104,7 @@ export function CharacterOrganizationMembershipsContainer({
     [sheet.memberships],
   )
 
-  const formKey = useMemo(
-    () => sheet.memberships.map((membership) => membership.organizationId).join(','),
-    [sheet.memberships],
-  )
+  const formKey = `${subjectKind}:${characterId}`
 
   if (sheet.isBootstrapping) return null
 
