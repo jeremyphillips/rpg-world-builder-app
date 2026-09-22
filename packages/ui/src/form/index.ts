@@ -417,6 +417,13 @@ export {
   registerArrayFieldMutators,
   type ArrayFieldMutators,
 } from './context/array-field-mutators.registry'
+export {
+  ArrayAddActionInterceptProvider,
+  useArrayAddActionIntercept,
+  type ArrayAddActionInterceptHandler,
+  type ArrayAddActionInterceptProviderProps,
+  type ArrayAddActionInterceptRegistry,
+} from './context/array-add-action-intercept.context'
 export { useArrayItemCollapseState } from './hooks/use-array-item-collapse-state.client'
 export {
   ArrayItemActionsRail,
@@ -447,6 +454,17 @@ export {
   type ArrayItemIssueSummaryProps,
 } from './renderers/array/array-item-issue.client'
 export { buildFieldRendererIds } from './renderers/field-renderer-config.lib'
+export {
+  RelationshipFieldProvider,
+  resolveRelationshipFieldAdapter,
+  useRelationshipFieldContext,
+  type RelationshipFieldAdapter,
+  type RelationshipFieldPickerProps,
+  type RelationshipFieldProviderProps,
+  type RelationshipFieldRegistry,
+  type RelationshipFieldRowActions,
+  type RelationshipFieldRowContent,
+} from './context/relationship-field.context'
 export {
   ArrayLikeSectionHeader,
   type ArrayLikeSectionHeaderProps,

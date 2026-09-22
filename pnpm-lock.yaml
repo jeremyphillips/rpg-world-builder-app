@@ -280,6 +280,9 @@ importers:
       '@rpg/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
+      '@rpg/character-narrative-integrations':
+        specifier: workspace:*
+        version: link:../../packages/character-narrative-integrations
       '@rpg/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -579,6 +582,69 @@ importers:
       '@rpg/content-types':
         specifier: workspace:*
         version: link:../../tools/content-types
+      eslint:
+        specifier: ^10.4.1
+        version: 10.4.1(jiti@2.6.1)
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.8
+        version: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@26.1.0)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/character-narrative-core:
+    dependencies:
+      '@rpg/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@rpg/config':
+        specifier: workspace:*
+        version: link:../config
+      eslint:
+        specifier: ^10.4.1
+        version: 10.4.1(jiti@2.6.1)
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.8
+        version: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@26.1.0)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/character-narrative-data:
+    dependencies:
+      '@rpg/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@rpg/config':
+        specifier: workspace:*
+        version: link:../config
+      eslint:
+        specifier: ^10.4.1
+        version: 10.4.1(jiti@2.6.1)
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.8
+        version: 4.1.8(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@26.1.0)(vite@8.0.16(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/character-narrative-integrations:
+    dependencies:
+      '@rpg/character-narrative-core':
+        specifier: workspace:*
+        version: link:../character-narrative-core
+      '@rpg/character-narrative-data':
+        specifier: workspace:*
+        version: link:../character-narrative-data
+      '@rpg/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@rpg/config':
+        specifier: workspace:*
+        version: link:../config
       eslint:
         specifier: ^10.4.1
         version: 10.4.1(jiti@2.6.1)

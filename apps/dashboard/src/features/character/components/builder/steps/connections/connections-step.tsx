@@ -1,27 +1,22 @@
-import { useMemo, useState } from 'react'
+import { createElement, useMemo } from 'react'
 
-import {
-  getOrganizationDomainLabel,
-  resolvePlayableBuilderContent,
-  type CharacterBuildContext,
-  type CharacterBuilderDraft,
-  type CharacterOrganizationConnection,
-} from '@rpg/contracts'
+import type { CharacterBuildContext, CharacterBuilderDraft } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Plus } from 'lucide-react'
+import { Form, useRelationshipFieldContext, type FormItem } from '@rpg/ui/form'
 
-import { Button, InsetPanel } from '@rpg/ui'
-
-import { ContentEntityCard } from '@/features/content'
-import { BuilderInventoryRemoveAction } from '../../inventory/builder-inventory-remove-action'
-import { OrganizationPickerDrawer } from '../../../connections/picker/organization-picker-drawer'
-import type { OrganizationMembershipSelection } from '../../../connections/picker/organization-picker-drawer.types'
 import {
-  connectionsStepEmptyClasses,
-  connectionsStepHeaderClasses,
-  connectionsStepListClasses,
-} from './connections-step.variants'
+  buildConnectionsStepFormFields,
+  connectionsFormSchema,
+} from '../../../../lib/steps/connections-form-fields'
+import { connectionsDraftToFormValues } from '../../../../lib/steps/connections-form-values'
+import { CharacterRelationshipFormProvider } from '../../../../lib/relationship/character-relationship-field-registry'
+import {
+  CharacterRelationshipArrayAddInterceptProvider,
+  CharacterRelationshipPickerBridges,
+} from '../../../relationship/character-relationship-array-add-intercept'
+import type { CharacterRelationshipFieldContext } from '../../../../lib/relationship/character-relationship-field-context.types'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
+import { ConnectionsDraftSync } from './connections-draft-sync'
 
 export type ConnectionsStepProps = {
   context: CharacterBuildContext
@@ -30,13 +25,47 @@ export type ConnectionsStepProps = {
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
 }
 
-function membershipSecondaryLabel(
-  membership: CharacterOrganizationConnection,
-  organizationDomain: string | undefined,
-): string | null {
-  if (membership.title) return membership.title
-  if (organizationDomain) return getOrganizationDomainLabel(organizationDomain)
-  return null
+type ConnectionsStepFormProps = {
+  draft: CharacterBuilderDraft
+  onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
+}
+
+function ConnectionsStepForm({ draft, onDraftChange }: ConnectionsStepFormProps) {
+  const { context } = useRelationshipFieldContext()
+  const relationshipContext = context as CharacterRelationshipFieldContext
+
+  const fields = useMemo(
+    (): FormItem[] => [
+      ...buildConnectionsStepFormFields({
+        relationshipContext,
+        renderDraftSync: () => (
+          <ConnectionsDraftSync
+            draftConnections={draft.connections}
+            onDraftChange={onDraftChange}
+          />
+        ),
+      }),
+      {
+        kind: 'slot',
+        name: '_characterRelationshipPickers',
+        chrome: { variant: 'none' },
+        render: () => createElement(CharacterRelationshipPickerBridges),
+      },
+    ],
+    [draft.connections, onDraftChange, relationshipContext],
+  )
+
+  return (
+    <CharacterRelationshipArrayAddInterceptProvider>
+      <Form
+        schema={connectionsFormSchema}
+        fields={fields}
+        defaultValues={connectionsDraftToFormValues(draft.connections)}
+        mode="onChange"
+        onSubmit={() => undefined}
+      />
+    </CharacterRelationshipArrayAddInterceptProvider>
+  )
 }
 
 export function ConnectionsStep({
@@ -45,120 +74,11 @@ export function ConnectionsStep({
   validationIssues,
   onDraftChange,
 }: ConnectionsStepProps) {
-  const [pickerOpen, setPickerOpen] = useState(false)
-  const availableOrganizations = useMemo(
-    () => resolvePlayableBuilderContent(context).organizations,
-    [context],
-  )
-  const memberships = draft.connections.organizations
-  const selectedIdSet = new Set(memberships.map(({ organizationId }) => organizationId))
-  const organizationsById = useMemo(
-    () =>
-      new Map(context.catalog.organizations.map((organization) => [organization.id, organization])),
-    [context.catalog.organizations],
-  )
-  const availableIdSet = useMemo(
-    () => new Set(availableOrganizations.map(({ id }) => id)),
-    [availableOrganizations],
-  )
-  const pickerItems = availableOrganizations.map((organization) => ({
-    organization,
-    selected: selectedIdSet.has(organization.id),
-  }))
-
-  // Title and priority arrive already stamped by the picker's shared metadata helper —
-  // the builder must not derive priority locally.
-  const handleAdd = (membership: OrganizationMembershipSelection) => {
-    if (selectedIdSet.has(membership.organizationId)) return
-    onDraftChange({
-      connections: {
-        organizations: [...memberships, membership],
-        locations: draft.connections.locations,
-      },
-    })
-  }
-
-  const handleRemove = (organizationId: string) => {
-    onDraftChange({
-      connections: {
-        organizations: memberships.filter(
-          (membership) => membership.organizationId !== organizationId,
-        ),
-        locations: draft.connections.locations,
-      },
-    })
-  }
-
   return (
     <BuilderStepFrame stepId="connections" validationIssues={validationIssues}>
-      <div className={connectionsStepHeaderClasses}>
-        <Button type="button" variant="outline" onClick={() => setPickerOpen(true)}>
-          <Plus aria-hidden />
-          Add organization
-        </Button>
-      </div>
-
-      {memberships.length === 0 ? (
-        <InsetPanel
-          borderStyle="dashed"
-          size="md"
-          align="center"
-          className={connectionsStepEmptyClasses}
-        >
-          <InsetPanel.PassiveMessage>No organizations connected yet.</InsetPanel.PassiveMessage>
-        </InsetPanel>
-      ) : (
-        <div className={connectionsStepListClasses} aria-label="Selected organizations">
-          {memberships.map((membership) => {
-            const organization = organizationsById.get(membership.organizationId)
-            const unavailable = !availableIdSet.has(membership.organizationId)
-            const label = organization?.name ?? membership.organizationId
-            const secondary = membershipSecondaryLabel(membership, organization?.organizationDomain)
-
-            const status = [
-              ...(secondary
-                ? [{ kind: 'text' as const, label: secondary, variant: 'muted' as const }]
-                : []),
-              ...(unavailable
-                ? [
-                    {
-                      kind: 'badge' as const,
-                      label: organization ? 'Unavailable' : 'Missing organization',
-                      tone: 'warning' as const,
-                    },
-                  ]
-                : []),
-            ]
-
-            return (
-              <ContentEntityCard
-                key={membership.organizationId}
-                entity={{
-                  heading: label,
-                  status: status.length > 0 ? status : undefined,
-                }}
-                trailing={{
-                  kind: 'action',
-                  content: (
-                    <BuilderInventoryRemoveAction
-                      itemLabel={label}
-                      onRemove={() => handleRemove(membership.organizationId)}
-                    />
-                  ),
-                }}
-                density="compact"
-              />
-            )
-          })}
-        </div>
-      )}
-
-      <OrganizationPickerDrawer
-        open={pickerOpen}
-        onOpenChange={setPickerOpen}
-        items={pickerItems}
-        onAdd={handleAdd}
-      />
+      <CharacterRelationshipFormProvider buildContext={context}>
+        <ConnectionsStepForm draft={draft} onDraftChange={onDraftChange} />
+      </CharacterRelationshipFormProvider>
     </BuilderStepFrame>
   )
 }

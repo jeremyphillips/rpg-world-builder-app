@@ -3,7 +3,7 @@ import { WidePage } from '@/components/layout/page/wide-page'
 
 import { CampaignCharacterStatusSummary } from '../../components/detail/status/campaign-character-status-summary'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content'
-import { CharacterOrganizationMembershipsContainer } from '../../components/detail/memberships/character-organization-memberships-container'
+import { CharacterIdentityConnectionsSupplement } from '../../components/detail/memberships/character-identity-connections-supplement'
 import { NpcStatusEditAction } from '../components/npc-status-edit-action'
 import { useNpcDetailPage } from '../hooks/use-npc-detail-page'
 
@@ -48,7 +48,7 @@ export function NpcDetail() {
               ) : undefined
             }
             identitySupplement={
-              <CharacterOrganizationMembershipsContainer
+              <CharacterIdentityConnectionsSupplement
                 campaignId={campaignId}
                 characterId={npcDetail.character.id}
                 characterName={viewModel.identity.name}

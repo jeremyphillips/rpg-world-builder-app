@@ -358,6 +358,30 @@ Nested `{ valueKey, unitKey }` for multi-unit enums. Single unit: `fixedUnit` + 
 
 `valueDigitsDependsOn` + `valueDigitsLookup` when width tracks another field.
 
+## Relationship (`relationship`)
+
+Typed content-entity edge list with vocabulary-driven picker wiring. For form
+authoring that should match grant-style array cards, prefer `kind: 'array'` with
+`item.renderShell` (`EntityDisclosureArrayItemShell`) and `addAction.intercept` for
+picker-driven inline adds — see character connections in the dashboard.
+
+```ts
+{
+  type: 'relationship',
+  name: 'organizations',
+  label: 'Organizations',
+  vocabulary: 'character_organization_membership',
+  emptyLabel: 'No organizations connected yet.',
+  addActionLabel: 'Add organization',
+}
+```
+
+- Value is an RHF field array of edge objects.
+- Wrap the form in `RelationshipFieldProvider` with a `registry` mapping `vocabulary` ids to
+  `RelationshipFieldAdapter` implementations (row projection + picker drawer).
+- `cardinality: 'one'` replaces the array on add instead of appending.
+- Empty state and add chrome align with array fields (`EmptyPanel` + shared `CollectionAddControl`).
+
 ## Combobox (`combobox`)
 
 Searchable dropdown for large lists (catalog refs).

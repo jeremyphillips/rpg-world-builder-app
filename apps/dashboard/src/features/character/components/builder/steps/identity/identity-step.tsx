@@ -16,6 +16,7 @@ import { BUILDER_STEP_FORM_IDS } from '../../../../lib/steps/builder-step-form-i
 import { BuilderFormContinueRegistration } from '../../builder-form-continue-registration'
 import { IdentityDraftSync } from './identity-draft-sync'
 import { IdentityNameField } from './identity-name-field'
+import { IdentityNarrativeGenerateAction } from './identity-narrative-generate-action'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 
 export type IdentityStepProps = {
@@ -39,6 +40,9 @@ export function IdentityStep({
     () =>
       buildIdentityStepFormFields({
         renderNameField: () => <IdentityNameField buildContext={context} draft={draft} />,
+        renderGenerateNarrative: () => (
+          <IdentityNarrativeGenerateAction context={context} draft={draft} />
+        ),
         renderDraftSync: () => (
           <IdentityDraftSync draftIdentity={draft.identity} onDraftChange={onDraftChange} />
         ),

@@ -74,6 +74,10 @@
       "types": "./src/character-import/index.ts",
       "default": "./src/character-import/index.ts"
     },
+    "./character-narrative": {
+      "types": "./src/character-narrative/index.ts",
+      "default": "./src/character-narrative/index.ts"
+    },
     "./name-generator": {
       "types": "./src/name-generator/index.ts",
       "default": "./src/name-generator/index.ts"

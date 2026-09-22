@@ -122,6 +122,10 @@ export {
   iconContainerGlyphClasses,
 } from './components/ui/icon-container.variants'
 export { EmptyPanel, type EmptyPanelProps } from './components/ui/empty-panel.client'
+export {
+  CollectionAddControl,
+  type CollectionAddControlProps,
+} from './components/ui/collection-add-control.client'
 export { emptyPanelVariants } from './components/ui/empty-panel.variants'
 export {
   emptyStateWellBodyClasses,
@@ -955,6 +959,11 @@ export {
   type ComboboxRenderSelectedItem,
   type ComboboxSelectedItemRenderContext,
 } from './components/ui/combobox-field.client'
+export {
+  RelationshipField,
+  type RelationshipFieldProps,
+  type RelationshipFieldAddAction,
+} from './components/ui/relationship-field.client'
 
 export {
   EditableGrid,

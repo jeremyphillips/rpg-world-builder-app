@@ -130,6 +130,7 @@ export type FieldType =
   | 'joinedPair'
   | 'levelRange'
   | 'rollValue'
+  | 'relationship'
 
 /** Option for the `select`, `radio`, `radioCard`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -922,6 +923,23 @@ export interface RollValueFieldConfig extends BaseFieldConfig {
 }
 
 /**
+ * Typed content-entity relationship list (`type: 'relationship'`).
+ *
+ * Values are edge objects stored in an RHF field array. Picker wiring and row
+ * projection are resolved from a vocabulary id via `RelationshipFieldProvider`.
+ */
+export interface RelationshipFieldConfig extends BaseFieldConfig {
+  type: 'relationship'
+  /** Registry key resolved by `RelationshipFieldProvider`. */
+  vocabulary: string
+  /** Single vs multi edge authoring. Defaults to `many`. */
+  cardinality?: 'one' | 'many'
+  emptyLabel: string
+  addActionLabel: string
+  defaultValue?: unknown[]
+}
+
+/**
  * Value + unit composite bound to a nested object field (e.g. `{ amount, currency }`).
  * `valueKey` / `unitKey` name the object properties the control reads and writes.
  */
@@ -1006,6 +1024,7 @@ export type FieldConfig =
   | RollValueFieldConfig
   | InputSelectFieldConfig
   | InputUnitFieldConfig
+  | RelationshipFieldConfig
 
 /** Leaf fields and slots allowed inside a horizontal `kind: 'row'`. */
 export type RowFieldItem = FieldConfig | SlotConfig
@@ -1350,6 +1369,11 @@ export interface ArrayAddActionConfig {
   layout?: ArrayAddActionLayout
   size?: NonNullable<ButtonVariantProps['size']>
   menu?: ArrayAddMenuConfig
+  /**
+   * When set, the add control invokes {@link ArrayAddActionInterceptProvider} instead
+   * of appending a default row.
+   */
+  intercept?: string
 }
 
 /** Item-level header chrome visibility — mirrors {@link FieldLabelVisibility} naming. */
@@ -1584,6 +1608,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   joinedPair: undefined,
   levelRange: undefined,
   rollValue: undefined,
+  relationship: [],
 }
 
 function assignInlineSentenceJoinedPairDefaults(

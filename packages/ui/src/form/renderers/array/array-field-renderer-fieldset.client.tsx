@@ -69,7 +69,7 @@ export function ArrayFieldRendererFieldset({
       showAddIcon={state.showAddIcon}
       addActionMenu={state.addActionMenu}
       addActionMenuItems={state.addActionMenuItems}
-      onAppendItem={state.appendItem}
+      onAppendItem={state.onAppendItem}
       onAppendFromMenu={state.appendFromAddMenu}
     />
   )

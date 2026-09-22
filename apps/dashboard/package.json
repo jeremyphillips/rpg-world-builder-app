@@ -28,6 +28,7 @@
     "@rpg/api-client": "workspace:*",
     "@rpg/campaign-invite": "workspace:*",
     "@rpg/catalog": "workspace:*",
+    "@rpg/character-narrative-integrations": "workspace:*",
     "@rpg/contracts": "workspace:*",
     "@rpg/name-generator-core": "workspace:*",
     "@rpg/name-generator-data": "workspace:*",

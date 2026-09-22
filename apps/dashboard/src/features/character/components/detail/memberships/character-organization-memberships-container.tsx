@@ -1,7 +1,20 @@
+import { useMemo } from 'react'
+
+import { isContentPlayableFor } from '@rpg/contracts'
+
+import type { OrganizationMembershipSelection } from '../../connections/picker/organization-picker-drawer.types'
+
+import { useOrganizations } from '@/features/content'
+
+import { CharacterControlledRelationshipField } from '../../relationship/character-controlled-relationship-field'
 import { CharacterOrganizationMembershipDrawers } from './character-organization-membership-drawers'
 import { useCharacterOrganizationMembershipsSheet } from '../../../hooks/use-character-organization-memberships-sheet'
 import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
-import { CharacterOrganizationsSummary } from './character-organizations-summary'
+import {
+  buildCharacterApiRelationshipFieldContext,
+  CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
+  CHARACTER_RELATIONSHIP_FIELD_REGISTRY,
+} from '../../../lib/relationship/character-relationship-field-registry'
 
 export type CharacterOrganizationMembershipsContainerProps = {
   campaignId: string
@@ -26,26 +39,56 @@ export function CharacterOrganizationMembershipsContainer({
     canEdit,
     subjectKind,
   })
+  const organizationsQuery = useOrganizations(canEdit ? campaignId : undefined)
+
+  const relationshipContext = useMemo(() => {
+    const availableOrganizations = (organizationsQuery.data ?? []).filter((organization) =>
+      isContentPlayableFor(organization, { kind: 'pc', characterId }),
+    )
+    const organizationsById = new Map(
+      (organizationsQuery.data ?? []).map((organization) => [organization.id, organization]),
+    )
+
+    return buildCharacterApiRelationshipFieldContext({
+      campaignId,
+      availableOrganizations,
+      eligibleResidenceLocations: [],
+      locationsQueryStatus: { status: 'idle' },
+      organizationsById,
+      locationsById: new Map(),
+      availableOrganizationIdSet: new Set(availableOrganizations.map(({ id }) => id)),
+      availableResidenceIdSet: new Set(),
+      onEditMembership: canEdit ? sheet.setEditingMembership : undefined,
+      onRemoveUnresolvedMembership: canEdit ? sheet.setUnresolvedToRemove : undefined,
+    })
+  }, [
+    campaignId,
+    canEdit,
+    characterId,
+    organizationsQuery.data,
+    sheet.setEditingMembership,
+    sheet.setUnresolvedToRemove,
+  ])
 
   if (sheet.isBootstrapping) return null
 
   return (
     <>
-      <CharacterOrganizationsSummary
-        campaignId={campaignId}
-        memberships={sheet.memberships}
-        canEdit={canEdit}
-        onEditMembership={canEdit ? sheet.setEditingMembership : undefined}
-        onRemoveUnresolvedMembership={canEdit ? sheet.setUnresolvedToRemove : undefined}
-        onAddOrganization={canEdit ? () => sheet.setPickerOpen(true) : undefined}
+      <CharacterControlledRelationshipField
+        vocabulary={CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY}
+        registry={CHARACTER_RELATIONSHIP_FIELD_REGISTRY}
+        context={relationshipContext}
+        label="Organizations"
+        emptyItemLabel="organization"
+        addActionLabel="Add organization"
+        items={sheet.memberships}
+        disabled={!canEdit}
+        onAdd={(selection) => sheet.handleAdd(selection as OrganizationMembershipSelection)}
+        onRemove={() => undefined}
       />
       {canEdit ? (
         <CharacterOrganizationMembershipDrawers
           characterName={characterName}
-          pickerOpen={sheet.pickerOpen}
-          onPickerOpenChange={sheet.setPickerOpen}
-          pickerItems={sheet.pickerItems}
-          onAdd={sheet.handleAdd}
           editingMembership={sheet.editingMembership}
           editingOrganization={sheet.editingOrganization}
           onEditingOpenChange={(open) => {

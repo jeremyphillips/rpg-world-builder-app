@@ -1,3 +1,4 @@
+import type { OrganizationReferenceResolution } from '@rpg/contracts'
 import { ConfirmDialog } from '@rpg/ui'
 
 import { EditOrganizationMembershipDrawer } from '../../connections/edit-organization-membership-drawer'
@@ -5,17 +6,9 @@ import {
   CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
   type EditOrganizationMembershipOrganization,
 } from '../../connections/edit-organization-membership-drawer.types'
-import { OrganizationPickerDrawer } from '../../connections/picker/organization-picker-drawer'
-import type { OrganizationMembershipSelection } from '../../connections/picker/organization-picker-drawer.types'
-import type { OrganizationPickerItem } from '../../connections/picker/organization-picker-drawer.types'
-import type { OrganizationReferenceResolution } from '@rpg/contracts'
 
 type CharacterOrganizationMembershipDrawersProps = {
   characterName: string
-  pickerOpen: boolean
-  onPickerOpenChange: (open: boolean) => void
-  pickerItems: readonly OrganizationPickerItem[]
-  onAdd: (membership: OrganizationMembershipSelection) => Promise<void>
   editingMembership: OrganizationReferenceResolution | null
   editingOrganization: EditOrganizationMembershipOrganization | null
   onEditingOpenChange: (open: boolean) => void
@@ -27,13 +20,9 @@ type CharacterOrganizationMembershipDrawersProps = {
   onRemoveUnresolved: () => Promise<void>
 }
 
-/** Drawer/confirm chrome for sheet membership editing — keeps the container presentation-thin. */
+/** Edit/confirm chrome for sheet membership editing — add picker lives on the relationship field. */
 export function CharacterOrganizationMembershipDrawers({
   characterName,
-  pickerOpen,
-  onPickerOpenChange,
-  pickerItems,
-  onAdd,
   editingMembership,
   editingOrganization,
   onEditingOpenChange,
@@ -46,13 +35,6 @@ export function CharacterOrganizationMembershipDrawers({
 }: CharacterOrganizationMembershipDrawersProps) {
   return (
     <>
-      <OrganizationPickerDrawer
-        open={pickerOpen}
-        onOpenChange={onPickerOpenChange}
-        items={pickerItems}
-        onAdd={onAdd}
-      />
-
       {editingOrganization && editingMembership ? (
         <EditOrganizationMembershipDrawer
           key={`${editingMembership.organizationId}:${editingMembership.title ?? ''}`}

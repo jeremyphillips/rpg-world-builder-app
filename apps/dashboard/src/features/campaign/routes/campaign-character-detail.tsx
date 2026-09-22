@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 
 import { CampaignCharacterStatusSummary } from '@/features/character'
 import { CharacterDetailContent } from '@/features/character'
-import { CharacterOrganizationMembershipsContainer } from '@/features/character'
+import { CharacterIdentityConnectionsSupplement } from '@/features/character'
 import { CharacterSheetDetailShell } from '@/features/character'
 
 import { useCampaignCharacterDetail } from '../hooks/use-campaign-character-detail'
@@ -35,7 +35,7 @@ export function CampaignCharacterDetail() {
             />
           }
           identitySupplement={
-            <CharacterOrganizationMembershipsContainer
+            <CharacterIdentityConnectionsSupplement
               campaignId={campaignId!}
               characterId={characterId!}
               characterName={detail.viewModel.identity.name}

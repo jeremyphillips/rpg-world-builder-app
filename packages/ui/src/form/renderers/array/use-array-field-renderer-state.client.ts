@@ -18,9 +18,9 @@ import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-s
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
 import { useFormUiContext } from '../../context/form-ui.context'
 import { useFocusFirstArrayIssue } from './use-focus-first-array-issue.client'
-import { useArrayFieldAppend } from './use-array-field-append.client'
 import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-chrome.lib'
 import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
+import { useArrayFieldAppendControls } from './use-array-field-append-controls.client'
 
 type UseArrayFieldRendererStateOptions = {
   config: ArrayConfig
@@ -137,18 +137,24 @@ export function useArrayFieldRendererState({
     addValidationSessionExpandKeys,
   })
 
-  const { appendItem, appendFromAddMenu, appendItemWithDefaults, addActionMenuItems } =
-    useArrayFieldAppend({
-      config,
-      fullName,
-      fields,
-      append,
-      getValues,
-      watchedItems,
-      collapsible,
-      itemCollapseKey,
-      addValidationSessionExpandKeys,
-    })
+  const {
+    appendItem,
+    appendFromAddMenu,
+    appendItemWithDefaults,
+    addActionMenuItems,
+    onAppendItem,
+  } = useArrayFieldAppendControls({
+    addAction,
+    config,
+    fullName,
+    fields,
+    append,
+    getValues,
+    watchedItems,
+    collapsible,
+    itemCollapseKey,
+    addValidationSessionExpandKeys,
+  })
 
   const itemProps = React.useCallback(
     (rhfField: (typeof fields)[number], index: number) => ({
@@ -204,6 +210,7 @@ export function useArrayFieldRendererState({
     addActionMenuItems,
     appendFromAddMenu,
     appendItem,
+    onAppendItem,
     appendItemWithDefaults,
     arrayIssueCount,
     showAddControl: addAction !== null,

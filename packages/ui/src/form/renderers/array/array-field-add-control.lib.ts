@@ -1,4 +1,5 @@
 import type { ButtonVariantProps } from '../../../components/ui/button.variants'
+import { resolveCollectionAddDisabledProps } from '../../../components/ui/collection-add-control.lib'
 import type { ArrayAddActionLayout } from '../../field-config'
 
 export function resolveArrayAddButtonDensity(
@@ -8,22 +9,4 @@ export function resolveArrayAddButtonDensity(
   return layout === 'inline' && variant === 'text' ? 'compact' : undefined
 }
 
-export function resolveArrayAddDisabledProps(
-  addEnabled: boolean,
-  addDisabledReason?: string,
-  disabledReasonId?: string,
-): {
-  disabled?: true
-  title?: string
-  'aria-disabled'?: true
-  'aria-describedby'?: string
-} {
-  if (addEnabled) return {}
-
-  return {
-    disabled: true,
-    title: addDisabledReason,
-    'aria-disabled': true,
-    'aria-describedby': addDisabledReason ? disabledReasonId : undefined,
-  }
-}
+export const resolveArrayAddDisabledProps = resolveCollectionAddDisabledProps

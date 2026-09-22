@@ -83,6 +83,7 @@ function narrativeArrayField(
 
 export type BuildIdentityStepFormFieldsInput = {
   renderNameField: () => ReactNode
+  renderGenerateNarrative: () => ReactNode
   renderDraftSync: () => ReactNode
   renderContinueRegistration: () => ReactNode
 }
@@ -90,6 +91,7 @@ export type BuildIdentityStepFormFieldsInput = {
 /** Composes the identity step field list, including optional name generation chrome. */
 export function buildIdentityStepFormFields({
   renderNameField,
+  renderGenerateNarrative,
   renderDraftSync,
   renderContinueRegistration,
 }: BuildIdentityStepFormFieldsInput): FormItem[] {
@@ -132,6 +134,12 @@ export function buildIdentityStepFormFields({
       legend: 'Narrative',
       fieldChrome: { variant: 'none' },
       fields: [
+        {
+          kind: 'slot' as const,
+          name: '_identityGenerateNarrative',
+          chrome: { variant: 'none' as const },
+          render: renderGenerateNarrative,
+        },
         narrativeArrayField(
           'personalityTraits',
           'Personality traits',
@@ -175,6 +183,7 @@ export function buildIdentityStepFormFields({
 
 export const identityFormFields: FormItem[] = buildIdentityStepFormFields({
   renderNameField: () => null,
+  renderGenerateNarrative: () => null,
   renderDraftSync: () => null,
   renderContinueRegistration: () => null,
 })

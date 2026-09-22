@@ -42,6 +42,11 @@ export {
   DisclosureEntityCard,
   type DisclosureEntityCardProps,
 } from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card'
+export {
+  EntityDisclosureArrayItemShell,
+  type EntityDisclosureArrayItemShellProps,
+} from './lib/entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell'
+export { projectArrayItemEntitySummary } from './lib/entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
 export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
 export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
 export { EntitySummary } from './lib/entity/summary/entity-summary'
@@ -50,6 +55,8 @@ export type {
   EntityAnatomyTrailingSecondary,
 } from './lib/entity/anatomy/entity-anatomy-trailing.types'
 export { EntityAnatomyHost } from './lib/entity/anatomy/entity-anatomy'
+export { CrossContentRelationshipRow } from './lib/relationship/list/row/cross-content-relationship-row'
+export type { CrossContentRelationshipRowProps } from './lib/relationship/list/row/cross-content-relationship-row'
 export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row'
 export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row'
 export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
