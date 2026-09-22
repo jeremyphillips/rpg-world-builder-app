@@ -1369,6 +1369,11 @@ export interface ArrayAddActionConfig {
   layout?: ArrayAddActionLayout
   size?: NonNullable<ButtonVariantProps['size']>
   menu?: ArrayAddMenuConfig
+  /**
+   * When set, the add control invokes {@link ArrayAddActionInterceptProvider} instead
+   * of appending a default row.
+   */
+  intercept?: string
 }
 
 /** Item-level header chrome visibility — mirrors {@link FieldLabelVisibility} naming. */

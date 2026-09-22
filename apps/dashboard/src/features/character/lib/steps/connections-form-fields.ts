@@ -3,10 +3,11 @@ import type { ReactNode } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 import type { z } from 'zod'
 
+import type { CharacterRelationshipFieldContext } from '../relationship/character-relationship-field-context.types'
 import {
-  CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
-  CHARACTER_RESIDENCE_VOCABULARY,
-} from '../relationship/character-relationship-vocabulary'
+  buildCharacterOrganizationMembershipArrayField,
+  buildCharacterResidenceArrayField,
+} from '../relationship/character-relationship-array-form-fields'
 
 export const connectionsFormSchema = characterConnectionsSchema.pick({
   organizations: true,
@@ -16,10 +17,12 @@ export const connectionsFormSchema = characterConnectionsSchema.pick({
 export type ConnectionsFormValues = z.infer<typeof connectionsFormSchema>
 
 export type BuildConnectionsStepFormFieldsInput = {
+  relationshipContext: CharacterRelationshipFieldContext
   renderDraftSync: () => ReactNode
 }
 
 export function buildConnectionsStepFormFields({
+  relationshipContext,
   renderDraftSync,
 }: BuildConnectionsStepFormFieldsInput): FormItem[] {
   return [
@@ -27,22 +30,8 @@ export function buildConnectionsStepFormFields({
       kind: 'group',
       fieldChrome: { variant: 'none' },
       fields: [
-        {
-          type: 'relationship',
-          name: 'organizations',
-          label: 'Organizations',
-          vocabulary: CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
-          emptyLabel: 'No organizations connected yet.',
-          addActionLabel: 'Add organization',
-        },
-        {
-          type: 'relationship',
-          name: 'locations',
-          label: 'Residence',
-          vocabulary: CHARACTER_RESIDENCE_VOCABULARY,
-          emptyLabel: 'No residence connected yet.',
-          addActionLabel: 'Add residence',
-        },
+        buildCharacterOrganizationMembershipArrayField(relationshipContext),
+        buildCharacterResidenceArrayField(relationshipContext),
       ],
     },
     {

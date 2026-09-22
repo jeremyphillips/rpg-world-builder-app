@@ -122,6 +122,10 @@ export {
   iconContainerGlyphClasses,
 } from './components/ui/icon-container.variants'
 export { EmptyPanel, type EmptyPanelProps } from './components/ui/empty-panel.client'
+export {
+  CollectionAddControl,
+  type CollectionAddControlProps,
+} from './components/ui/collection-add-control.client'
 export { emptyPanelVariants } from './components/ui/empty-panel.variants'
 export {
   emptyStateWellBodyClasses,

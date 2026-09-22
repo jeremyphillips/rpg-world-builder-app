@@ -1,8 +1,8 @@
-import { useMemo } from 'react'
+import { createElement, useMemo } from 'react'
 
 import type { CharacterBuildContext, CharacterBuilderDraft } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Form } from '@rpg/ui/form'
+import { Form, useRelationshipFieldContext, type FormItem } from '@rpg/ui/form'
 
 import {
   buildConnectionsStepFormFields,
@@ -10,6 +10,11 @@ import {
 } from '../../../../lib/steps/connections-form-fields'
 import { connectionsDraftToFormValues } from '../../../../lib/steps/connections-form-values'
 import { CharacterRelationshipFormProvider } from '../../../../lib/relationship/character-relationship-field-registry'
+import {
+  CharacterRelationshipArrayAddInterceptProvider,
+  CharacterRelationshipPickerBridges,
+} from '../../../relationship/character-relationship-array-add-intercept'
+import type { CharacterRelationshipFieldContext } from '../../../../lib/relationship/character-relationship-field-context.types'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 import { ConnectionsDraftSync } from './connections-draft-sync'
 
@@ -20,15 +25,19 @@ export type ConnectionsStepProps = {
   onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
 }
 
-export function ConnectionsStep({
-  context,
-  draft,
-  validationIssues,
-  onDraftChange,
-}: ConnectionsStepProps) {
+type ConnectionsStepFormProps = {
+  draft: CharacterBuilderDraft
+  onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
+}
+
+function ConnectionsStepForm({ draft, onDraftChange }: ConnectionsStepFormProps) {
+  const { context } = useRelationshipFieldContext()
+  const relationshipContext = context as CharacterRelationshipFieldContext
+
   const fields = useMemo(
-    () =>
-      buildConnectionsStepFormFields({
+    (): FormItem[] => [
+      ...buildConnectionsStepFormFields({
+        relationshipContext,
         renderDraftSync: () => (
           <ConnectionsDraftSync
             draftConnections={draft.connections}
@@ -36,19 +45,39 @@ export function ConnectionsStep({
           />
         ),
       }),
-    [draft.connections, onDraftChange],
+      {
+        kind: 'slot',
+        name: '_characterRelationshipPickers',
+        chrome: { variant: 'none' },
+        render: () => createElement(CharacterRelationshipPickerBridges),
+      },
+    ],
+    [draft.connections, onDraftChange, relationshipContext],
   )
 
   return (
+    <CharacterRelationshipArrayAddInterceptProvider>
+      <Form
+        schema={connectionsFormSchema}
+        fields={fields}
+        defaultValues={connectionsDraftToFormValues(draft.connections)}
+        mode="onChange"
+        onSubmit={() => undefined}
+      />
+    </CharacterRelationshipArrayAddInterceptProvider>
+  )
+}
+
+export function ConnectionsStep({
+  context,
+  draft,
+  validationIssues,
+  onDraftChange,
+}: ConnectionsStepProps) {
+  return (
     <BuilderStepFrame stepId="connections" validationIssues={validationIssues}>
       <CharacterRelationshipFormProvider buildContext={context}>
-        <Form
-          schema={connectionsFormSchema}
-          fields={fields}
-          defaultValues={connectionsDraftToFormValues(draft.connections)}
-          mode="onChange"
-          onSubmit={() => undefined}
-        />
+        <ConnectionsStepForm draft={draft} onDraftChange={onDraftChange} />
       </CharacterRelationshipFormProvider>
     </BuilderStepFrame>
   )

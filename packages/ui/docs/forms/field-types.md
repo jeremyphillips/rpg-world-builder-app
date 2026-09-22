@@ -360,7 +360,10 @@ Nested `{ valueKey, unitKey }` for multi-unit enums. Single unit: `fixedUnit` + 
 
 ## Relationship (`relationship`)
 
-Typed content-entity edge list with vocabulary-driven picker wiring.
+Typed content-entity edge list with vocabulary-driven picker wiring. For form
+authoring that should match grant-style array cards, prefer `kind: 'array'` with
+`item.renderShell` (`EntityDisclosureArrayItemShell`) and `addAction.intercept` for
+picker-driven inline adds — see character connections in the dashboard.
 
 ```ts
 {
@@ -377,6 +380,7 @@ Typed content-entity edge list with vocabulary-driven picker wiring.
 - Wrap the form in `RelationshipFieldProvider` with a `registry` mapping `vocabulary` ids to
   `RelationshipFieldAdapter` implementations (row projection + picker drawer).
 - `cardinality: 'one'` replaces the array on add instead of appending.
+- Empty state and add chrome align with array fields (`EmptyPanel` + shared `CollectionAddControl`).
 
 ## Combobox (`combobox`)
 

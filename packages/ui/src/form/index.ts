@@ -417,6 +417,13 @@ export {
   registerArrayFieldMutators,
   type ArrayFieldMutators,
 } from './context/array-field-mutators.registry'
+export {
+  ArrayAddActionInterceptProvider,
+  useArrayAddActionIntercept,
+  type ArrayAddActionInterceptHandler,
+  type ArrayAddActionInterceptProviderProps,
+  type ArrayAddActionInterceptRegistry,
+} from './context/array-add-action-intercept.context'
 export { useArrayItemCollapseState } from './hooks/use-array-item-collapse-state.client'
 export {
   ArrayItemActionsRail,

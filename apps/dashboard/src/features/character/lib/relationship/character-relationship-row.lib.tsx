@@ -1,39 +1,21 @@
-import { Link } from 'react-router-dom'
 import { SquarePen } from 'lucide-react'
 
-import {
-  getOrganizationDomainLabel,
-  resolveLocationClassificationDisplay,
-  type Organization,
-  type OrganizationReferenceResolution,
-} from '@rpg/contracts'
+import type { Organization, OrganizationReferenceResolution } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
-import type { EntitySummaryStatusItem } from '@/features/content'
+import type { EntityAnatomyTrailing } from '@/features/content'
 
-import { ROUTES } from '@/app/routes'
-import { CrossContentRelationshipRow } from '@/features/content'
-import {
-  UNAVAILABLE_LOCATION_LABEL,
-  UNAVAILABLE_ORGANIZATION_LABEL,
-} from '../display/character-display'
 import { BuilderInventoryRemoveAction } from '../../components/builder/inventory/builder-inventory-remove-action'
 import type {
   CharacterOrganizationMembershipEdge,
   CharacterRelationshipFieldContext,
   CharacterResidenceEdge,
 } from './character-relationship-field-context.types'
-
-type TextStatusItem = Extract<EntitySummaryStatusItem, { kind: 'text' }>
-type BadgeStatusItem = Extract<EntitySummaryStatusItem, { kind: 'badge' }>
-
-function organizationMembershipTitle(
-  membership: CharacterOrganizationMembershipEdge,
-  organization: Organization | null | undefined,
-): string | null {
-  if (membership.title) return membership.title
-  const domain = organization?.organizationDomain
-  return domain ? getOrganizationDomainLabel(domain) : null
-}
+import {
+  canEditOrganizationMembershipTitle,
+  resolveOrganizationMembershipPresentation,
+  resolveResidencePresentation,
+  shouldOfferUnresolvedMembershipRemoval,
+} from './character-relationship-presentation.lib'
 
 function resolveOrganizationMembershipOrganization(
   membership: CharacterOrganizationMembershipEdge,
@@ -45,58 +27,32 @@ function resolveOrganizationMembershipOrganization(
   return resolved as Organization | null
 }
 
-function resolveOrganizationMembershipLabel(
-  organizationId: string,
-  organization: Organization | null,
-  context: CharacterRelationshipFieldContext,
-): string {
-  if (organization?.name) return organization.name
-  return context.mode === 'draft' ? organizationId : UNAVAILABLE_ORGANIZATION_LABEL
-}
-
-function buildOrganizationMembershipStatus(
-  secondary: string | null,
-  unavailable: boolean,
-  organization: Organization | null,
-): Array<TextStatusItem | BadgeStatusItem> {
-  const status: Array<TextStatusItem | BadgeStatusItem> = []
-  if (secondary) {
-    status.push({ kind: 'text', label: secondary, variant: 'muted' })
-  }
-  if (unavailable) {
-    status.push({
-      kind: 'badge',
-      label: organization ? 'Unavailable' : 'Missing organization',
-      tone: 'warning',
-    })
-  }
-  return status
-}
-
-function resolveOrganizationMembershipTrailing(
+export function resolveOrganizationMembershipApiTrailing(
   membership: CharacterOrganizationMembershipEdge,
   context: CharacterRelationshipFieldContext,
-  label: string,
-  unavailable: boolean,
-  organization: Organization | null,
-  onRemove?: () => void,
-) {
-  if (context.mode === 'draft' && onRemove) {
+  index: number,
+  onRemove: (edge: CharacterOrganizationMembershipEdge, index: number) => void,
+): EntityAnatomyTrailing | undefined {
+  const organization = resolveOrganizationMembershipOrganization(membership, context)
+  const presentation = resolveOrganizationMembershipPresentation(membership, context)
+  const label = typeof presentation.heading === 'string' ? presentation.heading : 'organization'
+  const unavailable = !context.availableOrganizationIdSet.has(membership.organizationId)
+
+  if (context.mode === 'draft') {
     return {
-      kind: 'action' as const,
-      content: <BuilderInventoryRemoveAction itemLabel={label} onRemove={onRemove} />,
+      kind: 'action',
+      content: (
+        <BuilderInventoryRemoveAction
+          itemLabel={label}
+          onRemove={() => onRemove(membership, index)}
+        />
+      ),
     }
   }
 
-  const canEditTitle =
-    context.mode === 'api' &&
-    organization !== null &&
-    typeof organization.organizationDomain === 'string' &&
-    context.onEditMembership
-
-  if (canEditTitle) {
+  if (canEditOrganizationMembershipTitle(membership, context, organization)) {
     return {
-      kind: 'action' as const,
+      kind: 'action',
       content: (
         <Button
           type="button"
@@ -111,9 +67,9 @@ function resolveOrganizationMembershipTrailing(
     }
   }
 
-  if (context.mode === 'api' && unavailable && context.onRemoveUnresolvedMembership) {
+  if (shouldOfferUnresolvedMembershipRemoval(membership, context, unavailable)) {
     return {
-      kind: 'action' as const,
+      kind: 'action',
       content: (
         <BuilderInventoryRemoveAction
           itemLabel={label}
@@ -128,138 +84,22 @@ function resolveOrganizationMembershipTrailing(
   return undefined
 }
 
-function resolveLinkedHeading(
-  label: string,
+export function resolveResidenceApiTrailing(
+  edge: CharacterResidenceEdge,
   context: CharacterRelationshipFieldContext,
-  detailRoute: string | null,
-) {
-  if (context.mode === 'api' && detailRoute) {
-    return (
-      <Link to={detailRoute} className="underline-offset-4 hover:underline">
-        {label}
-      </Link>
-    )
-  }
-  return label
-}
+  index: number,
+  onRemove: (edge: CharacterResidenceEdge, index: number) => void,
+  disabled?: boolean,
+): EntityAnatomyTrailing | undefined {
+  const presentation = resolveResidencePresentation(edge, context)
+  const label = typeof presentation.heading === 'string' ? presentation.heading : 'residence'
 
-export function projectOrganizationMembershipRow(
-  membership: CharacterOrganizationMembershipEdge,
-  context: CharacterRelationshipFieldContext,
-  onRemove?: () => void,
-) {
-  const organizationId = membership.organizationId
-  const organization = resolveOrganizationMembershipOrganization(membership, context)
-  const unavailable = !context.availableOrganizationIdSet.has(organizationId)
-  const label = resolveOrganizationMembershipLabel(organizationId, organization, context)
-  const status = buildOrganizationMembershipStatus(
-    organizationMembershipTitle(membership, organization),
-    unavailable,
-    organization,
-  )
-  const trailing = resolveOrganizationMembershipTrailing(
-    membership,
-    context,
-    label,
-    unavailable,
-    organization,
-    onRemove,
-  )
-  const heading = resolveLinkedHeading(
-    label,
-    context,
-    context.campaignId && organization
-      ? ROUTES.content.organizations.detail(context.campaignId, organizationId)
-      : null,
-  )
+  if (disabled) return undefined
 
   return {
-    key: organizationId,
+    kind: 'action',
     content: (
-      <CrossContentRelationshipRow
-        heading={heading}
-        status={status.length > 0 ? status : undefined}
-        trailing={trailing ?? null}
-      />
+      <BuilderInventoryRemoveAction itemLabel={label} onRemove={() => onRemove(edge, index)} />
     ),
-  }
-}
-
-function buildResidenceStatus(
-  classification: string | null,
-  unavailable: boolean,
-  location: { name: string } | null,
-): Array<TextStatusItem | BadgeStatusItem> {
-  const status: Array<TextStatusItem | BadgeStatusItem> = []
-  if (classification) {
-    status.push({ kind: 'text', label: classification, variant: 'muted' })
-  }
-  if (unavailable) {
-    status.push({
-      kind: 'badge',
-      label: location ? 'Unavailable' : 'Missing location',
-      tone: 'warning',
-    })
-  }
-  return status
-}
-
-function resolveResidenceLocation(
-  edge: CharacterResidenceEdge,
-  locationId: string,
-  context: CharacterRelationshipFieldContext,
-) {
-  return (
-    context.locationsById.get(locationId) ?? ('location' in edge ? edge.location : null) ?? null
-  )
-}
-
-function buildResidenceRowContent(
-  connection: { id: string; locationId: string },
-  location: ReturnType<typeof resolveResidenceLocation>,
-  context: CharacterRelationshipFieldContext,
-  onRemove?: () => void,
-) {
-  const unavailable = !context.availableResidenceIdSet.has(connection.locationId)
-  const label = location?.name ?? UNAVAILABLE_LOCATION_LABEL
-  const status = buildResidenceStatus(
-    location ? resolveLocationClassificationDisplay(location).text : null,
-    unavailable,
-    location,
-  )
-  const heading = resolveLinkedHeading(
-    label,
-    context,
-    context.campaignId && location
-      ? ROUTES.content.locations.detail(context.campaignId, connection.locationId)
-      : null,
-  )
-  const trailing = onRemove
-    ? {
-        kind: 'action' as const,
-        content: <BuilderInventoryRemoveAction itemLabel={label} onRemove={onRemove} />,
-      }
-    : undefined
-
-  return (
-    <CrossContentRelationshipRow
-      heading={heading}
-      status={status.length > 0 ? status : undefined}
-      trailing={trailing ?? null}
-    />
-  )
-}
-
-export function projectResidenceRow(
-  edge: CharacterResidenceEdge,
-  context: CharacterRelationshipFieldContext,
-  onRemove?: () => void,
-) {
-  const connection = 'connection' in edge ? edge.connection : edge
-  const location = resolveResidenceLocation(edge, connection.locationId, context)
-
-  return {
-    key: connection.id,
-    content: buildResidenceRowContent(connection, location, context, onRemove),
   }
 }

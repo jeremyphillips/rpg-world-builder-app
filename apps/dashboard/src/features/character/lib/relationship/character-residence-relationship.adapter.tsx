@@ -1,3 +1,4 @@
+import { Text } from '@rpg/ui'
 import type { RelationshipFieldAdapter } from '@rpg/ui/form'
 
 import { ResidenceLocationPickerDrawer } from '../../components/connections/picker/residence-location-picker-drawer'
@@ -7,8 +8,6 @@ import type {
   CharacterRelationshipFieldContext,
   CharacterResidenceEdge,
 } from './character-relationship-field-context.types'
-import { projectResidenceRow } from './character-relationship-row.lib'
-import { Text } from '@rpg/ui'
 
 export const characterResidenceRelationshipAdapter: RelationshipFieldAdapter<
   CharacterResidenceEdge,
@@ -23,7 +22,10 @@ export const characterResidenceRelationshipAdapter: RelationshipFieldAdapter<
         Choose a campaign to link a residence location.
       </Text>
     ) : null,
-  projectRow: (edge, context, actions) => projectResidenceRow(edge, context, actions.onRemove),
+  projectRow: (edge) => ({
+    key: 'connection' in edge ? edge.connection.id : edge.id,
+    content: null,
+  }),
   renderPicker: ({ open, onOpenChange, context, onAdd, items }) => {
     const selectedIds = new Set(
       items.map((item) => ('connection' in item ? item.connection.locationId : item.locationId)),

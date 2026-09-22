@@ -65,7 +65,7 @@ export function CharacterResidenceContainer({
       registry={CHARACTER_RELATIONSHIP_FIELD_REGISTRY}
       context={relationshipContext}
       label="Residence"
-      emptyLabel="None"
+      emptyItemLabel="residence"
       addActionLabel="Add residence"
       items={residences}
       disabled={!canEdit}

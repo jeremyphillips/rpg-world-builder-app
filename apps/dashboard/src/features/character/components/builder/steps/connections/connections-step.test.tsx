@@ -29,18 +29,15 @@ const campaignContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
-vi.mock('@/features/content', async (importOriginal) => {
-  const actual = await importOriginal<Record<string, unknown>>()
-  return {
-    ...actual,
-    useLocations: () => ({
-      data: [harborfordSettlement],
-      isPending: false,
-      isError: false,
-      error: null,
-    }),
-  }
-})
+vi.mock('@/features/content/locations', () => ({
+  useLocations: () => ({
+    data: [harborfordSettlement],
+    isPending: false,
+    isError: false,
+    error: null,
+  }),
+  locationsQueryKey: (campaignId: string) => ['locations', campaignId],
+}))
 
 describe('ConnectionsStep', () => {
   it('adds titled memberships and removes them from the summary', async () => {
@@ -65,13 +62,13 @@ describe('ConnectionsStep', () => {
 
     expect(screen.getByText('Organizations')).toBeInTheDocument()
     expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
-    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Remove Lantern Guild' }))
+    expect(screen.getAllByText('Guildmaster').length).toBeGreaterThan(0)
+    await user.click(screen.getByRole('button', { name: /Remove .*Lantern Guild/ }))
     expect(onDraftChange).toHaveBeenCalledWith({
       connections: { organizations: [], locations: [] },
     })
 
-    await user.click(screen.getAllByRole('button', { name: 'Add organization' })[0]!)
+    await user.click(screen.getByRole('button', { name: 'Add organization' }))
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
     expect(onDraftChange).not.toHaveBeenCalledWith(
       expect.objectContaining({
@@ -137,7 +134,9 @@ describe('ConnectionsStep', () => {
 
     expect(screen.getByText('organization-missing')).toBeInTheDocument()
     expect(screen.getByText('Missing organization')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove organization-missing' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /Remove .*organization-missing/ }),
+    ).toBeInTheDocument()
     await expectNoAxeViolations(container)
   })
 
@@ -151,7 +150,7 @@ describe('ConnectionsStep', () => {
       />,
     )
 
-    expect(screen.getByText('No organizations connected yet.')).toBeInTheDocument()
+    expect(screen.getByText('No organization added.')).toBeInTheDocument()
     expect(screen.getByText('Choose a campaign to link a residence location.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add organization' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add residence' })).toBeDisabled()

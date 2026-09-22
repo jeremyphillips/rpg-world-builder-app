@@ -78,7 +78,7 @@ export function CharacterOrganizationMembershipsContainer({
         registry={CHARACTER_RELATIONSHIP_FIELD_REGISTRY}
         context={relationshipContext}
         label="Organizations"
-        emptyLabel="None"
+        emptyItemLabel="organization"
         addActionLabel="Add organization"
         items={sheet.memberships}
         disabled={!canEdit}

@@ -6,7 +6,6 @@ import type {
   CharacterOrganizationMembershipEdge,
   CharacterRelationshipFieldContext,
 } from './character-relationship-field-context.types'
-import { projectOrganizationMembershipRow } from './character-relationship-row.lib'
 
 export const characterOrganizationMembershipRelationshipAdapter: RelationshipFieldAdapter<
   CharacterOrganizationMembershipEdge,
@@ -15,8 +14,7 @@ export const characterOrganizationMembershipRelationshipAdapter: RelationshipFie
 > = {
   getItemKey: (edge) => edge.organizationId,
   listAriaLabel: 'Selected organizations',
-  projectRow: (edge, context, actions) =>
-    projectOrganizationMembershipRow(edge, context, actions.onRemove),
+  projectRow: (edge) => ({ key: edge.organizationId, content: null }),
   renderPicker: ({ open, onOpenChange, context, onAdd, items }) => {
     const selectedIds = new Set(items.map((item) => item.organizationId))
     const pickerItems = context.availableOrganizations.map((organization) => ({

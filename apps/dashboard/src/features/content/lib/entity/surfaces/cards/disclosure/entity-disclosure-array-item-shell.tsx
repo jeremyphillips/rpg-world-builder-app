@@ -2,12 +2,17 @@ import type { ArrayItemShellRenderProps } from '@rpg/ui/form'
 
 import type { ReactElement } from 'react'
 
+import type { EntitySummaryStatusItem } from '../../../summary/entity-summary-status.types'
 import { DisclosureEntityCard } from './disclosure-entity-card'
 import { projectArrayItemEntitySummary } from './array-item-entity-summary.lib'
 
 export type EntityDisclosureArrayItemShellProps = ArrayItemShellRenderProps & {
   /** Optional metadata label mapped to EntitySummary.classification (muted · suffix). */
   classification?: string
+  /** Entity summary status lane — availability badges and similar metadata. */
+  status?: readonly EntitySummaryStatusItem[]
+  /** Links the entity heading only — not whole-row/card navigation. */
+  headingHref?: string
   /** Overrides default header.ariaLabel for disclosure controls. */
   toolbarAriaLabel?: string
   density?: 'compact' | 'comfortable'
@@ -24,6 +29,8 @@ export function EntityDisclosureArrayItemShell({
   header,
   summary,
   classification,
+  status,
+  headingHref,
   toolbarAriaLabel,
   collapsed,
   onToggleCollapse,
@@ -36,6 +43,7 @@ export function EntityDisclosureArrayItemShell({
     header,
     summary,
     classification,
+    status,
   })
 
   return (
@@ -44,6 +52,7 @@ export function EntityDisclosureArrayItemShell({
         itemId={itemId}
         toolbarAriaLabel={toolbarAriaLabel ?? header.ariaLabel}
         entity={entity}
+        headingHref={headingHref}
         trailing={action ? { kind: 'action', content: action as ReactElement } : undefined}
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
