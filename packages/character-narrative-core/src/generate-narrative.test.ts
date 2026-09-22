@@ -15,6 +15,9 @@ const context: NarrativeGenerationContext = {
   tokens: {},
   organizations: [],
   residences: [],
+  people: [],
+  places: [],
+  boundConditions: [],
   omittedReferenceIds: [],
 }
 
@@ -37,6 +40,7 @@ const foundationCollection: NarrativeCollection = {
         text: `I have a ${slot} ${index}.`,
         themeIds: ['duty' as const],
         requires: [],
+        conditions: [],
         affinities: [],
         conflictTags: [],
         weight: 1,
@@ -50,6 +54,7 @@ const foundationCollection: NarrativeCollection = {
       alignmentIds: ['ce'],
       themeIds: ['duty'],
       requires: [],
+      conditions: [],
       affinities: [],
       conflictTags: [],
       weight: 1,

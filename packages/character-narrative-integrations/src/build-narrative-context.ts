@@ -1,4 +1,4 @@
-import { resolveLocationConnectionEligibility, type Location } from '@rpg/contracts/rpg/content'
+import type { Location } from '@rpg/contracts/rpg/content'
 import {
   indexCharacterBuildCatalog,
   resolvePlayableBuilderContent,
@@ -7,27 +7,16 @@ import {
 } from '@rpg/contracts/rpg/runtime'
 import {
   narrativeGenerationContextSchema,
+  narrativeRelationshipFactsSchema,
   type NarrativeGenerationContext,
+  type NarrativeOrganizationFact,
 } from '@rpg/contracts/character-narrative'
 
-function resolveResidences(draft: CharacterBuilderDraft, locations: readonly Location[]) {
-  const byId = new Map(locations.map((location) => [location.id, location]))
-  return draft.relationshipEdges
-    .filter((edge) => edge.kind === 'resides_at')
-    .flatMap(({ locationId }) => {
-      const location = byId.get(locationId)
-      if (!location || !('name' in location)) return []
-      const classification =
-        location.kind === 'structure'
-          ? { kind: location.kind, structureType: location.structureType }
-          : { kind: location.kind }
-      if (
-        !resolveLocationConnectionEligibility(classification).characterKinds.includes('resides_at')
-      )
-        return []
-      return [{ id: location.id, name: location.name, affinities: [`location:${location.kind}`] }]
-    })
-}
+import {
+  buildNarrativeRelationshipFacts,
+  resolveOmittedRelationshipReferenceIds,
+  type NarrativeCharacterReference,
+} from './resolve-narrative-relationship-facts'
 
 function resolveSpeciesContext(
   draft: CharacterBuilderDraft,
@@ -69,24 +58,10 @@ function resolveClassContext(
   return { tokens, affinities }
 }
 
-function resolveOmittedReferenceIds(
+function resolveOrganizations(
   draft: CharacterBuilderDraft,
-  organizations: NarrativeGenerationContext['organizations'],
-  residences: NarrativeGenerationContext['residences'],
-) {
-  const resolvedIds = new Set([...organizations, ...residences].map(({ id }) => id))
-  const selectedIds = [
-    ...draft.relationshipEdges
-      .filter((edge) => edge.kind === 'organizationMembership')
-      .map(({ organizationId }) => organizationId),
-    ...draft.relationshipEdges
-      .filter((edge) => edge.kind === 'resides_at')
-      .map(({ locationId }) => locationId),
-  ]
-  return selectedIds.filter((id) => !resolvedIds.has(id))
-}
-
-function resolveOrganizations(draft: CharacterBuilderDraft, context: CharacterBuildContext) {
+  context: CharacterBuildContext,
+): NarrativeOrganizationFact[] {
   const available = new Map(
     resolvePlayableBuilderContent(context).organizations.map((row) => [row.id, row]),
   )
@@ -96,45 +71,66 @@ function resolveOrganizations(draft: CharacterBuilderDraft, context: CharacterBu
       const organization = available.get(edge.organizationId)
       if (!organization) return []
       const title = edge.details?.title
+      const lifecycle = edge.details?.lifecycle ?? 'current'
       return [
         {
           id: organization.id,
           name: organization.name,
           ...(title !== undefined ? { title } : {}),
+          lifecycle,
           affinities: [
             `organization:${organization.organizationDomain}`,
+            `organizationMembership:${lifecycle}`,
             ...organization.functions.map((value) => `function:${value}`),
             ...organization.practices.map((value) => `practice:${value}`),
           ],
+          provenance: { source: 'draft', draftEdgeId: edge.id },
         },
       ]
     })
 }
 
-/** Callers supply locations from the existing authorized campaign query. */
+/** Callers supply locations and characters from existing authorized campaign queries. */
 export function buildNarrativeContext({
   draft,
   context,
   locations = [],
+  characters = [],
 }: {
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
   locations?: readonly Location[]
+  characters?: readonly NarrativeCharacterReference[]
 }): NarrativeGenerationContext {
   const index = indexCharacterBuildCatalog(context.catalog)
   const available = resolvePlayableBuilderContent(context)
   const speciesContext = resolveSpeciesContext(draft, index, available)
   const classContext = resolveClassContext(draft, index, available)
   const organizations = resolveOrganizations(draft, context)
-  const residences = resolveResidences(draft, locations)
+  const relationshipFacts = buildNarrativeRelationshipFacts({
+    draft,
+    organizations,
+    locations,
+    characters,
+  })
+
   return narrativeGenerationContextSchema.parse({
     alignment: draft.identity.alignment,
     characterKind: context.characterKind,
     level: draft.class.level,
     tokens: { ...speciesContext.tokens, ...classContext.tokens },
     affinities: [...speciesContext.affinities, ...classContext.affinities],
-    organizations,
-    residences,
-    omittedReferenceIds: resolveOmittedReferenceIds(draft, organizations, residences),
+    organizations: relationshipFacts.organizations,
+    residences: relationshipFacts.residences,
+    people: relationshipFacts.people,
+    places: relationshipFacts.places,
+    relationshipFacts: narrativeRelationshipFactsSchema.parse(relationshipFacts),
+    omittedReferenceIds: resolveOmittedRelationshipReferenceIds({
+      draft,
+      organizations: relationshipFacts.organizations,
+      residences: relationshipFacts.residences,
+      places: relationshipFacts.places,
+      people: relationshipFacts.people,
+    }),
   })
 }

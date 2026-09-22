@@ -14,7 +14,7 @@ import {
   type NarrativeTheme,
   type NarrativeToken,
 } from '@rpg/contracts/character-narrative'
-import { bindNarrativeReferences } from './bind-references'
+import { bindNarrativeReferences, collectSelectedBindings } from './bind-references'
 import {
   createNarrativeRandom,
   fragmentWeight,
@@ -118,6 +118,7 @@ export function generateNarrative(input: {
     fragmentIds: selected.map(({ id }) => id),
     usedFallback,
     omittedReferenceIds: [...context.omittedReferenceIds].sort(),
+    selectedBindings: collectSelectedBindings(plan),
   })
   return result.success ? result.data : { ok: false, reason: INVALID_REASON }
 }

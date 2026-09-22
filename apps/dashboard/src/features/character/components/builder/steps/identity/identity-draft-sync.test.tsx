@@ -20,6 +20,19 @@ vi.mock('@/features/content', async (importOriginal) => {
   }
 })
 
+vi.mock('@/features/campaign', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/campaign')>()
+  return {
+    ...actual,
+    useCampaignCharacters: () => ({
+      data: [],
+      isPending: false,
+      isError: false,
+      error: null,
+    }),
+  }
+})
+
 describe('IdentityDraftSync', () => {
   it('seeds the form from an externally restored draft without clobbering the store', async () => {
     const onDraftChange = vi.fn()

@@ -10,6 +10,7 @@ import {
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
 import type { GeneratedNarrative } from '@rpg/contracts/character-narrative'
+import type { CampaignCharacterCardDto } from '@rpg/contracts'
 import type { Location } from '@rpg/contracts/rpg/content'
 
 import { formatContentListLoadErrorMessage } from '@/features/content/lib/content-type-labels'
@@ -119,6 +120,9 @@ export async function runNarrativeGeneration(input: {
   locations: readonly Location[]
   locationsQueryError: unknown
   locationsQueryIsError: boolean
+  characters: readonly CampaignCharacterCardDto[]
+  charactersQueryError: unknown
+  charactersQueryIsError: boolean
 }): Promise<NarrativeGenerationFeedback | undefined> {
   const snapshot = JSON.stringify(input.form.getValues())
   if (input.campaignId && input.locationsQueryIsError) {
@@ -130,6 +134,15 @@ export async function runNarrativeGeneration(input: {
       ),
     }
   }
+  if (input.campaignId && input.charactersQueryIsError) {
+    return {
+      tone: 'destructive',
+      message: getErrorMessage(
+        input.charactersQueryError,
+        'Campaign characters could not be loaded.',
+      ),
+    }
+  }
 
   try {
     const currentDraft = buildDraftFromIdentityValues(input.draft, input.form.getValues())
@@ -137,6 +150,7 @@ export async function runNarrativeGeneration(input: {
       draft: currentDraft,
       context: input.context,
       locations: input.locations,
+      characters: input.characters.map(({ id, name }) => ({ id, name })),
     })
     const result = await generateCharacterNarrative(
       generationContext,
