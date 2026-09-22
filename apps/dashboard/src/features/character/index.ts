@@ -78,6 +78,22 @@ export {
   updateCharacterOrganizationMembership,
 } from './api/organization-membership-client'
 export {
+  createCharacterRelationship,
+  createCharacterRelationshipIdempotencyKey,
+  deleteCharacterRelationship,
+  listCharacterRelationships,
+  updateCharacterRelationship,
+} from './api/character-relationship-client'
+export {
+  characterRelationshipsQueryKey,
+  useCharacterRelationships,
+} from './hooks/use-character-relationships'
+export { useCharacterRelationshipMutations } from './hooks/use-character-relationship-mutations'
+export {
+  invalidateCharacterRelationshipQueries,
+  type CharacterRelationshipInvalidationTarget,
+} from './lib/invalidate-character-relationship-queries'
+export {
   invalidateCharacterOrganizationMembershipQueries,
   type CharacterOrganizationMembershipSubjectKind,
 } from './lib/invalidate-character-organization-membership-queries'
