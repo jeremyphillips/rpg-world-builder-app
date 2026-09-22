@@ -1,4 +1,4 @@
-import { createElement, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import type { CharacterBuildContext, CharacterBuilderDraft } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
@@ -10,10 +10,6 @@ import {
 } from '../../../../lib/steps/connections-form-fields'
 import { connectionsDraftToFormValues } from '../../../../lib/steps/connections-form-values'
 import { CharacterRelationshipFormProvider } from '../../../../lib/relationship/character-relationship-field-registry'
-import {
-  CharacterRelationshipArrayAddInterceptProvider,
-  CharacterRelationshipPickerBridges,
-} from '../../../relationship/character-relationship-array-add-intercept'
 import type { CharacterRelationshipFieldContext } from '../../../../lib/relationship/character-relationship-field-context.types'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 import { ConnectionsDraftSync } from './connections-draft-sync'
@@ -35,8 +31,8 @@ function ConnectionsStepForm({ draft, onDraftChange }: ConnectionsStepFormProps)
   const relationshipContext = context as CharacterRelationshipFieldContext
 
   const fields = useMemo(
-    (): FormItem[] => [
-      ...buildConnectionsStepFormFields({
+    (): FormItem[] =>
+      buildConnectionsStepFormFields({
         relationshipContext,
         renderDraftSync: () => (
           <ConnectionsDraftSync
@@ -45,26 +41,17 @@ function ConnectionsStepForm({ draft, onDraftChange }: ConnectionsStepFormProps)
           />
         ),
       }),
-      {
-        kind: 'slot',
-        name: '_characterRelationshipPickers',
-        chrome: { variant: 'none' },
-        render: () => createElement(CharacterRelationshipPickerBridges),
-      },
-    ],
     [draft.connections, onDraftChange, relationshipContext],
   )
 
   return (
-    <CharacterRelationshipArrayAddInterceptProvider>
-      <Form
-        schema={connectionsFormSchema}
-        fields={fields}
-        defaultValues={connectionsDraftToFormValues(draft.connections)}
-        mode="onChange"
-        onSubmit={() => undefined}
-      />
-    </CharacterRelationshipArrayAddInterceptProvider>
+    <Form
+      schema={connectionsFormSchema}
+      fields={fields}
+      defaultValues={connectionsDraftToFormValues(draft.connections)}
+      mode="onChange"
+      onSubmit={() => undefined}
+    />
   )
 }
 

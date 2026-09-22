@@ -90,6 +90,7 @@ export function resolveArrayAddAction(config: ArrayConfig): ArrayAddActionConfig
     layout,
     size: action.size,
     menu: action.menu,
+    relationship: action.relationship,
     intercept: action.intercept,
   }
 }

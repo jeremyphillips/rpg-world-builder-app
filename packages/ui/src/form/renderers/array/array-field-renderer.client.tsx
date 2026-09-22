@@ -43,7 +43,7 @@ export function ArrayFieldRenderer({
   sectionLayout,
 }: ArrayFieldRendererProps) {
   const form = useFormContext()
-  const { fields, append, remove, move } = useFieldArray({ name: fullName })
+  const { fields, append, remove, move, replace } = useFieldArray({ name: fullName })
   const { getValues } = form
   const watchedItems = useWatch({ name: fullName }) as unknown[] | undefined
 
@@ -64,8 +64,11 @@ export function ArrayFieldRenderer({
       getValues: () => fields.map((_, index) => form.getValues(`${fullName}.${index}`)),
       remove,
       append: state.appendItemWithDefaults,
+      replace: (items) => {
+        replace(items)
+      },
     })
-  }, [form, fullName, fields, remove, state.appendItemWithDefaults])
+  }, [form, fullName, fields, remove, replace, state.appendItemWithDefaults])
 
   return (
     <ArrayFieldRendererFieldset

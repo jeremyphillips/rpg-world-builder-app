@@ -44,6 +44,17 @@ describe('isArrayItemCollapsed', () => {
       true,
     )
   })
+
+  it('defaults closed for sole items when defaultCollapsed is true', () => {
+    expect(
+      isArrayItemCollapsed({
+        itemCount: 1,
+        itemKey: 'a',
+        overrides,
+        defaultCollapsed: true,
+      }),
+    ).toBe(true)
+  })
 })
 
 describe('toggleArrayItemCollapseOverride', () => {

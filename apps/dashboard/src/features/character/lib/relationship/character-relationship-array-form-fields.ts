@@ -25,16 +25,23 @@ const RELATIONSHIP_ADAPTERS = {
   [CHARACTER_RESIDENCE_VOCABULARY]: characterResidenceRelationshipAdapter,
 }
 
-function buildCharacterRelationshipArrayField(
-  vocabulary: CharacterRelationshipVocabulary,
-  context: CharacterRelationshipFieldContext,
-): FormItem {
+export type BuildRelationshipArrayFieldInput = {
+  vocabulary: CharacterRelationshipVocabulary
+  context: CharacterRelationshipFieldContext
+}
+
+export function buildRelationshipArrayField({
+  vocabulary,
+  context,
+}: BuildRelationshipArrayFieldInput): FormItem {
   const config = CHARACTER_RELATIONSHIP_VOCABULARY_CONFIG[vocabulary]
   const adapter = RELATIONSHIP_ADAPTERS[vocabulary]
   const resolvePresentation =
     vocabulary === CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY
       ? resolveOrganizationMembershipPresentationFromValues
       : resolveResidencePresentationFromValues
+  const cardinality =
+    vocabulary === CHARACTER_RESIDENCE_VOCABULARY ? ('one' as const) : ('many' as const)
 
   const residenceStatusCopy =
     vocabulary === CHARACTER_RESIDENCE_VOCABULARY
@@ -50,7 +57,7 @@ function buildCharacterRelationshipArrayField(
     addAction: {
       label: config.addActionLabel,
       layout: 'inline',
-      intercept: vocabulary,
+      relationship: { vocabulary, cardinality },
     },
     resolveCanAppend: (items) => {
       if (vocabulary === CHARACTER_RESIDENCE_VOCABULARY) {
@@ -66,6 +73,8 @@ function buildCharacterRelationshipArrayField(
     },
     item: {
       collapsible: true,
+      defaultCollapsed: true,
+      reorder: false,
       header: {
         fallback: (index) => `${config.emptyItemLabel} ${index + 1}`,
         primary: (values) => {
@@ -83,11 +92,17 @@ function buildCharacterRelationshipArrayField(
 export function buildCharacterOrganizationMembershipArrayField(
   context: CharacterRelationshipFieldContext,
 ): FormItem {
-  return buildCharacterRelationshipArrayField(CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY, context)
+  return buildRelationshipArrayField({
+    vocabulary: CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
+    context,
+  })
 }
 
 export function buildCharacterResidenceArrayField(
   context: CharacterRelationshipFieldContext,
 ): FormItem {
-  return buildCharacterRelationshipArrayField(CHARACTER_RESIDENCE_VOCABULARY, context)
+  return buildRelationshipArrayField({
+    vocabulary: CHARACTER_RESIDENCE_VOCABULARY,
+    context,
+  })
 }

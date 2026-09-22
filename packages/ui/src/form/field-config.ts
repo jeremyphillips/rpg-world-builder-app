@@ -1360,6 +1360,13 @@ export interface ArrayItemHeaderConfig {
   srOnly?: boolean
 }
 
+export type ArrayRelationshipAddAction = {
+  /** Key in `RelationshipFieldProvider` registry. */
+  vocabulary: string
+  /** `one` replaces the field array on add. Default `many` appends. */
+  cardinality?: 'one' | 'many'
+}
+
 export interface ArrayAddActionConfig {
   label?: string
   /** @default true */
@@ -1369,6 +1376,11 @@ export interface ArrayAddActionConfig {
   layout?: ArrayAddActionLayout
   size?: NonNullable<ButtonVariantProps['size']>
   menu?: ArrayAddMenuConfig
+  /**
+   * When set, the add control opens the schema form relationship picker host for this
+   * array path instead of appending a default row.
+   */
+  relationship?: ArrayRelationshipAddAction
   /**
    * When set, the add control invokes {@link ArrayAddActionInterceptProvider} instead
    * of appending a default row.
@@ -1400,6 +1412,13 @@ export interface ArrayItemConfig {
   headerVisibility?: ArrayItemHeaderVisibility
   collapsible?: boolean
   collapseKey?: string
+  /**
+   * When true, items default collapsed even as the sole row, and append skips session
+   * expand keys. Use for entity-card relationship rows that should stay summarized.
+   *
+   * @default false
+   */
+  defaultCollapsed?: boolean
   /** @default dragHandle */
   reorder?: ArrayItemReorder
   /** @default true */

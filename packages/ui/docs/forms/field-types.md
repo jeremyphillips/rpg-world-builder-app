@@ -360,10 +360,10 @@ Nested `{ valueKey, unitKey }` for multi-unit enums. Single unit: `fixedUnit` + 
 
 ## Relationship (`relationship`)
 
-Typed content-entity edge list with vocabulary-driven picker wiring. For form
-authoring that should match grant-style array cards, prefer `kind: 'array'` with
-`item.renderShell` (`EntityDisclosureArrayItemShell`) and `addAction.intercept` for
-picker-driven inline adds — see character connections in the dashboard.
+Legacy flat-list field type with vocabulary-driven picker wiring. For grant-style array
+cards, prefer `kind: 'array'` with `item.renderShell` and `addAction.relationship` — see
+[array field authoring](./array-field-authoring.md#addactionrelationship--picker-driven-collections).
+Character connections in the dashboard use that array path.
 
 ```ts
 {

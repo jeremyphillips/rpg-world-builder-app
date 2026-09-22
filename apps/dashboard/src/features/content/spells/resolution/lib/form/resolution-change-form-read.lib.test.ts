@@ -53,6 +53,7 @@ describe('readResolutionValues', () => {
       getValues: () => liveEffects,
       remove: () => undefined,
       append: () => undefined,
+      replace: () => undefined,
     })
 
     const getValues = (name?: string) => {

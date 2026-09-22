@@ -50,6 +50,7 @@ export function SpellResolutionOutcomeApplicationsList({
       getValues: () => fields.map((_, index) => form.getValues(`${fullName}.${index}`)),
       remove,
       append: () => undefined,
+      replace: () => undefined,
     })
   }, [form, fullName, fields, remove])
 

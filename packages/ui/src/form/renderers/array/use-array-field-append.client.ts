@@ -31,6 +31,7 @@ type UseArrayFieldAppendOptions = {
   getValues: (name: string) => unknown
   watchedItems: unknown[] | undefined
   collapsible: boolean
+  defaultCollapsed?: boolean
   itemCollapseKey: string | undefined
   addValidationSessionExpandKeys: (keys: readonly ValidationSessionExpandKey[]) => void
 }
@@ -43,6 +44,7 @@ export function useArrayFieldAppend({
   getValues,
   watchedItems,
   collapsible,
+  defaultCollapsed = false,
   itemCollapseKey,
   addValidationSessionExpandKeys,
 }: UseArrayFieldAppendOptions) {
@@ -67,15 +69,25 @@ export function useArrayFieldAppend({
       const newIndex = fields.length
       append(payload)
 
-      if (collapsible) {
+      if (collapsible && !defaultCollapsed) {
         addValidationSessionExpandKeys(
           buildArrayAddMenuExpandKeys(fullName, newIndex, payload, itemCollapseKey),
         )
       }
 
-      scheduleArrayItemFocus(fullName, newIndex)
+      if (!defaultCollapsed) {
+        scheduleArrayItemFocus(fullName, newIndex)
+      }
     },
-    [addValidationSessionExpandKeys, append, collapsible, fields.length, fullName, itemCollapseKey],
+    [
+      addValidationSessionExpandKeys,
+      append,
+      collapsible,
+      defaultCollapsed,
+      fields.length,
+      fullName,
+      itemCollapseKey,
+    ],
   )
 
   const appendFromAddMenu = React.useCallback(

@@ -4,10 +4,11 @@ import type { FormItem } from '@rpg/ui/form'
 import type { z } from 'zod'
 
 import type { CharacterRelationshipFieldContext } from '../relationship/character-relationship-field-context.types'
+import { buildRelationshipArrayField } from '../relationship/character-relationship-array-form-fields'
 import {
-  buildCharacterOrganizationMembershipArrayField,
-  buildCharacterResidenceArrayField,
-} from '../relationship/character-relationship-array-form-fields'
+  CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
+  CHARACTER_RESIDENCE_VOCABULARY,
+} from '../relationship/character-relationship-vocabulary'
 
 export const connectionsFormSchema = characterConnectionsSchema.pick({
   organizations: true,
@@ -30,8 +31,14 @@ export function buildConnectionsStepFormFields({
       kind: 'group',
       fieldChrome: { variant: 'none' },
       fields: [
-        buildCharacterOrganizationMembershipArrayField(relationshipContext),
-        buildCharacterResidenceArrayField(relationshipContext),
+        buildRelationshipArrayField({
+          vocabulary: CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
+          context: relationshipContext,
+        }),
+        buildRelationshipArrayField({
+          vocabulary: CHARACTER_RESIDENCE_VOCABULARY,
+          context: relationshipContext,
+        }),
       ],
     },
     {

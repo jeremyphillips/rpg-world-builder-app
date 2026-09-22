@@ -194,6 +194,45 @@ stay aligned. When the list is empty, the renderer shows a neutral panel:
 path (e.g. `Add at least one {itemLabel}.`) below the panel on failed submit — not
 inside the empty-state panel.
 
+## `addAction.relationship` — picker-driven collections
+
+Grant-style relationship authoring uses `kind: 'array'` with `addAction.relationship`
+instead of a separate `type: 'relationship'` field or dashboard-only intercept slots.
+`SchemaFormShell` scans the field tree, mounts `RelationshipArrayPickerHost`, and wires
+add clicks to the vocabulary adapter registered on `RelationshipFieldProvider`.
+
+```ts
+defineArrayField({
+  kind: 'array',
+  name: 'organizations',
+  legend: 'Organizations',
+  addAction: {
+    label: 'Add organization',
+    layout: 'inline',
+    relationship: {
+      vocabulary: 'character_organization_membership',
+      cardinality: 'many',
+    },
+  },
+  item: {
+    collapsible: true,
+    reorder: false,
+    renderShell: (props) => createElement(EntityDisclosureArrayItemShell, props),
+  },
+  fields: [],
+})
+```
+
+| Prop                              | Notes                                                                  |
+| --------------------------------- | ---------------------------------------------------------------------- |
+| `relationship.vocabulary`         | Registry key on `RelationshipFieldProvider`                            |
+| `relationship.cardinality: 'one'` | Replaces the array on add instead of appending (e.g. single residence) |
+| `addAction.intercept`             | Legacy override for non-relationship custom add flows                  |
+
+Wrap the form in `RelationshipFieldProvider` with adapters that implement
+`createEdge` and `renderPicker`. Row presentation stays on `item.renderShell`; the host
+only owns picker lifecycle and RHF `append` / `replace`.
+
 ## `addActionMenu`
 
 Replace the plain add button with a searchable template dropdown. Each item supplies
