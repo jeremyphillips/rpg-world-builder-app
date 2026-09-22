@@ -1,7 +1,8 @@
 # Character narrative generator — v1 architecture
 
 Status: implemented for v1 (Identity generate action, foundation collection, and
-dashboard wiring). Form `type: 'relationship'` follow-up remains out of v1 scope.
+dashboard wiring). Character connections author through `kind: 'array'` with
+`addAction.relationship`; there is no form `type: 'relationship'` primitive.
 
 ## Goal and agreed behavior
 

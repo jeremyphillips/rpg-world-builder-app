@@ -27,6 +27,28 @@ function resolveOrganizationMembershipOrganization(
   return resolved as Organization | null
 }
 
+function resolveApiOrganizationMembership(
+  membership: CharacterOrganizationMembershipEdge,
+  context: CharacterRelationshipFieldContext,
+): OrganizationReferenceResolution | undefined {
+  const fromServer = context.resolvedMemberships?.find(
+    (item) => item.organizationId === membership.organizationId,
+  )
+  if (fromServer) return fromServer
+
+  const organization = resolveOrganizationMembershipOrganization(membership, context)
+  if (!organization) return undefined
+
+  return {
+    organizationId: membership.organizationId,
+    ...(membership.title !== undefined ? { title: membership.title } : {}),
+    ...('priority' in membership && membership.priority !== undefined
+      ? { priority: membership.priority }
+      : {}),
+    organization,
+  }
+}
+
 export function resolveOrganizationMembershipApiTrailing(
   membership: CharacterOrganizationMembershipEdge,
   context: CharacterRelationshipFieldContext,
@@ -59,7 +81,10 @@ export function resolveOrganizationMembershipApiTrailing(
           variant="ghost"
           size="icon"
           aria-label={`Edit membership in ${label}`}
-          onClick={() => context.onEditMembership?.(membership as OrganizationReferenceResolution)}
+          onClick={() => {
+            const resolved = resolveApiOrganizationMembership(membership, context)
+            if (resolved) context.onEditMembership?.(resolved)
+          }}
         >
           <SquarePen aria-hidden className="size-4" />
         </Button>
@@ -73,9 +98,10 @@ export function resolveOrganizationMembershipApiTrailing(
       content: (
         <BuilderInventoryRemoveAction
           itemLabel={label}
-          onRemove={() =>
-            context.onRemoveUnresolvedMembership?.(membership as OrganizationReferenceResolution)
-          }
+          onRemove={() => {
+            const resolved = resolveApiOrganizationMembership(membership, context)
+            if (resolved) context.onRemoveUnresolvedMembership?.(resolved)
+          }}
         />
       ),
     }

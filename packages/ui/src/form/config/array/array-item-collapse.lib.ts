@@ -31,15 +31,18 @@ export function resolveArrayItemCollapseKey(
 
 /**
  * Default: one item open; two or more closed. User overrides take precedence.
+ * When `defaultCollapsed` is true, items default closed regardless of count.
  */
 export function isArrayItemCollapsed(options: {
   itemCount: number
   itemKey: string
   overrides: Map<string, ArrayItemCollapseOverride>
+  defaultCollapsed?: boolean
 }): boolean {
   const override = options.overrides.get(options.itemKey)
   if (override === 'open') return false
   if (override === 'closed') return true
+  if (options.defaultCollapsed) return true
   return options.itemCount >= 2
 }
 
@@ -69,12 +72,15 @@ export function collapsedIdsFromSnapshot(
   itemKeysByFieldId: ReadonlyMap<string, string>,
   snapshot: ArrayItemCollapseSnapshot,
   itemCount: number,
+  defaultCollapsed = false,
 ): ReadonlySet<string> {
   const collapsed = new Set<string>()
   for (const field of fields) {
     const itemKey = itemKeysByFieldId.get(field.id)
     if (itemKey === undefined) continue
-    if (isArrayItemCollapsed({ itemCount, itemKey, overrides: snapshot.overrides })) {
+    if (
+      isArrayItemCollapsed({ itemCount, itemKey, overrides: snapshot.overrides, defaultCollapsed })
+    ) {
       collapsed.add(field.id)
     }
   }

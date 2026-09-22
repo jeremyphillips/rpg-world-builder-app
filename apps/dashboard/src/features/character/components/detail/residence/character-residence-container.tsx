@@ -1,15 +1,24 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
-import type { ResidenceLocationSelection } from '../../connections/picker/residence-location-picker-drawer.types'
-import { CharacterControlledRelationshipField } from '../../relationship/character-controlled-relationship-field'
+import { Form } from '@rpg/ui/form'
+
+import { CharacterResidenceApiSync } from './character-residence-api-sync'
 import { useCharacterResidenceSheet } from '../../../hooks/use-character-residence-sheet'
 import type { CharacterOrganizationMembershipSubjectKind } from '../../../lib/invalidate-character-organization-membership-queries'
+import { RESIDENCE_CONNECTION_KIND } from '../../../lib/connections/residence-location-connection.lib'
+import {
+  mergeLocationsById,
+  resolveAvailableResidenceIdSet,
+} from '../../../lib/relationship/character-relationship-resolved-entities.lib'
 import {
   buildCharacterApiRelationshipFieldContext,
-  CHARACTER_RELATIONSHIP_FIELD_REGISTRY,
-  CHARACTER_RESIDENCE_VOCABULARY,
+  CharacterApiRelationshipFormProvider,
 } from '../../../lib/relationship/character-relationship-field-registry'
-import { RESIDENCE_CONNECTION_KIND } from '../../../lib/connections/residence-location-connection.lib'
+import {
+  buildResidenceFormFields,
+  residenceFormSchema,
+  residencesToFormValues,
+} from '../../../lib/relationship/character-residence-form-fields'
 
 export type CharacterResidenceContainerProps = {
   campaignId: string
@@ -42,9 +51,6 @@ export function CharacterResidenceContainer({
 
   const relationshipContext = useMemo(() => {
     const eligibleResidenceLocations = sheet.pickerItems.map(({ location }) => location)
-    const locationsById = new Map(
-      eligibleResidenceLocations.map((location) => [location.id, location]),
-    )
 
     return buildCharacterApiRelationshipFieldContext({
       campaignId,
@@ -52,28 +58,60 @@ export function CharacterResidenceContainer({
       eligibleResidenceLocations,
       locationsQueryStatus: sheet.locationsQueryStatus,
       organizationsById: new Map(),
-      locationsById,
+      locationsById: mergeLocationsById(sheet.locations, residences),
       availableOrganizationIdSet: new Set(),
-      availableResidenceIdSet: new Set(eligibleResidenceLocations.map(({ id }) => id)),
+      availableResidenceIdSet: resolveAvailableResidenceIdSet({
+        canEdit,
+        eligibleLocationIds: eligibleResidenceLocations.map(({ id }) => id),
+        residences,
+      }),
     })
-  }, [campaignId, sheet.locationsQueryStatus, sheet.pickerItems])
+  }, [
+    campaignId,
+    canEdit,
+    residences,
+    sheet.locations,
+    sheet.locationsQueryStatus,
+    sheet.pickerItems,
+  ])
+
+  const renderApiSync = useCallback(
+    () => (
+      <CharacterResidenceApiSync
+        serverResidences={residences}
+        onAdd={sheet.handleAdd}
+        onRemove={sheet.handleRemove}
+      />
+    ),
+    [residences, sheet.handleAdd, sheet.handleRemove],
+  )
+
+  const fields = useMemo(
+    () =>
+      buildResidenceFormFields({
+        relationshipContext,
+        disabled: !canEdit,
+        renderApiSync,
+      }),
+    [canEdit, relationshipContext, renderApiSync],
+  )
+
+  const defaultValues = useMemo(() => residencesToFormValues(residences), [residences])
+
+  const formKey = `${subjectKind}:${characterId}`
 
   if (sheet.isBootstrapping) return null
 
   return (
-    <CharacterControlledRelationshipField
-      vocabulary={CHARACTER_RESIDENCE_VOCABULARY}
-      registry={CHARACTER_RELATIONSHIP_FIELD_REGISTRY}
-      context={relationshipContext}
-      label="Residence"
-      emptyItemLabel="residence"
-      addActionLabel="Add residence"
-      items={residences}
-      disabled={!canEdit}
-      onAdd={(selection) => sheet.handleAdd(selection as ResidenceLocationSelection)}
-      onRemove={(reference) => {
-        void sheet.handleRemove(reference.connection.id, reference.connection.locationId)
-      }}
-    />
+    <CharacterApiRelationshipFormProvider context={relationshipContext}>
+      <Form
+        key={formKey}
+        schema={residenceFormSchema}
+        fields={fields}
+        defaultValues={defaultValues}
+        mode="onChange"
+        onSubmit={() => undefined}
+      />
+    </CharacterApiRelationshipFormProvider>
   )
 }

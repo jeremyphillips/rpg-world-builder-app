@@ -157,6 +157,10 @@ header `identitySupplement` slot via
   `…/organization-memberships` routes and invalidate org references, the sheet
   detail query, and the affected organization’s members key.
 - **Standalone sheets** have no Organizations block (campaign-scoped orgs only).
+- **API-mode chrome:** organization membership rows are not removable from the
+  array rail (`removable: false`); edit and unresolved removal use the trailing
+  pencil / unresolved-remove control. Residence rows use array remove, which
+  flows through API sync to `handleRemove`.
 
 ## Error copy (route shells)
 

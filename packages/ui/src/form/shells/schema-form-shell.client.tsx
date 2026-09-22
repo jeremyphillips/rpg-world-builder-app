@@ -20,6 +20,8 @@ import {
 } from '../context/form-ui.context'
 import type { FormIssue } from '../errors/form-issue.types'
 import type { FileFieldPropsMap, FormItem } from '../field-config'
+import { RelationshipArrayControllerProvider } from '../context/relationship-array-controller.context'
+import { RelationshipArrayPickerHost } from './relationship-array-picker-host.client'
 import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
 import {
   FormShellFooterPublisher,
@@ -257,9 +259,12 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
             externalFooter={externalFooter}
             externalFooterContent={externalFooterContent}
           >
-            <FormSectionContext.Provider value={sectionContext}>
-              {children}
-            </FormSectionContext.Provider>
+            <RelationshipArrayControllerProvider>
+              <RelationshipArrayPickerHost fields={fields} />
+              <FormSectionContext.Provider value={sectionContext}>
+                {children}
+              </FormSectionContext.Provider>
+            </RelationshipArrayControllerProvider>
           </SchemaFormElement>
         </FormUiProvider>
       </FileFieldPropsProvider>

@@ -7,22 +7,22 @@ import {
   buildItemKeysByFieldId,
   collapsedIdsFromSnapshot,
   createArrayItemCollapseSnapshot,
-  isArrayItemCollapsed,
   pruneArrayItemCollapseOverrides,
-  serializeArrayItemCollapseOverrides,
-  toggleArrayItemCollapseOverride,
 } from '../config/array/array-item-collapse.lib'
+import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
+import { useFormUiContext } from '../context/form-ui.context'
 import {
-  readArrayItemCollapseOverrides,
-  writeArrayItemCollapseOverrides,
-} from '../config/array/array-item-collapse-storage.lib'
-import { useFormUiContext, type ValidationSessionExpandKey } from '../context/form-ui.context'
+  mergeValidationSessionExpandedArrayItems,
+  pruneArrayItemCollapseStorageOverrides,
+  syncArrayItemCollapseStorageKey,
+  toggleArrayItemCollapseField,
+} from './array-item-collapse-state.lib'
 
 export interface UseArrayItemCollapseStateOptions {
   fullName: string
   collapsible: boolean
   fields: ReadonlyArray<{ id: string }>
-  itemCollapseKey?: string
+  config: { item?: { collapseKey?: string; defaultCollapsed?: boolean } }
   getItemValues: (index: number) => Record<string, unknown>
 }
 
@@ -30,20 +30,15 @@ function serializeActiveItemKeys(itemKeysByFieldId: ReadonlyMap<string, string>)
   return [...itemKeysByFieldId.values()].sort().join('\0')
 }
 
-function buildValidationSessionExpandKey(
-  fullName: string,
-  itemKey: string,
-): ValidationSessionExpandKey {
-  return `${fullName}:${itemKey}`
-}
-
 export function useArrayItemCollapseState({
   fullName,
   collapsible,
   fields,
-  itemCollapseKey = 'id',
+  config,
   getItemValues,
 }: UseArrayItemCollapseStateOptions) {
+  const itemCollapseKey = config.item?.collapseKey ?? 'id'
+  const defaultCollapsed = config.item?.defaultCollapsed ?? false
   const { uiStateKey, validationSessionExpandKeys, removeValidationSessionExpandKeys } =
     useFormUiContext()
   const { control } = useFormContext()
@@ -62,15 +57,19 @@ export function useArrayItemCollapseState({
 
   const storageSyncKey = collapsible && uiStateKey ? `${uiStateKey}:${fullName}` : null
   const [trackedStorageSyncKey, setTrackedStorageSyncKey] = React.useState(storageSyncKey)
-  if (storageSyncKey !== trackedStorageSyncKey) {
-    setTrackedStorageSyncKey(storageSyncKey)
-    if (storageSyncKey && uiStateKey) {
-      const stored = readArrayItemCollapseOverrides(uiStateKey, fullName)
-      setSnapshot(createArrayItemCollapseSnapshot(stored))
-    } else {
-      setSnapshot(createArrayItemCollapseSnapshot())
-    }
-  }
+  syncArrayItemCollapseStorageKey({
+    collapsible,
+    fullName,
+    readStoredSnapshot: () => {
+      const stored = readArrayItemCollapseOverrides(uiStateKey!, fullName)
+      return createArrayItemCollapseSnapshot(stored)
+    },
+    setSnapshot,
+    setTrackedStorageSyncKey,
+    storageSyncKey,
+    trackedStorageSyncKey,
+    uiStateKey,
+  })
 
   const resolveItemValues = React.useCallback(
     (index: number) =>
@@ -97,81 +96,71 @@ export function useArrayItemCollapseState({
 
   const persistedCollapsedIds = React.useMemo(() => {
     if (!collapsible) return new Set<string>()
-    return collapsedIdsFromSnapshot(fields, itemKeysByFieldId, prunedSnapshot, itemCount)
-  }, [collapsible, fields, itemKeysByFieldId, prunedSnapshot, itemCount])
+    return collapsedIdsFromSnapshot(
+      fields,
+      itemKeysByFieldId,
+      prunedSnapshot,
+      itemCount,
+      defaultCollapsed,
+    )
+  }, [collapsible, defaultCollapsed, fields, itemKeysByFieldId, prunedSnapshot, itemCount])
 
-  const collapsedIds = React.useMemo(() => {
-    if (!collapsible || validationSessionExpandKeys.size === 0) return persistedCollapsedIds
-
-    const next = new Set(persistedCollapsedIds)
-    for (const field of fields) {
-      const itemKey = itemKeysByFieldId.get(field.id)
-      if (!itemKey) continue
-      if (validationSessionExpandKeys.has(buildValidationSessionExpandKey(fullName, itemKey))) {
-        next.delete(field.id)
-      }
-    }
-    return next
-  }, [
-    collapsible,
-    fields,
-    fullName,
-    itemKeysByFieldId,
-    persistedCollapsedIds,
-    validationSessionExpandKeys,
-  ])
+  const collapsedIds = React.useMemo(
+    () =>
+      mergeValidationSessionExpandedArrayItems({
+        collapsible,
+        fields,
+        fullName,
+        itemKeysByFieldId,
+        persistedCollapsedIds,
+        validationSessionExpandKeys,
+      }),
+    [
+      collapsible,
+      fields,
+      fullName,
+      itemKeysByFieldId,
+      persistedCollapsedIds,
+      validationSessionExpandKeys,
+    ],
+  )
 
   const [trackedActiveItemKeySignature, setTrackedActiveItemKeySignature] = React.useState<
     string | null
   >(null)
-  if (collapsible && uiStateKey && activeItemKeySignature !== trackedActiveItemKeySignature) {
-    setTrackedActiveItemKeySignature(activeItemKeySignature)
-    const activeItemKeys = new Set(itemKeysByFieldId.values())
-    setSnapshot((prev) => {
-      const pruned = pruneArrayItemCollapseOverrides(prev, activeItemKeys)
-      if (pruned.overrides.size === prev.overrides.size) return prev
-      writeArrayItemCollapseOverrides(
-        uiStateKey,
-        fullName,
-        serializeArrayItemCollapseOverrides(pruned),
-      )
-      return pruned
-    })
-  }
+  pruneArrayItemCollapseStorageOverrides({
+    activeItemKeySignature,
+    collapsible,
+    fullName,
+    itemKeysByFieldId,
+    setSnapshot,
+    setTrackedActiveItemKeySignature,
+    trackedActiveItemKeySignature,
+    uiStateKey,
+  })
 
   const toggleCollapse = React.useCallback(
     (fieldId: string) => {
-      if (!collapsible) return
-      const itemKey = itemKeysByFieldId.get(fieldId)
-      if (itemKey === undefined) return
-      const validationSessionKey = buildValidationSessionExpandKey(fullName, itemKey)
-
-      setSnapshot((prev) => {
-        const currentlyCollapsed = validationSessionExpandKeys.has(validationSessionKey)
-          ? false
-          : isArrayItemCollapsed({
-              itemCount,
-              itemKey,
-              overrides: prev.overrides,
-            })
-        const next = toggleArrayItemCollapseOverride(prev, itemKey, !currentlyCollapsed)
-        if (uiStateKey) {
-          writeArrayItemCollapseOverrides(
-            uiStateKey,
-            fullName,
-            serializeArrayItemCollapseOverrides(next),
-          )
-        }
-        return next
+      toggleArrayItemCollapseField({
+        collapsible,
+        defaultCollapsed,
+        fieldId,
+        fullName,
+        itemCount,
+        itemKeysByFieldId,
+        removeValidationSessionExpandKeys,
+        setSnapshot,
+        uiStateKey,
+        validationSessionExpandKeys,
       })
-      removeValidationSessionExpandKeys([validationSessionKey])
     },
     [
       collapsible,
+      defaultCollapsed,
+      fullName,
       itemCount,
       itemKeysByFieldId,
       uiStateKey,
-      fullName,
       validationSessionExpandKeys,
       removeValidationSessionExpandKeys,
     ],

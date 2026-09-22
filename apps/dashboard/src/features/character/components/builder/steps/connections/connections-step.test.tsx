@@ -95,6 +95,10 @@ describe('ConnectionsStep', () => {
         locations: [],
       },
     })
+    expect(screen.getByRole('button', { name: 'Expand City Council' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
   })
 
   it('adds and removes residence connections in campaign context', async () => {
@@ -125,6 +129,10 @@ describe('ConnectionsStep', () => {
         ],
       },
     })
+    expect(screen.getByRole('button', { name: 'Expand Harborford' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
   })
 
   it('shows stale selections as recoverable and has no axe violations', async () => {

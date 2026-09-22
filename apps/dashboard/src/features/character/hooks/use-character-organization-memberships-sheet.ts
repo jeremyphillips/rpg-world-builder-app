@@ -20,11 +20,12 @@ import { useCharacterOrganizationMembershipMutations } from './use-character-org
 import { useCharacterOrganizationReferences } from './use-character-organization-references'
 import type { CharacterOrganizationMembershipSubjectKind } from '../lib/invalidate-character-organization-membership-queries'
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../lib/display/character-display'
+import { resolveRelationshipPlayActor } from '../lib/relationship/character-relationship-play-actor.lib'
 
 function toPickerItems(
   organizations: readonly Organization[],
   memberships: readonly OrganizationReferenceResolution[],
-  playActor: { kind: 'pc'; characterId: string },
+  playActor: ReturnType<typeof resolveRelationshipPlayActor>,
 ): OrganizationPickerItem[] {
   const selectedIds = new Set(memberships.map((membership) => membership.organizationId))
   return organizations
@@ -72,15 +73,19 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   )
 
   const memberships = React.useMemo(() => referencesQuery.data ?? [], [referencesQuery.data])
-  const [pickerOpen, setPickerOpen] = React.useState(false)
   const [editingMembership, setEditingMembership] =
     React.useState<OrganizationReferenceResolution | null>(null)
   const [unresolvedToRemove, setUnresolvedToRemove] =
     React.useState<OrganizationReferenceResolution | null>(null)
 
   const pickerItems = React.useMemo(
-    () => toPickerItems(organizationsQuery.data ?? [], memberships, { kind: 'pc', characterId }),
-    [characterId, memberships, organizationsQuery.data],
+    () =>
+      toPickerItems(
+        organizationsQuery.data ?? [],
+        memberships,
+        resolveRelationshipPlayActor(subjectKind, characterId),
+      ),
+    [characterId, memberships, organizationsQuery.data, subjectKind],
   )
   const editingOrganization = React.useMemo(
     () => toEditableOrganization(editingMembership),
@@ -147,8 +152,6 @@ export function useCharacterOrganizationMembershipsSheet(input: {
   return {
     isBootstrapping: referencesQuery.isPending && referencesQuery.data === undefined,
     memberships,
-    pickerOpen,
-    setPickerOpen,
     pickerItems,
     editingMembership,
     setEditingMembership,

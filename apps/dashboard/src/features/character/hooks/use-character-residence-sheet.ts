@@ -49,7 +49,6 @@ export function useCharacterResidenceSheet(input: {
   const referencesQuery = useCharacterLocationReferences(campaignId, characterId)
   const locationsQuery = useLocations(canEdit ? campaignId : undefined)
   const mutations = useCharacterResidenceMutations(campaignId, characterId, subjectKind)
-  const [pickerOpen, setPickerOpen] = React.useState(false)
 
   const locationReferences = React.useMemo(() => referencesQuery.data ?? [], [referencesQuery.data])
 
@@ -107,8 +106,7 @@ export function useCharacterResidenceSheet(input: {
       (referencesQuery.isPending && referencesQuery.data === undefined) ||
       (canEdit && locationsQuery.isPending && locationsQuery.data === undefined),
     locationReferences,
-    pickerOpen,
-    setPickerOpen,
+    locations: locationsQuery.data ?? [],
     pickerItems,
     locationsQueryStatus,
     handleAdd,

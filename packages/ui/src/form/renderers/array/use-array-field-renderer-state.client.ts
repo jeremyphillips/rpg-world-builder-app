@@ -98,7 +98,7 @@ export function useArrayFieldRendererState({
     fullName,
     collapsible,
     fields,
-    itemCollapseKey,
+    config,
     getItemValues,
   })
 

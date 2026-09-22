@@ -130,7 +130,6 @@ export type FieldType =
   | 'joinedPair'
   | 'levelRange'
   | 'rollValue'
-  | 'relationship'
 
 /** Option for the `select`, `radio`, `radioCard`, `chips`, and `combobox` field types. */
 export interface FieldOption {
@@ -923,23 +922,6 @@ export interface RollValueFieldConfig extends BaseFieldConfig {
 }
 
 /**
- * Typed content-entity relationship list (`type: 'relationship'`).
- *
- * Values are edge objects stored in an RHF field array. Picker wiring and row
- * projection are resolved from a vocabulary id via `RelationshipFieldProvider`.
- */
-export interface RelationshipFieldConfig extends BaseFieldConfig {
-  type: 'relationship'
-  /** Registry key resolved by `RelationshipFieldProvider`. */
-  vocabulary: string
-  /** Single vs multi edge authoring. Defaults to `many`. */
-  cardinality?: 'one' | 'many'
-  emptyLabel: string
-  addActionLabel: string
-  defaultValue?: unknown[]
-}
-
-/**
  * Value + unit composite bound to a nested object field (e.g. `{ amount, currency }`).
  * `valueKey` / `unitKey` name the object properties the control reads and writes.
  */
@@ -1024,7 +1006,6 @@ export type FieldConfig =
   | RollValueFieldConfig
   | InputSelectFieldConfig
   | InputUnitFieldConfig
-  | RelationshipFieldConfig
 
 /** Leaf fields and slots allowed inside a horizontal `kind: 'row'`. */
 export type RowFieldItem = FieldConfig | SlotConfig
@@ -1360,6 +1341,13 @@ export interface ArrayItemHeaderConfig {
   srOnly?: boolean
 }
 
+export type ArrayRelationshipAddAction = {
+  /** Key in `RelationshipFieldProvider` registry. */
+  vocabulary: string
+  /** `one` replaces the field array on add. Default `many` appends. */
+  cardinality?: 'one' | 'many'
+}
+
 export interface ArrayAddActionConfig {
   label?: string
   /** @default true */
@@ -1369,6 +1357,11 @@ export interface ArrayAddActionConfig {
   layout?: ArrayAddActionLayout
   size?: NonNullable<ButtonVariantProps['size']>
   menu?: ArrayAddMenuConfig
+  /**
+   * When set, the add control opens the schema form relationship picker host for this
+   * array path instead of appending a default row.
+   */
+  relationship?: ArrayRelationshipAddAction
   /**
    * When set, the add control invokes {@link ArrayAddActionInterceptProvider} instead
    * of appending a default row.
@@ -1400,6 +1393,13 @@ export interface ArrayItemConfig {
   headerVisibility?: ArrayItemHeaderVisibility
   collapsible?: boolean
   collapseKey?: string
+  /**
+   * When true, items default collapsed even as the sole row, and append skips session
+   * expand keys. Use for entity-card relationship rows that should stay summarized.
+   *
+   * @default false
+   */
+  defaultCollapsed?: boolean
   /** @default dragHandle */
   reorder?: ArrayItemReorder
   /** @default true */
@@ -1608,7 +1608,6 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   joinedPair: undefined,
   levelRange: undefined,
   rollValue: undefined,
-  relationship: [],
 }
 
 function assignInlineSentenceJoinedPairDefaults(

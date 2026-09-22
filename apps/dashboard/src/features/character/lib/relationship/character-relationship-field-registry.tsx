@@ -45,6 +45,36 @@ export function CharacterRelationshipFormProvider({
   const context = useCharacterBuilderRelationshipFieldContext(buildContext)
 
   return (
+    <CharacterRelationshipFieldProvider context={context}>
+      {children}
+    </CharacterRelationshipFieldProvider>
+  )
+}
+
+export type CharacterApiRelationshipFormProviderProps = {
+  context: CharacterRelationshipFieldContext
+  children: ReactNode
+}
+
+export function CharacterApiRelationshipFormProvider({
+  context,
+  children,
+}: CharacterApiRelationshipFormProviderProps) {
+  return (
+    <CharacterRelationshipFieldProvider context={context}>
+      {children}
+    </CharacterRelationshipFieldProvider>
+  )
+}
+
+function CharacterRelationshipFieldProvider({
+  context,
+  children,
+}: {
+  context: CharacterRelationshipFieldContext
+  children: ReactNode
+}) {
+  return (
     <RelationshipFieldProvider context={context} registry={CHARACTER_RELATIONSHIP_FIELD_REGISTRY}>
       {children}
     </RelationshipFieldProvider>
@@ -116,6 +146,7 @@ export type CharacterApiRelationshipFieldContextInput = {
   availableResidenceIdSet: Set<string>
   onEditMembership?: (membership: OrganizationReferenceResolution) => void
   onRemoveUnresolvedMembership?: (membership: OrganizationReferenceResolution) => void
+  resolvedMemberships?: readonly OrganizationReferenceResolution[]
 }
 
 export function buildCharacterApiRelationshipFieldContext(
@@ -133,6 +164,7 @@ export function buildCharacterApiRelationshipFieldContext(
     locationsQueryStatus: input.locationsQueryStatus,
     onEditMembership: input.onEditMembership,
     onRemoveUnresolvedMembership: input.onRemoveUnresolvedMembership,
+    resolvedMemberships: input.resolvedMemberships,
   }
 }
 

@@ -3,13 +3,13 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { z } from 'zod'
 
-import { Form } from '../../shells/form.client'
+import { Form } from './form.client'
 import {
   RelationshipFieldProvider,
   type RelationshipFieldAdapter,
   type RelationshipFieldRegistry,
-} from '../../context/relationship-field.context'
-import type { FormItem } from '../../field-config'
+} from '../context/relationship-field.context'
+import type { FormItem } from '../field-config'
 
 const TEST_VOCABULARY = 'test_relationship'
 
@@ -17,21 +17,6 @@ type TestEdge = { id: string; label: string }
 type TestSelection = { label: string }
 
 const testAdapter: RelationshipFieldAdapter<TestEdge, TestSelection, { nextId: number }> = {
-  getItemKey: (edge) => edge.id,
-  listAriaLabel: 'Test relationships',
-  projectRow: (edge, _context, actions) => ({
-    key: edge.id,
-    content: (
-      <div>
-        <span>{edge.label}</span>
-        {actions.onRemove ? (
-          <button type="button" onClick={actions.onRemove}>
-            Remove {edge.label}
-          </button>
-        ) : null}
-      </div>
-    ),
-  }),
   renderPicker: ({ open, onOpenChange, onAdd }) =>
     open ? (
       <div>
@@ -57,27 +42,55 @@ const schema = z.object({
   links: z.array(z.object({ id: z.string(), label: z.string() })),
 })
 
-const fields: FormItem[] = [
-  {
-    type: 'relationship',
-    name: 'links',
-    label: 'Links',
-    vocabulary: TEST_VOCABULARY,
-    emptyLabel: 'No links yet.',
-    addActionLabel: 'Add link',
+const relationshipArrayField = (cardinality: 'one' | 'many' | undefined): FormItem => ({
+  kind: 'array',
+  name: 'links',
+  legend: 'Links',
+  fields: [],
+  addAction: {
+    label: 'Add link',
+    relationship: { vocabulary: TEST_VOCABULARY, ...(cardinality ? { cardinality } : {}) },
   },
-]
+  item: {
+    header: {
+      fallback: (index) => `Link ${index + 1}`,
+      primary: (values) => (typeof values.label === 'string' ? values.label : undefined),
+    },
+  },
+})
 
-describe('Form relationship field', () => {
-  it('renders empty state and appends an edge from the vocabulary picker', async () => {
+describe('Form relationship array addAction', () => {
+  it('opens the adapter picker and appends an edge', async () => {
     const user = userEvent.setup()
 
     render(
       <RelationshipFieldProvider context={{ nextId: 1 }} registry={registry}>
         <Form
           schema={schema}
-          fields={fields}
-          defaultValues={{ links: [{ id: 'edge-0', label: 'Alpha' }] }}
+          fields={[relationshipArrayField(undefined)]}
+          defaultValues={{ links: [] }}
+          onSubmit={() => undefined}
+        />
+      </RelationshipFieldProvider>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add link' }))
+    await user.click(screen.getByRole('button', { name: 'Pick Gamma' }))
+
+    expect(screen.getByText('Gamma')).toBeInTheDocument()
+  })
+
+  it('replaces the array when cardinality is one', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <RelationshipFieldProvider context={{ nextId: 2 }} registry={registry}>
+        <Form
+          schema={schema}
+          fields={[relationshipArrayField('one')]}
+          defaultValues={{
+            links: [{ id: 'edge-1', label: 'Alpha' }],
+          }}
           onSubmit={() => undefined}
         />
       </RelationshipFieldProvider>,
@@ -88,29 +101,6 @@ describe('Form relationship field', () => {
     await user.click(screen.getByRole('button', { name: 'Pick Gamma' }))
 
     expect(screen.getByText('Gamma')).toBeInTheDocument()
-  })
-
-  it('removes an edge from the list', async () => {
-    const user = userEvent.setup()
-
-    render(
-      <RelationshipFieldProvider context={{ nextId: 2 }} registry={registry}>
-        <Form
-          schema={schema}
-          fields={fields}
-          defaultValues={{
-            links: [
-              { id: 'edge-1', label: 'Alpha' },
-              { id: 'edge-2', label: 'Beta' },
-            ],
-          }}
-          onSubmit={() => undefined}
-        />
-      </RelationshipFieldProvider>,
-    )
-
-    await user.click(screen.getByRole('button', { name: 'Remove Beta' }))
-    expect(screen.queryByText('Beta')).not.toBeInTheDocument()
-    expect(screen.getByText('Alpha')).toBeInTheDocument()
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument()
   })
 })

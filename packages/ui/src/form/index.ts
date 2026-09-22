@@ -265,6 +265,7 @@ export {
   type DependentConfig,
   type DependentDependentsConfig,
   type ArrayAddActionConfig,
+  type ArrayRelationshipAddAction,
   type ArrayItemConfig,
   type ArrayItemHeaderVisibility,
   type ArrayFilterSelectConfig,
@@ -418,6 +419,16 @@ export {
   type ArrayFieldMutators,
 } from './context/array-field-mutators.registry'
 export {
+  collectRelationshipArrayBindings,
+  type RelationshipArrayBinding,
+} from './config/array/collect-relationship-array-bindings'
+export {
+  RelationshipArrayControllerProvider,
+  useRelationshipArrayController,
+  type RelationshipArrayController,
+  type RelationshipArrayControllerProviderProps,
+} from './context/relationship-array-controller.context'
+export {
   ArrayAddActionInterceptProvider,
   useArrayAddActionIntercept,
   type ArrayAddActionInterceptHandler,
@@ -462,8 +473,6 @@ export {
   type RelationshipFieldPickerProps,
   type RelationshipFieldProviderProps,
   type RelationshipFieldRegistry,
-  type RelationshipFieldRowActions,
-  type RelationshipFieldRowContent,
 } from './context/relationship-field.context'
 export {
   ArrayLikeSectionHeader,

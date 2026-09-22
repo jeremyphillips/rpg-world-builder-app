@@ -1,5 +1,8 @@
+import { createElement } from 'react'
+
 import type { FormItem } from '@rpg/ui/form'
 
+import { CharacterRelationshipApiTrailingControl } from '../../components/relationship/character-relationship-api-trailing-control'
 import type { CharacterRelationshipFieldContext } from './character-relationship-field-context.types'
 import { createCharacterRelationshipArrayItemShell } from './character-relationship-array-item-shell.lib'
 import {
@@ -25,16 +28,25 @@ const RELATIONSHIP_ADAPTERS = {
   [CHARACTER_RESIDENCE_VOCABULARY]: characterResidenceRelationshipAdapter,
 }
 
-function buildCharacterRelationshipArrayField(
-  vocabulary: CharacterRelationshipVocabulary,
-  context: CharacterRelationshipFieldContext,
-): FormItem {
+export type BuildRelationshipArrayFieldInput = {
+  vocabulary: CharacterRelationshipVocabulary
+  context: CharacterRelationshipFieldContext
+  disabled?: boolean
+}
+
+export function buildRelationshipArrayField({
+  vocabulary,
+  context,
+  disabled = false,
+}: BuildRelationshipArrayFieldInput): FormItem {
   const config = CHARACTER_RELATIONSHIP_VOCABULARY_CONFIG[vocabulary]
   const adapter = RELATIONSHIP_ADAPTERS[vocabulary]
   const resolvePresentation =
     vocabulary === CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY
       ? resolveOrganizationMembershipPresentationFromValues
       : resolveResidencePresentationFromValues
+  const cardinality =
+    vocabulary === CHARACTER_RESIDENCE_VOCABULARY ? ('one' as const) : ('many' as const)
 
   const residenceStatusCopy =
     vocabulary === CHARACTER_RESIDENCE_VOCABULARY
@@ -50,9 +62,12 @@ function buildCharacterRelationshipArrayField(
     addAction: {
       label: config.addActionLabel,
       layout: 'inline',
-      intercept: vocabulary,
+      relationship: { vocabulary, cardinality },
     },
     resolveCanAppend: (items) => {
+      if (disabled) {
+        return { enabled: false }
+      }
       if (vocabulary === CHARACTER_RESIDENCE_VOCABULARY) {
         return resolveResidenceCanAppend(items as never, context)
       }
@@ -66,6 +81,22 @@ function buildCharacterRelationshipArrayField(
     },
     item: {
       collapsible: true,
+      defaultCollapsed: true,
+      reorder: false,
+      removable:
+        context.mode === 'api'
+          ? vocabulary === CHARACTER_RESIDENCE_VOCABULARY && !disabled
+          : undefined,
+      ...(context.mode === 'api' &&
+      vocabulary === CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY &&
+      !disabled
+        ? {
+            removeSlot: {
+              name: '_characterRelationshipApiTrailing',
+              render: () => createElement(CharacterRelationshipApiTrailingControl, { vocabulary }),
+            },
+          }
+        : {}),
       header: {
         fallback: (index) => `${config.emptyItemLabel} ${index + 1}`,
         primary: (values) => {
@@ -78,16 +109,4 @@ function buildCharacterRelationshipArrayField(
     },
     fields: [],
   }
-}
-
-export function buildCharacterOrganizationMembershipArrayField(
-  context: CharacterRelationshipFieldContext,
-): FormItem {
-  return buildCharacterRelationshipArrayField(CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY, context)
-}
-
-export function buildCharacterResidenceArrayField(
-  context: CharacterRelationshipFieldContext,
-): FormItem {
-  return buildCharacterRelationshipArrayField(CHARACTER_RESIDENCE_VOCABULARY, context)
 }
