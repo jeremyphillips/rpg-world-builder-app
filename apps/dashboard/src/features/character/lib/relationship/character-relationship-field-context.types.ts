@@ -8,6 +8,8 @@ import type {
   OrganizationReferenceResolution,
 } from '@rpg/contracts'
 
+import type { CharacterLocationsQueryStatus } from './character-locations-query-status.lib'
+
 export type CharacterRelationshipFieldMode = 'draft' | 'api'
 
 export type CharacterRelationshipFieldContext = {
@@ -20,6 +22,7 @@ export type CharacterRelationshipFieldContext = {
   availableResidenceIdSet: Set<string>
   availableOrganizations: readonly Organization[]
   eligibleResidenceLocations: readonly Location[]
+  locationsQueryStatus: CharacterLocationsQueryStatus
   onEditMembership?: (membership: OrganizationReferenceResolution) => void
   onRemoveUnresolvedMembership?: (membership: OrganizationReferenceResolution) => void
 }

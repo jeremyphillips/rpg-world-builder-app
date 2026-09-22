@@ -17,6 +17,7 @@ import {
 import { useLocations } from '@/features/content'
 
 import { filterResidenceEligibleLocations } from '../connections/residence-location-connection.lib'
+import { resolveCharacterLocationsQueryStatus } from './character-locations-query-status.lib'
 import { characterOrganizationMembershipRelationshipAdapter } from './character-organization-membership-relationship.adapter'
 import { characterResidenceRelationshipAdapter } from './character-residence-relationship.adapter'
 import type { CharacterRelationshipFieldContext } from './character-relationship-field-context.types'
@@ -64,7 +65,17 @@ export function useCharacterBuilderRelationshipFieldContext(
     const organizationsById = new Map(
       buildContext.catalog.organizations.map((organization) => [organization.id, organization]),
     )
-    const eligibleResidenceLocations = filterResidenceEligibleLocations(locationsQuery.data ?? [])
+    const locationsQueryStatus = resolveCharacterLocationsQueryStatus({
+      campaignId,
+      isPending: locationsQuery.isPending,
+      isError: locationsQuery.isError,
+      error: locationsQuery.error,
+      hasData: locationsQuery.data !== undefined,
+    })
+    const eligibleResidenceLocations =
+      locationsQueryStatus.status === 'success'
+        ? filterResidenceEligibleLocations(locationsQuery.data ?? [])
+        : []
     const locationsById = new Map(
       eligibleResidenceLocations.map((location) => [location.id, location]),
     )
@@ -81,14 +92,24 @@ export function useCharacterBuilderRelationshipFieldContext(
       availableResidenceIdSet,
       availableOrganizations,
       eligibleResidenceLocations,
+      locationsQueryStatus,
     }
-  }, [availableOrganizations, buildContext, campaignId, locationsQuery.data])
+  }, [
+    availableOrganizations,
+    buildContext,
+    campaignId,
+    locationsQuery.data,
+    locationsQuery.error,
+    locationsQuery.isError,
+    locationsQuery.isPending,
+  ])
 }
 
 export type CharacterApiRelationshipFieldContextInput = {
   campaignId: string
   availableOrganizations: readonly Organization[]
   eligibleResidenceLocations: readonly Location[]
+  locationsQueryStatus: CharacterRelationshipFieldContext['locationsQueryStatus']
   organizationsById: Map<string, Organization>
   locationsById: Map<string, Location>
   availableOrganizationIdSet: Set<string>
@@ -109,6 +130,7 @@ export function buildCharacterApiRelationshipFieldContext(
     availableResidenceIdSet: input.availableResidenceIdSet,
     availableOrganizations: input.availableOrganizations,
     eligibleResidenceLocations: input.eligibleResidenceLocations,
+    locationsQueryStatus: input.locationsQueryStatus,
     onEditMembership: input.onEditMembership,
     onRemoveUnresolvedMembership: input.onRemoveUnresolvedMembership,
   }

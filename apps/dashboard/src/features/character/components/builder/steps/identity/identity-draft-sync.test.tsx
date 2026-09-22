@@ -7,6 +7,19 @@ import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import { IdentityStep } from './identity-step'
 import { identityStepTestContext } from './identity-step.fixtures'
 
+vi.mock('@/features/content', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/content')>()
+  return {
+    ...actual,
+    useLocations: () => ({
+      data: [],
+      isPending: false,
+      isError: false,
+      error: null,
+    }),
+  }
+})
+
 describe('IdentityDraftSync', () => {
   it('seeds the form from an externally restored draft without clobbering the store', async () => {
     const onDraftChange = vi.fn()

@@ -50,12 +50,13 @@ export function CharacterResidenceContainer({
       campaignId,
       availableOrganizations: [],
       eligibleResidenceLocations,
+      locationsQueryStatus: sheet.locationsQueryStatus,
       organizationsById: new Map(),
       locationsById,
       availableOrganizationIdSet: new Set(),
       availableResidenceIdSet: new Set(eligibleResidenceLocations.map(({ id }) => id)),
     })
-  }, [campaignId, sheet.pickerItems])
+  }, [campaignId, sheet.locationsQueryStatus, sheet.pickerItems])
 
   if (sheet.isBootstrapping) return null
 

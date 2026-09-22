@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
-export const NARRATIVE_THEME_TERM = { label: 'Narrative theme' }
+export const NARRATIVE_THEME_TERM = {
+  label: 'Narrative theme',
+  description: 'Authoring theme that groups narrative fragments.',
+}
 export const NARRATIVE_THEME_ENTRIES = {
   duty: { label: 'Duty' },
   belonging: { label: 'Belonging' },
@@ -9,7 +12,10 @@ export const NARRATIVE_THEME_ENTRIES = {
 export const narrativeThemeSchema = z.enum(['duty', 'belonging', 'ambition'])
 export const NARRATIVE_THEMES = narrativeThemeSchema.options
 
-export const NARRATIVE_SLOT_TERM = { label: 'Narrative slot' }
+export const NARRATIVE_SLOT_TERM = {
+  label: 'Narrative slot',
+  description: 'Output slot a narrative fragment fills.',
+}
 export const NARRATIVE_SLOT_ENTRIES = {
   personalityTraits: { label: 'Personality trait' },
   ideals: { label: 'Ideal' },
@@ -32,7 +38,10 @@ export const NARRATIVE_SLOTS = narrativeSlotSchema.options
 export const NARRATIVE_ARRAY_FIELDS = ['personalityTraits', 'ideals', 'bonds', 'flaws'] as const
 export const NARRATIVE_STORY_SLOTS = ['experience', 'choice', 'motivation'] as const
 
-export const NARRATIVE_TOKEN_TERM = { label: 'Narrative token' }
+export const NARRATIVE_TOKEN_TERM = {
+  label: 'Narrative token',
+  description: 'Interpolated character or connection token in narrative prose.',
+}
 export const NARRATIVE_TOKEN_ENTRIES = {
   'organization.name': { label: 'Organization name' },
   'organization.title': { label: 'Membership title' },

@@ -5,7 +5,7 @@ import { useRelationshipFieldContext } from '@rpg/ui/form'
 
 import type { CharacterRelationshipFieldContext } from './character-relationship-field-context.types'
 
-import { EntityDisclosureArrayItemShell } from '@/features/content/lib/entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell'
+import { EntityDisclosureArrayItemShell } from '@/features/content'
 
 import {
   resolveOrganizationMembershipPresentationFromValues,

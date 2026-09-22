@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   createCampaignNpcBuilderContextFixture,
@@ -29,17 +29,26 @@ const campaignContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
+const locationsQueryState = vi.hoisted(() => ({
+  data: undefined as (typeof harborfordSettlement)[] | undefined,
+  isPending: false,
+  isError: false,
+  error: null as Error | null,
+}))
+
 vi.mock('@/features/content/locations', () => ({
-  useLocations: () => ({
-    data: [harborfordSettlement],
-    isPending: false,
-    isError: false,
-    error: null,
-  }),
+  useLocations: () => locationsQueryState,
   locationsQueryKey: (campaignId: string) => ['locations', campaignId],
 }))
 
 describe('ConnectionsStep', () => {
+  beforeEach(() => {
+    locationsQueryState.data = [harborfordSettlement]
+    locationsQueryState.isPending = false
+    locationsQueryState.isError = false
+    locationsQueryState.error = null
+  })
+
   it('adds titled memberships and removes them from the summary', async () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
@@ -140,6 +149,42 @@ describe('ConnectionsStep', () => {
     await expectNoAxeViolations(container)
   })
 
+  it('disables residence add while locations are loading in campaign context', () => {
+    locationsQueryState.data = undefined
+    locationsQueryState.isPending = true
+
+    render(
+      <ConnectionsStep
+        context={campaignContext}
+        draft={createEmptyCharacterBuilderDraft()}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getAllByText('Loading residence locations…').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Add residence' })).toBeDisabled()
+  })
+
+  it('disables residence add when the locations query fails in campaign context', () => {
+    locationsQueryState.data = undefined
+    locationsQueryState.isPending = false
+    locationsQueryState.isError = true
+    locationsQueryState.error = new Error('Could not load locations.')
+
+    render(
+      <ConnectionsStep
+        context={campaignContext}
+        draft={createEmptyCharacterBuilderDraft()}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getAllByText('Could not load locations.').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Add residence' })).toBeDisabled()
+  })
+
   it('renders the optional empty selection state', () => {
     render(
       <ConnectionsStep
@@ -151,7 +196,9 @@ describe('ConnectionsStep', () => {
     )
 
     expect(screen.getByText('No organization added.')).toBeInTheDocument()
-    expect(screen.getByText('Choose a campaign to link a residence location.')).toBeInTheDocument()
+    expect(
+      screen.getAllByText('Choose a campaign to link a residence location.').length,
+    ).toBeGreaterThan(0)
     expect(screen.getByRole('button', { name: 'Add organization' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add residence' })).toBeDisabled()
   })

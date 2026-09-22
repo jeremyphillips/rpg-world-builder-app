@@ -1,19 +1,17 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import {
-  generateCharacterNarrative,
-  buildNarrativeContext,
-} from '@rpg/character-narrative-integrations'
+import { resolveCampaignIdFromContext } from '@rpg/contracts'
 import type { CharacterBuildContext, CharacterBuilderDraft } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
+import { useLocations } from '@/features/content'
+
 import type { IdentityFormValues } from '../../../../lib/steps/identity-form-fields'
 import {
-  applyGeneratedNarrativeToForm,
-  buildDraftFromIdentityValues,
   canGenerateNarrative,
-  listCampaignLocations,
+  NARRATIVE_ALL_FIELDS_FILLED_MESSAGE,
+  runNarrativeGeneration,
 } from './identity-narrative-generate-action.lib'
 
 export function IdentityNarrativeGenerateAction({
@@ -25,44 +23,49 @@ export function IdentityNarrativeGenerateAction({
 }) {
   const form = useFormContext<IdentityFormValues>()
   const values = useWatch({ control: form.control })
+  const campaignId = resolveCampaignIdFromContext(context)
+  const locationsQuery = useLocations(campaignId)
   const [pending, setPending] = useState(false)
   const [message, setMessage] = useState<string>()
+  const [messageTone, setMessageTone] = useState<'destructive' | 'muted'>('destructive')
 
   const canGenerate = useMemo(() => canGenerateNarrative(values.narrative), [values.narrative])
+  const allFieldsFilled = !canGenerate
+  const isLocationsPending =
+    Boolean(campaignId) && locationsQuery.isPending && locationsQuery.data === undefined
 
   const handleGenerate = useCallback(async () => {
-    if (pending || !canGenerate) return
+    if (pending || !canGenerate || isLocationsPending) return
     setPending(true)
     setMessage(undefined)
-    const snapshot = JSON.stringify(form.getValues())
-    try {
-      const locations = await listCampaignLocations(context)
-      const currentValues = form.getValues()
-      const currentDraft = buildDraftFromIdentityValues(draft, currentValues)
-      const generationContext = buildNarrativeContext({
-        draft: currentDraft,
-        context,
-        locations,
-      })
-      const result = await generateCharacterNarrative(
-        generationContext,
-        Math.floor(Math.random() * 2 ** 31),
-      )
-      if (JSON.stringify(form.getValues()) !== snapshot) {
-        setMessage('Character details changed while generating. Try again.')
-        return
-      }
-      if (!result.ok) {
-        setMessage(result.reason)
-        return
-      }
-      applyGeneratedNarrativeToForm(form, result.narrative)
-    } catch {
-      setMessage('Narrative generation could not load the available campaign context. Try again.')
-    } finally {
-      setPending(false)
+    const feedback = await runNarrativeGeneration({
+      form,
+      draft,
+      context,
+      campaignId,
+      locations: campaignId ? (locationsQuery.data ?? []) : [],
+      locationsQueryError: locationsQuery.error,
+      locationsQueryIsError: locationsQuery.isError,
+    })
+    if (feedback) {
+      setMessageTone(feedback.tone)
+      setMessage(feedback.message)
     }
-  }, [canGenerate, context, draft, form, pending])
+    setPending(false)
+  }, [
+    campaignId,
+    canGenerate,
+    context,
+    draft,
+    form,
+    isLocationsPending,
+    locationsQuery.data,
+    locationsQuery.error,
+    locationsQuery.isError,
+    pending,
+  ])
+
+  const statusMessage = allFieldsFilled ? NARRATIVE_ALL_FIELDS_FILLED_MESSAGE : message
 
   return (
     <div className="flex items-center justify-between gap-3">
@@ -73,9 +76,13 @@ export function IdentityNarrativeGenerateAction({
         <Text variant="muted" className="text-sm">
           Create aligned traits, ideals, bonds, flaws, and a first-person backstory.
         </Text>
-        {message ? (
-          <Text variant="destructive" className="text-sm">
-            {message}
+        {statusMessage ? (
+          <Text
+            variant={allFieldsFilled ? 'muted' : messageTone}
+            className="text-sm"
+            aria-live="polite"
+          >
+            {statusMessage}
           </Text>
         ) : null}
       </div>
@@ -83,7 +90,7 @@ export function IdentityNarrativeGenerateAction({
         type="button"
         variant="secondary"
         onClick={handleGenerate}
-        disabled={!canGenerate || pending}
+        disabled={!canGenerate || pending || isLocationsPending}
       >
         {pending ? 'Generating…' : 'Generate background'}
       </Button>

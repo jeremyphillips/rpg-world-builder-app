@@ -1,6 +1,7 @@
 # Character narrative generator — v1 architecture
 
-Status: product decisions agreed; implementation pending.
+Status: implemented for v1 (Identity generate action, foundation collection, and
+dashboard wiring). Form `type: 'relationship'` follow-up remains out of v1 scope.
 
 ## Goal and agreed behavior
 

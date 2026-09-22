@@ -129,14 +129,8 @@ export function CharacterRelationshipArrayAddInterceptProvider({
 
 /** Mount inside the connections `<Form>` so picker bridges can access RHF context. */
 export function CharacterRelationshipPickerBridges() {
-  const { context } = useRelationshipFieldContext()
-  const relationshipContext = context as CharacterRelationshipFieldContext
-  const residenceSupplementary =
-    characterResidenceRelationshipAdapter.supplementary?.(relationshipContext)
-
   return (
     <>
-      {residenceSupplementary}
       <CharacterRelationshipPickerBridge
         vocabulary={CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY}
       />

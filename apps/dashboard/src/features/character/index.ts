@@ -47,7 +47,6 @@ export { CharacterDetailContent } from './components/detail/character-detail-con
 export { CharacterOrganizationsSummary } from './components/detail/memberships/character-organizations-summary'
 export { CharacterOrganizationMembershipsContainer } from './components/detail/memberships/character-organization-memberships-container'
 export { CharacterIdentityConnectionsSupplement } from './components/detail/memberships/character-identity-connections-supplement'
-export { CharacterResidenceSummary } from './components/detail/residence/character-residence-summary'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
 export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action'
 export { NpcAuthoringGate } from './npc/components/npc-authoring-gate'

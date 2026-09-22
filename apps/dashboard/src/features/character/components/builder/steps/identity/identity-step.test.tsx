@@ -15,6 +15,19 @@ import { identityStepTestContext } from './identity-step.fixtures'
 
 const generateCharacterSpeciesNameMock = vi.hoisted(() => vi.fn())
 
+vi.mock('@/features/content', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/content')>()
+  return {
+    ...actual,
+    useLocations: () => ({
+      data: [],
+      isPending: false,
+      isError: false,
+      error: null,
+    }),
+  }
+})
+
 vi.mock('../../../../lib/naming/character-species-name-generation.lib', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return {

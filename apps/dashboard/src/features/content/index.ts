@@ -42,6 +42,11 @@ export {
   DisclosureEntityCard,
   type DisclosureEntityCardProps,
 } from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card'
+export {
+  EntityDisclosureArrayItemShell,
+  type EntityDisclosureArrayItemShellProps,
+} from './lib/entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell'
+export { projectArrayItemEntitySummary } from './lib/entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
 export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
 export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
 export { EntitySummary } from './lib/entity/summary/entity-summary'
@@ -146,7 +151,6 @@ export {
   useOrganizationMembers,
 } from './organizations'
 export { useLocations, locationsQueryKey } from './locations'
-export { listLocations } from './locations/api/locations-api'
 export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'
 export { SpellCreate } from './spells/routes/spell-create'
 export { SpellEdit } from './spells/routes/spell-edit'

@@ -14,6 +14,7 @@ import {
   filterResidenceEligibleLocations,
   RESIDENCE_CONNECTION_KIND,
 } from '../lib/connections/residence-location-connection.lib'
+import { resolveCharacterLocationsQueryStatus } from '../lib/relationship/character-locations-query-status.lib'
 import type { CharacterOrganizationMembershipSubjectKind } from '../lib/invalidate-character-organization-membership-queries'
 import { useCharacterLocationReferences } from './use-character-location-references'
 import { useCharacterResidenceMutations } from './use-character-residence-mutations'
@@ -52,10 +53,29 @@ export function useCharacterResidenceSheet(input: {
 
   const locationReferences = React.useMemo(() => referencesQuery.data ?? [], [referencesQuery.data])
 
-  const pickerItems = React.useMemo(
-    () => toPickerItems(locationsQuery.data ?? [], locationReferences),
-    [locationReferences, locationsQuery.data],
+  const locationsQueryStatus = React.useMemo(
+    () =>
+      resolveCharacterLocationsQueryStatus({
+        campaignId: canEdit ? campaignId : undefined,
+        isPending: locationsQuery.isPending,
+        isError: locationsQuery.isError,
+        error: locationsQuery.error,
+        hasData: locationsQuery.data !== undefined,
+      }),
+    [
+      campaignId,
+      canEdit,
+      locationsQuery.data,
+      locationsQuery.error,
+      locationsQuery.isError,
+      locationsQuery.isPending,
+    ],
   )
+
+  const pickerItems = React.useMemo(() => {
+    if (locationsQueryStatus.status !== 'success') return []
+    return toPickerItems(locationsQuery.data ?? [], locationReferences)
+  }, [locationReferences, locationsQuery.data, locationsQueryStatus.status])
 
   const handleAdd = React.useCallback(
     async (selection: ResidenceLocationSelection) => {
@@ -75,8 +95,8 @@ export function useCharacterResidenceSheet(input: {
     async (connectionId: string, locationId: string) => {
       try {
         await mutations.removeResidence(connectionId, locationId)
-      } catch {
-        // Keep row visible for retry.
+      } catch (error) {
+        rethrowCanonicalized(error, 'Could not remove this residence.')
       }
     },
     [mutations],
@@ -90,6 +110,7 @@ export function useCharacterResidenceSheet(input: {
     pickerOpen,
     setPickerOpen,
     pickerItems,
+    locationsQueryStatus,
     handleAdd,
     handleRemove,
   }

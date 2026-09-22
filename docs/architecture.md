@@ -21,6 +21,9 @@ packages/
   catalog/     # system SRD seed JSON + validated loaders (shared catalog data)
   name-generator-core/  # pure name generation and convention recommendation
   name-generator-data/  # naming conventions manifest + lazy collection loaders
+  character-narrative-core/  # pure character narrative composition
+  character-narrative-data/  # narrative fragment collections + lazy loaders
+  character-narrative-integrations/  # dashboard-facing narrative generation wiring
   ui/          # shadcn primitives, Tailwind v4 preset, design tokens
                # Storybook (:6006) for primitives, forms, recipes
 tools/
@@ -29,21 +32,24 @@ tools/
 docs/          # this folder — cross-cutting architecture/env/run guides
 ```
 
-| Workspace                  | README                                                                              |
-| -------------------------- | ----------------------------------------------------------------------------------- |
-| `@rpg/public`              | [apps/public/README.md](../apps/public/README.md)                                   |
-| `@rpg/dashboard`           | [apps/dashboard/README.md](../apps/dashboard/README.md)                             |
-| `@rpg/bench`               | [apps/bench/README.md](../apps/bench/README.md)                                     |
-| `@rpg/api`                 | [apps/api/README.md](../apps/api/README.md)                                         |
-| `@rpg/config`              | [packages/config/README.md](../packages/config/README.md)                           |
-| `@rpg/contracts`           | [packages/contracts/README.md](../packages/contracts/README.md)                     |
-| `@rpg/dev-bench-core`      | [packages/dev-bench-core/src/index.ts](../packages/dev-bench-core/src/index.ts)     |
-| `@rpg/bench-cli`           | [tools/bench/README.md](../tools/bench/README.md)                                   |
-| `@rpg/api-client`          | [packages/api-client/README.md](../packages/api-client/README.md)                   |
-| `@rpg/catalog`             | [packages/catalog/README.md](../packages/catalog/README.md)                         |
-| `@rpg/name-generator-core` | [packages/name-generator-core/README.md](../packages/name-generator-core/README.md) |
-| `@rpg/name-generator-data` | [packages/name-generator-data/README.md](../packages/name-generator-data/README.md) |
-| `@rpg/ui`                  | [packages/ui/README.md](../packages/ui/README.md)                                   |
+| Workspace                               | README                                                                                                        |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `@rpg/public`                           | [apps/public/README.md](../apps/public/README.md)                                                             |
+| `@rpg/dashboard`                        | [apps/dashboard/README.md](../apps/dashboard/README.md)                                                       |
+| `@rpg/bench`                            | [apps/bench/README.md](../apps/bench/README.md)                                                               |
+| `@rpg/api`                              | [apps/api/README.md](../apps/api/README.md)                                                                   |
+| `@rpg/config`                           | [packages/config/README.md](../packages/config/README.md)                                                     |
+| `@rpg/contracts`                        | [packages/contracts/README.md](../packages/contracts/README.md)                                               |
+| `@rpg/dev-bench-core`                   | [packages/dev-bench-core/src/index.ts](../packages/dev-bench-core/src/index.ts)                               |
+| `@rpg/bench-cli`                        | [tools/bench/README.md](../tools/bench/README.md)                                                             |
+| `@rpg/api-client`                       | [packages/api-client/README.md](../packages/api-client/README.md)                                             |
+| `@rpg/catalog`                          | [packages/catalog/README.md](../packages/catalog/README.md)                                                   |
+| `@rpg/name-generator-core`              | [packages/name-generator-core/README.md](../packages/name-generator-core/README.md)                           |
+| `@rpg/name-generator-data`              | [packages/name-generator-data/README.md](../packages/name-generator-data/README.md)                           |
+| `@rpg/character-narrative-core`         | [packages/character-narrative-core/README.md](../packages/character-narrative-core/README.md)                 |
+| `@rpg/character-narrative-data`         | [packages/character-narrative-data/README.md](../packages/character-narrative-data/README.md)                 |
+| `@rpg/character-narrative-integrations` | [packages/character-narrative-integrations/README.md](../packages/character-narrative-integrations/README.md) |
+| `@rpg/ui`                               | [packages/ui/README.md](../packages/ui/README.md)                                                             |
 
 ## Single-origin topology
 
@@ -169,6 +175,11 @@ Package layout → [apps/api/src/realtime/README.md](../apps/api/src/realtime/RE
   experimental name generator foundation (pure generation + lazy fixture data).
   Contracts live on the isolated `@rpg/contracts/name-generator` subpath — not
   the root contracts barrel.
+- **`@rpg/character-narrative-core`**, **`@rpg/character-narrative-data`**, and
+  **`@rpg/character-narrative-integrations`** provide the character narrative
+  generator (pure composition + lazy authored fragments + dashboard wiring).
+  Contracts live on the isolated `@rpg/contracts/character-narrative` subpath —
+  not the root contracts barrel.
 - **`@rpg/api-client`** provides same-origin `fetch` wrappers (CSRF header,
   `ApiError`, `fetchSession`, `logout`) shared by the public and dashboard apps.
   No React dependency — apps wire it through TanStack Query hooks locally.

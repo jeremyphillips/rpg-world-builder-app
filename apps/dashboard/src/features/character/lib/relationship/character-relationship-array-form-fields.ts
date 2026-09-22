@@ -14,6 +14,10 @@ import {
 } from './character-relationship-presentation.lib'
 import { characterOrganizationMembershipRelationshipAdapter } from './character-organization-membership-relationship.adapter'
 import { characterResidenceRelationshipAdapter } from './character-residence-relationship.adapter'
+import {
+  resolveResidenceCanAppend,
+  resolveResidenceSectionStatusCopy,
+} from './character-residence-can-append.lib'
 
 const RELATIONSHIP_ADAPTERS = {
   [CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY]:
@@ -32,16 +36,26 @@ function buildCharacterRelationshipArrayField(
       ? resolveOrganizationMembershipPresentationFromValues
       : resolveResidencePresentationFromValues
 
+  const residenceStatusCopy =
+    vocabulary === CHARACTER_RESIDENCE_VOCABULARY
+      ? resolveResidenceSectionStatusCopy(context)
+      : undefined
+
   return {
     kind: 'array',
     name: config.fieldName,
-    heading: config.heading,
+    heading: residenceStatusCopy
+      ? { ...config.heading, hint: residenceStatusCopy }
+      : config.heading,
     addAction: {
       label: config.addActionLabel,
       layout: 'inline',
       intercept: vocabulary,
     },
     resolveCanAppend: (items) => {
+      if (vocabulary === CHARACTER_RESIDENCE_VOCABULARY) {
+        return resolveResidenceCanAppend(items as never, context)
+      }
       const canAdd = adapter.canAdd?.(items as never, context) ?? true
       if (typeof canAdd === 'boolean') {
         return canAdd

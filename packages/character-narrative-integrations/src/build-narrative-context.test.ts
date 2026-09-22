@@ -1,0 +1,169 @@
+import {
+  createEmptyCharacterBuilderDraft,
+  DEFAULT_ABILITY_GENERATION_RULES,
+  defaultCampaignMechanicsPatch,
+  resolveCharacterCreationPatch,
+  type CampaignNpcBuildContext,
+  type Location,
+  type Organization,
+} from '@rpg/contracts'
+import { describe, expect, it } from 'vitest'
+
+import { buildNarrativeContext } from './build-narrative-context'
+
+const TEST_CAMPAIGN_ID = 'camp_1'
+const TEST_RULESET_ID = 'srd-cc-5.2.1'
+
+const lanternGuild = {
+  id: 'organization-lantern-guild',
+  slug: 'lantern-guild',
+  rulesetId: TEST_RULESET_ID,
+  source: 'homebrew',
+  status: 'published',
+  campaignId: TEST_CAMPAIGN_ID,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Lantern Guild',
+  description: '<p>Guides and cartographers.</p>',
+  organizationDomain: 'occupational',
+  functions: [],
+  practices: [],
+  members: {
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+    titles: [],
+  },
+  connections: { locations: [] },
+} satisfies Organization
+
+const harborfordSettlement = {
+  id: 'location-harborford',
+  slug: 'harborford',
+  rulesetId: TEST_RULESET_ID,
+  source: 'homebrew',
+  status: 'published',
+  campaignId: TEST_CAMPAIGN_ID,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Harborford',
+  kind: 'settlement',
+  settlementType: 'city',
+} satisfies Location
+
+const greyshoreRegion = {
+  id: 'location-greyshore',
+  slug: 'greyshore',
+  rulesetId: TEST_RULESET_ID,
+  source: 'homebrew',
+  status: 'published',
+  campaignId: TEST_CAMPAIGN_ID,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Greyshore',
+  kind: 'region',
+  classification: { kind: 'geographic', type: 'coast' },
+} satisfies Location
+
+function createCampaignNpcContext(
+  organizations: Organization[] = [lanternGuild],
+): CampaignNpcBuildContext {
+  return {
+    channel: 'build',
+    surface: 'dashboard',
+    characterKind: 'npc',
+    mode: 'dashboard',
+    scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
+    rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
+    ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
+    acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+    playActor: { kind: 'npc' },
+    rulesetId: TEST_RULESET_ID,
+    catalog: {
+      species: [],
+      classes: [],
+      spells: [],
+      equipment: [],
+      skillProficiencies: [],
+      organizations,
+      languages: [],
+    },
+    characterCreationRules: {
+      ...resolveCharacterCreationPatch(undefined, {
+        name: 'Standard starting wealth',
+        scope: { kind: 'standard' },
+        tiers: [],
+      }),
+      abilityGeneration: DEFAULT_ABILITY_GENERATION_RULES,
+      armorClass: defaultCampaignMechanicsPatch().armorClass,
+    },
+    spellcastingProgression: {
+      byClassSlug: new Map(),
+      slotProgressions: new Map(),
+    },
+    permissions: { canCreateCharacter: true },
+  } as unknown as CampaignNpcBuildContext
+}
+
+describe('buildNarrativeContext', () => {
+  it('includes playable organizations and omits unavailable ones', () => {
+    const context = createCampaignNpcContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      connections: {
+        organizations: [
+          { organizationId: lanternGuild.id, title: 'Guildmaster' },
+          { organizationId: 'organization-missing' },
+        ],
+        locations: [],
+      },
+    }
+
+    const result = buildNarrativeContext({ draft, context, locations: [] })
+
+    expect(result.organizations).toEqual([
+      expect.objectContaining({ id: lanternGuild.id, name: 'Lantern Guild', title: 'Guildmaster' }),
+    ])
+    expect(result.omittedReferenceIds).toEqual(['organization-missing'])
+  })
+
+  it('includes eligible resides_at locations and omits ineligible or missing ones', () => {
+    const context = createCampaignNpcContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      connections: {
+        organizations: [],
+        locations: [
+          { id: 'conn-1', locationId: harborfordSettlement.id, kind: 'resides_at' as const },
+          { id: 'conn-2', locationId: greyshoreRegion.id, kind: 'resides_at' as const },
+          { id: 'conn-3', locationId: 'location-missing', kind: 'resides_at' as const },
+          { id: 'conn-4', locationId: harborfordSettlement.id, kind: 'owns' as const },
+        ],
+      },
+    }
+
+    const result = buildNarrativeContext({
+      draft,
+      context,
+      locations: [harborfordSettlement, greyshoreRegion],
+    })
+
+    expect(result.residences).toEqual([
+      expect.objectContaining({ id: harborfordSettlement.id, name: 'Harborford' }),
+    ])
+    expect(result.omittedReferenceIds).toEqual([greyshoreRegion.id, 'location-missing'])
+  })
+
+  it('omits class tokens for classless and npc drafts', () => {
+    const context = createCampaignNpcContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: 'srd-cc-5.2.1:fighter', level: 0 },
+    }
+
+    const result = buildNarrativeContext({ draft, context, locations: [] })
+
+    expect(result.characterKind).toBe('npc')
+    expect(result.tokens['class.name']).toBeUndefined()
+    expect(result.level).toBe(0)
+  })
+})

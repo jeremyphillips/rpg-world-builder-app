@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  NARRATIVE_SLOT_TERM,
+  NARRATIVE_THEME_TERM,
+  NARRATIVE_TOKEN_TERM,
+} from '../../character-narrative/vocabulary'
 import { PERSONAL_NAME_COMPONENT_TERM } from './personal-name-component'
 import { NAME_REGION_TERM } from '../../name-generator/region'
 import { NAME_SUBJECT_KIND_TERM } from '../../name-generator/subject-kind'
@@ -142,6 +147,12 @@ const NAME_GENERATOR_TERMS = [
   PERSONAL_NAME_COMPONENT_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
+const CHARACTER_NARRATIVE_TERMS = [
+  NARRATIVE_THEME_TERM,
+  NARRATIVE_SLOT_TERM,
+  NARRATIVE_TOKEN_TERM,
+] as const satisfies readonly VocabularyTerm[]
+
 const PRIMITIVE_TERMS = [AREA_GEOMETRY_SHAPE_TERM] as const satisfies readonly VocabularyTerm[]
 
 /** Taxonomies with `*_TERM` only — no `*_ENTRIES`, not in `VOCABULARY_OPTION_SET_TERMS`. */
@@ -185,6 +196,15 @@ describe('name-generator term coverage', () => {
   it('defines vocab terms for every *_ENTRIES map', () => {
     expect(NAME_GENERATOR_TERMS).toHaveLength(3)
     for (const term of NAME_GENERATOR_TERMS) {
+      expectVocabularyTerm(term)
+    }
+  })
+})
+
+describe('character-narrative term coverage', () => {
+  it('defines vocab terms for every *_ENTRIES map', () => {
+    expect(CHARACTER_NARRATIVE_TERMS).toHaveLength(3)
+    for (const term of CHARACTER_NARRATIVE_TERMS) {
       expectVocabularyTerm(term)
     }
   })

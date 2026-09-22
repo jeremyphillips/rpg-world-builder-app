@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { CollectionAddControl, EmptyPanel, fieldArrayItemListClasses } from '@rpg/ui'
+import { CollectionAddControl, EmptyPanel, fieldArrayItemListClasses, Text } from '@rpg/ui'
 import {
   ArrayLikeSectionHeader,
   resolveRelationshipFieldAdapter,
@@ -8,7 +8,10 @@ import {
 } from '@rpg/ui/form'
 
 import { CharacterRelationshipEntityCard } from './character-relationship-entity-card'
-import type { CharacterRelationshipFieldContext } from '../../lib/relationship/character-relationship-field-context.types'
+import type {
+  CharacterRelationshipFieldContext,
+  CharacterResidenceEdge,
+} from '../../lib/relationship/character-relationship-field-context.types'
 import {
   resolveOrganizationMembershipPresentation,
   resolveResidencePresentation,
@@ -17,7 +20,11 @@ import {
   resolveOrganizationMembershipApiTrailing,
   resolveResidenceApiTrailing,
 } from '../../lib/relationship/character-relationship-row.lib'
-import { CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY } from '../../lib/relationship/character-relationship-vocabulary'
+import { resolveResidenceCanAppend } from '../../lib/relationship/character-residence-can-append.lib'
+import {
+  CHARACTER_ORGANIZATION_MEMBERSHIP_VOCABULARY,
+  CHARACTER_RESIDENCE_VOCABULARY,
+} from '../../lib/relationship/character-relationship-vocabulary'
 
 type CharacterControlledRelationshipFieldProps<TEdge> = {
   vocabulary: string
@@ -29,7 +36,7 @@ type CharacterControlledRelationshipFieldProps<TEdge> = {
   items: readonly TEdge[]
   disabled?: boolean
   onAdd: (selection: unknown) => void | Promise<void>
-  onRemove: (edge: TEdge, index: number) => void
+  onRemove: (edge: TEdge, index: number) => void | Promise<void>
 }
 
 /** API-backed relationship collection with grant-aligned array chrome. */
@@ -47,9 +54,35 @@ export function CharacterControlledRelationshipField<TEdge>({
 }: CharacterControlledRelationshipFieldProps<TEdge>) {
   const adapter = resolveRelationshipFieldAdapter(registry, vocabulary)
   const [pickerOpen, setPickerOpen] = React.useState(false)
+  const [removeError, setRemoveError] = React.useState<string>()
   const itemCount = items.length
-  const canAdd = adapter.canAdd?.(items, context) ?? !disabled
+  const appendResult =
+    vocabulary === CHARACTER_RESIDENCE_VOCABULARY
+      ? resolveResidenceCanAppend(items as readonly CharacterResidenceEdge[], context)
+      : {
+          enabled: (adapter.canAdd?.(items, context) ?? !disabled) && !disabled,
+        }
   const supplementary = adapter.supplementary?.(context)
+
+  const handleRemoveAt = React.useCallback(
+    async (edge: TEdge, index: number) => {
+      if (vocabulary !== CHARACTER_RESIDENCE_VOCABULARY) {
+        onRemove(edge, index)
+        return
+      }
+      setRemoveError(undefined)
+      try {
+        await onRemove(edge, index)
+      } catch (error) {
+        const message =
+          error instanceof Error && error.message.trim().length > 0
+            ? error.message
+            : 'Could not remove this residence.'
+        setRemoveError(message)
+      }
+    },
+    [onRemove, vocabulary],
+  )
 
   const handleAdd = React.useCallback(
     async (selection: unknown) => {
@@ -79,7 +112,9 @@ export function CharacterControlledRelationshipField<TEdge>({
         edge as Parameters<typeof resolveOrganizationMembershipApiTrailing>[0],
         context,
         index,
-        (membership, removeIndex) => onRemove(membership as TEdge, removeIndex),
+        (membership, removeIndex) => {
+          void handleRemoveAt(membership as TEdge, removeIndex)
+        },
       )
     }
 
@@ -87,7 +122,9 @@ export function CharacterControlledRelationshipField<TEdge>({
       edge as Parameters<typeof resolveResidenceApiTrailing>[0],
       context,
       index,
-      (residence, removeIndex) => onRemove(residence as TEdge, removeIndex),
+      (residence, removeIndex) => {
+        void handleRemoveAt(residence as TEdge, removeIndex)
+      },
       disabled,
     )
   }
@@ -101,13 +138,19 @@ export function CharacterControlledRelationshipField<TEdge>({
           <CollectionAddControl
             label={addActionLabel}
             onClick={() => setPickerOpen(true)}
-            enabled={!disabled && canAdd}
+            enabled={!disabled && appendResult.enabled}
+            disabledReason={appendResult.enabled ? undefined : appendResult.reason}
             variant="text"
             size="sm"
           />
         }
       />
       {supplementary}
+      {removeError ? (
+        <Text variant="destructive" className="text-sm" aria-live="polite">
+          {removeError}
+        </Text>
+      ) : null}
       <div className={fieldArrayItemListClasses({ rhythm: 'compact', size: 'md' })}>
         {itemCount === 0 ? (
           <EmptyPanel>No {emptyItemLabel} added.</EmptyPanel>

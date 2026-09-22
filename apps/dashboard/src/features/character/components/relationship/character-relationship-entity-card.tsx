@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { DisclosureEntityCard } from '@/features/content/lib/entity/surfaces/cards/disclosure/disclosure-entity-card'
-import { projectArrayItemEntitySummary } from '@/features/content/lib/entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
+import { projectArrayItemEntitySummary } from '@/features/content'
 import type { EntityAnatomyTrailing } from '@/features/content/lib/entity/anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryStatusItem } from '@/features/content/lib/entity/summary/entity-summary-status.types'
 

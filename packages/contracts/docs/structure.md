@@ -8,7 +8,9 @@ existing `import { … } from '@rpg/contracts'` usage stays unchanged.
 **Dev Bench** (`dev-bench/`) is isolated for the local workbench product — import
 `@rpg/contracts/dev-bench` explicitly. **Name generator** (`name-generator/`) is
 isolated experimental naming contracts — import `@rpg/contracts/name-generator`
-explicitly. **Public** (`public/`) is a scaffold for
+explicitly. **Character narrative** (`character-narrative/`) is isolated
+generator contracts — import `@rpg/contracts/character-narrative` explicitly.
+**Public** (`public/`) is a scaffold for
 future marketing/CMS contracts — import `@rpg/contracts/public` when added.
 
 ## Layer diagram
@@ -477,6 +479,7 @@ path should document a layer boundary:
 | `@rpg/contracts/public`                | `src/public/index.ts`                | Public app only (scaffold)                                 |
 | `@rpg/contracts/dev-bench`             | `src/dev-bench/index.ts`             | Dev Bench tickets, epics, inputs                           |
 | `@rpg/contracts/name-generator`        | `src/name-generator/index.ts`        | Naming conventions and collections                         |
+| `@rpg/contracts/character-narrative`   | `src/character-narrative/index.ts`   | Narrative generation context, fragments, and results       |
 
 Legacy `./vocab`, `./content`, and `./primitives` export paths remain as
 backward-compat aliases pointing at `rpg/*`. Prefer `./shared`, `./rpg/*`, and

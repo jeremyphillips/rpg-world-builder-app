@@ -53,6 +53,7 @@ export function CharacterOrganizationMembershipsContainer({
       campaignId,
       availableOrganizations,
       eligibleResidenceLocations: [],
+      locationsQueryStatus: { status: 'idle' },
       organizationsById,
       locationsById: new Map(),
       availableOrganizationIdSet: new Set(availableOrganizations.map(({ id }) => id)),

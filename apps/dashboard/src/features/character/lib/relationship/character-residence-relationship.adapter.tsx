@@ -8,6 +8,7 @@ import type {
   CharacterRelationshipFieldContext,
   CharacterResidenceEdge,
 } from './character-relationship-field-context.types'
+import { resolveResidenceSectionStatusCopy } from './character-residence-can-append.lib'
 
 export const characterResidenceRelationshipAdapter: RelationshipFieldAdapter<
   CharacterResidenceEdge,
@@ -16,12 +17,14 @@ export const characterResidenceRelationshipAdapter: RelationshipFieldAdapter<
 > = {
   getItemKey: (edge) => ('connection' in edge ? edge.connection.id : edge.id),
   listAriaLabel: 'Selected residences',
-  supplementary: (context) =>
-    !context.campaignId ? (
+  supplementary: (context) => {
+    const copy = resolveResidenceSectionStatusCopy(context)
+    return copy ? (
       <Text variant="muted" className="text-sm">
-        Choose a campaign to link a residence location.
+        {copy}
       </Text>
-    ) : null,
+    ) : null
+  },
   projectRow: (edge) => ({
     key: 'connection' in edge ? edge.connection.id : edge.id,
     content: null,
