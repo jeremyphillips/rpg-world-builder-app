@@ -24,7 +24,7 @@ function DialogDisclosureStory() {
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
           variant: 'dialog',
-          hint: 'Controls where this content can be discovered and used.',
+          info: 'Controls where this content can be discovered and used.',
           dialogHeadline: 'Campaign availability',
           resolveSummary: (values) => ({
             status: {

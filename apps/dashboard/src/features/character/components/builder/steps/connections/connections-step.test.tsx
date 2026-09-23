@@ -1,26 +1,21 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import type { ReactElement } from 'react'
+import { MemoryRouter } from 'react-router-dom'
+import {
+  CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  createEmptyCharacterBuilderDraft,
+} from '@rpg/contracts'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import {
-  createCampaignNpcBuilderContextFixture,
-  createStandaloneBuilderContextFixture,
-} from '../../../../lib/fixtures/character-builder-fixtures'
+import { createCampaignNpcBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
 import {
   cityCouncil,
   lanternGuild,
 } from '../../../connections/picker/organization-picker-drawer.fixtures'
 import { harborfordSettlement } from '../../../connections/picker/residence-location-picker-drawer.fixtures'
 import { ConnectionsStep } from './connections-step'
-
-const standaloneContext = createStandaloneBuilderContextFixture({
-  catalog: {
-    ...createStandaloneBuilderContextFixture().catalog,
-    organizations: [lanternGuild, cityCouncil],
-  },
-})
 
 const campaignContext = createCampaignNpcBuilderContextFixture({
   catalog: {
@@ -36,10 +31,45 @@ const locationsQueryState = vi.hoisted(() => ({
   error: null as Error | null,
 }))
 
+const campaignCharactersQueryState = vi.hoisted(() => ({
+  data: [] as Array<{
+    character: { id: string; name: string; summary: string; classIds: string[] }
+    controller: null
+    roster: { status: 'active' }
+  }>,
+  isPending: false,
+}))
+
+const npcsQueryState = vi.hoisted(() => ({
+  data: [] as Array<{
+    character: {
+      id: string
+      name: string
+      classes: Array<{ classId: string }>
+      species: { id: string }
+    }
+  }>,
+  isPending: false,
+}))
+
 vi.mock('@/features/content/locations', () => ({
   useLocations: () => locationsQueryState,
   locationsQueryKey: (campaignId: string) => ['locations', campaignId],
 }))
+
+vi.mock('@/features/campaign', () => ({
+  useCampaignCharacters: () => campaignCharactersQueryState,
+  campaignCharactersListQueryKey: (campaignId: string) => ['campaign-characters', campaignId],
+}))
+
+vi.mock('../../../../npc/hooks/use-npcs', () => ({
+  useNpcs: () => npcsQueryState,
+  npcsQueryKey: (campaignId: string) => ['npcs', campaignId],
+}))
+
+function renderConnectionsStep(ui: ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>)
+}
 
 describe('ConnectionsStep', () => {
   beforeEach(() => {
@@ -47,121 +77,85 @@ describe('ConnectionsStep', () => {
     locationsQueryState.isPending = false
     locationsQueryState.isError = false
     locationsQueryState.error = null
+    campaignCharactersQueryState.data = []
+    campaignCharactersQueryState.isPending = false
+    npcsQueryState.data = []
+    npcsQueryState.isPending = false
   })
 
-  it('adds titled memberships and removes them from the summary', async () => {
-    const user = userEvent.setup()
-    const onDraftChange = vi.fn()
-    const draft = {
-      ...createEmptyCharacterBuilderDraft(),
-      connections: {
-        organizations: [{ organizationId: lanternGuild.id, title: 'Guildmaster' }],
-        locations: [],
-      },
-    }
-
-    render(
-      <ConnectionsStep
-        context={standaloneContext}
-        draft={draft}
-        validationIssues={[]}
-        onDraftChange={onDraftChange}
-      />,
-    )
-
-    expect(screen.getByText('Organizations')).toBeInTheDocument()
-    expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
-    expect(screen.getAllByText('Guildmaster').length).toBeGreaterThan(0)
-    await user.click(screen.getByRole('button', { name: /Remove .*Lantern Guild/ }))
-    expect(onDraftChange).toHaveBeenCalledWith({
-      connections: { organizations: [], locations: [] },
-    })
-
-    await user.click(screen.getByRole('button', { name: 'Add organization' }))
-    await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
-    expect(onDraftChange).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        connections: expect.objectContaining({
-          organizations: expect.arrayContaining([
-            expect.objectContaining({ organizationId: cityCouncil.id }),
-          ]),
-        }),
-      }),
-    )
-    await user.click(screen.getByRole('button', { name: 'Add organization' }))
-    expect(onDraftChange).toHaveBeenCalledWith({
-      connections: {
-        organizations: [{ organizationId: cityCouncil.id }],
-        locations: [],
-      },
-    })
-    expect(screen.getByRole('button', { name: 'Expand City Council' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    )
-  })
-
-  it('adds and removes residence connections in campaign context', async () => {
-    const user = userEvent.setup()
-    const onDraftChange = vi.fn()
-
-    render(
+  it('renders four connection sections with split add controls', () => {
+    renderConnectionsStep(
       <ConnectionsStep
         context={campaignContext}
         draft={createEmptyCharacterBuilderDraft()}
-        validationIssues={[]}
-        onDraftChange={onDraftChange}
-      />,
-    )
-
-    expect(screen.getByText('Residence')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Add residence' }))
-    await user.click(screen.getAllByRole('button', { name: 'Add' }).at(-1)!)
-
-    expect(onDraftChange).toHaveBeenCalledWith({
-      connections: {
-        organizations: [],
-        locations: [
-          expect.objectContaining({
-            locationId: harborfordSettlement.id,
-            kind: 'resides_at',
-          }),
-        ],
-      },
-    })
-    expect(screen.getByRole('button', { name: 'Expand Harborford' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    )
-  })
-
-  it('shows stale selections as recoverable and has no axe violations', async () => {
-    const draft = {
-      ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: 'organization-missing' }], locations: [] },
-    }
-    const { container } = render(
-      <ConnectionsStep
-        context={standaloneContext}
-        draft={draft}
         validationIssues={[]}
         onDraftChange={vi.fn()}
       />,
     )
 
-    expect(screen.getByText('organization-missing')).toBeInTheDocument()
-    expect(screen.getByText('Missing organization')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: /Remove .*organization-missing/ }),
-    ).toBeInTheDocument()
-    await expectNoAxeViolations(container)
+    expect(screen.getByText('People')).toBeInTheDocument()
+    expect(screen.getByText('Organizations')).toBeInTheDocument()
+    expect(screen.getByText('Places')).toBeInTheDocument()
+    expect(screen.getByText('Property')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add person' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add organization' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add place' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add property' })).toBeInTheDocument()
   })
 
-  it('disables residence add while locations are loading in campaign context', () => {
+  it('lists organization memberships with overflow remove actions', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      relationshipEdges: [
+        {
+          id: 'edge-org-1',
+          kind: 'organizationMembership' as const,
+          characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+          organizationId: lanternGuild.id,
+          details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+        },
+      ],
+    }
+
+    renderConnectionsStep(
+      <ConnectionsStep
+        context={campaignContext}
+        draft={draft}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+      />,
+    )
+
+    expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Actions for Lantern Guild/ }))
+    await user.click(screen.getByRole('menuitem', { name: 'Remove connection' }))
+    expect(onDraftChange).toHaveBeenCalledWith({ relationshipEdges: [] })
+  })
+
+  it('opens the parent shortcut menu from the people split button', async () => {
+    const user = userEvent.setup()
+
+    renderConnectionsStep(
+      <ConnectionsStep
+        context={campaignContext}
+        draft={createEmptyCharacterBuilderDraft()}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add person shortcuts' }))
+    expect(screen.getByRole('menuitem', { name: 'Add parent' })).toBeInTheDocument()
+  })
+
+  it('disables place and property add while locations are loading', () => {
     locationsQueryState.data = undefined
     locationsQueryState.isPending = true
 
-    render(
+    renderConnectionsStep(
       <ConnectionsStep
         context={campaignContext}
         draft={createEmptyCharacterBuilderDraft()}
@@ -170,44 +164,31 @@ describe('ConnectionsStep', () => {
       />,
     )
 
-    expect(screen.getAllByText('Loading residence locations…').length).toBeGreaterThan(0)
-    expect(screen.getByRole('button', { name: 'Add residence' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Add place' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Add property' })).toBeDisabled()
   })
 
-  it('disables residence add when the locations query fails in campaign context', () => {
-    locationsQueryState.data = undefined
-    locationsQueryState.isPending = false
-    locationsQueryState.isError = true
-    locationsQueryState.error = new Error('Could not load locations.')
-
-    render(
+  it('has no axe violations in the populated state', async () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      relationshipEdges: [
+        {
+          id: 'edge-org-1',
+          kind: 'organizationMembership' as const,
+          characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+          organizationId: lanternGuild.id,
+        },
+      ],
+    }
+    const { container } = renderConnectionsStep(
       <ConnectionsStep
         context={campaignContext}
-        draft={createEmptyCharacterBuilderDraft()}
+        draft={draft}
         validationIssues={[]}
         onDraftChange={vi.fn()}
       />,
     )
 
-    expect(screen.getAllByText('Could not load locations.').length).toBeGreaterThan(0)
-    expect(screen.getByRole('button', { name: 'Add residence' })).toBeDisabled()
-  })
-
-  it('renders the optional empty selection state', () => {
-    render(
-      <ConnectionsStep
-        context={standaloneContext}
-        draft={createEmptyCharacterBuilderDraft()}
-        validationIssues={[]}
-        onDraftChange={vi.fn()}
-      />,
-    )
-
-    expect(screen.getByText('No organization added.')).toBeInTheDocument()
-    expect(
-      screen.getAllByText('Choose a campaign to link a residence location.').length,
-    ).toBeGreaterThan(0)
-    expect(screen.getByRole('button', { name: 'Add organization' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add residence' })).toBeDisabled()
+    await expectNoAxeViolations(container)
   })
 })

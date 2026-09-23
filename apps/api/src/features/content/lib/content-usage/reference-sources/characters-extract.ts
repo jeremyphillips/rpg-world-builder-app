@@ -22,10 +22,6 @@ export type CharacterContentUsageHit = {
   equipment?: Partial<
     Record<(typeof CHARACTER_EQUIPMENT_INVENTORY_BUCKETS)[number], Array<{ equipmentId?: string }>>
   >
-  connections?: {
-    organizations?: Array<{ organizationId?: string }>
-    locations?: Array<{ locationId?: string }>
-  }
   proficiencies?: {
     skills?: Array<{ skill?: string }>
   }
@@ -77,10 +73,6 @@ const CHARACTER_DESCRIPTOR_EXTRACTORS: Record<
   'species.id': (hit) => (hit.species?.id ? [hit.species.id] : []),
   'spells.spellId': (hit) => nonEmptyStrings((hit.spells ?? []).map((entry) => entry.spellId)),
   'feats.featId': (hit) => nonEmptyStrings((hit.feats ?? []).map((entry) => entry.featId)),
-  'connections.organizations.organizationId': (hit) =>
-    nonEmptyStrings((hit.connections?.organizations ?? []).map((entry) => entry.organizationId)),
-  'connections.locations.locationId': (hit) =>
-    nonEmptyStrings((hit.connections?.locations ?? []).map((entry) => entry.locationId)),
   'proficiencies.skills.skill': (hit) =>
     nonEmptyStrings((hit.proficiencies?.skills ?? []).map((entry) => entry.skill)),
 }

@@ -6,6 +6,7 @@ import {
 } from '@rpg/contracts'
 
 import { CharacterModel } from '../../character'
+import { CharacterRelationshipModel } from '../../character-relationships/character-relationship.model'
 import { HttpError } from '../../../lib/http-error'
 import type { HomebrewDoc } from '../lib/content-write-config'
 import { HomebrewOrganizationModel } from './homebrew-organization.model'
@@ -67,15 +68,31 @@ export async function resolveCharacterOrganizationReferences({
     throw new HttpError(403, 'forbidden', 'Not authorized to view this character reference.')
   }
 
-  const character = await CharacterModel.findById(characterId).select({ connections: 1 }).lean<{
-    connections?: {
-      organizations?: { organizationId: string; title?: string; priority?: number }[]
-    }
-  } | null>()
-  if (!character) return null
+  const characterExists = await CharacterModel.exists({ _id: characterId })
+  if (!characterExists) return null
 
-  const references = character.connections?.organizations ?? []
-  if (references.length === 0) return []
+  const edges = await CharacterRelationshipModel.find({
+    campaignId,
+    characterId,
+    kind: 'organizationMembership',
+  })
+    .select({ organizationId: 1, details: 1 })
+    .lean<Array<{ organizationId?: string; details?: { title?: string; priority?: number } }>>()
+
+  if (edges.length === 0) return []
+
+  const references = edges.flatMap((edge) => {
+    if (!edge.organizationId) return []
+    const title = edge.details?.title
+    const priority = edge.details?.priority
+    return [
+      {
+        organizationId: edge.organizationId,
+        ...(title !== undefined ? { title } : {}),
+        ...(priority !== undefined ? { priority } : {}),
+      },
+    ]
+  })
 
   const ids = references.map(({ organizationId }) => organizationId)
   const docs = await HomebrewOrganizationModel.find({
@@ -89,10 +106,17 @@ export async function resolveCharacterOrganizationReferences({
     }),
   )
 
-  return references.map(({ organizationId, title, priority }) => ({
-    organizationId,
-    ...(title !== undefined ? { title } : {}),
-    ...(priority !== undefined ? { priority } : {}),
-    organization: organizationsById.get(organizationId) ?? null,
-  }))
+  return references
+    .map(({ organizationId, title, priority }) => ({
+      organizationId,
+      ...(title !== undefined ? { title } : {}),
+      ...(priority !== undefined ? { priority } : {}),
+      organization: organizationsById.get(organizationId) ?? null,
+    }))
+    .sort((left, right) => {
+      const leftResolved = left.organization ? 0 : 1
+      const rightResolved = right.organization ? 0 : 1
+      if (leftResolved !== rightResolved) return leftResolved - rightResolved
+      return left.organizationId.localeCompare(right.organizationId)
+    })
 }

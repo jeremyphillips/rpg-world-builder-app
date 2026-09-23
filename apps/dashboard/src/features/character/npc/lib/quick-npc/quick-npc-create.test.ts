@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { isCharacterBuildFinalizationError, type CharacterBuildContext } from '@rpg/contracts'
+import {
+  CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  isCharacterBuildFinalizationError,
+  type CharacterBuildContext,
+} from '@rpg/contracts'
 
 import {
   createCampaignNpcBuilderContextFixture,
@@ -57,17 +61,16 @@ const seed = {
 } as const
 
 describe('buildQuickNpcCreateInput', () => {
-  it('produces a canonical NPC create input without organization connections when membership is omitted', () => {
+  it('produces a canonical NPC create input without organization edges when membership is omitted', () => {
     const input = buildQuickNpcCreateInput({
       seed,
       context: quickNpcTestContext(),
     })
 
-    expect(input.connections.organizations).toEqual([])
-    expect(input.connections.locations).toEqual([])
+    expect(input.relationshipEdges).toEqual([])
   })
 
-  it('produces a canonical NPC create input with the membership connection included', () => {
+  it('produces a canonical NPC create input with the membership edge included', () => {
     const input = buildQuickNpcCreateInput({
       seed,
       context: quickNpcTestContext(),
@@ -80,9 +83,15 @@ describe('buildQuickNpcCreateInput', () => {
       classes: [{ classId: quickFighter.id, level: 1 }],
       species: { id: seed.speciesId },
     })
-    expect(input.connections.organizations).toEqual([
-      { organizationId: 'organization-1', title: 'Guildmaster', priority: 50 },
-    ])
+    expect(input.relationshipEdges?.[0]).toMatchObject({
+      kind: 'organizationMembership',
+      characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+      organizationId: 'organization-1',
+      details: expect.objectContaining({
+        title: 'Guildmaster',
+        priority: 50,
+      }),
+    })
   })
 
   it('omits title and priority for an untitled membership', () => {
@@ -92,7 +101,12 @@ describe('buildQuickNpcCreateInput', () => {
       membership: { organizationId: 'organization-1' },
     })
 
-    expect(input.connections.organizations).toEqual([{ organizationId: 'organization-1' }])
+    expect(input.relationshipEdges).toEqual([
+      expect.objectContaining({
+        kind: 'organizationMembership',
+        organizationId: 'organization-1',
+      }),
+    ])
   })
 
   it('throws a finalization error carrying builder issues for an unavailable species', () => {

@@ -23,10 +23,14 @@ function makeDraftInProgress(): CharacterBuilderDraft {
     species: { speciesId: 'srd-cc-5.2.1:dwarf' },
     class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
     abilities: { method: 'standard-array', scores: { str: 15, con: 14 } },
-    connections: {
-      organizations: [{ organizationId: 'organization-lantern-guild' }],
-      locations: [],
-    },
+    relationshipEdges: [
+      {
+        id: 'edge-lantern-guild',
+        kind: 'organizationMembership',
+        characterId: '__new_character__',
+        organizationId: 'organization-lantern-guild',
+      },
+    ],
     choiceSelections: {
       'class:srd-cc-5.2.1:fighter:skills': ['srd-cc-5.2.1:athletics'],
     },

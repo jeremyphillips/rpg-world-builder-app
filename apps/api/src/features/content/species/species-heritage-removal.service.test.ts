@@ -54,7 +54,7 @@ describe('getSpeciesHeritageRemovalAvailability', () => {
     const heritageOptionId = created.heritage?.options[0]?.id
     expect(heritageOptionId).toBeDefined()
 
-    await createCampaignNpc(campaign.id, {
+    await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Heritage NPC',
       species: { id: created.id, heritageId: heritageOptionId! },

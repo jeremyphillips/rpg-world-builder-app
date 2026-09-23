@@ -44,8 +44,6 @@ export { CharacterBuilderPageShell } from './components/builder/character-builde
 export { CharacterBuilderShell } from './components/builder/character-builder-shell'
 export { CampaignCharacterStatusSummary } from './components/detail/status/campaign-character-status-summary'
 export { CharacterDetailContent } from './components/detail/character-detail-content'
-export { CharacterOrganizationsSummary } from './components/detail/memberships/character-organizations-summary'
-export { CharacterOrganizationMembershipsContainer } from './components/detail/memberships/character-organization-memberships-container'
 export { CharacterIdentityConnectionsSupplement } from './components/detail/memberships/character-identity-connections-supplement'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
 export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action'
@@ -73,14 +71,24 @@ export {
   titleFromMembershipRadioValue,
 } from './lib/organization-membership/organization-membership-title.lib'
 export {
-  createCharacterOrganizationMembership,
-  deleteCharacterOrganizationMembership,
-  updateCharacterOrganizationMembership,
-} from './api/organization-membership-client'
+  createCharacterRelationship,
+  createCharacterRelationshipIdempotencyKey,
+  deleteCharacterRelationship,
+  listCharacterRelationships,
+  replaceCharacterRelationship,
+  updateCharacterRelationship,
+} from './api/character-relationship-client'
 export {
-  invalidateCharacterOrganizationMembershipQueries,
+  characterRelationshipsQueryKey,
+  useCharacterRelationships,
+} from './hooks/use-character-relationships'
+export { useCharacterRelationshipMutations } from './hooks/use-character-relationship-mutations'
+export {
+  invalidateCharacterRelationshipQueries,
+  type CharacterRelationshipInvalidationTarget,
+  type CharacterRelationshipSubjectKind,
   type CharacterOrganizationMembershipSubjectKind,
-} from './lib/invalidate-character-organization-membership-queries'
+} from './lib/invalidate-character-relationship-queries'
 export {
   characterLocationReferencesQueryKey,
   useCharacterLocationReferences,

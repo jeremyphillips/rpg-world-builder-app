@@ -1,6 +1,8 @@
+import { createElement } from 'react'
 import type { FieldGroupSummary, FormItem, FormDensity } from '@rpg/ui/form'
 
 import { resolveVocabularyAvailabilitySummary } from './availability-status-summary.lib'
+import { CampaignAvailabilityChangeAffordance } from './campaign-availability-change-affordance'
 
 export { resolveVocabularyAvailabilitySummary }
 
@@ -8,11 +10,12 @@ import {
   CAMPAIGN_ACCESS_AVAILABLE_HINT,
   CAMPAIGN_ACCESS_AVAILABLE_LABEL,
   CAMPAIGN_ACCESS_AVAILABLE_TOOLTIP,
-  CAMPAIGN_ACCESS_CHANGE_LABEL,
   CAMPAIGN_ACCESS_DONE_LABEL,
-  CAMPAIGN_ACCESS_SECTION_HINT,
+  CAMPAIGN_ACCESS_SECTION_TOOLTIP,
   CAMPAIGN_ACCESS_SECTION_LEGEND,
 } from '@/features/content/lib/campaign-access/campaign-access-labels'
+
+const CAMPAIGN_AVAILABILITY_CHANGE_AFFORDANCE = createElement(CampaignAvailabilityChangeAffordance)
 
 export type CampaignAvailabilityPresentation = 'dialog' | 'disclosure'
 
@@ -48,10 +51,10 @@ export function buildCampaignAvailabilityFields(ctx: CampaignAvailabilityFieldCt
     presentation === 'dialog'
       ? {
           variant: 'dialog' as const,
-          openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
+          openLabel: CAMPAIGN_AVAILABILITY_CHANGE_AFFORDANCE,
           closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
           disabled: ctx.pending,
-          hint: CAMPAIGN_ACCESS_SECTION_HINT,
+          info: CAMPAIGN_ACCESS_SECTION_TOOLTIP,
           dialogHeadline: CAMPAIGN_ACCESS_SECTION_LEGEND,
           summaryDependsOn: ctx.summaryDependsOn,
           resolveSummary: ctx.resolveSummary,
@@ -60,7 +63,7 @@ export function buildCampaignAvailabilityFields(ctx: CampaignAvailabilityFieldCt
           variant: 'inline' as const,
           defaultOpen: false,
           panelDivider: false,
-          openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
+          openLabel: CAMPAIGN_AVAILABILITY_CHANGE_AFFORDANCE,
           closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
           disabled: ctx.pending,
           summaryDependsOn: ctx.summaryDependsOn,

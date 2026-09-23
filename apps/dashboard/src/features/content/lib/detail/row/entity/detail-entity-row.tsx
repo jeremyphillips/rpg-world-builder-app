@@ -31,6 +31,7 @@ export type DetailEntityRowProps = {
   subheading?: ReactNode
   metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   trailing?: EntityAnatomyTrailing
+  trailingAlign?: 'start' | 'center'
   inset?: 'self' | 'parent'
   disclosure?: DetailEntityRowDisclosure
   className?: string
@@ -80,13 +81,27 @@ function DetailEntityRowDisclosureUtility({
 function DetailEntityRowIdentity(
   props: Pick<
     DetailEntityRowProps,
-    'heading' | 'headingHref' | 'headingSuffix' | 'subheading' | 'metadata' | 'trailing'
+    | 'heading'
+    | 'headingHref'
+    | 'headingSuffix'
+    | 'subheading'
+    | 'metadata'
+    | 'trailing'
+    | 'trailingAlign'
   > & {
     leadingUtilities?: readonly ReactNode[]
   },
 ) {
-  const { heading, headingHref, headingSuffix, subheading, metadata, trailing, leadingUtilities } =
-    props
+  const {
+    heading,
+    headingHref,
+    headingSuffix,
+    subheading,
+    metadata,
+    trailing,
+    trailingAlign,
+    leadingUtilities,
+  } = props
 
   return (
     <EntityAnatomy
@@ -99,6 +114,7 @@ function DetailEntityRowIdentity(
       headingHref={headingHref}
       leadingUtilities={leadingUtilities}
       trailing={trailing}
+      trailingAlign={trailingAlign}
       density={DETAIL_ENTITY_ROW_DENSITY}
     />
   )
@@ -111,6 +127,7 @@ export function DetailEntityRow({
   subheading,
   metadata,
   trailing,
+  trailingAlign,
   inset = 'self',
   disclosure,
   className,
@@ -128,6 +145,7 @@ export function DetailEntityRow({
           subheading={subheading}
           metadata={metadata}
           trailing={trailing}
+          trailingAlign={trailingAlign}
         />
       </div>
     )
@@ -151,6 +169,7 @@ export function DetailEntityRow({
           subheading={subheading}
           metadata={metadata}
           trailing={trailing}
+          trailingAlign={trailingAlign}
           leadingUtilities={[
             <DetailEntityRowDisclosureUtility
               key="disclosure-utility"

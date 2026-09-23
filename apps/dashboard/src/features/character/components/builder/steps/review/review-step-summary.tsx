@@ -11,6 +11,7 @@ import { characterBuilderPreviewStatGridClasses } from '../../character-builder-
 import { UNAVAILABLE_ORGANIZATION_LABEL } from '../../../../lib/display/character-display'
 import { resolveBuilderModelingAdvisories } from '../../../../lib/builder-preview/builder-review-advisories.lib'
 import { getGenderLabel } from '@rpg/contracts'
+import { relationshipEdgesToOrganizationMembershipRows } from '../../../../lib/relationship/character-relationship-form-rows.lib'
 
 import {
   formatAbilityMethodLabel,
@@ -31,10 +32,13 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
   const organizationsById = new Map(
     context.catalog.organizations.map((organization) => [organization.id, organization]),
   )
+  const organizationMemberships = relationshipEdgesToOrganizationMembershipRows(
+    draft.relationshipEdges,
+  )
   const organizationSummary =
-    draft.connections.organizations.length === 0
+    organizationMemberships.length === 0
       ? 'None'
-      : draft.connections.organizations
+      : organizationMemberships
           .map(({ organizationId }) => {
             const organization = organizationsById.get(organizationId)
             return organization

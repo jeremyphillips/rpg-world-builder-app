@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import type { FieldSize } from './field.client'
 import type { FieldGroupSummary } from './field-group-disclosure.types'
 import { FieldGroupSummaryTrigger } from './field-group-summary-trigger.client'
@@ -9,7 +11,7 @@ export type FieldGroupSummaryDisclosureCollapsedProps = {
   panelId: string
   size: FieldSize
   summary: FieldGroupSummary
-  openLabel: string
+  openLabel: ReactNode
   unsavedSuffix: string
   showDirtySuffix: boolean
   disabled: boolean

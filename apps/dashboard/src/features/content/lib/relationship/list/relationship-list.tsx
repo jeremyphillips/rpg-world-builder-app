@@ -27,8 +27,10 @@ export type RelationshipListAction = {
 export type RelationshipRowMenuItem = {
   id: string
   label: string
+  icon?: ReactNode
   destructive?: boolean
   disabled?: boolean
+  separatorBefore?: boolean
   onSelect: () => void
 }
 
@@ -51,6 +53,7 @@ export type RelationshipListRowProps = {
     label: string
     items: readonly RelationshipRowMenuItem[]
   }
+  overflowTriggerIcon?: 'horizontal' | 'vertical'
 }
 
 function RelationshipListHeaderAction({ action }: { action: RelationshipListAction }) {
@@ -73,8 +76,10 @@ function toOverflowActions(items: readonly RelationshipRowMenuItem[]): DetailOve
   return items.map((item) => ({
     id: item.id,
     label: item.label,
+    icon: item.icon,
     destructive: item.destructive,
     disabled: item.disabled,
+    separatorBefore: item.separatorBefore,
     onSelect: item.onSelect,
   }))
 }
@@ -216,6 +221,7 @@ function RelationshipListRow({
   badge,
   metadata,
   menu,
+  overflowTriggerIcon = 'horizontal',
 }: RelationshipListRowProps) {
   const resolvedClassification = classification ?? headingSuffix
   const resolvedStatus = status ?? badge ?? metadata
@@ -231,6 +237,7 @@ function RelationshipListRow({
         status={resolvedStatus}
         actions={actions}
         overflowTriggerLabel={menu?.label ?? 'Relationship actions'}
+        overflowTriggerIcon={overflowTriggerIcon}
       />
     </li>
   )

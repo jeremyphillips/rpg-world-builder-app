@@ -3,9 +3,10 @@
 Authored narrative fragments and trusted collection loaders for the character
 narrative generator.
 
-The initial collection contains reviewed first-person fragments for three themes:
-duty, belonging, and ambition. It includes generic fallbacks plus alignment,
-organization, residence, class, species, heritage, and culture references.
+The foundation collection contains reviewed first-person fragments for three
+themes: duty, belonging, and ambition. It includes generic fallbacks plus
+alignment, organization, residence, person, place, class, species, heritage, and
+culture references.
 
 ## Responsibilities
 
@@ -14,11 +15,14 @@ organization, residence, class, species, heritage, and culture references.
 - Keep collection revision identifiers stable for reproducibility and diagnostics.
 - Expose lazy loading so a builder route does not eagerly include all narrative prose.
 
-Data entries are complete sentences or short passages. `{{organization.name}}`,
-`{{organization.title}}`, `{{residence.name}}`, `{{class.name}}`,
-`{{species.name}}`, `{{heritage.name}}`, and `{{culture.name}}` are the supported
-tokens. A fragment must declare every token it uses and must not make campaign
-claims that are not represented by the supplied reference.
+Data entries are complete sentences or short passages. Supported tokens include
+`{{organization.name}}`, `{{organization.title}}`, `{{residence.name}}`,
+`{{hometown.name}}`, `{{birthplace.name}}`, `{{property.name}}`,
+`{{mentor.name}}`, `{{child.name}}`, `{{partner.name}}`, `{{rival.name}}`,
+`{{parent.name}}`, `{{class.name}}`, `{{species.name}}`, `{{heritage.name}}`, and
+`{{culture.name}}`. A fragment must declare every token and semantic condition it
+requires and must not make campaign claims that are not represented by the
+supplied reference.
 
 ## Public API
 

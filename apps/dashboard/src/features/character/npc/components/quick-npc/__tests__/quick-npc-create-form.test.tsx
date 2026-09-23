@@ -188,8 +188,12 @@ describe('QuickNpcAuthoringForm', () => {
       alignment: 'ln',
       classes: [{ classId: quickFighter.id, level: 1 }],
     })
-    expect(input.connections.organizations).toEqual([
-      { organizationId: organization.id, title: 'Guildmaster', priority: 50 },
+    expect(input.relationshipEdges).toEqual([
+      expect.objectContaining({
+        kind: 'organizationMembership',
+        organizationId: organization.id,
+        details: { lifecycle: 'current', title: 'Guildmaster', priority: 50 },
+      }),
     ])
   })
 

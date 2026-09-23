@@ -42,7 +42,7 @@ function wrapFieldGridPlacement(
   const gridColumn = resolveArrayItemAnatomyFieldGridColumn(fieldIndex, showGrip)
 
   return (
-    <FieldAnatomyGridPlacementProvider gridColumn={gridColumn}>
+    <FieldAnatomyGridPlacementProvider key={fieldIndex} gridColumn={gridColumn}>
       {child}
     </FieldAnatomyGridPlacementProvider>
   )

@@ -56,7 +56,7 @@ describe('content campaign access policy', () => {
       slug: 'policy-referenced-feat',
     })
 
-    const { character: npc } = await createCampaignNpc(campaign.id, {
+    const { character: npc } = await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Feat NPC',
       feats: [{ featId: created.id }],
@@ -94,7 +94,7 @@ describe('content campaign access policy', () => {
 
     await promoteContentToPublished(featWriteConfig, campaign.id, created.id)
 
-    await createCampaignNpc(campaign.id, {
+    await createCampaignNpc(campaign.id, campaign.owner.id, {
       ...minimalNpcRequestInput,
       name: 'Blocking Feat NPC',
       feats: [{ featId: created.id }],

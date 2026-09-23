@@ -1,6 +1,6 @@
 import { SquarePen } from 'lucide-react'
 
-import type { Organization, OrganizationReferenceResolution } from '@rpg/contracts'
+import type { Organization } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 import type { EntityAnatomyTrailing } from '@/features/content'
 
@@ -9,6 +9,7 @@ import type {
   CharacterOrganizationMembershipEdge,
   CharacterRelationshipFieldContext,
   CharacterResidenceEdge,
+  OrganizationMembershipSheetRow,
 } from './character-relationship-field-context.types'
 import {
   canEditOrganizationMembershipTitle,
@@ -30,16 +31,23 @@ function resolveOrganizationMembershipOrganization(
 function resolveApiOrganizationMembership(
   membership: CharacterOrganizationMembershipEdge,
   context: CharacterRelationshipFieldContext,
-): OrganizationReferenceResolution | undefined {
-  const fromServer = context.resolvedMemberships?.find(
-    (item) => item.organizationId === membership.organizationId,
-  )
+): OrganizationMembershipSheetRow | undefined {
+  const fromServer = context.resolvedMemberships?.find((item) => {
+    if ('relationshipId' in membership && item.relationshipId === membership.relationshipId) {
+      return true
+    }
+    return item.organizationId === membership.organizationId
+  })
   if (fromServer) return fromServer
 
   const organization = resolveOrganizationMembershipOrganization(membership, context)
-  if (!organization) return undefined
+  if (!organization || !('relationshipId' in membership) || membership.revision === undefined) {
+    return undefined
+  }
 
   return {
+    relationshipId: membership.relationshipId,
+    revision: membership.revision,
     organizationId: membership.organizationId,
     ...(membership.title !== undefined ? { title: membership.title } : {}),
     ...('priority' in membership && membership.priority !== undefined

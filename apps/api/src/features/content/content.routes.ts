@@ -8,8 +8,6 @@ import { validate } from '../../middleware/validate'
 import * as controller from './content.controller'
 import * as subclassController from './subclasses/subclass-write.handlers'
 import * as speciesHeritageRemovalController from './species/species-heritage-removal.handlers'
-import * as characterLocationConnectionController from './characters/character-location-connection.handlers'
-import * as characterOrganizationMembershipController from './characters/character-organization-membership.handlers'
 import * as organizationLocationConnectionController from './organizations/organization-location-connection.handlers'
 import { listClasses } from './classes/list-classes'
 import { listCharacterOrganizationReferences } from './organizations/organization-reference.controller'
@@ -58,48 +56,6 @@ contentRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   listCharacterLocationReferences,
-)
-
-contentRouter.post(
-  '/characters/:characterId/location-connections',
-  requireAuth,
-  requireCampaignRole('owner', 'co-owner'),
-  characterLocationConnectionController.createCharacterLocationConnectionItem,
-)
-
-contentRouter.patch(
-  '/characters/:characterId/location-connections/:connectionId',
-  requireAuth,
-  requireCampaignRole('owner', 'co-owner'),
-  characterLocationConnectionController.updateCharacterLocationConnectionItem,
-)
-
-contentRouter.delete(
-  '/characters/:characterId/location-connections/:connectionId',
-  requireAuth,
-  requireCampaignRole('owner', 'co-owner'),
-  characterLocationConnectionController.deleteCharacterLocationConnectionItem,
-)
-
-contentRouter.post(
-  '/characters/:characterId/organization-memberships',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  characterOrganizationMembershipController.createCharacterOrganizationMembershipItem,
-)
-
-contentRouter.patch(
-  '/characters/:characterId/organization-memberships/:organizationId',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  characterOrganizationMembershipController.updateCharacterOrganizationMembershipItem,
-)
-
-contentRouter.delete(
-  '/characters/:characterId/organization-memberships/:organizationId',
-  requireAuth,
-  requireCampaignRole(...CAMPAIGN_ROLES),
-  characterOrganizationMembershipController.deleteCharacterOrganizationMembershipItem,
 )
 
 contentRouter.post(

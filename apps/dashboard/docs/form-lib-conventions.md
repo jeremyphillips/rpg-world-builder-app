@@ -368,8 +368,9 @@ panel/outline stacks) in feature components when `FormItem[]` can express it.
   visual treatment and `disclosure` for compact settings sections (campaign access is
   the reference implementation). `kind: 'row'` is one shared field container for sibling
   leaves/slots. `kind: 'columns'` is layout-only (independent stacks at `md+`); each child
-  stays a top-level chrome unit. Content identity on full routes uses a row so Name and
-  Campaign availability share a box.
+  stays a top-level chrome unit. Content identity on full routes uses `columns` with
+  `widths: 'primary-detail'` so Name and Campaign availability stay side by side with
+  independent field containers.
 - **Persistence** — may stay in a section shell (`CampaignAvailabilityField`, create/edit
   shells) when it uses a separate API or RHF form — but the **rendered UI** must still flow
   through `FormProvider` + `FormItems` over the field builder.

@@ -14,7 +14,7 @@ vi.mock('@/features/campaign', () => ({
 
 vi.mock('@/features/character', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
-  invalidateCharacterOrganizationMembershipQueries: (...args: unknown[]) => invalidateMock(...args),
+  invalidateCharacterRelationshipQueries: (...args: unknown[]) => invalidateMock(...args),
   useCampaignNpcBuildContext: () => ({
     catalogIndex: { species: new Map(), classes: new Map() },
     context: { catalog: {}, characterKind: 'npc' },
@@ -99,8 +99,7 @@ describe('useOrganizationMembersDetail Quick NPC handoff', () => {
         expect.anything(),
         expect.objectContaining({
           campaignId: 'campaign-test-1',
-          characterId: 'npc-character-1',
-          subjectKind: 'npc',
+          characters: [{ characterId: 'npc-character-1', subjectKind: 'npc' }],
           organizationIds: [organization.id],
         }),
       )

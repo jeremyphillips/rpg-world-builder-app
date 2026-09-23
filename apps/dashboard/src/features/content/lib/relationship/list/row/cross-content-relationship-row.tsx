@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react'
 
-import { cn } from '@rpg/ui'
-
 import { DetailEntityRow } from '../../../detail/row/entity/detail-entity-row'
 import type { EntityAnatomyTrailing } from '../../../entity/anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryStatusItem } from '../../../entity/summary/entity-summary-status.types'
@@ -28,6 +26,7 @@ export type CrossContentRelationshipRowProps = {
   badge?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   actions?: readonly DetailOverflowAction[]
   overflowTriggerLabel?: string
+  overflowTriggerIcon?: 'horizontal' | 'vertical'
   /**
    * Trailing controls override.
    * - `undefined` — convenience overflow from `actions` when non-empty
@@ -58,6 +57,7 @@ export function CrossContentRelationshipRow({
   badge,
   actions = [],
   overflowTriggerLabel = 'Relationship actions',
+  overflowTriggerIcon = 'horizontal',
   trailing,
   className,
 }: CrossContentRelationshipRowProps) {
@@ -69,12 +69,20 @@ export function CrossContentRelationshipRow({
       : actions.length > 0
         ? {
             kind: 'action' as const,
-            content: <DetailOverflowMenu actions={actions} triggerLabel={overflowTriggerLabel} />,
+            content: (
+              <DetailOverflowMenu
+                actions={actions}
+                triggerLabel={overflowTriggerLabel}
+                triggerIcon={overflowTriggerIcon}
+              />
+            ),
           }
         : undefined
 
+  const trailingAlign = overflowTriggerIcon === 'vertical' ? 'center' : 'start'
+
   return (
-    <div className={cn(className)}>
+    <div className={className}>
       {relationshipEyebrow ? (
         <p className={detailEntityRowSubheadingVariants()}>{relationshipEyebrow}</p>
       ) : null}
@@ -86,6 +94,7 @@ export function CrossContentRelationshipRow({
         subheading={resolvedDescription}
         metadata={resolvedStatus}
         trailing={resolvedTrailing}
+        trailingAlign={trailingAlign}
       />
     </div>
   )

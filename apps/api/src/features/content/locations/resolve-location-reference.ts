@@ -4,9 +4,14 @@ import type {
   Location,
   OrganizationLocationReferenceResolution,
 } from '@rpg/contracts'
-import { canResolveSavedContentReference } from '@rpg/contracts'
+import {
+  canResolveSavedContentReference,
+  CHARACTER_LOCATION_CONNECTION_KIND_IDS,
+  type CharacterLocationConnectionKind,
+} from '@rpg/contracts'
 
 import { CharacterModel } from '../../character'
+import { CharacterRelationshipModel } from '../../character-relationships/character-relationship.model'
 import { HttpError } from '../../../lib/http-error'
 import type { HomebrewDoc } from '../lib/content-write-config'
 import { HomebrewLocationModel } from '../locations/homebrew-location.model'
@@ -45,15 +50,29 @@ export async function resolveCharacterLocationReferences({
     throw new HttpError(403, 'forbidden', 'Not authorized to view this character reference.')
   }
 
-  const character = await CharacterModel.findById(characterId).select({ connections: 1 }).lean<{
-    connections?: {
-      locations?: Array<{ id: string; locationId: string; kind: string }>
-    }
-  } | null>()
-  if (!character) return null
+  const characterExists = await CharacterModel.exists({ _id: characterId })
+  if (!characterExists) return null
 
-  const connections = character.connections?.locations ?? []
-  if (connections.length === 0) return []
+  const edges = await CharacterRelationshipModel.find({
+    campaignId,
+    characterId,
+    kind: { $in: [...CHARACTER_LOCATION_CONNECTION_KIND_IDS] },
+  })
+    .select({ _id: 1, kind: 1, locationId: 1 })
+    .lean<Array<{ _id: string; kind: string; locationId?: string }>>()
+
+  if (edges.length === 0) return []
+
+  const connections = edges.flatMap((edge) => {
+    if (!edge.locationId) return []
+    return [
+      {
+        id: edge._id,
+        locationId: edge.locationId,
+        kind: edge.kind as CharacterLocationConnectionKind,
+      },
+    ]
+  })
 
   const ids = connections.map(({ locationId }) => locationId)
   const docs = await HomebrewLocationModel.find({
@@ -68,11 +87,7 @@ export async function resolveCharacterLocationReferences({
   )
 
   return connections.map((connection) => ({
-    connection: {
-      id: connection.id,
-      locationId: connection.locationId,
-      kind: connection.kind as CharacterLocationReferenceResolution['connection']['kind'],
-    },
+    connection,
     location: locationsById.get(connection.locationId) ?? null,
   }))
 }

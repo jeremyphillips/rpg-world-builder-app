@@ -38,7 +38,6 @@ export function toCharacter(doc: CharacterRecord): PcCharacter {
     wealth: doc.wealth,
     narrative: doc.narrative ?? undefined,
     feats: doc.feats ?? [],
-    connections: doc.connections ?? { organizations: [] },
     vital: normalizeCharacterVital(rawVital),
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),

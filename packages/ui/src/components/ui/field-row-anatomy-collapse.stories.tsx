@@ -6,6 +6,7 @@ import { Field } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { resolveFieldRowAnatomyPresentation } from './field-row-anatomy.variants'
+import { useFieldRowAnatomyCollapse } from './use-field-row-anatomy-collapse.client'
 import { Input } from './input.client'
 import { SelectField } from './select-field'
 import { cn } from '../../lib/utils'
@@ -25,13 +26,16 @@ function AnatomyRow({
   className?: string
 }) {
   const presentation = resolveFieldRowAnatomyPresentation(widths)
+  const collapse = useFieldRowAnatomyCollapse(presentation.collapseMinWidth)
   return (
     <FieldRowAnatomyProvider>
       <div
+        ref={collapse.ref}
         data-field-row=""
         data-field-row-anatomy=""
         className={cn(presentation.className, className)}
         style={presentation.style}
+        data-field-row-collapsed={collapse['data-field-row-collapsed']}
       >
         {children}
       </div>

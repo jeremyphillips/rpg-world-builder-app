@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { Types } from 'mongoose'
 
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
+import { seedOrganizationMembershipEdge } from '../../../test/helpers/character-relationship-edges'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { createCampaignNpc } from '../../campaign'
-import { CharacterModel } from '../../character'
 import { createHomebrewContent } from '../lib/content-write.service'
 import { organizationWriteConfig } from './organizations.config'
 
@@ -16,19 +15,6 @@ useIntegrationDb()
 
 const organizationReferencesPath = (campaignId: string, characterId: string) =>
   `/api/campaigns/${campaignId}/content/organizations/references/${characterId}`
-
-async function setOrganizationConnection(characterId: string, organizationId: string) {
-  await CharacterModel.collection.updateOne(
-    { _id: new Types.ObjectId(characterId) },
-    {
-      $set: {
-        connections: {
-          organizations: [{ organizationId }],
-        },
-      },
-    },
-  )
-}
 
 describe('GET /api/campaigns/:campaignId/content/organizations/references/:characterId', () => {
   it('returns organization references for a participating campaign NPC', async () => {
@@ -47,11 +33,16 @@ describe('GET /api/campaigns/:campaignId/content/organizations/references/:chara
       name: 'Shadow Guild',
       organizationDomain: 'other',
     })
-    const { character: npc } = await createCampaignNpc(campaignId, {
+    const { character: npc } = await createCampaignNpc(campaignId, owner.userId, {
       ...minimalNpcRequestInput,
       name: 'Guild Contact',
     })
-    await setOrganizationConnection(npc.id, organization.id)
+    await seedOrganizationMembershipEdge({
+      campaignId,
+      characterId: npc.id,
+      organizationId: organization.id,
+      actorUserId: owner.userId,
+    })
 
     const response = await owner.agent
       .get(organizationReferencesPath(campaignId, npc.id))

@@ -21,6 +21,12 @@ const locationsQueryState = vi.hoisted(() => ({
   isError: false,
   error: null as Error | null,
 }))
+const charactersQueryState = vi.hoisted(() => ({
+  data: [] as { character: { id: string; name: string } }[] | undefined,
+  isPending: false,
+  isError: false,
+  error: null as Error | null,
+}))
 
 vi.mock('@rpg/character-narrative-integrations', () => ({
   buildNarrativeContext: vi.fn((input) => input),
@@ -29,6 +35,10 @@ vi.mock('@rpg/character-narrative-integrations', () => ({
 
 vi.mock('@/features/content', () => ({
   useLocations: () => locationsQueryState,
+}))
+
+vi.mock('@/features/campaign', () => ({
+  useCampaignCharacters: () => charactersQueryState,
 }))
 
 function Harness({
@@ -101,6 +111,10 @@ describe('IdentityNarrativeGenerateAction', () => {
     locationsQueryState.isPending = false
     locationsQueryState.isError = false
     locationsQueryState.error = null
+    charactersQueryState.data = []
+    charactersQueryState.isPending = false
+    charactersQueryState.isError = false
+    charactersQueryState.error = null
   })
 
   it('does not generate when the locations query fails', async () => {

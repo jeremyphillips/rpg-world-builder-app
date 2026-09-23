@@ -679,6 +679,12 @@ export {
   type ButtonDropdownProps,
 } from './components/ui/button-dropdown.client'
 export {
+  SplitButton,
+  type SplitButtonMenuGroup,
+  type SplitButtonMenuItem,
+  type SplitButtonProps,
+} from './components/ui/split-button.client'
+export {
   Tooltip,
   TooltipTrigger,
   TooltipContent,

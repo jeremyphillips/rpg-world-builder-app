@@ -208,13 +208,14 @@ formatting, UI state reducers). Move to `character/lib/<concern>/` only when the
 module is reused across components, imported outside the subtree, or is an
 independently testable view-model seam.
 
-| Location                                   | Keep co-located when…                                         |
-| ------------------------------------------ | ------------------------------------------------------------- |
-| `components/picker/*.lib.ts`               | Shared picker chrome (search/sort/filter shell)               |
-| `components/equipment/picker/**/*.lib.ts`  | Equipment picker/drawer view models                           |
-| `components/spells/picker/*.lib.ts`        | Spell drawer-only helpers                                     |
-| `components/proficiencies/picker/*.lib.ts` | Proficiency drawer-only helpers                               |
-| `components/connections/*.lib.ts`          | Picker/edit drawer view models (filter/sort stays co-located) |
+| Location                                   | Keep co-located when…                                              |
+| ------------------------------------------ | ------------------------------------------------------------------ |
+| `components/picker/*.lib.ts`               | Shared picker chrome (search/sort/filter shell)                    |
+| `components/equipment/picker/**/*.lib.ts`  | Equipment picker/drawer view models                                |
+| `components/spells/picker/*.lib.ts`        | Spell drawer-only helpers                                          |
+| `components/proficiencies/picker/*.lib.ts` | Proficiency drawer-only helpers                                    |
+| `components/connections/*.lib.ts`          | Picker/edit drawer view models (filter/sort stays co-located)      |
+| `lib/relationship/*.lib.ts`                | Shared Connections catalogs, row view-models, API sync, sheet save |
 
 Package-switch resolution state lives in
 `character/lib/equipment/equipment-package-switch-resolution.lib.ts` (pure logic,

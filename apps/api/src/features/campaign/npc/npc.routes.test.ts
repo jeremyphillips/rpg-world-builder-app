@@ -25,10 +25,7 @@ describe('campaign NPC routes', () => {
     const createRes = await agent
       .post(`/api/campaigns/${campaignId}/npcs`)
       .set(CSRF_HEADER, csrfToken)
-      .send({
-        ...minimalNpcRequestInput,
-        connections: { organizations: [{ organizationId: 'organization-1' }], locations: [] },
-      })
+      .send(minimalNpcRequestInput)
       .expect(201)
 
     const npcId = createRes.body.npc.character.id as string
@@ -37,7 +34,6 @@ describe('campaign NPC routes', () => {
         characterType: 'npc',
         name: 'Goblin Scout',
         rulesetId: 'srd-cc-5.2.1',
-        connections: { organizations: [{ organizationId: 'organization-1' }], locations: [] },
         vital: { status: 'alive' },
       },
       participation: {

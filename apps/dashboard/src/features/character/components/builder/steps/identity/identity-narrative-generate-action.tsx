@@ -5,6 +5,7 @@ import { resolveCampaignIdFromContext } from '@rpg/contracts'
 import type { CharacterBuildContext, CharacterBuilderDraft } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
+import { useCampaignCharacters } from '@/features/campaign'
 import { useLocations } from '@/features/content'
 
 import type { IdentityFormValues } from '../../../../lib/steps/identity-form-fields'
@@ -25,17 +26,20 @@ export function IdentityNarrativeGenerateAction({
   const values = useWatch({ control: form.control })
   const campaignId = resolveCampaignIdFromContext(context)
   const locationsQuery = useLocations(campaignId)
+  const charactersQuery = useCampaignCharacters(campaignId)
   const [pending, setPending] = useState(false)
   const [message, setMessage] = useState<string>()
   const [messageTone, setMessageTone] = useState<'destructive' | 'muted'>('destructive')
 
   const canGenerate = useMemo(() => canGenerateNarrative(values.narrative), [values.narrative])
   const allFieldsFilled = !canGenerate
-  const isLocationsPending =
-    Boolean(campaignId) && locationsQuery.isPending && locationsQuery.data === undefined
+  const isCampaignContextPending =
+    Boolean(campaignId) &&
+    ((locationsQuery.isPending && locationsQuery.data === undefined) ||
+      (charactersQuery.isPending && charactersQuery.data === undefined))
 
   const handleGenerate = useCallback(async () => {
-    if (pending || !canGenerate || isLocationsPending) return
+    if (pending || !canGenerate || isCampaignContextPending) return
     setPending(true)
     setMessage(undefined)
     const feedback = await runNarrativeGeneration({
@@ -46,6 +50,9 @@ export function IdentityNarrativeGenerateAction({
       locations: campaignId ? (locationsQuery.data ?? []) : [],
       locationsQueryError: locationsQuery.error,
       locationsQueryIsError: locationsQuery.isError,
+      characters: campaignId ? (charactersQuery.data?.map(({ character }) => character) ?? []) : [],
+      charactersQueryError: charactersQuery.error,
+      charactersQueryIsError: charactersQuery.isError,
     })
     if (feedback) {
       setMessageTone(feedback.tone)
@@ -58,10 +65,13 @@ export function IdentityNarrativeGenerateAction({
     context,
     draft,
     form,
-    isLocationsPending,
+    isCampaignContextPending,
     locationsQuery.data,
     locationsQuery.error,
     locationsQuery.isError,
+    charactersQuery.data,
+    charactersQuery.error,
+    charactersQuery.isError,
     pending,
   ])
 
@@ -90,7 +100,7 @@ export function IdentityNarrativeGenerateAction({
         type="button"
         variant="secondary"
         onClick={handleGenerate}
-        disabled={!canGenerate || pending || isLocationsPending}
+        disabled={!canGenerate || pending || isCampaignContextPending}
       >
         {pending ? 'Generating…' : 'Generate background'}
       </Button>

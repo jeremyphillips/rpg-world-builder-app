@@ -1,3 +1,5 @@
+import { Pencil } from 'lucide-react'
+
 import { Button, InlineInactiveStatus } from '@rpg/ui'
 
 import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary'
@@ -42,12 +44,13 @@ export function MasterDetailAvailabilityHeaderLine({
       <OverviewResultSummaryDotSeparator />
       <Button
         type="button"
-        variant="text"
-        size="sm"
+        variant="ghost"
+        size="icon"
         disabled={disabled}
         onClick={onAvailabilityChange}
+        aria-label={changeLabel}
       >
-        {changeLabel}
+        <Pencil aria-hidden className="size-3.5 text-muted-foreground" />
       </Button>
     </div>
   )

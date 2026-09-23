@@ -37,7 +37,8 @@ export function isFragmentEligible(
     fragment.themeIds.includes(theme) &&
     (!fragment.alignmentIds ||
       (context.alignment !== undefined && fragment.alignmentIds.includes(context.alignment))) &&
-    fragment.requires.every((token) => Boolean(context.tokens[token]))
+    fragment.requires.every((token) => Boolean(context.tokens[token])) &&
+    fragment.conditions.every((condition) => context.boundConditions.includes(condition))
   )
 }
 

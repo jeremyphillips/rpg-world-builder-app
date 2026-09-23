@@ -1,8 +1,6 @@
 import {
   CLASS_CHARACTER_REFERENCE,
   FEAT_CHARACTER_REFERENCE,
-  LOCATION_CHARACTER_REFERENCE,
-  ORGANIZATION_CHARACTER_REFERENCE,
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
   SPECIES_CHARACTER_REFERENCE,
   SPELL_CHARACTER_REFERENCE,
@@ -10,6 +8,11 @@ import {
   type CharacterContentReferenceDescriptor,
 } from '@rpg/contracts'
 
+import {
+  indexCharacterRelationshipCharacterBlockersByContentId,
+  indexCharacterRelationshipLocationBlockersByContentId,
+  indexCharacterRelationshipOrganizationBlockersByContentId,
+} from '../../../character-relationships/lib/content-usage/character-relationship-usage'
 import {
   indexCharacterBlockersByContentId,
   indexCharacterEquipmentBlockersByContentId,
@@ -43,10 +46,6 @@ export const characterSubclassSource = characterDescriptorSource(SUBCLASS_CHARAC
 export const characterSpeciesSource = characterDescriptorSource(SPECIES_CHARACTER_REFERENCE)
 export const characterSpellSource = characterDescriptorSource(SPELL_CHARACTER_REFERENCE)
 export const characterFeatSource = characterDescriptorSource(FEAT_CHARACTER_REFERENCE)
-export const characterOrganizationSource = characterDescriptorSource(
-  ORGANIZATION_CHARACTER_REFERENCE,
-)
-export const characterLocationSource = characterDescriptorSource(LOCATION_CHARACTER_REFERENCE)
 export const characterSkillProficiencySource = characterDescriptorSource(
   SKILL_PROFICIENCY_CHARACTER_REFERENCE,
 )
@@ -79,4 +78,16 @@ export const locationParentReferenceSource: ContentUsageSource = {
 
 export const campaignPrimaryWorldReferenceSource: ContentUsageSource = {
   loadBlockerIndex: (ctx) => indexCampaignPrimaryWorldBlockersByContentId(ctx),
+}
+
+export const characterRelationshipOrganizationSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexCharacterRelationshipOrganizationBlockersByContentId(ctx),
+}
+
+export const characterRelationshipLocationSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexCharacterRelationshipLocationBlockersByContentId(ctx),
+}
+
+export const characterRelationshipCharacterSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexCharacterRelationshipCharacterBlockersByContentId(ctx),
 }

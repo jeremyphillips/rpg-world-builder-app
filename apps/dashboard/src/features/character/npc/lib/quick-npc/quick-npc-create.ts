@@ -1,4 +1,5 @@
 import {
+  CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
   CharacterBuildFinalizationError,
   finalizeNpcCharacterBuild,
   isCharacterBuildFinalizationError,
@@ -27,18 +28,30 @@ function withMembershipConnection(
   draft: CharacterBuilderDraft,
   membership: QuickNpcMembership,
 ): CharacterBuilderDraft {
+  const preservedEdges = draft.relationshipEdges.filter(
+    (edge) => edge.kind !== 'organizationMembership',
+  )
+
   return {
     ...draft,
-    connections: {
-      ...draft.connections,
-      organizations: [
-        {
-          organizationId: membership.organizationId,
-          ...(membership.title !== undefined ? { title: membership.title } : {}),
-          ...(membership.priority !== undefined ? { priority: membership.priority } : {}),
-        },
-      ],
-    },
+    relationshipEdges: [
+      ...preservedEdges,
+      {
+        id: crypto.randomUUID(),
+        kind: 'organizationMembership',
+        characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+        organizationId: membership.organizationId,
+        ...(membership.title !== undefined || membership.priority !== undefined
+          ? {
+              details: {
+                lifecycle: 'current' as const,
+                ...(membership.title !== undefined ? { title: membership.title } : {}),
+                ...(membership.priority !== undefined ? { priority: membership.priority } : {}),
+              },
+            }
+          : {}),
+      },
+    ],
   }
 }
 

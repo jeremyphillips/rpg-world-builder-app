@@ -1,15 +1,6 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  buttonVariants,
-} from '@rpg/ui'
-import { ChevronDown } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { SplitButton } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { formatContentCreateHeading } from '@/features/content/lib/content-type-labels'
@@ -46,49 +37,38 @@ export function LocationCreateActions({ campaignId }: LocationCreateActionsProps
         intent={{ authoringType: 'building' }}
         campaignId={campaignId}
       />
-      <div className="flex items-stretch">
-        <Link
-          to={createHref}
-          className={buttonVariants({
-            size: 'sm',
-            className: 'rounded-r-none border-r-0',
-          })}
-        >
-          {createLabel}
-        </Link>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="button"
-              size="sm"
-              className="rounded-l-none px-2"
-              aria-label={`${createLabel} shortcuts`}
-            >
-              <ChevronDown className="size-3.5 opacity-80" aria-hidden />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {LOCATION_CREATE_PROMOTED_AUTHORING_TYPES.map((authoringType) => (
-              <DropdownMenuItem
-                key={authoringType}
-                onSelect={() => {
-                  if (authoringType === 'building') {
-                    setBuildingCreateOpen(true)
-                    return
-                  }
-                  launch({ authoringType })
-                }}
-              >
-                {getLocationAuthoringTypeLabel(authoringType)}
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link to={createHref}>More location types…</Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <SplitButton
+        label={createLabel}
+        showLeadingIcon={false}
+        onPrimaryClick={() => navigate(createHref)}
+        menuGroups={[
+          {
+            id: 'promoted',
+            items: LOCATION_CREATE_PROMOTED_AUTHORING_TYPES.map((authoringType) => ({
+              id: authoringType,
+              label: getLocationAuthoringTypeLabel(authoringType),
+              onSelect: () => {
+                if (authoringType === 'building') {
+                  setBuildingCreateOpen(true)
+                  return
+                }
+                launch({ authoringType })
+              },
+            })),
+          },
+          {
+            id: 'more',
+            items: [
+              {
+                id: 'more-types',
+                label: 'More location types…',
+                onSelect: () => navigate(createHref),
+              },
+            ],
+          },
+        ]}
+        menuAriaLabel={`${createLabel} shortcuts`}
+      />
     </>
   )
 }

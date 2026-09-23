@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createNpcRequestInputSchema } from '../../character/create-npc-input'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { finalizeNpcCharacterBuild } from './finalize-npc'
+import type { CampaignNpcBuildContext } from '../context'
 import { builderTestContext, createCharacterBuildContext } from '../test-fixtures'
 
 function makeClassedNpcDraft() {
@@ -30,7 +31,7 @@ describe('finalizeNpcCharacterBuild', () => {
     expect(input).not.toHaveProperty('campaignId')
   })
 
-  it('copies organization connections to the NPC request', () => {
+  it('copies organization relationship edges to the NPC request', () => {
     const organization = {
       id: 'organization-lantern-guild',
       slug: 'lantern-guild',
@@ -49,17 +50,40 @@ describe('finalizeNpcCharacterBuild', () => {
     }
     const draft = {
       ...makeClassedNpcDraft(),
-      connections: { organizations: [{ organizationId: organization.id }], locations: [] },
+      relationshipEdges: [
+        {
+          id: 'edge-lantern-guild',
+          kind: 'organizationMembership' as const,
+          characterId: '__new_character__',
+          organizationId: organization.id,
+        },
+      ],
     }
-    const input = finalizeNpcCharacterBuild(draft, {
-      ...builderTestContext,
-      catalog: { ...builderTestContext.catalog, organizations: [organization] },
-    })
+    const campaignNpcContext = {
+      ...createCharacterBuildContext({
+        characterKind: 'npc',
+        rulesScope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: 'srd-cc-5.2.1' },
+        catalog: { ...builderTestContext.catalog, organizations: [organization] },
+      }),
+      characterKind: 'npc',
+      mode: 'dashboard',
+      scope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: 'srd-cc-5.2.1' },
+      rulesScope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: 'srd-cc-5.2.1' },
+      ownershipTarget: { type: 'campaign', campaignId: 'campaign-1' },
+      acquisition: { kind: 'campaign_npc', campaignId: 'campaign-1' },
+      playActor: { kind: 'npc' },
+    } satisfies CampaignNpcBuildContext
 
-    expect(input.connections).toEqual({
-      organizations: [{ organizationId: organization.id }],
-      locations: [],
-    })
+    const input = finalizeNpcCharacterBuild(draft, campaignNpcContext)
+
+    expect(input.relationshipEdges).toEqual([
+      {
+        id: 'edge-lantern-guild',
+        kind: 'organizationMembership',
+        characterId: '__new_character__',
+        organizationId: organization.id,
+      },
+    ])
   })
 
   it('finalizes a classless level 0 NPC with empty classes and level-zero wealth', () => {

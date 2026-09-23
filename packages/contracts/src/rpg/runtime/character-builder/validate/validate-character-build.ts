@@ -5,8 +5,9 @@ import type { CharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
 import type { CharacterBuilderStepId } from '../../../character-builder/step-ids'
 import { isChoiceStep, resolveEffectiveBuilderSteps } from '../steps'
-import { characterConnectionsSchema } from '../../character/connections/connections'
+import { characterRelationshipDraftEdgesSchema } from '../../character-relationships/draft'
 import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
+import { canWriteCharacterRelationships } from '../relationship-write'
 
 import { validationIssue } from './issue'
 import type {
@@ -35,28 +36,50 @@ const STEP_VALIDATORS: Record<
 > = {
   identity: (draft, _context, _choiceSets) => validateIdentity(draft),
   connections: (draft, context) => {
-    const parsed = characterConnectionsSchema.safeParse(draft.connections)
-    if (!parsed.success) {
+    if (!canWriteCharacterRelationships(context) && draft.relationshipEdges.length > 0) {
       return [
         validationIssue(
-          'connections_invalid',
-          'Remove duplicate or invalid organization connections.',
-          { path: 'connections.organizations', stepId: 'connections' },
+          'connections_unauthorized',
+          'This build cannot author campaign relationships.',
+          { path: 'relationshipEdges', stepId: 'connections' },
         ),
       ]
     }
 
-    const availableIds = new Set(
+    const parsed = characterRelationshipDraftEdgesSchema.safeParse(draft.relationshipEdges)
+    if (!parsed.success) {
+      return [
+        validationIssue('connections_invalid', 'Remove duplicate or invalid relationship edges.', {
+          path: 'relationshipEdges',
+          stepId: 'connections',
+        }),
+      ]
+    }
+
+    const organizationIds = parsed.data
+      .filter((edge) => edge.kind === 'organizationMembership')
+      .map((edge) => edge.organizationId)
+    if (new Set(organizationIds).size !== organizationIds.length) {
+      return [
+        validationIssue('connections_invalid', 'Remove duplicate or invalid relationship edges.', {
+          path: 'relationshipEdges',
+          stepId: 'connections',
+        }),
+      ]
+    }
+
+    const availableOrganizationIds = new Set(
       resolvePlayableBuilderContent(context).organizations.map(({ id }) => id),
     )
-    return parsed.data.organizations
-      .filter(({ organizationId }) => !availableIds.has(organizationId))
+    return parsed.data
+      .filter((edge) => edge.kind === 'organizationMembership')
+      .filter(({ organizationId }) => !availableOrganizationIds.has(organizationId))
       .map(({ organizationId }) =>
         validationIssue(
           'organization_connection_unavailable',
           'Remove or replace an organization that is no longer available.',
           {
-            path: `connections.organizations.${organizationId}`,
+            path: `relationshipEdges.${organizationId}`,
             stepId: 'connections',
           },
         ),
@@ -160,8 +183,16 @@ export function validateCharacterBuild(
     return { ok: issues.length === 0, issues }
   }
 
+  const effectiveSteps = resolveEffectiveBuilderSteps(context, draft)
+  const effectiveStepIds = new Set(effectiveSteps.map((step) => step.id))
   const issues = [
-    ...validateAllSteps(draft, context, choiceSets, true),
+    ...effectiveSteps.flatMap((step) => STEP_VALIDATORS[step.id](draft, context, choiceSets)),
+    ...validateIdentity(draft, { requireAlignment: true, requireGender: true }).filter(
+      (entry) => entry.code === 'alignment_required' || entry.code === 'gender_required',
+    ),
+    ...(!effectiveStepIds.has('connections') && draft.relationshipEdges.length > 0
+      ? STEP_VALIDATORS.connections(draft, context, choiceSets)
+      : []),
     ...validateEquipmentPurchases(draft, context),
   ]
   return { ok: issues.length === 0, issues }

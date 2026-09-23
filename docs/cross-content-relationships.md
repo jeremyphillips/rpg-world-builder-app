@@ -20,11 +20,11 @@ write affordances must gate on declared registry capability
 
 ## Three concepts
 
-| Concept                   | Role                                                       | Example                                                                  |
-| ------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
-| **Authoritative storage** | Persisted edge on the owning type                          | Character `connections.locations[]`                                      |
-| **Projection**            | Inverse or cross-type read derived from authoritative data | Location detail lists characters and orgs via connected-parties resolver |
-| **Mutation**              | Write path that updates authoritative storage only         | Character nested `location-connections` routes                           |
+| Concept                   | Role                                                       | Example                                                                                       |
+| ------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| **Authoritative storage** | Persisted edge on the owning type or relationship service  | Character location edges in `character_relationships`; organization `connections.locations[]` |
+| **Projection**            | Inverse or cross-type read derived from authoritative data | Location detail lists characters and orgs via connected-parties resolver                      |
+| **Mutation**              | Write path that updates authoritative storage only         | Campaign `character-relationships` routes; organization nested `location-connections`         |
 
 ## Projection registry
 
@@ -74,15 +74,27 @@ when meaningful.
 
 ## Mutation ownership
 
-Character and organization nested connection routes are the **canonical**
-surfaces for targeted location-connection mutation. Location inverse editing
-delegates to the same commands; Location `PATCH` never persists relationship
-arrays.
+Character relationship edges — organization membership, person kinds (parent,
+partner, mentor, rival, …), and location kinds (`resides_at`, hometown,
+birthplace, property associations) — are stored in the campaign
+`character_relationships` collection and mutated through the character
+relationship service. Organization location edges remain on organization
+documents and use nested `location-connections` routes. Location inverse editing
+delegates to the authoritative command for each family; Location `PATCH` never
+persists relationship arrays.
+
+Edges carry campaign scope, revision, visibility (`dm_only` | `all_players` |
+selected characters), and lifecycle details where the kind supports it. List
+reads project endpoint-relative rows for the viewer character and filter hidden
+edges before returning items. Narrative generation uses authorized draft edges or
+resolved projections only — hidden edges never appear in generated prose or
+user-visible diagnostics.
 
 ```text
-POST   /api/campaigns/:campaignId/content/characters/:characterId/location-connections
-PATCH  /api/campaigns/:campaignId/content/characters/:characterId/location-connections/:connectionId
-DELETE /api/campaigns/:campaignId/content/characters/:characterId/location-connections/:connectionId
+GET    /api/campaigns/:campaignId/characters/:characterId/relationships
+POST   /api/campaigns/:campaignId/character-relationships
+PATCH  /api/campaigns/:campaignId/character-relationships/:relationshipId
+DELETE /api/campaigns/:campaignId/character-relationships/:relationshipId
 ```
 
 Organization nested routes follow the same pattern under
@@ -92,9 +104,9 @@ the nested routes use — not parallel validation paths.
 
 ### Authorization
 
-Permission is evaluated against mutation of the **authoritative** character or
+Permission is evaluated against mutation of the **authoritative** edge or
 organization document, regardless of which UI originated the request. Character
-connection mutations require campaign owner/co-owner.
+relationship mutations require campaign owner/co-owner.
 
 ### Stale projection concurrency (v1)
 
@@ -106,10 +118,10 @@ connection mutations require campaign owner/co-owner.
 
 ### v1 dedupe policy
 
-Within each subject's `connections.locations` array, `{locationId, kind}` pairs
-must be unique. Mutations address edges by persisted `id`, never by
-`{locationId, kind}`. This dedupe is a v1 policy that temporal-edge support
-will explicitly relax later.
+Character location edges are unique per campaign, character, location, and kind
+in `character_relationships`. Organization location arrays enforce unique
+`{locationId, kind}` pairs per organization. Mutations address edges by
+persisted `id`, never by composite keys alone.
 
 ## Proving examples
 
@@ -123,14 +135,14 @@ will explicitly relax later.
 
 ### Character / Organization → Location
 
-| Concern                 | Detail                                                                      |
-| ----------------------- | --------------------------------------------------------------------------- |
-| **Authoritative owner** | Character or organization `connections.locations[]`                         |
-| **Inverse**             | Location connected-parties resolver (merged, server-side sort + pagination) |
-| **Usage**               | Character location refs registered on the locations usage surface           |
+| Concern                 | Detail                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------- |
+| **Authoritative owner** | Character location edges in `character_relationships`; organization `connections.locations[]` |
+| **Inverse**             | Location connected-parties resolver (merged, server-side sort + pagination)                   |
+| **Usage**               | Character relationship refs registered via the edge usage source                              |
 
 Location-owned `partyAssociations` and `territorialAuthority` fields have been
-removed. All relationship edges live on subject documents.
+removed. Character edges no longer live on character documents.
 
 ## What to reuse vs invent
 
@@ -153,6 +165,12 @@ query engine.
 ## Further inverse editing (evaluation)
 
 Document-only decisions — not automatic enablement:
+
+Character relationship expansion (people, places, property, narrative facts) is
+documented in [Character relationships and narrative context](roadmap/character-relationships-plan.md).
+Organization membership and all character location kinds now live in
+`character_relationships`; builder Connections, sheet Connections, and narrative
+facts consume that service without alternate embedded arrays.
 
 1. **Skill → Class** — recommend **read-only**: choice-set context makes
    inverse edits unsafe without hiding Class semantics.

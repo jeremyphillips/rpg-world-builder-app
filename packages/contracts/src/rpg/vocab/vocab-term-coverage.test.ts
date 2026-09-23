@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  NARRATIVE_FRAGMENT_CONDITION_TERM,
   NARRATIVE_SLOT_TERM,
   NARRATIVE_THEME_TERM,
   NARRATIVE_TOKEN_TERM,
@@ -151,6 +152,7 @@ const CHARACTER_NARRATIVE_TERMS = [
   NARRATIVE_THEME_TERM,
   NARRATIVE_SLOT_TERM,
   NARRATIVE_TOKEN_TERM,
+  NARRATIVE_FRAGMENT_CONDITION_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 const PRIMITIVE_TERMS = [AREA_GEOMETRY_SHAPE_TERM] as const satisfies readonly VocabularyTerm[]
@@ -203,7 +205,7 @@ describe('name-generator term coverage', () => {
 
 describe('character-narrative term coverage', () => {
   it('defines vocab terms for every *_ENTRIES map', () => {
-    expect(CHARACTER_NARRATIVE_TERMS).toHaveLength(3)
+    expect(CHARACTER_NARRATIVE_TERMS).toHaveLength(4)
     for (const term of CHARACTER_NARRATIVE_TERMS) {
       expectVocabularyTerm(term)
     }

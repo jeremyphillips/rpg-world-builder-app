@@ -6,19 +6,27 @@ import { organizationSchema } from '../rpg/content/organization/organization'
 import { characterOrganizationConnectionSchema } from '../rpg/runtime/character/connections/connections'
 import {
   NARRATIVE_TOKEN_PATTERN,
+  narrativeFragmentConditionSchema,
   narrativeSlotSchema,
   narrativeThemeSchema,
   narrativeTokenSchema,
 } from './vocabulary'
+import {
+  narrativeOrganizationFactSchema,
+  narrativePersonFactSchema,
+  narrativePlaceFactSchema,
+  narrativeRelationshipFactsSchema,
+  narrativeResidenceFactSchema,
+  narrativeBindingProvenanceSchema,
+  narrativePersonRoleSchema,
+  narrativePlaceRoleSchema,
+} from './relationship-facts'
 
-const namedReferenceSchema = z.object({ id: z.string().min(1), name: z.string().min(1) })
 export const narrativeOrganizationSchema = organizationSchema
   .pick({ id: true, name: true })
   .merge(characterOrganizationConnectionSchema.pick({ title: true }))
   .extend({ affinities: z.array(z.string()).default([]) })
-export const narrativeResidenceSchema = namedReferenceSchema.extend({
-  affinities: z.array(z.string()).default([]),
-})
+export const narrativeResidenceSchema = narrativeResidenceFactSchema
 
 export const narrativeGenerationContextSchema = z.object({
   alignment: alignmentSchema.optional(),
@@ -26,8 +34,12 @@ export const narrativeGenerationContextSchema = z.object({
   level: z.number().int().nonnegative(),
   affinities: z.array(z.string()).default([]),
   tokens: z.partialRecord(narrativeTokenSchema, z.string().min(1)).default({}),
-  organizations: z.array(narrativeOrganizationSchema).default([]),
-  residences: z.array(narrativeResidenceSchema).default([]),
+  organizations: z.array(narrativeOrganizationFactSchema).default([]),
+  residences: z.array(narrativeResidenceFactSchema).default([]),
+  people: z.array(narrativePersonFactSchema).default([]),
+  places: z.array(narrativePlaceFactSchema).default([]),
+  relationshipFacts: narrativeRelationshipFactsSchema.optional(),
+  boundConditions: z.array(narrativeFragmentConditionSchema).default([]),
   omittedReferenceIds: z.array(z.string()).default([]),
 })
 
@@ -39,6 +51,7 @@ export const narrativeFragmentSchema = z
     alignmentIds: z.array(alignmentSchema).min(1).optional(),
     themeIds: z.array(narrativeThemeSchema).min(1),
     requires: z.array(narrativeTokenSchema).default([]),
+    conditions: z.array(narrativeFragmentConditionSchema).default([]),
     affinities: z.array(z.string()).default([]),
     conflictTags: z.array(z.string()).default([]),
     weight: z.number().positive().default(1),
@@ -79,10 +92,26 @@ export const narrativeCollectionSchema = z
     if (new Set(ids).size !== ids.length)
       ctx.addIssue({ code: 'custom', message: 'Duplicate fragment IDs' })
   })
+export const narrativeRoleBindingSchema = z.object({
+  targetId: z.string().min(1),
+  provenance: narrativeBindingProvenanceSchema,
+})
+
+export const narrativePersonBindingSchema = narrativeRoleBindingSchema.extend({
+  role: narrativePersonRoleSchema,
+})
+
+export const narrativePlaceBindingSchema = narrativeRoleBindingSchema.extend({
+  role: narrativePlaceRoleSchema,
+})
+
 export const narrativeCompositionPlanSchema = z.object({
   theme: narrativeThemeSchema,
   organizationId: z.string().optional(),
   residenceId: z.string().optional(),
+  organization: narrativeRoleBindingSchema.optional(),
+  place: narrativePlaceBindingSchema.optional(),
+  person: narrativePersonBindingSchema.optional(),
 })
 export const generatedNarrativeSchema = characterNarrativeSchema
   .omit({ backstory: true })
@@ -100,6 +129,7 @@ export const narrativeGenerationResultSchema = z.discriminatedUnion('ok', [
     fragmentIds: z.array(z.string()),
     usedFallback: z.boolean(),
     omittedReferenceIds: z.array(z.string()),
+    selectedBindings: z.array(narrativeBindingProvenanceSchema).default([]),
   }),
   z.object({ ok: z.literal(false), reason: z.string() }),
 ])

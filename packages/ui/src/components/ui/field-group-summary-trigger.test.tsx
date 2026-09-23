@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
+import { createElement } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Pencil } from 'lucide-react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { FieldGroupSummaryTrigger } from './field-group-summary-trigger.client'
@@ -77,6 +79,28 @@ describe('FieldGroupSummaryTrigger', () => {
     expect(body).toHaveClass('flex-nowrap', 'overflow-hidden')
     expect(body).toContainElement(screen.getByText(/Unsaved/))
     expect(trigger).toHaveTextContent('Change')
+  })
+
+  it('supports icon affordances beside the summary copy', () => {
+    render(
+      <FieldGroupSummaryTrigger
+        size="md"
+        summary={{
+          status: { label: 'Available', tone: 'success', indicator: 'dot' },
+          detail: 'All players',
+        }}
+        openLabel={createElement(Pencil, { 'aria-hidden': true, className: 'size-3.5' })}
+        unsavedSuffix=" · Unsaved"
+        showDirtySuffix={false}
+        disabled={false}
+        onOpen={() => undefined}
+      />,
+    )
+
+    expect(screen.queryByText('Change')).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Available. All players' }).querySelector('svg'),
+    ).toBeTruthy()
   })
 
   itAxe('has no axe violations', async () => {

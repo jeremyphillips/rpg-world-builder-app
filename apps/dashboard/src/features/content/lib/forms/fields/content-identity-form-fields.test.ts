@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { FormItem } from '@rpg/ui/form'
 
-import {
-  buildContentIdentityFields,
-  CONTENT_IDENTITY_AVAILABILITY_ROW_WIDTH,
-  CONTENT_IDENTITY_NAME_ROW_WIDTH,
-  nameField,
-} from './content-identity-form-fields'
+import { buildContentIdentityFields, nameField } from './content-identity-form-fields'
 
 const availabilityItem: FormItem = {
   kind: 'slot',
@@ -15,7 +10,7 @@ const availabilityItem: FormItem = {
 }
 
 describe('buildContentIdentityFields', () => {
-  it('returns a shared field-container row for inline layout', () => {
+  it('returns independent field containers in a primary-detail columns layout', () => {
     const [item] = buildContentIdentityFields({
       layout: 'inline',
       nameItem: nameField(),
@@ -23,39 +18,22 @@ describe('buildContentIdentityFields', () => {
     })
 
     expect(item).toMatchObject({
-      kind: 'row',
-      align: 'start',
+      kind: 'columns',
+      widths: 'primary-detail',
+      columns: [
+        { fields: [{ ...nameField(), chrome: { variant: 'none' } }] },
+        { fields: [availabilityItem] },
+      ],
     })
-    if (item && 'kind' in item && item.kind === 'row') {
-      expect(item.fields).toEqual([
-        { ...nameField(), width: CONTENT_IDENTITY_NAME_ROW_WIDTH },
-        { ...availabilityItem, width: CONTENT_IDENTITY_AVAILABILITY_ROW_WIDTH },
-      ])
-    }
   })
 
-  it('returns a shared field-container stack for stacked layout', () => {
+  it('returns stacked identity fields without a shared container', () => {
     expect(
       buildContentIdentityFields({
         layout: 'stacked',
         nameItem: nameField(),
         availabilityItem,
       }),
-    ).toEqual([
-      {
-        kind: 'group',
-        fields: [nameField(), availabilityItem],
-      },
-    ])
-  })
-
-  it('rejects non-leaf identity items for inline layout', () => {
-    expect(() =>
-      buildContentIdentityFields({
-        layout: 'inline',
-        nameItem: { kind: 'group', legend: 'Name', fields: [] },
-        availabilityItem,
-      }),
-    ).toThrow('Identity row fields must be a leaf field or slot.')
+    ).toEqual([{ ...nameField(), chrome: { variant: 'none' } }, availabilityItem])
   })
 })

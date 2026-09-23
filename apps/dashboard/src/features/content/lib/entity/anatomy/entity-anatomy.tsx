@@ -24,6 +24,7 @@ export type EntityAnatomyProps = {
   /** Ordered leading utilities; Anatomy is the sole EntityLeadingRail wrapper. */
   leadingUtilities?: readonly ReactNode[]
   trailing?: EntityAnatomyTrailing
+  trailingAlign?: 'start' | 'center'
   density?: ContentCardDensity
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
@@ -62,6 +63,7 @@ export function EntityAnatomy({
   headingHref,
   leadingUtilities,
   trailing,
+  trailingAlign = 'start',
   density = 'comfortable',
   headingEndValue,
 }: EntityAnatomyProps) {
@@ -87,7 +89,7 @@ export function EntityAnatomy({
       </div>
       {trailing ? (
         <div
-          className={entityAnatomyTrailingSlotVariants({ density })}
+          className={entityAnatomyTrailingSlotVariants({ density, align: trailingAlign })}
           data-entity-item-slot="trailing"
         >
           <EntityAnatomyTrailingSlot trailing={trailing} />

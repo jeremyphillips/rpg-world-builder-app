@@ -7,13 +7,15 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCampaignCharacters, useCanManageCampaign } from '@/features/campaign'
 import type { CreatedContentResult } from '@/lib/create-flow'
 import {
-  createCharacterOrganizationMembership,
-  deleteCharacterOrganizationMembership,
-  invalidateCharacterOrganizationMembershipQueries,
-  updateCharacterOrganizationMembership,
+  createCharacterRelationship,
+  createCharacterRelationshipIdempotencyKey,
+  deleteCharacterRelationship,
+  invalidateCharacterRelationshipQueries,
+  listCharacterRelationships,
+  updateCharacterRelationship,
   useCampaignNpcBuildContext,
   useNpcs,
-  type CharacterOrganizationMembershipSubjectKind,
+  type CharacterRelationshipSubjectKind,
 } from '@/features/character'
 
 import { buildLocationConnectedPartyCharactersById } from '../../locations/lib/connected-parties/location-connected-party-character-options.lib'
@@ -44,8 +46,26 @@ export type OrganizationMembersDrawerState =
 
 function subjectKindFor(
   row: Pick<OrganizationMemberRowVm, 'characterType'>,
-): CharacterOrganizationMembershipSubjectKind {
+): CharacterRelationshipSubjectKind {
   return row.characterType === 'npc' ? 'npc' : 'pc'
+}
+
+async function findOrganizationMembershipEdge(
+  campaignId: string,
+  characterId: string,
+  organizationId: string,
+) {
+  const response = await listCharacterRelationships(campaignId, characterId, {
+    kinds: ['organizationMembership'],
+    limit: 50,
+  })
+
+  return response.items.find(
+    (row) =>
+      row.kind === 'organizationMembership' &&
+      row.target?.type === 'organization' &&
+      row.target.id === organizationId,
+  )
 }
 
 export function useOrganizationMembersDetail(
@@ -111,14 +131,10 @@ export function useOrganizationMembersDetail(
   }, [campaignCharactersQuery.data, canManage, catalogIndex, membersByCharacterId, npcsQuery.data])
 
   const invalidate = React.useCallback(
-    async (input: {
-      characterId: string
-      subjectKind: CharacterOrganizationMembershipSubjectKind
-    }) =>
-      invalidateCharacterOrganizationMembershipQueries(queryClient, {
+    async (input: { characterId: string; subjectKind: CharacterRelationshipSubjectKind }) =>
+      invalidateCharacterRelationshipQueries(queryClient, {
         campaignId,
-        characterId: input.characterId,
-        subjectKind: input.subjectKind,
+        characters: [{ characterId: input.characterId, subjectKind: input.subjectKind }],
         organizationIds: [organizationId],
       }),
     [campaignId, organizationId, queryClient],
@@ -128,10 +144,18 @@ export function useOrganizationMembersDetail(
     async (commit: OrganizationMemberPickerCommit) => {
       setMutationError(null)
       try {
-        await createCharacterOrganizationMembership(campaignId, commit.characterId, {
-          organizationId,
-          ...(commit.title !== undefined ? { title: commit.title } : {}),
-          ...(commit.priority !== undefined ? { priority: commit.priority } : {}),
+        await createCharacterRelationship(campaignId, {
+          idempotencyKey: createCharacterRelationshipIdempotencyKey(),
+          relationship: {
+            kind: 'organizationMembership',
+            characterId: commit.characterId,
+            organizationId,
+            details: {
+              lifecycle: 'current',
+              ...(commit.title !== undefined ? { title: commit.title } : {}),
+              ...(commit.priority !== undefined ? { priority: commit.priority } : {}),
+            },
+          },
         })
         await invalidate({
           characterId: commit.characterId,
@@ -170,12 +194,19 @@ export function useOrganizationMembersDetail(
 
       setMutationError(null)
       try {
-        await updateCharacterOrganizationMembership(
+        const edge = await findOrganizationMembershipEdge(
           campaignId,
           editingRow.characterId,
           organizationId,
-          { title: metadata.title ?? null, priority: metadata.priority ?? null },
         )
+        if (!edge) {
+          throw new Error(UPDATE_MEMBERSHIP_FAILED)
+        }
+
+        await updateCharacterRelationship(campaignId, edge.relationshipId, {
+          expectedRevision: edge.revision,
+          details: { title: metadata.title ?? null, priority: metadata.priority ?? null },
+        })
         await invalidate({
           characterId: editingRow.characterId,
           subjectKind: subjectKindFor(editingRow),
@@ -200,7 +231,18 @@ export function useOrganizationMembersDetail(
     async (row: OrganizationMemberRowVm) => {
       setPendingCharacterId(row.characterId)
       try {
-        await deleteCharacterOrganizationMembership(campaignId, row.characterId, organizationId)
+        const edge = await findOrganizationMembershipEdge(
+          campaignId,
+          row.characterId,
+          organizationId,
+        )
+        if (!edge) {
+          throw new Error(REMOVE_MEMBER_FAILED)
+        }
+
+        await deleteCharacterRelationship(campaignId, edge.relationshipId, {
+          expectedRevision: edge.revision,
+        })
         await invalidate({ characterId: row.characterId, subjectKind: subjectKindFor(row) })
       } finally {
         setPendingCharacterId(undefined)

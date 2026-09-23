@@ -109,19 +109,33 @@ describe('buildNarrativeContext', () => {
     const context = createCampaignNpcContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: {
-        organizations: [
-          { organizationId: lanternGuild.id, title: 'Guildmaster' },
-          { organizationId: 'organization-missing' },
-        ],
-        locations: [],
-      },
+      relationshipEdges: [
+        {
+          id: 'edge-lantern-guild',
+          kind: 'organizationMembership' as const,
+          characterId: '__new_character__',
+          organizationId: lanternGuild.id,
+          details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+        },
+        {
+          id: 'edge-missing-org',
+          kind: 'organizationMembership' as const,
+          characterId: '__new_character__',
+          organizationId: 'organization-missing',
+        },
+      ],
     }
 
     const result = buildNarrativeContext({ draft, context, locations: [] })
 
     expect(result.organizations).toEqual([
-      expect.objectContaining({ id: lanternGuild.id, name: 'Lantern Guild', title: 'Guildmaster' }),
+      expect.objectContaining({
+        id: lanternGuild.id,
+        name: 'Lantern Guild',
+        title: 'Guildmaster',
+        lifecycle: 'current',
+        provenance: { source: 'draft', draftEdgeId: 'edge-lantern-guild' },
+      }),
     ])
     expect(result.omittedReferenceIds).toEqual(['organization-missing'])
   })
@@ -130,15 +144,32 @@ describe('buildNarrativeContext', () => {
     const context = createCampaignNpcContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
-      connections: {
-        organizations: [],
-        locations: [
-          { id: 'conn-1', locationId: harborfordSettlement.id, kind: 'resides_at' as const },
-          { id: 'conn-2', locationId: greyshoreRegion.id, kind: 'resides_at' as const },
-          { id: 'conn-3', locationId: 'location-missing', kind: 'resides_at' as const },
-          { id: 'conn-4', locationId: harborfordSettlement.id, kind: 'owns' as const },
-        ],
-      },
+      relationshipEdges: [
+        {
+          id: 'conn-1',
+          kind: 'resides_at' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+        {
+          id: 'conn-2',
+          kind: 'resides_at' as const,
+          characterId: '__new_character__',
+          locationId: greyshoreRegion.id,
+        },
+        {
+          id: 'conn-3',
+          kind: 'resides_at' as const,
+          characterId: '__new_character__',
+          locationId: 'location-missing',
+        },
+        {
+          id: 'conn-4',
+          kind: 'owns' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+      ],
     }
 
     const result = buildNarrativeContext({
@@ -148,9 +179,113 @@ describe('buildNarrativeContext', () => {
     })
 
     expect(result.residences).toEqual([
-      expect.objectContaining({ id: harborfordSettlement.id, name: 'Harborford' }),
+      expect.objectContaining({
+        id: harborfordSettlement.id,
+        name: 'Harborford',
+        role: 'residence',
+        provenance: { source: 'draft', draftEdgeId: 'conn-1' },
+      }),
     ])
     expect(result.omittedReferenceIds).toEqual([greyshoreRegion.id, 'location-missing'])
+  })
+
+  it('projects person and place relationship facts from draft edges', () => {
+    const context = createCampaignNpcContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      relationshipEdges: [
+        {
+          id: 'edge-home',
+          kind: 'hometown' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+        {
+          id: 'edge-mentor',
+          kind: 'mentorOf' as const,
+          characterId: 'char-mentor',
+          relatedCharacterId: '__new_character__',
+        },
+        {
+          id: 'edge-child',
+          kind: 'parentOf' as const,
+          characterId: '__new_character__',
+          relatedCharacterId: 'char-child',
+        },
+      ],
+    }
+
+    const result = buildNarrativeContext({
+      draft,
+      context,
+      locations: [harborfordSettlement],
+      characters: [
+        { id: 'char-mentor', name: 'Seraphina Vale' },
+        { id: 'char-child', name: 'Darius Vale' },
+      ],
+    })
+
+    expect(result.places).toEqual([
+      expect.objectContaining({
+        id: harborfordSettlement.id,
+        name: 'Harborford',
+        role: 'hometown',
+      }),
+    ])
+    expect(result.people).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'char-mentor', role: 'mentor', name: 'Seraphina Vale' }),
+        expect.objectContaining({ id: 'char-child', role: 'child', name: 'Darius Vale' }),
+      ]),
+    )
+    expect(result.relationshipFacts?.people).toHaveLength(2)
+  })
+
+  it('keeps organization and residence facts alongside person and place enrichment', () => {
+    const context = createCampaignNpcContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      relationshipEdges: [
+        {
+          id: 'edge-lantern-guild',
+          kind: 'organizationMembership' as const,
+          characterId: '__new_character__',
+          organizationId: lanternGuild.id,
+          details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+        },
+        {
+          id: 'conn-1',
+          kind: 'resides_at' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+        {
+          id: 'edge-home',
+          kind: 'hometown' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+        {
+          id: 'edge-mentor',
+          kind: 'mentorOf' as const,
+          characterId: 'char-mentor',
+          relatedCharacterId: '__new_character__',
+        },
+      ],
+    }
+
+    const result = buildNarrativeContext({
+      draft,
+      context,
+      locations: [harborfordSettlement],
+      characters: [{ id: 'char-mentor', name: 'Seraphina Vale' }],
+    })
+
+    expect(result.organizations).toHaveLength(1)
+    expect(result.residences).toHaveLength(1)
+    expect(result.people).toHaveLength(1)
+    expect(result.places).toHaveLength(1)
+    expect(result.omittedReferenceIds).toEqual([])
   })
 
   it('omits class tokens for classless and npc drafts', () => {

@@ -113,17 +113,17 @@ Collapsed summary disclosure for unavailable campaign access:
 }
 ```
 
-Status, detail, and **Change** share one line; the summary omits a `secondary`
+Status, detail, and the edit affordance share one line; the summary omits a `secondary`
 consequence line. Trigger copy is 12px (`text-xs`) at every field size.
 
-| Element             | Treatment                                             |
-| ------------------- | ----------------------------------------------------- |
-| Left accent rail    | `resolveChromeAccentClasses` — warning faint          |
-| `CircleSlash` icon  | `text-semantic-warning`                               |
-| `Unavailable` label | `text-semantic-warning`                               |
-| **Change**          | `aria-hidden` affordance on the single trigger button |
-| `DM only` detail    | `text-muted-foreground`                               |
-| Section legend      | `Text variant="muted"`                                |
+| Element             | Treatment                                              |
+| ------------------- | ------------------------------------------------------ |
+| Left accent rail    | `resolveChromeAccentClasses` — warning faint           |
+| `CircleSlash` icon  | `text-semantic-warning`                                |
+| `Unavailable` label | `text-semantic-warning`                                |
+| Edit affordance     | `aria-hidden` pencil icon on the single trigger button |
+| `DM only` detail    | `text-muted-foreground`                                |
+| Section legend      | `Text variant="muted"`                                 |
 
 Expanded state stays visually neutral (inset chrome only). Validate in Storybook
 light and dark: **Content → Campaign Access → SectionUnavailable** and

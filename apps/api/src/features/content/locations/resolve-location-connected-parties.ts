@@ -6,6 +6,7 @@ import type {
   PaginatedItems,
 } from '@rpg/contracts'
 import {
+  CHARACTER_LOCATION_CONNECTION_KIND_IDS,
   comparePriorityDescending,
   getCharacterLocationConnectionDisplayLabel,
   getCharacterLocationConnectionFamily,
@@ -18,17 +19,22 @@ import {
 } from '@rpg/contracts'
 
 import { CharacterModel } from '../../character'
+import { CharacterRelationshipModel } from '../../character-relationships/character-relationship.model'
 import { resolveCatalogForCampaign } from '../content.service'
 import { locationWriteConfig } from '../locations/locations.config'
 import { HomebrewOrganizationModel } from '../organizations/homebrew-organization.model'
 
-type CharacterConnectionHit = {
+type CharacterRelationshipHit = {
+  _id: string
+  characterId: string
+  kind: string
+  locationId?: string
+}
+
+type CharacterSubjectHit = {
   _id: unknown
   name: string
   characterType: CharacterType
-  connections?: {
-    locations?: Array<{ id: string; locationId: string; kind: string }>
-  }
 }
 
 type OrganizationConnectionHit = {
@@ -46,39 +52,40 @@ type ConnectedPartySortRow = LocationConnectedPartyRow & {
   sortSubjectId: string
 }
 
-function expandCharacterRows(
-  hit: CharacterConnectionHit,
+function expandCharacterRelationshipRows(
+  edge: CharacterRelationshipHit,
+  character: CharacterSubjectHit,
   locationId: string,
-): ConnectedPartySortRow[] {
-  const subjectId = String(hit._id)
+): ConnectedPartySortRow | null {
+  if (edge.locationId !== locationId) return null
+  if (!(CHARACTER_LOCATION_CONNECTION_KIND_IDS as readonly string[]).includes(edge.kind)) {
+    return null
+  }
 
-  return (hit.connections?.locations ?? [])
-    .filter((connection) => connection.locationId === locationId)
-    .map((connection) => {
-      const kind = connection.kind as CharacterLocationConnectionKind
-      const family = getCharacterLocationConnectionFamily(kind)
-      const sectionGroup = resolveLocationConnectedPartySectionGroup(family)
+  const kind = edge.kind as CharacterLocationConnectionKind
+  const subjectId = String(character._id)
+  const family = getCharacterLocationConnectionFamily(kind)
+  const sectionGroup = resolveLocationConnectedPartySectionGroup(family)
 
-      return {
-        relationshipId: connection.id,
-        subjectType: 'character' as const,
-        subject: {
-          type: 'character' as const,
-          id: subjectId,
-          name: hit.name,
-          slug: subjectId,
-          characterType: hit.characterType,
-        },
-        kind,
-        label: getCharacterLocationConnectionDisplayLabel(kind, 'inverse'),
-        family,
-        priority: getCharacterLocationConnectionPriority(kind),
-        sectionGroup,
-        sortSectionRank: getLocationConnectedPartySectionRank(sectionGroup),
-        sortSubjectName: hit.name,
-        sortSubjectId: subjectId,
-      }
-    })
+  return {
+    relationshipId: edge._id,
+    subjectType: 'character' as const,
+    subject: {
+      type: 'character' as const,
+      id: subjectId,
+      name: character.name,
+      slug: subjectId,
+      characterType: character.characterType,
+    },
+    kind,
+    label: getCharacterLocationConnectionDisplayLabel(kind, 'inverse'),
+    family,
+    priority: getCharacterLocationConnectionPriority(kind),
+    sectionGroup,
+    sortSectionRank: getLocationConnectedPartySectionRank(sectionGroup),
+    sortSubjectName: character.name,
+    sortSubjectId: subjectId,
+  }
 }
 
 function expandOrganizationRows(
@@ -176,12 +183,14 @@ export async function resolveLocationConnectedParties(input: {
     return null
   }
 
-  const [characters, organizations] = await Promise.all([
-    CharacterModel.find({
-      'connections.locations.locationId': locationId,
+  const [relationshipEdges, organizations] = await Promise.all([
+    CharacterRelationshipModel.find({
+      campaignId,
+      locationId,
+      kind: { $in: [...CHARACTER_LOCATION_CONNECTION_KIND_IDS] },
     })
-      .select({ _id: 1, name: 1, characterType: 1, connections: 1 })
-      .lean<CharacterConnectionHit[]>(),
+      .select({ _id: 1, characterId: 1, kind: 1, locationId: 1 })
+      .lean<CharacterRelationshipHit[]>(),
     HomebrewOrganizationModel.find({
       campaignId,
       'connections.locations.locationId': locationId,
@@ -190,8 +199,24 @@ export async function resolveLocationConnectedParties(input: {
       .lean<OrganizationConnectionHit[]>(),
   ])
 
+  const characterIds = [...new Set(relationshipEdges.map((edge) => edge.characterId))]
+  const characters =
+    characterIds.length > 0
+      ? await CharacterModel.find({ _id: { $in: characterIds } })
+          .select({ _id: 1, name: 1, characterType: 1 })
+          .lean<CharacterSubjectHit[]>()
+      : []
+  const characterById = new Map(characters.map((character) => [String(character._id), character]))
+
+  const characterRows = relationshipEdges.flatMap((edge) => {
+    const character = characterById.get(edge.characterId)
+    if (!character) return []
+    const row = expandCharacterRelationshipRows(edge, character, locationId)
+    return row ? [row] : []
+  })
+
   const rows = sortConnectedPartyRows([
-    ...characters.flatMap((hit) => expandCharacterRows(hit, locationId)),
+    ...characterRows,
     ...organizations.flatMap((hit) => expandOrganizationRows(hit, locationId)),
   ])
 

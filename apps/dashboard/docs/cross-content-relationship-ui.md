@@ -601,8 +601,8 @@ Before building a new cross-content relationship surface, evaluate:
 ## Organization Members (character-owned membership inverse)
 
 The organization detail **Members** section is the organization-facing inverse of
-character-owned `connections.organizations` memberships — not a typed location-style
-edge. It uses `DetailCollectionPanel` + `RelationshipList` (unlabeled `Group`, populated
+character `organizationMembership` relationship edges — not a typed location-style
+edge or nested membership routes. It uses `DetailCollectionPanel` + `RelationshipList` (unlabeled `Group`, populated
 `Footer` for Add) and composes member metadata through `RelationshipList.Row` props (no
 membership-specific props on shared primitives).
 

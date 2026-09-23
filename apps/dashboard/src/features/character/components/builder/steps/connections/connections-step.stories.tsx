@@ -1,16 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import {
+  CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  createEmptyCharacterBuilderDraft,
+} from '@rpg/contracts'
 
-import { createStandaloneBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
+import { createCampaignNpcBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
 import {
   cityCouncil,
   lanternGuild,
 } from '../../../connections/picker/organization-picker-drawer.fixtures'
+import { harborfordSettlement } from '../../../connections/picker/residence-location-picker-drawer.fixtures'
 import { ConnectionsStep } from './connections-step'
 
-const context = createStandaloneBuilderContextFixture({
+const context = createCampaignNpcBuilderContextFixture({
   catalog: {
-    ...createStandaloneBuilderContextFixture().catalog,
+    ...createCampaignNpcBuilderContextFixture().catalog,
     organizations: [lanternGuild, cityCouncil],
   },
 })
@@ -18,7 +22,12 @@ const context = createStandaloneBuilderContextFixture({
 const meta = {
   title: 'Character Builder/ConnectionsStep',
   component: ConnectionsStep,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    msw: {
+      handlers: [],
+    },
+  },
   args: {
     context,
     draft: createEmptyCharacterBuilderDraft(),
@@ -36,7 +45,21 @@ export const Selected: Story = {
   args: {
     draft: {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: lanternGuild.id }], locations: [] },
+      relationshipEdges: [
+        {
+          id: 'edge-org-1',
+          kind: 'organizationMembership',
+          characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+          organizationId: lanternGuild.id,
+          details: { lifecycle: 'current', title: 'Guildmaster' },
+        },
+        {
+          id: 'edge-place-1',
+          kind: 'resides_at',
+          characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+          locationId: harborfordSettlement.id,
+        },
+      ],
     },
   },
 }
@@ -45,7 +68,14 @@ export const StaleSelection: Story = {
   args: {
     draft: {
       ...createEmptyCharacterBuilderDraft(),
-      connections: { organizations: [{ organizationId: 'organization-missing' }], locations: [] },
+      relationshipEdges: [
+        {
+          id: 'edge-org-missing',
+          kind: 'organizationMembership',
+          characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+          organizationId: 'organization-missing',
+        },
+      ],
     },
   },
 }

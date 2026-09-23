@@ -42,7 +42,8 @@ catalog/filter logic lives in `lib/detail/`; view models in `lib/display/`.
 | `sheet/`       | Upper sheet layout — header, ability/stat/combat rows, stat tile, CVA |
 | `tabs/`        | Lower tab region — spells/equipment catalog tabs, narrative           |
 | `status/`      | Route-injected status chrome (`statusSummary` slot)                   |
-| `memberships/` | Campaign org membership summary, container, drawer wiring             |
+| `connections/` | Campaign relationship sheet — add/edit modals, grouped list, pickers  |
+| `memberships/` | `CharacterIdentityConnectionsSupplement` wrapper for sheet header     |
 
 Builder `equipment/`, `spells/`, and `connections/` folders are separate
 lifecycles — detail tabs and membership composition stay here.
@@ -87,17 +88,34 @@ spell choice/summary cards) lives under `components/builder/steps/proficiencies/
 | `proficiencies/picker/proficiency-picker-drawer.*`                                | Proficiency catalog drawer shell            |
 | `proficiencies/picker/map-skill-proficiency-compact-summary-to-metadata-lines.ts` | Skill metadata mapper                       |
 
+## Connections (builder + sheet)
+
+Campaign character relationships are authored through the builder Connections
+step and the compact Connections section on character detail. Both surfaces share
+`lib/relationship/` catalogs, pickers, row view-models, and edge API sync.
+
+| Area               | Path                                                                           |
+| ------------------ | ------------------------------------------------------------------------------ |
+| Builder step       | `components/builder/steps/connections/`                                        |
+| Sheet Connections  | `components/detail/connections/`                                               |
+| Shared pickers     | `components/connections/picker/`                                               |
+| Relationship lib   | `lib/relationship/` — section/role catalogs, projection rows, mutations        |
+| API client + hooks | `api/character-relationship-client.ts`, `hooks/use-character-relationships.ts` |
+
+The Connections builder step is available only for authorized campaign NPC
+authoring (`canWriteCharacterRelationships`). Standalone PC creation and campaign
+PC onboarding omit the step and reject relationship edge payloads at finalize.
+
 ## `components/connections/` layout
 
-Reusable organization membership UI — picker drawer, edit drawer, and shared title
-field. Builder step composition lives in `components/builder/steps/connections/`;
-sheet summary and drawer wiring live in `components/detail/memberships/`.
+Reusable relationship picker drawers shared by builder and sheet flows.
 
-| Subfolder / file                          | Responsibility                          |
-| ----------------------------------------- | --------------------------------------- |
-| `picker/organization-picker-drawer.*`     | Add-membership catalog picker sheet     |
-| `edit-organization-membership-drawer.*`   | Edit/remove membership drawer + copy    |
-| `organization-membership-title-field.tsx` | Shared title radio field (presentation) |
+| Subfolder / file                            | Responsibility                  |
+| ------------------------------------------- | ------------------------------- |
+| `picker/character-picker-drawer.*`          | Campaign character search       |
+| `picker/organization-picker-drawer.*`       | Organization membership picker  |
+| `picker/location-relationship-add-drawer.*` | Place/property location picker  |
+| `picker/person-relationship-add-drawer.*`   | Person relationship guided flow |
 
 Membership title semantics (sentinel constant, radio mappers) live in
 `lib/organization-membership/organization-membership-title.lib.ts`.
@@ -265,6 +283,7 @@ subdirectories.
 | `navigation/`              | Standalone sheet redirect helpers (not builder step rail)                                  |
 | `proficiencies/`           | Proficiencies step view models                                                             |
 | `organization-membership/` | Title sentinel + radio mapping for org membership connections                              |
+| `relationship/`            | Connections catalogs, edge sync, sheet save, projection row presentation                   |
 | `spells/`                  | Spells step view models                                                                    |
 | `steps/`                   | Identity and abilities builder form modules                                                |
 

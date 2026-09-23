@@ -19,9 +19,9 @@ type Values = {
 }
 
 function DialogDisclosureHarness({
-  hint = 'Controls where this content can be discovered and used.',
+  info = 'Controls where this content can be discovered and used.',
 }: {
-  hint?: string
+  info?: string
 }) {
   const form = useForm<Values>({ defaultValues: { available: true } })
 
@@ -33,7 +33,7 @@ function DialogDisclosureHarness({
         formControl={form.control as unknown as Control<FieldValues>}
         disclosure={{
           variant: 'dialog',
-          hint,
+          info,
           dialogHeadline: 'Campaign availability',
           resolveSummary: (values) => ({
             status: {
@@ -97,7 +97,7 @@ describe('FieldGroup dialog disclosure', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     const trigger = screen.getByRole('button', { name: 'Campaign availability' })
     expect(trigger).toHaveAttribute('aria-labelledby')
-    expect(trigger).toHaveAttribute('aria-describedby')
+    expect(screen.getByRole('button', { name: 'About Campaign availability' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Change' })).not.toBeInTheDocument()
 
     await user.click(trigger)
@@ -126,7 +126,7 @@ describe('FieldGroup dialog disclosure', () => {
     expect(screen.getByText('Available · dm_only')).toBeInTheDocument()
   })
 
-  itAxe('has no axe violations for labelledby/describedby trigger wiring', async () => {
+  itAxe('has no axe violations for labelledby trigger wiring', async () => {
     const { container } = render(<DialogDisclosureHarness />)
     await expectNoAxeViolations(container)
 
