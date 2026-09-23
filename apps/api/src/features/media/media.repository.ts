@@ -1,6 +1,8 @@
-import type { MediaScope } from '@rpg/contracts'
+import type { MediaScope, MediaSubject } from '@rpg/contracts'
 
+import type { WithMongoSession } from '../../lib/mongo-session'
 import { MediaAssetModel, type MediaAssetDoc } from './media-asset.model'
+import { MediaReferenceModel, type MediaReferenceDoc } from './media-reference.model'
 import { MediaUploadIdempotencyModel } from './media-upload-idempotency.model'
 import { MediaUploadSessionModel, type MediaUploadSessionDoc } from './media-upload-session.model'
 import { serializeMediaScope } from './lib/scope.lib'
@@ -108,4 +110,96 @@ function isDuplicateKeyError(error: unknown): boolean {
     'code' in error &&
     (error as { code?: number }).code === 11000
   )
+}
+
+export async function findMediaAssetsByIds(
+  assetIds: readonly string[],
+  options?: WithMongoSession,
+): Promise<MediaAssetDoc[]> {
+  if (assetIds.length === 0) return []
+  return MediaAssetModel.find({ _id: { $in: assetIds } })
+    .session(options?.session ?? null)
+    .lean<MediaAssetDoc[]>()
+}
+
+export async function findMediaReferencesForSubject(
+  subject: MediaSubject,
+  options?: WithMongoSession,
+): Promise<MediaReferenceDoc[]> {
+  return MediaReferenceModel.find({ subjectKind: subject.kind, subjectId: subject.id })
+    .session(options?.session ?? null)
+    .lean<MediaReferenceDoc[]>()
+}
+
+export async function deleteMediaReferencesForSubject(
+  subject: MediaSubject,
+  options?: WithMongoSession,
+): Promise<void> {
+  await MediaReferenceModel.deleteMany(
+    { subjectKind: subject.kind, subjectId: subject.id },
+    { session: options?.session },
+  )
+}
+
+export async function createMediaReferenceRecords(
+  records: Array<Omit<MediaReferenceDoc, 'createdAt'>>,
+  options?: WithMongoSession,
+): Promise<void> {
+  if (records.length === 0) return
+  await MediaReferenceModel.create(records, { session: options?.session, ordered: true })
+}
+
+export async function incrementMediaAssetReferenceCount(
+  assetId: string,
+  delta: number,
+  options?: WithMongoSession,
+): Promise<void> {
+  await MediaAssetModel.updateOne(
+    { _id: assetId },
+    { $inc: { referenceCount: delta } },
+    { session: options?.session },
+  )
+}
+
+export async function markExpiredUnreferencedMediaAssets(now: Date): Promise<number> {
+  const result = await MediaAssetModel.updateMany(
+    {
+      lifecycle: 'ready',
+      referenceCount: 0,
+      leaseExpiresAt: { $lte: now },
+    },
+    { $set: { lifecycle: 'expired' } },
+  )
+  return result.modifiedCount
+}
+
+export async function claimExpiredMediaAssetForDeletion(
+  assetId: string,
+): Promise<MediaAssetDoc | null> {
+  const doc = await MediaAssetModel.findOneAndUpdate(
+    { _id: assetId, lifecycle: 'expired', referenceCount: 0 },
+    { $set: { lifecycle: 'deleting' } },
+    { new: false },
+  ).lean<MediaAssetDoc | null>()
+
+  return doc
+}
+
+export async function deleteMediaAssetRecord(
+  assetId: string,
+  options?: WithMongoSession,
+): Promise<void> {
+  await MediaAssetModel.deleteOne({ _id: assetId }, { session: options?.session })
+}
+
+export async function findExpiredUnreferencedMediaAssetIds(limit = 100): Promise<string[]> {
+  const docs = await MediaAssetModel.find({
+    lifecycle: 'expired',
+    referenceCount: 0,
+  })
+    .select('_id')
+    .limit(limit)
+    .lean<Array<{ _id: string }>>()
+
+  return docs.map((doc) => doc._id)
 }

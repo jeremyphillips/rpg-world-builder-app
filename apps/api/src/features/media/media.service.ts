@@ -4,7 +4,9 @@ import type {
   CreateMediaUploadSessionInput,
   MediaAsset,
   MediaAssetUploadResponse,
+  MediaRenditionPreset,
   MediaUploadSession,
+  NormalizedCrop,
 } from '@rpg/contracts'
 import {
   CONTENT_MEDIA_MAX_ATTACHMENTS,
@@ -16,6 +18,7 @@ import { loadEnv } from '../../env'
 import { HttpError } from '../../lib/http-error'
 import { validateFileType } from '../uploads'
 import { extensionForMime, inspectImageBuffer } from './lib/inspect-image.lib'
+import { generateMediaRendition } from './lib/generate-rendition.lib'
 import { assertMediaScopeAuthorized, serializeMediaScope } from './lib/scope.lib'
 import { storeMediaOriginal } from './lib/storage.lib'
 import { scopeFromDoc, toMediaAsset } from './lib/to-media-asset'
@@ -193,6 +196,33 @@ export async function uploadMediaAsset(input: {
 
 export async function getMediaAssetMetadata(assetId: string, userId: string): Promise<MediaAsset> {
   return loadAuthorizedAsset(assetId, userId)
+}
+
+export async function getMediaAssetRendition(input: {
+  assetId: string
+  preset: MediaRenditionPreset
+  crop?: NormalizedCrop
+  userId: string
+}): Promise<{ buffer: Buffer; mimeType: string }> {
+  const doc = await findMediaAssetById(input.assetId)
+  if (!doc) {
+    throw new HttpError(404, 'not_found', 'Media asset not found.')
+  }
+
+  if (doc.lifecycle !== 'ready') {
+    throw HttpError.badRequest('Media asset is not available.')
+  }
+
+  const scope = scopeFromDoc(doc)
+  await assertMediaScopeAuthorized(scope, input.userId)
+
+  const rendition = await generateMediaRendition({
+    asset: doc,
+    preset: input.preset,
+    crop: input.crop,
+  })
+
+  return { buffer: rendition.buffer, mimeType: rendition.mimeType }
 }
 
 function sanitizeFilename(filename: string): string {

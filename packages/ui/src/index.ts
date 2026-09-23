@@ -109,6 +109,16 @@ export {
   RichTextTableEmbedHostRegistrar,
 } from './components/ui/rich-text-table-embed-host.client'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
+export { MediaImage, type MediaImageProps } from './components/ui/media-image.client'
+export {
+  mediaImageVariants,
+  mediaImagePlaceholderVariants,
+  type MediaImageVariantProps,
+} from './components/ui/media-image.variants'
+export {
+  MediaCompactPreview,
+  type MediaCompactPreviewProps,
+} from './components/ui/media-compact-preview.client'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
 export {

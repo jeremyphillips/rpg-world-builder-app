@@ -233,4 +233,40 @@ describe('media routes', () => {
       .send({ scope: { kind: 'user-pc', userId: other.userId } })
       .expect(403)
   })
+
+  it('serves authorized renditions with private caching and rejects outsiders', async () => {
+    await clearTestDb()
+
+    const owner = await authedOwnerCampaign('media-rendition-owner@example.com')
+    const outsider = await registerAndLoginTestUser(getApp(), {
+      email: 'media-rendition-outsider@example.com',
+      password: 'supersecret',
+      displayName: 'Outsider',
+    })
+
+    const sessionRes = await createSession(owner.agent, owner.csrfToken, {
+      kind: 'campaign-content',
+      campaignId: owner.campaignId,
+    })
+    const sessionId = sessionRes.body.id as string
+    const buffer = await createTestImageBuffer('png', 200)
+    const uploadRes = await uploadToSession(
+      owner.agent,
+      owner.csrfToken,
+      sessionId,
+      buffer,
+      'art.png',
+    ).expect(201)
+    const assetId = uploadRes.body.asset.id as string
+
+    const renditionRes = await owner.agent
+      .get(`/api/media/assets/${assetId}/renditions/compact-identity`)
+      .expect(200)
+
+    expect(renditionRes.headers['content-type']).toContain('image/webp')
+    expect(renditionRes.headers['cache-control']).toContain('private')
+    expect(renditionRes.body.length).toBeGreaterThan(0)
+
+    await outsider.agent.get(`/api/media/assets/${assetId}/renditions/compact-identity`).expect(403)
+  })
 })

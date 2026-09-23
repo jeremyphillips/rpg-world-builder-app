@@ -28,6 +28,9 @@ and are not served by `GET /api/uploads/:key`.
 - Normalized crop geometry and `validateContentMedia`
 - `mediaBearingAuthoredContentBodySchema` (not yet wired into live type schemas)
 - Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`)
+- `reconcileContentMedia`, `reclaimExpiredAssets`, `remapContentMediaForDuplicate`
+- `resolveContentMediaPresentation`, rendition presets, system asset manifest
+- `@rpg/ui` `MediaImage` / `MediaCompactPreview` (not mounted in product surfaces)
 
 ## Phase status
 
@@ -35,8 +38,8 @@ and are not served by `GET /api/uploads/:key`.
 | ------------------------- | ------- | --------------------------------- |
 | 1 Contracts & crop proof  | Done    | Live schemas still use `imageKey` |
 | 2 Asset upload & delivery | Done    | Parallel to legacy `/api/uploads` |
-| 3 Attachment lifecycle    | Pending | Reconcile, leases, cleanup        |
-| 4 Resolver & derivatives  | Pending |                                   |
+| 3 Attachment lifecycle    | Done    | Reconcile, leases, cleanup        |
+| 4 Resolver & derivatives  | Done    | Primitives not mounted in product |
 | 5 Media manager UI        | Pending |                                   |
 | 6 Domain cutover          | Pending |                                   |
 | 7 Acceptance              | Pending |                                   |

@@ -22,3 +22,17 @@ export const contentMediaWriteInputSchema = z
   .strict()
 
 export type ContentMediaWriteInput = z.infer<typeof contentMediaWriteInputSchema>
+
+/** Result of applying validated media to a parent form draft (modal Save). */
+export type ApplyContentMediaToDraftResult =
+  | { ok: true; media: z.infer<typeof contentMediaSchema>; dirty: true }
+  | { ok: false; reason: 'validation_failed'; issues: readonly { message: string }[] }
+
+/** Result of committing media to a saved record (detail Save / domain command). */
+export type CommitContentMediaRecordResult =
+  | { ok: true; media: z.infer<typeof contentMediaSchema> }
+  | {
+      ok: false
+      reason: 'stale_revision' | 'validation_failed'
+      media?: z.infer<typeof contentMediaSchema>
+    }

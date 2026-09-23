@@ -1,10 +1,13 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { setTimeout as delay } from 'node:timers/promises'
 
 import { HttpError } from '../../../lib/http-error'
 import { resolveUploadDir } from '../../uploads'
 
 const MEDIA_SEGMENT = 'media'
+const DELETE_RETRY_ATTEMPTS = 3
+const DELETE_RETRY_DELAY_MS = 25
 
 export function resolveMediaAssetDir(assetId: string): string {
   if (!/^[0-9a-f-]{36}$/i.test(assetId)) {
@@ -54,4 +57,28 @@ export function readMediaOriginal(storageKey: string): Buffer {
   }
 
   return fs.readFileSync(absolutePath)
+}
+
+export async function deleteMediaAssetDir(assetId: string): Promise<void> {
+  const assetDir = resolveMediaAssetDir(assetId)
+  if (!fs.existsSync(assetDir)) {
+    return
+  }
+
+  let lastError: unknown
+  for (let attempt = 0; attempt < DELETE_RETRY_ATTEMPTS; attempt += 1) {
+    try {
+      fs.rmSync(assetDir, { recursive: true, force: true })
+      return
+    } catch (error) {
+      lastError = error
+      if (attempt < DELETE_RETRY_ATTEMPTS - 1) {
+        await delay(DELETE_RETRY_DELAY_MS)
+      }
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error('Failed to delete media asset directory.')
 }

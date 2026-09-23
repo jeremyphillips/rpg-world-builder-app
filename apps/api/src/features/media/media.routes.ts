@@ -38,3 +38,5 @@ mediaRouter.post(
 )
 
 mediaRouter.get('/assets/:assetId', requireAuth, controller.getAsset)
+
+mediaRouter.get('/assets/:assetId/renditions/:preset', requireAuth, controller.getAssetRendition)
