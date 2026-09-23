@@ -67,6 +67,7 @@ export function identityDraftToFormValues(
     name: identity.name ?? '',
     narrative: narrativeDraftToFormValues(identity.narrative),
     alignment: identity.alignment,
+    media: identity.media,
   }
 }
 
@@ -78,6 +79,7 @@ export function identityFormValuesToDraft(
     name: values.name.trim(),
     narrative: narrativeFormValuesToDraft(values.narrative),
     alignment: values.alignment || undefined,
+    media: values.media,
   }
 }
 

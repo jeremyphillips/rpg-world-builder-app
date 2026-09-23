@@ -9,6 +9,10 @@ import {
   contentPatchBaseSchema,
   slugSchema,
 } from '../lib/envelope'
+import {
+  mediaBearingAuthoredContentBodySchema,
+  mediaBearingDraftAuthoredContentBodySchema,
+} from '../../../shared/media/media-bearing-content'
 import { customContentTraitSchema, normalizeContentTrait } from '../lib/grants'
 import type { GrantGroup } from '../lib/grants'
 import {
@@ -19,7 +23,6 @@ import {
 } from '../lib/grants/proficiency-grant-set'
 import { CLASS_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
 import { createDraftInputSchema, draftStoredSchema } from '../lib/content-input-schemas'
-import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'
 
 import {
   classCharacterCreationDraftSchema,
@@ -136,7 +139,7 @@ export type ClassProficienciesDraft = z.infer<typeof classProficienciesDraftSche
 // ---------------------------------------------------------------------------
 
 /** Persisted body — seed, homebrew Mongo, and overlay patches. */
-export const classStoredBodySchema = contentBodyBaseSchema.extend({
+export const classStoredBodySchema = mediaBearingAuthoredContentBodySchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
   spellcasting: spellcastingSchema.optional(),
@@ -148,7 +151,7 @@ export const classStoredBodySchema = contentBodyBaseSchema.extend({
 export type ClassStoredBody = z.infer<typeof classStoredBodySchema>
 
 /** Draft save body — untitled name fallback; core progression fields optional. */
-export const classBodyDraftSchema = draftAuthoredContentBodySchema(
+export const classBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema(
   CLASS_CONTENT_TYPE_TERM.label,
 ).extend({
   primaryAbilities: z.array(abilitySchema).max(2).optional(),

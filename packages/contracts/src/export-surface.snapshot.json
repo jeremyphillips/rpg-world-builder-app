@@ -2169,6 +2169,7 @@
     "mediaAssetSchema",
     "mediaAssetUploadResponseSchema",
     "mediaBearingAuthoredContentBodySchema",
+    "mediaBearingDraftAuthoredContentBodySchema",
     "mediaPersistenceModeSchema",
     "mediaRenditionCropQuerySchema",
     "mediaRenditionPresetSchema",

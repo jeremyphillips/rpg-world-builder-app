@@ -307,6 +307,7 @@ export function assembleCharacterBuildSheet(
   return {
     name: effectiveDraft.identity.name!.trim(),
     imageKey: effectiveDraft.identity.imageKey,
+    media: effectiveDraft.identity.media,
     rulesetId: context.rulesetId,
     classes: isClasslessLevelZero ? [] : [{ classId: classId!, level: effectiveDraft.class.level }],
     species: {

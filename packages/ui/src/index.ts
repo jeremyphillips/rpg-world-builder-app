@@ -1162,3 +1162,8 @@ export {
   dataTableHeaderCellVariants,
   dataTableSortIconVariants,
 } from './components/ui/data-table.variants'
+
+export {
+  MediaCropEditor,
+  type MediaCropEditorProps,
+} from './components/ui/media-crop-editor.client'

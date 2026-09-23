@@ -1,14 +1,17 @@
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
+import { useState } from 'react'
 import type {
   ContentCampaignAccessPatch,
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
-import { cn, fieldStackRhythmVariants } from '@rpg/ui'
+import { emptyContentMediaSchema, type ContentMediaDomain } from '@rpg/contracts'
+import { Button, cn, fieldStackRhythmVariants } from '@rpg/ui'
 import { FormItems, resolveFormDensity, useFormSectionContext, type FormItem } from '@rpg/ui/form'
 
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import type { CampaignAvailabilityPresentation } from '@/lib/campaign-availability/campaign-availability-form-fields'
+import { MediaManager, type MediaManagerSave } from '@/features/media'
 
 import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context'
 import { buildContentAvailabilitySlotItem } from '../../fields/content-availability-slot.lib'
@@ -34,6 +37,54 @@ export interface ContentFormCampaignAccessProps {
   onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
   identityLayout?: ContentIdentityLayout
   availabilityPresentation?: CampaignAvailabilityPresentation
+  form?: UseFormReturn<FieldValues>
+  mediaDomain?: ContentMediaDomain
+}
+
+function resolveMediaDomain(routeKey: string): ContentMediaDomain | undefined {
+  const domains: Record<string, ContentMediaDomain> = {
+    characters: 'character',
+    classes: 'class',
+    species: 'species',
+    equipment: 'equipment',
+    locations: 'location',
+    organizations: 'organization',
+  }
+  return domains[routeKey]
+}
+
+function ContentMediaIdentitySlot({
+  domain,
+  form,
+  campaignId,
+}: {
+  domain: ContentMediaDomain
+  form: UseFormReturn<FieldValues>
+  campaignId?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const media =
+    (form.getValues('media') as typeof emptyContentMediaSchema | undefined) ??
+    emptyContentMediaSchema
+  const onSave = (change: MediaManagerSave) => {
+    form.setValue('media', change.media, { shouldDirty: true, shouldTouch: true })
+  }
+  return (
+    <>
+      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+        {media.images.length ? `${media.images.length} images · Manage images` : 'Add image'}
+      </Button>
+      <MediaManager
+        open={open}
+        onOpenChange={setOpen}
+        domain={domain}
+        value={media}
+        scope={{ kind: 'campaign-content', campaignId: campaignId ?? 'draft' }}
+        mode="form"
+        onSave={onSave}
+      />
+    </>
+  )
 }
 
 export function ContentFormHeader({
@@ -47,6 +98,8 @@ export function ContentFormHeader({
   onCampaignAccessPersisted,
   identityLayout = 'stacked',
   availabilityPresentation = 'disclosure',
+  form,
+  mediaDomain,
 }: ContentFormCampaignAccessProps) {
   const { density } = useFormSectionContext()
   const { rhythm } = resolveFormDensity(density)
@@ -75,7 +128,18 @@ export function ContentFormHeader({
 
   return (
     <div className={cn(fieldStackRhythmVariants({ rhythm }))}>
-      <FormItems items={items} idPrefix={idPrefix} />
+      <div className="flex items-end justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <FormItems items={items} idPrefix={idPrefix} />
+        </div>
+        {form && (mediaDomain ?? resolveMediaDomain(def.routeKey)) ? (
+          <ContentMediaIdentitySlot
+            domain={mediaDomain ?? resolveMediaDomain(def.routeKey)!}
+            form={form}
+            campaignId={campaignId}
+          />
+        ) : null}
+      </div>
     </div>
   )
 }

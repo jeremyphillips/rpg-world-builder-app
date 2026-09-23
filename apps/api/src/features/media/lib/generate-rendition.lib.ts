@@ -42,7 +42,11 @@ export async function generateMediaRendition(input: {
   crop?: NormalizedCrop
 }): Promise<GeneratedMediaRendition> {
   const source = { width: input.asset.orientedWidth, height: input.asset.orientedHeight }
-  const effectiveCrop = input.crop ?? resolveEffectiveCrop(undefined, source)
+  const effectiveCrop =
+    input.crop ??
+    (input.preset === 'artwork'
+      ? { x: 0, y: 0, width: 1, height: 1 }
+      : resolveEffectiveCrop(undefined, source))
   const presetConfig = getMediaRenditionPresetConfig(input.preset)
   const cacheKey = buildMediaRenditionCacheKey({
     assetId: input.asset._id,
@@ -66,7 +70,9 @@ export async function generateMediaRendition(input: {
   const buffer = await sharp(original, { animated: false, failOn: 'error' })
     .rotate()
     .extract(extract)
-    .resize(presetConfig.width, presetConfig.height, { fit: 'cover' })
+    .resize(presetConfig.width, presetConfig.height, {
+      fit: input.preset === 'artwork' ? 'inside' : 'cover',
+    })
     .webp()
     .toBuffer()
 

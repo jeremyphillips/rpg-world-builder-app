@@ -40,7 +40,7 @@ export const MEDIA_RENDITION_PRESETS = Object.keys(MEDIA_RENDITION_PRESET_ENTRIE
 export const mediaRenditionPresetSchema = z.enum(MEDIA_RENDITION_PRESETS)
 
 /** Bump when derivative generation logic changes to invalidate on-disk caches. */
-export const MEDIA_RENDITION_RENDERER_VERSION = 1
+export const MEDIA_RENDITION_RENDERER_VERSION = 2
 
 export type MediaRenditionPresetConfig =
   (typeof MEDIA_RENDITION_PRESET_ENTRIES)[MediaRenditionPreset]

@@ -429,3 +429,12 @@ Vitest is split into two projects: `ui:node` runs pure lib tests (`*.test.ts`,
 node environment, no jsdom/setup cost) and `ui:jsdom` runs component tests
 (`*.test.tsx`). Name test files accordingly — a `.test.ts` file that touches the
 DOM (render, renderHook, `document`, DOMPurify, …) must be `.test.tsx`.
+
+### Media editing
+
+`MediaCropEditor` is a controlled, persistence-free Portrait editor. Pass an oriented
+full-source `src`, original `source` dimensions, a normalized `crop`, and `onChange`.
+It supports pointer/touch pan, arrow-key repositioning, bounded zoom, reset, and live
+square/circular previews. Keep source dimensions consistent with the displayed image;
+never pass an already cropped rendition. `Modal.Content size="media"` provides the
+wide desktop workspace and full-height mobile shell used by content media management.

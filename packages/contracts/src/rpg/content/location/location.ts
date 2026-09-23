@@ -4,7 +4,6 @@ import { LOCATION_KIND_IDS } from '../../vocab/location/region/kind'
 import { formatUnionBranchDescription } from '../../vocab/enum-schema'
 import { createDraftInputSchema } from '../lib/content-input-schemas'
 import { LOCATION_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
-import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'
 import { contentMetaSchema, slugSchema } from '../lib/envelope'
 import { locationBaseSchema } from './base'
 import { districtLocationKindFields } from './district-variant'
@@ -31,6 +30,7 @@ import { interiorClassificationSchema } from './interior-classification'
 import { settlementTypeSchema } from '../../vocab/location/region/settlement-type'
 import { siteTypeSchema } from '../../vocab/location/region/site-type'
 import { structureTypeSchema } from '../../vocab/location/building/structure-type'
+import { mediaBearingDraftAuthoredContentBodySchema } from '../../../shared/media/media-bearing-content'
 
 // ---------------------------------------------------------------------------
 // Location — campaign-authored content type discriminated by `kind`. Each
@@ -118,7 +118,7 @@ export type CreateLocationInput = z.infer<typeof createLocationInputSchema>
 // Draft body variants — kind required; subtypes and parent may remain unset.
 // ---------------------------------------------------------------------------
 
-const locationBaseDraftSchema = draftAuthoredContentBodySchema(
+const locationBaseDraftSchema = mediaBearingDraftAuthoredContentBodySchema(
   LOCATION_CONTENT_TYPE_TERM.label,
 ).extend({
   parentLocationId: z.string().min(1).optional(),

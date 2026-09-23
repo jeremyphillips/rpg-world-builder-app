@@ -51,35 +51,38 @@ describe('generateMediaRendition crop parity', () => {
     const crop = resetPortraitCrop({ width: sourceWidth, height: sourceHeight })
     const expected = cropPixelDimensions(crop, sourceWidth, sourceHeight)
 
-    const rendition = await generateMediaRendition({
-      asset: {
-        _id: assetId,
-        sessionId: '00000000-0000-4000-8000-000000000001',
-        scopeKind: 'campaign-content',
-        scopeKey: 'campaign-content:camp-parity',
-        campaignId: 'camp-parity',
-        createdByUserId: 'user-parity',
-        storageKey: `media/${assetId}/original.png`,
-        originalFilename: 'landscape.png',
-        mimeType: 'image/png',
-        byteSize: buffer.byteLength,
-        orientedWidth: sourceWidth,
-        orientedHeight: sourceHeight,
-        contentHash: 'parity-hash',
-        animated: false,
-        lifecycle: 'ready',
-        referenceCount: 0,
-        leaseExpiresAt: new Date(Date.now() + 60_000),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      preset: 'portrait',
-      crop,
-    })
+    const asset = {
+      _id: assetId,
+      sessionId: '00000000-0000-4000-8000-000000000001',
+      scopeKind: 'campaign-content',
+      scopeKey: 'campaign-content:camp-parity',
+      campaignId: 'camp-parity',
+      createdByUserId: 'user-parity',
+      storageKey: `media/${assetId}/original.png`,
+      originalFilename: 'landscape.png',
+      mimeType: 'image/png',
+      byteSize: buffer.byteLength,
+      orientedWidth: sourceWidth,
+      orientedHeight: sourceHeight,
+      contentHash: 'parity-hash',
+      animated: false,
+      lifecycle: 'ready',
+      referenceCount: 0,
+      leaseExpiresAt: new Date(Date.now() + 60_000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as const
+    const rendition = await generateMediaRendition({ asset, preset: 'portrait', crop })
 
     const metadata = await sharp(rendition.buffer).metadata()
     expect(metadata.width).toBeLessThanOrEqual(expected.width)
     expect(metadata.height).toBeLessThanOrEqual(expected.height)
     expect(metadata.width).toBe(metadata.height)
+    const artwork = await generateMediaRendition({ asset, preset: 'artwork' })
+    const artworkMetadata = await sharp(artwork.buffer).metadata()
+    expect(artworkMetadata.width).toBe(800)
+    expect(artworkMetadata.height).toBe(450)
+    // A full-source editor preview must retain the original aspect ratio.
+    expect(artworkMetadata.width! / artworkMetadata.height!).toBeCloseTo(sourceWidth / sourceHeight)
   })
 })

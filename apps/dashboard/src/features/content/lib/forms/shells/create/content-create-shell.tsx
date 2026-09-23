@@ -4,6 +4,7 @@ import type {
   ContentTypeKey,
   ContentValidationIntent,
 } from '@rpg/contracts'
+import { emptyContentMediaSchema } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 import { useRef, useState, type ReactNode } from 'react'
 
@@ -176,7 +177,11 @@ function ContentCreateFormBody({
         def={def}
         ctx={ctx}
         schema={resolveContentFormSchema(def, ctx, 'draft')}
-        defaultValues={{ ...def.createDefaultValues, ...initialValues }}
+        defaultValues={{
+          ...def.createDefaultValues,
+          ...initialValues,
+          media: emptyContentMediaSchema,
+        }}
         formKey={formKey}
         formMode="create"
         contentTypeKey={contentTypeKey}

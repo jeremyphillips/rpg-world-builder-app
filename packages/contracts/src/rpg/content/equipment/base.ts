@@ -2,10 +2,10 @@ import { z } from 'zod'
 
 import { equipmentCostSchema } from '../../primitives/money'
 import { weightSchema } from '../../primitives/units'
-import { contentBodyBaseSchema } from '../lib/envelope'
+import { mediaBearingAuthoredContentBodySchema } from '../../../shared/media/media-bearing-content'
 
 /** Shared body fields present on every equipment union variant. */
-export const equipmentBaseSchema = contentBodyBaseSchema.extend({
+export const equipmentBaseSchema = mediaBearingAuthoredContentBodySchema.extend({
   cost: equipmentCostSchema,
   weight: weightSchema.optional(),
   tags: z.array(z.string()).optional(),

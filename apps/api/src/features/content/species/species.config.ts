@@ -31,6 +31,7 @@ function toHomebrewSpecies(doc: HomebrewDoc): Species {
     ...homebrewContentEnvelope(record),
     name: record.name,
     ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
+    ...(record.media !== undefined && { media: record.media }),
     ...(record.description !== undefined && { description: record.description }),
     creatureType: record.creatureType,
     sizes: record.sizes ?? [],

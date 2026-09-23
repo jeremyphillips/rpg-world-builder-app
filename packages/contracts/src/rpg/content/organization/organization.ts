@@ -12,9 +12,12 @@ import {
   type OrganizationMembershipTitleDefinition,
 } from './membership-titles'
 import { createDraftInputSchema } from '../lib/content-input-schemas'
-import { draftAuthoredContentBodySchema } from '../lib/draft-authored-content'
-import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from '../lib/envelope'
+import { contentMetaSchema, slugSchema } from '../lib/envelope'
 import { ORGANIZATION_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
+import {
+  mediaBearingAuthoredContentBodySchema,
+  mediaBearingDraftAuthoredContentBodySchema,
+} from '../../../shared/media/media-bearing-content'
 
 function uniqueOrganizationClassificationArray<T extends z.ZodTypeAny>(
   itemSchema: T,
@@ -79,7 +82,7 @@ const organizationMembersWithOptionalTitlesSchema = organizationMembersAffinityF
 })
 
 /** Classification + identity fields mutable on normal organization edit. */
-const organizationClassificationBodyFieldsSchema = contentBodyBaseSchema.extend({
+const organizationClassificationBodyFieldsSchema = mediaBearingAuthoredContentBodySchema.extend({
   organizationDomain: organizationDomainSchema,
   organizationForm: organizationFormSchema.optional(),
   functions: organizationFunctionsSchema.default([]),
@@ -115,7 +118,7 @@ export const organizationBodySchema = organizationBodyFieldsSchema
 export type OrganizationBody = z.infer<typeof organizationBodySchema>
 
 /** Draft organization body fields — domain may remain unset until publish. */
-const organizationBodyDraftFieldsSchema = draftAuthoredContentBodySchema(
+const organizationBodyDraftFieldsSchema = mediaBearingDraftAuthoredContentBodySchema(
   ORGANIZATION_CONTENT_TYPE_TERM.label,
 )
   .extend(organizationClassificationDraftFieldsSchema.shape)

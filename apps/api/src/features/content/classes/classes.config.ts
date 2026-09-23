@@ -35,6 +35,7 @@ function toHomebrewClass(doc: HomebrewDoc | HomebrewClassRecord): CharacterClass
     ...homebrewContentEnvelope(doc),
     name: doc.name,
     ...(doc.imageKey !== undefined && { imageKey: doc.imageKey }),
+    ...(doc.media !== undefined && { media: doc.media }),
     ...(doc.description !== undefined && { description: doc.description }),
     ...(doc.primaryAbilities != null && { primaryAbilities: doc.primaryAbilities }),
     ...(doc.hitDie != null && { hitDie: doc.hitDie }),

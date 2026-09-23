@@ -182,10 +182,14 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
     [fields, tabbedFormTabs],
   )
   const previewEnabled = hasContentFormPreview(headerProps.def) && Boolean(tabbedFormTabs)
-  const header = () => (
+  const header = (form: UseFormReturn<TFormValues>) => (
     <>
       {headerPrefix}
-      <ContentFormHeader {...headerProps} formKey={formKey} />
+      <ContentFormHeader
+        {...headerProps}
+        formKey={formKey}
+        form={form as UseFormReturn<FieldValues>}
+      />
       {previewEnabled ? (
         <>
           <ContentFormPublishValidationBridge

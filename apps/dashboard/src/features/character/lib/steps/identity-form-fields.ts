@@ -11,6 +11,7 @@ import {
   optionalGenderSchema,
 } from '@rpg/contracts'
 import { CANVAS_SURFACE, toOptions, type FormItem } from '@rpg/ui/form'
+import { contentMediaSchema } from '@rpg/contracts'
 
 const narrativeFormItemSchema = z.object({
   value: z.string(),
@@ -32,6 +33,7 @@ export const identityFormSchema = z.object({
     .min(1, formatFieldMessage(characterBuilderValidationMessages.nameRequired())),
   narrative: narrativeFormSchema,
   alignment: optionalAlignmentSchema,
+  media: contentMediaSchema.optional(),
 })
 
 export type IdentityFormValues = z.infer<typeof identityFormSchema>
@@ -86,6 +88,7 @@ export type BuildIdentityStepFormFieldsInput = {
   renderGenerateNarrative: () => ReactNode
   renderDraftSync: () => ReactNode
   renderContinueRegistration: () => ReactNode
+  renderMediaManager?: () => ReactNode
 }
 
 /** Composes the identity step field list, including optional name generation chrome. */
@@ -94,6 +97,7 @@ export function buildIdentityStepFormFields({
   renderGenerateNarrative,
   renderDraftSync,
   renderContinueRegistration,
+  renderMediaManager,
 }: BuildIdentityStepFormFieldsInput): FormItem[] {
   return [
     {
@@ -108,6 +112,16 @@ export function buildIdentityStepFormFields({
           options: toOptions(CHARACTER_GENDERS, GENDER_LABELS),
           width: 'full',
         },
+        ...(renderMediaManager
+          ? [
+              {
+                kind: 'slot',
+                name: '_identityMediaManager',
+                chrome: { variant: 'none' },
+                render: renderMediaManager,
+              } as FormItem,
+            ]
+          : []),
         {
           kind: 'row',
           fields: [

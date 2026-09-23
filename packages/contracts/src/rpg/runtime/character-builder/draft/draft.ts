@@ -12,6 +12,7 @@ import type { CharacterBuilderDraftScope } from './draft-scope'
 import { characterBuilderDraftScopeSchema } from './draft-scope'
 import { magicItemGrantSelectionSchema } from '../equipment/magic-item-selection'
 import { characterRelationshipDraftEdgesSchema } from '../../character-relationships/draft'
+import { contentMediaSchema } from '../../../../shared/media/content-media'
 
 // ---------------------------------------------------------------------------
 // CharacterBuilderDraft — the temporary workflow object. Allowed to represent
@@ -25,6 +26,7 @@ export const characterBuilderDraftIdentitySchema = z.object({
   name: z.string().optional(),
   narrative: characterNarrativeSchema.optional(),
   imageKey: z.string().optional(),
+  media: contentMediaSchema.optional(),
   alignment: optionalAlignmentSchema,
   gender: optionalGenderSchema,
 })
