@@ -2,30 +2,35 @@ import { cva } from 'class-variance-authority'
 
 export const dropzoneVariants = cva(
   [
-    'relative flex flex-col items-center justify-center gap-2',
-    'rounded-md border-2 border-dashed',
-    'px-6 py-8 text-center',
+    'relative flex flex-col items-center justify-center text-center',
+    'rounded-md border-2 border-dashed border-border',
     'transition-colors duration-150',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-    'cursor-pointer',
   ],
   {
     variants: {
+      density: {
+        compact: 'gap-2 px-6 py-8',
+        comfortable: 'min-h-48 gap-3 bg-sunken px-6 py-10',
+      },
       state: {
-        idle: 'border-border bg-background text-muted-foreground hover:border-ring hover:bg-accent',
+        idle: 'text-muted-foreground',
         dragover: 'border-drop-target-border bg-drop-target text-primary',
-        disabled:
-          'pointer-events-none cursor-not-allowed border-border bg-surface-muted text-muted-foreground opacity-50',
+        disabled: 'pointer-events-none opacity-50',
       },
     },
     defaultVariants: {
+      density: 'compact',
       state: 'idle',
     },
   },
 )
 
-export const dropzoneIconVariants = cva('mb-1', {
+export const dropzoneIconVariants = cva('', {
   variants: {
+    density: {
+      compact: 'size-8',
+      comfortable: 'size-10',
+    },
     state: {
       idle: 'text-muted-foreground',
       dragover: 'text-primary',
@@ -33,9 +38,28 @@ export const dropzoneIconVariants = cva('mb-1', {
     },
   },
   defaultVariants: {
+    density: 'compact',
     state: 'idle',
   },
 })
+
+export const dropzoneTitleVariants = cva('font-semibold text-foreground', {
+  variants: {
+    density: {
+      compact: 'text-sm',
+      comfortable: 'text-base',
+    },
+  },
+  defaultVariants: {
+    density: 'compact',
+  },
+})
+
+export const dropzoneDescriptionVariants = cva('text-sm text-muted-foreground')
+
+export const dropzoneRequirementsVariants = cva('text-xs text-muted-foreground')
+
+export const dropzoneActionsVariants = cva('flex flex-col items-center gap-2')
 
 export const fileListVariants = cva('mt-4 w-full space-y-2')
 
@@ -55,10 +79,6 @@ export const removeButtonVariants = cva([
   'hover:opacity-100 hover:text-destructive',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
 ])
-
-export const dropzonePromptVariants = cva('text-sm font-medium')
-
-export const dropzoneHintVariants = cva('text-xs text-muted-foreground')
 
 export const fileNameVariants = cva('truncate text-sm font-medium')
 

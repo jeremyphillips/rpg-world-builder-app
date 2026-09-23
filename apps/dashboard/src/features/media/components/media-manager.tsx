@@ -1,14 +1,24 @@
 import { Button, ConfirmDialog, Modal } from '@rpg/ui'
 import { useMediaManager } from '../hooks/use-media-manager'
+import { useMediaManagerBodyDrop } from '../hooks/use-media-manager-body-drop'
+import { useMediaManagerScrollBoundary } from '../hooks/use-media-manager-scroll-boundary'
 import type { MediaManagerProps } from '../lib/media-manager.types'
-import { MediaGallery } from './media-gallery'
-import { MediaWorkspace } from './media-workspace'
+import { MediaManagerBody } from './media-manager-body'
+import {
+  resolveMediaManagerBodyDropOverlay,
+  resolveMediaManagerFooterHint,
+  shouldShowMediaManagerStatus,
+} from './media-manager-session.lib'
+import { MediaManagerStatus } from './media-manager-status'
 import { mediaManagerStyles as styles } from './media-manager.variants'
+
 export type { MediaManagerProps, MediaManagerSave } from '../lib/media-manager.types'
+
 /** Mount one isolated session per opening; parent refreshes never overwrite a draft. */
 export function MediaManager(props: MediaManagerProps) {
   return props.open ? <MediaManagerSession {...props} /> : null
 }
+
 function MediaManagerSession(props: MediaManagerProps) {
   const controller = useMediaManager(props)
   const {
@@ -26,6 +36,18 @@ function MediaManagerSession(props: MediaManagerProps) {
     save,
     blocked,
   } = controller
+  const bodyDrop = useMediaManagerBodyDrop(uploads.add, uploads.maxUploadBytes)
+  const { headerScrolled, onGalleryBoundaryChange, onWorkspaceBoundaryChange } =
+    useMediaManagerScrollBoundary()
+  const bodyDropOverlay = resolveMediaManagerBodyDropOverlay(props.previewBodyDrop, bodyDrop)
+  const statusNotice = uploads.notice || state.notice
+  const showStatus = shouldShowMediaManagerStatus({
+    statusNotice,
+    pendingUploadCount: uploads.entries.length,
+    validationOk: validation.ok,
+    error,
+  })
+
   return (
     <Modal.Root
       open
@@ -35,51 +57,39 @@ function MediaManagerSession(props: MediaManagerProps) {
     >
       <Modal.Content size="media" layout="stable" stableSize="tall">
         <Modal.Header
+          className={styles.header()}
           headline="Manage images"
           description={`Add, organize, and assign images for this ${label}.`}
-        />
-        <Modal.Body>
-          <fieldset disabled={saving} className={styles.layout()}>
-            <MediaGallery
-              imageUrl={props.imageUrl}
-              media={state.media}
-              assets={assets}
-              selectedId={state.selectedId}
-              entries={uploads.entries}
-              onSelect={(id) => dispatch({ type: 'select', id })}
-              onAdd={uploads.add}
-              onRetry={uploads.retry}
-              onRemoveUpload={uploads.remove}
+        >
+          <div aria-hidden data-visible={headerScrolled} className={styles.headerScrollShadow()} />
+        </Modal.Header>
+        <Modal.Body stableBody>
+          <MediaManagerBody
+            bodyDrop={bodyDrop}
+            bodyDropOverlay={bodyDropOverlay}
+            controller={controller}
+            imageUrl={props.imageUrl}
+            media={state.media}
+            assets={assets}
+            selectedId={state.selectedId}
+            entries={uploads.entries}
+            saving={saving}
+            onSelect={(id) => dispatch({ type: 'select', id })}
+            onGalleryBoundaryChange={onGalleryBoundaryChange}
+            onWorkspaceBoundaryChange={onWorkspaceBoundaryChange}
+          />
+          {showStatus ? (
+            <MediaManagerStatus
+              statusNotice={statusNotice}
+              pendingUploadCount={uploads.entries.length}
+              validation={validation}
+              error={error}
             />
-            <MediaWorkspace controller={controller} imageUrl={props.imageUrl} />
-          </fieldset>
-          <p role="status" className={styles.muted()}>
-            {uploads.notice || state.notice}
-          </p>
-          {uploads.entries.length > 0 && (
-            <p className={styles.muted()}>
-              Finish uploads or remove pending/failed entries before saving.
-            </p>
-          )}
-          {!validation.ok && (
-            <p role="alert" className={styles.error()}>
-              {validation.issues.map((issue) => issue.message).join(' ')}
-            </p>
-          )}
-          {error && (
-            <p role="alert" className={styles.error()}>
-              {error} Your draft has been preserved. Cancel to discard and reopen with the latest
-              record if it changed elsewhere.
-            </p>
-          )}
+          ) : null}
         </Modal.Body>
         <Modal.Footer>
           <div className={styles.row()}>
-            <p className={styles.muted()}>
-              {props.mode === 'form'
-                ? `Image changes are saved when you save this ${label}.`
-                : 'Save changes to this record.'}
-            </p>
+            <p className={styles.muted()}>{resolveMediaManagerFooterHint(props.mode, label)}</p>
             <div className={styles.row()}>
               <Button type="button" variant="outline" disabled={saving} onClick={dismiss}>
                 Cancel

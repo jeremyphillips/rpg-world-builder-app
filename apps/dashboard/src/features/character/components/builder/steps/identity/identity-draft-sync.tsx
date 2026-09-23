@@ -38,6 +38,7 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
       name: name ?? '',
       narrative: narrative ?? emptyNarrativeFormValues(),
       alignment,
+      media: draftIdentity.media,
     })
 
     if (draftChanged) {

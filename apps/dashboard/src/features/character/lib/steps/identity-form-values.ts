@@ -79,7 +79,7 @@ export function identityFormValuesToDraft(
     name: values.name.trim(),
     narrative: narrativeFormValuesToDraft(values.narrative),
     alignment: values.alignment || undefined,
-    media: values.media,
+    ...(values.media !== undefined ? { media: values.media } : {}),
   }
 }
 
@@ -95,12 +95,16 @@ function narrativeFingerprint(narrative: CharacterNarrative | undefined): string
   })
 }
 
+function mediaFingerprint(media: CharacterBuilderDraftIdentity['media']): string {
+  return media ? JSON.stringify(media) : ''
+}
+
 function identityDraftFingerprint(identity: CharacterBuilderDraftIdentity): string {
   const name = identity.name ?? ''
   const imageKey = identity.imageKey ?? ''
   const alignment = identity.alignment ?? ''
   const gender = identity.gender ?? ''
-  return `${name}\0${narrativeFingerprint(identity.narrative)}\0${imageKey}\0${alignment}\0${gender}`
+  return `${name}\0${narrativeFingerprint(identity.narrative)}\0${imageKey}\0${alignment}\0${gender}\0${mediaFingerprint(identity.media)}`
 }
 
 /** Compares normalized identity slices — avoids redundant draft writes during live sync. */

@@ -17,4 +17,6 @@ export type MediaManagerProps = {
   initialAssets?: MediaAsset[]
   mode: 'form' | 'detail'
   onSave: (change: MediaManagerSave) => void | Promise<void>
+  /** Storybook-only: force the body drop overlay without a live file drag. */
+  previewBodyDrop?: 'active' | 'invalid'
 }

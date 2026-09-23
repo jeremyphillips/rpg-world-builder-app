@@ -116,7 +116,8 @@ uses `--foreground-disabled` (surface-relative, distinct from field-disabled).
 
 ## Chrome, brand, status
 
-Overlay: `--palette-overlay` (documented alpha exception). Generic borders are Layer 2
+Overlay: `--palette-overlay`, `--palette-drop-target-overlay`, `--palette-drop-target-overlay-invalid`
+(documented alpha exceptions). Generic borders are Layer 2
 `color-mix(foreground → --surface-current)` at `--border-*`.
 
 Brand: `--palette-primary`, `--palette-primary-foreground`, `--palette-on-solid`.

@@ -1,12 +1,22 @@
-import { Button, MediaCropEditor } from '@rpg/ui'
+import {
+  Button,
+  cn,
+  DialogPanelScrollRegion,
+  FileDropzone,
+  MediaCropEditor,
+  resolveChromeCalloutClasses,
+  type ScrollBoundaryState,
+} from '@rpg/ui'
+import { Info } from 'lucide-react'
 import { resolveEffectiveCrop, type ContentMedia, type MediaAsset } from '@rpg/contracts'
 import type { UseQueryResult } from '@tanstack/react-query'
 
 import type { MediaManagerController } from '../hooks/use-media-manager'
 import { mediaImageUrl, MEDIA_SOURCE_CROP } from '../lib/media-display'
+import { MEDIA_IMAGE_ACCEPT } from '../lib/media-upload.lib'
 import { MediaImageDetails } from './media-image-details'
 import { mediaManagerStyles as styles } from './media-manager.variants'
-import { resolveMediaWorkspaceCopy } from './media-workspace.lib'
+import { resolveMediaWorkspaceCopy, resolveMediaWorkspaceOnboarding } from './media-workspace.lib'
 
 function MediaWorkspaceErrorAlert({
   queries,
@@ -38,36 +48,85 @@ function MediaWorkspaceErrorAlert({
 export function MediaWorkspace({
   controller,
   imageUrl = mediaImageUrl,
+  onScrollBoundaryChange,
 }: {
   controller: MediaManagerController
   imageUrl?: typeof mediaImageUrl
+  onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }) {
-  const { state, selected, asset, queries } = controller
+  const { state, selected, asset, queries, policy, uploads } = controller
   const portrait = Boolean(
     selected &&
     state.media.roles.portrait?.imageId === selected.id &&
     state.presentation === 'portrait',
   )
   const primary = Boolean(selected && state.media.roles.primary?.imageId === selected.id)
-  const copy = resolveMediaWorkspaceCopy({ portrait, primary })
+  const copy = resolveMediaWorkspaceCopy({
+    portrait,
+    primary,
+    hasSelection: Boolean(selected),
+  })
 
   return (
     <section className={styles.workspace()} aria-label="Image workspace">
-      <h2 className={styles.heading()}>{copy.heading}</h2>
-      <p className={styles.muted()}>{copy.description}</p>
-      {selected && asset ? (
-        <MediaWorkspaceSelection
-          controller={controller}
-          imageUrl={imageUrl}
-          image={selected}
-          asset={asset}
-        />
-      ) : (
-        <div className={styles.empty()}>
-          {selected ? 'Loading image details…' : 'Add an image to get started.'}
+      <DialogPanelScrollRegion
+        inset="innerLeading"
+        regionClassName={styles.columnScroll()}
+        viewportClassName={styles.columnScrollViewport()}
+        showTopBoundaryShadow={false}
+        showBottomBoundaryShadow={false}
+        onBoundaryStateChange={onScrollBoundaryChange}
+      >
+        {portrait ? (
+          <div className={styles.workspaceHeaderPortrait()}>
+            <h2 className={styles.workspacePortraitHeading()}>{copy.heading}</h2>
+            <p className={styles.muted()}>{copy.description}</p>
+          </div>
+        ) : (
+          <div className={styles.workspaceHeader()}>
+            <h2 className={styles.heading()}>{copy.heading}</h2>
+            <p className={styles.muted()}>{copy.description}</p>
+          </div>
+        )}
+        <div className={styles.workspaceContent()}>
+          {selected && asset ? (
+            <MediaWorkspaceSelection
+              controller={controller}
+              imageUrl={imageUrl}
+              image={selected}
+              asset={asset}
+            />
+          ) : selected ? (
+            <div className={styles.empty()}>Loading image details…</div>
+          ) : (
+            <>
+              <div className={styles.empty()}>
+                <FileDropzone
+                  className="h-full"
+                  density="comfortable"
+                  multiple
+                  dropTarget={false}
+                  accept={[...MEDIA_IMAGE_ACCEPT]}
+                  maxSize={uploads.maxUploadBytes}
+                  onChange={(files) => uploads.add(files)}
+                />
+              </div>
+              <div
+                className={cn(
+                  styles.workspaceOnboarding(),
+                  resolveChromeCalloutClasses({ variant: 'callout', tone: 'info' }),
+                )}
+              >
+                <div className="flex items-start gap-2">
+                  <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <p className="text-sm">{resolveMediaWorkspaceOnboarding(policy.domain)}</p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-      )}
-      <MediaWorkspaceErrorAlert queries={queries} />
+        <MediaWorkspaceErrorAlert queries={queries} />
+      </DialogPanelScrollRegion>
     </section>
   )
 }

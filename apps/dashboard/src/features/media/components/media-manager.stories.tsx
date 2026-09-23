@@ -60,6 +60,23 @@ export const Equipment: Story = { args: { domain: 'equipment', value: primaryVal
 export const Location: Story = { args: { domain: 'location', value: primaryValue } }
 export const Organization: Story = { args: { domain: 'organization', value: primaryValue } }
 export const Empty: Story = { args: { value: { revision: 0, images: [], roles: {} } } }
+
+/** Static preview of the transparent body drop overlay (valid files). */
+export const EmptyBodyDropActive: Story = {
+  args: {
+    value: { revision: 0, images: [], roles: {} },
+    previewBodyDrop: 'active',
+  },
+}
+
+/** Static preview when dragged files are outside the accept list. */
+export const EmptyBodyDropInvalid: Story = {
+  args: {
+    value: { revision: 0, images: [], roles: {} },
+    previewBodyDrop: 'invalid',
+  },
+}
+
 export const Unassigned: Story = { args: { value: { ...mediaFixture, roles: {} } } }
 export const FailedSave: Story = {
   args: {

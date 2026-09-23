@@ -56,6 +56,28 @@
   );
 
   --palette-overlay: oklch(0.05 0.003 var(--palette-neutral-hue) / 0.7);
+  --palette-drop-target-overlay: color-mix(
+    in oklch,
+    var(--palette-primary) 42%,
+    color-mix(in oklch, var(--palette-fg-default) 82%, transparent)
+  );
+  --palette-drop-target-overlay-fg: var(--palette-fg-on-status);
+  --palette-drop-target-overlay-fg-muted: color-mix(
+    in oklch,
+    var(--palette-fg-on-status) 72%,
+    transparent
+  );
+  --palette-drop-target-overlay-border: color-mix(
+    in oklch,
+    var(--palette-primary) 72%,
+    var(--palette-fg-on-status)
+  );
+  --palette-drop-target-overlay-invalid: color-mix(
+    in oklch,
+    var(--palette-destructive) 38%,
+    var(--palette-drop-target-overlay)
+  );
+  --palette-drop-target-overlay-invalid-fg: var(--palette-destructive);
 
   /* Field control — global fill; no parent-context matrix */
   --palette-field-bg: var(--palette-surface-lift);

@@ -106,21 +106,25 @@ on the fallback as SSOT.
 Shared recipes (Layer 2 → Tailwind). Tinted washes mix toward inherited `--surface-current`
 (not `--background` or canvas wash aliases), not `transparent`:
 
-| CSS role                          | Utility                                | Composition (light/dark)                                                      |
-| --------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------- |
-| `--control-hover-bg`              | `bg-control-hover`                     | `color-mix(accent → --surface-current)`                                       |
-| `--control-selected-bg`           | `bg-control-selected`                  | `color-mix(accent → --surface-current)`                                       |
-| `--row-hover-bg`                  | `hover:bg-row-hover`                   | `--surface-subtle` (canvas wash ladder)                                       |
-| `--row-selected-bg`               | `bg-row-selected`                      | `--surface-strong` (canvas wash ladder)                                       |
-| `--row-selected-border`           | `border-row-selected-border`           | `--border-strong` (surface-relative)                                          |
-| `--drop-target-bg`                | `bg-drop-target`                       | `color-mix(accent → --surface-current)`                                       |
-| `--drop-target-border`            | `border-drop-target-border`            | `--primary`                                                                   |
-| `--segmented-track-bg`            | `bg-segmented-track`                   | `--surface-strong` (canvas wash ladder)                                       |
-| `--interactive-outline-border`    | `border-interactive-outline`           | `color-mix(foreground → --surface-current)` — distinct from `--border-subtle` |
-| `--interactive-outline-hover-bg`  | `hover:bg-interactive-outline-hover`   | `color-mix(primary → --surface-current)` via `@utility`                       |
-| `--interactive-outline-active-bg` | `active:bg-interactive-outline-active` | `color-mix(primary → --surface-current)` via `@utility`                       |
-| `--field-control-bg-default`      | inherited default field fill           | `--palette-field-bg`                                                          |
-| `--field-control-bg-on-muted`     | fill on `bg-surface-muted` panels      | `--surface-subtle` (one-step lift)                                            |
+| CSS role                           | Utility                                | Composition (light/dark)                                                      |
+| ---------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------- |
+| `--control-hover-bg`               | `bg-control-hover`                     | `color-mix(accent → --surface-current)`                                       |
+| `--control-selected-bg`            | `bg-control-selected`                  | `color-mix(accent → --surface-current)`                                       |
+| `--row-hover-bg`                   | `hover:bg-row-hover`                   | `--surface-subtle` (canvas wash ladder)                                       |
+| `--row-selected-bg`                | `bg-row-selected`                      | `--surface-strong` (canvas wash ladder)                                       |
+| `--row-selected-border`            | `border-row-selected-border`           | `--border-strong` (surface-relative)                                          |
+| `--drop-target-bg`                 | `bg-drop-target`                       | `color-mix(accent → --surface-current)`                                       |
+| `--drop-target-overlay-bg`         | `bg-drop-target-overlay`               | Inverted palette alpha scrim for full-surface drop overlays (modal body)      |
+| `--drop-target-overlay-fg`         | `text-drop-target-overlay-foreground`  | High-contrast copy on the inverted scrim                                      |
+| `--drop-target-overlay-border`     | `border-drop-target-overlay-border`    | Border on the inverted scrim                                                  |
+| `--drop-target-overlay-invalid-bg` | `bg-drop-target-overlay-invalid`       | Destructive-tinted inverted scrim for rejected full-surface drops             |
+| `--drop-target-border`             | `border-drop-target-border`            | `--primary`                                                                   |
+| `--segmented-track-bg`             | `bg-segmented-track`                   | `--surface-strong` (canvas wash ladder)                                       |
+| `--interactive-outline-border`     | `border-interactive-outline`           | `color-mix(foreground → --surface-current)` — distinct from `--border-subtle` |
+| `--interactive-outline-hover-bg`   | `hover:bg-interactive-outline-hover`   | `color-mix(primary → --surface-current)` via `@utility`                       |
+| `--interactive-outline-active-bg`  | `active:bg-interactive-outline-active` | `color-mix(primary → --surface-current)` via `@utility`                       |
+| `--field-control-bg-default`       | inherited default field fill           | `--palette-field-bg`                                                          |
+| `--field-control-bg-on-muted`      | fill on `bg-surface-muted` panels      | `--surface-subtle` (one-step lift)                                            |
 
 Add a new recipe only when the state is reused, owned by a shared primitive, or must stay
 independently tunable across light/dark. One-offs stay in local CVA using the ladder or status

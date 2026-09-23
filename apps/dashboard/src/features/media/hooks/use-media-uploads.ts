@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import {
   CONTENT_MEDIA_MAX_ATTACHMENTS,
@@ -24,19 +24,33 @@ export function useMediaUploads(
 ) {
   const [entries, setEntries] = useState<UploadEntry[]>([])
   const [notice, setNotice] = useState('')
+  const [maxUploadBytes, setMaxUploadBytes] = useState<number | undefined>(undefined)
   const queue = useRef<UploadEntry[]>([])
   const active = useRef(new Map<string, AbortController>())
   const alive = useRef(true)
   const callback = useRef(onAsset)
   callback.current = onAsset
   const session = useRef<Promise<MediaUploadSession> | undefined>(undefined)
-  const mutation = useMutation({
-    mutationFn: async (entry: UploadEntry & { signal: AbortSignal }) => {
-      session.current ??= createUploadSession(scope).catch((error) => {
+
+  const ensureSession = useCallback(() => {
+    session.current ??= createUploadSession(scope)
+      .then((uploadSession) => {
+        if (alive.current) setMaxUploadBytes(uploadSession.maxUploadBytes)
+        return uploadSession
+      })
+      .catch((error) => {
         session.current = undefined
         throw error
       })
-      const uploadSession = await session.current
+    return session.current
+  }, [scope])
+  useEffect(() => {
+    void ensureSession()
+  }, [ensureSession])
+
+  const mutation = useMutation({
+    mutationFn: async (entry: UploadEntry & { signal: AbortSignal }) => {
+      const uploadSession = await ensureSession()
       if (Date.parse(uploadSession.expiresAt) <= Date.now())
         throw new Error('Upload session expired. Close and reopen Manage images to upload again.')
       if (entry.file.size > uploadSession.maxUploadBytes)
@@ -121,5 +135,5 @@ export function useMediaUploads(
       pump()
     }
   }
-  return { entries, notice, add, remove, retry }
+  return { entries, notice, maxUploadBytes, add, remove, retry }
 }

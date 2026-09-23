@@ -44,6 +44,24 @@ export const MultipleFiles: StoryObj = {
   },
 }
 
+/** Comfortable density for tall surfaces such as Manage images. */
+export const Comfortable: StoryObj = {
+  render: () => {
+    const [files, setFiles] = useState<File[]>([])
+    return (
+      <FileDropzone
+        value={files}
+        onChange={setFiles}
+        density="comfortable"
+        className="h-64"
+        multiple
+        accept={['image/jpeg', 'image/png', 'image/webp', 'image/gif']}
+        maxSize={5_242_880}
+      />
+    )
+  },
+}
+
 /** Disabled — no interaction possible. */
 export const Disabled: StoryObj = {
   render: () => <FileDropzone value={[]} onChange={() => undefined} disabled />,

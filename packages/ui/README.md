@@ -262,15 +262,17 @@ const schema = z.object({
 
 ### `FileDropzone` props
 
-| Prop       | Type                      | Default       | Description                                |
-| ---------- | ------------------------- | ------------- | ------------------------------------------ |
-| `value`    | `File[]`                  | `[]`          | Current file list (controlled)             |
-| `onChange` | `(files: File[]) => void` | —             | Called when files are added or removed     |
-| `accept`   | `string[]`                | `['image/*']` | MIME types or extensions (e.g. `['.pdf']`) |
-| `multiple` | `boolean`                 | `false`       | Allow multiple files                       |
-| `maxFiles` | `number`                  | —             | Cap on number of files (when `multiple`)   |
-| `maxSize`  | `number`                  | —             | Max bytes per file                         |
-| `disabled` | `boolean`                 | `false`       | Disables all interaction                   |
+| Prop         | Type                         | Default       | Description                                                                 |
+| ------------ | ---------------------------- | ------------- | --------------------------------------------------------------------------- |
+| `value`      | `File[]`                     | `[]`          | Current file list (controlled)                                              |
+| `onChange`   | `(files: File[]) => void`    | —             | Called when files are added or removed                                      |
+| `accept`     | `string[]`                   | `['image/*']` | MIME types or extensions (e.g. `['.pdf']`)                                  |
+| `multiple`   | `boolean`                    | `false`       | Allow multiple files                                                        |
+| `maxFiles`   | `number`                     | —             | Cap on number of files (when `multiple`)                                    |
+| `maxSize`    | `number`                     | —             | Max bytes per file — drives the requirement line below the Browse button    |
+| `density`    | `'compact' \| 'comfortable'` | `'compact'`   | Visual density; form fields use `compact`, media manager uses `comfortable` |
+| `dropTarget` | `boolean`                    | `true`        | When `false`, the dashed region does not accept drops (parent owns drag)    |
+| `disabled`   | `boolean`                    | `false`       | Disables all interaction                                                    |
 
 ### Rendering stored images
 

@@ -32,6 +32,17 @@ describe('isolated media session', () => {
     expect(state.media.images).toHaveLength(1)
     expect(state.media.roles).toEqual({})
   })
+  it('selects the first image added to an empty collection', () => {
+    let state = createMediaSession({ revision: 0, images: [], roles: {} })
+    state = mediaSessionReducer(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
+    expect(state.selectedId).toBe('a')
+  })
+  it('preserves the open selection when later images finish uploading', () => {
+    let state = createMediaSession({ revision: 0, images: [], roles: {} })
+    state = mediaSessionReducer(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
+    state = mediaSessionReducer(state, { type: 'add', id: 'b', asset: mediaFixtureAssets[1]! })
+    expect(state.selectedId).toBe('a')
+  })
   it('transfers one role without disturbing the other role or parent revision', () => {
     const state = mediaSessionReducer(createMediaSession(mediaFixture), {
       type: 'role',

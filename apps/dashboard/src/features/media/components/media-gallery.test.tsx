@@ -1,7 +1,42 @@
 import { expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MediaGallery } from './media-gallery'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
+
+it('shows the quiet empty state copy', () => {
+  render(
+    <MediaGallery
+      media={{ revision: 0, images: [], roles: {} }}
+      assets={{}}
+      entries={[]}
+      onSelect={vi.fn()}
+      onAdd={vi.fn()}
+      onRetry={vi.fn()}
+      onRemoveUpload={vi.fn()}
+    />,
+  )
+  expect(screen.getByText('No images yet')).toBeInTheDocument()
+  expect(screen.getByText('Uploaded images will appear here.')).toBeInTheDocument()
+  expect(screen.queryByText(/assign a role/i)).not.toBeInTheDocument()
+})
+
+it('calls onAdd from the gallery picker', async () => {
+  const onAdd = vi.fn()
+  const user = userEvent.setup()
+  render(
+    <MediaGallery
+      media={{ revision: 0, images: [], roles: {} }}
+      assets={{}}
+      entries={[]}
+      onSelect={vi.fn()}
+      onAdd={onAdd}
+      onRetry={vi.fn()}
+      onRemoveUpload={vi.fn()}
+    />,
+  )
+  await user.click(screen.getByRole('button', { name: /\+ add images/i }))
+})
 
 it('moves keyboard selection between images and exposes independent role badges', () => {
   const onSelect = vi.fn()

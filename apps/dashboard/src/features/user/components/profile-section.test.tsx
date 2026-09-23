@@ -88,7 +88,9 @@ describe('ProfileSection', () => {
     renderSection()
 
     await screen.findByDisplayValue('Dungeon Master')
-    const dropZone = screen.getByRole('button', { name: /upload file/i })
+    const dropZone = screen
+      .getByRole('button', { name: /browse files/i })
+      .closest('div[class*="border-dashed"]')!
     fireEvent.drop(dropZone, { dataTransfer: { files: [avatar] } })
     await user.click(screen.getByRole('button', { name: 'Save profile' }))
 

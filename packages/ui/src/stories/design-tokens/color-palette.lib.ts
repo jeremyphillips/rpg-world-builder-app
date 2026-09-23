@@ -627,6 +627,30 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         usage: 'background',
       },
       {
+        name: 'drop-target-overlay-bg',
+        cssVar: '--drop-target-overlay-bg',
+        tailwind: 'bg-drop-target-overlay',
+        usage: 'background',
+      },
+      {
+        name: 'drop-target-overlay-fg',
+        cssVar: '--drop-target-overlay-fg',
+        tailwind: 'text-drop-target-overlay-foreground',
+        usage: 'text',
+      },
+      {
+        name: 'drop-target-overlay-border',
+        cssVar: '--drop-target-overlay-border',
+        tailwind: 'border-drop-target-overlay-border',
+        usage: 'border',
+      },
+      {
+        name: 'drop-target-overlay-invalid-bg',
+        cssVar: '--drop-target-overlay-invalid-bg',
+        tailwind: 'bg-drop-target-overlay-invalid',
+        usage: 'background',
+      },
+      {
         name: 'drop-target-border',
         cssVar: '--drop-target-border',
         tailwind: 'border-drop-target-border',

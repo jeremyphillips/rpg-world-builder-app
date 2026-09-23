@@ -288,6 +288,12 @@
     var(--accent) var(--mix-drop-target),
     var(--surface-current)
   );
+  --drop-target-overlay-bg: var(--palette-drop-target-overlay);
+  --drop-target-overlay-fg: var(--palette-drop-target-overlay-fg);
+  --drop-target-overlay-fg-muted: var(--palette-drop-target-overlay-fg-muted);
+  --drop-target-overlay-border: var(--palette-drop-target-overlay-border);
+  --drop-target-overlay-invalid-bg: var(--palette-drop-target-overlay-invalid);
+  --drop-target-overlay-invalid-fg: var(--palette-drop-target-overlay-invalid-fg);
   --drop-target-border: var(--primary);
   --segmented-track-bg: var(--surface-strong);
 

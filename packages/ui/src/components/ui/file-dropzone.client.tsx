@@ -1,14 +1,18 @@
 'use client'
 
 import * as React from 'react'
-import { FileIcon, ImageIcon, UploadCloudIcon, X } from 'lucide-react'
+import { FileIcon, ImageIcon, Upload, UploadCloudIcon, X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { Button } from './button.client'
+import { resolveFileDropzoneCopy, resolveFileDropzoneRequirements } from './file-dropzone-copy.lib'
 import {
   dropzoneVariants,
   dropzoneIconVariants,
-  dropzonePromptVariants,
-  dropzoneHintVariants,
+  dropzoneTitleVariants,
+  dropzoneDescriptionVariants,
+  dropzoneRequirementsVariants,
+  dropzoneActionsVariants,
   fileNameVariants,
   fileMetaVariants,
   fileListVariants,
@@ -23,7 +27,7 @@ import { Text } from './text'
 export const DEFAULT_ACCEPT = ['image/*']
 
 /** Returns true if a given File matches any entry in the accept list. */
-function matchesAccept(file: File, accept: string[]): boolean {
+export function matchesAccept(file: File, accept: string[]): boolean {
   return accept.some((pattern) => {
     if (pattern.endsWith('/*')) return file.type.startsWith(pattern.slice(0, -1))
     return file.type === pattern || file.name.endsWith(pattern)
@@ -46,6 +50,13 @@ export interface FileDropzoneProps {
   maxFiles?: number
   /** Maximum size per file in bytes. */
   maxSize?: number
+  /** Visual density — media manager uses `comfortable`; form fields stay `compact`. */
+  density?: 'comfortable' | 'compact'
+  /**
+   * When false, the dashed region does not accept drops. Use when a parent owns
+   * global file-drop handling (e.g. Manage images modal body overlay).
+   */
+  dropTarget?: boolean
   /**
    * URL for an already-uploaded image when `value` is empty (e.g. from a storage key).
    * Shown as a remote row in the file list until a new file is selected or cleared.
@@ -63,10 +74,6 @@ export interface FileDropzoneProps {
   'aria-invalid'?: boolean | 'true' | 'false'
 }
 
-// ---------------------------------------------------------------------------
-// Hook — all state and event logic lives here
-// ---------------------------------------------------------------------------
-
 interface UseFileDropzoneOptions {
   value: File[]
   onChange?: (files: File[]) => void
@@ -75,6 +82,7 @@ interface UseFileDropzoneOptions {
   maxFiles?: number
   maxSize?: number
   disabled: boolean
+  dropTarget: boolean
 }
 
 function useFileDropzone({
@@ -85,14 +93,13 @@ function useFileDropzone({
   maxFiles,
   maxSize,
   disabled,
+  dropTarget,
 }: UseFileDropzoneOptions) {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const previewUrlsRef = React.useRef(new Map<File, string>())
   const [isDragOver, setIsDragOver] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
 
-  // Revoke blob URLs for files removed from the controlled value. No setState —
-  // the parent re-render already dropped the preview from the tree.
   React.useEffect(() => {
     for (const [file, url] of [...previewUrlsRef.current]) {
       if (!value.includes(file)) {
@@ -157,25 +164,21 @@ function useFileDropzone({
   }
 
   function handleDragOver(e: React.DragEvent) {
+    if (!dropTarget) return
     e.preventDefault()
     if (!disabled) setIsDragOver(true)
   }
 
   function handleDragLeave(e: React.DragEvent) {
+    if (!dropTarget) return
     if (!e.currentTarget.contains(e.relatedTarget as Node)) setIsDragOver(false)
   }
 
   function handleDrop(e: React.DragEvent) {
+    if (!dropTarget) return
     e.preventDefault()
     setIsDragOver(false)
     if (!disabled && e.dataTransfer.files.length > 0) addFiles(e.dataTransfer.files)
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      openPicker()
-    }
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -195,106 +198,77 @@ function useFileDropzone({
     handleDragOver,
     handleDragLeave,
     handleDrop,
-    handleKeyDown,
     handleInputChange,
   }
 }
 
-// ---------------------------------------------------------------------------
-// DropZoneArea — the interactive drop target
-// ---------------------------------------------------------------------------
-
 type DropZoneState = 'idle' | 'dragover' | 'disabled'
-
-function getDropZoneAriaLabel(disabled: boolean, multiple: boolean): string {
-  if (disabled) return 'File upload disabled'
-  return `Upload file${multiple ? 's' : ''}. Press Enter or Space to browse.`
-}
-
-function DropZoneContent({ isDragOver, state }: { isDragOver: boolean; state: DropZoneState }) {
-  const Icon = isDragOver ? UploadCloudIcon : ImageIcon
-  return (
-    <>
-      <Icon className={cn('size-8', dropzoneIconVariants({ state }))} aria-hidden="true" />
-      <p className={dropzonePromptVariants()}>
-        {isDragOver ? 'Drop to upload' : 'Drag & drop or click to browse'}
-      </p>
-    </>
-  )
-}
-
-function DropZoneHints({ accept, maxSize }: { accept: string[]; maxSize?: number }) {
-  return (
-    <>
-      {accept !== DEFAULT_ACCEPT && <p className={dropzoneHintVariants()}>{accept.join(', ')}</p>}
-      {maxSize !== undefined && (
-        <p className={dropzoneHintVariants()}>
-          Max {(maxSize / 1024 / 1024).toFixed(0)} MB per file
-        </p>
-      )}
-    </>
-  )
-}
 
 interface DropZoneAreaProps {
   id?: string
+  density: 'comfortable' | 'compact'
   isDragOver: boolean
   disabled: boolean
-  multiple: boolean
   accept: string[]
+  multiple: boolean
   maxSize?: number
+  dropTarget: boolean
   className?: string
   ariaDescribedby?: string
   ariaInvalid?: boolean | 'true' | 'false'
   onDragOver: React.DragEventHandler
   onDragLeave: React.DragEventHandler
   onDrop: React.DragEventHandler
-  onClick: () => void
-  onKeyDown: React.KeyboardEventHandler
+  onBrowse: () => void
 }
 
 function DropZoneArea({
   id,
+  density,
   isDragOver,
   disabled,
-  multiple,
   accept,
+  multiple,
   maxSize,
+  dropTarget,
   className,
   ariaDescribedby,
   ariaInvalid,
   onDragOver,
   onDragLeave,
   onDrop,
-  onClick,
-  onKeyDown,
+  onBrowse,
 }: DropZoneAreaProps) {
   const state: DropZoneState = disabled ? 'disabled' : isDragOver ? 'dragover' : 'idle'
+  const copy = resolveFileDropzoneCopy({ accept, multiple })
+  const requirements = resolveFileDropzoneRequirements({ accept, maxSize })
+  const Icon = isDragOver ? UploadCloudIcon : copy.useImageIcon ? ImageIcon : FileIcon
+
   return (
     <div
       id={id}
-      role="button"
-      tabIndex={disabled ? -1 : 0}
-      aria-label={getDropZoneAriaLabel(disabled, multiple)}
       aria-describedby={ariaDescribedby}
       aria-invalid={ariaInvalid}
-      aria-disabled={disabled}
-      className={cn(dropzoneVariants({ state }), className)}
+      className={cn(dropzoneVariants({ density, state }), className)}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
     >
-      <DropZoneContent isDragOver={isDragOver} state={state} />
-      <DropZoneHints accept={accept} maxSize={maxSize} />
+      <Icon className={cn(dropzoneIconVariants({ density, state }))} aria-hidden="true" />
+      <div className={dropzoneActionsVariants()}>
+        <p className={dropzoneTitleVariants({ density })}>
+          {isDragOver && dropTarget ? 'Drop to upload' : copy.title}
+        </p>
+        {!isDragOver && <p className={dropzoneDescriptionVariants()}>{copy.description}</p>}
+        <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={onBrowse}>
+          <Upload className="size-4" aria-hidden="true" />
+          Browse files
+        </Button>
+        {requirements ? <p className={dropzoneRequirementsVariants()}>{requirements}</p> : null}
+      </div>
     </div>
   )
 }
-
-// ---------------------------------------------------------------------------
-// FileList — selected files with preview thumbnails and remove buttons
-// ---------------------------------------------------------------------------
 
 interface FileListProps {
   files: File[]
@@ -369,17 +343,10 @@ function FileList({ files, disabled, getPreviewUrl, onRemove }: FileListProps) {
   )
 }
 
-// ---------------------------------------------------------------------------
-// FileDropzone — public component
-// ---------------------------------------------------------------------------
-
 /**
  * Drag-and-drop file upload primitive. Controlled via `value` + `onChange`.
- * Supports click-to-browse, keyboard activation (Enter/Space), MIME/size
- * validation, per-file removal, and image thumbnail previews.
- *
- * Compose inside `FileField` for full label/hint/error wiring, or use directly
- * with your own `useForm` + `Controller`.
+ * Supports MIME/size validation, per-file removal, and image thumbnail previews.
+ * Browse files opens the picker; the dashed region is the drop target only.
  */
 export function FileDropzone({
   value = [],
@@ -388,6 +355,8 @@ export function FileDropzone({
   multiple = false,
   maxFiles,
   maxSize,
+  density = 'compact',
+  dropTarget = true,
   existingImageUrl,
   existingImageLabel = DEFAULT_EXISTING_IMAGE_LABEL,
   onClearExisting,
@@ -407,9 +376,17 @@ export function FileDropzone({
     handleDragOver,
     handleDragLeave,
     handleDrop,
-    handleKeyDown,
     handleInputChange,
-  } = useFileDropzone({ value, onChange, accept, multiple, maxFiles, maxSize, disabled })
+  } = useFileDropzone({
+    value,
+    onChange,
+    accept,
+    multiple,
+    maxFiles,
+    maxSize,
+    disabled,
+    dropTarget,
+  })
 
   const atLimit = !multiple || (maxFiles !== undefined && value.length >= maxFiles)
   const showDropZone = !atLimit || value.length === 0
@@ -421,19 +398,20 @@ export function FileDropzone({
       {showDropZone ? (
         <DropZoneArea
           id={id}
+          density={density}
           isDragOver={isDragOver}
           disabled={disabled}
           multiple={multiple}
           accept={accept}
           maxSize={maxSize}
+          dropTarget={dropTarget}
           className={className}
           ariaDescribedby={ariaDescribedby}
           ariaInvalid={ariaInvalid}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={openPicker}
-          onKeyDown={handleKeyDown}
+          onBrowse={openPicker}
         />
       ) : null}
 

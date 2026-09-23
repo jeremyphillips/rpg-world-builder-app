@@ -100,6 +100,46 @@ describe('IdentityDraftSync', () => {
     })
   })
 
+  it('preserves saved identity media when another identity field changes', async () => {
+    const onDraftChange = vi.fn()
+    const savedMedia = {
+      revision: 1,
+      images: [{ id: 'image-0', assetId: 'asset-0' }],
+      roles: {},
+    }
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      identity: {
+        name: 'Verna',
+        media: savedMedia,
+      },
+    }
+
+    render(
+      <IdentityStep
+        context={identityStepTestContext}
+        draft={draft}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+        onStepComplete={vi.fn()}
+        onFormContinueValidationFailed={vi.fn()}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Female' }))
+
+    await waitFor(() => {
+      expect(onDraftChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          identity: expect.objectContaining({
+            gender: 'female',
+            media: savedMedia,
+          }),
+        }),
+      )
+    })
+  })
+
   it('mirrors narrative ideal edits into the builder draft', async () => {
     const onDraftChange = vi.fn()
     const draft = createEmptyCharacterBuilderDraft()
