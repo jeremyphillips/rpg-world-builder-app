@@ -15,9 +15,7 @@ describe('resolveFieldRowAnatomyPresentation', () => {
     expect(presentation.style).toMatchObject({
       '--row-cols': gridTemplateColumns,
     })
-    expect(
-      String(presentation.style['--row-collapse-min' as keyof typeof presentation.style]),
-    ).toMatch(/^\d+px$/)
+    expect(presentation.collapseMinWidth).toBeGreaterThan(0)
   })
 
   it('uses compact horizontal gap when requested', () => {

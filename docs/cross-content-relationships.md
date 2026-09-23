@@ -74,12 +74,21 @@ when meaningful.
 
 ## Mutation ownership
 
-Character location and organization membership edges are stored in the campaign
+Character relationship edges — organization membership, person kinds (parent,
+partner, mentor, rival, …), and location kinds (`resides_at`, hometown,
+birthplace, property associations) — are stored in the campaign
 `character_relationships` collection and mutated through the character
 relationship service. Organization location edges remain on organization
 documents and use nested `location-connections` routes. Location inverse editing
 delegates to the authoritative command for each family; Location `PATCH` never
 persists relationship arrays.
+
+Edges carry campaign scope, revision, visibility (`dm_only` | `all_players` |
+selected characters), and lifecycle details where the kind supports it. List
+reads project endpoint-relative rows for the viewer character and filter hidden
+edges before returning items. Narrative generation uses authorized draft edges or
+resolved projections only — hidden edges never appear in generated prose or
+user-visible diagnostics.
 
 ```text
 GET    /api/campaigns/:campaignId/characters/:characterId/relationships
@@ -159,9 +168,9 @@ Document-only decisions — not automatic enablement:
 
 Character relationship expansion (people, places, property, narrative facts) is
 documented in [Character relationships and narrative context](roadmap/character-relationships-plan.md).
-Phase 4 cut over existing organization membership and location connection kinds
-to `character_relationships`; later phases add kinds and UI without changing
-that authority boundary.
+Organization membership and all character location kinds now live in
+`character_relationships`; builder Connections, sheet Connections, and narrative
+facts consume that service without alternate embedded arrays.
 
 1. **Skill → Class** — recommend **read-only**: choice-set context makes
    inverse edits unsafe without hiding Class semantics.

@@ -171,6 +171,12 @@ Package layout → [apps/api/src/realtime/README.md](../apps/api/src/realtime/RE
   [vocabulary.md](./vocabulary.md).
   Cross-content relationship ownership, projections, and mutation rules →
   [cross-content-relationships.md](./cross-content-relationships.md).
+  Campaign character relationships (people, organizations, places, property) are
+  persisted in the `character_relationships` collection and exposed through
+  `apps/api/src/features/character-relationships/`. Dashboard authoring uses
+  `character/lib/relationship/` and builder draft `relationshipEdges`; narrative
+  generation consumes a bounded `NarrativeRelationshipFacts` projection from
+  `@rpg/character-narrative-integrations` — never raw graph documents.
 - **`@rpg/name-generator-core`** and **`@rpg/name-generator-data`** provide the
   experimental name generator foundation (pure generation + lazy fixture data).
   Contracts live on the isolated `@rpg/contracts/name-generator` subpath — not

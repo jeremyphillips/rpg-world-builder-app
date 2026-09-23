@@ -618,6 +618,35 @@ describe('resolveEffectiveBuilderSteps', () => {
     ).not.toContain('connections')
   })
 
+  it('keeps Connections available when the campaign has no organizations', () => {
+    const context = {
+      ...createCharacterBuildContext({
+        characterKind: 'npc',
+        rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+        catalog: {
+          species: [],
+          classes: [],
+          spells: [],
+          equipment: [],
+          skillProficiencies: [],
+          organizations: [],
+          languages: [],
+        },
+      }),
+      characterKind: 'npc',
+      mode: 'dashboard',
+      scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: 'srd-cc-5.2.1' },
+      ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
+      acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
+      playActor: { kind: 'npc' },
+    } satisfies CampaignNpcBuildContext
+
+    expect(resolveEffectiveBuilderSteps(context, makeDraft()).map(({ id }) => id)).toContain(
+      'connections',
+    )
+  })
+
   it('inserts Connections after Identity for campaign NPC authoring', () => {
     const context = {
       ...createCharacterBuildContext({

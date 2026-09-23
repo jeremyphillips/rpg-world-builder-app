@@ -91,6 +91,31 @@ describe('generateNarrative', () => {
     }
   })
 
+  it('does not leak omitted reference diagnostics into generated prose', () => {
+    const result = generateNarrative({
+      context: {
+        ...context,
+        omittedReferenceIds: ['organization-missing', 'location-missing'],
+      },
+      collection: foundationCollection,
+      seed: 11,
+    })
+
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      const prose = [
+        ...result.narrative.personalityTraits,
+        ...result.narrative.ideals,
+        ...result.narrative.bonds,
+        ...result.narrative.flaws,
+        ...result.narrative.backstoryParagraphs,
+      ].join(' ')
+      expect(prose).not.toContain('organization-missing')
+      expect(prose).not.toContain('location-missing')
+      expect(result.omittedReferenceIds).toEqual(['location-missing', 'organization-missing'])
+    }
+  })
+
   it('supports NPC generation contexts', () => {
     const result = generateNarrative({
       context: { ...context, characterKind: 'npc' },

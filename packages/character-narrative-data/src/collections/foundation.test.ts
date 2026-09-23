@@ -8,6 +8,23 @@ describe('foundation narrative collection', () => {
     expect(foundationCollection.fragments.length).toBeGreaterThan(80)
   })
 
+  it('includes relationship-conditioned fragments for Phase 7 enrichment', () => {
+    const relationshipFragmentIds = [
+      'relationship-hometown-1',
+      'relationship-org-obligation-1',
+      'relationship-mentor-1',
+      'relationship-child-1',
+      'relationship-rival-1',
+    ]
+
+    for (const id of relationshipFragmentIds) {
+      const fragment = foundationCollection.fragments.find((entry) => entry.id === id)
+      expect(fragment).toBeDefined()
+      expect(fragment?.conditions.length).toBeGreaterThan(0)
+      expect(fragment?.requires.length).toBeGreaterThan(0)
+    }
+  })
+
   it('provides enough fallback fragments per theme and slot', () => {
     for (const theme of NARRATIVE_THEMES) {
       for (const slot of NARRATIVE_SLOTS) {

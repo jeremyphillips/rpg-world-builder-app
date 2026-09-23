@@ -12,7 +12,7 @@ import type { FieldRhythm } from './field.variants'
  * Column tracks come from {@link resolveFieldRowColumnTracks} (width-parity SSOT).
  */
 export const fieldRowAnatomyVariants = cva(
-  '@container/field-row field-row-anatomy-grid grid min-w-0 [grid-template-rows:auto_auto_auto] [grid-template-columns:var(--row-cols)]',
+  'field-row-anatomy-grid grid min-w-0 [grid-template-rows:auto_auto_auto] [grid-template-columns:var(--row-cols)]',
   {
     variants: {
       gap: {
@@ -41,7 +41,7 @@ export function resolveFieldRowAnatomyPresentation(
   widths: readonly FieldWidth[],
   gap: Exclude<NonNullable<FieldRowAnatomyVariantProps['gap']>, 'none'> = 'form',
   options: ResolveFieldRowAnatomyPresentationOptions = {},
-): { className: string; style: CSSProperties } {
+): { className: string; style: CSSProperties; collapseMinWidth: number } {
   const { tracks, gridTemplateColumns: fieldGridTemplateColumns } =
     resolveFieldRowColumnTracks(widths)
   const gridTemplateColumns = options.fieldDivider
@@ -56,7 +56,7 @@ export function resolveFieldRowAnatomyPresentation(
     className: fieldRowAnatomyVariants({ gap: resolvedGap }),
     style: {
       '--row-cols': gridTemplateColumns,
-      '--row-collapse-min': `${collapseMinWidth}px`,
     } as CSSProperties,
+    collapseMinWidth,
   }
 }

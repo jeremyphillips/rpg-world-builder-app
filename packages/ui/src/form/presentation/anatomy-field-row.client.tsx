@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { FieldRowAnatomyProvider } from '../../components/ui/field-row-anatomy.context'
 import { resolveFieldRowAnatomyPresentation } from '../../components/ui/field-row-anatomy.variants'
+import { useFieldRowAnatomyCollapse } from '../../components/ui/use-field-row-anatomy-collapse.client'
 import { FieldRowDivider } from '../../components/ui/field-row-divider.client'
 import { FieldRow } from '../../components/ui/field-row'
 import { cn } from '../../lib/utils'
@@ -52,14 +53,17 @@ export function AnatomyFieldRow({
     fieldDivider: useFieldDivider,
     rhythm,
   })
+  const collapse = useFieldRowAnatomyCollapse(presentation.collapseMinWidth)
 
   return (
     <FieldRowAnatomyProvider>
       <FieldRow
+        ref={collapse.ref}
         layout="anatomy-grid"
         gap={gap}
         className={cn(presentation.className, className)}
         style={presentation.style}
+        data-field-row-collapsed={collapse['data-field-row-collapsed']}
       >
         {fields.map((field, index) => {
           const fieldKey = isRowSlotItem(field)

@@ -241,6 +241,53 @@ describe('buildNarrativeContext', () => {
     expect(result.relationshipFacts?.people).toHaveLength(2)
   })
 
+  it('keeps organization and residence facts alongside person and place enrichment', () => {
+    const context = createCampaignNpcContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      relationshipEdges: [
+        {
+          id: 'edge-lantern-guild',
+          kind: 'organizationMembership' as const,
+          characterId: '__new_character__',
+          organizationId: lanternGuild.id,
+          details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+        },
+        {
+          id: 'conn-1',
+          kind: 'resides_at' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+        {
+          id: 'edge-home',
+          kind: 'hometown' as const,
+          characterId: '__new_character__',
+          locationId: harborfordSettlement.id,
+        },
+        {
+          id: 'edge-mentor',
+          kind: 'mentorOf' as const,
+          characterId: 'char-mentor',
+          relatedCharacterId: '__new_character__',
+        },
+      ],
+    }
+
+    const result = buildNarrativeContext({
+      draft,
+      context,
+      locations: [harborfordSettlement],
+      characters: [{ id: 'char-mentor', name: 'Seraphina Vale' }],
+    })
+
+    expect(result.organizations).toHaveLength(1)
+    expect(result.residences).toHaveLength(1)
+    expect(result.people).toHaveLength(1)
+    expect(result.places).toHaveLength(1)
+    expect(result.omittedReferenceIds).toEqual([])
+  })
+
   it('omits class tokens for classless and npc drafts', () => {
     const context = createCampaignNpcContext()
     const draft = {

@@ -12,6 +12,8 @@ import {
   resolveRelationshipProjectionRoleLabel,
 } from '@rpg/contracts'
 
+import { canViewerSeeCharacterRelationship } from './character-relationship-visibility.lib'
+
 import { findNpcById, findPcById } from '../../character'
 import type { HomebrewDoc } from '../../content/lib/content-write-config'
 import { HomebrewLocationModel } from '../../content/locations/homebrew-location.model'
@@ -40,25 +42,6 @@ const LOCATION_RELATIONSHIP_KINDS = new Set([
   'hometown',
   'birthplace',
 ])
-
-function canViewerSeeRelationship(
-  relationship: CharacterRelationshipEdge,
-  viewer: ViewerContext,
-): boolean {
-  if (isCampaignManager(viewer.viewerRole)) {
-    return true
-  }
-
-  if (relationship.visibility === 'dm_only') {
-    return false
-  }
-
-  if (relationship.visibility === 'all_players') {
-    return true
-  }
-
-  return relationship.createdByUserId === viewer.viewerUserId
-}
 
 async function resolveCharacterTarget(
   characterId: string,
@@ -179,7 +162,7 @@ export async function projectCharacterRelationshipRow(
   relationship: CharacterRelationshipEdge,
   viewer: ViewerContext,
 ): Promise<CharacterRelationshipProjectionRow | null> {
-  if (!canViewerSeeRelationship(relationship, viewer)) {
+  if (!canViewerSeeCharacterRelationship(relationship, viewer)) {
     return null
   }
 

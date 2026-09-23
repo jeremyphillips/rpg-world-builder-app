@@ -1,3 +1,4 @@
+import * as React from 'react'
 import type { HTMLAttributes } from 'react'
 
 import { cn } from '../../lib/utils'
@@ -25,17 +26,15 @@ export interface FieldRowProps extends HTMLAttributes<HTMLDivElement> {
  * {@link resolveFieldRowAnatomyPresentation}. Non-schema uses flex
  * (`items-end` / control-edge) unless `align="start"`.
  */
-export function FieldRow({
-  className,
-  align = 'control-edge',
-  gap = 'form',
-  layout = 'flow',
-  ...props
-}: FieldRowProps) {
+export const FieldRow = React.forwardRef<HTMLDivElement, FieldRowProps>(function FieldRow(
+  { className, align = 'control-edge', gap = 'form', layout = 'flow', ...props },
+  ref,
+) {
   const isAnatomyGrid = layout === 'anatomy-grid'
 
   return (
     <div
+      ref={ref}
       data-field-row=""
       data-field-row-anatomy={isAnatomyGrid ? '' : undefined}
       className={cn(
@@ -45,4 +44,4 @@ export function FieldRow({
       {...props}
     />
   )
-}
+})

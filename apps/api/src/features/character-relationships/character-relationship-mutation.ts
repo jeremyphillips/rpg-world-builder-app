@@ -106,21 +106,21 @@ export async function createCharacterRelationshipRecordCommand(input: {
       }
 
       return await runInTransaction(async (session) => {
+        await clearOtherPrimaryResidences(
+          {
+            campaignId: input.campaignId,
+            characterId: input.command.relationship.characterId,
+            relationshipId: relationshipId,
+          },
+          { session },
+        )
+
         const relationship = await createCharacterRelationshipRecord(
           {
             id: relationshipId,
             campaignId: input.campaignId,
             createdByUserId: input.actorUserId,
             ...input.command.relationship,
-          },
-          { session },
-        )
-
-        await clearOtherPrimaryResidences(
-          {
-            campaignId: input.campaignId,
-            characterId: relationship.characterId,
-            relationshipId: relationship.id,
           },
           { session },
         )
@@ -192,7 +192,16 @@ export async function updateCharacterRelationshipRecordCommand(input: {
     }
 
     return runInTransaction(async (session) => {
-      const relationship = await updateCharacterRelationshipRecord(
+      await clearOtherPrimaryResidences(
+        {
+          campaignId: input.campaignId,
+          characterId: existing.characterId,
+          relationshipId: input.relationshipId,
+        },
+        { session },
+      )
+
+      return updateCharacterRelationshipRecord(
         {
           campaignId: input.campaignId,
           relationshipId: input.relationshipId,
@@ -201,17 +210,6 @@ export async function updateCharacterRelationshipRecordCommand(input: {
         },
         { session },
       )
-
-      await clearOtherPrimaryResidences(
-        {
-          campaignId: input.campaignId,
-          characterId: relationship.characterId,
-          relationshipId: relationship.id,
-        },
-        { session },
-      )
-
-      return relationship
     })
   }
 

@@ -436,9 +436,12 @@ existing backstory beats; richer context does not require more segments.
    ownership fractions, complex calendars, or graph visualization in this release.
 6. **Narrative facts.** Add role requirements and a small authored fragment pack;
    test binding, tense, alignment compatibility, visibility, and preservation.
+   **Done:** Phase 7 shipped role-specific tokens, semantic fragment conditions,
+   three-role binding, and the foundation relationship fragment pack.
 7. **Document and verify.** Update architecture, contracts structure, cross-content
    policy, dashboard builder docs, and all affected package READMEs. Run the current
    tiered repository gates and full pre-push gates before sharing implementation.
+   **Done:** docs and acceptance tests added in Phase 8 wrap-up.
 
 This is a dev-only project: make a direct schema/consumer cutover. Update fixtures
 and seed definitions and bump persisted draft version to invalidate obsolete drafts.
