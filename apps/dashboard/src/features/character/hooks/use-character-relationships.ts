@@ -4,21 +4,19 @@ import type { CharacterRelationshipsListQuery } from '@rpg/contracts'
 
 import { listCharacterRelationships } from '../api/character-relationship-client'
 
+/** Prefix shared by every list query for a character — use without `query` when invalidating. */
 export function characterRelationshipsQueryKey(
   campaignId: string | undefined,
   characterId: string | undefined,
   query?: CharacterRelationshipsListQuery,
 ) {
-  return [
-    'campaigns',
-    campaignId,
-    'characters',
-    characterId,
-    'relationships',
-    query?.kinds ?? null,
-    query?.cursor ?? null,
-    query?.limit ?? null,
-  ] as const
+  const base = ['campaigns', campaignId, 'characters', characterId, 'relationships'] as const
+
+  if (query === undefined) {
+    return base
+  }
+
+  return [...base, query.kinds ?? null, query.cursor ?? null, query.limit ?? null] as const
 }
 
 export function useCharacterRelationships(
