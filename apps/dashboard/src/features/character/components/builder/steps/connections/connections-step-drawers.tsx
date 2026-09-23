@@ -1,12 +1,16 @@
+import * as React from 'react'
+
 import type {
   CharacterRelationshipDraftEdge,
   CharacterRelationshipDraftEdges,
 } from '@rpg/contracts'
+import { Button, Modal } from '@rpg/ui'
 
 import { OrganizationPickerDrawer } from '../../../connections/picker/organization-picker-drawer'
 import { PersonRelationshipAddDrawer } from '../../../connections/picker/person-relationship-add-drawer'
 import { LocationRelationshipAddDrawer } from '../../../connections/picker/location-relationship-add-drawer'
 import { EditOrganizationMembershipDrawer } from '../../../connections/edit-organization-membership-drawer'
+import { ConnectionDetailsFields } from '../../../detail/connections/character-connection-details-fields'
 import {
   PLACE_CONNECTION_ROLE_OPTIONS,
   PROPERTY_CONNECTION_ROLE_OPTIONS,
@@ -18,10 +22,16 @@ import {
   createPersonDraftEdge,
   createPlaceDraftEdge,
   createPropertyDraftEdge,
+  draftEdgeHasEditableDetails,
   removeDraftEdgeById,
   updateDraftEdgeDetails,
   upsertDraftEdge,
 } from '../../../../lib/relationship/connection-draft-edges.lib'
+import {
+  buildConnectionDetailsPatch,
+  connectionDetailsFromDraftEdge,
+  type ConnectionDetailsFormState,
+} from '../../../../lib/relationship/connection-details-fields.lib'
 import type {
   ConnectionsStepActiveDrawer,
   ConnectionsStepData,
@@ -30,11 +40,78 @@ import type {
 export type ConnectionsStepDrawersProps = {
   activeDrawer: ConnectionsStepActiveDrawer
   onActiveDrawerChange: (drawer: ConnectionsStepActiveDrawer) => void
-  editingMembershipEdgeId: string | null
-  onEditingMembershipEdgeIdChange: (edgeId: string | null) => void
+  editingEdgeId: string | null
+  onEditingEdgeIdChange: (edgeId: string | null) => void
   relationshipEdges: CharacterRelationshipDraftEdges
   stepData: ConnectionsStepData
   onUpdateEdges: (nextEdges: CharacterRelationshipDraftEdges) => void
+}
+
+function toConnectionDetailsSheetData(stepData: ConnectionsStepData) {
+  return {
+    campaignId: stepData.campaignId ?? '',
+    characterId: '',
+    availableOrganizations: stepData.availableOrganizations,
+    organizationsById: stepData.organizationsById,
+    locationsById: stepData.locationsById,
+    charactersById: stepData.charactersById,
+    campaignCharacterOptions: stepData.campaignCharacterOptions,
+    eligibleResidenceLocations: stepData.eligibleResidenceLocations,
+    eligiblePropertyLocations: stepData.eligiblePropertyLocations,
+    allLocations: stepData.allLocations,
+    locationsQueryStatus: stepData.locationsQueryStatus,
+  }
+}
+
+function ConnectionDraftDetailsDrawer(input: {
+  edge: CharacterRelationshipDraftEdge
+  stepData: ConnectionsStepData
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSave: (patch: Record<string, unknown>) => void
+}) {
+  const [state, setState] = React.useState<ConnectionDetailsFormState>(() =>
+    connectionDetailsFromDraftEdge(input.edge),
+  )
+
+  React.useEffect(() => {
+    setState(connectionDetailsFromDraftEdge(input.edge))
+  }, [input.edge])
+
+  return (
+    <Modal.Root open={input.open} onOpenChange={input.onOpenChange}>
+      <Modal.Content size="md" aria-describedby="connection-draft-details-description">
+        <Modal.Header headline="Edit connection details" />
+        <Modal.Body id="connection-draft-details-description">
+          <ConnectionDetailsFields
+            rowKind={input.edge.kind}
+            organizationId={
+              input.edge.kind === 'organizationMembership' ? input.edge.organizationId : undefined
+            }
+            sheetData={toConnectionDetailsSheetData(input.stepData)}
+            state={state}
+            onStateChange={setState}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Modal.FooterActions>
+            <Button type="button" variant="outline" onClick={() => input.onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                input.onSave(buildConnectionDetailsPatch(input.edge.kind, state))
+                input.onOpenChange(false)
+              }}
+            >
+              Save
+            </Button>
+          </Modal.FooterActions>
+        </Modal.Footer>
+      </Modal.Content>
+    </Modal.Root>
+  )
 }
 
 // Orchestrator: wires section-specific add/edit drawers to draft-edge mutations.
@@ -42,16 +119,14 @@ export type ConnectionsStepDrawersProps = {
 export function ConnectionsStepDrawers({
   activeDrawer,
   onActiveDrawerChange,
-  editingMembershipEdgeId,
-  onEditingMembershipEdgeIdChange,
+  editingEdgeId,
+  onEditingEdgeIdChange,
   relationshipEdges,
   stepData,
   onUpdateEdges,
 }: ConnectionsStepDrawersProps) {
-  const editingMembershipEdge = relationshipEdges.find(
-    (edge): edge is Extract<CharacterRelationshipDraftEdge, { kind: 'organizationMembership' }> =>
-      edge.id === editingMembershipEdgeId && edge.kind === 'organizationMembership',
-  )
+  const editingEdge = relationshipEdges.find((edge) => edge.id === editingEdgeId) ?? null
+  const editingMembershipEdge = editingEdge?.kind === 'organizationMembership' ? editingEdge : null
   const editingOrganization =
     editingMembershipEdge && stepData.organizationsById.get(editingMembershipEdge.organizationId)
 
@@ -137,9 +212,9 @@ export function ConnectionsStepDrawers({
 
       {editingMembershipEdge && editingOrganization ? (
         <EditOrganizationMembershipDrawer
-          open={Boolean(editingMembershipEdgeId)}
+          open={Boolean(editingEdgeId)}
           onOpenChange={(open) => {
-            if (!open) onEditingMembershipEdgeIdChange(null)
+            if (!open) onEditingEdgeIdChange(null)
           }}
           organization={editingOrganization}
           characterName="this character"
@@ -153,6 +228,24 @@ export function ConnectionsStepDrawers({
           }}
           onRemove={async () => {
             onUpdateEdges(removeDraftEdgeById(relationshipEdges, editingMembershipEdge.id))
+          }}
+        />
+      ) : null}
+
+      {editingEdge &&
+      editingEdge.kind !== 'organizationMembership' &&
+      draftEdgeHasEditableDetails(editingEdge.kind) ? (
+        <ConnectionDraftDetailsDrawer
+          edge={editingEdge}
+          stepData={stepData}
+          open={Boolean(editingEdgeId)}
+          onOpenChange={(open) => {
+            if (!open) onEditingEdgeIdChange(null)
+          }}
+          onSave={(patch) => {
+            onUpdateEdges(
+              upsertDraftEdge(relationshipEdges, updateDraftEdgeDetails(editingEdge, patch)),
+            )
           }}
         />
       ) : null}

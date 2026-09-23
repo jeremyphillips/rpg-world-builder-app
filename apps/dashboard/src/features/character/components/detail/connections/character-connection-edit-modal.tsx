@@ -17,6 +17,7 @@ import { resolveConnectionSheetEditCopy } from '../../../lib/relationship/connec
 import type { ConnectionSheetData } from '../../../lib/relationship/connection-sheet-data.lib'
 import { getConnectionTopLevelSectionForKind } from '../../../lib/relationship/connection-section-catalog'
 import {
+  buildConnectionAudiencePatch,
   buildConnectionDetailsPatch,
   connectionDetailsFromProjection,
   type ConnectionDetailsFormState,
@@ -35,6 +36,8 @@ export type CharacterConnectionEditModalProps = {
       placeRoleId?: string
       propertyRoleId?: string
       details: Record<string, unknown>
+      visibility?: CharacterRelationshipProjectionRow['visibility']
+      participantIds?: string[]
     },
   ) => Promise<void>
   onRemove: (row: CharacterRelationshipProjectionRow) => Promise<void>
@@ -117,11 +120,15 @@ export function CharacterConnectionEditModal({
         (role) => role.id === selectedRoleId,
       )
 
+      const audience = buildConnectionAudiencePatch(detailsState)
+
       await onSave(row, {
         ...(selectedPersonRole ? { personRoleId: selectedPersonRole.id } : {}),
         ...(selectedPlaceRole ? { placeRoleId: selectedPlaceRole.id } : {}),
         ...(selectedPropertyRole ? { propertyRoleId: selectedPropertyRole.id } : {}),
         details: buildConnectionDetailsPatch(row.kind, detailsState),
+        visibility: audience.visibility,
+        participantIds: audience.participantIds,
       })
       handleOpenChange(false)
     } catch (error) {
@@ -175,6 +182,7 @@ export function CharacterConnectionEditModal({
               sheetData={sheetData}
               state={detailsState}
               onStateChange={setDetailsState}
+              showAudienceFields
             />
 
             {submitError ? (

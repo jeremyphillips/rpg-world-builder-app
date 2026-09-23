@@ -8,6 +8,7 @@ import {
   createCharacterRelationshipItem,
   deleteCharacterRelationshipItem,
   listCharacterRelationships,
+  replaceCharacterRelationshipItem,
   updateCharacterRelationshipItem,
 } from './character-relationship.handlers'
 
@@ -33,6 +34,13 @@ characterRelationshipsRouter.patch(
   requireAuth,
   requireCampaignRole('owner', 'co-owner'),
   updateCharacterRelationshipItem,
+)
+
+characterRelationshipsRouter.post(
+  '/character-relationships/:relationshipId/replace',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  replaceCharacterRelationshipItem,
 )
 
 characterRelationshipsRouter.delete(

@@ -39,8 +39,8 @@ Given the requested breadth, central edge storage is the recommended destination
 | Usage/deletion          | **Done (Phase 4):** edge collection registered as usage source; character documents no longer embed connections    | Extend deletion/unlink workflows as new kinds ship                                                      |
 | Forms                   | Shared RelationshipFieldProvider and character adapter registry, with draft/API modes                              | Extend this foundation; a new generic picker framework is unnecessary                                   |
 | Reconciliation          | **Done (Phases 3–4):** edge ID + revision reconciliation via `useRelationshipEdgeApiSync`                          | Extend for new kinds and metadata-only edits in Phase 5+                                                |
-| Detail surface          | Identity connections supplement composes membership and residence containers                                       | Phase 6: one compact Connections section, type-first Add menu, pencil edit modals                       |
-| Narrative input         | **Done (Phase 4):** builder reads `draft.relationshipEdges` for org/residence context                              | Introduce typed narrative facts, role binding, lifecycle and visibility filtering (Phase 7)             |
+| Detail surface          | **Done (Phase 6):** `CharacterConnectionsSection` with type-first Add menu, edit modals, query-error alert         | Extend stories and residence eligibility polish as needed                                               |
+| Narrative input         | **Done (Phases 4–7):** builder reads `draft.relationshipEdges`; audience filtering on list/projection              | Extend typed narrative facts and role binding as new kinds ship                                         |
 | Narrative binding       | One selected organization and one residence per composition                                                        | Extend to a small role budget, not unrestricted graph traversal                                         |
 
 Relevant sources:

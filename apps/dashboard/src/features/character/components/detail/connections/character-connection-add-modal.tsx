@@ -150,6 +150,15 @@ export function CharacterConnectionAddModal({
         })
         await onAddOrganization(selectedEntityId, metadata.title, metadata.priority)
       } else if (sectionId === 'places' && selectedPlaceRole) {
+        if (selectedPlaceRole.kind === 'resides_at') {
+          const eligibleResidenceIds = new Set(
+            sheetData.eligibleResidenceLocations.map((location) => location.id),
+          )
+          if (!eligibleResidenceIds.has(selectedEntityId)) {
+            throw new Error('This location cannot be used as a residence.')
+          }
+        }
+
         const details =
           selectedPlaceRole.kind === 'resides_at'
             ? buildConnectionDetailsPatch('resides_at', detailsState)

@@ -17,6 +17,7 @@ const characterRelationshipSchema = new Schema(
     canonicalEndpointsKey: { type: String, required: true },
     details: { type: Schema.Types.Mixed, default: () => ({}) },
     visibility: { type: String, enum: [...CONTENT_VISIBILITY_MODES], required: true },
+    participantIds: { type: [String], default: [] },
     createdByUserId: { type: String, required: true },
   },
   { timestamps: true, versionKey: false },

@@ -18,6 +18,7 @@ import {
   updateCharacterVital,
 } from '../../character'
 import { createCharacterRelationshipsFromDraftEdges } from '../../character-relationships/lib/create-character-relationships-from-draft'
+import { resolveCampaignCharacterRelationshipBlockers } from '../../character-relationships/lib/character-relationship-deletion-guards'
 import { HttpError } from '../../../lib/http-error'
 import { areMongoTransactionsEnabled, runInTransaction } from '../../../lib/mongo-transaction'
 import type { WithMongoSession } from '../../../lib/mongo-session'
@@ -121,6 +122,14 @@ export async function createCampaignNpc(
 
   const joinedAt = new Date().toISOString()
 
+  if (relationshipEdges && relationshipEdges.length > 0 && !areMongoTransactionsEnabled()) {
+    throw new HttpError(
+      503,
+      'transactions_unavailable',
+      'Creating an NPC with relationship edges requires MongoDB transactions.',
+    )
+  }
+
   if (areMongoTransactionsEnabled()) {
     return runInTransaction((session) =>
       createNpcParticipationAndEdges({
@@ -219,6 +228,11 @@ export async function deleteCampaignNpc(
 
   const participation = await findOpenParticipation({ campaignId, characterId: npcId })
   if (!participation) return { status: 'not_found' }
+
+  const blockers = await resolveCampaignCharacterRelationshipBlockers(campaignId, npcId)
+  if (blockers.length > 0) {
+    return { status: 'blocked', blockers }
+  }
 
   await deleteAllParticipationsForCharacter(npcId)
   const deleted = await deleteNpcById(npcId)

@@ -105,7 +105,7 @@ while choices auto-complete, disabled/enabled Continue while Build resolves, re-
 returning from authoring without material changes.
 
 **Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
-`requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `connections.organizations`, then
+`requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `relationshipEdges`, then
 `finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included. No
 template id is persisted on the created NPC.
 
@@ -174,7 +174,7 @@ PC vital PATCH is deferred — see
 
 Quick NPC skips the step-by-step builder: `resolveAutomaticNpcBuild()` completes
 a draft from a compact seed, the flow injects the organization membership into
-`connections.organizations`, and the same `finalizeNpcCharacterBuild()` performs
+`relationshipEdges`, and the same `finalizeNpcCharacterBuild()` performs
 the single authoritative `finalSubmit` validation. One `POST /api/campaigns/:id/npcs`
 creates the NPC with its membership — no follow-up mutation. Domain detail:
 [automatic-build-resolution.md](../../../packages/contracts/docs/character-builder/automatic-build-resolution.md).

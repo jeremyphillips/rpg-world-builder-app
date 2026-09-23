@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { fieldValidationMessages } from '../../../validation/messages'
 import {
   characterRelationshipVisibilitySchema,
   DEFAULT_CHARACTER_RELATIONSHIP_VISIBILITY,
@@ -16,14 +17,34 @@ import { characterRelationshipEdgeSchema } from './relationship'
 
 export const CHARACTER_RELATIONSHIP_IDEMPOTENCY_HEADER = 'Idempotency-Key' as const
 
+function normalizeCharacterRelationshipAudience<
+  T extends {
+    visibility?: z.infer<typeof characterRelationshipVisibilitySchema>
+    participantIds?: string[]
+  },
+>(
+  data: T,
+): T & {
+  visibility: z.infer<typeof characterRelationshipVisibilitySchema>
+  participantIds: string[]
+} {
+  const visibility = data.visibility ?? DEFAULT_CHARACTER_RELATIONSHIP_VISIBILITY
+  return {
+    ...data,
+    visibility,
+    participantIds: visibility === 'specific_players' ? (data.participantIds ?? []) : [],
+  }
+}
+
 const createRelationshipBaseSchema = z.object({
   characterId: z.string().min(1),
   visibility: characterRelationshipVisibilitySchema
     .default(DEFAULT_CHARACTER_RELATIONSHIP_VISIBILITY)
     .optional(),
+  participantIds: z.array(z.string()).optional(),
 })
 
-export const createCharacterRelationshipInputSchema = z.discriminatedUnion('kind', [
+const createCharacterRelationshipInputVariants = [
   createRelationshipBaseSchema.extend({
     kind: z.literal('organizationMembership'),
     organizationId: z.string().min(1),
@@ -104,10 +125,26 @@ export const createCharacterRelationshipInputSchema = z.discriminatedUnion('kind
     relatedCharacterId: z.string().min(1),
     details: lifecyclePersonRelationshipDetailsSchema.optional(),
   }),
+] as const
+
+const createCharacterRelationshipInputRawSchema = z.discriminatedUnion('kind', [
+  ...createCharacterRelationshipInputVariants,
 ])
 
+export const createCharacterRelationshipInputSchema = createCharacterRelationshipInputRawSchema
+  .transform(normalizeCharacterRelationshipAudience)
+  .superRefine((data, ctx) => {
+    if (data.visibility === 'specific_players' && data.participantIds.length < 1) {
+      ctx.addIssue({
+        code: 'custom',
+        message: fieldValidationMessages.minSelections({ itemLabel: 'player' }),
+        path: ['participantIds'],
+      })
+    }
+  })
+
 export type CreateCharacterRelationshipInput = z.infer<
-  typeof createCharacterRelationshipInputSchema
+  typeof createCharacterRelationshipInputRawSchema
 >
 
 export const createCharacterRelationshipCommandSchema = z.object({
@@ -115,19 +152,46 @@ export const createCharacterRelationshipCommandSchema = z.object({
   relationship: createCharacterRelationshipInputSchema,
 })
 
-export type CreateCharacterRelationshipCommand = z.infer<
-  typeof createCharacterRelationshipCommandSchema
->
+export type CreateCharacterRelationshipCommand = {
+  idempotencyKey: string
+  relationship: CreateCharacterRelationshipInput
+}
 
 export const updateCharacterRelationshipInputSchema = z
   .object({
     expectedRevision: z.number().int().positive(),
     visibility: characterRelationshipVisibilitySchema.optional(),
+    participantIds: z.array(z.string()).optional(),
     details: z.record(z.string(), z.unknown()).optional(),
   })
-  .refine((value) => value.visibility !== undefined || value.details !== undefined, {
-    message: 'At least one of visibility or details is required.',
+  .superRefine((data, ctx) => {
+    if (
+      data.visibility === 'specific_players' &&
+      (data.participantIds === undefined || data.participantIds.length < 1)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: fieldValidationMessages.minSelections({ itemLabel: 'player' }),
+        path: ['participantIds'],
+      })
+    }
   })
+  .transform((data) => {
+    if (data.visibility === undefined) {
+      return data
+    }
+
+    return normalizeCharacterRelationshipAudience(data)
+  })
+  .refine(
+    (value) =>
+      value.visibility !== undefined ||
+      value.participantIds !== undefined ||
+      value.details !== undefined,
+    {
+      message: 'At least one of visibility, participantIds, or details is required.',
+    },
+  )
 
 export type UpdateCharacterRelationshipInput = z.infer<
   typeof updateCharacterRelationshipInputSchema
@@ -140,6 +204,20 @@ export const deleteCharacterRelationshipInputSchema = z.object({
 export type DeleteCharacterRelationshipInput = z.infer<
   typeof deleteCharacterRelationshipInputSchema
 >
+
+export const replaceCharacterRelationshipCommandSchema = z.object({
+  idempotencyKey: z.string().trim().min(1).max(128),
+  relationshipId: z.string().min(1),
+  expectedRevision: z.number().int().positive(),
+  relationship: createCharacterRelationshipInputSchema,
+})
+
+export type ReplaceCharacterRelationshipCommand = {
+  idempotencyKey: string
+  relationshipId: string
+  expectedRevision: number
+  relationship: CreateCharacterRelationshipInput
+}
 
 export const characterRelationshipRevisionConflictSchema = z.object({
   code: z.literal('stale_revision'),

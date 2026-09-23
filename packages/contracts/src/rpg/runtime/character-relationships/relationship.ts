@@ -23,6 +23,8 @@ export const characterRelationshipEdgeEnvelopeSchema = z.object({
   visibility: characterRelationshipVisibilitySchema.default(
     DEFAULT_CHARACTER_RELATIONSHIP_VISIBILITY,
   ),
+  /** PC character ids granted when visibility is specific_players. */
+  participantIds: z.array(z.string()).default([]),
 })
 
 export type CharacterRelationshipEdgeEnvelope = z.infer<

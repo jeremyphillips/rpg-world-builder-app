@@ -62,14 +62,10 @@ vi.mock('@/features/campaign', () => ({
   campaignCharactersListQueryKey: (campaignId: string) => ['campaign-characters', campaignId],
 }))
 
-vi.mock('@/features/character', async () => {
-  const actual =
-    await vi.importActual<typeof import('@/features/character')>('@/features/character')
-  return {
-    ...actual,
-    useNpcs: () => npcsQueryState,
-  }
-})
+vi.mock('../../../../npc/hooks/use-npcs', () => ({
+  useNpcs: () => npcsQueryState,
+  npcsQueryKey: (campaignId: string) => ['npcs', campaignId],
+}))
 
 function renderConnectionsStep(ui: ReactElement) {
   return render(<MemoryRouter>{ui}</MemoryRouter>)

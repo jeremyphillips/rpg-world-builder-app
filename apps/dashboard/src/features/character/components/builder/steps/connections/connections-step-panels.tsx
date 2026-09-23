@@ -7,7 +7,7 @@ import {
 } from '@rpg/contracts'
 
 import { useCampaignCharacters } from '@/features/campaign'
-import { useNpcs } from '@/features/character'
+import { useNpcs } from '../../../../npc/hooks/use-npcs'
 import { useLocations } from '@/features/content'
 
 import { CONNECTION_TOP_LEVEL_SECTION_IDS } from '../../../../lib/relationship/connection-section-catalog'
@@ -55,7 +55,7 @@ export function ConnectionsStepPanels({
   )
 
   const [activeDrawer, setActiveDrawer] = useState<ConnectionsStepActiveDrawer>(null)
-  const [editingMembershipEdgeId, setEditingMembershipEdgeId] = useState<string | null>(null)
+  const [editingEdgeId, setEditingEdgeId] = useState<string | null>(null)
 
   const updateEdges = (nextEdges: CharacterRelationshipDraftEdges) => {
     onDraftChange({ relationshipEdges: nextEdges })
@@ -71,7 +71,7 @@ export function ConnectionsStepPanels({
           stepData={stepData}
           campaignId={campaignId}
           onOpenDrawer={setActiveDrawer}
-          onEditMembership={setEditingMembershipEdgeId}
+          onEditEdge={setEditingEdgeId}
           onRemoveEdge={updateEdges}
         />
       ))}
@@ -79,8 +79,8 @@ export function ConnectionsStepPanels({
       <ConnectionsStepDrawers
         activeDrawer={activeDrawer}
         onActiveDrawerChange={setActiveDrawer}
-        editingMembershipEdgeId={editingMembershipEdgeId}
-        onEditingMembershipEdgeIdChange={setEditingMembershipEdgeId}
+        editingEdgeId={editingEdgeId}
+        onEditingEdgeIdChange={setEditingEdgeId}
         relationshipEdges={relationshipEdges}
         stepData={stepData}
         onUpdateEdges={updateEdges}

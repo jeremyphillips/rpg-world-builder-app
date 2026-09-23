@@ -36,6 +36,7 @@ export function toCharacterRelationshipEdge(
     updatedAt: toIsoString(doc.updatedAt),
     createdByUserId: doc.createdByUserId,
     visibility: doc.visibility,
+    participantIds: doc.participantIds ?? [],
     kind: doc.kind,
     characterId: doc.characterId,
     organizationId: doc.organizationId ?? undefined,
@@ -73,6 +74,10 @@ function buildRelationshipDocFields(
     canonicalEndpointsKey,
     details: input.details ?? {},
     visibility: input.visibility ?? DEFAULT_CHARACTER_RELATIONSHIP_VISIBILITY,
+    participantIds:
+      (input.visibility ?? DEFAULT_CHARACTER_RELATIONSHIP_VISIBILITY) === 'specific_players'
+        ? (input.participantIds ?? [])
+        : [],
     createdByUserId: input.createdByUserId,
   }
 }
@@ -236,6 +241,14 @@ export async function updateCharacterRelationshipRecord(
   if (input.patch.visibility !== undefined) {
     setFields.visibility = input.patch.visibility
   }
+  if (input.patch.participantIds !== undefined) {
+    setFields.participantIds = input.patch.participantIds
+  } else if (
+    input.patch.visibility !== undefined &&
+    input.patch.visibility !== 'specific_players'
+  ) {
+    setFields.participantIds = []
+  }
 
   const result = await CharacterRelationshipModel.updateOne(
     {
@@ -298,6 +311,26 @@ export async function deleteCharacterRelationshipRecord(
   throw new HttpError(409, 'stale_revision', 'Character relationship revision is stale.', {
     relationship: current ? toCharacterRelationshipEdge(current) : undefined,
   })
+}
+
+export async function findCharacterRelationshipEdgesForCharacter(
+  input: {
+    campaignId: string
+    characterId: string
+    kinds?: readonly CharacterRelationshipEdgeKind[]
+  },
+  options?: WithMongoSession,
+): Promise<CharacterRelationshipEdge[]> {
+  const docs = await CharacterRelationshipModel.find({
+    campaignId: input.campaignId,
+    $or: [{ characterId: input.characterId }, { relatedCharacterId: input.characterId }],
+    ...(input.kinds ? { kind: { $in: input.kinds } } : {}),
+  })
+    .sort({ _id: 1 })
+    .lean<CharacterRelationshipDoc[]>()
+    .session(options?.session ?? null)
+
+  return docs.map(toCharacterRelationshipEdge)
 }
 
 export async function listCharacterRelationshipsForCharacter(

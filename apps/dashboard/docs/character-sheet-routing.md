@@ -142,25 +142,19 @@ assignments** — not raw membership control ids or a fixed list link.
 See [Availability](./availability.md) for `viewerOnboardingState` on campaign
 list rows.
 
-## Organizations block (campaign sheets)
+## Connections (campaign sheets)
 
-Campaign PC and NPC sheets render a compact **Organizations** block in the
-header `identitySupplement` slot via
-`CharacterOrganizationMembershipsContainer`.
+Campaign PC and NPC sheets render a compact **Connections** block in the
+header `identitySupplement` slot via `CharacterIdentityConnectionsSupplement` →
+`CharacterConnectionsSection`.
 
-- **Read:** memberships from `GET …/content/organizations/references/:characterId`
-  (title included when persisted). Untitled rows show the organization name only
-  — no kind fallback.
-- **Edit:** gated by PC `capabilities.canEdit` or NPC campaign manage. Add uses
-  the shared `OrganizationPickerDrawer`; edit/remove uses
-  `EditOrganizationMembershipDrawer`. Mutations hit nested
-  `…/organization-memberships` routes and invalidate org references, the sheet
-  detail query, and the affected organization’s members key.
-- **Standalone sheets** have no Organizations block (campaign-scoped orgs only).
-- **API-mode chrome:** organization membership rows are not removable from the
-  array rail (`removable: false`); edit and unresolved removal use the trailing
-  pencil / unresolved-remove control. Residence rows use array remove, which
-  flows through API sync to `handleRemove`.
+- **Read:** `GET /api/campaigns/:campaignId/characters/:characterId/relationships`
+  (projected rows with audience filtering). Query failures render an alert —
+  never the empty-state copy.
+- **Write:** gated by PC `capabilities.canEdit` or NPC campaign manage. Add/edit
+  modals call `/api/campaigns/:campaignId/character-relationships` (create,
+  replace, update, delete). Kind changes use the transactional replace command.
+- **Standalone sheets** have no Connections block (campaign-scoped edges only).
 
 ## Error copy (route shells)
 

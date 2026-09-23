@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { SquarePen } from 'lucide-react'
 
-import { Button } from '@rpg/ui'
+import { Alert, Button } from '@rpg/ui'
 
 import {
   CrossContentRelationshipRow,
   DetailCollectionPanel,
   RelationshipList,
+  detailCollectionRecordSeparatorVariants,
 } from '@/features/content'
 
 import { useCharacterConnectionsSheet } from '../../../hooks/use-character-connections-sheet'
@@ -69,7 +70,7 @@ export function CharacterConnectionsSection({
         headerSurface="subtle"
         bodySurface="transparent"
         action={
-          canEdit ? (
+          canEdit && !sheet.isRelationshipsError ? (
             <CharacterConnectionsAddMenu
               disabled={sheet.isMutating}
               onSelectSection={setAddSectionId}
@@ -77,62 +78,72 @@ export function CharacterConnectionsSection({
           ) : undefined
         }
       >
-        <RelationshipList.Root
-          itemCount={sheet.projections.length}
-          emptyLabel={CONNECTIONS_EMPTY_LABEL}
-        >
-          {hasRows ? (
-            <div className="flex flex-col gap-4 px-4">
-              {CONNECTION_TOP_LEVEL_SECTION_IDS.map((sectionId) => {
-                const sectionRows = filterProjectionsBySection(sheet.projections, sectionId)
-                if (sectionRows.length === 0) return null
+        {sheet.isRelationshipsError ? (
+          <div className="px-4">
+            <Alert variant="destructive" title="Could not load connections" role="alert">
+              {sheet.relationshipsErrorLabel}
+            </Alert>
+          </div>
+        ) : (
+          <RelationshipList.Root
+            itemCount={sheet.projections.length}
+            emptyLabel={CONNECTIONS_EMPTY_LABEL}
+          >
+            {hasRows ? (
+              <div className="px-4">
+                {CONNECTION_TOP_LEVEL_SECTION_IDS.map((sectionId) => {
+                  const sectionRows = filterProjectionsBySection(sheet.projections, sectionId)
+                  if (sectionRows.length === 0) return null
 
-                const section = CONNECTION_SECTION_CATALOG[sectionId]
-                const editCopy = resolveConnectionSheetEditCopy(sectionId)
+                  const section = CONNECTION_SECTION_CATALOG[sectionId]
+                  const editCopy = resolveConnectionSheetEditCopy(sectionId)
 
-                return (
-                  <RelationshipList.Group
-                    key={sectionId}
-                    label={section.heading}
-                    itemCount={sectionRows.length}
-                  >
-                    {sectionRows.map((row) => {
-                      const presentation = resolveProjectionRowPresentation(row, campaignId)
+                  return (
+                    <RelationshipList.Group
+                      key={sectionId}
+                      label={section.heading}
+                      itemCount={sectionRows.length}
+                    >
+                      <ul className={detailCollectionRecordSeparatorVariants()}>
+                        {sectionRows.map((row) => {
+                          const presentation = resolveProjectionRowPresentation(row, campaignId)
 
-                      return (
-                        <li key={row.relationshipId}>
-                          <CrossContentRelationshipRow
-                            heading={presentation.heading}
-                            href={presentation.headingHref}
-                            description={presentation.description}
-                            trailing={
-                              canEdit && row.capabilities.canUpdateDetails
-                                ? {
-                                    kind: 'action',
-                                    content: (
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        aria-label={`${editCopy.editLabel} for ${presentation.heading}`}
-                                        onClick={() => sheet.setEditingRow(row)}
-                                      >
-                                        <SquarePen aria-hidden className="size-4" />
-                                      </Button>
-                                    ),
-                                  }
-                                : null
-                            }
-                          />
-                        </li>
-                      )
-                    })}
-                  </RelationshipList.Group>
-                )
-              })}
-            </div>
-          ) : null}
-        </RelationshipList.Root>
+                          return (
+                            <li key={row.relationshipId}>
+                              <CrossContentRelationshipRow
+                                heading={presentation.heading}
+                                href={presentation.headingHref}
+                                description={presentation.description}
+                                trailing={
+                                  canEdit && row.capabilities.canUpdateDetails
+                                    ? {
+                                        kind: 'action',
+                                        content: (
+                                          <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            aria-label={`${editCopy.editLabel} for ${presentation.heading}`}
+                                            onClick={() => sheet.setEditingRow(row)}
+                                          >
+                                            <SquarePen aria-hidden className="size-4" />
+                                          </Button>
+                                        ),
+                                      }
+                                    : null
+                                }
+                              />
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </RelationshipList.Group>
+                  )
+                })}
+              </div>
+            ) : null}
+          </RelationshipList.Root>
+        )}
       </DetailCollectionPanel>
 
       {canEdit ? (

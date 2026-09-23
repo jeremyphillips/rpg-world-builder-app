@@ -5,6 +5,7 @@ import {
   type CharacterRelationshipsProjectionResponse,
   type CreateCharacterRelationshipCommand,
   type DeleteCharacterRelationshipInput,
+  type ReplaceCharacterRelationshipCommand,
   type UpdateCharacterRelationshipInput,
 } from '@rpg/contracts'
 
@@ -64,6 +65,19 @@ export async function updateCharacterRelationship(
   fallbackMessage = 'Could not update this relationship.',
 ): Promise<{ relationship: CharacterRelationshipEdge }> {
   return patchJson(relationshipItemPath(campaignId, relationshipId), input, fallbackMessage)
+}
+
+export async function replaceCharacterRelationship(
+  campaignId: string,
+  relationshipId: string,
+  command: ReplaceCharacterRelationshipCommand,
+  fallbackMessage = 'Could not replace this relationship.',
+): Promise<{ relationship: CharacterRelationshipEdge }> {
+  return postJson(
+    `${relationshipItemPath(campaignId, relationshipId)}/replace`,
+    command,
+    fallbackMessage,
+  )
 }
 
 export async function deleteCharacterRelationship(

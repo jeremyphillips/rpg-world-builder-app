@@ -9,7 +9,9 @@ import {
 } from '@rpg/contracts'
 import { z } from 'zod'
 
-import { createLocalRelationshipId } from './relationship-edge-api-sync.lib'
+function createLocalRelationshipId(): string {
+  return crypto.randomUUID()
+}
 
 export const organizationMembershipFormRowSchema = z.object({
   relationshipId: z.string().min(1),

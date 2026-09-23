@@ -2,6 +2,7 @@ export { characterRelationshipsRouter } from './character-relationship.routes'
 export {
   createCharacterRelationshipRecordCommand,
   deleteCharacterRelationshipRecordCommand,
+  replaceCharacterRelationshipRecordCommand,
   updateCharacterRelationshipRecordCommand,
 } from './character-relationship-mutation'
 export {

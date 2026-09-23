@@ -297,4 +297,56 @@ describe('character relationship services', () => {
     expect(refreshedFirst?.details).toMatchObject({ isPrimary: false })
     expect(refreshedSecond?.details).toMatchObject({ isPrimary: true })
   })
+
+  it('replaces a person relationship kind transactionally', async () => {
+    const { agent, csrfToken, userId } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const { character: focalNpc } = await createCampaignNpc(campaignId, userId, {
+      ...minimalNpcRequestInput,
+      name: 'Focal Character',
+    })
+    const { character: relatedNpc } = await createCampaignNpc(campaignId, userId, {
+      ...minimalNpcRequestInput,
+      name: 'Related Character',
+    })
+
+    const parentEdge = await createCharacterRelationshipRecordCommand({
+      campaignId,
+      actorUserId: userId,
+      command: {
+        idempotencyKey: 'parent-edge',
+        relationship: {
+          kind: 'parentOf',
+          characterId: focalNpc.id,
+          relatedCharacterId: relatedNpc.id,
+        },
+      },
+    })
+
+    const { replaceCharacterRelationshipRecordCommand } =
+      await import('./character-relationship-mutation')
+
+    const friendEdge = await replaceCharacterRelationshipRecordCommand({
+      campaignId,
+      actorUserId: userId,
+      relationshipId: parentEdge.id,
+      expectedRevision: parentEdge.revision,
+      command: {
+        idempotencyKey: 'replace-parent-with-friend',
+        relationshipId: parentEdge.id,
+        expectedRevision: parentEdge.revision,
+        relationship: {
+          kind: 'friendOf',
+          characterId: focalNpc.id,
+          relatedCharacterId: relatedNpc.id,
+        },
+      },
+    })
+
+    expect(friendEdge.kind).toBe('friendOf')
+    expect(await findCharacterRelationshipById(campaignId, parentEdge.id)).toBeNull()
+    expect(await findCharacterRelationshipById(campaignId, friendEdge.id)).toMatchObject({
+      kind: 'friendOf',
+    })
+  })
 })

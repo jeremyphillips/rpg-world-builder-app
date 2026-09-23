@@ -11,6 +11,7 @@ const baseRow = {
   relationshipId: 'edge-1',
   section: 'people.social' as const,
   visibility: 'dm_only' as const,
+  participantIds: [],
   referenceStatus: 'resolved' as const,
   revision: 1,
   capabilities: { canUpdateDetails: true, canDelete: true },

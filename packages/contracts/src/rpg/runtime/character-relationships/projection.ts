@@ -48,6 +48,7 @@ export const characterRelationshipProjectionRowSchema = z.object({
   roleLabel: z.string().min(1),
   details: z.record(z.string(), z.unknown()),
   visibility: characterRelationshipVisibilitySchema,
+  participantIds: z.array(z.string()),
   referenceStatus: characterRelationshipReferenceStatusSchema,
   target: relationshipProjectionTargetSchema.optional(),
   revision: z.number().int().positive(),

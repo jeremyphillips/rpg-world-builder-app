@@ -44,8 +44,6 @@ export { CharacterBuilderPageShell } from './components/builder/character-builde
 export { CharacterBuilderShell } from './components/builder/character-builder-shell'
 export { CampaignCharacterStatusSummary } from './components/detail/status/campaign-character-status-summary'
 export { CharacterDetailContent } from './components/detail/character-detail-content'
-export { CharacterOrganizationsSummary } from './components/detail/memberships/character-organizations-summary'
-export { CharacterOrganizationMembershipsContainer } from './components/detail/memberships/character-organization-memberships-container'
 export { CharacterIdentityConnectionsSupplement } from './components/detail/memberships/character-identity-connections-supplement'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
 export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action'
@@ -77,6 +75,7 @@ export {
   createCharacterRelationshipIdempotencyKey,
   deleteCharacterRelationship,
   listCharacterRelationships,
+  replaceCharacterRelationship,
   updateCharacterRelationship,
 } from './api/character-relationship-client'
 export {

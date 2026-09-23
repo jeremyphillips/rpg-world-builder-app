@@ -1,5 +1,8 @@
 import type { CreateCharacterRelationshipInput } from '@rpg/contracts'
-import { isCharacterLocationConnectionEligible } from '@rpg/contracts'
+import {
+  getCharacterRelationshipEdgeKindEntry,
+  isCharacterLocationConnectionEligible,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import type { WithMongoSession } from '../../../lib/mongo-session'
@@ -9,14 +12,6 @@ import type { HomebrewDoc } from '../../content/lib/content-write-config'
 import { HomebrewLocationModel } from '../../content/locations/homebrew-location.model'
 import { toHomebrewLocation } from '../../content/locations/locations.config'
 import { HomebrewOrganizationModel } from '../../content/organizations/homebrew-organization.model'
-
-const ELIGIBLE_LOCATION_CONNECTION_KINDS = new Set([
-  'resides_at',
-  'owns',
-  'tenant',
-  'operator',
-  'works_at',
-])
 
 async function assertCharacterParticipatesInCampaign(
   campaignId: string,
@@ -123,12 +118,28 @@ export async function assertCreateCharacterRelationshipEndpoints(
 ): Promise<void> {
   await assertCharacterParticipatesInCampaign(campaignId, input.characterId, options)
 
-  if (input.kind === 'organizationMembership') {
-    await assertOrganizationExistsInCampaign(campaignId, input.organizationId, options)
+  const endpointType = getCharacterRelationshipEdgeKindEntry(input.kind)?.endpointType
+
+  if (endpointType === 'organization') {
+    await assertOrganizationExistsInCampaign(
+      campaignId,
+      (input as Extract<CreateCharacterRelationshipInput, { organizationId: string }>)
+        .organizationId,
+      options,
+    )
     return
   }
 
-  if (ELIGIBLE_LOCATION_CONNECTION_KINDS.has(input.kind)) {
+  if (endpointType === 'location') {
+    if (input.kind === 'hometown' || input.kind === 'birthplace') {
+      await loadCampaignLocation(
+        campaignId,
+        (input as Extract<CreateCharacterRelationshipInput, { locationId: string }>).locationId,
+        options,
+      )
+      return
+    }
+
     await assertEligibleLocationConnection(
       campaignId,
       input as Extract<
@@ -140,23 +151,16 @@ export async function assertCreateCharacterRelationshipEndpoints(
     return
   }
 
-  if (input.kind === 'hometown' || input.kind === 'birthplace') {
-    await loadCampaignLocation(campaignId, input.locationId, options)
+  if (endpointType === 'character') {
+    await assertRelatedCharacterEndpoints(
+      campaignId,
+      input.characterId,
+      (input as Extract<CreateCharacterRelationshipInput, { relatedCharacterId: string }>)
+        .relatedCharacterId,
+      options,
+    )
     return
   }
 
-  if (!('relatedCharacterId' in input)) {
-    throw new HttpError(
-      400,
-      'validation_error',
-      'Related character is required for this relationship kind.',
-    )
-  }
-
-  await assertRelatedCharacterEndpoints(
-    campaignId,
-    input.characterId,
-    input.relatedCharacterId,
-    options,
-  )
+  throw new HttpError(400, 'validation_error', 'Unsupported relationship kind.')
 }

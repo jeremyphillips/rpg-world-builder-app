@@ -1,4 +1,5 @@
 import {
+  isSymmetricCharacterRelationshipEdgeKind,
   normalizeDirectedPersonRelationshipEndpoints,
   orderSymmetricCharacterIds,
   type CreateCharacterRelationshipInput,
@@ -9,13 +10,6 @@ import type {
   PlaceConnectionRoleOption,
   PropertyConnectionRoleOption,
 } from './connection-role-catalog'
-
-const SYMMETRIC_PERSON_KINDS = new Set<PersonConnectionRoleOption['kind']>([
-  'partnerOf',
-  'siblingOf',
-  'friendOf',
-  'allyOf',
-])
 
 export function buildPersonRelationshipCreateInput(
   focalCharacterId: string,
@@ -37,7 +31,7 @@ export function buildPersonRelationshipCreateInput(
     }
   }
 
-  if (SYMMETRIC_PERSON_KINDS.has(role.kind)) {
+  if (isSymmetricCharacterRelationshipEdgeKind(role.kind)) {
     const [left, right] = orderSymmetricCharacterIds(focalCharacterId, relatedCharacterId)
     return {
       kind: role.kind,

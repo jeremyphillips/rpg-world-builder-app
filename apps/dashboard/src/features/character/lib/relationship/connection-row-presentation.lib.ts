@@ -12,6 +12,7 @@ import type { ReactNode } from 'react'
 import { ROUTES } from '@/app/routes'
 import type { CharacterPickerOption } from '../picker/character-picker-option.lib'
 import {
+  UNAVAILABLE_CHARACTER_LABEL,
   UNAVAILABLE_LOCATION_LABEL,
   UNAVAILABLE_ORGANIZATION_LABEL,
 } from '../display/character-display'
@@ -197,12 +198,9 @@ export function resolveUnavailableEntityLabel(
     return 'Missing location'
   }
   if ('relatedCharacterId' in edge) {
-    const connectedCharacterId =
-      edge.characterId === CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT
-        ? edge.relatedCharacterId
-        : edge.characterId
+    const connectedCharacterId = resolveConnectedCharacterId(edge)
     if (!charactersById.has(connectedCharacterId)) {
-      return 'Missing character'
+      return UNAVAILABLE_CHARACTER_LABEL
     }
   }
   return undefined

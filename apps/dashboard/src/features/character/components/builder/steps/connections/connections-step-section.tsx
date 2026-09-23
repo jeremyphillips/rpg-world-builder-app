@@ -8,10 +8,12 @@ import type {
 import { IconContainer, SplitButton } from '@rpg/ui'
 import { cn } from '@rpg/ui'
 
-import { DetailCollectionPanel } from '@/features/content/lib/detail/collection/panel/detail-collection-panel'
-import { RelationshipList } from '@/features/content/lib/relationship/list/relationship-list'
-import type { DetailOverflowAction } from '@/features/content/lib/detail/detail-overflow-menu'
-import { detailCollectionRecordSeparatorVariants } from '@/features/content/lib/detail/collection/detail-collection-chrome.variants'
+import {
+  DetailCollectionPanel,
+  RelationshipList,
+  detailCollectionRecordSeparatorVariants,
+  type DetailOverflowAction,
+} from '@/features/content'
 
 import {
   CONNECTION_SECTION_CATALOG,
@@ -19,7 +21,10 @@ import {
   type ConnectionTopLevelSectionId,
 } from '../../../../lib/relationship/connection-section-catalog'
 import { getConnectionSectionIcon } from '../../../../lib/relationship/connection-section-icons'
-import { removeDraftEdgeById } from '../../../../lib/relationship/connection-draft-edges.lib'
+import {
+  draftEdgeHasEditableDetails,
+  removeDraftEdgeById,
+} from '../../../../lib/relationship/connection-draft-edges.lib'
 import {
   resolveConnectionRowPresentation,
   resolveUnavailableEntityLabel,
@@ -37,7 +42,7 @@ export type ConnectionsStepSectionProps = {
   stepData: ConnectionsStepData
   campaignId?: string
   onOpenDrawer: (drawer: ConnectionsStepActiveDrawer) => void
-  onEditMembership: (edgeId: string) => void
+  onEditEdge: (edgeId: string) => void
   onRemoveEdge: (nextEdges: CharacterRelationshipDraftEdges) => void
 }
 
@@ -46,20 +51,19 @@ function buildConnectionOverflowActions(input: {
   presentation: ReturnType<typeof resolveConnectionRowPresentation>
   relationshipEdges: CharacterRelationshipDraftEdges
   navigate: ReturnType<typeof useNavigate>
-  onEditMembership: (edgeId: string) => void
+  onEditEdge: (edgeId: string) => void
   onRemoveEdge: (nextEdges: CharacterRelationshipDraftEdges) => void
 }): DetailOverflowAction[] {
-  const editActions: DetailOverflowAction[] =
-    input.edge.kind === 'organizationMembership'
-      ? [
-          {
-            id: 'edit',
-            label: 'Edit relationship',
-            icon: <Pencil aria-hidden />,
-            onSelect: () => input.onEditMembership(input.edge.id),
-          },
-        ]
-      : []
+  const editActions: DetailOverflowAction[] = draftEdgeHasEditableDetails(input.edge.kind)
+    ? [
+        {
+          id: 'edit',
+          label: 'Edit relationship',
+          icon: <Pencil aria-hidden />,
+          onSelect: () => input.onEditEdge(input.edge.id),
+        },
+      ]
+    : []
 
   return [
     ...editActions,
@@ -92,7 +96,7 @@ export function ConnectionsStepSection({
   stepData,
   campaignId,
   onOpenDrawer,
-  onEditMembership,
+  onEditEdge,
   onRemoveEdge,
 }: ConnectionsStepSectionProps) {
   const navigate = useNavigate()
@@ -155,7 +159,7 @@ export function ConnectionsStepSection({
                 presentation,
                 relationshipEdges,
                 navigate,
-                onEditMembership,
+                onEditEdge,
                 onRemoveEdge,
               })
 

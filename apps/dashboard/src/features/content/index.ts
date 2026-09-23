@@ -70,6 +70,8 @@ export type {
 } from './lib/relationship/list/relationship-list'
 export { DetailCollectionPanel } from './lib/detail/collection/panel/detail-collection-panel'
 export type { DetailCollectionPanelProps } from './lib/detail/collection/panel/detail-collection-panel'
+export { detailCollectionRecordSeparatorVariants } from './lib/detail/collection/detail-collection-chrome.variants'
+export type { DetailOverflowAction } from './lib/detail/detail-overflow-menu'
 export { buildLocationConnectedPartyCharactersById } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
 export type { CharacterPickerOption } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
 export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row'

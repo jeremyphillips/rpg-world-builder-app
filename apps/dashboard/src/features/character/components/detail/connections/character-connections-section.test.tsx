@@ -15,6 +15,8 @@ function mockConnectionsSheet(
 ) {
   mockedUseCharacterConnectionsSheet.mockReturnValue({
     isBootstrapping: false,
+    isRelationshipsError: false,
+    relationshipsErrorLabel: undefined,
     projections: [],
     sheetData: {
       campaignId: 'campaign-1',
@@ -57,6 +59,7 @@ describe('CharacterConnectionsSection', () => {
           roleLabel: 'Parent',
           details: {},
           visibility: 'dm_only',
+          participantIds: [],
           referenceStatus: 'resolved',
           revision: 1,
           capabilities: { canUpdateDetails: true, canDelete: true },
@@ -74,6 +77,7 @@ describe('CharacterConnectionsSection', () => {
           roleLabel: 'Hometown',
           details: {},
           visibility: 'dm_only',
+          participantIds: [],
           referenceStatus: 'resolved',
           revision: 1,
           capabilities: { canUpdateDetails: true, canDelete: true },
@@ -106,6 +110,29 @@ describe('CharacterConnectionsSection', () => {
 
     await user.click(screen.getByRole('button', { name: 'Edit relationship for Darius Vale' }))
     expect(setEditingRow).toHaveBeenCalled()
+  })
+
+  it('shows an error alert instead of the empty state when relationships fail to load', () => {
+    mockConnectionsSheet({
+      isRelationshipsError: true,
+      relationshipsErrorLabel: 'Network error',
+      projections: [],
+    })
+
+    render(
+      <MemoryRouter>
+        <CharacterConnectionsSection
+          campaignId="campaign-1"
+          characterId="character-1"
+          canEdit
+          subjectKind="pc"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Network error')
+    expect(screen.queryByText('No connections added yet.')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add connection' })).not.toBeInTheDocument()
   })
 
   it('opens the add connection menu with four section options', async () => {

@@ -2,6 +2,8 @@ import * as React from 'react'
 
 import { getErrorMessage, type CharacterRelationshipProjectionRow } from '@rpg/contracts'
 
+import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
+
 import { useCampaignCharacters } from '@/features/campaign'
 import { useOrganizations, useLocations } from '@/features/content'
 
@@ -176,12 +178,20 @@ export function useCharacterConnectionsSheet(input: {
             nextPlaceRole: roleChange.nextPlaceRole,
             nextPropertyRole: roleChange.nextPropertyRole,
             details: input.details,
+            visibility: input.visibility,
+            participantIds: input.participantIds,
             mutations,
           })
           return
         }
 
-        await updateConnectionRowDetails({ row, details: input.details, mutations })
+        await updateConnectionRowDetails({
+          row,
+          details: input.details,
+          visibility: input.visibility,
+          participantIds: input.participantIds,
+          mutations,
+        })
       } catch (error) {
         rethrowCanonicalized(error, 'Could not update this connection.')
       }
@@ -206,8 +216,15 @@ export function useCharacterConnectionsSheet(input: {
     (relationshipsQuery.isPending && relationshipsQuery.data === undefined) ||
     (organizationsQuery.isPending && organizationsQuery.data === undefined)
 
+  const relationshipsErrorLabel = resolveQueryErrorLabel(
+    [relationshipsQuery],
+    'Could not load character relationships.',
+  )
+
   return {
     isBootstrapping,
+    isRelationshipsError: relationshipsQuery.isError,
+    relationshipsErrorLabel,
     projections,
     sheetData,
     editingRow,

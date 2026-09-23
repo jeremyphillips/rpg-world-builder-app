@@ -51,11 +51,7 @@ export function DetailCollectionPanel({
               <Heading variant="label" as={headingAs} id={headingId}>
                 {heading}
               </Heading>
-              {helper ? (
-                <Text variant="muted" className="text-sm">
-                  {helper}
-                </Text>
-              ) : null}
+              {helper ? <Text variant="muted">{helper}</Text> : null}
             </div>
           </div>
           {action ? <div className="shrink-0">{action}</div> : null}

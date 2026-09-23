@@ -6,13 +6,17 @@ import type {
 } from '@rpg/contracts'
 import {
   getCharacterRelationshipEdgeKindDisplayLabel,
+  getCharacterRelationshipEdgeKindEntry,
   getCharacterRelationshipEdgeKindSection,
   isCampaignManager,
   isViewerRelationshipSource,
   resolveRelationshipProjectionRoleLabel,
 } from '@rpg/contracts'
 
-import { canViewerSeeCharacterRelationship } from './character-relationship-visibility.lib'
+import {
+  canViewerSeeCharacterRelationship,
+  isRelationshipTargetVisibleToViewer,
+} from './character-relationship-visibility.lib'
 
 import { findNpcById, findPcById } from '../../character'
 import type { HomebrewDoc } from '../../content/lib/content-write-config'
@@ -21,8 +25,8 @@ import { toHomebrewLocation } from '../../content/locations/locations.config'
 import { HomebrewOrganizationModel } from '../../content/organizations/homebrew-organization.model'
 
 type ViewerContext = {
-  viewerUserId: string
   viewerRole: 'owner' | 'co-owner' | 'pc' | 'observer'
+  viewerCharacterIds: readonly string[]
   viewerCharacterId: string
 }
 
@@ -32,16 +36,6 @@ type ProjectionRowContext = {
   roleLabel: string
   capabilities: CharacterRelationshipProjectionRow['capabilities']
 }
-
-const LOCATION_RELATIONSHIP_KINDS = new Set([
-  'resides_at',
-  'owns',
-  'tenant',
-  'operator',
-  'works_at',
-  'hometown',
-  'birthplace',
-])
 
 async function resolveCharacterTarget(
   characterId: string,
@@ -81,6 +75,7 @@ function buildProjectionRowBase({
     roleLabel,
     details: relationship.details,
     visibility: relationship.visibility,
+    participantIds: relationship.participantIds,
     referenceStatus,
     target,
     revision: relationship.revision,
@@ -110,12 +105,7 @@ async function projectOrganizationRelationshipRow(
 
 async function projectLocationRelationshipRow(
   context: ProjectionRowContext & {
-    relationship: Extract<
-      CharacterRelationshipEdge,
-      {
-        kind: 'resides_at' | 'owns' | 'tenant' | 'operator' | 'works_at' | 'hometown' | 'birthplace'
-      }
-    >
+    relationship: Extract<CharacterRelationshipEdge, { locationId: string }>
   },
 ): Promise<CharacterRelationshipProjectionRow> {
   const location = await resolveLocationTarget(context.relationship.locationId)
@@ -130,10 +120,7 @@ async function projectLocationRelationshipRow(
 
 async function projectCharacterRelationshipTargetRow(
   context: ProjectionRowContext & {
-    relationship: Extract<
-      CharacterRelationshipEdge,
-      { kind: 'parentOf' | 'partnerOf' | 'siblingOf' | 'mentorOf' | 'rivalOf' }
-    >
+    relationship: Extract<CharacterRelationshipEdge, { relatedCharacterId: string }>
   },
 ): Promise<CharacterRelationshipProjectionRow> {
   const targetCharacterId = isViewerRelationshipSource(
@@ -162,7 +149,10 @@ export async function projectCharacterRelationshipRow(
   relationship: CharacterRelationshipEdge,
   viewer: ViewerContext,
 ): Promise<CharacterRelationshipProjectionRow | null> {
-  if (!canViewerSeeCharacterRelationship(relationship, viewer)) {
+  if (
+    !canViewerSeeCharacterRelationship(relationship, viewer) ||
+    !(await isRelationshipTargetVisibleToViewer(relationship, viewer, relationship.campaignId))
+  ) {
     return null
   }
 
@@ -182,39 +172,36 @@ export async function projectCharacterRelationshipRow(
     },
   }
 
-  if (relationship.kind === 'organizationMembership') {
-    return projectOrganizationRelationshipRow({
-      ...context,
-      relationship,
-    })
-  }
+  const endpointType = getCharacterRelationshipEdgeKindEntry(relationship.kind)?.endpointType
 
-  if (LOCATION_RELATIONSHIP_KINDS.has(relationship.kind)) {
-    return projectLocationRelationshipRow({
+  if (endpointType === 'organization') {
+    return projectOrganizationRelationshipRow({
       ...context,
       relationship: relationship as Extract<
         CharacterRelationshipEdge,
-        {
-          kind:
-            | 'resides_at'
-            | 'owns'
-            | 'tenant'
-            | 'operator'
-            | 'works_at'
-            | 'hometown'
-            | 'birthplace'
-        }
+        { kind: 'organizationMembership' }
       >,
     })
   }
 
-  return projectCharacterRelationshipTargetRow({
-    ...context,
-    relationship: relationship as Extract<
-      CharacterRelationshipEdge,
-      { kind: 'parentOf' | 'partnerOf' | 'siblingOf' | 'mentorOf' | 'rivalOf' }
-    >,
-  })
+  if (endpointType === 'location') {
+    return projectLocationRelationshipRow({
+      ...context,
+      relationship: relationship as Extract<CharacterRelationshipEdge, { locationId: string }>,
+    })
+  }
+
+  if (endpointType === 'character') {
+    return projectCharacterRelationshipTargetRow({
+      ...context,
+      relationship: relationship as Extract<
+        CharacterRelationshipEdge,
+        { relatedCharacterId: string }
+      >,
+    })
+  }
+
+  return null
 }
 
 export async function projectCharacterRelationships(

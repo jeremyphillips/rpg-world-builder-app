@@ -42,7 +42,8 @@ catalog/filter logic lives in `lib/detail/`; view models in `lib/display/`.
 | `sheet/`       | Upper sheet layout — header, ability/stat/combat rows, stat tile, CVA |
 | `tabs/`        | Lower tab region — spells/equipment catalog tabs, narrative           |
 | `status/`      | Route-injected status chrome (`statusSummary` slot)                   |
-| `memberships/` | Campaign org membership summary, container, drawer wiring             |
+| `connections/` | Campaign relationship sheet — add/edit modals, grouped list, pickers  |
+| `memberships/` | `CharacterIdentityConnectionsSupplement` wrapper for sheet header     |
 
 Builder `equipment/`, `spells/`, and `connections/` folders are separate
 lifecycles — detail tabs and membership composition stay here.

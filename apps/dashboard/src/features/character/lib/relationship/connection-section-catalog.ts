@@ -1,4 +1,8 @@
-import type { CharacterRelationshipEdgeKind } from '@rpg/contracts'
+import {
+  getCharacterRelationshipEdgeKindSection,
+  type CharacterRelationshipEdgeKind,
+  type CharacterRelationshipSection,
+} from '@rpg/contracts'
 
 export const CONNECTION_TOP_LEVEL_SECTION_IDS = [
   'people',
@@ -46,34 +50,22 @@ export const CONNECTION_SECTION_CATALOG: Record<
   },
 }
 
-const PEOPLE_KINDS = new Set<CharacterRelationshipEdgeKind>([
-  'parentOf',
-  'partnerOf',
-  'siblingOf',
-  'mentorOf',
-  'rivalOf',
-  'friendOf',
-  'allyOf',
-  'enemyOf',
-])
+function toTopLevelSection(section: CharacterRelationshipSection): ConnectionTopLevelSectionId {
+  if (section.startsWith('people.')) {
+    return 'people'
+  }
 
-const PLACE_KINDS = new Set<CharacterRelationshipEdgeKind>(['hometown', 'birthplace', 'resides_at'])
+  if (section === 'organizations' || section === 'places' || section === 'property') {
+    return section
+  }
 
-const PROPERTY_KINDS = new Set<CharacterRelationshipEdgeKind>([
-  'owns',
-  'tenant',
-  'operator',
-  'works_at',
-])
+  throw new Error(`Unsupported character relationship section "${section}".`)
+}
 
 export function getConnectionTopLevelSectionForKind(
   kind: CharacterRelationshipEdgeKind,
 ): ConnectionTopLevelSectionId {
-  if (kind === 'organizationMembership') return 'organizations'
-  if (PEOPLE_KINDS.has(kind)) return 'people'
-  if (PLACE_KINDS.has(kind)) return 'places'
-  if (PROPERTY_KINDS.has(kind)) return 'property'
-  return 'people'
+  return toTopLevelSection(getCharacterRelationshipEdgeKindSection(kind))
 }
 
 export function filterDraftEdgesBySection<T extends { kind: CharacterRelationshipEdgeKind }>(

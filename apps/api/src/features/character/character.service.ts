@@ -7,6 +7,7 @@ import type {
 } from '@rpg/contracts'
 import { applyCharacterVitalTransitionMetadata } from '@rpg/contracts'
 
+import { resolveCrossCampaignCharacterRelationshipBlockers } from '../character-relationships/lib/character-relationship-deletion-guards'
 import { assertStandalonePcCreateRestrictions } from './assert-standalone-pc-create'
 import {
   createPcRecord,
@@ -40,6 +41,11 @@ export async function deleteCharacterForUser(
   characterId: string,
   userId: string,
 ): Promise<ContentDeletionResult | { status: 'not_found' }> {
+  const blockers = await resolveCrossCampaignCharacterRelationshipBlockers(characterId)
+  if (blockers.length > 0) {
+    return { status: 'blocked', blockers }
+  }
+
   const deleted = await deletePcForUser(characterId, userId)
   if (!deleted) {
     return { status: 'not_found' }

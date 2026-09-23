@@ -4,6 +4,7 @@ import type {
   CharacterRelationshipEdge,
   CreateCharacterRelationshipCommand,
   DeleteCharacterRelationshipInput,
+  ReplaceCharacterRelationshipCommand,
   UpdateCharacterRelationshipInput,
 } from '@rpg/contracts'
 
@@ -231,4 +232,121 @@ export async function deleteCharacterRelationshipRecordCommand(input: {
     relationshipId: input.relationshipId,
     expectedRevision: input.body.expectedRevision,
   })
+}
+
+export async function replaceCharacterRelationshipRecordCommand(input: {
+  campaignId: string
+  actorUserId: string
+  relationshipId: string
+  expectedRevision: number
+  command: ReplaceCharacterRelationshipCommand
+}): Promise<CharacterRelationshipEdge> {
+  if (!areMongoTransactionsEnabled()) {
+    throw new HttpError(
+      503,
+      'transactions_unavailable',
+      'Relationship kind changes require MongoDB transactions.',
+    )
+  }
+
+  const existing = await findCharacterRelationshipById(input.campaignId, input.relationshipId)
+  if (!existing) {
+    throw new HttpError(404, 'not_found', 'Character relationship not found.')
+  }
+
+  if (existing.revision !== input.expectedRevision) {
+    throw new HttpError(409, 'stale_revision', 'Character relationship revision is stale.', {
+      relationship: existing,
+    })
+  }
+
+  const requestHash = hashCharacterRelationshipCreateRequest({
+    campaignId: input.campaignId,
+    actorUserId: input.actorUserId,
+    relationship: input.command.relationship,
+  })
+
+  const existingIdempotency = await findCharacterRelationshipIdempotencyRecord({
+    campaignId: input.campaignId,
+    actorUserId: input.actorUserId,
+    commandType: 'create',
+    idempotencyKey: input.command.idempotencyKey,
+  })
+
+  if (existingIdempotency) {
+    if (existingIdempotency.requestHash !== requestHash) {
+      throw HttpError.conflict(
+        'Idempotency key was already used for a different relationship request.',
+      )
+    }
+
+    const relationship = await findCharacterRelationshipById(
+      input.campaignId,
+      existingIdempotency.relationshipId,
+    )
+    if (!relationship) {
+      throw new HttpError(404, 'not_found', 'Character relationship not found.')
+    }
+    return relationship
+  }
+
+  await assertCreateCharacterRelationshipEndpoints(input.campaignId, input.command.relationship)
+
+  const relationshipId = randomUUID()
+
+  try {
+    return await runInTransaction(async (session) => {
+      if (
+        input.command.relationship.kind === 'resides_at' &&
+        input.command.relationship.details?.isPrimary
+      ) {
+        await clearOtherPrimaryResidences(
+          {
+            campaignId: input.campaignId,
+            characterId: input.command.relationship.characterId,
+            relationshipId,
+          },
+          { session },
+        )
+      }
+
+      const relationship = await createCharacterRelationshipRecord(
+        {
+          id: relationshipId,
+          campaignId: input.campaignId,
+          createdByUserId: input.actorUserId,
+          ...input.command.relationship,
+        },
+        { session },
+      )
+
+      await recordCharacterRelationshipIdempotency(
+        {
+          campaignId: input.campaignId,
+          actorUserId: input.actorUserId,
+          commandType: 'create',
+          idempotencyKey: input.command.idempotencyKey,
+          requestHash,
+          relationshipId: relationship.id,
+        },
+        { session },
+      )
+
+      await deleteCharacterRelationshipRecord(
+        {
+          campaignId: input.campaignId,
+          relationshipId: input.relationshipId,
+          expectedRevision: input.expectedRevision,
+        },
+        { session },
+      )
+
+      return relationship
+    })
+  } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      throw HttpError.conflict('A relationship with the same kind and endpoints already exists.')
+    }
+    throw error
+  }
 }

@@ -12,6 +12,7 @@ const baseRelationship = {
   updatedAt: '2026-01-01T00:00:00.000Z',
   createdByUserId: 'manager-1',
   visibility: 'dm_only' as const,
+  participantIds: [],
   kind: 'organizationMembership' as const,
   characterId: 'char-1',
   organizationId: 'org-1',
@@ -22,14 +23,14 @@ describe('canViewerSeeCharacterRelationship', () => {
   it('hides dm_only edges from non-manager viewers', () => {
     expect(
       canViewerSeeCharacterRelationship(baseRelationship, {
-        viewerUserId: 'player-1',
         viewerRole: 'pc',
+        viewerCharacterIds: ['pc-1'],
       }),
     ).toBe(false)
     expect(
       canViewerSeeCharacterRelationship(baseRelationship, {
-        viewerUserId: 'manager-1',
         viewerRole: 'owner',
+        viewerCharacterIds: [],
       }),
     ).toBe(true)
   })
@@ -38,8 +39,46 @@ describe('canViewerSeeCharacterRelationship', () => {
     expect(
       canViewerSeeCharacterRelationship(
         { ...baseRelationship, visibility: 'all_players' },
-        { viewerUserId: 'player-1', viewerRole: 'pc' },
+        { viewerRole: 'pc', viewerCharacterIds: ['pc-1'] },
       ),
     ).toBe(true)
+  })
+
+  it('shows specific_players edges only to granted PCs', () => {
+    expect(
+      canViewerSeeCharacterRelationship(
+        {
+          ...baseRelationship,
+          visibility: 'specific_players',
+          participantIds: ['pc-1'],
+        },
+        { viewerRole: 'pc', viewerCharacterIds: ['pc-1'] },
+      ),
+    ).toBe(true)
+
+    expect(
+      canViewerSeeCharacterRelationship(
+        {
+          ...baseRelationship,
+          visibility: 'specific_players',
+          participantIds: ['pc-1'],
+        },
+        { viewerRole: 'pc', viewerCharacterIds: ['pc-2'] },
+      ),
+    ).toBe(false)
+  })
+
+  it('does not grant visibility based on createdByUserId', () => {
+    expect(
+      canViewerSeeCharacterRelationship(
+        {
+          ...baseRelationship,
+          visibility: 'specific_players',
+          participantIds: ['pc-1'],
+          createdByUserId: 'player-who-created-edge',
+        },
+        { viewerRole: 'pc', viewerCharacterIds: ['player-who-created-edge'] },
+      ),
+    ).toBe(false)
   })
 })

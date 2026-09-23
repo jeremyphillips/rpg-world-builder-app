@@ -2357,6 +2357,7 @@
     "relationshipProjectionOrganizationTargetSchema",
     "relationshipProjectionTargetSchema",
     "remainingBudgetCp",
+    "replaceCharacterRelationshipCommandSchema",
     "reportCharacterBuilderDraftStorageIssue",
     "requirePlayActorFromQuery",
     "requiredWhenCopy",

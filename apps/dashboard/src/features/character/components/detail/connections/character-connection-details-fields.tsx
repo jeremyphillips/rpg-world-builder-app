@@ -5,6 +5,7 @@ import {
 import { CheckboxField, Eyebrow, SelectField, Text } from '@rpg/ui'
 
 import { OrganizationMembershipTitleField } from '../../connections/organization-membership-title-field'
+import { ConnectionAudienceFields } from './connection-audience-fields'
 import type { ConnectionSheetData } from '../../../lib/relationship/connection-sheet-data.lib'
 import type { ConnectionDetailsFormState } from '../../../lib/relationship/connection-details-fields.lib'
 
@@ -14,6 +15,7 @@ export type ConnectionDetailsFieldsProps = {
   sheetData: ConnectionSheetData
   state: ConnectionDetailsFormState
   onStateChange: (next: ConnectionDetailsFormState) => void
+  showAudienceFields?: boolean
 }
 
 export function ConnectionDetailsFields({
@@ -22,6 +24,7 @@ export function ConnectionDetailsFields({
   sheetData,
   state,
   onStateChange,
+  showAudienceFields = false,
 }: ConnectionDetailsFieldsProps) {
   const organization = organizationId ? sheetData.organizationsById.get(organizationId) : undefined
 
@@ -31,6 +34,14 @@ export function ConnectionDetailsFields({
         <Eyebrow size="sm">Since</Eyebrow>
         <Text variant="muted">—</Text>
       </div>
+
+      {showAudienceFields ? (
+        <ConnectionAudienceFields
+          campaignId={sheetData.campaignId}
+          state={state}
+          onStateChange={onStateChange}
+        />
+      ) : null}
 
       {rowKind === 'organizationMembership' && organization ? (
         <OrganizationMembershipTitleField

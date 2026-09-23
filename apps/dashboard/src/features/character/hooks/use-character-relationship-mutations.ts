@@ -3,12 +3,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   CreateCharacterRelationshipCommand,
   DeleteCharacterRelationshipInput,
+  ReplaceCharacterRelationshipCommand,
   UpdateCharacterRelationshipInput,
 } from '@rpg/contracts'
 
 import {
   createCharacterRelationship,
   deleteCharacterRelationship,
+  replaceCharacterRelationship,
   updateCharacterRelationship,
 } from '../api/character-relationship-client'
 import {
@@ -58,6 +60,19 @@ export function useCharacterRelationshipMutations(
     },
   })
 
+  const replaceMutation = useMutation({
+    mutationFn: ({
+      relationshipId,
+      command,
+    }: {
+      relationshipId: string
+      command: ReplaceCharacterRelationshipCommand
+    }) => replaceCharacterRelationship(campaignId, relationshipId, command),
+    onSuccess: async () => {
+      await invalidate()
+    },
+  })
+
   const deleteMutation = useMutation({
     mutationFn: ({
       relationshipId,
@@ -76,14 +91,26 @@ export function useCharacterRelationshipMutations(
       createMutation.mutateAsync(command),
     updateRelationship: (relationshipId: string, input: UpdateCharacterRelationshipInput) =>
       updateMutation.mutateAsync({ relationshipId, input }),
+    replaceRelationship: (relationshipId: string, command: ReplaceCharacterRelationshipCommand) =>
+      replaceMutation.mutateAsync({ relationshipId, command }),
     deleteRelationship: (relationshipId: string, input: DeleteCharacterRelationshipInput) =>
       deleteMutation.mutateAsync({ relationshipId, input }),
-    isPending: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
-    error: createMutation.error ?? updateMutation.error ?? deleteMutation.error ?? null,
+    isPending:
+      createMutation.isPending ||
+      updateMutation.isPending ||
+      replaceMutation.isPending ||
+      deleteMutation.isPending,
+    error:
+      createMutation.error ??
+      updateMutation.error ??
+      replaceMutation.error ??
+      deleteMutation.error ??
+      null,
     invalidate,
     resetErrors: () => {
       createMutation.reset()
       updateMutation.reset()
+      replaceMutation.reset()
       deleteMutation.reset()
     },
   }

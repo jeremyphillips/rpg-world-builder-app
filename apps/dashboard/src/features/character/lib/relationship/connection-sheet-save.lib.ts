@@ -26,6 +26,8 @@ export type ConnectionSheetSaveInput = {
   placeRoleId?: string
   propertyRoleId?: string
   details?: Record<string, unknown>
+  visibility?: CharacterRelationshipProjectionRow['visibility']
+  participantIds?: string[]
 }
 
 function hasRoleChanged(
@@ -35,7 +37,6 @@ function hasRoleChanged(
   return nextRoleId !== undefined && nextRoleId !== currentRoleId
 }
 
-// fallow-ignore-next-line complexity
 // fallow-ignore-next-line complexity
 export function resolveConnectionRoleChange(
   row: CharacterRelationshipProjectionRow,
@@ -74,9 +75,14 @@ export function resolveConnectionRoleChange(
 }
 
 type ConnectionSheetMutations = {
-  deleteRelationship: (
+  replaceRelationship: (
     relationshipId: string,
-    input: { expectedRevision: number },
+    command: {
+      idempotencyKey: string
+      relationshipId: string
+      expectedRevision: number
+      relationship: ReturnType<typeof buildPersonRelationshipCreateInput>
+    },
   ) => Promise<unknown>
   createRelationship: (command: {
     idempotencyKey: string
@@ -84,8 +90,68 @@ type ConnectionSheetMutations = {
   }) => Promise<unknown>
   updateRelationship: (
     relationshipId: string,
-    input: { expectedRevision: number; details: Record<string, unknown> },
+    input: {
+      expectedRevision: number
+      details?: Record<string, unknown>
+      visibility?: CharacterRelationshipProjectionRow['visibility']
+      participantIds?: string[]
+    },
   ) => Promise<unknown>
+}
+
+function buildReplacementRelationship(input: {
+  row: CharacterRelationshipProjectionRow
+  focalCharacterId: string
+  sectionId: ReturnType<typeof getConnectionTopLevelSectionForKind>
+  nextPersonRole?: PersonConnectionRoleOption
+  nextPlaceRole?: PlaceConnectionRoleOption
+  nextPropertyRole?: PropertyConnectionRoleOption
+  details?: Record<string, unknown>
+  visibility?: CharacterRelationshipProjectionRow['visibility']
+  participantIds?: string[]
+}) {
+  const targetId = input.row.target?.id
+  if (!targetId) {
+    throw new Error('Cannot replace a connection with an unresolved target.')
+  }
+
+  const audience = {
+    ...(input.visibility !== undefined ? { visibility: input.visibility } : {}),
+    ...(input.participantIds !== undefined ? { participantIds: input.participantIds } : {}),
+  }
+
+  if (input.sectionId === 'people' && input.nextPersonRole) {
+    return {
+      ...buildPersonRelationshipCreateInput(input.focalCharacterId, targetId, input.nextPersonRole),
+      ...audience,
+    }
+  }
+
+  if (input.sectionId === 'places' && input.nextPlaceRole) {
+    return {
+      ...buildPlaceRelationshipCreateInput(
+        input.focalCharacterId,
+        targetId,
+        input.nextPlaceRole,
+        input.details,
+      ),
+      ...audience,
+    }
+  }
+
+  if (input.sectionId === 'property' && input.nextPropertyRole) {
+    return {
+      ...buildPropertyRelationshipCreateInput(
+        input.focalCharacterId,
+        targetId,
+        input.nextPropertyRole,
+        input.details,
+      ),
+      ...audience,
+    }
+  }
+
+  throw new Error('Cannot replace a connection without a valid next role.')
 }
 
 export async function replaceConnectionRow(input: {
@@ -96,64 +162,35 @@ export async function replaceConnectionRow(input: {
   nextPlaceRole?: PlaceConnectionRoleOption
   nextPropertyRole?: PropertyConnectionRoleOption
   details?: Record<string, unknown>
+  visibility?: CharacterRelationshipProjectionRow['visibility']
+  participantIds?: string[]
   mutations: ConnectionSheetMutations
 }): Promise<void> {
-  const targetId = input.row.target?.id
-  if (!targetId) {
-    throw new Error('Cannot replace a connection with an unresolved target.')
-  }
+  const relationship = buildReplacementRelationship(input)
 
-  await input.mutations.deleteRelationship(input.row.relationshipId, {
+  await input.mutations.replaceRelationship(input.row.relationshipId, {
+    idempotencyKey: createCharacterRelationshipIdempotencyKey(),
+    relationshipId: input.row.relationshipId,
     expectedRevision: input.row.revision,
+    relationship,
   })
-
-  if (input.sectionId === 'people' && input.nextPersonRole) {
-    await input.mutations.createRelationship({
-      idempotencyKey: createCharacterRelationshipIdempotencyKey(),
-      relationship: buildPersonRelationshipCreateInput(
-        input.focalCharacterId,
-        targetId,
-        input.nextPersonRole,
-      ),
-    })
-    return
-  }
-
-  if (input.sectionId === 'places' && input.nextPlaceRole) {
-    await input.mutations.createRelationship({
-      idempotencyKey: createCharacterRelationshipIdempotencyKey(),
-      relationship: buildPlaceRelationshipCreateInput(
-        input.focalCharacterId,
-        targetId,
-        input.nextPlaceRole,
-        input.details,
-      ),
-    })
-    return
-  }
-
-  if (input.sectionId === 'property' && input.nextPropertyRole) {
-    await input.mutations.createRelationship({
-      idempotencyKey: createCharacterRelationshipIdempotencyKey(),
-      relationship: buildPropertyRelationshipCreateInput(
-        input.focalCharacterId,
-        targetId,
-        input.nextPropertyRole,
-        input.details,
-      ),
-    })
-  }
 }
 
 export async function updateConnectionRowDetails(input: {
   row: CharacterRelationshipProjectionRow
   details?: Record<string, unknown>
+  visibility?: CharacterRelationshipProjectionRow['visibility']
+  participantIds?: string[]
   mutations: ConnectionSheetMutations
 }): Promise<void> {
-  if (!input.details) return
+  if (!input.details && input.visibility === undefined && input.participantIds === undefined) {
+    return
+  }
 
   await input.mutations.updateRelationship(input.row.relationshipId, {
     expectedRevision: input.row.revision,
-    details: input.details,
+    ...(input.details ? { details: input.details } : {}),
+    ...(input.visibility !== undefined ? { visibility: input.visibility } : {}),
+    ...(input.participantIds !== undefined ? { participantIds: input.participantIds } : {}),
   })
 }

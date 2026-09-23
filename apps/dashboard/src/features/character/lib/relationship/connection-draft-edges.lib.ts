@@ -1,5 +1,6 @@
 import {
   CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  characterRelationshipEdgeKindSupportsLifecycle,
   normalizeDraftPersonRelationshipEdge,
   type CharacterRelationshipDraftEdge,
   type CharacterRelationshipDraftEdges,
@@ -147,4 +148,12 @@ export function isPersonRelationshipKind(kind: CharacterRelationshipEdgeKind): b
     kind === 'allyOf' ||
     kind === 'enemyOf'
   )
+}
+
+export function draftEdgeHasEditableDetails(kind: CharacterRelationshipEdgeKind): boolean {
+  if (kind === 'organizationMembership' || kind === 'resides_at') {
+    return true
+  }
+
+  return characterRelationshipEdgeKindSupportsLifecycle(kind)
 }

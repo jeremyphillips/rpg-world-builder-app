@@ -57,6 +57,8 @@ export const UNAVAILABLE_ORGANIZATION_LABEL = 'Unavailable organization'
 
 export const UNAVAILABLE_LOCATION_LABEL = 'Unavailable location'
 
+export const UNAVAILABLE_CHARACTER_LABEL = 'Unavailable character'
+
 export const CHARACTER_CONTROLLER_DISPLAY = {
   noPlayerAssigned: 'No player assigned',
   playedByYou: 'Played by you',
