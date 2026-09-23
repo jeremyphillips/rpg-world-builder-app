@@ -3,5 +3,7 @@ export {
   ALLOWED_MIME_TYPES,
   storeUpload,
   resolveUploadPath,
+  resolveUploadDir,
+  validateFileType,
   ensureUploadDir,
 } from './upload.service'

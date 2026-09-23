@@ -162,11 +162,12 @@ Package layout → [apps/api/src/realtime/README.md](../apps/api/src/realtime/RE
 ## Shared contracts & UI
 
 - **`@rpg/contracts`** is the single source of truth for domain/DTO shapes:
-  Zod schemas with `z.infer` types, organized under `shared/` (auth, users),
-  `rpg/content/` (catalog types), `rpg/runtime/` (character sheets),
+  Zod schemas with `z.infer` types, organized under `shared/` (auth, users,
+  media), `rpg/content/` (catalog types), `rpg/runtime/` (character sheets),
   and `rpg/campaign/` (campaign + ruleset patches). The API validates against
   them; apps reuse the same schemas with `@hookform/resolvers/zod`.
   Package layout → [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
+  Reusable content media (phased rollout) → [content-media.md](./content-media.md).
   Campaign **rules vocabulary** (creature types, …) is documented in
   [vocabulary.md](./vocabulary.md).
   Cross-content relationship ownership, projections, and mutation rules →
