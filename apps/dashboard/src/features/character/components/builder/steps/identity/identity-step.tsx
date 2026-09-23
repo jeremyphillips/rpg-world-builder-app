@@ -1,9 +1,5 @@
-import { useMemo, useState } from 'react'
-import {
-  emptyContentMediaSchema,
-  type CharacterBuildContext,
-  type CharacterBuilderDraft,
-} from '@rpg/contracts'
+import { useMemo } from 'react'
+import { type CharacterBuildContext, type CharacterBuilderDraft } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Form } from '@rpg/ui/form'
 
@@ -22,8 +18,7 @@ import { IdentityDraftSync } from './identity-draft-sync'
 import { IdentityNameField } from './identity-name-field'
 import { IdentityNarrativeGenerateAction } from './identity-narrative-generate-action'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
-import { Button } from '@rpg/ui'
-import { MediaManager } from '@/features/media'
+import { ManagedMediaField } from '@/features/media'
 
 export type IdentityStepProps = {
   context: CharacterBuildContext
@@ -42,8 +37,6 @@ export function IdentityStep({
   onStepComplete,
   onFormContinueValidationFailed,
 }: IdentityStepProps) {
-  const [mediaOpen, setMediaOpen] = useState(false)
-  const media = draft.identity.media ?? emptyContentMediaSchema
   const mediaScope = useMemo(
     () =>
       context.characterKind === 'npc' &&
@@ -76,36 +69,14 @@ export function IdentityStep({
           />
         ),
         renderMediaManager: () => (
-          <>
-            <Button type="button" variant="outline" onClick={() => setMediaOpen(true)}>
-              {media.images.length
-                ? `${media.images.length} images · Manage images`
-                : 'Add character images'}
-            </Button>
-            <MediaManager
-              open={mediaOpen}
-              onOpenChange={setMediaOpen}
-              domain="character"
-              value={media}
-              scope={mediaScope}
-              mode="form"
-              onSave={({ media: nextMedia }) =>
-                onDraftChange({ identity: { ...draft.identity, media: nextMedia } })
-              }
-            />
-          </>
+          <ManagedMediaField
+            config={{ domain: 'character', presentation: { layout: 'expanded' } }}
+            scope={mediaScope}
+            label="Character images"
+          />
         ),
       }),
-    [
-      context,
-      draft,
-      media,
-      mediaOpen,
-      mediaScope,
-      onDraftChange,
-      onFormContinueValidationFailed,
-      onStepComplete,
-    ],
+    [context, draft, mediaScope, onDraftChange, onFormContinueValidationFailed, onStepComplete],
   )
 
   return (

@@ -17,6 +17,13 @@ The form system is two layers:
 Rule of thumb: start with `<Form>`. Drop a layer only when the config can't express what
 you need — and consider whether the gap belongs in the renderer.
 
+### Managed media slots
+
+Managed `ContentMedia` values are not native file fields. Dashboard integrations
+render `ManagedMediaField` through a form slot; it watches and updates the RHF value
+while `MediaFieldSummary` in `@rpg/ui` remains controlled and API-free. Continue to
+use `type: 'file'` only for browser `File`/`File[]` values such as account avatars.
+
 ## When to use which layer
 
 | Use…                                | When…                                                                |

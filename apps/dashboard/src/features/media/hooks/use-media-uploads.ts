@@ -21,6 +21,7 @@ export function useMediaUploads(
   scope: MediaScope,
   count: number,
   onAsset: (asset: MediaAsset, id: string) => void,
+  maxItems = CONTENT_MEDIA_MAX_ATTACHMENTS,
 ) {
   const [entries, setEntries] = useState<UploadEntry[]>([])
   const [notice, setNotice] = useState('')
@@ -112,11 +113,9 @@ export function useMediaUploads(
     publish()
   }
   function add(files: File[]) {
-    const remaining = Math.max(0, CONTENT_MEDIA_MAX_ATTACHMENTS - count - queue.current.length)
+    const remaining = Math.max(0, maxItems - count - queue.current.length)
     if (files.length > remaining)
-      setNotice(
-        `Only ${remaining} more images can be added (limit ${CONTENT_MEDIA_MAX_ATTACHMENTS}).`,
-      )
+      setNotice(`Only ${remaining} more images can be added (limit ${maxItems}).`)
     for (const file of files.slice(0, remaining))
       queue.current.push({ id: crypto.randomUUID(), file, status: 'queued' })
     pump()

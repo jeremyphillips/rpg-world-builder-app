@@ -2,6 +2,22 @@ import { z } from 'zod'
 
 import type { MediaRole } from './roles'
 import { MEDIA_ROLES, mediaRoleSchema } from './roles'
+import { CONTENT_MEDIA_MAX_ATTACHMENTS_CEILING } from './limits'
+
+export const contentMediaCollectionConstraintSchema = z.object({
+  maxItems: z.number().int().positive().max(CONTENT_MEDIA_MAX_ATTACHMENTS_CEILING).optional(),
+})
+
+export type ContentMediaCollectionConstraint = z.infer<
+  typeof contentMediaCollectionConstraintSchema
+>
+
+export function resolveContentMediaMaxItems(constraint?: ContentMediaCollectionConstraint): number {
+  return (
+    contentMediaCollectionConstraintSchema.parse(constraint ?? {}).maxItems ??
+    CONTENT_MEDIA_MAX_ATTACHMENTS_CEILING
+  )
+}
 
 /** Domains opted into reusable content media management. */
 export const CONTENT_MEDIA_DOMAINS = [

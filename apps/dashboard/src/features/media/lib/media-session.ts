@@ -16,13 +16,23 @@ export type MediaAction =
   | { type: 'role'; id: string; role: MediaRole; assigned: boolean }
   | { type: 'crop'; crop: NormalizedCrop }
 
-export function createMediaSession(media: ContentMedia): MediaSession {
+export function createMediaSession(
+  media: ContentMedia,
+  initialSelectedImageId?: string,
+): MediaSession {
+  const requested = media.images.some((image) => image.id === initialSelectedImageId)
+    ? initialSelectedImageId
+    : undefined
+  const selectedId =
+    requested ??
+    media.roles.portrait?.imageId ??
+    media.roles.primary?.imageId ??
+    media.images[0]?.id
   return {
     initial: structuredClone(media),
     media: structuredClone(media),
-    selectedId:
-      media.roles.portrait?.imageId ?? media.roles.primary?.imageId ?? media.images[0]?.id,
-    presentation: media.roles.portrait ? 'portrait' : 'primary',
+    selectedId,
+    presentation: media.roles.portrait?.imageId === selectedId ? 'portrait' : 'primary',
     notice: '',
   }
 }

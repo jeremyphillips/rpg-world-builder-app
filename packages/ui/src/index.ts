@@ -119,6 +119,12 @@ export {
   MediaCompactPreview,
   type MediaCompactPreviewProps,
 } from './components/ui/media-compact-preview.client'
+export {
+  MediaFieldSummary,
+  MEDIA_FIELD_SUMMARY_TILE_BUDGET,
+  type MediaFieldSummaryItem,
+  type MediaFieldSummaryProps,
+} from './components/ui/media-field-summary.client'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
 export {

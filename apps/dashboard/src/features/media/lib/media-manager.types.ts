@@ -15,6 +15,8 @@ export type MediaManagerProps = {
   value: ContentMedia
   scope: MediaScope
   initialAssets?: MediaAsset[]
+  initialSelectedImageId?: ContentMedia['images'][number]['id']
+  maxItems?: number
   mode: 'form' | 'detail'
   onSave: (change: MediaManagerSave) => void | Promise<void>
   /** Storybook-only: force the body drop overlay without a live file drag. */

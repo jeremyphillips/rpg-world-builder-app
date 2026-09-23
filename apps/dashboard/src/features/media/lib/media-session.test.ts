@@ -3,6 +3,12 @@ import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 import { createMediaSession, isMediaSessionDirty, mediaSessionReducer } from './media-session'
 
 describe('isolated media session', () => {
+  it('honors a valid requested selection and falls back when it is stale', () => {
+    expect(createMediaSession(mediaFixture, 'image-1').selectedId).toBe('image-1')
+    expect(createMediaSession(mediaFixture, 'missing').selectedId).toBe(
+      mediaFixture.roles.portrait?.imageId,
+    )
+  })
   it('preserves parent and other presentations while editing and switching', () => {
     const initial = structuredClone(mediaFixture)
     let state = createMediaSession(initial)

@@ -12,6 +12,9 @@ export const DEFAULT_UPLOAD_MAX_BYTES = 5_242_880
 /** Maximum attachments per content record gallery. */
 export const CONTENT_MEDIA_MAX_ATTACHMENTS = 20
 
+/** Absolute platform ceiling for any configured content-media collection. */
+export const CONTENT_MEDIA_MAX_ATTACHMENTS_CEILING = CONTENT_MEDIA_MAX_ATTACHMENTS
+
 /** Maximum concurrent in-flight uploads per client session. */
 export const CONTENT_MEDIA_MAX_UPLOADS_IN_FLIGHT = 3
 

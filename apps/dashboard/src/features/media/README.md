@@ -7,6 +7,13 @@ content identity area and the character builder identity step.
 
 ## Integration contract
 
+`ManagedMediaField` is the form-facing adapter. Its `MediaFieldConfig` keeps the
+domain, collection constraint, and presentation separate from persisted
+`ContentMedia`. Compact summaries are used by content form headers; the character
+Identity step selects the expanded presentation. The adapter watches the RHF value,
+retains assets returned by Apply, and opens `MediaManager` with the chosen attachment.
+Omitted collection capacity resolves to the platform default of 20.
+
 Mount under the app's TanStack Query provider. Pass `open`, `onOpenChange`, `domain`,
 `scope`, `value`, `mode`, and `onSave`. Supply `initialAssets` when metadata is already
 available; other metadata loads through authorized queries. `imageUrl` is an optional

@@ -18,10 +18,14 @@ export function useMediaManager({
   value,
   scope,
   initialAssets = EMPTY_ASSETS,
+  initialSelectedImageId,
+  maxItems,
   onSave,
 }: MediaManagerProps) {
   const policy = getContentMediaPolicy(domain)
-  const [state, dispatch] = useReducer(mediaSessionReducer, value, createMediaSession)
+  const [state, dispatch] = useReducer(mediaSessionReducer, undefined, () =>
+    createMediaSession(value, initialSelectedImageId),
+  )
   const [uploaded, setUploaded] = useState<Record<string, MediaAsset>>({})
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -46,14 +50,23 @@ export function useMediaManager({
   queries.forEach((query) => {
     if (query.data) assets[query.data.id] = query.data
   })
-  const uploads = useMediaUploads(scope, state.media.images.length, (asset, id) => {
-    setUploaded((previous) => ({ ...previous, [asset.id]: asset }))
-    dispatch({ type: 'add', asset, id })
-  })
+  const uploads = useMediaUploads(
+    scope,
+    state.media.images.length,
+    (asset, id) => {
+      setUploaded((previous) => ({ ...previous, [asset.id]: asset }))
+      dispatch({ type: 'add', asset, id })
+    },
+    maxItems,
+  )
   const dirty = isMediaSessionDirty(state) || uploads.entries.length > 0
   const selected = state.media.images.find((image) => image.id === state.selectedId)
   const asset = selected ? assets[selected.assetId] : undefined
-  const validation = validateContentMedia(state.media, { policy, assetDimensionsById: assets })
+  const validation = validateContentMedia(state.media, {
+    policy,
+    assetDimensionsById: assets,
+    maxItems,
+  })
   const metadataReady = state.media.images.every((image) => Boolean(assets[image.assetId]))
   const label = domain === 'equipment' ? 'equipment item' : domain
   const onAlt = useCallback(

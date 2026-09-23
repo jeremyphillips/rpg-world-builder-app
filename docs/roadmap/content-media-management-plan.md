@@ -1,6 +1,6 @@
 # Reusable content media management
 
-Status: proposed technical implementation plan and UX review. No runtime changes.
+Status: managed media and reusable authoring summaries are implemented.
 
 ## Scope and recommendation
 

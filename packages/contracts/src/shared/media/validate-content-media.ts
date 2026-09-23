@@ -16,6 +16,7 @@ import type { MediaRole } from './roles'
 export type ContentMediaValidationContext = {
   policy: ContentMediaPolicy
   assetDimensionsById: Readonly<Record<string, MediaAssetDimensions | undefined>>
+  maxItems?: number
 }
 
 export type ContentMediaValidationResult =
@@ -26,17 +27,13 @@ function customIssue(message: string, path: Array<string | number>): ZodIssue {
   return { code: 'custom', message, path }
 }
 
-function collectAttachmentIssues(images: ContentMedia['images']): ZodIssue[] {
+function collectAttachmentIssues(images: ContentMedia['images'], maxItems: number): ZodIssue[] {
   const issues: ZodIssue[] = []
   const imageIds = new Set<string>()
   const assetIds = new Set<string>()
 
-  if (images.length > CONTENT_MEDIA_MAX_ATTACHMENTS) {
-    issues.push(
-      customIssue(`A record may have at most ${CONTENT_MEDIA_MAX_ATTACHMENTS} attachments.`, [
-        'images',
-      ]),
-    )
+  if (images.length > maxItems) {
+    issues.push(customIssue(`A record may have at most ${maxItems} attachments.`, ['images']))
   }
 
   for (const [index, image] of images.entries()) {
@@ -161,7 +158,7 @@ export function validateContentMedia(
   context: ContentMediaValidationContext,
 ): ContentMediaValidationResult {
   const issues = [
-    ...collectAttachmentIssues(media.images),
+    ...collectAttachmentIssues(media.images, context.maxItems ?? CONTENT_MEDIA_MAX_ATTACHMENTS),
     ...collectRoleIssues(media, context.policy, context.assetDimensionsById),
   ]
 
