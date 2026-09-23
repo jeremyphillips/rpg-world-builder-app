@@ -135,5 +135,8 @@ export function useMediaUploads(
       pump()
     }
   }
-  return { entries, notice, maxUploadBytes, add, remove, retry }
+  function notify(message: string) {
+    setNotice(message)
+  }
+  return { entries, notice, maxUploadBytes, add, remove, retry, notify }
 }

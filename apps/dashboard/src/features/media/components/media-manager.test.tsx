@@ -111,6 +111,22 @@ describe('MediaManager', () => {
     expect(screen.queryByText('Drop images to add')).not.toBeInTheDocument()
   })
 
+  it('enqueues oversized image body drops for the upload pipeline', () => {
+    mount({ value: { revision: 0, images: [], roles: {} } })
+    const host = screen.getByLabelText('Images').parentElement!.parentElement!
+    const oversized = createUploadFile('large.png', 'image/png')
+    Object.defineProperty(oversized, 'size', { value: 7_153_401 })
+
+    fireEvent.drop(host, {
+      dataTransfer: {
+        types: ['Files'],
+        files: [oversized],
+      },
+    })
+
+    expect(screen.getByText(/large\.png/)).toBeInTheDocument()
+  })
+
   it('refuses invalid body drops without enqueueing uploads', () => {
     mount({ value: { revision: 0, images: [], roles: {} } })
     const host = screen.getByLabelText('Images').parentElement!.parentElement!

@@ -36,7 +36,11 @@ function MediaManagerSession(props: MediaManagerProps) {
     save,
     blocked,
   } = controller
-  const bodyDrop = useMediaManagerBodyDrop(uploads.add, uploads.maxUploadBytes)
+  const bodyDrop = useMediaManagerBodyDrop({
+    onAdd: uploads.add,
+    onReject: uploads.notify,
+    maxUploadBytes: uploads.maxUploadBytes,
+  })
   const { headerScrolled, onGalleryBoundaryChange, onWorkspaceBoundaryChange } =
     useMediaManagerScrollBoundary()
   const bodyDropOverlay = resolveMediaManagerBodyDropOverlay(props.previewBodyDrop, bodyDrop)

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   areMediaImageFilesValid,
+  areMediaImageTypesValid,
   canAcceptDraggedMediaFiles,
   isExternalFileDrag,
   isMediaImageFile,
@@ -25,6 +26,11 @@ describe('media upload validation', () => {
         5000,
       ),
     ).toBe(false)
+  })
+
+  it('accepts supported image types regardless of size', () => {
+    expect(areMediaImageTypesValid([makeFile('photo.jpg', 'image/jpeg', 10_000_000)])).toBe(true)
+    expect(areMediaImageTypesValid([makeFile('doc.pdf', 'application/pdf')])).toBe(false)
   })
 
   it('detects external file drags', () => {
@@ -52,5 +58,24 @@ describe('media upload validation', () => {
 
     expect(accepted).toBe(true)
     expect(rejected).toBe(false)
+  })
+
+  it('rejects oversized drags when file sizes are exposed', () => {
+    const oversized = canAcceptDraggedMediaFiles(
+      {
+        types: ['Files'],
+        items: [
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => makeFile('photo.png', 'image/png', 10_000),
+          },
+        ],
+        files: [makeFile('photo.png', 'image/png', 10_000)],
+      } as unknown as DataTransfer,
+      5000,
+    )
+
+    expect(oversized).toBe(false)
   })
 })

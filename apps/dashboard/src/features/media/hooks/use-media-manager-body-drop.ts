@@ -1,13 +1,23 @@
 import { useCallback, useRef, useState } from 'react'
 
 import {
-  areMediaImageFilesValid,
+  areMediaImageTypesValid,
   canAcceptDraggedMediaFiles,
   isExternalFileDrag,
   readDraggedMediaFiles,
 } from '../lib/media-upload.lib'
 
-export function useMediaManagerBodyDrop(onAdd: (files: File[]) => void, maxUploadBytes?: number) {
+const BODY_DROP_REJECTED_MESSAGE = "These files can't be added."
+
+export function useMediaManagerBodyDrop({
+  onAdd,
+  onReject,
+  maxUploadBytes,
+}: {
+  onAdd: (files: File[]) => void
+  onReject?: (message: string) => void
+  maxUploadBytes?: number
+}) {
   const depth = useRef(0)
   const [active, setActive] = useState(false)
   const [invalid, setInvalid] = useState(false)
@@ -50,10 +60,13 @@ export function useMediaManagerBodyDrop(onAdd: (files: File[]) => void, maxUploa
       event.preventDefault()
       const files = readDraggedMediaFiles(event.dataTransfer)
       reset()
-      if (!areMediaImageFilesValid(files, maxUploadBytes)) return
+      if (!areMediaImageTypesValid(files)) {
+        onReject?.(BODY_DROP_REJECTED_MESSAGE)
+        return
+      }
       onAdd(files)
     },
-    [maxUploadBytes, onAdd, reset],
+    [onAdd, onReject, reset],
   )
 
   return { active, invalid, onDragEnter, onDragLeave, onDragOver, onDrop }
