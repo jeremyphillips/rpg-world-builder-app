@@ -1,3 +1,14 @@
+/** Accepted MIME types for standard raster image upload fields and media manager drop targets. */
+export const STANDARD_IMAGE_UPLOAD_ACCEPT = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+] as const
+
+/** Default per-file upload byte ceiling — mirrors API `MAX_UPLOAD_BYTES` default (5 MiB). */
+export const DEFAULT_UPLOAD_MAX_BYTES = 5_242_880
+
 /** Maximum attachments per content record gallery. */
 export const CONTENT_MEDIA_MAX_ATTACHMENTS = 20
 

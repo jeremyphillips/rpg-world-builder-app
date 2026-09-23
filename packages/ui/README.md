@@ -260,19 +260,34 @@ const schema = z.object({
 />
 ```
 
+### `DropTargetPrompt`
+
+Shared drop-target chrome and copy for inline file fields and full-surface modal overlays.
+`FileDropzone` composes this primitive; modal body overlays should import it directly.
+
+| Prop         | Type                         | Default         | Description                                                                                                                                          |
+| ------------ | ---------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `accept`     | `string[]`                   | —               | MIME types or extensions — drives icon and idle copy                                                                                                 |
+| `multiple`   | `boolean`                    | `false`         | Plural idle copy when true                                                                                                                           |
+| `maxSize`    | `number`                     | —               | Max bytes per file — requirement line in idle state                                                                                                  |
+| `density`    | `'compact' \| 'comfortable'` | `'comfortable'` | Image/file drop targets default to the modal well density                                                                                            |
+| `layout`     | `'inline' \| 'cover'`        | `'inline'`      | `inline` keeps idle chrome invisibly in place during active/invalid so height stays stable; `cover` unmounts idle chrome and fills a positioned host |
+| `state`      | `'idle' \| 'active' \| …`    | `'idle'`        | Active/invalid use alpha overlay scrim tokens (`dropTarget*SurfaceClasses` in variants) for all layouts                                              |
+| `showBrowse` | `boolean`                    | `false`         | Shows Browse files in idle state                                                                                                                     |
+
 ### `FileDropzone` props
 
-| Prop         | Type                         | Default       | Description                                                                 |
-| ------------ | ---------------------------- | ------------- | --------------------------------------------------------------------------- |
-| `value`      | `File[]`                     | `[]`          | Current file list (controlled)                                              |
-| `onChange`   | `(files: File[]) => void`    | —             | Called when files are added or removed                                      |
-| `accept`     | `string[]`                   | `['image/*']` | MIME types or extensions (e.g. `['.pdf']`)                                  |
-| `multiple`   | `boolean`                    | `false`       | Allow multiple files                                                        |
-| `maxFiles`   | `number`                     | —             | Cap on number of files (when `multiple`)                                    |
-| `maxSize`    | `number`                     | —             | Max bytes per file — drives the requirement line below the Browse button    |
-| `density`    | `'compact' \| 'comfortable'` | `'compact'`   | Visual density; form fields use `compact`, media manager uses `comfortable` |
-| `dropTarget` | `boolean`                    | `true`        | When `false`, the dashed region does not accept drops (parent owns drag)    |
-| `disabled`   | `boolean`                    | `false`       | Disables all interaction                                                    |
+| Prop         | Type                         | Default         | Description                                                              |
+| ------------ | ---------------------------- | --------------- | ------------------------------------------------------------------------ |
+| `value`      | `File[]`                     | `[]`            | Current file list (controlled)                                           |
+| `onChange`   | `(files: File[]) => void`    | —               | Called when files are added or removed                                   |
+| `accept`     | `string[]`                   | `['image/*']`   | MIME types or extensions (e.g. `['.pdf']`)                               |
+| `multiple`   | `boolean`                    | `false`         | Allow multiple files                                                     |
+| `maxFiles`   | `number`                     | —               | Cap on number of files (when `multiple`)                                 |
+| `maxSize`    | `number`                     | —               | Max bytes per file — drives the requirement line below the Browse button |
+| `density`    | `'compact' \| 'comfortable'` | `'comfortable'` | Visual density; image drop targets share the modal well default          |
+| `dropTarget` | `boolean`                    | `true`          | When `false`, the dashed region does not accept drops (parent owns drag) |
+| `disabled`   | `boolean`                    | `false`         | Disables all interaction                                                 |
 
 ### Rendering stored images
 

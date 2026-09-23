@@ -1,4 +1,6 @@
-export const MEDIA_IMAGE_ACCEPT = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const
+import { STANDARD_IMAGE_UPLOAD_ACCEPT } from '@rpg/contracts'
+
+export const MEDIA_IMAGE_ACCEPT = STANDARD_IMAGE_UPLOAD_ACCEPT
 
 function matchesAccept(file: File, accept: readonly string[]): boolean {
   return accept.some((pattern) => {

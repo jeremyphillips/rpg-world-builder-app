@@ -5,6 +5,7 @@ import {
   FileDropzone,
   MediaCropEditor,
   resolveChromeCalloutClasses,
+  resolveImageDropTargetDefaults,
   type ScrollBoundaryState,
 } from '@rpg/ui'
 import { Info } from 'lucide-react'
@@ -13,7 +14,6 @@ import type { UseQueryResult } from '@tanstack/react-query'
 
 import type { MediaManagerController } from '../hooks/use-media-manager'
 import { mediaImageUrl, MEDIA_SOURCE_CROP } from '../lib/media-display'
-import { MEDIA_IMAGE_ACCEPT } from '../lib/media-upload.lib'
 import { MediaImageDetails } from './media-image-details'
 import { mediaManagerStyles as styles } from './media-manager.variants'
 import { resolveMediaWorkspaceCopy, resolveMediaWorkspaceOnboarding } from './media-workspace.lib'
@@ -102,12 +102,14 @@ export function MediaWorkspace({
             <>
               <div className={styles.empty()}>
                 <FileDropzone
+                  {...resolveImageDropTargetDefaults(
+                    uploads.maxUploadBytes !== undefined
+                      ? { maxUploadBytes: uploads.maxUploadBytes }
+                      : { includeMaxSize: false },
+                  )}
                   className="h-full"
-                  density="comfortable"
                   multiple
                   dropTarget={false}
-                  accept={[...MEDIA_IMAGE_ACCEPT]}
-                  maxSize={uploads.maxUploadBytes}
                   onChange={(files) => uploads.add(files)}
                 />
               </div>

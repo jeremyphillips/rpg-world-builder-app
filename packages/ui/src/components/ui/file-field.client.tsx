@@ -64,7 +64,7 @@ export function FileField({
       size={size}
       chrome={chrome}
     >
-      <FileDropzone density="compact" {...dropzoneProps} />
+      <FileDropzone {...dropzoneProps} />
     </FormField>
   )
 }

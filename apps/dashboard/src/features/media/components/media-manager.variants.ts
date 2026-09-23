@@ -20,13 +20,6 @@ export const mediaManagerStyles = {
   /** Pull columns under the header; double top inset for overlap + breathing room. */
   columnScroll: cva('-mt-5 min-h-0 flex-1'),
   columnScrollViewport: cva('flex min-h-full flex-col !pb-0 pt-10'),
-  bodyDropOverlay: cva(
-    'pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-md border-2 border-drop-target-overlay-border bg-drop-target-overlay p-6 text-center text-drop-target-overlay-foreground',
-  ),
-  bodyDropInvalid: cva(
-    'border-destructive-muted bg-drop-target-overlay-invalid text-drop-target-overlay-invalid-foreground',
-  ),
-  bodyDropSubtitle: cva('text-sm text-drop-target-overlay-foreground-muted'),
   layout: cva(
     'grid h-full min-h-0 min-w-0 flex-1 gap-6 md:min-h-[24rem] md:grid-cols-[minmax(0,0.35fr)_minmax(0,0.65fr)]',
   ),

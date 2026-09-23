@@ -11,9 +11,9 @@ function makeFile(name: string, type: string, size = 1024): File {
 }
 
 function getDropRegion() {
-  return screen
-    .getByRole('button', { name: /browse files/i })
-    .closest('div[class*="border-dashed"]')!
+  const browse = screen.queryByRole('button', { name: /browse files/i })
+  if (browse) return browse.closest('div[class*="border-dashed"]')!
+  return screen.getByText(/drop to upload/i).closest('div[class*="border-dashed"]')!
 }
 
 describe('FileDropzone', () => {

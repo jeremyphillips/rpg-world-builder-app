@@ -1,5 +1,12 @@
 import { z } from 'zod'
-import { PLAY_STYLES, MOODS, MAGIC_LEVELS, DIFFICULTIES } from '@rpg/contracts'
+import {
+  DEFAULT_UPLOAD_MAX_BYTES,
+  PLAY_STYLES,
+  MOODS,
+  MAGIC_LEVELS,
+  DIFFICULTIES,
+  STANDARD_IMAGE_UPLOAD_ACCEPT,
+} from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import {
@@ -41,8 +48,9 @@ export const identityFields: FormItem[] = [
     type: 'file',
     name: 'banner',
     label: 'Campaign image',
-    hint: 'JPEG, PNG, or WebP. Used as the campaign banner.',
-    accept: ['image/jpeg', 'image/png', 'image/webp'],
+    hint: 'Used as the campaign banner.',
+    accept: [...STANDARD_IMAGE_UPLOAD_ACCEPT],
+    maxSize: DEFAULT_UPLOAD_MAX_BYTES,
   },
 ]
 

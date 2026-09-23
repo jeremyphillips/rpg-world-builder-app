@@ -753,6 +753,23 @@ export {
   type FileDropzoneProps,
   DEFAULT_ACCEPT,
 } from './components/ui/file-dropzone.client'
+export {
+  DropTargetPrompt,
+  type DropTargetPromptProps,
+  type DropTargetPromptState,
+} from './components/ui/drop-target-prompt.client'
+export {
+  DROP_TARGET_ACTIVE_TITLE,
+  DROP_TARGET_INVALID_MESSAGE,
+  isImageAcceptList,
+  resolveDropTargetCopy,
+  resolveDropTargetRequirements,
+} from './components/ui/drop-target-copy.lib'
+export {
+  IMAGE_DROP_TARGET_ACCEPT,
+  resolveImageDropTargetDefaults,
+  type ImageDropTargetDefaults,
+} from './components/ui/drop-target-image-defaults.lib'
 export { FileField, type FileFieldProps } from './components/ui/file-field.client'
 
 export {

@@ -1,19 +1,16 @@
-import { cn } from '@rpg/ui'
-import { ImagePlus } from 'lucide-react'
-
-import { mediaManagerStyles as styles } from './media-manager.variants'
+import { DropTargetPrompt, resolveImageDropTargetDefaults } from '@rpg/ui'
 
 export function MediaManagerBodyDropOverlay({ invalid = false }: { invalid?: boolean }) {
+  const defaults = resolveImageDropTargetDefaults()
   return (
-    <div
-      className={cn(styles.bodyDropOverlay(), invalid && styles.bodyDropInvalid())}
+    <DropTargetPrompt
       aria-hidden="true"
-    >
-      <ImagePlus className="size-8" aria-hidden="true" />
-      <p className="text-sm font-semibold">
-        {invalid ? "These files can't be added" : 'Drop images to add'}
-      </p>
-      {!invalid && <p className={styles.bodyDropSubtitle()}>Release to add them to this record</p>}
-    </div>
+      layout="cover"
+      state={invalid ? 'invalid' : 'active'}
+      accept={defaults.accept}
+      multiple
+      maxSize={defaults.maxSize}
+      density={defaults.density}
+    />
   )
 }

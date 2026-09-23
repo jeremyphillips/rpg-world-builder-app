@@ -1,18 +1,16 @@
 'use client'
 
 import * as React from 'react'
-import { FileIcon, ImageIcon, Upload, UploadCloudIcon, X } from 'lucide-react'
+import { FileIcon, X } from 'lucide-react'
 
-import { cn } from '../../lib/utils'
-import { Button } from './button.client'
-import { resolveFileDropzoneCopy, resolveFileDropzoneRequirements } from './file-dropzone-copy.lib'
+import { DropTargetPrompt } from './drop-target-prompt.client'
 import {
-  dropzoneVariants,
-  dropzoneIconVariants,
-  dropzoneTitleVariants,
-  dropzoneDescriptionVariants,
-  dropzoneRequirementsVariants,
-  dropzoneActionsVariants,
+  resolveFileDropzonePromptState,
+  resolveFileDropzoneVisibility,
+  resolveNextDropzoneFiles,
+  validateDropzoneFiles,
+} from './file-dropzone.lib'
+import {
   fileNameVariants,
   fileMetaVariants,
   fileListVariants,
@@ -26,13 +24,7 @@ import { Text } from './text'
 /** Default accepted MIME types when `accept` is not specified. */
 export const DEFAULT_ACCEPT = ['image/*']
 
-/** Returns true if a given File matches any entry in the accept list. */
-export function matchesAccept(file: File, accept: string[]): boolean {
-  return accept.some((pattern) => {
-    if (pattern.endsWith('/*')) return file.type.startsWith(pattern.slice(0, -1))
-    return file.type === pattern || file.name.endsWith(pattern)
-  })
-}
+export { matchesAccept } from './file-dropzone.lib'
 
 export interface FileDropzoneProps {
   /** Current file list (controlled). */
@@ -50,7 +42,7 @@ export interface FileDropzoneProps {
   maxFiles?: number
   /** Maximum size per file in bytes. */
   maxSize?: number
-  /** Visual density — media manager uses `comfortable`; form fields stay `compact`. */
+  /** Visual density — image drop targets default to `comfortable`. */
   density?: 'comfortable' | 'compact'
   /**
    * When false, the dashed region does not accept drops. Use when a parent owns
@@ -126,36 +118,18 @@ function useFileDropzone({
     return cache.get(file) ?? null
   }
 
-  function validateAndFilter(files: File[]): { accepted: File[]; error: string | null } {
-    const errors: string[] = []
-    const accepted = files.filter((file) => {
-      if (!matchesAccept(file, accept)) {
-        errors.push(`"${file.name}" is not an accepted file type.`)
-        return false
-      }
-      if (maxSize !== undefined && file.size > maxSize) {
-        errors.push(`"${file.name}" exceeds the ${(maxSize / 1024 / 1024).toFixed(1)} MB limit.`)
-        return false
-      }
-      return true
-    })
-    return { accepted, error: errors.length > 0 ? errors.join(' ') : null }
-  }
-
   function addFiles(incoming: FileList | File[]) {
-    const { accepted, error } = validateAndFilter(Array.from(incoming))
+    const { accepted, error } = validateDropzoneFiles(Array.from(incoming), accept, maxSize)
     if (error) {
       setErrorMsg(error)
       return
     }
     setErrorMsg(null)
-    const next = multiple ? [...value, ...accepted].slice(0, maxFiles) : accepted.slice(0, 1)
-    onChange?.(next)
+    onChange?.(resolveNextDropzoneFiles(value, accepted, multiple, maxFiles))
   }
 
   function removeFile(file: File) {
-    const next = value.filter((f) => f !== file)
-    onChange?.(next)
+    onChange?.(value.filter((f) => f !== file))
     setErrorMsg(null)
   }
 
@@ -202,91 +176,19 @@ function useFileDropzone({
   }
 }
 
-type DropZoneState = 'idle' | 'dragover' | 'disabled'
-
-interface DropZoneAreaProps {
-  id?: string
-  density: 'comfortable' | 'compact'
-  isDragOver: boolean
-  disabled: boolean
-  accept: string[]
-  multiple: boolean
-  maxSize?: number
-  dropTarget: boolean
-  className?: string
-  ariaDescribedby?: string
-  ariaInvalid?: boolean | 'true' | 'false'
-  onDragOver: React.DragEventHandler
-  onDragLeave: React.DragEventHandler
-  onDrop: React.DragEventHandler
-  onBrowse: () => void
-}
-
-function DropZoneArea({
-  id,
-  density,
-  isDragOver,
-  disabled,
-  accept,
-  multiple,
-  maxSize,
-  dropTarget,
-  className,
-  ariaDescribedby,
-  ariaInvalid,
-  onDragOver,
-  onDragLeave,
-  onDrop,
-  onBrowse,
-}: DropZoneAreaProps) {
-  const state: DropZoneState = disabled ? 'disabled' : isDragOver ? 'dragover' : 'idle'
-  const copy = resolveFileDropzoneCopy({ accept, multiple })
-  const requirements = resolveFileDropzoneRequirements({ accept, maxSize })
-  const Icon = isDragOver ? UploadCloudIcon : copy.useImageIcon ? ImageIcon : FileIcon
-
-  return (
-    <div
-      id={id}
-      aria-describedby={ariaDescribedby}
-      aria-invalid={ariaInvalid}
-      className={cn(dropzoneVariants({ density, state }), className)}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-    >
-      <Icon className={cn(dropzoneIconVariants({ density, state }))} aria-hidden="true" />
-      <div className={dropzoneActionsVariants()}>
-        <p className={dropzoneTitleVariants({ density })}>
-          {isDragOver && dropTarget ? 'Drop to upload' : copy.title}
-        </p>
-        {!isDragOver && <p className={dropzoneDescriptionVariants()}>{copy.description}</p>}
-        <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={onBrowse}>
-          <Upload className="size-4" aria-hidden="true" />
-          Browse files
-        </Button>
-        {requirements ? <p className={dropzoneRequirementsVariants()}>{requirements}</p> : null}
-      </div>
-    </div>
-  )
-}
-
-interface FileListProps {
-  files: File[]
-  disabled: boolean
-  getPreviewUrl: (file: File) => string | null
-  onRemove: (file: File) => void
-}
-
 const DEFAULT_EXISTING_IMAGE_LABEL = 'Current image'
 
-interface ExistingImageRowProps {
+function ExistingImageRow({
+  url,
+  label,
+  disabled,
+  onRemove,
+}: {
   url: string
   label: string
   disabled: boolean
   onRemove?: () => void
-}
-
-function ExistingImageRow({ url, label, disabled, onRemove }: ExistingImageRowProps) {
+}) {
   return (
     <li className={fileItemVariants()}>
       <img src={url} alt={label} className={fileThumbnailVariants()} />
@@ -309,7 +211,17 @@ function ExistingImageRow({ url, label, disabled, onRemove }: ExistingImageRowPr
   )
 }
 
-function FileList({ files, disabled, getPreviewUrl, onRemove }: FileListProps) {
+function FileList({
+  files,
+  disabled,
+  getPreviewUrl,
+  onRemove,
+}: {
+  files: File[]
+  disabled: boolean
+  getPreviewUrl: (file: File) => string | null
+  onRemove: (file: File) => void
+}) {
   return (
     <>
       {files.map((file, index) => {
@@ -348,36 +260,27 @@ function FileList({ files, disabled, getPreviewUrl, onRemove }: FileListProps) {
  * Supports MIME/size validation, per-file removal, and image thumbnail previews.
  * Browse files opens the picker; the dashed region is the drop target only.
  */
-export function FileDropzone({
-  value = [],
-  onChange,
-  accept = DEFAULT_ACCEPT,
-  multiple = false,
-  maxFiles,
-  maxSize,
-  density = 'compact',
-  dropTarget = true,
-  existingImageUrl,
-  existingImageLabel = DEFAULT_EXISTING_IMAGE_LABEL,
-  onClearExisting,
-  disabled = false,
-  className,
-  id,
-  'aria-describedby': ariaDescribedby,
-  'aria-invalid': ariaInvalid,
-}: FileDropzoneProps) {
+export function FileDropzone(props: FileDropzoneProps) {
   const {
-    inputRef,
-    isDragOver,
-    errorMsg,
-    getPreviewUrl,
-    openPicker,
-    removeFile,
-    handleDragOver,
-    handleDragLeave,
-    handleDrop,
-    handleInputChange,
-  } = useFileDropzone({
+    value = [],
+    onChange,
+    accept = DEFAULT_ACCEPT,
+    multiple = false,
+    maxFiles,
+    maxSize,
+    density = 'comfortable',
+    dropTarget = true,
+    existingImageUrl,
+    existingImageLabel = DEFAULT_EXISTING_IMAGE_LABEL,
+    onClearExisting,
+    disabled = false,
+    className,
+    id,
+    'aria-describedby': ariaDescribedby,
+    'aria-invalid': ariaInvalid,
+  } = props
+
+  const dropzone = useFileDropzone({
     value,
     onChange,
     accept,
@@ -388,35 +291,42 @@ export function FileDropzone({
     dropTarget,
   })
 
-  const atLimit = !multiple || (maxFiles !== undefined && value.length >= maxFiles)
-  const showDropZone = !atLimit || value.length === 0
-  const showExistingImage = value.length === 0 && Boolean(existingImageUrl)
-  const showFileList = value.length > 0 || showExistingImage
+  const visibility = resolveFileDropzoneVisibility({
+    value,
+    multiple,
+    maxFiles,
+    existingImageUrl,
+  })
+  const promptState = resolveFileDropzonePromptState({
+    disabled,
+    isDragOver: dropzone.isDragOver,
+    dropTarget,
+  })
 
   return (
     <div className="w-full space-y-1">
-      {showDropZone ? (
-        <DropZoneArea
+      {visibility.showDropZone ? (
+        <DropTargetPrompt
           id={id}
-          density={density}
-          isDragOver={isDragOver}
-          disabled={disabled}
-          multiple={multiple}
           accept={accept}
+          multiple={multiple}
           maxSize={maxSize}
-          dropTarget={dropTarget}
+          density={density}
+          state={promptState}
+          showBrowse
+          onBrowse={dropzone.openPicker}
+          disabled={disabled}
           className={className}
-          ariaDescribedby={ariaDescribedby}
-          ariaInvalid={ariaInvalid}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onBrowse={openPicker}
+          aria-describedby={ariaDescribedby}
+          aria-invalid={ariaInvalid}
+          onDragOver={dropzone.handleDragOver}
+          onDragLeave={dropzone.handleDragLeave}
+          onDrop={dropzone.handleDrop}
         />
       ) : null}
 
       <input
-        ref={inputRef}
+        ref={dropzone.inputRef}
         type="file"
         accept={accept.join(',')}
         multiple={multiple}
@@ -424,18 +334,18 @@ export function FileDropzone({
         tabIndex={-1}
         aria-hidden="true"
         className="sr-only"
-        onChange={handleInputChange}
+        onChange={dropzone.handleInputChange}
       />
 
-      {errorMsg ? (
+      {dropzone.errorMsg ? (
         <Text variant="destructive" role="alert">
-          {errorMsg}
+          {dropzone.errorMsg}
         </Text>
       ) : null}
 
-      {showFileList ? (
+      {visibility.showFileList ? (
         <ul className={fileListVariants()} aria-label="Selected files">
-          {showExistingImage ? (
+          {visibility.showExistingImage ? (
             <ExistingImageRow
               url={existingImageUrl!}
               label={existingImageLabel}
@@ -446,8 +356,8 @@ export function FileDropzone({
             <FileList
               files={value}
               disabled={disabled}
-              getPreviewUrl={getPreviewUrl}
-              onRemove={removeFile}
+              getPreviewUrl={dropzone.getPreviewUrl}
+              onRemove={dropzone.removeFile}
             />
           )}
         </ul>

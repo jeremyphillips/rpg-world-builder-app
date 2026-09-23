@@ -104,11 +104,11 @@ describe('MediaManager', () => {
     mount({ value: { revision: 0, images: [], roles: {} } })
     const host = screen.getByLabelText('Images').parentElement!.parentElement!
     fireEvent.dragEnter(host, { dataTransfer: { types: ['Files'], items: [] } })
-    expect(screen.getByText('Drop images to add')).toBeInTheDocument()
+    expect(screen.getByText('Drop to upload')).toBeInTheDocument()
     fireEvent.dragLeave(host, { dataTransfer: { types: ['Files'], items: [] } })
-    expect(screen.queryByText('Drop images to add')).not.toBeInTheDocument()
+    expect(screen.queryByText('Drop to upload')).not.toBeInTheDocument()
     fireEvent.dragEnter(host, { dataTransfer: { types: ['text/plain'], items: [] } })
-    expect(screen.queryByText('Drop images to add')).not.toBeInTheDocument()
+    expect(screen.queryByText('Drop to upload')).not.toBeInTheDocument()
   })
 
   it('enqueues oversized image body drops for the upload pipeline', () => {

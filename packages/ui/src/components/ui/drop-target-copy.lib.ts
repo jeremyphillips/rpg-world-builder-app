@@ -1,3 +1,9 @@
+/** Shared title while an external file drag is over an active drop target. */
+export const DROP_TARGET_ACTIVE_TITLE = 'Drop to upload'
+
+/** Shared message when dragged files fail accept/size validation. */
+export const DROP_TARGET_INVALID_MESSAGE = "These files can't be added"
+
 /** Maps a MIME type or extension entry to a short display label. */
 function resolveAcceptLabel(entry: string): string {
   if (entry === 'image/jpeg') return 'JPG'
@@ -34,7 +40,7 @@ function joinAcceptLabels(labels: string[]): string {
   return `${labels.slice(0, -1).join(', ')}, or ${labels[labels.length - 1]}`
 }
 
-export function resolveFileDropzoneCopy(input: { accept: string[]; multiple: boolean }): {
+export function resolveDropTargetCopy(input: { accept: string[]; multiple: boolean }): {
   title: string
   description: string
   useImageIcon: boolean
@@ -58,7 +64,7 @@ export function resolveFileDropzoneCopy(input: { accept: string[]; multiple: boo
   }
 }
 
-export function resolveFileDropzoneRequirements(input: {
+export function resolveDropTargetRequirements(input: {
   accept: string[]
   maxSize?: number
 }): string | undefined {
