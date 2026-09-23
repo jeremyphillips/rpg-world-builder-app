@@ -2,11 +2,11 @@ import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
 import {
-  CAMPAIGN_ACCESS_CHANGE_LABEL,
   CAMPAIGN_ACCESS_DONE_LABEL,
-  CAMPAIGN_ACCESS_SECTION_HINT,
+  CAMPAIGN_ACCESS_SECTION_TOOLTIP,
   CAMPAIGN_ACCESS_SECTION_LEGEND,
 } from '../../lib/campaign-access/campaign-access-labels'
+import { CampaignAvailabilityChangeAffordance } from '@/lib/campaign-availability/campaign-availability-change-affordance'
 import { resolveVocabularyAvailabilitySummary } from '@/lib/campaign-availability/campaign-availability-form-fields'
 import { ClassSpellcastingFeatureAvailabilityField } from '../components/class-spellcasting-feature-availability-field'
 
@@ -22,9 +22,9 @@ export function buildSpellcastingFeatureAvailabilityFormFields(
       density: 'compact',
       disclosure: {
         variant: 'dialog',
-        openLabel: CAMPAIGN_ACCESS_CHANGE_LABEL,
+        openLabel: createElement(CampaignAvailabilityChangeAffordance),
         closeLabel: CAMPAIGN_ACCESS_DONE_LABEL,
-        hint: CAMPAIGN_ACCESS_SECTION_HINT,
+        info: CAMPAIGN_ACCESS_SECTION_TOOLTIP,
         dialogHeadline: CAMPAIGN_ACCESS_SECTION_LEGEND,
         summaryDependsOn: ['available'],
         resolveSummary: (values) => resolveVocabularyAvailabilitySummary(Boolean(values.available)),

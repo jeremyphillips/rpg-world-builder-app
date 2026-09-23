@@ -91,7 +91,7 @@ function FieldGroupSummaryDisclosureHeader({
   legendId: string
   panelId: string
   size: FieldSize
-  openLabel: string
+  openLabel: React.ReactNode
   unsavedSuffix: string
   showDirtySuffix: boolean
   disabled: boolean

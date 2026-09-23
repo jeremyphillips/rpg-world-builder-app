@@ -43,8 +43,8 @@ export const fieldGroupSummaryTriggerBodyClasses =
 /** Secondary explanatory copy drops below the status line inside the wrapping body. */
 export const fieldGroupSummaryTriggerSecondaryClasses = 'basis-full'
 
-/** `Change` visual affordance — not a separate control; `aria-hidden` on the trigger. */
+/** Summary edit affordance — not a separate control; `aria-hidden` on the trigger. */
 export const fieldGroupSummaryTriggerAffordanceClasses = cn(
-  'shrink-0 font-medium text-primary',
+  'shrink-0 text-muted-foreground',
   fieldGroupSummaryTriggerTypographyClasses,
 )

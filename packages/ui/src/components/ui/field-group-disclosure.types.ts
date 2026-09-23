@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import type { ModalSize } from './modal.variants'
 import type { ChromeConfig } from './visual-vocabulary.types'
 
@@ -47,7 +49,7 @@ export interface FieldGroupSummaryDisclosure {
   defaultOpen?: boolean
   /** Stable key for uiStateKey persistence; falls back to group `id` or legend slug. */
   collapseKey?: string
-  openLabel?: string
+  openLabel?: ReactNode
   closeLabel?: string
   unsavedSuffix?: string
   /** Appends `unsavedSuffix` while the surrounding form is dirty. Requires `FormProvider`. */
@@ -67,14 +69,14 @@ export interface FieldGroupSummaryDisclosure {
 /** Collapsed faux-input summary that opens the editor in a modal. Requires `FormProvider`. */
 export interface FieldGroupDialogDisclosure {
   variant: 'dialog'
-  openLabel?: string
+  openLabel?: ReactNode
   /** Footer dismiss action — edits apply live, so this only closes the modal. */
   closeLabel?: string
   disabled?: boolean
   unsavedSuffix?: string
   showDirtySuffix?: boolean
-  /** Bottom-aligned helper text under the faux-input trigger. */
-  hint?: string
+  /** Label-level info tooltip beside the section legend. */
+  info?: ReactNode
   dialogHeadline?: string
   dialogDescription?: string
   dialogSize?: ModalSize

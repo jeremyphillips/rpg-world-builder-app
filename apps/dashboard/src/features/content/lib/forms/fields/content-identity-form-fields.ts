@@ -1,16 +1,9 @@
 import type { NumberInputDigits } from '@rpg/ui'
-import {
-  type FieldConfig,
-  type FieldWidth,
-  type FormItem,
-  type InlineSentenceFieldConfig,
-  type RowConfig,
-  type RowFieldItem,
-} from '@rpg/ui/form'
+import { type FieldConfig, type FormItem, type InlineSentenceFieldConfig } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../registry/content-form-registry'
 
-type GroupField = FieldConfig | RowConfig
+type GroupField = FieldConfig
 
 /** Digit width for walk-speed inline count fields (values such as 30 or 35). */
 export const WALK_SPEED_INLINE_COUNT_DIGITS = 2 satisfies NumberInputDigits
@@ -76,44 +69,35 @@ export type ContentIdentityLayout = 'inline' | 'stacked'
 /** Slot name for the campaign availability control beside Name. */
 export const CONTENT_IDENTITY_AVAILABILITY_SLOT_NAME = 'campaignAvailability'
 
-/** Name grows; availability is the supporting column inside the shared identity row. */
-export const CONTENT_IDENTITY_NAME_ROW_WIDTH = 'full' satisfies FieldWidth
-export const CONTENT_IDENTITY_AVAILABILITY_ROW_WIDTH = '1/3' satisfies FieldWidth
-
-function asIdentityRowField(item: FormItem, width: FieldWidth): RowFieldItem {
-  if (!('kind' in item)) {
-    return { ...item, width }
-  }
-  if (item.kind === 'slot') {
-    return { ...item, width }
+function nameItemWithoutFieldContainer(item: FormItem): FormItem {
+  if ('type' in item) {
+    return { ...item, chrome: { variant: 'none' } }
   }
 
-  throw new Error('Identity row fields must be a leaf field or slot.')
+  if ('kind' in item && item.kind === 'slot') {
+    return { ...item, chrome: { variant: 'none' } }
+  }
+
+  return item
 }
 
-/** Pairs Name with Campaign availability — one shared field container on full routes, stacked in overlays. */
+/** Pairs Name with Campaign availability — side by side on full routes, stacked in overlays. */
 export function buildContentIdentityFields(input: {
   layout: ContentIdentityLayout
   nameItem: FormItem
   availabilityItem: FormItem
 }): FormItem[] {
+  const nameItem = nameItemWithoutFieldContainer(input.nameItem)
+
   if (input.layout === 'stacked') {
-    return [
-      {
-        kind: 'group',
-        fields: [input.nameItem, input.availabilityItem],
-      },
-    ]
+    return [nameItem, input.availabilityItem]
   }
 
   return [
     {
-      kind: 'row',
-      align: 'start',
-      fields: [
-        asIdentityRowField(input.nameItem, CONTENT_IDENTITY_NAME_ROW_WIDTH),
-        asIdentityRowField(input.availabilityItem, CONTENT_IDENTITY_AVAILABILITY_ROW_WIDTH),
-      ],
+      kind: 'columns',
+      widths: 'primary-detail',
+      columns: [{ fields: [nameItem] }, { fields: [input.availabilityItem] }],
     },
   ]
 }

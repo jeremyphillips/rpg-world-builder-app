@@ -71,9 +71,7 @@ describe('CampaignAvailabilityField', () => {
       />,
     )
 
-    expect(
-      screen.getByText('Controls where this content can be discovered and used.'),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'About Campaign availability' })).toBeInTheDocument()
     await expandDialogAvailability(user)
 
     const dialog = screen.getByRole('dialog', { name: 'Campaign availability' })
@@ -226,8 +224,8 @@ describe('CampaignAvailabilityField', () => {
     expect(
       screen.queryByText('Hidden from discovery and selection in this campaign.'),
     ).not.toBeInTheDocument()
-    expect(screen.getByText('Change')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Change' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Change')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Unavailable/ }).querySelector('svg')).toBeTruthy()
   })
 
   it('restores availability toggle when preflight is blocked', async () => {

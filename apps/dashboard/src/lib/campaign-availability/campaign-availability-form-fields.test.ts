@@ -27,7 +27,7 @@ describe('buildCampaignAvailabilityFields', () => {
     expect(availabilityGroup.fields?.[0]).toMatchObject({ name: 'available', type: 'switch' })
   })
 
-  it('maps dialog presentation to the dialog disclosure variant and hint', () => {
+  it('maps dialog presentation to the dialog disclosure variant and info tooltip', () => {
     const [group] = buildCampaignAvailabilityFields({
       groupId: 'test-group',
       pending: false,
@@ -39,7 +39,7 @@ describe('buildCampaignAvailabilityFields', () => {
     const availabilityGroup = group as GroupConfig
     expect(availabilityGroup.disclosure?.variant).toBe('dialog')
     if (availabilityGroup.disclosure?.variant === 'dialog') {
-      expect(availabilityGroup.disclosure.hint).toBe(
+      expect(availabilityGroup.disclosure.info).toBe(
         'Controls where this content can be discovered and used.',
       )
       expect(availabilityGroup.disclosure.dialogHeadline).toBe('Campaign availability')

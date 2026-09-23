@@ -91,10 +91,10 @@ inline-disclosure group.
 
 Two knobs — do not stack redundant boxes:
 
-| Knob                          | Owns                                                                         | Use for                                                     |
-| ----------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `fieldChrome`                 | Shared **field container** around the whole group (legend + fields)          | Default boxed sections, campaign availability identity rows |
-| `chrome` (`FieldGroupChrome`) | Semantic treatment on the **field stack** (rail, panel, outline, callout, …) | Legend stays outside; decorates dependents only             |
+| Knob                          | Owns                                                                         | Use for                                         |
+| ----------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------- |
+| `fieldChrome`                 | Shared **field container** around the whole group (legend + fields)          | Default boxed sections                          |
+| `chrome` (`FieldGroupChrome`) | Semantic treatment on the **field stack** (rail, panel, outline, callout, …) | Legend stays outside; decorates dependents only |
 
 Inline disclosure groups skip the outer `fieldChrome` wrap while collapsed; the **expanded**
 panel uses the resolved `fieldChrome` via `FieldChromeShell` (same path as non-disclosure
@@ -108,7 +108,7 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `legend`  | Legend becomes a disclosure trigger; fields stay registered when collapsed. `defaultOpen` (default `true`); optional `collapseKey` for `uiStateKey` persistence.                                                                                                                  |
 | `inline`  | Compact collapsed summary (faux input) that expands in place. `resolveSummary`, optional `summaryDependsOn`, `showDirtySuffix`, `panelDivider` (default `true`), `openLabel` / `closeLabel`. **Done** is an outline button in the expanded panel footer. Requires `FormProvider`. |
-| `dialog`  | Same collapsed faux-input summary; the editor opens in a modal. **Done** (`closeLabel`) is the single footer action — edits apply live, so it only dismisses. `hint` sits under the trigger. `dialogHeadline` defaults to the group legend. Requires `FormProvider`.              |
+| `dialog`  | Same collapsed faux-input summary; the editor opens in a modal. **Done** (`closeLabel`) is the single footer action — edits apply live, so it only dismisses. `info` renders an inline label tooltip. `dialogHeadline` defaults to the group legend. Requires `FormProvider`.     |
 
 `resolveSummary` returns a `FieldGroupSummary`:
 

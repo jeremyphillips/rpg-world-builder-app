@@ -1,5 +1,5 @@
 import { CircleSlash } from 'lucide-react'
-import type { ButtonHTMLAttributes } from 'react'
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { resolveChromeClasses } from './chrome.variants'
@@ -33,7 +33,7 @@ export type FieldGroupSummaryTriggerProps = Omit<
 > & {
   size: FieldSize
   summary: FieldGroupSummary
-  openLabel: string
+  openLabel: ReactNode
   unsavedSuffix: string
   showDirtySuffix: boolean
   onOpen: () => void

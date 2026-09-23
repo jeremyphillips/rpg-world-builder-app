@@ -20,8 +20,8 @@ import { formatUsageBlockerBulkDescription } from '@/lib/usage-references/usage-
 /** Subgroup legend for the campaign access disclosure. */
 export const CAMPAIGN_ACCESS_SECTION_LEGEND = 'Campaign availability'
 
-/** Helper text under the dialog-presentation availability trigger. */
-export const CAMPAIGN_ACCESS_SECTION_HINT =
+/** Label-level tooltip for the campaign availability section. */
+export const CAMPAIGN_ACCESS_SECTION_TOOLTIP =
   'Controls where this content can be discovered and used.'
 
 /** Switch label for the campaign access section. */
