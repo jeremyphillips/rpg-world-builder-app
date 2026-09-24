@@ -759,6 +759,18 @@ export {
   type FileDropzoneProps,
   DEFAULT_ACCEPT,
 } from './components/ui/file-dropzone.client'
+export { FilenamePreview, type FilenamePreviewProps } from './components/ui/filename-preview.client'
+export type { FilenamePreviewDisplayVariantProps } from './components/ui/filename-preview.variants'
+export {
+  FILENAME_PREVIEW_ELLIPSIS,
+  FILENAME_PREVIEW_MAX_COMFORTABLE,
+  FILENAME_PREVIEW_MAX_COMPACT,
+  FILENAME_PREVIEW_MAX_METADATA,
+  resolveFilenamePreviewMaxLength,
+  splitFilename,
+  truncateFilename,
+  type FilenamePreviewDensity,
+} from './components/ui/filename-preview.lib'
 export {
   DropTargetPrompt,
   type DropTargetPromptProps,

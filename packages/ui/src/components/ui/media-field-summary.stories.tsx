@@ -12,8 +12,14 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const CompactEmpty: Story = { args: { layout: 'compact', items: [] } }
+export const CompactEmptySingle: Story = {
+  args: { layout: 'compact', items: [], maxItems: 1, label: 'Portrait' },
+}
 export const CompactPopulated: Story = {
   args: { layout: 'compact', items: [{ id: 'one' }, { id: 'two' }] },
+}
+export const CompactPopulatedSingle: Story = {
+  args: { layout: 'compact', items: [{ id: 'one' }], maxItems: 1, label: 'Portrait' },
 }
 export const ExpandedEmpty: Story = { args: { layout: 'expanded', items: [] } }
 export const ExpandedOverflow: Story = {

@@ -4,6 +4,7 @@ import {
   DialogPanelScrollRegion,
   FileDropzone,
   MediaCropEditor,
+  FilenamePreview,
   resolveChromeCalloutClasses,
   resolveImageDropTargetDefaults,
   type ScrollBoundaryState,
@@ -177,11 +178,16 @@ function MediaWorkspaceSelection({
             onChange={(crop) => dispatch({ type: 'crop', crop })}
           />
         ) : (
-          <img
-            className={styles.preview()}
-            src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
-            alt={selected.alt ?? ''}
-          />
+          <figure className={styles.previewCard()}>
+            <img
+              className={styles.preview()}
+              src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
+              alt={selected.alt ?? ''}
+            />
+            <figcaption className={styles.previewCaption()}>
+              <FilenamePreview filename={asset.filename} />
+            </figcaption>
+          </figure>
         )}
         <MediaImageDetails
           image={selected}

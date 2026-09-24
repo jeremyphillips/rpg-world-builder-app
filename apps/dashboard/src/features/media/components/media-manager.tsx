@@ -9,6 +9,7 @@ import {
   resolveMediaManagerFooterHint,
   shouldShowMediaManagerStatus,
 } from './media-manager-session.lib'
+import { resolveMediaStatusNotice } from '../lib/media-notice.lib'
 import { MediaManagerStatus } from './media-manager-status'
 import { mediaManagerStyles as styles } from './media-manager.variants'
 
@@ -44,7 +45,7 @@ function MediaManagerSession(props: MediaManagerProps) {
   const { headerScrolled, onGalleryBoundaryChange, onWorkspaceBoundaryChange } =
     useMediaManagerScrollBoundary()
   const bodyDropOverlay = resolveMediaManagerBodyDropOverlay(props.previewBodyDrop, bodyDrop)
-  const statusNotice = uploads.notice || state.notice
+  const statusNotice = resolveMediaStatusNotice(uploads.notice, state.notice)
   const showStatus = shouldShowMediaManagerStatus({
     statusNotice,
     pendingUploadCount: uploads.entries.length,

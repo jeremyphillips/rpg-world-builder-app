@@ -1,5 +1,7 @@
 import type { ContentMediaValidationResult } from '@rpg/contracts'
+import type { MediaStatusNotice } from '../lib/media-notice.lib'
 import { mediaManagerStyles as styles } from './media-manager.variants'
+import { MediaStatusNotice as MediaStatusNoticeContent } from './media-status-notice'
 
 export function MediaManagerStatus({
   statusNotice,
@@ -7,7 +9,7 @@ export function MediaManagerStatus({
   validation,
   error,
 }: {
-  statusNotice?: string
+  statusNotice?: MediaStatusNotice | null
   pendingUploadCount: number
   validation: ContentMediaValidationResult
   error?: string
@@ -15,8 +17,16 @@ export function MediaManagerStatus({
   return (
     <div className={styles.status()}>
       {statusNotice ? (
-        <p role="status" className={styles.muted()}>
-          {statusNotice}
+        <p
+          role="status"
+          className={styles.muted()}
+          aria-label={
+            statusNotice.kind === 'image-added'
+              ? `${statusNotice.filename} added. Assign a role to use it as representative artwork.`
+              : undefined
+          }
+        >
+          <MediaStatusNoticeContent notice={statusNotice} />
         </p>
       ) : null}
       {pendingUploadCount > 0 && (

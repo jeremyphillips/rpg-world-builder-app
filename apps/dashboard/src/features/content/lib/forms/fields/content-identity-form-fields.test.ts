@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { FormItem } from '@rpg/ui/form'
 
-import { buildContentIdentityFields, nameField } from './content-identity-form-fields'
+import {
+  buildContentIdentityFields,
+  CONTENT_IDENTITY_AVAILABILITY_COLUMN_CLASS,
+  nameField,
+} from './content-identity-form-fields'
 
 const availabilityItem: FormItem = {
   kind: 'slot',
@@ -20,6 +24,7 @@ describe('buildContentIdentityFields', () => {
     expect(item).toMatchObject({
       kind: 'columns',
       widths: 'primary-detail',
+      className: CONTENT_IDENTITY_AVAILABILITY_COLUMN_CLASS,
       columns: [
         { fields: [{ ...nameField(), chrome: { variant: 'none' } }] },
         { fields: [availabilityItem] },

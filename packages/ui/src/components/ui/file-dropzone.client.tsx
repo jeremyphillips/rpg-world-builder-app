@@ -19,6 +19,7 @@ import {
   fileIconVariants,
   removeButtonVariants,
 } from './file-dropzone.variants'
+import { FilenamePreview } from './filename-preview.client'
 import { Text } from './text'
 
 /** Default accepted MIME types when `accept` is not specified. */
@@ -193,7 +194,7 @@ function ExistingImageRow({
     <li className={fileItemVariants()}>
       <img src={url} alt={label} className={fileThumbnailVariants()} />
       <div className="min-w-0 flex-1">
-        <p className={fileNameVariants()}>{label}</p>
+        <FilenamePreview filename={label} density="compact" className={fileNameVariants()} />
         <p className={fileMetaVariants()}>Saved</p>
       </div>
       {onRemove ? (
@@ -236,7 +237,11 @@ function FileList({
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <p className={fileNameVariants()}>{file.name}</p>
+              <FilenamePreview
+                filename={file.name}
+                density="compact"
+                className={fileNameVariants()}
+              />
               <p className={fileMetaVariants()}>{(file.size / 1024).toFixed(1)} KB</p>
             </div>
             <button

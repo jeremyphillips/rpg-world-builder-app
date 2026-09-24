@@ -102,7 +102,7 @@ export function ContentFormHeader({
 
   return (
     <div className={cn(fieldStackRhythmVariants({ rhythm }))}>
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex items-start justify-between gap-4">
         {form && mediaConfig ? (
           <ContentMediaIdentitySlot
             domain={mediaConfig.domain}

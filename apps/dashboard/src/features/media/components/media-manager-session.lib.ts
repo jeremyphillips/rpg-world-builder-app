@@ -1,5 +1,6 @@
 import type { UseMediaManagerBodyDropResult } from '../hooks/use-media-manager-body-drop'
 import type { MediaManagerProps } from '../lib/media-manager.types'
+import { hasMediaStatusNotice, type MediaStatusNotice } from '../lib/media-notice.lib'
 
 export type MediaManagerBodyDropOverlayState = 'active' | 'invalid'
 
@@ -13,13 +14,13 @@ export function resolveMediaManagerBodyDropOverlay(
 }
 
 export function shouldShowMediaManagerStatus(input: {
-  statusNotice?: string
+  statusNotice?: MediaStatusNotice | null
   pendingUploadCount: number
   validationOk: boolean
   error?: string
 }): boolean {
   return (
-    Boolean(input.statusNotice) ||
+    hasMediaStatusNotice(input.statusNotice) ||
     input.pendingUploadCount > 0 ||
     !input.validationOk ||
     Boolean(input.error)

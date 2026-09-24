@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Button, DialogPanelScrollRegion, type ScrollBoundaryState } from '@rpg/ui'
+import { Button, DialogPanelScrollRegion, FilenamePreview, type ScrollBoundaryState } from '@rpg/ui'
 import { Images } from 'lucide-react'
 import { MEDIA_ROLE_ENTRIES, type ContentMedia, type MediaAsset } from '@rpg/contracts'
 import type { UploadEntry } from '../hooks/use-media-uploads'
@@ -111,8 +111,13 @@ export function MediaGallery({
         )}
         {entries.map((entry) => (
           <div key={entry.id} className={styles.queue()}>
-            <p>
-              {entry.file.name} — {entry.status}
+            <p className="flex min-w-0 items-center gap-2">
+              <FilenamePreview
+                filename={entry.file.name}
+                density="compact"
+                className="min-w-0 flex-1"
+              />
+              <span className="shrink-0 text-muted-foreground">— {entry.status}</span>
             </p>
             {entry.error && (
               <p role="alert" className={styles.error()}>

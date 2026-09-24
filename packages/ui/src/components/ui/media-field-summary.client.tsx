@@ -5,8 +5,13 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { MediaImage } from './media-image.client'
+import { resolveCompactSummaryCopy } from './media-field-summary.lib'
 import {
+  mediaSummaryCompactActionVariants,
   mediaSummaryCompactButtonVariants,
+  mediaSummaryCompactMetaVariants,
+  mediaSummaryCompactSplitPrefixVariants,
+  mediaSummaryCompactSplitVariants,
   mediaSummaryTileButtonVariants,
   mediaSummaryWellVariants,
 } from './media-field-summary.variants'
@@ -31,11 +36,6 @@ export type MediaFieldSummaryProps = {
   readOnly?: boolean
   onOpen: (imageId?: string) => void
   emptyContent?: ReactNode
-}
-
-function countCopy(count: number, maxItems: number, display: 'capacity' | 'count') {
-  if (display === 'count') return `${count} ${count === 1 ? 'image' : 'images'} · Manage`
-  return `${count} of ${maxItems} images · Manage`
 }
 
 function SummaryImage({ item }: { item: MediaFieldSummaryItem }) {
@@ -72,10 +72,7 @@ function CompactMediaFieldSummary({
   const count = items.length
   const canEdit = !disabled && !readOnly
   const representative = resolveRepresentative(items, representativeId)
-  const single = maxItems === 1
-  const action = count ? (single ? 'Change image' : countCopy(count, maxItems, countDisplay)) : ''
-  const emptySubject = single ? 'No image' : 'No images'
-  const emptyAction = single ? 'Add image' : 'Add images'
+  const copy = resolveCompactSummaryCopy(count, maxItems, countDisplay)
 
   return (
     <button
@@ -83,21 +80,16 @@ function CompactMediaFieldSummary({
       className={mediaSummaryCompactButtonVariants()}
       disabled={!canEdit}
       onClick={() => onOpen(representative?.id)}
-      aria-label={`${label}: ${count ? action : `${emptySubject}. ${emptyAction}`}`}
+      aria-label={`${label}: ${copy.ariaLabel}`}
     >
       <span className={mediaSummaryWellVariants({ layout: 'compact' })} aria-hidden="true">
         {representative ? <SummaryImage item={representative} /> : (emptyContent ?? <ImagePlus />)}
       </span>
-      <span className="max-w-48 text-xs leading-tight">
-        {count ? (
-          action
-        ) : (
-          <>
-            <span className="text-muted-foreground">{emptySubject}</span>
-            <span aria-hidden="true"> · </span>
-            <span>{emptyAction}</span>
-          </>
-        )}
+      <span className={mediaSummaryCompactMetaVariants()}>
+        <span className={mediaSummaryCompactSplitVariants()}>
+          <span className={mediaSummaryCompactSplitPrefixVariants()}>{copy.subject} ·</span>
+          <span className={mediaSummaryCompactActionVariants()}>{copy.action}</span>
+        </span>
       </span>
     </button>
   )

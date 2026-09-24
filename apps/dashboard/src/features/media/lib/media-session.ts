@@ -1,11 +1,17 @@
 import type { ContentMedia, MediaAsset, MediaRole, NormalizedCrop } from '@rpg/contracts'
 
+import {
+  imageAddedMediaStatusNotice,
+  textMediaStatusNotice,
+  type MediaStatusNotice,
+} from './media-notice.lib'
+
 export type MediaSession = {
   initial: ContentMedia
   media: ContentMedia
   selectedId?: string
   presentation: MediaRole
-  notice: string
+  notice: MediaStatusNotice | null
 }
 export type MediaAction =
   | { type: 'select'; id: string }
@@ -33,7 +39,7 @@ export function createMediaSession(
     media: structuredClone(media),
     selectedId,
     presentation: media.roles.portrait?.imageId === selectedId ? 'portrait' : 'primary',
-    notice: '',
+    notice: null,
   }
 }
 export function isMediaSessionDirty(state: MediaSession): boolean {
@@ -76,7 +82,9 @@ function removeImage(next: MediaSession, id: string) {
   if (next.selectedId === id)
     next.selectedId = media.images[Math.min(index, media.images.length - 1)]?.id
   next.presentation = media.roles.portrait?.imageId === next.selectedId ? 'portrait' : 'primary'
-  next.notice = 'Image removed from the draft. No other image was assigned automatically.'
+  next.notice = textMediaStatusNotice(
+    'Image removed from the draft. No other image was assigned automatically.',
+  )
 }
 
 function assignRole(next: MediaSession, action: Extract<MediaAction, { type: 'role' }>) {
@@ -89,7 +97,9 @@ function assignRole(next: MediaSession, action: Extract<MediaAction, { type: 'ro
     delete media.roles[action.role]
     next.presentation = 'primary'
   }
-  next.notice = `${action.role === 'portrait' ? 'Portrait' : 'Primary image'} ${action.assigned ? 'assigned to selected image' : 'unassigned'}.`
+  next.notice = textMediaStatusNotice(
+    `${action.role === 'portrait' ? 'Portrait' : 'Primary image'} ${action.assigned ? 'assigned to selected image' : 'unassigned'}.`,
+  )
 }
 
 function selectImage(state: MediaSession, id: string): MediaSession {
@@ -101,12 +111,12 @@ function selectImage(state: MediaSession, id: string): MediaSession {
 }
 function addImage(next: MediaSession, action: Extract<MediaAction, { type: 'add' }>) {
   if (next.media.images.some((image) => image.assetId === action.asset.id)) {
-    next.notice = 'This image is already in the collection.'
+    next.notice = textMediaStatusNotice('This image is already in the collection.')
     return
   }
   next.media.images.push({ id: action.id, assetId: action.asset.id })
   next.selectedId ??= action.id
-  next.notice = `${action.asset.filename} added. Assign a role to use it as representative artwork.`
+  next.notice = imageAddedMediaStatusNotice(action.asset.filename)
 }
 function updateCrop(next: MediaSession, crop: NormalizedCrop) {
   const portrait = next.media.roles.portrait

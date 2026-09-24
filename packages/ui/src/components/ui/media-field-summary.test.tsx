@@ -15,8 +15,23 @@ describe('MediaFieldSummary', () => {
         onOpen={onOpen}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Portrait: No image. Add image' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Portrait: No image. Add' }))
     expect(onOpen).toHaveBeenCalledWith(undefined)
+  })
+
+  it('uses singular populated copy at capacity one', () => {
+    const onOpen = vi.fn()
+    render(
+      <MediaFieldSummary
+        label="Portrait"
+        layout="compact"
+        items={[{ id: 'one' }]}
+        maxItems={1}
+        onOpen={onOpen}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Portrait: Image. Change' }))
+    expect(onOpen).toHaveBeenCalledWith('one')
   })
 
   it('shows capacity copy and opens the representative attachment', () => {

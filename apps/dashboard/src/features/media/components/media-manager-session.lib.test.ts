@@ -30,7 +30,7 @@ describe('media-manager-session.lib', () => {
     ).toBe(false)
     expect(
       shouldShowMediaManagerStatus({
-        statusNotice: 'Upload complete.',
+        statusNotice: { kind: 'text', text: 'Upload complete.' },
         pendingUploadCount: 0,
         validationOk: true,
       }),

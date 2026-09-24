@@ -1,5 +1,5 @@
 import { useId, useMemo } from 'react'
-import { Button, CheckboxField } from '@rpg/ui'
+import { Button, CheckboxField, FilenamePreview } from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
 import {
   CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX,
@@ -87,14 +87,16 @@ export function MediaImageDetails({
           ))}
       </fieldset>
       <dl className={styles.metadata()}>
-        <dt>File name</dt>
-        <dd>{asset.filename}</dd>
-        <dt>Dimensions</dt>
-        <dd>
+        <dt className={styles.metadataLabel()}>File name</dt>
+        <dd className={styles.metadataValue()}>
+          <FilenamePreview filename={asset.filename} density="metadata" />
+        </dd>
+        <dt className={styles.metadataLabel()}>Dimensions</dt>
+        <dd className={styles.metadataValue()}>
           {asset.orientedWidth} × {asset.orientedHeight}
         </dd>
-        <dt>File size</dt>
-        <dd>
+        <dt className={styles.metadataLabel()}>File size</dt>
+        <dd className={styles.metadataValue()}>
           {new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(
             asset.byteSize / 1024,
           )}{' '}
