@@ -10,48 +10,40 @@ type MediaRoleSurfaceCopy = {
   instructions: string
   workspaceHeading: string
   workspaceDescription: string
+  switchLabel: string
 }
 
-function fixedAspectInstructions(spec: FixedAspectCropSpec, repositionOnly = false): string {
-  const aspectLabel = formatAspectRatioLabel(spec)
-  if (repositionOnly) {
-    return `Drag to reposition, or focus the crop and use arrow keys. Portrait is fixed at ${aspectLabel}.`
-  }
-  if (spec.supportsFocalPoint) {
-    return `Drag to reposition the ${aspectLabel} crop and place the focal point inside it.`
-  }
-  return `Drag to reposition the ${aspectLabel} crop.`
-}
-
-const portraitSpec = getFixedAspectCropSpec('portrait')!
 const bannerSpec = getFixedAspectCropSpec('banner')!
 const primarySpec = getFixedAspectCropSpec('primary')!
 
 export const mediaRoleSurfaceCopy = {
   portrait: {
     positionLabel: 'Portrait crop position',
-    instructions: fixedAspectInstructions(portraitSpec, true),
+    instructions: 'Drag to reposition.',
     workspaceHeading: 'Portrait crop',
-    workspaceDescription:
-      'Crop and position how this image appears in character cards, lists, and tokens.',
+    workspaceDescription: 'Crop a square portrait for character cards, lists, and tokens.',
+    switchLabel: 'Portrait',
   },
   banner: {
     positionLabel: 'Banner crop position',
-    instructions: fixedAspectInstructions(bannerSpec),
+    instructions: 'Drag to reposition. Move the focal point to adjust focus.',
     workspaceHeading: 'Banner crop',
-    workspaceDescription: `Crop a ${formatAspectRatioLabel(bannerSpec)} banner and place the focal point inside that crop.`,
+    workspaceDescription: `Crop a wide ${formatAspectRatioLabel(bannerSpec)} image for campaign headers.`,
+    switchLabel: 'Banner',
   },
   primary: {
     positionLabel: 'Primary crop position',
-    instructions: fixedAspectInstructions(primarySpec),
+    instructions: 'Drag to reposition. Move the focal point to adjust focus.',
     workspaceHeading: 'Primary crop',
-    workspaceDescription: `Crop a ${formatAspectRatioLabel(primarySpec)} detail image and place the focal point inside that crop. The original file is kept.`,
+    workspaceDescription: `Crop a ${formatAspectRatioLabel(primarySpec)} image for representative artwork and detail views.`,
+    switchLabel: 'Primary',
   },
   emblem: {
     positionLabel: 'Emblem layout',
-    instructions: 'Drag to reposition the emblem within the frame.',
-    workspaceHeading: 'Edit emblem',
-    workspaceDescription: "Adjust how the emblem appears inside the frame. It won't be cropped.",
+    instructions: 'Drag to reposition.',
+    workspaceHeading: 'Emblem',
+    workspaceDescription: "Adjust how the emblem appears inside its frame. It won't be cropped.",
+    switchLabel: 'Emblem',
   },
 } satisfies Record<MediaRole, MediaRoleSurfaceCopy>
 

@@ -65,10 +65,7 @@ describe('isolated media session', () => {
     )
     state = mediaSessionReducer(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
     expect(state.selectedId).toBe('a')
-    expect(state.notice).toEqual({
-      kind: 'image-added',
-      filename: mediaFixtureAssets[0]!.filename,
-    })
+    expect(state.notice).toBeNull()
   })
   it('preserves the open selection when later images finish uploading', () => {
     let state = createMediaSession(

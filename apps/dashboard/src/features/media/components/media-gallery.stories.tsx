@@ -9,6 +9,7 @@ const meta = {
     imageUrl: mediaFixtureImageUrl,
     media: mediaFixture,
     assets: Object.fromEntries(mediaFixtureAssets.map((asset) => [asset.id, asset])),
+    allowedRoles: ['portrait', 'primary'],
     selectedId: 'image-0',
     entries: [],
     onSelect: () => {},

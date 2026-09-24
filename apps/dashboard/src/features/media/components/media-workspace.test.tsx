@@ -26,6 +26,55 @@ beforeEach(() => {
   })
 })
 
+it('shows a neutral preview for a selected image with no assigned roles', () => {
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <MediaManager
+        open
+        onOpenChange={vi.fn()}
+        domain="character"
+        value={{
+          revision: 0,
+          images: [{ id: 'image-0', assetId: mediaFixtureAssets[0]!.id }],
+          roles: {},
+        }}
+        scope={{ kind: 'user-pc', userId: 'demo' }}
+        initialAssets={mediaFixtureAssets}
+        initialSelectedImageId="image-0"
+        mode="form"
+        onSave={vi.fn()}
+      />
+    </QueryClientProvider>,
+  )
+  expect(screen.getByRole('heading', { name: 'Image preview' })).toBeInTheDocument()
+  expect(screen.getByText('Assign a role to control how this image is used.')).toBeInTheDocument()
+  expect(screen.queryByLabelText('Zoom')).not.toBeInTheDocument()
+  expect(screen.queryByText(/Seraphina Vale/)).not.toBeInTheDocument()
+})
+
+it('renders a presentation switch only when multiple roles are assigned', () => {
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <MediaManager
+        open
+        onOpenChange={vi.fn()}
+        domain="character"
+        value={{
+          ...mediaFixture,
+          roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+        }}
+        scope={{ kind: 'user-pc', userId: 'demo' }}
+        initialAssets={mediaFixtureAssets}
+        initialSelectedImageId="image-0"
+        mode="form"
+        onSave={vi.fn()}
+      />
+    </QueryClientProvider>,
+  )
+  expect(screen.getByRole('group', { name: 'Presentation' })).toBeInTheDocument()
+  expect(screen.getByRole('checkbox', { name: 'Portrait' })).toBeInTheDocument()
+})
+
 it('switches presentations on a shared source without changing role assignments', () => {
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -45,7 +94,7 @@ it('switches presentations on a shared source without changing role assignments'
     </QueryClientProvider>,
   )
   expect(screen.getByLabelText('Zoom')).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: 'Primary image' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Primary' }))
   expect(screen.getByRole('group', { name: 'Primary crop position' })).toBeInTheDocument()
   expect(screen.getByRole('checkbox', { name: 'Portrait' })).toBeChecked()
   expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeChecked()

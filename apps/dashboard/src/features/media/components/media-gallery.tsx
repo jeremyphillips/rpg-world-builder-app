@@ -1,7 +1,12 @@
 import { useRef } from 'react'
 import { Button, DialogPanelScrollRegion, FilenamePreview, type ScrollBoundaryState } from '@rpg/ui'
 import { Images } from 'lucide-react'
-import { MEDIA_ROLE_ENTRIES, type ContentMedia, type MediaAsset } from '@rpg/contracts'
+import {
+  mediaRoleSurfaceCopy,
+  type ContentMedia,
+  type MediaAsset,
+  type MediaRole,
+} from '@rpg/contracts'
 import type { UploadEntry } from '../hooks/use-media-uploads'
 import { mediaImageUrl } from '../lib/media-display'
 import { MEDIA_IMAGE_ACCEPT } from '../lib/media-upload.lib'
@@ -11,6 +16,7 @@ export type MediaGalleryProps = {
   imageUrl?: typeof mediaImageUrl
   media: ContentMedia
   assets: Record<string, MediaAsset>
+  allowedRoles: readonly MediaRole[]
   selectedId?: string
   entries: UploadEntry[]
   onSelect: (id: string) => void
@@ -19,10 +25,20 @@ export type MediaGalleryProps = {
   onRemoveUpload: (id: string) => void
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }
+
+function rolesForImage(
+  media: ContentMedia,
+  imageId: string,
+  allowedRoles: readonly MediaRole[],
+): MediaRole[] {
+  return allowedRoles.filter((role) => media.roles[role]?.imageId === imageId)
+}
+
 export function MediaGallery({
   imageUrl = mediaImageUrl,
   media,
   assets,
+  allowedRoles,
   selectedId,
   entries,
   onSelect,
@@ -69,17 +85,15 @@ export function MediaGallery({
         ) : (
           <div className={styles.grid()}>
             {media.images.map((image, index) => {
-              const roles = Object.keys(MEDIA_ROLE_ENTRIES).filter(
-                (role) =>
-                  media.roles[role as keyof typeof MEDIA_ROLE_ENTRIES]?.imageId === image.id,
-              ) as Array<keyof typeof MEDIA_ROLE_ENTRIES>
+              const roles = rolesForImage(media, image.id, allowedRoles)
+              const roleLabels = roles.map((role) => mediaRoleSurfaceCopy[role].switchLabel)
               return (
                 <button
                   key={image.id}
                   type="button"
                   className={styles.tile({ selected: selectedId === image.id })}
                   aria-pressed={selectedId === image.id}
-                  aria-label={`${assets[image.assetId]?.filename ?? `Image ${index + 1}`}${roles.map((role) => `, ${MEDIA_ROLE_ENTRIES[role].label}`).join('')}`}
+                  aria-label={`${assets[image.assetId]?.filename ?? `Image ${index + 1}`}${roleLabels.map((label) => `, ${label}`).join('')}`}
                   onClick={() => onSelect(image.id)}
                   onKeyDown={(event) => {
                     const delta =
@@ -92,19 +106,16 @@ export function MediaGallery({
                     buttons?.[next]?.focus()
                   }}
                 >
-                  <img
-                    className={styles.thumbnail()}
-                    src={imageUrl(image.assetId, 'gallery-thumbnail')}
-                    alt=""
-                  />
-                  <span className={styles.badges()}>
-                    {selectedId === image.id && <span className={styles.badge()}>✓ Selected</span>}
-                    {roles.map((role) => (
-                      <span key={role} className={styles.badge()}>
-                        {MEDIA_ROLE_ENTRIES[role].label}
-                      </span>
-                    ))}
-                  </span>
+                  <div className={styles.tileThumb()}>
+                    <img
+                      className={styles.thumbnail()}
+                      src={imageUrl(image.assetId, 'gallery-thumbnail')}
+                      alt=""
+                    />
+                  </div>
+                  {roles.length > 0 ? (
+                    <div className={styles.tileFooter()}>{roleLabels.join(' · ')}</div>
+                  ) : null}
                 </button>
               )
             })}

@@ -15,6 +15,13 @@ export function resolveMediaWorkspaceCopy(input: {
     }
   }
 
+  if (input.assignedRoles.length === 0) {
+    return {
+      heading: 'Image preview',
+      description: 'Assign a role to control how this image is used.',
+    }
+  }
+
   const copy = mediaRoleSurfaceCopy[input.presentation]
   return {
     heading: copy.workspaceHeading,

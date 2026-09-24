@@ -14,11 +14,7 @@ import {
   asCropPresentation,
 } from '@rpg/contracts'
 
-import {
-  imageAddedMediaStatusNotice,
-  textMediaStatusNotice,
-  type MediaStatusNotice,
-} from './media-notice.lib'
+import { textMediaStatusNotice, type MediaStatusNotice } from './media-notice.lib'
 
 export type MediaSession = {
   initial: ContentMedia
@@ -155,9 +151,6 @@ function assignRole(next: MediaSession, action: Extract<MediaAction, { type: 'ro
     delete media.roles[action.role]
     next.presentation = resolvePresentationForImage(media, next.selectedId, action.allowedRoles)
   }
-  next.notice = textMediaStatusNotice(
-    `${action.role} ${action.assigned ? 'assigned to selected image' : 'unassigned'}.`,
-  )
 }
 
 function selectImage(
@@ -179,7 +172,6 @@ function addImage(next: MediaSession, action: Extract<MediaAction, { type: 'add'
   }
   next.media.images.push({ id: action.id, assetId: action.asset.id })
   next.selectedId ??= action.id
-  next.notice = imageAddedMediaStatusNotice(action.asset.filename)
 }
 
 function updateCrop(next: MediaSession, crop: NormalizedCrop, focalPoint?: NormalizedFocalPoint) {

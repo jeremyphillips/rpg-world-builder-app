@@ -1,6 +1,5 @@
-import { Button, FilenamePreview, MediaCropEditor, MediaEmblemEditor } from '@rpg/ui'
+import { MediaCropEditor, MediaEmblemEditor } from '@rpg/ui'
 import {
-  MEDIA_ROLE_ENTRIES,
   asContainPresentation,
   asCropPresentation,
   defaultEmblemPresentation,
@@ -37,9 +36,6 @@ function MediaWorkspacePreviewFigure({
         src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
         alt={selected.alt ?? ''}
       />
-      <figcaption className={styles.previewCaption()}>
-        <FilenamePreview filename={asset.filename} />
-      </figcaption>
     </figure>
   )
 }
@@ -161,38 +157,16 @@ export function MediaWorkspaceSelection({
   asset: MediaAsset
   assignedRoles: MediaRole[]
 }) {
-  const { state, policy, dispatch, onAlt, changeRole, remove } = controller
+  const { state, policy, onAlt, changeRole, remove } = controller
   const activeRole = state.presentation
   const assignment = state.media.roles[activeRole]
   const isActiveForSelection = assignment?.imageId === selected.id
 
-  return (
-    <>
-      {assignedRoles.length >= 2 && (
-        <div className={styles.row()} role="group" aria-label="Presentation">
-          {assignedRoles.map((role) => (
-            <Button
-              key={role}
-              type="button"
-              variant="outline"
-              aria-pressed={state.presentation === role}
-              onClick={() => dispatch({ type: 'presentation', role })}
-            >
-              {MEDIA_ROLE_ENTRIES[role].label}
-            </Button>
-          ))}
-        </div>
-      )}
+  if (assignedRoles.length === 0) {
+    return (
       <div className={styles.editor()}>
         <div className={styles.editorCrop()}>
-          <MediaWorkspaceEditor
-            controller={controller}
-            imageUrl={imageUrl}
-            selected={selected}
-            asset={asset}
-            activeRole={activeRole}
-            isActiveForSelection={isActiveForSelection}
-          />
+          <MediaWorkspacePreviewFigure imageUrl={imageUrl} selected={selected} asset={asset} />
         </div>
         <MediaImageDetails
           image={selected}
@@ -204,6 +178,30 @@ export function MediaWorkspaceSelection({
           onRemove={remove}
         />
       </div>
-    </>
+    )
+  }
+
+  return (
+    <div className={styles.editor()}>
+      <div className={styles.editorCrop()}>
+        <MediaWorkspaceEditor
+          controller={controller}
+          imageUrl={imageUrl}
+          selected={selected}
+          asset={asset}
+          activeRole={activeRole}
+          isActiveForSelection={isActiveForSelection}
+        />
+      </div>
+      <MediaImageDetails
+        image={selected}
+        asset={asset}
+        media={state.media}
+        policy={policy}
+        onAlt={onAlt}
+        onRole={changeRole}
+        onRemove={remove}
+      />
+    </div>
   )
 }

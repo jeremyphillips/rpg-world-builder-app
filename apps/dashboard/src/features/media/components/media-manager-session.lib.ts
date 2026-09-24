@@ -15,13 +15,15 @@ export function resolveMediaManagerBodyDropOverlay(
 
 export function shouldShowMediaManagerStatus(input: {
   statusNotice?: MediaStatusNotice | null
-  pendingUploadCount: number
+  hasActiveUploads: boolean
+  hasFailedUploads: boolean
   validationOk: boolean
   error?: string
 }): boolean {
   return (
     hasMediaStatusNotice(input.statusNotice) ||
-    input.pendingUploadCount > 0 ||
+    input.hasActiveUploads ||
+    input.hasFailedUploads ||
     !input.validationOk ||
     Boolean(input.error)
   )
@@ -31,7 +33,5 @@ export function resolveMediaManagerFooterHint(
   mode: MediaManagerProps['mode'],
   label: string,
 ): string {
-  return mode === 'form'
-    ? `Image changes are saved when you save this ${label}.`
-    : 'Save changes to this record.'
+  return mode === 'form' ? `Changes are saved with this ${label}.` : 'Save changes to this record.'
 }

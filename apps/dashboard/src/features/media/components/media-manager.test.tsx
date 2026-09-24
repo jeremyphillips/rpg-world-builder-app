@@ -159,6 +159,25 @@ describe('MediaManager', () => {
     await user.click(screen.getByRole('button', { name: /\+ add images/i }))
   })
 
+  it('does not emit routine status notices when toggling roles', () => {
+    mount({
+      value: {
+        revision: 0,
+        images: [{ id: 'image-0', assetId: mediaFixtureAssets[0]!.id }],
+        roles: {},
+      },
+      initialSelectedImageId: 'image-0',
+    })
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Portrait' }))
+    expect(screen.queryByText(/assigned to selected image/i)).not.toBeInTheDocument()
+    expect(screen.queryByText(/unassigned/i)).not.toBeInTheDocument()
+  })
+
+  it('shows the form footer hint with the singular domain label', () => {
+    mount({ domain: 'class', value: { revision: 0, images: [], roles: {} } })
+    expect(screen.getByText('Changes are saved with this class.')).toBeInTheDocument()
+  })
+
   it('retains draft on failed detail save', async () => {
     const { props } = mount({
       mode: 'detail',

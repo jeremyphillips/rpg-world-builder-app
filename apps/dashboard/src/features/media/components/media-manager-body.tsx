@@ -49,6 +49,7 @@ export function MediaManagerBody({
           imageUrl={imageUrl}
           media={media}
           assets={assets}
+          allowedRoles={controller.policy.allowedRoles}
           selectedId={selectedId}
           entries={entries}
           onSelect={onSelect}

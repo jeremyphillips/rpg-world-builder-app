@@ -48,7 +48,10 @@ function MediaManagerSession(props: MediaManagerProps) {
   const statusNotice = resolveMediaStatusNotice(uploads.notice, state.notice)
   const showStatus = shouldShowMediaManagerStatus({
     statusNotice,
-    pendingUploadCount: uploads.entries.length,
+    hasActiveUploads: uploads.entries.some(
+      (entry) => entry.status === 'queued' || entry.status === 'uploading',
+    ),
+    hasFailedUploads: uploads.entries.some((entry) => entry.status === 'failed'),
     validationOk: validation.ok,
     error,
   })
@@ -88,7 +91,7 @@ function MediaManagerSession(props: MediaManagerProps) {
           {showStatus ? (
             <MediaManagerStatus
               statusNotice={statusNotice}
-              pendingUploadCount={uploads.entries.length}
+              entries={uploads.entries}
               validation={validation}
               error={error}
             />

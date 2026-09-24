@@ -9,6 +9,7 @@ it('shows the quiet empty state copy', () => {
     <MediaGallery
       media={{ revision: 0, images: [], roles: {} }}
       assets={{}}
+      allowedRoles={['portrait', 'primary']}
       entries={[]}
       onSelect={vi.fn()}
       onAdd={vi.fn()}
@@ -28,6 +29,7 @@ it('calls onAdd from the gallery picker', async () => {
     <MediaGallery
       media={{ revision: 0, images: [], roles: {} }}
       assets={{}}
+      allowedRoles={['portrait', 'primary']}
       entries={[]}
       onSelect={vi.fn()}
       onAdd={onAdd}
@@ -38,12 +40,13 @@ it('calls onAdd from the gallery picker', async () => {
   await user.click(screen.getByRole('button', { name: /\+ add images/i }))
 })
 
-it('moves keyboard selection between images and exposes independent role badges', () => {
+it('moves keyboard selection between images and shows role labels in the tile footer', () => {
   const onSelect = vi.fn()
   render(
     <MediaGallery
       media={mediaFixture}
       assets={Object.fromEntries(mediaFixtureAssets.map((asset) => [asset.id, asset]))}
+      allowedRoles={['portrait', 'primary']}
       selectedId="image-0"
       entries={[]}
       onSelect={onSelect}
@@ -57,4 +60,6 @@ it('moves keyboard selection between images and exposes independent role badges'
   fireEvent.keyDown(first, { key: 'ArrowRight' })
   expect(onSelect).toHaveBeenCalledWith('image-1')
   expect(screen.getByRole('button', { name: /mountain expedition/ })).toHaveFocus()
+  expect(screen.queryByText(/✓ Selected/)).not.toBeInTheDocument()
+  expect(screen.getByText('Portrait')).toBeInTheDocument()
 })

@@ -24,21 +24,28 @@ describe('media-manager-session.lib', () => {
   it('shows status only when there is feedback to surface', () => {
     expect(
       shouldShowMediaManagerStatus({
-        pendingUploadCount: 0,
+        hasActiveUploads: false,
+        hasFailedUploads: false,
         validationOk: true,
       }),
     ).toBe(false)
     expect(
       shouldShowMediaManagerStatus({
         statusNotice: { kind: 'text', text: 'Upload complete.' },
-        pendingUploadCount: 0,
+        hasActiveUploads: false,
+        hasFailedUploads: false,
         validationOk: true,
       }),
     ).toBe(true)
   })
 
   it('resolves footer hint copy by mode', () => {
-    expect(resolveMediaManagerFooterHint('form', 'character')).toContain('character')
+    expect(resolveMediaManagerFooterHint('form', 'character')).toBe(
+      'Changes are saved with this character.',
+    )
+    expect(resolveMediaManagerFooterHint('form', 'class')).toBe(
+      'Changes are saved with this class.',
+    )
     expect(resolveMediaManagerFooterHint('detail', 'class')).toBe('Save changes to this record.')
   })
 })

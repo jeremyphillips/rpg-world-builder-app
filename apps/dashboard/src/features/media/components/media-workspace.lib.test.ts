@@ -24,8 +24,8 @@ describe('resolveMediaWorkspaceCopy', () => {
         hasSelection: true,
       }),
     ).toEqual({
-      heading: 'Edit emblem',
-      description: "Adjust how the emblem appears inside the frame. It won't be cropped.",
+      heading: 'Emblem',
+      description: "Adjust how the emblem appears inside its frame. It won't be cropped.",
     })
   })
 
@@ -37,9 +37,21 @@ describe('resolveMediaWorkspaceCopy', () => {
         hasSelection: true,
       }),
     ).toEqual({
+      heading: 'Image preview',
+      description: 'Assign a role to control how this image is used.',
+    })
+  })
+
+  it('separates workspace purpose from editor instructions for primary', () => {
+    expect(
+      resolveMediaWorkspaceCopy({
+        presentation: 'primary',
+        assignedRoles: ['primary'],
+        hasSelection: true,
+      }),
+    ).toEqual({
       heading: 'Primary crop',
-      description:
-        'Crop a 4:3 detail image and place the focal point inside that crop. The original file is kept.',
+      description: 'Crop a 4:3 image for representative artwork and detail views.',
     })
   })
 })

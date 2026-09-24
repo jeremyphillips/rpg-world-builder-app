@@ -50,7 +50,8 @@ retain the media draft until its own save/cancel decision.
 - `hooks/use-media-uploads.ts`: three-request queue, retry idempotency, bounded count,
   abort handling and ordered publication of successful uploads.
 - `api/media-api.ts`: response contracts and CSRF-protected same-origin requests.
-- `components/`: gallery, schema-driven alt form, role controls and modal workspace.
+- `components/`: gallery with role footers, schema-driven alt form, role controls,
+  and modal workspace with presentation switching.
 - `@rpg/ui` `MediaCropEditor`: fixed-aspect crop constraints (1:1 portrait, 3:1 banner,
   4:3 primary) with optional focal-point handles in source space.
 - `@rpg/ui` `MediaEmblemEditor`: artwork size and optional position for emblem contain layout.
@@ -65,6 +66,8 @@ unresolved uploads before applying changes.
 Run `pnpm --filter @rpg/dashboard storybook` and open **Features / Media / MediaManager**
 on port 6007. Examples cover domain policies, dual-role sources, empty and unassigned
 collections, save failure and mobile. Gallery stories cover partial upload failure.
+Unassigned selections show a neutral image preview until a role is assigned.
+Routine role toggles do not emit status notices; upload progress and failures do.
 Offline artwork fixtures are intentional geometric illustrations for crop verification.
 Real uploads require an authenticated API and authorized scope.
 

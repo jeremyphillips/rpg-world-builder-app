@@ -5,9 +5,11 @@ import {
   FileDropzone,
   resolveChromeCalloutClasses,
   resolveImageDropTargetDefaults,
+  SegmentedControl,
   type ScrollBoundaryState,
 } from '@rpg/ui'
 import { Info } from 'lucide-react'
+import { mediaRoleSurfaceCopy, type MediaRole } from '@rpg/contracts'
 import type { UseQueryResult } from '@tanstack/react-query'
 
 import type { MediaManagerController } from '../hooks/use-media-manager'
@@ -44,6 +46,44 @@ function MediaWorkspaceErrorAlert({
   )
 }
 
+function MediaWorkspaceHeader({
+  copy,
+  assignedRoles,
+  presentation,
+  onPresentationChange,
+  isCropEditor,
+}: {
+  copy: { heading: string; description: string }
+  assignedRoles: readonly MediaRole[]
+  presentation: MediaRole
+  onPresentationChange: (role: MediaRole) => void
+  isCropEditor: boolean
+}) {
+  const headingClass = isCropEditor ? styles.workspacePortraitHeading() : styles.heading()
+  const headerClass = isCropEditor ? styles.workspaceHeaderPortrait() : styles.workspaceHeader()
+
+  return (
+    <div className={headerClass}>
+      <div className={styles.workspaceHeaderRow()}>
+        <h2 className={headingClass}>{copy.heading}</h2>
+        {assignedRoles.length >= 2 ? (
+          <SegmentedControl
+            value={presentation}
+            options={assignedRoles.map((role) => ({
+              value: role,
+              label: mediaRoleSurfaceCopy[role].switchLabel,
+            }))}
+            onValueChange={onPresentationChange}
+            segmentWidth="auto"
+            aria-label="Presentation"
+          />
+        ) : null}
+      </div>
+      <p className={styles.muted()}>{copy.description}</p>
+    </div>
+  )
+}
+
 export function MediaWorkspace({
   controller,
   imageUrl = mediaImageUrl,
@@ -53,7 +93,7 @@ export function MediaWorkspace({
   imageUrl?: typeof mediaImageUrl
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }) {
-  const { state, selected, asset, queries, policy, uploads } = controller
+  const { state, selected, asset, queries, policy, uploads, dispatch } = controller
   const assignedRoles = selected
     ? assignedRolesForImage(state.media, selected.id, policy.allowedRoles)
     : []
@@ -64,6 +104,7 @@ export function MediaWorkspace({
   })
   const isCropEditor =
     selected &&
+    assignedRoles.length > 0 &&
     assignedRoles.includes(state.presentation) &&
     state.presentation !== 'emblem' &&
     ['portrait', 'banner', 'primary'].includes(state.presentation)
@@ -78,17 +119,13 @@ export function MediaWorkspace({
         showBottomBoundaryShadow={false}
         onBoundaryStateChange={onScrollBoundaryChange}
       >
-        {isCropEditor ? (
-          <div className={styles.workspaceHeaderPortrait()}>
-            <h2 className={styles.workspacePortraitHeading()}>{copy.heading}</h2>
-            <p className={styles.muted()}>{copy.description}</p>
-          </div>
-        ) : (
-          <div className={styles.workspaceHeader()}>
-            <h2 className={styles.heading()}>{copy.heading}</h2>
-            <p className={styles.muted()}>{copy.description}</p>
-          </div>
-        )}
+        <MediaWorkspaceHeader
+          copy={copy}
+          assignedRoles={assignedRoles}
+          presentation={state.presentation}
+          onPresentationChange={(role) => dispatch({ type: 'presentation', role })}
+          isCropEditor={Boolean(isCropEditor)}
+        />
         <div className={styles.workspaceContent()}>
           {selected && asset ? (
             <MediaWorkspaceSelection

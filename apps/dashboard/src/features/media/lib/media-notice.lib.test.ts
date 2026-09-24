@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   hasMediaStatusNotice,
-  imageAddedMediaStatusNotice,
   resolveMediaStatusNotice,
   textMediaStatusNotice,
 } from './media-notice.lib'
@@ -10,15 +9,12 @@ import {
 describe('media notice helpers', () => {
   it('prefers upload notices over session notices', () => {
     expect(
-      resolveMediaStatusNotice(
-        'Upload limit reached.',
-        imageAddedMediaStatusNotice('long-name.webp'),
-      ),
+      resolveMediaStatusNotice('Upload limit reached.', textMediaStatusNotice('Image removed.')),
     ).toEqual(textMediaStatusNotice('Upload limit reached.'))
   })
 
-  it('detects image-added notices', () => {
-    expect(hasMediaStatusNotice(imageAddedMediaStatusNotice('portrait.webp'))).toBe(true)
+  it('detects non-empty text notices', () => {
+    expect(hasMediaStatusNotice(textMediaStatusNotice('Upload complete.'))).toBe(true)
     expect(hasMediaStatusNotice(textMediaStatusNotice(''))).toBe(false)
     expect(hasMediaStatusNotice(null)).toBe(false)
   })
