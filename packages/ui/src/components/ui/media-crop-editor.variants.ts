@@ -9,7 +9,7 @@ export const mediaCropStyles = {
         frame: {
           square: 'aspect-square',
           banner: 'aspect-[3/1]',
-          free: 'aspect-square',
+          free: 'min-h-32',
         },
       },
       defaultVariants: { frame: 'square' },

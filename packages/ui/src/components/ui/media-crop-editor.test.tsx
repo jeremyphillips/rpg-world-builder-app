@@ -9,7 +9,7 @@ import {
   resetPortraitCrop,
   resetPrimaryCrop,
 } from '@rpg/contracts'
-import { MediaCropEditor } from './media-crop-editor.client'
+import { MediaCropEditor, resolveCropPreviewLayout } from './media-crop-editor.client'
 
 describe('MediaCropEditor', () => {
   const source = { width: 2400, height: 1600 }
@@ -29,7 +29,7 @@ describe('MediaCropEditor', () => {
     expect(meetsPortraitMinimumCrop(crop, source)).toBe(true)
     expect(crop.x + crop.width / 2).toBeCloseTo(0.5)
   })
-  it('preserves source aspect for primary full-frame crop', () => {
+  it('fills the aperture for a primary full-frame crop', () => {
     const primarySource = { width: 1600, height: 900 }
     const { container } = render(
       <MediaCropEditor
@@ -40,9 +40,25 @@ describe('MediaCropEditor', () => {
         onChange={vi.fn()}
       />,
     )
-    const img = container.querySelector('[aria-label="Primary crop position"] img')
-    expect(img).toHaveStyle({ width: '75%' })
-    expect(img).toHaveStyle({ height: '42.1875%' })
+    const img = container.querySelector<HTMLImageElement>(
+      '[aria-label="Primary crop position"] img',
+    )
+    expect(Number.parseFloat(img?.style.width ?? '')).toBeCloseTo(75)
+    expect(Number.parseFloat(img?.style.height ?? '')).toBeCloseTo(75)
+    expect(Number.parseFloat(img?.style.top ?? '')).toBeCloseTo(12.5)
+    expect(Number.parseFloat(img?.style.left ?? '')).toBeCloseTo(12.5)
+  })
+
+  it('covers the aperture without letterboxing for a full-frame primary crop', () => {
+    const layout = resolveCropPreviewLayout(
+      'free',
+      { width: 1600, height: 900 },
+      resetPrimaryCrop(),
+    )
+    expect(layout.widthPercent).toBeCloseTo(75)
+    expect(layout.heightPercent).toBeCloseTo(75)
+    expect(layout.topPercent).toBeCloseTo(12.5)
+    expect(layout.leftPercent).toBeCloseTo(12.5)
   })
 
   it('zooms banner while retaining a valid 3:1 crop on non-wide sources', () => {
@@ -71,7 +87,7 @@ describe('MediaCropEditor', () => {
     fireEvent.keyDown(screen.getByRole('group', { name: 'Portrait crop position' }), {
       key: 'ArrowRight',
     })
-    expect(onChange.mock.calls[0]![0].x).toBeGreaterThan(crop.x)
+    expect(onChange.mock.calls[0]![0].x).toBeLessThan(crop.x)
     fireEvent.click(screen.getByRole('button', { name: 'Reset crop' }))
     expect(onChange).toHaveBeenLastCalledWith(resetPortraitCrop(source))
   })

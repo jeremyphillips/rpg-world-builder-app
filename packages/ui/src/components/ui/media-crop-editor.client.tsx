@@ -59,8 +59,44 @@ function minEdgePxForFrame(frame: MediaCropEditorFrame): number {
   return CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX
 }
 
-function viewportAspectForFrame(frame: MediaCropEditorFrame): number {
-  return frame === 'banner' ? 3 : 1
+function viewportAspectForFrame(frame: MediaCropEditorFrame, source: SourceDimensions): number {
+  if (frame === 'banner') return 3
+  if (frame === 'free') return source.width / source.height
+  return 1
+}
+
+type CropPreviewLayout = {
+  widthPercent: number
+  heightPercent: number
+  leftPercent: number
+  topPercent: number
+}
+
+/** Map a normalized crop to viewport percentages with uniform scale that fills the aperture. */
+export function resolveCropPreviewLayout(
+  frame: MediaCropEditorFrame,
+  source: SourceDimensions,
+  crop: NormalizedCrop,
+  insets: FrameLayout = APERTURE_LAYOUT,
+): CropPreviewLayout {
+  const viewportAspect = viewportAspectForFrame(frame, source)
+  const viewportHeight = 1 / viewportAspect
+  const cropWidthPx = crop.width * source.width
+  const cropHeightPx = crop.height * source.height
+  const apertureLeft = insets.offsetX / 100
+  const apertureTop = insets.offsetY / 100
+  const apertureWidth = insets.scaleX
+  const apertureHeight = insets.scaleY / viewportAspect
+  const scale = Math.max(apertureWidth / cropWidthPx, apertureHeight / cropHeightPx)
+  const imageWidth = scale * source.width
+  const imageHeight = scale * source.height
+
+  return {
+    widthPercent: imageWidth * 100,
+    heightPercent: (imageHeight / viewportHeight) * 100,
+    leftPercent: (apertureLeft - scale * crop.x * source.width) * 100,
+    topPercent: (apertureTop - scale * crop.y * source.height * viewportAspect) * 100,
+  }
 }
 
 /** Controlled normalized crop editor; original bytes and persistence remain caller-owned. */
@@ -111,23 +147,13 @@ export function MediaCropEditor({
     })
   }
 
-  function changeFreeDimension(axis: 'width' | 'height', value: number) {
-    const next = { ...crop, [axis]: value }
-    next.x = clamp(next.x, 0, 1 - next.width)
-    next.y = clamp(next.y, 0, 1 - next.height)
-    onChange(next)
-  }
-
   const imageStyle = (insets: FrameLayout) => {
-    const scale = insets.scaleX
-    const viewportAspect = viewportAspectForFrame(frame)
-    const sourceAspect = source.width / source.height
-
+    const layout = resolveCropPreviewLayout(frame, source, crop, insets)
     return {
-      width: `${(100 * scale) / crop.width}%`,
-      height: `${(100 * scale * viewportAspect) / (crop.width * sourceAspect)}%`,
-      left: `${insets.offsetX - (100 * scale * crop.x) / crop.width}%`,
-      top: `${insets.offsetY - (100 * scale * crop.y * viewportAspect) / (crop.width * sourceAspect)}%`,
+      width: `${layout.widthPercent}%`,
+      height: `${layout.heightPercent}%`,
+      left: `${layout.leftPercent}%`,
+      top: `${layout.topPercent}%`,
     }
   }
 
@@ -142,16 +168,17 @@ export function MediaCropEditor({
     <div className={styles.root()}>
       <div
         className={styles.viewport({ frame })}
+        style={frame === 'free' ? { aspectRatio: `${source.width} / ${source.height}` } : undefined}
         role="group"
         aria-label={frameLabel}
         aria-describedby={`${id}-instructions`}
         tabIndex={0}
         onKeyDown={(event) => {
           const moves: Record<string, [number, number]> = {
-            ArrowLeft: [-crop.width / 50, 0],
-            ArrowRight: [crop.width / 50, 0],
-            ArrowUp: [0, -crop.height / 50],
-            ArrowDown: [0, crop.height / 50],
+            ArrowLeft: [crop.width / 50, 0],
+            ArrowRight: [-crop.width / 50, 0],
+            ArrowUp: [0, crop.height / 50],
+            ArrowDown: [0, -crop.height / 50],
           }
           const delta = moves[event.key]
           if (delta) {
@@ -261,7 +288,7 @@ export function MediaCropEditor({
       )}
       <p id={`${id}-instructions`} className={styles.label()}>
         {frame === 'free'
-          ? 'Drag to reposition, adjust crop size, or place the focal point inside the crop.'
+          ? 'Drag to reposition, zoom, or place the focal point inside the crop.'
           : frame === 'banner'
             ? 'Drag to reposition the 3:1 banner crop and place the focal point inside it.'
             : 'Drag to reposition, or focus the crop and use arrow keys. Portrait is fixed at 1:1.'}
@@ -299,32 +326,6 @@ export function MediaCropEditor({
           Reset crop
         </Button>
       </div>
-      {frame === 'free' && (
-        <div className={styles.row()}>
-          <label htmlFor={`${id}-width`}>Width</label>
-          <input
-            id={`${id}-width`}
-            className={styles.slider()}
-            type="range"
-            min={CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX / source.width}
-            max={1}
-            step={0.001}
-            value={crop.width}
-            onChange={(event) => changeFreeDimension('width', Number(event.target.value))}
-          />
-          <label htmlFor={`${id}-height`}>Height</label>
-          <input
-            id={`${id}-height`}
-            className={styles.slider()}
-            type="range"
-            min={CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX / source.height}
-            max={1}
-            step={0.001}
-            value={crop.height}
-            onChange={(event) => changeFreeDimension('height', Number(event.target.value))}
-          />
-        </div>
-      )}
       {frame === 'square' && (
         <div className={styles.previews()}>
           {[false, true].map((circle) => (
