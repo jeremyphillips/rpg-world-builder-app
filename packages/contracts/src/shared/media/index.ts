@@ -1,6 +1,7 @@
 export * from './limits'
 export * from './roles'
 export * from './geometry'
+export * from './emblem-layout'
 export * from './image-presentation'
 export * from './role-presentation'
 export * from './resolve-representative-image-id'

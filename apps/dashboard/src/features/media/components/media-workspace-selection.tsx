@@ -58,8 +58,15 @@ function MediaWorkspaceEditor({
     return (
       <MediaEmblemEditor
         src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
+        source={{ width: asset.orientedWidth, height: asset.orientedHeight }}
         layout={containPresentation}
-        onChange={(layout) => dispatch({ type: 'contain', layout })}
+        onChange={(layout) =>
+          dispatch({
+            type: 'contain',
+            layout,
+            source: { width: asset.orientedWidth, height: asset.orientedHeight },
+          })
+        }
       />
     )
   }

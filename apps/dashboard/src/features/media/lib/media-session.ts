@@ -8,6 +8,7 @@ import type {
   SourceDimensions,
 } from '@rpg/contracts'
 import {
+  canonicalizeEmblemPresentation,
   createDefaultRolePresentation,
   defaultEmblemPresentation,
   asCropPresentation,
@@ -42,7 +43,7 @@ export type MediaAction =
       source?: SourceDimensions
     }
   | { type: 'crop'; crop: NormalizedCrop; focalPoint?: NormalizedFocalPoint }
-  | { type: 'contain'; layout: ContainPresentation }
+  | { type: 'contain'; layout: ContainPresentation; source: SourceDimensions }
 
 function rolesForImage(
   media: ContentMedia,
@@ -114,7 +115,7 @@ export function mediaSessionReducer(state: MediaSession, action: MediaAction): M
       updateCrop(next, action.crop, action.focalPoint)
       break
     case 'contain':
-      updateContain(next, action.layout)
+      updateContain(next, action.layout, action.source)
       break
   }
 
@@ -195,10 +196,10 @@ function updateCrop(next: MediaSession, crop: NormalizedCrop, focalPoint?: Norma
   }
 }
 
-function updateContain(next: MediaSession, layout: ContainPresentation) {
+function updateContain(next: MediaSession, layout: ContainPresentation, source: SourceDimensions) {
   const assignment = next.media.roles[next.presentation]
   if (!assignment || assignment.imageId !== next.selectedId) return
-  assignment.presentation = layout
+  assignment.presentation = canonicalizeEmblemPresentation(source, layout)
 }
 
 export function assignedRolesForImage(

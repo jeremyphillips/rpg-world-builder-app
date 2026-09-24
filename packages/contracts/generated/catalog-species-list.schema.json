@@ -414,19 +414,18 @@
                   "minimum": 0.25,
                   "maximum": 1
                 },
-                "padding": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 0.2
-                },
                 "offset": {
                   "type": "object",
                   "properties": {
                     "x": {
-                      "type": "number"
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
                     },
                     "y": {
-                      "type": "number"
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
                     }
                   },
                   "required": [
@@ -438,8 +437,7 @@
               },
               "required": [
                 "mode",
-                "scale",
-                "padding"
+                "scale"
               ],
               "additionalProperties": false
             }

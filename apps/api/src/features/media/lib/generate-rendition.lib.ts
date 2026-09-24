@@ -6,9 +6,11 @@ import sharp from 'sharp'
 import type { ContainPresentation, MediaRenditionPreset, NormalizedCrop } from '@rpg/contracts'
 import {
   buildMediaRenditionCacheKey,
+  defaultEmblemPresentation,
   getMediaRenditionPresetConfig,
   resetPrimaryCrop,
   resolveEffectiveCrop,
+  resolveEmblemLayoutMetrics,
 } from '@rpg/contracts'
 
 import type { MediaAssetDoc } from '../media-asset.model'
@@ -43,28 +45,22 @@ async function renderEmblem(input: {
 }): Promise<GeneratedMediaRendition> {
   const presetConfig = getMediaRenditionPresetConfig('emblem')
   const canvasSize = 'width' in presetConfig ? presetConfig.width : presetConfig.maxWidth
-  const innerSize = canvasSize * (1 - 2 * input.layout.padding)
   const sourceMeta = await sharp(input.original, { animated: false, failOn: 'error' })
     .rotate()
     .metadata()
-  const sourceWidth = sourceMeta.width ?? input.asset.orientedWidth
-  const sourceHeight = sourceMeta.height ?? input.asset.orientedHeight
-  const containScale = Math.min(innerSize / sourceWidth, innerSize / sourceHeight)
-  const scaledWidth = Math.max(1, Math.round(sourceWidth * containScale * input.layout.scale))
-  const scaledHeight = Math.max(1, Math.round(sourceHeight * containScale * input.layout.scale))
-  const maxOffsetX = Math.max(0, (innerSize - scaledWidth) / 2)
-  const maxOffsetY = Math.max(0, (innerSize - scaledHeight) / 2)
-  const offsetX = Math.round(
-    maxOffsetX + clamp(input.layout.offset?.x ?? 0, -maxOffsetX, maxOffsetX),
-  )
-  const offsetY = Math.round(
-    maxOffsetY + clamp(input.layout.offset?.y ?? 0, -maxOffsetY, maxOffsetY),
-  )
-  const inset = Math.round(canvasSize * input.layout.padding)
+  const source = {
+    width: sourceMeta.width ?? input.asset.orientedWidth,
+    height: sourceMeta.height ?? input.asset.orientedHeight,
+  }
+  const { renderedWidth, renderedHeight, left, top } = resolveEmblemLayoutMetrics({
+    source,
+    canvasSize,
+    layout: input.layout,
+  })
 
   const fitted = await sharp(input.original, { animated: false, failOn: 'error' })
     .rotate()
-    .resize(scaledWidth, scaledHeight, { fit: 'inside', withoutEnlargement: true })
+    .resize(renderedWidth, renderedHeight, { fit: 'inside', withoutEnlargement: true })
     .png()
     .toBuffer()
 
@@ -76,7 +72,7 @@ async function renderEmblem(input: {
       background: { r: 0, g: 0, b: 0, alpha: 0 },
     },
   })
-    .composite([{ input: fitted, left: inset + offsetX, top: inset + offsetY }])
+    .composite([{ input: fitted, left, top }])
     .png()
     .toBuffer()
 
@@ -198,7 +194,7 @@ export async function generateMediaRendition(input: {
     return renderEmblem({
       original: readMediaOriginal(input.asset.storageKey),
       asset: input.asset,
-      layout: input.emblemLayout ?? { mode: 'contain', scale: 1, padding: 0 },
+      layout: input.emblemLayout ?? defaultEmblemPresentation(),
       cachePath,
     })
   }
@@ -220,8 +216,4 @@ export function cropPixelDimensions(
 ): { width: number; height: number } {
   const extract = cropExtract(crop, sourceWidth, sourceHeight)
   return { width: extract.width, height: extract.height }
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value))
 }

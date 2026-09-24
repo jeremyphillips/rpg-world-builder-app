@@ -35,7 +35,7 @@ export function createDefaultRolePresentation(
 }
 
 export function defaultEmblemPresentation(): ContainPresentation {
-  return { mode: 'contain', scale: 1, padding: 0 }
+  return { mode: 'contain', scale: 1 }
 }
 
 export function asCropPresentation(

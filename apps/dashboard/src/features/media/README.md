@@ -53,7 +53,7 @@ retain the media draft until its own save/cancel decision.
 - `components/`: gallery, schema-driven alt form, role controls and modal workspace.
 - `@rpg/ui` `MediaCropEditor`: square, 3:1 banner, and free primary crop modes with
   optional focal-point handles in source space.
-- `@rpg/ui` `MediaEmblemEditor`: padding, scale, and offset contain layout for emblem roles.
+- `@rpg/ui` `MediaEmblemEditor`: artwork size and optional position for emblem contain layout.
 
 The image collection stays in insertion order. Role eligibility is shared between
 the role checkbox and server validation via `resolveMediaRoleEligibility()`. Server

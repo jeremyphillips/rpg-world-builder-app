@@ -41,8 +41,7 @@ export function resolveMediaWorkspaceCopy(input: {
   if (input.presentation === 'emblem') {
     return {
       heading: 'Edit emblem',
-      description:
-        'Scale and pad the image inside the frame. It stays fully visible and is not cropped.',
+      description: "Adjust how the emblem appears inside the frame. It won't be cropped.",
     }
   }
 

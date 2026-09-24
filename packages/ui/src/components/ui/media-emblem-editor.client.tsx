@@ -2,29 +2,41 @@
 
 import { useId, useRef } from 'react'
 import {
-  CONTENT_MEDIA_EMBLEM_PADDING_MAX,
   CONTENT_MEDIA_EMBLEM_SCALE_MIN,
+  canonicalizeEmblemPresentation,
+  defaultEmblemPresentation,
+  isDefaultEmblemPresentation,
+  isEmblemCentered,
+  resolveEmblemCanvasSize,
+  resolveEmblemLayoutMetrics,
   type ContainPresentation,
+  type SourceDimensions,
 } from '@rpg/contracts'
+import { Button } from './button.client'
+import { resolveOffsetFromDragDelta } from './media-emblem-editor.lib'
 import { mediaEmblemStyles as styles } from './media-emblem-editor.variants'
 
 export type MediaEmblemEditorProps = {
   src: string
+  source: SourceDimensions
   layout: ContainPresentation
   onChange: (layout: ContainPresentation) => void
 }
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
-
-/** Controlled emblem contain editor with padding, scale, and offset. */
-export function MediaEmblemEditor({ src, layout, onChange }: MediaEmblemEditorProps) {
+/** Controlled emblem contain editor with artwork size and optional position. */
+export function MediaEmblemEditor({ src, source, layout, onChange }: MediaEmblemEditorProps) {
   const id = useId()
   const drag = useRef<{ x: number; y: number; offset: { x: number; y: number } } | null>(null)
-  const innerFraction = 1 - 2 * layout.padding
+  const canvasSize = resolveEmblemCanvasSize()
+  const metrics = resolveEmblemLayoutMetrics({ source, canvasSize, layout })
+  const canonicalLayout = canonicalizeEmblemPresentation(source, layout)
+
+  const emitLayout = (next: ContainPresentation) => {
+    onChange(canonicalizeEmblemPresentation(source, next))
+  }
 
   return (
     <div className={styles.root()}>
-      <h3 className={styles.heading()}>Edit emblem</h3>
       <div
         className={styles.viewport()}
         role="group"
@@ -32,6 +44,7 @@ export function MediaEmblemEditor({ src, layout, onChange }: MediaEmblemEditorPr
         aria-describedby={`${id}-instructions`}
         tabIndex={0}
         onPointerDown={(event) => {
+          if (event.button !== 0) return
           event.currentTarget.setPointerCapture(event.pointerId)
           drag.current = {
             x: event.clientX,
@@ -49,60 +62,69 @@ export function MediaEmblemEditor({ src, layout, onChange }: MediaEmblemEditorPr
           const start = drag.current
           if (!start) return
           const rect = event.currentTarget.getBoundingClientRect()
-          const frameSize = rect.width * innerFraction * 0.75
-          if (!frameSize) return
-          onChange({
-            ...layout,
-            offset: {
-              x: clamp(start.offset.x + (event.clientX - start.x) / frameSize, -0.5, 0.5),
-              y: clamp(start.offset.y + (event.clientY - start.y) / frameSize, -0.5, 0.5),
-            },
+          if (!rect.width) return
+          const offset = resolveOffsetFromDragDelta({
+            startOffset: start.offset,
+            deltaX: event.clientX - start.x,
+            deltaY: event.clientY - start.y,
+            maxTranslationX: metrics.maxTranslationX,
+            maxTranslationY: metrics.maxTranslationY,
+            viewportSize: rect.width,
           })
+          emitLayout({ ...layout, offset })
         }}
       >
         <div className={styles.checkerboard()} aria-hidden="true" />
-        <div className={styles.frame()}>
-          <div
-            className={styles.imageWrap()}
-            style={{
-              padding: `${layout.padding * 50}%`,
-              transform: `scale(${layout.scale}) translate(${(layout.offset?.x ?? 0) * 100}%, ${(layout.offset?.y ?? 0) * 100}%)`,
-            }}
-          >
-            <img src={src} alt="" draggable={false} className={styles.image()} />
-          </div>
-        </div>
-      </div>
-      <p id={`${id}-instructions`} className={styles.label()}>
-        Scale and pad the image inside the frame. It stays fully visible and is not cropped.
-      </p>
-      <div className={styles.row()}>
-        <label htmlFor={`${id}-padding`}>Padding</label>
-        <input
-          id={`${id}-padding`}
-          className={styles.slider()}
-          type="range"
-          min={0}
-          max={CONTENT_MEDIA_EMBLEM_PADDING_MAX}
-          step={0.01}
-          value={layout.padding}
-          onChange={(event) =>
-            onChange({ ...layout, padding: Number(event.target.value), offset: layout.offset })
-          }
+        <img
+          src={src}
+          alt=""
+          draggable={false}
+          className={styles.image()}
+          style={{
+            left: `${(metrics.left / canvasSize) * 100}%`,
+            top: `${(metrics.top / canvasSize) * 100}%`,
+            width: `${(metrics.renderedWidth / canvasSize) * 100}%`,
+            height: `${(metrics.renderedHeight / canvasSize) * 100}%`,
+          }}
         />
-        <label htmlFor={`${id}-scale`}>Scale</label>
+      </div>
+      <p id={`${id}-instructions`} className="sr-only">
+        Drag to reposition the emblem within the frame.
+      </p>
+      <div className={styles.controls()}>
+        <label htmlFor={`${id}-size`}>Artwork size</label>
         <input
-          id={`${id}-scale`}
+          id={`${id}-size`}
           className={styles.slider()}
           type="range"
           min={CONTENT_MEDIA_EMBLEM_SCALE_MIN}
           max={1}
           step={0.01}
           value={layout.scale}
-          onChange={(event) =>
-            onChange({ ...layout, scale: Number(event.target.value), offset: layout.offset })
-          }
+          onChange={(event) => emitLayout({ ...layout, scale: Number(event.target.value) })}
         />
+        <output htmlFor={`${id}-size`}>{Math.round(layout.scale * 100)}%</output>
+      </div>
+      <div className={styles.actions()}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isEmblemCentered(canonicalLayout)}
+          onClick={() => emitLayout({ mode: 'contain', scale: layout.scale })}
+        >
+          Center
+        </Button>
+        <span aria-hidden="true" className={styles.actionSeparator()}>
+          ·
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isDefaultEmblemPresentation(canonicalLayout)}
+          onClick={() => onChange(defaultEmblemPresentation())}
+        >
+          Reset
+        </Button>
       </div>
     </div>
   )

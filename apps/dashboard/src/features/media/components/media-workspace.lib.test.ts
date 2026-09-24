@@ -16,6 +16,19 @@ describe('resolveMediaWorkspaceCopy', () => {
     })
   })
 
+  it('describes emblem editing without padding controls', () => {
+    expect(
+      resolveMediaWorkspaceCopy({
+        presentation: 'emblem',
+        assignedRoles: ['emblem'],
+        hasSelection: true,
+      }),
+    ).toEqual({
+      heading: 'Edit emblem',
+      description: "Adjust how the emblem appears inside the frame. It won't be cropped.",
+    })
+  })
+
   it('describes uploaded artwork without an assigned role', () => {
     expect(
       resolveMediaWorkspaceCopy({

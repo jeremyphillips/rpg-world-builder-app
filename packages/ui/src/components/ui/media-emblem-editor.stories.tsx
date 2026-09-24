@@ -14,6 +14,7 @@ const meta = {
   render: (args) => <Example {...args} />,
   args: {
     src: 'https://picsum.photos/seed/emblem/512/512',
+    source: { width: 512, height: 512 },
     layout: defaultEmblemPresentation(),
     onChange: () => {},
   },
@@ -23,3 +24,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
+
+export const Landscape: Story = {
+  args: {
+    src: 'https://picsum.photos/seed/emblem-landscape/640/320',
+    source: { width: 640, height: 320 },
+  },
+}

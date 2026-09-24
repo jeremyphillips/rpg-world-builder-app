@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
 import { normalizedCropSchema, normalizedFocalPointSchema } from './geometry'
-import { CONTENT_MEDIA_EMBLEM_PADDING_MAX, CONTENT_MEDIA_EMBLEM_SCALE_MIN } from './limits'
+import { CONTENT_MEDIA_EMBLEM_SCALE_MIN } from './limits'
 
 const emblemOffsetSchema = z
   .object({
-    x: z.number(),
-    y: z.number(),
+    x: z.number().min(-1).max(1),
+    y: z.number().min(-1).max(1),
   })
   .strict()
 
@@ -24,7 +24,6 @@ export const containPresentationSchema = z
   .object({
     mode: z.literal('contain'),
     scale: z.number().min(CONTENT_MEDIA_EMBLEM_SCALE_MIN).max(1),
-    padding: z.number().min(0).max(CONTENT_MEDIA_EMBLEM_PADDING_MAX),
     offset: emblemOffsetSchema.optional(),
   })
   .strict()

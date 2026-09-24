@@ -70,7 +70,7 @@ export const MEDIA_RENDITION_PRESETS = Object.keys(MEDIA_RENDITION_PRESET_ENTRIE
 export const mediaRenditionPresetSchema = z.enum(MEDIA_RENDITION_PRESETS)
 
 /** Bump when derivative generation logic changes to invalidate on-disk caches. */
-export const MEDIA_RENDITION_RENDERER_VERSION = 3
+export const MEDIA_RENDITION_RENDERER_VERSION = 4
 
 export type MediaRenditionPresetConfig =
   (typeof MEDIA_RENDITION_PRESET_ENTRIES)[MediaRenditionPreset]
@@ -86,7 +86,7 @@ export function buildMediaRenditionCacheKey(input: {
   preset: MediaRenditionPreset
   crop: NormalizedCrop
   outputFormat: 'webp' | 'jpeg' | 'png'
-  emblemLayout?: Pick<ContainPresentation, 'scale' | 'padding' | 'offset'>
+  emblemLayout?: Pick<ContainPresentation, 'scale' | 'offset'>
 }): string {
   const cropKey = [
     input.crop.x.toFixed(6),
@@ -98,7 +98,6 @@ export function buildMediaRenditionCacheKey(input: {
   const emblemKey = input.emblemLayout
     ? [
         input.emblemLayout.scale.toFixed(4),
-        input.emblemLayout.padding.toFixed(4),
         input.emblemLayout.offset?.x.toFixed(4) ?? '0',
         input.emblemLayout.offset?.y.toFixed(4) ?? '0',
       ].join('_')

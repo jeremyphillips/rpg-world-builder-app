@@ -51,8 +51,5 @@ export const CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX = 256
 /** Minimum decoded source edge for Emblem eligibility in oriented pixels. */
 export const CONTENT_MEDIA_EMBLEM_MIN_EDGE_PX = 128
 
-/** Emblem contain layout: per-side padding as a fraction of the frame edge (0–0.2). */
-export const CONTENT_MEDIA_EMBLEM_PADDING_MAX = 0.2
-
 /** Emblem contain layout: minimum scale multiplier (0.25–1). */
 export const CONTENT_MEDIA_EMBLEM_SCALE_MIN = 0.25
