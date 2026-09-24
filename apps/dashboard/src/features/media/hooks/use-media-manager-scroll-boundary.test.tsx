@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { useMediaManagerScrollBoundary } from './use-media-manager-scroll-boundary'
 
 describe('useMediaManagerScrollBoundary', () => {
-  it('shows the header shadow when either column scrolls away from the top', () => {
+  it('shows the header shadow when any column scrolls away from the top', () => {
     const { result } = renderHook(() => useMediaManagerScrollBoundary())
 
     expect(result.current.headerScrolled).toBe(false)
@@ -18,7 +18,7 @@ describe('useMediaManagerScrollBoundary', () => {
     expect(result.current.headerScrolled).toBe(true)
 
     act(() => {
-      result.current.onWorkspaceBoundaryChange({
+      result.current.onPreviewBoundaryChange({
         showTopShadow: false,
         showBottomShadow: true,
       })

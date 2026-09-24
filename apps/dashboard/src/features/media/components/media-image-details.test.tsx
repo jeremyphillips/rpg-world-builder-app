@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { getContentMediaPolicy } from '@rpg/contracts'
 import { MediaImageDetails } from './media-image-details'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
@@ -20,4 +20,25 @@ it('explains why a small image cannot have Portrait or Primary', () => {
   expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeDisabled()
   expect(screen.getByText(/Portrait needs a 1:1 crop at least/)).toHaveTextContent('64 × 64')
   expect(screen.getByText(/Primary image needs a 4:3 crop at least/)).toHaveTextContent('64 × 64')
+})
+
+it('keeps accessibility fields inside a collapsed disclosure by default', () => {
+  render(
+    <MediaImageDetails
+      image={mediaFixture.images[0]!}
+      asset={mediaFixtureAssets[0]!}
+      media={mediaFixture}
+      policy={getContentMediaPolicy('character')}
+      onAlt={vi.fn()}
+      onRole={vi.fn()}
+      onRemove={vi.fn()}
+    />,
+  )
+  expect(screen.getByRole('button', { name: 'Accessibility & details' })).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  )
+  expect(screen.queryByLabelText('Image description')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Accessibility & details' }))
+  expect(screen.getByLabelText('Image description')).toBeInTheDocument()
 })

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { CONTENT_MEDIA_DOMAINS } from '@rpg/contracts'
+import { CONTENT_MEDIA_DOMAINS, focalPointFromCropCenter, resetPrimaryCrop } from '@rpg/contracts'
 import { createUploadSession } from '../api/media-api'
 import { MediaManager, type MediaManagerProps } from './media-manager'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
@@ -54,6 +54,7 @@ function mount(overrides: Partial<MediaManagerProps> = {}) {
   )
   return { ...view, props }
 }
+
 describe('MediaManager', () => {
   it.each(CONTENT_MEDIA_DOMAINS)('renders policy controls for %s', (domain) => {
     mount({ domain, value: { ...mediaFixture, roles: { primary: { imageId: 'image-0' } } } })
@@ -67,9 +68,11 @@ describe('MediaManager', () => {
     )
     expect(screen.queryByRole('button', { name: 'Set as primary' })).not.toBeInTheDocument()
   })
+
   it('applies alt edits and preserves initial revision without mutating the parent', async () => {
     const { props } = mount()
-    fireEvent.change(screen.getByLabelText('Alt text'), {
+    fireEvent.click(screen.getByRole('button', { name: 'Accessibility & details' }))
+    fireEvent.change(screen.getByLabelText('Image description'), {
       target: { value: 'A warrior wearing a blue cloak' },
     })
     await waitFor(() => expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled())
@@ -87,7 +90,8 @@ describe('MediaManager', () => {
     )
     expect(props.value).toEqual(mediaFixture)
   })
-  it('confirms assigned removal, clears both roles, and supports discarding the draft', async () => {
+
+  it('removes an image immediately with an undo toast and supports discarding the draft', async () => {
     const { props } = mount({
       value: {
         ...mediaFixture,
@@ -95,15 +99,62 @@ describe('MediaManager', () => {
       },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Remove image' }))
-    expect(screen.getByRole('alertdialog')).toHaveTextContent('portrait')
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    expect(screen.getByText('Image removed')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Undo' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(screen.getByRole('alertdialog')).toHaveTextContent('Discard image changes?')
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(screen.getByRole('button', { name: 'Keep editing' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
     expect(props.onOpenChange).toHaveBeenCalledWith(false)
     expect(props.onSave).not.toHaveBeenCalled()
   })
+
+  it('restores a removed image, index, and roles from undo', async () => {
+    mount({
+      value: {
+        ...mediaFixture,
+        roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+      },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Remove image' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Seraphina Vale — portrait.jpg, Portrait, Primary/ }),
+      ).toHaveAttribute('aria-pressed', 'true')
+    })
+    expect(screen.getByRole('checkbox', { name: 'Portrait' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeChecked()
+  })
+
+  it('confirms customized role removal with role-specific copy', () => {
+    const source = {
+      width: mediaFixtureAssets[0]!.orientedWidth,
+      height: mediaFixtureAssets[0]!.orientedHeight,
+    }
+    const crop = resetPrimaryCrop(source)
+    const customizedCrop = { ...crop, x: crop.x + 0.05 }
+    mount({
+      value: {
+        ...mediaFixture,
+        roles: {
+          primary: {
+            imageId: 'image-0',
+            presentation: {
+              mode: 'crop',
+              crop: customizedCrop,
+              focalPoint: focalPointFromCropCenter(customizedCrop),
+            },
+          },
+        },
+      },
+    })
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Primary image' }))
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('Remove Primary image role?')
+    expect(screen.getByRole('button', { name: 'Remove role' })).toBeInTheDocument()
+  })
+
   it('shows a body drop overlay for external file drags but not text drags', () => {
     mount({ value: { revision: 0, images: [], roles: {} } })
     const host = screen.getByLabelText('Images').parentElement!.parentElement!
@@ -178,18 +229,28 @@ describe('MediaManager', () => {
     expect(screen.getByText('Changes are saved with this class.')).toBeInTheDocument()
   })
 
-  it('retains draft on failed detail save', async () => {
+  it('retains draft on failed detail save and surfaces a persistent toast', async () => {
     const { props } = mount({
       mode: 'detail',
       onSave: vi.fn().mockRejectedValue(new Error('Revision conflict')),
     })
-    fireEvent.change(screen.getByLabelText('Alt text'), {
+    fireEvent.click(screen.getByRole('button', { name: 'Accessibility & details' }))
+    fireEvent.change(screen.getByLabelText('Image description'), {
       target: { value: 'Unsaved description' },
     })
     await waitFor(() => expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled())
     fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
-    await screen.findByText(/Revision conflict/)
-    expect(screen.getByLabelText('Alt text')).toHaveValue('Unsaved description')
+    await screen.findByText('Revision conflict')
+    expect(screen.getByLabelText('Image description')).toHaveValue('Unsaved description')
     expect(props.onOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('orders the details column as roles, file metadata, accessibility disclosure, and remove', () => {
+    mount()
+    const details = screen.getByLabelText('Image details')
+    const headings = Array.from(details.querySelectorAll('h4')).map((node) => node.textContent)
+    expect(headings).toEqual(['Assign roles', 'File'])
+    expect(screen.getByRole('button', { name: 'Accessibility & details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove image' })).toBeInTheDocument()
   })
 })

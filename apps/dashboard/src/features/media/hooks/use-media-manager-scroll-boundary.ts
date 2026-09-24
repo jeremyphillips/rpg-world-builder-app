@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { ScrollBoundaryState } from '@rpg/ui'
 
-type MediaManagerColumn = 'gallery' | 'workspace'
+type MediaManagerColumn = 'gallery' | 'preview' | 'details'
 
 function boundaryStateChanged(
   previous: ScrollBoundaryState | undefined,
@@ -38,9 +38,16 @@ export function useMediaManagerScrollBoundary() {
     [updateColumnBoundary],
   )
 
-  const onWorkspaceBoundaryChange = useCallback(
+  const onPreviewBoundaryChange = useCallback(
     (state: ScrollBoundaryState) => {
-      updateColumnBoundary('workspace', state)
+      updateColumnBoundary('preview', state)
+    },
+    [updateColumnBoundary],
+  )
+
+  const onDetailsBoundaryChange = useCallback(
+    (state: ScrollBoundaryState) => {
+      updateColumnBoundary('details', state)
     },
     [updateColumnBoundary],
   )
@@ -50,5 +57,10 @@ export function useMediaManagerScrollBoundary() {
     [boundaryByColumn],
   )
 
-  return { headerScrolled, onGalleryBoundaryChange, onWorkspaceBoundaryChange }
+  return {
+    headerScrolled,
+    onGalleryBoundaryChange,
+    onPreviewBoundaryChange,
+    onDetailsBoundaryChange,
+  }
 }

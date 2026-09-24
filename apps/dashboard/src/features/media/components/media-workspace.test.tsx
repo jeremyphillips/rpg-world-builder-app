@@ -26,8 +26,8 @@ beforeEach(() => {
   })
 })
 
-it('shows a neutral preview for a selected image with no assigned roles', () => {
-  render(
+function mount(overrides: Partial<Parameters<typeof MediaManager>[0]> = {}) {
+  return render(
     <QueryClientProvider client={new QueryClient()}>
       <MediaManager
         open
@@ -43,60 +43,68 @@ it('shows a neutral preview for a selected image with no assigned roles', () => 
         initialSelectedImageId="image-0"
         mode="form"
         onSave={vi.fn()}
+        {...overrides}
       />
     </QueryClientProvider>,
   )
+}
+
+it('shows a neutral preview for a selected image with no assigned roles', () => {
+  mount()
   expect(screen.getByRole('heading', { name: 'Image preview' })).toBeInTheDocument()
-  expect(screen.getByText('Assign a role to control how this image is used.')).toBeInTheDocument()
+  expect(
+    screen.getByText('Assign a role to control how this image is used on this character.'),
+  ).toBeInTheDocument()
   expect(screen.queryByLabelText('Zoom')).not.toBeInTheDocument()
   expect(screen.queryByText(/Seraphina Vale/)).not.toBeInTheDocument()
 })
 
 it('renders a presentation switch only when multiple roles are assigned', () => {
-  render(
-    <QueryClientProvider client={new QueryClient()}>
-      <MediaManager
-        open
-        onOpenChange={vi.fn()}
-        domain="character"
-        value={{
-          ...mediaFixture,
-          roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
-        }}
-        scope={{ kind: 'user-pc', userId: 'demo' }}
-        initialAssets={mediaFixtureAssets}
-        initialSelectedImageId="image-0"
-        mode="form"
-        onSave={vi.fn()}
-      />
-    </QueryClientProvider>,
-  )
+  mount({
+    value: {
+      ...mediaFixture,
+      roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+    },
+  })
   expect(screen.getByRole('group', { name: 'Presentation' })).toBeInTheDocument()
   expect(screen.getByRole('checkbox', { name: 'Portrait' })).toBeInTheDocument()
 })
 
+it('hides the presentation switch when only one role is assigned', () => {
+  mount({
+    value: {
+      ...mediaFixture,
+      roles: { primary: { imageId: 'image-0' } },
+    },
+  })
+  expect(screen.queryByRole('group', { name: 'Presentation' })).not.toBeInTheDocument()
+})
+
 it('switches presentations on a shared source without changing role assignments', () => {
-  render(
-    <QueryClientProvider client={new QueryClient()}>
-      <MediaManager
-        open
-        onOpenChange={vi.fn()}
-        domain="character"
-        value={{
-          ...mediaFixture,
-          roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
-        }}
-        scope={{ kind: 'user-pc', userId: 'demo' }}
-        initialAssets={mediaFixtureAssets}
-        mode="form"
-        onSave={vi.fn()}
-      />
-    </QueryClientProvider>,
-  )
+  mount({
+    value: {
+      ...mediaFixture,
+      roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+    },
+  })
   expect(screen.getByLabelText('Zoom')).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Primary' }))
   expect(screen.getByRole('group', { name: 'Primary crop position' })).toBeInTheDocument()
   expect(screen.getByRole('checkbox', { name: 'Portrait' })).toBeChecked()
   expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeChecked()
   expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
+})
+
+it('returns to the neutral preview when the active role is unchecked', () => {
+  mount({
+    value: {
+      ...mediaFixture,
+      roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+    },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Primary' }))
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Primary image' }))
+  expect(screen.getByRole('heading', { name: 'Portrait crop' })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Portrait' }))
+  expect(screen.getByRole('heading', { name: 'Image preview' })).toBeInTheDocument()
 })

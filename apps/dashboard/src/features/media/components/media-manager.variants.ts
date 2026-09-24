@@ -22,7 +22,7 @@ export const mediaManagerStyles = {
   columnScroll: cva('-mt-5 min-h-0 flex-1'),
   columnScrollViewport: cva('flex min-h-full flex-col !pb-0 pt-10'),
   layout: cva(
-    'grid h-full min-h-0 min-w-0 flex-1 gap-6 md:min-h-[24rem] md:grid-cols-[minmax(0,0.35fr)_minmax(0,0.65fr)]',
+    'grid h-full min-h-0 min-w-0 flex-1 items-start gap-6 md:min-h-[24rem] md:grid-cols-[minmax(0,0.28fr)_minmax(0,0.4fr)_minmax(0,0.32fr)]',
   ),
   gallery: cva('flex h-full min-h-0 min-w-0 flex-col md:border-r md:border-border md:pr-6'),
   galleryEmpty: cva(
@@ -31,23 +31,20 @@ export const mediaManagerStyles = {
   row: cva('flex shrink-0 flex-wrap items-center justify-between gap-2'),
   grid: cva('flex gap-3 pb-2 md:grid md:grid-cols-2'),
   tile: cva(
-    'flex w-28 shrink-0 flex-col overflow-hidden rounded-md border-2 bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:w-full',
+    'relative flex w-28 shrink-0 flex-col overflow-hidden rounded-md border-2 bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:w-full',
     { variants: { selected: { true: 'border-primary', false: 'border-transparent' } } },
   ),
-  tileThumb: cva('aspect-square overflow-hidden'),
+  tileThumb: cva('relative aspect-square overflow-hidden'),
+  tileBadges: cva('absolute inset-x-1 bottom-1 flex flex-wrap gap-1'),
   thumbnail: cva('size-full object-cover'),
-  tileFooter: cva('px-2 py-1 text-xs text-muted-foreground'),
+  previewColumn: cva('flex h-full min-h-0 min-w-0 flex-col md:border-r md:border-border md:pr-6'),
+  detailsColumn: cva('flex h-full min-h-0 min-w-0 flex-col'),
   workspace: cva('@container/media-workspace flex h-full min-h-0 min-w-0 flex-col'),
   workspaceHeader: cva('mb-4 shrink-0 space-y-1'),
   workspaceHeaderRow: cva('flex items-center justify-between gap-2'),
-  workspaceHeaderPortrait: cva('mb-4 shrink-0 space-y-1'),
-  workspacePortraitHeading: cva('text-lg font-semibold'),
   workspaceContent: cva('min-h-0 flex-1'),
   workspaceOnboarding: cva('mt-4 shrink-0'),
-  editor: cva(
-    'grid min-h-0 min-w-0 gap-6 @min-[32rem]/media-workspace:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]',
-  ),
-  editorCrop: cva('min-w-0 max-w-full'),
+  editorCrop: cva('min-w-0 max-w-full space-y-2'),
   details: cva('min-w-0 space-y-4'),
   detailsPanel: cva(
     cn(
@@ -72,5 +69,4 @@ export const mediaManagerStyles = {
   hidden: cva('sr-only'),
   roles: cva('space-y-3'),
   error: cva('text-sm text-destructive'),
-  status: cva('shrink-0 space-y-1 pt-4'),
 }

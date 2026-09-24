@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import {
   resolveMediaManagerBodyDropOverlay,
   resolveMediaManagerFooterHint,
-  shouldShowMediaManagerStatus,
 } from './media-manager-session.lib'
 
 describe('media-manager-session.lib', () => {
@@ -19,24 +18,6 @@ describe('media-manager-session.lib', () => {
     expect(resolveMediaManagerBodyDropOverlay(undefined, { active: false, invalid: false })).toBe(
       undefined,
     )
-  })
-
-  it('shows status only when there is feedback to surface', () => {
-    expect(
-      shouldShowMediaManagerStatus({
-        hasActiveUploads: false,
-        hasFailedUploads: false,
-        validationOk: true,
-      }),
-    ).toBe(false)
-    expect(
-      shouldShowMediaManagerStatus({
-        statusNotice: { kind: 'text', text: 'Upload complete.' },
-        hasActiveUploads: false,
-        hasFailedUploads: false,
-        validationOk: true,
-      }),
-    ).toBe(true)
   })
 
   it('resolves footer hint copy by mode', () => {

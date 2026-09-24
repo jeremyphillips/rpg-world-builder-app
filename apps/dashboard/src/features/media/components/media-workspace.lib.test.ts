@@ -9,6 +9,7 @@ describe('resolveMediaWorkspaceCopy', () => {
         presentation: 'primary',
         assignedRoles: [],
         hasSelection: false,
+        label: 'character',
       }),
     ).toEqual({
       heading: 'Image preview',
@@ -22,10 +23,12 @@ describe('resolveMediaWorkspaceCopy', () => {
         presentation: 'emblem',
         assignedRoles: ['emblem'],
         hasSelection: true,
+        label: 'campaign',
       }),
     ).toEqual({
       heading: 'Emblem',
       description: "Adjust how the emblem appears inside its frame. It won't be cropped.",
+      interaction: 'Drag to reposition.',
     })
   })
 
@@ -35,10 +38,11 @@ describe('resolveMediaWorkspaceCopy', () => {
         presentation: 'primary',
         assignedRoles: [],
         hasSelection: true,
+        label: 'character',
       }),
     ).toEqual({
       heading: 'Image preview',
-      description: 'Assign a role to control how this image is used.',
+      description: 'Assign a role to control how this image is used on this character.',
     })
   })
 
@@ -48,10 +52,12 @@ describe('resolveMediaWorkspaceCopy', () => {
         presentation: 'primary',
         assignedRoles: ['primary'],
         hasSelection: true,
+        label: 'class',
       }),
     ).toEqual({
       heading: 'Primary crop',
       description: 'Crop a 4:3 image for representative artwork and detail views.',
+      interaction: 'Drag to reposition. Move the focal point to adjust focus.',
     })
   })
 })

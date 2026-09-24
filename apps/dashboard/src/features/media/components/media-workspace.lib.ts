@@ -4,9 +4,11 @@ export function resolveMediaWorkspaceCopy(input: {
   presentation: MediaRole
   assignedRoles: readonly MediaRole[]
   hasSelection: boolean
+  label: string
 }): {
   heading: string
   description: string
+  interaction?: string
 } {
   if (!input.hasSelection) {
     return {
@@ -18,7 +20,7 @@ export function resolveMediaWorkspaceCopy(input: {
   if (input.assignedRoles.length === 0) {
     return {
       heading: 'Image preview',
-      description: 'Assign a role to control how this image is used.',
+      description: `Assign a role to control how this image is used on this ${input.label}.`,
     }
   }
 
@@ -26,6 +28,7 @@ export function resolveMediaWorkspaceCopy(input: {
   return {
     heading: copy.workspaceHeading,
     description: copy.workspaceDescription,
+    interaction: copy.instructions,
   }
 }
 

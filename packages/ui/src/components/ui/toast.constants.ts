@@ -7,6 +7,7 @@ export const TOAST_DURATION = {
   success: 4000,
   warning: 7000,
   destructive: 8000,
+  undo: 6000,
 } as const
 
 export const TOAST_MAX_VISIBLE = 3

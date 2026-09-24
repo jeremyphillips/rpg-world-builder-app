@@ -51,21 +51,16 @@ function MediaWorkspaceHeader({
   assignedRoles,
   presentation,
   onPresentationChange,
-  isCropEditor,
 }: {
   copy: { heading: string; description: string }
   assignedRoles: readonly MediaRole[]
   presentation: MediaRole
   onPresentationChange: (role: MediaRole) => void
-  isCropEditor: boolean
 }) {
-  const headingClass = isCropEditor ? styles.workspacePortraitHeading() : styles.heading()
-  const headerClass = isCropEditor ? styles.workspaceHeaderPortrait() : styles.workspaceHeader()
-
   return (
-    <div className={headerClass}>
+    <div className={styles.workspaceHeader()}>
       <div className={styles.workspaceHeaderRow()}>
-        <h2 className={headingClass}>{copy.heading}</h2>
+        <h2 className={styles.heading()}>{copy.heading}</h2>
         {assignedRoles.length >= 2 ? (
           <SegmentedControl
             value={presentation}
@@ -94,7 +89,7 @@ export function MediaWorkspace({
   imageUrl?: typeof mediaImageUrl
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }) {
-  const { state, selected, asset, queries, policy, uploads, dispatch } = controller
+  const { state, selected, asset, queries, policy, uploads, dispatch, label } = controller
   const assignedRoles = selected
     ? assignedRolesForImage(state.media, selected.id, policy.allowedRoles)
     : []
@@ -102,16 +97,11 @@ export function MediaWorkspace({
     presentation: state.presentation,
     assignedRoles,
     hasSelection: Boolean(selected),
+    label,
   })
-  const isCropEditor =
-    selected &&
-    assignedRoles.length > 0 &&
-    assignedRoles.includes(state.presentation) &&
-    state.presentation !== 'emblem' &&
-    ['portrait', 'banner', 'primary'].includes(state.presentation)
 
   return (
-    <section className={styles.workspace()} aria-label="Image workspace">
+    <section className={styles.previewColumn()} aria-label="Image preview">
       <DialogPanelScrollRegion
         inset="innerLeading"
         regionClassName={styles.columnScroll()}
@@ -125,7 +115,6 @@ export function MediaWorkspace({
           assignedRoles={assignedRoles}
           presentation={state.presentation}
           onPresentationChange={(role) => dispatch({ type: 'presentation', role })}
-          isCropEditor={Boolean(isCropEditor)}
         />
         <div className={styles.workspaceContent()}>
           {selected && asset ? (
@@ -135,6 +124,7 @@ export function MediaWorkspace({
               image={selected}
               asset={asset}
               assignedRoles={assignedRoles}
+              interaction={copy.interaction}
             />
           ) : selected ? (
             <div className={styles.empty()}>Loading image details…</div>

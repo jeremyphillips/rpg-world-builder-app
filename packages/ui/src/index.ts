@@ -56,6 +56,7 @@ export { Toast, ToastPresentation, type ToastProps } from './components/ui/toast
 export {
   toastVariants,
   toastViewportVariants,
+  toastModalViewportVariants,
   toastTitleVariants,
   toastDescriptionVariants,
   toastActionsVariants,
@@ -66,13 +67,20 @@ export {
 export { ToastViewport, type ToastViewportProps } from './components/ui/toast-viewport.client'
 export { ToastProvider, toast } from './components/ui/toast-provider.client'
 export {
+  ToastScopeProvider,
+  useToastScope,
+  type ToastScopeProviderProps,
+} from './components/ui/toast-scope.client'
+export {
   TOAST_DURATION,
   TOAST_MAX_VISIBLE,
   TOAST_DISMISS_LABEL,
   resolveToastDuration,
+  createToastStore,
   type ToastAction,
   type ToastOptions,
   type ToastRecord,
+  type ToastStore,
   type ToastTone,
 } from './components/ui/toast-manager.client'
 export { RichTextContent, type RichTextContentProps } from './components/ui/rich-text-content'

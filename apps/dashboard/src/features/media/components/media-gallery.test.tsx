@@ -40,7 +40,7 @@ it('calls onAdd from the gallery picker', async () => {
   await user.click(screen.getByRole('button', { name: /\+ add images/i }))
 })
 
-it('moves keyboard selection between images and shows role labels in the tile footer', () => {
+it('moves keyboard selection between images and shows role badges without a footer row', () => {
   const onSelect = vi.fn()
   render(
     <MediaGallery
@@ -62,4 +62,27 @@ it('moves keyboard selection between images and shows role labels in the tile fo
   expect(screen.getByRole('button', { name: /mountain expedition/ })).toHaveFocus()
   expect(screen.queryByText(/✓ Selected/)).not.toBeInTheDocument()
   expect(screen.getByText('Portrait')).toBeInTheDocument()
+  expect(first.textContent).not.toMatch(/Portrait ·/)
+})
+
+it('labels upload queue rows with Waiting, Uploading, or Failed', () => {
+  render(
+    <MediaGallery
+      media={{ revision: 0, images: [], roles: {} }}
+      assets={{}}
+      allowedRoles={['primary']}
+      entries={[
+        { id: 'a', file: new File(['a'], 'queued.png'), status: 'queued' },
+        { id: 'b', file: new File(['b'], 'uploading.png'), status: 'uploading' },
+        { id: 'c', file: new File(['c'], 'failed.png'), status: 'failed', error: 'Network error' },
+      ]}
+      onSelect={vi.fn()}
+      onAdd={vi.fn()}
+      onRetry={vi.fn()}
+      onRemoveUpload={vi.fn()}
+    />,
+  )
+  expect(screen.getByText(/— Waiting/)).toBeInTheDocument()
+  expect(screen.getByText(/— Uploading/)).toBeInTheDocument()
+  expect(screen.getByText(/— Failed/)).toBeInTheDocument()
 })

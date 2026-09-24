@@ -1,5 +1,11 @@
 import { useRef } from 'react'
-import { Button, DialogPanelScrollRegion, FilenamePreview, type ScrollBoundaryState } from '@rpg/ui'
+import {
+  Badge,
+  Button,
+  DialogPanelScrollRegion,
+  FilenamePreview,
+  type ScrollBoundaryState,
+} from '@rpg/ui'
 import { Images } from 'lucide-react'
 import {
   mediaRoleSurfaceCopy,
@@ -8,6 +14,7 @@ import {
   type MediaRole,
 } from '@rpg/contracts'
 import type { UploadEntry } from '../hooks/use-media-uploads'
+import { resolveUploadEntryStatusLabel } from '../hooks/use-media-uploads'
 import { mediaImageUrl } from '../lib/media-display'
 import { MEDIA_IMAGE_ACCEPT } from '../lib/media-upload.lib'
 import { mediaManagerStyles as styles } from './media-manager.variants'
@@ -112,10 +119,22 @@ export function MediaGallery({
                       src={imageUrl(image.assetId, 'gallery-thumbnail')}
                       alt=""
                     />
+                    {roles.length > 0 ? (
+                      <div className={styles.tileBadges()}>
+                        {roles.map((role) => (
+                          <Badge
+                            key={role}
+                            size="sm"
+                            appearance="soft"
+                            tone="neutral"
+                            className="max-w-full truncate"
+                          >
+                            {mediaRoleSurfaceCopy[role].switchLabel}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
-                  {roles.length > 0 ? (
-                    <div className={styles.tileFooter()}>{roleLabels.join(' · ')}</div>
-                  ) : null}
                 </button>
               )
             })}
@@ -129,7 +148,9 @@ export function MediaGallery({
                 density="compact"
                 className="min-w-0 flex-1"
               />
-              <span className="shrink-0 text-muted-foreground">— {entry.status}</span>
+              <span className="shrink-0 text-muted-foreground">
+                — {resolveUploadEntryStatusLabel(entry.status)}
+              </span>
             </p>
             {entry.error && (
               <p role="alert" className={styles.error()}>

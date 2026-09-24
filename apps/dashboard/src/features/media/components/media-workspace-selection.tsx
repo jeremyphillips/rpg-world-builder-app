@@ -17,7 +17,6 @@ import {
   resolveWorkspaceEditorCrop,
   useCorrectStalePrimaryCrop,
 } from './media-workspace-editor.lib'
-import { MediaImageDetails } from './media-image-details'
 import { mediaManagerStyles as styles } from './media-manager.variants'
 
 function MediaWorkspacePreviewFigure({
@@ -93,6 +92,7 @@ function MediaWorkspaceEditor({
   asset,
   activeRole,
   isActiveForSelection,
+  interaction,
 }: {
   controller: MediaManagerController
   imageUrl: typeof mediaImageUrl
@@ -100,6 +100,7 @@ function MediaWorkspaceEditor({
   asset: MediaAsset
   activeRole: MediaRole
   isActiveForSelection: boolean
+  interaction?: string
 }) {
   const { dispatch } = controller
   const source = { width: asset.orientedWidth, height: asset.orientedHeight }
@@ -123,24 +124,30 @@ function MediaWorkspaceEditor({
 
   if (activeRole === 'emblem') {
     return (
-      <MediaEmblemEditor
-        src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
-        source={source}
-        layout={containPresentation}
-        instructions={mediaRoleSurfaceCopy.emblem.instructions}
-        onChange={(layout) => dispatch({ type: 'contain', layout, source })}
-      />
+      <div className={styles.editorCrop()}>
+        <MediaEmblemEditor
+          src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
+          source={source}
+          layout={containPresentation}
+          instructions={mediaRoleSurfaceCopy.emblem.instructions}
+          onChange={(layout) => dispatch({ type: 'contain', layout, source })}
+        />
+        {interaction ? <p className={styles.muted()}>{interaction}</p> : null}
+      </div>
     )
   }
 
   return (
-    <MediaWorkspaceCropEditor
-      controller={controller}
-      imageUrl={imageUrl}
-      asset={asset}
-      activeRole={activeRole}
-      cropPresentation={cropPresentation}
-    />
+    <div className={styles.editorCrop()}>
+      <MediaWorkspaceCropEditor
+        controller={controller}
+        imageUrl={imageUrl}
+        asset={asset}
+        activeRole={activeRole}
+        cropPresentation={cropPresentation}
+      />
+      {interaction ? <p className={styles.muted()}>{interaction}</p> : null}
+    </div>
   )
 }
 
@@ -150,58 +157,33 @@ export function MediaWorkspaceSelection({
   image: selected,
   asset,
   assignedRoles,
+  interaction,
 }: {
   controller: MediaManagerController
   imageUrl?: typeof mediaImageUrl
   image: ContentMedia['images'][number]
   asset: MediaAsset
   assignedRoles: MediaRole[]
+  interaction?: string
 }) {
-  const { state, policy, onAlt, changeRole, remove } = controller
+  const { state } = controller
   const activeRole = state.presentation
   const assignment = state.media.roles[activeRole]
   const isActiveForSelection = assignment?.imageId === selected.id
 
   if (assignedRoles.length === 0) {
-    return (
-      <div className={styles.editor()}>
-        <div className={styles.editorCrop()}>
-          <MediaWorkspacePreviewFigure imageUrl={imageUrl} selected={selected} asset={asset} />
-        </div>
-        <MediaImageDetails
-          image={selected}
-          asset={asset}
-          media={state.media}
-          policy={policy}
-          onAlt={onAlt}
-          onRole={changeRole}
-          onRemove={remove}
-        />
-      </div>
-    )
+    return <MediaWorkspacePreviewFigure imageUrl={imageUrl} selected={selected} asset={asset} />
   }
 
   return (
-    <div className={styles.editor()}>
-      <div className={styles.editorCrop()}>
-        <MediaWorkspaceEditor
-          controller={controller}
-          imageUrl={imageUrl}
-          selected={selected}
-          asset={asset}
-          activeRole={activeRole}
-          isActiveForSelection={isActiveForSelection}
-        />
-      </div>
-      <MediaImageDetails
-        image={selected}
-        asset={asset}
-        media={state.media}
-        policy={policy}
-        onAlt={onAlt}
-        onRole={changeRole}
-        onRemove={remove}
-      />
-    </div>
+    <MediaWorkspaceEditor
+      controller={controller}
+      imageUrl={imageUrl}
+      selected={selected}
+      asset={asset}
+      activeRole={activeRole}
+      isActiveForSelection={isActiveForSelection}
+      interaction={interaction}
+    />
   )
 }

@@ -17,14 +17,28 @@ export type UploadEntry = {
   asset?: MediaAsset
   error?: string
 }
+
+export function resolveUploadEntryStatusLabel(status: UploadEntry['status']): string {
+  switch (status) {
+    case 'queued':
+      return 'Waiting'
+    case 'uploading':
+      return 'Uploading'
+    case 'failed':
+      return 'Failed'
+    default:
+      return status
+  }
+}
+
 export function useMediaUploads(
   scope: MediaScope,
   count: number,
   onAsset: (asset: MediaAsset, id: string) => void,
   maxItems = CONTENT_MEDIA_MAX_ATTACHMENTS,
+  onUploadLimit?: (remaining: number) => void,
 ) {
   const [entries, setEntries] = useState<UploadEntry[]>([])
-  const [notice, setNotice] = useState('')
   const [maxUploadBytes, setMaxUploadBytes] = useState<number | undefined>(undefined)
   const queue = useRef<UploadEntry[]>([])
   const active = useRef(new Map<string, AbortController>())
@@ -72,7 +86,6 @@ export function useMediaUploads(
   function publish() {
     if (alive.current) setEntries([...queue.current])
   }
-  // Publish successes in chooser order, even when network responses arrive out of order.
   function flushCompleted() {
     for (const entry of [...queue.current]) {
       if (entry.status === 'queued' || entry.status === 'uploading') break
@@ -114,8 +127,7 @@ export function useMediaUploads(
   }
   function add(files: File[]) {
     const remaining = Math.max(0, maxItems - count - queue.current.length)
-    if (files.length > remaining)
-      setNotice(`Only ${remaining} more images can be added (limit ${maxItems}).`)
+    if (files.length > remaining && remaining >= 0) onUploadLimit?.(remaining)
     for (const file of files.slice(0, remaining))
       queue.current.push({ id: crypto.randomUUID(), file, status: 'queued' })
     pump()
@@ -134,8 +146,5 @@ export function useMediaUploads(
       pump()
     }
   }
-  function notify(message: string) {
-    setNotice(message)
-  }
-  return { entries, notice, maxUploadBytes, add, remove, retry, notify }
+  return { entries, maxUploadBytes, add, remove, retry }
 }

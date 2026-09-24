@@ -5,6 +5,7 @@ import type { UploadEntry } from '../hooks/use-media-uploads'
 import type { mediaImageUrl } from '../lib/media-display'
 import { MediaManagerBodyDropOverlay } from './media-manager-body-drop-overlay'
 import { MediaGallery } from './media-gallery'
+import { MediaImageDetails } from './media-image-details'
 import { MediaWorkspace } from './media-workspace'
 import type { MediaManagerBodyDropOverlayState } from './media-manager-session.lib'
 import { mediaManagerStyles as styles } from './media-manager.variants'
@@ -21,7 +22,8 @@ export function MediaManagerBody({
   saving,
   onSelect,
   onGalleryBoundaryChange,
-  onWorkspaceBoundaryChange,
+  onPreviewBoundaryChange,
+  onDetailsBoundaryChange,
 }: {
   bodyDrop: UseMediaManagerBodyDropResult
   bodyDropOverlay?: MediaManagerBodyDropOverlayState
@@ -34,8 +36,11 @@ export function MediaManagerBody({
   saving: boolean
   onSelect: (id: string) => void
   onGalleryBoundaryChange: Parameters<typeof MediaGallery>[0]['onScrollBoundaryChange']
-  onWorkspaceBoundaryChange: Parameters<typeof MediaWorkspace>[0]['onScrollBoundaryChange']
+  onPreviewBoundaryChange: Parameters<typeof MediaWorkspace>[0]['onScrollBoundaryChange']
+  onDetailsBoundaryChange: Parameters<typeof MediaImageDetails>[0]['onScrollBoundaryChange']
 }) {
+  const { selected, asset, policy, onAlt, changeRole, remove } = controller
+
   return (
     <div
       className={styles.bodyDropHost()}
@@ -61,8 +66,22 @@ export function MediaManagerBody({
         <MediaWorkspace
           controller={controller}
           imageUrl={imageUrl}
-          onScrollBoundaryChange={onWorkspaceBoundaryChange}
+          onScrollBoundaryChange={onPreviewBoundaryChange}
         />
+        {selected && asset ? (
+          <MediaImageDetails
+            image={selected}
+            asset={asset}
+            media={media}
+            policy={policy}
+            onAlt={onAlt}
+            onRole={changeRole}
+            onRemove={remove}
+            onScrollBoundaryChange={onDetailsBoundaryChange}
+          />
+        ) : (
+          <div className={styles.detailsColumn()} aria-hidden="true" />
+        )}
       </fieldset>
       {bodyDropOverlay ? (
         <MediaManagerBodyDropOverlay invalid={bodyDropOverlay === 'invalid'} />

@@ -14,14 +14,11 @@ import {
   asCropPresentation,
 } from '@rpg/contracts'
 
-import { textMediaStatusNotice, type MediaStatusNotice } from './media-notice.lib'
-
 export type MediaSession = {
   initial: ContentMedia
   media: ContentMedia
   selectedId?: string
   presentation: MediaRole
-  notice: MediaStatusNotice | null
 }
 
 export type MediaAction =
@@ -29,6 +26,14 @@ export type MediaAction =
   | { type: 'presentation'; role: MediaRole }
   | { type: 'add'; id: string; asset: MediaAsset }
   | { type: 'remove'; id: string; allowedRoles: readonly MediaRole[] }
+  | {
+      type: 'restoreRemoved'
+      image: ContentMedia['images'][number]
+      index: number
+      roles: Partial<Record<MediaRole, NonNullable<ContentMedia['roles'][MediaRole]>>>
+      restoreSelection: boolean
+      allowedRoles: readonly MediaRole[]
+    }
   | { type: 'alt'; id: string; alt: string }
   | {
       type: 'role'
@@ -77,12 +82,16 @@ export function createMediaSession(
     media: structuredClone(media),
     selectedId,
     presentation: resolvePresentationForImage(media, selectedId, allowedRoles),
-    notice: null,
   }
 }
 
 export function isMediaSessionDirty(state: MediaSession): boolean {
   return JSON.stringify(state.initial) !== JSON.stringify(state.media)
+}
+
+export function hasNewMediaUploads(state: MediaSession): boolean {
+  const initialIds = new Set(state.initial.images.map((image) => image.id))
+  return state.media.images.some((image) => !initialIds.has(image.id))
 }
 
 export function mediaSessionReducer(state: MediaSession, action: MediaAction): MediaSession {
@@ -98,6 +107,9 @@ export function mediaSessionReducer(state: MediaSession, action: MediaAction): M
       break
     case 'remove':
       removeImage(next, action.id, action.allowedRoles)
+      break
+    case 'restoreRemoved':
+      restoreRemovedImage(next, action)
       break
     case 'alt': {
       const image = media.images.find((image) => image.id === action.id)
@@ -129,9 +141,24 @@ function removeImage(next: MediaSession, id: string, allowedRoles: readonly Medi
     next.selectedId = media.images[Math.min(index, media.images.length - 1)]?.id
   }
   next.presentation = resolvePresentationForImage(media, next.selectedId, allowedRoles)
-  next.notice = textMediaStatusNotice(
-    'Image removed from the draft. No other image was assigned automatically.',
-  )
+}
+
+function restoreRemovedImage(
+  next: MediaSession,
+  action: Extract<MediaAction, { type: 'restoreRemoved' }>,
+) {
+  const { media } = next
+  const clampedIndex = Math.max(0, Math.min(action.index, media.images.length))
+  media.images.splice(clampedIndex, 0, structuredClone(action.image))
+  for (const [role, assignment] of Object.entries(action.roles) as Array<
+    [MediaRole, NonNullable<ContentMedia['roles'][MediaRole]>]
+  >) {
+    media.roles[role] = structuredClone(assignment)
+  }
+  if (action.restoreSelection) {
+    next.selectedId = action.image.id
+    next.presentation = resolvePresentationForImage(media, action.image.id, action.allowedRoles)
+  }
 }
 
 function assignRole(next: MediaSession, action: Extract<MediaAction, { type: 'role' }>) {
@@ -167,7 +194,6 @@ function selectImage(
 
 function addImage(next: MediaSession, action: Extract<MediaAction, { type: 'add' }>) {
   if (next.media.images.some((image) => image.assetId === action.asset.id)) {
-    next.notice = textMediaStatusNotice('This image is already in the collection.')
     return
   }
   next.media.images.push({ id: action.id, assetId: action.asset.id })
@@ -200,4 +226,11 @@ export function assignedRolesForImage(
   allowedRoles: readonly MediaRole[],
 ): MediaRole[] {
   return rolesForImage(media, imageId, allowedRoles)
+}
+
+export function resolvePostRemovalSelection(
+  images: ContentMedia['images'],
+  removedIndex: number,
+): string | undefined {
+  return images[Math.min(removedIndex, images.length - 1)]?.id
 }
