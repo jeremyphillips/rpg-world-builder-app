@@ -59,6 +59,10 @@ function minEdgePxForFrame(frame: MediaCropEditorFrame): number {
   return CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX
 }
 
+function viewportAspectForFrame(frame: MediaCropEditorFrame): number {
+  return frame === 'banner' ? 3 : 1
+}
+
 /** Controlled normalized crop editor; original bytes and persistence remain caller-owned. */
 // fallow-ignore-next-line complexity
 export function MediaCropEditor({
@@ -114,12 +118,18 @@ export function MediaCropEditor({
     onChange(next)
   }
 
-  const imageStyle = (insets: FrameLayout) => ({
-    width: `${(100 * insets.scaleX) / crop.width}%`,
-    height: `${(100 * insets.scaleY) / crop.height}%`,
-    left: `${insets.offsetX - (100 * insets.scaleX * crop.x) / crop.width}%`,
-    top: `${insets.offsetY - (100 * insets.scaleY * crop.y) / crop.height}%`,
-  })
+  const imageStyle = (insets: FrameLayout) => {
+    const scale = insets.scaleX
+    const viewportAspect = viewportAspectForFrame(frame)
+    const sourceAspect = source.width / source.height
+
+    return {
+      width: `${(100 * scale) / crop.width}%`,
+      height: `${(100 * scale * viewportAspect) / (crop.width * sourceAspect)}%`,
+      left: `${insets.offsetX - (100 * scale * crop.x) / crop.width}%`,
+      top: `${insets.offsetY - (100 * scale * crop.y * viewportAspect) / (crop.width * sourceAspect)}%`,
+    }
+  }
 
   const frameLabel =
     frame === 'banner'

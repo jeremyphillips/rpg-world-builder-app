@@ -7,6 +7,7 @@ import {
   meetsPortraitMinimumCrop,
   resetBannerCrop,
   resetPortraitCrop,
+  resetPrimaryCrop,
 } from '@rpg/contracts'
 import { MediaCropEditor } from './media-crop-editor.client'
 
@@ -28,6 +29,22 @@ describe('MediaCropEditor', () => {
     expect(meetsPortraitMinimumCrop(crop, source)).toBe(true)
     expect(crop.x + crop.width / 2).toBeCloseTo(0.5)
   })
+  it('preserves source aspect for primary full-frame crop', () => {
+    const primarySource = { width: 1600, height: 900 }
+    const { container } = render(
+      <MediaCropEditor
+        src="/image.png"
+        source={primarySource}
+        frame="free"
+        crop={resetPrimaryCrop()}
+        onChange={vi.fn()}
+      />,
+    )
+    const img = container.querySelector('[aria-label="Primary crop position"] img')
+    expect(img).toHaveStyle({ width: '75%' })
+    expect(img).toHaveStyle({ height: '42.1875%' })
+  })
+
   it('zooms banner while retaining a valid 3:1 crop on non-wide sources', () => {
     const bannerSource = { width: 1800, height: 1200 }
     const onChange = vi.fn()
