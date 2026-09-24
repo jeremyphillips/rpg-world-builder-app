@@ -3,6 +3,7 @@ import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import {
   emptyContentMediaSchema,
   getContentMediaPolicy,
+  resolveRepresentativeImageId,
   type MediaAsset,
   type MediaScope,
 } from '@rpg/contracts'
@@ -33,10 +34,7 @@ export function ManagedMediaField({
   const [selectedId, setSelectedId] = useState<string | undefined>()
   const [assets, setAssets] = useState<MediaAsset[]>([])
   const policy = getContentMediaPolicy(config.domain)
-  const representativeId =
-    media.roles[policy.representativeRole]?.imageId ??
-    media.roles.primary?.imageId ??
-    media.images[0]?.id
+  const representativeId = resolveRepresentativeImageId(media, policy)
   const maxItems = resolveMediaFieldCapacity(config)
   const items = media.images.map((image: { id: string; assetId: string; alt?: string }) => ({
     id: image.id,

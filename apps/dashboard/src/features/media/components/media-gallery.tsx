@@ -69,9 +69,10 @@ export function MediaGallery({
         ) : (
           <div className={styles.grid()}>
             {media.images.map((image, index) => {
-              const roles = (['portrait', 'primary'] as const).filter(
-                (role) => media.roles[role]?.imageId === image.id,
-              )
+              const roles = Object.keys(MEDIA_ROLE_ENTRIES).filter(
+                (role) =>
+                  media.roles[role as keyof typeof MEDIA_ROLE_ENTRIES]?.imageId === image.id,
+              ) as Array<keyof typeof MEDIA_ROLE_ENTRIES>
               return (
                 <button
                   key={image.id}

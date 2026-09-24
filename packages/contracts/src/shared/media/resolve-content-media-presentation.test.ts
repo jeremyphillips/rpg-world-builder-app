@@ -20,7 +20,7 @@ function characterMedia(overrides: Partial<ContentMedia> = {}): ContentMedia {
     roles: {
       portrait: {
         imageId: 'img-1',
-        presentation: { crop: resetPortraitCrop({ width: 1600, height: 900 }) },
+        presentation: { mode: 'crop', crop: resetPortraitCrop({ width: 1600, height: 900 }) },
       },
       primary: { imageId: 'img-1' },
     },
@@ -86,11 +86,11 @@ describe('resolveContentMediaPresentation', () => {
       roles: {
         portrait: {
           imageId: 'img-1',
-          presentation: { crop: { x: 0.1, y: 0.2, width: 0.5, height: 0.5 } },
+          presentation: { mode: 'crop', crop: { x: 0.1, y: 0.2, width: 0.5, height: 0.5 } },
         },
         primary: {
           imageId: 'img-1',
-          presentation: { crop: { x: 0, y: 0, width: 1, height: 1 } },
+          presentation: { mode: 'crop', crop: { x: 0, y: 0, width: 1, height: 1 } },
         },
       },
     })

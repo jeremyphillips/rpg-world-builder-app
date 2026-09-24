@@ -22,12 +22,19 @@ describe('CONTENT_MEDIA_POLICIES', () => {
     }
   })
 
-  it('allows portrait only on character', () => {
-    expect(CONTENT_MEDIA_POLICIES.character.allowedRoles).toEqual(['primary', 'portrait'])
+  it('assigns role policies per domain', () => {
+    expect(CONTENT_MEDIA_POLICIES.character.allowedRoles).toEqual(['portrait', 'primary'])
+    expect(CONTENT_MEDIA_POLICIES.campaign.allowedRoles).toEqual(['banner', 'primary', 'emblem'])
+    expect(CONTENT_MEDIA_POLICIES.organization.allowedRoles).toEqual(['primary', 'emblem'])
 
-    for (const domain of CONTENT_MEDIA_DOMAINS) {
-      if (domain === 'character') continue
+    for (const domain of ['class', 'species', 'equipment', 'location'] as const) {
       expect(getContentMediaPolicy(domain).allowedRoles).toEqual(['primary'])
     }
+  })
+
+  it('uses representative role fallbacks per domain', () => {
+    expect(CONTENT_MEDIA_POLICIES.character.representativeRoles).toEqual(['portrait', 'primary'])
+    expect(CONTENT_MEDIA_POLICIES.campaign.representativeRoles).toEqual(['primary', 'banner'])
+    expect(CONTENT_MEDIA_POLICIES.organization.representativeRoles).toEqual(['primary'])
   })
 })

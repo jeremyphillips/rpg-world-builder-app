@@ -12,7 +12,10 @@ function sampleMedia(): ContentMedia {
     ],
     roles: {
       primary: { imageId: 'img-1' },
-      portrait: { imageId: 'img-1', presentation: { crop: { x: 0, y: 0, width: 1, height: 1 } } },
+      portrait: {
+        imageId: 'img-1',
+        presentation: { mode: 'crop', crop: { x: 0, y: 0, width: 1, height: 1 } },
+      },
     },
   }
 }

@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from 'react'
+import { createElement, useMemo, type ReactNode } from 'react'
 import { Globe, IdCard, Palette } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { Heading, Spinner, Text } from '@rpg/ui'
@@ -8,10 +8,10 @@ import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
-import { useExistingImageField } from '@/lib/use-existing-image-field'
 import { useLocations } from '@/features/content'
+import { EXPANDED_MEDIA_FIELD_PRESENTATION, ManagedMediaField } from '@/features/media'
 
-import { flavorFields, identityFields } from '../lib/settings/campaign-profile-form-fields'
+import { flavorFields, settingsIdentityFields } from '../lib/settings/campaign-profile-form-fields'
 import { buildWorldSettingsFields } from '../lib/settings/world-settings-form-fields'
 import {
   buildUpdateCampaignInput,
@@ -38,20 +38,42 @@ export function CampaignSettings() {
 
   const { mutateAsync, isPending } = useUpdateCampaign(campaignId ?? '')
 
-  const bannerField = useExistingImageField({
-    fieldName: 'banner',
-    currentKey: campaign?.identity.imageKey,
-    label: 'Current campaign image',
-    uploadErrorMessage: 'Could not upload campaign image.',
-  })
+  const tabs = useMemo((): TabbedFormTab[] => {
+    if (!campaignId) {
+      return [
+        {
+          id: 'identity',
+          label: 'Identity',
+          leadingIcon: <IdCard aria-hidden />,
+          fields: settingsIdentityFields,
+        },
+      ]
+    }
 
-  const tabs = useMemo(
-    (): TabbedFormTab[] => [
+    return [
       {
         id: 'identity',
         label: 'Identity',
         leadingIcon: <IdCard aria-hidden />,
-        fields: identityFields,
+        fields: [
+          ...settingsIdentityFields,
+          {
+            kind: 'slot',
+            name: 'media',
+            chrome: { variant: 'container' },
+            heading: { label: 'Campaign images' },
+            render: () =>
+              createElement(ManagedMediaField, {
+                config: {
+                  domain: 'campaign',
+                  presentation: EXPANDED_MEDIA_FIELD_PRESENTATION,
+                },
+                scope: { kind: 'campaign-identity', campaignId },
+                name: 'media',
+                label: 'Campaign images',
+              }),
+          },
+        ],
       },
       {
         id: 'flavor',
@@ -65,13 +87,11 @@ export function CampaignSettings() {
         leadingIcon: <Globe aria-hidden />,
         fields: buildWorldSettingsFields(locations),
       },
-    ],
-    [locations],
-  )
+    ]
+  }, [campaignId, locations])
 
   const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values, form) => {
-    const imageKey = await bannerField.resolveImageKey(values.banner)
-    await mutateAsync(buildUpdateCampaignInput(values, imageKey))
+    await mutateAsync(buildUpdateCampaignInput(values))
     form.reset(values)
     notifySaveSuccess()
   }, 'Could not save campaign.')
@@ -94,7 +114,6 @@ export function CampaignSettings() {
         schema={campaignSettingsSchema}
         tabs={tabs}
         defaultValues={mapCampaignToSettingsValues(campaign)}
-        fileFieldProps={bannerField.fileFieldProps}
         onSubmit={onSubmit}
         formError={formError}
         footer={(form) => (

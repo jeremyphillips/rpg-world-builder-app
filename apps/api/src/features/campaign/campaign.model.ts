@@ -20,7 +20,7 @@ const campaignSchema = new Schema(
     identity: {
       name: { type: String, required: true, trim: true },
       description: { type: String, trim: true },
-      imageKey: { type: String },
+      media: { type: Schema.Types.Mixed },
     },
     configuration: {
       flavor: {

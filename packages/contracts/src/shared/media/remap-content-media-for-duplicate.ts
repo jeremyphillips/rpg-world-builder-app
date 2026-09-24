@@ -1,4 +1,5 @@
 import type { ContentMedia } from './content-media'
+import { MEDIA_ROLES } from './roles'
 
 export type RemapContentMediaForDuplicateInput = {
   media: ContentMedia
@@ -43,16 +44,12 @@ export function remapContentMediaForDuplicate(
   }))
 
   const roles: ContentMedia['roles'] = {}
-  if (input.media.roles.primary) {
-    roles.primary = {
-      ...input.media.roles.primary,
-      imageId: attachmentIdMap.get(input.media.roles.primary.imageId) ?? images[0]?.id ?? '',
-    }
-  }
-  if (input.media.roles.portrait) {
-    roles.portrait = {
-      ...input.media.roles.portrait,
-      imageId: attachmentIdMap.get(input.media.roles.portrait.imageId) ?? images[0]?.id ?? '',
+  for (const role of MEDIA_ROLES) {
+    const assignment = input.media.roles[role]
+    if (!assignment) continue
+    roles[role] = {
+      ...assignment,
+      imageId: attachmentIdMap.get(assignment.imageId) ?? images[0]?.id ?? '',
     }
   }
 

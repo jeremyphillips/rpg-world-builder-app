@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import { getErrorMessage } from '@rpg/contracts'
+import { useQueryClient } from '@tanstack/react-query'
+import { getErrorMessage, resolveMediaRoleEligibility } from '@rpg/contracts'
 import { Heading, Wizard, type WizardStepDef } from '@rpg/ui'
 import { WizardStepForm } from '@rpg/ui/form'
 
-import { uploadFile } from '@/lib/api-client'
 import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { updateCampaign } from '../api/campaign-client'
 import {
   createRulesFields,
   createRulesSchema,
@@ -12,18 +13,23 @@ import {
 } from '../lib/rules/character-configuration/character-configuration-form'
 import { useCreateCampaign } from '../hooks/use-create-campaign'
 import { useOpenCampaign } from '../hooks/use-select-campaign'
+import { campaignsQueryKey } from '../hooks/use-campaigns'
 import {
-  identitySchema,
-  identityFields,
+  createIdentitySchema,
+  createIdentityFields,
   flavorSchema,
   flavorFields,
-  type IdentityValues,
+  type CreateIdentityValues,
   type FlavorValues,
 } from '../lib/settings/campaign-profile-form-fields'
 import {
   buildCreateCampaignInput,
   type CampaignCreateValues,
 } from '../lib/settings/campaign-settings-form-values'
+import {
+  attachCampaignBannerMedia,
+  readImageFileDimensions,
+} from '../lib/media/campaign-banner-media.lib'
 import { ReviewStep } from '../components/create/review-step'
 import { InviteMembersStep } from '../components/create/invite-members-step'
 import {
@@ -47,6 +53,7 @@ export function CampaignCreate() {
   const templatesQuery = useCampaignTemplates()
   const [createError, setCreateError] = useState<string | null>(null)
   const [selectedTemplateId, setSelectedTemplateId] = useState(BLANK_CAMPAIGN_TEMPLATE_VALUE)
+  const queryClient = useQueryClient()
 
   const selectedTemplate = useMemo(
     () => templatesQuery.data?.find((template) => template.metadata.id === selectedTemplateId),
@@ -62,14 +69,34 @@ export function CampaignCreate() {
     const createValues = values as CampaignCreateValues
 
     try {
-      let imageKey: string | undefined
       if (createValues.banner?.[0]) {
-        imageKey = await uploadFile(createValues.banner[0], 'Could not upload campaign image.')
+        const dimensions = await readImageFileDimensions(createValues.banner[0])
+        const eligibility = resolveMediaRoleEligibility('banner', dimensions)
+        if (!eligibility.eligible) {
+          setCreateError(eligibility.message)
+          return
+        }
       }
 
       const result = await mutateAsync(
-        buildCreateCampaignInput(createValues, imageKey, selectedTemplate?.metadata.id),
+        buildCreateCampaignInput(createValues, selectedTemplate?.metadata.id),
       )
+
+      if (createValues.banner?.[0]) {
+        try {
+          const { media } = await attachCampaignBannerMedia(
+            result.campaign.id,
+            createValues.banner[0],
+          )
+          await updateCampaign(result.campaign.id, { media })
+          await queryClient.invalidateQueries({ queryKey: campaignsQueryKey })
+          openCampaign(result.campaign.id)
+          return
+        } catch {
+          openCampaign(result.campaign.id, { bannerUploadFailed: true })
+          return
+        }
+      }
 
       openCampaign(result.campaign.id)
     } catch (err) {
@@ -99,7 +126,10 @@ export function CampaignCreate() {
         initialValues={initialValues}
         hint="Configure rules later from Homebrew → Rules Configuration."
       >
-        <WizardStepForm<IdentityValues> schema={identitySchema} fields={identityFields} />
+        <WizardStepForm<CreateIdentityValues>
+          schema={createIdentitySchema}
+          fields={createIdentityFields}
+        />
         <WizardStepForm<CreateRulesValues> schema={createRulesSchema} fields={createRulesFields} />
         <WizardStepForm<FlavorValues> schema={flavorSchema} fields={flavorFields} />
         <ReviewStep

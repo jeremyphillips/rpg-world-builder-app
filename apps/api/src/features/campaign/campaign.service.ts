@@ -122,7 +122,7 @@ function buildIdentityUpdateSet(input: UpdateCampaignInput): Record<string, unkn
   const $set: Record<string, unknown> = {}
   if (input.name !== undefined) $set['identity.name'] = input.name
   if (input.description !== undefined) $set['identity.description'] = input.description
-  if (input.imageKey !== undefined) $set['identity.imageKey'] = input.imageKey
+  if (input.media !== undefined) $set['identity.media'] = input.media
   return $set
 }
 

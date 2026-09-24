@@ -4,7 +4,7 @@ import { getContentMediaPolicy } from '@rpg/contracts'
 import { MediaImageDetails } from './media-image-details'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 
-it('explains why a small image cannot have Portrait without disabling Primary', () => {
+it('explains why a small image cannot have Portrait or Primary', () => {
   render(
     <MediaImageDetails
       image={mediaFixture.images[0]!}
@@ -17,6 +17,6 @@ it('explains why a small image cannot have Portrait without disabling Primary', 
     />,
   )
   expect(screen.getByRole('checkbox', { name: 'Portrait' })).toBeDisabled()
-  expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeEnabled()
+  expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeDisabled()
   expect(screen.getByText(/Requires at least/)).toHaveTextContent('64 × 64')
 })

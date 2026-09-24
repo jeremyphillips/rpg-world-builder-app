@@ -9,6 +9,7 @@ const AUTHORING_CAMPAIGN_ROLES = new Set(['owner', 'co-owner'])
 export function serializeMediaScope(scope: MediaScope): string {
   switch (scope.kind) {
     case 'campaign-content':
+    case 'campaign-identity':
     case 'campaign-npc':
       return `${scope.kind}:${scope.campaignId}`
     case 'user-pc':
@@ -20,6 +21,7 @@ export function serializeMediaScope(scope: MediaScope): string {
 export async function assertMediaScopeAuthorized(scope: MediaScope, userId: string): Promise<void> {
   switch (scope.kind) {
     case 'campaign-content':
+    case 'campaign-identity':
     case 'campaign-npc': {
       const membership = await CampaignMembershipModel.findOne({
         campaignId: scope.campaignId,

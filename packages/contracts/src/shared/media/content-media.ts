@@ -15,6 +15,8 @@ export const contentMediaRolesSchema = z
   .object({
     primary: contentMediaRoleAssignmentSchema.optional(),
     portrait: contentMediaRoleAssignmentSchema.optional(),
+    banner: contentMediaRoleAssignmentSchema.optional(),
+    emblem: contentMediaRoleAssignmentSchema.optional(),
   })
   .strict()
 

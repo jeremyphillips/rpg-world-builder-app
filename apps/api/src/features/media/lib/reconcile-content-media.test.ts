@@ -127,7 +127,10 @@ describe('reconcileContentMedia', () => {
         roles: {
           portrait: {
             imageId: 'img-1',
-            presentation: { crop: resetPortraitCrop({ width: 512, height: 512 }) },
+            presentation: {
+              mode: 'crop',
+              crop: resetPortraitCrop({ width: 512, height: 512 }),
+            },
           },
         },
       },
@@ -147,7 +150,10 @@ describe('reconcileContentMedia', () => {
         roles: {
           portrait: {
             imageId: 'img-2',
-            presentation: { crop: resetPortraitCrop({ width: 512, height: 512 }) },
+            presentation: {
+              mode: 'crop',
+              crop: resetPortraitCrop({ width: 512, height: 512 }),
+            },
           },
         },
       },

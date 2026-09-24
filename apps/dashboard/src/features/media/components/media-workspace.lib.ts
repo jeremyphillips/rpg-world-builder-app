@@ -1,8 +1,8 @@
-import type { ContentMediaDomain } from '@rpg/contracts'
+import type { ContentMediaDomain, MediaRole } from '@rpg/contracts'
 
 export function resolveMediaWorkspaceCopy(input: {
-  portrait: boolean
-  primary: boolean
+  presentation: MediaRole
+  assignedRoles: readonly MediaRole[]
   hasSelection: boolean
 }): {
   heading: string
@@ -15,7 +15,7 @@ export function resolveMediaWorkspaceCopy(input: {
     }
   }
 
-  if (input.portrait) {
+  if (input.presentation === 'portrait') {
     return {
       heading: 'Portrait crop',
       description:
@@ -23,10 +23,26 @@ export function resolveMediaWorkspaceCopy(input: {
     }
   }
 
-  if (input.primary) {
+  if (input.presentation === 'banner') {
     return {
-      heading: 'Primary image preview',
-      description: 'Preview the original artwork. Assign a role to control where it appears.',
+      heading: 'Banner crop',
+      description: 'Crop a 3:1 banner and place the focal point inside that crop.',
+    }
+  }
+
+  if (input.presentation === 'primary') {
+    return {
+      heading: 'Primary crop',
+      description:
+        'Crop the detail image and place the focal point inside that crop. The original file is kept.',
+    }
+  }
+
+  if (input.presentation === 'emblem') {
+    return {
+      heading: 'Edit emblem',
+      description:
+        'Scale and pad the image inside the frame. It stays fully visible and is not cropped.',
     }
   }
 
@@ -37,9 +53,14 @@ export function resolveMediaWorkspaceCopy(input: {
 }
 
 export function resolveMediaWorkspaceOnboarding(domain: ContentMediaDomain): string {
-  if (domain === 'character') {
-    return 'You can assign roles after adding an image, such as a portrait for character cards or a primary image for detail views.'
+  switch (domain) {
+    case 'character':
+      return 'You can assign roles after adding an image, such as a portrait for character cards or a primary image for detail views.'
+    case 'campaign':
+      return 'You can assign a banner, a primary image, or an emblem after adding an image.'
+    case 'organization':
+      return 'You can assign a primary image or an emblem after adding an image.'
+    default:
+      return 'You can assign a primary image after adding an image.'
   }
-
-  return 'You can assign roles after adding an image, such as a primary image for detail views.'
 }

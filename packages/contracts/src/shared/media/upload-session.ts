@@ -21,6 +21,12 @@ export const mediaScopeSchema = z.discriminatedUnion('kind', [
     .strict(),
   z
     .object({
+      kind: z.literal('campaign-identity'),
+      campaignId: z.string().min(1),
+    })
+    .strict(),
+  z
+    .object({
       kind: z.literal('campaign-npc'),
       campaignId: z.string().min(1),
     })

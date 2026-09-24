@@ -1,17 +1,25 @@
 import type { ZodIssue } from 'zod'
 
 import type { ContentMedia } from './content-media'
-import { CONTENT_MEDIA_MAX_ATTACHMENTS, CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX } from './limits'
+import { CONTENT_MEDIA_MAX_ATTACHMENTS } from './limits'
 import {
+  isBannerAspectCrop,
+  isFocalPointInCrop,
   isSquareCrop,
+  meetsBannerMinimumCrop,
   meetsPortraitMinimumCrop,
+  meetsPrimaryMinimumCrop,
   normalizedCropSchema,
+  resolveDefaultCropForRole,
   resolveEffectiveCrop,
+  resolveMediaRoleEligibility,
+  type NormalizedCrop,
   type SourceDimensions,
 } from './geometry'
+import { isCropPresentation, type CropPresentation } from './image-presentation'
 import type { ContentMediaPolicy } from './media-policy'
 import type { MediaAssetDimensions } from './asset'
-import type { MediaRole } from './roles'
+import { MEDIA_ROLE_ENTRIES, type MediaRole } from './roles'
 
 export type ContentMediaValidationContext = {
   policy: ContentMediaPolicy
@@ -59,10 +67,7 @@ function collectAttachmentIssues(images: ContentMedia['images'], maxItems: numbe
   return issues
 }
 
-function collectRoleCropIssues(
-  role: MediaRole,
-  crop: NonNullable<NonNullable<ContentMedia['roles'][MediaRole]>['presentation']>['crop'],
-): ZodIssue[] {
+function collectRoleCropSchemaIssues(role: MediaRole, crop: CropPresentation['crop']): ZodIssue[] {
   if (!crop) return []
 
   const cropResult = normalizedCropSchema.safeParse(crop)
@@ -74,13 +79,133 @@ function collectRoleCropIssues(
   }))
 }
 
-function collectPortraitCropIssues(
-  assignment: NonNullable<ContentMedia['roles']['portrait']>,
+function collectEmblemPresentationIssues(
+  role: MediaRole,
+  assignment: NonNullable<ContentMedia['roles'][MediaRole]>,
+  source: SourceDimensions,
+): ZodIssue[] {
+  const issues: ZodIssue[] = []
+  if (assignment.presentation && assignment.presentation.mode !== 'contain') {
+    issues.push(
+      customIssue('Emblem presentation must use contain mode.', ['roles', role, 'presentation']),
+    )
+  }
+  const eligibility = resolveMediaRoleEligibility(role, source)
+  if (!eligibility.eligible) {
+    issues.push(customIssue(eligibility.message, ['roles', role]))
+  }
+  return issues
+}
+
+function collectCropShapeIssues(
+  role: MediaRole,
+  crop: NormalizedCrop,
+  source: SourceDimensions,
+): ZodIssue[] {
+  const issues: ZodIssue[] = []
+  if (role === 'portrait') {
+    if (!isSquareCrop(crop, source)) {
+      issues.push(
+        customIssue('Portrait crop must be square within the configured pixel tolerance.', [
+          'roles',
+          role,
+          'presentation',
+          'crop',
+        ]),
+      )
+    }
+    if (!meetsPortraitMinimumCrop(crop, source)) {
+      issues.push(
+        customIssue('Portrait crop must meet the minimum edge requirement.', [
+          'roles',
+          role,
+          'presentation',
+          'crop',
+        ]),
+      )
+    }
+  }
+  if (
+    role === 'banner' &&
+    (!isBannerAspectCrop(crop, source) || !meetsBannerMinimumCrop(crop, source))
+  ) {
+    issues.push(
+      customIssue('Banner crop must be 3:1 and at least 1200 × 400 pixels.', [
+        'roles',
+        role,
+        'presentation',
+        'crop',
+      ]),
+    )
+  }
+  if (role === 'primary' && !meetsPrimaryMinimumCrop(crop, source)) {
+    issues.push(
+      customIssue('Primary crop must meet the minimum short-edge requirement.', [
+        'roles',
+        role,
+        'presentation',
+        'crop',
+      ]),
+    )
+  }
+  return issues
+}
+
+function collectCropPresentationIssues(
+  role: MediaRole,
+  assignment: NonNullable<ContentMedia['roles'][MediaRole]>,
+  source: SourceDimensions,
+): ZodIssue[] {
+  if (assignment.presentation?.mode === 'contain') {
+    return [
+      customIssue(`${MEDIA_ROLE_ENTRIES[role].label} presentation must use crop mode.`, [
+        'roles',
+        role,
+        'presentation',
+      ]),
+    ]
+  }
+
+  const cropPresentation = isCropPresentation(assignment.presentation)
+    ? assignment.presentation
+    : undefined
+  const issues = collectRoleCropSchemaIssues(role, cropPresentation?.crop)
+  const crop = resolveEffectiveCrop(cropPresentation, source, () =>
+    resolveDefaultCropForRole(role, source),
+  )
+
+  if (cropPresentation?.focalPoint && !isFocalPointInCrop(cropPresentation.focalPoint, crop)) {
+    issues.push(
+      customIssue('Focal point must sit inside the crop.', [
+        'roles',
+        role,
+        'presentation',
+        'focalPoint',
+      ]),
+    )
+  }
+
+  const eligibility = resolveMediaRoleEligibility(role, source, cropPresentation)
+  if (!eligibility.eligible) {
+    issues.push(customIssue(eligibility.message, ['roles', role, 'presentation']))
+    return issues
+  }
+
+  issues.push(...collectCropShapeIssues(role, crop, source))
+  return issues
+}
+
+function collectRolePresentationIssues(
+  role: MediaRole,
+  assignment: NonNullable<ContentMedia['roles'][MediaRole]>,
   dimensions: MediaAssetDimensions | undefined,
 ): ZodIssue[] {
   if (!dimensions) {
     return [
-      customIssue('Portrait validation requires trusted asset dimensions.', ['roles', 'portrait']),
+      customIssue(
+        `${MEDIA_ROLE_ENTRIES[role].label} validation requires trusted asset dimensions.`,
+        ['roles', role],
+      ),
     ]
   }
 
@@ -88,30 +213,12 @@ function collectPortraitCropIssues(
     width: dimensions.orientedWidth,
     height: dimensions.orientedHeight,
   }
-  const crop = resolveEffectiveCrop(assignment.presentation, source)
-  const issues: ZodIssue[] = []
 
-  if (!isSquareCrop(crop, source)) {
-    issues.push(
-      customIssue('Portrait crop must be square within the configured pixel tolerance.', [
-        'roles',
-        'portrait',
-        'presentation',
-        'crop',
-      ]),
-    )
+  if (role === 'emblem') {
+    return collectEmblemPresentationIssues(role, assignment, source)
   }
 
-  if (!meetsPortraitMinimumCrop(crop, source)) {
-    issues.push(
-      customIssue(
-        `Portrait crop must be at least ${CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX}×${CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX} oriented pixels.`,
-        ['roles', 'portrait', 'presentation', 'crop'],
-      ),
-    )
-  }
-
-  return issues
+  return collectCropPresentationIssues(role, assignment, source)
 }
 
 function collectRoleIssues(
@@ -121,12 +228,9 @@ function collectRoleIssues(
 ): ZodIssue[] {
   const imageIds = new Set(media.images.map((image) => image.id))
   const issues: ZodIssue[] = []
-  const roleEntries: Array<[MediaRole, ContentMedia['roles'][MediaRole]]> = [
-    ['primary', media.roles.primary],
-    ['portrait', media.roles.portrait],
-  ]
 
-  for (const [role, assignment] of roleEntries) {
+  for (const role of Object.keys(MEDIA_ROLE_ENTRIES) as MediaRole[]) {
+    const assignment = media.roles[role]
     if (!assignment) continue
 
     if (!policy.allowedRoles.includes(role)) {
@@ -141,12 +245,9 @@ function collectRoleIssues(
       continue
     }
 
-    issues.push(...collectRoleCropIssues(role, assignment.presentation?.crop))
-    if (role !== 'portrait') continue
-
     const image = media.images.find((entry) => entry.id === assignment.imageId)
     const dimensions = image ? assetDimensionsById[image.assetId] : undefined
-    issues.push(...collectPortraitCropIssues(assignment, dimensions))
+    issues.push(...collectRolePresentationIssues(role, assignment, dimensions))
   }
 
   return issues

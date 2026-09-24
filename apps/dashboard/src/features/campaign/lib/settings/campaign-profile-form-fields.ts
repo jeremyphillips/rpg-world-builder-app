@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import {
+  contentMediaSchema,
   DEFAULT_UPLOAD_MAX_BYTES,
   PLAY_STYLES,
   MOODS,
@@ -17,18 +18,18 @@ import {
 } from './campaign-profile-form-labels'
 
 // ---------------------------------------------------------------------------
-// Identity
+// Identity — create wizard
 // ---------------------------------------------------------------------------
 
-export const identitySchema = z.object({
+export const createIdentitySchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   banner: z.array(z.custom<File>((v: unknown) => v instanceof File)).optional(),
 })
 
-export type IdentityValues = z.infer<typeof identitySchema>
+export type CreateIdentityValues = z.infer<typeof createIdentitySchema>
 
-export const identityFields: FormItem[] = [
+export const createIdentityFields: FormItem[] = [
   {
     type: 'text',
     name: 'name',
@@ -53,6 +54,42 @@ export const identityFields: FormItem[] = [
     maxSize: DEFAULT_UPLOAD_MAX_BYTES,
   },
 ]
+
+// ---------------------------------------------------------------------------
+// Identity — settings
+// ---------------------------------------------------------------------------
+
+export const settingsIdentitySchema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  media: contentMediaSchema.optional(),
+})
+
+export type SettingsIdentityValues = z.infer<typeof settingsIdentitySchema>
+
+export const settingsIdentityFields: FormItem[] = [
+  {
+    type: 'text',
+    name: 'name',
+    label: 'Campaign name',
+    placeholder: 'Your campaign name',
+    required: true,
+  },
+  {
+    type: 'textarea',
+    name: 'description',
+    label: 'Description',
+    placeholder: 'A short summary of the campaign setting and tone.',
+    rows: 3,
+  },
+]
+
+/** @deprecated Use createIdentitySchema or settingsIdentitySchema. */
+export const identitySchema = createIdentitySchema
+/** @deprecated Use createIdentityFields or settingsIdentityFields. */
+export const identityFields = createIdentityFields
+/** @deprecated Use CreateIdentityValues or SettingsIdentityValues. */
+export type IdentityValues = CreateIdentityValues
 
 // ---------------------------------------------------------------------------
 // Flavor — maps to campaign.configuration.flavor.*

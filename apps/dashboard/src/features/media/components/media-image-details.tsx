@@ -2,9 +2,10 @@ import { useId, useMemo } from 'react'
 import { Button, CheckboxField, FilenamePreview } from '@rpg/ui'
 import { Form, type FormItem, type FormValueSync } from '@rpg/ui/form'
 import {
-  CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX,
   MEDIA_ROLE_ENTRIES,
+  asCropPresentation,
   contentImageSchema,
+  resolveMediaRoleEligibility,
   type ContentMedia,
   type ContentMediaPolicy,
   type MediaAsset,
@@ -52,8 +53,8 @@ export function MediaImageDetails({
     ],
     [onAlt],
   )
-  const portraitEligible =
-    Math.min(asset.orientedWidth, asset.orientedHeight) >= CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX
+  const source = { width: asset.orientedWidth, height: asset.orientedHeight }
+
   return (
     <aside className={styles.details()}>
       <h3 className={styles.subheading()}>Image details</h3>
@@ -68,23 +69,28 @@ export function MediaImageDetails({
       />
       <fieldset className={styles.roles()}>
         <legend className={styles.subheading()}>Assign roles</legend>
-        {(['portrait', 'primary'] as const)
-          .filter((role) => policy.allowedRoles.includes(role))
-          .map((role) => (
+        {policy.allowedRoles.map((role) => {
+          const assignment = media.roles[role]
+          const cropPresentation = asCropPresentation(
+            assignment?.imageId === image.id ? assignment.presentation : undefined,
+          )
+          const eligibility = resolveMediaRoleEligibility(role, source, cropPresentation)
+          const hint = !eligibility.eligible
+            ? eligibility.message
+            : (eligibility.hint ?? MEDIA_ROLE_ENTRIES[role].description)
+
+          return (
             <CheckboxField
               key={role}
               id={`${id}-${role}`}
               label={MEDIA_ROLE_ENTRIES[role].label}
-              hint={
-                role === 'portrait' && !portraitEligible
-                  ? `Requires at least ${CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX} × ${CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX} pixels; this image is ${asset.orientedWidth} × ${asset.orientedHeight}.`
-                  : MEDIA_ROLE_ENTRIES[role].description
-              }
+              hint={hint}
               checked={media.roles[role]?.imageId === image.id}
-              disabled={role === 'portrait' && !portraitEligible}
+              disabled={!eligibility.eligible}
               onCheckedChange={(checked) => onRole(role, checked === true)}
             />
-          ))}
+          )
+        })}
       </fieldset>
       <dl className={styles.metadata()}>
         <dt className={styles.metadataLabel()}>File name</dt>

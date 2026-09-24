@@ -96,7 +96,7 @@ describe('validateContentMedia', () => {
         roles: {
           portrait: {
             imageId: 'img-1',
-            presentation: { crop: { x: 0, y: 0, width: 1, height: 1 } },
+            presentation: { mode: 'crop', crop: { x: 0, y: 0, width: 1, height: 1 } },
           },
         },
       }),
@@ -114,7 +114,7 @@ describe('validateContentMedia', () => {
         roles: {
           portrait: {
             imageId: 'img-1',
-            presentation: { crop: { x: 0.8, y: 0, width: 0.5, height: 0.5 } },
+            presentation: { mode: 'crop', crop: { x: 0.8, y: 0, width: 0.5, height: 0.5 } },
           },
         },
       }),

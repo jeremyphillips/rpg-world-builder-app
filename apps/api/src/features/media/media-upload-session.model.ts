@@ -8,7 +8,7 @@ const mediaUploadSessionSchema = new Schema(
     scopeKind: {
       type: String,
       required: true,
-      enum: ['campaign-content', 'campaign-npc', 'user-pc'],
+      enum: ['campaign-content', 'campaign-identity', 'campaign-npc', 'user-pc'],
     },
     scopeKey: { type: String, required: true, index: true },
     campaignId: { type: String },

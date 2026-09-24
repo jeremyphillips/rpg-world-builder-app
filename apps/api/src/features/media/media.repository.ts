@@ -18,7 +18,7 @@ function scopeFields(scope: MediaScope): ScopeFields {
   const scopeKey = serializeMediaScope(scope)
   switch (scope.kind) {
     case 'campaign-content':
-      return { scopeKind: scope.kind, scopeKey, campaignId: scope.campaignId }
+    case 'campaign-identity':
     case 'campaign-npc':
       return { scopeKind: scope.kind, scopeKey, campaignId: scope.campaignId }
     case 'user-pc':

@@ -1,4 +1,17 @@
-import type { ContentMedia, MediaAsset, MediaRole, NormalizedCrop } from '@rpg/contracts'
+import type {
+  ContentMedia,
+  ContainPresentation,
+  MediaAsset,
+  MediaRole,
+  NormalizedCrop,
+  NormalizedFocalPoint,
+  SourceDimensions,
+} from '@rpg/contracts'
+import {
+  createDefaultRolePresentation,
+  defaultEmblemPresentation,
+  asCropPresentation,
+} from '@rpg/contracts'
 
 import {
   imageAddedMediaStatusNotice,
@@ -13,49 +26,81 @@ export type MediaSession = {
   presentation: MediaRole
   notice: MediaStatusNotice | null
 }
+
 export type MediaAction =
-  | { type: 'select'; id: string }
+  | { type: 'select'; id: string; allowedRoles: readonly MediaRole[] }
   | { type: 'presentation'; role: MediaRole }
   | { type: 'add'; id: string; asset: MediaAsset }
-  | { type: 'remove'; id: string }
+  | { type: 'remove'; id: string; allowedRoles: readonly MediaRole[] }
   | { type: 'alt'; id: string; alt: string }
-  | { type: 'role'; id: string; role: MediaRole; assigned: boolean }
-  | { type: 'crop'; crop: NormalizedCrop }
+  | {
+      type: 'role'
+      id: string
+      role: MediaRole
+      assigned: boolean
+      allowedRoles: readonly MediaRole[]
+      source?: SourceDimensions
+    }
+  | { type: 'crop'; crop: NormalizedCrop; focalPoint?: NormalizedFocalPoint }
+  | { type: 'contain'; layout: ContainPresentation }
+
+function rolesForImage(
+  media: ContentMedia,
+  imageId: string,
+  allowedRoles: readonly MediaRole[],
+): MediaRole[] {
+  return allowedRoles.filter((role) => media.roles[role]?.imageId === imageId)
+}
+
+function resolvePresentationForImage(
+  media: ContentMedia,
+  imageId: string | undefined,
+  allowedRoles: readonly MediaRole[],
+): MediaRole {
+  if (!imageId) return allowedRoles[0] ?? 'primary'
+  const assigned = rolesForImage(media, imageId, allowedRoles)
+  return assigned[0] ?? allowedRoles[0] ?? 'primary'
+}
 
 export function createMediaSession(
   media: ContentMedia,
-  initialSelectedImageId?: string,
+  initialSelectedImageId: string | undefined,
+  allowedRoles: readonly MediaRole[],
 ): MediaSession {
   const requested = media.images.some((image) => image.id === initialSelectedImageId)
     ? initialSelectedImageId
     : undefined
   const selectedId =
     requested ??
-    media.roles.portrait?.imageId ??
-    media.roles.primary?.imageId ??
+    allowedRoles.map((role) => media.roles[role]?.imageId).find(Boolean) ??
     media.images[0]?.id
+
   return {
     initial: structuredClone(media),
     media: structuredClone(media),
     selectedId,
-    presentation: media.roles.portrait?.imageId === selectedId ? 'portrait' : 'primary',
+    presentation: resolvePresentationForImage(media, selectedId, allowedRoles),
     notice: null,
   }
 }
+
 export function isMediaSessionDirty(state: MediaSession): boolean {
   return JSON.stringify(state.initial) !== JSON.stringify(state.media)
 }
+
 export function mediaSessionReducer(state: MediaSession, action: MediaAction): MediaSession {
-  if (action.type === 'select') return selectImage(state, action.id)
+  if (action.type === 'select') return selectImage(state, action.id, action.allowedRoles)
   if (action.type === 'presentation') return { ...state, presentation: action.role }
+
   const next = structuredClone(state)
   const { media } = next
+
   switch (action.type) {
     case 'add':
       addImage(next, action)
       break
     case 'remove':
-      removeImage(next, action.id)
+      removeImage(next, action.id, action.allowedRoles)
       break
     case 'alt': {
       const image = media.images.find((image) => image.id === action.id)
@@ -66,22 +111,27 @@ export function mediaSessionReducer(state: MediaSession, action: MediaAction): M
       assignRole(next, action)
       break
     case 'crop':
-      updateCrop(next, action.crop)
+      updateCrop(next, action.crop, action.focalPoint)
+      break
+    case 'contain':
+      updateContain(next, action.layout)
       break
   }
+
   return next
 }
 
-function removeImage(next: MediaSession, id: string) {
+function removeImage(next: MediaSession, id: string, allowedRoles: readonly MediaRole[]) {
   const { media } = next
   const index = media.images.findIndex((image) => image.id === id)
   media.images = media.images.filter((image) => image.id !== id)
-  for (const role of ['primary', 'portrait'] as const) {
+  for (const role of allowedRoles) {
     if (media.roles[role]?.imageId === id) delete media.roles[role]
   }
-  if (next.selectedId === id)
+  if (next.selectedId === id) {
     next.selectedId = media.images[Math.min(index, media.images.length - 1)]?.id
-  next.presentation = media.roles.portrait?.imageId === next.selectedId ? 'portrait' : 'primary'
+  }
+  next.presentation = resolvePresentationForImage(media, next.selectedId, allowedRoles)
   next.notice = textMediaStatusNotice(
     'Image removed from the draft. No other image was assigned automatically.',
   )
@@ -91,24 +141,36 @@ function assignRole(next: MediaSession, action: Extract<MediaAction, { type: 'ro
   const { media } = next
   if (action.assigned) {
     if (media.roles[action.role]?.imageId === action.id) return
-    media.roles[action.role] = { imageId: action.id }
+    media.roles[action.role] = {
+      imageId: action.id,
+      presentation: action.source
+        ? createDefaultRolePresentation(action.role, action.source)
+        : action.role === 'emblem'
+          ? defaultEmblemPresentation()
+          : { mode: 'crop' },
+    }
     next.presentation = action.role
   } else {
     delete media.roles[action.role]
-    next.presentation = 'primary'
+    next.presentation = resolvePresentationForImage(media, next.selectedId, action.allowedRoles)
   }
   next.notice = textMediaStatusNotice(
-    `${action.role === 'portrait' ? 'Portrait' : 'Primary image'} ${action.assigned ? 'assigned to selected image' : 'unassigned'}.`,
+    `${action.role} ${action.assigned ? 'assigned to selected image' : 'unassigned'}.`,
   )
 }
 
-function selectImage(state: MediaSession, id: string): MediaSession {
+function selectImage(
+  state: MediaSession,
+  id: string,
+  allowedRoles: readonly MediaRole[],
+): MediaSession {
   return {
     ...state,
     selectedId: id,
-    presentation: state.media.roles.portrait?.imageId === id ? 'portrait' : 'primary',
+    presentation: resolvePresentationForImage(state.media, id, allowedRoles),
   }
 }
+
 function addImage(next: MediaSession, action: Extract<MediaAction, { type: 'add' }>) {
   if (next.media.images.some((image) => image.assetId === action.asset.id)) {
     next.notice = textMediaStatusNotice('This image is already in the collection.')
@@ -118,7 +180,37 @@ function addImage(next: MediaSession, action: Extract<MediaAction, { type: 'add'
   next.selectedId ??= action.id
   next.notice = imageAddedMediaStatusNotice(action.asset.filename)
 }
-function updateCrop(next: MediaSession, crop: NormalizedCrop) {
-  const portrait = next.media.roles.portrait
-  if (portrait && portrait.imageId === next.selectedId) portrait.presentation = { crop }
+
+function updateCrop(next: MediaSession, crop: NormalizedCrop, focalPoint?: NormalizedFocalPoint) {
+  const assignment = next.media.roles[next.presentation]
+  if (!assignment || assignment.imageId !== next.selectedId) return
+  assignment.presentation = {
+    mode: 'crop',
+    crop,
+    ...(focalPoint
+      ? { focalPoint }
+      : asCropPresentation(assignment.presentation)?.focalPoint
+        ? { focalPoint: asCropPresentation(assignment.presentation)!.focalPoint }
+        : {}),
+  }
+}
+
+function updateContain(next: MediaSession, layout: ContainPresentation) {
+  const assignment = next.media.roles[next.presentation]
+  if (!assignment || assignment.imageId !== next.selectedId) return
+  assignment.presentation = layout
+}
+
+export function assignedRolesForImage(
+  media: ContentMedia,
+  imageId: string,
+  allowedRoles: readonly MediaRole[],
+): MediaRole[] {
+  return rolesForImage(media, imageId, allowedRoles)
+}
+
+export function cropFrameForRole(role: MediaRole): 'square' | 'banner' | 'free' {
+  if (role === 'banner') return 'banner'
+  if (role === 'primary') return 'free'
+  return 'square'
 }

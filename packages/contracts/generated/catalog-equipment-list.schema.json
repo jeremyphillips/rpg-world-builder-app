@@ -284,6 +284,20 @@
                   "$ref": "#/definitions/__schema13"
                 }
               ]
+            },
+            "banner": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema13"
+                }
+              ]
+            },
+            "emblem": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema13"
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -304,54 +318,108 @@
           "minLength": 1
         },
         "presentation": {
-          "type": "object",
-          "properties": {
-            "crop": {
+          "oneOf": [
+            {
               "type": "object",
               "properties": {
-                "x": {
-                  "$ref": "#/definitions/__schema14"
+                "mode": {
+                  "type": "string",
+                  "const": "crop",
+                  "description": "crop"
                 },
-                "y": {
-                  "$ref": "#/definitions/__schema15"
+                "crop": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "$ref": "#/definitions/__schema14"
+                    },
+                    "y": {
+                      "$ref": "#/definitions/__schema15"
+                    },
+                    "width": {
+                      "$ref": "#/definitions/__schema16"
+                    },
+                    "height": {
+                      "$ref": "#/definitions/__schema17"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "width",
+                    "height"
+                  ],
+                  "additionalProperties": false
                 },
-                "width": {
-                  "$ref": "#/definitions/__schema16"
-                },
-                "height": {
-                  "$ref": "#/definitions/__schema17"
+                "focalPoint": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ],
+                  "additionalProperties": false
                 }
               },
               "required": [
-                "x",
-                "y",
-                "width",
-                "height"
+                "mode"
               ],
               "additionalProperties": false
             },
-            "focalPoint": {
+            {
               "type": "object",
               "properties": {
-                "x": {
+                "mode": {
+                  "type": "string",
+                  "const": "contain",
+                  "description": "contain"
+                },
+                "scale": {
                   "type": "number",
-                  "minimum": 0,
+                  "minimum": 0.25,
                   "maximum": 1
                 },
-                "y": {
+                "padding": {
                   "type": "number",
                   "minimum": 0,
-                  "maximum": 1
+                  "maximum": 0.2
+                },
+                "offset": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ],
+                  "additionalProperties": false
                 }
               },
               "required": [
-                "x",
-                "y"
+                "mode",
+                "scale",
+                "padding"
               ],
               "additionalProperties": false
             }
-          },
-          "additionalProperties": false
+          ]
         }
       },
       "required": [

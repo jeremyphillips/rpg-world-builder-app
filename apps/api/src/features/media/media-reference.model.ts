@@ -6,7 +6,12 @@ const mediaReferenceSchema = new Schema(
   {
     _id: { type: String, required: true },
     assetId: { type: String, required: true, index: true },
-    subjectKind: { type: String, required: true, enum: ['content', 'character'], index: true },
+    subjectKind: {
+      type: String,
+      required: true,
+      enum: ['content', 'character', 'campaign'],
+      index: true,
+    },
     subjectId: { type: String, required: true, index: true },
     scopeKey: { type: String, required: true },
     attachmentId: { type: String, required: true },

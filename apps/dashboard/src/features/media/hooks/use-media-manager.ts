@@ -23,8 +23,9 @@ export function useMediaManager({
   onSave,
 }: MediaManagerProps) {
   const policy = getContentMediaPolicy(domain)
+  const allowedRoles = policy.allowedRoles
   const [state, dispatch] = useReducer(mediaSessionReducer, undefined, () =>
-    createMediaSession(value, initialSelectedImageId),
+    createMediaSession(value, initialSelectedImageId, allowedRoles),
   )
   const [uploaded, setUploaded] = useState<Record<string, MediaAsset>>({})
   const [saving, setSaving] = useState(false)
@@ -90,7 +91,15 @@ export function useMediaManager({
   }
   function changeRole(role: MediaRole, assigned: boolean) {
     if (!selected) return
-    const apply = () => dispatch({ type: 'role', id: selected.id, role, assigned })
+    const apply = () =>
+      dispatch({
+        type: 'role',
+        id: selected.id,
+        role,
+        assigned,
+        allowedRoles,
+        source: asset ? { width: asset.orientedWidth, height: asset.orientedHeight } : undefined,
+      })
     const previous = state.media.roles[role]
     if (previous?.presentation && (!assigned || previous.imageId !== selected.id)) {
       setConfirm({
@@ -106,7 +115,7 @@ export function useMediaManager({
     const roles = policy.allowedRoles.filter(
       (role) => state.media.roles[role]?.imageId === selected.id,
     )
-    const action = () => dispatch({ type: 'remove', id: selected.id })
+    const action = () => dispatch({ type: 'remove', id: selected.id, allowedRoles })
     if (roles.length)
       setConfirm({
         title: `Remove from this ${label}?`,

@@ -15,6 +15,14 @@ export const MEDIA_ROLE_ENTRIES = {
     label: 'Portrait',
     description: 'Compact identity, cards, lists, and tokens.',
   },
+  banner: {
+    label: 'Banner',
+    description: 'Wide 3:1 image for campaign headers.',
+  },
+  emblem: {
+    label: 'Emblem',
+    description: 'Crest or logo shown in full without cropping.',
+  },
 } as const satisfies Record<string, { label: string; description: string }>
 
 export type MediaRole = keyof typeof MEDIA_ROLE_ENTRIES

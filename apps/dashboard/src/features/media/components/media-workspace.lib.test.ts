@@ -5,7 +5,11 @@ import { resolveMediaWorkspaceCopy, resolveMediaWorkspaceOnboarding } from './me
 describe('resolveMediaWorkspaceCopy', () => {
   it('describes the empty workspace', () => {
     expect(
-      resolveMediaWorkspaceCopy({ portrait: false, primary: false, hasSelection: false }),
+      resolveMediaWorkspaceCopy({
+        presentation: 'primary',
+        assignedRoles: [],
+        hasSelection: false,
+      }),
     ).toEqual({
       heading: 'Image preview',
       description: 'Add artwork, then assign how it should be used on this record.',
@@ -14,10 +18,15 @@ describe('resolveMediaWorkspaceCopy', () => {
 
   it('describes uploaded artwork without an assigned role', () => {
     expect(
-      resolveMediaWorkspaceCopy({ portrait: false, primary: false, hasSelection: true }),
+      resolveMediaWorkspaceCopy({
+        presentation: 'primary',
+        assignedRoles: [],
+        hasSelection: true,
+      }),
     ).toEqual({
-      heading: 'Image preview',
-      description: 'Preview the original artwork. Assign a role to control where it appears.',
+      heading: 'Primary crop',
+      description:
+        'Crop the detail image and place the focal point inside that crop. The original file is kept.',
     })
   })
 })
@@ -26,5 +35,10 @@ describe('resolveMediaWorkspaceOnboarding', () => {
   it('mentions portrait guidance for characters only', () => {
     expect(resolveMediaWorkspaceOnboarding('character')).toMatch(/portrait/)
     expect(resolveMediaWorkspaceOnboarding('class')).not.toMatch(/portrait/)
+  })
+
+  it('mentions banner and emblem for campaign and organization domains', () => {
+    expect(resolveMediaWorkspaceOnboarding('campaign')).toMatch(/banner/)
+    expect(resolveMediaWorkspaceOnboarding('organization')).toMatch(/emblem/)
   })
 })

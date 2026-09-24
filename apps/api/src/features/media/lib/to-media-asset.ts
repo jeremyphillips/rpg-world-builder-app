@@ -25,6 +25,8 @@ export function scopeFromDoc(doc: {
   switch (doc.scopeKind) {
     case 'campaign-content':
       return { kind: 'campaign-content', campaignId: doc.campaignId ?? '' }
+    case 'campaign-identity':
+      return { kind: 'campaign-identity', campaignId: doc.campaignId ?? '' }
     case 'campaign-npc':
       return { kind: 'campaign-npc', campaignId: doc.campaignId ?? '' }
     case 'user-pc':

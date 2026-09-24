@@ -81,13 +81,10 @@ describe('CampaignSettings', () => {
     expect(screen.queryByRole('button', { name: 'Rules' })).not.toBeInTheDocument()
   })
 
-  it('shows the saved banner preview when the campaign has an imageKey', async () => {
-    listCampaigns.mockResolvedValue([
-      { ...campaign, identity: { ...campaign.identity, imageKey: 'banner.jpg' } },
-    ])
+  it('shows the campaign images field on the identity tab', async () => {
     renderSettings()
-    const img = await screen.findByRole('img', { name: 'Current campaign image' })
-    expect(img).toHaveAttribute('src', '/api/uploads/banner.jpg')
+    await screen.findByDisplayValue('Sunless Citadel')
+    expect(screen.getByText('Campaign images')).toBeInTheDocument()
   })
 
   it('calls updateCampaign with identity and flavor on submit', async () => {
@@ -102,6 +99,7 @@ describe('CampaignSettings', () => {
     expect(updateCampaign.mock.lastCall?.[1]).toEqual({
       name: 'Sunless Citadel',
       description: 'A dungeon delve.',
+      media: { revision: 0, images: [], roles: {} },
       flavor: {
         playStyle: ['dungeon_crawl'],
         mood: ['heroic'],

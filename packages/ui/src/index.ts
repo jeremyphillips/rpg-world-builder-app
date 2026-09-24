@@ -1200,5 +1200,10 @@ export {
 
 export {
   MediaCropEditor,
+  type MediaCropEditorFrame,
   type MediaCropEditorProps,
 } from './components/ui/media-crop-editor.client'
+export {
+  MediaEmblemEditor,
+  type MediaEmblemEditorProps,
+} from './components/ui/media-emblem-editor.client'

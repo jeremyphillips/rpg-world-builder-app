@@ -1,5 +1,11 @@
 import type { ContentMedia } from './content-media'
-import { resetPortraitCrop, resolveEffectiveCrop, type NormalizedCrop } from './geometry'
+import {
+  resetPortraitCrop,
+  resolveDefaultCropForRole,
+  resolveEffectiveCrop,
+  type NormalizedCrop,
+} from './geometry'
+import { asCropPresentation } from './role-presentation'
 import type { ContentMediaPolicy } from './media-policy'
 import type { MediaRenditionPreset } from './rendition-preset'
 import type { MediaRole } from './roles'
@@ -63,7 +69,9 @@ function resolveRolePresentation(input: {
   if (!asset) return null
 
   const source = { width: asset.orientedWidth, height: asset.orientedHeight }
-  const crop = resolveEffectiveCrop(input.presentation?.presentation, source)
+  const cropPresentation = asCropPresentation(input.presentation?.presentation)
+  const defaultCrop = () => resolveDefaultCropForRole(input.role, source)
+  const crop = resolveEffectiveCrop(cropPresentation, source, defaultCrop)
 
   return {
     kind: 'rendition',
@@ -125,10 +133,12 @@ function resolvePrimarySquareFallback(
   if (!image || !asset) return null
 
   const source = { width: asset.orientedWidth, height: asset.orientedHeight }
+  const squareCrop = resetPortraitCrop(source)
+
   return {
     kind: 'rendition',
     preset: 'compact-identity',
-    crop: resetPortraitCrop(source),
+    crop: squareCrop,
     fallbackReason: 'primary-square-fallback',
     alt: image.alt ?? '',
     attachmentId: image.id,

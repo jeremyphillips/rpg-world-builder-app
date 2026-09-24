@@ -12,6 +12,7 @@ import { InviteMemberDialog } from '../components/overview/invite-member-dialog'
 import { useCampaignOverviewData } from '../hooks/use-campaign-overview-data'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useCanManageCampaign } from '../hooks/use-can-manage-campaign'
+import { CampaignBannerUploadAlert } from '../components/campaign-banner-upload-alert'
 import { buildCampaignDisplay, CAMPAIGN_UNKNOWN_NAME } from '../lib/campaign-display'
 
 /** Campaign overview — members, invitations, and party sections. */
@@ -32,6 +33,7 @@ export function CampaignDetail() {
 
   return (
     <NarrowPage rhythm="list">
+      <CampaignBannerUploadAlert />
       <div className="flex flex-wrap items-start justify-between gap-4">
         <CampaignDisplayName display={display} surface="page" />
         <div className="flex flex-wrap items-center gap-2">

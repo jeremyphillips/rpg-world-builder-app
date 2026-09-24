@@ -74,6 +74,7 @@ describe('resolveEffectiveCrop', () => {
   it('prefers explicit crop over focal point and reset', () => {
     const crop = resolveEffectiveCrop(
       {
+        mode: 'crop',
         crop: { x: 0.1, y: 0.2, width: 0.3, height: 0.3 },
         focalPoint: { x: 0.8, y: 0.8 },
       },
@@ -85,7 +86,7 @@ describe('resolveEffectiveCrop', () => {
 
   it('derives a crop from focal point when no explicit crop exists', () => {
     const crop = resolveEffectiveCrop(
-      { focalPoint: { x: 0.75, y: 0.25 } },
+      { mode: 'crop', focalPoint: { x: 0.75, y: 0.25 } },
       { width: 1200, height: 800 },
     )
 

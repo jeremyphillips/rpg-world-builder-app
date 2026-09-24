@@ -44,7 +44,6 @@ const campaign = makeCampaign({
   identity: {
     name: 'Sunless Citadel',
     description: 'A classic dungeon delve.',
-    imageKey: 'banner.jpg',
   },
   configuration: {
     flavor: {
@@ -96,7 +95,7 @@ describe('mapCampaignToSettingsValues', () => {
     expect(mapCampaignToSettingsValues(campaign)).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
-      banner: [],
+      media: { revision: 0, images: [], roles: {} },
       playStyle: ['dungeon_crawl'],
       mood: ['heroic'],
       magicLevel: 'standard_fantasy',
@@ -114,7 +113,7 @@ describe('mapCampaignToSettingsValues', () => {
     expect(mapCampaignToSettingsValues(minimal)).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
-      banner: [],
+      media: { revision: 0, images: [], roles: {} },
       playStyle: undefined,
       mood: undefined,
       magicLevel: undefined,
@@ -334,10 +333,9 @@ describe('buildCreateCampaignInput', () => {
       importedCharactersPolicy: 'approval_required',
     }
 
-    expect(buildCreateCampaignInput(values, 'banner.webp', 'classic-adventure')).toEqual({
+    expect(buildCreateCampaignInput(values, 'classic-adventure')).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
-      imageKey: 'banner.webp',
       campaignTemplateId: 'classic-adventure',
       characterCreation: {
         startingLevel: 3,
@@ -353,8 +351,8 @@ describe('buildCreateCampaignInput', () => {
     })
   })
 
-  it('omits imageKey when no banner was uploaded', () => {
-    expect(buildCreateCampaignInput(defaultRules)).not.toHaveProperty('imageKey')
+  it('does not include media on create payload', () => {
+    expect(buildCreateCampaignInput(defaultRules)).not.toHaveProperty('media')
   })
 })
 
@@ -403,12 +401,10 @@ describe('mapRulesetPatchToRulesValues', () => {
 
 describe('buildUpdateCampaignInput', () => {
   it('maps settings form values to identity, flavor, and world settings', () => {
-    expect(
-      buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign), 'new-banner.webp'),
-    ).toEqual({
+    expect(buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign))).toEqual({
       name: 'Sunless Citadel',
       description: 'A classic dungeon delve.',
-      imageKey: 'new-banner.webp',
+      media: { revision: 0, images: [], roles: {} },
       flavor: {
         playStyle: ['dungeon_crawl'],
         mood: ['heroic'],
@@ -430,9 +426,7 @@ describe('buildUpdateCampaignInput', () => {
     })
   })
 
-  it('omits imageKey when no new banner was uploaded', () => {
-    expect(buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign))).not.toHaveProperty(
-      'imageKey',
-    )
+  it('includes media from settings values', () => {
+    expect(buildUpdateCampaignInput(mapCampaignToSettingsValues(campaign))).toHaveProperty('media')
   })
 })

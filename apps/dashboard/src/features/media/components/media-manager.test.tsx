@@ -61,6 +61,10 @@ describe('MediaManager', () => {
     expect(Boolean(screen.queryByRole('checkbox', { name: 'Portrait' }))).toBe(
       domain === 'character',
     )
+    expect(Boolean(screen.queryByRole('checkbox', { name: 'Banner' }))).toBe(domain === 'campaign')
+    expect(Boolean(screen.queryByRole('checkbox', { name: 'Emblem' }))).toBe(
+      domain === 'campaign' || domain === 'organization',
+    )
     expect(screen.queryByRole('button', { name: 'Set as primary' })).not.toBeInTheDocument()
   })
   it('applies alt edits and preserves initial revision without mutating the parent', async () => {

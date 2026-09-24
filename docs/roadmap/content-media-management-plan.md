@@ -9,21 +9,21 @@ with Primary and Portrait referencing those attachments through independent
 presentation metadata. Preserve uploaded original bytes. Keep the identity area
 above tabs compact; collection management belongs in one modal.
 
-Deliver shared infrastructure for **Character, Class, Species, Equipment, Location, and Organization**.
-Portrait applies exclusively to Character, including PC and NPC. Do not introduce separate uploads
+Deliver shared infrastructure for **Character, Campaign, Class, Species, Equipment, Location, and Organization**.
+Portrait applies exclusively to Character, including PC and NPC. Campaign identity uses
+`identity.media` with Banner, Primary, and Emblem roles. Do not introduce separate uploads
 for portraits, scatter role checks by content type, or expand identity into a gallery.
-Account avatars and campaign banners are separate consumers of the existing upload
-service; preserve their behavior unless explicitly included in a later cutover.
-All other content types are outside this rollout.
+Account avatars remain a separate consumer. All other content types are outside this rollout.
 
-| Content policy                     | Available roles         | Identity presentation                                            |
-| ---------------------------------- | ----------------------- | ---------------------------------------------------------------- |
-| Character (PC and NPC)             | Portrait, Primary image | Portrait → transient square Primary crop → character placeholder |
-| Class                              | Primary image           | Primary → class placeholder                                      |
-| Species                            | Primary image           | Primary → species placeholder                                    |
-| Equipment (all authoring families) | Primary image           | Primary → equipment placeholder                                  |
-| Location                           | Primary image           | Primary → location placeholder                                   |
-| Organization                       | Primary image           | Primary → organization placeholder                               |
+| Content policy                     | Available roles               | Representative fallback | Identity presentation                                            |
+| ---------------------------------- | ----------------------------- | ----------------------- | ---------------------------------------------------------------- |
+| Character (PC and NPC)             | Portrait, Primary image       | Portrait → Primary      | Portrait → transient square Primary crop → character placeholder |
+| Campaign                           | Banner, Primary image, Emblem | Primary → Banner        | Banner for headers; Primary for cards/previews                   |
+| Class                              | Primary image                 | Primary                 | Primary → class placeholder                                      |
+| Species                            | Primary image                 | Primary                 | Primary → species placeholder                                    |
+| Equipment (all authoring families) | Primary image                 | Primary                 | Primary → equipment placeholder                                  |
+| Location                           | Primary image                 | Primary                 | Primary → location placeholder                                   |
+| Organization                       | Primary image, Emblem         | Primary                 | Primary → organization placeholder                               |
 
 Use an explicit opt-in registry. Unsupported content types do not gain a Manage images
 action just because they share the identity layout. Reject Portrait on Class, Species,

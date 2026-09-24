@@ -3,20 +3,18 @@ import {
   cn,
   DialogPanelScrollRegion,
   FileDropzone,
-  MediaCropEditor,
-  FilenamePreview,
   resolveChromeCalloutClasses,
   resolveImageDropTargetDefaults,
   type ScrollBoundaryState,
 } from '@rpg/ui'
 import { Info } from 'lucide-react'
-import { resolveEffectiveCrop, type ContentMedia, type MediaAsset } from '@rpg/contracts'
 import type { UseQueryResult } from '@tanstack/react-query'
 
 import type { MediaManagerController } from '../hooks/use-media-manager'
-import { mediaImageUrl, MEDIA_SOURCE_CROP } from '../lib/media-display'
-import { MediaImageDetails } from './media-image-details'
+import { assignedRolesForImage } from '../lib/media-session'
+import { mediaImageUrl } from '../lib/media-display'
 import { mediaManagerStyles as styles } from './media-manager.variants'
+import { MediaWorkspaceSelection } from './media-workspace-selection'
 import { resolveMediaWorkspaceCopy, resolveMediaWorkspaceOnboarding } from './media-workspace.lib'
 
 function MediaWorkspaceErrorAlert({
@@ -56,17 +54,19 @@ export function MediaWorkspace({
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }) {
   const { state, selected, asset, queries, policy, uploads } = controller
-  const portrait = Boolean(
-    selected &&
-    state.media.roles.portrait?.imageId === selected.id &&
-    state.presentation === 'portrait',
-  )
-  const primary = Boolean(selected && state.media.roles.primary?.imageId === selected.id)
+  const assignedRoles = selected
+    ? assignedRolesForImage(state.media, selected.id, policy.allowedRoles)
+    : []
   const copy = resolveMediaWorkspaceCopy({
-    portrait,
-    primary,
+    presentation: state.presentation,
+    assignedRoles,
     hasSelection: Boolean(selected),
   })
+  const isCropEditor =
+    selected &&
+    assignedRoles.includes(state.presentation) &&
+    state.presentation !== 'emblem' &&
+    ['portrait', 'banner', 'primary'].includes(state.presentation)
 
   return (
     <section className={styles.workspace()} aria-label="Image workspace">
@@ -78,7 +78,7 @@ export function MediaWorkspace({
         showBottomBoundaryShadow={false}
         onBoundaryStateChange={onScrollBoundaryChange}
       >
-        {portrait ? (
+        {isCropEditor ? (
           <div className={styles.workspaceHeaderPortrait()}>
             <h2 className={styles.workspacePortraitHeading()}>{copy.heading}</h2>
             <p className={styles.muted()}>{copy.description}</p>
@@ -96,6 +96,7 @@ export function MediaWorkspace({
               imageUrl={imageUrl}
               image={selected}
               asset={asset}
+              assignedRoles={assignedRoles}
             />
           ) : selected ? (
             <div className={styles.empty()}>Loading image details…</div>
@@ -131,74 +132,5 @@ export function MediaWorkspace({
         <MediaWorkspaceErrorAlert queries={queries} />
       </DialogPanelScrollRegion>
     </section>
-  )
-}
-
-function MediaWorkspaceSelection({
-  controller,
-  imageUrl,
-  image: selected,
-  asset,
-}: {
-  controller: MediaManagerController
-  imageUrl: typeof mediaImageUrl
-  image: ContentMedia['images'][number]
-  asset: MediaAsset
-}) {
-  const { state, policy, dispatch, onAlt, changeRole, remove } = controller
-  const portrait =
-    state.media.roles.portrait?.imageId === selected.id && state.presentation === 'portrait'
-  const primary = state.media.roles.primary?.imageId === selected.id
-  return (
-    <>
-      {primary && state.media.roles.portrait?.imageId === selected.id && (
-        <div className={styles.row()} role="group" aria-label="Presentation">
-          {(['portrait', 'primary'] as const).map((role) => (
-            <Button
-              key={role}
-              type="button"
-              variant="outline"
-              aria-pressed={state.presentation === role}
-              onClick={() => dispatch({ type: 'presentation', role })}
-            >
-              {role === 'portrait' ? 'Portrait' : 'Primary image'}
-            </Button>
-          ))}
-        </div>
-      )}
-      <div className={styles.editor()}>
-        {portrait ? (
-          <MediaCropEditor
-            src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
-            source={{ width: asset.orientedWidth, height: asset.orientedHeight }}
-            crop={resolveEffectiveCrop(state.media.roles.portrait?.presentation, {
-              width: asset.orientedWidth,
-              height: asset.orientedHeight,
-            })}
-            onChange={(crop) => dispatch({ type: 'crop', crop })}
-          />
-        ) : (
-          <figure className={styles.previewCard()}>
-            <img
-              className={styles.preview()}
-              src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
-              alt={selected.alt ?? ''}
-            />
-            <figcaption className={styles.previewCaption()}>
-              <FilenamePreview filename={asset.filename} />
-            </figcaption>
-          </figure>
-        )}
-        <MediaImageDetails
-          image={selected}
-          asset={asset}
-          media={state.media}
-          policy={policy}
-          onAlt={onAlt}
-          onRole={changeRole}
-          onRemove={remove}
-        />
-      </div>
-    </>
   )
 }

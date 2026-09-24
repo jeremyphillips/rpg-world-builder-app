@@ -79,7 +79,9 @@ function MediaManagerSession(props: MediaManagerProps) {
             selectedId={state.selectedId}
             entries={uploads.entries}
             saving={saving}
-            onSelect={(id) => dispatch({ type: 'select', id })}
+            onSelect={(id) =>
+              dispatch({ type: 'select', id, allowedRoles: controller.policy.allowedRoles })
+            }
             onGalleryBoundaryChange={onGalleryBoundaryChange}
             onWorkspaceBoundaryChange={onWorkspaceBoundaryChange}
           />

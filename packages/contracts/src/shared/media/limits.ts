@@ -32,3 +32,27 @@ export const CONTENT_MEDIA_UPLOAD_LEASE_MS = 24 * 60 * 60 * 1000
 
 /** Rounding tolerance when validating square Portrait crops against source pixels. */
 export const CONTENT_MEDIA_PORTRAIT_SQUARE_TOLERANCE_PX = 1
+
+/** Minimum decoded Banner crop width in oriented pixels. */
+export const CONTENT_MEDIA_BANNER_MIN_WIDTH_PX = 1200
+
+/** Minimum decoded Banner crop height in oriented pixels. */
+export const CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX = 400
+
+/** Banner crop width-to-height ratio. */
+export const CONTENT_MEDIA_BANNER_ASPECT_RATIO = 3
+
+/** Rounding tolerance when validating Banner 3:1 crops against source pixels. */
+export const CONTENT_MEDIA_BANNER_ASPECT_TOLERANCE_PX = 1
+
+/** Minimum decoded Primary crop short edge in oriented pixels. */
+export const CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX = 256
+
+/** Minimum decoded source edge for Emblem eligibility in oriented pixels. */
+export const CONTENT_MEDIA_EMBLEM_MIN_EDGE_PX = 128
+
+/** Emblem contain layout: per-side padding as a fraction of the frame edge (0–0.2). */
+export const CONTENT_MEDIA_EMBLEM_PADDING_MAX = 0.2
+
+/** Emblem contain layout: minimum scale multiplier (0.25–1). */
+export const CONTENT_MEDIA_EMBLEM_SCALE_MIN = 0.25
