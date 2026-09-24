@@ -367,6 +367,23 @@ describe('Form', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
+  it('does not enable bounded scroll from scrollBodyClassName alone', () => {
+    const { container } = render(
+      <Form<Values>
+        schema={schema}
+        fields={[{ type: 'text', name: 'name', label: 'Name' }]}
+        onSubmit={vi.fn()}
+        stickyFooter
+        scrollBodyClassName="pt-8"
+        documentScroll
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(container.querySelector('.form-scroll-body-container')).toBeNull()
+    expect(container.querySelector('.overflow-y-auto')).toBeNull()
+  })
+
   it('follows content when documentScroll and stickyFooter are both enabled', () => {
     const { container } = render(
       <Form<Values>

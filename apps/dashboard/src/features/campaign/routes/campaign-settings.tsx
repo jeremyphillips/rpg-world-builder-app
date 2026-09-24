@@ -116,6 +116,7 @@ export function CampaignSettings() {
         defaultValues={mapCampaignToSettingsValues(campaign)}
         onSubmit={onSubmit}
         formError={formError}
+        documentScroll
         footer={(form) => (
           <>
             <FormUnsavedChangesGuard />

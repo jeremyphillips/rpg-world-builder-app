@@ -81,6 +81,12 @@ describe('CampaignSettings', () => {
     expect(screen.queryByRole('button', { name: 'Rules' })).not.toBeInTheDocument()
   })
 
+  it('uses document scroll without a bounded inner scroll body', async () => {
+    const { container } = renderSettings()
+    await screen.findByDisplayValue('Sunless Citadel')
+    expect(container.querySelector('.form-scroll-body-container')).toBeNull()
+  })
+
   it('shows the campaign images field on the identity tab', async () => {
     renderSettings()
     await screen.findByDisplayValue('Sunless Citadel')

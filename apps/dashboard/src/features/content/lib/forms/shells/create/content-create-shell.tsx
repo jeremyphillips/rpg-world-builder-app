@@ -8,12 +8,12 @@ import { emptyContentMediaSchema } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 import { useRef, useState, type ReactNode } from 'react'
 
-import { hasContentFormPreview } from '../../preview/content-form-preview.types'
+import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import {
-  contentFormPageShellBodyClasses,
-  contentFormPageShellHeadingClasses,
-} from '../layout/content-form-page-shell.variants'
+  resolveContentFormLayout,
+  type ContentFormLayout as ResolvedContentFormLayout,
+} from '../layout/content-form-layout.lib'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import { notifyContentCreated } from '@/lib/notify'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
@@ -64,7 +64,7 @@ interface ContentCreateFormBodyProps {
   backHref: string
   ctx: ContentFormCtx
   heading: string
-  usePreviewLayout: boolean
+  layout: ResolvedContentFormLayout
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
   prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
@@ -78,7 +78,7 @@ function ContentCreateFormBody({
   backHref,
   ctx,
   heading,
-  usePreviewLayout,
+  layout,
   initialValues,
   formCtx,
   prepareSubmitValues,
@@ -199,10 +199,12 @@ function ContentCreateFormBody({
         onLeaveGuardReady={(guard) => {
           leaveGuardRef.current = guard
         }}
-        previewDraftBadge={usePreviewLayout}
+        scrollMode={layout.scrollMode}
+        previewEnabled={layout.previewEnabled}
+        previewDraftBadge={layout.previewEnabled}
         formHeaderPrefix={
           <>
-            {usePreviewLayout ? (
+            {layout.previewEnabled ? (
               <Heading variant="page" as="h1">
                 {heading}
               </Heading>
@@ -222,7 +224,7 @@ interface ContentCreateFormProps {
   campaignId: string
   backHref: string
   heading: string
-  usePreviewLayout: boolean
+  layout: ResolvedContentFormLayout
   initialValues?: Record<string, unknown>
   formCtx?: Partial<ContentFormCtx>
   prepareSubmitValues?: (values: Record<string, unknown>) => Record<string, unknown>
@@ -235,7 +237,7 @@ function ContentCreateForm({
   campaignId,
   backHref,
   heading,
-  usePreviewLayout,
+  layout,
   initialValues,
   formCtx,
   prepareSubmitValues,
@@ -250,7 +252,7 @@ function ContentCreateForm({
           campaignId={campaignId}
           backHref={backHref}
           heading={heading}
-          usePreviewLayout={usePreviewLayout}
+          layout={layout}
           ctx={{
             ...optionsCtx,
             ...formCtx,
@@ -288,7 +290,7 @@ export function ContentCreateShell({
   formHeaderPrefix,
 }: ContentCreateShellProps) {
   const def = contentFormRegistry[contentType]
-  const usePreviewLayout = def != null && hasContentFormPreview(def)
+  const layout = def != null ? resolveContentFormLayout(def) : null
 
   const formContent = def ? (
     <ContentAuthoringGate campaignId={campaignId}>
@@ -298,7 +300,7 @@ export function ContentCreateShell({
         campaignId={campaignId}
         backHref={backHref}
         heading={heading}
-        usePreviewLayout={usePreviewLayout}
+        layout={layout!}
         initialValues={initialValues}
         formCtx={formCtx}
         prepareSubmitValues={prepareSubmitValues}
@@ -309,19 +311,28 @@ export function ContentCreateShell({
     <ContentFormComingSoon />
   )
 
+  if (!layout) {
+    return (
+      <NarrowPage>
+        <Heading variant="page" as="h1">
+          {heading}
+        </Heading>
+        {formContent}
+      </NarrowPage>
+    )
+  }
+
   return (
-    <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
-      {!usePreviewLayout ? (
-        <div className={contentFormPageShellBodyClasses}>
-          <div className={contentFormPageShellHeadingClasses}>
-            <Heading variant="page" as="h1">
-              {heading}
-            </Heading>
-          </div>
-          {formContent}
-        </div>
-      ) : (
+    <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
+      {layout.previewEnabled ? (
         formContent
+      ) : (
+        <>
+          <Heading variant="page" as="h1">
+            {heading}
+          </Heading>
+          {formContent}
+        </>
       )}
     </ContentFormPageShell>
   )

@@ -194,6 +194,27 @@ describe('TabbedForm', () => {
     expect(clipRegion?.contains(toolbar)).toBe(false)
   })
 
+  it('follows content when documentScroll and stickyChrome are both enabled', () => {
+    const { container } = render(
+      <TabbedForm<TestValues>
+        schema={schema}
+        tabs={tabs}
+        onSubmit={vi.fn()}
+        documentScroll
+        footer={<button type="submit">Save changes</button>}
+      />,
+    )
+
+    const sectionsNav = getSectionsNav()
+    expect(sectionsNav.parentElement).toHaveClass('sticky')
+    expect(container.querySelector('.form-scroll-body-container')).toBeNull()
+    expect(sectionsNav.closest('.overflow-y-auto')).toBeNull()
+
+    const toolbar = screen.getByRole('toolbar', { name: 'Form actions' })
+    expect(toolbar).toHaveClass('sticky')
+    expect(toolbar).not.toHaveClass('shrink-0')
+  })
+
   it('renders scrollBodyClassName as a scroll-away inset inside the scroll region', () => {
     render(
       <TabbedForm<TestValues>

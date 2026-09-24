@@ -146,10 +146,10 @@ may own vertical scrolling.
 
 **ViewportWorkspace consumers** (bounded routes — no document scrollbar):
 
-| Consumer                                                                                              | Route pattern       |
-| ----------------------------------------------------------------------------------------------------- | ------------------- |
-| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Catalog create/edit |
-| [`MessagesWorkspaceShell`](../src/features/message/components/workspace/messages-workspace-shell.tsx) | `/messages`         |
+| Consumer                                                                                              | Route pattern                                        |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Preview catalog create/edit (`scrollMode: viewport`) |
+| [`MessagesWorkspaceShell`](../src/features/message/components/workspace/messages-workspace-shell.tsx) | `/messages`                                          |
 
 `AppShell` publishes `--app-sticky-chrome-block-size` (sticky topbar + breadcrumb)
 for workspace bounds and chrome-aware sticky rails; `<main>` aliases
@@ -167,11 +167,11 @@ Inset vs child rhythm are **independent** on width shells:
 
 Every route picks **one width shell** from `components/layout/page/`:
 
-| Shell                                                                                                 | Width                | Typical routes                                                                         |
-| ----------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------------------------------------------------------------- |
-| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx)                                         | Centered `max-w-4xl` | Settings, wizards, account settings, simple forms                                      |
-| [`WidePage`](../src/components/layout/page/wide-page.tsx)                                             | Full main column     | Lists, hubs, detail pages, tables, Rules Config                                        |
-| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Narrow or wide       | Catalog create/edit — wraps `ViewportWorkspace`; form panes own scroll + docked footer |
+| Shell                                                                                                 | Width                | Typical routes                                                                      |
+| ----------------------------------------------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------------------------- |
+| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx)                                         | Centered `max-w-4xl` | Settings, wizards, account settings, simple forms                                   |
+| [`WidePage`](../src/components/layout/page/wide-page.tsx)                                             | Full main column     | Lists, hubs, detail pages, tables, Rules Config                                     |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Narrow or wide       | Catalog create/edit — `resolveContentFormLayout` picks `scrollMode` and `pageWidth` |
 
 Nested readable columns inside `WidePage` use
 [`narrowPageContentClasses`](../src/components/layout/page/page-content.variants.ts)
@@ -206,9 +206,10 @@ import { WidePage } from '@/components/layout/page/wide-page'
   {/* card grid */}
 </WidePage>
 
-// Content catalog create/edit — ViewportWorkspace; TabbedForm owns scroll + docked footer
-<ContentFormPageShell usePreviewLayout={hasPreview}>
-  {/* form */}
+// Content catalog create/edit — layout resolver picks scroll ownership once
+const layout = resolveContentFormLayout(def)
+<ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
+  {/* form — viewport routes use bounded inner scroll; document routes use NarrowPage + documentScroll */}
 </ContentFormPageShell>
 ```
 

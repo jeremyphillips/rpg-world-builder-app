@@ -1,8 +1,5 @@
-/**
- * Flex fill participant for TabbedForm / Form inside ViewportWorkspace —
- * overflow-hidden caps content min-size for docked footer; not a scrollport.
- */
-export const contentSchemaFormFillClasses = 'flex min-h-0 flex-1 flex-col overflow-hidden'
+/** Flex fill participant for TabbedForm / Form inside ViewportWorkspace only. */
+export const contentViewportFormFillClasses = 'flex min-h-0 flex-1 flex-col overflow-hidden'
 
 /**
  * Wrapper for page heading + form — publishes the page-heading increment so dvh

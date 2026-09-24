@@ -20,8 +20,8 @@ import {
   ContentFormSaveFooter,
   type ContentFormFooterShellProps,
 } from './content-form-shell-layout.lib'
-import { contentSchemaFormFillClasses } from './content-form-page-shell.variants'
-import { hasContentFormPreview } from '../../preview/content-form-preview.types'
+import type { ContentFormScrollMode } from './content-form-layout.lib'
+import { contentViewportFormFillClasses } from './content-form-page-shell.variants'
 import {
   ContentPreviewCompactTrigger,
   ContentPreviewRail,
@@ -53,6 +53,8 @@ interface ContentSchemaFormShellProps<
   fields?: FormItem[]
   tabs?: TabbedFormTab[]
   previewDraftBadge?: boolean
+  scrollMode: ContentFormScrollMode
+  previewEnabled: boolean
 }
 
 function useContentSchemaSubmitHandler<TFormValues extends FieldValues>(
@@ -141,6 +143,8 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
   onSaved,
   onLeaveGuardReady,
   previewDraftBadge = false,
+  scrollMode,
+  previewEnabled,
 }: ContentSchemaFormShellProps<TFormValues>) {
   const [hasAttemptedPublish, setHasAttemptedPublish] = React.useState(false)
   const [publishPresentationIssues, setPublishPresentationIssues] = React.useState<FormIssue[]>([])
@@ -181,7 +185,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
     () => (tabbedFormTabs ? collectTabbedFormResolverItems(tabbedFormTabs) : (fields ?? [])),
     [fields, tabbedFormTabs],
   )
-  const previewEnabled = hasContentFormPreview(headerProps.def) && Boolean(tabbedFormTabs)
+  const isViewport = scrollMode === 'viewport'
   const header = (form: UseFormReturn<TFormValues>) => (
     <>
       {headerPrefix}
@@ -225,7 +229,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
     <>
       {tabbedFormTabs ? (
         <ContentPreviewUiProvider>
-          <div className={contentSchemaFormFillClasses}>
+          <div className={isViewport ? contentViewportFormFillClasses : undefined}>
             <TabbedForm<TFormValues>
               key={formKey}
               id={formKey}
@@ -238,8 +242,9 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
               formError={formError}
               header={header}
               footer={footer}
-              className="flex min-h-0 flex-1 flex-col"
-              scrollBodyClassName={formViewportScrollBodyTopInsetClasses}
+              documentScroll={!isViewport}
+              className={isViewport ? contentViewportFormFillClasses : undefined}
+              scrollBodyClassName={isViewport ? formViewportScrollBodyTopInsetClasses : undefined}
               hasAttemptedPublish={hasAttemptedPublish}
               onMarkPublishAttempted={markPublishAttempted}
               publishPresentationIssues={publishPresentationIssues}
@@ -259,7 +264,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
           </div>
         </ContentPreviewUiProvider>
       ) : (
-        <div className={contentSchemaFormFillClasses}>
+        <div className={isViewport ? contentViewportFormFillClasses : undefined}>
           <Form<TFormValues>
             key={formKey}
             id={formKey}
@@ -271,8 +276,9 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
             formError={formError}
             valueSyncs={valueSyncs}
             stickyFooter
-            className="flex min-h-0 flex-1 flex-col"
-            scrollBodyClassName={formViewportScrollBodyTopInsetClasses}
+            documentScroll={!isViewport}
+            className={isViewport ? contentViewportFormFillClasses : undefined}
+            scrollBodyClassName={isViewport ? formViewportScrollBodyTopInsetClasses : undefined}
             header={header}
             footer={footer}
           />

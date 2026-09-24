@@ -24,15 +24,18 @@ footer. Master-detail list rails offset sticky `top` with
 `--master-detail-shell-max-block-size`. The scroll body is also a size container
 (`form-scroll-body-container` on the clip slot only, `boundedScroll` on `FormStickyScrollBody`) so
 descendants can cap against the definite flex column above the footer; the inner scroller owns
-`overflow-y-auto`. Plain `<Form stickyFooter documentScroll>` on document-scroll routes omits the docked
-column and inner scroller so fields keep their natural height; the actions bar uses sticky
-placement during ancestor scroll. Pass `stickyChrome={false}` for
-flat layout. Dashboard content create/edit routes mount
-`ContentFormPageShell` (`ViewportWorkspace` + width shell with `spacing="none"`) so the page
-fills the app main column without document scroll; TabbedForm owns the bounded scroll body and
-docked footer (flush to the viewport bottom). Top inset scrolls away via `scrollBodyClassName`
-(typically `formViewportScrollBodyTopInsetClasses`) as the first child inside the scroll region —
-not as padding on the scroll container — so sticky tabs can reach `top-0`; preview-rail top
+`overflow-y-auto`. Plain `<Form stickyFooter documentScroll>` and `<TabbedForm documentScroll>`
+on document-scroll routes omit the docked column and inner scroller so fields keep their natural
+height; the actions bar uses sticky placement during ancestor scroll. Pass `stickyChrome={false}`
+for flat layout. Dashboard preview catalog routes (`scrollMode: 'viewport'`) mount
+`ContentFormPageShell` with `ViewportWorkspace` + width shell (`spacing="none"`) so the page fills
+the app main column without document scroll; TabbedForm owns the bounded scroll body and docked
+footer (flush to the viewport bottom). Non-preview catalog routes and settings-style pages use
+`scrollMode: 'document'` (`NarrowPage` + `documentScroll`). `scrollBodyClassName` is inset-only —
+it never selects scroll ownership; pass explicit `boundedScroll` or use the docked-footer shell path.
+Top inset scrolls away via `scrollBodyClassName` (typically `formViewportScrollBodyTopInsetClasses`)
+as the first child inside the scroll region — not as padding on the scroll container — so sticky
+tabs can reach `top-0`; preview-rail top
 gutter lives on `formTabbedAsideSlotTopInsetClasses`; bottom breathing room on
 `formTabbedAsideSlotBottomInsetClasses` (`xl:pb-4` — intentional inset so preview content clears
 the docked form footer; the form-column footer itself stays flush). Plain `<Form>` with docked

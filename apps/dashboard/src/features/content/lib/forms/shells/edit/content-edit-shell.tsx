@@ -10,12 +10,8 @@ import { type ReactNode } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
-import {
-  contentFormPageShellBodyClasses,
-  contentFormPageShellHeadingClasses,
-} from '../layout/content-form-page-shell.variants'
+import { resolveContentFormLayout } from '../layout/content-form-layout.lib'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
@@ -178,7 +174,7 @@ function ContentEditEntityFormBody<
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
-  const usePreviewLayout = hasContentFormPreview(def)
+  const layout = resolveContentFormLayout(def)
   const {
     campaignAccess,
     setCampaignAccess,
@@ -207,7 +203,7 @@ function ContentEditEntityFormBody<
       source={entity.source}
       status={entity.status}
       campaignAccess={campaignAccess}
-      omitDraft={usePreviewLayout}
+      omitDraft={layout.previewEnabled}
       lifecycle={
         showLifecycleActions ? (
           <ContentEditLifecycleActions
@@ -240,21 +236,23 @@ function ContentEditEntityFormBody<
       onSaved={handleCoordinatedSaveSuccess}
       publishSchema={entity.status === 'draft' ? publishSchema : undefined}
       onPublish={entity.status === 'draft' ? handlePublish : undefined}
-      previewDraftBadge={usePreviewLayout && entity.status === 'draft'}
-      formHeaderPrefix={usePreviewLayout ? heading : undefined}
+      scrollMode={layout.scrollMode}
+      previewEnabled={layout.previewEnabled}
+      previewDraftBadge={layout.previewEnabled && entity.status === 'draft'}
+      formHeaderPrefix={layout.previewEnabled ? heading : undefined}
     />
   )
 
   const formBody = (
     <ContentAuthoringGate campaignId={campaignId}>
-      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
-        {usePreviewLayout ? (
+      <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
+        {layout.previewEnabled ? (
           formLayout
         ) : (
-          <div className={contentFormPageShellBodyClasses}>
-            <div className={contentFormPageShellHeadingClasses}>{heading}</div>
+          <>
+            {heading}
             {formLayout}
-          </div>
+          </>
         )}
       </ContentFormPageShell>
 
@@ -426,25 +424,33 @@ export function ContentEditShell({
   formCtx,
 }: ContentEditShellProps) {
   const def = contentFormRegistry[contentType]
-  const usePreviewLayout = def != null && hasContentFormPreview(def)
+  const layout = def != null ? resolveContentFormLayout(def) : null
 
   if (isPending) {
-    return (
-      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
+    return layout ? (
+      <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
         <div className="flex justify-center">
           <Spinner />
         </div>
       </ContentFormPageShell>
+    ) : (
+      <div className="flex justify-center">
+        <Spinner />
+      </div>
     )
   }
 
   if (isError) {
-    return (
-      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
+    return layout ? (
+      <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
         <Text variant="destructive" role="alert">
           {loadErrorLabel}
         </Text>
       </ContentFormPageShell>
+    ) : (
+      <Text variant="destructive" role="alert">
+        {loadErrorLabel}
+      </Text>
     )
   }
 

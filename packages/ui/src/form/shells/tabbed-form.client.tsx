@@ -95,6 +95,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   stickyActionsBarClassName?: string
   /** Extra classes merged onto the bounded scroll body (e.g. top inset that scrolls with content). */
   scrollBodyClassName?: string
+  /**
+   * When true, fields grow with the page and the actions bar sticks during ancestor
+   * scroll instead of using a bounded inner scroll body.
+   */
+  documentScroll?: boolean
   /** Wrap tab chrome and panels (e.g. `<Sheet.Body>` in a drawer layout). */
   contentWrapper?: (content: React.ReactNode) => React.ReactNode
   /**
@@ -162,6 +167,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   stickyTabsClassName,
   stickyActionsBarClassName,
   scrollBodyClassName,
+  documentScroll = false,
   contentWrapper,
   externalFooter = false,
   valueSyncs,
@@ -246,19 +252,19 @@ export function TabbedForm<TFieldValues extends FieldValues>({
     </DialogPanelScrollRegion>
   )
 
+  const usesDockedScrollBody = stickyChrome && !externalFooter && !documentScroll
+
   const footerRegion = !externalFooter ? (
     <TabbedFormFooterRegion
       hasFooterRegion={Boolean(formError || resolvedFooter)}
       stickyChrome={stickyChrome}
       stickyActionsBarClassName={stickyActionsBarClassName}
-      actionsBarPlacement={stickyChrome ? 'docked' : 'sticky'}
+      actionsBarPlacement={usesDockedScrollBody ? 'docked' : 'sticky'}
       formError={formError}
       validationSummary={validationSummary}
       resolvedFooter={resolvedFooter}
     />
   ) : null
-
-  const usesDockedScrollBody = stickyChrome && !externalFooter
 
   const scrollableBody = (
     <>
@@ -342,7 +348,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         externalFooterContent={externalFooterContent}
         className={cn(
           externalFooter && 'flex min-h-0 flex-1 flex-col',
-          stickyChrome && !externalFooter && 'flex min-h-0 flex-1 flex-col',
+          usesDockedScrollBody && 'flex min-h-0 flex-1 flex-col',
           resolveTabbedFormShellClassName(className, stickyChrome, externalFooter),
         )}
       >
