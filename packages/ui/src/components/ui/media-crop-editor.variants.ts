@@ -4,30 +4,10 @@ export const mediaCropStyles = {
   root: cva('flex min-w-0 max-w-full flex-col gap-4'),
   viewport: cva(
     'relative min-w-0 w-full max-w-full overflow-hidden rounded-md bg-sunken touch-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-    {
-      variants: {
-        frame: {
-          square: 'aspect-square',
-          banner: 'aspect-[3/1]',
-          free: 'min-h-32',
-        },
-      },
-      defaultVariants: { frame: 'square' },
-    },
   ),
   image: cva('pointer-events-none absolute max-w-none select-none'),
   aperture: cva(
-    'pointer-events-none absolute border-2 border-foreground ring-[100vmax] ring-overlay',
-    {
-      variants: {
-        frame: {
-          square: 'inset-[12.5%]',
-          banner: 'inset-[12.5%]',
-          free: 'inset-[12.5%]',
-        },
-      },
-      defaultVariants: { frame: 'square' },
-    },
+    'pointer-events-none absolute inset-[12.5%] border-2 border-foreground ring-[100vmax] ring-overlay',
   ),
   guides: cva('absolute inset-1/3 border-x border-y border-border'),
   focalPoint: cva(

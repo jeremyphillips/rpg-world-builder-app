@@ -5,6 +5,7 @@ import {
   MEDIA_ROLE_ENTRIES,
   asCropPresentation,
   contentImageSchema,
+  formatFieldMessage,
   resolveMediaRoleEligibility,
   type ContentMedia,
   type ContentMediaPolicy,
@@ -72,7 +73,7 @@ export function MediaImageDetails({
               )
               const eligibility = resolveMediaRoleEligibility(role, source, cropPresentation)
               const hint = !eligibility.eligible
-                ? eligibility.message
+                ? formatFieldMessage(eligibility.message)
                 : (eligibility.hint ?? MEDIA_ROLE_ENTRIES[role].description)
 
               return (

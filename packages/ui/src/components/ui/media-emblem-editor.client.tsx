@@ -20,11 +20,18 @@ export type MediaEmblemEditorProps = {
   src: string
   source: SourceDimensions
   layout: ContainPresentation
+  instructions: string
   onChange: (layout: ContainPresentation) => void
 }
 
 /** Controlled emblem contain editor with artwork size and optional position. */
-export function MediaEmblemEditor({ src, source, layout, onChange }: MediaEmblemEditorProps) {
+export function MediaEmblemEditor({
+  src,
+  source,
+  layout,
+  instructions,
+  onChange,
+}: MediaEmblemEditorProps) {
   const id = useId()
   const drag = useRef<{ x: number; y: number; offset: { x: number; y: number } } | null>(null)
   const canvasSize = resolveEmblemCanvasSize()
@@ -89,7 +96,7 @@ export function MediaEmblemEditor({ src, source, layout, onChange }: MediaEmblem
         />
       </div>
       <p id={`${id}-instructions`} className="sr-only">
-        Drag to reposition the emblem within the frame.
+        {instructions}
       </p>
       <div className={styles.controls()}>
         <label htmlFor={`${id}-size`}>Artwork size</label>

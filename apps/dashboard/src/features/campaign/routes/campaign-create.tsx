@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { getErrorMessage, resolveMediaRoleEligibility } from '@rpg/contracts'
+import { formatFieldMessage, getErrorMessage, resolveMediaRoleEligibility } from '@rpg/contracts'
 import { Heading, Wizard, type WizardStepDef } from '@rpg/ui'
 import { WizardStepForm } from '@rpg/ui/form'
 
@@ -73,7 +73,7 @@ export function CampaignCreate() {
         const dimensions = await readImageFileDimensions(createValues.banner[0])
         const eligibility = resolveMediaRoleEligibility('banner', dimensions)
         if (!eligibility.eligible) {
-          setCreateError(eligibility.message)
+          setCreateError(formatFieldMessage(eligibility.message))
           return
         }
       }

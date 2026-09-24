@@ -51,8 +51,8 @@ retain the media draft until its own save/cancel decision.
   abort handling and ordered publication of successful uploads.
 - `api/media-api.ts`: response contracts and CSRF-protected same-origin requests.
 - `components/`: gallery, schema-driven alt form, role controls and modal workspace.
-- `@rpg/ui` `MediaCropEditor`: square, 3:1 banner, and free primary crop modes with
-  optional focal-point handles in source space.
+- `@rpg/ui` `MediaCropEditor`: fixed-aspect crop constraints (1:1 portrait, 3:1 banner,
+  4:3 primary) with optional focal-point handles in source space.
 - `@rpg/ui` `MediaEmblemEditor`: artwork size and optional position for emblem contain layout.
 
 The image collection stays in insertion order. Role eligibility is shared between

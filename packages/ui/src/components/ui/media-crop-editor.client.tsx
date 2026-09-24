@@ -2,13 +2,8 @@
 
 import { useId, useRef, useState } from 'react'
 import {
-  CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX,
-  CONTENT_MEDIA_BANNER_MIN_WIDTH_PX,
-  CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX,
-  CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX,
-  resetBannerCrop,
-  resetPortraitCrop,
-  resetPrimaryCrop,
+  resetFixedAspectCrop,
+  type FixedAspectCropSpec,
   type NormalizedCrop,
   type NormalizedFocalPoint,
   type SourceDimensions,
@@ -16,14 +11,22 @@ import {
 import { Button } from './button.client'
 import { mediaCropStyles as styles } from './media-crop-editor.variants'
 
-export type MediaCropEditorFrame = 'square' | 'banner' | 'free'
+export type MediaCropEditorConstraint = {
+  aspectRatio: number
+  minWidthPx: number
+  minHeightPx: number
+  positionLabel: string
+  instructions: string
+  showPortraitPreviews: boolean
+  spec: FixedAspectCropSpec
+}
 
 export type MediaCropEditorProps = {
   src: string
   source: SourceDimensions
   crop: NormalizedCrop
   onChange: (crop: NormalizedCrop) => void
-  frame?: MediaCropEditorFrame
+  constraint: MediaCropEditorConstraint
   focalPoint?: NormalizedFocalPoint
   onFocalPointChange?: (focalPoint: NormalizedFocalPoint) => void
 }
@@ -45,26 +48,6 @@ const APERTURE_LAYOUT: FrameLayout = {
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
-function defaultCropForFrame(
-  frame: MediaCropEditorFrame,
-  source: SourceDimensions,
-): NormalizedCrop {
-  if (frame === 'banner') return resetBannerCrop(source)
-  if (frame === 'free') return resetPrimaryCrop()
-  return resetPortraitCrop(source)
-}
-
-function minEdgePxForFrame(frame: MediaCropEditorFrame): number {
-  if (frame === 'free') return CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX
-  return CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX
-}
-
-function viewportAspectForFrame(frame: MediaCropEditorFrame, source: SourceDimensions): number {
-  if (frame === 'banner') return 3
-  if (frame === 'free') return source.width / source.height
-  return 1
-}
-
 type CropPreviewLayout = {
   widthPercent: number
   heightPercent: number
@@ -74,19 +57,18 @@ type CropPreviewLayout = {
 
 /** Map a normalized crop to viewport percentages with uniform scale that fills the aperture. */
 export function resolveCropPreviewLayout(
-  frame: MediaCropEditorFrame,
+  aspectRatio: number,
   source: SourceDimensions,
   crop: NormalizedCrop,
   insets: FrameLayout = APERTURE_LAYOUT,
 ): CropPreviewLayout {
-  const viewportAspect = viewportAspectForFrame(frame, source)
-  const viewportHeight = 1 / viewportAspect
+  const viewportHeight = 1 / aspectRatio
   const cropWidthPx = crop.width * source.width
   const cropHeightPx = crop.height * source.height
   const apertureLeft = insets.offsetX / 100
   const apertureTop = insets.offsetY / 100
   const apertureWidth = insets.scaleX
-  const apertureHeight = insets.scaleY / viewportAspect
+  const apertureHeight = insets.scaleY / aspectRatio
   const scale = Math.max(apertureWidth / cropWidthPx, apertureHeight / cropHeightPx)
   const imageWidth = scale * source.width
   const imageHeight = scale * source.height
@@ -95,7 +77,7 @@ export function resolveCropPreviewLayout(
     widthPercent: imageWidth * 100,
     heightPercent: (imageHeight / viewportHeight) * 100,
     leftPercent: (apertureLeft - scale * crop.x * source.width) * 100,
-    topPercent: (apertureTop - scale * crop.y * source.height * viewportAspect) * 100,
+    topPercent: (apertureTop - scale * crop.y * source.height * aspectRatio) * 100,
   }
 }
 
@@ -106,7 +88,7 @@ export function MediaCropEditor({
   source,
   crop,
   onChange,
-  frame = 'square',
+  constraint,
   focalPoint,
   onFocalPointChange,
 }: MediaCropEditorProps) {
@@ -115,17 +97,13 @@ export function MediaCropEditor({
   const [attempt, setAttempt] = useState(0)
   const drag = useRef<{ x: number; y: number; crop: NormalizedCrop } | null>(null)
   const focalDrag = useRef<{ crop: NormalizedCrop } | null>(null)
-  const base = defaultCropForFrame(frame, source)
+  const base = resetFixedAspectCrop(source, constraint.spec)
   const layout = APERTURE_LAYOUT
   const zoom = base.width / crop.width
-  const minEdge = minEdgePxForFrame(frame)
-  const maxZoom =
-    frame === 'banner'
-      ? Math.min(
-          (base.width * source.width) / CONTENT_MEDIA_BANNER_MIN_WIDTH_PX,
-          (base.height * source.height) / CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX,
-        )
-      : Math.min(source.width, source.height) / minEdge
+  const maxZoom = Math.min(
+    (base.width * source.width) / constraint.minWidthPx,
+    (base.height * source.height) / constraint.minHeightPx,
+  )
 
   function move(x: number, y: number) {
     onChange({
@@ -148,29 +126,22 @@ export function MediaCropEditor({
   }
 
   const imageStyle = (insets: FrameLayout) => {
-    const layout = resolveCropPreviewLayout(frame, source, crop, insets)
+    const previewLayout = resolveCropPreviewLayout(constraint.aspectRatio, source, crop, insets)
     return {
-      width: `${layout.widthPercent}%`,
-      height: `${layout.heightPercent}%`,
-      left: `${layout.leftPercent}%`,
-      top: `${layout.topPercent}%`,
+      width: `${previewLayout.widthPercent}%`,
+      height: `${previewLayout.heightPercent}%`,
+      left: `${previewLayout.leftPercent}%`,
+      top: `${previewLayout.topPercent}%`,
     }
   }
-
-  const frameLabel =
-    frame === 'banner'
-      ? 'Banner crop position'
-      : frame === 'free'
-        ? 'Primary crop position'
-        : 'Portrait crop position'
 
   return (
     <div className={styles.root()}>
       <div
-        className={styles.viewport({ frame })}
-        style={frame === 'free' ? { aspectRatio: `${source.width} / ${source.height}` } : undefined}
+        className={styles.viewport()}
+        style={{ aspectRatio: constraint.aspectRatio }}
         role="group"
-        aria-label={frameLabel}
+        aria-label={constraint.positionLabel}
         aria-describedby={`${id}-instructions`}
         tabIndex={0}
         onKeyDown={(event) => {
@@ -250,7 +221,7 @@ export function MediaCropEditor({
           className={styles.image()}
           style={imageStyle(layout)}
         />
-        <div className={styles.aperture({ frame })}>
+        <div className={styles.aperture()}>
           <div className={styles.guides()} />
           {focalPoint && onFocalPointChange && (
             <button
@@ -287,11 +258,7 @@ export function MediaCropEditor({
         </p>
       )}
       <p id={`${id}-instructions`} className={styles.label()}>
-        {frame === 'free'
-          ? 'Drag to reposition, zoom, or place the focal point inside the crop.'
-          : frame === 'banner'
-            ? 'Drag to reposition the 3:1 banner crop and place the focal point inside it.'
-            : 'Drag to reposition, or focus the crop and use arrow keys. Portrait is fixed at 1:1.'}
+        {constraint.instructions}
       </p>
       <div className={styles.row()}>
         <Button
@@ -326,7 +293,7 @@ export function MediaCropEditor({
           Reset crop
         </Button>
       </div>
-      {frame === 'square' && (
+      {constraint.showPortraitPreviews && (
         <div className={styles.previews()}>
           {[false, true].map((circle) => (
             <figure key={String(circle)}>

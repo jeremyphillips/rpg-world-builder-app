@@ -46,7 +46,7 @@ it('switches presentations on a shared source without changing role assignments'
   )
   expect(screen.getByLabelText('Zoom')).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Primary image' }))
-  expect(screen.getByLabelText('Width')).toBeInTheDocument()
+  expect(screen.getByRole('group', { name: 'Primary crop position' })).toBeInTheDocument()
   expect(screen.getByRole('checkbox', { name: 'Portrait' })).toBeChecked()
   expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeChecked()
   expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()

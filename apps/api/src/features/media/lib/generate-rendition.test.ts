@@ -81,9 +81,8 @@ describe('generateMediaRendition crop parity', () => {
     const artwork = await generateMediaRendition({ asset, preset: 'artwork' })
     const artworkMetadata = await sharp(artwork.buffer).metadata()
     expect(artworkMetadata.width).toBe(1200)
-    expect(artworkMetadata.height).toBe(675)
-    // A full-source editor preview must retain the original aspect ratio.
-    expect(artworkMetadata.width! / artworkMetadata.height!).toBeCloseTo(sourceWidth / sourceHeight)
+    expect(artworkMetadata.height).toBe(900)
+    expect(artworkMetadata.width! / artworkMetadata.height!).toBeCloseTo(4 / 3)
   })
 })
 

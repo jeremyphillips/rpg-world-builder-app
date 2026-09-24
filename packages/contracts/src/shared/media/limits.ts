@@ -45,8 +45,24 @@ export const CONTENT_MEDIA_BANNER_ASPECT_RATIO = 3
 /** Rounding tolerance when validating Banner 3:1 crops against source pixels. */
 export const CONTENT_MEDIA_BANNER_ASPECT_TOLERANCE_PX = 1
 
-/** Minimum decoded Primary crop short edge in oriented pixels. */
-export const CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX = 256
+/** Primary crop width-to-height ratio (integer numerator). */
+export const CONTENT_MEDIA_PRIMARY_ASPECT_WIDTH = 4
+
+/** Primary crop width-to-height ratio (integer denominator). */
+export const CONTENT_MEDIA_PRIMARY_ASPECT_HEIGHT = 3
+
+/** Primary crop width-to-height ratio. */
+export const CONTENT_MEDIA_PRIMARY_ASPECT_RATIO =
+  CONTENT_MEDIA_PRIMARY_ASPECT_WIDTH / CONTENT_MEDIA_PRIMARY_ASPECT_HEIGHT
+
+/** Minimum decoded Primary crop width in oriented pixels. */
+export const CONTENT_MEDIA_PRIMARY_MIN_WIDTH_PX = 800
+
+/** Minimum decoded Primary crop height in oriented pixels. */
+export const CONTENT_MEDIA_PRIMARY_MIN_HEIGHT_PX = 600
+
+/** Rounding tolerance when validating Primary 4:3 crops against source pixels. */
+export const CONTENT_MEDIA_PRIMARY_ASPECT_TOLERANCE_PX = 1
 
 /** Minimum decoded source edge for Emblem eligibility in oriented pixels. */
 export const CONTENT_MEDIA_EMBLEM_MIN_EDGE_PX = 128

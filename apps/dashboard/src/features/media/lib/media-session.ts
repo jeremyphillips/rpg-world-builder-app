@@ -209,9 +209,3 @@ export function assignedRolesForImage(
 ): MediaRole[] {
   return rolesForImage(media, imageId, allowedRoles)
 }
-
-export function cropFrameForRole(role: MediaRole): 'square' | 'banner' | 'free' {
-  if (role === 'banner') return 'banner'
-  if (role === 'primary') return 'free'
-  return 'square'
-}

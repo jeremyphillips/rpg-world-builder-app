@@ -39,7 +39,7 @@ describe('resolveMediaWorkspaceCopy', () => {
     ).toEqual({
       heading: 'Primary crop',
       description:
-        'Crop the detail image and place the focal point inside that crop. The original file is kept.',
+        'Crop a 4:3 detail image and place the focal point inside that crop. The original file is kept.',
     })
   })
 })

@@ -1,4 +1,4 @@
-import type { ContentMediaDomain, MediaRole } from '@rpg/contracts'
+import { mediaRoleSurfaceCopy, type ContentMediaDomain, type MediaRole } from '@rpg/contracts'
 
 export function resolveMediaWorkspaceCopy(input: {
   presentation: MediaRole
@@ -15,39 +15,10 @@ export function resolveMediaWorkspaceCopy(input: {
     }
   }
 
-  if (input.presentation === 'portrait') {
-    return {
-      heading: 'Portrait crop',
-      description:
-        'Crop and position how this image appears in character cards, lists, and tokens.',
-    }
-  }
-
-  if (input.presentation === 'banner') {
-    return {
-      heading: 'Banner crop',
-      description: 'Crop a 3:1 banner and place the focal point inside that crop.',
-    }
-  }
-
-  if (input.presentation === 'primary') {
-    return {
-      heading: 'Primary crop',
-      description:
-        'Crop the detail image and place the focal point inside that crop. The original file is kept.',
-    }
-  }
-
-  if (input.presentation === 'emblem') {
-    return {
-      heading: 'Edit emblem',
-      description: "Adjust how the emblem appears inside the frame. It won't be cropped.",
-    }
-  }
-
+  const copy = mediaRoleSurfaceCopy[input.presentation]
   return {
-    heading: 'Image preview',
-    description: 'Preview the original artwork. Assign a role to control where it appears.',
+    heading: copy.workspaceHeading,
+    description: copy.workspaceDescription,
   }
 }
 

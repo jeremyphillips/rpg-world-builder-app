@@ -18,5 +18,6 @@ it('explains why a small image cannot have Portrait or Primary', () => {
   )
   expect(screen.getByRole('checkbox', { name: 'Portrait' })).toBeDisabled()
   expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeDisabled()
-  expect(screen.getByText(/Requires at least/)).toHaveTextContent('64 × 64')
+  expect(screen.getByText(/Portrait needs a 1:1 crop at least/)).toHaveTextContent('64 × 64')
+  expect(screen.getByText(/Primary image needs a 4:3 crop at least/)).toHaveTextContent('64 × 64')
 })

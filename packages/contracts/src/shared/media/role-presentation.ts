@@ -1,10 +1,6 @@
 import type { ContainPresentation, CropPresentation, ImagePresentation } from './image-presentation'
-import {
-  focalPointFromCropCenter,
-  resetBannerCrop,
-  resetPrimaryCrop,
-  type SourceDimensions,
-} from './geometry'
+import { focalPointFromCropCenter, resetFixedAspectCrop, type SourceDimensions } from './geometry'
+import { getFixedAspectCropSpec } from './role-crop-spec'
 import type { MediaRole } from './roles'
 
 /** Default presentation seeded when a role is first assigned to an image. */
@@ -16,19 +12,19 @@ export function createDefaultRolePresentation(
     return defaultEmblemPresentation()
   }
 
-  const cropPresentation: CropPresentation = { mode: 'crop' }
-
-  if (role === 'banner') {
-    const crop = resetBannerCrop(source)
-    return {
-      mode: 'crop',
-      crop,
-      focalPoint: focalPointFromCropCenter(crop),
-    }
+  const spec = getFixedAspectCropSpec(role)
+  if (!spec) {
+    return { mode: 'crop' }
   }
 
-  if (role === 'primary') {
-    return { mode: 'crop', crop: resetPrimaryCrop() }
+  const crop = resetFixedAspectCrop(source, spec)
+  const cropPresentation: CropPresentation = { mode: 'crop', crop }
+
+  if (spec.supportsFocalPoint) {
+    return {
+      ...cropPresentation,
+      focalPoint: focalPointFromCropCenter(crop),
+    }
   }
 
   return cropPresentation

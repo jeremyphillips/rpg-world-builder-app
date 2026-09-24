@@ -94,7 +94,8 @@ function resolveEffectiveCropForPreset(input: {
   source: { width: number; height: number }
 }): NormalizedCrop {
   if (input.crop) return input.crop
-  if (input.preset === 'artwork' || input.preset === 'emblem') return resetPrimaryCrop()
+  if (input.preset === 'artwork') return resetPrimaryCrop(input.source)
+  if (input.preset === 'emblem') return { x: 0, y: 0, width: 1, height: 1 }
   return resolveEffectiveCrop(undefined, input.source)
 }
 

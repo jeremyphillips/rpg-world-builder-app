@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { defaultEmblemPresentation } from '@rpg/contracts'
+import { defaultEmblemPresentation, mediaRoleSurfaceCopy } from '@rpg/contracts'
 import { MediaEmblemEditor, type MediaEmblemEditorProps } from './media-emblem-editor.client'
 
 function Example(args: MediaEmblemEditorProps) {
@@ -16,6 +16,7 @@ const meta = {
     src: 'https://picsum.photos/seed/emblem/512/512',
     source: { width: 512, height: 512 },
     layout: defaultEmblemPresentation(),
+    instructions: mediaRoleSurfaceCopy.emblem.instructions,
     onChange: () => {},
   },
 } satisfies Meta<typeof MediaEmblemEditor>

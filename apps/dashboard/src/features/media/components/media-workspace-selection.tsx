@@ -4,18 +4,91 @@ import {
   asContainPresentation,
   asCropPresentation,
   defaultEmblemPresentation,
-  resolveDefaultCropForRole,
-  resolveEffectiveCrop,
+  mediaRoleSurfaceCopy,
+  resolveMediaCropEditorConstraint,
   type ContentMedia,
   type MediaAsset,
   type MediaRole,
 } from '@rpg/contracts'
 
 import type { MediaManagerController } from '../hooks/use-media-manager'
-import { cropFrameForRole } from '../lib/media-session'
 import { mediaImageUrl, MEDIA_SOURCE_CROP } from '../lib/media-display'
+import {
+  isStalePrimaryCrop,
+  resolveWorkspaceEditorCrop,
+  useCorrectStalePrimaryCrop,
+} from './media-workspace-editor.lib'
 import { MediaImageDetails } from './media-image-details'
 import { mediaManagerStyles as styles } from './media-manager.variants'
+
+function MediaWorkspacePreviewFigure({
+  imageUrl,
+  selected,
+  asset,
+}: {
+  imageUrl: typeof mediaImageUrl
+  selected: ContentMedia['images'][number]
+  asset: MediaAsset
+}) {
+  return (
+    <figure className={styles.previewCard()}>
+      <img
+        className={styles.preview()}
+        src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
+        alt={selected.alt ?? ''}
+      />
+      <figcaption className={styles.previewCaption()}>
+        <FilenamePreview filename={asset.filename} />
+      </figcaption>
+    </figure>
+  )
+}
+
+function MediaWorkspaceCropEditor({
+  controller,
+  imageUrl,
+  asset,
+  activeRole,
+  cropPresentation,
+}: {
+  controller: MediaManagerController
+  imageUrl: typeof mediaImageUrl
+  asset: MediaAsset
+  activeRole: MediaRole
+  cropPresentation: ReturnType<typeof asCropPresentation>
+}) {
+  const { dispatch } = controller
+  const source = { width: asset.orientedWidth, height: asset.orientedHeight }
+  const constraint = resolveMediaCropEditorConstraint(activeRole)
+  if (!constraint) return null
+
+  const stalePrimaryCrop = isStalePrimaryCrop(activeRole, source, cropPresentation)
+  const crop = resolveWorkspaceEditorCrop({
+    role: activeRole,
+    source,
+    cropPresentation,
+    stalePrimaryCrop,
+  })
+  const supportsFocalPoint = constraint.spec.supportsFocalPoint
+
+  return (
+    <MediaCropEditor
+      src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
+      source={source}
+      constraint={constraint}
+      crop={crop}
+      focalPoint={supportsFocalPoint ? cropPresentation?.focalPoint : undefined}
+      onFocalPointChange={
+        supportsFocalPoint
+          ? (focalPoint) => dispatch({ type: 'crop', crop, focalPoint })
+          : undefined
+      }
+      onChange={(nextCrop) =>
+        dispatch({ type: 'crop', crop: nextCrop, focalPoint: cropPresentation?.focalPoint })
+      }
+    />
+  )
+}
 
 function MediaWorkspaceEditor({
   controller,
@@ -38,58 +111,39 @@ function MediaWorkspaceEditor({
   const cropPresentation = asCropPresentation(assignment?.presentation)
   const containPresentation =
     asContainPresentation(assignment?.presentation) ?? defaultEmblemPresentation()
+  const stalePrimaryCrop = isStalePrimaryCrop(activeRole, source, cropPresentation)
+
+  useCorrectStalePrimaryCrop({
+    dispatch,
+    stalePrimaryCrop,
+    isActiveForSelection,
+    source,
+    focalPoint: cropPresentation?.focalPoint,
+  })
 
   if (!isActiveForSelection) {
-    return (
-      <figure className={styles.previewCard()}>
-        <img
-          className={styles.preview()}
-          src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
-          alt={selected.alt ?? ''}
-        />
-        <figcaption className={styles.previewCaption()}>
-          <FilenamePreview filename={asset.filename} />
-        </figcaption>
-      </figure>
-    )
+    return <MediaWorkspacePreviewFigure imageUrl={imageUrl} selected={selected} asset={asset} />
   }
 
   if (activeRole === 'emblem') {
     return (
       <MediaEmblemEditor
         src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
-        source={{ width: asset.orientedWidth, height: asset.orientedHeight }}
+        source={source}
         layout={containPresentation}
-        onChange={(layout) =>
-          dispatch({
-            type: 'contain',
-            layout,
-            source: { width: asset.orientedWidth, height: asset.orientedHeight },
-          })
-        }
+        instructions={mediaRoleSurfaceCopy.emblem.instructions}
+        onChange={(layout) => dispatch({ type: 'contain', layout, source })}
       />
     )
   }
 
-  const resolvedCrop = resolveEffectiveCrop(cropPresentation, source, () =>
-    resolveDefaultCropForRole(activeRole, source),
-  )
-
   return (
-    <MediaCropEditor
-      src={imageUrl(asset.id, 'artwork', MEDIA_SOURCE_CROP)}
-      source={source}
-      frame={cropFrameForRole(activeRole)}
-      crop={resolvedCrop}
-      focalPoint={activeRole === 'portrait' ? undefined : cropPresentation?.focalPoint}
-      onFocalPointChange={
-        activeRole === 'portrait'
-          ? undefined
-          : (focalPoint) => dispatch({ type: 'crop', crop: resolvedCrop, focalPoint })
-      }
-      onChange={(crop) =>
-        dispatch({ type: 'crop', crop, focalPoint: cropPresentation?.focalPoint })
-      }
+    <MediaWorkspaceCropEditor
+      controller={controller}
+      imageUrl={imageUrl}
+      asset={asset}
+      activeRole={activeRole}
+      cropPresentation={cropPresentation}
     />
   )
 }

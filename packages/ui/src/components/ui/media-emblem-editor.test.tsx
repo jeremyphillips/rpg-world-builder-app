@@ -2,7 +2,11 @@ import { useState } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { defaultEmblemPresentation, type ContainPresentation } from '@rpg/contracts'
+import {
+  defaultEmblemPresentation,
+  mediaRoleSurfaceCopy,
+  type ContainPresentation,
+} from '@rpg/contracts'
 
 import { MediaEmblemEditor } from './media-emblem-editor.client'
 
@@ -19,6 +23,7 @@ function StatefulEditor({
       src="/emblem.png"
       source={{ width: 512, height: 256 }}
       layout={layout}
+      instructions={mediaRoleSurfaceCopy.emblem.instructions}
       onChange={(next) => {
         onChange(next)
         setLayout(next)
@@ -62,6 +67,7 @@ describe('MediaEmblemEditor', () => {
         src="/emblem.png"
         source={{ width: 256, height: 256 }}
         layout={defaultEmblemPresentation()}
+        instructions={mediaRoleSurfaceCopy.emblem.instructions}
         onChange={() => {}}
       />,
     )

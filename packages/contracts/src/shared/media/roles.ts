@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+import { CONTENT_MEDIA_PRIMARY_ASPECT_HEIGHT, CONTENT_MEDIA_PRIMARY_ASPECT_WIDTH } from './limits'
+
+const bannerAspectLabel = '3:1'
+const primaryAspectLabel = `${CONTENT_MEDIA_PRIMARY_ASPECT_WIDTH}:${CONTENT_MEDIA_PRIMARY_ASPECT_HEIGHT}`
+
 /** Attachment presentation roles for content media (not game vocabulary). */
 export const MEDIA_ROLE_TERM = {
   label: 'Media role',
@@ -9,7 +14,7 @@ export const MEDIA_ROLE_TERM = {
 export const MEDIA_ROLE_ENTRIES = {
   primary: {
     label: 'Primary image',
-    description: 'Representative artwork and detail views.',
+    description: `${primaryAspectLabel} representative artwork and detail views.`,
   },
   portrait: {
     label: 'Portrait',
@@ -17,7 +22,7 @@ export const MEDIA_ROLE_ENTRIES = {
   },
   banner: {
     label: 'Banner',
-    description: 'Wide 3:1 image for campaign headers.',
+    description: `Wide ${bannerAspectLabel} image for campaign headers.`,
   },
   emblem: {
     label: 'Emblem',

@@ -1,13 +1,24 @@
 import { describe, expect, it } from 'vitest'
 
+import { formatFieldMessage } from '../../validation/define-message'
+import { contentMediaValidationMessages } from './content-media-validation-messages'
 import {
   cropFromFocalPoint,
   cropFromPanZoom,
+  fixedAspectRoleEligibility,
+  isFixedAspectCrop,
   isSquareCrop,
+  meetsFixedAspectMinimum,
   meetsPortraitMinimumCrop,
+  resetFixedAspectCrop,
   resetPortraitCrop,
+  resetPrimaryCrop,
   resolveEffectiveCrop,
+  widestFixedAspectCropDimensions,
 } from './geometry'
+import { getFixedAspectCropSpec } from './role-crop-spec'
+import { validateContentMedia } from './validate-content-media'
+import { getContentMediaPolicy } from './media-policy'
 
 describe('resetPortraitCrop', () => {
   it('centers the largest square on landscape sources', () => {
@@ -35,6 +46,48 @@ describe('resetPortraitCrop', () => {
       width: 1,
       height: 1,
     })
+  })
+})
+
+describe('fixed-aspect crop geometry', () => {
+  const primarySpec = getFixedAspectCropSpec('primary')!
+  const bannerSpec = getFixedAspectCropSpec('banner')!
+  const portraitSpec = getFixedAspectCropSpec('portrait')!
+
+  it('computes widest crops for 1:1, 3:1, and 4:3', () => {
+    const source = { width: 1800, height: 1200 }
+    expect(widestFixedAspectCropDimensions(source, 1)).toEqual({ cropW: 1200, cropH: 1200 })
+    expect(widestFixedAspectCropDimensions(source, 3)).toEqual({ cropW: 1800, cropH: 600 })
+    expect(widestFixedAspectCropDimensions(source, 4 / 3)).toEqual({ cropW: 1600, cropH: 1200 })
+  })
+
+  it('resets centered fixed-aspect crops', () => {
+    const source = { width: 1600, height: 900 }
+    const crop = resetFixedAspectCrop(source, primarySpec)
+    expect(isFixedAspectCrop(crop, source, primarySpec)).toBe(true)
+    expect(crop.x + crop.width / 2).toBeCloseTo(0.5)
+    expect(crop.y + crop.height / 2).toBeCloseTo(0.5)
+  })
+
+  it('rejects primary crops below 800×600 and accepts 800×600 exactly', () => {
+    const source = { width: 800, height: 600 }
+    const passCrop = resetPrimaryCrop(source)
+    expect(meetsFixedAspectMinimum(passCrop, source, primarySpec)).toBe(true)
+
+    const failSource = { width: 799, height: 600 }
+    const failCrop = resetPrimaryCrop(failSource)
+    expect(meetsFixedAspectMinimum(failCrop, failSource, primarySpec)).toBe(false)
+  })
+
+  it('validates aspect ratio within tolerance for each role spec', () => {
+    const source = { width: 1200, height: 900 }
+    expect(isFixedAspectCrop(resetPrimaryCrop(source), source, primarySpec)).toBe(true)
+    expect(isFixedAspectCrop(resetFixedAspectCrop(source, bannerSpec), source, bannerSpec)).toBe(
+      true,
+    )
+    expect(
+      isFixedAspectCrop(resetFixedAspectCrop(source, portraitSpec), source, portraitSpec),
+    ).toBe(true)
   })
 })
 
@@ -125,5 +178,52 @@ describe('portrait eligibility helpers', () => {
 
     expect(meetsPortraitMinimumCrop(tooSmall, source)).toBe(false)
     expect(meetsPortraitMinimumCrop(largeEnough, source)).toBe(true)
+  })
+})
+
+describe('fixedAspectRoleEligibility and validateContentMedia', () => {
+  it('emits the same formatted message for an invalid primary crop', () => {
+    const source = { width: 1200, height: 900 }
+    const invalidCrop = { x: 0, y: 0, width: 0.2, height: 0.2 }
+    const eligibility = fixedAspectRoleEligibility('primary', source, {
+      mode: 'crop',
+      crop: invalidCrop,
+    })
+    expect(eligibility.eligible).toBe(false)
+    if (eligibility.eligible) return
+
+    const validation = validateContentMedia(
+      {
+        revision: 0,
+        images: [{ id: 'img-1', assetId: 'asset-large' }],
+        roles: {
+          primary: {
+            imageId: 'img-1',
+            presentation: { mode: 'crop', crop: invalidCrop },
+          },
+        },
+      },
+      {
+        policy: getContentMediaPolicy('class'),
+        assetDimensionsById: { 'asset-large': { orientedWidth: 1200, orientedHeight: 900 } },
+      },
+    )
+
+    expect(validation.ok).toBe(false)
+    if (validation.ok) return
+    const validationMessage = validation.issues.find((issue) =>
+      issue.path.includes('primary'),
+    )?.message
+    expect(formatFieldMessage(eligibility.message)).toBe(formatFieldMessage(validationMessage!))
+    expect(formatFieldMessage(eligibility.message)).toBe(
+      formatFieldMessage(
+        contentMediaValidationMessages.fixedAspectCropInvalid({
+          roleLabel: 'Primary image',
+          aspectLabel: '4:3',
+          minWidthPx: 800,
+          minHeightPx: 600,
+        }),
+      ),
+    )
   })
 })

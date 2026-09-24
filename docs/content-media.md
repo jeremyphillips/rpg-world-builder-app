@@ -10,7 +10,9 @@ Equipment, Location, Organization). Full product and UX specification:
 | ---------------------- | ---------------------------------- |
 | Attachments per record | 20                                 |
 | Uploads in flight      | 3                                  |
-| Portrait minimum crop  | 128×128 oriented px                |
+| Portrait minimum crop  | 128×128 oriented px (1:1)          |
+| Primary minimum crop   | 800×600 oriented px (4:3)          |
+| Banner minimum crop    | 1200×400 oriented px (3:1)         |
 | Max decode pixels      | 25 MP                              |
 | Max edge               | 8192 px                            |
 | Upload byte ceiling    | `MAX_UPLOAD_BYTES` (5 MiB default) |

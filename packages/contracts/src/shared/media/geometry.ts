@@ -1,17 +1,21 @@
 import { z } from 'zod'
 
+import { contentMediaValidationMessages } from './content-media-validation-messages'
 import type { CropPresentation } from './image-presentation'
 import {
   CONTENT_MEDIA_BANNER_ASPECT_RATIO,
   CONTENT_MEDIA_BANNER_ASPECT_TOLERANCE_PX,
-  CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX,
-  CONTENT_MEDIA_BANNER_MIN_WIDTH_PX,
   CONTENT_MEDIA_EMBLEM_MIN_EDGE_PX,
   CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX,
   CONTENT_MEDIA_PORTRAIT_SQUARE_TOLERANCE_PX,
-  CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX,
 } from './limits'
-import type { MediaRole } from './roles'
+import {
+  formatAspectRatioLabel,
+  getFixedAspectCropSpec,
+  getMediaRoleCropSpec,
+  type FixedAspectCropSpec,
+} from './role-crop-spec'
+import { MEDIA_ROLE_ENTRIES, type MediaRole } from './roles'
 
 /** Normalized crop rectangle against the EXIF-oriented display source. */
 export const normalizedCropSchema = z
@@ -66,25 +70,80 @@ export type MediaRoleEligibility =
   | { eligible: true; hint?: string }
   | { eligible: false; message: string; hint?: string }
 
-/** Largest centered square crop for a source, expressed in normalized coordinates. */
-export function resetPortraitCrop(source: SourceDimensions): NormalizedCrop {
+/** Pixel dimensions of the widest crop with the given aspect ratio that fits inside the source. */
+export function widestFixedAspectCropDimensions(
+  source: SourceDimensions,
+  aspectRatio: number,
+): {
+  cropW: number
+  cropH: number
+} {
+  const { width, height } = source
+  const sourceAspect = width / height
+
+  if (sourceAspect >= aspectRatio) {
+    const cropH = height
+    const cropW = Math.min(width, aspectRatio * height)
+    return { cropW, cropH }
+  }
+
+  const cropW = width
+  const cropH = cropW / aspectRatio
+  return { cropW, cropH: Math.min(cropH, height) }
+}
+
+/** Largest centered fixed-aspect crop for a source, expressed in normalized coordinates. */
+export function resetFixedAspectCrop(
+  source: SourceDimensions,
+  spec: FixedAspectCropSpec,
+): NormalizedCrop {
   const { width, height } = source
   if (width <= 0 || height <= 0) {
     throw new Error('Source dimensions must be positive.')
   }
 
-  const squarePx = Math.min(width, height)
-  const widthNorm = squarePx / width
-  const heightNorm = squarePx / height
+  const aspectRatio = spec.aspectWidth / spec.aspectHeight
+  const { cropW, cropH } = widestFixedAspectCropDimensions(source, aspectRatio)
+  const widthNorm = cropW / width
+  const heightNorm = cropH / height
   const x = (1 - widthNorm) / 2
   const y = (1 - heightNorm) / 2
 
   return { x, y, width: widthNorm, height: heightNorm }
 }
 
-/** Full-frame crop for primary artwork. */
-export function resetPrimaryCrop(): NormalizedCrop {
-  return { x: 0, y: 0, width: 1, height: 1 }
+/** Whether the crop matches the fixed aspect ratio within the configured pixel tolerance. */
+export function isFixedAspectCrop(
+  crop: NormalizedCrop,
+  source: SourceDimensions,
+  spec: FixedAspectCropSpec,
+): boolean {
+  const cropWidthPx = crop.width * source.width
+  const cropHeightPx = crop.height * source.height
+  const aspectRatio = spec.aspectWidth / spec.aspectHeight
+  const expectedHeight = cropWidthPx / aspectRatio
+  return Math.abs(cropHeightPx - expectedHeight) <= spec.aspectTolerancePx
+}
+
+/** Whether the crop meets the minimum fixed-aspect size requirement. */
+export function meetsFixedAspectMinimum(
+  crop: NormalizedCrop,
+  source: SourceDimensions,
+  spec: FixedAspectCropSpec,
+): boolean {
+  const cropWidthPx = crop.width * source.width
+  const cropHeightPx = crop.height * source.height
+  return cropWidthPx >= spec.minWidthPx && cropHeightPx >= spec.minHeightPx
+}
+
+/** Largest centered square crop for a source, expressed in normalized coordinates. */
+export function resetPortraitCrop(source: SourceDimensions): NormalizedCrop {
+  return resetFixedAspectCrop(source, getFixedAspectCropSpec('portrait')!)
+}
+
+/** Largest centered 4:3 crop for a source, expressed in normalized coordinates. */
+export function resetPrimaryCrop(source: SourceDimensions): NormalizedCrop {
+  return resetFixedAspectCrop(source, getFixedAspectCropSpec('primary')!)
 }
 
 /** Pixel dimensions of the widest 3:1 crop that fits inside the source. */
@@ -92,34 +151,12 @@ export function widestBannerCropDimensions(source: SourceDimensions): {
   cropW: number
   cropH: number
 } {
-  const { width, height } = source
-  const sourceAspect = width / height
-
-  if (sourceAspect >= CONTENT_MEDIA_BANNER_ASPECT_RATIO) {
-    const cropH = height
-    const cropW = Math.min(width, CONTENT_MEDIA_BANNER_ASPECT_RATIO * height)
-    return { cropW, cropH }
-  }
-
-  const cropW = width
-  const cropH = cropW / CONTENT_MEDIA_BANNER_ASPECT_RATIO
-  return { cropW, cropH: Math.min(cropH, height) }
+  return widestFixedAspectCropDimensions(source, CONTENT_MEDIA_BANNER_ASPECT_RATIO)
 }
 
 /** Largest centered 3:1 crop for a source, expressed in normalized coordinates. */
 export function resetBannerCrop(source: SourceDimensions): NormalizedCrop {
-  const { width, height } = source
-  if (width <= 0 || height <= 0) {
-    throw new Error('Source dimensions must be positive.')
-  }
-
-  const { cropW, cropH } = widestBannerCropDimensions(source)
-  const widthNorm = cropW / width
-  const heightNorm = cropH / height
-  const x = (1 - widthNorm) / 2
-  const y = (1 - heightNorm) / 2
-
-  return { x, y, width: widthNorm, height: heightNorm }
+  return resetFixedAspectCrop(source, getFixedAspectCropSpec('banner')!)
 }
 
 /** Source-space focal point at the center of a normalized crop rectangle. */
@@ -204,9 +241,8 @@ export function isSquareCrop(
   source: SourceDimensions,
   tolerancePx = CONTENT_MEDIA_PORTRAIT_SQUARE_TOLERANCE_PX,
 ): boolean {
-  const cropWidthPx = crop.width * source.width
-  const cropHeightPx = crop.height * source.height
-  return Math.abs(cropWidthPx - cropHeightPx) <= tolerancePx
+  const spec = getFixedAspectCropSpec('portrait')!
+  return isFixedAspectCrop(crop, source, { ...spec, aspectTolerancePx: tolerancePx })
 }
 
 /** Whether the crop meets the minimum Portrait edge requirement. */
@@ -215,9 +251,12 @@ export function meetsPortraitMinimumCrop(
   source: SourceDimensions,
   minEdgePx = CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX,
 ): boolean {
-  const cropWidthPx = crop.width * source.width
-  const cropHeightPx = crop.height * source.height
-  return Math.min(cropWidthPx, cropHeightPx) >= minEdgePx
+  const spec = getFixedAspectCropSpec('portrait')!
+  return meetsFixedAspectMinimum(crop, source, {
+    ...spec,
+    minWidthPx: minEdgePx,
+    minHeightPx: minEdgePx,
+  })
 }
 
 /** Whether the crop is 3:1 within the configured pixel tolerance. */
@@ -226,31 +265,23 @@ export function isBannerAspectCrop(
   source: SourceDimensions,
   tolerancePx = CONTENT_MEDIA_BANNER_ASPECT_TOLERANCE_PX,
 ): boolean {
-  const cropWidthPx = crop.width * source.width
-  const cropHeightPx = crop.height * source.height
-  const expectedHeight = cropWidthPx / CONTENT_MEDIA_BANNER_ASPECT_RATIO
-  return Math.abs(cropHeightPx - expectedHeight) <= tolerancePx
+  const spec = getFixedAspectCropSpec('banner')!
+  return isFixedAspectCrop(crop, source, { ...spec, aspectTolerancePx: tolerancePx })
 }
 
 /** Whether the crop meets the minimum Banner size requirement. */
 export function meetsBannerMinimumCrop(crop: NormalizedCrop, source: SourceDimensions): boolean {
-  const cropWidthPx = crop.width * source.width
-  const cropHeightPx = crop.height * source.height
-  return (
-    cropWidthPx >= CONTENT_MEDIA_BANNER_MIN_WIDTH_PX &&
-    cropHeightPx >= CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX
-  )
+  return meetsFixedAspectMinimum(crop, source, getFixedAspectCropSpec('banner')!)
 }
 
-/** Whether the crop meets the minimum Primary short-edge requirement. */
-export function meetsPrimaryMinimumCrop(
-  crop: NormalizedCrop,
-  source: SourceDimensions,
-  minShortSidePx = CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX,
-): boolean {
-  const cropWidthPx = crop.width * source.width
-  const cropHeightPx = crop.height * source.height
-  return Math.min(cropWidthPx, cropHeightPx) >= minShortSidePx
+/** Whether the crop is 4:3 within the configured pixel tolerance. */
+export function isPrimaryAspectCrop(crop: NormalizedCrop, source: SourceDimensions): boolean {
+  return isFixedAspectCrop(crop, source, getFixedAspectCropSpec('primary')!)
+}
+
+/** Whether the crop meets the minimum Primary size requirement. */
+export function meetsPrimaryMinimumCrop(crop: NormalizedCrop, source: SourceDimensions): boolean {
+  return meetsFixedAspectMinimum(crop, source, getFixedAspectCropSpec('primary')!)
 }
 
 /** Whether the source meets the minimum Emblem edge requirement. */
@@ -275,72 +306,81 @@ export function isFocalPointInCrop(
 }
 
 function defaultCropForRole(role: MediaRole, source: SourceDimensions): NormalizedCrop {
-  switch (role) {
-    case 'portrait':
-      return resetPortraitCrop(source)
-    case 'banner':
-      return resetBannerCrop(source)
-    case 'primary':
-      return resetPrimaryCrop()
-    default:
-      return resetPrimaryCrop()
+  const spec = getFixedAspectCropSpec(role)
+  if (spec) {
+    return resetFixedAspectCrop(source, spec)
   }
+  return resetPrimaryCrop(source)
 }
 
-function portraitRoleEligibility(source: SourceDimensions): MediaRoleEligibility {
-  const { width, height } = source
-  if (Math.min(width, height) < CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX) {
-    return {
-      eligible: false,
-      message: `Requires at least ${CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX} × ${CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX} pixels; this image is ${width} × ${height}.`,
-    }
-  }
-  return { eligible: true }
-}
-
-function bannerRoleEligibility(
+export function fixedAspectRoleEligibility(
+  role: MediaRole,
   source: SourceDimensions,
   presentation?: CropPresentation,
 ): MediaRoleEligibility {
+  const spec = getFixedAspectCropSpec(role)
+  if (!spec) {
+    throw new Error(`Role ${role} does not use fixed-aspect crop eligibility.`)
+  }
+
   const { width, height } = source
-  const { cropW, cropH } = widestBannerCropDimensions(source)
-  if (cropW < CONTENT_MEDIA_BANNER_MIN_WIDTH_PX || cropH < CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX) {
+  const aspectLabel = formatAspectRatioLabel(spec)
+  const roleLabel = MEDIA_ROLE_ENTRIES[role].label
+  const { cropW, cropH } = widestFixedAspectCropDimensions(
+    source,
+    spec.aspectWidth / spec.aspectHeight,
+  )
+
+  if (cropW < spec.minWidthPx || cropH < spec.minHeightPx) {
     return {
       eligible: false,
-      message: `Banner needs a 3:1 crop at least ${CONTENT_MEDIA_BANNER_MIN_WIDTH_PX} × ${CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX} pixels. This image is ${width} × ${height}, so its widest 3:1 crop is ${Math.round(cropW)} × ${Math.round(cropH)}.`,
+      message: contentMediaValidationMessages.fixedAspectSourceTooSmall({
+        roleLabel,
+        aspectLabel,
+        minWidthPx: spec.minWidthPx,
+        minHeightPx: spec.minHeightPx,
+        sourceWidth: width,
+        sourceHeight: height,
+        widestCropWidth: Math.round(cropW),
+        widestCropHeight: Math.round(cropH),
+      }),
     }
   }
+
   const crop = presentation?.crop
-  if (crop && (!isBannerAspectCrop(crop, source) || !meetsBannerMinimumCrop(crop, source))) {
+  if (
+    crop &&
+    (!isFixedAspectCrop(crop, source, spec) || !meetsFixedAspectMinimum(crop, source, spec))
+  ) {
     return {
       eligible: false,
-      message: `Banner crop must be 3:1 and at least ${CONTENT_MEDIA_BANNER_MIN_WIDTH_PX} × ${CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX} pixels.`,
+      message: contentMediaValidationMessages.fixedAspectCropInvalid({
+        roleLabel,
+        aspectLabel,
+        minWidthPx: spec.minWidthPx,
+        minHeightPx: spec.minHeightPx,
+      }),
     }
   }
-  return { eligible: true }
-}
 
-function primaryRoleEligibility(
-  source: SourceDimensions,
-  presentation?: CropPresentation,
-): MediaRoleEligibility {
-  const { width, height } = source
-  const crop = presentation?.crop ?? resetPrimaryCrop()
-  if (!meetsPrimaryMinimumCrop(crop, source)) {
-    return {
-      eligible: false,
-      message: `Primary image needs a crop at least ${CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX} pixels on its shorter side. This image is ${width} × ${height}.`,
-    }
-  }
   return { eligible: true }
 }
 
 function emblemRoleEligibility(source: SourceDimensions): MediaRoleEligibility {
   const { width, height } = source
-  if (!meetsEmblemMinimumEdge(source)) {
+  const emblemSpec = getMediaRoleCropSpec('emblem')
+  if (emblemSpec.kind !== 'contain') {
+    throw new Error('Emblem crop spec must use contain mode.')
+  }
+  const minEdgePx = emblemSpec.minEdgePx
+  if (!meetsEmblemMinimumEdge(source, minEdgePx)) {
     return {
       eligible: false,
-      message: `Emblem needs an image at least ${CONTENT_MEDIA_EMBLEM_MIN_EDGE_PX} × ${CONTENT_MEDIA_EMBLEM_MIN_EDGE_PX} pixels. This image is ${width} × ${height}.`,
+      message: contentMediaValidationMessages.emblemSourceTooSmall({
+        minEdgePx,
+        sourceWidth: width,
+        sourceHeight: height,
+      }),
     }
   }
   return {
@@ -353,9 +393,9 @@ const ROLE_ELIGIBILITY: Record<
   MediaRole,
   (source: SourceDimensions, presentation?: CropPresentation) => MediaRoleEligibility
 > = {
-  portrait: (source) => portraitRoleEligibility(source),
-  banner: (source, presentation) => bannerRoleEligibility(source, presentation),
-  primary: (source, presentation) => primaryRoleEligibility(source, presentation),
+  portrait: (source, presentation) => fixedAspectRoleEligibility('portrait', source, presentation),
+  banner: (source, presentation) => fixedAspectRoleEligibility('banner', source, presentation),
+  primary: (source, presentation) => fixedAspectRoleEligibility('primary', source, presentation),
   emblem: (source) => emblemRoleEligibility(source),
 }
 

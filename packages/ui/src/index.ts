@@ -1200,7 +1200,7 @@ export {
 
 export {
   MediaCropEditor,
-  type MediaCropEditorFrame,
+  type MediaCropEditorConstraint,
   type MediaCropEditorProps,
 } from './components/ui/media-crop-editor.client'
 export {

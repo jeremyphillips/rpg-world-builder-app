@@ -1,14 +1,13 @@
 import type { ZodIssue } from 'zod'
 
+import { contentMediaValidationMessages } from './content-media-validation-messages'
 import type { ContentMedia } from './content-media'
 import { CONTENT_MEDIA_MAX_ATTACHMENTS } from './limits'
+import { formatAspectRatioLabel, getFixedAspectCropSpec } from './role-crop-spec'
 import {
-  isBannerAspectCrop,
   isFocalPointInCrop,
-  isSquareCrop,
-  meetsBannerMinimumCrop,
-  meetsPortraitMinimumCrop,
-  meetsPrimaryMinimumCrop,
+  isFixedAspectCrop,
+  meetsFixedAspectMinimum,
   normalizedCropSchema,
   resolveDefaultCropForRole,
   resolveEffectiveCrop,
@@ -102,53 +101,25 @@ function collectCropShapeIssues(
   crop: NormalizedCrop,
   source: SourceDimensions,
 ): ZodIssue[] {
-  const issues: ZodIssue[] = []
-  if (role === 'portrait') {
-    if (!isSquareCrop(crop, source)) {
-      issues.push(
-        customIssue('Portrait crop must be square within the configured pixel tolerance.', [
-          'roles',
-          role,
-          'presentation',
-          'crop',
-        ]),
-      )
-    }
-    if (!meetsPortraitMinimumCrop(crop, source)) {
-      issues.push(
-        customIssue('Portrait crop must meet the minimum edge requirement.', [
-          'roles',
-          role,
-          'presentation',
-          'crop',
-        ]),
-      )
-    }
+  const spec = getFixedAspectCropSpec(role)
+  if (!spec) return []
+
+  if (!isFixedAspectCrop(crop, source, spec) || !meetsFixedAspectMinimum(crop, source, spec)) {
+    const aspectLabel = formatAspectRatioLabel(spec)
+    return [
+      customIssue(
+        contentMediaValidationMessages.fixedAspectCropInvalid({
+          roleLabel: MEDIA_ROLE_ENTRIES[role].label,
+          aspectLabel,
+          minWidthPx: spec.minWidthPx,
+          minHeightPx: spec.minHeightPx,
+        }),
+        ['roles', role, 'presentation', 'crop'],
+      ),
+    ]
   }
-  if (
-    role === 'banner' &&
-    (!isBannerAspectCrop(crop, source) || !meetsBannerMinimumCrop(crop, source))
-  ) {
-    issues.push(
-      customIssue('Banner crop must be 3:1 and at least 1200 × 400 pixels.', [
-        'roles',
-        role,
-        'presentation',
-        'crop',
-      ]),
-    )
-  }
-  if (role === 'primary' && !meetsPrimaryMinimumCrop(crop, source)) {
-    issues.push(
-      customIssue('Primary crop must meet the minimum short-edge requirement.', [
-        'roles',
-        role,
-        'presentation',
-        'crop',
-      ]),
-    )
-  }
-  return issues
+
+  return []
 }
 
 function collectCropPresentationIssues(

@@ -5,7 +5,7 @@ import { getContentMediaPolicy } from './media-policy'
 import { validateContentMedia } from './validate-content-media'
 
 const assetDimensions = {
-  'asset-large': { orientedWidth: 512, orientedHeight: 512 },
+  'asset-large': { orientedWidth: 1200, orientedHeight: 900 },
   'asset-small': { orientedWidth: 64, orientedHeight: 64 },
 }
 
@@ -96,7 +96,7 @@ describe('validateContentMedia', () => {
         roles: {
           portrait: {
             imageId: 'img-1',
-            presentation: { mode: 'crop', crop: { x: 0, y: 0, width: 1, height: 1 } },
+            presentation: { mode: 'crop' },
           },
         },
       }),

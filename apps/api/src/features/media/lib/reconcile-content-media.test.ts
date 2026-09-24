@@ -19,6 +19,8 @@ async function seedAsset(input: {
   lifecycle?: 'ready' | 'expired' | 'deleting'
   referenceCount?: number
   leaseExpiresAt?: Date
+  orientedWidth?: number
+  orientedHeight?: number
 }) {
   const assetId = input.assetId ?? randomUUID()
   await createMediaAssetRecord({
@@ -32,8 +34,8 @@ async function seedAsset(input: {
     originalFilename: 'sample.png',
     mimeType: 'image/png',
     byteSize: 128,
-    orientedWidth: 512,
-    orientedHeight: 512,
+    orientedWidth: input.orientedWidth ?? 1200,
+    orientedHeight: input.orientedHeight ?? 900,
     contentHash: randomUUID(),
     animated: false,
     lifecycle: input.lifecycle ?? 'ready',
@@ -112,7 +114,11 @@ describe('reconcileContentMedia', () => {
   })
 
   it('returns stale revision conflicts without mutating references', async () => {
-    const assetId = await seedAsset({ scopeKey: 'campaign-npc:camp-1' })
+    const assetId = await seedAsset({
+      scopeKey: 'campaign-npc:camp-1',
+      orientedWidth: 512,
+      orientedHeight: 512,
+    })
     const subject = { kind: 'character' as const, id: 'char-1', scopeKey: 'campaign-npc:camp-1' }
     const scope = { kind: 'campaign-npc' as const, campaignId: 'camp-1' }
     const policy = getContentMediaPolicy('character')
