@@ -75,6 +75,7 @@ function MediaWorkspaceHeader({
             }))}
             onValueChange={onPresentationChange}
             segmentWidth="auto"
+            size="sm"
             aria-label="Presentation"
           />
         ) : null}

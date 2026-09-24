@@ -99,7 +99,9 @@ function MediaManagerSession(props: MediaManagerProps) {
         </Modal.Body>
         <Modal.Footer>
           <div className={styles.row()}>
-            <p className={styles.muted()}>{resolveMediaManagerFooterHint(props.mode, label)}</p>
+            <p className={styles.footerHint()}>
+              {resolveMediaManagerFooterHint(props.mode, label)}
+            </p>
             <div className={styles.row()}>
               <Button type="button" variant="outline" disabled={saving} onClick={dismiss}>
                 Cancel

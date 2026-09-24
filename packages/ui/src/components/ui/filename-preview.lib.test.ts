@@ -4,11 +4,27 @@ import {
   FILENAME_PREVIEW_MAX_COMFORTABLE,
   FILENAME_PREVIEW_MAX_COMPACT,
   FILENAME_PREVIEW_MAX_METADATA,
+  prepareFilenameForDisplay,
+  repairFilenameMojibake,
   splitFilename,
   truncateFilename,
 } from './filename-preview.lib'
 
 const LONG_NAME = 'seraphina-final-character-portrait.webp'
+
+describe('prepareFilenameForDisplay', () => {
+  it('repairs UTF-8 middle-dot mojibake', () => {
+    const corrupted = 'DALL\u00C2\u00B7E-2024-armor-.webp'
+    expect(repairFilenameMojibake(corrupted)).toBe('DALL·E-2024-armor-.webp')
+    expect(prepareFilenameForDisplay(corrupted)).toBe('DALL·E-2024-armor-.webp')
+  })
+
+  it('leaves valid ASCII filenames unchanged', () => {
+    expect(prepareFilenameForDisplay('seraphina-final-character-portrait.webp')).toBe(
+      'seraphina-final-character-portrait.webp',
+    )
+  })
+})
 
 describe('splitFilename', () => {
   it('preserves dotted extensions', () => {

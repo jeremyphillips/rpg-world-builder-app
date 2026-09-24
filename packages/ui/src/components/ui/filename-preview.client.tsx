@@ -3,6 +3,7 @@
 import { cn } from '../../lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 import {
+  prepareFilenameForDisplay,
   resolveFilenamePreviewMaxLength,
   truncateFilename,
   type FilenamePreviewDensity,
@@ -32,12 +33,14 @@ export function FilenamePreview({
   display = 'block',
   className,
 }: FilenamePreviewProps) {
+  const preparedFilename = prepareFilenameForDisplay(filename)
+
   if (full) {
-    return <span className={cn(filenamePreviewFullVariants(), className)}>{filename}</span>
+    return <span className={cn(filenamePreviewFullVariants(), className)}>{preparedFilename}</span>
   }
 
   const resolvedMaxLength = resolveFilenamePreviewMaxLength(density, maxLength)
-  const { display: preview, truncated } = truncateFilename(filename, resolvedMaxLength)
+  const { display: preview, truncated } = truncateFilename(preparedFilename, resolvedMaxLength)
   const classes = cn(filenamePreviewVariants({ display }), className)
   const widthStyle = { maxWidth: `min(100%, ${resolvedMaxLength}ch)` }
 
@@ -57,7 +60,7 @@ export function FilenamePreview({
             {preview}
           </span>
         </TooltipTrigger>
-        <TooltipContent>{filename}</TooltipContent>
+        <TooltipContent>{preparedFilename}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   )

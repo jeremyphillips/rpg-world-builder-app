@@ -5,10 +5,11 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import {
   segmentedControlLabelVariants,
-  segmentedControlLeadingIconClasses,
+  segmentedControlLeadingIconVariants,
   segmentedControlMetadataVariants,
   segmentedControlRootVariants,
   segmentedControlSegmentVariants,
+  type SegmentedControlSize,
 } from './segmented-control.variants'
 
 export type SegmentedControlOptionButtonProps = {
@@ -28,6 +29,8 @@ export type SegmentedControlOption<TValue extends string> = {
 
 export type SegmentedControlSegmentWidth = 'equal' | 'auto'
 
+export type { SegmentedControlSize }
+
 export type SegmentedControlProps<TValue extends string> = {
   /** When null, no segment is selected (all `aria-pressed={false}`). */
   value: TValue | null
@@ -36,6 +39,8 @@ export type SegmentedControlProps<TValue extends string> = {
   fullWidth?: boolean
   /** `equal` stretches segments and truncates labels; `auto` sizes each segment to its label. */
   segmentWidth?: SegmentedControlSegmentWidth
+  /** `sm` mirrors Button `size="sm"` + `density="compact"`. */
+  size?: SegmentedControlSize
   'aria-label'?: string
   className?: string
 }
@@ -59,6 +64,7 @@ export function SegmentedControl<TValue extends string>({
   onValueChange,
   fullWidth = false,
   segmentWidth = 'equal',
+  size = 'default',
   'aria-label': ariaLabel,
   className,
 }: SegmentedControlProps<TValue>) {
@@ -127,12 +133,12 @@ export function SegmentedControl<TValue extends string>({
             aria-pressed={isActive}
             disabled={option.disabled}
             tabIndex={activeIndex >= 0 && index === activeIndex ? 0 : -1}
-            className={segmentedControlSegmentVariants({ active: isActive, segmentWidth })}
+            className={segmentedControlSegmentVariants({ active: isActive, segmentWidth, size })}
             onClick={() => selectSegment(index)}
             onKeyDown={(event) => handleKeyDown(event, index)}
           >
             {option.leadingIcon ? (
-              <span aria-hidden className={segmentedControlLeadingIconClasses}>
+              <span aria-hidden className={segmentedControlLeadingIconVariants({ size })}>
                 {option.leadingIcon}
               </span>
             ) : null}
