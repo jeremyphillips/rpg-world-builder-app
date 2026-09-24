@@ -21,3 +21,10 @@ export function mediaImageUrl(
 export function mediaErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : 'Unable to save image changes. Please retry.'
 }
+
+export function systemContentImageUrl(srcPath: string): string {
+  const base = import.meta.env.BASE_URL
+  const normalizedBase = base.endsWith('/') ? base : `${base}/`
+  const normalizedPath = srcPath.startsWith('/') ? srcPath.slice(1) : srcPath
+  return `${normalizedBase}${normalizedPath}`
+}

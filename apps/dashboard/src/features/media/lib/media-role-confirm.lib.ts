@@ -2,6 +2,9 @@ import {
   isRolePresentationCustomized,
   MEDIA_ROLE_ENTRIES,
   resolveMediaRolePresentationNoun,
+  roleAssignmentMatchesImageId,
+  roleAssignmentUploadImageId,
+  SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
   type ContentMedia,
   type MediaAsset,
   type MediaRole,
@@ -24,6 +27,7 @@ export function resolveMediaRoleConfirmCopy(role: MediaRole, mode: 'remove' | 'm
   }
 }
 
+// fallow-ignore-next-line complexity
 export function shouldConfirmMediaRoleChange(input: {
   role: MediaRole
   assigned: boolean
@@ -35,11 +39,16 @@ export function shouldConfirmMediaRoleChange(input: {
   const previous = input.media.roles[input.role]
   if (!previous) return { required: false }
 
-  const previousImage = input.media.images.find((image) => image.id === previous.imageId)
+  const previousImageId = roleAssignmentUploadImageId(previous)
+  const previousImage = previousImageId
+    ? input.media.images.find((image) => image.id === previousImageId)
+    : undefined
   const previousAsset = previousImage ? input.assets[previousImage.assetId] : undefined
   const previousSource = previousAsset
     ? { width: previousAsset.orientedWidth, height: previousAsset.orientedHeight }
-    : input.source
+    : previous.source.kind === 'system'
+      ? SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS
+      : input.source
 
   if (
     !previousSource ||
@@ -48,13 +57,16 @@ export function shouldConfirmMediaRoleChange(input: {
       presentation: previous.presentation,
       source: previousSource,
     }) ||
-    (input.assigned && previous.imageId === input.selectedId)
+    (input.assigned &&
+      (roleAssignmentMatchesImageId(previous, input.selectedId) ||
+        previousImageId === input.selectedId))
   ) {
     return { required: false }
   }
 
   return {
     required: true,
-    mode: input.assigned && previous.imageId !== input.selectedId ? 'move' : 'remove',
+    mode:
+      input.assigned && previousImageId && previousImageId !== input.selectedId ? 'move' : 'remove',
   }
 }

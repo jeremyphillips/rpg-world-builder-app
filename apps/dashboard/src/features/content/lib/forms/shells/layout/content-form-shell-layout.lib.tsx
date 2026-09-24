@@ -1,10 +1,12 @@
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type {
   ContentCampaignAccessPatch,
+  ContentSource,
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { type ContentMediaDomain } from '@rpg/contracts'
+import { useWatch } from 'react-hook-form'
 import { cn, fieldStackRhythmVariants } from '@rpg/ui'
 import { FormItems, resolveFormDensity, useFormSectionContext, type FormItem } from '@rpg/ui/form'
 
@@ -38,22 +40,36 @@ export interface ContentFormCampaignAccessProps {
   availabilityPresentation?: CampaignAvailabilityPresentation
   form?: UseFormReturn<FieldValues>
   mediaDomain?: ContentMediaDomain
+  entitySource?: ContentSource
 }
 
 function ContentMediaIdentitySlot({
   domain,
   form,
   campaignId,
+  contentType,
+  contentSource,
 }: {
   domain: ContentMediaDomain
   form: UseFormReturn<FieldValues>
   campaignId?: string
+  contentType: ContentTypeKey
+  contentSource?: ContentSource
 }) {
-  void form
+  const slug = useWatch({ control: form.control, name: 'slug' }) as string | undefined
   return (
     <ManagedMediaField
       config={{ domain, presentation: { layout: 'compact' } }}
       scope={{ kind: 'campaign-content', campaignId: campaignId ?? 'draft' }}
+      contentContext={
+        slug && contentSource
+          ? {
+              contentType,
+              slug,
+              contentSource,
+            }
+          : undefined
+      }
     />
   )
 }
@@ -71,6 +87,7 @@ export function ContentFormHeader({
   availabilityPresentation = 'disclosure',
   form,
   mediaDomain,
+  entitySource,
 }: ContentFormCampaignAccessProps) {
   const { density } = useFormSectionContext()
   const { rhythm } = resolveFormDensity(density)
@@ -108,6 +125,8 @@ export function ContentFormHeader({
             domain={mediaConfig.domain}
             form={form}
             campaignId={campaignId}
+            contentType={def.routeKey as ContentTypeKey}
+            contentSource={entitySource}
           />
         ) : null}
         <div className="min-w-0 flex-1">

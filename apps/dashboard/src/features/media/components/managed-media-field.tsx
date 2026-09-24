@@ -12,6 +12,7 @@ import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } fro
 
 import { mediaImageUrl, MEDIA_SOURCE_CROP } from '../lib/media-display'
 import { resolveMediaFieldCapacity, type MediaFieldConfig } from '../lib/media-field-config'
+import type { MediaManagerContentContext } from '../lib/media-manager.types'
 import { MediaManager } from './media-manager'
 
 const MEDIA_FIELD_ADD_IMAGES_LABEL = 'Add images'
@@ -22,6 +23,7 @@ export type ManagedMediaFieldProps = {
   scope: MediaScope
   name?: string
   label?: string
+  contentContext?: MediaManagerContentContext
 }
 
 /** RHF-aware dashboard adapter around the API-free UI summary primitive. */
@@ -30,6 +32,7 @@ export function ManagedMediaField({
   scope,
   name = 'media',
   label = 'Images',
+  contentContext,
 }: ManagedMediaFieldProps) {
   const headingId = useId()
   const { density } = useFormSectionContext()
@@ -106,6 +109,7 @@ export function ManagedMediaField({
         initialAssets={assets}
         initialSelectedImageId={selectedId}
         maxItems={maxItems}
+        contentContext={contentContext}
         onSave={(change) => {
           setAssets(change.assets)
           form.setValue(name, change.media, {

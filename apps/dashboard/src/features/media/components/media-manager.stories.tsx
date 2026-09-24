@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createUploadRoleAssignment } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 import { MediaManager, type MediaManagerProps } from './media-manager'
 import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../fixtures'
@@ -49,11 +50,14 @@ export const SameSourceBothRoles: Story = {
   args: {
     value: {
       ...mediaFixture,
-      roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+      roles: {
+        primary: createUploadRoleAssignment('image-0'),
+        portrait: createUploadRoleAssignment('image-0'),
+      },
     },
   },
 }
-const primaryValue = { ...mediaFixture, roles: { primary: { imageId: 'image-1' } } }
+const primaryValue = { ...mediaFixture, roles: { primary: createUploadRoleAssignment('image-1') } }
 export const Class: Story = { args: { domain: 'class', value: primaryValue } }
 export const Species: Story = { args: { domain: 'species', value: primaryValue } }
 export const Equipment: Story = { args: { domain: 'equipment', value: primaryValue } }

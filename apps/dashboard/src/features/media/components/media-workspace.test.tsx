@@ -1,3 +1,4 @@
+import { createUploadRoleAssignment } from '@rpg/contracts'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -63,7 +64,10 @@ it('renders a presentation switch only when multiple roles are assigned', () => 
   mount({
     value: {
       ...mediaFixture,
-      roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+      roles: {
+        primary: createUploadRoleAssignment('image-0'),
+        portrait: createUploadRoleAssignment('image-0'),
+      },
     },
   })
   expect(screen.getByRole('group', { name: 'Presentation' })).toBeInTheDocument()
@@ -74,7 +78,7 @@ it('hides the presentation switch when only one role is assigned', () => {
   mount({
     value: {
       ...mediaFixture,
-      roles: { primary: { imageId: 'image-0' } },
+      roles: { primary: createUploadRoleAssignment('image-0') },
     },
   })
   expect(screen.queryByRole('group', { name: 'Presentation' })).not.toBeInTheDocument()
@@ -84,7 +88,10 @@ it('switches presentations on a shared source without changing role assignments'
   mount({
     value: {
       ...mediaFixture,
-      roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+      roles: {
+        primary: createUploadRoleAssignment('image-0'),
+        portrait: createUploadRoleAssignment('image-0'),
+      },
     },
   })
   expect(screen.getByLabelText('Zoom')).toBeInTheDocument()
@@ -99,7 +106,10 @@ it('returns to the neutral preview when the active role is unchecked', () => {
   mount({
     value: {
       ...mediaFixture,
-      roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+      roles: {
+        primary: createUploadRoleAssignment('image-0'),
+        portrait: createUploadRoleAssignment('image-0'),
+      },
     },
   })
   fireEvent.click(screen.getByRole('button', { name: 'Primary' }))

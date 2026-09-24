@@ -4,10 +4,18 @@ import userEvent from '@testing-library/user-event'
 import { MediaGallery } from './media-gallery'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 
+const emptyAvailable: never[] = []
+const fixtureAvailable = mediaFixture.images.map((attachment) => ({
+  kind: 'upload' as const,
+  id: attachment.id,
+  attachment,
+}))
+
 it('shows the quiet empty state copy', () => {
   render(
     <MediaGallery
       media={{ revision: 0, images: [], roles: {} }}
+      availableImages={emptyAvailable}
       assets={{}}
       allowedRoles={['portrait', 'primary']}
       entries={[]}
@@ -28,6 +36,7 @@ it('calls onAdd from the gallery picker', async () => {
   render(
     <MediaGallery
       media={{ revision: 0, images: [], roles: {} }}
+      availableImages={emptyAvailable}
       assets={{}}
       allowedRoles={['portrait', 'primary']}
       entries={[]}
@@ -45,6 +54,7 @@ it('moves keyboard selection between images and shows role badges without a foot
   render(
     <MediaGallery
       media={mediaFixture}
+      availableImages={fixtureAvailable}
       assets={Object.fromEntries(mediaFixtureAssets.map((asset) => [asset.id, asset]))}
       allowedRoles={['portrait', 'primary']}
       selectedId="image-0"
@@ -69,6 +79,7 @@ it('labels upload queue rows with Waiting, Uploading, or Failed', () => {
   render(
     <MediaGallery
       media={{ revision: 0, images: [], roles: {} }}
+      availableImages={emptyAvailable}
       assets={{}}
       allowedRoles={['primary']}
       entries={[

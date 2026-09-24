@@ -2,6 +2,7 @@ import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   formatEquipmentCostLabel,
   moneyToCp,
+  type ContentDisplayImage,
   type ContentOverviewUsageScope,
   type ContentStatus,
   type ContentUsageSummaryLabels,
@@ -20,6 +21,7 @@ import type { ColumnDef } from '@rpg/ui'
 
 import { buildSourceColumn, stampDataColumns } from '@/lib/data-table/column-builders'
 
+import { ContentMediaImage } from '../detail/page/content-media-image'
 import { getContentImageUrl } from '../detail/page/content-image-url'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
@@ -34,8 +36,11 @@ import { buildContentUsedByColumn } from './content-used-by-column'
 export type ContentBase = {
   imageKey?: string
   name: string
+  slug?: string
+  rulesetId?: string
   source: ContentSource
   status: ContentStatus
+  media?: import('@rpg/contracts').ContentMedia
 }
 
 function readCampaignAccess(row: ContentBase): ResolvedContentCampaignAccess {
@@ -47,6 +52,8 @@ export { readCampaignAccess as readContentRowCampaignAccess }
 export type ContentTableOptions<T> = {
   /** Content type used to resolve shared source-presentation policy. */
   contentType: ContentTypeKey
+  /** Optional resolver for crop-aware overview thumbnails. */
+  resolveDisplayImage?: (row: T) => ContentDisplayImage
   /** When provided, the name cell renders as a link to this href. */
   nameHref?: (row: T) => string
   /** When provided with `canManage`, renders the line-2 Edit utility action. */
@@ -95,6 +102,7 @@ export function buildContentColumns<T extends ContentBase>(
 ): ColumnDef<T>[] {
   const {
     contentType,
+    resolveDisplayImage,
     nameHref,
     editHref,
     canManage = false,
@@ -106,6 +114,10 @@ export function buildContentColumns<T extends ContentBase>(
     accessorKey: 'imageKey',
     header: () => <span className="sr-only">Image</span>,
     cell: ({ row }) => {
+      if (resolveDisplayImage) {
+        const display = resolveDisplayImage(row.original)
+        return <ContentMediaImage display={display} alt="" frame="square" />
+      }
       const key = row.getValue<string | undefined>('imageKey')
       return <DataTableImageCell src={getContentImageUrl(key)} />
     },

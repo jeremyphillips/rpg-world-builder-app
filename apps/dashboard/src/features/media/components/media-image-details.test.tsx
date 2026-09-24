@@ -4,15 +4,23 @@ import { getContentMediaPolicy } from '@rpg/contracts'
 import { MediaImageDetails } from './media-image-details'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 
+const uploadAvailable = {
+  kind: 'upload' as const,
+  id: mediaFixture.images[0]!.id,
+  attachment: mediaFixture.images[0]!,
+}
+
 it('explains why a small image cannot have Portrait or Primary', () => {
   render(
     <MediaImageDetails
-      image={mediaFixture.images[0]!}
+      selectedAvailable={uploadAvailable}
       asset={{ ...mediaFixtureAssets[0]!, orientedWidth: 64, orientedHeight: 64 }}
       media={{ ...mediaFixture, roles: {} }}
       policy={getContentMediaPolicy('character')}
+      assignedRoles={[]}
       onAlt={vi.fn()}
       onRole={vi.fn()}
+      canRemove
       onRemove={vi.fn()}
     />,
   )
@@ -25,12 +33,14 @@ it('explains why a small image cannot have Portrait or Primary', () => {
 it('keeps accessibility fields inside a collapsed disclosure by default', () => {
   render(
     <MediaImageDetails
-      image={mediaFixture.images[0]!}
+      selectedAvailable={uploadAvailable}
       asset={mediaFixtureAssets[0]!}
       media={mediaFixture}
       policy={getContentMediaPolicy('character')}
+      assignedRoles={['portrait']}
       onAlt={vi.fn()}
       onRole={vi.fn()}
+      canRemove
       onRemove={vi.fn()}
     />,
   )

@@ -2,7 +2,13 @@ import type { ZodIssue } from 'zod'
 
 import { contentMediaValidationMessages } from './content-media-validation-messages'
 import type { ContentMedia } from './content-media'
+import { isSystemRoleAssignment, roleAssignmentUploadImageId } from './content-media-source'
 import { CONTENT_MEDIA_MAX_ATTACHMENTS } from './limits'
+import {
+  deriveSystemClassPrimarySource,
+  resolveContentImageSet,
+  SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
+} from './system-content-image-registry'
 import { formatAspectRatioLabel, getFixedAspectCropSpec } from './role-crop-spec'
 import {
   isFocalPointInCrop,
@@ -192,6 +198,39 @@ function collectRolePresentationIssues(
   return collectCropPresentationIssues(role, assignment, source)
 }
 
+function collectSystemRoleIssues(
+  role: MediaRole,
+  assignment: NonNullable<ContentMedia['roles'][MediaRole]>,
+): ZodIssue[] {
+  if (!isSystemRoleAssignment(assignment)) return []
+
+  const imageSetId = resolveContentImageSet({})
+  const derived = deriveSystemClassPrimarySource({
+    imageSetId,
+    slug: assignment.source.slug,
+  })
+  if (
+    !derived ||
+    assignment.source.imageSetId !== derived.imageSetId ||
+    assignment.source.contentType !== derived.contentType ||
+    assignment.source.assetRole !== derived.assetRole ||
+    assignment.source.slug !== derived.slug
+  ) {
+    return [
+      customIssue(`Role ${role} references an unknown system image source.`, [
+        'roles',
+        role,
+        'source',
+      ]),
+    ]
+  }
+
+  return collectRolePresentationIssues(role, assignment, {
+    orientedWidth: SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS.width,
+    orientedHeight: SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS.height,
+  })
+}
+
 function collectRoleIssues(
   media: ContentMedia,
   policy: ContentMediaPolicy,
@@ -209,14 +248,20 @@ function collectRoleIssues(
       continue
     }
 
-    if (!imageIds.has(assignment.imageId)) {
+    if (isSystemRoleAssignment(assignment)) {
+      issues.push(...collectSystemRoleIssues(role, assignment))
+      continue
+    }
+
+    const imageId = roleAssignmentUploadImageId(assignment)
+    if (!imageId || !imageIds.has(imageId)) {
       issues.push(
-        customIssue(`Role ${role} references a missing attachment.`, ['roles', role, 'imageId']),
+        customIssue(`Role ${role} references a missing attachment.`, ['roles', role, 'source']),
       )
       continue
     }
 
-    const image = media.images.find((entry) => entry.id === assignment.imageId)
+    const image = media.images.find((entry) => entry.id === imageId)
     const dimensions = image ? assetDimensionsById[image.assetId] : undefined
     issues.push(...collectRolePresentationIssues(role, assignment, dimensions))
   }

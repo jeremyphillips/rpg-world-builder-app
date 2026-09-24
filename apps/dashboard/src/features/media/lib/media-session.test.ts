@@ -1,3 +1,4 @@
+import { createUploadRoleAssignment, roleAssignmentUploadImageId } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 import {
@@ -13,7 +14,7 @@ describe('isolated media session', () => {
   it('honors a valid requested selection and falls back when it is stale', () => {
     expect(createMediaSession(mediaFixture, 'image-1', characterRoles).selectedId).toBe('image-1')
     expect(createMediaSession(mediaFixture, 'missing', characterRoles).selectedId).toBe(
-      mediaFixture.roles.portrait?.imageId,
+      roleAssignmentUploadImageId(mediaFixture.roles.portrait),
     )
   })
 
@@ -40,7 +41,10 @@ describe('isolated media session', () => {
     let state = createMediaSession(
       {
         ...mediaFixture,
-        roles: { portrait: { imageId: 'image-0' }, primary: { imageId: 'image-0' } },
+        roles: {
+          portrait: createUploadRoleAssignment('image-0'),
+          primary: createUploadRoleAssignment('image-0'),
+        },
       },
       undefined,
       characterRoles,
@@ -58,7 +62,10 @@ describe('isolated media session', () => {
     let state = createMediaSession(
       {
         ...mediaFixture,
-        roles: { portrait: { imageId: 'image-0' }, primary: { imageId: 'image-0' } },
+        roles: {
+          portrait: createUploadRoleAssignment('image-0'),
+          primary: createUploadRoleAssignment('image-0'),
+        },
       },
       'image-0',
       characterRoles,
@@ -82,7 +89,7 @@ describe('isolated media session', () => {
       allowedRoles: characterRoles,
     })
     expect(state.media.images[0]?.id).toBe('image-0')
-    expect(state.media.roles.portrait?.imageId).toBe('image-0')
+    expect(roleAssignmentUploadImageId(state.media.roles.portrait)).toBe('image-0')
     expect(state.selectedId).toBe('image-0')
   })
 
@@ -128,7 +135,7 @@ describe('isolated media session', () => {
       allowedRoles: characterRoles,
       source: { width: 2400, height: 1600 },
     })
-    expect(state.media.roles.portrait?.imageId).toBe('image-1')
+    expect(roleAssignmentUploadImageId(state.media.roles.portrait)).toBe('image-1')
     expect(state.media.roles.primary).toEqual(mediaFixture.roles.primary)
     expect(state.media.revision).toBe(mediaFixture.revision)
   })

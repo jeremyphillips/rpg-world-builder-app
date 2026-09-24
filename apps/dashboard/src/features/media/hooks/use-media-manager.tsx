@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useQueries } from '@tanstack/react-query'
 import {
+  getAvailableContentImages,
   getContentMediaPolicy,
+  normalizePersistedContentMedia,
+  roleAssignmentMatchesImageId,
   validateContentMedia,
+  type AvailableContentImage,
   type ContentMedia,
   type MediaAsset,
   type MediaRole,
@@ -11,13 +15,15 @@ import { useToastScope } from '@rpg/ui'
 import { fetchMediaAsset } from '../api/media-api'
 import { useMediaUploads } from './use-media-uploads'
 import {
+  assignedRolesForImage,
   createMediaSession,
   hasNewMediaUploads,
   isMediaSessionDirty,
+  isRemovableMediaSelection,
   mediaSessionReducer,
   resolvePostRemovalSelection,
 } from '../lib/media-session'
-import { mediaErrorMessage, mediaImageUrl } from '../lib/media-display'
+import { mediaErrorMessage, mediaImageUrl, systemContentImageUrl } from '../lib/media-display'
 import {
   MEDIA_MANAGER_TOAST_IDS,
   resolveMediaRemovedToastDuration,
@@ -47,6 +53,27 @@ type RemovedImageSnapshot = {
   fallbackSelectedId?: string
 }
 
+function resolveAvailableImages(
+  value: ContentMedia,
+  contentContext: MediaManagerProps['contentContext'],
+): AvailableContentImage[] {
+  if (!contentContext) {
+    return value.images.map((attachment) => ({
+      kind: 'upload' as const,
+      id: attachment.id,
+      attachment,
+    }))
+  }
+  return getAvailableContentImages({
+    media: value,
+    contentType: contentContext.contentType,
+    slug: contentContext.slug,
+    contentSource: contentContext.contentSource,
+    rulesetId: contentContext.rulesetId,
+  })
+}
+
+// fallow-ignore-next-line complexity
 export function useMediaManager({
   onOpenChange,
   domain,
@@ -55,13 +82,28 @@ export function useMediaManager({
   initialAssets = EMPTY_ASSETS,
   initialSelectedImageId,
   maxItems,
+  contentContext,
+  systemImageUrl: resolveSystemImageUrl = systemContentImageUrl,
   onSave,
 }: MediaManagerProps) {
   const toast = useToastScope()
   const policy = getContentMediaPolicy(domain)
   const allowedRoles = policy.allowedRoles
+  const availableImages = useMemo(
+    () => resolveAvailableImages(value, contentContext),
+    [contentContext, value],
+  )
   const [state, dispatch] = useReducer(mediaSessionReducer, undefined, () =>
-    createMediaSession(value, initialSelectedImageId, allowedRoles),
+    createMediaSession(
+      value,
+      initialSelectedImageId,
+      allowedRoles,
+      availableImages.length > 0 ? availableImages : resolveAvailableImages(value, contentContext),
+    ),
+  )
+  const sessionAvailableImages = useMemo(
+    () => resolveAvailableImages(state.media, contentContext),
+    [contentContext, state.media],
   )
   const [uploaded, setUploaded] = useState<Record<string, MediaAsset>>({})
   const [saving, setSaving] = useState(false)
@@ -86,6 +128,22 @@ export function useMediaManager({
   queries.forEach((query) => {
     if (query.data) assets[query.data.id] = query.data
   })
+
+  const selectedAvailable = state.selectedId
+    ? sessionAvailableImages.find((image) => image.id === state.selectedId)
+    : undefined
+  const selectedUpload =
+    selectedAvailable?.kind === 'upload'
+      ? selectedAvailable.attachment
+      : state.media.images.find((image) => image.id === state.selectedId)
+  const selected = selectedUpload
+  const asset = selected ? assets[selected.assetId] : undefined
+  const selectedSourceDimensions =
+    selectedAvailable?.kind === 'system'
+      ? selectedAvailable.sourceDimensions
+      : asset
+        ? { width: asset.orientedWidth, height: asset.orientedHeight }
+        : undefined
 
   const addAsset = useCallback(
     (asset: MediaAsset, id: string) => {
@@ -136,8 +194,6 @@ export function useMediaManager({
   }, [error, toast])
 
   const dirty = isMediaSessionDirty(state) || uploads.entries.length > 0
-  const selected = state.media.images.find((image) => image.id === state.selectedId)
-  const asset = selected ? assets[selected.assetId] : undefined
   const validation = validateContentMedia(state.media, {
     policy,
     assetDimensionsById: assets,
@@ -147,9 +203,11 @@ export function useMediaManager({
   const label = domain === 'equipment' ? 'equipment item' : domain
   const onAlt = useCallback(
     (alt: string) => {
-      if (state.selectedId) dispatch({ type: 'alt', id: state.selectedId, alt })
+      if (state.selectedId && selectedAvailable?.kind === 'upload') {
+        dispatch({ type: 'alt', id: state.selectedId, alt })
+      }
     },
-    [state.selectedId],
+    [selectedAvailable?.kind, state.selectedId],
   )
 
   function notifyRejectedDrop(message: string) {
@@ -184,24 +242,23 @@ export function useMediaManager({
   }
 
   function changeRole(role: MediaRole, assigned: boolean) {
-    if (!selected) return
-    const source = asset ? { width: asset.orientedWidth, height: asset.orientedHeight } : undefined
+    if (!state.selectedId) return
     const apply = () =>
       dispatch({
         type: 'role',
-        id: selected.id,
+        id: state.selectedId!,
         role,
         assigned,
         allowedRoles,
-        source,
+        source: selectedSourceDimensions,
       })
     const confirmation = shouldConfirmMediaRoleChange({
       role,
       assigned,
-      selectedId: selected.id,
+      selectedId: state.selectedId,
       media: state.media,
       assets,
-      source,
+      source: selectedSourceDimensions,
     })
     if (confirmation.required) {
       const copy = resolveMediaRoleConfirmCopy(role, confirmation.mode)
@@ -240,7 +297,7 @@ export function useMediaManager({
     const fallbackSelectedId = resolvePostRemovalSelection(remainingImages, index)
     const roles = Object.fromEntries(
       allowedRoles
-        .filter((role) => state.media.roles[role]?.imageId === selected.id)
+        .filter((role) => roleAssignmentMatchesImageId(state.media.roles[role], selected.id))
         .map((role) => [role, structuredClone(state.media.roles[role]!)]),
     ) as RemovedImageSnapshot['roles']
 
@@ -276,14 +333,26 @@ export function useMediaManager({
   }
 
   const blocked = saving || !validation.ok || !metadataReady || uploads.entries.length > 0 || !dirty
+  const canRemove = isRemovableMediaSelection(state.selectedId, sessionAvailableImages)
 
   async function save() {
     if (blocked) return
     setSaving(true)
     setError('')
     try {
+      const normalizedMedia = contentContext
+        ? normalizePersistedContentMedia({
+            media: structuredClone(state.media),
+            contentType: contentContext.contentType,
+            slug: contentContext.slug,
+            contentSource: contentContext.contentSource,
+            rulesetId: contentContext.rulesetId,
+            allowedRoles,
+          })
+        : structuredClone(state.media)
+
       await onSave({
-        media: structuredClone(state.media),
+        media: normalizedMedia,
         expectedMediaRevision: state.initial.revision,
         assets: Object.values(assets),
       })
@@ -310,7 +379,9 @@ export function useMediaManager({
     queries,
     uploads,
     selected,
+    selectedAvailable,
     asset,
+    selectedSourceDimensions,
     validation,
     label,
     onAlt,
@@ -319,7 +390,13 @@ export function useMediaManager({
     remove,
     save,
     blocked,
+    canRemove,
     notifyRejectedDrop,
+    resolveSystemImageUrl,
+    sessionAvailableImages,
+    assignedRolesForSelection: state.selectedId
+      ? assignedRolesForImage(state.media, state.selectedId, allowedRoles, sessionAvailableImages)
+      : [],
   }
 }
 

@@ -39,7 +39,7 @@ export function MediaManagerBody({
   onPreviewBoundaryChange: Parameters<typeof MediaWorkspace>[0]['onScrollBoundaryChange']
   onDetailsBoundaryChange: Parameters<typeof MediaImageDetails>[0]['onScrollBoundaryChange']
 }) {
-  const { selected, asset, policy, onAlt, changeRole, remove } = controller
+  const { selectedAvailable, asset, policy, onAlt, changeRole, remove, canRemove } = controller
 
   return (
     <div
@@ -52,7 +52,9 @@ export function MediaManagerBody({
       <fieldset disabled={saving} className={styles.layout()}>
         <MediaGallery
           imageUrl={imageUrl}
+          systemImageUrl={controller.resolveSystemImageUrl}
           media={media}
+          availableImages={controller.sessionAvailableImages}
           assets={assets}
           allowedRoles={controller.policy.allowedRoles}
           selectedId={selectedId}
@@ -68,15 +70,17 @@ export function MediaManagerBody({
           imageUrl={imageUrl}
           onScrollBoundaryChange={onPreviewBoundaryChange}
         />
-        {selected && asset ? (
+        {selectedAvailable ? (
           <MediaImageDetails
-            image={selected}
+            selectedAvailable={selectedAvailable}
             asset={asset}
             media={media}
             policy={policy}
+            assignedRoles={controller.assignedRolesForSelection}
             onAlt={onAlt}
             onRole={changeRole}
             onRemove={remove}
+            canRemove={canRemove}
             onScrollBoundaryChange={onDetailsBoundaryChange}
           />
         ) : (

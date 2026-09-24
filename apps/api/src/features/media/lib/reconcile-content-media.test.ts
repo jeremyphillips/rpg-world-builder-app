@@ -2,7 +2,11 @@ import { randomUUID } from 'node:crypto'
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { getContentMediaPolicy, resetPortraitCrop } from '@rpg/contracts'
+import {
+  createUploadRoleAssignment,
+  getContentMediaPolicy,
+  resetPortraitCrop,
+} from '@rpg/contracts'
 
 import { setMongoTransactionsEnabled } from '../../../lib/mongo-transaction'
 import { createMediaAssetRecord } from '../media.repository'
@@ -74,7 +78,7 @@ describe('reconcileContentMedia', () => {
       proposedMedia: {
         revision: 0,
         images: [{ id: 'img-1', assetId: sharedAssetId, alt: 'Shared' }],
-        roles: { primary: { imageId: 'img-1' } },
+        roles: { primary: createUploadRoleAssignment('img-1') },
       },
       policy,
     })
@@ -87,7 +91,7 @@ describe('reconcileContentMedia', () => {
       proposedMedia: {
         revision: 0,
         images: [{ id: 'img-2', assetId: sharedAssetId, alt: 'Also shared' }],
-        roles: { primary: { imageId: 'img-2' } },
+        roles: { primary: createUploadRoleAssignment('img-2') },
       },
       policy,
     })
@@ -100,7 +104,7 @@ describe('reconcileContentMedia', () => {
       proposedMedia: {
         revision: 0,
         images: [{ id: 'img-3', assetId: soloAssetId, alt: 'Solo' }],
-        roles: { primary: { imageId: 'img-3' } },
+        roles: { primary: createUploadRoleAssignment('img-3') },
       },
       policy,
     })
@@ -132,7 +136,7 @@ describe('reconcileContentMedia', () => {
         images: [{ id: 'img-1', assetId, alt: 'Portrait' }],
         roles: {
           portrait: {
-            imageId: 'img-1',
+            ...createUploadRoleAssignment('img-1'),
             presentation: {
               mode: 'crop',
               crop: resetPortraitCrop({ width: 512, height: 512 }),
@@ -155,7 +159,7 @@ describe('reconcileContentMedia', () => {
         images: [{ id: 'img-2', assetId, alt: 'Other' }],
         roles: {
           portrait: {
-            imageId: 'img-2',
+            ...createUploadRoleAssignment('img-2'),
             presentation: {
               mode: 'crop',
               crop: resetPortraitCrop({ width: 512, height: 512 }),
@@ -178,7 +182,7 @@ describe('reconcileContentMedia', () => {
       proposedMedia: {
         revision: 0,
         images: [{ id: 'img-1', assetId, alt: 'Blocked' }],
-        roles: { primary: { imageId: 'img-1' } },
+        roles: { primary: createUploadRoleAssignment('img-1') },
       },
       policy: getContentMediaPolicy('location'),
     })

@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ContentMedia } from './content-media'
+import { createUploadRoleAssignment } from './content-media-source'
 import { getContentMediaPolicy } from './media-policy'
 import { validateContentMedia } from './validate-content-media'
+
+function uploadRole(imageId: string) {
+  return createUploadRoleAssignment(imageId)
+}
 
 const assetDimensions = {
   'asset-large': { orientedWidth: 1200, orientedHeight: 900 },
@@ -20,7 +25,7 @@ function baseMedia(overrides: Partial<ContentMedia> = {}): ContentMedia {
 
 describe('validateContentMedia', () => {
   it('accepts a valid primary-only class gallery', () => {
-    const result = validateContentMedia(baseMedia({ roles: { primary: { imageId: 'img-1' } } }), {
+    const result = validateContentMedia(baseMedia({ roles: { primary: uploadRole('img-1') } }), {
       policy: getContentMediaPolicy('class'),
       assetDimensionsById: assetDimensions,
     })
@@ -29,7 +34,7 @@ describe('validateContentMedia', () => {
   })
 
   it('rejects portrait on primary-only domains', () => {
-    const result = validateContentMedia(baseMedia({ roles: { portrait: { imageId: 'img-1' } } }), {
+    const result = validateContentMedia(baseMedia({ roles: { portrait: uploadRole('img-1') } }), {
       policy: getContentMediaPolicy('species'),
       assetDimensionsById: assetDimensions,
     })
@@ -41,7 +46,7 @@ describe('validateContentMedia', () => {
 
   it('rejects dangling role references and duplicate attachments', () => {
     const dangling = validateContentMedia(
-      baseMedia({ roles: { primary: { imageId: 'missing' } } }),
+      baseMedia({ roles: { primary: uploadRole('missing') } }),
       {
         policy: getContentMediaPolicy('location'),
         assetDimensionsById: assetDimensions,
@@ -82,7 +87,7 @@ describe('validateContentMedia', () => {
     const tooSmall = validateContentMedia(
       baseMedia({
         images: [{ id: 'img-1', assetId: 'asset-small' }],
-        roles: { portrait: { imageId: 'img-1' } },
+        roles: { portrait: uploadRole('img-1') },
       }),
       {
         policy: getContentMediaPolicy('character'),
@@ -95,7 +100,7 @@ describe('validateContentMedia', () => {
       baseMedia({
         roles: {
           portrait: {
-            imageId: 'img-1',
+            ...uploadRole('img-1'),
             presentation: { mode: 'crop' },
           },
         },
@@ -113,7 +118,7 @@ describe('validateContentMedia', () => {
       baseMedia({
         roles: {
           portrait: {
-            imageId: 'img-1',
+            ...uploadRole('img-1'),
             presentation: { mode: 'crop', crop: { x: 0.8, y: 0, width: 0.5, height: 0.5 } },
           },
         },

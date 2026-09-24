@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { CONTENT_MEDIA_REPLACE_KEY, emptyContentMediaSchema } from '@rpg/contracts'
+import {
+  CONTENT_MEDIA_REPLACE_KEY,
+  createUploadRoleAssignment,
+  emptyContentMediaSchema,
+} from '@rpg/contracts'
 
 import { deepMerge } from './deep-merge'
 
@@ -59,14 +63,17 @@ describe('deepMerge', () => {
       media: {
         revision: 0,
         images: [{ id: 'img-base', assetId: 'asset-base', alt: 'Base art' }],
-        roles: { primary: { imageId: 'img-base' }, portrait: { imageId: 'img-base' } },
+        roles: {
+          primary: createUploadRoleAssignment('img-base'),
+          portrait: createUploadRoleAssignment('img-base'),
+        },
       },
     }
     const patch = {
       media: {
         revision: 0,
         images: [{ id: 'img-patch', assetId: 'asset-patch', alt: 'Patch art' }],
-        roles: { primary: { imageId: 'img-patch' } },
+        roles: { primary: createUploadRoleAssignment('img-patch') },
       },
     }
 
@@ -80,7 +87,10 @@ describe('deepMerge', () => {
       media: {
         revision: 0,
         images: [{ id: 'img-base', assetId: 'asset-base' }],
-        roles: { primary: { imageId: 'img-base' }, portrait: { imageId: 'img-base' } },
+        roles: {
+          primary: createUploadRoleAssignment('img-base'),
+          portrait: createUploadRoleAssignment('img-base'),
+        },
       },
     }
 

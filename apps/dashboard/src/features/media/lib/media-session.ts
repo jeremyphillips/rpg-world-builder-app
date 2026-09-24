@@ -1,4 +1,5 @@
 import type {
+  AvailableContentImage,
   ContentMedia,
   ContainPresentation,
   MediaAsset,
@@ -8,9 +9,17 @@ import type {
   SourceDimensions,
 } from '@rpg/contracts'
 import {
+  buildSystemContentImageVirtualId,
   canonicalizeEmblemPresentation,
   createDefaultRolePresentation,
+  createSystemRoleAssignment,
+  createUploadRoleAssignment,
   defaultEmblemPresentation,
+  isSystemRoleAssignment,
+  parseSystemContentImageVirtualId,
+  roleAssignmentMatchesImageId,
+  roleAssignmentMatchesVirtualId,
+  roleAssignmentUploadImageId,
   asCropPresentation,
 } from '@rpg/contracts'
 
@@ -19,6 +28,7 @@ export type MediaSession = {
   media: ContentMedia
   selectedId?: string
   presentation: MediaRole
+  availableImages: AvailableContentImage[]
 }
 
 export type MediaAction =
@@ -46,42 +56,105 @@ export type MediaAction =
   | { type: 'crop'; crop: NormalizedCrop; focalPoint?: NormalizedFocalPoint }
   | { type: 'contain'; layout: ContainPresentation; source: SourceDimensions }
 
+function isVirtualSystemId(id: string): boolean {
+  return parseSystemContentImageVirtualId(id) !== undefined
+}
+
+function derivedSystemImage(
+  availableImages: AvailableContentImage[],
+): AvailableContentImage | undefined {
+  return availableImages.find((image) => image.kind === 'system')
+}
+
+function assignmentMatchesSelection(
+  assignment: NonNullable<ContentMedia['roles'][MediaRole]>,
+  selectedId: string,
+): boolean {
+  return (
+    roleAssignmentMatchesImageId(assignment, selectedId) ||
+    roleAssignmentMatchesVirtualId(assignment, selectedId)
+  )
+}
+
 function rolesForImage(
   media: ContentMedia,
   imageId: string,
   allowedRoles: readonly MediaRole[],
+  availableImages: AvailableContentImage[],
 ): MediaRole[] {
-  return allowedRoles.filter((role) => media.roles[role]?.imageId === imageId)
+  const explicit = allowedRoles.filter((role) => {
+    const assignment = media.roles[role]
+    return assignment ? assignmentMatchesSelection(assignment, imageId) : false
+  })
+  if (explicit.length > 0) return explicit
+
+  const systemImage = derivedSystemImage(availableImages)
+  if (systemImage?.id === imageId && allowedRoles.includes('primary')) {
+    return ['primary']
+  }
+
+  return []
 }
 
 function resolvePresentationForImage(
   media: ContentMedia,
   imageId: string | undefined,
   allowedRoles: readonly MediaRole[],
+  availableImages: AvailableContentImage[],
 ): MediaRole {
   if (!imageId) return allowedRoles[0] ?? 'primary'
-  const assigned = rolesForImage(media, imageId, allowedRoles)
+  const assigned = rolesForImage(media, imageId, allowedRoles, availableImages)
   return assigned[0] ?? allowedRoles[0] ?? 'primary'
+}
+
+function resolveInitialSelectedId(
+  media: ContentMedia,
+  initialSelectedImageId: string | undefined,
+  allowedRoles: readonly MediaRole[],
+  availableImages: AvailableContentImage[],
+): string | undefined {
+  const selectableIds = new Set([
+    ...media.images.map((image) => image.id),
+    ...availableImages.filter((image) => image.kind === 'system').map((image) => image.id),
+  ])
+  const requested =
+    initialSelectedImageId && selectableIds.has(initialSelectedImageId)
+      ? initialSelectedImageId
+      : undefined
+  if (requested) return requested
+
+  for (const role of allowedRoles) {
+    const assignment = media.roles[role]
+    if (!assignment) continue
+    if (isSystemRoleAssignment(assignment)) {
+      return buildSystemContentImageVirtualId(assignment.source)
+    }
+    const imageId = roleAssignmentUploadImageId(assignment)
+    if (imageId) return imageId
+  }
+
+  return derivedSystemImage(availableImages)?.id ?? media.images[0]?.id
 }
 
 export function createMediaSession(
   media: ContentMedia,
   initialSelectedImageId: string | undefined,
   allowedRoles: readonly MediaRole[],
+  availableImages: AvailableContentImage[] = [],
 ): MediaSession {
-  const requested = media.images.some((image) => image.id === initialSelectedImageId)
-    ? initialSelectedImageId
-    : undefined
-  const selectedId =
-    requested ??
-    allowedRoles.map((role) => media.roles[role]?.imageId).find(Boolean) ??
-    media.images[0]?.id
+  const selectedId = resolveInitialSelectedId(
+    media,
+    initialSelectedImageId,
+    allowedRoles,
+    availableImages,
+  )
 
   return {
     initial: structuredClone(media),
     media: structuredClone(media),
     selectedId,
-    presentation: resolvePresentationForImage(media, selectedId, allowedRoles),
+    presentation: resolvePresentationForImage(media, selectedId, allowedRoles, availableImages),
+    availableImages,
   }
 }
 
@@ -95,7 +168,9 @@ export function hasNewMediaUploads(state: MediaSession): boolean {
 }
 
 export function mediaSessionReducer(state: MediaSession, action: MediaAction): MediaSession {
-  if (action.type === 'select') return selectImage(state, action.id, action.allowedRoles)
+  if (action.type === 'select') {
+    return selectImage(state, action.id, action.allowedRoles)
+  }
   if (action.type === 'presentation') return { ...state, presentation: action.role }
 
   const next = structuredClone(state)
@@ -131,16 +206,29 @@ export function mediaSessionReducer(state: MediaSession, action: MediaAction): M
 }
 
 function removeImage(next: MediaSession, id: string, allowedRoles: readonly MediaRole[]) {
+  if (isVirtualSystemId(id)) return
+
   const { media } = next
   const index = media.images.findIndex((image) => image.id === id)
   media.images = media.images.filter((image) => image.id !== id)
+  next.availableImages = next.availableImages.filter((image) => image.id !== id)
   for (const role of allowedRoles) {
-    if (media.roles[role]?.imageId === id) delete media.roles[role]
+    const assignment = media.roles[role]
+    if (assignment && roleAssignmentMatchesImageId(assignment, id)) {
+      delete media.roles[role]
+    }
   }
   if (next.selectedId === id) {
-    next.selectedId = media.images[Math.min(index, media.images.length - 1)]?.id
+    next.selectedId =
+      derivedSystemImage(next.availableImages)?.id ??
+      media.images[Math.min(index, media.images.length - 1)]?.id
   }
-  next.presentation = resolvePresentationForImage(media, next.selectedId, allowedRoles)
+  next.presentation = resolvePresentationForImage(
+    media,
+    next.selectedId,
+    allowedRoles,
+    next.availableImages,
+  )
 }
 
 function restoreRemovedImage(
@@ -157,27 +245,76 @@ function restoreRemovedImage(
   }
   if (action.restoreSelection) {
     next.selectedId = action.image.id
-    next.presentation = resolvePresentationForImage(media, action.image.id, action.allowedRoles)
+    next.presentation = resolvePresentationForImage(
+      media,
+      action.image.id,
+      action.allowedRoles,
+      next.availableImages,
+    )
   }
 }
 
+// fallow-ignore-next-line complexity
 function assignRole(next: MediaSession, action: Extract<MediaAction, { type: 'role' }>) {
   const { media } = next
-  if (action.assigned) {
-    if (media.roles[action.role]?.imageId === action.id) return
+
+  if (!action.assigned) {
+    const assignment = media.roles[action.role]
+    if (
+      assignment &&
+      (roleAssignmentMatchesImageId(assignment, action.id) ||
+        roleAssignmentMatchesVirtualId(assignment, action.id))
+    ) {
+      delete media.roles[action.role]
+    }
+    next.presentation = resolvePresentationForImage(
+      media,
+      next.selectedId,
+      action.allowedRoles,
+      next.availableImages,
+    )
+    return
+  }
+
+  const systemSource = parseSystemContentImageVirtualId(action.id)
+  if (systemSource) {
+    if (
+      media.roles[action.role] &&
+      roleAssignmentMatchesVirtualId(media.roles[action.role], action.id)
+    ) {
+      return
+    }
     media.roles[action.role] = {
-      imageId: action.id,
+      ...createSystemRoleAssignment({
+        imageSetId: systemSource.imageSetId,
+        contentType: systemSource.contentType as 'classes',
+        assetRole: systemSource.assetRole,
+        slug: systemSource.slug,
+      }),
       presentation: action.source
         ? createDefaultRolePresentation(action.role, action.source)
-        : action.role === 'emblem'
-          ? defaultEmblemPresentation()
-          : { mode: 'crop' },
+        : { mode: 'crop' },
     }
     next.presentation = action.role
-  } else {
-    delete media.roles[action.role]
-    next.presentation = resolvePresentationForImage(media, next.selectedId, action.allowedRoles)
+    return
   }
+
+  if (
+    media.roles[action.role] &&
+    roleAssignmentMatchesImageId(media.roles[action.role], action.id)
+  ) {
+    return
+  }
+
+  media.roles[action.role] = {
+    ...createUploadRoleAssignment(action.id),
+    presentation: action.source
+      ? createDefaultRolePresentation(action.role, action.source)
+      : action.role === 'emblem'
+        ? defaultEmblemPresentation()
+        : { mode: 'crop' },
+  }
+  next.presentation = action.role
 }
 
 function selectImage(
@@ -188,7 +325,7 @@ function selectImage(
   return {
     ...state,
     selectedId: id,
-    presentation: resolvePresentationForImage(state.media, id, allowedRoles),
+    presentation: resolvePresentationForImage(state.media, id, allowedRoles, state.availableImages),
   }
 }
 
@@ -196,13 +333,49 @@ function addImage(next: MediaSession, action: Extract<MediaAction, { type: 'add'
   if (next.media.images.some((image) => image.assetId === action.asset.id)) {
     return
   }
-  next.media.images.push({ id: action.id, assetId: action.asset.id })
+  const attachment = { id: action.id, assetId: action.asset.id }
+  next.media.images.push(attachment)
+  next.availableImages = [
+    ...next.availableImages.filter((image) => image.id !== action.id),
+    { kind: 'upload', id: action.id, attachment },
+  ]
   next.selectedId ??= action.id
 }
 
+function ensureAssignmentForSelection(
+  next: MediaSession,
+): NonNullable<ContentMedia['roles'][MediaRole]> | null {
+  if (!next.selectedId) return null
+
+  const existing = next.media.roles[next.presentation]
+  if (existing && assignmentMatchesSelection(existing, next.selectedId)) {
+    return existing
+  }
+
+  const systemSource = parseSystemContentImageVirtualId(next.selectedId)
+  if (systemSource) {
+    next.media.roles[next.presentation] = createSystemRoleAssignment({
+      imageSetId: systemSource.imageSetId,
+      contentType: systemSource.contentType as 'classes',
+      assetRole: systemSource.assetRole,
+      slug: systemSource.slug,
+    })
+    return next.media.roles[next.presentation]!
+  }
+
+  if (next.media.images.some((image) => image.id === next.selectedId)) {
+    next.media.roles[next.presentation] = createUploadRoleAssignment(next.selectedId)
+    return next.media.roles[next.presentation]!
+  }
+
+  return null
+}
+
 function updateCrop(next: MediaSession, crop: NormalizedCrop, focalPoint?: NormalizedFocalPoint) {
-  const assignment = next.media.roles[next.presentation]
-  if (!assignment || assignment.imageId !== next.selectedId) return
+  const assignment = ensureAssignmentForSelection(next)
+  if (!assignment) {
+    return
+  }
   assignment.presentation = {
     mode: 'crop',
     crop,
@@ -216,7 +389,9 @@ function updateCrop(next: MediaSession, crop: NormalizedCrop, focalPoint?: Norma
 
 function updateContain(next: MediaSession, layout: ContainPresentation, source: SourceDimensions) {
   const assignment = next.media.roles[next.presentation]
-  if (!assignment || assignment.imageId !== next.selectedId) return
+  if (!assignment || !next.selectedId || !assignmentMatchesSelection(assignment, next.selectedId)) {
+    return
+  }
   assignment.presentation = canonicalizeEmblemPresentation(source, layout)
 }
 
@@ -224,8 +399,9 @@ export function assignedRolesForImage(
   media: ContentMedia,
   imageId: string,
   allowedRoles: readonly MediaRole[],
+  availableImages: AvailableContentImage[] = [],
 ): MediaRole[] {
-  return rolesForImage(media, imageId, allowedRoles)
+  return rolesForImage(media, imageId, allowedRoles, availableImages)
 }
 
 export function resolvePostRemovalSelection(
@@ -233,4 +409,12 @@ export function resolvePostRemovalSelection(
   removedIndex: number,
 ): string | undefined {
   return images[Math.min(removedIndex, images.length - 1)]?.id
+}
+
+export function isRemovableMediaSelection(
+  selectedId: string | undefined,
+  availableImages: AvailableContentImage[],
+): boolean {
+  if (!selectedId || isVirtualSystemId(selectedId)) return false
+  return availableImages.some((image) => image.kind === 'upload' && image.id === selectedId)
 }

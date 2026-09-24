@@ -16,7 +16,10 @@ import {
   asCropPresentation,
   contentImageSchema,
   formatFieldMessage,
+  isSystemRoleAssignment,
   resolveMediaRoleEligibility,
+  roleAssignmentMatchesVirtualId,
+  type AvailableContentImage,
   type ContentMedia,
   type ContentMediaPolicy,
   type MediaAsset,
@@ -36,28 +39,48 @@ const altFields: FormItem[] = [
 ]
 
 export type MediaImageDetailsProps = {
-  image: ContentMedia['images'][number]
-  asset: MediaAsset
+  selectedAvailable: AvailableContentImage
   media: ContentMedia
   policy: ContentMediaPolicy
+  assignedRoles: MediaRole[]
+  asset?: MediaAsset
   onAlt: (alt: string) => void
   onRole: (role: MediaRole, assigned: boolean) => void
-  onRemove: () => void
+  onRemove?: () => void
+  canRemove: boolean
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }
 
+function isDerivedPrimaryOnly(
+  media: ContentMedia,
+  selectedAvailable: AvailableContentImage,
+  role: MediaRole,
+): boolean {
+  if (role !== 'primary' || selectedAvailable.kind !== 'system') return false
+  const assignment = media.roles.primary
+  if (!assignment) return true
+  if (isSystemRoleAssignment(assignment)) {
+    return roleAssignmentMatchesVirtualId(assignment, selectedAvailable.id)
+  }
+  return false
+}
+
+// fallow-ignore-next-line complexity
 export function MediaImageDetails({
-  image,
-  asset,
+  selectedAvailable,
   media,
   policy,
+  assignedRoles,
+  asset,
   onAlt,
   onRole,
   onRemove,
+  canRemove,
   onScrollBoundaryChange,
 }: MediaImageDetailsProps) {
   const id = useId()
   const [accessibilityOpen, setAccessibilityOpen] = useState(false)
+  const uploadImage = selectedAvailable.kind === 'upload' ? selectedAvailable.attachment : undefined
   const syncs = useMemo<FormValueSync[]>(
     () => [
       {
@@ -70,7 +93,12 @@ export function MediaImageDetails({
     ],
     [onAlt],
   )
-  const source = { width: asset.orientedWidth, height: asset.orientedHeight }
+  const source =
+    selectedAvailable.kind === 'system'
+      ? selectedAvailable.sourceDimensions
+      : asset
+        ? { width: asset.orientedWidth, height: asset.orientedHeight }
+        : undefined
 
   return (
     <aside className={styles.detailsColumn()} aria-label="Image details">
@@ -90,15 +118,30 @@ export function MediaImageDetails({
                 Assign roles
               </h4>
               <div className={styles.roles()} role="group" aria-labelledby={`${id}-roles-heading`}>
+                {/* fallow-ignore-next-line complexity */}
                 {policy.allowedRoles.map((role) => {
                   const assignment = media.roles[role]
+                  const checked = assignedRoles.includes(role)
+                  const derivedOnly = isDerivedPrimaryOnly(media, selectedAvailable, role)
                   const cropPresentation = asCropPresentation(
-                    assignment?.imageId === image.id ? assignment.presentation : undefined,
+                    assignment &&
+                      (selectedAvailable.kind === 'upload'
+                        ? assignment.source.kind === 'upload' &&
+                          assignment.source.imageId === uploadImage?.id
+                        : roleAssignmentMatchesVirtualId(assignment, selectedAvailable.id))
+                      ? assignment.presentation
+                      : undefined,
                   )
-                  const eligibility = resolveMediaRoleEligibility(role, source, cropPresentation)
+                  const eligibility = source
+                    ? resolveMediaRoleEligibility(role, source, cropPresentation)
+                    : { eligible: false, message: 'Image details are still loading.' }
                   const hint = !eligibility.eligible
                     ? formatFieldMessage(eligibility.message)
-                    : (eligibility.hint ?? MEDIA_ROLE_ENTRIES[role].description)
+                    : derivedOnly
+                      ? 'System artwork stays visible until you assign another image.'
+                      : ((eligibility.eligible && 'hint' in eligibility
+                          ? eligibility.hint
+                          : undefined) ?? MEDIA_ROLE_ENTRIES[role].description)
 
                   return (
                     <CheckboxField
@@ -106,9 +149,9 @@ export function MediaImageDetails({
                       id={`${id}-${role}`}
                       label={MEDIA_ROLE_ENTRIES[role].label}
                       hint={hint}
-                      checked={media.roles[role]?.imageId === image.id}
-                      disabled={!eligibility.eligible}
-                      onCheckedChange={(checked) => onRole(role, checked === true)}
+                      checked={checked}
+                      disabled={!eligibility.eligible || derivedOnly}
+                      onCheckedChange={(nextChecked) => onRole(role, nextChecked === true)}
                     />
                   )
                 })}
@@ -119,60 +162,78 @@ export function MediaImageDetails({
                 File
               </h4>
               <dl className={styles.metadata()} aria-labelledby={`${id}-file-heading`}>
-                <dt className={styles.metadataLabel()}>File name</dt>
-                <dd className={styles.metadataValue()}>
-                  <FilenamePreview filename={asset.filename} density="metadata" />
-                </dd>
-                <dt className={styles.metadataLabel()}>Dimensions</dt>
-                <dd className={styles.metadataValue()}>
-                  {asset.orientedWidth} × {asset.orientedHeight}
-                </dd>
-                <dt className={styles.metadataLabel()}>File size</dt>
-                <dd className={styles.metadataValue()}>
-                  {new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(
-                    asset.byteSize / 1024,
-                  )}{' '}
-                  KB
-                </dd>
+                {selectedAvailable.kind === 'system' ? (
+                  <>
+                    <dt className={styles.metadataLabel()}>Source</dt>
+                    <dd className={styles.metadataValue()}>System artwork</dd>
+                    <dt className={styles.metadataLabel()}>Dimensions</dt>
+                    <dd className={styles.metadataValue()}>
+                      {selectedAvailable.sourceDimensions.width} ×{' '}
+                      {selectedAvailable.sourceDimensions.height}
+                    </dd>
+                  </>
+                ) : asset ? (
+                  <>
+                    <dt className={styles.metadataLabel()}>File name</dt>
+                    <dd className={styles.metadataValue()}>
+                      <FilenamePreview filename={asset.filename} density="metadata" />
+                    </dd>
+                    <dt className={styles.metadataLabel()}>Dimensions</dt>
+                    <dd className={styles.metadataValue()}>
+                      {asset.orientedWidth} × {asset.orientedHeight}
+                    </dd>
+                    <dt className={styles.metadataLabel()}>File size</dt>
+                    <dd className={styles.metadataValue()}>
+                      {new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(
+                        asset.byteSize / 1024,
+                      )}{' '}
+                      KB
+                    </dd>
+                  </>
+                ) : null}
               </dl>
-              {asset.animated ? (
+              {asset?.animated ? (
                 <p className={styles.muted()}>Animated source; still preview.</p>
               ) : null}
             </section>
-            <section className={styles.detailsSection()}>
-              <Collapsible open={accessibilityOpen} onOpenChange={setAccessibilityOpen}>
-                <CollapsibleTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="text"
-                    size="sm"
-                    className="h-auto w-full justify-between px-0 py-0 text-sm font-semibold"
-                    aria-expanded={accessibilityOpen}
-                  >
-                    Accessibility & details
-                    <ChevronDown
-                      className={`size-4 shrink-0 transition-transform ${accessibilityOpen ? 'rotate-180' : ''}`}
-                      aria-hidden="true"
+            {uploadImage ? (
+              <section className={styles.detailsSection()}>
+                <Collapsible open={accessibilityOpen} onOpenChange={setAccessibilityOpen}>
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="text"
+                      size="sm"
+                      className="h-auto w-full justify-between px-0 py-0 text-sm font-semibold"
+                      aria-expanded={accessibilityOpen}
+                    >
+                      Accessibility & details
+                      <ChevronDown
+                        className={`size-4 shrink-0 transition-transform ${accessibilityOpen ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                      />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-3">
+                    <Form
+                      key={uploadImage.id}
+                      schema={altSchema}
+                      fields={altFields}
+                      defaultValues={{ alt: uploadImage.alt ?? '' }}
+                      onSubmit={(values) => onAlt(values.alt ?? '')}
+                      valueSyncs={syncs}
+                      footer={null}
                     />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-3">
-                  <Form
-                    key={image.id}
-                    schema={altSchema}
-                    fields={altFields}
-                    defaultValues={{ alt: image.alt ?? '' }}
-                    onSubmit={(values) => onAlt(values.alt ?? '')}
-                    valueSyncs={syncs}
-                    footer={null}
-                  />
-                </CollapsibleContent>
-              </Collapsible>
-            </section>
+                  </CollapsibleContent>
+                </Collapsible>
+              </section>
+            ) : null}
           </div>
-          <Button type="button" variant="outline" onClick={onRemove}>
-            Remove image
-          </Button>
+          {canRemove && onRemove ? (
+            <Button type="button" variant="outline" onClick={onRemove}>
+              Remove image
+            </Button>
+          ) : null}
         </div>
       </DialogPanelScrollRegion>
     </aside>

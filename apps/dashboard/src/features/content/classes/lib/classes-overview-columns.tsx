@@ -6,6 +6,7 @@ import { createBooleanFilter, createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
+import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
 import { buildContentColumns } from '../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
@@ -109,6 +110,16 @@ export function classColumns(
   return buildContentColumns<ClassListItem>(CLASS_MIDDLE_COLUMNS, {
     ...usage,
     contentType: 'classes',
+    resolveDisplayImage: (row) =>
+      getContentDisplayImage({
+        media: row.media,
+        imageKey: row.imageKey,
+        contentType: 'classes',
+        slug: row.slug,
+        contentSource: row.source,
+        rulesetId: row.rulesetId,
+        role: 'primary',
+      }),
     nameHref: (row) => ROUTES.content.classes.detail(campaignId, row.id),
   })
 }

@@ -1,4 +1,4 @@
-import type { ContentMedia, MediaAsset } from '@rpg/contracts'
+import { createUploadRoleAssignment, type ContentMedia, type MediaAsset } from '@rpg/contracts'
 
 export const mediaFixtureAssets: MediaAsset[] = [
   {
@@ -33,7 +33,10 @@ export const mediaFixture: ContentMedia = {
     assetId: asset.id,
     alt: 'An adventurer in the mountains',
   })),
-  roles: { portrait: { imageId: 'image-0' }, primary: { imageId: 'image-1' } },
+  roles: {
+    portrait: createUploadRoleAssignment('image-0'),
+    primary: createUploadRoleAssignment('image-1'),
+  },
 }
 
 /** Local, offline source-coordinate fixture for visual crop verification. */

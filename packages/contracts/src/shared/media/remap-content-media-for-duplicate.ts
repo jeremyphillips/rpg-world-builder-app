@@ -1,4 +1,5 @@
 import type { ContentMedia } from './content-media'
+import { createUploadRoleAssignment } from './content-media-source'
 import { MEDIA_ROLES } from './roles'
 
 export type RemapContentMediaForDuplicateInput = {
@@ -47,9 +48,15 @@ export function remapContentMediaForDuplicate(
   for (const role of MEDIA_ROLES) {
     const assignment = input.media.roles[role]
     if (!assignment) continue
+    if (assignment.source.kind === 'system') {
+      roles[role] = structuredClone(assignment)
+      continue
+    }
+    const remappedImageId =
+      attachmentIdMap.get(assignment.source.imageId) ?? images[0]?.id ?? assignment.source.imageId
     roles[role] = {
       ...assignment,
-      imageId: attachmentIdMap.get(assignment.imageId) ?? images[0]?.id ?? '',
+      source: createUploadRoleAssignment(remappedImageId).source,
     }
   }
 

@@ -1,14 +1,17 @@
 import { z } from 'zod'
 
 import { contentImageSchema } from './content-image'
+import { contentMediaRoleSourceSchema } from './content-media-source'
 import { imagePresentationSchema } from './image-presentation'
 
 const contentMediaRoleAssignmentSchema = z
   .object({
-    imageId: z.string().min(1),
+    source: contentMediaRoleSourceSchema,
     presentation: imagePresentationSchema.optional(),
   })
   .strict()
+
+export type ContentMediaRoleAssignment = z.infer<typeof contentMediaRoleAssignmentSchema>
 
 /** Optional role map. Strict shape rejects unknown role keys. */
 export const contentMediaRolesSchema = z

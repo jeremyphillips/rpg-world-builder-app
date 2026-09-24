@@ -9,19 +9,23 @@ import {
 import { Images } from 'lucide-react'
 import {
   mediaRoleSurfaceCopy,
+  type AvailableContentImage,
   type ContentMedia,
   type MediaAsset,
   type MediaRole,
 } from '@rpg/contracts'
 import type { UploadEntry } from '../hooks/use-media-uploads'
 import { resolveUploadEntryStatusLabel } from '../hooks/use-media-uploads'
-import { mediaImageUrl } from '../lib/media-display'
+import { assignedRolesForImage } from '../lib/media-session'
+import { mediaImageUrl, systemContentImageUrl } from '../lib/media-display'
 import { MEDIA_IMAGE_ACCEPT } from '../lib/media-upload.lib'
 import { mediaManagerStyles as styles } from './media-manager.variants'
 
 export type MediaGalleryProps = {
   imageUrl?: typeof mediaImageUrl
+  systemImageUrl?: (srcPath: string) => string
   media: ContentMedia
+  availableImages: AvailableContentImage[]
   assets: Record<string, MediaAsset>
   allowedRoles: readonly MediaRole[]
   selectedId?: string
@@ -33,17 +37,33 @@ export type MediaGalleryProps = {
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }
 
-function rolesForImage(
-  media: ContentMedia,
-  imageId: string,
-  allowedRoles: readonly MediaRole[],
-): MediaRole[] {
-  return allowedRoles.filter((role) => media.roles[role]?.imageId === imageId)
+function resolveGalleryImageSrc(
+  image: AvailableContentImage,
+  imageUrl: typeof mediaImageUrl,
+  resolveSystemImageUrl: (srcPath: string) => string,
+): string {
+  if (image.kind === 'system') {
+    return resolveSystemImageUrl(image.srcPath)
+  }
+  return imageUrl(image.attachment.assetId, 'gallery-thumbnail')
+}
+
+function resolveGalleryImageLabel(
+  image: AvailableContentImage,
+  index: number,
+  assets: Record<string, MediaAsset>,
+): string {
+  if (image.kind === 'system') {
+    return `System ${image.source.slug}`
+  }
+  return assets[image.attachment.assetId]?.filename ?? `Image ${index + 1}`
 }
 
 export function MediaGallery({
   imageUrl = mediaImageUrl,
+  systemImageUrl: resolveSystemImageUrl = systemContentImageUrl,
   media,
+  availableImages,
   assets,
   allowedRoles,
   selectedId,
@@ -55,6 +75,8 @@ export function MediaGallery({
   onScrollBoundaryChange,
 }: MediaGalleryProps) {
   const input = useRef<HTMLInputElement>(null)
+  const uploadCount = availableImages.filter((image) => image.kind === 'upload').length
+
   return (
     <section className={styles.gallery()} aria-label="Images">
       <DialogPanelScrollRegion
@@ -66,7 +88,7 @@ export function MediaGallery({
         onBoundaryStateChange={onScrollBoundaryChange}
       >
         <div className={styles.row()}>
-          <h2 className={styles.subheading()}>Images ({media.images.length})</h2>
+          <h2 className={styles.subheading()}>Images ({uploadCount})</h2>
           <Button type="button" variant="outline" onClick={() => input.current?.click()}>
             + Add images
           </Button>
@@ -83,7 +105,7 @@ export function MediaGallery({
             }}
           />
         </div>
-        {!media.images.length ? (
+        {!availableImages.length ? (
           <div className={styles.galleryEmpty()}>
             <Images className="size-8 text-muted-foreground" aria-hidden="true" />
             <p className="text-sm font-semibold text-foreground">No images yet</p>
@@ -91,8 +113,8 @@ export function MediaGallery({
           </div>
         ) : (
           <div className={styles.grid()}>
-            {media.images.map((image, index) => {
-              const roles = rolesForImage(media, image.id, allowedRoles)
+            {availableImages.map((image, index) => {
+              const roles = assignedRolesForImage(media, image.id, allowedRoles, availableImages)
               const roleLabels = roles.map((role) => mediaRoleSurfaceCopy[role].switchLabel)
               return (
                 <button
@@ -100,15 +122,15 @@ export function MediaGallery({
                   type="button"
                   className={styles.tile({ selected: selectedId === image.id })}
                   aria-pressed={selectedId === image.id}
-                  aria-label={`${assets[image.assetId]?.filename ?? `Image ${index + 1}`}${roleLabels.map((label) => `, ${label}`).join('')}`}
+                  aria-label={`${resolveGalleryImageLabel(image, index, assets)}${roleLabels.map((label) => `, ${label}`).join('')}`}
                   onClick={() => onSelect(image.id)}
                   onKeyDown={(event) => {
                     const delta =
                       event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
                     if (!delta) return
                     event.preventDefault()
-                    const next = (index + delta + media.images.length) % media.images.length
-                    onSelect(media.images[next]!.id)
+                    const next = (index + delta + availableImages.length) % availableImages.length
+                    onSelect(availableImages[next]!.id)
                     const buttons = event.currentTarget.parentElement?.querySelectorAll('button')
                     buttons?.[next]?.focus()
                   }}
@@ -116,7 +138,7 @@ export function MediaGallery({
                   <div className={styles.tileThumb()}>
                     <img
                       className={styles.thumbnail()}
-                      src={imageUrl(image.assetId, 'gallery-thumbnail')}
+                      src={resolveGalleryImageSrc(image, imageUrl, resolveSystemImageUrl)}
                       alt=""
                     />
                     {roles.length > 0 ? (

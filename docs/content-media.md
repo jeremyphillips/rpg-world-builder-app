@@ -31,8 +31,18 @@ and are not served by `GET /api/uploads/:key`.
 - `mediaBearingAuthoredContentBodySchema` (not yet wired into live type schemas)
 - Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`)
 - `reconcileContentMedia`, `reclaimExpiredAssets`, `remapContentMediaForDuplicate`
-- `resolveContentMediaPresentation`, rendition presets, system asset manifest
+- `resolveContentMediaPresentation`, rendition presets, system asset manifest, system content image registry
 - `@rpg/ui` `MediaImage` / `MediaCompactPreview` (not mounted in product surfaces)
+
+## System artwork vs rendition fixture
+
+- **`SYSTEM_ASSET_MANIFEST`** (`system-asset-manifest.ts`) — upload/rendition fixture
+  dimensions for tests and resolver primitives (e.g. `/assets/system/class/fighter.webp`).
+- **`system-content-image-registry.ts`** — shipped SRD catalog artwork for opted-in
+  content types. Paths follow
+  `assets/system/{imageSetId}/{contentType}/{assetRole}/{slug}.jpeg` and are served from
+  dashboard `public/`. Class primary art for `srd-cc-5.2.1` is registered there; display
+  resolves derived system sources when `media.roles` is empty.
 
 ## Phase status
 

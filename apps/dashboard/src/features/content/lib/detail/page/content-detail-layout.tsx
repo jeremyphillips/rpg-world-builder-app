@@ -1,15 +1,19 @@
 import type { ReactNode } from 'react'
+import type { ContentDisplayImage } from '@rpg/contracts'
 import { Card, CardContent, Heading } from '@rpg/ui'
 
 import { narrowPageContentClasses } from '@/components/layout/page/page-content.variants'
 import { useCanManageCampaign } from '@/features/campaign'
 
+import { ContentMediaImage } from './content-media-image'
 import { ContentDetailEditAction } from './content-detail-edit-action'
 import {
   contentDetailHeroCardClasses,
   contentDetailHeroCardContentClasses,
   contentDetailHeroGridClasses,
   contentDetailHeroImageClasses,
+  contentDetailHeroImageFrameClasses,
+  contentDetailHeroImageShellClasses,
   contentDetailHeroMainClasses,
   contentDetailRootClasses,
   contentDetailToolbarClasses,
@@ -40,7 +44,9 @@ export type ContentDetailLayoutProps = {
   /** Optional badge rendered beside the hero heading (e.g. draft status). */
   nameBadge?: ReactNode
   /** Resolved artwork URL for the content item. */
-  imageUrl: string
+  imageUrl?: string
+  /** Crop-aware display image; takes precedence over `imageUrl`. */
+  displayImage?: ContentDisplayImage
   /** Accessible name for the image (e.g. the content item's name). */
   imageName: string
   /** Campaign context for edit-button gating. */
@@ -66,10 +72,12 @@ export type ContentDetailLayoutProps = {
  * Wrap in `WidePage`. Render full-width sections (e.g. progression tables) as `WidePage`
  * siblings outside this layout.
  */
+// fallow-ignore-next-line complexity
 export function ContentDetailLayout({
   name,
   nameBadge,
   imageUrl,
+  displayImage,
   imageName,
   campaignId,
   editHref,
@@ -108,8 +116,17 @@ export function ContentDetailLayout({
               </div>
               {heroMetadata}
             </div>
-            <div>
-              <img src={imageUrl} alt={imageName} className={contentDetailHeroImageClasses} />
+            <div className={contentDetailHeroImageShellClasses}>
+              {displayImage ? (
+                <ContentMediaImage
+                  display={displayImage}
+                  alt={imageName}
+                  frame="intrinsic"
+                  className={contentDetailHeroImageFrameClasses}
+                />
+              ) : (
+                <img src={imageUrl} alt={imageName} className={contentDetailHeroImageClasses} />
+              )}
             </div>
           </div>
         </CardContent>

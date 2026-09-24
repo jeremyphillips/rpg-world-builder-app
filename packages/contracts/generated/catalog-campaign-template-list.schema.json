@@ -314,9 +314,62 @@
     "__schema0": {
       "type": "object",
       "properties": {
-        "imageId": {
-          "type": "string",
-          "minLength": 1
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "upload",
+                  "description": "upload"
+                },
+                "imageId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "imageId"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "system",
+                  "description": "system"
+                },
+                "imageSetId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "contentType": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "assetRole": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "slug": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "imageSetId",
+                "contentType",
+                "assetRole",
+                "slug"
+              ],
+              "additionalProperties": false
+            }
+          ]
         },
         "presentation": {
           "oneOf": [
@@ -422,7 +475,7 @@
         }
       },
       "required": [
-        "imageId"
+        "source"
       ],
       "additionalProperties": false
     },

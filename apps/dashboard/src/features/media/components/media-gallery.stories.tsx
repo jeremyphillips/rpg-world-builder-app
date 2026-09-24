@@ -2,12 +2,19 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MediaGallery } from './media-gallery'
 import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../fixtures'
 
+const fixtureAvailable = mediaFixture.images.map((attachment) => ({
+  kind: 'upload' as const,
+  id: attachment.id,
+  attachment,
+}))
+
 const meta = {
   title: 'Features/Media/Gallery',
   component: MediaGallery,
   args: {
     imageUrl: mediaFixtureImageUrl,
     media: mediaFixture,
+    availableImages: fixtureAvailable,
     assets: Object.fromEntries(mediaFixtureAssets.map((asset) => [asset.id, asset])),
     allowedRoles: ['portrait', 'primary'],
     selectedId: 'image-0',

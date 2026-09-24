@@ -2,7 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { CONTENT_MEDIA_DOMAINS, focalPointFromCropCenter, resetPrimaryCrop } from '@rpg/contracts'
+import {
+  CONTENT_MEDIA_DOMAINS,
+  createUploadRoleAssignment,
+  focalPointFromCropCenter,
+  resetPrimaryCrop,
+} from '@rpg/contracts'
 import { createUploadSession } from '../api/media-api'
 import { MediaManager, type MediaManagerProps } from './media-manager'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
@@ -57,7 +62,10 @@ function mount(overrides: Partial<MediaManagerProps> = {}) {
 
 describe('MediaManager', () => {
   it.each(CONTENT_MEDIA_DOMAINS)('renders policy controls for %s', (domain) => {
-    mount({ domain, value: { ...mediaFixture, roles: { primary: { imageId: 'image-0' } } } })
+    mount({
+      domain,
+      value: { ...mediaFixture, roles: { primary: createUploadRoleAssignment('image-0') } },
+    })
     expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeInTheDocument()
     expect(Boolean(screen.queryByRole('checkbox', { name: 'Portrait' }))).toBe(
       domain === 'character',
@@ -95,7 +103,10 @@ describe('MediaManager', () => {
     const { props } = mount({
       value: {
         ...mediaFixture,
-        roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+        roles: {
+          primary: createUploadRoleAssignment('image-0'),
+          portrait: createUploadRoleAssignment('image-0'),
+        },
       },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Remove image' }))
@@ -114,7 +125,10 @@ describe('MediaManager', () => {
     mount({
       value: {
         ...mediaFixture,
-        roles: { primary: { imageId: 'image-0' }, portrait: { imageId: 'image-0' } },
+        roles: {
+          primary: createUploadRoleAssignment('image-0'),
+          portrait: createUploadRoleAssignment('image-0'),
+        },
       },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Remove image' }))
@@ -140,7 +154,7 @@ describe('MediaManager', () => {
         ...mediaFixture,
         roles: {
           primary: {
-            imageId: 'image-0',
+            ...createUploadRoleAssignment('image-0'),
             presentation: {
               mode: 'crop',
               crop: customizedCrop,

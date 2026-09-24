@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ContentMedia } from './content-media'
+import { createUploadRoleAssignment } from './content-media-source'
 import { resetPortraitCrop } from './geometry'
 import { getContentMediaPolicy } from './media-policy'
 import {
@@ -19,10 +20,10 @@ function characterMedia(overrides: Partial<ContentMedia> = {}): ContentMedia {
     images: [{ id: 'img-1', assetId: 'asset-landscape', alt: 'Hero portrait' }],
     roles: {
       portrait: {
-        imageId: 'img-1',
+        ...createUploadRoleAssignment('img-1'),
         presentation: { mode: 'crop', crop: resetPortraitCrop({ width: 1600, height: 900 }) },
       },
-      primary: { imageId: 'img-1' },
+      primary: createUploadRoleAssignment('img-1'),
     },
     ...overrides,
   }
@@ -46,7 +47,7 @@ describe('resolveContentMediaPresentation', () => {
 
   it('falls back to a transient primary square without assigning portrait', () => {
     const resolved = resolveContentMediaPresentation({
-      media: characterMedia({ roles: { primary: { imageId: 'img-1' } } }),
+      media: characterMedia({ roles: { primary: createUploadRoleAssignment('img-1') } }),
       policy: getContentMediaPolicy('character'),
       context: 'compact-identity',
       assetSummariesById: assets,
@@ -60,7 +61,7 @@ describe('resolveContentMediaPresentation', () => {
 
   it('uses primary for full artwork and placeholders when assets are missing', () => {
     const artwork = resolveContentMediaPresentation({
-      media: characterMedia({ roles: { primary: { imageId: 'img-1' } } }),
+      media: characterMedia({ roles: { primary: createUploadRoleAssignment('img-1') } }),
       policy: getContentMediaPolicy('class'),
       context: 'full-artwork',
       assetSummariesById: assets,
@@ -85,11 +86,11 @@ describe('resolveContentMediaPresentation', () => {
     const media = characterMedia({
       roles: {
         portrait: {
-          imageId: 'img-1',
+          ...createUploadRoleAssignment('img-1'),
           presentation: { mode: 'crop', crop: { x: 0.1, y: 0.2, width: 0.5, height: 0.5 } },
         },
         primary: {
-          imageId: 'img-1',
+          ...createUploadRoleAssignment('img-1'),
           presentation: { mode: 'crop', crop: { x: 0, y: 0, width: 1, height: 1 } },
         },
       },

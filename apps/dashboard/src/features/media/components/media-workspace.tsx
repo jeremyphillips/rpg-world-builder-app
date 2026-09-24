@@ -13,7 +13,6 @@ import { mediaRoleSurfaceCopy, type MediaRole } from '@rpg/contracts'
 import type { UseQueryResult } from '@tanstack/react-query'
 
 import type { MediaManagerController } from '../hooks/use-media-manager'
-import { assignedRolesForImage } from '../lib/media-session'
 import { mediaImageUrl } from '../lib/media-display'
 import { mediaManagerStyles as styles } from './media-manager.variants'
 import { MediaWorkspaceSelection } from './media-workspace-selection'
@@ -89,14 +88,12 @@ export function MediaWorkspace({
   imageUrl?: typeof mediaImageUrl
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }) {
-  const { state, selected, asset, queries, policy, uploads, dispatch, label } = controller
-  const assignedRoles = selected
-    ? assignedRolesForImage(state.media, selected.id, policy.allowedRoles)
-    : []
+  const { state, selectedAvailable, asset, queries, policy, uploads, dispatch, label } = controller
+  const assignedRoles = controller.assignedRolesForSelection
   const copy = resolveMediaWorkspaceCopy({
     presentation: state.presentation,
     assignedRoles,
-    hasSelection: Boolean(selected),
+    hasSelection: Boolean(selectedAvailable),
     label,
   })
 
@@ -117,17 +114,15 @@ export function MediaWorkspace({
           onPresentationChange={(role) => dispatch({ type: 'presentation', role })}
         />
         <div className={styles.workspaceContent()}>
-          {selected && asset ? (
+          {selectedAvailable ? (
             <MediaWorkspaceSelection
               controller={controller}
               imageUrl={imageUrl}
-              image={selected}
+              selectedAvailable={selectedAvailable}
               asset={asset}
               assignedRoles={assignedRoles}
               interaction={copy.interaction}
             />
-          ) : selected ? (
-            <div className={styles.empty()}>Loading image details…</div>
           ) : (
             <>
               <div className={styles.empty()}>

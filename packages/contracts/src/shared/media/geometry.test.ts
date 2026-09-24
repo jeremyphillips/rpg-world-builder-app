@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { formatFieldMessage } from '../../validation/define-message'
 import { contentMediaValidationMessages } from './content-media-validation-messages'
+import { createUploadRoleAssignment } from './content-media-source'
 import {
   cropFromFocalPoint,
   cropFromPanZoom,
@@ -198,7 +199,7 @@ describe('fixedAspectRoleEligibility and validateContentMedia', () => {
         images: [{ id: 'img-1', assetId: 'asset-large' }],
         roles: {
           primary: {
-            imageId: 'img-1',
+            ...createUploadRoleAssignment('img-1'),
             presentation: { mode: 'crop', crop: invalidCrop },
           },
         },

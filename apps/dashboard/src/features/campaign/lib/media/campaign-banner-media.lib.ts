@@ -1,5 +1,6 @@
 import {
   createDefaultRolePresentation,
+  createUploadRoleAssignment,
   emptyContentMediaSchema,
   type ContentMedia,
   type MediaAsset,
@@ -35,7 +36,7 @@ export function buildCampaignBannerMedia(
     images: [{ id: imageId, assetId: asset.id }],
     roles: {
       banner: {
-        imageId,
+        ...createUploadRoleAssignment(imageId),
         presentation: createDefaultRolePresentation('banner', source),
       },
     },

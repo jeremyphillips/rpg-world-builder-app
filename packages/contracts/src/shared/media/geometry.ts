@@ -44,6 +44,23 @@ export const normalizedCropSchema = z
 
 export type NormalizedCrop = z.infer<typeof normalizedCropSchema>
 
+export type NormalizedCropImageLayout = {
+  widthPercent: number
+  heightPercent: number
+  offsetXPercent: number
+  offsetYPercent: number
+}
+
+/** Map a normalized crop to percentage offsets for object-fit display math. */
+export function resolveNormalizedCropImageLayout(crop: NormalizedCrop): NormalizedCropImageLayout {
+  return {
+    widthPercent: 100 / crop.width,
+    heightPercent: 100 / crop.height,
+    offsetXPercent: -(crop.x / crop.width) * 100,
+    offsetYPercent: -(crop.y / crop.height) * 100,
+  }
+}
+
 /** Optional normalized focal point stored in source space. */
 export const normalizedFocalPointSchema = z.object({
   x: z.number().min(0).max(1),

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ContentMedia } from './content-media'
+import { createUploadRoleAssignment, roleAssignmentUploadImageId } from './content-media-source'
 import { remapContentMediaForDuplicate } from './remap-content-media-for-duplicate'
 
 function sampleMedia(): ContentMedia {
@@ -11,9 +12,9 @@ function sampleMedia(): ContentMedia {
       { id: 'img-2', assetId: 'asset-b', alt: 'Side' },
     ],
     roles: {
-      primary: { imageId: 'img-1' },
+      primary: createUploadRoleAssignment('img-1'),
       portrait: {
-        imageId: 'img-1',
+        ...createUploadRoleAssignment('img-1'),
         presentation: { mode: 'crop', crop: { x: 0, y: 0, width: 1, height: 1 } },
       },
     },
@@ -37,8 +38,8 @@ describe('remapContentMediaForDuplicate', () => {
     expect(result.media.revision).toBe(0)
     expect(result.media.images.map((image) => image.assetId)).toEqual(['asset-a', 'asset-b'])
     expect(result.media.images.map((image) => image.id)).toEqual(['new-1', 'new-2'])
-    expect(result.media.roles.primary?.imageId).toBe('new-1')
-    expect(result.media.roles.portrait?.imageId).toBe('new-1')
+    expect(roleAssignmentUploadImageId(result.media.roles.primary)).toBe('new-1')
+    expect(roleAssignmentUploadImageId(result.media.roles.portrait)).toBe('new-1')
   })
 
   it('returns a copy plan for cross-scope duplication without authorizing source assets', () => {

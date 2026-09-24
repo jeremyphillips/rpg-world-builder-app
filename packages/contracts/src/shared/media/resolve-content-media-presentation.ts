@@ -1,4 +1,5 @@
 import type { ContentMedia } from './content-media'
+import { roleAssignmentUploadImageId } from './content-media-source'
 import {
   resetPortraitCrop,
   resolveDefaultCropForRole,
@@ -112,10 +113,15 @@ function resolveFullArtworkPresentation(
     return placeholderPresentation(preset, 'missing-role')
   }
 
+  const imageId = roleAssignmentUploadImageId(primary)
+  if (!imageId) {
+    return placeholderPresentation(preset, 'missing-role')
+  }
+
   const resolved = resolveRolePresentation({
     media,
     role: 'primary',
-    imageId: primary.imageId,
+    imageId,
     presentation: primary,
     preset: 'artwork',
     assetSummariesById,
@@ -128,7 +134,10 @@ function resolvePrimarySquareFallback(
   primary: NonNullable<ContentMedia['roles']['primary']>,
   assetSummariesById: ResolveContentMediaPresentationInput['assetSummariesById'],
 ): ResolvedContentMediaPresentation | null {
-  const image = findImage(media, primary.imageId)
+  const imageId = roleAssignmentUploadImageId(primary)
+  if (!imageId) return null
+
+  const image = findImage(media, imageId)
   const asset = image ? assetSummariesById[image.assetId] : undefined
   if (!image || !asset) return null
 
@@ -156,10 +165,15 @@ function resolveCompactIdentityPresentation(
   const portrait = media.roles.portrait
 
   if (portrait) {
+    const portraitImageId = roleAssignmentUploadImageId(portrait)
+    if (!portraitImageId) {
+      return placeholderPresentation(preset, portrait ? 'missing-asset' : 'missing-role')
+    }
+
     const resolved = resolveRolePresentation({
       media,
       role: 'portrait',
-      imageId: portrait.imageId,
+      imageId: portraitImageId,
       presentation: portrait,
       preset: 'compact-identity',
       assetSummariesById,
@@ -203,10 +217,13 @@ export function resolveContentMediaRolePresentation(input: {
   const assignment = input.media.roles[input.role]
   if (!assignment) return null
 
+  const imageId = roleAssignmentUploadImageId(assignment)
+  if (!imageId) return null
+
   return resolveRolePresentation({
     media: input.media,
     role: input.role,
-    imageId: assignment.imageId,
+    imageId,
     presentation: assignment,
     preset: input.preset,
     assetSummariesById: input.assetSummariesById,
