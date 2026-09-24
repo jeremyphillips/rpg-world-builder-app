@@ -1,4 +1,4 @@
-import { createElement, useMemo, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { Globe, IdCard, Palette } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import { Heading, Spinner, Text } from '@rpg/ui'
@@ -9,9 +9,11 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useLocations } from '@/features/content'
-import { EXPANDED_MEDIA_FIELD_PRESENTATION, ManagedMediaField } from '@/features/media'
-
-import { flavorFields, settingsIdentityFields } from '../lib/settings/campaign-profile-form-fields'
+import {
+  buildSettingsIdentityTabFields,
+  flavorFields,
+  settingsIdentityFields,
+} from '../lib/settings/campaign-profile-form-fields'
 import { buildWorldSettingsFields } from '../lib/settings/world-settings-form-fields'
 import {
   buildUpdateCampaignInput,
@@ -55,25 +57,7 @@ export function CampaignSettings() {
         id: 'identity',
         label: 'Identity',
         leadingIcon: <IdCard aria-hidden />,
-        fields: [
-          ...settingsIdentityFields,
-          {
-            kind: 'slot',
-            name: 'media',
-            chrome: { variant: 'container' },
-            heading: { label: 'Campaign images' },
-            render: () =>
-              createElement(ManagedMediaField, {
-                config: {
-                  domain: 'campaign',
-                  presentation: EXPANDED_MEDIA_FIELD_PRESENTATION,
-                },
-                scope: { kind: 'campaign-identity', campaignId },
-                name: 'media',
-                label: 'Campaign images',
-              }),
-          },
-        ],
+        fields: buildSettingsIdentityTabFields(campaignId),
       },
       {
         id: 'flavor',

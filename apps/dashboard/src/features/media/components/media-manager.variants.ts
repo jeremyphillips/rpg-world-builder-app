@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 import {
   cn,
+  establishSurfaceCurrent,
   scrollBoundaryTopShadowHeightClasses,
   scrollBoundaryTopShadowTintClasses,
 } from '@rpg/ui'
@@ -36,14 +37,24 @@ export const mediaManagerStyles = {
   thumbnail: cva('size-full object-cover'),
   badges: cva('absolute inset-x-1 bottom-1 flex flex-wrap gap-1'),
   badge: cva('rounded bg-background px-2 py-1 text-xs text-foreground'),
-  workspace: cva('flex h-full min-h-0 min-w-0 flex-col'),
+  workspace: cva('@container/media-workspace flex h-full min-h-0 min-w-0 flex-col'),
   workspaceHeader: cva('mb-4 shrink-0 space-y-1'),
   workspaceHeaderPortrait: cva('mb-4 shrink-0'),
   workspacePortraitHeading: cva('mb-0.5 text-lg font-semibold'),
   workspaceContent: cva('min-h-0 flex-1'),
   workspaceOnboarding: cva('mt-4 shrink-0'),
-  editor: cva('grid min-h-0 min-w-0 gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]'),
-  details: cva('min-w-0 space-y-5'),
+  editor: cva(
+    'grid min-h-0 min-w-0 gap-6 @min-[32rem]/media-workspace:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]',
+  ),
+  editorCrop: cva('min-w-0 max-w-full'),
+  details: cva('min-w-0 space-y-4'),
+  detailsPanel: cva(
+    cn(
+      'divide-y divide-border-subtle overflow-hidden rounded-lg border bg-field-container text-foreground',
+      establishSurfaceCurrent('field-container'),
+    ),
+  ),
+  detailsSection: cva('space-y-3 p-4'),
   previewCard: cva('min-w-0 space-y-2'),
   preview: cva('aspect-square w-full rounded-md bg-sunken object-contain'),
   previewCaption: cva('min-w-0 text-sm font-medium text-foreground'),
@@ -51,7 +62,7 @@ export const mediaManagerStyles = {
   subheading: cva('text-sm font-semibold'),
   muted: cva('text-sm text-muted-foreground'),
   metadata: cva(
-    'grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 border-t border-border pt-4 text-sm',
+    'grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-sm',
   ),
   metadataLabel: cva('text-muted-foreground'),
   metadataValue: cva('m-0 min-w-0'),

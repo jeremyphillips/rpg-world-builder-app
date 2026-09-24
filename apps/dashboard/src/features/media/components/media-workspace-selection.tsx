@@ -130,14 +130,16 @@ export function MediaWorkspaceSelection({
         </div>
       )}
       <div className={styles.editor()}>
-        <MediaWorkspaceEditor
-          controller={controller}
-          imageUrl={imageUrl}
-          selected={selected}
-          asset={asset}
-          activeRole={activeRole}
-          isActiveForSelection={isActiveForSelection}
-        />
+        <div className={styles.editorCrop()}>
+          <MediaWorkspaceEditor
+            controller={controller}
+            imageUrl={imageUrl}
+            selected={selected}
+            asset={asset}
+            activeRole={activeRole}
+            isActiveForSelection={isActiveForSelection}
+          />
+        </div>
         <MediaImageDetails
           image={selected}
           asset={asset}

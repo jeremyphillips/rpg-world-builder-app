@@ -50,6 +50,21 @@ describe('MediaFieldSummary', () => {
     expect(onOpen).toHaveBeenCalledWith('two')
   })
 
+  it('omits the built-in expanded header when showHeader is false', () => {
+    render(
+      <MediaFieldSummary
+        label="Campaign images"
+        layout="expanded"
+        showHeader={false}
+        items={[]}
+        maxItems={20}
+        onOpen={vi.fn()}
+      />,
+    )
+    expect(screen.queryByText('Campaign images')).not.toBeInTheDocument()
+    expect(screen.getByText('No images yet.')).toBeInTheDocument()
+  })
+
   it('renders three thumbnails and a stable hidden-count tile after four items', () => {
     const onOpen = vi.fn()
     const items = Array.from({ length: 7 }, (_, index) => ({ id: `image-${index + 1}` }))

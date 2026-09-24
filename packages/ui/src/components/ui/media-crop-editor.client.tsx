@@ -2,7 +2,8 @@
 
 import { useId, useRef, useState } from 'react'
 import {
-  CONTENT_MEDIA_BANNER_ASPECT_RATIO,
+  CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX,
+  CONTENT_MEDIA_BANNER_MIN_WIDTH_PX,
   CONTENT_MEDIA_PORTRAIT_MIN_EDGE_PX,
   CONTENT_MEDIA_PRIMARY_MIN_SHORT_SIDE_PX,
   resetBannerCrop,
@@ -27,7 +28,21 @@ export type MediaCropEditorProps = {
   onFocalPointChange?: (focalPoint: NormalizedFocalPoint) => void
 }
 
-const APERTURE_FRACTION = 0.75
+type FrameLayout = {
+  scaleX: number
+  scaleY: number
+  offsetX: number
+  offsetY: number
+}
+
+/** Matches uniform inset percentages in media-crop-editor.variants.ts aperture styles. */
+const APERTURE_LAYOUT: FrameLayout = {
+  scaleX: 0.75,
+  scaleY: 0.75,
+  offsetX: 12.5,
+  offsetY: 12.5,
+}
+
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 function defaultCropForFrame(
@@ -61,13 +76,14 @@ export function MediaCropEditor({
   const drag = useRef<{ x: number; y: number; crop: NormalizedCrop } | null>(null)
   const focalDrag = useRef<{ crop: NormalizedCrop } | null>(null)
   const base = defaultCropForFrame(frame, source)
+  const layout = APERTURE_LAYOUT
   const zoom = base.width / crop.width
   const minEdge = minEdgePxForFrame(frame)
   const maxZoom =
     frame === 'banner'
       ? Math.min(
-          source.width / (CONTENT_MEDIA_BANNER_ASPECT_RATIO * minEdge),
-          source.height / minEdge,
+          (base.width * source.width) / CONTENT_MEDIA_BANNER_MIN_WIDTH_PX,
+          (base.height * source.height) / CONTENT_MEDIA_BANNER_MIN_HEIGHT_PX,
         )
       : Math.min(source.width, source.height) / minEdge
 
@@ -82,8 +98,7 @@ export function MediaCropEditor({
   function changeZoom(value: number) {
     const nextZoom = Math.min(maxZoom, Math.max(1, value))
     const width = base.width / nextZoom
-    const height =
-      frame === 'banner' ? width / CONTENT_MEDIA_BANNER_ASPECT_RATIO : base.height / nextZoom
+    const height = base.height / nextZoom
     onChange({
       width,
       height,
@@ -99,11 +114,11 @@ export function MediaCropEditor({
     onChange(next)
   }
 
-  const imageStyle = (scale: number, offset: number) => ({
-    width: `${(100 * scale) / crop.width}%`,
-    height: `${(100 * scale) / crop.height}%`,
-    left: `${offset - (100 * scale * crop.x) / crop.width}%`,
-    top: `${offset - (100 * scale * crop.y) / crop.height}%`,
+  const imageStyle = (insets: FrameLayout) => ({
+    width: `${(100 * insets.scaleX) / crop.width}%`,
+    height: `${(100 * insets.scaleY) / crop.height}%`,
+    left: `${insets.offsetX - (100 * insets.scaleX * crop.x) / crop.width}%`,
+    top: `${insets.offsetY - (100 * insets.scaleY * crop.y) / crop.height}%`,
   })
 
   const frameLabel =
@@ -170,17 +185,19 @@ export function MediaCropEditor({
 
           const start = drag.current
           if (!start) return
-          const size = event.currentTarget.getBoundingClientRect().width * APERTURE_FRACTION
-          if (!size) return
+          const rect = event.currentTarget.getBoundingClientRect()
+          const xSize = rect.width * layout.scaleX
+          const ySize = rect.height * layout.scaleY
+          if (!xSize || !ySize) return
           onChange({
             ...start.crop,
             x: clamp(
-              start.crop.x - ((event.clientX - start.x) / size) * start.crop.width,
+              start.crop.x - ((event.clientX - start.x) / xSize) * start.crop.width,
               0,
               1 - start.crop.width,
             ),
             y: clamp(
-              start.crop.y - ((event.clientY - start.y) / size) * start.crop.height,
+              start.crop.y - ((event.clientY - start.y) / ySize) * start.crop.height,
               0,
               1 - start.crop.height,
             ),
@@ -194,7 +211,7 @@ export function MediaCropEditor({
           key={attempt}
           onError={() => setFailed(true)}
           className={styles.image()}
-          style={imageStyle(APERTURE_FRACTION, frame === 'banner' ? 8 : 12.5)}
+          style={imageStyle(layout)}
         />
         <div className={styles.aperture({ frame })}>
           <div className={styles.guides()} />
@@ -303,7 +320,12 @@ export function MediaCropEditor({
           {[false, true].map((circle) => (
             <figure key={String(circle)}>
               <div className={styles.preview({ circle })}>
-                <img src={src} alt="" className={styles.image()} style={imageStyle(1, 0)} />
+                <img
+                  src={src}
+                  alt=""
+                  className={styles.image()}
+                  style={imageStyle({ scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0 })}
+                />
               </div>
               <figcaption className={styles.label()}>
                 {circle ? 'Circular avatar preview' : 'Square portrait'}

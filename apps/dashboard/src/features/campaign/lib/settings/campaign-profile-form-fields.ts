@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import { z } from 'zod'
 import {
   contentMediaSchema,
@@ -8,7 +9,9 @@ import {
   DIFFICULTIES,
   STANDARD_IMAGE_UPLOAD_ACCEPT,
 } from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FormItem, type GroupFieldItem } from '@rpg/ui/form'
+
+import { EXPANDED_MEDIA_FIELD_PRESENTATION, ManagedMediaField } from '@/features/media'
 
 import {
   PLAY_STYLE_LABELS,
@@ -83,6 +86,43 @@ export const settingsIdentityFields: FormItem[] = [
     rows: 3,
   },
 ]
+
+const CAMPAIGN_IMAGES_FIELD_LABEL = 'Campaign images'
+
+/** Leaf fields inside a shared group container must opt out of per-field chrome. */
+function identityFieldsInSharedContainer(fields: GroupFieldItem[]): GroupFieldItem[] {
+  return fields.map((field) => ({
+    ...field,
+    chrome: { variant: 'none' as const },
+  })) as GroupFieldItem[]
+}
+
+export function buildSettingsIdentityTabFields(campaignId: string): FormItem[] {
+  return [
+    {
+      kind: 'group',
+      fieldChrome: { variant: 'container' },
+      fields: [
+        ...identityFieldsInSharedContainer(settingsIdentityFields as GroupFieldItem[]),
+        {
+          kind: 'slot',
+          name: 'media',
+          chrome: { variant: 'none' },
+          render: () =>
+            createElement(ManagedMediaField, {
+              config: {
+                domain: 'campaign',
+                presentation: EXPANDED_MEDIA_FIELD_PRESENTATION,
+              },
+              scope: { kind: 'campaign-identity', campaignId },
+              name: 'media',
+              label: CAMPAIGN_IMAGES_FIELD_LABEL,
+            }),
+        },
+      ],
+    },
+  ]
+}
 
 /** @deprecated Use createIdentitySchema or settingsIdentitySchema. */
 export const identitySchema = createIdentitySchema

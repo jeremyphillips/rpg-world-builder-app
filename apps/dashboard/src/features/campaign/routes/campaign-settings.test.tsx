@@ -90,7 +90,20 @@ describe('CampaignSettings', () => {
   it('shows the campaign images field on the identity tab', async () => {
     renderSettings()
     await screen.findByDisplayValue('Sunless Citadel')
-    expect(screen.getByText('Campaign images')).toBeInTheDocument()
+    expect(screen.getAllByText('Campaign images')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Add images' })).toBeInTheDocument()
+    expect(screen.queryByText(/^Images$/)).not.toBeInTheDocument()
+  })
+
+  it('wraps identity fields in one shared field container', async () => {
+    renderSettings()
+    const nameInput = await screen.findByDisplayValue('Sunless Citadel')
+    const descriptionInput = screen.getByDisplayValue('A dungeon delve.')
+    const sharedShell = nameInput.closest('.bg-field-container')
+    expect(sharedShell).toBeInstanceOf(HTMLElement)
+    expect(descriptionInput.closest('.bg-field-container')).toBe(sharedShell)
+    expect(sharedShell).toContainElement(screen.getByText('Campaign images'))
+    expect(sharedShell?.querySelectorAll('.bg-field-container')).toHaveLength(0)
   })
 
   it('calls updateCampaign with identity and flavor on submit', async () => {

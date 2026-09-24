@@ -1,9 +1,9 @@
 import { cva } from 'class-variance-authority'
 
 export const mediaCropStyles = {
-  root: cva('flex min-w-0 flex-col gap-4'),
+  root: cva('flex min-w-0 max-w-full flex-col gap-4'),
   viewport: cva(
-    'relative w-full overflow-hidden rounded-md bg-sunken touch-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+    'relative min-w-0 w-full max-w-full overflow-hidden rounded-md bg-sunken touch-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
     {
       variants: {
         frame: {
@@ -22,7 +22,7 @@ export const mediaCropStyles = {
       variants: {
         frame: {
           square: 'inset-[12.5%]',
-          banner: 'inset-x-[8%] inset-y-[20%]',
+          banner: 'inset-[12.5%]',
           free: 'inset-[12.5%]',
         },
       },
@@ -33,7 +33,7 @@ export const mediaCropStyles = {
   focalPoint: cva(
     'absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-foreground bg-background shadow-sm touch-none',
   ),
-  row: cva('flex flex-wrap items-center gap-2'),
+  row: cva('flex min-w-0 max-w-full flex-wrap items-center gap-2'),
   slider: cva('min-w-0 flex-1 accent-primary'),
   previews: cva('flex flex-wrap gap-4'),
   preview: cva('relative size-20 overflow-hidden bg-sunken', {

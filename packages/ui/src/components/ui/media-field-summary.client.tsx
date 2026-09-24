@@ -36,6 +36,8 @@ export type MediaFieldSummaryProps = {
   readOnly?: boolean
   onOpen: (imageId?: string) => void
   emptyContent?: ReactNode
+  /** Expanded layout only — omit the built-in title/action row when an outer header owns chrome. */
+  showHeader?: boolean
 }
 
 function SummaryImage({ item }: { item: MediaFieldSummaryItem }) {
@@ -173,6 +175,64 @@ function ExpandedMediaFieldSummaryTiles({
   )
 }
 
+function ExpandedMediaFieldSummaryHeader({
+  label,
+  count,
+  maxItems,
+  canEdit,
+  onOpen,
+  representativeId,
+  items,
+}: {
+  label: string
+  count: number
+  maxItems: number
+  canEdit: boolean
+  onOpen: (imageId?: string) => void
+  representativeId?: string
+  items: readonly MediaFieldSummaryItem[]
+}) {
+  const representative = resolveRepresentative(items, representativeId)
+
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <h3 className="font-medium">{label}</h3>
+        {count ? (
+          <p className="text-sm text-muted-foreground">
+            {count} of {maxItems} images
+          </p>
+        ) : null}
+      </div>
+      {canEdit ? (
+        <button
+          type="button"
+          className="text-sm font-medium underline-offset-4 hover:underline"
+          onClick={() => onOpen(representative?.id)}
+        >
+          {count ? 'Manage' : 'Add images'}
+        </button>
+      ) : null}
+    </div>
+  )
+}
+
+export function ExpandedMediaFieldSummaryBody({
+  items,
+  disabled = false,
+  readOnly = false,
+  onOpen,
+}: Pick<MediaFieldSummaryLayoutProps, 'items' | 'disabled' | 'readOnly' | 'onOpen'>) {
+  const count = items.length
+  const canEdit = !disabled && !readOnly
+
+  if (!count) {
+    return <ExpandedMediaFieldSummaryEmpty canEdit={canEdit} onOpen={() => onOpen()} />
+  }
+
+  return <ExpandedMediaFieldSummaryTiles items={items} canEdit={canEdit} onOpen={onOpen} />
+}
+
 function ExpandedMediaFieldSummary({
   label,
   items,
@@ -181,37 +241,30 @@ function ExpandedMediaFieldSummary({
   disabled = false,
   readOnly = false,
   onOpen,
-}: MediaFieldSummaryLayoutProps) {
+  showHeader = true,
+}: MediaFieldSummaryLayoutProps & { showHeader?: boolean }) {
   const count = items.length
   const canEdit = !disabled && !readOnly
-  const representative = resolveRepresentative(items, representativeId)
 
   return (
     <section aria-label={label} className="space-y-3">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h3 className="font-medium">Images</h3>
-          {count ? (
-            <p className="text-sm text-muted-foreground">
-              {count} of {maxItems} images
-            </p>
-          ) : null}
-        </div>
-        {canEdit ? (
-          <button
-            type="button"
-            className="text-sm font-medium underline-offset-4 hover:underline"
-            onClick={() => onOpen(representative?.id)}
-          >
-            {count ? 'Manage' : 'Add images'}
-          </button>
-        ) : null}
-      </div>
-      {!count ? (
-        <ExpandedMediaFieldSummaryEmpty canEdit={canEdit} onOpen={() => onOpen()} />
-      ) : (
-        <ExpandedMediaFieldSummaryTiles items={items} canEdit={canEdit} onOpen={onOpen} />
-      )}
+      {showHeader ? (
+        <ExpandedMediaFieldSummaryHeader
+          label={label}
+          count={count}
+          maxItems={maxItems}
+          canEdit={canEdit}
+          onOpen={onOpen}
+          representativeId={representativeId}
+          items={items}
+        />
+      ) : null}
+      <ExpandedMediaFieldSummaryBody
+        items={items}
+        disabled={disabled}
+        readOnly={readOnly}
+        onOpen={onOpen}
+      />
     </section>
   )
 }

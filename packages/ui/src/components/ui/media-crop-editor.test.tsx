@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { isSquareCrop, meetsPortraitMinimumCrop, resetPortraitCrop } from '@rpg/contracts'
+import {
+  isBannerAspectCrop,
+  isSquareCrop,
+  meetsBannerMinimumCrop,
+  meetsPortraitMinimumCrop,
+  resetBannerCrop,
+  resetPortraitCrop,
+} from '@rpg/contracts'
 import { MediaCropEditor } from './media-crop-editor.client'
 
 describe('MediaCropEditor', () => {
@@ -21,6 +28,25 @@ describe('MediaCropEditor', () => {
     expect(meetsPortraitMinimumCrop(crop, source)).toBe(true)
     expect(crop.x + crop.width / 2).toBeCloseTo(0.5)
   })
+  it('zooms banner while retaining a valid 3:1 crop on non-wide sources', () => {
+    const bannerSource = { width: 1800, height: 1200 }
+    const onChange = vi.fn()
+    render(
+      <MediaCropEditor
+        src="/image.png"
+        source={bannerSource}
+        frame="banner"
+        crop={resetBannerCrop(bannerSource)}
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText('Zoom'), { target: { value: '1.5' } })
+    const crop = onChange.mock.calls[0]![0]
+    expect(isBannerAspectCrop(crop, bannerSource)).toBe(true)
+    expect(meetsBannerMinimumCrop(crop, bannerSource)).toBe(true)
+    expect(crop.x + crop.width / 2).toBeCloseTo(0.5)
+  })
+
   it('offers keyboard repositioning and resets to the original centered crop', () => {
     const onChange = vi.fn()
     const crop = { x: 0.2, y: 0.2, width: 0.2, height: 0.3 }

@@ -20,6 +20,7 @@ const altFields: FormItem[] = [
     type: 'text',
     label: 'Alt text',
     hint: 'Describe the original image for accessibility.',
+    chrome: { variant: 'none' },
   },
 ]
 export type MediaImageDetailsProps = {
@@ -58,58 +59,68 @@ export function MediaImageDetails({
   return (
     <aside className={styles.details()}>
       <h3 className={styles.subheading()}>Image details</h3>
-      <Form
-        key={image.id}
-        schema={altSchema}
-        fields={altFields}
-        defaultValues={{ alt: image.alt ?? '' }}
-        onSubmit={(values) => onAlt(values.alt ?? '')}
-        valueSyncs={syncs}
-        footer={null}
-      />
-      <fieldset className={styles.roles()}>
-        <legend className={styles.subheading()}>Assign roles</legend>
-        {policy.allowedRoles.map((role) => {
-          const assignment = media.roles[role]
-          const cropPresentation = asCropPresentation(
-            assignment?.imageId === image.id ? assignment.presentation : undefined,
-          )
-          const eligibility = resolveMediaRoleEligibility(role, source, cropPresentation)
-          const hint = !eligibility.eligible
-            ? eligibility.message
-            : (eligibility.hint ?? MEDIA_ROLE_ENTRIES[role].description)
+      <div className={styles.detailsPanel()}>
+        <section className={styles.detailsSection()} aria-labelledby={`${id}-roles-heading`}>
+          <h4 id={`${id}-roles-heading`} className={styles.subheading()}>
+            Assign roles
+          </h4>
+          <div className={styles.roles()} role="group" aria-labelledby={`${id}-roles-heading`}>
+            {policy.allowedRoles.map((role) => {
+              const assignment = media.roles[role]
+              const cropPresentation = asCropPresentation(
+                assignment?.imageId === image.id ? assignment.presentation : undefined,
+              )
+              const eligibility = resolveMediaRoleEligibility(role, source, cropPresentation)
+              const hint = !eligibility.eligible
+                ? eligibility.message
+                : (eligibility.hint ?? MEDIA_ROLE_ENTRIES[role].description)
 
-          return (
-            <CheckboxField
-              key={role}
-              id={`${id}-${role}`}
-              label={MEDIA_ROLE_ENTRIES[role].label}
-              hint={hint}
-              checked={media.roles[role]?.imageId === image.id}
-              disabled={!eligibility.eligible}
-              onCheckedChange={(checked) => onRole(role, checked === true)}
-            />
-          )
-        })}
-      </fieldset>
-      <dl className={styles.metadata()}>
-        <dt className={styles.metadataLabel()}>File name</dt>
-        <dd className={styles.metadataValue()}>
-          <FilenamePreview filename={asset.filename} density="metadata" />
-        </dd>
-        <dt className={styles.metadataLabel()}>Dimensions</dt>
-        <dd className={styles.metadataValue()}>
-          {asset.orientedWidth} × {asset.orientedHeight}
-        </dd>
-        <dt className={styles.metadataLabel()}>File size</dt>
-        <dd className={styles.metadataValue()}>
-          {new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(
-            asset.byteSize / 1024,
-          )}{' '}
-          KB
-        </dd>
-      </dl>
-      {asset.animated && <p className={styles.muted()}>Animated source; still preview.</p>}
+              return (
+                <CheckboxField
+                  key={role}
+                  id={`${id}-${role}`}
+                  label={MEDIA_ROLE_ENTRIES[role].label}
+                  hint={hint}
+                  checked={media.roles[role]?.imageId === image.id}
+                  disabled={!eligibility.eligible}
+                  onCheckedChange={(checked) => onRole(role, checked === true)}
+                />
+              )
+            })}
+          </div>
+        </section>
+        <div className={styles.detailsSection()}>
+          <dl className={styles.metadata()}>
+            <dt className={styles.metadataLabel()}>File name</dt>
+            <dd className={styles.metadataValue()}>
+              <FilenamePreview filename={asset.filename} density="metadata" />
+            </dd>
+            <dt className={styles.metadataLabel()}>Dimensions</dt>
+            <dd className={styles.metadataValue()}>
+              {asset.orientedWidth} × {asset.orientedHeight}
+            </dd>
+            <dt className={styles.metadataLabel()}>File size</dt>
+            <dd className={styles.metadataValue()}>
+              {new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(
+                asset.byteSize / 1024,
+              )}{' '}
+              KB
+            </dd>
+          </dl>
+          {asset.animated && <p className={styles.muted()}>Animated source; still preview.</p>}
+        </div>
+        <div className={styles.detailsSection()}>
+          <Form
+            key={image.id}
+            schema={altSchema}
+            fields={altFields}
+            defaultValues={{ alt: image.alt ?? '' }}
+            onSubmit={(values) => onAlt(values.alt ?? '')}
+            valueSyncs={syncs}
+            footer={null}
+          />
+        </div>
+      </div>
       <Button type="button" variant="outline" onClick={onRemove}>
         Remove image
       </Button>
