@@ -11,6 +11,7 @@ import {
   heroMarkFrameClasses,
   heroMarkImageClasses,
   heroMediaImageClasses,
+  heroMetaClasses,
   type RowActionsMenuLinkProps,
 } from '@rpg/ui'
 import { UserPlus } from 'lucide-react'
@@ -114,7 +115,7 @@ export function CampaignOverviewHero({
         }
         markPlacement={bannerUrl ? 'overlap' : 'inline'}
         title={
-          <Heading variant="page" as="h1" className="truncate">
+          <Heading variant="heroTitle" as="h1" className="truncate">
             {campaign.identity.name}
           </Heading>
         }
@@ -127,7 +128,7 @@ export function CampaignOverviewHero({
           />
         }
         meta={
-          <Text variant="muted" className="inline-flex items-center gap-1.5 text-sm">
+          <Text variant="muted" className={heroMetaClasses}>
             <StatusDot tone={statusLine.statusTone} />
             {statusLine.countsSuffix
               ? `${statusLine.statusLabel} · ${statusLine.countsSuffix}`

@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import {
+  heroCopyColumnClasses,
+  heroIdentityBlockVariants,
   heroIdentityRowClasses,
   heroMarkShellVariants,
   heroMediaFrameClasses,
@@ -39,21 +41,30 @@ export function Hero({
   return (
     <section className={cn(heroRootClasses, className)}>
       {media ? <div className={heroMediaFrameClasses}>{media}</div> : null}
-      {mark ? (
-        <div className={heroMarkShellVariants({ placement: resolvedMarkPlacement })}>{mark}</div>
-      ) : null}
-      <div className={heroIdentityRowClasses}>
-        <div className={heroTitleShellClasses}>{title}</div>
-        {actions}
-      </div>
-      {meta || secondary ? (
-        <div className={heroMetaStackClasses}>
-          {meta}
-          {secondary}
+      <div className={heroIdentityBlockVariants({ hasMark: Boolean(mark) })}>
+        {mark ? (
+          <div className={heroMarkShellVariants({ placement: resolvedMarkPlacement })}>{mark}</div>
+        ) : null}
+        <div className={heroCopyColumnClasses}>
+          <div className={heroIdentityRowClasses}>
+            <div className={heroTitleShellClasses}>{title}</div>
+            {actions}
+          </div>
+          {meta || secondary ? (
+            <div className={heroMetaStackClasses}>
+              {meta}
+              {secondary}
+            </div>
+          ) : null}
         </div>
-      ) : null}
+      </div>
     </section>
   )
 }
 
-export { heroMarkFrameClasses, heroMarkImageClasses, heroMediaImageClasses } from './hero.variants'
+export {
+  heroMarkFrameClasses,
+  heroMarkImageClasses,
+  heroMediaImageClasses,
+  heroMetaClasses,
+} from './hero.variants'

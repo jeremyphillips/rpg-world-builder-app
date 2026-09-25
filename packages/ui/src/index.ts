@@ -1081,6 +1081,8 @@ export {
   heroMarkShellVariants,
   heroMediaFrameClasses,
   heroMediaImageClasses,
+  heroMarkVisibilityClasses,
+  heroMetaClasses,
   heroMetaStackClasses,
   heroRootClasses,
   heroTitleShellClasses,

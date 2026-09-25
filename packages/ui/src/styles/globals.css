@@ -150,7 +150,7 @@
   --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
   --color-sidebar: var(--sidebar);
   --spacing-sidebar: var(--sidebar-width);
-  --spacing-image-preview: 7.5rem;
+  --spacing-image-preview: var(--image-preview-size);
   --z-index-toast: var(--z-toast);
   --color-control-hover: var(--control-hover-bg);
   --color-control-selected: var(--control-selected-bg);
@@ -313,7 +313,6 @@
   /* Heading weight roles */
   --font-weight-heading-display: var(--font-weight-bold);
   --font-weight-heading: var(--font-weight-semibold);
-  --font-weight-heading-section: var(--font-weight-light);
   --font-weight-heading-group: var(--font-weight-medium);
   --font-weight-heading-label: var(--font-weight-medium);
 
@@ -606,7 +605,7 @@
 @utility heading-style-section {
   font-size: var(--text-heading-section);
   line-height: var(--text-heading-section--line-height);
-  font-weight: var(--font-weight-heading-section);
+  font-weight: var(--font-weight-heading);
   letter-spacing: var(--tracking-heading);
 }
 
@@ -653,7 +652,7 @@
 @utility heading-style-sheet-section {
   font-size: var(--text-heading-sheet-section);
   line-height: var(--text-heading-sheet-section--line-height);
-  font-weight: var(--font-weight-heading-section);
+  font-weight: var(--font-weight-heading);
   letter-spacing: var(--tracking-heading);
 }
 
@@ -780,6 +779,22 @@
 }
 
 @layer base {
+  :root {
+    --image-preview-size: 7.5rem; /* 120px — compact media preview default and lg+ */
+  }
+
+  @media (width >= 48rem) {
+    :root {
+      --image-preview-size: 5.625rem; /* 90px — md tier */
+    }
+  }
+
+  @media (width >= 64rem) {
+    :root {
+      --image-preview-size: 7.5rem; /* 120px — large breakpoints */
+    }
+  }
+
   /* Structural default only — semantic shells must set an explicit border role utility. */
   * {
     border-color: var(--border);

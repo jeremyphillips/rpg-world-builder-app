@@ -88,7 +88,6 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'font-weight': [
         'heading-display',
         'heading',
-        'heading-section',
         'heading-group',
         'heading-label',
         'body',

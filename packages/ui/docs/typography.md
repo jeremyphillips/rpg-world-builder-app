@@ -20,7 +20,7 @@ h1 per page** (route title via `page`, or entity title via `display` on detail r
 | ------------------------------ | ------ | ----- | -------------------- | --------------------------------------------------------------- |
 | `Heading` `display`            | `h1`   | 42    | 700                  | Hero, content detail entity titles                              |
 | `Heading` `page`               | `h1`   | 34    | 600                  | Route titles (`PageHeader`)                                     |
-| `Heading` `section`            | `h2`   | 28    | 300                  | Top-level in-page sections                                      |
+| `Heading` `section`            | `h2`   | 28    | 600                  | Top-level in-page sections                                      |
 | `Heading` `subsection`         | `h3`   | 19    | 600                  | Nested blocks within a section                                  |
 | `Heading` `group`              | `h4`   | 16    | 500                  | Headings inside subsections                                     |
 | `Heading` `card`               | Radix  | 19    | 600                  | `CardTitle` (chrome)                                            |
@@ -190,20 +190,19 @@ for token inspection and docs — components use composites via `headingVariants
 
 Primitive weights and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
 
-| Role utility / token            | Value                | Typical use                               |
-| ------------------------------- | -------------------- | ----------------------------------------- |
-| `--font-weight-heading-display` | 700                  | `Heading` display                         |
-| `--font-weight-heading`         | 600                  | page, subsection, card, nav, brand, alert |
-| `--font-weight-heading-section` | 300                  | `Heading` section                         |
-| `--font-weight-heading-group`   | 500                  | `Heading` group                           |
-| `--font-weight-heading-label`   | 500                  | `Heading` label                           |
-| `font-field-label`              | 600                  | Form field labels (`fieldLabelVariants`)  |
-| `font-body-emphasis`            | 500                  | Button, badge, `Text` emphasis            |
-| `font-body`                     | 400                  | `Text` body default                       |
-| `font-meta`                     | 300                  | Data-table meta cells                     |
-| `--font-weight-eyebrow`         | 500 light / 300 dark | `eyebrow-style-*` composites              |
-| `font-data-name`                | 600                  | Data-table name cells                     |
-| `font-data-stat`                | 500                  | Data-table stat columns                   |
+| Role utility / token            | Value                | Typical use                                                       |
+| ------------------------------- | -------------------- | ----------------------------------------------------------------- |
+| `--font-weight-heading-display` | 700                  | `Heading` display                                                 |
+| `--font-weight-heading`         | 600                  | page, section, subsection, card, nav, brand, alert, sheet section |
+| `--font-weight-heading-group`   | 500                  | `Heading` group                                                   |
+| `--font-weight-heading-label`   | 500                  | `Heading` label                                                   |
+| `font-field-label`              | 600                  | Form field labels (`fieldLabelVariants`)                          |
+| `font-body-emphasis`            | 500                  | Button, badge, `Text` emphasis                                    |
+| `font-body`                     | 400                  | `Text` body default                                               |
+| `font-meta`                     | 300                  | Data-table meta cells                                             |
+| `--font-weight-eyebrow`         | 500 light / 300 dark | `eyebrow-style-*` composites                                      |
+| `font-data-name`                | 600                  | Data-table name cells                                             |
+| `font-data-stat`                | 500                  | Data-table stat columns                                           |
 
 ## Meta typography tokens
 
