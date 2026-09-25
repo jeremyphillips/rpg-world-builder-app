@@ -1172,6 +1172,7 @@
     "contentDeletionResultSchema",
     "contentDemotionAvailabilitySchema",
     "contentDemotionResultSchema",
+    "contentDisplayImageSchema",
     "contentEntryUsageSchema",
     "contentGrantSchema",
     "contentImageSchema",

@@ -1,6 +1,7 @@
 import {
   SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS,
   SPECIES_CONTENT_TYPE_TERM,
+  type ContentMedia,
   type Species,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
@@ -21,6 +22,7 @@ import type {
   ContentPreviewIdentity,
   ContentPreviewSection,
 } from '../../lib/forms/preview/content-form-preview.types'
+import { resolveFormPreviewDisplayImage } from '../../lib/forms/preview/resolve-form-preview-display-image'
 import { getCreatureTypeLabel } from './creature-type-field-options'
 import { heritageFromFormValues } from './species-heritage-form-values'
 import type { SpeciesFormValues } from './species-form-fields'
@@ -113,10 +115,18 @@ function isRulesConfigured(values: SpeciesFormValues): boolean {
 
 export function buildSpeciesPreviewIdentity(
   values: SpeciesFormValues,
-  _ctx: ContentFormCtx,
+  ctx: ContentFormCtx,
 ): ContentPreviewIdentity {
+  const displayImage = resolveFormPreviewDisplayImage({
+    media: (values as SpeciesFormValues & { media?: ContentMedia }).media,
+    ctx,
+    contentType: 'species',
+    slug: values.slug ?? 'preview',
+  })
+
   return {
     name: speciesPreviewName(values),
+    ...(displayImage ? { displayImage } : {}),
   }
 }
 

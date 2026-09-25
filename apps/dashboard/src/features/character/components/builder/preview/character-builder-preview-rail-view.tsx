@@ -7,6 +7,9 @@ import type {
 import { PreviewRail, type PreviewRailLayout } from '@rpg/ui'
 import { User } from 'lucide-react'
 
+import { ContentPreviewRailMedia } from '@/features/content/lib/forms/preview/content-preview-rail-media'
+import { resolveCharacterPrimaryDisplayImage } from '../../../lib/display/resolve-character-display-image'
+
 import { getBuilderDraftNarrative } from '../../../lib/builder-preview/character-builder-preview-panel.lib'
 import type { BuilderPreviewRailProjection } from '../../../lib/builder-preview/builder-preview-projection.lib'
 import {
@@ -110,7 +113,12 @@ export function CharacterBuilderPreviewRailView({
         />
       )}
       <PreviewRail.Identity
-        media={<PreviewRail.Media fallbackIcon={<User />} />}
+        media={
+          <ContentPreviewRailMedia
+            displayImage={resolveCharacterPrimaryDisplayImage(draft.identity)}
+            fallbackIcon={<User />}
+          />
+        }
         name={projection.identity.name}
         status={projection.identity.statusLine}
         facts={projection.identity.facts}

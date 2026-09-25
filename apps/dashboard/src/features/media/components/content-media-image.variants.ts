@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { cn } from '@rpg/ui'
+import { cn, identityFrameVariants } from '@rpg/ui'
 
 /** Matches inherited radio-card / shell `--surface-current` for blend knockouts. */
 export const contentMediaImageSurfaceBackdropClasses =
@@ -13,7 +13,8 @@ export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
       primary: 'isolate aspect-[4/3] w-full min-h-0',
       builderSheetHero: 'isolate aspect-[4/3] w-full min-h-0',
       builderCard: cn('aspect-[4/2] w-full min-h-0', contentMediaImageSurfaceBackdropClasses),
-      square: 'isolate size-6 shrink-0 rounded-md lg:size-8',
+      square: cn(identityFrameVariants({ shape: 'box', size: 'xs' }), 'isolate'),
+      insetSm: cn(identityFrameVariants({ shape: 'box', size: 'sm' }), 'isolate'),
     },
   },
   defaultVariants: {

@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { Castle } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { cn, Text } from '@rpg/ui'
+import { cn, IdentityFrame, Text } from '@rpg/ui'
 
 import type { CampaignDisplayVM } from '../lib/campaign-display'
 import {
-  campaignDisplayNameIconVariants,
   campaignDisplayNameListLinkVariants,
   campaignDisplayNameListVariants,
   campaignDisplayNameTextVariants,
@@ -20,7 +19,7 @@ export type CampaignDisplayNameListProps = {
   suffix?: React.ReactNode
 }
 
-/** One campaign icon with comma-separated linked names — `inlineMuted` list layout. */
+/** One campaign mark with comma-separated linked names — `inlineMuted` list layout. */
 export function CampaignDisplayNameList({
   displays,
   surface = 'inlineMuted',
@@ -30,9 +29,18 @@ export function CampaignDisplayNameList({
 }: CampaignDisplayNameListProps) {
   if (displays.length === 0) return null
 
+  const singleDisplay = displays.length === 1 ? displays[0] : undefined
+
   return (
     <span className={cn(campaignDisplayNameListVariants({ surface }), className)}>
-      <Castle aria-hidden className={campaignDisplayNameIconVariants({ surface })} />
+      <IdentityFrame
+        src={singleDisplay?.imageUrl ?? undefined}
+        alt=""
+        shape="box"
+        size="inline"
+        fit="contain"
+        fallback={<Castle aria-hidden />}
+      />
       <span className="inline-flex min-w-0 flex-wrap items-center">
         {displays.map((display, index) => (
           <span key={display.id}>

@@ -41,6 +41,7 @@ import {
   resolvePreviewRailFallbackIcon,
   resolvePreviewRailOpenSection,
 } from './content-preview-rail.lib'
+import { ContentPreviewRailMedia } from './content-preview-rail-media'
 import {
   isContentPreviewSectionExpandable,
   resolveContentPreviewSectionBodyProps,
@@ -210,7 +211,12 @@ function ContentPreviewRailView({
         />
       )}
       <PreviewRail.Identity
-        media={<PreviewRail.Media imageSrc={identity.imageSrc} fallbackIcon={<FallbackIcon />} />}
+        media={
+          <ContentPreviewRailMedia
+            displayImage={identity.displayImage}
+            fallbackIcon={<FallbackIcon />}
+          />
+        }
         name={identity.name}
         status={
           <PreviewRail.AvailabilityLine

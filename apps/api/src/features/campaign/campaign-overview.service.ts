@@ -7,6 +7,7 @@ import { CAMPAIGN_ROLES } from '@rpg/contracts'
 
 import { findPcsByIds, findPcOwnerIdsByCharacterIds } from '../character'
 import { buildCharacterCardSummaryDto } from '../character'
+import { resolveCampaignEmblemImageUrl } from './lib/resolve-campaign-emblem-image-url.lib'
 import { buildCampaignContentEligibilityIndex } from '../campaign-invite'
 import { findUsersByIds } from '../user'
 import { HttpError } from '../../lib/http-error'
@@ -140,6 +141,7 @@ export async function listCampaignPartyForOverview(
     if (!character) continue
 
     const controller = controllerByCharacterId.get(participation.characterId)
+    const campaignEmblemUrl = resolveCampaignEmblemImageUrl(campaign.identity.media)
 
     party.push({
       character: {
@@ -147,6 +149,7 @@ export async function listCampaignPartyForOverview(
         campaign: {
           id: campaignId,
           name: campaign.identity.name,
+          ...(campaignEmblemUrl ? { emblemUrl: campaignEmblemUrl } : {}),
         },
       },
       member: controller

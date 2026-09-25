@@ -12,6 +12,7 @@ export const campaignPartyPcListItemSchema = z.object({
     .object({
       id: z.string().min(1),
       displayName: z.string().min(1),
+      avatarKey: z.string().min(1).optional(),
     })
     .nullable(),
   roster: z.object({

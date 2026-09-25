@@ -1,4 +1,9 @@
 export {
+  ContentMediaImage,
+  type ContentMediaImageFrame,
+  type ContentMediaImageProps,
+} from './components/content-media-image'
+export {
   MediaManager,
   type MediaManagerProps,
   type MediaManagerSave,

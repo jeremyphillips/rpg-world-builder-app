@@ -10,6 +10,7 @@ const characterSchema = new Schema(
     userId: { type: String, index: true },
     name: { type: String, required: true, trim: true },
     imageKey: { type: String },
+    media: { type: Schema.Types.Mixed },
     rulesetId: { type: String, enum: SYSTEM_RULESET_IDS, required: true },
     classes: { type: [Schema.Types.Mixed], required: true },
     species: { type: Schema.Types.Mixed, required: true },

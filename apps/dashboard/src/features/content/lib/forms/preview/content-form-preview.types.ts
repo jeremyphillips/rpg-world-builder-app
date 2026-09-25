@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { FieldValues } from 'react-hook-form'
+import type { ContentDisplayImage } from '@rpg/contracts'
 import type { PreviewRailFact } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../registry/content-form-registry'
@@ -9,7 +10,7 @@ export type ContentPreviewDerivedKind = 'ready' | 'off' | 'none' | 'notConfigure
 
 export type ContentPreviewIdentity = {
   name: string
-  imageSrc?: string
+  displayImage?: ContentDisplayImage
   /** Optional header metadata — omit when facts belong in a scroll section instead. */
   facts?: PreviewRailFact[]
 }

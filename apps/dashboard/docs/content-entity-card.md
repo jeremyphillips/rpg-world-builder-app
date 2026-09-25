@@ -571,3 +571,35 @@ for cleanup — do not weaken docs to match legacy patterns:
 
 CEC and DEC expose presentational disabled state. Hosts still own interactive
 `disabled`, `aria-disabled`, and focus behavior.
+
+---
+
+## Card image pipeline
+
+Identity artwork follows one pipeline from role resolution to a geometry-only frame:
+
+```text
+getContentDisplayImage / resolveMediaRoleDisplayImage → ContentDisplayImage
+  → dashboard ContentMediaImage (crop math)
+  → @rpg/ui IdentityFrame (size, shape, cover/contain)
+  → surface adapter (card, table cell, preview rail, campaign name row)
+```
+
+**Identity frame** (`IdentityFrame`, shared tokens with `IconContainer`) clips and
+sizes only. Crop math stays in the dashboard media layer.
+
+**Utility-rail invariant:** leading utilities (grip, caret) own their rail. Identity
+media begins at the same content-column inset and the same gap to the heading whether
+or not that rail is present. Never set `leading: true` on entity card frames to
+make room for an image.
+
+### Layout modes
+
+| Mode          | Surfaces                                                   | Geometry                                                                                                                        |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-3` comfortable); heading-band min-height matches frame size; outer row `items-start` |
+| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                          |
+| Stacked bleed | Species/class radio cards, character list cards            | Full-bleed `ContentMediaImage` `builderCard` frame; text padding under the image                                                |
+
+Portrait role copy targets compact circle/square tokens; stacked character cards use
+**primary** crop in the builder-card window.

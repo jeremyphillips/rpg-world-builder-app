@@ -23,6 +23,7 @@ export function toNpcCharacter(doc: CharacterRecord): NpcCharacter {
     characterType: 'npc',
     name: doc.name,
     imageKey: doc.imageKey ?? undefined,
+    media: doc.media ?? undefined,
     rulesetId: doc.rulesetId,
     classes: doc.classes,
     species: doc.species,

@@ -3,21 +3,32 @@
 import { Trash2 } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { contentCardMediaVariants, contentCardRemoveButtonVariants } from './content-card.variants'
+import { contentCardRemoveButtonVariants } from './content-card.variants'
+import { IdentityFrame } from './identity-frame.client'
+import type { ContentCardDensity } from './content-card.variants'
+import { resolveContentCardMediaFrameSize } from './content-card-media.lib'
 
 export type ContentCardMediaProps = {
   src: string
   alt?: string
+  density?: ContentCardDensity
   className?: string
 }
 
-export function ContentCardMedia({ src, alt = '', className }: ContentCardMediaProps) {
+/** Compact entity thumb — geometry-only frame at card density. */
+export function ContentCardMedia({
+  src,
+  alt = '',
+  density = 'comfortable',
+  className,
+}: ContentCardMediaProps) {
   return (
-    <img
+    <IdentityFrame
       src={src}
       alt={alt}
-      aria-hidden={alt === '' ? true : undefined}
-      className={cn(contentCardMediaVariants(), className)}
+      shape="box"
+      size={resolveContentCardMediaFrameSize(density)}
+      className={className}
     />
   )
 }
