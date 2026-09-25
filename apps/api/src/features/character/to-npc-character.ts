@@ -5,6 +5,7 @@ import {
   type NpcCharacter,
 } from '@rpg/contracts'
 
+import { resolveCharacterDisplayImageForSurface } from './lib/resolve-character-display-image.lib'
 import type { CharacterSchemaType } from './character.model'
 
 type CharacterRecord = CharacterSchemaType & {
@@ -22,7 +23,6 @@ export function toNpcCharacter(doc: CharacterRecord): NpcCharacter {
     id: String(doc._id),
     characterType: 'npc',
     name: doc.name,
-    imageKey: doc.imageKey ?? undefined,
     media: doc.media ?? undefined,
     rulesetId: doc.rulesetId,
     classes: doc.classes,
@@ -45,11 +45,14 @@ export function toNpcCharacter(doc: CharacterRecord): NpcCharacter {
 }
 
 export function toNpcListCharacterSummary(npc: NpcCharacter) {
+  const displayImage = resolveCharacterDisplayImageForSurface(npc, 'compact')
+
   return {
     id: npc.id,
     name: npc.name,
     vital: npc.vital,
     classes: npc.classes,
     species: npc.species,
+    ...(displayImage ? { displayImage } : {}),
   }
 }

@@ -1,21 +1,24 @@
-import type { ContentDisplayImage } from '@rpg/contracts'
-import { IconContainer } from '@rpg/ui'
-import type { ReactNode } from 'react'
+import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
+import { ContentDisplayFallbackIcon, IconContainer } from '@rpg/ui'
 
 import { ContentMediaImage } from '@/features/media/components/content-media-image'
 
 export type ContentPreviewRailMediaProps = {
   displayImage?: ContentDisplayImage
-  fallbackIcon: ReactNode
+  fallback?: ContentDisplayFallback
 }
 
 export function ContentPreviewRailMedia({
   displayImage,
-  fallbackIcon,
+  fallback = 'generic',
 }: ContentPreviewRailMediaProps) {
   if (displayImage) {
     return <ContentMediaImage display={displayImage} alt="" frame="insetSm" />
   }
 
-  return <IconContainer size="sm">{fallbackIcon}</IconContainer>
+  return (
+    <IconContainer size="sm">
+      <ContentDisplayFallbackIcon fallback={fallback} size="md" />
+    </IconContainer>
+  )
 }

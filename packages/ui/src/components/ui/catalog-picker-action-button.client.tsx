@@ -7,27 +7,23 @@ export type CatalogPickerActionButtonProps = {
   disabled?: boolean
   onClick: () => void
   variant?: ButtonProps['variant']
-  size?: ButtonProps['size']
-  density?: ButtonProps['density']
   className?: string
 }
 
-/** Shared picker header action chrome — outline by default, overridable per surface. */
+/** Shared picker header action chrome — outline, sm, compact density (not overridable). */
 export function CatalogPickerActionButton({
   children,
   disabled,
   onClick,
   variant = 'outline',
-  size = 'sm',
-  density = 'compact',
   className,
 }: CatalogPickerActionButtonProps) {
   return (
     <Button
       type="button"
       variant={variant}
-      size={size}
-      density={density}
+      size="sm"
+      density="compact"
       className={className}
       disabled={disabled}
       onClick={onClick}

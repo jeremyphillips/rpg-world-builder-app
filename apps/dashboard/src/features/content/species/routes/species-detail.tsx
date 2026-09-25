@@ -47,8 +47,9 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
         name={species.name}
         nameBadge={<ContentStatusNameBadge status={species.status} />}
         displayImage={getContentDisplayImage(
-          buildSpeciesContentDisplayImageInput(species, 'primary'),
+          buildSpeciesContentDisplayImageInput(species, 'detail'),
         )}
+        displayFallback="generic"
         imageName={species.name}
         viewModel={viewModel}
         campaignId={campaignId}

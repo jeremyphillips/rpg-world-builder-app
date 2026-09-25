@@ -1,6 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
-import { emptyContentMediaSchema, type MediaAsset, type MediaScope } from '@rpg/contracts'
+import {
+  emptyContentMediaSchema,
+  resolveContentDisplayFallbackForDomain,
+  type MediaAsset,
+  type MediaScope,
+} from '@rpg/contracts'
 import { CollectionAddControl, MediaFieldSummary, resolveExpandedCapacityHint } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
@@ -95,6 +100,7 @@ export function ManagedMediaField({
             representativeId={summary.representativeId}
             maxItems={maxItems}
             countDisplay={config.presentation.countDisplay}
+            emptyFallback={resolveContentDisplayFallbackForDomain(config.domain)}
             onOpen={onOpen}
           />
         </div>
@@ -107,6 +113,7 @@ export function ManagedMediaField({
           representativeId={summary.representativeId}
           maxItems={maxItems}
           countDisplay={config.presentation.countDisplay}
+          emptyFallback={resolveContentDisplayFallbackForDomain(config.domain)}
           onOpen={onOpen}
         />
       )}

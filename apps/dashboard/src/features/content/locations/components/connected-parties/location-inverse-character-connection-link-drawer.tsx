@@ -6,12 +6,9 @@ import type {
   LocationConnectedPartyRow,
 } from '@rpg/contracts'
 import { resolveLocationConnectionEligibility } from '@rpg/contracts'
-import {
-  Button,
-  Text,
-  CatalogPickerSelectionActions,
-  resolveCatalogPickerRowActionPhase,
-} from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
+
+import { buildCharacterEntityCardModel } from '@/features/character'
 
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import {
@@ -21,7 +18,7 @@ import {
   characterInverseSubjectHasAvailableKind,
 } from '../../../lib/relationship/location-connection/location-connection-drawer-intent'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
-import { buildCharacterPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
+import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
@@ -277,46 +274,37 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       getItemToolbarLabel={(character) => character.name}
       getSearchText={buildConnectedPartyCharacterPickerSearchText}
       renderEntityRow={createCatalogEntityRowRenderer({
-        buildEntity: (character) =>
-          buildCharacterPickerEntitySummary(character, {
-            description: !characterInverseSubjectHasAvailableKind(
-              character.id,
-              availabilityKinds,
-              existingKeys,
-            )
-              ? CHARACTER_DRAWER_FULLY_LINKED_REASON
-              : undefined,
-          }),
-        buildTrailing: (character) => {
+        buildSurface: (character) => {
           const isSelected = selectedCharacterId === character.id
           const hasAvailableKind = characterInverseSubjectHasAvailableKind(
             character.id,
             availabilityKinds,
             existingKeys,
           )
-          const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
           return {
-            kind: 'action',
-            content: (
-              <CatalogPickerSelectionActions
-                phase={phase}
-                canSelect={hasAvailableKind}
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => {
-                  setSelectedCharacterId(character.id)
-                  if (!resolvedAddKind) {
-                    setSelectedKind(null)
-                  }
-                }}
-                onRemove={() => {
-                  setSelectedCharacterId(null)
-                  if (!resolvedAddKind) {
-                    setSelectedKind(null)
-                  }
-                }}
-              />
+            identity: buildCharacterEntityCardModel(
+              buildConnectedPartyCharacterEntitySummary(character),
+              {
+                metadata: !hasAvailableKind ? CHARACTER_DRAWER_FULLY_LINKED_REASON : undefined,
+              },
             ),
+            inlineAction: buildCatalogToggleSelectInlineAction({
+              isSelected,
+              canSelect: hasAvailableKind,
+              onSelect: () => {
+                setSelectedCharacterId(character.id)
+                if (!resolvedAddKind) {
+                  setSelectedKind(null)
+                }
+              },
+              onDeselect: () => {
+                setSelectedCharacterId(null)
+                if (!resolvedAddKind) {
+                  setSelectedKind(null)
+                }
+              },
+            }),
           }
         },
       })}

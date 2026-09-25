@@ -78,8 +78,9 @@ export function ClassDetailContent({
         name={characterClass.name}
         nameBadge={<ContentStatusNameBadge status={characterClass.status} />}
         displayImage={getContentDisplayImage(
-          buildClassContentDisplayImageInput(characterClass, 'primary'),
+          buildClassContentDisplayImageInput(characterClass, 'detail'),
         )}
+        displayFallback="generic"
         imageName={characterClass.name}
         viewModel={viewModel}
         subclasses={subclasses}

@@ -19,8 +19,11 @@ import {
   CREATE_FLOW_FORM_DENSITY,
 } from '@/lib/create-flow'
 
-import { ContentEntityCard } from '@/features/content'
-import { buildOrganizationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
+import { EntitySurfaceContentCard } from '@/features/content/lib/entity/surfaces/cards/content/entity-surface-content-card'
+import {
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from '../../../organizations/lib/organization-display'
 import {
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
@@ -132,31 +135,20 @@ function BuildingOrganizationDiscoveryRow({
 }) {
   const options = kindOptionsFor({ kind: 'existing', organizationId: organization.id })
   const selectState = resolveBuildingOrganizationSelectState({ kind, options })
-  const entity = buildOrganizationPickerEntitySummary(organization, {
-    ...(selectState.selectDisabledReason ? { description: undefined } : {}),
-  })
-  const entityWithStatus = selectState.selectDisabledReason
-    ? { ...entity, status: [{ kind: 'text' as const, label: selectState.selectDisabledReason }] }
-    : entity
-
   return (
-    <ContentEntityCard
-      entity={entityWithStatus}
+    <EntitySurfaceContentCard
       density="compact"
-      trailing={{
-        kind: 'action',
-        content: (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            density="compact"
-            disabled={selectState.selectDisabled}
-            onClick={() => selectExistingOrganization(organization.id)}
-          >
-            {BUILDING_ORGANIZATIONS_SELECT_LABEL}
-          </Button>
-        ),
+      surface={{
+        identity: buildOrganizationEntityCardModel(buildOrganizationEntitySummaryVm(organization), {
+          status: selectState.selectDisabledReason
+            ? [{ kind: 'text', label: selectState.selectDisabledReason }]
+            : undefined,
+        }),
+        inlineAction: {
+          label: BUILDING_ORGANIZATIONS_SELECT_LABEL,
+          onClick: () => selectExistingOrganization(organization.id),
+          disabled: selectState.selectDisabled,
+        },
       }}
     />
   )

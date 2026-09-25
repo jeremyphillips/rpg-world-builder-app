@@ -1,7 +1,6 @@
 import { Modal } from '@rpg/ui'
 
 import { useDamageTypeVocabulary, useSpellSchoolVocabulary } from '@/features/vocabulary'
-import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import type { ContentPreviewPlayerPreviewProps } from '../../lib/forms/preview/content-form-preview.types'
 import { CONTENT_PREVIEW_AS_PLAYER_LABEL } from '../../lib/forms/preview/content-form-preview-copy'
 import { SpellDetailBody } from '../components/spell-detail-body'
@@ -31,7 +30,6 @@ export function SpellPreviewPlayerHost({
         <Modal.Body>
           <SpellDetailBody
             name={name}
-            imageUrl={getContentImageUrl()}
             imageName={name}
             viewModel={viewModel}
             campaignId={ctx.campaignId ?? ''}

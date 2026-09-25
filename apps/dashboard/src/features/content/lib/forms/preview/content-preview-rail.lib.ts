@@ -59,6 +59,21 @@ export function resolvePreviewRailFallbackIcon(contentTypeKey: string): LucideIc
   return FileText
 }
 
+export function resolvePreviewRailDisplayFallback(
+  contentTypeKey: string,
+): import('@rpg/contracts').ContentDisplayFallback {
+  switch (contentTypeKey) {
+    case 'equipment':
+      return 'equipment'
+    case 'locations':
+      return 'location'
+    case 'organizations':
+      return 'organization'
+    default:
+      return 'generic'
+  }
+}
+
 export function resolvePreviewRailOpenSection(
   activeTabId: string,
   manualSection: { forTabId: string; value: string } | null,

@@ -42,6 +42,15 @@ Dependency direction: `surfaces → anatomy → summary`. `summary/` must not im
 | Detail hierarchy or typed relationship                                                 | `DetailEntityRow` / `RelationshipList` |
 | Anonymous form value or choice affordance                                              | Purpose-built form/choice component    |
 
+### EntitySurfaceConfig (character / organization / location pickers)
+
+Compact catalog and bordered cards share one **data-only** identity contract:
+
+- Feature display modules return `EntitySurfaceIdentity` (`heading`, optional `metadata`, `classification`, `status`, optional `displayImage`, required semantic `fallback`) via `buildCharacterEntityCardModel`, `buildLocationEntityCardModel`, and `buildOrganizationEntityCardModel`. No JSX, no media nodes, no row chrome. Projection always paints compact media (image or fallback icon).
+- Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`, or `createCatalogEntityRowRenderer({ buildSurface })`.
+- Heading label buttons use **`inlineAction` only** (`label`, `onClick`, `disabled?`, `loading?`). Surfaces render locked compact picker buttons.
+- **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / DEC children; `trailing.kind: 'group'` for inventory quantity and icon-remove controls.
+
 The host keeps its own navigation, hover, selection, separators, drag behavior, and
 domain controls. Never put a full-row link in `EntitySummaryModel`; when a host owns
 full-row navigation, omit `EntityAnatomyHost.headingHref`.

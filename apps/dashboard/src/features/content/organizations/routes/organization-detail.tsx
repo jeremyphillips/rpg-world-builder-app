@@ -12,7 +12,8 @@ import {
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
-import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
+import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import { buildOrganizationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSpecies } from '../../species/hooks/use-species'
@@ -56,7 +57,10 @@ export function OrganizationDetailContent({
       <ContentDetailLayout
         name={organization.name}
         nameBadge={<ContentStatusNameBadge status={organization.status} />}
-        imageUrl={getContentImageUrl(organization.imageKey)}
+        displayImage={getContentDisplayImage(
+          buildOrganizationContentDisplayImageInput(organization, 'detail'),
+        )}
+        displayFallback="organization"
         imageName={organization.name}
         campaignId={campaignId}
         editHref={contentEditHref('organizations', campaignId, organization.id)}

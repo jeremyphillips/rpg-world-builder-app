@@ -10,15 +10,12 @@ export function resolveFormPreviewDisplayImage(input: {
   contentType: ContentTypeKey
   slug: string
 }): ContentDisplayImage | undefined {
-  const display = getContentDisplayImage({
+  return getContentDisplayImage({
     media: input.media,
     contentType: input.contentType,
     slug: input.slug,
     contentSource: input.ctx.entitySource ?? 'homebrew',
     rulesetId: input.ctx.rulesetId,
-    role: 'primary',
+    surface: 'field',
   })
-
-  if (display.sourceKind === 'fallback') return undefined
-  return display
 }

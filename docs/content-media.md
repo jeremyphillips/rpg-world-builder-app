@@ -4,6 +4,33 @@ Implementation tracker for reusable content media (Character, Class, Species,
 Equipment, Location, Organization). Full product and UX specification:
 [roadmap/content-media-management-plan.md](./roadmap/content-media-management-plan.md).
 
+## Display-image SSOT (locked)
+
+1. **No image fallbacks as URLs.** No `fallback-content.png`, `getContentImageUrl`,
+   or placeholder `<img>` src. Wire `ContentDisplayImage` is omitted when there is no
+   real upload or registry path; compact UI paints semantic fallback icons instead.
+2. **Semantic fallback keys** (contracts): `'character' | 'location' | 'organization' |
+'campaign' | 'equipment' | 'generic'`. `@rpg/ui` maps keys to Lucide icons
+   (Backpack for equipment). Castle is only for `'generic'` and unrecognized keys.
+3. **Field summary empty state:** ImagePlus when the viewer can manage media; otherwise
+   the domain fallback passed from the media field.
+4. **Always-on media on compact identity rows** (entity cards, pickers, link rows).
+   `CharacterListCard` still omits the stacked band when `displayImage` is absent.
+5. **Closed surface walker** — `resolveContentDisplayImage({ surface, domain, … })` with
+   `surface: 'compact' | 'detail' | 'field'`. Compact walks `representativeRoles`
+   (character: portrait → primary). Detail walks primary only. Field walks the
+   domain representative role. Campaign overview hero stays on its banner path.
+6. **`imageKey` removed from authored catalog content.** Media domains display through
+   `ContentMedia` only. Spells, feats, and skill-proficiencies have no image field and
+   no image UI on detail or overview until they opt into `ContentMedia`. `avatarKey`
+   stays.
+7. **Location and organization** allow `primary` and `emblem` uploads. Compact cards,
+   pickers, and overview thumbnails resolve **primary** only (emblem is manager-only in
+   this pass).
+
+System art comes only from `SYSTEM_CONTENT_IMAGE_ENTRIES` while walking each role
+(upload assignment, then registry entry for that content type, slug, and role).
+
 ## v1 policy defaults (locked)
 
 | Limit                  | Value                              |
@@ -18,81 +45,52 @@ Equipment, Location, Organization). Full product and UX specification:
 | Upload byte ceiling    | `MAX_UPLOAD_BYTES` (5 MiB default) |
 | Unreferenced lease     | 24 hours                           |
 
-Character allows Portrait + Primary; all other opted-in domains are Primary only.
-Animated GIF/WebP originals are preserved; inspection and derivatives use the first
-frame. SVG is rejected. Private assets live under `{UPLOAD_DIR}/media/{assetId}/`
-and are not served by `GET /api/uploads/:key`.
+Character allows Portrait + Primary; location and organization allow Primary + Emblem;
+all other opted-in catalog domains are Primary only. Animated GIF/WebP originals are
+preserved; inspection and derivatives use the first frame. SVG is rejected. Private
+assets live under `{UPLOAD_DIR}/media/{assetId}/` and are not served by
+`GET /api/uploads/:key`.
 
 ## Contracts (`@rpg/contracts/shared/media`)
 
 - Asset DTO, upload session, `ContentImage`, `ImagePresentation`, `ContentMedia`
 - Typed `CONTENT_MEDIA_POLICIES` registry
+- `resolveContentDisplayImage` + `ContentDisplayFallback` semantic keys
+- `resolveCharacterDisplayImage` for portrait → primary character resolution
 - Normalized crop geometry and `validateContentMedia`
-- `mediaBearingAuthoredContentBodySchema` (not yet wired into live type schemas)
+- `mediaBearingAuthoredContentBodySchema` (authored bodies without `imageKey`)
 - Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`)
 - `reconcileContentMedia`, `reclaimExpiredAssets`, `remapContentMediaForDuplicate`
-- `ResolvedContentMediaPresentation`, rendition presets, system asset manifest, system content image registry
-- `@rpg/ui` `MediaImage` / `MediaCompactPreview` (not mounted in product surfaces)
+- System content image registry (`SYSTEM_CONTENT_IMAGE_ENTRIES`)
 
 ## System artwork vs rendition fixture
 
-- **`SYSTEM_ASSET_MANIFEST`** (`system-asset-manifest.ts`) — upload/rendition fixture
-  dimensions for tests and resolver primitives (e.g. `/assets/system/class/fighter.webp`).
-- **`system-content-image-registry.ts`** — shipped SRD catalog artwork for opted-in
-  content types. Each registered file is one catalog entry (slug, path, dimensions,
-  and `presentation.treatment`). Paths follow
-  `assets/system/{imageSetId}/{contentType}/{assetRole}/{slug}.jpeg` and are served from
-  dashboard `public/`. Class and species primary art for `srd-cc-5.2.1` are registered
-  there with `white-paper-knockout` treatment; display resolves derived system sources
-  when `media.roles` is empty. The media manager and compact form field summary list
-  those virtual system sources alongside uploads (non-deletable, not copied into
-  `media.images`).
+- **`SYSTEM_ASSET_MANIFEST`** — upload/rendition fixture dimensions for tests.
+- **`system-content-image-registry.ts`** — shipped SRD catalog artwork (class and
+  species primary for `srd-cc-5.2.1`, `white-paper-knockout` treatment). The media
+  manager lists virtual system sources alongside uploads.
 
 ## Phase status
 
-| Phase                     | Status  | Notes                             |
-| ------------------------- | ------- | --------------------------------- |
-| 1 Contracts & crop proof  | Done    | Live schemas still use `imageKey` |
-| 2 Asset upload & delivery | Done    | Parallel to legacy `/api/uploads` |
-| 3 Attachment lifecycle    | Done    | Reconcile, leases, cleanup        |
-| 4 Resolver & derivatives  | Done    | Primitives not mounted in product |
-| 5 Media manager UI        | Done    | Dashboard manager + form fields   |
-| 6 Domain cutover          | Pending |                                   |
-| 7 Acceptance              | Pending |                                   |
+| Phase                     | Status |
+| ------------------------- | ------ |
+| 1 Contracts & crop proof  | Done   |
+| 2 Asset upload & delivery | Done   |
+| 3 Attachment lifecycle    | Done   |
+| 4 Resolver & derivatives  | Done   |
+| 5 Media manager UI        | Done   |
+| 6 Domain cutover          | Done   |
+| 7 Acceptance              | Done   |
 
-## Integration checklist (cutover — phase 6)
+## Out of scope
 
-### Render paths (dashboard)
+- Account avatar (`avatarKey`)
+- Legacy `POST /api/uploads` and `GET /api/uploads/:key` (parallel to media assets)
+- Character builder draft `imageKey` fingerprint (legacy field on sheet/draft; display
+  uses `media` only)
 
-- `apps/dashboard/src/features/content/lib/detail/page/content-image-url.ts`
-- `apps/dashboard/src/features/content/lib/entity/summary/entity-media.lib.tsx`
-- Content detail routes: class, species, spell, feat, equipment, location,
-  organization, skill-proficiency
-- Overview columns via `content-table-config.tsx`
-- Entity picker / connection drawers using `buildEntityMediaFromImageKey`
-
-### Character
-
-- Contracts: `character/sheet.ts`, builder draft identity, finalize input
-- API: `character.model.ts`, `to-character.ts`, `to-npc-character.ts`
-- Dashboard: builder identity image UI, builder class and species step primary
-  art (fallback placeholders omitted on cards and drawer heroes), import coverage
-
-### Campaign banner media
+## Campaign banner media
 
 - Campaign identity stores banner, primary, and emblem roles on `identity.media`
-- Create flow uploads banner media after campaign creation; failed uploads link
-  to settings with the identity media manager opened once
+- Create flow uploads banner media after campaign creation
 - Campaign overview hero renders the saved banner rendition (3:1 cover frame)
-
-### Out of scope (keep `imageKey` / legacy upload)
-
-- Spells, feats, skill-proficiencies, subclass patches, starting wealth
-- Account avatar (`avatarKey`)
-- Legacy `POST /api/uploads` and `GET /api/uploads/:key`
-
-### API / overlay
-
-- Register `media` on `patchReplaceKeys` per opted-in content config
-- Character and content write services: atomic media replacement + revision
-- Duplication, seeds, imports, system overlay merge

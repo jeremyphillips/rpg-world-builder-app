@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { contentDisplayImageSchema } from '../../../shared/media/content-display-image-dto'
 import { characterClassEntrySchema, characterSpeciesSchema } from '../character/sheet/core'
 import { characterVitalStateSchema } from '../character/sheet/character-vital'
 import { npcCharacterSchema } from '../character/sheet'
@@ -20,6 +21,7 @@ export const npcListCharacterSummarySchema = z.object({
   vital: characterVitalStateSchema,
   classes: z.array(characterClassEntrySchema).min(1),
   species: characterSpeciesSchema,
+  displayImage: contentDisplayImageSchema.optional(),
 })
 
 export type NpcListCharacterSummary = z.infer<typeof npcListCharacterSummarySchema>

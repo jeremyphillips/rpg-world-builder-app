@@ -7,7 +7,7 @@ import type {
 } from '@rpg/contracts'
 import { formatCharacterSummary, resolveCharacterSummaryParts } from '@rpg/contracts'
 
-import { resolveCharacterPrimaryDisplayImage } from './resolve-character-display-image.lib'
+import { resolveCharacterDisplayImageForSurface } from './resolve-character-display-image.lib'
 
 function isContentIndex(
   contentIndex:
@@ -47,7 +47,7 @@ export function buildCharacterCardSummaryDto(input: {
   const lookup = createCharacterSummaryLabelLookup(input.contentIndex)
   const parts = resolveCharacterSummaryParts(input.character, lookup)
 
-  const displayImage = resolveCharacterPrimaryDisplayImage(input.character)
+  const displayImage = resolveCharacterDisplayImageForSurface(input.character, 'compact')
 
   return {
     id: input.character.id,

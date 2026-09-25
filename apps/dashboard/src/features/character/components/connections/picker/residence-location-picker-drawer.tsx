@@ -1,13 +1,12 @@
 import * as React from 'react'
 
 import { resolveLocationClassificationDisplay } from '@rpg/contracts'
-import { Button, CatalogPickerSelectionActions, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
-import {
-  CatalogEntityPickerSheet,
-  CatalogEntityRow,
-  CatalogMetadataRenderer,
-} from '@/features/content'
+import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
+import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
+import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
+import { buildLocationEntityCardModelFromClassification } from '@/features/content/locations/lib/location-display'
 
 import { filterAndSortResidencePickerItems } from './residence-location-picker-drawer.lib'
 import {
@@ -87,7 +86,7 @@ export function ResidenceLocationPickerDrawer({
         const classification = resolveLocationClassificationDisplay(location)
 
         return (
-          <CatalogEntityRow
+          <CatalogEntitySurfaceRow
             toolbarLabel={args.toolbarLabel}
             domIds={args.domIds}
             collapsible={args.collapsible}
@@ -95,35 +94,25 @@ export function ResidenceLocationPickerDrawer({
             onToggleCollapse={args.onToggleCollapse}
             summary={args.summary}
             details={args.details}
-            entity={{
-              heading: location.name,
-              description: classification.text ? (
-                <CatalogMetadataRenderer
-                  lines={[
-                    {
-                      segments: [{ type: 'text', text: classification.text }],
-                    },
-                  ]}
-                />
-              ) : undefined,
-              status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
-            }}
-            trailing={
-              selected
+            surface={{
+              identity: buildLocationEntityCardModelFromClassification({
+                name: location.name,
+                classificationText: classification.text,
+                status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
+                displayImage: getContentDisplayImage(
+                  buildLocationContentDisplayImageInput(location, 'compact'),
+                ),
+              }),
+              inlineAction: selected
                 ? undefined
                 : {
-                    kind: 'action',
-                    content: (
-                      <CatalogPickerSelectionActions
-                        canSelect
-                        onAdd={() => {
-                          void commitResidence(location.id)
-                        }}
-                        onRemove={() => undefined}
-                      />
-                    ),
-                  }
-            }
+                    label: 'Add',
+                    onClick: () => {
+                      void commitResidence(location.id)
+                    },
+                    loading: pending,
+                  },
+            }}
           />
         )
       }}

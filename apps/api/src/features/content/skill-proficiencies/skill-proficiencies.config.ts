@@ -35,7 +35,6 @@ function toHomebrewSkillProficiency(doc: HomebrewDoc): SkillProficiency {
   return {
     ...homebrewContentEnvelope(record),
     name: record.name,
-    ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
     ...(record.ability !== undefined && { ability: record.ability }),
     examples: record.examples ?? [],

@@ -35,7 +35,6 @@ function toHomebrewSubclass(doc: HomebrewDoc): Subclass {
     ...homebrewContentEnvelope(record),
     name: record.name,
     classId: record.classId,
-    ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
     ...(record.tagline !== undefined && { tagline: record.tagline }),
     features: (record.features ?? []) as Subclass['features'],

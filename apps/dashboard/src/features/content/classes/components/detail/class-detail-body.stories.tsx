@@ -3,7 +3,6 @@ import { loadSeedSkillProficiencies } from '@rpg/catalog/skill-proficiencies'
 
 import { withDashboardProviders } from '../../../../../../.storybook/decorators'
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
-import { getContentImageUrl } from '../../../lib/detail/page/content-image-url'
 import { pickSubclassesForClass } from '../../../lib/fixtures/pick'
 import { FIGHTER } from '../../fixtures'
 import { buildClassDetailViewModel } from '../../lib/class-display'
@@ -28,7 +27,7 @@ type Story = StoryObj<typeof meta>
 export const Fighter: Story = {
   args: {
     name: FIGHTER.name,
-    imageUrl: getContentImageUrl(),
+    displayFallback: 'generic',
     imageName: FIGHTER.name,
     viewModel: buildClassDetailViewModel(FIGHTER, vocabulary, { surface: 'content-detail' }),
     subclasses: pickSubclassesForClass('fighter'),

@@ -672,6 +672,14 @@ export {
   type ContentCardRemoveButtonProps,
 } from './components/ui/content-card-parts.client'
 export {
+  ContentDisplayFallbackIcon,
+  type ContentDisplayFallbackIconProps,
+} from './components/ui/content-display-fallback-icon.client'
+export {
+  contentDisplayFallbackIconVariants,
+  type ContentDisplayFallbackIconSize,
+} from './components/ui/content-display-fallback-icon.variants'
+export {
   contentCardRootVariants,
   contentCardDensityInsetVariants,
   contentCardHeadingLinkVariants,

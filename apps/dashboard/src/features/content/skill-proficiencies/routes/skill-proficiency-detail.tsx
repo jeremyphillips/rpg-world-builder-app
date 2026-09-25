@@ -17,7 +17,6 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentStatRow } from '../../lib/detail/metadata/content-stat-row'
-import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentLinkBadge } from '../../lib/detail/metadata/content-link-badge'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { buildSkillProficiencyDetailViewModel } from '../lib/skill-proficiency-display'
@@ -94,7 +93,6 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
       <ContentDetailLayout
         name={skill.name}
         nameBadge={<ContentStatusNameBadge status={skill.status} />}
-        imageUrl={getContentImageUrl(skill.imageKey)}
         imageName={skill.name}
         campaignId={campaignId}
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}

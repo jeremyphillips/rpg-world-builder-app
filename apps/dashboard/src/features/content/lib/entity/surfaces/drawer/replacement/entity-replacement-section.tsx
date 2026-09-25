@@ -33,7 +33,8 @@ export function EntityReplacementSection({
           <EntityReplacementCurrentField
             label={labels.currentLabel}
             entity={current.entity}
-            imageKey={current.imageKey}
+            displayImage={current.displayImage}
+            fallback={current.fallback}
           />
           {current.unavailable ? (
             <Text variant="muted" className="mt-2 text-sm" role="status">

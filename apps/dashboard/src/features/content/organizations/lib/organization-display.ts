@@ -7,11 +7,19 @@ import {
   getOrganizationFormEntry,
   getOrganizationFormLabel,
   type Organization,
+  type OrganizationDomain,
   type OrganizationLocationConnectionFamily,
   type OrganizationLocationConnectionKind,
   type CharacterClass,
   type Species,
 } from '@rpg/contracts'
+
+import type { ContentDisplayImage } from '@rpg/contracts'
+
+import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import { buildOrganizationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
+import type { EntitySurfaceIdentity } from '../../lib/entity/summary/entity-surface-identity.types'
+import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import type { DrawerEntityPresentation } from '../../lib/entity/surfaces/drawer/drawer-entity.types'
@@ -30,6 +38,55 @@ export const ORGANIZATION_EMPTY_SECTION_TEXT = {
 } as const
 
 export const ORGANIZATION_DRAWER_CONTEXT_TYPE_SUFFIX = ' · Organization' as const
+
+export type OrganizationEntitySummaryVm = {
+  id: string
+  name: string
+  organizationDomain: OrganizationDomain
+  displayImage?: ContentDisplayImage
+}
+
+export function buildOrganizationEntitySummaryVm(
+  organization: Pick<
+    Organization,
+    'id' | 'name' | 'organizationDomain' | 'media' | 'slug' | 'source' | 'rulesetId'
+  >,
+): OrganizationEntitySummaryVm {
+  return {
+    id: organization.id,
+    name: organization.name,
+    organizationDomain: organization.organizationDomain,
+    displayImage: getContentDisplayImage(
+      buildOrganizationContentDisplayImageInput(
+        {
+          media: organization.media,
+          slug: organization.slug,
+          source: organization.source,
+          rulesetId: organization.rulesetId,
+        },
+        'compact',
+      ),
+    ),
+  }
+}
+
+export function buildOrganizationEntityCardModel(
+  vm: OrganizationEntitySummaryVm,
+  options: { metadata?: string; status?: readonly EntitySummaryStatusItem[] } = {},
+): EntitySurfaceIdentity {
+  return {
+    heading: vm.name,
+    fallback: 'organization',
+    classification: getOrganizationDomainLabel(vm.organizationDomain),
+    ...(options.metadata !== undefined
+      ? options.metadata
+        ? { metadata: options.metadata }
+        : {}
+      : {}),
+    ...(options.status && options.status.length > 0 ? { status: options.status } : {}),
+    ...(vm.displayImage ? { displayImage: vm.displayImage } : {}),
+  }
+}
 
 export function buildOrganizationDrawerEntityPresentation(
   organization: Pick<Organization, 'name'>,

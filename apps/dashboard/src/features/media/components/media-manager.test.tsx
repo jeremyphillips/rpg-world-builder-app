@@ -72,7 +72,7 @@ describe('MediaManager', () => {
     )
     expect(Boolean(screen.queryByRole('checkbox', { name: 'Banner' }))).toBe(domain === 'campaign')
     expect(Boolean(screen.queryByRole('checkbox', { name: 'Emblem' }))).toBe(
-      domain === 'campaign' || domain === 'organization',
+      domain === 'campaign' || domain === 'organization' || domain === 'location',
     )
     expect(screen.queryByRole('button', { name: 'Set as primary' })).not.toBeInTheDocument()
   })

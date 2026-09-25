@@ -23,7 +23,6 @@ export function toCharacter(doc: CharacterRecord): PcCharacter {
     characterType: 'pc',
     userId: doc.userId,
     name: doc.name,
-    imageKey: doc.imageKey ?? undefined,
     media: doc.media ?? undefined,
     rulesetId: doc.rulesetId,
     classes: doc.classes,

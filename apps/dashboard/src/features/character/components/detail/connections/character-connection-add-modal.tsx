@@ -7,10 +7,18 @@ import {
 import { Button, Modal, SelectField, Text } from '@rpg/ui'
 
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
+import { buildCharacterEntityCardModel } from '../../../lib/display/character-entity-summary.lib'
 import {
   buildCharacterPickerOptionEntitySummary,
   buildCharacterPickerOptionSearchText,
 } from '../../../lib/picker/character-picker-option.lib'
+import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
+import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
+import { buildLocationEntityCardModelFromClassification } from '@/features/content/locations/lib/location-display'
+import {
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from '@/features/content/organizations/lib/organization-display'
 import {
   PERSON_CONNECTION_ROLE_OPTIONS,
   PLACE_CONNECTION_ROLE_OPTIONS,
@@ -225,9 +233,16 @@ export function CharacterConnectionAddModal({
                       return {
                         item: character.id,
                         key: character.id,
-                        heading: summary.name,
-                        description: summary.identitySummary,
                         searchText: buildCharacterPickerOptionSearchText(character),
+                        surface: {
+                          identity: buildCharacterEntityCardModel(summary, {
+                            includeCharacterTypeInMetadata: true,
+                          }),
+                          inlineAction: {
+                            label: 'Select',
+                            onClick: () => undefined,
+                          },
+                        },
                       }
                     })
                   : sectionId === 'organizations'
@@ -240,25 +255,72 @@ export function CharacterConnectionAddModal({
                       ).map(({ organization, selected }) => ({
                         item: organization.id,
                         key: organization.id,
-                        heading: organization.name,
-                        description: organization.organizationDomain,
                         searchText: getOrganizationPickerSearchText(organization),
-                        disabled: selected,
+                        surface: {
+                          identity: buildOrganizationEntityCardModel(
+                            buildOrganizationEntitySummaryVm(organization),
+                          ),
+                          inlineAction: {
+                            label: 'Select',
+                            onClick: () => undefined,
+                            disabled: selected,
+                          },
+                        },
                       }))
                     : sectionId === 'places'
                       ? sheetData.allLocations.map((location) => ({
                           item: location.id,
                           key: location.id,
-                          heading: location.name,
-                          description: resolveLocationClassificationDisplay(location).text,
                           searchText: location.name,
+                          surface: {
+                            identity: buildLocationEntityCardModelFromClassification({
+                              name: location.name,
+                              classificationText:
+                                resolveLocationClassificationDisplay(location).text,
+                              displayImage: getContentDisplayImage(
+                                buildLocationContentDisplayImageInput(
+                                  {
+                                    media: location.media,
+                                    slug: location.slug,
+                                    source: location.source,
+                                    rulesetId: location.rulesetId,
+                                  },
+                                  'compact',
+                                ),
+                              ),
+                            }),
+                            inlineAction: {
+                              label: 'Select',
+                              onClick: () => undefined,
+                            },
+                          },
                         }))
                       : sheetData.eligiblePropertyLocations.map((location) => ({
                           item: location.id,
                           key: location.id,
-                          heading: location.name,
-                          description: resolveLocationClassificationDisplay(location).text,
                           searchText: location.name,
+                          surface: {
+                            identity: buildLocationEntityCardModelFromClassification({
+                              name: location.name,
+                              classificationText:
+                                resolveLocationClassificationDisplay(location).text,
+                              displayImage: getContentDisplayImage(
+                                buildLocationContentDisplayImageInput(
+                                  {
+                                    media: location.media,
+                                    slug: location.slug,
+                                    source: location.source,
+                                    rulesetId: location.rulesetId,
+                                  },
+                                  'compact',
+                                ),
+                              ),
+                            }),
+                            inlineAction: {
+                              label: 'Select',
+                              onClick: () => undefined,
+                            },
+                          },
                         }))
               }
               searchPlaceholder={

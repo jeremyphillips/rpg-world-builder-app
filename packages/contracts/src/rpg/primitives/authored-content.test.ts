@@ -8,16 +8,14 @@ describe('authoredContentBodySchema', () => {
       authoredContentBodySchema.parse({
         name: 'The Silver Compass',
         description: '<p>A far-reaching explorers guild.</p>',
-        imageKey: 'organizations/silver-compass.webp',
       }),
     ).toEqual({
       name: 'The Silver Compass',
       description: '<p>A far-reaching explorers guild.</p>',
-      imageKey: 'organizations/silver-compass.webp',
     })
   })
 
-  it('requires a non-empty name while leaving prose and artwork optional', () => {
+  it('requires a non-empty name while leaving prose optional', () => {
     expect(authoredContentBodySchema.parse({ name: 'The Silver Compass' })).toEqual({
       name: 'The Silver Compass',
     })

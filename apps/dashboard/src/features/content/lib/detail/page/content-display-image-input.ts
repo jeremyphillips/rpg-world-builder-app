@@ -3,15 +3,13 @@ import type {
   ContentMedia,
   ContentSource,
   ContentTypeKey,
-  MediaRole,
   Species,
 } from '@rpg/contracts'
 
-import type { ResolveDashboardContentDisplayImageInput } from './content-display-image'
+import type { ResolveDashboardContentDisplayInput } from './content-display-image'
 
 export type ContentDisplayImageRecord = {
   media?: ContentMedia | null
-  imageKey?: string
   slug: string
   source: ContentSource
   rulesetId?: string
@@ -20,7 +18,6 @@ export type ContentDisplayImageRecord = {
 /** Preview forms carry the same identity image fields as persisted content records. */
 export type ContentPreviewDisplayImageValues = {
   media?: ContentMedia | null
-  imageKey?: string
   slug?: string
 }
 
@@ -28,49 +25,67 @@ export type ContentPreviewDisplayImageValues = {
 export function buildContentDisplayImageInput(
   contentType: ContentTypeKey,
   record: ContentDisplayImageRecord,
-  role?: MediaRole,
-): ResolveDashboardContentDisplayImageInput {
+  surface: ResolveDashboardContentDisplayInput['surface'] = 'detail',
+): ResolveDashboardContentDisplayInput {
   return {
     media: record.media,
-    imageKey: record.imageKey,
     contentType,
     slug: record.slug,
     contentSource: record.source,
     rulesetId: record.rulesetId,
-    role,
+    surface,
   }
 }
 
 export function buildClassContentDisplayImageInput(
   characterClass: CharacterClass,
-  role?: MediaRole,
-): ResolveDashboardContentDisplayImageInput {
+  surface: ResolveDashboardContentDisplayInput['surface'] = 'detail',
+): ResolveDashboardContentDisplayInput {
   return buildContentDisplayImageInput(
     'classes',
     {
       media: characterClass.media,
-      imageKey: characterClass.imageKey,
       slug: characterClass.slug,
       source: characterClass.source,
       rulesetId: characterClass.rulesetId,
     },
-    role,
+    surface,
   )
 }
 
 export function buildSpeciesContentDisplayImageInput(
   species: Species,
-  role?: MediaRole,
-): ResolveDashboardContentDisplayImageInput {
+  surface: ResolveDashboardContentDisplayInput['surface'] = 'detail',
+): ResolveDashboardContentDisplayInput {
   return buildContentDisplayImageInput(
     'species',
     {
       media: species.media,
-      imageKey: species.imageKey,
       slug: species.slug,
       source: species.source,
       rulesetId: species.rulesetId,
     },
-    role,
+    surface,
   )
+}
+
+export function buildLocationContentDisplayImageInput(
+  location: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'source' | 'rulesetId'>,
+  surface: ResolveDashboardContentDisplayInput['surface'] = 'compact',
+): ResolveDashboardContentDisplayInput {
+  return buildContentDisplayImageInput('locations', location, surface)
+}
+
+export function buildOrganizationContentDisplayImageInput(
+  organization: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'source' | 'rulesetId'>,
+  surface: ResolveDashboardContentDisplayInput['surface'] = 'compact',
+): ResolveDashboardContentDisplayInput {
+  return buildContentDisplayImageInput('organizations', organization, surface)
+}
+
+export function buildEquipmentContentDisplayImageInput(
+  equipment: Pick<ContentDisplayImageRecord, 'media' | 'slug' | 'source' | 'rulesetId'>,
+  surface: ResolveDashboardContentDisplayInput['surface'] = 'compact',
+): ResolveDashboardContentDisplayInput {
+  return buildContentDisplayImageInput('equipment', equipment, surface)
 }

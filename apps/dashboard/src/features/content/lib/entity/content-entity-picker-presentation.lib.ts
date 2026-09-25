@@ -1,95 +1,77 @@
 import type { ReactNode } from 'react'
 import type { Organization } from '@rpg/contracts'
-import { getOrganizationDomainLabel } from '@rpg/contracts'
 import type { ContentCardDensity } from '@rpg/ui'
 
-import { buildCharacterEntityContextPresentation } from '@/features/character'
+import { buildCharacterEntityCardModel } from '@/features/character/lib/display/character-entity-summary.lib'
 
 import {
-  buildLocationEntityContextPresentation,
+  buildLocationEntityCardModel,
   type LocationEntitySummaryVm,
 } from '../../locations/lib/location-display'
 import {
   buildConnectedPartyCharacterEntitySummary,
   type LocationConnectedPartyCharacterOption,
 } from '../../locations/lib/connected-parties/location-connected-party-character-options.lib'
+import {
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from '../../organizations/lib/organization-display'
 
-import { buildEntityMediaFromImageKey } from './summary/entity-media.lib'
+import { projectEntitySurfaceIdentityToSummaryModel } from './surfaces/entity-surface-projection.lib'
 import type { EntitySummaryModel } from './summary/entity-summary.types'
 
 type EntitySummaryAdapterOptions = {
-  imageKey?: string
   description?: ReactNode
   density?: ContentCardDensity
 }
 
-function resolveEntityMedia(
-  imageKey: string | undefined,
-  heading: EntitySummaryModel['heading'],
-  density: ContentCardDensity,
-): ReactNode | undefined {
-  if (!imageKey) {
-    return undefined
+function projectPickerIdentity(
+  identity: ReturnType<typeof buildLocationEntityCardModel>,
+  options: EntitySummaryAdapterOptions,
+): EntitySummaryModel {
+  const density = options.density ?? 'compact'
+  const model = projectEntitySurfaceIdentityToSummaryModel(identity, density)
+
+  if (options.description !== undefined) {
+    return { ...model, description: options.description }
   }
 
-  const alt = typeof heading === 'string' ? heading : ''
-  return buildEntityMediaFromImageKey(imageKey, alt, density)
-}
-
-function stripLeadingClassificationSeparator(classification: string): string {
-  return classification.startsWith(' · ') ? classification.slice(3) : classification
+  return model
 }
 
 export function buildLocationPickerEntitySummary(
   summary: LocationEntitySummaryVm,
   options: EntitySummaryAdapterOptions = {},
 ): EntitySummaryModel {
-  const presentation = buildLocationEntityContextPresentation(summary)
-  const density = options.density ?? 'compact'
-
-  return {
-    heading: presentation.heading,
-    classification: presentation.headingSuffix
-      ? stripLeadingClassificationSeparator(presentation.headingSuffix)
-      : undefined,
-    description: options.description ?? presentation.supportingText,
-    media: resolveEntityMedia(options.imageKey ?? summary.imageKey, presentation.heading, density),
-  }
+  return projectPickerIdentity(buildLocationEntityCardModel(summary), options)
 }
 
 export function buildOrganizationPickerEntitySummary(
-  organization: Pick<Organization, 'name' | 'organizationDomain' | 'imageKey'>,
+  organization: Pick<
+    Organization,
+    'id' | 'name' | 'organizationDomain' | 'media' | 'slug' | 'source' | 'rulesetId'
+  >,
   options: EntitySummaryAdapterOptions = {},
 ): EntitySummaryModel {
-  const density = options.density ?? 'compact'
-
-  return {
-    heading: organization.name,
-    classification: getOrganizationDomainLabel(organization.organizationDomain),
-    description: options.description,
-    media: resolveEntityMedia(
-      options.imageKey ?? organization.imageKey,
-      organization.name,
-      density,
-    ),
-  }
+  return projectPickerIdentity(
+    buildOrganizationEntityCardModel(buildOrganizationEntitySummaryVm(organization)),
+    options,
+  )
 }
 
 export function buildCharacterPickerEntitySummary(
   character: LocationConnectedPartyCharacterOption,
   options: EntitySummaryAdapterOptions = {},
 ): EntitySummaryModel {
-  const presentation = buildCharacterEntityContextPresentation(
-    buildConnectedPartyCharacterEntitySummary(character),
-  )
-  const density = options.density ?? 'compact'
+  const vm = buildConnectedPartyCharacterEntitySummary(character)
+  const identity = buildCharacterEntityCardModel(vm, { includeCharacterTypeInMetadata: true })
 
-  return {
-    heading: presentation.heading,
-    classification: presentation.headingSuffix
-      ? stripLeadingClassificationSeparator(presentation.headingSuffix)
-      : undefined,
-    description: options.description ?? presentation.supportingText,
-    media: resolveEntityMedia(options.imageKey, presentation.heading, density),
+  const density = options.density ?? 'compact'
+  const model = projectEntitySurfaceIdentityToSummaryModel(identity, density)
+
+  if (options.description !== undefined) {
+    return { ...model, description: options.description }
   }
+
+  return model
 }

@@ -1,21 +1,17 @@
 import * as React from 'react'
 
 import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Button, Text, CatalogPickerSelectionActions } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import {
-  formatCharacterInlineSummary,
+  buildCharacterEntityCardModel,
   ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   OrganizationMembershipTitleField,
   titleFromMembershipRadioValue,
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
 
-import {
-  CatalogEntityPickerSheet,
-  CatalogEntityRow,
-  CatalogMetadataRenderer,
-} from '@/features/content'
+import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
 
 import {
   buildConnectedPartyCharacterEntitySummary,
@@ -61,10 +57,32 @@ export type OrganizationMemberPickerDrawerProps = {
   candidatesLoading?: boolean
 }
 
-function formatCandidateIdentityLine(candidate: OrganizationMemberPickerCandidate): string {
-  return formatCharacterInlineSummary(buildConnectedPartyCharacterEntitySummary(candidate), {
-    includeCharacterType: true,
-  })
+function buildMemberPickerSurface(candidate: OrganizationMemberPickerCandidate) {
+  const vm = buildConnectedPartyCharacterEntitySummary(candidate)
+
+  return {
+    identity: buildCharacterEntityCardModel(vm, {
+      includeCharacterTypeInMetadata: true,
+      status: candidate.isMember
+        ? [
+            {
+              kind: 'badge' as const,
+              label: formatOrganizationMemberPickerStatusBadgeLabel(candidate.membershipTitle),
+              tone: 'success' as const,
+            },
+          ]
+        : candidate.isRecommended
+          ? [
+              {
+                kind: 'badge' as const,
+                label: ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL,
+                appearance: 'outline' as const,
+                tone: 'info' as const,
+              },
+            ]
+          : undefined,
+    }),
+  }
 }
 
 export function OrganizationMemberPickerDrawer({
@@ -195,9 +213,10 @@ export function OrganizationMemberPickerDrawer({
       onExpandedItemChange={handleExpandedItemChange}
       renderEntityRow={(args) => {
         const candidate = args.item
+        const surface = buildMemberPickerSurface(candidate)
 
         return (
-          <CatalogEntityRow
+          <CatalogEntitySurfaceRow
             toolbarLabel={args.toolbarLabel}
             domIds={args.domIds}
             collapsible={args.collapsible}
@@ -205,52 +224,15 @@ export function OrganizationMemberPickerDrawer({
             onToggleCollapse={args.onToggleCollapse}
             summary={args.summary}
             details={args.details}
-            entity={{
-              heading: candidate.name,
-              description: formatCandidateIdentityLine(candidate) ? (
-                <CatalogMetadataRenderer
-                  lines={[
-                    {
-                      segments: [{ type: 'text', text: formatCandidateIdentityLine(candidate)! }],
-                    },
-                  ]}
-                />
-              ) : undefined,
-              status: candidate.isMember
-                ? [
-                    {
-                      kind: 'badge',
-                      label: formatOrganizationMemberPickerStatusBadgeLabel(
-                        candidate.membershipTitle,
-                      ),
-                      tone: 'success',
-                    },
-                  ]
-                : candidate.isRecommended
-                  ? [
-                      {
-                        kind: 'badge',
-                        label: ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL,
-                        appearance: 'outline',
-                        tone: 'info',
-                      },
-                    ]
-                  : undefined,
-            }}
-            trailing={
-              candidate.isMember
+            surface={{
+              identity: surface.identity,
+              inlineAction: candidate.isMember
                 ? undefined
                 : {
-                    kind: 'action',
-                    content: (
-                      <CatalogPickerSelectionActions
-                        canSelect
-                        onAdd={() => handleExpandedItemChange(candidate.id)}
-                        onRemove={() => undefined}
-                      />
-                    ),
-                  }
-            }
+                    label: 'Add',
+                    onClick: () => handleExpandedItemChange(candidate.id),
+                  },
+            }}
           />
         )
       }}

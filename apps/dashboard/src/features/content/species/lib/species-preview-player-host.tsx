@@ -48,14 +48,14 @@ export function SpeciesPreviewPlayerHost({
                 {
                   media:
                     (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
-                  imageKey: (values as ContentPreviewDisplayImageValues).imageKey,
                   slug: values.slug ?? 'preview',
                   source: ctx.entitySource ?? 'homebrew',
                   rulesetId: ctx.rulesetId,
                 },
-                'primary',
+                'detail',
               ),
             )}
+            displayFallback="generic"
             imageName={name}
             viewModel={viewModel}
             campaignId={ctx.campaignId ?? ''}

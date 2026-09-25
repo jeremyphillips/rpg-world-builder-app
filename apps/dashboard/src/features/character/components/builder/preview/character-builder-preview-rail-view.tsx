@@ -5,8 +5,6 @@ import type {
   ChoiceSet,
 } from '@rpg/contracts'
 import { PreviewRail, type PreviewRailLayout } from '@rpg/ui'
-import { User } from 'lucide-react'
-
 import { ContentPreviewRailMedia } from '@/features/content/lib/forms/preview/content-preview-rail-media'
 import { resolveCharacterPrimaryDisplayImage } from '../../../lib/display/resolve-character-display-image'
 
@@ -116,7 +114,7 @@ export function CharacterBuilderPreviewRailView({
         media={
           <ContentPreviewRailMedia
             displayImage={resolveCharacterPrimaryDisplayImage(draft.identity)}
-            fallbackIcon={<User />}
+            fallback="character"
           />
         }
         name={projection.identity.name}

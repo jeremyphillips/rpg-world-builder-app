@@ -99,7 +99,7 @@ describe('card image instance matrix', () => {
       render: () => (
         <ContentPreviewRailMedia
           displayImage={{ src: '/spell.png', sourceKind: 'upload', crop: PRIMARY_CROP }}
-          fallbackIcon={<User aria-hidden />}
+          fallback="character"
         />
       ),
       assert: (container: HTMLElement) => {
@@ -109,7 +109,7 @@ describe('card image instance matrix', () => {
     },
     {
       name: 'character builder preview rail fallback user icon',
-      render: () => <ContentPreviewRailMedia fallbackIcon={<User aria-hidden />} />,
+      render: () => <ContentPreviewRailMedia fallback="character" />,
       assert: (container: HTMLElement) => {
         expect(container.firstElementChild).toHaveClass('size-10')
         expect(container.querySelector('img')).toBeNull()

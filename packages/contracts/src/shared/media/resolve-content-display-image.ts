@@ -1,18 +1,23 @@
-import { getAssetUrl } from '../assets'
 import type { ContentSource } from '../../rpg/content/lib/envelope'
 import type { ContentTypeKey } from '../../rpg/primitives/content/content-type-keys'
 import type { ContentMedia } from './content-media'
 import { isSystemRoleAssignment, type ContentMediaSystemSource } from './content-media-source'
+import type { ContentDisplaySurface } from './content-display-surface'
+import {
+  resolveContentDisplayFallbackForDomain,
+  type ContentDisplayFallback,
+} from './content-display-fallback'
 import { asCropPresentation } from './role-presentation'
 import type { NormalizedCrop } from './geometry'
 import type { MediaRole } from './roles'
+import { getContentMediaPolicy, type ContentMediaDomain } from './media-policy'
 import {
   resolveContentImageSet,
   resolveSystemContentImage,
   resolveSystemContentImageSourceDimensionsFromPath,
 } from './system-content-image-registry'
 
-export const CONTENT_DISPLAY_IMAGE_SOURCE_KINDS = ['system', 'upload', 'fallback'] as const
+export const CONTENT_DISPLAY_IMAGE_SOURCE_KINDS = ['system', 'upload'] as const
 
 export type ContentDisplayImageSourceKind = (typeof CONTENT_DISPLAY_IMAGE_SOURCE_KINDS)[number]
 
@@ -28,16 +33,19 @@ export type ContentDisplayImage = {
 
 export type ResolveContentDisplayImageInput = {
   media?: ContentMedia | null
-  imageKey?: string
+  surface: ContentDisplaySurface
+  domain: ContentMediaDomain
   contentType: ContentTypeKey
   slug: string
   contentSource: ContentSource
   rulesetId?: string
   campaignImageSetId?: string
-  role?: MediaRole
   resolveUploadSrc?: (assetId: string) => string | undefined
-  fallbackSrc: string
 }
+
+export type ResolveContentDisplayImageResult =
+  | { outcome: 'image'; display: ContentDisplayImage }
+  | { outcome: 'fallback'; fallback: ContentDisplayFallback }
 
 function resolveUploadAssignmentSrc(
   media: ContentMedia,
@@ -65,15 +73,26 @@ function presentationTreatmentFromSystemImage(
   return presentation?.treatment === 'white-paper-knockout' ? 'white-paper-knockout' : undefined
 }
 
-/** Resolve the effective display image for a content record presentation role. */
-export function resolveContentDisplayImage(
+function resolveRolesForSurface(
+  surface: ContentDisplaySurface,
+  domain: ContentMediaDomain,
+): readonly MediaRole[] {
+  const policy = getContentMediaPolicy(domain)
+  if (surface === 'compact') {
+    return policy.representativeRoles
+  }
+  if (surface === 'detail') {
+    return ['primary']
+  }
+  const representative = policy.representativeRoles[0]
+  return representative ? [representative] : ['primary']
+}
+
+function resolveDisplayImageForRole(
   input: ResolveContentDisplayImageInput,
-): ContentDisplayImage {
-  const role = input.role ?? 'primary'
-  const imageSetId = resolveContentImageSet({
-    campaignImageSetId: input.campaignImageSetId,
-    rulesetId: input.rulesetId,
-  })
+  role: MediaRole,
+  imageSetId: string,
+): ContentDisplayImage | undefined {
   const assignment = input.media?.roles[role]
 
   if (assignment) {
@@ -104,7 +123,7 @@ export function resolveContentDisplayImage(
   const derivedResolved = resolveSystemContentImage({
     imageSetId,
     contentType: input.contentType,
-    assetRole: 'primary',
+    assetRole: role,
     slug: input.slug,
     contentSource: input.contentSource,
   })
@@ -116,11 +135,38 @@ export function resolveContentDisplayImage(
     }
   }
 
-  if (input.imageKey) {
-    return { src: getAssetUrl(input.imageKey), sourceKind: 'upload' }
+  return undefined
+}
+
+/** Resolve display image or semantic fallback for a content record and surface. */
+export function resolveContentDisplayImage(
+  input: ResolveContentDisplayImageInput,
+): ResolveContentDisplayImageResult {
+  const imageSetId = resolveContentImageSet({
+    campaignImageSetId: input.campaignImageSetId,
+    rulesetId: input.rulesetId,
+  })
+  const roles = resolveRolesForSurface(input.surface, input.domain)
+
+  for (const role of roles) {
+    const display = resolveDisplayImageForRole(input, role, imageSetId)
+    if (display) {
+      return { outcome: 'image', display }
+    }
   }
 
-  return { src: input.fallbackSrc, sourceKind: 'fallback' }
+  return {
+    outcome: 'fallback',
+    fallback: resolveContentDisplayFallbackForDomain(input.domain),
+  }
+}
+
+/** Wire DTO helper — omits display image when only a semantic fallback applies. */
+export function resolveContentDisplayImageAsOptional(
+  input: ResolveContentDisplayImageInput,
+): ContentDisplayImage | undefined {
+  const result = resolveContentDisplayImage(input)
+  return result.outcome === 'image' ? result.display : undefined
 }
 
 export function resolveContentDisplayImageSourceDimensions(

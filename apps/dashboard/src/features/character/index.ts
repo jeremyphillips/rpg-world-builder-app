@@ -132,6 +132,8 @@ export {
   formatCharacterInlineSummary,
   formatCharacterMixedHeadingSuffix,
   buildCharacterEntityContextPresentation,
+  buildCharacterEntityCardModel,
+  type BuildCharacterEntityCardModelOptions,
   resolveCharacterControllerDisplay,
   normalizePartyController,
   normalizeListController,
