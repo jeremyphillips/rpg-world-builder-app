@@ -8,7 +8,10 @@ identity area, campaign settings, and the character builder identity step.
 
 ## Integration contract
 
-`ManagedMediaField` is the form-facing adapter. Its `MediaFieldConfig` keeps the
+`ManagedMediaField` is the form-facing adapter; `DetailMediaField` is the detail-page
+adapter (compact preview, `readOnly` empty `Image` icon, `mode: 'detail'` saves).
+Both use `buildMediaFieldSummaryModel` for representative images and counts.
+`ManagedMediaField` keeps the form-facing `MediaFieldConfig` that keeps the
 domain, collection constraint, and presentation separate from persisted
 `ContentMedia`. Compact summaries are used by content form headers; campaign
 settings and the character Identity step use the expanded presentation. The adapter

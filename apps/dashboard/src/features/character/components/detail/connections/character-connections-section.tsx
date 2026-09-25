@@ -149,7 +149,7 @@ export function CharacterConnectionsSection({
       {canEdit ? (
         <>
           <CharacterConnectionAddModal
-            key={addSectionId ?? 'closed'}
+            key={addSectionId ?? 'add-closed'}
             open={addSectionId !== null}
             sectionId={addSectionId}
             sheetData={sheet.sheetData}
@@ -164,7 +164,7 @@ export function CharacterConnectionsSection({
           />
 
           <CharacterConnectionEditModal
-            key={sheet.editingRow?.relationshipId ?? 'closed'}
+            key={sheet.editingRow?.relationshipId ?? 'edit-closed'}
             open={sheet.editingRow !== null}
             row={sheet.editingRow}
             sheetData={sheet.sheetData}

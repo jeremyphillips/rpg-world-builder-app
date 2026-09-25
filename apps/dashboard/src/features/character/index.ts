@@ -43,7 +43,13 @@ export { useDeleteCharacter } from './hooks/use-delete-character'
 export { CharacterBuilderPageShell } from './components/builder/character-builder-page-shell'
 export { CharacterBuilderShell } from './components/builder/character-builder-shell'
 export { CampaignCharacterStatusSummary } from './components/detail/status/campaign-character-status-summary'
+export { CampaignParticipatingCharacterStatusEditAction } from './components/detail/status/campaign-participating-character-status-edit-action'
+export {
+  toCampaignParticipatingCharacterStatusPatch,
+  toCampaignParticipatingCharacterStatusEditorValues,
+} from './lib/campaign-participating-character-status.lib'
 export { CharacterDetailContent } from './components/detail/character-detail-content'
+export { CharacterDetailRouteMedia } from './components/detail/sheet/character-detail-route-media'
 export { CharacterIdentityConnectionsSupplement } from './components/detail/memberships/character-identity-connections-supplement'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'
 export { BuilderInventoryRemoveAction } from './components/builder/inventory/builder-inventory-remove-action'

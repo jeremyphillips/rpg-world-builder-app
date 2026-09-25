@@ -1,7 +1,10 @@
 import type { Agent } from 'supertest'
 import { describe, expect, it } from 'vitest'
 
+import { MEDIA_UPLOAD_FORM_FIELD } from '@rpg/contracts'
+
 import { CSRF_HEADER } from '../../lib/cookies'
+import { MINIMAL_PNG_BUFFER } from '../../test/fixtures/media-images'
 import { CampaignCharacterParticipationModel } from '../campaign'
 import { CampaignMembershipModel } from '../campaign'
 import { createTestCampaign, registerAndLoginTestUser } from '../../test/auth-agent'
@@ -468,6 +471,187 @@ describe('GET /api/campaigns/:campaignId/characters/:characterId', () => {
       .expect(403)
 
     expect(response.body.error.code).toBe('forbidden')
+  })
+})
+
+async function uploadScopedAsset(
+  agent: Agent,
+  csrfToken: string,
+  scope: { kind: string; campaignId?: string; userId?: string },
+): Promise<string> {
+  const sessionRes = await agent
+    .post('/api/media/sessions')
+    .set(CSRF_HEADER, csrfToken)
+    .send({ scope })
+    .expect(201)
+  const sessionId = sessionRes.body.id as string
+  const uploadRes = await agent
+    .post(`/api/media/sessions/${sessionId}/assets`)
+    .set(CSRF_HEADER, csrfToken)
+    .attach(MEDIA_UPLOAD_FORM_FIELD, MINIMAL_PNG_BUFFER, 'tiny.png')
+    .expect(201)
+  return uploadRes.body.asset.id as string
+}
+
+describe('PATCH /api/campaigns/:campaignId/characters/:characterId/media', () => {
+  const emptyMediaPatch = {
+    expectedMediaRevision: 0,
+    media: { revision: 0, images: [], roles: {} },
+  }
+
+  it('allows a campaign manager to update a peer PC media record', async () => {
+    const owner = await registerOwner('campaign-char-media-owner@example.com')
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken, 'Peer Media Campaign')
+    await seedParticipatingPc({
+      campaignId,
+      ownerAgent: owner.agent,
+      ownerCsrfToken: owner.csrfToken,
+      ownerUserId: owner.userId,
+    })
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-media-player@example.com',
+      campaignRole: 'pc',
+    })
+    const playerCharacterId = await createCharacter(player.agent, player.csrfToken, 'Player PC')
+    await seedCharacterParticipation({ campaignId, characterId: playerCharacterId })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: player.userId,
+      controlledCharacterIds: [playerCharacterId],
+    })
+
+    const response = await owner.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${playerCharacterId}/media`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send(emptyMediaPatch)
+      .expect(200)
+
+    expect(response.body.character.id).toBe(playerCharacterId)
+    expect(response.body.character.media).toMatchObject({
+      revision: 1,
+      images: [],
+      roles: {},
+    })
+    expect(response.body.capabilities.canManage).toBe(true)
+  })
+
+  it('lets the character owner read manager-uploaded campaign-pc assets attached to their sheet', async () => {
+    const owner = await registerOwner('campaign-char-media-read-owner@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Peer Media Read Campaign',
+    )
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-media-read-player@example.com',
+      campaignRole: 'pc',
+    })
+    const playerCharacterId = await createCharacter(player.agent, player.csrfToken, 'Player PC')
+    await seedCharacterParticipation({ campaignId, characterId: playerCharacterId })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: player.userId,
+      controlledCharacterIds: [playerCharacterId],
+    })
+
+    const assetId = await uploadScopedAsset(owner.agent, owner.csrfToken, {
+      kind: 'campaign-pc',
+      campaignId,
+    })
+
+    const imageId = 'mgr-upload-1'
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${playerCharacterId}/media`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        expectedMediaRevision: 0,
+        media: {
+          revision: 0,
+          images: [{ id: imageId, assetId, alt: '' }],
+          roles: {},
+        },
+      })
+      .expect(200)
+
+    await player.agent.get(`/api/media/assets/${assetId}/renditions/compact-identity`).expect(200)
+  })
+
+  it('forbids a peer PC from updating another player character media', async () => {
+    const owner = await registerOwner('campaign-char-media-peer-owner@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Peer Media Forbidden Campaign',
+    )
+    await seedParticipatingPc({
+      campaignId,
+      ownerAgent: owner.agent,
+      ownerCsrfToken: owner.csrfToken,
+      ownerUserId: owner.userId,
+      characterName: 'Owner PC',
+    })
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-media-peer-player@example.com',
+      campaignRole: 'pc',
+    })
+    const playerCharacterId = await createCharacter(player.agent, player.csrfToken, 'Player PC')
+    await seedCharacterParticipation({ campaignId, characterId: playerCharacterId })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: player.userId,
+      controlledCharacterIds: [playerCharacterId],
+    })
+
+    const ownerCharacter = await owner.agent.get('/api/characters').expect(200)
+    const ownerCharacterId = ownerCharacter.body.characters[0]?.id as string
+
+    await player.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${ownerCharacterId}/media`)
+      .set(CSRF_HEADER, player.csrfToken)
+      .send(emptyMediaPatch)
+      .expect(403)
+  })
+})
+
+describe('PATCH /api/campaigns/:campaignId/characters/:characterId/status', () => {
+  it('allows a campaign manager to update vital and roster for a peer PC', async () => {
+    const owner = await registerOwner('campaign-char-status-owner@example.com')
+    const campaignId = await createTestCampaign(
+      owner.agent,
+      owner.csrfToken,
+      'Peer Status Campaign',
+    )
+
+    const player = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'campaign-char-status-player@example.com',
+      campaignRole: 'pc',
+    })
+    const playerCharacterId = await createCharacter(player.agent, player.csrfToken, 'Player PC')
+    await seedCharacterParticipation({ campaignId, characterId: playerCharacterId })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: player.userId,
+      controlledCharacterIds: [playerCharacterId],
+    })
+
+    const response = await owner.agent
+      .patch(`/api/campaigns/${campaignId}/characters/${playerCharacterId}/status`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        vital: { status: 'deceased', note: 'Fallen in battle' },
+        roster: { status: 'inactive', note: 'Removed from active play' },
+      })
+      .expect(200)
+
+    expect(response.body.character.vital.status).toBe('deceased')
+    expect(response.body.participation.roster.status).toBe('inactive')
   })
 })
 

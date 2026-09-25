@@ -20,6 +20,7 @@ function scopeFields(scope: MediaScope): ScopeFields {
     case 'campaign-content':
     case 'campaign-identity':
     case 'campaign-npc':
+    case 'campaign-pc':
       return { scopeKind: scope.kind, scopeKey, campaignId: scope.campaignId }
     case 'user-pc':
       return { scopeKind: scope.kind, scopeKey, userId: scope.userId }
@@ -129,6 +130,10 @@ export async function findMediaReferencesForSubject(
   return MediaReferenceModel.find({ subjectKind: subject.kind, subjectId: subject.id })
     .session(options?.session ?? null)
     .lean<MediaReferenceDoc[]>()
+}
+
+export async function findMediaReferencesForAssetId(assetId: string): Promise<MediaReferenceDoc[]> {
+  return MediaReferenceModel.find({ assetId }).lean<MediaReferenceDoc[]>()
 }
 
 export async function deleteMediaReferencesForSubject(

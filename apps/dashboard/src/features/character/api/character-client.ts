@@ -3,6 +3,7 @@ import {
   contentDeletionResultSchema,
   fetchCsrfToken,
   getCharacterBuilderChromeMessages,
+  type CharacterMediaPatchInput,
   type CharacterRoutingContextResponse,
   type ContentDeletionResult,
   type CreateCharacterInput,
@@ -11,7 +12,9 @@ import {
   type SystemRulesetId,
 } from '@rpg/contracts'
 
-import { CSRF_HEADER, postJson, request } from '@/lib/api-client'
+import { CSRF_HEADER, patchJson, postJson, request } from '@/lib/api-client'
+
+const PATCH_CHARACTER_MEDIA_ERROR = 'Could not update character images.'
 
 const CREATE_CHARACTER_ERROR = getCharacterBuilderChromeMessages('standalone_pc').createErrorDefault
 const DELETE_CHARACTER_ERROR = 'Could not delete character.'
@@ -34,6 +37,18 @@ export async function listCharacters(): Promise<PcCharacterListItem[]> {
     LIST_CHARACTERS_ERROR,
   )
   return characters
+}
+
+export async function patchCharacterMedia(
+  characterId: string,
+  patch: CharacterMediaPatchInput,
+): Promise<PcCharacter> {
+  const { character } = await patchJson<{ character: PcCharacter }>(
+    `/api/characters/${encodeURIComponent(characterId)}/media`,
+    patch,
+    PATCH_CHARACTER_MEDIA_ERROR,
+  )
+  return character
 }
 
 export async function getCharacter(characterId: string): Promise<PcCharacter> {

@@ -1,4 +1,5 @@
 import type {
+  CharacterMediaPatchInput,
   CharacterVitalPatch,
   CharacterVitalState,
   ContentDeletionResult,
@@ -9,6 +10,7 @@ import { applyCharacterVitalTransitionMetadata } from '@rpg/contracts'
 
 import { resolveCrossCampaignCharacterRelationshipBlockers } from '../character-relationships/lib/character-relationship-deletion-guards'
 import { assertStandalonePcCreateRestrictions } from './assert-standalone-pc-create'
+import { updateCharacterMediaRecord } from './lib/update-character-media.lib'
 import {
   createPcRecord,
   deletePcForUser,
@@ -74,4 +76,30 @@ export async function updateCharacterVital(
 
   const updated = await updateCharacterVitalRecord(characterId, nextVital)
   return updated ? nextVital : null
+}
+
+export async function patchCharacterMediaForUser(
+  characterId: string,
+  userId: string,
+  patch: CharacterMediaPatchInput,
+): Promise<
+  PcCharacter | 'not_found' | 'stale_revision' | 'validation_failed' | 'asset_unavailable'
+> {
+  const character = await findPcForUser(characterId, userId)
+  if (!character) {
+    return 'not_found'
+  }
+
+  const result = await updateCharacterMediaRecord({
+    characterId,
+    scope: { kind: 'user-pc', userId },
+    patch,
+  })
+
+  if (!result.ok) {
+    return result.reason
+  }
+
+  const updated = await findPcForUser(characterId, userId)
+  return updated ?? 'not_found'
 }

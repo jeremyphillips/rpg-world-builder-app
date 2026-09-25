@@ -108,14 +108,16 @@ function CompactMediaFieldSummary({
         aria-label={`${label}: ${copy.previewAriaLabel}`}
       >
         <CompactPreviewWell representative={representative} emptyContent={emptyContent} />
-        <div
-          className={cn(
-            mediaSummaryCompactOverlayVariants(),
-            copy.showManageGear && canEdit && 'pr-6',
-          )}
-        >
-          <span className={mediaSummaryCompactCountVariants()}>{copy.countLabel}</span>
-        </div>
+        {canEdit || galleryCount > 0 ? (
+          <div
+            className={cn(
+              mediaSummaryCompactOverlayVariants(),
+              copy.showManageGear && canEdit && 'pr-6',
+            )}
+          >
+            <span className={mediaSummaryCompactCountVariants()}>{copy.countLabel}</span>
+          </div>
+        ) : null}
       </button>
       {copy.showManageGear && canEdit ? (
         <button

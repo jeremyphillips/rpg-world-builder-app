@@ -2,6 +2,7 @@ import type {
   CampaignNpcDetail,
   CampaignNpcListItem,
   CampaignNpcStatusPatch,
+  CharacterMediaPatchInput,
   ContentDeletionResult,
   CreateNpcRequestInput,
   CreateNpcServiceInput,
@@ -17,6 +18,7 @@ import {
   toNpcListCharacterSummary,
   updateCharacterVital,
 } from '../../character'
+import { updateCharacterMediaRecord } from '../../character/lib/update-character-media.lib'
 import { createCharacterRelationshipsFromDraftEdges } from '../../character-relationships/lib/create-character-relationships-from-draft'
 import { resolveCampaignCharacterRelationshipBlockers } from '../../character-relationships/lib/character-relationship-deletion-guards'
 import { HttpError } from '../../../lib/http-error'
@@ -271,6 +273,37 @@ export async function patchCampaignNpcStatus(
       timestamp,
     })
     if (!updatedRoster) return null
+  }
+
+  return getCampaignNpc(campaignId, npcId)
+}
+
+export async function patchCampaignNpcMedia(
+  campaignId: string,
+  npcId: string,
+  patch: CharacterMediaPatchInput,
+): Promise<
+  CampaignNpcDetail | null | 'stale_revision' | 'validation_failed' | 'asset_unavailable'
+> {
+  const campaign = await findCampaignById(campaignId)
+  if (!campaign) {
+    throw new HttpError(404, 'not_found', 'Campaign not found.')
+  }
+
+  const existing = await getCampaignNpc(campaignId, npcId)
+  if (!existing) return null
+
+  const result = await updateCharacterMediaRecord({
+    characterId: npcId,
+    scope: { kind: 'campaign-npc', campaignId },
+    patch,
+  })
+
+  if (!result.ok) {
+    if (result.reason === 'not_found') return null
+    if (result.reason === 'stale_revision') return 'stale_revision'
+    if (result.reason === 'validation_failed') return 'validation_failed'
+    if (result.reason === 'asset_unavailable') return 'asset_unavailable'
   }
 
   return getCampaignNpc(campaignId, npcId)

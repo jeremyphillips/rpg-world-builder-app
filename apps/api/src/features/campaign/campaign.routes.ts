@@ -1,6 +1,8 @@
 import { Router } from 'express'
 
 import {
+  campaignParticipatingCharacterStatusPatchSchema,
+  characterMediaPatchInputSchema,
   createCampaignInputSchema,
   selectCampaignInputSchema,
   updateCampaignInputSchema,
@@ -75,6 +77,20 @@ campaignRouter.get(
   requireAuth,
   requireCampaignRole(...CAMPAIGN_ROLES),
   campaignCharacterController.getCampaignCharacter,
+)
+campaignRouter.patch(
+  '/:campaignId/characters/:characterId/media',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  validate(characterMediaPatchInputSchema),
+  campaignCharacterController.patchCampaignCharacterMediaHandler,
+)
+campaignRouter.patch(
+  '/:campaignId/characters/:characterId/status',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  validate(campaignParticipatingCharacterStatusPatchSchema),
+  campaignCharacterController.patchCampaignCharacterStatusHandler,
 )
 campaignRouter.get(
   '/:campaignId/characters/:characterId/relationships',
