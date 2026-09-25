@@ -59,7 +59,7 @@ export async function listCampaignMembersForOverview(
     findUsersByIds(visibleMemberships.map((membership) => membership.userId)),
     listOpenParticipationsForCampaign(campaignId),
   ])
-  const displayNameByUserId = new Map(users.map((user) => [user.id, user.displayName]))
+  const userById = new Map(users.map((user) => [user.id, user]))
   const openParticipationCharacterIds = openParticipations.map(
     (participation) => participation.characterId,
   )
@@ -83,9 +83,11 @@ export async function listCampaignMembersForOverview(
         characterOwnerById,
       })
 
+      const user = userById.get(membership.userId)
       return {
         id: String(membership._id),
-        displayName: displayNameByUserId.get(membership.userId) ?? 'Unknown member',
+        displayName: user?.displayName ?? 'Unknown member',
+        ...(user?.avatarKey ? { avatarKey: user.avatarKey } : {}),
         role,
         onboardingState,
         ...(onboardingState === 'onboarding_incomplete' && membership.joinedAt
@@ -130,7 +132,7 @@ export async function listCampaignPartyForOverview(
   const users = await findUsersByIds([
     ...new Set([...controllerByCharacterId.values()].map((entry) => entry.userId)),
   ])
-  const displayNameByUserId = new Map(users.map((user) => [user.id, user.displayName]))
+  const userById = new Map(users.map((user) => [user.id, user]))
 
   const party: CampaignPartyPcListItem[] = []
 
@@ -153,10 +155,14 @@ export async function listCampaignPartyForOverview(
         },
       },
       member: controller
-        ? {
-            id: controller.membershipId,
-            displayName: displayNameByUserId.get(controller.userId) ?? 'Unknown member',
-          }
+        ? (() => {
+            const user = userById.get(controller.userId)
+            return {
+              id: controller.membershipId,
+              displayName: user?.displayName ?? 'Unknown member',
+              ...(user?.avatarKey ? { avatarKey: user.avatarKey } : {}),
+            }
+          })()
         : null,
       roster: participation.roster,
     })

@@ -121,7 +121,7 @@ export function buildSpeciesPreviewIdentity(
     media: (values as SpeciesFormValues & { media?: ContentMedia }).media,
     ctx,
     contentType: 'species',
-    slug: values.slug ?? 'preview',
+    slug: ctx.entitySlug ?? values.slug ?? 'preview',
   })
 
   return {

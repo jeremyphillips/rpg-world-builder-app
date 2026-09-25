@@ -155,7 +155,7 @@ export function buildClassPreviewIdentity(
     media: (values as ClassFormValues & { media?: ContentMedia }).media,
     ctx,
     contentType: 'classes',
-    slug: values.slug ?? 'preview',
+    slug: ctx.entitySlug ?? values.slug ?? 'preview',
   })
 
   return {

@@ -18,6 +18,7 @@ export type CampaignOverviewMemberOnboardingState = z.infer<
 export const campaignOverviewMemberListItemSchema = z.object({
   id: z.string().min(1),
   displayName: z.string().min(1),
+  avatarKey: z.string().min(1).optional(),
   role: campaignRoleSchema,
   onboardingState: campaignOverviewMemberOnboardingStateSchema.optional(),
   inviteAcceptedAt: z.iso.datetime().optional(),

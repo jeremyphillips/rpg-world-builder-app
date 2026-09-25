@@ -1,5 +1,5 @@
-import type { CampaignOverviewMemberListItem } from '@rpg/contracts'
-import { Badge, Heading, Text } from '@rpg/ui'
+import { getAssetUrl, type CampaignOverviewMemberListItem } from '@rpg/contracts'
+import { Avatar, Badge, Heading, Text } from '@rpg/ui'
 
 import {
   CAMPAIGN_OVERVIEW_EMPTY_TEXT,
@@ -50,14 +50,20 @@ export function CampaignOverviewMembersSection({
               key={member.id}
               className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3"
             >
-              <div className="space-y-1">
-                <Text className="font-medium">{member.displayName}</Text>
-                <Text variant="small" className="text-muted-foreground">
-                  {formatCampaignRoleLabel(member.role)}
-                  {member.inviteAcceptedAt
-                    ? ` · ${formatMemberInviteAcceptedLine(member.inviteAcceptedAt)}`
-                    : ''}
-                </Text>
+              <div className="flex items-center gap-3">
+                <Avatar
+                  name={member.displayName}
+                  src={member.avatarKey ? getAssetUrl(member.avatarKey) : undefined}
+                />
+                <div className="space-y-1">
+                  <Text className="font-medium">{member.displayName}</Text>
+                  <Text variant="small" className="text-muted-foreground">
+                    {formatCampaignRoleLabel(member.role)}
+                    {member.inviteAcceptedAt
+                      ? ` · ${formatMemberInviteAcceptedLine(member.inviteAcceptedAt)}`
+                      : ''}
+                  </Text>
+                </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {memberOnboardingBadge(member.onboardingState)}

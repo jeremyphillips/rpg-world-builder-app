@@ -10,8 +10,6 @@ export function resolveFormPreviewDisplayImage(input: {
   contentType: ContentTypeKey
   slug: string
 }): ContentDisplayImage | undefined {
-  if (!input.media) return undefined
-
   const display = getContentDisplayImage({
     media: input.media,
     contentType: input.contentType,
