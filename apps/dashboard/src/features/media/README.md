@@ -25,6 +25,11 @@ available; other metadata loads through authorized queries. `imageUrl` is an opt
 rendition resolver for authorized/system assets and offline visual fixtures; the
 default uses the same-origin media API.
 
+Upload sessions require a resolved signed-in user id. For standalone character
+identity, `ManagedMediaField` stays closed and does not mount `MediaManager` until
+`useSession()` returns `session.user.id`. Pass that id in a `user-pc` scope; the
+upload hook starts `createUploadSession` only after scope is ready.
+
 Campaign settings use scope `{ kind: 'campaign-identity', campaignId }`. Create
 still accepts a single banner file, uploads through the media API after the campaign
 exists, and patches `identity.media`.
@@ -59,7 +64,9 @@ retain the media draft until its own save/cancel decision.
 The image collection stays in insertion order. Role eligibility is shared between
 the role checkbox and server validation via `resolveMediaRoleEligibility()`. Server
 validation is authoritative; the client additionally blocks invalid assignments and
-unresolved uploads before applying changes.
+unresolved uploads before applying changes. When Save is blocked and not in flight,
+the footer shows one compact warning alert beside Save: the first validation issue,
+then `+N more` when additional issues remain.
 
 ## Testing and preview
 

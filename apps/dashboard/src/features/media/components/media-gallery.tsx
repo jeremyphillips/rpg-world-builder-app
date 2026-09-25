@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Badge,
   Button,
@@ -20,6 +20,11 @@ import { resolveUploadEntryStatusLabel } from '../hooks/use-media-uploads'
 import { mediaImageUrl, systemContentImageUrl } from '../lib/media-display'
 import { MEDIA_IMAGE_ACCEPT } from '../lib/media-upload.lib'
 import { mediaManagerStyles as styles } from './media-manager.variants'
+
+function readGalleryColumnStride(): number {
+  if (typeof window.matchMedia !== 'function') return 1
+  return window.matchMedia('(min-width: 768px)').matches ? 2 : 1
+}
 
 export type MediaGalleryProps = {
   imageUrl?: typeof mediaImageUrl
@@ -77,7 +82,22 @@ export function MediaGallery({
   mutationsLocked = false,
 }: MediaGalleryProps) {
   const input = useRef<HTMLInputElement>(null)
+  const [columnStride, setColumnStride] = useState<number>(readGalleryColumnStride)
   const imageCount = availableImages.length
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return
+
+    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    const syncColumnStride = () =>
+      setColumnStride((current) => {
+        const next = mediaQuery.matches ? 2 : 1
+        return current === next ? current : next
+      })
+    syncColumnStride()
+    mediaQuery.addEventListener('change', syncColumnStride)
+    return () => mediaQuery.removeEventListener('change', syncColumnStride)
+  }, [])
 
   return (
     <section className={styles.gallery()} aria-label="Images">
@@ -115,8 +135,8 @@ export function MediaGallery({
         </div>
         {!availableImages.length ? (
           <div className={styles.galleryEmpty()}>
-            <Images className="size-8 text-muted-foreground" aria-hidden="true" />
-            <p className="text-sm font-semibold text-foreground">No images yet</p>
+            <Images className={styles.galleryEmptyIcon()} aria-hidden="true" />
+            <p className={styles.galleryEmptyTitle()}>No images yet</p>
             <p className={styles.muted()}>Uploaded images will appear here.</p>
           </div>
         ) : (
@@ -138,8 +158,15 @@ export function MediaGallery({
                   aria-label={`${resolveGalleryImageLabel(image, index, assets)}${roleLabels.map((label) => `, ${label}`).join('')}`}
                   onClick={() => onSelect(image.id)}
                   onKeyDown={(event) => {
-                    const delta =
+                    const horizontalDelta =
                       event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
+                    const verticalDelta =
+                      event.key === 'ArrowDown'
+                        ? columnStride
+                        : event.key === 'ArrowUp'
+                          ? -columnStride
+                          : 0
+                    const delta = horizontalDelta || verticalDelta
                     if (!delta) return
                     event.preventDefault()
                     const next = (index + delta + availableImages.length) % availableImages.length

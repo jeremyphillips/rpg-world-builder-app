@@ -194,17 +194,17 @@ export function MediaImageDetails({
                       type="button"
                       variant="text"
                       size="sm"
-                      className="h-auto w-full justify-between px-0 py-0 text-sm font-semibold"
+                      className={styles.detailsDisclosureTrigger()}
                       aria-expanded={accessibilityOpen}
                     >
                       Accessibility & details
                       <ChevronDown
-                        className={`size-4 shrink-0 transition-transform ${accessibilityOpen ? 'rotate-180' : ''}`}
+                        className={styles.detailsDisclosureChevron({ open: accessibilityOpen })}
                         aria-hidden="true"
                       />
                     </Button>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-3">
+                  <CollapsibleContent className={styles.detailsDisclosureContent()}>
                     <Form
                       key={uploadImage.id}
                       schema={altSchema}

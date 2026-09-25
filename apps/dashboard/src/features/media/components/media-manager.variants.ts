@@ -36,6 +36,8 @@ export const mediaManagerStyles = {
   galleryEmpty: cva(
     'flex min-h-48 flex-1 flex-col items-center justify-center gap-2 px-4 text-center md:min-h-0',
   ),
+  galleryEmptyIcon: cva('size-8 text-muted-foreground'),
+  galleryEmptyTitle: cva('text-sm font-semibold text-foreground'),
   row: cva('flex shrink-0 flex-wrap items-center justify-between gap-2'),
   grid: cva('flex gap-3 pb-2 md:grid md:grid-cols-2'),
   tile: cva(
@@ -52,6 +54,9 @@ export const mediaManagerStyles = {
   workspaceHeaderRow: cva('flex items-center justify-between gap-2'),
   workspaceContent: cva('flex min-h-0 flex-1 flex-col'),
   workspaceOnboarding: cva('mt-4 shrink-0'),
+  workspaceOnboardingContent: cva('flex items-start gap-2'),
+  workspaceOnboardingIcon: cva('mt-0.5 size-4 shrink-0'),
+  workspaceOnboardingText: cva('text-sm'),
   editorCrop: cva('min-w-0 max-w-full space-y-2'),
   details: cva('min-w-0 space-y-4'),
   detailsPanel: cva(
@@ -61,6 +66,12 @@ export const mediaManagerStyles = {
     ),
   ),
   detailsSection: cva('space-y-3 p-4'),
+  detailsDisclosureTrigger: cva('h-auto w-full justify-between px-0 py-0 text-sm font-semibold'),
+  detailsDisclosureChevron: cva('size-4 shrink-0 transition-transform', {
+    variants: { open: { true: 'rotate-180', false: '' } },
+    defaultVariants: { open: false },
+  }),
+  detailsDisclosureContent: cva('pt-3'),
   previewCard: cva('min-w-0 space-y-2'),
   preview: cva('aspect-square w-full rounded-md bg-sunken object-contain'),
   heading: cva('text-lg font-semibold'),
@@ -77,4 +88,5 @@ export const mediaManagerStyles = {
   hidden: cva('sr-only'),
   roles: cva('space-y-3'),
   error: cva('text-sm text-destructive'),
+  undoToastThumbnail: cva('size-10 rounded-md object-cover'),
 }

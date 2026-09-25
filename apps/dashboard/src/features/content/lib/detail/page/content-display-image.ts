@@ -8,7 +8,11 @@ import {
   type MediaRole,
 } from '@rpg/contracts'
 
-import { mediaImageUrl, MEDIA_SOURCE_CROP } from '@/features/media/lib/media-display'
+import {
+  mediaImageUrl,
+  MEDIA_SOURCE_CROP,
+  systemContentImageUrl,
+} from '@/features/media/lib/media-display'
 
 import { getContentImageUrl } from './content-image-url'
 
@@ -24,13 +28,6 @@ export type ResolveDashboardContentDisplayImageInput = {
   role?: MediaRole
 }
 
-function joinPublicAssetPath(srcPath: string): string {
-  const base = import.meta.env.BASE_URL
-  const normalizedBase = base.endsWith('/') ? base : `${base}/`
-  const normalizedPath = srcPath.startsWith('/') ? srcPath.slice(1) : srcPath
-  return `${normalizedBase}${normalizedPath}`
-}
-
 /** Resolve a dashboard-ready display image with absolute URLs. */
 export function getContentDisplayImage(
   input: ResolveDashboardContentDisplayImageInput,
@@ -42,7 +39,7 @@ export function getContentDisplayImage(
   })
 
   if (resolved.sourceKind === 'system') {
-    return { ...resolved, src: joinPublicAssetPath(resolved.src) }
+    return { ...resolved, src: systemContentImageUrl(resolved.src) }
   }
 
   if (resolved.sourceKind === 'fallback') {

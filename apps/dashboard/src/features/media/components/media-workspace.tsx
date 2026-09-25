@@ -144,9 +144,11 @@ export function MediaWorkspace({
                   resolveChromeCalloutClasses({ variant: 'callout', tone: 'info' }),
                 )}
               >
-                <div className="flex items-start gap-2">
-                  <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                  <p className="text-sm">{resolveMediaWorkspaceOnboarding(policy.domain)}</p>
+                <div className={styles.workspaceOnboardingContent()}>
+                  <Info className={styles.workspaceOnboardingIcon()} aria-hidden="true" />
+                  <p className={styles.workspaceOnboardingText()}>
+                    {resolveMediaWorkspaceOnboarding(policy.domain)}
+                  </p>
                 </div>
               </div>
             </>

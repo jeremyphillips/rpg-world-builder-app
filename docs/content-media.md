@@ -31,7 +31,7 @@ and are not served by `GET /api/uploads/:key`.
 - `mediaBearingAuthoredContentBodySchema` (not yet wired into live type schemas)
 - Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`)
 - `reconcileContentMedia`, `reclaimExpiredAssets`, `remapContentMediaForDuplicate`
-- `resolveContentMediaPresentation`, rendition presets, system asset manifest, system content image registry
+- `ResolvedContentMediaPresentation`, rendition presets, system asset manifest, system content image registry
 - `@rpg/ui` `MediaImage` / `MediaCompactPreview` (not mounted in product surfaces)
 
 ## System artwork vs rendition fixture
