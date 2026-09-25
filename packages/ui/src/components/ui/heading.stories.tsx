@@ -31,6 +31,15 @@ export const Display: Story = {
   },
 }
 
+/** Page hero titles — 19px mobile, 24px md, 34px lg+. */
+export const HeroTitle: Story = {
+  args: {
+    variant: 'heroTitle',
+    as: 'h1',
+    children: 'Ruins of the Shattered Crown',
+  },
+}
+
 /** Top-level section headings within a detail page. */
 export const Section: Story = {
   args: {
@@ -129,6 +138,9 @@ export const Hierarchy: Story = {
       </Heading>
       <Heading variant="page" as="h1">
         Species catalog
+      </Heading>
+      <Heading variant="heroTitle" as="h1">
+        Ruins of the Shattered Crown
       </Heading>
       <Heading variant="section" as="h2">
         Traits

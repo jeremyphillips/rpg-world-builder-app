@@ -29,11 +29,19 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     useCase: 'Route and shell titles (PageHeader)',
   },
   {
+    variant: 'heroTitle',
+    utility: 'heading-style-subsection md:heading-style-sheet-section lg:heading-style-page',
+    level: 'h1',
+    px: 19,
+    weight: 600,
+    useCase: 'Hero titles — 19px mobile, 24px md, 34px lg+',
+  },
+  {
     variant: 'section',
     utility: 'heading-style-section',
     level: 'h2',
     px: 28,
-    weight: 300,
+    weight: 600,
     useCase: 'Top-level in-page sections',
   },
   {
@@ -81,7 +89,7 @@ export const HEADING_STYLE_SPECS: HeadingStyleSpec[] = [
     utility: 'heading-style-sheet-section',
     level: 'h2',
     px: 24,
-    weight: 300,
+    weight: 600,
     useCase: 'Builder option detail sheet section headings',
   },
   {

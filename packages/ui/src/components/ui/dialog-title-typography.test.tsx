@@ -27,6 +27,16 @@ describe('dialog title typography ownership', () => {
     expect(headingVariants({ variant: 'dialogTitle' })).toBe('heading-style-dialog-title')
   })
 
+  it('uses standard heading weight for section and sheet section titles', () => {
+    expect(globalsCss).toMatch(
+      /@utility heading-style-section \{[\s\S]*?font-weight: var\(--font-weight-heading\)/,
+    )
+    expect(globalsCss).toMatch(
+      /@utility heading-style-sheet-section \{[\s\S]*?font-weight: var\(--font-weight-heading\)/,
+    )
+    expect(globalsCss).not.toContain('--font-weight-heading-section')
+  })
+
   it('defines dialogTitle as 19px base with 24px from the md breakpoint', () => {
     expect(globalsCss).toMatch(/--text-heading-dialog-title:\s*var\(--text-heading-subsection\)/)
     expect(globalsCss).toMatch(/--text-heading-dialog-title-md:\s*var\(--text-heading-3-md\)/)

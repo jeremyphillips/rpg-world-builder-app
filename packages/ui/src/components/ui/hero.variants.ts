@@ -9,26 +9,54 @@ export const heroMediaFrameClasses =
 
 export const heroMediaImageClasses = 'block size-full object-cover object-center'
 
-export const heroIdentityRowClasses = 'flex items-start justify-between gap-4'
+/** Emblem is desktop-only; below sm the layout matches the no-emblem path. */
+export const heroMarkVisibilityClasses = 'hidden sm:block'
 
-export const heroTitleShellClasses = 'min-w-0 flex-1'
+/** Horizontal separation between the emblem shell and the copy column. */
+export const heroMarkCopyGapClasses = 'sm:mr-4'
 
-export const heroMetaStackClasses = 'flex flex-col gap-1'
-
-export const heroMarkShellVariants = cva('relative', {
+export const heroIdentityBlockVariants = cva('flex items-start', {
   variants: {
-    placement: {
-      inline: '',
-      overlap: '-mt-3 z-10',
+    hasMark: {
+      true: 'sm:px-2 lg:px-4',
+      false: '',
     },
   },
   defaultVariants: {
-    placement: 'inline',
+    hasMark: false,
   },
 })
 
-export const heroMarkFrameClasses = cn(
-  'box-content size-image-preview overflow-hidden rounded-lg border-[6px] border-background',
+export const heroCopyColumnClasses = 'flex min-w-0 flex-1 flex-col gap-1'
+
+export const heroIdentityRowClasses = 'flex items-center justify-between gap-4'
+
+export const heroTitleShellClasses = 'min-w-0 flex-1'
+
+export const heroMetaStackClasses = 'flex flex-col gap-3'
+
+export const heroMetaClasses = 'inline-flex items-center gap-1.5 text-xs sm:text-sm'
+
+export const heroMarkShellVariants = cva(
+  cn('relative shrink-0', heroMarkVisibilityClasses, heroMarkCopyGapClasses),
+  {
+    variants: {
+      placement: {
+        inline: '',
+        overlap: 'sm:-mt-6 z-10',
+      },
+    },
+    defaultVariants: {
+      placement: 'inline',
+    },
+  },
 )
 
-export const heroMarkImageClasses = 'block size-full object-contain'
+export const heroMarkRadiusClasses = 'rounded-lg'
+
+export const heroMarkFrameClasses = cn(
+  'box-content size-image-preview overflow-hidden border-[6px] border-background',
+  heroMarkRadiusClasses,
+)
+
+export const heroMarkImageClasses = cn('block size-full object-contain', heroMarkRadiusClasses)

@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Heading } from './heading'
+import { headingVariants } from './heading.variants'
 
 describe('Heading', () => {
   it('renders with the requested semantic element', () => {
@@ -36,6 +37,17 @@ describe('Heading', () => {
       </Heading>,
     )
     expect(screen.getByText('Darkvision')).toHaveClass('heading-style-label')
+  })
+
+  it('applies responsive heroTitle composite classes', () => {
+    render(
+      <Heading variant="heroTitle" as="h1">
+        Campaign
+      </Heading>,
+    )
+    expect(screen.getByRole('heading', { level: 1, name: 'Campaign' })).toHaveClass(
+      ...headingVariants({ variant: 'heroTitle' }).split(/\s+/),
+    )
   })
 
   it('applies subsection and group composite classes', () => {

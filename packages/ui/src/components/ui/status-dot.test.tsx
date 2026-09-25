@@ -22,6 +22,14 @@ describe('StatusDot', () => {
     expect(dot).toHaveClass('size-2.5')
   })
 
+  it('applies the sunken tone for draft and archived states', () => {
+    const { container } = render(<StatusDot tone="sunken" />)
+    const dot = container.querySelector('[aria-hidden="true"]')
+    expect(dot).toHaveClass('bg-sunken')
+    expect(dot).toHaveClass('ring-1')
+    expect(dot).toHaveClass('ring-border')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<StatusDot tone="info" />)
     await expectNoAxeViolations(container)

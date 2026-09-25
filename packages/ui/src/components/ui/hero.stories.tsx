@@ -4,7 +4,13 @@ import { Ellipsis } from 'lucide-react'
 import { Badge } from './badge'
 import { Button } from './button.client'
 import { Heading } from './heading'
-import { Hero, heroMarkFrameClasses, heroMarkImageClasses, heroMediaImageClasses } from './hero'
+import {
+  Hero,
+  heroMarkFrameClasses,
+  heroMarkImageClasses,
+  heroMediaImageClasses,
+  heroMetaClasses,
+} from './hero'
 import { StatusDot } from './status-dot'
 import { Text } from './text'
 
@@ -44,7 +50,7 @@ export const WithMediaAndOverlapMark: Story = {
       mark={emblem}
       markPlacement="overlap"
       title={
-        <Heading variant="page" as="h1" className="truncate">
+        <Heading variant="heroTitle" as="h1" className="truncate">
           Ruins of the Shattered Crown
         </Heading>
       }
@@ -54,7 +60,7 @@ export const WithMediaAndOverlapMark: Story = {
         </Button>
       }
       meta={
-        <Text variant="muted" className="inline-flex items-center gap-1.5 text-sm">
+        <Text variant="muted" className={heroMetaClasses}>
           <StatusDot tone="success" />
           Active · 4 players · 6 characters
         </Text>
@@ -77,13 +83,13 @@ export const WithoutMedia: Story = {
   render: () => (
     <Hero
       title={
-        <Heading variant="page" as="h1" className="truncate">
+        <Heading variant="heroTitle" as="h1" className="truncate">
           New Campaign
         </Heading>
       }
       meta={
-        <Text variant="muted" className="inline-flex items-center gap-1.5 text-sm">
-          <StatusDot tone="sunken" className="ring-1 ring-border" />
+        <Text variant="muted" className={heroMetaClasses}>
+          <StatusDot tone="sunken" />
           Draft
         </Text>
       }
@@ -97,7 +103,7 @@ export const InlineMark: Story = {
       mark={emblem}
       markPlacement="inline"
       title={
-        <Heading variant="page" as="h1" className="truncate">
+        <Heading variant="heroTitle" as="h1" className="truncate">
           Inline Mark
         </Heading>
       }
