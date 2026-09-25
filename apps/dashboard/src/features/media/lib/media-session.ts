@@ -16,9 +16,11 @@ import {
   createUploadRoleAssignment,
   defaultEmblemPresentation,
   isSystemRoleAssignment,
+  normalizeFocalPointForCrop,
   parseSystemContentImageVirtualId,
+  resolveEffectiveImageRoles,
   roleAssignmentMatchesImageId,
-  roleAssignmentMatchesVirtualId,
+  roleAssignmentMatchesSelection,
   roleAssignmentUploadImageId,
   asCropPresentation,
 } from '@rpg/contracts'
@@ -28,7 +30,6 @@ export type MediaSession = {
   media: ContentMedia
   selectedId?: string
   presentation: MediaRole
-  availableImages: AvailableContentImage[]
 }
 
 export type MediaAction =
@@ -56,44 +57,10 @@ export type MediaAction =
   | { type: 'crop'; crop: NormalizedCrop; focalPoint?: NormalizedFocalPoint }
   | { type: 'contain'; layout: ContainPresentation; source: SourceDimensions }
 
+export type DeriveAvailableImages = (media: ContentMedia) => AvailableContentImage[]
+
 function isVirtualSystemId(id: string): boolean {
   return parseSystemContentImageVirtualId(id) !== undefined
-}
-
-function derivedSystemImage(
-  availableImages: AvailableContentImage[],
-): AvailableContentImage | undefined {
-  return availableImages.find((image) => image.kind === 'system')
-}
-
-function assignmentMatchesSelection(
-  assignment: NonNullable<ContentMedia['roles'][MediaRole]>,
-  selectedId: string,
-): boolean {
-  return (
-    roleAssignmentMatchesImageId(assignment, selectedId) ||
-    roleAssignmentMatchesVirtualId(assignment, selectedId)
-  )
-}
-
-function rolesForImage(
-  media: ContentMedia,
-  imageId: string,
-  allowedRoles: readonly MediaRole[],
-  availableImages: AvailableContentImage[],
-): MediaRole[] {
-  const explicit = allowedRoles.filter((role) => {
-    const assignment = media.roles[role]
-    return assignment ? assignmentMatchesSelection(assignment, imageId) : false
-  })
-  if (explicit.length > 0) return explicit
-
-  const systemImage = derivedSystemImage(availableImages)
-  if (systemImage?.id === imageId && allowedRoles.includes('primary')) {
-    return ['primary']
-  }
-
-  return []
 }
 
 function resolvePresentationForImage(
@@ -103,8 +70,8 @@ function resolvePresentationForImage(
   availableImages: AvailableContentImage[],
 ): MediaRole {
   if (!imageId) return allowedRoles[0] ?? 'primary'
-  const assigned = rolesForImage(media, imageId, allowedRoles, availableImages)
-  return assigned[0] ?? allowedRoles[0] ?? 'primary'
+  const { roles } = resolveEffectiveImageRoles(media, imageId, allowedRoles, availableImages)
+  return roles[0] ?? allowedRoles[0] ?? 'primary'
 }
 
 function resolveInitialSelectedId(
@@ -133,7 +100,7 @@ function resolveInitialSelectedId(
     if (imageId) return imageId
   }
 
-  return derivedSystemImage(availableImages)?.id ?? media.images[0]?.id
+  return availableImages.find((image) => image.kind === 'system')?.id ?? media.images[0]?.id
 }
 
 export function createMediaSession(
@@ -154,7 +121,6 @@ export function createMediaSession(
     media: structuredClone(media),
     selectedId,
     presentation: resolvePresentationForImage(media, selectedId, allowedRoles, availableImages),
-    availableImages,
   }
 }
 
@@ -167,9 +133,13 @@ export function hasNewMediaUploads(state: MediaSession): boolean {
   return state.media.images.some((image) => !initialIds.has(image.id))
 }
 
-export function mediaSessionReducer(state: MediaSession, action: MediaAction): MediaSession {
+export function mediaSessionReducer(
+  state: MediaSession,
+  action: MediaAction,
+  deriveAvailableImages: DeriveAvailableImages,
+): MediaSession {
   if (action.type === 'select') {
-    return selectImage(state, action.id, action.allowedRoles)
+    return selectImage(state, action.id, action.allowedRoles, deriveAvailableImages)
   }
   if (action.type === 'presentation') return { ...state, presentation: action.role }
 
@@ -181,10 +151,10 @@ export function mediaSessionReducer(state: MediaSession, action: MediaAction): M
       addImage(next, action)
       break
     case 'remove':
-      removeImage(next, action.id, action.allowedRoles)
+      removeImage(next, action.id, action.allowedRoles, deriveAvailableImages)
       break
     case 'restoreRemoved':
-      restoreRemovedImage(next, action)
+      restoreRemovedImage(next, action, deriveAvailableImages)
       break
     case 'alt': {
       const image = media.images.find((image) => image.id === action.id)
@@ -192,7 +162,7 @@ export function mediaSessionReducer(state: MediaSession, action: MediaAction): M
       break
     }
     case 'role':
-      assignRole(next, action)
+      assignRole(next, action, deriveAvailableImages)
       break
     case 'crop':
       updateCrop(next, action.crop, action.focalPoint)
@@ -205,13 +175,18 @@ export function mediaSessionReducer(state: MediaSession, action: MediaAction): M
   return next
 }
 
-function removeImage(next: MediaSession, id: string, allowedRoles: readonly MediaRole[]) {
+function removeImage(
+  next: MediaSession,
+  id: string,
+  allowedRoles: readonly MediaRole[],
+  deriveAvailableImages: DeriveAvailableImages,
+) {
   if (isVirtualSystemId(id)) return
 
   const { media } = next
   const index = media.images.findIndex((image) => image.id === id)
   media.images = media.images.filter((image) => image.id !== id)
-  next.availableImages = next.availableImages.filter((image) => image.id !== id)
+  const availableImages = deriveAvailableImages(media)
   for (const role of allowedRoles) {
     const assignment = media.roles[role]
     if (assignment && roleAssignmentMatchesImageId(assignment, id)) {
@@ -220,20 +195,21 @@ function removeImage(next: MediaSession, id: string, allowedRoles: readonly Medi
   }
   if (next.selectedId === id) {
     next.selectedId =
-      derivedSystemImage(next.availableImages)?.id ??
+      availableImages.find((image) => image.kind === 'system')?.id ??
       media.images[Math.min(index, media.images.length - 1)]?.id
   }
   next.presentation = resolvePresentationForImage(
     media,
     next.selectedId,
     allowedRoles,
-    next.availableImages,
+    availableImages,
   )
 }
 
 function restoreRemovedImage(
   next: MediaSession,
   action: Extract<MediaAction, { type: 'restoreRemoved' }>,
+  deriveAvailableImages: DeriveAvailableImages,
 ) {
   const { media } = next
   const clampedIndex = Math.max(0, Math.min(action.index, media.images.length))
@@ -243,35 +219,36 @@ function restoreRemovedImage(
   >) {
     media.roles[role] = structuredClone(assignment)
   }
+  const availableImages = deriveAvailableImages(media)
   if (action.restoreSelection) {
     next.selectedId = action.image.id
     next.presentation = resolvePresentationForImage(
       media,
       action.image.id,
       action.allowedRoles,
-      next.availableImages,
+      availableImages,
     )
   }
 }
 
 // fallow-ignore-next-line complexity
-function assignRole(next: MediaSession, action: Extract<MediaAction, { type: 'role' }>) {
+function assignRole(
+  next: MediaSession,
+  action: Extract<MediaAction, { type: 'role' }>,
+  deriveAvailableImages: DeriveAvailableImages,
+) {
   const { media } = next
 
   if (!action.assigned) {
     const assignment = media.roles[action.role]
-    if (
-      assignment &&
-      (roleAssignmentMatchesImageId(assignment, action.id) ||
-        roleAssignmentMatchesVirtualId(assignment, action.id))
-    ) {
+    if (assignment && roleAssignmentMatchesSelection(assignment, action.id)) {
       delete media.roles[action.role]
     }
     next.presentation = resolvePresentationForImage(
       media,
       next.selectedId,
       action.allowedRoles,
-      next.availableImages,
+      deriveAvailableImages(media),
     )
     return
   }
@@ -280,7 +257,7 @@ function assignRole(next: MediaSession, action: Extract<MediaAction, { type: 'ro
   if (systemSource) {
     if (
       media.roles[action.role] &&
-      roleAssignmentMatchesVirtualId(media.roles[action.role], action.id)
+      roleAssignmentMatchesSelection(media.roles[action.role], action.id)
     ) {
       return
     }
@@ -321,11 +298,13 @@ function selectImage(
   state: MediaSession,
   id: string,
   allowedRoles: readonly MediaRole[],
+  deriveAvailableImages: DeriveAvailableImages,
 ): MediaSession {
+  const availableImages = deriveAvailableImages(state.media)
   return {
     ...state,
     selectedId: id,
-    presentation: resolvePresentationForImage(state.media, id, allowedRoles, state.availableImages),
+    presentation: resolvePresentationForImage(state.media, id, allowedRoles, availableImages),
   }
 }
 
@@ -335,10 +314,6 @@ function addImage(next: MediaSession, action: Extract<MediaAction, { type: 'add'
   }
   const attachment = { id: action.id, assetId: action.asset.id }
   next.media.images.push(attachment)
-  next.availableImages = [
-    ...next.availableImages.filter((image) => image.id !== action.id),
-    { kind: 'upload', id: action.id, attachment },
-  ]
   next.selectedId ??= action.id
 }
 
@@ -348,7 +323,7 @@ function ensureAssignmentForSelection(
   if (!next.selectedId) return null
 
   const existing = next.media.roles[next.presentation]
-  if (existing && assignmentMatchesSelection(existing, next.selectedId)) {
+  if (existing && roleAssignmentMatchesSelection(existing, next.selectedId)) {
     return existing
   }
 
@@ -376,32 +351,25 @@ function updateCrop(next: MediaSession, crop: NormalizedCrop, focalPoint?: Norma
   if (!assignment) {
     return
   }
+  const previousCrop = asCropPresentation(assignment.presentation)?.crop
+  const previousFocal = focalPoint ?? asCropPresentation(assignment.presentation)?.focalPoint
   assignment.presentation = {
     mode: 'crop',
     crop,
-    ...(focalPoint
-      ? { focalPoint }
-      : asCropPresentation(assignment.presentation)?.focalPoint
-        ? { focalPoint: asCropPresentation(assignment.presentation)!.focalPoint }
-        : {}),
+    focalPoint: normalizeFocalPointForCrop(previousCrop, crop, previousFocal),
   }
 }
 
 function updateContain(next: MediaSession, layout: ContainPresentation, source: SourceDimensions) {
   const assignment = next.media.roles[next.presentation]
-  if (!assignment || !next.selectedId || !assignmentMatchesSelection(assignment, next.selectedId)) {
+  if (
+    !assignment ||
+    !next.selectedId ||
+    !roleAssignmentMatchesSelection(assignment, next.selectedId)
+  ) {
     return
   }
   assignment.presentation = canonicalizeEmblemPresentation(source, layout)
-}
-
-export function assignedRolesForImage(
-  media: ContentMedia,
-  imageId: string,
-  allowedRoles: readonly MediaRole[],
-  availableImages: AvailableContentImage[] = [],
-): MediaRole[] {
-  return rolesForImage(media, imageId, allowedRoles, availableImages)
 }
 
 export function resolvePostRemovalSelection(

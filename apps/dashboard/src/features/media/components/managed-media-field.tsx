@@ -4,11 +4,11 @@ import {
   emptyContentMediaSchema,
   getAvailableContentImages,
   getContentMediaPolicy,
-  resolveRepresentativeImageId,
+  resolveEffectiveRepresentativeImageId,
   type MediaAsset,
   type MediaScope,
 } from '@rpg/contracts'
-import { CollectionAddControl, MediaFieldSummary } from '@rpg/ui'
+import { CollectionAddControl, MediaFieldSummary, resolveExpandedCapacityHint } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
 import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '../lib/media-display'
@@ -59,7 +59,11 @@ export function ManagedMediaField({
     [contentContext, media],
   )
   const systemImage = availableImages.find((image) => image.kind === 'system')
-  const representativeId = resolveRepresentativeImageId(media, policy) ?? systemImage?.id
+  const representativeId = resolveEffectiveRepresentativeImageId(
+    media,
+    policy.representativeRoles,
+    availableImages,
+  )
   const maxItems = resolveMediaFieldCapacity(config)
   const items = [
     ...media.images.map((image: { id: string; assetId: string; alt?: string }) => ({
@@ -77,6 +81,7 @@ export function ManagedMediaField({
         ]
       : []),
   ]
+  const galleryCount = items.length
   const attachmentCount = media.images.length
   const onOpen = (imageId?: string) => {
     setSelectedId(imageId)
@@ -94,9 +99,7 @@ export function ManagedMediaField({
             label={label}
             size={size}
             hint={
-              attachmentCount > 0 || systemImage
-                ? `${attachmentCount} of ${maxItems} images`
-                : undefined
+              galleryCount > 0 ? resolveExpandedCapacityHint(attachmentCount, maxItems) : undefined
             }
             action={
               <CollectionAddControl

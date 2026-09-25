@@ -91,6 +91,16 @@ export function roleAssignmentMatchesVirtualId(
   return buildSystemContentImageVirtualId(assignment.source) === virtualId
 }
 
+export function roleAssignmentMatchesSelection(
+  assignment: { source: ContentMediaRoleSource } | undefined,
+  selectedId: string,
+): boolean {
+  return (
+    roleAssignmentMatchesImageId(assignment, selectedId) ||
+    roleAssignmentMatchesVirtualId(assignment, selectedId)
+  )
+}
+
 export function createUploadRoleAssignment(imageId: string): {
   source: ContentMediaUploadSource
 } {

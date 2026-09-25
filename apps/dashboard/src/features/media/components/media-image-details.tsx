@@ -16,9 +16,9 @@ import {
   asCropPresentation,
   contentImageSchema,
   formatFieldMessage,
-  isSystemRoleAssignment,
+  resolveEffectiveImageRoles,
   resolveMediaRoleEligibility,
-  roleAssignmentMatchesVirtualId,
+  roleAssignmentMatchesSelection,
   type AvailableContentImage,
   type ContentMedia,
   type ContentMediaPolicy,
@@ -40,6 +40,7 @@ const altFields: FormItem[] = [
 
 export type MediaImageDetailsProps = {
   selectedAvailable: AvailableContentImage
+  availableImages: AvailableContentImage[]
   media: ContentMedia
   policy: ContentMediaPolicy
   assignedRoles: MediaRole[]
@@ -51,23 +52,10 @@ export type MediaImageDetailsProps = {
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
 }
 
-function isDerivedPrimaryOnly(
-  media: ContentMedia,
-  selectedAvailable: AvailableContentImage,
-  role: MediaRole,
-): boolean {
-  if (role !== 'primary' || selectedAvailable.kind !== 'system') return false
-  const assignment = media.roles.primary
-  if (!assignment) return true
-  if (isSystemRoleAssignment(assignment)) {
-    return roleAssignmentMatchesVirtualId(assignment, selectedAvailable.id)
-  }
-  return false
-}
-
 // fallow-ignore-next-line complexity
 export function MediaImageDetails({
   selectedAvailable,
+  availableImages,
   media,
   policy,
   assignedRoles,
@@ -99,6 +87,12 @@ export function MediaImageDetails({
       : asset
         ? { width: asset.orientedWidth, height: asset.orientedHeight }
         : undefined
+  const effectiveRoles = resolveEffectiveImageRoles(
+    media,
+    selectedAvailable.id,
+    policy.allowedRoles,
+    availableImages,
+  )
 
   return (
     <aside className={styles.detailsColumn()} aria-label="Image details">
@@ -122,13 +116,9 @@ export function MediaImageDetails({
                 {policy.allowedRoles.map((role) => {
                   const assignment = media.roles[role]
                   const checked = assignedRoles.includes(role)
-                  const derivedOnly = isDerivedPrimaryOnly(media, selectedAvailable, role)
+                  const derivedOnly = effectiveRoles.derivedRoles.includes(role)
                   const cropPresentation = asCropPresentation(
-                    assignment &&
-                      (selectedAvailable.kind === 'upload'
-                        ? assignment.source.kind === 'upload' &&
-                          assignment.source.imageId === uploadImage?.id
-                        : roleAssignmentMatchesVirtualId(assignment, selectedAvailable.id))
+                    assignment && roleAssignmentMatchesSelection(assignment, selectedAvailable.id)
                       ? assignment.presentation
                       : undefined,
                   )

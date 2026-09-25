@@ -133,6 +133,12 @@ export {
   type MediaFieldSummaryItem,
   type MediaFieldSummaryProps,
 } from './components/ui/media-field-summary.client'
+export {
+  MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL,
+  resolveCompactSummaryCopy,
+  resolveExpandedCapacityHint,
+  resolveMediaFieldCountFigures,
+} from './components/ui/media-field-summary.lib'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
 export {

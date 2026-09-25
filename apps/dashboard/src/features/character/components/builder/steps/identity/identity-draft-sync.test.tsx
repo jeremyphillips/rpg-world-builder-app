@@ -1,8 +1,10 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+
+import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
 
 import { IdentityStep } from './identity-step'
 import { identityStepTestContext } from './identity-step.fixtures'
@@ -20,6 +22,14 @@ vi.mock('@/features/content', async (importOriginal) => {
   }
 })
 
+vi.mock('@/features/auth', () => ({
+  useSession: vi.fn(),
+}))
+
+import { useSession as useSessionFn } from '@/features/auth'
+
+const useSession = vi.mocked(useSessionFn)
+
 vi.mock('@/features/campaign', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/campaign')>()
   return {
@@ -34,6 +44,12 @@ vi.mock('@/features/campaign', async (importOriginal) => {
 })
 
 describe('IdentityDraftSync', () => {
+  beforeEach(() => {
+    useSession.mockReturnValue({
+      data: makeAuthMe(makeSessionUser({ id: 'user-test-1' })),
+    } as ReturnType<typeof useSessionFn>)
+  })
+
   it('seeds the form from an externally restored draft without clobbering the store', async () => {
     const onDraftChange = vi.fn()
     const emptyDraft = createEmptyCharacterBuilderDraft()

@@ -14,6 +14,7 @@ it('explains why a small image cannot have Portrait or Primary', () => {
   render(
     <MediaImageDetails
       selectedAvailable={uploadAvailable}
+      availableImages={[uploadAvailable]}
       asset={{ ...mediaFixtureAssets[0]!, orientedWidth: 64, orientedHeight: 64 }}
       media={{ ...mediaFixture, roles: {} }}
       policy={getContentMediaPolicy('character')}
@@ -34,6 +35,7 @@ it('keeps accessibility fields inside a collapsed disclosure by default', () => 
   render(
     <MediaImageDetails
       selectedAvailable={uploadAvailable}
+      availableImages={[uploadAvailable]}
       asset={mediaFixtureAssets[0]!}
       media={mediaFixture}
       policy={getContentMediaPolicy('character')}

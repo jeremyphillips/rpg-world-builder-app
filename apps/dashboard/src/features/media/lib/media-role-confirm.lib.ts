@@ -2,7 +2,7 @@ import {
   isRolePresentationCustomized,
   MEDIA_ROLE_ENTRIES,
   resolveMediaRolePresentationNoun,
-  roleAssignmentMatchesImageId,
+  roleAssignmentMatchesSelection,
   roleAssignmentUploadImageId,
   resolveSystemContentImageSourceDimensions,
   type ContentMedia,
@@ -62,9 +62,7 @@ export function shouldConfirmMediaRoleChange(input: {
       presentation: previous.presentation,
       source: previousSource,
     }) ||
-    (input.assigned &&
-      (roleAssignmentMatchesImageId(previous, input.selectedId) ||
-        previousImageId === input.selectedId))
+    (input.assigned && roleAssignmentMatchesSelection(previous, input.selectedId))
   ) {
     return { required: false }
   }
@@ -72,6 +70,8 @@ export function shouldConfirmMediaRoleChange(input: {
   return {
     required: true,
     mode:
-      input.assigned && previousImageId && previousImageId !== input.selectedId ? 'move' : 'remove',
+      input.assigned && previous && !roleAssignmentMatchesSelection(previous, input.selectedId)
+        ? 'move'
+        : 'remove',
   }
 }

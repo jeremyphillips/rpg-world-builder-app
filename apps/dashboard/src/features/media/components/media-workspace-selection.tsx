@@ -4,8 +4,8 @@ import {
   asCropPresentation,
   defaultEmblemPresentation,
   mediaRoleSurfaceCopy,
+  resolveEffectiveImageRoles,
   resolveMediaCropEditorConstraint,
-  roleAssignmentMatchesVirtualId,
   type AvailableContentImage,
   type MediaAsset,
   type MediaRole,
@@ -173,15 +173,18 @@ export function MediaWorkspaceSelection({
   assignedRoles: MediaRole[]
   interaction?: string
 }) {
-  const { state, resolveSystemImageUrl = systemContentImageUrl } = controller
+  const {
+    state,
+    resolveSystemImageUrl = systemContentImageUrl,
+    sessionAvailableImages,
+  } = controller
   const activeRole = state.presentation
-  const assignment = state.media.roles[activeRole]
-  const isActiveForSelection =
-    selectedAvailable.kind === 'system'
-      ? assignedRoles.includes(activeRole) &&
-        (!assignment || roleAssignmentMatchesVirtualId(assignment, selectedAvailable.id))
-      : assignment?.source.kind === 'upload' &&
-        assignment.source.imageId === selectedAvailable.attachment.id
+  const isActiveForSelection = resolveEffectiveImageRoles(
+    state.media,
+    selectedAvailable.id,
+    [activeRole],
+    sessionAvailableImages,
+  ).roles.includes(activeRole)
   const context = resolveSelectionContext({
     selectedAvailable,
     asset,

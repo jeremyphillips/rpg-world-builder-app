@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { type CharacterBuildContext, type CharacterBuilderDraft } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
+import type { MediaScope } from '@rpg/contracts'
 import { Form } from '@rpg/ui/form'
 
 import {
@@ -19,6 +20,7 @@ import { IdentityNameField } from './identity-name-field'
 import { IdentityNarrativeGenerateAction } from './identity-narrative-generate-action'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 import { ManagedMediaField } from '@/features/media'
+import { useSession } from '@/features/auth'
 
 export type IdentityStepProps = {
   context: CharacterBuildContext
@@ -37,19 +39,27 @@ export function IdentityStep({
   onStepComplete,
   onFormContinueValidationFailed,
 }: IdentityStepProps) {
-  const mediaScope = useMemo(
-    () =>
+  const { data: session } = useSession()
+  const mediaScope = useMemo((): MediaScope | undefined => {
+    if (
       context.characterKind === 'npc' &&
       'ownershipTarget' in context &&
       context.ownershipTarget.type === 'campaign'
-        ? { kind: 'campaign-npc' as const, campaignId: context.ownershipTarget.campaignId }
-        : 'ownershipTarget' in context &&
-            'userId' in context.ownershipTarget &&
-            typeof context.ownershipTarget.userId === 'string'
-          ? { kind: 'user-pc' as const, userId: context.ownershipTarget.userId }
-          : { kind: 'user-pc' as const, userId: 'current-user' },
-    [context],
-  )
+    ) {
+      return { kind: 'campaign-npc', campaignId: context.ownershipTarget.campaignId }
+    }
+
+    if (
+      'ownershipTarget' in context &&
+      'userId' in context.ownershipTarget &&
+      typeof context.ownershipTarget.userId === 'string'
+    ) {
+      return { kind: 'user-pc', userId: context.ownershipTarget.userId }
+    }
+
+    const userId = session?.user.id
+    return userId ? { kind: 'user-pc', userId } : undefined
+  }, [context, session?.user.id])
   const fields = useMemo(
     () =>
       buildIdentityStepFormFields({
@@ -68,13 +78,14 @@ export function IdentityStep({
             onContinueValidationFailed={onFormContinueValidationFailed}
           />
         ),
-        renderMediaManager: () => (
-          <ManagedMediaField
-            config={{ domain: 'character', presentation: { layout: 'expanded' } }}
-            scope={mediaScope}
-            label="Character images"
-          />
-        ),
+        renderMediaManager: () =>
+          mediaScope ? (
+            <ManagedMediaField
+              config={{ domain: 'character', presentation: { layout: 'expanded' } }}
+              scope={mediaScope}
+              label="Character images"
+            />
+          ) : null,
       }),
     [context, draft, mediaScope, onDraftChange, onFormContinueValidationFailed, onStepComplete],
   )

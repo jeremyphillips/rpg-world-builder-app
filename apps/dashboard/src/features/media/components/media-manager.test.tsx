@@ -299,4 +299,138 @@ describe('MediaManager', () => {
     expect(screen.getByRole('button', { name: 'Accessibility & details' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove image' })).toBeInTheDocument()
   })
+
+  it('keeps earlier removal undoable after a second removal', async () => {
+    mount({
+      value: {
+        revision: 0,
+        images: [
+          { id: 'image-0', assetId: mediaFixtureAssets[0]!.id },
+          { id: 'image-1', assetId: mediaFixtureAssets[1]!.id },
+        ],
+        roles: {
+          primary: createUploadRoleAssignment('image-0'),
+          portrait: createUploadRoleAssignment('image-0'),
+        },
+      },
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove image' }))
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /Seraphina Vale — mountain expedition.jpg/i,
+      }),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Remove image' }))
+
+    const undoButtons = screen.getAllByRole('button', { name: 'Undo' })
+    expect(undoButtons).toHaveLength(2)
+
+    fireEvent.click(undoButtons[0]!)
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Seraphina Vale — portrait.jpg, Portrait, Primary/ }),
+      ).toBeInTheDocument()
+    })
+    expect(screen.getAllByRole('button', { name: 'Undo' })).toHaveLength(1)
+  })
+
+  it('tracks effective primary ownership across save and reopen for system classes', async () => {
+    const contentContext = {
+      contentType: 'classes' as const,
+      slug: 'fighter',
+      contentSource: 'system' as const,
+      rulesetId: 'srd-cc-5.2.1',
+    }
+    const onSave = vi.fn()
+    const initialValue: MediaManagerProps['value'] = {
+      revision: 0,
+      images: [{ id: 'upload-1', assetId: mediaFixtureAssets[0]!.id }],
+      roles: {},
+    }
+
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    })
+    const { props, rerender } = mount({
+      domain: 'class',
+      value: initialValue,
+      initialAssets: [mediaFixtureAssets[0]!],
+      initialSelectedImageId: 'upload-1',
+      contentContext,
+      onSave,
+    })
+
+    expect(screen.getByRole('button', { name: /System fighter, Primary/ })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /Seraphina Vale — portrait.jpg/i }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Seraphina Vale — portrait.jpg, Primary/ }),
+    ).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Primary image' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled())
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1))
+
+    const savedAfterUploadPrimary = onSave.mock.calls[0]![0].media as MediaManagerProps['value']
+    expect(savedAfterUploadPrimary.roles.primary?.source).toEqual(
+      expect.objectContaining({ kind: 'upload', imageId: 'upload-1' }),
+    )
+
+    rerender(
+      <QueryClientProvider client={client}>
+        <MediaManager
+          open
+          onOpenChange={props.onOpenChange}
+          domain="class"
+          value={savedAfterUploadPrimary}
+          scope={props.scope}
+          mode="form"
+          initialAssets={[mediaFixtureAssets[0]!]}
+          initialSelectedImageId="upload-1"
+          contentContext={contentContext}
+          onSave={onSave}
+        />
+      </QueryClientProvider>,
+    )
+
+    expect(
+      screen.queryByRole('button', { name: /System fighter, Primary/ }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /Seraphina Vale — portrait.jpg, Primary/ }),
+    ).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /System fighter/i }))
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Primary image' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled())
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2))
+
+    const savedAfterSystemPrimary = onSave.mock.calls[1]![0].media as MediaManagerProps['value']
+    expect(savedAfterSystemPrimary.roles.primary).toBeUndefined()
+
+    rerender(
+      <QueryClientProvider client={client}>
+        <MediaManager
+          open
+          onOpenChange={props.onOpenChange}
+          domain="class"
+          value={savedAfterSystemPrimary}
+          scope={props.scope}
+          mode="form"
+          initialAssets={[mediaFixtureAssets[0]!]}
+          contentContext={contentContext}
+          onSave={onSave}
+        />
+      </QueryClientProvider>,
+    )
+
+    expect(screen.getByRole('button', { name: /System fighter, Primary/ })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /Seraphina Vale — portrait.jpg, Primary/ }),
+    ).not.toBeInTheDocument()
+  })
 })

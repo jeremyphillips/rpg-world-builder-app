@@ -14,6 +14,7 @@ const meta = {
   component: MediaImageDetails,
   args: {
     selectedAvailable: uploadAvailable,
+    availableImages: [uploadAvailable],
     asset: mediaFixtureAssets[0]!,
     media: mediaFixture,
     policy: getContentMediaPolicy('character'),

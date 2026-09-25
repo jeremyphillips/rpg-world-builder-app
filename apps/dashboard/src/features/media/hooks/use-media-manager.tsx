@@ -4,6 +4,7 @@ import {
   getAvailableContentImages,
   getContentMediaPolicy,
   normalizePersistedContentMedia,
+  resolveEffectiveImageRoles,
   roleAssignmentMatchesImageId,
   validateContentMedia,
   type AvailableContentImage,
@@ -15,18 +16,20 @@ import { useToastScope } from '@rpg/ui'
 import { fetchMediaAsset } from '../api/media-api'
 import { useMediaUploads } from './use-media-uploads'
 import {
-  assignedRolesForImage,
   createMediaSession,
   hasNewMediaUploads,
   isMediaSessionDirty,
   isRemovableMediaSelection,
   mediaSessionReducer,
   resolvePostRemovalSelection,
+  type DeriveAvailableImages,
+  type MediaAction,
 } from '../lib/media-session'
 import { mediaErrorMessage, mediaImageUrl, systemContentImageUrl } from '../lib/media-display'
 import {
   MEDIA_MANAGER_TOAST_IDS,
   resolveMediaRemovedToastDuration,
+  resolveMediaRemovedToastId,
   resolveMediaUploadLimitToastMessage,
 } from '../lib/media-manager-toast.lib'
 import {
@@ -47,6 +50,7 @@ type MediaManagerConfirm = {
 }
 
 type RemovedImageSnapshot = {
+  toastId: string
   image: ContentMedia['images'][number]
   index: number
   roles: Partial<Record<MediaRole, NonNullable<ContentMedia['roles'][MediaRole]>>>
@@ -73,6 +77,13 @@ function resolveAvailableImages(
   })
 }
 
+function isMediaUploadScopeReady(scope: MediaManagerProps['scope']): boolean {
+  if (scope.kind === 'user-pc') {
+    return scope.userId.length > 0
+  }
+  return true
+}
+
 // fallow-ignore-next-line complexity
 export function useMediaManager({
   onOpenChange,
@@ -89,29 +100,41 @@ export function useMediaManager({
   const toast = useToastScope()
   const policy = getContentMediaPolicy(domain)
   const allowedRoles = policy.allowedRoles
-  const availableImages = useMemo(
+  const deriveAvailableImages = useCallback<DeriveAvailableImages>(
+    (media) => resolveAvailableImages(media, contentContext),
+    [contentContext],
+  )
+  const initialAvailableImages = useMemo(
     () => resolveAvailableImages(value, contentContext),
     [contentContext, value],
   )
-  const [state, dispatch] = useReducer(mediaSessionReducer, undefined, () =>
-    createMediaSession(
-      value,
-      initialSelectedImageId,
-      allowedRoles,
-      availableImages.length > 0 ? availableImages : resolveAvailableImages(value, contentContext),
-    ),
+  const [state, dispatchReducer] = useReducer(
+    (current: ReturnType<typeof createMediaSession>, action: MediaAction) =>
+      mediaSessionReducer(current, action, deriveAvailableImages),
+    undefined,
+    () =>
+      createMediaSession(
+        value,
+        initialSelectedImageId,
+        allowedRoles,
+        initialAvailableImages.length > 0
+          ? initialAvailableImages
+          : resolveAvailableImages(value, contentContext),
+      ),
   )
   const sessionAvailableImages = useMemo(
-    () => resolveAvailableImages(state.media, contentContext),
-    [contentContext, state.media],
+    () => deriveAvailableImages(state.media),
+    [deriveAvailableImages, state.media],
   )
   const [uploaded, setUploaded] = useState<Record<string, MediaAsset>>({})
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [confirm, setConfirm] = useState<MediaManagerConfirm | null>(null)
-  const removedSnapshot = useRef<RemovedImageSnapshot | null>(null)
+  const removedSnapshots = useRef(new Map<string, RemovedImageSnapshot>())
   const stateRef = useRef(state)
   stateRef.current = state
+  const mutationsLocked = saving
+  const uploadScopeReady = isMediaUploadScopeReady(scope)
   const knownAssets = useMemo(
     () => ({ ...Object.fromEntries(initialAssets.map((asset) => [asset.id, asset])), ...uploaded }),
     [initialAssets, uploaded],
@@ -129,24 +152,17 @@ export function useMediaManager({
     if (query.data) assets[query.data.id] = query.data
   })
 
-  const selectedAvailable = state.selectedId
-    ? sessionAvailableImages.find((image) => image.id === state.selectedId)
-    : undefined
-  const selectedUpload =
-    selectedAvailable?.kind === 'upload'
-      ? selectedAvailable.attachment
-      : state.media.images.find((image) => image.id === state.selectedId)
-  const selected = selectedUpload
-  const asset = selected ? assets[selected.assetId] : undefined
-  const selectedSourceDimensions =
-    selectedAvailable?.kind === 'system'
-      ? selectedAvailable.sourceDimensions
-      : asset
-        ? { width: asset.orientedWidth, height: asset.orientedHeight }
-        : undefined
+  const dispatch = useCallback(
+    (action: MediaAction) => {
+      if (mutationsLocked) return
+      dispatchReducer(action)
+    },
+    [mutationsLocked],
+  )
 
   const addAsset = useCallback(
     (asset: MediaAsset, id: string) => {
+      if (mutationsLocked) return
       if (state.media.images.some((image) => image.assetId === asset.id)) {
         toast.toast({
           id: MEDIA_MANAGER_TOAST_IDS.duplicate,
@@ -157,7 +173,7 @@ export function useMediaManager({
       setUploaded((previous) => ({ ...previous, [asset.id]: asset }))
       dispatch({ type: 'add', asset, id })
     },
-    [state.media.images, toast],
+    [mutationsLocked, state.media.images, toast, dispatch],
   )
 
   const uploads = useMediaUploads(
@@ -172,6 +188,7 @@ export function useMediaManager({
         tone: 'warning',
       })
     },
+    uploadScopeReady && !mutationsLocked,
   )
 
   useEffect(() => {
@@ -201,16 +218,33 @@ export function useMediaManager({
   })
   const metadataReady = state.media.images.every((image) => Boolean(assets[image.assetId]))
   const label = domain === 'equipment' ? 'equipment item' : domain
+  const selectedAvailable = state.selectedId
+    ? sessionAvailableImages.find((image) => image.id === state.selectedId)
+    : undefined
   const onAlt = useCallback(
     (alt: string) => {
+      if (mutationsLocked) return
       if (state.selectedId && selectedAvailable?.kind === 'upload') {
         dispatch({ type: 'alt', id: state.selectedId, alt })
       }
     },
-    [selectedAvailable?.kind, state.selectedId],
+    [mutationsLocked, selectedAvailable?.kind, state.selectedId, dispatch],
   )
+  const selectedUpload =
+    selectedAvailable?.kind === 'upload'
+      ? selectedAvailable.attachment
+      : state.media.images.find((image) => image.id === state.selectedId)
+  const selected = selectedUpload
+  const asset = selected ? assets[selected.assetId] : undefined
+  const selectedSourceDimensions =
+    selectedAvailable?.kind === 'system'
+      ? selectedAvailable.sourceDimensions
+      : asset
+        ? { width: asset.orientedWidth, height: asset.orientedHeight }
+        : undefined
 
   function notifyRejectedDrop(message: string) {
+    if (mutationsLocked) return
     toast.toast({
       id: MEDIA_MANAGER_TOAST_IDS.dropRejected,
       title: message,
@@ -242,7 +276,7 @@ export function useMediaManager({
   }
 
   function changeRole(role: MediaRole, assigned: boolean) {
-    if (!state.selectedId) return
+    if (mutationsLocked || !state.selectedId) return
     const apply = () =>
       dispatch({
         type: 'role',
@@ -275,8 +309,9 @@ export function useMediaManager({
     apply()
   }
 
-  function restoreRemovedImage() {
-    const snapshot = removedSnapshot.current
+  function restoreRemovedImage(toastId: string) {
+    if (mutationsLocked) return
+    const snapshot = removedSnapshots.current.get(toastId)
     if (!snapshot) return
     dispatch({
       type: 'restoreRemoved',
@@ -286,12 +321,12 @@ export function useMediaManager({
       restoreSelection: stateRef.current.selectedId === snapshot.fallbackSelectedId,
       allowedRoles,
     })
-    removedSnapshot.current = null
-    toast.dismiss(MEDIA_MANAGER_TOAST_IDS.imageRemoved)
+    removedSnapshots.current.delete(toastId)
+    toast.dismiss(toastId)
   }
 
   function remove() {
-    if (!selected || !asset) return
+    if (mutationsLocked || !selected || !asset) return
     const index = state.media.images.findIndex((image) => image.id === selected.id)
     const remainingImages = state.media.images.filter((image) => image.id !== selected.id)
     const fallbackSelectedId = resolvePostRemovalSelection(remainingImages, index)
@@ -300,18 +335,20 @@ export function useMediaManager({
         .filter((role) => roleAssignmentMatchesImageId(state.media.roles[role], selected.id))
         .map((role) => [role, structuredClone(state.media.roles[role]!)]),
     ) as RemovedImageSnapshot['roles']
+    const toastId = resolveMediaRemovedToastId()
 
-    removedSnapshot.current = {
+    removedSnapshots.current.set(toastId, {
+      toastId,
       image: structuredClone(selected),
       index,
       roles,
       fallbackSelectedId,
-    }
+    })
 
     dispatch({ type: 'remove', id: selected.id, allowedRoles })
 
     toast.toast({
-      id: MEDIA_MANAGER_TOAST_IDS.imageRemoved,
+      id: toastId,
       title: 'Image removed',
       duration: resolveMediaRemovedToastDuration(),
       leading: (
@@ -324,16 +361,24 @@ export function useMediaManager({
       action: {
         label: 'Undo',
         variant: 'text',
-        onClick: restoreRemovedImage,
+        onClick: () => restoreRemovedImage(toastId),
       },
       onDismiss: () => {
-        removedSnapshot.current = null
+        removedSnapshots.current.delete(toastId)
       },
     })
   }
 
   const blocked = saving || !validation.ok || !metadataReady || uploads.entries.length > 0 || !dirty
   const canRemove = isRemovableMediaSelection(state.selectedId, sessionAvailableImages)
+  const assignedRolesForSelection = state.selectedId
+    ? resolveEffectiveImageRoles(
+        state.media,
+        state.selectedId,
+        allowedRoles,
+        sessionAvailableImages,
+      ).roles
+    : []
 
   async function save() {
     if (blocked) return
@@ -356,8 +401,10 @@ export function useMediaManager({
         expectedMediaRevision: state.initial.revision,
         assets: Object.values(assets),
       })
-      removedSnapshot.current = null
-      toast.dismiss(MEDIA_MANAGER_TOAST_IDS.imageRemoved)
+      for (const toastId of removedSnapshots.current.keys()) {
+        toast.dismiss(toastId)
+      }
+      removedSnapshots.current.clear()
       toast.dismissAll()
       onOpenChange(false)
     } catch (failure) {
@@ -373,6 +420,7 @@ export function useMediaManager({
     dispatch,
     assets,
     saving,
+    mutationsLocked,
     error,
     confirm,
     setConfirm,
@@ -394,9 +442,7 @@ export function useMediaManager({
     notifyRejectedDrop,
     resolveSystemImageUrl,
     sessionAvailableImages,
-    assignedRolesForSelection: state.selectedId
-      ? assignedRolesForImage(state.media, state.selectedId, allowedRoles, sessionAvailableImages)
-      : [],
+    assignedRolesForSelection,
   }
 }
 

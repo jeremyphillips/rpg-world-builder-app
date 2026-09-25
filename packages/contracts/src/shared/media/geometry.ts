@@ -322,6 +322,39 @@ export function isFocalPointInCrop(
   )
 }
 
+const FOCAL_POINT_CENTER_EPSILON = 1e-6
+
+function focalPointsEqual(
+  left: NormalizedFocalPoint,
+  right: NormalizedFocalPoint,
+  epsilon = FOCAL_POINT_CENTER_EPSILON,
+): boolean {
+  return Math.abs(left.x - right.x) <= epsilon && Math.abs(left.y - right.y) <= epsilon
+}
+
+/** Recenter implicit focal points and clamp explicit ones whenever the crop changes. */
+export function normalizeFocalPointForCrop(
+  previousCrop: NormalizedCrop | undefined,
+  nextCrop: NormalizedCrop,
+  focalPoint: NormalizedFocalPoint | undefined,
+): NormalizedFocalPoint {
+  if (!focalPoint) {
+    return focalPointFromCropCenter(nextCrop)
+  }
+
+  const previousCenter = previousCrop ? focalPointFromCropCenter(previousCrop) : undefined
+  const isImplicit = !previousCenter || focalPointsEqual(focalPoint, previousCenter)
+
+  if (isImplicit) {
+    return focalPointFromCropCenter(nextCrop)
+  }
+
+  return {
+    x: clamp(focalPoint.x, nextCrop.x, nextCrop.x + nextCrop.width),
+    y: clamp(focalPoint.y, nextCrop.y, nextCrop.y + nextCrop.height),
+  }
+}
+
 function defaultCropForRole(role: MediaRole, source: SourceDimensions): NormalizedCrop {
   const spec = getFixedAspectCropSpec(role)
   if (spec) {

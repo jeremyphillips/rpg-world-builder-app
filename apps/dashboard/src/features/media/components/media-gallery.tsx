@@ -9,6 +9,7 @@ import {
 import { Images } from 'lucide-react'
 import {
   mediaRoleSurfaceCopy,
+  resolveEffectiveImageRoles,
   type AvailableContentImage,
   type ContentMedia,
   type MediaAsset,
@@ -16,7 +17,6 @@ import {
 } from '@rpg/contracts'
 import type { UploadEntry } from '../hooks/use-media-uploads'
 import { resolveUploadEntryStatusLabel } from '../hooks/use-media-uploads'
-import { assignedRolesForImage } from '../lib/media-session'
 import { mediaImageUrl, systemContentImageUrl } from '../lib/media-display'
 import { MEDIA_IMAGE_ACCEPT } from '../lib/media-upload.lib'
 import { mediaManagerStyles as styles } from './media-manager.variants'
@@ -35,6 +35,7 @@ export type MediaGalleryProps = {
   onRetry: (id: string) => void
   onRemoveUpload: (id: string) => void
   onScrollBoundaryChange?: (state: ScrollBoundaryState) => void
+  mutationsLocked?: boolean
 }
 
 function resolveGalleryImageSrc(
@@ -73,6 +74,7 @@ export function MediaGallery({
   onRetry,
   onRemoveUpload,
   onScrollBoundaryChange,
+  mutationsLocked = false,
 }: MediaGalleryProps) {
   const input = useRef<HTMLInputElement>(null)
   const imageCount = availableImages.length
@@ -89,7 +91,12 @@ export function MediaGallery({
       >
         <div className={styles.galleryHeaderRow()}>
           <h2 className={styles.subheading()}>Images ({imageCount})</h2>
-          <Button type="button" variant="outline" onClick={() => input.current?.click()}>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={mutationsLocked}
+            onClick={() => input.current?.click()}
+          >
             + Add images
           </Button>
           <input
@@ -99,6 +106,7 @@ export function MediaGallery({
             aria-label="Upload images"
             multiple
             accept={MEDIA_IMAGE_ACCEPT.join(',')}
+            disabled={mutationsLocked}
             onChange={(event) => {
               onAdd(Array.from(event.target.files ?? []))
               event.target.value = ''
@@ -114,7 +122,12 @@ export function MediaGallery({
         ) : (
           <div className={styles.grid()}>
             {availableImages.map((image, index) => {
-              const roles = assignedRolesForImage(media, image.id, allowedRoles, availableImages)
+              const roles = resolveEffectiveImageRoles(
+                media,
+                image.id,
+                allowedRoles,
+                availableImages,
+              ).roles
               const roleLabels = roles.map((role) => mediaRoleSurfaceCopy[role].switchLabel)
               return (
                 <button

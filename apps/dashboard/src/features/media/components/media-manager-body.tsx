@@ -69,6 +69,7 @@ export function MediaManagerBody({
           onRetry={controller.uploads.retry}
           onRemoveUpload={controller.uploads.remove}
           onScrollBoundaryChange={onGalleryBoundaryChange}
+          mutationsLocked={controller.mutationsLocked}
         />
         <MediaWorkspace
           controller={controller}
@@ -78,6 +79,7 @@ export function MediaManagerBody({
         {showDetailsColumn && selectedAvailable ? (
           <MediaImageDetails
             selectedAvailable={selectedAvailable}
+            availableImages={controller.sessionAvailableImages}
             asset={asset}
             media={media}
             policy={policy}

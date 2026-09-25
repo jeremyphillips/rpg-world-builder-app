@@ -1,4 +1,9 @@
-import { createUploadRoleAssignment, roleAssignmentUploadImageId } from '@rpg/contracts'
+import {
+  createUploadRoleAssignment,
+  focalPointFromCropCenter,
+  roleAssignmentUploadImageId,
+  type ContentMedia,
+} from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 import {
@@ -6,9 +11,24 @@ import {
   hasNewMediaUploads,
   isMediaSessionDirty,
   mediaSessionReducer,
+  type DeriveAvailableImages,
 } from './media-session'
 
 const characterRoles = ['portrait', 'primary'] as const
+
+const deriveUploadAvailableImages: DeriveAvailableImages = (media: ContentMedia) =>
+  media.images.map((attachment) => ({
+    kind: 'upload' as const,
+    id: attachment.id,
+    attachment,
+  }))
+
+function reduce(
+  state: ReturnType<typeof createMediaSession>,
+  action: Parameters<typeof mediaSessionReducer>[1],
+) {
+  return mediaSessionReducer(state, action, deriveUploadAvailableImages)
+}
 
 describe('isolated media session', () => {
   it('honors a valid requested selection and falls back when it is stale', () => {
@@ -22,15 +42,19 @@ describe('isolated media session', () => {
     const initial = structuredClone(mediaFixture)
     let state = createMediaSession(initial, undefined, characterRoles)
     const crop = { x: 0.1, y: 0.2, width: 0.6, height: 0.4 }
-    state = mediaSessionReducer(state, { type: 'presentation', role: 'portrait' })
-    state = mediaSessionReducer(state, { type: 'crop', crop })
-    state = mediaSessionReducer(state, {
+    state = reduce(state, { type: 'presentation', role: 'portrait' })
+    state = reduce(state, { type: 'crop', crop })
+    state = reduce(state, {
       type: 'select',
       id: 'image-1',
       allowedRoles: characterRoles,
     })
-    state = mediaSessionReducer(state, { type: 'alt', id: 'image-1', alt: 'New description' })
-    expect(state.media.roles.portrait?.presentation).toEqual({ mode: 'crop', crop })
+    state = reduce(state, { type: 'alt', id: 'image-1', alt: 'New description' })
+    expect(state.media.roles.portrait?.presentation).toEqual({
+      mode: 'crop',
+      crop,
+      focalPoint: focalPointFromCropCenter(crop),
+    })
     expect(state.media.roles.primary).toEqual(initial.roles.primary)
     expect(initial).toEqual(mediaFixture)
     expect(isMediaSessionDirty(state)).toBe(true)
@@ -49,7 +73,7 @@ describe('isolated media session', () => {
       undefined,
       characterRoles,
     )
-    state = mediaSessionReducer(state, {
+    state = reduce(state, {
       type: 'remove',
       id: 'image-0',
       allowedRoles: characterRoles,
@@ -75,12 +99,12 @@ describe('isolated media session', () => {
       portrait: structuredClone(state.media.roles.portrait!),
       primary: structuredClone(state.media.roles.primary!),
     }
-    state = mediaSessionReducer(state, {
+    state = reduce(state, {
       type: 'remove',
       id: 'image-0',
       allowedRoles: characterRoles,
     })
-    state = mediaSessionReducer(state, {
+    state = reduce(state, {
       type: 'restoreRemoved',
       image: removed,
       index: 0,
@@ -99,8 +123,8 @@ describe('isolated media session', () => {
       undefined,
       characterRoles,
     )
-    state = mediaSessionReducer(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
-    state = mediaSessionReducer(state, { type: 'add', id: 'b', asset: mediaFixtureAssets[0]! })
+    state = reduce(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
+    state = reduce(state, { type: 'add', id: 'b', asset: mediaFixtureAssets[0]! })
     expect(state.media.images).toHaveLength(1)
     expect(state.media.roles).toEqual({})
   })
@@ -111,7 +135,7 @@ describe('isolated media session', () => {
       undefined,
       characterRoles,
     )
-    state = mediaSessionReducer(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
+    state = reduce(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
     expect(state.selectedId).toBe('a')
   })
 
@@ -121,13 +145,13 @@ describe('isolated media session', () => {
       undefined,
       characterRoles,
     )
-    state = mediaSessionReducer(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
-    state = mediaSessionReducer(state, { type: 'add', id: 'b', asset: mediaFixtureAssets[1]! })
+    state = reduce(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
+    state = reduce(state, { type: 'add', id: 'b', asset: mediaFixtureAssets[1]! })
     expect(state.selectedId).toBe('a')
   })
 
   it('transfers one role without disturbing the other role or parent revision', () => {
-    const state = mediaSessionReducer(createMediaSession(mediaFixture, undefined, characterRoles), {
+    const state = reduce(createMediaSession(mediaFixture, undefined, characterRoles), {
       type: 'role',
       id: 'image-1',
       role: 'portrait',
@@ -147,7 +171,7 @@ describe('isolated media session', () => {
       characterRoles,
     )
     expect(hasNewMediaUploads(state)).toBe(false)
-    state = mediaSessionReducer(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
+    state = reduce(state, { type: 'add', id: 'a', asset: mediaFixtureAssets[0]! })
     expect(hasNewMediaUploads(state)).toBe(true)
   })
 })

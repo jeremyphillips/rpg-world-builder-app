@@ -7,10 +7,12 @@ import {
   cropFromFocalPoint,
   cropFromPanZoom,
   fixedAspectRoleEligibility,
+  focalPointFromCropCenter,
   isFixedAspectCrop,
   isSquareCrop,
   meetsFixedAspectMinimum,
   meetsPortraitMinimumCrop,
+  normalizeFocalPointForCrop,
   resetFixedAspectCrop,
   resetPortraitCrop,
   resetPrimaryCrop,
@@ -226,5 +228,27 @@ describe('fixedAspectRoleEligibility and validateContentMedia', () => {
         }),
       ),
     )
+  })
+})
+
+describe('normalizeFocalPointForCrop', () => {
+  it('recenters implicit focal points when the crop changes', () => {
+    const previousCrop = resetPrimaryCrop({ width: 1600, height: 1200 })
+    const nextCrop = { ...previousCrop, x: previousCrop.x + 0.1 }
+    const implicitFocal = focalPointFromCropCenter(previousCrop)
+
+    expect(normalizeFocalPointForCrop(previousCrop, nextCrop, implicitFocal)).toEqual(
+      focalPointFromCropCenter(nextCrop),
+    )
+  })
+
+  it('clamps explicit focal points into the next crop', () => {
+    const previousCrop = resetPrimaryCrop({ width: 1600, height: 1200 })
+    const nextCrop = { ...previousCrop, width: previousCrop.width / 2 }
+    const explicitFocal = { x: previousCrop.x + previousCrop.width - 0.01, y: 0.5 }
+
+    const normalized = normalizeFocalPointForCrop(previousCrop, nextCrop, explicitFocal)
+    expect(normalized.x).toBeLessThanOrEqual(nextCrop.x + nextCrop.width)
+    expect(normalized.x).toBeGreaterThanOrEqual(nextCrop.x)
   })
 })

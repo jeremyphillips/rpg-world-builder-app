@@ -1,5 +1,6 @@
 import { useRef } from 'react'
-import { Button, ConfirmDialog, Modal, ToastScopeProvider } from '@rpg/ui'
+import { Alert, Button, ConfirmDialog, Modal, ToastScopeProvider } from '@rpg/ui'
+import { formatFieldMessage } from '@rpg/contracts'
 import { useMediaManager } from '../hooks/use-media-manager'
 import { useMediaManagerBodyDrop } from '../hooks/use-media-manager-body-drop'
 import { useMediaManagerScrollBoundary } from '../hooks/use-media-manager-scroll-boundary'
@@ -56,6 +57,7 @@ function MediaManagerSessionContent({
     dismiss,
     save,
     blocked,
+    validation,
     notifyRejectedDrop,
   } = controller
   dismissRef.current = dismiss
@@ -64,6 +66,7 @@ function MediaManagerSessionContent({
     onAdd: uploads.add,
     onReject: notifyRejectedDrop,
     maxUploadBytes: uploads.maxUploadBytes,
+    disabled: controller.mutationsLocked,
   })
   const {
     headerScrolled,
@@ -105,6 +108,15 @@ function MediaManagerSessionContent({
         <div className={styles.row()}>
           <p className={styles.footerHint()}>{resolveMediaManagerFooterHint(props.mode, label)}</p>
           <div className={styles.row()}>
+            {!saving && !validation.ok && validation.issues.length > 0 ? (
+              <Alert
+                variant="warning"
+                density="compact"
+                description={`${formatFieldMessage(validation.issues[0]!.message)}${
+                  validation.issues.length > 1 ? ` +${validation.issues.length - 1} more` : ''
+                }`}
+              />
+            ) : null}
             <Button type="button" variant="outline" disabled={saving} onClick={dismiss}>
               Cancel
             </Button>

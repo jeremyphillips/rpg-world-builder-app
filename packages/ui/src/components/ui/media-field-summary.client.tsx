@@ -90,11 +90,12 @@ function CompactMediaFieldSummary({
   onOpen,
   emptyContent,
 }: MediaFieldSummaryLayoutProps) {
-  const resolvedAttachmentCount = attachmentCount ?? items.length
-  const hasPreview = items.length > 0
+  const resolvedUploadCount =
+    attachmentCount ?? items.filter((item) => !item.id.startsWith('system:')).length
+  const galleryCount = items.length
   const canEdit = !disabled && !readOnly
   const representative = resolveRepresentative(items, representativeId)
-  const copy = resolveCompactSummaryCopy(resolvedAttachmentCount, maxItems, hasPreview)
+  const copy = resolveCompactSummaryCopy(resolvedUploadCount, galleryCount, maxItems)
   const openManager = () => onOpen(representative?.id)
 
   return (

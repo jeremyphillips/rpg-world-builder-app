@@ -37,6 +37,7 @@ export function useMediaUploads(
   onAsset: (asset: MediaAsset, id: string) => void,
   maxItems = CONTENT_MEDIA_MAX_ATTACHMENTS,
   onUploadLimit?: (remaining: number) => void,
+  enabled = true,
 ) {
   const [entries, setEntries] = useState<UploadEntry[]>([])
   const [maxUploadBytes, setMaxUploadBytes] = useState<number | undefined>(undefined)
@@ -48,6 +49,9 @@ export function useMediaUploads(
   const session = useRef<Promise<MediaUploadSession> | undefined>(undefined)
 
   const ensureSession = useCallback(() => {
+    if (!enabled) {
+      return Promise.reject(new Error('Upload session is not ready.'))
+    }
     session.current ??= createUploadSession(scope)
       .then((uploadSession) => {
         if (alive.current) setMaxUploadBytes(uploadSession.maxUploadBytes)
@@ -58,10 +62,12 @@ export function useMediaUploads(
         throw error
       })
     return session.current
-  }, [scope])
+  }, [enabled, scope])
   useEffect(() => {
+    session.current = undefined
+    if (!enabled) return
     void ensureSession()
-  }, [ensureSession])
+  }, [ensureSession, enabled])
 
   const mutation = useMutation({
     mutationFn: async (entry: UploadEntry & { signal: AbortSignal }) => {
@@ -126,6 +132,7 @@ export function useMediaUploads(
     publish()
   }
   function add(files: File[]) {
+    if (!enabled) return
     const remaining = Math.max(0, maxItems - count - queue.current.length)
     if (files.length > remaining && remaining >= 0) onUploadLimit?.(remaining)
     for (const file of files.slice(0, remaining))
