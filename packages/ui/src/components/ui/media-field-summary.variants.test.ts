@@ -1,18 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  mediaSummaryCompactActionVariants,
-  mediaSummaryCompactButtonVariants,
+  mediaSummaryCompactGearButtonVariants,
+  mediaSummaryCompactInteractiveRootVariants,
+  mediaSummaryCompactOverlayVariants,
+  mediaSummaryCompactPreviewButtonVariants,
   mediaSummaryWellVariants,
 } from './media-field-summary.variants'
 
-describe('mediaSummaryCompactButtonVariants', () => {
-  it('keeps hover and focus chrome off the parent control', () => {
-    const classes = mediaSummaryCompactButtonVariants()
+describe('mediaSummaryCompactInteractiveRootVariants', () => {
+  it('keeps the compact preview in a fixed square hover group container', () => {
+    const classes = mediaSummaryCompactInteractiveRootVariants()
     expect(classes).toContain('group')
-    expect(classes).toContain('cursor-pointer')
-    expect(classes).not.toContain('hover:bg-muted')
-    expect(classes).not.toContain('focus-visible:ring-2')
+    expect(classes).toContain('relative')
+    expect(classes).toContain('block')
+    expect(classes).toContain('size-24')
+    expect(classes).toContain('overflow-hidden')
   })
 })
 
@@ -21,14 +24,40 @@ describe('mediaSummaryWellVariants', () => {
     const classes = mediaSummaryWellVariants({ layout: 'compact' })
     expect(classes).toContain('group-hover:border-ring/50')
     expect(classes).toContain('group-hover:bg-accent')
-    expect(classes).toContain('group-focus-visible:ring-2')
+    expect(classes).toContain('group-focus-within:ring-2')
   })
 })
 
-describe('mediaSummaryCompactActionVariants', () => {
-  it('underlines the action on group hover and focus', () => {
-    const classes = mediaSummaryCompactActionVariants()
-    expect(classes).toContain('group-hover:underline')
-    expect(classes).toContain('group-focus-visible:underline')
+describe('mediaSummaryCompactPreviewButtonVariants', () => {
+  it('exposes focus ring chrome and pointer cursor on the preview control', () => {
+    const classes = mediaSummaryCompactPreviewButtonVariants()
+    expect(classes).toContain('focus-visible:ring-2')
+    expect(classes).toContain('enabled:cursor-pointer')
+  })
+})
+
+describe('mediaSummaryCompactOverlayVariants', () => {
+  it('anchors count copy over a translucent sunken bar', () => {
+    const classes = mediaSummaryCompactOverlayVariants()
+    expect(classes).toContain('absolute')
+    expect(classes).toContain('bottom-px')
+    expect(classes).toContain('inset-x-px')
+    expect(classes).toContain('h-5')
+    expect(classes).toContain('items-center')
+    expect(classes).toContain('bg-sunken/80')
+  })
+})
+
+describe('mediaSummaryCompactGearButtonVariants', () => {
+  it('exposes focus ring chrome and trailing inset on the manage control', () => {
+    const classes = mediaSummaryCompactGearButtonVariants()
+    expect(classes).toContain('absolute')
+    expect(classes).toContain('bottom-px')
+    expect(classes).toContain('right-px')
+    expect(classes).toContain('h-5')
+    expect(classes).toContain('focus-visible:ring-2')
+    expect(classes).toContain('enabled:cursor-pointer')
+    expect(classes).toContain('items-center')
+    expect(classes).toContain('pr-0.5')
   })
 })

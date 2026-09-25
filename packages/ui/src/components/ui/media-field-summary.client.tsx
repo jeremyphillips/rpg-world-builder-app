@@ -1,17 +1,21 @@
 'use client'
 
-import { ImagePlus } from 'lucide-react'
+import { ImagePlus, Settings } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { MediaImage } from './media-image.client'
-import { resolveCompactSummaryCopy } from './media-field-summary.lib'
 import {
-  mediaSummaryCompactActionVariants,
-  mediaSummaryCompactButtonVariants,
-  mediaSummaryCompactMetaVariants,
-  mediaSummaryCompactSplitPrefixVariants,
-  mediaSummaryCompactSplitVariants,
+  MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL,
+  resolveCompactSummaryCopy,
+} from './media-field-summary.lib'
+import {
+  mediaSummaryCompactCountVariants,
+  mediaSummaryCompactGearButtonVariants,
+  mediaSummaryCompactGearIconVariants,
+  mediaSummaryCompactInteractiveRootVariants,
+  mediaSummaryCompactOverlayVariants,
+  mediaSummaryCompactPreviewButtonVariants,
   mediaSummaryTileButtonVariants,
   mediaSummaryWellVariants,
 } from './media-field-summary.variants'
@@ -29,6 +33,8 @@ export type MediaFieldSummaryProps = {
   label: string
   layout: 'compact' | 'expanded'
   items: readonly MediaFieldSummaryItem[]
+  /** Uploaded attachments only — omit virtual or derived preview sources. */
+  attachmentCount?: number
   maxItems: number
   countDisplay?: 'capacity' | 'count'
   representativeId?: string
@@ -47,8 +53,7 @@ function SummaryImage({ item }: { item: MediaFieldSummaryItem }) {
       src={item.state === 'error' ? undefined : item.src}
       alt=""
       shape="square"
-      size="lg"
-      className={cn('size-full', loading && 'animate-pulse')}
+      className={cn('size-full rounded-none', loading && 'animate-pulse')}
       placeholderLabel={loading ? 'Image preview loading' : 'Preview unavailable'}
     />
   )
@@ -60,40 +65,68 @@ function resolveRepresentative(items: readonly MediaFieldSummaryItem[], represen
   return items.find((item) => item.id === representativeId) ?? items[0]
 }
 
+function CompactPreviewWell({
+  representative,
+  emptyContent,
+}: {
+  representative?: MediaFieldSummaryItem
+  emptyContent?: ReactNode
+}) {
+  return (
+    <span className={mediaSummaryWellVariants({ layout: 'compact' })} aria-hidden="true">
+      {representative ? <SummaryImage item={representative} /> : (emptyContent ?? <ImagePlus />)}
+    </span>
+  )
+}
+
 function CompactMediaFieldSummary({
   label,
   items,
+  attachmentCount,
   maxItems,
-  countDisplay = 'capacity',
   representativeId,
   disabled = false,
   readOnly = false,
   onOpen,
   emptyContent,
 }: MediaFieldSummaryLayoutProps) {
-  const count = items.length
+  const resolvedAttachmentCount = attachmentCount ?? items.length
+  const hasPreview = items.length > 0
   const canEdit = !disabled && !readOnly
   const representative = resolveRepresentative(items, representativeId)
-  const copy = resolveCompactSummaryCopy(count, maxItems, countDisplay)
+  const copy = resolveCompactSummaryCopy(resolvedAttachmentCount, maxItems, hasPreview)
+  const openManager = () => onOpen(representative?.id)
 
   return (
-    <button
-      type="button"
-      className={mediaSummaryCompactButtonVariants()}
-      disabled={!canEdit}
-      onClick={() => onOpen(representative?.id)}
-      aria-label={`${label}: ${copy.ariaLabel}`}
-    >
-      <span className={mediaSummaryWellVariants({ layout: 'compact' })} aria-hidden="true">
-        {representative ? <SummaryImage item={representative} /> : (emptyContent ?? <ImagePlus />)}
-      </span>
-      <span className={mediaSummaryCompactMetaVariants()}>
-        <span className={mediaSummaryCompactSplitVariants()}>
-          <span className={mediaSummaryCompactSplitPrefixVariants()}>{copy.subject} ·</span>
-          <span className={mediaSummaryCompactActionVariants()}>{copy.action}</span>
-        </span>
-      </span>
-    </button>
+    <div className={mediaSummaryCompactInteractiveRootVariants()} role="group" aria-label={label}>
+      <button
+        type="button"
+        className={mediaSummaryCompactPreviewButtonVariants()}
+        disabled={!canEdit}
+        onClick={openManager}
+        aria-label={`${label}: ${copy.previewAriaLabel}`}
+      >
+        <CompactPreviewWell representative={representative} emptyContent={emptyContent} />
+        <div
+          className={cn(
+            mediaSummaryCompactOverlayVariants(),
+            copy.showManageGear && canEdit && 'pr-6',
+          )}
+        >
+          <span className={mediaSummaryCompactCountVariants()}>{copy.countLabel}</span>
+        </div>
+      </button>
+      {copy.showManageGear && canEdit ? (
+        <button
+          type="button"
+          className={mediaSummaryCompactGearButtonVariants()}
+          aria-label={MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL}
+          onClick={openManager}
+        >
+          <Settings aria-hidden="true" className={mediaSummaryCompactGearIconVariants()} />
+        </button>
+      ) : null}
+    </div>
   )
 }
 

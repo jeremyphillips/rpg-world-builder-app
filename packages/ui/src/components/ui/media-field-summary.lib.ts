@@ -1,41 +1,56 @@
+export const MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL = 'Manage images'
+
 export type CompactSummaryCopy = {
-  subject: string
-  action: string
-  ariaLabel: string
+  countLabel: string
+  showManageGear: boolean
+  previewAriaLabel: string
 }
 
-export function resolveCompactCountCopy(
-  count: number,
+/** Visible image count for compact copy — derived previews count as one image. */
+export function resolveCompactDisplayCount(attachmentCount: number, hasPreview: boolean): number {
+  if (attachmentCount === 0 && hasPreview) return 1
+  return attachmentCount
+}
+
+export function resolveCompactAttachmentCountLabel(
+  displayCount: number,
+  attachmentCount: number,
   maxItems: number,
-  display: 'capacity' | 'count',
 ): string {
-  if (display === 'count') return `${count} ${count === 1 ? 'image' : 'images'} · Manage`
-  return `${count} of ${maxItems} images · Manage`
-}
-
-function splitCompactActionCopy(text: string): Pick<CompactSummaryCopy, 'subject' | 'action'> {
-  const separator = ' · '
-  const index = text.lastIndexOf(separator)
-  if (index === -1) return { subject: text, action: '' }
-  return {
-    subject: text.slice(0, index),
-    action: text.slice(index + separator.length),
+  if (maxItems === 1) {
+    if (displayCount === 0) return 'No image'
+    const base = '1 image'
+    return attachmentCount >= maxItems ? `${base} · Limit reached` : base
   }
+
+  if (displayCount === 0) return 'No images'
+
+  const noun = displayCount === 1 ? 'image' : 'images'
+  const base = `${displayCount} ${noun}`
+  if (attachmentCount >= maxItems) return `${base} · Limit reached`
+  return base
 }
 
 export function resolveCompactSummaryCopy(
-  count: number,
+  attachmentCount: number,
   maxItems: number,
-  countDisplay: 'capacity' | 'count' = 'capacity',
+  hasPreview: boolean,
 ): CompactSummaryCopy {
-  const single = maxItems === 1
-  if (count === 0) {
-    const subject = single ? 'No image' : 'No images'
-    return { subject, action: 'Add', ariaLabel: `${subject}. Add` }
+  const displayCount = resolveCompactDisplayCount(attachmentCount, hasPreview)
+
+  if (displayCount === 0 && !hasPreview) {
+    const countLabel = resolveCompactAttachmentCountLabel(displayCount, attachmentCount, maxItems)
+    return {
+      countLabel,
+      showManageGear: false,
+      previewAriaLabel: `${countLabel}. Add`,
+    }
   }
-  if (single) {
-    return { subject: 'Image', action: 'Change', ariaLabel: 'Image. Change' }
+
+  const countLabel = resolveCompactAttachmentCountLabel(displayCount, attachmentCount, maxItems)
+  return {
+    countLabel,
+    showManageGear: true,
+    previewAriaLabel: countLabel,
   }
-  const text = resolveCompactCountCopy(count, maxItems, countDisplay)
-  return { ...splitCompactActionCopy(text), ariaLabel: text }
 }

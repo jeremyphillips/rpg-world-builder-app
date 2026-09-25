@@ -30,11 +30,12 @@ describe('MediaFieldSummary', () => {
         onOpen={onOpen}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Portrait: Image. Change' }))
+    expect(screen.getByText('1 image · Limit reached')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Manage images' }))
     expect(onOpen).toHaveBeenCalledWith('one')
   })
 
-  it('shows capacity copy and opens the representative attachment', () => {
+  it('shows attachment count without capacity and opens from the gear control', () => {
     const onOpen = vi.fn()
     render(
       <MediaFieldSummary
@@ -42,12 +43,61 @@ describe('MediaFieldSummary', () => {
         layout="compact"
         items={[{ id: 'one' }, { id: 'two' }]}
         representativeId="two"
-        maxItems={3}
+        maxItems={20}
         onOpen={onOpen}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Images: 2 of 3 images · Manage' }))
+    expect(screen.getByText('2 images')).toBeInTheDocument()
+    expect(screen.queryByText(/of 20/)).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Manage images' }))
     expect(onOpen).toHaveBeenCalledWith('two')
+  })
+
+  it('shows one image when a derived preview item is present without uploads', () => {
+    const onOpen = vi.fn()
+    render(
+      <MediaFieldSummary
+        label="Images"
+        layout="compact"
+        items={[{ id: 'system:elf' }]}
+        attachmentCount={0}
+        maxItems={20}
+        representativeId="system:elf"
+        onOpen={onOpen}
+      />,
+    )
+    expect(screen.getByText('1 image')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Manage images' }))
+    expect(onOpen).toHaveBeenCalledWith('system:elf')
+  })
+
+  it('restores pointer cursor and hover chrome on the preview control', () => {
+    render(
+      <MediaFieldSummary
+        label="Images"
+        layout="compact"
+        items={[{ id: 'one' }]}
+        maxItems={20}
+        onOpen={vi.fn()}
+      />,
+    )
+    const previewButton = screen.getByRole('button', { name: 'Images: 1 image' })
+    expect(previewButton).toHaveClass('enabled:cursor-pointer')
+    expect(previewButton.querySelector('.group-hover\\:border-ring\\/50')).toBeInTheDocument()
+  })
+
+  it('shows limit reached copy at capacity', () => {
+    render(
+      <MediaFieldSummary
+        label="Images"
+        layout="compact"
+        items={Array.from({ length: 20 }, (_, index) => ({ id: `image-${index}` }))}
+        attachmentCount={20}
+        maxItems={20}
+        onOpen={vi.fn()}
+      />,
+    )
+    expect(screen.getByText('20 images · Limit reached')).toBeInTheDocument()
   })
 
   it('omits the built-in expanded header when showHeader is false', () => {

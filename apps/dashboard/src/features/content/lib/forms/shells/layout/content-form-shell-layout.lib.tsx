@@ -49,6 +49,7 @@ function ContentMediaIdentitySlot({
   campaignId,
   contentType,
   contentSource,
+  entitySlug,
   rulesetId,
 }: {
   domain: ContentMediaDomain
@@ -56,9 +57,11 @@ function ContentMediaIdentitySlot({
   campaignId?: string
   contentType: ContentTypeKey
   contentSource?: ContentSource
+  entitySlug?: string
   rulesetId?: string
 }) {
-  const slug = useWatch({ control: form.control, name: 'slug' }) as string | undefined
+  const watchedSlug = useWatch({ control: form.control, name: 'slug' }) as string | undefined
+  const slug = entitySlug ?? watchedSlug
   return (
     <ManagedMediaField
       config={{ domain, presentation: { layout: 'compact' } }}
@@ -130,6 +133,7 @@ export function ContentFormHeader({
             campaignId={campaignId}
             contentType={def.routeKey as ContentTypeKey}
             contentSource={entitySource}
+            entitySlug={ctx.entitySlug}
             rulesetId={ctx.rulesetId}
           />
         ) : null}

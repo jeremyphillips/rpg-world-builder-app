@@ -15,7 +15,12 @@ export function mergeEditLayoutCtx(
   campaignId: string,
   entityId: string,
   entity:
-    | { source?: ContentFormCtx['entitySource']; kind?: unknown; rulesetId?: string }
+    | {
+        source?: ContentFormCtx['entitySource']
+        kind?: unknown
+        rulesetId?: string
+        slug?: string
+      }
     | undefined,
 ): ContentFormCtx {
   return {
@@ -25,6 +30,7 @@ export function mergeEditLayoutCtx(
     entityId,
     mode: 'edit',
     entitySource: entity?.source,
+    entitySlug: entity?.slug,
     rulesetId: entity?.rulesetId ?? optionsCtx.rulesetId,
     equipmentKind: formCtx?.equipmentKind ?? entityEquipmentKind(entity),
   }

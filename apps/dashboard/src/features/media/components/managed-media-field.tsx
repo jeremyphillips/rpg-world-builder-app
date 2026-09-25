@@ -77,7 +77,7 @@ export function ManagedMediaField({
         ]
       : []),
   ]
-  const count = items.length
+  const attachmentCount = media.images.length
   const onOpen = (imageId?: string) => {
     setSelectedId(imageId)
     setOpen(true)
@@ -93,12 +93,20 @@ export function ManagedMediaField({
             id={headingId}
             label={label}
             size={size}
-            hint={count > 0 ? `${count} of ${maxItems} images` : undefined}
+            hint={
+              attachmentCount > 0 || systemImage
+                ? `${attachmentCount} of ${maxItems} images`
+                : undefined
+            }
             action={
               <CollectionAddControl
-                label={count > 0 ? MEDIA_FIELD_MANAGE_LABEL : MEDIA_FIELD_ADD_IMAGES_LABEL}
+                label={
+                  attachmentCount > 0 || systemImage
+                    ? MEDIA_FIELD_MANAGE_LABEL
+                    : MEDIA_FIELD_ADD_IMAGES_LABEL
+                }
                 enabled
-                showIcon={count === 0}
+                showIcon={attachmentCount === 0 && !systemImage}
                 onClick={() => onOpen(representativeId)}
               />
             }
@@ -108,6 +116,7 @@ export function ManagedMediaField({
             layout="expanded"
             showHeader={false}
             items={items}
+            attachmentCount={attachmentCount}
             representativeId={representativeId}
             maxItems={maxItems}
             countDisplay={config.presentation.countDisplay}
@@ -119,6 +128,7 @@ export function ManagedMediaField({
           label={label}
           layout="compact"
           items={items}
+          attachmentCount={attachmentCount}
           representativeId={representativeId}
           maxItems={maxItems}
           countDisplay={config.presentation.countDisplay}
