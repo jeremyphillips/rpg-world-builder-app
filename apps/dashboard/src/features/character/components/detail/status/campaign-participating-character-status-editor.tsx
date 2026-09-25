@@ -22,38 +22,43 @@ import {
 function buildStatusEditorFields(): FormItem[] {
   return [
     {
-      type: 'select',
-      name: 'rosterStatus',
-      label: 'Roster status',
-      width: 'full',
-      options: CHARACTER_ROSTER_STATUSES.map((value) => ({
-        value,
-        label: CHARACTER_ROSTER_STATUS_ENTRIES[value].label,
-      })),
-    },
-    {
-      type: 'textarea',
-      name: 'rosterNote',
-      label: 'Roster note',
-      width: 'full',
-      rows: 3,
-    },
-    {
-      type: 'select',
-      name: 'vitalStatus',
-      label: 'Vital status',
-      width: 'full',
-      options: CHARACTER_VITAL_STATUSES.map((value) => ({
-        value,
-        label: CHARACTER_VITAL_STATUS_ENTRIES[value].label,
-      })),
-    },
-    {
-      type: 'textarea',
-      name: 'vitalNote',
-      label: 'Vital note',
-      width: 'full',
-      rows: 3,
+      kind: 'group',
+      fields: [
+        {
+          type: 'select',
+          name: 'rosterStatus',
+          label: 'Roster status',
+          width: 'full',
+          options: CHARACTER_ROSTER_STATUSES.map((value) => ({
+            value,
+            label: CHARACTER_ROSTER_STATUS_ENTRIES[value].label,
+          })),
+        },
+        {
+          type: 'textarea',
+          name: 'rosterNote',
+          label: 'Roster note',
+          width: 'full',
+          rows: 3,
+        },
+        {
+          type: 'select',
+          name: 'vitalStatus',
+          label: 'Vital status',
+          width: 'full',
+          options: CHARACTER_VITAL_STATUSES.map((value) => ({
+            value,
+            label: CHARACTER_VITAL_STATUS_ENTRIES[value].label,
+          })),
+        },
+        {
+          type: 'textarea',
+          name: 'vitalNote',
+          label: 'Vital note',
+          width: 'full',
+          rows: 3,
+        },
+      ],
     },
   ]
 }
