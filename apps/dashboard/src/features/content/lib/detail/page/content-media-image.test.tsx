@@ -54,6 +54,46 @@ describe('ContentMediaImage', () => {
     expect(img?.style.objectPosition).toBe('')
   })
 
+  it('renders a 4:3 builder sheet hero frame with primary presentation defaults', () => {
+    const { container } = render(
+      <ContentMediaImage
+        display={{ src: '/fighter.jpeg', sourceKind: 'system' }}
+        alt="Fighter"
+        frame="builderSheetHero"
+      />,
+    )
+
+    const frame = container.firstElementChild
+    expect(frame).toHaveClass('aspect-[4/3]')
+    expect(frame).toHaveClass('isolate')
+    expect(frame).not.toHaveClass('bg-[var(--surface-current,var(--background))]')
+
+    const img = container.querySelector('img')
+    expect(img).toHaveStyle({
+      objectFit: CONTENT_IMAGE_PRESENTATION_DEFAULTS.primary.objectFit,
+      objectPosition: CONTENT_IMAGE_PRESENTATION_DEFAULTS.primary.objectPosition,
+    })
+    expect(img).not.toHaveClass('mix-blend-multiply')
+  })
+
+  it('honors normalized crop layout on builder sheet hero frames', () => {
+    const { container } = render(
+      <ContentMediaImage
+        display={{
+          src: '/fighter.jpeg',
+          sourceKind: 'system',
+          crop: { x: 0.1, y: 0.2, width: 0.5, height: 0.5 },
+        }}
+        alt="Fighter"
+        frame="builderSheetHero"
+      />,
+    )
+
+    const img = container.querySelector('img')
+    expect(img).toHaveStyle({ width: '200%', height: '200%' })
+    expect(img?.style.objectPosition).toBe('')
+  })
+
   it('renders a 4:2 builder frame with knockout backdrop and blend classes', () => {
     const { container } = render(
       <ContentMediaImage

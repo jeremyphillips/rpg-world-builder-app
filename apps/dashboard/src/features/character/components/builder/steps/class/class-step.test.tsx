@@ -65,10 +65,50 @@ describe('ClassStep', () => {
 
     await user.click(screen.getByRole('button', { name: 'View Fighter details' }))
 
+    const dialog = screen.getByRole('dialog')
+
+    expect(dialog.querySelector('img')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Fighter' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Proficiencies' })).toBeInTheDocument()
     expect(screen.getByText('Choose 2 from 5 options')).toBeInTheDocument()
     expect(onDraftChange).not.toHaveBeenCalled()
+  })
+
+  it('omits drawer hero media when the resolved image is a fallback placeholder', async () => {
+    const user = userEvent.setup()
+    const homebrewClass = {
+      ...fighter,
+      id: 'homebrew-custom-warrior',
+      slug: 'custom-warrior',
+      source: 'homebrew' as const,
+      media: undefined,
+      imageKey: undefined,
+    }
+
+    const context = createStandaloneBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [homebrewClass],
+        skillProficiencies: [],
+        organizations: [],
+      },
+    })
+
+    render(
+      <ClassStep
+        context={context}
+        draft={createEmptyCharacterBuilderDraft()}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'View Fighter details' }))
+
+    const dialog = screen.getByRole('dialog')
+    expect(dialog).not.toHaveAttribute('data-has-media')
+    expect(screen.queryByTestId('sheet-sticky-header-shell')).not.toBeInTheDocument()
+    expect(dialog.querySelector('img')).not.toBeInTheDocument()
   })
 
   it('selects from the sheet and closes it', async () => {

@@ -19,6 +19,7 @@ import {
   resolveClassCardSummaryBadge,
 } from '../../../../lib/builder/builder-option-display.lib'
 import { BuilderOptionCardImage } from '../shared/builder-option-card-image'
+import { BuilderOptionSheetHeroImage } from '../shared/builder-option-sheet-hero-image'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 
 const SELECT_CLASS_ACTION_LABEL = formatFieldMessage(
@@ -68,6 +69,11 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
 
   const isDetailsClassSelected = detailsClassId != null && draft.class.classId === detailsClassId
 
+  const detailsHeroDisplay = useMemo(() => {
+    if (!detailsClass) return null
+    return getContentDisplayImage(resolveClassCardDisplayImageInput(detailsClass, context))
+  }, [context, detailsClass])
+
   if (options.length === 0) {
     return (
       <BuilderStepFrame stepId="class" validationIssues={validationIssues}>
@@ -102,6 +108,11 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
           onOpenChange={(open) => {
             if (!open) setDetailsClassId(null)
           }}
+          heroImage={
+            detailsHeroDisplay && detailsHeroDisplay.sourceKind !== 'fallback' ? (
+              <BuilderOptionSheetHeroImage display={detailsHeroDisplay} />
+            ) : undefined
+          }
           title={detailsContent.title}
           eyebrow={detailsContent.eyebrow}
           descriptionHtml={detailsContent.descriptionHtml}

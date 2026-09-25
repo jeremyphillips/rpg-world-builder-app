@@ -20,6 +20,7 @@ import {
   type SheetSize,
   type SheetSurface,
 } from './sheet.variants'
+import { SheetMediaScroll } from './sheet-media-scroll.client'
 import { useDialogLayerPortalContainer } from './use-dialog-layer-portal-container.client'
 
 const SheetRoot = DialogPrimitive.Root
@@ -45,6 +46,8 @@ export interface SheetContentProps extends React.ComponentPropsWithoutRef<
   closeLabel?: string
   closeOnOutsideClick?: boolean
   closeOnEscape?: boolean
+  /** When true, sets `data-has-media` for close-button surface chip styling. */
+  hasMedia?: boolean
 }
 
 const SheetContent = React.forwardRef<
@@ -61,6 +64,7 @@ const SheetContent = React.forwardRef<
       closeLabel = 'Close',
       closeOnOutsideClick = true,
       closeOnEscape = true,
+      hasMedia = false,
       onOpenAutoFocus,
       onInteractOutside,
       onEscapeKeyDown,
@@ -79,8 +83,10 @@ const SheetContent = React.forwardRef<
           className={cn(
             sheetContentVariants({ side, surface, size }),
             dialogContentFocusShellClasses,
+            'group/sheet',
             className,
           )}
+          data-has-media={hasMedia ? true : undefined}
           {...dialogDismissHandlers(
             closeOnOutsideClick,
             closeOnEscape,
@@ -184,6 +190,7 @@ export const Sheet = {
   Root: SheetRoot,
   Trigger: SheetTrigger,
   Content: SheetContent,
+  MediaScroll: SheetMediaScroll,
   Header: SheetHeader,
   Body: SheetBody,
   Footer: SheetFooter,

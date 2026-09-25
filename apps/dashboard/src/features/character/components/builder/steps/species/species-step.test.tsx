@@ -168,6 +168,9 @@ describe('SpeciesStep', () => {
 
     await user.click(screen.getByRole('button', { name: 'View Dwarf details' }))
 
+    const dialog = screen.getByRole('dialog')
+
+    expect(dialog.querySelector('img')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Dwarf' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()
     expect(onDraftChange).not.toHaveBeenCalled()

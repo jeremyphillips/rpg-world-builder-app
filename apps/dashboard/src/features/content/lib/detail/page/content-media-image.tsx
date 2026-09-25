@@ -11,7 +11,12 @@ import {
   contentMediaImageFrameVariants,
 } from './content-media-image.variants'
 
-export type ContentMediaImageFrame = 'intrinsic' | 'primary' | 'builderCard' | 'square'
+export type ContentMediaImageFrame =
+  | 'intrinsic'
+  | 'primary'
+  | 'builderSheetHero'
+  | 'builderCard'
+  | 'square'
 
 export type ContentMediaImageProps = {
   display: ContentDisplayImage
@@ -25,6 +30,7 @@ function resolvePresentationSurface(
 ): ContentImagePresentationSurface {
   if (frame === 'square') return 'thumbnail'
   if (frame === 'builderCard') return 'builderCard'
+  if (frame === 'builderSheetHero') return 'primary'
   return 'primary'
 }
 

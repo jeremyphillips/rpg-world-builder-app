@@ -30,6 +30,34 @@ const baseProps = {
 }
 
 describe('BuilderOptionDetailsSheet', () => {
+  it('uses media scroll anatomy when a hero image is present', () => {
+    render(
+      <BuilderOptionDetailsSheet
+        {...baseProps}
+        heroImage={<img data-testid="hero-image" src="/dwarf.jpeg" alt="" />}
+      />,
+    )
+
+    const dialog = screen.getByRole('dialog')
+    const hero = screen.getByTestId('hero-image')
+    const stickyShell = screen.getByTestId('sheet-sticky-header-shell')
+
+    expect(dialog).toHaveAttribute('data-has-media', 'true')
+    expect(hero.closest('.overflow-y-auto')).toContainElement(stickyShell)
+    expect(stickyShell).toHaveClass('sticky', 'top-0')
+  })
+
+  it('keeps the pinned header anatomy when no hero image is present', () => {
+    render(<BuilderOptionDetailsSheet {...baseProps} />)
+
+    const dialog = screen.getByRole('dialog')
+    const header = screen.getByRole('heading', { name: 'Dwarf' }).closest('.border-b')
+
+    expect(dialog).not.toHaveAttribute('data-has-media')
+    expect(header).toHaveClass('shrink-0')
+    expect(screen.queryByTestId('sheet-sticky-header-shell')).not.toBeInTheDocument()
+  })
+
   it('renders metadata, description, and trait sections when open', () => {
     render(<BuilderOptionDetailsSheet {...baseProps} />)
     const dialog = screen.getByRole('dialog')

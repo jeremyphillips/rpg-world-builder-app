@@ -15,7 +15,7 @@ import { textVariants } from './text.variants'
 import { cn } from '../../lib/utils'
 
 const dialogCloseButtonClassName =
-  'absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none'
+  'absolute right-4 top-4 z-30 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none group-data-[has-media=true]/sheet:rounded-md group-data-[has-media=true]/sheet:bg-[var(--surface-current)] group-data-[has-media=true]/sheet:p-1'
 
 export function dialogDismissHandlers(
   closeOnOutsideClick: boolean,

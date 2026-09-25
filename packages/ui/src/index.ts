@@ -873,6 +873,10 @@ export { DIALOG_INITIAL_FOCUS_SELECTOR } from './components/ui/dialog-focus.lib'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
 export {
+  SheetMediaScroll,
+  type SheetMediaScrollProps,
+} from './components/ui/sheet-media-scroll.client'
+export {
   BuilderOptionDetailsSheet,
   type BuilderOptionDetailsSheetProps,
   type BuilderOptionDetailsMetadata,

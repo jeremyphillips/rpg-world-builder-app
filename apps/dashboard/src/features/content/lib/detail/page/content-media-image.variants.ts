@@ -11,6 +11,7 @@ export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
     frame: {
       intrinsic: 'isolate min-h-0 w-full',
       primary: 'isolate aspect-[4/3] w-full min-h-0',
+      builderSheetHero: 'isolate aspect-[4/3] w-full min-h-0',
       builderCard: cn('aspect-[4/2] w-full min-h-0', contentMediaImageSurfaceBackdropClasses),
       square: 'isolate size-6 shrink-0 rounded-md lg:size-8',
     },

@@ -34,6 +34,7 @@ import {
 } from '../../../../lib/choice-sets/species-selection.lib'
 import { BuilderDependentChoiceSection } from '../../fields/builder-dependent-choice-section'
 import { BuilderOptionCardImage } from '../shared/builder-option-card-image'
+import { BuilderOptionSheetHeroImage } from '../shared/builder-option-sheet-hero-image'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 
 const ENABLE_INLINE_HERITAGE_SELECTION = false
@@ -212,6 +213,11 @@ export function SpeciesStep({
     detailsSpeciesId != null && draft.species.speciesId === detailsSpeciesId
   const detailsSpeciesHasHeritage = detailsSpecies?.heritage != null
 
+  const detailsHeroDisplay = useMemo(() => {
+    if (!detailsSpecies) return null
+    return getContentDisplayImage(resolveSpeciesCardDisplayImageInput(detailsSpecies, context))
+  }, [context, detailsSpecies])
+
   if (options.length === 0) {
     return (
       <BuilderStepFrame stepId="species" validationIssues={validationIssues}>
@@ -241,6 +247,11 @@ export function SpeciesStep({
           onOpenChange={(open) => {
             if (!open) setDetailsSpeciesId(null)
           }}
+          heroImage={
+            detailsHeroDisplay && detailsHeroDisplay.sourceKind !== 'fallback' ? (
+              <BuilderOptionSheetHeroImage display={detailsHeroDisplay} />
+            ) : undefined
+          }
           title={detailsContent.title}
           eyebrow={detailsContent.eyebrow}
           descriptionHtml={detailsContent.descriptionHtml}

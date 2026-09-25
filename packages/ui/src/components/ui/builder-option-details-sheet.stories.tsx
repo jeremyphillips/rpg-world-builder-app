@@ -76,6 +76,13 @@ export const SpeciesDetails: Story = {
           {...args}
           open={open}
           onOpenChange={setOpen}
+          heroImage={
+            <img
+              src="/assets/system/srd-cc-5.2.1/species/primary/dwarf.jpeg"
+              alt=""
+              className="block aspect-[4/3] size-full object-cover object-[50%_20%]"
+            />
+          }
           primaryAction={<Button onClick={() => setOpen(false)}>Select species</Button>}
         />
       </>
