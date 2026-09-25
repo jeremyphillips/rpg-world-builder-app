@@ -42,3 +42,10 @@ export const Sizes: Story = {
     </div>
   ),
 }
+
+export const Sunken: Story = {
+  args: {
+    tone: 'sunken',
+    label: 'Draft',
+  },
+}

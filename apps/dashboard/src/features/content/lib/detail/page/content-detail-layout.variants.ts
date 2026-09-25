@@ -16,10 +16,10 @@ export const contentDetailHeroImageShellClasses = 'flex w-full min-h-0 md:h-full
 
 /**
  * Hero artwork clip shell — outer corners use `rounded-card`; inner edge stays
- * square where the image meets text. Mobile keeps a 4:3 block; desktop fills the column.
+ * square where the image meets text. Keeps a stable 4:3 clip so saved crops match the editor.
  */
 export const contentDetailHeroImageFrameClasses =
-  'aspect-[4/3] size-full w-full min-h-0 md:aspect-auto md:h-full rounded-none rounded-b-card shadow-sm md:rounded-none md:rounded-tr-card md:rounded-br-card'
+  'size-full w-full min-h-0 rounded-none rounded-b-card shadow-sm md:rounded-none md:rounded-tr-card md:rounded-br-card'
 
 /** Legacy img hero path — same shell geometry plus object-cover on the element. */
 export const contentDetailHeroImageClasses = `${contentDetailHeroImageFrameClasses} object-cover`

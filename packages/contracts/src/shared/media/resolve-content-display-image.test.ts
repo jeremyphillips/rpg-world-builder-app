@@ -22,6 +22,7 @@ describe('resolveContentDisplayImage', () => {
     expect(display).toEqual({
       src: 'assets/system/srd-cc-5.2.1/classes/primary/fighter.jpeg',
       sourceKind: 'system',
+      presentationTreatment: 'white-paper-knockout',
     })
   })
 
@@ -89,6 +90,7 @@ describe('resolveContentDisplayImage', () => {
     expect(display).toEqual({
       src: 'assets/system/srd-cc-5.2.1/species/primary/elf.jpeg',
       sourceKind: 'system',
+      presentationTreatment: 'white-paper-knockout',
     })
   })
 

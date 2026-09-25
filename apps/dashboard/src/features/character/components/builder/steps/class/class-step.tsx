@@ -10,12 +10,11 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
-import { getContentDisplayImage } from '@/features/content'
+import { buildClassContentDisplayImageInput, getContentDisplayImage } from '@/features/content'
 
 import {
   buildClassDetailsSheetContent,
   formatClassCardOption,
-  resolveClassCardDisplayImageInput,
   resolveClassCardSummaryBadge,
 } from '../../../../lib/builder/builder-option-display.lib'
 import { BuilderOptionCardImage } from '../shared/builder-option-card-image'
@@ -43,17 +42,18 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
 
   const options = useMemo(
     () =>
-      classes.map((entry) => ({
-        value: entry.id,
-        ...formatClassCardOption(entry),
-        media: (
-          <BuilderOptionCardImage
-            display={getContentDisplayImage(resolveClassCardDisplayImageInput(entry, context))}
-          />
-        ),
-        summaryBadge: resolveClassCardSummaryBadge(entry, context.spellcastingProgression),
-        onDetails: () => setDetailsClassId(entry.id),
-      })),
+      classes.map((entry) => {
+        const display = getContentDisplayImage(buildClassContentDisplayImageInput(entry))
+        return {
+          value: entry.id,
+          ...formatClassCardOption(entry),
+          ...(display.sourceKind !== 'fallback'
+            ? { media: <BuilderOptionCardImage display={display} /> }
+            : {}),
+          summaryBadge: resolveClassCardSummaryBadge(entry, context.spellcastingProgression),
+          onDetails: () => setDetailsClassId(entry.id),
+        }
+      }),
     [classes, context],
   )
 
@@ -71,8 +71,8 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
 
   const detailsHeroDisplay = useMemo(() => {
     if (!detailsClass) return null
-    return getContentDisplayImage(resolveClassCardDisplayImageInput(detailsClass, context))
-  }, [context, detailsClass])
+    return getContentDisplayImage(buildClassContentDisplayImageInput(detailsClass))
+  }, [detailsClass])
 
   if (options.length === 0) {
     return (

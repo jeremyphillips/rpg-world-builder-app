@@ -18,6 +18,18 @@ const STANDARD_SOURCE_DIMENSIONS: SourceDimensions = {
   height: 896,
 }
 
+export const SYSTEM_CONTENT_IMAGE_PRESENTATION_TREATMENTS = [
+  'default',
+  'white-paper-knockout',
+] as const
+
+export type SystemContentImagePresentationTreatment =
+  (typeof SYSTEM_CONTENT_IMAGE_PRESENTATION_TREATMENTS)[number]
+
+export type SystemContentImagePresentation = {
+  treatment: SystemContentImagePresentationTreatment
+}
+
 export type SystemContentImageEntry = {
   imageSetId: SystemImageSetId
   contentType: ContentTypeKey
@@ -25,6 +37,13 @@ export type SystemContentImageEntry = {
   slug: string
   path: string
   sourceDimensions: SourceDimensions
+  presentation: SystemContentImagePresentation
+}
+
+export type ResolvedSystemContentImage = {
+  path: string
+  sourceDimensions: SourceDimensions
+  presentation: SystemContentImagePresentation
 }
 
 const CLASS_PRIMARY_SLUGS = [
@@ -56,6 +75,10 @@ const SPECIES_PRIMARY_SLUGS = [
 
 const SYSTEM_IMAGE_SET_ID_SET = new Set<string>(SYSTEM_IMAGE_SET_IDS)
 
+const WHITE_PAPER_KNOCKOUT_PRESENTATION: SystemContentImagePresentation = {
+  treatment: 'white-paper-knockout',
+}
+
 function buildEntry(contentType: ContentTypeKey, slug: string): SystemContentImageEntry {
   const imageSetId = DEFAULT_SYSTEM_IMAGE_SET_ID
   const assetRole = SYSTEM_CONTENT_IMAGE_ASSET_ROLE_PRIMARY
@@ -66,6 +89,7 @@ function buildEntry(contentType: ContentTypeKey, slug: string): SystemContentIma
     slug,
     path: buildSystemContentImagePath({ imageSetId, contentType, assetRole, slug }),
     sourceDimensions: STANDARD_SOURCE_DIMENSIONS,
+    presentation: WHITE_PAPER_KNOCKOUT_PRESENTATION,
   }
 }
 
@@ -125,9 +149,15 @@ export function resolveSystemContentImage(input: {
   assetRole: string
   slug: string
   contentSource: ContentSource
-}): string | undefined {
+}): ResolvedSystemContentImage | undefined {
   if (input.contentSource !== 'system') return undefined
-  return lookupSystemContentImageEntry(input)?.path
+  const entry = lookupSystemContentImageEntry(input)
+  if (!entry) return undefined
+  return {
+    path: entry.path,
+    sourceDimensions: entry.sourceDimensions,
+    presentation: entry.presentation,
+  }
 }
 
 export function deriveSystemContentImage(input: {

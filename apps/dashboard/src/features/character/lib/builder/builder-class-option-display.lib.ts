@@ -3,7 +3,6 @@ import {
   getSlotProgressionKindEntry,
   resolveSlotProgressionForClass,
   type CharacterBuildCatalog,
-  type CharacterBuildContext,
   type CharacterClass,
   type ResolvedSpellcastingProgressionConfig,
 } from '@rpg/contracts'
@@ -78,20 +77,6 @@ export function resolveClassCardSummaryBadge(
   return {
     label: vocabEntry?.label ?? slotProgression.label,
     tooltip: vocabEntry?.description,
-  }
-}
-
-export function resolveClassCardDisplayImageInput(
-  characterClass: CharacterClass,
-  context: Pick<CharacterBuildContext, 'rulesetId'>,
-) {
-  return {
-    media: characterClass.media,
-    imageKey: characterClass.imageKey,
-    contentType: 'classes' as const,
-    slug: characterClass.slug,
-    contentSource: characterClass.source,
-    rulesetId: context.rulesetId,
   }
 }
 

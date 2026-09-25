@@ -17,4 +17,18 @@ describe('BuilderOptionCardImage', () => {
       objectPosition: CONTENT_IMAGE_PRESENTATION_DEFAULTS.builderCard.objectPosition,
     })
   })
+
+  it('applies white-paper knockout blend classes from presentation treatment metadata', () => {
+    const { container } = render(
+      <BuilderOptionCardImage
+        display={{
+          src: '/elf.jpeg',
+          sourceKind: 'system',
+          presentationTreatment: 'white-paper-knockout',
+        }}
+      />,
+    )
+
+    expect(container.querySelector('img')).toHaveClass('mix-blend-multiply')
+  })
 })

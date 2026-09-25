@@ -6,9 +6,9 @@ import {
   type ContentImagePresentationSurface,
 } from './content-image-presentation-defaults'
 import {
-  contentMediaImageBuilderBlendClasses,
   contentMediaImageClasses,
   contentMediaImageFrameVariants,
+  contentMediaImageWhitePaperKnockoutClasses,
 } from './content-media-image.variants'
 
 export type ContentMediaImageFrame =
@@ -34,6 +34,10 @@ function resolvePresentationSurface(
   return 'primary'
 }
 
+function usesNormalizedCropLayout(frame: ContentMediaImageFrame): boolean {
+  return frame === 'primary' || frame === 'builderSheetHero'
+}
+
 /** Renders a content display image with optional normalized-crop math. */
 export function ContentMediaImage({
   display,
@@ -41,8 +45,11 @@ export function ContentMediaImage({
   frame = 'intrinsic',
   className,
 }: ContentMediaImageProps) {
-  const cropLayout = display.crop ? resolveNormalizedCropImageLayout(display.crop) : undefined
+  const applyCropLayout = usesNormalizedCropLayout(frame)
+  const cropLayout =
+    applyCropLayout && display.crop ? resolveNormalizedCropImageLayout(display.crop) : undefined
   const presentation = resolveContentImagePresentationDefault(resolvePresentationSurface(frame))
+  const usesWhitePaperKnockout = display.presentationTreatment === 'white-paper-knockout'
 
   return (
     <div className={cn(contentMediaImageFrameVariants({ frame }), className)}>
@@ -51,7 +58,7 @@ export function ContentMediaImage({
         alt={alt}
         className={cn(
           contentMediaImageClasses,
-          frame === 'builderCard' && contentMediaImageBuilderBlendClasses,
+          usesWhitePaperKnockout && contentMediaImageWhitePaperKnockoutClasses,
         )}
         style={
           cropLayout

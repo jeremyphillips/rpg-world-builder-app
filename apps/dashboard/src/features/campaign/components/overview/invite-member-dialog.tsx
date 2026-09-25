@@ -20,13 +20,32 @@ import { useSendCampaignInvite } from '../../hooks/use-send-campaign-invite'
 
 export type InviteMemberDialogProps = {
   campaignId: string
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  showTrigger?: boolean
 }
 
 /** Manager-only invite dialog for the campaign overview. */
-export function InviteMemberDialog({ campaignId }: InviteMemberDialogProps) {
-  const [open, setOpen] = useState(false)
+export function InviteMemberDialog({
+  campaignId,
+  open: controlledOpen,
+  onOpenChange,
+  showTrigger = true,
+}: InviteMemberDialogProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const open = controlledOpen ?? uncontrolledOpen
   const [deliveryFailed, setDeliveryFailed] = useState(false)
   const { mutateAsync, isPending, isSuccess } = useSendCampaignInvite(campaignId)
+
+  function handleOpenChange(nextOpen: boolean) {
+    if (controlledOpen === undefined) {
+      setUncontrolledOpen(nextOpen)
+    }
+    onOpenChange?.(nextOpen)
+    if (!nextOpen) {
+      setDeliveryFailed(false)
+    }
+  }
 
   const { onSubmit, formError } = useSubmitHandler<InviteMemberValues>({
     submit: async (values, form) => {
@@ -38,27 +57,22 @@ export function InviteMemberDialog({ campaignId }: InviteMemberDialogProps) {
 
       form.reset(inviteMemberDefaultValues)
       setDeliveryFailed(false)
-      setOpen(false)
+      handleOpenChange(false)
     },
     fallbackMessage: INVITE_MEMBER_DIALOG_COPY.fallbackError,
     mapError: mapInviteSendError,
   })
 
-  function handleOpenChange(nextOpen: boolean) {
-    setOpen(nextOpen)
-    if (!nextOpen) {
-      setDeliveryFailed(false)
-    }
-  }
-
   return (
     <Modal.Root open={open} onOpenChange={handleOpenChange}>
-      <Modal.Trigger asChild>
-        <Button type="button" variant="outline" size="sm">
-          <UserPlus aria-hidden className="size-4" />
-          Invite member
-        </Button>
-      </Modal.Trigger>
+      {showTrigger ? (
+        <Modal.Trigger asChild>
+          <Button type="button" variant="outline" size="sm">
+            <UserPlus aria-hidden className="size-4" />
+            Invite member
+          </Button>
+        </Modal.Trigger>
+      ) : null}
       <Modal.Content size="md">
         {deliveryFailed ? (
           <>

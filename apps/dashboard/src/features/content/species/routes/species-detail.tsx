@@ -21,6 +21,7 @@ import { ContentDetailResolver } from '../../lib/detail/page/content-detail-reso
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import { buildSpeciesContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { SpeciesDetailBody } from '../components/detail/species-detail-body'
 
@@ -45,15 +46,9 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
       <SpeciesDetailBody
         name={species.name}
         nameBadge={<ContentStatusNameBadge status={species.status} />}
-        displayImage={getContentDisplayImage({
-          media: species.media,
-          imageKey: species.imageKey,
-          contentType: 'species',
-          slug: species.slug,
-          contentSource: species.source,
-          rulesetId: species.rulesetId,
-          role: 'primary',
-        })}
+        displayImage={getContentDisplayImage(
+          buildSpeciesContentDisplayImageInput(species, 'primary'),
+        )}
         imageName={species.name}
         viewModel={viewModel}
         campaignId={campaignId}

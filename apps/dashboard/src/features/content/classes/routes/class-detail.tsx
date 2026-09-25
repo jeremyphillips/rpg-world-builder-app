@@ -18,6 +18,7 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import { buildClassContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { ClassProgressionTable } from '../components/detail/class-progression-table'
 import { ClassDetailBody } from '../components/detail/class-detail-body'
@@ -76,15 +77,9 @@ export function ClassDetailContent({
       <ClassDetailBody
         name={characterClass.name}
         nameBadge={<ContentStatusNameBadge status={characterClass.status} />}
-        displayImage={getContentDisplayImage({
-          media: characterClass.media,
-          imageKey: characterClass.imageKey,
-          contentType: 'classes',
-          slug: characterClass.slug,
-          contentSource: characterClass.source,
-          rulesetId: characterClass.rulesetId,
-          role: 'primary',
-        })}
+        displayImage={getContentDisplayImage(
+          buildClassContentDisplayImageInput(characterClass, 'primary'),
+        )}
         imageName={characterClass.name}
         viewModel={viewModel}
         subclasses={subclasses}

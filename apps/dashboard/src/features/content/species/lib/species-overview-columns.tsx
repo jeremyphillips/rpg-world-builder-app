@@ -8,6 +8,7 @@ import { ROUTES } from '@/app/routes'
 import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
 
 import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import { buildSpeciesContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { buildContentColumns } from '../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
@@ -68,15 +69,7 @@ export function speciesColumns(
     ...usage,
     contentType: 'species',
     resolveDisplayImage: (row) =>
-      getContentDisplayImage({
-        media: row.media,
-        imageKey: row.imageKey,
-        contentType: 'species',
-        slug: row.slug,
-        contentSource: row.source,
-        rulesetId: row.rulesetId,
-        role: 'primary',
-      }),
+      getContentDisplayImage(buildSpeciesContentDisplayImageInput(row, 'primary')),
     nameHref: (row) => ROUTES.content.species.detail(campaignId, row.id),
   })
 }

@@ -11,7 +11,7 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
-import { getContentDisplayImage } from '@/features/content'
+import { buildSpeciesContentDisplayImageInput, getContentDisplayImage } from '@/features/content'
 
 import {
   findSpeciesHeritageChoiceSet,
@@ -21,7 +21,6 @@ import {
 import {
   buildSpeciesDetailsSheetContent,
   formatSpeciesCardOption,
-  resolveSpeciesCardDisplayImageInput,
 } from '../../../../lib/builder/builder-option-display.lib'
 import {
   DEPENDENT_KIND_HERITAGE,
@@ -167,14 +166,14 @@ export function SpeciesStep({
               })
             : undefined
 
+        const display = getContentDisplayImage(buildSpeciesContentDisplayImageInput(entry))
+
         return {
           value: entry.id,
           ...card,
-          media: (
-            <BuilderOptionCardImage
-              display={getContentDisplayImage(resolveSpeciesCardDisplayImageInput(entry, context))}
-            />
-          ),
+          ...(display.sourceKind !== 'fallback'
+            ? { media: <BuilderOptionCardImage display={display} /> }
+            : {}),
           ...(titleMeta ? { titleMeta } : {}),
           ...(isSelected && entry.heritage && heritageEmbeddedContent
             ? {
@@ -215,8 +214,8 @@ export function SpeciesStep({
 
   const detailsHeroDisplay = useMemo(() => {
     if (!detailsSpecies) return null
-    return getContentDisplayImage(resolveSpeciesCardDisplayImageInput(detailsSpecies, context))
-  }, [context, detailsSpecies])
+    return getContentDisplayImage(buildSpeciesContentDisplayImageInput(detailsSpecies))
+  }, [detailsSpecies])
 
   if (options.length === 0) {
     return (

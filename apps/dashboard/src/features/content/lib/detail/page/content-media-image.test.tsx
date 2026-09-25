@@ -36,7 +36,7 @@ describe('ContentMediaImage', () => {
     })
   })
 
-  it('honors normalized crop layout over object-position defaults', () => {
+  it('keeps object-position defaults on non-4:3 builder card frames when a crop exists', () => {
     const { container } = render(
       <ContentMediaImage
         display={{
@@ -50,8 +50,11 @@ describe('ContentMediaImage', () => {
     )
 
     const img = container.querySelector('img')
-    expect(img).toHaveStyle({ width: '200%', height: '200%' })
-    expect(img?.style.objectPosition).toBe('')
+    expect(img).toHaveStyle({
+      objectFit: CONTENT_IMAGE_PRESENTATION_DEFAULTS.builderCard.objectFit,
+      objectPosition: CONTENT_IMAGE_PRESENTATION_DEFAULTS.builderCard.objectPosition,
+    })
+    expect(img?.style.width).toBe('')
   })
 
   it('renders a 4:3 builder sheet hero frame with primary presentation defaults', () => {
@@ -94,10 +97,14 @@ describe('ContentMediaImage', () => {
     expect(img?.style.objectPosition).toBe('')
   })
 
-  it('renders a 4:2 builder frame with knockout backdrop and blend classes', () => {
+  it('renders a 4:2 builder frame with knockout backdrop and treatment blend classes', () => {
     const { container } = render(
       <ContentMediaImage
-        display={{ src: '/fighter.jpeg', sourceKind: 'system' }}
+        display={{
+          src: '/fighter.jpeg',
+          sourceKind: 'system',
+          presentationTreatment: 'white-paper-knockout',
+        }}
         alt="Fighter"
         frame="builderCard"
       />,
@@ -108,6 +115,19 @@ describe('ContentMediaImage', () => {
     expect(frame).toHaveClass('bg-[var(--surface-current,var(--background))]')
     expect(frame).not.toHaveClass('isolate')
     expect(container.querySelector('img')).toHaveClass('mix-blend-multiply')
+    expect(container.querySelector('img')).not.toHaveClass('dark:invert')
     expect(container.querySelector('img')).toHaveClass('object-cover')
+  })
+
+  it('does not apply knockout blend classes without presentation treatment metadata', () => {
+    const { container } = render(
+      <ContentMediaImage
+        display={{ src: '/upload.jpg', sourceKind: 'upload' }}
+        alt="Upload"
+        frame="builderCard"
+      />,
+    )
+
+    expect(container.querySelector('img')).not.toHaveClass('mix-blend-multiply')
   })
 })

@@ -16,10 +16,14 @@ export const CONTENT_DISPLAY_IMAGE_SOURCE_KINDS = ['system', 'upload', 'fallback
 
 export type ContentDisplayImageSourceKind = (typeof CONTENT_DISPLAY_IMAGE_SOURCE_KINDS)[number]
 
+export type ContentDisplayImagePresentationTreatment = 'white-paper-knockout'
+
 export type ContentDisplayImage = {
   src: string
   crop?: NormalizedCrop
   sourceKind: ContentDisplayImageSourceKind
+  /** Set only when resolved from a registry entry that declares a non-default treatment. */
+  presentationTreatment?: ContentDisplayImagePresentationTreatment
 }
 
 export type ResolveContentDisplayImageInput = {
@@ -45,10 +49,7 @@ function resolveUploadAssignmentSrc(
   return resolveUploadSrc(attachment.assetId)
 }
 
-function resolveSystemAssignmentSrc(
-  source: ContentMediaSystemSource,
-  contentSource: ContentSource,
-): string | undefined {
+function resolveSystemAssignment(source: ContentMediaSystemSource, contentSource: ContentSource) {
   return resolveSystemContentImage({
     imageSetId: source.imageSetId,
     contentType: source.contentType,
@@ -58,19 +59,10 @@ function resolveSystemAssignmentSrc(
   })
 }
 
-function resolveDerivedSystemSrc(input: {
-  contentType: ContentTypeKey
-  slug: string
-  contentSource: ContentSource
-  imageSetId: string
-}): string | undefined {
-  return resolveSystemContentImage({
-    imageSetId: input.imageSetId,
-    contentType: input.contentType,
-    assetRole: 'primary',
-    slug: input.slug,
-    contentSource: input.contentSource,
-  })
+function presentationTreatmentFromSystemImage(
+  presentation: { treatment: string } | undefined,
+): ContentDisplayImagePresentationTreatment | undefined {
+  return presentation?.treatment === 'white-paper-knockout' ? 'white-paper-knockout' : undefined
 }
 
 /** Resolve the effective display image for a content record presentation role. */
@@ -97,21 +89,31 @@ export function resolveContentDisplayImage(
     }
 
     if (isSystemRoleAssignment(assignment)) {
-      const src = resolveSystemAssignmentSrc(assignment.source, input.contentSource)
-      if (src) {
-        return { src, crop, sourceKind: 'system' }
+      const resolved = resolveSystemAssignment(assignment.source, input.contentSource)
+      if (resolved) {
+        return {
+          src: resolved.path,
+          crop,
+          sourceKind: 'system',
+          presentationTreatment: presentationTreatmentFromSystemImage(resolved.presentation),
+        }
       }
     }
   }
 
-  const derivedSrc = resolveDerivedSystemSrc({
+  const derivedResolved = resolveSystemContentImage({
+    imageSetId,
     contentType: input.contentType,
+    assetRole: 'primary',
     slug: input.slug,
     contentSource: input.contentSource,
-    imageSetId,
   })
-  if (derivedSrc) {
-    return { src: derivedSrc, sourceKind: 'system' }
+  if (derivedResolved) {
+    return {
+      src: derivedResolved.path,
+      sourceKind: 'system',
+      presentationTreatment: presentationTreatmentFromSystemImage(derivedResolved.presentation),
+    }
   }
 
   if (input.imageKey) {

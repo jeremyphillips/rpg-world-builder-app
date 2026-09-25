@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import {
   emptyContentMediaSchema,
@@ -25,6 +25,8 @@ export type ManagedMediaFieldProps = {
   name?: string
   label?: string
   contentContext?: MediaManagerContentContext
+  /** Opens the manager once on mount — used for deep links from failed banner upload alerts. */
+  initialOpen?: boolean
 }
 
 /** RHF-aware dashboard adapter around the API-free UI summary primitive. */
@@ -34,6 +36,7 @@ export function ManagedMediaField({
   name = 'media',
   label = 'Images',
   contentContext,
+  initialOpen = false,
 }: ManagedMediaFieldProps) {
   const headingId = useId()
   const { density } = useFormSectionContext()
@@ -41,7 +44,14 @@ export function ManagedMediaField({
   const form = useFormContext<FieldValues>()
   const watched = useWatch({ control: form.control, name })
   const media = watched ?? emptyContentMediaSchema
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(initialOpen)
+  const handledInitialOpenRef = useRef(false)
+
+  useEffect(() => {
+    if (!initialOpen || handledInitialOpenRef.current) return
+    handledInitialOpenRef.current = true
+    setOpen(true)
+  }, [initialOpen])
   const [selectedId, setSelectedId] = useState<string | undefined>()
   const [assets, setAssets] = useState<MediaAsset[]>([])
   const policy = getContentMediaPolicy(config.domain)

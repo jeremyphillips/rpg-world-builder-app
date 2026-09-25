@@ -150,6 +150,7 @@
   --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
   --color-sidebar: var(--sidebar);
   --spacing-sidebar: var(--sidebar-width);
+  --spacing-image-preview: 7.5rem;
   --z-index-toast: var(--z-toast);
   --color-control-hover: var(--control-hover-bg);
   --color-control-selected: var(--control-selected-bg);

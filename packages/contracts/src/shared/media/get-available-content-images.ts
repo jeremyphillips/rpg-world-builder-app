@@ -11,7 +11,6 @@ import {
   deriveSystemContentImage,
   resolveContentImageSet,
   resolveSystemContentImage,
-  resolveSystemContentImageSourceDimensions,
 } from './system-content-image-registry'
 
 export type AvailableContentUploadImage = {
@@ -62,21 +61,17 @@ export function getAvailableContentImages(input: {
     return uploads
   }
 
-  const srcPath = resolveSystemContentImage({
+  const resolved = resolveSystemContentImage({
     imageSetId: derived.imageSetId,
     contentType: derived.contentType,
     assetRole: derived.assetRole,
     slug: derived.slug,
     contentSource: input.contentSource,
   })
-  if (!srcPath) return uploads
+  if (!resolved) return uploads
 
-  const sourceDimensions = resolveSystemContentImageSourceDimensions({
-    imageSetId: derived.imageSetId,
-    contentType: derived.contentType,
-    assetRole: derived.assetRole,
-    slug: derived.slug,
-  }) ?? { width: 0, height: 0 }
+  const srcPath = resolved.path
+  const sourceDimensions = resolved.sourceDimensions
 
   const source = createSystemRoleAssignment({
     imageSetId: derived.imageSetId,

@@ -231,6 +231,11 @@ export {
 export { ContentDeletionBlockedDialog } from './lib/delete/content-deletion-blocked-dialog'
 export { ContentCampaignAvailabilityAction } from './lib/campaign-access/overview/content-campaign-availability-action'
 export { getContentDisplayImage } from './lib/detail/page/content-display-image'
+export {
+  buildClassContentDisplayImageInput,
+  buildContentDisplayImageInput,
+  buildSpeciesContentDisplayImageInput,
+} from './lib/detail/page/content-display-image-input'
 export { ContentMediaImage } from './lib/detail/page/content-media-image'
 export type { ContentMediaImageFrame } from './lib/detail/page/content-media-image'
 export {

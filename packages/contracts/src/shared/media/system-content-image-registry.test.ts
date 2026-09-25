@@ -8,7 +8,7 @@ import {
 } from './system-content-image-registry'
 
 describe('system content image registry', () => {
-  it('resolves fighter system primary to the public path', () => {
+  it('resolves fighter system primary to the public path with presentation metadata', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
@@ -17,7 +17,11 @@ describe('system content image registry', () => {
         slug: 'fighter',
         contentSource: 'system',
       }),
-    ).toBe('assets/system/srd-cc-5.2.1/classes/primary/fighter.jpeg')
+    ).toEqual({
+      path: 'assets/system/srd-cc-5.2.1/classes/primary/fighter.jpeg',
+      sourceDimensions: { width: 1200, height: 896 },
+      presentation: { treatment: 'white-paper-knockout' },
+    })
   })
 
   it('resolves elf and human system species primary to the public path', () => {
@@ -28,7 +32,7 @@ describe('system content image registry', () => {
         assetRole: 'primary',
         slug: 'elf',
         contentSource: 'system',
-      }),
+      })?.path,
     ).toBe('assets/system/srd-cc-5.2.1/species/primary/elf.jpeg')
 
     expect(
@@ -38,7 +42,7 @@ describe('system content image registry', () => {
         assetRole: 'primary',
         slug: 'human',
         contentSource: 'system',
-      }),
+      })?.path,
     ).toBe('assets/system/srd-cc-5.2.1/species/primary/human.jpeg')
   })
 

@@ -121,7 +121,7 @@ export function ContentDetailLayout({
                 <ContentMediaImage
                   display={displayImage}
                   alt={imageName}
-                  frame="intrinsic"
+                  frame="primary"
                   className={contentDetailHeroImageFrameClasses}
                 />
               ) : (

@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type GroupFieldItem } from '@rpg/ui/form'
 
-import { EXPANDED_MEDIA_FIELD_PRESENTATION, ManagedMediaField } from '@/features/media'
+import { CampaignSettingsIdentityMediaField } from '../../components/settings/campaign-settings-identity-media-field'
 
 import {
   PLAY_STYLE_LABELS,
@@ -87,8 +87,6 @@ export const settingsIdentityFields: FormItem[] = [
   },
 ]
 
-const CAMPAIGN_IMAGES_FIELD_LABEL = 'Campaign images'
-
 /** Leaf fields inside a shared group container must opt out of per-field chrome. */
 function identityFieldsInSharedContainer(fields: GroupFieldItem[]): GroupFieldItem[] {
   return fields.map((field) => ({
@@ -108,16 +106,7 @@ export function buildSettingsIdentityTabFields(campaignId: string): FormItem[] {
           kind: 'slot',
           name: 'media',
           chrome: { variant: 'none' },
-          render: () =>
-            createElement(ManagedMediaField, {
-              config: {
-                domain: 'campaign',
-                presentation: EXPANDED_MEDIA_FIELD_PRESENTATION,
-              },
-              scope: { kind: 'campaign-identity', campaignId },
-              name: 'media',
-              label: CAMPAIGN_IMAGES_FIELD_LABEL,
-            }),
+          render: () => createElement(CampaignSettingsIdentityMediaField, { campaignId }),
         },
       ],
     },

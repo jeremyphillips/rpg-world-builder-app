@@ -1,5 +1,4 @@
 import {
-  getAssetUrl,
   resolveContentDisplayImage,
   type ContentDisplayImage,
   type ContentMedia,
@@ -13,8 +12,6 @@ import {
   MEDIA_SOURCE_CROP,
   systemContentImageUrl,
 } from '@/features/media/lib/media-display'
-
-import { getContentImageUrl } from './content-image-url'
 
 const FALLBACK_CONTENT_IMAGE = `${import.meta.env.BASE_URL}fallback-content.png`
 
@@ -40,18 +37,6 @@ export function getContentDisplayImage(
 
   if (resolved.sourceKind === 'system') {
     return { ...resolved, src: systemContentImageUrl(resolved.src) }
-  }
-
-  if (resolved.sourceKind === 'fallback') {
-    return { ...resolved, src: getContentImageUrl() }
-  }
-
-  if (
-    resolved.sourceKind === 'upload' &&
-    input.imageKey &&
-    resolved.src === getAssetUrl(input.imageKey)
-  ) {
-    return resolved
   }
 
   return resolved

@@ -74,6 +74,46 @@ describe('ClassStep', () => {
     expect(onDraftChange).not.toHaveBeenCalled()
   })
 
+  it('omits card media for fallback art while keeping the card stretched in the row', () => {
+    const homebrewClass = {
+      ...fighter,
+      id: 'homebrew-custom-warrior',
+      slug: 'custom-warrior',
+      source: 'homebrew' as const,
+      media: undefined,
+      imageKey: undefined,
+    }
+
+    const context = createStandaloneBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [fighter, homebrewClass],
+        skillProficiencies: [],
+        organizations: [],
+      },
+    })
+
+    const { container } = render(
+      <ClassStep
+        context={context}
+        draft={createEmptyCharacterBuilderDraft()}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+      />,
+    )
+
+    const radios = screen.getAllByRole('radio')
+    expect(radios).toHaveLength(2)
+    for (const radio of radios) {
+      let shell: Element | null = radio
+      while (shell && !shell.classList.contains('h-full')) {
+        shell = shell.parentElement
+      }
+      expect(shell).not.toBeNull()
+    }
+    expect(container.querySelectorAll('img')).toHaveLength(1)
+  })
+
   it('omits drawer hero media when the resolved image is a fallback placeholder', async () => {
     const user = userEvent.setup()
     const homebrewClass = {

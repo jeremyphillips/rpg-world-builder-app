@@ -1,9 +1,4 @@
-import {
-  type CharacterBuildContext,
-  type CharacterBuildLanguageOption,
-  type Species,
-  type Spell,
-} from '@rpg/contracts'
+import { type CharacterBuildLanguageOption, type Species, type Spell } from '@rpg/contracts'
 
 import { getContentTypeItemLabel } from '@/features/content'
 import {
@@ -64,20 +59,6 @@ function mapSpeciesDetailItemToSheetItem(item: SpeciesDetailItem) {
 
 export function formatSpeciesCardOption(species: Species) {
   return buildSpeciesCardViewModel(species)
-}
-
-export function resolveSpeciesCardDisplayImageInput(
-  species: Species,
-  context: Pick<CharacterBuildContext, 'rulesetId'>,
-) {
-  return {
-    media: species.media,
-    imageKey: species.imageKey,
-    contentType: 'species' as const,
-    slug: species.slug,
-    contentSource: species.source,
-    rulesetId: context.rulesetId,
-  }
 }
 
 export type SpeciesDetailsSheetContent = {

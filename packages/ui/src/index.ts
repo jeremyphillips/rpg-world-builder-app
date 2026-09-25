@@ -1073,6 +1073,18 @@ export { Spinner, type SpinnerProps } from './components/ui/spinner'
 export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
 export { StatusDot, type StatusDotProps } from './components/ui/status-dot'
 export { statusDotVariants, type StatusDotVariantProps } from './components/ui/status-dot.variants'
+export { Hero, type HeroMarkPlacement, type HeroProps } from './components/ui/hero'
+export {
+  heroIdentityRowClasses,
+  heroMarkFrameClasses,
+  heroMarkImageClasses,
+  heroMarkShellVariants,
+  heroMediaFrameClasses,
+  heroMediaImageClasses,
+  heroMetaStackClasses,
+  heroRootClasses,
+  heroTitleShellClasses,
+} from './components/ui/hero.variants'
 export {
   StatusIcon,
   type StatusIconProps,

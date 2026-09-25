@@ -23,6 +23,5 @@ export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
 
 export const contentMediaImageClasses = 'block size-full max-w-none select-none object-cover'
 
-/** White-paper knockout for monochrome builder card artwork. */
-export const contentMediaImageBuilderBlendClasses =
-  'mix-blend-multiply dark:invert dark:mix-blend-screen'
+/** White-paper line art on a light surface; dark mode renders the original artwork. */
+export const contentMediaImageWhitePaperKnockoutClasses = 'mix-blend-multiply dark:mix-blend-normal'
