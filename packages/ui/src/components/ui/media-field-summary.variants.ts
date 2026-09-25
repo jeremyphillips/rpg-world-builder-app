@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const mediaSummaryCompactInteractiveRootVariants = cva(
-  'group relative block size-24 shrink-0 overflow-hidden rounded-md',
+  'group relative block size-30 shrink-0 overflow-hidden rounded-md',
 )
 
 export const mediaSummaryCompactPreviewButtonVariants = cva(

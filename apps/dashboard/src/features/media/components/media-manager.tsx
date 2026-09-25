@@ -28,9 +28,11 @@ function MediaManagerSession(props: MediaManagerProps) {
         if (!open) dismissRef.current?.()
       }}
     >
-      <Modal.Content size="media" layout="stable" stableSize="tall" className="relative">
+      <Modal.Content size="media" layout="stable" stableSize="tall">
         <ToastScopeProvider>
-          <MediaManagerSessionContent {...props} dismissRef={dismissRef} />
+          <div className={styles.modalSession()}>
+            <MediaManagerSessionContent {...props} dismissRef={dismissRef} />
+          </div>
         </ToastScopeProvider>
       </Modal.Content>
     </Modal.Root>

@@ -259,6 +259,21 @@ describe('MediaManager', () => {
     expect(props.onOpenChange).not.toHaveBeenCalled()
   })
 
+  it('keeps the modal viewport-centered by not overriding fixed positioning', () => {
+    mount({ value: { revision: 0, images: [], roles: {} } })
+    const dialog = screen.getByRole('dialog')
+    expect(dialog.className).toContain('fixed')
+    expect(dialog.className).toContain('-translate-y-1/2')
+    expect(dialog.className).not.toContain('relative')
+  })
+
+  it('omits the details column and widens preview when the gallery is empty', () => {
+    mount({ value: { revision: 0, images: [], roles: {} } })
+    expect(screen.queryByLabelText('Image details')).not.toBeInTheDocument()
+    const fieldset = screen.getByLabelText('Images').closest('fieldset')
+    expect(fieldset?.className).toContain('md:grid-cols-[minmax(0,0.28fr)_minmax(0,0.72fr)]')
+  })
+
   it('shows the system class tile without remove image when media.images is empty', () => {
     mount({
       domain: 'class',

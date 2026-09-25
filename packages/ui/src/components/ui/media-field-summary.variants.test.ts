@@ -14,7 +14,7 @@ describe('mediaSummaryCompactInteractiveRootVariants', () => {
     expect(classes).toContain('group')
     expect(classes).toContain('relative')
     expect(classes).toContain('block')
-    expect(classes).toContain('size-24')
+    expect(classes).toContain('size-30')
     expect(classes).toContain('overflow-hidden')
   })
 })

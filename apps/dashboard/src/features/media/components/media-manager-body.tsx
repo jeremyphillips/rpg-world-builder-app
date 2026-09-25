@@ -40,6 +40,8 @@ export function MediaManagerBody({
   onDetailsBoundaryChange: Parameters<typeof MediaImageDetails>[0]['onScrollBoundaryChange']
 }) {
   const { selectedAvailable, asset, policy, onAlt, changeRole, remove, canRemove } = controller
+  const hasGalleryImages = controller.sessionAvailableImages.length > 0
+  const showDetailsColumn = hasGalleryImages && Boolean(selectedAvailable)
 
   return (
     <div
@@ -49,7 +51,10 @@ export function MediaManagerBody({
       onDragOver={bodyDrop.onDragOver}
       onDrop={bodyDrop.onDrop}
     >
-      <fieldset disabled={saving} className={styles.layout()}>
+      <fieldset
+        disabled={saving}
+        className={styles.layout({ columns: showDetailsColumn ? 'three' : 'two' })}
+      >
         <MediaGallery
           imageUrl={imageUrl}
           systemImageUrl={controller.resolveSystemImageUrl}
@@ -70,7 +75,7 @@ export function MediaManagerBody({
           imageUrl={imageUrl}
           onScrollBoundaryChange={onPreviewBoundaryChange}
         />
-        {selectedAvailable ? (
+        {showDetailsColumn && selectedAvailable ? (
           <MediaImageDetails
             selectedAvailable={selectedAvailable}
             asset={asset}
@@ -83,9 +88,7 @@ export function MediaManagerBody({
             canRemove={canRemove}
             onScrollBoundaryChange={onDetailsBoundaryChange}
           />
-        ) : (
-          <div className={styles.detailsColumn()} aria-hidden="true" />
-        )}
+        ) : null}
       </fieldset>
       {bodyDropOverlay ? (
         <MediaManagerBodyDropOverlay invalid={bodyDropOverlay === 'invalid'} />

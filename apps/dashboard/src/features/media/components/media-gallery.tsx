@@ -87,7 +87,7 @@ export function MediaGallery({
         showBottomBoundaryShadow={false}
         onBoundaryStateChange={onScrollBoundaryChange}
       >
-        <div className={styles.row()}>
+        <div className={styles.galleryHeaderRow()}>
           <h2 className={styles.subheading()}>Images ({imageCount})</h2>
           <Button type="button" variant="outline" onClick={() => input.current?.click()}>
             + Add images

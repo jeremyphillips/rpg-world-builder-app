@@ -20,11 +20,19 @@ export const mediaManagerStyles = {
   ),
   /** Pull columns under the header; double top inset for overlap + breathing room. */
   columnScroll: cva('-mt-5 min-h-0 flex-1'),
-  columnScrollViewport: cva('flex min-h-full flex-col !pb-0 pt-10'),
-  layout: cva(
-    'grid h-full min-h-0 min-w-0 flex-1 items-start gap-6 md:min-h-[24rem] md:grid-cols-[minmax(0,0.28fr)_minmax(0,0.4fr)_minmax(0,0.32fr)]',
-  ),
+  columnScrollViewport: cva('flex min-h-0 flex-col !pb-0 pt-10'),
+  layout: cva('grid h-full min-h-0 min-w-0 flex-1 items-start gap-6 md:min-h-[24rem]', {
+    variants: {
+      columns: {
+        two: 'md:grid-cols-[minmax(0,0.28fr)_minmax(0,0.72fr)]',
+        three: 'md:grid-cols-[minmax(0,0.28fr)_minmax(0,0.47fr)_minmax(0,0.25fr)]',
+      },
+    },
+    defaultVariants: { columns: 'three' },
+  }),
+  modalSession: cva('relative flex min-h-0 flex-1 flex-col overflow-hidden'),
   gallery: cva('flex h-full min-h-0 min-w-0 flex-col md:border-r md:border-border md:pr-6'),
+  galleryHeaderRow: cva('mb-3 flex shrink-0 flex-wrap items-center justify-between gap-2'),
   galleryEmpty: cva(
     'flex min-h-48 flex-1 flex-col items-center justify-center gap-2 px-4 text-center md:min-h-0',
   ),
@@ -42,7 +50,7 @@ export const mediaManagerStyles = {
   workspace: cva('@container/media-workspace flex h-full min-h-0 min-w-0 flex-col'),
   workspaceHeader: cva('mb-4 shrink-0 space-y-1'),
   workspaceHeaderRow: cva('flex items-center justify-between gap-2'),
-  workspaceContent: cva('min-h-0 flex-1'),
+  workspaceContent: cva('flex min-h-0 flex-1 flex-col'),
   workspaceOnboarding: cva('mt-4 shrink-0'),
   editorCrop: cva('min-w-0 max-w-full space-y-2'),
   details: cva('min-w-0 space-y-4'),
@@ -64,7 +72,7 @@ export const mediaManagerStyles = {
   ),
   metadataLabel: cva('text-muted-foreground'),
   metadataValue: cva('m-0 min-w-0'),
-  empty: cva('flex h-full min-h-48 items-stretch'),
+  empty: cva('flex min-h-48 flex-1 items-stretch'),
   queue: cva('space-y-2 rounded-md border border-border p-3 text-sm'),
   hidden: cva('sr-only'),
   roles: cva('space-y-3'),
