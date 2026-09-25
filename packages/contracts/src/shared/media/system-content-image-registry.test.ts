@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildSystemContentImagePath,
+  deriveSystemContentImage,
   resolveContentImageSet,
   resolveSystemContentImage,
 } from './system-content-image-registry'
@@ -17,6 +18,28 @@ describe('system content image registry', () => {
         contentSource: 'system',
       }),
     ).toBe('assets/system/srd-cc-5.2.1/classes/primary/fighter.jpeg')
+  })
+
+  it('resolves elf and human system species primary to the public path', () => {
+    expect(
+      resolveSystemContentImage({
+        imageSetId: 'srd-cc-5.2.1',
+        contentType: 'species',
+        assetRole: 'primary',
+        slug: 'elf',
+        contentSource: 'system',
+      }),
+    ).toBe('assets/system/srd-cc-5.2.1/species/primary/elf.jpeg')
+
+    expect(
+      resolveSystemContentImage({
+        imageSetId: 'srd-cc-5.2.1',
+        contentType: 'species',
+        assetRole: 'primary',
+        slug: 'human',
+        contentSource: 'system',
+      }),
+    ).toBe('assets/system/srd-cc-5.2.1/species/primary/human.jpeg')
   })
 
   it('rejects unknown slug, asset role, and content type', () => {
@@ -59,6 +82,32 @@ describe('system content image registry', () => {
         contentSource: 'homebrew',
       }),
     ).toBeUndefined()
+
+    expect(
+      resolveSystemContentImage({
+        imageSetId: 'srd-cc-5.2.1',
+        contentType: 'species',
+        assetRole: 'primary',
+        slug: 'elf',
+        contentSource: 'homebrew',
+      }),
+    ).toBeUndefined()
+  })
+
+  it('derives catalog entries by content type and slug', () => {
+    expect(
+      deriveSystemContentImage({
+        imageSetId: 'srd-cc-5.2.1',
+        contentType: 'species',
+        assetRole: 'primary',
+        slug: 'elf',
+      }),
+    ).toEqual({
+      imageSetId: 'srd-cc-5.2.1',
+      contentType: 'species',
+      assetRole: 'primary',
+      slug: 'elf',
+    })
   })
 
   it('applies image set precedence through resolveContentImageSet', () => {

@@ -75,7 +75,7 @@ export function MediaGallery({
   onScrollBoundaryChange,
 }: MediaGalleryProps) {
   const input = useRef<HTMLInputElement>(null)
-  const uploadCount = availableImages.filter((image) => image.kind === 'upload').length
+  const imageCount = availableImages.length
 
   return (
     <section className={styles.gallery()} aria-label="Images">
@@ -88,7 +88,7 @@ export function MediaGallery({
         onBoundaryStateChange={onScrollBoundaryChange}
       >
         <div className={styles.row()}>
-          <h2 className={styles.subheading()}>Images ({uploadCount})</h2>
+          <h2 className={styles.subheading()}>Images ({imageCount})</h2>
           <Button type="button" variant="outline" onClick={() => input.current?.click()}>
             + Add images
           </Button>

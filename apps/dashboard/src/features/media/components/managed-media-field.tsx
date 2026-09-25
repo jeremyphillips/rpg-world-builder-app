@@ -1,7 +1,8 @@
-import { useId, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import {
   emptyContentMediaSchema,
+  getAvailableContentImages,
   getContentMediaPolicy,
   resolveRepresentativeImageId,
   type MediaAsset,
@@ -10,7 +11,7 @@ import {
 import { CollectionAddControl, MediaFieldSummary } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
-import { mediaImageUrl, MEDIA_SOURCE_CROP } from '../lib/media-display'
+import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '../lib/media-display'
 import { resolveMediaFieldCapacity, type MediaFieldConfig } from '../lib/media-field-config'
 import type { MediaManagerContentContext } from '../lib/media-manager.types'
 import { MediaManager } from './media-manager'
@@ -44,13 +45,38 @@ export function ManagedMediaField({
   const [selectedId, setSelectedId] = useState<string | undefined>()
   const [assets, setAssets] = useState<MediaAsset[]>([])
   const policy = getContentMediaPolicy(config.domain)
-  const representativeId = resolveRepresentativeImageId(media, policy)
+  const availableImages = useMemo(
+    () =>
+      contentContext
+        ? getAvailableContentImages({
+            media,
+            contentType: contentContext.contentType,
+            slug: contentContext.slug,
+            contentSource: contentContext.contentSource,
+            rulesetId: contentContext.rulesetId,
+          })
+        : [],
+    [contentContext, media],
+  )
+  const systemImage = availableImages.find((image) => image.kind === 'system')
+  const representativeId = resolveRepresentativeImageId(media, policy) ?? systemImage?.id
   const maxItems = resolveMediaFieldCapacity(config)
-  const items = media.images.map((image: { id: string; assetId: string; alt?: string }) => ({
-    id: image.id,
-    alt: image.alt,
-    src: mediaImageUrl(image.assetId, 'gallery-thumbnail', MEDIA_SOURCE_CROP),
-  }))
+  const items = [
+    ...media.images.map((image: { id: string; assetId: string; alt?: string }) => ({
+      id: image.id,
+      alt: image.alt,
+      src: mediaImageUrl(image.assetId, 'gallery-thumbnail', MEDIA_SOURCE_CROP),
+    })),
+    ...(systemImage
+      ? [
+          {
+            id: systemImage.id,
+            alt: `System ${systemImage.source.slug}`,
+            src: systemContentImageUrl(systemImage.srcPath),
+          },
+        ]
+      : []),
+  ]
   const count = items.length
   const onOpen = (imageId?: string) => {
     setSelectedId(imageId)

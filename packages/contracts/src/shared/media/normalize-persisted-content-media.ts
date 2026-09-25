@@ -4,9 +4,9 @@ import type { ContentMedia } from './content-media'
 import { isRolePresentationCustomized } from './is-role-presentation-customized'
 import type { MediaRole } from './roles'
 import {
-  deriveSystemClassPrimarySource,
+  deriveSystemContentImage,
   resolveContentImageSet,
-  SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
+  resolveSystemContentImageSourceDimensions,
 } from './system-content-image-registry'
 
 /** Strip derived-default role assignments before persisting media from the manager. */
@@ -24,8 +24,10 @@ export function normalizePersistedContentMedia(input: {
     campaignImageSetId: input.campaignImageSetId,
     rulesetId: input.rulesetId,
   })
-  const derived = deriveSystemClassPrimarySource({
+  const derived = deriveSystemContentImage({
     imageSetId,
+    contentType: input.contentType,
+    assetRole: 'primary',
     slug: input.slug,
   })
   const roles = { ...input.media.roles }
@@ -42,10 +44,17 @@ export function normalizePersistedContentMedia(input: {
         assignment.source.assetRole === derived.assetRole &&
         assignment.source.slug === derived.slug
 
+      const sourceDimensions = resolveSystemContentImageSourceDimensions({
+        imageSetId: assignment.source.imageSetId,
+        contentType: assignment.source.contentType,
+        assetRole: assignment.source.assetRole,
+        slug: assignment.source.slug,
+      }) ?? { width: 0, height: 0 }
+
       const customized = isRolePresentationCustomized({
         role,
         presentation: assignment.presentation,
-        source: SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
+        source: sourceDimensions,
       })
 
       if (matchesDerived && !customized) {

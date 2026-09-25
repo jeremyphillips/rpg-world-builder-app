@@ -99,7 +99,7 @@ export function createUploadRoleAssignment(imageId: string): {
 
 export function createSystemRoleAssignment(input: {
   imageSetId: string
-  contentType: ContentTypeKey
+  contentType: ContentTypeKey | string
   assetRole: string
   slug: string
 }): { source: ContentMediaSystemSource } {

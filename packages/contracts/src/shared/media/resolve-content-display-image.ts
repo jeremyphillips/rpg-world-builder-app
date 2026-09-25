@@ -9,7 +9,7 @@ import type { MediaRole } from './roles'
 import {
   resolveContentImageSet,
   resolveSystemContentImage,
-  SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
+  resolveSystemContentImageSourceDimensionsFromPath,
 } from './system-content-image-registry'
 
 export const CONTENT_DISPLAY_IMAGE_SOURCE_KINDS = ['system', 'upload', 'fallback'] as const
@@ -125,7 +125,7 @@ export function resolveContentDisplayImageSourceDimensions(
   display: ContentDisplayImage,
 ): { width: number; height: number } | undefined {
   if (display.sourceKind === 'system') {
-    return SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS
+    return resolveSystemContentImageSourceDimensionsFromPath(display.src)
   }
   return undefined
 }

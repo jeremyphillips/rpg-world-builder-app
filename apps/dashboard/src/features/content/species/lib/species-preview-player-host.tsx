@@ -1,3 +1,4 @@
+import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'
 import { Modal } from '@rpg/ui'
 
 import {
@@ -5,7 +6,7 @@ import {
   useLanguageVocabulary,
   useSenseVocabulary,
 } from '@/features/vocabulary'
-import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
+import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
 import type { ContentPreviewPlayerPreviewProps } from '../../lib/forms/preview/content-form-preview.types'
 import { CONTENT_PREVIEW_AS_PLAYER_LABEL } from '../../lib/forms/preview/content-form-preview-copy'
 import { SpeciesDetailBody } from '../components/detail/species-detail-body'
@@ -37,7 +38,14 @@ export function SpeciesPreviewPlayerHost({
         <Modal.Body>
           <SpeciesDetailBody
             name={name}
-            imageUrl={getContentImageUrl()}
+            displayImage={getContentDisplayImage({
+              media: (values as { media?: ContentMedia }).media ?? emptyContentMediaSchema,
+              contentType: 'species',
+              slug: values.slug ?? 'preview',
+              contentSource: ctx.entitySource ?? 'homebrew',
+              rulesetId: ctx.rulesetId,
+              role: 'primary',
+            })}
             imageName={name}
             viewModel={viewModel}
             campaignId={ctx.campaignId ?? ''}

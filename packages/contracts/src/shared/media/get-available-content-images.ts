@@ -8,10 +8,10 @@ import {
 } from './content-media-source'
 import type { SourceDimensions } from './geometry'
 import {
-  deriveSystemClassPrimarySource,
+  deriveSystemContentImage,
   resolveContentImageSet,
   resolveSystemContentImage,
-  SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
+  resolveSystemContentImageSourceDimensions,
 } from './system-content-image-registry'
 
 export type AvailableContentUploadImage = {
@@ -48,11 +48,17 @@ export function getAvailableContentImages(input: {
     attachment,
   }))
 
-  const derived = deriveSystemClassPrimarySource({
+  if (input.contentSource !== 'system') {
+    return uploads
+  }
+
+  const derived = deriveSystemContentImage({
     imageSetId: resolvedImageSetId,
+    contentType: input.contentType,
+    assetRole: 'primary',
     slug: input.slug,
   })
-  if (!derived || input.contentSource !== 'system' || input.contentType !== 'classes') {
+  if (!derived) {
     return uploads
   }
 
@@ -64,6 +70,13 @@ export function getAvailableContentImages(input: {
     contentSource: input.contentSource,
   })
   if (!srcPath) return uploads
+
+  const sourceDimensions = resolveSystemContentImageSourceDimensions({
+    imageSetId: derived.imageSetId,
+    contentType: derived.contentType,
+    assetRole: derived.assetRole,
+    slug: derived.slug,
+  }) ?? { width: 0, height: 0 }
 
   const source = createSystemRoleAssignment({
     imageSetId: derived.imageSetId,
@@ -77,7 +90,7 @@ export function getAvailableContentImages(input: {
     id: buildSystemContentImageVirtualId(source),
     source,
     srcPath,
-    sourceDimensions: SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
+    sourceDimensions,
   }
 
   return [...uploads, systemImage]

@@ -39,6 +39,8 @@ export type ContentFormCtx = {
    * `source` field on the embedded element.
    */
   entitySource?: ContentSource
+  /** Ruleset for system artwork resolution in media fields. */
+  rulesetId?: string
   /** Resolved campaign rule overrides (defaults when absent). */
   campaignRules?: ResolvedCampaignRules
   /** Resolved spellcasting progression records (seed + campaign patch). */

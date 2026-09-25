@@ -356,7 +356,7 @@ function ensureAssignmentForSelection(
   if (systemSource) {
     next.media.roles[next.presentation] = createSystemRoleAssignment({
       imageSetId: systemSource.imageSetId,
-      contentType: systemSource.contentType as 'classes',
+      contentType: systemSource.contentType,
       assetRole: systemSource.assetRole,
       slug: systemSource.slug,
     })

@@ -4,7 +4,7 @@ import {
   resolveMediaRolePresentationNoun,
   roleAssignmentMatchesImageId,
   roleAssignmentUploadImageId,
-  SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
+  resolveSystemContentImageSourceDimensions,
   type ContentMedia,
   type MediaAsset,
   type MediaRole,
@@ -47,7 +47,12 @@ export function shouldConfirmMediaRoleChange(input: {
   const previousSource = previousAsset
     ? { width: previousAsset.orientedWidth, height: previousAsset.orientedHeight }
     : previous.source.kind === 'system'
-      ? SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS
+      ? resolveSystemContentImageSourceDimensions({
+          imageSetId: previous.source.imageSetId,
+          contentType: previous.source.contentType,
+          assetRole: previous.source.assetRole,
+          slug: previous.source.slug,
+        })
       : input.source
 
   if (

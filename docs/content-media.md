@@ -39,10 +39,13 @@ and are not served by `GET /api/uploads/:key`.
 - **`SYSTEM_ASSET_MANIFEST`** (`system-asset-manifest.ts`) — upload/rendition fixture
   dimensions for tests and resolver primitives (e.g. `/assets/system/class/fighter.webp`).
 - **`system-content-image-registry.ts`** — shipped SRD catalog artwork for opted-in
-  content types. Paths follow
+  content types. Each registered file is one catalog entry (slug, path, dimensions).
+  Paths follow
   `assets/system/{imageSetId}/{contentType}/{assetRole}/{slug}.jpeg` and are served from
-  dashboard `public/`. Class primary art for `srd-cc-5.2.1` is registered there; display
-  resolves derived system sources when `media.roles` is empty.
+  dashboard `public/`. Class and species primary art for `srd-cc-5.2.1` are registered
+  there; display resolves derived system sources when `media.roles` is empty. The media
+  manager and compact form field summary list those virtual system sources alongside
+  uploads (non-deletable, not copied into `media.images`).
 
 ## Phase status
 
@@ -71,7 +74,8 @@ and are not served by `GET /api/uploads/:key`.
 
 - Contracts: `character/sheet.ts`, builder draft identity, finalize input
 - API: `character.model.ts`, `to-character.ts`, `to-npc-character.ts`
-- Dashboard: builder identity (currently no image UI), builder class step primary art, import coverage
+- Dashboard: builder identity (currently no image UI), builder class and species step primary
+  art, import coverage
 
 ### Out of scope (keep `imageKey` / legacy upload)
 

@@ -5,9 +5,9 @@ import type { ContentMedia } from './content-media'
 import { isSystemRoleAssignment, roleAssignmentUploadImageId } from './content-media-source'
 import { CONTENT_MEDIA_MAX_ATTACHMENTS } from './limits'
 import {
-  deriveSystemClassPrimarySource,
+  deriveSystemContentImage,
   resolveContentImageSet,
-  SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS,
+  resolveSystemContentImageSourceDimensions,
 } from './system-content-image-registry'
 import { formatAspectRatioLabel, getFixedAspectCropSpec } from './role-crop-spec'
 import {
@@ -205,8 +205,10 @@ function collectSystemRoleIssues(
   if (!isSystemRoleAssignment(assignment)) return []
 
   const imageSetId = resolveContentImageSet({})
-  const derived = deriveSystemClassPrimarySource({
+  const derived = deriveSystemContentImage({
     imageSetId,
+    contentType: assignment.source.contentType,
+    assetRole: assignment.source.assetRole,
     slug: assignment.source.slug,
   })
   if (
@@ -225,9 +227,16 @@ function collectSystemRoleIssues(
     ]
   }
 
+  const sourceDimensions = resolveSystemContentImageSourceDimensions({
+    imageSetId: assignment.source.imageSetId,
+    contentType: assignment.source.contentType,
+    assetRole: assignment.source.assetRole,
+    slug: assignment.source.slug,
+  }) ?? { width: 0, height: 0 }
+
   return collectRolePresentationIssues(role, assignment, {
-    orientedWidth: SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS.width,
-    orientedHeight: SYSTEM_CLASS_PRIMARY_SOURCE_DIMENSIONS.height,
+    orientedWidth: sourceDimensions.width,
+    orientedHeight: sourceDimensions.height,
   })
 }
 

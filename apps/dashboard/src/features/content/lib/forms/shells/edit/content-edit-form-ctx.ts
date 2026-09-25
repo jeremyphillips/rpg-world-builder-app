@@ -14,7 +14,9 @@ export function mergeEditLayoutCtx(
   formCtx: Partial<ContentFormCtx> | undefined,
   campaignId: string,
   entityId: string,
-  entity: { source?: ContentFormCtx['entitySource']; kind?: unknown } | undefined,
+  entity:
+    | { source?: ContentFormCtx['entitySource']; kind?: unknown; rulesetId?: string }
+    | undefined,
 ): ContentFormCtx {
   return {
     ...optionsCtx,
@@ -23,6 +25,7 @@ export function mergeEditLayoutCtx(
     entityId,
     mode: 'edit',
     entitySource: entity?.source,
+    rulesetId: entity?.rulesetId ?? optionsCtx.rulesetId,
     equipmentKind: formCtx?.equipmentKind ?? entityEquipmentKind(entity),
   }
 }

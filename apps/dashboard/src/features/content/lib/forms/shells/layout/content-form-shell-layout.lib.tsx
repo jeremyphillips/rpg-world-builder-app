@@ -49,12 +49,14 @@ function ContentMediaIdentitySlot({
   campaignId,
   contentType,
   contentSource,
+  rulesetId,
 }: {
   domain: ContentMediaDomain
   form: UseFormReturn<FieldValues>
   campaignId?: string
   contentType: ContentTypeKey
   contentSource?: ContentSource
+  rulesetId?: string
 }) {
   const slug = useWatch({ control: form.control, name: 'slug' }) as string | undefined
   return (
@@ -67,6 +69,7 @@ function ContentMediaIdentitySlot({
               contentType,
               slug,
               contentSource,
+              rulesetId,
             }
           : undefined
       }
@@ -127,6 +130,7 @@ export function ContentFormHeader({
             campaignId={campaignId}
             contentType={def.routeKey as ContentTypeKey}
             contentSource={entitySource}
+            rulesetId={ctx.rulesetId}
           />
         ) : null}
         <div className="min-w-0 flex-1">

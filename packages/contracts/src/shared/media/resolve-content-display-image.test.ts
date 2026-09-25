@@ -76,6 +76,22 @@ describe('resolveContentDisplayImage', () => {
     expect(display.crop).toEqual(crop)
   })
 
+  it('derives a system species primary with no media and no crop', () => {
+    const display = resolveContentDisplayImage({
+      media: emptyContentMediaSchema,
+      contentType: 'species',
+      slug: 'elf',
+      contentSource: 'system',
+      rulesetId: 'srd-cc-5.2.1',
+      fallbackSrc,
+    })
+
+    expect(display).toEqual({
+      src: 'assets/system/srd-cc-5.2.1/species/primary/elf.jpeg',
+      sourceKind: 'system',
+    })
+  })
+
   it('falls back to imageKey and then the fallback image', () => {
     expect(
       resolveContentDisplayImage({
@@ -120,6 +136,22 @@ describe('getAvailableContentImages', () => {
     })
   })
 
+  it('includes a virtual species source only for system content', () => {
+    const available = getAvailableContentImages({
+      media: emptyContentMediaSchema,
+      contentType: 'species',
+      slug: 'human',
+      contentSource: 'system',
+      rulesetId: 'srd-cc-5.2.1',
+    })
+
+    expect(available).toHaveLength(1)
+    expect(available[0]).toMatchObject({
+      kind: 'system',
+      srcPath: 'assets/system/srd-cc-5.2.1/species/primary/human.jpeg',
+    })
+  })
+
   it('does not derive fighter art for a different slug or homebrew source', () => {
     expect(
       getAvailableContentImages({
@@ -136,6 +168,16 @@ describe('getAvailableContentImages', () => {
         media: emptyContentMediaSchema,
         contentType: 'classes',
         slug: 'fighter',
+        contentSource: 'homebrew',
+        rulesetId: 'srd-cc-5.2.1',
+      }),
+    ).toEqual([])
+
+    expect(
+      getAvailableContentImages({
+        media: emptyContentMediaSchema,
+        contentType: 'species',
+        slug: 'elf',
         contentSource: 'homebrew',
         rulesetId: 'srd-cc-5.2.1',
       }),

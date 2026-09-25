@@ -10,7 +10,7 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
-import { ContentMediaImage, getContentDisplayImage } from '@/features/content'
+import { getContentDisplayImage } from '@/features/content'
 
 import {
   buildClassDetailsSheetContent,
@@ -18,6 +18,7 @@ import {
   resolveClassCardDisplayImageInput,
   resolveClassCardSummaryBadge,
 } from '../../../../lib/builder/builder-option-display.lib'
+import { BuilderOptionCardImage } from '../shared/builder-option-card-image'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 
 const SELECT_CLASS_ACTION_LABEL = formatFieldMessage(
@@ -45,10 +46,8 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
         value: entry.id,
         ...formatClassCardOption(entry),
         media: (
-          <ContentMediaImage
+          <BuilderOptionCardImage
             display={getContentDisplayImage(resolveClassCardDisplayImageInput(entry, context))}
-            alt=""
-            frame="builderCard"
           />
         ),
         summaryBadge: resolveClassCardSummaryBadge(entry, context.spellcastingProgression),

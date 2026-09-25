@@ -260,6 +260,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const ctx = useMemo(
     (): ContentFormCtx => ({
       campaignId,
+      rulesetId,
       campaignRules,
       spellcastingProgression,
       creatureTypeVocabulary: vocabulary.creatureTypeVocabulary,
@@ -269,7 +270,7 @@ export function useContentFormOptions(campaignId: string | undefined): {
       spellSchoolVocabulary: vocabulary.spellSchoolVocabulary,
       options,
     }),
-    [campaignId, campaignRules, spellcastingProgression, vocabulary, options],
+    [campaignId, rulesetId, campaignRules, spellcastingProgression, vocabulary, options],
   )
 
   return {

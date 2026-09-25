@@ -259,6 +259,23 @@ describe('MediaManager', () => {
     expect(props.onOpenChange).not.toHaveBeenCalled()
   })
 
+  it('shows the system class tile without remove image when media.images is empty', () => {
+    mount({
+      domain: 'class',
+      value: { revision: 0, images: [], roles: {} },
+      contentContext: {
+        contentType: 'classes',
+        slug: 'fighter',
+        contentSource: 'system',
+        rulesetId: 'srd-cc-5.2.1',
+      },
+    })
+
+    expect(screen.getByRole('button', { name: /System fighter/i })).toBeInTheDocument()
+    expect(screen.getByText('Images (1)')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove image' })).not.toBeInTheDocument()
+  })
+
   it('orders the details column as roles, file metadata, accessibility disclosure, and remove', () => {
     mount()
     const details = screen.getByLabelText('Image details')
