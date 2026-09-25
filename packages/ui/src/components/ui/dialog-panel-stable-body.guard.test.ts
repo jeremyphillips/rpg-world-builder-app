@@ -10,6 +10,7 @@ const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..
 const STABLE_BODY_ALLOWLIST = new Set([
   'apps/dashboard/src/features/content/classes/components/class-spellbook-acquisition-modal.tsx',
   'apps/dashboard/src/features/content/components/table-builder/table-builder-modal.tsx',
+  'apps/dashboard/src/features/media/components/media-manager.tsx',
   'apps/dashboard/src/lib/create-flow/create-modal-shell.tsx',
 ])
 

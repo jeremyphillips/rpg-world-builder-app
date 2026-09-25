@@ -37,21 +37,23 @@ function expectViewportWorkspaceChain(container: HTMLElement) {
 }
 
 describe('ContentFormPageShell', () => {
-  it('uses ViewportWorkspace and NarrowPage without shell inset when preview is disabled', () => {
+  it('uses NarrowPage with page inset when scrollMode is document', () => {
     const { container } = renderShell(
-      <ContentFormPageShell usePreviewLayout={false}>
+      <ContentFormPageShell scrollMode="document" pageWidth="narrow">
         <p>Form body</p>
       </ContentFormPageShell>,
     )
 
-    const { widthShell } = expectViewportWorkspaceChain(container)
-    expect(widthShell).toHaveClass('mx-auto', 'max-w-4xl')
-    expect(widthShell?.firstElementChild?.textContent).toBe('Form body')
+    const root = container.firstElementChild
+    expect(root).toHaveClass('mx-auto', 'max-w-4xl')
+    expect(root).toHaveClass(...pageShellInsetTopClasses.split(/\s+/))
+    expect(root).not.toHaveClass(...viewportWorkspaceClasses.split(/\s+/))
+    expect(root?.textContent).toBe('Form body')
   })
 
-  it('uses ViewportWorkspace, body wrapper, and WidePage when preview is enabled', () => {
+  it('uses ViewportWorkspace, body wrapper, and WidePage when scrollMode is viewport', () => {
     const { container } = renderShell(
-      <ContentFormPageShell usePreviewLayout>
+      <ContentFormPageShell scrollMode="viewport" pageWidth="wide">
         <p>Form body</p>
       </ContentFormPageShell>,
     )

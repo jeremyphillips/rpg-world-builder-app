@@ -56,6 +56,7 @@ export { Toast, ToastPresentation, type ToastProps } from './components/ui/toast
 export {
   toastVariants,
   toastViewportVariants,
+  toastModalViewportVariants,
   toastTitleVariants,
   toastDescriptionVariants,
   toastActionsVariants,
@@ -66,13 +67,20 @@ export {
 export { ToastViewport, type ToastViewportProps } from './components/ui/toast-viewport.client'
 export { ToastProvider, toast } from './components/ui/toast-provider.client'
 export {
+  ToastScopeProvider,
+  useToastScope,
+  type ToastScopeProviderProps,
+} from './components/ui/toast-scope.client'
+export {
   TOAST_DURATION,
   TOAST_MAX_VISIBLE,
   TOAST_DISMISS_LABEL,
   resolveToastDuration,
+  createToastStore,
   type ToastAction,
   type ToastOptions,
   type ToastRecord,
+  type ToastStore,
   type ToastTone,
 } from './components/ui/toast-manager.client'
 export { RichTextContent, type RichTextContentProps } from './components/ui/rich-text-content'
@@ -109,6 +117,28 @@ export {
   RichTextTableEmbedHostRegistrar,
 } from './components/ui/rich-text-table-embed-host.client'
 export { Avatar, type AvatarProps } from './components/ui/avatar.client'
+export { MediaImage, type MediaImageProps } from './components/ui/media-image.client'
+export {
+  mediaImageVariants,
+  mediaImagePlaceholderVariants,
+  type MediaImageVariantProps,
+} from './components/ui/media-image.variants'
+export {
+  MediaCompactPreview,
+  type MediaCompactPreviewProps,
+} from './components/ui/media-compact-preview.client'
+export {
+  MediaFieldSummary,
+  MEDIA_FIELD_SUMMARY_TILE_BUDGET,
+  type MediaFieldSummaryItem,
+  type MediaFieldSummaryProps,
+} from './components/ui/media-field-summary.client'
+export {
+  MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL,
+  resolveCompactSummaryCopy,
+  resolveExpandedCapacityHint,
+  resolveMediaFieldCountFigures,
+} from './components/ui/media-field-summary.lib'
 export { eyebrowVariants, type EyebrowVariantProps } from './components/ui/eyebrow.variants'
 export { Eyebrow, type EyebrowProps } from './components/ui/eyebrow'
 export {
@@ -346,7 +376,7 @@ export {
 export {
   RadioCard,
   radioCardVariants,
-  RADIO_CARD_DEFAULT_DETAILS_LABEL,
+  resolveRadioCardDetailsAriaLabel,
   type RadioCardDensity,
   type RadioCardVisualControl,
   type RadioCardVariant,
@@ -743,6 +773,35 @@ export {
   type FileDropzoneProps,
   DEFAULT_ACCEPT,
 } from './components/ui/file-dropzone.client'
+export { FilenamePreview, type FilenamePreviewProps } from './components/ui/filename-preview.client'
+export type { FilenamePreviewDisplayVariantProps } from './components/ui/filename-preview.variants'
+export {
+  FILENAME_PREVIEW_ELLIPSIS,
+  FILENAME_PREVIEW_MAX_COMFORTABLE,
+  FILENAME_PREVIEW_MAX_COMPACT,
+  FILENAME_PREVIEW_MAX_METADATA,
+  resolveFilenamePreviewMaxLength,
+  splitFilename,
+  truncateFilename,
+  type FilenamePreviewDensity,
+} from './components/ui/filename-preview.lib'
+export {
+  DropTargetPrompt,
+  type DropTargetPromptProps,
+  type DropTargetPromptState,
+} from './components/ui/drop-target-prompt.client'
+export {
+  DROP_TARGET_ACTIVE_TITLE,
+  DROP_TARGET_INVALID_MESSAGE,
+  isImageAcceptList,
+  resolveDropTargetCopy,
+  resolveDropTargetRequirements,
+} from './components/ui/drop-target-copy.lib'
+export {
+  IMAGE_DROP_TARGET_ACCEPT,
+  resolveImageDropTargetDefaults,
+  type ImageDropTargetDefaults,
+} from './components/ui/drop-target-image-defaults.lib'
 export { FileField, type FileFieldProps } from './components/ui/file-field.client'
 
 export {
@@ -819,6 +878,10 @@ export {
 export { DIALOG_INITIAL_FOCUS_SELECTOR } from './components/ui/dialog-focus.lib'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
+export {
+  SheetMediaScroll,
+  type SheetMediaScrollProps,
+} from './components/ui/sheet-media-scroll.client'
 export {
   BuilderOptionDetailsSheet,
   type BuilderOptionDetailsSheetProps,
@@ -1010,6 +1073,18 @@ export { Spinner, type SpinnerProps } from './components/ui/spinner'
 export { spinnerVariants, type SpinnerVariantProps } from './components/ui/spinner.variants'
 export { StatusDot, type StatusDotProps } from './components/ui/status-dot'
 export { statusDotVariants, type StatusDotVariantProps } from './components/ui/status-dot.variants'
+export { Hero, type HeroMarkPlacement, type HeroProps } from './components/ui/hero'
+export {
+  heroIdentityRowClasses,
+  heroMarkFrameClasses,
+  heroMarkImageClasses,
+  heroMarkShellVariants,
+  heroMediaFrameClasses,
+  heroMediaImageClasses,
+  heroMetaStackClasses,
+  heroRootClasses,
+  heroTitleShellClasses,
+} from './components/ui/hero.variants'
 export {
   StatusIcon,
   type StatusIconProps,
@@ -1152,3 +1227,13 @@ export {
   dataTableHeaderCellVariants,
   dataTableSortIconVariants,
 } from './components/ui/data-table.variants'
+
+export {
+  MediaCropEditor,
+  type MediaCropEditorConstraint,
+  type MediaCropEditorProps,
+} from './components/ui/media-crop-editor.client'
+export {
+  MediaEmblemEditor,
+  type MediaEmblemEditorProps,
+} from './components/ui/media-emblem-editor.client'

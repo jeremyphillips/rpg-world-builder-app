@@ -11,6 +11,7 @@ import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 import {
+  builderOptionDetailsHeroImageVariants,
   builderOptionDetailsMetadataListVariants,
   builderOptionDetailsSectionVariants,
   type BuilderOptionPrimaryActionPlacement,
@@ -53,6 +54,8 @@ export type BuilderOptionDetailsSheetProps = {
   primaryActionPlacement?: BuilderOptionPrimaryActionPlacement
   /** Override the default lifted drawer plane when a feature needs a different shell fill. */
   surface?: SheetSurface
+  /** Full-bleed artwork rendered above padded header/body content. */
+  heroImage?: React.ReactNode
 }
 
 function MetadataRow({ label, value }: BuilderOptionDetailsMetadata) {
@@ -150,44 +153,66 @@ export function BuilderOptionDetailsSheet({
   primaryAction,
   primaryActionPlacement = 'header',
   surface = 'background',
+  heroImage,
 }: BuilderOptionDetailsSheetProps) {
   const visibleMetadata = metadata?.filter((row) => row.value != null && row.value !== '')
   const visibleSections = sections?.filter(
     (section) => section.description || (section.items && section.items.length > 0),
   )
   const showHeaderAction = primaryAction != null && primaryActionPlacement === 'header'
+  const hasMedia = heroImage != null
+
+  const header = (
+    <Sheet.Header
+      kicker={eyebrow ? <Eyebrow size="xs">{eyebrow}</Eyebrow> : undefined}
+      headline={title}
+      endSlot={showHeaderAction ? primaryAction : undefined}
+    />
+  )
+
+  const bodyContent = (
+    <>
+      {visibleMetadata && visibleMetadata.length > 0 ? (
+        <div className={builderOptionDetailsMetadataListVariants()}>
+          {visibleMetadata.map((row) => (
+            <MetadataRow key={row.label} label={row.label} value={row.value} />
+          ))}
+        </div>
+      ) : null}
+      {descriptionHtml ? (
+        <RichTextContent
+          id="builder-option-details-description"
+          html={descriptionHtml}
+          size="md"
+          tone="muted"
+        />
+      ) : null}
+      {visibleSections?.map((section) => (
+        <DetailsSection key={section.title} section={section} />
+      ))}
+    </>
+  )
 
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content
         surface={surface}
+        hasMedia={hasMedia}
         aria-describedby={descriptionHtml ? 'builder-option-details-description' : undefined}
       >
-        <Sheet.Header
-          kicker={eyebrow ? <Eyebrow size="xs">{eyebrow}</Eyebrow> : undefined}
-          headline={title}
-          endSlot={showHeaderAction ? primaryAction : undefined}
-        />
-        <Sheet.Body className="space-y-6">
-          {visibleMetadata && visibleMetadata.length > 0 ? (
-            <div className={builderOptionDetailsMetadataListVariants()}>
-              {visibleMetadata.map((row) => (
-                <MetadataRow key={row.label} label={row.label} value={row.value} />
-              ))}
-            </div>
-          ) : null}
-          {descriptionHtml ? (
-            <RichTextContent
-              id="builder-option-details-description"
-              html={descriptionHtml}
-              size="md"
-              tone="muted"
-            />
-          ) : null}
-          {visibleSections?.map((section) => (
-            <DetailsSection key={section.title} section={section} />
-          ))}
-        </Sheet.Body>
+        {hasMedia ? (
+          <Sheet.MediaScroll
+            media={<div className={builderOptionDetailsHeroImageVariants()}>{heroImage}</div>}
+            header={header}
+          >
+            <div className="space-y-6">{bodyContent}</div>
+          </Sheet.MediaScroll>
+        ) : (
+          <>
+            {header}
+            <Sheet.Body className="space-y-6">{bodyContent}</Sheet.Body>
+          </>
+        )}
         {primaryAction && primaryActionPlacement === 'footer' ? (
           <Sheet.Footer>
             <div className={dialogPanelActionRowClasses}>{primaryAction}</div>

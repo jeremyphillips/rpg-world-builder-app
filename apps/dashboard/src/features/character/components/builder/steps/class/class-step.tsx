@@ -10,10 +10,15 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
+import { buildClassContentDisplayImageInput, getContentDisplayImage } from '@/features/content'
+
 import {
   buildClassDetailsSheetContent,
   formatClassCardOption,
+  resolveClassCardSummaryBadge,
 } from '../../../../lib/builder/builder-option-display.lib'
+import { BuilderOptionCardImage } from '../shared/builder-option-card-image'
+import { BuilderOptionSheetHeroImage } from '../shared/builder-option-sheet-hero-image'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 
 const SELECT_CLASS_ACTION_LABEL = formatFieldMessage(
@@ -37,12 +42,19 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
 
   const options = useMemo(
     () =>
-      classes.map((entry) => ({
-        value: entry.id,
-        ...formatClassCardOption(entry),
-        onDetails: () => setDetailsClassId(entry.id),
-      })),
-    [classes],
+      classes.map((entry) => {
+        const display = getContentDisplayImage(buildClassContentDisplayImageInput(entry))
+        return {
+          value: entry.id,
+          ...formatClassCardOption(entry),
+          ...(display.sourceKind !== 'fallback'
+            ? { media: <BuilderOptionCardImage display={display} /> }
+            : {}),
+          summaryBadge: resolveClassCardSummaryBadge(entry, context.spellcastingProgression),
+          onDetails: () => setDetailsClassId(entry.id),
+        }
+      }),
+    [classes, context],
   )
 
   const detailsClass = useMemo(
@@ -57,6 +69,11 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
 
   const isDetailsClassSelected = detailsClassId != null && draft.class.classId === detailsClassId
 
+  const detailsHeroDisplay = useMemo(() => {
+    if (!detailsClass) return null
+    return getContentDisplayImage(buildClassContentDisplayImageInput(detailsClass))
+  }, [detailsClass])
+
   if (options.length === 0) {
     return (
       <BuilderStepFrame stepId="class" validationIssues={validationIssues}>
@@ -69,6 +86,9 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
     <BuilderStepFrame stepId="class" validationIssues={validationIssues}>
       <RadioCard
         density="compact"
+        columns="three"
+        copyWidth="content"
+        reserveSummaryBadgeRow
         value={draft.class.classId ?? ''}
         onValueChange={(classId) => {
           onDraftChange({
@@ -88,6 +108,11 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
           onOpenChange={(open) => {
             if (!open) setDetailsClassId(null)
           }}
+          heroImage={
+            detailsHeroDisplay && detailsHeroDisplay.sourceKind !== 'fallback' ? (
+              <BuilderOptionSheetHeroImage display={detailsHeroDisplay} />
+            ) : undefined
+          }
           title={detailsContent.title}
           eyebrow={detailsContent.eyebrow}
           descriptionHtml={detailsContent.descriptionHtml}

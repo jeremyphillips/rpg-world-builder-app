@@ -132,6 +132,25 @@ describe('SegmentedControl', () => {
     expect(screen.getByTestId('leading-icon').parentElement).toHaveAttribute('aria-hidden')
   })
 
+  it('applies compact button tokens for sm segments', () => {
+    render(
+      <SegmentedControl
+        aria-label="Presentation"
+        value="primary"
+        size="sm"
+        segmentWidth="auto"
+        options={[
+          { value: 'primary', label: 'Primary' },
+          { value: 'banner', label: 'Banner' },
+        ]}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    const segment = screen.getByRole('button', { name: 'Primary' })
+    expect(segment).toHaveClass('h-control-action-compact', 'text-xs', 'px-2')
+  })
+
   it('forwards trailing content and button props onto the segment', () => {
     render(
       <SegmentedControl

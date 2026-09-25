@@ -8,6 +8,7 @@ export const statusDotVariants = cva('inline-block shrink-0 rounded-full', {
       success: 'bg-semantic-success',
       warning: 'bg-semantic-warning',
       destructive: 'bg-semantic-destructive',
+      sunken: 'bg-sunken ring-1 ring-border',
     },
     size: {
       sm: 'size-2',

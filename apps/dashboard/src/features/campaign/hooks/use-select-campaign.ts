@@ -44,13 +44,13 @@ export function useOpenCampaign() {
   const { data: campaigns } = useCampaigns()
 
   return useCallback(
-    (campaignId: string) => {
+    (campaignId: string, navigationState?: Record<string, unknown>) => {
       persistSelection(campaignId)
       const campaign = campaigns?.find((item) => item.id === campaignId)
       const href = campaign
         ? resolveCampaignEntryDestination(campaign).href
         : ROUTES.campaign.detail(campaignId)
-      navigate(href)
+      navigate(href, navigationState ? { state: navigationState } : undefined)
     },
     [campaigns, navigate, persistSelection],
   )

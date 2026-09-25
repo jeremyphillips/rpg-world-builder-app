@@ -8,6 +8,48 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FieldGroupSummaryTrigger } from './field-group-summary-trigger.client'
 
 describe('FieldGroupSummaryTrigger', () => {
+  it('uses pointer cursor because Tailwind v4 resets button cursor to default', () => {
+    render(
+      <FieldGroupSummaryTrigger
+        size="md"
+        summary={{
+          status: { label: 'Available', tone: 'success', indicator: 'dot' },
+          detail: 'All players',
+        }}
+        openLabel="Change"
+        unsavedSuffix=" · Unsaved"
+        showDirtySuffix={false}
+        disabled={false}
+        onOpen={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Available. All players' })).toHaveClass(
+      'cursor-pointer',
+    )
+  })
+
+  it('uses not-allowed cursor when disabled', () => {
+    render(
+      <FieldGroupSummaryTrigger
+        size="md"
+        summary={{
+          status: { label: 'Available', tone: 'success', indicator: 'dot' },
+          detail: 'All players',
+        }}
+        openLabel="Change"
+        unsavedSuffix=" · Unsaved"
+        showDirtySuffix={false}
+        disabled
+        onOpen={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Available. All players' })).toHaveClass(
+      'disabled:cursor-not-allowed',
+    )
+  })
+
   it('is a single button and keeps Change as a non-focusable affordance', async () => {
     const user = userEvent.setup()
     const onOpen = vi.fn()

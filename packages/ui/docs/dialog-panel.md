@@ -16,7 +16,36 @@ Modal.*                     Centered behavior (thin Header — inherits dialogTi
 Sheet.*                     Edge behavior (thin Header — inherits dialogTitle)
 ConfirmDialog               AlertDialog; confirmDialogTitle (19px); reuses modal panel tokens
 dashboard DrawerShell       Sheet composition + bodyMode (scroll ownership)
+Sheet.MediaScroll           Optional media + sticky identity header in one scrollport
 ```
+
+## Sheet media scroll
+
+When a sheet includes optional full-bleed media (artwork, hero image), use
+`Sheet.MediaScroll` instead of pinning `Sheet.Header` above `Sheet.Body`.
+
+```text
+Sheet.Content hasMedia
+  Sheet.MediaScroll          clip root + one overflow scrollport
+    media                    full bleed, in flow
+    sentinel                   observed sticky boundary
+    header                     sticky top-0; opaque fill only when stuck
+    header boundary shadow     bottom edge when stuck && scrollTop > 0
+    children                   section inset (px-6 / pt-5 / pb-6)
+    bottom boundary shadow     viewport foot when content continues below
+  Sheet.Footer               optional, still docked outside the scrollport
+  Close                      fixed on Sheet.Content; z-30 + surface chip when hasMedia
+```
+
+Set `hasMedia` on `Sheet.Content` so the close button gets a `--surface-current`
+chip via `data-has-media` (no React context — close is a sibling of scroll content).
+
+**Stuck state** is named explicitly: the header has crossed the sticky boundary
+(`!isIntersecting && sentinelTop < rootTop`), not “artwork is visible.” Scroll
+boundary shadows reuse `ScrollBoundaryRegion` measurement, but the top affordance
+attaches to the **sticky header bottom** (`stuck && showTopShadow`) — not the
+viewport top edge (which would paint over scrolling artwork). Sheets without
+media keep the pinned header + scrolling body anatomy unchanged.
 
 ## Shared tokens (`dialog-panel.variants.ts`)
 

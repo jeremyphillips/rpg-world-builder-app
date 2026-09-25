@@ -50,7 +50,7 @@ describe('builder-option-display.lib', () => {
 
     expect(formatClassCardOption(fighter)).toEqual({
       label: 'Fighter',
-      description: 'Strength · d10 Hit Die',
+      description: 'STR · d10 Hit Die',
     })
   })
 

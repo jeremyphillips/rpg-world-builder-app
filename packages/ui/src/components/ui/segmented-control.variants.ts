@@ -1,4 +1,12 @@
-import { cva } from 'class-variance-authority'
+import { cva, type VariantProps } from 'class-variance-authority'
+
+import { cn } from '../../lib/utils'
+import { controlActionCompactTextClasses } from './control-action.variants'
+import { iconGlyphDescendantClasses } from './icon-glyph.variants'
+
+export type SegmentedControlSize = NonNullable<
+  VariantProps<typeof segmentedControlSegmentVariants>['size']
+>
 
 export const segmentedControlRootVariants = cva(
   'inline-flex gap-[calc(var(--spacing)*0.5)] rounded-lg border border-border bg-segmented-track p-0.5',
@@ -16,7 +24,7 @@ export const segmentedControlRootVariants = cva(
 )
 
 export const segmentedControlSegmentVariants = cva(
-  'inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-body-emphasis transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center rounded-md font-body-emphasis transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       active: {
@@ -27,10 +35,15 @@ export const segmentedControlSegmentVariants = cva(
         equal: 'min-w-0 flex-1',
         auto: 'shrink-0',
       },
+      size: {
+        default: 'gap-1.5 px-3 py-1.5 text-sm',
+        sm: cn(controlActionCompactTextClasses, 'gap-1 px-2 py-0 text-xs'),
+      },
     },
     defaultVariants: {
       active: false,
       segmentWidth: 'equal',
+      size: 'default',
     },
   },
 )
@@ -59,5 +72,14 @@ export const segmentedControlMetadataVariants = cva('text-xs tabular-nums', {
   },
 })
 
-export const segmentedControlLeadingIconClasses =
-  'inline-flex shrink-0 leading-none [&_svg]:size-icon-glyph-sm'
+export const segmentedControlLeadingIconVariants = cva('inline-flex shrink-0 leading-none', {
+  variants: {
+    size: {
+      default: iconGlyphDescendantClasses.sm,
+      sm: iconGlyphDescendantClasses.sm,
+    },
+  },
+  defaultVariants: {
+    size: 'default',
+  },
+})

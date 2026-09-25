@@ -69,6 +69,10 @@ export type ContentIdentityLayout = 'inline' | 'stacked'
 /** Slot name for the campaign availability control beside Name. */
 export const CONTENT_IDENTITY_AVAILABILITY_SLOT_NAME = 'campaignAvailability'
 
+/** Fixed width for the campaign availability column beside Name on full-page routes. */
+export const CONTENT_IDENTITY_AVAILABILITY_COLUMN_CLASS =
+  'items-start md:grid-cols-[minmax(0,1fr)_15rem]'
+
 function nameItemWithoutFieldContainer(item: FormItem): FormItem {
   if ('type' in item) {
     return { ...item, chrome: { variant: 'none' } }
@@ -97,6 +101,7 @@ export function buildContentIdentityFields(input: {
     {
       kind: 'columns',
       widths: 'primary-detail',
+      className: CONTENT_IDENTITY_AVAILABILITY_COLUMN_CLASS,
       columns: [{ fields: [nameItem] }, { fields: [input.availabilityItem] }],
     },
   ]

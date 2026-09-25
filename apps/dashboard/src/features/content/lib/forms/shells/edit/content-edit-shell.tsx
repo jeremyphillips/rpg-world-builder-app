@@ -4,21 +4,16 @@ import type {
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
-import { DEFAULT_CONTENT_CAMPAIGN_ACCESS, getErrorMessage } from '@rpg/contracts'
+import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'
 import { Heading, Spinner, Text } from '@rpg/ui'
-import { useCallback, useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
-import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
-import {
-  contentFormPageShellBodyClasses,
-  contentFormPageShellHeadingClasses,
-} from '../layout/content-form-page-shell.variants'
+import { resolveContentFormLayout } from '../layout/content-form-layout.lib'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
-import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
@@ -27,27 +22,18 @@ import {
   type AnyContentFormDef,
   type ContentFormCtx,
 } from '../../registry/content-form-registry'
-import {
-  findContentEditEntity,
-  loadContentEditFormState,
-  resolveContentPublishSchema,
-} from './content-edit-load'
+import { findContentEditEntity, loadContentEditFormState } from './content-edit-load'
+import { useContentEditEntityFormState } from './content-edit-entity-form-state'
 import {
   ContentFormNotRegistered,
   ContentFormOptionsGate,
   ContentFormLayout,
 } from '../layout/content-form-shell-layout'
 import { ContentAuthoringGate } from '../layout/content-authoring-gate'
-import { ContentDeletionBlockedDialog } from '../../../delete/content-deletion-blocked-dialog'
-import { ContentDeletionConfirmDialog } from '../../../delete/content-deletion-confirm-dialog'
-import { useContentDeleteFlow } from '../../../delete/use-content-delete-flow'
-import { ContentDemotionBlockedDialog } from '../../../demotion/content-demotion-blocked-dialog'
-import { ContentDemotionConfirmDialog } from '../../../demotion/content-demotion-confirm-dialog'
-import { useContentDemoteFlow } from '../../../demotion/use-content-demote-flow'
-import { useContentPublishFlow } from '../../../demotion/use-content-publish-flow'
 import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions'
 import { ContentEditPublishProvider } from './content-edit-publish-context'
 import { ContentEditHeadingBadges } from '../../../campaign-access/content-edit-heading-badges'
+import { ContentEditEntityFormDialogs } from './content-edit-entity-form-dialogs'
 
 function ContentEditFormHeading({
   heading,
@@ -130,6 +116,7 @@ interface ContentEditEntityFormProps<
     source: ContentSource
     status: ContentStatus
     campaignAccess?: ResolvedContentCampaignAccess
+    media?: ContentMedia
   },
 > {
   def: AnyContentFormDef
@@ -153,6 +140,7 @@ function ContentEditEntityForm<
     source: ContentSource
     status: ContentStatus
     campaignAccess?: ResolvedContentCampaignAccess
+    media?: ContentMedia
   },
 >(props: ContentEditEntityFormProps<TEntity>) {
   return (
@@ -169,6 +157,7 @@ function ContentEditEntityFormBody<
     source: ContentSource
     status: ContentStatus
     campaignAccess?: ResolvedContentCampaignAccess
+    media?: ContentMedia
   },
 >({
   entity,
@@ -185,54 +174,28 @@ function ContentEditEntityFormBody<
   onSubmit,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
-  const [campaignAccess, setCampaignAccess] = useState(
-    () => entity.campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS,
-  )
-  const publishSchema = resolveContentPublishSchema(def, layoutCtx)
-  const deleteFlow = useContentDeleteFlow({
-    def,
+  const layout = resolveContentFormLayout(def)
+  const {
+    campaignAccess,
+    setCampaignAccess,
+    publishSchema,
+    deleteFlow,
+    publishFlow,
+    demoteFlow,
+    handlePublish,
+    handleCoordinatedSaveSuccess,
+    headerError,
+    showLifecycleActions,
+  } = useContentEditEntityFormState({
+    entity,
     campaignId,
-    entityId: entity.id,
-    entityName: entity.name,
-    entitySource: entity.source,
-    contentTypeKey,
     overviewHref,
-  })
-  const publishFlow = useContentPublishFlow({
+    contentTypeKey,
     def,
-    campaignId,
-    entityId: entity.id,
-    entitySource: entity.source,
-    entityStatus: entity.status,
-  })
-  const demoteFlow = useContentDemoteFlow({
-    def,
-    campaignId,
-    entityId: entity.id,
-    entityName: entity.name,
-    entitySource: entity.source,
-    entityStatus: entity.status,
+    layoutCtx,
+    formError,
   })
 
-  const handlePublish = useCallback(async () => {
-    try {
-      await publishFlow.runPublishMutation()
-    } catch (err) {
-      publishFlow.setPublishError(getErrorMessage(err, 'Could not publish this item.'))
-    }
-  }, [publishFlow.runPublishMutation, publishFlow.setPublishError])
-
-  const handleCoordinatedSaveSuccess = useCallback(
-    (event: Parameters<typeof notifyCoordinatedContentSaveSuccess>[0]) => {
-      notifyCoordinatedContentSaveSuccess(event, entity.name)
-    },
-    [entity.name],
-  )
-
-  const headerError =
-    deleteFlow.deleteError ?? publishFlow.publishError ?? demoteFlow.demoteError ?? formError
-  const showLifecycleActions = entity.source === 'homebrew'
-  const usePreviewLayout = hasContentFormPreview(def)
   const heading = (
     <ContentEditFormHeading
       heading={headingFn(entity.name)}
@@ -240,7 +203,7 @@ function ContentEditEntityFormBody<
       source={entity.source}
       status={entity.status}
       campaignAccess={campaignAccess}
-      omitDraft={usePreviewLayout}
+      omitDraft={layout.previewEnabled}
       lifecycle={
         showLifecycleActions ? (
           <ContentEditLifecycleActions
@@ -259,7 +222,7 @@ function ContentEditEntityFormBody<
       ctx={layoutCtx}
       formKey={entity.id}
       schema={schema}
-      defaultValues={defaultValues}
+      defaultValues={{ ...defaultValues, media: entity.media ?? emptyContentMediaSchema }}
       formMode="edit"
       contentTypeKey={contentTypeKey}
       campaignId={campaignId}
@@ -273,50 +236,31 @@ function ContentEditEntityFormBody<
       onSaved={handleCoordinatedSaveSuccess}
       publishSchema={entity.status === 'draft' ? publishSchema : undefined}
       onPublish={entity.status === 'draft' ? handlePublish : undefined}
-      previewDraftBadge={usePreviewLayout && entity.status === 'draft'}
-      formHeaderPrefix={usePreviewLayout ? heading : undefined}
+      scrollMode={layout.scrollMode}
+      previewEnabled={layout.previewEnabled}
+      previewDraftBadge={layout.previewEnabled && entity.status === 'draft'}
+      formHeaderPrefix={layout.previewEnabled ? heading : undefined}
     />
   )
 
   const formBody = (
     <ContentAuthoringGate campaignId={campaignId}>
-      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
-        {usePreviewLayout ? (
+      <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
+        {layout.previewEnabled ? (
           formLayout
         ) : (
-          <div className={contentFormPageShellBodyClasses}>
-            <div className={contentFormPageShellHeadingClasses}>{heading}</div>
+          <>
+            {heading}
             {formLayout}
-          </div>
+          </>
         )}
       </ContentFormPageShell>
 
-      <ContentDeletionConfirmDialog
-        open={deleteFlow.confirmOpen}
-        onOpenChange={deleteFlow.setConfirmOpen}
+      <ContentEditEntityFormDialogs
         contentTypeKey={contentTypeKey}
         entityName={entity.name}
-        onConfirm={() => void deleteFlow.handleConfirmDelete()}
-      />
-
-      <ContentDeletionBlockedDialog
-        open={deleteFlow.blockedOpen}
-        onOpenChange={deleteFlow.setBlockedOpen}
-        entityName={entity.name}
-        blockers={deleteFlow.blockers}
-      />
-
-      <ContentDemotionConfirmDialog
-        open={demoteFlow.confirmOpen}
-        onOpenChange={demoteFlow.setConfirmOpen}
-        entityName={entity.name}
-        onConfirm={() => void demoteFlow.handleConfirmDemote()}
-      />
-
-      <ContentDemotionBlockedDialog
-        open={demoteFlow.blockedOpen}
-        onOpenChange={demoteFlow.setBlockedOpen}
-        blockers={demoteFlow.blockers}
+        deleteFlow={deleteFlow}
+        demoteFlow={demoteFlow}
       />
     </ContentAuthoringGate>
   )
@@ -372,6 +316,7 @@ interface ContentEditFormBodyProps {
     source: ContentSource
     status: ContentStatus
     campaignAccess?: ResolvedContentCampaignAccess
+    media?: ContentMedia
   }
   campaignId: string
   entityId: string
@@ -403,7 +348,6 @@ function ContentEditFormBody({
     campaignId,
     entityId,
   })
-
   const { onSubmit, formError } = useSubmitHandler({
     submit: async (values, form) => {
       const saved = await mutation.mutateAsync(
@@ -418,9 +362,13 @@ function ContentEditFormBody({
           validationIntent,
         ),
       )
-      const baseline = stripEditEnvelopeFromFormDefaults(def.toFormValues(saved), {
-        stripKind: layoutCtx.equipmentKind != null,
-      })
+      const savedRecord = saved as typeof entity & { media?: ContentMedia }
+      const baseline = stripEditEnvelopeFromFormDefaults(
+        { ...def.toFormValues(saved), media: savedRecord.media ?? emptyContentMediaSchema },
+        {
+          stripKind: layoutCtx.equipmentKind != null,
+        },
+      )
       form.reset(baseline)
     },
     fallbackMessage: `Could not update ${def.routeKey}.`,
@@ -436,7 +384,7 @@ function ContentEditFormBody({
       headingFn={headingFn}
       layoutCtx={layoutCtx}
       schema={schema}
-      defaultValues={defaultValues}
+      defaultValues={{ ...defaultValues, media: entity.media ?? emptyContentMediaSchema }}
       submitPending={mutation.isPending}
       formError={formError ?? null}
       onSubmit={onSubmit}
@@ -476,25 +424,33 @@ export function ContentEditShell({
   formCtx,
 }: ContentEditShellProps) {
   const def = contentFormRegistry[contentType]
-  const usePreviewLayout = def != null && hasContentFormPreview(def)
+  const layout = def != null ? resolveContentFormLayout(def) : null
 
   if (isPending) {
-    return (
-      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
+    return layout ? (
+      <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
         <div className="flex justify-center">
           <Spinner />
         </div>
       </ContentFormPageShell>
+    ) : (
+      <div className="flex justify-center">
+        <Spinner />
+      </div>
     )
   }
 
   if (isError) {
-    return (
-      <ContentFormPageShell usePreviewLayout={usePreviewLayout}>
+    return layout ? (
+      <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
         <Text variant="destructive" role="alert">
           {loadErrorLabel}
         </Text>
       </ContentFormPageShell>
+    ) : (
+      <Text variant="destructive" role="alert">
+        {loadErrorLabel}
+      </Text>
     )
   }
 

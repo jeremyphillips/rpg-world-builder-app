@@ -81,13 +81,29 @@ describe('CampaignSettings', () => {
     expect(screen.queryByRole('button', { name: 'Rules' })).not.toBeInTheDocument()
   })
 
-  it('shows the saved banner preview when the campaign has an imageKey', async () => {
-    listCampaigns.mockResolvedValue([
-      { ...campaign, identity: { ...campaign.identity, imageKey: 'banner.jpg' } },
-    ])
+  it('uses document scroll without a bounded inner scroll body', async () => {
+    const { container } = renderSettings()
+    await screen.findByDisplayValue('Sunless Citadel')
+    expect(container.querySelector('.form-scroll-body-container')).toBeNull()
+  })
+
+  it('shows the campaign images field on the identity tab', async () => {
     renderSettings()
-    const img = await screen.findByRole('img', { name: 'Current campaign image' })
-    expect(img).toHaveAttribute('src', '/api/uploads/banner.jpg')
+    await screen.findByDisplayValue('Sunless Citadel')
+    expect(screen.getAllByText('Campaign images')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Add images' })).toBeInTheDocument()
+    expect(screen.queryByText(/^Images$/)).not.toBeInTheDocument()
+  })
+
+  it('wraps identity fields in one shared field container', async () => {
+    renderSettings()
+    const nameInput = await screen.findByDisplayValue('Sunless Citadel')
+    const descriptionInput = screen.getByDisplayValue('A dungeon delve.')
+    const sharedShell = nameInput.closest('.bg-field-container')
+    expect(sharedShell).toBeInstanceOf(HTMLElement)
+    expect(descriptionInput.closest('.bg-field-container')).toBe(sharedShell)
+    expect(sharedShell).toContainElement(screen.getByText('Campaign images'))
+    expect(sharedShell?.querySelectorAll('.bg-field-container')).toHaveLength(0)
   })
 
   it('calls updateCampaign with identity and flavor on submit', async () => {
@@ -102,6 +118,7 @@ describe('CampaignSettings', () => {
     expect(updateCampaign.mock.lastCall?.[1]).toEqual({
       name: 'Sunless Citadel',
       description: 'A dungeon delve.',
+      media: { revision: 0, images: [], roles: {} },
       flavor: {
         playStyle: ['dungeon_crawl'],
         mood: ['heroic'],

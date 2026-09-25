@@ -12,6 +12,7 @@ import { contentRouter, homebrewRouter } from './features/content'
 import { benchRouter } from './features/dev-bench'
 import { rulesetPatchRouter, vocabularyRouter } from './features/vocabulary'
 import { rulesetRouter } from './features/ruleset'
+import { mediaRouter } from './features/media'
 import { uploadsRouter, ensureUploadDir } from './features/uploads'
 import { characterImportRouter } from './features/character-import'
 import {
@@ -59,6 +60,7 @@ export function createApp(): Express {
   api.use('/campaigns/:campaignId/ruleset-patch', rulesetPatchRouter)
   api.use('/campaigns/:campaignId/homebrew', homebrewRouter)
   api.use('/uploads', uploadsRouter)
+  api.use('/media', mediaRouter)
   api.use('/users', userRouter)
   api.use('/notifications', notificationRouter)
   api.use('/conversations', conversationRouter)

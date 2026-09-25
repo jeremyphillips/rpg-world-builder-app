@@ -1,0 +1,98 @@
+# Content media management
+
+Implementation tracker for reusable content media (Character, Class, Species,
+Equipment, Location, Organization). Full product and UX specification:
+[roadmap/content-media-management-plan.md](./roadmap/content-media-management-plan.md).
+
+## v1 policy defaults (locked)
+
+| Limit                  | Value                              |
+| ---------------------- | ---------------------------------- |
+| Attachments per record | 20                                 |
+| Uploads in flight      | 3                                  |
+| Portrait minimum crop  | 128×128 oriented px (1:1)          |
+| Primary minimum crop   | 800×600 oriented px (4:3)          |
+| Banner minimum crop    | 1200×400 oriented px (3:1)         |
+| Max decode pixels      | 25 MP                              |
+| Max edge               | 8192 px                            |
+| Upload byte ceiling    | `MAX_UPLOAD_BYTES` (5 MiB default) |
+| Unreferenced lease     | 24 hours                           |
+
+Character allows Portrait + Primary; all other opted-in domains are Primary only.
+Animated GIF/WebP originals are preserved; inspection and derivatives use the first
+frame. SVG is rejected. Private assets live under `{UPLOAD_DIR}/media/{assetId}/`
+and are not served by `GET /api/uploads/:key`.
+
+## Contracts (`@rpg/contracts/shared/media`)
+
+- Asset DTO, upload session, `ContentImage`, `ImagePresentation`, `ContentMedia`
+- Typed `CONTENT_MEDIA_POLICIES` registry
+- Normalized crop geometry and `validateContentMedia`
+- `mediaBearingAuthoredContentBodySchema` (not yet wired into live type schemas)
+- Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`)
+- `reconcileContentMedia`, `reclaimExpiredAssets`, `remapContentMediaForDuplicate`
+- `ResolvedContentMediaPresentation`, rendition presets, system asset manifest, system content image registry
+- `@rpg/ui` `MediaImage` / `MediaCompactPreview` (not mounted in product surfaces)
+
+## System artwork vs rendition fixture
+
+- **`SYSTEM_ASSET_MANIFEST`** (`system-asset-manifest.ts`) — upload/rendition fixture
+  dimensions for tests and resolver primitives (e.g. `/assets/system/class/fighter.webp`).
+- **`system-content-image-registry.ts`** — shipped SRD catalog artwork for opted-in
+  content types. Each registered file is one catalog entry (slug, path, dimensions,
+  and `presentation.treatment`). Paths follow
+  `assets/system/{imageSetId}/{contentType}/{assetRole}/{slug}.jpeg` and are served from
+  dashboard `public/`. Class and species primary art for `srd-cc-5.2.1` are registered
+  there with `white-paper-knockout` treatment; display resolves derived system sources
+  when `media.roles` is empty. The media manager and compact form field summary list
+  those virtual system sources alongside uploads (non-deletable, not copied into
+  `media.images`).
+
+## Phase status
+
+| Phase                     | Status  | Notes                             |
+| ------------------------- | ------- | --------------------------------- |
+| 1 Contracts & crop proof  | Done    | Live schemas still use `imageKey` |
+| 2 Asset upload & delivery | Done    | Parallel to legacy `/api/uploads` |
+| 3 Attachment lifecycle    | Done    | Reconcile, leases, cleanup        |
+| 4 Resolver & derivatives  | Done    | Primitives not mounted in product |
+| 5 Media manager UI        | Done    | Dashboard manager + form fields   |
+| 6 Domain cutover          | Pending |                                   |
+| 7 Acceptance              | Pending |                                   |
+
+## Integration checklist (cutover — phase 6)
+
+### Render paths (dashboard)
+
+- `apps/dashboard/src/features/content/lib/detail/page/content-image-url.ts`
+- `apps/dashboard/src/features/content/lib/entity/summary/entity-media.lib.tsx`
+- Content detail routes: class, species, spell, feat, equipment, location,
+  organization, skill-proficiency
+- Overview columns via `content-table-config.tsx`
+- Entity picker / connection drawers using `buildEntityMediaFromImageKey`
+
+### Character
+
+- Contracts: `character/sheet.ts`, builder draft identity, finalize input
+- API: `character.model.ts`, `to-character.ts`, `to-npc-character.ts`
+- Dashboard: builder identity image UI, builder class and species step primary
+  art (fallback placeholders omitted on cards and drawer heroes), import coverage
+
+### Campaign banner media
+
+- Campaign identity stores banner, primary, and emblem roles on `identity.media`
+- Create flow uploads banner media after campaign creation; failed uploads link
+  to settings with the identity media manager opened once
+- Campaign overview hero renders the saved banner rendition (3:1 cover frame)
+
+### Out of scope (keep `imageKey` / legacy upload)
+
+- Spells, feats, skill-proficiencies, subclass patches, starting wealth
+- Account avatar (`avatarKey`)
+- Legacy `POST /api/uploads` and `GET /api/uploads/:key`
+
+### API / overlay
+
+- Register `media` on `patchReplaceKeys` per opted-in content config
+- Character and content write services: atomic media replacement + revision
+- Duplication, seeds, imports, system overlay merge

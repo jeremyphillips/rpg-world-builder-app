@@ -39,6 +39,10 @@ export type ContentFormCtx = {
    * `source` field on the embedded element.
    */
   entitySource?: ContentSource
+  /** Immutable catalog slug on edit — omitted from RHF because slug is envelope-only. */
+  entitySlug?: string
+  /** Ruleset for system artwork resolution in media fields. */
+  rulesetId?: string
   /** Resolved campaign rule overrides (defaults when absent). */
   campaignRules?: ResolvedCampaignRules
   /** Resolved spellcasting progression records (seed + campaign patch). */

@@ -37,7 +37,7 @@ export async function persistCreatedCampaign(
       ...(materializedInput.description !== undefined && {
         description: materializedInput.description,
       }),
-      ...(materializedInput.imageKey !== undefined && { imageKey: materializedInput.imageKey }),
+      ...(materializedInput.media !== undefined && { media: materializedInput.media }),
     },
     configuration: {
       ...(materializedInput.flavor !== undefined && { flavor: materializedInput.flavor }),

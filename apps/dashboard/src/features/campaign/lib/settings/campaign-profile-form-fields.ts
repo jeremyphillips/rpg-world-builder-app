@@ -1,6 +1,17 @@
+import { createElement } from 'react'
 import { z } from 'zod'
-import { PLAY_STYLES, MOODS, MAGIC_LEVELS, DIFFICULTIES } from '@rpg/contracts'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import {
+  contentMediaSchema,
+  DEFAULT_UPLOAD_MAX_BYTES,
+  PLAY_STYLES,
+  MOODS,
+  MAGIC_LEVELS,
+  DIFFICULTIES,
+  STANDARD_IMAGE_UPLOAD_ACCEPT,
+} from '@rpg/contracts'
+import { toOptions, type FormItem, type GroupFieldItem } from '@rpg/ui/form'
+
+import { CampaignSettingsIdentityMediaField } from '../../components/settings/campaign-settings-identity-media-field'
 
 import {
   PLAY_STYLE_LABELS,
@@ -10,18 +21,18 @@ import {
 } from './campaign-profile-form-labels'
 
 // ---------------------------------------------------------------------------
-// Identity
+// Identity — create wizard
 // ---------------------------------------------------------------------------
 
-export const identitySchema = z.object({
+export const createIdentitySchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   banner: z.array(z.custom<File>((v: unknown) => v instanceof File)).optional(),
 })
 
-export type IdentityValues = z.infer<typeof identitySchema>
+export type CreateIdentityValues = z.infer<typeof createIdentitySchema>
 
-export const identityFields: FormItem[] = [
+export const createIdentityFields: FormItem[] = [
   {
     type: 'text',
     name: 'name',
@@ -41,10 +52,73 @@ export const identityFields: FormItem[] = [
     type: 'file',
     name: 'banner',
     label: 'Campaign image',
-    hint: 'JPEG, PNG, or WebP. Used as the campaign banner.',
-    accept: ['image/jpeg', 'image/png', 'image/webp'],
+    hint: 'Used as the campaign banner.',
+    accept: [...STANDARD_IMAGE_UPLOAD_ACCEPT],
+    maxSize: DEFAULT_UPLOAD_MAX_BYTES,
   },
 ]
+
+// ---------------------------------------------------------------------------
+// Identity — settings
+// ---------------------------------------------------------------------------
+
+export const settingsIdentitySchema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  media: contentMediaSchema.optional(),
+})
+
+export type SettingsIdentityValues = z.infer<typeof settingsIdentitySchema>
+
+export const settingsIdentityFields: FormItem[] = [
+  {
+    type: 'text',
+    name: 'name',
+    label: 'Campaign name',
+    placeholder: 'Your campaign name',
+    required: true,
+  },
+  {
+    type: 'textarea',
+    name: 'description',
+    label: 'Description',
+    placeholder: 'A short summary of the campaign setting and tone.',
+    rows: 3,
+  },
+]
+
+/** Leaf fields inside a shared group container must opt out of per-field chrome. */
+function identityFieldsInSharedContainer(fields: GroupFieldItem[]): GroupFieldItem[] {
+  return fields.map((field) => ({
+    ...field,
+    chrome: { variant: 'none' as const },
+  })) as GroupFieldItem[]
+}
+
+export function buildSettingsIdentityTabFields(campaignId: string): FormItem[] {
+  return [
+    {
+      kind: 'group',
+      fieldChrome: { variant: 'container' },
+      fields: [
+        ...identityFieldsInSharedContainer(settingsIdentityFields as GroupFieldItem[]),
+        {
+          kind: 'slot',
+          name: 'media',
+          chrome: { variant: 'none' },
+          render: () => createElement(CampaignSettingsIdentityMediaField, { campaignId }),
+        },
+      ],
+    },
+  ]
+}
+
+/** @deprecated Use createIdentitySchema or settingsIdentitySchema. */
+export const identitySchema = createIdentitySchema
+/** @deprecated Use createIdentityFields or settingsIdentityFields. */
+export const identityFields = createIdentityFields
+/** @deprecated Use CreateIdentityValues or SettingsIdentityValues. */
+export type IdentityValues = CreateIdentityValues
 
 // ---------------------------------------------------------------------------
 // Flavor — maps to campaign.configuration.flavor.*

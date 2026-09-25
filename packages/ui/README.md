@@ -35,6 +35,7 @@ compiles the TSX. The `build` script only emits type declarations for tooling.
 | `Tooltip` + `InfoTooltip`                       | component  | Radix tooltip parts + the focusable `[i]` info pattern                                                                                                                      |
 | `Modal` (compound)                              | component  | `Modal.Root/Trigger/Content/Header/Body/Footer/Close` on Radix Dialog; `size`, `closeOnOutsideClick`, `closeOnEscape`; panel inset via [dialog-panel](docs/dialog-panel.md) |
 | `Sheet` (compound)                              | component  | Edge panel on Radix Dialog; modality-owned `size`/`surface`; shared dialog-panel body/footer tokens                                                                         |
+| `Hero`                                          | component  | Layout-only page hero — optional media frame, mark placement, title row, and stacked meta/secondary slots                                                                   |
 | `useModal`                                      | hook       | Modal open/close state + promise-based `confirm()` + guarded-close helpers                                                                                                  |
 | `ConfirmDialog`                                 | component  | Radix AlertDialog "are you sure?"; pairs with `useModal`'s guarded close; reuses dialog-panel inset                                                                         |
 | `RichTextEditor`, `sanitizeHtml`                | component  | Tiptap HTML-string editor + the mandatory render-time sanitizer                                                                                                             |
@@ -260,17 +261,34 @@ const schema = z.object({
 />
 ```
 
+### `DropTargetPrompt`
+
+Shared drop-target chrome and copy for inline file fields and full-surface modal overlays.
+`FileDropzone` composes this primitive; modal body overlays should import it directly.
+
+| Prop         | Type                         | Default         | Description                                                                                                                                          |
+| ------------ | ---------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `accept`     | `string[]`                   | —               | MIME types or extensions — drives icon and idle copy                                                                                                 |
+| `multiple`   | `boolean`                    | `false`         | Plural idle copy when true                                                                                                                           |
+| `maxSize`    | `number`                     | —               | Max bytes per file — requirement line in idle state                                                                                                  |
+| `density`    | `'compact' \| 'comfortable'` | `'comfortable'` | Image/file drop targets default to the modal well density                                                                                            |
+| `layout`     | `'inline' \| 'cover'`        | `'inline'`      | `inline` keeps idle chrome invisibly in place during active/invalid so height stays stable; `cover` unmounts idle chrome and fills a positioned host |
+| `state`      | `'idle' \| 'active' \| …`    | `'idle'`        | Active/invalid use alpha overlay scrim tokens (`dropTarget*SurfaceClasses` in variants) for all layouts                                              |
+| `showBrowse` | `boolean`                    | `false`         | Shows Browse files in idle state                                                                                                                     |
+
 ### `FileDropzone` props
 
-| Prop       | Type                      | Default       | Description                                |
-| ---------- | ------------------------- | ------------- | ------------------------------------------ |
-| `value`    | `File[]`                  | `[]`          | Current file list (controlled)             |
-| `onChange` | `(files: File[]) => void` | —             | Called when files are added or removed     |
-| `accept`   | `string[]`                | `['image/*']` | MIME types or extensions (e.g. `['.pdf']`) |
-| `multiple` | `boolean`                 | `false`       | Allow multiple files                       |
-| `maxFiles` | `number`                  | —             | Cap on number of files (when `multiple`)   |
-| `maxSize`  | `number`                  | —             | Max bytes per file                         |
-| `disabled` | `boolean`                 | `false`       | Disables all interaction                   |
+| Prop         | Type                         | Default         | Description                                                              |
+| ------------ | ---------------------------- | --------------- | ------------------------------------------------------------------------ |
+| `value`      | `File[]`                     | `[]`            | Current file list (controlled)                                           |
+| `onChange`   | `(files: File[]) => void`    | —               | Called when files are added or removed                                   |
+| `accept`     | `string[]`                   | `['image/*']`   | MIME types or extensions (e.g. `['.pdf']`)                               |
+| `multiple`   | `boolean`                    | `false`         | Allow multiple files                                                     |
+| `maxFiles`   | `number`                     | —               | Cap on number of files (when `multiple`)                                 |
+| `maxSize`    | `number`                     | —               | Max bytes per file — drives the requirement line below the Browse button |
+| `density`    | `'compact' \| 'comfortable'` | `'comfortable'` | Visual density; image drop targets share the modal well default          |
+| `dropTarget` | `boolean`                    | `true`          | When `false`, the dashed region does not accept drops (parent owns drag) |
+| `disabled`   | `boolean`                    | `false`         | Disables all interaction                                                 |
 
 ### Rendering stored images
 
@@ -429,3 +447,12 @@ Vitest is split into two projects: `ui:node` runs pure lib tests (`*.test.ts`,
 node environment, no jsdom/setup cost) and `ui:jsdom` runs component tests
 (`*.test.tsx`). Name test files accordingly — a `.test.ts` file that touches the
 DOM (render, renderHook, `document`, DOMPurify, …) must be `.test.tsx`.
+
+### Media editing
+
+`MediaCropEditor` is a controlled, persistence-free Portrait editor. Pass an oriented
+full-source `src`, original `source` dimensions, a normalized `crop`, and `onChange`.
+It supports pointer/touch pan, arrow-key repositioning, bounded zoom, reset, and live
+square/circular previews. Keep source dimensions consistent with the displayed image;
+never pass an already cropped rendition. `Modal.Content size="media"` provides the
+wide desktop workspace and full-height mobile shell used by content media management.

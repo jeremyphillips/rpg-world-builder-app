@@ -7,6 +7,8 @@ import type { ColumnDef } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
 
+import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import { buildSpeciesContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { buildContentColumns } from '../../lib/overview/content-table-config'
 import {
   buildContentFilterSchema,
@@ -66,6 +68,8 @@ export function speciesColumns(
   return buildContentColumns<Species>(speciesMiddleColumns(), {
     ...usage,
     contentType: 'species',
+    resolveDisplayImage: (row) =>
+      getContentDisplayImage(buildSpeciesContentDisplayImageInput(row, 'primary')),
     nameHref: (row) => ROUTES.content.species.detail(campaignId, row.id),
   })
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import { type SkillProficiency, type Subclass } from '@rpg/contracts'
+import { type ContentDisplayImage, type SkillProficiency, type Subclass } from '@rpg/contracts'
 
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
 import { ClassProficienciesSection } from './class-proficiencies-section'
@@ -118,7 +118,8 @@ function ClassDetailSections({
 export type ClassDetailBodyProps = {
   name: string
   nameBadge?: ReactNode
-  imageUrl: string
+  imageUrl?: string
+  displayImage?: ContentDisplayImage
   imageName: string
   viewModel: ClassDetailViewModel
   subclasses: Subclass[]
@@ -136,6 +137,7 @@ export function ClassDetailBody({
   name,
   nameBadge,
   imageUrl,
+  displayImage,
   imageName,
   viewModel,
   subclasses,
@@ -152,6 +154,7 @@ export function ClassDetailBody({
       name={name}
       nameBadge={nameBadge}
       imageUrl={imageUrl}
+      displayImage={displayImage}
       imageName={imageName}
       campaignId={campaignId}
       editHref={editHref}

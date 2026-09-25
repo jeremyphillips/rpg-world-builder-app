@@ -24,6 +24,7 @@ export type ToastProps = ToastVariantProps & {
   dismissible?: boolean
   onDismiss?: () => void
   icon?: React.ReactNode
+  leading?: React.ReactNode
   className?: string
   /** Opt-in assertive announcement for errors requiring immediate attention. */
   urgent?: boolean
@@ -92,14 +93,25 @@ export function ToastPresentation({
   dismissible = true,
   onDismiss,
   icon,
+  leading,
   urgent = false,
   className,
 }: ToastProps) {
   const hasCopy = title != null || description != null
+  const leadingContent = leading ?? icon
 
   return (
-    <div role={urgent ? 'alert' : 'status'} className={cn(toastVariants({ tone }), className)}>
-      {icon ? <div className="mt-0.5 shrink-0">{icon}</div> : null}
+    <div
+      role={urgent ? 'alert' : 'status'}
+      className={cn(
+        toastVariants({ tone }),
+        leadingContent ? 'items-center' : undefined,
+        className,
+      )}
+    >
+      {leadingContent ? (
+        <div className={leading ? 'shrink-0' : 'mt-0.5 shrink-0'}>{leadingContent}</div>
+      ) : null}
       {hasCopy ? (
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           {title ? <p className={toastTitleVariants()}>{title}</p> : null}

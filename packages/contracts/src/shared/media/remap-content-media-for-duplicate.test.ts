@@ -1,0 +1,59 @@
+import { describe, expect, it } from 'vitest'
+
+import type { ContentMedia } from './content-media'
+import { createUploadRoleAssignment, roleAssignmentUploadImageId } from './content-media-source'
+import { remapContentMediaForDuplicate } from './remap-content-media-for-duplicate'
+
+function sampleMedia(): ContentMedia {
+  return {
+    revision: 2,
+    images: [
+      { id: 'img-1', assetId: 'asset-a', alt: 'Front' },
+      { id: 'img-2', assetId: 'asset-b', alt: 'Side' },
+    ],
+    roles: {
+      primary: createUploadRoleAssignment('img-1'),
+      portrait: {
+        ...createUploadRoleAssignment('img-1'),
+        presentation: { mode: 'crop', crop: { x: 0, y: 0, width: 1, height: 1 } },
+      },
+    },
+  }
+}
+
+describe('remapContentMediaForDuplicate', () => {
+  it('remaps attachment ids within the same scope while reusing asset ids', () => {
+    let counter = 0
+    const result = remapContentMediaForDuplicate({
+      media: sampleMedia(),
+      sourceScopeKey: 'campaign-content:camp-1',
+      targetScopeKey: 'campaign-content:camp-1',
+      createAttachmentId: () => `new-${++counter}`,
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    expect(result.assetReuse).toBe('same-scope')
+    expect(result.media.revision).toBe(0)
+    expect(result.media.images.map((image) => image.assetId)).toEqual(['asset-a', 'asset-b'])
+    expect(result.media.images.map((image) => image.id)).toEqual(['new-1', 'new-2'])
+    expect(roleAssignmentUploadImageId(result.media.roles.primary)).toBe('new-1')
+    expect(roleAssignmentUploadImageId(result.media.roles.portrait)).toBe('new-1')
+  })
+
+  it('returns a copy plan for cross-scope duplication without authorizing source assets', () => {
+    const result = remapContentMediaForDuplicate({
+      media: sampleMedia(),
+      sourceScopeKey: 'campaign-content:camp-1',
+      targetScopeKey: 'campaign-content:camp-2',
+      createAttachmentId: () => 'unused',
+    })
+
+    expect(result).toEqual({
+      ok: false,
+      reason: 'cross_scope_copy_required',
+      copyPlan: { assetIds: ['asset-a', 'asset-b'] },
+    })
+  })
+})

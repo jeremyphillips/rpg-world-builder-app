@@ -150,6 +150,7 @@
   --color-catalog-picker-row-surface: var(--catalog-picker-row-surface);
   --color-sidebar: var(--sidebar);
   --spacing-sidebar: var(--sidebar-width);
+  --spacing-image-preview: 7.5rem;
   --z-index-toast: var(--z-toast);
   --color-control-hover: var(--control-hover-bg);
   --color-control-selected: var(--control-selected-bg);
@@ -157,6 +158,12 @@
   --color-row-selected: var(--row-selected-bg);
   --color-row-selected-border: var(--row-selected-border);
   --color-drop-target: var(--drop-target-bg);
+  --color-drop-target-overlay: var(--drop-target-overlay-bg);
+  --color-drop-target-overlay-foreground: var(--drop-target-overlay-fg);
+  --color-drop-target-overlay-foreground-muted: var(--drop-target-overlay-fg-muted);
+  --color-drop-target-overlay-border: var(--drop-target-overlay-border);
+  --color-drop-target-overlay-invalid: var(--drop-target-overlay-invalid-bg);
+  --color-drop-target-overlay-invalid-foreground: var(--drop-target-overlay-invalid-fg);
   --color-drop-target-border: var(--drop-target-border);
   --color-segmented-track: var(--segmented-track-bg);
   --color-message-bubble-self: var(--message-bubble-self-bg);

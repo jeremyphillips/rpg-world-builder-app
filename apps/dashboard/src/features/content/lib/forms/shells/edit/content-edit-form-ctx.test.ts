@@ -34,4 +34,18 @@ describe('mergeEditLayoutCtx', () => {
     const ctx = mergeEditLayoutCtx(baseOptionsCtx, undefined, 'c1', 'e1', { kind: 'armor' })
     expect(ctx.equipmentKind).toBe('armor')
   })
+
+  it('carries entity slug and ruleset for media resolution on edit', () => {
+    const ctx = mergeEditLayoutCtx(
+      { ...baseOptionsCtx, rulesetId: 'srd-cc-5.2.1' },
+      undefined,
+      'c1',
+      'srd-cc-5.2.1:elf',
+      { source: 'system', slug: 'elf', rulesetId: 'srd-cc-5.2.1' },
+    )
+
+    expect(ctx.entitySlug).toBe('elf')
+    expect(ctx.entitySource).toBe('system')
+    expect(ctx.rulesetId).toBe('srd-cc-5.2.1')
+  })
 })

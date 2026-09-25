@@ -8,10 +8,12 @@ import { NarrowPage } from '@/components/layout/page/narrow-page'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
-import { useExistingImageField } from '@/lib/use-existing-image-field'
 import { useLocations } from '@/features/content'
-
-import { flavorFields, identityFields } from '../lib/settings/campaign-profile-form-fields'
+import {
+  buildSettingsIdentityTabFields,
+  flavorFields,
+  settingsIdentityFields,
+} from '../lib/settings/campaign-profile-form-fields'
 import { buildWorldSettingsFields } from '../lib/settings/world-settings-form-fields'
 import {
   buildUpdateCampaignInput,
@@ -38,20 +40,24 @@ export function CampaignSettings() {
 
   const { mutateAsync, isPending } = useUpdateCampaign(campaignId ?? '')
 
-  const bannerField = useExistingImageField({
-    fieldName: 'banner',
-    currentKey: campaign?.identity.imageKey,
-    label: 'Current campaign image',
-    uploadErrorMessage: 'Could not upload campaign image.',
-  })
+  const tabs = useMemo((): TabbedFormTab[] => {
+    if (!campaignId) {
+      return [
+        {
+          id: 'identity',
+          label: 'Identity',
+          leadingIcon: <IdCard aria-hidden />,
+          fields: settingsIdentityFields,
+        },
+      ]
+    }
 
-  const tabs = useMemo(
-    (): TabbedFormTab[] => [
+    return [
       {
         id: 'identity',
         label: 'Identity',
         leadingIcon: <IdCard aria-hidden />,
-        fields: identityFields,
+        fields: buildSettingsIdentityTabFields(campaignId),
       },
       {
         id: 'flavor',
@@ -65,13 +71,11 @@ export function CampaignSettings() {
         leadingIcon: <Globe aria-hidden />,
         fields: buildWorldSettingsFields(locations),
       },
-    ],
-    [locations],
-  )
+    ]
+  }, [campaignId, locations])
 
   const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values, form) => {
-    const imageKey = await bannerField.resolveImageKey(values.banner)
-    await mutateAsync(buildUpdateCampaignInput(values, imageKey))
+    await mutateAsync(buildUpdateCampaignInput(values))
     form.reset(values)
     notifySaveSuccess()
   }, 'Could not save campaign.')
@@ -94,9 +98,9 @@ export function CampaignSettings() {
         schema={campaignSettingsSchema}
         tabs={tabs}
         defaultValues={mapCampaignToSettingsValues(campaign)}
-        fileFieldProps={bannerField.fileFieldProps}
         onSubmit={onSubmit}
         formError={formError}
+        documentScroll
         footer={(form) => (
           <>
             <FormUnsavedChangesGuard />

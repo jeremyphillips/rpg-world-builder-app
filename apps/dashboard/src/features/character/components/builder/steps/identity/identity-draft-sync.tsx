@@ -23,6 +23,7 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
   const name = useWatch({ control, name: 'name' })
   const narrative = useWatch({ control, name: 'narrative' })
   const alignment = useWatch({ control, name: 'alignment' })
+  const media = useWatch({ control, name: 'media' })
   const onDraftChangeRef = useRef(onDraftChange)
   const priorDraftRef = useRef(draftIdentity)
 
@@ -38,6 +39,7 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
       name: name ?? '',
       narrative: narrative ?? emptyNarrativeFormValues(),
       alignment,
+      media,
     })
 
     if (draftChanged) {
@@ -51,7 +53,7 @@ export function IdentityDraftSync({ draftIdentity, onDraftChange }: IdentityDraf
     if (!areIdentityDraftsEqual(draftIdentity, formIdentity)) {
       onDraftChangeRef.current({ identity: formIdentity })
     }
-  }, [alignment, draftIdentity, gender, name, narrative, reset])
+  }, [alignment, draftIdentity, gender, media, name, narrative, reset])
 
   return null
 }

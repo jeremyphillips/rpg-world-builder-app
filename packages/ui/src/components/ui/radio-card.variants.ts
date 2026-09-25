@@ -13,12 +13,12 @@ import { establishSurfaceCurrent } from './surface-current.lib'
 import {
   optionCardDensityBodyLayoutVariants,
   optionCardDensityContentGapVariants,
-  optionCardSelectedChromeClasses,
+  optionCardSummaryBadgeRowVariants,
 } from './selection-option-card.variants'
 
 const radioCardCardBase = cn(
-  `group relative flex w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-surface-subtle text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary/50 hover:bg-control-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-card-selected-border data-[state=checked]:bg-surface-strong data-[state=checked]:[--surface-current:var(--surface-strong)] data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
-  establishSurfaceCurrent('surface-subtle'),
+  `group relative flex h-full w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-background text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary hover:bg-surface-subtle hover:[--surface-current:var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-surface-strong data-[state=checked]:[--surface-current:var(--surface-strong)] data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
+  establishSurfaceCurrent('background'),
 )
 
 const radioCardRowBase = cn(
@@ -74,59 +74,70 @@ export const radioCardVariants = cva('', {
   },
 })
 
+/** Selected/hover chrome for radio card shells (distinct from static selection cards). */
+export const radioCardShellSelectedChromeClasses =
+  'border-primary bg-surface-strong ring-1 ring-primary/20 [--surface-current:var(--surface-strong)]'
+
 /** Outer shell when a details action sits beside the radio item (avoids nested interactives). */
 export const radioCardShellVariants = cva(
   cn(
-    `relative overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-surface-subtle text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
-    establishSurfaceCurrent('surface-subtle'),
+    `relative flex h-full flex-col overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-background text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
+    establishSurfaceCurrent('background'),
   ),
   {
     variants: {
-      density: {
-        default: optionCardDensityBodyLayoutVariants({ density: 'default' }),
-        compact: optionCardDensityBodyLayoutVariants({ density: 'compact' }),
+      hasMedia: {
+        true: 'p-0',
+        false: '',
       },
       selected: {
-        true: optionCardSelectedChromeClasses,
-        false: 'hover:border-primary/50 hover:bg-control-hover',
+        true: radioCardShellSelectedChromeClasses,
+        false:
+          'hover:border-primary hover:bg-surface-subtle hover:[--surface-current:var(--surface-subtle)]',
       },
     },
     defaultVariants: {
-      density: 'default',
+      hasMedia: false,
       selected: false,
     },
   },
 )
 
-/** Grid for radio + title row + right-aligned details link on one line. */
-export const radioCardDetailsGridVariants = cva(
-  'grid w-full grid-cols-[auto_1fr_auto] items-start',
-  {
-    variants: {
-      density: {
-        default: 'gap-x-3 gap-y-2',
-        compact: 'gap-x-3 gap-y-1',
-      },
-    },
-    defaultVariants: {
-      density: 'default',
+/** Body region below a full-bleed media slot. */
+export const radioCardShellBodyVariants = cva('flex min-h-0 flex-1 flex-col', {
+  variants: {
+    density: {
+      default: optionCardDensityBodyLayoutVariants({ density: 'default' }),
+      compact: optionCardDensityBodyLayoutVariants({ density: 'compact' }),
     },
   },
-)
+  defaultVariants: {
+    density: 'default',
+  },
+})
 
-/** Radix item wrapper — children participate in the parent details grid. */
-export const radioCardItemWithDetailsVariants = cva(
-  'contents cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
-)
+/** Full-bleed top image slot for card-variant radio options. */
+export const radioCardMediaSlotVariants = cva('shrink-0 overflow-hidden')
 
 /** Transparent radio row inside an outer shell (embedded/footer slots below). */
 export const radioCardShellItemVariants = cva(
   'flex w-full cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
 )
 
-/** Right-aligned details action aligned with the title row. */
-export const radioCardDetailsInlineSlotVariants = cva(
-  'col-start-3 row-start-1 shrink-0 self-center',
+/** Centers the leading radio with the option title line when a title-end action is present. */
+export const radioCardLeadingControlTitleLineVariants = cva(
+  'flex shrink-0 items-center self-start',
+  {
+    variants: {
+      density: {
+        default: 'h-5',
+        compact: 'h-5',
+      },
+    },
+    defaultVariants: {
+      density: 'default',
+    },
+  },
 )
 
 /** Decorative radio circle shown inside the card, synced to the parent item state. */
@@ -171,10 +182,13 @@ export const radioCardIconControlVariants = cva(
   },
 )
 
-export const radioCardDetailsActionVariants = cva('shrink-0 text-muted-foreground')
+export const radioCardDetailsActionVariants = cva('shrink-0 [&_svg]:size-4')
+
+/** Reserved third-row height for spellcasting badges in equal-height card grids. */
+export const radioCardSummaryBadgeRowVariants = optionCardSummaryBadgeRowVariants
 
 /** Vertical gap between sibling radio options in a group. */
-export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
+export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 items-stretch', {
   variants: {
     variant: {
       card: '',
@@ -186,7 +200,8 @@ export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
     },
     columns: {
       one: 'grid-cols-1',
-      two: 'grid-cols-1 sm:grid-cols-2',
+      two: 'grid-cols-1 @min-[32rem]:grid-cols-2',
+      three: 'grid-cols-1 @min-[32rem]:grid-cols-2 @min-[48rem]:grid-cols-3',
     },
   },
   compoundVariants: [

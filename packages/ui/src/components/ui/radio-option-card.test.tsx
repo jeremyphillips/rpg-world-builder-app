@@ -18,12 +18,14 @@ describe('RadioOptionCard titleEndSlot interactions', () => {
           label="Dwarf"
           description="Humanoid"
           density="compact"
-          titleEndSlot={<RadioOptionCardDetailsAction label="Details" onDetails={onDetails} />}
+          titleEndSlot={
+            <RadioOptionCardDetailsAction ariaLabel="View Dwarf details" onDetails={onDetails} />
+          }
         />
       </RadioGroup>,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Dwarf details' }))
     expect(onDetails).toHaveBeenCalledTimes(1)
     expect(onValueChange).not.toHaveBeenCalled()
   })
@@ -39,12 +41,14 @@ describe('RadioOptionCard titleEndSlot interactions', () => {
           value="dwarf"
           label="Dwarf"
           density="compact"
-          titleEndSlot={<RadioOptionCardDetailsAction label="Details" onDetails={onDetails} />}
+          titleEndSlot={
+            <RadioOptionCardDetailsAction ariaLabel="View Dwarf details" onDetails={onDetails} />
+          }
         />
       </RadioGroup>,
     )
 
-    const detailsButton = screen.getByRole('button', { name: 'Details' })
+    const detailsButton = screen.getByRole('button', { name: 'View Dwarf details' })
     detailsButton.focus()
     await user.keyboard('{Enter}')
 
@@ -63,12 +67,14 @@ describe('RadioOptionCard titleEndSlot interactions', () => {
           value="dwarf"
           label="Dwarf"
           density="compact"
-          titleEndSlot={<RadioOptionCardDetailsAction label="Details" onDetails={onDetails} />}
+          titleEndSlot={
+            <RadioOptionCardDetailsAction ariaLabel="View Dwarf details" onDetails={onDetails} />
+          }
         />
       </RadioGroup>,
     )
 
-    const detailsButton = screen.getByRole('button', { name: 'Details' })
+    const detailsButton = screen.getByRole('button', { name: 'View Dwarf details' })
     detailsButton.focus()
     await user.keyboard(' ')
 
@@ -87,7 +93,9 @@ describe('RadioOptionCard titleEndSlot interactions', () => {
           label="Dwarf"
           description="Humanoid"
           density="compact"
-          titleEndSlot={<RadioOptionCardDetailsAction label="Details" onDetails={vi.fn()} />}
+          titleEndSlot={
+            <RadioOptionCardDetailsAction ariaLabel="View Dwarf details" onDetails={vi.fn()} />
+          }
         />
       </RadioGroup>,
     )

@@ -7,6 +7,7 @@ import {
   messagesWorkspaceRootClasses,
 } from '@/features/message/components/workspace/messages-workspace.variants'
 
+import { pageShellInsetTopClasses } from '../page/page-spacing.variants'
 import { NarrowPage } from '../page/narrow-page'
 import { viewportWorkspaceClasses } from '../page/viewport-workspace.variants'
 import { ViewportWorkspace } from '../page/viewport-workspace'
@@ -76,7 +77,7 @@ describe('AppShell route scroll ownership', () => {
 
   it('ContentFormPageShell uses ViewportWorkspace without shell inset on the width shell', () => {
     const { container } = render(
-      <ContentFormPageShell usePreviewLayout>
+      <ContentFormPageShell scrollMode="viewport" pageWidth="wide">
         <p>Form</p>
       </ContentFormPageShell>,
     )
@@ -101,6 +102,17 @@ describe('AppShell route scroll ownership', () => {
     expect(messagesWorkspaceRootClasses).toContain('min-h-0')
     expect(messagesWorkspaceRootClasses).toContain('flex-1')
     expect(messagesWorkspaceBodyClasses).toContain('overflow-hidden')
+  })
+
+  it('ContentFormPageShell document mode does not mount ViewportWorkspace', () => {
+    const { container } = render(
+      <ContentFormPageShell scrollMode="document" pageWidth="narrow">
+        <p>Form</p>
+      </ContentFormPageShell>,
+    )
+    const root = container.firstElementChild
+    expect(root).not.toHaveClass(...viewportWorkspaceClasses.split(/\s+/).filter(Boolean))
+    expect(root).toHaveClass(...pageShellInsetTopClasses.split(/\s+/))
   })
 
   it('ViewportWorkspace is a bounded workspace that flex-fills main', () => {

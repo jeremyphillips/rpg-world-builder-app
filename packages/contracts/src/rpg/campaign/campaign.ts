@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { contentMediaSchema } from '../../shared/media/content-media'
 import { campaignRoleSchema } from '../../shared/roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { versionedTemplateReferenceSchema } from '../primitives/versioned-template'
@@ -31,8 +32,8 @@ export {
 export const campaignIdentitySchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
-  /** Storage key for the campaign banner image — resolve to a URL with `getAssetUrl`. */
-  imageKey: z.string().optional(),
+  /** Campaign gallery with banner, primary, and emblem role assignments. */
+  media: contentMediaSchema.optional(),
 })
 
 export type CampaignIdentity = z.infer<typeof campaignIdentitySchema>
@@ -184,7 +185,8 @@ export type CampaignListItem = z.infer<typeof campaignListItemSchema>
  * Client-facing payload for creating a campaign. `createdBy` is set server-side
  * from the session, so the client only sends the campaign identity and initial
  * configuration. All fields except `name` are optional — the server applies
- * defaults for any omitted configuration.
+ * defaults for any omitted configuration. Banner images are attached after create
+ * via the media API and `identity.media`.
  */
 export const createCampaignInputSchema = campaignIdentitySchema.extend({
   /** Stable shipped template id. Resolved server-side; its release reference is stored as provenance. */
@@ -223,8 +225,8 @@ export type CreateCampaignResult = z.infer<typeof createCampaignResultSchema>
 
 /**
  * Partial update payload. All fields are optional; the server merges the patch
- * with the existing campaign document. `imageKey` is set server-side after an
- * upload completes, so clients send the key returned by the upload service.
+ * with the existing campaign document. `identity.media` replaces the entire
+ * gallery when present on the patch.
  * `rulesetId` is intentionally omitted — it is immutable after creation.
  */
 export const updateCampaignInputSchema = createCampaignInputSchema

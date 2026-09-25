@@ -20,6 +20,7 @@ import {
 } from './content-form-shell-resolver'
 import { useAdvisoryFormSubmit, type AdvisoryFormSubmitOptions } from './use-advisory-form-submit'
 import type { CoordinatedSaveSavedEvent } from '../session/use-content-save-session'
+import type { ContentFormScrollMode } from './content-form-layout.lib'
 import { ContentSchemaFormShell } from './content-schema-form-shell'
 import {
   CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
@@ -72,6 +73,8 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   onLeaveGuardReady?: (guard: Pick<UnsavedChangesConfirmController, 'runTrusted'>) => void
   formHeaderPrefix?: React.ReactNode
   previewDraftBadge?: boolean
+  scrollMode: ContentFormScrollMode
+  previewEnabled: boolean
 }
 
 export function ContentFormLayout<TFormValues extends FieldValues>({
@@ -100,6 +103,8 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onLeaveGuardReady,
   formHeaderPrefix,
   previewDraftBadge = false,
+  scrollMode,
+  previewEnabled,
 }: ContentFormLayoutProps<TFormValues>) {
   const isWeaponEquipmentForm = def.routeKey === 'equipment' && ctx.equipmentKind === 'weapon'
   const weaponAdvisoryOptions = React.useMemo((): AdvisoryFormSubmitOptions<TFormValues> => {
@@ -149,11 +154,14 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         campaignAccess,
         onCampaignAccessDraftChange,
         onCampaignAccessPersisted,
+        entitySource: ctx.entitySource,
         identityLayout: CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
         availabilityPresentation: CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
       }}
       headerPrefix={formHeaderPrefix}
       previewDraftBadge={previewDraftBadge}
+      scrollMode={scrollMode}
+      previewEnabled={previewEnabled}
     />
   )
 }

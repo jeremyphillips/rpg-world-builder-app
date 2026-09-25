@@ -10,38 +10,86 @@ function makeFile(name: string, type: string, size = 1024): File {
   return file
 }
 
+function getDropRegion() {
+  const browse = screen.queryByRole('button', { name: /browse files/i })
+  if (browse) return browse.closest('div[class*="border-dashed"]')!
+  return screen.getByText(/drop to upload/i).closest('div[class*="border-dashed"]')!
+}
+
 describe('FileDropzone', () => {
-  it('renders the drop zone with accessible role and label', () => {
+  it('renders browse files and singular image copy by default', () => {
     render(<FileDropzone value={[]} onChange={() => undefined} />)
-    expect(screen.getByRole('button', { name: /upload file/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /browse files/i })).toBeInTheDocument()
+    expect(screen.getByText('Add an image')).toBeInTheDocument()
+    expect(screen.getByText(/Drag and drop an image here, or choose a file/i)).toBeInTheDocument()
+  })
+
+  it('uses plural image copy when multiple is enabled', () => {
+    render(
+      <FileDropzone
+        value={[]}
+        onChange={() => undefined}
+        multiple
+        accept={['image/jpeg', 'image/png', 'image/webp', 'image/gif']}
+      />,
+    )
+    expect(screen.getByText('Add images')).toBeInTheDocument()
+    expect(screen.getByText(/Drag and drop images here, or choose files/i)).toBeInTheDocument()
+  })
+
+  it('builds the requirement line from accept and maxSize', () => {
+    render(
+      <FileDropzone
+        value={[]}
+        onChange={() => undefined}
+        accept={['image/png', 'image/jpeg', 'image/webp', 'image/gif']}
+        maxSize={20_971_520}
+      />,
+    )
+    expect(screen.getByText('PNG, JPG, WEBP, or GIF · Max 20 MB')).toBeInTheDocument()
+  })
+
+  it('omits the size clause when maxSize is unset', () => {
+    render(
+      <FileDropzone value={[]} onChange={() => undefined} accept={['image/jpeg', 'image/png']} />,
+    )
+    expect(screen.getByText('JPG or PNG')).toBeInTheDocument()
+    expect(screen.queryByText(/Max/i)).not.toBeInTheDocument()
   })
 
   it('is disabled when the disabled prop is set', () => {
     render(<FileDropzone value={[]} onChange={() => undefined} disabled />)
-    const zone = screen.getByRole('button', { name: /disabled/i })
-    expect(zone).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByRole('button', { name: /browse files/i })).toBeDisabled()
   })
 
-  it('calls onChange when a valid file is dropped', () => {
+  it('calls onChange when a valid file is dropped on the drop region', () => {
     const onChange = vi.fn()
     render(<FileDropzone value={[]} onChange={onChange} accept={['image/jpeg']} />)
-    const zone = screen.getByRole('button')
     const file = makeFile('photo.jpg', 'image/jpeg')
     const dataTransfer = { files: [file] } as unknown as DataTransfer
 
-    fireEvent.dragOver(zone)
-    fireEvent.drop(zone, { dataTransfer })
+    fireEvent.dragOver(getDropRegion())
+    fireEvent.drop(getDropRegion(), { dataTransfer })
 
     expect(onChange).toHaveBeenCalledWith([file])
+  })
+
+  it('does not accept drops when dropTarget is false', () => {
+    const onChange = vi.fn()
+    render(
+      <FileDropzone value={[]} onChange={onChange} accept={['image/jpeg']} dropTarget={false} />,
+    )
+    const file = makeFile('photo.jpg', 'image/jpeg')
+    fireEvent.drop(getDropRegion(), { dataTransfer: { files: [file] } })
+    expect(onChange).not.toHaveBeenCalled()
   })
 
   it('shows an error and does not call onChange for a rejected MIME type', () => {
     const onChange = vi.fn()
     render(<FileDropzone value={[]} onChange={onChange} accept={['image/jpeg']} />)
-    const zone = screen.getByRole('button')
     const file = makeFile('script.exe', 'application/octet-stream')
 
-    fireEvent.drop(zone, { dataTransfer: { files: [file] } })
+    fireEvent.drop(getDropRegion(), { dataTransfer: { files: [file] } })
 
     expect(onChange).not.toHaveBeenCalled()
     expect(screen.getByRole('alert')).toHaveTextContent(/not an accepted file type/i)
@@ -51,9 +99,7 @@ describe('FileDropzone', () => {
     const onChange = vi.fn()
     render(<FileDropzone value={[]} onChange={onChange} accept={['image/jpeg']} maxSize={500} />)
     const file = makeFile('big.jpg', 'image/jpeg', 1024)
-    fireEvent.drop(screen.getByRole('button'), {
-      dataTransfer: { files: [file] },
-    })
+    fireEvent.drop(getDropRegion(), { dataTransfer: { files: [file] } })
 
     expect(onChange).not.toHaveBeenCalled()
     expect(screen.getByRole('alert')).toHaveTextContent(/exceeds/i)
@@ -121,15 +167,17 @@ describe('FileDropzone', () => {
     expect(screen.queryByText('Old image')).not.toBeInTheDocument()
   })
 
-  it('opens the file picker on Enter key', async () => {
-    const user = userEvent.setup()
-    render(<FileDropzone value={[]} onChange={() => undefined} />)
-    const zone = screen.getByRole('button')
-    // jsdom doesn't open a real picker — just assert the input exists and is hidden.
-    zone.focus()
-    await user.keyboard('{Enter}')
-    // No error should be thrown and zone remains interactive.
-    expect(zone).toBeInTheDocument()
+  it('applies comfortable density classes when requested', () => {
+    render(
+      <FileDropzone
+        value={[]}
+        onChange={() => undefined}
+        density="comfortable"
+        className="h-full"
+      />,
+    )
+    expect(getDropRegion()).toHaveClass('bg-sunken')
+    expect(getDropRegion()).toHaveClass('min-h-48')
   })
 
   itAxe('has no axe accessibility violations (empty state)', async () => {

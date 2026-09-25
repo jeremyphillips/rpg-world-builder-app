@@ -1,7 +1,11 @@
 import type { z } from 'zod'
 import type { CreateCampaignInput } from '@rpg/contracts'
 
-import { flavorSchema, identitySchema } from './campaign-profile-form-fields'
+import {
+  createIdentitySchema,
+  flavorSchema,
+  settingsIdentitySchema,
+} from './campaign-profile-form-fields'
 import { worldSettingsSchema } from './world-settings-form-fields'
 import { inviteMembersSchema } from '../forms/invite-members-form-fields'
 import {
@@ -22,11 +26,13 @@ export {
 } from '../rules/character-configuration/character-configuration-form-values'
 export { buildUpdateCampaignInput, mapCampaignToSettingsValues }
 
-export const campaignSettingsSchema = identitySchema.and(flavorSchema).and(worldSettingsSchema)
+export const campaignSettingsSchema = settingsIdentitySchema
+  .and(flavorSchema)
+  .and(worldSettingsSchema)
 
 export type CampaignSettingsValues = z.infer<typeof campaignSettingsSchema>
 
-export const campaignCreateSchema = identitySchema
+export const campaignCreateSchema = createIdentitySchema
   .and(createRulesSchema)
   .and(flavorSchema)
   .and(inviteMembersSchema)
@@ -36,7 +42,6 @@ export type CampaignCreateValues = z.infer<typeof campaignCreateSchema>
 /** Builds the create payload from the flat values accumulated by the wizard. */
 export function buildCreateCampaignInput(
   values: CampaignCreateValues,
-  imageKey?: string,
   campaignTemplateId?: string,
 ): CreateCampaignInput {
   const inviteEmails = (values.inviteEmails ?? [])
@@ -46,7 +51,6 @@ export function buildCreateCampaignInput(
   return {
     name: values.name,
     description: values.description,
-    ...(imageKey !== undefined && { imageKey }),
     ...(campaignTemplateId !== undefined && { campaignTemplateId }),
     characterCreation: buildCharacterCreationPatchInputFromCreateWizard(values),
     flavor: {

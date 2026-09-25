@@ -1,7 +1,12 @@
+import { emptyContentMediaSchema } from '@rpg/contracts'
 import { Modal } from '@rpg/ui'
 
 import { useCampaignRules } from '@/features/campaign'
-import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
+import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import {
+  buildContentDisplayImageInput,
+  type ContentPreviewDisplayImageValues,
+} from '../../lib/detail/page/content-display-image-input'
 import type { ContentPreviewPlayerPreviewProps } from '../../lib/forms/preview/content-form-preview.types'
 import { CONTENT_PREVIEW_AS_PLAYER_LABEL } from '../../lib/forms/preview/content-form-preview-copy'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
@@ -40,7 +45,20 @@ export function ClassPreviewPlayerHost({
         <Modal.Body>
           <ClassDetailBody
             name={name}
-            imageUrl={getContentImageUrl()}
+            displayImage={getContentDisplayImage(
+              buildContentDisplayImageInput(
+                'classes',
+                {
+                  media:
+                    (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
+                  imageKey: (values as ContentPreviewDisplayImageValues).imageKey,
+                  slug: values.slug ?? 'preview',
+                  source: ctx.entitySource ?? 'homebrew',
+                  rulesetId: ctx.rulesetId,
+                },
+                'primary',
+              ),
+            )}
             imageName={name}
             viewModel={viewModel as ClassDetailViewModel}
             subclasses={subclasses}

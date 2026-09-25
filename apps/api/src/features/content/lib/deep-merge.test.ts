@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  CONTENT_MEDIA_REPLACE_KEY,
+  createUploadRoleAssignment,
+  emptyContentMediaSchema,
+} from '@rpg/contracts'
+
 import { deepMerge } from './deep-merge'
 
 describe('deepMerge', () => {
@@ -50,5 +56,54 @@ describe('deepMerge', () => {
     expect(deepMerge(base, patch, { replaceKeys: ['resolution'] }).resolution).toEqual(
       patch.resolution,
     )
+  })
+
+  it('replaces media wholesale for overlay patches', () => {
+    const base = {
+      media: {
+        revision: 0,
+        images: [{ id: 'img-base', assetId: 'asset-base', alt: 'Base art' }],
+        roles: {
+          primary: createUploadRoleAssignment('img-base'),
+          portrait: createUploadRoleAssignment('img-base'),
+        },
+      },
+    }
+    const patch = {
+      media: {
+        revision: 0,
+        images: [{ id: 'img-patch', assetId: 'asset-patch', alt: 'Patch art' }],
+        roles: { primary: createUploadRoleAssignment('img-patch') },
+      },
+    }
+
+    expect(deepMerge(base, patch, { replaceKeys: [CONTENT_MEDIA_REPLACE_KEY] }).media).toEqual(
+      patch.media,
+    )
+  })
+
+  it('inherits overlay media when omitted and clears roles with an empty media object', () => {
+    const base = {
+      media: {
+        revision: 0,
+        images: [{ id: 'img-base', assetId: 'asset-base' }],
+        roles: {
+          primary: createUploadRoleAssignment('img-base'),
+          portrait: createUploadRoleAssignment('img-base'),
+        },
+      },
+    }
+
+    expect(deepMerge(base, {}, { replaceKeys: [CONTENT_MEDIA_REPLACE_KEY] }).media).toEqual(
+      base.media,
+    )
+
+    expect(
+      deepMerge(
+        base,
+        { media: emptyContentMediaSchema },
+        { replaceKeys: [CONTENT_MEDIA_REPLACE_KEY] },
+      ).media,
+    ).toEqual(emptyContentMediaSchema)
   })
 })

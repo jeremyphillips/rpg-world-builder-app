@@ -166,8 +166,11 @@ describe('SpeciesStep', () => {
 
     renderSpeciesStep({ context, onDraftChange })
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Dwarf details' }))
 
+    const dialog = screen.getByRole('dialog')
+
+    expect(dialog.querySelector('img')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Dwarf' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()
     expect(onDraftChange).not.toHaveBeenCalled()
@@ -180,7 +183,7 @@ describe('SpeciesStep', () => {
 
     renderSpeciesStep({ context, onDraftChange })
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Dwarf details' }))
     await user.click(
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Select species' }),
     )
@@ -195,7 +198,7 @@ describe('SpeciesStep', () => {
     expect(screen.queryByRole('heading', { name: 'Traits' })).not.toBeInTheDocument()
   })
 
-  it('shows optional heritage picker on the selected Elf card without required chrome', async () => {
+  it('hides inline heritage selection while ENABLE_INLINE_HERITAGE_SELECTION is false', async () => {
     const user = userEvent.setup()
     const context = createElfContext()
 
@@ -204,55 +207,30 @@ describe('SpeciesStep', () => {
     await user.click(screen.getByRole('radio', { name: /Elf/i }))
 
     const elfCard = speciesCard(elf.id)
-    expect(elfCard).not.toHaveTextContent(
-      formatFieldMessage(
-        characterBuilderDependentChoiceMessages.parentChoiceRequired({
-          kind: DEPENDENT_CHOICE_KINDS.heritage,
-        }),
-      ),
-    )
-    const heritageRegion = within(elfCard as HTMLElement).getByRole('region', {
-      name: 'Elven Lineage',
-    })
-    expect(heritageRegion).toBeInTheDocument()
     expect(
-      within(heritageRegion).queryByText(
-        formatFieldMessage(characterBuilderDependentChoiceMessages.requiredStatus()),
-      ),
+      within(elfCard as HTMLElement).queryByRole('region', { name: 'Elven Lineage' }),
     ).not.toBeInTheDocument()
-    expect(
-      within(heritageRegion).getByText(
-        formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
-      ),
-    ).toBeInTheDocument()
   })
 
-  it('calls onDraftChange when Drow heritage is selected', async () => {
+  it('hides Change heritage in the details sheet while inline heritage is disabled', async () => {
     const user = userEvent.setup()
-    const onDraftChange = vi.fn()
     const context = createElfContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       species: { speciesId: elf.id },
     }
 
-    renderSpeciesStep({ context, draft, onDraftChange })
+    renderSpeciesStep({ context, draft })
 
-    await user.click(screen.getByRole('radio', { name: /Drow/i }))
+    await user.click(screen.getByRole('button', { name: 'View Elf details' }))
 
-    const heritageChoiceSetId = `species:${elf.id}:heritage`
-    expect(onDraftChange).toHaveBeenCalledWith({
-      choiceSelections: {
-        [heritageChoiceSetId]: ['drow'],
-      },
-      species: {
-        speciesId: elf.id,
-        heritageId: 'drow',
-      },
-    })
+    const dialog = screen.getByRole('dialog')
+    expect(
+      within(dialog).queryByRole('button', { name: CHANGE_HERITAGE_LABEL }),
+    ).not.toBeInTheDocument()
   })
 
-  it('shows resolved heritage copy inside the selected Elf card', () => {
+  it('does not show heritage title meta on the selected Elf card while inline heritage is disabled', () => {
     const context = createElfContext()
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -265,7 +243,7 @@ describe('SpeciesStep', () => {
     renderSpeciesStep({ context, draft })
 
     const elfCard = speciesCard(elf.id)
-    expect(elfCard).toHaveTextContent(
+    expect(elfCard).not.toHaveTextContent(
       formatFieldMessage(
         characterBuilderDependentChoiceMessages.parentChoiceSelected({
           selectedOptionLabel: 'Drow',
@@ -273,44 +251,6 @@ describe('SpeciesStep', () => {
         }),
       ),
     )
-    const heritageRegion = within(elfCard as HTMLElement).getByRole('region', {
-      name: 'Elven Lineage',
-    })
-    expect(
-      within(heritageRegion).getByText(
-        formatFieldMessage(
-          characterBuilderDependentChoiceMessages.optionSelected({ selectedOptionLabel: 'Drow' }),
-        ),
-      ),
-    ).toBeInTheDocument()
-    expect(
-      within(heritageRegion).queryByText(
-        formatFieldMessage(characterBuilderDependentChoiceMessages.helperText()),
-      ),
-    ).not.toBeInTheDocument()
-  })
-
-  it('shows Change heritage in the sheet and focuses the embedded heritage section', async () => {
-    const user = userEvent.setup()
-    const context = createElfContext()
-    const draft = {
-      ...createEmptyCharacterBuilderDraft(),
-      species: { speciesId: elf.id },
-    }
-
-    renderSpeciesStep({ context, draft })
-
-    await user.click(screen.getByRole('button', { name: 'Details' }))
-
-    const dialog = screen.getByRole('dialog')
-    expect(within(dialog).getByRole('button', { name: CHANGE_HERITAGE_LABEL })).toBeInTheDocument()
-
-    await user.click(within(dialog).getByRole('button', { name: CHANGE_HERITAGE_LABEL }))
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(
-      within(speciesCard(elf.id) as HTMLElement).getByRole('region', { name: 'Elven Lineage' }),
-    ).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

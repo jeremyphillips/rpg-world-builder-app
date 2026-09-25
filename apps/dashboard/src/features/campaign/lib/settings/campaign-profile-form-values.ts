@@ -1,13 +1,14 @@
 import type { Campaign, UpdateCampaignInput } from '@rpg/contracts'
+import { emptyContentMediaSchema } from '@rpg/contracts'
 
-import type { FlavorValues, IdentityValues } from './campaign-profile-form-fields'
+import type { FlavorValues, SettingsIdentityValues } from './campaign-profile-form-fields'
 import {
   primaryWorldIdFromSettingsValue,
   primaryWorldIdToSettingsValue,
   type WorldSettingsValues,
 } from './world-settings-form-fields'
 
-type CampaignProfileSettingsValues = IdentityValues & FlavorValues & WorldSettingsValues
+type CampaignProfileSettingsValues = SettingsIdentityValues & FlavorValues & WorldSettingsValues
 
 /** Maps a `Campaign` document to the flat shape used by the settings form. */
 export function mapCampaignToSettingsValues(campaign: Campaign): CampaignProfileSettingsValues {
@@ -16,7 +17,7 @@ export function mapCampaignToSettingsValues(campaign: Campaign): CampaignProfile
   return {
     name: campaign.identity.name,
     description: campaign.identity.description ?? '',
-    banner: [],
+    media: campaign.identity.media ?? emptyContentMediaSchema,
     playStyle: flavor?.playStyle,
     mood: flavor?.mood,
     magicLevel: flavor?.magicLevel,
@@ -28,14 +29,13 @@ export function mapCampaignToSettingsValues(campaign: Campaign): CampaignProfile
 /** Builds the API patch payload from validated settings form values. */
 export function buildUpdateCampaignInput(
   values: CampaignProfileSettingsValues,
-  imageKey?: string,
 ): UpdateCampaignInput {
   const primaryWorldId = primaryWorldIdFromSettingsValue(values.primaryWorldId)
 
   return {
     name: values.name,
     description: values.description,
-    ...(imageKey !== undefined && { imageKey }),
+    media: values.media,
     flavor: {
       playStyle: values.playStyle,
       mood: values.mood,

@@ -1,10 +1,12 @@
 import type { ComponentProps } from 'react'
-import { beforeAll, afterEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+
+import { makeAuthMe, makeSessionUser } from '@/test/fixtures/session'
 
 import {
   clearBuilderFormContinueHandlersForTests,
@@ -14,6 +16,14 @@ import { IdentityStep } from './identity-step'
 import { identityStepTestContext } from './identity-step.fixtures'
 
 const generateCharacterSpeciesNameMock = vi.hoisted(() => vi.fn())
+
+vi.mock('@/features/auth', () => ({
+  useSession: vi.fn(),
+}))
+
+import { useSession as useSessionFn } from '@/features/auth'
+
+const useSession = vi.mocked(useSessionFn)
 
 vi.mock('@/features/content', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/features/content')>()
@@ -78,6 +88,13 @@ describe('IdentityStep', () => {
   afterEach(() => {
     clearBuilderFormContinueHandlersForTests()
     generateCharacterSpeciesNameMock.mockReset()
+    useSession.mockReset()
+  })
+
+  beforeEach(() => {
+    useSession.mockReturnValue({
+      data: makeAuthMe(makeSessionUser({ id: 'user-test-1' })),
+    } as ReturnType<typeof useSessionFn>)
   })
 
   it('registers a continue handler that surfaces validation failure without a silent no-op', async () => {

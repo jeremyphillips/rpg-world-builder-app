@@ -11,6 +11,8 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
+import { buildSpeciesContentDisplayImageInput, getContentDisplayImage } from '@/features/content'
+
 import {
   findSpeciesHeritageChoiceSet,
   mapHeritageOptionsToDependentCardOptions,
@@ -30,7 +32,11 @@ import {
   buildSpeciesSelectionPatch,
 } from '../../../../lib/choice-sets/species-selection.lib'
 import { BuilderDependentChoiceSection } from '../../fields/builder-dependent-choice-section'
+import { BuilderOptionCardImage } from '../shared/builder-option-card-image'
+import { BuilderOptionSheetHeroImage } from '../shared/builder-option-sheet-hero-image'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
+
+const ENABLE_INLINE_HERITAGE_SELECTION = false
 
 const HERITAGE_SECTION_ID_PREFIX = 'character-builder-species-heritage'
 const SELECT_SPECIES_ACTION_LABEL = formatFieldMessage(
@@ -110,6 +116,7 @@ export function SpeciesStep({
   )
 
   const heritageEmbeddedContent = useMemo(() => {
+    if (!ENABLE_INLINE_HERITAGE_SELECTION) return null
     if (!heritageChoiceSet || !selectedSpecies) return null
 
     return (
@@ -151,7 +158,7 @@ export function SpeciesStep({
         const isSelected = selectedSpeciesId === entry.id
 
         const titleMeta =
-          isSelected && entry.heritage
+          ENABLE_INLINE_HERITAGE_SELECTION && isSelected && entry.heritage
             ? formatParentChoiceTitleMeta({
                 dependentKindLabel: DEPENDENT_KIND_HERITAGE,
                 required: heritageRequired,
@@ -159,9 +166,14 @@ export function SpeciesStep({
               })
             : undefined
 
+        const display = getContentDisplayImage(buildSpeciesContentDisplayImageInput(entry))
+
         return {
           value: entry.id,
           ...card,
+          ...(display.sourceKind !== 'fallback'
+            ? { media: <BuilderOptionCardImage display={display} /> }
+            : {}),
           ...(titleMeta ? { titleMeta } : {}),
           ...(isSelected && entry.heritage && heritageEmbeddedContent
             ? {
@@ -173,6 +185,7 @@ export function SpeciesStep({
         }
       }),
     [
+      context,
       heritageEmbeddedContent,
       heritageRequired,
       selectedHeritageOptionLabel,
@@ -199,6 +212,11 @@ export function SpeciesStep({
     detailsSpeciesId != null && draft.species.speciesId === detailsSpeciesId
   const detailsSpeciesHasHeritage = detailsSpecies?.heritage != null
 
+  const detailsHeroDisplay = useMemo(() => {
+    if (!detailsSpecies) return null
+    return getContentDisplayImage(buildSpeciesContentDisplayImageInput(detailsSpecies))
+  }, [detailsSpecies])
+
   if (options.length === 0) {
     return (
       <BuilderStepFrame stepId="species" validationIssues={validationIssues}>
@@ -211,6 +229,8 @@ export function SpeciesStep({
     <BuilderStepFrame stepId="species" validationIssues={validationIssues}>
       <RadioCard
         density="compact"
+        columns="three"
+        copyWidth="content"
         value={selectedSpeciesId ?? ''}
         onValueChange={(speciesId) => {
           if (!speciesId) return
@@ -226,6 +246,11 @@ export function SpeciesStep({
           onOpenChange={(open) => {
             if (!open) setDetailsSpeciesId(null)
           }}
+          heroImage={
+            detailsHeroDisplay && detailsHeroDisplay.sourceKind !== 'fallback' ? (
+              <BuilderOptionSheetHeroImage display={detailsHeroDisplay} />
+            ) : undefined
+          }
           title={detailsContent.title}
           eyebrow={detailsContent.eyebrow}
           descriptionHtml={detailsContent.descriptionHtml}
@@ -233,7 +258,7 @@ export function SpeciesStep({
           sections={detailsContent.sections}
           primaryAction={
             isDetailsSpeciesSelected ? (
-              detailsSpeciesHasHeritage ? (
+              detailsSpeciesHasHeritage && ENABLE_INLINE_HERITAGE_SELECTION ? (
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge appearance="soft" tone="neutral">
                     {SELECTED_SPECIES_LABEL}

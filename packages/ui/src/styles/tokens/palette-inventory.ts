@@ -40,7 +40,15 @@ export const PALETTE_SIDEBAR_STEPS = ['sidebar-surface', 'sidebar-shade'] as con
 
 export const PALETTE_FG_STEPS = ['fg-default', 'fg-on-solid', 'fg-on-status'] as const
 
-export const PALETTE_CHROME_STEPS = ['overlay'] as const
+export const PALETTE_CHROME_STEPS = [
+  'overlay',
+  'drop-target-overlay',
+  'drop-target-overlay-fg',
+  'drop-target-overlay-fg-muted',
+  'drop-target-overlay-border',
+  'drop-target-overlay-invalid',
+  'drop-target-overlay-invalid-fg',
+] as const
 
 export const PALETTE_BRAND_STEPS = ['primary', 'primary-foreground', 'on-solid'] as const
 

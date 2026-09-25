@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { contentBodyBaseSchema } from '../lib/envelope'
+import { mediaBearingAuthoredContentBodySchema } from '../../../shared/media/media-bearing-content'
 
 /**
  * Shared body fields present on every location union variant.
@@ -12,7 +12,7 @@ import { contentBodyBaseSchema } from '../lib/envelope'
  * Non-containment graph links (`connected_to`, `entrance_to`, `portal_to`) are
  * reserved for a separate relationship layer; never model them as parent/child.
  */
-export const locationBaseSchema = contentBodyBaseSchema.extend({
+export const locationBaseSchema = mediaBearingAuthoredContentBodySchema.extend({
   parentLocationId: z.string().min(1).optional(),
 })
 

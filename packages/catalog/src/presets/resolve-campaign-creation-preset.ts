@@ -81,7 +81,7 @@ function materializeInput(
   return {
     ...explicit,
     description: explicit.description ?? templateIdentity?.description,
-    imageKey: explicit.imageKey ?? templateIdentity?.imageKey,
+    media: explicit.media ?? templateIdentity?.media,
     rulesetId: explicit.rulesetId ?? template.rulesetId,
     flavor: materializeFlavor(template, explicit),
     characterCreation: materializeCharacterCreation(template, explicit),

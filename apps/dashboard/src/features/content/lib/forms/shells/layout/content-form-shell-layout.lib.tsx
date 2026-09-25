@@ -1,14 +1,18 @@
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type {
   ContentCampaignAccessPatch,
+  ContentSource,
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
+import { type ContentMediaDomain } from '@rpg/contracts'
+import { useWatch } from 'react-hook-form'
 import { cn, fieldStackRhythmVariants } from '@rpg/ui'
 import { FormItems, resolveFormDensity, useFormSectionContext, type FormItem } from '@rpg/ui/form'
 
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import type { CampaignAvailabilityPresentation } from '@/lib/campaign-availability/campaign-availability-form-fields'
+import { ManagedMediaField, resolveContentMediaFieldConfig } from '@/features/media'
 
 import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context'
 import { buildContentAvailabilitySlotItem } from '../../fields/content-availability-slot.lib'
@@ -34,6 +38,46 @@ export interface ContentFormCampaignAccessProps {
   onCampaignAccessPersisted?: (access: ResolvedContentCampaignAccess) => void
   identityLayout?: ContentIdentityLayout
   availabilityPresentation?: CampaignAvailabilityPresentation
+  form?: UseFormReturn<FieldValues>
+  mediaDomain?: ContentMediaDomain
+  entitySource?: ContentSource
+}
+
+function ContentMediaIdentitySlot({
+  domain,
+  form,
+  campaignId,
+  contentType,
+  contentSource,
+  entitySlug,
+  rulesetId,
+}: {
+  domain: ContentMediaDomain
+  form: UseFormReturn<FieldValues>
+  campaignId?: string
+  contentType: ContentTypeKey
+  contentSource?: ContentSource
+  entitySlug?: string
+  rulesetId?: string
+}) {
+  const watchedSlug = useWatch({ control: form.control, name: 'slug' }) as string | undefined
+  const slug = entitySlug ?? watchedSlug
+  return (
+    <ManagedMediaField
+      config={{ domain, presentation: { layout: 'compact' } }}
+      scope={{ kind: 'campaign-content', campaignId: campaignId ?? 'draft' }}
+      contentContext={
+        slug && contentSource
+          ? {
+              contentType,
+              slug,
+              contentSource,
+              rulesetId,
+            }
+          : undefined
+      }
+    />
+  )
 }
 
 export function ContentFormHeader({
@@ -47,6 +91,9 @@ export function ContentFormHeader({
   onCampaignAccessPersisted,
   identityLayout = 'stacked',
   availabilityPresentation = 'disclosure',
+  form,
+  mediaDomain,
+  entitySource,
 }: ContentFormCampaignAccessProps) {
   const { density } = useFormSectionContext()
   const { rhythm } = resolveFormDensity(density)
@@ -65,6 +112,9 @@ export function ContentFormHeader({
       })
     : undefined
 
+  const mediaConfig = mediaDomain
+    ? { domain: mediaDomain, presentation: { layout: 'compact' as const } }
+    : resolveContentMediaFieldConfig(def.routeKey)
   const items = availabilityItem
     ? buildContentIdentityFields({
         layout: identityLayout,
@@ -75,7 +125,22 @@ export function ContentFormHeader({
 
   return (
     <div className={cn(fieldStackRhythmVariants({ rhythm }))}>
-      <FormItems items={items} idPrefix={idPrefix} />
+      <div className="flex items-start justify-between gap-4">
+        {form && mediaConfig ? (
+          <ContentMediaIdentitySlot
+            domain={mediaConfig.domain}
+            form={form}
+            campaignId={campaignId}
+            contentType={def.routeKey as ContentTypeKey}
+            contentSource={entitySource}
+            entitySlug={ctx.entitySlug}
+            rulesetId={ctx.rulesetId}
+          />
+        ) : null}
+        <div className="min-w-0 flex-1">
+          <FormItems items={items} idPrefix={idPrefix} />
+        </div>
+      </div>
     </div>
   )
 }

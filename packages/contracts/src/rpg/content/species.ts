@@ -1,11 +1,10 @@
 import { z } from 'zod'
 
+import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/envelope'
 import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from './lib/envelope'
+  mediaBearingAuthoredContentBodySchema,
+  mediaBearingDraftAuthoredContentBodySchema,
+} from '../../shared/media/media-bearing-content'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { movementSpeedsDraftSchema, movementSpeedsSchema } from '../vocab/movement-mode'
@@ -23,7 +22,6 @@ import { speciesCharacterCreationSchema } from './species-character-creation'
 import { speciesCultureConfigSchema } from './species-culture'
 import { SPECIES_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 import { createDraftInputSchema, draftStoredSchema } from './lib/content-input-schemas'
-import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
 
 // ---------------------------------------------------------------------------
 // Species — a playable people/ancestry. SRD-faithful prose lives in rich-text
@@ -78,7 +76,7 @@ export type SpeciesHeritageDraft = z.infer<typeof speciesHeritageDraftSchema>
 // --- Species — editable body + stored shape ---------------------------------
 
 /** The editable shape: what a form authors and what a patch overrides. */
-export const speciesBodySchema = contentBodyBaseSchema.extend({
+export const speciesBodySchema = mediaBearingAuthoredContentBodySchema.extend({
   creatureType: creatureTypeSchema,
   /** Allowed sizes; a single-element array is a fixed size, multiple is a choice. */
   sizes: z.array(creatureSizeSchema).min(1),
@@ -99,7 +97,7 @@ export const speciesBodySchema = contentBodyBaseSchema.extend({
 export type SpeciesBody = z.infer<typeof speciesBodySchema>
 
 /** Draft save body — untitled name fallback; sizes/movement/heritage relaxed. */
-export const speciesBodyDraftSchema = draftAuthoredContentBodySchema(
+export const speciesBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema(
   SPECIES_CONTENT_TYPE_TERM.label,
 ).extend({
   creatureType: creatureTypeSchema,

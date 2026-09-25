@@ -10,7 +10,8 @@ import { fieldControlSizeClasses } from './field-sizing.variants'
 
 /** Layout + focus for the shared summary trigger. Fill chrome is applied separately. */
 export const fieldGroupSummaryTriggerLayoutClasses =
-  'flex w-full items-center justify-between gap-3 text-left'
+  // `cursor-pointer` is explicit because Tailwind v4 preflight resets buttons to `cursor: default`.
+  'flex w-full cursor-pointer items-center justify-between gap-3 text-left'
 
 /** Summary copy sits at 12px in both compact and comfortable forms. */
 export const fieldGroupSummaryTriggerTypographyClasses = 'text-xs'

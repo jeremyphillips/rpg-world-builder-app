@@ -64,6 +64,80 @@
     "description": {
       "type": "string"
     },
+    "media": {
+      "type": "object",
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "assetId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "alt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "assetId"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "roles": {
+          "type": "object",
+          "properties": {
+            "primary": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema1"
+                }
+              ]
+            },
+            "portrait": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema1"
+                }
+              ]
+            },
+            "banner": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema1"
+                }
+              ]
+            },
+            "emblem": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema1"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "revision",
+        "images",
+        "roles"
+      ],
+      "additionalProperties": false
+    },
     "primaryAbilities": {
       "minItems": 1,
       "type": "array",
@@ -104,13 +178,13 @@
       "type": "object",
       "properties": {
         "slotProgressionId": {
-          "$ref": "#/definitions/__schema2"
+          "$ref": "#/definitions/__schema7"
         },
         "spellSelection": {
-          "$ref": "#/definitions/__schema3"
+          "$ref": "#/definitions/__schema8"
         },
         "progression": {
-          "$ref": "#/definitions/__schema7"
+          "$ref": "#/definitions/__schema12"
         },
         "ability": {
           "type": "string",
@@ -125,16 +199,16 @@
           "description": "str | dex | con | int | wis | cha"
         },
         "requiredGear": {
-          "$ref": "#/definitions/__schema12"
+          "$ref": "#/definitions/__schema17"
         },
         "focusKinds": {
-          "$ref": "#/definitions/__schema14"
+          "$ref": "#/definitions/__schema19"
         },
         "recommendedGear": {
-          "$ref": "#/definitions/__schema16"
+          "$ref": "#/definitions/__schema21"
         },
         "recommendations": {
-          "$ref": "#/definitions/__schema17"
+          "$ref": "#/definitions/__schema22"
         }
       },
       "required": [
@@ -181,7 +255,7 @@
               }
             },
             "items": {
-              "$ref": "#/definitions/__schema20"
+              "$ref": "#/definitions/__schema25"
             }
           },
           "required": [
@@ -206,7 +280,7 @@
               }
             },
             "items": {
-              "$ref": "#/definitions/__schema20"
+              "$ref": "#/definitions/__schema25"
             }
           },
           "required": [
@@ -235,7 +309,7 @@
               }
             },
             "items": {
-              "$ref": "#/definitions/__schema20"
+              "$ref": "#/definitions/__schema25"
             }
           },
           "required": [
@@ -290,19 +364,19 @@
                 "description": "custom"
               },
               "id": {
-                "$ref": "#/definitions/__schema23"
+                "$ref": "#/definitions/__schema28"
               },
               "name": {
-                "$ref": "#/definitions/__schema24"
+                "$ref": "#/definitions/__schema29"
               },
               "description": {
-                "$ref": "#/definitions/__schema25"
+                "$ref": "#/definitions/__schema30"
               },
               "grantGroups": {
-                "$ref": "#/definitions/__schema26"
+                "$ref": "#/definitions/__schema31"
               },
               "level": {
-                "$ref": "#/definitions/__schema5"
+                "$ref": "#/definitions/__schema10"
               },
               "tables": {
                 "type": "array",
@@ -315,7 +389,7 @@
                           "$ref": "#/definitions/__schema0"
                         },
                         "name": {
-                          "$ref": "#/definitions/__schema102"
+                          "$ref": "#/definitions/__schema107"
                         },
                         "kind": {
                           "type": "string",
@@ -325,7 +399,7 @@
                           "description": "levelProgression"
                         },
                         "columns": {
-                          "$ref": "#/definitions/__schema104"
+                          "$ref": "#/definitions/__schema109"
                         }
                       },
                       "required": [
@@ -343,7 +417,7 @@
                           "$ref": "#/definitions/__schema0"
                         },
                         "name": {
-                          "$ref": "#/definitions/__schema119"
+                          "$ref": "#/definitions/__schema124"
                         },
                         "kind": {
                           "type": "string",
@@ -353,10 +427,10 @@
                           "description": "general"
                         },
                         "columns": {
-                          "$ref": "#/definitions/__schema121"
+                          "$ref": "#/definitions/__schema126"
                         },
                         "rows": {
-                          "$ref": "#/definitions/__schema123"
+                          "$ref": "#/definitions/__schema128"
                         }
                       },
                       "required": [
@@ -372,7 +446,7 @@
                 }
               },
               "available": {
-                "$ref": "#/definitions/__schema125"
+                "$ref": "#/definitions/__schema130"
               }
             },
             "required": [
@@ -392,22 +466,22 @@
                 "description": "subclass-choice"
               },
               "id": {
-                "$ref": "#/definitions/__schema23"
+                "$ref": "#/definitions/__schema28"
               },
               "name": {
-                "$ref": "#/definitions/__schema24"
+                "$ref": "#/definitions/__schema29"
               },
               "description": {
-                "$ref": "#/definitions/__schema25"
+                "$ref": "#/definitions/__schema30"
               },
               "grantGroups": {
-                "$ref": "#/definitions/__schema26"
+                "$ref": "#/definitions/__schema31"
               },
               "level": {
-                "$ref": "#/definitions/__schema5"
+                "$ref": "#/definitions/__schema10"
               },
               "available": {
-                "$ref": "#/definitions/__schema125"
+                "$ref": "#/definitions/__schema130"
               }
             },
             "required": [
@@ -425,16 +499,16 @@
       "type": "object",
       "properties": {
         "startingEquipment": {
-          "$ref": "#/definitions/__schema126"
+          "$ref": "#/definitions/__schema131"
         },
         "proficiencies": {
-          "$ref": "#/definitions/__schema141"
+          "$ref": "#/definitions/__schema146"
         },
         "equipmentRecommendations": {
-          "$ref": "#/definitions/__schema149"
+          "$ref": "#/definitions/__schema154"
         },
         "abilityScoreOrder": {
-          "$ref": "#/definitions/__schema151"
+          "$ref": "#/definitions/__schema156"
         }
       },
       "additionalProperties": false
@@ -462,6 +536,194 @@
       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
     },
     "__schema1": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "upload",
+                  "description": "upload"
+                },
+                "imageId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "imageId"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "system",
+                  "description": "system"
+                },
+                "imageSetId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "contentType": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "assetRole": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "slug": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "imageSetId",
+                "contentType",
+                "assetRole",
+                "slug"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "presentation": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "const": "crop",
+                  "description": "crop"
+                },
+                "crop": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "$ref": "#/definitions/__schema2"
+                    },
+                    "y": {
+                      "$ref": "#/definitions/__schema3"
+                    },
+                    "width": {
+                      "$ref": "#/definitions/__schema4"
+                    },
+                    "height": {
+                      "$ref": "#/definitions/__schema5"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "width",
+                    "height"
+                  ],
+                  "additionalProperties": false
+                },
+                "focalPoint": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "mode"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "const": "contain",
+                  "description": "contain"
+                },
+                "scale": {
+                  "type": "number",
+                  "minimum": 0.25,
+                  "maximum": 1
+                },
+                "offset": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "mode",
+                "scale"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "additionalProperties": false
+    },
+    "__schema2": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "__schema3": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "__schema4": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1
+    },
+    "__schema5": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1
+    },
+    "__schema6": {
       "type": "string",
       "enum": [
         "str",
@@ -473,11 +735,11 @@
       ],
       "description": "str | dex | con | int | wis | cha"
     },
-    "__schema2": {
+    "__schema7": {
       "type": "string",
       "minLength": 1
     },
-    "__schema3": {
+    "__schema8": {
       "oneOf": [
         {
           "type": "object",
@@ -488,7 +750,7 @@
               "description": "limitedRepertoire"
             },
             "change": {
-              "$ref": "#/definitions/__schema4"
+              "$ref": "#/definitions/__schema9"
             },
             "columnLabel": {
               "type": "string",
@@ -510,7 +772,7 @@
               "description": "prepareFromClassList"
             },
             "change": {
-              "$ref": "#/definitions/__schema4"
+              "$ref": "#/definitions/__schema9"
             },
             "columnLabel": {
               "type": "string",
@@ -551,7 +813,7 @@
                         "type": "object",
                         "properties": {
                           "level": {
-                            "$ref": "#/definitions/__schema5"
+                            "$ref": "#/definitions/__schema10"
                           },
                           "count": {
                             "type": "integer",
@@ -594,7 +856,7 @@
               "additionalProperties": false
             },
             "change": {
-              "$ref": "#/definitions/__schema4"
+              "$ref": "#/definitions/__schema9"
             },
             "columnLabel": {
               "type": "string",
@@ -611,7 +873,7 @@
         }
       ]
     },
-    "__schema4": {
+    "__schema9": {
       "oneOf": [
         {
           "type": "object",
@@ -667,12 +929,12 @@
         }
       ]
     },
-    "__schema5": {
+    "__schema10": {
       "type": "integer",
       "minimum": 1,
       "maximum": 100
     },
-    "__schema6": {
+    "__schema11": {
       "type": "string",
       "enum": [
         "carryForward",
@@ -681,41 +943,41 @@
       ],
       "description": "carryForward | zero | explicit"
     },
-    "__schema7": {
+    "__schema12": {
       "type": "object",
       "properties": {
         "cantrips": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema8"
+              "$ref": "#/definitions/__schema13"
             }
           ]
         },
         "repertoire": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema8"
+              "$ref": "#/definitions/__schema13"
             }
           ]
         },
         "preparedSpells": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema8"
+              "$ref": "#/definitions/__schema13"
             }
           ]
         }
       },
       "additionalProperties": false
     },
-    "__schema8": {
+    "__schema13": {
       "type": "object",
       "properties": {
         "curve": {
-          "$ref": "#/definitions/__schema9"
+          "$ref": "#/definitions/__schema14"
         },
         "extension": {
-          "$ref": "#/definitions/__schema11"
+          "$ref": "#/definitions/__schema16"
         }
       },
       "required": [
@@ -724,11 +986,11 @@
       ],
       "additionalProperties": false
     },
-    "__schema9": {
+    "__schema14": {
       "type": "object",
       "properties": {
         "rows": {
-          "$ref": "#/definitions/__schema10"
+          "$ref": "#/definitions/__schema15"
         }
       },
       "required": [
@@ -736,14 +998,14 @@
       ],
       "additionalProperties": false
     },
-    "__schema10": {
+    "__schema15": {
       "default": [],
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "level": {
-            "$ref": "#/definitions/__schema5"
+            "$ref": "#/definitions/__schema10"
           },
           "count": {
             "type": "integer",
@@ -758,7 +1020,7 @@
         "additionalProperties": false
       }
     },
-    "__schema11": {
+    "__schema16": {
       "default": "carryForward",
       "allOf": [
         {
@@ -772,7 +1034,7 @@
         }
       ]
     },
-    "__schema12": {
+    "__schema17": {
       "minItems": 1,
       "type": "array",
       "items": {
@@ -787,7 +1049,7 @@
         "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
       }
     },
-    "__schema13": {
+    "__schema18": {
       "type": "string",
       "enum": [
         "arcane_focus",
@@ -798,7 +1060,7 @@
       ],
       "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
     },
-    "__schema14": {
+    "__schema19": {
       "minItems": 1,
       "type": "array",
       "items": {
@@ -811,7 +1073,7 @@
         "description": "arcane_focus | druidic_focus | holy_symbol"
       }
     },
-    "__schema15": {
+    "__schema20": {
       "type": "string",
       "enum": [
         "arcane_focus",
@@ -820,7 +1082,7 @@
       ],
       "description": "arcane_focus | druidic_focus | holy_symbol"
     },
-    "__schema16": {
+    "__schema21": {
       "minItems": 1,
       "type": "array",
       "items": {
@@ -835,7 +1097,7 @@
         "description": "arcane_focus | druidic_focus | holy_symbol | spellbook | component_pouch"
       }
     },
-    "__schema17": {
+    "__schema22": {
       "type": "array",
       "items": {
         "type": "object",
@@ -851,7 +1113,7 @@
           "classLevel": {
             "allOf": [
               {
-                "$ref": "#/definitions/__schema5"
+                "$ref": "#/definitions/__schema10"
               }
             ]
           },
@@ -864,7 +1126,7 @@
             "minItems": 1,
             "type": "array",
             "items": {
-              "$ref": "#/definitions/__schema18"
+              "$ref": "#/definitions/__schema23"
             }
           }
         },
@@ -875,11 +1137,11 @@
         "additionalProperties": false
       }
     },
-    "__schema18": {
+    "__schema23": {
       "type": "string",
       "minLength": 1
     },
-    "__schema19": {
+    "__schema24": {
       "type": "string",
       "enum": [
         "light",
@@ -889,14 +1151,14 @@
       ],
       "description": "light | medium | heavy | shields"
     },
-    "__schema20": {
+    "__schema25": {
       "default": [],
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "__schema21": {
+    "__schema26": {
       "type": "string",
       "enum": [
         "simple",
@@ -904,7 +1166,7 @@
       ],
       "description": "simple | martial"
     },
-    "__schema22": {
+    "__schema27": {
       "type": "string",
       "enum": [
         "artisan",
@@ -916,31 +1178,31 @@
       ],
       "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
     },
-    "__schema23": {
+    "__schema28": {
       "type": "string",
       "minLength": 1
     },
-    "__schema24": {
+    "__schema29": {
       "type": "string",
       "minLength": 1
     },
-    "__schema25": {
+    "__schema30": {
       "type": "string"
     },
-    "__schema26": {
+    "__schema31": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema27"
+        "$ref": "#/definitions/__schema32"
       }
     },
-    "__schema27": {
+    "__schema32": {
       "type": "object",
       "properties": {
         "unlock": {
           "description": "When this group unlocks. Omit for the default group (granted when the trait or feature is first gained).",
           "allOf": [
             {
-              "$ref": "#/definitions/__schema28"
+              "$ref": "#/definitions/__schema33"
             }
           ]
         },
@@ -948,7 +1210,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema29"
+            "$ref": "#/definitions/__schema34"
           },
           "description": "Atomic grants that unlock together. At least one grant is required."
         }
@@ -958,11 +1220,11 @@
       ],
       "additionalProperties": false
     },
-    "__schema28": {
+    "__schema33": {
       "type": "object",
       "properties": {
         "level": {
-          "$ref": "#/definitions/__schema5"
+          "$ref": "#/definitions/__schema10"
         }
       },
       "required": [
@@ -970,13 +1232,13 @@
       ],
       "additionalProperties": false
     },
-    "__schema29": {
+    "__schema34": {
       "oneOf": [
         {
           "type": "object",
           "properties": {
             "type": {
-              "$ref": "#/definitions/__schema30"
+              "$ref": "#/definitions/__schema35"
             },
             "range": {
               "type": "integer",
@@ -1008,7 +1270,7 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "$ref": "#/definitions/__schema30"
+                "$ref": "#/definitions/__schema35"
               }
             }
           },
@@ -1030,7 +1292,7 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "$ref": "#/definitions/__schema30"
+                "$ref": "#/definitions/__schema35"
               }
             }
           },
@@ -1162,7 +1424,7 @@
                   ]
                 },
                 "condition": {
-                  "$ref": "#/definitions/__schema32"
+                  "$ref": "#/definitions/__schema37"
                 },
                 "kind": {
                   "type": "string",
@@ -1226,7 +1488,7 @@
                   ]
                 },
                 "condition": {
-                  "$ref": "#/definitions/__schema32"
+                  "$ref": "#/definitions/__schema37"
                 },
                 "kind": {
                   "type": "string",
@@ -1273,7 +1535,7 @@
                   "description": "walk | fly | swim | climb | burrow"
                 },
                 "condition": {
-                  "$ref": "#/definitions/__schema32"
+                  "$ref": "#/definitions/__schema37"
                 },
                 "kind": {
                   "type": "string",
@@ -1302,10 +1564,10 @@
             "grant": {
               "oneOf": [
                 {
-                  "$ref": "#/definitions/__schema33"
+                  "$ref": "#/definitions/__schema38"
                 },
                 {
-                  "$ref": "#/definitions/__schema37"
+                  "$ref": "#/definitions/__schema42"
                 }
               ],
               "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
@@ -1328,10 +1590,10 @@
             "grant": {
               "oneOf": [
                 {
-                  "$ref": "#/definitions/__schema43"
+                  "$ref": "#/definitions/__schema48"
                 },
                 {
-                  "$ref": "#/definitions/__schema47"
+                  "$ref": "#/definitions/__schema52"
                 }
               ],
               "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
@@ -1354,10 +1616,10 @@
             "grant": {
               "oneOf": [
                 {
-                  "$ref": "#/definitions/__schema56"
+                  "$ref": "#/definitions/__schema61"
                 },
                 {
-                  "$ref": "#/definitions/__schema57"
+                  "$ref": "#/definitions/__schema62"
                 }
               ],
               "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
@@ -1380,10 +1642,10 @@
             "grant": {
               "oneOf": [
                 {
-                  "$ref": "#/definitions/__schema60"
+                  "$ref": "#/definitions/__schema65"
                 },
                 {
-                  "$ref": "#/definitions/__schema64"
+                  "$ref": "#/definitions/__schema69"
                 }
               ],
               "markdownDescription": "Branch on **kind**: **fixed** | **choice**"
@@ -1407,7 +1669,7 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "$ref": "#/definitions/__schema30"
+                "$ref": "#/definitions/__schema35"
               }
             }
           },
@@ -1426,13 +1688,13 @@
               "description": "languageChoice"
             },
             "choose": {
-              "$ref": "#/definitions/__schema69"
+              "$ref": "#/definitions/__schema74"
             },
             "from": {
-              "$ref": "#/definitions/__schema70"
+              "$ref": "#/definitions/__schema75"
             },
             "categories": {
-              "$ref": "#/definitions/__schema71"
+              "$ref": "#/definitions/__schema76"
             }
           },
           "required": [
@@ -1460,16 +1722,16 @@
               "description": "origin | general | fighting-style | epic-boon"
             },
             "choose": {
-              "$ref": "#/definitions/__schema75"
+              "$ref": "#/definitions/__schema80"
             },
             "allowAnyQualifying": {
-              "$ref": "#/definitions/__schema76"
+              "$ref": "#/definitions/__schema81"
             },
             "replaceable": {
-              "$ref": "#/definitions/__schema77"
+              "$ref": "#/definitions/__schema82"
             },
             "recommendedFeatIds": {
-              "$ref": "#/definitions/__schema78"
+              "$ref": "#/definitions/__schema83"
             }
           },
           "required": [
@@ -1490,10 +1752,10 @@
             "grant": {
               "oneOf": [
                 {
-                  "$ref": "#/definitions/__schema79"
+                  "$ref": "#/definitions/__schema84"
                 },
                 {
-                  "$ref": "#/definitions/__schema81"
+                  "$ref": "#/definitions/__schema86"
                 }
               ],
               "markdownDescription": "Branch on **kind**: **grant** | **choice**"
@@ -1526,7 +1788,7 @@
               "description": "str | dex | con | int | wis | cha"
             },
             "spellIds": {
-              "$ref": "#/definitions/__schema98"
+              "$ref": "#/definitions/__schema103"
             },
             "availability": {
               "type": "string",
@@ -1536,7 +1798,7 @@
               "description": "always_prepared"
             },
             "casting": {
-              "$ref": "#/definitions/__schema101"
+              "$ref": "#/definitions/__schema106"
             }
           },
           "required": [
@@ -1562,11 +1824,11 @@
         }
       ]
     },
-    "__schema30": {
+    "__schema35": {
       "type": "string",
       "pattern": "^[a-z0-9]+(?:[-_][a-z0-9]+)*$"
     },
-    "__schema31": {
+    "__schema36": {
       "type": "string",
       "enum": [
         "walk",
@@ -1577,11 +1839,11 @@
       ],
       "description": "walk | fly | swim | climb | burrow"
     },
-    "__schema32": {
+    "__schema37": {
       "type": "string",
       "minLength": 1
     },
-    "__schema33": {
+    "__schema38": {
       "type": "object",
       "properties": {
         "kind": {
@@ -1590,10 +1852,10 @@
           "description": "fixed"
         },
         "weaponSlugs": {
-          "$ref": "#/definitions/__schema35"
+          "$ref": "#/definitions/__schema40"
         },
         "weaponCategories": {
-          "$ref": "#/definitions/__schema36"
+          "$ref": "#/definitions/__schema41"
         }
       },
       "required": [
@@ -1601,19 +1863,19 @@
       ],
       "additionalProperties": false
     },
-    "__schema34": {
+    "__schema39": {
       "type": "string",
       "const": "fixed",
       "description": "fixed"
     },
-    "__schema35": {
+    "__schema40": {
       "type": "array",
       "items": {
         "type": "string",
         "minLength": 1
       }
     },
-    "__schema36": {
+    "__schema41": {
       "type": "array",
       "items": {
         "type": "string",
@@ -1624,14 +1886,14 @@
         "description": "simple | martial"
       }
     },
-    "__schema37": {
+    "__schema42": {
       "type": "object",
       "properties": {
         "choose": {
-          "$ref": "#/definitions/__schema38"
+          "$ref": "#/definitions/__schema43"
         },
         "description": {
-          "$ref": "#/definitions/__schema39"
+          "$ref": "#/definitions/__schema44"
         },
         "kind": {
           "type": "string",
@@ -1641,10 +1903,10 @@
         "pool": {
           "oneOf": [
             {
-              "$ref": "#/definitions/__schema40"
+              "$ref": "#/definitions/__schema45"
             },
             {
-              "$ref": "#/definitions/__schema42"
+              "$ref": "#/definitions/__schema47"
             }
           ],
           "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
@@ -1657,16 +1919,16 @@
       ],
       "additionalProperties": false
     },
-    "__schema38": {
+    "__schema43": {
       "default": 1,
       "type": "integer",
       "minimum": 1,
       "maximum": 9007199254740991
     },
-    "__schema39": {
+    "__schema44": {
       "type": "string"
     },
-    "__schema40": {
+    "__schema45": {
       "type": "object",
       "properties": {
         "source": {
@@ -1678,7 +1940,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema41"
+            "$ref": "#/definitions/__schema46"
           }
         }
       },
@@ -1688,11 +1950,11 @@
       ],
       "additionalProperties": false
     },
-    "__schema41": {
+    "__schema46": {
       "type": "string",
       "minLength": 1
     },
-    "__schema42": {
+    "__schema47": {
       "type": "object",
       "properties": {
         "source": {
@@ -1718,7 +1980,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema43": {
+    "__schema48": {
       "type": "object",
       "properties": {
         "kind": {
@@ -1727,10 +1989,10 @@
           "description": "fixed"
         },
         "toolSlugs": {
-          "$ref": "#/definitions/__schema45"
+          "$ref": "#/definitions/__schema50"
         },
         "toolCategories": {
-          "$ref": "#/definitions/__schema46"
+          "$ref": "#/definitions/__schema51"
         }
       },
       "required": [
@@ -1738,19 +2000,19 @@
       ],
       "additionalProperties": false
     },
-    "__schema44": {
+    "__schema49": {
       "type": "string",
       "const": "fixed",
       "description": "fixed"
     },
-    "__schema45": {
+    "__schema50": {
       "type": "array",
       "items": {
         "type": "string",
         "minLength": 1
       }
     },
-    "__schema46": {
+    "__schema51": {
       "type": "array",
       "items": {
         "type": "string",
@@ -1765,14 +2027,14 @@
         "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
       }
     },
-    "__schema47": {
+    "__schema52": {
       "type": "object",
       "properties": {
         "choose": {
-          "$ref": "#/definitions/__schema38"
+          "$ref": "#/definitions/__schema43"
         },
         "description": {
-          "$ref": "#/definitions/__schema39"
+          "$ref": "#/definitions/__schema44"
         },
         "kind": {
           "type": "string",
@@ -1780,7 +2042,7 @@
           "description": "choice"
         },
         "pool": {
-          "$ref": "#/definitions/__schema48"
+          "$ref": "#/definitions/__schema53"
         }
       },
       "required": [
@@ -1790,21 +2052,21 @@
       ],
       "additionalProperties": false
     },
-    "__schema48": {
+    "__schema53": {
       "oneOf": [
         {
-          "$ref": "#/definitions/__schema49"
+          "$ref": "#/definitions/__schema54"
         },
         {
-          "$ref": "#/definitions/__schema51"
+          "$ref": "#/definitions/__schema56"
         },
         {
-          "$ref": "#/definitions/__schema55"
+          "$ref": "#/definitions/__schema60"
         }
       ],
       "markdownDescription": "Branch on **source**: **explicit** | **filtered** | **any**"
     },
-    "__schema49": {
+    "__schema54": {
       "type": "object",
       "properties": {
         "source": {
@@ -1816,7 +2078,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema50"
+            "$ref": "#/definitions/__schema55"
           }
         }
       },
@@ -1826,11 +2088,11 @@
       ],
       "additionalProperties": false
     },
-    "__schema50": {
+    "__schema55": {
       "type": "string",
       "minLength": 1
     },
-    "__schema51": {
+    "__schema56": {
       "type": "object",
       "properties": {
         "source": {
@@ -1839,10 +2101,10 @@
           "description": "filtered"
         },
         "toolCategories": {
-          "$ref": "#/definitions/__schema53"
+          "$ref": "#/definitions/__schema58"
         },
         "toolSlugs": {
-          "$ref": "#/definitions/__schema54"
+          "$ref": "#/definitions/__schema59"
         }
       },
       "required": [
@@ -1850,12 +2112,12 @@
       ],
       "additionalProperties": false
     },
-    "__schema52": {
+    "__schema57": {
       "type": "string",
       "const": "filtered",
       "description": "filtered"
     },
-    "__schema53": {
+    "__schema58": {
       "type": "array",
       "items": {
         "type": "string",
@@ -1870,14 +2132,14 @@
         "description": "artisan | gaming_set | musical_instrument | navigator | thieves | other"
       }
     },
-    "__schema54": {
+    "__schema59": {
       "type": "array",
       "items": {
         "type": "string",
         "minLength": 1
       }
     },
-    "__schema55": {
+    "__schema60": {
       "type": "object",
       "properties": {
         "source": {
@@ -1891,7 +2153,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema56": {
+    "__schema61": {
       "type": "object",
       "properties": {
         "kind": {
@@ -1913,14 +2175,14 @@
       ],
       "additionalProperties": false
     },
-    "__schema57": {
+    "__schema62": {
       "type": "object",
       "properties": {
         "choose": {
-          "$ref": "#/definitions/__schema38"
+          "$ref": "#/definitions/__schema43"
         },
         "description": {
-          "$ref": "#/definitions/__schema39"
+          "$ref": "#/definitions/__schema44"
         },
         "kind": {
           "type": "string",
@@ -1930,10 +2192,10 @@
         "pool": {
           "oneOf": [
             {
-              "$ref": "#/definitions/__schema58"
+              "$ref": "#/definitions/__schema63"
             },
             {
-              "$ref": "#/definitions/__schema59"
+              "$ref": "#/definitions/__schema64"
             }
           ],
           "markdownDescription": "Branch on **source**: **explicit** | **any**"
@@ -1946,7 +2208,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema58": {
+    "__schema63": {
       "type": "object",
       "properties": {
         "source": {
@@ -1968,7 +2230,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema59": {
+    "__schema64": {
       "type": "object",
       "properties": {
         "source": {
@@ -1982,7 +2244,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema60": {
+    "__schema65": {
       "type": "object",
       "properties": {
         "kind": {
@@ -1991,10 +2253,10 @@
           "description": "fixed"
         },
         "armorSlugs": {
-          "$ref": "#/definitions/__schema62"
+          "$ref": "#/definitions/__schema67"
         },
         "armorCategories": {
-          "$ref": "#/definitions/__schema63"
+          "$ref": "#/definitions/__schema68"
         }
       },
       "required": [
@@ -2002,19 +2264,19 @@
       ],
       "additionalProperties": false
     },
-    "__schema61": {
+    "__schema66": {
       "type": "string",
       "const": "fixed",
       "description": "fixed"
     },
-    "__schema62": {
+    "__schema67": {
       "type": "array",
       "items": {
         "type": "string",
         "minLength": 1
       }
     },
-    "__schema63": {
+    "__schema68": {
       "type": "array",
       "items": {
         "type": "string",
@@ -2027,14 +2289,14 @@
         "description": "light | medium | heavy | shields"
       }
     },
-    "__schema64": {
+    "__schema69": {
       "type": "object",
       "properties": {
         "choose": {
-          "$ref": "#/definitions/__schema38"
+          "$ref": "#/definitions/__schema43"
         },
         "description": {
-          "$ref": "#/definitions/__schema39"
+          "$ref": "#/definitions/__schema44"
         },
         "kind": {
           "type": "string",
@@ -2044,10 +2306,10 @@
         "pool": {
           "oneOf": [
             {
-              "$ref": "#/definitions/__schema65"
+              "$ref": "#/definitions/__schema70"
             },
             {
-              "$ref": "#/definitions/__schema67"
+              "$ref": "#/definitions/__schema72"
             }
           ],
           "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
@@ -2060,7 +2322,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema65": {
+    "__schema70": {
       "type": "object",
       "properties": {
         "source": {
@@ -2072,7 +2334,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema66"
+            "$ref": "#/definitions/__schema71"
           }
         }
       },
@@ -2082,11 +2344,11 @@
       ],
       "additionalProperties": false
     },
-    "__schema66": {
+    "__schema71": {
       "type": "string",
       "minLength": 1
     },
-    "__schema67": {
+    "__schema72": {
       "type": "object",
       "properties": {
         "source": {
@@ -2114,25 +2376,25 @@
       ],
       "additionalProperties": false
     },
-    "__schema68": {
+    "__schema73": {
       "type": "string",
       "const": "languageChoice",
       "description": "languageChoice"
     },
-    "__schema69": {
+    "__schema74": {
       "default": 1,
       "type": "integer",
       "minimum": 1,
       "maximum": 9007199254740991
     },
-    "__schema70": {
+    "__schema75": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema30"
+        "$ref": "#/definitions/__schema35"
       }
     },
-    "__schema71": {
+    "__schema76": {
       "minItems": 1,
       "type": "array",
       "items": {
@@ -2144,7 +2406,7 @@
         "description": "standard | rare"
       }
     },
-    "__schema72": {
+    "__schema77": {
       "type": "string",
       "enum": [
         "standard",
@@ -2152,12 +2414,12 @@
       ],
       "description": "standard | rare"
     },
-    "__schema73": {
+    "__schema78": {
       "type": "string",
       "const": "featChoice",
       "description": "featChoice"
     },
-    "__schema74": {
+    "__schema79": {
       "type": "string",
       "enum": [
         "origin",
@@ -2167,26 +2429,26 @@
       ],
       "description": "origin | general | fighting-style | epic-boon"
     },
-    "__schema75": {
+    "__schema80": {
       "default": 1,
       "type": "integer",
       "minimum": 1,
       "maximum": 9007199254740991
     },
-    "__schema76": {
+    "__schema81": {
       "type": "boolean"
     },
-    "__schema77": {
+    "__schema82": {
       "type": "boolean"
     },
-    "__schema78": {
+    "__schema83": {
       "type": "array",
       "items": {
         "type": "string",
         "minLength": 1
       }
     },
-    "__schema79": {
+    "__schema84": {
       "type": "object",
       "properties": {
         "kind": {
@@ -2210,7 +2472,7 @@
         "modifiers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema80"
+            "$ref": "#/definitions/__schema85"
           }
         }
       },
@@ -2221,7 +2483,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema80": {
+    "__schema85": {
       "oneOf": [
         {
           "type": "object",
@@ -2249,14 +2511,14 @@
         }
       ]
     },
-    "__schema81": {
+    "__schema86": {
       "type": "object",
       "properties": {
         "choose": {
-          "$ref": "#/definitions/__schema38"
+          "$ref": "#/definitions/__schema43"
         },
         "description": {
-          "$ref": "#/definitions/__schema39"
+          "$ref": "#/definitions/__schema44"
         },
         "kind": {
           "type": "string",
@@ -2264,7 +2526,7 @@
           "description": "choice"
         },
         "pool": {
-          "$ref": "#/definitions/__schema82"
+          "$ref": "#/definitions/__schema87"
         }
       },
       "required": [
@@ -2274,18 +2536,18 @@
       ],
       "additionalProperties": false
     },
-    "__schema82": {
+    "__schema87": {
       "oneOf": [
         {
-          "$ref": "#/definitions/__schema83"
+          "$ref": "#/definitions/__schema88"
         },
         {
-          "$ref": "#/definitions/__schema85"
+          "$ref": "#/definitions/__schema90"
         }
       ],
       "markdownDescription": "Branch on **source**: **explicit** | **filtered**"
     },
-    "__schema83": {
+    "__schema88": {
       "type": "object",
       "properties": {
         "source": {
@@ -2297,7 +2559,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema84"
+            "$ref": "#/definitions/__schema89"
           }
         }
       },
@@ -2307,11 +2569,11 @@
       ],
       "additionalProperties": false
     },
-    "__schema84": {
+    "__schema89": {
       "type": "string",
       "minLength": 1
     },
-    "__schema85": {
+    "__schema90": {
       "type": "object",
       "properties": {
         "source": {
@@ -2334,13 +2596,13 @@
           "description": "weapon | armor | adventuring_gear | tool | mount | vehicle | service | magic_item"
         },
         "toolCategory": {
-          "$ref": "#/definitions/__schema88"
+          "$ref": "#/definitions/__schema93"
         },
         "weaponCategory": {
-          "$ref": "#/definitions/__schema89"
+          "$ref": "#/definitions/__schema94"
         },
         "armorCategory": {
-          "$ref": "#/definitions/__schema90"
+          "$ref": "#/definitions/__schema95"
         },
         "gearKind": {
           "type": "string",
@@ -2355,7 +2617,7 @@
           "description": "general | ammunition | book | spellcasting | container | consumable"
         },
         "spellcastingGearKind": {
-          "$ref": "#/definitions/__schema92"
+          "$ref": "#/definitions/__schema97"
         },
         "magicItemCategory": {
           "type": "string",
@@ -2418,12 +2680,12 @@
       ],
       "additionalProperties": false
     },
-    "__schema86": {
+    "__schema91": {
       "type": "string",
       "const": "filtered",
       "description": "filtered"
     },
-    "__schema87": {
+    "__schema92": {
       "type": "string",
       "enum": [
         "weapon",
@@ -2437,7 +2699,7 @@
       ],
       "description": "weapon | armor | adventuring_gear | tool | mount | vehicle | service | magic_item"
     },
-    "__schema88": {
+    "__schema93": {
       "allOf": [
         {
           "type": "string",
@@ -2453,7 +2715,7 @@
         }
       ]
     },
-    "__schema89": {
+    "__schema94": {
       "allOf": [
         {
           "type": "string",
@@ -2465,7 +2727,7 @@
         }
       ]
     },
-    "__schema90": {
+    "__schema95": {
       "allOf": [
         {
           "type": "string",
@@ -2479,7 +2741,7 @@
         }
       ]
     },
-    "__schema91": {
+    "__schema96": {
       "type": "string",
       "enum": [
         "general",
@@ -2491,7 +2753,7 @@
       ],
       "description": "general | ammunition | book | spellcasting | container | consumable"
     },
-    "__schema92": {
+    "__schema97": {
       "allOf": [
         {
           "type": "string",
@@ -2506,7 +2768,7 @@
         }
       ]
     },
-    "__schema93": {
+    "__schema98": {
       "type": "string",
       "enum": [
         "weapon",
@@ -2522,7 +2784,7 @@
       ],
       "description": "weapon | armor | wondrous_item | potion | ring | rod | scroll | staff | wand | other"
     },
-    "__schema94": {
+    "__schema99": {
       "type": "string",
       "enum": [
         "common",
@@ -2534,7 +2796,7 @@
       ],
       "description": "common | uncommon | rare | very_rare | legendary | artifact"
     },
-    "__schema95": {
+    "__schema100": {
       "type": "string",
       "enum": [
         "land",
@@ -2545,7 +2807,7 @@
       ],
       "description": "land | water | air | space | other"
     },
-    "__schema96": {
+    "__schema101": {
       "type": "string",
       "enum": [
         "hireling",
@@ -2560,30 +2822,30 @@
       ],
       "description": "hireling | lodging | meal | travel | transport | stable | spellcasting | lifestyle | other"
     },
-    "__schema97": {
+    "__schema102": {
       "type": "string",
       "const": "spells",
       "description": "spells"
     },
-    "__schema98": {
+    "__schema103": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema99"
+        "$ref": "#/definitions/__schema104"
       }
     },
-    "__schema99": {
+    "__schema104": {
       "type": "string",
       "minLength": 1
     },
-    "__schema100": {
+    "__schema105": {
       "type": "string",
       "enum": [
         "always_prepared"
       ],
       "description": "always_prepared"
     },
-    "__schema101": {
+    "__schema106": {
       "type": "object",
       "properties": {
         "mode": {
@@ -2610,25 +2872,25 @@
       ],
       "additionalProperties": false
     },
-    "__schema102": {
+    "__schema107": {
       "type": "string",
       "minLength": 1
     },
-    "__schema103": {
+    "__schema108": {
       "type": "string",
       "enum": [
         "levelProgression"
       ],
       "description": "levelProgression"
     },
-    "__schema104": {
+    "__schema109": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema105"
+        "$ref": "#/definitions/__schema110"
       }
     },
-    "__schema105": {
+    "__schema110": {
       "oneOf": [
         {
           "type": "object",
@@ -2637,7 +2899,7 @@
               "$ref": "#/definitions/__schema0"
             },
             "label": {
-              "$ref": "#/definitions/__schema106"
+              "$ref": "#/definitions/__schema111"
             },
             "valueType": {
               "type": "string",
@@ -2653,7 +2915,7 @@
               "description": "plain | signed"
             },
             "entries": {
-              "$ref": "#/definitions/__schema109"
+              "$ref": "#/definitions/__schema114"
             }
           },
           "required": [
@@ -2671,7 +2933,7 @@
               "$ref": "#/definitions/__schema0"
             },
             "label": {
-              "$ref": "#/definitions/__schema111"
+              "$ref": "#/definitions/__schema116"
             },
             "valueType": {
               "type": "string",
@@ -2679,7 +2941,7 @@
               "description": "dice"
             },
             "entries": {
-              "$ref": "#/definitions/__schema113"
+              "$ref": "#/definitions/__schema118"
             }
           },
           "required": [
@@ -2697,7 +2959,7 @@
               "$ref": "#/definitions/__schema0"
             },
             "label": {
-              "$ref": "#/definitions/__schema115"
+              "$ref": "#/definitions/__schema120"
             },
             "valueType": {
               "type": "string",
@@ -2705,7 +2967,7 @@
               "description": "text"
             },
             "entries": {
-              "$ref": "#/definitions/__schema117"
+              "$ref": "#/definitions/__schema122"
             }
           },
           "required": [
@@ -2718,16 +2980,16 @@
         }
       ]
     },
-    "__schema106": {
+    "__schema111": {
       "type": "string",
       "minLength": 1
     },
-    "__schema107": {
+    "__schema112": {
       "type": "string",
       "const": "number",
       "description": "number"
     },
-    "__schema108": {
+    "__schema113": {
       "type": "string",
       "enum": [
         "plain",
@@ -2735,18 +2997,18 @@
       ],
       "description": "plain | signed"
     },
-    "__schema109": {
+    "__schema114": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema110"
+        "$ref": "#/definitions/__schema115"
       }
     },
-    "__schema110": {
+    "__schema115": {
       "type": "object",
       "properties": {
         "level": {
-          "$ref": "#/definitions/__schema5"
+          "$ref": "#/definitions/__schema10"
         },
         "value": {
           "type": "number"
@@ -2758,27 +3020,27 @@
       ],
       "additionalProperties": false
     },
-    "__schema111": {
+    "__schema116": {
       "type": "string",
       "minLength": 1
     },
-    "__schema112": {
+    "__schema117": {
       "type": "string",
       "const": "dice",
       "description": "dice"
     },
-    "__schema113": {
+    "__schema118": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema114"
+        "$ref": "#/definitions/__schema119"
       }
     },
-    "__schema114": {
+    "__schema119": {
       "type": "object",
       "properties": {
         "level": {
-          "$ref": "#/definitions/__schema5"
+          "$ref": "#/definitions/__schema10"
         },
         "value": {
           "type": "object",
@@ -2834,27 +3096,27 @@
       ],
       "additionalProperties": false
     },
-    "__schema115": {
+    "__schema120": {
       "type": "string",
       "minLength": 1
     },
-    "__schema116": {
+    "__schema121": {
       "type": "string",
       "const": "text",
       "description": "text"
     },
-    "__schema117": {
+    "__schema122": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema118"
+        "$ref": "#/definitions/__schema123"
       }
     },
-    "__schema118": {
+    "__schema123": {
       "type": "object",
       "properties": {
         "level": {
-          "$ref": "#/definitions/__schema5"
+          "$ref": "#/definitions/__schema10"
         },
         "value": {
           "type": "string",
@@ -2867,25 +3129,25 @@
       ],
       "additionalProperties": false
     },
-    "__schema119": {
+    "__schema124": {
       "type": "string",
       "minLength": 1
     },
-    "__schema120": {
+    "__schema125": {
       "type": "string",
       "enum": [
         "general"
       ],
       "description": "general"
     },
-    "__schema121": {
+    "__schema126": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema122"
+        "$ref": "#/definitions/__schema127"
       }
     },
-    "__schema122": {
+    "__schema127": {
       "oneOf": [
         {
           "type": "object",
@@ -2894,7 +3156,7 @@
               "$ref": "#/definitions/__schema0"
             },
             "label": {
-              "$ref": "#/definitions/__schema106"
+              "$ref": "#/definitions/__schema111"
             },
             "valueType": {
               "type": "string",
@@ -2924,7 +3186,7 @@
               "$ref": "#/definitions/__schema0"
             },
             "label": {
-              "$ref": "#/definitions/__schema111"
+              "$ref": "#/definitions/__schema116"
             },
             "valueType": {
               "type": "string",
@@ -2946,7 +3208,7 @@
               "$ref": "#/definitions/__schema0"
             },
             "label": {
-              "$ref": "#/definitions/__schema115"
+              "$ref": "#/definitions/__schema120"
             },
             "valueType": {
               "type": "string",
@@ -2963,14 +3225,14 @@
         }
       ]
     },
-    "__schema123": {
+    "__schema128": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema124"
+        "$ref": "#/definitions/__schema129"
       }
     },
-    "__schema124": {
+    "__schema129": {
       "type": "object",
       "properties": {
         "id": {
@@ -2990,17 +3252,17 @@
       ],
       "additionalProperties": false
     },
-    "__schema125": {
+    "__schema130": {
       "type": "boolean"
     },
-    "__schema126": {
+    "__schema131": {
       "type": "object",
       "properties": {
         "choose": {
-          "$ref": "#/definitions/__schema127"
+          "$ref": "#/definitions/__schema132"
         },
         "options": {
-          "$ref": "#/definitions/__schema128"
+          "$ref": "#/definitions/__schema133"
         }
       },
       "required": [
@@ -3009,39 +3271,39 @@
       ],
       "additionalProperties": false
     },
-    "__schema127": {
+    "__schema132": {
       "default": 1,
       "type": "integer",
       "minimum": 1,
       "maximum": 9007199254740991
     },
-    "__schema128": {
+    "__schema133": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema129"
+        "$ref": "#/definitions/__schema134"
       }
     },
-    "__schema129": {
+    "__schema134": {
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/__schema130"
+          "$ref": "#/definitions/__schema135"
         },
         "label": {
-          "$ref": "#/definitions/__schema131"
+          "$ref": "#/definitions/__schema136"
         },
         "description": {
-          "$ref": "#/definitions/__schema132"
+          "$ref": "#/definitions/__schema137"
         },
         "items": {
-          "$ref": "#/definitions/__schema133"
+          "$ref": "#/definitions/__schema138"
         },
         "wealth": {
-          "$ref": "#/definitions/__schema139"
+          "$ref": "#/definitions/__schema144"
         },
         "available": {
-          "$ref": "#/definitions/__schema140"
+          "$ref": "#/definitions/__schema145"
         }
       },
       "required": [
@@ -3051,18 +3313,18 @@
       ],
       "additionalProperties": false
     },
-    "__schema130": {
+    "__schema135": {
       "type": "string",
       "minLength": 1
     },
-    "__schema131": {
+    "__schema136": {
       "type": "string",
       "minLength": 1
     },
-    "__schema132": {
+    "__schema137": {
       "type": "string"
     },
-    "__schema133": {
+    "__schema138": {
       "type": "array",
       "items": {
         "oneOf": [
@@ -3075,16 +3337,16 @@
                 "description": "grant"
               },
               "target": {
-                "$ref": "#/definitions/__schema135"
+                "$ref": "#/definitions/__schema140"
               },
               "quantity": {
-                "$ref": "#/definitions/__schema136"
+                "$ref": "#/definitions/__schema141"
               },
               "equipped": {
-                "$ref": "#/definitions/__schema137"
+                "$ref": "#/definitions/__schema142"
               },
               "modifiers": {
-                "$ref": "#/definitions/__schema138"
+                "$ref": "#/definitions/__schema143"
               }
             },
             "required": [
@@ -3095,17 +3357,17 @@
             "additionalProperties": false
           },
           {
-            "$ref": "#/definitions/__schema81"
+            "$ref": "#/definitions/__schema86"
           }
         ]
       }
     },
-    "__schema134": {
+    "__schema139": {
       "type": "string",
       "const": "grant",
       "description": "grant"
     },
-    "__schema135": {
+    "__schema140": {
       "oneOf": [
         {
           "type": "object",
@@ -3147,22 +3409,22 @@
         }
       ]
     },
-    "__schema136": {
+    "__schema141": {
       "default": 1,
       "type": "integer",
       "minimum": 1,
       "maximum": 9007199254740991
     },
-    "__schema137": {
+    "__schema142": {
       "type": "boolean"
     },
-    "__schema138": {
+    "__schema143": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema80"
+        "$ref": "#/definitions/__schema85"
       }
     },
-    "__schema139": {
+    "__schema144": {
       "type": "object",
       "properties": {
         "cp": {
@@ -3188,17 +3450,17 @@
       },
       "additionalProperties": false
     },
-    "__schema140": {
+    "__schema145": {
       "type": "boolean"
     },
-    "__schema141": {
+    "__schema146": {
       "type": "object",
       "properties": {
         "skills": {
           "type": "object",
           "properties": {
             "choices": {
-              "$ref": "#/definitions/__schema142"
+              "$ref": "#/definitions/__schema147"
             }
           },
           "required": [
@@ -3210,7 +3472,7 @@
           "type": "object",
           "properties": {
             "choices": {
-              "$ref": "#/definitions/__schema147"
+              "$ref": "#/definitions/__schema152"
             }
           },
           "required": [
@@ -3221,24 +3483,24 @@
       },
       "additionalProperties": false
     },
-    "__schema142": {
+    "__schema147": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema143"
+        "$ref": "#/definitions/__schema148"
       }
     },
-    "__schema143": {
+    "__schema148": {
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/__schema144"
+          "$ref": "#/definitions/__schema149"
         },
         "label": {
-          "$ref": "#/definitions/__schema145"
+          "$ref": "#/definitions/__schema150"
         },
         "choose": {
-          "$ref": "#/definitions/__schema146"
+          "$ref": "#/definitions/__schema151"
         },
         "from": {
           "default": [],
@@ -3255,41 +3517,41 @@
       ],
       "additionalProperties": false
     },
-    "__schema144": {
+    "__schema149": {
       "type": "string",
       "minLength": 1
     },
-    "__schema145": {
+    "__schema150": {
       "type": "string"
     },
-    "__schema146": {
+    "__schema151": {
       "type": "integer",
       "minimum": 0,
       "maximum": 9007199254740991
     },
-    "__schema147": {
+    "__schema152": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema148"
+        "$ref": "#/definitions/__schema153"
       }
     },
-    "__schema148": {
+    "__schema153": {
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/__schema144"
+          "$ref": "#/definitions/__schema149"
         },
         "label": {
-          "$ref": "#/definitions/__schema145"
+          "$ref": "#/definitions/__schema150"
         },
         "choose": {
-          "$ref": "#/definitions/__schema146"
+          "$ref": "#/definitions/__schema151"
         },
         "pool": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema48"
+              "$ref": "#/definitions/__schema53"
             }
           ]
         },
@@ -3306,29 +3568,29 @@
       ],
       "additionalProperties": false
     },
-    "__schema149": {
+    "__schema154": {
       "type": "object",
       "properties": {
         "essential": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema150"
+            "$ref": "#/definitions/__schema155"
           }
         },
         "strong": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema150"
+            "$ref": "#/definitions/__schema155"
           }
         }
       },
       "additionalProperties": false
     },
-    "__schema150": {
+    "__schema155": {
       "type": "object",
       "properties": {
         "match": {
-          "$ref": "#/definitions/__schema82"
+          "$ref": "#/definitions/__schema87"
         },
         "tag": {
           "type": "string",
@@ -3337,7 +3599,7 @@
         "minLevel": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema5"
+              "$ref": "#/definitions/__schema10"
             }
           ]
         },
@@ -3351,7 +3613,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema151": {
+    "__schema156": {
       "minItems": 6,
       "maxItems": 6,
       "type": "array",

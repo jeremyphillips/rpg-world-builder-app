@@ -70,6 +70,25 @@ export const LeadingIcons: Story = {
   },
 }
 
+export const CompactSize: Story = {
+  args: {
+    'aria-label': 'Presentation',
+    value: 'primary',
+    segmentWidth: 'auto',
+    size: 'sm',
+    options: [
+      { value: 'primary', label: 'Primary' },
+      { value: 'banner', label: 'Banner' },
+      { value: 'portrait', label: 'Portrait' },
+    ],
+    onValueChange: () => undefined,
+  },
+  render: (args) => {
+    const [value, setValue] = useState(args.value)
+    return <SegmentedControl {...args} value={value} onValueChange={(next) => setValue(next)} />
+  },
+}
+
 export const TwoSegments: Story = {
   args: {
     'aria-label': 'Spell picker mode',

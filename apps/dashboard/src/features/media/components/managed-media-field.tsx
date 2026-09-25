@@ -1,0 +1,173 @@
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
+import {
+  emptyContentMediaSchema,
+  getAvailableContentImages,
+  getContentMediaPolicy,
+  resolveEffectiveRepresentativeImageId,
+  type MediaAsset,
+  type MediaScope,
+} from '@rpg/contracts'
+import { CollectionAddControl, MediaFieldSummary, resolveExpandedCapacityHint } from '@rpg/ui'
+import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
+
+import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '../lib/media-display'
+import { resolveMediaFieldCapacity, type MediaFieldConfig } from '../lib/media-field-config'
+import type { MediaManagerContentContext } from '../lib/media-manager.types'
+import { MediaManager } from './media-manager'
+
+const MEDIA_FIELD_ADD_IMAGES_LABEL = 'Add images'
+const MEDIA_FIELD_MANAGE_LABEL = 'Manage'
+
+export type ManagedMediaFieldProps = {
+  config: MediaFieldConfig
+  scope: MediaScope
+  name?: string
+  label?: string
+  contentContext?: MediaManagerContentContext
+  /** Opens the manager once on mount — used for deep links from failed banner upload alerts. */
+  initialOpen?: boolean
+}
+
+/** RHF-aware dashboard adapter around the API-free UI summary primitive. */
+export function ManagedMediaField({
+  config,
+  scope,
+  name = 'media',
+  label = 'Images',
+  contentContext,
+  initialOpen = false,
+}: ManagedMediaFieldProps) {
+  const headingId = useId()
+  const { density } = useFormSectionContext()
+  const { size } = resolveFormDensity(density)
+  const form = useFormContext<FieldValues>()
+  const watched = useWatch({ control: form.control, name })
+  const media = watched ?? emptyContentMediaSchema
+  const [open, setOpen] = useState(initialOpen)
+  const handledInitialOpenRef = useRef(false)
+
+  useEffect(() => {
+    if (!initialOpen || handledInitialOpenRef.current) return
+    handledInitialOpenRef.current = true
+    setOpen(true)
+  }, [initialOpen])
+  const [selectedId, setSelectedId] = useState<string | undefined>()
+  const [assets, setAssets] = useState<MediaAsset[]>([])
+  const policy = getContentMediaPolicy(config.domain)
+  const availableImages = useMemo(
+    () =>
+      contentContext
+        ? getAvailableContentImages({
+            media,
+            contentType: contentContext.contentType,
+            slug: contentContext.slug,
+            contentSource: contentContext.contentSource,
+            rulesetId: contentContext.rulesetId,
+          })
+        : [],
+    [contentContext, media],
+  )
+  const systemImage = availableImages.find((image) => image.kind === 'system')
+  const representativeId = resolveEffectiveRepresentativeImageId(
+    media,
+    policy.representativeRoles,
+    availableImages,
+  )
+  const maxItems = resolveMediaFieldCapacity(config)
+  const items = [
+    ...media.images.map((image: { id: string; assetId: string; alt?: string }) => ({
+      id: image.id,
+      alt: image.alt,
+      src: mediaImageUrl(image.assetId, 'gallery-thumbnail', MEDIA_SOURCE_CROP),
+    })),
+    ...(systemImage
+      ? [
+          {
+            id: systemImage.id,
+            alt: `System ${systemImage.source.slug}`,
+            src: systemContentImageUrl(systemImage.srcPath),
+          },
+        ]
+      : []),
+  ]
+  const galleryCount = items.length
+  const attachmentCount = media.images.length
+  const onOpen = (imageId?: string) => {
+    setSelectedId(imageId)
+    setOpen(true)
+  }
+  const isExpanded = config.presentation.layout === 'expanded'
+
+  return (
+    <>
+      {isExpanded ? (
+        <div className="space-y-3" role="group" aria-labelledby={headingId}>
+          <ArrayLikeSectionHeader
+            wrapper="none"
+            id={headingId}
+            label={label}
+            size={size}
+            hint={
+              galleryCount > 0 ? resolveExpandedCapacityHint(attachmentCount, maxItems) : undefined
+            }
+            action={
+              <CollectionAddControl
+                label={
+                  attachmentCount > 0 || systemImage
+                    ? MEDIA_FIELD_MANAGE_LABEL
+                    : MEDIA_FIELD_ADD_IMAGES_LABEL
+                }
+                enabled
+                showIcon={attachmentCount === 0 && !systemImage}
+                onClick={() => onOpen(representativeId)}
+              />
+            }
+          />
+          <MediaFieldSummary
+            label={label}
+            layout="expanded"
+            showHeader={false}
+            items={items}
+            attachmentCount={attachmentCount}
+            representativeId={representativeId}
+            maxItems={maxItems}
+            countDisplay={config.presentation.countDisplay}
+            onOpen={onOpen}
+          />
+        </div>
+      ) : (
+        <MediaFieldSummary
+          label={label}
+          layout="compact"
+          items={items}
+          attachmentCount={attachmentCount}
+          representativeId={representativeId}
+          maxItems={maxItems}
+          countDisplay={config.presentation.countDisplay}
+          onOpen={onOpen}
+        />
+      )}
+      <MediaManager
+        open={open}
+        onOpenChange={setOpen}
+        domain={config.domain}
+        value={media}
+        scope={scope}
+        mode="form"
+        initialAssets={assets}
+        initialSelectedImageId={selectedId}
+        maxItems={maxItems}
+        contentContext={contentContext}
+        onSave={(change) => {
+          setAssets(change.assets)
+          form.setValue(name, change.media, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          })
+        }}
+      />
+    </>
+  )
+}

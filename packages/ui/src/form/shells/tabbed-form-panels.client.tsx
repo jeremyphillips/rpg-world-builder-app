@@ -170,6 +170,7 @@ export function TabbedFormPanels({
 }: TabbedFormPanelsProps) {
   const { density } = useFormSectionContext()
   const { rhythm } = resolveFormDensity(density)
+  const sectionControlSize = density === 'compact' ? 'sm' : 'default'
   const { tabStates } = useTabbedFormTabValidationState(tabs)
   const tabStateById = React.useMemo(
     () => new Map(tabStates.map((state) => [state.tabId, state])),
@@ -187,6 +188,7 @@ export function TabbedFormPanels({
       options={sectionOptions}
       onValueChange={onActiveTabChange}
       fullWidth
+      size={sectionControlSize}
       aria-label={TABBED_FORM_SECTIONS_ARIA_LABEL}
     />
   )

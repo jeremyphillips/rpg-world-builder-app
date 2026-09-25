@@ -1,6 +1,7 @@
 import {
   availableClassFeatures,
   formatToolProficiencyPoolLabel,
+  getAbilityCompactLabel,
   getAbilityLabel,
   getArmorCategoryEntry,
   getToolCategoryEntry,
@@ -386,7 +387,7 @@ export function projectVisibleClassFeatures(
 }
 
 export function buildClassCardViewModel(characterClass: CharacterClass): ClassCardViewModel {
-  const abilities = characterClass.primaryAbilities.map(getAbilityLabel).join(' or ')
+  const abilities = characterClass.primaryAbilities.map(getAbilityCompactLabel).join(' or ')
 
   return {
     label: characterClass.name,
