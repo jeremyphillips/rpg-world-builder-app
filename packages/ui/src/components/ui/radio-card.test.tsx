@@ -397,7 +397,7 @@ describe('RadioCard', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Dwarf details' }))
     expect(onDetails).toHaveBeenCalledTimes(1)
     expect(onValueChange).not.toHaveBeenCalled()
   })
@@ -412,16 +412,16 @@ describe('RadioCard', () => {
             label: 'Dwarf',
             value: 'dwarf',
             onDetails: vi.fn(),
-            detailsLabel: 'View details',
+            detailsAriaLabel: 'View Dwarf details',
           },
         ]}
       />,
     )
-    expect(screen.getByRole('button', { name: 'View details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'View Dwarf details' })).toBeInTheDocument()
   })
 
-  it('renders the details link inline with the title row', () => {
-    const { container } = render(
+  it('renders the details action inline with the title row', () => {
+    render(
       <RadioCard
         aria-label="Species"
         density="compact"
@@ -436,15 +436,15 @@ describe('RadioCard', () => {
       />,
     )
 
-    const detailsSlot = container.querySelector('[class*="col-start-3"]')
     const title = screen.getByText('Dwarf')
+    const titleRow = title.closest('.flex.min-w-0.items-center.justify-between')
+    const detailsButton = screen.getByRole('button', { name: 'View Dwarf details' })
 
-    expect(detailsSlot).toContainElement(screen.getByRole('button', { name: 'Details' }))
-    expect(detailsSlot).toHaveClass('row-start-1')
-    expect(title.closest('[class*="col-start-2"]')).toBeInTheDocument()
+    expect(titleRow).toContainElement(title)
+    expect(titleRow).toContainElement(detailsButton)
   })
 
-  it('renders a chevron on the details action', () => {
+  it('renders an info icon on the details action', () => {
     const { container } = render(
       <RadioCard
         aria-label="Classes"
@@ -458,7 +458,7 @@ describe('RadioCard', () => {
       />,
     )
 
-    expect(container.querySelector('svg.lucide-chevron-right')).toBeInTheDocument()
+    expect(container.querySelector('svg.lucide-info')).toBeInTheDocument()
   })
 
   it('renders a media slot above the card body', () => {

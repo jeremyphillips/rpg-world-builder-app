@@ -166,7 +166,7 @@ describe('SpeciesStep', () => {
 
     renderSpeciesStep({ context, onDraftChange })
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Dwarf details' }))
 
     expect(screen.getByRole('heading', { name: 'Dwarf' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()
@@ -180,7 +180,7 @@ describe('SpeciesStep', () => {
 
     renderSpeciesStep({ context, onDraftChange })
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Dwarf details' }))
     await user.click(
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Select species' }),
     )
@@ -219,7 +219,7 @@ describe('SpeciesStep', () => {
 
     renderSpeciesStep({ context, draft })
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Elf details' }))
 
     const dialog = screen.getByRole('dialog')
     expect(

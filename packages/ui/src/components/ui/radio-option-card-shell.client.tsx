@@ -6,17 +6,15 @@ import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 import { cn } from '../../lib/utils'
 import {
   SelectionOptionCardAnatomy,
+  type SelectionOptionCardCopyWidth,
   type SelectionOptionCardDensity,
 } from './selection-option-card-anatomy.client'
 import {
-  optionCardBodyVariants,
   optionCardEmbeddedSlotVariants,
   optionCardFooterSlotVariants,
 } from './selection-option-card.variants'
 import {
-  radioCardDetailsGridVariants,
-  radioCardDetailsInlineSlotVariants,
-  radioCardItemWithDetailsVariants,
+  radioCardLeadingControlTitleLineVariants,
   radioCardMediaSlotVariants,
   radioCardShellBodyVariants,
   radioCardShellItemVariants,
@@ -24,7 +22,6 @@ import {
   type RadioCardVariant,
   type RadioCardVisualControl,
 } from './radio-card.variants'
-import { RadioOptionCardLeadingControl } from './radio-option-card-controls.client'
 export type RadioOptionCardEmbeddedSlotTone = 'divider' | 'panel'
 
 type RadioOptionCardItemProps = React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
@@ -40,6 +37,7 @@ type RadioOptionCardShellAnatomyProps = {
   summaryBadgeNode: React.ReactNode
   reserveSummaryBadgeRow: boolean
   clampDescription: boolean
+  copyWidth: SelectionOptionCardCopyWidth
 }
 
 type RadioOptionCardShellLayoutProps = RadioOptionCardShellAnatomyProps & {
@@ -79,76 +77,29 @@ export function RadioOptionCardMediaSlot({
   return <div className={radioCardMediaSlotVariants()}>{media}</div>
 }
 
-function RadioOptionCardDetailsShellRow({
-  itemProps,
-  anatomyProps,
-  visualControl,
-  icon,
-  variant,
-  density,
-  titleEndSlot,
-}: {
-  itemProps: RadioOptionCardItemProps
-  anatomyProps: RadioOptionCardShellAnatomyProps
-  visualControl: RadioCardVisualControl
-  icon?: React.ReactNode
-  variant: RadioCardVariant
-  density: SelectionOptionCardDensity
-  titleEndSlot: React.ReactNode
-}) {
-  const { clampDescription, summaryBadgeNode, reserveSummaryBadgeRow, ...anatomyRest } =
-    anatomyProps
-
-  return (
-    <div className={radioCardDetailsGridVariants({ density })}>
-      <RadioGroupPrimitive.Item
-        {...itemProps}
-        aria-label={anatomyRest.label}
-        className={cn(radioCardItemWithDetailsVariants(), 'group', itemProps.className)}
-      >
-        <RadioOptionCardLeadingControl
-          visualControl={visualControl}
-          icon={icon}
-          variant={variant}
-          density={density}
-          className="col-start-1 row-start-1"
-        />
-        <div
-          className={cn(
-            optionCardBodyVariants({ density }),
-            'col-start-2 row-start-1 min-w-0',
-            clampDescription && 'flex min-h-0 flex-1 flex-col',
-          )}
-        >
-          <SelectionOptionCardAnatomy
-            {...anatomyRest}
-            density={density}
-            summaryBadge={summaryBadgeNode}
-            reserveSummaryBadgeRow={reserveSummaryBadgeRow}
-            clampDescription={clampDescription}
-          />
-        </div>
-      </RadioGroupPrimitive.Item>
-      <div className={radioCardDetailsInlineSlotVariants()}>{titleEndSlot}</div>
-    </div>
-  )
-}
-
 function RadioOptionCardShellPrimaryRow({
   itemProps,
   anatomyProps,
   leadingControl,
   effectiveControlPosition,
   density,
+  titleEndSlot,
 }: {
   itemProps: RadioOptionCardItemProps
   anatomyProps: RadioOptionCardShellAnatomyProps
   leadingControl: React.ReactNode
   effectiveControlPosition: 'left' | 'right'
   density: SelectionOptionCardDensity
+  titleEndSlot?: React.ReactNode
 }) {
   const { clampDescription, summaryBadgeNode, reserveSummaryBadgeRow, ...anatomyRest } =
     anatomyProps
+
+  const alignedLeadingControl = titleEndSlot ? (
+    <div className={radioCardLeadingControlTitleLineVariants({ density })}>{leadingControl}</div>
+  ) : (
+    leadingControl
+  )
 
   return (
     <RadioGroupPrimitive.Item
@@ -159,11 +110,13 @@ function RadioOptionCardShellPrimaryRow({
       <SelectionOptionCardAnatomy
         {...anatomyRest}
         density={density}
-        leadingControl={leadingControl}
+        leadingControl={alignedLeadingControl}
         controlPosition={effectiveControlPosition}
+        titleEndSlot={titleEndSlot}
         summaryBadge={summaryBadgeNode}
         reserveSummaryBadgeRow={reserveSummaryBadgeRow}
         clampDescription={clampDescription}
+        copyWidth={anatomyProps.copyWidth}
       />
     </RadioGroupPrimitive.Item>
   )
@@ -201,25 +154,14 @@ export function RadioOptionCardShellLayout({
           media && 'flex min-h-0 flex-1 flex-col',
         )}
       >
-        {titleEndSlot ? (
-          <RadioOptionCardDetailsShellRow
-            itemProps={itemProps}
-            anatomyProps={{ ...anatomyProps, density }}
-            visualControl={visualControl}
-            icon={icon}
-            variant={variant}
-            density={density}
-            titleEndSlot={titleEndSlot}
-          />
-        ) : (
-          <RadioOptionCardShellPrimaryRow
-            itemProps={itemProps}
-            anatomyProps={{ ...anatomyProps, density }}
-            leadingControl={leadingControl}
-            effectiveControlPosition={effectiveControlPosition}
-            density={density}
-          />
-        )}
+        <RadioOptionCardShellPrimaryRow
+          itemProps={itemProps}
+          anatomyProps={{ ...anatomyProps, density }}
+          leadingControl={leadingControl}
+          effectiveControlPosition={effectiveControlPosition}
+          density={density}
+          titleEndSlot={titleEndSlot}
+        />
         {showEmbedded && embedded ? (
           <div className={optionCardEmbeddedSlotVariants({ density, tone: embeddedTone })}>
             {embedded}

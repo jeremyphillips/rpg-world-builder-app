@@ -225,7 +225,7 @@ export function SpeciesStep({
       <RadioCard
         density="compact"
         columns="three"
-        clampDescription
+        copyWidth="content"
         value={selectedSpeciesId ?? ''}
         onValueChange={(speciesId) => {
           if (!speciesId) return

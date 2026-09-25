@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
-import { ChevronRight } from 'lucide-react'
+import { Info } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Badge } from './badge'
@@ -10,6 +10,7 @@ import { Button } from './button.client'
 import {
   SelectionOptionCardAnatomy,
   SelectionOptionCardTitleMeta,
+  type SelectionOptionCardCopyWidth,
   type SelectionOptionCardDensity,
 } from './selection-option-card-anatomy.client'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
@@ -56,6 +57,7 @@ export type RadioOptionCardProps = React.ComponentPropsWithoutRef<
   summaryBadge?: RadioOptionCardSummaryBadge
   reserveSummaryBadgeRow?: boolean
   clampDescription?: boolean
+  copyWidth?: SelectionOptionCardCopyWidth
   /** Outer shell selected chrome when using shell layout. */
   shellSelected?: boolean
   /** When shell layout is used, whether embedded content is visible. */
@@ -127,6 +129,7 @@ export const RadioOptionCard = React.forwardRef<
       summaryBadge,
       reserveSummaryBadgeRow = false,
       clampDescription = false,
+      copyWidth = 'fill',
       shellSelected = false,
       showEmbedded = false,
       disabled,
@@ -158,6 +161,7 @@ export const RadioOptionCard = React.forwardRef<
       summaryBadgeNode,
       reserveSummaryBadgeRow,
       clampDescription,
+      copyWidth,
     }
     const itemProps = {
       ref,
@@ -181,6 +185,7 @@ export const RadioOptionCard = React.forwardRef<
             leadingControl={leadingControl}
             label={label}
             titleAdornment={titleAdornment}
+            titleEndSlot={titleEndSlot}
             description={description}
             summaryItems={summaryItems}
             summaryLines={summaryLines}
@@ -189,6 +194,7 @@ export const RadioOptionCard = React.forwardRef<
             summaryBadge={summaryBadgeNode}
             reserveSummaryBadgeRow={reserveSummaryBadgeRow}
             clampDescription={clampDescription}
+            copyWidth={copyWidth}
           />
         </RadioGroupPrimitive.Item>
       )
@@ -221,26 +227,44 @@ export const RadioOptionCard = React.forwardRef<
 )
 RadioOptionCard.displayName = 'RadioOptionCard'
 
+export const RADIO_CARD_DETAILS_TOOLTIP = 'View details'
+
 export function RadioOptionCardDetailsAction({
-  label,
+  ariaLabel,
   onDetails,
 }: {
-  label: string
+  ariaLabel: string
   onDetails: () => void
 }) {
   return (
-    <Button
-      type="button"
-      variant="text"
-      tone="accent"
-      size="sm"
-      density="compact"
-      className={radioCardDetailsActionVariants()}
-      onClick={onDetails}
-    >
-      {label}
-      <ChevronRight aria-hidden />
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            type="button"
+            variant="text"
+            tone="neutral"
+            size="sm"
+            density="compact"
+            className={radioCardDetailsActionVariants()}
+            aria-label={ariaLabel}
+            onPointerDown={(event) => event.stopPropagation()}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.stopPropagation()
+              }
+            }}
+            onClick={(event) => {
+              event.stopPropagation()
+              onDetails()
+            }}
+          >
+            <Info aria-hidden="true" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{RADIO_CARD_DETAILS_TOOLTIP}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 

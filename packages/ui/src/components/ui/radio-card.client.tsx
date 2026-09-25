@@ -9,9 +9,12 @@ import {
   RadioOptionCardDetailsAction,
   RadioOptionCardTitleAdornment,
 } from './radio-option-card.client'
+import type { SelectionOptionCardCopyWidth } from './selection-option-card-anatomy.client'
 import { radioCardGroupGapVariants } from './radio-card.variants'
 
-export const RADIO_CARD_DEFAULT_DETAILS_LABEL = 'Details'
+export function resolveRadioCardDetailsAriaLabel(label: string): string {
+  return `View ${label} details`
+}
 
 /** Radix RadioGroup skips onValueChange when the current option is clicked again. */
 export function createRadioCardReselectClickHandler(
@@ -72,7 +75,8 @@ export interface RadioCardOption {
   /** Always-visible region below the primary row inside the shell (e.g. validation reasons). */
   footerContent?: React.ReactNode
   onDetails?: () => void
-  detailsLabel?: string
+  /** Overrides the default `View {label} details` accessible name for the info action. */
+  detailsAriaLabel?: string
 }
 
 export interface RadioCardProps extends React.ComponentPropsWithoutRef<typeof RadioGroup> {
@@ -94,6 +98,8 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<typeof Ra
   reserveSummaryBadgeRow?: boolean
   /** Clamp title and description for equal-height card grids. */
   clampDescription?: boolean
+  /** When `content`, metadata under the title shrink-wraps instead of filling the content column. */
+  copyWidth?: SelectionOptionCardCopyWidth
 }
 
 /**
@@ -111,6 +117,7 @@ function RadioCard({
   columns = 'one',
   reserveSummaryBadgeRow = false,
   clampDescription = false,
+  copyWidth = 'fill',
   value,
   onValueChange,
   ...props
@@ -126,12 +133,14 @@ function RadioCard({
     >
       {options.map((option) => {
         const selected = selectedValue === option.value
-        const detailsLabel = option.detailsLabel ?? RADIO_CARD_DEFAULT_DETAILS_LABEL
         const titleAdornment = (
           <RadioOptionCardTitleAdornment badge={option.badge} titleMeta={option.titleMeta} />
         )
         const titleEndSlot = option.onDetails ? (
-          <RadioOptionCardDetailsAction label={detailsLabel} onDetails={option.onDetails} />
+          <RadioOptionCardDetailsAction
+            ariaLabel={option.detailsAriaLabel ?? resolveRadioCardDetailsAriaLabel(option.label)}
+            onDetails={option.onDetails}
+          />
         ) : undefined
 
         return (
@@ -155,6 +164,7 @@ function RadioCard({
             summaryBadge={option.summaryBadge}
             reserveSummaryBadgeRow={reserveSummaryBadgeRow}
             clampDescription={clampDescription}
+            copyWidth={copyWidth}
             embedded={option.embeddedContent}
             footer={option.footerContent}
             embeddedTone={option.embeddedSlotTone}

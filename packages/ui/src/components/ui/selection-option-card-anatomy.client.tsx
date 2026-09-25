@@ -16,8 +16,13 @@ import {
   optionCardTitleRowVariants,
   optionCardTitleVariants,
   selectionOptionCardAnatomyBodyVariants,
+  optionCardSecondaryCopyStackVariants,
+  optionCardSummaryBadgeRowVariants,
+  optionCardTitleLineVariants,
   selectionOptionCardAnatomyRootVariants,
 } from './selection-option-card.variants'
+
+export type SelectionOptionCardCopyWidth = 'fill' | 'content'
 
 export const SELECTION_OPTION_CARD_SUMMARY_SEPARATOR = ' · '
 
@@ -46,6 +51,8 @@ export type SelectionOptionCardAnatomyProps = {
   reserveSummaryBadgeRow?: boolean
   /** Clamp title and description for equal-height card grids. */
   clampDescription?: boolean
+  /** When `content`, metadata under the title shrink-wraps instead of filling the content column. */
+  copyWidth?: SelectionOptionCardCopyWidth
 }
 
 function SelectionOptionCardSummaryLines({
@@ -101,6 +108,99 @@ function SelectionOptionCardSecondaryContent({
   )
 }
 
+function SelectionOptionCardTitleRow({
+  label,
+  titleAdornment,
+  titleClassName,
+  density,
+  useSummaryTitle,
+  clampDescription,
+}: {
+  label: string
+  titleAdornment?: ReactNode
+  titleClassName?: string
+  density: SelectionOptionCardDensity
+  useSummaryTitle: boolean
+  clampDescription: boolean
+}) {
+  const titleVariants = useSummaryTitle ? optionCardSummaryTitleVariants : optionCardTitleVariants
+  const TitleElement = useSummaryTitle ? 'h3' : 'span'
+
+  return (
+    <div className={optionCardTitleRowVariants()}>
+      <TitleElement
+        className={cn(
+          titleVariants({ density }),
+          clampDescription && optionCardTitleClampVariants(),
+          titleClassName,
+        )}
+      >
+        {label}
+      </TitleElement>
+      {titleAdornment}
+    </div>
+  )
+}
+
+function SelectionOptionCardPrimaryCopy({
+  density,
+  titleEndSlot,
+  titleRow,
+  description,
+  summaryText,
+  summaryLines,
+  clampDescription,
+  copyWidth,
+  summaryBadge,
+  reserveSummaryBadgeRow,
+}: {
+  density: SelectionOptionCardDensity
+  titleEndSlot?: ReactNode
+  titleRow: ReactNode
+  description?: string
+  summaryText?: string
+  summaryLines?: string[]
+  clampDescription: boolean
+  copyWidth: SelectionOptionCardCopyWidth
+  summaryBadge?: ReactNode
+  reserveSummaryBadgeRow: boolean
+}) {
+  const showSummaryBadgeRow = reserveSummaryBadgeRow || summaryBadge != null
+
+  return (
+    <div
+      className={cn(
+        optionCardPrimaryCopyStackVariants({ density }),
+        'min-w-0 w-full',
+        showSummaryBadgeRow && 'flex min-h-0 flex-1 flex-col',
+      )}
+    >
+      <div className={cn(showSummaryBadgeRow && 'flex min-h-0 flex-1 flex-col')}>
+        {titleEndSlot ? (
+          <div className={optionCardTitleLineVariants()}>
+            <div className="min-w-0 shrink">{titleRow}</div>
+            <div className="shrink-0">{titleEndSlot}</div>
+          </div>
+        ) : (
+          titleRow
+        )}
+        <div className={optionCardSecondaryCopyStackVariants({ density, copyWidth })}>
+          <SelectionOptionCardSecondaryContent
+            description={description}
+            summaryText={summaryText}
+            summaryLines={summaryLines}
+            density={density}
+            clampDescription={clampDescription}
+          />
+        </div>
+      </div>
+      {showSummaryBadgeRow ? (
+        <div className={optionCardSummaryBadgeRowVariants()}>{summaryBadge}</div>
+      ) : null}
+    </div>
+  )
+}
+
 export function SelectionOptionCardAnatomy({
   density = 'default',
   headerRow,
@@ -119,57 +219,21 @@ export function SelectionOptionCardAnatomy({
   summaryBadge,
   reserveSummaryBadgeRow = false,
   clampDescription = false,
+  copyWidth = 'fill',
 }: SelectionOptionCardAnatomyProps) {
   const summaryText =
     summaryItems && summaryItems.length > 0
       ? summaryItems.join(SELECTION_OPTION_CARD_SUMMARY_SEPARATOR)
       : undefined
-  const titleVariants = useSummaryTitle ? optionCardSummaryTitleVariants : optionCardTitleVariants
-
-  const TitleElement = useSummaryTitle ? 'h3' : 'span'
   const titleRow = (
-    <div className={optionCardTitleRowVariants()}>
-      <TitleElement
-        className={cn(
-          titleVariants({ density }),
-          clampDescription && optionCardTitleClampVariants(),
-          titleClassName,
-        )}
-      >
-        {label}
-      </TitleElement>
-      {titleAdornment}
-    </div>
-  )
-
-  const showSummaryBadgeRow = reserveSummaryBadgeRow || summaryBadge != null
-
-  const primaryCopy = (
-    <div
-      className={cn(
-        optionCardPrimaryCopyStackVariants({ density }),
-        showSummaryBadgeRow && 'flex min-h-0 flex-1 flex-col',
-      )}
-    >
-      <div className={cn(showSummaryBadgeRow && 'flex min-h-0 flex-1 flex-col')}>
-        {titleEndSlot ? (
-          <div className="flex min-w-0 items-start justify-between gap-2">
-            <div className="min-w-0 flex-1">{titleRow}</div>
-            <div className="shrink-0 self-center">{titleEndSlot}</div>
-          </div>
-        ) : (
-          titleRow
-        )}
-        <SelectionOptionCardSecondaryContent
-          description={description}
-          summaryText={summaryText}
-          summaryLines={summaryLines}
-          density={density}
-          clampDescription={clampDescription}
-        />
-      </div>
-      {showSummaryBadgeRow ? <div className="mt-auto min-h-6 pt-1">{summaryBadge}</div> : null}
-    </div>
+    <SelectionOptionCardTitleRow
+      label={label}
+      titleAdornment={titleAdornment}
+      titleClassName={titleClassName}
+      density={density}
+      useSummaryTitle={useSummaryTitle}
+      clampDescription={clampDescription}
+    />
   )
 
   const body = (
@@ -181,7 +245,18 @@ export function SelectionOptionCardAnatomy({
       }
     >
       {headerRow}
-      {primaryCopy}
+      <SelectionOptionCardPrimaryCopy
+        density={density}
+        titleEndSlot={titleEndSlot}
+        titleRow={titleRow}
+        description={description}
+        summaryText={summaryText}
+        summaryLines={summaryLines}
+        clampDescription={clampDescription}
+        copyWidth={copyWidth}
+        summaryBadge={summaryBadge}
+        reserveSummaryBadgeRow={reserveSummaryBadgeRow}
+      />
       {embedded}
       {footer}
     </div>

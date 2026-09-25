@@ -28,7 +28,7 @@ describe('class-display', () => {
   it('builds class card view model with ability summary and hit die', () => {
     expect(buildClassCardViewModel(FIGHTER)).toEqual({
       label: 'Fighter',
-      description: 'Strength or Dexterity · d10 Hit Die',
+      description: 'STR or DEX · d10 Hit Die',
     })
   })
 

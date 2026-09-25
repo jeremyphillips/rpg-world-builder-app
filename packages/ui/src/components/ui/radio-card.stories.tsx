@@ -146,7 +146,7 @@ const compactBuilderOptions = [
   },
 ]
 
-/** Builder species/class cards: compact density, inline summary, optional Details. */
+/** Builder species/class cards: compact density, inline summary, optional info details action. */
 export const Compact: Story = {
   args: {
     'aria-label': 'Character builder option',

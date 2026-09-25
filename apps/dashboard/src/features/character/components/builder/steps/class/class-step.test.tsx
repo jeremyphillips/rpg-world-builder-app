@@ -63,7 +63,7 @@ describe('ClassStep', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Fighter details' }))
 
     expect(screen.getByRole('heading', { name: 'Fighter' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Proficiencies' })).toBeInTheDocument()
@@ -85,7 +85,7 @@ describe('ClassStep', () => {
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Details' }))
+    await user.click(screen.getByRole('button', { name: 'View Fighter details' }))
     await user.click(
       within(screen.getByRole('dialog')).getByRole('button', { name: 'Select class' }),
     )

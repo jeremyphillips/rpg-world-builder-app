@@ -13,6 +13,7 @@ import { establishSurfaceCurrent } from './surface-current.lib'
 import {
   optionCardDensityBodyLayoutVariants,
   optionCardDensityContentGapVariants,
+  optionCardSummaryBadgeRowVariants,
 } from './selection-option-card.variants'
 
 const radioCardCardBase = cn(
@@ -118,35 +119,25 @@ export const radioCardShellBodyVariants = cva('flex min-h-0 flex-1 flex-col', {
 /** Full-bleed top image slot for card-variant radio options. */
 export const radioCardMediaSlotVariants = cva('shrink-0 overflow-hidden')
 
-/** Grid for radio + title row + right-aligned details link on one line. */
-export const radioCardDetailsGridVariants = cva(
-  'grid w-full grid-cols-[auto_1fr_auto] items-start',
+/** Transparent radio row inside an outer shell (embedded/footer slots below). */
+export const radioCardShellItemVariants = cva(
+  'flex w-full cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
+)
+
+/** Centers the leading radio with the option title line when a title-end action is present. */
+export const radioCardLeadingControlTitleLineVariants = cva(
+  'flex shrink-0 items-center self-start',
   {
     variants: {
       density: {
-        default: 'gap-x-3 gap-y-2',
-        compact: 'gap-x-3 gap-y-1',
+        default: 'h-5',
+        compact: 'h-5',
       },
     },
     defaultVariants: {
       density: 'default',
     },
   },
-)
-
-/** Radix item wrapper — children participate in the parent details grid. */
-export const radioCardItemWithDetailsVariants = cva(
-  'contents cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
-)
-
-/** Transparent radio row inside an outer shell (embedded/footer slots below). */
-export const radioCardShellItemVariants = cva(
-  'flex w-full cursor-pointer border-0 bg-transparent p-0 text-left text-inherit shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-50',
-)
-
-/** Right-aligned details action aligned with the title row. */
-export const radioCardDetailsInlineSlotVariants = cva(
-  'col-start-3 row-start-1 shrink-0 self-center',
 )
 
 /** Decorative radio circle shown inside the card, synced to the parent item state. */
@@ -194,7 +185,7 @@ export const radioCardIconControlVariants = cva(
 export const radioCardDetailsActionVariants = cva('shrink-0 [&_svg]:size-4')
 
 /** Reserved third-row height for spellcasting badges in equal-height card grids. */
-export const radioCardSummaryBadgeRowVariants = cva('mt-auto min-h-6 pt-1')
+export const radioCardSummaryBadgeRowVariants = optionCardSummaryBadgeRowVariants
 
 /** Vertical gap between sibling radio options in a group. */
 export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 items-stretch', {

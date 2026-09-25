@@ -23,6 +23,12 @@ export type CompactLabelVariantProps = {
   removable?: boolean
 }
 
+/** Chip/Badge sm fixed height — 22px @ 16px root. */
+export const COMPACT_LABEL_SM_HEIGHT_CLASS = 'h-[22px]'
+
+/** Reserved row height for Badge/Chip sm — matches {@link COMPACT_LABEL_SM_HEIGHT_CLASS}. */
+export const COMPACT_LABEL_SM_MIN_HEIGHT_CLASS = 'min-h-[22px]'
+
 const compactLabelRemovablePaddingClasses: Record<'md' | 'lg', string> = {
   md: 'pr-0.5',
   lg: 'pr-1',
@@ -40,7 +46,7 @@ export const compactLabelVariants = cva(
   {
     variants: {
       size: {
-        sm: 'h-[22px] px-2 text-xs-meta',
+        sm: cn(COMPACT_LABEL_SM_HEIGHT_CLASS, 'px-2 text-xs-meta'),
         md: 'h-[31px] px-3 text-sm-meta',
         lg: 'h-[41px] px-4 text-md',
       },

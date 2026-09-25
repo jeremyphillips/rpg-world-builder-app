@@ -370,7 +370,7 @@ export {
 export {
   RadioCard,
   radioCardVariants,
-  RADIO_CARD_DEFAULT_DETAILS_LABEL,
+  resolveRadioCardDetailsAriaLabel,
   type RadioCardDensity,
   type RadioCardVisualControl,
   type RadioCardVariant,

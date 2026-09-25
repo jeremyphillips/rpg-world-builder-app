@@ -81,7 +81,7 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
       <RadioCard
         density="compact"
         columns="three"
-        clampDescription
+        copyWidth="content"
         reserveSummaryBadgeRow
         value={draft.class.classId ?? ''}
         onValueChange={(classId) => {

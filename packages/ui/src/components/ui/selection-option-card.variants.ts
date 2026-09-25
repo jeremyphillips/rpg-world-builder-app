@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { COMPACT_LABEL_SM_MIN_HEIGHT_CLASS } from './compact-label.variants'
 import { cardBorderClasses, cardRadiusClasses } from './card.variants'
 import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
@@ -69,6 +70,32 @@ export const optionCardPrimaryCopyStackVariants = cva('flex flex-col', {
   },
 })
 
+/** Compact option metadata typography — tight line-height for card secondary copy. */
+export const optionCardCompactSecondaryTypographyClasses = 'text-xs leading-snug'
+
+/** Secondary copy stack under the title row. */
+export const optionCardSecondaryCopyStackVariants = cva('min-w-0', {
+  variants: {
+    density: {
+      default: '',
+      compact: optionCardCompactSecondaryTypographyClasses,
+    },
+    copyWidth: {
+      fill: 'w-full',
+      content: 'w-fit max-w-full',
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+    copyWidth: 'fill',
+  },
+})
+
+/** Title row with a trailing end slot — spans the content column so the slot can align end. */
+export const optionCardTitleLineVariants = cva(
+  'flex w-full min-w-0 items-center justify-between gap-2',
+)
+
 export const optionCardTitleVariants = cva('font-bold', {
   variants: {
     density: {
@@ -106,7 +133,7 @@ export const optionCardDescriptionVariants = cva('text-muted-foreground', {
   variants: {
     density: {
       default: 'text-sm',
-      compact: 'text-xs',
+      compact: optionCardCompactSecondaryTypographyClasses,
     },
   },
   defaultVariants: {
@@ -115,6 +142,11 @@ export const optionCardDescriptionVariants = cva('text-muted-foreground', {
 })
 
 export const optionCardSummaryVariants = optionCardDescriptionVariants
+
+/** Reserved row for optional summary badges — matches Badge/Chip sm height. */
+export const optionCardSummaryBadgeRowVariants = cva(
+  cn('mt-auto pt-1', COMPACT_LABEL_SM_MIN_HEIGHT_CLASS),
+)
 
 /** Two-line clamp for compact card descriptions in equal-height grids. */
 export const optionCardDescriptionClampVariants = cva('line-clamp-2 min-h-[2lh]')
@@ -237,7 +269,7 @@ export const optionCardFooterSlotVariants = cva('min-w-0', {
   },
 })
 
-export const selectionOptionCardAnatomyRootVariants = cva('flex items-start', {
+export const selectionOptionCardAnatomyRootVariants = cva('flex w-full min-w-0 items-start', {
   variants: {
     controlPosition: {
       left: '',
