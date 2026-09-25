@@ -10,9 +10,13 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
+import { ContentMediaImage, getContentDisplayImage } from '@/features/content'
+
 import {
   buildClassDetailsSheetContent,
   formatClassCardOption,
+  resolveClassCardDisplayImageInput,
+  resolveClassCardSummaryBadge,
 } from '../../../../lib/builder/builder-option-display.lib'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 
@@ -40,9 +44,17 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
       classes.map((entry) => ({
         value: entry.id,
         ...formatClassCardOption(entry),
+        media: (
+          <ContentMediaImage
+            display={getContentDisplayImage(resolveClassCardDisplayImageInput(entry, context))}
+            alt=""
+            frame="builderCard"
+          />
+        ),
+        summaryBadge: resolveClassCardSummaryBadge(entry, context.spellcastingProgression),
         onDetails: () => setDetailsClassId(entry.id),
       })),
-    [classes],
+    [classes, context],
   )
 
   const detailsClass = useMemo(
@@ -69,6 +81,9 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
     <BuilderStepFrame stepId="class" validationIssues={validationIssues}>
       <RadioCard
         density="compact"
+        columns="three"
+        clampDescription
+        reserveSummaryBadgeRow
         value={draft.class.classId ?? ''}
         onValueChange={(classId) => {
           onDraftChange({

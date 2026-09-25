@@ -71,7 +71,7 @@ and are not served by `GET /api/uploads/:key`.
 
 - Contracts: `character/sheet.ts`, builder draft identity, finalize input
 - API: `character.model.ts`, `to-character.ts`, `to-npc-character.ts`
-- Dashboard: builder identity (currently no image UI), import coverage
+- Dashboard: builder identity (currently no image UI), builder class step primary art, import coverage
 
 ### Out of scope (keep `imageKey` / legacy upload)
 

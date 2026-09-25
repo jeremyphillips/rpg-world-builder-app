@@ -9,5 +9,8 @@ export {
   BUILDER_CLASS_EYEBROW,
   buildClassDetailsSheetContent,
   formatClassCardOption,
+  resolveClassCardDisplayImageInput,
+  resolveClassCardSummaryBadge,
+  type ClassCardSummaryBadge,
   type ClassDetailsSheetContent,
 } from './builder-class-option-display.lib'

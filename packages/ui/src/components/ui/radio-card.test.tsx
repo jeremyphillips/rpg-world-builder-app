@@ -164,7 +164,7 @@ describe('RadioCard', () => {
 
     expect(screen.getByText('Requires strength 13')).toBeInTheDocument()
     const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('[class*="rounded-card"]')
-    expect(shell).toHaveClass('bg-surface-subtle')
+    expect(shell).toHaveClass('bg-background')
   })
 
   it('renders embedded content inside the selected card shell', () => {
@@ -242,7 +242,7 @@ describe('RadioCard', () => {
   })
 
   it('renders embedded panel slot edge-to-edge inside the card shell', () => {
-    const { container } = render(
+    render(
       <RadioCard
         aria-label="Species"
         density="compact"
@@ -260,7 +260,7 @@ describe('RadioCard', () => {
       />,
     )
 
-    const panel = container.querySelector('[class*="bg-background"]')
+    const panel = screen.getByText('Configuration panel').parentElement
     expect(panel).toHaveTextContent('Configuration panel')
     expect(panel?.className).toContain('-ml-3')
     expect(panel?.className).toContain('-mr-4')
@@ -357,7 +357,7 @@ describe('RadioCard', () => {
     )
 
     const selected = screen.getByRole('radio', { name: /General table/i })
-    expect(selected).toHaveClass('data-[state=checked]:border-card-selected-border')
+    expect(selected).toHaveClass('data-[state=checked]:border-primary')
     expect(selected).toHaveClass('data-[state=checked]:bg-surface-strong')
   })
 
@@ -442,5 +442,105 @@ describe('RadioCard', () => {
     expect(detailsSlot).toContainElement(screen.getByRole('button', { name: 'Details' }))
     expect(detailsSlot).toHaveClass('row-start-1')
     expect(title.closest('[class*="col-start-2"]')).toBeInTheDocument()
+  })
+
+  it('renders a chevron on the details action', () => {
+    const { container } = render(
+      <RadioCard
+        aria-label="Classes"
+        options={[
+          {
+            label: 'Fighter',
+            value: 'fighter',
+            onDetails: vi.fn(),
+          },
+        ]}
+      />,
+    )
+
+    expect(container.querySelector('svg.lucide-chevron-right')).toBeInTheDocument()
+  })
+
+  it('renders a media slot above the card body', () => {
+    render(
+      <RadioCard
+        aria-label="Classes"
+        options={[
+          {
+            label: 'Fighter',
+            value: 'fighter',
+            media: <img src="/fighter.jpeg" alt="" data-testid="class-art" />,
+            onDetails: vi.fn(),
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByTestId('class-art')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Fighter/i })).toBeInTheDocument()
+  })
+
+  it('selects the card when the media slot is clicked', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+
+    render(
+      <RadioCard
+        aria-label="Classes"
+        onValueChange={onValueChange}
+        options={[
+          {
+            label: 'Fighter',
+            value: 'fighter',
+            media: <img src="/fighter.jpeg" alt="" data-testid="class-art" />,
+            onDetails: vi.fn(),
+          },
+        ]}
+      />,
+    )
+
+    await user.click(screen.getByTestId('class-art'))
+    expect(onValueChange).toHaveBeenCalledWith('fighter')
+  })
+
+  it('reveals a summary badge tooltip on keyboard focus', async () => {
+    const user = userEvent.setup()
+    render(
+      <RadioCard
+        aria-label="Classes"
+        options={[
+          {
+            label: 'Wizard',
+            value: 'wizard',
+            summaryBadge: {
+              label: 'Full caster',
+              tooltip: 'Eventually reaches 9th-level spell slots.',
+            },
+            onDetails: vi.fn(),
+          },
+        ]}
+      />,
+    )
+
+    await user.hover(screen.getByText('Full caster'))
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'Eventually reaches 9th-level spell slots.',
+    )
+  })
+
+  it('uses a three-column container grid when columns is three', () => {
+    const { container } = render(
+      <RadioCard
+        aria-label="Classes"
+        columns="three"
+        options={[
+          { label: 'Fighter', value: 'fighter' },
+          { label: 'Wizard', value: 'wizard' },
+        ]}
+      />,
+    )
+
+    expect(container.firstElementChild).toHaveClass('@min-[48rem]:grid-cols-3')
   })
 })

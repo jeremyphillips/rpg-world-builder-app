@@ -9,20 +9,24 @@ import {
   optionCardTitleVariants,
   selectionOptionCardShellVariants,
 } from './selection-option-card.variants'
-import { radioCardShellVariants, radioCardVariants } from './radio-card.variants'
+import {
+  radioCardShellSelectedChromeClasses,
+  radioCardShellVariants,
+  radioCardVariants,
+} from './radio-card.variants'
 
 describe('optionCard selected chrome parity', () => {
   it('uses the same selected classes on static and radio shells', () => {
     expect(selectionOptionCardShellVariants({ selected: true })).toContain(
       optionCardSelectedChromeClasses,
     )
-    expect(radioCardShellVariants({ selected: true })).toContain(optionCardSelectedChromeClasses)
+    expect(radioCardShellVariants({ selected: true })).toContain(
+      radioCardShellSelectedChromeClasses,
+    )
   })
 
   it('applies selected chrome to checked radio card variant', () => {
-    expect(radioCardVariants({ variant: 'card' })).toContain(
-      'data-[state=checked]:border-card-selected-border',
-    )
+    expect(radioCardVariants({ variant: 'card' })).toContain('data-[state=checked]:border-primary')
     expect(radioCardVariants({ variant: 'card' })).toContain(
       'data-[state=checked]:bg-surface-strong',
     )

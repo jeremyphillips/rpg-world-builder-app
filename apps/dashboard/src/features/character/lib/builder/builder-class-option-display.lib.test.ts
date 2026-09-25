@@ -3,10 +3,17 @@ import { describe, expect, it } from 'vitest'
 import { CLASS_SECTION_LABELS, CLASS_STAT_LABELS } from '@/features/content'
 import { pickClass, pickSkillProficiency } from '@/features/content'
 
-import { buildClassDetailsSheetContent } from './builder-class-option-display.lib'
-import { populatedBuilderCatalog } from '../fixtures/character-builder-fixtures'
+import {
+  buildClassDetailsSheetContent,
+  resolveClassCardSummaryBadge,
+} from './builder-class-option-display.lib'
+import {
+  createStandaloneBuilderContextFixture,
+  populatedBuilderCatalog,
+} from '../fixtures/character-builder-fixtures'
 
 describe('builder-class-option-display.lib', () => {
+  const spellcastingProgression = createStandaloneBuilderContextFixture().spellcastingProgression
   const fighter = pickClass('fighter')
   const catalog = {
     ...populatedBuilderCatalog,
@@ -58,6 +65,20 @@ describe('builder-class-option-display.lib', () => {
       ]),
     )
     expect(proficiencies?.items?.find((item) => item.title === 'Tools')).toBeUndefined()
+  })
+
+  it('returns no spellcasting badge for non-casters', () => {
+    expect(resolveClassCardSummaryBadge(fighter, spellcastingProgression)).toBeUndefined()
+  })
+
+  it('returns a vocab-backed badge for spellcasting classes', () => {
+    const wizard = pickClass('wizard')
+
+    expect(resolveClassCardSummaryBadge(wizard, spellcastingProgression)).toEqual({
+      label: 'Full caster',
+      tooltip:
+        'Gains spell slots at the standard spellcasting progression, eventually reaching 9th-level spell slots.',
+    })
   })
 
   it('includes level-1 features only', () => {

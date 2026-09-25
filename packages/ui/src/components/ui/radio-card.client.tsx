@@ -39,7 +39,12 @@ export type RadioCardVisualControl = 'radio' | 'icon'
 
 export type RadioCardEmbeddedSlotTone = 'divider' | 'panel'
 
-export type RadioCardColumns = 'one' | 'two'
+export type RadioCardColumns = 'one' | 'two' | 'three'
+
+export type RadioCardSummaryBadge = {
+  label: string
+  tooltip?: string
+}
 
 export interface RadioCardOption {
   label: string
@@ -56,6 +61,10 @@ export interface RadioCardOption {
   summaryItems?: string[]
   /** Stacked muted lines below the title row (e.g. level-grouped grant summaries). */
   summaryLines?: string[]
+  /** Full-bleed image region above the card body. */
+  media?: React.ReactNode
+  /** Third-row neutral badge (e.g. spellcasting progression). */
+  summaryBadge?: RadioCardSummaryBadge
   /** Rendered inside the card shell when this option is selected (e.g. dependent-choice flow). */
   embeddedContent?: React.ReactNode
   /** Visual treatment for the embedded region below the primary card row. */
@@ -81,6 +90,10 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<typeof Ra
   visualControl?: RadioCardVisualControl
   /** Responsive column count for card-variant groups. Default 'one'. */
   columns?: RadioCardColumns
+  /** Reserve third-row badge height on every card for equal-height grids. */
+  reserveSummaryBadgeRow?: boolean
+  /** Clamp title and description for equal-height card grids. */
+  clampDescription?: boolean
 }
 
 /**
@@ -96,6 +109,8 @@ function RadioCard({
   controlPosition = 'left',
   visualControl = 'radio',
   columns = 'one',
+  reserveSummaryBadgeRow = false,
+  clampDescription = false,
   value,
   onValueChange,
   ...props
@@ -136,6 +151,10 @@ function RadioCard({
             icon={option.icon}
             titleAdornment={titleAdornment}
             titleEndSlot={titleEndSlot}
+            media={option.media}
+            summaryBadge={option.summaryBadge}
+            reserveSummaryBadgeRow={reserveSummaryBadgeRow}
+            clampDescription={clampDescription}
             embedded={option.embeddedContent}
             footer={option.footerContent}
             embeddedTone={option.embeddedSlotTone}

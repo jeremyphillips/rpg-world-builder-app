@@ -230,3 +230,10 @@ export {
 } from './lib/list/use-content-mutations'
 export { ContentDeletionBlockedDialog } from './lib/delete/content-deletion-blocked-dialog'
 export { ContentCampaignAvailabilityAction } from './lib/campaign-access/overview/content-campaign-availability-action'
+export { getContentDisplayImage } from './lib/detail/page/content-display-image'
+export { ContentMediaImage } from './lib/detail/page/content-media-image'
+export type { ContentMediaImageFrame } from './lib/detail/page/content-media-image'
+export {
+  CONTENT_IMAGE_PRESENTATION_DEFAULTS,
+  resolveContentImagePresentationDefault,
+} from './lib/detail/page/content-image-presentation-defaults'

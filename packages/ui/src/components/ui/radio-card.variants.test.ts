@@ -35,8 +35,14 @@ describe('radioCard group layout', () => {
 
   it('uses a responsive two-column grid when columns is two', () => {
     expect(radioCardGroupGapVariants({ columns: 'two' })).toContain('grid-cols-1')
-    expect(radioCardGroupGapVariants({ columns: 'two' })).toContain('sm:grid-cols-2')
+    expect(radioCardGroupGapVariants({ columns: 'two' })).toContain('@min-[32rem]:grid-cols-2')
     expect(radioCardGroupGapVariants({ columns: 'one' })).toContain('grid-cols-1')
-    expect(radioCardGroupGapVariants({ columns: 'one' })).not.toContain('sm:grid-cols-2')
+    expect(radioCardGroupGapVariants({ columns: 'one' })).not.toContain('@min-[32rem]:grid-cols-2')
+  })
+
+  it('uses a responsive three-column grid when columns is three', () => {
+    expect(radioCardGroupGapVariants({ columns: 'three' })).toContain('grid-cols-1')
+    expect(radioCardGroupGapVariants({ columns: 'three' })).toContain('@min-[32rem]:grid-cols-2')
+    expect(radioCardGroupGapVariants({ columns: 'three' })).toContain('@min-[48rem]:grid-cols-3')
   })
 })

@@ -88,7 +88,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
               characterType: 'npc',
             },
             kind: 'works_at',
-            label: 'Works at',
+            label: 'Works here',
             family: 'operation',
             priority: 40,
             sectionGroup: 'people_and_organizations',
@@ -109,7 +109,7 @@ describe('LocationInverseCharacterConnectionLinkDrawer', () => {
     expect(screen.getByText('NPC')).toBeInTheDocument()
     expect(screen.queryByText(/Current:/i)).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Connection type' })).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /Works at/i })).toBeChecked()
+    expect(screen.getByRole('radio', { name: /Works here/i })).toBeChecked()
     expect(screen.queryByPlaceholderText('Search characters')).not.toBeInTheDocument()
     expect(screen.queryByText('No characters are available.')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save change' })).toBeInTheDocument()

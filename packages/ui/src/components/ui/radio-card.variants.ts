@@ -13,12 +13,11 @@ import { establishSurfaceCurrent } from './surface-current.lib'
 import {
   optionCardDensityBodyLayoutVariants,
   optionCardDensityContentGapVariants,
-  optionCardSelectedChromeClasses,
 } from './selection-option-card.variants'
 
 const radioCardCardBase = cn(
-  `group relative flex w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-surface-subtle text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary/50 hover:bg-control-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-card-selected-border data-[state=checked]:bg-surface-strong data-[state=checked]:[--surface-current:var(--surface-strong)] data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
-  establishSurfaceCurrent('surface-subtle'),
+  `group relative flex h-full w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-background text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary hover:bg-surface-subtle hover:[--surface-current:var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-surface-strong data-[state=checked]:[--surface-current:var(--surface-strong)] data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
+  establishSurfaceCurrent('background'),
 )
 
 const radioCardRowBase = cn(
@@ -74,29 +73,50 @@ export const radioCardVariants = cva('', {
   },
 })
 
+/** Selected/hover chrome for radio card shells (distinct from static selection cards). */
+export const radioCardShellSelectedChromeClasses =
+  'border-primary bg-surface-strong ring-1 ring-primary/20 [--surface-current:var(--surface-strong)]'
+
 /** Outer shell when a details action sits beside the radio item (avoids nested interactives). */
 export const radioCardShellVariants = cva(
   cn(
-    `relative overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-surface-subtle text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
-    establishSurfaceCurrent('surface-subtle'),
+    `relative flex h-full flex-col overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-background text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
+    establishSurfaceCurrent('background'),
   ),
   {
     variants: {
-      density: {
-        default: optionCardDensityBodyLayoutVariants({ density: 'default' }),
-        compact: optionCardDensityBodyLayoutVariants({ density: 'compact' }),
+      hasMedia: {
+        true: 'p-0',
+        false: '',
       },
       selected: {
-        true: optionCardSelectedChromeClasses,
-        false: 'hover:border-primary/50 hover:bg-control-hover',
+        true: radioCardShellSelectedChromeClasses,
+        false:
+          'hover:border-primary hover:bg-surface-subtle hover:[--surface-current:var(--surface-subtle)]',
       },
     },
     defaultVariants: {
-      density: 'default',
+      hasMedia: false,
       selected: false,
     },
   },
 )
+
+/** Body region below a full-bleed media slot. */
+export const radioCardShellBodyVariants = cva('flex min-h-0 flex-1 flex-col', {
+  variants: {
+    density: {
+      default: optionCardDensityBodyLayoutVariants({ density: 'default' }),
+      compact: optionCardDensityBodyLayoutVariants({ density: 'compact' }),
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
+
+/** Full-bleed top image slot for card-variant radio options. */
+export const radioCardMediaSlotVariants = cva('shrink-0 overflow-hidden')
 
 /** Grid for radio + title row + right-aligned details link on one line. */
 export const radioCardDetailsGridVariants = cva(
@@ -171,10 +191,13 @@ export const radioCardIconControlVariants = cva(
   },
 )
 
-export const radioCardDetailsActionVariants = cva('shrink-0 text-muted-foreground')
+export const radioCardDetailsActionVariants = cva('shrink-0 [&_svg]:size-4')
+
+/** Reserved third-row height for spellcasting badges in equal-height card grids. */
+export const radioCardSummaryBadgeRowVariants = cva('mt-auto min-h-6 pt-1')
 
 /** Vertical gap between sibling radio options in a group. */
-export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
+export const radioCardGroupGapVariants = cva('@container grid w-full min-w-0 items-stretch', {
   variants: {
     variant: {
       card: '',
@@ -186,7 +209,8 @@ export const radioCardGroupGapVariants = cva('grid w-full min-w-0', {
     },
     columns: {
       one: 'grid-cols-1',
-      two: 'grid-cols-1 sm:grid-cols-2',
+      two: 'grid-cols-1 @min-[32rem]:grid-cols-2',
+      three: 'grid-cols-1 @min-[32rem]:grid-cols-2 @min-[48rem]:grid-cols-3',
     },
   },
   compoundVariants: [

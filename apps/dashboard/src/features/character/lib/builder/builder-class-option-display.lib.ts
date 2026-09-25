@@ -1,4 +1,12 @@
-import { getSkillName, type CharacterBuildCatalog, type CharacterClass } from '@rpg/contracts'
+import {
+  getSkillName,
+  getSlotProgressionKindEntry,
+  resolveSlotProgressionForClass,
+  type CharacterBuildCatalog,
+  type CharacterBuildContext,
+  type CharacterClass,
+  type ResolvedSpellcastingProgressionConfig,
+} from '@rpg/contracts'
 
 import {
   buildClassCardViewModel,
@@ -52,6 +60,39 @@ function resolveChoiceOptionLabels(
 
 export function formatClassCardOption(characterClass: CharacterClass) {
   return buildClassCardViewModel(characterClass)
+}
+
+export type ClassCardSummaryBadge = {
+  label: string
+  tooltip?: string
+}
+
+export function resolveClassCardSummaryBadge(
+  characterClass: CharacterClass,
+  spellcastingProgression: ResolvedSpellcastingProgressionConfig,
+): ClassCardSummaryBadge | undefined {
+  const slotProgression = resolveSlotProgressionForClass(characterClass, spellcastingProgression)
+  if (!slotProgression) return undefined
+
+  const vocabEntry = getSlotProgressionKindEntry(slotProgression.id)
+  return {
+    label: vocabEntry?.label ?? slotProgression.label,
+    tooltip: vocabEntry?.description,
+  }
+}
+
+export function resolveClassCardDisplayImageInput(
+  characterClass: CharacterClass,
+  context: Pick<CharacterBuildContext, 'rulesetId'>,
+) {
+  return {
+    media: characterClass.media,
+    imageKey: characterClass.imageKey,
+    contentType: 'classes' as const,
+    slug: characterClass.slug,
+    contentSource: characterClass.source,
+    rulesetId: context.rulesetId,
+  }
 }
 
 export type ClassDetailsSheetContent = {

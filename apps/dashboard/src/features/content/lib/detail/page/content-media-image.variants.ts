@@ -1,11 +1,18 @@
 import { cva } from 'class-variance-authority'
 
-export const contentMediaImageFrameVariants = cva('relative isolate overflow-hidden', {
+import { cn } from '@rpg/ui'
+
+/** Matches inherited radio-card / shell `--surface-current` for blend knockouts. */
+export const contentMediaImageSurfaceBackdropClasses =
+  'bg-[var(--surface-current,var(--background))]'
+
+export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
   variants: {
     frame: {
-      intrinsic: 'min-h-0 w-full',
-      primary: 'aspect-[4/3] w-full min-h-0',
-      square: 'size-6 shrink-0 rounded-md lg:size-8',
+      intrinsic: 'isolate min-h-0 w-full',
+      primary: 'isolate aspect-[4/3] w-full min-h-0',
+      builderCard: cn('aspect-[4/2] w-full min-h-0', contentMediaImageSurfaceBackdropClasses),
+      square: 'isolate size-6 shrink-0 rounded-md lg:size-8',
     },
   },
   defaultVariants: {
@@ -13,5 +20,8 @@ export const contentMediaImageFrameVariants = cva('relative isolate overflow-hid
   },
 })
 
-export const contentMediaImageClasses =
-  'block size-full max-w-none select-none object-cover object-center'
+export const contentMediaImageClasses = 'block size-full max-w-none select-none object-cover'
+
+/** White-paper knockout for monochrome builder card artwork. */
+export const contentMediaImageBuilderBlendClasses =
+  'mix-blend-multiply dark:invert dark:mix-blend-screen'

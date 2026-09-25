@@ -6,11 +6,13 @@ import { cn } from '../../lib/utils'
 import { textVariants } from './text.variants'
 import {
   optionCardBodyVariants,
+  optionCardDescriptionClampVariants,
   optionCardDescriptionVariants,
   optionCardPrimaryCopyStackVariants,
   optionCardSummaryLinesVariants,
   optionCardSummaryTitleVariants,
   optionCardSummaryVariants,
+  optionCardTitleClampVariants,
   optionCardTitleRowVariants,
   optionCardTitleVariants,
   selectionOptionCardAnatomyBodyVariants,
@@ -38,6 +40,12 @@ export type SelectionOptionCardAnatomyProps = {
   controlPosition?: 'left' | 'right'
   /** When true, use summary title scale instead of chooser title scale. */
   useSummaryTitle?: boolean
+  /** Third-row badge below the description (e.g. spellcasting progression). */
+  summaryBadge?: ReactNode
+  /** Reserve badge-row height even when {@link summaryBadge} is absent. */
+  reserveSummaryBadgeRow?: boolean
+  /** Clamp title and description for equal-height card grids. */
+  clampDescription?: boolean
 }
 
 function SelectionOptionCardSummaryLines({
@@ -63,16 +71,25 @@ function SelectionOptionCardSecondaryContent({
   summaryText,
   summaryLines,
   density = 'default',
+  clampDescription = false,
 }: {
   description?: string
   summaryText?: string
   summaryLines?: string[]
   density?: SelectionOptionCardDensity
+  clampDescription?: boolean
 }) {
   return (
     <>
       {description ? (
-        <span className={optionCardDescriptionVariants({ density })}>{description}</span>
+        <span
+          className={cn(
+            optionCardDescriptionVariants({ density }),
+            clampDescription && optionCardDescriptionClampVariants(),
+          )}
+        >
+          {description}
+        </span>
       ) : null}
       {summaryText ? (
         <span className={optionCardSummaryVariants({ density })}>{summaryText}</span>
@@ -99,6 +116,9 @@ export function SelectionOptionCardAnatomy({
   titleClassName,
   controlPosition = 'left',
   useSummaryTitle = false,
+  summaryBadge,
+  reserveSummaryBadgeRow = false,
+  clampDescription = false,
 }: SelectionOptionCardAnatomyProps) {
   const summaryText =
     summaryItems && summaryItems.length > 0
@@ -109,29 +129,46 @@ export function SelectionOptionCardAnatomy({
   const TitleElement = useSummaryTitle ? 'h3' : 'span'
   const titleRow = (
     <div className={optionCardTitleRowVariants()}>
-      <TitleElement className={cn(titleVariants({ density }), titleClassName)}>
+      <TitleElement
+        className={cn(
+          titleVariants({ density }),
+          clampDescription && optionCardTitleClampVariants(),
+          titleClassName,
+        )}
+      >
         {label}
       </TitleElement>
       {titleAdornment}
     </div>
   )
 
+  const showSummaryBadgeRow = reserveSummaryBadgeRow || summaryBadge != null
+
   const primaryCopy = (
-    <div className={optionCardPrimaryCopyStackVariants({ density })}>
-      {titleEndSlot ? (
-        <div className="flex min-w-0 items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">{titleRow}</div>
-          <div className="shrink-0 self-center">{titleEndSlot}</div>
-        </div>
-      ) : (
-        titleRow
+    <div
+      className={cn(
+        optionCardPrimaryCopyStackVariants({ density }),
+        showSummaryBadgeRow && 'flex min-h-0 flex-1 flex-col',
       )}
-      <SelectionOptionCardSecondaryContent
-        description={description}
-        summaryText={summaryText}
-        summaryLines={summaryLines}
-        density={density}
-      />
+    >
+      <div className={cn(showSummaryBadgeRow && 'flex min-h-0 flex-1 flex-col')}>
+        {titleEndSlot ? (
+          <div className="flex min-w-0 items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">{titleRow}</div>
+            <div className="shrink-0 self-center">{titleEndSlot}</div>
+          </div>
+        ) : (
+          titleRow
+        )}
+        <SelectionOptionCardSecondaryContent
+          description={description}
+          summaryText={summaryText}
+          summaryLines={summaryLines}
+          density={density}
+          clampDescription={clampDescription}
+        />
+      </div>
+      {showSummaryBadgeRow ? <div className="mt-auto min-h-6 pt-1">{summaryBadge}</div> : null}
     </div>
   )
 

@@ -116,6 +116,12 @@ export const optionCardDescriptionVariants = cva('text-muted-foreground', {
 
 export const optionCardSummaryVariants = optionCardDescriptionVariants
 
+/** Two-line clamp for compact card descriptions in equal-height grids. */
+export const optionCardDescriptionClampVariants = cva('line-clamp-2 min-h-[2lh]')
+
+/** Single-line clamp for compact card titles in equal-height grids. */
+export const optionCardTitleClampVariants = cva('line-clamp-1')
+
 /** Static resolved option shell — selected chrome only, no hover. */
 export const selectionOptionCardShellVariants = cva(
   cn(
