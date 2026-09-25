@@ -89,7 +89,7 @@ async function loadAuthorizedAsset(assetId: string, userId: string): Promise<Med
   }
 
   const scope = scopeFromDoc(doc)
-  await assertMediaScopeAuthorized(scope, userId)
+  await assertMediaScopeAuthorized(scope, userId, 'read')
   return toMediaAsset(doc)
 }
 
@@ -214,7 +214,7 @@ export async function getMediaAssetRendition(input: {
   }
 
   const scope = scopeFromDoc(doc)
-  await assertMediaScopeAuthorized(scope, input.userId)
+  await assertMediaScopeAuthorized(scope, input.userId, 'read')
 
   const rendition = await generateMediaRendition({
     asset: doc,

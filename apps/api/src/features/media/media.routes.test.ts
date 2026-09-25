@@ -12,6 +12,7 @@ import {
   MINIMAL_PNG_BUFFER,
   SVG_BUFFER,
 } from '../../test/fixtures/media-images'
+import { registerCampaignMember } from '../../test/helpers/campaign-membership'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 import { useIntegrationDb } from '../../test/setup/integration-db'
 
@@ -268,5 +269,40 @@ describe('media routes', () => {
     expect(renditionRes.body.length).toBeGreaterThan(0)
 
     await outsider.agent.get(`/api/media/assets/${assetId}/renditions/compact-identity`).expect(403)
+  })
+
+  it('lets campaign members read campaign-identity renditions but not upload', async () => {
+    await clearTestDb()
+
+    const owner = await authedOwnerCampaign('media-identity-owner@example.com')
+    const player = await registerCampaignMember(getApp(), {
+      campaignId: owner.campaignId,
+      email: 'media-identity-player@example.com',
+      campaignRole: 'pc',
+    })
+
+    const sessionRes = await createSession(owner.agent, owner.csrfToken, {
+      kind: 'campaign-identity',
+      campaignId: owner.campaignId,
+    })
+    const sessionId = sessionRes.body.id as string
+    const buffer = await createTestImageBuffer('png', 200)
+    const uploadRes = await uploadToSession(
+      owner.agent,
+      owner.csrfToken,
+      sessionId,
+      buffer,
+      'banner.png',
+    ).expect(201)
+    const assetId = uploadRes.body.asset.id as string
+
+    await player.agent.get(`/api/media/assets/${assetId}/renditions/banner`).expect(200)
+    await player.agent.get(`/api/media/assets/${assetId}`).expect(200)
+
+    await player.agent
+      .post('/api/media/sessions')
+      .set(CSRF_HEADER, player.csrfToken)
+      .send({ scope: { kind: 'campaign-identity', campaignId: owner.campaignId } })
+      .expect(403)
   })
 })

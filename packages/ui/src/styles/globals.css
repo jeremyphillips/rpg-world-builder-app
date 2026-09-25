@@ -783,9 +783,9 @@
     --image-preview-size: 7.5rem; /* 120px — compact media preview default and lg+ */
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 40rem) {
     :root {
-      --image-preview-size: 5.625rem; /* 90px — md tier */
+      --image-preview-size: 5.625rem; /* 90px — sm through below lg */
     }
   }
 

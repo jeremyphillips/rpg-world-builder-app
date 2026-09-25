@@ -16,28 +16,29 @@ styles, and list behavior on all descendants and fights layout utilities
 Document outline presets — pair each `variant` with the matching `as` level. Use **one
 h1 per page** (route title via `page`, or entity title via `display` on detail routes).
 
-| Variant / component            | `as`   | px    | Weight               | Use case                                                        |
-| ------------------------------ | ------ | ----- | -------------------- | --------------------------------------------------------------- |
-| `Heading` `display`            | `h1`   | 42    | 700                  | Hero, content detail entity titles                              |
-| `Heading` `page`               | `h1`   | 34    | 600                  | Route titles (`PageHeader`)                                     |
-| `Heading` `section`            | `h2`   | 28    | 600                  | Top-level in-page sections                                      |
-| `Heading` `subsection`         | `h3`   | 19    | 600                  | Nested blocks within a section                                  |
-| `Heading` `group`              | `h4`   | 16    | 500                  | Headings inside subsections                                     |
-| `Heading` `card`               | Radix  | 19    | 600                  | `CardTitle` (chrome)                                            |
-| `Heading` `dialogTitle`        | Radix  | 19→24 | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+) |
-| `Heading` `confirmDialogTitle` | Radix  | 19    | 600                  | `ConfirmDialog` title — compact, non-responsive                 |
-| `Heading` `nav` / `brand`      | `span` | 16    | 600                  | Topbar title, sidebar product name                              |
-| `Heading` `alert`              | Radix  | 16    | 600                  | Inline `Alert` titles                                           |
-| `Heading` `label`              | `p`    | 16    | 500                  | Inline non-outline titles (trait names)                         |
-| `Text` `body`                  | `p`    | 16    | 400                  | Default foreground copy                                         |
-| `Text` `muted`                 | `p`    | 16    | 400                  | Non-catalog plain copy (hints, errors)                          |
-| `Text` `small`                 | `p`    | 15    | 400                  | Helper text, secondary metadata                                 |
-| `Text` `caption`               | `p`    | 12    | 400                  | Form field hints                                                |
-| `Text` `lead`                  | `p`    | 18    | 400                  | Marketing subheads                                              |
-| `Text` `destructive`           | `p`    | 15    | 400                  | Inline errors — pair with `role="alert"`                        |
-| `Eyebrow` `xs` / `sm` / `md`   | `p`    | 9–13  | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)   |
-| `RichTextContent` `size="md"`  | `div`  | 15    | 400                  | Catalog descriptions (TipTap / CMS HTML)                        |
-| `CardDescription`              | `div`  | 15    | 400                  | Card header secondary line                                      |
+| Variant / component            | `as`   | px    | Weight               | Use case                                                                      |
+| ------------------------------ | ------ | ----- | -------------------- | ----------------------------------------------------------------------------- |
+| `Heading` `display`            | `h1`   | 42    | 700                  | Hero, content detail entity titles                                            |
+| `Heading` `page`               | `h1`   | 34    | 600                  | Route titles (`PageHeader`)                                                   |
+| `Heading` `heroTitle`          | `h1`   | 19→34 | 600                  | Page hero titles (`Hero`, campaign overview) — 19px mobile, 24px md, 34px lg+ |
+| `Heading` `section`            | `h2`   | 28    | 600                  | Top-level in-page sections                                                    |
+| `Heading` `subsection`         | `h3`   | 19    | 600                  | Nested blocks within a section                                                |
+| `Heading` `group`              | `h4`   | 16    | 500                  | Headings inside subsections                                                   |
+| `Heading` `card`               | Radix  | 19    | 600                  | `CardTitle` (chrome)                                                          |
+| `Heading` `dialogTitle`        | Radix  | 19→24 | 600                  | `Modal.Header` / `Sheet.Header` default (19px mobile, 24px md+)               |
+| `Heading` `confirmDialogTitle` | Radix  | 19    | 600                  | `ConfirmDialog` title — compact, non-responsive                               |
+| `Heading` `nav` / `brand`      | `span` | 16    | 600                  | Topbar title, sidebar product name                                            |
+| `Heading` `alert`              | Radix  | 16    | 600                  | Inline `Alert` titles                                                         |
+| `Heading` `label`              | `p`    | 16    | 500                  | Inline non-outline titles (trait names)                                       |
+| `Text` `body`                  | `p`    | 16    | 400                  | Default foreground copy                                                       |
+| `Text` `muted`                 | `p`    | 16    | 400                  | Non-catalog plain copy (hints, errors)                                        |
+| `Text` `small`                 | `p`    | 15    | 400                  | Helper text, secondary metadata                                               |
+| `Text` `caption`               | `p`    | 12    | 400                  | Form field hints                                                              |
+| `Text` `lead`                  | `p`    | 18    | 400                  | Marketing subheads                                                            |
+| `Text` `destructive`           | `p`    | 15    | 400                  | Inline errors — pair with `role="alert"`                                      |
+| `Eyebrow` `xs` / `sm` / `md`   | `p`    | 9–13  | 500 light / 300 dark | Uppercase section labels (`tone`: muted, foreground, primary)                 |
+| `RichTextContent` `size="md"`  | `div`  | 15    | 400                  | Catalog descriptions (TipTap / CMS HTML)                                      |
+| `CardDescription`              | `div`  | 15    | 400                  | Card header secondary line                                                    |
 
 Preserve semantic headings and existing `id`s — content detail routes use
 `aria-labelledby` on sections.
@@ -163,16 +164,30 @@ They override Tailwind’s built-in `text-*` utilities — components keep using
 Visual tiers and role aliases live in [`styles/globals.css`](../src/styles/globals.css).
 Retune the document ladder via `--text-heading-1` … `--text-heading-5` (@ 16px root):
 
-| Visual tier | Role alias                  | `Heading` variant                         | px  |
-| ----------- | --------------------------- | ----------------------------------------- | --- |
-| heading-1   | `--text-heading-display`    | `display`                                 | 42  |
-| heading-2   | `--text-heading-page`       | `page`                                    | 34  |
-| heading-3   | `--text-heading-section`    | `section`                                 | 28  |
-| heading-4   | `--text-heading-subsection` | `subsection`, `card` (chrome)             | 19  |
-| heading-5   | `--text-heading-group`      | `group`, `label`, `nav`, `brand`, `alert` | 16  |
+| Visual tier | Role alias                  | `Heading` variant                               | px    |
+| ----------- | --------------------------- | ----------------------------------------------- | ----- |
+| heading-1   | `--text-heading-display`    | `display`                                       | 42    |
+| heading-2   | `--text-heading-page`       | `page`                                          | 34    |
+| —           | responsive composite        | `heroTitle` (subsection → sheet-section → page) | 19→34 |
+| heading-3   | `--text-heading-section`    | `section`                                       | 28    |
+| heading-4   | `--text-heading-subsection` | `subsection`, `card` (chrome)                   | 19    |
+| heading-5   | `--text-heading-group`      | `group`, `label`, `nav`, `brand`, `alert`       | 16    |
 
 `variant` controls appearance; `as` controls document semantics. Match the hierarchy
 table above in app code.
+
+## Media preview size
+
+`size-image-preview` maps to `--spacing-image-preview` → `--image-preview-size` in
+[`styles/globals.css`](../src/styles/globals.css):
+
+| Viewport        | Size  |
+| --------------- | ----- |
+| below `sm`      | 120px |
+| `sm`–below `lg` | 90px  |
+| `lg`+           | 120px |
+
+Shared by `Hero` mark frames and `MediaFieldSummary` compact previews.
 
 ## Composite typography utilities
 

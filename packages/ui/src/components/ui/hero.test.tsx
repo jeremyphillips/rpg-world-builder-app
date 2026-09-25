@@ -62,8 +62,8 @@ describe('Hero', () => {
     const identityBlock = mark.parentElement?.parentElement
     const markShell = mark.parentElement
 
-    expect(identityBlock).toHaveClass('sm:px-4', 'md:px-2', 'lg:px-4')
-    expect(identityBlock).not.toHaveClass('px-4')
+    expect(identityBlock).toHaveClass('sm:px-2', 'lg:px-4')
+    expect(identityBlock).not.toHaveClass('px-4', 'sm:px-4')
     expect(markShell).toHaveClass('hidden', 'sm:block', 'sm:mr-4')
     expect(mark.compareDocumentPosition(title)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     expect(identityBlock).toContainElement(screen.getByTestId('meta'))
@@ -77,8 +77,8 @@ describe('Hero', () => {
   it('omits desktop emblem spacing when the mark is absent', () => {
     const { container } = render(<Hero title="Campaign" meta={<span>Meta</span>} />)
 
-    expect(container.querySelector('.sm\\:px-4')).toBeNull()
-    expect(container.querySelector('.md\\:px-2')).toBeNull()
+    expect(container.querySelector('.sm\\:px-2')).toBeNull()
+    expect(container.querySelector('.lg\\:px-4')).toBeNull()
     expect(container.querySelector('.sm\\:mr-4')).toBeNull()
     expect(container.querySelector('.hidden.sm\\:block')).toBeNull()
   })

@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+import { headingVariants } from '@rpg/ui'
+
 import { ROUTES } from '@/app/routes'
 import { MESSAGES_ACTION_COPY } from '@/features/message'
 import { renderWithProviders } from '@/test/render'
@@ -55,11 +57,7 @@ describe('CampaignOverviewHero', () => {
 
     const heading = screen.getByRole('heading', { level: 1, name: 'Sunless Citadel' })
     expect(heading).toBeInTheDocument()
-    expect(heading).toHaveClass(
-      'heading-style-subsection',
-      'md:heading-style-sheet-section',
-      'lg:heading-style-page',
-    )
+    expect(heading).toHaveClass(...headingVariants({ variant: 'heroTitle' }).split(/\s+/))
     expect(screen.getByText('Active · 4 players · 6 characters')).toBeInTheDocument()
   })
 

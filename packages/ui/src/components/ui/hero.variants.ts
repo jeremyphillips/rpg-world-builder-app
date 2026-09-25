@@ -18,7 +18,7 @@ export const heroMarkCopyGapClasses = 'sm:mr-4'
 export const heroIdentityBlockVariants = cva('flex items-start', {
   variants: {
     hasMark: {
-      true: 'sm:px-4 md:px-2 lg:px-4',
+      true: 'sm:px-2 lg:px-4',
       false: '',
     },
   },
