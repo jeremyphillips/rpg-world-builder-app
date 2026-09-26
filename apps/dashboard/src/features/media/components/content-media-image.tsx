@@ -1,5 +1,9 @@
-import { cn } from '@rpg/ui'
-import { resolveNormalizedCropImageLayout, type ContentDisplayImage } from '@rpg/contracts'
+import { cn, ContentDisplayFallbackIcon } from '@rpg/ui'
+import {
+  resolveNormalizedCropImageLayout,
+  type ContentDisplayFallback,
+  type ContentDisplayImage,
+} from '@rpg/contracts'
 
 import {
   resolveContentImagePresentationDefault,
@@ -7,21 +11,24 @@ import {
 } from '@/features/content/lib/detail/page/content-image-presentation-defaults'
 import {
   contentMediaImageClasses,
+  contentMediaImageFallbackIconClasses,
+  contentMediaImageFallbackWellClasses,
   contentMediaImageFrameVariants,
   contentMediaImageWhitePaperKnockoutClasses,
+  type ContentMediaImageFrame,
 } from './content-media-image.variants'
 
-export type ContentMediaImageFrame =
-  | 'intrinsic'
-  | 'primary'
-  | 'builderSheetHero'
-  | 'builderCard'
-  | 'square'
-  | 'insetSm'
+export type { ContentMediaImageFrame }
 
 export type ContentMediaImageProps = {
   display: ContentDisplayImage
   alt: string
+  frame?: ContentMediaImageFrame
+  className?: string
+}
+
+export type ContentMediaFallbackProps = {
+  fallback: ContentDisplayFallback
   frame?: ContentMediaImageFrame
   className?: string
 }
@@ -80,6 +87,29 @@ export function ContentMediaImage({
               }
         }
       />
+    </div>
+  )
+}
+
+/** Semantic fallback in the same aspect frame as {@link ContentMediaImage} for a surface. */
+export function ContentMediaFallback({
+  fallback,
+  frame = 'intrinsic',
+  className,
+}: ContentMediaFallbackProps) {
+  return (
+    <div
+      className={cn(contentMediaImageFrameVariants({ frame }), className)}
+      aria-hidden
+      data-content-media-fallback={fallback}
+    >
+      <div className={contentMediaImageFallbackWellClasses}>
+        <ContentDisplayFallbackIcon
+          fallback={fallback}
+          size="sm"
+          className={contentMediaImageFallbackIconClasses[frame]}
+        />
+      </div>
     </div>
   )
 }

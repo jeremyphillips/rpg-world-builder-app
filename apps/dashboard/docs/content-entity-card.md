@@ -589,8 +589,8 @@ Identity artwork follows one pipeline from role resolution to a geometry-only fr
 
 ```text
 getContentDisplayImage / resolveMediaRoleDisplayImage → ContentDisplayImage
-  → dashboard ContentMediaImage (crop math)
-  → @rpg/ui IdentityFrame (size, shape, cover/contain)
+  → dashboard ContentMediaImage (crop math) or ContentMediaFallback (same frame)
+  → @rpg/ui IdentityFrame (compact inset) / aspect frames (primary, builderCard, …)
   → surface adapter (card, table cell, preview rail, campaign name row)
 ```
 

@@ -2,6 +2,14 @@ import { cva } from 'class-variance-authority'
 
 import { cn, identityFrameVariants } from '@rpg/ui'
 
+export type ContentMediaImageFrame =
+  | 'intrinsic'
+  | 'primary'
+  | 'builderSheetHero'
+  | 'builderCard'
+  | 'square'
+  | 'insetSm'
+
 /** Matches inherited radio-card / shell `--surface-current` for blend knockouts. */
 export const contentMediaImageSurfaceBackdropClasses =
   'bg-[var(--surface-current,var(--background))]'
@@ -26,3 +34,17 @@ export const contentMediaImageClasses = 'block size-full max-w-none select-none 
 
 /** White-paper line art on a light surface; dark mode renders the original artwork. */
 export const contentMediaImageWhitePaperKnockoutClasses = 'mix-blend-multiply dark:mix-blend-normal'
+
+/** Empty-state well — matches {@link identityFrameFallbackVariants} tone inside aspect frames. */
+export const contentMediaImageFallbackWellClasses =
+  'flex size-full items-center justify-center bg-surface-strong text-muted-foreground'
+
+/** Lucide root sizing for semantic fallback icons — keyed to {@link ContentMediaImageFrame}. */
+export const contentMediaImageFallbackIconClasses: Record<ContentMediaImageFrame, string> = {
+  square: 'size-icon-glyph-xs',
+  insetSm: 'size-icon-glyph-sm',
+  builderCard: 'size-icon-glyph-lg',
+  primary: 'size-icon-glyph-xl',
+  builderSheetHero: 'size-icon-glyph-xl',
+  intrinsic: 'size-icon-glyph-xl',
+}

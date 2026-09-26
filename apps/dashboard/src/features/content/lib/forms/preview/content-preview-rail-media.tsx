@@ -1,7 +1,9 @@
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
-import { ContentDisplayFallbackIcon, IconContainer } from '@rpg/ui'
 
-import { ContentMediaImage } from '@/features/media/components/content-media-image'
+import {
+  ContentMediaFallback,
+  ContentMediaImage,
+} from '@/features/media/components/content-media-image'
 
 export type ContentPreviewRailMediaProps = {
   displayImage?: ContentDisplayImage
@@ -16,9 +18,5 @@ export function ContentPreviewRailMedia({
     return <ContentMediaImage display={displayImage} alt="" frame="insetSm" />
   }
 
-  return (
-    <IconContainer size="sm">
-      <ContentDisplayFallbackIcon fallback={fallback} size="md" />
-    </IconContainer>
-  )
+  return <ContentMediaFallback fallback={fallback} frame="insetSm" />
 }

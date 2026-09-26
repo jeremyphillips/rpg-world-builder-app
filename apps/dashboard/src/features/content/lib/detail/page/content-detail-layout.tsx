@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
-import { Card, CardContent, ContentDisplayFallbackIcon, Heading, IdentityFrame } from '@rpg/ui'
+import { Card, CardContent, Heading } from '@rpg/ui'
 
 import { narrowPageContentClasses } from '@/components/layout/page/page-content.variants'
 import { useCanManageCampaign } from '@/features/campaign'
 
-import { ContentMediaImage } from './content-media-image'
+import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
 import { ContentDetailEditAction } from './content-detail-edit-action'
 import {
   contentDetailHeroCardClasses,
@@ -132,10 +132,10 @@ export function ContentDetailLayout({
                 ) : imageUrl ? (
                   <img src={imageUrl} alt={imageName} className={contentDetailHeroImageClasses} />
                 ) : displayFallback ? (
-                  <IdentityFrame
-                    shape="box"
-                    size="md"
-                    fallback={<ContentDisplayFallbackIcon fallback={displayFallback} size="md" />}
+                  <ContentMediaFallback
+                    fallback={displayFallback}
+                    frame="primary"
+                    className={contentDetailHeroImageFrameClasses}
                   />
                 ) : null}
               </div>

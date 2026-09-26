@@ -1,5 +1,7 @@
 export {
+  ContentMediaFallback,
   ContentMediaImage,
+  type ContentMediaFallbackProps,
   type ContentMediaImageFrame,
   type ContentMediaImageProps,
 } from './components/content-media-image'

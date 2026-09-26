@@ -3,7 +3,7 @@ import { render } from '@testing-library/react'
 
 import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content/lib/detail/page/content-image-presentation-defaults'
 
-import { ContentMediaImage } from './content-media-image'
+import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
 
 describe('ContentMediaImage', () => {
   it('applies surface defaults when no crop is present', () => {
@@ -115,6 +115,18 @@ describe('ContentMediaImage', () => {
     expect(container.querySelector('img')).toHaveClass('mix-blend-multiply')
     expect(container.querySelector('img')).not.toHaveClass('dark:invert')
     expect(container.querySelector('img')).toHaveClass('object-cover')
+  })
+
+  it('renders semantic fallback in the same primary aspect frame as artwork', () => {
+    const { container } = render(
+      <ContentMediaFallback fallback="equipment" frame="primary" className="rounded-card" />,
+    )
+
+    const frame = container.firstElementChild
+    expect(frame).toHaveClass('aspect-[4/3]')
+    expect(frame).toHaveClass('rounded-card')
+    expect(frame).toHaveAttribute('data-content-media-fallback', 'equipment')
+    expect(container.querySelector('svg')).toHaveClass('size-icon-glyph-xl')
   })
 
   it('does not apply knockout blend classes without presentation treatment metadata', () => {
