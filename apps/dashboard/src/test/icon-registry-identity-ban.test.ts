@@ -26,8 +26,6 @@ const IDENTITY_ALIAS_CONSUMER_FILES: Readonly<Record<string, readonly RegExp[]>>
   ],
   'apps/dashboard/src/features/character/components/builder/steps/proficiencies/proficiency-category-icons.ts':
     [/\bListChecks\b/],
-  'apps/dashboard/src/features/character/components/builder/steps/shared/builder-step-choose-class-prompt.tsx':
-    [/\bWaypoints\b/, /\bBookOpen\b/],
   'apps/dashboard/src/components/layout/sidebar/lib/sidebar-nav-icons.ts': [
     /\bCONTENT_DISPLAY_FALLBACK_ICONS\b/,
   ],

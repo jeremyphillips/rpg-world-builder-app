@@ -1,4 +1,6 @@
-import { Button, IconContainer, contentIdentityIcon } from '@rpg/ui'
+import { Waypoints } from 'lucide-react'
+
+import { Button, IconContainer } from '@rpg/ui'
 
 import { BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL } from '../../../../lib/builder/builder-step-choose-class-prompt.lib'
 import type { CharacterBuilderNavigateToStep } from '../../../../lib/builder/character-builder-navigation-options'
@@ -24,13 +26,11 @@ export function BuilderStepChooseClassPrompt({
   onNavigateToStep,
   actionLabel = BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL,
 }: BuilderStepChooseClassPromptProps) {
-  const ClassIdentityIcon = contentIdentityIcon('class')
-
   return (
     <article className={builderStepChooseClassPromptCardClasses}>
       <div className={builderStepChooseClassPromptBodyClasses}>
         <IconContainer shape="circle">
-          <ClassIdentityIcon aria-hidden />
+          <Waypoints aria-hidden />
         </IconContainer>
         <div className={builderStepChooseClassPromptContentClasses}>
           <div className={builderStepChooseClassPromptTextStackClasses}>
