@@ -43,12 +43,12 @@ Full checklist and file matrix → [reference.md](./reference.md). Policy depth
 
 ### Create mode
 
-1. **Contracts** — add `ContentTypeKey` to `CONTENT_TYPE_KEYS`, `CONTENT_TYPE_TERMS`, and `CONTENT_TYPE_CAPABILITIES` when duplication applies.
+1. **Contracts** — add `ContentTypeKey` to `CONTENT_TYPE_KEYS`, `CONTENT_TYPE_TERMS`, and `CONTENT_TYPE_CAPABILITIES` when duplication applies. Wire display fallbacks: media-opted types in `resolve-content-media-domain.ts`; non-media types add a row to `CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT` in `content-display-fallback.ts` (preview rail uses identity keys, not `generic`). Extend `content-display-fallback.test.ts` coverage for the new key.
 2. **Integration manifest** — add entry in [`CONTENT_TYPE_INTEGRATION_MANIFEST`](../../../tools/content-types/src/content-type-integration-manifest.ts) (`satisfies Record<ContentTypeKey, …>` enforces completeness). Declare API and dashboard metadata only as those integrations are implemented.
 3. **Contracts schema** — `packages/contracts/src/rpg/content/<type>.ts` + barrel export + co-located tests.
 4. **Catalog capability** — set manifest `catalog.bundledContent`; only bundled types add `packages/catalog/src/<type>/` JSON, loaders, tests, and package exports. Do not create empty seed packages for campaign-authored types.
 5. **API** — `*.config.ts` with an optional `system` capability for bundled content + one line in `content-types.ts`.
-6. **Dashboard** — sub-area folder: list/detail routes, `*-display.ts` view model, form def (if authoring), lazy routes, `CONTENT_ROUTES`, router tree. Authorable types also register their API `routeKey` in `content-form-navigation.ts` so create flows can resolve the edit route.
+6. **Dashboard** — sub-area folder: list/detail routes, `*-display.ts` view model, form def (if authoring), lazy routes, `CONTENT_ROUTES`, router tree. Authorable types also register their API `routeKey` in `content-form-navigation.ts` so create flows can resolve the edit route. Sidebar nav: `sidebar-nav-icons.ts` entry via `contentIdentityIcon('…')` — never `CONTENT_DISPLAY_FALLBACK_ICONS` or duplicate Lucide identity glyphs. Form tabs that _are_ a catalog role alias through `contentIdentityIcon` in `content-form-tab-icons.ts` when applicable.
    - Before `*-overview-columns.tsx`: run [Overview table UX](#overview-table-ux) if the user did not specify columns or filters.
    - Optional `ContentFormDef.preview` (identity / sections / player detail). Class is the reference; omit the block to keep NarrowPage. Drift: `buildSections` keys must equal `buildTabs` ids.
 7. **Manifest flags** — set implemented dashboard capabilities (`formDefinitionPath`, `visibleInSidebar`, `routeSection`) and `catalog.bundledContent`; add `catalog.packageName` only for bundled content.
@@ -182,6 +182,7 @@ Work is not done until affected drift tests pass:
 | Dashboard sidebar | `content-registry.test.ts`                                       |
 | Dashboard forms   | `content-form-registry.test.ts`                                  |
 | Dashboard test factories | `content-test-factory-registry.test.ts` + `content-test-factory-semantics.test.ts` |
+| Icon registry     | `icon-registry-identity-ban.test.ts` (sidebar + alias consumers); expand `icon-registry-scope-ban.test.ts` when migrating action verbs in the new folder |
 
 Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 
@@ -199,6 +200,7 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 | Production bundle bloat               | Imported `content-form-test-registry.ts` from runtime code — **never**         |
 | Overview table feels wrong            | Built columns/filters without user input — should have prompted first          |
 | Test factory parity fails             | New `ContentTypeKey` without `CONTENT_TEST_FACTORY_REGISTRY` entry             |
+| Preview rail / sidebar icon drift     | Missing `CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT` or `sidebar-nav-icons` `contentIdentityIcon` entry |
 
 **Rule:** Runtime registries are authoritative. The integration manifest is metadata for drift tests only — no schemas, loaders, or route functions in tooling.
 
@@ -225,6 +227,7 @@ Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------- |
 | Full 18-step checklist + file matrix | [reference.md](./reference.md)                                                                        |
 | End-to-end guide (SSOT)              | [`docs/content-types.md`](../../../docs/content-types.md)                                             |
+| Icon registry (identity vs actions)  | [`packages/ui/docs/icon-registry.md`](../../../packages/ui/docs/icon-registry.md)                     |
 | Integration manifest                 | [`tools/content-types/README.md`](../../../tools/content-types/README.md)                             |
 | Form conventions                     | [`apps/dashboard/docs/form-lib-conventions.md`](../../../apps/dashboard/docs/form-lib-conventions.md) |
 | Content duplication                  | [`apps/api/docs/content-duplication.md`](../../../apps/api/docs/content-duplication.md)               |
