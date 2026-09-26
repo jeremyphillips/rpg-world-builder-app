@@ -3,6 +3,7 @@ import { Router } from 'express'
 import {
   CAMPAIGN_ROLES,
   campaignNpcStatusPatchSchema,
+  characterMediaPatchInputSchema,
   createNpcRequestInputSchema,
 } from '@rpg/contracts'
 
@@ -27,6 +28,13 @@ campaignNpcRouter.post(
   controller.create,
 )
 campaignNpcRouter.get('/:npcId', requireAuth, requireCampaignMember, controller.getById)
+campaignNpcRouter.patch(
+  '/:npcId/media',
+  requireAuth,
+  requireNpcAuthor,
+  validate(characterMediaPatchInputSchema),
+  controller.patchMedia,
+)
 campaignNpcRouter.patch(
   '/:npcId',
   requireAuth,

@@ -7,6 +7,8 @@ import type {
 } from '@rpg/contracts'
 import { formatCharacterSummary, resolveCharacterSummaryParts } from '@rpg/contracts'
 
+import { resolveCharacterDisplayImageForSurface } from './resolve-character-display-image.lib'
+
 function isContentIndex(
   contentIndex:
     | CampaignContentEligibilityIndex
@@ -37,7 +39,7 @@ export function createCharacterSummaryLabelLookup(
 }
 
 export function buildCharacterCardSummaryDto(input: {
-  character: Pick<Character, 'id' | 'name' | 'classes' | 'species'>
+  character: Pick<Character, 'id' | 'name' | 'classes' | 'species' | 'media'>
   contentIndex:
     | CampaignContentEligibilityIndex
     | ReadonlyMap<string, CampaignContentEligibilityEntry>
@@ -45,11 +47,14 @@ export function buildCharacterCardSummaryDto(input: {
   const lookup = createCharacterSummaryLabelLookup(input.contentIndex)
   const parts = resolveCharacterSummaryParts(input.character, lookup)
 
+  const displayImage = resolveCharacterDisplayImageForSurface(input.character, 'compact')
+
   return {
     id: input.character.id,
     name: input.character.name,
     summary: formatCharacterSummary(parts),
     classIds: input.character.classes.map((entry) => entry.classId),
     speciesId: input.character.species.id,
+    ...(displayImage ? { displayImage } : {}),
   }
 }

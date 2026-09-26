@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
-import type { ContentDisplayImage } from '@rpg/contracts'
+import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 import { Card, CardContent, Heading } from '@rpg/ui'
 
 import { narrowPageContentClasses } from '@/components/layout/page/page-content.variants'
 import { useCanManageCampaign } from '@/features/campaign'
 
-import { ContentMediaImage } from './content-media-image'
+import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
 import { ContentDetailEditAction } from './content-detail-edit-action'
 import {
   contentDetailHeroCardClasses,
@@ -47,6 +47,8 @@ export type ContentDetailLayoutProps = {
   imageUrl?: string
   /** Crop-aware display image; takes precedence over `imageUrl`. */
   displayImage?: ContentDisplayImage
+  /** Semantic fallback when no artwork resolves (media domains). */
+  displayFallback?: ContentDisplayFallback
   /** Accessible name for the image (e.g. the content item's name). */
   imageName: string
   /** Campaign context for edit-button gating. */
@@ -78,6 +80,7 @@ export function ContentDetailLayout({
   nameBadge,
   imageUrl,
   displayImage,
+  displayFallback,
   imageName,
   campaignId,
   editHref,
@@ -93,6 +96,7 @@ export function ContentDetailLayout({
   const heroMetadata =
     metadata ??
     (statRows && statRows.length > 0 ? <ContentDetailStatRows statRows={statRows} /> : null)
+  const showHeroImage = displayImage != null || imageUrl != null || displayFallback != null
   const hasBody = Boolean(descriptionContent || children)
 
   return (
@@ -116,18 +120,26 @@ export function ContentDetailLayout({
               </div>
               {heroMetadata}
             </div>
-            <div className={contentDetailHeroImageShellClasses}>
-              {displayImage ? (
-                <ContentMediaImage
-                  display={displayImage}
-                  alt={imageName}
-                  frame="primary"
-                  className={contentDetailHeroImageFrameClasses}
-                />
-              ) : (
-                <img src={imageUrl} alt={imageName} className={contentDetailHeroImageClasses} />
-              )}
-            </div>
+            {showHeroImage ? (
+              <div className={contentDetailHeroImageShellClasses}>
+                {displayImage ? (
+                  <ContentMediaImage
+                    display={displayImage}
+                    alt={imageName}
+                    frame="primary"
+                    className={contentDetailHeroImageFrameClasses}
+                  />
+                ) : imageUrl ? (
+                  <img src={imageUrl} alt={imageName} className={contentDetailHeroImageClasses} />
+                ) : displayFallback ? (
+                  <ContentMediaFallback
+                    fallback={displayFallback}
+                    frame="primary"
+                    className={contentDetailHeroImageFrameClasses}
+                  />
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </CardContent>
       </Card>

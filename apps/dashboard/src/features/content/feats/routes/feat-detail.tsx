@@ -13,7 +13,6 @@ import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
-import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { buildFeatDetailViewModel } from '../lib/feat-display'
 
@@ -31,7 +30,6 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
       <ContentDetailLayout
         name={feat.name}
         nameBadge={<ContentStatusNameBadge status={feat.status} />}
-        imageUrl={getContentImageUrl(feat.imageKey)}
         imageName={feat.name}
         campaignId={campaignId}
         editHref={contentEditHref('feats', campaignId, feat.id)}

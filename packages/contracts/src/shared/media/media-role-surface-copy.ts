@@ -21,7 +21,8 @@ export const mediaRoleSurfaceCopy = {
     positionLabel: 'Portrait crop position',
     instructions: 'Drag to reposition.',
     workspaceHeading: 'Portrait crop',
-    workspaceDescription: 'Crop a square portrait for character cards, lists, and tokens.',
+    workspaceDescription:
+      'Crop a square portrait for compact circle and square tokens in rows and pickers.',
     switchLabel: 'Portrait',
   },
   banner: {
@@ -35,7 +36,7 @@ export const mediaRoleSurfaceCopy = {
     positionLabel: 'Primary crop position',
     instructions: 'Drag to reposition. Move the focal point to adjust focus.',
     workspaceHeading: 'Primary crop',
-    workspaceDescription: `Crop a ${formatAspectRatioLabel(primarySpec)} image for representative artwork and detail views.`,
+    workspaceDescription: `Crop a ${formatAspectRatioLabel(primarySpec)} image for stacked cards, detail views, and preview rails.`,
     switchLabel: 'Primary',
   },
   emblem: {

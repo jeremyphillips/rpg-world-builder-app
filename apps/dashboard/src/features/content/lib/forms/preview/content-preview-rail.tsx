@@ -21,7 +21,8 @@ import {
   type FieldGroupSummary,
   type TabbedFormTab,
 } from '@rpg/ui/form'
-import { Eye, type LucideIcon } from 'lucide-react'
+import type { ContentDisplayFallback } from '@rpg/contracts'
+import { Eye } from 'lucide-react'
 
 import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context'
 import { resolveCampaignAccessSummary } from '../../campaign-access/campaign-access-summary'
@@ -38,9 +39,10 @@ import {
 import {
   resolveContentPreviewAvailability,
   resolveContentPreviewReadinessPanel,
-  resolvePreviewRailFallbackIcon,
+  resolvePreviewRailDisplayFallback,
   resolvePreviewRailOpenSection,
 } from './content-preview-rail.lib'
+import { ContentPreviewRailMedia } from './content-preview-rail-media'
 import {
   isContentPreviewSectionExpandable,
   resolveContentPreviewSectionBodyProps,
@@ -106,7 +108,7 @@ function ContentPreviewRailBody({
   const preview = def.preview
   const contentTypeKey = def.routeKey as ContentTypeKey
   const term = getContentTypeTerm(contentTypeKey)
-  const FallbackIcon = resolvePreviewRailFallbackIcon(contentTypeKey)
+  const displayFallback = resolvePreviewRailDisplayFallback(contentTypeKey)
 
   const identity = useMemo(() => preview?.buildIdentity(values, ctx), [preview, values, ctx])
 
@@ -129,7 +131,7 @@ function ContentPreviewRailBody({
         hideHeader={hideHeader}
         showDraftBadge={showDraftBadge}
         term={term}
-        FallbackIcon={FallbackIcon}
+        displayFallback={displayFallback}
         identity={identity}
         access={access}
         accessSummary={accessSummary}
@@ -162,7 +164,7 @@ type ContentPreviewRailViewProps = {
   hideHeader: boolean
   showDraftBadge: boolean
   term: VocabularyTerm
-  FallbackIcon: LucideIcon
+  displayFallback: ContentDisplayFallback
   identity: ContentPreviewIdentity
   access: ContentCampaignAccessPatch
   accessSummary: FieldGroupSummary
@@ -185,7 +187,7 @@ function ContentPreviewRailView({
   hideHeader,
   showDraftBadge,
   term,
-  FallbackIcon,
+  displayFallback,
   identity,
   access,
   accessSummary,
@@ -210,7 +212,12 @@ function ContentPreviewRailView({
         />
       )}
       <PreviewRail.Identity
-        media={<PreviewRail.Media imageSrc={identity.imageSrc} fallbackIcon={<FallbackIcon />} />}
+        media={
+          <ContentPreviewRailMedia
+            displayImage={identity.displayImage}
+            fallback={displayFallback}
+          />
+        }
         name={identity.name}
         status={
           <PreviewRail.AvailabilityLine

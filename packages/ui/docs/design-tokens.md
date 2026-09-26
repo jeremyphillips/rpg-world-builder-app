@@ -238,6 +238,7 @@ Module: [`icon-glyph.variants.ts`](../src/components/ui/icon-glyph.variants.ts)
 | sm   | 12  | `size-icon-glyph-sm` | Dense inline — semantic text, filter reset       |
 | md   | 14  | `size-icon-glyph-md` | Breadcrumbs, compact icon-button glyph (pairing) |
 | lg   | 16  | `size-icon-glyph-lg` | Menus, default button icons                      |
+| xl   | 32  | `size-icon-glyph-xl` | Large empty-state glyphs (detail hero fallbacks) |
 
 Use `iconGlyphRootClasses` on root Lucide nodes; `iconGlyphDescendantClasses` /
 `iconGlyphDirectChildClasses` on wrappers.

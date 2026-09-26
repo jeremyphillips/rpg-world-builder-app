@@ -7,6 +7,7 @@ import { CAMPAIGN_ROLES } from '@rpg/contracts'
 
 import { findPcsByIds, findPcOwnerIdsByCharacterIds } from '../character'
 import { buildCharacterCardSummaryDto } from '../character'
+import { resolveCampaignEmblemImageUrl } from './lib/resolve-campaign-emblem-image-url.lib'
 import { buildCampaignContentEligibilityIndex } from '../campaign-invite'
 import { findUsersByIds } from '../user'
 import { HttpError } from '../../lib/http-error'
@@ -58,7 +59,7 @@ export async function listCampaignMembersForOverview(
     findUsersByIds(visibleMemberships.map((membership) => membership.userId)),
     listOpenParticipationsForCampaign(campaignId),
   ])
-  const displayNameByUserId = new Map(users.map((user) => [user.id, user.displayName]))
+  const userById = new Map(users.map((user) => [user.id, user]))
   const openParticipationCharacterIds = openParticipations.map(
     (participation) => participation.characterId,
   )
@@ -82,9 +83,11 @@ export async function listCampaignMembersForOverview(
         characterOwnerById,
       })
 
+      const user = userById.get(membership.userId)
       return {
         id: String(membership._id),
-        displayName: displayNameByUserId.get(membership.userId) ?? 'Unknown member',
+        displayName: user?.displayName ?? 'Unknown member',
+        ...(user?.avatarKey ? { avatarKey: user.avatarKey } : {}),
         role,
         onboardingState,
         ...(onboardingState === 'onboarding_incomplete' && membership.joinedAt
@@ -129,7 +132,7 @@ export async function listCampaignPartyForOverview(
   const users = await findUsersByIds([
     ...new Set([...controllerByCharacterId.values()].map((entry) => entry.userId)),
   ])
-  const displayNameByUserId = new Map(users.map((user) => [user.id, user.displayName]))
+  const userById = new Map(users.map((user) => [user.id, user]))
 
   const party: CampaignPartyPcListItem[] = []
 
@@ -140,6 +143,7 @@ export async function listCampaignPartyForOverview(
     if (!character) continue
 
     const controller = controllerByCharacterId.get(participation.characterId)
+    const campaignEmblemUrl = resolveCampaignEmblemImageUrl(campaign.identity.media)
 
     party.push({
       character: {
@@ -147,13 +151,18 @@ export async function listCampaignPartyForOverview(
         campaign: {
           id: campaignId,
           name: campaign.identity.name,
+          ...(campaignEmblemUrl ? { emblemUrl: campaignEmblemUrl } : {}),
         },
       },
       member: controller
-        ? {
-            id: controller.membershipId,
-            displayName: displayNameByUserId.get(controller.userId) ?? 'Unknown member',
-          }
+        ? (() => {
+            const user = userById.get(controller.userId)
+            return {
+              id: controller.membershipId,
+              displayName: user?.displayName ?? 'Unknown member',
+              ...(user?.avatarKey ? { avatarKey: user.avatarKey } : {}),
+            }
+          })()
         : null,
       roster: participation.roster,
     })

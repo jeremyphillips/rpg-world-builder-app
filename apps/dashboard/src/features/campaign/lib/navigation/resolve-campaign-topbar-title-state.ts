@@ -12,7 +12,7 @@ export type CampaignTopbarTitleState =
   | { kind: 'hidden' }
   | { kind: 'loading' }
   | { kind: 'error' }
-  | { kind: 'resolved'; campaignId: string; name: string }
+  | { kind: 'resolved'; campaign: CampaignListItem }
   | { kind: 'missing'; campaignId: string }
 
 export type CampaignsQueryState = {
@@ -47,8 +47,7 @@ export function resolveCampaignTopbarTitleState(
 
   return {
     kind: 'resolved',
-    campaignId,
-    name: buildCampaignDisplay(campaign).name,
+    campaign,
   }
 }
 
@@ -70,8 +69,8 @@ export function mapCampaignTopbarTitleState(
     case 'resolved':
       return {
         kind: 'resolved',
-        display: buildCampaignDisplay({ id: state.campaignId, name: state.name }),
-        href: ROUTES.campaign.detail(state.campaignId),
+        display: buildCampaignDisplay(state.campaign),
+        href: ROUTES.campaign.detail(state.campaign.id),
       }
     case 'missing':
       return {

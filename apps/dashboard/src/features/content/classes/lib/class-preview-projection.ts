@@ -1,6 +1,7 @@
 import {
   availableClassFeatures,
   CLASS_CONTENT_TYPE_TERM,
+  type ContentMedia,
   getAbilityCompactLabel,
   getArmorCategoryPreviewLabel,
   getWeaponCategoryPreviewLabel,
@@ -22,6 +23,7 @@ import type {
   ContentPreviewIdentity,
   ContentPreviewSection,
 } from '../../lib/forms/preview/content-form-preview.types'
+import { resolveFormPreviewDisplayImage } from '../../lib/forms/preview/resolve-form-preview-display-image'
 import type { ClassPreviewResources } from './class-preview-resources'
 import { featuresFromFormValues } from './class-feature-form-fields'
 import type { ClassFormValues } from './class-form-fields'
@@ -147,10 +149,18 @@ function isCharacterCreationConfigured(values: ClassFormValues): boolean {
 
 export function buildClassPreviewIdentity(
   values: ClassFormValues,
-  _ctx: ContentFormCtx,
+  ctx: ContentFormCtx,
 ): ContentPreviewIdentity {
+  const displayImage = resolveFormPreviewDisplayImage({
+    media: (values as ClassFormValues & { media?: ContentMedia }).media,
+    ctx,
+    contentType: 'classes',
+    slug: ctx.entitySlug ?? values.slug ?? 'preview',
+  })
+
   return {
     name: classPreviewName(values),
+    ...(displayImage ? { displayImage } : {}),
   }
 }
 

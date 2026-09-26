@@ -27,7 +27,9 @@ describe('CONTENT_MEDIA_POLICIES', () => {
     expect(CONTENT_MEDIA_POLICIES.campaign.allowedRoles).toEqual(['banner', 'primary', 'emblem'])
     expect(CONTENT_MEDIA_POLICIES.organization.allowedRoles).toEqual(['primary', 'emblem'])
 
-    for (const domain of ['class', 'species', 'equipment', 'location'] as const) {
+    expect(getContentMediaPolicy('location').allowedRoles).toEqual(['primary', 'emblem'])
+
+    for (const domain of ['class', 'species', 'equipment'] as const) {
       expect(getContentMediaPolicy(domain).allowedRoles).toEqual(['primary'])
     }
   })

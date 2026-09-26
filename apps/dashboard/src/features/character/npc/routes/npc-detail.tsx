@@ -3,6 +3,7 @@ import { WidePage } from '@/components/layout/page/wide-page'
 
 import { CampaignCharacterStatusSummary } from '../../components/detail/status/campaign-character-status-summary'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content'
+import { CharacterDetailRouteMedia } from '../../components/detail/sheet/character-detail-route-media'
 import { CharacterIdentityConnectionsSupplement } from '../../components/detail/memberships/character-identity-connections-supplement'
 import { NpcStatusEditAction } from '../components/npc-status-edit-action'
 import { useNpcDetailPage } from '../hooks/use-npc-detail-page'
@@ -31,6 +32,15 @@ export function NpcDetail() {
         {viewModel && npcDetail ? (
           <CharacterDetailContent
             viewModel={viewModel}
+            identityMedia={
+              <CharacterDetailRouteMedia
+                characterType="npc"
+                characterId={npcDetail.character.id}
+                campaignId={campaignId}
+                media={npcDetail.character.media}
+                canEditMedia={canManage}
+              />
+            }
             statusSummary={
               <CampaignCharacterStatusSummary
                 vital={npcDetail.character.vital}

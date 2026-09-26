@@ -17,16 +17,17 @@ import {
   SelectionSummaryCard,
   SelectionSummaryChangeAction,
   Text,
-  CatalogPickerSelectionActions,
-  resolveCatalogPickerRowActionPhase,
 } from '@rpg/ui'
 
+import { buildCharacterEntityCardModel } from '@/features/character'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import {
-  buildCharacterPickerEntitySummary,
-  buildOrganizationPickerEntitySummary,
-} from '../../../lib/entity/content-entity-picker-presentation.lib'
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from '../../../organizations/lib/organization-display'
+import { buildConnectedPartyCharacterEntitySummary } from '../../lib/connected-parties/location-connected-party-character-options.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
 import { applyPeopleKindSlotDownstreamState } from '../../../locations/lib/connected-parties/apply-people-kind-slot-downstream-state.lib'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
@@ -592,21 +593,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
             )
           }
           renderEntityRow={createCatalogEntityRowRenderer({
-            buildEntity: (organization) =>
-              buildOrganizationPickerEntitySummary(organization, {
-                imageKey: organization.imageKey,
-                description:
-                  organizationDomain != null &&
-                  !organizationInverseSubjectHasAvailableKind(
-                    organization.id,
-                    location.id,
-                    organizationAvailabilityKinds,
-                    orgRows,
-                  )
-                    ? organizationFullyLinkedReason
-                    : undefined,
-              }),
-            buildTrailing: (organization) => {
+            buildSurface: (organization) => {
               const isSelected = selectedOrganizationId === organization.id
               const hasAvailableKind =
                 organizationDomain != null &&
@@ -616,19 +603,23 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                   organizationAvailabilityKinds,
                   orgRows,
                 )
-              const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
               return {
-                kind: 'action',
-                content: (
-                  <CatalogPickerSelectionActions
-                    phase={phase}
-                    canSelect={hasAvailableKind}
-                    addLabel={isSelected ? 'Selected' : 'Select'}
-                    onAdd={() => setSelectedOrganizationId(organization.id)}
-                    onRemove={() => setSelectedOrganizationId(null)}
-                  />
+                identity: buildOrganizationEntityCardModel(
+                  buildOrganizationEntitySummaryVm(organization),
+                  {
+                    metadata:
+                      organizationDomain != null && !hasAvailableKind
+                        ? organizationFullyLinkedReason
+                        : undefined,
+                  },
                 ),
+                inlineAction: buildCatalogToggleSelectInlineAction({
+                  isSelected,
+                  canSelect: hasAvailableKind,
+                  onSelect: () => setSelectedOrganizationId(organization.id),
+                  onDeselect: () => setSelectedOrganizationId(null),
+                }),
               }
             },
           })}
@@ -659,19 +650,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         getItemToolbarLabel={(character) => character.name}
         getSearchText={buildConnectedPartyCharacterPickerSearchText}
         renderEntityRow={createCatalogEntityRowRenderer({
-          buildEntity: (character) =>
-            buildCharacterPickerEntitySummary(character, {
-              description:
-                characterKind != null &&
-                !characterInverseSubjectHasAvailableKind(
-                  character.id,
-                  characterAvailabilityKinds,
-                  characterExistingKeys,
-                )
-                  ? CHARACTER_DRAWER_FULLY_LINKED_REASON
-                  : undefined,
-            }),
-          buildTrailing: (character) => {
+          buildSurface: (character) => {
             const isSelected = selectedCharacterId === character.id
             const hasAvailableKind =
               characterKind != null &&
@@ -680,19 +659,23 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                 characterAvailabilityKinds,
                 characterExistingKeys,
               )
-            const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
             return {
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  phase={phase}
-                  canSelect={hasAvailableKind}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => setSelectedCharacterId(character.id)}
-                  onRemove={() => setSelectedCharacterId(null)}
-                />
+              identity: buildCharacterEntityCardModel(
+                buildConnectedPartyCharacterEntitySummary(character),
+                {
+                  metadata:
+                    characterKind != null && !hasAvailableKind
+                      ? CHARACTER_DRAWER_FULLY_LINKED_REASON
+                      : undefined,
+                },
               ),
+              inlineAction: buildCatalogToggleSelectInlineAction({
+                isSelected,
+                canSelect: hasAvailableKind,
+                onSelect: () => setSelectedCharacterId(character.id),
+                onDeselect: () => setSelectedCharacterId(null),
+              }),
             }
           },
         })}

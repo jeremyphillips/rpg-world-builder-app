@@ -18,6 +18,7 @@ describe('CampaignOverviewMembersSection', () => {
           {
             id: 'member_player',
             displayName: 'Player One',
+            avatarKey: 'avatars/player-one.png',
             role: 'pc',
             onboardingState: 'onboarding_incomplete',
           },
@@ -27,6 +28,10 @@ describe('CampaignOverviewMembersSection', () => {
 
     expect(screen.getByText('Dungeon Master')).toBeInTheDocument()
     expect(screen.getByText('Player One')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Player One' })).toHaveAttribute(
+      'src',
+      '/api/uploads/avatars/player-one.png',
+    )
     expect(
       screen.getByText(CAMPAIGN_OVERVIEW_MEMBER_ONBOARDING_LABELS.onboarding_incomplete),
     ).toBeInTheDocument()

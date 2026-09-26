@@ -11,7 +11,6 @@ export const untitledContentName = formatUntitledContentName
 /** Draft-authored body fields — allows empty name, then applies an untitled fallback. */
 export function draftAuthoredContentBodySchema(typeLabel: string) {
   return z.object({
-    imageKey: z.string().optional(),
     name: z
       .string()
       .transform((value) => (value.trim() ? value : formatUntitledContentName(typeLabel)))

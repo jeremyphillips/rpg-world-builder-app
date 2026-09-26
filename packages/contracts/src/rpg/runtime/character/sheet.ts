@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { contentMediaSchema } from '../../campaign/campaign-media.lib'
 import { alignmentSchema } from '../../vocab/alignment'
 import { genderSchema } from '../../vocab/character-gender'
 import {
@@ -29,6 +30,7 @@ const characterBaseFields = {
   id: z.string().min(1),
   name: z.string().min(1),
   imageKey: z.string().optional(),
+  media: contentMediaSchema.optional(),
   rulesetId: z.string().min(1),
   species: characterSpeciesSchema,
   alignment: alignmentSchema,

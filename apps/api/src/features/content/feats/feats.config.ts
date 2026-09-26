@@ -29,7 +29,6 @@ function toHomebrewFeat(doc: HomebrewDoc): Feat {
   return {
     ...homebrewContentEnvelope(record),
     name: record.name,
-    ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
     ...(record.category !== undefined && { category: record.category }),
     ...(record.prerequisite !== undefined && {

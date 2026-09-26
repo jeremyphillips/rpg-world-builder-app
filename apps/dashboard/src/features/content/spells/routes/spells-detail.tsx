@@ -20,7 +20,6 @@ import { useSpells } from '../hooks/use-spells'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
-import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { buildSpellDetailViewModel } from '../lib/spell-display'
 import { SpellDetailBody } from '../components/spell-detail-body'
@@ -52,7 +51,6 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
       <SpellDetailBody
         name={spell.name}
         nameBadge={<ContentStatusNameBadge status={spell.status} />}
-        imageUrl={getContentImageUrl(spell.imageKey)}
         imageName={spell.name}
         viewModel={viewModel}
         campaignId={campaignId}

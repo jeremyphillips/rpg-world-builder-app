@@ -1,9 +1,17 @@
 export {
+  ContentMediaFallback,
+  ContentMediaImage,
+  type ContentMediaFallbackProps,
+  type ContentMediaImageFrame,
+  type ContentMediaImageProps,
+} from './components/content-media-image'
+export {
   MediaManager,
   type MediaManagerProps,
   type MediaManagerSave,
 } from './components/media-manager'
 export { ManagedMediaField, type ManagedMediaFieldProps } from './components/managed-media-field'
+export { DetailMediaField, type DetailMediaFieldProps } from './components/detail-media-field'
 export {
   COMPACT_MEDIA_FIELD_PRESENTATION,
   EXPANDED_MEDIA_FIELD_PRESENTATION,

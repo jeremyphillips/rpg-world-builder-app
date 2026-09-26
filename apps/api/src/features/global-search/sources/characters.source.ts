@@ -1,4 +1,4 @@
-import type { GlobalSearchDocument, GlobalSearchField } from '@rpg/contracts'
+import type { ContentDisplayImage, GlobalSearchDocument, GlobalSearchField } from '@rpg/contracts'
 import {
   formatCharacterSummary,
   getCharacterTypeLabel,
@@ -24,6 +24,7 @@ function buildPcDocument(
   secondary: string,
   characterId: string,
   fields: GlobalSearchField[],
+  displayImage?: ContentDisplayImage,
 ): GlobalSearchDocument {
   return {
     id: `character:pc:${characterId}`,
@@ -37,6 +38,7 @@ function buildPcDocument(
       characterType: 'pc',
     },
     fields,
+    ...(displayImage ? { displayImage } : {}),
   }
 }
 
@@ -44,6 +46,7 @@ function buildNpcDocument(
   character: { id: string; name: string },
   secondary: string,
   fields: GlobalSearchField[],
+  displayImage?: ContentDisplayImage,
 ): GlobalSearchDocument {
   return {
     id: `character:npc:${character.id}`,
@@ -57,6 +60,7 @@ function buildNpcDocument(
       characterType: 'npc',
     },
     fields,
+    ...(displayImage ? { displayImage } : {}),
   }
 }
 
@@ -81,10 +85,13 @@ export const charactersSearchSource: SearchSource = {
     for (const entry of pcs) {
       const summary = entry.character.summary
       documents.push(
-        buildPcDocument(entry.character.name, summary, entry.character.id, [
-          labelField(entry.character.name),
-          keywordField(summary),
-        ]),
+        buildPcDocument(
+          entry.character.name,
+          summary,
+          entry.character.id,
+          [labelField(entry.character.name), keywordField(summary)],
+          entry.character.displayImage,
+        ),
       )
     }
 
@@ -92,10 +99,12 @@ export const charactersSearchSource: SearchSource = {
       const parts = resolveCharacterSummaryParts(entry.character, lookup)
       const secondary = formatCharacterSummary(parts)
       documents.push(
-        buildNpcDocument(entry.character, secondary, [
-          labelField(entry.character.name),
-          keywordField(secondary),
-        ]),
+        buildNpcDocument(
+          entry.character,
+          secondary,
+          [labelField(entry.character.name), keywordField(secondary)],
+          entry.character.displayImage,
+        ),
       )
     }
 

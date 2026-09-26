@@ -41,6 +41,19 @@ describe('class preview projection', () => {
     expect(identity.facts).toBeUndefined()
   })
 
+  it('derives system artwork when the form has no persisted media', () => {
+    const identity = buildClassPreviewIdentity(createValues(), {
+      entitySource: 'system',
+      entitySlug: 'fighter',
+      rulesetId: 'srd-cc-5.2.1',
+    })
+
+    expect(identity.displayImage).toMatchObject({
+      src: '/assets/system/srd-cc-5.2.1/classes/primary/fighter.jpeg',
+      sourceKind: 'system',
+    })
+  })
+
   it('projects hit die and primary abilities into the basics section', () => {
     const sections = buildClassPreviewSections(createValues(), emptyCtx)
 

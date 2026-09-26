@@ -1,13 +1,12 @@
 import * as React from 'react'
 
 import { resolveLocationClassificationDisplay, type Location } from '@rpg/contracts'
-import { Button, CatalogPickerSelectionActions, Eyebrow, Text } from '@rpg/ui'
+import { Button, Eyebrow, Text } from '@rpg/ui'
 
-import {
-  CatalogEntityPickerSheet,
-  CatalogEntityRow,
-  CatalogMetadataRenderer,
-} from '@/features/content'
+import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
+import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
+import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
+import { buildLocationEntityCardModelFromClassification } from '@/features/content/locations/lib/location-display'
 import { DrawerShell } from '@/components/drawer'
 
 import type {
@@ -127,7 +126,7 @@ export function LocationRelationshipAddDrawer({
           const classification = resolveLocationClassificationDisplay(location)
 
           return (
-            <CatalogEntityRow
+            <CatalogEntitySurfaceRow
               toolbarLabel={args.toolbarLabel}
               domIds={args.domIds}
               collapsible={args.collapsible}
@@ -135,25 +134,21 @@ export function LocationRelationshipAddDrawer({
               onToggleCollapse={args.onToggleCollapse}
               summary={args.summary}
               details={args.details}
-              entity={{
-                heading: location.name,
-                description: classification.text ? (
-                  <CatalogMetadataRenderer
-                    lines={[{ segments: [{ type: 'text', text: classification.text }] }]}
-                  />
-                ) : undefined,
-              }}
-              trailing={{
-                kind: 'action',
-                content: (
-                  <CatalogPickerSelectionActions
-                    canSelect
-                    onAdd={() => {
-                      void commitLocation(location.id)
-                    }}
-                    onRemove={() => undefined}
-                  />
-                ),
+              surface={{
+                identity: buildLocationEntityCardModelFromClassification({
+                  name: location.name,
+                  classificationText: classification.text,
+                  displayImage: getContentDisplayImage(
+                    buildLocationContentDisplayImageInput(location, 'compact'),
+                  ),
+                }),
+                inlineAction: {
+                  label: 'Add',
+                  onClick: () => {
+                    void commitLocation(location.id)
+                  },
+                  loading: pending,
+                },
               }}
             />
           )

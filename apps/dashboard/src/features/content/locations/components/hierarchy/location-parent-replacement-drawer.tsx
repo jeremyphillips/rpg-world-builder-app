@@ -1,19 +1,16 @@
 import * as React from 'react'
 
 import type { Location } from '@rpg/contracts'
-import {
-  Button,
-  SegmentedControl,
-  Text,
-  CatalogPickerSelectionActions,
-  resolveCatalogPickerRowActionPhase,
-} from '@rpg/ui'
+import { Button, SegmentedControl, Text } from '@rpg/ui'
 
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
-import { buildLocationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
+import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
-import { buildLocationEntitySummarySearchText } from '../../lib/location-display'
+import {
+  buildLocationEntityCardModel,
+  buildLocationEntitySummarySearchText,
+} from '../../lib/location-display'
 import {
   buildLocationParentReplacementContext,
   canSubmitLocationParentReplacement,
@@ -57,7 +54,8 @@ function toEntityReplacementCurrentSnapshot(
 ): EntityReplacementCurrentSnapshot {
   return {
     entity: current.entity,
-    imageKey: current.imageKey,
+    displayImage: current.displayImage,
+    fallback: current.fallback,
     unavailable: current.unavailable,
   }
 }
@@ -265,25 +263,14 @@ function LocationParentReplacementDrawerContent({
       getItemToolbarLabel={(summary) => summary.name}
       getSearchText={buildLocationEntitySummarySearchText}
       renderEntityRow={createCatalogEntityRowRenderer({
-        buildEntity: (summary) =>
-          buildLocationPickerEntitySummary(summary, { imageKey: summary.imageKey }),
-        buildTrailing: (summary) => {
-          const isSelected = selectedParentId === summary.id
-          const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
-
-          return {
-            kind: 'action',
-            content: (
-              <CatalogPickerSelectionActions
-                phase={phase}
-                canSelect
-                addLabel={isSelected ? 'Selected' : 'Select'}
-                onAdd={() => setSelectedParentId(summary.id)}
-                onRemove={() => setSelectedParentId(null)}
-              />
-            ),
-          }
-        },
+        buildSurface: (summary) => ({
+          identity: buildLocationEntityCardModel(summary),
+          inlineAction: buildCatalogToggleSelectInlineAction({
+            isSelected: selectedParentId === summary.id,
+            onSelect: () => setSelectedParentId(summary.id),
+            onDeselect: () => setSelectedParentId(null),
+          }),
+        }),
       })}
     />
   )

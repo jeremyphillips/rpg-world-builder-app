@@ -337,6 +337,7 @@
   --icon-glyph-sm: 0.75rem;
   --icon-glyph-md: 0.875rem;
   --icon-glyph-lg: 1rem;
+  --icon-glyph-xl: 2rem;
 
   /* StatusIcon off-slash — smaller than the icon-glyph ladder (Lucide slash reads heavier). */
   --status-icon-slash-sm: 0.375rem;
@@ -409,6 +410,11 @@
 @utility size-icon-glyph-lg {
   width: var(--icon-glyph-lg);
   height: var(--icon-glyph-lg);
+}
+
+@utility size-icon-glyph-xl {
+  width: var(--icon-glyph-xl);
+  height: var(--icon-glyph-xl);
 }
 
 @utility size-status-icon-slash-sm {

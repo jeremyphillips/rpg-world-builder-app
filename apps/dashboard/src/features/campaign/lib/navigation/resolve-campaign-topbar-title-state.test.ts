@@ -56,8 +56,7 @@ describe('resolveCampaignTopbarTitleState', () => {
       }),
     ).toEqual({
       kind: 'resolved',
-      campaignId: 'camp_1',
-      name: 'The Argent Road',
+      campaign: makeCampaignListItem({ id: 'camp_1', identity: { name: 'The Argent Road' } }),
     })
   })
 
@@ -77,8 +76,7 @@ describe('mapCampaignTopbarTitleState', () => {
     expect(
       mapCampaignTopbarTitleState({
         kind: 'resolved',
-        campaignId: 'camp_1',
-        name: 'The Argent Road',
+        campaign: makeCampaignListItem({ id: 'camp_1', identity: { name: 'The Argent Road' } }),
       }),
     ).toEqual({
       kind: 'resolved',

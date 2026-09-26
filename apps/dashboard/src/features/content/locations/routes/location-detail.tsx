@@ -13,7 +13,8 @@ import {
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
-import { getContentImageUrl } from '../../lib/detail/page/content-image-url'
+import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import { buildLocationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { LocationChildrenSection } from '../components/hierarchy/location-children-section'
 import { LocationConnectedPartiesDetailSections } from '../components/connected-parties/location-connected-parties-detail-sections'
@@ -47,7 +48,10 @@ export function LocationDetailContent({
       <ContentDetailLayout
         name={location.name}
         nameBadge={<ContentStatusNameBadge status={location.status} />}
-        imageUrl={getContentImageUrl(location.imageKey)}
+        displayImage={getContentDisplayImage(
+          buildLocationContentDisplayImageInput(location, 'detail'),
+        )}
+        displayFallback="location"
         imageName={location.name}
         campaignId={campaignId}
         editHref={contentEditHref('locations', campaignId, location.id)}

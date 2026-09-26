@@ -9,7 +9,6 @@ export const homebrewContentIdentityFields = {
   campaignId: { type: String, required: true, index: true },
   status: { type: String, enum: ['draft', 'published'], default: 'published' },
   name: { type: String, required: true, trim: true },
-  imageKey: { type: String },
   /** Managed image collection; contracts restrict this to opted-in content domains. */
   media: { type: Object },
   description: { type: String },

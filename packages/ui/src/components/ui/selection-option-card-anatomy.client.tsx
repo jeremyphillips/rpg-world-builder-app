@@ -6,6 +6,7 @@ import { cn } from '../../lib/utils'
 import { textVariants } from './text.variants'
 import {
   optionCardBodyVariants,
+  optionCardIdentityRowVariants,
   optionCardDescriptionClampVariants,
   optionCardDescriptionVariants,
   optionCardPrimaryCopyStackVariants,
@@ -53,6 +54,8 @@ export type SelectionOptionCardAnatomyProps = {
   clampDescription?: boolean
   /** When `content`, metadata under the title shrink-wraps instead of filling the content column. */
   copyWidth?: SelectionOptionCardCopyWidth
+  /** Optional identity frame in the content column (radio row art). */
+  leadingMedia?: ReactNode
 }
 
 function SelectionOptionCardSummaryLines({
@@ -220,6 +223,7 @@ export function SelectionOptionCardAnatomy({
   reserveSummaryBadgeRow = false,
   clampDescription = false,
   copyWidth = 'fill',
+  leadingMedia,
 }: SelectionOptionCardAnatomyProps) {
   const summaryText =
     summaryItems && summaryItems.length > 0
@@ -236,6 +240,21 @@ export function SelectionOptionCardAnatomy({
     />
   )
 
+  const primaryCopy = (
+    <SelectionOptionCardPrimaryCopy
+      density={density}
+      titleEndSlot={titleEndSlot}
+      titleRow={titleRow}
+      description={description}
+      summaryText={summaryText}
+      summaryLines={summaryLines}
+      clampDescription={clampDescription}
+      copyWidth={copyWidth}
+      summaryBadge={summaryBadge}
+      reserveSummaryBadgeRow={reserveSummaryBadgeRow}
+    />
+  )
+
   const body = (
     <div
       className={
@@ -245,18 +264,14 @@ export function SelectionOptionCardAnatomy({
       }
     >
       {headerRow}
-      <SelectionOptionCardPrimaryCopy
-        density={density}
-        titleEndSlot={titleEndSlot}
-        titleRow={titleRow}
-        description={description}
-        summaryText={summaryText}
-        summaryLines={summaryLines}
-        clampDescription={clampDescription}
-        copyWidth={copyWidth}
-        summaryBadge={summaryBadge}
-        reserveSummaryBadgeRow={reserveSummaryBadgeRow}
-      />
+      {leadingMedia ? (
+        <div className={optionCardIdentityRowVariants({ density })}>
+          <div className="shrink-0">{leadingMedia}</div>
+          <div className="min-w-0 flex-1">{primaryCopy}</div>
+        </div>
+      ) : (
+        primaryCopy
+      )}
       {embedded}
       {footer}
     </div>

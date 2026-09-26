@@ -14,15 +14,18 @@ import {
   SelectionSummaryCard,
   SelectionSummaryChangeAction,
   Text,
-  CatalogPickerSelectionActions,
-  resolveCatalogPickerRowActionPhase,
 } from '@rpg/ui'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import type { ContentCreateContext } from '@/lib/create-flow'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
-import { buildLocationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
+import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
+import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
+import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../../locations/lib/connected-parties/location-connection-kind-options-copy.lib'
-import { buildEntityMediaFromImageKey } from '../../../lib/entity/summary/entity-media.lib'
+import {
+  buildLocationEntityCardModel,
+  buildLocationEntityCardModelFromClassification,
+} from '../../../locations/lib/location-display'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
@@ -767,7 +770,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
           return summary ? buildLocationEntitySummarySearchText(summary) : location.name
         }}
         renderEntityRow={createCatalogEntityRowRenderer({
-          buildEntity: (location) => {
+          buildSurface: (location) => {
             const summary = pickerLocationSummaries.get(location.id)
             const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
             const kindAvailable =
@@ -780,45 +783,26 @@ function OrganizationLocationConnectionLinkDrawerContent({
                 edgesAtLocation,
                 excludeConnectionId,
               })
-
-            return summary
-              ? buildLocationPickerEntitySummary(summary, {
-                  imageKey: location.imageKey,
-                  description: !kindAvailable ? fullyLinkedReason : undefined,
-                })
-              : {
-                  heading: location.name,
-                  description: !kindAvailable ? fullyLinkedReason : undefined,
-                  media: location.imageKey
-                    ? buildEntityMediaFromImageKey(location.imageKey, location.name, 'compact')
-                    : undefined,
-                }
-          },
-          buildTrailing: (location) => {
             const isSelected = selectedLocationId === location.id
-            const edgesAtLocation = resolveEdgesAtLocation(location.id, edgesByLocationId)
-            const kindAvailable =
-              activeKind != null &&
-              organizationLocationConnectionHasAvailableKind({
-                locationId: location.id,
-                kinds: [activeKind],
-                subjectOrganizationId: organizationId,
-                connections: existingConnections,
-                edgesAtLocation,
-                excludeConnectionId,
-              })
+            const metadata = !kindAvailable ? fullyLinkedReason : undefined
 
             return {
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  phase={resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })}
-                  canSelect={kindAvailable}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => setSelectedLocationId(location.id)}
-                  onRemove={() => setSelectedLocationId(null)}
-                />
-              ),
+              identity: summary
+                ? buildLocationEntityCardModel(summary, { metadata })
+                : buildLocationEntityCardModelFromClassification({
+                    name: location.name,
+                    classificationText: '',
+                    metadata,
+                    displayImage: getContentDisplayImage(
+                      buildLocationContentDisplayImageInput(location, 'compact'),
+                    ),
+                  }),
+              inlineAction: buildCatalogToggleSelectInlineAction({
+                isSelected,
+                canSelect: kindAvailable,
+                onSelect: () => setSelectedLocationId(location.id),
+                onDeselect: () => setSelectedLocationId(null),
+              }),
             }
           },
         })}

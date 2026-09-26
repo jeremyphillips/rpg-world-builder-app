@@ -16,6 +16,9 @@ import { CampaignCharacterDetail } from './campaign-character-detail'
 vi.mock('../hooks/use-campaign-character-detail')
 vi.mock('../hooks/use-campaigns')
 vi.mock('../hooks/use-campaign-character-navigation-context')
+vi.mock('@/features/auth', () => ({
+  useSession: () => ({ data: { user: { id: 'other-user' } } }),
+}))
 vi.mock('@/features/character', async (importOriginal) => {
   const actual = await importOriginal<typeof CharacterFeature>()
   return {
@@ -96,6 +99,36 @@ describe('CampaignCharacterDetail', () => {
     expect(screen.getByRole('heading', { name: viewModel.identity.name })).toBeInTheDocument()
     expect(screen.getByText('Roster: Active')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Character images:/ })).not.toBeInTheDocument()
+  })
+
+  it('allows campaign managers to edit another player character images', () => {
+    useCampaignCharacterDetail.mockReturnValue({
+      campaignCharacter: {
+        character: SAMPLE_PC,
+        capabilities: { canEdit: false, canManage: true, canDelete: false },
+        participation: { roster: { status: 'active' } },
+      },
+      viewModel,
+      organizationReferences: [],
+      locationReferences: [],
+      isPending: false,
+      isError: false,
+      errorLabel: undefined,
+    })
+
+    renderWithProviders(
+      <Routes>
+        <Route
+          path="/campaigns/:campaignId/characters/:characterId"
+          element={<CampaignCharacterDetail />}
+        />
+      </Routes>,
+      { initialEntries: ['/campaigns/camp-1/characters/char-sample-1'] },
+    )
+
+    expect(screen.getByRole('button', { name: 'Character images: No images. Add' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument()
   })
 
   it('shows delete for owners via campaign capabilities', () => {

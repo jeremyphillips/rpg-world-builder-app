@@ -1,5 +1,6 @@
 import type { CampaignListItem } from '@rpg/contracts'
 import { Link } from 'react-router-dom'
+import { IdentityFrame } from '@rpg/ui'
 
 import { EntityAnatomyHost } from '@/features/content'
 
@@ -44,6 +45,9 @@ export function CampaignDestinationRow({
         entity={{
           heading: display.name,
           description: destination.supportingCopy,
+          media: display.imageUrl ? (
+            <IdentityFrame src={display.imageUrl} alt="" shape="box" size="sm" fit="contain" />
+          ) : undefined,
           status:
             badgeLabel && badgeTone
               ? [{ kind: 'badge', label: badgeLabel, appearance: 'outline', tone: badgeTone }]

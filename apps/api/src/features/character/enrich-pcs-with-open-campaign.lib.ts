@@ -1,6 +1,7 @@
 import type { PcCharacter, PcCharacterListItem } from '@rpg/contracts'
 
 import { findCampaignById, listOpenParticipationsForCharacters } from '../campaign'
+import { resolveCampaignEmblemImageUrl } from '../campaign/lib/resolve-campaign-emblem-image-url.lib'
 
 /** Attach route context and optional open-campaign label for personal character list cards. */
 export async function enrichPcsWithOpenCampaign(
@@ -20,13 +21,17 @@ export async function enrichPcsWithOpenCampaign(
     }))
   }
 
-  const campaignNames = new Map<string, string>()
+  const campaignLabels = new Map<string, { name: string; emblemUrl?: string }>()
 
   for (const participation of participations) {
-    if (campaignNames.has(participation.campaignId)) continue
+    if (campaignLabels.has(participation.campaignId)) continue
     const campaign = await findCampaignById(participation.campaignId)
     if (campaign) {
-      campaignNames.set(participation.campaignId, campaign.identity.name)
+      const emblemUrl = resolveCampaignEmblemImageUrl(campaign.identity.media)
+      campaignLabels.set(participation.campaignId, {
+        name: campaign.identity.name,
+        ...(emblemUrl ? { emblemUrl } : {}),
+      })
     }
   }
 
@@ -39,7 +44,7 @@ export async function enrichPcsWithOpenCampaign(
       }
     }
 
-    const campaignName = campaignNames.get(participation.campaignId)
+    const campaignLabel = campaignLabels.get(participation.campaignId)
 
     return {
       ...character,
@@ -48,11 +53,12 @@ export async function enrichPcsWithOpenCampaign(
         openCampaign: { id: participation.campaignId },
         rosterStatus: participation.roster.status,
       },
-      ...(campaignName
+      ...(campaignLabel
         ? {
             campaign: {
               id: participation.campaignId,
-              name: campaignName,
+              name: campaignLabel.name,
+              ...(campaignLabel.emblemUrl ? { emblemUrl: campaignLabel.emblemUrl } : {}),
             },
           }
         : {}),

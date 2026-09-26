@@ -151,6 +151,25 @@ export {
   iconContainerVariants,
   iconContainerGlyphClasses,
 } from './components/ui/icon-container.variants'
+export { IdentityFrame, type IdentityFrameProps } from './components/ui/identity-frame.client'
+export {
+  identityFrameVariants,
+  identityFrameImageVariants,
+  identityFrameFallbackVariants,
+  identityHeadingBandVariants,
+  identityInsetRowVariants,
+} from './components/ui/identity-frame.variants'
+export {
+  IDENTITY_FRAME_SIZES,
+  IDENTITY_FRAME_SHAPES,
+  IDENTITY_FRAME_FITS,
+  identityFrameSizeClasses,
+  identityFrameShapeClasses,
+  identityFrameFitClasses,
+  type IdentityFrameSize,
+  type IdentityFrameShape,
+  type IdentityFrameFit,
+} from './components/ui/identity-frame-tokens.variants'
 export { EmptyPanel, type EmptyPanelProps } from './components/ui/empty-panel.client'
 export {
   CollectionAddControl,
@@ -652,6 +671,15 @@ export {
   type ContentCardMediaProps,
   type ContentCardRemoveButtonProps,
 } from './components/ui/content-card-parts.client'
+export {
+  ContentDisplayFallbackIcon,
+  CONTENT_DISPLAY_FALLBACK_ICONS,
+  type ContentDisplayFallbackIconProps,
+} from './components/ui/content-display-fallback-icon.client'
+export {
+  contentDisplayFallbackIconVariants,
+  type ContentDisplayFallbackIconSize,
+} from './components/ui/content-display-fallback-icon.variants'
 export {
   contentCardRootVariants,
   contentCardDensityInsetVariants,

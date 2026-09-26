@@ -3,7 +3,10 @@ import { useParams } from 'react-router-dom'
 import { type SystemRulesetId } from '@rpg/contracts'
 import { resolveCampaignXpProgressionForRules } from '@/lib/campaign-xp-progression.lib'
 
+import { useSession } from '@/features/auth'
+
 import { CharacterDetailContent } from '../components/detail/character-detail-content'
+import { CharacterDetailRouteMedia } from '../components/detail/sheet/character-detail-route-media'
 import { CharacterSheetDetailShell } from '../components/detail/character-sheet-detail-shell'
 import { CharacterVitalSummary } from '../components/detail/status/character-vital-summary'
 import { StandaloneCharacterRedirectGuard } from '../components/standalone-character-redirect-guard'
@@ -14,6 +17,7 @@ import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 
 function CharacterDetailBody() {
   const { characterId } = useParams<{ characterId: string }>()
+  const { data: session } = useSession()
   const {
     data: character,
     isPending: isCharacterPending,
@@ -56,9 +60,18 @@ function CharacterDetailBody() {
       isError={isError}
       errorLabel={errorLabel}
     >
-      {viewModel ? (
+      {viewModel && character ? (
         <CharacterDetailContent
           viewModel={viewModel}
+          identityMedia={
+            <CharacterDetailRouteMedia
+              characterType="pc"
+              characterId={character.id}
+              userId={session?.user.id ?? character.userId}
+              media={character.media}
+              canEditMedia={Boolean(session?.user.id)}
+            />
+          }
           statusSummary={<CharacterVitalSummary vital={viewModel.identity.vital} />}
           showDelete
         />

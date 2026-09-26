@@ -13,6 +13,7 @@ export function serializeMediaScope(scope: MediaScope): string {
     case 'campaign-content':
     case 'campaign-identity':
     case 'campaign-npc':
+    case 'campaign-pc':
       return `${scope.kind}:${scope.campaignId}`
     case 'user-pc':
       return `${scope.kind}:${scope.userId}`
@@ -64,6 +65,7 @@ export async function assertMediaScopeAuthorized(
     case 'campaign-content':
     case 'campaign-identity':
     case 'campaign-npc':
+    case 'campaign-pc':
       await assertCampaignMediaScopeAuthorized(scope.campaignId, userId, access)
       return
     case 'user-pc':
