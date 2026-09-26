@@ -9,9 +9,14 @@ Equipment, Location, Organization). Full product and UX specification:
 1. **No image fallbacks as URLs.** No `fallback-content.png`, `getContentImageUrl`,
    or placeholder `<img>` src. Wire `ContentDisplayImage` is omitted when there is no
    real upload or registry path; compact UI paints semantic fallback icons instead.
-2. **Semantic fallback keys** (contracts): `'character' | 'location' | 'organization' |
-'campaign' | 'equipment' | 'generic'`. `@rpg/ui` maps keys to Lucide icons
-   (Backpack for equipment). Castle is only for `'generic'` and unrecognized keys.
+2. **Semantic fallback keys** (contracts): concept keys such as `character`, `npc`,
+   `class`, `species`, `spell`, `feat`, `skill-proficiency`, `game-term`, media domains,
+   and `generic`. Resolve via `resolveContentDisplayFallback({ domain, surface, … })`
+   and `resolveContentDisplayFallbackForSearchTarget` — compact and search share class
+   and species keys; detail and field keep class/species on `generic`. `@rpg/ui`
+   `CONTENT_DISPLAY_FALLBACK_ICONS` is the only icon map (sidebar catalog items reuse it).
+   Wire `ContentDisplayImage` / search `displayImage` is real media only — no fallback field
+   on search documents.
 3. **Field summary empty state:** ImagePlus when the viewer can manage media; otherwise
    the domain fallback passed from the media field.
 4. **Always-on media on compact identity rows** (entity cards, pickers, link rows).

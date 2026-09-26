@@ -4,7 +4,7 @@ import type { ContentMedia } from './content-media'
 import { isSystemRoleAssignment, type ContentMediaSystemSource } from './content-media-source'
 import type { ContentDisplaySurface } from './content-display-surface'
 import {
-  resolveContentDisplayFallbackForDomain,
+  resolveContentDisplayFallback,
   type ContentDisplayFallback,
 } from './content-display-fallback'
 import { asCropPresentation } from './role-presentation'
@@ -157,7 +157,7 @@ export function resolveContentDisplayImage(
 
   return {
     outcome: 'fallback',
-    fallback: resolveContentDisplayFallbackForDomain(input.domain),
+    fallback: resolveContentDisplayFallback({ domain: input.domain, surface: input.surface }),
   }
 }
 

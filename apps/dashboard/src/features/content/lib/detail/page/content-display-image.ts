@@ -1,5 +1,5 @@
 import {
-  resolveContentDisplayFallbackForDomain,
+  resolveContentDisplayFallback,
   resolveContentDisplayImage,
   type ContentDisplayFallback,
   type ContentDisplayImage,
@@ -90,5 +90,5 @@ export function resolveDashboardContentDisplayFallback(
     return resolved.fallback
   }
 
-  return resolveContentDisplayFallbackForDomain(domain)
+  return resolveContentDisplayFallback({ domain, surface: input.surface ?? 'detail' })
 }

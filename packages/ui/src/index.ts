@@ -673,6 +673,7 @@ export {
 } from './components/ui/content-card-parts.client'
 export {
   ContentDisplayFallbackIcon,
+  CONTENT_DISPLAY_FALLBACK_ICONS,
   type ContentDisplayFallbackIconProps,
 } from './components/ui/content-display-fallback-icon.client'
 export {

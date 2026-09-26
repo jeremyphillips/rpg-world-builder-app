@@ -33,14 +33,19 @@ Dependency direction: `surfaces → anatomy → summary`. `summary/` must not im
 
 ## Choose a surface
 
-| Need                                                                                   | Surface                                |
-| -------------------------------------------------------------------------------------- | -------------------------------------- |
-| Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityAnatomyHost`                    |
-| Bordered static identity                                                               | `ContentEntityCard`                    |
-| Bordered identity with expandable domain content                                       | `DisclosureEntityCard`                 |
-| Create-tab Add/Pending discovery or pending rows                                       | `ContentEntityCard` + trailing action  |
-| Detail hierarchy or typed relationship                                                 | `DetailEntityRow` / `RelationshipList` |
-| Anonymous form value or choice affordance                                              | Purpose-built form/choice component    |
+| Need                                                                                   | Surface             |
+| -------------------------------------------------------------------------------------- | ------------------- |
+| Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityAnatomyHost` |
+
+Global search preview and results use `ListResultItem` row chrome with a **passive**
+compact `EntityAnatomyHost` inside the row link (no `headingHref`, leading utility,
+trailing action, or disclosure). Campaign-unavailable hits use entity `inactive` status
+only — not a duplicate trailing badge.
+| Bordered static identity | `ContentEntityCard` |
+| Bordered identity with expandable domain content | `DisclosureEntityCard` |
+| Create-tab Add/Pending discovery or pending rows | `ContentEntityCard` + trailing action |
+| Detail hierarchy or typed relationship | `DetailEntityRow` / `RelationshipList` |
+| Anonymous form value or choice affordance | Purpose-built form/choice component |
 
 ### EntitySurfaceConfig (character / organization / location pickers)
 

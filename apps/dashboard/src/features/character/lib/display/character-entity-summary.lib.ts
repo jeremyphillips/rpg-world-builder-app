@@ -5,6 +5,7 @@ import type {
   CharacterType,
   ContentDisplayImage,
 } from '@rpg/contracts'
+import { resolveContentDisplayFallback } from '@rpg/contracts'
 
 import type { EntitySurfaceIdentity } from '@/features/content/lib/entity/summary/entity-surface-identity.types'
 import type { EntitySummaryStatusItem } from '@/features/content/lib/entity/summary/entity-summary-status.types'
@@ -141,7 +142,11 @@ export function buildCharacterEntityCardModel(
   const displayImage = options.displayImage ?? vm.displayImage
   const identity: EntitySurfaceIdentity = {
     heading: vm.name,
-    fallback: 'character',
+    fallback: resolveContentDisplayFallback({
+      domain: 'character',
+      surface: 'compact',
+      characterType: vm.characterType.value,
+    }),
     ...(displayImage ? { displayImage } : {}),
   }
 

@@ -196,7 +196,7 @@ describe('resolveContentDisplayImage', () => {
         slug: 'custom-archetype',
         contentSource: 'homebrew',
       }),
-    ).toEqual({ outcome: 'fallback', fallback: 'generic' })
+    ).toEqual({ outcome: 'fallback', fallback: 'class' })
 
     expect(
       resolveContentDisplayImageAsOptional({

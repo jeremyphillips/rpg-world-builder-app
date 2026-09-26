@@ -1,22 +1,15 @@
 'use client'
 
 import type { ContentDisplayFallback } from '@rpg/contracts'
-import { Backpack, Building2, Castle, Flag, MapPin, User, type LucideIcon } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { CONTENT_DISPLAY_FALLBACK_ICONS } from './content-display-fallback-icon.map'
 import {
   contentDisplayFallbackIconVariants,
   type ContentDisplayFallbackIconSize,
 } from './content-display-fallback-icon.variants'
 
-const CONTENT_DISPLAY_FALLBACK_ICONS: Record<ContentDisplayFallback, LucideIcon> = {
-  character: User,
-  location: MapPin,
-  organization: Building2,
-  campaign: Flag,
-  equipment: Backpack,
-  generic: Castle,
-}
+export { CONTENT_DISPLAY_FALLBACK_ICONS } from './content-display-fallback-icon.map'
 
 export type ContentDisplayFallbackIconProps = {
   fallback: ContentDisplayFallback
