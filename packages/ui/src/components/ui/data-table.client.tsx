@@ -41,7 +41,9 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import { ArrowUpDown, Check, ChevronDown, ChevronUp, Ellipsis, X } from 'lucide-react'
+import { ArrowUpDown, Check, ChevronDown, ChevronUp, X } from 'lucide-react'
+
+import { ActionIcon } from './action-icon.client'
 
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
@@ -552,7 +554,7 @@ export function RowActionsMenu({
           aria-label={triggerLabel}
           disabled={disabled}
         >
-          <Ellipsis className="size-4" aria-hidden />
+          <ActionIcon action="overflowMenu" step="md" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className={contentClassName}>

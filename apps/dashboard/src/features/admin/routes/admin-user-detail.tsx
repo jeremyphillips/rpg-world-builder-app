@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Badge, buttonVariants, Heading, RowActionsMenu, Text } from '@rpg/ui'
+import { ActionIcon, Badge, buttonVariants, Heading, RowActionsMenu, Text } from '@rpg/ui'
 import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
-import { Trash2 } from 'lucide-react'
 
 import { ROUTES } from '@/app/routes'
 import { NarrowPage } from '@/components/layout/page/narrow-page'
@@ -73,7 +72,7 @@ export function AdminUserDetail() {
                 kind: 'action',
                 id: 'delete-user',
                 label: 'Delete user',
-                icon: <Trash2 />,
+                icon: <ActionIcon action="delete" />,
                 destructive: true,
                 disabled: deleteDisabled,
                 disabledReason: deleteReason,

@@ -5,7 +5,7 @@ import type { CampaignCharacterNavModel } from '@/features/campaign'
 
 import { buildCampaignSidebarSections } from './build-campaign-sidebar-sections'
 import { buildGlobalSidebarSections } from './build-global-sidebar-sections'
-import { CONTENT_DISPLAY_FALLBACK_ICONS } from '@rpg/ui'
+import { contentIdentityIcon } from '@rpg/ui'
 
 import { SIDEBAR_NAV_ICONS, type SidebarNavIconId } from './sidebar-nav-icons'
 
@@ -21,9 +21,9 @@ const managerCharacterNav: CampaignCharacterNavModel = {
 
 describe('SIDEBAR_NAV_ICONS', () => {
   it('reuses canonical content fallback icons for catalog nav items', () => {
-    expect(SIDEBAR_NAV_ICONS.spells).toBe(CONTENT_DISPLAY_FALLBACK_ICONS.spell)
-    expect(SIDEBAR_NAV_ICONS.characters).toBe(CONTENT_DISPLAY_FALLBACK_ICONS.character)
-    expect(SIDEBAR_NAV_ICONS.classes).toBe(CONTENT_DISPLAY_FALLBACK_ICONS.class)
+    expect(SIDEBAR_NAV_ICONS.spells).toBe(contentIdentityIcon('spell'))
+    expect(SIDEBAR_NAV_ICONS.characters).toBe(contentIdentityIcon('character'))
+    expect(SIDEBAR_NAV_ICONS.classes).toBe(contentIdentityIcon('class'))
   })
 
   it('covers every nav item emitted by global and campaign builders', () => {

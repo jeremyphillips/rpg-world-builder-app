@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { resolveXpThresholdsSummary, type SystemRulesetId } from '@rpg/contracts'
-import { Pencil, Table2 } from 'lucide-react'
-import { Button, IconContainer, SemanticText, Text } from '@rpg/ui'
+import { Table2 } from 'lucide-react'
+import { ActionButton, IconContainer, SemanticText, Text } from '@rpg/ui'
 
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 
@@ -139,10 +139,14 @@ export function XpThresholdsField() {
             </div>
           </div>
           <div className={xpThresholdsFieldTrailingClasses}>
-            <Button type="button" variant="outline" size="sm" onClick={() => setModalOpen(true)}>
-              <Pencil aria-hidden />
+            <ActionButton
+              action="edit"
+              variant="outline"
+              size="sm"
+              onClick={() => setModalOpen(true)}
+            >
               Edit table
-            </Button>
+            </ActionButton>
           </div>
         </div>
       </div>

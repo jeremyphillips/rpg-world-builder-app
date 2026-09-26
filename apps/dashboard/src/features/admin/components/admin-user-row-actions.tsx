@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { AdminUserListItem } from '@rpg/contracts'
-import { RowActionsMenu, type RowActionsMenuLinkProps } from '@rpg/ui'
-import { Trash2 } from 'lucide-react'
+import { ActionIcon, RowActionsMenu, type RowActionsMenuLinkProps } from '@rpg/ui'
 
 import { useIsSuperadmin } from '@/features/auth'
 import { ROUTES } from '@/app/routes'
@@ -59,7 +58,7 @@ export function AdminUserRowActions({ user }: AdminUserRowActionsProps) {
             kind: 'action',
             id: 'delete-user',
             label: 'Delete user',
-            icon: <Trash2 />,
+            icon: <ActionIcon action="delete" />,
             destructive: true,
             separatorBefore: true,
             disabled: deleteDisabled,

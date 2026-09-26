@@ -12,11 +12,12 @@ import {
   Sparkles,
   Tags,
   UserRound,
-  type LucideIcon,
 } from 'lucide-react'
 
+import type { AppIcon } from './app-icon.types'
+
 /** Canonical semantic fallback key → icon component (sidebar, cards, search). */
-export const CONTENT_DISPLAY_FALLBACK_ICONS: Record<ContentDisplayFallback, LucideIcon> = {
+export const CONTENT_DISPLAY_FALLBACK_ICONS: Record<ContentDisplayFallback, AppIcon> = {
   character: UserRound,
   npc: Drama,
   location: MapPin,

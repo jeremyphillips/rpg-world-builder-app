@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { Castle } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { cn, IdentityFrame, Text } from '@rpg/ui'
+import { cn, IdentityFrame, Text, contentIdentityIcon } from '@rpg/ui'
 
 import type { CampaignDisplayVM } from '../lib/campaign-display'
 import {
@@ -30,6 +29,7 @@ export function CampaignDisplayNameList({
   if (displays.length === 0) return null
 
   const singleDisplay = displays.length === 1 ? displays[0] : undefined
+  const CampaignIdentityIcon = contentIdentityIcon('campaign')
 
   return (
     <span className={cn(campaignDisplayNameListVariants({ surface }), className)}>
@@ -39,7 +39,7 @@ export function CampaignDisplayNameList({
         shape="box"
         size="inline"
         fit="contain"
-        fallback={<Castle aria-hidden />}
+        fallback={<CampaignIdentityIcon aria-hidden />}
       />
       <span className="inline-flex min-w-0 flex-wrap items-center">
         {displays.map((display, index) => (

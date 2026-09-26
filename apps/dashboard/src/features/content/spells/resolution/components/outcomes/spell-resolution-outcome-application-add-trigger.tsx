@@ -1,5 +1,4 @@
-import { Plus } from 'lucide-react'
-import { Button, ButtonDropdown, INLINE_HEADER_ACTION_BUTTON_SIZE } from '@rpg/ui'
+import { ActionButton, ActionIcon, ButtonDropdown, INLINE_HEADER_ACTION_BUTTON_SIZE } from '@rpg/ui'
 
 import {
   OUTCOME_APPLICATION_MENU_GROUPS,
@@ -25,17 +24,16 @@ export function SpellResolutionOutcomeApplicationAddTrigger({
 
   if (addState.kind === 'all-incomplete') {
     return (
-      <Button
-        type="button"
+      <ActionButton
+        action="add"
         variant="outline"
         size={buttonSize}
         className="w-fit shrink-0"
         disabled
         aria-describedby={hintId}
       >
-        <Plus aria-hidden />
         {label}
-      </Button>
+      </ActionButton>
     )
   }
 
@@ -48,7 +46,7 @@ export function SpellResolutionOutcomeApplicationAddTrigger({
   return (
     <ButtonDropdown
       label={label}
-      leadingIcon={<Plus aria-hidden />}
+      leadingIcon={<ActionIcon action="add" />}
       width="fit"
       items={items}
       groups={groups}

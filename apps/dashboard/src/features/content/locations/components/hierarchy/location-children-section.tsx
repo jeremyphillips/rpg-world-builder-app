@@ -7,8 +7,7 @@ import {
   type Location,
   type LocationKind,
 } from '@rpg/contracts'
-import { Button, Text, toast } from '@rpg/ui'
-import { Plus } from 'lucide-react'
+import { ActionButton, Text, toast } from '@rpg/ui'
 
 import { DetailEntityRow } from '../../../lib/detail/row/entity/detail-entity-row'
 import type { EntityAnatomyTrailing } from '../../../lib/entity/anatomy/entity-anatomy-trailing.types'
@@ -414,16 +413,15 @@ function LocationStructureGroups({
       structureAuthoring.structural === group.structuralAuthoringType
     ) {
       return (
-        <Button
-          type="button"
+        <ActionButton
+          action="add"
           variant="text"
           size="sm"
           density="compact"
           onClick={() => onSelectAuthoringType(group.structuralAuthoringType!)}
         >
-          <Plus aria-hidden />
           {formatLocationAuthoringTypeAddHeading(group.structuralAuthoringType, { parentKind })}
-        </Button>
+        </ActionButton>
       )
     }
 

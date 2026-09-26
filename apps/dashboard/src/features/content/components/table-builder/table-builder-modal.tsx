@@ -1,10 +1,9 @@
 import { useId, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash2 } from 'lucide-react'
 import { FormProvider, useForm } from 'react-hook-form'
 import type { FieldPath } from 'react-hook-form'
 import type { GeneralTable, ProgressionTable } from '@rpg/contracts'
-import { Button, ConfirmDialog, DialogPanelScrollRegion, Modal } from '@rpg/ui'
+import { ActionButton, Button, ConfirmDialog, DialogPanelScrollRegion, Modal } from '@rpg/ui'
 
 import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
 
@@ -179,15 +178,14 @@ function TableBuilderModalContent({
           <Modal.Footer>
             <Modal.FooterActions>
               {showDelete ? (
-                <Button
-                  type="button"
+                <ActionButton
+                  action="delete"
                   variant="ghost"
                   className={tableBuilderModalDeleteButtonClasses}
                   onClick={() => setConfirmingDelete(true)}
                 >
-                  <Trash2 className="size-4" aria-hidden />
                   {TABLE_BUILDER_DELETE_LABEL}
-                </Button>
+                </ActionButton>
               ) : null}
               <Button type="button" variant="outline" onClick={handleRequestClose}>
                 {TABLE_BUILDER_CANCEL_LABEL}

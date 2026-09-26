@@ -1,7 +1,5 @@
 import * as React from 'react'
-import { SquarePen } from 'lucide-react'
-
-import { Alert, Button } from '@rpg/ui'
+import { Alert, ActionButton } from '@rpg/ui'
 
 import {
   CrossContentRelationshipRow,
@@ -119,15 +117,14 @@ export function CharacterConnectionsSection({
                                     ? {
                                         kind: 'action',
                                         content: (
-                                          <Button
-                                            type="button"
+                                          <ActionButton
+                                            action="edit"
                                             variant="ghost"
                                             size="icon"
+                                            iconStep="md"
                                             aria-label={`${editCopy.editLabel} for ${presentation.heading}`}
                                             onClick={() => sheet.setEditingRow(row)}
-                                          >
-                                            <SquarePen aria-hidden className="size-4" />
-                                          </Button>
+                                          />
                                         ),
                                       }
                                     : null

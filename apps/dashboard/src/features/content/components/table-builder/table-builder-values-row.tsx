@@ -1,9 +1,9 @@
-import { RotateCcw, Trash2 } from 'lucide-react'
 import { useMemo } from 'react'
 import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 import type { FieldPath } from 'react-hook-form'
 import { formatFieldMessage } from '@rpg/contracts'
 import {
+  ActionIcon,
   Select,
   SelectContent,
   SelectItem,
@@ -128,7 +128,7 @@ function TableBuilderValuesRowRestoreButton({
             aria-label={restoreAction.ariaLabel}
             onClick={onRestore}
           >
-            <RotateCcw aria-hidden className="size-3.5" />
+            <ActionIcon action="reset" step="sm" />
           </button>
         </TooltipTrigger>
         <TooltipContent>{restoreAction.tooltip}</TooltipContent>
@@ -158,7 +158,7 @@ function TableBuilderValuesRowDeleteButton({
         }
         onClick={() => onRemove(index)}
       >
-        <Trash2 aria-hidden />
+        <ActionIcon action="delete" />
       </button>
     </div>
   )

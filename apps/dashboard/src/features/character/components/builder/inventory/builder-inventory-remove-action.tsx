@@ -1,6 +1,4 @@
-import { Trash2 } from 'lucide-react'
-
-import { cn, iconGhostControlVariants } from '@rpg/ui'
+import { ActionIcon, cn, iconGhostControlVariants } from '@rpg/ui'
 
 export const BUILDER_INVENTORY_REMOVE_LABEL_PREFIX = 'Remove' as const
 
@@ -28,7 +26,7 @@ export function BuilderInventoryRemoveAction({
       aria-label={removeAriaLabel ?? formatBuilderInventoryRemoveLabel(itemLabel)}
       onClick={onRemove}
     >
-      <Trash2 aria-hidden />
+      <ActionIcon action="remove" step="md" />
     </button>
   )
 }

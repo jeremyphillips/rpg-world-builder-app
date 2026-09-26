@@ -1,6 +1,5 @@
-import { Castle } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { cn, IdentityFrame, Text } from '@rpg/ui'
+import { cn, IdentityFrame, Text, contentIdentityIcon } from '@rpg/ui'
 
 import type { CampaignDisplayVM } from '../lib/campaign-display'
 import {
@@ -25,6 +24,8 @@ export function CampaignDisplayName({
   asLink = false,
   className,
 }: CampaignDisplayNameProps) {
+  const CampaignIdentityIcon = contentIdentityIcon('campaign')
+
   const mark = (
     <IdentityFrame
       src={display.imageUrl ?? undefined}
@@ -32,7 +33,7 @@ export function CampaignDisplayName({
       shape="box"
       size="inline"
       fit="contain"
-      fallback={<Castle aria-hidden />}
+      fallback={<CampaignIdentityIcon aria-hidden />}
     />
   )
 

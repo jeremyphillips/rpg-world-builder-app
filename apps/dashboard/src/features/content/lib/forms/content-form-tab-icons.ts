@@ -1,35 +1,22 @@
 import { createElement, type ReactNode } from 'react'
-import type { LucideIcon } from 'lucide-react'
-import {
-  BookOpen,
-  Clock,
-  Flag,
-  ListChecks,
-  Network,
-  Scale,
-  Sparkle,
-  Sparkles,
-  Tags,
-  Target,
-  Trees,
-  User,
-} from 'lucide-react'
+import { BookOpen, Clock, Flag, Network, Scale, Sparkle, Target, Trees } from 'lucide-react'
+import { contentIdentityIcon, type AppIcon } from '@rpg/ui'
 import type { TabbedFormTab } from '@rpg/ui/form'
 
 export const CONTENT_FORM_TAB_ICONS = {
   basics: BookOpen,
-  proficiencies: ListChecks,
-  spellcasting: Sparkles,
+  proficiencies: contentIdentityIcon('skill-proficiency'),
+  spellcasting: contentIdentityIcon('spell'),
   features: Flag,
   subclasses: Network,
-  characterCreation: User,
+  characterCreation: contentIdentityIcon('character'),
   traits: Sparkle,
   heritage: Trees,
   rules: Scale,
   casting: Clock,
   resolution: Target,
-  tags: Tags,
-} as const satisfies Record<string, LucideIcon>
+  tags: contentIdentityIcon('game-term'),
+} as const satisfies Record<string, AppIcon>
 
 export type ContentFormTabIconId = keyof typeof CONTENT_FORM_TAB_ICONS
 

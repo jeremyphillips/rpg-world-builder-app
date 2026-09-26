@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
 import {
   formatProgressionBaseValueLabel,
   formatProgressionTrackHeading,
   type SpellResolution,
 } from '@rpg/contracts'
 import {
+  ActionIcon,
   Button,
   ButtonDropdown,
   Heading,
@@ -147,7 +147,7 @@ function ProgressionTrackCard({
           onClick={onRemove}
           aria-label="Remove track"
         >
-          <Trash2 aria-hidden className="size-4" />
+          <ActionIcon action="remove" step="md" />
         </Button>
       </div>
 
@@ -325,7 +325,7 @@ export function SpellResolutionProgression() {
           {menuItems.some((item) => !item.disabled) ? (
             <ButtonDropdown
               label={RESOLUTION_SECTION_LABELS.addProgressionTrack}
-              leadingIcon={<Plus aria-hidden />}
+              leadingIcon={<ActionIcon action="add" />}
               width="fit"
               size="sm"
               items={menuItems}

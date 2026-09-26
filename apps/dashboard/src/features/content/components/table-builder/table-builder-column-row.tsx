@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Trash2 } from 'lucide-react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import {
   TABLE_NUMBER_FORMATS,
@@ -11,6 +10,7 @@ import {
   type TableNumberFormat,
 } from '@rpg/contracts'
 import {
+  ActionIcon,
   Input,
   Select,
   SelectContent,
@@ -93,7 +93,7 @@ export function TableBuilderColumnRow({
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="size-3.5" aria-hidden />
+          <ActionIcon action="drag" step="sm" />
         </button>
       </div>
 
@@ -170,7 +170,7 @@ export function TableBuilderColumnRow({
           aria-label={`Delete ${displayName}`}
           onClick={() => onRemove(index)}
         >
-          <Trash2 aria-hidden />
+          <ActionIcon action="delete" />
         </button>
       </div>
     </div>

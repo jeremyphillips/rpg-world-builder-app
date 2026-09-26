@@ -1,9 +1,8 @@
 'use client'
 
 import * as React from 'react'
-import { Trash2 } from 'lucide-react'
-
 import { cn } from '../../../lib/utils'
+import { ActionIcon } from '../../../components/ui/action-icon.client'
 import { CollapsibleListItemShell } from '../../../components/ui/collapsible-list-item/collapsible-list-item-shell.client'
 import { resolveArrayItemShellSurface } from '../../config/array/resolve-array-item-shell-surface.lib'
 import { useFormSectionContext } from '../../context/form-section.context'
@@ -34,7 +33,7 @@ export function ArrayItemRemoveButton({
       aria-label={ariaLabel}
       onClick={onRemove}
     >
-      <Trash2 aria-hidden />
+      <ActionIcon action="remove" step="md" />
     </button>
   )
 }

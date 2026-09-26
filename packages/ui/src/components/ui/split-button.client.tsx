@@ -1,7 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { ChevronDown, Plus } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
+
+import { ActionIcon } from './action-icon.client'
 
 import { cn } from '../../lib/utils'
 import { Button, type ButtonForwardingProps } from './button.client'
@@ -70,7 +72,7 @@ export function SplitButton({
         onClick={onPrimaryClick}
         {...props}
       >
-        {showLeadingIcon ? <Plus aria-hidden /> : null}
+        {showLeadingIcon ? <ActionIcon action="add" /> : null}
         {label}
       </Button>
       {hasMenu ? (

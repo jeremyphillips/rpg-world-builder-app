@@ -1,9 +1,9 @@
 'use client'
 
-import { Plus } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { Button } from './button.client'
+import { ActionIcon } from './action-icon.client'
 import type { FieldSize } from './field.client'
 import { FieldLabelContent } from './field-label-content'
 import { fieldAnatomyStackVariants, fieldLabelVariants } from './field.variants'
@@ -48,7 +48,7 @@ export function OptionalFieldDisclosure({
         aria-expanded={false}
         onClick={() => onOpenChange(true)}
       >
-        <Plus aria-hidden />
+        <ActionIcon action="add" />
         {addLabel}
       </Button>
     )

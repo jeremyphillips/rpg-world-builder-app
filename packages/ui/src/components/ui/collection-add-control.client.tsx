@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { Plus } from 'lucide-react'
 
 import type { ButtonVariantProps } from './button.variants'
+import { ActionIcon } from './action-icon.client'
 import { Button } from './button.client'
 import { resolveCollectionAddDisabledProps } from './collection-add-control.lib'
 
@@ -27,7 +27,7 @@ function CollectionAddTriggerLabel({
 
   return (
     <>
-      <Plus aria-hidden />
+      <ActionIcon action="add" />
       {label}
     </>
   )

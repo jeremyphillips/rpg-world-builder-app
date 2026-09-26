@@ -7,6 +7,7 @@ import {
   useWatch,
 } from 'react-hook-form'
 import {
+  ActionIcon,
   Badge,
   Button,
   cn,
@@ -35,7 +36,6 @@ import {
   resolveNestedFieldErrorMessage,
 } from '@rpg/ui/form'
 import { ABILITY_SCORE_MAX, ABILITY_SCORE_MIN, MAX_CHARACTER_LEVEL } from '@rpg/contracts'
-import { Trash2 } from 'lucide-react'
 
 import {
   ABILITY_FIELD_LABEL,
@@ -384,7 +384,7 @@ function ConditionSentenceRow({
             aria-label={removeConditionLabel(setIndex, conditionIndex)}
             onClick={onRemove}
           >
-            <Trash2 className="size-4" aria-hidden />
+            <ActionIcon action="remove" step="md" />
           </Button>
         ) : null}
       </div>
@@ -466,7 +466,7 @@ function ConditionSetEditor({
           aria-label={removeConditionSetLabel(setIndex)}
           onClick={onRemove}
         >
-          <Trash2 className="size-4" aria-hidden />
+          <ActionIcon action="remove" step="md" />
         </Button>
       </div>
 

@@ -11,8 +11,7 @@ import type {
   CharacterBuilderStepId,
   CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
-import { Button, PreviewRail, Sheet, useMediaMinWidth, VIEWPORT_MD_MIN_QUERY } from '@rpg/ui'
-import { Eye } from 'lucide-react'
+import { ActionButton, PreviewRail, Sheet, useMediaMinWidth, VIEWPORT_MD_MIN_QUERY } from '@rpg/ui'
 
 import type { CharacterBuilderPreviewSectionId } from '../../../lib/builder-preview/character-builder-preview-panel.lib'
 import { projectBuilderPreviewRail } from '../../../lib/builder-preview/builder-preview-projection.lib'
@@ -126,16 +125,15 @@ export function CharacterBuilderPreviewRail(props: CharacterBuilderPreviewRailPr
 
 export function CharacterBuilderPreviewCompactTrigger({ onOpen }: { onOpen: () => void }) {
   return (
-    <Button
-      type="button"
+    <ActionButton
+      action="view"
       variant="outline"
       size="sm"
       className={characterBuilderPreviewCompactTriggerClasses}
       onClick={onOpen}
     >
-      <Eye aria-hidden />
       {BUILDER_PREVIEW_COMPACT_LABEL}
-    </Button>
+    </ActionButton>
   )
 }
 

@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react'
-import { Plus } from 'lucide-react'
-
-import { Button, Eyebrow, Text, cn } from '@rpg/ui'
+import { ActionButton, Eyebrow, Text, cn } from '@rpg/ui'
 
 import {
   detailCollectionGroupHeaderVariants,
@@ -58,17 +56,16 @@ export type RelationshipListRowProps = {
 
 function RelationshipListHeaderAction({ action }: { action: RelationshipListAction }) {
   return (
-    <Button
-      type="button"
+    <ActionButton
+      action="add"
       variant="text"
       size="sm"
       density="compact"
       disabled={action.disabled}
       onClick={action.onSelect}
     >
-      <Plus aria-hidden />
       {action.label}
-    </Button>
+    </ActionButton>
   )
 }
 

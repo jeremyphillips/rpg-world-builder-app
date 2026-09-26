@@ -16,6 +16,7 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 1    | Contracts | `<type>.ts` schema, inputs, patch DTOs, tests, barrel export                                                                                              |
 | 1b   | Contracts | `CONTENT_TYPE_TERMS` entry; vocab maps if closed sets                                                                                                     |
 | 1c   | Contracts | `CONTENT_TYPE_CAPABILITIES` when duplication applies                                                                                                      |
+| 1d   | Contracts | Display fallback: `resolve-content-media-domain.ts` when type opts into `ContentMedia`; else `CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT` in `content-display-fallback.ts` + tests |
 | 2    | Catalog   | Declare `catalog.bundledContent`; bundled types add seed JSON under `packages/catalog/src/<type>/data/srd-cc-5.2.1/`                                      |
 | 3    | Catalog   | Bundled types only: `index.ts` loaders + `index.test.ts`; `package.json` export. No-bundle types omit the package.                                        |
 | 4    | API       | Patch/homebrew Mongoose models when needed                                                                                                                |
@@ -33,6 +34,7 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 16   | Dashboard | Lazy route exports in `app/lazy-routes.ts`                                                                                                                |
 | 17   | Dashboard | Router tree in `app/router.tsx`                                                                                                                           |
 | 18   | Dashboard | `VISIBLE_SIDEBAR_CONTENT` when `visibleInSidebar: true`                                                                                                   |
+| 18b  | Dashboard | `sidebar-nav-icons.ts` — `contentIdentityIcon` for the catalog role; extend `icon-registry-identity-ban.test.ts` if adding alias consumers                |
 | —    | Dashboard | Authorable types: API `routeKey` mapping in `content-form-navigation.ts` for post-create edit navigation                                                  |
 | —    | Tests     | `content-form-test-registry.ts` import when form def exists                                                                                               |
 | 10b  | Dashboard | `factories/<type>.ts` + `CONTENT_TEST_FACTORY_REGISTRY` entry (synthetic `makeX`; catalog via `pickX`)                                                    |

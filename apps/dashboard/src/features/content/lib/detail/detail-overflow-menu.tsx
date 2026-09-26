@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { MoreHorizontal, MoreVertical, Trash2 } from 'lucide-react'
 
 import {
+  ActionIcon,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,7 @@ export function detailOverflowDeleteAction(
   return {
     id: 'delete',
     label,
-    icon: <Trash2 aria-hidden />,
+    icon: <ActionIcon action="delete" />,
     destructive: true,
     onSelect,
   }
@@ -50,7 +50,7 @@ export function DetailOverflowMenu({
     return null
   }
 
-  const TriggerIcon = triggerIcon === 'vertical' ? MoreVertical : MoreHorizontal
+  const triggerAction = triggerIcon === 'vertical' ? 'overflowVertical' : 'overflow'
 
   return (
     <DropdownMenu>
@@ -62,7 +62,7 @@ export function DetailOverflowMenu({
           density="compact"
           aria-label={triggerLabel}
         >
-          <TriggerIcon aria-hidden />
+          <ActionIcon action={triggerAction} step="md" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   resolveContentPreviewAvailability,
   resolveContentPreviewReadinessPanel,
+  resolvePreviewRailDisplayFallback,
   resolvePreviewRailOpenSection,
 } from './content-preview-rail.lib'
 import {
@@ -21,6 +22,14 @@ describe('resolveContentPreviewReadinessPanel', () => {
     expect(resolveContentPreviewReadinessPanel(false, false, 2).title).toBe(
       CONTENT_PREVIEW_NOT_READY_TITLE,
     )
+  })
+})
+
+describe('resolvePreviewRailDisplayFallback', () => {
+  it('follows field surface policy for catalog content types', () => {
+    expect(resolvePreviewRailDisplayFallback('classes')).toBe('generic')
+    expect(resolvePreviewRailDisplayFallback('spells')).toBe('spell')
+    expect(resolvePreviewRailDisplayFallback('equipment')).toBe('equipment')
   })
 })
 

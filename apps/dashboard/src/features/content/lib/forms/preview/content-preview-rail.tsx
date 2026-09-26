@@ -8,7 +8,8 @@ import {
   type VocabularyTerm,
 } from '@rpg/contracts'
 import {
-  Button,
+  ActionButton,
+  ActionIcon,
   PreviewRail,
   Sheet,
   useMediaMinWidth,
@@ -22,7 +23,6 @@ import {
   type TabbedFormTab,
 } from '@rpg/ui/form'
 import type { ContentDisplayFallback } from '@rpg/contracts'
-import { Eye } from 'lucide-react'
 
 import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context'
 import { resolveCampaignAccessSummary } from '../../campaign-access/campaign-access-summary'
@@ -57,16 +57,15 @@ export function ContentPreviewCompactTrigger() {
   const { setSheetOpen } = useContentPreviewUi()
 
   return (
-    <Button
-      type="button"
+    <ActionButton
+      action="view"
       variant="outline"
       size="sm"
       className={contentPreviewCompactTriggerClasses}
       onClick={() => setSheetOpen(true)}
     >
-      <Eye aria-hidden />
       {CONTENT_PREVIEW_COMPACT_LABEL}
-    </Button>
+    </ActionButton>
   )
 }
 
@@ -249,7 +248,7 @@ function ContentPreviewRailView({
           <PreviewRail.Action
             label={CONTENT_PREVIEW_AS_PLAYER_LABEL}
             helperText={contentPreviewAsPlayerHelper(term)}
-            icon={<Eye />}
+            icon={<ActionIcon action="view" />}
             onClick={onPreviewAsPlayer}
           />
         ) : null}

@@ -1,5 +1,4 @@
-import { Button } from '@rpg/ui'
-import { Pencil, Plus } from 'lucide-react'
+import { ActionButton } from '@rpg/ui'
 
 type ChoiceAddActionProps = {
   compactAddLabel: string
@@ -9,9 +8,14 @@ type ChoiceAddActionProps = {
 
 export function ChoiceAddAction({ compactAddLabel, isFull, onClick }: ChoiceAddActionProps) {
   return (
-    <Button type="button" variant="text" tone="accent" density="compact" onClick={onClick}>
-      {isFull ? <Pencil aria-hidden /> : <Plus aria-hidden />}
+    <ActionButton
+      action={isFull ? 'edit' : 'add'}
+      variant="text"
+      tone="accent"
+      density="compact"
+      onClick={onClick}
+    >
       {compactAddLabel}
-    </Button>
+    </ActionButton>
   )
 }

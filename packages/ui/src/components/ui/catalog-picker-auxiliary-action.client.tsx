@@ -1,8 +1,7 @@
 'use client'
 
-import { Plus } from 'lucide-react'
-
 import { Button } from './button.client'
+import { ActionIcon } from './action-icon.client'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +35,7 @@ export function CatalogPickerAuxiliaryActionSlot({
               density="compact"
               disabled={action.disabled}
             >
-              <Plus aria-hidden />
+              <ActionIcon action="add" />
               {action.label}
             </Button>
           </DropdownMenuTrigger>
@@ -61,7 +60,7 @@ export function CatalogPickerAuxiliaryActionSlot({
           disabled={action.disabled}
           onClick={action.onAction}
         >
-          <Plus aria-hidden />
+          <ActionIcon action="add" />
           {action.label}
         </Button>
       )}

@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { ActionIcon } from '@rpg/ui'
 
 import {
   TABLE_BUILDER_ADD_ROW_LABEL,
@@ -34,7 +34,7 @@ export function TableBuilderValuesAddRow({
         disabled={addRowDisabled}
         title={addRowDisabled ? TABLE_BUILDER_ALL_LEVELS_USED_REASON : undefined}
       >
-        <Plus className={tableBuilderAddActionIconClasses} aria-hidden />
+        <ActionIcon action="add" className={tableBuilderAddActionIconClasses} />
         {addRowLabel}
         {includeLevel && addRowDisabled ? (
           <span className="sr-only">{TABLE_BUILDER_ALL_LEVELS_USED_REASON}</span>

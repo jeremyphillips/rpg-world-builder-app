@@ -1,5 +1,4 @@
-import { Plus } from 'lucide-react'
-import { ButtonDropdown, INLINE_HEADER_ACTION_BUTTON_SIZE } from '@rpg/ui'
+import { ActionIcon, ButtonDropdown, INLINE_HEADER_ACTION_BUTTON_SIZE } from '@rpg/ui'
 import type { ButtonDropdownItem } from '@rpg/ui'
 import { getArrayFieldMutators } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
@@ -35,7 +34,7 @@ export function SpellResolutionEffectAddControl() {
   return (
     <ButtonDropdown
       label={RESOLUTION_SECTION_LABELS.addAuthoredEffect}
-      leadingIcon={<Plus aria-hidden />}
+      leadingIcon={<ActionIcon action="add" />}
       width="fit"
       items={menuItems}
       groups={[{ id: 'effects', label: 'Effects' }]}
