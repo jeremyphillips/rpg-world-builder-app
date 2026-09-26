@@ -1,6 +1,4 @@
-import { Pencil } from 'lucide-react'
-
-import { Button, InlineInactiveStatus } from '@rpg/ui'
+import { ActionIcon, Button, InlineInactiveStatus } from '@rpg/ui'
 
 import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary'
 import { CAMPAIGN_ACCESS_CHANGE_LABEL } from '../../lib/campaign-access/campaign-access-labels'
@@ -50,7 +48,7 @@ export function MasterDetailAvailabilityHeaderLine({
         onClick={onAvailabilityChange}
         aria-label={changeLabel}
       >
-        <Pencil aria-hidden className="size-3.5 text-muted-foreground" />
+        <ActionIcon action="edit" step="sm" className="text-muted-foreground" />
       </Button>
     </div>
   )

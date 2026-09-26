@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { ConfirmDialog, RowActionsMenu } from '@rpg/ui'
-import { Trash2 } from 'lucide-react'
+import { ActionIcon, ConfirmDialog, RowActionsMenu } from '@rpg/ui'
 import type {
   ContentUsageBlocker,
   VocabularyOptionSetId,
@@ -74,7 +73,7 @@ export function VocabularyRowActions({
           kind: 'action' as const,
           id: 'delete',
           label: 'Delete',
-          icon: <Trash2 />,
+          icon: <ActionIcon action="delete" />,
           destructive: true,
           onSelect: () => setConfirmDeleteOpen(true),
         },

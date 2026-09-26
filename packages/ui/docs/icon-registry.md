@@ -19,9 +19,13 @@ Lucide remains the default glyph set. **One owner per semantic role** — charac
 
 Domain verbs (`invite`, `addMedia`, `compose`) are explicit keys, not overloads of `add`.
 
+**`remove`** vs **`delete`** — detach from a collection vs destructive record removal; may share `Trash2` but stay separate verb keys.
+
+Overflow triggers: **`overflow`**, **`overflowVertical`**, **`overflowMenu`**.
+
 ## Guards
 
-`icon-registry-ban.test.ts` blocks direct Lucide imports for migrated action wrappers and identity alias consumers.
+`icon-registry-ban.test.ts` (`@rpg/ui`) and `icon-registry-scope-ban.test.ts` (dashboard positive scopes) block raw `Plus` / `Pencil` / `Trash2` / `RotateCcw` imports in migrated paths.
 
 ## Custom icons later
 

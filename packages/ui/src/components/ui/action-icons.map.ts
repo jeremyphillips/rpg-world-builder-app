@@ -1,7 +1,10 @@
 import {
+  Ellipsis,
   Eye,
   GripVertical,
   ImagePlus,
+  MoreHorizontal,
+  MoreVertical,
   Pencil,
   Plus,
   RotateCcw,
@@ -18,6 +21,7 @@ export const ACTION_ICON_VERBS = [
   'add',
   'edit',
   'remove',
+  'delete',
   'reset',
   'view',
   'close',
@@ -26,6 +30,9 @@ export const ACTION_ICON_VERBS = [
   'invite',
   'addMedia',
   'compose',
+  'overflow',
+  'overflowVertical',
+  'overflowMenu',
 ] as const
 
 export type ActionIconVerb = (typeof ACTION_ICON_VERBS)[number]
@@ -35,6 +42,7 @@ export const ACTION_ICONS = {
   add: Plus,
   edit: Pencil,
   remove: Trash2,
+  delete: Trash2,
   reset: RotateCcw,
   view: Eye,
   close: X,
@@ -43,4 +51,7 @@ export const ACTION_ICONS = {
   invite: UserPlus,
   addMedia: ImagePlus,
   compose: SquarePen,
+  overflow: MoreHorizontal,
+  overflowVertical: MoreVertical,
+  overflowMenu: Ellipsis,
 } as const satisfies Record<ActionIconVerb, LucideIcon & AppIcon>

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { CampaignOverviewMemberListItem } from '@rpg/contracts'
-import { ConfirmDialog, RowActionsMenu } from '@rpg/ui'
-import { Trash2 } from 'lucide-react'
+import { ActionIcon, ConfirmDialog, RowActionsMenu } from '@rpg/ui'
 
 import { CAMPAIGN_MEMBER_ROW_ACTION_COPY } from '../../lib/overview/campaign-overview-labels'
 import { useRemoveIncompleteCampaignMember } from '../../hooks/use-remove-incomplete-campaign-member'
@@ -41,7 +40,7 @@ export function CampaignOverviewMemberRowActions({
             kind: 'action',
             id: 'remove-member',
             label: CAMPAIGN_MEMBER_ROW_ACTION_COPY.removeIncomplete,
-            icon: <Trash2 />,
+            icon: <ActionIcon action="remove" />,
             destructive: true,
             onSelect: () => setRemoveOpen(true),
           },

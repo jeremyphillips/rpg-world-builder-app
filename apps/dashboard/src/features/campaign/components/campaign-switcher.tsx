@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import type { CampaignListItem } from '@rpg/contracts'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Check, ChevronsUpDown } from 'lucide-react'
 
 import { ROUTES } from '@/app/routes'
 import {
+  ActionIcon,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -121,7 +122,7 @@ export function CampaignSwitcher({ showLabel = true }: CampaignSwitcherProps) {
         />
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate(ROUTES.campaign.create)}>
-          <Plus className="size-4" />
+          <ActionIcon action="add" step="md" />
           Create campaign
         </DropdownMenuItem>
       </DropdownMenuContent>

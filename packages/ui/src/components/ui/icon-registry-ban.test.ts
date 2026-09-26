@@ -13,6 +13,7 @@ const ACTION_WRAPPER_FILES = [
   'packages/ui/src/components/ui/optional-field-disclosure.client.tsx',
   'packages/ui/src/form/renderers/array/array-item-shell.client.tsx',
   'packages/ui/src/components/ui/content-card-parts.client.tsx',
+  'packages/ui/src/components/ui/data-table.client.tsx',
 ] as const
 
 const BANNED_ACTION_GLYPH_IMPORT =

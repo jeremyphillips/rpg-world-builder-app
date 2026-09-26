@@ -1,7 +1,6 @@
 import { useId, useMemo, useState } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
-import { Plus } from 'lucide-react'
-import { Button, ConfirmDialog, TextField } from '@rpg/ui'
+import { ActionButton, Button, ConfirmDialog, TextField } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 import type { SlotProgression } from '@rpg/contracts'
 
@@ -163,15 +162,14 @@ export function SlotProgressionsField() {
           hint="Spell slot tables shared by spellcasting classes."
           size={size}
           action={
-            <Button
-              type="button"
+            <ActionButton
+              action="add"
               variant="outline"
               size="sm"
               onClick={() => setShowCreateForm(true)}
             >
-              <Plus aria-hidden />
               Add custom
-            </Button>
+            </ActionButton>
           }
           wrapper="none"
         />

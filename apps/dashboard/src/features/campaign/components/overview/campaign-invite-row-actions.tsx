@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { CampaignInviteAdminListItem } from '@rpg/contracts'
-import { ConfirmDialog, RowActionsMenu } from '@rpg/ui'
-import { Link2, Trash2 } from 'lucide-react'
+import { ActionIcon, ConfirmDialog, RowActionsMenu } from '@rpg/ui'
+import { Link2 } from 'lucide-react'
 
 import { CAMPAIGN_INVITE_ROW_ACTION_COPY } from '../../lib/overview/campaign-overview-labels'
 import {
@@ -57,7 +57,7 @@ export function CampaignInviteRowActions({ campaignId, invite }: CampaignInviteR
             kind: 'action',
             id: 'revoke',
             label: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePending,
-            icon: <Trash2 />,
+            icon: <ActionIcon action="remove" />,
             destructive: true,
             separatorBefore: true,
             onSelect: () => setRevokeOpen(true),

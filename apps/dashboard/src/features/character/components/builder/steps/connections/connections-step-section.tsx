@@ -1,11 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { Eye, Pencil, Trash2 } from 'lucide-react'
-
 import type {
   CharacterRelationshipDraftEdge,
   CharacterRelationshipDraftEdges,
 } from '@rpg/contracts'
-import { IconContainer, SplitButton } from '@rpg/ui'
+import { ActionIcon, IconContainer, SplitButton } from '@rpg/ui'
 import { cn } from '@rpg/ui'
 
 import {
@@ -59,7 +57,7 @@ function buildConnectionOverflowActions(input: {
         {
           id: 'edit',
           label: 'Edit relationship',
-          icon: <Pencil aria-hidden />,
+          icon: <ActionIcon action="edit" />,
           onSelect: () => input.onEditEdge(input.edge.id),
         },
       ]
@@ -70,7 +68,7 @@ function buildConnectionOverflowActions(input: {
     {
       id: 'view',
       label: 'View connected record',
-      icon: <Eye aria-hidden />,
+      icon: <ActionIcon action="view" />,
       disabled: !input.presentation.canViewRecord,
       onSelect: () => {
         if (input.presentation.headingHref) {
@@ -81,7 +79,7 @@ function buildConnectionOverflowActions(input: {
     {
       id: 'remove',
       label: 'Remove connection',
-      icon: <Trash2 aria-hidden />,
+      icon: <ActionIcon action="remove" />,
       destructive: true,
       separatorBefore: true,
       onSelect: () =>

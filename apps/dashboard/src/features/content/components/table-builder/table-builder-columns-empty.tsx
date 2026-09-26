@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { ActionIcon } from '@rpg/ui'
 
 import {
   TABLE_BUILDER_ADD_COLUMN_LABEL,
@@ -26,7 +26,7 @@ export function TableBuilderColumnsEmpty({ onAddColumn }: TableBuilderColumnsEmp
           className={tableBuilderColumnsEmptyAddActionClasses}
           onClick={onAddColumn}
         >
-          <Plus className={tableBuilderColumnsEmptyAddActionIconClasses} aria-hidden />
+          <ActionIcon action="add" className={tableBuilderColumnsEmptyAddActionIconClasses} />
           {TABLE_BUILDER_ADD_COLUMN_LABEL}
         </button>
       }

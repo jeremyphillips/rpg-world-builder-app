@@ -1,5 +1,7 @@
 import type { LocationKind } from '@rpg/contracts'
 import {
+  ActionButton,
+  ActionIcon,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +9,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@rpg/ui'
-import { Plus } from 'lucide-react'
 
 import {
   childAuthoringTypesForParentKind,
@@ -68,13 +69,12 @@ export function LocationAddChildMenu({
         density="compact"
         aria-label={triggerProps.triggerLabel}
       >
-        <Plus aria-hidden />
+        <ActionIcon action="add" />
       </Button>
     ) : (
-      <Button type="button" variant="text" size="sm" density="compact">
-        <Plus aria-hidden />
+      <ActionButton action="add" variant="text" size="sm" density="compact">
         {labeledText}
-      </Button>
+      </ActionButton>
     )
 
   return (

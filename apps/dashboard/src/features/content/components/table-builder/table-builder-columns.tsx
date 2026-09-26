@@ -14,9 +14,9 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { Plus } from 'lucide-react'
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import { formatFieldMessage, type TableColumnValueType } from '@rpg/contracts'
+import { ActionIcon } from '@rpg/ui'
 import { FormSectionHeader } from '@rpg/ui/form'
 
 import { resolveSortableArrayMove } from '../../lib/utils/sortable-array-move.lib'
@@ -205,7 +205,7 @@ export function TableBuilderColumns() {
             columnList
           )}
           <button type="button" className={tableBuilderAddActionClasses} onClick={handleAddColumn}>
-            <Plus className="size-4" aria-hidden />
+            <ActionIcon action="add" step="md" />
             {TABLE_BUILDER_ADD_COLUMN_LABEL}
           </button>
         </div>

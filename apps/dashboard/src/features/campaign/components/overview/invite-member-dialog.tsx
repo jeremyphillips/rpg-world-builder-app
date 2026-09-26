@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { UserPlus } from 'lucide-react'
 
-import { Button, Modal } from '@rpg/ui'
+import { ActionButton, Button, Modal } from '@rpg/ui'
 import { Form, FormFooterActions } from '@rpg/ui/form'
 
 import { useSubmitHandler } from '@/lib/use-submit-handler'
@@ -67,10 +66,9 @@ export function InviteMemberDialog({
     <Modal.Root open={open} onOpenChange={handleOpenChange}>
       {showTrigger ? (
         <Modal.Trigger asChild>
-          <Button type="button" variant="outline" size="sm">
-            <UserPlus aria-hidden className="size-4" />
+          <ActionButton action="invite" variant="outline" size="sm" iconStep="md">
             Invite member
-          </Button>
+          </ActionButton>
         </Modal.Trigger>
       ) : null}
       <Modal.Content size="md">

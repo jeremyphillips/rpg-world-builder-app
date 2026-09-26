@@ -1,7 +1,7 @@
-import { Pencil, Table2 } from 'lucide-react'
+import { Table2 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import { Badge, Button, IconContainer } from '@rpg/ui'
+import { ActionButton, Badge, IconContainer } from '@rpg/ui'
 
 import { DetailEntityRowActions } from '../../../lib/detail/row/entity/detail-entity-row-actions'
 import {
@@ -54,10 +54,9 @@ export function FeatureTableRow({
             {onEdit || overflowActions ? (
               <DetailEntityRowActions className={featureTableRowActionsClasses}>
                 {onEdit ? (
-                  <Button type="button" variant="outline" size="sm" onClick={onEdit}>
-                    <Pencil aria-hidden />
+                  <ActionButton action="edit" variant="outline" size="sm" onClick={onEdit}>
                     {editLabel}
-                  </Button>
+                  </ActionButton>
                 ) : null}
                 {overflowActions}
               </DetailEntityRowActions>

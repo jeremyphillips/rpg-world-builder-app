@@ -1,6 +1,4 @@
-import { Trash2 } from 'lucide-react'
-
-import { Text, iconGhostControlVariants } from '@rpg/ui'
+import { ActionIcon, Text, iconGhostControlVariants } from '@rpg/ui'
 
 import { ContentEntityCard } from '@/features/content'
 import {
@@ -45,7 +43,7 @@ function InventoryRemoveIconButton({
       aria-label={removeLabel}
       onClick={onRemove}
     >
-      <Trash2 aria-hidden />
+      <ActionIcon action="remove" />
     </button>
   )
 }

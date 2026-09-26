@@ -1,6 +1,4 @@
-import { RotateCcw } from 'lucide-react'
-
-import { Button } from '@rpg/ui'
+import { ActionButton } from '@rpg/ui'
 
 import { catalogPickerToolbarResetButtonClasses } from './catalog-picker-filter-toolbar.variants'
 
@@ -16,17 +14,17 @@ export function CatalogToolbarResetAction({
   tabIndex,
 }: CatalogToolbarResetActionProps) {
   return (
-    <Button
-      type="button"
+    <ActionButton
+      action="reset"
       variant="ghost"
       size="sm"
+      iconStep="sm"
       className={catalogPickerToolbarResetButtonClasses}
       onClick={onClick}
       tabIndex={tabIndex}
     >
-      <RotateCcw aria-hidden className="size-3" />
       {label}
-    </Button>
+    </ActionButton>
   )
 }
 

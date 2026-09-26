@@ -1,6 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react'
-import { Plus } from 'lucide-react'
-import { Button, ScrollBoundaryRegion, Text, ValidationIssueCountBadge } from '@rpg/ui'
+import { ActionButton, ScrollBoundaryRegion, Text, ValidationIssueCountBadge } from '@rpg/ui'
 
 import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
 import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
@@ -128,10 +127,9 @@ export function MasterDetailListPanel({
     <nav aria-label={ariaLabel} className={masterDetailListShellClasses}>
       <div className={masterDetailListHeaderClasses}>
         <div className={masterDetailListTitleClasses}>{listTitle}</div>
-        <Button type="button" variant="outline" size="sm" onClick={onAdd}>
-          <Plus aria-hidden />
+        <ActionButton action="add" variant="outline" size="sm" onClick={onAdd}>
           {addLabel}
-        </Button>
+        </ActionButton>
       </div>
 
       {countSupplement || invalidItemCount > 0 ? (

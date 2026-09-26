@@ -1,6 +1,12 @@
-import { Plus } from 'lucide-react'
-
-import { Button, Input, Text, cn, fieldArrayItemClasses, fieldLabelVariants } from '@rpg/ui'
+import {
+  ActionButton,
+  Button,
+  Input,
+  Text,
+  cn,
+  fieldArrayItemClasses,
+  fieldLabelVariants,
+} from '@rpg/ui'
 
 import { useSettlementCreateComposition } from './settlement-create-composition-context'
 
@@ -59,10 +65,9 @@ export function LocationSettlementStartingDistrictsSlot() {
           })}
         </ul>
       )}
-      <Button type="button" variant="ghost" size="sm" density="compact" onClick={addDistrict}>
-        <Plus aria-hidden />
+      <ActionButton action="add" variant="ghost" size="sm" density="compact" onClick={addDistrict}>
         {SETTLEMENT_STARTING_DISTRICTS_ADD_LABEL}
-      </Button>
+      </ActionButton>
     </div>
   )
 }

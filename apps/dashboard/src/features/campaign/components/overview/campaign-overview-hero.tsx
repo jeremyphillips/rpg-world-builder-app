@@ -12,9 +12,9 @@ import {
   heroMarkImageClasses,
   heroMediaImageClasses,
   heroMetaClasses,
+  ActionIcon,
   type RowActionsMenuLinkProps,
 } from '@rpg/ui'
-import { UserPlus } from 'lucide-react'
 
 import { ROUTES } from '@/app/routes'
 import { MESSAGES_ACTION_COPY } from '@/features/message'
@@ -81,7 +81,7 @@ export function CampaignOverviewHero({
             kind: 'action' as const,
             id: 'invite-member',
             label: 'Invite member',
-            icon: <UserPlus aria-hidden className="size-4" />,
+            icon: <ActionIcon action="invite" step="md" />,
             onSelect: () => setInviteOpen(true),
           },
         ]
