@@ -160,10 +160,10 @@ scrollport. When a descendant mounts `data-viewport-fill="workspace"`, AppShell
 
 Inset vs child rhythm are **independent** on width shells:
 
-| Prop      | SSOT                                                                                 | Default   | Role                                    |
-| --------- | ------------------------------------------------------------------------------------ | --------- | --------------------------------------- |
-| `spacing` | [`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts) | `page`    | Shell vertical inset (`py-8` or `none`) |
-| `rhythm`  | same file (`pageSpacingClasses`)                                                     | `compact` | Direct-child `space-y-*` only           |
+| Prop      | SSOT                                                                                 | Default   | Role                                         |
+| --------- | ------------------------------------------------------------------------------------ | --------- | -------------------------------------------- |
+| `spacing` | [`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts) | `page`    | Shell vertical inset (`pt-6 pb-8` or `none`) |
+| `rhythm`  | same file (`pageSpacingClasses`)                                                     | `compact` | Direct-child `space-y-*` only                |
 
 Every route picks **one width shell** from `components/layout/page/`:
 

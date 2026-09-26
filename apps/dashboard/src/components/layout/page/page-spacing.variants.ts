@@ -1,5 +1,5 @@
 /** Top shell inset below the breadcrumb rail. */
-export const pageShellInsetTopClasses = 'pt-8'
+export const pageShellInsetTopClasses = 'pt-6'
 
 /** Bottom shell inset above the viewport edge (scrollable routes). */
 export const pageShellInsetBottomClasses = 'pb-8'

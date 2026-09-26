@@ -1,8 +1,6 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import type { Organization } from '@rpg/contracts'
-import { RichTextContent } from '@rpg/ui'
-
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/page/wide-page'
 import {
@@ -58,6 +56,7 @@ export function OrganizationDetailContent({
   return (
     <WidePage>
       <ContentDetailLayout
+        contentTypeKey="organizations"
         name={organization.name}
         nameBadge={<ContentStatusNameBadge status={organization.status} />}
         displayImage={getContentDisplayImage(
@@ -68,11 +67,7 @@ export function OrganizationDetailContent({
         campaignId={campaignId}
         editHref={contentEditHref('organizations', campaignId, organization.id)}
         statRows={viewModel.statRows}
-        descriptionContent={
-          viewModel.description ? (
-            <RichTextContent html={viewModel.description} size="md" tone="muted" />
-          ) : undefined
-        }
+        descriptionHtml={viewModel.description}
       >
         <div className="space-y-8">
           <OrganizationMembersDetailSection campaignId={campaignId} organization={organization} />

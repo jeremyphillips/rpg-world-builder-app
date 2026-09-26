@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button, Heading, RichTextContent } from '@rpg/ui'
+import { Button, Heading } from '@rpg/ui'
 
+import { PageChromeActionsProvider } from '@/components/layout/page-chrome/page-chrome-actions-provider'
 import { withDashboardProviders } from '../../../../../../../.storybook/decorators'
 import { ContentDetailLayout } from '../content-detail-layout'
 
@@ -8,7 +9,14 @@ const meta = {
   title: 'Content/ContentDetailLayout',
   component: ContentDetailLayout,
   parameters: { layout: 'padded' },
-  decorators: [withDashboardProviders],
+  decorators: [
+    withDashboardProviders,
+    (Story) => (
+      <PageChromeActionsProvider>
+        <Story />
+      </PageChromeActionsProvider>
+    ),
+  ],
 } satisfies Meta<typeof ContentDetailLayout>
 
 export default meta
@@ -23,21 +31,18 @@ const FIGHTER_STAT_ROWS = [
   { label: 'Hit Die', value: 'd10 per level' },
   { label: 'Primary Abilities', value: 'Strength, Dexterity' },
   { label: 'Saving Throws', value: 'Strength, Constitution' },
+  { label: 'Armor', value: 'All armor, shields' },
 ]
 
 export const Default: Story = {
   args: {
+    contentTypeKey: 'classes',
     name: 'Fighter',
     displayImage: PLACEHOLDER_DISPLAY_IMAGE,
     imageName: 'Fighter',
     statRows: FIGHTER_STAT_ROWS,
-    descriptionContent: (
-      <RichTextContent
-        html="<p>A master of martial combat, skilled with a variety of weapons and armor.</p>"
-        size="md"
-        tone="muted"
-      />
-    ),
+    descriptionHtml:
+      '<p>A master of martial combat, skilled with a variety of weapons and armor.</p>',
     children: (
       <section aria-labelledby="features-heading">
         <Heading variant="section" as="h2" id="features-heading" className="mb-4">
@@ -51,27 +56,26 @@ export const Default: Story = {
 
 export const WithActions: Story = {
   args: {
+    contentTypeKey: 'classes',
     name: 'Wizard',
     displayImage: PLACEHOLDER_DISPLAY_IMAGE,
     imageName: 'Wizard',
+    campaignId: 'c1',
+    editHref: '/campaigns/c1/classes/wizard/edit',
     statRows: [{ label: 'Hit Die', value: 'd6 per level' }],
     actions: (
       <Button variant="outline" size="sm">
         Duplicate
       </Button>
     ),
-    descriptionContent: (
-      <RichTextContent
-        html="<p>A scholarly magic-user capable of manipulating the structures of reality.</p>"
-        size="md"
-        tone="muted"
-      />
-    ),
+    descriptionHtml:
+      '<p>A scholarly magic-user capable of manipulating the structures of reality.</p>',
   },
 }
 
 export const HeroOnly: Story = {
   args: {
+    contentTypeKey: 'equipment',
     name: 'Shield',
     displayImage: PLACEHOLDER_DISPLAY_IMAGE,
     imageName: 'Shield',
@@ -81,6 +85,7 @@ export const HeroOnly: Story = {
 
 export const SemanticFallback: Story = {
   args: {
+    contentTypeKey: 'equipment',
     name: 'Custom Item',
     displayFallback: 'equipment',
     imageName: 'Custom Item',

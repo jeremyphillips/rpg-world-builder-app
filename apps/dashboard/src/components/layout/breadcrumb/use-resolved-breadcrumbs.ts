@@ -21,16 +21,17 @@ function resolveIsCollectionIndex(matches: UIMatch[]): boolean {
     return false
   }
 
-  for (let index = matches.length - 2; index >= 0; index -= 1) {
-    const match = matches[index]
-    if (match && hasCrumb(match.handle)) {
-      const leafSegments = leaf.pathname.split('/').filter(Boolean)
-      const parentSegments = match.pathname.split('/').filter(Boolean)
-      return leafSegments.length === parentSegments.length
-    }
+  const crumbMatches = matches.filter((match) => hasCrumb(match.handle))
+  const collectionCrumb = crumbMatches[0]
+  if (!collectionCrumb || crumbMatches.length !== 1) {
+    // Entity detail (and other nested trails) register multiple crumb matches — not a collection index.
+    return false
   }
 
-  return false
+  const leafSegments = leaf.pathname.split('/').filter(Boolean)
+  const collectionSegments = collectionCrumb.pathname.split('/').filter(Boolean)
+
+  return leafSegments.length === collectionSegments.length
 }
 
 /** Resolves breadcrumb items from the active route matches and page label context. */

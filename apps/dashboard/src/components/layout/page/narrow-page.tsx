@@ -12,7 +12,7 @@ import {
 
 export interface NarrowPageProps {
   children: ReactNode
-  /** Vertical shell inset below the breadcrumb rail. Default: page (`py-8`). */
+  /** Vertical shell inset below the breadcrumb rail. Default: page (`pt-6 pb-8`). */
   spacing?: PageShellInset
   /** Vertical rhythm between direct children. Default: compact (`space-y-2`). */
   rhythm?: PageRhythm

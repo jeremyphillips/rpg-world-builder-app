@@ -28,17 +28,14 @@ export function FeatDetailContent({ feat, campaignId }: FeatDetailContentProps) 
   return (
     <WidePage>
       <ContentDetailLayout
+        contentTypeKey="feats"
         name={feat.name}
         nameBadge={<ContentStatusNameBadge status={feat.status} />}
         imageName={feat.name}
         campaignId={campaignId}
         editHref={contentEditHref('feats', campaignId, feat.id)}
         statRows={viewModel.statRows}
-        descriptionContent={
-          viewModel.description ? (
-            <RichTextContent html={viewModel.description} size="md" tone="muted" />
-          ) : undefined
-        }
+        descriptionHtml={viewModel.description}
       >
         {viewModel.repeatableNotes && (
           <section aria-labelledby="feat-repeatable-notes-heading">

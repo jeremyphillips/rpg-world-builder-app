@@ -91,11 +91,13 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
   return (
     <WidePage>
       <ContentDetailLayout
+        contentTypeKey="skill-proficiencies"
         name={skill.name}
         nameBadge={<ContentStatusNameBadge status={skill.status} />}
         imageName={skill.name}
         campaignId={campaignId}
         editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
+        descriptionHtml={skill.description}
         metadata={
           <div className="space-y-8">
             <ContentStatRow label="Governing Ability" value={viewModel.governingAbilityLabel} />

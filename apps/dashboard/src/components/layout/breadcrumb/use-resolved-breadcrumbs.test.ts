@@ -171,6 +171,38 @@ describe('useResolvedBreadcrumbs', () => {
     ])
   })
 
+  it('keeps collection href on entity detail pages', () => {
+    mockUseMatches.mockReturnValue([
+      makeMatch(
+        '/campaigns/c1/species',
+        { campaignId: 'c1' },
+        {
+          crumb: (_params, data) => ({
+            label: 'Species',
+            href: data.isCollectionIndex ? undefined : '/campaigns/c1/species',
+          }),
+        },
+      ),
+      makeMatch(
+        '/campaigns/c1/species/dragonborn',
+        { campaignId: 'c1', speciesId: 'dragonborn' },
+        {
+          crumb: (_params, { entityLabel }) => ({
+            label: entityLabel ?? '…',
+          }),
+        },
+      ),
+      makeMatch('/campaigns/c1/species/dragonborn', { campaignId: 'c1', speciesId: 'dragonborn' }),
+    ])
+
+    const { result } = renderHook(() => useResolvedBreadcrumbs())
+
+    expect(result.current).toEqual([
+      { label: 'Species', href: '/campaigns/c1/species' },
+      { label: 'Wizard' },
+    ])
+  })
+
   it('adds entity detail href when breadcrumbMode is edit', () => {
     mockUseMatches.mockReturnValue([
       makeMatch(

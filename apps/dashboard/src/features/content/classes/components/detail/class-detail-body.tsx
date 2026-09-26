@@ -156,6 +156,7 @@ export function ClassDetailBody({
 }: ClassDetailBodyProps) {
   return (
     <ContentDetailLayout
+      contentTypeKey="classes"
       name={name}
       nameBadge={nameBadge}
       displayImage={displayImage}
@@ -164,11 +165,7 @@ export function ClassDetailBody({
       campaignId={campaignId}
       editHref={editHref}
       statRows={viewModel.statRows}
-      descriptionContent={
-        viewModel.descriptionHtml ? (
-          <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
-        ) : undefined
-      }
+      descriptionHtml={viewModel.descriptionHtml}
     >
       <ClassDetailSections
         sections={viewModel.sections}

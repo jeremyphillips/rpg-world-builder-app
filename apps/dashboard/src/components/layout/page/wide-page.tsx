@@ -12,7 +12,7 @@ import { widePageBaseClasses } from './wide-page.variants'
 
 export interface WidePageProps {
   children: ReactNode
-  /** Vertical shell inset below the breadcrumb rail. Default: page (`py-8`); `page-top` is document-scroll only (top inset). Viewport forms use `spacing="none"` inside ViewportWorkspace. */
+  /** Vertical shell inset below the breadcrumb rail. Default: page (`pt-6 pb-8`); `page-top` is document-scroll only (top inset). Viewport forms use `spacing="none"` inside ViewportWorkspace. */
   spacing?: PageShellInset
   /** Vertical rhythm between direct children. Default: compact (`space-y-2`). */
   rhythm?: PageRhythm

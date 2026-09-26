@@ -1,8 +1,6 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import type { Location } from '@rpg/contracts'
-import { RichTextContent } from '@rpg/ui'
-
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { WidePage } from '@/components/layout/page/wide-page'
 import { useCanManageCampaign } from '@/features/campaign'
@@ -49,6 +47,7 @@ export function LocationDetailContent({
   return (
     <WidePage>
       <ContentDetailLayout
+        contentTypeKey="locations"
         name={location.name}
         nameBadge={<ContentStatusNameBadge status={location.status} />}
         displayImage={getContentDisplayImage(
@@ -66,11 +65,7 @@ export function LocationDetailContent({
             identity={viewModel.identity}
           />
         }
-        descriptionContent={
-          viewModel.description ? (
-            <RichTextContent html={viewModel.description} size="md" tone="muted" />
-          ) : undefined
-        }
+        descriptionHtml={viewModel.description}
       >
         <div className="space-y-8">
           <LocationChildrenSection

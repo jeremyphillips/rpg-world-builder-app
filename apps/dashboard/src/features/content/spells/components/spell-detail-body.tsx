@@ -184,11 +184,13 @@ export function SpellDetailBody({
 }: SpellDetailBodyProps) {
   return (
     <ContentDetailLayout
+      contentTypeKey="spells"
       name={name}
       nameBadge={nameBadge}
       imageName={imageName}
       campaignId={campaignId}
       editHref={editHref}
+      heroDescription={false}
       statRows={viewModel.statRows}
       descriptionContent={
         viewModel.descriptionHtml ? (

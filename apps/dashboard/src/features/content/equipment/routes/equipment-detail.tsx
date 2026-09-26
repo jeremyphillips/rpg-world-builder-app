@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom'
-import { RichTextContent } from '@rpg/ui'
 import type { Equipment } from '@rpg/contracts'
 
 import {
@@ -41,6 +40,7 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
   return (
     <WidePage>
       <ContentDetailLayout
+        contentTypeKey="equipment"
         name={item.name}
         nameBadge={<ContentStatusNameBadge status={item.status} />}
         displayImage={getContentDisplayImage(
@@ -51,11 +51,7 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
         campaignId={campaignId}
         editHref={contentEditHref('equipment', campaignId, item.id, family)}
         statRows={viewModel.statRows}
-        descriptionContent={
-          viewModel.description ? (
-            <RichTextContent html={viewModel.description} size="md" tone="muted" />
-          ) : undefined
-        }
+        descriptionHtml={viewModel.description}
       >
         <ContentUsageReferencesSection
           campaignId={campaignId}
