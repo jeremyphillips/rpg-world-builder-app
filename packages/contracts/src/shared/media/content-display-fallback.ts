@@ -1,4 +1,5 @@
 import type { GlobalSearchTarget } from '../../rpg/campaign/global-search/global-search-target'
+import type { ContentTypeKey } from '../../rpg/primitives/content/content-type-keys'
 import type { ContentDisplaySurface } from './content-display-surface'
 import type { ContentMediaDomain } from './media-policy'
 
@@ -63,6 +64,26 @@ function resolveMediaDomainFallback(
   }
 
   return MEDIA_DOMAIN_COMPACT_FALLBACK[domain]
+}
+
+const CONTENT_TYPE_DISPLAY_FALLBACK_SUBJECT = {
+  classes: 'class',
+  species: 'species',
+  equipment: 'equipment',
+  locations: 'location',
+  organizations: 'organization',
+  spells: 'spell',
+  feats: 'feat',
+  'skill-proficiencies': 'skill-proficiency',
+} as const satisfies Record<ContentTypeKey, ContentDisplayFallbackSubject>
+
+/** Preview rail, catalog chrome — `surface: 'field'` matches detail/field fallback policy. */
+export function resolveContentDisplayFallbackForContentType(
+  contentType: ContentTypeKey,
+  surface: ContentDisplayFallbackSurface = 'field',
+): ContentDisplayFallback {
+  const domain = CONTENT_TYPE_DISPLAY_FALLBACK_SUBJECT[contentType]
+  return resolveContentDisplayFallback({ domain, surface })
 }
 
 /** Surface-aware semantic empty-state key (UI maps to icons). */

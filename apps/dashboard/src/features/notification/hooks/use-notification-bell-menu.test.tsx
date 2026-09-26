@@ -11,11 +11,16 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
 }))
 
-vi.mock('@rpg/ui', () => ({
-  toast: {
-    error: vi.fn(),
-  },
-}))
+vi.mock('@rpg/ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@rpg/ui')>()
+  return {
+    ...actual,
+    toast: {
+      ...actual.toast,
+      error: vi.fn(),
+    },
+  }
+})
 
 vi.mock('./use-notifications', () => ({
   useNotifications: () => ({

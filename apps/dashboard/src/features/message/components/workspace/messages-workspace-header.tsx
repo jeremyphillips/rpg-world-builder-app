@@ -1,5 +1,4 @@
-import { SquarePen } from 'lucide-react'
-import { Button } from '@rpg/ui'
+import { ActionButton, Button } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 
@@ -25,10 +24,9 @@ export function MessagesWorkspaceHeader({
             {MESSAGES_ACTION_COPY.cancel}
           </Button>
         ) : (
-          <Button type="button" onClick={onNewMessage}>
-            <SquarePen aria-hidden className="size-4" />
+          <ActionButton action="compose" iconStep="md" onClick={onNewMessage}>
             {MESSAGES_ACTION_COPY.newMessage}
-          </Button>
+          </ActionButton>
         )
       }
     />

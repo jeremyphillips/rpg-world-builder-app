@@ -10,6 +10,7 @@ import {
 } from './content-display-fallback-icon.variants'
 
 export { CONTENT_DISPLAY_FALLBACK_ICONS } from './content-display-fallback-icon.map'
+export { contentIdentityIcon } from './content-identity-icon.lib'
 
 export type ContentDisplayFallbackIconProps = {
   fallback: ContentDisplayFallback

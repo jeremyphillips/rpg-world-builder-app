@@ -1,18 +1,11 @@
 import {
-  resolveContentDisplayFallback,
-  resolveContentMediaDomainForContentType,
+  resolveContentDisplayFallbackForContentType,
   type ContentCampaignAccessPatch,
   type ContentDisplayFallback,
   type ContentTypeKey,
 } from '@rpg/contracts'
 import type { PreviewRailAvailability, PreviewRailStatusPanelVariant } from '@rpg/ui'
 import type { FieldGroupSummary } from '@rpg/ui/form'
-import { FileText, type LucideIcon } from 'lucide-react'
-
-import {
-  SIDEBAR_NAV_ICONS,
-  type SidebarNavIconId,
-} from '@/components/layout/sidebar/lib/sidebar-nav-icons'
 import {
   AVAILABILITY_STATUS_AVAILABLE,
   AVAILABILITY_STATUS_UNAVAILABLE,
@@ -58,21 +51,10 @@ export function resolveContentPreviewReadinessPanel(
   }
 }
 
-export function resolvePreviewRailFallbackIcon(contentTypeKey: string): LucideIcon {
-  if (contentTypeKey in SIDEBAR_NAV_ICONS) {
-    return SIDEBAR_NAV_ICONS[contentTypeKey as SidebarNavIconId]
-  }
-  return FileText
-}
-
 export function resolvePreviewRailDisplayFallback(
   contentTypeKey: ContentTypeKey,
 ): ContentDisplayFallback {
-  const domain = resolveContentMediaDomainForContentType(contentTypeKey)
-  if (!domain) {
-    return 'generic'
-  }
-  return resolveContentDisplayFallback({ domain, surface: 'field' })
+  return resolveContentDisplayFallbackForContentType(contentTypeKey, 'field')
 }
 
 export function resolvePreviewRailOpenSection(

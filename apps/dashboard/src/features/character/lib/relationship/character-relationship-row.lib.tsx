@@ -1,7 +1,5 @@
-import { SquarePen } from 'lucide-react'
-
 import type { Organization } from '@rpg/contracts'
-import { Button } from '@rpg/ui'
+import { ActionButton } from '@rpg/ui'
 import type { EntityAnatomyTrailing } from '@/features/content'
 
 import { BuilderInventoryRemoveAction } from '../../components/builder/inventory/builder-inventory-remove-action'
@@ -84,18 +82,17 @@ export function resolveOrganizationMembershipApiTrailing(
     return {
       kind: 'action',
       content: (
-        <Button
-          type="button"
+        <ActionButton
+          action="edit"
           variant="ghost"
           size="icon"
+          iconStep="md"
           aria-label={`Edit membership in ${label}`}
           onClick={() => {
             const resolved = resolveApiOrganizationMembership(membership, context)
             if (resolved) context.onEditMembership?.(resolved)
           }}
-        >
-          <SquarePen aria-hidden className="size-4" />
-        </Button>
+        />
       ),
     }
   }

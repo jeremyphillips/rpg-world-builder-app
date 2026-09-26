@@ -2579,6 +2579,7 @@
     "resolveCompiledChoiceProgressionQuotaAtLevel",
     "resolveContentCampaignAccess",
     "resolveContentDisplayFallback",
+    "resolveContentDisplayFallbackForContentType",
     "resolveContentDisplayFallbackForSearchTarget",
     "resolveContentDisplayImage",
     "resolveContentDisplayImageAsOptional",

@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
-import { MoreHorizontal, MoreVertical, Trash2 } from 'lucide-react'
+import { MoreHorizontal, MoreVertical } from 'lucide-react'
 
 import {
+  ActionIcon,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +36,7 @@ export function detailOverflowDeleteAction(
   return {
     id: 'delete',
     label,
-    icon: <Trash2 aria-hidden />,
+    icon: <ActionIcon action="remove" />,
     destructive: true,
     onSelect,
   }

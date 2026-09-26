@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   resolveContentDisplayFallback,
+  resolveContentDisplayFallbackForContentType,
   resolveContentDisplayFallbackForSearchTarget,
 } from './content-display-fallback'
 
@@ -37,6 +38,22 @@ describe('resolveContentDisplayFallback', () => {
     expect(resolveContentDisplayFallback({ domain: 'spell', surface: 'search' })).toBe('spell')
     expect(resolveContentDisplayFallback({ domain: 'game-term', surface: 'compact' })).toBe(
       'game-term',
+    )
+  })
+})
+
+describe('resolveContentDisplayFallbackForContentType', () => {
+  it('uses field surface policy for media catalog types', () => {
+    expect(resolveContentDisplayFallbackForContentType('classes')).toBe('generic')
+    expect(resolveContentDisplayFallbackForContentType('species')).toBe('generic')
+    expect(resolveContentDisplayFallbackForContentType('equipment')).toBe('equipment')
+  })
+
+  it('maps non-media catalog types to their identity keys', () => {
+    expect(resolveContentDisplayFallbackForContentType('spells')).toBe('spell')
+    expect(resolveContentDisplayFallbackForContentType('feats')).toBe('feat')
+    expect(resolveContentDisplayFallbackForContentType('skill-proficiencies')).toBe(
+      'skill-proficiency',
     )
   })
 })

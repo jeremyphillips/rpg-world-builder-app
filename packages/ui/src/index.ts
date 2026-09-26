@@ -200,6 +200,14 @@ export {
   type SidebarNavSectionDisclosureProps,
 } from './components/ui/sidebar-nav-section-disclosure.client'
 export { Button, type ButtonForwardingProps, type ButtonProps } from './components/ui/button.client'
+export { ActionButton, type ActionButtonProps } from './components/ui/action-button.client'
+export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
+export {
+  ACTION_ICONS,
+  ACTION_ICON_VERBS,
+  type ActionIconVerb,
+} from './components/ui/action-icons.map'
+export { type AppIcon } from './components/ui/app-icon.types'
 export { buttonVariants } from './components/ui/button.variants'
 export { Link, type LinkProps } from './components/ui/link'
 export {
@@ -674,6 +682,7 @@ export {
 export {
   ContentDisplayFallbackIcon,
   CONTENT_DISPLAY_FALLBACK_ICONS,
+  contentIdentityIcon,
   type ContentDisplayFallbackIconProps,
 } from './components/ui/content-display-fallback-icon.client'
 export {

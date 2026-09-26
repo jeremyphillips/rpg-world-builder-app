@@ -1,9 +1,8 @@
 'use client'
 
 import type { ContentDisplayFallback } from '@rpg/contracts'
-import { Trash2 } from 'lucide-react'
-
 import { cn } from '../../lib/utils'
+import { ActionIcon } from './action-icon.client'
 import { contentCardRemoveButtonVariants } from './content-card.variants'
 import { ContentDisplayFallbackIcon } from './content-display-fallback-icon.client'
 import { IdentityFrame } from './identity-frame.client'
@@ -68,7 +67,7 @@ export function ContentCardRemoveButton({
       aria-label={removeAriaLabel ?? formatContentCardRemoveLabel(label)}
       onClick={onRemove}
     >
-      <Trash2 aria-hidden />
+      <ActionIcon action="remove" step="md" />
     </button>
   )
 }

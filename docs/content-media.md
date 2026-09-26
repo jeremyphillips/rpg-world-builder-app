@@ -14,7 +14,9 @@ Equipment, Location, Organization). Full product and UX specification:
    and `generic`. Resolve via `resolveContentDisplayFallback({ domain, surface, … })`
    and `resolveContentDisplayFallbackForSearchTarget` — compact and search share class
    and species keys; detail and field keep class/species on `generic`. `@rpg/ui`
-   `CONTENT_DISPLAY_FALLBACK_ICONS` is the only icon map (sidebar catalog items reuse it).
+   `CONTENT_DISPLAY_FALLBACK_ICONS` is the identity glyph map (sidebar catalog items reuse it via
+   `contentIdentityIcon`). Section and action glyphs live in separate registries — see
+   [packages/ui/docs/icon-registry.md](../packages/ui/docs/icon-registry.md).
    Wire `ContentDisplayImage` / search `displayImage` is real media only — no fallback field
    on search documents.
 3. **Field summary empty state:** ImagePlus when the viewer can manage media; otherwise
