@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import { CONTENT_TYPE_KEYS } from '../../rpg/primitives/content/content-type-keys'
 import {
   resolveContentDisplayFallback,
   resolveContentDisplayFallbackForContentType,
   resolveContentDisplayFallbackForSearchTarget,
 } from './content-display-fallback'
+import { resolveContentMediaDomainForContentType } from './resolve-content-media-domain'
 
 describe('resolveContentDisplayFallback', () => {
   it('uses class and species keys on compact and search surfaces', () => {
@@ -43,13 +45,29 @@ describe('resolveContentDisplayFallback', () => {
 })
 
 describe('resolveContentDisplayFallbackForContentType', () => {
+  it('covers every content type key via media domain or non-media subject map', () => {
+    for (const contentType of CONTENT_TYPE_KEYS) {
+      expect(resolveContentDisplayFallbackForContentType(contentType)).toBeDefined()
+    }
+  })
+
+  it('delegates media-opted types to resolveContentMediaDomainForContentType', () => {
+    for (const contentType of CONTENT_TYPE_KEYS) {
+      const mediaDomain = resolveContentMediaDomainForContentType(contentType)
+      if (!mediaDomain) continue
+      expect(resolveContentDisplayFallbackForContentType(contentType, 'compact')).toBe(
+        resolveContentDisplayFallback({ domain: mediaDomain, surface: 'compact' }),
+      )
+    }
+  })
+
   it('uses field surface policy for media catalog types', () => {
     expect(resolveContentDisplayFallbackForContentType('classes')).toBe('generic')
     expect(resolveContentDisplayFallbackForContentType('species')).toBe('generic')
     expect(resolveContentDisplayFallbackForContentType('equipment')).toBe('equipment')
   })
 
-  it('maps non-media catalog types to their identity keys', () => {
+  it('maps non-media catalog types to their identity keys on field surfaces', () => {
     expect(resolveContentDisplayFallbackForContentType('spells')).toBe('spell')
     expect(resolveContentDisplayFallbackForContentType('feats')).toBe('feat')
     expect(resolveContentDisplayFallbackForContentType('skill-proficiencies')).toBe(

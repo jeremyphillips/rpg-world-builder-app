@@ -13,6 +13,8 @@ Lucide remains the default glyph set. **One owner per semantic role** — charac
 
 `campaign` and `generic` may share a component today but are separate map entries — do not alias one to the other.
 
+**Preview rail / form chrome:** `resolveContentDisplayFallbackForContentType` uses `resolveContentMediaDomainForContentType` for media-opted types (class/species stay on `generic` for `surface: 'field'`). Non-media catalog types (spells, feats, skill-proficiencies) use identity keys (`spell`, `feat`, `skill-proficiency`), not `generic`.
+
 ## Actions
 
 `ActionButton` accepts only `action` (closed verb) plus normal `Button` props. It does not accept custom glyphs, `icon`, or destructive styling for `remove`. Use `ArrayItemRemoveButton`, `ContentCardRemoveButton`, or explicit `variant` on the button.
@@ -25,7 +27,7 @@ Overflow triggers: **`overflow`**, **`overflowVertical`**, **`overflowMenu`**.
 
 ## Guards
 
-`icon-registry-ban.test.ts` (`@rpg/ui`) and `icon-registry-scope-ban.test.ts` (dashboard positive scopes) block raw `Plus` / `Pencil` / `Trash2` / `RotateCcw` imports in migrated paths.
+`icon-registry-ban.test.ts` (`@rpg/ui` action wrappers), `icon-registry-scope-ban.test.ts` and `icon-registry-identity-ban.test.ts` (dashboard) block raw Lucide verbs and direct identity imports in migrated paths.
 
 ## Custom icons later
 

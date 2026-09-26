@@ -2,6 +2,7 @@ import type { GlobalSearchTarget } from '../../rpg/campaign/global-search/global
 import type { ContentTypeKey } from '../../rpg/primitives/content/content-type-keys'
 import type { ContentDisplaySurface } from './content-display-surface'
 import type { ContentMediaDomain } from './media-policy'
+import { resolveContentMediaDomainForContentType } from './resolve-content-media-domain'
 
 export const CONTENT_DISPLAY_FALLBACKS = [
   'character',
@@ -66,23 +67,38 @@ function resolveMediaDomainFallback(
   return MEDIA_DOMAIN_COMPACT_FALLBACK[domain]
 }
 
-const CONTENT_TYPE_DISPLAY_FALLBACK_SUBJECT = {
-  classes: 'class',
-  species: 'species',
-  equipment: 'equipment',
-  locations: 'location',
-  organizations: 'organization',
+/** Non-media catalog types — identity fallback subjects (preview rail, form chrome). */
+const CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT = {
   spells: 'spell',
   feats: 'feat',
   'skill-proficiencies': 'skill-proficiency',
-} as const satisfies Record<ContentTypeKey, ContentDisplayFallbackSubject>
+} as const satisfies Partial<Record<ContentTypeKey, ContentDisplayFallbackSubject>>
+
+function resolveContentDisplayFallbackSubjectForContentType(
+  contentType: ContentTypeKey,
+): ContentDisplayFallbackSubject {
+  const mediaDomain = resolveContentMediaDomainForContentType(contentType)
+  if (mediaDomain) {
+    return mediaDomain
+  }
+
+  const nonMediaSubject =
+    CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT[
+      contentType as keyof typeof CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT
+    ]
+  if (nonMediaSubject) {
+    return nonMediaSubject
+  }
+
+  throw new Error(`Missing content display fallback subject for content type: ${contentType}`)
+}
 
 /** Preview rail, catalog chrome — `surface: 'field'` matches detail/field fallback policy. */
 export function resolveContentDisplayFallbackForContentType(
   contentType: ContentTypeKey,
   surface: ContentDisplayFallbackSurface = 'field',
 ): ContentDisplayFallback {
-  const domain = CONTENT_TYPE_DISPLAY_FALLBACK_SUBJECT[contentType]
+  const domain = resolveContentDisplayFallbackSubjectForContentType(contentType)
   return resolveContentDisplayFallback({ domain, surface })
 }
 
