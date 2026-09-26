@@ -1,4 +1,10 @@
-import type { ContentCampaignAccessPatch } from '@rpg/contracts'
+import {
+  resolveContentDisplayFallback,
+  resolveContentMediaDomainForContentType,
+  type ContentCampaignAccessPatch,
+  type ContentDisplayFallback,
+  type ContentTypeKey,
+} from '@rpg/contracts'
 import type { PreviewRailAvailability, PreviewRailStatusPanelVariant } from '@rpg/ui'
 import type { FieldGroupSummary } from '@rpg/ui/form'
 import { FileText, type LucideIcon } from 'lucide-react'
@@ -60,18 +66,13 @@ export function resolvePreviewRailFallbackIcon(contentTypeKey: string): LucideIc
 }
 
 export function resolvePreviewRailDisplayFallback(
-  contentTypeKey: string,
-): import('@rpg/contracts').ContentDisplayFallback {
-  switch (contentTypeKey) {
-    case 'equipment':
-      return 'equipment'
-    case 'locations':
-      return 'location'
-    case 'organizations':
-      return 'organization'
-    default:
-      return 'generic'
+  contentTypeKey: ContentTypeKey,
+): ContentDisplayFallback {
+  const domain = resolveContentMediaDomainForContentType(contentTypeKey)
+  if (!domain) {
+    return 'generic'
   }
+  return resolveContentDisplayFallback({ domain, surface: 'field' })
 }
 
 export function resolvePreviewRailOpenSection(

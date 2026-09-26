@@ -24,7 +24,7 @@ describe('DetailMediaField', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 
-  it('renders nothing when read-only and empty', () => {
+  it('shows the domain fallback icon when read-only and empty', () => {
     const { container } = render(
       <DetailMediaField
         config={{ domain: 'character', presentation: COMPACT_MEDIA_FIELD_PRESENTATION }}
@@ -35,6 +35,6 @@ describe('DetailMediaField', () => {
       />,
     )
 
-    expect(container).toBeEmptyDOMElement()
+    expect(container.querySelector('.lucide-user-round')).toBeInTheDocument()
   })
 })

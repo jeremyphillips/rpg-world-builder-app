@@ -5,7 +5,7 @@ import { MediaAssetModel, type MediaAssetDoc } from './media-asset.model'
 import { MediaReferenceModel, type MediaReferenceDoc } from './media-reference.model'
 import { MediaUploadIdempotencyModel } from './media-upload-idempotency.model'
 import { MediaUploadSessionModel, type MediaUploadSessionDoc } from './media-upload-session.model'
-import { serializeMediaScope } from './lib/scope.lib'
+import { serializeMediaScopeKey } from '@rpg/contracts'
 
 type ScopeFields = {
   scopeKind: MediaScope['kind']
@@ -15,7 +15,7 @@ type ScopeFields = {
 }
 
 function scopeFields(scope: MediaScope): ScopeFields {
-  const scopeKey = serializeMediaScope(scope)
+  const scopeKey = serializeMediaScopeKey(scope)
   switch (scope.kind) {
     case 'campaign-content':
     case 'campaign-identity':
@@ -59,7 +59,7 @@ export async function findMediaAssetByScopeHash(
   contentHash: string,
 ): Promise<MediaAssetDoc | null> {
   return MediaAssetModel.findOne({
-    scopeKey: serializeMediaScope(scope),
+    scopeKey: serializeMediaScopeKey(scope),
     contentHash,
     lifecycle: 'ready',
   }).lean<MediaAssetDoc | null>()

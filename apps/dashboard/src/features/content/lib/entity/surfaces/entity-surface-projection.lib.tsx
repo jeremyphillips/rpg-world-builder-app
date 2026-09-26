@@ -1,6 +1,8 @@
 import { ContentCardMedia, contentCardMediaVariants, type ContentCardDensity } from '@rpg/ui'
 import { CatalogPickerActionButton } from '@rpg/ui'
 
+import { ContentMediaImage, type ContentMediaImageFrame } from '@/features/media'
+
 import type { EntityAnatomyTrailing } from '../anatomy/entity-anatomy-trailing.types'
 import type {
   EntitySurfaceIdentity,
@@ -9,14 +11,30 @@ import type {
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import type { EntitySurfaceConfig } from './entity-surface.types'
 
+function resolveEntitySurfaceMediaFrame(density: ContentCardDensity): ContentMediaImageFrame {
+  return density === 'compact' ? 'square' : 'insetSm'
+}
+
 function buildEntitySurfaceMedia(identity: EntitySurfaceIdentity, density: ContentCardDensity) {
+  const className = contentCardMediaVariants({ density })
+
+  if (identity.displayImage) {
+    return (
+      <ContentMediaImage
+        display={identity.displayImage}
+        alt={identity.heading}
+        frame={resolveEntitySurfaceMediaFrame(density)}
+        className={className}
+      />
+    )
+  }
+
   return (
     <ContentCardMedia
-      src={identity.displayImage?.src}
       fallback={identity.fallback}
       alt={identity.heading}
       density={density}
-      className={contentCardMediaVariants({ density })}
+      className={className}
     />
   )
 }

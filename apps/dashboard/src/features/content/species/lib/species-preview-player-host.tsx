@@ -6,7 +6,10 @@ import {
   useLanguageVocabulary,
   useSenseVocabulary,
 } from '@/features/vocabulary'
-import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import {
+  getContentDisplayImage,
+  resolveDashboardDetailDisplayFallback,
+} from '../../lib/detail/page/content-display-image'
 import {
   buildContentDisplayImageInput,
   type ContentPreviewDisplayImageValues,
@@ -55,7 +58,7 @@ export function SpeciesPreviewPlayerHost({
                 'detail',
               ),
             )}
-            displayFallback="generic"
+            displayFallback={resolveDashboardDetailDisplayFallback('species')}
             imageName={name}
             viewModel={viewModel}
             campaignId={ctx.campaignId ?? ''}

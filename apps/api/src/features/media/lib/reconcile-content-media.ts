@@ -2,12 +2,17 @@ import { randomUUID } from 'node:crypto'
 
 import type { ClientSession } from 'mongoose'
 
-import type { ContentMedia, ContentMediaPolicy, MediaSubject } from '@rpg/contracts'
-import { validateContentMedia } from '@rpg/contracts'
+import {
+  serializeMediaScopeKey,
+  validateContentMedia,
+  type ContentMedia,
+  type ContentMediaPolicy,
+  type MediaScope,
+  type MediaSubject,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { areMongoTransactionsEnabled, runInTransaction } from '../../../lib/mongo-transaction'
-import { serializeMediaScope } from './scope.lib'
 import {
   createMediaReferenceRecords,
   deleteMediaReferencesForSubject,
@@ -18,7 +23,7 @@ import {
 
 export type ReconcileContentMediaInput = {
   subject: MediaSubject
-  scope: Parameters<typeof serializeMediaScope>[0]
+  scope: MediaScope
   currentMedia: ContentMedia | null
   proposedMedia: ContentMedia
   expectedMediaRevision?: number
@@ -142,7 +147,7 @@ export async function prepareContentMediaReconciliation(input: ReconcileContentM
     }
   }
 
-  const scopeKey = serializeMediaScope(input.scope)
+  const scopeKey = serializeMediaScopeKey(input.scope)
   if (input.subject.scopeKey !== scopeKey) {
     throw HttpError.badRequest('Media subject scope does not match the authorized scope.')
   }

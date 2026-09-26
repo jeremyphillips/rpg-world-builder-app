@@ -20,7 +20,9 @@ import { validateFileType } from '../uploads'
 import { extensionForMime, inspectImageBuffer } from './lib/inspect-image.lib'
 import { generateMediaRendition } from './lib/generate-rendition.lib'
 import { assertMediaAssetReadable } from './lib/assert-media-asset-readable.lib'
-import { assertMediaScopeAuthorized, serializeMediaScope } from './lib/scope.lib'
+import { serializeMediaScopeKey } from '@rpg/contracts'
+
+import { assertMediaScopeAuthorized } from './lib/scope.lib'
 import { storeMediaOriginal } from './lib/storage.lib'
 import { scopeFromDoc, toMediaAsset } from './lib/to-media-asset'
 import {
@@ -162,7 +164,7 @@ export async function uploadMediaAsset(input: {
     _id: assetId,
     sessionId: input.sessionId,
     scopeKind: scope.kind,
-    scopeKey: serializeMediaScope(scope),
+    scopeKey: serializeMediaScopeKey(scope),
     campaignId: 'campaignId' in scope ? scope.campaignId : undefined,
     userId: scope.kind === 'user-pc' ? scope.userId : undefined,
     createdByUserId: input.userId,

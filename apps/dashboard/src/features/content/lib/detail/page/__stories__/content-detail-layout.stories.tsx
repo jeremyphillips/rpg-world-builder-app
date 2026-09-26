@@ -14,7 +14,10 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const PLACEHOLDER_IMAGE = 'https://placehold.co/400x500/1e293b/94a3b8?text=Class+Art'
+const PLACEHOLDER_DISPLAY_IMAGE = {
+  src: 'https://placehold.co/400x500/1e293b/94a3b8?text=Class+Art',
+  sourceKind: 'upload' as const,
+}
 
 const FIGHTER_STAT_ROWS = [
   { label: 'Hit Die', value: 'd10 per level' },
@@ -25,7 +28,7 @@ const FIGHTER_STAT_ROWS = [
 export const Default: Story = {
   args: {
     name: 'Fighter',
-    imageUrl: PLACEHOLDER_IMAGE,
+    displayImage: PLACEHOLDER_DISPLAY_IMAGE,
     imageName: 'Fighter',
     statRows: FIGHTER_STAT_ROWS,
     descriptionContent: (
@@ -49,7 +52,7 @@ export const Default: Story = {
 export const WithActions: Story = {
   args: {
     name: 'Wizard',
-    imageUrl: PLACEHOLDER_IMAGE,
+    displayImage: PLACEHOLDER_DISPLAY_IMAGE,
     imageName: 'Wizard',
     statRows: [{ label: 'Hit Die', value: 'd6 per level' }],
     actions: (
@@ -70,8 +73,17 @@ export const WithActions: Story = {
 export const HeroOnly: Story = {
   args: {
     name: 'Shield',
-    imageUrl: PLACEHOLDER_IMAGE,
+    displayImage: PLACEHOLDER_DISPLAY_IMAGE,
     imageName: 'Shield',
     statRows: [{ label: 'AC', value: '+2' }],
+  },
+}
+
+export const SemanticFallback: Story = {
+  args: {
+    name: 'Custom Item',
+    displayFallback: 'equipment',
+    imageName: 'Custom Item',
+    statRows: [{ label: 'Type', value: 'Adventuring gear' }],
   },
 }

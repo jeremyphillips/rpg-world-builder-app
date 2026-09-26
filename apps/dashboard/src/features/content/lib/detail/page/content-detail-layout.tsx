@@ -11,7 +11,6 @@ import {
   contentDetailHeroCardClasses,
   contentDetailHeroCardContentClasses,
   contentDetailHeroGridClasses,
-  contentDetailHeroImageClasses,
   contentDetailHeroImageFrameClasses,
   contentDetailHeroImageShellClasses,
   contentDetailHeroMainClasses,
@@ -43,9 +42,7 @@ export type ContentDetailLayoutProps = {
   name: string
   /** Optional badge rendered beside the hero heading (e.g. draft status). */
   nameBadge?: ReactNode
-  /** Resolved artwork URL for the content item. */
-  imageUrl?: string
-  /** Crop-aware display image; takes precedence over `imageUrl`. */
+  /** Crop-aware display image when artwork resolves. */
   displayImage?: ContentDisplayImage
   /** Semantic fallback when no artwork resolves (media domains). */
   displayFallback?: ContentDisplayFallback
@@ -78,7 +75,6 @@ export type ContentDetailLayoutProps = {
 export function ContentDetailLayout({
   name,
   nameBadge,
-  imageUrl,
   displayImage,
   displayFallback,
   imageName,
@@ -96,7 +92,7 @@ export function ContentDetailLayout({
   const heroMetadata =
     metadata ??
     (statRows && statRows.length > 0 ? <ContentDetailStatRows statRows={statRows} /> : null)
-  const showHeroImage = displayImage != null || imageUrl != null || displayFallback != null
+  const showHeroImage = displayImage != null || displayFallback != null
   const hasBody = Boolean(descriptionContent || children)
 
   return (
@@ -129,8 +125,6 @@ export function ContentDetailLayout({
                     frame="primary"
                     className={contentDetailHeroImageFrameClasses}
                   />
-                ) : imageUrl ? (
-                  <img src={imageUrl} alt={imageName} className={contentDetailHeroImageClasses} />
                 ) : displayFallback ? (
                   <ContentMediaFallback
                     fallback={displayFallback}

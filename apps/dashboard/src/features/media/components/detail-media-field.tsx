@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import {
   emptyContentMediaSchema,
+  resolveContentDisplayFallback,
   type ContentMedia,
   type MediaAsset,
   type MediaScope,
 } from '@rpg/contracts'
 import { MediaFieldSummary } from '@rpg/ui'
-import { Image } from 'lucide-react'
 
 import { buildMediaFieldSummaryModel } from '../lib/build-media-field-summary-model'
 import type { MediaFieldConfig } from '../lib/media-field-config'
@@ -41,11 +41,10 @@ export function DetailMediaField({
   const media = value ?? emptyContentMediaSchema
   const summary = buildMediaFieldSummaryModel({ config, media, contentContext })
   const canEdit = !readOnly
-  const hasGalleryImages = summary.items.length > 0
-
-  if (readOnly && !hasGalleryImages) {
-    return null
-  }
+  const fieldEmptyFallback = resolveContentDisplayFallback({
+    domain: config.domain,
+    surface: 'field',
+  })
 
   const onOpen = (imageId?: string) => {
     if (!canEdit) return
@@ -64,8 +63,8 @@ export function DetailMediaField({
         maxItems={summary.maxItems}
         countDisplay={config.presentation.countDisplay}
         readOnly={readOnly}
+        emptyFallback={fieldEmptyFallback}
         onOpen={onOpen}
-        emptyContent={readOnly ? <Image aria-hidden /> : undefined}
       />
       {canEdit ? (
         <MediaManager

@@ -13,7 +13,10 @@ import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
-import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import {
+  getContentDisplayImage,
+  resolveDashboardDetailDisplayFallback,
+} from '../../lib/detail/page/content-display-image'
 import { buildEquipmentContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { buildEquipmentDetailViewModel } from '../lib/equipment-display'
@@ -43,7 +46,7 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
         displayImage={getContentDisplayImage(
           buildEquipmentContentDisplayImageInput(item, 'detail'),
         )}
-        displayFallback="equipment"
+        displayFallback={resolveDashboardDetailDisplayFallback('equipment')}
         imageName={item.name}
         campaignId={campaignId}
         editHref={contentEditHref('equipment', campaignId, item.id, family)}

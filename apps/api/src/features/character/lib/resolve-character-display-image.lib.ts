@@ -5,9 +5,7 @@ import {
   type ContentDisplaySurface,
 } from '@rpg/contracts'
 
-import { resolveMediaAssetUrl } from '../../media/lib/resolve-media-asset-url.lib'
-
-const MEDIA_SOURCE_CROP = { x: 0, y: 0, width: 1, height: 1 } as const
+import { resolveMediaArtworkUrl } from '../../media/lib/media-artwork-url.lib'
 
 export function resolveCharacterDisplayImageForSurface(
   character: Pick<Character, 'media'>,
@@ -16,6 +14,6 @@ export function resolveCharacterDisplayImageForSurface(
   return resolveCharacterDisplayImageAsOptional({
     media: character.media,
     surface,
-    resolveUploadSrc: (assetId) => resolveMediaAssetUrl(assetId, 'artwork', MEDIA_SOURCE_CROP),
+    resolveUploadSrc: resolveMediaArtworkUrl,
   })
 }

@@ -1,6 +1,6 @@
 import type { MediaScope } from './upload-session'
 
-/** Stable scope key — must stay aligned with API media persistence. */
+/** Stable media scope key for persistence, deduplication, and authorization checks. */
 export function serializeMediaScopeKey(scope: MediaScope): string {
   switch (scope.kind) {
     case 'campaign-content':

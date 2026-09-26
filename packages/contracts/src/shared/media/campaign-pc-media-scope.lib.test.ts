@@ -15,7 +15,16 @@ describe('resolveCampaignPcMediaScopeKeys', () => {
     ).toEqual(['campaign-pc:camp-1', 'user-pc:user-1'])
   })
 
-  it('matches serializeMediaScopeKey for each scope variant', () => {
+  it('serializes every media scope kind', () => {
+    expect(serializeMediaScopeKey({ kind: 'campaign-content', campaignId: 'c1' })).toBe(
+      'campaign-content:c1',
+    )
+    expect(serializeMediaScopeKey({ kind: 'campaign-identity', campaignId: 'c1' })).toBe(
+      'campaign-identity:c1',
+    )
+    expect(serializeMediaScopeKey({ kind: 'campaign-npc', campaignId: 'c1' })).toBe(
+      'campaign-npc:c1',
+    )
     expect(serializeMediaScopeKey({ kind: 'campaign-pc', campaignId: 'c1' })).toBe('campaign-pc:c1')
     expect(serializeMediaScopeKey({ kind: 'user-pc', userId: 'u1' })).toBe('user-pc:u1')
   })

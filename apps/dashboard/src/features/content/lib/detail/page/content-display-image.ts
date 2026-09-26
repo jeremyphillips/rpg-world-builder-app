@@ -4,6 +4,7 @@ import {
   type ContentDisplayFallback,
   type ContentDisplayImage,
   type ContentDisplaySurface,
+  type ContentMediaDomain,
   type ContentMedia,
   type ContentSource,
   type ContentTypeKey,
@@ -75,6 +76,13 @@ export function getContentDisplayImage(
 ): ContentDisplayImage | undefined {
   const resolved = resolveDashboardContentDisplay(input)
   return resolved.outcome === 'image' ? resolved.display : undefined
+}
+
+/** Semantic empty-state for catalog detail heroes and preview rails. */
+export function resolveDashboardDetailDisplayFallback(
+  domain: ContentMediaDomain,
+): ContentDisplayFallback {
+  return resolveContentDisplayFallback({ domain, surface: 'detail' })
 }
 
 export function resolveDashboardContentDisplayFallback(

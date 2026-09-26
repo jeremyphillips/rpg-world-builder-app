@@ -13,6 +13,12 @@ export {
 export { ManagedMediaField, type ManagedMediaFieldProps } from './components/managed-media-field'
 export { DetailMediaField, type DetailMediaFieldProps } from './components/detail-media-field'
 export {
+  mediaErrorMessage,
+  mediaImageUrl,
+  MEDIA_SOURCE_CROP,
+  systemContentImageUrl,
+} from './lib/media-display'
+export {
   COMPACT_MEDIA_FIELD_PRESENTATION,
   EXPANDED_MEDIA_FIELD_PRESENTATION,
   resolveContentMediaFieldConfig,

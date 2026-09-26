@@ -79,7 +79,6 @@ function SpeciesDetailSections({ sections }: { sections: SpeciesDetailViewModel[
 export type SpeciesDetailBodyProps = {
   name: string
   nameBadge?: ReactNode
-  imageUrl?: string
   displayImage?: ContentDisplayImage
   displayFallback?: ContentDisplayFallback
   imageName: string
@@ -93,7 +92,6 @@ export type SpeciesDetailBodyProps = {
 export function SpeciesDetailBody({
   name,
   nameBadge,
-  imageUrl,
   displayImage,
   displayFallback,
   imageName,
@@ -106,7 +104,6 @@ export function SpeciesDetailBody({
     <ContentDetailLayout
       name={name}
       nameBadge={nameBadge}
-      imageUrl={imageUrl}
       displayImage={displayImage}
       displayFallback={displayFallback}
       imageName={imageName}

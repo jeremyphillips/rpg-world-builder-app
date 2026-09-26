@@ -12,7 +12,10 @@ import {
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
-import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import {
+  getContentDisplayImage,
+  resolveDashboardDetailDisplayFallback,
+} from '../../lib/detail/page/content-display-image'
 import { buildOrganizationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { useClasses } from '../../classes/hooks/use-classes'
@@ -60,7 +63,7 @@ export function OrganizationDetailContent({
         displayImage={getContentDisplayImage(
           buildOrganizationContentDisplayImageInput(organization, 'detail'),
         )}
-        displayFallback="organization"
+        displayFallback={resolveDashboardDetailDisplayFallback('organization')}
         imageName={organization.name}
         campaignId={campaignId}
         editHref={contentEditHref('organizations', campaignId, organization.id)}

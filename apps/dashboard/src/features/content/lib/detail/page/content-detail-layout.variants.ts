@@ -21,7 +21,4 @@ export const contentDetailHeroImageShellClasses = 'flex w-full min-h-0 md:h-full
 export const contentDetailHeroImageFrameClasses =
   'size-full w-full min-h-0 rounded-none rounded-b-card shadow-sm md:rounded-none md:rounded-tr-card md:rounded-br-card'
 
-/** Legacy img hero path — same shell geometry plus object-cover on the element. */
-export const contentDetailHeroImageClasses = `${contentDetailHeroImageFrameClasses} object-cover`
-
 export const contentDetailHeroCardClasses = 'overflow-hidden'

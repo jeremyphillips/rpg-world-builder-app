@@ -20,7 +20,10 @@ import { useSpecies } from '../hooks/use-species'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
-import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import {
+  getContentDisplayImage,
+  resolveDashboardDetailDisplayFallback,
+} from '../../lib/detail/page/content-display-image'
 import { buildSpeciesContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { SpeciesDetailBody } from '../components/detail/species-detail-body'
@@ -49,7 +52,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
         displayImage={getContentDisplayImage(
           buildSpeciesContentDisplayImageInput(species, 'detail'),
         )}
-        displayFallback="generic"
+        displayFallback={resolveDashboardDetailDisplayFallback('species')}
         imageName={species.name}
         viewModel={viewModel}
         campaignId={campaignId}

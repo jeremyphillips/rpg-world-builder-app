@@ -1,4 +1,5 @@
 import {
+  resolveContentMediaDomainForDashboardRoute,
   resolveContentMediaMaxItems,
   type ContentMediaCollectionConstraint,
   type ContentMediaDomain,
@@ -23,17 +24,8 @@ export type MediaFieldConfig = {
 export const COMPACT_MEDIA_FIELD_PRESENTATION: MediaFieldPresentation = { layout: 'compact' }
 export const EXPANDED_MEDIA_FIELD_PRESENTATION: MediaFieldPresentation = { layout: 'expanded' }
 
-const CONTENT_MEDIA_ROUTE_DOMAINS = {
-  characters: 'character',
-  classes: 'class',
-  species: 'species',
-  equipment: 'equipment',
-  locations: 'location',
-  organizations: 'organization',
-} as const satisfies Record<string, ContentMediaDomain>
-
 export function resolveContentMediaFieldConfig(routeKey: string): MediaFieldConfig | undefined {
-  const domain = CONTENT_MEDIA_ROUTE_DOMAINS[routeKey as keyof typeof CONTENT_MEDIA_ROUTE_DOMAINS]
+  const domain = resolveContentMediaDomainForDashboardRoute(routeKey)
   return domain ? { domain, presentation: COMPACT_MEDIA_FIELD_PRESENTATION } : undefined
 }
 

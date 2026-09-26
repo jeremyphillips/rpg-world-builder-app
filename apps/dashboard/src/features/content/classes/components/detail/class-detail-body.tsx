@@ -123,7 +123,6 @@ function ClassDetailSections({
 export type ClassDetailBodyProps = {
   name: string
   nameBadge?: ReactNode
-  imageUrl?: string
   displayImage?: ContentDisplayImage
   displayFallback?: ContentDisplayFallback
   imageName: string
@@ -142,7 +141,6 @@ export type ClassDetailBodyProps = {
 export function ClassDetailBody({
   name,
   nameBadge,
-  imageUrl,
   displayImage,
   displayFallback,
   imageName,
@@ -160,7 +158,6 @@ export function ClassDetailBody({
     <ContentDetailLayout
       name={name}
       nameBadge={nameBadge}
-      imageUrl={imageUrl}
       displayImage={displayImage}
       displayFallback={displayFallback}
       imageName={imageName}

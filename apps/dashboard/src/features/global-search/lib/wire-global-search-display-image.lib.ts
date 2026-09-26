@@ -1,6 +1,6 @@
 import type { ContentDisplayImage } from '@rpg/contracts'
 
-import { systemContentImageUrl } from '@/features/media/lib/media-display'
+import { systemContentImageUrl } from '@/features/media'
 
 /** Absolutizes registry-relative system art for client `<img>` src. */
 export function wireGlobalSearchDisplayImage(

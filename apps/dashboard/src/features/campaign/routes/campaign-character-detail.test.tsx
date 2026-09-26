@@ -99,7 +99,7 @@ describe('CampaignCharacterDetail', () => {
     expect(screen.getByRole('heading', { name: viewModel.identity.name })).toBeInTheDocument()
     expect(screen.getByText('Roster: Active')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Character images:/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Character images:/ })).toBeDisabled()
   })
 
   it('allows campaign managers to edit another player character images', () => {

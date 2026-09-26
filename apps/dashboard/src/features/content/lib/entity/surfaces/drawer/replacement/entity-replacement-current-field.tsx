@@ -1,5 +1,7 @@
 import { ContentCardMedia, Heading, InsetPanel } from '@rpg/ui'
 
+import { ContentMediaImage } from '@/features/media'
+
 import { DrawerEntityBlock } from '../drawer-entity-block'
 import type { DrawerEntityPresentation } from '../drawer-entity.types'
 import type { EntityReplacementCurrentSnapshot } from './entity-replacement-current.types'
@@ -24,12 +26,16 @@ export function EntityReplacementCurrentField({
       </Heading>
       <InsetPanel size="sm" className="p-0">
         <div className="flex items-start gap-3 p-3">
-          <ContentCardMedia
-            src={displayImage?.src}
-            fallback={fallback}
-            alt={entity.heading}
-            className="shrink-0"
-          />
+          {displayImage ? (
+            <ContentMediaImage
+              display={displayImage}
+              alt={entity.heading}
+              frame="insetSm"
+              className="shrink-0"
+            />
+          ) : (
+            <ContentCardMedia fallback={fallback} alt={entity.heading} className="shrink-0" />
+          )}
           <DrawerEntityBlock {...entity} className="min-w-0 flex-1" />
         </div>
       </InsetPanel>

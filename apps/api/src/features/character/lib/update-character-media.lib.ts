@@ -9,7 +9,7 @@ import {
   reconcileReferencesWithSession,
   type ReconcileContentMediaResult,
 } from '../../media/lib/reconcile-content-media'
-import { serializeMediaScope } from '../../media/lib/scope.lib'
+import { serializeMediaScopeKey } from '@rpg/contracts'
 import { CharacterModel } from '../character.model'
 
 export type UpdateCharacterMediaResult =
@@ -58,7 +58,7 @@ export async function updateCharacterMediaRecord(input: {
     )
   }
 
-  const scopeKey = serializeMediaScope(scope)
+  const scopeKey = serializeMediaScopeKey(scope)
   const subject = { kind: 'character' as const, id: characterId, scopeKey }
   const policy = getContentMediaPolicy('character')
 
