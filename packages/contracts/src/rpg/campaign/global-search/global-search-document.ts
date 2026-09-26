@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { contentDisplayImageSchema } from '../../../shared/media/content-display-image-dto'
 import { globalSearchViewerCharacterRelationshipsSchema } from './global-search-viewer-character-relationships'
 import { globalSearchFieldSchema } from './global-search-field'
 import { globalSearchFilterGroupSchema } from './filter-group'
@@ -21,6 +22,8 @@ export const globalSearchDocumentSchema = z.object({
   campaignAvailable: z.literal(false).optional(),
   /** Present when one or more viewer-controlled PCs relate to this content hit. */
   viewerCharacterRelationships: globalSearchViewerCharacterRelationshipsSchema.optional(),
+  /** Compact representative upload or system art — omitted when only a semantic fallback applies. */
+  displayImage: contentDisplayImageSchema.optional(),
 })
 
 export type GlobalSearchDocument = z.infer<typeof globalSearchDocumentSchema>

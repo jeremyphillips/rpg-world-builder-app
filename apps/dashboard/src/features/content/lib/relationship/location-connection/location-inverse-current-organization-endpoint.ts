@@ -1,13 +1,18 @@
 import type { LocationConnectedPartyRow, Organization } from '@rpg/contracts'
 import { getOrganizationDomainLabel } from '@rpg/contracts'
 
+import { getContentDisplayImage } from '../../detail/page/content-display-image'
+import { buildOrganizationContentDisplayImageInput } from '../../detail/page/content-display-image-input'
 import { ENTITY_UNAVAILABLE_ORGANIZATION_HEADING } from '../../entity/summary/entity-unavailable-headings.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../entity/surfaces/drawer/replacement/entity-replacement-current.types'
 
 export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
   relationshipId: string
   rows: readonly LocationConnectedPartyRow[]
-  organizations?: readonly Pick<Organization, 'id' | 'organizationDomain' | 'imageKey'>[]
+  organizations?: readonly Pick<
+    Organization,
+    'id' | 'organizationDomain' | 'media' | 'slug' | 'source' | 'rulesetId'
+  >[]
 }): EntityReplacementCurrentSnapshot {
   const row = input.rows.find(({ relationshipId }) => relationshipId === input.relationshipId)
 
@@ -28,7 +33,10 @@ export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
       heading: row.subject.name,
       headingSuffix: kindLabel ? ` · ${kindLabel}` : undefined,
     },
-    imageKey: organization?.imageKey,
+    displayImage: organization
+      ? getContentDisplayImage(buildOrganizationContentDisplayImageInput(organization, 'compact'))
+      : undefined,
+    fallback: 'organization',
     unavailable: organization == null,
   }
 }

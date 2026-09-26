@@ -95,7 +95,6 @@ const organizationClassificationFieldsWithoutAuthoredBodySchema =
   organizationClassificationBodyFieldsSchema.omit({
     name: true,
     description: true,
-    imageKey: true,
   })
 
 /** Draft classification fields — domain may remain unset until publish. */

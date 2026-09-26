@@ -19,7 +19,10 @@ import { HttpError } from '../../lib/http-error'
 import { validateFileType } from '../uploads'
 import { extensionForMime, inspectImageBuffer } from './lib/inspect-image.lib'
 import { generateMediaRendition } from './lib/generate-rendition.lib'
-import { assertMediaScopeAuthorized, serializeMediaScope } from './lib/scope.lib'
+import { assertMediaAssetReadable } from './lib/assert-media-asset-readable.lib'
+import { serializeMediaScopeKey } from '@rpg/contracts'
+
+import { assertMediaScopeAuthorized } from './lib/scope.lib'
 import { storeMediaOriginal } from './lib/storage.lib'
 import { scopeFromDoc, toMediaAsset } from './lib/to-media-asset'
 import {
@@ -88,8 +91,7 @@ async function loadAuthorizedAsset(assetId: string, userId: string): Promise<Med
     throw HttpError.badRequest('Media asset is not available.')
   }
 
-  const scope = scopeFromDoc(doc)
-  await assertMediaScopeAuthorized(scope, userId, 'read')
+  await assertMediaAssetReadable(doc, userId)
   return toMediaAsset(doc)
 }
 
@@ -162,7 +164,7 @@ export async function uploadMediaAsset(input: {
     _id: assetId,
     sessionId: input.sessionId,
     scopeKind: scope.kind,
-    scopeKey: serializeMediaScope(scope),
+    scopeKey: serializeMediaScopeKey(scope),
     campaignId: 'campaignId' in scope ? scope.campaignId : undefined,
     userId: scope.kind === 'user-pc' ? scope.userId : undefined,
     createdByUserId: input.userId,
@@ -213,8 +215,7 @@ export async function getMediaAssetRendition(input: {
     throw HttpError.badRequest('Media asset is not available.')
   }
 
-  const scope = scopeFromDoc(doc)
-  await assertMediaScopeAuthorized(scope, input.userId, 'read')
+  await assertMediaAssetReadable(doc, input.userId)
 
   const rendition = await generateMediaRendition({
     asset: doc,

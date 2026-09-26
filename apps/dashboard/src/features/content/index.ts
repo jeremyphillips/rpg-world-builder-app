@@ -76,9 +76,23 @@ export { buildLocationConnectedPartyCharactersById } from './locations/lib/conne
 export type { CharacterPickerOption } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
 export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row'
 export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalog-entity-row'
+export { CatalogEntitySurfaceRow } from './lib/entity/surfaces/catalog/catalog-entity-surface-row'
+export type { CatalogEntitySurfaceRowProps } from './lib/entity/surfaces/catalog/catalog-entity-surface-row'
 export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
 export type { CatalogEntityPickerSheetProps } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
 export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/catalog-entity-row-renderer'
+export { EntitySurfaceContentCard } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
+export type { EntitySurfaceContentCardProps } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
+export {
+  buildCatalogToggleSelectInlineAction,
+  projectEntitySurfaceConfig,
+  projectEntitySurfaceIdentityToSummaryModel,
+} from './lib/entity/surfaces/entity-surface-projection.lib'
+export type { EntitySurfaceConfig } from './lib/entity/surfaces/entity-surface.types'
+export type {
+  EntitySurfaceIdentity,
+  EntitySurfaceInlineAction,
+} from './lib/entity/summary/entity-surface-identity.types'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
   CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,

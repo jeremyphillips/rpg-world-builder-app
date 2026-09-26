@@ -1,4 +1,9 @@
-import type { Ability, CharacterNarrative, CharacterVitalState } from '@rpg/contracts'
+import type {
+  Ability,
+  CharacterNarrative,
+  CharacterVitalState,
+  ContentDisplayImage,
+} from '@rpg/contracts'
 
 import type {
   CharacterSheetEquipmentCard,
@@ -9,9 +14,11 @@ export type CharacterCardViewModel = {
   id: string
   name: string
   summary: string
+  displayImage?: ContentDisplayImage
   campaign?: {
     id: string
     name: string
+    emblemUrl?: string
   }
 }
 

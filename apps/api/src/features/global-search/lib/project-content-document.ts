@@ -1,6 +1,7 @@
 import type {
   ApiContentTypeKey,
   CharacterClass,
+  ContentMedia,
   Equipment,
   Feat,
   GlobalSearchDocument,
@@ -32,9 +33,12 @@ import {
 } from '@rpg/contracts'
 
 import type { WriteEntityBase } from '../../content'
+import { resolveGlobalSearchContentDisplayImage } from './resolve-global-search-display-image.lib'
 
 type NamedContentEntity = WriteEntityBase & {
   name: string
+  media?: ContentMedia | null
+  rulesetId?: string
   campaignAccess?: ResolvedContentCampaignAccess
 }
 
@@ -255,6 +259,14 @@ export function projectContentEntity(
   entity: NamedContentEntity,
 ): GlobalSearchDocument {
   const projector = CONTENT_PROJECTORS[contentType]
+  const displayImage = resolveGlobalSearchContentDisplayImage({
+    contentType,
+    media: entity.media,
+    slug: entity.slug,
+    contentSource: entity.source,
+    rulesetId: entity.rulesetId,
+  })
+
   return {
     id: buildContentDocumentId(contentType, entity.id),
     filterGroup: CONTENT_TYPE_LABEL,
@@ -264,6 +276,7 @@ export function projectContentEntity(
     target: projector.target(entity),
     fields: projector.fields(entity),
     ...(entity.campaignAccess?.available === false ? { campaignAvailable: false as const } : {}),
+    ...(displayImage ? { displayImage } : {}),
   }
 }
 

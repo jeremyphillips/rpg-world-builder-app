@@ -14,7 +14,7 @@ const useCanManageCampaignMock = vi.mocked(useCanManageCampaign)
 
 const defaultProps = {
   name: 'Fighter',
-  imageUrl: '/img.png',
+  displayImage: { src: '/img.png', sourceKind: 'upload' as const },
   imageName: 'Fighter',
   campaignId: 'c1',
   editHref: '/campaigns/c1/classes/f1/edit',

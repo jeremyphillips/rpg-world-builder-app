@@ -3,8 +3,13 @@ import { cva } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import { iconGlyphDirectChildClasses } from './icon-glyph.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
+import {
+  identityFrameFallbackIconClasses,
+  identityFrameShapeClasses,
+  identityFrameSizeClasses,
+} from './identity-frame-tokens.variants'
 
-export const ICON_CONTAINER_SIZES = ['sm', 'md'] as const
+export const ICON_CONTAINER_SIZES = ['xs', 'sm', 'md', 'inline'] as const
 export type IconContainerSize = (typeof ICON_CONTAINER_SIZES)[number]
 
 export const iconContainerVariants = cva(
@@ -14,13 +19,12 @@ export const iconContainerVariants = cva(
   ),
   {
     variants: {
-      shape: {
-        box: 'rounded-md',
-        circle: 'rounded-full',
-      },
+      shape: identityFrameShapeClasses,
       size: {
-        sm: cn('size-10', iconGlyphDirectChildClasses.lg),
-        md: cn('size-[3.75rem]', '[&>svg]:size-6'),
+        xs: cn(identityFrameSizeClasses.xs, identityFrameFallbackIconClasses.xs),
+        sm: cn(identityFrameSizeClasses.sm, identityFrameFallbackIconClasses.sm),
+        md: cn(identityFrameSizeClasses.md, identityFrameFallbackIconClasses.md),
+        inline: cn(identityFrameSizeClasses.inline, identityFrameFallbackIconClasses.inline),
       },
     },
     defaultVariants: {

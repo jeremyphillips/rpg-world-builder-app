@@ -9,7 +9,6 @@ vi.mock('@/features/campaign', () => ({
   useCanManageCampaign: vi.fn(() => false),
 }))
 
-import { getContentImageUrl } from '../../../lib/detail/page/content-image-url'
 import { pickSkillProficiency } from '../../../lib/fixtures/pick'
 import { FIGHTER, SUBCLASSES_FOR_FIGHTER } from '../../fixtures'
 import { buildClassDetailViewModel } from '../../lib/class-display'
@@ -29,7 +28,7 @@ describe('ClassDetailBody', () => {
       <MemoryRouter>
         <ClassDetailBody
           name={FIGHTER.name}
-          imageUrl={getContentImageUrl()}
+          displayFallback="generic"
           imageName={FIGHTER.name}
           viewModel={buildClassDetailViewModel(FIGHTER, vocabulary, { surface: 'content-detail' })}
           subclasses={SUBCLASSES_FOR_FIGHTER}

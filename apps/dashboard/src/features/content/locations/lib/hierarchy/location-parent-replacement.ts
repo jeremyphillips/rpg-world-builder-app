@@ -34,7 +34,8 @@ export type LocationParentReplacementMode = 'change' | 'set'
 export type LocationParentReplacementCurrentSnapshot = {
   parentLocationId: string
   entity: DrawerEntityPresentation
-  imageKey?: string
+  displayImage?: import('@rpg/contracts').ContentDisplayImage
+  fallback?: import('@rpg/contracts').ContentDisplayFallback
   unavailable?: boolean
 }
 
@@ -90,7 +91,8 @@ export function resolveLocationParentReplacementCurrentSnapshot(input: {
   return {
     parentLocationId,
     entity: buildLocationEntityContextPresentation(summary),
-    imageKey: summary.imageKey,
+    displayImage: summary.displayImage,
+    fallback: 'location',
   }
 }
 

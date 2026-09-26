@@ -5,7 +5,7 @@ import { mediaBearingAuthoredContentBodySchema } from '../../../shared/media/med
 /**
  * Shared body fields present on every location union variant.
  *
- * Images use the existing `imageKey` on the authored-content body base.
+ * Images use optional `ContentMedia` on the authored body (`mediaBearingAuthoredContentBodySchema`).
  * Future map metadata (`map?: LocationMap`) can extend this schema when grid
  * maps land — keep maps decoupled from the kind taxonomy.
  *

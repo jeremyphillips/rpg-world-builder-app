@@ -94,7 +94,7 @@ export const COVERAGE_READINESS_GROUPS = [
   {
     id: 'context',
     label: 'Save context',
-    targetPaths: ['imageKey', 'campaignId'],
+    targetPaths: ['campaignId'],
   },
 ] as const
 

@@ -1,11 +1,18 @@
 import { randomUUID } from 'node:crypto'
 
-import type { ContentMedia, ContentMediaPolicy, MediaSubject } from '@rpg/contracts'
-import { validateContentMedia } from '@rpg/contracts'
+import type { ClientSession } from 'mongoose'
+
+import {
+  serializeMediaScopeKey,
+  validateContentMedia,
+  type ContentMedia,
+  type ContentMediaPolicy,
+  type MediaScope,
+  type MediaSubject,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { areMongoTransactionsEnabled, runInTransaction } from '../../../lib/mongo-transaction'
-import { serializeMediaScope } from './scope.lib'
 import {
   createMediaReferenceRecords,
   deleteMediaReferencesForSubject,
@@ -16,11 +23,13 @@ import {
 
 export type ReconcileContentMediaInput = {
   subject: MediaSubject
-  scope: Parameters<typeof serializeMediaScope>[0]
+  scope: MediaScope
   currentMedia: ContentMedia | null
   proposedMedia: ContentMedia
   expectedMediaRevision?: number
   policy: ContentMediaPolicy
+  /** Existing attachments authorized outside the active write scope (e.g. owner uploads on campaign PC). */
+  additionalAssetScopeKeys?: readonly string[]
 }
 
 export type ReconcileContentMediaResult =
@@ -39,6 +48,7 @@ function nextRevision(current: ContentMedia | null): number {
 async function assertAssetsAttachable(input: {
   assetIds: readonly string[]
   scopeKey: string
+  additionalScopeKeys?: readonly string[]
 }): Promise<
   | {
       ok: true
@@ -55,7 +65,8 @@ async function assertAssetsAttachable(input: {
     if (!asset) {
       return { ok: false, message: `Media asset ${assetId} was not found.` }
     }
-    if (asset.scopeKey !== input.scopeKey) {
+    const allowedScopeKeys = new Set([input.scopeKey, ...(input.additionalScopeKeys ?? [])])
+    if (!allowedScopeKeys.has(asset.scopeKey)) {
       return { ok: false, message: `Media asset ${assetId} is outside the authorized scope.` }
     }
     if (asset.lifecycle !== 'ready') {
@@ -70,45 +81,60 @@ async function assertAssetsAttachable(input: {
   return { ok: true, assetDimensionsById }
 }
 
+export async function reconcileReferencesWithSession(
+  input: {
+    subject: MediaSubject
+    previousAssetIds: readonly string[]
+    nextAssetIds: readonly string[]
+    proposedMedia: ContentMedia
+  },
+  session: ClientSession,
+): Promise<ContentMedia> {
+  const previousSet = new Set(input.previousAssetIds)
+  const nextSet = new Set(input.nextAssetIds)
+  const removed = input.previousAssetIds.filter((assetId) => !nextSet.has(assetId))
+  const added = input.nextAssetIds.filter((assetId) => !previousSet.has(assetId))
+
+  await deleteMediaReferencesForSubject(input.subject, { session })
+
+  await createMediaReferenceRecords(
+    input.proposedMedia.images.map((image) => ({
+      _id: randomUUID(),
+      assetId: image.assetId,
+      subjectKind: input.subject.kind,
+      subjectId: input.subject.id,
+      scopeKey: input.subject.scopeKey,
+      attachmentId: image.id,
+    })),
+    { session },
+  )
+
+  await Promise.all([
+    ...removed.map((assetId) => incrementMediaAssetReferenceCount(assetId, -1, { session })),
+    ...added.map((assetId) => incrementMediaAssetReferenceCount(assetId, 1, { session })),
+  ])
+
+  return input.proposedMedia
+}
+
 async function reconcileReferencesInTransaction(input: {
   subject: MediaSubject
   previousAssetIds: readonly string[]
   nextAssetIds: readonly string[]
   proposedMedia: ContentMedia
 }): Promise<ContentMedia> {
-  return runInTransaction(async (session) => {
-    const previousSet = new Set(input.previousAssetIds)
-    const nextSet = new Set(input.nextAssetIds)
-    const removed = input.previousAssetIds.filter((assetId) => !nextSet.has(assetId))
-    const added = input.nextAssetIds.filter((assetId) => !previousSet.has(assetId))
-
-    await deleteMediaReferencesForSubject(input.subject, { session })
-
-    await createMediaReferenceRecords(
-      input.proposedMedia.images.map((image) => ({
-        _id: randomUUID(),
-        assetId: image.assetId,
-        subjectKind: input.subject.kind,
-        subjectId: input.subject.id,
-        scopeKey: input.subject.scopeKey,
-        attachmentId: image.id,
-      })),
-      { session },
-    )
-
-    await Promise.all([
-      ...removed.map((assetId) => incrementMediaAssetReferenceCount(assetId, -1, { session })),
-      ...added.map((assetId) => incrementMediaAssetReferenceCount(assetId, 1, { session })),
-    ])
-
-    return input.proposedMedia
-  })
+  return runInTransaction(async (session) => reconcileReferencesWithSession(input, session))
 }
 
-/** Validate, replace gallery references, and bump media revision atomically. */
-export async function reconcileContentMedia(
-  input: ReconcileContentMediaInput,
-): Promise<ReconcileContentMediaResult> {
+export async function prepareContentMediaReconciliation(input: ReconcileContentMediaInput): Promise<
+  | {
+      ok: true
+      reconciledMedia: ContentMedia
+      previousAssetIds: readonly string[]
+      nextAssetIds: readonly string[]
+    }
+  | Extract<ReconcileContentMediaResult, { ok: false }>
+> {
   const currentRevision = input.currentMedia?.revision ?? 0
   if (
     input.expectedMediaRevision !== undefined &&
@@ -121,13 +147,17 @@ export async function reconcileContentMedia(
     }
   }
 
-  const scopeKey = serializeMediaScope(input.scope)
+  const scopeKey = serializeMediaScopeKey(input.scope)
   if (input.subject.scopeKey !== scopeKey) {
     throw HttpError.badRequest('Media subject scope does not match the authorized scope.')
   }
 
   const uniqueAssetIds = [...new Set(input.proposedMedia.images.map((image) => image.assetId))]
-  const assetCheck = await assertAssetsAttachable({ assetIds: uniqueAssetIds, scopeKey })
+  const assetCheck = await assertAssetsAttachable({
+    assetIds: uniqueAssetIds,
+    scopeKey,
+    additionalScopeKeys: input.additionalAssetScopeKeys,
+  })
   if (!assetCheck.ok) {
     return { ok: false, reason: 'asset_unavailable', message: assetCheck.message }
   }
@@ -149,6 +179,18 @@ export async function reconcileContentMedia(
     revision: nextRevision(input.currentMedia),
   }
 
+  return { ok: true, reconciledMedia, previousAssetIds, nextAssetIds }
+}
+
+/** Validate, replace gallery references, and bump media revision atomically. */
+export async function reconcileContentMedia(
+  input: ReconcileContentMediaInput,
+): Promise<ReconcileContentMediaResult> {
+  const prepared = await prepareContentMediaReconciliation(input)
+  if (!prepared.ok) {
+    return prepared
+  }
+
   if (!areMongoTransactionsEnabled()) {
     throw new HttpError(
       503,
@@ -159,10 +201,33 @@ export async function reconcileContentMedia(
 
   await reconcileReferencesInTransaction({
     subject: input.subject,
-    previousAssetIds,
-    nextAssetIds,
-    proposedMedia: reconciledMedia,
+    previousAssetIds: prepared.previousAssetIds,
+    nextAssetIds: prepared.nextAssetIds,
+    proposedMedia: prepared.reconciledMedia,
   })
 
-  return { ok: true, media: reconciledMedia }
+  return { ok: true, media: prepared.reconciledMedia }
+}
+
+/** Reconcile gallery references using an existing Mongo session (no nested transaction). */
+export async function reconcileContentMediaReferencesInSession(
+  input: ReconcileContentMediaInput,
+  session: ClientSession,
+): Promise<ReconcileContentMediaResult> {
+  const prepared = await prepareContentMediaReconciliation(input)
+  if (!prepared.ok) {
+    return prepared
+  }
+
+  await reconcileReferencesWithSession(
+    {
+      subject: input.subject,
+      previousAssetIds: prepared.previousAssetIds,
+      nextAssetIds: prepared.nextAssetIds,
+      proposedMedia: prepared.reconciledMedia,
+    },
+    session,
+  )
+
+  return { ok: true, media: prepared.reconciledMedia }
 }

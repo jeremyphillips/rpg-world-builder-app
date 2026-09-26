@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Heading, RichTextContent } from '@rpg/ui'
-import type { ContentDisplayImage } from '@rpg/contracts'
+import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
 import type { SpeciesDetailItem, SpeciesDetailViewModel } from '../../lib/species-display'
@@ -79,8 +79,8 @@ function SpeciesDetailSections({ sections }: { sections: SpeciesDetailViewModel[
 export type SpeciesDetailBodyProps = {
   name: string
   nameBadge?: ReactNode
-  imageUrl?: string
   displayImage?: ContentDisplayImage
+  displayFallback?: ContentDisplayFallback
   imageName: string
   viewModel: SpeciesDetailViewModel
   campaignId: string
@@ -92,8 +92,8 @@ export type SpeciesDetailBodyProps = {
 export function SpeciesDetailBody({
   name,
   nameBadge,
-  imageUrl,
   displayImage,
+  displayFallback,
   imageName,
   viewModel,
   campaignId,
@@ -104,8 +104,8 @@ export function SpeciesDetailBody({
     <ContentDetailLayout
       name={name}
       nameBadge={nameBadge}
-      imageUrl={imageUrl}
       displayImage={displayImage}
+      displayFallback={displayFallback}
       imageName={imageName}
       campaignId={campaignId}
       editHref={editHref}

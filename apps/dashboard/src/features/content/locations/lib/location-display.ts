@@ -15,6 +15,12 @@ import { formatDescriptorCount } from '@/lib/actions'
 
 import { ROUTES } from '@/app/routes'
 
+import type { ContentDisplayImage } from '@rpg/contracts'
+
+import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import { buildLocationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
+import type { EntitySurfaceIdentity } from '../../lib/entity/summary/entity-surface-identity.types'
+import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'
 import type { DrawerEntityPresentation } from '../../lib/entity/surfaces/drawer/drawer-entity.types'
 
 import type { LocationAuthoringType } from './location-authoring-type'
@@ -85,7 +91,7 @@ export type LocationEntitySummaryVm = {
   id: string
   name: string
   href?: string
-  imageKey?: string
+  displayImage?: ContentDisplayImage
   classification: LocationClassificationDisplay
   ancestry: {
     items: readonly LocationAncestorDisplayVm[]
@@ -256,12 +262,55 @@ export function buildLocationEntitySummaryVm(
     id: location.id,
     name: location.name,
     href: ctx.href,
-    imageKey: location.imageKey,
+    displayImage: getContentDisplayImage(
+      buildLocationContentDisplayImageInput(
+        {
+          media: location.media,
+          slug: location.slug,
+          source: location.source,
+          rulesetId: location.rulesetId,
+        },
+        'compact',
+      ),
+    ),
     classification: resolveLocationClassificationDisplay(location),
     ancestry: {
       items,
       text: items.map((item) => item.name).join(LOCATION_ANCESTRY_TEXT_SEPARATOR),
     },
+  }
+}
+
+export function buildLocationEntityCardModelFromClassification(
+  input: Pick<LocationEntitySummaryVm, 'name' | 'displayImage'> & {
+    classificationText: string
+    metadata?: string
+    status?: readonly EntitySummaryStatusItem[]
+  },
+): EntitySurfaceIdentity {
+  return {
+    heading: input.name,
+    fallback: 'location',
+    classification: input.classificationText,
+    ...(input.metadata ? { metadata: input.metadata } : {}),
+    ...(input.status && input.status.length > 0 ? { status: input.status } : {}),
+    ...(input.displayImage ? { displayImage: input.displayImage } : {}),
+  }
+}
+
+export function buildLocationEntityCardModel(
+  vm: LocationEntitySummaryVm,
+  options: { metadata?: string } = {},
+): EntitySurfaceIdentity {
+  const presentation = buildLocationEntityContextPresentation(vm)
+  const metadata = options.metadata !== undefined ? options.metadata : presentation.supportingText
+
+  return {
+    heading: vm.name,
+    fallback: 'location',
+    ...(vm.classification.text ? { classification: vm.classification.text } : {}),
+    ...(metadata ? { metadata } : {}),
+    ...(vm.displayImage ? { displayImage: vm.displayImage } : {}),
   }
 }
 

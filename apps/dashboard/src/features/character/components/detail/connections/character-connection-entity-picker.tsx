@@ -1,15 +1,13 @@
 import * as React from 'react'
 
-import { Button, Input, Text } from '@rpg/ui'
-import { CatalogEntityRow } from '@/features/content'
+import { Input, Text } from '@rpg/ui'
+import { CatalogEntitySurfaceRow, type EntitySurfaceConfig } from '@/features/content'
 
 export type ConnectionEntityPickerItem<TItem> = {
   item: TItem
   key: string
-  heading: string
-  description?: string
   searchText: string
-  disabled?: boolean
+  surface: EntitySurfaceConfig
 }
 
 export type ConnectionEntityPickerProps<TItem> = {
@@ -53,8 +51,8 @@ export function ConnectionEntityPicker<TItem>({
         <ul className="flex max-h-72 flex-col gap-2 overflow-y-auto">
           {filteredItems.map((entry) => (
             <li key={entry.key}>
-              <CatalogEntityRow
-                toolbarLabel={entry.heading}
+              <CatalogEntitySurfaceRow
+                toolbarLabel={entry.surface.identity.heading}
                 domIds={{
                   itemId: entry.key,
                   titleId: `${entry.key}-title`,
@@ -63,23 +61,14 @@ export function ConnectionEntityPicker<TItem>({
                 collapsible={false}
                 collapsed={false}
                 onToggleCollapse={() => undefined}
-                entity={{
-                  heading: entry.heading,
-                  description: entry.description,
-                }}
-                trailing={{
-                  kind: 'action',
-                  content: (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      disabled={entry.disabled}
-                      onClick={() => onSelect(entry.item)}
-                    >
-                      Select
-                    </Button>
-                  ),
+                surface={{
+                  identity: entry.surface.identity,
+                  inlineAction: entry.surface.inlineAction
+                    ? {
+                        ...entry.surface.inlineAction,
+                        onClick: () => onSelect(entry.item),
+                      }
+                    : undefined,
                 }}
               />
             </li>

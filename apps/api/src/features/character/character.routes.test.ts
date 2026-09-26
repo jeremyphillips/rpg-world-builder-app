@@ -147,6 +147,21 @@ describe('character routes', () => {
     await request(getApp()).delete('/api/characters/000000000000000000000000').expect(403)
   })
 
+  it('forbids patching another user character media', async () => {
+    const owner = await registerAndLogin('media-owner@example.com')
+    const other = await registerAndLogin('media-other@example.com')
+    const ownedId = await createCharacter(owner.agent, owner.csrfToken)
+
+    await other.agent
+      .patch(`/api/characters/${ownedId}/media`)
+      .set(CSRF_HEADER, other.csrfToken)
+      .send({
+        expectedMediaRevision: 0,
+        media: { revision: 0, images: [], roles: {} },
+      })
+      .expect(404)
+  })
+
   it('does not expose a public PC lifecycle PATCH route', async () => {
     const { agent, csrfToken } = await registerAndLogin('patch@example.com')
     const characterId = await createCharacter(agent, csrfToken)

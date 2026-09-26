@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveLocationInverseCurrentOrganizationEndpoint } from './location-inverse-current-organization-endpoint'
 import { ENTITY_UNAVAILABLE_ORGANIZATION_HEADING } from '../../entity/summary/entity-unavailable-headings.lib'
+import { resolveLocationInverseCurrentOrganizationEndpoint } from './location-inverse-current-organization-endpoint'
 
 describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
   it('returns hydrated organization snapshot from connected party row', () => {
@@ -29,7 +29,9 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
           {
             id: 'org-1',
             organizationDomain: 'government',
-            imageKey: 'img-1',
+            slug: 'city-council',
+            source: 'homebrew',
+            rulesetId: 'srd-cc-5.2.1',
           },
         ],
       }),
@@ -38,7 +40,8 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
         heading: 'City Council',
         headingSuffix: ' · Government',
       },
-      imageKey: 'img-1',
+      displayImage: undefined,
+      fallback: 'organization',
       unavailable: false,
     })
   })

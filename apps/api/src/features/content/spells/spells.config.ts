@@ -32,7 +32,6 @@ function toHomebrewSpell(doc: HomebrewDoc): Spell {
   return {
     ...homebrewContentEnvelope(record),
     name: record.name,
-    ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.description !== undefined && { description: record.description }),
     school: record.school,
     ...(record.level != null && { level: record.level }),

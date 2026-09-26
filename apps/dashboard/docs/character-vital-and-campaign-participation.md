@@ -29,12 +29,14 @@ normalize to the same defaults on read.
 
 ## API
 
-| Route                                          | Vital PATCH  | Roster PATCH                      |
-| ---------------------------------------------- | ------------ | --------------------------------- |
-| `PATCH /api/campaigns/:campaignId/npcs/:npcId` | Yes          | Yes — campaign owner/co-owner     |
-| `PATCH /api/characters/:id`                    | **Deferred** | N/A — PC edit ownership undefined |
+| Route                                                             | Vital PATCH  | Roster PATCH                  |
+| ----------------------------------------------------------------- | ------------ | ----------------------------- |
+| `PATCH /api/campaigns/:campaignId/npcs/:npcId`                    | Yes          | Yes — campaign owner/co-owner |
+| `PATCH /api/campaigns/:campaignId/characters/:characterId/status` | Yes          | Yes — campaign owner/co-owner |
+| `PATCH /api/characters/:id`                                       | **Deferred** | N/A                           |
 
-NPC patch body: `campaignNpcStatusPatchSchema` — optional `vital` and/or `roster`
+Patch body: `campaignParticipatingCharacterStatusPatchSchema` — optional `vital`
+and/or `roster` (`campaignNpcStatusPatchSchema` is a deprecated alias).
 patches (`characterVitalPatchSchema`, `campaignRosterPatchSchema`). The API
 assigns `changedAt` when a dimension's status changes and preserves it for
 note-only updates or no-op status re-submissions.
@@ -57,11 +59,10 @@ character in that campaign.
 - Read-only `CampaignCharacterStatusSummary` below XP (vital + roster).
 - `NpcStatusEditor` dialog (owner/co-owner) for status + notes.
 
-### PC detail
+### PC detail (campaign)
 
-- `CharacterVitalSummary` only — no edit action until ownership rules are defined.
-- Campaign roster for PCs will surface from participation when PC campaign
-  workflows land.
+- Read-only `CampaignCharacterStatusSummary` below XP (vital + roster).
+- Shared status editor with NPC detail when `capabilities.canManage`.
 
 ## Contracts
 

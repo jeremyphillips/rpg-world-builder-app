@@ -41,6 +41,19 @@ describe('species preview projection', () => {
     expect(identity.facts).toBeUndefined()
   })
 
+  it('derives system artwork when the form has no persisted media', () => {
+    const identity = buildSpeciesPreviewIdentity(createValues(), {
+      entitySource: 'system',
+      entitySlug: 'elf',
+      rulesetId: 'srd-cc-5.2.1',
+    })
+
+    expect(identity.displayImage).toMatchObject({
+      src: '/assets/system/srd-cc-5.2.1/species/primary/elf.jpeg',
+      sourceKind: 'system',
+    })
+  })
+
   it('uses the description placeholder when description is empty', () => {
     const sections = buildSpeciesPreviewSections(createValues(), emptyCtx)
 

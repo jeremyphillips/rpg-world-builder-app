@@ -189,7 +189,8 @@ describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
         href: undefined,
         supportingText: 'Located in Dock Ward',
       },
-      imageKey: YAWNING_PORTAL.imageKey,
+      displayImage: undefined,
+      fallback: 'location',
     })
   })
 

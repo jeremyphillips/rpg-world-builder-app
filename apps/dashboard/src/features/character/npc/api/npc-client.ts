@@ -6,6 +6,7 @@ import {
   type CampaignNpcDetail,
   type CampaignNpcListItem,
   type CampaignNpcStatusPatch,
+  type CharacterMediaPatchInput,
   type ContentDeletionResult,
   type CreateNpcRequestInput,
 } from '@rpg/contracts'
@@ -17,6 +18,7 @@ const GET_NPC_ERROR = 'Could not load NPC.'
 const CREATE_NPC_ERROR = getCharacterBuilderChromeMessages('campaign_npc').createErrorDefault
 const DELETE_NPC_ERROR = 'Could not delete NPC.'
 const PATCH_NPC_STATUS_ERROR = 'Could not update NPC status.'
+const PATCH_NPC_MEDIA_ERROR = 'Could not update NPC images.'
 
 function npcCollectionPath(campaignId: string) {
   return `/api/campaigns/${campaignId}/npcs`
@@ -95,6 +97,19 @@ export async function deleteNpc(campaignId: string, npcId: string): Promise<Cont
     body?.error?.code ?? 'request_error',
     body?.error?.message ?? DELETE_NPC_ERROR,
   )
+}
+
+export async function patchNpcMedia(
+  campaignId: string,
+  npcId: string,
+  patch: CharacterMediaPatchInput,
+): Promise<CampaignNpcDetail> {
+  const { npc } = await patchJson<{ npc: CampaignNpcDetail }>(
+    `${npcCollectionPath(campaignId)}/${npcId}/media`,
+    patch,
+    PATCH_NPC_MEDIA_ERROR,
+  )
+  return npc
 }
 
 export async function patchNpcStatus(

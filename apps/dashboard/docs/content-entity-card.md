@@ -33,14 +33,28 @@ Dependency direction: `surfaces → anatomy → summary`. `summary/` must not im
 
 ## Choose a surface
 
-| Need                                                                                   | Surface                                |
-| -------------------------------------------------------------------------------------- | -------------------------------------- |
-| Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityAnatomyHost`                    |
-| Bordered static identity                                                               | `ContentEntityCard`                    |
-| Bordered identity with expandable domain content                                       | `DisclosureEntityCard`                 |
-| Create-tab Add/Pending discovery or pending rows                                       | `ContentEntityCard` + trailing action  |
-| Detail hierarchy or typed relationship                                                 | `DetailEntityRow` / `RelationshipList` |
-| Anonymous form value or choice affordance                                              | Purpose-built form/choice component    |
+| Need                                                                                   | Surface             |
+| -------------------------------------------------------------------------------------- | ------------------- |
+| Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityAnatomyHost` |
+
+Global search preview and results use `ListResultItem` row chrome with a **passive**
+compact `EntityAnatomyHost` inside the row link (no `headingHref`, leading utility,
+trailing action, or disclosure). Campaign-unavailable hits use entity `inactive` status
+only — not a duplicate trailing badge.
+| Bordered static identity | `ContentEntityCard` |
+| Bordered identity with expandable domain content | `DisclosureEntityCard` |
+| Create-tab Add/Pending discovery or pending rows | `ContentEntityCard` + trailing action |
+| Detail hierarchy or typed relationship | `DetailEntityRow` / `RelationshipList` |
+| Anonymous form value or choice affordance | Purpose-built form/choice component |
+
+### EntitySurfaceConfig (character / organization / location pickers)
+
+Compact catalog and bordered cards share one **data-only** identity contract:
+
+- Feature display modules return `EntitySurfaceIdentity` (`heading`, optional `metadata`, `classification`, `status`, optional `displayImage`, required semantic `fallback`) via `buildCharacterEntityCardModel`, `buildLocationEntityCardModel`, and `buildOrganizationEntityCardModel`. No JSX, no media nodes, no row chrome. Projection always paints compact media (image or fallback icon).
+- Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`, or `createCatalogEntityRowRenderer({ buildSurface })`.
+- Heading label buttons use **`inlineAction` only** (`label`, `onClick`, `disabled?`, `loading?`). Surfaces render locked compact picker buttons.
+- **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / DEC children; `trailing.kind: 'group'` for inventory quantity and icon-remove controls.
 
 The host keeps its own navigation, hover, selection, separators, drag behavior, and
 domain controls. Never put a full-row link in `EntitySummaryModel`; when a host owns
@@ -571,3 +585,35 @@ for cleanup — do not weaken docs to match legacy patterns:
 
 CEC and DEC expose presentational disabled state. Hosts still own interactive
 `disabled`, `aria-disabled`, and focus behavior.
+
+---
+
+## Card image pipeline
+
+Identity artwork follows one pipeline from role resolution to a geometry-only frame:
+
+```text
+getContentDisplayImage / resolveMediaRoleDisplayImage → ContentDisplayImage
+  → dashboard ContentMediaImage (crop math) or ContentMediaFallback (same frame)
+  → @rpg/ui IdentityFrame (compact inset) / aspect frames (primary, builderCard, …)
+  → surface adapter (card, table cell, preview rail, campaign name row)
+```
+
+**Identity frame** (`IdentityFrame`, shared tokens with `IconContainer`) clips and
+sizes only. Crop math stays in the dashboard media layer.
+
+**Utility-rail invariant:** leading utilities (grip, caret) own their rail. Identity
+media begins at the same content-column inset and the same gap to the heading whether
+or not that rail is present. Never set `leading: true` on entity card frames to
+make room for an image.
+
+### Layout modes
+
+| Mode          | Surfaces                                                   | Geometry                                                                                                                        |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-3` comfortable); heading-band min-height matches frame size; outer row `items-start` |
+| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                          |
+| Stacked bleed | Species/class radio cards, character list cards            | Full-bleed `ContentMediaImage` `builderCard` frame; text padding under the image                                                |
+
+Portrait role copy targets compact circle/square tokens; stacked character cards use
+**primary** crop in the builder-card window.

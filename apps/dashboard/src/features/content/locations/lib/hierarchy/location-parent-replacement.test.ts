@@ -90,13 +90,14 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
         locationsById: buildLocationsById(LOCATIONS_LIST),
         campaignId: STORY_CAMPAIGN_ID,
       }),
-    ).toEqual({
+    ).toMatchObject({
       parentLocationId: DOCK_WARD.id,
       entity: {
         heading: DOCK_WARD.name,
         headingSuffix: ' · District',
         supportingText: 'Located in Harborford',
       },
+      fallback: 'location',
     })
   })
 

@@ -141,11 +141,12 @@ export const contentCardHeadingEndSlotVariants = cva('shrink-0 text-sm')
 /** Linked entity headings — link color only; no hover underline. */
 export const contentCardHeadingLinkVariants = cva('text-link')
 
-export const contentCardMediaVariants = cva('shrink-0 rounded-md object-cover', {
+/** @deprecated Prefer {@link IdentityFrame} via {@link ContentCardMedia}. */
+export const contentCardMediaVariants = cva('shrink-0', {
   variants: {
     density: {
-      compact: 'size-8',
-      comfortable: 'size-10',
+      compact: '',
+      comfortable: '',
     },
   },
   defaultVariants: {

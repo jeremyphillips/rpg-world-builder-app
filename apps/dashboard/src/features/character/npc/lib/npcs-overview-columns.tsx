@@ -1,5 +1,5 @@
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
-import { dataTableWidthMeta, SortableHeader, TableBadgeCell } from '@rpg/ui'
+import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader, TableBadgeCell } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
@@ -13,6 +13,8 @@ import {
   NPC_ROSTER_COLUMN_LABEL,
   NPC_VITAL_COLUMN_LABEL,
 } from './npc-overview-labels'
+import { ContentDisplayOverviewCell } from '@/features/media/components/content-display-overview-cell'
+
 import type { NpcOverviewTableRow } from './npc-overview-row'
 
 export function npcsOverviewColumns(
@@ -20,6 +22,28 @@ export function npcsOverviewColumns(
   catalogIndex: CharacterBuildCatalogIndex,
 ): ColumnDef<NpcOverviewTableRow>[] {
   return [
+    {
+      id: 'overview-display-image',
+      header: () => <span className="sr-only">Image</span>,
+      cell: ({ row }) => (
+        <ContentDisplayOverviewCell
+          resolved={
+            row.original.character.displayImage
+              ? { outcome: 'image', display: row.original.character.displayImage }
+              : { outcome: 'fallback', fallback: 'character' }
+          }
+          alt={row.original.character.name}
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        ...dataTableColumnMeta.identity,
+        ...dataTableWidthMeta('image'),
+        label: 'Image',
+        locked: true,
+      },
+    },
     {
       accessorKey: 'character.name',
       id: 'name',

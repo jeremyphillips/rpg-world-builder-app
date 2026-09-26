@@ -183,6 +183,7 @@ export const RadioOptionCard = React.forwardRef<
           <SelectionOptionCardAnatomy
             density={density}
             leadingControl={leadingControl}
+            leadingMedia={variant === 'row' ? media : undefined}
             label={label}
             titleAdornment={titleAdornment}
             titleEndSlot={titleEndSlot}

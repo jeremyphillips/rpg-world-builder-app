@@ -171,9 +171,7 @@ export function SpeciesStep({
         return {
           value: entry.id,
           ...card,
-          ...(display.sourceKind !== 'fallback'
-            ? { media: <BuilderOptionCardImage display={display} /> }
-            : {}),
+          ...(display ? { media: <BuilderOptionCardImage display={display} /> } : {}),
           ...(titleMeta ? { titleMeta } : {}),
           ...(isSelected && entry.heritage && heritageEmbeddedContent
             ? {
@@ -247,7 +245,7 @@ export function SpeciesStep({
             if (!open) setDetailsSpeciesId(null)
           }}
           heroImage={
-            detailsHeroDisplay && detailsHeroDisplay.sourceKind !== 'fallback' ? (
+            detailsHeroDisplay ? (
               <BuilderOptionSheetHeroImage display={detailsHeroDisplay} />
             ) : undefined
           }

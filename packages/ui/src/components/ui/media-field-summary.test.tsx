@@ -4,6 +4,21 @@ import { describe, expect, it, vi } from 'vitest'
 import { MediaFieldSummary } from './media-field-summary.client'
 
 describe('MediaFieldSummary', () => {
+  it('omits the compact count overlay when read-only and empty', () => {
+    render(
+      <MediaFieldSummary
+        label="Portrait"
+        layout="compact"
+        items={[]}
+        maxItems={20}
+        readOnly
+        onOpen={vi.fn()}
+      />,
+    )
+    expect(screen.queryByText('No images')).not.toBeInTheDocument()
+    expect(screen.queryByText('No image')).not.toBeInTheDocument()
+  })
+
   it('uses one compact control with singular empty copy at capacity one', () => {
     const onOpen = vi.fn()
     render(

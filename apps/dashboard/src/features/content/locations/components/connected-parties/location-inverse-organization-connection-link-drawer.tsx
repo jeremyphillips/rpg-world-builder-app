@@ -10,16 +10,15 @@ import {
   getOrganizationDomainLabel,
   getOrganizationLocationConnectionDisplayLabel,
 } from '@rpg/contracts'
-import {
-  Button,
-  Text,
-  CatalogPickerSelectionActions,
-  resolveCatalogPickerRowActionPhase,
-} from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
-import { buildOrganizationPickerEntitySummary } from '../../../lib/entity/content-entity-picker-presentation.lib'
+import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
+import {
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from '../../../organizations/lib/organization-display'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
@@ -474,20 +473,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
           [organization.name, getOrganizationDomainLabel(organization.organizationDomain)].join(' ')
         }
         renderEntityRow={createCatalogEntityRowRenderer({
-          buildEntity: (organization) =>
-            buildOrganizationPickerEntitySummary(organization, {
-              imageKey: organization.imageKey,
-              description: !organizationInverseSubjectHasAvailableKind(
-                organization.id,
-                location.id,
-                availabilityKinds,
-                orgRows,
-                excludeRelationshipId,
-              )
-                ? fullyLinkedReason
-                : undefined,
-            }),
-          buildTrailing: (organization) => {
+          buildSurface: (organization) => {
             const isSelected = selectedOrganizationId === organization.id
             const hasAvailableKind = organizationInverseSubjectHasAvailableKind(
               organization.id,
@@ -496,29 +482,30 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               orgRows,
               excludeRelationshipId,
             )
-            const phase = resolveCatalogPickerRowActionPhase({ isSelected, isSuccess: false })
 
             return {
-              kind: 'action',
-              content: (
-                <CatalogPickerSelectionActions
-                  phase={phase}
-                  canSelect={hasAvailableKind}
-                  addLabel={isSelected ? 'Selected' : 'Select'}
-                  onAdd={() => {
-                    setSelectedOrganizationId(organization.id)
-                    if (!resolvedAddKind) {
-                      setSelectedKind(null)
-                    }
-                  }}
-                  onRemove={() => {
-                    setSelectedOrganizationId(null)
-                    if (!resolvedAddKind) {
-                      setSelectedKind(null)
-                    }
-                  }}
-                />
+              identity: buildOrganizationEntityCardModel(
+                buildOrganizationEntitySummaryVm(organization),
+                {
+                  metadata: !hasAvailableKind ? fullyLinkedReason : undefined,
+                },
               ),
+              inlineAction: buildCatalogToggleSelectInlineAction({
+                isSelected,
+                canSelect: hasAvailableKind,
+                onSelect: () => {
+                  setSelectedOrganizationId(organization.id)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
+                },
+                onDeselect: () => {
+                  setSelectedOrganizationId(null)
+                  if (!resolvedAddKind) {
+                    setSelectedKind(null)
+                  }
+                },
+              }),
             }
           },
         })}

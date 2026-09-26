@@ -7,18 +7,6 @@ const AUTHORING_CAMPAIGN_ROLES = new Set(['owner', 'co-owner'])
 
 export type MediaScopeAccess = 'read' | 'write'
 
-/** Stable scope key for hash deduplication within an authorized owner boundary. */
-export function serializeMediaScope(scope: MediaScope): string {
-  switch (scope.kind) {
-    case 'campaign-content':
-    case 'campaign-identity':
-    case 'campaign-npc':
-      return `${scope.kind}:${scope.campaignId}`
-    case 'user-pc':
-      return `${scope.kind}:${scope.userId}`
-  }
-}
-
 function isCampaignMediaAuthorized(
   membership: { campaignRole?: string } | null,
   access: MediaScopeAccess,
@@ -64,6 +52,7 @@ export async function assertMediaScopeAuthorized(
     case 'campaign-content':
     case 'campaign-identity':
     case 'campaign-npc':
+    case 'campaign-pc':
       await assertCampaignMediaScopeAuthorized(scope.campaignId, userId, access)
       return
     case 'user-pc':

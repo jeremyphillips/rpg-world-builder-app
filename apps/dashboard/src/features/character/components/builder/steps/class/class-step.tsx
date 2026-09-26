@@ -47,9 +47,7 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
         return {
           value: entry.id,
           ...formatClassCardOption(entry),
-          ...(display.sourceKind !== 'fallback'
-            ? { media: <BuilderOptionCardImage display={display} /> }
-            : {}),
+          ...(display ? { media: <BuilderOptionCardImage display={display} /> } : {}),
           summaryBadge: resolveClassCardSummaryBadge(entry, context.spellcastingProgression),
           onDetails: () => setDetailsClassId(entry.id),
         }
@@ -109,7 +107,7 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
             if (!open) setDetailsClassId(null)
           }}
           heroImage={
-            detailsHeroDisplay && detailsHeroDisplay.sourceKind !== 'fallback' ? (
+            detailsHeroDisplay ? (
               <BuilderOptionSheetHeroImage display={detailsHeroDisplay} />
             ) : undefined
           }

@@ -1,12 +1,15 @@
 import { z } from 'zod'
 
+import { contentDisplayImageSchema } from '../../../shared/media/content-display-image-dto'
 import { characterClassEntrySchema, characterSpeciesSchema } from '../character/sheet/core'
 import { characterVitalStateSchema } from '../character/sheet/character-vital'
-import { characterVitalPatchSchema } from '../character/update-character-vital'
 import { npcCharacterSchema } from '../character/sheet'
 import { campaignCharacterParticipationSchema } from '../../campaign/character/participation'
 import { characterRosterStateSchema } from '../../campaign/character/roster-state'
-import { campaignRosterPatchSchema } from '../../campaign/character/update-roster'
+import {
+  campaignNpcStatusPatchSchema,
+  type CampaignNpcStatusPatch,
+} from '../../campaign/character/participating-character-status-patch'
 
 // ---------------------------------------------------------------------------
 // Campaign NPC DTOs — composed list, detail, and patch wire shapes.
@@ -18,6 +21,7 @@ export const npcListCharacterSummarySchema = z.object({
   vital: characterVitalStateSchema,
   classes: z.array(characterClassEntrySchema).min(1),
   species: characterSpeciesSchema,
+  displayImage: contentDisplayImageSchema.optional(),
 })
 
 export type NpcListCharacterSummary = z.infer<typeof npcListCharacterSummarySchema>
@@ -40,9 +44,4 @@ export const campaignNpcDetailSchema = z.object({
 
 export type CampaignNpcDetail = z.infer<typeof campaignNpcDetailSchema>
 
-export const campaignNpcStatusPatchSchema = z.object({
-  vital: characterVitalPatchSchema.optional(),
-  roster: campaignRosterPatchSchema.optional(),
-})
-
-export type CampaignNpcStatusPatch = z.infer<typeof campaignNpcStatusPatchSchema>
+export { campaignNpcStatusPatchSchema, type CampaignNpcStatusPatch }

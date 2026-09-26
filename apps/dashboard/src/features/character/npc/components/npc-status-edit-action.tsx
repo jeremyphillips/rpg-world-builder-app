@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import type { CharacterRosterState, CharacterVitalState } from '@rpg/contracts'
-import { Button } from '@rpg/ui'
 
-import { NpcStatusEditor } from './npc-status-editor'
+import { CampaignParticipatingCharacterStatusEditAction } from '../../components/detail/status/campaign-participating-character-status-edit-action'
+import { toCampaignParticipatingCharacterStatusPatch } from '../../lib/campaign-participating-character-status.lib'
+import { useUpdateNpcStatus } from '../hooks/use-update-npc-status'
 
 export type NpcStatusEditActionProps = {
   campaignId: string
@@ -17,21 +17,19 @@ export function NpcStatusEditAction({
   vital,
   roster,
 }: NpcStatusEditActionProps) {
-  const [open, setOpen] = useState(false)
+  const updateStatus = useUpdateNpcStatus(campaignId, npcId)
 
   return (
-    <>
-      <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
-        Edit
-      </Button>
-      <NpcStatusEditor
-        open={open}
-        onOpenChange={setOpen}
-        campaignId={campaignId}
-        npcId={npcId}
-        vital={vital}
-        roster={roster}
-      />
-    </>
+    <CampaignParticipatingCharacterStatusEditAction
+      vital={vital}
+      roster={roster}
+      description="Update roster and vital status for this NPC."
+      errorMessage="Could not update NPC status."
+      isPending={updateStatus.isPending}
+      error={updateStatus.error}
+      onSave={async (values) => {
+        await updateStatus.mutateAsync(toCampaignParticipatingCharacterStatusPatch(values))
+      }}
+    />
   )
 }

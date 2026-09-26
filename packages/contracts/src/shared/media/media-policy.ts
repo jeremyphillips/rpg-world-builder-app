@@ -78,7 +78,7 @@ export const CONTENT_MEDIA_POLICIES = {
   },
   location: {
     domain: 'location',
-    allowedRoles: PRIMARY_ONLY,
+    allowedRoles: ['primary', 'emblem'] as const,
     representativeRoles: PRIMARY_REPRESENTATIVE,
   },
   organization: {

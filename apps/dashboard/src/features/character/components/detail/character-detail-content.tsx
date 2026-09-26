@@ -32,6 +32,7 @@ export type CharacterDetailContentProps = {
   viewModel: CharacterDetailViewModel
   showDelete?: boolean
   deleteConfig?: CharacterDetailDeleteConfig
+  identityMedia?: ReactNode
   statusSummary?: ReactNode
   statusActions?: ReactNode
   identitySupplement?: ReactNode
@@ -57,6 +58,7 @@ export function CharacterDetailContent({
   viewModel,
   showDelete = true,
   deleteConfig,
+  identityMedia,
   statusSummary,
   statusActions,
   identitySupplement,
@@ -99,6 +101,7 @@ export function CharacterDetailContent({
         summary={viewModel.identity.summary}
         gender={viewModel.identity.gender}
         xp={viewModel.identity.xp}
+        identityMedia={identityMedia}
         statusSummary={statusSummary}
         statusActions={statusActions}
         identitySupplement={identitySupplement}

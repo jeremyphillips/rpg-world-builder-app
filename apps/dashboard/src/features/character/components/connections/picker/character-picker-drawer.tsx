@@ -1,9 +1,10 @@
 import * as React from 'react'
 
-import { Button, CatalogPickerSelectionActions, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
-import { CatalogEntityPickerSheet, CatalogEntityRow } from '@/features/content'
+import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
 
+import { buildCharacterEntityCardModel } from '../../../lib/display/character-entity-summary.lib'
 import {
   buildCharacterPickerOptionEntitySummary,
   buildCharacterPickerOptionSearchText,
@@ -80,7 +81,7 @@ export function CharacterPickerDrawer({
         const summary = buildCharacterPickerOptionEntitySummary(character)
 
         return (
-          <CatalogEntityRow
+          <CatalogEntitySurfaceRow
             toolbarLabel={args.toolbarLabel}
             domIds={args.domIds}
             collapsible={args.collapsible}
@@ -88,27 +89,22 @@ export function CharacterPickerDrawer({
             onToggleCollapse={args.onToggleCollapse}
             summary={args.summary}
             details={args.details}
-            entity={{
-              heading: summary.name,
-              description: summary.identitySummary,
-              status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
+            surface={{
+              identity: buildCharacterEntityCardModel(summary, {
+                includeCharacterTypeInMetadata: true,
+                status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
+              }),
+              inlineAction:
+                selected || disabled
+                  ? undefined
+                  : {
+                      label: 'Add',
+                      onClick: () => {
+                        void commitSelection(character.id)
+                      },
+                      loading: pending,
+                    },
             }}
-            trailing={
-              selected || disabled
-                ? undefined
-                : {
-                    kind: 'action',
-                    content: (
-                      <CatalogPickerSelectionActions
-                        canSelect
-                        onAdd={() => {
-                          void commitSelection(character.id)
-                        }}
-                        onRemove={() => undefined}
-                      />
-                    ),
-                  }
-            }
           />
         )
       }}

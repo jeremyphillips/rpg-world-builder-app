@@ -1,9 +1,11 @@
 'use client'
 
+import type { ContentDisplayFallback } from '@rpg/contracts'
 import { ImagePlus, Settings } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { ContentDisplayFallbackIcon } from './content-display-fallback-icon.client'
 import { MediaImage } from './media-image.client'
 import {
   MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL,
@@ -42,6 +44,8 @@ export type MediaFieldSummaryProps = {
   readOnly?: boolean
   onOpen: (imageId?: string) => void
   emptyContent?: ReactNode
+  /** Read-only empty preview — domain semantic fallback when `emptyContent` is omitted. */
+  emptyFallback?: ContentDisplayFallback
   /** Expanded layout only — omit the built-in title/action row when an outer header owns chrome. */
   showHeader?: boolean
 }
@@ -65,16 +69,41 @@ function resolveRepresentative(items: readonly MediaFieldSummaryItem[], represen
   return items.find((item) => item.id === representativeId) ?? items[0]
 }
 
+function resolveCompactEmptyPreview(input: {
+  representative?: MediaFieldSummaryItem
+  emptyContent?: ReactNode
+  emptyFallback?: ContentDisplayFallback
+  canEdit: boolean
+}): ReactNode {
+  if (input.representative) {
+    return <SummaryImage item={input.representative} />
+  }
+  if (input.emptyContent !== undefined) {
+    return input.emptyContent
+  }
+  if (input.canEdit) {
+    return <ImagePlus aria-hidden />
+  }
+  if (input.emptyFallback) {
+    return <ContentDisplayFallbackIcon fallback={input.emptyFallback} size="md" />
+  }
+  return <ImagePlus aria-hidden />
+}
+
 function CompactPreviewWell({
   representative,
   emptyContent,
+  emptyFallback,
+  canEdit,
 }: {
   representative?: MediaFieldSummaryItem
   emptyContent?: ReactNode
+  emptyFallback?: ContentDisplayFallback
+  canEdit: boolean
 }) {
   return (
     <span className={mediaSummaryWellVariants({ layout: 'compact' })} aria-hidden="true">
-      {representative ? <SummaryImage item={representative} /> : (emptyContent ?? <ImagePlus />)}
+      {resolveCompactEmptyPreview({ representative, emptyContent, emptyFallback, canEdit })}
     </span>
   )
 }
@@ -89,6 +118,7 @@ function CompactMediaFieldSummary({
   readOnly = false,
   onOpen,
   emptyContent,
+  emptyFallback,
 }: MediaFieldSummaryLayoutProps) {
   const resolvedUploadCount =
     attachmentCount ?? items.filter((item) => !item.id.startsWith('system:')).length
@@ -107,15 +137,22 @@ function CompactMediaFieldSummary({
         onClick={openManager}
         aria-label={`${label}: ${copy.previewAriaLabel}`}
       >
-        <CompactPreviewWell representative={representative} emptyContent={emptyContent} />
-        <div
-          className={cn(
-            mediaSummaryCompactOverlayVariants(),
-            copy.showManageGear && canEdit && 'pr-6',
-          )}
-        >
-          <span className={mediaSummaryCompactCountVariants()}>{copy.countLabel}</span>
-        </div>
+        <CompactPreviewWell
+          representative={representative}
+          emptyContent={emptyContent}
+          emptyFallback={emptyFallback}
+          canEdit={canEdit}
+        />
+        {canEdit || galleryCount > 0 ? (
+          <div
+            className={cn(
+              mediaSummaryCompactOverlayVariants(),
+              copy.showManageGear && canEdit && 'pr-6',
+            )}
+          >
+            <span className={mediaSummaryCompactCountVariants()}>{copy.countLabel}</span>
+          </div>
+        ) : null}
       </button>
       {copy.showManageGear && canEdit ? (
         <button

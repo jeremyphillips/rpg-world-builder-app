@@ -158,7 +158,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
       heading: CITY_COUNCIL.name,
       headingSuffix: ' · Government',
     },
-    imageKey: CITY_COUNCIL.imageKey,
+    fallback: 'organization' as const,
   }
 
   it('uses site-family replace copy without territorial drawer strings', () => {

@@ -8,8 +8,6 @@ import { z } from 'zod'
  * entries can compose the same authoring fields with their own envelopes.
  */
 export const authoredContentBodySchema = z.object({
-  /** Storage key for the content item's artwork. Resolve to a URL with `getAssetUrl`. */
-  imageKey: z.string().optional(),
   name: z.string().min(1),
   /** Rich-text HTML (TipTap / authored prose). Render with `RichTextContent`. */
   description: z.string().optional(),

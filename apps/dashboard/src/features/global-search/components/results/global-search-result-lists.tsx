@@ -71,9 +71,7 @@ export function GlobalSearchFlatResults({
       {results.map((document) => (
         <SearchResultRow
           key={document.id}
-          title={document.title}
-          secondary={document.secondary}
-          typeLabel={document.typeLabel}
+          document={document}
           href={resolveHref(document)}
           campaignUnavailable={isGlobalSearchCampaignUnavailable(document)}
           onActivate={onResultActivate}

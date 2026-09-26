@@ -3,6 +3,7 @@ import { isCampaignManager } from '@rpg/contracts'
 
 import { findPcsByIds } from '../character'
 import { buildCharacterCardSummaryDto } from '../character'
+import { resolveCampaignEmblemImageUrl } from '../campaign/lib/resolve-campaign-emblem-image-url.lib'
 import { HttpError } from '../../lib/http-error'
 import { buildCampaignContentEligibilityIndex } from '../campaign-invite'
 import { findUsersByIds } from '../user'
@@ -85,6 +86,7 @@ export async function listCampaignCharactersForViewer(input: {
     if (!character) continue
 
     const controller = controllerByCharacterId.get(participation.characterId)
+    const campaignEmblemUrl = resolveCampaignEmblemImageUrl(campaign.identity.media)
 
     characters.push({
       character: {
@@ -92,6 +94,7 @@ export async function listCampaignCharactersForViewer(input: {
         campaign: {
           id: campaignId,
           name: campaign.identity.name,
+          ...(campaignEmblemUrl ? { emblemUrl: campaignEmblemUrl } : {}),
         },
       },
       controller: controller

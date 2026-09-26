@@ -351,12 +351,6 @@ const buildFeatsCoverage: CoverageBuilder = (_extraction, payload) => {
   }
 }
 
-const buildImageKeyCoverage: CoverageBuilder = (_extraction, _payload) => ({
-  targetPath: 'imageKey',
-  state: 'deferred',
-  reason: 'Portrait import is deferred; image keys are assigned by the application.',
-})
-
 const buildCampaignIdCoverage: CoverageBuilder = (_extraction, _payload) => ({
   targetPath: 'campaignId',
   state: 'deferred',
@@ -379,7 +373,6 @@ const CREATE_INPUT_COVERAGE_BUILDERS: CoverageBuilder[] = [
   buildProficienciesCoverage,
   buildSpellsCoverage,
   buildFeatsCoverage,
-  buildImageKeyCoverage,
   buildCampaignIdCoverage,
 ]
 

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
+import { createUploadRoleAssignment } from '@rpg/contracts'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { ROUTES } from '@/app/routes'
@@ -55,6 +56,30 @@ describe('CampaignPicker', () => {
     )
     expect(screen.getByText('Active Campaign')).toHaveClass('font-body-emphasis')
     expect(screen.queryByRole('button', { name: 'Open campaign' })).not.toBeInTheDocument()
+  })
+
+  it('renders a campaign emblem in destination rows', () => {
+    renderWithProviders(
+      <CampaignPicker
+        campaigns={[
+          makeCampaignListItem({
+            id: 'camp_1',
+            identity: {
+              name: 'Illustrated Campaign',
+              media: {
+                revision: 0,
+                images: [{ id: 'emblem-image', assetId: 'emblem-asset' }],
+                roles: { emblem: createUploadRoleAssignment('emblem-image') },
+              },
+            },
+          }),
+        ]}
+      />,
+    )
+
+    const emblem = document.querySelector('img')
+    expect(emblem).toHaveAttribute('src', '/api/media/assets/emblem-asset/renditions/emblem')
+    expect(emblem).toHaveClass('object-contain')
   })
 
   it('renders entry destination links with inline supporting copy for incomplete memberships', () => {

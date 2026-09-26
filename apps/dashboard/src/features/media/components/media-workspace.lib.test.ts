@@ -56,7 +56,7 @@ describe('resolveMediaWorkspaceCopy', () => {
       }),
     ).toEqual({
       heading: 'Primary crop',
-      description: 'Crop a 4:3 image for representative artwork and detail views.',
+      description: 'Crop a 4:3 image for stacked cards, detail views, and preview rails.',
       interaction: 'Drag to reposition. Move the focal point to adjust focus.',
     })
   })

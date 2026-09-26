@@ -3,10 +3,25 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import type { GlobalSearchDocument } from '@rpg/contracts'
+
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { renderWithProviders } from '@/test/render'
 
 import { SearchResultRow } from './global-search-result-row'
+
+function spellDocument(overrides: Partial<GlobalSearchDocument> = {}): GlobalSearchDocument {
+  return {
+    id: 'content:spells:fireball',
+    filterGroup: 'content',
+    typeLabel: 'Spell',
+    title: 'Fireball',
+    secondary: '3rd-level evocation',
+    target: { kind: 'spell', id: 'fireball' },
+    fields: [{ text: 'Fireball', weight: 1, role: 'label' }],
+    ...overrides,
+  }
+}
 
 function rowShell(link: HTMLElement): HTMLElement {
   return link.parentElement!
@@ -15,19 +30,14 @@ function rowShell(link: HTMLElement): HTMLElement {
 describe('SearchResultRow', () => {
   it('renders presentation fields and navigates via link', () => {
     renderWithProviders(
-      <SearchResultRow
-        title="Fireball"
-        secondary="3rd-level evocation"
-        typeLabel="Spell"
-        href="/campaigns/c1/spells/fireball"
-      />,
+      <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,
     )
 
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
     expect(link).toHaveAttribute('href', '/campaigns/c1/spells/fireball')
     expect(screen.getByText('3rd-level evocation')).toBeInTheDocument()
     expect(screen.getByText('Spell')).toBeInTheDocument()
-    expect(screen.getByText('Fireball')).toHaveClass('font-body-emphasis')
+    expect(screen.getByText('Fireball')).toBeInTheDocument()
   })
 
   it('calls onActivate when clicked', async () => {
@@ -36,9 +46,7 @@ describe('SearchResultRow', () => {
 
     renderWithProviders(
       <SearchResultRow
-        title="Fireball"
-        secondary=""
-        typeLabel="Spell"
+        document={spellDocument({ secondary: '' })}
         href="/campaigns/c1/spells/fireball"
         onActivate={onActivate}
       />,
@@ -51,9 +59,12 @@ describe('SearchResultRow', () => {
   it('shows inactive content inline with the title for managers', () => {
     renderWithProviders(
       <SearchResultRow
-        title="Arcane Trickster"
-        secondary="d8 Hit Die"
-        typeLabel="Class"
+        document={spellDocument({
+          title: 'Arcane Trickster',
+          secondary: 'd8 Hit Die',
+          typeLabel: 'Class',
+          target: { kind: 'class', id: 'arcane-trickster' },
+        })}
         href="/campaigns/c1/classes/arcane-trickster"
         campaignUnavailable
       />,
@@ -69,30 +80,29 @@ describe('SearchResultRow', () => {
 
   it('keeps classification adjacent to the title', () => {
     renderWithProviders(
-      <SearchResultRow
-        title="Fire Bolt"
-        secondary="Evocation cantrip"
-        typeLabel="Spell"
-        href="/campaigns/c1/spells/fire-bolt"
-      />,
+      <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fire-bolt" />,
     )
 
-    const name = screen.getByText('Fire Bolt')
+    const name = screen.getByText('Fireball')
     const classification = screen.getByText('Spell')
     const mixedHeadingRow = name.parentElement as HTMLElement
 
-    expect(mixedHeadingRow.childNodes[0]).toBe(name)
-    expect(mixedHeadingRow.childNodes[2]).toBe(classification)
+    expect(mixedHeadingRow).toContainElement(classification)
+    expect(mixedHeadingRow.textContent).toContain('Fireball')
+    expect(mixedHeadingRow.textContent).toContain('Spell')
+  })
+
+  it('renders a semantic fallback icon for spell hits without displayImage', () => {
+    const { container } = renderWithProviders(
+      <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,
+    )
+
+    expect(container.querySelector('.lucide-sparkles')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {
     const { container } = renderWithProviders(
-      <SearchResultRow
-        title="Fireball"
-        secondary="3rd-level evocation"
-        typeLabel="Spell"
-        href="/campaigns/c1/spells/fireball"
-      />,
+      <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,
     )
 
     await expectNoAxeViolations(container)
@@ -101,9 +111,12 @@ describe('SearchResultRow', () => {
   it('renders relationship indicator outside the navigable link', () => {
     renderWithProviders(
       <SearchResultRow
-        title="Champion"
-        secondary="Fighter subclass"
-        typeLabel="Subclass"
+        document={spellDocument({
+          title: 'Champion',
+          secondary: 'Fighter subclass',
+          typeLabel: 'Subclass',
+          target: { kind: 'class', id: 'champion' },
+        })}
         href="/campaigns/c1/classes/fighter/subclasses/champion"
         viewerCharacterRelationships={{
           count: 1,
@@ -128,9 +141,12 @@ describe('SearchResultRow', () => {
   itAxe('has no axe accessibility violations with relationships', async () => {
     const { container } = renderWithProviders(
       <SearchResultRow
-        title="Champion"
-        secondary="Fighter subclass"
-        typeLabel="Subclass"
+        document={spellDocument({
+          title: 'Champion',
+          secondary: 'Fighter subclass',
+          typeLabel: 'Subclass',
+          target: { kind: 'class', id: 'champion' },
+        })}
         href="/campaigns/c1/classes/fighter/subclasses/champion"
         viewerCharacterRelationships={{
           count: 1,

@@ -1,10 +1,9 @@
 import { Castle } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { cn, Text } from '@rpg/ui'
+import { cn, IdentityFrame, Text } from '@rpg/ui'
 
 import type { CampaignDisplayVM } from '../lib/campaign-display'
 import {
-  campaignDisplayNameIconVariants,
   campaignDisplayNameTextVariants,
   campaignDisplayNameVariants,
   type CampaignDisplaySurface,
@@ -18,7 +17,7 @@ export type CampaignDisplayNameProps = {
   className?: string
 }
 
-/** Presentational campaign identity — icon or image plus name for a given surface. */
+/** Presentational campaign identity — emblem or castle plus name for a given surface. */
 export function CampaignDisplayName({
   display,
   surface,
@@ -26,17 +25,20 @@ export function CampaignDisplayName({
   asLink = false,
   className,
 }: CampaignDisplayNameProps) {
+  const mark = (
+    <IdentityFrame
+      src={display.imageUrl ?? undefined}
+      alt=""
+      shape="box"
+      size="inline"
+      fit="contain"
+      fallback={<Castle aria-hidden />}
+    />
+  )
+
   const content = (
     <>
-      {display.imageUrl ? (
-        <img
-          src={display.imageUrl}
-          alt=""
-          className={cn(campaignDisplayNameIconVariants({ surface }), 'rounded-sm object-cover')}
-        />
-      ) : (
-        <Castle aria-hidden className={campaignDisplayNameIconVariants({ surface })} />
-      )}
+      {mark}
       <Text as="span" className={campaignDisplayNameTextVariants({ surface })}>
         {display.name || display.id}
       </Text>

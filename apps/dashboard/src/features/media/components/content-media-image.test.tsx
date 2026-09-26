@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 
-import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from './content-image-presentation-defaults'
-import { ContentMediaImage } from './content-media-image'
+import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content/lib/detail/page/content-image-presentation-defaults'
+
+import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
 
 describe('ContentMediaImage', () => {
   it('applies surface defaults when no crop is present', () => {
@@ -21,7 +22,7 @@ describe('ContentMediaImage', () => {
     })
   })
 
-  it('uses thumbnail defaults for square frames', () => {
+  it('uses thumbnail defaults for square frames without a crop', () => {
     const { container } = render(
       <ContentMediaImage
         display={{ src: '/fighter.jpeg', sourceKind: 'system' }}
@@ -36,7 +37,7 @@ describe('ContentMediaImage', () => {
     })
   })
 
-  it('keeps object-position defaults on non-4:3 builder card frames when a crop exists', () => {
+  it('honors normalized crop layout on builder card frames when a crop exists', () => {
     const { container } = render(
       <ContentMediaImage
         display={{
@@ -50,11 +51,8 @@ describe('ContentMediaImage', () => {
     )
 
     const img = container.querySelector('img')
-    expect(img).toHaveStyle({
-      objectFit: CONTENT_IMAGE_PRESENTATION_DEFAULTS.builderCard.objectFit,
-      objectPosition: CONTENT_IMAGE_PRESENTATION_DEFAULTS.builderCard.objectPosition,
-    })
-    expect(img?.style.width).toBe('')
+    expect(img).toHaveStyle({ width: '200%', height: '200%' })
+    expect(img?.style.objectPosition).toBe('')
   })
 
   it('renders a 4:3 builder sheet hero frame with primary presentation defaults', () => {
@@ -117,6 +115,18 @@ describe('ContentMediaImage', () => {
     expect(container.querySelector('img')).toHaveClass('mix-blend-multiply')
     expect(container.querySelector('img')).not.toHaveClass('dark:invert')
     expect(container.querySelector('img')).toHaveClass('object-cover')
+  })
+
+  it('renders semantic fallback in the same primary aspect frame as artwork', () => {
+    const { container } = render(
+      <ContentMediaFallback fallback="equipment" frame="primary" className="rounded-card" />,
+    )
+
+    const frame = container.firstElementChild
+    expect(frame).toHaveClass('aspect-[4/3]')
+    expect(frame).toHaveClass('rounded-card')
+    expect(frame).toHaveAttribute('data-content-media-fallback', 'equipment')
+    expect(container.querySelector('svg')).toHaveClass('size-icon-glyph-xl')
   })
 
   it('does not apply knockout blend classes without presentation treatment metadata', () => {

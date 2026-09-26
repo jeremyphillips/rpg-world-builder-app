@@ -165,7 +165,6 @@ function SpellDetailSections({
 export type SpellDetailBodyProps = {
   name: string
   nameBadge?: ReactNode
-  imageUrl: string
   imageName: string
   viewModel: SpellDetailViewModel
   campaignId: string
@@ -177,7 +176,6 @@ export type SpellDetailBodyProps = {
 export function SpellDetailBody({
   name,
   nameBadge,
-  imageUrl,
   imageName,
   viewModel,
   campaignId,
@@ -188,7 +186,6 @@ export function SpellDetailBody({
     <ContentDetailLayout
       name={name}
       nameBadge={nameBadge}
-      imageUrl={imageUrl}
       imageName={imageName}
       campaignId={campaignId}
       editHref={editHref}

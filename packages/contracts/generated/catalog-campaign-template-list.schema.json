@@ -7,9 +7,6 @@
       "metadata": {
         "type": "object",
         "properties": {
-          "imageKey": {
-            "type": "string"
-          },
           "name": {
             "type": "string",
             "minLength": 1

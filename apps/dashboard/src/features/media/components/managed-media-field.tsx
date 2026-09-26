@@ -1,17 +1,15 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import {
   emptyContentMediaSchema,
-  getAvailableContentImages,
-  getContentMediaPolicy,
-  resolveEffectiveRepresentativeImageId,
+  resolveContentDisplayFallback,
   type MediaAsset,
   type MediaScope,
 } from '@rpg/contracts'
 import { CollectionAddControl, MediaFieldSummary, resolveExpandedCapacityHint } from '@rpg/ui'
 import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
-import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '../lib/media-display'
+import { buildMediaFieldSummaryModel } from '../lib/build-media-field-summary-model'
 import { resolveMediaFieldCapacity, type MediaFieldConfig } from '../lib/media-field-config'
 import type { MediaManagerContentContext } from '../lib/media-manager.types'
 import { MediaManager } from './media-manager'
@@ -54,45 +52,8 @@ export function ManagedMediaField({
   }, [initialOpen])
   const [selectedId, setSelectedId] = useState<string | undefined>()
   const [assets, setAssets] = useState<MediaAsset[]>([])
-  const policy = getContentMediaPolicy(config.domain)
-  const availableImages = useMemo(
-    () =>
-      contentContext
-        ? getAvailableContentImages({
-            media,
-            contentType: contentContext.contentType,
-            slug: contentContext.slug,
-            contentSource: contentContext.contentSource,
-            rulesetId: contentContext.rulesetId,
-          })
-        : [],
-    [contentContext, media],
-  )
-  const systemImage = availableImages.find((image) => image.kind === 'system')
-  const representativeId = resolveEffectiveRepresentativeImageId(
-    media,
-    policy.representativeRoles,
-    availableImages,
-  )
+  const summary = buildMediaFieldSummaryModel({ config, media, contentContext })
   const maxItems = resolveMediaFieldCapacity(config)
-  const items = [
-    ...media.images.map((image: { id: string; assetId: string; alt?: string }) => ({
-      id: image.id,
-      alt: image.alt,
-      src: mediaImageUrl(image.assetId, 'gallery-thumbnail', MEDIA_SOURCE_CROP),
-    })),
-    ...(systemImage
-      ? [
-          {
-            id: systemImage.id,
-            alt: `System ${systemImage.source.slug}`,
-            src: systemContentImageUrl(systemImage.srcPath),
-          },
-        ]
-      : []),
-  ]
-  const galleryCount = items.length
-  const attachmentCount = media.images.length
   const onOpen = (imageId?: string) => {
     setSelectedId(imageId)
     setOpen(true)
@@ -109,18 +70,24 @@ export function ManagedMediaField({
             label={label}
             size={size}
             hint={
-              galleryCount > 0 ? resolveExpandedCapacityHint(attachmentCount, maxItems) : undefined
+              summary.galleryCount > 0
+                ? resolveExpandedCapacityHint(summary.attachmentCount, maxItems)
+                : undefined
             }
             action={
               <CollectionAddControl
                 label={
-                  attachmentCount > 0 || systemImage
+                  summary.attachmentCount > 0 ||
+                  summary.items.some((item) => item.id.startsWith('system:'))
                     ? MEDIA_FIELD_MANAGE_LABEL
                     : MEDIA_FIELD_ADD_IMAGES_LABEL
                 }
                 enabled
-                showIcon={attachmentCount === 0 && !systemImage}
-                onClick={() => onOpen(representativeId)}
+                showIcon={
+                  summary.attachmentCount === 0 &&
+                  !summary.items.some((item) => item.id.startsWith('system:'))
+                }
+                onClick={() => onOpen(summary.representativeId)}
               />
             }
           />
@@ -128,11 +95,15 @@ export function ManagedMediaField({
             label={label}
             layout="expanded"
             showHeader={false}
-            items={items}
-            attachmentCount={attachmentCount}
-            representativeId={representativeId}
+            items={summary.items}
+            attachmentCount={summary.attachmentCount}
+            representativeId={summary.representativeId}
             maxItems={maxItems}
             countDisplay={config.presentation.countDisplay}
+            emptyFallback={resolveContentDisplayFallback({
+              domain: config.domain,
+              surface: 'field',
+            })}
             onOpen={onOpen}
           />
         </div>
@@ -140,11 +111,12 @@ export function ManagedMediaField({
         <MediaFieldSummary
           label={label}
           layout="compact"
-          items={items}
-          attachmentCount={attachmentCount}
-          representativeId={representativeId}
+          items={summary.items}
+          attachmentCount={summary.attachmentCount}
+          representativeId={summary.representativeId}
           maxItems={maxItems}
           countDisplay={config.presentation.countDisplay}
+          emptyFallback={resolveContentDisplayFallback({ domain: config.domain, surface: 'field' })}
           onOpen={onOpen}
         />
       )}

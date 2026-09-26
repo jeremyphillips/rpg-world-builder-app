@@ -2,7 +2,6 @@ import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   formatEquipmentCostLabel,
   moneyToCp,
-  type ContentDisplayImage,
   type ContentOverviewUsageScope,
   type ContentStatus,
   type ContentUsageSummaryLabels,
@@ -11,18 +10,17 @@ import {
   type WithCampaignAccess,
   type ContentTypeKey,
 } from '@rpg/contracts'
-import {
-  DataTableImageCell,
-  dataTableColumnMeta,
-  dataTableWidthMeta,
-  SortableHeader,
-} from '@rpg/ui'
+import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 
 import { buildSourceColumn, stampDataColumns } from '@/lib/data-table/column-builders'
+import { ContentDisplayOverviewCell } from '@/features/media/components/content-display-overview-cell'
 
-import { ContentMediaImage } from '../detail/page/content-media-image'
-import { getContentImageUrl } from '../detail/page/content-image-url'
+import {
+  resolveDashboardContentDisplay,
+  type DashboardContentDisplayResult,
+  type ResolveDashboardContentDisplayInput,
+} from '../detail/page/content-display-image'
 import { CONTENT_SOURCE_BADGE, type ContentSource } from './content-source-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentOverviewNameCell } from './content-overview-name-cell'
@@ -34,7 +32,6 @@ import { buildContentUsedByColumn } from './content-used-by-column'
  * so the shared image, name, and source columns are type-safe.
  */
 export type ContentBase = {
-  imageKey?: string
   name: string
   slug?: string
   rulesetId?: string
@@ -52,8 +49,10 @@ export { readCampaignAccess as readContentRowCampaignAccess }
 export type ContentTableOptions<T> = {
   /** Content type used to resolve shared source-presentation policy. */
   contentType: ContentTypeKey
-  /** Optional resolver for crop-aware overview thumbnails. */
-  resolveDisplayImage?: (row: T) => ContentDisplayImage
+  /** When false, omits the leading image column (spells, feats, skill-proficiencies). */
+  includeImageColumn?: boolean
+  /** Optional resolver for crop-aware overview thumbnails and fallback icons. */
+  resolveOverviewDisplay?: (row: T) => DashboardContentDisplayResult
   /** When provided, the name cell renders as a link to this href. */
   nameHref?: (row: T) => string
   /** When provided with `canManage`, renders the line-2 Edit utility action. */
@@ -84,17 +83,23 @@ export function costColumn<T extends WithCost>(): ColumnDef<T> {
   }
 }
 
+function buildDefaultOverviewDisplayResolver<T extends ContentBase>(
+  contentType: ContentTypeKey,
+): (row: T) => DashboardContentDisplayResult {
+  return (row) =>
+    resolveDashboardContentDisplay({
+      media: row.media,
+      contentType,
+      slug: row.slug ?? row.name,
+      contentSource: row.source,
+      rulesetId: row.rulesetId,
+      surface: 'compact',
+    } satisfies ResolveDashboardContentDisplayInput)
+}
+
 /**
  * Wraps content-specific columns with the shared image + name (prepended) and
  * source (appended) columns. Every content overview uses this to stay consistent.
- *
- * Pass `options.nameHref` to make the name cell a navigable link.
- *
- * @example
- * const columns = buildContentColumns<CharacterClass>([hitDieCol, spellcastingCol], {
- *   contentType: 'classes',
- *   nameHref: (row) => ROUTES.content.classes.detail(campaignId, row.id),
- * })
  */
 export function buildContentColumns<T extends ContentBase>(
   middleColumns: ColumnDef<T>[],
@@ -102,7 +107,8 @@ export function buildContentColumns<T extends ContentBase>(
 ): ColumnDef<T>[] {
   const {
     contentType,
-    resolveDisplayImage,
+    includeImageColumn = !['spells', 'feats', 'skill-proficiencies'].includes(contentType),
+    resolveOverviewDisplay,
     nameHref,
     editHref,
     canManage = false,
@@ -110,17 +116,15 @@ export function buildContentColumns<T extends ContentBase>(
     overviewUsageScope,
   } = options
 
+  const resolveDisplay =
+    resolveOverviewDisplay ?? buildDefaultOverviewDisplayResolver<T>(contentType)
+
   const imageColumn: ColumnDef<T> = {
-    accessorKey: 'imageKey',
+    id: 'overview-display-image',
     header: () => <span className="sr-only">Image</span>,
-    cell: ({ row }) => {
-      if (resolveDisplayImage) {
-        const display = resolveDisplayImage(row.original)
-        return <ContentMediaImage display={display} alt="" frame="square" />
-      }
-      const key = row.getValue<string | undefined>('imageKey')
-      return <DataTableImageCell src={getContentImageUrl(key)} />
-    },
+    cell: ({ row }) => (
+      <ContentDisplayOverviewCell resolved={resolveDisplay(row.original)} alt={row.original.name} />
+    ),
     enableSorting: false,
     enableHiding: false,
     meta: {
@@ -174,8 +178,10 @@ export function buildContentColumns<T extends ContentBase>(
         ]
       : []
 
+  const leadingColumns = includeImageColumn ? [imageColumn] : []
+
   return [
-    imageColumn,
+    ...leadingColumns,
     nameColumn,
     ...stampDataColumns(middleColumns),
     ...usedByColumn,

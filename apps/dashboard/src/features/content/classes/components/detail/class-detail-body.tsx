@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import { type ContentDisplayImage, type SkillProficiency, type Subclass } from '@rpg/contracts'
+import {
+  type ContentDisplayFallback,
+  type ContentDisplayImage,
+  type SkillProficiency,
+  type Subclass,
+} from '@rpg/contracts'
 
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
 import { ClassProficienciesSection } from './class-proficiencies-section'
@@ -118,8 +123,8 @@ function ClassDetailSections({
 export type ClassDetailBodyProps = {
   name: string
   nameBadge?: ReactNode
-  imageUrl?: string
   displayImage?: ContentDisplayImage
+  displayFallback?: ContentDisplayFallback
   imageName: string
   viewModel: ClassDetailViewModel
   subclasses: Subclass[]
@@ -136,8 +141,8 @@ export type ClassDetailBodyProps = {
 export function ClassDetailBody({
   name,
   nameBadge,
-  imageUrl,
   displayImage,
+  displayFallback,
   imageName,
   viewModel,
   subclasses,
@@ -153,8 +158,8 @@ export function ClassDetailBody({
     <ContentDetailLayout
       name={name}
       nameBadge={nameBadge}
-      imageUrl={imageUrl}
       displayImage={displayImage}
+      displayFallback={displayFallback}
       imageName={imageName}
       campaignId={campaignId}
       editHref={editHref}

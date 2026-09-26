@@ -3,6 +3,7 @@ import type { CharacterRosterStatus } from '@rpg/contracts'
 import {
   Badge,
   buttonVariants,
+  cn,
   Card,
   CardDescription,
   CardFooter,
@@ -11,6 +12,7 @@ import {
   Text,
 } from '@rpg/ui'
 
+import { ContentMediaImage } from '@/features/media/components/content-media-image'
 import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
 
 import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
@@ -24,7 +26,7 @@ export type CharacterListCardProps = {
   rosterStatus?: CharacterRosterStatus
 }
 
-/** Roster card for a character summary row — name, summary line, and detail link. */
+/** Roster card for a character summary row — optional stacked art, name, summary, and detail link. */
 export function CharacterListCard({
   card,
   detailHref,
@@ -37,8 +39,11 @@ export function CharacterListCard({
     : null
 
   return (
-    <Card className="flex h-full flex-col">
-      <CardHeader>
+    <Card className="flex h-full flex-col overflow-hidden p-0">
+      {card.displayImage ? (
+        <ContentMediaImage display={card.displayImage} alt="" frame="builderCard" />
+      ) : null}
+      <CardHeader className={card.displayImage ? 'px-5 pb-3 pt-3' : undefined}>
         <div className="flex items-start justify-between gap-2">
           <CardTitle>{card.name}</CardTitle>
           {rosterPresentation ? (
@@ -55,12 +60,16 @@ export function CharacterListCard({
         ) : null}
         {showCampaign && card.campaign ? (
           <CampaignDisplayName
-            display={buildCampaignDisplay(card.campaign)}
+            display={buildCampaignDisplay({
+              id: card.campaign.id,
+              name: card.campaign.name,
+              emblemUrl: card.campaign.emblemUrl,
+            })}
             surface="inlineMuted"
           />
         ) : null}
       </CardHeader>
-      <CardFooter className="mt-auto">
+      <CardFooter className={cn('mt-auto', card.displayImage != null && 'px-5 pb-5')}>
         <Link to={detailHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
           View
         </Link>

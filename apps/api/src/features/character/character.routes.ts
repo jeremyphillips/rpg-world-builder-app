@@ -1,6 +1,6 @@
 import { Router } from 'express'
 
-import { createCharacterInputSchema } from '@rpg/contracts'
+import { characterMediaPatchInputSchema, createCharacterInputSchema } from '@rpg/contracts'
 
 import { requireAuth } from '../../middleware/require-auth'
 import { validate } from '../../middleware/validate'
@@ -19,4 +19,10 @@ characterRouter.post(
 )
 characterRouter.get('/:characterId/routing-context', requireAuth, controller.getRoutingContext)
 characterRouter.get('/:characterId', requireAuth, controller.getById)
+characterRouter.patch(
+  '/:characterId/media',
+  requireAuth,
+  validate(characterMediaPatchInputSchema),
+  controller.patchMedia,
+)
 characterRouter.delete('/:characterId', requireAuth, controller.remove)

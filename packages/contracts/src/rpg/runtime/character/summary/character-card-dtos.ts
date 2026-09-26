@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { contentDisplayImageSchema } from '../../../campaign/campaign-media.lib'
 import { characterRouteContextSchema } from '../../campaign/character-route-context'
 
 // ---------------------------------------------------------------------------
@@ -12,6 +13,7 @@ export const characterCardSummarySchema = z.object({
   summary: z.string(),
   classIds: z.array(z.string().min(1)).default([]),
   speciesId: z.string().min(1).optional(),
+  displayImage: contentDisplayImageSchema.optional(),
 })
 
 export type CharacterCardSummaryDto = z.infer<typeof characterCardSummarySchema>
@@ -19,6 +21,7 @@ export type CharacterCardSummaryDto = z.infer<typeof characterCardSummarySchema>
 export const characterCardCampaignSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
+  emblemUrl: z.string().min(1).optional(),
 })
 
 export type CharacterCardCampaign = z.infer<typeof characterCardCampaignSchema>

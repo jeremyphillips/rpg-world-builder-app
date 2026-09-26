@@ -5,6 +5,7 @@ import { COMPACT_LABEL_SM_MIN_HEIGHT_CLASS } from './compact-label.variants'
 import { cardBorderClasses, cardRadiusClasses } from './card.variants'
 import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
+import { identityInsetRowVariants } from './identity-frame.variants'
 
 /** Shared selected-state chrome for static and radio option cards. */
 export const optionCardSelectedChromeClasses =
@@ -196,6 +197,19 @@ export const selectionOptionCardBodyVariants = cva(
 export const selectionOptionCardHeaderRowVariants = cva(
   'flex flex-wrap items-center justify-between gap-2',
 )
+
+/** Identity row inside the content column — inset-row geometry for optional leading media. */
+export const optionCardIdentityRowVariants = cva('flex min-w-0 items-start', {
+  variants: {
+    density: {
+      default: identityInsetRowVariants({ density: 'comfortable', align: 'start' }),
+      compact: identityInsetRowVariants({ density: 'compact', align: 'start' }),
+    },
+  },
+  defaultVariants: {
+    density: 'default',
+  },
+})
 
 /** Summary anatomy body — flush header row to title; title→description gap stays on primary copy stack. */
 export const selectionOptionCardAnatomyBodyVariants = cva('flex min-w-0 flex-1 flex-col gap-0')

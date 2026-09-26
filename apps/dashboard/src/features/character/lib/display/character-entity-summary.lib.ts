@@ -3,7 +3,12 @@ import type {
   CharacterBuildCatalogIndex,
   CharacterSummaryParts,
   CharacterType,
+  ContentDisplayImage,
 } from '@rpg/contracts'
+import { resolveContentDisplayFallback } from '@rpg/contracts'
+
+import type { EntitySurfaceIdentity } from '@/features/content/lib/entity/summary/entity-surface-identity.types'
+import type { EntitySummaryStatusItem } from '@/features/content/lib/entity/summary/entity-summary-status.types'
 import {
   CHARACTER_SUMMARY_SEPARATOR,
   formatCharacterSummary,
@@ -28,6 +33,7 @@ export type CharacterEntitySummaryVm = {
   parts?: CharacterSummaryParts
   /** Authoritative species/advancement identity string (no PC/NPC). */
   identitySummary: string
+  displayImage?: ContentDisplayImage
 }
 
 export type CharacterInlineSummaryOptions = {
@@ -118,4 +124,51 @@ export function buildCharacterEntityContextPresentation(vm: CharacterEntitySumma
 
 export function buildCharacterEntitySummarySearchText(vm: CharacterEntitySummaryVm): string {
   return [vm.name, formatCharacterInlineSummary(vm, { includeCharacterType: true })].join(' ')
+}
+
+export type BuildCharacterEntityCardModelOptions = {
+  /** When true, PC/NPC is part of the metadata line (organization member picker). */
+  includeCharacterTypeInMetadata?: boolean
+  /** When set, replaces the default metadata line from the VM. */
+  metadata?: string
+  status?: readonly EntitySummaryStatusItem[]
+  displayImage?: ContentDisplayImage
+}
+
+export function buildCharacterEntityCardModel(
+  vm: CharacterEntitySummaryVm,
+  options: BuildCharacterEntityCardModelOptions = {},
+): EntitySurfaceIdentity {
+  const displayImage = options.displayImage ?? vm.displayImage
+  const identity: EntitySurfaceIdentity = {
+    heading: vm.name,
+    fallback: resolveContentDisplayFallback({
+      domain: 'character',
+      surface: 'compact',
+      characterType: vm.characterType.value,
+    }),
+    ...(displayImage ? { displayImage } : {}),
+  }
+
+  if (options.metadata !== undefined) {
+    if (options.metadata) {
+      identity.metadata = options.metadata
+    }
+  } else if (options.includeCharacterTypeInMetadata) {
+    const metadata = formatCharacterInlineSummary(vm, { includeCharacterType: true })
+    if (metadata) {
+      identity.metadata = metadata
+    }
+  } else {
+    identity.classification = vm.characterType.label
+    if (vm.identitySummary) {
+      identity.metadata = vm.identitySummary
+    }
+  }
+
+  if (options.status && options.status.length > 0) {
+    identity.status = options.status
+  }
+
+  return identity
 }

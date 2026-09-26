@@ -6,7 +6,10 @@ import {
   useLanguageVocabulary,
   useSenseVocabulary,
 } from '@/features/vocabulary'
-import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import {
+  getContentDisplayImage,
+  resolveDashboardDetailDisplayFallback,
+} from '../../lib/detail/page/content-display-image'
 import {
   buildContentDisplayImageInput,
   type ContentPreviewDisplayImageValues,
@@ -48,14 +51,14 @@ export function SpeciesPreviewPlayerHost({
                 {
                   media:
                     (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
-                  imageKey: (values as ContentPreviewDisplayImageValues).imageKey,
                   slug: values.slug ?? 'preview',
                   source: ctx.entitySource ?? 'homebrew',
                   rulesetId: ctx.rulesetId,
                 },
-                'primary',
+                'detail',
               ),
             )}
+            displayFallback={resolveDashboardDetailDisplayFallback('species')}
             imageName={name}
             viewModel={viewModel}
             campaignId={ctx.campaignId ?? ''}

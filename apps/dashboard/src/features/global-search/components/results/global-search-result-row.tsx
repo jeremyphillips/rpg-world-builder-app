@@ -2,17 +2,20 @@ import { Link } from 'react-router-dom'
 
 import {
   formatViewerCharacterRelationshipTooltip,
+  resolveContentDisplayFallbackForSearchTarget,
+  type GlobalSearchDocument,
   type ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { Badge, ListResultItem, cn, interactiveFocusVariants } from '@rpg/ui'
+import { ListResultItem, cn, interactiveFocusVariants } from '@rpg/ui'
 
+import { EntityAnatomyHost, projectEntitySurfaceIdentityToSummaryModel } from '@/features/content'
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator'
 
+import { wireGlobalSearchDisplayImage } from '../../lib/wire-global-search-display-image.lib'
+
 export type SearchResultRowProps = {
-  title: string
-  secondary: string
-  typeLabel: string
+  document: GlobalSearchDocument
   href: string
   campaignUnavailable?: boolean
   onActivate?: () => void
@@ -21,15 +24,15 @@ export type SearchResultRowProps = {
 }
 
 export function SearchResultRow({
-  title,
-  secondary,
-  typeLabel,
+  document,
   href,
   campaignUnavailable = false,
   onActivate,
   className,
   viewerCharacterRelationships,
 }: SearchResultRowProps) {
+  const { title, secondary, typeLabel, target, displayImage } = document
+
   const relationshipLabel = viewerCharacterRelationships
     ? formatViewerCharacterRelationshipTooltip(viewerCharacterRelationships)
     : undefined
@@ -42,19 +45,26 @@ export function SearchResultRow({
       ? `${title}, ${relationshipLabel}, ${typeLabel}`
       : `${title}, ${typeLabel}`
 
+  const wiredDisplayImage = wireGlobalSearchDisplayImage(displayImage)
+
+  const entity = projectEntitySurfaceIdentityToSummaryModel(
+    {
+      heading: title,
+      classification: typeLabel,
+      ...(secondary ? { metadata: secondary } : {}),
+      fallback: resolveContentDisplayFallbackForSearchTarget(target),
+      ...(wiredDisplayImage ? { displayImage: wiredDisplayImage } : {}),
+      ...(campaignUnavailable
+        ? { status: [{ kind: 'inactive', label: INACTIVE_ROW_BADGE_LABEL }] }
+        : {}),
+    },
+    'compact',
+  )
+
   return (
     <ListResultItem
-      name={title}
-      classification={typeLabel}
-      metadata={secondary || undefined}
+      content={<EntityAnatomyHost density="compact" entity={entity} />}
       className={className}
-      endSlot={
-        campaignUnavailable ? (
-          <Badge tone="neutral" appearance="outline" size="sm">
-            {INACTIVE_ROW_BADGE_LABEL}
-          </Badge>
-        ) : undefined
-      }
       trailingAction={
         viewerCharacterRelationships ? (
           <CharacterRelationshipIndicator

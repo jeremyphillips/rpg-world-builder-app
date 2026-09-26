@@ -26,7 +26,6 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
   return {
     ...homebrewContentEnvelope(record),
     name: record.name,
-    ...(record.imageKey !== undefined && { imageKey: record.imageKey }),
     ...(record.media !== undefined && { media: record.media }),
     ...(record.description !== undefined && { description: record.description }),
     ...(record.organizationDomain !== undefined && {

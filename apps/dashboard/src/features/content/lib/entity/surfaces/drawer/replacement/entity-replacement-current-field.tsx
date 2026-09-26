@@ -1,19 +1,23 @@
 import { ContentCardMedia, Heading, InsetPanel } from '@rpg/ui'
 
-import { getContentImageUrl } from '../../../../detail/page/content-image-url'
+import { ContentMediaImage } from '@/features/media'
+
 import { DrawerEntityBlock } from '../drawer-entity-block'
 import type { DrawerEntityPresentation } from '../drawer-entity.types'
+import type { EntityReplacementCurrentSnapshot } from './entity-replacement-current.types'
 
 export type EntityReplacementCurrentFieldProps = {
   label: string
   entity: DrawerEntityPresentation
-  imageKey?: string
+  displayImage?: EntityReplacementCurrentSnapshot['displayImage']
+  fallback?: EntityReplacementCurrentSnapshot['fallback']
 }
 
 export function EntityReplacementCurrentField({
   label,
   entity,
-  imageKey,
+  displayImage,
+  fallback = 'generic',
 }: EntityReplacementCurrentFieldProps) {
   return (
     <div className="space-y-2">
@@ -22,13 +26,16 @@ export function EntityReplacementCurrentField({
       </Heading>
       <InsetPanel size="sm" className="p-0">
         <div className="flex items-start gap-3 p-3">
-          {imageKey ? (
-            <ContentCardMedia
-              src={getContentImageUrl(imageKey)}
+          {displayImage ? (
+            <ContentMediaImage
+              display={displayImage}
               alt={entity.heading}
+              frame="insetSm"
               className="shrink-0"
             />
-          ) : null}
+          ) : (
+            <ContentCardMedia fallback={fallback} alt={entity.heading} className="shrink-0" />
+          )}
           <DrawerEntityBlock {...entity} className="min-w-0 flex-1" />
         </div>
       </InsetPanel>

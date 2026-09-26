@@ -10,6 +10,7 @@ import {
   effectiveSpellModelingStatus,
   parseSelectNumberInput,
   spellDeliveryMethodSchema,
+  type ContentMedia,
   type Spell,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
@@ -32,6 +33,7 @@ import type {
   ContentPreviewIdentity,
   ContentPreviewSection,
 } from '../../lib/forms/preview/content-form-preview.types'
+import { resolveFormPreviewDisplayImage } from '../../lib/forms/preview/resolve-form-preview-display-image'
 import { isResolutionFormConfigured } from '../resolution/lib/form/resolution-form-visibility'
 import { resolutionToStored } from '../resolution/lib/form/resolution-form-values'
 import type { ResolutionFormValues } from '../resolution/lib/form/resolution-form-schema'
@@ -168,10 +170,18 @@ function spellDeliveryMethodFromFormValues(deliveryMethod: string | undefined) {
 
 export function buildSpellPreviewIdentity(
   values: SpellFormValues,
-  _ctx: ContentFormCtx,
+  ctx: ContentFormCtx,
 ): ContentPreviewIdentity {
+  const displayImage = resolveFormPreviewDisplayImage({
+    media: (values as SpellFormValues & { media?: ContentMedia }).media,
+    ctx,
+    contentType: 'spells',
+    slug: values.slug ?? 'preview',
+  })
+
   return {
     name: spellPreviewName(values),
+    ...(displayImage ? { displayImage } : {}),
   }
 }
 

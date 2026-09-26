@@ -20,37 +20,41 @@ describe('content-entity-picker-presentation', () => {
       campaignId: 'camp-1',
     })
 
-    expect(buildLocationPickerEntitySummary(summary)).toEqual({
+    const model = buildLocationPickerEntitySummary(summary)
+
+    expect(model).toMatchObject({
       heading: 'Yawning Portal',
       classification: 'Building · Brewery',
       description: 'Located in Dock Ward',
-      media: undefined,
     })
+    expect(model.media).toBeTruthy()
   })
 
   it('builds organization picker rows with inline kind suffix', () => {
-    expect(buildOrganizationPickerEntitySummary(CITY_COUNCIL)).toEqual({
+    const model = buildOrganizationPickerEntitySummary(CITY_COUNCIL)
+
+    expect(model).toMatchObject({
       heading: 'City Council',
       classification: 'Government',
-      description: undefined,
-      media: undefined,
     })
+    expect(model.description).toBeUndefined()
+    expect(model.media).toBeTruthy()
   })
 
-  it('builds character picker rows with type on the heading line and identity below', () => {
-    expect(
-      buildCharacterPickerEntitySummary({
-        id: 'char-1',
-        name: 'Frug Daergel',
-        summary: 'Human · Level 1 Fighter',
-        characterType: 'pc',
-        classIds: ['srd-cc-5.2.1:fighter'],
-      }),
-    ).toEqual({
-      heading: 'Frug Daergel',
-      classification: 'PC',
-      description: 'Human · Level 1 Fighter',
-      media: undefined,
+  it('builds character picker rows with member-style metadata and always-on media', () => {
+    const model = buildCharacterPickerEntitySummary({
+      id: 'char-1',
+      name: 'Frug Daergel',
+      summary: 'Human · Level 1 Fighter',
+      characterType: 'pc',
+      classIds: ['srd-cc-5.2.1:fighter'],
     })
+
+    expect(model).toMatchObject({
+      heading: 'Frug Daergel',
+      description: 'PC · Human · Level 1 Fighter',
+    })
+    expect(model.classification).toBeUndefined()
+    expect(model.media).toBeTruthy()
   })
 })

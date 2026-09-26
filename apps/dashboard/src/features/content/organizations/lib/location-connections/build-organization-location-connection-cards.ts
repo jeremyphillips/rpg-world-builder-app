@@ -96,7 +96,8 @@ export function mapLocationEntitySummaryToEntityReplacementCurrentSnapshot(
 ): EntityReplacementCurrentSnapshot {
   return {
     entity: buildLocationEntityContextPresentation(vm),
-    imageKey: vm.imageKey,
+    displayImage: vm.displayImage,
+    fallback: 'location',
   }
 }
 

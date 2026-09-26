@@ -6,7 +6,7 @@ import { formatUntitledContentName } from '../../rpg/content/lib/draft-authored-
 
 /**
  * Authored content body variant for media-enabled catalog domains.
- * Omits legacy `imageKey`; not yet composed into live type schemas until cutover.
+ * Adds optional `ContentMedia`; not yet composed into live type schemas until cutover.
  */
 export const mediaBearingAuthoredContentBodySchema = authoredContentBodySchema.extend({
   media: contentMediaSchema.optional(),

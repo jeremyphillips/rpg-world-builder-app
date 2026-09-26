@@ -1,13 +1,13 @@
 import * as React from 'react'
 
-import { getOrganizationDomainLabel, resolveOrganizationMembershipMetadata } from '@rpg/contracts'
-import { Button, SelectField, Text, CatalogPickerSelectionActions } from '@rpg/ui'
+import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
+import { Button, SelectField, Text } from '@rpg/ui'
 
+import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
 import {
-  CatalogEntityPickerSheet,
-  CatalogEntityRow,
-  CatalogMetadataRenderer,
-} from '@/features/content'
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from '@/features/content/organizations/lib/organization-display'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
 import {
@@ -171,7 +171,7 @@ export function OrganizationPickerDrawer({
         const { organization, selected } = args.item
 
         return (
-          <CatalogEntityRow
+          <CatalogEntitySurfaceRow
             toolbarLabel={args.toolbarLabel}
             domIds={args.domIds}
             collapsible={args.collapsible}
@@ -179,38 +179,22 @@ export function OrganizationPickerDrawer({
             onToggleCollapse={args.onToggleCollapse}
             summary={args.summary}
             details={args.details}
-            entity={{
-              heading: organization.name,
-              description: (
-                <CatalogMetadataRenderer
-                  lines={[
-                    {
-                      segments: [
-                        {
-                          type: 'text',
-                          text: getOrganizationDomainLabel(organization.organizationDomain),
-                        },
-                      ],
-                    },
-                  ]}
-                />
+            surface={{
+              identity: buildOrganizationEntityCardModel(
+                buildOrganizationEntitySummaryVm(organization),
+                {
+                  status: selected
+                    ? [{ kind: 'badge', label: 'Added', tone: 'success' }]
+                    : undefined,
+                },
               ),
-              status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
-            }}
-            trailing={
-              selected
+              inlineAction: selected
                 ? undefined
                 : {
-                    kind: 'action',
-                    content: (
-                      <CatalogPickerSelectionActions
-                        canSelect
-                        onAdd={() => handleExpandedItemChange(organization.id)}
-                        onRemove={() => undefined}
-                      />
-                    ),
-                  }
-            }
+                    label: 'Add',
+                    onClick: () => handleExpandedItemChange(organization.id),
+                  },
+            }}
           />
         )
       }}

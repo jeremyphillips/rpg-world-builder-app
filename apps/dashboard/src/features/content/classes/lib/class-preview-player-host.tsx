@@ -2,7 +2,10 @@ import { emptyContentMediaSchema } from '@rpg/contracts'
 import { Modal } from '@rpg/ui'
 
 import { useCampaignRules } from '@/features/campaign'
-import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import {
+  getContentDisplayImage,
+  resolveDashboardDetailDisplayFallback,
+} from '../../lib/detail/page/content-display-image'
 import {
   buildContentDisplayImageInput,
   type ContentPreviewDisplayImageValues,
@@ -51,14 +54,14 @@ export function ClassPreviewPlayerHost({
                 {
                   media:
                     (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
-                  imageKey: (values as ContentPreviewDisplayImageValues).imageKey,
                   slug: values.slug ?? 'preview',
                   source: ctx.entitySource ?? 'homebrew',
                   rulesetId: ctx.rulesetId,
                 },
-                'primary',
+                'detail',
               ),
             )}
+            displayFallback={resolveDashboardDetailDisplayFallback('class')}
             imageName={name}
             viewModel={viewModel as ClassDetailViewModel}
             subclasses={subclasses}

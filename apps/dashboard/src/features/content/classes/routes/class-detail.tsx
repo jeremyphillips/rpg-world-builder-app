@@ -17,7 +17,10 @@ import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
-import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
+import {
+  getContentDisplayImage,
+  resolveDashboardDetailDisplayFallback,
+} from '../../lib/detail/page/content-display-image'
 import { buildClassContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { ClassProgressionTable } from '../components/detail/class-progression-table'
@@ -78,8 +81,9 @@ export function ClassDetailContent({
         name={characterClass.name}
         nameBadge={<ContentStatusNameBadge status={characterClass.status} />}
         displayImage={getContentDisplayImage(
-          buildClassContentDisplayImageInput(characterClass, 'primary'),
+          buildClassContentDisplayImageInput(characterClass, 'detail'),
         )}
+        displayFallback={resolveDashboardDetailDisplayFallback('class')}
         imageName={characterClass.name}
         viewModel={viewModel}
         subclasses={subclasses}

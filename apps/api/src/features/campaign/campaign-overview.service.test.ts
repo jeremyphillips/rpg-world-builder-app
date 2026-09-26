@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { createPcRecord } from '../character'
+import { updateProfile } from '../user'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { makeTestCampaign } from '../../test/fixtures/campaigns'
 import { makeTestUser } from '../../test/fixtures/users'
@@ -26,6 +27,7 @@ describe('campaign overview service', () => {
       email: 'overview-player@example.com',
       displayName: 'Player',
     })
+    await updateProfile(player.id, { avatarKey: 'avatars/overview-player.png' })
 
     await createOrConfirmPlayerMembership({
       campaignId,
@@ -44,6 +46,7 @@ describe('campaign overview service', () => {
         }),
         expect.objectContaining({
           displayName: 'Player',
+          avatarKey: 'avatars/overview-player.png',
           role: 'pc',
           onboardingState: 'onboarding_incomplete',
           inviteAcceptedAt: expect.any(String),
