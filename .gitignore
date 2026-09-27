@@ -55,4 +55,7 @@ pnpm-debug.log*
 __pycache__/
 *.py[cod]plans
 
+# System image staging
+temp-assets/
+
 CHEATSHEET.md
