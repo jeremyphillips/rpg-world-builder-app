@@ -789,7 +789,7 @@
 @layer base {
   :root {
     --image-preview-size: 7.5rem; /* 120px — compact media preview default and lg+ */
-    --hero-emblem-size: 12.1875rem; /* ~195px emblem hero for spell school detail */
+    --hero-emblem-size: 12.1875rem; /* 195px spell school emblem hero (max width and height) */
   }
 
   @media (width >= 40rem) {

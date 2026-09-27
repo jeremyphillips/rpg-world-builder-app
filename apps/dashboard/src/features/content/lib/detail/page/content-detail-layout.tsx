@@ -131,7 +131,11 @@ export function ContentDetailLayout({
     (statRows && statRows.length > 0 ? <ContentDetailStatRows statRows={statRows} /> : null)
   const showHeroImage = displayImage != null || displayFallback != null
   const heroFrame: ContentMediaImageFrame =
-    mediaPresentation.frame === 'emblem' ? 'emblem' : 'primary'
+    mediaPresentation.frame === 'emblem' && mediaPresentation.size === 'emblem-lg'
+      ? 'emblemHero'
+      : mediaPresentation.frame === 'emblem'
+        ? 'emblem'
+        : 'primary'
   const heroDescriptionText =
     heroDescription && descriptionHtml ? stripHtmlTags(descriptionHtml).trim() : undefined
   const hasBody = Boolean(descriptionContent || children)

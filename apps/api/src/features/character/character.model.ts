@@ -26,7 +26,7 @@ const characterSchema = new Schema(
     feats: { type: [Schema.Types.Mixed], default: [] },
     vital: { type: Schema.Types.Mixed },
   },
-  { timestamps: true },
+  { timestamps: true, minimize: false },
 )
 
 characterSchema.index({ userId: 1, characterType: 1, updatedAt: -1 })

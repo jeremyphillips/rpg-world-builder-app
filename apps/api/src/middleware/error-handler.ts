@@ -34,7 +34,11 @@ export function errorHandler(
         code: 'bad_request',
         message: 'Validation failed',
         details: {
-          issues: err.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+          issues: err.issues.map((i) => ({
+            path: i.path.join('.'),
+            message: i.message,
+            code: i.code,
+          })),
         },
       },
     })

@@ -14,8 +14,8 @@ import { Heading, Text } from '@rpg/ui'
 import { CharacterBuilderValidationAlert } from '../../chrome/character-builder-validation-alert'
 import { characterBuilderStepPanelClasses } from '../../character-builder-shell.variants'
 
-const STEP_VALIDATION_HEADING = formatFieldMessage(
-  characterBuilderValidationMessages.stepIncomplete(),
+const DEFAULT_STEP_VALIDATION_HEADING = formatFieldMessage(
+  characterBuilderValidationMessages.completeRequiredFields(),
 )
 
 export type BuilderStepFrameProps = {
@@ -48,7 +48,7 @@ export function BuilderStepFrame({
 
       <CharacterBuilderValidationAlert
         issues={validationIssues}
-        heading={validationHeading ?? STEP_VALIDATION_HEADING}
+        heading={validationHeading ?? DEFAULT_STEP_VALIDATION_HEADING}
       />
       {children}
     </section>

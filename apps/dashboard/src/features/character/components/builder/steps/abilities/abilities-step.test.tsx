@@ -131,7 +131,7 @@ describe('AbilitiesStep', () => {
     )
 
     expect(screen.getByRole('alert')).toHaveTextContent(
-      formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
+      formatFieldMessage(characterBuilderValidationMessages.completeRequiredFields()),
     )
     expect(screen.getByRole('alert')).toHaveTextContent('Assign a score to every ability.')
     expect(screen.getByRole('alert').textContent).not.toMatch(/\{"f":/)

@@ -1,15 +1,53 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { characterBuilderValidationMessages, formatFieldMessage } from '@rpg/contracts'
 
 import { CharacterBuilderValidationAlert } from '../character-builder-validation-alert'
 
+vi.mock('../../../../lib/builder/resolve-validation-issue-presentation.lib', async () => {
+  const actual = await vi.importActual<
+    typeof import('../../../../lib/builder/resolve-validation-issue-presentation.lib')
+  >('../../../../lib/builder/resolve-validation-issue-presentation.lib')
+
+  return {
+    ...actual,
+    shouldInlineValidationTechnicalDetails: () => false,
+  }
+})
+
 describe('CharacterBuilderValidationAlert', () => {
   it('renders nothing when there are no issues', () => {
     const { container } = render(<CharacterBuilderValidationAlert issues={[]} />)
     expect(container).toBeEmptyDOMElement()
+  })
+
+  it('shows the user-facing message and step context without inline path by default', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <CharacterBuilderValidationAlert
+        issues={[
+          {
+            code: 'invalid_type',
+            message: 'Spell access is required.',
+            path: 'spells.0.access',
+            source: 'api',
+            stepId: 'spells',
+          },
+        ]}
+      />,
+    )
+
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('Spell access is required.')
+    expect(alert).toHaveTextContent('Spells')
+    expect(alert).not.toHaveTextContent('spells.0.access')
+
+    await user.click(screen.getByRole('button', { name: 'Technical details' }))
+    expect(alert).toHaveTextContent('spells.0.access · invalid_type')
   })
 
   it('lists validation issues in an alert', () => {
@@ -32,7 +70,7 @@ describe('CharacterBuilderValidationAlert', () => {
   it('decodes structured validation headings before rendering', () => {
     render(
       <CharacterBuilderValidationAlert
-        heading={characterBuilderValidationMessages.stepIncomplete()}
+        heading={characterBuilderValidationMessages.completeRequiredFields()}
         issues={[
           {
             code: 'abilities_incomplete',
@@ -46,7 +84,7 @@ describe('CharacterBuilderValidationAlert', () => {
 
     const alert = screen.getByRole('alert')
     expect(alert).toHaveTextContent(
-      formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
+      formatFieldMessage(characterBuilderValidationMessages.completeRequiredFields()),
     )
     expect(alert).toHaveTextContent(
       formatFieldMessage(characterBuilderValidationMessages.abilitiesIncomplete()),

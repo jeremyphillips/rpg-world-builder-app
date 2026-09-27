@@ -74,6 +74,49 @@ describe('resolveBuilderCreateFailure', () => {
     })
   })
 
+  it('maps bad_request validation issues to builder validation with step ids', () => {
+    expect(
+      resolveBuilderCreateFailure(
+        new ApiError(400, 'bad_request', 'Validation failed', {
+          issues: [
+            {
+              path: 'spells.0.access',
+              message: 'Invalid input',
+              code: 'invalid_type',
+            },
+            {
+              path: 'vital.status',
+              message: 'Invalid enum value',
+              code: 'invalid_enum_value',
+            },
+          ],
+        }),
+        {
+          context: createStandaloneBuilderContextFixture(),
+          defaultMessage: 'Could not create character.',
+        },
+      ),
+    ).toEqual({
+      kind: 'validation',
+      validationAlertHeading: "We couldn't create this character.",
+      issues: [
+        {
+          code: 'invalid_type',
+          message: 'Invalid input',
+          path: 'spells.0.access',
+          source: 'api',
+          stepId: 'spells',
+        },
+        {
+          code: 'invalid_enum_value',
+          message: 'Invalid enum value',
+          path: 'vital.status',
+          source: 'api',
+        },
+      ],
+    })
+  })
+
   it('falls back to create_error for standalone builds', () => {
     expect(
       resolveBuilderCreateFailure(new Error('Save failed'), {
@@ -101,6 +144,47 @@ describe('resolveBuilderCreateFailure', () => {
 
     expect(setCreateError).toHaveBeenCalledWith(
       'This invitation has expired. Ask the campaign owner to send a new invite.',
+    )
+  })
+
+  it('does not set createError for structured validation outcomes', () => {
+    const setCreateError = vi.fn()
+    const applyValidationIssues = vi.fn()
+
+    applyBuilderCreateFailure(
+      {
+        kind: 'validation',
+        validationAlertHeading: "We couldn't create this NPC.",
+        issues: [
+          {
+            code: 'invalid_type',
+            message: 'Spell access is required.',
+            path: 'spells.0.access',
+            source: 'api',
+            stepId: 'spells',
+          },
+        ],
+      },
+      {
+        applyValidationIssues,
+        patchDraft: vi.fn(),
+        setCampaignEligibilityError: vi.fn(),
+        setCreateError,
+      },
+    )
+
+    expect(setCreateError).not.toHaveBeenCalled()
+    expect(applyValidationIssues).toHaveBeenCalledWith(
+      [
+        {
+          code: 'invalid_type',
+          message: 'Spell access is required.',
+          path: 'spells.0.access',
+          source: 'api',
+          stepId: 'spells',
+        },
+      ],
+      { heading: "We couldn't create this NPC." },
     )
   })
 })

@@ -5,6 +5,7 @@ import {
   type PcCharacter,
 } from '@rpg/contracts'
 
+import { normalizeStoredCharacterRecordForRead } from './lib/normalize-stored-character-for-read.lib'
 import type { CharacterSchemaType } from './character.model'
 
 type CharacterRecord = CharacterSchemaType & {
@@ -16,30 +17,31 @@ type CharacterRecord = CharacterSchemaType & {
 
 /** Maps a lean character document to the API `PcCharacter` DTO. */
 export function toCharacter(doc: CharacterRecord): PcCharacter {
-  const rawVital = doc.vital ?? doc.lifecycle?.vital
+  const normalized = normalizeStoredCharacterRecordForRead(doc)
+  const rawVital = normalized.vital ?? normalized.lifecycle?.vital
 
   return pcCharacterSchema.parse({
-    id: String(doc._id),
+    id: String(normalized._id),
     characterType: 'pc',
-    userId: doc.userId,
-    name: doc.name,
-    media: doc.media ?? undefined,
-    rulesetId: doc.rulesetId,
-    classes: doc.classes,
-    species: doc.species,
-    alignment: doc.alignment,
-    gender: normalizeStoredCharacterGender(doc.gender),
-    xp: doc.xp,
-    abilityScores: doc.abilityScores,
-    hitPoints: doc.hitPoints,
-    proficiencies: doc.proficiencies,
-    spells: doc.spells ?? [],
-    equipment: doc.equipment,
-    wealth: doc.wealth,
-    narrative: doc.narrative ?? undefined,
-    feats: doc.feats ?? [],
+    userId: normalized.userId,
+    name: normalized.name,
+    media: normalized.media ?? undefined,
+    rulesetId: normalized.rulesetId,
+    classes: normalized.classes,
+    species: normalized.species,
+    alignment: normalized.alignment,
+    gender: normalizeStoredCharacterGender(normalized.gender),
+    xp: normalized.xp,
+    abilityScores: normalized.abilityScores,
+    hitPoints: normalized.hitPoints,
+    proficiencies: normalized.proficiencies,
+    spells: normalized.spells ?? [],
+    equipment: normalized.equipment,
+    wealth: normalized.wealth,
+    narrative: normalized.narrative ?? undefined,
+    feats: normalized.feats ?? [],
     vital: normalizeCharacterVital(rawVital),
-    createdAt: doc.createdAt.toISOString(),
-    updatedAt: doc.updatedAt.toISOString(),
+    createdAt: normalized.createdAt.toISOString(),
+    updatedAt: normalized.updatedAt.toISOString(),
   })
 }

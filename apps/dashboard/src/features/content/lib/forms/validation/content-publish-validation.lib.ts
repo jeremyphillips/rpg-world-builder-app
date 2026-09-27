@@ -20,6 +20,7 @@ export function zodIssuesToValidationIssues(issues: ZodIssue[]): ApiValidationIs
   return issues.map((issue) => ({
     path: issue.path.map(String).join('.'),
     message: issue.message,
+    code: issue.code,
   }))
 }
 

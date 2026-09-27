@@ -1,8 +1,12 @@
 import { isApiError } from './errors'
 
+/** Stable issue code for invalid pagination cursors in hand-built API validation payloads. */
+export const INVALID_CURSOR_ISSUE_CODE = 'invalid_cursor'
+
 export type ApiValidationIssue = {
   path: string
   message: string
+  code: string
 }
 
 export type ApiValidationDetails = {
@@ -19,14 +23,17 @@ export function isApiValidationDetails(value: unknown): value is ApiValidationDe
         typeof issue === 'object' &&
         issue !== null &&
         typeof issue.path === 'string' &&
-        typeof issue.message === 'string',
+        typeof issue.message === 'string' &&
+        typeof issue.code === 'string',
     )
   )
 }
 
-/** Returns structured field issues from a `validation_error` ApiError, if present. */
+const API_VALIDATION_ISSUE_ERROR_CODES = new Set(['validation_error', 'bad_request'])
+
+/** Returns structured field issues from API validation payloads, if present. */
 export function getApiValidationIssues(err: unknown): ApiValidationIssue[] | undefined {
-  if (!isApiError(err) || err.code !== 'validation_error') return undefined
+  if (!isApiError(err) || !API_VALIDATION_ISSUE_ERROR_CODES.has(err.code)) return undefined
   if (!isApiValidationDetails(err.details)) return undefined
   return err.details.issues
 }

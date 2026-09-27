@@ -60,7 +60,7 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
       imageName={spell.name}
       displayImage={schoolMedia.displayImage}
       displayFallback={schoolMedia.fallback}
-      mediaPresentation={{ frame: 'emblem', placement: 'start', size: 'emblem-lg' }}
+      mediaPresentation={{ frame: 'emblem', placement: 'end', size: 'emblem-lg' }}
       viewModel={viewModel}
       campaignId={campaignId}
       editHref={contentEditHref('spells', campaignId, spell.id)}

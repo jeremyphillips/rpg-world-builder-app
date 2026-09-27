@@ -116,6 +116,7 @@ export * from './resolvers/proficiency/resolve-proficiency-step-model'
 export * from './readiness/step-readiness'
 export * from './steps'
 export * from './draft/storage-key'
+export { resolveCharacterBuildStepForIssuePath } from '../../character-builder/resolve-character-build-step-for-issue-path'
 export * from './validate/types'
 export { validateCharacterBuild } from './validate/validate-character-build'
 export {

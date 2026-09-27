@@ -9,6 +9,7 @@ export type CharacterBuilderChromeMessages = {
   exitLabel: string
   importLabel: string | null
   reviewValidationHeading: string
+  createValidationFailureHeading: string
   reviewReadyMessage: string
   reviewBlockedMessage: string
   reviewFooterHint: string
@@ -28,6 +29,7 @@ const CHARACTER_BUILDER_CHROME_MESSAGES = {
     exitLabel: 'Exit',
     importLabel: 'Import character',
     reviewValidationHeading: 'Fix the following before creating:',
+    createValidationFailureHeading: "We couldn't create this character.",
     reviewReadyMessage: 'Your character is ready to create.',
     reviewBlockedMessage: 'Resolve the issues above before creating your character.',
     reviewFooterHint: 'Resolve the issues above before creating your character.',
@@ -46,6 +48,7 @@ const CHARACTER_BUILDER_CHROME_MESSAGES = {
     exitLabel: 'Exit',
     importLabel: 'Import NPC',
     reviewValidationHeading: 'Fix the following before adding this NPC:',
+    createValidationFailureHeading: "We couldn't create this NPC.",
     reviewReadyMessage: 'This NPC is ready to add to your campaign.',
     reviewBlockedMessage: 'Resolve the issues above before adding this NPC.',
     reviewFooterHint: 'Resolve the issues above before adding this NPC.',
@@ -64,6 +67,7 @@ const CHARACTER_BUILDER_CHROME_MESSAGES = {
     exitLabel: 'Back to character choice',
     importLabel: null,
     reviewValidationHeading: 'Fix the following before creating your campaign character:',
+    createValidationFailureHeading: "We couldn't create this campaign character.",
     reviewReadyMessage: 'Your campaign character is ready to create.',
     reviewBlockedMessage: 'Resolve the issues above before creating your campaign character.',
     reviewFooterHint: 'Resolve the issues above before creating your campaign character.',

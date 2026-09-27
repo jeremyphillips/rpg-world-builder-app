@@ -40,7 +40,7 @@ export async function createPcRecord(
   })
 
   await character.save({ session: options?.session })
-  return toCharacter(character.toObject() as CharacterRecord)
+  return mapCharacterRecordAfterSave(character.id, toCharacter, options)
 }
 
 export async function createNpcRecord(
@@ -60,7 +60,28 @@ export async function createNpcRecord(
   })
 
   await character.save({ session: options?.session })
-  return toNpcCharacter(character.toObject() as CharacterRecord)
+  return mapCharacterRecordAfterSave(character.id, toNpcCharacter, options)
+}
+
+async function mapCharacterRecordAfterSave<T>(
+  characterId: unknown,
+  map: (doc: CharacterRecord) => T,
+  options?: WithMongoSession,
+): Promise<T> {
+  const reloaded = await CharacterModel.findById(characterId)
+    .session(options?.session ?? null)
+    .lean<CharacterRecord | null>()
+
+  if (!reloaded) {
+    throw new Error('Character document missing after save')
+  }
+
+  try {
+    return map(reloaded)
+  } catch (error) {
+    await CharacterModel.deleteOne({ _id: characterId }).session(options?.session ?? null)
+    throw error
+  }
 }
 
 export async function listPcsForUser(userId: string): Promise<PcCharacter[]> {

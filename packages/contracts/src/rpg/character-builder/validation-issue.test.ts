@@ -15,6 +15,24 @@ describe('characterBuildValidationIssueSchema', () => {
     })
   })
 
+  it('parses an issue with api provenance', () => {
+    expect(
+      characterBuildValidationIssueSchema.parse({
+        code: 'invalid_type',
+        message: 'Invalid input',
+        path: 'spells.0.access',
+        source: 'api',
+        stepId: 'spells',
+      }),
+    ).toEqual({
+      code: 'invalid_type',
+      message: 'Invalid input',
+      path: 'spells.0.access',
+      source: 'api',
+      stepId: 'spells',
+    })
+  })
+
   it('parses an issue with stepId only', () => {
     expect(
       characterBuildValidationIssueSchema.parse({

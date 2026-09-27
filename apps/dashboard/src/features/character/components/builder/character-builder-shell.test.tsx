@@ -169,7 +169,7 @@ describe('CharacterBuilderShell', () => {
       .filter((alert) => alert.textContent?.includes('Assign a score to every ability.'))
     expect(stepAlerts.length).toBeGreaterThan(0)
     expect(stepAlerts[0]).toHaveTextContent(
-      formatFieldMessage(characterBuilderValidationMessages.stepIncomplete()),
+      formatFieldMessage(characterBuilderValidationMessages.completeRequiredFields()),
     )
     expect(screen.getByRole('heading', { name: 'Abilities', level: 2 })).toBeInTheDocument()
     expect(

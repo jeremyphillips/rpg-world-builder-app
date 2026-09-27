@@ -10,6 +10,7 @@ export type ContentMediaImageFrame =
   | 'square'
   | 'insetSm'
   | 'emblem'
+  | 'emblemHero'
 
 /** Matches inherited radio-card / shell `--surface-current` for blend knockouts. */
 export const contentMediaImageSurfaceBackdropClasses =
@@ -25,6 +26,8 @@ export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
       square: cn(identityFrameVariants({ shape: 'box', size: 'xs' }), 'isolate'),
       insetSm: cn(identityFrameVariants({ shape: 'box', size: 'sm' }), 'isolate'),
       emblem: cn(identityFrameVariants({ shape: 'box', size: 'xs' }), 'isolate aspect-square'),
+      emblemHero:
+        'isolate aspect-square size-full max-h-hero-emblem max-w-hero-emblem overflow-hidden',
     },
   },
   defaultVariants: {
@@ -54,4 +57,5 @@ export const contentMediaImageFallbackIconClasses: Record<ContentMediaImageFrame
   builderSheetHero: 'size-icon-glyph-xl',
   intrinsic: 'size-icon-glyph-xl',
   emblem: 'size-icon-glyph-xl',
+  emblemHero: 'size-icon-glyph-xl',
 }

@@ -1,11 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  characterBuilderValidationMessages,
   createEmptyCharacterBuilderDraft,
+  formatFieldMessage,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
@@ -65,13 +67,27 @@ describe('ReviewStep', () => {
             stepId: 'identity',
           },
         ]}
-        validationHeading={chrome.reviewValidationHeading}
+        validationHeading={formatFieldMessage(
+          characterBuilderValidationMessages.completeRequiredFields(),
+        )}
         onNavigateToStep={onNavigateToStep}
       />,
     )
 
-    expect(screen.getByText(chrome.reviewValidationHeading)).toBeInTheDocument()
-    expect(screen.getAllByText('Enter a character name.')).toHaveLength(2)
+    expect(
+      screen.getByText(
+        formatFieldMessage(characterBuilderValidationMessages.completeRequiredFields()),
+      ),
+    ).toBeInTheDocument()
+    const validationAlert = screen
+      .getAllByRole('alert')
+      .find((node) => within(node).queryByText('Enter a character name.'))
+    expect(validationAlert).toBeDefined()
+    expect(within(validationAlert!).queryByText('identity.name')).not.toBeInTheDocument()
+
+    const requiredSection = screen.getByText('Required items').parentElement
+    expect(requiredSection).toBeTruthy()
+    expect(within(requiredSection!).getByText('Enter a character name.')).toBeInTheDocument()
     expect(screen.getByText('Required items')).toBeInTheDocument()
     expect(screen.getByText('Choose Skills')).toBeInTheDocument()
     expect(screen.getByText('Advisory notes')).toBeInTheDocument()
@@ -100,7 +116,9 @@ describe('ReviewStep', () => {
         draft={draft}
         preview={null}
         resolvedChoiceSets={[]}
-        validationHeading={chrome.reviewValidationHeading}
+        validationHeading={formatFieldMessage(
+          characterBuilderValidationMessages.completeRequiredFields(),
+        )}
         onNavigateToStep={vi.fn()}
       />,
     )
@@ -131,7 +149,9 @@ describe('ReviewStep', () => {
         draft={draft}
         preview={null}
         resolvedChoiceSets={[]}
-        validationHeading={chrome.reviewValidationHeading}
+        validationHeading={formatFieldMessage(
+          characterBuilderValidationMessages.completeRequiredFields(),
+        )}
         onNavigateToStep={vi.fn()}
       />,
     )
@@ -154,7 +174,9 @@ describe('ReviewStep', () => {
             stepId: 'identity',
           },
         ]}
-        validationHeading={chrome.reviewValidationHeading}
+        validationHeading={formatFieldMessage(
+          characterBuilderValidationMessages.completeRequiredFields(),
+        )}
         onNavigateToStep={vi.fn()}
       />,
     )

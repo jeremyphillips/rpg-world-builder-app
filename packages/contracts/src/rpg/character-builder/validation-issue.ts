@@ -17,6 +17,7 @@ export const characterBuildValidationIssueSchema = z
     stepId: characterBuilderStepIdSchema.optional(),
     choiceSetId: z.string().min(1).optional(),
     allowanceId: z.string().min(1).optional(),
+    source: z.literal('api').optional(),
   })
   .superRefine((issue, ctx) => {
     const referenceCount = [issue.stepId, issue.choiceSetId, issue.allowanceId].filter(

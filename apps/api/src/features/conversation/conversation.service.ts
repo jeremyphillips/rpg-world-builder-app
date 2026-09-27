@@ -1,10 +1,11 @@
-import type {
-  Conversation,
-  ConversationListResponse,
-  DirectConversationRecipientsResponse,
-  DirectMessage,
-  MessageListResponse,
-  SendFirstDirectMessageInput,
+import {
+  INVALID_CURSOR_ISSUE_CODE,
+  type Conversation,
+  type ConversationListResponse,
+  type DirectConversationRecipientsResponse,
+  type DirectMessage,
+  type MessageListResponse,
+  type SendFirstDirectMessageInput,
 } from '@rpg/contracts'
 
 import { HttpError } from '../../lib/http-error'
@@ -167,7 +168,7 @@ export async function listConversations(
     const decoded = decodeConversationCursor(options.cursor)
     if (!decoded) {
       throw HttpError.badRequest('Validation failed', {
-        issues: [{ path: 'cursor', message: 'Invalid cursor.' }],
+        issues: [{ path: 'cursor', message: 'Invalid cursor.', code: INVALID_CURSOR_ISSUE_CODE }],
       })
     }
   }
@@ -230,7 +231,7 @@ export async function listConversationMessages(
     const decoded = decodeMessageCursor(options.cursor)
     if (!decoded) {
       throw HttpError.badRequest('Validation failed', {
-        issues: [{ path: 'cursor', message: 'Invalid cursor.' }],
+        issues: [{ path: 'cursor', message: 'Invalid cursor.', code: INVALID_CURSOR_ISSUE_CODE }],
       })
     }
   }

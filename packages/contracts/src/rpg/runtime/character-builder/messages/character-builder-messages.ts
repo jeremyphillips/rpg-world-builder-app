@@ -20,6 +20,10 @@ export const characterBuilderValidationMessages = {
     'validation.characterBuilder.stepIncomplete',
     () => 'Complete this step before continuing.',
   ),
+  completeRequiredFields: defineMessage(
+    'validation.characterBuilder.completeRequiredFields',
+    () => 'Complete the required fields',
+  ),
   nameRequired: defineMessage(
     'validation.characterBuilder.nameRequired',
     () => 'Enter a character name.',

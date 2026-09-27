@@ -19,6 +19,7 @@ export function validate(schema: ZodType, source: Source = 'body') {
           issues: result.error.issues.map((issue) => ({
             path: issue.path.join('.'),
             message: issue.message,
+            code: issue.code,
           })),
         }),
       )
